@@ -60,6 +60,7 @@ void register_procon_tables(){
         ControllerCommandTable::make_row<ProControllerStateRow>,
         {
             "Milliseconds",
+            "Action",
             "Buttons",
             "Dpad",
             "Left JS (X)",
@@ -70,11 +71,20 @@ void register_procon_tables(){
     );
 }
 
-
+ProControllerStateRow::~ProControllerStateRow(){
+    DURATION.remove_listener(*this);
+    BUTTONS.remove_listener(*this);
+    DPAD.remove_listener(*this);
+    LEFT_JOYSTICK_X.remove_listener(*this);
+    LEFT_JOYSTICK_Y.remove_listener(*this);
+    RIGHT_JOYSTICK_X.remove_listener(*this);
+    RIGHT_JOYSTICK_Y.remove_listener(*this);
+}
 
 ProControllerStateRow::ProControllerStateRow(EditableTableOption& parent_table)
     : ControllerStateRow(parent_table)
     , DURATION(LockMode::LOCK_WHILE_RUNNING, "200 ms")
+    , ACTION(false, LockMode::UNLOCK_WHILE_RUNNING, "", "")
     , BUTTONS(
         "",
         ProController_Button_Database(),
@@ -92,12 +102,26 @@ ProControllerStateRow::ProControllerStateRow(EditableTableOption& parent_table)
     , RIGHT_JOYSTICK_Y(LockMode::UNLOCK_WHILE_RUNNING, 128, 0, 255)
 {
     PA_ADD_OPTION(DURATION);
+    PA_ADD_OPTION(ACTION);
     PA_ADD_OPTION(BUTTONS);
     PA_ADD_OPTION(DPAD);
     PA_ADD_OPTION(LEFT_JOYSTICK_X);
     PA_ADD_OPTION(LEFT_JOYSTICK_Y);
     PA_ADD_OPTION(RIGHT_JOYSTICK_X);
     PA_ADD_OPTION(RIGHT_JOYSTICK_Y);
+
+    ACTION.set_locked(true);
+
+    ProControllerStateRow::on_config_value_changed(this);
+    DURATION.add_listener(*this);
+    BUTTONS.add_listener(*this);
+    DPAD.add_listener(*this);
+    LEFT_JOYSTICK_X.add_listener(*this);
+    LEFT_JOYSTICK_Y.add_listener(*this);
+    RIGHT_JOYSTICK_X.add_listener(*this);
+    RIGHT_JOYSTICK_Y.add_listener(*this);
+
+    // ACTION.set_visibility(ConfigOptionState::DISABLED);
 }
 
 std::unique_ptr<EditableTableRow> ProControllerStateRow::clone() const{
@@ -116,9 +140,14 @@ void ProControllerStateRow::load_json(const JsonValue& json){
     const JsonObject& obj = json.to_object_throw();
 
     do{
-        const std::string* duration = obj.get_string("ms");
-        if (duration != nullptr){
-            DURATION.load_json(*duration);
+        uint64_t duration;
+        if (obj.read_integer(duration, "ms")){
+            DURATION.set(std::to_string(duration));
+            break;
+        }
+        const std::string* duration_str = obj.get_string("ms");
+        if (duration_str != nullptr){
+            DURATION.load_json(*duration_str);
             break;
         }
         DURATION.set(std::to_string(obj.get_integer_throw("duration_in_ms")));
@@ -158,6 +187,48 @@ std::unique_ptr<ControllerState> ProControllerStateRow::get_state(Milliseconds& 
     return ret;
 }
 
+void ProControllerStateRow::on_config_value_changed(void* object){
+    ProControllerState state;
+    get_state(state);
+
+    ACTION.set(get_controller_action(state));
+}
+
+
+std::string get_controller_action(ProControllerState& state){
+    std::string action = "";
+
+    if (state.buttons != BUTTON_NONE){
+        action += "Button";
+    }
+    if (state.dpad != DPAD_NONE){
+        if (action != ""){
+            action += ", ";
+        }
+        action += "Dpad";
+    }
+    if (state.left_x != STICK_CENTER || state.left_y != STICK_CENTER){
+        if (action != ""){
+            action += ", ";
+        }
+        action += "L-stick";
+        action += " " + get_joystick_direction(state.left_x, state.left_y);
+        
+    }
+    if (state.right_x != STICK_CENTER || state.right_y != STICK_CENTER){
+        if (action != ""){
+            action += ", ";
+        }
+        action += "R-stick";
+        action += " " + get_joystick_direction(state.right_x, state.right_y);
+    }
+
+    if (action == ""){
+        return "Wait";
+    }
+
+    return action;
+}
 
 
 

@@ -11,6 +11,7 @@
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/CheckboxDropdownOption.h"
+#include "Common/Cpp/Options/StringOption.h"
 #include "Controllers/ControllerStateTable.h"
 #include "NintendoSwitch_ProControllerState.h"
 
@@ -19,8 +20,9 @@ namespace NintendoSwitch{
 
 
 
-class ProControllerStateRow : public ControllerStateRow{
+class ProControllerStateRow : public ControllerStateRow, public ConfigOption::Listener{
 public:
+    ~ProControllerStateRow();
     ProControllerStateRow(EditableTableOption& parent_table);
 
     virtual std::unique_ptr<EditableTableRow> clone() const override;
@@ -31,9 +33,13 @@ public:
     void get_state(ProControllerState& state) const;
     virtual std::unique_ptr<ControllerState> get_state(Milliseconds& duration) const override;
 
+private:
+    virtual void on_config_value_changed(void* object) override;
+
 
 private:
     MillisecondsCell DURATION;
+    StringCell ACTION;
     CheckboxDropdownCell<Button> BUTTONS;
     EnumDropdownCell<DpadPosition> DPAD;
     SimpleIntegerCell<uint8_t> LEFT_JOYSTICK_X;
@@ -45,6 +51,7 @@ private:
 
 void register_procon_tables();
 
+std::string get_controller_action(ProControllerState& state);
 
 
 }

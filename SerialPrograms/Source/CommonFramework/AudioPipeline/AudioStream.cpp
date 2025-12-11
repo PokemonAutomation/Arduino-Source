@@ -171,7 +171,7 @@ void AudioFloatToStream::on_samples(const float* data, size_t frames){
         return;
     }
     if (m_format == AudioSampleFormat::FLOAT32){
-        m_listeners.run_method_unique(
+        m_listeners.run_method(
             &StreamListener::on_objects,
             data, frames
         );
@@ -196,7 +196,7 @@ void AudioFloatToStream::on_samples(const float* data, size_t frames){
         default:
             return;
         }
-        m_listeners.run_method_unique(
+        m_listeners.run_method(
             &StreamListener::on_objects,
             m_buffer.data(), block
         );

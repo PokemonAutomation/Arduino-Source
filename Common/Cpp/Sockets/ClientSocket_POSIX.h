@@ -120,7 +120,7 @@ private:
     }
 
     void thread_loop_internal(const std::string& address, uint16_t port){
-        m_listeners.run_method_unique(&Listener::on_thread_start);
+        m_listeners.run_method(&Listener::on_thread_start);
 
         {
             std::unique_lock<std::mutex> lg(m_lock);
@@ -155,13 +155,13 @@ private:
                     m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
                     m_error = "Connection timed out.";
                     m_lock.unlock();
-                    m_listeners.run_method_unique(&Listener::on_connect_finished, m_error);
+                    m_listeners.run_method(&Listener::on_connect_finished, m_error);
                     return;
                 default:
                     m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
                     m_error = "WSA Error Code: " + std::to_string(error);
                     m_lock.unlock();
-                    m_listeners.run_method_unique(&Listener::on_connect_finished, m_error);
+                    m_listeners.run_method(&Listener::on_connect_finished, m_error);
                     return;
                 }
 
@@ -173,7 +173,7 @@ Connected:
             m_state.store(State::CONNECTED, std::memory_order_relaxed);
         }
 
-        m_listeners.run_method_unique(&Listener::on_connect_finished, "");
+        m_listeners.run_method(&Listener::on_connect_finished, "");
 
 
         constexpr size_t BUFFER_SIZE = 4096;
@@ -195,7 +195,7 @@ Connected:
             }
 
             if (bytes > 0){
-                m_listeners.run_method_unique(&Listener::on_receive_data, buffer, bytes);
+                m_listeners.run_method(&Listener::on_receive_data, buffer, bytes);
                 continue;
             }
 

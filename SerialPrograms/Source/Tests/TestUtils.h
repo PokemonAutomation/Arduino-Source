@@ -64,23 +64,23 @@ public:
     virtual State state() const override { return State::RUNNING; }
     virtual size_t queue_limit() const override { return PABB_DEVICE_MINIMUM_QUEUE_SIZE; }
 
-    virtual void notify_all() override{}
+    virtual void on_cancellable_cancel() override{}
 
-    virtual void wait_for_all_requests(const Cancellable* cancelled = nullptr) override {}
+    virtual void wait_for_all_requests(Cancellable* cancelled = nullptr) override {}
     virtual void stop_all_commands() override {}
     virtual void next_command_interrupt() override {};
 
     virtual bool try_issue_request(
         const BotBaseRequest& request,
-        const Cancellable* cancelled = nullptr
+        Cancellable* cancelled = nullptr
     ) override { return true; }
     virtual void issue_request(
         const BotBaseRequest& request,
-        const Cancellable* cancelled = nullptr
+        Cancellable* cancelled = nullptr
     ) override {}
     virtual BotBaseMessage issue_request_and_wait(
         const BotBaseRequest& request,
-        const Cancellable* cancelled = nullptr
+        Cancellable* cancelled = nullptr
     ) override { return BotBaseMessage(0, ""); }
 
     Logger& m_logger;

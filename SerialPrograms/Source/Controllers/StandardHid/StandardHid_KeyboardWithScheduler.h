@@ -52,12 +52,12 @@ public:
     //  Superscalar Commands (the "ssf" framework)
 
     void issue_key(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         KeyboardKey key
     );
     void issue_keys(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         const std::vector<KeyboardKey>& keys
     );

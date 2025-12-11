@@ -56,7 +56,8 @@ WildZoneOption::WildZoneOption()
                 {WildZone::WILD_ZONE_17, "wild-zone-17", "Wild Zone 17"},
                 {WildZone::WILD_ZONE_18, "wild-zone-18", "Wild Zone 18"},
                 {WildZone::WILD_ZONE_19, "wild-zone-19", "Wild Zone 19"},
-                {WildZone::WILD_ZONE_20, "wild-zone-20", "Wild Zone 20"},
+                {WildZone::WILD_ZONE_20_NO_DISTORTION, "wild-zone-20", "Wild Zone 20 Without Distortion"},
+                {WildZone::WILD_ZONE_20_WITH_DISTORTION, "wild-zone-20-distortion", "Wild Zone 20 With Distortion"},
             },
             LockMode::LOCK_WHILE_RUNNING,
             WildZone::WILD_ZONE_1
@@ -567,6 +568,7 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
                     env.console.overlay().add_log("Error Found. Reset Game", COLOR_RED);
                     go_home(env.console, context);
                     reset_game_from_home(env, env.console, context);
+                    to_max_zoom_level_on_map = true; // map zoom level reset after game reset
                 }
                 send_program_status_notification(env, NOTIFICATION_STATUS);
             }

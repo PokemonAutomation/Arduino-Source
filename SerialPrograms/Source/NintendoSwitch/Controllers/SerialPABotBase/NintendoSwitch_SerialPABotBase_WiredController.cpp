@@ -77,7 +77,7 @@ void SerialPABotBase_WiredController::stop(){
 
 
 void SerialPABotBase_WiredController::execute_state(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     const SuperscalarScheduler::ScheduleEntry& entry
 ){
     if (!is_ready()){

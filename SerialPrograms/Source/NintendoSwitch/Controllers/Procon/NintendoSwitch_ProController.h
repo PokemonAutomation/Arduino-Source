@@ -83,58 +83,58 @@ public:
     //  This command will wait until all the selected buttons are ready to
     //  ensure that they are all dispatched simultaneously.
     virtual void issue_buttons(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         Button button
     ) = 0;
 
     //  Dpad
     virtual void issue_dpad(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         DpadPosition position
     ) = 0;
 
     //  Joysticks
     virtual void issue_left_joystick(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         uint8_t x, uint8_t y
     ) = 0;
     virtual void issue_right_joystick(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         uint8_t x, uint8_t y
     ) = 0;
 
     //  Gyro: Accelerometer (experimental - API subject to change)
     virtual void issue_gyro_accel_x(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
     ) = 0;
     virtual void issue_gyro_accel_y(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
     ) = 0;
     virtual void issue_gyro_accel_z(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
     ) = 0;
     virtual void issue_gyro_rotate_x(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
     ) = 0;
     virtual void issue_gyro_rotate_y(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
     ) = 0;
     virtual void issue_gyro_rotate_z(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
     ) = 0;
@@ -159,7 +159,7 @@ public:
     //  overloads to this and gate them behind features.
     //
     virtual void issue_full_controller_state(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         bool enable_logging,
         Milliseconds duration,
         Button button,
@@ -184,7 +184,7 @@ public:
 
     //  Mash a button as quickly as possible.
     virtual void issue_mash_button(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds duration,
         Button button
     ) = 0;
@@ -193,7 +193,7 @@ public:
     //  "button0" will always be pressed first.
     //  Both buttons will be pressed at least once.
     virtual void issue_mash_button(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds duration,
         Button button0, Button button1
     ) = 0;
@@ -202,7 +202,7 @@ public:
     //  them to logically mash A much faster than is possible with just one
     //  button.
     virtual void issue_mash_AZs(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds duration
     ) = 0;
 
@@ -217,7 +217,7 @@ public:
     //  time.
     //
     virtual void issue_system_scroll(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         DpadPosition direction  //  Diagonals not allowed.
     ) = 0;

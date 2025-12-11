@@ -97,8 +97,8 @@ void AudioSession::set(const AudioOption& option){
 
     signal_post_input_change();
     signal_post_output_change();
-    m_listeners.run_method_unique(&StateListener::post_volume_change, m_option.volume());
-    m_listeners.run_method_unique(&StateListener::post_display_change, m_option.m_display_type);
+    m_listeners.run_method(&StateListener::post_volume_change, m_option.volume());
+    m_listeners.run_method(&StateListener::post_display_change, m_option.m_display_type);
 }
 std::pair<std::string, AudioDeviceInfo> AudioSession::input_device() const{
     std::lock_guard<std::mutex> lg(m_lock);
@@ -199,7 +199,7 @@ void AudioSession::set_volume(double volume){
         m_devices->set_sink_volume(volume);
         m_option.m_volume = volume;
     }
-    m_listeners.run_method_unique(&StateListener::post_volume_change, m_option.volume());
+    m_listeners.run_method(&StateListener::post_volume_change, m_option.volume());
 }
 void AudioSession::set_display(AudioOption::AudioDisplayType display){
     {
@@ -209,7 +209,7 @@ void AudioSession::set_display(AudioOption::AudioDisplayType display){
         }
         m_option.m_display_type = display;
     }
-    m_listeners.run_method_unique(&StateListener::post_display_change, m_option.m_display_type);
+    m_listeners.run_method(&StateListener::post_display_change, m_option.m_display_type);
 }
 
 bool AudioSession::sanitize_format(){
@@ -241,10 +241,10 @@ bool AudioSession::sanitize_format(){
     return true;
 }
 void AudioSession::signal_pre_input_change(){
-    m_listeners.run_method_unique(&StateListener::pre_input_change);
+    m_listeners.run_method(&StateListener::pre_input_change);
 }
 void AudioSession::signal_post_input_change(){
-    m_listeners.run_method_unique(
+    m_listeners.run_method(
         &StateListener::post_input_change,
         m_option.input_file(),
         m_option.input_device(),
@@ -252,7 +252,7 @@ void AudioSession::signal_post_input_change(){
     );
 }
 void AudioSession::signal_post_output_change(){
-    m_listeners.run_method_unique(&StateListener::post_output_change, m_option.output_device());
+    m_listeners.run_method(&StateListener::post_output_change, m_option.output_device());
 }
 
 

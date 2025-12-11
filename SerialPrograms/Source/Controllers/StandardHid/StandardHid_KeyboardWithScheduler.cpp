@@ -12,7 +12,7 @@ namespace StandardHid{
 
 
 void KeyboardControllerWithScheduler::issue_key(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
     KeyboardKey key
 ){
@@ -39,7 +39,7 @@ void KeyboardControllerWithScheduler::issue_key(
     }
 }
 void KeyboardControllerWithScheduler::issue_keys(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
     const std::vector<KeyboardKey>& keys
 ){

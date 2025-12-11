@@ -76,21 +76,21 @@ public:
 public:
     //  Superscalar Commands (the "ssf" framework)
 
-    virtual void issue_barrier(const Cancellable* cancellable) override{
+    virtual void issue_barrier(Cancellable* cancellable) override{
         KeyboardControllerWithScheduler::issue_barrier(cancellable);
     }
-    virtual void issue_nop(const Cancellable* cancellable, Milliseconds duration) override{
+    virtual void issue_nop(Cancellable* cancellable, Milliseconds duration) override{
         KeyboardControllerWithScheduler::issue_nop(cancellable, duration);
     }
     virtual void issue_key(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         KeyboardKey key
     ) override{
         KeyboardControllerWithScheduler::issue_key(cancellable, delay, hold, cooldown, key);
     }
     virtual void issue_keys(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         const std::vector<KeyboardKey>& keys
     ) override{
@@ -112,12 +112,12 @@ public:
     virtual void cancel_all_commands() override;
     virtual void replace_on_next_command() override;
 
-    virtual void wait_for_all(const Cancellable* cancellable) override;
+    virtual void wait_for_all(Cancellable* cancellable) override;
 
 
 private:
     virtual void execute_state(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         const SuperscalarScheduler::ScheduleEntry& entry
     ) override;
 

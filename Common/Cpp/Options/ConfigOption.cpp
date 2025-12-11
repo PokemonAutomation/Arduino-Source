@@ -115,17 +115,17 @@ void ConfigOption::set_visibility(ConfigOptionState visibility){
 void ConfigOption::report_visibility_changed(){
     auto scope = m_lifetime_sanitizer.check_scope();
     Data& data = *m_data;
-    data.listeners.run_method_unique(&Listener::on_config_visibility_changed);
+    data.listeners.run_method(&Listener::on_config_visibility_changed);
 }
 void ConfigOption::report_program_state(bool program_is_running){
     auto scope = m_lifetime_sanitizer.check_scope();
     Data& data = *m_data;
-    data.listeners.run_method_unique(&Listener::on_program_state_changed, program_is_running);
+    data.listeners.run_method(&Listener::on_program_state_changed, program_is_running);
 }
 void ConfigOption::report_value_changed(void* object){
     auto scope = m_lifetime_sanitizer.check_scope();
     Data& data = *m_data;
-    data.listeners.run_method_unique(&Listener::on_config_value_changed, object);
+    data.listeners.run_method(&Listener::on_config_value_changed, object);
 }
 
 

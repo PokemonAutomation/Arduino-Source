@@ -49,7 +49,7 @@ def extract_circular_region(image, center_x, center_y, radius, cursor_radius=0):
     cropped = masked_image[y_min:y_max, x_min:x_max]
     cropped_mask = mask[y_min:y_max, x_min:x_max]
 
-    return cropped, cropped_mask, (x_min, y_min)
+    return cropped, cropped_mask
 
 
 def compute_phase_correlation(img1, mask1, img2, mask2, use_hanning=True):
@@ -242,14 +242,14 @@ Examples:
     )
     parser.add_argument('image1', help='Path to first image')
     parser.add_argument('image2', help='Path to second image')
-    parser.add_argument('--center-x', type=int, default=200,
-                        help='X coordinate of circle center (default: 200)')
-    parser.add_argument('--center-y', type=int, default=200,
-                        help='Y coordinate of circle center (default: 200)')
-    parser.add_argument('--radius', type=int, default=150,
-                        help='Radius of circular region (default: 150)')
-    parser.add_argument('--cursor-radius', type=int, default=0,
-                        help='Radius of cursor at center to mask out (default: 0, no masking)')
+    parser.add_argument('--center-x', type=int, default=180,
+                        help='X coordinate of circle center (default: 180)')
+    parser.add_argument('--center-y', type=int, default=180,
+                        help='Y coordinate of circle center (default: 180)')
+    parser.add_argument('--radius', type=int, default=120,
+                        help='Radius of circular region (default: 120)')
+    parser.add_argument('--cursor-radius', type=int, default=50,
+                        help='Radius of cursor at center to mask out (default: 50)')
     parser.add_argument('--output', default='phase_correlation_result.png',
                         help='Output image path (default: phase_correlation_result.png)')
     parser.add_argument('--no-hanning', action='store_true',
@@ -279,10 +279,10 @@ Examples:
     print()
 
     # Extract circular regions
-    crop1, mask1, offset1 = extract_circular_region(
+    crop1, mask1 = extract_circular_region(
         img1, args.center_x, args.center_y, args.radius, args.cursor_radius
     )
-    crop2, mask2, offset2 = extract_circular_region(
+    crop2, mask2 = extract_circular_region(
         img2, args.center_x, args.center_y, args.radius, args.cursor_radius
     )
 

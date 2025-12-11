@@ -75,7 +75,7 @@ void ProController_SysbotBase::replace_on_next_command(){
 }
 
 
-void ProController_SysbotBase::wait_for_all(const Cancellable* cancellable){
+void ProController_SysbotBase::wait_for_all(Cancellable* cancellable){
 //    cout << "ProController_SysbotBase::wait_for_all - Enter()" << endl;
     SuperscalarScheduler::Schedule schedule;
     std::lock_guard<std::mutex> lg0(m_issue_lock);
@@ -96,7 +96,7 @@ void ProController_SysbotBase::wait_for_all(const Cancellable* cancellable){
 //    cout << "ProController_SysbotBase::wait_for_all - Exit()" << endl;
 }
 void ProController_SysbotBase::execute_state(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     const SuperscalarScheduler::ScheduleEntry& entry
 ){
     if (cancellable){
