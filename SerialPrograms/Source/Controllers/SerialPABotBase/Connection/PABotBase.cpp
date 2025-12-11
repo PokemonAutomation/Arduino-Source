@@ -965,7 +965,12 @@ void PABotBase::cv_wait(Cancellable* cancellable, std::unique_lock<std::mutex>& 
 
     cancellable->add_cancel_listener(*this);
     m_cv.wait(lg);
+
+    //  Unlock to remove. Otherwise, it may deadlock with "on_cancellable_cancel()"
+    //  being called from a listener callback.
+    lg.unlock();
     cancellable->remove_cancel_listener(*this);
+    lg.lock();
 }
 
 
