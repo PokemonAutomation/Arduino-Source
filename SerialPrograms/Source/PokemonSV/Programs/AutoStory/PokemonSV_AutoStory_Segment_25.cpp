@@ -112,6 +112,10 @@ void checkpoint_59(
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
         context.wait_for_all_requests();
+
+        env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 180, 130});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 70, 130});
         
         // marker 1  {0.795312, 0.626852}
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
