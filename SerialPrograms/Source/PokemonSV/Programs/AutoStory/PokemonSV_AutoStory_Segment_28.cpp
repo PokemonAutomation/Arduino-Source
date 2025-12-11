@@ -281,12 +281,12 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         if (ret < 0){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Team Star Poison: Failed to kill 30 pokemon with Let's go.",
+                "Team Star Fairy: Failed to kill 30 pokemon with Let's go.",
                 env.console
             );            
         }
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
-        env.console.log("Battle the Team Star (Poison) boss.");
+        env.console.log("Battle the Team Star (Fairy) boss.");
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
