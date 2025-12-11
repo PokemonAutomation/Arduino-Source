@@ -103,7 +103,7 @@ void checkpoint_64(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
         context.wait_for_all_requests();
-        move_from_glaseado_mountain_to_casseroya_watchtower3(env, context);
+        move_from_glaseado_mountain_to_casseroya_watchtower3(env, context, attempt_number);
 
     });         
 }
@@ -140,13 +140,16 @@ void checkpoint_67(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
 
-void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t attempt_number){
     context.wait_for_all_requests();
 
     DirectionDetector direction;
-    env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-    move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 100, 255, 60});
-    move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 0, 60});
+    if (attempt_number >= 0){
+        day_skip_from_overworld(env.console, context);
+        env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 100, 255, 60});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 0, 60});
+    }
 
     direction.change_direction(env.program_info(), env.console, context, 1.448679);
 

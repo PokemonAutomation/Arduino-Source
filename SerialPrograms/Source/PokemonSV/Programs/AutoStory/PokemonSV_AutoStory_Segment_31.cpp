@@ -109,7 +109,7 @@ void AutoStory_Checkpoint_82::run_checkpoint(SingleSwitchProgramEnvironment& env
 void checkpoint_78(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
-        move_from_north_province_area_one_to_north_province_area_two(env, context);
+        move_from_north_province_area_one_to_north_province_area_two(env, context, attempt_number);
 
     });   
 }
@@ -126,7 +126,7 @@ void checkpoint_79(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 void checkpoint_80(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
-        beat_team_star_fighting1(env, context);
+        beat_team_star_fighting1(env, context, attempt_number);
         beat_team_star_fighting2(env, context);
     });
 }
@@ -149,12 +149,14 @@ void checkpoint_82(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
 
-void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t attempt_number){
     DirectionDetector direction;
-    env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-    move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 100});
-    move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 100});
-
+    if (attempt_number >= 0){
+        day_skip_from_overworld(env.console, context);
+        env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 100});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 100});
+    }
 
     do_action_and_monitor_for_battles(env.program_info(), env.console, context,
     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -332,12 +334,14 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
 }
 
 
-void beat_team_star_fighting1(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void beat_team_star_fighting1(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t attempt_number){
 
-    env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-    move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 80});
-    move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 80});
-
+    if (attempt_number >= 0){
+        day_skip_from_overworld(env.console, context);
+        env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 80});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 80});
+    }
 
     // marker 1
     realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 190, 30);

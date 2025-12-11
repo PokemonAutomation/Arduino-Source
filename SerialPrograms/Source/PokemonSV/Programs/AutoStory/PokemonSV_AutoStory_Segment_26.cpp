@@ -100,9 +100,12 @@ void checkpoint_61(
     [&](size_t attempt_number){
 
         // first, clear Pokemon in Minimap.
-        env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
+        if (attempt_number >= 0){
+            day_skip_from_overworld(env.console, context);
+            env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
+        }
 
         // marker 1   keep{0.490625, 0.594444}  in{0.589583, 0.569444} 
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
@@ -170,6 +173,7 @@ void checkpoint_62(
 
 
         DirectionDetector direction;
+        env.console.log("Fly back to Medali East Pokecenter");
         env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap. End up in Medal East Pokecenter.");
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 128, 30}, FlyPoint::POKECENTER);
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 0, 0});

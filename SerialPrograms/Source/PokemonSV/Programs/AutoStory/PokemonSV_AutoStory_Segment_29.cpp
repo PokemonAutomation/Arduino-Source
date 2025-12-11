@@ -104,8 +104,12 @@ void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     [&](size_t attempt_number){
         DirectionDetector direction;
 
-        env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-        
+        if (attempt_number >= 0){
+            day_skip_from_overworld(env.console, context);
+            env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+
+            // todo:
+        }
         // place down marker as a workaround with an issue with fly_to_overworld_from_map
         // fly_to_overworld_from_map() will fail since the snowy background on the map will false positive the destinationMenuItemWatcher (MapDestinationMenuDetector at box {0.523000, 0.680000, 0.080000, 0.010000}), which causes the fly to fail
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 

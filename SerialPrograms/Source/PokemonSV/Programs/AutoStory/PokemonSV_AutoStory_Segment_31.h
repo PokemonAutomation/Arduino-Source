@@ -93,10 +93,10 @@ void checkpoint_82(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
 // moves player from North Province Area One to Team Star Fighting base
-void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t attempt_number);
 
 
-void beat_team_star_fighting1(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+void beat_team_star_fighting1(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t attempt_number);
 
 void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
