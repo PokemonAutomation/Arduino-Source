@@ -56,7 +56,6 @@ void AutoStory_Segment_32::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    AutoStory_Checkpoint_82().run_checkpoint(env, context, options, stats);
     AutoStory_Checkpoint_83().run_checkpoint(env, context, options, stats);
     AutoStory_Checkpoint_84().run_checkpoint(env, context, options, stats);
 
@@ -66,17 +65,10 @@ void AutoStory_Segment_32::run_segment(
 }
 
 
-std::string AutoStory_Checkpoint_82::name() const{ return "082 - " + AutoStory_Segment_32().name(); }
-std::string AutoStory_Checkpoint_82::start_text() const{ return "At North Province Area Two Pokecenter";}
-std::string AutoStory_Checkpoint_82::end_text() const{ return "At Alfornada Pokecenter.";}
-void AutoStory_Checkpoint_82::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-    checkpoint_82(env, context, options.notif_status_update, stats);
-}
-
 
 std::string AutoStory_Checkpoint_83::name() const{ return "083 - " + AutoStory_Segment_32().name(); }
-std::string AutoStory_Checkpoint_83::start_text() const{ return AutoStory_Checkpoint_82().end_text();}
-std::string AutoStory_Checkpoint_83::end_text() const{ return "At Alfornada gym building. Spoke to receptionist.";}
+std::string AutoStory_Checkpoint_83::start_text() const{ return "At Alfornada Pokecenter.";}
+std::string AutoStory_Checkpoint_83::end_text() const{ return "At Alfornada Pokecenter.";}
 void AutoStory_Checkpoint_83::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_83(env, context, options.notif_status_update, stats);
 }
@@ -91,18 +83,16 @@ void AutoStory_Checkpoint_84::run_checkpoint(SingleSwitchProgramEnvironment& env
 
 
 
-void checkpoint_82(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+void checkpoint_83(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
-
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, 170, 550}, FlyPoint::POKECENTER);
-        move_from_west_province_area_one_north_to_alfornada(env, context);
+        // empty checkpoint
 
 
     });  
 }
 
-void checkpoint_83(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
         DirectionDetector direction;
@@ -170,19 +160,11 @@ void checkpoint_83(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
 
-    });  
-}
-
-void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](size_t attempt_number){
         pbf_move_left_joystick(context, 128, 255, 400, 100);
         pbf_wait(context, 3 * TICKS_PER_SECOND);        
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
-        DirectionDetector direction;
-        // we just hope the minimap Direction isn't covered
 
         direction.change_direction(env.program_info(), env.console, context, 4.413989);
         pbf_move_left_joystick(context, 128, 0, 180, 50);
