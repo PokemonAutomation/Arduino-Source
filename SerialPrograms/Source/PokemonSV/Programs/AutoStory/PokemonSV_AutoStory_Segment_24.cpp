@@ -180,6 +180,7 @@ void checkpoint_56(
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             
             DirectionDetector direction;
+            // we hope minimap is clear of Pokemon, after Orthworm phase 1
 
             direction.change_direction(env.program_info(), env.console, context, 5.042435);
             pbf_move_left_joystick(context, 128, 0, 900, 100);

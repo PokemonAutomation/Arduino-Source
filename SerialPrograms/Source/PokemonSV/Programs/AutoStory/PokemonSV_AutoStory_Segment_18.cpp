@@ -257,7 +257,7 @@ void checkpoint_40(
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 180, 90);
 
         DirectionDetector direction;
-        // recently flew a significant distance, so minimap should be clear of Pokemon
+        // recently flew a significant distance, so minimap should be clear of Pokemon, or at least the Pokemon have been reset
         
         direction.change_direction(env.program_info(), env.console, context, 5.60);
 
