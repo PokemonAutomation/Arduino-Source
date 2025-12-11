@@ -168,15 +168,14 @@ void checkpoint_62(
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
-        // fly to Medali East Pokecenter
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 255, 128, 20}, FlyPoint::POKECENTER);
-
-        pbf_press_button(context, BUTTON_L, 50, 50);
 
         DirectionDetector direction;
-        env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
+        env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap. End up in Medal East Pokecenter.");
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 128, 30}, FlyPoint::POKECENTER);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 0, 0});
+
+
+        pbf_press_button(context, BUTTON_L, 50, 50);
 
         direction.change_direction(env.program_info(), env.console, context, 1.971173);
         pbf_move_left_joystick(context, 128, 0, 600, 50);
