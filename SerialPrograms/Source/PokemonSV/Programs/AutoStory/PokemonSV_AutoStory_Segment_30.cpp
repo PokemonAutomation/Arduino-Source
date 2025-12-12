@@ -99,10 +99,17 @@ void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         if (attempt_number >= 0){
             day_skip_from_overworld(env.console, context);
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            // fly_to_overworld_from_map() may fail since the snowy background on the map will false positive the destinationMenuItemWatcher (MapDestinationMenuDetector at box {0.523000, 0.680000, 0.080000, 0.010000}), which causes the fly to fail
-            // we can get around this by either placing down a marker, or by zooming out so that that section isn't white snow.
+            // place down marker as a workaround with an issue with fly_to_overworld_from_map
+            // fly_to_overworld_from_map() will fail since the snowy background on the map will false positive the destinationMenuItemWatcher (MapDestinationMenuDetector at box {0.523000, 0.680000, 0.080000, 0.010000}), which causes the fly to fail
+
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 210, 255, 40);
+            // place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+            //     {ZoomChange::ZOOM_IN, 255, 200, 300}, 
+            //     FlyPoint::POKECENTER, 
+            //     {0.404687, 0.261111}
+            // );
             move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 0, 30});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 255, 30});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 200, 255, 110});
         }
         
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
@@ -165,7 +172,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // we can get around this by either placing down a marker, or by zooming out so that that section isn't white snow.
 
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 0, 30});
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 255, 30});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 200, 255, 110});
         
         DirectionDetector direction;
         
