@@ -43,6 +43,8 @@
 
  int test_pokemonLZA_DirectionArrowDetector(const ImageViewRGB32& image, int target_angle);
 
+int test_pokemonLZA_MapDetector(const ImageViewRGB32& image, bool target);
+
  }
 
  #endif

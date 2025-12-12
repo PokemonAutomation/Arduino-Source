@@ -32,12 +32,17 @@ print(f"Size: {width} x {height}")
 
 raw_image = image.copy()
 
+# ==================================================================
+# LZA Map detector
+add_infer_box_to_image(raw_image, 0.760730, 0.937023, 0.241416, 0.064885, image)
+add_infer_box_to_image(raw_image, 0.005000, 0.150000, 0.025000, 0.110000, image)
+add_infer_box_to_image(raw_image, 0.005000, 0.210000, 0.025000, 0.110000, image)
 
 
 # ==================================================================
 # LZA alert eye detector
-add_infer_box_to_image(raw_image, 0.485, 0.088, 0.029, 0.034, image)
-add_infer_box_to_image(raw_image, 0.464, 0.142, 0.071, 0.074, image)
+# add_infer_box_to_image(raw_image, 0.485, 0.088, 0.029, 0.034, image)
+# add_infer_box_to_image(raw_image, 0.464, 0.142, 0.071, 0.074, image)
 
 
 # ==================================================================

@@ -165,6 +165,46 @@ bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_t
     );
 }
 
+void open_hyperspace_map(ConsoleHandle& console, ProControllerContext& context){
+    pbf_press_button(context, BUTTON_PLUS, 240ms, 40ms);
+    context.wait_for_all_requests();
+    console.log("Opening Hyperspace Map...");
+    console.overlay().add_log("Open Hyperspace Map");
+    
+    WallClock deadline = current_time() + 30s;
+
+    MapWatcher map_detector(COLOR_RED, &console.overlay());
+
+    do{
+        map_detector.reset_state();
+
+        int ret = wait_until(
+            console, context,
+            5000ms,
+            {map_detector}
+        );
+        switch (ret){
+        case 0:
+            console.log("Detected map!", COLOR_BLUE);
+            console.overlay().add_log("Map Detected");
+            return;
+        default:
+            console.log("Map not found. Press + again", COLOR_ORANGE);
+            pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);
+            console.overlay().add_log("Map not Found. Press + Again");
+            context.wait_for_all_requests();
+        }
+
+    }while (current_time() < deadline);
+
+    console.overlay().add_log("Failed to Open Hyperspace Map After 30 sec", COLOR_RED);
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "open_map(): Unable to find map after 30 seconds.",
+        console
+    );
+}
+
 
 FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& context){
     console.log("Flying from map...");

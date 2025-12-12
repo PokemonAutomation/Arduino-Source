@@ -36,6 +36,7 @@ public:
 
     enum class Route{
         NO_MOVEMENT,
+        HYPERSPACE_WILD_ZONE,
         WILD_ZONE_19,
         ALPHA_PIDGEY,
         ALPHA_PIKACHU,

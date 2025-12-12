@@ -62,7 +62,8 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
     : SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY)
     , ROUTE("<b>Hunt Route:</b>",
         {
-            {Route::NO_MOVEMENT,  "no_movement",  "No Movement"},
+            {Route::NO_MOVEMENT,  "no_movement",  "No Movement in Lumiose"},
+            {Route::HYPERSPACE_WILD_ZONE, "hyperspace_wild_zone", "Hyperspace Wild Zone"},
             {Route::WILD_ZONE_19, "wild_zone_19", "Wild Zone 19"},
             {Route::ALPHA_PIDGEY, "alpha_pidgey", "Alpha Pidgey (Wild Zone 1)"},
             // {Route::ALPHA_PIKACHU, "alpha_pikachu", "Alpha Pikachu (Wild Zone 6)"},
@@ -102,7 +103,7 @@ void route_default(
         env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "FlySpotReset: Cannot open map for fast travel.",
+            "route_default(): Cannot open map for fast travel.",
             env.console
         );
     }
@@ -117,7 +118,27 @@ void route_default(
         env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "FlySpotReset: Cannot fast travel after moving map cursor.",
+            "route_default(): Cannot fast travel after moving map cursor.",
+            env.console
+        );
+    }
+}
+
+void route_hyperspace_wild_zone(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
+    bool to_zoom_to_max){
+    open_hyperspace_map(env.console, context);
+    
+    // Fly from map to reset spawns
+    FastTravelState travel_status = fly_from_map(env.console, context);
+    if (travel_status != FastTravelState::SUCCESS){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "route_hyperspace_wild_zone(): Cannot fast travel after moving map cursor.",
             env.console
         );
     }
@@ -206,6 +227,9 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
     switch (ROUTE) {
     case Route::NO_MOVEMENT:
         route = route_default;
+        break;
+    case Route::HYPERSPACE_WILD_ZONE:
+        route = route_hyperspace_wild_zone;
         break;
     case Route::WILD_ZONE_19:
         route = route_wild_zone_19;
