@@ -74,9 +74,9 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
         Route::NO_MOVEMENT
     )
     , NUM_RESETS(
-        "<b>Resets:</b><br>Number of resets, for use when performing fly resets in Hyperspace Wild Zones. Each fly takes about 1 Cal. of time. Make sure to leave enough time to catch found shinies. Zero disables this option.",
+        "<b>Hyperspace Resets:</b><br>Number of resets when running the Hyperspace Wild Zone route. Each fly takes about 1 Cal. of time. Make sure to leave enough time to catch found shinies.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        0, 0
+        100, 1
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -270,7 +270,7 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
                 }
 
                 uint64_t num_resets_temp = NUM_RESETS;
-                if (num_resets_temp != 0 && num_resets >= num_resets_temp){
+                if (ROUTE == Route::HYPERSPACE_WILD_ZONE && num_resets >= num_resets_temp){
                     env.log("Number of resets hit. Going to home to pause the game.");
                     go_home(env.console, context);
                     break;
