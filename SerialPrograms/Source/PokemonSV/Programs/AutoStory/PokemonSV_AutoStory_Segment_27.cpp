@@ -143,6 +143,8 @@ void checkpoint_67(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t attempt_number){
     context.wait_for_all_requests();
 
+    heal_at_pokecenter(env.program_info(), env.console, context);
+
     DirectionDetector direction;
     if (attempt_number >= 0){
         day_skip_from_overworld(env.console, context);
@@ -267,7 +269,7 @@ void move_from_dondozo_titan_phase1_to_phase2(SingleSwitchProgramEnvironment& en
 
     overworld_navigation(env.program_info(), env.console, context, 
         NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-        128, 0, 20, 10, false);
+        128, 0, 40, 10, false);
 
     // marker 2       x=0.393229, y=0.748148
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
