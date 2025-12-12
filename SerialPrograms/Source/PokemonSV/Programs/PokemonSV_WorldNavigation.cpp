@@ -775,13 +775,13 @@ void heal_at_pokecenter(
 ){
     context.wait_for_all_requests();
     
-    if (!attempt_fly_to_overlapping_flypoint(info, stream, context)){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "Failed to fly to pokecenter.",
-            stream
-        );  
-    }           
+    // if (!attempt_fly_to_overlapping_flypoint(info, stream, context)){
+    //     OperationFailedException::fire(
+    //         ErrorReport::SEND_ERROR_REPORT,
+    //         "Failed to fly to pokecenter.",
+    //         stream
+    //     );  
+    // }           
     uint16_t seconds_timeout = 60;
 
     // re-orient camera
