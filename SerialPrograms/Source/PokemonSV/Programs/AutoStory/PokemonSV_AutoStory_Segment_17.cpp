@@ -89,7 +89,6 @@ void checkpoint_37(
         context.wait_for_all_requests();
         DirectionDetector direction;
         if (attempt_number >= 0){
-            day_skip_from_overworld(env.console, context);
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
             move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 255, 128, 50});
             move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, 128, 80});

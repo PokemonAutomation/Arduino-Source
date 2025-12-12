@@ -1405,6 +1405,11 @@ void checkpoint_reattempt_loop(
             checkpoint_save(env, context, notif_status_update, stats);
         }
 
+        if (i >= 0){
+            day_skip_from_overworld(env.console, context);
+            save_game_from_overworld(env.program_info(), env.console, context);
+        }
+
         context.wait_for_all_requests();
         action(i);
 

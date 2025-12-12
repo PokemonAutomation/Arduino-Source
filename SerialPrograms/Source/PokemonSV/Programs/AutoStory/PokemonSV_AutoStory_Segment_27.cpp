@@ -147,7 +147,6 @@ void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnv
 
     DirectionDetector direction;
     if (attempt_number >= 0){
-        day_skip_from_overworld(env.console, context);
         env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 100, 255, 60});
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 0, 60});
