@@ -57,17 +57,17 @@ void ControllerConnection::declare_ready(){
 
 
 //void ControllerConnection::signal_pre_not_ready(){
-//    m_status_listeners.run_method_unique(&StatusListener::pre_connection_not_ready, *this);
+//    m_status_listeners.run_method(&StatusListener::pre_connection_not_ready, *this);
 //}
 void ControllerConnection::signal_post_ready(){
-    m_status_listeners.run_method_unique(&StatusListener::post_connection_ready, *this);
+    m_status_listeners.run_method(&StatusListener::post_connection_ready, *this);
 }
 void ControllerConnection::signal_status_text_changed(const std::string& text){
 //    cout << "m_status_listeners.size() = " << m_status_listeners.count_unique() << endl;
-    m_status_listeners.run_method_unique(&StatusListener::status_text_changed, *this, text);
+    m_status_listeners.run_method(&StatusListener::status_text_changed, *this, text);
 }
 void ControllerConnection::signal_error(const std::string& text){
-    m_status_listeners.run_method_unique(&StatusListener::on_error, *this, text);
+    m_status_listeners.run_method(&StatusListener::on_error, *this, text);
 }
 
 

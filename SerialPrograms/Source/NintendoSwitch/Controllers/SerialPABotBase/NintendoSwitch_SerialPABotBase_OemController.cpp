@@ -245,7 +245,7 @@ bool SerialPABotBase_OemController::populate_report_gyro(
 
 
 void SerialPABotBase_OemController::issue_report(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     WallDuration duration,
     const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons
 ){
@@ -268,7 +268,7 @@ void SerialPABotBase_OemController::issue_report(
     }
 }
 void SerialPABotBase_OemController::issue_report(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     WallDuration duration,
     const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons,
     const pabb_NintendoSwitch_OemController_State0x30_Gyro& gyro

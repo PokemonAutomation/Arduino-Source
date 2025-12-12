@@ -180,16 +180,16 @@ public:
     //  empty out rather than entering itself into the queue.
     //  If a cancellation happens inside this function, it will immediately
     //  throw an OperationCancelledException.
-    virtual void wait_for_all(const Cancellable* cancellable) = 0;
+    virtual void wait_for_all(Cancellable* cancellable) = 0;
 
     //  Tell the scheduler to wait for all pending commands to finish
     //  (including cooldowns) before executing further instructions.
     //  This is used to prevent hanging commands from overlapping with new
     //  commands issued after this barrier.
-    virtual void issue_barrier(const Cancellable* cancellable) = 0;
+    virtual void issue_barrier(Cancellable* cancellable) = 0;
 
     //  Do nothing for this much time.
-    virtual void issue_nop(const Cancellable* cancellable, Milliseconds duration) = 0;
+    virtual void issue_nop(Cancellable* cancellable, Milliseconds duration) = 0;
 
 
 public:
@@ -248,7 +248,7 @@ public:
 
 
 public:
-    void wait_for_all_requests() const{
+    void wait_for_all_requests(){
         auto scope = m_lifetime_sanitizer.check_scope();
         m_controller.wait_for_all(this);
     }

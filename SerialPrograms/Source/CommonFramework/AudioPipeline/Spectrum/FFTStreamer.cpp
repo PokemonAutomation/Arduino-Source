@@ -115,7 +115,7 @@ void AudioFloatToFFT::run_fft(){
     }
     std::shared_ptr<AlignedVector<float>> out = std::make_unique<AlignedVector<float>>(NUM_FFT_SAMPLES / 2);
     Kernels::AbsFFT::fft_abs(FFT_LENGTH_POWER_OF_TWO, out->data(), m_fft_input.data());
-    m_listeners.run_method_unique(
+    m_listeners.run_method(
         &FFTListener::on_fft,
         m_sample_rate, out
     );

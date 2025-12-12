@@ -95,17 +95,17 @@ void ProgramSession::set_state(ProgramState state){
         break;
     }
     m_state.store(state, std::memory_order_relaxed);
-    m_listeners.run_method_unique(&Listener::state_change, state);
+    m_listeners.run_method(&Listener::state_change, state);
 }
 void ProgramSession::push_stats(){
-    m_listeners.run_method_unique(
+    m_listeners.run_method(
         &Listener::stats_update,
         m_current_stats.get(),
         m_historical_stats.get()
     );
 }
 void ProgramSession::push_error(const std::string& message){
-    m_listeners.run_method_unique(&Listener::error, message);
+    m_listeners.run_method(&Listener::error, message);
 }
 
 void ProgramSession::load_historical_stats(){

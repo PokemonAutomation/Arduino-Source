@@ -326,7 +326,7 @@ std::string ControllerSession::reset(bool clear_settings){
 
 
 //void ControllerSession::pre_connection_not_ready(ControllerConnection& connection){
-//    m_listeners.run_method_unique(&Listener::pre_connection_not_ready, connection);
+//    m_listeners.run_method(&Listener::pre_connection_not_ready, connection);
 //}
 void ControllerSession::post_connection_ready(ControllerConnection& connection){
 //    cout << "ControllerSession::post_connection_ready()" << endl;
@@ -415,9 +415,9 @@ void ControllerSession::status_text_changed(
     }
 //    cout << "ControllerSession::status_text_changed(): controller_error = " << controller_error << endl;
     if (controller_error.empty()){
-        m_listeners.run_method_unique(&Listener::post_status_text_changed, text);
+        m_listeners.run_method(&Listener::post_status_text_changed, text);
     }else{
-        m_listeners.run_method_unique(&Listener::post_status_text_changed, controller_error);
+        m_listeners.run_method(&Listener::post_status_text_changed, controller_error);
     }
 }
 void ControllerSession::on_error(
@@ -432,25 +432,25 @@ void ControllerSession::on_error(
 
 
 void ControllerSession::signal_ready_changed(bool ready){
-    m_listeners.run_method_unique(&Listener::ready_changed, ready);
+    m_listeners.run_method(&Listener::ready_changed, ready);
 }
 void ControllerSession::signal_descriptor_changed(
     const std::shared_ptr<const ControllerDescriptor>& descriptor
 ){
-    m_listeners.run_method_unique(&Listener::descriptor_changed, descriptor);
+    m_listeners.run_method(&Listener::descriptor_changed, descriptor);
 }
 void ControllerSession::signal_controller_changed(
     ControllerType controller_type,
     const std::vector<ControllerType>& available_controllers
 ){
-    m_listeners.run_method_unique(&Listener::controller_changed, controller_type, available_controllers);
+    m_listeners.run_method(&Listener::controller_changed, controller_type, available_controllers);
 }
 void ControllerSession::signal_status_text_changed(const std::string& text){
 //    cout << text << endl;
-    m_listeners.run_method_unique(&Listener::post_status_text_changed, text);
+    m_listeners.run_method(&Listener::post_status_text_changed, text);
 }
 void ControllerSession::signal_options_locked(bool locked){
-    m_listeners.run_method_unique(&Listener::options_locked, locked);
+    m_listeners.run_method(&Listener::options_locked, locked);
 }
 
 

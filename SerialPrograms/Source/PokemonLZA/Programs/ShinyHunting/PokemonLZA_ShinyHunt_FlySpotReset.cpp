@@ -13,6 +13,7 @@
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
@@ -62,7 +63,8 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
     : SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY)
     , ROUTE("<b>Hunt Route:</b>",
         {
-            {Route::NO_MOVEMENT,  "no_movement",  "No Movement"},
+            {Route::NO_MOVEMENT,  "no_movement",  "No Movement in Lumiose"},
+            {Route::HYPERSPACE_WILD_ZONE, "hyperspace_wild_zone", "Hyperspace Wild Zone"},
             {Route::WILD_ZONE_19, "wild_zone_19", "Wild Zone 19"},
             {Route::ALPHA_PIDGEY, "alpha_pidgey", "Alpha Pidgey (Wild Zone 1)"},
             // {Route::ALPHA_PIKACHU, "alpha_pikachu", "Alpha Pikachu (Wild Zone 6)"},
@@ -70,6 +72,11 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
         },
         LockMode::LOCK_WHILE_RUNNING,
         Route::NO_MOVEMENT
+    )
+    , NUM_RESETS(
+        "<b>Hyperspace Resets:</b><br>Number of resets when running the Hyperspace Wild Zone route. Each fly takes about 1 Cal. of time. Make sure to leave enough time to catch found shinies.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        100, 1
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -82,6 +89,7 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(ROUTE);
+    PA_ADD_OPTION(NUM_RESETS);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -102,7 +110,7 @@ void route_default(
         env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "FlySpotReset: Cannot open map for fast travel.",
+            "route_default(): Cannot open map for fast travel.",
             env.console
         );
     }
@@ -117,7 +125,27 @@ void route_default(
         env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "FlySpotReset: Cannot fast travel after moving map cursor.",
+            "route_default(): Cannot fast travel after moving map cursor.",
+            env.console
+        );
+    }
+}
+
+void route_hyperspace_wild_zone(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
+    bool to_zoom_to_max){
+    open_hyperspace_map(env.console, context);
+    
+    // Fly from map to reset spawns
+    FastTravelState travel_status = fly_from_map(env.console, context);
+    if (travel_status != FastTravelState::SUCCESS){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "route_hyperspace_wild_zone(): Cannot fast travel after moving map cursor.",
             env.console
         );
     }
@@ -207,6 +235,9 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
     case Route::NO_MOVEMENT:
         route = route_default;
         break;
+    case Route::HYPERSPACE_WILD_ZONE:
+        route = route_hyperspace_wild_zone;
+        break;
     case Route::WILD_ZONE_19:
         route = route_wild_zone_19;
         break;
@@ -221,6 +252,7 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
         );
     }
     
+    uint64_t num_resets = 0;
     bool to_zoom_to_max = true;
     run_until<ProControllerContext>(
         env.console, context,
@@ -230,10 +262,18 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
                 shiny_sound_handler.process_pending(context);
                 route(env, context, stats, to_zoom_to_max);
                 to_zoom_to_max = false;
+                num_resets++;
                 stats.resets++;
                 env.update_stats();
                 if (stats.resets.load(std::memory_order_relaxed) % 10 == 0){
                     send_program_status_notification(env, NOTIFICATION_STATUS);
+                }
+
+                uint64_t num_resets_temp = NUM_RESETS;
+                if (ROUTE == Route::HYPERSPACE_WILD_ZONE && num_resets >= num_resets_temp){
+                    env.log("Number of resets hit. Going to home to pause the game.");
+                    go_home(env.console, context);
+                    break;
                 }
             } // end while
         },

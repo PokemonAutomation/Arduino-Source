@@ -31,7 +31,8 @@ enum class WildZone{
     WILD_ZONE_17,
     WILD_ZONE_18,
     WILD_ZONE_19,
-    WILD_ZONE_20,
+    WILD_ZONE_20_NO_DISTORTION,
+    WILD_ZONE_20_WITH_DISTORTION,
 };
 
 enum class WildZoneCafe{

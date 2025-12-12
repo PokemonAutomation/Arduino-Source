@@ -54,6 +54,8 @@ std::string to_string(std::vector<T>& vec){
 //  Print model input and output types and shapes to cout. Useful for debugging.
 void print_model_input_output_info(const Ort::Session& session);
 
+Ort::Env create_ORT_env();
+
 
 }
 }

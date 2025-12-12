@@ -30,7 +30,7 @@ const std::map<
 >& SUPPORTED_VERSIONS();
 
 
-
+bool controller_is_valid(uint32_t id);
 
 ControllerType id_to_controller_type(uint32_t id);
 uint32_t controller_type_to_id(ControllerType controller_type);

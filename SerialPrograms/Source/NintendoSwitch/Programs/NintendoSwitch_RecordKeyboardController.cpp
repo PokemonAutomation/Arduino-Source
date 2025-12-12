@@ -138,9 +138,17 @@ std::string json_to_cpp(const JsonArray& history){
     ControllerState state;
     for (const JsonValue& command : history){
         const JsonObject& snapshot = command.to_object_throw();
-        Milliseconds duration(snapshot.get_integer_throw("duration_in_ms"));
+
+        uint64_t duration = 0;
+        bool ok = false;
+        ok |= snapshot.read_integer(duration, "duration_in_ms");
+        ok |= snapshot.read_integer(duration, "ms");
+        if (!ok){
+            throw JsonParseException("", "ms");
+        }
+
         state.load_json(snapshot);
-        ret += state.to_cpp(duration, Milliseconds(0));
+        ret += state.to_cpp(Milliseconds(duration), Milliseconds(0));
     }
     return ret;
 }
@@ -156,9 +164,17 @@ void execute_json_schedule(
     for (uint32_t i = 0; i < num_loops; i++){
         for (const JsonValue& command : history){
             const JsonObject& snapshot = command.to_object_throw();
-            Milliseconds duration(snapshot.get_integer_throw("duration_in_ms"));
+
+            uint64_t duration = 0;
+            bool ok = false;
+            ok |= snapshot.read_integer(duration, "duration_in_ms");
+            ok |= snapshot.read_integer(duration, "ms");
+            if (!ok){
+                throw JsonParseException("", "ms");
+            }
+
             state.load_json(snapshot);
-            state.execute(context, context.controller(), duration);
+            state.execute(context, context.controller(), Milliseconds(duration));
         }
         state.clear();
         state.execute(context, context.controller(), Seconds(seconds_wait_between_loops));

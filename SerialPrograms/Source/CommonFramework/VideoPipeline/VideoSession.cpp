@@ -27,9 +27,6 @@ void VideoSession::remove_state_listener(StateListener& listener){
     m_state_listeners.remove(listener);
 }
 
-bool VideoSession::try_add_state_listener(StateListener& listener){
-    return m_state_listeners.try_add(listener);
-}
 bool VideoSession::try_remove_state_listener(StateListener& listener){
     return m_state_listeners.try_remove(listener);
 }
@@ -152,7 +149,7 @@ void VideoSession::set_resolution(Resolution resolution){
 
 void VideoSession::internal_reset(){
     m_logger.log("Resetting the video...", COLOR_GREEN);
-    m_state_listeners.run_method_unique(&StateListener::pre_shutdown);
+    m_state_listeners.run_method(&StateListener::pre_shutdown);
 
     Resolution resolution = m_option.m_resolution;
     std::unique_ptr<VideoSource> source;
@@ -179,7 +176,7 @@ void VideoSession::internal_reset(){
         m_video_source = std::move(source);
     }
 
-    m_state_listeners.run_method_unique(
+    m_state_listeners.run_method(
         &StateListener::post_startup,
         m_video_source.get()
     );
@@ -193,7 +190,7 @@ void VideoSession::internal_set_source(
         return;
     }
 
-    m_state_listeners.run_method_unique(&StateListener::pre_shutdown);
+    m_state_listeners.run_method(&StateListener::pre_shutdown);
 
     std::unique_ptr<VideoSource> source;
     {
@@ -225,7 +222,7 @@ void VideoSession::internal_set_source(
         m_video_source = std::move(source);
     }
 
-    m_state_listeners.run_method_unique(
+    m_state_listeners.run_method(
         &StateListener::post_startup,
         m_video_source.get()
     );
@@ -236,7 +233,7 @@ void VideoSession::internal_set_resolution(Resolution resolution){
         return;
     }
 
-    m_state_listeners.run_method_unique(&StateListener::pre_shutdown);
+    m_state_listeners.run_method(&StateListener::pre_shutdown);
 
     std::unique_ptr<VideoSource> source;
     {
@@ -262,7 +259,7 @@ void VideoSession::internal_set_resolution(Resolution resolution){
         m_video_source = std::move(source);
     }
 
-    m_state_listeners.run_method_unique(
+    m_state_listeners.run_method(
         &StateListener::post_startup,
         m_video_source.get()
     );
@@ -335,7 +332,7 @@ double VideoSession::fps_display() const{
     return m_fps_tracker_rendered.events_per_second();
 }
 void VideoSession::on_frame(std::shared_ptr<const VideoFrame> frame){
-    m_frame_listeners.run_method_unique(&VideoFrameListener::on_frame, frame);
+    m_frame_listeners.run_method(&VideoFrameListener::on_frame, frame);
     {
         WriteSpinLock lg(m_fps_lock);
         m_fps_tracker_source.push_event(frame->timestamp);

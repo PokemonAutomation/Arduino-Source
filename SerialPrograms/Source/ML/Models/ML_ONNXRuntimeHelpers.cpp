@@ -16,6 +16,7 @@
 #include <fstream>
 #include <onnxruntime_cxx_api.h>
 #include "3rdParty/ONNX/OnnxToolsPA.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Compiler.h"
 #include "ML_ONNXRuntimeHelpers.h"
 
@@ -192,6 +193,14 @@ void print_model_input_output_info(const Ort::Session& session){
         }
         std::cout << "]" << std::endl;
     }
+}
+
+Ort::Env create_ORT_env(){
+    if (Ort::Global<void>::api_ == nullptr){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Onnx API returned a null pointer.");  
+    }
+
+    return Ort::Env();
 }
 
 }

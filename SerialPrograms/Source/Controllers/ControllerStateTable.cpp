@@ -11,6 +11,7 @@
 #include "ControllerTypeStrings.h"
 #include "ControllerStateTable.h"
 
+#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerTable.h"
 #include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconTable.h"
 
@@ -367,6 +368,46 @@ EnumDropdownDatabase<ControllerClass> ControllerCommandTables::make_database(
 
 
 
+std::string get_joystick_direction(uint8_t x, uint8_t y){
+    std::string direction = "";
+    if (x > NintendoSwitch::STICK_CENTER){
+        if (y > NintendoSwitch::STICK_CENTER){
+            // right-down
+            direction = "\u2198";
+        }else if (y == NintendoSwitch::STICK_CENTER){
+            // right
+            direction = "\u2192";
+        }else{ // y < STICK_CENTER
+            // right-up
+            direction = "\u2197";
+        }
+    }else if (x == NintendoSwitch::STICK_CENTER){
+        if (y > NintendoSwitch::STICK_CENTER){
+            // down
+            direction = "\u2193";
+        }else if (y == NintendoSwitch::STICK_CENTER){
+            // neutral
+            direction = "neutral";
+        }else{ // y < STICK_CENTER
+            // up
+            direction = "\u2191";
+        }
+
+    }else { // x < STICK_CENTER
+        if (y > NintendoSwitch::STICK_CENTER){
+            // left-down
+            direction = "\u2199";
+        }else if (y == NintendoSwitch::STICK_CENTER){
+            // left
+            direction = "\u2190";
+        }else{ // y < STICK_CENTER
+            // left-up
+            direction = "\u2196";
+        }
+    }
+
+    return direction;
+}
 
 
 

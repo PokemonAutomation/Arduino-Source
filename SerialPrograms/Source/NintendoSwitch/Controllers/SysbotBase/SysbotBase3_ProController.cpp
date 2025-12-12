@@ -81,7 +81,7 @@ void ProController_SysbotBase3::replace_on_next_command(){
     m_cv.notify_all();
     m_logger.log("replace_on_next_command(): Command Queue Size = " + std::to_string(queued), COLOR_DARKGREEN);
 }
-void ProController_SysbotBase3::wait_for_all(const Cancellable* cancellable){
+void ProController_SysbotBase3::wait_for_all(Cancellable* cancellable){
     SuperscalarScheduler::Schedule schedule;
     std::lock_guard<std::mutex> lg0(m_issue_lock);
     {
@@ -177,7 +177,7 @@ void ProController_SysbotBase3::on_message(const std::string& message){
 }
 
 void ProController_SysbotBase3::execute_state(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     const SuperscalarScheduler::ScheduleEntry& entry
 ){
     if (cancellable){

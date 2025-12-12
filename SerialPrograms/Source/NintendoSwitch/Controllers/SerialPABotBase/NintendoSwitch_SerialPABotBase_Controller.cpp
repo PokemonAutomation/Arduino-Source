@@ -62,7 +62,7 @@ void SerialPABotBase_Controller::replace_on_next_command(){
 }
 
 
-void SerialPABotBase_Controller::wait_for_all(const Cancellable* cancellable){
+void SerialPABotBase_Controller::wait_for_all(Cancellable* cancellable){
     SuperscalarScheduler::Schedule schedule;
     std::lock_guard<std::mutex> lg0(m_issue_lock);
     {

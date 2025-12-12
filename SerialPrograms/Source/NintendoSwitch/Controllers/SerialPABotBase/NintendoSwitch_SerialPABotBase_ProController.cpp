@@ -37,7 +37,7 @@ SerialPABotBase_ProController::~SerialPABotBase_ProController(){
 
 
 void SerialPABotBase_ProController::execute_state(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     const SuperscalarScheduler::ScheduleEntry& entry
 ){
     SwitchControllerState controller_state;

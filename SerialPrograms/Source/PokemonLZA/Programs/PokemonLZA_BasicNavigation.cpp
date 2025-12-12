@@ -111,10 +111,15 @@ bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_t
     MapIconDetector pokecenter_icon(COLOR_RED, MapIconType::PokemonCenter, icon_region, &console.overlay());
     MapIconDetector flyable_building_icon(COLOR_BLACK, MapIconType::BuildingFlyable, icon_region, &console.overlay());
     MapIconDetector flayble_cafe_icon(COLOR_ORANGE, MapIconType::CafeFlyable, icon_region, &console.overlay());
+    MapIconDetector flyable_hyperspace_battle_zone_icon(COLOR_ORANGE, MapIconType::HyperspaceBattleZone, icon_region, &console.overlay());
+    MapIconDetector flyable_hyperspace_wild_zone_icon(COLOR_ORANGE, MapIconType::HyperspaceWildZone, icon_region, &console.overlay());
+
     MapWatcher map_detector(COLOR_RED, &console.overlay());
     map_detector.attach_map_icon_detector(pokecenter_icon);
     map_detector.attach_map_icon_detector(flyable_building_icon);
     map_detector.attach_map_icon_detector(flayble_cafe_icon);
+    map_detector.attach_map_icon_detector(flyable_hyperspace_battle_zone_icon);
+    map_detector.attach_map_icon_detector(flyable_hyperspace_wild_zone_icon);
 
     do{
         map_detector.reset_state();
@@ -158,6 +163,52 @@ bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_t
     }while (current_time() < deadline);
 
     console.overlay().add_log("Failed to Open Map After 30 sec", COLOR_RED);
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "open_map(): Unable to find map after 30 seconds.",
+        console
+    );
+}
+
+void open_hyperspace_map(ConsoleHandle& console, ProControllerContext& context){
+    pbf_press_button(context, BUTTON_PLUS, 240ms, 40ms);
+    context.wait_for_all_requests();
+    console.log("Opening Hyperspace Map...");
+    console.overlay().add_log("Open Hyperspace Map");
+    
+    WallClock deadline = current_time() + 30s;
+
+    const ImageFloatBox icon_region{0.0, 0.089, 1.0, 0.911};
+    MapIconDetector flyable_hyperspace_entry_wild_icon(COLOR_ORANGE, MapIconType::HyperspaceEntryWild, icon_region, &console.overlay());
+    MapIconDetector flyable_hyperspace_entry_battle_icon(COLOR_ORANGE, MapIconType::HyperspaceEntryBattle, icon_region, &console.overlay());
+
+    MapWatcher map_detector(COLOR_RED, &console.overlay());
+    map_detector.attach_map_icon_detector(flyable_hyperspace_entry_wild_icon);
+    map_detector.attach_map_icon_detector(flyable_hyperspace_entry_battle_icon);
+
+    do{
+        map_detector.reset_state();
+
+        int ret = wait_until(
+            console, context,
+            5000ms,
+            {map_detector}
+        );
+        switch (ret){
+        case 0:
+            console.log("Detected map!", COLOR_BLUE);
+            console.overlay().add_log("Map Detected");
+            return;
+        default:
+            console.log("Map not found. Press + again", COLOR_ORANGE);
+            pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);
+            console.overlay().add_log("Map not Found. Press + Again");
+            context.wait_for_all_requests();
+        }
+
+    }while (current_time() < deadline);
+
+    console.overlay().add_log("Failed to Open Hyperspace Map After 30 sec", COLOR_RED);
     OperationFailedException::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "open_map(): Unable to find map after 30 seconds.",
@@ -297,8 +348,15 @@ void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProController
     case WildZone::WILD_ZONE_19:
         pbf_move_left_joystick(context, 80, 255, 100ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_20:
+    case WildZone::WILD_ZONE_20_NO_DISTORTION:
         pbf_move_left_joystick(context, 0, 90, 140ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_20_WITH_DISTORTION:
+        // During the distortion happening on top of Lumiose Tower as part
+        // of the Mega Dimension DLC story, the wild zone 20 fast travel
+        // symbol on the map is moved to the entrance gate. So we only
+        // need a tiny left joystick push.
+        pbf_move_left_joystick(context, 100, 100, 100ms, 0ms);
         break;
     }
     pbf_wait(context, 300ms);
@@ -330,12 +388,7 @@ void sit_on_bench(ConsoleHandle& console, ProControllerContext& context){
             console, context,
             [](ProControllerContext& context){
                 // mash A to start day/night change and into the transition animation
-                pbf_mash_button(context, BUTTON_A, 26000ms);
-                // for (int c = 0; c < 3; c++){
-                //     pbf_move_left_joystick(context, 128, 255, 1000ms, 0ms);
-                //     pbf_mash_button(context, BUTTON_B, 1000ms);
-                //     pbf_mash_button(context, BUTTON_A, 5000ms);
-                // }
+                pbf_mash_button(context, BUTTON_A, 26s);
             },
             {black_screen}
         );

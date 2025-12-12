@@ -99,7 +99,7 @@ private:
             &socket, [this]{
 //                cout << "connected()" << endl;
                 m_state.store(State::CONNECTED, std::memory_order_release);
-                m_listeners.run_method_unique(&Listener::on_connect_finished, "");
+                m_listeners.run_method(&Listener::on_connect_finished, "");
             }
         );
         QThread::connect(
@@ -127,7 +127,7 @@ private:
                 qint64 bytes = m_socket->read(buffer, BUFFER_SIZE);
                 if (bytes > 0){
 //                    cout << "Received: " << std::string(buffer, bytes) << endl;
-                    m_listeners.run_method_unique(&Listener::on_receive_data, buffer, bytes);
+                    m_listeners.run_method(&Listener::on_receive_data, buffer, bytes);
                 }
             }
         );

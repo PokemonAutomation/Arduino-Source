@@ -19,7 +19,7 @@ class BotBaseControllerContext;
 
 
 
-class BotBaseController{
+class BotBaseController : public Cancellable::CancelListener{
 public:
     using ContextType = BotBaseControllerContext;
 
@@ -38,10 +38,8 @@ public:
     virtual State state() const = 0;
     virtual size_t queue_limit() const = 0;
 
-    virtual void notify_all() = 0;
-
     //  Waits for all pending requests to finish.
-    virtual void wait_for_all_requests(const Cancellable* cancelled = nullptr) = 0;
+    virtual void wait_for_all_requests(Cancellable* cancelled = nullptr) = 0;
 
     //  Stop all pending commands. This wipes the command queue on both sides
     //  and stops any currently executing command.
@@ -59,15 +57,15 @@ public:
 public:
     virtual bool try_issue_request(
         const BotBaseRequest& request,
-        const Cancellable* cancelled = nullptr
+        Cancellable* cancelled = nullptr
     ) = 0;
     virtual void issue_request(
         const BotBaseRequest& request,
-        const Cancellable* cancelled = nullptr
+        Cancellable* cancelled = nullptr
     ) = 0;
     virtual BotBaseMessage issue_request_and_wait(
         const BotBaseRequest& request,
-        const Cancellable* cancelled = nullptr
+        Cancellable* cancelled = nullptr
     ) = 0;
 
 };

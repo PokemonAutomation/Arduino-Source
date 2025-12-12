@@ -25,7 +25,7 @@ namespace PokemonAutomation{
 
 
 
-class KeyboardInputController{
+class KeyboardInputController : public Cancellable{
 public:
     KeyboardInputController(Logger& logger, bool enabled);
     virtual ~KeyboardInputController();
@@ -59,7 +59,7 @@ protected:
     SpinLock m_state_lock;
     KeyboardStateTracker m_state_tracker;
 
-    std::atomic<bool> m_stop;
+//    std::atomic<bool> m_stop;
 
     std::mutex m_sleep_lock;
     std::condition_variable m_cv;
@@ -77,6 +77,7 @@ public:
         , m_controller(&controller)
     {}
     void stop() noexcept{
+        KeyboardInputController::stop();
         {
             WriteSpinLock lg(m_lock);
             if (m_controller == nullptr){
@@ -84,7 +85,6 @@ public:
             }
             m_controller = nullptr;
         }
-        KeyboardInputController::stop();
     }
 
     virtual std::unique_ptr<ControllerState> make_state() const override{

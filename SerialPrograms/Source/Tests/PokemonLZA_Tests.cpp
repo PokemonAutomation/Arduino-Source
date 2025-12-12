@@ -15,6 +15,7 @@
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h"
 #include "PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.h"
+#include "PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h"
 #include "PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -515,6 +516,14 @@ int test_pokemonLZA_DirectionArrowDetector(const ImageViewRGB32& image, int targ
     }
 
     cout << "Angle detection successful within tolerance (diff: " << diff << " degrees)." << endl;
+    return 0;
+}
+
+int test_pokemonLZA_MapDetector(const ImageViewRGB32& image, bool target){
+    auto overlay = DummyVideoOverlay();
+    MapDetector detector(COLOR_RED, &overlay);
+    bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
     return 0;
 }
 
