@@ -1605,6 +1605,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h
+    Source/PokemonLZA/Inference/PokemonLZA_WeatherDetector.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_WeatherDetector.h
     Source/PokemonLZA/InferenceTraining/PokemonLZA_GenerateLocationNameOCR.cpp
     Source/PokemonLZA/InferenceTraining/PokemonLZA_GenerateLocationNameOCR.h
     Source/PokemonLZA/Options/PokemonLZA_BattleAIOption.cpp
@@ -1627,6 +1629,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/Farming/PokemonLZA_RestaurantFarmer.h
     Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_StatsReset.cpp
     Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_StatsReset.h
+    Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_WeatherFinder.cpp
+    Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_WeatherFinder.h
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.cpp
@@ -1662,6 +1666,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneCafe.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.cpp
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.cpp
