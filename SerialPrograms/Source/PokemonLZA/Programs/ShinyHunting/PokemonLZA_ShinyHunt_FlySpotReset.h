@@ -9,6 +9,7 @@
 #ifndef PokemonAutomation_PokemonLZA_ShinyHunt_FlySpotReset_H
 #define PokemonAutomation_PokemonLZA_ShinyHunt_FlySpotReset_H
 
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
@@ -47,6 +48,7 @@ public:
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
     ShinySoundDetectedActionOption SHINY_DETECTED;
     EnumDropdownOption<Route> ROUTE;
+    SimpleIntegerOption<uint64_t> NUM_RESETS;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;

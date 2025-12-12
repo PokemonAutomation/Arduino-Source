@@ -13,6 +13,7 @@
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
@@ -72,6 +73,11 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
         LockMode::LOCK_WHILE_RUNNING,
         Route::NO_MOVEMENT
     )
+    , NUM_RESETS(
+        "<b>Resets:</b><br>Number of resets, for use when performing fly resets in Hyperspace Wild Zones. Each fly takes about 1 Cal. of time. Make sure to leave enough time to catch found shinies. Zero disables this option.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0, 0
+    )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -83,6 +89,7 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(ROUTE);
+    PA_ADD_OPTION(NUM_RESETS);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -245,6 +252,7 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
         );
     }
     
+    uint64_t num_resets = 0;
     bool to_zoom_to_max = true;
     run_until<ProControllerContext>(
         env.console, context,
@@ -254,10 +262,18 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
                 shiny_sound_handler.process_pending(context);
                 route(env, context, stats, to_zoom_to_max);
                 to_zoom_to_max = false;
+                num_resets++;
                 stats.resets++;
                 env.update_stats();
                 if (stats.resets.load(std::memory_order_relaxed) % 10 == 0){
                     send_program_status_notification(env, NOTIFICATION_STATUS);
+                }
+
+                uint64_t num_resets_temp = NUM_RESETS;
+                if (num_resets_temp != 0 && num_resets >= num_resets_temp){
+                    env.log("Number of resets hit. Going to home to pause the game.");
+                    go_home(env.console, context);
+                    break;
                 }
             } // end while
         },
