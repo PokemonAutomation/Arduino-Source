@@ -11,6 +11,8 @@
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "ConfigWidget.h"
 
+class QLabel;
+
 namespace PokemonAutomation{
 
 
@@ -42,6 +44,7 @@ public:
 private:
     TimeDurationOption<Type>& m_value;
     QLineEdit* m_box;
+    QLabel* m_description;
 };
 
 
