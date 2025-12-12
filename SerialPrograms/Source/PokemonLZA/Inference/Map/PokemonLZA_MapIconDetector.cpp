@@ -161,6 +161,83 @@ const MapIconMatcher& MapIcon_BattleZone(){
     return ret;
 }
 
+const MapIconMatcher& MapIcon_HyperspaceBattleZone(){
+    static MapIconMatcher ret(
+        "PokemonLZA/MapIcons/HyperspaceBattleZone.png",
+        "HyperspaceBattleZone",
+        Color(0xff000000),
+        Color(0xffFB257D),
+        100,
+        100.0,
+        {
+            {0xff000000, 0xffFB257D},
+        }
+    );
+    return ret;
+}
+
+const MapIconMatcher& MapIcon_HyperspaceWildZone(){
+    static MapIconMatcher ret(
+        "PokemonLZA/MapIcons/HyperspaceWildZone.png",
+        "HyperspaceWildZone",
+        Color(0xff000000),
+        Color(0xffAED635),
+        100,
+        100.0,
+        {
+            {0xff000000, 0xffAED635},
+        }
+    );
+    return ret;
+}
+
+/*
+const MapIconMatcher& MapIcon_HyperspaceEntryQuest(){
+    static MapIconMatcher ret(
+        "PokemonLZA/MapIcons/HyperspaceEntryQuest.png",
+        "HyperspaceEntryWild",
+        Color(0xff000000),
+        Color(0xffFFFFDD),
+        100,
+        100.0,
+        {
+            {0xff000000, 0xffFFFFDD},
+        }
+    );
+    return ret;
+}
+*/
+
+const MapIconMatcher& MapIcon_HyperspaceEntryWild(){
+    static MapIconMatcher ret(
+        "PokemonLZA/MapIcons/HyperspaceEntryWild.png",
+        "HyperspaceEntryWild",
+        Color(0xff000000),
+        Color(0xffAED635),
+        100,
+        100.0,
+        {
+            {0xff000000, 0xffAED635},
+        }
+    );
+    return ret;
+}
+
+const MapIconMatcher& MapIcon_HyperspaceEntryBattle(){
+    static MapIconMatcher ret(
+        "PokemonLZA/MapIcons/HyperspaceEntryBattle.png",
+        "HyperspaceEntryWild",
+        Color(0xff000000),
+        Color(0xffFB257D),
+        100,
+        100.0,
+        {
+            {0xff000000, 0xffFB257D},
+        }
+    );
+    return ret;
+}
+
 const MapIconMatcher& get_map_icon_matcher(MapIconType icon){
     switch (icon){
     case MapIconType::PokemonCenter:
@@ -177,6 +254,14 @@ const MapIconMatcher& get_map_icon_matcher(MapIconType icon){
         return MapIcon_WildZoneFlyable();
     case MapIconType::BattleZone:
         return MapIcon_BattleZone();
+    case MapIconType::HyperspaceBattleZone:
+        return MapIcon_HyperspaceBattleZone();
+    case MapIconType::HyperspaceWildZone:
+        return MapIcon_HyperspaceWildZone();
+    case MapIconType::HyperspaceEntryWild:
+        return MapIcon_HyperspaceEntryWild();
+    case MapIconType::HyperspaceEntryBattle:
+        return MapIcon_HyperspaceEntryBattle();
     default:
         throw InternalProgramError(
             nullptr, PA_CURRENT_FUNCTION,
@@ -207,6 +292,14 @@ const char* map_icon_type_to_string(MapIconType type){
         return "WildZoneFlyable";
     case MapIconType::BattleZone:
         return "BattleZone";
+    case MapIconType::HyperspaceBattleZone:
+        return "HyperspaceBattleZone";
+    case MapIconType::HyperspaceWildZone:
+        return "HyperspaceWildZone";
+    case MapIconType::HyperspaceEntryWild:
+        return "HyperspaceEntryWild";
+    case MapIconType::HyperspaceEntryBattle:
+        return "HyperspaceEntryBattle";
     default:
         throw InternalProgramError(
             nullptr, PA_CURRENT_FUNCTION,
@@ -226,6 +319,10 @@ MapIconType string_to_map_icon_type(const std::string& str){
     if (str == "WildZone") return MapIconType::WildZone;
     if (str == "WildZoneFlyable") return MapIconType::WildZoneFlyable;
     if (str == "BattleZone") return MapIconType::BattleZone;
+    if (str == "HyperspaceBattleZone") return MapIconType::HyperspaceBattleZone;
+    if (str == "HyperspaceWildZone") return MapIconType::HyperspaceWildZone;
+    if (str == "HyperspaceEntryWild") return MapIconType::HyperspaceEntryWild;
+    if (str == "HyperspaceEntryBattle") return MapIconType::HyperspaceEntryBattle;
     throw InternalProgramError(
         nullptr, PA_CURRENT_FUNCTION,
         "Unknown MapIconType string: " + str
