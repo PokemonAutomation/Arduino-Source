@@ -294,10 +294,10 @@ void place_marker_offset_from_flypoint(
     WallClock start = current_time();
 
     while (true){
-        if (current_time() - start > std::chrono::minutes(5)){
+        if (current_time() - start > std::chrono::minutes(2)){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "place_marker_offset_from_flypoint(): Failed to place down marker after 5 minutes.",
+                "place_marker_offset_from_flypoint(): Failed to place down marker after 2 minutes.",
                 stream
             );
         }
