@@ -31,6 +31,10 @@ enum class MapIconType{
     WildZone,
     WildZoneFlyable,
     BattleZone,
+    HyperspaceBattleZone,
+    HyperspaceWildZone,
+    HyperspaceEntryWild,
+    HyperspaceEntryBattle,
 };
 
 const char* map_icon_type_to_string(MapIconType type);
