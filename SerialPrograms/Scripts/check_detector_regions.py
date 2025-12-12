@@ -33,10 +33,15 @@ print(f"Size: {width} x {height}")
 raw_image = image.copy()
 
 # ==================================================================
+# LZA Hyperspace Timer detection
+add_infer_box_to_image(raw_image, 0.044, 0.111, 0.060, 0.067, image)
+
+
+# ==================================================================
 # LZA Map detector
-add_infer_box_to_image(raw_image, 0.760730, 0.937023, 0.241416, 0.064885, image)
-add_infer_box_to_image(raw_image, 0.005000, 0.150000, 0.025000, 0.110000, image)
-add_infer_box_to_image(raw_image, 0.005000, 0.210000, 0.025000, 0.110000, image)
+# add_infer_box_to_image(raw_image, 0.760730, 0.937023, 0.241416, 0.064885, image)
+# add_infer_box_to_image(raw_image, 0.005000, 0.150000, 0.025000, 0.110000, image)
+# add_infer_box_to_image(raw_image, 0.005000, 0.210000, 0.025000, 0.110000, image)
 
 
 # ==================================================================
