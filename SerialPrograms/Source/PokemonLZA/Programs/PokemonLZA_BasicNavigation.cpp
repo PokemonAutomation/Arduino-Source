@@ -113,16 +113,13 @@ bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_t
     MapIconDetector flayble_cafe_icon(COLOR_ORANGE, MapIconType::CafeFlyable, icon_region, &console.overlay());
     MapIconDetector flyable_hyperspace_battle_zone_icon(COLOR_ORANGE, MapIconType::HyperspaceBattleZone, icon_region, &console.overlay());
     MapIconDetector flyable_hyperspace_wild_zone_icon(COLOR_ORANGE, MapIconType::HyperspaceWildZone, icon_region, &console.overlay());
-    MapIconDetector flyable_hyperspace_entry_wild_icon(COLOR_ORANGE, MapIconType::HyperspaceEntryWild, icon_region, &console.overlay());
-    MapIconDetector flyable_hyperspace_entry_battle_icon(COLOR_ORANGE, MapIconType::HyperspaceEntryBattle, icon_region, &console.overlay());
+
     MapWatcher map_detector(COLOR_RED, &console.overlay());
     map_detector.attach_map_icon_detector(pokecenter_icon);
     map_detector.attach_map_icon_detector(flyable_building_icon);
     map_detector.attach_map_icon_detector(flayble_cafe_icon);
     map_detector.attach_map_icon_detector(flyable_hyperspace_battle_zone_icon);
     map_detector.attach_map_icon_detector(flyable_hyperspace_wild_zone_icon);
-    map_detector.attach_map_icon_detector(flyable_hyperspace_entry_wild_icon);
-    map_detector.attach_map_icon_detector(flyable_hyperspace_entry_battle_icon);
 
     do{
         map_detector.reset_state();
@@ -181,7 +178,13 @@ void open_hyperspace_map(ConsoleHandle& console, ProControllerContext& context){
     
     WallClock deadline = current_time() + 30s;
 
+    const ImageFloatBox icon_region{0.0, 0.089, 1.0, 0.911};
+    MapIconDetector flyable_hyperspace_entry_wild_icon(COLOR_ORANGE, MapIconType::HyperspaceEntryWild, icon_region, &console.overlay());
+    MapIconDetector flyable_hyperspace_entry_battle_icon(COLOR_ORANGE, MapIconType::HyperspaceEntryBattle, icon_region, &console.overlay());
+
     MapWatcher map_detector(COLOR_RED, &console.overlay());
+    map_detector.attach_map_icon_detector(flyable_hyperspace_entry_wild_icon);
+    map_detector.attach_map_icon_detector(flyable_hyperspace_entry_battle_icon);
 
     do{
         map_detector.reset_state();
