@@ -343,6 +343,7 @@ void overworld_navigation(
 
 
     while (true){
+        NoMinimapWatcher no_minimap(stream.logger(), COLOR_RED, Milliseconds(250));
         NormalBattleMenuWatcher battle(COLOR_BLUE);
         DialogBoxWatcher        dialog(COLOR_RED, true);
         DestinationMarkerWatcher marker(COLOR_CYAN, {0.717, 0.165, 0.03, 0.061});
@@ -359,18 +360,31 @@ void overworld_navigation(
             [&](ProControllerContext& context){
 
                 for (int i = 0; i < seconds_timeout / seconds_realign; i++){
-                    if (movement_mode == NavigationMovementMode::CLEAR_WITH_LETS_GO){
-                        walk_forward_while_clear_front_path(info, stream, context, forward_ticks, y);
-                    }else{
-                        ssf_press_left_joystick(context, x, y, 0ms, Seconds(seconds_realign));
-                        if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
-                            pbf_wait(context, Seconds(seconds_realign));
-                        } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
-                            for (size_t j = 0; j < 5 * seconds_realign; j++){
-                                pbf_press_button(context, BUTTON_A, 20, 5);
+                    // if detect no minimap, then stop moving or spamming A.
+                    int ret2 = run_until<ProControllerContext>(
+                        stream, context,
+                        [&](ProControllerContext& context){
+                            if (movement_mode == NavigationMovementMode::CLEAR_WITH_LETS_GO){
+                                walk_forward_while_clear_front_path(info, stream, context, forward_ticks, y);
+                            }else{
+                                ssf_press_left_joystick(context, x, y, 0ms, Seconds(seconds_realign));
+                                if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
+                                    pbf_wait(context, Seconds(seconds_realign));
+                                } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
+                                    for (size_t j = 0; j < 5 * seconds_realign; j++){
+                                        pbf_press_button(context, BUTTON_A, 20, 5);
+                                    }
+                                }
                             }
-                        }
+                        },
+                        { no_minimap }
+                    );
+
+                    if (ret2 == 0){
+                        stream.log("overworld_navigation: No minimap detected. Wait for Battle or Dialog.");
+                        context.wait_for(Seconds(15));
                     }
+
                     context.wait_for_all_requests();
                     if (should_realign){
                         try {
