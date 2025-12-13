@@ -18,6 +18,7 @@ class QKeyEvent;
 namespace PokemonAutomation{
 
 class RecursiveThrottler;
+class ControllerInputState;
 enum class ControllerType;
 enum class ControllerPerformanceClass;
 enum class ControllerClass;
@@ -193,7 +194,9 @@ public:
 
 
 public:
-    //  Keyboard Controls
+    //  Controller Input
+
+    virtual void controller_input_state(const ControllerInputState& state){}
 
     virtual void keyboard_release_all(){}
     virtual void keyboard_press(const QKeyEvent& event){}

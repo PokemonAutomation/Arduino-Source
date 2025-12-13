@@ -224,7 +224,9 @@ public:
 
 
 public:
-    //  Keyboard Input
+    //  Controller Input
+
+    virtual void controller_input_state(const ControllerInputState& state) override;
 
     virtual void keyboard_release_all() override;
     virtual void keyboard_press(const QKeyEvent& event) override;

@@ -8,7 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_KeyboardEntryMappings_H
 
 #include <map>
-#include "Controllers/StandardHid/StandardHid_Keyboard_ControllerButtons.h"
+#include "ControllerInput/Keyboard/KeyboardHidButtons.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -19,10 +19,10 @@ enum class KeyboardLayout{
     AZERTY
 };
 
-const std::map<char, StandardHid::KeyboardKey>& KEYBOARD_MAPPINGS(KeyboardLayout layout);
+const std::map<char, KeyboardKey>& KEYBOARD_MAPPINGS(KeyboardLayout layout);
 
-const std::map<char, StandardHid::KeyboardKey>& KEYBOARD_MAPPINGS_QWERTY();
-const std::map<char, StandardHid::KeyboardKey>& KEYBOARD_MAPPINGS_AZERTY();
+const std::map<char, KeyboardKey>& KEYBOARD_MAPPINGS_QWERTY();
+const std::map<char, KeyboardKey>& KEYBOARD_MAPPINGS_AZERTY();
 
 
 

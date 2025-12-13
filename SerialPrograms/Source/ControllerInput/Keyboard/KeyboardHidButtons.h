@@ -1,17 +1,16 @@
-/*  HID Keyboard Controller Buttons
+/*  HID Keyboard Buttons
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_StandardHid_Keyboard_ControllerButtons_H
-#define PokemonAutomation_StandardHid_Keyboard_ControllerButtons_H
+#ifndef PokemonAutomation_ControllerInput_Keyboard_KeyboardHidButtons_H
+#define PokemonAutomation_ControllerInput_Keyboard_KeyboardHidButtons_H
 
 #include <stdint.h>
 
 
 namespace PokemonAutomation{
-namespace StandardHid{
 
 
 
@@ -192,6 +191,5 @@ enum KeyboardKey : uint8_t{
 
 
 
-}
 }
 #endif

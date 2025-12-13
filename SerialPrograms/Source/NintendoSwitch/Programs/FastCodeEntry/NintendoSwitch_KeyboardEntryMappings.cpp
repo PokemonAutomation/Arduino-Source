@@ -11,7 +11,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-const std::map<char, StandardHid::KeyboardKey>& KEYBOARD_MAPPINGS(KeyboardLayout layout){
+const std::map<char, KeyboardKey>& KEYBOARD_MAPPINGS(KeyboardLayout layout){
     switch (layout){
     case KeyboardLayout::QWERTY:
         return KEYBOARD_MAPPINGS_QWERTY();
@@ -42,8 +42,7 @@ const std::map<char, KeyboardEntryPosition>& KEYBOARD_POSITIONS(KeyboardLayout l
 
 
 
-const std::map<char, StandardHid::KeyboardKey>& KEYBOARD_MAPPINGS_QWERTY(){
-    using namespace StandardHid;
+const std::map<char, KeyboardKey>& KEYBOARD_MAPPINGS_QWERTY(){
     static const std::map<char, KeyboardKey> map{
         {'1', KeyboardKey::KEY_KP_1},
         {'2', KeyboardKey::KEY_KP_2},
@@ -87,8 +86,7 @@ const std::map<char, StandardHid::KeyboardKey>& KEYBOARD_MAPPINGS_QWERTY(){
     };
     return map;
 }
-const std::map<char, StandardHid::KeyboardKey>& KEYBOARD_MAPPINGS_AZERTY(){
-    using namespace StandardHid;
+const std::map<char, KeyboardKey>& KEYBOARD_MAPPINGS_AZERTY(){
     static const std::map<char, KeyboardKey> map{
         {'1', KeyboardKey::KEY_KP_1},
         {'2', KeyboardKey::KEY_KP_2},

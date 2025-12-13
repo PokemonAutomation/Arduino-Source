@@ -14,6 +14,7 @@
 #include "Common/Qt/CheckboxDropdown.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
+#include "ControllerInput/ControllerInput.h"
 #include "Controllers/ControllerSession.h"
 #include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
 
@@ -26,7 +27,8 @@ namespace NintendoSwitch{
 class CommandRow :
     public QWidget,
     public VideoOverlaySession::ContentListener,
-    public ControllerSession::Listener
+    public ControllerSession::Listener,
+    public ControllerInputListener
 {
     Q_OBJECT
 
@@ -55,6 +57,8 @@ public:
     void on_state_changed(ProgramState state);
 
 private:
+    virtual void controller_input_state(ControllerInputState& state) override;
+
     virtual void on_overlay_enabled_stats  (bool enabled) override;
     virtual void on_overlay_enabled_boxes  (bool enabled) override;
     virtual void on_overlay_enabled_text   (bool enabled) override;

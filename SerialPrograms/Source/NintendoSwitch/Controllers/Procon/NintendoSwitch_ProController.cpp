@@ -7,6 +7,8 @@
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "CommonTools/Async/InterruptableCommands.tpp"
 #include "CommonTools/Async/SuperControlSession.tpp"
+#include "ControllerInput/ControllerInput.h"
+#include "ControllerInput/Keyboard/KeyboardInput_State.h"
 #include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
@@ -90,6 +92,53 @@ public:
 
 
 
+#if 0
+class KeyboardToProconMap{
+public:
+    void update(){
+        WriteSpinLock lg(m_lock);
+
+        std::map<Qt::Key, ProControllerDeltas> map;
+        std::vector<std::shared_ptr<EditableTableRow>> mapping =
+            ConsoleSettings::instance().KEYBOARD_MAPPINGS.PRO_CONTROLLER1.current_refs();
+        for (const auto& deltas : mapping){
+            const ProControllerKeyMapTableRow& row = static_cast<const ProControllerKeyMapTableRow&>(*deltas);
+            map[(Qt::Key)(uint32_t)row.key] += row.snapshot();
+        }
+
+        m_map = std::move(map);
+    }
+
+    void accumulate(){
+
+    }
+
+
+private:
+    SpinLock m_lock;
+    std::map<Qt::Key, ProControllerDeltas> m_map;
+};
+
+
+const std::map<Qt::Key, ProControllerDeltas>& keyboard_to_procon_mapping(){
+    static std::map<Qt::Key, ProControllerDeltas> map;
+    static SpinLock lock;
+
+    WriteSpinLock lg(lock);
+
+    map.clear();
+    std::vector<std::shared_ptr<EditableTableRow>> mapping =
+        ConsoleSettings::instance().KEYBOARD_MAPPINGS.PRO_CONTROLLER1.current_refs();
+    for (const auto& deltas : mapping){
+        const ProControllerKeyMapTableRow& row = static_cast<const ProControllerKeyMapTableRow&>(*deltas);
+        map[(Qt::Key)(uint32_t)row.key] += row.snapshot();
+    }
+
+    return map;
+}
+#endif
+
+
 ProController::ProController(Logger& logger)
     : m_keyboard_manager(CONSTRUCT_TOKEN, logger, *this)
 {
@@ -105,6 +154,26 @@ ControllerClass ProController::controller_class() const{
     return ControllerClass::NintendoSwitch_ProController;
 }
 
+void ProController::controller_input_state(const ControllerInputState& state){
+    if (state.type() == ControllerInputType::HID_Keyboard){
+//        const KeyboardInputState& lstate = static_cast<const KeyboardInputState&>(state);
+    }
+
+
+#if 0
+
+    std::map<Qt::Key, ProControllerDeltas> m_mapping;
+
+    std::vector<std::shared_ptr<EditableTableRow>> mapping =
+        ConsoleSettings::instance().KEYBOARD_MAPPINGS.PRO_CONTROLLER1.current_refs();
+    for (const auto& deltas : mapping){
+        const ProControllerKeyMapTableRow& row = static_cast<const ProControllerKeyMapTableRow&>(*deltas);
+        m_mapping[(Qt::Key)(uint32_t)row.key] += row.snapshot();
+    }
+
+    ProControllerDeltas deltas;
+#endif
+}
 void ProController::keyboard_release_all(){
     m_keyboard_manager->clear_state();
 }

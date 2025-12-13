@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Controllers_GlobalQtKeyMap_H
-#define PokemonAutomation_Controllers_GlobalQtKeyMap_H
+#ifndef PokemonAutomation_ControllerInput_Keyboard_GlobalQtKeyMap_H
+#define PokemonAutomation_ControllerInput_Keyboard_GlobalQtKeyMap_H
 
 #include <set>
 #include <map>

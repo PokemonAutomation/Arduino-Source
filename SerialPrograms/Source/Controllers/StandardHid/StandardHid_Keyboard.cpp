@@ -6,12 +6,11 @@
 
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Options/KeyboardLayoutOption.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonTools/Async/InterruptableCommands.tpp"
 #include "CommonTools/Async/SuperControlSession.tpp"
+#include "ControllerInput/Keyboard/KeyboardInput_KeyMappings.h"
 #include "Controllers/ControllerState.h"
 #include "Controllers/KeyboardInput/KeyboardInput.h"
-#include "StandardHid_Keyboard_KeyMappings.h"
 #include "StandardHid_Keyboard.h"
 
 //#include <iostream>
@@ -102,21 +101,6 @@ void log_qtkey(Logger& logger, const QtKeyMap::QtKey& qtkey){
 
 
 
-const std::map<QtKeyMap::QtKey, KeyboardKey>& get_keyid_to_hid_map(){
-    KeyboardLayout layout = *GlobalSettings::instance().KEYBOARD_CONTROLS_LAYOUT;
-    switch (layout){
-    case KeyboardLayout::QWERTY:
-        return KEYID_TO_HID_QWERTY();
-    case KeyboardLayout::AZERTY:
-        return KEYID_TO_HID_AZERTY();
-    default:
-        throw InternalProgramError(
-            nullptr,
-            PA_CURRENT_FUNCTION,
-            "Invalid KeyboardLayout Enum: " + std::to_string((int)layout)
-        );
-    }
-}
 
 
 class Keyboard::KeyboardManager final : public PokemonAutomation::KeyboardInputController{

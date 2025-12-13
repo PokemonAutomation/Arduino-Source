@@ -11,8 +11,8 @@
 
 #include <vector>
 #include "Common/Cpp/Containers/Pimpl.h"
+#include "ControllerInput/Keyboard/KeyboardHidButtons.h"
 #include "Controllers/Controller.h"
-#include "StandardHid_Keyboard_ControllerButtons.h"
 
 namespace PokemonAutomation{
 namespace StandardHid{
@@ -64,7 +64,7 @@ public:
 
 
 public:
-    //  Keyboard Input
+    //  Controller Input
 
     virtual void keyboard_release_all() override;
     virtual void keyboard_press(const QKeyEvent& event) override;

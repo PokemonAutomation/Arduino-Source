@@ -129,8 +129,6 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Options/GroupOption.h
     ../Common/Cpp/Options/IntegerRangeOption.cpp
     ../Common/Cpp/Options/IntegerRangeOption.h
-    ../Common/Cpp/Options/KeyBindingOption.cpp
-    ../Common/Cpp/Options/KeyBindingOption.h
     ../Common/Cpp/Options/KeyboardLayoutOption.cpp
     ../Common/Cpp/Options/KeyboardLayoutOption.h
     ../Common/Cpp/Options/MacAddressOption.cpp
@@ -222,8 +220,6 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/Options/GroupWidget.h
     ../Common/Qt/Options/IntegerRangeWidget.cpp
     ../Common/Qt/Options/IntegerRangeWidget.h
-    ../Common/Qt/Options/KeyBindingWidget.cpp
-    ../Common/Qt/Options/KeyBindingWidget.h
     ../Common/Qt/Options/MacAddressWidget.cpp
     ../Common/Qt/Options/MacAddressWidget.h
     ../Common/Qt/Options/PathWidget.cpp
@@ -640,6 +636,25 @@ file(GLOB LIBRARY_SOURCES
     Source/ComputerPrograms/Framework/ComputerProgramSession.h
     Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp
     Source/ComputerPrograms/Framework/ComputerProgramWidget.h
+    Source/ControllerInput/ControllerInput.cpp
+    Source/ControllerInput/ControllerInput.h
+    Source/ControllerInput/Keyboard/GlobalKeyboardHidTracker.cpp
+    Source/ControllerInput/Keyboard/GlobalKeyboardHidTracker.h
+    Source/ControllerInput/Keyboard/GlobalQtKeyMap.cpp
+    Source/ControllerInput/Keyboard/GlobalQtKeyMap.h
+    Source/ControllerInput/Keyboard/KeyBindingOption.cpp
+    Source/ControllerInput/Keyboard/KeyBindingOption.h
+    Source/ControllerInput/Keyboard/KeyBindingWidget.cpp
+    Source/ControllerInput/Keyboard/KeyBindingWidget.h
+    Source/ControllerInput/Keyboard/KeyboardHidButtons.h
+    Source/ControllerInput/Keyboard/KeyboardInput_KeyMappings.cpp
+    Source/ControllerInput/Keyboard/KeyboardInput_KeyMappings.h
+    Source/ControllerInput/Keyboard/KeyboardInput_KeyMappings_AZERTY.cpp
+    Source/ControllerInput/Keyboard/KeyboardInput_KeyMappings_QWERTY.cpp
+    Source/ControllerInput/Keyboard/KeyboardInput_State.cpp
+    Source/ControllerInput/Keyboard/KeyboardInput_State.h
+    Source/ControllerInput/Keyboard/KeyboardInput_StateTracker.cpp
+    Source/ControllerInput/Keyboard/KeyboardInput_StateTracker.h
     Source/Controllers/Controller.cpp
     Source/Controllers/Controller.h
     Source/Controllers/ControllerConnection.cpp
@@ -658,14 +673,11 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/ControllerTypeStrings.h
     Source/Controllers/ControllerTypes.h
     Source/Controllers/JoystickTools.h
-    Source/Controllers/KeyboardInput/GlobalQtKeyMap.cpp
-    Source/Controllers/KeyboardInput/GlobalQtKeyMap.h
     Source/Controllers/KeyboardInput/KeyboardEventHandler.cpp
     Source/Controllers/KeyboardInput/KeyboardEventHandler.h
     Source/Controllers/KeyboardInput/KeyboardInput.cpp
     Source/Controllers/KeyboardInput/KeyboardInput.h
-    Source/Controllers/KeyboardInput/KeyboardStateTracker.cpp
-    Source/Controllers/KeyboardInput/KeyboardStateTracker.h
+    Source/Controllers/KeyboardInput/KeyboardHidButtons.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h
     Source/Controllers/Schedulers/ControllerWithScheduler.h
@@ -703,9 +715,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/StandardHid/StandardHid_Keyboard.h
     Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.cpp
     Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.h
-    Source/Controllers/StandardHid/StandardHid_Keyboard_ControllerButtons.h
-    Source/Controllers/StandardHid/StandardHid_Keyboard_KeyMappings.cpp
-    Source/Controllers/StandardHid/StandardHid_Keyboard_KeyMappings.h
     Source/Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.cpp
     Source/Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.h
     Source/Integrations/DiscordIntegrationSettings.cpp

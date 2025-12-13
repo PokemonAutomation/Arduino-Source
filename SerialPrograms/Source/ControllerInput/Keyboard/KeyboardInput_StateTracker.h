@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Controllers_KeyboardStateTracker_H
-#define PokemonAutomation_Controllers_KeyboardStateTracker_H
+#ifndef PokemonAutomation_ControllerInput_Keyboard_KeyboardInput_StateTracker_H
+#define PokemonAutomation_ControllerInput_Keyboard_KeyboardInput_StateTracker_H
 
 #include <deque>
 #include <set>

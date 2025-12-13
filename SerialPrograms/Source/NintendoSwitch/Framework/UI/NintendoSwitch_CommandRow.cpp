@@ -10,6 +10,7 @@
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Panels/ConsoleSettingsStretch.h"
 #include "CommonFramework/Recording/StreamHistoryOption.h"
+#include "ControllerInput/Keyboard/GlobalKeyboardHidTracker.h"
 #include "NintendoSwitch_CommandRow.h"
 
 //#include <iostream>
@@ -23,6 +24,7 @@ namespace NintendoSwitch{
 
 
 CommandRow::~CommandRow(){
+    global_keyboard_tracker().remove_listener(*this);
     m_controller.remove_listener(*this);
     m_session.remove_listener(*this);
 }
@@ -179,6 +181,7 @@ CommandRow::CommandRow(
 }
 
 void CommandRow::on_key_press(const QKeyEvent& key){
+#if 1   //  REMOVE
     if (!m_last_known_focus){
         m_controller.logger().log("Keyboard Command Suppressed: Not in focus.", COLOR_RED);
         return;
@@ -193,8 +196,10 @@ void CommandRow::on_key_press(const QKeyEvent& key){
         return;
     }
     controller->keyboard_press(key);
+#endif
 }
 void CommandRow::on_key_release(const QKeyEvent& key){
+#if 1   //  REMOVE
     if (!m_last_known_focus){
         return;
     }
@@ -203,14 +208,28 @@ void CommandRow::on_key_release(const QKeyEvent& key){
         return;
     }
     controller->keyboard_release(key);
+#endif
 }
 
+void CommandRow::controller_input_state(ControllerInputState& state){
+    AbstractController* controller = m_controller.controller();
+    if (controller != nullptr){
+        controller->controller_input_state(state);
+    }
+}
 void CommandRow::set_focus(bool focused){
+#if 1   //  REMOVE
     AbstractController* controller = m_controller.controller();
     if (!focused){
         if (controller != nullptr){
             controller->keyboard_release_all();
         }
+    }
+#endif
+    if (focused){
+        global_keyboard_tracker().add_listener(*this);
+    }else{
+        global_keyboard_tracker().remove_listener(*this);
     }
     if (m_last_known_focus == focused){
         return;

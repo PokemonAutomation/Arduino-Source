@@ -13,10 +13,10 @@
 //#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Thread.h"
+#include "ControllerInput/Keyboard/GlobalQtKeyMap.h"
+#include "ControllerInput/Keyboard/KeyboardInput_StateTracker.h"
 #include "Controllers/Controller.h"
-#include "Controllers/KeyboardInput/GlobalQtKeyMap.h"
 #include "KeyboardEventHandler.h"
-#include "KeyboardStateTracker.h"
 
 class QKeyEvent;
 

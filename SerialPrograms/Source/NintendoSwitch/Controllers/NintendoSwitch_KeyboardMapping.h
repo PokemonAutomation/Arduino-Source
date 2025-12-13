@@ -14,7 +14,7 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
-#include "Common/Cpp/Options/KeyBindingOption.h"
+#include "ControllerInput/Keyboard/KeyBindingOption.h"
 #include "NintendoSwitch_ControllerButtons.h"
 
 namespace PokemonAutomation{
@@ -74,6 +74,43 @@ public:
 private:
     std::atomic<bool> m_advanced_mode;
 };
+
+
+
+
+class ProControllerKeyMapTableRow2 : public EditableTableRow{
+public:
+    ProControllerKeyMapTableRow2(EditableTableOption& parent_table);
+    ProControllerKeyMapTableRow2(
+        EditableTableOption& parent_table,
+        bool advanced_mode,
+        std::string description,
+        Qt::Key key,
+        const ProControllerDeltas& deltas
+    );
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
+    ProControllerDeltas snapshot() const;
+
+    void set_advanced_mode(bool enabled);
+
+private:
+    std::atomic<bool> m_advanced_mode;
+
+public:
+    StringCell label;
+    KeyboardHidBindingCell key;
+    SimpleIntegerCell<ButtonFlagType> buttons;
+    SimpleIntegerCell<int8_t> dpad_x;
+    SimpleIntegerCell<int8_t> dpad_y;
+    SimpleIntegerCell<int8_t> left_stick_x;
+    SimpleIntegerCell<int8_t> left_stick_y;
+    SimpleIntegerCell<int8_t> right_stick_x;
+    SimpleIntegerCell<int8_t> right_stick_y;
+};
+
+
+
+
 
 
 

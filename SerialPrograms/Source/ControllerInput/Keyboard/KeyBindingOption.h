@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Options/ConfigOption.h"
+#include "ControllerInput/Keyboard/KeyboardHidButtons.h"
 
 namespace PokemonAutomation{
 
@@ -22,6 +23,36 @@ public:
     operator uint32_t() const;
     operator std::string() const;
     void set(uint32_t key);
+
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
+
+    virtual void restore_defaults() override;
+
+    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
+
+
+public:
+    //  UI Functions
+    void set(std::string text);
+
+
+private:
+    struct Data;
+    Pimpl<Data> m_data;
+};
+
+
+
+
+class KeyboardHidBindingCell : public ConfigOption{
+public:
+    ~KeyboardHidBindingCell();
+    KeyboardHidBindingCell(LockMode lock_while_program_is_running);
+
+    operator KeyboardKey() const;
+    operator std::string() const;
+    void set(KeyboardKey key);
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
