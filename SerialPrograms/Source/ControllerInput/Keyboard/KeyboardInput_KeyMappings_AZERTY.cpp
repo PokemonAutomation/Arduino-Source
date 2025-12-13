@@ -50,6 +50,7 @@ const std::map<QtKeyMap::QtKey, KeyboardKey>& KEYID_TO_HID_AZERTY(){
         {Qt::Key::Key_Ccedilla,         KeyboardKey::KEY_9},    // c key -> HID 9 position
         {Qt::Key::Key_Agrave,           KeyboardKey::KEY_0},    // a key -> HID 0 position
 
+        {Qt::Key::Key_Return,           KeyboardKey::KEY_ENTER},
         {Qt::Key::Key_Enter,            KeyboardKey::KEY_ENTER},
         {Qt::Key::Key_Escape,           KeyboardKey::KEY_ESC},
         {Qt::Key::Key_Backspace,        KeyboardKey::KEY_BACKSPACE},

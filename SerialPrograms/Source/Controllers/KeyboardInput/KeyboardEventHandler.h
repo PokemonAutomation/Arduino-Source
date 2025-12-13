@@ -28,7 +28,6 @@ public:
     void add_listener(KeyboardListener& listener);
     void remove_listener(KeyboardListener& listener);
 
-protected:
     //  Report that the keyboard state has changed. This will be pushed to
     //  all listeners.
     void report_keyboard_command_sent(WallClock time_stamp, const ControllerState& state);

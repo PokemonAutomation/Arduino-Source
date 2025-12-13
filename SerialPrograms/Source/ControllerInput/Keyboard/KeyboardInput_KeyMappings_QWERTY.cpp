@@ -50,6 +50,7 @@ const std::map<QtKeyMap::QtKey, KeyboardKey>& KEYID_TO_HID_QWERTY(){
         {Qt::Key::Key_9,                KeyboardKey::KEY_9},
         {Qt::Key::Key_0,                KeyboardKey::KEY_0},
 
+        {Qt::Key::Key_Return,           KeyboardKey::KEY_ENTER},
         {Qt::Key::Key_Enter,            KeyboardKey::KEY_ENTER},
         {Qt::Key::Key_Escape,           KeyboardKey::KEY_ESC},
         {Qt::Key::Key_Backspace,        KeyboardKey::KEY_BACKSPACE},

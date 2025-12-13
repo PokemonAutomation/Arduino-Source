@@ -49,7 +49,7 @@ private:
     OCR::LanguageOCROption LANGUAGE;
     SimpleIntegerOption<uint32_t> NUM_APRICORN_ONE;
     SimpleIntegerOption<uint32_t> NUM_APRICORN_TWO;
-    SimpleIntegerOption<uint32_t> NUM_NPCS;
+    SimpleIntegerOption<uint8_t> NUM_NPCS;
     CramomaticTable BALL_TABLE;
 
     TouchDateIntervalOption TOUCH_DATE_INTERVAL;

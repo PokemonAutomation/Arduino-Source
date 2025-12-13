@@ -212,10 +212,20 @@ void CommandRow::on_key_release(const QKeyEvent& key){
 }
 
 void CommandRow::controller_input_state(ControllerInputState& state){
-    AbstractController* controller = m_controller.controller();
-    if (controller != nullptr){
-        controller->controller_input_state(state);
+    if (!m_last_known_focus){
+        m_controller.logger().log("Keyboard Command Suppressed: Not in focus.", COLOR_RED);
+        return;
     }
+    AbstractController* controller = m_controller.controller();
+    if (controller == nullptr){
+        m_controller.logger().log("Keyboard Command Suppressed: Controller is null.", COLOR_RED);
+        return;
+    }
+    if (!m_allow_commands_while_running && m_last_known_state != ProgramState::STOPPED){
+        m_controller.logger().log("Keyboard Command Suppressed: Program is running.", COLOR_RED);
+        return;
+    }
+    controller->controller_input_state(state);
 }
 void CommandRow::set_focus(bool focused){
 #if 1   //  REMOVE
@@ -229,7 +239,14 @@ void CommandRow::set_focus(bool focused){
     if (focused){
         global_keyboard_tracker().add_listener(*this);
     }else{
+        global_keyboard_tracker().clear_state();
         global_keyboard_tracker().remove_listener(*this);
+
+        if (controller != nullptr &&
+            (m_allow_commands_while_running || m_last_known_state == ProgramState::STOPPED)
+        ){
+            controller->cancel_all_commands();
+        }
     }
     if (m_last_known_focus == focused){
         return;

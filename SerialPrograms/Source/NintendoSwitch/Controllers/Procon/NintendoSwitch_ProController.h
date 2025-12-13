@@ -71,11 +71,6 @@ public:
     virtual ControllerClass controller_class() const override;
 
 
-protected:
-    //  Must call before destruction begins.
-    void stop() noexcept;
-
-
 public:
     //  Standard Commands
 
@@ -228,16 +223,12 @@ public:
 
     virtual void controller_input_state(const ControllerInputState& state) override;
 
-    virtual void keyboard_release_all() override;
-    virtual void keyboard_press(const QKeyEvent& event) override;
-    virtual void keyboard_release(const QKeyEvent& event) override;
-
     virtual void add_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener) override;
     virtual void remove_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener) override;
 
 private:
-    class KeyboardManager;
-    Pimpl<KeyboardManager> m_keyboard_manager;
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 

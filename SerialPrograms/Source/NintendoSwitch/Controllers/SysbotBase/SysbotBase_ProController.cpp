@@ -46,7 +46,6 @@ void ProController_SysbotBase::stop(){
     if (m_stopping.exchange(true)){
         return;
     }
-    ProController::stop();
     {
         std::lock_guard<std::mutex> lg(m_state_lock);
         m_cv.notify_all();

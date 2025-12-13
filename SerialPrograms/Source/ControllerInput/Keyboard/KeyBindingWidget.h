@@ -15,24 +15,6 @@ namespace PokemonAutomation{
 
 
 
-class KeyBindingCellWidget : public QLineEdit, public ConfigWidget{
-public:
-    ~KeyBindingCellWidget();
-    KeyBindingCellWidget(QWidget& parent, KeyBindingCell& value);
-
-    virtual void update_value() override;
-    virtual void on_config_value_changed(void* object) override;
-
-    virtual void keyPressEvent(QKeyEvent* event) override;
-
-private:
-    KeyBindingCell& m_value;
-};
-
-
-
-
-
 class KeyboardHidBindingCellWidget : public QLineEdit, public ConfigWidget{
 public:
     ~KeyboardHidBindingCellWidget();
