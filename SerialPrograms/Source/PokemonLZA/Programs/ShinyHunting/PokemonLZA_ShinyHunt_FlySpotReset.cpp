@@ -74,7 +74,8 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
         Route::NO_MOVEMENT
     )
     , NUM_RESETS(
-        "<b>Hyperspace Resets:</b><br>Number of resets when running the Hyperspace Wild Zone route. Each fly takes about 1 Cal. of time. Make sure to leave enough time to catch found shinies.",
+        "<b>Hyperspace Resets:</b><br>Number of resets when running the Hyperspace Wild Zone route. Make sure to leave enough time to catch found shinies."
+        "<br>Approximate Star/Cal. per reset: 1 Star/1 Cal, 2 Star/1-1.5 Cal., 3 Star/2-2.5 Cal., 4 Star/5 Cal., 5 Star/6 Cal.",
         LockMode::UNLOCK_WHILE_RUNNING,
         100, 1
     )
