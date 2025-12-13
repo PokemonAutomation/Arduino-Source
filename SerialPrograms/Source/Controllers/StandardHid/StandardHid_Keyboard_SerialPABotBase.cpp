@@ -63,7 +63,6 @@ SerialPABotBase_Keyboard::~SerialPABotBase_Keyboard(){
     stop();
 }
 void SerialPABotBase_Keyboard::stop(){
-    Keyboard::stop();
     m_status_thread.reset();
 }
 

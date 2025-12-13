@@ -3,7 +3,6 @@
  */
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
-#include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "KeyboardEventHandler.h"
 
 namespace PokemonAutomation{

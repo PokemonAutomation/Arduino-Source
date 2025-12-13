@@ -42,9 +42,6 @@ public:
         bool allow_commands_while_running
     );
 
-    void on_key_press(const QKeyEvent& key);
-    void on_key_release(const QKeyEvent& key);
-
 signals:
     void load_profile();
     void save_profile();

@@ -37,7 +37,7 @@ KeyboardHidTracker::KeyboardHidTracker()
     , m_stopping(false)
     , m_thread([this]{
         run_with_catch(
-            "KeyboardInputController::thread_loop()",
+            "KeyboardHidTracker::thread_loop()",
             [this]{ thread_loop(); }
         );
     })

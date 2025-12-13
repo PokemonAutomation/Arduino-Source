@@ -13,8 +13,6 @@
 #include "Controllers/KeyboardInput/KeyboardEventHandler.h"
 #include "Common/Cpp/CancellableScope.h"
 
-class QKeyEvent;
-
 namespace PokemonAutomation{
 
 class RecursiveThrottler;
@@ -197,10 +195,6 @@ public:
     //  Controller Input
 
     virtual void controller_input_state(const ControllerInputState& state){}
-
-    virtual void keyboard_release_all(){}
-    virtual void keyboard_press(const QKeyEvent& event){}
-    virtual void keyboard_release(const QKeyEvent& event){}
 
     virtual void add_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener){};
     virtual void remove_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener){};

@@ -39,11 +39,6 @@ public:
     };
 
 
-protected:
-    //  Must call before destruction begins.
-    void stop() noexcept;
-
-
 public:
     //  Standard Commands
 
@@ -66,14 +61,10 @@ public:
 public:
     //  Controller Input
 
-    virtual void keyboard_release_all() override;
-    virtual void keyboard_press(const QKeyEvent& event) override;
-    virtual void keyboard_release(const QKeyEvent& event) override;
+    virtual void controller_input_state(const ControllerInputState& state) override;
 
 
 private:
-    class KeyboardManager;
-    Pimpl<KeyboardManager> m_keyboard_manager;
 };
 
 

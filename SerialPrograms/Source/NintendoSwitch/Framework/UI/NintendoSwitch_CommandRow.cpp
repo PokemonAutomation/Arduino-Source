@@ -180,37 +180,6 @@ CommandRow::CommandRow(
     m_controller.add_listener(*this);
 }
 
-void CommandRow::on_key_press(const QKeyEvent& key){
-#if 1   //  REMOVE
-    if (!m_last_known_focus){
-        m_controller.logger().log("Keyboard Command Suppressed: Not in focus.", COLOR_RED);
-        return;
-    }
-    AbstractController* controller = m_controller.controller();
-    if (controller == nullptr){
-        m_controller.logger().log("Keyboard Command Suppressed: Controller is null.", COLOR_RED);
-        return;
-    }
-    if (!m_allow_commands_while_running && m_last_known_state != ProgramState::STOPPED){
-        m_controller.logger().log("Keyboard Command Suppressed: Program is running.", COLOR_RED);
-        return;
-    }
-    controller->keyboard_press(key);
-#endif
-}
-void CommandRow::on_key_release(const QKeyEvent& key){
-#if 1   //  REMOVE
-    if (!m_last_known_focus){
-        return;
-    }
-    AbstractController* controller = m_controller.controller();
-    if (controller == nullptr){
-        return;
-    }
-    controller->keyboard_release(key);
-#endif
-}
-
 void CommandRow::controller_input_state(ControllerInputState& state){
     if (!m_last_known_focus){
         m_controller.logger().log("Keyboard Command Suppressed: Not in focus.", COLOR_RED);
@@ -228,20 +197,13 @@ void CommandRow::controller_input_state(ControllerInputState& state){
     controller->controller_input_state(state);
 }
 void CommandRow::set_focus(bool focused){
-#if 1   //  REMOVE
-    AbstractController* controller = m_controller.controller();
-    if (!focused){
-        if (controller != nullptr){
-            controller->keyboard_release_all();
-        }
-    }
-#endif
     if (focused){
         global_keyboard_tracker().add_listener(*this);
     }else{
         global_keyboard_tracker().clear_state();
         global_keyboard_tracker().remove_listener(*this);
 
+        AbstractController* controller = m_controller.controller();
         if (controller != nullptr &&
             (m_allow_commands_while_running || m_last_known_state == ProgramState::STOPPED)
         ){
@@ -307,10 +269,13 @@ void CommandRow::update_ui(){
 void CommandRow::on_state_changed(ProgramState state){
     m_last_known_state = state;
     if (m_allow_commands_while_running || state == ProgramState::STOPPED){
+        global_keyboard_tracker().clear_state();
+#if 0
         AbstractController* controller = m_controller.controller();
         if (controller != nullptr){
             controller->keyboard_release_all();
         }
+#endif
     }
     update_ui();
 }

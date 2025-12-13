@@ -675,9 +675,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/JoystickTools.h
     Source/Controllers/KeyboardInput/KeyboardEventHandler.cpp
     Source/Controllers/KeyboardInput/KeyboardEventHandler.h
-    Source/Controllers/KeyboardInput/KeyboardInput.cpp
-    Source/Controllers/KeyboardInput/KeyboardInput.h
-    Source/Controllers/KeyboardInput/KeyboardHidButtons.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h
     Source/Controllers/Schedulers/ControllerWithScheduler.h

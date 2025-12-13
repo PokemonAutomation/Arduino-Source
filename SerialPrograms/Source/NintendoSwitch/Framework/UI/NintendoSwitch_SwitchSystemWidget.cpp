@@ -203,13 +203,11 @@ void SwitchSystemWidget::update_ui(ProgramState state){
 
 void SwitchSystemWidget::key_press(QKeyEvent* event){
 //    cout << "press:   " << event->nativeVirtualKey() << endl;
-    m_command->on_key_press(*event);
     m_video_display->on_key_press(event);
 }
 
 void SwitchSystemWidget::key_release(QKeyEvent* event){
 //    cout << "release: " << event->nativeVirtualKey() << endl;
-    m_command->on_key_release(*event);
     m_video_display->on_key_release(event);
 }
 
