@@ -14,7 +14,7 @@
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "PokemonLZA/Options/PokemonLZA_HyperspacerewardTable.h"
+#include "PokemonLZA/Options/PokemonLZA_HyperspaceRewardTable.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
