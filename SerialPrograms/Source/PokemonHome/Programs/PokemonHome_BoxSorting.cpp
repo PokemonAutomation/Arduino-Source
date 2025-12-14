@@ -425,7 +425,8 @@ void output_boxes_data_json(const std::vector<std::optional<Pokemon>>& boxes_dat
         pokemon["box"] = cursor.box;
         pokemon["row"] =  cursor.row;
         pokemon["column"] =  cursor.column;
-        if (std::optional<Pokemon> current_pokemon = boxes_data[poke_nb]; current_pokemon != std::nullopt){
+        const auto& current_pokemon = boxes_data[poke_nb];
+        if (current_pokemon != std::nullopt){
             // NOTE edit when adding new struct members
             pokemon["national_dex_number"] = current_pokemon->national_dex_number;
             pokemon["shiny"] = current_pokemon->shiny;
@@ -666,7 +667,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             box_render.add(COLOR_RED, nature_box);
             box_render.add(COLOR_RED, ability_box);
 
-            //cycle through each summary of the current box and fill pokemon information
+            // cycle through each summary of the current box and fill pokemon information
             for (size_t row = 0; row < MAX_ROWS; row++){
                 for (size_t column = 0; column < MAX_COLUMNS; column++){
                     const size_t global_idx = get_index(box_idx, row, column);
@@ -674,7 +675,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                         continue;
                     }
 
-                    auto cur_pokemon_info = boxes_data[global_idx];
+                    auto& cur_pokemon_info = boxes_data[global_idx];
                     screen = env.console.video().snapshot();
 
                     const int national_dex_number = OCR::read_number_waterfill(env.console, extract_box_reference(screen, national_dex_number_box), 0xff808080, 0xffffffff);
