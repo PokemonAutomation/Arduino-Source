@@ -126,9 +126,8 @@ void checkpoint_08(
         pbf_mash_button(context, BUTTON_A, 100);
 
         env.console.log("Miraidon/Koraidon eats the sandwich.");
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 25, {});
-        env.console.log("Miraidon/Koraidon gets up and walks to cave entrance."); // long animation
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {});
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 35, {});  // long animation
+        env.console.log("Miraidon/Koraidon is now up and at the cave entrance."); 
 
         // First Nemona cave conversation
         context.wait_for_all_requests();
@@ -140,9 +139,7 @@ void checkpoint_08(
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 150, 20, 20);
                 pbf_move_left_joystick(context, 128, 0, 1000, 50);
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 160, 20, 20);
-                overworld_navigation(env.program_info(), env.console, context, 
-                    NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 20, 20, true, true);
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 128, 0);                
             }
         );  
 
@@ -193,7 +190,7 @@ void checkpoint_08(
         );
         
         env.console.log("overworld_navigation: Go to Houndoom.");
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 20, 20, true, true);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 128, 0);
         
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
