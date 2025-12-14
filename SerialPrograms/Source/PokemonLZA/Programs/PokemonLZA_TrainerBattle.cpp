@@ -96,14 +96,17 @@ bool TrainerBattleState::attempt_one_attack(
 
     int best_index = 4;
     for (int index = 0; index < 4; index++){
+//        cout << "index: " << index << endl;
         if (move_watcher[index] == MoveEffectivenessSymbol::None){
+//            cout << "skip due to none" << endl;
             continue;
         }
         if (m_settings.MODE == BattleAIMode::BlindMash){
             best_index = index;
             break;
         }
-        if (move_watcher[best_index] < move_watcher[index]){
+        if (best_index == 4 || move_watcher[best_index] < move_watcher[index]){
+//            cout << "better move found: " << index << endl;
             best_index = index;
         }
     }
