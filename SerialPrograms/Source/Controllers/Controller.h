@@ -194,10 +194,10 @@ public:
 public:
     //  Controller Input
 
-    virtual void controller_input_state(const ControllerInputState& state){}
+    virtual void run_controller_input(const ControllerInputState& state){}
 
-    virtual void add_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener){};
-    virtual void remove_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener){};
+    virtual void add_input_sniffer(KeyboardEventHandler::KeyboardListener& listener){};
+    virtual void remove_input_sniffer(KeyboardEventHandler::KeyboardListener& listener){};
 };
 
 

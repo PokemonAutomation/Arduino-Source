@@ -49,8 +49,8 @@ JoyconController::JoyconController(Logger& logger, ControllerClass controller_cl
 {
     std::vector<std::shared_ptr<EditableTableRow>> mapping =
         controller_class == ControllerClass::NintendoSwitch_LeftJoycon
-            ? ConsoleSettings::instance().KEYBOARD_MAPPINGS.LEFT_JOYCON.current_refs()
-            : ConsoleSettings::instance().KEYBOARD_MAPPINGS.RIGHT_JOYCON.current_refs();
+            ? ConsoleSettings::instance().KEYBOARD_MAPPINGS.LEFT_JOYCON2.current_refs()
+            : ConsoleSettings::instance().KEYBOARD_MAPPINGS.RIGHT_JOYCON2.current_refs();
 
     for (const auto& deltas : mapping){
         const JoyconFromKeyboardTableRow& row = static_cast<const JoyconFromKeyboardTableRow&>(*deltas);
@@ -60,7 +60,7 @@ JoyconController::JoyconController(Logger& logger, ControllerClass controller_cl
 JoyconController::~JoyconController(){
 }
 
-void JoyconController::controller_input_state(const ControllerInputState& state){
+void JoyconController::run_controller_input(const ControllerInputState& state){
 
     if (state.type() != ControllerInputType::HID_Keyboard){
         return;
@@ -98,11 +98,11 @@ void JoyconController::controller_input_state(const ControllerInputState& state)
     m_data->m_input_sniffer.report_keyboard_command_sent(timestamp, controller_state);
 }
 
-void JoyconController::add_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener){
-    m_data->m_input_sniffer.add_listener(keyboard_listener);
+void JoyconController::add_input_sniffer(KeyboardEventHandler::KeyboardListener& listener){
+    m_data->m_input_sniffer.add_listener(listener);
 }
-void JoyconController::remove_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener){
-    m_data->m_input_sniffer.remove_listener(keyboard_listener);
+void JoyconController::remove_input_sniffer(KeyboardEventHandler::KeyboardListener& listener){
+    m_data->m_input_sniffer.remove_listener(listener);
 }
 
 

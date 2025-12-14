@@ -61,7 +61,7 @@ public:
 public:
     //  Controller Input
 
-    virtual void controller_input_state(const ControllerInputState& state) override;
+    virtual void run_controller_input(const ControllerInputState& state) override;
 
 
 private:

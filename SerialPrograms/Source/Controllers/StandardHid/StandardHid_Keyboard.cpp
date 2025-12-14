@@ -111,7 +111,7 @@ Keyboard::~Keyboard(){
 }
 
 
-void Keyboard::controller_input_state(const ControllerInputState& state){
+void Keyboard::run_controller_input(const ControllerInputState& state){
 
     if (state.type() != ControllerInputType::HID_Keyboard){
         return;

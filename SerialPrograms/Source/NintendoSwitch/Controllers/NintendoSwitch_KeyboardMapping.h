@@ -31,9 +31,9 @@ private:
 public:
     StaticTextOption DESCRIPTION;
     BooleanCheckBoxOption ADVANCED_MODE;
-    ProControllerFromKeyboardTable PRO_CONTROLLER;
-    JoyconFromKeyboardTable LEFT_JOYCON;
-    JoyconFromKeyboardTable RIGHT_JOYCON;
+    ProControllerFromKeyboardTable PRO_CONTROLLER2;
+    JoyconFromKeyboardTable LEFT_JOYCON2;
+    JoyconFromKeyboardTable RIGHT_JOYCON2;
 };
 
 

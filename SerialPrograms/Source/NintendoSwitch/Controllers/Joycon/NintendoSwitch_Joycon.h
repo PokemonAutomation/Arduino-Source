@@ -166,10 +166,10 @@ public:
 public:
     //  Controller Input
 
-    virtual void controller_input_state(const ControllerInputState& state) override;
+    virtual void run_controller_input(const ControllerInputState& state) override;
 
-    virtual void add_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener) override;
-    virtual void remove_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener) override;
+    virtual void add_input_sniffer(KeyboardEventHandler::KeyboardListener& listener) override;
+    virtual void remove_input_sniffer(KeyboardEventHandler::KeyboardListener& listener) override;
 
 
 private:

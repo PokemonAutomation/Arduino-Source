@@ -180,7 +180,7 @@ CommandRow::CommandRow(
     m_controller.add_listener(*this);
 }
 
-void CommandRow::controller_input_state(ControllerInputState& state){
+void CommandRow::run_controller_input(ControllerInputState& state){
     if (!m_last_known_focus){
         m_controller.logger().log("Keyboard Command Suppressed: Not in focus.", COLOR_RED);
         return;
@@ -194,7 +194,7 @@ void CommandRow::controller_input_state(ControllerInputState& state){
         m_controller.logger().log("Keyboard Command Suppressed: Program is running.", COLOR_RED);
         return;
     }
-    controller->controller_input_state(state);
+    controller->run_controller_input(state);
 }
 void CommandRow::set_focus(bool focused){
     if (focused){

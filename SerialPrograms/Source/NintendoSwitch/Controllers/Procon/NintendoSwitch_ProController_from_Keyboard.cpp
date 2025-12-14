@@ -96,7 +96,7 @@ ProControllerFromKeyboardTableRow::ProControllerFromKeyboardTableRow(EditableTab
     , right_stick_y(LockMode::UNLOCK_WHILE_RUNNING, 0, -1, 1)
 {
     add_option(label, "Description");
-    add_option(key, "Key");
+    add_option(key, "HID ID");
     add_option(buttons, "Button Bit-Field");
     add_option(dpad_x, "Dpad x");
     add_option(dpad_y, "Dpad y");

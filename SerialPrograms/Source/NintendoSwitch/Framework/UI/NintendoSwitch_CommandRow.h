@@ -54,7 +54,7 @@ public:
     void on_state_changed(ProgramState state);
 
 private:
-    virtual void controller_input_state(ControllerInputState& state) override;
+    virtual void run_controller_input(ControllerInputState& state) override;
 
     virtual void on_overlay_enabled_stats  (bool enabled) override;
     virtual void on_overlay_enabled_boxes  (bool enabled) override;

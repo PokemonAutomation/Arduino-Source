@@ -97,7 +97,7 @@ void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, Canc
             throw FileException(nullptr, PA_CURRENT_FUNCTION, "Given file name already exists. Choose a different file name.", output_json_filename);
         }
 
-        context.controller().add_keyboard_listener(*this);
+        context.controller().add_input_sniffer(*this);
 
         try{
             context.wait_until_cancel();
@@ -111,7 +111,7 @@ void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, Canc
                 json_to_cpp_code(env.console.logger(), json, FILE_NAME);
             }
 
-            context.controller().remove_keyboard_listener(*this);
+            context.controller().remove_input_sniffer(*this);
             
             throw;
         }        

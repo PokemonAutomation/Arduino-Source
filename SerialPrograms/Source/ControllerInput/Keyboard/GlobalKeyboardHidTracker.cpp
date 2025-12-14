@@ -164,7 +164,7 @@ void KeyboardHidTracker::thread_loop(){
 
                 //  If state is neutral, just issue a stop.
                 if (neutral){
-                    m_listeners.run_method(&ControllerInputListener::controller_input_state, current);
+                    m_listeners.run_method(&ControllerInputListener::run_controller_input, current);
 //                    cancel_all_commands();
                     last.clear();
                     last_neutral = true;
@@ -180,7 +180,7 @@ void KeyboardHidTracker::thread_loop(){
 
                 //  Send the command.
 //                cout << "send_state()" << endl;
-                m_listeners.run_method(&ControllerInputListener::controller_input_state, current);
+                m_listeners.run_method(&ControllerInputListener::run_controller_input, current);
 //                send_state(*current);
 
                 std::swap(last, current);

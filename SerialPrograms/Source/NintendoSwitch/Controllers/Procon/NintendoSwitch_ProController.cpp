@@ -47,7 +47,7 @@ ProController::ProController(Logger& logger)
     : m_data(CONSTRUCT_TOKEN)
 {
     std::vector<std::shared_ptr<EditableTableRow>> mapping =
-        ConsoleSettings::instance().KEYBOARD_MAPPINGS.PRO_CONTROLLER.current_refs();
+        ConsoleSettings::instance().KEYBOARD_MAPPINGS.PRO_CONTROLLER2.current_refs();
 
     for (const auto& deltas : mapping){
         const ProControllerFromKeyboardTableRow& row = static_cast<const ProControllerFromKeyboardTableRow&>(*deltas);
@@ -61,8 +61,8 @@ ControllerClass ProController::controller_class() const{
     return ControllerClass::NintendoSwitch_ProController;
 }
 
-void ProController::controller_input_state(const ControllerInputState& state){
-//    cout << "controller_input_state()" << endl;
+void ProController::run_controller_input(const ControllerInputState& state){
+//    cout << "run_controller_input()" << endl;
 
     if (state.type() != ControllerInputType::HID_Keyboard){
         return;
@@ -103,11 +103,11 @@ void ProController::controller_input_state(const ControllerInputState& state){
     m_data->m_input_sniffer.report_keyboard_command_sent(timestamp, controller_state);
 }
 
-void ProController::add_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener){
-    m_data->m_input_sniffer.add_listener(keyboard_listener);
+void ProController::add_input_sniffer(KeyboardEventHandler::KeyboardListener& listener){
+    m_data->m_input_sniffer.add_listener(listener);
 }
-void ProController::remove_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener){
-    m_data->m_input_sniffer.remove_listener(keyboard_listener);
+void ProController::remove_input_sniffer(KeyboardEventHandler::KeyboardListener& listener){
+    m_data->m_input_sniffer.remove_listener(listener);
 }
 
 
