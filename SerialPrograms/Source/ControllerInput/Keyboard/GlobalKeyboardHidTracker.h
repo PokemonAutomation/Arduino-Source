@@ -9,7 +9,6 @@
 
 #include <set>
 #include <condition_variable>
-#include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "CommonFramework/Logging/Logger.h"
@@ -23,23 +22,14 @@ class QKeyEvent;
 namespace PokemonAutomation{
 
 
-class KeyboardHidTracker{
-public:
-    void add_listener(ControllerInputListener& listener){
-        m_listeners.add(listener);
-    }
-    void remove_listener(ControllerInputListener& listener){
-        m_listeners.remove(listener);
-    }
-
-
+class KeyboardHidTracker : public ControllerInputSource{
 public:
     ~KeyboardHidTracker();
     KeyboardHidTracker();
 
-    void stop();
+    virtual void stop() override;
 
-    void clear_state();
+    virtual void clear_state() override;
 
     void on_key_press(const QKeyEvent& key);
     void on_key_release(const QKeyEvent& key);
@@ -62,8 +52,6 @@ private:
     std::mutex m_sleep_lock;
     std::condition_variable m_cv;
     Thread m_thread;
-
-    ListenerSet<ControllerInputListener> m_listeners;
 };
 
 

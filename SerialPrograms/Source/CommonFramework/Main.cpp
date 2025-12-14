@@ -28,7 +28,7 @@
 #include "Startup/NewVersionCheck.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "CommonTools/OCR/OCR_RawOCR.h"
-#include "ControllerInput/Keyboard/GlobalKeyboardHidTracker.h"
+#include "ControllerInput/ControllerInput.h"
 #include "Windows/MainWindow.h"
 
 #include <iostream>
@@ -178,7 +178,7 @@ int main(int argc, char *argv[]){
 #endif
 
     //  Stop the controllers.
-    global_keyboard_tracker().stop();
+    global_input_stop();
 
     //  Force stop the thread pool
     PokemonAutomation::GlobalThreadPools::realtime_inference().stop();
