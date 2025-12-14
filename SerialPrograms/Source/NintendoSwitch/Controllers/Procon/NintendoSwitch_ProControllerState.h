@@ -32,7 +32,7 @@ public:
     virtual JsonObject to_json() const override;
 
     virtual void execute(
-        CancellableScope& scope,
+        Cancellable* scope,
         AbstractController& controller,
         Milliseconds duration
     ) const override;

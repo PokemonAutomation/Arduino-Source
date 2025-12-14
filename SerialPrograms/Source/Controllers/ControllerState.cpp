@@ -26,7 +26,7 @@ JsonObject ControllerState::to_json() const{
     );
 }
 void ControllerState::execute(
-    CancellableScope& scope,
+    Cancellable* scope,
     AbstractController& controller,
     Milliseconds duration
 ) const{

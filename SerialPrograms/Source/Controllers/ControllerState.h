@@ -12,7 +12,7 @@
 namespace PokemonAutomation{
 
 class JsonObject;
-class CancellableScope;
+class Cancellable;
 class AbstractController;
 
 
@@ -39,7 +39,7 @@ public:
 public:
     //  Execution
     virtual void execute(
-        CancellableScope& scope,
+        Cancellable* scope,
         AbstractController& controller,
         Milliseconds duration
     ) const;

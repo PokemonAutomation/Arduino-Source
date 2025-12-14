@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Controllers_ControllerStateTable_H
 #define PokemonAutomation_Controllers_ControllerStateTable_H
 
+#include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
@@ -64,7 +65,7 @@ public:
         for (std::unique_ptr<ControllerStateRow>& command : table){
             Milliseconds duration;
             std::unique_ptr<ControllerState> state = command->get_state(duration);
-            state->execute(scope, controller, duration);
+            state->execute(&scope, controller, duration);
         }
     }
 

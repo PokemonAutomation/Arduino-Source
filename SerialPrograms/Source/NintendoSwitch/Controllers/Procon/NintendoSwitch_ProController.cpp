@@ -83,21 +83,11 @@ void ProController::run_controller_input(const ControllerInputState& state){
 
     replace_on_next_command();
 
-    WallClock timestamp = current_time();
-
     ProControllerState controller_state;
     deltas.to_state(controller_state);
-    issue_full_controller_state(
-        nullptr,
-        false,
-        2000ms,
-        controller_state.buttons,
-        controller_state.dpad,
-        controller_state.left_x,
-        controller_state.left_y,
-        controller_state.right_x,
-        controller_state.right_y
-    );
+
+    WallClock timestamp = current_time();
+    controller_state.execute(nullptr, *this, 2000ms);
 
     on_command_input(timestamp, controller_state);
 }
