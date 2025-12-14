@@ -32,6 +32,7 @@ language
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -275,7 +276,7 @@ std::ostream& operator<<(std::ostream& os, const std::optional<Pokemon>& pokemon
     return os;
 }
 
-std::string create_overlay_log(const Pokemon& pokemon){
+std::string create_overlay_info(const Pokemon& pokemon){
     const std::string& species_slug = NATIONAL_DEX_SLUGS()[pokemon.national_dex_number-1];
     const std::string& display_name = get_pokemon_name(species_slug).display_name();
     std::string overlay_log = display_name;
@@ -283,8 +284,6 @@ std::string create_overlay_log(const Pokemon& pokemon){
         overlay_log += " " + UNICODE_MALE;
     } else if (pokemon.gender == StatsHuntGenderFilter::Female){
         overlay_log += " " + UNICODE_FEMALE;
-    } else{
-        overlay_log += " " + UNICODE_GENDERLESS;
     }
     if (pokemon.shiny){
         overlay_log += " *";
@@ -679,8 +678,12 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     screen = env.console.video().snapshot();
 
                     const int national_dex_number = OCR::read_number_waterfill(env.console, extract_box_reference(screen, national_dex_number_box), 0xff808080, 0xffffffff);
-                    if (national_dex_number <= 0 || national_dex_number > 1025) { // Current last pokemon is pecharunt
-                        dump_image(env.console, ProgramInfo(), "ReadSummary_national_dex_number", screen);
+                    if (national_dex_number <= 0 || national_dex_number > NATIONAL_DEX_SLUGS().size()) {
+                        OperationFailedException::fire(
+                            ErrorReport::SEND_ERROR_REPORT,
+                            "BoxSorting Check Summary: Unable to read a correct dex number, found: " + std::to_string(national_dex_number),
+                            env.console
+                        );
                     }
                     cur_pokemon_info->national_dex_number = (uint16_t)national_dex_number;
 
@@ -713,7 +716,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     }
                     cur_pokemon_info->ot_id = ot_id;
                     
-                    env.add_overlay_log("Read " + create_overlay_log(*cur_pokemon_info));
+                    env.add_overlay_log("Read " + create_overlay_info(*cur_pokemon_info));
 
                     // NOTE edit when adding new struct members (detections go here likely)
 
@@ -722,7 +725,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     // nature_box
                     // ability_box
 
-                    pbf_press_button(context, BUTTON_R, 10, VIDEO_DELAY+15);
+                    pbf_press_button(context, BUTTON_R, 10, VIDEO_DELAY+15); // Press button R to go to next summary screen
                     context.wait_for_all_requests();
                 }
             }
