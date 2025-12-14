@@ -93,17 +93,17 @@ std::unique_ptr<StatsTracker> BoxSorting_Descriptor::make_stats() const{
 
 BoxSorting::BoxSorting()
     : BOX_NUMBER(
-        "<b>Number of boxes to order:</b>",
+        "<b>Number of Boxes to Sort:</b>",
         LockMode::LOCK_WHILE_RUNNING,
         1, 1, MAX_BOXES
         )
     , VIDEO_DELAY(
-          "<b>Delay of your capture card:</b>",
+          "<b>Capture Card Delay:</b>",
           LockMode::LOCK_WHILE_RUNNING,
           50
           )
     , GAME_DELAY(
-          "<b>Delay of your Pokemon Home app:</b>",
+          "<b>" + STRING_POKEMON + " Home App Delay:</b>",
           LockMode::LOCK_WHILE_RUNNING,
           30
           )
@@ -112,13 +112,13 @@ BoxSorting::BoxSorting()
           )
     , OUTPUT_FILE(
           false,
-          "<b>Output File:</b><br>JSON file for output of storage boxes.",
+          "<b>Output File:</b><br>JSON file basename to catalogue box info found by the program.",
           LockMode::LOCK_WHILE_RUNNING,
           "box_order",
           "box_order"
           )
     , DRY_RUN(
-          "<b>Dry Run:</b><br>Catalogue and make sort plan without executing. (Will output to OUTPUT_FILE and OUTPUT_FILE.sortplan)",
+          "<b>Dry Run:</b><br>Catalogue and make sorting plan without execution. Check output at <output_file>.json and <output_file>-sorted.json)",
           LockMode::LOCK_WHILE_RUNNING,
           false
           )
@@ -174,9 +174,10 @@ struct Pokemon{
     uint16_t national_dex_number = 0;
     bool shiny = false;
     bool gmax = false;
+    bool alpha = false;
     std::string ball_slug = "";
     StatsHuntGenderFilter gender = StatsHuntGenderFilter::Genderless;
-    uint32_t ot_id = 0;
+    uint32_t ot_id = 0; // original trainer ID
 };
 
 bool operator==(const Pokemon& lhs, const Pokemon& rhs){
@@ -184,65 +185,73 @@ bool operator==(const Pokemon& lhs, const Pokemon& rhs){
     return lhs.national_dex_number == rhs.national_dex_number &&
            lhs.shiny == rhs.shiny &&
            lhs.gmax == rhs.gmax &&
+           lhs.alpha == rhs.alpha &&
            lhs.ball_slug == rhs.ball_slug &&
            lhs.gender == rhs.gender &&
            lhs.ot_id == rhs.ot_id;
 }
 
+// Sort two pokemon slot. "Smaller" pokemon is placed closer to front.
+// If a slot is empty, it is always larger than non-empty slot so all the empty slots are at end after sorting.
+// For two pokemon, check each preference rule. If we cannot determine the order based on the first rule, go
+// to the second rule, and so on.
+// Available rules:
+// - National dex number: smaller ID should be at front.
+// - Shiny: shiny pokemon should be at front.
+// - Gigantamax: Gigantamax pokemon should be at front.
+// - Alpha: Alpha pokemon should be at front.
+// - Ball slug: pokemon with a ball slug that's smaller in the alphabetical order should be at front.
+// - Gender: Male should be at front, then comes female, and genderless is last
+// Each rule type also has a "reverse" which if true, reverses above ordering for that rule type.
+// If user does not give a preference ruleset, sort by national dex number.
 bool operator<(const std::optional<Pokemon>& lhs, const std::optional<Pokemon>& rhs){
-    if (!lhs.has_value()){
+    if (!lhs.has_value()){ // lhs is empty
         return false;
     }
-    if (!rhs.has_value()){
+    if (!rhs.has_value()){ // lhs not empty but rhs is empty
         return true;
     }
-
+    // both sides are not empty:
     for (const BoxSortingSelection preference : *lhs->preferences){
-        std::optional<bool> ret{};
         switch(preference.sort_type){
         // NOTE edit when adding new struct members
         case BoxSortingSortType::NationalDexNo:
             if (lhs->national_dex_number != rhs->national_dex_number){
-                ret = lhs->national_dex_number < rhs->national_dex_number;
+                // we use (boolean != reverse) to apply the reverse effect
+                return (lhs->national_dex_number < rhs->national_dex_number) != preference.reverse;
             }
             break;
         case BoxSortingSortType::Shiny:
             if (lhs->shiny != rhs->shiny){
-                ret = lhs->shiny;
+                return lhs->shiny != preference.reverse;
             }
             break;
         case BoxSortingSortType::Gigantamax:
             if (lhs->gmax != rhs->gmax){
-                ret = lhs->gmax;
+                return lhs->gmax != preference.reverse;
+            }
+            break;
+        case BoxSortingSortType::Alpha:
+            if (lhs->alpha != rhs->alpha){
+                return lhs->gmax != preference.reverse;
             }
             break;
         case BoxSortingSortType::Ball_Slug:
-            if (lhs->ball_slug < rhs->ball_slug){
-                ret = true;
-            }
-            if (lhs->ball_slug > rhs->ball_slug){
-                ret = false;
+            if (lhs->ball_slug != rhs->ball_slug){
+                return (lhs->ball_slug < rhs->ball_slug) != preference.reverse;
             }
             break;
         case BoxSortingSortType::Gender:
-            if (lhs->gender < rhs->gender){
-                ret = true;
-            }
-            if (lhs->gender > rhs->gender){
-                ret = false;
+            if (lhs->gender != rhs->gender){
+                return (lhs->gender < rhs->gender) != preference.reverse;
             }
             break;
-        }
-        if (ret.has_value()){
-            bool value = *ret;
-            if (preference.reverse){
-                return !value;
-            }else{
-                return value;
-            }
-        }
-    }
+        default:
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "unknown BoxSortingSortType"); 
+        } // end switch
+    } // end for preference
 
+    // Default to sort by national dex number
     return lhs->national_dex_number < rhs->national_dex_number;
 }
 
@@ -254,6 +263,7 @@ std::ostream& operator<<(std::ostream& os, const std::optional<Pokemon>& pokemon
         os << "national_dex_number:" << pokemon->national_dex_number << " ";
         os << "shiny:" << (pokemon->shiny ? "true" : "false") << " ";
         os << "gmax:" << (pokemon->gmax ? "true" : "false") << " ";
+        os << "alpha:" << (pokemon->alpha ? "true" : "false") << " ";
         os << "ball_slug:" << pokemon->ball_slug << " ";
         os << "gender:" << gender_to_string(pokemon->gender) << " ";
         os << "ot_id:" << pokemon->ot_id << " ";
@@ -382,7 +392,7 @@ void print_boxes_data(const std::vector<std::optional<Pokemon>>& boxes_data, Sin
     env.console.log(ss.str());
 }
 
-void output_boxes_data_json(const std::vector<std::optional<Pokemon>>& boxes_data, const std::string& json_path){
+void output_boxes_data_json(const std::vector<std::optional<Pokemon>>& boxes_data, const std::string& json_path_basename){
     JsonArray pokemon_data;
     for (size_t poke_nb = 0; poke_nb < boxes_data.size(); poke_nb++){
         Cursor cursor = get_cursor(poke_nb);
@@ -396,13 +406,14 @@ void output_boxes_data_json(const std::vector<std::optional<Pokemon>>& boxes_dat
             pokemon["national_dex_number"] = current_pokemon->national_dex_number;
             pokemon["shiny"] = current_pokemon->shiny;
             pokemon["gmax"] = current_pokemon->gmax;
+            pokemon["alpha"] = current_pokemon->alpha;
             pokemon["ball_slug"] = current_pokemon->ball_slug;
             pokemon["gender"] = gender_to_string(current_pokemon->gender);
             pokemon["ot_id"] = current_pokemon->ot_id;
         }
         pokemon_data.push_back(std::move(pokemon));
     }
-    pokemon_data.dump(json_path + ".json");
+    pokemon_data.dump(json_path_basename + ".json");
 }
 
 void do_sort(
@@ -485,7 +496,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     ImageFloatBox ot_box(0.492, 0.719, 0.165, 0.049); // OT
     ImageFloatBox nature_box(0.157, 0.783, 0.212, 0.042); // Nature
     ImageFloatBox ability_box(0.158, 0.838, 0.213, 0.042); // Ability
-    // TODO: add alpha detection
+    ImageFloatBox alpha_box(0.787, 0.095, 0.024, 0.046); // Alpha symbol
 
 
     // vector that will store data for each slot
@@ -631,41 +642,47 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             //cycle through each summary of the current box and fill pokemon information
             for (size_t row = 0; row < MAX_ROWS; row++){
                 for (size_t column = 0; column < MAX_COLUMNS; column++){
-                    if (!boxes_data[get_index(box_idx, row, column)].has_value()){
+                    const size_t global_idx = get_index(box_idx, row, column);
+                    if (!boxes_data[global_idx].has_value()){
                         continue;
                     }
 
                     screen = env.console.video().snapshot();
 
-                    int national_dex_number = OCR::read_number_waterfill(env.console, extract_box_reference(screen, national_dex_number_box), 0xff808080, 0xffffffff);
+                    const int national_dex_number = OCR::read_number_waterfill(env.console, extract_box_reference(screen, national_dex_number_box), 0xff808080, 0xffffffff);
                     if (national_dex_number <= 0 || national_dex_number > 1025) { // Current last pokemon is pecharunt
                         dump_image(env.console, ProgramInfo(), "ReadSummary_national_dex_number", screen);
                     }
-                    boxes_data[get_index(box_idx, row, column)]->national_dex_number = (uint16_t)national_dex_number;
+                    boxes_data[global_idx]->national_dex_number = (uint16_t)national_dex_number;
 
-                    int shiny_stddev_value = (int)image_stddev(extract_box_reference(screen, shiny_symbol_box)).sum();
-                    bool is_shiny = shiny_stddev_value > 30;
-                    boxes_data[get_index(box_idx, row, column)]->shiny = is_shiny;
+                    const int shiny_stddev_value = (int)image_stddev(extract_box_reference(screen, shiny_symbol_box)).sum();
+                    const bool is_shiny = shiny_stddev_value > 30;
+                    boxes_data[global_idx]->shiny = is_shiny;
                     env.console.log("Shiny detection stddev:" + std::to_string(shiny_stddev_value) + " is shiny:" + std::to_string(is_shiny));
 
-                    int gmax_stddev_value = (int)image_stddev(extract_box_reference(screen, gmax_symbol_box)).sum();
-                    bool is_gmax = gmax_stddev_value > 30;
-                    boxes_data[get_index(box_idx, row, column)]->gmax = is_gmax;
+                    const int gmax_stddev_value = (int)image_stddev(extract_box_reference(screen, gmax_symbol_box)).sum();
+                    const bool is_gmax = gmax_stddev_value > 30;
+                    boxes_data[global_idx]->gmax = is_gmax;
                     env.console.log("Gmax detection stddev:" + std::to_string(gmax_stddev_value) + " is gmax:" + std::to_string(is_gmax));
 
+                    const int alpha_stddev_value = (int)image_stddev(extract_box_reference(screen, alpha_box)).sum();
+                    const bool is_alpha = alpha_stddev_value > 40;
+                    boxes_data[global_idx]->alpha = is_alpha;
+                    env.console.log("Alpha detection stddev:" + std::to_string(alpha_stddev_value) + " is alpha:" + std::to_string(is_alpha));
+
                     BallReader ball_reader(env.console);
-                    boxes_data[get_index(box_idx, row, column)]->ball_slug = ball_reader.read_ball(screen);
+                    boxes_data[global_idx]->ball_slug = ball_reader.read_ball(screen);
 
                     BoxGenderDetector::make_overlays(box_render);
-                    StatsHuntGenderFilter gender = BoxGenderDetector::detect(screen);
+                    const StatsHuntGenderFilter gender = BoxGenderDetector::detect(screen);
                     env.console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
-                    boxes_data[get_index(box_idx, row, column)]->gender = gender;
+                    boxes_data[global_idx]->gender = gender;
 
-                    int ot_id = OCR::read_number_waterfill(env.console, extract_box_reference(screen, ot_id_box), 0xff808080, 0xffffffff);
+                    const int ot_id = OCR::read_number_waterfill(env.console, extract_box_reference(screen, ot_id_box), 0xff808080, 0xffffffff);
                     if (ot_id < 0 || ot_id > 999'999) {
                         dump_image(env.console, ProgramInfo(), "ReadSummary_OT", screen);
                     }
-                    boxes_data[get_index(box_idx, row, column)]->ot_id = ot_id;
+                    boxes_data[global_idx]->ot_id = ot_id;
 
                     const std::string& species_slug = NATIONAL_DEX_SLUGS()[national_dex_number-1];
                     const std::string& display_name = get_pokemon_name(species_slug).display_name();
@@ -719,12 +736,12 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     env.console.log("Current boxes data :");
     print_boxes_data(boxes_data, env);
-    const std::string json_path = OUTPUT_FILE;
-    output_boxes_data_json(boxes_data, json_path);
+    const std::string json_path_basename = OUTPUT_FILE;
+    output_boxes_data_json(boxes_data, json_path_basename);
 
     env.console.log("Sorted boxes data :");
     print_boxes_data(boxes_sorted, env);
-    const std::string sorted_path = json_path + "-sorted";
+    const std::string sorted_path = json_path_basename + "-sorted";
     output_boxes_data_json(boxes_sorted, sorted_path);
 
     if (!DRY_RUN){

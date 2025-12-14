@@ -16,6 +16,7 @@ const EnumDropdownDatabase<BoxSortingSortType>& BallType_Database(){
         {BoxSortingSortType::NationalDexNo,     "dex",     "National Dex Number"},
         {BoxSortingSortType::Shiny,    "shiny",    "Shiny"},
         {BoxSortingSortType::Gigantamax,    "gigantamax",    "Gigantamax"},
+        {BoxSortingSortType::Alpha, "alpha", "Alpha"},
         {BoxSortingSortType::Ball_Slug,    "ball_slug",    "Ball Type"},
         {BoxSortingSortType::Gender,    "gender",    "Gender (Male, Female, Genderless)"},
     });

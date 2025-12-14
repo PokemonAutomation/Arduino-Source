@@ -21,6 +21,7 @@ enum class BoxSortingSortType
     NationalDexNo,
     Shiny,
     Gigantamax,
+    Alpha,
     Ball_Slug,
     Gender,
 };
