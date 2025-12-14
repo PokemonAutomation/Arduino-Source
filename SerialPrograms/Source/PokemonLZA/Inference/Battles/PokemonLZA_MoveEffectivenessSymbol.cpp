@@ -35,6 +35,24 @@ const char* template_path(MoveEffectivenessSymbol symbol){
 }
 
 
+const char* to_string(MoveEffectivenessSymbol symbol){
+    switch (symbol){
+    case MoveEffectivenessSymbol::NoEffect:
+        return "No Effect";
+    case MoveEffectivenessSymbol::NotVeryEffective:
+        return "Not Very Effective";
+    case MoveEffectivenessSymbol::Normal:
+        return "Effective";
+    case MoveEffectivenessSymbol::SuperEffective:
+        return "Super Effective";
+    default:
+        return nullptr;
+    }
+}
+
+
+
+
 MoveEffectivenessSymbolMatcher::MoveEffectivenessSymbolMatcher(MoveEffectivenessSymbol symbol)
     : WaterfillTemplateMatcher(
         template_path(symbol),
