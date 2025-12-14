@@ -1607,6 +1607,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/PokemonLZA_DayNightChangeDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.h
+    Source/PokemonLZA/Inference/PokemonLZA_HyperspaceRewardNameReader.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_HyperspaceRewardNameReader.h
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.cpp
@@ -1631,6 +1633,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/PokemonLZA_Settings.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_FriendshipFarmer.cpp
     Source/PokemonLZA/Programs/Farming/PokemonLZA_FriendshipFarmer.h
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_HyperspaceRewardReset.cpp
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_HyperspaceRewardReset.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_InPlaceCatcher.cpp
     Source/PokemonLZA/Programs/Farming/PokemonLZA_InPlaceCatcher.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.cpp
