@@ -1621,6 +1621,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Options/PokemonLZA_BattleAIOption.h
     Source/PokemonLZA/Options/PokemonLZA_HyperspaceRewardOption.cpp
     Source/PokemonLZA/Options/PokemonLZA_HyperspaceRewardOption.h
+    Source/PokemonLZA/Options/PokemonLZA_HyperspaceRewardTable.cpp
+    Source/PokemonLZA/Options/PokemonLZA_HyperspaceRewardTable.h
     Source/PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.cpp
     Source/PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h
     Source/PokemonLZA/PokemonLZA_Panels.cpp
