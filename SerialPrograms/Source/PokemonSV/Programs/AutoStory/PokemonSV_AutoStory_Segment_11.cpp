@@ -596,7 +596,7 @@ void checkpoint_26(
 
         enter_menu_from_overworld(env.program_info(), env.console, context, -1);
 
-    });
+    }, false);
 
 }
 

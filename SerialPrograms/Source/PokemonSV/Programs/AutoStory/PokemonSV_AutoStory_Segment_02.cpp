@@ -95,7 +95,7 @@ void checkpoint_04(
         context.wait_for_all_requests();
         env.console.log("Finished battle.");
 
-    }
+    }, false
     );
 
 }

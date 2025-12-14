@@ -371,7 +371,8 @@ void checkpoint_reattempt_loop(
     ProControllerContext& context, 
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats,
-    std::function<void(size_t attempt_number)>&& action
+    std::function<void(size_t attempt_number)>&& action,
+    bool day_skip = true
 );
 
 void checkpoint_reattempt_loop_tutorial(

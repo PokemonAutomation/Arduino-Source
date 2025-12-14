@@ -120,7 +120,7 @@ void checkpoint_79(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     [&](size_t attempt_number){
         // empty checkpoint
 
-    });
+    }, false);
 }
 
 void checkpoint_80(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
@@ -144,7 +144,7 @@ void checkpoint_82(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     [&](size_t attempt_number){
         // empty checkpoint
 
-    });  
+    }, false);  
 }
 
 

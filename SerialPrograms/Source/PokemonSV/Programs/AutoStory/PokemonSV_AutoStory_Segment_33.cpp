@@ -404,7 +404,7 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // finished battle
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
-    });     
+    }, false);     
 }
 
 void checkpoint_89(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
@@ -413,7 +413,7 @@ void checkpoint_89(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW, CallbackEnum::PROMPT_DIALOG});
 
-        env.console.log("Battle Elite Four 4.");
+        env.console.log("Battle Geeta.");
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
 
         // finished battle

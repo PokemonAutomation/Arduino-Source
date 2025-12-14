@@ -235,7 +235,7 @@ void checkpoint_56(
         run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {CallbackEnum::DIALOG_ARROW});
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
-    });    
+    }, false);    
 
 }
 

@@ -270,7 +270,7 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         );
 
         #endif  
-    });
+    }, false);
 }
 
 void checkpoint_103(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
@@ -297,7 +297,7 @@ void checkpoint_103(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 10);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
-    });
+    }, false);
 }
 
 

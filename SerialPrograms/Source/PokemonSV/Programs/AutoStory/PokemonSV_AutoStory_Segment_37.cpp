@@ -317,7 +317,7 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         run_trainer_double_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
-    });   
+    }, false);   
 }
 
 void checkpoint_99(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
@@ -351,7 +351,7 @@ void checkpoint_99(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         mash_button_till_overworld(env.console, context, BUTTON_A);  // black dialog, prompt
 
 
-    });     
+    }, false);     
 }
 
 

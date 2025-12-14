@@ -139,7 +139,7 @@ void checkpoint_16(
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
         
        
-    });
+    }, false);
 
 }
 
@@ -183,7 +183,7 @@ void checkpoint_17(
 
         
        
-    });
+    }, false);
 
 }
 
@@ -219,7 +219,7 @@ void checkpoint_18(
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
             {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG});
        
-    });
+    }, false);
 
 }
 
@@ -252,7 +252,7 @@ void checkpoint_19(
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
        
-    });
+    }, false);
 
 }
 
@@ -297,7 +297,7 @@ void checkpoint_20(
 
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
-    });
+    }, false);
 
 }
 

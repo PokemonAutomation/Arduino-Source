@@ -99,7 +99,7 @@ void checkpoint_58(
     [&](size_t attempt_number){
         // empty checkpoint, to preserve ordering
 
-    });    
+    }, false);    
 
 }
 

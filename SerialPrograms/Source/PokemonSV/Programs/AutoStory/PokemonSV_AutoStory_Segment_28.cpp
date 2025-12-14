@@ -96,7 +96,7 @@ void checkpoint_68(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // empty checkpoint, to preserve ordering
         
     
-    });
+    }, false);
     
 }
 

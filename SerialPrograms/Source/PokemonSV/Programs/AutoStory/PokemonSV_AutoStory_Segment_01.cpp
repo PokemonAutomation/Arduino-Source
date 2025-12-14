@@ -260,7 +260,7 @@ void checkpoint_03(
         swap_starter_moves(env, context, language);
         press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
 
-    }
+    }, false
     );
      
 }

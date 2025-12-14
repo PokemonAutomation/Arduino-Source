@@ -99,7 +99,7 @@ void checkpoint_05(
         env.console.overlay().add_log("Get mom's sandwich", COLOR_WHITE);
         mash_button_till_overworld(env.console, context);
     
-    });   
+    }, false);   
 }
 
 void checkpoint_06(
@@ -136,7 +136,7 @@ void checkpoint_06(
         env.console.log("Finished catch tutorial");
         env.console.overlay().add_log("Finished catch tutorial", COLOR_WHITE);
 
-    });
+    }, false);
 
 }
 
@@ -178,7 +178,7 @@ void checkpoint_07(
         env.console.log("Mystery cry");
         env.console.overlay().add_log("Mystery cry", COLOR_WHITE);
         
-    });
+    }, false);
        
 
 }

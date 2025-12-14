@@ -89,7 +89,7 @@ void checkpoint_83(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // empty checkpoint
 
 
-    });  
+    }, false);  
 }
 
 void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){

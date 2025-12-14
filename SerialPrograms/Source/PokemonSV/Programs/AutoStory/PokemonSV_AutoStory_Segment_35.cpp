@@ -591,7 +591,7 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
 
-    });
+    }, false);
 }
 
 void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
@@ -626,7 +626,7 @@ void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         
         
 
-    });     
+    }, false);     
 }
 
 

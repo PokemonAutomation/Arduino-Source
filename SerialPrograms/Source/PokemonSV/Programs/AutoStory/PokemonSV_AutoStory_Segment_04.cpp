@@ -198,7 +198,7 @@ void checkpoint_08(
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
     
-    });
+    }, false);
 
 
 }

@@ -1396,7 +1396,8 @@ void checkpoint_reattempt_loop(
     ProControllerContext& context, 
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats,
-    std::function<void(size_t attempt_number)>&& action
+    std::function<void(size_t attempt_number)>&& action,
+    bool day_skip
 ){
     size_t max_attempts = 100;
     for (size_t i = 0;;i++){
@@ -1405,7 +1406,7 @@ void checkpoint_reattempt_loop(
             checkpoint_save(env, context, notif_status_update, stats);
         }
 
-        if (i >= 0){
+        if (day_skip && i >= 0){
             day_skip_from_overworld(env.console, context);
             save_game_from_overworld(env.program_info(), env.console, context);
         }

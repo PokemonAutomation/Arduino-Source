@@ -116,7 +116,7 @@ void checkpoint_12(
 
         env.console.log("Reached Mesagoza (South) Pokecenter.");
 
-    });
+    }, false);
 
 }
 
