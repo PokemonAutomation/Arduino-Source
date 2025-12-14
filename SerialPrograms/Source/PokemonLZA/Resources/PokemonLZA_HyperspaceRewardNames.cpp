@@ -35,7 +35,7 @@ HyperspaceRewardNamesDatabase::HyperspaceRewardNamesDatabase()
 {
     // Load a list of tournament prize slugs in the desired order:
     // ["potion", "fresh-water", ... ]
-    std::string path_slugs = RESOURCE_PATH() + "PokemonSV/AAT/TournamentPrizeList.json"; //TODO: Get reward list
+    std::string path_slugs = RESOURCE_PATH() + "PokemonLZA/HyperBattle/HyperspaceRewardList.json";
     JsonValue json_slugs = load_json_file(path_slugs);
     JsonArray& slugs = json_slugs.to_array_throw(path_slugs);
 
@@ -48,7 +48,7 @@ HyperspaceRewardNamesDatabase::HyperspaceRewardNamesDatabase()
     //      },
     //      ....
     // }
-    std::string path_disp = RESOURCE_PATH() + "PokemonSV/AAT/TournamentPrizeNameDisplay.json"; //TODO: Get reward list
+    std::string path_disp = RESOURCE_PATH() + "PokemonLZA/HyperBattle/HyperspaceRewardNameDisplay.json"; //TODO: Get reward list
     JsonValue json_disp = load_json_file(path_disp);
     JsonObject& item_disp = json_disp.to_object_throw(path_disp);
 
