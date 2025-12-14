@@ -24,6 +24,7 @@
 #include "Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.h"
 #include "Programs/Farming/PokemonLZA_FriendshipFarmer.h"
 #include "Programs/Farming/PokemonLZA_InPlaceCatcher.h"
+#include "Programs/Farming/PokemonLZA_HyperspaceRewardReset.h"
 
 //  Shiny Hunting
 #include "Programs/ShinyHunting/PokemonLZA_AutoFossil.h"
@@ -77,6 +78,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<JacintheInfiniteFarmer_Descriptor, JacintheInfiniteFarmer>());
     ret.emplace_back(make_single_switch_program<FriendshipFarmer_Descriptor, FriendshipFarmer>());
     ret.emplace_back(make_single_switch_program<InPlaceCatcher_Descriptor, InPlaceCatcher>());
+    ret.emplace_back(make_single_switch_program<HyperspaceRewardReset_Descriptor, HyperspaceRewardReset>());
     if (IS_BETA_VERSION){
     }
 
