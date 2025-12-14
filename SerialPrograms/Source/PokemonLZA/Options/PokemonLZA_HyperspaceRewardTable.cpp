@@ -13,7 +13,7 @@ namespace PokemonLZA{
 
 HyperspaceRewardRow::HyperspaceRewardRow(EditableTableOption& parent_table)
     : EditableTableRow(parent_table)
-    , item("beast-ball")
+    , item("bottle-cap")
 {
     PA_ADD_OPTION(item);
 }

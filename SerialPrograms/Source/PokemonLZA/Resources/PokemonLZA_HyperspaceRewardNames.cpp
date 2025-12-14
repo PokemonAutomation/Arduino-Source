@@ -48,7 +48,7 @@ HyperspaceRewardNamesDatabase::HyperspaceRewardNamesDatabase()
     //      },
     //      ....
     // }
-    std::string path_disp = RESOURCE_PATH() + "PokemonLZA/HyperBattle/HyperspaceRewardNameDisplay.json"; //TODO: Get reward list
+    std::string path_disp = RESOURCE_PATH() + "PokemonLZA/HyperBattle/HyperspaceRewardNameDisplay.json";
     JsonValue json_disp = load_json_file(path_disp);
     JsonObject& item_disp = json_disp.to_object_throw(path_disp);
 
