@@ -18,7 +18,7 @@ HyperspaceRewardNameReader& HyperspaceRewardNameReader::instance(){
 
 
 HyperspaceRewardNameReader::HyperspaceRewardNameReader()
-    : SmallDictionaryMatcher("PokemonSV/AAT/TournamentPrizeNameOCR.json") //TODO: Get actual reward list
+    : SmallDictionaryMatcher("PokemonLZA/HyperBattle/HyperspaceRewardNameOCR.json")
 {}
 
 OCR::StringMatchResult HyperspaceRewardNameReader::read_substring(

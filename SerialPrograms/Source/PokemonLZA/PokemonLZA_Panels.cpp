@@ -78,8 +78,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<JacintheInfiniteFarmer_Descriptor, JacintheInfiniteFarmer>());
     ret.emplace_back(make_single_switch_program<FriendshipFarmer_Descriptor, FriendshipFarmer>());
     ret.emplace_back(make_single_switch_program<InPlaceCatcher_Descriptor, InPlaceCatcher>());
-    ret.emplace_back(make_single_switch_program<HyperspaceRewardReset_Descriptor, HyperspaceRewardReset>());
     if (IS_BETA_VERSION){
+        ret.emplace_back(make_single_switch_program<HyperspaceRewardReset_Descriptor, HyperspaceRewardReset>());
     }
 
     ret.emplace_back("---- Shiny Hunting ----");
