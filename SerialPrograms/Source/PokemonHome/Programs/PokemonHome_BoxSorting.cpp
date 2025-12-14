@@ -41,6 +41,8 @@ language
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "Pokemon/Resources/Pokemon_PokemonNames.h"
+#include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "PokemonHome/Inference/PokemonHome_BoxGenderDetector.h"
 #include "PokemonHome/Inference/PokemonHome_BallReader.h"
 #include "PokemonHome_BoxSorting.h"
@@ -261,28 +263,28 @@ std::ostream& operator<<(std::ostream& os, const std::optional<Pokemon>& pokemon
     return os;
 }
 
+// Move the red cursor to the first slot of the box
+// If the cursor is not add the first slot, move the cursor to the left and up one row at a time until it is at the first slot. 
 bool go_to_first_slot(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint16_t VIDEO_DELAY){
-
-    ImageFloatBox cursor_check(0.07, 0.15, 0.01, 0.01); //cursor position of the first slot of the box
+    ImageFloatBox first_slot_cursor_box(0.07, 0.15, 0.01, 0.01); //cursor position of the first slot of the box
     VideoSnapshot screen = env.console.video().snapshot();
-    FloatPixel image_value = image_stats(extract_box_reference(screen, cursor_check)).average;
-    env.console.log("Cursor color detection: " + image_value.to_string());
+    FloatPixel first_slot_cursor_color = image_stats(extract_box_reference(screen, first_slot_cursor_box)).average;
+    env.console.log("Cursor color detection: " + first_slot_cursor_color.to_string());
     VideoOverlaySet BoxRender(env.console);
+    BoxRender.add(COLOR_BLUE, first_slot_cursor_box);
 
-    BoxRender.add(COLOR_BLUE, cursor_check);
-    if(image_value.r <= image_value.g + image_value.b){
-
+    // If the cursor is not at the first slot
+    if(first_slot_cursor_color.r <= first_slot_cursor_color.g + first_slot_cursor_color.b){
         bool cursor_found = false;
-
         for (uint8_t rows = 0; rows < 7; rows++){
             for (uint8_t column = 0; column < 5; column++){
                 pbf_press_dpad(context, DPAD_LEFT, 10, VIDEO_DELAY);
                 context.wait_for_all_requests();
                 screen = env.console.video().snapshot();
-                image_value = image_stats(extract_box_reference(screen, cursor_check)).average;
-                env.console.log("Cursor color detection: " + image_value.to_string());
+                first_slot_cursor_color = image_stats(extract_box_reference(screen, first_slot_cursor_box)).average;
+                env.console.log("Cursor color detection: " + first_slot_cursor_color.to_string());
 
-                if(image_value.r > image_value.g + image_value.b){
+                if(first_slot_cursor_color.r > first_slot_cursor_color.g + first_slot_cursor_color.b){
                     cursor_found = true;
                     break;
                 }
@@ -291,10 +293,10 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, ProControllerContext&
                 pbf_press_dpad(context, DPAD_UP, 10, VIDEO_DELAY);
                 context.wait_for_all_requests();
                 screen = env.console.video().snapshot();
-                image_value = image_stats(extract_box_reference(screen, cursor_check)).average;
-                env.console.log("Cursor color detection: " + image_value.to_string());
+                first_slot_cursor_color = image_stats(extract_box_reference(screen, first_slot_cursor_box)).average;
+                env.console.log("Cursor color detection: " + first_slot_cursor_color.to_string());
 
-                if(image_value.r > image_value.g + image_value.b){
+                if(first_slot_cursor_color.r > first_slot_cursor_color.g + first_slot_cursor_color.b){
                     cursor_found = true;
                     break;
                 }
@@ -410,7 +412,10 @@ void do_sort(
     BoxSorting_Descriptor::Stats& stats,
     Cursor& cur_cursor,
     uint16_t GAME_DELAY
-    ){
+){
+    env.log("Start sorting...");
+    env.add_overlay_log("Start Sorting...");
+
     std::ostringstream ss;
     // this need to be separated into functions when I will redo the whole thing but I just wanted it to work
 
@@ -528,24 +533,25 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     box_render.clear();
 
     Cursor dest_cursor;
-    std::vector<size_t> first_poke_slot;
     Cursor nav_cursor = {0, 0, 0};
-    bool find_first_poke;
 
     //cycle through each box
-    for (size_t box_nb = 0; box_nb < BOX_NUMBER; box_nb++){
-
-        if(box_nb != 0){
+    for (size_t box_idx = 0; box_idx < BOX_NUMBER; box_idx++){
+        if(box_idx != 0){
+            // Press button R to move to next box
             pbf_press_button(context, BUTTON_R, 10, VIDEO_DELAY+100);
-            context.wait_for_all_requests();
         }else{
             // Moving the cursor until it goes to the first slot
             if(!go_to_first_slot(env, context, VIDEO_DELAY)){
                 env.console.log("ERROR: Could not move cursor to the first slot, please consider adjusting delay\n", COLOR_RED);
                 return;
             }
-            context.wait_for_all_requests();
         }
+
+        context.wait_for_all_requests();
+        const std::string log_msg = "Checking box " + std::to_string(box_idx+1) + "/" + std::to_string(BOX_NUMBER);
+        env.log(log_msg);
+        env.console.overlay().add_log(log_msg);
 
         screen = env.console.video().snapshot();
 
@@ -553,13 +559,12 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
         ss << "\n";
 
-        first_poke_slot = {0, 0};
-        find_first_poke = false;
+        std::array<size_t, 2> first_poke_slot = {0, 0};
+        bool find_first_poke = false;
 
+        int num_empty_slots = 0;
         for (size_t row = 0; row < MAX_ROWS; row++){
-
             for (size_t column = 0; column < MAX_COLUMNS; column++){
-
                 ImageFloatBox slot_box(0.06 + (0.072 * column), 0.2 + (0.1035 * row), 0.03, 0.057);
                 int current_box_value = (int)image_stddev(extract_box_reference(screen, slot_box)).sum();
 
@@ -569,6 +574,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 if(current_box_value < 10){
                     box_render.add(COLOR_RED, slot_box);
                     stats.empty++;
+                    num_empty_slots++;
                     env.update_stats();
                     boxes_data.push_back(std::nullopt); //empty optional to make sorting easier later
                     ss << "\u274c " ;    //  "X"
@@ -590,16 +596,18 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             }
             ss << "\n";
         }
-
         env.console.log(ss.str());
+        env.add_overlay_log("Empty: " + std::to_string(num_empty_slots) + "/30");
         ss.str("");
 
         // moving cursor to the first pokemon slot
         dest_cursor = {0, first_poke_slot[1], first_poke_slot[0]};
         nav_cursor = move_cursor_to(env, context, nav_cursor, dest_cursor, GAME_DELAY);
 
-        //enter the summary screen
-        if (find_first_poke == true){
+        //enter the summary screen to read pokemon info
+        if (find_first_poke){
+            env.add_overlay_log("Checking Summary...");
+
             pbf_press_button(context, BUTTON_A, 10, GAME_DELAY);
             context.wait_for_all_requests();
             box_render.clear();
@@ -621,50 +629,55 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             //cycle through each summary of the current box and fill pokemon information
             for (size_t row = 0; row < MAX_ROWS; row++){
                 for (size_t column = 0; column < MAX_COLUMNS; column++){
-
-                    if (boxes_data[get_index(box_nb, row, column)].has_value()){
-                        screen = env.console.video().snapshot();
-
-                        int national_dex_number = OCR::read_number_waterfill(env.console, extract_box_reference(screen, national_dex_number_box), 0xff808080, 0xffffffff);
-                        if (national_dex_number < 0 || national_dex_number > 1025) {
-                            dump_image(env.console, ProgramInfo(), "ReadSummary_national_dex_number", screen);
-                        }
-                        boxes_data[get_index(box_nb, row, column)]->national_dex_number = (uint16_t)national_dex_number;
-
-                        int shiny_stddev_value = (int)image_stddev(extract_box_reference(screen, shiny_symbol_box)).sum();
-                        bool is_shiny = shiny_stddev_value > 30;
-                        boxes_data[get_index(box_nb, row, column)]->shiny = is_shiny;
-                        env.console.log("Shiny detection stddev:" + std::to_string(shiny_stddev_value) + " is shiny:" + std::to_string(is_shiny));
-
-                        int gmax_stddev_value = (int)image_stddev(extract_box_reference(screen, gmax_symbol_box)).sum();
-                        bool is_gmax = gmax_stddev_value > 30;
-                        boxes_data[get_index(box_nb, row, column)]->gmax = is_gmax;
-                        env.console.log("Gmax detection stddev:" + std::to_string(gmax_stddev_value) + " is gmax:" + std::to_string(is_gmax));
-
-                        BallReader ball_reader(env.console);
-                        boxes_data[get_index(box_nb, row, column)]->ball_slug = ball_reader.read_ball(screen);
-
-                        BoxGenderDetector::make_overlays(box_render);
-                        StatsHuntGenderFilter gender = BoxGenderDetector::detect(screen);
-                        env.console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
-                        boxes_data[get_index(box_nb, row, column)]->gender = gender;
-
-                        int ot_id = OCR::read_number_waterfill(env.console, extract_box_reference(screen, ot_id_box), 0xff808080, 0xffffffff);
-                        if (ot_id < 0 || ot_id > 999'999) {
-                            dump_image(env.console, ProgramInfo(), "ReadSummary_OT", screen);
-                        }
-                        boxes_data[get_index(box_nb, row, column)]->ot_id = ot_id;
-
-                        // NOTE edit when adding new struct members (detections go here likely)
-
-                        // level_box
-                        // ot_box
-                        // nature_box
-                        // ability_box
-
-                        pbf_press_button(context, BUTTON_R, 10, VIDEO_DELAY+15);
-                        context.wait_for_all_requests();
+                    if (!boxes_data[get_index(box_idx, row, column)].has_value()){
+                        continue;
                     }
+
+                    screen = env.console.video().snapshot();
+
+                    int national_dex_number = OCR::read_number_waterfill(env.console, extract_box_reference(screen, national_dex_number_box), 0xff808080, 0xffffffff);
+                    if (national_dex_number <= 0 || national_dex_number > 1025) { // Current last pokemon is pecharunt
+                        dump_image(env.console, ProgramInfo(), "ReadSummary_national_dex_number", screen);
+                    }
+                    boxes_data[get_index(box_idx, row, column)]->national_dex_number = (uint16_t)national_dex_number;
+
+                    int shiny_stddev_value = (int)image_stddev(extract_box_reference(screen, shiny_symbol_box)).sum();
+                    bool is_shiny = shiny_stddev_value > 30;
+                    boxes_data[get_index(box_idx, row, column)]->shiny = is_shiny;
+                    env.console.log("Shiny detection stddev:" + std::to_string(shiny_stddev_value) + " is shiny:" + std::to_string(is_shiny));
+
+                    int gmax_stddev_value = (int)image_stddev(extract_box_reference(screen, gmax_symbol_box)).sum();
+                    bool is_gmax = gmax_stddev_value > 30;
+                    boxes_data[get_index(box_idx, row, column)]->gmax = is_gmax;
+                    env.console.log("Gmax detection stddev:" + std::to_string(gmax_stddev_value) + " is gmax:" + std::to_string(is_gmax));
+
+                    BallReader ball_reader(env.console);
+                    boxes_data[get_index(box_idx, row, column)]->ball_slug = ball_reader.read_ball(screen);
+
+                    BoxGenderDetector::make_overlays(box_render);
+                    StatsHuntGenderFilter gender = BoxGenderDetector::detect(screen);
+                    env.console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
+                    boxes_data[get_index(box_idx, row, column)]->gender = gender;
+
+                    int ot_id = OCR::read_number_waterfill(env.console, extract_box_reference(screen, ot_id_box), 0xff808080, 0xffffffff);
+                    if (ot_id < 0 || ot_id > 999'999) {
+                        dump_image(env.console, ProgramInfo(), "ReadSummary_OT", screen);
+                    }
+                    boxes_data[get_index(box_idx, row, column)]->ot_id = ot_id;
+
+                    const std::string& species_slug = NATIONAL_DEX_SLUGS()[national_dex_number-1];
+                    const std::string& display_name = get_pokemon_name(species_slug).display_name();
+                    env.add_overlay_log("Read " + display_name);
+
+                    // NOTE edit when adding new struct members (detections go here likely)
+
+                    // level_box
+                    // ot_box
+                    // nature_box
+                    // ability_box
+
+                    pbf_press_button(context, BUTTON_R, 10, VIDEO_DELAY+15);
+                    context.wait_for_all_requests();
                 }
             }
 
@@ -675,7 +688,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             // print box information
             for (size_t row = 0; row < MAX_ROWS; row++){
                 for (size_t column = 0; column < MAX_COLUMNS; column++){
-                    ss << boxes_data[get_index(box_nb, row, column)] << " ";
+                    ss << boxes_data[get_index(box_idx, row, column)] << " ";
                 }
                 ss << std::endl;
             }
@@ -694,7 +707,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         dest_cursor = {0, 0, 0};
         nav_cursor = move_cursor_to(env, context, nav_cursor, dest_cursor, GAME_DELAY);
         context.wait_for_all_requests();
-    }
+    } // end if (find_first_poke){
 
     // copy boxes data to sort
     std::vector<std::optional<Pokemon>> boxes_sorted = boxes_data;

@@ -27,6 +27,9 @@ class SingleSwitchProgramEnvironment : public ProgramEnvironment{
 public:
     ConsoleHandle console;
 
+    // Call console.overlay().add_log(msg, color) to add a log message to overlay display
+    void add_overlay_log(std::string msg, Color color = COLOR_WHITE);
+
 private:
     friend class SingleSwitchProgramSession;
     friend class SingleSwitchProgramWidget;
