@@ -1686,6 +1686,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/Trading/PokemonLZA_SelfBoxTrade.h
     Source/PokemonLZA/Programs/Trading/PokemonLZA_TradeRoutines.cpp
     Source/PokemonLZA/Programs/Trading/PokemonLZA_TradeRoutines.h
+    Source/PokemonLZA/Resources/PokemonLZA_HyperspaceRewardNames.cpp
+    Source/PokemonLZA/Resources/PokemonLZA_HyperspaceRewardNames.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.cpp
