@@ -24,6 +24,7 @@ language
 "stamps"
 */
 
+#include <array>
 #include <map>
 #include <optional>
 #include <sstream>
