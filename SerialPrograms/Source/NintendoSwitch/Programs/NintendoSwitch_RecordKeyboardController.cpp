@@ -338,28 +338,19 @@ JsonValue RecordKeyboardController::controller_history_to_json(Logger& logger, C
 }
 
 
-void RecordKeyboardController::on_keyboard_command_sent(WallClock time_stamp, const ControllerState& state){
+void RecordKeyboardController::on_command_input(WallClock timestamp, const ControllerState& state){
     cout << "keyboard_command_sent" << endl;
     JsonValue serialized_state = state.to_json();
     cout << serialized_state.dump(0) << endl;
-    
+
     ControllerStateSnapshot state_snapshot = {
-        time_stamp,
+        timestamp,
         std::move(serialized_state)
     };
     m_controller_history.emplace_back(std::move(state_snapshot));
 }
-void RecordKeyboardController::on_keyboard_command_stopped(WallClock time_stamp){
-    cout << "keyboard_command_stopped" << endl;
-    JsonObject obj;
-//    obj["is_neutral"] = true;
 
-    ControllerStateSnapshot state_snapshot = {
-        time_stamp, 
-        std::move(obj)
-    };
-    m_controller_history.emplace_back(std::move(state_snapshot));
-}
+
 
 
 

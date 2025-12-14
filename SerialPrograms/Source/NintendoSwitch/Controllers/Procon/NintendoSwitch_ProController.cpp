@@ -37,7 +37,6 @@ const char ProController::NAME[] = "Nintendo Switch: Pro Controller";
 
 struct ProController::Data{
     std::map<KeyboardKey, ProControllerDeltas> m_keyboard_mapping;
-    KeyboardEventHandler m_input_sniffer;
 };
 
 
@@ -100,14 +99,7 @@ void ProController::run_controller_input(const ControllerInputState& state){
         controller_state.right_y
     );
 
-    m_data->m_input_sniffer.report_keyboard_command_sent(timestamp, controller_state);
-}
-
-void ProController::add_input_sniffer(KeyboardEventHandler::KeyboardListener& listener){
-    m_data->m_input_sniffer.add_listener(listener);
-}
-void ProController::remove_input_sniffer(KeyboardEventHandler::KeyboardListener& listener){
-    m_data->m_input_sniffer.remove_listener(listener);
+    on_command_input(timestamp, controller_state);
 }
 
 

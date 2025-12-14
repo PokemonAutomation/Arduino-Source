@@ -38,7 +38,6 @@ const char RightJoycon::NAME[] = "Nintendo Switch: Right Joycon";
 
 struct JoyconController::Data{
     std::map<KeyboardKey, JoyconDeltas> m_keyboard_mapping;
-    KeyboardEventHandler m_input_sniffer;
 };
 
 
@@ -95,14 +94,7 @@ void JoyconController::run_controller_input(const ControllerInputState& state){
         controller_state.joystick_y
     );
 
-    m_data->m_input_sniffer.report_keyboard_command_sent(timestamp, controller_state);
-}
-
-void JoyconController::add_input_sniffer(KeyboardEventHandler::KeyboardListener& listener){
-    m_data->m_input_sniffer.add_listener(listener);
-}
-void JoyconController::remove_input_sniffer(KeyboardEventHandler::KeyboardListener& listener){
-    m_data->m_input_sniffer.remove_listener(listener);
+    on_command_input(timestamp, controller_state);
 }
 
 

@@ -129,7 +129,7 @@ void Keyboard::run_controller_input(const ControllerInputState& state){
         std::vector<KeyboardKey>(lstate.keys().begin(), lstate.keys().end())
     );
 
-//    m_data->m_input_sniffer.report_keyboard_command_sent(timestamp, controller_state);
+//    on_command_input(timestamp, controller_state);
 }
 
 

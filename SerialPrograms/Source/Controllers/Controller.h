@@ -10,13 +10,14 @@
 #include "Common/Compiler.h"
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Time.h"
-#include "Controllers/KeyboardInput/KeyboardEventHandler.h"
+#include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/CancellableScope.h"
 
 namespace PokemonAutomation{
 
 class RecursiveThrottler;
 class ControllerInputState;
+class ControllerState;
 enum class ControllerType;
 enum class ControllerPerformanceClass;
 enum class ControllerClass;
@@ -28,7 +29,8 @@ class AbstractController{
 public:
     static const char NAME[];
 
-    virtual ~AbstractController() = default;
+    AbstractController();
+    virtual ~AbstractController();
 
     virtual Logger& logger() = 0;
     virtual RecursiveThrottler& logging_throttler() = 0;
@@ -196,8 +198,18 @@ public:
 
     virtual void run_controller_input(const ControllerInputState& state){}
 
-    virtual void add_input_sniffer(KeyboardEventHandler::KeyboardListener& listener){};
-    virtual void remove_input_sniffer(KeyboardEventHandler::KeyboardListener& listener){};
+    struct InputSniffer{
+        virtual void on_command_input(WallClock timestamp, const ControllerState& state) = 0;
+    };
+    void add_input_sniffer(InputSniffer& listener);
+    void remove_input_sniffer(InputSniffer& listener);
+protected:
+    void on_command_input(WallClock timestamp, const ControllerState& state);
+
+
+private:
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 

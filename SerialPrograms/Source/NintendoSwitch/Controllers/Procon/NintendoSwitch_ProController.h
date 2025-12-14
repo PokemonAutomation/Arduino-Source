@@ -223,8 +223,6 @@ public:
 
     virtual void run_controller_input(const ControllerInputState& state) override;
 
-    virtual void add_input_sniffer(KeyboardEventHandler::KeyboardListener& listener) override;
-    virtual void remove_input_sniffer(KeyboardEventHandler::KeyboardListener& listener) override;
 
 private:
     struct Data;

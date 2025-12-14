@@ -673,8 +673,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/ControllerTypeStrings.h
     Source/Controllers/ControllerTypes.h
     Source/Controllers/JoystickTools.h
-    Source/Controllers/KeyboardInput/KeyboardEventHandler.cpp
-    Source/Controllers/KeyboardInput/KeyboardEventHandler.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h
     Source/Controllers/Schedulers/ControllerWithScheduler.h
