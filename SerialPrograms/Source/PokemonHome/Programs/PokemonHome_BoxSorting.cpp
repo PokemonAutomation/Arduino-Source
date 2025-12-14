@@ -54,6 +54,7 @@ namespace PokemonHome{
 using namespace Pokemon;
 
 
+
 const size_t MAX_BOXES = 200;
 const size_t MAX_COLUMNS = 6;
 const size_t MAX_ROWS = 5;
@@ -274,6 +275,29 @@ std::ostream& operator<<(std::ostream& os, const std::optional<Pokemon>& pokemon
     return os;
 }
 
+std::string create_overlay_log(const Pokemon& pokemon){
+    const std::string& species_slug = NATIONAL_DEX_SLUGS()[pokemon.national_dex_number-1];
+    const std::string& display_name = get_pokemon_name(species_slug).display_name();
+    std::string overlay_log = display_name;
+    if(pokemon.gender == StatsHuntGenderFilter::Male){
+        overlay_log += " " + UNICODE_MALE;
+    } else if (pokemon.gender == StatsHuntGenderFilter::Female){
+        overlay_log += " " + UNICODE_FEMALE;
+    } else{
+        overlay_log += " " + UNICODE_GENDERLESS;
+    }
+    if (pokemon.shiny){
+        overlay_log += " *";
+    }
+    if (pokemon.gmax){
+        overlay_log += " G";
+    }
+    if (pokemon.alpha){
+        overlay_log += " " + UNICODE_ALPHA;
+    }
+    return overlay_log;
+}
+
 // Move the red cursor to the first slot of the box
 // If the cursor is not add the first slot, move the cursor to the left and up one row at a time until it is at the first slot. 
 bool go_to_first_slot(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint16_t VIDEO_DELAY){
@@ -488,6 +512,8 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     ImageFloatBox select_check(0.495, 0.0045, 0.01, 0.005); // square color to check which mode is active
     ImageFloatBox national_dex_number_box(0.448, 0.245, 0.049, 0.04); //pokemon national dex number pos
     ImageFloatBox shiny_symbol_box(0.702, 0.09, 0.04, 0.06); // shiny symbol pos
+    // TODO: gmax symbol is at the same location as Tera type symbol! Need better detection to tell apart
+    // gmax symbol and tera types
     ImageFloatBox gmax_symbol_box(0.463, 0.09, 0.04, 0.06); // gmax symbol pos
     ImageFloatBox origin_symbol_box(0.623, 0.095, 0.033, 0.05); // origin symbol pos
     ImageFloatBox pokemon_box(0.69, 0.18, 0.28, 0.46); // pokemon render pos
@@ -628,9 +654,10 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             pbf_press_button(context, BUTTON_A, 10, VIDEO_DELAY+150);
             context.wait_for_all_requests();
 
-            box_render.add(COLOR_RED, national_dex_number_box);
+            box_render.add(COLOR_WHITE, national_dex_number_box);
             box_render.add(COLOR_BLUE, shiny_symbol_box);
-            box_render.add(COLOR_GREEN, gmax_symbol_box);
+            box_render.add(COLOR_RED, gmax_symbol_box);
+            box_render.add(COLOR_RED, alpha_box);
             box_render.add(COLOR_DARKGREEN, origin_symbol_box);
             box_render.add(COLOR_DARK_BLUE, pokemon_box);
             box_render.add(COLOR_RED, level_box);
@@ -647,46 +674,45 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                         continue;
                     }
 
+                    auto cur_pokemon_info = boxes_data[global_idx];
                     screen = env.console.video().snapshot();
 
                     const int national_dex_number = OCR::read_number_waterfill(env.console, extract_box_reference(screen, national_dex_number_box), 0xff808080, 0xffffffff);
                     if (national_dex_number <= 0 || national_dex_number > 1025) { // Current last pokemon is pecharunt
                         dump_image(env.console, ProgramInfo(), "ReadSummary_national_dex_number", screen);
                     }
-                    boxes_data[global_idx]->national_dex_number = (uint16_t)national_dex_number;
+                    cur_pokemon_info->national_dex_number = (uint16_t)national_dex_number;
 
                     const int shiny_stddev_value = (int)image_stddev(extract_box_reference(screen, shiny_symbol_box)).sum();
                     const bool is_shiny = shiny_stddev_value > 30;
-                    boxes_data[global_idx]->shiny = is_shiny;
+                    cur_pokemon_info->shiny = is_shiny;
                     env.console.log("Shiny detection stddev:" + std::to_string(shiny_stddev_value) + " is shiny:" + std::to_string(is_shiny));
 
                     const int gmax_stddev_value = (int)image_stddev(extract_box_reference(screen, gmax_symbol_box)).sum();
                     const bool is_gmax = gmax_stddev_value > 30;
-                    boxes_data[global_idx]->gmax = is_gmax;
+                    cur_pokemon_info->gmax = is_gmax;
                     env.console.log("Gmax detection stddev:" + std::to_string(gmax_stddev_value) + " is gmax:" + std::to_string(is_gmax));
 
                     const int alpha_stddev_value = (int)image_stddev(extract_box_reference(screen, alpha_box)).sum();
                     const bool is_alpha = alpha_stddev_value > 40;
-                    boxes_data[global_idx]->alpha = is_alpha;
+                    cur_pokemon_info->alpha = is_alpha;
                     env.console.log("Alpha detection stddev:" + std::to_string(alpha_stddev_value) + " is alpha:" + std::to_string(is_alpha));
 
                     BallReader ball_reader(env.console);
-                    boxes_data[global_idx]->ball_slug = ball_reader.read_ball(screen);
+                    cur_pokemon_info->ball_slug = ball_reader.read_ball(screen);
 
                     BoxGenderDetector::make_overlays(box_render);
                     const StatsHuntGenderFilter gender = BoxGenderDetector::detect(screen);
                     env.console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
-                    boxes_data[global_idx]->gender = gender;
+                    cur_pokemon_info->gender = gender;
 
                     const int ot_id = OCR::read_number_waterfill(env.console, extract_box_reference(screen, ot_id_box), 0xff808080, 0xffffffff);
                     if (ot_id < 0 || ot_id > 999'999) {
                         dump_image(env.console, ProgramInfo(), "ReadSummary_OT", screen);
                     }
-                    boxes_data[global_idx]->ot_id = ot_id;
-
-                    const std::string& species_slug = NATIONAL_DEX_SLUGS()[national_dex_number-1];
-                    const std::string& display_name = get_pokemon_name(species_slug).display_name();
-                    env.add_overlay_log("Read " + display_name);
+                    cur_pokemon_info->ot_id = ot_id;
+                    
+                    env.add_overlay_log("Read " + create_overlay_log(*cur_pokemon_info));
 
                     // NOTE edit when adding new struct members (detections go here likely)
 
