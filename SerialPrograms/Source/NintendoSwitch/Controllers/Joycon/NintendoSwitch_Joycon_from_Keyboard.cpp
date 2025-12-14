@@ -50,6 +50,7 @@ std::vector<std::unique_ptr<EditableTableRow>> JoyconFromKeyboardTable::make_def
 
         //  Other
         ret.emplace_back(make_mapping("-",                  KeyboardKey::KEY_MINUS,     JoyconDeltas{.buttons = BUTTON_MINUS}));
+        ret.emplace_back(make_mapping("-",                  KeyboardKey::KEY_KP_MINUS,  JoyconDeltas{.buttons = BUTTON_MINUS}));
         ret.emplace_back(make_mapping("Capture",            KeyboardKey::KEY_INSERT,    JoyconDeltas{.buttons = BUTTON_CAPTURE}));
 
         ret.emplace_back(make_mapping("SL",                 KeyboardKey::KEY_F1,        JoyconDeltas{.buttons = BUTTON_LEFT_SL}));
@@ -88,6 +89,7 @@ std::vector<std::unique_ptr<EditableTableRow>> JoyconFromKeyboardTable::make_def
 
         //  Other
         ret.emplace_back(make_mapping("+",                  KeyboardKey::KEY_EQUAL,     JoyconDeltas{.buttons = BUTTON_PLUS}));
+        ret.emplace_back(make_mapping("+",                  KeyboardKey::KEY_KP_PLUS,   JoyconDeltas{.buttons = BUTTON_PLUS}));
 
         ret.emplace_back(make_mapping("Home",               KeyboardKey::KEY_HOME,      JoyconDeltas{.buttons = BUTTON_HOME}));
         ret.emplace_back(make_mapping("Home",               KeyboardKey::KEY_ESC,       JoyconDeltas{.buttons = BUTTON_HOME}));

@@ -53,7 +53,9 @@ std::vector<std::unique_ptr<EditableTableRow>> ProControllerFromKeyboardTable::m
     ret.emplace_back(make_mapping("ZR",             KeyboardKey::KEY_BACKSLASH,     ProControllerDeltas{.buttons = BUTTON_ZR}));
 
     ret.emplace_back(make_mapping("-",              KeyboardKey::KEY_MINUS,         ProControllerDeltas{.buttons = BUTTON_MINUS}));
+    ret.emplace_back(make_mapping("-",              KeyboardKey::KEY_KP_MINUS,      ProControllerDeltas{.buttons = BUTTON_MINUS}));
     ret.emplace_back(make_mapping("+",              KeyboardKey::KEY_EQUAL,         ProControllerDeltas{.buttons = BUTTON_PLUS}));
+    ret.emplace_back(make_mapping("+",              KeyboardKey::KEY_KP_PLUS,       ProControllerDeltas{.buttons = BUTTON_PLUS}));
 
     ret.emplace_back(make_mapping("L-Click",        KeyboardKey::KEY_C,             ProControllerDeltas{.buttons = BUTTON_LCLICK}));
     ret.emplace_back(make_mapping("R-Click",        KeyboardKey::KEY_KP_0,          ProControllerDeltas{.buttons = BUTTON_RCLICK}));
