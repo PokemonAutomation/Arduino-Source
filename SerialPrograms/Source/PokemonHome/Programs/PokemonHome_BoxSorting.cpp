@@ -39,6 +39,8 @@ language
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/FrozenImageDetector.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -674,11 +676,21 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                         continue;
                     }
 
+                    if (row > 0 || column > 0){
+                        // Press button R to go to next summary screen
+                        pbf_press_button(context, BUTTON_R, 10, 40);
+                        context.wait_for_all_requests();
+                    }
+                    // Wait for the summary screen transition to end
+                    FrozenImageDetector frozen_image_detector(COLOR_GREEN, {0.388, 0.238, 0.109, 0.062}, Milliseconds(80), 20);
+                    frozen_image_detector.make_overlays(box_render);
+                    wait_until(env.console, context, 5s, {frozen_image_detector});
+
                     auto& cur_pokemon_info = boxes_data[global_idx];
                     screen = env.console.video().snapshot();
 
                     const int national_dex_number = OCR::read_number_waterfill(env.console, extract_box_reference(screen, national_dex_number_box), 0xff808080, 0xffffffff);
-                    if (national_dex_number <= 0 || national_dex_number > NATIONAL_DEX_SLUGS().size()) {
+                    if (national_dex_number <= 0 || national_dex_number > static_cast<int>(NATIONAL_DEX_SLUGS().size())) {
                         OperationFailedException::fire(
                             ErrorReport::SEND_ERROR_REPORT,
                             "BoxSorting Check Summary: Unable to read a correct dex number, found: " + std::to_string(national_dex_number),
@@ -716,7 +728,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     }
                     cur_pokemon_info->ot_id = ot_id;
                     
-                    env.add_overlay_log("Read " + create_overlay_info(*cur_pokemon_info));
+                    env.add_overlay_log(create_overlay_info(*cur_pokemon_info));
 
                     // NOTE edit when adding new struct members (detections go here likely)
 
@@ -724,9 +736,6 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     // ot_box
                     // nature_box
                     // ability_box
-
-                    pbf_press_button(context, BUTTON_R, 10, VIDEO_DELAY+15); // Press button R to go to next summary screen
-                    context.wait_for_all_requests();
                 }
             }
 

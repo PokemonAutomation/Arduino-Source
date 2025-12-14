@@ -2,7 +2,7 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  Detect if the entire screen is frozen.
+ *  Detect if the entire screen or a part of it is frozen.
  */
 
 #ifndef PokemonAutomation_CommonTools_FrozenImageDetector_H

@@ -33,8 +33,12 @@ print(f"Size: {width} x {height}")
 raw_image = image.copy()
 
 # ==================================================================
+# Home summary screen finish loading detector
+add_infer_box_to_image(raw_image, 0.388, 0.238, 0.109, 0.062, image)
+
+# ==================================================================
 # LZA Hyperspace Timer detection
-add_infer_box_to_image(raw_image, 0.044, 0.111, 0.060, 0.067, image)
+# add_infer_box_to_image(raw_image, 0.044, 0.111, 0.060, 0.067, image)
 
 
 # ==================================================================
