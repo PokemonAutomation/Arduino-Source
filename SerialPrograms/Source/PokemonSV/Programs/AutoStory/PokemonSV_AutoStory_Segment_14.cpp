@@ -84,7 +84,8 @@ void checkpoint_30(
     
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){         
-        context.wait_for_all_requests();
+        
+        heal_at_pokecenter(env.program_info(), env.console, context);
 
         // section 1
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 128, 17);

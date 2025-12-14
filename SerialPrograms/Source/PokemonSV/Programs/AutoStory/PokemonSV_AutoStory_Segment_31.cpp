@@ -109,6 +109,9 @@ void AutoStory_Checkpoint_82::run_checkpoint(SingleSwitchProgramEnvironment& env
 void checkpoint_78(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
+
+        heal_at_pokecenter(env.program_info(), env.console, context);
+        
         move_from_north_province_area_one_to_north_province_area_two(env, context, attempt_number);
 
     });   

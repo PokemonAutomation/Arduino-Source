@@ -796,7 +796,7 @@ void heal_at_pokecenter(
     while (true){
         OverworldWatcher    overworld(stream.logger(), COLOR_CYAN);
         // TODO: test the Prompt watcher on all languages. Ensure FloatBox is sized correctly.
-        PromptDialogWatcher prompt(COLOR_YELLOW, {0.50, 0.400, 0.400, 0.080}); // 0.630, 0.400, 0.100, 0.080 // {0.50, 0.40, 0.40, 0.50}
+        PromptDialogWatcher prompt(COLOR_YELLOW, {0.50, 0.400, 0.400, 0.320}); // 0.50, 0.400, 0.400, 0.080  // 0.630, 0.400, 0.100, 0.080 // {0.50, 0.40, 0.40, 0.50}
         AdvanceDialogWatcher    advance_dialog(COLOR_RED);
         TutorialWatcher     tutorial(COLOR_RED);
         context.wait_for_all_requests();
