@@ -480,11 +480,12 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     ImageFloatBox gmax_symbol_box(0.463, 0.09, 0.04, 0.06); // gmax symbol pos
     ImageFloatBox origin_symbol_box(0.623, 0.095, 0.033, 0.05); // origin symbol pos
     ImageFloatBox pokemon_box(0.69, 0.18, 0.28, 0.46); // pokemon render pos
-    ImageFloatBox level_box(0.546, 0.099, 0.044, 0.041); // Level box
-    ImageFloatBox ot_id_box(0.782, 0.719, 0.193, 0.046); // OT ID box
-    ImageFloatBox ot_box(0.492, 0.719, 0.165, 0.049); // OT box
-    ImageFloatBox nature_box(0.157, 0.783, 0.212, 0.042); // Nature box
-    ImageFloatBox ability_box(0.158, 0.838, 0.213, 0.042); // Ability box
+    ImageFloatBox level_box(0.546, 0.099, 0.044, 0.041); // Level
+    ImageFloatBox ot_id_box(0.782, 0.719, 0.193, 0.046); // OT ID
+    ImageFloatBox ot_box(0.492, 0.719, 0.165, 0.049); // OT
+    ImageFloatBox nature_box(0.157, 0.783, 0.212, 0.042); // Nature
+    ImageFloatBox ability_box(0.158, 0.838, 0.213, 0.042); // Ability
+    // TODO: add alpha detection
 
 
     // vector that will store data for each slot
