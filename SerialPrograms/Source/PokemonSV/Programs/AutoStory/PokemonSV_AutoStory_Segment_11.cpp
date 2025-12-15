@@ -540,17 +540,17 @@ void checkpoint_26(
         }
 
         // section 4.2 past second NPC and into the finish line
-        NoMinimapWatcher no_minimap(env.console, COLOR_RED, Milliseconds(5000));
+        NoMinimapWatcher no_minimap(env.console, COLOR_RED, Milliseconds(500));
         size_t MAX_ATTEMPTS_SECTION_4 = 3;
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [&](ProControllerContext& context){
                 for (size_t i = 0; i < MAX_ATTEMPTS_SECTION_4; i++){
                     try{
-                        green.push_olive_forward(env.program_info(), env.console, context, 6.0, 250);
-                        green.push_olive_forward(env.program_info(), env.console, context, 5.8, 100);
-                        green.push_olive_forward(env.program_info(), env.console, context, 6.0, 200);
-                        green.push_olive_forward(env.program_info(), env.console, context, 6.1, 200);                        
+                        green.push_olive_forward(env.program_info(), env.console, context, 6.0, 250, 75, 20, {0, 0.3, 1.0, 0.40}, false);
+                        green.push_olive_forward(env.program_info(), env.console, context, 5.8, 100, 75, 20, {0, 0.3, 1.0, 0.40}, false);
+                        green.push_olive_forward(env.program_info(), env.console, context, 6.0, 200, 75, 20, {0, 0.3, 1.0, 0.40}, false);
+                        green.push_olive_forward(env.program_info(), env.console, context, 6.1, 200, 75, 20, {0, 0.3, 1.0, 0.40}, false);                        
                         break;
                     }catch (OliveActionFailedException& e){
                         // may have failed to push the olive. and walked past it
@@ -565,7 +565,7 @@ void checkpoint_26(
                             pbf_wait(context, 7 * TICKS_PER_SECOND);
                             context.wait_for_all_requests();
                             // then push angled towards the right
-                            green.push_olive_forward(env.program_info(), env.console, context, 5.8, 100);                            
+                            green.push_olive_forward(env.program_info(), env.console, context, 5.8, 100, 75, 20, {0, 0.3, 1.0, 0.40}, false);                            
                         }else{ // FAILED_PUSH_OLIVE_TOTAL_DISTANCE, 
                             throw e;
                         }

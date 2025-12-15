@@ -47,7 +47,8 @@ public:
         ProControllerContext& context, 
         double direction_facing, 
         uint8_t rgb_gap = 20,
-        ImageFloatBox area_to_check = {0, 0.3, 1.0, 0.40}
+        ImageFloatBox area_to_check = {0, 0.3, 1.0, 0.40},
+        bool throw_if_fail_change_dir = true
     );
 
     // push the olive forward. 
@@ -62,7 +63,8 @@ public:
         uint16_t total_forward_distance,
         uint16_t push_olive = 75,
         uint8_t rgb_gap = 20,
-        ImageFloatBox area_to_check = {0, 0.3, 1.0, 0.40}  // {0, 0.15, 1, 0.7}
+        ImageFloatBox area_to_check = {0, 0.3, 1.0, 0.40},  // {0, 0.15, 1, 0.7}
+        bool throw_if_fail_change_dir = true
     );
 
     uint16_t walk_up_to_olive(

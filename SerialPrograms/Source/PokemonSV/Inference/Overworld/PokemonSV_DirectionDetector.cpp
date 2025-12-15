@@ -163,7 +163,8 @@ void DirectionDetector::change_direction(
     const ProgramInfo& info,
     VideoStream& stream,
     ProControllerContext& context,
-    double direction
+    double direction,
+    bool throw_if_fail
 ) const{
     size_t i = 0;
     size_t MAX_ATTEMPTS = 20;
@@ -174,12 +175,16 @@ void DirectionDetector::change_direction(
         context.wait_for_all_requests();
         VideoSnapshot screen = stream.video().snapshot();
         double current = get_current_direction(stream, screen);
-        if (current < 0){ 
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "change_direction(): Unable to detect current direction.",
-                stream
-            );
+        if (current < 0){
+            if (throw_if_fail){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "change_direction(): Unable to detect current direction.",
+                    stream
+                );
+            }else{
+                stream.log("change_direction(): Unable to detect current direction.");
+            }
         }
         double target = std::fmod(direction, (2 * PI));
 
