@@ -105,6 +105,26 @@ public:
     }
 };
 
+class DialogBlueArrowMatcher : public ImageMatch::WaterfillTemplateMatcher{
+public:
+    DialogBlueArrowMatcher()
+        : WaterfillTemplateMatcher(
+            "PokemonLZA/DialogBox/DialogBoxBlueArrow-Template.png",
+            Color(0xff005460), Color(0xff6BBEC9), 50
+        )
+    {
+        m_aspect_ratio_lower = 0.9;
+        m_aspect_ratio_upper = 1.1;
+        m_area_ratio_lower = 0.8;
+        m_area_ratio_upper = 1.1;
+    }
+
+    static const ImageMatch::WaterfillTemplateMatcher& instance() {
+        static DialogBlueArrowMatcher matcher;
+        return matcher;
+    }
+};
+
 
 namespace {
 
@@ -132,6 +152,33 @@ bool detect_white_arrow(const ImageViewRGB32& screen, PokemonAutomation::ImageFl
         screen.size(),
         extract_box_reference(screen, DIALOG_ARROW_BOX),
         DialogWhiteArrowMatcher::instance(),
+        FILTERS,
+        {min_area, SIZE_MAX},
+        rmsd_threshold,
+        [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
+            found_box = translate_to_parent(screen, DIALOG_ARROW_BOX, object);
+            return true;
+        }
+    );
+    return found;
+}
+
+bool detect_blue_arrow(const ImageViewRGB32& screen, PokemonAutomation::ImageFloatBox& found_box){
+    double screen_rel_size = (screen.height() / 1080.0);
+    double screen_rel_size_2 = screen_rel_size * screen_rel_size;
+
+    double min_area_1080p = 150.0;
+    double rmsd_threshold = 120.0;
+    size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
+
+    const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
+        {0x005460, 0xff7FC0C9},
+    };
+
+    bool found = match_template_by_waterfill(
+        screen.size(),
+        extract_box_reference(screen, DIALOG_ARROW_BOX),
+        DialogBlueArrowMatcher::instance(),
         FILTERS,
         {min_area, SIZE_MAX},
         rmsd_threshold,
@@ -473,6 +520,43 @@ void TransparentBattleDialogDetector::make_overlays(VideoOverlaySet& items) cons
 }
 bool TransparentBattleDialogDetector::detect(const ImageViewRGB32& screen){
     const bool found = detect_white_arrow(screen, m_last_detected_box);
+
+    if (m_overlay){
+        if (found){
+            m_last_detected_box_scope.emplace(*m_overlay, m_last_detected_box, COLOR_GREEN);
+        }else{
+            m_last_detected_box_scope.reset();
+        }
+    }
+
+    return found;
+}
+
+
+LightBlueDialogDetector::LightBlueDialogDetector(Color color, VideoOverlay* overlay)
+    : m_color(color)
+    , m_overlay(overlay)
+    , m_corner(0.765093, 0.933594, 0.006586, 0.013672)
+{}
+void LightBlueDialogDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_corner);
+    items.add(m_color, DIALOG_ARROW_BOX);
+}
+bool LightBlueDialogDetector::detect(const ImageViewRGB32& screen){
+    do{
+        if (is_solid(
+            extract_box_reference(screen, m_corner),
+            {0.108317, 0.462282, 0.429400},
+            0.25
+        )){
+            break;
+        }
+        m_last_detected_box_scope.reset();
+//        cout << "not solid" << endl;
+        return false;
+    }while (false);
+
+    const bool found = detect_blue_arrow(screen, m_last_detected_box);
 
     if (m_overlay){
         if (found){
