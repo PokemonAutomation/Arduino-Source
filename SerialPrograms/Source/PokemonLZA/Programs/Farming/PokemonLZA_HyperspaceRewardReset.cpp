@@ -85,61 +85,61 @@ HyperspaceRewardReset::HyperspaceRewardReset()
 
 void HyperspaceRewardReset::talk_to_trainer(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     HyperspaceRewardReset_Descriptor::Stats& stats = env.current_stats<HyperspaceRewardReset_Descriptor::Stats>();
-    context.wait_for_all_requests();
 
-    env.log("Looking for A button.");
-    ButtonWatcher buttonA_watcher(
-        COLOR_WHITE,
-        ButtonType::ButtonA,
-        {0.1, 0.1, 0.8, 0.8},
-        &env.console.overlay()
-    );
-    int ret = wait_until(
-        env.console, context,
-        10s,
-        {
-            buttonA_watcher,
-        }
-    );
-    if (ret == 0) {
-        env.log("Detected A button.");
-        pbf_press_button(context, BUTTON_A, 80ms, 40ms);
-    }
-    else {
-        stats.errors++;
-        env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "talk_to_trainer(): Failed to detect A button.",
-            env.console
+    bool exit = false;
+    while (!exit){
+        context.wait_for_all_requests();
+
+        ButtonWatcher buttonA_watcher(
+            COLOR_WHITE,
+            ButtonType::ButtonA,
+            {0.1, 0.1, 0.8, 0.8},
+            &env.console.overlay()
         );
-    }
-    context.wait_for_all_requests();
-
-    BlueDialogWatcher blue_dialog_watcher(COLOR_BLUE, &env.console.overlay());
-    env.log("Pressing A until item received dialog.");
-    //First dialog box varies by trainer (hologram, regular, etc.)
-    int ret_blue = run_until<ProControllerContext>(
-        env.console, context,
-        [](ProControllerContext& context){
-            for (int i = 0; i < 20; i++) {
-                pbf_press_button(context, BUTTON_A, 80ms, 100ms);
-                pbf_wait(context, 1000ms);
-                context.wait_for_all_requests();
+        //First dialog box varies by trainer (hologram, regular, etc.)
+        BlueDialogWatcher blue_dialog_watcher(COLOR_BLUE, &env.console.overlay()); //Item received (not the big box)
+        FlatWhiteDialogWatcher white_dialog_watcher(COLOR_WHITE, &env.console.overlay()); //Non-hologram
+        LightBlueDialogWatcher light_blue_dialog_watcher(COLOR_WHITE, &env.console.overlay()); //hologram
+        
+        int ret = wait_until(
+            env.console, context,
+            10s,
+            {
+                buttonA_watcher,
+                blue_dialog_watcher,
+                white_dialog_watcher,
+                light_blue_dialog_watcher,
             }
-        },
-        { blue_dialog_watcher }
-    );
-    if (ret_blue != 0){
-        stats.errors++;
-        env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "talk_to_trainer(): Failed to detect blue item received dialog after 20 A presses.",
-            env.console
         );
+        context.wait_for(100ms);
+
+        switch (ret){
+        case 0:
+            env.log("Detected A button.");
+            pbf_press_button(context, BUTTON_A, 80ms, 40ms);
+            continue;
+        case 1:
+            env.log("Detected item received dialog.");
+            exit = true;
+            break;
+        case 2:
+            env.log("Detected white dialog.");
+            pbf_press_button(context, BUTTON_A, 80ms, 40ms);
+            continue;
+        case 3:
+            env.log("Detected light blue dialog.");
+            pbf_press_button(context, BUTTON_A, 80ms, 40ms);
+            continue;
+        default:
+            stats.errors++;
+            env.update_stats();
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "talk_to_trainer(): Failed to detect blue item received dialog.",
+                env.console
+            );
+        }
     }
-    context.wait_for_all_requests();
 }
 
 //Check reward and notify if it matches filters
