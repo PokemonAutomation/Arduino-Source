@@ -275,9 +275,9 @@ void CommandRow::on_state_changed(ProgramState state){
     m_last_known_state = state;
     if (allow_controller_input()){
         global_input_clear_state();
-        global_input_add_listener(*this);
+//        global_input_add_listener(*this);
     }else{
-        global_input_remove_listener(*this);
+//        global_input_remove_listener(*this);
     }
     update_ui();
 }
