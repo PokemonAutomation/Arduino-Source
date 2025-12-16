@@ -520,29 +520,34 @@ void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProController
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
 
-            direction.change_direction(env.program_info(), env.console, context, 4.941664);
-            pbf_move_left_joystick(context, 128, 0, 100, 50);
-            pbf_press_button(context, BUTTON_R, 20, 20);
-            pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+            try {
+                direction.change_direction(env.program_info(), env.console, context, 4.941664);
+                pbf_move_left_joystick(context, 128, 0, 100, 50);
+                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
 
-            direction.change_direction(env.program_info(), env.console, context, 6.140720);
-            pbf_move_left_joystick(context, 128, 0, 100, 50);
-            pbf_press_button(context, BUTTON_R, 20, 20);
-            pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                direction.change_direction(env.program_info(), env.console, context, 6.140720);
+                pbf_move_left_joystick(context, 128, 0, 100, 50);
+                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
 
-            direction.change_direction(env.program_info(), env.console, context, 5.096584);
-            pbf_move_left_joystick(context, 128, 0, 300, 50);
+                direction.change_direction(env.program_info(), env.console, context, 5.096584);
+                pbf_move_left_joystick(context, 128, 0, 300, 50);
 
 
-            direction.change_direction(env.program_info(), env.console, context, 5.201017);
-            pbf_move_left_joystick(context, 128, 0, 1200, 50);
-            pbf_press_button(context, BUTTON_R, 20, 20);
-            pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                direction.change_direction(env.program_info(), env.console, context, 5.201017);
+                pbf_move_left_joystick(context, 128, 0, 1200, 50);
+                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
 
-            direction.change_direction(env.program_info(), env.console, context, 0);
-            pbf_move_left_joystick(context, 128, 0, 00, 50);
-            pbf_press_button(context, BUTTON_R, 20, 20);
-            pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                direction.change_direction(env.program_info(), env.console, context, 0);
+                pbf_move_left_joystick(context, 128, 0, 00, 50);
+                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+            }catch (OperationFailedException&){
+                env.console.log("Failed to change direction, but it's possibly due to clearing the challenge.");
+                pbf_wait(context, 20 * TICKS_PER_SECOND);
+            }
 
             // ///////////////
             // direction.change_direction(env.program_info(), env.console, context, 0);
