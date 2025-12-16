@@ -382,7 +382,7 @@ void overworld_navigation(
 
                     if (ret2 == 0){
                         stream.log("overworld_navigation: No minimap detected. Wait for Battle or Dialog.");
-                        context.wait_for(Seconds(30));
+                        context.wait_for(Seconds(60));
                     }
 
                     context.wait_for_all_requests();
