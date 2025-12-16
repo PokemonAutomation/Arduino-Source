@@ -2032,18 +2032,32 @@ void move_camera_until_yolo_object_detected(
 
 void confirm_titan_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 
-    context.wait_for_all_requests();
-    VideoSnapshot screen = env.console.video().snapshot();
-    ImageFloatBox hp_bar_box{0.394805, 0.088991, 0.220779, 0.021000};
+    bool is_green_hp_bar = false;
+    size_t MAX_ATTEMPTS = 10;
+    for (size_t i = 0; i < MAX_ATTEMPTS; i++){
+        context.wait_for_all_requests();
+        VideoSnapshot screen = env.console.video().snapshot();
+        ImageFloatBox hp_bar_box{0.394805, 0.088991, 0.220779, 0.021000};
 
 
-    ImageStats hp_bar_stats = image_stats(extract_box_reference(screen, hp_bar_box));
-    // cout << "hp_bar_stats.average.sum(): " << hp_bar_stats.average.sum() << endl;    
-    // expected color is green: {R 25-32, G 255, B 32-76}  {30, 255, 55}. total = 30+255+55 = 340
-    // 30/340, 255/340, 55/340
-    bool is_green_hp_bar = is_solid(hp_bar_stats, {0.088235, 0.75, 0.161765}, 0.15, 30);
+        ImageStats hp_bar_stats = image_stats(extract_box_reference(screen, hp_bar_box));
+        // cout << "hp_bar_stats.average.sum(): " << hp_bar_stats.average.sum() << endl;    
+        // expected color is green: {R 25-32, G 255, B 32-76}  {30, 255, 55}. total = 30+255+55 = 340
+        // 30/340, 255/340, 55/340
+        is_green_hp_bar = is_solid(hp_bar_stats, {0.088235, 0.75, 0.161765}, 0.15, 30);
+        if (is_green_hp_bar){
+            break;
+        }
 
-    if (!is_green_hp_bar){
+        env.console.log("Unable to confirm Titan battle. Wait 2 seconds and re-try.");
+        context.wait_for(Seconds(2));
+    }
+
+
+    if (is_green_hp_bar){
+        env.console.log("Confirmed Titan battle.");
+        
+    }else{
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "confirm_titan_battle(): Unable to confirm Titan battle.",
@@ -2051,7 +2065,6 @@ void confirm_titan_battle(SingleSwitchProgramEnvironment& env, ProControllerCont
         );
     }
 
-    env.console.log("Confirmed Titan battle.");
 }
 
 

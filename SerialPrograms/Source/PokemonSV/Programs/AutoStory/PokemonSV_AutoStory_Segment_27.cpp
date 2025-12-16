@@ -295,6 +295,8 @@ void move_from_dondozo_titan_phase1_to_phase2(SingleSwitchProgramEnvironment& en
         128, 0, 80, 40, false);
 
     clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE});
+
+    confirm_titan_battle(env, context);
     
     env.console.log("Battle Dondozo/Tatsugiri Titan phase 2.");
     run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);

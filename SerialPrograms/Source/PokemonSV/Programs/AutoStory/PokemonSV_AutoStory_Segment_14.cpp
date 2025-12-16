@@ -235,6 +235,8 @@ void checkpoint_30(
 
         }       
 
+        confirm_titan_battle(env, context);
+
         env.console.log("Battle Bombirdier Titan phase 1.");
         run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 30, {CallbackEnum::BATTLE});
