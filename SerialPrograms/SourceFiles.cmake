@@ -1155,8 +1155,12 @@ file(GLOB LIBRARY_SOURCES
     Source/Pokemon/Options/Pokemon_NameSelectOption.h
     Source/Pokemon/Options/Pokemon_NameSelectWidget.cpp
     Source/Pokemon/Options/Pokemon_NameSelectWidget.h
+    Source/Pokemon/Options/Pokemon_BoxSortingTable.cpp
+    Source/Pokemon/Options/Pokemon_BoxSortingTable.h
     Source/Pokemon/Options/Pokemon_StatsHuntFilter.cpp
     Source/Pokemon/Options/Pokemon_StatsHuntFilter.h
+    Source/Pokemon/Pokemon_CollectedPokemonInfo.cpp
+    Source/Pokemon/Pokemon_CollectedPokemonInfo.h
     Source/Pokemon/Pokemon_DataTypes.h
     Source/Pokemon/Pokemon_EncounterStats.cpp
     Source/Pokemon/Pokemon_EncounterStats.h
@@ -1336,8 +1340,6 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonHome/Inference/PokemonHome_BallReader.h
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.cpp
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.h
-    Source/PokemonHome/Options/PokemonHome_BoxSortingTable.cpp
-    Source/PokemonHome/Options/PokemonHome_BoxSortingTable.h
     Source/PokemonHome/PokemonHome_Panels.cpp
     Source/PokemonHome/PokemonHome_Panels.h
     Source/PokemonHome/PokemonHome_Settings.cpp
