@@ -551,11 +551,6 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                         continue;
                     }
 
-                    if (row > 0 || column > 0){
-                        // Press button R to go to next summary screen
-                        pbf_press_button(context, BUTTON_R, 10, 40);
-                        context.wait_for_all_requests();
-                    }
                     // Wait for the summary screen transition to end
                     FrozenImageDetector frozen_image_detector(COLOR_GREEN, {0.388, 0.238, 0.109, 0.062}, Milliseconds(80), 20);
                     frozen_image_detector.make_overlays(box_render);
@@ -611,6 +606,10 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     // ot_box
                     // nature_box
                     // ability_box
+
+                    // Press button R to go to next summary screen
+                    pbf_press_button(context, BUTTON_R, 10, VIDEO_DELAY+15);
+                    context.wait_for_all_requests();
                 }
             }
 
