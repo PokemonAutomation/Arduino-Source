@@ -345,7 +345,7 @@ void overworld_navigation(
     while (true){
         NoMinimapWatcher no_minimap(stream.logger(), COLOR_RED, Milliseconds(250));
         NormalBattleMenuWatcher battle(COLOR_BLUE);
-        DialogBoxWatcher        dialog(COLOR_RED, true);
+        AdvanceDialogWatcher        dialog(COLOR_RED);
         DestinationMarkerWatcher marker(COLOR_CYAN, {0.717, 0.165, 0.03, 0.061});
         context.wait_for_all_requests();
         std::vector<PeriodicInferenceCallback> callbacks = {battle, dialog}; 
