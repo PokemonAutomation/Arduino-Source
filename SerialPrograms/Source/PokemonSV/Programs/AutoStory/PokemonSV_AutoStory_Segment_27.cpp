@@ -248,6 +248,9 @@ void move_from_casseroya_watchtower3_to_dondozo_titan(SingleSwitchProgramEnviron
         128, 0, 20, 10, false);
 
     clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE});
+
+    confirm_titan_battle(env, context);
+
     env.console.log("Battle Dondozo/Tatsugiri Titan phase 1.");
     run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
 

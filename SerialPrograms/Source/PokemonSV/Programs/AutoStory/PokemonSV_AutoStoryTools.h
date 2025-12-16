@@ -518,6 +518,8 @@ void move_camera_until_yolo_object_detected(
 );
 
 
+void confirm_titan_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
 }
 }
 }
