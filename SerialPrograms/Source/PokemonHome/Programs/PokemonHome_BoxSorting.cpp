@@ -608,7 +608,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     // ability_box
 
                     // Press button R to go to next summary screen
-                    pbf_press_button(context, BUTTON_R, 10, VIDEO_DELAY+15);
+                    pbf_press_button(context, BUTTON_R, 10, 40);
                     context.wait_for_all_requests();
                 }
             }
