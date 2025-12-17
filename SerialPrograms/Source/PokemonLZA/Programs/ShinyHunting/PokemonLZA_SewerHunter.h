@@ -41,7 +41,7 @@ public:
         LITWICK_SKRELP,
         SKRELP,
         SKRELP_INKAY,
-        SKRELP_ARIADOS
+        ARIADOS
     };
 
 private:
