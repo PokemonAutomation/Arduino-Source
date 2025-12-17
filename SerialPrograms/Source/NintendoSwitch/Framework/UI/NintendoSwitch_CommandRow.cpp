@@ -179,6 +179,7 @@ CommandRow::CommandRow(
 
     m_session.add_listener(*this);
     m_controller.add_listener(*this);
+//    global_input_add_listener(*this);
 }
 
 
@@ -203,8 +204,8 @@ void CommandRow::run_controller_input(ControllerInputState& state){
 }
 void CommandRow::set_focus(bool focused){
     if (focused){
+        global_input_add_listener(*this);
         if (allow_controller_input()){
-            global_input_add_listener(*this);
         }
     }else{
         global_input_clear_state();
