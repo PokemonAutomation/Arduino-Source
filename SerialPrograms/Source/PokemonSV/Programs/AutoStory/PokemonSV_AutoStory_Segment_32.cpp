@@ -97,7 +97,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     [&](size_t attempt_number){
         DirectionDetector direction;
 
-        if (attempt_number >= 0){
+        if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
             move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 150});
             move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 150});

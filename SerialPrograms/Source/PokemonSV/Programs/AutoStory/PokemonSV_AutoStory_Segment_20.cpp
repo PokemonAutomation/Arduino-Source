@@ -113,7 +113,7 @@ void checkpoint_43(
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 50);
 
         DirectionDetector direction;
-        if (attempt_number >= 0){
+        if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
             move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
             move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 30});

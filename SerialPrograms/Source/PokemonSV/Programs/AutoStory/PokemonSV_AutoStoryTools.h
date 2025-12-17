@@ -21,6 +21,8 @@ namespace PokemonSV{
 
 using namespace ML;
 
+static constexpr bool ENABLE_TEST  = true;
+
 struct AutoStoryStats : public StatsTracker{
     AutoStoryStats()
         : m_checkpoint(m_stats["Checkpoint"])
