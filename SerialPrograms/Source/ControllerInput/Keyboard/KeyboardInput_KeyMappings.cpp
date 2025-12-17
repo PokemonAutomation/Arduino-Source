@@ -9,12 +9,78 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "KeyboardInput_KeyMappings.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
 
 
-const std::map<QtKeyMap::QtKey, KeyboardKey>& get_keyid_to_hid_map(){
+KeyboardInputMappings::KeyboardInputMappings(std::initializer_list<KeyboardInputMappingEntry> list){
+    for (auto iter = list.begin(); iter != list.end(); ++iter){
+        add(*iter);
+    }
+//    for (auto& item : m_map){
+//        cout << item.first << " : " << (int)item.second.standard << ", " << (int)item.second.keypad << endl;
+//    }
+}
+void KeyboardInputMappings::add(const KeyboardInputMappingEntry& entry){
+    Entry& key = m_map[entry.key.key];
+
+    if (entry.key.keypad){
+        if (key.keypad != KeyboardKey::KEY_NONE){
+            throw InternalProgramError(
+                nullptr,
+                PA_CURRENT_FUNCTION,
+                "Duplicate Keyboard Mapping: " + std::to_string((int)key.keypad)
+            );
+        }
+        key.keypad = entry.hid_id;
+    }else{
+        if (key.standard != KeyboardKey::KEY_NONE){
+            throw InternalProgramError(
+                nullptr,
+                PA_CURRENT_FUNCTION,
+                "Duplicate Keyboard Mapping: " + std::to_string((int)key.keypad)
+            );
+        }
+        key.standard = entry.hid_id;
+    }
+}
+KeyboardKey KeyboardInputMappings::get(const QtKeyMap::QtKey& key) const{
+//    cout << key.key << " : " << key.keypad << endl;
+    auto iter = m_map.find(key.key);
+    if (iter == m_map.end()){
+        return KeyboardKey::KEY_NONE;
+    }
+
+    //  If we don't override keypad, just return standard.
+    if (iter->second.keypad == KeyboardKey::KEY_NONE){
+        return iter->second.standard;
+    }
+
+    bool keypad = key.keypad;
+    if (keypad){
+        return iter->second.keypad;
+    }
+
+    return iter->second.standard;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+const KeyboardInputMappings& get_keyid_to_hid_map(){
     KeyboardLayout layout = *GlobalSettings::instance().KEYBOARD_CONTROLS_LAYOUT;
     switch (layout){
     case KeyboardLayout::QWERTY:

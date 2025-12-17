@@ -22,7 +22,7 @@ class QKeyEvent;
 namespace PokemonAutomation{
 
 
-class KeyboardHidTracker : public ControllerInputSource{
+class KeyboardHidTracker final : public ControllerInputSource{
 public:
     ~KeyboardHidTracker();
     KeyboardHidTracker();

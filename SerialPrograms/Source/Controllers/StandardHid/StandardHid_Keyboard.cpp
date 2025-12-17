@@ -71,7 +71,7 @@ public:
 
 
 
-
+#if 0
 void log_qtkey(Logger& logger, const QtKeyMap::QtKey& qtkey){
     std::stringstream ss;
     ss << "Pressed key " << QTKEY_TO_STRING().at(qtkey.key);
@@ -81,14 +81,15 @@ void log_qtkey(Logger& logger, const QtKeyMap::QtKey& qtkey){
         ss << " (main keyboard)";
     }
 
-    const std::map<QtKeyMap::QtKey, KeyboardKey>& qwerty_hid_map = KEYID_TO_HID_QWERTY();
+    const KeyboardInputMappings& qwerty_hid_map = KEYID_TO_HID_QWERTY();
+    KeyboardKey key = qwerty_hid_map.get();
     if (auto iter = qwerty_hid_map.find(qtkey); iter != qwerty_hid_map.end()){
         ss << " mapped to QWERTY HID key " << KEYBOARDKEY_TO_STRING().at(iter->second);
     }else{
         ss << " has no QWERTY HID mapping";
     }
 
-    const std::map<QtKeyMap::QtKey, KeyboardKey>& azerty_hid_map = KEYID_TO_HID_AZERTY();
+    const KeyboardInputMappings& azerty_hid_map = KEYID_TO_HID_AZERTY();
     if (auto iter = azerty_hid_map.find(qtkey); iter != azerty_hid_map.end()){
         ss << " mapped to AZERTY HID key " << KEYBOARDKEY_TO_STRING().at(iter->second);
     }
@@ -98,7 +99,7 @@ void log_qtkey(Logger& logger, const QtKeyMap::QtKey& qtkey){
 
     logger.log(ss.str(), COLOR_BLUE);
 }
-
+#endif
 
 
 

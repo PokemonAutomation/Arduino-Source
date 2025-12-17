@@ -10,8 +10,8 @@ namespace PokemonAutomation{
 
 
 
-const std::map<QtKeyMap::QtKey, KeyboardKey>& KEYID_TO_HID_QWERTY(){
-    static const std::map<QtKeyMap::QtKey, KeyboardKey> database{
+const KeyboardInputMappings& KEYID_TO_HID_QWERTY(){
+    static const KeyboardInputMappings database{
         {Qt::Key::Key_A,                KeyboardKey::KEY_A},
         {Qt::Key::Key_B,                KeyboardKey::KEY_B},
         {Qt::Key::Key_C,                KeyboardKey::KEY_C},

@@ -38,20 +38,17 @@ KeyboardHidBindingCellWidget::KeyboardHidBindingCellWidget(QWidget& parent, Keyb
 
 
 void KeyboardHidBindingCellWidget::keyPressEvent(QKeyEvent* event){
-    QtKeyMap::instance().record(*event);
+    QtKeyMap::QtKey qkey = QtKeyMap::instance().record(*event);
 
-    const std::map<QtKeyMap::QtKey, KeyboardKey>& MAP = get_keyid_to_hid_map();
-    auto iter = MAP.find(QtKeyMap::QtKey(
-        (Qt::Key)event->key(),
-        (event->modifiers() & Qt::KeypadModifier) != 0
-    ));
+    const KeyboardInputMappings& MAP = get_keyid_to_hid_map();
+    KeyboardKey key = MAP.get(qkey);
 
-    if (iter == MAP.end()){
+    if (key == KeyboardKey::KEY_NONE){
         global_logger_tagged().log("Unable to map Qt::Key to HID ID: " + std::to_string(event->key()));
         return;
     }
 
-    m_value.set(iter->second);
+    m_value.set(key);
 }
 
 

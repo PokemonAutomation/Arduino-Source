@@ -91,15 +91,16 @@ void KeyboardHidTracker::on_key_release(const QKeyEvent& key){
 
 KeyboardInputState KeyboardHidTracker::keys_to_state(const std::set<uint32_t>& pressed_native_keys) const{
     const QtKeyMap& qkey_map = QtKeyMap::instance();
-    const std::map<QtKeyMap::QtKey, KeyboardKey>& hid_map = get_keyid_to_hid_map();
+    const KeyboardInputMappings& hid_map = get_keyid_to_hid_map();
 
     KeyboardInputState ret;
     for (uint32_t native_key : pressed_native_keys){
         std::set<QtKeyMap::QtKey> qkeys = qkey_map.get_QtKeys(native_key);
-        for (QtKeyMap::QtKey qkey : qkeys){
-            auto iter = hid_map.find(qkey);
-            if (iter != hid_map.end()){
-                ret.add(iter->second);
+        for (const QtKeyMap::QtKey& qkey : qkeys){
+//            cout << "qkey = " << qkey.key << " : " << qkey.keypad << endl;
+            KeyboardKey key = hid_map.get(qkey);
+            if (key != KeyboardKey::KEY_NONE){
+                ret.add(key);
             }
 //            log_qtkey(m_logger, qkey);
         }

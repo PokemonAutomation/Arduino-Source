@@ -42,7 +42,7 @@ public:
         return map;
     }
 
-    void record(const QKeyEvent& event);
+    QtKeyMap::QtKey record(const QKeyEvent& event);
 
     std::set<QtKey> get_QtKeys(uint32_t native_key) const;
 
