@@ -258,17 +258,36 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
     }
 
     OverworldPartySelectionWatcher overworld(COLOR_WHITE, &console.overlay());
+    BlueDialogWatcher blue_dialog(COLOR_BLUE, &console.overlay());
     int ret = wait_until(
         console, context, 30s,  // set 30sec to be long enough for Switch 1 to load the overworld
-        {overworld,}
+        {overworld, blue_dialog}
     );
     switch (ret){
     case 0:
         console.log("Flying from map... Done!");
         console.overlay().add_log("Fast Travel Done");
         break;
+    case 1:
+        console.log("Detected blue dialog. Rare by probably too many button A mashing to trigger return to Lumiose dialog while teleporting to Hyperspace portal");
+        ret = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_B, 5s);
+            },
+            {{overworld}}
+        );
+        if (ret != 0){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "fly_from_map(): Does not detect overworld after encountering blue dialog.",
+                console
+            );
+        }
+        console.log("Flying from map... Done!");
+        console.overlay().add_log("Fast Travel Done");
+        break;
     default:
-        // return false;
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "fly_from_map(): Does not detect overworld after fast travel.",
