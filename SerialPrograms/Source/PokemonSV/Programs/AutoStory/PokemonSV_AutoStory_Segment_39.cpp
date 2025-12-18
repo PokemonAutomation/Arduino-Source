@@ -99,7 +99,7 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         // leave Station 2
         pbf_move_left_joystick(context, 50, 255, 130, 20);
 
-        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_move_left_joystick(context, 128, 255, 400, 100);
         pbf_wait(context, 3 * TICKS_PER_SECOND);        
         // wait for overworld after leaving research station
         wait_for_overworld(env.program_info(), env.console, context, 30);

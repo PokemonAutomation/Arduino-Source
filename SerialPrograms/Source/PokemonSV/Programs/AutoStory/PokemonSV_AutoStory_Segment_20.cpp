@@ -182,7 +182,7 @@ void checkpoint_44(
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
-        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_move_left_joystick(context, 128, 255, 300, 100);
         pbf_wait(context, 3 * TICKS_PER_SECOND);        
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);      
@@ -553,7 +553,7 @@ void checkpoint_46(
         
         context.wait_for_all_requests();
 
-        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_move_left_joystick(context, 128, 255, 300, 100);
         pbf_wait(context, 3 * TICKS_PER_SECOND);
         // wait for overworld after leaving Gym
         wait_for_overworld(env.program_info(), env.console, context, 30);

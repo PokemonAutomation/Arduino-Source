@@ -81,7 +81,7 @@ void checkpoint_100(SingleSwitchProgramEnvironment& env, ProControllerContext& c
 
         YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-station-4a.onnx");
 
-        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_move_left_joystick(context, 128, 255, 400, 100);
         pbf_wait(context, 3 * TICKS_PER_SECOND);        
         // wait for overworld after leaving research station
         wait_for_overworld(env.program_info(), env.console, context, 30);

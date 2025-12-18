@@ -185,7 +185,7 @@ void checkpoint_38(
         
         // Gym now defeated. now in Cascaraffa gym building
         context.wait_for_all_requests();
-        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_move_left_joystick(context, 128, 255, 300, 100);
         pbf_wait(context, 3 * TICKS_PER_SECOND);
         // wait for overworld after leaving Gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
