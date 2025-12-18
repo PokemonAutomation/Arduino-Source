@@ -90,9 +90,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHunt_WildZoneCafe_Descriptor, ShinyHunt_WildZoneCafe>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_FlySpotReset_Descriptor, ShinyHunt_FlySpotReset>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_SewerHunter_Descriptor, ShinyHunt_SewerHunter>());
+    ret.emplace_back(make_single_switch_program<ShinyHunt_HelioptileHunter_Descriptor, ShinyHunt_HelioptileHunter>());
     if (IS_BETA_VERSION){
         ret.emplace_back(make_single_switch_program<ShinyHunt_ShuttleRun_Descriptor, ShinyHunt_ShuttleRun>());
-        ret.emplace_back(make_single_switch_program<ShinyHunt_HelioptileHunter_Descriptor, ShinyHunt_HelioptileHunter>());
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<BeldumHunter_Descriptor, BeldumHunter>());
