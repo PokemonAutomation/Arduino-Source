@@ -113,18 +113,19 @@ void checkpoint_59(
     [&](size_t attempt_number){
         context.wait_for_all_requests();
 
-        if (attempt_number > 0 || ENABLE_TEST){
-            env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 180, 130});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 70, 130});
-        }
-
         // marker 1  {0.795312, 0.626852}
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
             {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
             FlyPoint::FAST_TRAVEL, 
             {0.795312, 0.626852}
         );
+
+        if (attempt_number > 0 || ENABLE_TEST){
+            env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 180, 130});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 70, 130});
+        }
+        
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
@@ -321,7 +322,8 @@ void checkpoint_60(
 ){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
-        // fly back to Porto Marinada Pokecenter
+        // fly back to Porto Marinada Pokecenter from Team Star Poison
+        // this clears Pokemon in minimap
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, 128, 600}, FlyPoint::POKECENTER);
 
 

@@ -298,6 +298,9 @@ void checkpoint_49(
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
+        // the landmark Pokecenter is far enough away from current location, that the map Pokemon don't cover it.
+        // Team Fire Base vs East Province (Area Two) Pokecenter
+
         context.wait_for_all_requests();
         // marker 1
         realign_player_from_landmark(

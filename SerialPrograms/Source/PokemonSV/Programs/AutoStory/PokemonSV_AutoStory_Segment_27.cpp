@@ -103,6 +103,13 @@ void checkpoint_64(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
         context.wait_for_all_requests();
+
+        if (attempt_number > 0 || ENABLE_TEST){
+            env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 180});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 180});
+        }
+
         move_from_glaseado_mountain_to_casseroya_watchtower3(env, context, attempt_number);
 
     });         
@@ -112,6 +119,13 @@ void checkpoint_65(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
         context.wait_for_all_requests();
+
+        if (attempt_number > 0 || ENABLE_TEST){
+            env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 128, 0}, FlyPoint::POKECENTER);
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 128, 0}, FlyPoint::FAST_TRAVEL);
+        }
+
         move_from_casseroya_watchtower3_to_dondozo_titan(env, context);
         
     }); 
@@ -130,7 +144,9 @@ void checkpoint_67(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
         context.wait_for_all_requests();
-        // fly to Glaseado Mountain Pokecenter
+        // fly to Glaseado Mountain Pokecenter from Dondozo
+        // this clears Pokemon in minimap
+
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, 0, 0}, FlyPoint::POKECENTER);
         move_from_glaseado_mountain_to_north_province_area_three(env, context);
 

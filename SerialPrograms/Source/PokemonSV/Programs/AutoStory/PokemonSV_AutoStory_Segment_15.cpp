@@ -115,6 +115,13 @@ void checkpoint_33(
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
+
+        if (attempt_number > 0 || ENABLE_TEST){
+            env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 80, 255, 85});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 180, 0, 85});
+        }
+
         // section 1
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 50, 0, 25);
         overworld_navigation(env.program_info(), env.console, context, 
@@ -286,6 +293,8 @@ void checkpoint_34(
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
+
+        // the landmark Pokecenter is far enough away from current location, that the map Pokemon don't cover it.
         // section 1
         realign_player_from_landmark(
             env.program_info(), env.console, context, 

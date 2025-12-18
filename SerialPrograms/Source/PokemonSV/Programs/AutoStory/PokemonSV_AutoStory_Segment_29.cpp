@@ -220,8 +220,26 @@ void checkpoint_74(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
-        // fly back to Montenevera Pokecenter
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 128, 0, 30}, FlyPoint::POKECENTER);
+        // fly somewhere else, then back to Montenevera Pokecenter
+        // move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 128, 0, 30}, FlyPoint::POKECENTER);
+
+        // fly_to_overworld_from_map() may fail since the snowy background on the map will false positive the destinationMenuItemWatcher (MapDestinationMenuDetector at box {0.523000, 0.680000, 0.080000, 0.010000}), which causes the fly to fail
+        // we can get around this by either placing down a marker, or by zooming out so that that section isn't white snow. 
+        // We place a marker in this case
+        env.console.log("fly somewhere else (Glaseado Mountain), then back to Montenevera Pokecenter");
+        env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+
+        // remove old marker, then place new one
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 50);
+        place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+                {ZoomChange::KEEP_ZOOM, 128, 255, 35}, 
+                FlyPoint::POKECENTER, 
+                {0.54375, 0.662037}
+            );
+
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 75});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 75});
+        
 
         move_from_montenevera_to_glaseado_gym(env, context);
 

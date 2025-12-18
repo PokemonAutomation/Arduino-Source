@@ -558,6 +558,8 @@ void checkpoint_46(
         // wait for overworld after leaving Gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
+        // At this startpoint, no Pokemon show up on minimap/map
+
         // fly to Artazon east pokecenter
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 255, 128, 50});
 

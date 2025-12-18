@@ -132,6 +132,10 @@ void checkpoint_36(
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
+
+        // At this startpoint, no Pokemon show up on minimap/map
+
+        // fly from Cascaraffa Gym to Cascaraffa North Pokecenter
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 100, 0, 80});
 
         // section 1

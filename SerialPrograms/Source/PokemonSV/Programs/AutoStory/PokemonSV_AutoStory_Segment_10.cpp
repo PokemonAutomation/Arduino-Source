@@ -150,6 +150,11 @@ void checkpoint_22(
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
+
+        // the landmark Pokecenter is far enough away from current location, that the map Pokemon don't cover it.
+        // Mesagoza West Gate flypoint vs South Province (Area Two) Pokecenter
+        // minimap Pokemon are refreshed after first marker
+
         // section 1
         realign_player_from_landmark(
             env.program_info(), env.console, context,
@@ -207,6 +212,8 @@ void checkpoint_23(
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
+
+        // the landmark Pokecenter is far enough away from startpoint, that the map Pokemon don't cover it.
 
         // section 1
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 110, 0, 30);

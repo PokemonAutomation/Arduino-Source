@@ -580,7 +580,7 @@ void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProController
 
 }
 
-
+// NOTE: This function isn't used
 void move_from_fighting_base_to_north_province_area_two(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     context.wait_for_all_requests();
 
@@ -622,6 +622,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
     context.wait_for_all_requests();
     DirectionDetector direction;
     // recently flew here, so Minimap should be clear of Pokemon. and we should have no issues detecting direction.
+    // from Team Star Fighting to West Province Area One Pokecenter
 
     do_action_and_monitor_for_battles(env.program_info(), env.console, context,
     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){

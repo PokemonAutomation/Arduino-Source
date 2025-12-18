@@ -249,7 +249,8 @@ void checkpoint_57(
 ){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
-        // fly back to East Province (Area Three) Watchtower
+        // fly back to East Province (Area Three) Watchtower. from Orthworm
+        // this clears Pokemon in minimap
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0}, FlyPoint::FAST_TRAVEL);
 
         // marker 1

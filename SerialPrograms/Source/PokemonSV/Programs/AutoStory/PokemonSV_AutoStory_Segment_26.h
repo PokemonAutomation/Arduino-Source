@@ -81,7 +81,7 @@ void checkpoint_63(
     AutoStoryStats& stats
 );
 
-// moves player from Medali West Pokecenter to Glaseado Mountain Pokecenter
+// moves player from Medali East Pokecenter to Glaseado Mountain Pokecenter
 void move_from_medali_to_glaseado_mountain(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 

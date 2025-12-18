@@ -300,6 +300,9 @@ void checkpoint_42(
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
 
+        // the landmark Pokecenter is far enough away from current location, that the map Pokemon don't cover it.
+        // Klawf vs Artazon (West) Pokecenter
+
         // section 1
         realign_player_from_landmark(
             env.program_info(), env.console, context, 

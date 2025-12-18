@@ -92,6 +92,7 @@ void checkpoint_39(
 
         DirectionDetector direction;
         // recently flew a significant distance, so minimap should be clear of Pokemon
+        // flew from Cascaraffa gym building to Porto Marinada Pokecenter
         
         // section 1
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
@@ -256,7 +257,8 @@ void checkpoint_40(
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
-        // fly to Mesagoza East
+        // fly to Mesagoza East from Great Tusk/Iron Treads
+        // this clears Pokemon in minimap
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 185, 440});
 
         // place down marker, for section 1
