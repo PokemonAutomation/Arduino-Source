@@ -69,7 +69,6 @@ SerialPABotBase_WiredController::~SerialPABotBase_WiredController(){
     stop();
 }
 void SerialPABotBase_WiredController::stop(){
-    ProController::stop();
     m_status_thread.reset();
 }
 

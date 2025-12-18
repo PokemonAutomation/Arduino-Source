@@ -206,6 +206,37 @@ public:
 };
 
 
+// Light blue dialog box for holograms
+class LightBlueDialogDetector : public StaticScreenDetector{
+public:
+    LightBlueDialogDetector(Color color = COLOR_RED, VideoOverlay* overlay = nullptr);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+
+    //  This is not const so that detectors can save/cache state.
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+private:
+    friend class LightBlueDialogWatcher;
+
+    const Color m_color;
+    VideoOverlay* m_overlay;
+    const ImageFloatBox m_corner;
+
+    ImageFloatBox m_last_detected_box;
+    std::optional<OverlayBoxScope> m_last_detected_box_scope;
+};
+class LightBlueDialogWatcher : public DetectorToFinder<LightBlueDialogDetector>{
+public:
+    LightBlueDialogWatcher(
+        Color color = COLOR_RED,
+        VideoOverlay* overlay = nullptr,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
+    )
+         : DetectorToFinder("BlueDialogWatcher", hold_duration, color, overlay)
+    {}
+};
+
 
 }
 }

@@ -24,6 +24,7 @@
 #include "Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.h"
 #include "Programs/Farming/PokemonLZA_FriendshipFarmer.h"
 #include "Programs/Farming/PokemonLZA_InPlaceCatcher.h"
+#include "Programs/Farming/PokemonLZA_HyperspaceRewardReset.h"
 
 //  Shiny Hunting
 #include "Programs/ShinyHunting/PokemonLZA_AutoFossil.h"
@@ -35,9 +36,11 @@
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShuttleRun.h"
 #include "Programs/ShinyHunting/PokemonLZA_SewerHunter.h"
+#include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.h"
 
 //  Non-Shiny Hunting
 #include "Programs/NonShinyHunting/PokemonLZA_StatsReset.h"
+#include "Programs/NonShinyHunting/PokemonLZA_WeatherFinder.h"
 
 //  Developer
 #include "Programs/TestPrograms/PokemonLZA_OverworldWatcher.h"
@@ -76,6 +79,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<FriendshipFarmer_Descriptor, FriendshipFarmer>());
     ret.emplace_back(make_single_switch_program<InPlaceCatcher_Descriptor, InPlaceCatcher>());
     if (IS_BETA_VERSION){
+        ret.emplace_back(make_single_switch_program<HyperspaceRewardReset_Descriptor, HyperspaceRewardReset>());
     }
 
     ret.emplace_back("---- Shiny Hunting ----");
@@ -88,10 +92,11 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHunt_SewerHunter_Descriptor, ShinyHunt_SewerHunter>());
     if (IS_BETA_VERSION){
         ret.emplace_back(make_single_switch_program<ShinyHunt_ShuttleRun_Descriptor, ShinyHunt_ShuttleRun>());
+        ret.emplace_back(make_single_switch_program<ShinyHunt_HelioptileHunter_Descriptor, ShinyHunt_HelioptileHunter>());
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<BeldumHunter_Descriptor, BeldumHunter>());
-        ret.emplace_back(make_single_switch_program<ShinyHunt_SewerHunter_Descriptor, ShinyHunt_SewerHunter>());
+        ret.emplace_back(make_single_switch_program<WeatherFinder_Descriptor, WeatherFinder>());
     }
 
 //    ret.emplace_back("---- Non-Shiny Hunting ----");

@@ -20,6 +20,10 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+void SingleSwitchProgramEnvironment::add_overlay_log(std::string msg, Color color){
+    console.overlay().add_log(std::move(msg), color);
+}
+
 
 SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     std::string identifier,

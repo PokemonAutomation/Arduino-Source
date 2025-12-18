@@ -6,6 +6,7 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_NoMinimapDetector.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -175,7 +176,7 @@ void checkpoint_48(
         );
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG, CallbackEnum::TUTORIAL});
 
-        AdvanceDialogWatcher    dialog(COLOR_RED);
+        NoMinimapWatcher no_minimap(env.console.logger(), COLOR_RED, Milliseconds(250));
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [&](ProControllerContext& context){
@@ -271,9 +272,10 @@ void checkpoint_48(
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, seconds_wait * TICKS_PER_SECOND);                 
                   
+                pbf_wait(context, 20 * TICKS_PER_SECOND);
                 
             },
-            {dialog}
+            {no_minimap}
         );
         context.wait_for(std::chrono::milliseconds(100));
         if (ret < 0){

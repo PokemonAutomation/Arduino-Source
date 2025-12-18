@@ -28,6 +28,7 @@
 #include "Startup/NewVersionCheck.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "CommonTools/OCR/OCR_RawOCR.h"
+#include "ControllerInput/ControllerInput.h"
 #include "Windows/MainWindow.h"
 
 #include <iostream>
@@ -164,7 +165,7 @@ int main(int argc, char *argv[]){
     int ret = run_program(argc, argv);
 
 
-    // Write program settings back to the json file.
+    //  Write program settings back to the json file.
     PERSISTENT_SETTINGS().write();
 
 
@@ -176,7 +177,10 @@ int main(int argc, char *argv[]){
     Integration::DppClient::Client::instance().disconnect();
 #endif
 
-    // Force stop the thread pool
+    //  Stop the controllers.
+    global_input_stop();
+
+    //  Force stop the thread pool
     PokemonAutomation::GlobalThreadPools::realtime_inference().stop();
     PokemonAutomation::GlobalThreadPools::normal_inference().stop();
 

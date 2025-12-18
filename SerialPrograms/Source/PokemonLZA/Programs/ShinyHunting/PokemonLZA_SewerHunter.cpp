@@ -64,7 +64,7 @@ ShinyHunt_SewerHunter::ShinyHunt_SewerHunter()
             {Route::LITWICK_SKRELP,  "litwick_skrelp",  "Litwick+Skrelp+Haunter"},
             {Route::SKRELP,  "skrelp",  "Skrelp"},
             {Route::SKRELP_INKAY,  "skrelp_inkay",  "Skrelp+Inkay"},
-            {Route::SKRELP_ARIADOS,  "skrelp_ariados",  "Skrelp+Ariados"},
+            {Route::ARIADOS,  "ariados",  "Ariados"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         Route::KLEFKI
@@ -157,7 +157,7 @@ void route_skrelp_inkay(SingleSwitchProgramEnvironment& env, ProControllerContex
     fly_back_to_sewers_entrance(env.console, context);
 }
 
-void route_skrelp_ariados(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void route_ariados(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     run_forward_backward_to_wall(env, context, 6s);
 }
 
@@ -199,8 +199,8 @@ void ShinyHunt_SewerHunter::program(SingleSwitchProgramEnvironment& env, ProCont
     case Route::SKRELP_INKAY:
         route = route_skrelp_inkay;
         break;
-    case Route::SKRELP_ARIADOS:
-        route = route_skrelp_ariados;
+    case Route::ARIADOS:
+        route = route_ariados;
         break;
     default:
         OperationFailedException::fire(

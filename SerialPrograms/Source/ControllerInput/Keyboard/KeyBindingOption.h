@@ -9,19 +9,21 @@
 
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Options/ConfigOption.h"
+#include "ControllerInput/Keyboard/KeyboardHidButtons.h"
 
 namespace PokemonAutomation{
 
 
 
-class KeyBindingCell : public ConfigOption{
-public:
-    ~KeyBindingCell();
-    KeyBindingCell(LockMode lock_while_program_is_running);
 
-    operator uint32_t() const;
+class KeyboardHidBindingCell : public ConfigOption{
+public:
+    ~KeyboardHidBindingCell();
+    KeyboardHidBindingCell(LockMode lock_while_program_is_running);
+
+    operator KeyboardKey() const;
     operator std::string() const;
-    void set(uint32_t key);
+    void set(KeyboardKey key);
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;

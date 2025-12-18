@@ -4,20 +4,20 @@
  *
  */
 
-#include "PokemonHome_BoxSortingTable.h"
+#include "Pokemon_BoxSortingTable.h"
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
-namespace PokemonHome{
+namespace Pokemon{
 
 
-const EnumDropdownDatabase<BoxSortingSortType>& BallType_Database(){
-    static const EnumDropdownDatabase<BoxSortingSortType> database({
-        {BoxSortingSortType::NationalDexNo,     "dex",     "National Dex Number"},
-        {BoxSortingSortType::Shiny,    "shiny",    "Shiny"},
-        {BoxSortingSortType::Gigantamax,    "gigantamax",    "Gigantamax"},
-        {BoxSortingSortType::Ball_Slug,    "ball_slug",    "Ball Type"},
-        {BoxSortingSortType::Gender,    "gender",    "Gender (Male, Female, Genderless)"},
+const EnumDropdownDatabase<SortingRuleType>& BallType_Database(){
+    static const EnumDropdownDatabase<SortingRuleType> database({
+        {SortingRuleType::NationalDexNo,     "dex",     "National Dex Number"},
+        {SortingRuleType::Shiny,    "shiny",    "Shiny"},
+        {SortingRuleType::Gigantamax,    "gigantamax",    "Gigantamax"},
+        {SortingRuleType::Alpha, "alpha", "Alpha"},
+        {SortingRuleType::Ball_Slug,    "ball_slug",    "Ball Type"},
+        {SortingRuleType::Gender,    "gender",    "Gender (Male, Female, Genderless)"},
     });
     return database;
 }
@@ -26,7 +26,7 @@ const EnumDropdownDatabase<BoxSortingSortType>& BallType_Database(){
 
 BoxSortingRow::BoxSortingRow(EditableTableOption& parent_table)
     : EditableTableRow(parent_table)
-    , sort_type(BallType_Database(), LockMode::LOCK_WHILE_RUNNING, BoxSortingSortType::NationalDexNo)
+    , sort_type(BallType_Database(), LockMode::LOCK_WHILE_RUNNING, SortingRuleType::NationalDexNo)
     , reverse(LockMode::LOCK_WHILE_RUNNING, false)
 {
     PA_ADD_OPTION(sort_type);
@@ -49,12 +49,12 @@ BoxSortingTable::BoxSortingTable(std::string label)
 {}
 
 
-std::vector<BoxSortingSelection> BoxSortingTable::preferences() const{
+std::vector<SortingRule> BoxSortingTable::preferences() const{
     std::vector<std::unique_ptr<BoxSortingRow>> table = copy_snapshot();
-    std::vector<BoxSortingSelection> selections;
+    std::vector<SortingRule> selections;
     for (const std::unique_ptr<BoxSortingRow>& row : table){
-        BoxSortingSelection selection;
-        selection.sort_type = BoxSortingSortType(row->sort_type.current_value());
+        SortingRule selection;
+        selection.sort_type = SortingRuleType(row->sort_type.current_value());
         selection.reverse = row->reverse.current_value();
 
         selections.emplace_back(selection);
@@ -85,14 +85,5 @@ std::vector<std::unique_ptr<EditableTableRow>> BoxSortingTable::make_defaults(){
 
 
 
-
-
-
-
-
-
-
-
-}
 }
 }

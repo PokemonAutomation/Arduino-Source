@@ -14,6 +14,10 @@
 #include "PokemonLZA/Inference/Battles/PokemonLZA_MoveEffectivenessSymbol.h"
 #include "PokemonLZA_TrainerBattle.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLZA{
@@ -25,6 +29,13 @@ TrainerBattleState::TrainerBattleState(BattleAIOption& settings)
 {}
 
 
+std::string move_effectiveness_detection(MoveEffectivenessSymbol symbol){
+    const char* str = to_string(symbol);
+    if (str){
+        return str;
+    }
+    return "(Unable to Detect)";
+}
 
 
 bool TrainerBattleState::attempt_one_attack(
@@ -34,7 +45,7 @@ bool TrainerBattleState::attempt_one_attack(
 ){
     AsyncCommandSession<ProController> command(
         context,
-        env.logger(),
+        console.logger(),
         env.realtime_dispatcher(),
         context
     );
@@ -44,7 +55,7 @@ bool TrainerBattleState::attempt_one_attack(
         pbf_press_button(context, BUTTON_ZL, 5000ms, 0ms);
     });
 
-    env.log("Begin looking for type symbols.");
+    console.log("Begin looking for type symbols.");
 
     int ret = wait_until(
         console, context, 1000ms,
@@ -60,6 +71,13 @@ bool TrainerBattleState::attempt_one_attack(
         }
         return false;
     }
+
+    std::string move_results = "Move Effectiveness:";
+    move_results += "\n- Top: " + move_effectiveness_detection(move_watcher[0]);
+    move_results += "\n- Left: " + move_effectiveness_detection(move_watcher[1]);
+    move_results += "\n- Right: " + move_effectiveness_detection(move_watcher[2]);
+    move_results += "\n- Bottom: " + move_effectiveness_detection(move_watcher[3]);
+    console.log(move_results);
 
     static const Button BUTTON_INDEX[] = {
         BUTTON_X,
@@ -78,19 +96,22 @@ bool TrainerBattleState::attempt_one_attack(
 
     int best_index = 4;
     for (int index = 0; index < 4; index++){
+//        cout << "index: " << index << endl;
         if (move_watcher[index] == MoveEffectivenessSymbol::None){
+//            cout << "skip due to none" << endl;
             continue;
         }
         if (m_settings.MODE == BattleAIMode::BlindMash){
             best_index = index;
             break;
         }
-        if (move_watcher[best_index] < move_watcher[index]){
+        if (best_index == 4 || move_watcher[best_index] < move_watcher[index]){
+//            cout << "better move found: " << index << endl;
             best_index = index;
         }
     }
 
-    env.log(STRING_INDEX[best_index], COLOR_BLUE);
+    console.log(STRING_INDEX[best_index], COLOR_BLUE);
     console.overlay().add_log(STRING_INDEX[best_index]);
 
     command.dispatch([&](ProControllerContext& context){

@@ -12,8 +12,8 @@
 
 #include <set>
 #include "Common/Cpp/CancellableScope.h"
+#include "ControllerInput/Keyboard/KeyboardHidButtons.h"
 #include "Controllers/Schedulers/ControllerWithScheduler.h"
-#include "StandardHid_Keyboard_ControllerButtons.h"
 
 namespace PokemonAutomation{
 namespace StandardHid{

@@ -42,7 +42,10 @@ public:
 
 
 
-class RecordKeyboardController : public SingleSwitchProgramInstance, public KeyboardEventHandler::KeyboardListener{ 
+class RecordKeyboardController
+    : public SingleSwitchProgramInstance
+    , public AbstractController::InputSniffer
+{
 public:
     ~RecordKeyboardController();
     RecordKeyboardController();
@@ -53,8 +56,7 @@ public:
 private:
     // whenever a keyboard command is sent/stopped: 
     // add to m_controller_history the time_stamp and the ControllerState serialized to JSON.
-    virtual void on_keyboard_command_sent(WallClock time_stamp, const ControllerState& state) override;
-    virtual void on_keyboard_command_stopped(WallClock time_stamp) override;
+    virtual void on_command_input(WallClock timestamp, const ControllerState& state) override;
 
     // convert m_controller_history to json
     // remove adjacent duplicate controller states.

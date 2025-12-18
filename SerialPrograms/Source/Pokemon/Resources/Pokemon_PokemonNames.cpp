@@ -17,6 +17,9 @@ namespace Pokemon{
 const std::string PokemonNames::NULL_SLUG;
 
 
+// A database of pokemon names. Each name corresponds to one national dex number.
+// This database does not differentiate any form differences. Its size equals the highest available national
+// dex number.
 struct PokemonNameDatabase{
     PokemonNameDatabase();
     static const PokemonNameDatabase& instance(){

@@ -32,7 +32,6 @@ SerialPABotBase_LeftJoycon::SerialPABotBase_LeftJoycon(
     m_valid_buttons = VALID_LEFT_JOYCON_BUTTONS;
 }
 SerialPABotBase_LeftJoycon::~SerialPABotBase_LeftJoycon(){
-    JoyconController::stop();
     SerialPABotBase_OemController::stop();
 }
 
@@ -52,7 +51,6 @@ SerialPABotBase_RightJoycon::SerialPABotBase_RightJoycon(
     m_valid_buttons = VALID_RIGHT_JOYCON_BUTTONS;
 }
 SerialPABotBase_RightJoycon::~SerialPABotBase_RightJoycon(){
-    JoyconController::stop();
     SerialPABotBase_OemController::stop();
 }
 

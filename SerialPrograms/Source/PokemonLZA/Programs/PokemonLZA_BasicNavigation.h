@@ -40,7 +40,7 @@ enum class FastTravelState{
     // that state if we need
 };
 
-// Press button + to open the map.
+// Press button + to open the normal Lumiose map.
 // Will repeatedly pressing button + to ensure the map is opened.
 // Robust against day/night changes: if there is a day/night chane before opening the map,
 // it will keep trying to open the map until day/night change finishes.
@@ -49,6 +49,12 @@ enum class FastTravelState{
 // Note the function uses flyable fast travel icons on map to detect if you are being chased. This
 // means for most reliable detection, set zoom_to_max to True.
 bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_to_max = false);
+
+// Press button + to open Hyperspace Lumiose map.
+// Will repeatedly pressing button + to ensure the map is opened.
+// It does not detect whether the player can fast travel or not.
+void open_hyperspace_map(ConsoleHandle& console, ProControllerContext& context);
+
 // Starting at map view, press A to fast travel to the current selected fast travel location
 // Return FastTravelState:
 // - SUCCESS: fast travel successful. After the function returns, the player character is on the overworld

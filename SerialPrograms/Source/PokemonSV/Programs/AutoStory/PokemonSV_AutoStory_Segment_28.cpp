@@ -6,6 +6,7 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_NoMinimapDetector.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -178,7 +179,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         );
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG});
 
-        AdvanceDialogWatcher    dialog(COLOR_RED);
+        NoMinimapWatcher no_minimap(env.console.logger(), COLOR_RED, Milliseconds(250));
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [&](ProControllerContext& context){
@@ -284,7 +285,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 pbf_wait(context, 20 * TICKS_PER_SECOND);
                 
             },
-            {dialog}
+            {no_minimap}
         );
         context.wait_for(std::chrono::milliseconds(100));
         if (ret < 0){

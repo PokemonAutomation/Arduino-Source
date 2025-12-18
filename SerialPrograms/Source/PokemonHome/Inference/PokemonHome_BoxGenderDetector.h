@@ -22,6 +22,7 @@ class BoxGenderDetector{
 public:
     static void make_overlays(VideoOverlaySet& items);
     
+    // Return StatsHuntGenderFilter::Male, Female or Genderless
     static Pokemon::StatsHuntGenderFilter detect(const ImageViewRGB32& screen);
 };
 

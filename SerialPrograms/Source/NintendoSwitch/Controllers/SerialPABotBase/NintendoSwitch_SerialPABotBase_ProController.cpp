@@ -31,7 +31,6 @@ SerialPABotBase_ProController::SerialPABotBase_ProController(
     )
 {}
 SerialPABotBase_ProController::~SerialPABotBase_ProController(){
-    ProController::stop();
     SerialPABotBase_OemController::stop();
 }
 

@@ -314,7 +314,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-    close_game_from_home(console, context);
+    std::string move_results = "Move Effectiveness:";
+    move_results += "\n- Top: " + std::string("asdf");
+    move_results += "\n- Left: " + std::string("asdf");
+    move_results += "\n- Right: " + std::string("asdf");
+    move_results += "\n- Bottom: " + std::string("asdf");
+    console.log(move_results);
+
+
+//    close_game_from_home(console, context);
 
 
 #if 0

@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Controllers_GlobalQtKeyMap_H
-#define PokemonAutomation_Controllers_GlobalQtKeyMap_H
+#ifndef PokemonAutomation_ControllerInput_Keyboard_GlobalQtKeyMap_H
+#define PokemonAutomation_ControllerInput_Keyboard_GlobalQtKeyMap_H
 
 #include <set>
 #include <map>
@@ -42,7 +42,7 @@ public:
         return map;
     }
 
-    void record(const QKeyEvent& event);
+    QtKeyMap::QtKey record(const QKeyEvent& event);
 
     std::set<QtKey> get_QtKeys(uint32_t native_key) const;
 

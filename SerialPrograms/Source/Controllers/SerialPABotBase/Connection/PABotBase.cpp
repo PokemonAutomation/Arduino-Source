@@ -109,8 +109,8 @@ void PABotBase::stop(std::string error_message){
     //  Wake everyone up.
     {
         std::lock_guard<std::mutex> lg(m_sleep_lock);
-        m_cv.notify_all();
     }
+    m_cv.notify_all();
     m_retransmit_thread.join();
 
     {
@@ -137,7 +137,9 @@ void PABotBase::stop(std::string error_message){
     m_state.store(State::STOPPED, std::memory_order_release);
 }
 void PABotBase::on_cancellable_cancel(){
-    std::unique_lock<std::mutex> lg(m_sleep_lock);
+    {
+        std::unique_lock<std::mutex> lg(m_sleep_lock);
+    }
     m_cv.notify_all();
 }
 
@@ -211,59 +213,67 @@ void PABotBase::next_command_interrupt(){
 }
 void PABotBase::clear_all_active_commands(uint64_t seqnum){
     auto scope_check = m_sanitizer.check_scope();
+    {
+        //  Remove all commands at or before the specified seqnum.
+        std::lock_guard<std::mutex> lg0(m_sleep_lock);
+        WriteSpinLock lg1(m_state_lock, "PABotBase::next_command_interrupt()");
+        m_logger.log(
+            "Clearing all active commands... (Commands: " + std::to_string(m_pending_commands.size()) + ")",
+            COLOR_DARKGREEN
+        );
 
-    //  Remove all commands at or before the specified seqnum.
-    std::lock_guard<std::mutex> lg0(m_sleep_lock);
-    WriteSpinLock lg1(m_state_lock, "PABotBase::next_command_interrupt()");
-    m_logger.log("Clearing all active commands... (Commands: " + std::to_string(m_pending_commands.size()) + ")", COLOR_DARKGREEN);
 
+        if (m_pending_commands.empty()){
+            return;
+        }
+
+        //  Remove all active commands up to the seqnum.
+        while (true){
+            auto iter = m_pending_commands.begin();
+            if (iter == m_pending_commands.end() || iter->first > seqnum){
+                break;
+            }
+            iter->second.sanitizer.check_usage();
+
+            //  We cannot remove un-acked messages from our buffer. If an un-acked
+            //  message is dropped and the receiver is still waiting for it, it will
+            //  wait forever since we will never retransmit.
+
+            if (iter->second.state == AckState::NOT_ACKED){
+                //  Convert the command into a no-op request.
+                SerialPABotBase::DeviceRequest_program_id request;
+                BotBaseMessage message = request.message();
+                seqnum_t seqnum_s = (seqnum_t)iter->first;
+                memcpy(&message.body[0], &seqnum_s, sizeof(seqnum_t));
+
+//                cout << "removing = " << seqnum_s << ", " << (int)iter->second.state << endl;
+
+                std::pair<std::map<uint64_t, PendingRequest>::iterator, bool> ret = m_pending_requests.emplace(
+                    std::piecewise_construct,
+                    std::forward_as_tuple(iter->first),
+                    std::forward_as_tuple()
+                );
+                if (!ret.second){
+                    throw InternalProgramError(
+                        &m_logger,
+                        PA_CURRENT_FUNCTION,
+                        "Duplicate sequence number: " + std::to_string(seqnum)
+                    );
+                }
+
+                //  This block will never throw.
+                {
+                    PendingRequest& handle = ret.first->second;
+                    handle.silent_remove = true;
+                    handle.request = std::move(message);
+                    handle.first_sent = current_time();
+                }
+            }
+
+            m_pending_commands.erase(iter);
+        }
+    }
     m_cv.notify_all();
-
-    if (m_pending_commands.empty()){
-        return;
-    }
-
-    //  Remove all active commands up to the seqnum.
-    while (true){
-        auto iter = m_pending_commands.begin();
-        if (iter == m_pending_commands.end() || iter->first > seqnum){
-            break;
-        }
-        iter->second.sanitizer.check_usage();
-
-        //  We cannot remove un-acked messages from our buffer. If an un-acked
-        //  message is dropped and the receiver is still waiting for it, it will
-        //  wait forever since we will never retransmit.
-
-        if (iter->second.state == AckState::NOT_ACKED){
-            //  Convert the command into a no-op request.
-            SerialPABotBase::DeviceRequest_program_id request;
-            BotBaseMessage message = request.message();
-            seqnum_t seqnum_s = (seqnum_t)iter->first;
-            memcpy(&message.body[0], &seqnum_s, sizeof(seqnum_t));
-
-//            cout << "removing = " << seqnum_s << ", " << (int)iter->second.state << endl;
-
-            std::pair<std::map<uint64_t, PendingRequest>::iterator, bool> ret = m_pending_requests.emplace(
-                std::piecewise_construct,
-                std::forward_as_tuple(iter->first),
-                std::forward_as_tuple()
-            );
-            if (!ret.second){
-                throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Duplicate sequence number: " + std::to_string(seqnum));
-            }
-
-            //  This block will never throw.
-            {
-                PendingRequest& handle = ret.first->second;
-                handle.silent_remove = true;
-                handle.request = std::move(message);
-                handle.first_sent = current_time();
-            }
-        }
-
-        m_pending_commands.erase(iter);
-    }
 }
 template <typename Map>
 uint64_t PABotBase::infer_full_seqnum(const Map& map, seqnum_t seqnum) const{
@@ -354,8 +364,8 @@ void PABotBase::process_ack_request(BotBaseMessage message){
     case AckState::NOT_ACKED:
         {
             std::lock_guard<std::mutex> lg(m_sleep_lock);
-            m_cv.notify_all();
         }
+        m_cv.notify_all();
         return;
     case AckState::ACKED:
         m_logger.log("Duplicate request ack message: seqnum = " + std::to_string(seqnum));
@@ -424,52 +434,54 @@ void PABotBase::process_command_finished(BotBaseMessage message){
     ack.seqnum = seqnum;
 //    m_send_queue.emplace_back((uint8_t)PABB_MSG_ACK, std::string((char*)&ack, sizeof(ack)));
 
-    std::lock_guard<std::mutex> lg0(m_sleep_lock);
-    WriteSpinLock lg1(m_state_lock, "PABotBase::process_command_finished() - 0");
+    {
+        std::lock_guard<std::mutex> lg0(m_sleep_lock);
+        WriteSpinLock lg1(m_state_lock, "PABotBase::process_command_finished() - 0");
 
 #ifdef INTENTIONALLY_DROP_MESSAGES
-    if (rand() % 10 != 0){
-        send_message(BotBaseMessage(PABB_MSG_ACK_REQUEST, std::string((char*)&ack, sizeof(ack))), false);
-    }else{
-        m_logger.log("Intentionally dropping finish ack: " + std::to_string(seqnum), COLOR_RED);
-    }
+        if (rand() % 10 != 0){
+            send_message(BotBaseMessage(PABB_MSG_ACK_REQUEST, std::string((char*)&ack, sizeof(ack))), false);
+        }else{
+            m_logger.log("Intentionally dropping finish ack: " + std::to_string(seqnum), COLOR_RED);
+        }
 #else
-    send_message(BotBaseMessage(PABB_MSG_ACK_REQUEST, std::string((char*)&ack, sizeof(ack))), false);
+        send_message(BotBaseMessage(PABB_MSG_ACK_REQUEST, std::string((char*)&ack, sizeof(ack))), false);
 #endif
 
-    if (m_pending_commands.empty()){
-        m_logger.log(
-            "Unexpected command finished message: seqnum = " + std::to_string(seqnum) +
-            ", command_seqnum = " + std::to_string(command_seqnum)
-        );
-        return;
-    }
-
-    uint64_t full_seqnum = infer_full_seqnum(m_pending_commands, command_seqnum);
-    auto iter = m_pending_commands.find(full_seqnum);
-    if (iter == m_pending_commands.end()){
-        m_logger.log(
-            "Unexpected command finished message: seqnum = " + std::to_string(seqnum) +
-            ", command_seqnum = " + std::to_string(command_seqnum)
-        );
-        return;
-    }
-    iter->second.sanitizer.check_usage();
-
-    switch (iter->second.state){
-    case AckState::NOT_ACKED:
-    case AckState::ACKED:
-        iter->second.state = AckState::FINISHED;
-        iter->second.ack = std::move(message);
-        if (iter->second.silent_remove){
-            m_pending_commands.erase(iter);
+        if (m_pending_commands.empty()){
+            m_logger.log(
+                "Unexpected command finished message: seqnum = " + std::to_string(seqnum) +
+                ", command_seqnum = " + std::to_string(command_seqnum)
+            );
+            return;
         }
-        m_cv.notify_all();
-        return;
-    case AckState::FINISHED:
-        m_logger.log("Duplicate command finish: seqnum = " + std::to_string(seqnum));
-        return;
+
+        uint64_t full_seqnum = infer_full_seqnum(m_pending_commands, command_seqnum);
+        auto iter = m_pending_commands.find(full_seqnum);
+        if (iter == m_pending_commands.end()){
+            m_logger.log(
+                "Unexpected command finished message: seqnum = " + std::to_string(seqnum) +
+                ", command_seqnum = " + std::to_string(command_seqnum)
+            );
+            return;
+        }
+        iter->second.sanitizer.check_usage();
+
+        switch (iter->second.state){
+        case AckState::NOT_ACKED:
+        case AckState::ACKED:
+            iter->second.state = AckState::FINISHED;
+            iter->second.ack = std::move(message);
+            if (iter->second.silent_remove){
+                m_pending_commands.erase(iter);
+            }
+            break;
+        case AckState::FINISHED:
+            m_logger.log("Duplicate command finish: seqnum = " + std::to_string(seqnum));
+            return;
+        }
     }
+    m_cv.notify_all();
 }
 void PABotBase::on_recv_message(BotBaseMessage message){
     auto scope_check = m_sanitizer.check_scope();
@@ -505,7 +517,9 @@ void PABotBase::on_recv_message(BotBaseMessage message){
             m_logger.log(m_error_message, COLOR_RED);
         }
         m_error.store(true, std::memory_order_release);
-        std::lock_guard<std::mutex> lg0(m_sleep_lock);
+        {
+            std::lock_guard<std::mutex> lg0(m_sleep_lock);
+        }
         m_cv.notify_all();
     }
     case PABB_MSG_ERROR_MISSED_REQUEST:{
@@ -521,7 +535,9 @@ void PABotBase::on_recv_message(BotBaseMessage message){
                 m_logger.log(m_error_message, COLOR_RED);
             }
             m_error.store(true, std::memory_order_release);
-            std::lock_guard<std::mutex> lg0(m_sleep_lock);
+            {
+                std::lock_guard<std::mutex> lg0(m_sleep_lock);
+            }
             m_cv.notify_all();
         }
         return;
@@ -533,7 +549,9 @@ void PABotBase::on_recv_message(BotBaseMessage message){
             m_error_message = "Disconnected by console.";
         }
         m_error.store(true, std::memory_order_release);
-        std::lock_guard<std::mutex> lg0(m_sleep_lock);
+        {
+            std::lock_guard<std::mutex> lg0(m_sleep_lock);
+        }
         m_cv.notify_all();
         return;
     }

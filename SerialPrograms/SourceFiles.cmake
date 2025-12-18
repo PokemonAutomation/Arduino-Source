@@ -129,8 +129,6 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Options/GroupOption.h
     ../Common/Cpp/Options/IntegerRangeOption.cpp
     ../Common/Cpp/Options/IntegerRangeOption.h
-    ../Common/Cpp/Options/KeyBindingOption.cpp
-    ../Common/Cpp/Options/KeyBindingOption.h
     ../Common/Cpp/Options/KeyboardLayoutOption.cpp
     ../Common/Cpp/Options/KeyboardLayoutOption.h
     ../Common/Cpp/Options/MacAddressOption.cpp
@@ -222,8 +220,6 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/Options/GroupWidget.h
     ../Common/Qt/Options/IntegerRangeWidget.cpp
     ../Common/Qt/Options/IntegerRangeWidget.h
-    ../Common/Qt/Options/KeyBindingWidget.cpp
-    ../Common/Qt/Options/KeyBindingWidget.h
     ../Common/Qt/Options/MacAddressWidget.cpp
     ../Common/Qt/Options/MacAddressWidget.h
     ../Common/Qt/Options/PathWidget.cpp
@@ -640,6 +636,25 @@ file(GLOB LIBRARY_SOURCES
     Source/ComputerPrograms/Framework/ComputerProgramSession.h
     Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp
     Source/ComputerPrograms/Framework/ComputerProgramWidget.h
+    Source/ControllerInput/ControllerInput.cpp
+    Source/ControllerInput/ControllerInput.h
+    Source/ControllerInput/Keyboard/GlobalKeyboardHidTracker.cpp
+    Source/ControllerInput/Keyboard/GlobalKeyboardHidTracker.h
+    Source/ControllerInput/Keyboard/GlobalQtKeyMap.cpp
+    Source/ControllerInput/Keyboard/GlobalQtKeyMap.h
+    Source/ControllerInput/Keyboard/KeyBindingOption.cpp
+    Source/ControllerInput/Keyboard/KeyBindingOption.h
+    Source/ControllerInput/Keyboard/KeyBindingWidget.cpp
+    Source/ControllerInput/Keyboard/KeyBindingWidget.h
+    Source/ControllerInput/Keyboard/KeyboardHidButtons.h
+    Source/ControllerInput/Keyboard/KeyboardInput_KeyMappings.cpp
+    Source/ControllerInput/Keyboard/KeyboardInput_KeyMappings.h
+    Source/ControllerInput/Keyboard/KeyboardInput_KeyMappings_AZERTY.cpp
+    Source/ControllerInput/Keyboard/KeyboardInput_KeyMappings_QWERTY.cpp
+    Source/ControllerInput/Keyboard/KeyboardInput_State.cpp
+    Source/ControllerInput/Keyboard/KeyboardInput_State.h
+    Source/ControllerInput/Keyboard/KeyboardInput_StateTracker.cpp
+    Source/ControllerInput/Keyboard/KeyboardInput_StateTracker.h
     Source/Controllers/Controller.cpp
     Source/Controllers/Controller.h
     Source/Controllers/ControllerConnection.cpp
@@ -658,14 +673,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/ControllerTypeStrings.h
     Source/Controllers/ControllerTypes.h
     Source/Controllers/JoystickTools.h
-    Source/Controllers/KeyboardInput/GlobalQtKeyMap.cpp
-    Source/Controllers/KeyboardInput/GlobalQtKeyMap.h
-    Source/Controllers/KeyboardInput/KeyboardEventHandler.cpp
-    Source/Controllers/KeyboardInput/KeyboardEventHandler.h
-    Source/Controllers/KeyboardInput/KeyboardInput.cpp
-    Source/Controllers/KeyboardInput/KeyboardInput.h
-    Source/Controllers/KeyboardInput/KeyboardStateTracker.cpp
-    Source/Controllers/KeyboardInput/KeyboardStateTracker.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h
     Source/Controllers/Schedulers/ControllerWithScheduler.h
@@ -703,9 +710,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/StandardHid/StandardHid_Keyboard.h
     Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.cpp
     Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.h
-    Source/Controllers/StandardHid/StandardHid_Keyboard_ControllerButtons.h
-    Source/Controllers/StandardHid/StandardHid_Keyboard_KeyMappings.cpp
-    Source/Controllers/StandardHid/StandardHid_Keyboard_KeyMappings.h
     Source/Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.cpp
     Source/Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.h
     Source/Integrations/DiscordIntegrationSettings.cpp
@@ -943,6 +947,8 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h
     Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.cpp
     Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.h
+    Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon_from_Keyboard.cpp
+    Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon_from_Keyboard.h
     Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconState.cpp
     Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconState.h
     Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconTable.cpp
@@ -959,6 +965,8 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.cpp
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h
+    Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController_from_Keyboard.cpp
+    Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController_from_Keyboard.h
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerState.cpp
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerState.h
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerTable.cpp
@@ -1147,8 +1155,12 @@ file(GLOB LIBRARY_SOURCES
     Source/Pokemon/Options/Pokemon_NameSelectOption.h
     Source/Pokemon/Options/Pokemon_NameSelectWidget.cpp
     Source/Pokemon/Options/Pokemon_NameSelectWidget.h
+    Source/Pokemon/Options/Pokemon_BoxSortingTable.cpp
+    Source/Pokemon/Options/Pokemon_BoxSortingTable.h
     Source/Pokemon/Options/Pokemon_StatsHuntFilter.cpp
     Source/Pokemon/Options/Pokemon_StatsHuntFilter.h
+    Source/Pokemon/Pokemon_CollectedPokemonInfo.cpp
+    Source/Pokemon/Pokemon_CollectedPokemonInfo.h
     Source/Pokemon/Pokemon_DataTypes.h
     Source/Pokemon/Pokemon_EncounterStats.cpp
     Source/Pokemon/Pokemon_EncounterStats.h
@@ -1328,8 +1340,6 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonHome/Inference/PokemonHome_BallReader.h
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.cpp
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.h
-    Source/PokemonHome/Options/PokemonHome_BoxSortingTable.cpp
-    Source/PokemonHome/Options/PokemonHome_BoxSortingTable.h
     Source/PokemonHome/PokemonHome_Panels.cpp
     Source/PokemonHome/PokemonHome_Panels.h
     Source/PokemonHome/PokemonHome_Settings.cpp
@@ -1599,16 +1609,24 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/PokemonLZA_DayNightChangeDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.h
+    Source/PokemonLZA/Inference/PokemonLZA_HyperspaceRewardNameReader.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_HyperspaceRewardNameReader.h
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h
+    Source/PokemonLZA/Inference/PokemonLZA_WeatherDetector.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_WeatherDetector.h
     Source/PokemonLZA/InferenceTraining/PokemonLZA_GenerateLocationNameOCR.cpp
     Source/PokemonLZA/InferenceTraining/PokemonLZA_GenerateLocationNameOCR.h
     Source/PokemonLZA/Options/PokemonLZA_BattleAIOption.cpp
     Source/PokemonLZA/Options/PokemonLZA_BattleAIOption.h
+    Source/PokemonLZA/Options/PokemonLZA_HyperspaceRewardOption.cpp
+    Source/PokemonLZA/Options/PokemonLZA_HyperspaceRewardOption.h
+    Source/PokemonLZA/Options/PokemonLZA_HyperspaceRewardTable.cpp
+    Source/PokemonLZA/Options/PokemonLZA_HyperspaceRewardTable.h
     Source/PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.cpp
     Source/PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h
     Source/PokemonLZA/PokemonLZA_Panels.cpp
@@ -1617,6 +1635,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/PokemonLZA_Settings.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_FriendshipFarmer.cpp
     Source/PokemonLZA/Programs/Farming/PokemonLZA_FriendshipFarmer.h
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_HyperspaceRewardReset.cpp
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_HyperspaceRewardReset.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_InPlaceCatcher.cpp
     Source/PokemonLZA/Programs/Farming/PokemonLZA_InPlaceCatcher.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.cpp
@@ -1627,6 +1647,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/Farming/PokemonLZA_RestaurantFarmer.h
     Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_StatsReset.cpp
     Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_StatsReset.h
+    Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_WeatherFinder.cpp
+    Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_WeatherFinder.h
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.cpp
@@ -1662,6 +1684,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneCafe.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.cpp
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.cpp
@@ -1672,6 +1696,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/Trading/PokemonLZA_SelfBoxTrade.h
     Source/PokemonLZA/Programs/Trading/PokemonLZA_TradeRoutines.cpp
     Source/PokemonLZA/Programs/Trading/PokemonLZA_TradeRoutines.h
+    Source/PokemonLZA/Resources/PokemonLZA_HyperspaceRewardNames.cpp
+    Source/PokemonLZA/Resources/PokemonLZA_HyperspaceRewardNames.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.cpp

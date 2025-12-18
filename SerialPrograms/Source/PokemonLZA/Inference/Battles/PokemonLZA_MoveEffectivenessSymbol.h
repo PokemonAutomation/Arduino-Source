@@ -28,6 +28,7 @@ enum class MoveEffectivenessSymbol{
     Normal,
     SuperEffective,
 };
+const char* to_string(MoveEffectivenessSymbol symbol);
 
 
 

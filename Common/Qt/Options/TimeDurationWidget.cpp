@@ -39,9 +39,9 @@ TimeDurationCellWidget<Type>::TimeDurationCellWidget(QWidget& parent, TimeDurati
     ));
 
     connect(
-        this, &QLineEdit::textChanged,
-        this, [this](const QString& text){
-            std::string error = m_value.set(text.toStdString());
+        this, &QLineEdit::editingFinished,
+        this, [this](){
+            m_value.set(this->text().toStdString());
         }
     );
 
@@ -105,43 +105,47 @@ TimeDurationOptionWidget<Type>::TimeDurationOptionWidget(QWidget& parent, TimeDu
         "Wireless controllers have larger tick sizes and are imprecise due to wireless communication latency."
     ));
 
-    QLabel* description = nullptr;
+    m_description = nullptr;
     if (value.show_summary()){
-        description = new QLabel(QString::fromStdString(m_value.time_string()), this);
-        description->setAlignment(Qt::AlignHCenter);
-        row1->addWidget(description);
+        m_description = new QLabel(QString::fromStdString(m_value.time_string()), this);
+        m_description->setAlignment(Qt::AlignHCenter);
+        row1->addWidget(m_description);
     }
 
     connect(
         m_box, &QLineEdit::editingFinished,
-        this, [this, description](){
+        this, [this](){
             std::string error = m_value.set(m_box->text().toStdString());
-            if (description == nullptr){
+            if (m_description == nullptr){
                 return;
             }
             if (error.empty()){
-                description->setText(QString::fromStdString(m_value.time_string()));
+                m_description->setText(QString::fromStdString(m_value.time_string()));
             }else{
-                description->setText(QString::fromStdString("<font color=\"red\">" + error + "</font>"));
+                m_description->setText(QString::fromStdString("<font color=\"red\">" + error + "</font>"));
             }
         }
     );
+#if 0
     connect(
         m_box, &QLineEdit::textChanged,
-        this, [this, description](){
-            if (description == nullptr){
+        this, [this, m_description](){
+            if (m_description == nullptr){
                 return;
             }
             std::string text = m_value.time_string(m_box->text().toStdString());
-            description->setText(QString::fromStdString(text));
+            m_description->setText(QString::fromStdString(text));
         }
     );
+#endif
 
     value.add_listener(*this);
 }
 template <typename Type>
 void TimeDurationOptionWidget<Type>::update_value(){
-    m_box->setText(QString::fromStdString(m_value.current_text()));
+    std::string text = m_value.current_text();
+    m_box->setText(QString::fromStdString(text));
+    m_description->setText(QString::fromStdString(m_value.time_string()));
 }
 template <typename Type>
 void TimeDurationOptionWidget<Type>::on_config_value_changed(void* object){

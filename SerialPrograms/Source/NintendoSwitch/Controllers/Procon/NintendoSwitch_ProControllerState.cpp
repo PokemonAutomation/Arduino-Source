@@ -110,12 +110,12 @@ JsonObject ProControllerState::to_json() const{
     return obj;
 }
 void ProControllerState::execute(
-    CancellableScope& scope,
+    Cancellable* scope,
     AbstractController& controller,
     Milliseconds duration
 ) const{
     controller.cast_with_exception<ProController>().issue_full_controller_state(
-        &scope,
+        scope,
         true,
         duration,
         buttons,

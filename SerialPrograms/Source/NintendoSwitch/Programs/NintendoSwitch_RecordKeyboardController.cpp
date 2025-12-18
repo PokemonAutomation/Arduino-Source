@@ -97,7 +97,7 @@ void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, Canc
             throw FileException(nullptr, PA_CURRENT_FUNCTION, "Given file name already exists. Choose a different file name.", output_json_filename);
         }
 
-        context.controller().add_keyboard_listener(*this);
+        context.controller().add_input_sniffer(*this);
 
         try{
             context.wait_until_cancel();
@@ -111,7 +111,7 @@ void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, Canc
                 json_to_cpp_code(env.console.logger(), json, FILE_NAME);
             }
 
-            context.controller().remove_keyboard_listener(*this);
+            context.controller().remove_input_sniffer(*this);
             
             throw;
         }        
@@ -174,10 +174,10 @@ void execute_json_schedule(
             }
 
             state.load_json(snapshot);
-            state.execute(context, context.controller(), Milliseconds(duration));
+            state.execute(&context, context.controller(), Milliseconds(duration));
         }
         state.clear();
-        state.execute(context, context.controller(), Seconds(seconds_wait_between_loops));
+        state.execute(&context, context.controller(), Seconds(seconds_wait_between_loops));
     }
 }
 
@@ -338,28 +338,19 @@ JsonValue RecordKeyboardController::controller_history_to_json(Logger& logger, C
 }
 
 
-void RecordKeyboardController::on_keyboard_command_sent(WallClock time_stamp, const ControllerState& state){
+void RecordKeyboardController::on_command_input(WallClock timestamp, const ControllerState& state){
     cout << "keyboard_command_sent" << endl;
     JsonValue serialized_state = state.to_json();
     cout << serialized_state.dump(0) << endl;
-    
+
     ControllerStateSnapshot state_snapshot = {
-        time_stamp,
+        timestamp,
         std::move(serialized_state)
     };
     m_controller_history.emplace_back(std::move(state_snapshot));
 }
-void RecordKeyboardController::on_keyboard_command_stopped(WallClock time_stamp){
-    cout << "keyboard_command_stopped" << endl;
-    JsonObject obj;
-//    obj["is_neutral"] = true;
 
-    ControllerStateSnapshot state_snapshot = {
-        time_stamp, 
-        std::move(obj)
-    };
-    m_controller_history.emplace_back(std::move(state_snapshot));
-}
+
 
 
 
