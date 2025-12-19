@@ -110,6 +110,7 @@ public:
         Params params;
         memcpy(&params, body.data(), sizeof(params));
         ret += ": seqnum = " + std::to_string(params.seqnum);
+        ret += ", mode = " + std::to_string(params.mode);
         return ret;
     }
 };
@@ -119,6 +120,7 @@ public:
     DeviceRequest_read_mac_address(uint32_t mode)
         : BotBaseRequest(false)
     {
+        params.seqnum = 0;
         params.mode = mode;
     }
     virtual BotBaseMessage message() const override{

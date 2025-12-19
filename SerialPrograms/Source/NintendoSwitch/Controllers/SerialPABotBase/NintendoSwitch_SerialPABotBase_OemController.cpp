@@ -128,6 +128,19 @@ void SerialPABotBase_OemController::set_info(){
                 response.body.data() + sizeof(seqnum_t),
                 sizeof(controller_mac_address)
             );
+
+            std::string str = "Controller MAC Address: ";
+
+            static const char HEX_DIGITS[] = "0123456789abcdef";
+            for (size_t c = 0; c < 6; c++){
+                uint8_t byte = controller_mac_address[c];
+                str += " ";
+                str += HEX_DIGITS[(byte >> 4)];
+                str += HEX_DIGITS[byte & 15];
+            }
+
+            m_logger.log(str);
+
         }else{
             m_logger.log(
                 "Invalid response size to PABB_MSG_ESP32_REQUEST_READ_SPI: body = " + std::to_string(response.body.size()),

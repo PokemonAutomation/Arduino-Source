@@ -213,7 +213,11 @@ void CommandRow::set_focus(bool focused){
 
         AbstractController* controller = m_controller.controller();
         if (controller != nullptr && allow_controller_input()){
-            controller->cancel_all_commands();
+            try{
+                controller->cancel_all_commands();
+            }catch (InvalidConnectionStateException&){
+            }catch (OperationCancelledException&){
+            }
         }
     }
     if (m_last_known_focus == focused){
