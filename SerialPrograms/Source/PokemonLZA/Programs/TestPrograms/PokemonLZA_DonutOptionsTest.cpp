@@ -36,11 +36,18 @@ DonutOptionsTest_Descriptor::DonutOptionsTest_Descriptor()
 DonutOptionsTest::DonutOptionsTest()
     : LANGUAGE(
         "<b>Game Language:</b>",
-        PokemonSwSh::IV_READER().languages(), //TODO: replace?
+        PokemonSwSh::IV_READER().languages(), //TODO: replace later or something
         LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , BERRIES("<b>Berries:</b><br>The berries used to make the donut. Minimum 3 berries, maximum 8 berries.")
+    , NUM_POWER_REQUIRED(
+        "<b>Number of Powers to Match:</b><br>How many of a dount's powers must be in the the table below. Minimum 1, maximum 3. "
+        "<br>Ex. For a target dount of Big Haul Lv.3, Berry Lv.3, and any or none for the 3rd power, set the number as 2."
+        "<br>Then, in the flavor powers table, make sure to add Big Haul Lv.3 and Berry Lv. 3.",
+        LockMode::LOCK_WHILE_RUNNING,
+        1, 1, 3
+        )
     , NUM_DONUTS(
         "<b>Number of Donuts:</b><br>The number of donuts to make.",
         LockMode::LOCK_WHILE_RUNNING,
@@ -56,6 +63,8 @@ DonutOptionsTest::DonutOptionsTest()
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(BERRIES);
+    PA_ADD_OPTION(NUM_POWER_REQUIRED);
+    PA_ADD_OPTION(FLAVOR_POWERS);
     PA_ADD_OPTION(NUM_DONUTS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -80,6 +89,10 @@ void DonutOptionsTest::program(SingleSwitchProgramEnvironment& env, ProControlle
         throw UserSetupError(env.console, "Must have at least 3 berries and no more than 8 berries.");
     }
     env.log("Number of berries validated.", COLOR_BLACK);
+
+
+    //Validate flavor power table
+    //(not all powers can have all types)
 
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);

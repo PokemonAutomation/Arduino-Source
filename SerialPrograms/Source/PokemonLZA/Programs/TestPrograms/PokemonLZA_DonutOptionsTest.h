@@ -12,6 +12,7 @@
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonTools/Options/LanguageOCROption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "PokemonLZA/Options/PokemonLZA_DonutBerriesOption.h"
 
 namespace PokemonAutomation{
@@ -32,6 +33,11 @@ public:
 private:
     OCR::LanguageOCROption LANGUAGE;
     DonutBerriesTable BERRIES;
+
+    SimpleIntegerOption<uint8_t> NUM_POWER_REQUIRED;
+
+    FlavorPowerTable FLAVOR_POWERS;
+
     SimpleIntegerOption<uint8_t> NUM_DONUTS;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
