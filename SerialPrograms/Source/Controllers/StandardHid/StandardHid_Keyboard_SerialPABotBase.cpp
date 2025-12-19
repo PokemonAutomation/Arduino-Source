@@ -204,7 +204,7 @@ void SerialPABotBase_Keyboard::execute_state(
     while (time_left > Milliseconds::zero()){
         Milliseconds current = std::min(time_left, 65535ms);
         m_serial->issue_request(
-            SerialPABotBase::DeviceRequest_HID_Keyboard_StateMs(
+            DeviceRequest_HID_Keyboard_StateMs(
                 (uint16_t)current.count(),
                 report
             ),

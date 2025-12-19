@@ -180,6 +180,7 @@ void SerialPABotBase_Connection::add_message_printers(){
     add_message_printer<MessageType_SystemClock>();
     add_message_printer<MessageType_ControllerStatus>();
     add_message_printer<MessageType_ReadMacAddress>();
+    add_message_printer<MessageType_PairedMacAddress>();
 }
 void SerialPABotBase_Connection::process_queue_size(){
     m_logger.log("Requesting queue size...");
@@ -205,7 +206,7 @@ ControllerType SerialPABotBase_Connection::process_device(bool set_to_null_contr
     const std::map<pabb_ProgramID, uint8_t>* PROGRAMS;
     {
         m_logger.Logger::log("Checking Protocol Version...");
-        m_protocol = protocol_version(*m_botbase);
+        m_protocol = SerialPABotBase::protocol_version(*m_botbase);
         m_logger.Logger::log("Checking Protocol Version... (" + std::to_string(m_protocol) + ")");
         auto iter = SUPPORTED_VERSIONS().find(m_protocol / 100);
         if (iter == SUPPORTED_VERSIONS().end()){

@@ -8,6 +8,8 @@
 #define PokemonAutomation_SerialPABotBase_MessageWrappers_BaseProtocol_Misc_H
 
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
+#include "Controllers/ControllerTypes.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "Controllers/SerialPABotBase/Connection/BotBaseMessage.h"
 
 namespace PokemonAutomation{
@@ -91,7 +93,7 @@ public:
 
 
 class MessageType_ReadMacAddress : public BotBaseMessageType{
-    using Params = pabb_Message_RequestStatus;
+    using Params = pabb_MsgRequestReadMacAddress;
 public:
     MessageType_ReadMacAddress()
         : BotBaseMessageType(
@@ -121,6 +123,46 @@ public:
     }
     virtual BotBaseMessage message() const override{
         return BotBaseMessage(PABB_MSG_REQUEST_READ_MAC_ADDRESS, params);
+    }
+};
+
+
+
+class MessageType_PairedMacAddress : public BotBaseMessageType{
+    using Params = pabb_MsgRequestPairedMacAddress;
+public:
+    MessageType_PairedMacAddress()
+        : BotBaseMessageType(
+            "PABB_MSG_REQUEST_PAIRED_MAC_ADDRESS",
+            PABB_MSG_REQUEST_PAIRED_MAC_ADDRESS,
+            sizeof(Params)
+        )
+    {}
+    virtual bool should_print(const std::string& body) const override{
+        return GlobalSettings::instance().LOG_EVERYTHING;
+    }
+    virtual std::string tostr(const std::string& body) const override{
+        std::string ret = BotBaseMessageType::tostr(body);
+        if (!is_valid(body)){
+            return ret;
+        }
+        Params params;
+        memcpy(&params, body.data(), sizeof(params));
+        ret += ": seqnum = " + std::to_string(params.seqnum);
+        ret += ", mode = " + std::to_string(params.mode);
+        return ret;
+    }
+};
+class DeviceRequest_paired_mac_address : public BotBaseRequest{
+public:
+    pabb_MsgRequestPairedMacAddress params{};
+    DeviceRequest_paired_mac_address(ControllerType controller_type)
+        : BotBaseRequest(false)
+    {
+        params.mode = controller_type_to_id(controller_type);
+    }
+    virtual BotBaseMessage message() const override{
+        return BotBaseMessage(PABB_MSG_REQUEST_PAIRED_MAC_ADDRESS, params);
     }
 };
 

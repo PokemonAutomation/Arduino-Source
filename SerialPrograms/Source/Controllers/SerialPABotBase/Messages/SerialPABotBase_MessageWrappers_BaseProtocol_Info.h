@@ -82,7 +82,7 @@ public:
         return true;
     }
     virtual std::string tostr(const std::string& body) const override{
-        return BotBaseMessageType::tostr(body) + body;
+        return BotBaseMessageType::tostr(body) + ": " + body;
     }
 };
 class MessageType_Info_Label_i32 : public BotBaseMessageType{

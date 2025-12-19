@@ -41,7 +41,7 @@ SerialPABotBase_WiredController::SerialPABotBase_WiredController(
 
 
     //  Add controller-specific messages.
-    connection.add_message_printer<MessageType_NS_WiredController_ControllerStateMs>();
+    connection.add_message_printer<MessageType_WiredController_ControllerStateMs>();
 
 
     switch (reset_mode){
@@ -176,7 +176,7 @@ void SerialPABotBase_WiredController::execute_state(
     while (time_left > Milliseconds::zero()){
         Milliseconds current = std::min(time_left, 65535ms);
         m_serial->issue_request(
-            SerialPABotBase::DeviceRequest_NS_WiredController_ControllerStateMs(
+            DeviceRequest_WiredController_ControllerStateMs(
                 (uint16_t)current.count(),
                 buttons,
                 dpad_byte,

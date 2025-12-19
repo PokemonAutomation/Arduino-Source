@@ -47,6 +47,7 @@ SerialPABotBase_OemController::SerialPABotBase_OemController(
 
 
     //  Add controller-specific messages.
+    connection.add_message_printer<MessageType_NS1_PlayerLights>();
     connection.add_message_printer<MessageType_NS1_ReadSpi>();
     connection.add_message_printer<MessageType_NS1_WriteSpi>();
     connection.add_message_printer<MessageType_NS1_OemControllerStateButtons>();
@@ -170,7 +171,7 @@ void SerialPABotBase_OemController::set_info(){
 
 
     m_serial->issue_request_and_wait(
-        MessageControllerWriteSpi(
+        DeviceRequest_NS1_WriteSpi(
             m_controller_type,
             0x00006050, sizeof(PABB_NintendoSwitch_ControllerColors),
             &colors
@@ -268,7 +269,7 @@ void SerialPABotBase_OemController::issue_report(
     while (time_left > Milliseconds::zero()){
         Milliseconds current = std::min(time_left, 65535ms);
         m_serial->issue_request(
-            SerialPABotBase::MessageControllerStateButtons(
+            DeviceRequest_ControllerStateButtons(
                 (uint16_t)current.count(),
                 buttons
             ),
@@ -331,7 +332,7 @@ void SerialPABotBase_OemController::issue_report(
     while (time_left > Milliseconds::zero()){
         Milliseconds current = std::min(time_left, 65535ms);
         m_serial->issue_request(
-            SerialPABotBase::MessageControllerStateFull(
+            DeviceRequest_ControllerStateFull(
                 (uint16_t)current.count(),
                 buttons, gyro3
             ),
@@ -352,7 +353,7 @@ void SerialPABotBase_OemController::update_status(Cancellable& cancellable){
             using ControllerColors = PABB_NintendoSwitch_ControllerColors;
 
             BotBaseMessage response = m_serial->issue_request_and_wait(
-                SerialPABotBase::MessageControllerReadSpi(
+                DeviceRequest_NS1_ReadSpi(
                     m_controller_type,
                     0x00006050, sizeof(ControllerColors)
                 ),
@@ -400,34 +401,84 @@ void SerialPABotBase_OemController::update_status(Cancellable& cancellable){
         }
     }
 
-
-    pabb_MsgAckRequestI32 response;
-    m_serial->issue_request_and_wait(
-        SerialPABotBase::MessageControllerStatus(),
-        &cancellable
-    ).convert<PABB_MSG_ACK_REQUEST_I32>(m_logger, response);
-
-    uint32_t status = response.data;
-//            bool status_connected = status & 1;
-    bool status_ready     = status & 2;
-    bool status_paired    = status & 4;
-
     std::string str;
-    str += "Paired: " + (status_paired
-        ? html_color_text("Yes", theme_friendly_darkblue())
-        : html_color_text("No", COLOR_RED)
-    );
+    str += m_color_html + " - ";
+
+    uint32_t status;
+    {
+        pabb_MsgAckRequestI32 response;
+        m_serial->issue_request_and_wait(
+            SerialPABotBase::MessageControllerStatus(),
+            &cancellable
+        ).convert<PABB_MSG_ACK_REQUEST_I32>(m_logger, response);
+        status = response.data;
+    }
+
+    if (protocol_version() >= 2025120806){
+        uint8_t mac_address[6] = {};
+        BotBaseMessage response = m_serial->issue_request_and_wait(
+            SerialPABotBase::DeviceRequest_paired_mac_address(m_controller_type),
+            &cancellable
+        );
+        if (response.body.size() == sizeof(seqnum_t) + sizeof(mac_address)){
+            memcpy(
+                mac_address,
+                response.body.data() + sizeof(seqnum_t),
+                sizeof(mac_address)
+            );
+        }else{
+            m_logger.log(
+                "Invalid response size to PABB_MSG_ESP32_REQUEST_READ_SPI: body = " + std::to_string(response.body.size()),
+                COLOR_RED
+            );
+        }
+
+        str += "Paired: ";
+        if (std::all_of(mac_address, mac_address + 6, [](uint8_t x){ return x == 0; })){
+            str += html_color_text("No", COLOR_RED);
+        }else{
+            str += html_color_text(
+                tostr_hex(mac_address[4]) + ":" +
+                tostr_hex(mac_address[5]),
+                theme_friendly_darkblue()
+            );
+        }
+    }else{
+        bool status_paired = status & 4;
+        str += "Paired: " + (status_paired
+            ? html_color_text("Yes", theme_friendly_darkblue())
+            : html_color_text("No", COLOR_RED)
+        );
+    }
+
+    bool status_ready = status & 2;
+    if (protocol_version() >= 2025120806 && status_ready){
+        pabb_MsgAckRequestI8 response;
+        m_serial->issue_request_and_wait(
+            DeviceRequest_PlayerLights(m_controller_type),
+            &cancellable
+        ).convert<PABB_MSG_ACK_REQUEST_I8>(m_logger, response);
+
+        uint8_t byte = response.data;
+        byte = (byte | (byte >> 4)) & 0x0f;
+        str += " - Connected: ";
+        for (int c = 0; c < 4; c++){
+            str += html_color_text("\u258d", byte & (1 << c) ? COLOR_GREEN : COLOR_BLACK);
+        }
+    }else{
+        str += " - Connected: " + (status_ready
+            ? html_color_text("Yes", theme_friendly_darkblue())
+            : html_color_text("No", COLOR_RED)
+        );
+    }
+
+//    bool status_connected = status & 1;
 #if 0
     str += "Connected: " + (status_connected
         ? html_color_text("Yes", theme_friendly_darkblue())
         : html_color_text("No", COLOR_RED)
     );
 #endif
-    str += " - Connected: " + (status_ready
-        ? html_color_text("Yes", theme_friendly_darkblue())
-        : html_color_text("No", COLOR_RED)
-    );
-    str += " - " + m_color_html;
 
     m_handle.set_status_line1(str);
 }

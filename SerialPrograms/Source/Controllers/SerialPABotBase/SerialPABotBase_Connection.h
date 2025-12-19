@@ -42,6 +42,10 @@ public:
     const std::string& device_name() const{
         return m_device_name;
     }
+    uint32_t protocol_version() const{
+        return m_protocol;
+    }
+
     BotBaseController* botbase();
 
     ControllerType refresh_controller_type();

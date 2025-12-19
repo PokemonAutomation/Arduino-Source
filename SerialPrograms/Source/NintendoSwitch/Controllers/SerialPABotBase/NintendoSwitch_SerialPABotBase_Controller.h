@@ -23,6 +23,10 @@ public:
         SerialPABotBase::SerialPABotBase_Connection& connection
     );
 
+    uint32_t protocol_version() const{
+        return m_handle.protocol_version();
+    }
+
     void stop_with_error(std::string error_message){
         {
             WriteSpinLock lg(m_error_lock);

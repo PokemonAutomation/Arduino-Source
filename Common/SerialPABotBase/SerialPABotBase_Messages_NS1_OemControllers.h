@@ -37,14 +37,14 @@ typedef struct{
 
 
 
-#define PABB_MSG_INFO_NS1_OEM_CONTROLLER_RUMBLE        0x30
+#define PABB_MSG_INFO_NS1_OEM_CONTROLLER_RUMBLE             0x30
 typedef struct{
     pabb_NintendoSwitch_Rumble rumble;
 } PABB_PACK pabb_MsgInfo_NS1_OemController_Rumble;
 
 
 
-#define PABB_MSG_REQUEST_NS1_OEM_CONTROLLER_READ_SPI   0x60
+#define PABB_MSG_REQUEST_NS1_OEM_CONTROLLER_READ_SPI        0x60
 typedef struct{
     seqnum_t seqnum;
     uint32_t controller_type;
@@ -52,7 +52,7 @@ typedef struct{
     uint8_t bytes;
 } PABB_PACK pabb_Message_NS1_OemController_ReadSpi;
 
-#define PABB_MSG_REQUEST_NS1_OEM_CONTROLLER_WRITE_SPI  0x61
+#define PABB_MSG_REQUEST_NS1_OEM_CONTROLLER_WRITE_SPI       0x61
 typedef struct{
     seqnum_t seqnum;
     uint32_t controller_type;
@@ -60,9 +60,15 @@ typedef struct{
     uint8_t bytes;
 } PABB_PACK pabb_Message_NS1_OemController_WriteSpi;
 
+#define PABB_MSG_REQUEST_NS1_OEM_CONTROLLER_PLAYER_LIGHTS   0x62
+typedef struct{
+    seqnum_t seqnum;
+    uint32_t controller_type;
+} PABB_PACK pabb_MsgInfo_NS1_OemController_PlayerLights;
 
 
-#define PABB_MSG_COMMAND_NS1_OEM_CONTROLLER_BUTTONS    0xa0
+
+#define PABB_MSG_COMMAND_NS1_OEM_CONTROLLER_BUTTONS         0xa0
 typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
@@ -70,7 +76,7 @@ typedef struct{
 } PABB_PACK pabb_Message_Command_NS1_OemController_Buttons;
 
 
-#define PABB_MSG_COMMAND_NS1_OEM_CONTROLLER_FULL_STATE 0xa1
+#define PABB_MSG_COMMAND_NS1_OEM_CONTROLLER_FULL_STATE      0xa1
 typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;

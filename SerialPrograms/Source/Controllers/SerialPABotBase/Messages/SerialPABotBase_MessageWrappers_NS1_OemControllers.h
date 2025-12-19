@@ -1,20 +1,60 @@
-/*  SerialPABotBase Messages - NS1 OEM Controllers
+/*  SerialPABotBase Messages - NintendoSwitch OEM Controllers
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_SerialPABotBase_MessageWrappers_NS1_OemControllers_H
-#define PokemonAutomation_SerialPABotBase_MessageWrappers_NS1_OemControllers_H
+#ifndef PokemonAutomation_SerialPABotBase_MessageWrappers_NintendoSwitch_OemControllers_H
+#define PokemonAutomation_SerialPABotBase_MessageWrappers_NintendoSwitch_OemControllers_H
 
 #include "Common/SerialPABotBase/SerialPABotBase_Messages_NS1_OemControllers.h"
 #include "Controllers/ControllerTypes.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
+//#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 #include "Controllers/SerialPABotBase/Connection/BotBaseMessage.h"
 
 namespace PokemonAutomation{
-namespace SerialPABotBase{
+namespace NintendoSwitch{
+
+
+
+class MessageType_NS1_PlayerLights : public BotBaseMessageType{
+    using Params = pabb_MsgInfo_NS1_OemController_PlayerLights;
+public:
+    MessageType_NS1_PlayerLights()
+        : BotBaseMessageType(
+            "PABB_MSG_REQUEST_NS1_OEM_CONTROLLER_PLAYER_LIGHTS",
+            PABB_MSG_REQUEST_NS1_OEM_CONTROLLER_PLAYER_LIGHTS,
+            sizeof(Params)
+        )
+    {}
+    virtual bool should_print(const std::string& body) const override{
+        return GlobalSettings::instance().LOG_EVERYTHING;
+    }
+    virtual std::string tostr(const std::string& body) const override{
+        std::string ret = BotBaseMessageType::tostr(body);
+        if (!is_valid(body)){
+            return ret;
+        }
+        Params params;
+        memcpy(&params, body.data(), sizeof(params));
+        ret += ": seqnum = " + std::to_string(params.seqnum);
+        return ret;
+    }
+};
+class DeviceRequest_PlayerLights : public BotBaseRequest{
+public:
+    pabb_MsgInfo_NS1_OemController_PlayerLights params;
+    DeviceRequest_PlayerLights(ControllerType controller_type)
+        : BotBaseRequest(false)
+    {
+        params.seqnum = 0;
+        params.controller_type = SerialPABotBase::controller_type_to_id(controller_type);
+    }
+    virtual BotBaseMessage message() const override{
+        return BotBaseMessage(PABB_MSG_REQUEST_NS1_OEM_CONTROLLER_PLAYER_LIGHTS, params);
+    }
+};
 
 
 
@@ -35,21 +75,21 @@ public:
         }
         Params params;
         memcpy(&params, body.data(), sizeof(params));
-        ret += "seqnum = " + std::to_string(params.seqnum);
+        ret += ": seqnum = " + std::to_string(params.seqnum);
         ret += ", controller = " + std::to_string(params.controller_type);
         ret += ", address = 0x" + tostr_hex(params.address);
         ret += ", bytes = " + std::to_string((size_t)params.bytes);
         return ret;
     }
 };
-class MessageControllerReadSpi : public BotBaseRequest{
+class DeviceRequest_NS1_ReadSpi : public BotBaseRequest{
 public:
     pabb_Message_NS1_OemController_ReadSpi params;
-    MessageControllerReadSpi(ControllerType controller_type, uint32_t address, uint8_t bytes)
+    DeviceRequest_NS1_ReadSpi(ControllerType controller_type, uint32_t address, uint8_t bytes)
         : BotBaseRequest(false)
     {
         params.seqnum = 0;
-        params.controller_type = controller_type_to_id(controller_type);
+        params.controller_type = SerialPABotBase::controller_type_to_id(controller_type);
         params.address = address;
         params.bytes = bytes;
     }
@@ -80,17 +120,17 @@ public:
         }
         Params params;
         memcpy(&params, body.data(), sizeof(params));
-        ret += "seqnum = " + std::to_string(params.seqnum);
+        ret += ": seqnum = " + std::to_string(params.seqnum);
         ret += ", controller = " + std::to_string(params.controller_type);
         ret += ", address = 0x" + tostr_hex(params.address);
         ret += ", bytes = " + std::to_string((size_t)params.bytes);
         return ret;
     }
 };
-class MessageControllerWriteSpi : public BotBaseRequest{
+class DeviceRequest_NS1_WriteSpi : public BotBaseRequest{
 public:
     std::string data;
-    MessageControllerWriteSpi(
+    DeviceRequest_NS1_WriteSpi(
         ControllerType controller_type,
         uint32_t address, uint8_t bytes,
         const void* p_data
@@ -99,7 +139,7 @@ public:
     {
         pabb_Message_NS1_OemController_WriteSpi params;
         params.seqnum = 0;
-        params.controller_type = controller_type_to_id(controller_type);
+        params.controller_type = SerialPABotBase::controller_type_to_id(controller_type);
         params.address = address;
         params.bytes = bytes;
         data = std::string((char*)&params, sizeof(params));
@@ -137,10 +177,10 @@ public:
         return ret;
     }
 };
-class MessageControllerStateButtons : public BotBaseRequest{
+class DeviceRequest_ControllerStateButtons : public BotBaseRequest{
 public:
     pabb_Message_Command_NS1_OemController_Buttons params;
-    MessageControllerStateButtons(
+    DeviceRequest_ControllerStateButtons(
         uint16_t milliseconds,
         const pabb_NintendoSwitch_OemController_State0x30_Buttons& state
     )
@@ -182,10 +222,10 @@ public:
         return ret;
     }
 };
-class MessageControllerStateFull : public BotBaseRequest{
+class DeviceRequest_ControllerStateFull : public BotBaseRequest{
 public:
     pabb_Message_Command_NS1_OemController_FullState params;
-    MessageControllerStateFull(
+    DeviceRequest_ControllerStateFull(
         uint16_t milliseconds,
         const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons,
         const pabb_NintendoSwitch_OemController_State0x30_GyroX3& gyro

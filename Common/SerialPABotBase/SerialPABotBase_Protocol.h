@@ -359,6 +359,12 @@ typedef struct{
     uint32_t mode;
 } PABB_PACK pabb_MsgRequestReadMacAddress;
 
+#define PABB_MSG_REQUEST_PAIRED_MAC_ADDRESS     0x52
+typedef struct{
+    seqnum_t seqnum;
+    uint32_t mode;
+} PABB_PACK pabb_MsgRequestPairedMacAddress;
+
 ////////////////////////////////////////////////////////////////////////////////
 //  Commands
 

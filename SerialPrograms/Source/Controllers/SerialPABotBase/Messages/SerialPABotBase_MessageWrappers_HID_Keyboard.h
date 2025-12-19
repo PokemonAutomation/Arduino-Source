@@ -1,17 +1,17 @@
-/*  SerialPABotBase Messages - HID Keyboard
+/*  SerialPABotBase Messages - StandardHid: HID Keyboard
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_SerialPABotBase_MessageWrappers_HID_Keyboard_H
-#define PokemonAutomation_SerialPABotBase_MessageWrappers_HID_Keyboard_H
+#ifndef PokemonAutomation_StandardHid_MessageWrappers_HID_Keyboard_H
+#define PokemonAutomation_StandardHid_MessageWrappers_HID_Keyboard_H
 
 #include "Common/SerialPABotBase/SerialPABotBase_Messages_HID_Keyboard.h"
 #include "Controllers/SerialPABotBase/Connection/BotBaseMessage.h"
 
 namespace PokemonAutomation{
-namespace SerialPABotBase{
+namespace StandardHid{
 
 
 

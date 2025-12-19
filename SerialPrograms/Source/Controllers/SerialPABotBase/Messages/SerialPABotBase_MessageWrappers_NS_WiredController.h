@@ -1,25 +1,25 @@
-/*  SerialPABotBase Messages - NS Wired Controller
+/*  SerialPABotBase Messages - NintendoSwitch: Wired Controller
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_SerialPABotBase_MessageWrappers_NS_WiredController_H
-#define PokemonAutomation_SerialPABotBase_MessageWrappers_NS_WiredController_H
+#ifndef PokemonAutomation_SerialPABotBase_MessageWrappers_NintendoSwitch_WiredController_H
+#define PokemonAutomation_SerialPABotBase_MessageWrappers_NintendoSwitch_WiredController_H
 
 #include "Common/SerialPABotBase/SerialPABotBase_Messages_NS_WiredController.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 #include "Controllers/SerialPABotBase/Connection/BotBaseMessage.h"
 
 namespace PokemonAutomation{
-namespace SerialPABotBase{
+namespace NintendoSwitch{
 
 
 
-class MessageType_NS_WiredController_ControllerStateMs : public BotBaseMessageType{
+class MessageType_WiredController_ControllerStateMs : public BotBaseMessageType{
     using Params = pabb_Message_Command_NS_WiredController_State;
 public:
-    MessageType_NS_WiredController_ControllerStateMs()
+    MessageType_WiredController_ControllerStateMs()
         : BotBaseMessageType(
             "PABB_MSG_COMMAND_NS_WIRED_CONTROLLER_STATE",
             PABB_MSG_COMMAND_NS_WIRED_CONTROLLER_STATE,
@@ -56,10 +56,10 @@ public:
         return ret;
     }
 };
-class DeviceRequest_NS_WiredController_ControllerStateMs : public BotBaseRequest{
+class DeviceRequest_WiredController_ControllerStateMs : public BotBaseRequest{
 public:
     pabb_Message_Command_NS_WiredController_State params;
-    DeviceRequest_NS_WiredController_ControllerStateMs(
+    DeviceRequest_WiredController_ControllerStateMs(
         uint16_t milliseconds,
         uint16_t buttons,
         uint8_t dpad_byte,
