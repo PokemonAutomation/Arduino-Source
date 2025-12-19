@@ -104,11 +104,11 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Options/BooleanCheckBoxOption.h
     ../Common/Cpp/Options/BoxFloatOption.cpp
     ../Common/Cpp/Options/BoxFloatOption.h
-    ../Common/Cpp/Options/CheckboxDropdownDatabase.h
-    ../Common/Cpp/Options/CheckboxDropdownOption.tpp
-    ../Common/Cpp/Options/CheckboxDropdownOption.h
     ../Common/Cpp/Options/ButtonOption.cpp
     ../Common/Cpp/Options/ButtonOption.h
+    ../Common/Cpp/Options/CheckboxDropdownDatabase.h
+    ../Common/Cpp/Options/CheckboxDropdownOption.h
+    ../Common/Cpp/Options/CheckboxDropdownOption.tpp
     ../Common/Cpp/Options/ColorOption.cpp
     ../Common/Cpp/Options/ColorOption.h
     ../Common/Cpp/Options/ConfigOption.cpp
@@ -251,8 +251,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/WidgetStackFixedAspectRatio.cpp
     ../Common/Qt/WidgetStackFixedAspectRatio.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_HID_Keyboard.h
-    ../Common/SerialPABotBase/SerialPABotBase_Messages_NS_WiredController.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS1_OemControllers.h
+    ../Common/SerialPABotBase/SerialPABotBase_Messages_NS_WiredController.h
     ../Common/SerialPABotBase/SerialPABotBase_Protocol.h
     ../Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h
     Source/CommonFramework/AudioPipeline/AudioConstants.h
@@ -698,10 +698,10 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_HID_Keyboard.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_HID_Keyboard.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_WiredController.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_WiredController.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_OemControllers.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_OemControllers.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_WiredController.cpp
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_WiredController.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h
@@ -947,12 +947,12 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h
     Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.cpp
     Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.h
-    Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon_from_Keyboard.cpp
-    Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon_from_Keyboard.h
     Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconState.cpp
     Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconState.h
     Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconTable.cpp
     Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconTable.h
+    Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon_from_Keyboard.cpp
+    Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon_from_Keyboard.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.cpp
@@ -965,12 +965,12 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.cpp
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h
-    Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController_from_Keyboard.cpp
-    Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController_from_Keyboard.h
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerState.cpp
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerState.h
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerTable.cpp
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerTable.h
+    Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController_from_Keyboard.cpp
+    Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController_from_Keyboard.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.cpp
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Joycon.cpp
@@ -1676,6 +1676,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShuttleRun.cpp
@@ -1684,8 +1686,6 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneCafe.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h
-    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.cpp
-    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.cpp
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.cpp
@@ -1696,6 +1696,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/Trading/PokemonLZA_SelfBoxTrade.h
     Source/PokemonLZA/Programs/Trading/PokemonLZA_TradeRoutines.cpp
     Source/PokemonLZA/Programs/Trading/PokemonLZA_TradeRoutines.h
+    Source/PokemonLZA/Resources/PokemonLZA_AvailablePokemon.cpp
+    Source/PokemonLZA/Resources/PokemonLZA_AvailablePokemon.h
     Source/PokemonLZA/Resources/PokemonLZA_HyperspaceRewardNames.cpp
     Source/PokemonLZA/Resources/PokemonLZA_HyperspaceRewardNames.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
