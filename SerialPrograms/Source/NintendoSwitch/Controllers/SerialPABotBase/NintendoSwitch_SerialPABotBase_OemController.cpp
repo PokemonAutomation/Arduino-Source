@@ -7,8 +7,9 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_OemControllers.h"
+#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_ControllerMode.h"
+#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Misc.h"
+#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_NS1_OemControllers.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_SerialPABotBase_OemController.h"
 
@@ -43,6 +44,15 @@ SerialPABotBase_OemController::SerialPABotBase_OemController(
 //    cout << "controller_type = " << (int)controller_type << endl;
 
     using namespace SerialPABotBase;
+
+
+    //  Add controller-specific messages.
+    connection.add_message_printer<MessageType_NS1_ReadSpi>();
+    connection.add_message_printer<MessageType_NS1_WriteSpi>();
+    connection.add_message_printer<MessageType_NS1_OemControllerStateButtons>();
+    connection.add_message_printer<MessageType_NS1_OemControllerStateFull>();
+    connection.add_message_printer<MessageType_NS1_OemControllerRumble>();
+
 
     switch (controller_type){
     case ControllerType::NintendoSwitch_WiredProController:

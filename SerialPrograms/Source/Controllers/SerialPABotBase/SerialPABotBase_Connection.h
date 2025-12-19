@@ -13,11 +13,13 @@
 #include <condition_variable>
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "Controllers/SerialPABotBase/Connection/BotBase.h"
+#include "Controllers/SerialPABotBase/Connection/PABotBase.h"
 #include "Controllers/SerialPABotBase/Connection/MessageLogger.h"
 #include "Controllers/ControllerConnection.h"
 
 namespace PokemonAutomation{
     class PABotBase;
+    class BotBaseMessageType;
 namespace SerialPABotBase{
 
 
@@ -30,6 +32,11 @@ public:
     );
     ~SerialPABotBase_Connection();
 
+    template <typename MessageType>
+    void add_message_printer(){
+        m_botbase->add_message_printer(BotBaseMessageType::instance<MessageType>());
+    }
+
 
 public:
     const std::string& device_name() const{
@@ -41,6 +48,8 @@ public:
 
 
 private:
+    void add_message_printers();
+
     void process_queue_size();
     void throw_incompatible_protocol();
     ControllerType process_device(bool set_to_null_controller);

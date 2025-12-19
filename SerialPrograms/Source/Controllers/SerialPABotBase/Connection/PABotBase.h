@@ -41,19 +41,16 @@
 namespace PokemonAutomation{
 
 
-class PABotBase : public BotBaseController, private PABotBaseConnection{
+class PABotBase : public BotBaseController, public PABotBaseConnection{
     static const seqnum_t MAX_SEQNUM_GAP = (seqnum_t)-1 >> 2;
 
 public:
     PABotBase(
         Logger& logger,
         std::unique_ptr<StreamConnection> connection,
-        MessageLogger* message_logger = nullptr,
         std::chrono::milliseconds retransmit_delay = std::chrono::milliseconds(100)
     );
     virtual ~PABotBase();
-
-    using PABotBaseConnection::set_sniffer;
 
     void connect();
     virtual void stop(std::string error_message = "") override;

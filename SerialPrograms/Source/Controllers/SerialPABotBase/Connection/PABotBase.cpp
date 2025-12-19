@@ -9,7 +9,8 @@
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
+#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_StaticRequests.h"
+#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_CommandQueue.h"
 #include "PABotBase.h"
 
 //#include <iostream>
@@ -40,7 +41,6 @@ namespace PokemonAutomation{
 PABotBase::PABotBase(
     Logger& logger,
     std::unique_ptr<StreamConnection> connection,
-    MessageLogger* message_logger,
     std::chrono::milliseconds retransmit_delay
 )
     : PABotBaseConnection(logger, std::move(connection))
@@ -52,8 +52,6 @@ PABotBase::PABotBase(
     , m_state(State::RUNNING)
     , m_error(false)
 {
-    set_sniffer(message_logger);
-
     //  We must initialize this last because it will trigger the lifetime
     //  sanitizer if it beats it to construction.
     m_retransmit_thread = Thread([this]{

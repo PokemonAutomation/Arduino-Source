@@ -10,8 +10,11 @@
 #include <stdint.h>
 #include <cstring>
 #include <string>
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
+#include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 
 namespace PokemonAutomation{
 
@@ -68,6 +71,65 @@ public:
 private:
     bool m_is_command;
 };
+
+
+
+
+
+class BotBaseMessageType{
+public:
+    template <typename ChildType>
+    static const BotBaseMessageType& instance(){
+        static const ChildType type;
+        return type;
+    }
+
+    BotBaseMessageType(const char* name, uint8_t type, uint8_t body_size)
+        : m_name(name)
+        , m_type(type)
+        , m_size(body_size)
+    {}
+
+    uint8_t type() const{
+        return m_type;
+    }
+
+    friend bool operator<(const BotBaseMessageType& x, const BotBaseMessageType& y){
+        return x.m_type < y.m_type;
+    }
+
+
+public:
+    virtual bool should_print(const std::string& body) const{
+        if (GlobalSettings::instance().LOG_EVERYTHING){
+            return true;
+        }
+        if (PABB_MSG_IS_ACK(m_type)){
+            return false;
+        }
+        return true;
+    }
+    virtual bool is_valid(const std::string& body) const{
+        return body.size() == m_size;
+    }
+    virtual std::string tostr(const std::string& body) const{
+        std::string ret;
+        ret += "(0x" + tostr_hex(m_type) + ") ";
+        ret += m_name;
+        if (!is_valid(body)){
+            ret += ": (Invalid: Size = " + std::to_string(body.size()) + ")";
+        }
+        return ret;
+    }
+
+
+private:
+    const char* m_name;
+    const uint8_t m_type;
+    const uint8_t m_size;   //  Excluding header and CRC.
+};
+
+
 
 
 

@@ -4,9 +4,11 @@
  *
  */
 
+#include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_HID_Keyboard.h"
+#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_ControllerMode.h"
+#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Misc.h"
+#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_HID_Keyboard.h"
 #include "StandardHid_Keyboard_SerialPABotBase.h"
 
 //#include <iostream>
@@ -31,6 +33,9 @@ SerialPABotBase_Keyboard::SerialPABotBase_Keyboard(
     , m_serial(connection.botbase())
 {
     using namespace SerialPABotBase;
+
+    //  Add controller-specific messages.
+    connection.add_message_printer<MessageType_HID_Keyboard_StateMs>();
 
     switch (reset_mode){
     case PokemonAutomation::ControllerResetMode::DO_NOT_RESET:

@@ -4,7 +4,6 @@
  *
  */
 
-#include "Controllers/SerialPABotBase/Connection/MessageConverter.h"
 #include "NintendoSwitch_SerialPABotBase_ProController.h"
 
 //#include <iostream>

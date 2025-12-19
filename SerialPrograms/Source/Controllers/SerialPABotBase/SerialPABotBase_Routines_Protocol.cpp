@@ -4,6 +4,8 @@
  *
  */
 
+#include "Messages/SerialPABotBase_MessageWrappers_BaseProtocol_StaticRequests.h"
+#include "Messages/SerialPABotBase_MessageWrappers_BaseProtocol_ControllerMode.h"
 #include "SerialPABotBase_Routines_Protocol.h"
 
 namespace PokemonAutomation{

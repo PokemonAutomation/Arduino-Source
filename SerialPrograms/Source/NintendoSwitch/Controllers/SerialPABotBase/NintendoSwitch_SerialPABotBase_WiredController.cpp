@@ -7,8 +7,9 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_WiredController.h"
+#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_ControllerMode.h"
+#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Misc.h"
+#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_NS_WiredController.h"
 #include "NintendoSwitch_SerialPABotBase_WiredController.h"
 
 //#include <iostream>
@@ -37,6 +38,11 @@ SerialPABotBase_WiredController::SerialPABotBase_WiredController(
     )
 {
     using namespace SerialPABotBase;
+
+
+    //  Add controller-specific messages.
+    connection.add_message_printer<MessageType_NS_WiredController_ControllerStateMs>();
+
 
     switch (reset_mode){
     case PokemonAutomation::ControllerResetMode::DO_NOT_RESET:
@@ -170,7 +176,7 @@ void SerialPABotBase_WiredController::execute_state(
     while (time_left > Milliseconds::zero()){
         Milliseconds current = std::min(time_left, 65535ms);
         m_serial->issue_request(
-            SerialPABotBase::DeviceRequest_NS2_WiredController_ControllerStateMs(
+            SerialPABotBase::DeviceRequest_NS_WiredController_ControllerStateMs(
                 (uint16_t)current.count(),
                 buttons,
                 dpad_byte,

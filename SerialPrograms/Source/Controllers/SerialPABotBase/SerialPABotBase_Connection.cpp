@@ -14,7 +14,13 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/ControllerTypeStrings.h"
-#include "Controllers/SerialPABotBase/Connection/PABotBase.h"
+#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Errors.h"
+#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Acks.h"
+#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Info.h"
+#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_StaticRequests.h"
+#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_ControllerMode.h"
+#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_CommandQueue.h"
+#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Misc.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
 #include "SerialPABotBase.h"
 #include "SerialPABotBase_Connection.h"
@@ -66,7 +72,8 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
     try{
         set_status_line0("Connecting...", COLOR_DARKGREEN);
         std::unique_ptr<SerialConnection> connection(new SerialConnection(info.systemLocation().toStdString(), PABB_BAUD_RATE));
-        m_botbase.reset(new PABotBase(m_logger, std::move(connection), nullptr));
+        m_botbase.reset(new PABotBase(m_logger, std::move(connection)));
+        add_message_printers();
     }catch (const ConnectionException& e){
         error = e.message();
     }catch (const SerialProtocolException& e){
@@ -123,7 +130,57 @@ ControllerType SerialPABotBase_Connection::refresh_controller_type(){
 }
 
 
+void SerialPABotBase_Connection::add_message_printers(){
+    //  Errors
+    add_message_printer<MessageType_ErrorReady>();
+    add_message_printer<MessageType_InvalidMessage>();
+    add_message_printer<MessageType_ChecksumMismatch>();
+    add_message_printer<MessageType_InvalidType>();
+    add_message_printer<MessageType_InvalidRequest>();
+    add_message_printer<MessageType_MissedRequest>();
+    add_message_printer<MessageType_CommandDropped>();
+    add_message_printer<MessageType_ErrorWarning>();
+    add_message_printer<MessageType_ErrorDisconnected>();
 
+    //  Framework Acks
+    add_message_printer<MessageType_AckCommand>();
+    add_message_printer<MessageType_AckRequest>();
+    add_message_printer<MessageType_AckRequest_i8>();
+    add_message_printer<MessageType_AckRequest_i16>();
+    add_message_printer<MessageType_AckRequest_i32>();
+    add_message_printer<MessageType_AckRequest_Data>();
+
+    //  Custom Info
+    add_message_printer<MessageType_Info_i32>();
+    add_message_printer<MessageType_Info_Data>();
+    add_message_printer<MessageType_Info_String>();
+    add_message_printer<MessageType_Info_Label_i32>();
+    add_message_printer<MessageType_Info_Label_h32>();
+
+    //  Static Requests
+    add_message_printer<MessageType_SeqnumReset>();
+    add_message_printer<MessageType_ProtocolVersion>();
+    add_message_printer<MessageType_ProgramVersion>();
+    add_message_printer<MessageType_ProgramID>();
+    add_message_printer<MessageType_ProgramName>();
+    add_message_printer<MessageType_ControllerList>();
+    add_message_printer<MessageType_QueueSize>();
+
+    //  Mode Requests
+    add_message_printer<MessageType_ReadControllerMode>();
+    add_message_printer<MessageType_ChangeControllerMode>();
+    add_message_printer<MessageType_ResetToController>();
+
+    //  Command Queue Requests
+    add_message_printer<MessageType_CommandFinished>();
+    add_message_printer<MessageType_RequestStop>();
+    add_message_printer<MessageType_NextCommandInterrupt>();
+
+    //  Other Requests
+    add_message_printer<MessageType_SystemClock>();
+    add_message_printer<MessageType_ControllerStatus>();
+    add_message_printer<MessageType_ReadMacAddress>();
+}
 void SerialPABotBase_Connection::process_queue_size(){
     m_logger.log("Requesting queue size...");
     uint8_t queue_size = device_queue_size(*m_botbase);
@@ -232,8 +289,6 @@ ControllerType SerialPABotBase_Connection::process_device(bool set_to_null_contr
 
 void SerialPABotBase_Connection::thread_body(bool set_to_null_controller){
     using namespace PokemonAutomation;
-
-    m_botbase->set_sniffer(&m_logger);
 
     //  Connect
     {
