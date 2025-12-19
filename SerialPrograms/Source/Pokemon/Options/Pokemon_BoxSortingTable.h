@@ -17,7 +17,7 @@ namespace Pokemon{
 
 enum class SortingRuleType
 {
-    NationalDexNo,
+    DexNo,
     Shiny,
     Gigantamax,
     Alpha,
@@ -27,7 +27,7 @@ enum class SortingRuleType
 
 struct SortingRule
 {
-    SortingRuleType sort_type = SortingRuleType::NationalDexNo;
+    SortingRuleType sort_type = SortingRuleType::DexNo;
     bool reverse = false;
 };
 

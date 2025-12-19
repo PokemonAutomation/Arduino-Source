@@ -1,4 +1,4 @@
-/*  Box Reorder National Dex
+/*  Home Box Sorter
  *
  *  From: https://github.com/PokemonAutomation/
  *

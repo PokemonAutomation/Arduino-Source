@@ -22,8 +22,9 @@ namespace Pokemon{
 struct CollectedPokemonInfo{
     const std::vector<SortingRule>* preferences;
 
-    // When adding any new member here, do not forget to modify the operators below (ctrl-f "new struct members")
-    uint16_t national_dex_number = 0;
+    // When adding any new member here, do not forget to modify the functions below (ctrl-f "new struct members")
+    uint16_t dex_number = 0;
+    std::string name_slug = "";
     bool shiny = false;
     bool gmax = false;
     bool alpha = false;
@@ -39,14 +40,14 @@ bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs
 // For two pokemon, check each preference rule. If we cannot determine the order based on the first rule, go
 // to the second rule, and so on.
 // Available rules:
-// - National dex number: smaller ID should be at front.
+// - Dex number: smaller ID should be at front.
 // - Shiny: shiny pokemon should be at front.
 // - Gigantamax: Gigantamax pokemon should be at front.
 // - Alpha: Alpha pokemon should be at front.
 // - Ball slug: pokemon with a ball slug that's smaller in the alphabetical order should be at front.
 // - Gender: Male should be at front, then comes female, and genderless is last
 // Each rule type also has a "reverse" which if true, reverses above ordering for that rule type.
-// If user does not give a preference ruleset, sort by national dex number.
+// If user does not give a preference ruleset, sort by dex number.
 bool operator<(const std::optional<CollectedPokemonInfo>& lhs, const std::optional<CollectedPokemonInfo>& rhs);
 
 // Print pokemon info into ostream
@@ -54,6 +55,9 @@ std::ostream& operator<<(std::ostream& os, const std::optional<CollectedPokemonI
 
 // Create short info of a pokemon for overlay log display
 std::string create_overlay_info(const CollectedPokemonInfo& pokemon);
+
+// save boxes of pokemon info to a JSON file
+void save_boxes_data_to_json(const std::vector<std::optional<CollectedPokemonInfo>>& boxes_data, const std::string& json_path);
 
 
 }

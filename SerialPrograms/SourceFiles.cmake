@@ -1146,6 +1146,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.h
+    Source/Pokemon/Options/Pokemon_BoxSortingTable.cpp
+    Source/Pokemon/Options/Pokemon_BoxSortingTable.h
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h
     Source/Pokemon/Options/Pokemon_HomeSpriteSelectOption.cpp
     Source/Pokemon/Options/Pokemon_HomeSpriteSelectOption.h
@@ -1155,10 +1157,10 @@ file(GLOB LIBRARY_SOURCES
     Source/Pokemon/Options/Pokemon_NameSelectOption.h
     Source/Pokemon/Options/Pokemon_NameSelectWidget.cpp
     Source/Pokemon/Options/Pokemon_NameSelectWidget.h
-    Source/Pokemon/Options/Pokemon_BoxSortingTable.cpp
-    Source/Pokemon/Options/Pokemon_BoxSortingTable.h
     Source/Pokemon/Options/Pokemon_StatsHuntFilter.cpp
     Source/Pokemon/Options/Pokemon_StatsHuntFilter.h
+    Source/Pokemon/Pokemon_BoxCursor.cpp
+    Source/Pokemon/Pokemon_BoxCursor.h
     Source/Pokemon/Pokemon_CollectedPokemonInfo.cpp
     Source/Pokemon/Pokemon_CollectedPokemonInfo.h
     Source/Pokemon/Pokemon_DataTypes.h

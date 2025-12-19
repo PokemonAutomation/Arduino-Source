@@ -10,9 +10,9 @@ namespace PokemonAutomation{
 namespace Pokemon{
 
 
-const EnumDropdownDatabase<SortingRuleType>& BallType_Database(){
+const EnumDropdownDatabase<SortingRuleType>& SortingRuleType_Database(){
     static const EnumDropdownDatabase<SortingRuleType> database({
-        {SortingRuleType::NationalDexNo,     "dex",     "National Dex Number"},
+        {SortingRuleType::DexNo,     "dex",     "Dex Number"},
         {SortingRuleType::Shiny,    "shiny",    "Shiny"},
         {SortingRuleType::Gigantamax,    "gigantamax",    "Gigantamax"},
         {SortingRuleType::Alpha, "alpha", "Alpha"},
@@ -26,7 +26,7 @@ const EnumDropdownDatabase<SortingRuleType>& BallType_Database(){
 
 BoxSortingRow::BoxSortingRow(EditableTableOption& parent_table)
     : EditableTableRow(parent_table)
-    , sort_type(BallType_Database(), LockMode::LOCK_WHILE_RUNNING, SortingRuleType::NationalDexNo)
+    , sort_type(SortingRuleType_Database(), LockMode::LOCK_WHILE_RUNNING, SortingRuleType::DexNo)
     , reverse(LockMode::LOCK_WHILE_RUNNING, false)
 {
     PA_ADD_OPTION(sort_type);

@@ -5,7 +5,11 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "Pokemon/Pokemon_BoxCursor.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon_CollectedPokemonInfo.h"
@@ -16,7 +20,8 @@ namespace Pokemon{
 
 bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs){
     // NOTE edit when adding new struct members
-    return lhs.national_dex_number == rhs.national_dex_number &&
+    return lhs.dex_number == rhs.dex_number &&
+           lhs.name_slug == rhs.name_slug &&
            lhs.shiny == rhs.shiny &&
            lhs.gmax == rhs.gmax &&
            lhs.alpha == rhs.alpha &&
@@ -25,19 +30,7 @@ bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs
            lhs.ot_id == rhs.ot_id;
 }
 
-// Sort two pokemon slot. "Smaller" pokemon is placed closer to front.
-// If a slot is empty, it is always larger than non-empty slot so all the empty slots are at end after sorting.
-// For two pokemon, check each preference rule. If we cannot determine the order based on the first rule, go
-// to the second rule, and so on.
-// Available rules:
-// - National dex number: smaller ID should be at front.
-// - Shiny: shiny pokemon should be at front.
-// - Gigantamax: Gigantamax pokemon should be at front.
-// - Alpha: Alpha pokemon should be at front.
-// - Ball slug: pokemon with a ball slug that's smaller in the alphabetical order should be at front.
-// - Gender: Male should be at front, then comes female, and genderless is last
-// Each rule type also has a "reverse" which if true, reverses above ordering for that rule type.
-// If user does not give a preference ruleset, sort by national dex number.
+
 bool operator<(const std::optional<CollectedPokemonInfo>& lhs, const std::optional<CollectedPokemonInfo>& rhs){
     if (!lhs.has_value()){ // lhs is empty
         return false;
@@ -49,10 +42,10 @@ bool operator<(const std::optional<CollectedPokemonInfo>& lhs, const std::option
     for (const SortingRule& preference : *lhs->preferences){
         switch(preference.sort_type){
         // NOTE edit when adding new struct members
-        case SortingRuleType::NationalDexNo:
-            if (lhs->national_dex_number != rhs->national_dex_number){
+        case SortingRuleType::DexNo:
+            if (lhs->dex_number != rhs->dex_number){
                 // we use (boolean != reverse) to apply the reverse effect
-                return (lhs->national_dex_number < rhs->national_dex_number) != preference.reverse;
+                return (lhs->dex_number < rhs->dex_number) != preference.reverse;
             }
             break;
         case SortingRuleType::Shiny:
@@ -85,8 +78,8 @@ bool operator<(const std::optional<CollectedPokemonInfo>& lhs, const std::option
         } // end switch
     } // end for preference
 
-    // Default to sort by national dex number
-    return lhs->national_dex_number < rhs->national_dex_number;
+    // Default to sort by dex number
+    return lhs->dex_number < rhs->dex_number;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::optional<CollectedPokemonInfo>& pokemon)
@@ -94,11 +87,11 @@ std::ostream& operator<<(std::ostream& os, const std::optional<CollectedPokemonI
     if (pokemon.has_value()){
         // NOTE edit when adding new struct members
         os << "(";
-        os << "national_dex_number:" << pokemon->national_dex_number << " ";
+        os << "dex_id: " << pokemon->dex_number << " " << pokemon->name_slug << " ";
         os << "shiny:" << (pokemon->shiny ? "true" : "false") << " ";
         os << "gmax:" << (pokemon->gmax ? "true" : "false") << " ";
         os << "alpha:" << (pokemon->alpha ? "true" : "false") << " ";
-        os << "ball_slug:" << pokemon->ball_slug << " ";
+        os << "ball:" << pokemon->ball_slug << " ";
         os << "gender:" << gender_to_string(pokemon->gender) << " ";
         os << "ot_id:" << pokemon->ot_id << " ";
         os << ")";
@@ -109,9 +102,10 @@ std::ostream& operator<<(std::ostream& os, const std::optional<CollectedPokemonI
 }
 
 std::string create_overlay_info(const CollectedPokemonInfo& pokemon){
-    const std::string& species_slug = NATIONAL_DEX_SLUGS()[pokemon.national_dex_number-1];
-    const std::string& display_name = get_pokemon_name(species_slug).display_name();
-    std::string overlay_log = display_name;
+    const std::string& display_name = get_pokemon_name(pokemon.name_slug).display_name();
+    char dex_str[5];
+    snprintf(dex_str, sizeof(dex_str), "%04d", pokemon.dex_number);
+    std::string overlay_log = std::string(dex_str) + " " + display_name;
     if(pokemon.gender == StatsHuntGenderFilter::Male){
         overlay_log += " " + UNICODE_MALE;
     } else if (pokemon.gender == StatsHuntGenderFilter::Female){
@@ -127,6 +121,33 @@ std::string create_overlay_info(const CollectedPokemonInfo& pokemon){
         overlay_log += " " + UNICODE_ALPHA;
     }
     return overlay_log;
+}
+
+
+void save_boxes_data_to_json(const std::vector<std::optional<CollectedPokemonInfo>>& boxes_data, const std::string& json_path){
+    JsonArray pokemon_data;
+    for (size_t slot_idx = 0; slot_idx < boxes_data.size(); slot_idx++){
+        BoxCursor cursor(slot_idx);
+        JsonObject pokemon;
+        pokemon["index"] = slot_idx;
+        pokemon["box"] = cursor.box;
+        pokemon["row"] =  cursor.row;
+        pokemon["column"] =  cursor.column;
+        const auto& current_pokemon = boxes_data[slot_idx];
+        if (current_pokemon != std::nullopt){
+            // NOTE edit when adding new struct members
+            pokemon["name"] = current_pokemon->name_slug;
+            pokemon["dex"] = current_pokemon->dex_number;
+            pokemon["shiny"] = current_pokemon->shiny;
+            pokemon["gmax"] = current_pokemon->gmax;
+            pokemon["alpha"] = current_pokemon->alpha;
+            pokemon["ball"] = current_pokemon->ball_slug;
+            pokemon["gender"] = gender_to_string(current_pokemon->gender);
+            pokemon["ot_id"] = current_pokemon->ot_id;
+        }
+        pokemon_data.push_back(std::move(pokemon));
+    }
+    pokemon_data.dump(json_path);
 }
 
 
