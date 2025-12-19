@@ -82,7 +82,8 @@ BoxSorter::BoxSorter()
         1, 1, MAX_BOXES
         )
     , SORT_TABLE(
-          "<b>Sort Order Rules:</b><br>Sort order rules will be applied top to bottom."
+          "<b>Sort Order Rules:</b><br>Sort order rules will be applied top to bottom.",
+          {SortingRuleType::DexNo, SortingRuleType::Shiny, SortingRuleType::Alpha}
           )
     , OUTPUT_FILE(
           false,

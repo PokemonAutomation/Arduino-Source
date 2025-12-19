@@ -173,7 +173,7 @@ std::string read_number_waterfill_no_normalization(
     std::string ocr_text;
     for (const auto& item : map){
         const WaterfillObject& object = item.second;
-        ImageRGB32 cropped = extract_box_reference(filtered, object).copy();            
+        ImageRGB32 cropped = extract_box_reference(filtered, object).copy();
         PackedBinaryMatrix tmp(object.packed_matrix());
         filter_by_mask(tmp, cropped, Color(0xffffffff), true);
 
@@ -190,11 +190,9 @@ std::string read_number_waterfill_no_normalization(
         // std::cout << ocr[0] << std::endl;
         if (!ocr.empty()){
             ocr_text += ocr[0];
-        }else{
-            if (check_empty_string){
-                logger.log("OCR fail: one of characters read as empty string.", COLOR_RED);
-                return "";
-            }
+        }else if (check_empty_string){
+            logger.log("OCR fail: one of characters read as empty string.", COLOR_RED);
+            return "";
         }
     }
 
@@ -228,13 +226,14 @@ int read_number_waterfill_multifilter(
 
             uint32_t rgb32_min = filter.first;
             uint32_t rgb32_max = filter.second;
+            bool check_empty_string = false;
             std::string ocr_text = read_number_waterfill_no_normalization(
                 logger,
                 image,
                 rgb32_min, rgb32_max,
                 text_inside_range,
                 width_max,
-                true
+                check_empty_string
             );
 
             std::string normalized = run_number_normalization(ocr_text);

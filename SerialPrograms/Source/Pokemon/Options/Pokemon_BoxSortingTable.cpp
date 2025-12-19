@@ -26,7 +26,11 @@ const EnumDropdownDatabase<SortingRuleType>& SortingRuleType_Database(){
 
 BoxSortingRow::BoxSortingRow(EditableTableOption& parent_table)
     : EditableTableRow(parent_table)
-    , sort_type(SortingRuleType_Database(), LockMode::LOCK_WHILE_RUNNING, SortingRuleType::DexNo)
+    , sort_type(
+        static_cast<BoxSortingTable&>(parent_table).database(),
+        LockMode::LOCK_WHILE_RUNNING,
+        SortingRuleType::DexNo
+    )
     , reverse(LockMode::LOCK_WHILE_RUNNING, false)
 {
     PA_ADD_OPTION(sort_type);
@@ -41,7 +45,30 @@ std::unique_ptr<EditableTableRow> BoxSortingRow::clone() const{
 
 
 BoxSortingTable::BoxSortingTable(std::string label)
-    : EditableTableOption_t<BoxSortingRow>(
+    : BoxSortingTableDatabaseHelper(nullptr)
+    , EditableTableOption_t<BoxSortingRow>(
+        std::move(label),
+        LockMode::LOCK_WHILE_RUNNING,
+        make_defaults()
+    )
+{}
+
+BoxSortingTable::BoxSortingTable(std::string label, const std::vector<SortingRuleType>& allowed_rules)
+    : BoxSortingTableDatabaseHelper([&allowed_rules]() {
+        // Build custom database from allowed rules
+        const EnumDropdownDatabase<SortingRuleType>& full_db = SortingRuleType_Database();
+        auto custom_db = std::make_shared<EnumDropdownDatabase<SortingRuleType>>();
+
+        for (SortingRuleType rule : allowed_rules) {
+            const EnumEntry* entry = full_db.find(rule);
+            if (entry != nullptr) {
+                custom_db->add(rule, entry->slug, entry->display, entry->enabled);
+            }
+        }
+
+        return custom_db;
+    }())
+    , EditableTableOption_t<BoxSortingRow>(
         std::move(label),
         LockMode::LOCK_WHILE_RUNNING,
         make_defaults()
@@ -75,6 +102,13 @@ std::vector<std::unique_ptr<EditableTableRow>> BoxSortingTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
     ret.emplace_back(std::make_unique<BoxSortingRow>(*this));
     return ret;
+}
+
+const EnumDropdownDatabase<SortingRuleType>& BoxSortingTable::database() const{
+    if (m_database) {
+        return *m_database;
+    }
+    return SortingRuleType_Database();
 }
 
 
