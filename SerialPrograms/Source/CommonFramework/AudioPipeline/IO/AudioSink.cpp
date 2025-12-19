@@ -39,7 +39,7 @@ float convertAudioVolumeFromSlider(double volume){
 
 
 
-class AudioOutputDevice : public AudioFloatToStream, private StreamListener{
+class AudioOutputDevice : public AudioFloatToStream, private ObjectStreamListener{
 public:
     AudioOutputDevice(
         Logger& logger,
@@ -48,7 +48,7 @@ public:
         double volume
     )
         : AudioFloatToStream(sample_format, samples_per_frame)
-        , StreamListener(samples_per_frame * sample_size(sample_format))
+        , ObjectStreamListener(samples_per_frame * sample_size(sample_format))
         , m_logger(logger)
         , m_sink(device, format)
     {

@@ -13,12 +13,12 @@
 namespace PokemonAutomation{
 
 
-class StreamListener{
+class ObjectStreamListener{
 public:
-    StreamListener(size_t p_object_size)
+    ObjectStreamListener(size_t p_object_size)
         : object_size(p_object_size)
     {}
-    virtual ~StreamListener() = default;
+    virtual ~ObjectStreamListener() = default;
     virtual void on_objects(const void* data, size_t objects) = 0;
 
     const size_t object_size;
@@ -28,8 +28,8 @@ public:
 
 class StreamConverter{
 public:
-    void add_listener(StreamListener& listener);
-    void remove_listener(StreamListener& listener);
+    void add_listener(ObjectStreamListener& listener);
+    void remove_listener(ObjectStreamListener& listener);
 
 public:
     StreamConverter(
@@ -51,7 +51,7 @@ private:
     size_t m_buffer_capacity;
     AlignedVector<char> m_buffer;
 
-    std::set<StreamListener*> m_listeners;
+    std::set<ObjectStreamListener*> m_listeners;
 };
 
 
@@ -60,8 +60,8 @@ private:
 //  alignment, convert it to a stream of objects B.
 class MisalignedStreamConverter{
 public:
-    void add_listener(StreamListener& listener);
-    void remove_listener(StreamListener& listener);
+    void add_listener(ObjectStreamListener& listener);
+    void remove_listener(ObjectStreamListener& listener);
 
 public:
     MisalignedStreamConverter(
@@ -86,7 +86,7 @@ private:
     size_t m_buffer_capacity;
     AlignedVector<char> m_buffer;
 
-    std::set<StreamListener*> m_listeners;
+    std::set<ObjectStreamListener*> m_listeners;
 };
 
 

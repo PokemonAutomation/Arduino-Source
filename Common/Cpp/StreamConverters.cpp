@@ -27,13 +27,13 @@ StreamConverter::StreamConverter(
     , m_buffer(object_size_out * buffer_capacity)
 {}
 StreamConverter::~StreamConverter(){}
-void StreamConverter::add_listener(StreamListener& listener){
+void StreamConverter::add_listener(ObjectStreamListener& listener){
     if (listener.object_size != m_object_size_out){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching object size.");
     }
     m_listeners.insert(&listener);
 }
-void StreamConverter::remove_listener(StreamListener& listener){
+void StreamConverter::remove_listener(ObjectStreamListener& listener){
     m_listeners.erase(&listener);
 }
 void StreamConverter::push_objects(const void* data, size_t objects){
@@ -42,7 +42,7 @@ void StreamConverter::push_objects(const void* data, size_t objects){
         convert(m_buffer.data(), data, block);
         data = (char*)data + block * m_object_size_in;
         objects -= block;
-        for (StreamListener* listener : m_listeners){
+        for (ObjectStreamListener* listener : m_listeners){
             listener->on_objects(m_buffer.data(), block);
         }
     }
@@ -64,13 +64,13 @@ MisalignedStreamConverter::MisalignedStreamConverter(
     , m_buffer(object_size_out * buffer_capacity)
 {}
 MisalignedStreamConverter::~MisalignedStreamConverter(){}
-void MisalignedStreamConverter::add_listener(StreamListener& listener){
+void MisalignedStreamConverter::add_listener(ObjectStreamListener& listener){
     if (listener.object_size != m_object_size_out){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching object size.");
     }
     m_listeners.insert(&listener);
 }
-void MisalignedStreamConverter::remove_listener(StreamListener& listener){
+void MisalignedStreamConverter::remove_listener(ObjectStreamListener& listener){
     m_listeners.erase(&listener);
 }
 void MisalignedStreamConverter::push_bytes(const void* data, size_t bytes){
@@ -108,7 +108,7 @@ void MisalignedStreamConverter::push_bytes(const void* data, size_t bytes){
         bytes -= block * m_object_size_in;
         stored += block;
         objects -= block;
-        for (StreamListener* listener : m_listeners){
+        for (ObjectStreamListener* listener : m_listeners){
             listener->on_objects(m_buffer.data(), stored);
         }
         stored = 0;

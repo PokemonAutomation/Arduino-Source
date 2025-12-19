@@ -29,7 +29,7 @@ struct AudioFloatStreamListener{
 
 
 //  Convert a stream of raw audio and output to aligned frames of float samples.
-class AudioStreamToFloat : private MisalignedStreamConverter, private StreamListener{
+class AudioStreamToFloat : private MisalignedStreamConverter, private ObjectStreamListener{
 public:
     void add_listener(AudioFloatStreamListener& listener);
     void remove_listener(AudioFloatStreamListener& listener);
@@ -66,8 +66,8 @@ private:
 //  Convert a stream of float samples to raw audio.
 class AudioFloatToStream : public AudioFloatStreamListener{
 public:
-    void add_listener(StreamListener& listener);
-    void remove_listener(StreamListener& listener);
+    void add_listener(ObjectStreamListener& listener);
+    void remove_listener(ObjectStreamListener& listener);
 
 public:
     AudioFloatToStream(AudioSampleFormat output_format, size_t samples_per_frame);
@@ -81,7 +81,7 @@ private:
     size_t m_frame_size;
     size_t m_buffer_size;
     AlignedVector<char> m_buffer;
-    ListenerSet<StreamListener> m_listeners;
+    ListenerSet<ObjectStreamListener> m_listeners;
 
     LifetimeSanitizer m_sanitizer;
 };
