@@ -18,8 +18,6 @@
  
  class ImageViewRGB32;
  
- 
- int test_pokemonZLA_NormalDialogBoxDetector(const ImageViewRGB32& image, bool target);
 
  int test_pokemonLZA_FlatWhiteDialogDetector(const ImageViewRGB32& image, bool target);
 

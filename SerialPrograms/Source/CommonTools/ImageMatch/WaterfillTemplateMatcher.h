@@ -52,8 +52,8 @@ public:
     //  before computing RMSD.
     //  The part of the image template where alpha is 0 is not used to compare with the corresponding part in the input image.
     //  In case the image is invalid, return a large value.
-    //  It also calls the virtual function `check_image()` on the image.
-    //  If the function returns false, then return a large value. 
+    //  It also calls the virtual function `check_image(input_resolution, image)` on the image, where `input_resolution` is
+    //  the full screen resolution where the image is from. If the function returns false, then return a large value. 
     double rmsd(Resolution input_resolution, const ImageViewRGB32& image) const;
 
     //  Compute RMSD of the object on the image against the template.
@@ -86,6 +86,12 @@ public:
     const ImageRGB32& image_template() const { return m_matcher->image_template(); }
 
 protected:
+    // This function is called inside each rmsd...() function before the actual RMSD computation.
+    // Derived classes can override this function to offer additional checks before computing RMSD.
+    // rmsd...() functions will proceed to RMSD computation if this function returns true. If false
+    // returns a large value.
+    // input_resolution: resolution of the full screen where the input image is from. This is useful for checks on
+    // input image pixel count or minimum size.
     virtual bool check_image(Resolution input_resolution, const ImageViewRGB32& image) const{ return true; };
     bool check_aspect_ratio(size_t candidate_width, size_t candidate_height) const;
     bool check_area_ratio(double candidate_area_ratio) const;
