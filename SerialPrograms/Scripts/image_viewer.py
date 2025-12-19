@@ -23,6 +23,7 @@ You can draw multiple boxes on the screen.
 """
 
 
+import argparse
 import cv2
 import numpy as np
 
@@ -60,7 +61,7 @@ class ImageViewer:
 		if x >= 0 and x < self.width and y >= 0 and y < self.height:
 			self.buffer[y, x] = self._solid_color(color)
 
-	def _render(self):
+	def update_buffer(self) -> None:
 		self.buffer = self.image.copy()
 		if self.selected_pixel[0] >= 0 and self.selected_pixel[1] >= 0:
 			p = self.selected_pixel
@@ -83,6 +84,8 @@ class ImageViewer:
 			color = (0, 0, 255) if i == self.cur_rect_index else (255, 0, 0)
 			self.buffer = cv2.rectangle(self.buffer, (rect[0], rect[1]), (rect[2], rect[3]), color, width)
 
+	def _render(self) -> None:
+		self.update_buffer();
 		cv2.imshow(self.window_name, self.buffer)
 		# self.fullscreen = False
 
@@ -190,7 +193,6 @@ class ImageViewer:
 			self._render()
 
 	def run(self):
-		
 		cv2.imshow(self.window_name, self.buffer)
 		cv2.setWindowProperty(self.window_name, cv2.WND_PROP_TOPMOST, 1)
 		cv2.setMouseCallback(self.window_name, self._mouse_callback)
@@ -243,18 +245,89 @@ class ImageViewer:
 				print(f"Pressed key {key}")
 			self._render()
 
-if __name__ == '__main__':
-	import sys
-	assert len(sys.argv) == 2
 
-	filename = sys.argv[1]
+def parse_box(box_str: str):
+	"""
+	Parse a box string in the format "start_x,start_y,width,height".
+	All values should be floats between 0.0 and 1.0 (inclusive).
+	Returns a tuple of (start_x, start_y, width, height).
+	"""
+	try:
+		parts = box_str.split(',')
+		if len(parts) != 4:
+			raise ValueError(f"Box must have exactly 4 values, got {len(parts)}")
+
+		values = [float(v) for v in parts]
+		for i, v in enumerate(values):
+			if not (0.0 <= v <= 1.0):
+				raise ValueError(f"Value at position {i} ({v}) is not between 0.0 and 1.0")
+
+		return tuple(values)
+	except ValueError as e:
+		raise argparse.ArgumentTypeError(f"Invalid box format '{box_str}': {e}")
+
+
+if __name__ == '__main__':
+	parser = argparse.ArgumentParser(
+		description='Interactive image viewer with pixel inspection and box drawing capabilities.',
+		epilog="""
+Controls:
+  Left click: Select pixel and show info
+  Left drag: Draw a box
+  Right click: Select existing box
+  w/s/a/d: Move selected pixel
+  i: Print info for all boxes
+  Backspace/Delete: Delete selected box (or last box if none selected)
+  ESC: Exit
+
+Box format:
+  Each box is specified as "start_x,start_y,width,height" where all values
+  are floats between 0.0 and 1.0 (inclusive), representing normalized coordinates.
+		""",
+		formatter_class=argparse.RawDescriptionHelpFormatter
+	)
+
+	parser.add_argument(
+		'image',
+		help='Path to the image file to view'
+	)
+
+	parser.add_argument(
+		'--box',
+		action='append',
+		type=parse_box,
+		metavar='START_X,START_Y,WIDTH,HEIGHT',
+		help='Add a box to render on the image. Format: "start_x,start_y,width,height" '
+		     'where each value is a float between 0.0 and 1.0. Can be specified multiple times.'
+	)
+
+	args = parser.parse_args()
 
 	# bgr or bgra channel order
-	image = cv2.imread(filename, cv2.IMREAD_UNCHANGED)
-	assert image is not None
+	image = cv2.imread(args.image, cv2.IMREAD_UNCHANGED)
+	if image is None:
+		parser.error(f"Could not load image from '{args.image}'")
 
 	height = image.shape[0]
 	width = image.shape[1]
-	print(f"Load image from {filename}, size: {width} x {height}")
+	print(f"Load image from {args.image}, size: {width} x {height}")
+
 	viewer = ImageViewer(image)
+
+	# Add boxes from command line arguments
+	if args.box:
+		for box in args.box:
+			start_x, start_y, box_width, box_height = box
+			# Convert normalized coordinates to absolute pixel coordinates
+			abs_start_x = int(start_x * width)
+			abs_start_y = int(start_y * height)
+			abs_end_x = int((start_x + box_width) * width)
+			abs_end_y = int((start_y + box_height) * height)
+
+			# Add to viewer's rect list in the format [start_x, start_y, end_x, end_y]
+			viewer.rects.append([abs_start_x, abs_start_y, abs_end_x, abs_end_y])
+			print(f"Added box: ({start_x:.3f}, {start_y:.3f}, {box_width:.3f}, {box_height:.3f}) -> "
+			      f"pixels ({abs_start_x}, {abs_start_y}, {abs_end_x}, {abs_end_y})")
+		viewer.update_buffer()
+
 	viewer.run()

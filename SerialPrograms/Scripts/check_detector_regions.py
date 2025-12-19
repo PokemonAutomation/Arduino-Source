@@ -34,7 +34,7 @@ raw_image = image.copy()
 
 # ==================================================================
 # Home summary screen finish loading detector
-add_infer_box_to_image(raw_image, 0.388, 0.238, 0.109, 0.062, image)
+# add_infer_box_to_image(raw_image, 0.388, 0.238, 0.109, 0.062, image)
 
 # ==================================================================
 # LZA Hyperspace Timer detection
@@ -95,6 +95,17 @@ add_infer_box_to_image(raw_image, 0.388, 0.238, 0.109, 0.062, image)
 
 
 # ==================================================================
+# New LZA box system cursor detection
+# triangle_upper_edge_width = 0.008
+# traingle_full_height = 0.035
+# for row in range(6):
+# 	y = (0.122 if row == 0 else 0.333 + (0.797 - 0.331)/ 4.0 * (row-1)) - 0.003
+# 	for col in range(6):
+# 		x = 0.0545 + col*(0.386 - 0.059)/5.0
+# 		add_infer_box_to_image(raw_image, x, y, 0.025, traingle_full_height, image)
+
+
+# ==================================================================
 # LZA box system cursor detection
 # triangle_upper_edge_width = 0.008
 # traingle_full_height = 0.026
@@ -102,7 +113,9 @@ add_infer_box_to_image(raw_image, 0.388, 0.238, 0.109, 0.062, image)
 # 	y = 0.122 if row == 0 else 0.333 + (0.797 - 0.331)/ 4.0 * (row-1)
 # 	for col in range(6):
 # 		x = 0.058 + col*(0.386 - 0.059)/5.0
-# 		add_infer_box_to_image(raw_image, x, y, 0.018, traingle_full_height, image)
+# 		# add_infer_box_to_image(raw_image, x, y, 0.018, traingle_full_height, image)
+# 		add_infer_box_to_image(raw_image, x+0.011, y-0.009, 0.023, 0.031, image)
+
 # Pixel (x,y) = (775, 136), (0.404, 0.126), rgb=[255,188,245,71] hsv=[ 80 181 245]
 # Pixel (x,y) = (759, 135), (0.395, 0.125), rgb=[255,182,233,70] hsv=[ 81 178 233]
 # Pixel (x,y) = (796, 135), (0.415, 0.125), rgb=[255,181,239,63] hsv=[ 80 188 239]
