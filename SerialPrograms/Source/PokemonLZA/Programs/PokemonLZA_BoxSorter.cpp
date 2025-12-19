@@ -126,7 +126,14 @@ BoxSorter::BoxSorter()
     }
 
     BoxDetector box_detector(COLOR_RED, &env.console.overlay());
-    box_detector.move_cursor(env.program_info(), env.console, context, dest_cursor.row+1, dest_cursor.column, holding_pokemon);
+    box_detector.move_cursor(
+        env.program_info(),
+        env.console,
+        context,
+        (uint8_t)dest_cursor.row + 1,
+        (uint8_t)dest_cursor.column,
+        holding_pokemon
+    );
 
     return dest_cursor;
 }
@@ -278,7 +285,13 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         int num_empty_slots = 0;
         for (size_t row = 0; row < BOX_ROWS; row++){
             for (size_t column = 0; column < BOX_COLS; column++){
-                box_detector.move_cursor(env.program_info(), env.console, context, row+1, column);
+                box_detector.move_cursor(
+                    env.program_info(),
+                    env.console,
+                    context,
+                    (uint8_t)row + 1,
+                    (uint8_t)column
+                );
                 
                 pbf_wait(context, 100ms); // wait some time for the pokemon info to be updated
                 VideoSnapshot screen = env.console.video().snapshot();
@@ -297,12 +310,12 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                     }
 
                     // XXX TODO: change code to use regional dex, both Lumiose and Hyperspace
-                    int dex_number = dex_number_detector.dex_number();
+                    uint16_t dex_number = dex_number_detector.dex_number();
                     std::string name_slug;
                     // env.add_overlay_log(std::to_string(dex_number_detector.dex_type_color_ratio()));
                     if (dex_number_detector.dex_type() == DexType::HYPERSPACE){
                         name_slug = HYPERSPACE_DEX_SLUGS()[dex_number-1];
-                        dex_number += LUMIOSE_DEX_SLUGS().size();
+                        dex_number += (uint16_t)LUMIOSE_DEX_SLUGS().size();
                     } else{
                         name_slug = LUMIOSE_DEX_SLUGS()[dex_number-1];
                     }
