@@ -6,6 +6,7 @@
 
 #include "CommonFramework/Logging/Logger.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
+#include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "PokemonSV/Resources/PokemonSV_PokemonSprites.h"
 #include "PokemonSV_NameDatabase.h"
 
@@ -44,10 +45,10 @@ StringSelectDatabase make_ALL_POKEMON_NAMES(){
     const SpriteDatabase& sprites = ALL_POKEMON_SPRITES();
 
     std::vector<std::string> slugs;
-    for (std::string& slug : load_pokemon_slug_json_list("Pokemon/Pokedex/Pokedex-National.json")){
+    for (const std::string& slug : NATIONAL_DEX_SLUGS()){
         const SpriteDatabase::Sprite* sprite = sprites.get_nothrow(slug);
         if (sprite != nullptr){
-            slugs.emplace_back(std::move(slug));
+            slugs.emplace_back(slug);
         }
     }
 

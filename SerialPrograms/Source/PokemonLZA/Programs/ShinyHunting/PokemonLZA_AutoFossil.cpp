@@ -115,7 +115,7 @@ AutoFossil::AutoFossil()
         ImageAttachmentMode::JPG,
         {"Notifs", "Showcase"}
     )
-    , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATION_STATUS("Status Update", true, false, Seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
         &FOUND_SHINY_OR_ALPHA,
@@ -281,11 +281,11 @@ bool AutoFossil::check_fossils_in_one_box(
         box_detector.move_cursor(env.program_info(), env.console, context, box_row, box_col);
 
         info_watcher.reset_state();
-        const int ret = wait_until(env.console, context, std::chrono::seconds(10), {info_watcher});
+        const int ret = wait_until(env.console, context, Seconds(5), {info_watcher});
         if (ret < 0) {
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Failed to detect box info at cell idx " + std::to_string(i) + " after 30 seconds",
+                "Failed to detect box info at cell idx " + std::to_string(i) + " after 5 seconds",
                 env.console
             );
         }
