@@ -151,7 +151,7 @@ std::string create_overlay_info(const CollectedPokemonInfo& pokemon, const BoxDe
     
     std::string overlay_log = dex_number_detector.dex_type() == DexType::HYPERSPACE ? "H" : "L";
     
-    char dex_str[4];
+    char dex_str[6];
     snprintf(dex_str, sizeof(dex_str), "%03d", dex_number_detector.dex_number());
     overlay_log += std::string(dex_str) + " " + display_name;
     if(pokemon.gender == StatsHuntGenderFilter::Male){
