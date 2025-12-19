@@ -11,6 +11,7 @@
 #include "PokemonLZA_Settings.h"
 
 //  General
+#include "Programs/PokemonLZA_BoxSorter.h"
 #include "Programs/PokemonLZA_ClothingBuyer.h"
 #include "Programs/PokemonLZA_StallBuyer.h"
 #include "Programs/PokemonLZA_PostKillCatcher.h"
@@ -70,6 +71,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
     ret.emplace_back(make_single_switch_program<PostKillCatcher_Descriptor, PostKillCatcher>());
     if (IS_BETA_VERSION){
+        ret.emplace_back(make_single_switch_program<BoxSorter_Descriptor, BoxSorter>());
     }
 
     ret.emplace_back("---- Farming ----");
