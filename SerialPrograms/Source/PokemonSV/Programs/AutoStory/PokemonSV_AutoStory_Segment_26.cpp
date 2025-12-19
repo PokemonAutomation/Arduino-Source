@@ -223,6 +223,8 @@ void checkpoint_62(
 
         env.console.log("Battle Normal Gym leader.");
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        // We see Dialog right before the final pokemon terastalizes, but after you select your move. So, technically, we see dialog before the battle officially ends.
+        // it's fine as long as you OHKO Larry's final Pokemon. If you can't OHKO the final Staraptor, they you probably won't be able to beat the Elite Four.
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 60);
         pbf_mash_button(context, BUTTON_A, 1000ms);
 
