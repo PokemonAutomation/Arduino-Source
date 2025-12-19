@@ -48,6 +48,7 @@
 #include "Programs/TestPrograms/PokemonLZA_MoveBoxArrow.h"
 #include "Programs/TestPrograms/PokemonLZA_TestBoxCellInfo.h"
 #include "InferenceTraining/PokemonLZA_GenerateLocationNameOCR.h"
+#include "Programs/TestPrograms/PokemonLZA_DonutOptionsTest.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -114,6 +115,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back(make_single_switch_program<MoveBoxArrow_Descriptor, MoveBoxArrow>());
         ret.emplace_back(make_single_switch_program<TestBoxCellInfo_Descriptor, TestBoxCellInfo>());
         ret.emplace_back(make_single_switch_program<GenerateLocationNameOCR_Descriptor, GenerateLocationNameOCR>());
+        ret.emplace_back(make_single_switch_program<DonutOptionsTest_Descriptor, DonutOptionsTest>());
     }
     return ret;
 }
