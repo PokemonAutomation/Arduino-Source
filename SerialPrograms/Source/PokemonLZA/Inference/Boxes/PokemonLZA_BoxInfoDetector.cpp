@@ -4,12 +4,17 @@
  *
  */
 
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/OCR/OCR_NumberReader.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "PokemonLZA/Resources/PokemonLZA_AvailablePokemon.h"
 #include "PokemonLZA_BoxInfoDetector.h"
 
 namespace PokemonAutomation{
@@ -190,7 +195,40 @@ std::string BoxPageInfoWatcher::info_str() const{
     return "Regular";
 }
 
+BoxDexNummberDetector::BoxDexNummberDetector(Logger& logger) : m_logger(logger), m_dex_number_box{0.510, 0.203, 0.039, 0.031}, m_dex_type_box{0.472, 0.204, 0.018, 0.030}{}
 
+void BoxDexNummberDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(COLOR_GRAY, m_dex_number_box);
+    items.add(COLOR_GRAY, m_dex_type_box);
+}
+
+bool BoxDexNummberDetector::detect(const ImageViewRGB32& screen){
+    const size_t max_dex_number = std::max(LUMIOSE_DEX_SLUGS().size(), HYPERSPACE_DEX_SLUGS().size());
+
+    const int dex_number = OCR::read_number_waterfill(m_logger, extract_box_reference(screen, m_dex_number_box), 0xff808080, 0xffffffff, false);
+    if (dex_number <= 0 || dex_number > static_cast<int>(max_dex_number)) {
+        m_dex_number = 0;
+        m_dex_number_when_error = dex_number;
+        return false;
+    }
+    m_dex_number = static_cast<uint16_t>(dex_number);
+    m_dex_number_when_error = 0;
+
+    // Replacing white background with zero-alpha color so that they won't be counted in
+    // the following image_stats()
+    // The white background is defined as the color between 0xffa0a0a0 and 0xffffffff.
+    const bool replace_color_within_range = true;
+    ImageRGB32 region = filter_rgb32_range(
+        extract_box_reference(screen, m_dex_type_box),
+        0xffa0a0a0, 0xffffffff, Color(0), replace_color_within_range
+    );
+
+    ImageStats stats = image_stats(region);
+    m_dex_type_color_ratio = stats.count / ((double)region.width() * region.height());
+    m_dex_type = (m_dex_type_color_ratio > 0.2) ? DexType::LUMIOSE : DexType::HYPERSPACE;
+
+    return true;
+}
 
 }
 }

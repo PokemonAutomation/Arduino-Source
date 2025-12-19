@@ -1,4 +1,4 @@
-/*  Box Info Detector
+/*  Detectors for various pokemon info on box view
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -15,6 +15,7 @@
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
+    class Logger;
 namespace NintendoSwitch{
 namespace PokemonLZA{
 
@@ -116,6 +117,43 @@ public:
 private:
     BoxShinyWatcher m_shiny_watcher;
     BoxAlphaWatcher m_alpha_watcher;
+};
+
+
+enum class DexType{
+    LUMIOSE,
+    HYPERSPACE,
+};
+
+
+class BoxDexNummberDetector : public StaticScreenDetector{
+public:
+    BoxDexNummberDetector(Logger& logger);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+    DexType dex_type() const { return m_dex_type; }
+    uint16_t dex_number() const { return m_dex_number; }
+
+
+    // debugging value:
+    double dex_type_color_ratio() const { return m_dex_type_color_ratio; }
+    // error reporting
+    int dex_number_when_error() const { return m_dex_number_when_error; }
+
+private:
+    friend class BoxShinyWatcher;
+
+    Logger& m_logger;
+    ImageFloatBox m_dex_number_box;
+    ImageFloatBox m_dex_type_box;
+
+    uint16_t m_dex_number = 0;
+    DexType m_dex_type = DexType::LUMIOSE;
+    double m_dex_type_color_ratio = 0.0;
+    int m_dex_number_when_error = 0;
 };
 
 
