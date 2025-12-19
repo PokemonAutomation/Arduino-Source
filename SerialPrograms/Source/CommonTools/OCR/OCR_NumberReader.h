@@ -36,35 +36,25 @@ int read_number_waterfill(
     int8_t line_index = -1
  );
 
-// run OCR on each individual character in the string of numbers.
-// return empty string if OCR fails
-//
-// text_inside_range: binary filter is applied to the image so that any pixels within the color range will be turned black, and everything else will be white
-// width_max: return empty string if any character's width is greater than width_max (likely means that two characters are touching, and so are treated as one large character)
-// check_empty_string: if set to true, return empty string (and stop evaluation) if any character returns an empty string from OCR
- std::string read_number_waterfill_no_normalization(
-    Logger& logger, const ImageViewRGB32& image,
-    uint32_t rgb32_min, uint32_t rgb32_max,
-    bool text_inside_range = true,
-    size_t width_max = (size_t)-1,
-    bool check_empty_string = false
- );
 
 // Try OCR with all the given color filters. still running OCR on each individual character
 // Return the best majority candidate. return -1 if failed to read.
+// width_max: if a character width is greater than this value (likely means two characters are touching, will cause bad read), skip this filter.
+// min_digit_area: if a character has area (aka pixel count) smaller than this value (likely noise or punctuations), skip this character
 // 
 // prioritize_numeric_only_results: 
 //  - if true: if OCR reads only numeric characters, the candidate gets 2 votes. If OCR reads non-numeric characters, the candidate gets only 1 vote.
 //  - if false: all reads only get 1 vote
 //
-// line_index: specifies the current number's row. for logging purposes, when multithreaded.
+// log_line_index: adds an index prefix to the logging lines for logging purposes when calling this function in parallel.
 int read_number_waterfill_multifilter(
     Logger& logger, const ImageViewRGB32& image,
     std::vector<std::pair<uint32_t, uint32_t>> filters,
-    size_t width_max = (size_t)-1,
     bool text_inside_range = true,
     bool prioritize_numeric_only_results = true,
-    int8_t line_index = -1
+    size_t width_max = (size_t)-1,
+    size_t min_digit_area = 20,
+    int8_t log_line_index = -1
  );
 
 

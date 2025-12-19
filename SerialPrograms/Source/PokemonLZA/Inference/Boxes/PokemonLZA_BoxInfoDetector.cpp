@@ -205,19 +205,32 @@ void BoxDexNumberDetector::make_overlays(VideoOverlaySet& items) const{
 bool BoxDexNumberDetector::detect(const ImageViewRGB32& screen){
     const size_t max_dex_number = std::max(LUMIOSE_DEX_SLUGS().size(), HYPERSPACE_DEX_SLUGS().size());
 
-    const ImageViewRGB32 dex_image_crop = extract_box_reference(screen, m_dex_number_box);
     // const bool in_range_black = false;
     // const ImageRGB32 black_white_dex_image_crop = to_blackwhite_rgb32_range(dex_image_crop, in_range_black, 0xff808080, 0xffffffff);
     // black_white_dex_image_crop.save("blackwhite_number.png");
     // const int dex_number = OCR::read_number(m_logger, black_white_dex_image_crop);
     // const int dex_number = OCR::read_number_waterfill(m_logger, dex_image_crop, 0xff808080, 0xffffffff, false);
-    const int dex_number = OCR::read_number_waterfill_multifilter(m_logger, dex_image_crop, {
-        {0x0, 0xff202020},
-        {0x0, 0xff404040},
-        {0x0, 0xff606060},
-        {0x0, 0xff808080},
-        {0x0, 0xffA0A0A0},
-    });
+    
+    const int dex_number = [&](){
+        const ImageViewRGB32 dex_image_crop = extract_box_reference(screen, m_dex_number_box);
+        const bool text_inside_range = true;
+        const bool prioritize_numeric_only_results = true;
+        const size_t width_max = SIZE_MAX;
+        // To accomodate the dex number "No. xxx" for all language, we have to make the dex number crop to cover the "dot" character
+        // for some languages. We have to use `min_digit_area` to filter out the dot when doing OCR.
+        // The min digit area computation is that any dot with size smaller than image_crop.height()/5 is filtered out when OCR.
+        const size_t min_digit_area = dex_image_crop.height()*dex_image_crop.height() / 25;
+        return OCR::read_number_waterfill_multifilter(m_logger, dex_image_crop,
+            {
+                {0x0, 0xff202020},
+                {0x0, 0xff404040},
+                {0x0, 0xff606060},
+                {0x0, 0xff808080},
+                {0x0, 0xffA0A0A0},
+            },
+            text_inside_range, prioritize_numeric_only_results, width_max, min_digit_area
+        );
+    }();
     if (dex_number <= 0 || dex_number > static_cast<int>(max_dex_number)) {
         m_dex_number = 0;
         m_dex_number_when_error = dex_number;

@@ -101,43 +101,21 @@ int read_number(Logger& logger, const ImageViewRGB32& image, Language language){
     return number;
 }
 
-int read_number_waterfill(
-    Logger& logger, const ImageViewRGB32& image,
-    uint32_t rgb32_min, uint32_t rgb32_max,    
-    bool text_inside_range,
-    int8_t line_index
-){
-    std::string ocr_text = read_number_waterfill_no_normalization(
-        logger,
-        image,
-        rgb32_min, rgb32_max,
-        text_inside_range
-    );
 
-    std::string normalized = run_number_normalization(ocr_text);
-
-    std::string line_index_str = "";
-    if (line_index != -1){
-        line_index_str = "Line " + std::to_string(line_index) + ": ";
-    }
-    if (normalized.empty()){
-        logger.log(line_index_str + "OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> Unable to read.", COLOR_RED);
-        return -1;
-    }
-
-    int number = std::atoi(normalized.c_str());
-    logger.log(line_index_str + "OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> " + std::to_string(number));
-
-    return number;
-}
-
-
+// Run OCR on each individual character in the string of numbers.
+// Return empty string if OCR fails.
+//
+// text_inside_range: binary filter is applied to the image so that any pixels within the color range will be turned black, and everything else will be white
+// width_max: return empty string if any character's width is greater than width_max (likely means that two characters are touching, and so are treated as one large character)
+// min_digit_area: if a character has area (aka pixel count) smaller than this value (likely noise or punctuations), skip this character
+// check_empty_string: if set to true, return empty string (and stop evaluation) if any character returns an empty string from OCR
 std::string read_number_waterfill_no_normalization(
     Logger& logger, const ImageViewRGB32& image,
     uint32_t rgb32_min, uint32_t rgb32_max,    
-    bool text_inside_range,
-    size_t width_max,
-    bool check_empty_string
+    bool text_inside_range = true,
+    size_t width_max = (size_t)-1,
+    size_t min_digit_area = 20,
+    bool check_empty_string = false
 ){
     using namespace Kernels::Waterfill;
 
@@ -159,7 +137,7 @@ std::string read_number_waterfill_no_normalization(
     std::map<size_t, WaterfillObject> map;
     {
         std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
-        auto iter = session->make_iterator(20);
+        auto iter = session->make_iterator(min_digit_area);
         WaterfillObject object;
         while (map.size() < 16 && iter->find_next(object, true)){
             if (object.width() > width_max){
@@ -205,12 +183,45 @@ bool is_digits(const std::string &str)
     return std::all_of(str.begin(), str.end(), ::isdigit);
 }
 
+
+int read_number_waterfill(
+    Logger& logger, const ImageViewRGB32& image,
+    uint32_t rgb32_min, uint32_t rgb32_max,    
+    bool text_inside_range,
+    int8_t line_index
+){
+    std::string ocr_text = read_number_waterfill_no_normalization(
+        logger,
+        image,
+        rgb32_min, rgb32_max,
+        text_inside_range
+    );
+
+    std::string normalized = run_number_normalization(ocr_text);
+
+    std::string line_index_str = "";
+    if (line_index != -1){
+        line_index_str = "Line " + std::to_string(line_index) + ": ";
+    }
+    if (normalized.empty()){
+        logger.log(line_index_str + "OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> Unable to read.", COLOR_RED);
+        return -1;
+    }
+
+    int number = std::atoi(normalized.c_str());
+    logger.log(line_index_str + "OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> " + std::to_string(number));
+
+    return number;
+}
+
+
 int read_number_waterfill_multifilter(
     Logger& logger, const ImageViewRGB32& image,
     std::vector<std::pair<uint32_t, uint32_t>> filters,    
-    size_t width_max,
     bool text_inside_range,
     bool prioritize_numeric_only_results, 
+    size_t width_max,
+    size_t min_digit_area,
     int8_t line_index
 ){
     std::string line_index_str = "";
@@ -226,13 +237,14 @@ int read_number_waterfill_multifilter(
 
             uint32_t rgb32_min = filter.first;
             uint32_t rgb32_max = filter.second;
-            bool check_empty_string = false;
+            bool check_empty_string = true;
             std::string ocr_text = read_number_waterfill_no_normalization(
                 logger,
                 image,
                 rgb32_min, rgb32_max,
                 text_inside_range,
                 width_max,
+                min_digit_area,
                 check_empty_string
             );
 

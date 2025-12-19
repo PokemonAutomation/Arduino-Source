@@ -136,13 +136,16 @@ int16_t ItemPrinterMaterialDetector::read_number(
             }
         }();
     
-    size_t max_width = (size_t)((double)24 * screen.width() / 1080);
-
+    const bool text_inside_range = true;
+    const bool prioritize_numeric_only_results = true;
+    const size_t max_width = (size_t)((double)24 * screen.width() / 1080);
+    const size_t min_digit_area = 20;
     int16_t number = (int16_t)OCR::read_number_waterfill_multifilter(
         logger,
         cropped, filters,
+        text_inside_range, prioritize_numeric_only_results,
         max_width,
-        true, true,
+        min_digit_area,
         row_index
     );
 
