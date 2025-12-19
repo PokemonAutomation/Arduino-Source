@@ -6,6 +6,7 @@
 
 #include "PokemonLZA_Tests.h"
 #include "TestUtils.h"
+#include "Common/Cpp/Time.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
@@ -37,16 +38,6 @@ using namespace NintendoSwitch;
 using namespace NintendoSwitch::PokemonLZA; 
 
 
-
-int test_pokemonZLA_NormalDialogBoxDetector(const ImageViewRGB32& image, bool target){
-    auto& logger = global_logger_command_line();
-    auto overlay = DummyVideoOverlay();
-    const bool stop_on_detected = true;
-    NormalDialogDetector detector(logger, overlay, stop_on_detected);
-    bool result = detector.process_frame(image, current_time());
-    TEST_RESULT_EQUAL(result, target);
-    return 0;
-}
 
 int test_pokemonLZA_FlatWhiteDialogDetector(const ImageViewRGB32& image, bool target){
     auto overlay = DummyVideoOverlay();
@@ -175,24 +166,25 @@ int test_pokemonLZA_SelectionArrowDetector(const ImageViewRGB32& image, const st
 }
 
 int test_pokemonLZA_BoxCellInfoDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
-    // Expected filename format: <...>_<row>_<col>_<status>.png
-    // Where status is one of: Empty, Shiny, Alpha, ShinyAlpha
+    // Expected filename format: <...>_<row>_<col>_<status>_<dex_info>.png
+    // Where status is one of: Empty, Shiny, Alpha, ShinyAlpha and can be followed by "Held"
+    // Where dex_info is one of: "None", "L<number>" (Lumiose dex), or "H<number>" (Hyperspace dex)
     // Examples:
-    //   test_2_3_Empty.png -> row 2, col 3, empty cell
-    //   test_2_3_Regular.png -> row 2, col 3, non-shiny, non-alpha pokemon
-    //   test_2_3_Shiny.png -> row 2, col 3, shiny (non-alpha)
-    //   test_2_3_Alpha.png -> row 2, col 3, alpha (non-shiny)
-    //   test_2_3_ShinyAlpha.png -> row 2, col 3, shiny alpha
+    //   test_2_3_Empty_None.png -> row 2, col 3, empty cell, no dex number
+    //   test_2_3_Regular_L25.png -> row 2, col 3, non-shiny, non-alpha pokemon, Lumiose dex #25
+    //   test_2_3_Shiny_H100.png -> row 2, col 3, shiny (non-alpha), Hyperspace dex #100
+    //   test_2_3_Alpha_L50.png -> row 2, col 3, alpha (non-shiny), Lumiose dex #50
+    //   test_2_3_ShinyAlphaHeld_H75.png -> row 2, col 3, shiny alpha and holding a pokemon, Hyperspace dex #75
 
-    if (words.size() < 3){
-        cerr << "Error: filename must have at least 3 words (row, col, status)." << endl;
+    if (words.size() < 4){
+        cerr << "Error: filename must have at least 4 words (row, col, status, dex_info)." << endl;
         return 1;
     }
 
-    // Parse row from third-to-last word
+    // Parse row from fourth-to-last word
     int expected_row;
-    if (parse_int(words[words.size() - 3], expected_row) == false){
-        cerr << "Error: third-to-last word in filename should be row number (0-5)." << endl;
+    if (parse_int(words[words.size() - 4], expected_row) == false){
+        cerr << "Error: fourth-to-last word in filename should be row number (0-5)." << endl;
         return 1;
     }
     if (expected_row < 0 || expected_row > 5){
@@ -200,10 +192,10 @@ int test_pokemonLZA_BoxCellInfoDetector(const ImageViewRGB32& image, const std::
         return 1;
     }
 
-    // Parse col from second-to-last word
+    // Parse col from third-to-last word
     int expected_col;
-    if (parse_int(words[words.size() - 2], expected_col) == false){
-        cerr << "Error: second-to-last word in filename should be col number (0-5)." << endl;
+    if (parse_int(words[words.size() - 3], expected_col) == false){
+        cerr << "Error: third-to-last word in filename should be col number (0-5)." << endl;
         return 1;
     }
     if (expected_col < 0 || expected_col > 5){
@@ -211,8 +203,13 @@ int test_pokemonLZA_BoxCellInfoDetector(const ImageViewRGB32& image, const std::
         return 1;
     }
 
-    // Parse status from last word
-    const std::string& status_word = words[words.size() - 1];
+    // Parse status from second-to-last word
+    std::string status_word = words[words.size() - 2];
+    bool holding_pokemon = false;
+    if (status_word.ends_with("Held")){
+        holding_pokemon = true;
+        status_word = status_word.substr(0, status_word.size() - 4);
+    }
     bool expected_something_in_cell;
     bool expected_shiny;
     bool expected_alpha;
@@ -238,7 +235,31 @@ int test_pokemonLZA_BoxCellInfoDetector(const ImageViewRGB32& image, const std::
         expected_shiny = true;
         expected_alpha = true;
     } else {
-        cerr << "Error: last word must be 'Empty', 'Shiny', 'Alpha', or 'ShinyAlpha', got '" << status_word << "'." << endl;
+        cerr << "Error: second-to-last word must be 'Empty', 'Shiny', 'Alpha', or 'ShinyAlpha', got '" << status_word << "'." << endl;
+        return 1;
+    }
+
+    // Parse dex info from last word
+    std::string dex_info_word = words[words.size() - 1];
+    bool expect_dex_detection = false;
+    DexType expected_dex_type = DexType::LUMIOSE;
+    uint16_t expected_dex_number = 0;
+
+    if (dex_info_word == "None"){
+        expect_dex_detection = false;
+    } else if (dex_info_word.size() >= 2 && (dex_info_word[0] == 'L' || dex_info_word[0] == 'H')){
+        expect_dex_detection = true;
+        expected_dex_type = (dex_info_word[0] == 'L') ? DexType::LUMIOSE : DexType::HYPERSPACE;
+
+        std::string number_str = dex_info_word.substr(1);
+        int dex_num_int;
+        if (parse_int(number_str, dex_num_int) == false || dex_num_int <= 0){
+            cerr << "Error: invalid dex number in '" << dex_info_word << "'. Expected format: L<number> or H<number>." << endl;
+            return 1;
+        }
+        expected_dex_number = static_cast<uint16_t>(dex_num_int);
+    } else {
+        cerr << "Error: last word must be 'None', 'L<number>', or 'H<number>', got '" << dex_info_word << "'." << endl;
         return 1;
     }
 
@@ -248,7 +269,31 @@ int test_pokemonLZA_BoxCellInfoDetector(const ImageViewRGB32& image, const std::
     // Test BoxDetector for row and col
     BoxDetector box_detector(COLOR_RED, &overlay);
     box_detector.set_debug_mode(true);
+    box_detector.holding_pokemon(holding_pokemon);
+
+// #define PROFILE_BOX_DETECTION
+#ifdef PROFILE_BOX_DETECTION
+    // Profile the template matching performance
+    const int num_iterations = 100;
+    auto time_start = current_time();
+    bool in_box_system = false;
+    for (int i = 0; i < num_iterations; i++){
+        in_box_system = box_detector.detect(image);
+    }
+    auto time_end = current_time();
+
+    const auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_end - time_start).count();
+    const double ms_total = ns / 1000000.0;
+    const double ms_per_iteration = ms_total / num_iterations;
+
+    cout << "BoxDetector::detect() performance:" << endl;
+    cout << "  Total time for " << num_iterations << " iterations: " << ms_total << " ms" << endl;
+    cout << "  Average time per iteration: " << ms_per_iteration << " ms" << endl;
+    cout << "  Throughput: " << (1000.0 / ms_per_iteration) << " detections/second" << endl;
+#else
     bool in_box_system = box_detector.detect(image);
+#endif
+
     if (!in_box_system){
         cerr << "Error: BoxDetector did not detect box system view." << endl;
         return 1;
@@ -277,6 +322,31 @@ int test_pokemonLZA_BoxCellInfoDetector(const ImageViewRGB32& image, const std::
     BoxAlphaDetector alpha_detector(COLOR_RED, &overlay);
     bool detected_alpha = alpha_detector.detect(image);
     TEST_RESULT_COMPONENT_EQUAL(detected_alpha, expected_alpha, "alpha");
+
+    // Test BoxDexNumberDetector
+    if (expect_dex_detection){
+        BoxDexNumberDetector dex_detector(global_logger_command_line());
+        bool detected_dex = dex_detector.detect(image);
+
+        if (!detected_dex){
+            cerr << "Error: BoxDexNumberDetector failed to detect dex number." << endl;
+            return 1;
+        }
+
+        DexType detected_dex_type = dex_detector.dex_type();
+        uint16_t detected_dex_number = dex_detector.dex_number();
+
+        std::string expected_dex_type_str = (expected_dex_type == DexType::LUMIOSE) ? "Lumiose" : "Hyperspace";
+        std::string detected_dex_type_str = (detected_dex_type == DexType::LUMIOSE) ? "Lumiose" : "Hyperspace";
+
+        if (detected_dex_type != expected_dex_type){
+            cerr << "Error: dex type mismatch. Expected " << expected_dex_type_str
+                 << " but detected " << detected_dex_type_str << "." << endl;
+            return 1;
+        }
+
+        TEST_RESULT_COMPONENT_EQUAL((int)detected_dex_number, (int)expected_dex_number, "dex_number");
+    }
 
     return 0;
 }

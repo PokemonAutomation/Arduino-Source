@@ -126,21 +126,23 @@ enum class DexType{
 };
 
 
-class BoxDexNummberDetector : public StaticScreenDetector{
+class BoxDexNumberDetector : public StaticScreenDetector{
 public:
-    BoxDexNummberDetector(Logger& logger);
+    BoxDexNumberDetector(Logger& logger);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
 
     virtual bool detect(const ImageViewRGB32& screen) override;
 
+    // Return either DexType::LUMIOSE or DexType::HYPERSPACE.
     DexType dex_type() const { return m_dex_type; }
+    // Return dex number (1-indexed).
     uint16_t dex_number() const { return m_dex_number; }
 
 
-    // debugging value:
+    // Debugging value, used to compute whether the pokemon origin symbol is Lumiose or Hyperspace.
     double dex_type_color_ratio() const { return m_dex_type_color_ratio; }
-    // error reporting
+    // Debugging value, if the detected dex number value is not a correct dex number, what number it is.
     int dex_number_when_error() const { return m_dex_number_when_error; }
 
 private:

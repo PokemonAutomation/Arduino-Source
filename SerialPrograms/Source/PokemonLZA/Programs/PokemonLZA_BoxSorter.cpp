@@ -138,7 +138,7 @@ void print_boxes_data(const std::vector<std::optional<CollectedPokemonInfo>>& bo
     env.console.log(ss.str());
 }
 
-std::string create_overlay_info(const CollectedPokemonInfo& pokemon, const BoxDexNummberDetector& dex_number_detector){
+std::string create_overlay_info(const CollectedPokemonInfo& pokemon, const BoxDexNumberDetector& dex_number_detector){
     const std::string& display_name = get_pokemon_name(pokemon.name_slug).display_name();
     
     std::string overlay_log = dex_number_detector.dex_type() == DexType::HYPERSPACE ? "H" : "L";
@@ -247,7 +247,7 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     BoxShinyDetector shiny_detector(COLOR_RED, &env.console.overlay());
     BoxAlphaDetector alpha_detector(COLOR_RED, &env.console.overlay());
     SomethingInBoxCellDetector non_empty_detector(COLOR_BLUE, &env.console.overlay());
-    BoxDexNummberDetector dex_number_detector(env.console);
+    BoxDexNumberDetector dex_number_detector(env.console);
 
     box_detector.make_overlays(video_overlay_set);
     shiny_detector.make_overlays(video_overlay_set);

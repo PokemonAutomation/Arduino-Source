@@ -195,14 +195,14 @@ std::string BoxPageInfoWatcher::info_str() const{
     return "Regular";
 }
 
-BoxDexNummberDetector::BoxDexNummberDetector(Logger& logger) : m_logger(logger), m_dex_number_box{0.510, 0.203, 0.039, 0.031}, m_dex_type_box{0.472, 0.204, 0.018, 0.030}{}
+BoxDexNumberDetector::BoxDexNumberDetector(Logger& logger) : m_logger(logger), m_dex_number_box{0.510, 0.203, 0.039, 0.031}, m_dex_type_box{0.472, 0.204, 0.018, 0.030}{}
 
-void BoxDexNummberDetector::make_overlays(VideoOverlaySet& items) const{
+void BoxDexNumberDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_GRAY, m_dex_number_box);
     items.add(COLOR_GRAY, m_dex_type_box);
 }
 
-bool BoxDexNummberDetector::detect(const ImageViewRGB32& screen){
+bool BoxDexNumberDetector::detect(const ImageViewRGB32& screen){
     const size_t max_dex_number = std::max(LUMIOSE_DEX_SLUGS().size(), HYPERSPACE_DEX_SLUGS().size());
 
     const int dex_number = OCR::read_number_waterfill(m_logger, extract_box_reference(screen, m_dex_number_box), 0xff808080, 0xffffffff, false);
