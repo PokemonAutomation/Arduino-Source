@@ -43,6 +43,10 @@ class BoxDetector : public StaticScreenDetector{
 public:
     BoxDetector(Color color = COLOR_RED, VideoOverlay* overlay = nullptr);
 
+    // Set whether the game is currently holding a pokemon to move around in box view.
+    // The box cursor detection functionality inside BoxDetector needs to know this info.
+    void holding_pokemon(bool holding_pokemon) { m_holding_pokemon = holding_pokemon; }
+
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
 
@@ -50,9 +54,12 @@ public:
     BoxCursorCoordinates detected_location() const;
 
     // While in the box system view, move the cursor to the desired slot.
+    // - holding_pokemon: whether the movement is with a held pokemon
+    // This function will call `holding_pokemon()` to change internal detection based on
+    // whether the cursor is holding a pokemon or not.
     void move_cursor(
         const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
-        uint8_t row, uint8_t col
+        uint8_t row, uint8_t col, bool holding_pokemon = false
     );
 
     // Under debug mode, will throw FatalProgramException when more than one box cell
@@ -61,12 +68,14 @@ public:
 
 private:
     // called for each box cell to check if the selection arrow is above that cell
-    bool detect_at_cell(const ImageViewRGB32& image_crop);
+    bool detect_at_cell(const Resolution& screen_resolution, const ImageViewRGB32& image_crop);
 
+    bool m_holding_pokemon = false;
     Color m_color;
 
     ButtonDetector m_plus_button;
     std::vector<ImageFloatBox> m_arrow_boxes;  // all 6 x 6 potential locations of the arrow interiors on box view
+    std::vector<ImageFloatBox> m_lifted_arrow_boxes;  // all 6 x 6 potential locations of the arrow interiors on box view when lifting/holding a pokemon
     uint8_t m_found_row = 0;
     uint8_t m_found_col = 0;
     bool m_debug_mode = false;
