@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Script to update wiki links from old format to new format.
-Old format: Programs/PokemonSV/AutoStory.html
+Old format: ComputerControl/blob/master/Wiki/Programs/PokemonSV/AutoStory.md
 New format: Programs/PokemonSV/AutoStory.html
 """
 
