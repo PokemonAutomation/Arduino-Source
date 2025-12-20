@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef BOXSORTING_H
-#define BOXSORTING_H
+#ifndef PokemonAutomation_PokemonHome_BoxSorter_H
+#define PokemonAutomation_PokemonHome_BoxSorter_H
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
@@ -20,17 +20,17 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonHome{
 
-class BoxSorting_Descriptor : public SingleSwitchProgramDescriptor{
+class BoxSorter_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-    BoxSorting_Descriptor();
+    BoxSorter_Descriptor();
 
     struct Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class BoxSorting : public SingleSwitchProgramInstance{
+class BoxSorter : public SingleSwitchProgramInstance{
 public:
-    BoxSorting();
+    BoxSorter();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

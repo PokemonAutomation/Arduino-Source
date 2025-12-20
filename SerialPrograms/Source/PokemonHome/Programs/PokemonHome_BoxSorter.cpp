@@ -1,11 +1,10 @@
-/*  Home Box Sorting
+/*  Home Box Sorter
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
 /* TODO ideas
-break into smaller functions
 read pokemon name and store the slug (easier to detect missread than reading a number)
 Optimise the swapping algo
 Add enum for ball ? Also, BDSP is reading from swsh data. Worth refactoring ?
@@ -49,7 +48,7 @@ language
 #include "Pokemon/Pokemon_CollectedPokemonInfo.h"
 #include "PokemonHome/Inference/PokemonHome_BoxGenderDetector.h"
 #include "PokemonHome/Inference/PokemonHome_BallReader.h"
-#include "PokemonHome_BoxSorting.h"
+#include "PokemonHome_BoxSorter.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -60,7 +59,7 @@ using namespace Pokemon;
 const size_t MAX_BOXES = 200;
 
 
-BoxSorting_Descriptor::BoxSorting_Descriptor()
+BoxSorter_Descriptor::BoxSorter_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonHome:BoxSorter",
         STRING_POKEMON + " Home", "Box Sorter",
@@ -72,7 +71,7 @@ BoxSorting_Descriptor::BoxSorting_Descriptor()
         {}
     )
 {}
-struct BoxSorting_Descriptor::Stats : public StatsTracker{
+struct BoxSorter_Descriptor::Stats : public StatsTracker{
     Stats()
         : pkmn(m_stats["Pokemon"])
         , empty(m_stats["Empty Slots"])
@@ -89,11 +88,11 @@ struct BoxSorting_Descriptor::Stats : public StatsTracker{
     std::atomic<uint64_t>& compare;
     std::atomic<uint64_t>& swaps;
 };
-std::unique_ptr<StatsTracker> BoxSorting_Descriptor::make_stats() const{
+std::unique_ptr<StatsTracker> BoxSorter_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-BoxSorting::BoxSorting()
+BoxSorter::BoxSorter()
     : BOX_NUMBER(
         "<b>Number of Boxes to Sort:</b>",
         LockMode::LOCK_WHILE_RUNNING,
@@ -262,7 +261,7 @@ void sort(
     ProControllerContext& context,
     std::vector<std::optional<CollectedPokemonInfo>> boxes_data,
     std::vector<std::optional<CollectedPokemonInfo>> boxes_sorted,
-    BoxSorting_Descriptor::Stats& stats,
+    BoxSorter_Descriptor::Stats& stats,
     BoxCursor& cur_cursor,
     uint16_t GAME_DELAY
 ){
@@ -316,7 +315,7 @@ void sort(
     }
 }
 
-void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     StartProgramChecks::check_performance_class_wired_or_wireless(context);
 
     std::vector<SortingRule> sort_preferences = SORT_TABLE.preferences();
@@ -324,7 +323,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         throw UserSetupError(env.console, "At least one sorting method selection needs to be made!");
     }
 
-    BoxSorting_Descriptor::Stats& stats = env.current_stats< BoxSorting_Descriptor::Stats>();
+    BoxSorter_Descriptor::Stats& stats = env.current_stats< BoxSorter_Descriptor::Stats>();
 
     ImageFloatBox select_check(0.495, 0.0045, 0.01, 0.005); // square color to check which mode is active
     ImageFloatBox national_dex_number_box(0.448, 0.245, 0.049, 0.04); //pokemon national dex number pos
@@ -503,7 +502,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     if (dex_number <= 0 || dex_number > static_cast<int>(NATIONAL_DEX_SLUGS().size())) {
                         OperationFailedException::fire(
                             ErrorReport::SEND_ERROR_REPORT,
-                            "BoxSorting Check Summary: Unable to read a correct dex number, found: " + std::to_string(dex_number),
+                            "BoxSorter Check Summary: Unable to read a correct dex number, found: " + std::to_string(dex_number),
                             env.console
                         );
                     }
