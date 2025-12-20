@@ -14,33 +14,65 @@ namespace PokemonLZA{
 
 const EnumDropdownDatabase<Flavor_Powers>& flavor_power_enum_database(){
     static EnumDropdownDatabase<Flavor_Powers> database{
-        {Flavor_Powers::alpha,            "alpha",             "Alpha"},
-        {Flavor_Powers::humungo,           "humungo",            "Humungo"},
-        {Flavor_Powers::teensy,           "teensy",            "Teensy"},
-        {Flavor_Powers::sparkling,           "sparkling",            "Sparkling"},
-        {Flavor_Powers::item,           "item",            "Item"},
+        {Flavor_Powers::alpha,      "alpha",        "Alpha"},
+        {Flavor_Powers::humungo,    "humungo",      "Humungo"},
+        {Flavor_Powers::teensy,     "teensy",       "Teensy"},
+        {Flavor_Powers::sparkling,  "sparkling",    "Sparkling"},
+        {Flavor_Powers::atk,        "atk",          "Attack"},
+        {Flavor_Powers::spatk,      "spatk",        "Sp. Atk"},
+        {Flavor_Powers::move,       "move",         "Move"},
+        {Flavor_Powers::speed,      "speed",        "Speed"},
+        {Flavor_Powers::bighaul,    "bighaul",      "Big Haul"},
+        {Flavor_Powers::item,       "item",         "Item"},
+        {Flavor_Powers::mega,       "mega",         "Mega"},
+        {Flavor_Powers::def,        "def",          "Defense"},
+        {Flavor_Powers::spdef,      "spdef",        "Sp. Def"},
+        {Flavor_Powers::resistance, "resistance",   "Resistance"},
+        {Flavor_Powers::encounter,  "encounter",    "Encounter"},
+        {Flavor_Powers::catching,   "catching",     "Catching"},
     };
     return database;
 }
 const EnumDropdownDatabase<Power_Pokemon_Types>& pokemon_power_enum_database(){
     static EnumDropdownDatabase<Power_Pokemon_Types> database{
-        {Power_Pokemon_Types::all,           "all",            "All Types"},
-        {Power_Pokemon_Types::fire,           "fire",            "Fire"},
+        {Power_Pokemon_Types::all,      "all",      "All Types"},
+        {Power_Pokemon_Types::normal,   "normal",   "Normal"},
+        {Power_Pokemon_Types::fire,     "fire",     "Fire"},
+        {Power_Pokemon_Types::water,    "water",    "Water"},
+        {Power_Pokemon_Types::electric, "electric", "Electric"},
+        {Power_Pokemon_Types::grass,    "grass",    "Grass"},
+        {Power_Pokemon_Types::ice,      "ice",      "Ice"},
+        {Power_Pokemon_Types::fighting, "fighting", "Fighting"},
+        {Power_Pokemon_Types::poison,   "poison",   "Poison"},
+        {Power_Pokemon_Types::ground,   "ground",   "Ground"},
+        {Power_Pokemon_Types::flying,   "flying",   "Flying"},
+        {Power_Pokemon_Types::psychic,  "psychic",  "Psychic"},
+        {Power_Pokemon_Types::bug,      "bug",      "Bug"},
+        {Power_Pokemon_Types::rock,     "rock",     "Rock"},
+        {Power_Pokemon_Types::ghost,    "ghost",    "Ghost"},
+        {Power_Pokemon_Types::dragon,   "dragon",   "Dragon"},
+        {Power_Pokemon_Types::dark,     "dark",     "Dark"},
+        {Power_Pokemon_Types::steel,    "steel",    "Steel"},
+        {Power_Pokemon_Types::fairy,    "fairy",    "Fairy"},
     };
     return database;
 }
 const EnumDropdownDatabase<Power_Item_Types>& item_power_enum_database(){
     static EnumDropdownDatabase<Power_Item_Types> database{
-        {Power_Item_Types::berries,            "berries",             "Berry"},
-        {Power_Item_Types::candies,           "candies",            "Candy"},
+        {Power_Item_Types::berries,     "berries",      "Berries"},
+        {Power_Item_Types::candies,     "candies",      "Candies"},
+        {Power_Item_Types::treasure,    "treasure",     "Treasure"},
+        {Power_Item_Types::pokeballs,   "pokeballs",    "Poke Balls"},
+        {Power_Item_Types::special,     "special",      "Special"},
+        {Power_Item_Types::coins,       "coins",        "Coins"},
     };
     return database;
 }
 const EnumDropdownDatabase<Power_Level>& power_level_enum_database(){
     static EnumDropdownDatabase<Power_Level> database{
-        {Power_Level::one,      "one",      "Lv.1"},
-        {Power_Level::two,      "two",      "Lv.2"},
-        {Power_Level::three,    "three",    "Lv.3"},
+        {Power_Level::one,      "one",      "Lv. 1"},
+        {Power_Level::two,      "two",      "Lv. 2"},
+        {Power_Level::three,    "three",    "Lv. 3"},
     };
     return database;
 }
@@ -164,7 +196,8 @@ FlavorPowerTable::FlavorPowerTable()
         "<b>Flavor Powers Table:</b><br>"
         "Add all desired flavor powers to this table. "
         "The program will check the powers of any baked donut and compare them against the selected items in the table. "
-        "Be sure to set Number of Powers to Match above.",
+        "Be sure to set the correct Number of Powers to Match above."
+        "<br>Note: \"All Types\" means the All Types Power in-game.",
         LockMode::LOCK_WHILE_RUNNING,
         make_defaults()
     )

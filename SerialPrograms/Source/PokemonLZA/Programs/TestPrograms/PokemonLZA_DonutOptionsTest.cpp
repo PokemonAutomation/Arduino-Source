@@ -43,7 +43,7 @@ DonutOptionsTest::DonutOptionsTest()
     , BERRIES("<b>Berries:</b><br>The berries used to make the donut. Minimum 3 berries, maximum 8 berries.")
     , NUM_POWER_REQUIRED(
         "<b>Number of Powers to Match:</b><br>How many of a dount's powers must be in the the table below. Minimum 1, maximum 3. "
-        "<br>Ex. For a target dount of Big Haul Lv.3, Berry Lv.3, and any or none for the 3rd power, set the number as 2."
+        "<br>Ex. For a target donut of Big Haul Lv.3, Berry Lv.3, and any or none for the 3rd power, set the number as 2."
         "<br>Then, in the flavor powers table, make sure to add Big Haul Lv.3 and Berry Lv. 3.",
         LockMode::LOCK_WHILE_RUNNING,
         1, 1, 3
@@ -91,8 +91,8 @@ void DonutOptionsTest::program(SingleSwitchProgramEnvironment& env, ProControlle
     env.log("Number of berries validated.", COLOR_BLACK);
 
 
-    //Validate flavor power table
-    //(not all powers can have all types)
+    //Todo: Convert to slug and also validate flavor power table (Move and resist powers cannot have All Types)
+    std::vector<std::unique_ptr<FlavorPowerTableRow>> wanted_powers_table = FLAVOR_POWERS.copy_snapshot();
 
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);

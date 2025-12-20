@@ -36,7 +36,6 @@ enum class Flavor_Powers {
 };
 
 enum class Power_Pokemon_Types {
-    any, //Accept any of the below options
     all, //Accept only the All type (ex. Sparkling Power: All Types (Lv. 3)) Applies to catching and sparkling, but not move or resist
     normal,
     fire,

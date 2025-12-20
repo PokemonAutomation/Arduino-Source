@@ -33,11 +33,8 @@ public:
 private:
     OCR::LanguageOCROption LANGUAGE;
     DonutBerriesTable BERRIES;
-
     SimpleIntegerOption<uint8_t> NUM_POWER_REQUIRED;
-
     FlavorPowerTable FLAVOR_POWERS;
-
     SimpleIntegerOption<uint8_t> NUM_DONUTS;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
