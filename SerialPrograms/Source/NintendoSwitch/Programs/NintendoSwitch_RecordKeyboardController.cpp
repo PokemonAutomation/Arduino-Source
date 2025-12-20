@@ -174,10 +174,10 @@ void execute_json_schedule(
             }
 
             state.load_json(snapshot);
-            state.execute(&context, context.controller(), Milliseconds(duration));
+            state.execute(&context, true, context.controller(), Milliseconds(duration));
         }
         state.clear();
-        state.execute(&context, context.controller(), Seconds(seconds_wait_between_loops));
+        state.execute(&context, true, context.controller(), Seconds(seconds_wait_between_loops));
     }
 }
 

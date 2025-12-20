@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Controllers/JoystickTools.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_ControllerMode.h"
 #include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Misc.h"
@@ -180,8 +181,10 @@ void SerialPABotBase_WiredController::execute_state(
                 (uint16_t)current.count(),
                 buttons,
                 dpad_byte,
-                controller_state.left_stick_x, controller_state.left_stick_y,
-                controller_state.right_stick_x, controller_state.right_stick_y
+                JoystickTools::linear_float_to_u8(controller_state.left_joystick.x),
+                JoystickTools::linear_float_to_u8(-controller_state.left_joystick.y),
+                JoystickTools::linear_float_to_u8(controller_state.right_joystick.x),
+                JoystickTools::linear_float_to_u8(-controller_state.right_joystick.y)
             ),
             cancellable
         );

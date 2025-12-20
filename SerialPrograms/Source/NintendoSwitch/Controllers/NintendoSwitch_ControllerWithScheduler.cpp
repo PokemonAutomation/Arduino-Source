@@ -7,6 +7,7 @@
  *
  */
 
+#include "Common/Cpp/PrettyPrint.h"
 #include "NintendoSwitch_ControllerWithScheduler.h"
 
 namespace PokemonAutomation{
@@ -89,8 +90,10 @@ void ControllerWithScheduler::issue_dpad(
 void ControllerWithScheduler::issue_left_joystick(
     Cancellable* cancellable,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-    uint8_t x, uint8_t y
+    const JoystickPosition& position
 ){
+    auto command = std::make_unique<SwitchCommand_LeftJoystick>(position);
+
     SuperscalarScheduler::Schedule schedule;
     std::lock_guard<std::mutex> lg0(m_issue_lock);
     {
@@ -100,14 +103,14 @@ void ControllerWithScheduler::issue_left_joystick(
         }
         m_scheduler.issue_to_resource(
             schedule,
-            std::make_unique<SwitchCommand_LeftJoystick>(x, y),
+            std::move(command),
             delay, hold, cooldown
         );
     }
     execute_schedule(cancellable, schedule);
     if (m_logging_throttler){
         m_logger.log(
-            "issue_left_joystick(): (" + std::to_string(x) + "," + std::to_string(y) + ")" +
+            "issue_left_joystick(): (" + std::to_string(position.x) + "," + std::to_string(position.y) + ")" +
             ", delay = " + std::to_string(delay.count()) + "ms" +
             ", hold = " + std::to_string(hold.count()) + "ms" +
             ", cooldown = " + std::to_string(cooldown.count()) + "ms",
@@ -118,8 +121,10 @@ void ControllerWithScheduler::issue_left_joystick(
 void ControllerWithScheduler::issue_right_joystick(
     Cancellable* cancellable,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-    uint8_t x, uint8_t y
+    const JoystickPosition& position
 ){
+    auto command = std::make_unique<SwitchCommand_RightJoystick>(position);
+
     SuperscalarScheduler::Schedule schedule;
     std::lock_guard<std::mutex> lg0(m_issue_lock);
     {
@@ -129,14 +134,14 @@ void ControllerWithScheduler::issue_right_joystick(
         }
         m_scheduler.issue_to_resource(
             schedule,
-            std::make_unique<SwitchCommand_RightJoystick>(x, y),
+            std::move(command),
             delay, hold, cooldown
         );
     }
     execute_schedule(cancellable, schedule);
     if (m_logging_throttler){
         m_logger.log(
-            "issue_right_joystick(): (" + std::to_string(x) + "," + std::to_string(y) + ")" +
+            "issue_right_joystick(): (" + std::to_string(position.x) + "," + std::to_string(position.y) + ")" +
             ", delay = " + std::to_string(delay.count()) + "ms" +
             ", hold = " + std::to_string(hold.count()) + "ms" +
             ", cooldown = " + std::to_string(cooldown.count()) + "ms",
@@ -185,9 +190,9 @@ void ControllerWithScheduler::issue_full_controller_state(
     bool enable_logging,
     Milliseconds hold,
     Button button,
-    DpadPosition position,
-    uint8_t left_x, uint8_t left_y,
-    uint8_t right_x, uint8_t right_y
+    DpadPosition dpad,
+    const JoystickPosition& left_joystick,
+    const JoystickPosition& right_joystick
 ){
     SuperscalarScheduler::Schedule schedule;
     std::lock_guard<std::mutex> lg0(m_issue_lock);
@@ -223,17 +228,17 @@ void ControllerWithScheduler::issue_full_controller_state(
         }
         m_scheduler.issue_to_resource(
             schedule,
-            std::make_unique<SwitchCommand_Dpad>(position),
+            std::make_unique<SwitchCommand_Dpad>(dpad),
             WallDuration::zero(), hold, WallDuration::zero()
         );
         m_scheduler.issue_to_resource(
             schedule,
-            std::make_unique<SwitchCommand_LeftJoystick>(left_x, left_y),
+            std::make_unique<SwitchCommand_LeftJoystick>(left_joystick),
             WallDuration::zero(), hold, WallDuration::zero()
         );
         m_scheduler.issue_to_resource(
             schedule,
-            std::make_unique<SwitchCommand_RightJoystick>(right_x, right_y),
+            std::make_unique<SwitchCommand_RightJoystick>(right_joystick),
             hold, hold, WallDuration::zero()
         );
     }
@@ -244,9 +249,9 @@ void ControllerWithScheduler::issue_full_controller_state(
         if (enable_logging){
             m_logger.log(
                 "issue_controller_state(): (" + button_to_string(button) +
-                "), dpad(" + dpad_to_string(position) +
-                "), LJ(" + std::to_string(left_x) + "," + std::to_string(left_y) +
-                "), RJ(" + std::to_string(right_x) + "," + std::to_string(right_y) +
+                "), dpad(" + dpad_to_string(dpad) +
+                "), LJ(" + tostr_fixed(left_joystick.x, 3) + "," + tostr_fixed(left_joystick.y, 3) +
+                "), RJ(" + tostr_fixed(right_joystick.x, 3) + "," + tostr_fixed(right_joystick.y, 3) +
                 "), hold = " + std::to_string(hold.count()) + "ms",
                 COLOR_DARKGREEN
             );
@@ -385,53 +390,53 @@ void ControllerWithScheduler::issue_system_scroll(
             break;
         }
 
-        uint8_t x = 128;
-        uint8_t y = 128;
+        double x = 0;
+        double y = 0;
         switch (direction){
         case DPAD_NONE:
-            x = 128;
-            y = 128;
-            break;
-        case DPAD_UP:
-            x = 128;
+            x = 0;
             y = 0;
             break;
+        case DPAD_UP:
+            x = 0;
+            y = +1;
+            break;
         case DPAD_RIGHT:
-            x = 255;
-            y = 128;
+            x = +1;
+            y = 0;
             break;
         case DPAD_DOWN:
-            x = 128;
-            y = 255;
+            x = 0;
+            y = -1;
             break;
         case DPAD_LEFT:
-            x = 0;
-            y = 128;
+            x = -1;
+            y = 0;
             break;
 
         //  These diagonal ones probably don't work.
         case DPAD_UP_RIGHT:
-            x = 255;
-            y = 0;
+            x = +1;
+            y = +1;
             break;
         case DPAD_DOWN_RIGHT:
-            x = 255;
-            y = 255;
+            x = +1;
+            y = -1;
             break;
         case DPAD_DOWN_LEFT:
-            x = 0;
-            y = 255;
+            x = -1;
+            y = -1;
             break;
         case DPAD_UP_LEFT:
-            x = 0;
-            y = 0;
+            x = -1;
+            y = +1;
             break;
         }
 
         if (left_joystick <= dpad && left_joystick <= right_joystick){
-            issue_left_joystick(cancellable, delay, hold, cooldown, x, y);
+            issue_left_joystick(cancellable, delay, hold, cooldown, JoystickPosition(x, y));
         }else{
-            issue_right_joystick(cancellable, delay, hold, cooldown, x, y);
+            issue_right_joystick(cancellable, delay, hold, cooldown, JoystickPosition(x, y));
         }
     }while (false);
 

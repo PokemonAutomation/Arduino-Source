@@ -8,6 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_Joycon_H
 
 #include "Common/Cpp/Containers/Pimpl.h"
+#include "Controllers/Joystick.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 #include "Controllers/ControllerTypes.h"
 #include "Controllers/Controller.h"
@@ -77,10 +78,15 @@ public:
         Button button
     ) = 0;
 
-    virtual void issue_joystick(
+    void issue_joystick(
         Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         uint8_t x, uint8_t y
+    );
+    virtual void issue_joystick(
+        Cancellable* cancellable,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        const JoystickPosition& position
     ) = 0;
 
     //  Gyro: Accelerometer (experimental - API subject to change)
@@ -134,12 +140,19 @@ public:
     //  (such as Joycon gyro or new stuff in Switch 2), we can simply add
     //  overloads to this and gate them behind features.
     //
-    virtual void issue_full_controller_state(
+    void issue_full_controller_state(
         Cancellable* cancellable,
         bool enable_logging,
         Milliseconds duration,
         Button button,
         uint8_t joystick_x, uint8_t joystick_y
+    );
+    virtual void issue_full_controller_state(
+        Cancellable* cancellable,
+        bool enable_logging,
+        Milliseconds duration,
+        Button button,
+        const JoystickPosition& joystick
     ) = 0;
 
 

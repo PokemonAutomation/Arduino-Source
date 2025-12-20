@@ -672,6 +672,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/ControllerTypeStrings.cpp
     Source/Controllers/ControllerTypeStrings.h
     Source/Controllers/ControllerTypes.h
+    Source/Controllers/Joystick.cpp
+    Source/Controllers/Joystick.h
     Source/Controllers/JoystickTools.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h

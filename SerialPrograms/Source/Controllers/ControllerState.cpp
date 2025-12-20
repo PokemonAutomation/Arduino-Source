@@ -27,6 +27,7 @@ JsonObject ControllerState::to_json() const{
 }
 void ControllerState::execute(
     Cancellable* scope,
+    bool enable_logging,
     AbstractController& controller,
     Milliseconds duration
 ) const{

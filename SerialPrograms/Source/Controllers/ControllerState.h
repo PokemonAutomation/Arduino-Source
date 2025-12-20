@@ -40,6 +40,7 @@ public:
     //  Execution
     virtual void execute(
         Cancellable* scope,
+        bool enable_logging,
         AbstractController& controller,
         Milliseconds duration
     ) const;

@@ -139,10 +139,8 @@ void ProController_SysbotBase::execute_state(
 
     command.state.buttons = controller_state.buttons;
     command.state.dpad = controller_state.dpad;
-    command.state.left_x = controller_state.left_stick_x;
-    command.state.left_y = controller_state.left_stick_y;
-    command.state.right_x = controller_state.right_stick_x;
-    command.state.right_y = controller_state.right_stick_y;
+    command.state.left_joystick = controller_state.left_joystick;
+    command.state.right_joystick = controller_state.right_joystick;
 
     command.duration = std::chrono::duration_cast<Milliseconds>(entry.duration);
 }
@@ -223,11 +221,9 @@ void ProController_SysbotBase::send_diff(
         }
     }
 
-    if (old_state.left_x != new_state.left_x ||
-        old_state.left_y != new_state.left_y
-    ){
-        double fx = JoystickTools::linear_u8_to_float(new_state.left_x);
-        double fy = -JoystickTools::linear_u8_to_float(new_state.left_y);
+    if (old_state.left_joystick != new_state.left_joystick){
+        double fx = new_state.left_joystick.x;
+        double fy = new_state.left_joystick.y;
         JoystickTools::clip_magnitude(fx, fy);
 //        cout << "fx = " << fx << ", fy = " << fy << endl;
         int16_t ix = JoystickTools::linear_float_to_s16(fx);
@@ -239,11 +235,9 @@ void ProController_SysbotBase::send_diff(
         message += std::to_string(iy);
         message += "\r\n";
     }
-    if (old_state.right_x != new_state.right_x ||
-        old_state.right_y != new_state.right_y
-    ){
-        double fx = JoystickTools::linear_u8_to_float(new_state.right_x);
-        double fy = -JoystickTools::linear_u8_to_float(new_state.right_y);
+    if (old_state.right_joystick != new_state.right_joystick){
+        double fx = new_state.right_joystick.x;
+        double fy = new_state.right_joystick.y;
         JoystickTools::clip_magnitude(fx, fy);
         int16_t ix = JoystickTools::linear_float_to_s16(fx);
         int16_t iy = JoystickTools::linear_float_to_s16(fy);

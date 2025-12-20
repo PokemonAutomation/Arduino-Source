@@ -93,14 +93,14 @@ template <typename JoyconType>
 void SerialPABotBase_Joycon<JoyconType>::issue_joystick(
     Cancellable* cancellable,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-    uint8_t x, uint8_t y
+    const JoystickPosition& position
 ){
     switch (this->controller_class()){
     case ControllerClass::NintendoSwitch_LeftJoycon:
-        ControllerWithScheduler::issue_left_joystick(cancellable, delay, hold, cooldown, x, y);
+        ControllerWithScheduler::issue_left_joystick(cancellable, delay, hold, cooldown, position);
         break;
     case ControllerClass::NintendoSwitch_RightJoycon:
-        ControllerWithScheduler::issue_right_joystick(cancellable, delay, hold, cooldown, x, y);
+        ControllerWithScheduler::issue_right_joystick(cancellable, delay, hold, cooldown, position);
         break;
     default:
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Invalid joycon type.");
@@ -112,7 +112,7 @@ void SerialPABotBase_Joycon<JoyconType>::issue_full_controller_state(
     bool enable_logging,
     Milliseconds duration,
     Button button,
-    uint8_t joystick_x, uint8_t joystick_y
+    const JoystickPosition& joystick
 ){
     button &= m_valid_buttons;
     switch (this->controller_class()){
@@ -123,8 +123,8 @@ void SerialPABotBase_Joycon<JoyconType>::issue_full_controller_state(
             duration,
             button,
             DPAD_NONE,
-            joystick_x, joystick_y,
-            0x80, 0x80
+            joystick,
+            {0, 0}
         );
         break;
     case ControllerClass::NintendoSwitch_RightJoycon:
@@ -134,8 +134,8 @@ void SerialPABotBase_Joycon<JoyconType>::issue_full_controller_state(
             duration,
             button,
             DPAD_NONE,
-            0x80, 0x80,
-            joystick_x, joystick_y
+            {0, 0},
+            joystick
         );
         break;
     default:;
@@ -188,7 +188,7 @@ void SerialPABotBase_Joycon<JoyconType>::execute_state_left_joycon(
     //  Left Stick
     encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
         buttons.left_joystick,
-        controller_state.left_stick_x, controller_state.left_stick_y
+        controller_state.left_joystick
     );
 
     pabb_NintendoSwitch_OemController_State0x30_Gyro gyro{};
@@ -224,7 +224,7 @@ void SerialPABotBase_Joycon<JoyconType>::execute_state_right_joycon(
     //  Right Stick
     encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
         buttons.right_joystick,
-        controller_state.right_stick_x, controller_state.right_stick_y
+        controller_state.right_joystick
     );
 
 #if 0

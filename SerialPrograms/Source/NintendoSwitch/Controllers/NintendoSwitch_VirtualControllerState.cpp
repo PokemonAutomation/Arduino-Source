@@ -70,26 +70,26 @@ bool ProControllerDeltas::to_state(ProControllerState& state) const{
         }while (false);
     }
 
-    state.left_x = 128;
-    state.left_y = 128;
+    state.left_joystick.x = 0;
+    state.left_joystick.y = 0;
     if (left_x != 0 || left_y != 0){
         neutral = false;
         int mag = std::abs(left_x) > std::abs(left_y)
             ? std::abs(left_x)
             : std::abs(left_y);
-        state.left_x = (uint8_t)std::min(128 * left_x / mag + 128, 255);
-        state.left_y = (uint8_t)std::min(128 * left_y / mag + 128, 255);
+        state.left_joystick.x = (double)left_x / mag;
+        state.left_joystick.y = -(double)left_y / mag;
     }
 
-    state.right_x = 128;
-    state.right_y = 128;
+    state.right_joystick.x = 0;
+    state.right_joystick.y = 0;
     if (right_x != 0 || right_y != 0){
         neutral = false;
         int mag = std::abs(right_x) > std::abs(right_y)
             ? std::abs(right_x)
             : std::abs(right_y);
-        state.right_x = (uint8_t)std::min(128 * right_x / mag + 128, 255);
-        state.right_y = (uint8_t)std::min(128 * right_y / mag + 128, 255);
+        state.right_joystick.x = (double)right_x / mag;
+        state.right_joystick.y = -(double)right_y / mag;
     }
 
     return neutral;
@@ -112,15 +112,15 @@ bool JoyconDeltas::to_state(JoyconState& state) const{
     state.buttons = buttons;
     neutral = buttons == 0;
 
-    state.joystick_x = 128;
-    state.joystick_y = 128;
+    state.joystick.x = 0;
+    state.joystick.y = 0;
     if (joystick_x != 0 || joystick_y != 0){
         neutral = false;
         int mag = std::abs(joystick_x) > std::abs(joystick_y)
             ? std::abs(joystick_x)
             : std::abs(joystick_y);
-        state.joystick_x = (uint8_t)std::min(128 * joystick_x / mag + 128, 255);
-        state.joystick_y = (uint8_t)std::min(128 * joystick_y / mag + 128, 255);
+        state.joystick.x = (double)joystick_x / mag;
+        state.joystick.y = -(double)joystick_y / mag;
     }
 
     return neutral;

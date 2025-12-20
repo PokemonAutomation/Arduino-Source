@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_ProControllerTable_H
 #define PokemonAutomation_NintendoSwitch_ProControllerTable_H
 
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/CheckboxDropdownOption.h"
@@ -42,10 +42,10 @@ private:
     StringCell ACTION;
     CheckboxDropdownCell<Button> BUTTONS;
     EnumDropdownCell<DpadPosition> DPAD;
-    SimpleIntegerCell<uint8_t> LEFT_JOYSTICK_X;
-    SimpleIntegerCell<uint8_t> LEFT_JOYSTICK_Y;
-    SimpleIntegerCell<uint8_t> RIGHT_JOYSTICK_X;
-    SimpleIntegerCell<uint8_t> RIGHT_JOYSTICK_Y;
+    FloatingPointCell LEFT_JOYSTICK_X;
+    FloatingPointCell LEFT_JOYSTICK_Y;
+    FloatingPointCell RIGHT_JOYSTICK_X;
+    FloatingPointCell RIGHT_JOYSTICK_Y;
 };
 
 

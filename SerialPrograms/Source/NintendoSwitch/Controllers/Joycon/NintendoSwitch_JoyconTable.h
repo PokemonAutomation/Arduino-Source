@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_JoyconTable_H
 #define PokemonAutomation_NintendoSwitch_JoyconTable_H
 
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/CheckboxDropdownOption.h"
 #include "Common/Cpp/Options/StringOption.h"
@@ -39,10 +39,10 @@ private:
 
 private:
     MillisecondsCell DURATION;
-    CheckboxDropdownCell<Button> BUTTONS;
-    SimpleIntegerCell<uint8_t> JOYSTICK_X;
-    SimpleIntegerCell<uint8_t> JOYSTICK_Y;
     StringCell ACTION;
+    CheckboxDropdownCell<Button> BUTTONS;
+    FloatingPointCell JOYSTICK_X;
+    FloatingPointCell JOYSTICK_Y;
 };
 
 

@@ -43,7 +43,7 @@ protected:
 
 protected:
     template <uint16_t min_threshold, uint16_t max_threshold>
-    void encode_joystick(uint8_t data[3], uint8_t x, uint8_t y){
+    void encode_joystick(uint8_t data[3], const JoystickPosition& position){
         //  2048 is the neutral position.
         //
         //  1897 is the point where the joystick calibrator will register it as
@@ -61,8 +61,8 @@ protected:
         //  slightly different.
         //
 
-        double fx = JoystickTools::linear_u8_to_float(x);
-        double fy = -JoystickTools::linear_u8_to_float(y);
+        double fx = position.x;
+        double fy = position.y;
 //        cout << "fx = " << fx << ", fy = " << fy << endl;
         double mag_squared = fx*fx + fy*fy;
 

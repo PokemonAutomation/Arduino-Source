@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_JoyconState_H
 #define PokemonAutomation_NintendoSwitch_JoyconState_H
 
+#include "Controllers/Joystick.h"
 #include "Controllers/ControllerState.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 
@@ -32,6 +33,7 @@ public:
 
     virtual void execute(
         Cancellable* scope,
+        bool enable_logging,
         AbstractController& controller,
         Milliseconds duration
     ) const override;
@@ -39,8 +41,7 @@ public:
 
 public:
     Button buttons = BUTTON_NONE;
-    uint8_t joystick_x = 128;
-    uint8_t joystick_y = 128;
+    JoystickPosition joystick;
 };
 
 

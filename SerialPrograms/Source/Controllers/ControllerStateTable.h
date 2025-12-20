@@ -11,6 +11,7 @@
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
+#include "Controllers/Joystick.h"
 #include "ControllerTypes.h"
 #include "ControllerState.h"
 
@@ -65,7 +66,7 @@ public:
         for (std::unique_ptr<ControllerStateRow>& command : table){
             Milliseconds duration;
             std::unique_ptr<ControllerState> state = command->get_state(duration);
-            state->execute(&scope, controller, duration);
+            state->execute(&scope, true, controller, duration);
         }
     }
 
@@ -123,7 +124,7 @@ private:
 };
 
 
-std::string get_joystick_direction(uint8_t x, uint8_t y);
+std::string get_joystick_direction(const JoystickPosition& position);
 
 
 

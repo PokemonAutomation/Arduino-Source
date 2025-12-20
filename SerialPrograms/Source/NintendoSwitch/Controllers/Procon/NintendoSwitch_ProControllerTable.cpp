@@ -96,10 +96,10 @@ ProControllerStateRow::ProControllerStateRow(EditableTableOption& parent_table)
         LockMode::UNLOCK_WHILE_RUNNING,
         DpadPosition::DPAD_NONE
     )
-    , LEFT_JOYSTICK_X(LockMode::UNLOCK_WHILE_RUNNING, 128, 0, 255)
-    , LEFT_JOYSTICK_Y(LockMode::UNLOCK_WHILE_RUNNING, 128, 0, 255)
-    , RIGHT_JOYSTICK_X(LockMode::UNLOCK_WHILE_RUNNING, 128, 0, 255)
-    , RIGHT_JOYSTICK_Y(LockMode::UNLOCK_WHILE_RUNNING, 128, 0, 255)
+    , LEFT_JOYSTICK_X(LockMode::UNLOCK_WHILE_RUNNING, 0, -1, +1)
+    , LEFT_JOYSTICK_Y(LockMode::UNLOCK_WHILE_RUNNING, 0, -1, +1)
+    , RIGHT_JOYSTICK_X(LockMode::UNLOCK_WHILE_RUNNING, 0, -1, +1)
+    , RIGHT_JOYSTICK_Y(LockMode::UNLOCK_WHILE_RUNNING, 0, -1, +1)
 {
     PA_ADD_OPTION(DURATION);
     PA_ADD_OPTION(ACTION);
@@ -158,10 +158,10 @@ void ProControllerStateRow::load_json(const JsonValue& json){
 
     BUTTONS.replace_all(state.buttons);
     DPAD.set(state.dpad);
-    LEFT_JOYSTICK_X.set(state.left_x);
-    LEFT_JOYSTICK_Y.set(state.left_y);
-    RIGHT_JOYSTICK_X.set(state.right_x);
-    RIGHT_JOYSTICK_Y.set(state.right_y);
+    LEFT_JOYSTICK_X.set(state.left_joystick.x);
+    LEFT_JOYSTICK_Y.set(state.left_joystick.y);
+    RIGHT_JOYSTICK_X.set(state.right_joystick.x);
+    RIGHT_JOYSTICK_Y.set(state.right_joystick.y);
 }
 JsonValue ProControllerStateRow::to_json() const{
     ProControllerState state;
@@ -175,10 +175,10 @@ JsonValue ProControllerStateRow::to_json() const{
 void ProControllerStateRow::get_state(ProControllerState& state) const{
     state.buttons = BUTTONS;
     state.dpad = DPAD;
-    state.left_x = LEFT_JOYSTICK_X;
-    state.left_y = LEFT_JOYSTICK_Y;
-    state.right_x = RIGHT_JOYSTICK_X;
-    state.right_y = RIGHT_JOYSTICK_Y;
+    state.left_joystick.x = LEFT_JOYSTICK_X;
+    state.left_joystick.y = LEFT_JOYSTICK_Y;
+    state.right_joystick.x = RIGHT_JOYSTICK_X;
+    state.right_joystick.y = RIGHT_JOYSTICK_Y;
 }
 std::unique_ptr<ControllerState> ProControllerStateRow::get_state(Milliseconds& duration) const{
     std::unique_ptr<ProControllerState> ret(new ProControllerState());
@@ -207,20 +207,20 @@ std::string get_controller_action(ProControllerState& state){
         }
         action += "Dpad";
     }
-    if (state.left_x != STICK_CENTER || state.left_y != STICK_CENTER){
+    if (!state.left_joystick.is_neutral()){
         if (action != ""){
             action += ", ";
         }
         action += "L-stick";
-        action += " " + get_joystick_direction(state.left_x, state.left_y);
+        action += " " + get_joystick_direction(state.left_joystick);
         
     }
-    if (state.right_x != STICK_CENTER || state.right_y != STICK_CENTER){
+    if (!state.right_joystick.is_neutral()){
         if (action != ""){
             action += ", ";
         }
         action += "R-stick";
-        action += " " + get_joystick_direction(state.right_x, state.right_y);
+        action += " " + get_joystick_direction(state.right_joystick);
     }
 
     if (action == ""){

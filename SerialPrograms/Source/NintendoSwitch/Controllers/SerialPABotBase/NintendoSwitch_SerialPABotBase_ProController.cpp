@@ -67,13 +67,13 @@ void SerialPABotBase_ProController::execute_state(
     //  Left Stick
     encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
         buttons.left_joystick,
-        controller_state.left_stick_x, controller_state.left_stick_y
+        controller_state.left_joystick
     );
 
     //  Right Stick
     encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
         buttons.right_joystick,
-        controller_state.right_stick_x, controller_state.right_stick_y
+        controller_state.right_joystick
     );
 
     pabb_NintendoSwitch_OemController_State0x30_Gyro gyro{

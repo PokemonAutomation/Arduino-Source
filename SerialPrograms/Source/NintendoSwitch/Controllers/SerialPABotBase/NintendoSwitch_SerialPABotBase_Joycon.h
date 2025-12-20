@@ -94,7 +94,7 @@ public:
     virtual void issue_joystick(
         Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        uint8_t x, uint8_t y
+        const JoystickPosition& position
     ) override;
 
     virtual void issue_gyro_accel_x(
@@ -145,7 +145,7 @@ public:
         bool enable_logging,
         Milliseconds duration,
         Button button,
-        uint8_t joystick_x, uint8_t joystick_y
+        const JoystickPosition& joystick
     ) override;
 
 

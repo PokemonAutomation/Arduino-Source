@@ -234,15 +234,15 @@ void ProController_SysbotBase3::execute_state(
     int16_t right_x = 0;
     int16_t right_y = 0;
     {
-        double fx = JoystickTools::linear_u8_to_float(controller_state.left_stick_x);
-        double fy = -JoystickTools::linear_u8_to_float(controller_state.left_stick_y);
+        double fx = controller_state.left_joystick.x;
+        double fy = controller_state.left_joystick.y;
         JoystickTools::clip_magnitude(fx, fy);
         left_x = JoystickTools::linear_float_to_s16(fx);
         left_y = JoystickTools::linear_float_to_s16(fy);
     }
     {
-        double fx = JoystickTools::linear_u8_to_float(controller_state.right_stick_x);
-        double fy = -JoystickTools::linear_u8_to_float(controller_state.right_stick_y);
+        double fx = controller_state.right_joystick.x;
+        double fy = controller_state.right_joystick.y;
         JoystickTools::clip_magnitude(fx, fy);
         right_x = JoystickTools::linear_float_to_s16(fx);
         right_y = JoystickTools::linear_float_to_s16(fy);

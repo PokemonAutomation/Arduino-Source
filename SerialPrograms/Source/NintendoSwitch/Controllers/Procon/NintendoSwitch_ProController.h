@@ -10,6 +10,7 @@
 #define PokemonAutomation_NintendoSwitch_ProController_H
 
 #include "Common/Cpp/Containers/Pimpl.h"
+#include "Controllers/Joystick.h"
 #include "Controllers/Controller.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 
@@ -91,15 +92,25 @@ public:
     ) = 0;
 
     //  Joysticks
-    virtual void issue_left_joystick(
+    void issue_left_joystick(
         Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         uint8_t x, uint8_t y
+    );
+    void issue_right_joystick(
+        Cancellable* cancellable,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        uint8_t x, uint8_t y
+    );
+    virtual void issue_left_joystick(
+        Cancellable* cancellable,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        const JoystickPosition& position
     ) = 0;
     virtual void issue_right_joystick(
         Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        uint8_t x, uint8_t y
+        const JoystickPosition& position
     ) = 0;
 
     //  Gyro: Accelerometer (experimental - API subject to change)
@@ -153,14 +164,23 @@ public:
     //  (such as Joycon gyro or new stuff in Switch 2), we can simply add
     //  overloads to this and gate them behind features.
     //
+    void issue_full_controller_state(
+        Cancellable* cancellable,
+        bool enable_logging,
+        Milliseconds duration,
+        Button button,
+        DpadPosition dpad,
+        uint8_t left_x, uint8_t left_y,
+        uint8_t right_x, uint8_t right_y
+    );
     virtual void issue_full_controller_state(
         Cancellable* cancellable,
         bool enable_logging,
         Milliseconds duration,
         Button button,
-        DpadPosition position,
-        uint8_t left_x, uint8_t left_y,
-        uint8_t right_x, uint8_t right_y
+        DpadPosition dpad,
+        const JoystickPosition& left_joystick,
+        const JoystickPosition& right_joystick
     ) = 0;
 
 

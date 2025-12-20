@@ -85,6 +85,7 @@ JoyconStateRow::~JoyconStateRow(){
 JoyconStateRow::JoyconStateRow(EditableTableOption& parent_table)
     : ControllerStateRow(parent_table)
     , DURATION(LockMode::LOCK_WHILE_RUNNING, "200 ms")
+    , ACTION(false, LockMode::UNLOCK_WHILE_RUNNING, "", "")
     , BUTTONS(
         "",
         static_cast<ControllerCommandTable&>(parent_table).type() == ControllerClass::NintendoSwitch_LeftJoycon
@@ -93,9 +94,8 @@ JoyconStateRow::JoyconStateRow(EditableTableOption& parent_table)
         LockMode::UNLOCK_WHILE_RUNNING,
         BUTTON_NONE
     )
-    , JOYSTICK_X(LockMode::UNLOCK_WHILE_RUNNING, 128, 0, 255)
-    , JOYSTICK_Y(LockMode::UNLOCK_WHILE_RUNNING, 128, 0, 255)
-    , ACTION(false, LockMode::UNLOCK_WHILE_RUNNING, "", "")
+    , JOYSTICK_X(LockMode::UNLOCK_WHILE_RUNNING, 0, -1, +1)
+    , JOYSTICK_Y(LockMode::UNLOCK_WHILE_RUNNING, 0, -1, +1)
 {
     PA_ADD_OPTION(DURATION);
     PA_ADD_OPTION(ACTION);
@@ -135,8 +135,8 @@ void JoyconStateRow::load_json(const JsonValue& json){
     state.load_json(obj);
 
     BUTTONS.replace_all(state.buttons);
-    JOYSTICK_X.set(state.joystick_x);
-    JOYSTICK_Y.set(state.joystick_y);
+    JOYSTICK_X.set(state.joystick.x);
+    JOYSTICK_Y.set(state.joystick.y);
 }
 JsonValue JoyconStateRow::to_json() const{
     JoyconState state;
@@ -149,8 +149,8 @@ JsonValue JoyconStateRow::to_json() const{
 
 void JoyconStateRow::get_state(JoyconState& state) const{
     state.buttons = BUTTONS;
-    state.joystick_x = JOYSTICK_X;
-    state.joystick_y = JOYSTICK_Y;
+    state.joystick.x = JOYSTICK_X;
+    state.joystick.y = JOYSTICK_Y;
 }
 std::unique_ptr<ControllerState> JoyconStateRow::get_state(Milliseconds& duration) const{
     std::unique_ptr<JoyconState> ret(new JoyconState());
@@ -177,12 +177,12 @@ std::string get_controller_action(JoyconState& state){
         action += "Button";
     }
 
-    if (state.joystick_x != STICK_CENTER || state.joystick_y != STICK_CENTER){
+    if (!state.joystick.is_neutral()){
         if (action != ""){
             action += ", ";
         }
         action += "Joystick";
-        action += " " + get_joystick_direction(state.joystick_x, state.joystick_y);
+        action += " " + get_joystick_direction(state.joystick);
         
     }
 

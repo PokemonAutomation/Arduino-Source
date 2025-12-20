@@ -106,16 +106,16 @@ public:
     virtual void issue_left_joystick(
         Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        uint8_t x, uint8_t y
+        const JoystickPosition& position
     ) override{
-        ControllerWithScheduler::issue_left_joystick(cancellable, delay, hold, cooldown, x, y);
+        ControllerWithScheduler::issue_left_joystick(cancellable, delay, hold, cooldown, position);
     }
     virtual void issue_right_joystick(
         Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        uint8_t x, uint8_t y
+        const JoystickPosition& position
     ) override{
-        ControllerWithScheduler::issue_right_joystick(cancellable, delay, hold, cooldown, x, y);
+        ControllerWithScheduler::issue_right_joystick(cancellable, delay, hold, cooldown, position);
     }
 
     virtual void issue_gyro_accel_x(
@@ -164,20 +164,20 @@ public:
     virtual void issue_full_controller_state(
         Cancellable* cancellable,
         bool enable_logging,
-        Milliseconds hold,
+        Milliseconds duration,
         Button button,
-        DpadPosition position,
-        uint8_t left_x, uint8_t left_y,
-        uint8_t right_x, uint8_t right_y
+        DpadPosition dpad,
+        const JoystickPosition& left_joystick,
+        const JoystickPosition& right_joystick
     ) override{
         ControllerWithScheduler::issue_full_controller_state(
             cancellable,
             enable_logging,
-            hold,
+            duration,
             button,
-            position,
-            left_x, left_y,
-            right_x, right_y
+            dpad,
+            left_joystick,
+            right_joystick
         );
     }
 

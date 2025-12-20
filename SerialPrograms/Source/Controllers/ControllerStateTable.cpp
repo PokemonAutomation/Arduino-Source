@@ -368,24 +368,24 @@ EnumDropdownDatabase<ControllerClass> ControllerCommandTables::make_database(
 
 
 
-std::string get_joystick_direction(uint8_t x, uint8_t y){
+std::string get_joystick_direction(const JoystickPosition& position){
     std::string direction = "";
-    if (x > NintendoSwitch::STICK_CENTER){
-        if (y > NintendoSwitch::STICK_CENTER){
+    if (position.x > 0){
+        if (position.y < 0){
             // right-down
             direction = "\u2198";
-        }else if (y == NintendoSwitch::STICK_CENTER){
+        }else if (position.y == 0){
             // right
             direction = "\u2192";
         }else{ // y < STICK_CENTER
             // right-up
             direction = "\u2197";
         }
-    }else if (x == NintendoSwitch::STICK_CENTER){
-        if (y > NintendoSwitch::STICK_CENTER){
+    }else if (position.x == 0){
+        if (position.y < 0){
             // down
             direction = "\u2193";
-        }else if (y == NintendoSwitch::STICK_CENTER){
+        }else if (position.y == 0){
             // neutral
             direction = "neutral";
         }else{ // y < STICK_CENTER
@@ -394,10 +394,10 @@ std::string get_joystick_direction(uint8_t x, uint8_t y){
         }
 
     }else { // x < STICK_CENTER
-        if (y > NintendoSwitch::STICK_CENTER){
+        if (position.y < 0){
             // left-down
             direction = "\u2199";
-        }else if (y == NintendoSwitch::STICK_CENTER){
+        }else if (position.y == 0){
             // left
             direction = "\u2190";
         }else{ // y < STICK_CENTER
