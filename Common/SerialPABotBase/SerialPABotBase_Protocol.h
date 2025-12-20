@@ -265,6 +265,20 @@ typedef struct{
     uint32_t value;
 } PABB_PACK pabb_MsgInfoI32Label;
 
+typedef uint8_t pabb_DeviceResetReason;
+#define PABB_DeviceResetReason_UNKNOWN          0x00
+#define PABB_DeviceResetReason_OTHER            0x01
+#define PABB_DeviceResetReason_POWER_ON         0x02
+#define PABB_DeviceResetReason_MANUAL           0x03
+#define PABB_DeviceResetReason_BROWNOUT         0x04
+#define PABB_DeviceResetReason_CRASH            0x05
+
+#define PABB_MSG_INFO_DEVICE_RESET_REASON       0x26
+typedef struct{
+    pabb_DeviceResetReason reason;
+    uint32_t native_code;
+} PABB_PACK pabb_MsgDeviceReset;
+
 ////////////////////////////////////////////////////////////////////////////////
 //  Static Requests
 

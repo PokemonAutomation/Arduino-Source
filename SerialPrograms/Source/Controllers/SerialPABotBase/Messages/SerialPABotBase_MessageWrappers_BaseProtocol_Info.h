@@ -135,6 +135,53 @@ public:
         return ret;
     }
 };
+class MessageType_Info_ResetReason : public BotBaseMessageType{
+    using Params = pabb_MsgDeviceReset;
+public:
+    MessageType_Info_ResetReason()
+        : BotBaseMessageType(
+            "PABB_MSG_INFO_DEVICE_RESET_REASON",
+            PABB_MSG_INFO_DEVICE_RESET_REASON,
+            sizeof(Params)
+        )
+    {}
+    virtual std::string tostr(const std::string& body) const override{
+        std::string ret = BotBaseMessageType::tostr(body);
+        if (!is_valid(body)){
+            return ret;
+        }
+        Params params;
+        memcpy(&params, body.data(), sizeof(params));
+
+        std::string reason;
+        switch (params.reason){
+        case PABB_DeviceResetReason_UNKNOWN:
+            reason = "Unknown";
+            break;
+        case PABB_DeviceResetReason_OTHER:
+            reason = "Other";
+            break;
+        case PABB_DeviceResetReason_POWER_ON:
+            reason = "Power On";
+            break;
+        case PABB_DeviceResetReason_MANUAL:
+            reason = "Manual";
+            break;
+        case PABB_DeviceResetReason_BROWNOUT:
+            reason = "Brownout";
+            break;
+        case PABB_DeviceResetReason_CRASH:
+            reason = "Crash";
+            break;
+        default:
+            reason = "(Invalid Reason)";
+        }
+
+        ret += ": reason = " + reason;
+        ret += ", native_code = " + std::to_string(params.native_code);
+        return ret;
+    }
+};
 
 
 

@@ -156,6 +156,7 @@ void SerialPABotBase_Connection::add_message_printers(){
     add_message_printer<MessageType_Info_String>();
     add_message_printer<MessageType_Info_Label_i32>();
     add_message_printer<MessageType_Info_Label_h32>();
+    add_message_printer<MessageType_Info_ResetReason>();
 
     //  Static Requests
     add_message_printer<MessageType_SeqnumReset>();
