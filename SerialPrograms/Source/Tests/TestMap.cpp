@@ -9,6 +9,7 @@
 #include "CommonFramework_Tests.h"
 #include "Kernels_Tests.h"
 #include "NintendoSwitch_Tests.h"
+#include "PokemonHome_Tests.h"
 #include "PokemonLA_Tests.h"
 #include "PokemonLZA_Tests.h"
 #include "PokemonSwSh_Tests.h"
@@ -263,6 +264,8 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonLA_MMOSpriteMatcher", test_pokemonLA_MMOSpriteMatcher},
     {"PokemonLA_MapWeatherAndTimeReader", std::bind(image_words_detector_helper, test_pokemonLA_MapWeatherAndTimeReader, _1)},
     {"PokemonLA_FlagTrackerPerformance", std::bind(image_int_detector_helper, test_pokemonLA_FlagTracker_performance, _1)},
+    {"PokemonHome_BoxView", std::bind(image_words_detector_helper, test_pokemonHome_BoxView, _1)},
+    {"PokemonHome_SummaryScreen", std::bind(image_words_detector_helper, test_pokemonHome_SummaryScreen, _1)},
     {"PokemonSV_MapDetector", std::bind(image_words_detector_helper, test_pokemonSV_MapDetector, _1)},
     {"PokemonSV_PicnicDetector", std::bind(image_bool_detector_helper, test_pokemonSV_PicnicDetector, _1)},
     {"PokemonSV_TeraCardFinder", std::bind(image_bool_detector_helper, test_pokemonSV_TeraCardFinder, _1)},
