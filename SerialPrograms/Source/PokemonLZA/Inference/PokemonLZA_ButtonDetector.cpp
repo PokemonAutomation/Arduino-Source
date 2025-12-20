@@ -31,7 +31,7 @@ public:
         return matcher;
     }
     static const ButtonMatcher& B(){
-        static ButtonMatcher matcher(ButtonType::ButtonB, 50, 50, 70);
+        static ButtonMatcher matcher(ButtonType::ButtonB, 50, 50, 80);
         return matcher;
     }
     static const ButtonMatcher& X(){
