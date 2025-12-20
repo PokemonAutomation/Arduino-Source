@@ -203,11 +203,13 @@ void SwitchSystemWidget::update_ui(ProgramState state){
 
 void SwitchSystemWidget::key_press(QKeyEvent* event){
 //    cout << "press:   " << event->nativeVirtualKey() << endl;
+    global_keyboard_tracker().on_key_press(*event);
     m_video_display->on_key_press(event);
 }
 
 void SwitchSystemWidget::key_release(QKeyEvent* event){
 //    cout << "release: " << event->nativeVirtualKey() << endl;
+    global_keyboard_tracker().on_key_release(*event);
     m_video_display->on_key_release(event);
 }
 
@@ -221,13 +223,11 @@ void SwitchSystemWidget::focus_out(QFocusEvent* event){
 
 void SwitchSystemWidget::keyPressEvent(QKeyEvent* event){
 //    cout << "SwitchSystemWidget::keyPressEvent()" << endl;
-    global_keyboard_tracker().on_key_press(*event);
     key_press(event);
 //    QWidget::keyPressEvent(event);
 }
 void SwitchSystemWidget::keyReleaseEvent(QKeyEvent* event){
 //    cout << "SwitchSystemWidget::keyReleaseEvent()" << endl;
-    global_keyboard_tracker().on_key_release(*event);
     key_release(event);
 //    QWidget::keyReleaseEvent(event);
 }
