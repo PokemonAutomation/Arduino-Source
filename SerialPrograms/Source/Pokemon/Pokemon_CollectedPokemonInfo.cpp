@@ -87,7 +87,7 @@ std::ostream& operator<<(std::ostream& os, const std::optional<CollectedPokemonI
     if (pokemon.has_value()){
         // NOTE edit when adding new struct members
         os << "(";
-        os << "dex_id: " << pokemon->dex_number << " " << pokemon->name_slug << " ";
+        os << "dex: " << pokemon->dex_number << " " << pokemon->name_slug << " ";
         os << "shiny:" << (pokemon->shiny ? "true" : "false") << " ";
         os << "gmax:" << (pokemon->gmax ? "true" : "false") << " ";
         os << "alpha:" << (pokemon->alpha ? "true" : "false") << " ";

@@ -50,7 +50,8 @@ bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs
 // If user does not give a preference ruleset, sort by dex number.
 bool operator<(const std::optional<CollectedPokemonInfo>& lhs, const std::optional<CollectedPokemonInfo>& rhs);
 
-// Print pokemon info into ostream
+// Print pokemon info into ostream.
+// If empty, return "(empty)". Otherwise, "(dex: 1: bulbasaur shiny:...)"
 std::ostream& operator<<(std::ostream& os, const std::optional<CollectedPokemonInfo>& pokemon);
 
 // Create short info of a pokemon for overlay log display
