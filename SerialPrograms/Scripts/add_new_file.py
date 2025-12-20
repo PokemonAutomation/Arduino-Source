@@ -74,7 +74,7 @@ def get_code_file_range(file_lines: List[str], starting_line: str, ending_line: 
 
 
 
-cmake_file_path = os.path.join(code_root_path, "SerialPrograms", "SourceFiles.cmake")
+cmake_file_path = os.path.join(code_root_path, "SerialPrograms", "cmake", "SourceFiles.cmake")
 print(f"SourceFiles.cmake path: {cmake_file_path}")
 
 file_lines = read_lines(cmake_file_path)

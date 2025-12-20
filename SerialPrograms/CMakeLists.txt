@@ -5,7 +5,6 @@ cmake_minimum_required(VERSION 3.18.0)
 set(_cmake_files_to_watch
     "${CMAKE_SOURCE_DIR}/CMakeLists.txt"
     "${CMAKE_SOURCE_DIR}/CMakePresets.json"
-    "${CMAKE_SOURCE_DIR}/SourceFiles.cmake"
 )
 
 # Watch any helper .cmake files under cmake/
@@ -129,7 +128,7 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 link_directories(${CMAKE_CURRENT_LIST_DIR})
 
 # add the list of all code file paths as ${LIBRARY_SOURCES} and ${EXECUTABLE_SOURCES}
-include(SourceFiles.cmake)
+include(cmake/SourceFiles.cmake)
 
 # Organize source files in IDE project view
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${LIBRARY_SOURCES})
