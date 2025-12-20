@@ -315,10 +315,66 @@ void sort(
     }
 }
 
+// Read current screen to find occupied and empty slots in the box.
+// Add a placeholder value for each slot in order into `boxes_data`. For empty slot the value is just std::nullopt, while
+// for the occupied slot it is an empty pokemon struct `CollectedPokemonInfo`.
+// Return the (row, col) index of the first pokemon (aka non-empty) slot in the box.
+std::array<size_t, 2> find_occupied_slots_in_box(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    std::vector<std::optional<CollectedPokemonInfo>>& boxes_data,
+    const std::vector<SortingRule>& sort_preferences)
+{
+    BoxSorter_Descriptor::Stats& stats = env.current_stats< BoxSorter_Descriptor::Stats>();
+
+    VideoSnapshot screen = env.console.video().snapshot();
+
+    std::ostringstream ss;
+    ss << "\n";
+
+    std::array<size_t, 2> first_pokemon_slot = {SIZE_MAX, SIZE_MAX};
+
+    int num_empty_slots = 0;
+    for (size_t row = 0; row < BOX_ROWS; row++){
+        for (size_t col = 0; col < BOX_COLS; col++){
+            ImageFloatBox slot_box(0.06 + (0.072 * col), 0.2 + (0.1035 * row), 0.03, 0.057);
+            int current_box_value = (int)image_stddev(extract_box_reference(screen, slot_box)).sum();
+
+            ss << current_box_value;
+
+            //checking color to know if a pokemon is on the slot or not
+            if(current_box_value < 10){
+                stats.empty++;
+                num_empty_slots++;
+                boxes_data.push_back(std::nullopt); //empty optional to make sorting easier later
+                ss << "\u274c " ;    //  "X"
+            }else{
+                if(first_pokemon_slot[0] == SIZE_MAX){
+                    first_pokemon_slot = {row, col};
+                }
+                stats.pkmn++;
+                boxes_data.push_back(
+                    CollectedPokemonInfo{
+                        .preferences = &sort_preferences
+                    }
+                    ); //default initialised pokemon to know there is a pokemon here that needs a value
+                ss << "\u2705 " ;    //  checkbox
+            }
+        }
+        ss << "\n";
+    }    
+
+    env.update_stats();
+    env.log(ss.str());
+    env.add_overlay_log("Empty: " + std::to_string(num_empty_slots) + "/30");
+
+    return first_pokemon_slot;
+}
+
 void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     StartProgramChecks::check_performance_class_wired_or_wireless(context);
 
-    std::vector<SortingRule> sort_preferences = SORT_TABLE.preferences();
+    const std::vector<SortingRule> sort_preferences = SORT_TABLE.preferences();
     if (sort_preferences.empty()){
         throw UserSetupError(env.console, "At least one sorting method selection needs to be made!");
     }
@@ -398,8 +454,10 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         }else{
             // Moving the cursor until it goes to the first slot
             if(!go_to_first_slot(env, context, VIDEO_DELAY)){
-                env.console.log("ERROR: Could not move cursor to the first slot, please consider adjusting delay\n", COLOR_RED);
-                return;
+                throw UserSetupError(
+                    env.logger(),
+                    "ERROR: Could not move cursor to the first slot, please consider adjusting delay."
+                );
             }
         }
 
@@ -408,59 +466,17 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         env.log(log_msg);
         env.console.overlay().add_log(log_msg);
 
-        screen = env.console.video().snapshot();
 
-        // Box grid to find empty slots (red boxes) and fill boxes_data with value to check or not for pokemon dex number
-
-        ss << "\n";
-
-        std::array<size_t, 2> first_poke_slot = {0, 0};
-        bool find_first_poke = false;
-
-        int num_empty_slots = 0;
-        for (size_t row = 0; row < BOX_ROWS; row++){
-            for (size_t column = 0; column < BOX_COLS; column++){
-                ImageFloatBox slot_box(0.06 + (0.072 * column), 0.2 + (0.1035 * row), 0.03, 0.057);
-                int current_box_value = (int)image_stddev(extract_box_reference(screen, slot_box)).sum();
-
-                ss << current_box_value;
-
-                //checking color to know if a pokemon is on the slot or not
-                if(current_box_value < 10){
-                    box_render.add(COLOR_RED, slot_box);
-                    stats.empty++;
-                    num_empty_slots++;
-                    env.update_stats();
-                    boxes_data.push_back(std::nullopt); //empty optional to make sorting easier later
-                    ss << "\u274c " ;    //  "X"
-                }else{
-                    if(find_first_poke == false){
-                        first_poke_slot = {column, row};
-                        find_first_poke = true;
-                    }
-                    box_render.add(COLOR_GREEN, slot_box);
-                    stats.pkmn++;
-                    env.update_stats();
-                    boxes_data.push_back(
-                        CollectedPokemonInfo{
-                            .preferences = &sort_preferences
-                        }
-                        ); //default initialised pokemon to know there is a pokemon here that needs a value
-                    ss << "\u2705 " ;    //  checkbox
-                }
-            }
-            ss << "\n";
-        }
-        env.console.log(ss.str());
-        env.add_overlay_log("Empty: " + std::to_string(num_empty_slots) + "/30");
+        // Check box grid color stddev to find occupied slots and fill boxes_data with placeholder pokemon info.
+        const std::array<size_t, 2> first_pokemon_slot = find_occupied_slots_in_box(env, context, boxes_data, sort_preferences);
         ss.str("");
 
-        // moving cursor to the first pokemon slot
-        dest_cursor = {0, first_poke_slot[1], first_poke_slot[0]};
-        nav_cursor = move_cursor_to(env, context, nav_cursor, dest_cursor, GAME_DELAY);
-
         //enter the summary screen to read pokemon info
-        if (find_first_poke){
+        if (first_pokemon_slot[0] != SIZE_MAX){
+            // moving cursor to the first pokemon slot
+            dest_cursor = {0, first_pokemon_slot[0], first_pokemon_slot[1]};
+            nav_cursor = move_cursor_to(env, context, nav_cursor, dest_cursor, GAME_DELAY);
+
             env.add_overlay_log("Checking Summary...");
 
             pbf_press_button(context, BUTTON_A, 10, GAME_DELAY);
