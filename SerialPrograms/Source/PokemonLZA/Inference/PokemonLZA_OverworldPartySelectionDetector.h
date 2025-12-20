@@ -64,6 +64,10 @@ private:
     std::array<ButtonDetector, 6> m_dpad_ups;
     std::array<ButtonDetector, 6> m_dpad_downs;
 
+    // 6 regions, one for each party pokemon, to detect the black triangles inside dpad buttons
+    std::array<ButtonDetector, 6> m_dpad_up_interiors;
+    std::array<ButtonDetector, 6> m_dpad_down_interiors;
+
     uint8_t m_detected_up_idx = INVALID_PARTY_IDX;
     uint8_t m_detected_down_idx = INVALID_PARTY_IDX;
 

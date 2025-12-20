@@ -31,6 +31,8 @@ enum class ButtonType{
     RightStickUpDown,
     ButtonDpadUp,
     ButtonDpadDown,
+    ButtonDpadUpInterior,   // Used to create button detector that detects the black triangle inside the DPAD_UP button
+    ButtonDpadDownInterior, // Used to create button detector that detects the black triangle inside the DPAD_DOWN button
 };
 
 class ButtonMatcher;
@@ -51,7 +53,10 @@ public:
 
     virtual void reset_state() override { m_last_detected_box.reset(); }
 
+    ButtonType button_type() const { return m_button_type; }
+
 private:
+    ButtonType m_button_type;
     Color m_color;
     const ButtonMatcher& m_matcher;
     ImageFloatBox m_box;

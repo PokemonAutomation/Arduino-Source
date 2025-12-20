@@ -54,6 +54,22 @@ OverworldPartySelectionDetector::OverworldPartySelectionDetector(Color color, Vi
         ButtonDetector(color, ButtonType::ButtonDpadDown, BOXES()[4], overlay),
         ButtonDetector(color, ButtonType::ButtonDpadDown, BOXES()[5], overlay)
     }
+    , m_dpad_up_interiors{
+        ButtonDetector(color, ButtonType::ButtonDpadUpInterior, BOXES()[0]),
+        ButtonDetector(color, ButtonType::ButtonDpadUpInterior, BOXES()[1]),
+        ButtonDetector(color, ButtonType::ButtonDpadUpInterior, BOXES()[2]),
+        ButtonDetector(color, ButtonType::ButtonDpadUpInterior, BOXES()[3]),
+        ButtonDetector(color, ButtonType::ButtonDpadUpInterior, BOXES()[4]),
+        ButtonDetector(color, ButtonType::ButtonDpadUpInterior, BOXES()[5])
+    }
+    , m_dpad_down_interiors{
+        ButtonDetector(color, ButtonType::ButtonDpadDownInterior, BOXES()[0]),
+        ButtonDetector(color, ButtonType::ButtonDpadDownInterior, BOXES()[1]),
+        ButtonDetector(color, ButtonType::ButtonDpadDownInterior, BOXES()[2]),
+        ButtonDetector(color, ButtonType::ButtonDpadDownInterior, BOXES()[3]),
+        ButtonDetector(color, ButtonType::ButtonDpadDownInterior, BOXES()[4]),
+        ButtonDetector(color, ButtonType::ButtonDpadDownInterior, BOXES()[5])
+    }
 {}
 
 void OverworldPartySelectionDetector::make_overlays(VideoOverlaySet& items) const{
@@ -67,7 +83,10 @@ bool OverworldPartySelectionDetector::detect(const ImageViewRGB32& screen){
     m_detected_up_idx = INVALID_PARTY_IDX, m_detected_down_idx = INVALID_PARTY_IDX;
     for(uint8_t i = 0; i < 6; i++){
         if (m_debug_mode || m_detected_up_idx == INVALID_PARTY_IDX){
-            if (m_dpad_ups[i].detect(screen)){
+            if (m_dpad_ups[i].detect(screen) || m_dpad_up_interiors[i].detect(screen)){
+                if (m_debug_mode && m_dpad_up_interiors[i].detect(screen)){
+                    cout << "DPAD UP Interior detected at index " << i << endl;
+                }
                 if (m_debug_mode && m_detected_up_idx != INVALID_PARTY_IDX){
                     cout << "Multiple dpad up buttons detected! First detection " << int(m_detected_up_idx)
                          << " second detection (" << int(i) << endl;
@@ -78,7 +97,10 @@ bool OverworldPartySelectionDetector::detect(const ImageViewRGB32& screen){
             }
         }
         if (m_debug_mode || m_detected_down_idx == INVALID_PARTY_IDX){
-            if (m_dpad_downs[i].detect(screen)){
+            if (m_dpad_downs[i].detect(screen) || m_dpad_down_interiors[i].detect(screen)){
+                if (m_debug_mode && m_dpad_down_interiors[i].detect(screen)){
+                    cout << "DPAD DOWN Interior detected at index " << i << endl;
+                }
                 if (m_debug_mode && m_detected_down_idx != INVALID_PARTY_IDX){
                     cout << "Multiple dpad down buttons detected! First detection " << int(m_detected_down_idx)
                          << " second detection (" << int(i) << endl;
