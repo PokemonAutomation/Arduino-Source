@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 class FloatingPointCellWidget : public QLineEdit, public ConfigWidget{
 public:
     ~FloatingPointCellWidget();
-    FloatingPointCellWidget(QWidget& parent, FloatingPointCell& value);
+    FloatingPointCellWidget(QWidget& parent, FloatingPointCell& value, bool sanitize);
 
     virtual void update_value() override;
     virtual void on_config_value_changed(void* object) override;

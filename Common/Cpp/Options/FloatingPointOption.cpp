@@ -89,6 +89,17 @@ std::string FloatingPointCell::set(double x){
     }
     return err;
 }
+void FloatingPointCell::set_and_sanitize(double x){
+    if (std::isnan(x)){
+        x = 0;
+    }
+    const Data& data = *m_data;
+    x = std::max(x, data.m_min_value);
+    x = std::min(x, data.m_max_value);
+    if (x != m_data->m_current.exchange(x, std::memory_order_relaxed)){
+        report_value_changed(this);
+    }
+}
 
 void FloatingPointCell::load_json(const JsonValue& json){
     double value;

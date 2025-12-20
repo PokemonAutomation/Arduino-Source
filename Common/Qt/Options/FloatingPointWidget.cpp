@@ -10,12 +10,16 @@
 #include "ConfigWidget.h"
 #include "FloatingPointWidget.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
 
 ConfigWidget* FloatingPointCell::make_QtWidget(QWidget& parent){
-    return new FloatingPointCellWidget(parent, *this);
+    return new FloatingPointCellWidget(parent, *this, true);
 }
 ConfigWidget* FloatingPointOption::make_QtWidget(QWidget& parent){
     return new FloatingPointOptionWidget(parent, *this);
@@ -27,7 +31,7 @@ ConfigWidget* FloatingPointOption::make_QtWidget(QWidget& parent){
 FloatingPointCellWidget::~FloatingPointCellWidget(){
     m_value.remove_listener(*this);
 }
-FloatingPointCellWidget::FloatingPointCellWidget(QWidget& parent, FloatingPointCell& value)
+FloatingPointCellWidget::FloatingPointCellWidget(QWidget& parent, FloatingPointCell& value, bool sanitize)
     : QLineEdit(QString::number(value, 'f'), &parent)
     , ConfigWidget(value, *this)
     , m_value(value)
@@ -48,17 +52,23 @@ FloatingPointCellWidget::FloatingPointCellWidget(QWidget& parent, FloatingPointC
     );
     connect(
         this, &QLineEdit::editingFinished,
-        this, [this](){
+        this, [this, sanitize](){
             bool ok;
             double current = this->text().toDouble(&ok);
             QPalette palette;
-            if (ok && m_value.check_validity(current).empty()){
-                palette.setColor(QPalette::Text, Qt::black);
+            palette.setColor(QPalette::Text, Qt::black);
+            if (sanitize){
+                m_value.set_and_sanitize(current);
             }else{
-                palette.setColor(QPalette::Text, Qt::red);
+                if (!ok || !m_value.check_validity(current).empty()){
+                    palette.setColor(QPalette::Text, Qt::red);
+                }
+                m_value.set(current);
             }
             this->setPalette(palette);
-            m_value.set(current);
+
+            //  Always update the UI.
+            on_config_value_changed(this);
         }
     );
     value.add_listener(*this);
@@ -91,7 +101,7 @@ FloatingPointOptionWidget::FloatingPointOptionWidget(QWidget& parent, FloatingPo
     text->setTextInteractionFlags(Qt::TextBrowserInteraction);
     text->setOpenExternalLinks(true);
     layout->addWidget(text, 1);
-    m_cell = new FloatingPointCellWidget(*this, value);
+    m_cell = new FloatingPointCellWidget(*this, value, false);
     layout->addWidget(m_cell, 1);
     value.add_listener(*this);
 }

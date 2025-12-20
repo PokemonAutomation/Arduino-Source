@@ -38,6 +38,7 @@ public:
 
     operator double() const;
     std::string set(double x);
+    void set_and_sanitize(double x);
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
