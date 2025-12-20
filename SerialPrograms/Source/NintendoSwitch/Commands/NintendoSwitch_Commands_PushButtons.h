@@ -55,6 +55,7 @@ void pbf_press_dpad     (ProControllerContext& context, DpadPosition position, M
 //           move the joystick upper-right: (x, y) = (255, 0)
 void pbf_move_left_joystick (ProControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks);
 void pbf_move_left_joystick (ProControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release);
+void pbf_move_left_joystick (ProControllerContext& context, const JoystickPosition& position, Milliseconds hold, Milliseconds release);
 
 //  Move right joystick towards a 2D direction. Hold the direction for `hold_ticks`, then release it for `release_ticks`.
 //  The direction is specified by (x, y):
@@ -66,8 +67,9 @@ void pbf_move_left_joystick (ProControllerContext& context, uint8_t x, uint8_t y
 //  y = 255 : down
 //  Example: move the joystick fully left: (x, y) = (0, 128)
 //           move the joystick upper-right: (x, y) = (255, 0)
-void pbf_move_right_joystick    (ProControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks);
-void pbf_move_right_joystick    (ProControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release);
+void pbf_move_right_joystick(ProControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks);
+void pbf_move_right_joystick(ProControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release);
+void pbf_move_right_joystick(ProControllerContext& context, const JoystickPosition& position, Milliseconds hold, Milliseconds release);
 
 //  Mash a Switch controller button (excluding D-Pad) repeatedly for `ticks` ticks.
 //  The buttons are defined in Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h. Examples include BUTTON_A, BUTTON_ZL.
@@ -112,6 +114,14 @@ void pbf_controller_state(
     uint8_t right_x, uint8_t right_y,
     Milliseconds duration
 );
+void pbf_controller_state(
+    ProControllerContext& context,
+    Button button,
+    DpadPosition position,
+    const JoystickPosition& left_joystick,
+    const JoystickPosition& right_joystick,
+    Milliseconds duration
+);
 
 
 
@@ -119,12 +129,13 @@ void pbf_controller_state(
 void pbf_wait           (JoyconContext& context, Milliseconds duration);
 void pbf_press_button   (JoyconContext& context, Button button, Milliseconds hold, Milliseconds release);
 void pbf_move_joystick  (JoyconContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release);
+void pbf_move_joystick  (JoyconContext& context, const JoystickPosition& position, Milliseconds hold, Milliseconds release);
 void pbf_mash_button    (JoyconContext& context, Button button, Milliseconds duration);
 
 void pbf_controller_state(
     JoyconContext& context,
     Button button,
-    uint8_t x, uint8_t y,
+    const JoystickPosition& joystick,
     Milliseconds duration
 );
 

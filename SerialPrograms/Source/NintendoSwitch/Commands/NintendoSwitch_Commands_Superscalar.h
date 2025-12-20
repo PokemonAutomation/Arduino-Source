@@ -51,6 +51,11 @@ void ssf_press_left_joystick(
     uint8_t x, uint8_t y,
     Milliseconds delay, Milliseconds hold, Milliseconds cool = 0ms
 );
+void ssf_press_left_joystick(
+    ProControllerContext& context,
+    const JoystickPosition& position,
+    Milliseconds delay, Milliseconds hold, Milliseconds cool = 0ms
+);
 void ssf_press_right_joystick(
     ProControllerContext& context,
     uint8_t x, uint8_t y,
@@ -59,6 +64,11 @@ void ssf_press_right_joystick(
 void ssf_press_right_joystick(
     ProControllerContext& context,
     uint8_t x, uint8_t y,
+    Milliseconds delay, Milliseconds hold, Milliseconds cool = 0ms
+);
+void ssf_press_right_joystick(
+    ProControllerContext& context,
+    const JoystickPosition& position,
     Milliseconds delay, Milliseconds hold, Milliseconds cool = 0ms
 );
 
@@ -182,6 +192,11 @@ void ssf_press_button(
 void ssf_press_joystick(
     JoyconContext& context,
     uint8_t x, uint8_t y,
+    Milliseconds delay, Milliseconds hold, Milliseconds cool = 0ms
+);
+void ssf_press_joystick(
+    JoyconContext& context,
+    const JoystickPosition& position,
     Milliseconds delay, Milliseconds hold, Milliseconds cool = 0ms
 );
 void ssf_mash1_button   (JoyconContext& context, Button button, Milliseconds duration);

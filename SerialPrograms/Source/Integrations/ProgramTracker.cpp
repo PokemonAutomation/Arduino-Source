@@ -7,6 +7,7 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "Controllers/JoystickTools.h"
 #include "Controllers/ControllerSession.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "ProgramTracker.h"
@@ -185,7 +186,13 @@ std::string ProgramTracker::nsw_press_left_joystick(uint64_t console_id, uint8_t
     try{
         err = iter->second.first->controller().try_run<ProController>(
             [=](ProController& controller){
-                controller.issue_left_joystick(nullptr, duration, duration, 0ms, x, y);
+                controller.issue_left_joystick(
+                    nullptr, duration, duration, 0ms,
+                    {
+                        JoystickTools::linear_u8_to_float(x),
+                        -JoystickTools::linear_u8_to_float(y)
+                    }
+                );
             }
         );
     }catch (Exception& e){
@@ -215,7 +222,13 @@ std::string ProgramTracker::nsw_press_right_joystick(uint64_t console_id, uint8_
     try{
         err = iter->second.first->controller().try_run<ProController>(
             [=](ProController& controller){
-                controller.issue_right_joystick(nullptr, duration, duration, 0ms, x, y);
+                controller.issue_right_joystick(
+                    nullptr, duration, duration, 0ms,
+                    {
+                        JoystickTools::linear_u8_to_float(x),
+                        -JoystickTools::linear_u8_to_float(y)
+                    }
+                );
             }
         );
     }catch (Exception& e){

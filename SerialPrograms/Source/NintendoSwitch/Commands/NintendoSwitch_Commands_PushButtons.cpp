@@ -4,6 +4,7 @@
  * 
  */
 
+#include "Controllers/JoystickTools.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch_Commands_Superscalar.h"
@@ -42,6 +43,9 @@ void pbf_move_left_joystick(ProControllerContext& context, uint8_t x, uint8_t y,
 void pbf_move_left_joystick (ProControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release){
     ssf_press_left_joystick(context, x, y, hold + release, hold, 0ms);
 }
+void pbf_move_left_joystick(ProControllerContext& context, const JoystickPosition& position, Milliseconds hold, Milliseconds release){
+    ssf_press_left_joystick(context, position, hold + release, hold, 0ms);
+}
 void pbf_move_right_joystick(ProControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
     uint32_t delay = (uint32_t)hold_ticks + release_ticks;
     if ((uint16_t)delay == delay){
@@ -53,6 +57,9 @@ void pbf_move_right_joystick(ProControllerContext& context, uint8_t x, uint8_t y
 }
 void pbf_move_right_joystick (ProControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release){
     ssf_press_right_joystick(context, x, y, hold + release, hold, 0ms);
+}
+void pbf_move_right_joystick(ProControllerContext& context, const JoystickPosition& position, Milliseconds hold, Milliseconds release){
+    ssf_press_right_joystick(context, position, hold + release, hold, 0ms);
 }
 void pbf_mash_button(ProControllerContext& context, Button button, uint16_t ticks){
     ssf_mash1_button(context, button, ticks);
@@ -81,8 +88,14 @@ void pbf_controller_state(
         true,
         ticks*8ms,
         button, position,
-        left_x, left_y,
-        right_x, right_y
+        {
+            JoystickTools::linear_u8_to_float(left_x),
+            -JoystickTools::linear_u8_to_float(left_y)
+        },
+        {
+            JoystickTools::linear_u8_to_float(right_x),
+            -JoystickTools::linear_u8_to_float(right_y)
+        }
     );
 }
 void pbf_controller_state(
@@ -98,8 +111,31 @@ void pbf_controller_state(
         true,
         duration,
         button, position,
-        left_x, left_y,
-        right_x, right_y
+        {
+            JoystickTools::linear_u8_to_float(left_x),
+            -JoystickTools::linear_u8_to_float(left_y)
+        },
+        {
+            JoystickTools::linear_u8_to_float(right_x),
+            -JoystickTools::linear_u8_to_float(right_y)
+        }
+    );
+}
+void pbf_controller_state(
+    ProControllerContext& context,
+    Button button,
+    DpadPosition position,
+    const JoystickPosition& left_joystick,
+    const JoystickPosition& right_joystick,
+    Milliseconds duration
+){
+    context->issue_full_controller_state(
+        &context,
+        true,
+        duration,
+        button, position,
+        left_joystick,
+        right_joystick
     );
 }
 
@@ -114,6 +150,9 @@ void pbf_press_button(JoyconContext& context, Button button, Milliseconds hold, 
 }
 void pbf_move_joystick(JoyconContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release){
     ssf_press_joystick(context, x, y, hold + release, hold, 0ms);
+}
+void pbf_move_joystick(JoyconContext& context, const JoystickPosition& position, Milliseconds hold, Milliseconds release){
+    ssf_press_joystick(context, position, hold + release, hold, 0ms);
 }
 void pbf_mash_button(JoyconContext& context, Button button, Milliseconds duration){
     ssf_mash1_button(context, button, duration);
@@ -130,10 +169,26 @@ void pbf_controller_state(
         true,
         duration,
         button,
-        x, y
+        {
+            JoystickTools::linear_u8_to_float(x),
+            -JoystickTools::linear_u8_to_float(y)
+        }
     );
 }
-
+void pbf_controller_state(
+    JoyconContext& context,
+    Button button,
+    const JoystickPosition& joystick,
+    Milliseconds duration
+){
+    context->issue_full_controller_state(
+        &context,
+        true,
+        duration,
+        button,
+        joystick
+    );
+}
 
 
 

@@ -9,7 +9,6 @@
 #include "CommonTools/Async/SuperControlSession.tpp"
 #include "ControllerInput/ControllerInput.h"
 #include "ControllerInput/Keyboard/KeyboardInput_State.h"
-#include "Controllers/JoystickTools.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
 #include "NintendoSwitch_ProControllerState.h"
@@ -62,60 +61,6 @@ ControllerClass ProController::controller_class() const{
 }
 
 
-
-void ProController::issue_left_joystick(
-    Cancellable* cancellable,
-    Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-    uint8_t x, uint8_t y
-){
-    issue_left_joystick(
-        cancellable,
-        delay, hold, cooldown,
-        JoystickPosition(
-            JoystickTools::linear_u8_to_float(x),
-            -JoystickTools::linear_u8_to_float(y)
-        )
-    );
-}
-void ProController::issue_right_joystick(
-    Cancellable* cancellable,
-    Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-    uint8_t x, uint8_t y
-){
-    issue_right_joystick(
-        cancellable,
-        delay, hold, cooldown,
-        JoystickPosition(
-            JoystickTools::linear_u8_to_float(x),
-            -JoystickTools::linear_u8_to_float(y)
-        )
-    );
-}
-void ProController::issue_full_controller_state(
-    Cancellable* cancellable,
-    bool enable_logging,
-    Milliseconds duration,
-    Button button,
-    DpadPosition dpad,
-    uint8_t left_x, uint8_t left_y,
-    uint8_t right_x, uint8_t right_y
-){
-    issue_full_controller_state(
-        cancellable,
-        enable_logging,
-        duration,
-        button,
-        dpad,
-        JoystickPosition(
-            JoystickTools::linear_u8_to_float(left_x),
-            -JoystickTools::linear_u8_to_float(left_y)
-        ),
-        JoystickPosition(
-            JoystickTools::linear_u8_to_float(right_x),
-            -JoystickTools::linear_u8_to_float(right_y)
-        )
-    );
-}
 
 
 

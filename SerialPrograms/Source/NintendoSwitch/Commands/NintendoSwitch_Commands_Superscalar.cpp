@@ -4,6 +4,7 @@
  *
  */
 
+#include "Controllers/JoystickTools.h"
 #include "NintendoSwitch_Commands_Superscalar.h"
 //#include "NintendoSwitch_Messages_Superscalar.h"
 
@@ -68,7 +69,10 @@ void ssf_press_left_joystick(
     context->issue_left_joystick(
         &context,
         delay*8ms, hold*8ms, cool*8ms,
-        x, y
+        {
+            JoystickTools::linear_u8_to_float(x),
+            -JoystickTools::linear_u8_to_float(y)
+        }
     );
 }
 void ssf_press_left_joystick(
@@ -76,7 +80,20 @@ void ssf_press_left_joystick(
     uint8_t x, uint8_t y,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){
-    context->issue_left_joystick(&context, delay, hold, cool, x, y);
+    context->issue_left_joystick(
+        &context, delay, hold, cool,
+        {
+            JoystickTools::linear_u8_to_float(x),
+            -JoystickTools::linear_u8_to_float(y)
+        }
+    );
+}
+void ssf_press_left_joystick(
+    ProControllerContext& context,
+    const JoystickPosition& position,
+    Milliseconds delay, Milliseconds hold, Milliseconds cool
+){
+    context->issue_left_joystick(&context, delay, hold, cool, position);
 }
 void ssf_press_right_joystick(
     ProControllerContext& context,
@@ -86,7 +103,10 @@ void ssf_press_right_joystick(
     context->issue_right_joystick(
         &context,
         delay*8ms, hold*8ms, cool*8ms,
-        x, y
+        {
+            JoystickTools::linear_u8_to_float(x),
+            -JoystickTools::linear_u8_to_float(y)
+        }
     );
 }
 void ssf_press_right_joystick(
@@ -94,7 +114,20 @@ void ssf_press_right_joystick(
     uint8_t x, uint8_t y,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){
-    context->issue_right_joystick(&context, delay, hold, cool, x, y);
+    context->issue_right_joystick(
+        &context, delay, hold, cool,
+        {
+            JoystickTools::linear_u8_to_float(x),
+            -JoystickTools::linear_u8_to_float(y)
+        }
+    );
+}
+void ssf_press_right_joystick(
+    ProControllerContext& context,
+    const JoystickPosition& position,
+    Milliseconds delay, Milliseconds hold, Milliseconds cool
+){
+    context->issue_right_joystick(&context, delay, hold, cool, position);
 }
 
 
@@ -164,7 +197,20 @@ void ssf_press_joystick(
     uint8_t x, uint8_t y,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){
-    context->issue_joystick(&context, delay, hold, cool, x, y);
+    context->issue_joystick(
+        &context, delay, hold, cool,
+        {
+            JoystickTools::linear_u8_to_float(x),
+            -JoystickTools::linear_u8_to_float(y)
+        }
+    );
+}
+void ssf_press_joystick(
+    JoyconContext& context,
+    const JoystickPosition& position,
+    Milliseconds delay, Milliseconds hold, Milliseconds cool
+){
+    context->issue_joystick(&context, delay, hold, cool, position);
 }
 void ssf_mash1_button(JoyconContext& context, Button button, Milliseconds duration){
     context->issue_mash_button(&context, button, duration);
@@ -183,28 +229,28 @@ void ssf_issue_scroll(
 ){
     switch (direction){
     case DpadPosition::DPAD_UP:
-        ssf_press_joystick(context, 128, 0, delay, hold, cool);
+        ssf_press_joystick(context, {0, +1}, delay, hold, cool);
         break;
     case DpadPosition::DPAD_UP_RIGHT:
-        ssf_press_joystick(context, 255, 0, delay, hold, cool);
+        ssf_press_joystick(context, {+1, +1}, delay, hold, cool);
         break;
     case DpadPosition::DPAD_RIGHT:
-        ssf_press_joystick(context, 255, 128, delay, hold, cool);
+        ssf_press_joystick(context, {+1, 0}, delay, hold, cool);
         break;
     case DpadPosition::DPAD_DOWN_RIGHT:
-        ssf_press_joystick(context, 255, 255, delay, hold, cool);
+        ssf_press_joystick(context, {+1, -1}, delay, hold, cool);
         break;
     case DpadPosition::DPAD_DOWN:
-        ssf_press_joystick(context, 128, 255, delay, hold, cool);
+        ssf_press_joystick(context, {0, -1}, delay, hold, cool);
         break;
     case DpadPosition::DPAD_DOWN_LEFT:
-        ssf_press_joystick(context, 0, 255, delay, hold, cool);
+        ssf_press_joystick(context, {-1, -1}, delay, hold, cool);
         break;
     case DpadPosition::DPAD_LEFT:
-        ssf_press_joystick(context, 0, 128, delay, hold, cool);
+        ssf_press_joystick(context, {-1, 0}, delay, hold, cool);
         break;
     case DpadPosition::DPAD_UP_LEFT:
-        ssf_press_joystick(context, 0, 0, delay, hold, cool);
+        ssf_press_joystick(context, {-1, +1}, delay, hold, cool);
         break;
     default:;
     }
