@@ -27,7 +27,8 @@ enum class Flavor_Powers {
     speed,
     bighaul,
     item,
-    mega,
+    megacharge,
+    megaconserve,
     def,
     spdef,
     resistance,
@@ -72,6 +73,15 @@ enum class Power_Level{
     three,
 };
 
+struct FlavorPowerTableEntry{
+    Flavor_Powers power;
+    Power_Pokemon_Types pokemon_type;
+    Power_Item_Types item_type;
+    Power_Level level;
+
+    std::string to_str() const;
+};
+
 
 //Berry + Hyperspace Berry selection
 class DonutBerriesTableCell : public StringSelectCell{
@@ -107,6 +117,8 @@ public:
     FlavorPowerTableRow(EditableTableOption& parent_table);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
+    FlavorPowerTableEntry snapshot() const;
+
 private:
     virtual void on_config_value_changed(void* object) override;
 
@@ -121,6 +133,8 @@ private:
 class FlavorPowerTable : public EditableTableOption_t<FlavorPowerTableRow>{
 public:
     FlavorPowerTable();
+
+    std::vector<FlavorPowerTableEntry> snapshot();
 
     virtual std::vector<std::string> make_header() const;
 

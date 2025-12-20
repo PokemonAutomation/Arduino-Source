@@ -24,7 +24,8 @@ const EnumDropdownDatabase<Flavor_Powers>& flavor_power_enum_database(){
         {Flavor_Powers::speed,      "speed",        "Speed"},
         {Flavor_Powers::bighaul,    "bighaul",      "Big Haul"},
         {Flavor_Powers::item,       "item",         "Item"},
-        {Flavor_Powers::mega,       "mega",         "Mega"},
+        {Flavor_Powers::megacharge, "megacharge",   "Mega Charge"},
+        {Flavor_Powers::megaconserve,"megaconserve","Mega Conserve"},
         {Flavor_Powers::def,        "def",          "Defense"},
         {Flavor_Powers::spdef,      "spdef",        "Sp. Def"},
         {Flavor_Powers::resistance, "resistance",   "Resistance"},
@@ -75,6 +76,159 @@ const EnumDropdownDatabase<Power_Level>& power_level_enum_database(){
         {Power_Level::three,    "three",    "Lv. 3"},
     };
     return database;
+}
+
+std::string FlavorPowerTableEntry::to_str() const{
+    std::string selected_power;
+
+    switch (power){
+    case Flavor_Powers::alpha:
+        selected_power += "alpha-power-";
+        break;
+    case Flavor_Powers::humungo:
+        selected_power += "humungo-power-";
+        break;
+    case Flavor_Powers::teensy:
+        selected_power += "teensy-power-";
+        break;
+    case Flavor_Powers::sparkling:
+        selected_power += "sparkling-power-";
+        break;
+    case Flavor_Powers::atk:
+        selected_power += "attack-power-";
+        break;
+    case Flavor_Powers::spatk:
+        selected_power += "sp-atk-power-";
+        break;
+    case Flavor_Powers::move:
+        selected_power += "move-power-";
+        break;
+    case Flavor_Powers::speed:
+        selected_power += "speed-power-";
+        break;
+    case Flavor_Powers::bighaul:
+        selected_power += "big-haul-power-";
+        break;
+    case Flavor_Powers::item:
+        selected_power += "item-power-";
+        break;
+    case Flavor_Powers::megacharge:
+        selected_power += "mega-power-charging-";
+        break;
+    case Flavor_Powers::megaconserve:
+        selected_power += "mega-power-conservation-";
+        break;
+    case Flavor_Powers::def:
+        selected_power += "defense-power-";
+        break;
+    case Flavor_Powers::spdef:
+        selected_power += "sp-def-power-";
+        break;
+    case Flavor_Powers::resistance:
+        selected_power += "resistance-power-";
+        break;
+    case Flavor_Powers::encounter:
+        selected_power += "encounter-power-";
+        break;
+    case Flavor_Powers::catching:
+        selected_power += "catching-power-";
+        break;
+    }
+
+    if (power == Flavor_Powers::catching || power == Flavor_Powers::sparkling) {
+        switch (pokemon_type) {
+        case Power_Pokemon_Types::all:
+            selected_power += "all-types-";
+            break;
+        case Power_Pokemon_Types::normal:
+            selected_power += "normal-";
+            break;
+        case Power_Pokemon_Types::fire:
+            selected_power += "fire-";
+            break;
+        case Power_Pokemon_Types::water:
+            selected_power += "water-";
+            break;
+        case Power_Pokemon_Types::electric:
+            selected_power += "electric-";
+            break;
+        case Power_Pokemon_Types::grass:
+            selected_power += "grass-";
+            break;
+        case Power_Pokemon_Types::ice:
+            selected_power += "ice-";
+            break;
+        case Power_Pokemon_Types::fighting:
+            selected_power += "fighting-";
+            break;
+        case Power_Pokemon_Types::poison:
+            selected_power += "poison-";
+            break;
+        case Power_Pokemon_Types::ground:
+            selected_power += "ground-";
+            break;
+        case Power_Pokemon_Types::flying:
+            selected_power += "flying-";
+            break;
+        case Power_Pokemon_Types::psychic:
+            selected_power += "psychic-";
+            break;
+        case Power_Pokemon_Types::bug:
+            selected_power += "bug-";
+            break;
+        case Power_Pokemon_Types::rock:
+            selected_power += "rock-";
+            break;
+        case Power_Pokemon_Types::ghost:
+            selected_power += "ghost-";
+            break;
+        case Power_Pokemon_Types::dragon:
+            selected_power += "dragon-";
+            break;
+        case Power_Pokemon_Types::dark:
+            selected_power += "dark-";
+            break;
+        case Power_Pokemon_Types::steel:
+            selected_power += "steel-";
+            break;
+        case Power_Pokemon_Types::fairy:
+            selected_power += "fairy-";
+            break;
+        }
+    }
+    else if (power == Flavor_Powers::move || power == Flavor_Powers::resistance) {
+        switch (item_type) {
+        case Power_Item_Types::berries:
+            selected_power += "berries-";
+            break;
+        case Power_Item_Types::candies:
+            selected_power += "candies-";
+            break;
+        case Power_Item_Types::treasure:
+            selected_power += "treasure-";
+            break;
+        case Power_Item_Types::pokeballs:
+            selected_power += "poke-balls-";
+            break;
+        case Power_Item_Types::special:
+            selected_power += "special-";
+            break;
+        case Power_Item_Types::coins:
+            selected_power += "coins-";
+            break;
+        }
+    }
+
+    switch (level) {
+    case Power_Level::one:
+        selected_power += "1";
+    case Power_Level::two:
+        selected_power += "2";
+    case Power_Level::three:
+        selected_power += "3";
+    }
+
+    return selected_power;
 }
 
 StringSelectDatabase make_donut_berries_database(){
@@ -169,6 +323,9 @@ std::unique_ptr<EditableTableRow> FlavorPowerTableRow::clone() const{
     ret->level.set(level);
     return ret;
 }
+FlavorPowerTableEntry FlavorPowerTableRow::snapshot() const{
+    return FlavorPowerTableEntry{power, type_pokemon, type_item, level};
+}
 void FlavorPowerTableRow::on_config_value_changed(void* object){
     Flavor_Powers power = this->power;
 
@@ -202,6 +359,9 @@ FlavorPowerTable::FlavorPowerTable()
         make_defaults()
     )
 {}
+std::vector<FlavorPowerTableEntry> FlavorPowerTable::snapshot(){
+    return EditableTableOption_t<FlavorPowerTableRow>::snapshot<FlavorPowerTableEntry>();
+}
 std::vector<std::string> FlavorPowerTable::make_header() const{
     return {
         "Flavor Power     ",

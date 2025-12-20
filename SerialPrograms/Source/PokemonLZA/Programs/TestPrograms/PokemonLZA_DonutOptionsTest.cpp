@@ -91,9 +91,12 @@ void DonutOptionsTest::program(SingleSwitchProgramEnvironment& env, ProControlle
     env.log("Number of berries validated.", COLOR_BLACK);
 
 
-    //Todo: Convert to slug and also validate flavor power table (Move and resist powers cannot have All Types)
+    //Print table to log to check
     std::vector<std::unique_ptr<FlavorPowerTableRow>> wanted_powers_table = FLAVOR_POWERS.copy_snapshot();
-
+    for (const std::unique_ptr<FlavorPowerTableRow>& row : wanted_powers_table){
+        FlavorPowerTableEntry table_line = row->snapshot();
+        env.log(table_line.to_str());
+    }
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
