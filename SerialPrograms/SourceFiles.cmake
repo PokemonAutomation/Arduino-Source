@@ -1342,6 +1342,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonHome/Inference/PokemonHome_BallReader.h
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.cpp
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.h
+    Source/PokemonHome/Inference/PokemonHome_ButtonDetector.cpp
+    Source/PokemonHome/Inference/PokemonHome_ButtonDetector.h
     Source/PokemonHome/PokemonHome_Panels.cpp
     Source/PokemonHome/PokemonHome_Panels.h
     Source/PokemonHome/PokemonHome_Settings.cpp
