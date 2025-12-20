@@ -28,7 +28,11 @@ public:
     ButtonMatcher(ButtonType type, size_t min_width, size_t min_height, double max_rmsd);
     
     static const ButtonMatcher& B(){
-        static ButtonMatcher matcher(ButtonType::ButtonB, 25, 25, 70);
+        static ButtonMatcher matcher(ButtonType::ButtonB, 25, 25, 80);
+        return matcher;
+    }
+    static const ButtonMatcher& Plus(){
+        static ButtonMatcher matcher(ButtonType::ButtonPlus, 25, 25, 80);
         return matcher;
     }
     
@@ -55,7 +59,9 @@ public:
 const char* template_path(ButtonType type){
     switch (type){
     case ButtonType::ButtonB:
-        return "PokemonHome/Buttons/ButtonB.png";
+        return "PokemonHome/Buttons/ButtonB-Template.png";
+    case ButtonType::ButtonPlus:
+        return "PokemonHome/Buttons/ButtonPlus-Template.png";
     default:
         return "";
     }
@@ -65,6 +71,8 @@ const char* button_name(ButtonType type){
     switch (type){
     case ButtonType::ButtonB:
         return "ButtonB";
+    case ButtonType::ButtonPlus:
+        return "ButtonPlus";
     default:
         return "";
     }
@@ -74,6 +82,8 @@ const ButtonMatcher& get_button_matcher(ButtonType type){
     switch (type){
     case ButtonType::ButtonB:
         return ButtonMatcher::B();
+    case ButtonType::ButtonPlus:
+        return ButtonMatcher::Plus();
     default:
         throw std::runtime_error("No corresponding ButtonMatcher for ButtonType");
     }
@@ -146,16 +156,26 @@ bool ButtonDetector::detect(const ImageViewRGB32& screen){
 }
 
 
+BoxViewDetector::BoxViewDetector(VideoOverlay* overlay) : m_button_plus_detector(COLOR_BLACK, ButtonType::ButtonPlus, {0.100, 0.956, 0.107, 0.041}, overlay){}
+
+void BoxViewDetector::make_overlays(VideoOverlaySet& items) const{
+    m_button_plus_detector.make_overlays(items);
+}
+
+bool BoxViewDetector::detect(const ImageViewRGB32& screen){
+    return m_button_plus_detector.detect(screen);
+}
 
 
+SummaryScreenDetector::SummaryScreenDetector(VideoOverlay* overlay) : m_button_B_detector(COLOR_BLACK, ButtonType::ButtonB, {0.100, 0.956, 0.107, 0.041}, overlay){}
 
+void SummaryScreenDetector::make_overlays(VideoOverlaySet& items) const{
+    m_button_B_detector.make_overlays(items);
+}
 
-
-
-
-
-
-
+bool SummaryScreenDetector::detect(const ImageViewRGB32& screen){
+    return m_button_B_detector.detect(screen);
+}
 
 
 

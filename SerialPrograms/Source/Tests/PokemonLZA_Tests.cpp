@@ -4,8 +4,6 @@
 *
 */
 
-#include "PokemonLZA_Tests.h"
-#include "TestUtils.h"
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
@@ -20,6 +18,8 @@
 #include "PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "PokemonLZA_Tests.h"
+#include "TestUtils.h"
 #include <iostream>
 #include <fstream>
 #include <map>

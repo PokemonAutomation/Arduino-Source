@@ -20,6 +20,7 @@ namespace PokemonHome{
 
 enum class ButtonType{
     ButtonB,
+    ButtonPlus,
 };
 
 class ButtonMatcher;
@@ -56,13 +57,53 @@ public:
         ButtonType button_type,
         const ImageFloatBox& box,
         VideoOverlay* overlay = nullptr,
-        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
+        Milliseconds hold_duration = Milliseconds(50)
     )
          : DetectorToFinder("ButtonWatcher", hold_duration, color, button_type, box, overlay)
     {}
 };
 
 
+class BoxViewDetector : public StaticScreenDetector{
+public:
+    BoxViewDetector(VideoOverlay* overlay = nullptr);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+    virtual void reset_state() override { m_button_plus_detector.reset_state(); }
+
+private:
+    ButtonDetector m_button_plus_detector;
+
+};
+class BoxViewWatcher : public DetectorToFinder<BoxViewDetector>{
+public:
+    BoxViewWatcher(VideoOverlay* overlay = nullptr)
+        : DetectorToFinder("BoxViewWatcher", Milliseconds(100), overlay)
+    {}
+};
+
+
+class SummaryScreenDetector : public StaticScreenDetector{
+public:
+    SummaryScreenDetector(VideoOverlay* overlay = nullptr);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+    virtual void reset_state() override { m_button_B_detector.reset_state(); }
+
+private:
+    ButtonDetector m_button_B_detector;
+
+};
+class SummaryScreenWatcher : public DetectorToFinder<SummaryScreenDetector>{
+public:
+    SummaryScreenWatcher(VideoOverlay* overlay = nullptr)
+        : DetectorToFinder("SummaryScreenWatcher", Milliseconds(100), overlay)
+    {}
+};
 
 
 
