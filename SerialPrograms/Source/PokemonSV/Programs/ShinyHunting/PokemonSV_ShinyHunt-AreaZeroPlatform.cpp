@@ -210,7 +210,7 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(ProControllerContext& context){
 
     double hp = m_sensors->lets_go_hp.last_known_value() * 100;
     if (0 < hp){
-        stream.log(std::format("Last Known HP: {}%", hp), COLOR_BLUE);
+        stream.log("Last Known HP: " + tostr_default(hp) + "%", COLOR_BLUE);
     }else{
         stream.log("Last Known HP: ?", COLOR_RED);
     }
@@ -246,13 +246,12 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(ProControllerContext& context){
             kills, encounters, window_seconds
         );
     }
-    stream.log(std::format(
-        "Starting Traversal Iteration: {:L}\n"
-        "    Time Window (Seconds): {}\n"
-        "    Kills: {}\n"
-        "    Encounters: {}",
-        m_iterations, window_seconds.count(), kills, encounters
-    ));
+    stream.log(
+        "Starting Traversal Iteration: " + tostr_u_commas(m_iterations) +
+        "\n    Time Window (Seconds): " + std::to_string(window_seconds.count()) +
+        "\n    Kills: " + std::to_string(kills) +
+        "\n    Encounters: " + std::to_string(encounters)
+    );
 
     // Check we want to do a platform reset first:
     do{

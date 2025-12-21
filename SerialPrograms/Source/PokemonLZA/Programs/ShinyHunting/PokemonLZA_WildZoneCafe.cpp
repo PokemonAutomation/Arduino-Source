@@ -186,8 +186,8 @@ void do_one_cafe_trip(
         {
             const double cur_direction = get_facing_direction(env.console, context);
             const double direction_change = get_angle_between_facing_directions(starting_direction, cur_direction);
-            env.log(std::format("Facing direction difference after day/night change: {:.0f} deg, from {:.0f} to {:.0f} deg",
-                direction_change, starting_direction, cur_direction));
+            env.log("Facing direction difference after day/night change: " + tostr_fixed(direction_change, 0) + " deg, from "
+                + tostr_fixed(starting_direction, 0) + " to " + tostr_fixed(cur_direction, 0) + " deg");
 
             if (direction_change > 30){
                 // we are already facing the gate

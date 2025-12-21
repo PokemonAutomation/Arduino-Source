@@ -153,7 +153,7 @@ void route_wild_zone_3_tower(SingleSwitchProgramEnvironment& env, ProControllerC
         } else{
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                std::format("route_wild_zone_3_tower: unexpected facing direction: {:.0f} deg", direction),
+                "route_wild_zone_3_tower: unexpected facing direction: " + PokemonAutomation::tostr_fixed(direction, 0) + " deg",
                 env.console
             );
         }

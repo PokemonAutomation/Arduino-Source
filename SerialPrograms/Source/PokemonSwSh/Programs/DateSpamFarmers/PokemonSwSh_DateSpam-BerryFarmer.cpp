@@ -66,7 +66,7 @@ void BerryFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCont
     uint8_t year = MAX_YEAR;
     uint16_t save_count = 0;
     for (uint32_t c = 0; c < SKIPS; c++){
-        env.log(std::format("Fetch Attempts: {:L}", c));
+        env.log("Fetch Attempts: " + tostr_u_commas(c));
 
         home_roll_date_enter_game_autorollback(env.console, context, year);
         if (context->performance_class() == ControllerPerformanceClass::SysbotBase){

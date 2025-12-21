@@ -165,7 +165,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
     uint32_t c = 0;
     while(c < PP){
         //  Press A to enter battle, assuming there is a chest
-        env.log(std::format("Fetch Attempts: {:L}", c));
+        env.log("Fetch Attempts: " + tostr_u_commas(c));
         pbf_mash_button(context, BUTTON_A, 125);
         pbf_wait(context, 125); //Wait extra to make sure the overworld map vanishes
         context.wait_for_all_requests();

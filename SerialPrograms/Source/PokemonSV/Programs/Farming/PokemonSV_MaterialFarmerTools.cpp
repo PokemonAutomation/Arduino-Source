@@ -262,7 +262,7 @@ void run_material_farmer(
 
             // heal before starting Let's go
             console.log("Heal before starting Let's go", COLOR_PURPLE);
-            console.log(std::format("Heal threshold: {}", options.AUTO_HEAL_PERCENT.operator double()), COLOR_PURPLE);
+            console.log("Heal threshold: " + tostr_default(options.AUTO_HEAL_PERCENT), COLOR_PURPLE);
             check_hp(env, console, context, options, hp_watcher, stats);
 
             /*
@@ -335,7 +335,7 @@ void check_hp(
 ){
     double hp = hp_watcher.last_known_value() * 100;
     if (0 < hp){
-        stream.log(std::format("Last Known HP: {}%", hp), COLOR_BLUE);
+        stream.log("Last Known HP: " + tostr_default(hp) + "%", COLOR_BLUE);
     }else{
         stream.log("Last Known HP: ?", COLOR_RED);
     }

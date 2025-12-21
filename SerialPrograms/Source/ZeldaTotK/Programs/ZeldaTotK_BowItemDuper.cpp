@@ -81,7 +81,7 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCon
 
     while (c < ATTEMPTS){
 
-        env.log(std::format("Current Attempts: {:L}", c));
+        env.log("Current Attempts: " + tostr_u_commas(c));
 
         // this routine is thanks to koboldtime#2248 on the PA discord server
         // it has been adjusted and modified by denvoros#0001

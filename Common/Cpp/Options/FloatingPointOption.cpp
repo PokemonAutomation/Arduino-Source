@@ -121,10 +121,12 @@ JsonValue FloatingPointCell::to_json() const{
 std::string FloatingPointCell::check_validity(double x) const{
     const Data& data = *m_data;
     if (x < data.m_min_value){
-        return std::format("Value too small: min = {}, value = {}", data.m_min_value, x);
+        std::ostringstream ss;
+        return "Value too small: min = " + tostr_default(data.m_min_value) + ", value = " + tostr_default(x);
     }
     if (x > data.m_max_value){
-        return std::format("Value too large: max = {}, value = {}", data.m_max_value, x);
+        std::ostringstream ss;
+        return "Value too large: max = " + tostr_default(data.m_max_value) + ", value = " + tostr_default(x);
     }
     if (std::isnan(x)){
         return "Value is NaN.";

@@ -116,6 +116,7 @@ void DaySkipperJPN::run_switch1(SingleSwitchProgramEnvironment& env, ProControll
             day++;
             remaining_skips--;
             stats.issued++;
+//            env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
             env.update_stats();
         }
         if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){

@@ -1534,7 +1534,7 @@ ImageFloatBox get_yolo_box(
         ImageFloatBox box = detected_box.box;
         std::string label = yolo_detector.session()->label_name(detected_box.label_idx);
         double score = detected_box.score;
-        std::string label_score = std::format("{}: {:.2f}", label, score);
+        std::string label_score = label + ": " + tostr_fixed(score, 2);
         if (target_label == label){
             overlays.add(COLOR_RED, box, label_score);
             
@@ -1548,12 +1548,8 @@ ImageFloatBox get_yolo_box(
         
     }
 
-    env.console.log(std::format("{}: {{ {}, {}, {}, {} }}",
-        target_label, target_box.x, target_box.y, target_box.width, target_box.height));
-
-    env.console.log(std::format("center-y: {}    center-x: {}",
-        target_box.y + target_box.height / 2,
-        target_box.x + target_box.width / 2));
+    env.console.log(std::string(target_label) + ": {" + std::to_string(target_box.x) + ", " + std::to_string(target_box.y) + ", " + std::to_string(target_box.width) + ", " + std::to_string(target_box.height) + "}");
+    env.console.log("center-y: " + std::to_string(target_box.y + target_box.height/2) + "   center-x: " + std::to_string(target_box.x + target_box.width/2));
 
     return target_box;
 }

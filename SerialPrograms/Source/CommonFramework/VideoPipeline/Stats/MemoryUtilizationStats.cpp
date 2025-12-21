@@ -84,7 +84,9 @@ bool MemoryUtilizationStats::get_stat(
 
     if (current != 0 && total != 0){
         usage = (double)current / total;
-        stat_text += std::format(" ({:.1f}%)", usage * 100);
+        stat_text += " (";
+        stat_text += tostr_fixed(usage * 100, 1);
+        stat_text += "%)";
         return true;
     }
 

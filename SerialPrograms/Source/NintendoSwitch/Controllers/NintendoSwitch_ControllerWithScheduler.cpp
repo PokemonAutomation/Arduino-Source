@@ -141,10 +141,10 @@ void ControllerWithScheduler::issue_right_joystick(
     execute_schedule(cancellable, schedule);
     if (m_logging_throttler){
         m_logger.log(
-            std::format(
-                "issue_right_joystick(): ({:.3f}, {:.3f}), delay = {}ms, hold = {}ms, cooldown = {}ms",
-                position.x, position.y, delay.count(), hold.count(), cooldown.count()
-            ),
+            "issue_right_joystick(): (" + tostr_fixed(position.x, 3) + "," + tostr_fixed(position.y, 3) + ")" +
+            ", delay = " + std::to_string(delay.count()) + "ms" +
+            ", hold = " + std::to_string(hold.count()) + "ms" +
+            ", cooldown = " + std::to_string(cooldown.count()) + "ms",
             COLOR_DARKGREEN
         );
     }
@@ -248,14 +248,11 @@ void ControllerWithScheduler::issue_full_controller_state(
         //  (people entering passwords)
         if (enable_logging){
             m_logger.log(
-                std::format(
-                    "issue_controller_state(): ({}), dpad({}), LJ({:.3f}, {:.3f}), RJ({:.3f}, {:.3f}), hold = {}ms",
-                    button_to_string(button),
-                    dpad_to_string(dpad),
-                    left_joystick.x, left_joystick.y,
-                    right_joystick.x, right_joystick.y,
-                    hold.count()
-                ),
+                "issue_controller_state(): (" + button_to_string(button) +
+                "), dpad(" + dpad_to_string(dpad) +
+                "), LJ(" + tostr_fixed(left_joystick.x, 3) + "," + tostr_fixed(left_joystick.y, 3) +
+                "), RJ(" + tostr_fixed(right_joystick.x, 3) + "," + tostr_fixed(right_joystick.y, 3) +
+                "), hold = " + std::to_string(hold.count()) + "ms",
                 COLOR_DARKGREEN
             );
         }else{

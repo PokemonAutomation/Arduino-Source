@@ -365,15 +365,16 @@ std::unique_ptr<AsyncTask> send_all_unsent_reports(Logger& logger, bool allow_pr
         QMessageBox::StandardButton button = box.information(
             nullptr,
             "Error Reporting",
-            QString::fromStdString(std::format(
-                "There {} {:L} error report{}.<br><br>"
-                "Would you like to help make this program better by sending {} to the developers?<br><br>{}",
-                (reports.size() == 1 ? "is" : "are"),
-                reports.size(),
-                (reports.size() == 1 ? "" : "s"),
-                (reports.size() == 1 ? "it" : "them"),
-                make_text_url(ERROR_PATH_UNSENT, "View unsent error reports.")
-            )),
+            QString::fromStdString(
+                (reports.size() == 1
+                    ? "There is " + tostr_u_commas(reports.size()) + " error report.<br><br>"
+                      "Would you like to help make this program better by sending it to the developers?<br><br>"
+                    : "There are " + tostr_u_commas(reports.size()) + " error reports.<br><br>"
+                      "Would you like to help make this program better by sending them to the developers?<br><br>"
+                ) +
+                make_text_url(ERROR_PATH_UNSENT, "View unsent error reports.")// + "<br><br>"
+//                "(You can change )"
+            ),
             QMessageBox::Yes | QMessageBox::No,
             QMessageBox::StandardButton::Yes
         );

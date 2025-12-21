@@ -139,7 +139,7 @@ bool YOLOv5Watcher::process_frame(const ImageViewRGB32& frame, WallClock timesta
 
     m_overlay_set.clear();
     for(const auto& box : m_detector.detected_boxes()){
-        std::string text = std::format("{}: {:.2f}", m_detector.session()->label_name(box.label_idx), box.score);
+        std::string text = m_detector.session()->label_name(box.label_idx) + ": " + tostr_fixed(box.score, 2);
         m_overlay_set.add(COLOR_RED, box.box, text);
     }
     return false;

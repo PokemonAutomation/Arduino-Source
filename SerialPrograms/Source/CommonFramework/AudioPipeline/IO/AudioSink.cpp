@@ -73,7 +73,7 @@ public:
     void set_volume(double volume){
         auto scope_check = m_sanitizer.check_scope();
         double absolute = convertAudioVolumeFromSlider(volume);
-        m_logger.log(std::format("Volume set to: Slider = {} -> Absolute = {}", volume, absolute));
+        m_logger.log("Volume set to: Slider = " + tostr_default(volume) + " -> Absolute = " + tostr_default(absolute));
         m_sink.setVolume(absolute);
     }
 

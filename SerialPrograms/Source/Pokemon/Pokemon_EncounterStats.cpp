@@ -81,7 +81,10 @@ std::string EncounterFrequencies::dump_sorted_map(const std::string& header) con
     MapType map = to_sorted_map();
     std::string str = header;
     for (const auto& item : map){
-        str += std::format("{:L} : {}\n", item.first, item.second->dump());
+        str += tostr_u_commas(item.first);
+        str += " : ";
+        str += item.second->dump();
+        str += "\n";
     }
     return str;
 }

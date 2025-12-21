@@ -150,7 +150,7 @@ struct BurmyFinder::TreeCounter{
             if (i != 0){
                 oss << " - ";
             }
-            oss << std::format("Tree {}: {:L}", i, tree[i]);
+            oss << "Tree " << i << ": " << tostr_u_commas(tree[i]);
         }
         logger.log(oss.str());
     }

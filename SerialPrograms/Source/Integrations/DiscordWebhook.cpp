@@ -65,7 +65,8 @@ void DiscordWebhookSender::send(
 ){
     cleanup_stuck_requests();
     std::shared_ptr<JsonValue> json(new JsonValue(obj.clone()));
-    logger.log(std::format("Scheduling Webhook Message... (queue = {:L})", m_queue.size()), COLOR_PURPLE);
+//    cout << "Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")" << endl;
+    logger.log("Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
     m_queue.add_event(
         delay,
         [
@@ -97,7 +98,8 @@ void DiscordWebhookSender::send(
 ){
     cleanup_stuck_requests();
     std::shared_ptr<JsonValue> json(new JsonValue(obj.clone()));
-    logger.log(std::format("Scheduling Webhook Message... (queue = {:L})", m_queue.size()), COLOR_PURPLE);
+//    cout << "Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")" << endl;
+    logger.log("Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
     m_queue.add_event(
         delay,
         [
@@ -232,7 +234,8 @@ void DiscordWebhookSender::internal_send(
         QNetworkRequest request(url);
         QNetworkAccessManager manager;
         m_event_loop->connect(&manager, SIGNAL(finished(QNetworkReply*)), SLOT(quit()));
-        m_logger.log(std::format("Sending Webhook Message... (queue = {:L})", m_queue.size()), COLOR_BLUE);
+//        cout << "Sending Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")" << endl;
+        m_logger.log("Sending Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_BLUE);
         std::unique_ptr<QNetworkReply> reply(manager.post(request, &multiPart));
 
         if (!m_stopping.load(std::memory_order_acquire)){

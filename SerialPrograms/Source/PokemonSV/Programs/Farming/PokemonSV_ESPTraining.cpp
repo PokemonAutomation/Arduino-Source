@@ -66,7 +66,7 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, ProControllerCont
     ESPTrainingStats& stats = env.current_stats<ESPTrainingStats>();
 
     for (uint32_t c = 0; c < ROUNDS; c++){
-        env.log(std::format("Round: {:L}", c));
+        env.log("Round: " + tostr_u_commas(c));
 
         //Initiate dialog with Dendra
         //Dendra needs time to turn and face the player

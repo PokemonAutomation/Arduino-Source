@@ -67,7 +67,7 @@ void GimmighoulRoamingFarmer::program(SingleSwitchProgramEnvironment& env, ProCo
     uint8_t year = MAX_YEAR;
     for (uint32_t c = 0; c < SKIPS; c++){
         //  Grab coin assuming there is one
-        env.log(std::format("Fetch Attempts: {:L}", c));
+        env.log("Fetch Attempts: " + tostr_u_commas(c));
         pbf_mash_button(context, BUTTON_A, 90);
         pbf_wait(context, 2 * TICKS_PER_SECOND);
 
