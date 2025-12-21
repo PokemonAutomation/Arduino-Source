@@ -64,6 +64,8 @@ class LetsGoKillSoundDetector : public AudioPerSpectrumDetectorBase{
 public:
     LetsGoKillSoundDetector(Logger& logger, DetectedCallback detected_callback = nullptr);
 
+    virtual void set_detected_callback(DetectedCallback detected_callback) override;
+
     virtual float get_score_threshold() const override;
 
     WallClock last_kill() const{
@@ -74,6 +76,7 @@ private:
     virtual std::unique_ptr<SpectrogramMatcher> build_spectrogram_matcher(size_t sample_rate) override;
 
 private:
+    DetectedCallback m_detected_callback;
     std::atomic<WallClock> m_last_detected;
 };
 

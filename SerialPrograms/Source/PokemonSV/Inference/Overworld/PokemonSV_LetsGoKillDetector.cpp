@@ -218,13 +218,17 @@ LetsGoKillSoundDetector::LetsGoKillSoundDetector(Logger& logger, DetectedCallbac
         "LetsGoKillSoundDetector",
         "Let's Go Kill Sound",
         COLOR_RED,
-        [this, callback = std::move(detected_callback)](float error_coefficient){
+        [this](float error_coefficient){
             m_last_detected = current_time();
-            return callback != nullptr ? callback(error_coefficient) : false;
+            return m_detected_callback != nullptr ? m_detected_callback(error_coefficient) : false;
         }
     )
+    , m_detected_callback(std::move(detected_callback))
     , m_last_detected(WallClock::min())
 {}
+void LetsGoKillSoundDetector::set_detected_callback(DetectedCallback detected_callback){
+    m_detected_callback = std::move(detected_callback);
+}
 float LetsGoKillSoundDetector::get_score_threshold() const{
     return (float)GameSettings::instance().LETS_GO_KILL_SOUND_THRESHOLD;
 }

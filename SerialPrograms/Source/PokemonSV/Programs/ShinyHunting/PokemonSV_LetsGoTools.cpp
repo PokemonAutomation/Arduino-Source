@@ -5,18 +5,19 @@
  */
 
 #include <algorithm>
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Exceptions/FatalProgramException.h"
+//#include "CommonFramework/Exceptions/OperationFailedException.h"
+//#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Pokemon/Pokemon_Notification.h"
-#include "PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
+//#include "Pokemon/Pokemon_Notification.h"
+//#include "PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
 #include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_Battles.h"
-#include "PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
+//#include "PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
 #include "PokemonSV_LetsGoTools.h"
 
 //#include <iostream>
@@ -195,7 +196,7 @@ bool use_lets_go_to_clear_in_front(
     if (ret == 0){
         if (throw_ball_if_bubble){
             stream.log("Detected sweat bubble. Throwing ball...");
-            pbf_mash_button(context, BUTTON_ZR, 5 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_ZR, 5000ms);
         }else{
             stream.log("Detected sweat bubble. Will not throw ball.");
         }
@@ -203,10 +204,10 @@ bool use_lets_go_to_clear_in_front(
         stream.log("Did not detect sweat bubble.");
     }
 
-    WallClock last_kill = tracker.last_kill();
     context.wait_for_all_requests();
     std::chrono::seconds timeout(6);
     while (true){
+//        cout << "last kill: " << last_kill << endl;
         if (command){
 //            cout << "running command..." << endl;
             command(context);
@@ -214,15 +215,30 @@ bool use_lets_go_to_clear_in_front(
             command = nullptr;
         }else{
 //            cout << "Waiting out... " << timeout.count() << " seconds" << endl;
-            context.wait_until(last_kill + timeout);
+            context.wait_until(tracker.last_kill() + timeout);
         }
 //        timeout = std::chrono::seconds(3);
-        if (last_kill == tracker.last_kill()){
+
+        WallClock now = current_time();
+        WallClock last_kill_time = tracker.last_kill();
+        WallDuration last_kill;
+        if (last_kill_time == WallClock::min()){
+            stream.log("Last Kill: Never");
+            last_kill = WallDuration::max();
+        }else{
+            last_kill = now - last_kill_time;
+            stream.log(
+                "Last Kill: " +
+                tostr_fixed(std::chrono::duration_cast<Milliseconds>(last_kill).count() / 1000., 3) +
+                " seconds ago"
+            );
+        }
+
+        if (last_kill > timeout){
 //            cout << "no kill" << endl;
             break;
         }
 //        cout << "found kill" << endl;
-        last_kill = tracker.last_kill();
     }
     stream.log("Nothing left to clear...");
     tracker.throw_if_no_sound();

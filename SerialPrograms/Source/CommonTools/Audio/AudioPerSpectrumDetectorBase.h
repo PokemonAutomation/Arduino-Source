@@ -66,7 +66,7 @@ public:
         DetectedCallback detected_callback = nullptr
     );
 
-    void set_detected_callback(DetectedCallback detected_callback);
+    virtual void set_detected_callback(DetectedCallback detected_callback);
 
     WallClock last_detection() const{
         return m_last_timestamp;
