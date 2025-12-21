@@ -49,8 +49,7 @@ EggStepDatabase::EggStepDatabase(const char* resource_path, const SpriteDatabase
 
     for (const auto& item : nat_id_to_steps){
         const std::string& slug = item.second.first;
-        std::string display_name = Pokemon::get_pokemon_name(slug).display_name();
-        display_name += " (" + tostr_u_commas(item.second.second) + " steps)";
+        std::string display_name = std::format("{} ({:L} steps)", Pokemon::get_pokemon_name(slug).display_name(), item.second.second);
 
         const SpriteDatabase::Sprite* sprite = sprites == nullptr
             ? nullptr

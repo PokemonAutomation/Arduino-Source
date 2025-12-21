@@ -160,7 +160,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, ProControll
 //                break;
 //            }
 
-            env.log("Raids Attempted: " + tostr_u_commas(raids++));
+            env.log(std::format("Raids Attempted: {:L}", raids++));
 
             //  Start game.
             rollback_date_from_home(env.console, context, game.skips);

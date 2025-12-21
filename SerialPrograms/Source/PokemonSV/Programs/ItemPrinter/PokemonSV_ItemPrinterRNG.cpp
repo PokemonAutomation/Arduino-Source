@@ -400,7 +400,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
             //  Commit the date and start the timer.
             pbf_press_button(context, BUTTON_A, 20, 30);
             WallClock trigger_time = std::chrono::system_clock::now() + trigger_delay;
-            env.log("Will commit in " + tostr_u_commas(trigger_delay.count()) + " milliseconds.");
+            env.log(std::format("Will commit in {:L} milliseconds.", trigger_delay.count()));
 
             //  Re-enter the game.
             pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);

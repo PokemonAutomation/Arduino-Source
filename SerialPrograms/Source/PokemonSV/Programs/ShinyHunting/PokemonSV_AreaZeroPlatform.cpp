@@ -439,7 +439,7 @@ void choose_path(
     double diff_x = platform_x - 0.62;
     double diff_y = platform_y - 0.71;
 
-    logger.log("Move Direction: x = " + tostr_default(diff_x) + ", y = " + tostr_default(diff_y), COLOR_BLUE);
+    logger.log(std::format("Move Direction: x = {}, y = {}", diff_x, diff_y), COLOR_BLUE);
 
     direction_to_stick(x, y, diff_x, diff_y);
     duration = (uint16_t)std::min<double>(std::sqrt(diff_x*diff_x + diff_y*diff_y) * 125 * 12, 400);
@@ -480,7 +480,7 @@ void area_zero_platform_run_path2(
             stream.log("Unable to find center of platform.", COLOR_RED);
             return;
         }
-        stream.log("Platform center at: x = " + tostr_default(platform_x) + ", y = " + tostr_default(platform_y), COLOR_BLUE);
+        stream.log(std::format("Platform center at: x = {}, y = {}", platform_x, platform_y), COLOR_BLUE);
 
         choose_path(stream.logger(), move_x, move_y, duration, platform_x, platform_y);
 

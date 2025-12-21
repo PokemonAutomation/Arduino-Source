@@ -60,7 +60,7 @@ bool check_hardware(){
         str += "You can continue, but the program may not work correctly.<br>";
         str += "(i.e. Increased error rate. Fail to reliably detect shinies, etc...)<br><br>";
         str += "(Reason: Base frequency measured at ";
-        str += QString::fromStdString(tostr_fixed(specs.base_frequency / 1000000000., 3));
+        str += QString::fromStdString(std::format("{:.3f}", specs.base_frequency / 1e9));
         str += " GHz which is very slow.)<br><br>";
         str += "Recommendation: Use a more powerful computer.";
         box.warning(nullptr, "Warning", str);
@@ -82,10 +82,10 @@ bool check_hardware(){
         str += "Threads: " + QString::number(specs.threads) + "<br>";
         str += "Sockets: " + QString::number(specs.sockets) + "<br>";
         str += "Numa Nodes: " + QString::number(specs.numa_nodes) + "<br>";
-        str += "Base Frequency: " + QString::fromStdString(tostr_fixed(specs.base_frequency / 1000000000., 3)) + " GHz<br>";
+        str += QString::fromStdString(std::format("Base Frequency: {:.3f} GHz<br>", specs.base_frequency / 1e9));
         str += "<br>";
         str += "(p-cores + 0.2 * v-cores) * base-frequency = ";
-        str += QString::fromStdString(tostr_fixed(efreq / 1000000000., 3));
+        str += QString::fromStdString(std::format("{:.3f}", efreq / 1e9));
         str += " GHz<br><br>";
         str += "Recommendation: Use a more powerful computer.";
         box.warning(nullptr, "Warning", str);

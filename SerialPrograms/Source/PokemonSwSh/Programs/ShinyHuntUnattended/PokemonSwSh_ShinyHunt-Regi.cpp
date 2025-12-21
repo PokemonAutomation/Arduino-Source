@@ -98,23 +98,23 @@ void run_regi_light_puzzle(
     switch (regi){
     case RegiGolem::Regirock:
         regirock(context);
-        logger.log("Starting Regirock Encounter: " + tostr_u_commas(encounter + 1));
+        logger.log(std::format("Starting Regirock Encounter: {:L}", encounter + 1));
         break;
     case RegiGolem::Regice:
         regice(context);
-        logger.log("Starting Regice Encounter: " + tostr_u_commas(encounter + 1));
+        logger.log(std::format("Starting Regice Encounter: {:L}", encounter + 1));
         break;
     case RegiGolem::Registeel:
         registeel(context);
-        logger.log("Starting Registeel Encounter: " + tostr_u_commas(encounter + 1));
+        logger.log(std::format("Starting Registeel Encounter: {:L}", encounter + 1));
         break;
     case RegiGolem::Regieleki:
         regieleki(context);
-        logger.log("Starting Regieleki Encounter: " + tostr_u_commas(encounter + 1));
+        logger.log(std::format("Starting Regieleki Encounter: {:L}", encounter + 1));
         break;
     case RegiGolem::Regidrago:
         regidrago(context);
-        logger.log("Starting Regidrago Encounter: " + tostr_u_commas(encounter + 1));
+        logger.log(std::format("Starting Regidrago Encounter: {:L}", encounter + 1));
         break;
     }
 }

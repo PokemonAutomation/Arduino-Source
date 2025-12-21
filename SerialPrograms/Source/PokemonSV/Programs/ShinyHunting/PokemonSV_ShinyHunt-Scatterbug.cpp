@@ -370,7 +370,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(
 
         double hp = hp_watcher.last_known_value() * 100;
         if (0 < hp){
-            env.console.log("Last Known HP: " + tostr_default(hp) + "%", COLOR_BLUE);
+            env.console.log(std::format("Last Known HP: {}%", hp), COLOR_BLUE);
         }else{
             env.console.log("Last Known HP: ?", COLOR_RED);
         }

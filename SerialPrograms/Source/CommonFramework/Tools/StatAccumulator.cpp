@@ -40,13 +40,12 @@ double StatAccumulatorI32::stddev() const{
 
 std::string StatAccumulatorI32::dump(const char* units, double divider) const{
     divider = 1. / divider;
-    std::string str;
-    str += "Count = " + tostr_u_commas(m_count);
-    str += ", Mean = " + tostr_default(mean() * divider) + units;
-    str += ", Stddev = " + tostr_default(stddev() * divider) + units;
-    str += ", Min = " + tostr_default(min() * divider) + units;
-    str += ", Max = " + tostr_default(max() * divider) + units;
-    return str;
+    return std::format("Count = {:L}, Mean = {}{}, Stddev = {}{}, Min = {}{}, Max = {}{}",
+        m_count,
+        mean() * divider, units,
+        stddev() * divider, units,
+        min() * divider, units,
+        max() * divider, units);
 }
 void StatAccumulatorI32::log(Logger& logger, const std::string& label, const char* units, double divider) const{
     logger.log(label + ": " + dump(units, divider), COLOR_MAGENTA);

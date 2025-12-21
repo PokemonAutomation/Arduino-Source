@@ -90,10 +90,11 @@ TrainingSession::TrainingSession(
         scope.throw_if_cancelled();
     }
 
-    logger.log(
-        "Parsing Complete: Languages = " + tostr_u_commas(m_samples.size()) +
-        ", Samples = " + tostr_u_commas(m_total_samples)
-    );
+    logger.log(std::format(
+        "Parsing Complete: Languages = {:L}, Samples = {:L}",
+        m_samples.size(),
+        m_total_samples
+    ));
 }
 
 
@@ -176,10 +177,10 @@ void TrainingSession::generate_small_dictionary(
         m_scope.throw_if_cancelled();
     }
 
-    m_logger.log("Languages: " + tostr_u_commas(m_samples.size()));
-    m_logger.log("Samples: " + tostr_u_commas(m_total_samples));
-    m_logger.log("Matched: " + tostr_u_commas(matched));
-    m_logger.log("Missed: " + tostr_u_commas(failed));
+    m_logger.log(std::format("Languages: {:L}", m_samples.size()));
+    m_logger.log(std::format("Samples:   {:L}", m_total_samples));
+    m_logger.log(std::format("Matched:   {:L}", matched.load()));
+    m_logger.log(std::format("Missed:    {:L}", failed.load()));
 
     trained.save(output_json_file);
 }
@@ -265,10 +266,10 @@ void TrainingSession::generate_large_dictionary(
         m_scope.throw_if_cancelled();
     }
 
-    m_logger.log("Languages: " + tostr_u_commas(m_samples.size()));
-    m_logger.log("Samples: " + tostr_u_commas(m_total_samples));
-    m_logger.log("Matched: " + tostr_u_commas(matched));
-    m_logger.log("Missed: " + tostr_u_commas(failed));
+    m_logger.log(std::format("Languages: {:L}", m_samples.size()));
+    m_logger.log(std::format("Samples:   {:L}", m_total_samples));
+    m_logger.log(std::format("Matched:   {:L}", matched.load()));
+    m_logger.log(std::format("Missed:    {:L}", failed.load()));
 }
 
 

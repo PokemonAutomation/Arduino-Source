@@ -329,9 +329,11 @@ void leave_zone_and_reset_spawns(
         {
             const double cur_direction = get_facing_direction(env.console, context);
             const double direction_change = get_angle_between_facing_directions(starting_direction, cur_direction);
-            env.log("Facing direction difference after day/night change: " + tostr_fixed(direction_change, 0) + " deg, from "
-                + tostr_fixed(starting_direction, 0) + " to " + tostr_fixed(cur_direction, 0) + " deg");
-            
+            env.log(std::format(
+                "Facing direction difference after day/night change: {:.0f} deg, from {:.0f} to {:.0f} deg",
+                direction_change, starting_direction, cur_direction
+            ));
+
             uint8_t joystick_y = 0;
             if (direction_change > 150.0){
                 // we are facing towards the gate
@@ -346,7 +348,7 @@ void leave_zone_and_reset_spawns(
             }else{
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
-                    "leave_zone_and_reset_spawns(): Facing direction after day/night change is wrong: " + tostr_fixed(direction_change, 0) + " deg",
+                    std::format("leave_zone_and_reset_spawns(): Facing direction after day/night change is wrong: {:.0f} deg", direction_change),
                     env.console
                 );
             }

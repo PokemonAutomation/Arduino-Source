@@ -298,8 +298,8 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     while (c < FETCH_ATTEMPTS){
         env.update_stats();
         uint16_t iteration_attempts = 1;
-        env.log("Fetch Attempts: " + tostr_u_commas(c));
-        
+        env.log(std::format("Fetch Attempts: {:L}", c));
+
         home_roll_date_enter_game_autorollback(env.console, context, year);
         stats.days++;
         // Interact with the tree

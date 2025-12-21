@@ -76,7 +76,7 @@ private:
                 auto last = current_time() - last_ack.load(std::memory_order_relaxed);
                 std::chrono::duration<double> seconds = last;
                 if (last > 2 * PERIOD){
-                    std::string text = "Last Ack: " + tostr_fixed(seconds.count(), 3) + " seconds ago";
+                    std::string text = std::format("Last Ack: {:.3f} seconds ago", seconds.count());
                     m_connection.set_status_line1(text, COLOR_RED);
     //                m_logger.log("Connection issue detected. Turning on all logging...");
     //                settings.log_everything.store(true, std::memory_order_release);

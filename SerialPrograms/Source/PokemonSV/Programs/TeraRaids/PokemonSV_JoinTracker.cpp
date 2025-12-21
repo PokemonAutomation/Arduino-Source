@@ -85,7 +85,7 @@ bool check_ban_for_name(
             double w_log10p = std::log10(w_probability);
             if (w_log10p <= entry.log10p){
                 if (PreloadSettings::instance().DEVELOPER_MODE){
-                    logger.log("Cannot ban whitelisted user: " + name + " (log10p = " + tostr_default(w_log10p) + ")", COLOR_RED);
+                    logger.log(std::format("Cannot ban whitelisted user: {} (log10p = {})", name, w_log10p), COLOR_RED);
                 }
                 return false;
             }

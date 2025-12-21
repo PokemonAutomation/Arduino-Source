@@ -213,13 +213,10 @@ void determine_shiny_status(
             alpha_own += DIALOG_ALPHA;
         }
     }
-    env.log(
-        "ShinyDetector: Wild Alpha = " + tostr_default(alpha_wild_overall) +
-        (wild_shiny_sound_detected ? " (shiny sound detected)" : "") +
-        ", Left Alpha = " + tostr_default(alpha_wild_left) +
-        ", Right Alpha = " + tostr_default(alpha_wild_right) +
-        ", Your Alpha = " + tostr_default(alpha_own) +
-        (own_shiny_sound_detected ? " (shiny sound detected)" : ""),
+    env.log(std::format("ShinyDetector: Wild Alpha = {}{}, Left Alpha = {}, Right Alpha = {}, Your Alpha = {}{}",
+        alpha_wild_overall, wild_shiny_sound_detected ? " (shiny sound detected)" : "",
+        alpha_wild_left, alpha_wild_right,
+        alpha_own, own_shiny_sound_detected ? " (shiny sound detected)" : ""),
         COLOR_PURPLE
     );
 
@@ -240,10 +237,7 @@ void determine_shiny_status(
 
     if (DIALOG_ALPHA <= alpha_wild_overall && alpha_wild_overall < DIALOG_ALPHA + 1.5){
         dump_image(env.logger(), env.program_info(), "LowShinyAlpha", wild_result.get_best_screenshot());
-        std::string str;
-        str += "Low alpha shiny (alpha = ";
-        str += tostr_default(alpha_wild_overall);
-        str += ").\nPlease report this image to the " + PROGRAM_NAME + " server.";
+        std::string str = std::format("Low alpha shiny (alpha = {}).\nPlease report this image to the {} server.", alpha_wild_overall, PROGRAM_NAME);
         send_program_recoverable_error_notification(
             env, settings,
             str,

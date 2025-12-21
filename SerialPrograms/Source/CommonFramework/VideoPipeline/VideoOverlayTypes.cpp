@@ -65,7 +65,7 @@ OverlayStatSnapshot OverlayStatUtilizationPrinter::get_snapshot(const std::strin
         color = COLOR_YELLOW;
     }
     return OverlayStatSnapshot{
-        label + " " + tostr_fixed(utilization * 100, 2) + " %",
+        std::format("{} {:.2f} %", label, utilization * 100),
         color
     };
 }

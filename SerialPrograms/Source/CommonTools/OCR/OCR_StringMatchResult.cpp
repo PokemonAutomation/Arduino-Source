@@ -53,7 +53,7 @@ void StringMatchResult::log(Logger& logger, double max_log10p, const std::string
         if (results.size() == 1){
             auto iter = results.begin();
             str += iter->second.to_str();
-            str += " (log10p = " + tostr_default(iter->first) +")";
+            str += std::format(" (log10p = {})", iter->first);
         }else{
             str += "Multiple Candidates =>\n";
             size_t printed = 0;
@@ -62,7 +62,7 @@ void StringMatchResult::log(Logger& logger, double max_log10p, const std::string
                     str += "    (" + std::to_string(results.size() - 10) + " more...)\n";
                     break;
                 }
-                str += "    " + tostr_default(item.first) + " : " + item.second.to_str() + "\n";
+                str += std::format("    {} : {}\n", item.first, item.second.to_str());
                 printed++;
             }
         }

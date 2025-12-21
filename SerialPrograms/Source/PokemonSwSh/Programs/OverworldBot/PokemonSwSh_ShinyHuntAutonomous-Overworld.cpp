@@ -264,12 +264,11 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
         }
         if (target.first > MAX_TARGET_ALPHA){
             stream.log(
-                std::string("Target too Weak: ") +
-                (target.second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question") +
-                " at [" +
-                tostr_default(target.second.delta_x) + " , " +
-                tostr_default(-target.second.delta_y) + "], alpha = " +
-                tostr_default(target.first),
+                std::format("Target too Weak: {} at [{} , {}], alpha = {}",
+                    (target.second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question"),
+                    target.second.delta_x,
+                    -target.second.delta_y,
+                    target.first),
                 COLOR_ORANGE
             );
             continue;
@@ -288,12 +287,11 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
 ) const{
     OverlayBoxScope target_box(stream.overlay(), target.second.box, COLOR_YELLOW);
     stream.log(
-        std::string("Best Target: ") +
-        (target.second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question") +
-        " at [" +
-        tostr_default(target.second.delta_x) + " , " +
-        tostr_default(-target.second.delta_y) + "], alpha = " +
-        tostr_default(target.first),
+        std::format("Best Target: {} at [{} , {}], alpha = {}",
+            (target.second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question"),
+            target.second.delta_x,
+            -target.second.delta_y,
+            target.first),
         COLOR_PURPLE
     );
 
@@ -302,10 +300,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
         (double)trajectory.joystick_y - 128,
         (double)trajectory.joystick_x - 128
     ) * 57.295779513082320877;
-    stream.log(
-        "Trajectory: Distance = " + std::to_string(trajectory.distance_in_ticks) +
-        ", Direction = " + tostr_default(-angle) + " degrees"
-    );
+    stream.log(std::format("Trajectory: Distance = {}, Direction = {} degrees", trajectory.distance_in_ticks, -angle));
 
     Milliseconds duration = (trajectory.distance_in_ticks + 16) * 8ms;
     duration = std::min<Milliseconds>(duration, MAX_MOVE_DURATION0);

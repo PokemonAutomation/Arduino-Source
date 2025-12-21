@@ -91,7 +91,7 @@ void GodEggDuplication::run_program(Logger& logger, ProControllerContext& contex
 
     //  1st Fetch: Get into position.
     {
-        logger.log("Fetch Attempts: " + tostr_u_commas(c));
+        logger.log(std::format("Fetch Attempts: {:L}", c));
         fly_home_collect_egg(context, true);
         collect_godegg(context, party_slot++);
         if (party_slot >= items){
@@ -106,7 +106,7 @@ void GodEggDuplication::run_program(Logger& logger, ProControllerContext& contex
 
     //  Now we are in steady state.
     for (; c < attempts; c++){
-        logger.log("Fetch Attempts: " + tostr_u_commas(c));
+        logger.log(std::format("Fetch Attempts: {:L}", c));
         eggfetcher_loop(context);
         collect_egg(context);
         collect_godegg(context, party_slot++);

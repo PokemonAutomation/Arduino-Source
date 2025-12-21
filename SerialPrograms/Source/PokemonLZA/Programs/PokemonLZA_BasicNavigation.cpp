@@ -486,8 +486,8 @@ double get_facing_direction(
         );
     }
     double angle = arrow_watcher.detected_angle_deg();
-    console.log("Direction arrow detected! Angle: " + tostr_fixed(angle, 0) + " degrees");
-    console.overlay().add_log("Minimap Arrow: " + tostr_fixed(angle, 0) + " deg", COLOR_YELLOW);
+    console.log(std::format("Direction arrow detected! Angle: {:.0f} degrees", angle));
+    console.overlay().add_log(std::format("Minimap Arrow: {:.0f} deg", angle), COLOR_YELLOW);
     return angle;
 }
 

@@ -41,7 +41,7 @@ bool SerialLogger::ok_to_log(){
     }
 
     if (m_messages_dropped != 0){
-        m_logger.log("Dropped " + tostr_u_commas(m_messages_dropped) + " message(s) due to logging rate limit.", COLOR_RED);
+        m_logger.log(std::format("Dropped {:L} message(s) due to logging rate limit.", m_messages_dropped), COLOR_RED);
         m_messages_dropped = 0;
     }
 
