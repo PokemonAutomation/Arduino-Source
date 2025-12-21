@@ -449,7 +449,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, 128, 0, 500ms, 0ms);
-            pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 1000ms);
+            pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 1000ms);
             pbf_move_left_joystick(context, 128, 0, 500ms, 0ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }

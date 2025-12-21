@@ -216,15 +216,15 @@ void checkpoint_56(
 
             // charge at orthworm
             pbf_move_left_joystick(context, 128, 0, 408ms, 0ms);
-            pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, 102ms);
+            pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, {0, +1}, {0, 0}, 102ms);
             pbf_move_left_joystick(context, 128, 0, 1970ms, 0ms);
-            pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, 128, 0, 0, 128, 432ms);
+            pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, {0, +1}, {-1, 0}, 432ms);
             pbf_move_left_joystick(context, 128, 0, 1993ms, 0ms);
-            pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, 128, 0, 0, 128, 301ms);
+            pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, {0, +1}, {-1, 0}, 301ms);
             pbf_move_left_joystick(context, 128, 0, 307ms, 0ms);
-            pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, 128, 0, 0, 128, 194ms);
+            pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, {0, +1}, {-1, 0}, 194ms);
             pbf_move_left_joystick(context, 128, 0, 886ms, 0ms);
-            pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, 128, 0, 0, 128, 626ms);
+            pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, {0, +1}, {-1, 0}, 626ms);
             pbf_move_left_joystick(context, 128, 0, 2651ms, 0ms);
         });
 

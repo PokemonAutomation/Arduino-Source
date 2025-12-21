@@ -146,9 +146,9 @@ void checkpoint_86(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         direction.change_direction(env.program_info(), env.console, context, 1.484555);
 
         pbf_move_left_joystick(context, 128, 0, 1506ms, 0ms);
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 703ms);
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 703ms);
         pbf_move_left_joystick(context, 128, 0, 233ms, 0ms);
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 5098ms);
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 5098ms);
         pbf_move_left_joystick(context, 128, 0, 1000ms, 0ms);
 
         wait_for_overworld(env.program_info(), env.console, context);
