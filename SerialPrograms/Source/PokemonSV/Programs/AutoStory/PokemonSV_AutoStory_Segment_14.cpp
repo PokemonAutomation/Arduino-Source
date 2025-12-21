@@ -84,7 +84,14 @@ void checkpoint_30(
     
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){         
-        context.wait_for_all_requests();
+        
+        if (attempt_number > 0 || ENABLE_TEST){
+            env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 255, 100});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 100});
+        }
+
+        heal_at_pokecenter(env.program_info(), env.console, context);
 
         // section 1
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 128, 17);
@@ -233,6 +240,8 @@ void checkpoint_30(
                 128, 128, 30, 30, false);          
 
         }       
+
+        confirm_titan_battle(env, context);
 
         env.console.log("Battle Bombirdier Titan phase 1.");
         run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);

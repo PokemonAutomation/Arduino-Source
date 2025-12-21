@@ -92,6 +92,7 @@ void checkpoint_39(
 
         DirectionDetector direction;
         // recently flew a significant distance, so minimap should be clear of Pokemon
+        // flew from Cascaraffa gym building to Porto Marinada Pokecenter
         
         // section 1
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
@@ -206,6 +207,9 @@ void checkpoint_39(
 
         // battle the titan phase 1
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::BLACK_DIALOG_BOX});
+
+        confirm_titan_battle(env, context);
+
         env.console.log("Battle Great Tusk/Iron Treads Titan phase 1.");
         run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
 
@@ -232,6 +236,9 @@ void checkpoint_39(
 
         // battle the titan phase 2
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE});  
+
+        confirm_titan_battle(env, context);
+        
         env.console.log("Battle Great Tusk/Iron Treads Titan phase 2.");
         run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {CallbackEnum::DIALOG_ARROW});
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
@@ -250,14 +257,15 @@ void checkpoint_40(
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
-        // fly to Mesagoza East
+        // fly to Mesagoza East from Great Tusk/Iron Treads
+        // this clears Pokemon in minimap
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 185, 440});
 
         // place down marker, for section 1
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 180, 90);
 
         DirectionDetector direction;
-        // recently flew a significant distance, so minimap should be clear of Pokemon
+        // recently flew a significant distance, so minimap should be clear of Pokemon, or at least the Pokemon have been reset
         
         direction.change_direction(env.program_info(), env.console, context, 5.60);
 

@@ -53,10 +53,10 @@ public:
 
 
 // start: At North Province Area Three Pokecenter
-// end: Beat team star grunt. At gate of Team Star (Fairy) base.
+// end: At North Province Area Three Pokecenter
 void checkpoint_68(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
-// start: Beat team star grunt. At gate of Team Star (Fairy) base.
+// start: At North Province Area Three Pokecenter
 // end: Beat Team Star (Fairy)
 void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 

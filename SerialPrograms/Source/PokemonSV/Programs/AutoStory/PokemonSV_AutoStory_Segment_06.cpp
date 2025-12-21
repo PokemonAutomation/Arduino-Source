@@ -117,7 +117,7 @@ void checkpoint_11(
         env.console.log("Reached Los Platos");
         env.console.overlay().add_log("Reached Los Platos", COLOR_WHITE);
 
-    });
+    }, false);
 
 }
 

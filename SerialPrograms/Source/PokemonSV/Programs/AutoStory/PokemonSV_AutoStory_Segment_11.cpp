@@ -115,9 +115,8 @@ void checkpoint_24(
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
         DirectionDetector direction;
-        VideoSnapshot snapshot = env.console.video().snapshot();
-        double current_direction = direction.get_current_direction(env.console, snapshot);
-        if (current_direction == -1){  // if unable to detect current direction, fly to neighbouring Pokecenter, then fly back. To hopefully clear any pokemon covering the Minimap.
+        if (attempt_number > 0 || ENABLE_TEST){
+            env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
             move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
             move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
         }
@@ -149,7 +148,7 @@ void checkpoint_24(
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
-        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_move_left_joystick(context, 128, 255, 300, 100);
         pbf_wait(context, 3 * TICKS_PER_SECOND);        
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
@@ -541,17 +540,17 @@ void checkpoint_26(
         }
 
         // section 4.2 past second NPC and into the finish line
-        NoMinimapWatcher no_minimap(env.console, COLOR_RED, Milliseconds(5000));
+        NoMinimapWatcher no_minimap(env.console, COLOR_RED, Milliseconds(500));
         size_t MAX_ATTEMPTS_SECTION_4 = 3;
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [&](ProControllerContext& context){
                 for (size_t i = 0; i < MAX_ATTEMPTS_SECTION_4; i++){
                     try{
-                        green.push_olive_forward(env.program_info(), env.console, context, 6.0, 250);
-                        green.push_olive_forward(env.program_info(), env.console, context, 5.8, 100);
-                        green.push_olive_forward(env.program_info(), env.console, context, 6.0, 200);
-                        green.push_olive_forward(env.program_info(), env.console, context, 6.1, 200);                        
+                        green.push_olive_forward(env.program_info(), env.console, context, 6.0, 250, 75, 20, {0, 0.3, 1.0, 0.40}, false);
+                        green.push_olive_forward(env.program_info(), env.console, context, 5.8, 100, 75, 20, {0, 0.3, 1.0, 0.40}, false);
+                        green.push_olive_forward(env.program_info(), env.console, context, 6.0, 200, 75, 20, {0, 0.3, 1.0, 0.40}, false);
+                        green.push_olive_forward(env.program_info(), env.console, context, 6.1, 200, 75, 20, {0, 0.3, 1.0, 0.40}, false);                        
                         break;
                     }catch (OliveActionFailedException& e){
                         // may have failed to push the olive. and walked past it
@@ -566,7 +565,7 @@ void checkpoint_26(
                             pbf_wait(context, 7 * TICKS_PER_SECOND);
                             context.wait_for_all_requests();
                             // then push angled towards the right
-                            green.push_olive_forward(env.program_info(), env.console, context, 5.8, 100);                            
+                            green.push_olive_forward(env.program_info(), env.console, context, 5.8, 100, 75, 20, {0, 0.3, 1.0, 0.40}, false);                            
                         }else{ // FAILED_PUSH_OLIVE_TOTAL_DISTANCE, 
                             throw e;
                         }
@@ -597,7 +596,7 @@ void checkpoint_26(
 
         enter_menu_from_overworld(env.program_info(), env.console, context, -1);
 
-    });
+    }, false);
 
 }
 

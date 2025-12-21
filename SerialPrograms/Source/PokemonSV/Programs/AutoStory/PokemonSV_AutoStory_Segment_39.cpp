@@ -99,7 +99,7 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         // leave Station 2
         pbf_move_left_joystick(context, 50, 255, 130, 20);
 
-        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_move_left_joystick(context, 128, 255, 400, 100);
         pbf_wait(context, 3 * TICKS_PER_SECOND);        
         // wait for overworld after leaving research station
         wait_for_overworld(env.program_info(), env.console, context, 30);
@@ -270,7 +270,7 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         );
 
         #endif  
-    });
+    }, false);
 }
 
 void checkpoint_103(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
@@ -297,7 +297,7 @@ void checkpoint_103(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 10);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
-    });
+    }, false);
 }
 
 

@@ -21,6 +21,8 @@ namespace PokemonSV{
 
 using namespace ML;
 
+static constexpr bool ENABLE_TEST  = true;
+
 struct AutoStoryStats : public StatsTracker{
     AutoStoryStats()
         : m_checkpoint(m_stats["Checkpoint"])
@@ -371,7 +373,8 @@ void checkpoint_reattempt_loop(
     ProControllerContext& context, 
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats,
-    std::function<void(size_t attempt_number)>&& action
+    std::function<void(size_t attempt_number)>&& action,
+    bool day_skip = true
 );
 
 void checkpoint_reattempt_loop_tutorial(
@@ -516,6 +519,8 @@ void move_camera_until_yolo_object_detected(
     uint16_t max_rounds = 50
 );
 
+
+void confirm_titan_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 }
 }

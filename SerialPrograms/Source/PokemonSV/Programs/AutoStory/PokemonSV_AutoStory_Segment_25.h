@@ -53,7 +53,7 @@ public:
 
 
 // start: Beat Orthworm. At East Province (Area Three) Pokecenter.
-// end: Beat team star grunt. At gate of Team Star (Poison) base.
+// end: Beat Orthworm. At East Province (Area Three) Pokecenter.
 void checkpoint_58(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -61,7 +61,7 @@ void checkpoint_58(
     AutoStoryStats& stats
 );
 
-// start: Beat team star grunt. At gate of Team Star (Poison) base.
+// start: Beat Orthworm. At East Province (Area Three) Pokecenter.
 // end: Beat Team Star (Poison)
 void checkpoint_59(
     SingleSwitchProgramEnvironment& env,

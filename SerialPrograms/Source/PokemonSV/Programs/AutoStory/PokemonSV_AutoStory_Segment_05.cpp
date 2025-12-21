@@ -113,7 +113,7 @@ void checkpoint_09(
         env.console.log("Receive legendary ball");
         env.console.overlay().add_log("Receive legendary ball", COLOR_WHITE);
 
-    });
+    }, false);
 
 }
 
@@ -144,7 +144,7 @@ void checkpoint_10(
 
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
-    });
+    }, false);
 }
 
 

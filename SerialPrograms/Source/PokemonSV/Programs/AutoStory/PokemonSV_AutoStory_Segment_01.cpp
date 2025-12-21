@@ -131,7 +131,7 @@ void checkpoint_02(
         env.console.log("Go to the kitchen, talk with mom");
         env.console.overlay().add_log("Go to the kitchen, talk with mom", COLOR_WHITE);
         pbf_move_left_joystick(context, 128, 255, 2 * TICKS_PER_SECOND, 20);
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, 128);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 0, 128);
 
         env.console.log("clear_dialog: Talk with Mom.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5, {});
@@ -140,7 +140,7 @@ void checkpoint_02(
         env.console.log("Go to the front door, talk with Clavell");
         env.console.overlay().add_log("Go to the front door, talk with Clavell", COLOR_WHITE);
         pbf_move_left_joystick(context, 230, 200, 2 * TICKS_PER_SECOND, 20);
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 255, 128);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 255, 128);
         
         env.console.log("clear_dialog: Talk with Clavell at front door.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5, {});
@@ -162,7 +162,7 @@ void checkpoint_02(
         pbf_move_left_joystick(context,   0,   0, 3 * TICKS_PER_SECOND, 20);
         pbf_move_left_joystick(context,   0, 128, 3 * TICKS_PER_SECOND, 20);
         pbf_move_left_joystick(context, 128, 255, 4 * TICKS_PER_SECOND, 20);
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, 128);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 0, 128);        
         
         env.console.log("clear_dialog: Talk with Clavell at living room.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {});
@@ -170,7 +170,7 @@ void checkpoint_02(
         context.wait_for_all_requests();
         env.console.log("Go outside, receive Rotom Phone");
         env.console.overlay().add_log("Go outside, receive Rotom Phone", COLOR_WHITE);
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 245, 230);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 245, 230);
 
         env.console.log("clear_dialog: Talk with Clavell outside. Receive Rotom phone. Stop when detect overworld.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD, CallbackEnum::WHITE_A_BUTTON});
@@ -260,8 +260,7 @@ void checkpoint_03(
         swap_starter_moves(env, context, language);
         press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
 
-    }
-    );
+    }, false);
      
 }
 

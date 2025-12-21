@@ -68,7 +68,7 @@ void AutoStory_Segment_28::run_segment(
 
 std::string AutoStory_Checkpoint_68::name() const{ return "068 - " + AutoStory_Segment_28().name(); }
 std::string AutoStory_Checkpoint_68::start_text() const{ return "At North Province Area Three Pokecenter";}
-std::string AutoStory_Checkpoint_68::end_text() const{ return "Beat team star grunt. At gate of Team Star (Fairy) base.";}
+std::string AutoStory_Checkpoint_68::end_text() const{ return "At North Province Area Three Pokecenter";}
 void AutoStory_Checkpoint_68::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_68(env, context, options.notif_status_update, stats);
 }
@@ -93,14 +93,24 @@ void AutoStory_Checkpoint_70::run_checkpoint(SingleSwitchProgramEnvironment& env
 void checkpoint_68(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
+        // empty checkpoint, to preserve ordering
+        
+    
+    }, false);
+    
+}
+
+void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+
         context.wait_for_all_requests();
         // move the marker elsewhere, away from North
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 255, 50);
 
         DirectionDetector direction;
-        VideoSnapshot snapshot = env.console.video().snapshot();
-        double current_direction = direction.get_current_direction(env.console, snapshot);
-        if (current_direction == -1){  // if unable to detect current direction, fly to neighbouring Pokecenter, then fly back. To hopefully clear any pokemon covering the Minimap.
+        if (attempt_number > 0 || ENABLE_TEST){
+            env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
             move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 50});
             move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 50});
         }
@@ -145,24 +155,6 @@ void checkpoint_68(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
-        context.wait_for_all_requests();
-        VideoSnapshot snapshot2 = env.console.video().snapshot();
-        double current_direction2 = direction.get_current_direction(env.console, snapshot2);
-        if (current_direction2 == -1){  // if unable to detect current direction, reset. We need to be able to detect the direction for the next checkpoint.
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Unable to detect direction. Reset.",
-                env.console
-            );      
-        }
-    
-    });
-    
-}
-
-void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](size_t attempt_number){
 
         context.wait_for_all_requests();
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
@@ -251,27 +243,32 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
 
 
-                direction.change_direction(env.program_info(), env.console, context, 1.451616);
-                pbf_move_left_joystick(context, 128, 0, 500, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
-                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
-                
+                try {
+                    direction.change_direction(env.program_info(), env.console, context, 1.451616);
+                    pbf_move_left_joystick(context, 128, 0, 500, 50);
+                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                    
 
-                direction.change_direction(env.program_info(), env.console, context, 2.023052);
-                pbf_move_left_joystick(context, 128, 0, 500, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
-                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
-                
+                    direction.change_direction(env.program_info(), env.console, context, 2.023052);
+                    pbf_move_left_joystick(context, 128, 0, 500, 50);
+                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                    
 
-                direction.change_direction(env.program_info(), env.console, context, 1.13517);
-                pbf_move_left_joystick(context, 128, 0, 1000, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
-                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);     
-                
-                direction.change_direction(env.program_info(), env.console, context, 0.609735);
-                pbf_move_left_joystick(context, 128, 0, 200, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
-                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                    direction.change_direction(env.program_info(), env.console, context, 1.13517);
+                    pbf_move_left_joystick(context, 128, 0, 1000, 50);
+                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_wait(context, seconds_wait * TICKS_PER_SECOND);     
+                    
+                    direction.change_direction(env.program_info(), env.console, context, 0.609735);
+                    pbf_move_left_joystick(context, 128, 0, 200, 50);
+                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                }catch (OperationFailedException&){
+                    env.console.log("Failed to change direction, but it's possibly due to clearing the challenge.");
+                    pbf_wait(context, 20 * TICKS_PER_SECOND);
+                }
 
                 // ///////////////////////
                 
@@ -291,12 +288,12 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         if (ret < 0){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Team Star Poison: Failed to kill 30 pokemon with Let's go.",
+                "Team Star Fairy: Failed to kill 30 pokemon with Let's go.",
                 env.console
             );            
         }
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
-        env.console.log("Battle the Team Star (Poison) boss.");
+        env.console.log("Battle the Team Star (Fairy) boss.");
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
@@ -311,6 +308,7 @@ void checkpoint_70(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0}, FlyPoint::POKECENTER);
 
         // fly back to Glaseado Mountain Pokecenter
+        // this clears Pokemon in minimap
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, 0, 0}, FlyPoint::POKECENTER);
 
         move_from_glaseado_mountain_to_montenevera(env, context);

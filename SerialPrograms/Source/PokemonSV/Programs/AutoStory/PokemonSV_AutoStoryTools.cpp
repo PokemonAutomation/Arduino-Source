@@ -343,8 +343,9 @@ void overworld_navigation(
 
 
     while (true){
+        NoMinimapWatcher no_minimap(stream.logger(), COLOR_RED, Milliseconds(250));
         NormalBattleMenuWatcher battle(COLOR_BLUE);
-        DialogBoxWatcher        dialog(COLOR_RED, true);
+        AdvanceDialogWatcher        dialog(COLOR_RED);
         DestinationMarkerWatcher marker(COLOR_CYAN, {0.717, 0.165, 0.03, 0.061});
         context.wait_for_all_requests();
         std::vector<PeriodicInferenceCallback> callbacks = {battle, dialog}; 
@@ -359,18 +360,31 @@ void overworld_navigation(
             [&](ProControllerContext& context){
 
                 for (int i = 0; i < seconds_timeout / seconds_realign; i++){
-                    if (movement_mode == NavigationMovementMode::CLEAR_WITH_LETS_GO){
-                        walk_forward_while_clear_front_path(info, stream, context, forward_ticks, y);
-                    }else{
-                        ssf_press_left_joystick(context, x, y, 0ms, Seconds(seconds_realign));
-                        if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
-                            pbf_wait(context, Seconds(seconds_realign));
-                        } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
-                            for (size_t j = 0; j < 5 * seconds_realign; j++){
-                                pbf_press_button(context, BUTTON_A, 20, 5);
+                    // if detect no minimap, then stop moving or spamming A.
+                    int ret2 = run_until<ProControllerContext>(
+                        stream, context,
+                        [&](ProControllerContext& context){
+                            if (movement_mode == NavigationMovementMode::CLEAR_WITH_LETS_GO){
+                                walk_forward_while_clear_front_path(info, stream, context, forward_ticks, y);
+                            }else{
+                                ssf_press_left_joystick(context, x, y, 0ms, Seconds(seconds_realign));
+                                if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
+                                    pbf_wait(context, Seconds(seconds_realign));
+                                } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
+                                    for (size_t j = 0; j < 5 * seconds_realign; j++){
+                                        pbf_press_button(context, BUTTON_A, 20, 5);
+                                    }
+                                }
                             }
-                        }
+                        },
+                        { no_minimap }
+                    );
+
+                    if (ret2 == 0){
+                        stream.log("overworld_navigation: No minimap detected. Wait for Battle or Dialog.");
+                        context.wait_for(Seconds(60));
                     }
+
                     context.wait_for_all_requests();
                     if (should_realign){
                         try {
@@ -1382,13 +1396,19 @@ void checkpoint_reattempt_loop(
     ProControllerContext& context, 
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats,
-    std::function<void(size_t attempt_number)>&& action
+    std::function<void(size_t attempt_number)>&& action,
+    bool day_skip
 ){
     size_t max_attempts = 100;
     for (size_t i = 0;;i++){
     try{
         if (i==0){
             checkpoint_save(env, context, notif_status_update, stats);
+        }
+
+        if (day_skip && (i > 0 || ENABLE_TEST)){
+            day_skip_from_overworld(env.console, context);
+            save_game_from_overworld(env.program_info(), env.console, context);
         }
 
         context.wait_for_all_requests();
@@ -2011,6 +2031,44 @@ void move_camera_until_yolo_object_detected(
             );  
         }
     }
+}
+
+
+void confirm_titan_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+
+    bool is_green_hp_bar = false;
+    size_t MAX_ATTEMPTS = 10;
+    for (size_t i = 0; i < MAX_ATTEMPTS; i++){
+        context.wait_for_all_requests();
+        VideoSnapshot screen = env.console.video().snapshot();
+        ImageFloatBox hp_bar_box{0.394805, 0.088991, 0.220779, 0.021000};
+
+
+        ImageStats hp_bar_stats = image_stats(extract_box_reference(screen, hp_bar_box));
+        // cout << "hp_bar_stats.average.sum(): " << hp_bar_stats.average.sum() << endl;    
+        // expected color is green: {R 25-32, G 255, B 32-76}  {30, 255, 55}. total = 30+255+55 = 340
+        // 30/340, 255/340, 55/340
+        is_green_hp_bar = is_solid(hp_bar_stats, {0.088235, 0.75, 0.161765}, 0.15, 30);
+        if (is_green_hp_bar){
+            break;
+        }
+
+        env.console.log("Unable to confirm Titan battle. Wait 2 seconds and re-try.");
+        context.wait_for(Seconds(2));
+    }
+
+
+    if (is_green_hp_bar){
+        env.console.log("Confirmed Titan battle.");
+        
+    }else{
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "confirm_titan_battle(): Unable to confirm Titan battle.",
+            env.console
+        );
+    }
+
 }
 
 

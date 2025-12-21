@@ -294,10 +294,10 @@ void place_marker_offset_from_flypoint(
     WallClock start = current_time();
 
     while (true){
-        if (current_time() - start > std::chrono::minutes(5)){
+        if (current_time() - start > std::chrono::minutes(2)){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "place_marker_offset_from_flypoint(): Failed to place down marker after 5 minutes.",
+                "place_marker_offset_from_flypoint(): Failed to place down marker after 2 minutes.",
                 stream
             );
         }
@@ -775,13 +775,13 @@ void heal_at_pokecenter(
 ){
     context.wait_for_all_requests();
     
-    if (!attempt_fly_to_overlapping_flypoint(info, stream, context)){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "Failed to fly to pokecenter.",
-            stream
-        );  
-    }           
+    // if (!attempt_fly_to_overlapping_flypoint(info, stream, context)){
+    //     OperationFailedException::fire(
+    //         ErrorReport::SEND_ERROR_REPORT,
+    //         "Failed to fly to pokecenter.",
+    //         stream
+    //     );  
+    // }           
     uint16_t seconds_timeout = 60;
 
     // re-orient camera
@@ -796,7 +796,7 @@ void heal_at_pokecenter(
     while (true){
         OverworldWatcher    overworld(stream.logger(), COLOR_CYAN);
         // TODO: test the Prompt watcher on all languages. Ensure FloatBox is sized correctly.
-        PromptDialogWatcher prompt(COLOR_YELLOW, {0.50, 0.400, 0.400, 0.080}); // 0.630, 0.400, 0.100, 0.080 // {0.50, 0.40, 0.40, 0.50}
+        PromptDialogWatcher prompt(COLOR_YELLOW, {0.50, 0.400, 0.400, 0.320}); // 0.50, 0.400, 0.400, 0.080  // 0.630, 0.400, 0.100, 0.080 // {0.50, 0.40, 0.40, 0.50}
         AdvanceDialogWatcher    advance_dialog(COLOR_RED);
         TutorialWatcher     tutorial(COLOR_RED);
         context.wait_for_all_requests();

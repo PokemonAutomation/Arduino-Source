@@ -121,7 +121,7 @@ void checkpoint_13(
             {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG, CallbackEnum::WHITE_A_BUTTON});
         
        
-    });
+    }, false);
 
 }
 
@@ -168,7 +168,7 @@ void checkpoint_14(
         // clear dialog until overworld
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
        
-    });
+    }, false);
 
 }
 
@@ -200,7 +200,7 @@ void checkpoint_15(
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
             {CallbackEnum::PROMPT_DIALOG, CallbackEnum::OVERWORLD});
        
-    });
+    }, false);
 
 }
 

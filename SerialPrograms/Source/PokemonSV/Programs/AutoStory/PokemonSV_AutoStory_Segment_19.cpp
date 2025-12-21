@@ -94,9 +94,8 @@ void checkpoint_41(
 
         // section 1
         DirectionDetector direction;
-        VideoSnapshot snapshot = env.console.video().snapshot();
-        double current_direction = direction.get_current_direction(env.console, snapshot);
-        if (current_direction == -1){  // if unable to detect current direction, fly to neighbouring Pokecenter, then fly back. To hopefully clear any pokemon covering the Minimap.
+        if (attempt_number > 0 || ENABLE_TEST){
+            env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
             move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 60});
             move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 60});
         }
@@ -264,6 +263,8 @@ void checkpoint_41(
 
 
         // battle Klawf phase 1
+        confirm_titan_battle(env, context);
+
         env.console.log("Battle Klawf Titan phase 1.");
         run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
@@ -277,7 +278,8 @@ void checkpoint_41(
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 30, {CallbackEnum::BATTLE});
         // Klawf battle phase 2
-        env.console.log("Battle Klawf Titan phase 1.");
+        confirm_titan_battle(env, context);
+        env.console.log("Battle Klawf Titan phase 2.");
         run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {CallbackEnum::DIALOG_ARROW});
         // get ride upgrade
         mash_button_till_overworld(env.console, context, BUTTON_A);        
@@ -297,6 +299,9 @@ void checkpoint_42(
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
+
+        // the landmark Pokecenter is far enough away from current location, that the map Pokemon don't cover it.
+        // Klawf vs Artazon (West) Pokecenter
 
         // section 1
         realign_player_from_landmark(

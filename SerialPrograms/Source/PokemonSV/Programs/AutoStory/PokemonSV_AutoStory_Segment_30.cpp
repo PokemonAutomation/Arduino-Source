@@ -96,17 +96,24 @@ void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     [&](size_t attempt_number){
 
         DirectionDetector direction;
-        VideoSnapshot snapshot = env.console.video().snapshot();
-        double current_direction = direction.get_current_direction(env.console, snapshot);
-        if (current_direction == -1){  // if unable to detect current direction, fly to neighbouring Pokecenter, then fly back. To hopefully clear any pokemon covering the Minimap.
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 50});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 50});
-        }
+        if (attempt_number > 0 || ENABLE_TEST){
+            env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+            // fly_to_overworld_from_map() may fail since the snowy background on the map will false positive the destinationMenuItemWatcher (MapDestinationMenuDetector at box {0.523000, 0.680000, 0.080000, 0.010000}), which causes the fly to fail
+            // we can get around this by either placing down a marker, or by zooming out so that that section isn't white snow.
+            // place down marker in this case
 
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 210, 255, 40);
+            // place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+            //     {ZoomChange::ZOOM_IN, 255, 200, 300}, 
+            //     FlyPoint::POKECENTER, 
+            //     {0.404687, 0.261111}
+            // );
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 0, 30});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 200, 255, 110});
+        }
+        
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            // move marker away so it doesn't block the North symbol
-            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 255, 50);
 
             direction.change_direction(env.program_info(), env.console, context, 3.855289);
             pbf_move_left_joystick(context, 128, 0, 200, 50);
@@ -153,24 +160,27 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
-        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_move_left_joystick(context, 128, 255, 300, 100);
         pbf_wait(context, 3 * TICKS_PER_SECOND);        
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
-        // place down marker as a workaround with an issue with fly_to_overworld_from_map
-        // fly_to_overworld_from_map() will fail since the snowy background on the map will false positive the destinationMenuItemWatcher (MapDestinationMenuDetector at box {0.523000, 0.680000, 0.080000, 0.010000}), which causes the fly to fail
-        place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 0, 0, 0}, 
-            FlyPoint::POKECENTER, 
-            {0.404687, 0.261111}
-        );
 
-        // fly back to Glaseado Gym Pokecenter
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 255, 0, 40}, FlyPoint::POKECENTER);
+        env.console.log("Fly back to Glaseado Gym Pokecenter");
+        env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap. End up in Glaseado Gym Pokecenter.");
+        // fly_to_overworld_from_map() may fail since the snowy background on the map will false positive the destinationMenuItemWatcher (MapDestinationMenuDetector at box {0.523000, 0.680000, 0.080000, 0.010000}), which causes the fly to fail
+        // we can get around this by either placing down a marker, or by zooming out so that that section isn't white snow.
+        // place down a marker in this case.
+
+        // remove old marker, then place new one
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 0, 0);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 180, 45);
+
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 0, 30});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 200, 255, 110});
         
         DirectionDetector direction;
-        // we just hope the minimap Direction isn't covered
+        
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
 
@@ -221,6 +231,8 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
+        // pokemon are cleared from minimap after the Snow Slope run
+
         // fly back to Glaseado Gym Pokecenter
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 0, 0}, FlyPoint::POKECENTER);
 
@@ -267,10 +279,44 @@ void checkpoint_77(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
-        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_move_left_joystick(context, 128, 255, 300, 100);
         pbf_wait(context, 3 * TICKS_PER_SECOND);        
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
+
+        env.console.log("Go to Glaseado Gym Pokecenter");
+        env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+        // fly_to_overworld_from_map() may fail since the snowy background on the map will false positive the destinationMenuItemWatcher (MapDestinationMenuDetector at box {0.523000, 0.680000, 0.080000, 0.010000}), which causes the fly to fail
+        // we can get around this by either placing down a marker, or by zooming out so that that section isn't white snow.
+        // place down a marker in this case.
+
+        // remove old marker, then place new one
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 0, 0);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 180, 45);
+
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 0, 30});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 200, 255, 110});
+
+        DirectionDetector direction;
+
+        do_action_and_monitor_for_battles(env.program_info(), env.console, context,
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+
+            direction.change_direction(env.program_info(), env.console, context, 3.855289);
+            pbf_move_left_joystick(context, 128, 0, 200, 50);
+
+            direction.change_direction(env.program_info(), env.console, context, 3.056395);
+            pbf_move_left_joystick(context, 128, 0, 250, 50);
+
+            direction.change_direction(env.program_info(), env.console, context, 3.749788);
+            pbf_move_left_joystick(context, 128, 0, 680, 50);
+
+            direction.change_direction(env.program_info(), env.console, context, 1.589021);
+            pbf_move_left_joystick(context, 128, 0, 1200, 50);
+            
+            // direction.change_direction(env.program_info(), env.console, context, 1.343606);   //1.327724
+           
+        });
 
         move_from_glaseado_gym_to_north_province_area_one(env, context);
 

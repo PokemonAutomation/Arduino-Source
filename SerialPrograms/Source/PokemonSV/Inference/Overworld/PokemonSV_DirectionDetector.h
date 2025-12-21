@@ -52,7 +52,8 @@ public:
         const ProgramInfo& info,
         VideoStream& stream,
         ProControllerContext& context,
-        double direction
+        double direction,
+        bool throw_if_fail = true
     ) const;
 
 protected:

@@ -171,7 +171,7 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         clear_tutorial(env.console, context);
 
 
-    });
+    }, false);
 }
 
 // void checkpoint_105(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){

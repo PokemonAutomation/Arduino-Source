@@ -100,9 +100,11 @@ void checkpoint_61(
     [&](size_t attempt_number){
 
         // first, clear Pokemon in Minimap.
-        env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
+        if (attempt_number > 0 || ENABLE_TEST){
+            env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
+        }
 
         // marker 1   keep{0.490625, 0.594444}  in{0.589583, 0.569444} 
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
@@ -163,24 +165,22 @@ void checkpoint_62(
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
-        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_move_left_joystick(context, 128, 255, 300, 100);
         pbf_wait(context, 3 * TICKS_PER_SECOND);        
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
-        // fly to Medali East Pokecenter
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 255, 128, 20}, FlyPoint::POKECENTER);
-
-        pbf_press_button(context, BUTTON_L, 50, 50);
 
         DirectionDetector direction;
-        context.wait_for_all_requests();
-        VideoSnapshot snapshot = env.console.video().snapshot();
-        double current_direction = direction.get_current_direction(env.console, snapshot);
-        if (current_direction == -1){  // if unable to detect current direction, fly to neighbouring Pokecenter, then fly back. To hopefully clear any pokemon covering the Minimap.
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
-        }
+        env.console.log("Fly back to Medali East Pokecenter");
+        env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+        env.console.log("Fly to Cascaraffa north to clear minimap. Then Medali West. End up in Medal East Pokecenter.");
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 180, 100}, FlyPoint::POKECENTER);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 80, 85});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 0, 0});
+
+
+        pbf_press_button(context, BUTTON_L, 50, 50);
 
         direction.change_direction(env.program_info(), env.console, context, 1.971173);
         pbf_move_left_joystick(context, 128, 0, 600, 50);
@@ -223,6 +223,8 @@ void checkpoint_62(
 
         env.console.log("Battle Normal Gym leader.");
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        // We see Dialog right before the final pokemon terastalizes, but after you select your move. So, technically, we see dialog before the battle officially ends.
+        // it's fine as long as you OHKO Larry's final Pokemon. If you can't OHKO the final Staraptor, they you probably won't be able to beat the Elite Four.
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 60);
         pbf_mash_button(context, BUTTON_A, 1000ms);
 
@@ -247,13 +249,20 @@ void checkpoint_63(
     [&](size_t attempt_number){
 
         // Gym leader defeated. Standing in Gym building
-        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_move_left_joystick(context, 128, 255, 300, 100);
         pbf_wait(context, 3 * TICKS_PER_SECOND);
         // wait for overworld after leaving Gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
         // fly to Medali East Pokecenter
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 255, 128, 20}, FlyPoint::POKECENTER);
+        env.console.log("Fly back to Medali East Pokecenter");
+        env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+        env.console.log("Fly to Cascaraffa north to clear minimap. Then Medali West. End up in Medal East Pokecenter.");
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 180, 100}, FlyPoint::POKECENTER);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 80, 85});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 0, 0});
+
+        
         move_from_medali_to_glaseado_mountain(env, context);
 
     });    

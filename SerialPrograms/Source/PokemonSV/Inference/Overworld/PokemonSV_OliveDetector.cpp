@@ -147,7 +147,8 @@ ImageFloatBox OliveDetector::align_to_olive(
     ProControllerContext& context, 
     double direction_facing, 
     uint8_t rgb_gap,
-    ImageFloatBox area_to_check
+    ImageFloatBox area_to_check,
+    bool throw_if_fail_change_dir
 ){
     size_t MAX_ATTEMPTS = 10;
     // size_t olive_unchanged_count = 0;
@@ -156,7 +157,7 @@ ImageFloatBox OliveDetector::align_to_olive(
     uint16_t scale_factor = 130;
     int16_t prev_push_direction = 0;
     for (size_t i = 0; i < MAX_ATTEMPTS; i++){
-        direction.change_direction(info, stream, context, direction_facing);
+        direction.change_direction(info, stream, context, direction_facing, throw_if_fail_change_dir);
         pbf_move_left_joystick(context, 128, 0, 5, 20);
     
         olive_box = get_olive_floatbox(stream, context, rgb_gap, area_to_check);
@@ -254,14 +255,15 @@ uint16_t OliveDetector::push_olive_forward(
     uint16_t total_forward_distance,
     uint16_t push_olive,
     uint8_t rgb_gap,
-    ImageFloatBox area_to_check
+    ImageFloatBox area_to_check, 
+    bool throw_if_fail_change_dir
 ){
     stream.log("push_olive_forward(): Total distance: " + std::to_string(total_forward_distance));
     // uint16_t initial_push_olive = push_olive;
     uint16_t ticks_walked = 0;
     size_t MAX_ATTEMPTS = 10;
     for (size_t i = 0; i < MAX_ATTEMPTS; i++){
-        align_to_olive(info, stream, context, direction_facing, rgb_gap, area_to_check);
+        align_to_olive(info, stream, context, direction_facing, rgb_gap, area_to_check, throw_if_fail_change_dir);
         ticks_walked += walk_up_to_olive(info, stream, context, direction_facing, rgb_gap, area_to_check);
         
 
@@ -270,7 +272,7 @@ uint16_t OliveDetector::push_olive_forward(
             return ticks_walked;
         }
 
-        align_to_olive(info, stream, context, direction_facing, rgb_gap, area_to_check);
+        align_to_olive(info, stream, context, direction_facing, rgb_gap, area_to_check, throw_if_fail_change_dir);
         // check location of olive before and after push
         // if olive is approximately in the same location, then the olive is stuck. try moving backward and running forward again.
         ImageFloatBox olive_box_1 = get_olive_floatbox(stream, context, rgb_gap, area_to_check);

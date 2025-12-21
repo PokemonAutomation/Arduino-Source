@@ -80,7 +80,9 @@ void checkpoint_54(
     [&](size_t attempt_number){
         
         DirectionDetector direction;
-        // recently flew to this pokecenter, so no need to worry about failing to detect direction
+        // recently flew a significant distance, so minimap should be clear of Pokemon
+        // flew from Levincia Gym to Levincia North Pokecenter.
+        
         direction.change_direction(env.program_info(), env.console, context, 1.341);
         pbf_move_left_joystick(context, 128, 0, 450, 100);
 

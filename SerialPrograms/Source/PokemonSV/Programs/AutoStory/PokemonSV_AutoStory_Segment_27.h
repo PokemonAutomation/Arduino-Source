@@ -80,7 +80,7 @@ void checkpoint_67(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
 // moves player from Glaseado Mountain Pokecenter to Casseroya Watchtower 3
-void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t attempt_number);
 
 // moves player from Casseroya Watchtower 3 to Dondozo Titan. Defeat Dondozo Titan phase 1.
 void move_from_casseroya_watchtower3_to_dondozo_titan(SingleSwitchProgramEnvironment& env, ProControllerContext& context);

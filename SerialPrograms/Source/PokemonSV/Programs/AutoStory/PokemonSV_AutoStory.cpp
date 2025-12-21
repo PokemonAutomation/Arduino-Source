@@ -1296,10 +1296,20 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
         DirectionDetector direction;
 
 
-        YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-station-2.onnx");
+        // YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-station-2.onnx");
         // move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-tera", 0.294444);
         // move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "tree-tera", 0.604688);
+direction.change_direction(env.program_info(), env.console, context, 3.855289);
+            pbf_move_left_joystick(context, 128, 0, 200, 50);
 
+            direction.change_direction(env.program_info(), env.console, context, 3.056395);
+            pbf_move_left_joystick(context, 128, 0, 250, 50);
+
+            direction.change_direction(env.program_info(), env.console, context, 3.749788);
+            pbf_move_left_joystick(context, 128, 0, 680, 50);
+
+            direction.change_direction(env.program_info(), env.console, context, 1.589021);
+            pbf_move_left_joystick(context, 128, 0, 1200, 50);
         
 
         return;

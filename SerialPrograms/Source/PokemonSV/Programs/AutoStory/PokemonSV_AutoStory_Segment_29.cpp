@@ -105,9 +105,8 @@ void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         DirectionDetector direction;
 
         env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-        
-        // place down marker as a workaround with an issue with fly_to_overworld_from_map
-        // fly_to_overworld_from_map() will fail since the snowy background on the map will false positive the destinationMenuItemWatcher (MapDestinationMenuDetector at box {0.523000, 0.680000, 0.080000, 0.010000}), which causes the fly to fail
+        // fly_to_overworld_from_map() may fail since the snowy background on the map will false positive the destinationMenuItemWatcher (MapDestinationMenuDetector at box {0.523000, 0.680000, 0.080000, 0.010000}), which causes the fly to fail
+        // we can get around this by either placing down a marker, or by zooming out so that that section isn't white snow.
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
             {ZoomChange::KEEP_ZOOM, 128, 255, 35}, 
             FlyPoint::POKECENTER, 
@@ -160,13 +159,13 @@ void checkpoint_72(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
-        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_move_left_joystick(context, 128, 255, 300, 100);
         pbf_wait(context, 3 * TICKS_PER_SECOND);        
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
         DirectionDetector direction;
-        // we just hope the minimap Direction isn't covered
+        // Minimap should be clear of Pokemon, since we haven't opened the map, since we cleared the Pokemon in checkpoint 71
         direction.change_direction(env.program_info(), env.console, context, 2.462858);  // 2.496149  // 2.479418
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
 
@@ -193,7 +192,7 @@ void checkpoint_73(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     [&](size_t attempt_number){
 
         DirectionDetector direction;
-        // we just hope the minimap Direction isn't covered
+        // Minimap should be clear of Pokemon, since we haven't opened the map, since we cleared the Pokemon in checkpoint 71
         direction.change_direction(env.program_info(), env.console, context, 5.478851);
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
@@ -214,13 +213,28 @@ void checkpoint_73(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 void checkpoint_74(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
-        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_move_left_joystick(context, 128, 255, 300, 100);
         pbf_wait(context, 3 * TICKS_PER_SECOND);        
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
-        // fly back to Montenevera Pokecenter
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 128, 0, 30}, FlyPoint::POKECENTER);
+        // fly_to_overworld_from_map() may fail since the snowy background on the map will false positive the destinationMenuItemWatcher (MapDestinationMenuDetector at box {0.523000, 0.680000, 0.080000, 0.010000}), which causes the fly to fail
+        // we can get around this by either placing down a marker, or by zooming out so that that section isn't white snow. 
+        // We place a marker in this case
+        env.console.log("fly somewhere else (Glaseado Mountain), then back to Montenevera Pokecenter");
+        env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+
+        // remove old marker, then place new one
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 50);
+        place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+                {ZoomChange::KEEP_ZOOM, 128, 255, 35}, 
+                FlyPoint::POKECENTER, 
+                {0.54375, 0.662037}
+            );
+
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 75});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 75});
+        
 
         move_from_montenevera_to_glaseado_gym(env, context);
 
@@ -232,7 +246,7 @@ void checkpoint_74(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DirectionDetector direction;
-    // we just hope the minimap Direction isn't covered
+    // minimap was cleared at the beginning of this checkpoint
     direction.change_direction(env.program_info(), env.console, context, 1.255489);
     pbf_move_left_joystick(context, 128, 0, 400, 50);
 

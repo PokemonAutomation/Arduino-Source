@@ -69,7 +69,7 @@ void AutoStory_Segment_25::run_segment(
 
 std::string AutoStory_Checkpoint_58::name() const{ return "058 - " + AutoStory_Segment_25().name(); }
 std::string AutoStory_Checkpoint_58::start_text() const{ return "Beat Orthworm. At East Province (Area Three) Pokecenter.";}
-std::string AutoStory_Checkpoint_58::end_text() const{ return "Beat team star grunt. At gate of Team Star (Poison) base.";}
+std::string AutoStory_Checkpoint_58::end_text() const{ return "Beat Orthworm. At East Province (Area Three) Pokecenter.";}
 void AutoStory_Checkpoint_58::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_58(env, context, options.notif_status_update, stats);
 }
@@ -97,15 +97,35 @@ void checkpoint_58(
 ){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
+        // empty checkpoint, to preserve ordering
 
+    }, false);    
+
+}
+
+void checkpoint_59(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
+){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
         context.wait_for_all_requests();
-        
+
         // marker 1  {0.795312, 0.626852}
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
             {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
             FlyPoint::FAST_TRAVEL, 
             {0.795312, 0.626852}
         );
+
+        if (attempt_number > 0 || ENABLE_TEST){
+            env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 180, 130});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 70, 130});
+        }
+        
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
@@ -166,30 +186,6 @@ void checkpoint_58(
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
-        context.wait_for_all_requests();
-        VideoSnapshot snapshot = env.console.video().snapshot();
-        DirectionDetector direction;
-        double current_direction = direction.get_current_direction(env.console, snapshot);
-        if (current_direction == -1){  // if unable to detect current direction, reset. We need to be able to detect the direction for the next checkpoint.
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Unable to detect direction. Reset.",
-                env.console
-            );      
-        }
-
-    });    
-
-}
-
-void checkpoint_59(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
-){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](size_t attempt_number){
 
         context.wait_for_all_requests();
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
@@ -270,29 +266,33 @@ void checkpoint_59(
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
                 
+                try {
+                    direction.change_direction(env.program_info(), env.console, context, 0.572754);
+                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_move_left_joystick(context, 128, 0, 700, 50);
+                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
 
-                direction.change_direction(env.program_info(), env.console, context, 0.572754);
-                pbf_press_button(context, BUTTON_R, 20, 20);
-                pbf_move_left_joystick(context, 128, 0, 700, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
-                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                    direction.change_direction(env.program_info(), env.console, context, 6.036137);
+                    pbf_move_left_joystick(context, 128, 0, 200, 50);
+                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
 
-                direction.change_direction(env.program_info(), env.console, context, 6.036137);
-                pbf_move_left_joystick(context, 128, 0, 200, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
-                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                    direction.change_direction(env.program_info(), env.console, context, 5.779599);
+                    pbf_move_left_joystick(context, 128, 0, 400, 50);
+                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
 
-                direction.change_direction(env.program_info(), env.console, context, 5.779599);
-                pbf_move_left_joystick(context, 128, 0, 400, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
-                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
-
-                pbf_move_left_joystick(context, 128, 0, 600, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
-                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                    pbf_move_left_joystick(context, 128, 0, 600, 50);
+                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
 
 
-                pbf_wait(context, 20 * TICKS_PER_SECOND);
+                    pbf_wait(context, 20 * TICKS_PER_SECOND);
+                }catch (OperationFailedException&){
+                    env.console.log("Failed to change direction, but it's possibly due to clearing the challenge.");
+                    pbf_wait(context, 20 * TICKS_PER_SECOND);
+                }
                 
             },
             {no_minimap}
@@ -322,7 +322,8 @@ void checkpoint_60(
 ){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
-        // fly back to Porto Marinada Pokecenter
+        // fly back to Porto Marinada Pokecenter from Team Star Poison
+        // this clears Pokemon in minimap
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, 128, 600}, FlyPoint::POKECENTER);
 
 

@@ -92,7 +92,7 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         // arrived at research station 1
 
-        pbf_move_left_joystick(context, 0, 255, 500, 100);
+        pbf_move_left_joystick(context, 0, 255, 300, 100);
         pbf_wait(context, 3 * TICKS_PER_SECOND);        
         // wait for overworld after leaving research station
         wait_for_overworld(env.program_info(), env.console, context, 30);
@@ -317,7 +317,7 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         run_trainer_double_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
-    });   
+    }, false);   
 }
 
 void checkpoint_99(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
@@ -351,7 +351,7 @@ void checkpoint_99(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         mash_button_till_overworld(env.console, context, BUTTON_A);  // black dialog, prompt
 
 
-    });     
+    }, false);     
 }
 
 

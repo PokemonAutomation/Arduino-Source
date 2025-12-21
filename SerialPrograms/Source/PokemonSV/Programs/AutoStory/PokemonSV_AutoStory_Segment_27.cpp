@@ -103,7 +103,14 @@ void checkpoint_64(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
         context.wait_for_all_requests();
-        move_from_glaseado_mountain_to_casseroya_watchtower3(env, context);
+
+        if (attempt_number > 0 || ENABLE_TEST){
+            env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 180});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 180});
+        }
+
+        move_from_glaseado_mountain_to_casseroya_watchtower3(env, context, attempt_number);
 
     });         
 }
@@ -112,6 +119,13 @@ void checkpoint_65(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
         context.wait_for_all_requests();
+
+        if (attempt_number > 0 || ENABLE_TEST){
+            env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 128, 0}, FlyPoint::POKECENTER);
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 128, 0}, FlyPoint::FAST_TRAVEL);
+        }
+
         move_from_casseroya_watchtower3_to_dondozo_titan(env, context);
         
     }); 
@@ -130,7 +144,9 @@ void checkpoint_67(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
         context.wait_for_all_requests();
-        // fly to Glaseado Mountain Pokecenter
+        // fly to Glaseado Mountain Pokecenter from Dondozo
+        // this clears Pokemon in minimap
+
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, 0, 0}, FlyPoint::POKECENTER);
         move_from_glaseado_mountain_to_north_province_area_three(env, context);
 
@@ -140,13 +156,14 @@ void checkpoint_67(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
 
-void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t attempt_number){
     context.wait_for_all_requests();
 
+    heal_at_pokecenter(env.program_info(), env.console, context);
+
     DirectionDetector direction;
-    VideoSnapshot snapshot = env.console.video().snapshot();
-    double current_direction = direction.get_current_direction(env.console, snapshot);
-    if (current_direction == -1){  // if unable to detect current direction, fly to neighbouring Pokecenter, then fly back. To hopefully clear any pokemon covering the Minimap.
+    if (attempt_number > 0 || ENABLE_TEST){
+        env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 100, 255, 60});
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 0, 60});
     }
@@ -247,6 +264,9 @@ void move_from_casseroya_watchtower3_to_dondozo_titan(SingleSwitchProgramEnviron
         128, 0, 20, 10, false);
 
     clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE});
+
+    confirm_titan_battle(env, context);
+
     env.console.log("Battle Dondozo/Tatsugiri Titan phase 1.");
     run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
 
@@ -267,7 +287,7 @@ void move_from_dondozo_titan_phase1_to_phase2(SingleSwitchProgramEnvironment& en
 
     overworld_navigation(env.program_info(), env.console, context, 
         NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-        128, 0, 20, 10, false);
+        128, 0, 40, 10, false);
 
     // marker 2       x=0.393229, y=0.748148
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
@@ -291,6 +311,8 @@ void move_from_dondozo_titan_phase1_to_phase2(SingleSwitchProgramEnvironment& en
         128, 0, 80, 40, false);
 
     clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE});
+
+    confirm_titan_battle(env, context);
     
     env.console.log("Battle Dondozo/Tatsugiri Titan phase 2.");
     run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);

@@ -66,7 +66,7 @@ void AutoStory_Segment_24::run_segment(
 
 std::string AutoStory_Checkpoint_55::name() const{ return "055 - " + AutoStory_Segment_24().name(); }
 std::string AutoStory_Checkpoint_55::start_text() const{ return "At East Province (Area Three) Watchtower.";}
-std::string AutoStory_Checkpoint_55::end_text() const{ return "Beat Orthworm phase 1";}
+std::string AutoStory_Checkpoint_55::end_text() const{ return "Beat Orthworm phase 1 and 2";}
 void AutoStory_Checkpoint_55::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_55(env, context, options.notif_status_update, stats);
 }
@@ -74,7 +74,7 @@ void AutoStory_Checkpoint_55::run_checkpoint(SingleSwitchProgramEnvironment& env
 
 std::string AutoStory_Checkpoint_56::name() const{ return "056 - " + AutoStory_Segment_24().name(); }
 std::string AutoStory_Checkpoint_56::start_text() const{ return AutoStory_Checkpoint_55().end_text();}
-std::string AutoStory_Checkpoint_56::end_text() const{ return "Beat Orthworm phase 2";}
+std::string AutoStory_Checkpoint_56::end_text() const{ return "At East Province (Area Three) Pokecenter.";}
 void AutoStory_Checkpoint_56::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_56(env, context, options.notif_status_update, stats);
 }
@@ -102,12 +102,10 @@ void checkpoint_55(
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             
             DirectionDetector direction;
-
-            VideoSnapshot snapshot = env.console.video().snapshot();
-            double current_direction = direction.get_current_direction(env.console, snapshot);
-            if (current_direction == -1){  // if unable to detect current direction, fly to neighbouring Pokecenter, then fly back. To hopefully clear any pokemon covering the Minimap.
+            if (attempt_number > 0 || ENABLE_TEST){
+                env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
                 move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 50});
-                move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 50}, FlyPoint::FAST_TRAVEL);
+                move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 100, 130}, FlyPoint::FAST_TRAVEL);
             }
 
             direction.change_direction(env.program_info(), env.console, context, 3.909067);
@@ -164,26 +162,16 @@ void checkpoint_55(
 
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
 
+        confirm_titan_battle(env, context);
         env.console.log("Battle Orthworm Titan phase 1.");
         run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
 
-    });    
-
-}
-
-void checkpoint_56(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
-){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](size_t attempt_number){
 
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             
             DirectionDetector direction;
+            // we hope minimap is clear of Pokemon, after Orthworm phase 1
 
             direction.change_direction(env.program_info(), env.console, context, 5.042435);
             pbf_move_left_joystick(context, 128, 0, 900, 100);
@@ -232,6 +220,7 @@ void checkpoint_56(
 
         // battle the titan phase 2
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE});  
+        confirm_titan_battle(env, context);
         env.console.log("Battle Orthworm Titan phase 2.");
         run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {CallbackEnum::DIALOG_ARROW});
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
@@ -240,7 +229,7 @@ void checkpoint_56(
 
 }
 
-void checkpoint_57(
+void checkpoint_56(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
     EventNotificationOption& notif_status_update,
@@ -248,7 +237,8 @@ void checkpoint_57(
 ){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
-        // fly back to East Province (Area Three) Watchtower
+        // fly back to East Province (Area Three) Watchtower. from Orthworm
+        // this clears Pokemon in minimap
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0}, FlyPoint::FAST_TRAVEL);
 
         // marker 1
@@ -357,6 +347,18 @@ void checkpoint_57(
         
     });    
 
+}
+
+void checkpoint_57(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
+){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+        // empty checkpoint, to preserve ordering
+    }, false);
 }
 
 
