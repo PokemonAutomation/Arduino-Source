@@ -29,11 +29,9 @@ public:
         if (total_skips == 0){
             return StatsTracker::to_str(mode);
         }else{
-            return std::format(
-                "Skips Issued: {:L} - Skips Remaining: {:L}",
-                issued.load(std::memory_order_relaxed),
-                total_skips - issued.load(std::memory_order_relaxed)
-            );
+            return
+                "Skips Issued: " + tostr_u_commas(issued) +
+                " - Skips Remaining: " + tostr_u_commas(total_skips - issued.load(std::memory_order_relaxed));
         }
     }
 

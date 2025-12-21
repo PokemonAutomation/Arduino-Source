@@ -62,7 +62,7 @@ void EggFetcher2::run_eggfetcher(
 
     //  1st Fetch: Get into position.
     {
-        logger.log(std::format("Fetch Attempts: {:L}", c));
+        logger.log("Fetch Attempts: " + tostr_u_commas(c));
         fly_home_collect_egg(context, true);
         collect_egg_mash_out(context, deposit_automatically);
 
@@ -74,7 +74,7 @@ void EggFetcher2::run_eggfetcher(
 
     //  Now we are in steady state.
     for (; c < attempts; c++){
-        logger.log(std::format("Fetch Attempts: {:L}", c));
+        logger.log("Fetch Attempts: " + tostr_u_commas(c));
         eggfetcher_loop(context);
         collect_egg(context);
         collect_egg_mash_out(context, deposit_automatically);

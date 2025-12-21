@@ -74,10 +74,10 @@ void GlobalMediaServices::refresh_cameras(){
 
         WallClock end = current_time();
         double seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.;
-        global_logger_tagged().log(std::format("Done refreshing camera list... {:.3f} seconds", seconds), COLOR_CYAN);
+        global_logger_tagged().log("Done refreshing camera list... " + tostr_fixed(seconds, 3) + " seconds", COLOR_CYAN);
     }catch (std::exception& e){
         global_logger_tagged().log(
-            std::format("Refreshing camera list returned exception: {}", e.what()),
+            std::string("Refreshing camera list returned exception: ") + e.what(),
             COLOR_RED
         );
     }

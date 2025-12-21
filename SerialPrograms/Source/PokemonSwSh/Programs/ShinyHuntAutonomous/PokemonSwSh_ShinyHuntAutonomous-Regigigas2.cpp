@@ -125,7 +125,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env,
 
     while (true){
         for (uint8_t pp = REVERSAL_PP; pp > 0; pp--){
-            env.log(std::format("Starting Regigigas Encounter: {:L}", stats.encounters() + 1));
+            env.log("Starting Regigigas Encounter: " + tostr_u_commas(stats.encounters() + 1));
 
             pbf_mash_button(context, BUTTON_A, 5s);
             context.wait_for_all_requests();

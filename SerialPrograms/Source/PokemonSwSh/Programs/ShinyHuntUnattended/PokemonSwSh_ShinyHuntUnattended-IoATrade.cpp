@@ -82,7 +82,7 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, P
     }
 
     for (uint32_t c = 0; ; c++){
-        env.log(std::format("Starting Trade: {:L}", c + 1));
+        env.log("Starting Trade: " + tostr_u_commas(c + 1));
 
         pbf_press_button(context, BUTTON_A, 10, 100);
         pbf_press_button(context, BUTTON_A, 10, 60);

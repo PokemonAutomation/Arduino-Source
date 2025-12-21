@@ -108,7 +108,7 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
             env.console, context,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
-        env.log(std::format("Starting Encounter: {:L}", stats.encounters() + 1));
+        env.log("Starting Encounter: " + tostr_u_commas(stats.encounters() + 1));
         context.wait_for_all_requests();
 
         //  Detect shiny.

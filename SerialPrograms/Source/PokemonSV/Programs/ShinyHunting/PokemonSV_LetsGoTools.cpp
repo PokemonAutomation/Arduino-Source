@@ -227,7 +227,11 @@ bool use_lets_go_to_clear_in_front(
             last_kill = WallDuration::max();
         }else{
             last_kill = now - last_kill_time;
-            stream.log(std::format("Last Kill: {:.3f} seconds ago", last_kill.count() / 1000.0));
+            stream.log(
+                "Last Kill: " +
+                tostr_fixed(std::chrono::duration_cast<Milliseconds>(last_kill).count() / 1000., 3) +
+                " seconds ago"
+            );
         }
 
         if (last_kill > timeout){

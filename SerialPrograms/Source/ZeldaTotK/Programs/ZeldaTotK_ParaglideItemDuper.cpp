@@ -104,7 +104,7 @@ void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, ProControl
     uint32_t c = 0;
 
     while (c < ATTEMPTS){
-        env.log(std::format("Current Attempts: {:L}", c));
+        env.log("Current Attempts: " + tostr_u_commas(c));
 
         //Walk forward from teleportation point
         pbf_move_left_joystick(context, 128, 0, 10, 5);

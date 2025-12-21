@@ -208,10 +208,10 @@ public:
         }
         double win_ratio = path_stats.win_ratio();
         if (win_ratio >= m_min_win_ratio){
-            m_logger.log(std::format("Win Ratio = {}: Resetting to keep path.", win_ratio), COLOR_BLUE);
+            m_logger.log("Win Ratio = " + tostr_default(win_ratio) + ": Resetting to keep path.", COLOR_BLUE);
             return CaughtScreenAction::RESET;
         }else{
-            m_logger.log(std::format("Win Ratio = {}: Continuing to get new path.", win_ratio), COLOR_BLUE);
+            m_logger.log("Win Ratio = " + tostr_default(win_ratio) + ": Continuing to get new path.", COLOR_BLUE);
             return CaughtScreenAction::TAKE_NON_BOSS_SHINY_AND_CONTINUE;
         }
     }

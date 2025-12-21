@@ -154,17 +154,13 @@ int run_program(int argc, char *argv[]){
 
 
 int main(int argc, char *argv[]){
-    //  DO NOT CHANGE THIS
-    //  We make assumptions about string formats for serialization.
-    //  If you change this, it can fuck up our parsing.
-    std::locale::global(std::locale("en_US.UTF-8"));
-
 #if 0
     // Retrieve and store program name
     set_program_path(argv[0]);
 #endif
 
     setup_crash_handler();
+
 
     int ret = run_program(argc, argv);
 

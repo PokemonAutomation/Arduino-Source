@@ -55,14 +55,14 @@ std::string ShinySparkleSetBDSP::to_str() const{
     if (m_alpha_overall < 3.0){
         return str;
     }
-    str = "SparkleDetector";
+    str += "SparkleDetector";
     if (!balls.empty()){
-        str += std::format(" - Balls: {}", balls.size());
+        str += " - Balls: " + std::to_string(balls.size());
     }
     if (!stars.empty()){
-        str += std::format(" - Stars: {}", stars.size());
+        str += " - Stars: " + std::to_string(stars.size());
     }
-    str += std::format(" - (alpha = {})", m_alpha_overall);
+    str += " - (alpha = " + tostr_default(m_alpha_overall) + ")";
     return str;
 }
 void ShinySparkleSetBDSP::draw_boxes(

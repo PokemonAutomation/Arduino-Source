@@ -259,7 +259,7 @@ std::string TimeDurationCell<Type>::time_string(const std::string& text) const{
     if constexpr (self >= milliseconds){
         return duration_to_string(std::chrono::duration_cast<Milliseconds>(value));
     }else{
-        return std::format("{:L} {}", value.count(), m_data->m_units);
+        return tostr_u_commas(value.count()) + " " + m_data->m_units;
     }
 }
 

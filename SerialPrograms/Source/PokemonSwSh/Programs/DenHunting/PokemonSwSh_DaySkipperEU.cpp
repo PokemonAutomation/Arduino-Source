@@ -128,6 +128,7 @@ void DaySkipperEU::run_switch1(SingleSwitchProgramEnvironment& env, ProControlle
         year++;
         remaining_skips--;
         stats.issued++;
+//        env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
         env.update_stats();
 
         if (year >= 60){

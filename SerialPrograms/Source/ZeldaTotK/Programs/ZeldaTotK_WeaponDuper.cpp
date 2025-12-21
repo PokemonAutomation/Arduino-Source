@@ -85,7 +85,7 @@ void WeaponDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCont
     uint32_t c = 0;
 
     while (c < ATTEMPTS){
-        env.log(std::format("Current Attempts: {:L}", c));
+        env.log("Current Attempts: " + tostr_u_commas(c));
 
         env.log("Open menu");
         pbf_press_button(context, BUTTON_PLUS, 10, 30);

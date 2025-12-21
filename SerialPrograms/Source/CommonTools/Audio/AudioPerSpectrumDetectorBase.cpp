@@ -61,9 +61,9 @@ void AudioPerSpectrumDetectorBase::throw_if_no_sound(std::chrono::milliseconds m
 
 void AudioPerSpectrumDetectorBase::log_results(){
     if (m_last_timestamp != WallClock::min()){
-        m_logger.log(std::format("{} detected! Error Coefficient = {}", m_audio_name, m_lowest_error), COLOR_BLUE);
+        m_logger.log(m_audio_name + " detected! Error Coefficient = " + tostr_default(m_lowest_error), COLOR_BLUE);
     }else{
-        m_logger.log(std::format("{} not detected. Error Coefficient = {}", m_audio_name, m_lowest_error), COLOR_PURPLE);
+        m_logger.log(m_audio_name + " not detected. Error Coefficient = " + tostr_default(m_lowest_error), COLOR_PURPLE);
     }
 
 #if 0

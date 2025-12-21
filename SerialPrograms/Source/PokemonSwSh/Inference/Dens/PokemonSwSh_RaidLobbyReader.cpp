@@ -40,6 +40,8 @@ RaidLobbyState RaidLobbyReader::read(const ImageViewRGB32& screen){
         return RaidLobbyState();
     }
 
+    std::string str;
+
     FloatPixel average0 = image_average(extract_box_reference(screen, m_checkbox0));
     FloatPixel average1 = image_average(extract_box_reference(screen, m_checkbox1));
     FloatPixel average2 = image_average(extract_box_reference(screen, m_checkbox2));
@@ -47,17 +49,21 @@ RaidLobbyState RaidLobbyReader::read(const ImageViewRGB32& screen){
     double distance1 = euclidean_distance(average0, average1);
     double distance2 = euclidean_distance(average0, average2);
     double distance3 = euclidean_distance(average0, average3);
+    str += "Ready = {";
+    str += tostr_default(0) + ", ";
+    str += tostr_default(distance1) + ", ";
+    str += tostr_default(distance2) + ", ";
+    str += tostr_default(distance3) + "}";
 
     double stddev0 = image_stddev(extract_box_reference(screen, m_spritebox0)).sum();
     double stddev1 = image_stddev(extract_box_reference(screen, m_spritebox1)).sum();
     double stddev2 = image_stddev(extract_box_reference(screen, m_spritebox2)).sum();
     double stddev3 = image_stddev(extract_box_reference(screen, m_spritebox3)).sum();
-
-    std::string str = std::format(
-        "Ready = {{0, {}, {}, {}}}, Sprites = {{{}, {}, {}, {}}}",
-        distance1, distance2, distance3,
-        stddev0, stddev1, stddev2, stddev3
-    );
+    str += ", Sprites = {";
+    str += tostr_default(stddev0) + ", ";
+    str += tostr_default(stddev1) + ", ";
+    str += tostr_default(stddev2) + ", ";
+    str += tostr_default(stddev3) + "}";
 
     m_logger.log("RaidLobbyReader(): " + str, COLOR_PURPLE);
 

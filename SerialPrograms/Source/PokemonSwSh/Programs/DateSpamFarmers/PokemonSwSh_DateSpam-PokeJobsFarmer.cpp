@@ -103,7 +103,7 @@ void PokeJobsFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
         // Start new jobs
         for (uint16_t j = 1; j <= CONCURRENCY; j++){
-            env.log(std::format("Starting job #{:L} in year {:L}", j, 2000 + year));
+            env.log("Starting job #" + tostr_u_commas(j) + " in year " + tostr_u_commas(2000 + year));
 
             // Enter Poke Jobs
             enter_jobs(context, MENU_INDEX);
@@ -145,7 +145,7 @@ void PokeJobsFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
         // Complete jobs
         for (uint16_t j = 1; j <= CONCURRENCY; j++){
-            env.log(std::format("Completing job #{:L} in year {:L}", j, 2000 + year));
+            env.log("Completing job #" + tostr_u_commas(j) + " in year " + tostr_u_commas(2000 + year));
 
             // Enter Poke Jobs
             enter_jobs(context, MENU_INDEX);

@@ -129,7 +129,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
 
 
     for (uint32_t raids = 0;; raids++){
-        env.log(std::format("Raids Completed: {:L}", raids));
+        env.log("Raids Completed: " + tostr_u_commas(raids));
 
         host.wait_for_all_requests();
         env.run_in_parallel(

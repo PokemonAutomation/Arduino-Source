@@ -93,7 +93,7 @@ void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env
         pbf_wait(context, START_GAME_WAIT_DELAY0);
 
         //  Enter game.
-        env.log(std::format("Starting Encounter: {:L}", c + 1));
+        env.log("Starting Encounter: " + tostr_u_commas(c + 1));
         pbf_press_button(context, BUTTON_A, 80ms, ENTER_GAME_TO_RUN_DELAY0);
 
         //  Run away.

@@ -264,15 +264,15 @@ void VideoDisplayWidget::on_key_release(QKeyEvent* event){
 OverlayStatSnapshot VideoSourceFPS::get_current(){
     double fps = m_parent.m_video_session.fps_source();
     return OverlayStatSnapshot{
-        std::format("Video Source FPS: {:.2f}", fps),
+        "Video Source FPS: " + tostr_fixed(fps, 2),
         fps < 20 ? COLOR_RED : COLOR_WHITE
     };
 }
 OverlayStatSnapshot VideoDisplayFPS::get_current(){
     double fps = m_parent.m_video_session.fps_display();
     return OverlayStatSnapshot{
-        fps < 0 ? "Video Display FPS: ???" : std::format("Video Display FPS: {:.2f}", fps),
-        (fps >= 0 && fps < 20) ? COLOR_RED : COLOR_WHITE
+        "Video Display FPS: " + (fps < 0 ? "???" : tostr_fixed(fps, 2)),
+        fps >= 0 && fps < 20 ? COLOR_RED : COLOR_WHITE
     };
 }
 

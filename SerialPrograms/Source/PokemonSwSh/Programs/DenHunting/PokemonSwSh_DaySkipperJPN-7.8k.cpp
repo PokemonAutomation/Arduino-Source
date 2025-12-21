@@ -198,6 +198,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, ProControll
             remaining_skips--;
             stats.issued++;
             env.log("Expected Date: " + std::to_string(date.year + 2000) + "/" + std::to_string(date.month) + "/" + std::to_string(date.day));
+//            env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
             env.update_stats();
         }
         if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){

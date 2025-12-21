@@ -135,7 +135,7 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
         }
         pbf_press_button(context, BUTTON_X, 20, 50);
         pbf_press_dpad(context, DPAD_LEFT, 20, 20);
-        env.log(std::format("Starting Encounter: {:L}", stats.encounters() + 1));
+        env.log("Starting Encounter: " + tostr_u_commas(stats.encounters() + 1));
         pbf_press_button(context, BUTTON_A, 20, 0);
         context.wait_for_all_requests();
 

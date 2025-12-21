@@ -4,7 +4,6 @@
  *
  */
 
-#include <format>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
@@ -104,7 +103,9 @@ std::ostream& operator<<(std::ostream& os, const std::optional<CollectedPokemonI
 
 std::string create_overlay_info(const CollectedPokemonInfo& pokemon){
     const std::string& display_name = get_pokemon_name(pokemon.name_slug).display_name();
-    std::string overlay_log = std::format("{:04} {}", pokemon.dex_number, display_name);
+    char dex_str[7]; // leaving enough space to convert dex number uint16_t to string with "0" to fill up at least 4 characters, e.g. "0005"
+    snprintf(dex_str, sizeof(dex_str), "%04d", pokemon.dex_number);
+    std::string overlay_log = std::string(dex_str) + " " + display_name;
     if(pokemon.gender == StatsHuntGenderFilter::Male){
         overlay_log += " " + UNICODE_MALE;
     } else if (pokemon.gender == StatsHuntGenderFilter::Female){

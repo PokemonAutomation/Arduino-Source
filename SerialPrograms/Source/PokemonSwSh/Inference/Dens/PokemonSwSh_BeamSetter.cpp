@@ -157,15 +157,13 @@ BeamSetter::Detection BeamSetter::run(
             }
         }
 
-        std::string str = std::format(
-            "BeamReader: column = {}, stddev = {}, brightness = {}, euclidean = {}, delta = {}, sigma = {}",
-            best_index,
-            best_stddev,
-            best_brightness,
-            best_euclidean,
-            best_delta,
-            best_sigma
-        );
+        std::string str = "BeamReader: column = " + std::to_string(best_index);
+
+        str += ", stddev = " + tostr_default(best_stddev);
+        str += ", brightness = " + tostr_default(best_brightness);
+        str += ", euclidean = " + tostr_default(best_euclidean);
+        str += ", delta = " + tostr_default(best_delta);
+        str += ", sigma = " + tostr_default(best_sigma);
 
         if (purple){
             m_stream.log(str, COLOR_BLUE);

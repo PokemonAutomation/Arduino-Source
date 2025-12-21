@@ -25,7 +25,7 @@ std::string ticks_to_time(double ticks_per_second, int64_t ticks){
     const double DAY = HOUR * 24;
 
     std::string str;
-    str += std::format("{:L}", ticks);
+    str += tostr_u_commas(ticks);
     str += " tick";
     // Compute absolute value of the ticks:
     uint64_t abs_ticks = 0;
@@ -44,13 +44,17 @@ std::string ticks_to_time(double ticks_per_second, int64_t ticks){
         str += "-";
     }
     if (abs_ticks < MINUTE * 2){
-        str += std::format("{:.3f} seconds", (double)abs_ticks / SECOND);
+        str += tostr_fixed((double)abs_ticks / SECOND, 3);
+        str += " seconds";
     }else if (abs_ticks < HOUR * 2){
-        str += std::format("{:.3f} minutes", (double)abs_ticks / MINUTE);
+        str += tostr_fixed((double)abs_ticks / MINUTE, 3);
+        str += " minutes";
     }else if (abs_ticks < DAY * 2){
-        str += std::format("{:.3f} hours", (double)abs_ticks / HOUR);
+        str += tostr_fixed((double)abs_ticks / HOUR, 3);
+        str += " hours";
     }else{
-        str += std::format("{:.3f} days", (double)abs_ticks / DAY);
+        str += tostr_fixed((double)abs_ticks / DAY, 3);
+        str += " days";
     }
     str += ")";
     return str;
