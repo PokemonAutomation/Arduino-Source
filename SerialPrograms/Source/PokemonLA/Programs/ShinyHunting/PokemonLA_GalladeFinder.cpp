@@ -148,7 +148,6 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProContro
                 // then forward left
                 pbf_move_left_joystick(context, 0, 0, 1100ms, 0ms);
 
-                //pbf_move_left_joystick(context, 128, 0, 3.9 * TICKS_PER_SECOND, 0); // OLD forward
                 pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, {0, +1}, {0, 0}, 3500ms);   // forward while sprinting until stairs, mash y a few times down the stairs
                 // we should easily be in range of gallade at this point, so if there's no shiny we're done
             },

@@ -22,8 +22,8 @@ GoHomeWhenDoneOption::GoHomeWhenDoneOption(bool default_value)
 
 void GoHomeWhenDoneOption::run_end_of_program(ProControllerContext& context){
     if (*this){
-        pbf_wait(context, 5 * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_HOME, 20, 125);
+        pbf_wait(context, 5000ms);
+        pbf_press_button(context, BUTTON_HOME, 160ms, 1000ms);
     }
 }
 

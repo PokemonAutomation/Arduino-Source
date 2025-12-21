@@ -92,7 +92,7 @@ bool ShinySoundDetectedActionOption::on_shiny_sound(
 
     if (TAKE_VIDEO){
         context.wait_for(SCREENSHOT_DELAY);
-        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+        pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
     }
 
     if (action != ShinySoundDetectedAction::NO_NOTIFICATIONS) {

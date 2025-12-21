@@ -234,7 +234,7 @@ void inside_zero_gate_to_platform(
 
 //    context.wait_for_all_requests();
     pbf_press_button(context, BUTTON_PLUS, 20, 105);
-    ssf_press_left_joystick(context, 128, 0, 1 * TICKS_PER_SECOND, 4 * TICKS_PER_SECOND);
+    ssf_press_left_joystick(context, 128, 0, 1000ms, 4000ms);
     pbf_press_button(context, BUTTON_R, 20, 355);
     pbf_press_button(context, BUTTON_R, 20, 105);
 
@@ -302,7 +302,7 @@ void area_zero_platform_run_path0(
 
     use_lets_go_to_clear_in_front(stream, context, tracker, false, [&](ProControllerContext& context){
         //  Move to wall.
-        pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 0);
+        pbf_move_left_joystick(context, 128, 0, 4000ms, 0ms);
 
         //  Turn around.
         stream.log("Turning towards sky...");
@@ -360,7 +360,7 @@ void area_zero_platform_run_path1(
     stream.log("Clear path to the wall...");
     pbf_press_button(context, BUTTON_L, 20, 50);
     use_lets_go_to_clear_in_front(stream, context, tracker, false, [&](ProControllerContext& context){
-        pbf_move_left_joystick(context, 128, 0, 5 * TICKS_PER_SECOND, 0);
+        pbf_move_left_joystick(context, 128, 0, 5000ms, 0ms);
 
         //  Turn right.
         pbf_move_left_joystick(context, 255, 128, 30, 0);
@@ -541,7 +541,7 @@ void area_zero_platform_run_path2(
     });
 
     use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](ProControllerContext& context){
-        pbf_move_left_joystick(context, 128, 255, 4 * TICKS_PER_SECOND, 0);
+        pbf_move_left_joystick(context, 128, 255, 4000ms, 0ms);
         pbf_move_left_joystick(context, 128, 0, 60, 4 * TICKS_PER_SECOND);
     });
 }

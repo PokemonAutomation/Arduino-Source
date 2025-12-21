@@ -208,7 +208,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProCont
 
     // Press the button to select the opponent
     pbf_press_button(context, BUTTON_A, 10, 115);
-    pbf_wait(context, 1 * TICKS_PER_SECOND);
+    pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
 
     env.log("Finish selecting the opponent. Battle should start now.");

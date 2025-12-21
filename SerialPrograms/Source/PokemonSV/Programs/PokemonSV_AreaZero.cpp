@@ -33,7 +33,7 @@ void inside_zero_gate_to_station(
         int ret = run_until<ProControllerContext>(
             stream, context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, 128, 0, 10 * TICKS_PER_SECOND, 0);
+                pbf_move_left_joystick(context, 128, 0, 10000ms, 0ms);
             },
             {dialog}
         );
@@ -96,7 +96,7 @@ void inside_zero_gate_to_station(
 
     if (heal_at_station){
         stream.log("Moving to bed to heal.");
-        pbf_move_left_joystick(context, 144, 0, 4 * TICKS_PER_SECOND, 0);
+        pbf_move_left_joystick(context, 144, 0, 4000ms, 0ms);
         ssf_press_left_joystick(context, 255, 128, 0, 125);
         bool healed = false;
         while (true){
@@ -149,9 +149,9 @@ void inside_zero_gate_to_station(
             stream, context,
             [=](ProControllerContext& context){
                 if (heal_at_station){
-                    pbf_move_left_joystick(context, 96, 255, 60 * TICKS_PER_SECOND, 0);
+                    pbf_move_left_joystick(context, 96, 255, 60000ms, 0ms);
                 }else{
-                    pbf_move_left_joystick(context, 0, 255, 60 * TICKS_PER_SECOND, 0);
+                    pbf_move_left_joystick(context, 0, 255, 60000ms, 0ms);
                 }
             },
             {black_screen}
@@ -202,7 +202,7 @@ void return_to_inside_zero_gate(
         [](ProControllerContext& context){
             pbf_move_left_joystick(context, 255, 32, 20, 105);
             pbf_mash_button(context, BUTTON_L, 60);
-            pbf_move_left_joystick(context, 128, 0, 10 * TICKS_PER_SECOND, 0);
+            pbf_move_left_joystick(context, 128, 0, 10000ms, 0ms);
         },
         {black_screen}
     );
@@ -237,7 +237,7 @@ void return_to_inside_zero_gate_from_picnic(
         [](ProControllerContext& context){
             pbf_move_left_joystick(context, 128, 255, 100, 40);
             pbf_mash_button(context, BUTTON_L, 60);
-            pbf_move_left_joystick(context, 128, 0, 10 * TICKS_PER_SECOND, 0);
+            pbf_move_left_joystick(context, 128, 0, 10000ms, 0ms);
         },
         {black_screen}
     );

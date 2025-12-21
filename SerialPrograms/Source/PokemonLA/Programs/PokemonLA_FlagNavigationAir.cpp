@@ -142,7 +142,7 @@ FlagNavigationAir::FlagNavigationAir(
         m_stream.log("Climbing wall...");
         m_looking_straight_ahead.store(false, std::memory_order_release);
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_move_left_joystick(context, 128, 0, 300 * TICKS_PER_SECOND, 0);
+            pbf_move_left_joystick(context, 128, 0, 300000ms, 0ms);
         });
         return false;
     });
@@ -173,7 +173,7 @@ FlagNavigationAir::FlagNavigationAir(
                 m_looking_straight_ahead.store(true, std::memory_order_release);
 //                cout << "State::DASH_FORWARD: m_looking_straight_ahead = true" << endl;
             }
-            pbf_press_button(context, BUTTON_B, 300 * TICKS_PER_SECOND, 0);
+            pbf_press_button(context, BUTTON_B, 300000ms, 0ms);
         });
         return false;
     });
@@ -217,7 +217,7 @@ FlagNavigationAir::FlagNavigationAir(
                 m_looking_straight_ahead.store(true, std::memory_order_release);
 //                cout << "State::DASH_FORWARD: m_looking_straight_ahead = true" << endl;
             }
-            pbf_press_button(context, BUTTON_Y, 60 * TICKS_PER_SECOND, 0);
+            pbf_press_button(context, BUTTON_Y, 60000ms, 0ms);
         });
         return false;
     });

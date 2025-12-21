@@ -52,7 +52,7 @@ EscapeFromAttack::EscapeFromAttack(
     register_state_command(State::UNKNOWN, [this](){
         m_stream.log("Unknown state. Moving forward...");
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_move_left_joystick(context, 128, 0, 300 * TICKS_PER_SECOND, 0);
+            pbf_move_left_joystick(context, 128, 0, 300000ms, 0ms);
         });
         return false;
     });
@@ -138,7 +138,7 @@ EscapeFromAttack::EscapeFromAttack(
     register_state_command(State::CLIMBING, [this](){
         m_stream.log("Climbing wall...");
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_move_left_joystick(context, 128, 0, 300 * TICKS_PER_SECOND, 0);
+            pbf_move_left_joystick(context, 128, 0, 300000ms, 0ms);
         });
         return false;
     });

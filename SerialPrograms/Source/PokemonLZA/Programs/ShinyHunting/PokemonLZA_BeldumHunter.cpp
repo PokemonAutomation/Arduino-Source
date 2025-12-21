@@ -147,7 +147,7 @@ bool BeldumHunter::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
         if (res == 0) {
             env.log("Shiny detected!");
             if (TAKE_VIDEO) {
-                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
             }
 
             return true;

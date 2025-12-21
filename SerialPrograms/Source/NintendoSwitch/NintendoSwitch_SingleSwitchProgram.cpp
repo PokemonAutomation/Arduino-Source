@@ -88,7 +88,7 @@ void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, C
             context.controller().cancel_all_commands();
             env.log("Saving debug video on Switch...");
             env.console.overlay().add_log("Save Debug Video on Switch");
-            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+            pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
             context.wait_for_all_requests();
         }
     };

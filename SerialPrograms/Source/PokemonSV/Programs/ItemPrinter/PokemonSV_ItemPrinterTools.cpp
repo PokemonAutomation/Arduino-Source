@@ -121,7 +121,7 @@ ItemPrinterPrizeResult item_printer_finish_print(
 //                snapshot->save("test-" + std::to_string(c) + ".png");
             }
 
-            pbf_mash_button(context, BUTTON_A, 1 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_A, 1000ms);
             print_finished = true;
             continue;
         }

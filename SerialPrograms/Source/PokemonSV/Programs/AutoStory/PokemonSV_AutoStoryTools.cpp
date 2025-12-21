@@ -476,8 +476,8 @@ void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContex
     enter_menu_from_overworld(info, stream, context, 0, MenuSide::LEFT);
 
     // enter Pokemon summary screen
-    pbf_press_button(context, BUTTON_A, 20, 5 * TICKS_PER_SECOND);
-    pbf_press_dpad(context, DPAD_RIGHT, 15, 1 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_A, 160ms, 5000ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 120ms, 1000ms);
     pbf_press_button(context, BUTTON_Y, 20, 40);
 
     // select move 1
@@ -521,8 +521,8 @@ void confirm_lead_pokemon_moves(SingleSwitchProgramEnvironment& env, ProControll
     enter_menu_from_overworld(info, stream, context, 0, MenuSide::LEFT);
 
     // enter Pokemon summary screen
-    pbf_press_button(context, BUTTON_A, 20, 5 * TICKS_PER_SECOND);
-    pbf_press_dpad(context, DPAD_RIGHT, 15, 1 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_A, 160ms, 5000ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 120ms, 1000ms);
     pbf_press_button(context, BUTTON_Y, 20, 40);
 
     // confirm that moves are: Moonblast, Mystical Fire, Psychic, Misty Terrain
@@ -761,7 +761,7 @@ void change_settings(SingleSwitchProgramEnvironment& env, ProControllerContext& 
         config_option(context, 1); // Helping Functions: Off
     }
 
-    pbf_mash_button(context, BUTTON_A, 1 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_A, 1000ms);
     clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5, {CallbackEnum::PROMPT_DIALOG});
     
 }

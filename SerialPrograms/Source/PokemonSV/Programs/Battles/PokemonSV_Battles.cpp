@@ -121,8 +121,8 @@ int run_from_battle(
             stream.log("Detected battle menu...");
             battle_menu.move_to_slot(stream, context, 3);
 //            pbf_press_dpad(context, DPAD_DOWN, 250, 0);
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+            pbf_press_button(context, BUTTON_B, 160ms, 1000ms);
             attempts++;
             continue;
         case 2:
@@ -185,8 +185,8 @@ int run_from_battle(
 
             battle_menu.move_to_slot(stream, context, 3);
 //            pbf_press_dpad(context, DPAD_DOWN, 250, 0);
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+            pbf_press_button(context, BUTTON_B, 160ms, 1000ms);
             attempts++;
             continue;
         }
@@ -244,7 +244,7 @@ void process_battle(
         shiny_counter++;
         if (settings.VIDEO_ON_SHINY){
             context.wait_for(std::chrono::seconds(3));
-            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+            pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
         }
     }
     env.update_stats();

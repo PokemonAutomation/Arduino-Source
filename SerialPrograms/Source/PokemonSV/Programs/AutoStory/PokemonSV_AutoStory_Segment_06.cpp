@@ -81,9 +81,9 @@ void checkpoint_11(
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 realign_player(info, stream, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 210, 100);
-                pbf_move_left_joystick(context, 128, 0, 187, 20);
-                pbf_move_left_joystick(context, 0, 128, 30, 8 * TICKS_PER_SECOND);
-                pbf_move_left_joystick(context, 128, 0, 1 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 128, 0, 1496ms, 160ms);
+                pbf_move_left_joystick(context, 0, 128, 240ms, 8000ms);
+                pbf_move_left_joystick(context, 128, 0, 1000ms, 2000ms);
 
                 realign_player(info, stream, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 60, 200);
             }

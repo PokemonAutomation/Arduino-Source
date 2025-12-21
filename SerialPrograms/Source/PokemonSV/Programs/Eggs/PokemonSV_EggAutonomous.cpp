@@ -750,9 +750,9 @@ void change_settings_egg_program(SingleSwitchProgramEnvironment& env, ProControl
         {MenuOptionItemEnum::AUTOSAVE, {MenuOptionToggleEnum::OFF}},
 
     };
-    session.set_options(options); 
+    session.set_options(options);
 
-    pbf_mash_button(context, BUTTON_A, 1 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_A, 1000ms);
     clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5, {CallbackEnum::PROMPT_DIALOG});
     press_Bs_to_back_to_overworld(env.program_info(), env.console, context);    
 }
@@ -770,7 +770,7 @@ bool EggAutonomous::handle_recoverable_error(
 
     if (SAVE_DEBUG_VIDEO){
         // Take a video to give more context for debugging
-        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 2000ms);
         context.wait_for_all_requests();
     }
     // if there is no auto save, then we shouldn't reset game to lose previous progress.

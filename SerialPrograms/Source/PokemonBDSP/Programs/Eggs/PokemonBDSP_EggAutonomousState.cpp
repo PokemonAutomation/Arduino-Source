@@ -395,7 +395,7 @@ void EggAutonomousState::hatch_egg(){
     VideoSnapshot overworld = m_stream.video().snapshot();
 //    overworld.save("test-0.png");
     {
-        pbf_mash_button(m_context, BUTTON_B, 10 * TICKS_PER_SECOND);
+        pbf_mash_button(m_context, BUTTON_B, 10000ms);
         m_context.wait_for_all_requests();
 
         ShortDialogWatcher dialog;
@@ -410,7 +410,7 @@ void EggAutonomousState::hatch_egg(){
         m_stream.log("Egg finished hatching.");
         m_stats.m_hatched++;
         m_env.update_stats();
-        pbf_mash_button(m_context, BUTTON_B, 1 * TICKS_PER_SECOND);
+        pbf_mash_button(m_context, BUTTON_B, 1000ms);
     }
 
     //  Return to overworld.
@@ -439,7 +439,7 @@ void EggAutonomousState::hatch_egg(){
             throw UserSetupError(m_stream.logger(), "Please turn off nicknaming.");
         default:
             m_stream.log("Failed to detect overworld after 30 seconds. Did day/night change?", COLOR_RED);
-//            pbf_mash_button(context, BUTTON_ZL, 30 * TICKS_PER_SECOND);
+//            pbf_mash_button(context, BUTTON_ZL, 30000ms);
             return;
         }
     }

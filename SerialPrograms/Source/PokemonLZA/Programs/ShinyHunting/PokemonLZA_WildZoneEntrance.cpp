@@ -555,7 +555,7 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
                         if (PreloadSettings::instance().DEVELOPER_MODE && GlobalSettings::instance().SAVE_DEBUG_VIDEOS_ON_SWITCH){
                             env.log("Saving debug video on Switch...");
                             env.console.overlay().add_log("Save Debug Video on Switch");
-                            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+                            pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
                             context.wait_for_all_requests();
                         }
                         go_home(env.console, context); // go Home to preserve game state for debugging

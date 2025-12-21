@@ -187,7 +187,7 @@ void AuctionFarmer::reset_auctions(SingleSwitchProgramEnvironment& env, ProContr
             go_home(env.console, context);
             PokemonSwSh::home_roll_date_enter_game_autorollback(env.console, context, year);
         }
-        pbf_wait(context, 1 * TICKS_PER_SECOND);
+        pbf_wait(context, 1000ms);
 
         go_home(env.console, context);
         context.wait_for_all_requests();
@@ -203,7 +203,7 @@ void AuctionFarmer::reset_auctions(SingleSwitchProgramEnvironment& env, ProContr
 std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     AuctionFarmer_Descriptor::Stats& stats = env.current_stats<AuctionFarmer_Descriptor::Stats>();
 
-    pbf_wait(context, 2 * TICKS_PER_SECOND);
+    pbf_wait(context, 2000ms);
     context.wait_for_all_requests();
     
     VideoSnapshot screen = env.console.video().snapshot();
@@ -558,7 +558,7 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         while (!good_offer){
             size_t npc_tries = 0;
             if (!ONE_NPC){
-                pbf_move_right_joystick(context, 128, 255, 2 * TICKS_PER_SECOND, 20);
+                pbf_move_right_joystick(context, 128, 255, 2000ms, 160ms);
             }
 
             std::vector<std::pair<AuctionOffer, ImageFloatBox>> offers = check_offers(env, context);

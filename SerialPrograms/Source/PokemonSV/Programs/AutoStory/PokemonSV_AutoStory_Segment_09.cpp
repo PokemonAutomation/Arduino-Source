@@ -124,8 +124,8 @@ void checkpoint_16(
         wait_for_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078}, 5);
 
         // enter Cafeteria
-        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
-        pbf_wait(context, 3 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_A, 3000ms);
+        pbf_wait(context, 3000ms);
         context.wait_for_all_requests();
 
         // walk forward
@@ -174,8 +174,8 @@ void checkpoint_17(
         navigate_school_layout_menu(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078},
             {0.031, 0.193 + 0.074219, 0.047, 0.078}, DPAD_DOWN, 1);
         // enter staff room
-        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
-        pbf_wait(context, 3 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_A, 3000ms);
+        pbf_wait(context, 3000ms);
 
         env.console.log("clear_dialog: See Geeta. Talk to Nemona. Receive Gym/Elite Four questline (Victory Road).");
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
@@ -208,13 +208,13 @@ void checkpoint_18(
         context.wait_for_all_requests();
         wait_for_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078}, 10);
         // enter Directors office
-        pbf_mash_button(context, BUTTON_A, 6 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_A, 6000ms);
 
         env.console.log("Talk to Clavell in his office, and the professor.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 25, 
             {CallbackEnum::PROMPT_DIALOG});  // max time between dialog: 17s. set timeout to 25 seconds for buffer.
         // mash A to get through the Random A press that you need. when the professor shows you area zero.
-        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_A, 3000ms);
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
             {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG});
@@ -293,7 +293,7 @@ void checkpoint_20(
             {CallbackEnum::TUTORIAL}); // max time between dialog: 3
         
         env.console.log("Get on ride.");
-        pbf_mash_button(context, BUTTON_PLUS, 1 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_PLUS, 1000ms);
 
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 

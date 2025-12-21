@@ -426,7 +426,7 @@ void start_game_from_home_with_inference(
         int ret = run_until<ProControllerContext>(
             console, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 10000ms);
             },
             { detector }
         );

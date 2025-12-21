@@ -171,8 +171,8 @@ bool read_battle_menu(
             stream.log("Unable to detect move slot.", COLOR_RED);
 //            dump_image(stream.logger(), MODULE_NAME, "MoveSlot", screen);
 //            pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
-//            pbf_press_dpad(context, DPAD_RIGHT, 2 * TICKS_PER_SECOND, 0);
-//            pbf_press_dpad(context, DPAD_UP, 2 * TICKS_PER_SECOND, 0);
+//            pbf_press_dpad(context, DPAD_RIGHT, 2000ms, 0ms);
+//            pbf_press_dpad(context, DPAD_UP, 2000ms, 0ms);
 //            move_slot = 0;
             pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
             continue;

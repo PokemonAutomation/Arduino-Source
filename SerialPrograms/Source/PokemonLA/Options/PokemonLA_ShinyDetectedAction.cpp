@@ -173,7 +173,7 @@ void on_shiny_sound(
         context.wait_for_all_requests();
         throw ProgramFinishedException();
     case OverworldShinyDetectedAction::TAKE_VIDEO_STOP_PROGRAM:
-        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+        pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
         pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
         context.wait_for_all_requests();
         throw ProgramFinishedException();
@@ -198,7 +198,7 @@ void on_battle_match_found(
     }
 
     if (options.TAKE_VIDEO){
-        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+        pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
     }
 
     stream.log("Stopping...");

@@ -82,7 +82,7 @@ void hatch_egg(VideoStream& stream, ProControllerContext& context){
             );
         }
         stream.log("Egg finished hatching.");
-        pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 1000ms);
     }
 
     //  Return to overworld.

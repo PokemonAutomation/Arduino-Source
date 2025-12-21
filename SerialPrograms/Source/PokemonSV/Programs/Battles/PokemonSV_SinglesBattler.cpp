@@ -73,7 +73,7 @@ bool run_move_select(
         }
 
         stream.log("Attempting to Terastallize...");
-        pbf_press_button(context, BUTTON_R, 20, 1 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_R, 160ms, 1000ms);
     }while (false);
 
     context.wait_for_all_requests();
@@ -153,8 +153,8 @@ bool run_pokemon(
             stream, context,
             [](ProControllerContext& context){
                 for (size_t c = 0; c < 4; c++){
-                    pbf_wait(context, 30 * TICKS_PER_SECOND);
-                    pbf_press_button(context, BUTTON_B, 20, 0);
+                    pbf_wait(context, 30000ms);
+                    pbf_press_button(context, BUTTON_B, 160ms, 0ms);
                 }
             },
             {

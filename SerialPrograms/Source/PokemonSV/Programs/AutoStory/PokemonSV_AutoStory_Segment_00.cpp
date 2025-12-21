@@ -66,14 +66,14 @@ void checkpoint_00(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_A, 240 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_A, 240000ms);
         },
         {leftstick}
     );
     
     // Stand up from chair and walk to left side of room
-    pbf_move_left_joystick(context, 128, 255, 3 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
-    pbf_move_left_joystick(context,   0, 128, 6 * TICKS_PER_SECOND, 1 * TICKS_PER_SECOND);
+    pbf_move_left_joystick(context, 128, 255, 3000ms, 5000ms);
+    pbf_move_left_joystick(context,   0, 128, 6000ms, 1000ms);
 
 }
 

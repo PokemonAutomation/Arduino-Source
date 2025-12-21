@@ -101,8 +101,8 @@ void checkpoint_12(
                 // check we're not still at the Los Platos Pokecenter.
                 confirm_no_overlapping_flypoint(info, env.console, context);
                 // not stuck at Los Platos Pokecenter
-                pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
-                pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_B, 160ms, 1000ms);
+                pbf_press_button(context, BUTTON_B, 160ms, 1000ms);
                 press_Bs_to_back_to_overworld(info, env.console, context, 7);
 
                 direction.change_direction(info, env.console, context, 0.29);

@@ -120,7 +120,7 @@ void use_move_blindly(
         " style " + MoveStyle_Database().find(style)->display
     );
 
-    pbf_wait(context, 1 * TICKS_PER_SECOND);
+    pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
 }
 
