@@ -404,7 +404,7 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // finished battle
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
-    }, false);     
+    });     
 }
 
 void checkpoint_89(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){

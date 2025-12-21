@@ -489,7 +489,7 @@ void checkpoint_44(
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
        
-    }, false);
+    });
 
 }
 
@@ -535,7 +535,7 @@ void checkpoint_45(
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A);
        
-    }, false);
+    });
 
 }
 

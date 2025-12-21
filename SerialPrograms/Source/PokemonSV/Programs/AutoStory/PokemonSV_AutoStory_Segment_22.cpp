@@ -346,7 +346,7 @@ void checkpoint_52(
 
 
 
-    }, false);
+    });
 
 }
 
@@ -383,7 +383,7 @@ void checkpoint_53(
         // fly to Levincia (North) Pokecenter
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 100, 0, 50});
 
-    }, false);
+    });
 
 }
 
