@@ -66,7 +66,7 @@ void AutoStory_Segment_24::run_segment(
 
 std::string AutoStory_Checkpoint_55::name() const{ return "055 - " + AutoStory_Segment_24().name(); }
 std::string AutoStory_Checkpoint_55::start_text() const{ return "At East Province (Area Three) Watchtower.";}
-std::string AutoStory_Checkpoint_55::end_text() const{ return "Beat Orthworm phase 1";}
+std::string AutoStory_Checkpoint_55::end_text() const{ return "Beat Orthworm phase 1 and 2";}
 void AutoStory_Checkpoint_55::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_55(env, context, options.notif_status_update, stats);
 }
@@ -74,7 +74,7 @@ void AutoStory_Checkpoint_55::run_checkpoint(SingleSwitchProgramEnvironment& env
 
 std::string AutoStory_Checkpoint_56::name() const{ return "056 - " + AutoStory_Segment_24().name(); }
 std::string AutoStory_Checkpoint_56::start_text() const{ return AutoStory_Checkpoint_55().end_text();}
-std::string AutoStory_Checkpoint_56::end_text() const{ return "Beat Orthworm phase 2";}
+std::string AutoStory_Checkpoint_56::end_text() const{ return "At East Province (Area Three) Pokecenter.";}
 void AutoStory_Checkpoint_56::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_56(env, context, options.notif_status_update, stats);
 }
@@ -166,18 +166,6 @@ void checkpoint_55(
         env.console.log("Battle Orthworm Titan phase 1.");
         run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
 
-    });    
-
-}
-
-void checkpoint_56(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
-){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](size_t attempt_number){
 
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -241,7 +229,7 @@ void checkpoint_56(
 
 }
 
-void checkpoint_57(
+void checkpoint_56(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
     EventNotificationOption& notif_status_update,
@@ -359,6 +347,18 @@ void checkpoint_57(
         
     });    
 
+}
+
+void checkpoint_57(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
+){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+        // empty checkpoint, to preserve ordering
+    });
 }
 
 
