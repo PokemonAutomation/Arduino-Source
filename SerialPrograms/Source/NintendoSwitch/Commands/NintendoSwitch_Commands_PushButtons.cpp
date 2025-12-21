@@ -102,11 +102,6 @@ void pbf_wait(JoyconContext& context, Milliseconds duration){
 void pbf_press_button(JoyconContext& context, Button button, Milliseconds hold, Milliseconds release){
     ssf_press_button(context, button, hold + release, hold, 0ms);
 }
-#if 0
-void pbf_move_joystick(JoyconContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release){
-    ssf_press_joystick(context, x, y, hold + release, hold, 0ms);
-}
-#endif
 void pbf_move_joystick(JoyconContext& context, const JoystickPosition& position, Milliseconds hold, Milliseconds release){
     ssf_press_joystick(context, position, hold + release, hold, 0ms);
 }

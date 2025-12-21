@@ -152,7 +152,7 @@ bool DirectionDetector::is_minimap_definitely_locked(VideoStream& stream, ProCon
     if (!pointing_north){
         return false;
     }
-    pbf_move_right_joystick(context, 0, 128, 100, 20);
+    pbf_move_right_joystick(context, {-1, 0}, 800ms, 160ms);
     context.wait_for_all_requests();
     double new_direction = get_current_direction(stream, stream.video().snapshot());
 

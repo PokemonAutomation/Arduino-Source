@@ -61,8 +61,8 @@ bool connect_to_internet_with_inference(
 
     //  Connect to internet.
     context.wait_for(std::chrono::seconds(1));
-    pbf_press_dpad(context, DPAD_UP, 5, 0);
-    pbf_move_right_joystick(context, 128, 0, 5, 0);
+    pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);
+    pbf_move_right_joystick(context, {0, +1}, 40ms, 0ms);
     pbf_mash_button(context, BUTTON_PLUS, TICKS_PER_SECOND);
     context.wait_for_all_requests();
 

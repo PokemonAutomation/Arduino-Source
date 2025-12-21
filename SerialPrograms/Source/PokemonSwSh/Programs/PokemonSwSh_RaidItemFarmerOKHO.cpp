@@ -139,8 +139,8 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
                     enter_den(context, 0ms, false, false);
                 }else{
                     pbf_press_button(context, BUTTON_Y, 80ms, GameSettings::instance().OPEN_YCOMM_DELAY0);
-                    pbf_press_dpad(context, DPAD_UP, 5, 0);
-                    pbf_move_right_joystick(context, 128, 0, 5, 0);
+                    pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);
+                    pbf_move_right_joystick(context, 128, 0, 40ms, 0ms);
                     pbf_press_button(context, BUTTON_X, 10, 10);
                 }
             }

@@ -12,12 +12,11 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 void detach(ProControllerContext& context){
-    pbf_press_button(context, BUTTON_ZL, 20, 50);
-    pbf_move_right_joystick(context, 128, 255, 20, 10);
-    pbf_press_button(context, BUTTON_ZL, 20, 85);
-    pbf_press_button(context, BUTTON_ZL, 20, 85);
-//    pbf_move_right_joystick(context, 128, 255, 20, 0);
-    pbf_press_button(context, BUTTON_B, 20, 85);
+    pbf_press_button(context, BUTTON_ZL, 160ms, 400ms);
+    pbf_move_right_joystick(context, 128, 255, 160ms, 80ms);
+    pbf_press_button(context, BUTTON_ZL, 160ms, 680ms);
+    pbf_press_button(context, BUTTON_ZL, 160ms, 680ms);
+    pbf_press_button(context, BUTTON_B, 160ms, 680ms);
 }
 void detach_box(ProControllerContext& context, uint16_t box_scroll_delay){
     for (uint8_t row = 0; row < 5; row++){

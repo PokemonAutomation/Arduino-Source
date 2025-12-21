@@ -148,8 +148,6 @@ bool NuggetFarmerHighlands::run_iteration(
                 pbf_move_left_joystick(context, 64, 255, 50, 0);
                 pbf_press_button(context, BUTTON_B, 150, 250);
 
-//                pbf_move_right_joystick(context, 0, 128, 200, 125);
-
             },
             {
                 {dialog_detector},

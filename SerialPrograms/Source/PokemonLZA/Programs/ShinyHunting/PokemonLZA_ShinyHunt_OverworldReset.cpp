@@ -121,7 +121,7 @@ void ShinyHunt_OverworldReset::program(SingleSwitchProgramEnvironment& env, ProC
                 reset_game_from_home(env, env.console, context);
 
                 if (ROTATE_CAMERA){
-                    pbf_move_right_joystick(context, 255, 128, RESET_DELAY, 0ms);
+                    pbf_move_right_joystick(context, {+1, 0}, RESET_DELAY, 0ms);
                 }else{
                     pbf_wait(context, RESET_DELAY);
                 }

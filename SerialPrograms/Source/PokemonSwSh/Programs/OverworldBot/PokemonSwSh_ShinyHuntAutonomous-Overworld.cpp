@@ -371,7 +371,7 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, 
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
     }
-    pbf_move_right_joystick(context, 128, 255, TICKS_PER_SECOND, 0);
+    pbf_move_right_joystick(context, {0, -1}, 1000ms, 0ms);
 
     WallDuration TIMEOUT = WATCHDOG_TIMER0;
     WallDuration PERIOD = std::chrono::hours(TIME_ROLLBACK_HOURS);

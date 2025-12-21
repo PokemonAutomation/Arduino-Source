@@ -190,8 +190,8 @@ std::string ProControllerState::to_cpp(Milliseconds hold, Milliseconds release) 
             + std::to_string(left_joystick.x) + ", " + std::to_string(left_joystick.y) + "}, "
             + hold_str + ", " + release_str + ");\n";
     case 3:
-        return "pbf_move_right_joystick(context, "
-            + std::to_string(right_joystick.x) + ", " + std::to_string(right_joystick.y) + ", "
+        return "pbf_move_right_joystick(context, {"
+            + std::to_string(right_joystick.x) + ", " + std::to_string(right_joystick.y) + "}, "
             + hold_str + ", " + release_str + ");\n";
     }
     throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Impossible state.");

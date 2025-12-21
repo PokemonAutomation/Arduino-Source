@@ -138,7 +138,7 @@ bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_t
                 map_detector.reset_state();
                 // move right joystick to zoom out the map
                 for(int i = 0; i < 3; i++){
-                    pbf_move_right_joystick(context, 128, 255, 100ms, 300ms);
+                    pbf_move_right_joystick(context, {0, -1}, 100ms, 300ms);
                 }
                 context.wait_for_all_requests();
                 console.log("Set to fully zoomed out");

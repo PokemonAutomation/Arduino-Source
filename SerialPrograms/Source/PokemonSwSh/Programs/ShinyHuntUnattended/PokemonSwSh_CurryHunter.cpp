@@ -134,16 +134,16 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
 
         //  Do circles with the joystick. Each circle has ten positions.
         for (uint16_t i = 0; i < 2350; i = i + 50){
-            pbf_move_right_joystick(context, 128, 255, 5, 0);
-            pbf_move_right_joystick(context, 202, 231, 5, 0);
-            pbf_move_right_joystick(context, 249, 167, 5, 0);
-            pbf_move_right_joystick(context, 249, 88, 5, 0);
-            pbf_move_right_joystick(context, 202, 24, 5, 0);
-            pbf_move_right_joystick(context, 128, 0, 5, 0);
-            pbf_move_right_joystick(context, 53, 24, 5, 0);
-            pbf_move_right_joystick(context, 6, 88, 5, 0);
-            pbf_move_right_joystick(context, 6, 167, 5, 0);
-            pbf_move_right_joystick(context, 53, 231, 5, 0);
+            pbf_move_right_joystick(context, 128, 255, 40ms, 0ms);
+            pbf_move_right_joystick(context, 202, 231, 40ms, 0ms);
+            pbf_move_right_joystick(context, 249, 167, 40ms, 0ms);
+            pbf_move_right_joystick(context, 249, 88, 40ms, 0ms);
+            pbf_move_right_joystick(context, 202, 24, 40ms, 0ms);
+            pbf_move_right_joystick(context, 128, 0, 40ms, 0ms);
+            pbf_move_right_joystick(context, 53, 24, 40ms, 0ms);
+            pbf_move_right_joystick(context, 6, 88, 40ms, 0ms);
+            pbf_move_right_joystick(context, 6, 167, 40ms, 0ms);
+            pbf_move_right_joystick(context, 53, 231, 40ms, 0ms);
         }
 
 

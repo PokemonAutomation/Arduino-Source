@@ -25,7 +25,7 @@ void OverworldTrigger::whistle(ProControllerContext& context, bool rotate){
     if (rotate){
         pbf_move_right_joystick(context, 192, 255, 50, 70);
     }
-    pbf_press_button(context, BUTTON_LCLICK, 5, 0);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 0ms);
     pbf_mash_button(context, BUTTON_B, 120);
 
     context.wait_for_all_requests();

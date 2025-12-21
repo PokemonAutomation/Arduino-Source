@@ -146,16 +146,6 @@ void ShinyHuntCustomPath::do_non_listen_action(
         }
         break;
     }
-#if 0
-    case PathAction::ROTATE_CAMERA:{
-        if (row.camera_turn_ticks > 0){
-            pbf_move_right_joystick(context, {+1, 0}, uint16_t(row.camera_turn_ticks), 0);
-        }else if (row.camera_turn_ticks < 0){
-            pbf_move_right_joystick(context, {-1, 0}, uint16_t(-row.camera_turn_ticks), 0);
-        }
-        break;
-    }
-#endif
     case PathAction::MOVE_FORWARD:{
         switch(row.parameters.move_speed){
         case PathSpeed::NORMAL_SPEED:

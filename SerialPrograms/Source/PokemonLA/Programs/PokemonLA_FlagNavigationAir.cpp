@@ -57,11 +57,11 @@ FlagNavigationAir::FlagNavigationAir(
         uint8_t turn = m_flag_x <= 0.5 ? 0 : 255;
         for (size_t c = 0; c < 2; c++){
             pbf_mash_button(context, BUTTON_ZL, 2 * TICKS_PER_SECOND);
-            pbf_move_right_joystick(context, turn, 128, 400, 0);
-            pbf_move_right_joystick(context, 128, 255, 120, 0);
-            pbf_move_right_joystick(context, turn, 128, 400, 0);
-            pbf_move_right_joystick(context, 128, 0, 200, 0);
-            pbf_move_right_joystick(context, turn, 128, 400, 0);
+            pbf_move_right_joystick(context, turn, 128, 3200ms, 0ms);
+            pbf_move_right_joystick(context, 128, 255, 960ms, 0ms);
+            pbf_move_right_joystick(context, turn, 128, 3200ms, 0ms);
+            pbf_move_right_joystick(context, 128, 0, 1600ms, 0ms);
+            pbf_move_right_joystick(context, turn, 128, 3200ms, 0ms);
         }
         context.wait_for_all_requests();
         m_find_flag_failed.store(true, std::memory_order_release);
