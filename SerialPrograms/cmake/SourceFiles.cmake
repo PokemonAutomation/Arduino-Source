@@ -1629,6 +1629,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/InferenceTraining/PokemonLZA_GenerateLocationNameOCR.h
     Source/PokemonLZA/Options/PokemonLZA_BattleAIOption.cpp
     Source/PokemonLZA/Options/PokemonLZA_BattleAIOption.h
+    Source/PokemonLZA/Options/PokemonLZA_DonutBerriesOption.cpp
+    Source/PokemonLZA/Options/PokemonLZA_DonutBerriesOption.h
     Source/PokemonLZA/Options/PokemonLZA_HyperspaceRewardOption.cpp
     Source/PokemonLZA/Options/PokemonLZA_HyperspaceRewardOption.h
     Source/PokemonLZA/Options/PokemonLZA_HyperspaceRewardTable.cpp
@@ -1694,6 +1696,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneCafe.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h
+    Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_DonutOptionsTest.cpp
+    Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_DonutOptionsTest.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.cpp
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.cpp
@@ -1706,6 +1710,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/Trading/PokemonLZA_TradeRoutines.h
     Source/PokemonLZA/Resources/PokemonLZA_AvailablePokemon.cpp
     Source/PokemonLZA/Resources/PokemonLZA_AvailablePokemon.h
+    Source/PokemonLZA/Resources/PokemonLZA_DonutBerries.cpp
+    Source/PokemonLZA/Resources/PokemonLZA_DonutBerries.h
     Source/PokemonLZA/Resources/PokemonLZA_HyperspaceRewardNames.cpp
     Source/PokemonLZA/Resources/PokemonLZA_HyperspaceRewardNames.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
