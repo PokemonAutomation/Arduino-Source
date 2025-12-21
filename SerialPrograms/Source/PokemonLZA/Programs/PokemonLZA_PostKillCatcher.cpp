@@ -36,7 +36,7 @@ PostKillCatcher::PostKillCatcher()
         "<b>" + STRING_POKEBALL + " Right-Scrolls:</b><br>"
         "Scroll this many balls to the right. Negative will scroll to the left.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        0, -10, 10
+        0, -15, 15
     )
     , SCROLL_HOLD(
         "<b>Scroll Hold:</b><br>"
