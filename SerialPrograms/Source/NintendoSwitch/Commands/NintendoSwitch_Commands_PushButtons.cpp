@@ -79,52 +79,6 @@ void pbf_controller_state(
     ProControllerContext& context,
     Button button,
     DpadPosition position,
-    uint8_t left_x, uint8_t left_y,
-    uint8_t right_x, uint8_t right_y,
-    uint16_t ticks
-){
-    context->issue_full_controller_state(
-        &context,
-        true,
-        ticks*8ms,
-        button, position,
-        {
-            JoystickTools::linear_u8_to_float(left_x),
-            -JoystickTools::linear_u8_to_float(left_y)
-        },
-        {
-            JoystickTools::linear_u8_to_float(right_x),
-            -JoystickTools::linear_u8_to_float(right_y)
-        }
-    );
-}
-void pbf_controller_state(
-    ProControllerContext& context,
-    Button button,
-    DpadPosition position,
-    uint8_t left_x, uint8_t left_y,
-    uint8_t right_x, uint8_t right_y,
-    Milliseconds duration
-){
-    context->issue_full_controller_state(
-        &context,
-        true,
-        duration,
-        button, position,
-        {
-            JoystickTools::linear_u8_to_float(left_x),
-            -JoystickTools::linear_u8_to_float(left_y)
-        },
-        {
-            JoystickTools::linear_u8_to_float(right_x),
-            -JoystickTools::linear_u8_to_float(right_y)
-        }
-    );
-}
-void pbf_controller_state(
-    ProControllerContext& context,
-    Button button,
-    DpadPosition position,
     const JoystickPosition& left_joystick,
     const JoystickPosition& right_joystick,
     Milliseconds duration
