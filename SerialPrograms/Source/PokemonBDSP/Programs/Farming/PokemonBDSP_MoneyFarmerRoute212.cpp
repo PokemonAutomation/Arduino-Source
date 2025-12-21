@@ -119,7 +119,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, ProControl
     }
     env.console.overlay().add_log("Starting battle", COLOR_WHITE);
 
-    pbf_mash_button(context, BUTTON_ZL, 5 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_ZL, 5000ms);
 
     bool battle_menu_seen = false;
 
@@ -134,7 +134,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, ProControl
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 30 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 30000ms);
             },
             {
                 {battle_menu},
@@ -214,9 +214,9 @@ void MoneyFarmerRoute212::heal_at_center_and_return(VideoStream& stream, ProCont
     stream.overlay().add_log("Heal at " + STRING_POKEMON + " Center", COLOR_WHITE);
     stream.log("Healing " + STRING_POKEMON + " at Hearthome City " + STRING_POKEMON + " Center.");
     pbf_move_left_joystick(context, 125, 0, 6000ms, 0ms);
-    pbf_mash_button(context, BUTTON_ZL, 3 * TICKS_PER_SECOND);
-//    ssf_mash_AZs(context, 3 * TICKS_PER_SECOND);
-    pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_ZL, 3000ms);
+//    ssf_mash_AZs(context, 3000ms);
+    pbf_mash_button(context, BUTTON_B, 10000ms);
     context.wait_for_all_requests();
     stream.overlay().add_log("Heal complete", COLOR_WHITE);
     stream.overlay().add_log("To rich couple", COLOR_WHITE);
@@ -255,7 +255,7 @@ void MoneyFarmerRoute212::fly_to_center_heal_and_return(VideoStream& stream, Pro
     pbf_press_button(context, BUTTON_PLUS, 10, 240);
     pbf_press_dpad(context, DPAD_UP, 10, 60);
     pbf_press_dpad(context, DPAD_UP, 10, 60);
-    pbf_mash_button(context, BUTTON_ZL, 12 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_ZL, 12000ms);
     heal_at_center_and_return(stream, context, pp);
 }
 

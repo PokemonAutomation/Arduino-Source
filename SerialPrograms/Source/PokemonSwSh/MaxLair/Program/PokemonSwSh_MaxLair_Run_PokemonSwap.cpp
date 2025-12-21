@@ -83,7 +83,7 @@ void run_swap_pokemon(
         int result = run_until<ProControllerContext>(
             stream, context,
             [&](ProControllerContext& context){
-                pbf_mash_button(context, swap ? BUTTON_A : BUTTON_B, 30 * TICKS_PER_SECOND);
+                pbf_mash_button(context, swap ? BUTTON_A : BUTTON_B, 30000ms);
             },
             {{detector}}
         );

@@ -201,7 +201,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Pro
             ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(200), stop_on_detected);
             int ret = run_until<ProControllerContext>(
                 env.console, context, [](ProControllerContext& context){
-                    pbf_mash_button(context, BUTTON_B, 20 * TICKS_PER_SECOND);
+                    pbf_mash_button(context, BUTTON_B, 20000ms);
                 },
                 {{arc_phone_detector}}
             );

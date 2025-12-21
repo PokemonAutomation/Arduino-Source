@@ -113,7 +113,7 @@ TravelLocations::TravelLocations()
         MapRegion::COASTLANDS, 0, 2, [](VideoStream& stream, ProControllerContext& context){
             change_mount(stream, context, MountState::BRAVIARY_ON);
             pbf_move_left_joystick(context, 160, 0, 160, 0);
-            pbf_mash_button(context, BUTTON_B, 4 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 4000ms);
         }
     )
 
@@ -159,7 +159,7 @@ TravelLocations::TravelLocations()
         MapRegion::ICELANDS, 0, 2, [](VideoStream& stream, ProControllerContext& context){
             change_mount(stream, context, MountState::BRAVIARY_ON);
             pbf_move_left_joystick(context, 192, 255, 160, 0);
-            pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 2000ms);
         }
     )
     , Icelands_Arena(

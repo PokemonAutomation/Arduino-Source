@@ -139,7 +139,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
             return false;
         }
     }
-    pbf_wait(context, 5 * TICKS_PER_SECOND);
+    pbf_wait(context, 5000ms);
 
     bool battle_menu_seen = false;
 
@@ -154,7 +154,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 120000ms);
             },
             {
                 {battle_menu},
@@ -251,8 +251,8 @@ void MoneyFarmerRoute210::heal_at_center_and_return(
 ){
     logger.log("Healing " + STRING_POKEMON + " Celestic Town " + STRING_POKEMON + " Center.");
     pbf_move_left_joystick(context, 125, 0, 6000ms, 0ms);
-    pbf_mash_button(context, BUTTON_ZL, 3 * TICKS_PER_SECOND);
-    pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_ZL, 3000ms);
+    pbf_mash_button(context, BUTTON_B, 10000ms);
 
     logger.log("Returning to trainers...");
     pbf_move_left_joystick(context, 128, 255, 6000ms, 0ms);
@@ -261,7 +261,7 @@ void MoneyFarmerRoute210::heal_at_center_and_return(
     pbf_move_left_joystick(context, 255, 128, 750, 0);
 
     pbf_press_button(context, BUTTON_R, 10, 150);
-    pbf_mash_button(context, BUTTON_ZL, 6 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_ZL, 6000ms);
 
     pbf_move_left_joystick(context, 128, 255, 30, 0);
     pbf_move_left_joystick(context,   0, 128, 30, 0);
@@ -295,7 +295,7 @@ void MoneyFarmerRoute210::fly_to_center_heal_and_return(
     pbf_press_button(context, BUTTON_PLUS, 10, 240);
     pbf_press_dpad(context, DPAD_LEFT, 10, 60);
     pbf_press_dpad(context, DPAD_LEFT, 10, 60);
-    pbf_mash_button(context, BUTTON_ZL, 12 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_ZL, 12000ms);
     heal_at_center_and_return(logger, context, pp0, pp1);
 }
 

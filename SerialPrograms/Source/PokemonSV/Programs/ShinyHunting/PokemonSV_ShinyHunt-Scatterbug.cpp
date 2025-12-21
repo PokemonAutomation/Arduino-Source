@@ -194,7 +194,7 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, ProContro
 
             if (SAVE_DEBUG_VIDEO){
                 // Take a video to give more context for debugging
-                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 2000ms);
                 context.wait_for_all_requests();
             }
 

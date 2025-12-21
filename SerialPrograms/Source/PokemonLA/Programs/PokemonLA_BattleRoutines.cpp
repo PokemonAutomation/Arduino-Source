@@ -28,7 +28,7 @@ void mash_A_until_end_of_battle(VideoStream& stream, ProControllerContext& conte
     int ret = run_until<ProControllerContext>(
         stream, context,
         [](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_A, 180 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_A, 180000ms);
         },
         {{detector}}
     );

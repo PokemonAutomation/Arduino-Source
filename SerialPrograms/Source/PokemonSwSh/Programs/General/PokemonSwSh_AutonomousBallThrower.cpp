@@ -124,14 +124,14 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, ProCont
                 [](ProControllerContext& context){
                     while (true){
                         //TODO edit here for what to do
-                        pbf_wait(context, 1 * TICKS_PER_SECOND);
+                        pbf_wait(context, 1000ms);
                     }
                 },
                 {{fight_detector}}
             );
             if (result == 0){
                 env.log("New fight detected.", COLOR_PURPLE);
-                pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 1000ms);
             }
         }
 

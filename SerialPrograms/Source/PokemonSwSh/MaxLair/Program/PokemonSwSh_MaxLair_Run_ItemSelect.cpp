@@ -47,7 +47,7 @@ void run_item_select(
     for (int8_t c = 0; c < item_index; c++){
         pbf_press_dpad(context, DPAD_DOWN, 10, 50);
     }
-    pbf_press_button(context, BUTTON_A, 10, 5 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_A, 80ms, 5000ms);
     context.wait_for_all_requests();
 
     //  Wait until we exit the window.
@@ -59,7 +59,7 @@ void run_item_select(
         INFERENCE_RATE
     );
 
-    pbf_wait(context, 1 * TICKS_PER_SECOND);
+    pbf_wait(context, 1000ms);
 }
 
 

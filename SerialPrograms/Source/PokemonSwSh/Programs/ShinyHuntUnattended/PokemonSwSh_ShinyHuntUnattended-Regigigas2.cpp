@@ -85,17 +85,17 @@ void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env,
         for (uint8_t pp = REVERSAL_PP; pp > 0; pp--){
             env.log("Starting Regigigas Encounter: " + tostr_u_commas(++encounter));
 
-            pbf_press_button(context, BUTTON_A, 10, 3 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_A, 80ms, 3000ms);
             pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
             pbf_press_button(context, BUTTON_A, 80ms, START_TO_ATTACK_DELAY0);
 
 //            set_leds(context, true);
-            pbf_press_button(context, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_A, 80ms, 2000ms);
 //            set_leds(context, false);
 
             //  Enter Pokemon menu if shiny.
             pbf_press_dpad(context, DPAD_DOWN, 10, 0);
-            pbf_mash_button(context, BUTTON_A, 2 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_A, 2000ms);
 
             pbf_press_dpad(context, DPAD_DOWN, 10, 0);
             pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);

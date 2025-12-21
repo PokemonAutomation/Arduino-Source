@@ -250,7 +250,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             
             if (SAVE_DEBUG_VIDEO){
                 // Take a video to give more context for debugging
-                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 2000ms);
                 context.wait_for_all_requests();
             }
 
@@ -490,7 +490,7 @@ void EggAutonomous::wait_for_egg_hatched(
     const int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_B, 60 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 60000ms);
         },
         {{end_egg_hatching_detector}}
     );

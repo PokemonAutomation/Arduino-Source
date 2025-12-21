@@ -190,7 +190,7 @@ bool start_raid_host_solo(
     if (!code.empty()){
         pbf_press_button(context, BUTTON_PLUS, 10, TICKS_PER_SECOND);
         FastCodeEntry::numberpad_enter_code(console, context, code, true);
-        pbf_wait(context, 2 * TICKS_PER_SECOND);
+        pbf_wait(context, 2000ms);
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
         context.wait_for_all_requests();
     }
@@ -211,7 +211,7 @@ bool start_raid_host_solo(
     auto time_limit = current_time() + settings.LOBBY_WAIT_DELAY0.get();
 
     if (!wait_for_a_player(console, context, *entrance, time_limit)){
-        pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 10000ms);
         return start_raid_self_solo(
             env.program_info(), console, context,
             state_tracker,
@@ -228,14 +228,14 @@ bool start_raid_host_solo(
 
     //  Wait
     if (!wait_for_lobby_ready(console, context, *entrance, 1, 4, time_limit)){
-        pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 10000ms);
         return false;
     }
 
     //  Start
     context.wait_for_all_requests();
     if (!start_adventure(console, context, 1)){
-        pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 10000ms);
         return false;
     }
 

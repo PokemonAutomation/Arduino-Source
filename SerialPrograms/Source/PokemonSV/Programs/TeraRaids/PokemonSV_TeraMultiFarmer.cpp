@@ -425,7 +425,7 @@ bool TeraMultiFarmer::start_sequence_host(
 #endif
 
     //  Start the raid.
-    pbf_mash_button(context, BUTTON_A, 10 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_A, 10000ms);
 
     return true;
 }

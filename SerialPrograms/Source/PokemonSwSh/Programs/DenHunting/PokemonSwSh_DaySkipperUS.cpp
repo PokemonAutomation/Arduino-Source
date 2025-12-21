@@ -148,7 +148,7 @@ void DaySkipperUS::run_switch1(SingleSwitchProgramEnvironment& env, ProControlle
     context.wait_for_all_requests();
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 
-    pbf_wait(context, 15 * TICKS_PER_SECOND);
+    pbf_wait(context, 15000ms);
     while (true){
         ssf_press_button(context, BUTTON_A, 15000ms);
     }

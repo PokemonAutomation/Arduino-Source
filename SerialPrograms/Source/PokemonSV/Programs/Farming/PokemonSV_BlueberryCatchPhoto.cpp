@@ -354,7 +354,7 @@ void quest_photo(
             bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
             if (is_shiny){
                 console.log("Shiny detected!");
-                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 5000ms);
                 throw ProgramFinishedException();
             }else{
                 console.log("Detected battle. Running from battle and returning to plaza.");
@@ -856,7 +856,7 @@ void quest_catch_handle_battle(
                     pbf_wait(context, 100);
                     context.wait_for_all_requests();
                     if (swap.move_to_slot(console, context, switch_party_slot)){
-                        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                        pbf_mash_button(context, BUTTON_A, 3000ms);
                         context.wait_for_all_requests();
                         switch_party_slot++;
                     }
@@ -936,7 +936,7 @@ void quest_catch(
         bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
         if (is_shiny){
             console.log("Shiny detected!");
-            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 5000ms);
             throw ProgramFinishedException();
         }else{
             quest_catch_handle_battle(info, console, context, BBQ_OPTIONS, current_quest);
@@ -1026,7 +1026,7 @@ void wild_battle_tera(
                 switch (ret3){
                 case 0:
                     console.log("Detected battle menu. Pressing A to attack...");
-                    pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                    pbf_mash_button(context, BUTTON_A, 3000ms);
                     context.wait_for_all_requests();
                     break;
                 case 1:
@@ -1035,7 +1035,7 @@ void wild_battle_tera(
                     pbf_wait(context, 100);
                     context.wait_for_all_requests();
                     if (swap.move_to_slot(console, context, switch_party_slot)){
-                        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                        pbf_mash_button(context, BUTTON_A, 3000ms);
                         context.wait_for_all_requests();
                         switch_party_slot++;
                     }

@@ -88,7 +88,7 @@ void checkpoint_08(
         env.console.log("Look over the injured Miraidon/Koraidon on the beach.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5, {});
         env.console.log("Fall down the cliff.");
-        pbf_wait(context, 20 * TICKS_PER_SECOND);  // long animation
+        pbf_wait(context, 20000ms);  // long animation
         context.wait_for_all_requests();
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {});
         env.console.log("Go to Legendary pokemon laying on the beach.");
@@ -152,9 +152,9 @@ void checkpoint_08(
                 context.wait_for_all_requests();
                 stream.log("Rock break");
                 stream.overlay().add_log("Rock break", COLOR_WHITE);
-                pbf_move_left_joystick(context, 128, 20, 3 * TICKS_PER_SECOND, 20);
+                pbf_move_left_joystick(context, 128, 20, 3000ms, 160ms);
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 230, 25, 30);
-                pbf_move_left_joystick(context, 128, 0, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 128, 0, 2000ms, 5000ms);
 
                 // Houndour wave
                 context.wait_for_all_requests();
@@ -162,29 +162,29 @@ void checkpoint_08(
                 stream.overlay().add_log("Houndour wave", COLOR_WHITE);
                 // walk to room entrance
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 150, 15, 30);
-                pbf_move_left_joystick(context, 128, 20, 4 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 128, 20, 4000ms, 2000ms);
 
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 210, 15, 30);
-                pbf_move_left_joystick(context, 128, 20, 3 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
-                pbf_move_left_joystick(context, 128, 20, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
-                pbf_move_left_joystick(context, 128, 20, 6 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 128, 20, 3000ms, 2000ms);
+                pbf_move_left_joystick(context, 128, 20, 2000ms, 2000ms);
+                pbf_move_left_joystick(context, 128, 20, 6000ms, 2000ms);
 
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 200, 25, 20);
-                pbf_move_left_joystick(context, 128, 20, 4 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
-                pbf_move_left_joystick(context, 128, 20, 4 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 128, 20, 4000ms, 2000ms);
+                pbf_move_left_joystick(context, 128, 20, 4000ms, 2000ms);
 
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 210, 25, 25);
-                pbf_move_left_joystick(context, 128, 20, 6 * TICKS_PER_SECOND, 20 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 128, 20, 6000ms, 20000ms);
 
                 // Houndoom encounter
                 context.wait_for_all_requests();
                 stream.log("Houndoom encounter");
                 stream.overlay().add_log("Houndoom encounter", COLOR_WHITE);
-                pbf_move_left_joystick(context, 128, 20, 4 * TICKS_PER_SECOND, 20);
+                pbf_move_left_joystick(context, 128, 20, 4000ms, 160ms);
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 245, 20, 20);
-                pbf_move_left_joystick(context, 128, 20, 2 * TICKS_PER_SECOND, 20);
+                pbf_move_left_joystick(context, 128, 20, 2000ms, 160ms);
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 255, 90, 20);
-                pbf_move_left_joystick(context, 128, 20, 8 * TICKS_PER_SECOND, 8 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 128, 20, 8000ms, 8000ms);
                 pbf_press_button(context, BUTTON_L, 20, 20);
             }
         );

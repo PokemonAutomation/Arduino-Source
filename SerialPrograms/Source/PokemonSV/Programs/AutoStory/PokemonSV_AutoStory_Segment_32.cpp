@@ -163,7 +163,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
         pbf_move_left_joystick(context, 128, 255, 300, 100);
-        pbf_wait(context, 3 * TICKS_PER_SECOND);        
+        pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
@@ -241,7 +241,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
         pbf_move_left_joystick(context, 128, 255, 300, 100);
-        pbf_wait(context, 3 * TICKS_PER_SECOND);        
+        pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0}, FlyPoint::POKECENTER);

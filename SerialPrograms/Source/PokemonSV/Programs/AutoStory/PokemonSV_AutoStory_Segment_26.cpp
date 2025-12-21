@@ -166,7 +166,7 @@ void checkpoint_62(
     [&](size_t attempt_number){
 
         pbf_move_left_joystick(context, 128, 255, 300, 100);
-        pbf_wait(context, 3 * TICKS_PER_SECOND);        
+        pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
@@ -192,7 +192,7 @@ void checkpoint_62(
         direction.change_direction(env.program_info(), env.console, context, 5.114177);  // old 4.975295
         pbf_move_left_joystick(context, 128, 0, 300, 50);
 
-        pbf_wait(context, 3 * TICKS_PER_SECOND);        
+        pbf_wait(context, 3000ms);
         // wait for overworld after entering Eatery
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
@@ -250,7 +250,7 @@ void checkpoint_63(
 
         // Gym leader defeated. Standing in Gym building
         pbf_move_left_joystick(context, 128, 255, 300, 100);
-        pbf_wait(context, 3 * TICKS_PER_SECOND);
+        pbf_wait(context, 3000ms);
         // wait for overworld after leaving Gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
 

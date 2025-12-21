@@ -387,21 +387,21 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
                 switch (ret){
                 case 0:
                     env.log("Detected switch " + STRING_POKEMON + " prompt. Pressing B to not switch...");
-                    pbf_mash_button(context, BUTTON_B, 3 * TICKS_PER_SECOND);
+                    pbf_mash_button(context, BUTTON_B, 3000ms);
                     break;
                 case 1:
                     env.log("Detected battle menu. Pressing A to attack...");
-                    pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                    pbf_mash_button(context, BUTTON_A, 3000ms);
                     break;
                 case 2:
                     env.log("Detected move selection. Pressing A to attack...");
-                    pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                    pbf_mash_button(context, BUTTON_A, 3000ms);
                     break;
                 case 3:
                     // Since we can't run from the tournament, loop through all party Pokemon spamming their first move.
                     env.log("Detected fainted " + STRING_POKEMON + ". Switching to next living " + STRING_POKEMON + "...");
                     if (fainted.move_to_slot(env.console, context, switch_party_slot)){
-                        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                        pbf_mash_button(context, BUTTON_A, 3000ms);
                         switch_party_slot++;
                     }
                     break;
@@ -713,7 +713,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
             int ret_battle2 = run_until<ProControllerContext>(
                 env.console, context,
                 [](ProControllerContext& context){
-                    pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
+                    pbf_mash_button(context, BUTTON_B, 120000ms);
                 },
                 { battle_menu2, overworld }
             );

@@ -100,7 +100,7 @@ void trigger_map_overlap(VideoStream& stream, ProControllerContext& context){
             return;
         }
         stream.log("Failed to activate map overlap.", COLOR_ORANGE);
-        pbf_mash_button(context, BUTTON_B, 3 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 3000ms);
         pbf_press_button(context, BUTTON_R, 20, 230);
     }
     OperationFailedException::fire(
@@ -118,15 +118,15 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProCont
     VideoStream& stream = env.console;
 
     trigger_map_overlap(stream, context);
-    pbf_wait(context, 3 * TICKS_PER_SECOND);
+    pbf_wait(context, 3000ms);
 
     //  Move to escalator.
     pbf_press_dpad(context, DPAD_UP, 20, 125);
     pbf_press_dpad(context, DPAD_UP, 20, 125);
-    pbf_move_left_joystick(context, 255, 128, 250, 5 * TICKS_PER_SECOND);
+    pbf_move_left_joystick(context, 255, 128, 2000ms, 5000ms);
 
     //  Re-enter escalator.
-    pbf_press_dpad(context, DPAD_RIGHT, 125, 6 * TICKS_PER_SECOND);
+    pbf_press_dpad(context, DPAD_RIGHT, 1000ms, 6000ms);
 
     //  Leave Pokemon center.
     pbf_press_dpad(context, DPAD_LEFT, 20, 105);
@@ -154,7 +154,7 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProCont
         }
         stream.log("Leaving " + STRING_POKEMON + " center detected!", COLOR_BLUE);
     }
-    pbf_move_left_joystick(context, 128, 255, 125, 4 * TICKS_PER_SECOND);
+    pbf_move_left_joystick(context, 128, 255, 1000ms, 4000ms);
 
     //  Center cursor.
     pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
@@ -165,10 +165,10 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProCont
     pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
 
     //  Fly
-    pbf_press_button(context, BUTTON_ZL, 20, 10 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_ZL, 160ms, 10000ms);
 
     //  Enter Pokemon center.
-    pbf_press_dpad(context, DPAD_UP, 50, 5 * TICKS_PER_SECOND);
+    pbf_press_dpad(context, DPAD_UP, 400ms, 5000ms);
     pbf_move_left_joystick(context, 255, 128, 125, 0);
     pbf_move_left_joystick(context, 128, 255, 125, 125);
 

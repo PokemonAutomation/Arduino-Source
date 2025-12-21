@@ -129,7 +129,7 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, ProCo
         run_regi_light_puzzle(env.console, context, REGI_NAME, stats.encounters());
 
         //  Start the encounter.
-        pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_A, 5000ms);
         context.wait_for_all_requests();
 
         //  Detect shiny.

@@ -698,7 +698,7 @@ void quest_tera_self_defeat(
     bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
     if (is_shiny){
         console.log("Shiny detected!");
-        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 5000ms);
         throw ProgramFinishedException();
     }else{
         bool tera_self = true;
@@ -797,7 +797,7 @@ void quest_sneak_up(
         bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
         if (is_shiny){
             console.log("Shiny detected!");
-            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 5000ms);
             throw ProgramFinishedException();
         }else{
             OverworldWatcher overworld(console.logger(), COLOR_BLUE);
@@ -918,7 +918,7 @@ void quest_wild_tera(
     bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
     if (is_shiny){
         console.log("Shiny detected!");
-        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 5000ms);
         throw ProgramFinishedException();
     }else{
         bool tera_self = false;
@@ -1256,7 +1256,7 @@ void quest_tera_raid(
             bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
             if (is_shiny){
                 console.log("Shiny detected!");
-                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 5000ms);
                 throw ProgramFinishedException();
             }else{
                 console.log("Detected battle. Running from battle.");

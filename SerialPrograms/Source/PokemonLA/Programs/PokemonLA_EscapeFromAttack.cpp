@@ -123,7 +123,7 @@ EscapeFromAttack::EscapeFromAttack(
             if (delay_dash){
                 pbf_move_left_joystick(context, 128, 0, 125, 0);
             }
-            pbf_mash_button(context, BUTTON_B, 300 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 300000ms);
         });
         return false;
     });

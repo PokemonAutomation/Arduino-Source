@@ -178,10 +178,10 @@ void ClaimMysteryGift::enter_mystery_gift_via_internet_window(SingleSwitchProgra
     size_t max_attempts = 5;
     for (size_t i = 0; i < max_attempts; i++){
         enter_menu_from_overworld(env.program_info(), env.console, context, menu_index);
-        pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 160ms, 4000ms);
         pbf_press_dpad(context, DPAD_UP, 20, 105);
-        pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 160ms, 4000ms);
+        pbf_press_button(context, BUTTON_A, 160ms, 4000ms);
         try {
             clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {CallbackEnum::PROMPT_DIALOG});
         }catch(OperationFailedException&){
@@ -298,12 +298,12 @@ void ClaimMysteryGift::enter_mystery_gift_code_window(SingleSwitchProgramEnviron
     size_t max_attempts = 5;
     for (size_t i = 0; i < max_attempts; i++){
         enter_menu_from_overworld(env.program_info(), env.console, context, menu_index);
-        pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 160ms, 4000ms);
         pbf_press_dpad(context, DPAD_UP, 20, 105);
-        pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 160ms, 4000ms);
         pbf_press_dpad(context, DPAD_DOWN, 20, 105);
-        pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_A, 20, 10 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 160ms, 4000ms);
+        pbf_press_button(context, BUTTON_A, 160ms, 10000ms);
         try {
             clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {CallbackEnum::PROMPT_DIALOG});
         }catch(OperationFailedException&){

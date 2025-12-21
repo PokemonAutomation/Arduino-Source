@@ -71,7 +71,7 @@ void clear_mons_in_front(
 #if 0
     WhiteButtonDetector detector(COLOR_RED, WhiteButton::ButtonA, {0.020, 0.590, 0.035, 0.060});
     while (detector.detect(console.video().snapshot())){
-        pbf_press_button(context, BUTTON_R, 20, 30 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_R, 20, 30000ms);
         context.wait_for_all_requests();
     }
 #endif

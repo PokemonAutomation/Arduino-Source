@@ -153,7 +153,7 @@ void checkpoint_38(
         pbf_move_left_joystick(context, 128, 0, 700, 100);
         // jump to ensure you get on elevator
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 1600ms);
-        pbf_wait(context, 3 * TICKS_PER_SECOND);
+        pbf_wait(context, 3000ms);
         // wait for overworld to reappear after stepping off elevator
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
@@ -186,7 +186,7 @@ void checkpoint_38(
         // Gym now defeated. now in Cascaraffa gym building
         context.wait_for_all_requests();
         pbf_move_left_joystick(context, 128, 255, 300, 100);
-        pbf_wait(context, 3 * TICKS_PER_SECOND);
+        pbf_wait(context, 3000ms);
         // wait for overworld after leaving Gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
 

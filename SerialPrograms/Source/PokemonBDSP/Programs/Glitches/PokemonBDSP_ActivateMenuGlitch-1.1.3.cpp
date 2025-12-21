@@ -54,8 +54,8 @@ void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, ProCont
     VideoStream& stream = env.console;
 
     //  Enable Strength
-    pbf_mash_button(context, BUTTON_ZL, 2 * TICKS_PER_SECOND);
-    pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_ZL, 2000ms);
+    pbf_mash_button(context, BUTTON_B, 5000ms);
 
 
     pbf_press_button(context, BUTTON_R, 5, 0);
@@ -87,7 +87,7 @@ void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, ProCont
     pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
 
     //  Fly
-    pbf_press_button(context, BUTTON_ZL, 20, 10 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_ZL, 160ms, 10000ms);
 }
 
 

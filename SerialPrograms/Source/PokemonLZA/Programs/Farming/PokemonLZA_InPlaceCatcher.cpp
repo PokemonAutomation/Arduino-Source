@@ -258,7 +258,7 @@ void InPlaceCatcher::program(SingleSwitchProgramEnvironment& env, ProControllerC
         }
     );
 
-    pbf_wait(context, 5 * TICKS_PER_SECOND);
+    pbf_wait(context, 5000ms);
     go_home(env.console, context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }

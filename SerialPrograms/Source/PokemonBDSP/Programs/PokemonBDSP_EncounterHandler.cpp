@@ -26,8 +26,8 @@ namespace PokemonBDSP{
 
 
 void take_video(ProControllerContext& context){
-    pbf_wait(context, 5 * TICKS_PER_SECOND);
-    pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+    pbf_wait(context, 5000ms);
+    pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 5000ms);
 //    context->wait_for_all_requests();
 }
 
@@ -280,7 +280,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
             }
             break;
         case CatchResult::POKEMON_FAINTED:
-            pbf_mash_button(m_context, BUTTON_B, 2 * TICKS_PER_SECOND);
+            pbf_mash_button(m_context, BUTTON_B, 2000ms);
             break;
         default:
             throw_and_log<FatalProgramException>(

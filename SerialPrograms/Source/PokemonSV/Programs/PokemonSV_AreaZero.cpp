@@ -76,7 +76,7 @@ void inside_zero_gate_to_station(
         case 1:
             stream.log("Detected prompt.");
             prompt.move_cursor(info, stream, context, station - 1);
-            pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_A, 3000ms);
             continue;
         case 2:
             stream.log("Black screen is over. Arrive at station.");

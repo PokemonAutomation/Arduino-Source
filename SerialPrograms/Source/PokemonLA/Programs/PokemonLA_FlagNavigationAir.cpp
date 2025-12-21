@@ -56,7 +56,7 @@ FlagNavigationAir::FlagNavigationAir(
     auto find_flag = [this](ProControllerContext& context){
         uint8_t turn = m_flag_x <= 0.5 ? 0 : 255;
         for (size_t c = 0; c < 2; c++){
-            pbf_mash_button(context, BUTTON_ZL, 2 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_ZL, 2000ms);
             pbf_move_right_joystick(context, turn, 128, 3200ms, 0ms);
             pbf_move_right_joystick(context, 128, 255, 960ms, 0ms);
             pbf_move_right_joystick(context, turn, 128, 3200ms, 0ms);
@@ -158,7 +158,7 @@ FlagNavigationAir::FlagNavigationAir(
                 m_looking_straight_ahead.store(true, std::memory_order_release);
 //                cout << "State::DASH_FORWARD: m_looking_straight_ahead = true" << endl;
             }
-            pbf_mash_button(context, BUTTON_B, 300 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 300000ms);
         });
         return false;
     });

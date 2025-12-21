@@ -394,7 +394,7 @@ void OutbreakFinder::goto_region_and_return(
             break;
         }
         env.console.log("Did not detect option to return to Jubilife.", COLOR_RED);
-        pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 5000ms);
         stats.errors++;
     }
 

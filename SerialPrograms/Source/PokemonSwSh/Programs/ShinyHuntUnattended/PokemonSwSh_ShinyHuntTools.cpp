@@ -21,12 +21,12 @@ namespace PokemonSwSh{
 void run_away_with_lights(ProControllerContext& context){
 //    set_leds(context, true);
     pbf_press_dpad(context, DPAD_UP, 10, 0);
-    pbf_press_button(context, BUTTON_A, 10, 3 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_A, 80ms, 3000ms);
 //    set_leds(context, false);
 }
 void enter_summary(ProControllerContext& context, bool regi_move_right){
     pbf_press_dpad(context, DPAD_DOWN, 10, 0);
-    pbf_press_button(context, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_A, 80ms, 2000ms);
     pbf_press_button(context, BUTTON_A, 10, 200);
     if (regi_move_right){
         pbf_move_left_joystick(context, 255, 128, 20, 30);

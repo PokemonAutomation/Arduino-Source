@@ -183,7 +183,7 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         pbf_move_left_joystick(context, 128, 255, 1000, 100);
         // wait for dialog when leaving school lobby
-        pbf_wait(context, 3 * TICKS_PER_SECOND);    
+        pbf_wait(context, 3000ms);
         
         mash_button_till_overworld(env.console, context, BUTTON_A);
         
@@ -224,7 +224,7 @@ void checkpoint_92(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         pbf_move_left_joystick(context, 0, 128, 300, 50);
         pbf_move_left_joystick(context, 255, 255, 100, 50);
 
-        pbf_wait(context, 3 * TICKS_PER_SECOND);        
+        pbf_wait(context, 3000ms);
         // wait for overworld after building
         wait_for_overworld(env.program_info(), env.console, context, 30);
 

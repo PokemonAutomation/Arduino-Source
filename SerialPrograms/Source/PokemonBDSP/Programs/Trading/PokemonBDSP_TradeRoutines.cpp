@@ -50,7 +50,7 @@ void trade_current_pokemon(
         int ret = run_until<ProControllerContext>(
             stream, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_ZL, 20 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_ZL, 20000ms);
             },
             {detector0, detector1}
         );
@@ -84,7 +84,7 @@ void trade_current_pokemon(
         int ret = run_until<ProControllerContext>(
             stream, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_ZL, 120 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_ZL, 120000ms);
             },
             {{black_screen}}
         );
@@ -103,7 +103,7 @@ void trade_current_pokemon(
         int ret = run_until<ProControllerContext>(
             stream, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 120000ms);
             },
             {{black_screen}}
         );

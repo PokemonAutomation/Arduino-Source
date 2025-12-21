@@ -173,7 +173,7 @@ CatchResults basic_catcher(
         run_until<ProControllerContext>(
             stream, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 120000ms);
             },
             {{black_screen_detector}}
         );
@@ -189,7 +189,7 @@ CatchResults basic_catcher(
         int result = run_until<ProControllerContext>(
             stream, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 4 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 4000ms);
             },
             {{caught_detector}}
         );
@@ -205,7 +205,7 @@ CatchResults basic_catcher(
         }
     }
 
-//    pbf_wait(context, 5 * TICKS_PER_SECOND);
+//    pbf_wait(context, 5000ms);
 //    console.video().snapshot()->save("test2.png");
     {
         stream.log("Waiting for black screen end...");
@@ -213,7 +213,7 @@ CatchResults basic_catcher(
         run_until<ProControllerContext>(
             stream, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 10000ms);
             },
             {{black_screen_detector}}
         );

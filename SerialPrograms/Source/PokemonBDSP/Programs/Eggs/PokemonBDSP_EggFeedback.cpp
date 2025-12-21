@@ -66,7 +66,7 @@ void hatch_egg(VideoStream& stream, ProControllerContext& context){
     VideoSnapshot overworld = stream.video().snapshot();
 //    overworld.save("test-0.png");
     {
-        pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 10000ms);
         context.wait_for_all_requests();
 
         ShortDialogWatcher dialog;
@@ -108,7 +108,7 @@ void hatch_egg(VideoStream& stream, ProControllerContext& context){
             throw UserSetupError(stream.logger(), "Detected prompt. Please turn off nicknaming.");
         default:
             stream.log("Failed to detect overworld after 30 seconds. Did day/night change?", COLOR_RED);
-//            pbf_mash_button(context, BUTTON_ZL, 30 * TICKS_PER_SECOND);
+//            pbf_mash_button(context, BUTTON_ZL, 30000ms);
             return;
         }
     }

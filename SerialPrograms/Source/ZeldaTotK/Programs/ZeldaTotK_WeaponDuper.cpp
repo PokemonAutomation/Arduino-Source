@@ -102,7 +102,7 @@ void WeaponDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         pbf_press_button(context, BUTTON_A, 10, 100);
         pbf_press_dpad(context, DPAD_UP, 10, 30);
         pbf_press_button(context, BUTTON_A, 10, 100);
-        pbf_wait(context, 5 * TICKS_PER_SECOND);
+        pbf_wait(context, 5000ms);
 
         context.wait_for_all_requests();
         env.log("Go to weapon menu");
@@ -168,7 +168,7 @@ void WeaponDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         pbf_press_button(context, BUTTON_A, 10, 100);
         pbf_press_dpad(context, DPAD_UP, 10, 30);
         pbf_press_button(context, BUTTON_A, 10, 100);
-        pbf_wait(context, 25 * TICKS_PER_SECOND);
+        pbf_wait(context, 25000ms);
 
         context.wait_for_all_requests();
         env.log("Pick up duped weapon - extra presses just in case");

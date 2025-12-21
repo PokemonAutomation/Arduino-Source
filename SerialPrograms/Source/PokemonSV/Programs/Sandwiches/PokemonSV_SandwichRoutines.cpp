@@ -715,7 +715,7 @@ void finish_two_herbs_sandwich(
     move_sandwich_hand(env, stream, context, SandwichHandType::FREE, false, HAND_INITIAL_BOX, INGREDIENT_BOX);
     // Mash button A to pick and drop ingredients, upper bread and pick.
     // Egg Power 3 is applied with only two sweet herb condiments!
-    pbf_mash_button(context, BUTTON_A, 8 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_A, 8000ms);
     context.wait_for_all_requests();
     stream.overlay().add_log("Built sandwich", COLOR_WHITE);
 }

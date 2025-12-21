@@ -131,7 +131,7 @@ void checkpoint_24(
        
         direction.change_direction(env.program_info(), env.console, context, 2.73);
         pbf_move_left_joystick(context, 128, 0, 200, 100);
-        pbf_wait(context, 5 * TICKS_PER_SECOND);
+        pbf_wait(context, 5000ms);
         context.wait_for_all_requests();
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -149,7 +149,7 @@ void checkpoint_24(
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
         pbf_move_left_joystick(context, 128, 255, 300, 100);
-        pbf_wait(context, 3 * TICKS_PER_SECOND);        
+        pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
@@ -288,7 +288,7 @@ void checkpoint_26(
                 if (e.m_fail_reason == OliveFail::NO_OLIVE_DETECTED || e.m_fail_reason == OliveFail::FAILED_WALK_TO_OLIVE){
                     // may have walked past olive
                     pbf_move_left_joystick(context, 128, 255, 200, 50);
-                    pbf_wait(context, 5 * TICKS_PER_SECOND);
+                    pbf_wait(context, 5000ms);
                     context.wait_for_all_requests();
                     ticks_to_walk_for_section1 = 100;
                     push_strength_section_1 = 50;               
@@ -325,13 +325,13 @@ void checkpoint_26(
                 if (e.m_fail_reason == OliveFail::NO_OLIVE_DETECTED){
                     pbf_move_left_joystick(context, 128, 255, 250, 50);
                     pbf_move_left_joystick(context, 128, 0, 50, 50);  // move forward slight in case the olive is undetectable since it's right in front of the character
-                    pbf_wait(context, 5 * TICKS_PER_SECOND);
+                    pbf_wait(context, 5000ms);
                     context.wait_for_all_requests();
                 }else if (e.m_fail_reason == OliveFail::FAILED_WALK_TO_OLIVE || e.m_fail_reason == OliveFail::OLIVE_STUCK){
                     // try moving back and then ramming forward
                     pbf_move_left_joystick(context, 128, 255, 50, 50);
                     pbf_move_left_joystick(context, 128, 0, 150, 50);
-                    pbf_wait(context, 7 * TICKS_PER_SECOND);
+                    pbf_wait(context, 7000ms);
                     context.wait_for_all_requests();
                     break; // then move on to next section
                 }else{ // FAILED_PUSH_OLIVE_TOTAL_DISTANCE, 
@@ -378,14 +378,14 @@ void checkpoint_26(
                     pbf_move_left_joystick(context, 128, 0, 100, 50);                    
                 }else if (e.m_fail_reason == OliveFail::NO_OLIVE_DETECTED){
                     pbf_move_left_joystick(context, 128, 255, 200, 50);
-                    pbf_wait(context, 5 * TICKS_PER_SECOND);
+                    pbf_wait(context, 5000ms);
                     context.wait_for_all_requests();                    
 
                 }else if (e.m_fail_reason == OliveFail::FAILED_WALK_TO_OLIVE){
                     // try moving back and then ramming forward
                     pbf_move_left_joystick(context, 128, 255, 50, 50);
                     pbf_move_left_joystick(context, 128, 0, 150, 50);
-                    pbf_wait(context, 7 * TICKS_PER_SECOND);
+                    pbf_wait(context, 7000ms);
                     context.wait_for_all_requests();
                 }else{ // FAILED_PUSH_OLIVE_TOTAL_DISTANCE, 
                     // continue trying to push the olive. at a different angle
@@ -419,7 +419,7 @@ void checkpoint_26(
                 if (e.m_fail_reason == OliveFail::NO_OLIVE_DETECTED || e.m_fail_reason == OliveFail::FAILED_WALK_TO_OLIVE){
                     // may have walked past olive
                     pbf_move_left_joystick(context, 128, 255, 200, 50);
-                    pbf_wait(context, 5 * TICKS_PER_SECOND);
+                    pbf_wait(context, 5000ms);
                     context.wait_for_all_requests();                    
                     // ticks_to_walk_for_section2_3 = 500;                    
                 }else{ // FAILED_PUSH_OLIVE_TOTAL_DISTANCE
@@ -453,14 +453,14 @@ void checkpoint_26(
                 if (e.m_fail_reason == OliveFail::NO_OLIVE_DETECTED){
                     pbf_move_left_joystick(context, 128, 255, 250, 50);
                     pbf_move_left_joystick(context, 128, 0, 50, 50);  // move forward slight in case the olive is undetectable since it's right in front of the character
-                    pbf_wait(context, 5 * TICKS_PER_SECOND);
+                    pbf_wait(context, 5000ms);
                     context.wait_for_all_requests();                    
                     ticks_to_walk_for_section3_1 = 200;
                 }else if (e.m_fail_reason == OliveFail::FAILED_WALK_TO_OLIVE || e.m_fail_reason == OliveFail::OLIVE_STUCK){
                     // try moving back and then ramming forward
                     pbf_move_left_joystick(context, 128, 255, 50, 50);
                     pbf_move_left_joystick(context, 128, 0, 150, 50);
-                    pbf_wait(context, 7 * TICKS_PER_SECOND);
+                    pbf_wait(context, 7000ms);
                     context.wait_for_all_requests();
                     ticks_to_walk_for_section3_1 = 200;
                 }else{ // FAILED_PUSH_OLIVE_TOTAL_DISTANCE, 
@@ -491,14 +491,14 @@ void checkpoint_26(
                 }
                 if (e.m_fail_reason == OliveFail::NO_OLIVE_DETECTED){
                     pbf_move_left_joystick(context, 128, 255, 200, 50);
-                    pbf_wait(context, 7 * TICKS_PER_SECOND);
+                    pbf_wait(context, 7000ms);
                     context.wait_for_all_requests();                    
                     ticks_to_walk_for_section3_2 += 200;
                 }else if (e.m_fail_reason == OliveFail::FAILED_WALK_TO_OLIVE || e.m_fail_reason == OliveFail::OLIVE_STUCK){
                     // try moving back and then ramming forward
                     pbf_move_left_joystick(context, 128, 255, 50, 50);
                     pbf_move_left_joystick(context, 128, 0, 150, 50);
-                    pbf_wait(context, 7 * TICKS_PER_SECOND);
+                    pbf_wait(context, 7000ms);
                     context.wait_for_all_requests();
                 }else{ // FAILED_PUSH_OLIVE_TOTAL_DISTANCE, 
                     throw e;
@@ -525,13 +525,13 @@ void checkpoint_26(
                 // may have failed to push the olive. and walked past it
                 if (e.m_fail_reason == OliveFail::NO_OLIVE_DETECTED){
                     pbf_move_left_joystick(context, 128, 255, 200, 50);
-                    pbf_wait(context, 7 * TICKS_PER_SECOND);
+                    pbf_wait(context, 7000ms);
                     context.wait_for_all_requests();                    
                 }else if (e.m_fail_reason == OliveFail::FAILED_WALK_TO_OLIVE || e.m_fail_reason == OliveFail::OLIVE_STUCK){
                     // try moving back and then ramming forward
                     pbf_move_left_joystick(context, 128, 255, 50, 50);
                     pbf_move_left_joystick(context, 128, 0, 100, 50);
-                    pbf_wait(context, 7 * TICKS_PER_SECOND);
+                    pbf_wait(context, 7000ms);
                     context.wait_for_all_requests();
                 }else{ // FAILED_PUSH_OLIVE_TOTAL_DISTANCE, 
                     throw e;
@@ -556,13 +556,13 @@ void checkpoint_26(
                         // may have failed to push the olive. and walked past it
                         if (e.m_fail_reason == OliveFail::NO_OLIVE_DETECTED){
                             pbf_move_left_joystick(context, 128, 255, 200, 50);
-                            pbf_wait(context, 7 * TICKS_PER_SECOND);
+                            pbf_wait(context, 7000ms);
                             context.wait_for_all_requests();                            
                         }else if (e.m_fail_reason == OliveFail::FAILED_WALK_TO_OLIVE || e.m_fail_reason == OliveFail::OLIVE_STUCK){
                             // try moving back and then ramming forward
                             pbf_move_left_joystick(context, 128, 255, 50, 50);
                             pbf_move_left_joystick(context, 128, 0, 150, 50);
-                            pbf_wait(context, 7 * TICKS_PER_SECOND);
+                            pbf_wait(context, 7000ms);
                             context.wait_for_all_requests();
                             // then push angled towards the right
                             green.push_olive_forward(env.program_info(), env.console, context, 5.8, 100, 75, 20, {0, 0.3, 1.0, 0.40}, false);                            

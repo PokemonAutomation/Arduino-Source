@@ -262,7 +262,7 @@ void BurmyFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env, ProCon
     context.wait_for_all_requests();
     disable_shiny_sound(context);
     // Throw pokemon
-    pbf_press_button(context, BUTTON_ZR, (0.5 * TICKS_PER_SECOND), 1.5 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_ZR, 500ms, 1500ms);
     context.wait_for_all_requests();
     env.current_stats<BurmyFinder_Descriptor::Stats>().trees++;
     env.update_stats();
@@ -295,7 +295,7 @@ void BurmyFinder::go_to_height_camp(SingleSwitchProgramEnvironment& env, ProCont
         // Unexpected battle during movement to camp
         if (SAVE_DEBUG_VIDEO){
             // Take a video to know why it enters battle during return trip
-            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 2000ms);
             context.wait_for_all_requests();
         }
         // Finish battle
@@ -327,7 +327,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_move_left_joystick(context, 255, 85, 20, (0.5 * TICKS_PER_SECOND));
                 pbf_press_button(context, BUTTON_ZL, 20, (0.6 * TICKS_PER_SECOND));
                 change_mount(env.console, context, MountState::BRAVIARY_ON);
-                pbf_wait(context, 0.7 * TICKS_PER_SECOND);
+                pbf_wait(context, 700ms);
                 pbf_press_button(context, BUTTON_B, (5.1 * TICKS_PER_SECOND), 0);
                 pbf_press_button(context, BUTTON_Y, (4.2 * TICKS_PER_SECOND), 0);
                 pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
@@ -379,7 +379,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_move_left_joystick(context, 255, 165, 20, (0.5 * TICKS_PER_SECOND));
                 pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
                 change_mount(env.console, context, MountState::BRAVIARY_ON);
-                pbf_wait(context, 0.6 * TICKS_PER_SECOND);
+                pbf_wait(context, 600ms);
                 pbf_press_button(context, BUTTON_B, (4.8 * TICKS_PER_SECOND), (0.6 * TICKS_PER_SECOND));
                 pbf_press_button(context, BUTTON_Y, (1.7 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
                 pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
@@ -809,7 +809,7 @@ void BurmyFinder::run_iteration(
         env.update_stats();
         if (SAVE_DEBUG_VIDEO){
             // Take a video to know why it blacks out
-            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 2000ms);
             context.wait_for_all_requests();
         }
         OperationFailedException::fire(

@@ -154,7 +154,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, ProControll
             int ret = run_until<ProControllerContext>(
                 env.console, context,
                 [](ProControllerContext& context){
-                    pbf_mash_button(context, BUTTON_B, 60 * TICKS_PER_SECOND);
+                    pbf_mash_button(context, BUTTON_B, 60000ms);
                 },
                 {{watcher}}
             );
@@ -226,7 +226,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, ProControll
                     screen
                 );
                 if (VIDEO_ON_SHINY){
-//                    pbf_wait(context, 5 * TICKS_PER_SECOND);
+//                    pbf_wait(context, 5000ms);
                     pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
                 }
                 break;

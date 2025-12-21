@@ -90,7 +90,7 @@ void return_to_plaza(const ProgramInfo& info, VideoStream& stream, ProController
             bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
             if (is_shiny){
                 stream.log("Shiny detected!");
-                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 5000ms);
                 throw ProgramFinishedException();
             }else{
                 stream.log("Detected battle. Running from battle.");

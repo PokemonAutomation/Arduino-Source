@@ -27,7 +27,7 @@ bool abort_if_error(MultiSwitchProgramEnvironment& env, CancellableScope& scope,
         env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
             pbf_press_button(context, BUTTON_B, 10, TICKS_PER_SECOND);
             pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
-            pbf_mash_button(context, BUTTON_B, 8 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 8000ms);
         });
         return true;
     }
@@ -159,7 +159,7 @@ bool start_raid_local(
     });
     if (errors.load(std::memory_order_acquire) != 0){
         env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_B, 8 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 8000ms);
         });
         return false;
     }
@@ -178,7 +178,7 @@ bool start_raid_local(
         if (!code.empty() && env.consoles.size() > 1){
             pbf_press_button(context, BUTTON_PLUS, 10, TICKS_PER_SECOND);
             FastCodeEntry::numberpad_enter_code(console, context, code, true);
-            pbf_wait(context, 2 * TICKS_PER_SECOND);
+            pbf_wait(context, 2000ms);
             pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
         }
     });
@@ -187,7 +187,7 @@ bool start_raid_local(
     env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         //  Delay to prevent the Switches from forming separate lobbies.
         if (env.consoles.size() > 1 && console.index() != host.index()){
-            pbf_wait(context, 3 * TICKS_PER_SECOND);
+            pbf_wait(context, 3000ms);
         }
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
     });
@@ -245,7 +245,7 @@ bool start_raid_local(
         size_t index = console.index();
         if (!wait_for_lobby_ready(console, context, *entrance[index], env.consoles.size(), env.consoles.size(), time_limit)){
             errors.fetch_add(1);
-            pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 10000ms);
             return;
         }
     });
@@ -257,7 +257,7 @@ bool start_raid_local(
         //  Start
         if (!start_adventure(console, context, env.consoles.size())){
             errors.fetch_add(1);
-            pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 10000ms);
             return;
         }
     });
@@ -313,7 +313,7 @@ bool start_raid_host(
     });
     if (errors.load(std::memory_order_acquire) != 0){
         env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_B, 8 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 8000ms);
         });
         return false;
     }
@@ -333,7 +333,7 @@ bool start_raid_host(
         if (!code.empty()){
             pbf_press_button(context, BUTTON_PLUS, 10, TICKS_PER_SECOND);
             FastCodeEntry::numberpad_enter_code(console, context, code, true);
-            pbf_wait(context, 2 * TICKS_PER_SECOND);
+            pbf_wait(context, 2000ms);
             pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
         }
     });
@@ -345,7 +345,7 @@ bool start_raid_host(
     env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         //  If you start the raids at the same time, they won't find each other.
         if (console.index() != host.index()){
-            pbf_wait(context, 3 * TICKS_PER_SECOND);
+            pbf_wait(context, 3000ms);
         }
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
     });
@@ -411,7 +411,7 @@ bool start_raid_host(
         size_t index = console.index();
         if (!wait_for_lobby_ready(console, context, *entrance[index], env.consoles.size(), 4, time_limit)){
             errors.fetch_add(1);
-            pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 10000ms);
             return;
         }
     });
@@ -423,7 +423,7 @@ bool start_raid_host(
         //  Start
         if (!start_adventure(console, context, env.consoles.size())){
             errors.fetch_add(1);
-            pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 10000ms);
             return;
         }
     });

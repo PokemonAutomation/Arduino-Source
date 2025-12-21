@@ -60,12 +60,12 @@ bool read_battle_menu(
         }
 
         stream.log("Unable to read opponent from battle. Attempting to read from summary.", COLOR_ORANGE);
-        pbf_press_button(context, BUTTON_Y, 10, TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_Y, 80ms, 1000ms);
         pbf_press_dpad(context, DPAD_UP, 10, 50);
-        pbf_press_button(context, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 80ms, 2000ms);
         context.wait_for_all_requests();
         mon = reader.read_opponent_in_summary(stream.logger(), stream.video().snapshot());
-        pbf_mash_button(context, BUTTON_B, 3 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 3000ms);
         state.opponent = std::move(mon);
 
         if (state.wins == 3 && !state.boss.empty()){
@@ -174,7 +174,7 @@ bool read_battle_menu(
 //            pbf_press_dpad(context, DPAD_RIGHT, 2000ms, 0ms);
 //            pbf_press_dpad(context, DPAD_UP, 2000ms, 0ms);
 //            move_slot = 0;
-            pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 1000ms);
             continue;
         }else{
             stream.log("Current Move Slot: " + std::to_string(move_slot), COLOR_BLUE);
@@ -227,7 +227,7 @@ StateMachineAction run_move_select(
 
         if (cheer_only){
             stream.log("Choosing move Cheer. (you are dead)", COLOR_PURPLE);
-//            pbf_mash_button(context, BUTTON_A, 2 * TICKS_PER_SECOND);
+//            pbf_mash_button(context, BUTTON_A, 2000ms);
 //            context.wait_for_all_requests();
             break;
         }

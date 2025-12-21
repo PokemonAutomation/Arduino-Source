@@ -147,7 +147,7 @@ int16_t throw_ball(
                 );
             }
             attempts++;
-            pbf_mash_button(context, BUTTON_B, 3 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 3000ms);
         }
     }
 }
@@ -222,8 +222,8 @@ CatchResults basic_catcher(
 
                 stream.log("BasicCatcher: Unable to throw ball. Attempting to use first move instead...", COLOR_RED);
                 battle_menu.move_to_slot(stream, context, 0);
-                pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
-                pbf_mash_button(context, BUTTON_B, 3 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_A, 3000ms);
+                pbf_mash_button(context, BUTTON_B, 3000ms);
                 last_move_attack = true;
                 break;
             }

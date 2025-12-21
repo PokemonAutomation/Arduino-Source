@@ -153,7 +153,7 @@ bool run_move_select(
         }
 
         stream.log("Attempting to Terastallize...");
-        pbf_press_button(context, BUTTON_R, 20, 4 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_R, 160ms, 4000ms);
     }while (false);
 
     if (move_select_menu.move_to_slot(stream, context, index)){
@@ -244,7 +244,7 @@ bool run_tera_battle(
             stream, context,
             [](ProControllerContext& context){
                 for (size_t c = 0; c < 4; c++){
-                    pbf_wait(context, 30 * TICKS_PER_SECOND);
+                    pbf_wait(context, 30000ms);
                     pbf_press_button(context, BUTTON_B, 20, 0);
                 }
             },

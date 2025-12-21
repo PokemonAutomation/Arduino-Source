@@ -360,13 +360,13 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, ProC
                 switch (ret){
                 case 0:
                     env.log("Detected battle menu. Pressing A to attack...");
-                    pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                    pbf_mash_button(context, BUTTON_A, 3000ms);
                     context.wait_for_all_requests();
                     break;
                 case 1:
                     env.log("Detected fainted Pokemon. Switching to next living Pokemon...");
                     if (fainted.move_to_slot(env.console, context, switch_party_slot)){
-                        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                        pbf_mash_button(context, BUTTON_A, 3000ms);
                         context.wait_for_all_requests();
                         switch_party_slot++;
                     }

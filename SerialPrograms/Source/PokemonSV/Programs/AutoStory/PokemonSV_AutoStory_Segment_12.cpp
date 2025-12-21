@@ -107,7 +107,7 @@ void checkpoint_28(
             [&](ProControllerContext& context){
                 handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
                     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                        pbf_move_left_joystick(context, 128, 0, 10 * TICKS_PER_SECOND, 100);
+                        pbf_move_left_joystick(context, 128, 0, 10000ms, 800ms);
                     }, 
                     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                         pbf_move_left_joystick(context, 0, 0, 100, 20);
@@ -138,7 +138,7 @@ void checkpoint_28(
 
         // leave gym building
         pbf_move_left_joystick(context, 128, 255, 300, 100);
-        pbf_wait(context, 3 * TICKS_PER_SECOND);        
+        pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
 

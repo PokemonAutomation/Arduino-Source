@@ -156,7 +156,7 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, P
                 env.console.video().snapshot()
             );
             if (VIDEO_ON_SHINY){
-                pbf_wait(context, 1 * TICKS_PER_SECOND);
+                pbf_wait(context, 1000ms);
                 pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 5000ms);
             }
             if (!RUN_FROM_EVERYTHING){

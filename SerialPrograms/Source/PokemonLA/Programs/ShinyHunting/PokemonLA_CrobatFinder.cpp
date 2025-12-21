@@ -112,7 +112,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
             break;
         }
         if (mount == MountState::WYRDEER_ON){
-            pbf_wait(context, 5 * TICKS_PER_SECOND);
+            pbf_wait(context, 5000ms);
             error = false;
             break;
         }

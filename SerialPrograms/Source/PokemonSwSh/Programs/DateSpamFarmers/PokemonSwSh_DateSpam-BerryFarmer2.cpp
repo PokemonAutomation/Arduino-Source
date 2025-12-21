@@ -312,7 +312,7 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         
         switch (current_rustling){
         case Rustling::Battle:
-            pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 1000ms);
             run_away(env.console, context, EXIT_BATTLE_TIMEOUT0);
             break;
         case Rustling::Fast:
@@ -334,10 +334,10 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             save_count += iteration_attempts;
             if (save_count >= save_iterations){
                 save_count = 0;
-                pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 2000ms);
                 pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
-                pbf_press_button(context, BUTTON_R, 20, 2 * TICKS_PER_SECOND);
-                pbf_press_button(context, BUTTON_ZL, 20, 3 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_R, 160ms, 2000ms);
+                pbf_press_button(context, BUTTON_ZL, 160ms, 3000ms);
             }
         }
 

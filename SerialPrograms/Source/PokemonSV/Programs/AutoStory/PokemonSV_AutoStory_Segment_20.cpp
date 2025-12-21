@@ -141,7 +141,7 @@ void checkpoint_43(
         pbf_move_left_joystick(context, 128, 0, 900, 100);
         direction.change_direction(env.program_info(), env.console, context, 3.05);
         pbf_move_left_joystick(context, 128, 0, 200, 100);
-        pbf_wait(context, 7 * TICKS_PER_SECOND);
+        pbf_wait(context, 7000ms);
         context.wait_for_all_requests();
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
@@ -183,7 +183,7 @@ void checkpoint_44(
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
         pbf_move_left_joystick(context, 128, 255, 300, 100);
-        pbf_wait(context, 3 * TICKS_PER_SECOND);        
+        pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);      
         
@@ -402,7 +402,7 @@ void checkpoint_44(
                 pbf_wait(context, 250);
                 press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
                 check_num_sunflora_found(env, context, 8);  
-                pbf_wait(context, 3 * TICKS_PER_SECOND);
+                pbf_wait(context, 3000ms);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, 128, 0, 30, 100);
@@ -473,7 +473,7 @@ void checkpoint_44(
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [&](ProControllerContext& context){
-                pbf_move_left_joystick(context, 128, 0, 30 * TICKS_PER_SECOND, 100);
+                pbf_move_left_joystick(context, 128, 0, 30000ms, 800ms);
             },
             {no_minimap}
         );
@@ -554,7 +554,7 @@ void checkpoint_46(
         context.wait_for_all_requests();
 
         pbf_move_left_joystick(context, 128, 255, 300, 100);
-        pbf_wait(context, 3 * TICKS_PER_SECOND);
+        pbf_wait(context, 3000ms);
         // wait for overworld after leaving Gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
 

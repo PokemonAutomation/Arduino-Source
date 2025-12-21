@@ -134,7 +134,7 @@ void mash_A_to_enter_sub_area(
     int ret = run_until<ProControllerContext>(
         stream, context,
         [](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_A, 7 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_A, 7000ms);
         },
         {{black_screen0}}
     );

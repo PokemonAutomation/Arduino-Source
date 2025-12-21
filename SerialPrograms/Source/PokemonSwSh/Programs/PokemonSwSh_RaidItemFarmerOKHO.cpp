@@ -168,7 +168,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
             [&](ConsoleHandle& console, ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, RAID_START_MASH_DURATION0);
                 pbf_wait(context, RAID_START_TO_ATTACK_DELAY0);
-                pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_A, 5000ms);
                 pbf_wait(context, ATTACK_TO_CATCH_DELAY0);
 
                 if (console.index() == 0){

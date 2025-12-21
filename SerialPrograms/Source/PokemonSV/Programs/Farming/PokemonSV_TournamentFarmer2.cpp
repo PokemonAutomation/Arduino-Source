@@ -211,7 +211,7 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, ProControll
             int ret = run_until<ProControllerContext>(
                 env.console, context,
                 [](ProControllerContext& context){
-                    pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
+                    pbf_mash_button(context, BUTTON_B, 120000ms);
                 },
                 {battle_menu, overworld}
             );
@@ -256,7 +256,7 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, ProControll
                 ret = run_until<ProControllerContext>(
                     env.console, context,
                     [](ProControllerContext& context){
-                        pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
+                        pbf_mash_button(context, BUTTON_B, 120000ms);
                     },
                     {overworld} 
                 );
@@ -273,7 +273,7 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, ProControll
                 ret = run_until<ProControllerContext>(
                     env.console, context,
                     [](ProControllerContext& context){
-                        pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);
+                        pbf_mash_button(context, BUTTON_B, 5000ms);
                     },
                     {fast_travel}
                 );

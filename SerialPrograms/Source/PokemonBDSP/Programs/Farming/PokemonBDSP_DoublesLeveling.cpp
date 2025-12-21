@@ -106,7 +106,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, ProControllerC
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 120000ms);
             },
             {
                 battle_menu,
@@ -118,7 +118,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, ProControllerC
         switch (ret){
         case 0:
             env.log("Battle menu detected!", COLOR_BLUE);
-            pbf_mash_button(context, BUTTON_ZL, 5 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_ZL, 5000ms);
             c++;
             break;
         case 1:

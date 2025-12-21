@@ -505,7 +505,7 @@ void enter_menu_from_overworld(const ProgramInfo& info, VideoStream& stream, Pro
             stream, context,
             [has_minimap](ProControllerContext& context){
                 for (int i = 0; i < 10; i++){
-                    pbf_wait(context, 3 * TICKS_PER_SECOND);
+                    pbf_wait(context, 3000ms);
                     if (!has_minimap){ 
                         // if no minimap, can't detect overworld, so repeatedly press X to cover for button drops
                         pbf_press_button(context, BUTTON_X, 20, 100);
@@ -738,9 +738,9 @@ void press_button_until_gradient_arrow(
     int ret = run_until<ProControllerContext>(
         stream, context,
         [button](ProControllerContext& context){
-            pbf_wait(context, 3 * TICKS_PER_SECOND); // avoid pressing button if arrow already detected
+            pbf_wait(context, 3000ms); // avoid pressing button if arrow already detected
             for (size_t c = 0; c < 10; c++){
-                pbf_press_button(context, button, 20, 3 * TICKS_PER_SECOND);
+                pbf_press_button(context, button, 160ms, 3000ms);
             }
         },
         {arrow}
