@@ -147,10 +147,13 @@ void SerialPABotBase_Joycon<JoyconType>::issue_full_controller_state(
 template <typename JoyconType>
 void SerialPABotBase_Joycon<JoyconType>::issue_mash_button(
     Cancellable* cancellable,
-    Button button, Milliseconds duration
+    Button button, Milliseconds duration,
+    Milliseconds delay,
+    Milliseconds hold,
+    Milliseconds cooldown
 ){
     button &= m_valid_buttons;
-    ControllerWithScheduler::issue_mash_button(cancellable, duration, button);
+    ControllerWithScheduler::issue_mash_button(cancellable, duration, button, delay, hold, cooldown);
 }
 
 

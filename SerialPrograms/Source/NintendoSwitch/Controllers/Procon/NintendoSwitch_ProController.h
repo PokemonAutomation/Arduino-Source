@@ -182,7 +182,10 @@ public:
     virtual void issue_mash_button(
         Cancellable* cancellable,
         Milliseconds duration,
-        Button button
+        Button button,
+        Milliseconds delay = Milliseconds(64),
+        Milliseconds hold = Milliseconds(40),
+        Milliseconds cooldown = Milliseconds(24)
     ) = 0;
 
     //  Alternate pressing "button0" and "button1" as quickly as possible.

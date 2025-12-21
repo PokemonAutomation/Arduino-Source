@@ -188,10 +188,11 @@ public:
     virtual void issue_mash_button(
         Cancellable* cancellable,
         Milliseconds duration,
-        Button button
+        Button button,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
     ) override{
         button &= VALID_PRO_CONTROLLER_BUTTONS;
-        ControllerWithScheduler::issue_mash_button(cancellable, duration, button);
+        ControllerWithScheduler::issue_mash_button(cancellable, duration, button, delay, hold, cooldown);
     }
     virtual void issue_mash_button(
         Cancellable* cancellable,

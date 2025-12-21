@@ -154,7 +154,10 @@ public:
 
     virtual void issue_mash_button(
         Cancellable* cancellable,
-        Button button, Milliseconds duration
+        Button button, Milliseconds duration,
+        Milliseconds delay,
+        Milliseconds hold,
+        Milliseconds cooldown
     ) override;
 
 

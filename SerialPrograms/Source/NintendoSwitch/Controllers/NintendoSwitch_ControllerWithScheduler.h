@@ -264,7 +264,10 @@ public:
     void issue_mash_button(
         Cancellable* cancellable,
         Milliseconds duration,
-        Button button
+        Button button,
+        Milliseconds delay,
+        Milliseconds hold,
+        Milliseconds cooldown
     );
     void issue_mash_button(
         Cancellable* cancellable,

@@ -160,7 +160,11 @@ public:
     //  Mash a button as quickly as possible.
     virtual void issue_mash_button(
         Cancellable* cancellable,
-        Button button, Milliseconds duration
+        Button button,
+        Milliseconds duration,
+        Milliseconds delay = Milliseconds(64),
+        Milliseconds hold = Milliseconds(40),
+        Milliseconds cooldown = Milliseconds(24)
     ) = 0;
 
 

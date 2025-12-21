@@ -268,7 +268,10 @@ void ControllerWithScheduler::issue_full_controller_state(
 void ControllerWithScheduler::issue_mash_button(
     Cancellable* cancellable,
     Milliseconds duration,
-    Button button
+    Button button,
+    Milliseconds delay,
+    Milliseconds hold,
+    Milliseconds cooldown
 ){
     if (cancellable){
         cancellable->throw_if_cancelled();
@@ -276,7 +279,7 @@ void ControllerWithScheduler::issue_mash_button(
     ThrottleScope scope(m_logging_throttler);
     bool log = true;
     while (duration > Milliseconds::zero()){
-        issue_buttons(cancellable, 8*8ms, 5*8ms, 3*8ms, button);
+        issue_buttons(cancellable, delay, hold, cooldown, button);
 
         //  We never log before the first issue to avoid delaying the critical path.
         //  But we do want to log before the mash spam. So we log after the first
@@ -290,8 +293,9 @@ void ControllerWithScheduler::issue_mash_button(
         }
         log = false;
 
-        duration = duration >= 8*8ms
-            ? duration - 8*8ms
+        Milliseconds elapsed = std::max(delay, hold + cooldown);
+        duration = duration >= elapsed
+            ? duration - elapsed
             : Milliseconds::zero();
     }
 }
