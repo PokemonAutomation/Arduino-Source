@@ -120,7 +120,7 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, ProCo
                     pbf_move_right_joystick(context, 0, 128, -TURN_DURATION0.get(), 0ms);
                 }
                 
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, FORWARD_DURATION0);
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, {0, +1}, {0, 0}, FORWARD_DURATION0);
 
                 pbf_wait(context, WAIT_DURATION0);
 

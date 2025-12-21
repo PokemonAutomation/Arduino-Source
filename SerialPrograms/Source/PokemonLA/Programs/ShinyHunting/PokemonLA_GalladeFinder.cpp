@@ -118,22 +118,22 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProContro
             env.console, context,
             [&](ProControllerContext& context){
                 // forward portion
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, 6800ms); // forward while running until stairs, mash y a few times down the stairs
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, {0, +1}, {0, 0}, 6800ms); // forward while running until stairs, mash y a few times down the stairs
                 pbf_mash_button(context, BUTTON_Y, 2800ms); // roll down the stairs, recover stamina
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, 4000ms); // forward while sprinting again
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, {0, +1}, {0, 0}, 4000ms); // forward while sprinting again
                 pbf_mash_button(context, BUTTON_Y, 2000ms); // two mashes and then one y
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, 3800ms); // forward while sprinting again
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, {0, +1}, {0, 0}, 3800ms); // forward while sprinting again
                 // basic map layout is walk forward for a while, move right, run back, then align camera, then walk left then forward to Gallade
 
                 // right portion
                 pbf_move_left_joystick(context, 255, 128, 500ms, 0ms); // right alone
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 255, 128, 128, 128, 2400ms); // forward while running until stairs
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, {+1, 0}, {0, 0}, 2400ms); // forward while running until stairs
                 pbf_mash_button(context, BUTTON_Y, 1800ms); // roll down the stairs, recover stamina
                 pbf_move_left_joystick(context, 255, 128, 1800ms, 160ms); // right alone
 
                 // down portion
                 // pbf_move_left_joystick(context, 128, 255, (uint16_t)(1.9 * TICKS_PER_SECOND), 20); // OLD down
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 255, 128, 128, 1800ms);
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, {0, -1}, {0, 0}, 1800ms);
 
                 // camera align
                 pbf_press_button(context, BUTTON_ZL, 20, 0); // camera align
@@ -149,7 +149,7 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProContro
                 pbf_move_left_joystick(context, 0, 0, 1100ms, 0ms);
 
                 //pbf_move_left_joystick(context, 128, 0, 3.9 * TICKS_PER_SECOND, 0); // OLD forward
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, 3500ms); // forward while sprinting until stairs, mash y a few times down the stairs
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, {0, +1}, {0, 0}, 3500ms);   // forward while sprinting until stairs, mash y a few times down the stairs
                 // we should easily be in range of gallade at this point, so if there's no shiny we're done
             },
             {{shiny_detector}}

@@ -117,8 +117,7 @@ void ShinyHuntCustomPath::do_non_listen_action(
 ){
     stream.log("Execute action " + row.action.current_display());
     switch(row.action){
-    case PathAction::CHANGE_MOUNT:
-    {
+    case PathAction::CHANGE_MOUNT:{
         MountState mountState = MountState::NOTHING;
         switch(row.parameters.mount){
         case PathMount::WYRDEER:
@@ -148,27 +147,25 @@ void ShinyHuntCustomPath::do_non_listen_action(
         break;
     }
 #if 0
-    case PathAction::ROTATE_CAMERA:
-    {
+    case PathAction::ROTATE_CAMERA:{
         if (row.camera_turn_ticks > 0){
-            pbf_move_right_joystick(context, 255, 128, uint16_t(row.camera_turn_ticks), 0);
+            pbf_move_right_joystick(context, {+1, 0}, uint16_t(row.camera_turn_ticks), 0);
         }else if (row.camera_turn_ticks < 0){
-            pbf_move_right_joystick(context, 0, 128, uint16_t(-row.camera_turn_ticks), 0);
+            pbf_move_right_joystick(context, {-1, 0}, uint16_t(-row.camera_turn_ticks), 0);
         }
         break;
     }
 #endif
-    case PathAction::MOVE_FORWARD:
-    {
+    case PathAction::MOVE_FORWARD:{
         switch(row.parameters.move_speed){
         case PathSpeed::NORMAL_SPEED:
-            pbf_move_left_joystick(context, 128, 0, row.parameters.move_forward, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, row.parameters.move_forward, 0ms);
             break;
         case PathSpeed::SLOW_SPEED:
-            pbf_move_left_joystick(context, 128, 64, row.parameters.move_forward, 0ms);
+            pbf_move_left_joystick(context, {0, +0.5}, row.parameters.move_forward, 0ms);
             break;
         case PathSpeed::RUN:
-            pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, row.parameters.move_forward);
+            pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, {0, +1}, {0, 0}, row.parameters.move_forward);
             break;
         case PathSpeed::DASH:
             pbf_press_button(context, BUTTON_B, row.parameters.move_forward, 0ms);
@@ -182,25 +179,24 @@ void ShinyHuntCustomPath::do_non_listen_action(
         }
         break;
     }
-    case PathAction::MOVE_IN_DIRECTION:
-    {
-        uint8_t x = (uint8_t)((row.parameters.left_x + 1.0) * 127.5 + 0.5);
-        uint8_t y = (uint8_t)((-row.parameters.left_y + 1.0) * 127.5 + 0.5);
-        pbf_move_left_joystick(context, x, y, row.parameters.move_forward, 0ms);
+    case PathAction::MOVE_IN_DIRECTION:{
+        pbf_move_left_joystick(
+            context,
+            {row.parameters.left_x, row.parameters.left_y},
+            row.parameters.move_forward,
+            0ms
+        );
         break;
     }
-    case PathAction::CENTER_CAMERA:
-    {
+    case PathAction::CENTER_CAMERA:{
         pbf_mash_button(context, BUTTON_ZL, 200);
         break;
     }
-    case PathAction::JUMP:
-    {
+    case PathAction::JUMP:{
         pbf_press_button(context, BUTTON_Y, 80ms, row.parameters.jump_wait);
         break;
     }
-    case PathAction::WAIT:
-    {
+    case PathAction::WAIT:{
         pbf_wait(context, row.parameters.wait);
         break;
     }

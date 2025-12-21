@@ -107,7 +107,6 @@ void pbf_controller_state(
     uint8_t right_x, uint8_t right_y,
     uint16_t ticks
 );
-#endif
 void pbf_controller_state(
     ProControllerContext& context,
     Button button,
@@ -116,6 +115,7 @@ void pbf_controller_state(
     uint8_t right_x, uint8_t right_y,
     Milliseconds duration
 );
+#endif
 void pbf_controller_state(
     ProControllerContext& context,
     Button button,

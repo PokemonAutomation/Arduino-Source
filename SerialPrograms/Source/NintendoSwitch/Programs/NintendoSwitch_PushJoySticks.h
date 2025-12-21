@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_NintendoSwitch_PushJoySticks_H
 #define PokemonAutomation_NintendoSwitch_PushJoySticks_H
 
+#include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -30,10 +30,10 @@ public:
 
 private:
     IntegerEnumDropdownOption JOYCON_CLICK;
-    SimpleIntegerOption<uint8_t> LEFT_X;
-    SimpleIntegerOption<uint8_t> LEFT_Y;
-    SimpleIntegerOption<uint8_t> RIGHT_X;
-    SimpleIntegerOption<uint8_t> RIGHT_Y;
+    FloatingPointOption LEFT_X0;
+    FloatingPointOption LEFT_Y0;
+    FloatingPointOption RIGHT_X0;
+    FloatingPointOption RIGHT_Y0;
     MillisecondsOption PRESS_DURATION;
     MillisecondsOption RELEASE_DURATION;
 };

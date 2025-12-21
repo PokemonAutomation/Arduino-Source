@@ -43,25 +43,25 @@ PushJoySticks::PushJoySticks()
         LockMode::LOCK_WHILE_RUNNING,
         0
     )
-    , LEFT_X(
-        "<b>Left Joy Stick X direction:</b><br>Range: 0-255. 0: left, 128: neutral, 255: right.",
+    , LEFT_X0(
+        "<b>Left Joy Stick X direction:</b><br>Range: [-1.0, 1.0.] -1: left, 0: neutral, +1: right.",
         LockMode::LOCK_WHILE_RUNNING,
-        128, 0, 255
+        0, -1, 1
     )
-    , LEFT_Y(
-        "<b>Left Joy Stick Y direction:</b><br>Range: 0-255. 0: up, 128: neutral, 255: down.",
+    , LEFT_Y0(
+        "<b>Left Joy Stick Y direction:</b><br>Range:  [-1.0, 1.0.]. +1: up, 0: neutral, -1: down.",
         LockMode::LOCK_WHILE_RUNNING,
-        128, 0, 255
+        0, -1, 1
     )
-    , RIGHT_X(
-        "<b>Right Joy Stick X direction:</b><br>Range: 0-255. 0: left, 128: neutral, 255: right.",
+    , RIGHT_X0(
+        "<b>Right Joy Stick X direction:</b><br>Range: [-1.0, 1.0.] -1: left, 0: neutral, +1: right.",
         LockMode::LOCK_WHILE_RUNNING,
-        128, 0, 255
+        0, -1, 1
     )
-    , RIGHT_Y(
-        "<b>Right Joy Stick Y direction:</b><br>Range: 0-255. 0: up, 128: neutral, 255: down.",
+    , RIGHT_Y0(
+        "<b>Right Joy Stick Y direction:</b><br>Range:  [-1.0, 1.0.]. +1: up, 0: neutral, -1: down.",
         LockMode::LOCK_WHILE_RUNNING,
-        128, 0, 255
+        0, -1, 1
     )
     , PRESS_DURATION(
         "<b>Press Duration:</b><br>Hold the joysticks down for this long.",
@@ -75,10 +75,10 @@ PushJoySticks::PushJoySticks()
     )
 {
     PA_ADD_OPTION(JOYCON_CLICK);
-    PA_ADD_OPTION(LEFT_X);
-    PA_ADD_OPTION(LEFT_Y);
-    PA_ADD_OPTION(RIGHT_X);
-    PA_ADD_OPTION(RIGHT_Y);
+    PA_ADD_OPTION(LEFT_X0);
+    PA_ADD_OPTION(LEFT_Y0);
+    PA_ADD_OPTION(RIGHT_X0);
+    PA_ADD_OPTION(RIGHT_Y0);
     PA_ADD_OPTION(PRESS_DURATION);
     PA_ADD_OPTION(RELEASE_DURATION);
 }
@@ -102,8 +102,12 @@ void PushJoySticks::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     }
 
     while(true){
-        pbf_controller_state(context, button, DPAD_NONE,
-            LEFT_X, LEFT_Y, RIGHT_X, RIGHT_Y, PRESS_DURATION);
+        pbf_controller_state(
+            context, button, DPAD_NONE,
+            {LEFT_X0, LEFT_Y0},
+            {RIGHT_X0, RIGHT_Y0},
+            PRESS_DURATION
+        );
         if (RELEASE_DURATION.get() > std::chrono::milliseconds(0)){
             pbf_wait(context, RELEASE_DURATION);
         }
