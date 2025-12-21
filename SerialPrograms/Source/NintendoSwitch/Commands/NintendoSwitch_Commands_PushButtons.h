@@ -98,6 +98,7 @@ void grip_menu_connect_go_home  (ProControllerContext& context);
 //  button overlapping, you should use ssf_* directly. (though lots of existing
 //  programs already use this for overlapping)
 //
+#if 0
 void pbf_controller_state(
     ProControllerContext& context,
     Button button,
@@ -106,6 +107,7 @@ void pbf_controller_state(
     uint8_t right_x, uint8_t right_y,
     uint16_t ticks
 );
+#endif
 void pbf_controller_state(
     ProControllerContext& context,
     Button button,

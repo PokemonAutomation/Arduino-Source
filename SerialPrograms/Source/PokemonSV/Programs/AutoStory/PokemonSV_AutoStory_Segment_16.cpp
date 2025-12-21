@@ -108,7 +108,7 @@ void checkpoint_35(
         // walk towards elevator
         pbf_move_left_joystick(context, 128, 0, 700, 100);
         // jump to ensure you get on elevator
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 200);
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 1600ms);
         pbf_wait(context, 3 * TICKS_PER_SECOND);
         // wait for overworld to reappear after stepping off elevator
         wait_for_overworld(env.program_info(), env.console, context, 30);

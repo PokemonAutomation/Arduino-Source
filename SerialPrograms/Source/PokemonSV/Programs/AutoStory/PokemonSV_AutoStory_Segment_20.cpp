@@ -361,7 +361,7 @@ void checkpoint_44(
 
         // align to corner 7.5. bush
         direction.change_direction(env.program_info(), env.console, context, 3.11);
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 150);
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 1200ms);
         pbf_move_left_joystick(context, 128, 0, 60, 100);
         direction.change_direction(env.program_info(), env.console, context, 4.28);
         pbf_move_left_joystick(context, 128, 0, 200, 100);
@@ -385,7 +385,7 @@ void checkpoint_44(
         // align to corner 8.1. bush
         direction.change_direction(env.program_info(), env.console, context, 4.54);
         pbf_move_left_joystick(context, 128, 0, 200, 100);
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 150);
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 1200ms);
         pbf_move_left_joystick(context, 128, 0, 200, 100);
         direction.change_direction(env.program_info(), env.console, context, 3.60);
         pbf_move_left_joystick(context, 128, 0, 400, 100);
@@ -416,7 +416,7 @@ void checkpoint_44(
         pbf_move_left_joystick(context, 128, 255, 200, 100);
         direction.change_direction(env.program_info(), env.console, context, 4.89);
         pbf_move_left_joystick(context, 128, 0, 350, 100);
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 180);
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 1440ms);
         get_off_ride(env.program_info(), env.console, context);
         direction.change_direction(env.program_info(), env.console, context, 3.60);
         pbf_move_left_joystick(context, 128, 0, 600, 100);
@@ -463,7 +463,7 @@ void checkpoint_44(
         // align to corner 11.1. bush
         direction.change_direction(env.program_info(), env.console, context, 0.65);
         pbf_move_left_joystick(context, 128, 0, 200, 100);
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 150);
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 1200ms);
         pbf_move_left_joystick(context, 128, 0, 800, 100);
 
         direction.change_direction(env.program_info(), env.console, context, 4.49);
@@ -515,7 +515,7 @@ void checkpoint_45(
         pbf_move_left_joystick(context, 128, 0, 400, 100);
 
         direction.change_direction(env.program_info(), env.console, context, 2.18);
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 150);
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 1200ms);
         pbf_move_left_joystick(context, 128, 0, 400, 100);
         direction.change_direction(env.program_info(), env.console, context, 3.16);
         pbf_move_left_joystick(context, 0, 0, 100, 50);

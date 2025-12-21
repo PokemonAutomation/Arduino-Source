@@ -171,7 +171,7 @@ void checkpoint_50(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 // jump over the fence when stationary
                 context.wait_for_all_requests();
-                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 100);
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 800ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );          
