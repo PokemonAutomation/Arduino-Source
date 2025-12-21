@@ -42,7 +42,7 @@ DonutOptionsTest::DonutOptionsTest()
     )
     , BERRIES("<b>Berries:</b><br>The berries used to make the donut. Minimum 3 berries, maximum 8 berries.")
     , NUM_POWER_REQUIRED(
-        "<b>Number of Powers to Match:</b><br>How many of a dount's powers must be in the the table below. Minimum 1, maximum 3. "
+        "<b>Number of Powers to Match:</b><br>How many of a donut's powers must be in the the table below. Minimum 1, maximum 3. "
         "<br>Ex. For a target donut of Big Haul Lv.3, Berry Lv.3, and any or none for the 3rd power, set the number as 2."
         "<br>Then, in the flavor powers table, make sure to add Big Haul Lv.3 and Berry Lv. 3.",
         LockMode::LOCK_WHILE_RUNNING,
