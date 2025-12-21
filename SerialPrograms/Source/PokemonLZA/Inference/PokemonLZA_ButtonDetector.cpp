@@ -4,6 +4,7 @@
  *
  */
 
+#include <iostream>
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -11,7 +12,6 @@
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonLZA_ButtonDetector.h"
 
-// #include <iostream>
 // using std::cout;
 // using std::endl;
 
@@ -91,8 +91,8 @@ public:
         size_t min_height = m_min_height * input_resolution.height / 2160;
 
         if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-            cout << "???? ButtonMatcher::check_image() ???? min size " << min_width << " x " << min_height
-                 << " got " << image.width() << " x " << image.height() << endl;
+            std::cout << "???? ButtonMatcher::check_image() ???? min size " << min_width << " x " << min_height
+                 << " got " << image.width() << " x " << image.height() << std::endl;
         }
         return image.width() >= min_width && image.height() >= min_height;
     };
