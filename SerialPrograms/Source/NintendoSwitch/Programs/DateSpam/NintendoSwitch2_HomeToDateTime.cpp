@@ -130,30 +130,30 @@ void home_to_settings_Switch2_joycon_blind(
     Milliseconds tv = context->timing_variation();
     Milliseconds unit = 24ms + tv;
 
-    pbf_move_joystick(context, 255, 128, 2*unit, unit);
-    pbf_move_joystick(context, 255, 128, 2*unit, unit);
-    pbf_move_joystick(context, 255, 128, 2*unit, unit);
+    pbf_move_joystick(context, {+1, 0}, 2*unit, unit);
+    pbf_move_joystick(context, {+1, 0}, 2*unit, unit);
+    pbf_move_joystick(context, {+1, 0}, 2*unit, unit);
 
     //  Down twice in case we drop one.
-    pbf_move_joystick(context, 128, 255, 2*unit, unit);
-    pbf_move_joystick(context, 128, 255, 2*unit, unit);
+    pbf_move_joystick(context, {0, -1}, 2*unit, unit);
+    pbf_move_joystick(context, {0, -1}, 2*unit, unit);
 
-    pbf_move_joystick(context, 0, 128, 2*unit, unit);
+    pbf_move_joystick(context, {-1, 0}, 2*unit, unit);
 
     //  Press A multiple times to make sure one goes through.
     pbf_press_button(context, BUTTON_A, 2*unit, unit);
     pbf_press_button(context, BUTTON_A, 2*unit, unit);
     pbf_press_button(context, BUTTON_A, 2*unit, unit);
 
-    pbf_move_joystick(context, 128, 255, 2000ms, 0ms);
+    pbf_move_joystick(context, {0, -1}, 2000ms, 0ms);
 
     //  Scroll left and press A to exit the sleep menu if we happened to
     //  land there.
-    pbf_move_joystick(context, 0, 128, 2*unit, unit);
+    pbf_move_joystick(context, {-1, 0}, 2*unit, unit);
     pbf_press_button(context, BUTTON_A, 2*unit, unit);
 
     for (size_t c = 0; c < 2; c++){
-        pbf_move_joystick(context, 255, 128, 2*unit, unit);
+        pbf_move_joystick(context, {+1, 0}, 2*unit, unit);
     }
 }
 

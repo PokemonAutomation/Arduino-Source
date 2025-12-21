@@ -137,8 +137,8 @@ void close_game_from_home_blind(ConsoleHandle& console, JoyconContext& context){
 
                                                         // if game initially open.  |  if game initially closed
     pbf_mash_button(context, BUTTON_X, 800ms);          // - Close game.            |  - does nothing
-    pbf_move_joystick(context, 128, 255, 100ms, 10ms);  // - Does nothing.          |  - moves selector away from the closed game to avoid opening it.
-    pbf_move_joystick(context, 128, 255, 100ms, 10ms);  // - Does nothing.          |  - Press Down a second time in case we drop one.
+    pbf_move_joystick(context, {0, -1}, 100ms, 10ms);   // - Does nothing.          |  - moves selector away from the closed game to avoid opening it.
+    pbf_move_joystick(context, {0, -1}, 100ms, 10ms);   // - Does nothing.          |  - Press Down a second time in case we drop one.
     pbf_mash_button(context, BUTTON_A, 400ms);          // - Confirm close game.    |  - opens an app on the home screen (e.g. Online)
     go_home(console, context);                          // - Does nothing.          |  - goes back to home screen.
 
@@ -303,7 +303,7 @@ void resume_game_from_home(
             if (ret == 0){
                 console.log("Detected update window.", COLOR_RED);
 
-                pbf_move_joystick(context, 128, 0, 10ms, 0ms);
+                pbf_move_joystick(context, {0, +1}, 10ms, 0ms);
                 pbf_press_button(context, BUTTON_A, 10ms, 500ms);
                 context.wait_for_all_requests();
                 continue;
@@ -343,10 +343,10 @@ void move_to_user(JoyconContext& context, uint8_t user_slot){
     if (user_slot != 0){
         //  Move to correct user.
         for (uint8_t c = 0; c < 9; c++){    //  Extra iteration in case one gets dropped.
-            pbf_move_joystick(context, 0, 128, 160ms, 160ms);
+            pbf_move_joystick(context, {-1, 0}, 160ms, 160ms);
         }
         for (uint8_t c = 1; c < user_slot; c++){
-            pbf_move_joystick(context, 0, 128, 160ms, 160ms);
+            pbf_move_joystick(context, {+1, 0}, 160ms, 160ms);
         }
     }
 }
@@ -546,7 +546,7 @@ void start_game_from_home_with_inference(
     if (game_slot != 0){
         ssf_press_button(context, BUTTON_HOME, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0, 160ms);
         for (uint8_t c = 1; c < game_slot; c++){
-            pbf_move_joystick(context, 255, 128, 160ms, 0ms);
+            pbf_move_joystick(context, {+1, 0}, 160ms, 0ms);
         }
         context.wait_for_all_requests();
     }
@@ -587,7 +587,7 @@ void start_game_from_home_with_inference(
             break;
         case 2:
             console.log("Detected update menu.", COLOR_RED);
-            pbf_move_joystick(context, 128, 0, 50ms, 0ms);
+            pbf_move_joystick(context, {0, +1}, 50ms, 0ms);
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case 3:

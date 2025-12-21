@@ -148,9 +148,11 @@ void pbf_wait(JoyconContext& context, Milliseconds duration){
 void pbf_press_button(JoyconContext& context, Button button, Milliseconds hold, Milliseconds release){
     ssf_press_button(context, button, hold + release, hold, 0ms);
 }
+#if 0
 void pbf_move_joystick(JoyconContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release){
     ssf_press_joystick(context, x, y, hold + release, hold, 0ms);
 }
+#endif
 void pbf_move_joystick(JoyconContext& context, const JoystickPosition& position, Milliseconds hold, Milliseconds release){
     ssf_press_joystick(context, position, hold + release, hold, 0ms);
 }
@@ -158,23 +160,6 @@ void pbf_mash_button(JoyconContext& context, Button button, Milliseconds duratio
     ssf_mash1_button(context, button, duration);
 }
 
-void pbf_controller_state(
-    JoyconContext& context,
-    Button button,
-    uint8_t x, uint8_t y,
-    Milliseconds duration
-){
-    context->issue_full_controller_state(
-        &context,
-        true,
-        duration,
-        button,
-        {
-            JoystickTools::linear_u8_to_float(x),
-            -JoystickTools::linear_u8_to_float(y)
-        }
-    );
-}
 void pbf_controller_state(
     JoyconContext& context,
     Button button,

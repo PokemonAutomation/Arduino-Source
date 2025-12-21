@@ -128,7 +128,7 @@ void pbf_controller_state(
 
 void pbf_wait           (JoyconContext& context, Milliseconds duration);
 void pbf_press_button   (JoyconContext& context, Button button, Milliseconds hold, Milliseconds release);
-void pbf_move_joystick  (JoyconContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release);
+//void pbf_move_joystick  (JoyconContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release);
 void pbf_move_joystick  (JoyconContext& context, const JoystickPosition& position, Milliseconds hold, Milliseconds release);
 void pbf_mash_button    (JoyconContext& context, Button button, Milliseconds duration);
 

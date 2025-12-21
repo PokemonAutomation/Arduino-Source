@@ -110,7 +110,7 @@ void FossilRevival::run_revives(SingleSwitchProgramEnvironment& env, JoyconConte
     //Select fossil slot
     env.log("Selecting fossil.");
     for (uint16_t c = 0; c < (uint16_t)SLOT.current_value(); c++){
-        pbf_move_joystick(context, 128, 255, 100ms, 200ms);
+        pbf_move_joystick(context, {0, -1}, 100ms, 200ms);
     }
     context.wait_for_all_requests();
 
@@ -222,13 +222,13 @@ void FossilRevival::program(SingleSwitchProgramEnvironment& env, CancellableScop
 
         //Press left to go to last (most recent) Pokemon
         env.log("Opening summary of most recent Pokemon.");
-        pbf_move_joystick(context, 0, 128, 100ms, 100ms);
+        pbf_move_joystick(context, {-1, 0}, 100ms, 100ms);
         context.wait_for_all_requests();
 
         //View summary - it takes a moment to load
         pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
-        pbf_move_joystick(context, 128, 255, 100ms, 100ms);
-        pbf_move_joystick(context, 128, 255, 100ms, 100ms);
+        pbf_move_joystick(context, {0, -1}, 100ms, 100ms);
+        pbf_move_joystick(context, {0, -1}, 100ms, 100ms);
         pbf_press_button(context, BUTTON_A, 200ms, 100ms);
         context.wait_for_all_requests();
 
@@ -253,9 +253,9 @@ void FossilRevival::program(SingleSwitchProgramEnvironment& env, CancellableScop
                 env.log("Favoriting shiny.");
                 pbf_press_button(context, BUTTON_B, 200ms, 5000ms);
                 pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
-                pbf_move_joystick(context, 128, 0, 100ms, 100ms);
-                pbf_move_joystick(context, 128, 0, 100ms, 100ms);
-                pbf_move_joystick(context, 128, 0, 100ms, 200ms);
+                pbf_move_joystick(context, {0, +1}, 100ms, 100ms);
+                pbf_move_joystick(context, {0, +1}, 100ms, 100ms);
+                pbf_move_joystick(context, {0, +1}, 100ms, 200ms);
                 pbf_press_button(context, BUTTON_A, 200ms, 800ms);
                 pbf_press_button(context, BUTTON_A, 200ms, 800ms);
                 pbf_press_button(context, BUTTON_B, 200ms, 800ms);
@@ -263,8 +263,8 @@ void FossilRevival::program(SingleSwitchProgramEnvironment& env, CancellableScop
                 //Go into summary again
                 env.log("Navigating back into summary.");
                 pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
-                pbf_move_joystick(context, 128, 255, 100ms, 100ms);
-                pbf_move_joystick(context, 128, 255, 100ms, 100ms);
+                pbf_move_joystick(context, {0, -1}, 100ms, 100ms);
+                pbf_move_joystick(context, {0, -1}, 100ms, 100ms);
                 pbf_press_button(context, BUTTON_A, 200ms, 100ms);
                 context.wait_for_all_requests();
                 pbf_wait(context, 5000ms);
@@ -275,7 +275,7 @@ void FossilRevival::program(SingleSwitchProgramEnvironment& env, CancellableScop
             }
 
             //Move left, check next.
-            pbf_move_joystick(context, 0, 128, 100ms, 100ms);
+            pbf_move_joystick(context, {-1, 0}, 100ms, 100ms);
             pbf_press_button(context, BUTTON_X, 0ms, 1000ms);
             context.wait_for_all_requests();
         }

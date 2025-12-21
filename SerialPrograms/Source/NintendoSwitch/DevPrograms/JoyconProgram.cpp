@@ -44,15 +44,15 @@ void JoyconProgram::program(SingleSwitchProgramEnvironment& env, CancellableScop
     //  No support for gyro yet. That's coming later.
     //
 
-    pbf_move_joystick(context, 64, 64, 10000ms, 0ms);
+    pbf_move_joystick(context, {-0.5, +0.5}, 10000ms, 0ms);
 
 #if 0
     pbf_press_button(context, BUTTON_A, 200ms, 2000ms);
     pbf_press_button(context, BUTTON_HOME, 200ms, 2000ms);
-    pbf_move_joystick(context, 128, 0, 100ms, 100ms);
-    pbf_move_joystick(context, 128, 0, 100ms, 100ms);
-    pbf_move_joystick(context, 255, 128, 100ms, 100ms);
-    pbf_move_joystick(context, 128, 0, 100ms, 100ms);
+    pbf_move_joystick(context, {0, +1}, 100ms, 100ms);
+    pbf_move_joystick(context, {0, +1}, 100ms, 100ms);
+    pbf_move_joystick(context, {+1, 0}, 100ms, 100ms);
+    pbf_move_joystick(context, {0, +1}, 100ms, 100ms);
     pbf_press_button(context, BUTTON_X, 200ms, 2000ms);
 #endif
 

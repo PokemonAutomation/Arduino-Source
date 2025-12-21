@@ -96,7 +96,7 @@ void DailyItemFarmer::start_local_trade(SingleSwitchProgramEnvironment& env, Joy
     env.log("Starting local trade.");
     //Open Menu -> Communication -> Nearby player -> Local Trade
     pbf_press_button(context, BUTTON_X, 200ms, 800ms);
-    pbf_move_joystick(context, 255, 128, 100ms, 400ms);
+    pbf_move_joystick(context, {+1, 0}, 100ms, 400ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
     pbf_press_button(context, BUTTON_A, 200ms, 2000ms); //  Black screen
     pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
@@ -107,39 +107,39 @@ void DailyItemFarmer::start_local_trade(SingleSwitchProgramEnvironment& env, Joy
     case LinkCode::Pikachu:
         break;
     case LinkCode::Eevee:
-        pbf_move_joystick(context, 255, 128, 100ms, 100ms);
+        pbf_move_joystick(context, {+1, 0}, 100ms, 100ms);
         break;
     case LinkCode::Bulbasaur:
-        pbf_move_joystick(context, 255, 128, 100ms, 100ms);
-        pbf_move_joystick(context, 255, 128, 100ms, 100ms);
+        pbf_move_joystick(context, {+1, 0}, 100ms, 100ms);
+        pbf_move_joystick(context, {+1, 0}, 100ms, 100ms);
         break;
     case LinkCode::Charmander:
-        pbf_move_joystick(context, 0, 128, 100ms, 100ms);
-        pbf_move_joystick(context, 0, 128, 100ms, 100ms);
+        pbf_move_joystick(context, {-1, 0}, 100ms, 100ms);
+        pbf_move_joystick(context, {-1, 0}, 100ms, 100ms);
         break;
     case LinkCode::Squirtle:
-        pbf_move_joystick(context, 0, 128, 100ms, 100ms);
+        pbf_move_joystick(context, {-1, 0}, 100ms, 100ms);
         break;
     case LinkCode::Pidgey:
-        pbf_move_joystick(context, 128, 255, 100ms, 100ms);
+        pbf_move_joystick(context, {0, -1}, 100ms, 100ms);
         break;
     case LinkCode::Caterpie:
-        pbf_move_joystick(context, 128, 255, 100ms, 100ms);
-        pbf_move_joystick(context, 255, 128, 100ms, 100ms);
+        pbf_move_joystick(context, {0, -1}, 100ms, 100ms);
+        pbf_move_joystick(context, {+1, 0}, 100ms, 100ms);
         break;
     case LinkCode::Rattata:
-        pbf_move_joystick(context, 128, 255, 100ms, 100ms);
-        pbf_move_joystick(context, 0, 128, 100ms, 100ms);
-        pbf_move_joystick(context, 0, 128, 100ms, 100ms);
+        pbf_move_joystick(context, {0, -1}, 100ms, 100ms);
+        pbf_move_joystick(context, {-1, 0}, 100ms, 100ms);
+        pbf_move_joystick(context, {-1, 0}, 100ms, 100ms);
         break;
     case LinkCode::Jigglypuff:
-        pbf_move_joystick(context, 128, 255, 100ms, 100ms);
-        pbf_move_joystick(context, 0, 128, 100ms, 100ms);
-        pbf_move_joystick(context, 0, 128, 100ms, 100ms);
+        pbf_move_joystick(context, {0, -1}, 100ms, 100ms);
+        pbf_move_joystick(context, {-1, 0}, 100ms, 100ms);
+        pbf_move_joystick(context, {-1, 0}, 100ms, 100ms);
         break;
     case LinkCode::Diglett:
-        pbf_move_joystick(context, 128, 255, 100ms, 100ms);
-        pbf_move_joystick(context, 0, 128, 100ms, 100ms);
+        pbf_move_joystick(context, {0, -1}, 100ms, 100ms);
+        pbf_move_joystick(context, {-1, 0}, 100ms, 100ms);
         break;
     default:
         env.log("Invalid link code selection. Defaulting to Pikachu.");

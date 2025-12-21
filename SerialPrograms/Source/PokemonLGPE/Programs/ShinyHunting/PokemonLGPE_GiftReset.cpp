@@ -149,14 +149,14 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, CancellableScope& s
 
         //Press left to go to last (most recent) Pokemon
         env.log("Opening summary of most recent Pokemon.");
-        pbf_move_joystick(context, 0, 128, 100ms, 100ms);
+        pbf_move_joystick(context, {-1, 0}, 100ms, 100ms);
         context.wait_for_all_requests();
 
         //View summary - it takes a moment to load
         env.log("Viewing summary.");
         pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
-        pbf_move_joystick(context, 128, 255, 100ms, 100ms);
-        pbf_move_joystick(context, 128, 255, 100ms, 100ms);
+        pbf_move_joystick(context, {0, -1}, 100ms, 100ms);
+        pbf_move_joystick(context, {0, -1}, 100ms, 100ms);
         pbf_press_button(context, BUTTON_A, 200ms, 100ms);
         context.wait_for_all_requests();
 
