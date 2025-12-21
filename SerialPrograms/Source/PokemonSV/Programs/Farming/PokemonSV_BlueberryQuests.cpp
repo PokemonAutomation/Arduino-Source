@@ -631,8 +631,10 @@ void quest_travel_500(const ProgramInfo& info, VideoStream& stream, ProControlle
     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
     for(int j = 0; j < 60; j++){ //One min just to be safe.
-        pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE,
-            128, 0, 255, 128, TICKS_PER_SECOND);
+        pbf_controller_state(
+            context, BUTTON_LCLICK, DPAD_NONE,
+            {0, +1}, {+1, 0}, 1000ms
+        );
     }
     context.wait_for_all_requests();
 

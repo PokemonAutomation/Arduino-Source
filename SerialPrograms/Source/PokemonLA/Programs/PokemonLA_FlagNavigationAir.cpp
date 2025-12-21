@@ -195,11 +195,11 @@ FlagNavigationAir::FlagNavigationAir(
             double shift = 0;
             double distance, flag_x, flag_y;
             if (m_flag.get(distance, flag_x, flag_y)){
-                shift = (flag_x - 0.5) * 320;
-                shift = std::max(shift, -32.);
-                shift = std::min(shift, 32.);
+                shift = (flag_x - 0.5) * 2.5;
+                shift = std::max(shift, -1/4.);
+                shift = std::min(shift, 1/4.);
             }
-            pbf_controller_state(context, BUTTON_B, DPAD_NONE, (int8_t)(128 + shift), 128, 128, 128, 255);
+            pbf_controller_state(context, BUTTON_B, DPAD_NONE, {shift, 0}, {0, 0}, 2000ms);
         });
         return false;
     };
@@ -237,11 +237,11 @@ FlagNavigationAir::FlagNavigationAir(
             double shift = 0;
             double distance, flag_x, flag_y;
             if (m_flag.get(distance, flag_x, flag_y)){
-                shift = (flag_x - 0.5) * 640;
-                shift = std::max(shift, -32.);
-                shift = std::min(shift, 32.);
+                shift = (flag_x - 0.5) * 5;
+                shift = std::max(shift, -1/4.);
+                shift = std::min(shift, 1/4.);
             }
-            pbf_controller_state(context, BUTTON_Y, DPAD_NONE, (int8_t)(128 + shift), 128, 128, 128, 125);
+            pbf_controller_state(context, BUTTON_Y, DPAD_NONE, {shift, 0}, {0, 0}, 1000ms);
         });
         return false;
     };

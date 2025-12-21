@@ -100,7 +100,7 @@ bool BeldumHunter::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [&](ProControllerContext& context) {
-                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 100);
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 800ms);
                 pbf_wait(context, 5000ms);
             },
             { {entered} }
@@ -123,20 +123,20 @@ bool BeldumHunter::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
             [&](ProControllerContext& context) {
 
                 env.log("Go straight toward the elevator.");
-                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 460);
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 3680ms);
 
                 env.log("Go left to where the Noivern spawns, then forward and then left.");
-                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, 300);
-                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 80);
-                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, 180);
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, {-1, 0}, {0, 0}, 2400ms);
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 640ms);
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, {-1, 0}, {0, 0}, 1440ms);
 
                 env.log("Through the Houndoom room and down the hallway.");
-                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 255, 128, 128, 140);
-                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, 200);
-                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 340);
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, -1}, {0, 0}, 1120ms);
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, {-1, 0}, {0, 0}, 1600ms);
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 2720ms);
 
                 env.log("Final hallway to Beldum room.");
-                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, 400);
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, {-1, 0}, {0, 0}, 3200ms);
                 pbf_press_button(context, BUTTON_L, 40ms, 40ms);
                 context.wait_for_all_requests();
             },

@@ -317,10 +317,10 @@ bool move_then_recover_sandwich_hand_position(
         
         move_session.dispatch([&](ProControllerContext& context){
             // move to bottom right corner, while holding A
-            pbf_controller_state(context, BUTTON_A, DPAD_NONE, 255, 255, 128, 128, num_ticks_to_move_1);
+            pbf_controller_state(context, BUTTON_A, DPAD_NONE, {+1, -1}, {0, 0}, num_ticks_to_move_1 * 8ms);
 
             // move to left slightly, while holding A
-            pbf_controller_state(context, BUTTON_A, DPAD_NONE, 0, 128, 128, 128, num_ticks_to_move_2);
+            pbf_controller_state(context, BUTTON_A, DPAD_NONE, {-1, 0}, {0, 0}, num_ticks_to_move_2 * 8ms);
 
             // keep holding A. 
             pbf_press_button(context, BUTTON_A, num_ticks_to_hold_A, 0);
@@ -420,7 +420,7 @@ HandMoveData move_sandwich_hand_and_check_if_plates_empty(
     
     if (pressing_A){
         move_session.dispatch([](ProControllerContext& context){
-            pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 128, 128, 128, 3000);
+            pbf_press_button(context, BUTTON_A, 24000ms, 0ms);
         });
     }
 
