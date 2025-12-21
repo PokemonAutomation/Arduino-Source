@@ -135,12 +135,11 @@ void OverworldTargetTracker::populate_targets(
 bool OverworldTargetTracker::save_target(std::multimap<double, OverworldTarget>::iterator target){
 #if 1
     m_logger.log(
-        std::string("Best Target: ") +
-        (target->second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question") +
-        " at [" +
-        tostr_default(target->second.delta_x) + " , " +
-        tostr_default(-target->second.delta_y) + "], alpha = " +
-        tostr_default(target->first),
+        std::format("Best Target: {} at [{}, {}], alpha = {}",
+            (target->second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question"),
+            target->second.delta_x,
+            -target->second.delta_y,
+            target->first),
         COLOR_ORANGE
     );
 #endif

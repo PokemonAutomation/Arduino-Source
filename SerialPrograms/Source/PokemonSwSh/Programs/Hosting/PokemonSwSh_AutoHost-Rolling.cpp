@@ -176,7 +176,7 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, ProController
     }
 
     for (uint32_t raids = 0;; raids++){
-        env.log("Raids Attempted: " + tostr_u_commas(raids));
+        env.log(std::format("Raids Attempted: {:L}", raids));
         env.update_stats();
 
         run_autohost(

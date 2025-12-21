@@ -22,33 +22,6 @@ std::string tostr_padded(size_t digits, uint64_t x){
     }
     return std::string(digits - str.size(), '0') + str;
 }
-std::string tostr_u_commas(int64_t x){
-    //  Prints out x with comma separators.
-
-    std::string str = std::to_string(x);
-    std::string out;
-
-    const char* ptr = str.c_str();
-    // len: how many digits, don't count "-" in the negative numbers
-    size_t len = str.size() - (x < 0);
-
-    size_t commas = (len + 2) / 3 - 1;
-    size_t shift = len - commas * 3 + (x < 0);
-
-    while (true){
-        char ch = *ptr++;
-        if (ch == '\0')
-            break;
-        if (shift == 0){
-            out += ',';
-            shift = 3;
-        }
-        out += ch;
-        shift--;
-    }
-
-    return out;
-}
 
 
 inline std::string byte_prefix(size_t index){
@@ -164,22 +137,6 @@ std::string tostr_bytes(uint64_t bytes){
     return tostr_ui_bytes(bytes);
 }
 
-
-
-std::string tostr_default(double x){
-    std::ostringstream ss;
-    ss << x;
-    return ss.str();
-}
-std::string tostr_fixed(double x, int precision){
-    std::ostringstream out;
-    out << std::setprecision(precision);
-    out << std::fixed;
-    out << x;
-    return out.str();
-}
-
-
 std::string now_to_filestring(){
 #if _WIN32 && _MSC_VER
 #pragma warning(disable:4996)
@@ -244,30 +201,21 @@ std::string duration_to_string(std::chrono::milliseconds milliseconds){
 
     uint64_t ticks = milliseconds.count();
 
-    std::string str;
     if (ticks < MINUTE * 2){
-        str += tostr_fixed((double)ticks / SECOND, 3);
-        str += " seconds";
+        return std::format("{:.3f} seconds", (double)ticks / SECOND);
     }else if (ticks < HOUR * 2){
-        str += tostr_fixed((double)ticks / MINUTE, 3);
-        str += " minutes";
+        return std::format("{:.3f} minutes", (double)ticks / MINUTE);
     }else if (ticks < DAY * 2){
-        str += tostr_fixed((double)ticks / HOUR, 3);
-        str += " hours";
+        return std::format("{:.3f} hours", (double)ticks / HOUR);
     }else if (ticks < WEEK * 2){
-        str += tostr_fixed((double)ticks / DAY, 3);
-        str += " days";
+        return std::format("{:.3f} days", (double)ticks / DAY);
     }else if (ticks < YEARS * 2){
-        str += tostr_fixed((double)ticks / WEEK, 3);
-        str += " weeks";
+        return std::format("{:.3f} weeks", (double)ticks / WEEK);
     }else if (ticks < MILLION_YEARS){
-        str += tostr_fixed((double)ticks / YEARS, 3);
-        str += " years";
+        return std::format("{:.3f} years", (double)ticks / YEARS);
     }else{
-        str += tostr_fixed((double)ticks / MILLION_YEARS, 3);
-        str += " million years";
+        return std::format("{:.3f} million years", (double)ticks / MILLION_YEARS);
     }
-    return str;
 }
 
 

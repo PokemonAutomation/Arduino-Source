@@ -69,9 +69,7 @@ std::string StatsTracker::to_str(PrintMode mode) const{
         if (!str.empty()){
             str += " - ";
         }
-        str += stat.label;
-        str += ": ";
-        str += tostr_u_commas(count);
+        str += std::format("{}: {:L}", stat.label, count);
     }
     return str;
 }

@@ -66,7 +66,7 @@ void LotoFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     uint8_t year = MAX_YEAR;
     for (uint32_t c = 0; c < SKIPS; c++){
-        env.log("Fetch Attempts: " + tostr_u_commas(c));
+        env.log(std::format("Fetch Attempts: {:L}", c));
         home_roll_date_enter_game_autorollback(env.console, context, year);
         if (context->performance_class() == ControllerPerformanceClass::SysbotBase){
             pbf_wait(context, 90);

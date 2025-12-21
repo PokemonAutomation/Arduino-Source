@@ -83,7 +83,7 @@ void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env,
     uint32_t encounter = 0;
     while (true){
         for (uint8_t pp = REVERSAL_PP; pp > 0; pp--){
-            env.log("Starting Regigigas Encounter: " + tostr_u_commas(++encounter));
+            env.log(std::format("Starting Regigigas Encounter: {:L}", ++encounter));
 
             pbf_press_button(context, BUTTON_A, 10, 3 * TICKS_PER_SECOND);
             pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);

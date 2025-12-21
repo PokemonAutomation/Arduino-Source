@@ -120,11 +120,13 @@ std::string JoyconState::to_cpp(Milliseconds hold, Milliseconds release) const{
     std::string release_str = std::to_string(release.count()) + "ms";
 
     if (non_neutral_fields > 1){
-        std::string ret;
-        ret += "pbf_controller_state(context, "
-            + button_to_code_string(buttons) + ", "
-            + tostr_fixed(joystick.x, 3) + ", " + tostr_fixed(joystick.y, 3) + ", "
-            + hold_str +");\n";
+        std::string ret = std::format(
+            "pbf_controller_state(context, {}, {:.3f}, {:.3f}, {});\n",
+            button_to_code_string(buttons),
+            joystick.x,
+            joystick.y,
+            hold_str
+        );
         if (release != Milliseconds(0)){
             ret += "pbf_wait(context, " + release_str + ");\n";
         }
@@ -132,13 +134,11 @@ std::string JoyconState::to_cpp(Milliseconds hold, Milliseconds release) const{
     }
     switch (non_neutral_field){
     case 0:
-        return "pbf_press_button(context, "
-            + button_to_code_string(buttons) + ", "
-            + hold_str + ", " + release_str + ");\n";
+        return std::format("pbf_press_button(context, {}, {}, {});\n",
+            button_to_code_string(buttons), hold_str, release_str);
     case 1:
-        return "pbf_move_joystick(context, "
-            + tostr_fixed(joystick.x, 3) + ", " + tostr_fixed(joystick.y, 3) + ", "
-            + hold_str + ", " + release_str + ");\n";
+        return std::format("pbf_move_joystick(context, {:.3f}, {:.3f}, {}, {});\n",
+            joystick.x, joystick.y, hold_str, release_str);
     }
     throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Impossible state.");
 }

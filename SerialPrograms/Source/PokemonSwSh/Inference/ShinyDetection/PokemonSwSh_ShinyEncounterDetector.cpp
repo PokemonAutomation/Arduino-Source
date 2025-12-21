@@ -103,9 +103,10 @@ ShinyType determine_shiny_status(
     double best_square = sparkles.best_square();
 
     logger.log(
-        "ShinyDetector: Overall Alpha = " + tostr_default(alpha) +
-        ", Star Alpha = " + tostr_default(best_star) +
-        ", Square Alpha = " + tostr_default(best_square),
+        std::format("ShinyDetector: Overall Alpha = {}, Star Alpha = {}, Square Alpha = {}",
+            alpha,
+            best_star,
+            best_square),
         COLOR_PURPLE
     );
 

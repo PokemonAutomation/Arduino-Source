@@ -76,7 +76,7 @@ public:
         m_source->start(this);
         WallClock end = current_time();
         double seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.;
-        logger.log("Done starting audio... " + tostr_fixed(seconds, 3) + " seconds", COLOR_CYAN);
+        logger.log(std::format("Done starting audio... {:.3f} seconds", seconds), COLOR_CYAN);
     }
     ~AudioInputDevice(){
         if (m_source){

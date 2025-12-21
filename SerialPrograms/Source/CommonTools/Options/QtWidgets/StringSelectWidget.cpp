@@ -77,7 +77,7 @@ void StringSelectCellWidget::load_options(){
 //    cout << "load_options()" << endl;
     const std::vector<StringSelectEntry>& cases = m_value.database().case_list();
     if (this->count() <= 1){
-        global_logger_tagged().log("Loading dropdown with " + tostr_u_commas(cases.size()) + " elements.");
+        global_logger_tagged().log(std::format("Loading dropdown with {:L} elements.", cases.size()));
         this->clear();
         for (const StringSelectEntry& item : cases){
             QPixmap pixmap = QPixmap::fromImage(item.icon.to_QImage_ref());

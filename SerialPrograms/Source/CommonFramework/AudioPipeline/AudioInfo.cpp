@@ -370,7 +370,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
 
     WallClock end = current_time();
     double seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.;
-    global_logger_tagged().log("Done querying audio inputs... " + tostr_fixed(seconds, 3) + " seconds", COLOR_CYAN);
+    global_logger_tagged().log(std::format("Done querying audio inputs... {:.3f} seconds", seconds), COLOR_CYAN);
 
     bool show_all_devices = GlobalSettings::instance().AUDIO_PIPELINE->SHOW_ALL_DEVICES;
     if (show_all_devices){

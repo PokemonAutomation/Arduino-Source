@@ -10,6 +10,7 @@
 #include <optional>
 #include <sstream>
 #include <algorithm>
+#include <format>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -148,12 +149,10 @@ void print_boxes_data(const std::vector<std::optional<CollectedPokemonInfo>>& bo
 
 std::string create_overlay_info(const CollectedPokemonInfo& pokemon, const BoxDexNumberDetector& dex_number_detector){
     const std::string& display_name = get_pokemon_name(pokemon.name_slug).display_name();
-    
+
     std::string overlay_log = dex_number_detector.dex_type() == DexType::HYPERSPACE ? "H" : "L";
-    
-    char dex_str[6];
-    snprintf(dex_str, sizeof(dex_str), "%03d", dex_number_detector.dex_number());
-    overlay_log += std::string(dex_str) + " " + display_name;
+
+    overlay_log += std::format("{:03} {}", dex_number_detector.dex_number(), display_name);
     if(pokemon.gender == StatsHuntGenderFilter::Male){
         overlay_log += " " + UNICODE_MALE;
     } else if (pokemon.gender == StatsHuntGenderFilter::Female){

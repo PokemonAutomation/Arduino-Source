@@ -90,7 +90,7 @@ void SurfItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     uint32_t c = 0;
 
     while (c < ATTEMPTS){
-        env.log("Current Attempts: " + tostr_u_commas(c));
+        env.log(std::format("Current Attempts: {:L}", c));
 
         //Initiate Shield Surf
         ssf_press_button(context, BUTTON_ZL, 0ms, 640ms);

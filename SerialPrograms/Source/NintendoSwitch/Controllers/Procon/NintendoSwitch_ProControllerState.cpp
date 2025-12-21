@@ -164,13 +164,13 @@ std::string ProControllerState::to_cpp(Milliseconds hold, Milliseconds release) 
     std::string release_str = std::to_string(release.count()) + "ms";
 
     if (non_neutral_fields > 1){
-        std::string ret;
-        ret += "pbf_controller_state(context, "
-            + button_to_code_string(buttons) + ", "
-            + dpad_to_code_string(dpad) + ", {"
-            + tostr_fixed(left_joystick.x, 3) + ", " + tostr_fixed(left_joystick.y, 3) + "}, {"
-            + tostr_fixed(right_joystick.x, 3) + ", " + tostr_fixed(right_joystick.y, 3) + "}, "
-            + hold_str +");\n";
+        std::string ret = std::format(
+            "pbf_controller_state(context, {}, {}, {{{:.3f}, {:.3f}}}, {{{:.3f}, {:.3f}}}, {});\n",
+            button_to_code_string(buttons),
+            dpad_to_code_string(dpad),
+            left_joystick.x, left_joystick.y,
+            right_joystick.x, right_joystick.y,
+            hold_str);
         if (release != Milliseconds(0)){
             ret += "pbf_wait(context, " + release_str + ");\n";
         }

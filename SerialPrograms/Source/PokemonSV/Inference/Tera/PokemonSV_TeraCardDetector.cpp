@@ -247,22 +247,13 @@ std::set<std::string> TeraCardReader::pokemon_slug(
 
 
 
-std::string TeraLobbyNameMatchResult::to_str() const{
-    std::string ret;
-    ret += "\"" + raw_ocr;
-    if (ret.back() == '\n'){
-        ret.pop_back();
-    }
-//    ret += "\" -> \"" + normalized_ocr + "\" == \"";
-    ret += "\" -> \"";
-    ret += entry.name;
-    ret += "\" (";
-    if (exact_match){
-        ret += "exact match, ";
-    }else{
-        ret += "partial match, ";
-    }
-    ret += "log10p = " + tostr_default(log10p) + ")";
+std::string TeraLobbyNameMatchResult::to_str() const {
+    std::string ret = std::format("\"{}\"", raw_ocr.ends_with('\n') ? raw_ocr.substr(0, raw_ocr.size() - 1) : raw_ocr);
+    ret += std::format(" -> \"{}\" ({} match, log10p = {})",
+        entry.name,
+        exact_match ? "exact" : "partial",
+        log10p
+    );
     return ret;
 }
 

@@ -115,13 +115,13 @@ void send_encounter_notification(
             shinies = "Maybe Shiny";
             break;
         case ShinyType::UNKNOWN_SHINY:
-            shinies = symbol + std::string(" Shiny ") + symbol;
+            shinies = std::format("{} Shiny {}", symbol, symbol);
             break;
         case ShinyType::STAR_SHINY:
-            shinies = symbol + std::string(" Star Shiny ") + symbol;
+            shinies = std::format("{} Star Shiny {}", symbol, symbol);
             break;
         case ShinyType::SQUARE_SHINY:
-            shinies = symbol + std::string(" Square Shiny ") + symbol;
+            shinies = std::format("{} Square Shiny {}", symbol, symbol);
             break;
         }
     }else if (!results.empty()){
@@ -130,16 +130,16 @@ void send_encounter_notification(
         case 0:
             if (shiny_detected){
                 symbol = shiny_symbol(ShinyType::UNKNOWN_SHINY);
-                shinies = symbol + " Found Shiny! " + symbol + " (Unable to determine which.)";
+                shinies = std::format("{} Found Shiny! {} (Unable to determine which.)", symbol, symbol);
             }else{
                 shinies = "No Shinies";
             }
             break;
         case 1:
-            shinies = symbol + " Found Shiny! " + symbol;
+            shinies = std::format("{} Found Shiny! {}", symbol, symbol);
             break;
         default:
-            shinies += symbol + std::string(" Multiple Shinies! ") + symbol;
+            shinies += std::format("{} Multiple Shinies! {}", symbol, symbol);
             break;
         }
     }
@@ -150,7 +150,7 @@ void send_encounter_notification(
     }
     if (!shinies.empty()){
         if (!std::isnan(alpha)){
-            shinies += "\n(Detection Alpha = " + tostr_default(alpha) + ")";
+            shinies += std::format("\n(Detection Alpha = {})", alpha);
         }
         embeds.emplace_back("Shininess:", std::move(shinies));
     }

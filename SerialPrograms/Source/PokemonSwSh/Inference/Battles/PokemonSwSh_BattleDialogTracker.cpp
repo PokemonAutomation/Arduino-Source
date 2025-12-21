@@ -50,8 +50,7 @@ bool EncounterDialogTracker::process_frame(const ImageViewRGB32& screen, WallClo
 
     std::chrono::milliseconds gap_duration = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - m_end_dialog);
     m_logger.log(
-        "DialogTracker: Dialog off -> on. " +
-        tostr_default(gap_duration.count() / 1000.) + " seconds",
+        std::format("DialogTracker: Dialog off -> on. {} seconds", gap_duration.count() / 1000.0),
         COLOR_PURPLE
     );
 
@@ -83,8 +82,7 @@ bool EncounterDialogTracker::process_frame(const ImageViewRGB32& screen, WallClo
 void EncounterDialogTracker::push_end(WallClock timestamp){
     std::chrono::milliseconds gap_duration = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - m_end_dialog);
     m_logger.log(
-        "DialogTracker: End " +
-        tostr_default(gap_duration.count() / 1000.) + " seconds",
+        std::format("DialogTracker: End {} seconds", gap_duration.count() / 1000.0),
         COLOR_PURPLE
     );
     EncounterState state = m_state.load(std::memory_order_relaxed);

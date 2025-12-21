@@ -93,7 +93,7 @@ void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, ProController
     uint32_t ITEMS_PER_ATTEMPT = IS_ZONAI_DEVICE ? 10 : 5;
     uint32_t c = 0;
     while (c < AMOUNT){
-        env.log("Current Amount: " + tostr_u_commas(c));
+        env.log(std::format("Current Amount: {:L}", c));
 
         // Open menu
         pbf_press_button(context, BUTTON_PLUS, 20, 100);
