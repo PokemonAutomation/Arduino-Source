@@ -43,6 +43,8 @@
 
 int test_pokemonLZA_MapDetector(const ImageViewRGB32& image, bool target);
 
+int test_pokemonLZA_HyperspaceCalorieDetector(const ImageViewRGB32& image, int expected_calorie);
+
  }
 
  #endif

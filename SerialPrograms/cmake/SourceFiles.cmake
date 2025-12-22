@@ -1617,6 +1617,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_HyperspaceRewardNameReader.cpp
     Source/PokemonLZA/Inference/PokemonLZA_HyperspaceRewardNameReader.h
+    Source/PokemonLZA/Inference/PokemonLZA_HyperspaceCalorieDetector.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_HyperspaceCalorieDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.cpp

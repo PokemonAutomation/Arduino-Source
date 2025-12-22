@@ -11,6 +11,7 @@
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_HyperspaceCalorieDetector.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h"
 #include "PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.h"
@@ -594,6 +595,37 @@ int test_pokemonLZA_MapDetector(const ImageViewRGB32& image, bool target){
     MapDetector detector(COLOR_RED, &overlay);
     bool result = detector.detect(image);
     TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
+int test_pokemonLZA_HyperspaceCalorieDetector(const ImageViewRGB32& image, int expected_calorie){
+    // Expected filename format: <...>_<calorie_number>.png
+    // Where calorie_number is an integer in range [1, 9999]
+    // Examples:
+    //   calorie_100.png -> 100 calories
+    //   calorie_1500.png -> 1500 calories
+    //   calorie_9999.png -> 9999 calories
+
+    if (expected_calorie <= 0 || expected_calorie > 9999){
+        cerr << "Error: expected calorie must be in range [1, 9999], got " << expected_calorie << "." << endl;
+        return 1;
+    }
+
+    // Run detector
+    HyperspaceCalorieDetector detector(global_logger_command_line());
+    bool detected = detector.detect(image);
+
+    if (!detected){
+        cerr << "Error: detector failed to detect calorie number in image." << endl;
+        return 1;
+    }
+
+    uint16_t detected_calorie = detector.calorie_number();
+
+    cout << "Expected calorie: " << expected_calorie << ", Detected calorie: " << detected_calorie << endl;
+
+    TEST_RESULT_EQUAL((int)detected_calorie, expected_calorie);
+
     return 0;
 }
 
