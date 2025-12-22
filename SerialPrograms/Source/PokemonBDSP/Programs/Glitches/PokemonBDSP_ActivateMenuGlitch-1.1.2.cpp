@@ -173,9 +173,9 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProCont
     pbf_move_left_joystick(context, 128, 255, 125, 125);
 
     //  Move cursor back to default location for "Pokemon".
-    pbf_move_right_joystick(context, 128, 0, 20, 20);
-    pbf_move_right_joystick(context, 0, 128, 20, 20);
-    pbf_move_right_joystick(context, 0, 128, 20, 20);
+    pbf_move_right_joystick(context, {0, +1}, 160ms, 160ms);
+    pbf_move_right_joystick(context, 0, 128, 160ms, 160ms);
+    pbf_move_right_joystick(context, 0, 128, 160ms, 160ms);
 }
 
 

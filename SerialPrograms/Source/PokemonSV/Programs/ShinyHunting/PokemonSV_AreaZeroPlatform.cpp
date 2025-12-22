@@ -466,7 +466,7 @@ void area_zero_platform_run_path2(
     use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](ProControllerContext& context){
 
         stream.log("Find the sky, turn around and fire.");
-        pbf_move_right_joystick(context, 128, 0, 60, 0);
+        pbf_move_right_joystick(context, {0, +1}, 480ms, 0ms);
         find_and_center_on_sky(env, stream, context);
         context.wait_for(std::chrono::seconds(1));
         pbf_move_left_joystick(context, 128, 255, 40, 85);

@@ -68,7 +68,7 @@ void TurnClockwiseSlow(ProControllerContext& context){ // One turn of stirring p
     pbf_move_right_joystick(context, 6, 167, 40ms, 0ms);
     pbf_move_right_joystick(context, 6, 88, 40ms, 0ms);
     pbf_move_right_joystick(context, 53, 24, 40ms, 0ms);
-    pbf_move_right_joystick(context, 128, 0, 40ms, 0ms);
+    pbf_move_right_joystick(context, {0, +1}, 40ms, 0ms);
     pbf_move_right_joystick(context, 202, 24, 40ms, 0ms);
     pbf_move_right_joystick(context, 249, 88, 40ms, 0ms);
     pbf_move_right_joystick(context, 249, 167, 40ms, 0ms);
@@ -80,7 +80,7 @@ void TurnClockwiseFast(ProControllerContext& context){ // Same as above, but fas
     pbf_move_right_joystick(context, 38, 218, 40ms, 0ms);
     pbf_move_right_joystick(context, 0, 128, 40ms, 0ms);
     pbf_move_right_joystick(context, 38, 38, 40ms, 0ms);
-    pbf_move_right_joystick(context, 128, 0, 40ms, 0ms);
+    pbf_move_right_joystick(context, {0, +1}, 40ms, 0ms);
     pbf_move_right_joystick(context, 218, 38, 40ms, 0ms);
     pbf_move_right_joystick(context, 255, 128, 40ms, 0ms);
     pbf_move_right_joystick(context, 218, 218, 40ms, 0ms);
@@ -93,7 +93,7 @@ void TurnCounterClockwiseSlow(ProControllerContext& context){ // One turn of sti
     pbf_move_right_joystick(context, 249, 167, 40ms, 0ms);
     pbf_move_right_joystick(context, 249, 88, 40ms, 0ms);
     pbf_move_right_joystick(context, 202, 24, 40ms, 0ms);
-    pbf_move_right_joystick(context, 128, 0, 40ms, 0ms);
+    pbf_move_right_joystick(context, {0, +1}, 40ms, 0ms);
     pbf_move_right_joystick(context, 53, 24, 40ms, 0ms);
     pbf_move_right_joystick(context, 6, 88, 40ms, 0ms);
     pbf_move_right_joystick(context, 6, 167, 40ms, 0ms);
@@ -105,7 +105,7 @@ void TurnCounterClockwiseFast(ProControllerContext& context){ // Same as above, 
     pbf_move_right_joystick(context, 218, 218, 40ms, 0ms);
     pbf_move_right_joystick(context, 255, 128, 40ms, 0ms);
     pbf_move_right_joystick(context, 218, 38, 40ms, 0ms);
-    pbf_move_right_joystick(context, 128, 0, 40ms, 0ms);
+    pbf_move_right_joystick(context, {0, +1}, 40ms, 0ms);
     pbf_move_right_joystick(context, 38, 38, 40ms, 0ms);
     pbf_move_right_joystick(context, 0, 128, 40ms, 0ms);
     pbf_move_right_joystick(context, 38, 218, 40ms, 0ms);

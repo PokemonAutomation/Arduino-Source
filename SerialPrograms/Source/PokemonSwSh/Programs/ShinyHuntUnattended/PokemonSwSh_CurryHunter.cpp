@@ -139,7 +139,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
             pbf_move_right_joystick(context, 249, 167, 40ms, 0ms);
             pbf_move_right_joystick(context, 249, 88, 40ms, 0ms);
             pbf_move_right_joystick(context, 202, 24, 40ms, 0ms);
-            pbf_move_right_joystick(context, 128, 0, 40ms, 0ms);
+            pbf_move_right_joystick(context, {0, +1}, 40ms, 0ms);
             pbf_move_right_joystick(context, 53, 24, 40ms, 0ms);
             pbf_move_right_joystick(context, 6, 88, 40ms, 0ms);
             pbf_move_right_joystick(context, 6, 167, 40ms, 0ms);

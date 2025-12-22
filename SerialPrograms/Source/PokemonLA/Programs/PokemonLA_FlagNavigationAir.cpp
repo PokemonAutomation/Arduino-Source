@@ -60,7 +60,7 @@ FlagNavigationAir::FlagNavigationAir(
             pbf_move_right_joystick(context, turn, 128, 3200ms, 0ms);
             pbf_move_right_joystick(context, {0, -1}, 960ms, 0ms);
             pbf_move_right_joystick(context, turn, 128, 3200ms, 0ms);
-            pbf_move_right_joystick(context, 128, 0, 1600ms, 0ms);
+            pbf_move_right_joystick(context, {0, +1}, 1600ms, 0ms);
             pbf_move_right_joystick(context, turn, 128, 3200ms, 0ms);
         }
         context.wait_for_all_requests();

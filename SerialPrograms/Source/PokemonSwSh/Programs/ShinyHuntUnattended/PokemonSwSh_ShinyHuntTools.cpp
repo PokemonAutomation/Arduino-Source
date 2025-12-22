@@ -45,7 +45,7 @@ void close_game_if_overworld(
     //  Move the cursor as far away from Link Trade and Surprise Trade as possible.
     //  This is added safety in case connect to internet takes too long.
     pbf_press_dpad(context, DPAD_UP, 5, 0);
-    pbf_move_right_joystick(context, 128, 0, 40ms, 0ms);
+    pbf_move_right_joystick(context, {0, +1}, 40ms, 0ms);
     pbf_press_dpad(context, DPAD_RIGHT, 5, 0);
 
     //  Connect to internet.

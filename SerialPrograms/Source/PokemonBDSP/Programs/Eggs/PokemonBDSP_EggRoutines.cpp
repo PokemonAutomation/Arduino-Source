@@ -51,7 +51,7 @@ void pickup_column(ProControllerContext& context){
 }
 void party_to_column(ProControllerContext& context, uint8_t column){
     const Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
-    pbf_move_right_joystick(context, 128, 0, 160ms, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(context, {0, +1}, 160ms, BOX_SCROLL_DELAY);
     if (column < 3){
         for (uint8_t c = 0; c <= column; c++){
             pbf_move_right_joystick(context, 255, 128, 160ms, BOX_SCROLL_DELAY);
