@@ -1497,7 +1497,7 @@ void move_player_forward(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 if (!use_lets_go){
                     // pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
-                    ssf_press_left_joystick(context, 128, 0, 0, 100, 0);
+                    ssf_press_left_joystick(context, 128, 0, 0ms, 800ms, 0ms);
 
                     if (mash_A){ // mashing A and Let's go aren't compatible. you end up talking to your Let's go pokemon if you mash A.
                         pbf_mash_button(context, BUTTON_A, forward_ticks);

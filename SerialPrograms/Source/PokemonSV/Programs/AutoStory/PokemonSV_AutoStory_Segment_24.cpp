@@ -126,7 +126,7 @@ void checkpoint_55(
 
             direction.change_direction(env.program_info(), env.console, context, 2.565);
             // run at Orthworm. run into its second position as well.
-            pbf_move_left_joystick(context, 128, 0, 50, 0);
+            pbf_move_left_joystick(context, 128, 0, 400ms, 0ms);
             pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, {0, +1}, {0, 0}, 4000ms);
             pbf_move_left_joystick(context, 255, 0, 300, 500);
 

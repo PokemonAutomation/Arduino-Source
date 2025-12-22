@@ -88,7 +88,7 @@ void trigger_map_overlap(VideoStream& stream, ProControllerContext& context){
     for (size_t c = 0; c < 10; c++){
         trigger_menu(stream, context);
 
-        pbf_press_dpad(context, DPAD_UP, 50, 0);
+        pbf_press_dpad(context, DPAD_UP, 400ms, 0ms);
         context.wait_for_all_requests();
         BlackScreenWatcher detector;
         int ret = wait_until(

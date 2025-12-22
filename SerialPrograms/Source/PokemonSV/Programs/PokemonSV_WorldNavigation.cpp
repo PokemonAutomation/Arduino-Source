@@ -572,7 +572,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, VideoStream& stre
     stream.log("No PokeCenter icon overlapping with the player character on the max warpable level");
     stream.overlay().add_log("No overlapping PokeCenter");
     // press B to close the destination menu item
-    pbf_press_button(context, BUTTON_B, 60, 100);
+    pbf_press_button(context, BUTTON_B, 480ms, 800ms);
 
 
     // Part 3: Tries to detect a pokecenter that is further away from the player, while at max warpable level

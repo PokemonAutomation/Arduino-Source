@@ -58,14 +58,14 @@ FriendDelete::FriendDelete()
     PA_ADD_OPTION(FINISH_DELETE_DELAY0);
 }
 void FriendDelete::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    pbf_press_button(context, BUTTON_A, 10, 20);
+    pbf_press_button(context, BUTTON_A, 80ms, 160ms);
 
     for (uint16_t c = 0; c < FRIENDS_TO_DELETE; c++){
         pbf_press_button(context, BUTTON_A, 40ms, VIEW_FRIEND_DELAY0);      //  View friend
-        pbf_press_dpad(context, DPAD_DOWN, 10, 20);
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 160ms);
         pbf_press_button(context, BUTTON_A, 10, 90);                        //  Click on Options
         if (BLOCK_FRIENDS){
-            pbf_press_dpad(context, DPAD_DOWN, 10, 20);
+            pbf_press_dpad(context, DPAD_DOWN, 80ms, 160ms);
         }
         pbf_press_button(context, BUTTON_A, 10, 90);                        //  Click on Remove/Block Friend
         if (BLOCK_FRIENDS){

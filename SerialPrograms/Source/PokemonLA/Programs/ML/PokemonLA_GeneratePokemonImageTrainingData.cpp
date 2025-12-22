@@ -190,7 +190,7 @@ void GeneratePokemonImageTrainingData::select_starting_location(SingleSwitchProg
         break;
     case StartingLocation::HIGHLANDS_MOUNTAIN:
         env.log("Starting at Highlands - Mountain Camp");
-        pbf_move_left_joystick(context, 0, 15, 100, 10);
+        pbf_move_left_joystick(context, 0, 15, 800ms, 80ms);
         break;
     case StartingLocation::HIGHLANDS_SUMMIT:
         env.log("Starting at Highlands - Summit Camp");

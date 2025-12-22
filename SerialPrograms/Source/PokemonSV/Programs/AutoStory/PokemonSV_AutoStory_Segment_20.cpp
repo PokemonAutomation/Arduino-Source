@@ -259,7 +259,7 @@ void checkpoint_44(
         pbf_move_left_joystick(context, 0, 0, 500, 100);
 
         direction.change_direction(env.program_info(), env.console, context, 5.85);
-        pbf_move_left_joystick(context, 128, 0, 60, 100);
+        pbf_move_left_joystick(context, 128, 0, 480ms, 800ms);
         handle_failed_action(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 500);
@@ -361,7 +361,7 @@ void checkpoint_44(
         // align to corner 7.5. bush
         direction.change_direction(env.program_info(), env.console, context, 3.11);
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 1200ms);
-        pbf_move_left_joystick(context, 128, 0, 60, 100);
+        pbf_move_left_joystick(context, 128, 0, 480ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 4.28);
         pbf_move_left_joystick(context, {0, +1}, 1600ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 3.60);

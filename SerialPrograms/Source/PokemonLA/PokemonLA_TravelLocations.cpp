@@ -112,7 +112,7 @@ TravelLocations::TravelLocations()
         "Cobalt Coastlands - Molten Arena (NW of Volcano)",
         MapRegion::COASTLANDS, 0, 2, [](VideoStream& stream, ProControllerContext& context){
             change_mount(stream, context, MountState::BRAVIARY_ON);
-            pbf_move_left_joystick(context, 160, 0, 160, 0);
+            pbf_move_left_joystick(context, 160, 0, 1280ms, 0ms);
             pbf_mash_button(context, BUTTON_B, 4000ms);
         }
     )
@@ -158,7 +158,7 @@ TravelLocations::TravelLocations()
         "Alabaster Icelands - Pearl Settlement (SW of landing spot)",
         MapRegion::ICELANDS, 0, 2, [](VideoStream& stream, ProControllerContext& context){
             change_mount(stream, context, MountState::BRAVIARY_ON);
-            pbf_move_left_joystick(context, 192, 255, 160, 0);
+            pbf_move_left_joystick(context, 192, 255, 1280ms, 0ms);
             pbf_mash_button(context, BUTTON_B, 2000ms);
         }
     )

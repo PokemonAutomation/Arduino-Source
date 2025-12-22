@@ -147,8 +147,8 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
             // Press ZR to throw sth.
             // Dispatch a new series of commands that overwrites the last ones
             session.dispatch([](ProControllerContext& context){
-                pbf_press_button(context, BUTTON_ZL | BUTTON_ZR, 30, 0);
-                pbf_press_button(context, BUTTON_ZL, 50, 0);
+                pbf_press_button(context, BUTTON_ZL | BUTTON_ZR, 240ms, 0ms);
+                pbf_press_button(context, BUTTON_ZL, 400ms, 0ms);
             });
 
             env.log("Sending command to throw pokemon to start battle");
@@ -182,7 +182,7 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
             // We focused onto a pokemon that is not the target pokemon, but there are other pokemon that can be focused.
             // Press A to change focus.
             session.dispatch([](ProControllerContext& context){
-                pbf_press_button(context, BUTTON_ZL | BUTTON_A, 30, 0);
+                pbf_press_button(context, BUTTON_ZL | BUTTON_A, 240ms, 0ms);
                 pbf_press_button(context, BUTTON_ZL, 10000, 0);
             });
 
@@ -577,7 +577,7 @@ PokemonDetails AutoMultiSpawn::go_to_spawn_point_and_try_focusing_pokemon(
     
     // Move to spawn location on Braviary
     pbf_move_left_joystick(context, 255, 165, 150, 0); // 170
-    pbf_press_button(context, BUTTON_B, 200, 10);
+    pbf_press_button(context, BUTTON_B, 1600ms, 80ms);
     pbf_mash_button(context, BUTTON_B, 1500); // 1450
 
     // Descend down from the air:
@@ -598,7 +598,7 @@ PokemonDetails AutoMultiSpawn::go_to_spawn_point_and_try_focusing_pokemon(
     pbf_wait(context, 50);
     
     // Move forward on foot
-    pbf_move_left_joystick(context, 128, 0, 160, 0);
+    pbf_move_left_joystick(context, 128, 0, 1280ms, 0ms);
 
     context.wait_for_all_requests();
 

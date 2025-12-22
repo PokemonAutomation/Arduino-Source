@@ -134,8 +134,8 @@ void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
                 }, 
                 [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                    pbf_move_left_joystick(context, 0, 0, 150, 50); // move left
-                    pbf_move_left_joystick(context, 255, 0, 150, 50);  // move right
+                    pbf_move_left_joystick(context, 0, 0, 1200ms, 400ms); // move left
+                    pbf_move_left_joystick(context, 255, 0, 1200ms, 400ms);  // move right
                 }
             );
         });
@@ -260,8 +260,8 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
                 }, 
                 [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                    pbf_move_left_joystick(context, 0, 0, 150, 50); // move left
-                    pbf_move_left_joystick(context, 255, 0, 150, 50);  // move right
+                    pbf_move_left_joystick(context, 0, 0, 1200ms, 400ms); // move left
+                    pbf_move_left_joystick(context, 255, 0, 1200ms, 400ms);  // move right
                 }
             );
         });

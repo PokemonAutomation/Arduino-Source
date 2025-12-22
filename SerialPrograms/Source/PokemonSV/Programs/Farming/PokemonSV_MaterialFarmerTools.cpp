@@ -379,11 +379,11 @@ WallClock make_sandwich_material_farm(
                 // look left
                 pbf_move_right_joystick(context, {-1, 0}, 960ms, 0ms);
                 // move toward clearing besides the pokecenter
-                pbf_move_left_joystick(context, 128, 0, 300, 0);
+                pbf_move_left_joystick(context, 128, 0, 2400ms, 0ms);
 
                 // make sandwich
                 picnic_from_overworld(env.program_info(), stream, context);
-                pbf_move_left_joystick(context, 128, 0, 100, 40);  // walk forward to picnic table
+                pbf_move_left_joystick(context, 128, 0, 800ms, 320ms);  // walk forward to picnic table
                 enter_sandwich_recipe_list(env.program_info(), stream, context);
                 make_sandwich_option(env, stream, context, options.SANDWICH_OPTIONS);
                 last_sandwich_time = current_time();
@@ -427,7 +427,7 @@ void move_to_start_position_for_letsgo0(
     // look left
     pbf_move_right_joystick(context, {-1, 0}, 960ms, 80ms);
     // move toward clearing besides the pokecenter
-    pbf_move_left_joystick(context, 128, 0, 300, 10);
+    pbf_move_left_joystick(context, 128, 0, 2400ms, 80ms);
 
     // look right, towards the start position
     pbf_move_right_joystick(context, {+1, 0}, 960ms, 80ms);
@@ -442,12 +442,12 @@ void move_to_start_position_for_letsgo0(
     // Fly 
     pbf_press_button(context, BUTTON_B, 50, 10); //  Double up this press 
     pbf_press_button(context, BUTTON_B, 50, 10);     //  in case one is dropped.
-    pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+    pbf_press_button(context, BUTTON_LCLICK, 400ms, 0ms);
     // you automatically move forward without pressing any buttons. so just wait
     pbf_wait(context, 1400);
 
     // Glide forward
-    // pbf_move_left_joystick(context, 128, 0, 2500, 10);
+    // pbf_move_left_joystick(context, 128, 0, 20000ms, 80ms);
 
     // arrived at start position. stop flying
     pbf_press_button(context, BUTTON_B, 50, 400);
@@ -481,7 +481,7 @@ void move_to_start_position_for_letsgo1(
     // look left
     pbf_move_right_joystick(context, {-1, 0}, 960ms, 80ms);
     // move toward clearing besides the pokecenter
-    pbf_move_left_joystick(context, 128, 0, 300, 10);
+    pbf_move_left_joystick(context, 128, 0, 2400ms, 80ms);
 
     // look right, towards the start position
     DirectionDetector direction;
@@ -498,7 +498,7 @@ void move_to_start_position_for_letsgo1(
     // Fly 
     pbf_press_button(context, BUTTON_B, 50, 10);
     pbf_press_button(context, BUTTON_B, 400ms, 400ms); // Double click in case of drop
-    pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+    pbf_press_button(context, BUTTON_LCLICK, 400ms, 0ms);
 
     // you automatically move forward  when flying without pressing any buttons. 
     // so, just wait.
@@ -520,7 +520,7 @@ void move_to_start_position_for_letsgo1(
     direction.change_direction(info, stream, context, 5.3);
 
     // move forward slightly
-    pbf_move_left_joystick(context, 128, 0, 50, 10);
+    pbf_move_left_joystick(context, 128, 0, 400ms, 80ms);
 
     stream.log("Arrived at Let's go start position", COLOR_PURPLE);
 }
@@ -529,13 +529,13 @@ void move_to_start_position_for_letsgo1(
 // wait, then move forward quickly
 void lets_go_movement0(ProControllerContext& context){
     pbf_wait(context, 500);
-    pbf_move_left_joystick(context, 128, 0, 200, 10);
+    pbf_move_left_joystick(context, 128, 0, 1600ms, 80ms);
 }
 
 // wait, then move forward quickly, then wait some more.
 void lets_go_movement1(ProControllerContext& context){
     pbf_wait(context, 500);
-    pbf_move_left_joystick(context, 128, 0, 100, 10);
+    pbf_move_left_joystick(context, 128, 0, 800ms, 80ms);
     pbf_wait(context, 100);
 }
 

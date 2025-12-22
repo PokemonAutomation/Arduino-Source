@@ -194,7 +194,7 @@ void jump_glide_fly(
     ssf_press_button(context, BUTTON_B, 0ms, 160ms);
     pbf_wait(context, 100);
     context.wait_for_all_requests();
-    pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+    pbf_press_button(context, BUTTON_LCLICK, 400ms, 0ms);
 
 
     if (inverted_flight){

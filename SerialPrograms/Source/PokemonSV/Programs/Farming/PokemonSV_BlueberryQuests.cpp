@@ -750,7 +750,7 @@ void quest_sneak_up(
             //Savanna Plaza - Pride Rock
             central_to_savanna_plaza(info, console, context);
 
-            pbf_move_left_joystick(context, 220, 255, 10, 20);
+            pbf_move_left_joystick(context, 220, 255, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 400, 400);
@@ -1035,9 +1035,9 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
                 ssf_press_left_joystick(context, {-1, 0}, 1200ms, 400ms);
 
                 ssf_press_button(context, BUTTON_A, 0ms, 1600ms, 0ms);
-                ssf_press_left_joystick(context, 128, 0, 0, 50);
+                ssf_press_left_joystick(context, 128, 0, 0ms, 400ms);
                 ssf_press_left_joystick(context, 128, 255, 50, 100);
-                ssf_press_left_joystick(context, 128, 0, 150, 50);
+                ssf_press_left_joystick(context, 128, 0, 1200ms, 400ms);
                 pbf_wait(context, 400);
                 context.wait_for_all_requests();
             }

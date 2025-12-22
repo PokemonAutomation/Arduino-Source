@@ -32,10 +32,10 @@ void goto_professor(Logger& logger, ProControllerContext& context, Camp camp){
         pbf_move_left_joystick(context, 255, 0, 1000ms, 0ms);
         return;
     case Camp::FIELDLANDS_HEIGHTS:
-        pbf_move_left_joystick(context, 240, 0, 200, 0);
+        pbf_move_left_joystick(context, 240, 0, 1600ms, 0ms);
         return;
     case Camp::MIRELANDS_MIRELANDS:
-        pbf_move_left_joystick(context, 255, 64, 160, 0);
+        pbf_move_left_joystick(context, 255, 64, 1280ms, 0ms);
         return;
     case Camp::MIRELANDS_BOGBOUND:
         pbf_move_left_joystick(context, 255, 64, 1120ms, 0ms);
@@ -575,7 +575,7 @@ void goto_Mai_from_camp(
     switch (camp){
     case Camp::FIELDLANDS_FIELDLANDS:
         // 80 - 128, time - 400
-        pbf_move_left_joystick(context, 85, 255, 300, 0);
+        pbf_move_left_joystick(context, 85, 255, 2400ms, 0ms);
         return;
     case Camp::MIRELANDS_MIRELANDS:
         pbf_move_left_joystick(context, 0, 120, 310, 0);
@@ -589,7 +589,7 @@ void goto_Mai_from_camp(
         pbf_move_left_joystick(context, 255, 165, 370, 0);
         return;
     case Camp::ICELANDS_SNOWFIELDS:
-        pbf_move_left_joystick(context, 255, 124, 250, 0);
+        pbf_move_left_joystick(context, 255, 124, 2000ms, 0ms);
         return;
     default:
         throw InternalProgramError(

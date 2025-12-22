@@ -111,7 +111,7 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         pbf_press_dpad(context, DPAD_LEFT, 80ms, 40ms);
         pbf_press_button(context, BUTTON_A, 80ms, 80ms);
         pbf_press_dpad(context, DPAD_DOWN, 80ms, 40ms);
-        pbf_press_button(context, BUTTON_A, 10, 20);
+        pbf_press_button(context, BUTTON_A, 80ms, 160ms);
 
         // back to overworld
         pbf_press_button(context, BUTTON_PLUS, 80ms, 80ms);

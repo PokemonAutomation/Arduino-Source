@@ -101,7 +101,7 @@ void settings_to_enter_game_den_lobby(
     pbf_wait(context, 90);
     if (tolerate_update_menu){
         //  home                home
-//        ssf_press_button2(BUTTON_HOME, 100, 10);
+//        ssf_press_button2(BUTTON_HOME, 800ms, 80ms);
         //  lobby-switch        update-yes
         ssf_press_dpad(context, DPAD_DOWN, 80ms);
         ssf_press_dpad(context, DPAD_UP, 80ms);
