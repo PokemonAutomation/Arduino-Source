@@ -223,7 +223,7 @@ void open_travel_map_from_jubilife(
     ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     bool fresh_from_reset
 ){
-    pbf_move_left_joystick(context, 128, 255, 200, 0);
+    pbf_move_left_joystick(context, {0, -1}, 1600ms, 0ms);
     MapDetector detector;
     int ret = run_until<ProControllerContext>(
         stream, context,

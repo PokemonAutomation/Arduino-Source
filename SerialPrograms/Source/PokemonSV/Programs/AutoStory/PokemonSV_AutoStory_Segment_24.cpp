@@ -186,7 +186,7 @@ void checkpoint_55(
             pbf_move_left_joystick(context, 128, 0, 600, 100);
 
             direction.change_direction(env.program_info(), env.console, context, 4.908646);
-            pbf_move_left_joystick(context, 128, 0, 300, 100);
+            pbf_move_left_joystick(context, 128, 0, 2400ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 1.169728);
             pbf_move_left_joystick(context, 128, 0, 200, 100);

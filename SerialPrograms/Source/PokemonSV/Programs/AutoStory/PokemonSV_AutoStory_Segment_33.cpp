@@ -316,7 +316,7 @@ void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         });
 
-        pbf_move_left_joystick(context, 128, 0, 100, 50); // stand up
+        pbf_move_left_joystick(context, 128, 0, 800ms, 400ms); // stand up
 
 
     }); 

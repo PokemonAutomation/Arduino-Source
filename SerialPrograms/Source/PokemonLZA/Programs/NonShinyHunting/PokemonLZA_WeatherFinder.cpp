@@ -184,7 +184,7 @@ std::string get_weather_name(size_t option) {
 
 void bench_it(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     sit_on_bench(env.console, context);
-    pbf_move_left_joystick(context, 128, 255, 500ms, 500ms);
+    pbf_move_left_joystick(context, {0, -1}, 500ms, 500ms);
     context.wait_for_all_requests();
 }
 

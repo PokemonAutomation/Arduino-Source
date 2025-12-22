@@ -118,13 +118,13 @@ void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
         direction.change_direction(env.program_info(), env.console, context, 1.536225);
-        pbf_move_left_joystick(context, 128, 0, 500, 50);
+        pbf_move_left_joystick(context, 128, 0, 4000ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 3.786414);
         pbf_move_left_joystick(context, 128, 0, 1100, 50);
 
         direction.change_direction(env.program_info(), env.console, context, 4.747153);
-        pbf_move_left_joystick(context, 128, 0, 200, 50);
+        pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
 
 
         direction.change_direction(env.program_info(), env.console, context, 4.222303);
@@ -159,7 +159,7 @@ void checkpoint_72(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
-        pbf_move_left_joystick(context, 128, 255, 300, 100);
+        pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
@@ -200,8 +200,8 @@ void checkpoint_73(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                pbf_move_left_joystick(context, 255, 128, 200, 50); // if to the left of the door, will move right
-                pbf_move_left_joystick(context, 128, 0, 200, 50);
+                pbf_move_left_joystick(context, 255, 128, 1600ms, 400ms); // if to the left of the door, will move right
+                pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
             }
         );
 
@@ -213,7 +213,7 @@ void checkpoint_73(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 void checkpoint_74(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
-        pbf_move_left_joystick(context, 128, 255, 300, 100);
+        pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);

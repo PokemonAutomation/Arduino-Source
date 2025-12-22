@@ -201,7 +201,7 @@ void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         );
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 120, {CallbackEnum::OVERWORLD, CallbackEnum::BLACK_DIALOG_BOX});
-        pbf_move_left_joystick(context, 128, 0, 100, 50);
+        pbf_move_left_joystick(context, 128, 0, 800ms, 400ms);
         pbf_move_left_joystick(context, 255, 70, 300, 50);
         mash_button_till_overworld(env.console, context, BUTTON_A);
         // clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 120, {CallbackEnum::OVERWORLD, CallbackEnum::BLACK_DIALOG_BOX, CallbackEnum::PROMPT_DIALOG});
@@ -378,7 +378,7 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }
         );
 
-        pbf_press_button(context, BUTTON_L, 20, 50);
+        pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
         move_camera_until_yolo_object_detected(env, context, yolo_detector, "rock-3", 255, 80ms);
 

@@ -92,7 +92,7 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
         // heal at the bed
-        pbf_move_left_joystick(context, 128, 0, 300, 100);
+        pbf_move_left_joystick(context, 128, 0, 2400ms, 800ms);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10, 255, 128);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::OVERWORLD});
 
@@ -292,7 +292,7 @@ void checkpoint_103(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         ); 
 
         pbf_move_left_joystick(context, 128, 0, 300, 50);
-        pbf_move_left_joystick(context, 255, 128, 200, 50);
+        pbf_move_left_joystick(context, 255, 128, 1600ms, 400ms);
 
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 10);
         mash_button_till_overworld(env.console, context, BUTTON_A);

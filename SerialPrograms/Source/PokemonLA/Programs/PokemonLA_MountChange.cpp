@@ -64,7 +64,7 @@ void change_mount(VideoStream& stream, ProControllerContext& context, MountState
             return;
         }
         if (current == MountState::NOTHING){
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms);
             continue;
         }
 
@@ -80,14 +80,14 @@ void change_mount(VideoStream& stream, ProControllerContext& context, MountState
         case 0:
             break;
         case 1:
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms);
             break;
         case 2:
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms);
             break;
         case 3:
-            pbf_press_dpad(context, DPAD_LEFT, 20, 50);
+            pbf_press_dpad(context, DPAD_LEFT, 160ms, 400ms);
             break;
         }
 
@@ -126,7 +126,7 @@ void dismount(VideoStream& stream, ProControllerContext& context){
         }
 
         if (current == MountState::NOTHING){
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms);
             continue;
         }
 

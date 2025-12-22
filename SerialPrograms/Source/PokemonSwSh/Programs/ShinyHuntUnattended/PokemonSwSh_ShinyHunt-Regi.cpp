@@ -20,8 +20,8 @@ void move_to_corner(
     if (correction){
         logger.log("Performing auto-correction.");
         //  Move down to building exit and exit.
-        pbf_move_left_joystick(context, 128, 255, 4000ms, TRANSITION_DELAY);
-        pbf_move_left_joystick(context, 128, 255, 2400ms, TRANSITION_DELAY);
+        pbf_move_left_joystick(context, {0, -1}, 4000ms, TRANSITION_DELAY);
+        pbf_move_left_joystick(context, {0, -1}, 2400ms, TRANSITION_DELAY);
 
         //  Navigate back into the corner.
         pbf_move_left_joystick(context, 255, 64, 1600ms, 0ms);
@@ -36,7 +36,7 @@ void move_to_corner(
 
 void regirock(ProControllerContext& context){
     pbf_move_left_joystick(context, 0, 232, 1352ms, 0ms);
-    pbf_move_left_joystick(context, 128, 255, 1080ms, 0ms);
+    pbf_move_left_joystick(context, {0, -1}, 1080ms, 0ms);
     pbf_move_left_joystick(context, {-1, 0}, 872ms, 0ms);
     pbf_move_left_joystick(context, 128, 0, 1120ms, 0ms);
     pbf_move_left_joystick(context, 226, 255, 720ms, 0ms);
@@ -47,7 +47,7 @@ void regirock(ProControllerContext& context){
 void regice(ProControllerContext& context){
     pbf_move_left_joystick(context, 80, 255, 1456ms, 0ms);
     pbf_move_left_joystick(context, {-1, 0}, 912ms, 0ms);
-    pbf_move_left_joystick(context, 128, 255, 448ms, 0ms);
+    pbf_move_left_joystick(context, {0, -1}, 448ms, 0ms);
     pbf_move_left_joystick(context, 32, 0, 608ms, 0ms);
     pbf_move_left_joystick(context, {-1, 0}, 432ms, 0ms);
     pbf_move_left_joystick(context, 255, 68, 1224ms, 0ms);

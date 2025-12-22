@@ -38,7 +38,7 @@ void set_time_to_12am_from_home(const ProgramInfo& info, ConsoleHandle& console,
 
 //    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
     home_to_date_time(console, context, true);
-    pbf_press_button(context, BUTTON_A, 20, 50);
+    pbf_press_button(context, BUTTON_A, 160ms, 400ms);
 
     context.wait_for_all_requests();
 
@@ -313,7 +313,7 @@ void enter_box_system_from_overworld(
                     stream
                 );
             }
-            pbf_press_button(context, BUTTON_A, 20, 50);
+            pbf_press_button(context, BUTTON_A, 160ms, 400ms);
             continue;
         case 2:
             stream.log("Detected box.");

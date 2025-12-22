@@ -116,7 +116,7 @@ void checkpoint_16(
         // walk left
         pbf_move_left_joystick(context, {-1, 0}, 3200ms, 800ms);
         // walk down to classroom exit.
-        pbf_move_left_joystick(context, 128, 255, 300, 100);
+        pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);
         env.console.log("clear_dialog: Leave classroom.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
 
@@ -163,7 +163,7 @@ void checkpoint_17(
         // re-orient camera
         pbf_press_button(context, BUTTON_L, 20, 100);
         // move backwards towards front desk
-        pbf_move_left_joystick(context, 128, 255, 200, 100);
+        pbf_move_left_joystick(context, {0, -1}, 1600ms, 800ms);
         // re-orient camera
         pbf_press_button(context, BUTTON_L, 20, 100);
         // move right towards navigation kiosk
@@ -200,7 +200,7 @@ void checkpoint_18(
         context.wait_for_all_requests();
 
         // walk down
-        pbf_move_left_joystick(context, 128, 255, 200, 100);
+        pbf_move_left_joystick(context, {0, -1}, 1600ms, 800ms);
         // walk left towards door
         pbf_move_left_joystick(context, {-1, 0}, 800ms, 800ms);
 
@@ -236,9 +236,9 @@ void checkpoint_19(
         context.wait_for_all_requests();
 
         // walk right 
-        pbf_move_left_joystick(context, 255, 128, 50, 100);
+        pbf_move_left_joystick(context, 255, 128, 400ms, 800ms);
         // walk down towards door
-        pbf_move_left_joystick(context, 128, 255, 200, 100);
+        pbf_move_left_joystick(context, {0, -1}, 1600ms, 800ms);
 
         env.console.log("Talk to Nemona and go to dorm.");
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);

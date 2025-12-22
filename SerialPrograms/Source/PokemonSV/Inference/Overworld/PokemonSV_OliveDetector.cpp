@@ -219,7 +219,7 @@ ImageFloatBox OliveDetector::align_to_olive(
         //     olive_unchanged_count++;
         //     // not moving closer to the olive. either wall/fence is in the way, or we are right next the olive.
         //     console.log("Can't align to Olive. Try moving backwards and try again.");
-        //     pbf_move_left_joystick(context, 128, 255, 600ms, 800ms);  // walk backwards
+        //     pbf_move_left_joystick(context, {0, -1}, 600ms, 800ms);  // walk backwards
         //     if (olive_unchanged_count == 2){
         //         throw OliveActionFailedException(
         //             console, ErrorReport::SEND_ERROR_REPORT,
@@ -293,7 +293,7 @@ uint16_t OliveDetector::push_olive_forward(
                 stream.log("Olive is stuck? Move backwards and try pushing again.");
                 stream.log("Olive 1: area: " + std::to_string(box_1_area) + ", x: " + std::to_string(olive_box_1.x) + ", y: " + std::to_string(olive_box_1.y));
                 stream.log("Olive 2: area: " + std::to_string(box_2_area) + ", x: " + std::to_string(olive_box_2.x) + ", y: " + std::to_string(olive_box_2.y));
-                pbf_move_left_joystick(context, 128, 255, 600ms, 800ms);  // walk backwards
+                pbf_move_left_joystick(context, {0, -1}, 600ms, 800ms);  // walk backwards
                 ticks_walked -= push_olive;
                 push_olive = 200; // run forward more on the next push
 

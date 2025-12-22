@@ -272,7 +272,7 @@ void checkpoint_40(
         get_on_ride(env.program_info(), env.console, context);
 
         // jump over the fence to exit Mesagoza
-        pbf_move_left_joystick(context, 128, 0, 200, 50);
+        pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 1600ms);
 
         wait_for_overworld(env.program_info(), env.console, context);

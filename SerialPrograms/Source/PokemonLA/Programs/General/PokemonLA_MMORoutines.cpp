@@ -131,11 +131,11 @@ std::set<std::string> enter_region_and_read_MMO(
         );
     }
     if (zoom_level == 0){
-        pbf_press_button(context, BUTTON_ZR, 50, 50);
+        pbf_press_button(context, BUTTON_ZR, 400ms, 400ms);
         context.wait_for_all_requests();
         question_mark_image = env.console.video().snapshot();
     }else if (zoom_level == 2){
-        pbf_press_button(context, BUTTON_ZL, 50, 50);
+        pbf_press_button(context, BUTTON_ZL, 400ms, 400ms);
         context.wait_for_all_requests();
         question_mark_image = env.console.video().snapshot();
     }
@@ -175,7 +175,7 @@ std::set<std::string> enter_region_and_read_MMO(
     }
 
     // Leave map view, back to overworld
-    pbf_press_button(context, BUTTON_B, 20, 50);
+    pbf_press_button(context, BUTTON_B, 160ms, 400ms);
 
     // Now go to Mai to see the reviewed map
     goto_Mai_from_camp(env.logger(), context, camp);
@@ -195,7 +195,7 @@ std::set<std::string> enter_region_and_read_MMO(
             );
         }
     }
-    pbf_press_button(context, BUTTON_B, 50, 50);
+    pbf_press_button(context, BUTTON_B, 400ms, 400ms);
 
     while (true){
         EventDialogDetector event_dialog_detector(env.logger(), env.console.overlay(), true);

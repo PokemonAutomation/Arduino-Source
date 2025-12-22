@@ -169,8 +169,8 @@ void checkpoint_38(
                 walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 18);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 0, 100, 50);
-                pbf_move_left_joystick(context, 0, 0, 100, 50);
+                pbf_move_left_joystick(context, 255, 0, 800ms, 400ms);
+                pbf_move_left_joystick(context, 0, 0, 800ms, 400ms);
             }
         );         
         // talk to Nemona
@@ -185,7 +185,7 @@ void checkpoint_38(
         
         // Gym now defeated. now in Cascaraffa gym building
         context.wait_for_all_requests();
-        pbf_move_left_joystick(context, 128, 255, 300, 100);
+        pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving Gym
         wait_for_overworld(env.program_info(), env.console, context, 30);

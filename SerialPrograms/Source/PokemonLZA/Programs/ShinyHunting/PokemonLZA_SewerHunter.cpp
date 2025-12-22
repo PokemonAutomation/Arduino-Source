@@ -118,7 +118,7 @@ void run_forward_backward_to_wall(
 ){
     ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
     pbf_move_left_joystick(context, 128, 0, duration, 0ms);
-    pbf_move_left_joystick(context, 128, 255, duration + 500ms, 0ms);
+    pbf_move_left_joystick(context, {0, -1}, duration + 500ms, 0ms);
     pbf_wait(context, 500ms);
 }
 

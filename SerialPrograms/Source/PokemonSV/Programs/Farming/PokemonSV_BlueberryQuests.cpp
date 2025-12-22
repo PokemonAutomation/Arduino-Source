@@ -266,8 +266,8 @@ std::vector<BBQuests> process_quest_list(
                     }
                     context.wait_for_all_requests();
                     
-                    pbf_press_button(context, BUTTON_A, 20, 50);
-                    pbf_press_button(context, BUTTON_A, 20, 50);
+                    pbf_press_button(context, BUTTON_A, 160ms, 400ms);
+                    pbf_press_button(context, BUTTON_A, 160ms, 400ms);
                     pbf_wait(context, 100);
                     context.wait_for_all_requests();
 
@@ -330,8 +330,8 @@ std::vector<BBQuests> process_quest_list(
                             }
                             
                             //Reroll
-                            pbf_press_button(context, BUTTON_A, 20, 50);
-                            pbf_press_button(context, BUTTON_A, 20, 50);
+                            pbf_press_button(context, BUTTON_A, 160ms, 400ms);
+                            pbf_press_button(context, BUTTON_A, 160ms, 400ms);
                             pbf_wait(context, 100);
                             context.wait_for_all_requests();
 
@@ -380,8 +380,8 @@ std::vector<BBQuests> process_quest_list(
         context.wait_for_all_requests();
 
         for (string::size_type i = 0; i < quest_list.size(); i++){
-            pbf_press_button(context, BUTTON_A, 20, 50);
-            pbf_press_button(context, BUTTON_A, 20, 50); //Yes.
+            pbf_press_button(context, BUTTON_A, 160ms, 400ms);
+            pbf_press_button(context, BUTTON_A, 160ms, 400ms); //Yes.
             pbf_wait(context, 100);
             context.wait_for_all_requests();
             pbf_press_dpad(context, DPAD_DOWN, 20, 20);
@@ -554,7 +554,7 @@ void quest_make_tm(const ProgramInfo& info, VideoStream& stream, ProControllerCo
         stream, context,
         [&](ProControllerContext& context){
             for (int i = 0; i < 10; i++){
-                pbf_press_button(context, BUTTON_A, 20, 50);
+                pbf_press_button(context, BUTTON_A, 160ms, 400ms);
                 pbf_wait(context, 200);
                 context.wait_for_all_requests();
             }
@@ -571,12 +571,12 @@ void quest_make_tm(const ProgramInfo& info, VideoStream& stream, ProControllerCo
             [&](ProControllerContext& context){
                 for (int i = 0; i < 229; i++) { //229 is max number of TMs
                     //click on tm
-                    pbf_press_button(context, BUTTON_A, 20, 50);
+                    pbf_press_button(context, BUTTON_A, 160ms, 400ms);
                     pbf_wait(context, 100);
                     context.wait_for_all_requests();
 
                     //not craftable, close and move on to next
-                    pbf_press_button(context, BUTTON_A, 20, 50);
+                    pbf_press_button(context, BUTTON_A, 160ms, 400ms);
                     pbf_press_dpad(context, DPAD_RIGHT, 20, 20);
                     pbf_wait(context, 100);
                     context.wait_for_all_requests();
@@ -756,15 +756,15 @@ void quest_sneak_up(
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 400, 400);
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
-            pbf_move_left_joystick(context, 255, 128, 20, 50);
+            pbf_move_left_joystick(context, 255, 128, 160ms, 400ms);
 
-            pbf_press_button(context, BUTTON_L, 20, 50);
-            pbf_move_left_joystick(context, 128, 0, 100, 50);
+            pbf_press_button(context, BUTTON_L, 160ms, 400ms);
+            pbf_move_left_joystick(context, 128, 0, 800ms, 400ms);
 
             //Turn slightly for switch 1
             if (console.state().console_type() == ConsoleType::Switch1) {
-                pbf_move_left_joystick(context, 0, 0, 20, 50);
-                pbf_press_button(context, BUTTON_L, 20, 50);
+                pbf_move_left_joystick(context, 0, 0, 160ms, 400ms);
+                pbf_press_button(context, BUTTON_L, 160ms, 400ms);
             }
 
             ssf_press_button(context, BUTTON_ZR, 0ms, 1600ms);
@@ -880,11 +880,11 @@ void quest_wild_tera(
 
             if (console.state().console_type() == ConsoleType::Switch1) {
                 pbf_move_left_joystick(context, 50, 0, 160ms, 840ms);
-                pbf_press_button(context, BUTTON_L, 20, 50);
-                pbf_move_left_joystick(context, 128, 0, 100, 50);
+                pbf_press_button(context, BUTTON_L, 160ms, 400ms);
+                pbf_move_left_joystick(context, 128, 0, 800ms, 400ms);
             } else { //Switch 2
                 pbf_move_left_joystick(context, 20, 0, 160ms, 840ms);
-                pbf_press_button(context, BUTTON_L, 20, 50);
+                pbf_press_button(context, BUTTON_L, 160ms, 400ms);
             }
 
             ssf_press_button(context, BUTTON_ZR, 0ms, 1600ms);
@@ -962,7 +962,7 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
     central_to_savanna_plaza(info, stream, context);
 
     //Turn around, open picnic
-    pbf_move_left_joystick(context, 128, 255, 20, 50);
+    pbf_move_left_joystick(context, 128, 255, 160ms, 400ms);
     pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
     picnic_from_overworld(info, stream, context);
@@ -1078,7 +1078,7 @@ void quest_hatch_egg(
     central_to_savanna_plaza(info, console, context);
 
     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
-    pbf_move_left_joystick(context, 128, 0, 500, 50);
+    pbf_move_left_joystick(context, 128, 0, 4000ms, 400ms);
 
     pbf_move_left_joystick(context, {-1, 0}, 160ms, 400ms);
     pbf_press_button(context, BUTTON_L, 160ms, 400ms);
@@ -1131,7 +1131,7 @@ void quest_hatch_egg(
 
         leave_box_system_to_overworld(info, console, context);
 
-        pbf_press_button(context, BUTTON_PLUS, 20, 50);
+        pbf_press_button(context, BUTTON_PLUS, 160ms, 400ms);
 
         return_to_plaza(info, console, context);
         context.wait_for_all_requests();
@@ -1355,10 +1355,10 @@ void quest_auto_battle(
         context.wait_for_all_requests();
 
         //Forward and right, stay in the battle court - safe zone
-        pbf_press_button(context, BUTTON_L, 20, 50);
-        pbf_move_left_joystick(context, 128, 0, 250, 50);
+        pbf_press_button(context, BUTTON_L, 160ms, 400ms);
+        pbf_move_left_joystick(context, 128, 0, 2000ms, 400ms);
         pbf_move_left_joystick(context, 255, 128, 180, 50);
-        pbf_press_button(context, BUTTON_L, 20, 50);
+        pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
         use_lets_go_to_clear_in_front(stream, context, tracker, false, [&](ProControllerContext& context){
             pbf_move_left_joystick(context, 128, 255, 180, 50);

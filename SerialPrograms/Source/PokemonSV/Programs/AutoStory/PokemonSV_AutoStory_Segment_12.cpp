@@ -137,7 +137,7 @@ void checkpoint_28(
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
         // leave gym building
-        pbf_move_left_joystick(context, 128, 255, 300, 100);
+        pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);

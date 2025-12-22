@@ -69,13 +69,13 @@ void ApplyGrits::ApplyGritsOnOnePokemon(SingleSwitchProgramEnvironment& env, Pro
         
         if (grit_index > 0){
             // Move to the next Grit item
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms);
         }
 
         // Press A to open the item menu of Grit Dust
-        pbf_press_button(context, BUTTON_A, 20, 50);
+        pbf_press_button(context, BUTTON_A, 160ms, 400ms);
         // Press A again to use the item
-        pbf_press_button(context, BUTTON_A, 20, 50);
+        pbf_press_button(context, BUTTON_A, 160ms, 400ms);
 
         // Move down the pokemon list
         for(size_t i = 0; i < pokemon_index; i++){
@@ -89,7 +89,7 @@ void ApplyGrits::ApplyGritsOnOnePokemon(SingleSwitchProgramEnvironment& env, Pro
         for(size_t attr_index = 0; attr_index < 6; attr_index++){
             if (attr_index > 0){
                 // Move to the next attribute
-                pbf_press_dpad(context, DPAD_DOWN, 20, 50);
+                pbf_press_dpad(context, DPAD_DOWN, 160ms, 400ms);
             }
             for(size_t i = 0; i < grit_level_increase[grit_index]; i++){
                 // One press to apply the Grit item
@@ -100,14 +100,14 @@ void ApplyGrits::ApplyGritsOnOnePokemon(SingleSwitchProgramEnvironment& env, Pro
         }
 
         // Press B twice to back to item selection
-        pbf_press_button(context, BUTTON_B, 20, 50);
-        pbf_press_button(context, BUTTON_B, 20, 50);
+        pbf_press_button(context, BUTTON_B, 160ms, 400ms);
+        pbf_press_button(context, BUTTON_B, 160ms, 400ms);
     }
 
     // Move back to hovering over Grit Dust
-    pbf_press_dpad(context, DPAD_LEFT, 20, 50);
-    pbf_press_dpad(context, DPAD_LEFT, 20, 50);
-    pbf_press_dpad(context, DPAD_LEFT, 20, 50);
+    pbf_press_dpad(context, DPAD_LEFT, 160ms, 400ms);
+    pbf_press_dpad(context, DPAD_LEFT, 160ms, 400ms);
+    pbf_press_dpad(context, DPAD_LEFT, 160ms, 400ms);
 
     context.wait_for_all_requests();
 }

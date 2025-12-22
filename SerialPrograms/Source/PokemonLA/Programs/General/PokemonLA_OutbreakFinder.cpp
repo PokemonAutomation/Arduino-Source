@@ -456,7 +456,7 @@ std::vector<std::string> OutbreakFinder::run_iteration(
 
         // Cancel map view
         inside_travel_map = false;
-        pbf_press_button(context, BUTTON_B, 50, 50);
+        pbf_press_button(context, BUTTON_B, 400ms, 400ms);
         // Leave the guard.
         pbf_move_left_joystick(context, 128, 0, 100, 50);
         // Checking MMO costs Aguav Berries.

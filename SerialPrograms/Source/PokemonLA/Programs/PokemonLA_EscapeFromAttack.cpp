@@ -61,7 +61,7 @@ EscapeFromAttack::EscapeFromAttack(
     register_state_command(State::WYRDEER_BASCULEGION_OFF, [this](){
         m_stream.log("Switching from Wyrdeer/Basculegion (off) to Braviary (on)...");
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms);
             pbf_press_button(context, BUTTON_PLUS, 160ms, GET_ON_BRAVIARY_TIME);
         });
         return false;
@@ -76,8 +76,8 @@ EscapeFromAttack::EscapeFromAttack(
     register_state_command(State::URSALUNA_OFF, [this](){
         m_stream.log("Switching from Ursaluna (off) to Braviary (on)...");
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms);
             pbf_press_button(context, BUTTON_PLUS, 160ms, GET_ON_BRAVIARY_TIME);
         });
         return false;
@@ -85,7 +85,7 @@ EscapeFromAttack::EscapeFromAttack(
     register_state_command(State::URSALUNA_ON, [this](){
         m_stream.log("Switching from Ursaluna (on) to Braviary (on)...");
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms);
             pbf_press_dpad(context, DPAD_RIGHT, 160ms, GET_ON_BRAVIARY_TIME);
         });
         return false;
@@ -93,7 +93,7 @@ EscapeFromAttack::EscapeFromAttack(
     register_state_command(State::SNEASLER_OFF, [this](){
         m_stream.log("Switching from Sneasler (off) to Braviary (on)...");
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_LEFT, 20, 50);
+            pbf_press_dpad(context, DPAD_LEFT, 160ms, 400ms);
             pbf_press_button(context, BUTTON_PLUS, 160ms, GET_ON_BRAVIARY_TIME);
         });
         return false;

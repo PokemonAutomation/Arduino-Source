@@ -116,7 +116,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
             error = false;
             break;
         }
-        pbf_press_dpad(context, DPAD_LEFT, 20, 50);
+        pbf_press_dpad(context, DPAD_LEFT, 160ms, 400ms);
         context.wait_for_all_requests();
     }
     if (error){
@@ -149,10 +149,10 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
                 // FORWARD PORTION OF CAVE UNTIL LEDGE
                 pbf_press_button(context, BUTTON_B, 2200ms, 640ms); // wyrdeer sprint
                 pbf_move_left_joystick(context, {-1, 0},  80ms, 160ms); // turn left
-                pbf_press_button(context, BUTTON_ZL, 20, 50); // align camera
+                pbf_press_button(context, BUTTON_ZL, 160ms, 400ms); // align camera
 
                 // ASCEND THE LEDGE WITH BRAVIARY
-                pbf_press_dpad(context, DPAD_RIGHT, 20, 50); // swap to braviary
+                pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms); // swap to braviary
                 pbf_wait(context, 600ms); // wait for the ascent
                 pbf_press_button(context, BUTTON_Y, 2400ms, 160ms); // descend to swap to Wyrdeer automatically
 

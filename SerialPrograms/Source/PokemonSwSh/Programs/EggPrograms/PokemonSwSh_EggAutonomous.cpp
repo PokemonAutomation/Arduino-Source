@@ -741,7 +741,7 @@ bool EggAutonomous::process_hatched_pokemon(
                 // pbf_mash_button(context, BUTTON_A, 180);
 
                 // Press A to open pokemon menu
-                pbf_press_button(context, BUTTON_A, 20, 50);
+                pbf_press_button(context, BUTTON_A, 160ms, 400ms);
                 context.wait_for_all_requests();
                 StoragePokemonMenuArrowFinder pokemon_menu_detector(env.console.overlay());
                 int ret = wait_until(

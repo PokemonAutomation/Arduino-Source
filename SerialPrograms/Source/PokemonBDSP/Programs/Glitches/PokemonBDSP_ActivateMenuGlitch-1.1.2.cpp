@@ -154,7 +154,7 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProCont
         }
         stream.log("Leaving " + STRING_POKEMON + " center detected!", COLOR_BLUE);
     }
-    pbf_move_left_joystick(context, 128, 255, 1000ms, 4000ms);
+    pbf_move_left_joystick(context, {0, -1}, 1000ms, 4000ms);
 
     //  Center cursor.
     pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
@@ -170,7 +170,7 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProCont
     //  Enter Pokemon center.
     pbf_press_dpad(context, DPAD_UP, 400ms, 5000ms);
     pbf_move_left_joystick(context, 255, 128, 1000ms, 0ms);
-    pbf_move_left_joystick(context, 128, 255, 125, 125);
+    pbf_move_left_joystick(context, {0, -1}, 1000ms, 1000ms);
 
     //  Move cursor back to default location for "Pokemon".
     pbf_move_right_joystick(context, {0, +1}, 160ms, 160ms);

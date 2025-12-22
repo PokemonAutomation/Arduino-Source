@@ -206,7 +206,7 @@ void jump_glide_fly(
     pbf_wait(context, flight_wait);
     context.wait_for_all_requests();
 
-    pbf_press_button(context, BUTTON_B, 20, 50);
+    pbf_press_button(context, BUTTON_B, 160ms, 400ms);
     pbf_wait(context, drop_time);
     context.wait_for_all_requests();
 }

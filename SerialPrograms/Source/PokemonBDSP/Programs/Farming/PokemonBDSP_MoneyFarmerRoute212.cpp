@@ -221,24 +221,24 @@ void MoneyFarmerRoute212::heal_at_center_and_return(VideoStream& stream, ProCont
     stream.overlay().add_log("Heal complete", COLOR_WHITE);
     stream.overlay().add_log("To rich couple", COLOR_WHITE);
     stream.log("Returning to rich couple location...");
-    pbf_move_left_joystick(context, 128, 255, 8000ms, 0ms);
-    pbf_move_left_joystick(context, 255, 128, 380, 0);
-    pbf_move_left_joystick(context, 128, 255, 300, 0);
-    pbf_move_left_joystick(context,   0, 128, 600, 0);
-    pbf_move_left_joystick(context, 255, 128,  75, 0);
-    pbf_move_left_joystick(context, 128, 255, 1375, 0);
+    pbf_move_left_joystick(context, {0, -1}, 8000ms, 0ms);
+    pbf_move_left_joystick(context, 255, 128, 3040ms, 0ms);
+    pbf_move_left_joystick(context, {0, -1}, 2400ms, 0ms);
+    pbf_move_left_joystick(context,   0, 128, 4800ms, 0ms);
+    pbf_move_left_joystick(context, 255, 128, 600ms, 0ms);
+    pbf_move_left_joystick(context, {0, -1}, 11000ms, 0ms);
     pbf_move_left_joystick(context, 255, 128, 1000ms, 0ms);
-    pbf_move_left_joystick(context, 128, 255, 200, 0);
-    pbf_move_left_joystick(context,   0, 128, 200, 0);
-    pbf_move_left_joystick(context, 128, 255,  50, 0);
+    pbf_move_left_joystick(context, {0, -1}, 1600ms, 0ms);
+    pbf_move_left_joystick(context,   0, 128, 1600ms, 0ms);
+    pbf_move_left_joystick(context, {0, -1}, 400ms, 0ms);
     pbf_move_left_joystick(context,   0, 128, 1000ms, 0ms);
-    pbf_move_left_joystick(context, 128, 255, 1000ms, 0ms);
-    pbf_move_left_joystick(context, 255, 128, 250, 0);
-    pbf_move_left_joystick(context, 128, 255, 200, 0);
-    pbf_move_left_joystick(context,   0, 128,  90, 0);
-    pbf_move_left_joystick(context, 128, 255, 200, 0);
+    pbf_move_left_joystick(context, {0, -1}, 1000ms, 0ms);
+    pbf_move_left_joystick(context, 255, 128, 2000ms, 0ms);
+    pbf_move_left_joystick(context, {0, -1}, 1600ms, 0ms);
+    pbf_move_left_joystick(context,   0, 128, 720ms, 0ms);
+    pbf_move_left_joystick(context, {0, -1}, 1600ms, 0ms);
     pbf_move_left_joystick(context, 255, 128, 1000ms, 0ms);
-    pbf_move_left_joystick(context, 128, 255, 200, 0);
+    pbf_move_left_joystick(context, {0, -1}, 1600ms, 0ms);
 
     pp[0] = MOVE1_PP;
     pp[1] = MOVE2_PP;
@@ -393,7 +393,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, ProContro
 
         if (woman){
 //            pbf_move_left_joystick(context, {-1, 0},  416ms, 0ms);
-            pbf_move_left_joystick(context, 128, 255, 80ms, 0ms);
+            pbf_move_left_joystick(context, {0, -1}, 80ms, 0ms);
 
             //  Battle woman.
             if(battle(env, context, pp, false)){
@@ -417,10 +417,10 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, ProContro
 
 //            if (woman){
                 pbf_move_left_joystick(context, {-1, 0},  416ms, 0ms);
-                pbf_move_left_joystick(context, 128, 255, 80ms, 0ms);
+                pbf_move_left_joystick(context, {0, -1}, 80ms, 0ms);
 //            }else{
 //                pbf_move_left_joystick(context, {-1, 0},  840ms, 0ms);
-//                pbf_move_left_joystick(context, 128, 255, 80ms, 0ms);
+//                pbf_move_left_joystick(context, {0, -1}, 80ms, 0ms);
 //            }
 
             //  Battle man.

@@ -41,7 +41,7 @@ void detach_box(ProControllerContext& context, Milliseconds box_scroll_delay){
 
 
 void release(ProControllerContext& context){
-    pbf_press_button(context, BUTTON_ZL, 20, 50);
+    pbf_press_button(context, BUTTON_ZL, 160ms, 400ms);
     pbf_move_right_joystick(context, {0, +1}, 160ms, 80ms);
     pbf_move_right_joystick(context, {0, +1}, 160ms, 80ms);
     pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);

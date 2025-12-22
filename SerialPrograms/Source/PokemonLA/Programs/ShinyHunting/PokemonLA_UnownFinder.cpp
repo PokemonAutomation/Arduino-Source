@@ -107,7 +107,7 @@ void ruins_entrance_route(ProControllerContext& context){
 void enter_ruins(ProControllerContext& context){
     pbf_press_button(context, BUTTON_B, 4000ms, 80ms);
     pbf_wait(context, 1500ms);
-    pbf_move_left_joystick(context, 128, 255, 80ms, 0ms);
+    pbf_move_left_joystick(context, {0, -1}, 80ms, 0ms);
     pbf_press_button(context, BUTTON_B, 2000ms, 80ms);
 }
 

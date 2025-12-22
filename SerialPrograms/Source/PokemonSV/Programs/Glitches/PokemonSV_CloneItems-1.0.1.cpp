@@ -177,7 +177,7 @@ bool CloneItems101::clone_item(ProgramEnvironment& env, VideoStream& stream, Pro
                     pbf_press_button(context, BUTTON_A, 20, 20);
                 }else{
                     main_menu.move_cursor(env.program_info(), stream, context, MenuSide::LEFT, 1, true);
-                    pbf_press_button(context, BUTTON_A, 20, 50);
+                    pbf_press_button(context, BUTTON_A, 160ms, 400ms);
                     pbf_press_dpad(context, DPAD_UP, 10, 10);
                     pbf_press_dpad(context, DPAD_UP, 20, 10);
                     pbf_press_button(context, BUTTON_A, 20, 20);
@@ -238,11 +238,11 @@ bool CloneItems101::clone_item(ProgramEnvironment& env, VideoStream& stream, Pro
             }
 
             pbf_press_button(context, BUTTON_L, 20, 40);
-            pbf_press_button(context, BUTTON_A, 20, 50);
+            pbf_press_button(context, BUTTON_A, 160ms, 400ms);
             pbf_press_dpad(context, DPAD_DOWN, 10, 10);
             pbf_press_dpad(context, DPAD_DOWN, 10, 10);
             pbf_press_dpad(context, DPAD_DOWN, 10, 10);
-            pbf_press_button(context, BUTTON_A, 20, 50);
+            pbf_press_button(context, BUTTON_A, 160ms, 400ms);
             item_held = false;
 
             continue;

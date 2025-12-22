@@ -709,13 +709,13 @@ void hatch_eggs_at_area_three_lighthouse(
                         //Run forward a bit
                         pbf_move_left_joystick(context, 128, 0, 150, 20);
                         //Face at an angle, to avoid the tent to the left
-                        pbf_move_left_joystick(context, 0, 0, 50, 50);
+                        pbf_move_left_joystick(context, 0, 0, 400ms, 400ms);
                         //Get on your mount
                         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
                         pbf_press_button(context, BUTTON_PLUS, 50, 100);
                         //Go in deep, spawns outside the fence like to come in otherwise
                         pbf_move_left_joystick(context, 128, 0, 750, 0);
-                        pbf_move_left_joystick(context, 0, 0, 50, 50);
+                        pbf_move_left_joystick(context, 0, 0, 400ms, 400ms);
                         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
                         pbf_move_left_joystick(context, 128, 0, 550, 0);
                     }
@@ -729,7 +729,7 @@ void hatch_eggs_at_area_three_lighthouse(
                 stream.log("Reset location by flying back to lighthouse.");
                 // Use map to fly back to the flying spot
                 open_map_from_overworld(info, stream, context);
-                pbf_move_left_joystick(context, 200, 0, 20, 50);
+                pbf_move_left_joystick(context, 200, 0, 160ms, 400ms);
                 fly_to_overworld_from_map(info, stream, context);
                 continue;
             }
@@ -785,7 +785,7 @@ void reset_position_at_zero_gate(
     // Use map to fly back to the flying spot
     open_map_from_overworld(info, stream, context);
 
-    pbf_move_left_joystick(context, 128, 160, 20, 50);
+    pbf_move_left_joystick(context, 128, 160, 160ms, 400ms);
 
     fly_to_overworld_from_map(info, stream, context);
 }

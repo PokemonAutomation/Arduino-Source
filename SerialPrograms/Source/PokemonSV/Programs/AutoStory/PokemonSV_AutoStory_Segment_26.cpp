@@ -165,7 +165,7 @@ void checkpoint_62(
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
-        pbf_move_left_joystick(context, 128, 255, 300, 100);
+        pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
@@ -180,7 +180,7 @@ void checkpoint_62(
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 0, 0});
 
 
-        pbf_press_button(context, BUTTON_L, 50, 50);
+        pbf_press_button(context, BUTTON_L, 400ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 1.971173);
         pbf_move_left_joystick(context, 128, 0, 600, 50);
@@ -196,25 +196,25 @@ void checkpoint_62(
         // wait for overworld after entering Eatery
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
-        pbf_move_left_joystick(context, 255, 128, 50, 50);
+        pbf_move_left_joystick(context, 255, 128, 400ms, 400ms);
         
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A);
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
 
         // grilled rice balls
-        pbf_press_button(context, BUTTON_A, 50, 50);
+        pbf_press_button(context, BUTTON_A, 400ms, 400ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
         // medium serving
         pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-        pbf_press_button(context, BUTTON_A, 50, 50);
+        pbf_press_button(context, BUTTON_A, 400ms, 400ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
         // extra crispy
         pbf_press_dpad(context, DPAD_UP, 13, 20);
-        pbf_press_button(context, BUTTON_A, 50, 50);
+        pbf_press_button(context, BUTTON_A, 400ms, 400ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
         // lemon
         pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-        pbf_press_button(context, BUTTON_A, 50, 50);
+        pbf_press_button(context, BUTTON_A, 400ms, 400ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD}, false);
 
 
@@ -249,7 +249,7 @@ void checkpoint_63(
     [&](size_t attempt_number){
 
         // Gym leader defeated. Standing in Gym building
-        pbf_move_left_joystick(context, 128, 255, 300, 100);
+        pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving Gym
         wait_for_overworld(env.program_info(), env.console, context, 30);

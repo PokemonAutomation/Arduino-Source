@@ -84,7 +84,7 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, ProControllerC
         pbf_press_dpad(context, DPAD_UP, 10, 50);
 
         // Press A to sleep to next night
-        pbf_press_button(context, BUTTON_A, 20, 50);
+        pbf_press_button(context, BUTTON_A, 160ms, 400ms);
         // Sleeping
         pbf_wait(context, 8000ms);
         context.wait_for_all_requests();

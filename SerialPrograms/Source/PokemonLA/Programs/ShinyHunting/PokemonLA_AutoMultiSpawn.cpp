@@ -589,7 +589,7 @@ PokemonDetails AutoMultiSpawn::go_to_spawn_point_and_try_focusing_pokemon(
 
     // pbf_press_button(context, BUTTON_PLUS, 20, 150); // jump down from Braviary
     // for(int i = 0; i < 2; i++){
-    //     pbf_press_button(context, BUTTON_PLUS, 20, 50); // Call back Braviary to stop falling
+    //     pbf_press_button(context, BUTTON_PLUS, 160ms, 400ms); // Call back Braviary to stop falling
     //     pbf_press_button(context, BUTTON_PLUS, 20, 150); // fall down again
     // }
     // In case the character hits a tree and change the Braviary mount state due to the hit,

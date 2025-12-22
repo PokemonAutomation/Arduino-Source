@@ -323,7 +323,7 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, ProC
         pbf_wait(context, 100);
         context.wait_for_all_requests();
 
-        pbf_press_button(context, BUTTON_R, 20, 50);
+        pbf_press_button(context, BUTTON_R, 160ms, 400ms);
         pbf_press_button(context, BUTTON_A, 10, 50);
     }
 

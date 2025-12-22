@@ -612,9 +612,9 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, VideoStream& stre
 
 void jump_off_wall_until_map_open(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     for (auto i = 0; i < 3; i++){
-        pbf_press_button(context, BUTTON_L, 50, 50);
-        pbf_press_button(context, BUTTON_B, 50, 50);
-        pbf_move_left_joystick(context, 128, 255, 100, 50);
+        pbf_press_button(context, BUTTON_L, 400ms, 400ms);
+        pbf_press_button(context, BUTTON_B, 400ms, 400ms);
+        pbf_move_left_joystick(context, 128, 255, 800ms, 400ms);
         context.wait_for_all_requests();
         try{
             open_map_from_overworld(info, stream, context);
