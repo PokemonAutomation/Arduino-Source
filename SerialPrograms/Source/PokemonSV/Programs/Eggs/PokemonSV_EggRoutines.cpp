@@ -278,11 +278,11 @@ void picnic_at_zero_gate(
     pbf_press_button(context, BUTTON_L, 50, 40);
 
     // Move right to make player character facing away from Aera Zero observation station
-    pbf_move_left_joystick(context, 255, 32, 50, 50);
+    pbf_move_left_joystick(context, 255, 32, 400ms, 400ms);
     // Press L to move camera to face the same direction as the player character
-    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
     // Move forward
-    pbf_move_left_joystick(context, 128, 0, 125, 0);
+    pbf_move_left_joystick(context, 128, 0, 1000ms, 0ms);
 
     picnic_from_overworld(info, stream, context);
 }
@@ -294,7 +294,7 @@ bool eat_egg_sandwich_at_picnic(
     Language language
 ){
     // Move forward to table to make sandwich
-    pbf_move_left_joystick(context, 128, 0, 30, 40);
+    pbf_move_left_joystick(context, 128, 0, 240ms, 320ms);
     context.wait_for_all_requests();
 
     clear_mons_in_front(env.program_info(), stream, context);
@@ -357,23 +357,23 @@ void collect_eggs_after_sandwich(
     // If we fail to reach the egg basket, we can then check that Camera support is on.
 
     //  Move forward to table
-    pbf_move_left_joystick(context, 128, 0, 80, 40);
+    pbf_move_left_joystick(context, 128, 0, 640ms, 320ms);
     //  Move left
-    pbf_move_left_joystick(context, 0, 128, 40, 40);
+    pbf_move_left_joystick(context, 0, 128, 320ms, 320ms);
     //  Move forward to pass table
-    pbf_move_left_joystick(context, 128, 0, 80, 40);
+    pbf_move_left_joystick(context, 128, 0, 640ms, 320ms);
     //  Move right
-    pbf_move_left_joystick(context, 255, 128, 40, 85);
+    pbf_move_left_joystick(context, 255, 128, 320ms, 680ms);
     //  Move back/right to align to basket
-    pbf_move_left_joystick(context, 240, 255, 40, 40);
+    pbf_move_left_joystick(context, 240, 255, 320ms, 320ms);
 
     //  Move closer to the basket, up to the table
     pbf_press_button(context, BUTTON_L, 160ms, 840ms);
-    pbf_move_left_joystick(context, 128, 0, 100, 40);
+    pbf_move_left_joystick(context, 128, 0, 800ms, 320ms);
 
     //  face away from the table
     pbf_press_button(context, BUTTON_L, 160ms, 840ms);
-    pbf_move_left_joystick(context, 128, 255, 10, 40);  
+    pbf_move_left_joystick(context, 128, 255, 80ms, 320ms);
 #endif
 
 #if 1
@@ -412,17 +412,17 @@ void collect_eggs_after_sandwich(
 
 #if 0
     //  Move left
-    pbf_move_left_joystick(context, 0, 128, 40, 40);
+    pbf_move_left_joystick(context, 0, 128, 320ms, 320ms);
     //  Move forward to pass table
-    pbf_move_left_joystick(context, 128, 0, 80, 40); // old value: 80
+    pbf_move_left_joystick(context, 128, 0, 640ms, 320ms); // old value: 80
     //  Move right
-    pbf_move_left_joystick(context, 255, 128, 50, 40);
+    pbf_move_left_joystick(context, 255, 128, 400ms, 320ms);
     //  Move back to face basket
-    pbf_move_left_joystick(context, 128, 255, 10, 40);
+    pbf_move_left_joystick(context, 128, 255, 80ms, 320ms);
 
     //  Move closer to the basket.
     pbf_press_button(context, BUTTON_L, 160ms, 840ms);
-    pbf_move_left_joystick(context, 128, 0, 10, 40);
+    pbf_move_left_joystick(context, 128, 0, 80ms, 320ms);
 #endif
 
 
@@ -652,13 +652,13 @@ void hatch_eggs_at_zero_gate(
                 [&](ProControllerContext& context){
                     if (egg_idx == 0){
                         // At beginning, ride on Koraidon/Miradon and go off ramp:
-                        pbf_press_button(context, BUTTON_PLUS, 50, 100);
+                        pbf_press_button(context, BUTTON_PLUS, 400ms, 800ms);
                         // Move right to make player character facing away from Aera Zero observation station
-                        pbf_move_left_joystick(context, 255, 0, 50, 50);
+                        pbf_move_left_joystick(context, 255, 0, 400ms, 400ms);
                         // Press L to move camera to face the same direction as the player character
-                        pbf_press_button(context, BUTTON_L, 50, 40);
+                        pbf_press_button(context, BUTTON_L, 400ms, 320ms);
                         // Move forward
-                        pbf_move_left_joystick(context, 128, 0, 200, 0);
+                        pbf_move_left_joystick(context, 128, 0, 1600ms, 0ms);
                     }
                 },
                 {dialog}

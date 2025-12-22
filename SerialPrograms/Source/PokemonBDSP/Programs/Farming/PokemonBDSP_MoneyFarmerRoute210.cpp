@@ -267,7 +267,7 @@ void MoneyFarmerRoute210::heal_at_center_and_return(
     pbf_move_left_joystick(context,   0, 128, 30, 0);
     pbf_move_left_joystick(context, 128, 255, 80, 0);
     pbf_move_left_joystick(context, 255, 128, 110, 0);
-    pbf_move_left_joystick(context, 128, 255, 125, 0);
+    pbf_move_left_joystick(context, 128, 255, 1000ms, 0ms);
     pbf_move_left_joystick(context, 255, 128, 105, 0);
     pbf_move_left_joystick(context, 128,   0, 375, 0);
     pbf_move_left_joystick(context, 255, 128, 300, 0);
@@ -275,7 +275,7 @@ void MoneyFarmerRoute210::heal_at_center_and_return(
 
     pbf_press_dpad(context, DPAD_RIGHT, 375, 0);
     pbf_press_dpad(context, DPAD_LEFT, 375, 0);
-    pbf_press_dpad(context, DPAD_DOWN, 125, 0);
+    pbf_press_dpad(context, DPAD_DOWN, 1000ms, 0ms);
 
     pp0[0] = MON0_MOVE1_PP;
     pp0[1] = MON0_MOVE2_PP;

@@ -53,8 +53,8 @@ CameraAngle quest_photo_navi(
             central_to_polar_rest(info, console, context);
 
             pbf_press_button(context, BUTTON_L, 10, 50);
-            pbf_move_left_joystick(context, 128, 0, 230, 20);
-            pbf_move_left_joystick(context, 0, 128, 250, 20);
+            pbf_move_left_joystick(context, 128, 0, 1840ms, 160ms);
+            pbf_move_left_joystick(context, 0, 128, 2000ms, 160ms);
 
             break;
         case BBQuests::photo_swim: case BBQuests::photo_water: case BBQuests::photo_polar:

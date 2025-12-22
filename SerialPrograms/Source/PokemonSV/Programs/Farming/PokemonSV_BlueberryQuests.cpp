@@ -995,7 +995,7 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
             break;
         case 1:
             stream.log("Rinse button found. Switching to rinse.");
-            pbf_press_button(context, BUTTON_Y, 40, 50);
+            pbf_press_button(context, BUTTON_Y, 320ms, 400ms);
             rinsed_once = true;
             //Move slightly right, as the showerhead is at an angle
             pbf_move_left_joystick(context, 255, 0, 30, 30);
@@ -1048,7 +1048,7 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
         stream.log("Shower completed successfully.");
     }else{
         stream.log("Shower did not complete. Backing out.");
-        pbf_press_button(context, BUTTON_B, 40, 50);
+        pbf_press_button(context, BUTTON_B, 320ms, 400ms);
     }
 
     leave_picnic(info, stream, context);

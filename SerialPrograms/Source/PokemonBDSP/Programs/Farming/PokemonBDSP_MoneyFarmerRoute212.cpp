@@ -227,17 +227,17 @@ void MoneyFarmerRoute212::heal_at_center_and_return(VideoStream& stream, ProCont
     pbf_move_left_joystick(context,   0, 128, 600, 0);
     pbf_move_left_joystick(context, 255, 128,  75, 0);
     pbf_move_left_joystick(context, 128, 255, 1375, 0);
-    pbf_move_left_joystick(context, 255, 128, 125, 0);
+    pbf_move_left_joystick(context, 255, 128, 1000ms, 0ms);
     pbf_move_left_joystick(context, 128, 255, 200, 0);
     pbf_move_left_joystick(context,   0, 128, 200, 0);
     pbf_move_left_joystick(context, 128, 255,  50, 0);
-    pbf_move_left_joystick(context,   0, 128, 125, 0);
-    pbf_move_left_joystick(context, 128, 255, 125, 0);
+    pbf_move_left_joystick(context,   0, 128, 1000ms, 0ms);
+    pbf_move_left_joystick(context, 128, 255, 1000ms, 0ms);
     pbf_move_left_joystick(context, 255, 128, 250, 0);
     pbf_move_left_joystick(context, 128, 255, 200, 0);
     pbf_move_left_joystick(context,   0, 128,  90, 0);
     pbf_move_left_joystick(context, 128, 255, 200, 0);
-    pbf_move_left_joystick(context, 255, 128, 125, 0);
+    pbf_move_left_joystick(context, 255, 128, 1000ms, 0ms);
     pbf_move_left_joystick(context, 128, 255, 200, 0);
 
     pp[0] = MOVE1_PP;

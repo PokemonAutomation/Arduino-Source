@@ -361,7 +361,7 @@ bool EggAutonomous::run_batch(
                     [](ProControllerContext& context){
                         // Try move a little to hatch more:
                         // We move toward lower-left so that it wont hit the lady or enter the Nursory.
-                        pbf_move_left_joystick(context, 0, 255, 100, 10);
+                        pbf_move_left_joystick(context, {-1, -1}, 800ms, 80ms);
                     },
                     {{egg_hatching_detector}}
                 );

@@ -29,7 +29,7 @@ namespace PokemonLA{
 void goto_professor(Logger& logger, ProControllerContext& context, Camp camp){
     switch (camp){
     case Camp::FIELDLANDS_FIELDLANDS:
-        pbf_move_left_joystick(context, 255, 0, 125, 0);
+        pbf_move_left_joystick(context, 255, 0, 1000ms, 0ms);
         return;
     case Camp::FIELDLANDS_HEIGHTS:
         pbf_move_left_joystick(context, 240, 0, 200, 0);
@@ -41,7 +41,7 @@ void goto_professor(Logger& logger, ProControllerContext& context, Camp camp){
         pbf_move_left_joystick(context, 255, 64, 140, 0);
         return;
     case Camp::COASTLANDS_BEACHSIDE:
-        pbf_move_left_joystick(context, 255, 96, 125, 0);
+        pbf_move_left_joystick(context, 255, 96, 1000ms, 0ms);
         return;
     case Camp::COASTLANDS_COASTLANDS:
         pbf_move_left_joystick(context, 255, 48, 105, 0);
@@ -50,13 +50,13 @@ void goto_professor(Logger& logger, ProControllerContext& context, Camp camp){
         pbf_move_left_joystick(context, 255, 64, 176, 0);
         return;
     case Camp::HIGHLANDS_MOUNTAIN:
-        pbf_move_left_joystick(context, 255, 32, 125, 0);
+        pbf_move_left_joystick(context, 255, 32, 1000ms, 0ms);
         return;
     case Camp::HIGHLANDS_SUMMIT:
-        pbf_move_left_joystick(context, 255, 0, 125, 0);
+        pbf_move_left_joystick(context, 255, 0, 1000ms, 0ms);
         return;
     case Camp::ICELANDS_SNOWFIELDS:
-        pbf_move_left_joystick(context, 255, 56, 125, 0);
+        pbf_move_left_joystick(context, 255, 56, 1000ms, 0ms);
         return;
     case Camp::ICELANDS_ICEPEAK:
         pbf_move_left_joystick(context, 255, 48, 75, 0);

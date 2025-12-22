@@ -310,7 +310,7 @@ void EggAutonomousState::fetch_egg(){
         int ret = run_until<ProControllerContext>(
             m_stream, m_context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 125, 0);
+                pbf_move_left_joystick(context, {-1, -1}, 1000ms, 0ms);
             },
             {{dialog}}
         );
@@ -333,9 +333,9 @@ void EggAutonomousState::fetch_egg(){
         int ret = run_until<ProControllerContext>(
             m_stream, m_context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 30, 0);
-                pbf_move_left_joystick(context, 128, 0, 35, 0);
-                pbf_move_left_joystick(context, 255, 128, 60, 125);
+                pbf_move_left_joystick(context, {-1, -1}, 240ms, 0ms);
+                pbf_move_left_joystick(context, 128, 0, 280ms, 0ms);
+                pbf_move_left_joystick(context, 255, 128, 480ms, 1000ms);
             },
             {{dialog}}
         );
@@ -384,7 +384,7 @@ void EggAutonomousState::fetch_egg(){
     m_stream.log("Getting back on bike.");
     m_shortcut.run(m_context, 800ms);
     m_on_bike = true;
-    pbf_move_left_joystick(m_context, 0, 255, 125, 0);
+    pbf_move_left_joystick(m_context, 0, 255, 1000ms, 0ms);
 }
 void EggAutonomousState::hatch_egg(){
     if (m_eggs_in_party == 0){

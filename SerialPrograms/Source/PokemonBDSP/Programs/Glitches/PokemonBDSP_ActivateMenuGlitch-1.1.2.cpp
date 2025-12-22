@@ -169,7 +169,7 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProCont
 
     //  Enter Pokemon center.
     pbf_press_dpad(context, DPAD_UP, 400ms, 5000ms);
-    pbf_move_left_joystick(context, 255, 128, 125, 0);
+    pbf_move_left_joystick(context, 255, 128, 1000ms, 0ms);
     pbf_move_left_joystick(context, 128, 255, 125, 125);
 
     //  Move cursor back to default location for "Pokemon".

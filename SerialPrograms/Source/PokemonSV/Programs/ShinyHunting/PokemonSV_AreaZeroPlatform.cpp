@@ -371,7 +371,7 @@ void area_zero_platform_run_path1(
     stream.log("Clear the wall...");
     Milliseconds duration = 2600ms;
     use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](ProControllerContext& context){
-        pbf_move_left_joystick(context, 255, 128, 125, 0);
+        pbf_move_left_joystick(context, 255, 128, 1000ms, 0ms);
         pbf_press_button(context, BUTTON_L, 20, 50);
         context.wait_for_all_requests();
 
@@ -403,7 +403,7 @@ void area_zero_platform_run_path1(
 
     stream.log("Run backwards and wait...");
     use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](ProControllerContext& context){
-//        pbf_move_left_joystick(context, 64, 0, 125, 0);
+//        pbf_move_left_joystick(context, 64, 0, 1000ms, 0ms);
 //        pbf_press_button(context, BUTTON_L, 160ms, 840ms);
         pbf_move_left_joystick(context, 128, 255, duration, 4000ms);
 //        pbf_controller_state(context, 0, DPAD_NONE, 255, 255, 120, 128, 3000ms);
@@ -506,7 +506,7 @@ void area_zero_platform_run_path2(
     //  One in every 4 iterations: Clear wall of spawns.
     if (iteration_count % 4 == 0){
         stream.log("Turning along wall...");
-        pbf_move_left_joystick(context, 0, 255, 20, 20);
+        pbf_move_left_joystick(context, {-1, -1}, 160ms, 160ms);
         pbf_mash_button(context, BUTTON_L, 60);
         use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](ProControllerContext& context){
             context.wait_for(std::chrono::milliseconds(1000));

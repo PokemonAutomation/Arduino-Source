@@ -129,7 +129,7 @@ void GenerateDexModelSession::iterate_form(const std::string& slug, bool shiny, 
         }
         pbf_press_dpad(m_context, DPAD_DOWN, step, 50);
     }
-    pbf_press_dpad(m_context, DPAD_UP, 125, 0);
+    pbf_press_dpad(m_context, DPAD_UP, 1000ms, 0ms);
 
     //  Motion
     pbf_press_button(m_context, BUTTON_A, 20, 30);
@@ -143,7 +143,7 @@ void GenerateDexModelSession::iterate_form(const std::string& slug, bool shiny, 
         }
         pbf_press_dpad(m_context, DPAD_DOWN, step, 50);
     }
-    pbf_press_dpad(m_context, DPAD_UP, 125, 0);
+    pbf_press_dpad(m_context, DPAD_UP, 1000ms, 0ms);
 }
 void GenerateDexModelSession::iterate_species(){
     ImageFloatBox SPRITE_BOX(0.45, 0.13, 0.06, 0.09);
