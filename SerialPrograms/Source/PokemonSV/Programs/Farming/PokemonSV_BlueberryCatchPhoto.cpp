@@ -197,7 +197,7 @@ CameraAngle quest_photo_navi(
 
             pbf_move_left_joystick(context, 128, 0, 1200ms, 160ms);
 
-            pbf_move_left_joystick(context, 255, 128, 80ms, 160ms);
+            pbf_move_left_joystick(context, {+1, 0}, 80ms, 160ms);
 
             angle = CameraAngle::down;
             break;

@@ -1357,7 +1357,7 @@ void quest_auto_battle(
         //Forward and right, stay in the battle court - safe zone
         pbf_press_button(context, BUTTON_L, 160ms, 400ms);
         pbf_move_left_joystick(context, {0, +1}, 2000ms, 400ms);
-        pbf_move_left_joystick(context, 255, 128, 1440ms, 400ms);
+        pbf_move_left_joystick(context, {+1, 0}, 1440ms, 400ms);
         pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
         use_lets_go_to_clear_in_front(stream, context, tracker, false, [&](ProControllerContext& context){

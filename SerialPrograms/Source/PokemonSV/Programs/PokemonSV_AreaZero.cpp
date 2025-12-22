@@ -97,7 +97,7 @@ void inside_zero_gate_to_station(
     if (heal_at_station){
         stream.log("Moving to bed to heal.");
         pbf_move_left_joystick(context, 144, 0, 4000ms, 0ms);
-        ssf_press_left_joystick(context, 255, 128, 0ms, 1000ms);
+        ssf_press_left_joystick(context, {+1, 0}, 0ms, 1000ms);
         bool healed = false;
         while (true){
             AdvanceDialogWatcher dialog(COLOR_GREEN);
