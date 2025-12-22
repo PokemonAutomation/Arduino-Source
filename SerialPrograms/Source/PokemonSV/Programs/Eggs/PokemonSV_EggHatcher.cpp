@@ -182,7 +182,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     if (START_LOCATION == StartLocation::AnywhereOffRide){
         // Get on ride:
-        pbf_press_button(context, BUTTON_PLUS, 50, 100);
+        pbf_press_button(context, BUTTON_PLUS, 400ms, 800ms);
         context.wait_for_all_requests();
     }
 

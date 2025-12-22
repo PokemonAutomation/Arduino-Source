@@ -94,7 +94,7 @@ bool enter_sandwich_recipe_list(
         case 0:
             stream.log("Detected picnic. Maybe button A press dropped.");
             // walk forward and press A again
-            pbf_move_left_joystick(context, 128, 0, 800ms, 320ms);
+            pbf_move_left_joystick(context, {0, +1}, 800ms, 320ms);
             pbf_press_button(context, BUTTON_A, 20, 80);
             continue;
         case 1:

@@ -235,7 +235,7 @@ void return_to_inside_zero_gate_from_picnic(
     int ret = run_until<ProControllerContext>(
         stream, context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, 128, 255, 800ms, 320ms);
+            pbf_move_left_joystick(context, {0, -1}, 800ms, 320ms);
             pbf_mash_button(context, BUTTON_L, 60);
             pbf_move_left_joystick(context, {0, +1}, 10000ms, 0ms);
         },
@@ -280,7 +280,7 @@ void inside_zero_gate_to_secret_cave_entrance(
 
     //  Leg 1
     ssf_press_button(context, BUTTON_LCLICK, 0ms, 4000ms);
-    ssf_press_left_joystick(context, 128, 0, 480ms, 10000ms);
+    ssf_press_left_joystick(context, {0, +1}, 480ms, 10000ms);
 
     //  Jump
     ssf_press_button(context, BUTTON_B, 1000ms, 800ms);
@@ -289,12 +289,12 @@ void inside_zero_gate_to_secret_cave_entrance(
     ssf_press_button(context, BUTTON_B, 0ms, 160ms, 80ms);  //  Double up this press in
     ssf_press_button(context, BUTTON_B, 0ms, 160ms);        //  case one is dropped.
 
-    pbf_move_left_joystick(context, 128, 0, 9000ms, 2400ms);
+    pbf_move_left_joystick(context, {0, +1}, 9000ms, 2400ms);
 
 
     //  Leg 2
     ssf_press_button(context, BUTTON_LCLICK, 0ms, 4000ms);
-    ssf_press_left_joystick(context, 128, 0, 480ms, 2000ms);
+    ssf_press_left_joystick(context, {0, +1}, 480ms, 2000ms);
 
     //  Jump
     ssf_press_button(context, BUTTON_B, 1000ms, 800ms);
@@ -303,25 +303,25 @@ void inside_zero_gate_to_secret_cave_entrance(
     ssf_press_button(context, BUTTON_B, 0ms, 160ms, 80ms);  //  Double up this press in
     ssf_press_button(context, BUTTON_B, 0ms, 160ms);        //  case one is dropped.
 
-    pbf_move_left_joystick(context, 128, 0, 2000ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 2000ms, 0ms);
     pbf_move_left_joystick(context, 112, 0, 2000ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, 6016ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 6016ms, 0ms);
     pbf_move_left_joystick(context, 96, 0, 2400ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, 5040ms, 2000ms);
+    pbf_move_left_joystick(context, {0, +1}, 5040ms, 2000ms);
 
 //    context.wait_for_all_requests();
 
 
     //  Leg 3
     ssf_press_button(context, BUTTON_LCLICK, 0ms, 4000ms);
-    ssf_press_left_joystick(context, 128, 0, 1440ms, 4400ms);
+    ssf_press_left_joystick(context, {0, +1}, 1440ms, 4400ms);
 
     //  Fly
     ssf_press_button(context, BUTTON_B, 0ms, 160ms, 80ms);  //  Double up this press in
     ssf_press_button(context, BUTTON_B, 0ms, 160ms);        //  case one is dropped.
 
     pbf_move_left_joystick(context, 48, 0, 1600ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, 2000ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 2000ms, 0ms);
 
 
 }

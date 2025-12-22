@@ -169,7 +169,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
         direction.change_direction(env.program_info(), env.console, context, 4.413989);
-        pbf_move_left_joystick(context, 128, 0, 180, 50);
+        pbf_move_left_joystick(context, {0, +1}, 1440ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 5.516255);
 

@@ -58,9 +58,9 @@ void central_to_chargestone(const ProgramInfo& info, VideoStream& stream, ProCon
 void jump_glide_fly(
     VideoStream& stream, ProControllerContext& context,
     bool inverted_flight,
-    uint16_t hold_up,
-    uint16_t flight_wait,
-    uint16_t drop_time
+    Milliseconds hold_up,
+    Milliseconds flight_wait,
+    Milliseconds drop_time
 );
 
 

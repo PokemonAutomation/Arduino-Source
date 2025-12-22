@@ -270,7 +270,7 @@ void checkpoint_41(
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 direction.change_direction(env.program_info(), env.console, context, 2.83);
-                // pbf_move_left_joystick(context, 128, 0, 800, 50);
+                // pbf_move_left_joystick(context, {0, +1}, 6400ms, 400ms);
         });         
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 

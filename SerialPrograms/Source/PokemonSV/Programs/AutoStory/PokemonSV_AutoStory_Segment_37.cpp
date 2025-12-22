@@ -280,7 +280,7 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         // walked off cliff. now move backwards
 
-        pbf_move_left_joystick(context, 128, 255, 800, 50); // move forward to align with camera
+        pbf_move_left_joystick(context, {0, -1}, 6400ms, 400ms); // move forward to align with camera
 
         pbf_press_button(context, BUTTON_L, 240ms, 100ms);
 

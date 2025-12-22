@@ -662,9 +662,9 @@ void quest_tera_self_defeat(
 
             //Drop on top of Kleavor (plenty of Scyther in the area as well)
             if (console.state().console_type() == ConsoleType::Switch1) {
-                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1650, 300);
+                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8000ms, 13200ms, 2400ms);
             } else { //All switch 2s
-                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1600, 300);
+                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8000ms, 12800ms, 2400ms);
             }
 
             ssf_press_button(context, BUTTON_ZR, 0ms, 1600ms);
@@ -753,7 +753,7 @@ void quest_sneak_up(
             pbf_move_left_joystick(context, 220, 255, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 400, 400);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 4800ms, 3200ms, 3200ms);
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
             pbf_move_left_joystick(context, {+1, 0}, 160ms, 400ms);
@@ -873,7 +873,7 @@ void quest_wild_tera(
             pbf_move_left_joystick(context, 255, 180, 160ms, 840ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 500, 1300, 150);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 4000ms, 10400ms, 1200ms);
 
             //Skarmory is likely to attack but sometimes there is a different pokemon
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
@@ -908,7 +908,7 @@ void quest_wild_tera(
             static_cast<VisualInferenceCallback&>(encounter_watcher),
             static_cast<AudioInferenceCallback&>(encounter_watcher),
         }
-        );
+    );
     encounter_watcher.throw_if_no_sound();
 
     if (ret >= 0){
@@ -1035,9 +1035,9 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
                 ssf_press_left_joystick(context, {-1, 0}, 1200ms, 400ms);
 
                 ssf_press_button(context, BUTTON_A, 0ms, 1600ms, 0ms);
-                ssf_press_left_joystick(context, 128, 0, 0ms, 400ms);
-                ssf_press_left_joystick(context, 128, 255, 50, 100);
-                ssf_press_left_joystick(context, 128, 0, 1200ms, 400ms);
+                ssf_press_left_joystick(context, {0, +1}, 0ms, 400ms);
+                ssf_press_left_joystick(context, {0, -1}, 400ms, 800ms);
+                ssf_press_left_joystick(context, {0, +1}, 1200ms, 400ms);
                 pbf_wait(context, 400);
                 context.wait_for_all_requests();
             }
@@ -1361,7 +1361,7 @@ void quest_auto_battle(
         pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
         use_lets_go_to_clear_in_front(stream, context, tracker, false, [&](ProControllerContext& context){
-            pbf_move_left_joystick(context, 128, 255, 180, 50);
+            pbf_move_left_joystick(context, {0, -1}, 1440ms, 400ms);
             pbf_wait(context, 1500);
             context.wait_for_all_requests();
             });
