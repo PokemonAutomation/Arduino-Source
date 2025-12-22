@@ -1810,14 +1810,14 @@ void move_camera_yolo(
             double push_magnitude_scale_factor;
             switch(axis){
             case CameraAxis::X:
-                duration_scale_factor = 250 / std::sqrt(std::abs(diff));
+                duration_scale_factor = 2000 / std::sqrt(std::abs(diff));
                 if (std::abs(diff) < 0.05){
                     duration_scale_factor /= 2;
                 }
                 push_magnitude_scale_factor = 60 / std::sqrt(std::abs(diff));
                 break;
             case CameraAxis::Y:
-                duration_scale_factor = 50 / std::sqrt(std::abs(diff));
+                duration_scale_factor = 400 / std::sqrt(std::abs(diff));
                 if (std::abs(diff) < 0.1){
                     duration_scale_factor *= 0.5;
                 }
@@ -1828,21 +1828,24 @@ void move_camera_yolo(
                 throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "move_camera_yolo: Unknown CameraAxis enum.");  
             }
 
-            uint16_t push_duration = std::max(uint16_t(std::abs(diff * duration_scale_factor)), uint16_t(8));
+            Milliseconds push_duration = std::max(
+                Milliseconds((int64_t)std::abs(diff * duration_scale_factor)),
+                64ms
+            );
             int16_t push_direction = (diff > 0) ? -1 : 1;
             double push_magnitude = std::max(double(std::abs(diff * push_magnitude_scale_factor)), double(15)); 
             uint8_t axis_push = uint8_t(std::max(std::min(int(128 + (push_direction * push_magnitude)), 255), 0));
 
             // env.console.log("object_x: {" + std::to_string(target_box.x) + ", " + std::to_string(target_box.y) + ", " + std::to_string(target_box.width) + ", " + std::to_string(target_box.height) + "}");
             // env.console.log("object_x_pos: " + std::to_string(object_x_pos));
-            env.console.log("axis push: " + std::to_string(axis_push) + ", push duration: " +  std::to_string(push_duration));
+            env.console.log("axis push: " + std::to_string(axis_push) + ", push duration: " +  std::to_string(push_duration.count()) + " ms");
             switch(axis){
             case CameraAxis::X:{
-                pbf_move_right_joystick(context, axis_push, 128, push_duration, 0);
+                pbf_move_right_joystick(context, axis_push, 128, push_duration, 0ms);
                 break;
             }
             case CameraAxis::Y:{
-                pbf_move_right_joystick(context, 128, axis_push, push_duration, 0);
+                pbf_move_right_joystick(context, 128, axis_push, push_duration, 0ms);
                 break;
             }
             default:
@@ -1987,7 +1990,7 @@ void move_camera_until_yolo_object_detected(
     YOLOv5Detector& yolo_detector, 
     const std::string& target_label,
     uint8_t initial_x_move, 
-    uint16_t initial_hold_ticks,
+    Milliseconds initial_hold,
     uint16_t max_rounds
 ){
     VideoOverlaySet overlays(env.console.overlay());
@@ -2000,7 +2003,7 @@ void move_camera_until_yolo_object_detected(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
 
                 if (round_num == 0){
-                    pbf_move_right_joystick(context, initial_x_move, 128, initial_hold_ticks, 50);
+                    pbf_move_right_joystick(context, initial_x_move, 128, initial_hold, 400ms);
                 }
                 context.wait_for_all_requests();
                 ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
@@ -2011,7 +2014,7 @@ void move_camera_until_yolo_object_detected(
 
                 
 
-                pbf_move_right_joystick(context, x_move, 128, 10, 50);
+                pbf_move_right_joystick(context, x_move, 128, 80ms, 400ms);
             });
             
         }catch (UnexpectedBattleException&){

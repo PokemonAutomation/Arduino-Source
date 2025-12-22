@@ -161,7 +161,7 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         );
 
         pbf_move_right_joystick(context, {0, -1}, 1600ms, 0ms);
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "beyond-cliff-5", 0, 60);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "beyond-cliff-5", 0, 480ms);
 
         move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "beyond-cliff-5", 0.5,
             [&](){
