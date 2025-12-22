@@ -130,7 +130,7 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, ProControl
         pbf_press_button(context, BUTTON_ZL, 20, 250);
 
         //  Back out.
-        pbf_press_button(context, BUTTON_B, 20, 230);
+        pbf_press_button(context, BUTTON_B, 160ms, 1840ms);
 
 #else
         //  Move entire box to a new box.
@@ -156,7 +156,7 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, ProControl
         pbf_press_button(context, BUTTON_ZL, 20, 250);
 
         //  Back out.
-        pbf_press_button(context, BUTTON_B, 20, 230);
+        pbf_press_button(context, BUTTON_B, 160ms, 1840ms);
 
         if (RELEASE){
             //  Release the cloned box.

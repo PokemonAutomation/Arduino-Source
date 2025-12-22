@@ -72,7 +72,7 @@ void change_mount(VideoStream& stream, ProControllerContext& context, MountState
         bool current_on = get_mount_coordinates(current_index, current);
 
         if (!desired_on && current_on){
-            pbf_press_button(context, BUTTON_PLUS, 20, 105);
+            pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
         }
 
         size_t index_diff = (4 + current_index - desired_index) % 4;
@@ -93,9 +93,9 @@ void change_mount(VideoStream& stream, ProControllerContext& context, MountState
 
         if (desired_on && !current_on){
             if (desired_index == 3){
-                pbf_press_button(context, BUTTON_PLUS, 20, 230);
+                pbf_press_button(context, BUTTON_PLUS, 160ms, 1840ms);
             }else{
-                pbf_press_button(context, BUTTON_PLUS, 20, 105);
+                pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
             }
         }
     }
@@ -131,7 +131,7 @@ void dismount(VideoStream& stream, ProControllerContext& context){
         }
 
         // We are mounted. Press + to unmount
-        pbf_press_button(context, BUTTON_PLUS, 20, 105);
+        pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
     }
 
     OperationFailedException::fire(

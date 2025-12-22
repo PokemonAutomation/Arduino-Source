@@ -208,7 +208,7 @@ std::set<std::string> enter_region_and_read_MMO(
         switch (ret){
         case 0:
             env.console.log("Detected dialog.");
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 1:
             env.console.log("Found revealed map thanks to Munchlax!");

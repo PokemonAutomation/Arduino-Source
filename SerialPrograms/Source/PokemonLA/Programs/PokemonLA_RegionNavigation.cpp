@@ -105,7 +105,7 @@ void from_professor_return_to_jubilife(
         switch (ret){
         case 0:
             stream.log("Detected return option...");
-            pbf_press_dpad(context, DPAD_DOWN, 20, 105);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 840ms);
             mash_A_to_change_region(env, stream, context);
             return;
         case 1:
@@ -229,7 +229,7 @@ void open_travel_map_from_jubilife(
         stream, context,
         [](ProControllerContext& context){
             for (size_t c = 0; c < 10; c++){
-                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             }
         },
         {{detector}}
@@ -292,7 +292,7 @@ void goto_camp_from_jubilife(
     }
 
     if (location.warp_slot != 0){
-        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_A, 160ms, 840ms);
         for (size_t c = 0; c < location.warp_slot; c++){
             pbf_press_dpad(context, DPAD_DOWN, 20, 30);
         }

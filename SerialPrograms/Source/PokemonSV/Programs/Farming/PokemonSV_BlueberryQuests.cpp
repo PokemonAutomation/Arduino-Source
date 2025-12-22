@@ -539,8 +539,8 @@ void quest_make_tm(const ProgramInfo& info, VideoStream& stream, ProControllerCo
     stream.log("Quest: Make TM");
 
     //Mount and then dismount in case you're crouched
-    pbf_press_button(context, BUTTON_PLUS, 20, 105);
-    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+    pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
+    pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
     context.wait_for_all_requests();
 
     GradientArrowWatcher machine(COLOR_BLUE, GradientArrowType::DOWN, {0.181, 0.127, 0.045, 0.070});
@@ -620,15 +620,15 @@ void quest_travel_500(const ProgramInfo& info, VideoStream& stream, ProControlle
     stream.log("Quest: Travel 500 meters.");
 
     //Mount and then dismount in case you're crouched
-    pbf_press_button(context, BUTTON_PLUS, 20, 105);
-    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+    pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
+    pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
     context.wait_for_all_requests();
 
     pbf_move_left_joystick(context, 0, 0, 100, 20);
     pbf_move_left_joystick(context, 128, 0, 150, 20);
     pbf_move_left_joystick(context, 0, 128, 140, 20);
 
-    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
     for(int j = 0; j < 60; j++){ //One min just to be safe.
         pbf_controller_state(
@@ -657,8 +657,8 @@ void quest_tera_self_defeat(
         [&](ProControllerContext& context){
             central_to_canyon_plaza(info, console, context);
 
-            pbf_move_left_joystick(context, 205, 64, 20, 105);
-            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+            pbf_move_left_joystick(context, 205, 64, 160ms, 840ms);
+            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             //Drop on top of Kleavor (plenty of Scyther in the area as well)
             if (console.state().console_type() == ConsoleType::Switch1) {
@@ -704,7 +704,7 @@ void quest_tera_self_defeat(
         bool tera_self = true;
         wild_battle_tera(info, console, context, tera_self);
     }
-    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+    pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
     return_to_plaza(info, console, context);
 
     //Day skip and attempt to respawn fixed encounters
@@ -751,11 +751,11 @@ void quest_sneak_up(
             central_to_savanna_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 220, 255, 10, 20);
-            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 400, 400);
 
-            pbf_press_button(context, BUTTON_PLUS, 20, 105);
+            pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
             pbf_move_left_joystick(context, 255, 128, 20, 50);
 
             pbf_press_button(context, BUTTON_L, 20, 50);
@@ -870,20 +870,20 @@ void quest_wild_tera(
             //Canyon Rest Area
             central_to_canyon_rest(info, console, context);
 
-            pbf_move_left_joystick(context, 255, 180, 20, 105);
-            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+            pbf_move_left_joystick(context, 255, 180, 160ms, 840ms);
+            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 500, 1300, 150);
 
             //Skarmory is likely to attack but sometimes there is a different pokemon
-            pbf_press_button(context, BUTTON_PLUS, 20, 105);
+            pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
 
             if (console.state().console_type() == ConsoleType::Switch1) {
-                pbf_move_left_joystick(context, 50, 0, 20, 105);
+                pbf_move_left_joystick(context, 50, 0, 160ms, 840ms);
                 pbf_press_button(context, BUTTON_L, 20, 50);
                 pbf_move_left_joystick(context, 128, 0, 100, 50);
             } else { //Switch 2
-                pbf_move_left_joystick(context, 20, 0, 20, 105);
+                pbf_move_left_joystick(context, 20, 0, 160ms, 840ms);
                 pbf_press_button(context, BUTTON_L, 20, 50);
             }
 
@@ -1068,8 +1068,8 @@ void quest_hatch_egg(
     if (BBQ_OPTIONS.FIX_TIME_FOR_HATCH){
         go_home(console, context);
         home_to_date_time(console, context, false);
-        pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+        pbf_press_button(context, BUTTON_A, 160ms, 840ms);
         pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         resume_game_from_home(console, context);
     }
@@ -1077,7 +1077,7 @@ void quest_hatch_egg(
     //Fly to Savanna Plaza and navigate to the battle court
     central_to_savanna_plaza(info, console, context);
 
-    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
     pbf_move_left_joystick(context, 128, 0, 500, 50);
 
     pbf_move_left_joystick(context, 0, 128, 20, 50);
@@ -1281,11 +1281,11 @@ void quest_tera_raid(
     //Swap to the second pokemon in your party
     pbf_press_dpad(context, DPAD_DOWN, 10, 10);
     pbf_press_dpad(context, DPAD_DOWN, 10, 10);
-    pbf_press_button(context, BUTTON_A, 20, 105);
+    pbf_press_button(context, BUTTON_A, 160ms, 840ms);
     context.wait_for(std::chrono::milliseconds(400));
     move_box_cursor(env.program_info(), console, context, BoxCursorLocation::PARTY, 1, 0);
-    pbf_press_button(context, BUTTON_A, 20, 105);
-    pbf_press_button(context, BUTTON_A, 20, 105);
+    pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+    pbf_press_button(context, BUTTON_A, 160ms, 840ms);
     pbf_press_dpad(context, DPAD_UP, 10, 10);
     pbf_mash_button(context, BUTTON_A, 250);
 
@@ -1298,8 +1298,8 @@ void quest_tera_raid(
             if (BBQ_OPTIONS.CATCH_ON_WIN.FIX_TIME_ON_CATCH){
                 go_home(console, context);
                 home_to_date_time(console, context, false);
-                pbf_press_button(context, BUTTON_A, 20, 105);
-                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+                pbf_press_button(context, BUTTON_A, 160ms, 840ms);
                 pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
                 resume_game_from_home(console, context);
             }

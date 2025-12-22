@@ -119,7 +119,7 @@ void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
     try{
         run_program(env, context);
     }catch (...){
-        pbf_press_button(context, BUTTON_HOME, 20, 105);
+        pbf_press_button(context, BUTTON_HOME, 160ms, 840ms);
         throw;
     }
 }
@@ -163,22 +163,22 @@ void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, ProControll
             if (move_overwrites >= 2){
                 continue;
             }
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             continue;
 
         case 1:
             env.log("Detected dialog.");
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             continue;
 
         case 2:
             env.log("Detected action select.");
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             continue;
 
         case 3:
             env.log("Detected move select.");
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             move_selected = true;
             continue;
 
@@ -209,7 +209,7 @@ bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, ProCo
             if (!battle_menu.move_to_slot(env.console, context, 1)){
                 return false;
             }
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             continue;
 
         case 1:
@@ -309,7 +309,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
             env.log("Trick PP: " + std::to_string(trick_PP));
 
             if (trick_PP <= 0){
-                pbf_press_button(context, BUTTON_X, 20, 105);
+                pbf_press_button(context, BUTTON_X, 160ms, 840ms);
                 continue;
             }
 
@@ -411,21 +411,21 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
             env.log("Detected main menu.");
             if (trick_PP > 0){
                 env.log("Backing out to overworld...");
-                pbf_press_button(context, BUTTON_B, 20, 105);
+                pbf_press_button(context, BUTTON_B, 160ms, 840ms);
                 continue;
             }
 
             if (!main_menu.move_cursor(env.program_info(), env.console, context, MenuSide::LEFT, 0)){
                 stats.errors++;
                 env.update_stats();
-                pbf_press_button(context, BUTTON_B, 20, 105);
+                pbf_press_button(context, BUTTON_B, 160ms, 840ms);
                 continue;
             }
 
             env.log("Attempting to enter summary...");
 
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
 
             continue;
 
@@ -433,16 +433,16 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
             env.log("Detected " + Pokemon::STRING_POKEMON + " summary.");
 
             if (trick_PP > 0){
-                pbf_press_button(context, BUTTON_B, 20, 105);
+                pbf_press_button(context, BUTTON_B, 160ms, 840ms);
                 continue;
             }
 
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 230);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 1840ms);
 
             refresh_pp(env, context);
             trick_PP = 10;
 
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
 
 //            throw ProgramFinishedException(env.console, "Out of PP.");
             continue;

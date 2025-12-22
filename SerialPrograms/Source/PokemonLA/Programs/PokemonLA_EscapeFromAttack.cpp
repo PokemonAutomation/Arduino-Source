@@ -132,7 +132,7 @@ EscapeFromAttack::EscapeFromAttack(
     register_state_command(State::GET_ON_SNEASLER, [this](){
         m_stream.log("Getting on Sneasler...");
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_press_button(context, BUTTON_A, 20, 230);
+            pbf_press_button(context, BUTTON_A, 160ms, 1840ms);
         });
         m_get_on_sneasler_time = current_time();
         return false;

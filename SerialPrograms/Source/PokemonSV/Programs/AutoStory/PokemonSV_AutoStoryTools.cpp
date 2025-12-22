@@ -61,7 +61,7 @@ void clear_tutorial(VideoStream& stream, ProControllerContext& context, uint16_t
         case 0:
             stream.log("clear_tutorial: Detected tutorial screen.");
             seen_tutorial = true;
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         default:
             stream.log("clear_tutorial: Timed out.");
@@ -182,7 +182,7 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
         case CallbackEnum::ADVANCE_DIALOG:
             stream.log("clear_dialog: Detected advance dialog.");
             seen_dialog = true;
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;            
         case CallbackEnum::OVERWORLD:
             stream.log("clear_dialog: Detected overworld.");
@@ -196,7 +196,7 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
             if (mode == ClearDialogMode::STOP_PROMPT){
                 return;
             }
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case CallbackEnum::WHITE_A_BUTTON:
             stream.log("clear_dialog: Detected white A button.");
@@ -204,7 +204,7 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
             if (mode == ClearDialogMode::STOP_WHITEBUTTON){
                 return;
             }
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case CallbackEnum::DIALOG_ARROW:
             stream.log("clear_dialog: Detected dialog arrow.");
@@ -212,7 +212,7 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
             if (mode == ClearDialogMode::STOP_BATTLE_DIALOG_ARROW){
                 return;
             }
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case CallbackEnum::BATTLE:
             stream.log("clear_dialog: Detected battle.");
@@ -225,12 +225,12 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
             if (mode == ClearDialogMode::STOP_TUTORIAL){
                 return;
             }
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case CallbackEnum::BLACK_DIALOG_BOX:    
             stream.log("clear_dialog: Detected black dialog box.");
             seen_dialog = true;
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;            
         default:
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "clear_dialog: Unknown callback triggered.");
@@ -286,10 +286,10 @@ void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerC
             open_map_from_overworld(info, stream, context);
         });
 
-        pbf_press_button(context, BUTTON_ZR, 20, 105);
+        pbf_press_button(context, BUTTON_ZR, 160ms, 840ms);
         pbf_move_left_joystick(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+        pbf_press_button(context, BUTTON_A, 160ms, 840ms);
 
         handle_unexpected_battles(info, stream, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){        
@@ -307,11 +307,11 @@ void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerC
             leave_phone_to_overworld(info, stream, context);
         });
 
-        pbf_press_button(context, BUTTON_L, 20, 105);
+        pbf_press_button(context, BUTTON_L, 160ms, 840ms);
         return;
     case PlayerRealignMode::REALIGN_NO_MARKER:
         pbf_move_left_joystick(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_L, 20, 105);
+        pbf_press_button(context, BUTTON_L, 160ms, 840ms);
         return;
     }  
 
@@ -1189,18 +1189,18 @@ void realign_player_from_landmark(
             // move cursor near landmark (pokecenter)
             switch(move_cursor_near_landmark.zoom_change){
             case ZoomChange::ZOOM_IN:
-                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                pbf_press_button(context, BUTTON_ZR, 160ms, 840ms);
                 break;
             case ZoomChange::ZOOM_IN_TWICE:
-                pbf_press_button(context, BUTTON_ZR, 20, 105);
-                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                pbf_press_button(context, BUTTON_ZR, 160ms, 840ms);
+                pbf_press_button(context, BUTTON_ZR, 160ms, 840ms);
                 break;                
             case ZoomChange::ZOOM_OUT:
-                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
                 break;    
             case ZoomChange::ZOOM_OUT_TWICE:
-                pbf_press_button(context, BUTTON_ZL, 20, 105);
-                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
+                pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
                 break;                  
             case ZoomChange::KEEP_ZOOM:
                 break;
@@ -1225,18 +1225,18 @@ void realign_player_from_landmark(
             // move cursor from landmark to target
             switch(move_cursor_to_target.zoom_change){
             case ZoomChange::ZOOM_IN:
-                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                pbf_press_button(context, BUTTON_ZR, 160ms, 840ms);
                 break;
             case ZoomChange::ZOOM_IN_TWICE:
-                pbf_press_button(context, BUTTON_ZR, 20, 105);
-                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                pbf_press_button(context, BUTTON_ZR, 160ms, 840ms);
+                pbf_press_button(context, BUTTON_ZR, 160ms, 840ms);
                 break;                
             case ZoomChange::ZOOM_OUT:
-                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
                 break;    
             case ZoomChange::ZOOM_OUT_TWICE:
-                pbf_press_button(context, BUTTON_ZL, 20, 105);
-                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
+                pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
                 break;                  
             case ZoomChange::KEEP_ZOOM:
                 break;
@@ -1247,8 +1247,8 @@ void realign_player_from_landmark(
             pbf_move_left_joystick(context, move_x2, move_y2, move_duration2, 1 * TICKS_PER_SECOND);
 
             // place down marker
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             leave_phone_to_overworld(info, stream, context);
 
             return;      
@@ -1319,18 +1319,18 @@ void move_cursor_towards_flypoint_and_go_there(
             // move cursor near landmark (pokecenter)
             switch(move_cursor_near_flypoint.zoom_change){
             case ZoomChange::ZOOM_IN:
-                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                pbf_press_button(context, BUTTON_ZR, 160ms, 840ms);
                 break;
             case ZoomChange::ZOOM_IN_TWICE:
-                pbf_press_button(context, BUTTON_ZR, 20, 105);
-                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                pbf_press_button(context, BUTTON_ZR, 160ms, 840ms);
+                pbf_press_button(context, BUTTON_ZR, 160ms, 840ms);
                 break;                
             case ZoomChange::ZOOM_OUT:
-                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
                 break;    
             case ZoomChange::ZOOM_OUT_TWICE:
-                pbf_press_button(context, BUTTON_ZL, 20, 105);
-                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
+                pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
                 break;                  
             case ZoomChange::KEEP_ZOOM:
                 break;
@@ -1932,7 +1932,7 @@ bool move_player_to_realign_via_yolo(
             env.console.log("x push: " + std::to_string(x_push) + ", push duration: " +  std::to_string(push_duration));
             if (i == 0){
                 pbf_move_left_joystick(context, x_push, 128, 10, 50);
-                pbf_press_button(context, BUTTON_R, 20, 105);
+                pbf_press_button(context, BUTTON_R, 160ms, 840ms);
             }
             
             pbf_move_left_joystick(context, x_push, 128, push_duration, 0);

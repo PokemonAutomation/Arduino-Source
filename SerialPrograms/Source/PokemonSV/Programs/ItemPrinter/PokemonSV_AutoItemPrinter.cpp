@@ -104,11 +104,11 @@ void AutoItemPrinter::enter_printing_mode(SingleSwitchProgramEnvironment& env, P
             return;
         case 1: // overworld
         case 2: // dialog
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             continue;
         case 3: // prompt
             env.console.log("Prompt detected.");
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             continue;
         default:
             OperationFailedException::fire(

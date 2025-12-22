@@ -222,11 +222,11 @@ void checkpoint_03(
             pbf_move_left_joystick(context, 128, 0, 80, 20);
             break;
         }
-        pbf_press_button(context, BUTTON_A, 20, 105); // choose the starter
+        pbf_press_button(context, BUTTON_A, 160ms, 840ms); // choose the starter
         env.console.log("clear_dialog: Choose starter. Stop when detect prompt to receive starter.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 20, {CallbackEnum::PROMPT_DIALOG});
 
-        pbf_press_button(context, BUTTON_A, 20, 105); // accept the pokemon
+        pbf_press_button(context, BUTTON_A, 160ms, 840ms); // accept the pokemon
         env.console.log("clear_dialog: Stop when detect prompt to give nickname to starter.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 20, {CallbackEnum::PROMPT_DIALOG});
 

@@ -138,7 +138,7 @@ void release(VideoStream& stream, ProControllerContext& context){
     pbf_press_button(context, BUTTON_ZL, 20, 50);
     pbf_move_right_joystick(context, 128, 0, 20, 30);
     pbf_move_right_joystick(context, 128, 0, 20, 30);
-    pbf_press_button(context, BUTTON_ZL, 20, 105);
+    pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
     pbf_move_right_joystick(context, 128, 255, 20, 30);
 
     ShortDialogDetector detector;
@@ -147,7 +147,7 @@ void release(VideoStream& stream, ProControllerContext& context){
         if (!detector.detect(stream.video().snapshot())){
             return;
         }
-        pbf_press_button(context, BUTTON_ZL, 20, 105);
+        pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
     }
     OperationFailedException::fire(
         ErrorReport::SEND_ERROR_REPORT,

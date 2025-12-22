@@ -450,7 +450,7 @@ void start_game_from_home_with_inference(
         context.wait_for_all_requests();
     }
 
-    pbf_press_button(context, BUTTON_A, 20, 105);
+    pbf_press_button(context, BUTTON_A, 160ms, 840ms);
 
     while (true){
         HomeMenuWatcher home(console, std::chrono::milliseconds(2000));
@@ -477,7 +477,7 @@ void start_game_from_home_with_inference(
         switch (ret){
         case 0:
             console.log("Detected home screen (again).", COLOR_RED);
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case 1:
             console.log("Detected user-select screen.");
@@ -487,7 +487,7 @@ void start_game_from_home_with_inference(
         case 2:
             console.log("Detected update menu.", COLOR_RED);
             pbf_press_dpad(context, DPAD_UP, 5, 0);
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case 3:
             console.log("Detected check online.", COLOR_RED);

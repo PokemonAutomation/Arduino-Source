@@ -223,8 +223,8 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
         case 2:
             env.log("Detected move learn!", COLOR_BLUE);
             if (ON_LEARN_MOVE == OnLearnMove::DONT_LEARN){
-                pbf_move_right_joystick(context, 128, 255, 20, 105);
-                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                pbf_move_right_joystick(context, 128, 255, 160ms, 840ms);
+                pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
                 break;
             }
             return true;

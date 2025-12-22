@@ -134,7 +134,7 @@ FlagNavigationAir::FlagNavigationAir(
         m_stream.log("Getting on Sneasler...");
         m_looking_straight_ahead.store(false, std::memory_order_release);
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_press_button(context, BUTTON_A, 20, 230);
+            pbf_press_button(context, BUTTON_A, 160ms, 1840ms);
         });
         return false;
     });

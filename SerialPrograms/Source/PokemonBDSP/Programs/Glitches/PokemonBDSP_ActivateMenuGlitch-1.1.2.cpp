@@ -62,7 +62,7 @@ void trigger_menu(VideoStream& stream, ProControllerContext& context){
                     pbf_wait(context, 3);
                 }
                 pbf_wait(context, 125);
-                pbf_press_button(context, BUTTON_R, 20, 105);
+                pbf_press_button(context, BUTTON_R, 160ms, 840ms);
             }
         },
         {{detector}}
@@ -80,7 +80,7 @@ void trigger_menu(VideoStream& stream, ProControllerContext& context){
     ShortDialogDetector dialog;
     while (dialog.detect(stream.video().snapshot())){
         stream.log("Overshot mashing. Backing out.", COLOR_ORANGE);
-        pbf_press_button(context, BUTTON_B, 20, 105);
+        pbf_press_button(context, BUTTON_B, 160ms, 840ms);
         context.wait_for_all_requests();
     }
 }
@@ -101,7 +101,7 @@ void trigger_map_overlap(VideoStream& stream, ProControllerContext& context){
         }
         stream.log("Failed to activate map overlap.", COLOR_ORANGE);
         pbf_mash_button(context, BUTTON_B, 3000ms);
-        pbf_press_button(context, BUTTON_R, 20, 230);
+        pbf_press_button(context, BUTTON_R, 160ms, 1840ms);
     }
     OperationFailedException::fire(
         ErrorReport::SEND_ERROR_REPORT,
@@ -129,9 +129,9 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProCont
     pbf_press_dpad(context, DPAD_RIGHT, 1000ms, 6000ms);
 
     //  Leave Pokemon center.
-    pbf_press_dpad(context, DPAD_LEFT, 20, 105);
-    pbf_press_dpad(context, DPAD_LEFT, 20, 105);
-    pbf_press_dpad(context, DPAD_LEFT, 20, 105);
+    pbf_press_dpad(context, DPAD_LEFT, 160ms, 840ms);
+    pbf_press_dpad(context, DPAD_LEFT, 160ms, 840ms);
+    pbf_press_dpad(context, DPAD_LEFT, 160ms, 840ms);
     {
         context.wait_for_all_requests();
         BlackScreenWatcher detector;
@@ -139,8 +139,8 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProCont
             stream, context,
             [](ProControllerContext& context){
                 for (size_t c = 0; c < 5; c++){
-                    pbf_press_dpad(context, DPAD_LEFT, 20, 105);
-                    pbf_press_dpad(context, DPAD_DOWN, 20, 105);
+                    pbf_press_dpad(context, DPAD_LEFT, 160ms, 840ms);
+                    pbf_press_dpad(context, DPAD_DOWN, 160ms, 840ms);
                 }
             },
             {{detector}}

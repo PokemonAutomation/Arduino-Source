@@ -760,7 +760,7 @@ void BurmyFinder::run_iteration(
             );
         }
         env.console.log("Not on Pokemon selection. Attempting to switch to it...", COLOR_ORANGE);
-        pbf_press_button(context, BUTTON_X, 20, 230);
+        pbf_press_button(context, BUTTON_X, 160ms, 1840ms);
     }
 
     float shiny_coefficient = 1.0;

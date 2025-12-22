@@ -91,8 +91,8 @@ bool SelfBoxTrade::move_to_next(
     }
     if (row < 4){
         env.run_in_parallel(scope, [](ConsoleHandle& console, ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 105);
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 105);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 840ms);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 840ms);
             pbf_press_dpad(context, DPAD_DOWN, 20, 140);
         });
         col = 0;
@@ -100,9 +100,9 @@ bool SelfBoxTrade::move_to_next(
         return false;
     }
     env.run_in_parallel(scope, [](ConsoleHandle& console, ProControllerContext& context){
-        pbf_press_button(context, BUTTON_R, 20, 230);
-        pbf_press_dpad(context, DPAD_RIGHT, 20, 105);
-        pbf_press_dpad(context, DPAD_RIGHT, 20, 105);
+        pbf_press_button(context, BUTTON_R, 160ms, 1840ms);
+        pbf_press_dpad(context, DPAD_RIGHT, 160ms, 840ms);
+        pbf_press_dpad(context, DPAD_RIGHT, 160ms, 840ms);
         pbf_press_dpad(context, DPAD_DOWN, 20, 140);
     });
     col = 0;

@@ -192,8 +192,8 @@ bool TeraLobbyWaiter::process_bans(const ImageViewRGB32& snapshot, bool skip_gra
         {{"Banned User(s):", std::move(message)}}, "",
         snapshot
     );
-    pbf_press_button(m_context, BUTTON_B, 20, 230);
-    pbf_press_button(m_context, BUTTON_A, 20, 230);
+    pbf_press_button(m_context, BUTTON_B, 160ms, 1840ms);
+    pbf_press_button(m_context, BUTTON_A, 160ms, 1840ms);
 
     return true;
 }

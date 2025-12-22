@@ -354,7 +354,7 @@ void AutoMultiSpawn::advance_one_path_step(
             );
         }
         env.console.log("Not on Pokemon selection. Attempting to switch to it...", COLOR_ORANGE);
-        pbf_press_button(context, BUTTON_X, 20, 230);
+        pbf_press_button(context, BUTTON_X, 160ms, 1840ms);
     }
 
     fast_travel_from_overworld(env, env.console, context, TravelLocations::instance().Mirelands_Mirelands);

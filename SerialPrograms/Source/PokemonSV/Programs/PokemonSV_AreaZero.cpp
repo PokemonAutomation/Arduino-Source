@@ -113,11 +113,11 @@ void inside_zero_gate_to_station(
             switch (ret){
             case 0:
                 stream.log("Detected dialog.");
-                pbf_press_button(context, BUTTON_B, 20, 105);
+                pbf_press_button(context, BUTTON_B, 160ms, 840ms);
                 continue;
             case 1:
                 stream.log("Detected rest prompt.");
-                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_button(context, BUTTON_A, 160ms, 840ms);
                 continue;
             case 2:
                 stream.log("Done healing!");
@@ -128,7 +128,7 @@ void inside_zero_gate_to_station(
                 if (healed){
                     break;
                 }else{
-                    pbf_press_button(context, BUTTON_A, 20, 105);
+                    pbf_press_button(context, BUTTON_A, 160ms, 840ms);
                     continue;
                 }
             default:
@@ -200,7 +200,7 @@ void return_to_inside_zero_gate(
     int ret = run_until<ProControllerContext>(
         stream, context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 32, 20, 105);
+            pbf_move_left_joystick(context, 255, 32, 160ms, 840ms);
             pbf_mash_button(context, BUTTON_L, 60);
             pbf_move_left_joystick(context, 128, 0, 10000ms, 0ms);
         },
@@ -275,7 +275,7 @@ void inside_zero_gate_to_secret_cave_entrance(
     context.wait_for(std::chrono::seconds(3));
 
     pbf_move_left_joystick(context, 0, 208, 30, 50);
-    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
 
     //  Leg 1

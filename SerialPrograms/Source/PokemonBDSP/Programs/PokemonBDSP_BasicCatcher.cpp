@@ -106,7 +106,7 @@ CatchResults throw_balls(
         {
             BattleBallReader reader(stream, language);
 
-            pbf_press_button(context, BUTTON_X, 20, 105);
+            pbf_press_button(context, BUTTON_X, 160ms, 840ms);
             context.wait_for_all_requests();
 
             const int16_t num_balls = move_to_ball(reader, stream, context, ball_slug);
@@ -264,8 +264,8 @@ CatchResults basic_catcher(
                     stream
                 );
             }
-            pbf_move_right_joystick(context, 128, 255, 20, 105);
-            pbf_press_button(context, BUTTON_ZL, 20, 105);
+            pbf_move_right_joystick(context, 128, 255, 160ms, 840ms);
+            pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
             break; //  Continue the loop.
 
         default:

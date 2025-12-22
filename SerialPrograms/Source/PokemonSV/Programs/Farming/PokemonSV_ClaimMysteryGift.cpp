@@ -179,7 +179,7 @@ void ClaimMysteryGift::enter_mystery_gift_via_internet_window(SingleSwitchProgra
     for (size_t i = 0; i < max_attempts; i++){
         enter_menu_from_overworld(env.program_info(), env.console, context, menu_index);
         pbf_press_button(context, BUTTON_A, 160ms, 4000ms);
-        pbf_press_dpad(context, DPAD_UP, 20, 105);
+        pbf_press_dpad(context, DPAD_UP, 160ms, 840ms);
         pbf_press_button(context, BUTTON_A, 160ms, 4000ms);
         pbf_press_button(context, BUTTON_A, 160ms, 4000ms);
         try {
@@ -299,9 +299,9 @@ void ClaimMysteryGift::enter_mystery_gift_code_window(SingleSwitchProgramEnviron
     for (size_t i = 0; i < max_attempts; i++){
         enter_menu_from_overworld(env.program_info(), env.console, context, menu_index);
         pbf_press_button(context, BUTTON_A, 160ms, 4000ms);
-        pbf_press_dpad(context, DPAD_UP, 20, 105);
+        pbf_press_dpad(context, DPAD_UP, 160ms, 840ms);
         pbf_press_button(context, BUTTON_A, 160ms, 4000ms);
-        pbf_press_dpad(context, DPAD_DOWN, 20, 105);
+        pbf_press_dpad(context, DPAD_DOWN, 160ms, 840ms);
         pbf_press_button(context, BUTTON_A, 160ms, 4000ms);
         pbf_press_button(context, BUTTON_A, 160ms, 10000ms);
         try {

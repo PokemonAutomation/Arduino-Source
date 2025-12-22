@@ -66,9 +66,9 @@ bool change_view_to_stats_or_judge(
 //        //  land on the IV checker. Otherwise, it will land us back to nothing.
 //        //  Then the next press will be a single which will put us on the stats
 //        //  with no IV checker.
-        pbf_press_button(context, BUTTON_PLUS, 20, 105);
+        pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
 //        if (attempts % 2 == 0){
-//            pbf_press_button(context, BUTTON_PLUS, 20, 230);
+//            pbf_press_button(context, BUTTON_PLUS, 160ms, 1840ms);
 //        }
     }
     return true;
@@ -106,7 +106,7 @@ void change_view_to_judge(
         //  Check if we're even on a stats screen.
         if (stats.stddev.sum() < 50){
             stream.log("Unable to detect stats menu. Attempting to correct.", COLOR_RED);
-            pbf_press_button(context, BUTTON_PLUS, 20, 105);
+            pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
             continue;
         }
 
@@ -123,7 +123,7 @@ void change_view_to_judge(
 
         //  If less than 4 of the IVs are read, assume we're not on the judge screen.
         if (detected < 4){
-            pbf_press_button(context, BUTTON_PLUS, 20, 230);
+            pbf_press_button(context, BUTTON_PLUS, 160ms, 1840ms);
         }else{
             break;
         }

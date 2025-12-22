@@ -350,7 +350,7 @@ void collect_eggs_after_sandwich(
     stream.overlay().add_log("Move past picnic table", COLOR_WHITE);
 
     //  Recall your ride to reduce obstacles.
-    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+    pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
 
 #if 0
     // this sequence will purposefully fail if Camera support is off. 
@@ -368,11 +368,11 @@ void collect_eggs_after_sandwich(
     pbf_move_left_joystick(context, 240, 255, 40, 40);
 
     //  Move closer to the basket, up to the table
-    pbf_press_button(context, BUTTON_L, 20, 105);
+    pbf_press_button(context, BUTTON_L, 160ms, 840ms);
     pbf_move_left_joystick(context, 128, 0, 100, 40);
 
     //  face away from the table
-    pbf_press_button(context, BUTTON_L, 20, 105);
+    pbf_press_button(context, BUTTON_L, 160ms, 840ms);
     pbf_move_left_joystick(context, 128, 255, 10, 40);  
 #endif
 
@@ -421,7 +421,7 @@ void collect_eggs_after_sandwich(
     pbf_move_left_joystick(context, 128, 255, 10, 40);
 
     //  Move closer to the basket.
-    pbf_press_button(context, BUTTON_L, 20, 105);
+    pbf_press_button(context, BUTTON_L, 160ms, 840ms);
     pbf_move_left_joystick(context, 128, 0, 10, 40);
 #endif
 

@@ -167,7 +167,7 @@ bool CloneItems101::clone_item(ProgramEnvironment& env, VideoStream& stream, Pro
         case 0:
             stream.log("Detected overworld. (unexpected)", COLOR_RED);
             stats.m_errors++;
-            pbf_press_button(context, BUTTON_X, 20, 105);
+            pbf_press_button(context, BUTTON_X, 160ms, 840ms);
             continue;
         case 1:
             stream.log("Detected main menu.");
@@ -223,7 +223,7 @@ bool CloneItems101::clone_item(ProgramEnvironment& env, VideoStream& stream, Pro
             stream.log("Detected box slot 1.");
 
             if (!item_held){
-                pbf_press_button(context, BUTTON_B, 20, 105);
+                pbf_press_button(context, BUTTON_B, 160ms, 840ms);
 //                continue;
                 return true;
             }
@@ -295,7 +295,7 @@ void CloneItems101::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             env.console, context,
             [](ProControllerContext& context){
                 for (size_t c = 0; c < 10; c++){
-                    pbf_press_button(context, BUTTON_B, 20, 230);
+                    pbf_press_button(context, BUTTON_B, 160ms, 1840ms);
                 }
             },
             {overworld, main_menu}

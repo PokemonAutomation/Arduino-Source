@@ -249,7 +249,7 @@ void SizeChecker::program(SingleSwitchProgramEnvironment& env, ProControllerCont
                     env.console, context,
                     [](ProControllerContext& context){
                         for (size_t c = 0; c < 10; c++){
-                            pbf_press_button(context, BUTTON_A, 20, 105);
+                            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
                         }
                     },
                     {dialog}
