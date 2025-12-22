@@ -33,6 +33,35 @@ print(f"Size: {width} x {height}")
 raw_image = image.copy()
 
 # ==================================================================
+# LZA Donut Berry Selection
+#add_infer_box_to_image(raw_image, 0.001, 0.245, 0.006, 0.070, image)
+#add_infer_box_to_image(raw_image, 0.001, 0.332, 0.006, 0.070, image)
+#add_infer_box_to_image(raw_image, 0.001, 0.419, 0.006, 0.070, image)
+#add_infer_box_to_image(raw_image, 0.001, 0.506, 0.006, 0.070, image)
+#add_infer_box_to_image(raw_image, 0.001, 0.593, 0.006, 0.070, image)
+#add_infer_box_to_image(raw_image, 0.001, 0.68, 0.006, 0.070, image)
+#add_infer_box_to_image(raw_image, 0.001, 0.767, 0.006, 0.070, image)
+#add_infer_box_to_image(raw_image, 0.001, 0.854, 0.006, 0.070, image)
+
+# ==================================================================
+# LZA Donut Berry Text
+#add_infer_box_to_image(raw_image, 0.065, 0.250, 0.173, 0.037, image)
+#add_infer_box_to_image(raw_image, 0.065, 0.336, 0.173, 0.037, image)
+#add_infer_box_to_image(raw_image, 0.065, 0.422, 0.173, 0.037, image)
+#add_infer_box_to_image(raw_image, 0.065, 0.508, 0.173, 0.037, image)
+#add_infer_box_to_image(raw_image, 0.065, 0.594, 0.173, 0.037, image)
+#add_infer_box_to_image(raw_image, 0.065, 0.680, 0.173, 0.037, image)
+#add_infer_box_to_image(raw_image, 0.065, 0.766, 0.173, 0.037, image)
+#add_infer_box_to_image(raw_image, 0.065, 0.852, 0.173, 0.037, image)
+
+# ==================================================================
+# LZA Donut Berry Image
+#add_infer_box_to_image(raw_image, 0.029, 0.254, 0.030, 0.047, image)
+#add_infer_box_to_image(raw_image, 0.029, 0.341, 0.030, 0.047, image)
+#add_infer_box_to_image(raw_image, 0.029, 0.428, 0.030, 0.047, image)
+
+
+# ==================================================================
 # Home summary screen finish loading detector
 # add_infer_box_to_image(raw_image, 0.388, 0.238, 0.109, 0.062, image)
 
