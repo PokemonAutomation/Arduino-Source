@@ -153,7 +153,7 @@ void MassAttachItems::program(SingleSwitchProgramEnvironment& env, ProController
     MassAttachItems_Descriptor::Stats& stats = env.current_stats<MassAttachItems_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 10, 0);
+    pbf_press_button(context, BUTTON_LCLICK, 80ms, 0ms);
 
     BoxDetector box_detector;
     VideoOverlaySet overlays(env.console.overlay());

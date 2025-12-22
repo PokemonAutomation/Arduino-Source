@@ -106,7 +106,7 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
     env.update_stats();
 
     //  Connect the controller.
-    pbf_move_right_joystick(context, 0, 255, 10, 0);
+    pbf_move_right_joystick(context, 0, 255, 80ms, 0ms);
 
     const auto selected_berries = TARGET_BERRIES.selected_berries();
     for (const auto& berry_slug: selected_berries){

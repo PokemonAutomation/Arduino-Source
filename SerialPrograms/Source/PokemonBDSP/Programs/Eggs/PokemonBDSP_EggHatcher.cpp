@@ -98,7 +98,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     Milliseconds TOTAL_DELAY = INCUBATION_TIME + SAFETY_TIME1.get() + HATCH_DELAY0.get();
 
     //  Connect the controller.
-    pbf_move_right_joystick(context, 0, 255, 10, 0);
+    pbf_move_right_joystick(context, 0, 255, 80ms, 0ms);
 
     uint8_t batches = BOXES_TO_HATCH * 6;
     uint8_t column = 0;

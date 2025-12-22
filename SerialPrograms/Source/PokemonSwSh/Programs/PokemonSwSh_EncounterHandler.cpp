@@ -33,7 +33,7 @@ void run_away(
     VideoStream& stream, ProControllerContext& context,
     Milliseconds exit_battle_time
 ){
-    pbf_press_dpad(context, DPAD_UP, 10, 0);
+    pbf_press_dpad(context, DPAD_UP, 80ms, 0ms);
     pbf_press_button(context, BUTTON_A, 250ms, 750ms);
 
     BlackScreenOverWatcher black_screen_detector;

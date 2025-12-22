@@ -76,7 +76,7 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     env.update_stats();
 
     //  Connect the controller.
-    pbf_move_right_joystick(context, 0, 255, 10, 0);
+    pbf_move_right_joystick(context, 0, 255, 80ms, 0ms);
 
     //  Move to corner.
     pbf_move_left_joystick(context, 0, 255, 125, 0);

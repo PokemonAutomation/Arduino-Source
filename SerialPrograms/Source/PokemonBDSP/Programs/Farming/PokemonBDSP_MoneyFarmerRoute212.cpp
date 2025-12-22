@@ -393,7 +393,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, ProContro
 
         if (woman){
 //            pbf_move_left_joystick(context, 0, 128, 52, 0);
-            pbf_move_left_joystick(context, 128, 255, 10, 0);
+            pbf_move_left_joystick(context, 128, 255, 80ms, 0ms);
 
             //  Battle woman.
             if(battle(env, context, pp, false)){
@@ -417,10 +417,10 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, ProContro
 
 //            if (woman){
                 pbf_move_left_joystick(context, 0, 128, 52, 0);
-                pbf_move_left_joystick(context, 128, 255, 10, 0);
+                pbf_move_left_joystick(context, 128, 255, 80ms, 0ms);
 //            }else{
 //                pbf_move_left_joystick(context, 0, 128, 105, 0);
-//                pbf_move_left_joystick(context, 128, 255, 10, 0);
+//                pbf_move_left_joystick(context, 128, 255, 80ms, 0ms);
 //            }
 
             //  Battle man.

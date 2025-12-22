@@ -20,18 +20,18 @@ namespace PokemonSwSh{
 
 void run_away_with_lights(ProControllerContext& context){
 //    set_leds(context, true);
-    pbf_press_dpad(context, DPAD_UP, 10, 0);
+    pbf_press_dpad(context, DPAD_UP, 80ms, 0ms);
     pbf_press_button(context, BUTTON_A, 80ms, 3000ms);
 //    set_leds(context, false);
 }
 void enter_summary(ProControllerContext& context, bool regi_move_right){
-    pbf_press_dpad(context, DPAD_DOWN, 10, 0);
+    pbf_press_dpad(context, DPAD_DOWN, 80ms, 0ms);
     pbf_press_button(context, BUTTON_A, 80ms, 2000ms);
     pbf_press_button(context, BUTTON_A, 10, 200);
     if (regi_move_right){
         pbf_move_left_joystick(context, 255, 128, 20, 30);
     }
-    pbf_press_dpad(context, DPAD_DOWN, 10, 0);
+    pbf_press_dpad(context, DPAD_DOWN, 80ms, 0ms);
     pbf_press_button(context, BUTTON_A, 10, 10);    //  For Regi, this clears the dialog after running.
 }
 void close_game_if_overworld(

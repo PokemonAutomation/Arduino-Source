@@ -381,8 +381,8 @@ void start_game_from_home_blind(
 
         //  If the update menu isn't there, these will get swallowed by the opening
         //  animation for the select user menu.
-        pbf_press_button(context, BUTTON_A, 10, 175);    //  Choose game
-        pbf_press_dpad(context, DPAD_UP, 10, 0);         //  Skip the update window.
+        pbf_press_button(context, BUTTON_A, 10, 175);   //  Choose game
+        pbf_press_dpad(context, DPAD_UP, 80ms, 0ms);    //  Skip the update window.
         move_to_user(context, user_slot);
     }
 

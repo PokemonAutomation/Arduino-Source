@@ -117,7 +117,7 @@ void PoffinCooker::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     env.update_stats();
 
     //  Connect the controller.
-    pbf_move_right_joystick(context, 0, 255, 10, 0);
+    pbf_move_right_joystick(context, 0, 255, 80ms, 0ms);
 
     env.log("Select the cooking option");
     //  Select the cooking option.

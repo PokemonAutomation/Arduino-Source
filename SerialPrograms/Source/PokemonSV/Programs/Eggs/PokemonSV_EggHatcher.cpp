@@ -178,7 +178,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     EggHatcher_Descriptor::Stats& stats = env.current_stats<EggHatcher_Descriptor::Stats>();
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 10, 0);
+    pbf_press_button(context, BUTTON_L, 80ms, 0ms);
 
     if (START_LOCATION == StartLocation::AnywhereOffRide){
         // Get on ride:

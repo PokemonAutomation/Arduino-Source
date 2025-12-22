@@ -200,7 +200,7 @@ void SizeChecker::program(SingleSwitchProgramEnvironment& env, ProControllerCont
     SizeChecker_Descriptor::Stats& stats = env.current_stats<SizeChecker_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 10, 0);
+    pbf_press_button(context, BUTTON_L, 80ms, 0ms);
 
     // Loop through boxes.
     for (uint8_t box = 0; box < BOXES_TO_CHECK; box++){

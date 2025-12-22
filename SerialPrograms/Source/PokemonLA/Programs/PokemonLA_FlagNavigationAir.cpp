@@ -191,7 +191,7 @@ FlagNavigationAir::FlagNavigationAir(
                 m_looking_straight_ahead.store(true, std::memory_order_release);
 //                cout << "State::DASH_LEFT: m_looking_straight_ahead = true" << endl;
             }
-//            pbf_press_button(context, BUTTON_B, 10, 0);
+//            pbf_press_button(context, BUTTON_B, 80ms, 0ms);
             double shift = 0;
             double distance, flag_x, flag_y;
             if (m_flag.get(distance, flag_x, flag_y)){
@@ -233,7 +233,7 @@ FlagNavigationAir::FlagNavigationAir(
                 m_looking_straight_ahead.store(true, std::memory_order_release);
 //                cout << "State::DASH_LEFT: m_looking_straight_ahead = true" << endl;
             }
-//            pbf_press_button(context, BUTTON_Y, 10, 0);
+//            pbf_press_button(context, BUTTON_Y, 80ms, 0ms);
             double shift = 0;
             double distance, flag_x, flag_y;
             if (m_flag.get(distance, flag_x, flag_y)){

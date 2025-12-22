@@ -86,7 +86,7 @@ void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, ProCo
     env.update_stats();
 
     //  Connect the controller.
-    pbf_move_right_joystick(context, 0, 255, 10, 0);
+    pbf_move_right_joystick(context, 0, 255, 80ms, 0ms);
 
     for (uint16_t c = 0; c < MAX_FETCH_ATTEMPTS; c++){
         env.update_stats();

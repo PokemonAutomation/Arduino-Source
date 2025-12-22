@@ -161,7 +161,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
 
     //  Connect both controllers.
     env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
-        pbf_press_button(context, BUTTON_LCLICK, 10, 0);
+        pbf_press_button(context, BUTTON_LCLICK, 80ms, 0ms);
     });
 
     uint8_t row = 0;

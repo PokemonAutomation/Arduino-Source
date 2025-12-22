@@ -213,7 +213,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
                 //Set starting position by flying - move map cursor
                 open_map_from_overworld(env.program_info(), env.console, context);
                 pbf_press_button(context, BUTTON_ZR, 50, 40);
-                pbf_move_left_joystick(context, 48, 192, 10, 0);
+                pbf_move_left_joystick(context, 48, 192, 80ms, 0ms);
                 navigate_to_gimmi(env, context);
 
                 //Check for tauros interrupt before pressing A - reset position if there was one
