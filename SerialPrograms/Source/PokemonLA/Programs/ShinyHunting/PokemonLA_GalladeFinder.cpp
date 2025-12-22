@@ -132,7 +132,7 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProContro
                 pbf_move_left_joystick(context, 255, 128, 1800ms, 160ms); // right alone
 
                 // down portion
-                // pbf_move_left_joystick(context, 128, 255, (uint16_t)(1.9 * TICKS_PER_SECOND), 20); // OLD down
+                // pbf_move_left_joystick(context, 128, 255, 1900ms, 160ms); // OLD down
                 pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, {0, -1}, {0, 0}, 1800ms);
 
                 // camera align

@@ -28,7 +28,7 @@ void resume_game_no_interact_old(ProControllerContext& context, bool tolerate_up
         pbf_press_button(context, BUTTON_HOME, 80ms, HOME_TO_GAME_DELAY);
     }
 }
-void resume_game_back_out_old(ProControllerContext& context, bool tolerate_update_menu, uint16_t mash_B_time){
+void resume_game_back_out_old(ProControllerContext& context, bool tolerate_update_menu, Milliseconds mash_B_time){
     Milliseconds HOME_TO_GAME_DELAY = GameSettings::instance().HOME_TO_GAME_DELAY0;
     if (tolerate_update_menu){
         pbf_press_button(context, BUTTON_HOME, 80ms, HOME_TO_GAME_DELAY);
@@ -41,7 +41,7 @@ void resume_game_back_out_old(ProControllerContext& context, bool tolerate_updat
     }
 }
 void resume_game_front_of_den_nowatts(ProControllerContext& context, bool tolerate_update_menu){
-    resume_game_back_out_old(context, tolerate_update_menu, 400);
+    resume_game_back_out_old(context, tolerate_update_menu, 3200ms);
 }
 
 void fast_reset_game(

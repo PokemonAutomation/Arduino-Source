@@ -73,7 +73,12 @@ void ShinyHuntUnattendedRegi::program(SingleSwitchProgramEnvironment& env, ProCo
 
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
-        resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
+        resume_game_back_out(
+            env.console,
+            context,
+            ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST,
+            1600ms
+        );
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
     }

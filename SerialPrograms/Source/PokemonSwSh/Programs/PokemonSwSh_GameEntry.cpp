@@ -38,7 +38,8 @@ void resume_game_no_interact(
 }
 void resume_game_back_out(
     ConsoleHandle& console, ProControllerContext& context,
-    bool tolerate_update_menu, uint16_t mash_B_time
+    bool tolerate_update_menu,
+    Milliseconds mash_B_time
 ){
     bool video_available = (bool)console.video().snapshot();
     if (video_available){
@@ -54,7 +55,7 @@ void resume_game_back_out(
 void enter_loading_game(
     VideoStream& stream, ProControllerContext& context,
     bool backup_save,
-    uint16_t post_wait_time
+    Milliseconds post_wait_time
 ){
     openedgame_to_gamemenu(stream, context, GameSettings::instance().START_GAME_WAIT0);
 
@@ -98,7 +99,7 @@ void enter_loading_game(
     }
     stream.log("start_game_with_inference(): Game started.", COLOR_PURPLE);
 
-    if (post_wait_time != 0){
+    if (post_wait_time != 0ms){
         pbf_wait(context, post_wait_time);
     }
 }
@@ -109,7 +110,7 @@ void start_game_from_home_with_inference(
     uint8_t game_slot,
     uint8_t user_slot,
     bool backup_save,
-    uint16_t post_wait_time
+    Milliseconds post_wait_time
 ){
     NintendoSwitch::start_game_from_home(
         console,
@@ -129,7 +130,7 @@ void reset_game_from_home_with_inference(
     ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu,
     bool backup_save,
-    uint16_t post_wait_time
+    Milliseconds post_wait_time
 ){
     from_home_close_and_reopen_game(console, context, tolerate_update_menu);
     context.wait_for_all_requests();
@@ -145,7 +146,7 @@ void start_game_from_home(
     uint8_t game_slot,
     uint8_t user_slot,
     bool backup_save,
-    uint16_t post_wait_time
+    Milliseconds post_wait_time
 ){
     bool video_available = (bool)console.video().snapshot();
     if (video_available ||
@@ -156,7 +157,13 @@ void start_game_from_home(
         close_game_from_home(console, context);
 //        cout << "start_game_from_home_with_inference game" << endl;
         start_game_from_home_with_inference(
-            console, context, tolerate_update_menu, game_slot, user_slot, backup_save, post_wait_time
+            console,
+            context,
+            tolerate_update_menu,
+            game_slot,
+            user_slot,
+            backup_save,
+            post_wait_time
         );
         return;
     }

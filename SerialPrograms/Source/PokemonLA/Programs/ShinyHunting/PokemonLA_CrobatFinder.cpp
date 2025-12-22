@@ -165,7 +165,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
                 destination_time = current_time();
                 shiny_action.store(&SHINY_DETECTED_DESTINATION, std::memory_order_release);
 
-                pbf_move_left_joystick(context, 128, 0, (uint16_t)(3.8 * TICKS_PER_SECOND), 0); // forward to crobat check
+                pbf_move_left_joystick(context, 128, 0, 3800ms, 0ms); // forward to crobat check
 
             },
             {{shiny_detector}}

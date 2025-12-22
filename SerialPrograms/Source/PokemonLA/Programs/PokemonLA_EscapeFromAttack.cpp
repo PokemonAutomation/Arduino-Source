@@ -14,7 +14,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-const Milliseconds GET_ON_MOUNT_TIME = Milliseconds(1000);
+//const Milliseconds GET_ON_MOUNT_TIME = Milliseconds(1000);
 const Milliseconds GET_ON_BRAVIARY_TIME = Milliseconds(2240);
 
 
@@ -50,8 +50,6 @@ EscapeFromAttack::EscapeFromAttack(
     *this += m_mount;
     *this += m_centerA;
     *this += m_leftB;
-
-    const std::chrono::milliseconds GET_ON_BRAVIARY_TIME_MILLIS(GET_ON_BRAVIARY_TIME * 1000 / TICKS_PER_SECOND);
 
     register_state_command(State::UNKNOWN, [this](){
         m_stream.log("Unknown state. Moving forward...");
@@ -115,9 +113,9 @@ EscapeFromAttack::EscapeFromAttack(
         });
         return false;
     });
-    register_state_command(State::DASH_FORWARD, [this, GET_ON_BRAVIARY_TIME_MILLIS](){
+    register_state_command(State::DASH_FORWARD, [this](){
         bool delay_dash =
-            current_time() < m_get_on_sneasler_time + GET_ON_BRAVIARY_TIME_MILLIS;
+            current_time() < m_get_on_sneasler_time + GET_ON_BRAVIARY_TIME;
         if (delay_dash){
             m_stream.log("Dashing forward... (delayed due to being on Sneasler)");
         }else{

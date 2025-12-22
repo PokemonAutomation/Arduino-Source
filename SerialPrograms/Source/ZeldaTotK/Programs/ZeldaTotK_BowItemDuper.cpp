@@ -119,7 +119,7 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         // turn around
         pbf_move_left_joystick(context, 128, 0, 3, 10);
         // wait half a second
-        pbf_wait(context, (uint16_t)(0.3 * TICKS_PER_SECOND));
+        pbf_wait(context, 300ms);
 
         // pick up both bows
         pbf_press_button(context, BUTTON_A, 20, 10);
@@ -128,7 +128,7 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         // turn back around and wait before reopening menu
         pbf_move_left_joystick(context, 128, 255, 3, 10);
         // wait half a second
-        pbf_wait(context, (uint16_t)(0.4 * TICKS_PER_SECOND));
+        pbf_wait(context, 400ms);
 
         // now go back into the menu
         pbf_press_button(context, BUTTON_PLUS, 10, 10);

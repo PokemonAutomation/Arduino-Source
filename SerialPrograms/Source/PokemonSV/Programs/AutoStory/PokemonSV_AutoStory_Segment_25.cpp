@@ -203,41 +203,41 @@ void checkpoint_59(
             [&](ProControllerContext& context){
 
                 DirectionDetector direction;
-                uint16_t seconds_wait = 8;
+                Milliseconds wait = 8000ms;
  
                 direction.change_direction(env.program_info(), env.console, context, 2.618972);
                 pbf_move_left_joystick(context, 128, 0, 100, 50);
                 pbf_press_button(context, BUTTON_R, 20, 20);
-                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                pbf_wait(context, wait);
                 pbf_move_left_joystick(context, 128, 0, 200, 50);
                 pbf_press_button(context, BUTTON_R, 20, 20);
 
                 direction.change_direction(env.program_info(), env.console, context, 3.265261);
                 pbf_move_left_joystick(context, 128, 0, 300, 50);
                 pbf_press_button(context, BUTTON_R, 20, 20);
-                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 2.411131);
                 pbf_move_left_joystick(context, 128, 0, 400, 50);
                 pbf_press_button(context, BUTTON_R, 20, 20);
-                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                pbf_wait(context, wait);
 
                 pbf_move_left_joystick(context, 128, 0, 300, 50);
 
                 direction.change_direction(env.program_info(), env.console, context, 2.828856);
                 pbf_move_left_joystick(context, 128, 0, 200, 50);
                 pbf_press_button(context, BUTTON_R, 20, 20);
-                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 2.306254);
                 pbf_move_left_joystick(context, 128, 0, 500, 50);
                 pbf_press_button(context, BUTTON_R, 20, 20);
-                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 2.565727);
                 pbf_move_left_joystick(context, 128, 0, 300, 50);
                 pbf_press_button(context, BUTTON_R, 20, 20);
-                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 3.036098);
                 pbf_move_left_joystick(context, 128, 0, 400, 50);
@@ -245,17 +245,17 @@ void checkpoint_59(
                 direction.change_direction(env.program_info(), env.console, context, 3.525225);
                 pbf_move_left_joystick(context, 128, 0, 200, 50);
                 pbf_press_button(context, BUTTON_R, 20, 20);
-                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 4.051901);
                 pbf_move_left_joystick(context, 128, 0, 700, 50);
                 pbf_press_button(context, BUTTON_R, 20, 20);
-                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 4.573712);
                 pbf_move_left_joystick(context, 128, 0, 500, 50);
                 pbf_press_button(context, BUTTON_R, 20, 20);
-                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                pbf_wait(context, wait);
 
 
                 // wait 30 seconds to let the trainers cooldown
@@ -264,28 +264,28 @@ void checkpoint_59(
                 direction.change_direction(env.program_info(), env.console, context, 1.310148);
                 pbf_move_left_joystick(context, 128, 0, 800, 50);
                 pbf_press_button(context, BUTTON_R, 20, 20);
-                pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                pbf_wait(context, wait);
                 
                 try {
                     direction.change_direction(env.program_info(), env.console, context, 0.572754);
                     pbf_press_button(context, BUTTON_R, 20, 20);
                     pbf_move_left_joystick(context, 128, 0, 700, 50);
                     pbf_press_button(context, BUTTON_R, 20, 20);
-                    pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                    pbf_wait(context, wait);
 
                     direction.change_direction(env.program_info(), env.console, context, 6.036137);
                     pbf_move_left_joystick(context, 128, 0, 200, 50);
                     pbf_press_button(context, BUTTON_R, 20, 20);
-                    pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                    pbf_wait(context, wait);
 
                     direction.change_direction(env.program_info(), env.console, context, 5.779599);
                     pbf_move_left_joystick(context, 128, 0, 400, 50);
                     pbf_press_button(context, BUTTON_R, 20, 20);
-                    pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                    pbf_wait(context, wait);
 
                     pbf_move_left_joystick(context, 128, 0, 600, 50);
                     pbf_press_button(context, BUTTON_R, 20, 20);
-                    pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
+                    pbf_wait(context, wait);
 
 
                     pbf_wait(context, 20000ms);

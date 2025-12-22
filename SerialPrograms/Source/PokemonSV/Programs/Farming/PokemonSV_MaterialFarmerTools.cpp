@@ -668,7 +668,7 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, VideoStream&
         pbf_press_button(context, BUTTON_L, 50, 300);
 
         // move cursor to bottom right corner
-        pbf_move_left_joystick(context, 255, 255, TICKS_PER_SECOND*5, 50);
+        pbf_move_left_joystick(context, 255, 255, 5000ms, 400ms);
 
         // move cursor to Blueberry academy fast travel point (up-left)
         // try different magnitudes of cursor push with each failure.

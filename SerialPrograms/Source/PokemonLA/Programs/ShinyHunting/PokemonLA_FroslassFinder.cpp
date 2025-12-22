@@ -116,9 +116,9 @@ void FroslassFinder::run_iteration(
     //Setup
     pbf_move_left_joystick(context, 108, 255, 20, 20);
     pbf_press_button(context, BUTTON_ZL, 10,10);
-    pbf_wait(context, (uint16_t)(0.5 * TICKS_PER_SECOND));
+    pbf_wait(context, 500ms);
     change_mount(env.console, context, MountState::BRAVIARY_ON);
-    pbf_wait(context, (uint16_t)(0.5 * TICKS_PER_SECOND));
+    pbf_wait(context, 500ms);
 
     {
         float shiny_coefficient = 1.0;

@@ -32,7 +32,7 @@ int move_to_ball(
     const BattleBallReader& reader,
     VideoStream& stream, ProControllerContext& context,
     const std::string& ball_slug,
-    bool forward, int attempts, uint16_t delay
+    bool forward, int attempts, Milliseconds delay
 ){
     VideoSnapshot frame = stream.video().snapshot();
     std::string first_ball = reader.read_ball(frame);
@@ -42,7 +42,7 @@ int move_to_ball(
 
     size_t repeat_counter = 0;
     for (int c = 1; c < attempts; c++){
-        pbf_press_dpad(context, forward ? DPAD_RIGHT : DPAD_LEFT, 10, delay);
+        pbf_press_dpad(context, forward ? DPAD_RIGHT : DPAD_LEFT, 80ms, delay);
         context.wait_for_all_requests();
         frame = stream.video().snapshot();
         std::string current_ball = reader.read_ball(frame);
@@ -66,7 +66,7 @@ int16_t move_to_ball(
     const std::string& ball_slug
 ){
     //  Search forward at high speed.
-    int ret = move_to_ball(reader, stream, context, ball_slug, true, 100, 40);
+    int ret = move_to_ball(reader, stream, context, ball_slug, true, 100, 320ms);
     if (ret < 0){
         return 0;
     }
@@ -81,7 +81,7 @@ int16_t move_to_ball(
 
     //  Now try again in reverse at a lower speed in case we overshot.
     //  This will return immediately if we got it right the first time.
-    ret = move_to_ball(reader, stream, context, ball_slug, false, 5, TICKS_PER_SECOND);
+    ret = move_to_ball(reader, stream, context, ball_slug, false, 5, 1000ms);
     if (ret < 0){
         return 0;
     }
