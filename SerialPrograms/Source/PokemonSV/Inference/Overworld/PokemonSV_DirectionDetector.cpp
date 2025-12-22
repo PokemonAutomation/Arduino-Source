@@ -169,7 +169,7 @@ void DirectionDetector::change_direction(
     size_t i = 0;
     size_t MAX_ATTEMPTS = 20;
     bool is_minimap_definitely_unlocked = false;
-    uint8_t scale_factor = 80;    
+    double scale_factor = 640;
     double push_magnitude_scale_factor = 1;
     while (i < MAX_ATTEMPTS){ // 10 attempts to move the direction to the target
         context.wait_for_all_requests();
@@ -225,20 +225,26 @@ void DirectionDetector::change_direction(
         }        
 
         
-        if (scale_factor > 40 && abs_diff < 0.05){
-            scale_factor = 40;
+        if (scale_factor > 320 && abs_diff < 0.05){
+            scale_factor = 320;
         }
 
         if (abs_diff < 0.05){
             push_magnitude_scale_factor = 0.5;
         }
 
-        uint16_t push_duration = std::max(uint16_t(std::abs(diff * scale_factor)), uint16_t(8));
+        Milliseconds push_duration = std::max(
+            Milliseconds((int64_t)std::abs(diff * scale_factor)),
+            64ms
+        );
         int16_t push_direction = (diff > 0) ? -1 : 1;
         double push_magnitude = std::max(double((128 * push_magnitude_scale_factor) / (i + 1)), double(15)); // push less with each iteration/attempt
         uint8_t push_x = uint8_t(std::max(std::min(int(128 + (push_direction * push_magnitude)), 255), 0));
-        stream.log("push magnitude: " + std::to_string(push_x) + ", push duration: " +  std::to_string(push_duration));
-        pbf_move_right_joystick(context, push_x, 128, push_duration, 100);
+        stream.log(
+            "push magnitude: " + std::to_string(push_x) +
+            ", push duration: " +  std::to_string(push_duration.count()) + "ms"
+        );
+        pbf_move_right_joystick(context, push_x, 128, push_duration, 800ms);
         i++;
     }
     
