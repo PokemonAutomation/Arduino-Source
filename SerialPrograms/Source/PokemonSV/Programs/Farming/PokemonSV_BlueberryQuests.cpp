@@ -908,7 +908,7 @@ void quest_wild_tera(
             static_cast<VisualInferenceCallback&>(encounter_watcher),
             static_cast<AudioInferenceCallback&>(encounter_watcher),
         }
-        );
+    );
     encounter_watcher.throw_if_no_sound();
 
     if (ret >= 0){
@@ -1035,9 +1035,9 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
                 ssf_press_left_joystick(context, {-1, 0}, 1200ms, 400ms);
 
                 ssf_press_button(context, BUTTON_A, 0ms, 1600ms, 0ms);
-                ssf_press_left_joystick(context, 128, 0, 0ms, 400ms);
-                ssf_press_left_joystick(context, 128, 255, 400ms, 800ms);
-                ssf_press_left_joystick(context, 128, 0, 1200ms, 400ms);
+                ssf_press_left_joystick(context, {0, +1}, 0ms, 400ms);
+                ssf_press_left_joystick(context, {0, -1}, 400ms, 800ms);
+                ssf_press_left_joystick(context, {0, +1}, 1200ms, 400ms);
                 pbf_wait(context, 400);
                 context.wait_for_all_requests();
             }
@@ -1361,7 +1361,7 @@ void quest_auto_battle(
         pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
         use_lets_go_to_clear_in_front(stream, context, tracker, false, [&](ProControllerContext& context){
-            pbf_move_left_joystick(context, 128, 255, 1440ms, 400ms);
+            pbf_move_left_joystick(context, {0, -1}, 1440ms, 400ms);
             pbf_wait(context, 1500);
             context.wait_for_all_requests();
             });

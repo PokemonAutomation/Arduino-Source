@@ -158,7 +158,7 @@ ImageFloatBox OliveDetector::align_to_olive(
     int16_t prev_push_direction = 0;
     for (size_t i = 0; i < MAX_ATTEMPTS; i++){
         direction.change_direction(info, stream, context, direction_facing, throw_if_fail_change_dir);
-        pbf_move_left_joystick(context, 128, 0, 40ms, 160ms);
+        pbf_move_left_joystick(context, {0, +1}, 40ms, 160ms);
     
         olive_box = get_olive_floatbox(stream, context, rgb_gap, area_to_check);
 

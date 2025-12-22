@@ -195,7 +195,7 @@ void checkpoint_44(
 
         // realign to wall
         direction.change_direction(env.program_info(), env.console, context, 1.477);
-        pbf_move_left_joystick(context, 128, 0, 4000ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 4000ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 2.166);
         pbf_move_left_joystick(context, {-1, +1}, 2400ms, 800ms);
 
@@ -259,7 +259,7 @@ void checkpoint_44(
         pbf_move_left_joystick(context, 0, 0, 4000ms, 800ms);
 
         direction.change_direction(env.program_info(), env.console, context, 5.85);
-        pbf_move_left_joystick(context, 128, 0, 480ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 480ms, 800ms);
         handle_failed_action(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 500);
@@ -280,7 +280,7 @@ void checkpoint_44(
         direction.change_direction(env.program_info(), env.console, context, 6.055);        
         pbf_move_left_joystick(context, {0, +1}, 3200ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 5.06);   
-        pbf_move_left_joystick(context, 128, 0, 4800ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 4800ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 4.38);   
         pbf_move_left_joystick(context, 0, 0, 700, 100);
 
@@ -307,9 +307,9 @@ void checkpoint_44(
         pbf_move_left_joystick(context, 0, 0, 700, 100);        
 
         direction.change_direction(env.program_info(), env.console, context, 0.96);
-        pbf_move_left_joystick(context, 128, 0, 2000ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 2000ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 5.17);        
-        pbf_move_left_joystick(context, 128, 0, 400ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 400ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 3.86);
         handle_failed_action(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -356,12 +356,12 @@ void checkpoint_44(
         direction.change_direction(env.program_info(), env.console, context, 4.28);
         pbf_move_left_joystick(context, {0, +1}, 3200ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 3.54);
-        pbf_move_left_joystick(context, 128, 0, 4800ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 4800ms, 800ms);
 
         // align to corner 7.5. bush
         direction.change_direction(env.program_info(), env.console, context, 3.11);
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 1200ms);
-        pbf_move_left_joystick(context, 128, 0, 480ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 480ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 4.28);
         pbf_move_left_joystick(context, {0, +1}, 1600ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 3.60);
@@ -418,18 +418,18 @@ void checkpoint_44(
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 1440ms);
         get_off_ride(env.program_info(), env.console, context);
         direction.change_direction(env.program_info(), env.console, context, 3.60);
-        pbf_move_left_joystick(context, 128, 0, 4800ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 4800ms, 800ms);
 
 
         direction.change_direction(env.program_info(), env.console, context, 1.48);
-        pbf_move_left_joystick(context, 128, 0, 400ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 400ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 3.11);
         pbf_move_left_joystick(context, 128, 0, 180, 100);
         direction.change_direction(env.program_info(), env.console, context, 4.75);
         pbf_move_left_joystick(context, {0, +1}, 800ms, 800ms);
         get_on_ride(env.program_info(), env.console, context);
         direction.change_direction(env.program_info(), env.console, context, 5.53);
-        pbf_move_left_joystick(context, 128, 0, 4800ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 4800ms, 800ms);
         handle_failed_action(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 500);
@@ -446,7 +446,7 @@ void checkpoint_44(
         pbf_move_left_joystick(context, {-1, 0}, 1600ms, 800ms);
 
         direction.change_direction(env.program_info(), env.console, context, 4.02);
-        pbf_move_left_joystick(context, 128, 0, 2000ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 2000ms, 800ms);
         handle_failed_action(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 500);

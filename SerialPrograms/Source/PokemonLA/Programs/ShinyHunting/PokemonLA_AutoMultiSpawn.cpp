@@ -598,7 +598,7 @@ PokemonDetails AutoMultiSpawn::go_to_spawn_point_and_try_focusing_pokemon(
     pbf_wait(context, 50);
     
     // Move forward on foot
-    pbf_move_left_joystick(context, 128, 0, 1280ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 1280ms, 0ms);
 
     context.wait_for_all_requests();
 

@@ -573,7 +573,7 @@ void return_to_academy_after_loss(
     pbf_press_button(context, BUTTON_PLUS, 400ms, 320ms);
     pbf_press_button(context, BUTTON_B, 400ms, 320ms); //Trying to jump/glide over npc spawns
     pbf_press_button(context, BUTTON_B, 400ms, 320ms);
-    pbf_move_left_joystick(context, 128, 0, 4000ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 4000ms, 0ms);
     pbf_press_button(context, BUTTON_B, 400ms, 320ms);
     pbf_press_button(context, BUTTON_B, 400ms, 320ms);
 
@@ -581,7 +581,7 @@ void return_to_academy_after_loss(
     int ret_black_lost = run_until<ProControllerContext>(
         stream, context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, 128, 0, 40000ms, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, 40000ms, 0ms);
         },
         { black_screen }
         );

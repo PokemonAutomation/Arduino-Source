@@ -198,9 +198,9 @@ void jump_glide_fly(
 
 
     if (inverted_flight){
-        pbf_move_left_joystick(context, 128, 255, hold_up, 2000ms);
+        pbf_move_left_joystick(context, {0, -1}, hold_up, 2000ms);
     }else{
-        pbf_move_left_joystick(context, 128, 0, hold_up, 2000ms);
+        pbf_move_left_joystick(context, {0, +1}, hold_up, 2000ms);
     }
 
     pbf_wait(context, flight_wait);

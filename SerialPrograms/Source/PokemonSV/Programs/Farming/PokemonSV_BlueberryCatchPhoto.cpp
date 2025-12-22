@@ -89,7 +89,7 @@ CameraAngle quest_photo_navi(
             pbf_wait(context, 100);
             context.wait_for_all_requests();
 
-            pbf_move_left_joystick(context, 128, 0, 1200ms, 160ms);
+            pbf_move_left_joystick(context, {0, +1}, 1200ms, 160ms);
             pbf_press_button(context, BUTTON_B, 20, 20);
             pbf_wait(context, 200);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
@@ -192,10 +192,10 @@ CameraAngle quest_photo_navi(
             pbf_move_left_joystick(context, {+1, +1}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            pbf_move_left_joystick(context, 128, 0, 4400ms, 160ms);
+            pbf_move_left_joystick(context, {0, +1}, 4400ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            pbf_move_left_joystick(context, 128, 0, 1200ms, 160ms);
+            pbf_move_left_joystick(context, {0, +1}, 1200ms, 160ms);
 
             pbf_move_left_joystick(context, {+1, 0}, 80ms, 160ms);
 
@@ -209,7 +209,7 @@ CameraAngle quest_photo_navi(
 
             pbf_move_left_joystick(context, {+1, -1}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-            pbf_move_left_joystick(context, 128, 0, 3200ms, 160ms);
+            pbf_move_left_joystick(context, {0, +1}, 3200ms, 160ms);
 
             break;
         case BBQuests::photo_fighting:
@@ -243,7 +243,7 @@ CameraAngle quest_photo_navi(
                 jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8000ms, 10400ms, 2400ms);
             }
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
-            pbf_move_left_joystick(context, 128, 0, 1200ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 1200ms, 400ms);
             pbf_move_left_joystick(context, 180, 0, 160ms, 400ms);
             pbf_wait(context, 200); //Give it time to spawn/load.
             context.wait_for_all_requests();
@@ -538,7 +538,7 @@ void quest_catch_navi(
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
             if (console.state().console_type() == ConsoleType::Switch1) {
-                pbf_move_left_joystick(context, 128, 0, 800ms, 160ms);
+                pbf_move_left_joystick(context, {0, +1}, 800ms, 160ms);
             } else {
                 pbf_move_left_joystick(context, 128, 0, 120, 20);
             }
@@ -581,7 +581,7 @@ void quest_catch_navi(
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
             pbf_move_left_joystick(context, {-1, 0}, 160ms, 400ms);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-            pbf_move_left_joystick(context, 128, 0, 400ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 400ms, 400ms);
 
             break;
         case BBQuests::catch_poison: case BBQuests::catch_dark: 
@@ -954,7 +954,7 @@ void quest_catch(
 
     //Heal up and then reset position again.
     OverworldWatcher done_healing(console.logger(), COLOR_BLUE);
-    pbf_move_left_joystick(context, 128, 0, 800ms, 160ms);
+    pbf_move_left_joystick(context, {0, +1}, 800ms, 160ms);
 
     pbf_mash_button(context, BUTTON_A, 300);
     context.wait_for_all_requests();

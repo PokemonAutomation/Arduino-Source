@@ -262,7 +262,7 @@ void checkpoint_59(
                 pbf_wait(context, 30000ms);
 
                 direction.change_direction(env.program_info(), env.console, context, 1.310148);
-                pbf_move_left_joystick(context, 128, 0, 6400ms, 400ms);
+                pbf_move_left_joystick(context, {0, +1}, 6400ms, 400ms);
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, wait);
                 
