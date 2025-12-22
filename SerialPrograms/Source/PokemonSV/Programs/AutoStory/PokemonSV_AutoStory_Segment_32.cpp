@@ -148,7 +148,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
                 pbf_move_left_joystick(context, 0, 0, 300, 50); // move left
-                pbf_move_left_joystick(context, 255, 128, 60, 50); // move right. center on door
+                pbf_move_left_joystick(context, 255, 128, 480ms, 400ms); // move right. center on door
                 pbf_move_left_joystick(context, 128, 0, 300, 50);  // move forward
             }
         );
@@ -227,7 +227,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
                 pbf_move_left_joystick(context, 0, 0, 300, 50); // move left
-                pbf_move_left_joystick(context, 255, 128, 60, 50); // move right. center on door
+                pbf_move_left_joystick(context, 255, 128, 480ms, 400ms); // move right. center on door
                 pbf_move_left_joystick(context, 128, 0, 300, 50);  // move forward
             }
         );
