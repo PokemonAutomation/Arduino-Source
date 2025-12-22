@@ -105,7 +105,7 @@ CameraAngle quest_photo_navi(
             pbf_move_left_joystick(context, 210, 128, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 250, 400);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 4800ms, 2000ms, 3200ms);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
@@ -119,7 +119,7 @@ CameraAngle quest_photo_navi(
             pbf_move_left_joystick(context, 220, 255, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 400, 400);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 4800ms, 3200ms, 3200ms);
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
             pbf_move_left_joystick(context, {+1, 0}, 160ms, 400ms);
@@ -142,7 +142,7 @@ CameraAngle quest_photo_navi(
             pbf_move_left_joystick(context, 205, 64, 160ms, 840ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1500, 300);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8000ms, 12000ms, 2400ms);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
@@ -157,7 +157,7 @@ CameraAngle quest_photo_navi(
             pbf_move_left_joystick(context, 0, 80, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 2000, 1500, 200);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 16000ms, 12000ms, 1600ms);
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
 
@@ -176,7 +176,7 @@ CameraAngle quest_photo_navi(
             pbf_move_left_joystick(context, {-1, +1}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1100, 1700, 200);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8800ms, 13600ms, 1600ms);
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
             pbf_move_left_joystick(context, {-1, 0}, 160ms, 400ms);
@@ -222,7 +222,7 @@ CameraAngle quest_photo_navi(
             pbf_move_left_joystick(context, 0, 100, 160ms, 400ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 200, 500, 800);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1600ms, 4000ms, 6400ms);
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 800ms);
             context.wait_for_all_requests();
@@ -238,9 +238,9 @@ CameraAngle quest_photo_navi(
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             if (console.state().console_type() == ConsoleType::Switch1) {
-                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1400, 300);
+                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8000ms, 11200ms, 2400ms);
             } else { //Switch 2
-                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1300, 300);
+                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8000ms, 10400ms, 2400ms);
             }
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
             pbf_move_left_joystick(context, 128, 0, 1200ms, 400ms);
@@ -261,9 +261,9 @@ CameraAngle quest_photo_navi(
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             if (console.state().console_type() == ConsoleType::Switch1) {
-                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 200, 575, 200);
+                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1600ms, 4600ms, 1600ms);
             } else { //Switch 2
-                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 200, 500, 200);
+                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1600ms, 400ms, 1600ms);
             }
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
@@ -396,7 +396,7 @@ void quest_catch_navi(
             pbf_move_left_joystick(context, 220, 255, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 400, 400);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 4800ms, 3200ms, 3200ms);
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
             pbf_move_left_joystick(context, {+1, 0}, 160ms, 400ms);
@@ -459,7 +459,7 @@ void quest_catch_navi(
             pbf_move_left_joystick(context, 210, 128, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 300, 400);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 4800ms, 2400ms, 3200ms);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
@@ -479,7 +479,7 @@ void quest_catch_navi(
             pbf_move_left_joystick(context, 0, 80, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 2000, 1500, 200);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 16000ms, 12000ms, 1600ms);
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
 
@@ -497,7 +497,7 @@ void quest_catch_navi(
             pbf_move_left_joystick(context, 0, 100, 160ms, 400ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 200, 500, 800);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1600ms, 4000ms, 6400ms);
 
             break;
 
@@ -509,7 +509,7 @@ void quest_catch_navi(
             pbf_move_left_joystick(context, 205, 64, 160ms, 840ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1650, 500);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8000ms, 13200ms, 4000ms);
             break;
         case BBQuests::catch_flying:
             console.log("Catch: Flying");
@@ -556,7 +556,7 @@ void quest_catch_navi(
             pbf_move_left_joystick(context, 70, 0, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 100, 550, 300);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 800ms, 4400ms, 2400ms);
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
             pbf_wait(context, 300);
@@ -573,9 +573,9 @@ void quest_catch_navi(
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             if (console.state().console_type() == ConsoleType::Switch1) {
-                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 200, 575, 200);
+                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1600ms, 4600ms, 1600ms);
             } else { //Switch 2
-                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 200, 500, 200);
+                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1600ms, 4000ms, 1600ms);
             }
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
@@ -594,9 +594,9 @@ void quest_catch_navi(
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             if (console.state().console_type() == ConsoleType::Switch1) {
-                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1800, 300);
+                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8000ms, 14400ms, 2400ms);
             } else {
-                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1600, 300);
+                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8000ms, 12800ms, 2400ms);
             }
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
@@ -635,7 +635,7 @@ void quest_catch_navi(
             pbf_move_left_joystick(context, 20, 0, 160ms, 400ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 700, 1700, 300);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 5600ms, 13600ms, 2400ms);
 
             break;
         default:
