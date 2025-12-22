@@ -55,19 +55,19 @@ public:
     // move forward a certain number of ticks, as per total_forward_distance
     // always face a certain direction, as per direction_facing
     // return number of ticks walked
-    uint16_t push_olive_forward(
+    Milliseconds push_olive_forward(
         const ProgramInfo& info, 
         VideoStream& stream,
         ProControllerContext& context, 
-        double direction_facing, 
-        uint16_t total_forward_distance,
-        uint16_t push_olive = 75,
+        double direction_facing,
+        Milliseconds total_forward_distance,
+        Milliseconds push_olive = Milliseconds(600),
         uint8_t rgb_gap = 20,
         ImageFloatBox area_to_check = {0, 0.3, 1.0, 0.40},  // {0, 0.15, 1, 0.7}
         bool throw_if_fail_change_dir = true
     );
 
-    uint16_t walk_up_to_olive(
+    Milliseconds walk_up_to_olive(
         const ProgramInfo& info, 
         VideoStream& stream,
         ProControllerContext& context, 
