@@ -22,13 +22,13 @@ void detach_box(ProControllerContext& context, Milliseconds box_scroll_delay){
     for (uint8_t row = 0; row < 5; row++){
         if (row != 0){
             pbf_move_right_joystick(context, {0, -1}, 160ms, box_scroll_delay);
-            pbf_move_right_joystick(context, 255, 128, 160ms, box_scroll_delay);
-            pbf_move_right_joystick(context, 255, 128, 160ms, box_scroll_delay);
+            pbf_move_right_joystick(context, {+1, 0}, 160ms, box_scroll_delay);
+            pbf_move_right_joystick(context, {+1, 0}, 160ms, box_scroll_delay);
         }
         for (uint8_t col = 0; col < 6; col++){
 //            context->wait_for_all_requests();
             if (col != 0){
-                pbf_move_right_joystick(context, 255, 128, 160ms, box_scroll_delay);
+                pbf_move_right_joystick(context, {+1, 0}, 160ms, box_scroll_delay);
             }
 //            context->wait_for_all_requests();
             detach(context);
@@ -53,13 +53,13 @@ void release_box(ProControllerContext& context, Milliseconds box_scroll_delay){
     for (uint8_t row = 0; row < 5; row++){
         if (row != 0){
             pbf_move_right_joystick(context, {0, -1}, 160ms, box_scroll_delay);
-            pbf_move_right_joystick(context, 255, 128, 160ms, box_scroll_delay);
-            pbf_move_right_joystick(context, 255, 128, 160ms, box_scroll_delay);
+            pbf_move_right_joystick(context, {+1, 0}, 160ms, box_scroll_delay);
+            pbf_move_right_joystick(context, {+1, 0}, 160ms, box_scroll_delay);
         }
         for (uint8_t col = 0; col < 6; col++){
 //            context->wait_for_all_requests();
             if (col != 0){
-                pbf_move_right_joystick(context, 255, 128, 160ms, box_scroll_delay);
+                pbf_move_right_joystick(context, {+1, 0}, 160ms, box_scroll_delay);
             }
 //            context->wait_for_all_requests();
             release(context);
@@ -80,8 +80,8 @@ void release_boxes(
         pbf_move_right_joystick(context, {0, -1}, 160ms, box_scroll_delay);
         pbf_move_right_joystick(context, {0, -1}, 160ms, box_scroll_delay);
         pbf_move_right_joystick(context, {0, -1}, 160ms, box_scroll_delay);
-        pbf_move_right_joystick(context, 255, 128, 160ms, box_scroll_delay);
-        pbf_move_right_joystick(context, 255, 128, 160ms, box_scroll_delay);
+        pbf_move_right_joystick(context, {+1, 0}, 160ms, box_scroll_delay);
+        pbf_move_right_joystick(context, {+1, 0}, 160ms, box_scroll_delay);
         pbf_wait(context, 50);
         pbf_press_button(context, BUTTON_R, 160ms, box_change_delay);
         release_box(context, box_scroll_delay);

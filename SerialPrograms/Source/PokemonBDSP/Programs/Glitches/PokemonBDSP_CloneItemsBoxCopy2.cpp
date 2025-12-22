@@ -138,7 +138,7 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, ProControl
         pbf_press_button(context, BUTTON_Y, 20, 50);
         pbf_press_button(context, BUTTON_ZL, 160ms, BOX_PICKUP_DROP_DELAY);
         for (size_t c = 0; c < 10; c++){
-            pbf_move_right_joystick(context, 255, 128, 5, 3);
+            pbf_move_right_joystick(context, {+1, 0}, 40ms, 24ms);
             pbf_move_right_joystick(context, {0, -1}, 40ms, 24ms);
         }
         pbf_press_button(context, BUTTON_ZL, 160ms, BOX_PICKUP_DROP_DELAY);
@@ -168,8 +168,8 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, ProControl
             pbf_move_right_joystick(context, {0, -1}, 160ms, BOX_SCROLL_DELAY);
             pbf_move_right_joystick(context, {0, -1}, 160ms, BOX_SCROLL_DELAY);
             pbf_move_right_joystick(context, {0, -1}, 160ms, BOX_SCROLL_DELAY);
-            pbf_move_right_joystick(context, 255, 128, 160ms, BOX_SCROLL_DELAY);
-            pbf_move_right_joystick(context, 255, 128, 160ms, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(context, {+1, 0}, 160ms, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(context, {+1, 0}, 160ms, BOX_SCROLL_DELAY);
         }
 #endif
 

@@ -430,7 +430,7 @@ void move_to_start_position_for_letsgo0(
     pbf_move_left_joystick(context, 128, 0, 300, 10);
 
     // look right, towards the start position
-    pbf_move_right_joystick(context, 255, 128, 120, 10);
+    pbf_move_right_joystick(context, {+1, 0}, 960ms, 80ms);
     pbf_move_left_joystick(context, 128, 0, 10, 10);
 
     // get on ride
@@ -455,8 +455,8 @@ void move_to_start_position_for_letsgo0(
     pbf_press_button(context, BUTTON_PLUS, 50, 50);
 
     // look right
-    pbf_move_right_joystick(context, 255, 128, 30, 10);
-    pbf_move_left_joystick(context, 128, 0, 50, 10);
+    pbf_move_right_joystick(context, {+1, 0}, 240ms, 80ms);
+    pbf_move_left_joystick(context, 128, 0, 400ms, 80ms);
 
     stream.log("Arrived at Let's go start position", COLOR_PURPLE);
     
@@ -486,7 +486,7 @@ void move_to_start_position_for_letsgo1(
     // look right, towards the start position
     DirectionDetector direction;
     direction.change_direction(info, stream, context, 5.76);
-    // pbf_move_right_joystick(context, 255, 128, 130, 10);
+    // pbf_move_right_joystick(context, {+1, 0}, 1040ms, 80ms);
     pbf_move_left_joystick(context, 128, 0, 10, 10);
 
     // get on ride
@@ -516,7 +516,7 @@ void move_to_start_position_for_letsgo1(
     pbf_press_button(context, BUTTON_B, 50, 10);
 
     // look right
-    // pbf_move_right_joystick(context, 255, 128, 20, 10);
+    // pbf_move_right_joystick(context, {+1, 0}, 160ms, 80ms);
     direction.change_direction(info, stream, context, 5.3);
 
     // move forward slightly

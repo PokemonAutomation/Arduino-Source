@@ -149,7 +149,7 @@ void trade_current_box(
                     pbf_move_right_joystick(context, {0, -1}, 160ms, box_scroll_delay);
                 }
                 for (size_t c = 0; c < col; c++){
-                    pbf_move_right_joystick(context, 255, 128, 160ms, box_scroll_delay);
+                    pbf_move_right_joystick(context, {+1, 0}, 160ms, box_scroll_delay);
                 }
                 trade_current_pokemon(console, context, error_state, stats);
             });

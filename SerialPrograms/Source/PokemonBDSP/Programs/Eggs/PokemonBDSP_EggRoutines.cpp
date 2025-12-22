@@ -54,7 +54,7 @@ void party_to_column(ProControllerContext& context, uint8_t column){
     pbf_move_right_joystick(context, {0, +1}, 160ms, BOX_SCROLL_DELAY);
     if (column < 3){
         for (uint8_t c = 0; c <= column; c++){
-            pbf_move_right_joystick(context, 255, 128, 160ms, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(context, {+1, 0}, 160ms, BOX_SCROLL_DELAY);
         }
     }else{
         for (uint8_t c = 6; c != column; c--){
@@ -70,7 +70,7 @@ void column_to_party(ProControllerContext& context, uint8_t column){
         }
     }else{
         for (uint8_t c = 6; c != column; c--){
-            pbf_move_right_joystick(context, 255, 128, 160ms, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(context, {+1, 0}, 160ms, BOX_SCROLL_DELAY);
         }
     }
     pbf_move_right_joystick(context, {0, -1}, 160ms, BOX_SCROLL_DELAY);
@@ -108,13 +108,13 @@ void swap_party(ProControllerContext& context, uint8_t current_column){
     const Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
     const Milliseconds BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY0;
 
-    pbf_move_right_joystick(context, 255, 128, 160ms, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(context, {+1, 0}, 160ms, BOX_SCROLL_DELAY);
     if (current_column < 5){
         pickup_column(context);
         column_to_party(context, current_column + 1);
     }else{
         pbf_press_button(context, BUTTON_R, 160ms, GameSettings::instance().BOX_CHANGE_DELAY0);
-        pbf_move_right_joystick(context, 255, 128, 160ms, BOX_SCROLL_DELAY);
+        pbf_move_right_joystick(context, {+1, 0}, 160ms, BOX_SCROLL_DELAY);
         pickup_column(context);
         column_to_party(context, 0);
     }
