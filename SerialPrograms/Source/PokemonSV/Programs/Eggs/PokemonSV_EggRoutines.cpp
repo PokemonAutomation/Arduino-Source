@@ -538,13 +538,13 @@ void check_basket_to_collect_eggs(
                 return;
             }
             stream.log("Attempting to talk to basket...");
-            pbf_press_button(context, BUTTON_A, 20, 30);
+            pbf_press_button(context, BUTTON_A, 160ms, 240ms);
             continue;
 
         case 1:
             stream.log("Detected advanced dialog.");
             last_prompt = BUTTON_NONE;
-            pbf_press_button(context, BUTTON_B, 20, 30);
+            pbf_press_button(context, BUTTON_B, 160ms, 240ms);
             checked = true;
             continue;
 

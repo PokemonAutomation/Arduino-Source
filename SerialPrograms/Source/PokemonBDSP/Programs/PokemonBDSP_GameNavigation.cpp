@@ -53,7 +53,7 @@ void box_to_overworld(ProControllerContext& context){
     //  In state (2):   The 1st B will drop the party pokemon. The 2nd B will
     //                  back out of the box.
 
-    pbf_press_button(context, BUTTON_B, 20, 30);
+    pbf_press_button(context, BUTTON_B, 160ms, 240ms);
     pbf_press_button(context, BUTTON_B, 160ms, GameSettings::instance().BOX_TO_POKEMON_DELAY0);
 
     pbf_press_button(context, BUTTON_B, 160ms, GameSettings::instance().POKEMON_TO_MENU_DELAY0);
@@ -131,7 +131,7 @@ void box_to_overworld(VideoStream& stream, ProControllerContext& context){
     //                  be swallowed by the animation.
     //  In state (2):   The 1st B will drop the party pokemon. The 2nd B will
     //                  back out of the box.
-    pbf_press_button(context, BUTTON_B, 20, 30);
+    pbf_press_button(context, BUTTON_B, 160ms, 240ms);
     pbf_press_button(context, BUTTON_B, 160ms, GameSettings::instance().BOX_TO_POKEMON_DELAY0);
 
     //  To menu.

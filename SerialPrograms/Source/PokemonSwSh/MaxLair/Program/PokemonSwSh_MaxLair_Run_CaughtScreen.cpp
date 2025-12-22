@@ -221,7 +221,7 @@ StateMachineAction run_caught_screen(
             console.log("Quitting back to entrance.", COLOR_PURPLE);
             tracker.leave_summary();
             synchronize_caught_screen(console_index, console, context, state_tracker);
-            pbf_press_dpad(context, DPAD_DOWN, 10, 50);
+            pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
             pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
             pbf_press_button(context, BUTTON_A, 10, 115);
             return mash_A_to_entrance(runtime, console, context, entrance);

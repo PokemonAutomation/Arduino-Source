@@ -152,7 +152,7 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, ProContro
     ShinyHuntScatterbug_Descriptor::Stats& stats = env.current_stats<ShinyHuntScatterbug_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 10, 50);
+    pbf_press_button(context, BUTTON_L, 80ms, 400ms);
 
     assert_16_9_720p_min(env.logger(), env.console);
 
@@ -429,7 +429,7 @@ void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& 
 
     if (path_id == 0){
         // move rightward, to the west
-        pbf_move_left_joystick(context, 255, 128, 100, 20);
+        pbf_move_left_joystick(context, 255, 128, 800ms, 160ms);
         // Align camera
         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
@@ -443,7 +443,7 @@ void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& 
         move_forward_with_lets_go(5);
 
         // move rightward, to south
-        pbf_move_left_joystick(context, 255, 128, 50, 20);
+        pbf_move_left_joystick(context, 255, 128, 400ms, 160ms);
         // Align camera
         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 

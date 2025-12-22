@@ -139,7 +139,7 @@ void checkpoint_14(
         // realign diagonally to the left
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 80, 0, 100);
         // walk forward so you're off center
-        pbf_move_left_joystick(context, 128, 0, 100, 100);
+        pbf_move_left_joystick(context, 128, 0, 800ms, 800ms);
         // realign going straight
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 100);
         // walk forward, while still off center
@@ -186,7 +186,7 @@ void checkpoint_15(
         // realign diagonally to the right
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 178, 0, 100);
         // walk forward so you're closer to the center
-        pbf_move_left_joystick(context, 128, 0, 100, 100);
+        pbf_move_left_joystick(context, 128, 0, 800ms, 800ms);
         // realign going straight
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 100);
         // walk forward up stairs

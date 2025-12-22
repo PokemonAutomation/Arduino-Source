@@ -81,7 +81,7 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, ProControllerC
         pbf_press_button(context, BUTTON_A, 10, 30);
         // Move the selection to "Until nightfall"
         pbf_press_dpad(context, DPAD_UP, 10, 30);
-        pbf_press_dpad(context, DPAD_UP, 10, 50);
+        pbf_press_dpad(context, DPAD_UP, 80ms, 400ms);
 
         // Press A to sleep to next night
         pbf_press_button(context, BUTTON_A, 160ms, 400ms);

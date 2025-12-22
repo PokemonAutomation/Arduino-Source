@@ -127,8 +127,8 @@ void release_one_pokemon(
                 stream.log("Detected selection. Releasing... (unexpected)", COLOR_RED);
                 errors++;
             }
-            pbf_press_dpad(context, DPAD_UP, 10, 10);
-            pbf_press_dpad(context, DPAD_UP, 10, 10);
+            pbf_press_dpad(context, DPAD_UP, 80ms, 80ms);
+            pbf_press_dpad(context, DPAD_UP, 80ms, 80ms);
 
             //  Double up this A press since dropping it currently isn't recoverable.
             pbf_press_button(context, BUTTON_A, 5, 3);
@@ -143,7 +143,7 @@ void release_one_pokemon(
                 stream.log("Detected release confirmation. (unexpected)", COLOR_RED);
                 errors++;
             }
-            pbf_press_dpad(context, DPAD_UP, 10, 10);
+            pbf_press_dpad(context, DPAD_UP, 80ms, 80ms);
             pbf_press_button(context, BUTTON_A, 20, 20);
             release_attempted = true;
             expected = 3;
@@ -155,7 +155,7 @@ void release_one_pokemon(
                 stream.log("Detected advance dialog. (unexpected)", COLOR_RED);
                 errors++;
             }
-            pbf_press_dpad(context, DPAD_UP, 10, 10);
+            pbf_press_dpad(context, DPAD_UP, 80ms, 80ms);
             pbf_press_button(context, BUTTON_A, 20, 20);
             release_completed = true;
             expected = 0;

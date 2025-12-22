@@ -77,23 +77,23 @@ void attach_item_from_bag(
         case 1:
             stream.log("Detected bag neutral...");
             if (attach_completed){
-                pbf_press_button(context, BUTTON_B, 20, 30);
+                pbf_press_button(context, BUTTON_B, 160ms, 240ms);
             }else{
-                pbf_press_button(context, BUTTON_A, 20, 30);
+                pbf_press_button(context, BUTTON_A, 160ms, 240ms);
             }
             break;
         case 2:
             stream.log("Detected selection...");
-            pbf_press_button(context, BUTTON_A, 20, 30);
+            pbf_press_button(context, BUTTON_A, 160ms, 240ms);
 //            attach_completed = true;
             break;
         case 3:
             stream.log("Detected prompt...");
-            pbf_press_button(context, BUTTON_A, 20, 30);
+            pbf_press_button(context, BUTTON_A, 160ms, 240ms);
             break;
         case 4:
             stream.log("Detected dialog...");
-            pbf_press_button(context, BUTTON_B, 20, 30);
+            pbf_press_button(context, BUTTON_B, 160ms, 240ms);
             attach_completed = true;
             break;
         }
@@ -183,7 +183,7 @@ void attach_item_from_box(
                 errors++;
             }
 
-            pbf_press_button(context, BUTTON_A, 20, 30);
+            pbf_press_button(context, BUTTON_A, 160ms, 240ms);
 
             expected = 3;
             continue;
@@ -197,7 +197,7 @@ void attach_item_from_box(
             }
 
             pbf_press_dpad(context, DPAD_DOWN, 20, 20);
-            pbf_press_button(context, BUTTON_A, 20, 30);
+            pbf_press_button(context, BUTTON_A, 160ms, 240ms);
 
             expected = 3;
             continue;
@@ -212,7 +212,7 @@ void attach_item_from_box(
 
             context.wait_for(std::chrono::milliseconds(200));
             if (attach_attempted){
-                pbf_press_button(context, BUTTON_B, 20, 30);
+                pbf_press_button(context, BUTTON_B, 160ms, 240ms);
                 expected = 0;
                 continue;
             }

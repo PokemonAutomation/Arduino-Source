@@ -250,7 +250,7 @@ void resume_game_from_home(
     bool skip_home_press
 ){
     if (!skip_home_press){
-        pbf_press_button(context, BUTTON_HOME, 10, 10);
+        pbf_press_button(context, BUTTON_HOME, 80ms, 80ms);
     }
     context.wait_for_all_requests();
 
@@ -276,7 +276,7 @@ void resume_game_from_home(
         HomeMenuWatcher home_detector(console);
         if (home_detector.detect(console.video().snapshot())){
             console.log("Failed to re-enter game. Trying again...", COLOR_RED);
-            pbf_press_button(context, BUTTON_HOME, 10, 10);
+            pbf_press_button(context, BUTTON_HOME, 80ms, 80ms);
             continue;
         }else{
             break;

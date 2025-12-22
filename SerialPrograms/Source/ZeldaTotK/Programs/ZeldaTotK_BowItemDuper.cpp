@@ -95,12 +95,12 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         pbf_press_button(context, BUTTON_PLUS, 20, 10);
 
         // drop current bow
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_dpad(context, DPAD_DOWN, 10, 5);
-        pbf_press_button(context, BUTTON_A, 10, 10);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 40ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
         // now go to other bow and equip
-        pbf_press_dpad(context, DPAD_RIGHT, 10, 5);
-        pbf_press_button(context, BUTTON_A, 10, 10);
+        pbf_press_dpad(context, DPAD_RIGHT, 80ms, 40ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
         pbf_press_button(context, BUTTON_A, 10, 15);
 
         // NOW WE HAVE TO PRESS PLUS AS FAST AS POSSIBLE
@@ -108,13 +108,13 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         pbf_press_button(context, BUTTON_PLUS, 3, 3);
 
         // navigate back to the "current" bow, then drop it
-        pbf_press_dpad(context, DPAD_LEFT, 10, 5);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_dpad(context, DPAD_DOWN, 10, 5);
+        pbf_press_dpad(context, DPAD_LEFT, 80ms, 40ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 40ms);
         pbf_press_button(context, BUTTON_A, 10, 20);
 
         // back to overworld
-        pbf_press_button(context, BUTTON_PLUS, 10, 10);
+        pbf_press_button(context, BUTTON_PLUS, 80ms, 80ms);
 
         // turn around
         pbf_move_left_joystick(context, 128, 0, 3, 10);
@@ -131,10 +131,10 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         pbf_wait(context, 400ms);
 
         // now go back into the menu
-        pbf_press_button(context, BUTTON_PLUS, 10, 10);
+        pbf_press_button(context, BUTTON_PLUS, 80ms, 80ms);
 
         // reset the cursor location, then go back to overworld to start again
-        pbf_press_dpad(context, DPAD_LEFT, 10, 5);
+        pbf_press_dpad(context, DPAD_LEFT, 80ms, 40ms);
 
         pbf_press_button(context, BUTTON_PLUS, 20, 40);
         // NOTE: needs a short buffer between runs to make sure new bow is ready

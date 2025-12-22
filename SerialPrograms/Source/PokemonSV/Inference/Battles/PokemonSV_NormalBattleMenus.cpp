@@ -89,13 +89,13 @@ bool NormalBattleMenuDetector::move_to_slot(VideoStream& stream, ProControllerCo
             return true;
         }
         case 1:
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
             continue;
         case 2:
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
             continue;
         case 3:
-            pbf_press_dpad(context, DPAD_UP, 20, 30);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 240ms);
             continue;
         }
     }
@@ -241,14 +241,14 @@ bool MoveSelectDetector::move_to_slot(VideoStream& stream, ProControllerContext&
         case 0:
             return true;
         case 1:
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
             continue;
         case 2:
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
             continue;
         case 3:
-            pbf_press_dpad(context, DPAD_UP, 20, 30);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 240ms);
             continue;
         }
     }
@@ -326,19 +326,19 @@ bool SwapMenuDetector::move_to_slot(VideoStream& stream, ProControllerContext& c
         case 0:
             return true;
         case 1:
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
             continue;
         case 2:
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
             continue;
         case 3:
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
             continue;
         case 4:
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
             continue;
         case 5:
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
             continue;
         }
     }

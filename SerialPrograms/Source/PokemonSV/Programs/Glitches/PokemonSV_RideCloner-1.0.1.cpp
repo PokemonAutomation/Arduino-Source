@@ -491,7 +491,7 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                 }
             }
 
-            pbf_press_dpad(context, DPAD_DOWN, 10, 10);
+            pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
             pbf_mash_button(context, BUTTON_A, 250);
 
             bool win = run_tera_battle(env, env.console, context, BATTLE_AI);

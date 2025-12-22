@@ -184,7 +184,7 @@ bool MainMenuDetector::move_cursor(
         if (diff < 4){
             if (fast){
                 for (int c = 0; c < diff - 1; c++){
-                    pbf_press_dpad(context, DPAD_UP, 10, 10);
+                    pbf_press_dpad(context, DPAD_UP, 80ms, 80ms);
                 }
             }
             pbf_press_dpad(context, DPAD_UP, 20, 10);
@@ -192,7 +192,7 @@ bool MainMenuDetector::move_cursor(
             if (fast){
                 diff = rows - diff;
                 for (int c = 0; c < diff - 1; c++){
-                    pbf_press_dpad(context, DPAD_DOWN, 10, 10);
+                    pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
                 }
             }
             pbf_press_dpad(context, DPAD_DOWN, 20, 10);

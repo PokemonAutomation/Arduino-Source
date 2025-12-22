@@ -102,15 +102,15 @@ bool ZeroGateWarpPromptDetector::move_cursor(
         int diff = (rows + current - row) % rows;
         if (diff < 3){
             for (int c = 0; c < diff - 1; c++){
-                pbf_press_dpad(context, DPAD_UP, 10, 10);
+                pbf_press_dpad(context, DPAD_UP, 80ms, 80ms);
             }
-            pbf_press_dpad(context, DPAD_UP, 20, 30);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 240ms);
         }else{
             diff = rows - diff;
             for (int c = 0; c < diff - 1; c++){
-                pbf_press_dpad(context, DPAD_DOWN, 10, 10);
+                pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
             }
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
         }
     }
 }

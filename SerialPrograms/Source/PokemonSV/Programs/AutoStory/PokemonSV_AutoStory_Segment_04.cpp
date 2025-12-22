@@ -135,7 +135,7 @@ void checkpoint_08(
         env.console.overlay().add_log("Enter cave", COLOR_WHITE);
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 128, 0, 600, 50);
+                pbf_move_left_joystick(context, 128, 0, 4800ms, 400ms);
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 150, 20, 20);
                 pbf_move_left_joystick(context, 128, 0, 1000, 50);
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 160, 20, 20);

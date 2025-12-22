@@ -209,7 +209,7 @@ bool select_sandwich_recipe(
                 stream.log("Move to the right column.");
                 // Target is in a different column
                 // Move cursor right.
-                pbf_press_dpad(context, DPAD_RIGHT, 10, 50);
+                pbf_press_dpad(context, DPAD_RIGHT, 80ms, 400ms);
                 continue;
             }
             // else, continue moving down the list
@@ -217,7 +217,7 @@ bool select_sandwich_recipe(
 
         // target sandwich recipe is still below the current displayed recipes.
         // Move down the list.
-        pbf_press_dpad(context, DPAD_DOWN, 10, 50);
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
     } // end for moving down the recipe list
 
     overlay_set.clear();

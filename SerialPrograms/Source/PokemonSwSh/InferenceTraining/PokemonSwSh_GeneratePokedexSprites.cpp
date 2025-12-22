@@ -132,7 +132,7 @@ void GenerateDexModelSession::iterate_form(const std::string& slug, bool shiny, 
     pbf_press_dpad(m_context, DPAD_UP, 1000ms, 0ms);
 
     //  Motion
-    pbf_press_button(m_context, BUTTON_A, 20, 30);
+    pbf_press_button(m_context, BUTTON_A, 160ms, 240ms);
     for (size_t y = 0; y < m_vertical_frames; y++){
         for (size_t x = 0; x < m_horizontal_frames; x++){
             pbf_press_dpad(m_context, DPAD_RIGHT, step, 50);

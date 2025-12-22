@@ -1567,7 +1567,7 @@ void move_forward_until_yolo_object_above_min_size(
     uint16_t delay_after_lets_go
 ){
     context.wait_for_all_requests();
-    pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+    pbf_move_left_joystick(context, 128, 0, 80ms, 400ms); // move forward to align with camera
 
     VideoOverlaySet overlays(env.console.overlay());
     bool seen_object = false;
@@ -1648,7 +1648,7 @@ void move_player_until_yolo_object_detected(
     uint16_t delay_after_lets_go
 ){
     context.wait_for_all_requests();
-    pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+    pbf_move_left_joystick(context, 128, 0, 80ms, 400ms); // move forward to align with camera
 
     VideoOverlaySet overlays(env.console.overlay());
     bool found_target = false;
@@ -1934,7 +1934,7 @@ bool move_player_to_realign_via_yolo(
             // env.console.log("object_x_pos: " + std::to_string(object_x_pos));
             env.console.log("x push: " + std::to_string(x_push) + ", push duration: " +  std::to_string(push_duration));
             if (i == 0){
-                pbf_move_left_joystick(context, x_push, 128, 10, 50);
+                pbf_move_left_joystick(context, x_push, 128, 80ms, 400ms);
                 pbf_press_button(context, BUTTON_R, 160ms, 840ms);
             }
             

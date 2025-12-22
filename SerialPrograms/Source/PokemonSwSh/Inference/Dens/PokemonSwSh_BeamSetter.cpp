@@ -67,7 +67,7 @@ BeamSetter::Detection BeamSetter::run(
     }
 
     //  Drop the wishing piece.
-    pbf_press_button(m_context, BUTTON_A, 10, 10);
+    pbf_press_button(m_context, BUTTON_A, 80ms, 80ms);
     m_context.wait_for_all_requests();
 
     bool low_stddev_flag = false;

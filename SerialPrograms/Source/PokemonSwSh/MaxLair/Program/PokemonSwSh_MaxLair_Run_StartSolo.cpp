@@ -148,7 +148,7 @@ bool start_raid_self_solo(
     state.boss = read_boss_sprite(stream);
 
     //  Start raid.
-    pbf_press_dpad(context, DPAD_DOWN, 10, 50);
+    pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
     pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
     context.wait_for_all_requests();
 

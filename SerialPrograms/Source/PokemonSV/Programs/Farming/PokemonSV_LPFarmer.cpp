@@ -91,7 +91,7 @@ void LPFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext
     LPFarmer_Descriptor::Stats& stats = env.current_stats<LPFarmer_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 10, 10);
+    pbf_press_button(context, BUTTON_L, 80ms, 80ms);
 
     bool first = true;
     uint32_t skip_counter = 0;

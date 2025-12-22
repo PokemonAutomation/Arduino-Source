@@ -128,7 +128,7 @@ void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
         direction.change_direction(env.program_info(), env.console, context, 4.222303);
-        pbf_move_left_joystick(context, 128, 0, 600, 50);
+        pbf_move_left_joystick(context, 128, 0, 4800ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 4.572071);
 
@@ -248,7 +248,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
     DirectionDetector direction;
     // minimap was cleared at the beginning of this checkpoint
     direction.change_direction(env.program_info(), env.console, context, 1.255489);
-    pbf_move_left_joystick(context, 128, 0, 400, 50);
+    pbf_move_left_joystick(context, 128, 0, 3200ms, 400ms);
 
     direction.change_direction(env.program_info(), env.console, context, 2.463760);
     pbf_move_left_joystick(context, 128, 0, 1100, 50);

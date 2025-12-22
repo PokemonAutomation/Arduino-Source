@@ -194,7 +194,7 @@ void checkpoint_51(
 
         context.wait_for_all_requests();
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 50);
-        pbf_move_left_joystick(context, 128, 0, 400, 100);        
+        pbf_move_left_joystick(context, 128, 0, 3200ms, 800ms);        
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 170, 0, 60);
         pbf_move_left_joystick(context, 128, 0, 1800, 100);       
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 85, 60);
@@ -255,7 +255,7 @@ void checkpoint_52(
 
         // select Clavell 1
         pbf_move_left_joystick(context, 255, 0, 2000ms, 480ms);
-        pbf_move_left_joystick(context, 10, 255, 100, 100);
+        pbf_move_left_joystick(context, 10, 255, 800ms, 800ms);
         pbf_mash_button(context, BUTTON_A, 1000ms);
 
         // mash B until detect battle 1
@@ -296,7 +296,7 @@ void checkpoint_52(
 
         // select Clavell 2
         pbf_move_left_joystick(context, 0, 0, 3000ms, 480ms);
-        pbf_move_left_joystick(context, 255, 250, 100, 100);
+        pbf_move_left_joystick(context, 255, 250, 800ms, 800ms);
         pbf_mash_button(context, BUTTON_A, 1000ms);
 
         // mash B until detect battle 2
@@ -305,7 +305,7 @@ void checkpoint_52(
             [&](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 100000ms); // press B so we don't mash past the Battle menu
                 // for (size_t i = 0; i < 200; i++){
-                //     pbf_press_button(context, BUTTON_A, 100, 100);
+                //     pbf_press_button(context, BUTTON_A, 800ms, 800ms);
                 // }
             },
             {battle}

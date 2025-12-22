@@ -202,7 +202,7 @@ void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment
     NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
 
     //  Initiate dialog with Perrin
-    pbf_press_button(context, BUTTON_A, 10, 50);
+    pbf_press_button(context, BUTTON_A, 80ms, 400ms);
     int ret = wait_until(env.console, context, Milliseconds(4000), { advance_detector });
     if (ret == 0){
         env.log("Dialog detected.");
@@ -274,7 +274,7 @@ void StatsResetEventBattle::enter_battle_pecharunt(SingleSwitchProgramEnvironmen
     NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
 
     //  Talk to Pecharunt
-    pbf_press_button(context, BUTTON_A, 10, 50);
+    pbf_press_button(context, BUTTON_A, 80ms, 400ms);
     int ret = wait_until(env.console, context, Milliseconds(6000), { advance_detector });
     if (ret == 0){
         env.log("Dialog detected.");
@@ -319,12 +319,12 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, ProC
     if (TRY_TO_TERASTILLIZE){
         env.log("Attempting to terastillize.");
         //Open move menu
-        pbf_press_button(context, BUTTON_A, 10, 50);
+        pbf_press_button(context, BUTTON_A, 80ms, 400ms);
         pbf_wait(context, 100);
         context.wait_for_all_requests();
 
         pbf_press_button(context, BUTTON_R, 160ms, 400ms);
-        pbf_press_button(context, BUTTON_A, 10, 50);
+        pbf_press_button(context, BUTTON_A, 80ms, 400ms);
     }
 
     //  Repeatedly use first attack
@@ -531,7 +531,7 @@ void StatsResetEventBattle::program(SingleSwitchProgramEnvironment& env, ProCont
     StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 10, 10);
+    pbf_press_button(context, BUTTON_L, 80ms, 80ms);
 
     while (true){
         if (TARGET == Target::Ursaluna){

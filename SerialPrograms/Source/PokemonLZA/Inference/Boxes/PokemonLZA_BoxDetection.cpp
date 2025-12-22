@@ -419,10 +419,10 @@ void BoxDetector::move_cursor(
                 left_dist = current.col + 6 - col;
             }
             if (left_dist < right_dist){
-                pbf_press_dpad(context, DPAD_LEFT, 20, 30);
+                pbf_press_dpad(context, DPAD_LEFT, 160ms, 240ms);
                 // cout << "move left" << endl;
             } else {
-                pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
+                pbf_press_dpad(context, DPAD_RIGHT, 160ms, 240ms);
                 // cout << "move right" << endl;
             }
         } else{ // move along y axis
@@ -435,10 +435,10 @@ void BoxDetector::move_cursor(
                 up_dist = current.row + 6 - row;
             }
             if (up_dist < down_dist){
-                pbf_press_dpad(context, DPAD_UP, 20, 30);
+                pbf_press_dpad(context, DPAD_UP, 160ms, 240ms);
                 // cout << "move up" << endl;
             } else {
-                pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+                pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
                 // cout << "move down" << endl;
             }
         }

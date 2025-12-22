@@ -377,7 +377,7 @@ void area_zero_platform_run_path1(
 
         find_and_center_on_sky(env, stream, context);
         pbf_move_left_joystick(context, 128, 0, 50, 0);
-        pbf_press_button(context, BUTTON_L, 20, 30);
+        pbf_press_button(context, BUTTON_L, 160ms, 240ms);
 
         //  Move forward.
 

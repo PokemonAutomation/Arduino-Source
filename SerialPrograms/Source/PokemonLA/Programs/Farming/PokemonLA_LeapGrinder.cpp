@@ -317,7 +317,7 @@ void LeapGrinder::program(SingleSwitchProgramEnvironment& env, ProControllerCont
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             fresh_from_reset = reset_game_from_home(env, env.console, context);
             // Switch from items to pokemons
-            pbf_press_button(context, BUTTON_X, 20, 30);
+            pbf_press_button(context, BUTTON_X, 160ms, 240ms);
         }
     }
 

@@ -78,10 +78,10 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
         if (box != 0){
             env.run_in_parallel(scope, [](ConsoleHandle& console, ProControllerContext& context){
                 move_to_right_box(context);
-//                pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
-//                pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-//                pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-//                pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+//                pbf_press_dpad(context, DPAD_RIGHT, 160ms, 240ms);
+//                pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
+//                pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
+//                pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
             });
         }
         trade_current_box(env, scope, NOTIFICATION_STATUS_UPDATE, stats, start_row, start_col);

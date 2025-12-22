@@ -122,12 +122,12 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){
-                pbf_press_button(context, BUTTON_ZL, 10, 10);
+                pbf_press_button(context, BUTTON_ZL, 80ms, 80ms);
                 for (size_t c = 0; c < 17; c++){
                     pbf_press_dpad(context, DPAD_UP, 5, 10);
-                    pbf_press_button(context, BUTTON_ZL, 10, 10);
+                    pbf_press_button(context, BUTTON_ZL, 80ms, 80ms);
                     pbf_press_dpad(context, DPAD_RIGHT, 20, 10);
-                    pbf_press_button(context, BUTTON_ZL, 10, 10);
+                    pbf_press_button(context, BUTTON_ZL, 80ms, 80ms);
                 }
             },
             {{detector}}
@@ -184,7 +184,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
                 }
 
                 for (uint8_t move_slot = 0; move_slot < slot; move_slot++){
-                    pbf_press_dpad(context, DPAD_DOWN, 10, 50);
+                    pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
                 }
                 pbf_press_button(context, BUTTON_ZL, 10, 125);
                 pbf_press_button(context, BUTTON_ZL, 10, 375);
@@ -208,7 +208,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
                 }
 
                 for (uint8_t move_slot = 0; move_slot < slot; move_slot++){
-                    pbf_press_dpad(context, DPAD_DOWN, 10, 50);
+                    pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
                 }
                 pbf_press_button(context, BUTTON_ZL, 10, 125);
                 pbf_press_button(context, BUTTON_ZL, 10, 375);
@@ -256,7 +256,7 @@ void MoneyFarmerRoute210::heal_at_center_and_return(
 
     logger.log("Returning to trainers...");
     pbf_move_left_joystick(context, {0, -1}, 6000ms, 0ms);
-    pbf_move_left_joystick(context, 255, 128, 60, 0);
+    pbf_move_left_joystick(context, 255, 128, 480ms, 0ms);
     pbf_move_left_joystick(context, 128, 0, 200, 0);
     pbf_move_left_joystick(context, 255, 128, 750, 0);
 

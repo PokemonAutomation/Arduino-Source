@@ -175,7 +175,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         }
 
         //  Select starter.
-        pbf_press_button(context, BUTTON_ZL, 20, 30);
+        pbf_press_button(context, BUTTON_ZL, 160ms, 240ms);
         context.wait_for_all_requests();
 
         {
@@ -191,7 +191,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
                 consecutive_failures++;
             }
             pbf_wait(context, 50);
-            pbf_press_dpad(context, DPAD_UP, 10, 50);
+            pbf_press_dpad(context, DPAD_UP, 80ms, 400ms);
             pbf_press_button(context, BUTTON_ZL, 80ms, 5000ms);
             context.wait_for_all_requests();
         }

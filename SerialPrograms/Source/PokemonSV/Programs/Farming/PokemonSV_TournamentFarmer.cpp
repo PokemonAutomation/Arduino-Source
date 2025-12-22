@@ -249,14 +249,14 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
         );
         if (retZ == 0){
             env.log("Using Memento to faint.");
-            pbf_press_button(context, BUTTON_A, 10, 50);
+            pbf_press_button(context, BUTTON_A, 80ms, 400ms);
             move_select.move_to_slot(env.console, context, 1);
-            pbf_press_button(context, BUTTON_A, 10, 50);
+            pbf_press_button(context, BUTTON_A, 80ms, 400ms);
             pbf_wait(context, 100);
             context.wait_for_all_requests();
 
-            pbf_press_dpad(context, DPAD_DOWN, 10, 50);
-            pbf_press_button(context, BUTTON_A, 10, 50);
+            pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
+            pbf_press_button(context, BUTTON_A, 80ms, 400ms);
             context.wait_for_all_requests();
 
             //Try six times, in case of paralysis (only applies to Pachirisu's Nuzzle) preventing use of Memento.
@@ -340,12 +340,12 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
     if (TRY_TO_TERASTILLIZE){
         env.log("Attempting to terastillize.");
         //Open move menu
-        pbf_press_button(context, BUTTON_A, 10, 50);
+        pbf_press_button(context, BUTTON_A, 80ms, 400ms);
         pbf_wait(context, 100);
         context.wait_for_all_requests();
 
         pbf_press_button(context, BUTTON_R, 160ms, 400ms);
-        pbf_press_button(context, BUTTON_A, 10, 50);
+        pbf_press_button(context, BUTTON_A, 80ms, 400ms);
     }
 
     //Mash A until battle finished
@@ -426,7 +426,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         //Close dialog and then check money
-        pbf_press_button(context, BUTTON_B, 10, 50);
+        pbf_press_button(context, BUTTON_B, 80ms, 400ms);
         pbf_wait(context, 100);
         context.wait_for_all_requests();
 
@@ -682,8 +682,8 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
 
         //  Initiate dialog then mash until first battle starts
         AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
-        pbf_press_button(context, BUTTON_A, 10, 50);
-        pbf_press_button(context, BUTTON_A, 10, 50);
+        pbf_press_button(context, BUTTON_A, 80ms, 400ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 400ms);
         int ret = wait_until(env.console, context, Milliseconds(7000), { advance_detector });
         if (ret == 0){
             env.log("Dialog detected.");

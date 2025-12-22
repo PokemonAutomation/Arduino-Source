@@ -159,13 +159,13 @@ void ShinyHuntMew::enter_mew(SingleSwitchProgramEnvironment& env, ProControllerC
 
 void ShinyHuntMew::exit_mew(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     ssf_press_button(context, BUTTON_B, 0ms, 400ms);
-    pbf_press_dpad(context, DPAD_DOWN, 50, 20);
+    pbf_press_dpad(context, DPAD_DOWN, 400ms, 160ms);
 
     ssf_press_button(context, BUTTON_B, 0ms, 720ms);
     pbf_press_dpad(context, DPAD_LEFT, 90, 20);
 
     ssf_press_button(context, BUTTON_B, 0ms, 800ms);
-    pbf_press_dpad(context, DPAD_DOWN, 100, 20);
+    pbf_press_dpad(context, DPAD_DOWN, 800ms, 160ms);
 
     BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     int ret = run_until<ProControllerContext>(

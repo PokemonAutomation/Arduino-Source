@@ -116,7 +116,7 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     TeraRoller_Descriptor::Stats& stats = env.current_stats<TeraRoller_Descriptor::Stats>();
 
     //  Connect the controller
-    pbf_press_button(context, BUTTON_L, 10, 10);
+    pbf_press_button(context, BUTTON_L, 80ms, 80ms);
 
     bool first = true;
     uint32_t skip_counter = 0;
@@ -175,7 +175,7 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
 
         // Enter tera raid battle alone
-        pbf_press_dpad(context, DPAD_DOWN, 10, 10);
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
         pbf_mash_button(context, BUTTON_A, 250);
         context.wait_for_all_requests();
 //        overlay_set.clear();

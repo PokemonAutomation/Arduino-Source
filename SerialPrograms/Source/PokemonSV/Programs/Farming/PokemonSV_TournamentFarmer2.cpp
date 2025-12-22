@@ -169,8 +169,8 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, ProControll
         //  Initiate dialog then mash until first battle starts
         {
             AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
-            pbf_press_button(context, BUTTON_A, 10, 50);
-            pbf_press_button(context, BUTTON_A, 10, 50);
+            pbf_press_button(context, BUTTON_A, 80ms, 400ms);
+            pbf_press_button(context, BUTTON_A, 80ms, 400ms);
             int ret = wait_until(env.console, context, Milliseconds(7000), { advance_detector });
             if (ret == 0){
                 env.log("Dialog detected.");

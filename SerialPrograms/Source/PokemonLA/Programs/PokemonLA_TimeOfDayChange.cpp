@@ -46,7 +46,7 @@ void change_time_of_day_at_tent(
         break;
     
     case Camp::COASTLANDS_BEACHSIDE:
-        pbf_move_left_joystick(context, 100, 0, 130, 20);
+        pbf_move_left_joystick(context, 100, 0, 1040ms, 160ms);
         break;
     
     case Camp::COASTLANDS_COASTLANDS:

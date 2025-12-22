@@ -187,7 +187,7 @@ int8_t ItemPrinterMaterialDetector::find_happiny_dust_row_index(
         }
 
         // keep searching for Happiny dust
-        pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
+        pbf_press_dpad(context, DPAD_RIGHT, 160ms, 240ms);
     }
 
     OperationFailedException::fire(
@@ -219,7 +219,7 @@ int16_t ItemPrinterMaterialDetector::find_highest_quantity_of_value_68(VideoStre
         }
 
         // keep searching for highest quantity of value 68.
-        pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
+        pbf_press_dpad(context, DPAD_RIGHT, 160ms, 240ms);
     }
 
     if (!seen_material_value_68){

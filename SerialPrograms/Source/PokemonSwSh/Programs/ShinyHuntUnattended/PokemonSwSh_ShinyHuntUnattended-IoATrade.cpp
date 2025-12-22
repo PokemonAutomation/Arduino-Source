@@ -92,23 +92,23 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, P
         pbf_press_button(context, BUTTON_A, 10, 100);
         pbf_press_button(context, BUTTON_A, 10, 60);
         pbf_press_button(context, BUTTON_A, 10, 100);
-        pbf_press_button(context, BUTTON_A, 10, 50);
+        pbf_press_button(context, BUTTON_A, 80ms, 400ms);
         pbf_press_button(context, BUTTON_A, 80ms, GameSettings::instance().POKEMON_TO_BOX_DELAY0);
-        pbf_press_dpad(context, DPAD_LEFT, 10, 10);
+        pbf_press_dpad(context, DPAD_LEFT, 80ms, 80ms);
         pbf_mash_button(context, BUTTON_A, MASH_TO_TRADE_DELAY0);
 
         if (true){
             //  Enter box system.
             pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
-            pbf_press_dpad(context, DPAD_RIGHT, 10, 10);
+            pbf_press_dpad(context, DPAD_RIGHT, 80ms, 80ms);
             pbf_press_button(context, BUTTON_A, 80ms, GameSettings::instance().MENU_TO_POKEMON_DELAY0);
 
             //  Move item from 2nd party member to 1st.
-            pbf_press_button(context, BUTTON_X, 10, 50);
-            pbf_press_dpad(context, DPAD_DOWN, 10, 50);
-            pbf_press_button(context, BUTTON_A, 10, 50);
-            pbf_press_dpad(context, DPAD_UP, 10, 50);
-            pbf_press_button(context, BUTTON_A, 10, 50);
+            pbf_press_button(context, BUTTON_X, 80ms, 400ms);
+            pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
+            pbf_press_button(context, BUTTON_A, 80ms, 400ms);
+            pbf_press_dpad(context, DPAD_UP, 80ms, 400ms);
+            pbf_press_button(context, BUTTON_A, 80ms, 400ms);
 
             //  Back out to menu.
             //  Prepend each B press by a DOWN press so that the B gets
@@ -119,7 +119,7 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, P
             pbf_press_dpad(context, DPAD_LEFT, 80ms, 0ms);
             pbf_move_left_joystick(context, 128, 255, 80ms, 0ms);
         }else{
-            pbf_press_dpad(context, DPAD_DOWN, 10, 50);
+            pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
         }
         pbf_press_button(context, BUTTON_A, 10, 350);
 

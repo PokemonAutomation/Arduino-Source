@@ -75,7 +75,7 @@ void BerryFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCont
             pbf_mash_button(context, BUTTON_B, 90);
         }
 
-        pbf_press_button(context, BUTTON_A, 10, 10);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
         pbf_mash_button(context, BUTTON_ZL, 385);
         pbf_mash_button(context, BUTTON_B, 600);
 

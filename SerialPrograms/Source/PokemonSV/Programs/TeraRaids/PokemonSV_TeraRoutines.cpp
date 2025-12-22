@@ -464,7 +464,7 @@ void exit_tera_win_without_catching(
         case 0:
             stream.log("Detected catch prompt.");
             catch_menu.move_to_slot(stream, context, 1);
-//            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+//            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
             pbf_mash_button(context, BUTTON_A, 30);
             pbf_mash_button(context, BUTTON_B, 125);
             continue;
