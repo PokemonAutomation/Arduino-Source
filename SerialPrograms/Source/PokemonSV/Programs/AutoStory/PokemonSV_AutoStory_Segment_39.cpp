@@ -104,7 +104,7 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         // wait for overworld after leaving research station
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
-        pbf_move_right_joystick(context, 180, 128, 30, 0);  // adjust camera so rock isn't at edge of screen.
+        pbf_move_right_joystick(context, 180, 128, 240ms, 0ms);  // adjust camera so rock isn't at edge of screen.
 
 
         // align to rock-5-1.  
