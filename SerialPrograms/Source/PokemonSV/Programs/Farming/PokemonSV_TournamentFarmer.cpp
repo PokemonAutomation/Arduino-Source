@@ -599,7 +599,7 @@ void return_to_academy_after_loss(
     context.wait_for_all_requests();
 
     //Move to tournament entry
-    pbf_move_left_joystick(context, 128, 0, 4000ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 4000ms, 0ms);
     pbf_move_left_joystick(context, {-1, 0}, 800ms, 0ms);
     pbf_move_left_joystick(context, 255, 0, 800ms, 0ms);
     context.wait_for_all_requests();

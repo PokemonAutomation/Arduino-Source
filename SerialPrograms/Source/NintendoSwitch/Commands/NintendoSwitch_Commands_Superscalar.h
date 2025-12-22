@@ -56,11 +56,13 @@ void ssf_press_left_joystick(
     const JoystickPosition& position,
     Milliseconds delay, Milliseconds hold, Milliseconds cool = 0ms
 );
+#if 0
 void ssf_press_right_joystick(
     ProControllerContext& context,
     uint8_t x, uint8_t y,
     uint16_t delay, uint16_t hold, uint8_t cool = 0
 );
+#endif
 void ssf_press_right_joystick(
     ProControllerContext& context,
     uint8_t x, uint8_t y,

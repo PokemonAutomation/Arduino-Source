@@ -148,12 +148,12 @@ void checkpoint_02(
         context.wait_for_all_requests();
         env.console.log("Go upstairs, dress up");
         env.console.overlay().add_log("Go upstairs, dress up", COLOR_WHITE);
-        pbf_move_left_joystick(context, 255, 128, 2000ms, 160ms);
+        pbf_move_left_joystick(context, {+1, 0}, 2000ms, 160ms);
         pbf_move_left_joystick(context, 185,  10, 1000ms, 160ms);
         pbf_move_left_joystick(context, 128,   0, 4000ms, 160ms);
-        pbf_move_left_joystick(context, 255, 128, 4000ms, 160ms);
+        pbf_move_left_joystick(context, {+1, 0}, 4000ms, 160ms);
         pbf_move_left_joystick(context, 110, 200, 3000ms, 160ms);
-        pbf_move_left_joystick(context, 255, 128, 2000ms, 160ms);
+        pbf_move_left_joystick(context, {+1, 0}, 2000ms, 160ms);
         pbf_mash_button(context, BUTTON_A, 20000ms);
 
         context.wait_for_all_requests();

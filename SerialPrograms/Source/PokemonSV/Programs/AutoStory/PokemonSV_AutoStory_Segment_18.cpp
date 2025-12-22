@@ -98,7 +98,7 @@ void checkpoint_39(
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 direction.change_direction(env.program_info(), env.console, context, 4.677921);
-                pbf_move_left_joystick(context, 128, 0, 150, 100);
+                pbf_move_left_joystick(context, {0, +1}, 1200ms, 800ms);
         });        
 
         // section 2
@@ -272,7 +272,7 @@ void checkpoint_40(
         get_on_ride(env.program_info(), env.console, context);
 
         // jump over the fence to exit Mesagoza
-        pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+        pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 1600ms);
 
         wait_for_overworld(env.program_info(), env.console, context);
@@ -286,7 +286,7 @@ void checkpoint_40(
                     128, 0, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 128, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, 0}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         ); 
@@ -304,7 +304,7 @@ void checkpoint_40(
                     128, 0, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 128, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, 0}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );   

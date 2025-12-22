@@ -350,7 +350,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
 
                 //============ Tree 2=============//
                 env.console.log("Checking tree: 2");
-                pbf_press_button(context, BUTTON_PLUS, 20, 100);
+                pbf_press_button(context, BUTTON_PLUS, 160ms, 800ms);
                 pbf_move_left_joystick(context, 255, 130, 1000ms, 0ms);
                 context.wait_for_all_requests();
                 enable_shiny_sound(context);
@@ -363,7 +363,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
 
                 //============ Tree 3=============//
                 env.console.log("Checking tree: 3");
-                pbf_press_button(context, BUTTON_PLUS, 20, 100);
+                pbf_press_button(context, BUTTON_PLUS, 160ms, 800ms);
                 pbf_move_left_joystick(context, 0, 95, 1000ms, 0ms);
                 context.wait_for_all_requests();
                 enable_shiny_sound(context);

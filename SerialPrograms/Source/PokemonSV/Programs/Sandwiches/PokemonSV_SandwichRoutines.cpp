@@ -101,7 +101,7 @@ bool enter_sandwich_recipe_list(
             stream.log("Detected \"make a sandwich\" menu item selection arrrow.");
             stream.overlay().add_log("Open sandwich recipes", COLOR_WHITE);
             opened_table_menu = true;
-            pbf_press_button(context, BUTTON_A, 20, 100);
+            pbf_press_button(context, BUTTON_A, 160ms, 800ms);
             continue;
         case 2:
             stream.log("Detected recipe selection arrow.");

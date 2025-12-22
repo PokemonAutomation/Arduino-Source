@@ -134,7 +134,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         reset = true;
 
         //  Enter the lake.
-        pbf_move_left_joystick(context, 128, 0, 1000ms, 0ms);
+        pbf_move_left_joystick(context, {0, +1}, 1000ms, 0ms);
 
         //  Mash B until we see the briefcase.
         ImageMatchWatcher detector(briefcase, {0.5, 0.1, 0.5, 0.7}, 100, true);

@@ -76,7 +76,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     uint8_t category_rotation_count = 0;
     bool finish_program = false;
     while (category_rotation_count < NUM_CATEGORY){
-        pbf_press_button(context, BUTTON_A, 20, 100);
+        pbf_press_button(context, BUTTON_A, 160ms, 800ms);
 
         AdvanceDialogWatcher already_purchased(COLOR_RED);
         PromptDialogWatcher buy_yes_no(COLOR_CYAN);

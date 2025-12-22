@@ -90,8 +90,8 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
         //  Move to man.
         pbf_move_left_joystick(context, {-1, -1}, 240ms, 0ms);
-        pbf_move_left_joystick(context, 128, 0, 280ms, 0ms);
-        pbf_move_left_joystick(context, 255, 128, 480ms, 0ms);
+        pbf_move_left_joystick(context, {0, +1}, 280ms, 0ms);
+        pbf_move_left_joystick(context, {+1, 0}, 480ms, 0ms);
 
         //  Fetch egg.
         pbf_mash_button(context, BUTTON_ZL, 600);

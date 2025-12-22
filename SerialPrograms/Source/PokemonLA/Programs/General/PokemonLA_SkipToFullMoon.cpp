@@ -72,9 +72,9 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, ProControllerC
         // Do another time skip:
 
         // Close menu
-        pbf_press_button(context, BUTTON_B, 20, 100);
+        pbf_press_button(context, BUTTON_B, 160ms, 800ms);
         // Character turn around to face the tent
-        pbf_move_left_joystick(context, 128, 0, 20, 100);
+        pbf_move_left_joystick(context, {0, +1}, 160ms, 800ms);
         // Press A to show the "how long do you rest" dialogue
         pbf_press_button(context, BUTTON_A, 10, 100);
         // Press A to show the time menu
@@ -101,7 +101,7 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, ProControllerC
         //     std::cout << "ERROR! Cannot detect the dialogue ellipse" << std::endl;
         // }
         // Press B to clear the "You Pokemon happy and healthy" dialogue.
-        // pbf_press_button(context, BUTTON_B, 20, 100);
+        // pbf_press_button(context, BUTTON_B, 160ms, 800ms);
 
 
         ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(100), stop_on_detected);

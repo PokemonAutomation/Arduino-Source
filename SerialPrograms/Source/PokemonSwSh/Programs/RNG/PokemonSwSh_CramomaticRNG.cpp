@@ -377,7 +377,7 @@ void CramomaticRNG::recover_from_wrong_state(SingleSwitchProgramEnvironment& env
     pbf_mash_button(context, BUTTON_B, 30s);
 
     // take a step in case Hyde repositioned the player
-    pbf_move_left_joystick(context, 128, 0, 1000ms, 80ms);
+    pbf_move_left_joystick(context, {0, +1}, 1000ms, 80ms);
 
     context.wait_for_all_requests();
 }

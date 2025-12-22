@@ -145,11 +145,11 @@ void checkpoint_86(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         get_on_ride(env.program_info(), env.console, context);
         direction.change_direction(env.program_info(), env.console, context, 1.484555);
 
-        pbf_move_left_joystick(context, 128, 0, 1506ms, 0ms);
+        pbf_move_left_joystick(context, {0, +1}, 1506ms, 0ms);
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 703ms);
-        pbf_move_left_joystick(context, 128, 0, 233ms, 0ms);
+        pbf_move_left_joystick(context, {0, +1}, 233ms, 0ms);
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 5098ms);
-        pbf_move_left_joystick(context, 128, 0, 1000ms, 0ms);
+        pbf_move_left_joystick(context, {0, +1}, 1000ms, 0ms);
 
         wait_for_overworld(env.program_info(), env.console, context);
 
@@ -316,7 +316,7 @@ void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         });
 
-        pbf_move_left_joystick(context, 128, 0, 800ms, 400ms); // stand up
+        pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms); // stand up
 
 
     }); 
@@ -330,8 +330,8 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // now done talking to Rika. walk around Rika's desk.
 
         pbf_move_left_joystick(context, {-1, 0}, 400ms, 400ms); // go left
-        pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms); // straight
-        pbf_move_left_joystick(context, 255, 128, 400ms, 400ms); // right
+        pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms); // straight
+        pbf_move_left_joystick(context, {+1, 0}, 400ms, 400ms); // right
         
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});

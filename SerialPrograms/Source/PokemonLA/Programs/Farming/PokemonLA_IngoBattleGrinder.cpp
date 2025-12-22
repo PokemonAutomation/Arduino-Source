@@ -284,7 +284,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProCo
                 env.console.log("Switch pokemon");
 
                 // Go to the switching pokemon screen:
-                pbf_press_dpad(context, DPAD_DOWN, 20, 100);
+                pbf_press_dpad(context, DPAD_DOWN, 160ms, 800ms);
 
                 switch_cur_pokemon();
             }else{
@@ -321,7 +321,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProCo
                     }
                     
                     // Go to the next move.
-                    pbf_press_dpad(context, DPAD_DOWN, 20, 100);
+                    pbf_press_dpad(context, DPAD_DOWN, 160ms, 800ms);
                     // env.console.context().wait_for_all_requests();
                     cur_move++;
                     env.console.log("No PP. Use next move, " + std::to_string(cur_move), COLOR_RED);
@@ -345,12 +345,12 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProCo
         }else if (ret == 1){
             env.console.log("Transparent dialogue box.");
             
-            pbf_press_button(context, BUTTON_B, 20, 100);
+            pbf_press_button(context, BUTTON_B, 160ms, 800ms);
             context.wait_for_all_requests();
         }else if(ret == 2){
             env.console.log("Normal dialogue box.");
 
-            pbf_press_button(context, BUTTON_B, 20, 100);
+            pbf_press_button(context, BUTTON_B, 160ms, 800ms);
             context.wait_for_all_requests();
         }else if (ret == 3){
             env.console.log("Pokemon fainted.", COLOR_RED);

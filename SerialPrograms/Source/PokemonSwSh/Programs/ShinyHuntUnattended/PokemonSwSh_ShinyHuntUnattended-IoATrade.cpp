@@ -117,7 +117,7 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, P
 
             //  Enter map.
             pbf_press_dpad(context, DPAD_LEFT, 80ms, 0ms);
-            pbf_move_left_joystick(context, 128, 255, 80ms, 0ms);
+            pbf_move_left_joystick(context, {0, -1}, 80ms, 0ms);
         }else{
             pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
         }

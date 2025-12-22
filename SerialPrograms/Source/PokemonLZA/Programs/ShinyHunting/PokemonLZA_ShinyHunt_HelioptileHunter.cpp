@@ -131,7 +131,7 @@ void reach_bench(SingleSwitchProgramEnvironment& env, ProControllerContext& cont
     pbf_wait(context, 3000ms);
     //Go to bench
     pbf_move_left_joystick(context, {-1, 0},  700ms, 200ms);
-    pbf_move_left_joystick(context, 128, 0, 500ms, 200ms);
+    pbf_move_left_joystick(context, {0, +1}, 500ms, 200ms);
 }
 
 void reach_gate(
@@ -144,7 +144,7 @@ void reach_gate(
         [](ProControllerContext& context){
             for (int c = 0; c < 30; c++){
                 ssf_press_button(context, BUTTON_B, 0ms, 2s, 0ms);
-                pbf_move_left_joystick(context, 128, 0, 2s, 200ms);
+                pbf_move_left_joystick(context, {0, +1}, 2s, 200ms);
             }
         },
         {{buttonA}}
@@ -170,11 +170,11 @@ void execute_fixed_routine(SingleSwitchProgramEnvironment& env, ConsoleHandle& c
 
     //moving forward
     ssf_press_button(context, BUTTON_B, 0ms, 2000ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, 2000ms, 700ms);
+    pbf_move_left_joystick(context, {0, +1}, 2000ms, 700ms);
     context.wait_for_all_requests();
     send_program_status_notification(env, settings, "", env.console.video().snapshot());
     ssf_press_button(context, BUTTON_B, 0ms, 2500ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, 2500ms, 500ms);
+    pbf_move_left_joystick(context, {0, +1}, 2500ms, 500ms);
 
     //moving back
     ssf_press_button(context, BUTTON_B, 0ms, 5s, 0ms);

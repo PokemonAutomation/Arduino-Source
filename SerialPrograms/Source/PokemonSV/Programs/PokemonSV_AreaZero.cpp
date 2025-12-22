@@ -33,7 +33,7 @@ void inside_zero_gate_to_station(
         int ret = run_until<ProControllerContext>(
             stream, context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, 128, 0, 10000ms, 0ms);
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 0ms);
             },
             {dialog}
         );
@@ -97,7 +97,7 @@ void inside_zero_gate_to_station(
     if (heal_at_station){
         stream.log("Moving to bed to heal.");
         pbf_move_left_joystick(context, 144, 0, 4000ms, 0ms);
-        ssf_press_left_joystick(context, 255, 128, 0, 125);
+        ssf_press_left_joystick(context, 255, 128, 0ms, 1000ms);
         bool healed = false;
         while (true){
             AdvanceDialogWatcher dialog(COLOR_GREEN);
@@ -202,7 +202,7 @@ void return_to_inside_zero_gate(
         [](ProControllerContext& context){
             pbf_move_left_joystick(context, 255, 32, 160ms, 840ms);
             pbf_mash_button(context, BUTTON_L, 60);
-            pbf_move_left_joystick(context, 128, 0, 10000ms, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, 10000ms, 0ms);
         },
         {black_screen}
     );
@@ -237,7 +237,7 @@ void return_to_inside_zero_gate_from_picnic(
         [](ProControllerContext& context){
             pbf_move_left_joystick(context, 128, 255, 100, 40);
             pbf_mash_button(context, BUTTON_L, 60);
-            pbf_move_left_joystick(context, 128, 0, 10000ms, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, 10000ms, 0ms);
         },
         {black_screen}
     );

@@ -107,14 +107,14 @@ void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, ProControl
         env.log("Current Attempts: " + tostr_u_commas(c));
 
         //Walk forward from teleportation point
-        pbf_move_left_joystick(context, 128, 0, 80ms, 40ms);
+        pbf_move_left_joystick(context, {0, +1}, 80ms, 40ms);
 
         //Jump and open paraglider
         pbf_press_button(context, BUTTON_X, 20, 80);
         pbf_press_button(context, BUTTON_X, 20, 20);
 
         //Open menu
-        pbf_press_button(context, BUTTON_PLUS, 20, 100);
+        pbf_press_button(context, BUTTON_PLUS, 160ms, 800ms);
 
         //Select 5 of the item to dupe - if less than 5 this still works
         pbf_press_button(context, BUTTON_A, 20, 20);
@@ -142,7 +142,7 @@ void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, ProControl
         pbf_press_button(context, BUTTON_A, 20, 10);
 
         //Turn around and try to pick up items as well
-        pbf_move_left_joystick(context, 128, 255, 80ms, 40ms);
+        pbf_move_left_joystick(context, {0, -1}, 80ms, 40ms);
         pbf_press_button(context, BUTTON_A, 20, 10);
         pbf_press_button(context, BUTTON_A, 20, 10);
         pbf_press_button(context, BUTTON_A, 20, 10);
@@ -152,7 +152,7 @@ void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, ProControl
 
         //Open map and teleport back
         pbf_press_button(context, BUTTON_MINUS, 20, 10);
-        pbf_move_left_joystick(context, 128, 255, 80ms, 80ms);
+        pbf_move_left_joystick(context, {0, -1}, 80ms, 80ms);
         pbf_press_button(context, BUTTON_A, 20, 10);
         pbf_press_button(context, BUTTON_A, 20, 10);
 

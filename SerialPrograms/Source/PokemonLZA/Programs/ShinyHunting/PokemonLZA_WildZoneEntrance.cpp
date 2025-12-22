@@ -475,7 +475,7 @@ void do_one_wild_zone_trip(
             } else{
                 env.console.overlay().add_log("Walking");
             }
-            pbf_move_left_joystick(context, 128, 0, walk_time_in_zone, 200ms);
+            pbf_move_left_joystick(context, {0, +1}, walk_time_in_zone, 200ms);
         }
         context.wait_for_all_requests();
         shiny_sound_handler.process_pending(context);

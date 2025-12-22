@@ -173,7 +173,7 @@ DailyHighlightRNG::DailyHighlightRNG()
 
 void DailyHighlightRNG::move_to_trader(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     pbf_move_right_joystick(context, {+1, 0}, 460ms, 80ms);
-    pbf_move_left_joystick(context, 128, 0, 1280ms, 80ms);
+    pbf_move_left_joystick(context, {0, +1}, 1280ms, 80ms);
 }
 
 void DailyHighlightRNG::interact_with_trader(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {

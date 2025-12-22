@@ -118,7 +118,7 @@ void checkpoint_50(
         }
 
         direction.change_direction(env.program_info(), env.console, context, 0);
-        pbf_move_left_joystick(context, 128, 0, 150, 100);
+        pbf_move_left_joystick(context, {0, +1}, 1200ms, 800ms);
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
@@ -148,7 +148,7 @@ void checkpoint_50(
                     128, 0, 40, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 128, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, 0}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );      
@@ -194,7 +194,7 @@ void checkpoint_51(
 
         context.wait_for_all_requests();
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 50);
-        pbf_move_left_joystick(context, 128, 0, 3200ms, 800ms);        
+        pbf_move_left_joystick(context, {0, +1}, 3200ms, 800ms);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 170, 0, 60);
         pbf_move_left_joystick(context, 128, 0, 1800, 100);       
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 85, 60);
@@ -230,7 +230,7 @@ void checkpoint_52(
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
         
-        pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
+        pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for dialog after leaving gym
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20000ms, 128, 255);
@@ -363,7 +363,7 @@ void checkpoint_53(
         pbf_press_button(context, BUTTON_L, 30, 30);
 
         // walk backwards into the Gym building
-        pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
+        pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
 
         // talk to Gym receptionist
@@ -375,7 +375,7 @@ void checkpoint_53(
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         // Gym leader defeated. Standing in Gym building
-        pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
+        pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving Gym
         wait_for_overworld(env.program_info(), env.console, context, 30);

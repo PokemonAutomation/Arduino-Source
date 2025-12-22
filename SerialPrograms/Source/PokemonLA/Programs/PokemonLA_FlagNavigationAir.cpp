@@ -117,7 +117,7 @@ FlagNavigationAir::FlagNavigationAir(
         m_stream.log("Switching from Sneasler (on) to Braviary (on)...");
         m_looking_straight_ahead.store(false, std::memory_order_release);
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_move_left_joystick(context, 128, 0, 1000ms, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, 1000ms, 0ms);
             pbf_press_dpad(context, DPAD_LEFT, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
@@ -142,7 +142,7 @@ FlagNavigationAir::FlagNavigationAir(
         m_stream.log("Climbing wall...");
         m_looking_straight_ahead.store(false, std::memory_order_release);
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_move_left_joystick(context, 128, 0, 300000ms, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, 300000ms, 0ms);
         });
         return false;
     });

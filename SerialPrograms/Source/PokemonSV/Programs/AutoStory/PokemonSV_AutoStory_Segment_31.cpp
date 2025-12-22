@@ -164,7 +164,7 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
 
         direction.change_direction(env.program_info(), env.console, context, 1.798578);
-        pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+        pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
 
         
     });
@@ -407,50 +407,50 @@ void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProController
             Milliseconds wait = 3000ms;
 
             direction.change_direction(env.program_info(), env.console, context, 3.837821);
-            pbf_move_left_joystick(context, 128, 0, 3200ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
-            pbf_move_left_joystick(context, 128, 0, 800ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
-            pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.683419);
             pbf_move_left_joystick(context, 128, 0, 300, 50);
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
-            pbf_move_left_joystick(context, 128, 0, 3200ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 3.577637);
-            pbf_move_left_joystick(context, 128, 0, 4000ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 4000ms, 400ms);
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
 
-            pbf_move_left_joystick(context, 128, 0, 3200ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 4.204571);
-            pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
             
-            pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
 
 
             direction.change_direction(env.program_info(), env.console, context, 3.737641);
-            pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 3.368991);
-            pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
@@ -460,18 +460,18 @@ void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProController
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 3.213118);
-            pbf_move_left_joystick(context, 128, 0, 3200ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 3.787068);
-            pbf_move_left_joystick(context, 128, 0, 4000ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 4000ms, 400ms);
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
 
             direction.change_direction(env.program_info(), env.console, context,  3.997072);
-            pbf_move_left_joystick(context, 128, 0, 4000ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 4000ms, 400ms);
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
@@ -479,12 +479,12 @@ void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProController
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
-            pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 5.200063);
-            pbf_move_left_joystick(context, 128, 0, 3200ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
@@ -493,12 +493,12 @@ void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProController
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
-            pbf_move_left_joystick(context, 128, 0, 3200ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 6.089752);
-            pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
@@ -507,27 +507,27 @@ void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProController
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 0.369203);
-            pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 5.515246);
-            pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
-            pbf_move_left_joystick(context, 128, 0, 3200ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
             pbf_press_button(context, BUTTON_R, 20, 20);
             pbf_wait(context, wait);
 
             try {
                 direction.change_direction(env.program_info(), env.console, context, 4.941664);
-                pbf_move_left_joystick(context, 128, 0, 800ms, 400ms);
+                pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 6.140720);
-                pbf_move_left_joystick(context, 128, 0, 800ms, 400ms);
+                pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, wait);
 
@@ -629,7 +629,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         // marker 1
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 140, 255, 30);
         direction.change_direction(env.program_info(), env.console, context, 4.047990);
-        pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+        pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
     });
 
@@ -733,11 +733,11 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         walk_forward_while_clear_front_path(env.program_info(), env.console, context, 700);
 
         // back away from wall and get on ride
-        pbf_move_left_joystick(context, 128, 255, 400ms, 400ms);
+        pbf_move_left_joystick(context, {0, -1}, 400ms, 400ms);
         get_on_ride(env.program_info(), env.console, context);
 
         // move back towards wall
-        pbf_move_left_joystick(context, 128, 0, 800ms, 400ms);
+        pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
         pbf_move_left_joystick(context, 0, 0, 3200ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 2.575); //2.566167
@@ -745,7 +745,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         // climb the wall
         pbf_press_button(context, BUTTON_B, 528ms, 0ms);
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 51ms);
-        pbf_move_left_joystick(context, 128, 0, 5002ms, 0ms);
+        pbf_move_left_joystick(context, {0, +1}, 5002ms, 0ms);
         pbf_wait(context, 1551ms);
         pbf_move_left_joystick(context, {-1, 0}, 2167ms, 0ms);
         pbf_wait(context, 745ms);
@@ -753,7 +753,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
     });
 
     // continue climbing wall
-    pbf_move_left_joystick(context, 128, 0, 8804ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 8804ms, 0ms);
 
     get_off_ride(env.program_info(), env.console, context);
 

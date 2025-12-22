@@ -177,7 +177,7 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, ProControlle
         //  Hop on bike, ride down to seabreak path
 //        SHORTCUT.run(env.console, 0);
         pbf_move_left_joystick(context, {0, -1}, 2880ms, 0ms);
-        pbf_move_left_joystick(context, 128, 0, 3200ms, 0ms);
+        pbf_move_left_joystick(context, {0, +1}, 3200ms, 0ms);
     }
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

@@ -200,9 +200,9 @@ void hold_one_column(const ProgramInfo& info, VideoStream& stream, ProController
 
     // Select rest of the pary
     // Press down multiple times to make sure we select full party in case the game drops some presses
-    for(int i = 0; i < 15; i++){
+    for (int i = 0; i < 15; i++){
         ssf_press_dpad(context, DPAD_DOWN, 32ms);
-        ssf_press_left_joystick(context, 128, 255, 4, 5, 3);
+        ssf_press_left_joystick(context, {0, -1}, 32ms, 40ms, 24ms);
     }
     // Hold rest of the party
     pbf_wait(context, 60);

@@ -93,9 +93,9 @@ void ApplyGrits::ApplyGritsOnOnePokemon(SingleSwitchProgramEnvironment& env, Pro
             }
             for(size_t i = 0; i < grit_level_increase[grit_index]; i++){
                 // One press to apply the Grit item
-                pbf_press_button(context, BUTTON_A, 20, 100);
+                pbf_press_button(context, BUTTON_A, 160ms, 800ms);
                 // Second press to clear the message box, whether it is applied successfully or not.
-                pbf_press_button(context, BUTTON_A, 20, 100);
+                pbf_press_button(context, BUTTON_A, 160ms, 800ms);
             }
         }
 

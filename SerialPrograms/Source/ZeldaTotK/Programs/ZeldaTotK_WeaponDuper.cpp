@@ -182,14 +182,14 @@ void WeaponDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCont
 
         context.wait_for_all_requests();
         env.log("Turn around and try to pick up items as well");
-        pbf_move_left_joystick(context, 128, 255, 80ms, 40ms);
+        pbf_move_left_joystick(context, {0, -1}, 80ms, 40ms);
         pbf_press_button(context, BUTTON_A, 80ms, 80ms);
         pbf_press_button(context, BUTTON_A, 80ms, 80ms);
         pbf_press_button(context, BUTTON_A, 80ms, 80ms);
         pbf_press_button(context, BUTTON_A, 80ms, 80ms);
         pbf_press_button(context, BUTTON_A, 80ms, 80ms);
         pbf_press_button(context, BUTTON_A, 80ms, 80ms);
-        pbf_move_left_joystick(context, 128, 0, 80ms, 40ms);
+        pbf_move_left_joystick(context, {0, +1}, 80ms, 40ms);
 
         // increment counter, increment stats
         c++;

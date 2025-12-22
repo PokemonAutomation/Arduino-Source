@@ -53,7 +53,7 @@ CameraAngle quest_photo_navi(
             central_to_polar_rest(info, console, context);
 
             pbf_press_button(context, BUTTON_L, 80ms, 400ms);
-            pbf_move_left_joystick(context, 128, 0, 1840ms, 160ms);
+            pbf_move_left_joystick(context, {0, +1}, 1840ms, 160ms);
             pbf_move_left_joystick(context, {-1, 0}, 2000ms, 160ms);
 
             break;
@@ -122,10 +122,10 @@ CameraAngle quest_photo_navi(
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 400, 400);
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
-            pbf_move_left_joystick(context, 255, 128, 160ms, 400ms);
+            pbf_move_left_joystick(context, {+1, 0}, 160ms, 400ms);
 
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-            pbf_move_left_joystick(context, 128, 0, 800ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
 
             //Turn slightly for switch 1
             if (console.state().console_type() == ConsoleType::Switch1) {
@@ -224,7 +224,7 @@ CameraAngle quest_photo_navi(
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 200, 500, 800);
 
-            pbf_press_button(context, BUTTON_PLUS, 20, 100);
+            pbf_press_button(context, BUTTON_PLUS, 160ms, 800ms);
             context.wait_for_all_requests();
 
             break;
@@ -399,10 +399,10 @@ void quest_catch_navi(
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 400, 400);
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
-            pbf_move_left_joystick(context, 255, 128, 160ms, 400ms);
+            pbf_move_left_joystick(context, {+1, 0}, 160ms, 400ms);
 
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-            pbf_move_left_joystick(context, 128, 0, 800ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
 
             //Turn slightly for switch 1
             if (console.state().console_type() == ConsoleType::Switch1) {
@@ -419,11 +419,11 @@ void quest_catch_navi(
             central_to_polar_rest(info, console, context);
 
             pbf_press_button(context, BUTTON_L, 80ms, 400ms);
-            pbf_move_left_joystick(context, 128, 0, 1840ms, 160ms);
+            pbf_move_left_joystick(context, {0, +1}, 1840ms, 160ms);
             pbf_move_left_joystick(context, {-1, 0}, 2000ms, 160ms);
 
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-            pbf_move_left_joystick(context, 128, 0, 1200ms, 160ms);
+            pbf_move_left_joystick(context, {0, +1}, 1200ms, 160ms);
 
             break;
 
@@ -465,7 +465,7 @@ void quest_catch_navi(
 
             pbf_move_left_joystick(context, 0, 0, 10, 20);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-            pbf_move_left_joystick(context, 128, 0, 400ms, 160ms);
+            pbf_move_left_joystick(context, {0, +1}, 400ms, 160ms);
 
             break;
         case BBQuests::catch_fairy:
@@ -609,7 +609,7 @@ void quest_catch_navi(
             context.wait_for_all_requests();
             pbf_press_button(context, BUTTON_ZR, 160ms, 400ms); //Withdraw pokemon
 
-            pbf_move_left_joystick(context, 255, 128, 160ms, 400ms);
+            pbf_move_left_joystick(context, {+1, 0}, 160ms, 400ms);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
             ssf_press_button(context, BUTTON_ZR, 0ms, 1600ms);
             ssf_press_button(context, BUTTON_ZL, 800ms, 400ms);
@@ -619,7 +619,7 @@ void quest_catch_navi(
             pbf_press_button(context, BUTTON_ZR, 160ms, 400ms); //Withdraw pokemon
 
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-            pbf_move_left_joystick(context, 255, 128, 160ms, 400ms);
+            pbf_move_left_joystick(context, {+1, 0}, 160ms, 400ms);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
             break;
@@ -683,7 +683,7 @@ void quest_catch_throw_ball(
         context.wait_for_all_requests();
 
         //Press X to open Ball menu
-        pbf_press_button(context, BUTTON_X, 20, 100);
+        pbf_press_button(context, BUTTON_X, 160ms, 800ms);
         context.wait_for_all_requests();
 
         VideoSnapshot screen = console.video().snapshot();
@@ -754,7 +754,7 @@ void quest_catch_handle_battle(
                 BattleBallReader exists(console, BBQ_OPTIONS.LANGUAGE);
                 std::string ball_exists = "";
 
-                pbf_press_button(context, BUTTON_X, 20, 100);
+                pbf_press_button(context, BUTTON_X, 160ms, 800ms);
                 context.wait_for_all_requests();
 
                 VideoSnapshot screen_ball = console.video().snapshot();

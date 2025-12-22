@@ -299,7 +299,7 @@ void FriendshipFarmer::exit_bench(SingleSwitchProgramEnvironment& env, ProContro
         default:
             if (seen_selection_arrow && ++reset_attempt <= 10){
                 env.log("Attempting to face the bench.");
-                pbf_move_left_joystick(context, 128, 0, 250ms, 0ms);
+                pbf_move_left_joystick(context, {0, +1}, 250ms, 0ms);
                 continue;
             }
 

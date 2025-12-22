@@ -170,7 +170,7 @@ void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnv
 
     direction.change_direction(env.program_info(), env.console, context, 1.448679);
 
-    pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+    pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
 
 
     // marker 1   x=0.548438, y=0.273148

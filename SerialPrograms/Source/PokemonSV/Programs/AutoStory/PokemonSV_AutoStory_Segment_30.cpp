@@ -116,16 +116,16 @@ void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
 
             direction.change_direction(env.program_info(), env.console, context, 3.855289);
-            pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.056395);
-            pbf_move_left_joystick(context, 128, 0, 2000ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 2000ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.749788);
             pbf_move_left_joystick(context, 128, 0, 680, 50);
 
             direction.change_direction(env.program_info(), env.console, context, 1.589021);
-            pbf_move_left_joystick(context, 128, 0, 4800ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 4800ms, 400ms);
             
             direction.change_direction(env.program_info(), env.console, context, 1.343606);   //1.327724
 
@@ -160,7 +160,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
-        pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
+        pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
@@ -185,7 +185,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
 
             direction.change_direction(env.program_info(), env.console, context, 0.943392);
-            pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 2.513925);
 
@@ -201,21 +201,21 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [&](ProControllerContext& context){
-                pbf_move_left_joystick(context, 128, 0, 2412ms, 0ms);
+                pbf_move_left_joystick(context, {0, +1}, 2412ms, 0ms);
                 pbf_wait(context, 3612ms);
-                pbf_move_left_joystick(context, 128, 0, 16ms, 0ms);
+                pbf_move_left_joystick(context, {0, +1}, 16ms, 0ms);
                 pbf_move_left_joystick(context, 0, 0, 2861ms, 0ms);
-                pbf_move_left_joystick(context, 128, 0, 309ms, 0ms);
+                pbf_move_left_joystick(context, {0, +1}, 309ms, 0ms);
                 pbf_wait(context, 6431ms);
                 pbf_move_left_joystick(context, {-1, 0}, 5081ms, 0ms);
                 pbf_wait(context, 239ms);
-                pbf_move_left_joystick(context, 128, 255, 961ms, 0ms);
+                pbf_move_left_joystick(context, {0, -1}, 961ms, 0ms);
                 pbf_wait(context, 1615ms);
-                pbf_move_left_joystick(context, 128, 0, 753ms, 0ms);
+                pbf_move_left_joystick(context, {0, +1}, 753ms, 0ms);
                 pbf_wait(context, 79ms);
-                pbf_move_left_joystick(context, 128, 0, 75ms, 0ms);
+                pbf_move_left_joystick(context, {0, +1}, 75ms, 0ms);
                 pbf_wait(context, 10485ms);
-                pbf_move_left_joystick(context, 128, 0, 7930ms, 0ms);
+                pbf_move_left_joystick(context, {0, +1}, 7930ms, 0ms);
                 pbf_wait(context, 12000ms);
             },
             {no_minimap}
@@ -242,16 +242,16 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
 
             direction.change_direction(env.program_info(), env.console, context, 3.855289);
-            pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.056395);
-            pbf_move_left_joystick(context, 128, 0, 2000ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 2000ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.749788);
             pbf_move_left_joystick(context, 128, 0, 680, 50);
 
             direction.change_direction(env.program_info(), env.console, context, 1.589021);
-            pbf_move_left_joystick(context, 128, 0, 4800ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 4800ms, 400ms);
             
             direction.change_direction(env.program_info(), env.console, context, 1.343606);   //1.327724
 
@@ -279,7 +279,7 @@ void checkpoint_77(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
-        pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
+        pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
@@ -303,10 +303,10 @@ void checkpoint_77(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
 
             direction.change_direction(env.program_info(), env.console, context, 3.855289);
-            pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.056395);
-            pbf_move_left_joystick(context, 128, 0, 2000ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 2000ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.749788);
             pbf_move_left_joystick(context, 128, 0, 680, 50);

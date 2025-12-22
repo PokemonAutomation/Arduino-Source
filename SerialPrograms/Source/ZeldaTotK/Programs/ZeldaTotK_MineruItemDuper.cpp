@@ -96,7 +96,7 @@ void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, ProController
         env.log("Current Amount: " + tostr_u_commas(c));
 
         // Open menu
-        pbf_press_button(context, BUTTON_PLUS, 20, 100);
+        pbf_press_button(context, BUTTON_PLUS, 160ms, 800ms);
 
         // Hold items to dupe
         pbf_press_button(context, BUTTON_A, 80ms, 80ms);

@@ -152,11 +152,11 @@ void inside_zero_gate_to_platform(
 #if 0
     //  Don't jump to avoid spawn.
     pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
-    pbf_move_left_joystick(context, 128, 0, 625, 0);
+    pbf_move_left_joystick(context, {0, +1}, 5000ms, 0ms);
     ssf_press_button(context, BUTTON_B, 0, 50);
-    pbf_move_left_joystick(context, 128, 0, 250, 0);
-    pbf_move_left_joystick(context, 160, 0, 600, 0);
-    pbf_move_left_joystick(context, 128, 0, 1875, 0);
+    pbf_move_left_joystick(context, {0, +1}, 2000ms, 0ms);
+    pbf_move_left_joystick(context, 160, 0, 4800ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 15000ms, 0ms);
 #endif
 
 #if 0
@@ -202,9 +202,9 @@ void inside_zero_gate_to_platform(
 
     ssf_press_button(context, BUTTON_LCLICK, 0ms, 4000ms);
     if (!flying_unlocked){
-        ssf_press_left_joystick(context, 128, 0, 125, 1250);
+        ssf_press_left_joystick(context, {0, +1}, 1000ms, 10000ms);
     }else{
-        ssf_press_left_joystick(context, 128, 0, 125, 875);
+        ssf_press_left_joystick(context, {0, +1}, 1000ms, 7000ms);
     }
 
     //  Jump
@@ -215,17 +215,17 @@ void inside_zero_gate_to_platform(
     ssf_press_button(context, BUTTON_B, 0ms, 160ms);        //  case one is dropped.
 
     if (!flying_unlocked){
-//        ssf_press_left_joystick(context, 128, 0, 375, 875);
-        pbf_move_left_joystick(context, 144, 0, 700, 0);
-        pbf_move_left_joystick(context, 128, 0, 1000ms, settings.MIDAIR_PAUSE_TIME0);
-        pbf_move_left_joystick(context, 128, 0, 875, 250);
+//        ssf_press_left_joystick(context, {0, +1}, 375, 875);
+        pbf_move_left_joystick(context, 144, 0, 5600ms, 0ms);
+        pbf_move_left_joystick(context, {0, +1}, 1000ms, settings.MIDAIR_PAUSE_TIME0);
+        pbf_move_left_joystick(context, {0, +1}, 7000ms, 2000ms);
     }else{
 //        ssf_press_button(context, BUTTON_B, 0, 20);
-//        pbf_move_left_joystick(context, 128, 0, 375, 250);
+//        pbf_move_left_joystick(context, {0, +1}, 375, 250);
         pbf_move_left_joystick(context, 164, 0, 1000ms, settings.MIDAIR_PAUSE_TIME0);
         pbf_press_button(context, BUTTON_LCLICK, 50, 0);
-        ssf_press_right_joystick(context, 128, 255, 0, 1500);
-        pbf_move_left_joystick(context, 128, 255, 1600, 125);
+        ssf_press_right_joystick(context, {0, -1}, 0ms, 12000ms);
+        pbf_move_left_joystick(context, {0, -1}, 12800ms, 1000ms);
 
         pbf_press_button(context, BUTTON_B, 125, 375);
 
@@ -234,7 +234,7 @@ void inside_zero_gate_to_platform(
 
 //    context.wait_for_all_requests();
     pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
-    ssf_press_left_joystick(context, 128, 0, 1000ms, 4000ms);
+    ssf_press_left_joystick(context, {0, +1}, 1000ms, 4000ms);
     pbf_press_button(context, BUTTON_R, 20, 355);
     pbf_press_button(context, BUTTON_R, 160ms, 840ms);
 
@@ -302,11 +302,11 @@ void area_zero_platform_run_path0(
 
     use_lets_go_to_clear_in_front(stream, context, tracker, false, [&](ProControllerContext& context){
         //  Move to wall.
-        pbf_move_left_joystick(context, 128, 0, 4000ms, 0ms);
+        pbf_move_left_joystick(context, {0, +1}, 4000ms, 0ms);
 
         //  Turn around.
         stream.log("Turning towards sky...");
-        pbf_move_left_joystick(context, 128, 255, 30, 95);
+        pbf_move_left_joystick(context, {0, -1}, 240ms, 760ms);
         pbf_press_button(context, BUTTON_L, 160ms, 400ms);
     });
 
@@ -338,7 +338,7 @@ void area_zero_platform_run_path0(
         pbf_move_left_joystick(context, x, 0, duration, 0ms);
     });
     use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](ProControllerContext& context){
-        pbf_move_left_joystick(context, 128, 255, duration, 4000ms);
+        pbf_move_left_joystick(context, {0, -1}, duration, 4000ms);
     });
 }
 void area_zero_platform_run_path1(
@@ -360,10 +360,10 @@ void area_zero_platform_run_path1(
     stream.log("Clear path to the wall...");
     pbf_press_button(context, BUTTON_L, 160ms, 400ms);
     use_lets_go_to_clear_in_front(stream, context, tracker, false, [&](ProControllerContext& context){
-        pbf_move_left_joystick(context, 128, 0, 5000ms, 0ms);
+        pbf_move_left_joystick(context, {0, +1}, 5000ms, 0ms);
 
         //  Turn right.
-        pbf_move_left_joystick(context, 255, 128, 30, 0);
+        pbf_move_left_joystick(context, {+1, 0}, 240ms, 0ms);
         pbf_press_button(context, BUTTON_L, 160ms, 400ms);
     });
 
@@ -371,7 +371,7 @@ void area_zero_platform_run_path1(
     stream.log("Clear the wall...");
     Milliseconds duration = 2600ms;
     use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](ProControllerContext& context){
-        pbf_move_left_joystick(context, 255, 128, 1000ms, 0ms);
+        pbf_move_left_joystick(context, {+1, 0}, 1000ms, 0ms);
         pbf_press_button(context, BUTTON_L, 160ms, 400ms);
         context.wait_for_all_requests();
 
@@ -405,7 +405,7 @@ void area_zero_platform_run_path1(
     use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](ProControllerContext& context){
 //        pbf_move_left_joystick(context, 64, 0, 1000ms, 0ms);
 //        pbf_press_button(context, BUTTON_L, 160ms, 840ms);
-        pbf_move_left_joystick(context, 128, 255, duration, 4000ms);
+        pbf_move_left_joystick(context, {0, -1}, duration, 4000ms);
 //        pbf_controller_state(context, 0, DPAD_NONE, 255, 255, 120, 128, 3000ms);
     });
 }
@@ -469,7 +469,7 @@ void area_zero_platform_run_path2(
         pbf_move_right_joystick(context, {0, +1}, 480ms, 0ms);
         find_and_center_on_sky(env, stream, context);
         context.wait_for(std::chrono::seconds(1));
-        pbf_move_left_joystick(context, 128, 255, 40, 85);
+        pbf_move_left_joystick(context, {0, -1}, 320ms, 680ms);
         pbf_mash_button(context, BUTTON_L, 60);
 
         pbf_move_right_joystick(context, {0, -1}, 2000ms, 0ms);

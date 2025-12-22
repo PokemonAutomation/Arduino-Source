@@ -334,8 +334,8 @@ void EggAutonomousState::fetch_egg(){
             m_stream, m_context,
             [](ProControllerContext& context){
                 pbf_move_left_joystick(context, {-1, -1}, 240ms, 0ms);
-                pbf_move_left_joystick(context, 128, 0, 280ms, 0ms);
-                pbf_move_left_joystick(context, 255, 128, 480ms, 1000ms);
+                pbf_move_left_joystick(context, {0, +1}, 280ms, 0ms);
+                pbf_move_left_joystick(context, {+1, 0}, 480ms, 1000ms);
             },
             {{dialog}}
         );

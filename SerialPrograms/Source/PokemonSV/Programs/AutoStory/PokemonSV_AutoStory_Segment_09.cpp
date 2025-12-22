@@ -161,13 +161,13 @@ void checkpoint_17(
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
         // re-orient camera
-        pbf_press_button(context, BUTTON_L, 20, 100);
+        pbf_press_button(context, BUTTON_L, 160ms, 800ms);
         // move backwards towards front desk
         pbf_move_left_joystick(context, {0, -1}, 1600ms, 800ms);
         // re-orient camera
-        pbf_press_button(context, BUTTON_L, 20, 100);
+        pbf_press_button(context, BUTTON_L, 160ms, 800ms);
         // move right towards navigation kiosk
-        pbf_move_left_joystick(context, 255, 128, 800ms, 800ms);
+        pbf_move_left_joystick(context, {+1, 0}, 800ms, 800ms);
         // open school navigation screen
         press_button_until_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078});
         // go to staff room
@@ -236,7 +236,7 @@ void checkpoint_19(
         context.wait_for_all_requests();
 
         // walk right 
-        pbf_move_left_joystick(context, 255, 128, 400ms, 800ms);
+        pbf_move_left_joystick(context, {+1, 0}, 400ms, 800ms);
         // walk down towards door
         pbf_move_left_joystick(context, {0, -1}, 1600ms, 800ms);
 
@@ -244,7 +244,7 @@ void checkpoint_19(
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
         // walk forward
-        pbf_move_left_joystick(context, 128, 0, 800ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 800ms, 800ms);
         // walk left towards bed
         pbf_move_left_joystick(context, {-1, 0}, 800ms, 800ms);
 
@@ -270,7 +270,7 @@ void checkpoint_20(
         context.wait_for_all_requests();
        
         //walk right towards door
-        pbf_move_left_joystick(context, 255, 128, 1600ms, 800ms);
+        pbf_move_left_joystick(context, {+1, 0}, 1600ms, 800ms);
 
         wait_for_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078}, 10);
 

@@ -119,9 +119,9 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     [&](size_t attempt_number){
         
         // walk down
-        pbf_move_left_joystick(context, 128, 255, 800ms, 800ms);
+        pbf_move_left_joystick(context, {0, -1}, 800ms, 800ms);
         // walk right towards door
-        pbf_move_left_joystick(context, 255, 128, 1600ms, 800ms);
+        pbf_move_left_joystick(context, {+1, 0}, 1600ms, 800ms);
 
         wait_for_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078}, 10);
 
@@ -153,7 +153,7 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // now back in dorm room.
 
         // walk right towards door
-        pbf_move_left_joystick(context, 255, 128, 1600ms, 800ms);
+        pbf_move_left_joystick(context, {+1, 0}, 1600ms, 800ms);
 
         wait_for_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078}, 10);
 
@@ -171,7 +171,7 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
          // walk right towards door
-        pbf_move_left_joystick(context, 255, 128, 1600ms, 800ms);
+        pbf_move_left_joystick(context, {+1, 0}, 1600ms, 800ms);
 
         wait_for_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078}, 10);
         mash_button_till_overworld(env.console, context, BUTTON_A);
@@ -181,7 +181,7 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         context.wait_for_all_requests();
         context.wait_for(1000ms);
 
-        pbf_move_left_joystick(context, 128, 255, 1000, 100);
+        pbf_move_left_joystick(context, {0, -1}, 8000ms, 800ms);
         // wait for dialog when leaving school lobby
         pbf_wait(context, 3000ms);
         
@@ -220,7 +220,7 @@ void checkpoint_92(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG});
 
         // leave the inside of the lighthouse and go outside
-        pbf_move_left_joystick(context, 128, 255, 800ms, 400ms);
+        pbf_move_left_joystick(context, {0, -1}, 800ms, 400ms);
         pbf_move_left_joystick(context, {-1, 0}, 2400ms, 400ms);
         pbf_move_left_joystick(context, 255, 255, 800ms, 400ms);
 

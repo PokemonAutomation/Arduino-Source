@@ -184,11 +184,11 @@ void route_alpha_pidgey(
             env.console, context,
             [&](ProControllerContext& context){
                 ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
-                pbf_move_left_joystick(context, 255, 128, 4000ms, 0ms);
+                pbf_move_left_joystick(context, {+1, 0}, 4000ms, 0ms);
                 pbf_move_left_joystick(context, {0, -1}, 7400ms, 0ms);
                 pbf_move_left_joystick(context, {-1, 0},  3000ms, 0ms);
                 pbf_press_button(context, BUTTON_A, 500ms, 2500ms); // elevator up
-                pbf_move_left_joystick(context, 255, 128, 100ms, 0ms);
+                pbf_move_left_joystick(context, {+1, 0}, 100ms, 0ms);
                 pbf_press_button(context, BUTTON_L, 100ms, 1000ms);
             },
             {black_screen}
@@ -200,7 +200,7 @@ void route_alpha_pidgey(
     open_map(env.console, context, to_zoom_to_max);
     pbf_move_left_joystick(context, {0, -1}, 200ms, 100ms);
     if (fly_from_map(env.console, context) == FastTravelState::NOT_AT_FLY_SPOT) {
-        pbf_move_left_joystick(context, 255, 128, 100ms, 100ms);
+        pbf_move_left_joystick(context, {+1, 0}, 100ms, 100ms);
         fly_from_map(env.console, context);
     }
     wait_until_overworld(env.console, context);

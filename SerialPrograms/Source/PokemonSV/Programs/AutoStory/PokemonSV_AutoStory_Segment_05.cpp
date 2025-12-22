@@ -132,8 +132,8 @@ void checkpoint_10(
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 110, 100);
-                pbf_move_left_joystick(context, 128, 0, 6000ms, 8000ms);
-                pbf_move_left_joystick(context, 128, 0, 4000ms, 160ms);
+                pbf_move_left_joystick(context, {0, +1}, 6000ms, 8000ms);
+                pbf_move_left_joystick(context, {0, +1}, 4000ms, 160ms);
             }
         );
         DirectionDetector direction;

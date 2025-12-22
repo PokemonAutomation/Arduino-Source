@@ -256,21 +256,21 @@ void MoneyFarmerRoute210::heal_at_center_and_return(
 
     logger.log("Returning to trainers...");
     pbf_move_left_joystick(context, {0, -1}, 6000ms, 0ms);
-    pbf_move_left_joystick(context, 255, 128, 480ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, 200, 0);
-    pbf_move_left_joystick(context, 255, 128, 750, 0);
+    pbf_move_left_joystick(context, {+1, 0}, 480ms, 0ms);
+    pbf_move_left_joystick(context, 128, 0, 1600ms, 0ms);
+    pbf_move_left_joystick(context, {+1, 0}, 6000ms, 0ms);
 
     pbf_press_button(context, BUTTON_R, 10, 150);
     pbf_mash_button(context, BUTTON_ZL, 6000ms);
 
     pbf_move_left_joystick(context, {0, -1}, 240ms, 0ms);
-    pbf_move_left_joystick(context, 0, 128, 240ms, 0ms);
+    pbf_move_left_joystick(context, {-1, 0}, 240ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 640ms, 0ms);
-    pbf_move_left_joystick(context, 255, 128, 880ms, 0ms);
+    pbf_move_left_joystick(context, {+1, 0}, 880ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 1000ms, 0ms);
-    pbf_move_left_joystick(context, 255, 128, 840ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, 3000ms, 0ms);
-    pbf_move_left_joystick(context, 255, 128, 2400ms, 0ms);
+    pbf_move_left_joystick(context, {+1, 0}, 840ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 3000ms, 0ms);
+    pbf_move_left_joystick(context, {+1, 0}, 2400ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 3000ms, 0ms);
 
     pbf_press_dpad(context, DPAD_RIGHT, 375, 0);
@@ -366,7 +366,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
         if (HEALING_METHOD == HealMethod::GlobalRoom){
             heal_by_global_room(env.console, context);
         }
-        pbf_move_left_joystick(context, 255, 128, 1120ms, 0ms);
+        pbf_move_left_joystick(context, {+1, 0}, 1120ms, 0ms);
     }
 
     while (true){
@@ -375,11 +375,11 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         if (need_to_charge){
-            pbf_move_left_joystick(context, 255, 128, 1120ms, 0ms);
+            pbf_move_left_joystick(context, {+1, 0}, 1120ms, 0ms);
             pbf_press_dpad(context, DPAD_UP, 85, 0);
             for (size_t c = 0; c < 7; c++){
                 pbf_move_left_joystick(context, {-1, 0},  1120ms, 0ms);
-                pbf_move_left_joystick(context, 255, 128, 1120ms, 0ms);
+                pbf_move_left_joystick(context, {+1, 0}, 1120ms, 0ms);
             }
             pbf_press_dpad(context, DPAD_DOWN, 75, 0);
         }

@@ -117,14 +117,14 @@ void run_forward_backward_to_wall(
     PokemonAutomation::Milliseconds duration
 ){
     ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, duration, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, duration, 0ms);
     pbf_move_left_joystick(context, {0, -1}, duration + 500ms, 0ms);
     pbf_wait(context, 500ms);
 }
 
 void route_klefki(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, 4900ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 4900ms, 0ms);
     pbf_move_left_joystick(context, {-1, 0},  1000ms, 0ms);
     pbf_press_button(context, BUTTON_L, 100ms, 500ms);
     fly_back_to_sewers_entrance(env.console, context);
@@ -132,8 +132,8 @@ void route_klefki(SingleSwitchProgramEnvironment& env, ProControllerContext& con
 
 void route_klefki_inkay_goomy(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, 8500ms, 0ms);
-    pbf_move_left_joystick(context, 255, 128, 1300ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 8500ms, 0ms);
+    pbf_move_left_joystick(context, {+1, 0}, 1300ms, 0ms);
     pbf_press_button(context, BUTTON_L, 100ms, 500ms);
     fly_back_to_sewers_entrance(env.console, context);
 }
@@ -153,7 +153,7 @@ void route_skrelp(SingleSwitchProgramEnvironment& env, ProControllerContext& con
 
 void route_skrelp_inkay(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, 3900ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 3900ms, 0ms);
     fly_back_to_sewers_entrance(env.console, context);
 }
 

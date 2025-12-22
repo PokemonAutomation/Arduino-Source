@@ -784,7 +784,7 @@ bool EggAutonomous::process_hatched_pokemon(
                         env.console
                     );
                 }
-                pbf_press_button(context, BUTTON_A, 20, 100);
+                pbf_press_button(context, BUTTON_A, 160ms, 800ms);
                 
                 size_t dialog_count = 0;
                 const size_t max_dialog_count = 6;
@@ -793,7 +793,7 @@ bool EggAutonomous::process_hatched_pokemon(
                     if (!dialog_detector.process_frame(env.console.video().snapshot(), current_time())){
                         break;
                     }
-                    pbf_press_button(context, BUTTON_A, 20, 100);
+                    pbf_press_button(context, BUTTON_A, 160ms, 800ms);
                 }
                 if (dialog_count == max_dialog_count){
                     OperationFailedException::fire(

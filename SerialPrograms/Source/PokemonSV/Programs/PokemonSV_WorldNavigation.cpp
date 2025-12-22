@@ -614,7 +614,7 @@ void jump_off_wall_until_map_open(const ProgramInfo& info, VideoStream& stream, 
     for (auto i = 0; i < 3; i++){
         pbf_press_button(context, BUTTON_L, 400ms, 400ms);
         pbf_press_button(context, BUTTON_B, 400ms, 400ms);
-        pbf_move_left_joystick(context, 128, 255, 800ms, 400ms);
+        pbf_move_left_joystick(context, {0, -1}, 800ms, 400ms);
         context.wait_for_all_requests();
         try{
             open_map_from_overworld(info, stream, context);
@@ -787,7 +787,7 @@ void heal_at_pokecenter(
     // re-orient camera
     pbf_press_button(context, BUTTON_L, 20, 20);
     // move towards pokecenter
-    pbf_move_left_joystick(context, 128, 255, 800ms, 160ms);
+    pbf_move_left_joystick(context, {0, -1}, 800ms, 160ms);
     // re-orient camera
     pbf_press_button(context, BUTTON_L, 20, 20); 
 

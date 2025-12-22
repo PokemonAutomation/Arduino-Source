@@ -94,15 +94,15 @@ void MegaShardFarmer::program(SingleSwitchProgramEnvironment& env, ProController
                 //  Travel to alley with logs of mega shards.
                 pbf_move_left_joystick(context, 0, 96, 400ms, 400ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 440ms);
-                pbf_move_left_joystick(context, 128, 0, 3000ms, 400ms);
-                pbf_move_left_joystick(context, 255, 128, 400ms, 400ms);
+                pbf_move_left_joystick(context, {0, +1}, 3000ms, 400ms);
+                pbf_move_left_joystick(context, {+1, 0}, 400ms, 400ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 440ms);
-                pbf_move_left_joystick(context, 128, 0, 2500ms, 400ms);
+                pbf_move_left_joystick(context, {0, +1}, 2500ms, 400ms);
                 pbf_move_left_joystick(context, 255, 64, 400ms, 400ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 440ms);
-                pbf_move_left_joystick(context, 128, 0, 2000ms, 0ms);
+                pbf_move_left_joystick(context, {0, +1}, 2000ms, 0ms);
                 pbf_move_left_joystick(context, 160, 0, 1000ms, 0ms);
-                pbf_move_left_joystick(context, 128, 0, 2000ms, 0ms);
+                pbf_move_left_joystick(context, {0, +1}, 2000ms, 0ms);
                 pbf_move_left_joystick(context, 160, 0, 1500ms, 1000ms);
 
                 //  Move camera up.

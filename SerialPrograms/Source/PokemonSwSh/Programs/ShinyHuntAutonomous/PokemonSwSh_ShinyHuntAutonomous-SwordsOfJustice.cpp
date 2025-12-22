@@ -130,8 +130,8 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
         pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
         pbf_press_button(context, BUTTON_A, 160ms, ENTER_CAMP_DELAY0);
         if (AIRPLANE_MODE){
-            pbf_press_button(context, BUTTON_A, 20, 100);
-            pbf_press_button(context, BUTTON_A, 20, 100);
+            pbf_press_button(context, BUTTON_A, 160ms, 800ms);
+            pbf_press_button(context, BUTTON_A, 160ms, 800ms);
         }
         pbf_press_button(context, BUTTON_X, 160ms, 400ms);
         pbf_press_dpad(context, DPAD_LEFT, 20, 20);

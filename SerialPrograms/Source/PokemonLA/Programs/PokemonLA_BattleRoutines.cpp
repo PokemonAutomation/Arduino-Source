@@ -63,7 +63,7 @@ size_t switch_pokemon(
 
     while(true){
         // Choose the next pokemon to battle.
-        pbf_press_button(context, BUTTON_A, 20, 100);
+        pbf_press_button(context, BUTTON_A, 160ms, 800ms);
         pbf_press_button(context, BUTTON_A, 20, 150);
         context.wait_for_all_requests();
 
@@ -88,7 +88,7 @@ size_t switch_pokemon(
         }
 
         // Fist hit B to clear the "cannot send pokemon" dialogue
-        pbf_press_button(context, BUTTON_B, 20, 100);
+        pbf_press_button(context, BUTTON_B, 160ms, 800ms);
         // Move to the next pokemon
         pbf_press_dpad(context, DPAD_DOWN, 20, 80);
     }
@@ -186,7 +186,7 @@ void use_next_move_with_pp(
         }
         
         // Go to the next move.
-        pbf_press_dpad(context, DPAD_DOWN, 20, 100);
+        pbf_press_dpad(context, DPAD_DOWN, 160ms, 800ms);
         // env.console.context().wait_for_all_requests();
         cur_move++;
         stream.log("No PP. Use next move, " + std::to_string(cur_move), COLOR_RED);

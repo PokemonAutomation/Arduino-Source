@@ -334,11 +334,11 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(
             // to this location.
             pbf_press_button(context, BUTTON_L, 400ms, 320ms);
             // Move forward
-            pbf_move_left_joystick(context, 128, 0, 180, 0);
+            pbf_move_left_joystick(context, {0, +1}, 1440ms, 0ms);
             if (!SKIP_SANDWICH){
                 picnic_from_overworld(env.program_info(), env.console, context);
 
-                pbf_move_left_joystick(context, 128, 0, 30, 40);
+                pbf_move_left_joystick(context, {0, +1}, 240ms, 320ms);
                 enter_sandwich_recipe_list(env.program_info(), env.console, context);
                 make_sandwich_option(env, env.console, context, SANDWICH_OPTIONS);
                 last_sandwich_time = current_time();
@@ -429,7 +429,7 @@ void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& 
 
     if (path_id == 0){
         // move rightward, to the west
-        pbf_move_left_joystick(context, 255, 128, 800ms, 160ms);
+        pbf_move_left_joystick(context, {+1, 0}, 800ms, 160ms);
         // Align camera
         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
@@ -443,7 +443,7 @@ void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& 
         move_forward_with_lets_go(5);
 
         // move rightward, to south
-        pbf_move_left_joystick(context, 255, 128, 400ms, 160ms);
+        pbf_move_left_joystick(context, {+1, 0}, 400ms, 160ms);
         // Align camera
         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 

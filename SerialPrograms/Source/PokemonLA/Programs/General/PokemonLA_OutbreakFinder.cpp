@@ -458,7 +458,7 @@ std::vector<std::string> OutbreakFinder::run_iteration(
         inside_travel_map = false;
         pbf_press_button(context, BUTTON_B, 400ms, 400ms);
         // Leave the guard.
-        pbf_move_left_joystick(context, 128, 0, 800ms, 400ms);
+        pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
         // Checking MMO costs Aguav Berries.
         // To not waste them, save here so that we can reset to get berries back.
         save_game_from_overworld(env, env.console, context);
