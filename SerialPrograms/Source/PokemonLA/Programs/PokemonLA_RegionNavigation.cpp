@@ -420,7 +420,7 @@ void goto_camp_from_overworld(
             if (ret < 0){
 //                dump_image(stream.logger(), env.program_info(), "MapNotDetected", stream.video().snapshot());
                 stream.log("Map not detected after 5 seconds.", COLOR_RED);
-                pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 1000ms);
                 context.wait_for_all_requests();
                 continue;
             }

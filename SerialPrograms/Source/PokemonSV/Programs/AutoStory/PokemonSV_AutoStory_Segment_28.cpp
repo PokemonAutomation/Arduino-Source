@@ -267,7 +267,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
                 }catch (OperationFailedException&){
                     env.console.log("Failed to change direction, but it's possibly due to clearing the challenge.");
-                    pbf_wait(context, 20 * TICKS_PER_SECOND);
+                    pbf_wait(context, 20000ms);
                 }
 
                 // ///////////////////////
@@ -279,7 +279,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 // pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
 
 
-                pbf_wait(context, 20 * TICKS_PER_SECOND);
+                pbf_wait(context, 20000ms);
                 
             },
             {no_minimap}

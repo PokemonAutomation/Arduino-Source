@@ -141,7 +141,7 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, ProCo
 //        shininess = ShinyDetection::SQUARE_SHINY;
         if (result.shiny_type == ShinyType::UNKNOWN){
             stats.add_error();
-            pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 1000ms);
             run_away(env.console, context, EXIT_BATTLE_TIMEOUT0);
             error = true;
             continue;

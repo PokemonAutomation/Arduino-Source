@@ -49,7 +49,7 @@ void close_game_if_overworld(
     pbf_press_dpad(context, DPAD_RIGHT, 5, 0);
 
     //  Connect to internet.
-    pbf_press_button(context, BUTTON_PLUS, 10, TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_PLUS, 80ms, 1000ms);
 
     //  Enter Switch Home.
     pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
@@ -67,7 +67,7 @@ void close_game_if_overworld(
 
     //  Back out.
     pbf_press_dpad(context, DPAD_LEFT, 10, 10);
-    pbf_press_button(context, BUTTON_B, 10, TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
     pbf_press_dpad(context, DPAD_DOWN, 10, 10);
 
     //  Close and restart game.

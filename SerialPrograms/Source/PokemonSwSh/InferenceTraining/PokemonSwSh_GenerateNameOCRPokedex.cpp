@@ -195,7 +195,7 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env, Pr
             break;
         }
 
-        pbf_press_dpad(context, DPAD_RIGHT, 10, TICKS_PER_SECOND);
+        pbf_press_dpad(context, DPAD_RIGHT, 80ms, 1000ms);
     }
 
     if (MODE == Mode::SaveToJson){

@@ -99,7 +99,7 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, ProControlle
             env.console, context,
             [&](ProControllerContext& context){
                 for (size_t c = 0; c < 60; c++){
-                    pbf_press_button(context, BUTTON_LCLICK, 20, 60 * TICKS_PER_SECOND - 20);
+                    pbf_press_button(context, BUTTON_LCLICK, 160ms, 60000ms - 160ms);
                     context.wait_for_all_requests();
                     auto elapsed = current_time() - start;
                     uint64_t minutes = std::chrono::duration_cast<std::chrono::minutes>(elapsed).count();

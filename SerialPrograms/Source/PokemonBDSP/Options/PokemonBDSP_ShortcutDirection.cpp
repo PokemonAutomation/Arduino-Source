@@ -44,7 +44,7 @@ ShortcutDirectionOption::ShortcutDirectionOption(std::string label)
     )
 {}
 
-void ShortcutDirectionOption::run(ProControllerContext& context, uint16_t delay){
+void ShortcutDirectionOption::run(ProControllerContext& context, Milliseconds delay){
     uint8_t shortcut_x = 128;
     uint8_t shortcut_y = 128;
     switch (this->get()){
@@ -62,8 +62,8 @@ void ShortcutDirectionOption::run(ProControllerContext& context, uint16_t delay)
         );
     }
 
-    pbf_mash_button(context, BUTTON_PLUS, 125);
-    pbf_move_right_joystick(context, shortcut_x, shortcut_y, 20, delay);
+    pbf_mash_button(context, BUTTON_PLUS, 1000ms);
+    pbf_move_right_joystick(context, shortcut_x, shortcut_y, 160ms, delay);
 }
 
 

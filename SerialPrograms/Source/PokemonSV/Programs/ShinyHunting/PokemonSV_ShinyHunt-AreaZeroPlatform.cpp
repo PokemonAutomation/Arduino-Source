@@ -576,7 +576,7 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Pro
             }
         }catch (ResetException&){
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
-            reset_game_from_home_zoom_out(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
+            reset_game_from_home_zoom_out(env.program_info(), env.console, context, 5000ms);
             m_current_location = m_saved_location;
             stats.m_game_resets++;
             m_env->update_stats();

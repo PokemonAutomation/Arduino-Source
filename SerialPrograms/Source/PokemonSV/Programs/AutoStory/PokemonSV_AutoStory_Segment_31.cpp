@@ -546,7 +546,7 @@ void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProController
                 pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
             }catch (OperationFailedException&){
                 env.console.log("Failed to change direction, but it's possibly due to clearing the challenge.");
-                pbf_wait(context, 20 * TICKS_PER_SECOND);
+                pbf_wait(context, 20000ms);
             }
 
             // ///////////////
@@ -557,7 +557,7 @@ void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProController
 
             
 
-            pbf_wait(context, 20 * TICKS_PER_SECOND);
+            pbf_wait(context, 20000ms);
 
                 
             

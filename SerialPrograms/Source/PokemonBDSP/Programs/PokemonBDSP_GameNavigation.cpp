@@ -87,8 +87,8 @@ void overworld_to_menu(VideoStream& stream, ProControllerContext& context){
 
 void save_game(VideoStream& stream, ProControllerContext& context){
     overworld_to_menu(stream, context);
-    pbf_press_button(context, BUTTON_R, 10, 2 * TICKS_PER_SECOND);
-    pbf_press_button(context, BUTTON_ZL, 10, 5 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_R, 80ms, 2000ms);
+    pbf_press_button(context, BUTTON_ZL, 80ms, 5000ms);
 }
 
 void overworld_to_box(VideoStream& stream, ProControllerContext& context){

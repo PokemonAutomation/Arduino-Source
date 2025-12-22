@@ -59,10 +59,6 @@ private:
     bool run_climbing(AsyncCommandSession<ProController>& commands, WallClock timestamp);
 
 private:
-    static const uint16_t GET_ON_MOUNT_TIME = 125;
-    static const uint16_t GET_ON_BRAVIARY_TIME = 280;
-
-
     const WallClock m_min_stop;
     const WallClock m_deadline;
 

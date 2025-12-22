@@ -348,7 +348,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, ProContro
             run_until<ProControllerContext>(
                 env.console, context,
                 [this](ProControllerContext& context){
-                    SHORTCUT.run(context, TICKS_PER_SECOND);
+                    SHORTCUT.run(context, 1000ms);
 
                 },
                 {{tracker}}

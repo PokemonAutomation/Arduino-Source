@@ -322,7 +322,7 @@ void EggAutonomousState::fetch_egg(){
 
     m_stream.log("Getting off bike.");
     if (m_on_bike){
-        m_shortcut.run(m_context, 100);
+        m_shortcut.run(m_context, 800ms);
         m_context.wait_for_all_requests();
         m_on_bike = false;
     }
@@ -382,7 +382,7 @@ void EggAutonomousState::fetch_egg(){
     }
 
     m_stream.log("Getting back on bike.");
-    m_shortcut.run(m_context, 100);
+    m_shortcut.run(m_context, 800ms);
     m_on_bike = true;
     pbf_move_left_joystick(m_context, 0, 255, 125, 0);
 }

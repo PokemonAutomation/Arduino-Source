@@ -259,7 +259,7 @@ void checkpoint_59(
 
 
                 // wait 30 seconds to let the trainers cooldown
-                pbf_wait(context, 30 * TICKS_PER_SECOND);
+                pbf_wait(context, 30000ms);
 
                 direction.change_direction(env.program_info(), env.console, context, 1.310148);
                 pbf_move_left_joystick(context, 128, 0, 800, 50);
@@ -288,10 +288,10 @@ void checkpoint_59(
                     pbf_wait(context, seconds_wait * TICKS_PER_SECOND);
 
 
-                    pbf_wait(context, 20 * TICKS_PER_SECOND);
+                    pbf_wait(context, 20000ms);
                 }catch (OperationFailedException&){
                     env.console.log("Failed to change direction, but it's possibly due to clearing the challenge.");
-                    pbf_wait(context, 20 * TICKS_PER_SECOND);
+                    pbf_wait(context, 20000ms);
                 }
                 
             },

@@ -444,7 +444,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
                 case 1:
                     env.log("Detected fainted Pokemon. Switching to next living Pokemon...");
                     if (fainted.move_to_slot(env.console, context, switch_party_slot)){
-                        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                        pbf_mash_button(context, BUTTON_A, 3000ms);
                         context.wait_for_all_requests();
                         switch_party_slot++;
                     }
@@ -535,7 +535,7 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, ProControllerC
         case StatsHuntAction::StopProgram:
             match = true;
 
-            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 5000ms);
 
             env.console.log("Match found!");
             stats.matches++;
@@ -589,7 +589,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 stats.resets++;
                 env.update_stats();
                 pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
-                reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
+                reset_game_from_home(env.program_info(), env.console, context, 5000ms);
             }
 
             //  Try to start battle 3 times.
@@ -635,7 +635,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             stats.resets++;
             env.update_stats();
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
-            reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
+            reset_game_from_home(env.program_info(), env.console, context, 5000ms);
         }
     }
     env.update_stats();

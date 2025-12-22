@@ -263,11 +263,11 @@ void TeraMultiFarmer::reset_host(const ProgramInfo& info, ConsoleHandle& console
             m_last_time_fix = now;
         }
     }
-    reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND);
+    reset_game_from_home(info, console, context, 5000ms);
 }
 void TeraMultiFarmer::reset_joiner(const ProgramInfo& info, ConsoleHandle& console, ProControllerContext& context){
     pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
-    reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND);
+    reset_game_from_home(info, console, context, 5000ms);
 }
 bool TeraMultiFarmer::run_raid_host(ProgramEnvironment& env, ConsoleHandle& console, ProControllerContext& context){
     TeraMultiFarmer_Descriptor::Stats& stats = env.current_stats<TeraMultiFarmer_Descriptor::Stats>();

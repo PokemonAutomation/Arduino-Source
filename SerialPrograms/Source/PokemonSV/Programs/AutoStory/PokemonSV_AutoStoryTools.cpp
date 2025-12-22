@@ -391,7 +391,7 @@ void overworld_navigation(
                             realign_player(info, stream, context, PlayerRealignMode::REALIGN_OLD_MARKER);
                    
                         }catch (UnexpectedBattleException&){
-                            pbf_wait(context, 30 * TICKS_PER_SECOND);  // catch exception to allow the battle callback to take over.
+                            pbf_wait(context, 30000ms);  // catch exception to allow the battle callback to take over.
                         }
                         
                     }
@@ -711,7 +711,7 @@ void change_settings_prior_to_autostory(
     enter_menu_from_overworld(env.program_info(), env.console, context, options_index, MenuSide::RIGHT, has_minimap);
     change_settings(env, context, language);
     if(!has_minimap){
-        pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 2000ms);
     }else{
         press_Bs_to_back_to_overworld(env.program_info(), env.console, context);    
     }

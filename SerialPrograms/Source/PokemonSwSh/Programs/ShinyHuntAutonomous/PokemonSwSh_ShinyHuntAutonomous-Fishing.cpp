@@ -128,7 +128,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Pr
         //  Trigger encounter.
         {
             pbf_press_button(context, BUTTON_A, 10, 10);
-            pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 1000ms);
             context.wait_for_all_requests();
 
             FishingMissDetector miss_detector;
@@ -152,7 +152,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Pr
             case 1:
                 env.log("Detected hook!", COLOR_PURPLE);
                 ssf_press_button_ptv(context, BUTTON_A, 120ms);
-//                pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
+//                pbf_mash_button(context, BUTTON_A, 1000ms);
                 break;
             case 2:
                 env.log("Unexpected battle menu.", COLOR_RED);

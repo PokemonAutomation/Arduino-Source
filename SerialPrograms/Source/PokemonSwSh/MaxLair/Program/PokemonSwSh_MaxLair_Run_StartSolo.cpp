@@ -149,7 +149,7 @@ bool start_raid_self_solo(
 
     //  Start raid.
     pbf_press_dpad(context, DPAD_DOWN, 10, 50);
-    pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
     context.wait_for_all_requests();
 
     return true;
@@ -188,10 +188,10 @@ bool start_raid_host_solo(
     //  Enter code.
     std::string code = settings.RAID_CODE.get_code();
     if (!code.empty()){
-        pbf_press_button(context, BUTTON_PLUS, 10, TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_PLUS, 80ms, 1000ms);
         FastCodeEntry::numberpad_enter_code(console, context, code, true);
         pbf_wait(context, 2000ms);
-        pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
         context.wait_for_all_requests();
     }
 
@@ -205,7 +205,7 @@ bool start_raid_host_solo(
     );
 
     //  Open lobby.
-    pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
     context.wait_for_all_requests();
 
     auto time_limit = current_time() + settings.LOBBY_WAIT_DELAY0.get();
@@ -223,7 +223,7 @@ bool start_raid_host_solo(
 
     //  Ready up.
     context.wait_for(std::chrono::seconds(1));
-    pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
     context.wait_for_all_requests();
 
     //  Wait

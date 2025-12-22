@@ -90,7 +90,7 @@ void PokedexTasksReader::program(SingleSwitchProgramEnvironment& env, ProControl
                 output_file << task << "\n";
             }
         }
-        pbf_press_dpad(context, DPAD_DOWN, 10, TICKS_PER_SECOND);
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 1000ms);
         context.wait_for_all_requests();
     }
 

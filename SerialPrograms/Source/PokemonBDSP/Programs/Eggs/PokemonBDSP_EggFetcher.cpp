@@ -86,7 +86,7 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         egg_spin_with_A(context, TRAVEL_TIME_PER_FETCH0);
-        SHORTCUT.run(context, 100);
+        SHORTCUT.run(context, 800ms);
 
         //  Move to man.
         pbf_move_left_joystick(context, 0, 255, 30, 0);
@@ -97,7 +97,7 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         pbf_mash_button(context, BUTTON_ZL, 600);
         pbf_mash_button(context, BUTTON_B, 520);
         pbf_move_left_joystick(context, 0, 255, 125, 0);
-        SHORTCUT.run(context, 100);
+        SHORTCUT.run(context, 800ms);
 
         stats.m_attempts++;
     }

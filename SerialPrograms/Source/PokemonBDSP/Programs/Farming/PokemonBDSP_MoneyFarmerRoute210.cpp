@@ -135,7 +135,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
         if (ret < 0){
             stats.m_errors++;
             env.log("Failed to detect start of battle after 20 seconds.", COLOR_RED);
-            pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 1000ms);
             return false;
         }
     }
@@ -394,7 +394,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
             run_until<ProControllerContext>(
                 env.console, context,
                 [this](ProControllerContext& context){
-                    SHORTCUT.run(context, TICKS_PER_SECOND);
+                    SHORTCUT.run(context, 1000ms);
                 },
                 {{tracker}}
             );

@@ -25,8 +25,8 @@ namespace MaxLairInternal{
 bool abort_if_error(MultiSwitchProgramEnvironment& env, CancellableScope& scope, const std::atomic<size_t>& errors){
     if (errors.load(std::memory_order_acquire)){
         env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
-            pbf_press_button(context, BUTTON_B, 10, TICKS_PER_SECOND);
-            pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
+            pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
             pbf_mash_button(context, BUTTON_B, 8000ms);
         });
         return true;
@@ -176,10 +176,10 @@ bool start_raid_local(
 
         //  Enter code.
         if (!code.empty() && env.consoles.size() > 1){
-            pbf_press_button(context, BUTTON_PLUS, 10, TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_PLUS, 80ms, 1000ms);
             FastCodeEntry::numberpad_enter_code(console, context, code, true);
             pbf_wait(context, 2000ms);
-            pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
         }
     });
 
@@ -189,7 +189,7 @@ bool start_raid_local(
         if (env.consoles.size() > 1 && console.index() != host.index()){
             pbf_wait(context, 3000ms);
         }
-        pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
     });
 
     auto time_limit = current_time() + settings.LOBBY_WAIT_DELAY0.get();
@@ -238,7 +238,7 @@ bool start_raid_local(
     env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         //  Ready up.
         context.wait_for(std::chrono::seconds(1));
-        pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
         context.wait_for_all_requests();
 
         //  Wait
@@ -331,10 +331,10 @@ bool start_raid_host(
 
         //  Enter Code
         if (!code.empty()){
-            pbf_press_button(context, BUTTON_PLUS, 10, TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_PLUS, 80ms, 1000ms);
             FastCodeEntry::numberpad_enter_code(console, context, code, true);
             pbf_wait(context, 2000ms);
-            pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
         }
     });
 
@@ -347,7 +347,7 @@ bool start_raid_host(
         if (console.index() != host.index()){
             pbf_wait(context, 3000ms);
         }
-        pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
     });
 
     auto time_limit = current_time() + settings.LOBBY_WAIT_DELAY0.get();
@@ -404,7 +404,7 @@ bool start_raid_host(
     env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         //  Ready up.
         context.wait_for(std::chrono::seconds(1));
-        pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
         context.wait_for_all_requests();
 
         //  Wait

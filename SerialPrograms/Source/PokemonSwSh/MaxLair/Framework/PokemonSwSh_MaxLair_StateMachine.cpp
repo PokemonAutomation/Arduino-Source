@@ -194,7 +194,7 @@ StateMachineAction run_state_iteration(
         return StateMachineAction::DONE_WITH_ADVENTURE;
     case 8:
         console.log("Current State: Frozen Screen", COLOR_RED);
-//        pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
+//        pbf_mash_button(context, BUTTON_B, 1000ms);
 //        context.wait_for_all_requests();
 //        return StateMachineAction::KEEP_GOING;
         return StateMachineAction::RESET_RECOVER;

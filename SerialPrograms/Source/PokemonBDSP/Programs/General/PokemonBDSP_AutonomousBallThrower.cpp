@@ -121,8 +121,8 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, ProCont
                     while (true){
                         //TODO edit here for what to do
                         //pbf_wait(context, 1000ms);
-                        pbf_press_button(context, BUTTON_A, 5, TICKS_PER_SECOND);
-                        pbf_press_dpad(context, DPAD_UP, 5, TICKS_PER_SECOND);
+                        pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
+                        pbf_press_dpad(context, DPAD_UP, 80ms, 1000ms);
                     }
                 },
                 {{fight_detector}}

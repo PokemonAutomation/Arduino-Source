@@ -14,6 +14,10 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
+const Milliseconds GET_ON_MOUNT_TIME = Milliseconds(1000);
+const Milliseconds GET_ON_BRAVIARY_TIME = Milliseconds(2240);
+
+
 
 EscapeFromAttack::EscapeFromAttack(
     ProgramEnvironment& env,
@@ -60,14 +64,14 @@ EscapeFromAttack::EscapeFromAttack(
         m_stream.log("Switching from Wyrdeer/Basculegion (off) to Braviary (on)...");
         m_active_command->dispatch([](ProControllerContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
-            pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
+            pbf_press_button(context, BUTTON_PLUS, 160ms, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
     register_state_command(State::WYRDEER_BASCULEGION_ON, [this](){
         m_stream.log("Switching from Wyrdeer/Basculegion (on) to Braviary (on)...");
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
@@ -76,7 +80,7 @@ EscapeFromAttack::EscapeFromAttack(
         m_active_command->dispatch([](ProControllerContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
-            pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
+            pbf_press_button(context, BUTTON_PLUS, 160ms, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
@@ -84,7 +88,7 @@ EscapeFromAttack::EscapeFromAttack(
         m_stream.log("Switching from Ursaluna (on) to Braviary (on)...");
         m_active_command->dispatch([](ProControllerContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
-            pbf_press_dpad(context, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
@@ -92,7 +96,7 @@ EscapeFromAttack::EscapeFromAttack(
         m_stream.log("Switching from Sneasler (off) to Braviary (on)...");
         m_active_command->dispatch([](ProControllerContext& context){
             pbf_press_dpad(context, DPAD_LEFT, 20, 50);
-            pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
+            pbf_press_button(context, BUTTON_PLUS, 160ms, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
@@ -100,14 +104,14 @@ EscapeFromAttack::EscapeFromAttack(
         m_stream.log("Switching from Sneasler (on) to Braviary (on)...");
         m_active_command->dispatch([](ProControllerContext& context){
             pbf_move_left_joystick(context, 128, 0, 125, 0);
-            pbf_press_dpad(context, DPAD_LEFT, 20, GET_ON_BRAVIARY_TIME);
+            pbf_press_dpad(context, DPAD_LEFT, 160ms, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
     register_state_command(State::BRAVIARY_OFF, [this](){
         m_stream.log("Switching from Braviary (off) to Braviary (on)...");
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
+            pbf_press_button(context, BUTTON_PLUS, 160ms, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });

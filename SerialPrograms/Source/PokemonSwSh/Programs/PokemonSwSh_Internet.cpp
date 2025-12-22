@@ -63,7 +63,7 @@ bool connect_to_internet_with_inference(
     context.wait_for(std::chrono::seconds(1));
     pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);
     pbf_move_right_joystick(context, {0, +1}, 40ms, 0ms);
-    pbf_mash_button(context, BUTTON_PLUS, TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_PLUS, 1000ms);
     context.wait_for_all_requests();
 
 //    cout << "Waiting for Y-COMM to close..." << endl;

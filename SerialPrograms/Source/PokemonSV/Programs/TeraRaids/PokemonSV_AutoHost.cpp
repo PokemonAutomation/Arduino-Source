@@ -302,7 +302,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, ProControllerContext
                     last_time_fix = now;
                 }
             }
-            reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
+            reset_game_from_home(env.program_info(), env.console, context, 5000ms);
         }
         skip_reset = false;
 

@@ -27,7 +27,7 @@ int move_to_ball(
     const BattleBallReader& reader,
     VideoStream& stream, ProControllerContext& context,
     const std::string& ball_slug,
-    bool forward, int attempts, uint16_t delay
+    bool forward, int attempts, Milliseconds delay
 ){
     std::string first_ball = reader.read_ball(stream.video().snapshot());
     if (first_ball == ball_slug){
@@ -36,7 +36,7 @@ int move_to_ball(
 
     size_t repeat_counter = 0;
     for (int c = 1; c < attempts; c++){
-        pbf_press_dpad(context, forward ? DPAD_RIGHT : DPAD_LEFT, 10, delay);
+        pbf_press_dpad(context, forward ? DPAD_RIGHT : DPAD_LEFT, 80ms, delay);
         context.wait_for_all_requests();
         std::string current_ball = reader.read_ball(stream.video().snapshot());
         if (current_ball == ball_slug){
@@ -61,7 +61,7 @@ int16_t move_to_ball(
     const std::string& ball_slug
 ){
     //  Search forward at high speed.
-    int ret = move_to_ball(reader, stream, context, ball_slug, true, 50, 30);
+    int ret = move_to_ball(reader, stream, context, ball_slug, true, 50, 240ms);
     if (ret < 0){
         return 0;
     }
@@ -71,12 +71,12 @@ int16_t move_to_ball(
     }
 
     //  Wait a second to let the video catch up.
-    pbf_wait(context, TICKS_PER_SECOND);
+    pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
 
     //  Now try again in reverse at a lower speed in case we overshot.
     //  This will return immediately if we got it right the first time.
-    ret = move_to_ball(reader, stream, context, ball_slug, false, 5, TICKS_PER_SECOND);
+    ret = move_to_ball(reader, stream, context, ball_slug, false, 5, 1000ms);
     if (ret < 0){
         return 0;
     }
@@ -99,7 +99,7 @@ CatchResults throw_balls(
         // Test code for checking catch outcome handling: if the wild pokemon fainted:
 // #define TEST_WILD_POKEMON_FAINTED
 #ifdef TEST_WILD_POKEMON_FAINTED
-        pbf_mash_button(context, BUTTON_ZL, TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_ZL, 1000ms);
         context.wait_for_all_requests();
         if (0)
 #endif
@@ -239,7 +239,7 @@ CatchResults basic_catcher(
                 );
             }
             stream.log("BasicCatcher: Battle finished!", COLOR_BLUE);
-            pbf_wait(context, TICKS_PER_SECOND);
+            pbf_wait(context, 1000ms);
             context.wait_for_all_requests();
             return results;
         case 1:

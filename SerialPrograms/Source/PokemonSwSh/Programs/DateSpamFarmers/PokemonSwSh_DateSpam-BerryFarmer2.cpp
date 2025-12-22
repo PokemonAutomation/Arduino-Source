@@ -203,7 +203,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
         env.log("Unexpected battle menu.", COLOR_RED);
         stats.add_error();
         env.update_stats();
-        pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 1000ms);
         run_away(env.console, context, EXIT_BATTLE_TIMEOUT0);
         result = Rustling::Battle;
         break;
@@ -274,7 +274,7 @@ uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env
         current_rustling = check_rustling(env, context);
     }
     if (current_rustling == Rustling::Battle){
-        pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 1000ms);
         env.console.log("Clearing dialog boxes...");
 //        run_away(env.console, context, EXIT_BATTLE_TIMEOUT);
 //        context.wait_for_all_requests();

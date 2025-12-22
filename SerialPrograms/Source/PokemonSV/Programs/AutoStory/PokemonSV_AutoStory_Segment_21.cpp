@@ -261,10 +261,10 @@ void checkpoint_48(
                     pbf_press_button(context, BUTTON_R, 20, 20);
                     pbf_wait(context, wait);
                     
-                    pbf_wait(context, 20 * TICKS_PER_SECOND);
+                    pbf_wait(context, 20000ms);
                 }catch (OperationFailedException&){
                     env.console.log("Failed to change direction, but it's possibly due to clearing the challenge.");
-                    pbf_wait(context, 20 * TICKS_PER_SECOND);
+                    pbf_wait(context, 20000ms);
                 }
                 
             },

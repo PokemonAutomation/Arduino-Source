@@ -106,7 +106,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, ProControlle
     //  Encounter Loop
     while (true){
         env.update_stats();
-        pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 1000ms);
         context.wait_for_all_requests();
 
         {
@@ -117,7 +117,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, ProControlle
             int ret = run_until<ProControllerContext>(
                 env.console, context,
                 [this](ProControllerContext& context){
-                    SHORTCUT.run(context, 30 * TICKS_PER_SECOND);
+                    SHORTCUT.run(context, 30000ms);
                 },
                 {
                     {dialog_detector},
@@ -132,7 +132,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, ProControlle
                 continue;
             case 1:
                 env.log("Hooked something!", COLOR_BLUE);
-                pbf_press_button(context, BUTTON_ZL, 10, TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_ZL, 80ms, 1000ms);
                 break;
             case 2:
                 env.log("Unexpected battle menu.", COLOR_RED);
@@ -156,7 +156,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, ProControlle
             );
             switch (ret){
             case 0:
-                pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 1000ms);
                 break;
             case 1:
                 env.log("Unexpected battle menu.", COLOR_RED);

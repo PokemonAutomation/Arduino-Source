@@ -34,12 +34,12 @@ bool gamemenu_to_ingame(VideoStream& stream, ProControllerContext& context);
 bool reset_game_from_home(
     const ProgramInfo& info,
     ConsoleHandle& console, ProControllerContext& context,
-    uint16_t post_wait_time = 125
+    Milliseconds post_wait_time = Milliseconds(1000)
 );
 bool reset_game_from_home_zoom_out(
     const ProgramInfo& info,
     ConsoleHandle& console, ProControllerContext& context,
-    uint16_t post_wait_time = 125
+    Milliseconds post_wait_time = Milliseconds(1000)
 );
 
 // From within the game, reset the game.

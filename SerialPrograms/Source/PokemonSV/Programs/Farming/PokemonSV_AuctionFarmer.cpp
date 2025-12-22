@@ -191,7 +191,7 @@ void AuctionFarmer::reset_auctions(SingleSwitchProgramEnvironment& env, ProContr
 
         go_home(env.console, context);
         context.wait_for_all_requests();
-        reset_game_from_home(env.program_info(), env.console, context, TICKS_PER_SECOND);
+        reset_game_from_home(env.program_info(), env.console, context, 1000ms);
     }catch (OperationFailedException& e){
         AuctionFarmer_Descriptor::Stats& stats = env.current_stats<AuctionFarmer_Descriptor::Stats>();
         stats.m_errors++;
@@ -488,18 +488,18 @@ void AuctionFarmer::bid_on_item(SingleSwitchProgramEnvironment& env, ProControll
 
         switch (ret){
         case 0:
-            pbf_press_button(context, BUTTON_A, 20, TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
             break;
         case 1:
             current_bid = read_next_bid(env.console, context, LANGUAGE, true);
-            pbf_press_button(context, BUTTON_A, 20, TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
             break;
         case 2:
             current_bid = read_next_bid(env.console, context, LANGUAGE, false);
-            pbf_press_button(context, BUTTON_A, 20, TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
             break;
         case 3:
-            pbf_press_button(context, BUTTON_A, 20, TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
             break;
         case 4:
             auction_ongoing = false;
@@ -541,7 +541,7 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 10, 0);
-    pbf_wait(context, TICKS_PER_SECOND);
+    pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
 
     uint8_t year = MAX_YEAR;

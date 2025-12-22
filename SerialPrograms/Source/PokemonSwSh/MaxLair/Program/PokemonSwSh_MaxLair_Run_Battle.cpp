@@ -106,7 +106,7 @@ bool read_battle_menu(
         player.dmax_turns_left = 0;
         player.health = Health{0, 1};
         player.can_dmax = false;
-        pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
         context.wait_for_all_requests();
         return true;
     }
@@ -143,7 +143,7 @@ bool read_battle_menu(
 
     for (size_t attempts = 0; attempts < 5; attempts++){
         //  Enter move selection to read PP.
-        pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
         context.wait_for_all_requests();
 
 
@@ -170,7 +170,7 @@ bool read_battle_menu(
         if (move_slot < 0){
             stream.log("Unable to detect move slot.", COLOR_RED);
 //            dump_image(stream.logger(), MODULE_NAME, "MoveSlot", screen);
-//            pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+//            pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
 //            pbf_press_dpad(context, DPAD_RIGHT, 2000ms, 0ms);
 //            pbf_press_dpad(context, DPAD_UP, 2000ms, 0ms);
 //            move_slot = 0;
@@ -241,7 +241,7 @@ StateMachineAction run_move_select(
 
         if (player.can_dmax && move.second){
             pbf_press_dpad(context, DPAD_LEFT, 10, 50);
-            pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
             player.dmax_turns_left = 3;
         }
         while (state.move_slot != move.first){

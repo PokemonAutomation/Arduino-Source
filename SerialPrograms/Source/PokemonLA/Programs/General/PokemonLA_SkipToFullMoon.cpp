@@ -86,7 +86,7 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, ProControllerC
         // Press A to sleep to next night
         pbf_press_button(context, BUTTON_A, 20, 50);
         // Sleeping
-        pbf_wait(context, 8 * TICKS_PER_SECOND);
+        pbf_wait(context, 8000ms);
         context.wait_for_all_requests();
 
         const bool stop_on_detected = true;
@@ -108,7 +108,7 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, ProControllerC
         run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& local_context){
-                // pbf_mash_button(local_context, BUTTON_B, 7 * TICKS_PER_SECOND);
+                // pbf_mash_button(local_context, BUTTON_B, 7000ms);
                 for(size_t i = 0; i < 15; i++){
                      pbf_press_button(local_context, BUTTON_B, 20, 80);
                 }

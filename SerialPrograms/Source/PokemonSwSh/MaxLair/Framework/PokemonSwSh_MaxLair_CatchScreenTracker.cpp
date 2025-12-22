@@ -72,7 +72,7 @@ void CaughtPokemonScreen::leave_summary(){
     SummaryShinySymbolDetector detector(m_stream.logger(), m_stream.overlay());
     process_detection(detector.wait_for_detection(m_context, m_stream.video()));
 
-    pbf_press_button(m_context, BUTTON_B, 10, TICKS_PER_SECOND);
+    pbf_press_button(m_context, BUTTON_B, 80ms, 1000ms);
 
     PokemonCaughtMenuWatcher caught_menu;
 
@@ -100,7 +100,7 @@ void CaughtPokemonScreen::leave_summary(){
     m_in_summary = false;
 }
 void CaughtPokemonScreen::scroll_down(){
-    pbf_press_dpad(m_context, DPAD_DOWN, 10, TICKS_PER_SECOND);
+    pbf_press_dpad(m_context, DPAD_DOWN, 80ms, 1000ms);
     m_context.wait_for_all_requests();
     m_current_position++;
     if (m_current_position >= m_total){

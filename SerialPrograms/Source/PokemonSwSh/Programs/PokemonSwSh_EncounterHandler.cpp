@@ -147,7 +147,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const ShinyDetectionRes
     m_env.update_stats();
 
     if (result.shiny_type == ShinyType::UNKNOWN){
-        pbf_mash_button(m_context, BUTTON_B, TICKS_PER_SECOND);
+        pbf_mash_button(m_context, BUTTON_B, 1000ms);
         return false;
     }
 

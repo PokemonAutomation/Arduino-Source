@@ -76,7 +76,7 @@ int16_t move_to_ball(
     }
 
     //  Wait a second to let the video catch up.
-    pbf_wait(context, TICKS_PER_SECOND);
+    pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
 
     //  Now try again in reverse at a lower speed in case we overshot.

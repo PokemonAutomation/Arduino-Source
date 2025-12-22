@@ -140,7 +140,7 @@ StateMachineAction run_caught_screen(
 ){
     bool is_host = console_index == runtime.host_index;
 
-    pbf_wait(context, TICKS_PER_SECOND);
+    pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
 
     CaughtPokemonScreen tracker(console, context);
@@ -222,7 +222,7 @@ StateMachineAction run_caught_screen(
             tracker.leave_summary();
             synchronize_caught_screen(console_index, console, context, state_tracker);
             pbf_press_dpad(context, DPAD_DOWN, 10, 50);
-            pbf_press_button(context, BUTTON_B, 10, TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
             pbf_press_button(context, BUTTON_A, 10, 115);
             return mash_A_to_entrance(runtime, console, context, entrance);
         }else{
