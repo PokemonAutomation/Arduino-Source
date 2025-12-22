@@ -624,9 +624,9 @@ void quest_travel_500(const ProgramInfo& info, VideoStream& stream, ProControlle
     pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
     context.wait_for_all_requests();
 
-    pbf_move_left_joystick(context, 0, 0, 100, 20);
-    pbf_move_left_joystick(context, 128, 0, 150, 20);
-    pbf_move_left_joystick(context, 0, 128, 140, 20);
+    pbf_move_left_joystick(context, 0, 0, 800ms, 160ms);
+    pbf_move_left_joystick(context, 128, 0, 1200ms, 160ms);
+    pbf_move_left_joystick(context, {-1, 0}, 1120ms, 160ms);
 
     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
@@ -963,7 +963,7 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
 
     //Turn around, open picnic
     pbf_move_left_joystick(context, 128, 255, 20, 50);
-    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
     picnic_from_overworld(info, stream, context);
 
@@ -1005,14 +1005,14 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
             stream.log("In wash. Scrubbing.");
 
             ssf_press_button(context, BUTTON_A, 0ms, 1600ms, 0ms);
-            ssf_press_left_joystick(context, 0, 128, 0, 50);
-            ssf_press_left_joystick(context, 255, 128, 50, 100);
-            ssf_press_left_joystick(context, 0, 128, 150, 50);
+            ssf_press_left_joystick(context, {-1, 0}, 0ms, 400ms);
+            ssf_press_left_joystick(context, 255, 128, 400ms, 800ms);
+            ssf_press_left_joystick(context, {-1, 0}, 1200ms, 400ms);
 
             ssf_press_button(context, BUTTON_A, 0ms, 1600ms, 0ms);
-            ssf_press_left_joystick(context, 128, 0, 0, 50);
-            ssf_press_left_joystick(context, 128, 255, 50, 100);
-            ssf_press_left_joystick(context, 128, 0, 150, 50);
+            ssf_press_left_joystick(context, 128, 0, 0ms, 400ms);
+            ssf_press_left_joystick(context, 128, 255, 400ms, 800ms);
+            ssf_press_left_joystick(context, 128, 0, 1200ms, 400ms);
             pbf_wait(context, 400);
             context.wait_for_all_requests();
             break;
@@ -1030,9 +1030,9 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
                     break;
                 }
                 ssf_press_button(context, BUTTON_A, 0ms, 1600ms, 0ms);
-                ssf_press_left_joystick(context, 0, 128, 0, 50);
-                ssf_press_left_joystick(context, 255, 128, 50, 100);
-                ssf_press_left_joystick(context, 0, 128, 150, 50);
+                ssf_press_left_joystick(context, {-1, 0}, 0ms, 400ms);
+                ssf_press_left_joystick(context, 255, 128, 400ms, 800ms);
+                ssf_press_left_joystick(context, {-1, 0}, 1200ms, 400ms);
 
                 ssf_press_button(context, BUTTON_A, 0ms, 1600ms, 0ms);
                 ssf_press_left_joystick(context, 128, 0, 0, 50);
@@ -1080,8 +1080,8 @@ void quest_hatch_egg(
     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
     pbf_move_left_joystick(context, 128, 0, 500, 50);
 
-    pbf_move_left_joystick(context, 0, 128, 20, 50);
-    pbf_press_button(context, BUTTON_L, 20, 50);
+    pbf_move_left_joystick(context, {-1, 0}, 160ms, 400ms);
+    pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
     //Do this after navigating to prevent egg from hatchining enroute
     //Enter box system, navigate to left box, find the first egg, swap it with first pokemon in party
@@ -1228,10 +1228,10 @@ void quest_tera_raid(
 
                 central_to_canyon_plaza(env.program_info(), console, context);
 
-                pbf_move_left_joystick(context, 0, 128, 375, 20);
-                pbf_press_button(context, BUTTON_L, 10, 50);
-                pbf_move_left_joystick(context, 0, 128, 90, 20);
-                pbf_press_button(context, BUTTON_L, 10, 50);
+                pbf_move_left_joystick(context, {-1, 0}, 3000ms, 160ms);
+                pbf_press_button(context, BUTTON_L, 80ms, 400ms);
+                pbf_move_left_joystick(context, {-1, 0}, 720ms, 160ms);
+                pbf_press_button(context, BUTTON_L, 80ms, 400ms);
 
                 //Keep rolling until we get a raid
                 uint64_t rerolls = 0;

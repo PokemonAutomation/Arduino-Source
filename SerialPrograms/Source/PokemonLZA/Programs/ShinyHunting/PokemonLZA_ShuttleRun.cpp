@@ -115,11 +115,11 @@ void route_alpha_pidgeot(SingleSwitchProgramEnvironment& env, ProControllerConte
         ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
         pbf_move_left_joystick(context, 255, 128, 800ms, 0ms);
         pbf_move_left_joystick(context, 128, 0, 4400ms, 0ms);
-        pbf_move_left_joystick(context, 0, 128, 300ms, 0ms);
+        pbf_move_left_joystick(context, {-1, 0},  300ms, 0ms);
         pbf_press_button(context, BUTTON_A, 500ms, 2500ms); // elevator up
         ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
         pbf_move_left_joystick(context, 128, 0, 900ms, 0ms);
-        pbf_move_left_joystick(context, 0, 128, 2000ms, 0ms);
+        pbf_move_left_joystick(context, {-1, 0},  2000ms, 0ms);
         pbf_move_left_joystick(context, 255, 128, 200ms, 200ms);
         pbf_press_button(context, BUTTON_L, 100ms, 200ms);
     }

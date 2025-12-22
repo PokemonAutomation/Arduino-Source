@@ -281,8 +281,8 @@ bool MoneyFarmerRoute212::heal_after_battle_and_return(
 
 void MoneyFarmerRoute212::charge_vs_seeker(ProControllerContext& context){
     for (size_t c = 0; c < 5; c++){
-        pbf_move_left_joystick(context, 0, 128, 180, 0);
-        pbf_move_left_joystick(context, 255, 128, 180, 0);
+        pbf_move_left_joystick(context, {-1, 0},  1440ms, 0ms);
+        pbf_move_left_joystick(context, 255, 128, 1440ms, 0ms);
     }
 }
 
@@ -335,7 +335,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, ProContro
         }
 
         //  Move to woman.
-        pbf_move_left_joystick(context, 0, 128, 52, 0);
+        pbf_move_left_joystick(context, {-1, 0},  416ms, 0ms);
 
         context.wait_for_all_requests();
         stats.m_searches++;
@@ -392,7 +392,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, ProContro
         env.update_stats();
 
         if (woman){
-//            pbf_move_left_joystick(context, 0, 128, 52, 0);
+//            pbf_move_left_joystick(context, {-1, 0},  416ms, 0ms);
             pbf_move_left_joystick(context, 128, 255, 80ms, 0ms);
 
             //  Battle woman.
@@ -416,10 +416,10 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, ProContro
 #endif
 
 //            if (woman){
-                pbf_move_left_joystick(context, 0, 128, 52, 0);
+                pbf_move_left_joystick(context, {-1, 0},  416ms, 0ms);
                 pbf_move_left_joystick(context, 128, 255, 80ms, 0ms);
 //            }else{
-//                pbf_move_left_joystick(context, 0, 128, 105, 0);
+//                pbf_move_left_joystick(context, {-1, 0},  840ms, 0ms);
 //                pbf_move_left_joystick(context, 128, 255, 80ms, 0ms);
 //            }
 

@@ -24,7 +24,7 @@ void egg_spin(ProControllerContext& context, Milliseconds duration){
         pbf_move_left_joystick(context, 255, 255, 40ms, 0ms);
         pbf_move_left_joystick(context, 128, 255, 40ms, 0ms);
         pbf_move_left_joystick(context, {-1, -1}, 48ms, 0ms);
-        pbf_move_left_joystick(context, 0, 128, 48ms, 0ms);
+        pbf_move_left_joystick(context, {-1, 0}, 48ms, 0ms);
     }
 }
 void egg_spin_with_A(ProControllerContext& context, Milliseconds duration){
@@ -37,7 +37,7 @@ void egg_spin_with_A(ProControllerContext& context, Milliseconds duration){
         pbf_move_left_joystick(context, 255, 255, 40ms, 0ms);
         pbf_move_left_joystick(context, 128, 255, 40ms, 0ms);
         pbf_move_left_joystick(context, {-1, -1}, 48ms, 0ms);
-        pbf_move_left_joystick(context, 0, 128, 48ms, 0ms);
+        pbf_move_left_joystick(context, {-1, 0}, 48ms, 0ms);
     }
 }
 

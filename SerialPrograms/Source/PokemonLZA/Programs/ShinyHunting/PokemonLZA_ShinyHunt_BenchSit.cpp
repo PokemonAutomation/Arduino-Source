@@ -211,11 +211,11 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                     }else if (WALK_DIRECTION.current_value() == 1){ // left
                         env.console.overlay().add_log("Move Left");
                         ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
-                        pbf_move_left_joystick(context, 0, 128, duration, 0ms);
+                        pbf_move_left_joystick(context, {-1, 0},  duration, 0ms);
                         pbf_press_button(context, BUTTON_L, 100ms, 400ms);
                         ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
                         pbf_move_left_joystick(context, 128, 255, duration, 0ms);
-                        pbf_move_left_joystick(context, 0, 128, 100ms, 0ms);
+                        pbf_move_left_joystick(context, {-1, 0},  100ms, 0ms);
                     }else if (WALK_DIRECTION.current_value() == 2){ // right
                         env.console.overlay().add_log("Move Right");
                         ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);

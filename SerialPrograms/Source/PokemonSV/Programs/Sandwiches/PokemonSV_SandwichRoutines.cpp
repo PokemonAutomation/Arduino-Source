@@ -303,7 +303,7 @@ bool move_then_recover_sandwich_hand_position(
         // move to bottom right corner,
         pbf_move_left_joystick(context, 255, 255, move_1, 800ms);
         // move to left slightly
-        pbf_move_left_joystick(context, 0, 128, move_2, 800ms);
+        pbf_move_left_joystick(context, {-1, 0}, move_2, 800ms);
         context.wait_for_all_requests();
     }
     else if(SandwichHandType::GRABBING == hand_type){

@@ -366,7 +366,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
         if (HEALING_METHOD == HealMethod::GlobalRoom){
             heal_by_global_room(env.console, context);
         }
-        pbf_move_left_joystick(context, 255, 128, 140, 0);
+        pbf_move_left_joystick(context, 255, 128, 1120ms, 0ms);
     }
 
     while (true){
@@ -375,11 +375,11 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         if (need_to_charge){
-            pbf_move_left_joystick(context, 255, 128, 140, 0);
+            pbf_move_left_joystick(context, 255, 128, 1120ms, 0ms);
             pbf_press_dpad(context, DPAD_UP, 85, 0);
             for (size_t c = 0; c < 7; c++){
-                pbf_move_left_joystick(context, 0, 128, 140, 0);
-                pbf_move_left_joystick(context, 255, 128, 140, 0);
+                pbf_move_left_joystick(context, {-1, 0},  1120ms, 0ms);
+                pbf_move_left_joystick(context, 255, 128, 1120ms, 0ms);
             }
             pbf_press_dpad(context, DPAD_DOWN, 75, 0);
         }

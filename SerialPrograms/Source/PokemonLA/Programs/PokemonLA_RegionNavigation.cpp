@@ -38,7 +38,7 @@ void goto_professor(Logger& logger, ProControllerContext& context, Camp camp){
         pbf_move_left_joystick(context, 255, 64, 160, 0);
         return;
     case Camp::MIRELANDS_BOGBOUND:
-        pbf_move_left_joystick(context, 255, 64, 140, 0);
+        pbf_move_left_joystick(context, 255, 64, 1120ms, 0ms);
         return;
     case Camp::COASTLANDS_BEACHSIDE:
         pbf_move_left_joystick(context, 255, 96, 1000ms, 0ms);

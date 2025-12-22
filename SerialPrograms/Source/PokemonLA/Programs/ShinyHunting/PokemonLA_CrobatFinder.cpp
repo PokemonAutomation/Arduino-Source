@@ -148,7 +148,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
 
                 // FORWARD PORTION OF CAVE UNTIL LEDGE
                 pbf_press_button(context, BUTTON_B, 2200ms, 640ms); // wyrdeer sprint
-                pbf_move_left_joystick(context, 0, 128, 10, 20); // turn left
+                pbf_move_left_joystick(context, {-1, 0},  80ms, 160ms); // turn left
                 pbf_press_button(context, BUTTON_ZL, 20, 50); // align camera
 
                 // ASCEND THE LEDGE WITH BRAVIARY

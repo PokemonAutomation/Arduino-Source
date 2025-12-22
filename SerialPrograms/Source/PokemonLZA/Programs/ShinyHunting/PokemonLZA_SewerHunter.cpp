@@ -125,7 +125,7 @@ void run_forward_backward_to_wall(
 void route_klefki(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
     pbf_move_left_joystick(context, 128, 0, 4900ms, 0ms);
-    pbf_move_left_joystick(context, 0, 128, 1000ms, 0ms);
+    pbf_move_left_joystick(context, {-1, 0},  1000ms, 0ms);
     pbf_press_button(context, BUTTON_L, 100ms, 500ms);
     fly_back_to_sewers_entrance(env.console, context);
 }

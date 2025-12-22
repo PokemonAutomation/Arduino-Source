@@ -370,12 +370,12 @@ WallClock make_sandwich_material_farm(
                 // Orient camera to look at same direction as player character
                 // - This is needed because when save-load the game, 
                 // the camera angle is different than when just flying to pokecenter
-                pbf_press_button(context, BUTTON_L, 50, 40);
+                pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
                 // move up towards pokecenter counter        
                 pbf_move_left_joystick(context, 128, 255, 180, 10);
                 // Orient camera to look at same direction as player character
-                pbf_press_button(context, BUTTON_L, 50, 40);
+                pbf_press_button(context, BUTTON_L, 400ms, 320ms);
                 // look left
                 pbf_move_right_joystick(context, {-1, 0}, 960ms, 0ms);
                 // move toward clearing besides the pokecenter
@@ -418,12 +418,12 @@ void move_to_start_position_for_letsgo0(
     // Orient camera to look at same direction as player character
     // - This is needed because when save-load the game, 
     // the camera angle is different than when just flying to pokecenter
-    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
     // move up towards pokecenter counter        
     pbf_move_left_joystick(context, 128, 255, 180, 10);
     // Orient camera to look at same direction as player character
-    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
     // look left
     pbf_move_right_joystick(context, {-1, 0}, 960ms, 80ms);
     // move toward clearing besides the pokecenter
@@ -472,12 +472,12 @@ void move_to_start_position_for_letsgo1(
     // Orient camera to look at same direction as player character
     // - This is needed because when save-load the game, 
     // the camera angle is different than when just flying to pokecenter
-    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
     // move up towards pokecenter counter        
     pbf_move_left_joystick(context, 128, 255, 180, 10);
     // Orient camera to look at same direction as player character
-    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
     // look left
     pbf_move_right_joystick(context, {-1, 0}, 960ms, 80ms);
     // move toward clearing besides the pokecenter
@@ -556,7 +556,7 @@ void run_lets_go_iteration(
     // - This is needed because when save-load the game, the camera points
     // in the same direction as the player.
     // - But when warping to pokecenter, the camera is facing the player.
-    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
     // zoom out camera
     pbf_move_right_joystick(context, {0, -1}, 360ms, 80ms);
@@ -769,7 +769,7 @@ void move_from_league_club_entrance_to_item_printer(const ProgramInfo& info, Vid
     pbf_move_left_joystick(context, 120, 0, 200, 50);
 
     // look left towards item printer
-    pbf_move_left_joystick(context, 0, 128, 10, 50);
+    pbf_move_left_joystick(context, {-1, 0}, 80ms, 400ms);
 }
 
 void move_from_item_printer_to_material_farming(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -783,7 +783,7 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Video
     context.wait_for_all_requests();
 
     // look left towards door
-    pbf_move_left_joystick(context, 0, 128, 10, 50);
+    pbf_move_left_joystick(context, {-1, 0}, 80ms, 400ms);
 
     // re-orient camera to look same direction as player
     pbf_press_button(context, BUTTON_L, 50, 50);

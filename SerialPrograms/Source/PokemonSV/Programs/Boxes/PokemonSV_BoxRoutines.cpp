@@ -193,7 +193,7 @@ void hold_one_column(const ProgramInfo& info, VideoStream& stream, ProController
     const bool to_enter_selection = true;
     change_held_mode(
         info, stream, context,
-        [&context](){ pbf_press_button(context, BUTTON_MINUS, 50, 40); },
+        [&context](){ pbf_press_button(context, BUTTON_MINUS, 400ms, 320ms); },
         to_enter_selection,
         "TimeoutHoldingColumn", "Failed to enter box selection mode after 1 minute of Button Minus pressing."
     );
@@ -208,7 +208,7 @@ void hold_one_column(const ProgramInfo& info, VideoStream& stream, ProController
     pbf_wait(context, 60);
     // We cannot detect whether this Button A will be dropped or not.
     // So we have to go blind here.
-    pbf_press_button(context, BUTTON_A, 50, 40);
+    pbf_press_button(context, BUTTON_A, 400ms, 320ms);
     context.wait_for_all_requests();
 }
 

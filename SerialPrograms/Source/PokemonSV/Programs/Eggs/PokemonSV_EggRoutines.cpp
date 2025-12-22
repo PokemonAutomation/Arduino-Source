@@ -96,7 +96,7 @@ void handle_egg_hatching(
     int ret = run_until<ProControllerContext>(
         stream, context,
         [](ProControllerContext& context){
-            ssf_press_right_joystick(context, 0, 128, 0, 95);
+            ssf_press_right_joystick(context, {-1, 0}, 0ms, 760ms);
             for(int i = 0; i < 60; i++){
                 pbf_mash_button(context, BUTTON_A, 125);
             }
@@ -275,7 +275,7 @@ void picnic_at_zero_gate(
     // Orient camera to look at same direction as player character
     // This is needed because when save-load the game, the camera is reset
     // to this location.
-    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
     // Move right to make player character facing away from Aera Zero observation station
     pbf_move_left_joystick(context, 255, 32, 400ms, 400ms);
@@ -359,7 +359,7 @@ void collect_eggs_after_sandwich(
     //  Move forward to table
     pbf_move_left_joystick(context, 128, 0, 640ms, 320ms);
     //  Move left
-    pbf_move_left_joystick(context, 0, 128, 320ms, 320ms);
+    pbf_move_left_joystick(context, {-1, 0}, 320ms, 320ms);
     //  Move forward to pass table
     pbf_move_left_joystick(context, 128, 0, 640ms, 320ms);
     //  Move right
@@ -383,7 +383,7 @@ void collect_eggs_after_sandwich(
     pbf_move_left_joystick(context, 128, 0, 320ms, 480ms);
 
     //  Move left
-    pbf_move_left_joystick(context, 0, 128, 80ms, 480ms);
+    pbf_move_left_joystick(context, {-1, 0}, 80ms, 480ms);
     pbf_press_button(context, BUTTON_L, 120ms, 480ms);
     pbf_move_left_joystick(context, 128, 0, 320ms, 480ms);
 
@@ -412,7 +412,7 @@ void collect_eggs_after_sandwich(
 
 #if 0
     //  Move left
-    pbf_move_left_joystick(context, 0, 128, 320ms, 320ms);
+    pbf_move_left_joystick(context, {-1, 0}, 320ms, 320ms);
     //  Move forward to pass table
     pbf_move_left_joystick(context, 128, 0, 640ms, 320ms); // old value: 80
     //  Move right
@@ -640,7 +640,7 @@ void hatch_eggs_at_zero_gate(
         // Orient camera to look at same direction as player character
         // This is needed because when save-load the game, the camera is reset
         // to this location.
-        pbf_press_button(context, BUTTON_L, 50, 40);
+        pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
         context.wait_for_all_requests();
 
@@ -695,7 +695,7 @@ void hatch_eggs_at_area_three_lighthouse(
         // Orient camera to look at same direction as player character
         // This is needed because when save-load the game, the camera is reset
         // to this location.
-        pbf_press_button(context, BUTTON_L, 50, 40);
+        pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
         context.wait_for_all_requests();
 
@@ -711,12 +711,12 @@ void hatch_eggs_at_area_three_lighthouse(
                         //Face at an angle, to avoid the tent to the left
                         pbf_move_left_joystick(context, 0, 0, 50, 50);
                         //Get on your mount
-                        pbf_press_button(context, BUTTON_L, 50, 40);
+                        pbf_press_button(context, BUTTON_L, 400ms, 320ms);
                         pbf_press_button(context, BUTTON_PLUS, 50, 100);
                         //Go in deep, spawns outside the fence like to come in otherwise
                         pbf_move_left_joystick(context, 128, 0, 750, 0);
                         pbf_move_left_joystick(context, 0, 0, 50, 50);
-                        pbf_press_button(context, BUTTON_L, 50, 40);
+                        pbf_press_button(context, BUTTON_L, 400ms, 320ms);
                         pbf_move_left_joystick(context, 128, 0, 550, 0);
                     }
                 },
@@ -765,7 +765,7 @@ void hatch_eggs_anywhere(
         // Orient camera to look at same direction as player character
         // This is needed because when save-load the game, the camera is reset
         // to this location.
-        pbf_press_button(context, BUTTON_L, 50, 40);
+        pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
         context.wait_for_all_requests();
 

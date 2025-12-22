@@ -130,7 +130,7 @@ void reach_bench(SingleSwitchProgramEnvironment& env, ProControllerContext& cont
     pbf_press_button(context, BUTTON_A, 500ms, 500ms);
     pbf_wait(context, 3000ms);
     //Go to bench
-    pbf_move_left_joystick(context, 0, 128, 700ms, 200ms);
+    pbf_move_left_joystick(context, {-1, 0},  700ms, 200ms);
     pbf_move_left_joystick(context, 128, 0, 500ms, 200ms);
 }
 

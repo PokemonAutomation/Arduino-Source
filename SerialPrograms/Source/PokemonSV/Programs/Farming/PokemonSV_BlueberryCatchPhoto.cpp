@@ -54,7 +54,7 @@ CameraAngle quest_photo_navi(
 
             pbf_press_button(context, BUTTON_L, 10, 50);
             pbf_move_left_joystick(context, 128, 0, 1840ms, 160ms);
-            pbf_move_left_joystick(context, 0, 128, 2000ms, 160ms);
+            pbf_move_left_joystick(context, {-1, 0}, 2000ms, 160ms);
 
             break;
         case BBQuests::photo_swim: case BBQuests::photo_water: case BBQuests::photo_polar:
@@ -179,8 +179,8 @@ CameraAngle quest_photo_navi(
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1100, 1700, 200);
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
-            pbf_move_left_joystick(context, 0, 128, 20, 50);
-            pbf_press_button(context, BUTTON_L, 20, 50);
+            pbf_move_left_joystick(context, {-1, 0}, 160ms, 400ms);
+            pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
             break;
         case BBQuests::photo_flying:
@@ -217,7 +217,7 @@ CameraAngle quest_photo_navi(
 
             //Hitmontop (TERA ICE) - Canyon Plaza or Classroom
             central_to_canyon_plaza(info, console, context);
-            pbf_move_left_joystick(context, 0, 128, 400, 20);
+            pbf_move_left_joystick(context, {-1, 0}, 3200ms, 160ms);
             pbf_press_button(context, BUTTON_L, 10, 50);
             pbf_move_left_joystick(context, 0, 100, 20, 50);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
@@ -233,7 +233,7 @@ CameraAngle quest_photo_navi(
 
             //Muk-A - area a bit laggy but consistently so
             central_to_coastal_plaza(info, console, context);
-            pbf_move_left_joystick(context, 0, 128, 20, 50);
+            pbf_move_left_joystick(context, {-1, 0}, 160ms, 400ms);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
@@ -256,7 +256,7 @@ CameraAngle quest_photo_navi(
 
             //Dugtrio-A - area a bit laggy but should work most of the time
             central_to_coastal_plaza(info, console, context);
-            pbf_move_left_joystick(context, 0, 128, 20, 50);
+            pbf_move_left_joystick(context, {-1, 0}, 160ms, 400ms);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
@@ -267,8 +267,8 @@ CameraAngle quest_photo_navi(
             }
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
-            pbf_move_left_joystick(context, 0, 128, 20, 50);
-            pbf_press_button(context, BUTTON_L, 20, 50);
+            pbf_move_left_joystick(context, {-1, 0}, 160ms, 400ms);
+            pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
             break;
         default:
@@ -419,11 +419,11 @@ void quest_catch_navi(
             central_to_polar_rest(info, console, context);
 
             pbf_press_button(context, BUTTON_L, 10, 50);
-            pbf_move_left_joystick(context, 128, 0, 230, 20);
-            pbf_move_left_joystick(context, 0, 128, 250, 20);
+            pbf_move_left_joystick(context, 128, 0, 1840ms, 160ms);
+            pbf_move_left_joystick(context, {-1, 0}, 2000ms, 160ms);
 
             pbf_press_button(context, BUTTON_L, 20, 50);
-            pbf_move_left_joystick(context, 128, 0, 150, 20);
+            pbf_move_left_joystick(context, 128, 0, 1200ms, 160ms);
 
             break;
 
@@ -492,7 +492,7 @@ void quest_catch_navi(
 
             //Hitmontop (TERA ICE) - Canyon Plaza or Classroom
             central_to_canyon_plaza(info, console, context);
-            pbf_move_left_joystick(context, 0, 128, 400, 20);
+            pbf_move_left_joystick(context, {-1, 0}, 3200ms, 160ms);
             pbf_press_button(context, BUTTON_L, 10, 50);
             pbf_move_left_joystick(context, 0, 100, 20, 50);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
@@ -568,7 +568,7 @@ void quest_catch_navi(
 
             //Dugtrio-A - area a bit laggy but should work most of the time
             central_to_coastal_plaza(info, console, context);
-            pbf_move_left_joystick(context, 0, 128, 20, 50);
+            pbf_move_left_joystick(context, {-1, 0}, 160ms, 400ms);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
@@ -579,7 +579,7 @@ void quest_catch_navi(
             }
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
-            pbf_move_left_joystick(context, 0, 128, 20, 50);
+            pbf_move_left_joystick(context, {-1, 0}, 160ms, 400ms);
             pbf_press_button(context, BUTTON_L, 20, 50);
             pbf_move_left_joystick(context, 128, 0, 50, 50);
 
@@ -589,7 +589,7 @@ void quest_catch_navi(
 
             //Muk-A - area a bit laggy but consistently so
             central_to_coastal_plaza(info, console, context);
-            pbf_move_left_joystick(context, 0, 128, 20, 50);
+            pbf_move_left_joystick(context, {-1, 0}, 160ms, 400ms);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
@@ -630,7 +630,7 @@ void quest_catch_navi(
             central_to_polar_rest(info, console, context);
             pbf_press_button(context, BUTTON_L, 10, 50);
             pbf_move_left_joystick(context, 128, 0, 230, 20);
-            pbf_move_left_joystick(context, 0, 128, 300, 20);
+            pbf_move_left_joystick(context, {-1, 0}, 2400ms, 160ms);
             pbf_press_button(context, BUTTON_L, 20, 50);
             pbf_move_left_joystick(context, 20, 0, 20, 50);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
