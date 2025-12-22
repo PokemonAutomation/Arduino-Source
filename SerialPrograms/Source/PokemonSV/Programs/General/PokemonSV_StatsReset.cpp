@@ -224,7 +224,7 @@ void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, ProControll
         context.wait_for_all_requests();
 
         //Press X to open Ball menu
-        pbf_press_button(context, BUTTON_X, 20, 100);
+        pbf_press_button(context, BUTTON_X, 160ms, 800ms);
         context.wait_for_all_requests();
 
         VideoSnapshot screen = env.console.video().snapshot();

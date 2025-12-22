@@ -1151,10 +1151,10 @@ void quest_sandwich(
 
     picnic_from_overworld(env.program_info(), stream, context);
 
-    pbf_move_left_joystick(context, 128, 0, 30, 40);
+    pbf_move_left_joystick(context, 128, 0, 240ms, 320ms);
     context.wait_for_all_requests();
 
-    pbf_move_left_joystick(context, 128, 0, 70, 0);
+    pbf_move_left_joystick(context, 128, 0, 560ms, 0ms);
     enter_sandwich_recipe_list(env.program_info(), stream, context);
 
     std::map<std::string, uint8_t> fillings;

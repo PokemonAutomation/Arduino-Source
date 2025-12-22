@@ -152,11 +152,11 @@ void inside_zero_gate_to_platform(
 #if 0
     //  Don't jump to avoid spawn.
     pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
-    pbf_move_left_joystick(context, 128, 0, 625, 0);
+    pbf_move_left_joystick(context, 128, 0, 5000ms, 0ms);
     ssf_press_button(context, BUTTON_B, 0, 50);
-    pbf_move_left_joystick(context, 128, 0, 250, 0);
-    pbf_move_left_joystick(context, 160, 0, 600, 0);
-    pbf_move_left_joystick(context, 128, 0, 1875, 0);
+    pbf_move_left_joystick(context, 128, 0, 2000ms, 0ms);
+    pbf_move_left_joystick(context, 160, 0, 4800ms, 0ms);
+    pbf_move_left_joystick(context, 128, 0, 15000ms, 0ms);
 #endif
 
 #if 0
@@ -202,9 +202,9 @@ void inside_zero_gate_to_platform(
 
     ssf_press_button(context, BUTTON_LCLICK, 0ms, 4000ms);
     if (!flying_unlocked){
-        ssf_press_left_joystick(context, 128, 0, 125, 1250);
+        ssf_press_left_joystick(context, 128, 0, 1000ms, 10000ms);
     }else{
-        ssf_press_left_joystick(context, 128, 0, 125, 875);
+        ssf_press_left_joystick(context, 128, 0, 1000ms, 7000ms);
     }
 
     //  Jump
@@ -216,16 +216,16 @@ void inside_zero_gate_to_platform(
 
     if (!flying_unlocked){
 //        ssf_press_left_joystick(context, 128, 0, 375, 875);
-        pbf_move_left_joystick(context, 144, 0, 700, 0);
+        pbf_move_left_joystick(context, 144, 0, 5600ms, 0ms);
         pbf_move_left_joystick(context, 128, 0, 1000ms, settings.MIDAIR_PAUSE_TIME0);
-        pbf_move_left_joystick(context, 128, 0, 875, 250);
+        pbf_move_left_joystick(context, 128, 0, 7000ms, 2000ms);
     }else{
 //        ssf_press_button(context, BUTTON_B, 0, 20);
 //        pbf_move_left_joystick(context, 128, 0, 375, 250);
         pbf_move_left_joystick(context, 164, 0, 1000ms, settings.MIDAIR_PAUSE_TIME0);
         pbf_press_button(context, BUTTON_LCLICK, 50, 0);
-        ssf_press_right_joystick(context, 128, 255, 0, 1500);
-        pbf_move_left_joystick(context, 128, 255, 1600, 125);
+        ssf_press_right_joystick(context, 128, 255, 0ms, 12000ms);
+        pbf_move_left_joystick(context, 128, 255, 12800ms, 1000ms);
 
         pbf_press_button(context, BUTTON_B, 125, 375);
 

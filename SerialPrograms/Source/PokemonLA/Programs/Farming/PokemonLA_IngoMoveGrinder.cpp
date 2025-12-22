@@ -266,7 +266,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProCont
                     env.console.log("No PP left for pokemon " + std::to_string(cur_pokemon) + " and move " + std::to_string(cur_move));
                     if (get_next_move_to_switch_to() == 4){
                         // Press down to select pokemons
-                        pbf_press_dpad(context, DPAD_DOWN, 20, 100);
+                        pbf_press_dpad(context, DPAD_DOWN, 160ms, 800ms);
                         go_to_next_pokemon(env, context);
 
                     }else
@@ -278,7 +278,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProCont
                 env.console.log("Done grinding for pokemon " + std::to_string(cur_pokemon) + " and move " + std::to_string(cur_move));
                 if (get_next_move_to_switch_to() == 4){
                     // Press down to select pokemons
-                    pbf_press_dpad(context, DPAD_DOWN, 20, 100);
+                    pbf_press_dpad(context, DPAD_DOWN, 160ms, 800ms);
                     go_to_next_pokemon(env, context);
 
                 }else{
@@ -290,12 +290,12 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProCont
         }else if (ret == 1){
             env.console.log("Transparent dialogue box.");
             
-            pbf_press_button(context, BUTTON_B, 20, 100);
+            pbf_press_button(context, BUTTON_B, 160ms, 800ms);
             context.wait_for_all_requests();
         }else if(ret == 2){
             env.console.log("Normal dialogue box.");
 
-            pbf_press_button(context, BUTTON_B, 20, 100);
+            pbf_press_button(context, BUTTON_B, 160ms, 800ms);
             context.wait_for_all_requests();
         }else if (ret == 3){
             env.console.log("Pokemon fainted.", COLOR_RED);
@@ -365,7 +365,7 @@ void IngoMoveGrinder::go_to_next_move(SingleSwitchProgramEnvironment& env, ProCo
     size_t next_move = get_next_move_to_switch_to();
     for (size_t i = 0; i < next_move - cur_move; ++i)
     {
-        pbf_press_dpad(context, DPAD_DOWN, 20, 100);
+        pbf_press_dpad(context, DPAD_DOWN, 160ms, 800ms);
     }
     pbf_press_button(context, BUTTON_B, 10, 125);
     cur_move = next_move;

@@ -302,7 +302,7 @@ void AuctionFarmer::move_to_auctioneer(SingleSwitchProgramEnvironment& env, ProC
             pbf_move_left_joystick(context, 128, 0, 480ms, 80ms);
         }
 
-        pbf_press_button(context, BUTTON_A, 20, 100);
+        pbf_press_button(context, BUTTON_A, 160ms, 800ms);
         int ret = wait_until(env.console, context, Milliseconds(4000), { advance_detector });
 
         if (ret == 0){

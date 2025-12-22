@@ -114,7 +114,7 @@ void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, ProControl
         pbf_press_button(context, BUTTON_X, 20, 20);
 
         //Open menu
-        pbf_press_button(context, BUTTON_PLUS, 20, 100);
+        pbf_press_button(context, BUTTON_PLUS, 160ms, 800ms);
 
         //Select 5 of the item to dupe - if less than 5 this still works
         pbf_press_button(context, BUTTON_A, 20, 20);

@@ -203,7 +203,7 @@ void checkpoint_25(
 
         // section 4. align to corner
         direction.change_direction(env.program_info(), env.console, context,  4.69);
-        pbf_move_left_joystick(context, 128, 0, 150, 100);
+        pbf_move_left_joystick(context, 128, 0, 1200ms, 800ms);
 
         // section 5. battle first NPC
         direction.change_direction(env.program_info(), env.console, context,  1.485);
@@ -215,7 +215,7 @@ void checkpoint_25(
 
         // section 6
         direction.change_direction(env.program_info(), env.console, context, 5.95);
-        pbf_move_left_joystick(context, 128, 0, 1000, 100);
+        pbf_move_left_joystick(context, 128, 0, 8000ms, 800ms);
 
         // section 7
         direction.change_direction(env.program_info(), env.console, context,  1.327);

@@ -124,7 +124,7 @@ void checkpoint_43(
                 direction.change_direction(env.program_info(), env.console, context, 6.198);
                 pbf_move_left_joystick(context, 128, 0, 3200ms, 800ms);
                 direction.change_direction(env.program_info(), env.console, context, 4.693);
-                pbf_move_left_joystick(context, 128, 0, 1000, 100);
+                pbf_move_left_joystick(context, 128, 0, 8000ms, 800ms);
         });
         // walk up right set of stairs
         direction.change_direction(env.program_info(), env.console, context, 4.276);

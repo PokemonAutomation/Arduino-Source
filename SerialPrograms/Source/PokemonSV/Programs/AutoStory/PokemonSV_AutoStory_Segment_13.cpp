@@ -319,7 +319,7 @@ void checkpoint_29(
         }
 
         confirm_no_overlapping_flypoint(env.program_info(), env.console, context);
-        pbf_press_button(context, BUTTON_B, 20, 100);
+        pbf_press_button(context, BUTTON_B, 160ms, 800ms);
         handle_unexpected_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             press_Bs_to_back_to_overworld(env.program_info(), env.console, context);

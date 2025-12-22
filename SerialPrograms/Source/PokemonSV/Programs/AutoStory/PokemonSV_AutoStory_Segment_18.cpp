@@ -98,7 +98,7 @@ void checkpoint_39(
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 direction.change_direction(env.program_info(), env.console, context, 4.677921);
-                pbf_move_left_joystick(context, 128, 0, 150, 100);
+                pbf_move_left_joystick(context, 128, 0, 1200ms, 800ms);
         });        
 
         // section 2

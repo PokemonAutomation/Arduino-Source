@@ -118,7 +118,7 @@ void checkpoint_50(
         }
 
         direction.change_direction(env.program_info(), env.console, context, 0);
-        pbf_move_left_joystick(context, 128, 0, 150, 100);
+        pbf_move_left_joystick(context, 128, 0, 1200ms, 800ms);
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 

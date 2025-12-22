@@ -224,7 +224,7 @@ CameraAngle quest_photo_navi(
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 200, 500, 800);
 
-            pbf_press_button(context, BUTTON_PLUS, 20, 100);
+            pbf_press_button(context, BUTTON_PLUS, 160ms, 800ms);
             context.wait_for_all_requests();
 
             break;
@@ -683,7 +683,7 @@ void quest_catch_throw_ball(
         context.wait_for_all_requests();
 
         //Press X to open Ball menu
-        pbf_press_button(context, BUTTON_X, 20, 100);
+        pbf_press_button(context, BUTTON_X, 160ms, 800ms);
         context.wait_for_all_requests();
 
         VideoSnapshot screen = console.video().snapshot();
@@ -754,7 +754,7 @@ void quest_catch_handle_battle(
                 BattleBallReader exists(console, BBQ_OPTIONS.LANGUAGE);
                 std::string ball_exists = "";
 
-                pbf_press_button(context, BUTTON_X, 20, 100);
+                pbf_press_button(context, BUTTON_X, 160ms, 800ms);
                 context.wait_for_all_requests();
 
                 VideoSnapshot screen_ball = console.video().snapshot();

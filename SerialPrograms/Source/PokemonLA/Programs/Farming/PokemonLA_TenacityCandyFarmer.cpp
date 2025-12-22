@@ -101,7 +101,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Pro
 
     // Talk to Ingo to start conversation and select Path of Tenacity:
     // Press A to start talking
-    pbf_press_button(context, BUTTON_A, 20, 100);
+    pbf_press_button(context, BUTTON_A, 160ms, 800ms);
     // Press A to show battle type selection menu box
     pbf_press_button(context, BUTTON_A, 160ms, 400ms);
     // Move down the menu box to select Path of Tenacity
@@ -191,7 +191,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Pro
             num_turns = 0;
         }
         clearing_dialogues = true;
-        pbf_press_button(context, BUTTON_B, 20, 100);
+        pbf_press_button(context, BUTTON_B, 160ms, 800ms);
         context.wait_for_all_requests();
 
         if (cur_battle >= 3){
@@ -284,12 +284,12 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Pro
                 if (cur_move < target_move){
                     // Move move selection down
                     for(size_t i = 0; i < target_move - cur_move; i++){
-                        pbf_press_dpad(context, DPAD_DOWN, 20, 100);
+                        pbf_press_dpad(context, DPAD_DOWN, 160ms, 800ms);
                     }
                 }else if (cur_move > target_move){
                     // Move move selection up
                     for(size_t i = 0; i < cur_move - target_move; i++){
-                        pbf_press_dpad(context, DPAD_UP, 20, 100);
+                        pbf_press_dpad(context, DPAD_UP, 160ms, 800ms);
                     }
                 }
                 cur_move = target_move;
@@ -300,7 +300,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Pro
             while (use_move(env.console, context, cur_pokemon, cur_move, no_style, check_move_success) == false){
                 // We are still on the move selection screen. No PP.
                 // Go to the next move.
-                pbf_press_dpad(context, DPAD_DOWN, 20, 100);
+                pbf_press_dpad(context, DPAD_DOWN, 160ms, 800ms);
                 // env.console.context().wait_for_all_requests();
                 cur_move = (cur_move + 1) % 4;
                 env.console.log("No PP. Use next move, " + std::to_string(cur_move), COLOR_RED);

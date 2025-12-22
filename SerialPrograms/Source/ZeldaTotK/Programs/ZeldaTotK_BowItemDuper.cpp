@@ -117,7 +117,7 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         pbf_press_button(context, BUTTON_PLUS, 80ms, 80ms);
 
         // turn around
-        pbf_move_left_joystick(context, 128, 0, 3, 10);
+        pbf_move_left_joystick(context, 128, 0, 24ms, 80ms);
         // wait half a second
         pbf_wait(context, 300ms);
 

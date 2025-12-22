@@ -321,7 +321,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, ProContro
             heal_by_global_room(env.console, context);
         }
         // Reset position to right most on the row above the rich couple
-        pbf_move_left_joystick(context, 255, 128, 180, 0);
+        pbf_move_left_joystick(context, 255, 128, 1440ms, 0ms);
     }
 
     while (true){
@@ -434,7 +434,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, ProContro
                 continue;
             }
         }
-        pbf_move_left_joystick(context, 255, 128, 180, 0);
+        pbf_move_left_joystick(context, 255, 128, 1440ms, 0ms);
 
     }
 }

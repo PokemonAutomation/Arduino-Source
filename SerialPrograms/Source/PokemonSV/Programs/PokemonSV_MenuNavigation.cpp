@@ -362,7 +362,7 @@ void open_pokedex_from_overworld(const ProgramInfo& info, VideoStream& stream, P
         switch (ret){
         case 0:
             // Try opening the Pokédex if overworld is detected
-            pbf_press_button(context, BUTTON_MINUS, 20, 100);
+            pbf_press_button(context, BUTTON_MINUS, 160ms, 800ms);
             continue;
         case 1:
             stream.log("Detected Pokédex.");
@@ -508,7 +508,7 @@ void enter_menu_from_overworld(const ProgramInfo& info, VideoStream& stream, Pro
                     pbf_wait(context, 3000ms);
                     if (!has_minimap){ 
                         // if no minimap, can't detect overworld, so repeatedly press X to cover for button drops
-                        pbf_press_button(context, BUTTON_X, 20, 100);
+                        pbf_press_button(context, BUTTON_X, 160ms, 800ms);
                     }
                 }
             },

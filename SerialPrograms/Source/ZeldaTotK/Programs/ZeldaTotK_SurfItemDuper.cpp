@@ -98,7 +98,7 @@ void SurfItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         ssf_press_button(context, BUTTON_A, 80ms, 640ms);
 
         //Open menu
-        pbf_press_button(context, BUTTON_PLUS, 20, 100);
+        pbf_press_button(context, BUTTON_PLUS, 160ms, 800ms);
 
         //Select 5 of the item to dupe - if less than 5 this still works
         pbf_press_button(context, BUTTON_X, 80ms, 80ms);

@@ -547,7 +547,7 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
         // Escape battle
         env.log("Running from battle...");
         pbf_press_button(context, BUTTON_B, 20, 225);
-        pbf_press_button(context, BUTTON_A, 20, 100);
+        pbf_press_button(context, BUTTON_A, 160ms, 800ms);
         context.wait_for_all_requests();
         ArcPhoneDetector escape_detector(env.console, env.console, std::chrono::milliseconds(100), stop_on_detected);
         ret = wait_until(

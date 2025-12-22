@@ -121,7 +121,7 @@ void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, ProCo
                 env.console.log("Switch Pokemon after Mimic used.", COLOR_RED);;
 
                 // Go to the switching pokemon screen:
-                pbf_press_dpad(context, DPAD_DOWN, 20, 100);
+                pbf_press_dpad(context, DPAD_DOWN, 160ms, 800ms);
                 
                 cur_pokemon = switch_pokemon(env.console, context, cur_pokemon);
 
@@ -207,7 +207,7 @@ void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, P
                 pbf_press_button(context, BUTTON_B, 10, 125);
 
                 // Go to the switching pokemon screen:
-                pbf_press_dpad(context, DPAD_DOWN, 20, 100);
+                pbf_press_dpad(context, DPAD_DOWN, 160ms, 800ms);
                 
                 cur_pokemon = switch_pokemon(env.console, context, cur_pokemon, POKEMON_ACTIONS.num_pokemon());
             }else{

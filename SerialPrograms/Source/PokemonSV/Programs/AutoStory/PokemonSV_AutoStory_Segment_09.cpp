@@ -161,11 +161,11 @@ void checkpoint_17(
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
         // re-orient camera
-        pbf_press_button(context, BUTTON_L, 20, 100);
+        pbf_press_button(context, BUTTON_L, 160ms, 800ms);
         // move backwards towards front desk
         pbf_move_left_joystick(context, {0, -1}, 1600ms, 800ms);
         // re-orient camera
-        pbf_press_button(context, BUTTON_L, 20, 100);
+        pbf_press_button(context, BUTTON_L, 160ms, 800ms);
         // move right towards navigation kiosk
         pbf_move_left_joystick(context, 255, 128, 800ms, 800ms);
         // open school navigation screen

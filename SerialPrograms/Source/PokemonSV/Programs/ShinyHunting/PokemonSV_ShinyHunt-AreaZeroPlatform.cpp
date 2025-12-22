@@ -383,7 +383,7 @@ void ShinyHuntAreaZeroPlatform::run_state(
         }
 
         picnic_at_zero_gate(info, stream, context);
-        pbf_move_left_joystick(context, 128, 0, 70, 0);
+        pbf_move_left_joystick(context, 128, 0, 560ms, 0ms);
         enter_sandwich_recipe_list(info, stream, context);
         make_sandwich_option(env, stream, context, SANDWICH_OPTIONS);
 

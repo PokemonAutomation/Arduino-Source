@@ -143,11 +143,11 @@ void checkpoint_14(
         // realign going straight
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 100);
         // walk forward, while still off center
-        pbf_move_left_joystick(context, 128, 0, 2000, 100);
+        pbf_move_left_joystick(context, 128, 0, 16000ms, 800ms);
         // realign diagonally to the right
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 178, 0, 100);
         // walk forward so you're closer to the center
-        pbf_move_left_joystick(context, 128, 0, 150, 100);
+        pbf_move_left_joystick(context, 128, 0, 1200ms, 800ms);
         // realign going straight
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 100);
         // walk forward until hit dialog at top of stairs
@@ -190,7 +190,7 @@ void checkpoint_15(
         // realign going straight
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 100);
         // walk forward up stairs
-        pbf_move_left_joystick(context, 128, 0, 1000, 100);
+        pbf_move_left_joystick(context, 128, 0, 8000ms, 800ms);
         // realign going straight
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         // walk forward until hit dialog inside the school

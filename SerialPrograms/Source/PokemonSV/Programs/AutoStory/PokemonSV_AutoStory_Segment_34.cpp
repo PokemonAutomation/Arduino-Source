@@ -181,7 +181,7 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         context.wait_for_all_requests();
         context.wait_for(1000ms);
 
-        pbf_move_left_joystick(context, 128, 255, 1000, 100);
+        pbf_move_left_joystick(context, 128, 255, 8000ms, 800ms);
         // wait for dialog when leaving school lobby
         pbf_wait(context, 3000ms);
         

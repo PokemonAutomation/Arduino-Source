@@ -207,7 +207,7 @@ void DirectionDetector::change_direction(
                 open_map_from_overworld(info, stream, context);
                 pbf_press_button(context, BUTTON_RCLICK, 20, 20);
                 pbf_press_button(context, BUTTON_RCLICK, 20, 20);
-                pbf_press_button(context, BUTTON_B, 20, 100);
+                pbf_press_button(context, BUTTON_B, 160ms, 800ms);
                 press_Bs_to_back_to_overworld(info, stream, context, 7);
             }else{
                 stream.log("Minimap not locked. Try again");

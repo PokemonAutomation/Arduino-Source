@@ -202,7 +202,7 @@ void order_compote_du_fils(
         case 1:
             stream.log("Detected restaurant menu.");
             stream.overlay().add_log("Restaurant menu", COLOR_WHITE);
-            pbf_press_dpad(context, DPAD_DOWN, 30, 60);
+            pbf_press_dpad(context, DPAD_DOWN, 240ms, 480ms);
             break;
         case 2:
             stream.log("Detected the dish we want.");
