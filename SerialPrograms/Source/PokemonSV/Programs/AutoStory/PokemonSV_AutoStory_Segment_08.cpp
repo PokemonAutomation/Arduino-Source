@@ -151,7 +151,7 @@ void checkpoint_14(
         // realign going straight
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 100);
         // walk forward until hit dialog at top of stairs
-        walk_forward_until_dialog( env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
         // clear dialog until battle. with prompt, battle
         env.console.log("clear_dialog: Talk with Team Star at the top of the stairs. Stop when detect battle.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
