@@ -370,7 +370,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
             if (trick_used || trick_PP <= 0){
                 env.log("Running away...");
                 if (battle_menu.move_to_slot(env.console, context, 3)){
-                    pbf_press_button(context, BUTTON_A, 20, 30);
+                    pbf_press_button(context, BUTTON_A, 160ms, 240ms);
                 }else{
                     stats.errors++;
                     env.update_stats();
@@ -379,7 +379,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
             }else{
                 env.log("Attempt to select a move.");
                 if (battle_menu.move_to_slot(env.console, context, 0)){
-                    pbf_press_button(context, BUTTON_A, 20, 30);
+                    pbf_press_button(context, BUTTON_A, 160ms, 240ms);
                 }else{
                     stats.errors++;
                     env.update_stats();
@@ -397,7 +397,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
                 continue;
             }
             if (move_select.move_to_slot(env.console, context, 0)){
-                pbf_press_button(context, BUTTON_A, 20, 30);
+                pbf_press_button(context, BUTTON_A, 160ms, 240ms);
                 trick_used = true;
                 last_trick_attempt = current_time();
             }else{

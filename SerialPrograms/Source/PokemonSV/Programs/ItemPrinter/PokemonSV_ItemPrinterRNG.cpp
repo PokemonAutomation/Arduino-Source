@@ -359,12 +359,12 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
                 return prize_result;
             }
             env.log("Detected overworld... Starting print.");
-            pbf_press_button(context, BUTTON_A, 20, 30);
+            pbf_press_button(context, BUTTON_A, 160ms, 240ms);
             continue;
 
         case 1:
             env.log("Detected advance dialog.");
-            pbf_press_button(context, BUTTON_B, 20, 30);
+            pbf_press_button(context, BUTTON_B, 160ms, 240ms);
             continue;
 
         case 2:{
@@ -398,7 +398,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
             date_reader.set_date(env.program_info(), env.console, context, set_date);
 
             //  Commit the date and start the timer.
-            pbf_press_button(context, BUTTON_A, 20, 30);
+            pbf_press_button(context, BUTTON_A, 160ms, 240ms);
             WallClock trigger_time = std::chrono::system_clock::now() + trigger_delay;
             env.log("Will commit in " + tostr_u_commas(trigger_delay.count()) + " milliseconds.");
 
@@ -429,7 +429,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
                 return prize_result;
             }
             if (!overworld_seen){
-                pbf_press_button(context, BUTTON_B, 20, 30);
+                pbf_press_button(context, BUTTON_B, 160ms, 240ms);
                 continue;
             }
             item_printer_start_print(env.console, context, LANGUAGE, jobs);
@@ -448,7 +448,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
                 adjust_delay(env.logger(), env, print_results, distance_from_target);
             }
 
-//            pbf_press_button(context, BUTTON_B, 20, 30);
+//            pbf_press_button(context, BUTTON_B, 160ms, 240ms);
             continue;
         }
         default:
@@ -615,7 +615,7 @@ void ItemPrinterRNG::print_again(
 
         case 1:
             env.log("Detected advance dialog.");
-            pbf_press_button(context, BUTTON_B, 20, 30);
+            pbf_press_button(context, BUTTON_B, 160ms, 240ms);
             continue;
 
         case 2:{
@@ -981,12 +981,12 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
         switch (ret){
         case 0:
             env.log("Detected overworld... Entering item printer.");
-            pbf_press_button(context, BUTTON_A, 20, 30);
+            pbf_press_button(context, BUTTON_A, 160ms, 240ms);
             continue;
 
         case 1:
             env.log("Detected advance dialog.");
-            pbf_press_button(context, BUTTON_B, 20, 30);
+            pbf_press_button(context, BUTTON_B, 160ms, 240ms);
             continue;
 
         case 2:{

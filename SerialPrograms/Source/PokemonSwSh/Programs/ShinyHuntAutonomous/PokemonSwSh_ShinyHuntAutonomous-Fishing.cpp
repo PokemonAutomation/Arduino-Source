@@ -127,7 +127,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Pr
 
         //  Trigger encounter.
         {
-            pbf_press_button(context, BUTTON_A, 10, 10);
+            pbf_press_button(context, BUTTON_A, 80ms, 80ms);
             pbf_mash_button(context, BUTTON_B, 1000ms);
             context.wait_for_all_requests();
 

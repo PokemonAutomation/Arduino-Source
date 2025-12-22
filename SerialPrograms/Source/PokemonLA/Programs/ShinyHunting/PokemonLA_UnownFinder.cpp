@@ -93,15 +93,15 @@ UnownFinder::UnownFinder()
 
 void ruins_entrance_route(ProControllerContext& context){
     pbf_wait(context, 500ms);
-    pbf_move_left_joystick(context, 139, 120, 10, 10);
+    pbf_move_left_joystick(context, 139, 120, 80ms, 80ms);
     pbf_wait(context, 1300ms);
 
     pbf_press_button(context, BUTTON_B, 9500ms, 80ms);
     pbf_wait(context, 800ms);
     pbf_move_left_joystick(context, 110, 90, 20, 10);
 
-    pbf_press_dpad(context, DPAD_LEFT, 10, 10);
-    pbf_press_button(context, BUTTON_PLUS, 10, 10);
+    pbf_press_dpad(context, DPAD_LEFT, 80ms, 80ms);
+    pbf_press_button(context, BUTTON_PLUS, 80ms, 80ms);
 }
 
 void enter_ruins(ProControllerContext& context){
@@ -165,7 +165,7 @@ void UnownFinder::run_iteration(
 
     env.console.log("No shiny detected, returning to Jubilife!");
     goto_camp_from_overworld(env, env.console, context);
-    pbf_press_dpad(context, DPAD_RIGHT, 10, 10);
+    pbf_press_dpad(context, DPAD_RIGHT, 80ms, 80ms);
     goto_professor(env.console, context, Camp::MIRELANDS_MIRELANDS);
     from_professor_return_to_jubilife(env, env.console, context);
 }

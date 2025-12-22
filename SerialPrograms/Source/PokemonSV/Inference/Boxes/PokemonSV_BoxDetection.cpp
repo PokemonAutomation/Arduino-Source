@@ -226,11 +226,11 @@ void BoxDetector::move_vertical(ProControllerContext& context, int current, int 
 //    cout << "diff = " << diff << endl;
     if (diff <= 3){
         for (int c = 0; c < diff; c++){
-            pbf_press_dpad(context, DPAD_UP, 20, 30);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 240ms);
         }
     }else{
         for (int c = diff; c < 7; c++){
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
         }
     }
 }
@@ -238,11 +238,11 @@ void BoxDetector::move_horizontal(ProControllerContext& context, int current, in
     int diff = (current - desired + 7) % 7;
     if (diff <= 3){
         for (int c = 0; c < diff; c++){
-            pbf_press_dpad(context, DPAD_LEFT, 20, 30);
+            pbf_press_dpad(context, DPAD_LEFT, 160ms, 240ms);
         }
     }else{
         for (int c = diff; c < 7; c++){
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 240ms);
         }
     }
 }
@@ -296,18 +296,18 @@ void BoxDetector::move_cursor(
             if (desired_x == -1){
                 if (row < current.second.row){
                     for (uint8_t r = row; r < current.second.row; r++){
-                        pbf_press_dpad(context, DPAD_UP, 20, 30);
+                        pbf_press_dpad(context, DPAD_UP, 160ms, 240ms);
                     }
                 }else{ // row >= current.second.row
                     for (uint8_t r = current.second.row; r < row; r++){
-                        pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+                        pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
                     }
                 }
                 continue;
             }else if (desired_x < 3){
-                pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
+                pbf_press_dpad(context, DPAD_RIGHT, 160ms, 240ms);
             }else{
-                pbf_press_dpad(context, DPAD_LEFT, 20, 30);
+                pbf_press_dpad(context, DPAD_LEFT, 160ms, 240ms);
             }
             continue;
         }
@@ -322,9 +322,9 @@ void BoxDetector::move_cursor(
         if (current_y == 5){
             int diff = (current_x - desired_x + 7) % 7;
             if (diff <= 3){
-                pbf_press_dpad(context, DPAD_LEFT, 20, 30);
+                pbf_press_dpad(context, DPAD_LEFT, 160ms, 240ms);
             }else{
-                pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
+                pbf_press_dpad(context, DPAD_RIGHT, 160ms, 240ms);
             }
             continue;
         }

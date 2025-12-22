@@ -47,7 +47,7 @@ void set_time_to_12am_from_home(const ProgramInfo& info, ConsoleHandle& console,
     reader.set_date(info, console, context, time);
 //    reader.set_hours(info, console, context, 0);
 
-    pbf_press_button(context, BUTTON_A, 20, 30);
+    pbf_press_button(context, BUTTON_A, 160ms, 240ms);
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 //    resume_game_from_home(console, context);
 }

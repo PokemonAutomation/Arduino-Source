@@ -134,7 +134,7 @@ void ItemPrinterJobsDetector::set_print_jobs(
         if (current_jobs == jobs){
             return;
         }
-        pbf_press_button(context, BUTTON_R, 20, 30);
+        pbf_press_button(context, BUTTON_R, 160ms, 240ms);
     }
 
     throw_and_log<OperationFailedException>(

@@ -787,7 +787,7 @@ void heal_at_pokecenter(
     // re-orient camera
     pbf_press_button(context, BUTTON_L, 20, 20);
     // move towards pokecenter
-    pbf_move_left_joystick(context, 128, 255, 100, 20);
+    pbf_move_left_joystick(context, 128, 255, 800ms, 160ms);
     // re-orient camera
     pbf_press_button(context, BUTTON_L, 20, 20); 
 

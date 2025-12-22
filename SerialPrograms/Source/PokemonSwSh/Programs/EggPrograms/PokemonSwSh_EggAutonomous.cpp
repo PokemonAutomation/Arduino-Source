@@ -768,7 +768,7 @@ bool EggAutonomous::process_hatched_pokemon(
                 // Press A to release
                 pbf_press_button(context, BUTTON_A, 160ms, 840ms);
                 // Move cursor from "Not release" to "release".
-                pbf_press_dpad(context, DPAD_UP, 20, 30);
+                pbf_press_dpad(context, DPAD_UP, 160ms, 240ms);
                 // Press A to confirm release, wait for a while to let the next dialog box pop up.
                 pbf_press_button(context, BUTTON_A, 20, 200);
 

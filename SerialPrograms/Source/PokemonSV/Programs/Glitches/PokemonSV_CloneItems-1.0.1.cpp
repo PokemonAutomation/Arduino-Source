@@ -178,7 +178,7 @@ bool CloneItems101::clone_item(ProgramEnvironment& env, VideoStream& stream, Pro
                 }else{
                     main_menu.move_cursor(env.program_info(), stream, context, MenuSide::LEFT, 1, true);
                     pbf_press_button(context, BUTTON_A, 160ms, 400ms);
-                    pbf_press_dpad(context, DPAD_UP, 10, 10);
+                    pbf_press_dpad(context, DPAD_UP, 80ms, 80ms);
                     pbf_press_dpad(context, DPAD_UP, 20, 10);
                     pbf_press_button(context, BUTTON_A, 20, 20);
                 }
@@ -189,8 +189,8 @@ bool CloneItems101::clone_item(ProgramEnvironment& env, VideoStream& stream, Pro
         case 2:
             stream.log("Detected 6th slot select top. (unexpected)", COLOR_RED);
             stats.m_errors++;
-            pbf_press_dpad(context, DPAD_UP, 10, 10);
-            pbf_press_dpad(context, DPAD_UP, 10, 10);
+            pbf_press_dpad(context, DPAD_UP, 80ms, 80ms);
+            pbf_press_dpad(context, DPAD_UP, 80ms, 80ms);
             continue;
         case 3:
             stream.log("Detected 6th slot select return. (unexpected)", COLOR_RED);
@@ -200,7 +200,7 @@ bool CloneItems101::clone_item(ProgramEnvironment& env, VideoStream& stream, Pro
         case 4:
             stream.log("Detected 6th slot select back. (unexpected)", COLOR_RED);
             stats.m_errors++;
-            pbf_press_dpad(context, DPAD_UP, 20, 30);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 240ms);
             continue;
         case 5:{
             stream.log("Detected dialog.");
@@ -239,9 +239,9 @@ bool CloneItems101::clone_item(ProgramEnvironment& env, VideoStream& stream, Pro
 
             pbf_press_button(context, BUTTON_L, 20, 40);
             pbf_press_button(context, BUTTON_A, 160ms, 400ms);
-            pbf_press_dpad(context, DPAD_DOWN, 10, 10);
-            pbf_press_dpad(context, DPAD_DOWN, 10, 10);
-            pbf_press_dpad(context, DPAD_DOWN, 10, 10);
+            pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
+            pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
+            pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
             pbf_press_button(context, BUTTON_A, 160ms, 400ms);
             item_held = false;
 

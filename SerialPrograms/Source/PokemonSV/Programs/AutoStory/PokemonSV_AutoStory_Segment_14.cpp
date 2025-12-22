@@ -172,7 +172,7 @@ void checkpoint_30(
 
         // section 8.1. move up
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 0, 50);
-        pbf_move_left_joystick(context, 128, 0, 100, 100);
+        pbf_move_left_joystick(context, 128, 0, 800ms, 800ms);
 
         // section 9. go to middle-right of boulder field
         realign_player_from_landmark(
@@ -186,7 +186,7 @@ void checkpoint_30(
 
         // // section 9.1. go to right edge of boulder field
         // realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 140, 0, 50);        
-        // pbf_move_left_joystick(context, 128, 0, 200, 100);
+        // pbf_move_left_joystick(context, 128, 0, 1600ms, 800ms);
 
         // section 10. walk up right edge
         realign_player_from_landmark(
@@ -207,7 +207,7 @@ void checkpoint_30(
 
         // section 10.2. move away from rock.
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 80, 255, 50);  
-        pbf_move_left_joystick(context, 128, 0, 200, 100);
+        pbf_move_left_joystick(context, 128, 0, 1600ms, 800ms);
 
         // section 11
         realign_player_from_landmark(

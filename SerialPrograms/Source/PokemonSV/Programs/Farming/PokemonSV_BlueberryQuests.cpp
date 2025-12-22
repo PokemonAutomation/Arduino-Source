@@ -146,7 +146,7 @@ int read_BP(const ProgramInfo& info, VideoStream& stream, ProControllerContext& 
         stream, context,
         [&](ProControllerContext& context){
             for (int i = 0; i < 6; i++) { //try 6 times
-                pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
+                pbf_press_dpad(context, DPAD_RIGHT, 400ms, 160ms);
                 pbf_wait(context, 200);
                 context.wait_for_all_requests();
             }
@@ -185,7 +185,7 @@ std::vector<BBQuests> read_quests(
         stream, context,
         [&](ProControllerContext& context){
             for (int i = 0; i < 6; i++) { //try 6 times
-                pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
+                pbf_press_dpad(context, DPAD_RIGHT, 400ms, 160ms);
                 pbf_wait(context, 200);
                 context.wait_for_all_requests();
             }
@@ -254,7 +254,7 @@ std::vector<BBQuests> process_quest_list(
                         stream, context,
                         [&](ProControllerContext& context){
                             for (int i = 0; i < 6; i++){
-                                pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
+                                pbf_press_dpad(context, DPAD_RIGHT, 400ms, 160ms);
                                 pbf_wait(context, 200);
                                 context.wait_for_all_requests();
                             }
@@ -310,7 +310,7 @@ std::vector<BBQuests> process_quest_list(
                                 stream, context,
                                 [&](ProControllerContext& context){
                                     for (int i = 0; i < 6; i++){
-                                        pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
+                                        pbf_press_dpad(context, DPAD_RIGHT, 400ms, 160ms);
                                         pbf_wait(context, 200);
                                         context.wait_for_all_requests();
                                     }
@@ -367,7 +367,7 @@ std::vector<BBQuests> process_quest_list(
             stream, context,
             [&](ProControllerContext& context){
                 for (int i = 0; i < 6; i++){
-                    pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
+                    pbf_press_dpad(context, DPAD_RIGHT, 400ms, 160ms);
                     pbf_wait(context, 200);
                     context.wait_for_all_requests();
                 }
@@ -547,8 +547,8 @@ void quest_make_tm(const ProgramInfo& info, VideoStream& stream, ProControllerCo
     PromptDialogWatcher makeTM(COLOR_RED);
     OverworldWatcher overworld(stream.logger(), COLOR_BLUE);
 
-    pbf_move_left_joystick(context, 255, 0, 100, 20);
-    pbf_press_button(context, BUTTON_L, 10, 50);
+    pbf_move_left_joystick(context, 255, 0, 800ms, 160ms);
+    pbf_press_button(context, BUTTON_L, 80ms, 400ms);
 
     int enter_machine = run_until<ProControllerContext>(
         stream, context,
@@ -716,7 +716,7 @@ void quest_tera_self_defeat(
 
     //Heal up and then reset position again.
     OverworldWatcher done_healing(console.logger(), COLOR_BLUE);
-    pbf_move_left_joystick(context, 128, 0, 100, 20);
+    pbf_move_left_joystick(context, 128, 0, 800ms, 160ms);
 
     pbf_mash_button(context, BUTTON_A, 300);
     context.wait_for_all_requests();
@@ -816,7 +816,7 @@ void quest_sneak_up(
                         switch (ret2){
                         case 0:
                             battle_menu.move_to_slot(console, context, 3);
-                            pbf_press_button(context, BUTTON_A, 10, 50);
+                            pbf_press_button(context, BUTTON_A, 80ms, 400ms);
                             break;
                         default:
                             console.log("Invalid state quest_sneak_up(). Smoke Ball equipped?");
@@ -935,7 +935,7 @@ void quest_wild_tera(
 
     //Heal up and then reset position again.
     OverworldWatcher done_healing(console.logger(), COLOR_BLUE);
-    pbf_move_left_joystick(context, 128, 0, 100, 20);
+    pbf_move_left_joystick(context, 128, 0, 800ms, 160ms);
 
     pbf_mash_button(context, BUTTON_A, 300);
     context.wait_for_all_requests();
@@ -1263,7 +1263,7 @@ void quest_tera_raid(
                 try{
                     NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
                     battle_menu.move_to_slot(console, context, 3);
-                    pbf_press_button(context, BUTTON_A, 10, 50);
+                    pbf_press_button(context, BUTTON_A, 80ms, 400ms);
                     press_Bs_to_back_to_overworld(env.program_info(), console, context);
                     return_to_plaza(env.program_info(), console, context);
                 }catch (...){
@@ -1279,14 +1279,14 @@ void quest_tera_raid(
     }
 
     //Swap to the second pokemon in your party
-    pbf_press_dpad(context, DPAD_DOWN, 10, 10);
-    pbf_press_dpad(context, DPAD_DOWN, 10, 10);
+    pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
+    pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
     pbf_press_button(context, BUTTON_A, 160ms, 840ms);
     context.wait_for(std::chrono::milliseconds(400));
     move_box_cursor(env.program_info(), console, context, BoxCursorLocation::PARTY, 1, 0);
     pbf_press_button(context, BUTTON_A, 160ms, 840ms);
     pbf_press_button(context, BUTTON_A, 160ms, 840ms);
-    pbf_press_dpad(context, DPAD_UP, 10, 10);
+    pbf_press_dpad(context, DPAD_UP, 80ms, 80ms);
     pbf_mash_button(context, BUTTON_A, 250);
 
     bool win = run_tera_battle(env, console, context, BBQ_OPTIONS.BATTLE_AI);
@@ -1370,7 +1370,7 @@ void quest_auto_battle(
         return_to_plaza(env.program_info(), stream, context);
 
         OverworldWatcher done_healing(stream.logger(), COLOR_BLUE);
-        pbf_move_left_joystick(context, 128, 0, 100, 20);
+        pbf_move_left_joystick(context, 128, 0, 800ms, 160ms);
 
         pbf_mash_button(context, BUTTON_A, 300);
         context.wait_for_all_requests();

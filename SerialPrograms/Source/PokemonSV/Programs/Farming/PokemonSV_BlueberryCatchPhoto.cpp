@@ -52,7 +52,7 @@ CameraAngle quest_photo_navi(
             //Polar Rest Area - targeting Duosion fixed spawn
             central_to_polar_rest(info, console, context);
 
-            pbf_press_button(context, BUTTON_L, 10, 50);
+            pbf_press_button(context, BUTTON_L, 80ms, 400ms);
             pbf_move_left_joystick(context, 128, 0, 1840ms, 160ms);
             pbf_move_left_joystick(context, {-1, 0}, 2000ms, 160ms);
 
@@ -66,7 +66,7 @@ CameraAngle quest_photo_navi(
             pbf_wait(context, 200);
             context.wait_for_all_requests();
 
-            pbf_press_button(context, BUTTON_L, 10, 50);
+            pbf_press_button(context, BUTTON_L, 80ms, 400ms);
             pbf_move_left_joystick(context, 255, 50, 180, 20);
 
             angle = CameraAngle::down;
@@ -218,7 +218,7 @@ CameraAngle quest_photo_navi(
             //Hitmontop (TERA ICE) - Canyon Plaza or Classroom
             central_to_canyon_plaza(info, console, context);
             pbf_move_left_joystick(context, {-1, 0}, 3200ms, 160ms);
-            pbf_press_button(context, BUTTON_L, 10, 50);
+            pbf_press_button(context, BUTTON_L, 80ms, 400ms);
             pbf_move_left_joystick(context, 0, 100, 160ms, 400ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
@@ -305,7 +305,7 @@ void quest_photo(
                 PromptDialogWatcher photo_prompt(COLOR_RED);
                 OverworldWatcher overworld(console.logger(), COLOR_BLUE);
 
-                pbf_press_dpad(context, DPAD_DOWN, 50, 20);
+                pbf_press_dpad(context, DPAD_DOWN, 400ms, 160ms);
                 pbf_wait(context, 100);
                 context.wait_for_all_requests();
 
@@ -362,7 +362,7 @@ void quest_photo(
                     //Smoke Ball or Flying type required due to Arena Trap/Magnet Pull
                     NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
                     battle_menu.move_to_slot(console, context, 3);
-                    pbf_press_button(context, BUTTON_A, 10, 50);
+                    pbf_press_button(context, BUTTON_A, 80ms, 400ms);
                     press_Bs_to_back_to_overworld(info, console, context);
                     return_to_plaza(info, console, context);
                 }catch (...){
@@ -418,7 +418,7 @@ void quest_catch_navi(
             //Polar Rest Area - targeting Duosion fixed spawn
             central_to_polar_rest(info, console, context);
 
-            pbf_press_button(context, BUTTON_L, 10, 50);
+            pbf_press_button(context, BUTTON_L, 80ms, 400ms);
             pbf_move_left_joystick(context, 128, 0, 1840ms, 160ms);
             pbf_move_left_joystick(context, {-1, 0}, 2000ms, 160ms);
 
@@ -465,7 +465,7 @@ void quest_catch_navi(
 
             pbf_move_left_joystick(context, 0, 0, 10, 20);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-            pbf_move_left_joystick(context, 128, 0, 50, 20);
+            pbf_move_left_joystick(context, 128, 0, 400ms, 160ms);
 
             break;
         case BBQuests::catch_fairy:
@@ -493,7 +493,7 @@ void quest_catch_navi(
             //Hitmontop (TERA ICE) - Canyon Plaza or Classroom
             central_to_canyon_plaza(info, console, context);
             pbf_move_left_joystick(context, {-1, 0}, 3200ms, 160ms);
-            pbf_press_button(context, BUTTON_L, 10, 50);
+            pbf_press_button(context, BUTTON_L, 80ms, 400ms);
             pbf_move_left_joystick(context, 0, 100, 160ms, 400ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
@@ -538,7 +538,7 @@ void quest_catch_navi(
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
             if (console.state().console_type() == ConsoleType::Switch1) {
-                pbf_move_left_joystick(context, 128, 0, 100, 20);
+                pbf_move_left_joystick(context, 128, 0, 800ms, 160ms);
             } else {
                 pbf_move_left_joystick(context, 128, 0, 120, 20);
             }
@@ -628,7 +628,7 @@ void quest_catch_navi(
 
             //Lapras - Tera Bug
             central_to_polar_rest(info, console, context);
-            pbf_press_button(context, BUTTON_L, 10, 50);
+            pbf_press_button(context, BUTTON_L, 80ms, 400ms);
             pbf_move_left_joystick(context, 128, 0, 230, 20);
             pbf_move_left_joystick(context, {-1, 0}, 2400ms, 160ms);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
@@ -796,7 +796,7 @@ void quest_catch_handle_battle(
                         int ret_move_select = run_until<ProControllerContext>(
                             console, context,
                             [&](ProControllerContext& context){
-                                pbf_press_button(context, BUTTON_A, 10, 50);
+                                pbf_press_button(context, BUTTON_A, 80ms, 400ms);
                                 pbf_wait(context, 100);
                                 context.wait_for_all_requests();
                             },
@@ -954,7 +954,7 @@ void quest_catch(
 
     //Heal up and then reset position again.
     OverworldWatcher done_healing(console.logger(), COLOR_BLUE);
-    pbf_move_left_joystick(context, 128, 0, 100, 20);
+    pbf_move_left_joystick(context, 128, 0, 800ms, 160ms);
 
     pbf_mash_button(context, BUTTON_A, 300);
     context.wait_for_all_requests();
@@ -1002,12 +1002,12 @@ void wild_battle_tera(
                 if (first_turn && tera_self){
                     console.log("Turn 1: Tera.");
                     //Open move menu
-                    pbf_press_button(context, BUTTON_A, 10, 50);
+                    pbf_press_button(context, BUTTON_A, 80ms, 400ms);
                     pbf_wait(context, 100);
                     context.wait_for_all_requests();
 
                     pbf_press_button(context, BUTTON_R, 160ms, 400ms);
-                    pbf_press_button(context, BUTTON_A, 10, 50);
+                    pbf_press_button(context, BUTTON_A, 80ms, 400ms);
 
                     first_turn = false;
                 }

@@ -71,22 +71,22 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         //Initiate dialog with Dendra
         //Dendra needs time to turn and face the player
         AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
-        pbf_press_button(context, BUTTON_A, 10, 50);
+        pbf_press_button(context, BUTTON_A, 80ms, 400ms);
         int retD = wait_until(env.console, context, Milliseconds(4000), { advance_detector });
         if (retD < 0){
             env.log("Dialog detected.");
         }
-        pbf_press_button(context, BUTTON_A, 10, 50);
+        pbf_press_button(context, BUTTON_A, 80ms, 400ms);
 
         //Yes let's train
-        pbf_press_button(context, BUTTON_A, 10, 50);
+        pbf_press_button(context, BUTTON_A, 80ms, 400ms);
         pbf_wait(context, 100);
         context.wait_for_all_requests();
 
         //What mode? - Knockout
-        pbf_press_button(context, BUTTON_A, 10, 50);
-        pbf_press_dpad(context, DPAD_DOWN, 10, 50);
-        pbf_press_button(context, BUTTON_A, 10, 50);
+        pbf_press_button(context, BUTTON_A, 80ms, 400ms);
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 400ms);
         context.wait_for_all_requests();
 
         //mash past other dialog
@@ -200,7 +200,7 @@ void run_esp_training(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
             // Press button and check it did not drop input. Press again if it did.
             // This will result in a duplicate press between phases, but the press will do nothing.
-            pbf_press_button(context, emotion_button, 10, 50);
+            pbf_press_button(context, emotion_button, 80ms, 400ms);
             env.update_stats();
 
             ESPPressedEmotionDetector emotion_press_detected;
@@ -211,7 +211,7 @@ void run_esp_training(SingleSwitchProgramEnvironment& env, ProControllerContext&
             );
             if (check < 0){
                 env.log("Emotion press not detected in bottom right. Pressing button again.");
-                pbf_press_button(context, emotion_button, 10, 50);
+                pbf_press_button(context, emotion_button, 80ms, 400ms);
             }else{
                 env.log("Emotion press detected.");
             }

@@ -69,7 +69,7 @@ void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
     assert_16_9_720p_min(env.logger(), env.console);
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 10, 50);
+    pbf_press_button(context, BUTTON_L, 80ms, 400ms);
 
     // Throw user setup errors early in program
     // - Ensure language is set

@@ -29,10 +29,10 @@ void enter_summary(ProControllerContext& context, bool regi_move_right){
     pbf_press_button(context, BUTTON_A, 80ms, 2000ms);
     pbf_press_button(context, BUTTON_A, 10, 200);
     if (regi_move_right){
-        pbf_move_left_joystick(context, 255, 128, 20, 30);
+        pbf_move_left_joystick(context, 255, 128, 160ms, 240ms);
     }
     pbf_press_dpad(context, DPAD_DOWN, 80ms, 0ms);
-    pbf_press_button(context, BUTTON_A, 10, 10);    //  For Regi, this clears the dialog after running.
+    pbf_press_button(context, BUTTON_A, 80ms, 80ms);    //  For Regi, this clears the dialog after running.
 }
 void close_game_if_overworld(
     ConsoleHandle& console, ProControllerContext& context,
@@ -62,13 +62,13 @@ void close_game_if_overworld(
     }
 
     //  Enter profile.
-    pbf_press_dpad(context, DPAD_UP, 10, 10);
+    pbf_press_dpad(context, DPAD_UP, 80ms, 80ms);
     pbf_press_button(context, BUTTON_A, 80ms, GameSettings::instance().ENTER_PROFILE_DELAY0);
 
     //  Back out.
-    pbf_press_dpad(context, DPAD_LEFT, 10, 10);
+    pbf_press_dpad(context, DPAD_LEFT, 80ms, 80ms);
     pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
-    pbf_press_dpad(context, DPAD_DOWN, 10, 10);
+    pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
 
     //  Close and restart game.
     close_game_from_home(console, context);

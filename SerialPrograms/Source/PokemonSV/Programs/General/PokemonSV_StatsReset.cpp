@@ -144,7 +144,7 @@ bool StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, ProController
 
     //Press A to talk to target
     AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
-    pbf_press_button(context, BUTTON_A, 10, 50);
+    pbf_press_button(context, BUTTON_A, 80ms, 400ms);
     int retD = wait_until(env.console, context, Milliseconds(4000), { advance_detector });
     if (retD < 0){
         env.log("Dialog not detected.");
@@ -338,7 +338,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
                     int ret_move_select = run_until<ProControllerContext>(
                     env.console, context,
                     [&](ProControllerContext& context){
-                        pbf_press_button(context, BUTTON_A, 10, 50);
+                        pbf_press_button(context, BUTTON_A, 80ms, 400ms);
                         pbf_wait(context, 100);
                         context.wait_for_all_requests();
                     },
@@ -575,7 +575,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 10, 10);
+    pbf_press_button(context, BUTTON_L, 80ms, 80ms);
 
     //  Autosave must be off, settings like Tera farmer.
     bool stats_matched = false;

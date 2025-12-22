@@ -271,7 +271,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, ProControllerContext
     AutoHost_Descriptor::Stats& stats = env.current_stats<AutoHost_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 10, 10);
+    pbf_press_button(context, BUTTON_L, 80ms, 80ms);
 
     m_killswitch_time = WallClock::max();
 

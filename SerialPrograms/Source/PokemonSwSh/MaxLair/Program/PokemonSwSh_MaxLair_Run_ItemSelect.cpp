@@ -41,11 +41,11 @@ void run_item_select(
     stream.log("Choosing item " + std::to_string((int)item_index) + ".", COLOR_PURPLE);
 
     if (item_index < 0){
-        pbf_press_button(context, BUTTON_B, 10, 50);
+        pbf_press_button(context, BUTTON_B, 80ms, 400ms);
         return;
     }
     for (int8_t c = 0; c < item_index; c++){
-        pbf_press_dpad(context, DPAD_DOWN, 10, 50);
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
     }
     pbf_press_button(context, BUTTON_A, 80ms, 5000ms);
     context.wait_for_all_requests();

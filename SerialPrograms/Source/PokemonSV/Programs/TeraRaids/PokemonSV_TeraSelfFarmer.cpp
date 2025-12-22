@@ -229,7 +229,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
     m_number_caught = 0;
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 10, 10);
+    pbf_press_button(context, BUTTON_L, 80ms, 80ms);
 
     bool first = true;
     uint32_t skip_counter = 0;
@@ -290,7 +290,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
             continue;
         }
 
-        pbf_press_dpad(context, DPAD_DOWN, 10, 10);
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
         pbf_mash_button(context, BUTTON_A, 250);
         bool raid_won = run_raid(env, context);
         {

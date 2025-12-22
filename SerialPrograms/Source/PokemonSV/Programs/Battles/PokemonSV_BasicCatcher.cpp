@@ -117,7 +117,7 @@ int16_t throw_ball(
         switch (ret){
         case 0:
             stream.log("Detected battle menu. Opening up ball selection...");
-            pbf_press_button(context, BUTTON_X, 20, 30);
+            pbf_press_button(context, BUTTON_X, 160ms, 240ms);
             break;
         case 1:
             stream.log("Detected move select. Backing out...");
@@ -126,7 +126,7 @@ int16_t throw_ball(
         case 2:
             stream.log("Tera catch menu. Opening up ball selection...");
             tera_catch_detector.move_to_slot(stream, context, 0);
-            pbf_press_button(context, BUTTON_A, 20, 30);
+            pbf_press_button(context, BUTTON_A, 160ms, 240ms);
             break;
         default:
             if (quantity > 0){

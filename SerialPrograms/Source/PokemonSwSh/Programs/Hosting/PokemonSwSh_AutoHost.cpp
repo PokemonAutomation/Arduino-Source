@@ -228,11 +228,11 @@ void run_autohost(
         pbf_wait(context, delay_to_select_move);
         pbf_press_button(context, BUTTON_A, 20, 80);
         if (dynamax){
-            pbf_press_dpad(context, DPAD_LEFT, 20, 30);
+            pbf_press_dpad(context, DPAD_LEFT, 160ms, 240ms);
             pbf_press_button(context, BUTTON_A, 20, 60);
         }
         for (uint8_t c = 1; c < move_slot; c++){
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
         }
         pbf_press_button(context, BUTTON_A, 20, 80);
 

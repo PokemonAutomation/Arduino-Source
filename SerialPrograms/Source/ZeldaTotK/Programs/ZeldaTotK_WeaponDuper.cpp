@@ -134,7 +134,7 @@ void WeaponDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         env.log("Drop weapon");
         pbf_press_button(context, BUTTON_A, 10, 30);
         pbf_press_dpad(context, DPAD_DOWN, 10, 30);
-        pbf_press_button(context, BUTTON_A, 10, 50);
+        pbf_press_button(context, BUTTON_A, 80ms, 400ms);
 
         context.wait_for_all_requests();
         env.log("Equip weapon on the right");
@@ -144,7 +144,7 @@ void WeaponDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCont
 
         context.wait_for_all_requests();
         env.log("Open and close the menu fast");
-        pbf_press_button(context, BUTTON_PLUS, 10, 10);
+        pbf_press_button(context, BUTTON_PLUS, 80ms, 80ms);
         pbf_press_button(context, BUTTON_PLUS, 10, 100);
 
         context.wait_for_all_requests();
@@ -152,7 +152,7 @@ void WeaponDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         pbf_press_dpad(context, DPAD_LEFT, 10, 30);
         pbf_press_button(context, BUTTON_A, 10, 30);
         pbf_press_dpad(context, DPAD_DOWN, 10, 30);
-        pbf_press_button(context, BUTTON_A, 10, 50);
+        pbf_press_button(context, BUTTON_A, 80ms, 400ms);
 
         context.wait_for_all_requests();
         env.log("Go back to options menu");
@@ -172,24 +172,24 @@ void WeaponDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCont
 
         context.wait_for_all_requests();
         env.log("Pick up duped weapon - extra presses just in case");
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
 
         context.wait_for_all_requests();
         env.log("Turn around and try to pick up items as well");
-        pbf_move_left_joystick(context, 128, 255, 10, 5);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_move_left_joystick(context, 128, 0, 10, 5);
+        pbf_move_left_joystick(context, 128, 255, 80ms, 40ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_move_left_joystick(context, 128, 0, 80ms, 40ms);
 
         // increment counter, increment stats
         c++;

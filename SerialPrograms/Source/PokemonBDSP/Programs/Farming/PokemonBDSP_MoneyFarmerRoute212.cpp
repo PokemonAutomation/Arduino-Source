@@ -165,7 +165,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, ProControl
             }
 
             for (uint8_t move_slot = 0; move_slot < slot; move_slot++){
-                pbf_press_dpad(context, DPAD_DOWN, 10, 50);
+                pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
             }
             pbf_mash_button(context, BUTTON_ZL, 250);
             pp[slot]--;

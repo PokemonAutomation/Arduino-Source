@@ -130,7 +130,7 @@ void checkpoint_24(
         });        
        
         direction.change_direction(env.program_info(), env.console, context, 2.73);
-        pbf_move_left_joystick(context, 128, 0, 200, 100);
+        pbf_move_left_joystick(context, 128, 0, 1600ms, 800ms);
         pbf_wait(context, 5000ms);
         context.wait_for_all_requests();
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
@@ -138,7 +138,7 @@ void checkpoint_24(
                 walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20000ms);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 0, 100, 20);
+                pbf_move_left_joystick(context, 0, 0, 800ms, 160ms);
             },
             5, 5
         ); 
@@ -223,7 +223,7 @@ void checkpoint_25(
 
         // section 8
         direction.change_direction(env.program_info(), env.console, context,  6.106);
-        pbf_move_left_joystick(context, 128, 0, 200, 100);
+        pbf_move_left_joystick(context, 128, 0, 1600ms, 800ms);
 
         // section 9. battle second NPC
         direction.change_direction(env.program_info(), env.console, context,  4.275);
@@ -265,7 +265,7 @@ void checkpoint_26(
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         // section 1
-        pbf_move_left_joystick(context, 128, 0, 400, 50);
+        pbf_move_left_joystick(context, 128, 0, 3200ms, 400ms);
         OliveDetector green(env.console);
         size_t MAX_ATTEMPTS_SECTION_1 = 2;
         uint16_t ticks_to_walk_for_section1 = 650;
@@ -371,9 +371,9 @@ void checkpoint_26(
                     pbf_move_left_joystick(context, {0, -1}, 400ms, 400ms);
                     // realign using fence corner
                     direction.change_direction(env.program_info(), env.console, context,  2.74);
-                    pbf_move_left_joystick(context, 128, 0, 400, 50);
+                    pbf_move_left_joystick(context, 128, 0, 3200ms, 400ms);
                     direction.change_direction(env.program_info(), env.console, context,  4.328);
-                    pbf_move_left_joystick(context, 128, 0, 400, 50);
+                    pbf_move_left_joystick(context, 128, 0, 3200ms, 400ms);
                     direction.change_direction(env.program_info(), env.console, context,  1.22);
                     pbf_move_left_joystick(context, 128, 0, 800ms, 400ms);
                 }else if (e.m_fail_reason == OliveFail::NO_OLIVE_DETECTED){

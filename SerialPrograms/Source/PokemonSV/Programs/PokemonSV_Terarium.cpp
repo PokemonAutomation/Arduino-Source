@@ -98,7 +98,7 @@ void return_to_plaza(const ProgramInfo& info, VideoStream& stream, ProController
                     //Smoke Ball or Flying type required due to Arena Trap
                     NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
                     battle_menu.move_to_slot(stream, context, 3);
-                    pbf_press_button(context, BUTTON_A, 10, 50);
+                    pbf_press_button(context, BUTTON_A, 80ms, 400ms);
                 }catch (...){
                     stream.log("Unable to flee.");
                     OperationFailedException::fire(

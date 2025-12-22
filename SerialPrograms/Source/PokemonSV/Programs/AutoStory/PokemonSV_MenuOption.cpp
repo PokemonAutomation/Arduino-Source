@@ -61,7 +61,7 @@ void MenuOption::set_target_option(const std::vector<MenuOptionToggleEnum>& targ
             return;
         }
 
-        pbf_press_dpad(m_context, DPAD_RIGHT, 10, 50);
+        pbf_press_dpad(m_context, DPAD_RIGHT, 80ms, 400ms);
     }
 
     OperationFailedException::fire(
@@ -194,12 +194,12 @@ void MenuOption::move_to_option(const MenuOptionItemEnum target_option_enum) con
         // move cursor in direction of target_option
         if (diff > 0){
             for (size_t i = 0; i < (size_t)diff; i++){
-                pbf_press_dpad(m_context, DPAD_DOWN, 10, 50);
+                pbf_press_dpad(m_context, DPAD_DOWN, 80ms, 400ms);
             }
         }
         if (diff < 0){
             for (size_t i = 0; i < (size_t)-diff; i++){
-                pbf_press_dpad(m_context, DPAD_UP, 10, 50);
+                pbf_press_dpad(m_context, DPAD_UP, 80ms, 400ms);
             }
         }
         current_option_slug = read_option_item();

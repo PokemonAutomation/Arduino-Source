@@ -74,7 +74,7 @@ void BeamReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 160ms);
 
         for (uint16_t c = 0; c < 4; c++){
-            pbf_press_button(context, BUTTON_HOME, 10, 10);
+            pbf_press_button(context, BUTTON_HOME, 80ms, 80ms);
             pbf_press_button(context, BUTTON_HOME, 10, 220);
         }
         pbf_wait(context, DELAY_BEFORE_RESET0);

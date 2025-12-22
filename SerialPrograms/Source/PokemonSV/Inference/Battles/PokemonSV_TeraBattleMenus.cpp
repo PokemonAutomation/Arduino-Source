@@ -77,10 +77,10 @@ bool TeraBattleMenuDetector::move_to_slot(VideoStream& stream, ProControllerCont
         case 0:
             return true;
         case 1:
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
             continue;
         case 2:
-            pbf_press_dpad(context, DPAD_UP, 20, 30);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 240ms);
             continue;
         }
     }
@@ -149,10 +149,10 @@ bool CheerSelectDetector::move_to_slot(VideoStream& stream, ProControllerContext
         case 0:
             return true;
         case 1:
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
             continue;
         case 2:
-            pbf_press_dpad(context, DPAD_UP, 20, 30);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 240ms);
             continue;
         }
     }
@@ -230,11 +230,11 @@ bool TeraTargetSelectDetector::move_to_slot(VideoStream& stream, ProControllerCo
         }
 
         if (current_slot == 0 && slot != 0){
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
             continue;
         }
         if (current_slot != 0 && slot == 0){
-            pbf_press_dpad(context, DPAD_UP, 20, 30);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 240ms);
             continue;
         }
 
@@ -243,14 +243,14 @@ bool TeraTargetSelectDetector::move_to_slot(VideoStream& stream, ProControllerCo
         case 0:
             return true;
         case 1:
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 240ms);
             continue;
         case 2:
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 240ms);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 240ms);
             continue;
         case 3:
-            pbf_press_dpad(context, DPAD_LEFT, 20, 30);
+            pbf_press_dpad(context, DPAD_LEFT, 160ms, 240ms);
             continue;
         }
     }
@@ -337,7 +337,7 @@ bool TeraCatchDetector::move_to_slot(VideoStream& stream, ProControllerContext& 
             return true;
         }
 
-        pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+        pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
     }
 
     stream.log("TeraCatchDetector::move_to_slot(): Failed to move slot after 10 attempts.", COLOR_RED);

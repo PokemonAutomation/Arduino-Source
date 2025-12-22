@@ -78,7 +78,7 @@ void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env
         }
 
         pbf_press_button(context, BUTTON_A, 10, 180);   //  Enter select user menu.
-        pbf_press_button(context, BUTTON_A, 10, 10);    //  Enter game
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);    //  Enter game
 
         //  Switch to mashing ZR instead of A to get into the game.
         //  Mash your way into the game.

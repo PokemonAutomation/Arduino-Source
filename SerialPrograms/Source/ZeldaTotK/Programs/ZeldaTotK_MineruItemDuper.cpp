@@ -99,16 +99,16 @@ void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, ProController
         pbf_press_button(context, BUTTON_PLUS, 20, 100);
 
         // Hold items to dupe
-        pbf_press_button(context, BUTTON_A, 10, 10);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
 
         // Pressing "Hold Item" is only necessary for Materials
         if (!IS_ZONAI_DEVICE){
-            pbf_press_dpad(context, DPAD_DOWN, 10, 10);
+            pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
         }
 
-        pbf_press_button(context, BUTTON_A, 10, 10);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
          for (uint32_t i = 0; i < ITEMS_PER_ATTEMPT && c < AMOUNT; i++){
-            pbf_press_button(context, BUTTON_A, 10, 10);
+            pbf_press_button(context, BUTTON_A, 80ms, 80ms);
 
             // Increment counters
             c++;
@@ -123,7 +123,7 @@ void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, ProController
         if (!IS_ZONAI_DEVICE){
             // Pick up duped items plus some extra attempts for potentially missed ones
             for (uint32_t i = 0; i < ITEMS_PER_ATTEMPT + 2; i++){
-                pbf_press_button(context, BUTTON_A, 10, 10);
+                pbf_press_button(context, BUTTON_A, 80ms, 80ms);
             }
         }else{
             pbf_wait(context, 250);

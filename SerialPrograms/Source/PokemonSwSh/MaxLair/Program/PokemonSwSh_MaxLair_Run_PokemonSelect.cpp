@@ -81,15 +81,15 @@ void run_select_pokemon(
     stream.log("Choosing option " + std::to_string((int)selection) + ".", COLOR_PURPLE);
     switch (selection){
     case 0:
-        pbf_press_dpad(context, DPAD_UP, 10, 50);
+        pbf_press_dpad(context, DPAD_UP, 80ms, 400ms);
         break;
     case 1:
         break;
     case 2:
-        pbf_press_dpad(context, DPAD_DOWN, 10, 50);
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
         break;
     }
-    pbf_press_button(context, BUTTON_A, 10, 50);
+    pbf_press_button(context, BUTTON_A, 80ms, 400ms);
     context.wait_for_all_requests();
 
     //  Update state.

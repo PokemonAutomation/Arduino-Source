@@ -101,12 +101,12 @@ void SurfItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         pbf_press_button(context, BUTTON_PLUS, 20, 100);
 
         //Select 5 of the item to dupe - if less than 5 this still works
-        pbf_press_button(context, BUTTON_X, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
+        pbf_press_button(context, BUTTON_X, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
 
         //Now press Y (sort) and B (exit) at the same time
         pbf_press_button(context, BUTTON_B | BUTTON_Y, 10, 40);
@@ -115,22 +115,22 @@ void SurfItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         pbf_press_button(context, BUTTON_B, 160ms, 400ms);
 
         //Pick up duped items - extra presses just in case
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
 
         //Turn around and try to pick up items as well
-        pbf_move_left_joystick(context, 128, 255, 10, 5);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, 10);
+        pbf_move_left_joystick(context, 128, 255, 80ms, 40ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 80ms);
 
         // increment counter, increment stats
         c++;

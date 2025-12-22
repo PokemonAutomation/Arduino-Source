@@ -61,7 +61,7 @@ bool read_battle_menu(
 
         stream.log("Unable to read opponent from battle. Attempting to read from summary.", COLOR_ORANGE);
         pbf_press_button(context, BUTTON_Y, 80ms, 1000ms);
-        pbf_press_dpad(context, DPAD_UP, 10, 50);
+        pbf_press_dpad(context, DPAD_UP, 80ms, 400ms);
         pbf_press_button(context, BUTTON_A, 80ms, 2000ms);
         context.wait_for_all_requests();
         mon = reader.read_opponent_in_summary(stream.logger(), stream.video().snapshot());
@@ -240,12 +240,12 @@ StateMachineAction run_move_select(
         stream.log("Choosing move " + std::to_string((int)move.first) + (move.second ? " (dmax)." : "."), COLOR_PURPLE);
 
         if (player.can_dmax && move.second){
-            pbf_press_dpad(context, DPAD_LEFT, 10, 50);
+            pbf_press_dpad(context, DPAD_LEFT, 80ms, 400ms);
             pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
             player.dmax_turns_left = 3;
         }
         while (state.move_slot != move.first){
-            pbf_press_dpad(context, DPAD_DOWN, 10, 50);
+            pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
             state.move_slot++;
             state.move_slot %= 4;
         }

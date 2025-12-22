@@ -106,17 +106,17 @@ void checkpoint_21(
         // turn left
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NO_MARKER, 0, 128, 50);
         // move forward
-        pbf_move_left_joystick(context, 128, 0, 100, 100);
+        pbf_move_left_joystick(context, 128, 0, 800ms, 800ms);
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 200, 70);
-        pbf_move_left_joystick(context, 128, 0, 400, 100);
+        pbf_move_left_joystick(context, 128, 0, 3200ms, 800ms);
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 70);
         pbf_move_left_joystick(context, 128, 0, 700, 100);
 
         // turn towards wall
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 50);
-        pbf_move_left_joystick(context, 128, 0, 200, 100);
+        pbf_move_left_joystick(context, 128, 0, 1600ms, 800ms);
         // run and jump over wall
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 800ms);
 

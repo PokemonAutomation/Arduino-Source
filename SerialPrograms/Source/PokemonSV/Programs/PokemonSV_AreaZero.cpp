@@ -71,7 +71,7 @@ void inside_zero_gate_to_station(
         switch (ret){
         case 0:
             stream.log("Detected dialog.");
-            pbf_press_button(context, BUTTON_A, 20, 30);
+            pbf_press_button(context, BUTTON_A, 160ms, 240ms);
             continue;
         case 1:
             stream.log("Detected prompt.");

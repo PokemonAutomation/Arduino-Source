@@ -294,7 +294,7 @@ void goto_camp_from_jubilife(
     if (location.warp_slot != 0){
         pbf_press_button(context, BUTTON_A, 160ms, 840ms);
         for (size_t c = 0; c < location.warp_slot; c++){
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
         }
     }
 
@@ -311,7 +311,7 @@ void goto_camp_from_jubilife(
     // It's a settlement or arena that requires another warp:
 
     //  Open the map.
-    pbf_press_button(context, BUTTON_MINUS, 20, 30);
+    pbf_press_button(context, BUTTON_MINUS, 160ms, 240ms);
     {
         MapDetector detector;
         int ret = wait_until(
@@ -331,7 +331,7 @@ void goto_camp_from_jubilife(
     }
 
     //  Warp to sub-camp.
-    pbf_press_button(context, BUTTON_X, 20, 30);
+    pbf_press_button(context, BUTTON_X, 160ms, 240ms);
     {
         ButtonDetector detector(
             stream.logger(), stream.overlay(),
@@ -355,7 +355,7 @@ void goto_camp_from_jubilife(
     pbf_wait(context, 50);
     for (size_t c = 0; c < location.warp_sub_slot; c++){
         const DpadPosition dir = (location.reverse_sub_menu_direction ? DPAD_UP : DPAD_DOWN);
-        pbf_press_dpad(context, dir, 20, 30);
+        pbf_press_dpad(context, dir, 160ms, 240ms);
     }
     pbf_mash_button(context, BUTTON_A, 125);
 
@@ -409,7 +409,7 @@ void goto_camp_from_overworld(
         }
 
         //  Open the map.
-        pbf_press_button(context, BUTTON_MINUS, 20, 30);
+        pbf_press_button(context, BUTTON_MINUS, 160ms, 240ms);
         {
             MapDetector detector;
             int ret = wait_until(
@@ -429,7 +429,7 @@ void goto_camp_from_overworld(
         }
 
         //  Try to fly back to camp.
-        pbf_press_button(context, BUTTON_X, 20, 30);
+        pbf_press_button(context, BUTTON_X, 160ms, 240ms);
 
         {
             ButtonDetector detector(
@@ -497,7 +497,7 @@ void fast_travel_from_overworld(
         }
 
         //  Open the map.
-        pbf_press_button(context, BUTTON_MINUS, 20, 30);
+        pbf_press_button(context, BUTTON_MINUS, 160ms, 240ms);
         {
             MapDetector detector;
             int ret = wait_until(
@@ -517,7 +517,7 @@ void fast_travel_from_overworld(
         }
 
         //  Warp to sub-camp.
-        pbf_press_button(context, BUTTON_X, 20, 30);
+        pbf_press_button(context, BUTTON_X, 160ms, 240ms);
         {
             ButtonDetector detector(
                 stream.logger(), stream.overlay(),
@@ -535,12 +535,12 @@ void fast_travel_from_overworld(
                 pbf_wait(context, 50);
                 if (location.warp_slot != 0){
                     for (size_t c = 0; c < location.warp_slot; c++){
-                        pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+                        pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
                     }
                 }
                 for (size_t c = 0; c < location.warp_sub_slot; c++){
                     const DpadPosition dir = (location.reverse_sub_menu_direction ? DPAD_UP : DPAD_DOWN);
-                    pbf_press_dpad(context, dir, 20, 30);
+                    pbf_press_dpad(context, dir, 160ms, 240ms);
                 }
                 pbf_mash_button(context, BUTTON_A, 125);
                 break;

@@ -21,8 +21,8 @@ void resume_game_no_interact_old(ProControllerContext& context, bool tolerate_up
     Milliseconds HOME_TO_GAME_DELAY = GameSettings::instance().HOME_TO_GAME_DELAY0;
     if (tolerate_update_menu){
         pbf_press_button(context, BUTTON_HOME, 80ms, HOME_TO_GAME_DELAY);
-        pbf_press_dpad(context, DPAD_DOWN, 10, 10);
-        pbf_press_dpad(context, DPAD_UP, 10, 10);
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
+        pbf_press_dpad(context, DPAD_UP, 80ms, 80ms);
         pbf_press_button(context, BUTTON_A, 80ms, HOME_TO_GAME_DELAY);
     }else{
         pbf_press_button(context, BUTTON_HOME, 80ms, HOME_TO_GAME_DELAY);
@@ -32,8 +32,8 @@ void resume_game_back_out_old(ProControllerContext& context, bool tolerate_updat
     Milliseconds HOME_TO_GAME_DELAY = GameSettings::instance().HOME_TO_GAME_DELAY0;
     if (tolerate_update_menu){
         pbf_press_button(context, BUTTON_HOME, 80ms, HOME_TO_GAME_DELAY);
-        pbf_press_dpad(context, DPAD_DOWN, 10, 10);
-        pbf_press_dpad(context, DPAD_UP, 10, 10);
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
+        pbf_press_dpad(context, DPAD_UP, 80ms, 80ms);
         pbf_press_button(context, BUTTON_A, 80ms, HOME_TO_GAME_DELAY);
         pbf_mash_button(context, BUTTON_B, mash_B_time);
     }else{
