@@ -76,10 +76,10 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     env.update_stats();
 
     //  Connect the controller.
-    pbf_move_right_joystick(context, 0, 255, 80ms, 0ms);
+    pbf_move_right_joystick(context, {-1, -1}, 80ms, 0ms);
 
     //  Move to corner.
-    pbf_move_left_joystick(context, 0, 255, 125, 0);
+    pbf_move_left_joystick(context, {-1, -1}, 1000ms, 0ms);
 
     for (uint16_t c = 0; c < MAX_FETCH_ATTEMPTS; c++){
         env.update_stats();
@@ -89,14 +89,14 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         SHORTCUT.run(context, 800ms);
 
         //  Move to man.
-        pbf_move_left_joystick(context, 0, 255, 30, 0);
+        pbf_move_left_joystick(context, {-1, -1}, 240ms, 0ms);
         pbf_move_left_joystick(context, 128, 0, 35, 0);
         pbf_move_left_joystick(context, 255, 128, 60, 0);
 
         //  Fetch egg.
         pbf_mash_button(context, BUTTON_ZL, 600);
         pbf_mash_button(context, BUTTON_B, 520);
-        pbf_move_left_joystick(context, 0, 255, 125, 0);
+        pbf_move_left_joystick(context, {-1, -1}, 1000ms, 0ms);
         SHORTCUT.run(context, 800ms);
 
         stats.m_attempts++;

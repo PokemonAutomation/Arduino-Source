@@ -181,10 +181,10 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     env.update_stats();
 
     //  Connect the controller.
-    pbf_move_right_joystick(context, 0, 255, 80ms, 0ms);
+    pbf_move_right_joystick(context, {-1, -1}, 80ms, 0ms);
 
     //  Move to corner.
-    pbf_move_left_joystick(context, 0, 255, 1000ms, 0ms);
+    pbf_move_left_joystick(context, {-1, -1}, 1000ms, 0ms);
 
     EggAutonomousState current_state(
         env, env.console, context,

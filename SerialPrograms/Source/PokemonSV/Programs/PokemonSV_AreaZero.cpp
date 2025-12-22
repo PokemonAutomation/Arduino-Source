@@ -151,7 +151,7 @@ void inside_zero_gate_to_station(
                 if (heal_at_station){
                     pbf_move_left_joystick(context, 96, 255, 60000ms, 0ms);
                 }else{
-                    pbf_move_left_joystick(context, 0, 255, 60000ms, 0ms);
+                    pbf_move_left_joystick(context, {-1, -1}, 60000ms, 0ms);
                 }
             },
             {black_screen}
