@@ -140,7 +140,7 @@ void find_and_center_on_sky(
                 stream.log("Sky not detected. Attempting to find the sky...", COLOR_ORANGE);
                 session.dispatch([](ProControllerContext& context){
                     pbf_move_right_joystick(context, {0, +1}, 2000ms, 0ms);
-                    pbf_move_right_joystick(context, 0, 0, 10 * 1000ms, 0ms);
+                    pbf_move_right_joystick(context, {-1, +1}, 10 * 1000ms, 0ms);
                 });
                 state = OverworldState::FindingSky;
             }

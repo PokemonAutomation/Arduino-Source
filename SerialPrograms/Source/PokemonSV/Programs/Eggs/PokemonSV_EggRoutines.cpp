@@ -654,7 +654,7 @@ void hatch_eggs_at_zero_gate(
                         // At beginning, ride on Koraidon/Miradon and go off ramp:
                         pbf_press_button(context, BUTTON_PLUS, 400ms, 800ms);
                         // Move right to make player character facing away from Aera Zero observation station
-                        pbf_move_left_joystick(context, 255, 0, 400ms, 400ms);
+                        pbf_move_left_joystick(context, {+1, +1}, 400ms, 400ms);
                         // Press L to move camera to face the same direction as the player character
                         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
                         // Move forward
@@ -709,13 +709,13 @@ void hatch_eggs_at_area_three_lighthouse(
                         //Run forward a bit
                         pbf_move_left_joystick(context, 128, 0, 1200ms, 160ms);
                         //Face at an angle, to avoid the tent to the left
-                        pbf_move_left_joystick(context, 0, 0, 400ms, 400ms);
+                        pbf_move_left_joystick(context, {-1, +1}, 400ms, 400ms);
                         //Get on your mount
                         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
                         pbf_press_button(context, BUTTON_PLUS, 50, 100);
                         //Go in deep, spawns outside the fence like to come in otherwise
                         pbf_move_left_joystick(context, 128, 0, 6000ms, 0ms);
-                        pbf_move_left_joystick(context, 0, 0, 400ms, 400ms);
+                        pbf_move_left_joystick(context, {-1, +1}, 400ms, 400ms);
                         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
                         pbf_move_left_joystick(context, 128, 0, 4400ms, 0ms);
                     }

@@ -29,7 +29,7 @@ namespace PokemonLA{
 void goto_professor(Logger& logger, ProControllerContext& context, Camp camp){
     switch (camp){
     case Camp::FIELDLANDS_FIELDLANDS:
-        pbf_move_left_joystick(context, 255, 0, 1000ms, 0ms);
+        pbf_move_left_joystick(context, {+1, +1}, 1000ms, 0ms);
         return;
     case Camp::FIELDLANDS_HEIGHTS:
         pbf_move_left_joystick(context, 240, 0, 1600ms, 0ms);
@@ -53,7 +53,7 @@ void goto_professor(Logger& logger, ProControllerContext& context, Camp camp){
         pbf_move_left_joystick(context, 255, 32, 1000ms, 0ms);
         return;
     case Camp::HIGHLANDS_SUMMIT:
-        pbf_move_left_joystick(context, 255, 0, 1000ms, 0ms);
+        pbf_move_left_joystick(context, {+1, +1}, 1000ms, 0ms);
         return;
     case Camp::ICELANDS_SNOWFIELDS:
         pbf_move_left_joystick(context, 255, 56, 1000ms, 0ms);

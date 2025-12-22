@@ -61,9 +61,9 @@ void return_to_plaza(const ProgramInfo& info, VideoStream& stream, ProController
 
                 //Now move toward center
                 if (laggy){
-                    pbf_move_left_joystick(context, 255, 255, 300, 40); //overshoot by a bit (still works even if not laggy)
+                    pbf_move_left_joystick(context, {+1, -1}, 2400ms, 320ms); //overshoot by a bit (still works even if not laggy)
                 }else{
-                    pbf_move_left_joystick(context, 255, 255, 250, 40); //250 is more accurate but 300 helps with lag
+                    pbf_move_left_joystick(context, {+1, -1}, 2000ms, 320ms); //250 is more accurate but 300 helps with lag
                 }
                 pbf_press_button(context, BUTTON_ZR, 40, 100);
 

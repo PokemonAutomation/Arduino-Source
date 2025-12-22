@@ -110,7 +110,7 @@ void checkpoint_28(
                         pbf_move_left_joystick(context, {0, +1}, 10000ms, 800ms);
                     }, 
                     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                        pbf_move_left_joystick(context, 0, 0, 800ms, 160ms);
+                        pbf_move_left_joystick(context, {-1, +1}, 800ms, 160ms);
                     },
                     5, 3
                 );     

@@ -111,9 +111,9 @@ void checkpoint_55(
             direction.change_direction(env.program_info(), env.console, context, 3.909067);
             pbf_move_left_joystick(context, {0, +1}, 8000ms, 800ms);
 
-            direction.change_direction(env.program_info(), env.console, context, 5.061720);        
-            pbf_move_left_joystick(context, 128, 0, 500, 100);
-            pbf_move_left_joystick(context, 255, 0, 1600ms, 800ms);
+            direction.change_direction(env.program_info(), env.console, context, 5.061720);
+            pbf_move_left_joystick(context, 128, 0, 4000ms, 800ms);
+            pbf_move_left_joystick(context, {+1, +1}, 1600ms, 800ms);
 
             // now aligned to the wall next to the hole/passage
 
@@ -128,13 +128,13 @@ void checkpoint_55(
             // run at Orthworm. run into its second position as well.
             pbf_move_left_joystick(context, 128, 0, 400ms, 0ms);
             pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, {0, +1}, {0, 0}, 4000ms);
-            pbf_move_left_joystick(context, 255, 0, 300, 500);
+            pbf_move_left_joystick(context, {+1, +1}, 2400ms, 4000ms);
 
             get_off_ride(env.program_info(), env.console, context);
 
             direction.change_direction(env.program_info(), env.console, context, 0.261);
-            pbf_move_left_joystick(context, 128, 0, 500, 100);
-            pbf_move_left_joystick(context, 0, 0, 500, 100);
+            pbf_move_left_joystick(context, 128, 0, 4000ms, 800ms);
+            pbf_move_left_joystick(context, 0, 0, 4000ms, 800ms);
 
             // now aligned to corner.
 
@@ -147,7 +147,7 @@ void checkpoint_55(
             
             direction.change_direction(env.program_info(), env.console, context, 4.988);
             pbf_move_left_joystick(context, 128, 0, 800, 100);
-            pbf_move_left_joystick(context, 255, 0, 500, 100);
+            pbf_move_left_joystick(context, {+1, +1}, 4000ms, 800ms);
 
             // now aligned to the wall next to the hole/passage   
 
@@ -155,7 +155,7 @@ void checkpoint_55(
             pbf_move_left_joystick(context, {0, -1}, 800ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 5.722795);
-            pbf_move_left_joystick(context, 128, 0, 600, 100);
+            pbf_move_left_joystick(context, 128, 0, 4800ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 0.625226);
         });
@@ -177,21 +177,21 @@ void checkpoint_55(
             pbf_move_left_joystick(context, 128, 0, 900, 100);
 
             direction.change_direction(env.program_info(), env.console, context, 5.360763);
-            pbf_move_left_joystick(context, 128, 0, 500, 100);
+            pbf_move_left_joystick(context, 128, 0, 4000ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 5.85);
             pbf_move_left_joystick(context, 128, 0, 700, 100);
 
             direction.change_direction(env.program_info(), env.console, context, 5.428);
-            pbf_move_left_joystick(context, 128, 0, 600, 100);
+            pbf_move_left_joystick(context, 128, 0, 4800ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 4.908646);
             pbf_move_left_joystick(context, {0, +1}, 2400ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 1.169728);
             pbf_move_left_joystick(context, {0, +1}, 1600ms, 800ms);
-            pbf_move_left_joystick(context, 255, 0, 1600ms, 800ms);
-            pbf_move_left_joystick(context, 0, 0, 1600ms, 800ms);
+            pbf_move_left_joystick(context, {+1, +1}, 1600ms, 800ms);
+            pbf_move_left_joystick(context, {-1, +1}, 1600ms, 800ms);
 
             // now aligned to the wall next to the hole/passage   
 
@@ -327,7 +327,7 @@ void checkpoint_56(
                     128, 0, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 0, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, +1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );             

@@ -322,7 +322,7 @@ void checkpoint_40(
                     128, 0, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 0, 320ms, 400ms);
+                pbf_move_left_joystick(context, {-1, +1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );               
@@ -341,7 +341,7 @@ void checkpoint_40(
                     128, 0, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 0, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, +1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );             

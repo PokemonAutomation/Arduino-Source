@@ -547,7 +547,7 @@ void quest_make_tm(const ProgramInfo& info, VideoStream& stream, ProControllerCo
     PromptDialogWatcher makeTM(COLOR_RED);
     OverworldWatcher overworld(stream.logger(), COLOR_BLUE);
 
-    pbf_move_left_joystick(context, 255, 0, 800ms, 160ms);
+    pbf_move_left_joystick(context, {+1, +1}, 800ms, 160ms);
     pbf_press_button(context, BUTTON_L, 80ms, 400ms);
 
     int enter_machine = run_until<ProControllerContext>(
@@ -624,7 +624,7 @@ void quest_travel_500(const ProgramInfo& info, VideoStream& stream, ProControlle
     pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
     context.wait_for_all_requests();
 
-    pbf_move_left_joystick(context, 0, 0, 800ms, 160ms);
+    pbf_move_left_joystick(context, {-1, +1}, 800ms, 160ms);
     pbf_move_left_joystick(context, {0, +1}, 1200ms, 160ms);
     pbf_move_left_joystick(context, {-1, 0}, 1120ms, 160ms);
 
@@ -763,7 +763,7 @@ void quest_sneak_up(
 
             //Turn slightly for switch 1
             if (console.state().console_type() == ConsoleType::Switch1) {
-                pbf_move_left_joystick(context, 0, 0, 160ms, 400ms);
+                pbf_move_left_joystick(context, {-1, +1}, 160ms, 400ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 400ms);
             }
 

@@ -204,7 +204,7 @@ void checkpoint_51(
                 walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 0, 800ms, 400ms);   // move forward/left
+                pbf_move_left_joystick(context, {-1, +1}, 800ms, 400ms);   // move forward/left
             },
             5, 5
         );         
@@ -254,7 +254,7 @@ void checkpoint_52(
         env.console.log("Detected white triangle in top right. Assume we are in the Levincia Hide-and-Seek gym challenge.");
 
         // select Clavell 1
-        pbf_move_left_joystick(context, 255, 0, 2000ms, 480ms);
+        pbf_move_left_joystick(context, {+1, +1}, 2000ms, 480ms);
         pbf_move_left_joystick(context, 10, 255, 800ms, 800ms);
         pbf_mash_button(context, BUTTON_A, 1000ms);
 
@@ -295,7 +295,7 @@ void checkpoint_52(
         env.console.log("Detected white triangle in top right. Assume we are in the Levincia Hide-and-Seek gym challenge.");
 
         // select Clavell 2
-        pbf_move_left_joystick(context, 0, 0, 3000ms, 480ms);
+        pbf_move_left_joystick(context, {-1, +1}, 3000ms, 480ms);
         pbf_move_left_joystick(context, 255, 250, 800ms, 800ms);
         pbf_mash_button(context, BUTTON_A, 1000ms);
 
@@ -339,7 +339,7 @@ void checkpoint_52(
         env.console.log("Detected white triangle in top right. Assume we are in the Levincia Hide-and-Seek gym challenge.");
 
         // select Clavell 3
-        pbf_move_left_joystick(context, 255, 0, 2000ms, 480ms);       
+        pbf_move_left_joystick(context, {+1, +1}, 2000ms, 480ms);
         pbf_move_left_joystick(context, 85, 255, 80, 100); 
 
         mash_button_till_overworld(env.console, context, BUTTON_A);

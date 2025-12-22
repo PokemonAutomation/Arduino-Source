@@ -127,7 +127,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     128, 0, 40, 20, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         ); 
@@ -143,7 +143,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     128, 0, 40, 20, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         ); 
@@ -334,7 +334,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
                 128, 0, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
+            pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -352,7 +352,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
                 128, 0, 60, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
+            pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -370,7 +370,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
                 128, 0, 50, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+            pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -388,7 +388,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
                 128, 0, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+            pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -407,7 +407,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
                 128, 0, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+            pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -425,7 +425,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
                 128, 0, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+            pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );

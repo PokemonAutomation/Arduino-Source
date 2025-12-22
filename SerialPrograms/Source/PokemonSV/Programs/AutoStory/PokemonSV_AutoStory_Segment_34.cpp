@@ -100,7 +100,7 @@ void checkpoint_90(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     128, 0, 30, 30, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
@@ -195,7 +195,7 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     128, 0, 60, 60, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
@@ -222,7 +222,7 @@ void checkpoint_92(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // leave the inside of the lighthouse and go outside
         pbf_move_left_joystick(context, {0, -1}, 800ms, 400ms);
         pbf_move_left_joystick(context, {-1, 0}, 2400ms, 400ms);
-        pbf_move_left_joystick(context, 255, 255, 800ms, 400ms);
+        pbf_move_left_joystick(context, {+1, -1}, 800ms, 400ms);
 
         pbf_wait(context, 3000ms);
         // wait for overworld after building

@@ -137,9 +137,9 @@ void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 0, 800ms, 400ms); // if to the left of the door, will move right and enter
+                pbf_move_left_joystick(context, {+1, +1}, 800ms, 400ms); // if to the left of the door, will move right and enter
                 pbf_move_left_joystick(context, {-1, 0}, 2400ms, 400ms); // if to the right of the door, will move left
-                pbf_move_left_joystick(context, 255, 0, 800ms, 400ms); // then move right and enter
+                pbf_move_left_joystick(context, {+1, +1}, 800ms, 400ms); // then move right and enter
             }
         );
         
@@ -267,7 +267,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
                 128, 0, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+            pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -311,7 +311,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
                 128, 0, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){ // todo: get on ride?
-            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+            pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -330,7 +330,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
                 128, 0, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+            pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -348,7 +348,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
                 128, 0, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+            pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -367,7 +367,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
                 128, 0, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+            pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -385,7 +385,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
                 128, 0, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+            pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -403,7 +403,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
                 128, 0, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+            pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -421,7 +421,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
                 128, 0, 24, 8, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+            pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -439,7 +439,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
                 128, 0, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+            pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );

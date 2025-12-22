@@ -204,14 +204,14 @@ void checkpoint_33(
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, wait);
 
-                pbf_move_left_joystick(context, 128, 0, 500, 100);
+                pbf_move_left_joystick(context, 128, 0, 4000ms, 800ms);
                 direction.change_direction(env.program_info(), env.console, context, 5.39);
                 pbf_move_left_joystick(context, 128, 0, 10, 100);
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 5.076);
-                pbf_move_left_joystick(context, 128, 0, 500, 100);
+                pbf_move_left_joystick(context, 128, 0, 4000ms, 800ms);
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, wait);
 
@@ -221,7 +221,7 @@ void checkpoint_33(
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, wait);
 
-                pbf_move_left_joystick(context, 128, 0, 500, 100);
+                pbf_move_left_joystick(context, 128, 0, 4000ms, 800ms);
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, wait);
 
@@ -237,7 +237,7 @@ void checkpoint_33(
 
                 try {
                     direction.change_direction(env.program_info(), env.console, context, 0.541);
-                    pbf_move_left_joystick(context, 128, 0, 500, 100);
+                    pbf_move_left_joystick(context, 128, 0, 4000ms, 800ms);
                     pbf_press_button(context, BUTTON_R, 20, 20);
                     pbf_wait(context, wait);
 
@@ -252,7 +252,7 @@ void checkpoint_33(
                     pbf_wait(context, wait);
 
                     direction.change_direction(env.program_info(), env.console, context, 1.556);
-                    pbf_move_left_joystick(context, 128, 0, 500, 100);
+                    pbf_move_left_joystick(context, 128, 0, 4000ms, 800ms);
                     pbf_press_button(context, BUTTON_R, 20, 20);
                     pbf_wait(context, wait);
                     

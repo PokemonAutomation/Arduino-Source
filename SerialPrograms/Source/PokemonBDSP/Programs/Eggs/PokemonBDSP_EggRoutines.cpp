@@ -17,11 +17,11 @@ namespace PokemonBDSP{
 
 void egg_spin(ProControllerContext& context, Milliseconds duration){
     for (Milliseconds c = 0ms; c < duration; c += 42*8ms){
-        pbf_move_left_joystick(context, 0, 0, 40ms, 0ms);
+        pbf_move_left_joystick(context, {-1, +1}, 40ms, 0ms);
         pbf_move_left_joystick(context, {0, +1}, 40ms, 0ms);
-        pbf_move_left_joystick(context, 255, 0, 40ms, 0ms);
+        pbf_move_left_joystick(context, {+1, +1}, 40ms, 0ms);
         pbf_move_left_joystick(context, {+1, 0}, 40ms, 0ms);
-        pbf_move_left_joystick(context, 255, 255, 40ms, 0ms);
+        pbf_move_left_joystick(context, {+1, -1}, 40ms, 0ms);
         pbf_move_left_joystick(context, {0, -1}, 40ms, 0ms);
         pbf_move_left_joystick(context, {-1, -1}, 48ms, 0ms);
         pbf_move_left_joystick(context, {-1, 0}, 48ms, 0ms);
@@ -30,11 +30,11 @@ void egg_spin(ProControllerContext& context, Milliseconds duration){
 void egg_spin_with_A(ProControllerContext& context, Milliseconds duration){
     for (Milliseconds c = 0ms; c < duration; c += 42*8ms){
         ssf_press_button(context, BUTTON_ZL, 0ms, 80ms);
-        pbf_move_left_joystick(context, 0, 0, 40ms, 0ms);
+        pbf_move_left_joystick(context, {-1, +1}, 40ms, 0ms);
         pbf_move_left_joystick(context, {0, +1}, 40ms, 0ms);
-        pbf_move_left_joystick(context, 255, 0, 40ms, 0ms);
+        pbf_move_left_joystick(context, {+1, +1}, 40ms, 0ms);
         pbf_move_left_joystick(context, {+1, 0}, 40ms, 0ms);
-        pbf_move_left_joystick(context, 255, 255, 40ms, 0ms);
+        pbf_move_left_joystick(context, {+1, -1}, 40ms, 0ms);
         pbf_move_left_joystick(context, {0, -1}, 40ms, 0ms);
         pbf_move_left_joystick(context, {-1, -1}, 48ms, 0ms);
         pbf_move_left_joystick(context, {-1, 0}, 48ms, 0ms);

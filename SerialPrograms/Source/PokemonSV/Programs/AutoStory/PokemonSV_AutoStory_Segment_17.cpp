@@ -169,8 +169,8 @@ void checkpoint_38(
                 walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 18);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 0, 800ms, 400ms);
-                pbf_move_left_joystick(context, 0, 0, 800ms, 400ms);
+                pbf_move_left_joystick(context, {+1, +1}, 800ms, 400ms);
+                pbf_move_left_joystick(context, {-1, +1}, 800ms, 400ms);
             }
         );         
         // talk to Nemona

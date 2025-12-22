@@ -94,7 +94,7 @@ void checkpoint_29(
                     128, 0, 30, 15, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );            
@@ -113,7 +113,7 @@ void checkpoint_29(
                     128, 0, 24, 12, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );         
@@ -133,7 +133,7 @@ void checkpoint_29(
                     128, 0, 36, 12, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );  
@@ -152,7 +152,7 @@ void checkpoint_29(
                     128, 0, 45, 15, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );  
@@ -172,7 +172,7 @@ void checkpoint_29(
                     128, 0, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );  
@@ -192,7 +192,7 @@ void checkpoint_29(
                     128, 0, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );            
@@ -212,7 +212,7 @@ void checkpoint_29(
                     128, 0, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
@@ -239,7 +239,7 @@ void checkpoint_29(
                     128, 0, 36, 12, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );        
@@ -342,7 +342,7 @@ void checkpoint_29(
                     128, 0, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
@@ -363,7 +363,7 @@ void checkpoint_29(
                     128, 0, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );       
@@ -383,7 +383,7 @@ void checkpoint_29(
                     128, 0, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );       
@@ -403,7 +403,7 @@ void checkpoint_29(
                     128, 0, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );    
@@ -425,7 +425,7 @@ void checkpoint_29(
                     128, 0, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );   

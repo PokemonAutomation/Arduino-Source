@@ -129,7 +129,7 @@ CameraAngle quest_photo_navi(
 
             //Turn slightly for switch 1
             if (console.state().console_type() == ConsoleType::Switch1) {
-                pbf_move_left_joystick(context, 0, 0, 160ms, 400ms);
+                pbf_move_left_joystick(context, {-1, +1}, 160ms, 400ms);
             }
 
             break;
@@ -161,7 +161,7 @@ CameraAngle quest_photo_navi(
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
 
-            pbf_move_left_joystick(context, 255, 0, 80ms, 160ms);
+            pbf_move_left_joystick(context, {+1, +1}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
             angle = CameraAngle::down;
@@ -173,7 +173,7 @@ CameraAngle quest_photo_navi(
             open_map_from_overworld(info, console, context);
             fly_to_overworld_from_map(info, console, context);
 
-            pbf_move_left_joystick(context, 0, 0, 80ms, 160ms);
+            pbf_move_left_joystick(context, {-1, +1}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1100, 1700, 200);
@@ -189,7 +189,7 @@ CameraAngle quest_photo_navi(
             //Vullaby/Mandibuzz
             central_to_savanna_plaza(info, console, context);
 
-            pbf_move_left_joystick(context, 255, 0, 80ms, 160ms);
+            pbf_move_left_joystick(context, {+1, +1}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             pbf_move_left_joystick(context, 128, 0, 4400ms, 160ms);
@@ -207,7 +207,7 @@ CameraAngle quest_photo_navi(
             //Electabuzz
             central_to_canyon_rest(info, console, context);
 
-            pbf_move_left_joystick(context, 255, 255, 80ms, 160ms);
+            pbf_move_left_joystick(context, {+1, -1}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
             pbf_move_left_joystick(context, 128, 0, 3200ms, 160ms);
 
@@ -406,7 +406,7 @@ void quest_catch_navi(
 
             //Turn slightly for switch 1
             if (console.state().console_type() == ConsoleType::Switch1) {
-                pbf_move_left_joystick(context, 0, 0, 160ms, 400ms);
+                pbf_move_left_joystick(context, {-1, +1}, 160ms, 400ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 400ms);
             }
 
@@ -463,7 +463,7 @@ void quest_catch_navi(
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            pbf_move_left_joystick(context, 0, 0, 80ms, 160ms);
+            pbf_move_left_joystick(context, {-1, +1}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
             pbf_move_left_joystick(context, {0, +1}, 400ms, 160ms);
 
@@ -483,7 +483,7 @@ void quest_catch_navi(
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
 
-            pbf_move_left_joystick(context, 255, 0, 80ms, 160ms);
+            pbf_move_left_joystick(context, {+1, +1}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
             break;
@@ -523,7 +523,7 @@ void quest_catch_navi(
             pbf_move_left_joystick(context, 128, 0, 500, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            pbf_move_left_joystick(context, 255, 0, 80ms, 160ms);
+            pbf_move_left_joystick(context, {+1, +1}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
             if (console.state().console_type() == ConsoleType::Switch1) {
@@ -534,7 +534,7 @@ void quest_catch_navi(
 
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
-            pbf_move_left_joystick(context, 0, 0, 80ms, 160ms);
+            pbf_move_left_joystick(context, {-1, +1}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
             if (console.state().console_type() == ConsoleType::Switch1) {
