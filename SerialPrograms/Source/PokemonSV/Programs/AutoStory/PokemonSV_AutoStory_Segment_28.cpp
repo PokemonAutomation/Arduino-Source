@@ -111,8 +111,8 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         DirectionDetector direction;
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 50});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 50});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 400ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 400ms});
         }
 
         direction.change_direction(env.program_info(), env.console, context, 0.696613);
@@ -305,11 +305,11 @@ void checkpoint_70(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     [&](size_t attempt_number){
         context.wait_for_all_requests();
         // fly back to North Province Area Three
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0}, FlyPoint::POKECENTER);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, FlyPoint::POKECENTER);
 
         // fly back to Glaseado Mountain Pokecenter
         // this clears Pokemon in minimap
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, 0, 0}, FlyPoint::POKECENTER);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, 0, 0ms}, FlyPoint::POKECENTER);
 
         move_from_glaseado_mountain_to_montenevera(env, context);
 
@@ -323,7 +323,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
 
     // marker 1         {0.745313, 0.637037}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.745313, 0.637037}
     );
@@ -341,7 +341,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
     
     // marker 2       x=0.225521, y=0.380556. {0.229687, 0.37037}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 255, 0, 50}, 
+        {ZoomChange::KEEP_ZOOM, 255, 0, 400ms},
         FlyPoint::POKECENTER, 
         {0.229687, 0.37037}
     );
@@ -359,7 +359,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
 
     // marker 3       x=0.396354, y=0.69537.  x=0.396875, y=0.725926
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 255, 200, 50}, 
+        {ZoomChange::KEEP_ZOOM, 255, 200, 400ms},
         FlyPoint::POKECENTER, 
         {0.396875, 0.725926}
     );
@@ -377,7 +377,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
 
     // marker 4       (0.409896, 0.65)
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.409896, 0.65}
     );
@@ -396,7 +396,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
     
     // marker 5        {0.509896, 0.639815}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.509896, 0.639815}
     );
@@ -414,7 +414,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
 
     // marker 6         {0.508333, 0.566667}   {0.521875, 0.483333}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_IN, 128, 255, 20}, 
+        {ZoomChange::ZOOM_IN, 128, 255, 160ms},
         FlyPoint::POKECENTER, 
         {0.508333, 0.566667}
     );
@@ -432,7 +432,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
 
     // marker 7         {0.508333, 0.566667}   {0.521875, 0.483333}  {0.529687, 0.483333}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_IN, 0, 0, 0}, 
+        {ZoomChange::ZOOM_IN, 0, 0, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.529687, 0.483333}
     );

@@ -115,8 +115,8 @@ void checkpoint_43(
         DirectionDetector direction;
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 30});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 240ms});
         }
 
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
@@ -146,7 +146,13 @@ void checkpoint_43(
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
+                walk_forward_until_dialog(
+                    env.program_info(),
+                    env.console,
+                    context,
+                    NavigationMovementMode::DIRECTIONAL_ONLY,
+                    20000ms
+                );
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, 0, 0, 100, 50);
@@ -179,7 +185,13 @@ void checkpoint_44(
 
         // talk to receptionist
         env.console.log("Talk to Artazon gym receptionist.");
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
+        walk_forward_until_dialog(
+            env.program_info(),
+            env.console,
+            context,
+            NavigationMovementMode::DIRECTIONAL_SPAM_A,
+            10000ms
+        );
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
         pbf_move_left_joystick(context, 128, 255, 300, 100);
@@ -190,7 +202,13 @@ void checkpoint_44(
         // talk to Sunflora NPC
         DirectionDetector direction;
         direction.change_direction(env.program_info(), env.console, context, 4.91);
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
+        walk_forward_until_dialog(
+            env.program_info(),
+            env.console,
+            context,
+            NavigationMovementMode::DIRECTIONAL_SPAM_A,
+            10000ms
+        );
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG});
 
         // realign to wall
@@ -521,7 +539,13 @@ void checkpoint_45(
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
+                walk_forward_until_dialog(
+                    env.program_info(),
+                    env.console,
+                    context,
+                    NavigationMovementMode::DIRECTIONAL_SPAM_A,
+                    20000ms
+                );
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, 0, 0, 100, 50);
@@ -561,13 +585,13 @@ void checkpoint_46(
         // At this startpoint, no Pokemon show up on minimap/map
 
         // fly to Artazon east pokecenter
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 255, 128, 50});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 255, 128, 400ms});
 
         // section 1. set marker to pokecenter
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 0, 50},
-            {ZoomChange::ZOOM_IN, 0, 0, 0}
+            {ZoomChange::KEEP_ZOOM, 255, 0, 400ms},
+            {ZoomChange::ZOOM_IN, 0, 0, 0ms}
         );        
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 

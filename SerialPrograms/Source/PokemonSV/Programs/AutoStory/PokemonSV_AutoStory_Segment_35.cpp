@@ -90,11 +90,20 @@ void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     [&](size_t attempt_number){
         // fly to Medali West from Los Platos Pokecenter
         // this clears Pokemon in minimap
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 95, 0, 170}, FlyPoint::POKECENTER);
+        move_cursor_towards_flypoint_and_go_there(
+            env.program_info(),
+            env.console,
+            context,
+            {ZoomChange::ZOOM_OUT, 95, 0, 1360ms},
+            FlyPoint::POKECENTER
+        );
 
         // marker 1     {0.580729, 0.286111}
-        place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        place_marker_offset_from_flypoint(
+            env.program_info(),
+            env.console,
+            context,
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms},
             FlyPoint::POKECENTER, 
             {0.580729, 0.286111}
         );
@@ -111,8 +120,11 @@ void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         );
 
         // marker 2    {0.475, 0.4}
-        place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        place_marker_offset_from_flypoint(
+            env.program_info(),
+            env.console,
+            context,
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms},
             FlyPoint::POKECENTER, 
             {0.475, 0.4}
         );
@@ -129,8 +141,9 @@ void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         );
 
         // marker 3    {0.473958, 0.260185}      {0.479687, 0.250926}
-        place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 255, 30}, 
+        place_marker_offset_from_flypoint(
+            env.program_info(), env.console, context,
+            {ZoomChange::KEEP_ZOOM, 0, 255, 240ms},
             FlyPoint::POKECENTER, 
             {0.479687, 0.250926}
         );
@@ -147,8 +160,9 @@ void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         );
 
         // marker 4     {0.425, 0.289815}
-        place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        place_marker_offset_from_flypoint(
+            env.program_info(), env.console, context,
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms},
             FlyPoint::POKECENTER, 
             {0.425, 0.289815}
         );
@@ -165,8 +179,9 @@ void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         );
 
         // marker 5     {0.465104, 0.292593}
-        place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 0, 20}, 
+        place_marker_offset_from_flypoint(
+            env.program_info(), env.console, context,
+            {ZoomChange::KEEP_ZOOM, 255, 0, 160ms},
             FlyPoint::POKECENTER, 
             {0.465104, 0.292593}
         );
@@ -183,8 +198,9 @@ void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         );
 
         // marker 6     {0.439583, 0.274074}
-        place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_OUT, 255, 255, 20}, 
+        place_marker_offset_from_flypoint(
+            env.program_info(), env.console, context,
+            {ZoomChange::ZOOM_OUT, 255, 255, 160ms},
             FlyPoint::POKECENTER, 
             {0.439583, 0.274074}
         );
@@ -206,7 +222,13 @@ void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         mash_button_till_overworld(env.console, context, BUTTON_A);
         // clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 120, {CallbackEnum::OVERWORLD, CallbackEnum::BLACK_DIALOG_BOX, CallbackEnum::PROMPT_DIALOG});
 
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
+        walk_forward_until_dialog(
+            env.program_info(),
+            env.console,
+            context,
+            NavigationMovementMode::DIRECTIONAL_ONLY,
+            30000ms
+        );
         mash_button_till_overworld(env.console, context, BUTTON_A); // prompt, black dialog. random A press
 
     }); 
@@ -618,11 +640,23 @@ void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         
 
         // enter Station 1
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
+        walk_forward_until_dialog(
+            env.program_info(),
+            env.console,
+            context,
+            NavigationMovementMode::DIRECTIONAL_ONLY,
+            20000ms
+        );
         mash_button_till_overworld(env.console, context, BUTTON_A);  // black dialog
 
         // disable Lock at Station 1
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
+        walk_forward_until_dialog(
+            env.program_info(),
+            env.console,
+            context,
+            NavigationMovementMode::DIRECTIONAL_SPAM_A,
+            20000ms
+        );
         mash_button_till_overworld(env.console, context, BUTTON_A);     // prompt, black dialog, 
         
         

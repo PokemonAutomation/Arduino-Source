@@ -326,8 +326,8 @@ void place_marker_offset_from_flypoint(
             }
             uint8_t move_x1 = move_cursor_near_flypoint.move_x;
             uint8_t move_y1 = move_cursor_near_flypoint.move_y;
-            uint16_t move_duration1 = move_cursor_near_flypoint.move_duration;
-            pbf_move_left_joystick(context, move_x1, move_y1, move_duration1, 1 * TICKS_PER_SECOND);
+            Milliseconds move_duration1 = move_cursor_near_flypoint.move_duration;
+            pbf_move_left_joystick(context, move_x1, move_y1, move_duration1, 1000ms);
 
             move_cursor_to_position_offset_from_flypoint(info, stream, context, fly_point, {marker_offset.x, marker_offset.y});
 
@@ -655,21 +655,21 @@ void walk_forward_until_dialog(
     VideoStream& stream,
     ProControllerContext& context,
     NavigationMovementMode movement_mode,
-    uint16_t seconds_timeout,
+    Milliseconds timeout,
     uint8_t x,
     uint8_t y
 ){
 
-    DialogBoxWatcher        dialog(COLOR_RED, true);
+    DialogBoxWatcher dialog(COLOR_RED, true);
     context.wait_for_all_requests();
     int ret = run_until<ProControllerContext>(
         stream, context,
         [&](ProControllerContext& context){
-            ssf_press_left_joystick(context, x, y, 0, seconds_timeout * TICKS_PER_SECOND);
+            ssf_press_left_joystick(context, x, y, 0ms, timeout);
             if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
-                pbf_wait(context, seconds_timeout * TICKS_PER_SECOND);
+                pbf_wait(context, timeout);
             } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
-                pbf_mash_button(context, BUTTON_A, seconds_timeout * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_A, timeout);
                 // for (size_t j = 0; j < seconds_timeout; j++){
                 //     pbf_press_button(context, BUTTON_A, 20, 105);
                 // }

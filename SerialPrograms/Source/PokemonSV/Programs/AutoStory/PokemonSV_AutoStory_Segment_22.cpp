@@ -113,8 +113,8 @@ void checkpoint_50(
         DirectionDetector direction;
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 255, 70});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 80, 80});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 255, 560ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 80, 640ms});
         }
 
         direction.change_direction(env.program_info(), env.console, context, 0);
@@ -138,8 +138,8 @@ void checkpoint_50(
         // marker 2
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 50, 50},
-            {ZoomChange::ZOOM_IN, 0, 100, 60}
+            {ZoomChange::KEEP_ZOOM, 255, 50, 400ms},
+            {ZoomChange::ZOOM_IN, 0, 100, 480ms}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -158,8 +158,8 @@ void checkpoint_50(
         // marker 3
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 128, 20},
-            {ZoomChange::ZOOM_IN, 0, 0, 0}
+            {ZoomChange::KEEP_ZOOM, 255, 128, 160ms},
+            {ZoomChange::ZOOM_IN, 0, 0, 0ms}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -201,7 +201,7 @@ void checkpoint_51(
         
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 160ms);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, 0, 0, 100, 50);   // move forward/left
@@ -227,13 +227,13 @@ void checkpoint_52(
     [&](size_t attempt_number){
         // talk to receptionist
         env.console.log("Talk to Levincia gym receptionist.");
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});    
         
         pbf_move_left_joystick(context, 128, 255, 300, 100);
         pbf_wait(context, 3000ms);
         // wait for dialog after leaving gym
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20, 128, 255);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20000ms, 128, 255);
         
         WhiteTriangleWatcher white_triangle(COLOR_RED, ImageFloatBox(0.948773, 0.034156, 0.013874, 0.024668));
         // mash A until detect top right white triangle 1
@@ -367,7 +367,7 @@ void checkpoint_53(
         pbf_wait(context, 3000ms);
 
         // talk to Gym receptionist
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30000ms);
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
         env.console.log("Battle Electric Gym leader.");
@@ -381,7 +381,7 @@ void checkpoint_53(
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
         // fly to Levincia (North) Pokecenter
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 100, 0, 50});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 100, 0, 400ms});
 
     });
 

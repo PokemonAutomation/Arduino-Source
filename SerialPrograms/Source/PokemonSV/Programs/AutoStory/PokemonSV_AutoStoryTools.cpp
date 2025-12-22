@@ -1207,8 +1207,8 @@ void realign_player_from_landmark(
             }
             uint8_t move_x1 = move_cursor_near_landmark.move_x;
             uint8_t move_y1 = move_cursor_near_landmark.move_y;
-            uint16_t move_duration1 = move_cursor_near_landmark.move_duration;
-            pbf_move_left_joystick(context, move_x1, move_y1, move_duration1, 1 * TICKS_PER_SECOND);
+            Milliseconds move_duration1 = move_cursor_near_landmark.move_duration;
+            pbf_move_left_joystick(context, move_x1, move_y1, move_duration1, 1000ms);
 
             // move cursor to pokecenter
             double push_scale = 0.29 * adjustment_table[try_count];
@@ -1243,8 +1243,8 @@ void realign_player_from_landmark(
             }
             uint8_t move_x2 = move_cursor_to_target.move_x;
             uint8_t move_y2 = move_cursor_to_target.move_y;
-            uint16_t move_duration2 = move_cursor_to_target.move_duration;
-            pbf_move_left_joystick(context, move_x2, move_y2, move_duration2, 1 * TICKS_PER_SECOND);
+            Milliseconds move_duration2 = move_cursor_to_target.move_duration;
+            pbf_move_left_joystick(context, move_x2, move_y2, move_duration2, 1000ms);
 
             // place down marker
             pbf_press_button(context, BUTTON_A, 20, 105);
@@ -1337,8 +1337,8 @@ void move_cursor_towards_flypoint_and_go_there(
             }
             uint8_t move_x1 = move_cursor_near_flypoint.move_x;
             uint8_t move_y1 = move_cursor_near_flypoint.move_y;
-            uint16_t move_duration1 = move_cursor_near_flypoint.move_duration;
-            pbf_move_left_joystick(context, move_x1, move_y1, move_duration1, 1 * TICKS_PER_SECOND);
+            Milliseconds move_duration1 = move_cursor_near_flypoint.move_duration;
+            pbf_move_left_joystick(context, move_x1, move_y1, move_duration1, 1000ms);
 
             double push_scale = 0.29 * adjustment_table[try_count];
             if (!fly_to_visible_closest_flypoint_cur_zoom_level(info, stream, context, fly_point, push_scale)){

@@ -105,7 +105,13 @@ void checkpoint_13(
             context.wait_for_all_requests();
             realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 80, 50);
             walk_forward_while_clear_front_path(info, env.console, context, 500);
-            walk_forward_until_dialog(info, env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
+            walk_forward_until_dialog(
+                info,
+                env.console,
+                context,
+                NavigationMovementMode::DIRECTIONAL_ONLY,
+                30000ms
+            );
         });
 
         env.console.log("clear_dialog: Talk with Nemona at Mesagoza gate. Stop when detect battle.");
@@ -151,7 +157,13 @@ void checkpoint_14(
         // realign going straight
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 100);
         // walk forward until hit dialog at top of stairs
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
+        walk_forward_until_dialog(
+            env.program_info(),
+            env.console,
+            context,
+            NavigationMovementMode::DIRECTIONAL_ONLY,
+            60000ms
+        );
         // clear dialog until battle. with prompt, battle
         env.console.log("clear_dialog: Talk with Team Star at the top of the stairs. Stop when detect battle.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
@@ -194,7 +206,13 @@ void checkpoint_15(
         // realign going straight
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         // walk forward until hit dialog inside the school
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
+        walk_forward_until_dialog(
+            env.program_info(),
+            env.console,
+            context,
+            NavigationMovementMode::DIRECTIONAL_ONLY,
+            60000ms
+        );
 
         env.console.log("clear_dialog: Talk with Nemona, Clavell, and Jacq inside the school. Stop when detect overworld.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
