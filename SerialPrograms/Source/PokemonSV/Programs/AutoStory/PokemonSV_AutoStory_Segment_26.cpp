@@ -136,7 +136,7 @@ void checkpoint_61(
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20000ms);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
                 pbf_move_left_joystick(context, 255, 0, 800ms, 400ms); // if to the left of the door, will move right and enter
@@ -149,7 +149,7 @@ void checkpoint_61(
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         // speak to gym receptionist
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20000ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
     });    

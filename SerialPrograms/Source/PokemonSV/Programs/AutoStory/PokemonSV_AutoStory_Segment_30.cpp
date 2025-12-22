@@ -131,7 +131,7 @@ void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
             handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
                 [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                    walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
+                    walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30000ms);
                 }, 
                 [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
                     pbf_move_left_joystick(context, 0, 0, 150, 50); // move left
@@ -148,7 +148,7 @@ void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         // speak to gym receptionist
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20000ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
 
@@ -190,7 +190,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             direction.change_direction(env.program_info(), env.console, context, 2.513925);
 
             // talk to 
-            walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
+            walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30000ms);
 
         });
 
@@ -257,7 +257,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
             handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
                 [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                    walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
+                    walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30000ms);
                 }, 
                 [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
                     pbf_move_left_joystick(context, 0, 0, 150, 50); // move left

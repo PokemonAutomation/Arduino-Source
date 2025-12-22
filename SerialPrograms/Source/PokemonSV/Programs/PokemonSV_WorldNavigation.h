@@ -138,7 +138,7 @@ void walk_forward_until_dialog(
     VideoStream& stream,
     ProControllerContext& context,
     NavigationMovementMode movement_mode,
-    uint16_t seconds_timeout = 10,
+    Milliseconds timeout = Milliseconds(10000),
     uint8_t x = 128,
     uint8_t y = 0
 );

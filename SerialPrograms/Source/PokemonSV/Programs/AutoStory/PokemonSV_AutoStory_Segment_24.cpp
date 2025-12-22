@@ -160,7 +160,7 @@ void checkpoint_55(
             direction.change_direction(env.program_info(), env.console, context, 0.625226);
         });
 
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30000ms);
 
         confirm_titan_battle(env, context);
         env.console.log("Battle Orthworm Titan phase 1.");
@@ -216,7 +216,7 @@ void checkpoint_55(
             pbf_move_left_joystick(context, 128, 0, 2651ms, 0ms);
         });
 
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30000ms);
 
         // battle the titan phase 2
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE});  

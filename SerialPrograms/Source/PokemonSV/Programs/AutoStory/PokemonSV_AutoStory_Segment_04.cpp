@@ -92,7 +92,7 @@ void checkpoint_08(
         context.wait_for_all_requests();
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {});
         env.console.log("Go to Legendary pokemon laying on the beach.");
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30000ms);
 
         env.console.log("clear_dialog: Offer Miraidon/Koraidon a sandwich.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {});
@@ -139,7 +139,7 @@ void checkpoint_08(
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 150, 20, 20);
                 pbf_move_left_joystick(context, 128, 0, 1000, 50);
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 160, 20, 20);
-                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 128, 0);                
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms, 128, 0);                
             }
         );  
 
@@ -190,7 +190,7 @@ void checkpoint_08(
         );
         
         env.console.log("overworld_navigation: Go to Houndoom.");
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 128, 0);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms, 128, 0);
         
         mash_button_till_overworld(env.console, context, BUTTON_A);
 

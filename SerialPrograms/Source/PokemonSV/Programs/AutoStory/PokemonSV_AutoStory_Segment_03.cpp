@@ -92,7 +92,7 @@ void checkpoint_05(
         direction.change_direction(env.program_info(), env.console, context, 1.92);
         pbf_move_left_joystick(context, 128, 0, 7000ms, 400ms);
         direction.change_direction(env.program_info(), env.console, context, 1.13);
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20000ms);
         
         context.wait_for_all_requests();
         env.console.log("Get mom's sandwich");

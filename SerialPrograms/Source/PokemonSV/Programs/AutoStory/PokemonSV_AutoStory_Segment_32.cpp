@@ -142,9 +142,9 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         direction.change_direction(env.program_info(), env.console, context, 0.225386); //  0.225386
 
-        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
-            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context,
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30000ms);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
                 pbf_move_left_joystick(context, 0, 0, 300, 50); // move left
@@ -156,7 +156,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // speak to Nemona
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30000ms);
         
         // speak to receptionist
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
@@ -173,7 +173,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         direction.change_direction(env.program_info(), env.console, context, 5.516255);
 
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30000ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
 
         //mash past other dialog
@@ -223,7 +223,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30000ms);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
                 pbf_move_left_joystick(context, 0, 0, 300, 50); // move left

@@ -206,7 +206,7 @@ void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         mash_button_till_overworld(env.console, context, BUTTON_A);
         // clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 120, {CallbackEnum::OVERWORLD, CallbackEnum::BLACK_DIALOG_BOX, CallbackEnum::PROMPT_DIALOG});
 
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30000ms);
         mash_button_till_overworld(env.console, context, BUTTON_A); // prompt, black dialog. random A press
 
     }); 
@@ -618,11 +618,11 @@ void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         
 
         // enter Station 1
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20000ms);
         mash_button_till_overworld(env.console, context, BUTTON_A);  // black dialog
 
         // disable Lock at Station 1
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20000ms);
         mash_button_till_overworld(env.console, context, BUTTON_A);     // prompt, black dialog, 
         
         
