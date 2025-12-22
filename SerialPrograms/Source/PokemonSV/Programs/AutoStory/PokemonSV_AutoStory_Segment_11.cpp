@@ -359,8 +359,8 @@ void checkpoint_26(
 
                 if (e.m_fail_reason == OliveFail::OLIVE_STUCK){  // olive possibly stuck on fence
                     pbf_move_left_joystick(context, 128, 255, 20, 50);
-                    pbf_move_left_joystick(context, 0, 128, 100, 50);
-                    pbf_move_left_joystick(context, 128, 0, 200, 50);
+                    pbf_move_left_joystick(context, {-1, 0}, 800ms, 400ms);
+                    pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
                     // push olive parallel to fence
                     green.align_to_olive(env.program_info(), env.console, context, 4.28, 20);
                     green.walk_up_to_olive(env.program_info(), env.console, context, 4.28);

@@ -127,8 +127,8 @@ void checkpoint_50(
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
                     128, 0, 60, 20, false);
             }, 
-            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                pbf_move_left_joystick(context, 0, 128, 128, 255);
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 1024ms, 2040ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );

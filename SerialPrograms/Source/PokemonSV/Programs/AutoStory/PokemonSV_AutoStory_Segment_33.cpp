@@ -239,7 +239,7 @@ void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         do_action_and_monitor_for_overworld(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             // move left to sit down
-            pbf_move_left_joystick(context, 0, 128, 100, 50);
+            pbf_move_left_joystick(context, {-1, 0}, 800ms, 400ms);
 
             // talk to Rika 1. Choose first option. Walked here.
             clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
@@ -329,9 +329,9 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // standing in front of Rika
         // now done talking to Rika. walk around Rika's desk.
 
-        pbf_move_left_joystick(context, 0, 128, 50, 50); // go left
-        pbf_move_left_joystick(context, 128, 0, 200, 50); // straight
-        pbf_move_left_joystick(context, 255, 128, 50, 50); // right
+        pbf_move_left_joystick(context, {-1, 0}, 400ms, 400ms); // go left
+        pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms); // straight
+        pbf_move_left_joystick(context, 255, 128, 400ms, 400ms); // right
         
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});

@@ -207,7 +207,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 pbf_move_left_joystick(context, 0, 0, 2861ms, 0ms);
                 pbf_move_left_joystick(context, 128, 0, 309ms, 0ms);
                 pbf_wait(context, 6431ms);
-                pbf_move_left_joystick(context, 0, 128, 5081ms, 0ms);
+                pbf_move_left_joystick(context, {-1, 0}, 5081ms, 0ms);
                 pbf_wait(context, 239ms);
                 pbf_move_left_joystick(context, 128, 255, 961ms, 0ms);
                 pbf_wait(context, 1615ms);

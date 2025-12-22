@@ -747,7 +747,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 51ms);
         pbf_move_left_joystick(context, 128, 0, 5002ms, 0ms);
         pbf_wait(context, 1551ms);
-        pbf_move_left_joystick(context, 0, 128, 2167ms, 0ms);
+        pbf_move_left_joystick(context, {-1, 0}, 2167ms, 0ms);
         pbf_wait(context, 745ms);
         
     });

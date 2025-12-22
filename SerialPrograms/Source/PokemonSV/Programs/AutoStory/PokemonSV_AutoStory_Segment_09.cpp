@@ -114,7 +114,7 @@ void checkpoint_16(
         context.wait_for_all_requests();
 
         // walk left
-        pbf_move_left_joystick(context, 0, 128, 400, 100);
+        pbf_move_left_joystick(context, {-1, 0}, 3200ms, 800ms);
         // walk down to classroom exit.
         pbf_move_left_joystick(context, 128, 255, 300, 100);
         env.console.log("clear_dialog: Leave classroom.");
@@ -131,7 +131,7 @@ void checkpoint_16(
         // walk forward
         pbf_move_left_joystick(context, 128, 0, 600, 100);
         // turn left 
-        pbf_move_left_joystick(context, 0, 128, 20, 100);
+        pbf_move_left_joystick(context, {-1, 0}, 160ms, 800ms);
 
         // talk to Arven. stop at overworld. need prompt, overworld, white button A. and book?
         env.console.log("Talk with Arven. Receive Titan questline (Path of Legends).");
@@ -202,7 +202,7 @@ void checkpoint_18(
         // walk down
         pbf_move_left_joystick(context, 128, 255, 200, 100);
         // walk left towards door
-        pbf_move_left_joystick(context, 0, 128, 100, 100);
+        pbf_move_left_joystick(context, {-1, 0}, 800ms, 800ms);
 
         // wait for school navigation menu
         context.wait_for_all_requests();
@@ -246,7 +246,7 @@ void checkpoint_19(
         // walk forward
         pbf_move_left_joystick(context, 128, 0, 100, 100);
         // walk left towards bed
-        pbf_move_left_joystick(context, 0, 128, 100, 100);
+        pbf_move_left_joystick(context, {-1, 0}, 800ms, 800ms);
 
         env.console.log("Go to bed. Time passes until treasure hunt.");
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);

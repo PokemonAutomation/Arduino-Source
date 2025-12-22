@@ -198,7 +198,7 @@ void checkpoint_03(
         DirectionDetector direction;
         direction.change_direction(env.program_info(), env.console, context, 4.62);
         pbf_move_left_joystick(context, 128, 0, 3600, 50);
-        pbf_move_left_joystick(context, 0, 128, 30, 50);
+        pbf_move_left_joystick(context, {-1, 0}, 240ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 4.62);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);

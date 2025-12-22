@@ -127,7 +127,7 @@ void checkpoint_61(
                     128, 0, 60, 20, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 128, 320ms, 400ms);
+                pbf_move_left_joystick(context, {-1, 0}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
@@ -139,9 +139,9 @@ void checkpoint_61(
                 walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                pbf_move_left_joystick(context, 255, 0, 100, 50); // if to the left of the door, will move right and enter
-                pbf_move_left_joystick(context, 0, 128, 300, 50); // if to the right of the door, will move left
-                pbf_move_left_joystick(context, 255, 0, 100, 50); // then move right and enter
+                pbf_move_left_joystick(context, 255, 0, 800ms, 400ms); // if to the left of the door, will move right and enter
+                pbf_move_left_joystick(context, {-1, 0}, 2400ms, 400ms); // if to the right of the door, will move left
+                pbf_move_left_joystick(context, 255, 0, 800ms, 400ms); // then move right and enter
             }
         );
 

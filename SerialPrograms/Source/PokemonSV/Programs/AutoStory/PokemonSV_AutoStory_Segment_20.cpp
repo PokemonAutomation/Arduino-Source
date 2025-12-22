@@ -443,7 +443,7 @@ void checkpoint_44(
 
         // sunflora 10
         // align to corner 10.1. bush
-        pbf_move_left_joystick(context, 0, 128, 200, 100);
+        pbf_move_left_joystick(context, {-1, 0}, 1600ms, 800ms);
 
         direction.change_direction(env.program_info(), env.console, context, 4.02);
         pbf_move_left_joystick(context, 128, 0, 250, 100);
