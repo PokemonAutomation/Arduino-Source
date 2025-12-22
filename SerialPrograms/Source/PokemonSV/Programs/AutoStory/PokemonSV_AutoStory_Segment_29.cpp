@@ -200,7 +200,7 @@ void checkpoint_73(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                pbf_move_left_joystick(context, 255, 128, 1600ms, 400ms); // if to the left of the door, will move right
+                pbf_move_left_joystick(context, {+1, 0}, 1600ms, 400ms); // if to the left of the door, will move right
                 pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
             }
         );

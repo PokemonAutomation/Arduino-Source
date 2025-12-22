@@ -122,7 +122,7 @@ CameraAngle quest_photo_navi(
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 400, 400);
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
-            pbf_move_left_joystick(context, 255, 128, 160ms, 400ms);
+            pbf_move_left_joystick(context, {+1, 0}, 160ms, 400ms);
 
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
             pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
@@ -399,7 +399,7 @@ void quest_catch_navi(
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 400, 400);
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
-            pbf_move_left_joystick(context, 255, 128, 160ms, 400ms);
+            pbf_move_left_joystick(context, {+1, 0}, 160ms, 400ms);
 
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
             pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
@@ -609,7 +609,7 @@ void quest_catch_navi(
             context.wait_for_all_requests();
             pbf_press_button(context, BUTTON_ZR, 160ms, 400ms); //Withdraw pokemon
 
-            pbf_move_left_joystick(context, 255, 128, 160ms, 400ms);
+            pbf_move_left_joystick(context, {+1, 0}, 160ms, 400ms);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
             ssf_press_button(context, BUTTON_ZR, 0ms, 1600ms);
             ssf_press_button(context, BUTTON_ZL, 800ms, 400ms);
@@ -619,7 +619,7 @@ void quest_catch_navi(
             pbf_press_button(context, BUTTON_ZR, 160ms, 400ms); //Withdraw pokemon
 
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-            pbf_move_left_joystick(context, 255, 128, 160ms, 400ms);
+            pbf_move_left_joystick(context, {+1, 0}, 160ms, 400ms);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
             break;

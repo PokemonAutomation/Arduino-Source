@@ -222,22 +222,22 @@ void MoneyFarmerRoute212::heal_at_center_and_return(VideoStream& stream, ProCont
     stream.overlay().add_log("To rich couple", COLOR_WHITE);
     stream.log("Returning to rich couple location...");
     pbf_move_left_joystick(context, {0, -1}, 8000ms, 0ms);
-    pbf_move_left_joystick(context, 255, 128, 3040ms, 0ms);
+    pbf_move_left_joystick(context, {+1, 0}, 3040ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 2400ms, 0ms);
     pbf_move_left_joystick(context,   0, 128, 4800ms, 0ms);
-    pbf_move_left_joystick(context, 255, 128, 600ms, 0ms);
+    pbf_move_left_joystick(context, {+1, 0}, 600ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 11000ms, 0ms);
-    pbf_move_left_joystick(context, 255, 128, 1000ms, 0ms);
+    pbf_move_left_joystick(context, {+1, 0}, 1000ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 1600ms, 0ms);
     pbf_move_left_joystick(context,   0, 128, 1600ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 400ms, 0ms);
     pbf_move_left_joystick(context,   0, 128, 1000ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 1000ms, 0ms);
-    pbf_move_left_joystick(context, 255, 128, 2000ms, 0ms);
+    pbf_move_left_joystick(context, {+1, 0}, 2000ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 1600ms, 0ms);
     pbf_move_left_joystick(context,   0, 128, 720ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 1600ms, 0ms);
-    pbf_move_left_joystick(context, 255, 128, 1000ms, 0ms);
+    pbf_move_left_joystick(context, {+1, 0}, 1000ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 1600ms, 0ms);
 
     pp[0] = MOVE1_PP;
@@ -282,7 +282,7 @@ bool MoneyFarmerRoute212::heal_after_battle_and_return(
 void MoneyFarmerRoute212::charge_vs_seeker(ProControllerContext& context){
     for (size_t c = 0; c < 5; c++){
         pbf_move_left_joystick(context, {-1, 0},  1440ms, 0ms);
-        pbf_move_left_joystick(context, 255, 128, 1440ms, 0ms);
+        pbf_move_left_joystick(context, {+1, 0}, 1440ms, 0ms);
     }
 }
 
@@ -321,7 +321,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, ProContro
             heal_by_global_room(env.console, context);
         }
         // Reset position to right most on the row above the rich couple
-        pbf_move_left_joystick(context, 255, 128, 1440ms, 0ms);
+        pbf_move_left_joystick(context, {+1, 0}, 1440ms, 0ms);
     }
 
     while (true){
@@ -434,7 +434,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, ProContro
                 continue;
             }
         }
-        pbf_move_left_joystick(context, 255, 128, 1440ms, 0ms);
+        pbf_move_left_joystick(context, {+1, 0}, 1440ms, 0ms);
 
     }
 }

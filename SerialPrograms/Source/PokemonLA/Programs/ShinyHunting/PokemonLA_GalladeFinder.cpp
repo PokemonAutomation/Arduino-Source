@@ -126,10 +126,10 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProContro
                 // basic map layout is walk forward for a while, move right, run back, then align camera, then walk left then forward to Gallade
 
                 // right portion
-                pbf_move_left_joystick(context, 255, 128, 500ms, 0ms); // right alone
+                pbf_move_left_joystick(context, {+1, 0}, 500ms, 0ms); // right alone
                 pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, {+1, 0}, {0, 0}, 2400ms); // forward while running until stairs
                 pbf_mash_button(context, BUTTON_Y, 1800ms); // roll down the stairs, recover stamina
-                pbf_move_left_joystick(context, 255, 128, 1800ms, 160ms); // right alone
+                pbf_move_left_joystick(context, {+1, 0}, 1800ms, 160ms); // right alone
 
                 // down portion
                 // pbf_move_left_joystick(context, {0, -1}, 1900ms, 160ms); // OLD down

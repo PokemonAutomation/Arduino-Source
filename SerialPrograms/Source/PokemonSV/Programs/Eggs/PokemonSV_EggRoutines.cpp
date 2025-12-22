@@ -133,7 +133,7 @@ void do_egg_cycle_motion(
             // Left joystick forward, right joystick right
             // click left joystick
             ssf_press_left_joystick(context, {0, +1}, 0ms, std::chrono::minutes(10));
-            ssf_press_right_joystick(context, 255, 128, 0ms, std::chrono::minutes(10));
+            ssf_press_right_joystick(context, {+1, 0}, 0ms, std::chrono::minutes(10));
             pbf_press_button(context, BUTTON_LCLICK, std::chrono::minutes(10), 0ms);
         },
         {
@@ -363,7 +363,7 @@ void collect_eggs_after_sandwich(
     //  Move forward to pass table
     pbf_move_left_joystick(context, {0, +1}, 640ms, 320ms);
     //  Move right
-    pbf_move_left_joystick(context, 255, 128, 320ms, 680ms);
+    pbf_move_left_joystick(context, {+1, 0}, 320ms, 680ms);
     //  Move back/right to align to basket
     pbf_move_left_joystick(context, 240, 255, 320ms, 320ms);
 
@@ -388,17 +388,17 @@ void collect_eggs_after_sandwich(
     pbf_move_left_joystick(context, {0, +1}, 320ms, 480ms);
 
     //  Move forward to pass table
-    pbf_move_left_joystick(context, 255, 128, 80ms, 480ms);
+    pbf_move_left_joystick(context, {+1, 0}, 80ms, 480ms);
     pbf_press_button(context, BUTTON_L, 120ms, 480ms);
     pbf_move_left_joystick(context, {0, +1}, 640ms, 480ms);
 
     //  Move right
-    pbf_move_left_joystick(context, 255, 128, 80ms, 480ms);
+    pbf_move_left_joystick(context, {+1, 0}, 80ms, 480ms);
     pbf_press_button(context, BUTTON_L, 120ms, 480ms);
     pbf_move_left_joystick(context, {0, +1}, 320ms, 480ms);
 
     //  Turn right to face basket
-    pbf_move_left_joystick(context, 255, 128, 80ms, 480ms);
+    pbf_move_left_joystick(context, {+1, 0}, 80ms, 480ms);
     pbf_press_button(context, BUTTON_L, 120ms, 480ms);
 
     //  Move closer to the basket, up to the table
@@ -416,7 +416,7 @@ void collect_eggs_after_sandwich(
     //  Move forward to pass table
     pbf_move_left_joystick(context, {0, +1}, 640ms, 320ms); // old value: 80
     //  Move right
-    pbf_move_left_joystick(context, 255, 128, 400ms, 320ms);
+    pbf_move_left_joystick(context, {+1, 0}, 400ms, 320ms);
     //  Move back to face basket
     pbf_move_left_joystick(context, {0, -1}, 80ms, 320ms);
 

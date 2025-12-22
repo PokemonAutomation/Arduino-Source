@@ -756,7 +756,7 @@ void quest_sneak_up(
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 400, 400);
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
-            pbf_move_left_joystick(context, 255, 128, 160ms, 400ms);
+            pbf_move_left_joystick(context, {+1, 0}, 160ms, 400ms);
 
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
             pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
@@ -1006,7 +1006,7 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
 
             ssf_press_button(context, BUTTON_A, 0ms, 1600ms, 0ms);
             ssf_press_left_joystick(context, {-1, 0}, 0ms, 400ms);
-            ssf_press_left_joystick(context, 255, 128, 400ms, 800ms);
+            ssf_press_left_joystick(context, {+1, 0}, 400ms, 800ms);
             ssf_press_left_joystick(context, {-1, 0}, 1200ms, 400ms);
 
             ssf_press_button(context, BUTTON_A, 0ms, 1600ms, 0ms);
@@ -1031,7 +1031,7 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
                 }
                 ssf_press_button(context, BUTTON_A, 0ms, 1600ms, 0ms);
                 ssf_press_left_joystick(context, {-1, 0}, 0ms, 400ms);
-                ssf_press_left_joystick(context, 255, 128, 400ms, 800ms);
+                ssf_press_left_joystick(context, {+1, 0}, 400ms, 800ms);
                 ssf_press_left_joystick(context, {-1, 0}, 1200ms, 400ms);
 
                 ssf_press_button(context, BUTTON_A, 0ms, 1600ms, 0ms);
@@ -1357,7 +1357,7 @@ void quest_auto_battle(
         //Forward and right, stay in the battle court - safe zone
         pbf_press_button(context, BUTTON_L, 160ms, 400ms);
         pbf_move_left_joystick(context, {0, +1}, 2000ms, 400ms);
-        pbf_move_left_joystick(context, 255, 128, 180, 50);
+        pbf_move_left_joystick(context, 255, 128, 1440ms, 400ms);
         pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
         use_lets_go_to_clear_in_front(stream, context, tracker, false, [&](ProControllerContext& context){

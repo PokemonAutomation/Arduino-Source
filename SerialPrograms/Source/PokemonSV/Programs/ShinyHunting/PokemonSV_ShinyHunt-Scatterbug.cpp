@@ -429,7 +429,7 @@ void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& 
 
     if (path_id == 0){
         // move rightward, to the west
-        pbf_move_left_joystick(context, 255, 128, 800ms, 160ms);
+        pbf_move_left_joystick(context, {+1, 0}, 800ms, 160ms);
         // Align camera
         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
@@ -443,7 +443,7 @@ void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& 
         move_forward_with_lets_go(5);
 
         // move rightward, to south
-        pbf_move_left_joystick(context, 255, 128, 400ms, 160ms);
+        pbf_move_left_joystick(context, {+1, 0}, 400ms, 160ms);
         // Align camera
         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 

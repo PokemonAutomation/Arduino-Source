@@ -94,7 +94,7 @@ void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, ProCo
 
         for (uint16_t i = 0; i < ROUNDS_PER_FETCH; i++){
             //  Move right
-            pbf_move_left_joystick(context, 255, 128, ONE_WAY_MOVING_TIME0, 0ms);
+            pbf_move_left_joystick(context, {+1, 0}, ONE_WAY_MOVING_TIME0, 0ms);
             // Move left
             pbf_move_left_joystick(context, {-1, 0}, ONE_WAY_MOVING_TIME0, 0ms);
         }

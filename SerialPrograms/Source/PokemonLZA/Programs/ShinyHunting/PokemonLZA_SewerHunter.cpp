@@ -133,7 +133,7 @@ void route_klefki(SingleSwitchProgramEnvironment& env, ProControllerContext& con
 void route_klefki_inkay_goomy(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
     pbf_move_left_joystick(context, {0, +1}, 8500ms, 0ms);
-    pbf_move_left_joystick(context, 255, 128, 1300ms, 0ms);
+    pbf_move_left_joystick(context, {+1, 0}, 1300ms, 0ms);
     pbf_press_button(context, BUTTON_L, 100ms, 500ms);
     fly_back_to_sewers_entrance(env.console, context);
 }

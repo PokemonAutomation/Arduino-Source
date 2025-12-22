@@ -363,7 +363,7 @@ void area_zero_platform_run_path1(
         pbf_move_left_joystick(context, {0, +1}, 5000ms, 0ms);
 
         //  Turn right.
-        pbf_move_left_joystick(context, 255, 128, 30, 0);
+        pbf_move_left_joystick(context, {+1, 0}, 240ms, 0ms);
         pbf_press_button(context, BUTTON_L, 160ms, 400ms);
     });
 
@@ -371,7 +371,7 @@ void area_zero_platform_run_path1(
     stream.log("Clear the wall...");
     Milliseconds duration = 2600ms;
     use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](ProControllerContext& context){
-        pbf_move_left_joystick(context, 255, 128, 1000ms, 0ms);
+        pbf_move_left_joystick(context, {+1, 0}, 1000ms, 0ms);
         pbf_press_button(context, BUTTON_L, 160ms, 400ms);
         context.wait_for_all_requests();
 

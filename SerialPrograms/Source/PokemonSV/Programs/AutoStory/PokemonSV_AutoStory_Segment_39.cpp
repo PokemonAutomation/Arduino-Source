@@ -292,7 +292,7 @@ void checkpoint_103(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         ); 
 
         pbf_move_left_joystick(context, 128, 0, 300, 50);
-        pbf_move_left_joystick(context, 255, 128, 1600ms, 400ms);
+        pbf_move_left_joystick(context, {+1, 0}, 1600ms, 400ms);
 
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 10);
         mash_button_till_overworld(env.console, context, BUTTON_A);

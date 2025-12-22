@@ -196,7 +196,7 @@ void checkpoint_62(
         // wait for overworld after entering Eatery
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
-        pbf_move_left_joystick(context, 255, 128, 400ms, 400ms);
+        pbf_move_left_joystick(context, {+1, 0}, 400ms, 400ms);
         
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A);
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});

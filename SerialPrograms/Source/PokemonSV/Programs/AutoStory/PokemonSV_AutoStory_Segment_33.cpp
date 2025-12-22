@@ -331,7 +331,7 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         pbf_move_left_joystick(context, {-1, 0}, 400ms, 400ms); // go left
         pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms); // straight
-        pbf_move_left_joystick(context, 255, 128, 400ms, 400ms); // right
+        pbf_move_left_joystick(context, {+1, 0}, 400ms, 400ms); // right
         
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});

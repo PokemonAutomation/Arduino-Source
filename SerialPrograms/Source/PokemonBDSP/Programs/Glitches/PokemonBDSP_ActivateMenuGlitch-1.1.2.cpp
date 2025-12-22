@@ -123,7 +123,7 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProCont
     //  Move to escalator.
     pbf_press_dpad(context, DPAD_UP, 20, 125);
     pbf_press_dpad(context, DPAD_UP, 20, 125);
-    pbf_move_left_joystick(context, 255, 128, 2000ms, 5000ms);
+    pbf_move_left_joystick(context, {+1, 0}, 2000ms, 5000ms);
 
     //  Re-enter escalator.
     pbf_press_dpad(context, DPAD_RIGHT, 1000ms, 6000ms);
@@ -169,7 +169,7 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProCont
 
     //  Enter Pokemon center.
     pbf_press_dpad(context, DPAD_UP, 400ms, 5000ms);
-    pbf_move_left_joystick(context, 255, 128, 1000ms, 0ms);
+    pbf_move_left_joystick(context, {+1, 0}, 1000ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 1000ms, 1000ms);
 
     //  Move cursor back to default location for "Pokemon".
