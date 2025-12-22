@@ -124,7 +124,7 @@ void SurfItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         pbf_press_button(context, BUTTON_A, 80ms, 80ms);
 
         //Turn around and try to pick up items as well
-        pbf_move_left_joystick(context, 128, 255, 80ms, 40ms);
+        pbf_move_left_joystick(context, {0, -1}, 80ms, 40ms);
         pbf_press_button(context, BUTTON_A, 80ms, 80ms);
         pbf_press_button(context, BUTTON_A, 80ms, 80ms);
         pbf_press_button(context, BUTTON_A, 80ms, 80ms);

@@ -370,7 +370,7 @@ void AuctionFarmer::reset_position(SingleSwitchProgramEnvironment& env, ProContr
     }
 
     // move backwards, TODO: check position(?) and orientation
-    pbf_move_left_joystick(context, 128, 255, 400ms, 160ms);
+    pbf_move_left_joystick(context, {0, -1}, 400ms, 160ms);
     return;
 }
 

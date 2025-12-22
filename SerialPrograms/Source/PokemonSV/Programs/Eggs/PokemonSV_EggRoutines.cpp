@@ -373,7 +373,7 @@ void collect_eggs_after_sandwich(
 
     //  face away from the table
     pbf_press_button(context, BUTTON_L, 160ms, 840ms);
-    pbf_move_left_joystick(context, 128, 255, 80ms, 320ms);
+    pbf_move_left_joystick(context, {0, -1}, 80ms, 320ms);
 #endif
 
 #if 1
@@ -405,7 +405,7 @@ void collect_eggs_after_sandwich(
     pbf_move_left_joystick(context, {0, +1}, 800ms, 480ms);
 
     //  back away from the table, then face forwards towards the basket again
-    pbf_move_left_joystick(context, 128, 255, 200ms, 480ms);
+    pbf_move_left_joystick(context, {0, -1}, 200ms, 480ms);
     pbf_move_left_joystick(context, {0, +1}, 80ms, 480ms);
     pbf_press_button(context, BUTTON_L, 120ms, 480ms);   
 #endif
@@ -418,7 +418,7 @@ void collect_eggs_after_sandwich(
     //  Move right
     pbf_move_left_joystick(context, 255, 128, 400ms, 320ms);
     //  Move back to face basket
-    pbf_move_left_joystick(context, 128, 255, 80ms, 320ms);
+    pbf_move_left_joystick(context, {0, -1}, 80ms, 320ms);
 
     //  Move closer to the basket.
     pbf_press_button(context, BUTTON_L, 160ms, 840ms);

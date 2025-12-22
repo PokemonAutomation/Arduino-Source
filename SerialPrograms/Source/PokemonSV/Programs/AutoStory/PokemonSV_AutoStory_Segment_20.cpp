@@ -182,7 +182,7 @@ void checkpoint_44(
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
-        pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
+        pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);      
@@ -412,7 +412,7 @@ void checkpoint_44(
 
         // // sunflora 9
         // // align to corner 9.1. bush
-        pbf_move_left_joystick(context, 128, 255, 1600ms, 800ms);
+        pbf_move_left_joystick(context, {0, -1}, 1600ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 4.89);
         pbf_move_left_joystick(context, 128, 0, 350, 100);
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 1440ms);
@@ -553,7 +553,7 @@ void checkpoint_46(
         
         context.wait_for_all_requests();
 
-        pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
+        pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving Gym
         wait_for_overworld(env.program_info(), env.console, context, 30);

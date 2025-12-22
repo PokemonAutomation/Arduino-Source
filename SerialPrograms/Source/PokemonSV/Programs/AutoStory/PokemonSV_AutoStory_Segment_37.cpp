@@ -80,7 +80,7 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-station-3.onnx");
 
-        pbf_move_left_joystick(context, 128, 255, 1600ms, 800ms);
+        pbf_move_left_joystick(context, {0, -1}, 1600ms, 800ms);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 10, 255, 128);
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
         pbf_press_dpad(context, DPAD_DOWN, 13, 20);

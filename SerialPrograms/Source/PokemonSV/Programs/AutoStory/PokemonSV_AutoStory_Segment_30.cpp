@@ -160,7 +160,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
-        pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
+        pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
@@ -209,7 +209,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 pbf_wait(context, 6431ms);
                 pbf_move_left_joystick(context, {-1, 0}, 5081ms, 0ms);
                 pbf_wait(context, 239ms);
-                pbf_move_left_joystick(context, 128, 255, 961ms, 0ms);
+                pbf_move_left_joystick(context, {0, -1}, 961ms, 0ms);
                 pbf_wait(context, 1615ms);
                 pbf_move_left_joystick(context, {0, +1}, 753ms, 0ms);
                 pbf_wait(context, 79ms);
@@ -279,7 +279,7 @@ void checkpoint_77(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
-        pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
+        pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);

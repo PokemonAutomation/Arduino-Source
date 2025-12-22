@@ -733,7 +733,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         walk_forward_while_clear_front_path(env.program_info(), env.console, context, 700);
 
         // back away from wall and get on ride
-        pbf_move_left_joystick(context, 128, 255, 400ms, 400ms);
+        pbf_move_left_joystick(context, {0, -1}, 400ms, 400ms);
         get_on_ride(env.program_info(), env.console, context);
 
         // move back towards wall

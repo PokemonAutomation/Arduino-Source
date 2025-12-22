@@ -34,13 +34,13 @@ void SynchronizedSpinning::program(MultiSwitchProgramEnvironment& env, Cancellab
     env.run_in_parallel(
         scope,
         [&](ConsoleHandle& console, ProControllerContext& context){
-            pbf_move_left_joystick(context, 128, 255, 5, 20);
+            pbf_move_left_joystick(context, {0, -1}, 40ms, 160ms);
             while (true){
                 pbf_move_left_joystick(context, {0, +1}, 40ms, 0ms);
                 pbf_move_left_joystick(context, 255, 0, 40ms, 0ms);
                 pbf_move_left_joystick(context, 255, 128, 40ms, 0ms);
                 pbf_move_left_joystick(context, 255, 255, 40ms, 0ms);
-                pbf_move_left_joystick(context, 128, 255, 40ms, 0ms);
+                pbf_move_left_joystick(context, {0, -1}, 40ms, 0ms);
                 pbf_move_left_joystick(context, {-1, -1}, 40ms, 0ms);
                 pbf_move_left_joystick(context, {-1, 0}, 40ms, 0ms);
                 pbf_move_left_joystick(context, 0, 0, 40ms, 0ms);

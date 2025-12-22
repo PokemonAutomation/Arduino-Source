@@ -224,8 +224,8 @@ void inside_zero_gate_to_platform(
 //        pbf_move_left_joystick(context, {0, +1}, 375, 250);
         pbf_move_left_joystick(context, 164, 0, 1000ms, settings.MIDAIR_PAUSE_TIME0);
         pbf_press_button(context, BUTTON_LCLICK, 50, 0);
-        ssf_press_right_joystick(context, 128, 255, 0ms, 12000ms);
-        pbf_move_left_joystick(context, 128, 255, 12800ms, 1000ms);
+        ssf_press_right_joystick(context, {0, -1}, 0ms, 12000ms);
+        pbf_move_left_joystick(context, {0, -1}, 12800ms, 1000ms);
 
         pbf_press_button(context, BUTTON_B, 125, 375);
 
@@ -306,7 +306,7 @@ void area_zero_platform_run_path0(
 
         //  Turn around.
         stream.log("Turning towards sky...");
-        pbf_move_left_joystick(context, 128, 255, 30, 95);
+        pbf_move_left_joystick(context, {0, -1}, 240ms, 760ms);
         pbf_press_button(context, BUTTON_L, 160ms, 400ms);
     });
 
@@ -338,7 +338,7 @@ void area_zero_platform_run_path0(
         pbf_move_left_joystick(context, x, 0, duration, 0ms);
     });
     use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](ProControllerContext& context){
-        pbf_move_left_joystick(context, 128, 255, duration, 4000ms);
+        pbf_move_left_joystick(context, {0, -1}, duration, 4000ms);
     });
 }
 void area_zero_platform_run_path1(
@@ -405,7 +405,7 @@ void area_zero_platform_run_path1(
     use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](ProControllerContext& context){
 //        pbf_move_left_joystick(context, 64, 0, 1000ms, 0ms);
 //        pbf_press_button(context, BUTTON_L, 160ms, 840ms);
-        pbf_move_left_joystick(context, 128, 255, duration, 4000ms);
+        pbf_move_left_joystick(context, {0, -1}, duration, 4000ms);
 //        pbf_controller_state(context, 0, DPAD_NONE, 255, 255, 120, 128, 3000ms);
     });
 }
@@ -469,7 +469,7 @@ void area_zero_platform_run_path2(
         pbf_move_right_joystick(context, {0, +1}, 480ms, 0ms);
         find_and_center_on_sky(env, stream, context);
         context.wait_for(std::chrono::seconds(1));
-        pbf_move_left_joystick(context, 128, 255, 40, 85);
+        pbf_move_left_joystick(context, {0, -1}, 320ms, 680ms);
         pbf_mash_button(context, BUTTON_L, 60);
 
         pbf_move_right_joystick(context, {0, -1}, 2000ms, 0ms);

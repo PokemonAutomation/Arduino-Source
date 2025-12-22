@@ -152,7 +152,7 @@ void checkpoint_55(
             // now aligned to the wall next to the hole/passage   
 
             // walk away from wall slightly
-            pbf_move_left_joystick(context, 128, 255, 800ms, 800ms);
+            pbf_move_left_joystick(context, {0, -1}, 800ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 5.722795);
             pbf_move_left_joystick(context, 128, 0, 600, 100);
@@ -197,7 +197,7 @@ void checkpoint_55(
 
             // walk backwards
             direction.change_direction(env.program_info(), env.console, context, 2.303077);
-            pbf_move_left_joystick(context, 128, 255, 3200ms, 800ms);
+            pbf_move_left_joystick(context, {0, -1}, 3200ms, 800ms);
             direction.change_direction(env.program_info(), env.console, context, 3.908360);
 
             get_on_ride(env.program_info(), env.console, context);
