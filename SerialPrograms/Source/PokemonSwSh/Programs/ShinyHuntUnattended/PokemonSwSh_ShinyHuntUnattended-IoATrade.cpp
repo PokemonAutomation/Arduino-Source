@@ -116,8 +116,8 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, P
             IoA_backout(context, GameSettings::instance().POKEMON_TO_MENU_DELAY0);
 
             //  Enter map.
-            pbf_press_dpad(context, DPAD_LEFT, 10, 0);
-            pbf_move_left_joystick(context, 128, 255, 10, 0);
+            pbf_press_dpad(context, DPAD_LEFT, 80ms, 0ms);
+            pbf_move_left_joystick(context, 128, 255, 80ms, 0ms);
         }else{
             pbf_press_dpad(context, DPAD_DOWN, 10, 50);
         }

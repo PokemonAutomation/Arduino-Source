@@ -116,7 +116,7 @@ bool read_path(
         return false;
     }
 
-    pbf_move_right_joystick(context, 128, 0, 70, 50);
+    pbf_move_right_joystick(context, {0, +1}, 560ms, 400ms);
     context.wait_for_all_requests();
     ImagePixelBox boxes[4];
     error_image = read_type_array_retry(stream, context, box, hits, 4, path.mon2, boxes);
@@ -126,14 +126,14 @@ bool read_path(
     }
 
     while (true){
-        pbf_move_right_joystick(context, 128, 0, 80, 50);
+        pbf_move_right_joystick(context, {0, +1}, 640ms, 400ms);
         context.wait_for_all_requests();
 
         error_image = read_type_array_retry(stream, context, box, hits, 4, path.mon3, nullptr);
         if (!error_image){
             break;
         }
-        pbf_move_right_joystick(context, 128, 0, 20, 50);
+        pbf_move_right_joystick(context, {0, +1}, 160ms, 400ms);
         context.wait_for_all_requests();
         error_image = read_type_array_retry(stream, context, box, hits, 4, path.mon3, nullptr);
         if (!error_image){
@@ -144,7 +144,7 @@ bool read_path(
         return false;
     }
 
-    pbf_move_right_joystick(context, 128, 0, 125, 50);
+    pbf_move_right_joystick(context, {0, +1}, 1000ms, 400ms);
     context.wait_for_all_requests();
 
     error_image = read_type_array_retry(stream, context, box, hits, 1, &path.boss, nullptr);

@@ -105,7 +105,7 @@ void checkpoint_96(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }
         );
 
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "rock-2-1", 0, 30);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "rock-2-1", 0, 240ms);
 
         // align to rock-2-1.  
         // center before: center-y: 0.604167   center-x: 0.238281

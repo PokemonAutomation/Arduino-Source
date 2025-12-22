@@ -103,7 +103,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Pro
     // Press A to start talking
     pbf_press_button(context, BUTTON_A, 20, 100);
     // Press A to show battle type selection menu box
-    pbf_press_button(context, BUTTON_A, 20, 50);
+    pbf_press_button(context, BUTTON_A, 160ms, 400ms);
     // Move down the menu box to select Path of Tenacity
     pbf_press_dpad(context, DPAD_DOWN, 10, 50);
     // Press A to select Path of Tenacity

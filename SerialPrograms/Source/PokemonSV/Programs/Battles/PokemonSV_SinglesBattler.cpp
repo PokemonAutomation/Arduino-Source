@@ -301,9 +301,9 @@ bool run_singles_battle(
                 return true;
             case 2:
                 stream.log("Attempting to send in next " + STRING_POKEMON + "...");
-                pbf_press_dpad(context, DPAD_DOWN, 20, 105);
-                pbf_press_button(context, BUTTON_A, 20, 105);
-                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_dpad(context, DPAD_DOWN, 160ms, 840ms);
+                pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+                pbf_press_button(context, BUTTON_A, 160ms, 840ms);
                 pbf_mash_button(context, BUTTON_B, 250);
                 pbf_wait(context, 50);
                 continue;

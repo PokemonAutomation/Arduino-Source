@@ -198,7 +198,7 @@ bool AutoHost::start_raid(
             env.console, context,
             [start_time](ProControllerContext& context){
                 while (true){
-                    pbf_press_button(context, BUTTON_A, 20, 105);
+                    pbf_press_button(context, BUTTON_A, 160ms, 840ms);
                     context.wait_for_all_requests();
                     if (current_time() > start_time + std::chrono::minutes(4)){
                         return;

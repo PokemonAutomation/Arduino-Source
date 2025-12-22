@@ -86,7 +86,7 @@ void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, ProCo
     env.update_stats();
 
     //  Connect the controller.
-    pbf_move_right_joystick(context, 0, 255, 10, 0);
+    pbf_move_right_joystick(context, {-1, -1}, 80ms, 0ms);
 
     for (uint16_t c = 0; c < MAX_FETCH_ATTEMPTS; c++){
         env.update_stats();
@@ -96,7 +96,7 @@ void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, ProCo
             //  Move right
             pbf_move_left_joystick(context, 255, 128, ONE_WAY_MOVING_TIME0, 0ms);
             // Move left
-            pbf_move_left_joystick(context, 0, 128, ONE_WAY_MOVING_TIME0, 0ms);
+            pbf_move_left_joystick(context, {-1, 0}, ONE_WAY_MOVING_TIME0, 0ms);
         }
 
         // Wait for your pokemon to catch up to you

@@ -154,8 +154,8 @@ void GeneratePokemonImageTrainingData::select_starting_location(SingleSwitchProg
     case StartingLocation::JUBILIFE_VILLAGE:
         env.log("Starting at Jubilife Village");
         // at gate, face towards the gate
-        pbf_move_left_joystick(context, 128, 255, 240, 30); // move backwards
-        pbf_move_left_joystick(context, 255, 150, 120, 60); // move to right
+        pbf_move_left_joystick(context, {0, -1}, 1920ms, 240ms); // move backwards
+        pbf_move_left_joystick(context, 255, 150, 960ms, 480ms); // move to right
         pbf_press_button(context, BUTTON_ZL, 30, 125); // rotate camera to point to where the character is facing
         pbf_move_left_joystick(context, 128, 0, 700, 30); // move forward
         pbf_move_left_joystick(context, 255, 125, 30, 60); // move to right

@@ -13,7 +13,7 @@ namespace NintendoSwitch{
 
 
 void eggfetcher_loop(ProControllerContext& context){
-    ssf_press_left_joystick(context, STICK_MAX, STICK_MAX, 50, 50);
+    ssf_press_left_joystick(context, STICK_MAX, STICK_MAX, 400ms, 400ms);
     ssf_press_left_joystick(context, STICK_MAX, 160, 0, 510);
     ssf_press_button(context, BUTTON_A, 1360ms);
     ssf_press_button(context, BUTTON_A, 1360ms);
@@ -55,7 +55,7 @@ void travel_to_spin_location(ProControllerContext& context){
     ssf_press_left_joystick(context, STICK_MAX, 144, 100, 250);
     ssf_press_button(context, BUTTON_A, 800ms);
     ssf_press_button(context, BUTTON_A, 400ms);
-    ssf_press_left_joystick(context, STICK_MAX, STICK_MAX, 50, 50);
+    ssf_press_left_joystick(context, STICK_MAX, STICK_MAX, 400ms, 400ms);
 }
 void travel_back_to_lady(ProControllerContext& context){
     ssf_press_left_joystick(context, STICK_CENTER, STICK_MAX, 30, 30);

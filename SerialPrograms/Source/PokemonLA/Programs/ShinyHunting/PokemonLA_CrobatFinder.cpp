@@ -107,7 +107,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
     for (size_t c = 0; c < 10; c++){
         MountState mount = mount_detector.detect(env.console.video().snapshot());
         if (mount == MountState::WYRDEER_OFF){
-            pbf_press_button(context, BUTTON_PLUS, 20, 105);
+            pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
             error = false;
             break;
         }
@@ -116,7 +116,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
             error = false;
             break;
         }
-        pbf_press_dpad(context, DPAD_LEFT, 20, 50);
+        pbf_press_dpad(context, DPAD_LEFT, 160ms, 400ms);
         context.wait_for_all_requests();
     }
     if (error){
@@ -148,11 +148,11 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
 
                 // FORWARD PORTION OF CAVE UNTIL LEDGE
                 pbf_press_button(context, BUTTON_B, 2200ms, 640ms); // wyrdeer sprint
-                pbf_move_left_joystick(context, 0, 128, 10, 20); // turn left
-                pbf_press_button(context, BUTTON_ZL, 20, 50); // align camera
+                pbf_move_left_joystick(context, {-1, 0},  80ms, 160ms); // turn left
+                pbf_press_button(context, BUTTON_ZL, 160ms, 400ms); // align camera
 
                 // ASCEND THE LEDGE WITH BRAVIARY
-                pbf_press_dpad(context, DPAD_RIGHT, 20, 50); // swap to braviary
+                pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms); // swap to braviary
                 pbf_wait(context, 600ms); // wait for the ascent
                 pbf_press_button(context, BUTTON_Y, 2400ms, 160ms); // descend to swap to Wyrdeer automatically
 

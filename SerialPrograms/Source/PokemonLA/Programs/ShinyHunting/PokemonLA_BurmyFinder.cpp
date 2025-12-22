@@ -331,7 +331,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_press_button(context, BUTTON_B, 5100ms, 0ms);
                 pbf_press_button(context, BUTTON_Y, 4200ms, 0ms);
                 pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
-                pbf_move_right_joystick(context, 128, 255, 300ms, 200ms);
+                pbf_move_right_joystick(context, {0, -1}, 300ms, 200ms);
                 last_checked_tree = 0;
                 check_tree_no_stop(env, context);
 
@@ -344,7 +344,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_press_button(context, BUTTON_B, 600ms, 0ms);
                 pbf_press_button(context, BUTTON_Y, 2700ms, 0ms);
                 pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
-                pbf_move_right_joystick(context, 128, 255, 100ms, 300ms);
+                pbf_move_right_joystick(context, {0, -1}, 100ms, 300ms);
                 last_checked_tree = 1;
                 check_tree_no_stop(env, context);
 
@@ -357,7 +357,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_press_button(context, BUTTON_B, 600ms, 0ms);
                 pbf_press_button(context, BUTTON_Y, 2400ms, 0ms);
                 pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
-                pbf_move_right_joystick(context, 128, 255, 100ms, 300ms);
+                pbf_move_right_joystick(context, {0, -1}, 100ms, 300ms);
                 last_checked_tree = 2;
                 check_tree_no_stop(env, context);
 
@@ -370,7 +370,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_press_button(context, BUTTON_B, 110, 0);
                 pbf_press_button(context, BUTTON_Y, 2300ms, 0ms);
                 pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
-                pbf_move_right_joystick(context, 128, 255, 100ms, 300ms);
+                pbf_move_right_joystick(context, {0, -1}, 100ms, 300ms);
                 last_checked_tree = 3;
                 break;
             case 1:
@@ -760,7 +760,7 @@ void BurmyFinder::run_iteration(
             );
         }
         env.console.log("Not on Pokemon selection. Attempting to switch to it...", COLOR_ORANGE);
-        pbf_press_button(context, BUTTON_X, 20, 230);
+        pbf_press_button(context, BUTTON_X, 160ms, 1840ms);
     }
 
     float shiny_coefficient = 1.0;

@@ -323,7 +323,7 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, ProC
         pbf_wait(context, 100);
         context.wait_for_all_requests();
 
-        pbf_press_button(context, BUTTON_R, 20, 50);
+        pbf_press_button(context, BUTTON_R, 160ms, 400ms);
         pbf_press_button(context, BUTTON_A, 10, 50);
     }
 
@@ -453,11 +453,11 @@ bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment
             continue;
         case 1:
             env.console.log("Detected cursor over view summary.");
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             continue;
         case 2:
             env.console.log("Detected nickname prompt.");
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 3:{
             env.console.log("Detected summary.");
@@ -466,7 +466,7 @@ bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment
             SummaryStatsReader reader;
             reader.make_overlays(overlays);
 
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 230);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 1840ms);
             context.wait_for_all_requests();
 
             auto snapshot = env.console.video().snapshot();
@@ -500,7 +500,7 @@ bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment
         case 4:{
             if (first_advance_dialog){
                 env.console.log("Pressing continue, in case it's a new pokedex entry.");
-                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_button(context, BUTTON_A, 160ms, 840ms);
                 first_advance_dialog = false;
                 continue;
             }else{

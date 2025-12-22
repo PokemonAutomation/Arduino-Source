@@ -92,7 +92,7 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         // arrived at research station 1
 
-        pbf_move_left_joystick(context, 0, 255, 300, 100);
+        pbf_move_left_joystick(context, 0, 255, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving research station
         wait_for_overworld(env.program_info(), env.console, context, 30);
@@ -131,7 +131,7 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         pbf_press_button(context, BUTTON_L, 240ms, 100ms);
 
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "waterfall-3-1", 0, 100);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "waterfall-3-1", 0, 800ms);
 
 
 
@@ -256,13 +256,13 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
 
-        pbf_move_right_joystick(context, 128, 255, 200, 0);
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "beyond-cliff-3", 255, 30);
+        pbf_move_right_joystick(context, {0, -1}, 1600ms, 0ms);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "beyond-cliff-3", 255, 240ms);
 
         move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "beyond-cliff-3", 0.5,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-                pbf_move_right_joystick(context, 128, 255, 200, 0);
+                pbf_move_right_joystick(context, {0, -1}, 1600ms, 0ms);
                 pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
             }        
         );
@@ -272,7 +272,7 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             0.5, 0.9,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-                pbf_move_right_joystick(context, 128, 255, 200, 0);
+                pbf_move_right_joystick(context, {0, -1}, 1600ms, 0ms);
                 
                 pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
             }
@@ -284,7 +284,7 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         pbf_press_button(context, BUTTON_L, 240ms, 100ms);
 
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "station-3", 0, 100);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "station-3", 0, 800ms);
 
 
         move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "station-3", 0.5,

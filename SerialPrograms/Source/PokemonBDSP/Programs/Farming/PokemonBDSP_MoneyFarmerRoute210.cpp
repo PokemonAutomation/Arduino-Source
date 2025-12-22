@@ -223,8 +223,8 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
         case 2:
             env.log("Detected move learn!", COLOR_BLUE);
             if (ON_LEARN_MOVE == OnLearnMove::DONT_LEARN){
-                pbf_move_right_joystick(context, 128, 255, 20, 105);
-                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                pbf_move_right_joystick(context, {0, -1}, 160ms, 840ms);
+                pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
                 break;
             }
             return true;
@@ -255,7 +255,7 @@ void MoneyFarmerRoute210::heal_at_center_and_return(
     pbf_mash_button(context, BUTTON_B, 10000ms);
 
     logger.log("Returning to trainers...");
-    pbf_move_left_joystick(context, 128, 255, 6000ms, 0ms);
+    pbf_move_left_joystick(context, {0, -1}, 6000ms, 0ms);
     pbf_move_left_joystick(context, 255, 128, 60, 0);
     pbf_move_left_joystick(context, 128, 0, 200, 0);
     pbf_move_left_joystick(context, 255, 128, 750, 0);
@@ -263,19 +263,19 @@ void MoneyFarmerRoute210::heal_at_center_and_return(
     pbf_press_button(context, BUTTON_R, 10, 150);
     pbf_mash_button(context, BUTTON_ZL, 6000ms);
 
-    pbf_move_left_joystick(context, 128, 255, 30, 0);
-    pbf_move_left_joystick(context,   0, 128, 30, 0);
-    pbf_move_left_joystick(context, 128, 255, 80, 0);
-    pbf_move_left_joystick(context, 255, 128, 110, 0);
-    pbf_move_left_joystick(context, 128, 255, 125, 0);
-    pbf_move_left_joystick(context, 255, 128, 105, 0);
-    pbf_move_left_joystick(context, 128,   0, 375, 0);
-    pbf_move_left_joystick(context, 255, 128, 300, 0);
-    pbf_move_left_joystick(context, 128, 255, 375, 0);
+    pbf_move_left_joystick(context, {0, -1}, 240ms, 0ms);
+    pbf_move_left_joystick(context, 0, 128, 240ms, 0ms);
+    pbf_move_left_joystick(context, {0, -1}, 640ms, 0ms);
+    pbf_move_left_joystick(context, 255, 128, 880ms, 0ms);
+    pbf_move_left_joystick(context, {0, -1}, 1000ms, 0ms);
+    pbf_move_left_joystick(context, 255, 128, 840ms, 0ms);
+    pbf_move_left_joystick(context, 128, 0, 3000ms, 0ms);
+    pbf_move_left_joystick(context, 255, 128, 2400ms, 0ms);
+    pbf_move_left_joystick(context, {0, -1}, 3000ms, 0ms);
 
     pbf_press_dpad(context, DPAD_RIGHT, 375, 0);
     pbf_press_dpad(context, DPAD_LEFT, 375, 0);
-    pbf_press_dpad(context, DPAD_DOWN, 125, 0);
+    pbf_press_dpad(context, DPAD_DOWN, 1000ms, 0ms);
 
     pp0[0] = MON0_MOVE1_PP;
     pp0[1] = MON0_MOVE2_PP;
@@ -366,7 +366,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
         if (HEALING_METHOD == HealMethod::GlobalRoom){
             heal_by_global_room(env.console, context);
         }
-        pbf_move_left_joystick(context, 255, 128, 140, 0);
+        pbf_move_left_joystick(context, 255, 128, 1120ms, 0ms);
     }
 
     while (true){
@@ -375,11 +375,11 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         if (need_to_charge){
-            pbf_move_left_joystick(context, 255, 128, 140, 0);
+            pbf_move_left_joystick(context, 255, 128, 1120ms, 0ms);
             pbf_press_dpad(context, DPAD_UP, 85, 0);
             for (size_t c = 0; c < 7; c++){
-                pbf_move_left_joystick(context, 0, 128, 140, 0);
-                pbf_move_left_joystick(context, 255, 128, 140, 0);
+                pbf_move_left_joystick(context, {-1, 0},  1120ms, 0ms);
+                pbf_move_left_joystick(context, 255, 128, 1120ms, 0ms);
             }
             pbf_press_dpad(context, DPAD_DOWN, 75, 0);
         }

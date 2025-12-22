@@ -78,9 +78,9 @@ bool save_game_from_overworld(
     bool found = false;
     for (size_t c = 0; c < 10; c++){
         if (save_tab_selected(snapshot)){
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            pbf_press_button(context, BUTTON_B, 20, 105);
-//            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
+//            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             context.wait_for_all_requests();
             found = true;
             break;
@@ -102,7 +102,7 @@ bool save_game_from_overworld(
         stream, context,
         [&](ProControllerContext& context){
             for (size_t c = 0; c < 10; c++){
-                pbf_press_button(context, BUTTON_B, 20, 230);
+                pbf_press_button(context, BUTTON_B, 160ms, 1840ms);
             }
         },
         {detector}

@@ -72,7 +72,7 @@ void checkpoint_00(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     );
     
     // Stand up from chair and walk to left side of room
-    pbf_move_left_joystick(context, 128, 255, 3000ms, 5000ms);
+    pbf_move_left_joystick(context, {0, -1}, 3000ms, 5000ms);
     pbf_move_left_joystick(context,   0, 128, 6000ms, 1000ms);
 
 }

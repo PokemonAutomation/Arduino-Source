@@ -106,7 +106,7 @@ void MegaShardFarmer::program(SingleSwitchProgramEnvironment& env, ProController
                 pbf_move_left_joystick(context, 160, 0, 1500ms, 1000ms);
 
                 //  Move camera up.
-                pbf_move_right_joystick(context, 128, 0, 800ms, 0ms);
+                pbf_move_right_joystick(context, {0, +1}, 800ms, 0ms);
 
                 //  Bring out a Pokemon.
                 pbf_press_dpad(context, DPAD_UP, 1000ms, 0ms);
@@ -140,9 +140,9 @@ void MegaShardFarmer::fly_back(SingleSwitchProgramEnvironment& env, ProControlle
         open_map(env.console, context, zoom_to_max);
 
         //  Middle Zoom
-        pbf_move_right_joystick(context, 128, 0, 80ms, 80ms);
-        pbf_move_right_joystick(context, 128, 0, 80ms, 80ms);
-        pbf_move_right_joystick(context, 128, 255, 80ms, 80ms);
+        pbf_move_right_joystick(context, {0, +1}, 80ms, 80ms);
+        pbf_move_right_joystick(context, {0, +1}, 80ms, 80ms);
+        pbf_move_right_joystick(context, {0, -1}, 80ms, 80ms);
 
         //  Tap the stick to lock on to Le Yeah if you're already on top of it.
         pbf_move_left_joystick(context, 128, 192, 40ms, 120ms);

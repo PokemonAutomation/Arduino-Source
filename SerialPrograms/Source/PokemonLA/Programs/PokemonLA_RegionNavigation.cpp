@@ -29,7 +29,7 @@ namespace PokemonLA{
 void goto_professor(Logger& logger, ProControllerContext& context, Camp camp){
     switch (camp){
     case Camp::FIELDLANDS_FIELDLANDS:
-        pbf_move_left_joystick(context, 255, 0, 125, 0);
+        pbf_move_left_joystick(context, 255, 0, 1000ms, 0ms);
         return;
     case Camp::FIELDLANDS_HEIGHTS:
         pbf_move_left_joystick(context, 240, 0, 200, 0);
@@ -38,10 +38,10 @@ void goto_professor(Logger& logger, ProControllerContext& context, Camp camp){
         pbf_move_left_joystick(context, 255, 64, 160, 0);
         return;
     case Camp::MIRELANDS_BOGBOUND:
-        pbf_move_left_joystick(context, 255, 64, 140, 0);
+        pbf_move_left_joystick(context, 255, 64, 1120ms, 0ms);
         return;
     case Camp::COASTLANDS_BEACHSIDE:
-        pbf_move_left_joystick(context, 255, 96, 125, 0);
+        pbf_move_left_joystick(context, 255, 96, 1000ms, 0ms);
         return;
     case Camp::COASTLANDS_COASTLANDS:
         pbf_move_left_joystick(context, 255, 48, 105, 0);
@@ -50,13 +50,13 @@ void goto_professor(Logger& logger, ProControllerContext& context, Camp camp){
         pbf_move_left_joystick(context, 255, 64, 176, 0);
         return;
     case Camp::HIGHLANDS_MOUNTAIN:
-        pbf_move_left_joystick(context, 255, 32, 125, 0);
+        pbf_move_left_joystick(context, 255, 32, 1000ms, 0ms);
         return;
     case Camp::HIGHLANDS_SUMMIT:
-        pbf_move_left_joystick(context, 255, 0, 125, 0);
+        pbf_move_left_joystick(context, 255, 0, 1000ms, 0ms);
         return;
     case Camp::ICELANDS_SNOWFIELDS:
-        pbf_move_left_joystick(context, 255, 56, 125, 0);
+        pbf_move_left_joystick(context, 255, 56, 1000ms, 0ms);
         return;
     case Camp::ICELANDS_ICEPEAK:
         pbf_move_left_joystick(context, 255, 48, 75, 0);
@@ -105,7 +105,7 @@ void from_professor_return_to_jubilife(
         switch (ret){
         case 0:
             stream.log("Detected return option...");
-            pbf_press_dpad(context, DPAD_DOWN, 20, 105);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 840ms);
             mash_A_to_change_region(env, stream, context);
             return;
         case 1:
@@ -223,13 +223,13 @@ void open_travel_map_from_jubilife(
     ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     bool fresh_from_reset
 ){
-    pbf_move_left_joystick(context, 128, 255, 200, 0);
+    pbf_move_left_joystick(context, {0, -1}, 1600ms, 0ms);
     MapDetector detector;
     int ret = run_until<ProControllerContext>(
         stream, context,
         [](ProControllerContext& context){
             for (size_t c = 0; c < 10; c++){
-                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             }
         },
         {{detector}}
@@ -292,7 +292,7 @@ void goto_camp_from_jubilife(
     }
 
     if (location.warp_slot != 0){
-        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_A, 160ms, 840ms);
         for (size_t c = 0; c < location.warp_slot; c++){
             pbf_press_dpad(context, DPAD_DOWN, 20, 30);
         }

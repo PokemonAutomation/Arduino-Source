@@ -67,7 +67,7 @@ void pbf_move_left_joystick (ProControllerContext& context, const JoystickPositi
 //  y = 255 : down
 //  Example: move the joystick fully left: (x, y) = (0, 128)
 //           move the joystick upper-right: (x, y) = (255, 0)
-void pbf_move_right_joystick(ProControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks);
+//void pbf_move_right_joystick(ProControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks);
 void pbf_move_right_joystick(ProControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release);
 void pbf_move_right_joystick(ProControllerContext& context, const JoystickPosition& position, Milliseconds hold, Milliseconds release);
 

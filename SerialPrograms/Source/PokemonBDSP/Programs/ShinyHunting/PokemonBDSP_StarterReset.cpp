@@ -171,7 +171,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             scroll = 2;
         }
         for (size_t c = 0; c < scroll; c++){
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 105);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 840ms);
         }
 
         //  Select starter.

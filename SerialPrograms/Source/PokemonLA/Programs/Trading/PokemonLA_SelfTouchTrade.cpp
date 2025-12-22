@@ -135,16 +135,16 @@ bool SelfTouchTrade::move_to_next(Logger& logger, ProControllerContext& host, ui
         return false;
     }
     if (row < 4){
-        pbf_press_dpad(host, DPAD_RIGHT, 20, 105);
-        pbf_press_dpad(host, DPAD_RIGHT, 20, 105);
+        pbf_press_dpad(host, DPAD_RIGHT, 160ms, 840ms);
+        pbf_press_dpad(host, DPAD_RIGHT, 160ms, 840ms);
         pbf_press_dpad(host, DPAD_DOWN, 20, 140);
         col = 0;
         row++;
         return false;
     }
-    pbf_press_button(host, BUTTON_R, 20, 230);
-    pbf_press_dpad(host, DPAD_RIGHT, 20, 105);
-    pbf_press_dpad(host, DPAD_RIGHT, 20, 105);
+    pbf_press_button(host, BUTTON_R, 160ms, 1840ms);
+    pbf_press_dpad(host, DPAD_RIGHT, 160ms, 840ms);
+    pbf_press_dpad(host, DPAD_RIGHT, 160ms, 840ms);
     pbf_press_dpad(host, DPAD_DOWN, 20, 140);
     col = 0;
     row = 0;
@@ -161,7 +161,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
 
     //  Connect both controllers.
     env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
-        pbf_press_button(context, BUTTON_LCLICK, 10, 0);
+        pbf_press_button(context, BUTTON_LCLICK, 80ms, 0ms);
     });
 
     uint8_t row = 0;

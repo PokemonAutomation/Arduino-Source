@@ -143,7 +143,7 @@ void picnic_from_overworld(const ProgramInfo& info, VideoStream& stream, ProCont
         switch (ret){
         case 0:
             stream.log("Detected overworld.");
-            pbf_press_button(context, BUTTON_X, 20, 105); // open menu 
+            pbf_press_button(context, BUTTON_X, 160ms, 840ms); // open menu
             continue;
         case 1:
             stream.log("Detected main menu.");
@@ -308,18 +308,18 @@ void place_marker_offset_from_flypoint(
             // move cursor near landmark (pokecenter)
             switch(move_cursor_near_flypoint.zoom_change){
             case ZoomChange::ZOOM_IN:
-                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                pbf_press_button(context, BUTTON_ZR, 160ms, 840ms);
                 break;
             case ZoomChange::ZOOM_IN_TWICE:
-                pbf_press_button(context, BUTTON_ZR, 20, 105);
-                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                pbf_press_button(context, BUTTON_ZR, 160ms, 840ms);
+                pbf_press_button(context, BUTTON_ZR, 160ms, 840ms);
                 break;                
             case ZoomChange::ZOOM_OUT:
-                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
                 break;    
             case ZoomChange::ZOOM_OUT_TWICE:
-                pbf_press_button(context, BUTTON_ZL, 20, 105);
-                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
+                pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
                 break;                  
             case ZoomChange::KEEP_ZOOM:
                 break;
@@ -332,8 +332,8 @@ void place_marker_offset_from_flypoint(
             move_cursor_to_position_offset_from_flypoint(info, stream, context, fly_point, {marker_offset.x, marker_offset.y});
 
             // place down marker
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             leave_phone_to_overworld(info, stream, context);
 
             return;      
@@ -612,9 +612,9 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, VideoStream& stre
 
 void jump_off_wall_until_map_open(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     for (auto i = 0; i < 3; i++){
-        pbf_press_button(context, BUTTON_L, 50, 50);
-        pbf_press_button(context, BUTTON_B, 50, 50);
-        pbf_move_left_joystick(context, 128, 255, 100, 50);
+        pbf_press_button(context, BUTTON_L, 400ms, 400ms);
+        pbf_press_button(context, BUTTON_B, 400ms, 400ms);
+        pbf_move_left_joystick(context, 128, 255, 800ms, 400ms);
         context.wait_for_all_requests();
         try{
             open_map_from_overworld(info, stream, context);
@@ -671,7 +671,7 @@ void walk_forward_until_dialog(
             } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
                 pbf_mash_button(context, BUTTON_A, seconds_timeout * TICKS_PER_SECOND);
                 // for (size_t j = 0; j < seconds_timeout; j++){
-                //     pbf_press_button(context, BUTTON_A, 20, 105);
+                //     pbf_press_button(context, BUTTON_A, 160ms, 840ms);
                 // }
             }
         },
@@ -816,20 +816,20 @@ void heal_at_pokecenter(
                 stream.log("heal_at_pokecenter: Done healing.");
                 return;
             }
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case 1: // prompt
             stream.log("heal_at_pokecenter: Detected prompt.");
             seen_prompt = true;
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case 2: // advance dialog
             stream.log("heal_at_pokecenter: Detected advance dialog.");
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case 3: // tutorial
             stream.log("heal_at_pokecenter: Detected tutorial.");
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;   
         default:
             stream.log("heal_at_pokecenter: Timed out.");
@@ -929,7 +929,7 @@ void run_battle_press_A(
         case CallbackEnum::BATTLE: // battle
             stream.log("Detected battle menu.");
             consecutive_move_select = 0;
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case CallbackEnum::MOVE_SELECT:
             stream.log("Detected move select. Spam first move");
@@ -970,11 +970,11 @@ void run_battle_press_A(
             if (stop_condition == BattleStopCondition::STOP_DIALOG){
                 return;
             }
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case CallbackEnum::DIALOG_ARROW:  // dialog arrow
             stream.log("run_battle_press_A: Detected dialog arrow.");
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case CallbackEnum::NEXT_POKEMON:
             stream.log("run_battle_press_A: Detected prompt for bringing in next pokemon. Keep current pokemon.");

@@ -470,13 +470,13 @@ void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, ProContr
         case Target::kyogre:
         case Target::groudon:
             //Step forward to start the encounter.
-            pbf_press_dpad(context, DPAD_UP, 20, 50);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 400ms);
             break;
         //case Target::groudon: //Step up is easier.
-        //    pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
+        //    pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms);
         //    break;
         //case Target::kyogre:
-        //    pbf_press_dpad(context, DPAD_LEFT, 20, 50);
+        //    pbf_press_dpad(context, DPAD_LEFT, 160ms, 400ms);
         //    break;
         default:;
         }

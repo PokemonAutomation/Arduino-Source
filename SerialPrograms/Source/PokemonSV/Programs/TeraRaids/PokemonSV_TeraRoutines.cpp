@@ -68,7 +68,7 @@ bool open_raid(VideoStream& stream, ProControllerContext& context){
             return true;
         case 1:
             stream.log("Detect possible uncatchable dialog...", COLOR_ORANGE);
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         default:
             stream.log("No Tera raid found.", COLOR_ORANGE);
@@ -99,7 +99,7 @@ void close_raid(const ProgramInfo& info, VideoStream& stream, ProControllerConte
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 1:
             stream.log("Detected overworld.");
@@ -175,25 +175,25 @@ void open_hosting_lobby(
 #if 0
         case 1:
             stream.log("Detect possible uncatchable dialog...", COLOR_ORANGE);
-            pbf_press_button(context, BUTTON_B, 20, 230);
+            pbf_press_button(context, BUTTON_B, 160ms, 1840ms);
             continue;
 #endif
         case 1:
             stream.log("Detected Tera card.");
             if (mode != HostingMode::LOCAL){
-                pbf_press_button(context, BUTTON_A, 20, 230);
+                pbf_press_button(context, BUTTON_A, 160ms, 1840ms);
                 if (mode == HostingMode::ONLINE_EVERYONE){
-                    pbf_press_dpad(context, DPAD_DOWN, 20, 105);
+                    pbf_press_dpad(context, DPAD_DOWN, 160ms, 840ms);
                 }
             }
-            pbf_press_button(context, BUTTON_A, 20, 230);
+            pbf_press_button(context, BUTTON_A, 160ms, 1840ms);
             continue;
         case 2:
             stream.log("Detected Tera lobby.");
             return;
         default:
             stream.log("No state detected after 30 seconds. Backing out...", COLOR_RED);
-            pbf_press_button(context, BUTTON_B, 20, 230);
+            pbf_press_button(context, BUTTON_B, 160ms, 1840ms);
             recovery_mode = true;
         }
     }
@@ -240,7 +240,7 @@ void enter_tera_search(
         switch (ret){
         case 0:
             stream.log("Detected overworld.");
-            pbf_press_button(context, BUTTON_X, 20, 105);
+            pbf_press_button(context, BUTTON_X, 160ms, 840ms);
             continue;
         case 1:
             stream.log("Detected main menu.");
@@ -250,19 +250,19 @@ void enter_tera_search(
                 continue;
             }
             if (main_menu.move_cursor(info, stream, context, MenuSide::RIGHT, 3)){
-                pbf_press_button(context, BUTTON_A, 20, 230);
+                pbf_press_button(context, BUTTON_A, 160ms, 1840ms);
             }
             continue;
         case 2:
             stream.log("Detected Poke Portal.");
             if (poke_portal.move_cursor(info, stream, context, 1)){
-                pbf_press_button(context, BUTTON_A, 20, 230);
+                pbf_press_button(context, BUTTON_A, 160ms, 1840ms);
             }
             continue;
         case 3:
             stream.log("Detected Tera Raid Search.");
             if (raid_search.move_cursor_to_search(info, stream, context)){
-                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             }
             continue;
         case 4:
@@ -270,7 +270,7 @@ void enter_tera_search(
             return;
         case 5:
             stream.log("Detected Dialog.");
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         default:
             dump_image_and_throw_recoverable_exception(
@@ -322,7 +322,7 @@ void join_raid(
         switch (ret){
         case 0:
             console.log("Detected overworld.");
-            pbf_press_button(context, BUTTON_X, 20, 105);
+            pbf_press_button(context, BUTTON_X, 160ms, 840ms);
             continue;
 
         case 1:
@@ -333,27 +333,27 @@ void join_raid(
                 continue;
             }
             if (main_menu.move_cursor(info, console, context, MenuSide::RIGHT, 3)){
-                pbf_press_button(context, BUTTON_A, 20, 230);
+                pbf_press_button(context, BUTTON_A, 160ms, 1840ms);
             }
             continue;
 
         case 2:
             console.log("Detected Poke Portal.");
             if (poke_portal.move_cursor(info, console, context, 1)){
-                pbf_press_button(context, BUTTON_A, 20, 230);
+                pbf_press_button(context, BUTTON_A, 160ms, 1840ms);
             }
             continue;
 
         case 3:
             console.log("Detected Tera Raid Search.");
             if (raid_search.move_cursor_to_search(info, console, context)){
-                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             }
             continue;
 
         case 4:
             console.log("Detected Dialog.");
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
 
         case 5:{
@@ -471,11 +471,11 @@ void exit_tera_win_without_catching(
         case 1:
             stream.log("Detected possible (A) Next button.");
             stop_if_enough_rare_items(stream, context, stop_on_sparkly_items);
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             continue;
         case 2:
             stream.log("Detected dialog.");
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             break;
         case 3:
             stream.log("Detected overworld.");
@@ -566,24 +566,24 @@ void exit_tera_win_by_catching(
         case 1:
             stream.log("Detected (A) Next button.");
             stop_if_enough_rare_items(stream, context, stop_on_sparkly_items);
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 2:
             stream.log("Detected dialog.");
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 3:
             stream.log("Detected add-to-party prompt.");
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 4:
             stream.log("Detected nickname prompt.");
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 5:
             stream.log("Detected unexpected main menu.", COLOR_RED);
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 6:
             stream.log("Detected overworld.");
@@ -681,24 +681,24 @@ TeraResult exit_tera_win_by_catching(
         }
         case 2:
             stream.log("Detected dialog.");
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 3:
             stream.log("Detected add-to-party prompt.");
             if (result == TeraResult::NO_DETECTION){
                 pbf_press_dpad(context, DPAD_DOWN, 20, 60);
-//                pbf_press_button(context, BUTTON_A, 20, 105);
+//                pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             }else{
-                pbf_press_button(context, BUTTON_B, 20, 105);
+                pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             }
             continue;
         case 4:
             stream.log("Detected cursor over view summary.");
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             continue;
         case 5:
             stream.log("Detected nickname prompt.");
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 1:
             //  Next button detector is unreliable. Check if the summary is
@@ -706,8 +706,8 @@ TeraResult exit_tera_win_by_catching(
             if (!summary.detect(stream.video().snapshot())){
                 stream.log("Detected possible (A) Next button.");
                 stop_if_enough_rare_items(stream, context, stop_on_sparkly_items);
-                pbf_press_button(context, BUTTON_A, 20, 105);
-                pbf_press_button(context, BUTTON_B, 20, 105);
+                pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+                pbf_press_button(context, BUTTON_B, 160ms, 840ms);
                 break;
             }
             stream.log("Detected false positive (A) Next button.", COLOR_RED);
@@ -723,11 +723,11 @@ TeraResult exit_tera_win_by_catching(
                     stat_shinies
                 );
             }
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 7:
             stream.log("Detected unexpected main menu.", COLOR_RED);
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 8:
             stream.log("Detected overworld.");

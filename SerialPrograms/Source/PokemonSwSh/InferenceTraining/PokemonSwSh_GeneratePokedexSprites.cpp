@@ -129,7 +129,7 @@ void GenerateDexModelSession::iterate_form(const std::string& slug, bool shiny, 
         }
         pbf_press_dpad(m_context, DPAD_DOWN, step, 50);
     }
-    pbf_press_dpad(m_context, DPAD_UP, 125, 0);
+    pbf_press_dpad(m_context, DPAD_UP, 1000ms, 0ms);
 
     //  Motion
     pbf_press_button(m_context, BUTTON_A, 20, 30);
@@ -143,7 +143,7 @@ void GenerateDexModelSession::iterate_form(const std::string& slug, bool shiny, 
         }
         pbf_press_dpad(m_context, DPAD_DOWN, step, 50);
     }
-    pbf_press_dpad(m_context, DPAD_UP, 125, 0);
+    pbf_press_dpad(m_context, DPAD_UP, 1000ms, 0ms);
 }
 void GenerateDexModelSession::iterate_species(){
     ImageFloatBox SPRITE_BOX(0.45, 0.13, 0.06, 0.09);
@@ -195,10 +195,10 @@ void GenerateDexModelSession::iterate_species(){
 
         size_t& index = is_shiny ? shiny_index : non_shiny_index;
 
-        pbf_press_button(m_context, BUTTON_A, 20, 230);
+        pbf_press_button(m_context, BUTTON_A, 160ms, 1840ms);
         iterate_form(slug, is_shiny, index);
-        pbf_press_button(m_context, BUTTON_B, 20, 230);
-        pbf_press_dpad(m_context, DPAD_RIGHT, 20, 105);
+        pbf_press_button(m_context, BUTTON_B, 160ms, 1840ms);
+        pbf_press_dpad(m_context, DPAD_RIGHT, 160ms, 840ms);
         m_context.wait_for_all_requests();
 
         index++;
@@ -218,7 +218,7 @@ void GenerateDexModelSession::iterate_species(){
 void GenerateDexModelSession::iterate_dex(){
     while (true){
         iterate_species();
-        pbf_press_dpad(m_context, DPAD_DOWN, 20, 105);
+        pbf_press_dpad(m_context, DPAD_DOWN, 160ms, 840ms);
         m_context.wait_for_all_requests();
     }
 }

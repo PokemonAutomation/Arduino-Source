@@ -299,7 +299,7 @@ void AuctionFarmer::move_to_auctioneer(SingleSwitchProgramEnvironment& env, ProC
     while (tries < 10){
         if (!ONE_NPC){
             move_dialog_to_center(env, context, offer);
-            pbf_move_left_joystick(context, 128, 0, 60, 10);
+            pbf_move_left_joystick(context, 128, 0, 480ms, 80ms);
         }
 
         pbf_press_button(context, BUTTON_A, 20, 100);
@@ -348,7 +348,7 @@ void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, P
             env.console.log(std::to_string(distance_x));
             env.console.log(std::to_string(distance_y));
 
-            pbf_move_right_joystick(context, distance_x, distance_y, 20, 20);
+            pbf_move_right_joystick(context, distance_x, distance_y, 160ms, 160ms);
 
             break;
         }
@@ -540,7 +540,7 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     AuctionFarmer_Descriptor::Stats& stats = env.current_stats<AuctionFarmer_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 10, 0);
+    pbf_press_button(context, BUTTON_LCLICK, 80ms, 0ms);
     pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
 
@@ -558,7 +558,7 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         while (!good_offer){
             size_t npc_tries = 0;
             if (!ONE_NPC){
-                pbf_move_right_joystick(context, 128, 255, 2000ms, 160ms);
+                pbf_move_right_joystick(context, {0, -1}, 2000ms, 160ms);
             }
 
             std::vector<std::pair<AuctionOffer, ImageFloatBox>> offers = check_offers(env, context);

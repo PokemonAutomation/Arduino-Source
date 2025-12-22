@@ -344,7 +344,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
         pbf_wait(context, 100);
         context.wait_for_all_requests();
 
-        pbf_press_button(context, BUTTON_R, 20, 50);
+        pbf_press_button(context, BUTTON_R, 160ms, 400ms);
         pbf_press_button(context, BUTTON_A, 10, 50);
     }
 
@@ -568,14 +568,14 @@ void return_to_academy_after_loss(
     context.wait_for_all_requests();
 
     env.log("At academy fly point. Heading back to doors.");
-    pbf_move_left_joystick(context, 0, 128, 8, 0);
-    pbf_press_button(context, BUTTON_L, 50, 40);
-    pbf_press_button(context, BUTTON_PLUS, 50, 40);
-    pbf_press_button(context, BUTTON_B, 50, 40); //Trying to jump/glide over npc spawns
-    pbf_press_button(context, BUTTON_B, 50, 40);
+    pbf_move_left_joystick(context, {-1, 0}, 64ms, 0ms);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
+    pbf_press_button(context, BUTTON_PLUS, 400ms, 320ms);
+    pbf_press_button(context, BUTTON_B, 400ms, 320ms); //Trying to jump/glide over npc spawns
+    pbf_press_button(context, BUTTON_B, 400ms, 320ms);
     pbf_move_left_joystick(context, 128, 0, 500, 0);
-    pbf_press_button(context, BUTTON_B, 50, 40);
-    pbf_press_button(context, BUTTON_B, 50, 40);
+    pbf_press_button(context, BUTTON_B, 400ms, 320ms);
+    pbf_press_button(context, BUTTON_B, 400ms, 320ms);
 
     BlackScreenOverWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
     int ret_black_lost = run_until<ProControllerContext>(
@@ -599,9 +599,9 @@ void return_to_academy_after_loss(
     context.wait_for_all_requests();
 
     //Move to tournament entry
-    pbf_move_left_joystick(context, 128, 0, 500, 0);
-    pbf_move_left_joystick(context, 0, 128, 100, 0);
-    pbf_move_left_joystick(context, 255, 0, 100, 0);
+    pbf_move_left_joystick(context, 128, 0, 4000ms, 0ms);
+    pbf_move_left_joystick(context, {-1, 0}, 800ms, 0ms);
+    pbf_move_left_joystick(context, 255, 0, 800ms, 0ms);
     context.wait_for_all_requests();
 }
 
@@ -613,7 +613,7 @@ void go_to_academy_fly_point(ProgramEnvironment& env, VideoStream& stream, ProCo
 
     while (!isFlySuccessful && numAttempts < maxAttempts ){
         open_map_from_overworld(env.program_info(), stream, context);
-        pbf_press_button(context, BUTTON_ZR, 50, 40);
+        pbf_press_button(context, BUTTON_ZR, 400ms, 320ms);
         pbf_move_left_joystick(context, 200, 0, 47, 25);  
         // pbf_move_left_joystick(context, 187, 0, 50, 0);
         numAttempts++;

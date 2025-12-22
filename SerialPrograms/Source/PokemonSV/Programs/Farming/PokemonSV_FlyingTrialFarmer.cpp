@@ -183,7 +183,7 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, ProControll
     FlyingTrialFarmer_Descriptor::Stats& stats = env.current_stats<FlyingTrialFarmer_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 10, 0);
+    pbf_press_button(context, BUTTON_L, 80ms, 0ms);
 
     for (uint16_t i = 0; i < NUM_TRIALS; i++){
         BlackScreenOverWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });

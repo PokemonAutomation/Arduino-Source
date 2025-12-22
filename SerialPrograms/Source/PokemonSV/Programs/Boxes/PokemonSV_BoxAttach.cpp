@@ -218,7 +218,7 @@ void attach_item_from_box(
             }
 
             for (size_t c = 0; c < category_index; c++){
-                pbf_press_dpad(context, DPAD_RIGHT, 20, 105);
+                pbf_press_dpad(context, DPAD_RIGHT, 160ms, 840ms);
             }
 
             attach_item_from_bag(info, stream, context, errors);

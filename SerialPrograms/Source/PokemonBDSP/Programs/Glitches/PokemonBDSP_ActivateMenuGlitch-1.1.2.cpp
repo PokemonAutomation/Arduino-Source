@@ -62,7 +62,7 @@ void trigger_menu(VideoStream& stream, ProControllerContext& context){
                     pbf_wait(context, 3);
                 }
                 pbf_wait(context, 125);
-                pbf_press_button(context, BUTTON_R, 20, 105);
+                pbf_press_button(context, BUTTON_R, 160ms, 840ms);
             }
         },
         {{detector}}
@@ -80,7 +80,7 @@ void trigger_menu(VideoStream& stream, ProControllerContext& context){
     ShortDialogDetector dialog;
     while (dialog.detect(stream.video().snapshot())){
         stream.log("Overshot mashing. Backing out.", COLOR_ORANGE);
-        pbf_press_button(context, BUTTON_B, 20, 105);
+        pbf_press_button(context, BUTTON_B, 160ms, 840ms);
         context.wait_for_all_requests();
     }
 }
@@ -101,7 +101,7 @@ void trigger_map_overlap(VideoStream& stream, ProControllerContext& context){
         }
         stream.log("Failed to activate map overlap.", COLOR_ORANGE);
         pbf_mash_button(context, BUTTON_B, 3000ms);
-        pbf_press_button(context, BUTTON_R, 20, 230);
+        pbf_press_button(context, BUTTON_R, 160ms, 1840ms);
     }
     OperationFailedException::fire(
         ErrorReport::SEND_ERROR_REPORT,
@@ -129,9 +129,9 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProCont
     pbf_press_dpad(context, DPAD_RIGHT, 1000ms, 6000ms);
 
     //  Leave Pokemon center.
-    pbf_press_dpad(context, DPAD_LEFT, 20, 105);
-    pbf_press_dpad(context, DPAD_LEFT, 20, 105);
-    pbf_press_dpad(context, DPAD_LEFT, 20, 105);
+    pbf_press_dpad(context, DPAD_LEFT, 160ms, 840ms);
+    pbf_press_dpad(context, DPAD_LEFT, 160ms, 840ms);
+    pbf_press_dpad(context, DPAD_LEFT, 160ms, 840ms);
     {
         context.wait_for_all_requests();
         BlackScreenWatcher detector;
@@ -139,8 +139,8 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProCont
             stream, context,
             [](ProControllerContext& context){
                 for (size_t c = 0; c < 5; c++){
-                    pbf_press_dpad(context, DPAD_LEFT, 20, 105);
-                    pbf_press_dpad(context, DPAD_DOWN, 20, 105);
+                    pbf_press_dpad(context, DPAD_LEFT, 160ms, 840ms);
+                    pbf_press_dpad(context, DPAD_DOWN, 160ms, 840ms);
                 }
             },
             {{detector}}
@@ -154,7 +154,7 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProCont
         }
         stream.log("Leaving " + STRING_POKEMON + " center detected!", COLOR_BLUE);
     }
-    pbf_move_left_joystick(context, 128, 255, 1000ms, 4000ms);
+    pbf_move_left_joystick(context, {0, -1}, 1000ms, 4000ms);
 
     //  Center cursor.
     pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
@@ -169,13 +169,13 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProCont
 
     //  Enter Pokemon center.
     pbf_press_dpad(context, DPAD_UP, 400ms, 5000ms);
-    pbf_move_left_joystick(context, 255, 128, 125, 0);
-    pbf_move_left_joystick(context, 128, 255, 125, 125);
+    pbf_move_left_joystick(context, 255, 128, 1000ms, 0ms);
+    pbf_move_left_joystick(context, {0, -1}, 1000ms, 1000ms);
 
     //  Move cursor back to default location for "Pokemon".
-    pbf_move_right_joystick(context, 128, 0, 20, 20);
-    pbf_move_right_joystick(context, 0, 128, 20, 20);
-    pbf_move_right_joystick(context, 0, 128, 20, 20);
+    pbf_move_right_joystick(context, {0, +1}, 160ms, 160ms);
+    pbf_move_right_joystick(context, {-1, 0}, 160ms, 160ms);
+    pbf_move_right_joystick(context, {-1, 0}, 160ms, 160ms);
 }
 
 

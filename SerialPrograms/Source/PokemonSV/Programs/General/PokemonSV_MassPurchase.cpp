@@ -166,12 +166,12 @@ void PokemonSV::MassPurchase::program(SingleSwitchProgramEnvironment& env, ProCo
     bool extra = false;
     while (item_val != 0){
         uint16_t qt_val = QUANTITY;
-        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_A, 160ms, 840ms);
 
         skip_item = mass_purchase(env, env.console, context);
 
         if (skip_item){
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
         }
 
         if (!skip_item){
@@ -204,11 +204,11 @@ void PokemonSV::MassPurchase::program(SingleSwitchProgramEnvironment& env, ProCo
                 pbf_press_dpad(context, DPAD_DOWN, 5, 105);
             }
 
-            pbf_press_button(context, BUTTON_A, 20, 230);
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 1840ms);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             extra = extra_items(env, env.console, context);
             if (extra){
-                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             };
 
             env.log("Item Purchased");
@@ -217,19 +217,19 @@ void PokemonSV::MassPurchase::program(SingleSwitchProgramEnvironment& env, ProCo
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         }
         
-        pbf_press_dpad(context, DPAD_DOWN, 20, 105);
+        pbf_press_dpad(context, DPAD_DOWN, 160ms, 840ms);
         
         item_val--;
     }
         
-    pbf_press_button(context, BUTTON_B, 20, 105);
-    pbf_press_button(context, BUTTON_B, 20, 105);
-    pbf_press_button(context, BUTTON_B, 20, 105);
-    pbf_press_button(context, BUTTON_B, 20, 105);
-    pbf_press_button(context, BUTTON_B, 20, 105);
-    pbf_press_button(context, BUTTON_A, 20, 105);
-    pbf_press_button(context, BUTTON_B, 20, 105);
-    pbf_press_button(context, BUTTON_A, 20, 105);
+    pbf_press_button(context, BUTTON_B, 160ms, 840ms);
+    pbf_press_button(context, BUTTON_B, 160ms, 840ms);
+    pbf_press_button(context, BUTTON_B, 160ms, 840ms);
+    pbf_press_button(context, BUTTON_B, 160ms, 840ms);
+    pbf_press_button(context, BUTTON_B, 160ms, 840ms);
+    pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+    pbf_press_button(context, BUTTON_B, 160ms, 840ms);
+    pbf_press_button(context, BUTTON_A, 160ms, 840ms);
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

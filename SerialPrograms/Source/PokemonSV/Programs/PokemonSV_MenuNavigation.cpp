@@ -38,7 +38,7 @@ void set_time_to_12am_from_home(const ProgramInfo& info, ConsoleHandle& console,
 
 //    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
     home_to_date_time(console, context, true);
-    pbf_press_button(context, BUTTON_A, 20, 50);
+    pbf_press_button(context, BUTTON_A, 160ms, 400ms);
 
     context.wait_for_all_requests();
 
@@ -184,7 +184,7 @@ void open_map_from_overworld(
 
         if (ret == 0){
             stream.log("Detected overworld.");
-            pbf_press_button(context, BUTTON_Y, 20, 105); // open map
+            pbf_press_button(context, BUTTON_Y, 160ms, 840ms); // open map
         }else if (ret == 1){
             throw_and_log<UnexpectedBattleException>(
                 stream.logger(), ErrorReport::NO_ERROR_REPORT,
@@ -227,15 +227,15 @@ void open_map_from_overworld(
         switch (ret){
         case 0:
             stream.log("Detected overworld.");
-            pbf_press_button(context, BUTTON_Y, 20, 105); // open map
+            pbf_press_button(context, BUTTON_Y, 160ms, 840ms); // open map
             continue;
         case 1:
             stream.log("Detected dialog. Did you fall down?", COLOR_RED);
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 2:
             stream.log("Detected dialog. Did you fall down?", COLOR_RED);
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             continue;
         case 3:
             stream.log("Detected map.");
@@ -244,11 +244,11 @@ void open_map_from_overworld(
                 return;
             }else{ // click R joystick to change to fixed view
                 if (clear_tutorial){
-                    pbf_press_button(context, BUTTON_A, 20, 105);
+                    pbf_press_button(context, BUTTON_A, 160ms, 840ms);
                 }
                 stream.log("Map in rotate view, fix it");
                 stream.overlay().add_log("Change map to fixed view", COLOR_WHITE);
-                pbf_press_button(context, BUTTON_RCLICK, 20, 105);
+                pbf_press_button(context, BUTTON_RCLICK, 160ms, 840ms);
                 continue;
             }
         case 4:
@@ -300,7 +300,7 @@ void enter_box_system_from_overworld(
         switch (ret){
         case 0:
             stream.log("Detected overworld.");
-            pbf_press_button(context, BUTTON_X, 20, 105); // open menu
+            pbf_press_button(context, BUTTON_X, 160ms, 840ms); // open menu
             continue;
         case 1:
             stream.log("Detected main menu.");
@@ -313,7 +313,7 @@ void enter_box_system_from_overworld(
                     stream
                 );
             }
-            pbf_press_button(context, BUTTON_A, 20, 50);
+            pbf_press_button(context, BUTTON_A, 160ms, 400ms);
             continue;
         case 2:
             stream.log("Detected box.");
@@ -387,7 +387,7 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, VideoStream& st
         stream, context,
         [](ProControllerContext& context){
             for (size_t i = 0; i < 10; i++){
-                pbf_press_dpad(context, DPAD_DOWN, 20, 105);
+                pbf_press_dpad(context, DPAD_DOWN, 160ms, 840ms);
             }
         },
         {menu}
@@ -481,7 +481,7 @@ void enter_menu_from_overworld(const ProgramInfo& info, VideoStream& stream, Pro
     bool has_minimap
 ){
     if (!has_minimap){
-        pbf_press_button(context, BUTTON_X, 20, 105);
+        pbf_press_button(context, BUTTON_X, 160ms, 840ms);
     }
 
     WallClock start = current_time();
@@ -520,7 +520,7 @@ void enter_menu_from_overworld(const ProgramInfo& info, VideoStream& stream, Pro
         switch (ret){
         case 0:
             stream.log("Detected overworld.");
-            pbf_press_button(context, BUTTON_X, 20, 105);
+            pbf_press_button(context, BUTTON_X, 160ms, 840ms);
             continue;
         case 1:
             stream.log("Detected main menu.");
@@ -535,7 +535,7 @@ void enter_menu_from_overworld(const ProgramInfo& info, VideoStream& stream, Pro
                     stream
                 );
             }
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             return;
         case 2:
             throw_and_log<UnexpectedBattleException>(
@@ -598,7 +598,7 @@ void enter_menu_from_box_system(const ProgramInfo& info, VideoStream& stream, Pr
                     stream
                 );
             }
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             return;     
         default:
             OperationFailedException::fire(
@@ -657,11 +657,11 @@ void enter_menu_from_bag(const ProgramInfo& info, VideoStream& stream, ProContro
                     stream
                 );
             }
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             return;
         case 1:
             stream.log("still on bag.");
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         default:
             OperationFailedException::fire(
@@ -710,7 +710,7 @@ void enter_bag_from_menu(const ProgramInfo& info, VideoStream& stream, ProContro
                     stream
                 );
             }
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             continue;
         case 1:
             stream.overlay().add_log("Enter bag");
@@ -777,7 +777,7 @@ void navigate_school_layout_menu(
     }
 
     for (uint16_t i = 0; i < num_button_presses; i++){
-        pbf_press_dpad(context, dpad_button, 20, 105);
+        pbf_press_dpad(context, dpad_button, 160ms, 840ms);
     }
 
     GradientArrowWatcher arrow_end(COLOR_RED, GradientArrowType::RIGHT, arrow_box_end);

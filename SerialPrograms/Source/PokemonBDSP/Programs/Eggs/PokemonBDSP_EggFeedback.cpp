@@ -126,8 +126,8 @@ void withdraw_1st_column_from_overworld(VideoStream& stream, ProControllerContex
     pbf_press_button(context, BUTTON_Y, 20, 50);
     pbf_press_button(context, BUTTON_Y, 20, 50);
     pickup_column(context);
-    pbf_move_right_joystick(context, 0, 128, 160ms, BOX_SCROLL_DELAY);
-    pbf_move_right_joystick(context, 128, 255, 160ms, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(context, {-1, 0}, 160ms, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(context, {0, -1}, 160ms, BOX_SCROLL_DELAY);
     pbf_press_button(context, BUTTON_ZL, 160ms, BOX_PICKUP_DROP_DELAY);
     box_to_overworld(stream, context);
 }
@@ -136,10 +136,10 @@ void withdraw_1st_column_from_overworld(VideoStream& stream, ProControllerContex
 
 void release(VideoStream& stream, ProControllerContext& context){
     pbf_press_button(context, BUTTON_ZL, 20, 50);
-    pbf_move_right_joystick(context, 128, 0, 20, 30);
-    pbf_move_right_joystick(context, 128, 0, 20, 30);
-    pbf_press_button(context, BUTTON_ZL, 20, 105);
-    pbf_move_right_joystick(context, 128, 255, 20, 30);
+    pbf_move_right_joystick(context, {0, +1}, 160ms, 240ms);
+    pbf_move_right_joystick(context, {0, +1}, 160ms, 240ms);
+    pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
+    pbf_move_right_joystick(context, {0, -1}, 160ms, 240ms);
 
     ShortDialogDetector detector;
     for (size_t c = 0; c < 3; c++){
@@ -147,7 +147,7 @@ void release(VideoStream& stream, ProControllerContext& context){
         if (!detector.detect(stream.video().snapshot())){
             return;
         }
-        pbf_press_button(context, BUTTON_ZL, 20, 105);
+        pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
     }
     OperationFailedException::fire(
         ErrorReport::SEND_ERROR_REPORT,
