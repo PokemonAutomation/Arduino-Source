@@ -142,7 +142,7 @@ void MegaShardFarmer::fly_back(SingleSwitchProgramEnvironment& env, ProControlle
         //  Middle Zoom
         pbf_move_right_joystick(context, 128, 0, 80ms, 80ms);
         pbf_move_right_joystick(context, 128, 0, 80ms, 80ms);
-        pbf_move_right_joystick(context, 128, 255, 80ms, 80ms);
+        pbf_move_right_joystick(context, {0, -1}, 80ms, 80ms);
 
         //  Tap the stick to lock on to Le Yeah if you're already on top of it.
         pbf_move_left_joystick(context, 128, 192, 40ms, 120ms);

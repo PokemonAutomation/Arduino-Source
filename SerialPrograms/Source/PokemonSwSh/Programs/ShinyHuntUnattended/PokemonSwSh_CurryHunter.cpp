@@ -134,7 +134,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
 
         //  Do circles with the joystick. Each circle has ten positions.
         for (uint16_t i = 0; i < 2350; i = i + 50){
-            pbf_move_right_joystick(context, 128, 255, 40ms, 0ms);
+            pbf_move_right_joystick(context, {0, -1}, 40ms, 0ms);
             pbf_move_right_joystick(context, 202, 231, 40ms, 0ms);
             pbf_move_right_joystick(context, 249, 167, 40ms, 0ms);
             pbf_move_right_joystick(context, 249, 88, 40ms, 0ms);

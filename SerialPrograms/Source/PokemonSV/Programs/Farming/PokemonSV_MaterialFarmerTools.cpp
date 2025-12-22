@@ -559,7 +559,7 @@ void run_lets_go_iteration(
     pbf_press_button(context, BUTTON_L, 50, 40);
 
     // zoom out camera
-    pbf_move_right_joystick(context, 128, 255, 45, 10);
+    pbf_move_right_joystick(context, {0, -1}, 360ms, 80ms);
 
     const bool throw_ball_if_bubble = false;
     const int total_iterations = num_forward_moves_per_lets_go_iteration;

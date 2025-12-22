@@ -558,7 +558,7 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         while (!good_offer){
             size_t npc_tries = 0;
             if (!ONE_NPC){
-                pbf_move_right_joystick(context, 128, 255, 2000ms, 160ms);
+                pbf_move_right_joystick(context, {0, -1}, 2000ms, 160ms);
             }
 
             std::vector<std::pair<AuctionOffer, ImageFloatBox>> offers = check_offers(env, context);

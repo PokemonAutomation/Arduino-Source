@@ -58,7 +58,7 @@ FlagNavigationAir::FlagNavigationAir(
         for (size_t c = 0; c < 2; c++){
             pbf_mash_button(context, BUTTON_ZL, 2000ms);
             pbf_move_right_joystick(context, turn, 128, 3200ms, 0ms);
-            pbf_move_right_joystick(context, 128, 255, 960ms, 0ms);
+            pbf_move_right_joystick(context, {0, -1}, 960ms, 0ms);
             pbf_move_right_joystick(context, turn, 128, 3200ms, 0ms);
             pbf_move_right_joystick(context, 128, 0, 1600ms, 0ms);
             pbf_move_right_joystick(context, turn, 128, 3200ms, 0ms);

@@ -256,13 +256,13 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
 
-        pbf_move_right_joystick(context, 128, 255, 200, 0);
+        pbf_move_right_joystick(context, {0, -1}, 1600ms, 0ms);
         move_camera_until_yolo_object_detected(env, context, yolo_detector, "beyond-cliff-3", 255, 30);
 
         move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "beyond-cliff-3", 0.5,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-                pbf_move_right_joystick(context, 128, 255, 200, 0);
+                pbf_move_right_joystick(context, {0, -1}, 1600ms, 0ms);
                 pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
             }        
         );
@@ -272,7 +272,7 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             0.5, 0.9,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-                pbf_move_right_joystick(context, 128, 255, 200, 0);
+                pbf_move_right_joystick(context, {0, -1}, 1600ms, 0ms);
                 
                 pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
             }

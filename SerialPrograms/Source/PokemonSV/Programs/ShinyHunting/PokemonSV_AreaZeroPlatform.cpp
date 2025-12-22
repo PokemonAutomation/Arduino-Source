@@ -295,8 +295,8 @@ void area_zero_platform_run_path0(
     stream.log("Go back to wall...");
     use_lets_go_to_clear_in_front(stream, context, tracker, false, [&](ProControllerContext& context){
         find_and_center_on_sky(env, stream, context);
-        pbf_move_right_joystick(context, 128, 255, 80, 0);
-        pbf_move_left_joystick(context, 176, 255, 30, 0);
+        pbf_move_right_joystick(context, {0, -1}, 640ms, 0ms);
+        pbf_move_left_joystick(context, 176, 255, 240ms, 0ms);
         pbf_press_button(context, BUTTON_L, 20, 50);
     });
 
@@ -315,7 +315,7 @@ void area_zero_platform_run_path0(
     Milliseconds duration = 2600ms;
     use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](ProControllerContext& context){
         find_and_center_on_sky(env, stream, context);
-        pbf_move_right_joystick(context, 128, 255, 70, 0);
+        pbf_move_right_joystick(context, {0, -1}, 560ms, 0ms);
 
         uint8_t x = 128;
         switch (iteration_count % 4){
@@ -352,8 +352,8 @@ void area_zero_platform_run_path1(
     pbf_press_button(context, BUTTON_L, 160ms, 840ms);
     use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](ProControllerContext& context){
         find_and_center_on_sky(env, stream, context);
-        pbf_move_right_joystick(context, 128, 255, 80, 0);
-        pbf_move_left_joystick(context, 192, 255, 60, 0);
+        pbf_move_right_joystick(context, {0, -1}, 640ms, 0ms);
+        pbf_move_left_joystick(context, 192, 255, 480ms, 0ms);
     });
 
     //  Clear path to the wall.
@@ -472,7 +472,7 @@ void area_zero_platform_run_path2(
         pbf_move_left_joystick(context, 128, 255, 40, 85);
         pbf_mash_button(context, BUTTON_L, 60);
 
-        pbf_move_right_joystick(context, 128, 255, 250, 0);
+        pbf_move_right_joystick(context, {0, -1}, 2000ms, 0ms);
         context.wait_for_all_requests();
 
         stream.log("Finding center of platform...");

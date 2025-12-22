@@ -264,7 +264,7 @@ CatchResults basic_catcher(
                     stream
                 );
             }
-            pbf_move_right_joystick(context, 128, 255, 160ms, 840ms);
+            pbf_move_right_joystick(context, {0, -1}, 160ms, 840ms);
             pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
             break; //  Continue the loop.
 

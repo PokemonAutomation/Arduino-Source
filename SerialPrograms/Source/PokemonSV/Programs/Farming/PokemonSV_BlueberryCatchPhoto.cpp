@@ -310,9 +310,9 @@ void quest_photo(
                 context.wait_for_all_requests();
 
                 if (move_camera == CameraAngle::up){
-                    pbf_move_right_joystick(context, 128, 0, 50, 20);
+                    pbf_move_right_joystick(context, 128, 0, 400ms, 160ms);
                 }else if (move_camera == CameraAngle::down){
-                    pbf_move_right_joystick(context, 128, 255, 50, 20);
+                    pbf_move_right_joystick(context, {0, -1}, 400ms, 160ms);
                 }
                 context.wait_for_all_requests();
 

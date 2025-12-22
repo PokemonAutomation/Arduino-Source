@@ -73,7 +73,7 @@ void column_to_party(ProControllerContext& context, uint8_t column){
             pbf_move_right_joystick(context, 255, 128, 160ms, BOX_SCROLL_DELAY);
         }
     }
-    pbf_move_right_joystick(context, 128, 255, 160ms, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(context, {0, -1}, 160ms, BOX_SCROLL_DELAY);
 }
 
 void withdraw_1st_column_from_overworld(ProControllerContext& context){
@@ -84,7 +84,7 @@ void withdraw_1st_column_from_overworld(ProControllerContext& context){
     pbf_press_button(context, BUTTON_Y, 20, 50);
     pickup_column(context);
     pbf_move_right_joystick(context, 0, 128, 160ms, BOX_SCROLL_DELAY);
-    pbf_move_right_joystick(context, 128, 255, 160ms, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(context, {0, -1}, 160ms, BOX_SCROLL_DELAY);
     pbf_press_button(context, BUTTON_ZL, 160ms, BOX_PICKUP_DROP_DELAY);
     box_to_overworld(context);
 }
@@ -95,7 +95,7 @@ void deposit_party_to_column(ProControllerContext& context, uint8_t column){
     pbf_press_button(context, BUTTON_Y, 20, 50);
     pbf_press_button(context, BUTTON_Y, 20, 50);
     pbf_move_right_joystick(context, 0, 128, 160ms, BOX_SCROLL_DELAY);
-    pbf_move_right_joystick(context, 128, 255, 160ms, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(context, {0, -1}, 160ms, BOX_SCROLL_DELAY);
 
     //  Deposit current column.
     pickup_column(context);
