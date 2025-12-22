@@ -54,6 +54,34 @@ bool HyperspaceCalorieDetector::detect(const ImageViewRGB32& screen){
 }
 
 
+HyperspaceCalorieLimitWatcher::HyperspaceCalorieLimitWatcher(Logger& logger, uint16_t calorie_limit)
+: HyperspaceCalorieDetector(logger), VisualInferenceCallback("HyperspaceCalorieLimitWatcher")
+, m_calorie_limit(calorie_limit)
+{}
+
+bool HyperspaceCalorieLimitWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+    bool detected = detect(frame);
+    if (!detected){
+        m_start_of_detection = WallClock::min();
+        return false;
+    }
+    const uint16_t calorie = calorie_number();
+    if (calorie > m_calorie_limit){
+        m_start_of_detection = WallClock::min();
+        return false;
+    }
+
+    if (m_start_of_detection == WallClock::min()){
+        m_start_of_detection = timestamp;
+    }
+
+    if (timestamp - m_start_of_detection >= Milliseconds(300) && calorie <= m_calorie_limit){
+        return true;
+    }
+
+    return false;
+}
+
 
 
 }

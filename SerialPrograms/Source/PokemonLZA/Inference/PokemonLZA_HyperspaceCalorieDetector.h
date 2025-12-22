@@ -38,6 +38,17 @@ private:
     uint16_t m_calorie_number = 0;
 };
 
+class HyperspaceCalorieLimitWatcher : public HyperspaceCalorieDetector, public VisualInferenceCallback{
+public:
+    HyperspaceCalorieLimitWatcher(Logger& logger, uint16_t calorie_limit);
+
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+
+private:
+    uint16_t m_calorie_limit;
+    WallClock m_start_of_detection = WallClock::min();
+};
+
 
 
 
