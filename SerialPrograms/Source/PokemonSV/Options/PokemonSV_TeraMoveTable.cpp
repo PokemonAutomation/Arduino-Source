@@ -4,6 +4,8 @@
  *
  */
 
+#include "Common/Cpp/Time.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "PokemonSV_TeraMoveTable.h"
 
 //#include <iostream>
@@ -43,7 +45,7 @@ const EnumDropdownDatabase<TeraTarget>& tera_target_enum_database(){
 std::string TeraMoveEntry::to_str() const{
     switch (type){
     case TeraMoveType::Wait:
-        return "Wait for " + std::to_string(seconds) + " second(s).";
+        return "Wait for " + tostr_u_commas(duration.count()) + " milliseconds.";
     case TeraMoveType::Move1:
     case TeraMoveType::Move2:
     case TeraMoveType::Move3:
@@ -76,12 +78,12 @@ TeraMoveTableRow::~TeraMoveTableRow(){
 TeraMoveTableRow::TeraMoveTableRow(EditableTableOption& parent_table)
     : EditableTableRow(parent_table)
     , type(tera_move_enum_database(), LockMode::UNLOCK_WHILE_RUNNING, TeraMoveType::Move1)
-    , seconds(LockMode::UNLOCK_WHILE_RUNNING, 5)
+    , duration(LockMode::UNLOCK_WHILE_RUNNING, "5000 ms")
     , target(tera_target_enum_database(), LockMode::UNLOCK_WHILE_RUNNING, TeraTarget::Opponent)
     , notes(false, LockMode::UNLOCK_WHILE_RUNNING, "", "(e.g. Screech, Belly Drum)")
 {
     PA_ADD_OPTION(type);
-    PA_ADD_OPTION(seconds);
+    PA_ADD_OPTION(duration);
     PA_ADD_OPTION(target);
     PA_ADD_OPTION(notes);
 
@@ -91,19 +93,19 @@ TeraMoveTableRow::TeraMoveTableRow(EditableTableOption& parent_table)
 std::unique_ptr<EditableTableRow> TeraMoveTableRow::clone() const{
     std::unique_ptr<TeraMoveTableRow> ret(new TeraMoveTableRow(parent()));
     ret->type.set(type);
-    ret->seconds.set(seconds);
+    ret->duration.set(duration.current_text());
     ret->target.set(target);
     ret->notes.set(notes);
     return ret;
 }
 TeraMoveEntry TeraMoveTableRow::snapshot() const{
-    return TeraMoveEntry{type, seconds, target};
+    return TeraMoveEntry{type, duration, target};
 }
 void TeraMoveTableRow::on_config_value_changed(void* object){
     TeraMoveType type = this->type;
 //    cout << "Enter: type = " << (int)type << endl;
 
-    seconds.set_visibility(
+    duration.set_visibility(
         type == TeraMoveType::Wait
         ? ConfigOptionState::ENABLED
         : ConfigOptionState::HIDDEN
@@ -146,7 +148,7 @@ std::vector<TeraMoveEntry> TeraMoveTable::snapshot(){
 std::vector<std::string> TeraMoveTable::make_header() const{
     return {
         "Move",
-        "Wait (seconds)",
+        "Wait (ms)",
         "Target",
         "Notes",
     };

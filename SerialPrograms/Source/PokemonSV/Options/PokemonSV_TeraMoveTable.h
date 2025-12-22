@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_TeraMoveTable_H
 #define PokemonAutomation_PokemonSV_TeraMoveTable_H
 
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
@@ -44,7 +44,7 @@ const EnumDropdownDatabase<TeraTarget>& tera_target_enum_database();
 
 struct TeraMoveEntry{
     TeraMoveType type;
-    uint8_t seconds;
+    Milliseconds duration;
     TeraTarget target;
 
     std::string to_str() const;
@@ -64,7 +64,7 @@ private:
 
 private:
     EnumDropdownCell<TeraMoveType> type;
-    SimpleIntegerCell<uint8_t> seconds;
+    MillisecondsCell duration;
     EnumDropdownCell<TeraTarget> target;
     StringCell notes;
 };

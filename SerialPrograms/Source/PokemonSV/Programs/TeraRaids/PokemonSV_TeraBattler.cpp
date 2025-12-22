@@ -45,7 +45,7 @@ BattleMenuResult run_battle_menu(
         int ret = run_until<ProControllerContext>(
             stream, context,
             [&](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, move.seconds * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, move.duration);
             },
             {catch_menu, overworld}
         );
@@ -195,7 +195,7 @@ bool run_tera_battle(
 
     size_t turn = 0;
     std::vector<TeraMoveEntry> move_table = battle_AI.MOVE_TABLE.snapshot();
-    TeraMoveEntry current_move{TeraMoveType::Move1, 0, TeraTarget::Opponent};
+    TeraMoveEntry current_move{TeraMoveType::Move1, 0ms, TeraTarget::Opponent};
     if (!move_table.empty()){
         current_move = move_table[0];
     }
@@ -272,7 +272,7 @@ bool run_tera_battle(
                 //  Reset the move to the table entry in case we were forced to
                 //  change moves due to move being unselectable.
                 if (move_table.empty()){
-                    current_move = TeraMoveEntry{TeraMoveType::Move1, 0, TeraTarget::Opponent};
+                    current_move = TeraMoveEntry{TeraMoveType::Move1, 0ms, TeraTarget::Opponent};
                 }else if (turn < move_table.size()){
                     current_move = move_table[turn];
                 }else{
