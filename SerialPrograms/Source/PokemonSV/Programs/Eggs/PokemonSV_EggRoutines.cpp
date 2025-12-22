@@ -96,7 +96,7 @@ void handle_egg_hatching(
     int ret = run_until<ProControllerContext>(
         stream, context,
         [](ProControllerContext& context){
-            ssf_press_right_joystick(context, 0, 128, 0, 95);
+            ssf_press_right_joystick(context, {-1, 0}, 0ms, 760ms);
             for(int i = 0; i < 60; i++){
                 pbf_mash_button(context, BUTTON_A, 125);
             }
@@ -275,14 +275,14 @@ void picnic_at_zero_gate(
     // Orient camera to look at same direction as player character
     // This is needed because when save-load the game, the camera is reset
     // to this location.
-    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
     // Move right to make player character facing away from Aera Zero observation station
-    pbf_move_left_joystick(context, 255, 32, 50, 50);
+    pbf_move_left_joystick(context, 255, 32, 400ms, 400ms);
     // Press L to move camera to face the same direction as the player character
-    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
     // Move forward
-    pbf_move_left_joystick(context, 128, 0, 125, 0);
+    pbf_move_left_joystick(context, 128, 0, 1000ms, 0ms);
 
     picnic_from_overworld(info, stream, context);
 }
@@ -294,7 +294,7 @@ bool eat_egg_sandwich_at_picnic(
     Language language
 ){
     // Move forward to table to make sandwich
-    pbf_move_left_joystick(context, 128, 0, 30, 40);
+    pbf_move_left_joystick(context, 128, 0, 240ms, 320ms);
     context.wait_for_all_requests();
 
     clear_mons_in_front(env.program_info(), stream, context);
@@ -350,30 +350,30 @@ void collect_eggs_after_sandwich(
     stream.overlay().add_log("Move past picnic table", COLOR_WHITE);
 
     //  Recall your ride to reduce obstacles.
-    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+    pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
 
 #if 0
     // this sequence will purposefully fail if Camera support is off. 
     // If we fail to reach the egg basket, we can then check that Camera support is on.
 
     //  Move forward to table
-    pbf_move_left_joystick(context, 128, 0, 80, 40);
+    pbf_move_left_joystick(context, 128, 0, 640ms, 320ms);
     //  Move left
-    pbf_move_left_joystick(context, 0, 128, 40, 40);
+    pbf_move_left_joystick(context, {-1, 0}, 320ms, 320ms);
     //  Move forward to pass table
-    pbf_move_left_joystick(context, 128, 0, 80, 40);
+    pbf_move_left_joystick(context, 128, 0, 640ms, 320ms);
     //  Move right
-    pbf_move_left_joystick(context, 255, 128, 40, 85);
+    pbf_move_left_joystick(context, 255, 128, 320ms, 680ms);
     //  Move back/right to align to basket
-    pbf_move_left_joystick(context, 240, 255, 40, 40);
+    pbf_move_left_joystick(context, 240, 255, 320ms, 320ms);
 
     //  Move closer to the basket, up to the table
-    pbf_press_button(context, BUTTON_L, 20, 105);
-    pbf_move_left_joystick(context, 128, 0, 100, 40);
+    pbf_press_button(context, BUTTON_L, 160ms, 840ms);
+    pbf_move_left_joystick(context, 128, 0, 800ms, 320ms);
 
     //  face away from the table
-    pbf_press_button(context, BUTTON_L, 20, 105);
-    pbf_move_left_joystick(context, 128, 255, 10, 40);  
+    pbf_press_button(context, BUTTON_L, 160ms, 840ms);
+    pbf_move_left_joystick(context, 128, 255, 80ms, 320ms);
 #endif
 
 #if 1
@@ -383,7 +383,7 @@ void collect_eggs_after_sandwich(
     pbf_move_left_joystick(context, 128, 0, 320ms, 480ms);
 
     //  Move left
-    pbf_move_left_joystick(context, 0, 128, 80ms, 480ms);
+    pbf_move_left_joystick(context, {-1, 0}, 80ms, 480ms);
     pbf_press_button(context, BUTTON_L, 120ms, 480ms);
     pbf_move_left_joystick(context, 128, 0, 320ms, 480ms);
 
@@ -412,17 +412,17 @@ void collect_eggs_after_sandwich(
 
 #if 0
     //  Move left
-    pbf_move_left_joystick(context, 0, 128, 40, 40);
+    pbf_move_left_joystick(context, {-1, 0}, 320ms, 320ms);
     //  Move forward to pass table
-    pbf_move_left_joystick(context, 128, 0, 80, 40); // old value: 80
+    pbf_move_left_joystick(context, 128, 0, 640ms, 320ms); // old value: 80
     //  Move right
-    pbf_move_left_joystick(context, 255, 128, 50, 40);
+    pbf_move_left_joystick(context, 255, 128, 400ms, 320ms);
     //  Move back to face basket
-    pbf_move_left_joystick(context, 128, 255, 10, 40);
+    pbf_move_left_joystick(context, 128, 255, 80ms, 320ms);
 
     //  Move closer to the basket.
-    pbf_press_button(context, BUTTON_L, 20, 105);
-    pbf_move_left_joystick(context, 128, 0, 10, 40);
+    pbf_press_button(context, BUTTON_L, 160ms, 840ms);
+    pbf_move_left_joystick(context, 128, 0, 80ms, 320ms);
 #endif
 
 
@@ -587,7 +587,7 @@ void check_basket_to_collect_eggs(
 //                "check_basket_to_collect_eggs(): No state detected after 5 seconds."
 //            );
             stream.log("Rotating view and trying again...", COLOR_RED);
-            pbf_move_right_joystick(context, 0, 128, 30, 0);
+            pbf_move_right_joystick(context, {-1, 0}, 240ms, 0ms);
         }
 
     }
@@ -640,7 +640,7 @@ void hatch_eggs_at_zero_gate(
         // Orient camera to look at same direction as player character
         // This is needed because when save-load the game, the camera is reset
         // to this location.
-        pbf_press_button(context, BUTTON_L, 50, 40);
+        pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
         context.wait_for_all_requests();
 
@@ -652,13 +652,13 @@ void hatch_eggs_at_zero_gate(
                 [&](ProControllerContext& context){
                     if (egg_idx == 0){
                         // At beginning, ride on Koraidon/Miradon and go off ramp:
-                        pbf_press_button(context, BUTTON_PLUS, 50, 100);
+                        pbf_press_button(context, BUTTON_PLUS, 400ms, 800ms);
                         // Move right to make player character facing away from Aera Zero observation station
-                        pbf_move_left_joystick(context, 255, 0, 50, 50);
+                        pbf_move_left_joystick(context, 255, 0, 400ms, 400ms);
                         // Press L to move camera to face the same direction as the player character
-                        pbf_press_button(context, BUTTON_L, 50, 40);
+                        pbf_press_button(context, BUTTON_L, 400ms, 320ms);
                         // Move forward
-                        pbf_move_left_joystick(context, 128, 0, 200, 0);
+                        pbf_move_left_joystick(context, 128, 0, 1600ms, 0ms);
                     }
                 },
                 {dialog}
@@ -695,7 +695,7 @@ void hatch_eggs_at_area_three_lighthouse(
         // Orient camera to look at same direction as player character
         // This is needed because when save-load the game, the camera is reset
         // to this location.
-        pbf_press_button(context, BUTTON_L, 50, 40);
+        pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
         context.wait_for_all_requests();
 
@@ -709,14 +709,14 @@ void hatch_eggs_at_area_three_lighthouse(
                         //Run forward a bit
                         pbf_move_left_joystick(context, 128, 0, 150, 20);
                         //Face at an angle, to avoid the tent to the left
-                        pbf_move_left_joystick(context, 0, 0, 50, 50);
+                        pbf_move_left_joystick(context, 0, 0, 400ms, 400ms);
                         //Get on your mount
-                        pbf_press_button(context, BUTTON_L, 50, 40);
+                        pbf_press_button(context, BUTTON_L, 400ms, 320ms);
                         pbf_press_button(context, BUTTON_PLUS, 50, 100);
                         //Go in deep, spawns outside the fence like to come in otherwise
                         pbf_move_left_joystick(context, 128, 0, 750, 0);
-                        pbf_move_left_joystick(context, 0, 0, 50, 50);
-                        pbf_press_button(context, BUTTON_L, 50, 40);
+                        pbf_move_left_joystick(context, 0, 0, 400ms, 400ms);
+                        pbf_press_button(context, BUTTON_L, 400ms, 320ms);
                         pbf_move_left_joystick(context, 128, 0, 550, 0);
                     }
                 },
@@ -729,7 +729,7 @@ void hatch_eggs_at_area_three_lighthouse(
                 stream.log("Reset location by flying back to lighthouse.");
                 // Use map to fly back to the flying spot
                 open_map_from_overworld(info, stream, context);
-                pbf_move_left_joystick(context, 200, 0, 20, 50);
+                pbf_move_left_joystick(context, 200, 0, 160ms, 400ms);
                 fly_to_overworld_from_map(info, stream, context);
                 continue;
             }
@@ -765,7 +765,7 @@ void hatch_eggs_anywhere(
         // Orient camera to look at same direction as player character
         // This is needed because when save-load the game, the camera is reset
         // to this location.
-        pbf_press_button(context, BUTTON_L, 50, 40);
+        pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
         context.wait_for_all_requests();
 
@@ -785,7 +785,7 @@ void reset_position_at_zero_gate(
     // Use map to fly back to the flying spot
     open_map_from_overworld(info, stream, context);
 
-    pbf_move_left_joystick(context, 128, 160, 20, 50);
+    pbf_move_left_joystick(context, 128, 160, 160ms, 400ms);
 
     fly_to_overworld_from_map(info, stream, context);
 }

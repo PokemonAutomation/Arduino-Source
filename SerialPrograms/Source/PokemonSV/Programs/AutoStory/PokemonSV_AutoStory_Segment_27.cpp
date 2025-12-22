@@ -170,7 +170,7 @@ void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnv
 
     direction.change_direction(env.program_info(), env.console, context, 1.448679);
 
-    pbf_move_left_joystick(context, 128, 0, 200, 50);
+    pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
 
 
     // marker 1   x=0.548438, y=0.273148
@@ -189,7 +189,7 @@ void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnv
                 128, 0, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -207,7 +207,7 @@ void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnv
                 128, 0, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -342,7 +342,7 @@ void move_from_glaseado_mountain_to_north_province_area_three(SingleSwitchProgra
                 128, 0, 80, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     ); 

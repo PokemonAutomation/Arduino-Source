@@ -65,7 +65,7 @@ void box_to_overworld(ProControllerContext& context){
 //  Feedback
 
 void overworld_to_menu(VideoStream& stream, ProControllerContext& context){
-    pbf_press_button(context, BUTTON_X, 20, 105);
+    pbf_press_button(context, BUTTON_X, 160ms, 840ms);
     context.wait_for_all_requests();
     {
         MenuWatcher detector;
@@ -100,7 +100,7 @@ void overworld_to_box(VideoStream& stream, ProControllerContext& context){
     pbf_press_button(context, BUTTON_ZL, 160ms, MENU_TO_POKEMON_DELAY);
 
     //  Enter box system.
-    pbf_press_button(context, BUTTON_R, 20, 105);
+    pbf_press_button(context, BUTTON_R, 160ms, 840ms);
     context.wait_for_all_requests();
     {
         BoxWatcher detector;
@@ -135,7 +135,7 @@ void box_to_overworld(VideoStream& stream, ProControllerContext& context){
     pbf_press_button(context, BUTTON_B, 160ms, GameSettings::instance().BOX_TO_POKEMON_DELAY0);
 
     //  To menu.
-    pbf_press_button(context, BUTTON_B, 20, 105);
+    pbf_press_button(context, BUTTON_B, 160ms, 840ms);
     context.wait_for_all_requests();
     {
         MenuWatcher detector;

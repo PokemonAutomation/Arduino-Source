@@ -92,7 +92,7 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
         // heal at the bed
-        pbf_move_left_joystick(context, 128, 0, 300, 100);
+        pbf_move_left_joystick(context, 128, 0, 2400ms, 800ms);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms, 255, 128);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::OVERWORLD});
 
@@ -104,7 +104,7 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         // wait for overworld after leaving research station
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
-        pbf_move_right_joystick(context, 180, 128, 30, 0);  // adjust camera so rock isn't at edge of screen.
+        pbf_move_right_joystick(context, 180, 128, 240ms, 0ms);  // adjust camera so rock isn't at edge of screen.
 
 
         // align to rock-5-1.  
@@ -160,13 +160,13 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
             }
         );
 
-        pbf_move_right_joystick(context, 128, 255, 200, 0);
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "beyond-cliff-5", 0, 60);
+        pbf_move_right_joystick(context, {0, -1}, 1600ms, 0ms);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "beyond-cliff-5", 0, 480ms);
 
         move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "beyond-cliff-5", 0.5,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-                pbf_move_right_joystick(context, 128, 255, 200, 0);
+                pbf_move_right_joystick(context, {0, -1}, 1600ms, 0ms);
                 pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
             }        
         );
@@ -176,7 +176,7 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
             0.5, 0.9,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-                pbf_move_right_joystick(context, 128, 255, 200, 0);
+                pbf_move_right_joystick(context, {0, -1}, 1600ms, 0ms);
                 
                 pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
             }
@@ -292,7 +292,7 @@ void checkpoint_103(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         ); 
 
         pbf_move_left_joystick(context, 128, 0, 300, 50);
-        pbf_move_left_joystick(context, 255, 128, 200, 50);
+        pbf_move_left_joystick(context, 255, 128, 1600ms, 400ms);
 
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 10000ms);
         mash_button_till_overworld(env.console, context, BUTTON_A);

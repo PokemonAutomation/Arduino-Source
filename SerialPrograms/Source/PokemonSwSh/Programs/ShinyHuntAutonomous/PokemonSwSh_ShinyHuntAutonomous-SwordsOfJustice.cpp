@@ -133,7 +133,7 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
             pbf_press_button(context, BUTTON_A, 20, 100);
             pbf_press_button(context, BUTTON_A, 20, 100);
         }
-        pbf_press_button(context, BUTTON_X, 20, 50);
+        pbf_press_button(context, BUTTON_X, 160ms, 400ms);
         pbf_press_dpad(context, DPAD_LEFT, 20, 20);
         env.log("Starting Encounter: " + tostr_u_commas(stats.encounters() + 1));
         pbf_press_button(context, BUTTON_A, 20, 0);

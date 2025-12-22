@@ -67,7 +67,7 @@ void trade_current_pokemon(
         tracker.check_unrecoverable_error(stream.logger());
     }
     {
-        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_A, 160ms, 840ms);
         context.wait_for_all_requests();
         ButtonDetector detector(
             stream.logger(), stream.overlay(),

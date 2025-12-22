@@ -370,14 +370,14 @@ WallClock make_sandwich_material_farm(
                 // Orient camera to look at same direction as player character
                 // - This is needed because when save-load the game, 
                 // the camera angle is different than when just flying to pokecenter
-                pbf_press_button(context, BUTTON_L, 50, 40);
+                pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
                 // move up towards pokecenter counter        
                 pbf_move_left_joystick(context, 128, 255, 180, 10);
                 // Orient camera to look at same direction as player character
-                pbf_press_button(context, BUTTON_L, 50, 40);
+                pbf_press_button(context, BUTTON_L, 400ms, 320ms);
                 // look left
-                pbf_move_right_joystick(context, 0, 128, 120, 0);
+                pbf_move_right_joystick(context, {-1, 0}, 960ms, 0ms);
                 // move toward clearing besides the pokecenter
                 pbf_move_left_joystick(context, 128, 0, 300, 0);
 
@@ -418,23 +418,23 @@ void move_to_start_position_for_letsgo0(
     // Orient camera to look at same direction as player character
     // - This is needed because when save-load the game, 
     // the camera angle is different than when just flying to pokecenter
-    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
     // move up towards pokecenter counter        
     pbf_move_left_joystick(context, 128, 255, 180, 10);
     // Orient camera to look at same direction as player character
-    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
     // look left
-    pbf_move_right_joystick(context, 0, 128, 120, 10);
+    pbf_move_right_joystick(context, {-1, 0}, 960ms, 80ms);
     // move toward clearing besides the pokecenter
     pbf_move_left_joystick(context, 128, 0, 300, 10);
 
     // look right, towards the start position
-    pbf_move_right_joystick(context, 255, 128, 120, 10);
+    pbf_move_right_joystick(context, {+1, 0}, 960ms, 80ms);
     pbf_move_left_joystick(context, 128, 0, 10, 10);
 
     // get on ride
-    pbf_press_button(context, BUTTON_PLUS, 50, 50);
+    pbf_press_button(context, BUTTON_PLUS, 400ms, 400ms);
 
     // Jump
     pbf_press_button(context, BUTTON_B, 125, 100);
@@ -452,11 +452,11 @@ void move_to_start_position_for_letsgo0(
     // arrived at start position. stop flying
     pbf_press_button(context, BUTTON_B, 50, 400);
     // get off ride
-    pbf_press_button(context, BUTTON_PLUS, 50, 50);
+    pbf_press_button(context, BUTTON_PLUS, 400ms, 400ms);
 
     // look right
-    pbf_move_right_joystick(context, 255, 128, 30, 10);
-    pbf_move_left_joystick(context, 128, 0, 50, 10);
+    pbf_move_right_joystick(context, {+1, 0}, 240ms, 80ms);
+    pbf_move_left_joystick(context, 128, 0, 400ms, 80ms);
 
     stream.log("Arrived at Let's go start position", COLOR_PURPLE);
     
@@ -472,32 +472,32 @@ void move_to_start_position_for_letsgo1(
     // Orient camera to look at same direction as player character
     // - This is needed because when save-load the game, 
     // the camera angle is different than when just flying to pokecenter
-    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
     // move up towards pokecenter counter        
     pbf_move_left_joystick(context, 128, 255, 180, 10);
     // Orient camera to look at same direction as player character
-    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
     // look left
-    pbf_move_right_joystick(context, 0, 128, 120, 10);
+    pbf_move_right_joystick(context, {-1, 0}, 960ms, 80ms);
     // move toward clearing besides the pokecenter
     pbf_move_left_joystick(context, 128, 0, 300, 10);
 
     // look right, towards the start position
     DirectionDetector direction;
     direction.change_direction(info, stream, context, 5.76);
-    // pbf_move_right_joystick(context, 255, 128, 130, 10);
+    // pbf_move_right_joystick(context, {+1, 0}, 1040ms, 80ms);
     pbf_move_left_joystick(context, 128, 0, 10, 10);
 
     // get on ride
-    pbf_press_button(context, BUTTON_PLUS, 50, 50);
+    pbf_press_button(context, BUTTON_PLUS, 400ms, 400ms);
 
     // Jump
     pbf_press_button(context, BUTTON_B, 125, 30);
 
     // Fly 
     pbf_press_button(context, BUTTON_B, 50, 10);
-    pbf_press_button(context, BUTTON_B, 50, 50); // Double click in case of drop
+    pbf_press_button(context, BUTTON_B, 400ms, 400ms); // Double click in case of drop
     pbf_press_button(context, BUTTON_LCLICK, 50, 0);
 
     // you automatically move forward  when flying without pressing any buttons. 
@@ -507,7 +507,7 @@ void move_to_start_position_for_letsgo1(
     // arrived at start position. stop flying
     pbf_press_button(context, BUTTON_B, 50, 400);
     // get off ride
-    pbf_press_button(context, BUTTON_PLUS, 50, 50);
+    pbf_press_button(context, BUTTON_PLUS, 400ms, 400ms);
 
     // extra B presses to ensure we stop flying, in case the previous B press
     // was dropped. This way, you eventually reset back to Pokecenter, instead
@@ -516,7 +516,7 @@ void move_to_start_position_for_letsgo1(
     pbf_press_button(context, BUTTON_B, 50, 10);
 
     // look right
-    // pbf_move_right_joystick(context, 255, 128, 20, 10);
+    // pbf_move_right_joystick(context, {+1, 0}, 160ms, 80ms);
     direction.change_direction(info, stream, context, 5.3);
 
     // move forward slightly
@@ -556,10 +556,10 @@ void run_lets_go_iteration(
     // - This is needed because when save-load the game, the camera points
     // in the same direction as the player.
     // - But when warping to pokecenter, the camera is facing the player.
-    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
     // zoom out camera
-    pbf_move_right_joystick(context, 128, 255, 45, 10);
+    pbf_move_right_joystick(context, {0, -1}, 360ms, 80ms);
 
     const bool throw_ball_if_bubble = false;
     const int total_iterations = num_forward_moves_per_lets_go_iteration;
@@ -708,7 +708,7 @@ void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, VideoS
         numAttempts++;
 
         // move toward entrance gates
-        pbf_move_left_joystick(context, 190, 0, 200, 50);
+        pbf_move_left_joystick(context, 190, 0, 1600ms, 400ms);
 
         context.wait_for_all_requests();
 
@@ -724,7 +724,7 @@ void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, VideoS
         }
 
         // Move selector to League club room
-        pbf_press_dpad(context, DPAD_UP, 20, 50);
+        pbf_press_dpad(context, DPAD_UP, 160ms, 400ms);
 
         // Confirm to League club room is selected
         ImageFloatBox select_league_club_box(0.038, 0.785, 0.043, 0.081);
@@ -766,10 +766,10 @@ void move_from_league_club_entrance_to_item_printer(const ProgramInfo& info, Vid
     context.wait_for_all_requests();
 
     // move forwards towards table next to item printer
-    pbf_move_left_joystick(context, 120, 0, 200, 50);
+    pbf_move_left_joystick(context, 120, 0, 1600ms, 400ms);
 
     // look left towards item printer
-    pbf_move_left_joystick(context, 0, 128, 10, 50);
+    pbf_move_left_joystick(context, {-1, 0}, 80ms, 400ms);
 }
 
 void move_from_item_printer_to_material_farming(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -783,10 +783,10 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Video
     context.wait_for_all_requests();
 
     // look left towards door
-    pbf_move_left_joystick(context, 0, 128, 10, 50);
+    pbf_move_left_joystick(context, {-1, 0}, 80ms, 400ms);
 
     // re-orient camera to look same direction as player
-    pbf_press_button(context, BUTTON_L, 50, 50);
+    pbf_press_button(context, BUTTON_L, 400ms, 400ms);
 
     // move forward towards door
     pbf_move_left_joystick(context, 128, 0, 700, 50);

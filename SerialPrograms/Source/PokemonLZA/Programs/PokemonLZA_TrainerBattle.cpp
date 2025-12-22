@@ -135,7 +135,7 @@ bool TrainerBattleState::attempt_one_attack(
 void TrainerBattleState::run_lock_recovery(ConsoleHandle& console, ProControllerContext& context){
     console.log("Failed to lock on. Rotating camera...", COLOR_RED);
 
-    ssf_press_right_joystick(context, 0, 128, 0ms, 1000ms, 0ms);
+    ssf_press_right_joystick(context, {-1, 0},  0ms, 1000ms, 0ms);
     pbf_mash_button(context, BUTTON_ZL, 1000ms);
     context.wait_for_all_requests();
 }

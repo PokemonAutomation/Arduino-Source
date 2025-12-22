@@ -143,11 +143,11 @@ bool reset_game_from_home_zoom_out(
 
     //  5 zooms will guarantee that are fully zoomed out regardless of whether
     //  we are on the DLC update.
-    pbf_press_button(context, BUTTON_RCLICK, 20, 105);
-    pbf_press_button(context, BUTTON_RCLICK, 20, 105);
-    pbf_press_button(context, BUTTON_RCLICK, 20, 105);
-    pbf_press_button(context, BUTTON_RCLICK, 20, 105);
-    pbf_press_button(context, BUTTON_RCLICK, 20, 105);
+    pbf_press_button(context, BUTTON_RCLICK, 160ms, 840ms);
+    pbf_press_button(context, BUTTON_RCLICK, 160ms, 840ms);
+    pbf_press_button(context, BUTTON_RCLICK, 160ms, 840ms);
+    pbf_press_button(context, BUTTON_RCLICK, 160ms, 840ms);
+    pbf_press_button(context, BUTTON_RCLICK, 160ms, 840ms);
 
     return ret;
 }

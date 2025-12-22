@@ -95,7 +95,7 @@ void route_alpha_pidgeot(SingleSwitchProgramEnvironment& env, ProControllerConte
             [](ProControllerContext& context){
                 ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
                 pbf_move_left_joystick(context, 128, 0, 4000ms, 0ms);
-                pbf_move_left_joystick(context, 128, 255, 4500ms, 0ms);
+                pbf_move_left_joystick(context, {0, -1}, 4500ms, 0ms);
                 pbf_wait(context, 500ms);
             },
             {black_screen}
@@ -115,11 +115,11 @@ void route_alpha_pidgeot(SingleSwitchProgramEnvironment& env, ProControllerConte
         ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
         pbf_move_left_joystick(context, 255, 128, 800ms, 0ms);
         pbf_move_left_joystick(context, 128, 0, 4400ms, 0ms);
-        pbf_move_left_joystick(context, 0, 128, 300ms, 0ms);
+        pbf_move_left_joystick(context, {-1, 0},  300ms, 0ms);
         pbf_press_button(context, BUTTON_A, 500ms, 2500ms); // elevator up
         ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
         pbf_move_left_joystick(context, 128, 0, 900ms, 0ms);
-        pbf_move_left_joystick(context, 0, 128, 2000ms, 0ms);
+        pbf_move_left_joystick(context, {-1, 0},  2000ms, 0ms);
         pbf_move_left_joystick(context, 255, 128, 200ms, 200ms);
         pbf_press_button(context, BUTTON_L, 100ms, 200ms);
     }
@@ -146,7 +146,7 @@ void route_wild_zone_3_tower(SingleSwitchProgramEnvironment& env, ProControllerC
         }
         if (face_east || face_south){
             // if facing east or south, run backward
-            pbf_move_left_joystick(context, 128, 255, 500ms, 200ms);
+            pbf_move_left_joystick(context, {0, -1}, 500ms, 200ms);
         } else if (face_west || face_north){
             // if facing west or north, run forward
             pbf_move_left_joystick(context, 128, 0, 500ms, 200ms);

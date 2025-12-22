@@ -229,7 +229,7 @@ CatchResults basic_catcher(
             }
 
             last_move_attack = false;
-            pbf_press_button(context, BUTTON_X, 20, 105);
+            pbf_press_button(context, BUTTON_X, 160ms, 840ms);
 #if 0
             context.wait_for_all_requests();
             BattleBallReader reader(stream, language, COLOR_RED);
@@ -270,12 +270,12 @@ CatchResults basic_catcher(
         case 3:
             stream.log("Detected add to party...");
             caught = true;
-            pbf_press_button(context, BUTTON_B, 20, 230);
+            pbf_press_button(context, BUTTON_B, 160ms, 1840ms);
             break;
         case 4:
             stream.log("Detected dialog...");
             caught = true;
-            pbf_press_button(context, BUTTON_B, 20, 230);
+            pbf_press_button(context, BUTTON_B, 160ms, 1840ms);
             break;
         default:
             OperationFailedException::fire(

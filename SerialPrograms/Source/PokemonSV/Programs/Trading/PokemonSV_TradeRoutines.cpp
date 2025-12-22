@@ -160,7 +160,7 @@ void trade_current_pokemon(
         switch (ret){
         case 0:
             stream.log("Detected dialog.");
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             break;
         case 1:
             stream.log("Detected box. Trade completed.");
@@ -169,7 +169,7 @@ void trade_current_pokemon(
             return;
         case 2:
             stream.log("Detected move learn.");
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             break;
         default:
             stats.m_errors++;

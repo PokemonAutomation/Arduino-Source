@@ -15,7 +15,7 @@ namespace PokemonBDSP{
 
 //  Detach items.
 void detach(ProControllerContext& context);
-void detach_box(ProControllerContext& context, uint16_t box_scroll_delay);
+void detach_box(ProControllerContext& context, Milliseconds box_scroll_delay);
 
 //  Release Pokemon.
 void release(ProControllerContext& context);

@@ -10,14 +10,11 @@
 #ifndef PokemonAutomation_PokemonLA_GeneratePokemonImageTrainingData_H
 #define PokemonAutomation_PokemonLA_GeneratePokemonImageTrainingData_H
 
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonLA/PokemonLA_Locations.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

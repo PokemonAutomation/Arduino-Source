@@ -390,7 +390,7 @@ void OutbreakFinder::goto_region_and_return(
         );
         if (ret >= 0){
             context.wait_for(std::chrono::milliseconds(500));
-            pbf_press_dpad(context, DPAD_DOWN, 20, 105);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 840ms);
             break;
         }
         env.console.log("Did not detect option to return to Jubilife.", COLOR_RED);
@@ -456,7 +456,7 @@ std::vector<std::string> OutbreakFinder::run_iteration(
 
         // Cancel map view
         inside_travel_map = false;
-        pbf_press_button(context, BUTTON_B, 50, 50);
+        pbf_press_button(context, BUTTON_B, 400ms, 400ms);
         // Leave the guard.
         pbf_move_left_joystick(context, 128, 0, 100, 50);
         // Checking MMO costs Aguav Berries.

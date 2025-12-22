@@ -105,7 +105,7 @@ bool proper_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& c
 void bench_loop(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t quantity) {
     for(size_t i = 0; i < quantity; i++) {
         sit_on_bench(env.console, context);
-        pbf_move_left_joystick(context, 128, 255, 500ms, 200ms);
+        pbf_move_left_joystick(context, {0, -1}, 500ms, 200ms);
     }
 }
 
@@ -130,7 +130,7 @@ void reach_bench(SingleSwitchProgramEnvironment& env, ProControllerContext& cont
     pbf_press_button(context, BUTTON_A, 500ms, 500ms);
     pbf_wait(context, 3000ms);
     //Go to bench
-    pbf_move_left_joystick(context, 0, 128, 700ms, 200ms);
+    pbf_move_left_joystick(context, {-1, 0},  700ms, 200ms);
     pbf_move_left_joystick(context, 128, 0, 500ms, 200ms);
 }
 
@@ -178,7 +178,7 @@ void execute_fixed_routine(SingleSwitchProgramEnvironment& env, ConsoleHandle& c
 
     //moving back
     ssf_press_button(context, BUTTON_B, 0ms, 5s, 0ms);
-    pbf_move_left_joystick(context, 128, 255, 5s, 500ms);
+    pbf_move_left_joystick(context, {0, -1}, 5s, 500ms);
 
     //leave WZ
     pbf_press_button(context, BUTTON_A, 500ms, 1500ms);

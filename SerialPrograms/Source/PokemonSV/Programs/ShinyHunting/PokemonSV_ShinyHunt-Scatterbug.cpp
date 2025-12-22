@@ -332,7 +332,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(
             // Orient camera to look at same direction as player character
             // This is needed because when save-load the game, the camera is reset
             // to this location.
-            pbf_press_button(context, BUTTON_L, 50, 40);
+            pbf_press_button(context, BUTTON_L, 400ms, 320ms);
             // Move forward
             pbf_move_left_joystick(context, 128, 0, 180, 0);
             if (!SKIP_SANDWICH){
@@ -412,7 +412,7 @@ void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& 
     // Orient camera to look at same direction as player character
     // This is needed because when save-load the game, the camera is reset
     // to this location.
-    pbf_press_button(context, BUTTON_L, 50, 40);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
     const bool throw_ball_if_bubble = true;
 
@@ -431,21 +431,21 @@ void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& 
         // move rightward, to the west
         pbf_move_left_joystick(context, 255, 128, 100, 20);
         // Align camera
-        pbf_press_button(context, BUTTON_L, 50, 40);
+        pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
         move_forward_with_lets_go(10);
     }else{ // path_id == 1
         // move leftward, to the east
-        pbf_move_left_joystick(context, 0, 128, 100, 20);
+        pbf_move_left_joystick(context, {-1, 0}, 800ms, 160ms);
         // Align camera
-        pbf_press_button(context, BUTTON_L, 50, 40);
+        pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
         move_forward_with_lets_go(5);
 
         // move rightward, to south
         pbf_move_left_joystick(context, 255, 128, 50, 20);
         // Align camera
-        pbf_press_button(context, BUTTON_L, 50, 40);
+        pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
         move_forward_with_lets_go(5);
     }

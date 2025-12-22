@@ -117,7 +117,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         direction.change_direction(env.program_info(), env.console, context, 0.696613);
 
-        pbf_move_left_joystick(context, 128, 0, 200, 50);
+        pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 150, 0, 120);
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
@@ -127,7 +127,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     128, 0, 40, 20, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 40, 50);
+                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         ); 
@@ -143,7 +143,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     128, 0, 40, 20, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 40, 50);
+                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         ); 
@@ -181,7 +181,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 DirectionDetector direction;
 
                 direction.change_direction(env.program_info(), env.console, context, 0.611062);
-                pbf_move_left_joystick(context, 128, 0, 200, 50);
+                pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, wait);
 
@@ -195,7 +195,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 pbf_move_left_joystick(context, 128, 0, 400, 50);
 
                 direction.change_direction(env.program_info(), env.console, context, 4.920249);
-                pbf_move_left_joystick(context, 128, 0, 100, 50);
+                pbf_move_left_joystick(context, 128, 0, 800ms, 400ms);
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, wait);
 
@@ -215,7 +215,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 0.979935);
-                pbf_move_left_joystick(context, 128, 0, 500, 50);
+                pbf_move_left_joystick(context, 128, 0, 4000ms, 400ms);
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, wait);
 
@@ -225,7 +225,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 1.869166);
-                pbf_move_left_joystick(context, 128, 0, 200, 50);
+                pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, wait);
 
@@ -245,13 +245,13 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
                 try {
                     direction.change_direction(env.program_info(), env.console, context, 1.451616);
-                    pbf_move_left_joystick(context, 128, 0, 500, 50);
+                    pbf_move_left_joystick(context, 128, 0, 4000ms, 400ms);
                     pbf_press_button(context, BUTTON_R, 20, 20);
                     pbf_wait(context, wait);
                     
 
                     direction.change_direction(env.program_info(), env.console, context, 2.023052);
-                    pbf_move_left_joystick(context, 128, 0, 500, 50);
+                    pbf_move_left_joystick(context, 128, 0, 4000ms, 400ms);
                     pbf_press_button(context, BUTTON_R, 20, 20);
                     pbf_wait(context, wait);
                     
@@ -262,7 +262,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     pbf_wait(context, wait);
                     
                     direction.change_direction(env.program_info(), env.console, context, 0.609735);
-                    pbf_move_left_joystick(context, 128, 0, 200, 50);
+                    pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
                     pbf_press_button(context, BUTTON_R, 20, 20);
                     pbf_wait(context, wait);
                 }catch (OperationFailedException&){
@@ -334,7 +334,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
                 128, 0, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 0, 255, 40, 50);
+            pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -352,7 +352,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
                 128, 0, 60, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 0, 255, 40, 50);
+            pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -370,7 +370,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
                 128, 0, 50, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -388,7 +388,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
                 128, 0, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -407,7 +407,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
                 128, 0, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -425,7 +425,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
                 128, 0, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );

@@ -232,7 +232,7 @@ std::string IngredientSession::move_to_ingredient(const std::set<std::string>& i
                 return "";
             }else{
                 m_stream.log("End of page reached without finding ingredient. Wrapping back to beginning.", COLOR_ORANGE);
-                pbf_press_dpad(m_context, DPAD_DOWN, 20, 105);
+                pbf_press_dpad(m_context, DPAD_DOWN, 160ms, 840ms);
                 continue;
             }
         }
@@ -285,7 +285,7 @@ void IngredientSession::add_ingredients(
         while (iter->second > 0){
             bool ingredient_added = false;
             for (int attempt = 0; attempt < 5; attempt++){
-                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_button(context, BUTTON_A, 160ms, 840ms);
                 context.wait_for_all_requests();
                 VideoSnapshot image = stream.video().snapshot();
                 ImageMatch::ImageMatchResult image_result = 
@@ -325,17 +325,17 @@ void add_sandwich_ingredients(
     {
         IngredientSession session(stream, context, language, SandwichIngredientType::FILLING);
         session.add_ingredients(stream, context, std::move(fillings));
-        pbf_press_button(context, BUTTON_PLUS, 20, 230);
+        pbf_press_button(context, BUTTON_PLUS, 160ms, 1840ms);
     }
 
     {
         IngredientSession session(stream, context, language, SandwichIngredientType::CONDIMENT);
         // If there are herbs, we search first from bottom
         if (std::any_of(condiments.begin(), condiments.end(), [&](const auto& p){return p.first.find("herba") != std::string::npos;})){
-            pbf_press_dpad(context, DPAD_UP, 20, 105);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 840ms);
         }
         session.add_ingredients(stream, context, std::move(condiments));
-        pbf_press_button(context, BUTTON_PLUS, 20, 230);
+        pbf_press_button(context, BUTTON_PLUS, 160ms, 1840ms);
     }
 
     pbf_mash_button(context, BUTTON_A, 125);

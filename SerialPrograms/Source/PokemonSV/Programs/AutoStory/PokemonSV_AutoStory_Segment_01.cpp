@@ -123,14 +123,14 @@ void checkpoint_02(
         env.console.overlay().add_log("Go downstairs, get stopped by Skwovet", COLOR_WHITE);
         pbf_move_left_joystick(context, 128,   0, 3000ms, 160ms);
         pbf_move_left_joystick(context,   0, 128, 3000ms, 160ms);
-        pbf_move_left_joystick(context, 128, 255, 3000ms, 160ms);
+        pbf_move_left_joystick(context, {0, -1}, 3000ms, 160ms);
         pbf_wait(context, 5000ms);
         // clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5, {});
 
         context.wait_for_all_requests();
         env.console.log("Go to the kitchen, talk with mom");
         env.console.overlay().add_log("Go to the kitchen, talk with mom", COLOR_WHITE);
-        pbf_move_left_joystick(context, 128, 255, 2000ms, 160ms);
+        pbf_move_left_joystick(context, {0, -1}, 2000ms, 160ms);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms, 0, 128);
 
         env.console.log("clear_dialog: Talk with Mom.");
@@ -161,7 +161,7 @@ void checkpoint_02(
         env.console.overlay().add_log("Go to the living room, talk with Clavell", COLOR_WHITE);
         pbf_move_left_joystick(context,   0,   0, 3000ms, 160ms);
         pbf_move_left_joystick(context,   0, 128, 3000ms, 160ms);
-        pbf_move_left_joystick(context, 128, 255, 4000ms, 160ms);
+        pbf_move_left_joystick(context, {0, -1}, 4000ms, 160ms);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms, 0, 128);
         
         env.console.log("clear_dialog: Talk with Clavell at living room.");
@@ -198,7 +198,7 @@ void checkpoint_03(
         DirectionDetector direction;
         direction.change_direction(env.program_info(), env.console, context, 4.62);
         pbf_move_left_joystick(context, 128, 0, 3600, 50);
-        pbf_move_left_joystick(context, 0, 128, 30, 50);
+        pbf_move_left_joystick(context, {-1, 0}, 240ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 4.62);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20000ms);
@@ -222,11 +222,11 @@ void checkpoint_03(
             pbf_move_left_joystick(context, 128, 0, 80, 20);
             break;
         }
-        pbf_press_button(context, BUTTON_A, 20, 105); // choose the starter
+        pbf_press_button(context, BUTTON_A, 160ms, 840ms); // choose the starter
         env.console.log("clear_dialog: Choose starter. Stop when detect prompt to receive starter.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 20, {CallbackEnum::PROMPT_DIALOG});
 
-        pbf_press_button(context, BUTTON_A, 20, 105); // accept the pokemon
+        pbf_press_button(context, BUTTON_A, 160ms, 840ms); // accept the pokemon
         env.console.log("clear_dialog: Stop when detect prompt to give nickname to starter.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 20, {CallbackEnum::PROMPT_DIALOG});
 

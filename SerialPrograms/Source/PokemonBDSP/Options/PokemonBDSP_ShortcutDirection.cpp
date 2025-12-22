@@ -49,7 +49,7 @@ void ShortcutDirectionOption::run(ProControllerContext& context, Milliseconds de
     uint8_t shortcut_y = 128;
     switch (this->get()){
     case ShortcutDirection::NONE:
-        pbf_press_button(context, BUTTON_PLUS, 20, 105);
+        pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
         return;
     case ShortcutDirection::UP:     shortcut_y = 0; break;
     case ShortcutDirection::RIGHT:  shortcut_x = 255; break;

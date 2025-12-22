@@ -84,7 +84,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, ProCont
     AutonomousBallThrower_Descriptor::Stats& stats = env.current_stats<AutonomousBallThrower_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 10, 0);
+    pbf_press_button(context, BUTTON_LCLICK, 80ms, 0ms);
 
     CatchResults results = basic_catcher(
         env.console, context, LANGUAGE,

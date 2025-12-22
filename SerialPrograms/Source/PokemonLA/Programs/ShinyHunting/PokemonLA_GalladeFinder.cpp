@@ -132,7 +132,7 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProContro
                 pbf_move_left_joystick(context, 255, 128, 1800ms, 160ms); // right alone
 
                 // down portion
-                // pbf_move_left_joystick(context, 128, 255, 1900ms, 160ms); // OLD down
+                // pbf_move_left_joystick(context, {0, -1}, 1900ms, 160ms); // OLD down
                 pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, {0, -1}, {0, 0}, 1800ms);
 
                 // camera align
@@ -143,7 +143,7 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProContro
                 destination_time = current_time();
                 shiny_action.store(&SHINY_DETECTED_DESTINATION, std::memory_order_release);
 
-                pbf_move_left_joystick(context, 0, 128, 2000ms, 0ms); // left
+                pbf_move_left_joystick(context, {-1, 0},  2000ms, 0ms); // left
 
                 // then forward left
                 pbf_move_left_joystick(context, 0, 0, 1100ms, 0ms);

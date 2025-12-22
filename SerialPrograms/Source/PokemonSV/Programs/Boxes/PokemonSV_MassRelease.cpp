@@ -171,7 +171,7 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env, ProControllerCont
     MassRelease_Descriptor::Stats& stats = env.current_stats<MassRelease_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 10, 0);
+    pbf_press_button(context, BUTTON_LCLICK, 80ms, 0ms);
 
     m_in_judge_view = false;
 

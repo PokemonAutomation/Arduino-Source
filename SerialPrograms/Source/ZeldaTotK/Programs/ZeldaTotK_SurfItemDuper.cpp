@@ -112,7 +112,7 @@ void SurfItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         pbf_press_button(context, BUTTON_B | BUTTON_Y, 10, 40);
 
         //Drop to the ground
-        pbf_press_button(context, BUTTON_B, 20, 50);
+        pbf_press_button(context, BUTTON_B, 160ms, 400ms);
 
         //Pick up duped items - extra presses just in case
         pbf_press_button(context, BUTTON_A, 10, 10);

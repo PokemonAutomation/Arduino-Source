@@ -116,10 +116,10 @@ void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
 
             direction.change_direction(env.program_info(), env.console, context, 3.855289);
-            pbf_move_left_joystick(context, 128, 0, 200, 50);
+            pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.056395);
-            pbf_move_left_joystick(context, 128, 0, 250, 50);
+            pbf_move_left_joystick(context, 128, 0, 2000ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.749788);
             pbf_move_left_joystick(context, 128, 0, 680, 50);
@@ -160,7 +160,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
-        pbf_move_left_joystick(context, 128, 255, 300, 100);
+        pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
@@ -185,7 +185,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
 
             direction.change_direction(env.program_info(), env.console, context, 0.943392);
-            pbf_move_left_joystick(context, 128, 0, 200, 50);
+            pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 2.513925);
 
@@ -207,7 +207,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 pbf_move_left_joystick(context, 0, 0, 2861ms, 0ms);
                 pbf_move_left_joystick(context, 128, 0, 309ms, 0ms);
                 pbf_wait(context, 6431ms);
-                pbf_move_left_joystick(context, 0, 128, 5081ms, 0ms);
+                pbf_move_left_joystick(context, {-1, 0}, 5081ms, 0ms);
                 pbf_wait(context, 239ms);
                 pbf_move_left_joystick(context, 128, 255, 961ms, 0ms);
                 pbf_wait(context, 1615ms);
@@ -242,10 +242,10 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
 
             direction.change_direction(env.program_info(), env.console, context, 3.855289);
-            pbf_move_left_joystick(context, 128, 0, 200, 50);
+            pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.056395);
-            pbf_move_left_joystick(context, 128, 0, 250, 50);
+            pbf_move_left_joystick(context, 128, 0, 2000ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.749788);
             pbf_move_left_joystick(context, 128, 0, 680, 50);
@@ -279,7 +279,7 @@ void checkpoint_77(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
-        pbf_move_left_joystick(context, 128, 255, 300, 100);
+        pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
@@ -303,10 +303,10 @@ void checkpoint_77(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
 
             direction.change_direction(env.program_info(), env.console, context, 3.855289);
-            pbf_move_left_joystick(context, 128, 0, 200, 50);
+            pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.056395);
-            pbf_move_left_joystick(context, 128, 0, 250, 50);
+            pbf_move_left_joystick(context, 128, 0, 2000ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.749788);
             pbf_move_left_joystick(context, 128, 0, 680, 50);
@@ -342,7 +342,7 @@ void move_from_glaseado_gym_to_north_province_area_one(SingleSwitchProgramEnviro
                 128, 0, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -361,7 +361,7 @@ void move_from_glaseado_gym_to_north_province_area_one(SingleSwitchProgramEnviro
                 128, 0, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -379,7 +379,7 @@ void move_from_glaseado_gym_to_north_province_area_one(SingleSwitchProgramEnviro
                 128, 0, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 0, 255, 40, 50);
+            pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -399,7 +399,7 @@ void move_from_glaseado_gym_to_north_province_area_one(SingleSwitchProgramEnviro
                 128, 0, 50, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -417,7 +417,7 @@ void move_from_glaseado_gym_to_north_province_area_one(SingleSwitchProgramEnviro
                 128, 0, 110, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 0, 255, 40, 50);
+            pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     ); 

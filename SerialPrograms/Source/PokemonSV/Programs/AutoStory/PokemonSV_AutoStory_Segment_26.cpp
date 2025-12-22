@@ -126,8 +126,8 @@ void checkpoint_61(
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
                     128, 0, 60, 20, false);
             }, 
-            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                pbf_move_left_joystick(context, 0, 128, 40, 50);
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
@@ -139,9 +139,9 @@ void checkpoint_61(
                 walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20000ms);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                pbf_move_left_joystick(context, 255, 0, 100, 50); // if to the left of the door, will move right and enter
-                pbf_move_left_joystick(context, 0, 128, 300, 50); // if to the right of the door, will move left
-                pbf_move_left_joystick(context, 255, 0, 100, 50); // then move right and enter
+                pbf_move_left_joystick(context, 255, 0, 800ms, 400ms); // if to the left of the door, will move right and enter
+                pbf_move_left_joystick(context, {-1, 0}, 2400ms, 400ms); // if to the right of the door, will move left
+                pbf_move_left_joystick(context, 255, 0, 800ms, 400ms); // then move right and enter
             }
         );
 
@@ -165,7 +165,7 @@ void checkpoint_62(
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
-        pbf_move_left_joystick(context, 128, 255, 300, 100);
+        pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
@@ -180,7 +180,7 @@ void checkpoint_62(
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 0, 0ms});
 
 
-        pbf_press_button(context, BUTTON_L, 50, 50);
+        pbf_press_button(context, BUTTON_L, 400ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 1.971173);
         pbf_move_left_joystick(context, 128, 0, 600, 50);
@@ -196,25 +196,25 @@ void checkpoint_62(
         // wait for overworld after entering Eatery
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
-        pbf_move_left_joystick(context, 255, 128, 50, 50);
+        pbf_move_left_joystick(context, 255, 128, 400ms, 400ms);
         
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A);
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
 
         // grilled rice balls
-        pbf_press_button(context, BUTTON_A, 50, 50);
+        pbf_press_button(context, BUTTON_A, 400ms, 400ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
         // medium serving
         pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-        pbf_press_button(context, BUTTON_A, 50, 50);
+        pbf_press_button(context, BUTTON_A, 400ms, 400ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
         // extra crispy
         pbf_press_dpad(context, DPAD_UP, 13, 20);
-        pbf_press_button(context, BUTTON_A, 50, 50);
+        pbf_press_button(context, BUTTON_A, 400ms, 400ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
         // lemon
         pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-        pbf_press_button(context, BUTTON_A, 50, 50);
+        pbf_press_button(context, BUTTON_A, 400ms, 400ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD}, false);
 
 
@@ -249,7 +249,7 @@ void checkpoint_63(
     [&](size_t attempt_number){
 
         // Gym leader defeated. Standing in Gym building
-        pbf_move_left_joystick(context, 128, 255, 300, 100);
+        pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving Gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
@@ -287,7 +287,7 @@ void move_from_medali_to_glaseado_mountain(SingleSwitchProgramEnvironment& env, 
                 128, 0, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 0, 255, 40, 50);
+            pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -306,7 +306,7 @@ void move_from_medali_to_glaseado_mountain(SingleSwitchProgramEnvironment& env, 
                 128, 0, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 0, 255, 40, 50);
+            pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -325,7 +325,7 @@ void move_from_medali_to_glaseado_mountain(SingleSwitchProgramEnvironment& env, 
                 128, 0, 40, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 0, 255, 40, 50);
+            pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -371,7 +371,7 @@ void move_from_medali_to_glaseado_mountain(SingleSwitchProgramEnvironment& env, 
                 128, 0, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -389,7 +389,7 @@ void move_from_medali_to_glaseado_mountain(SingleSwitchProgramEnvironment& env, 
                 128, 0, 40, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 0, 255, 40, 50);
+            pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -408,7 +408,7 @@ void move_from_medali_to_glaseado_mountain(SingleSwitchProgramEnvironment& env, 
                 128, 0, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 0, 255, 40, 50);
+            pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -426,7 +426,7 @@ void move_from_medali_to_glaseado_mountain(SingleSwitchProgramEnvironment& env, 
                 128, 0, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 0, 255, 40, 50);
+            pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -444,7 +444,7 @@ void move_from_medali_to_glaseado_mountain(SingleSwitchProgramEnvironment& env, 
                 128, 0, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );
@@ -463,7 +463,7 @@ void move_from_medali_to_glaseado_mountain(SingleSwitchProgramEnvironment& env, 
                 128, 0, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     ); 

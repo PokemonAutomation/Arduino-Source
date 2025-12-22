@@ -361,7 +361,7 @@ bool EggAutonomous::run_batch(
                     [](ProControllerContext& context){
                         // Try move a little to hatch more:
                         // We move toward lower-left so that it wont hit the lady or enter the Nursory.
-                        pbf_move_left_joystick(context, 0, 255, 100, 10);
+                        pbf_move_left_joystick(context, {-1, -1}, 800ms, 80ms);
                     },
                     {{egg_hatching_detector}}
                 );
@@ -741,7 +741,7 @@ bool EggAutonomous::process_hatched_pokemon(
                 // pbf_mash_button(context, BUTTON_A, 180);
 
                 // Press A to open pokemon menu
-                pbf_press_button(context, BUTTON_A, 20, 50);
+                pbf_press_button(context, BUTTON_A, 160ms, 400ms);
                 context.wait_for_all_requests();
                 StoragePokemonMenuArrowFinder pokemon_menu_detector(env.console.overlay());
                 int ret = wait_until(
@@ -766,7 +766,7 @@ bool EggAutonomous::process_hatched_pokemon(
                 pbf_press_dpad(context, DPAD_UP, 20, 20);
 
                 // Press A to release
-                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_button(context, BUTTON_A, 160ms, 840ms);
                 // Move cursor from "Not release" to "release".
                 pbf_press_dpad(context, DPAD_UP, 20, 30);
                 // Press A to confirm release, wait for a while to let the next dialog box pop up.

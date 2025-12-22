@@ -58,9 +58,9 @@ FlagNavigationAir::FlagNavigationAir(
         for (size_t c = 0; c < 2; c++){
             pbf_mash_button(context, BUTTON_ZL, 2000ms);
             pbf_move_right_joystick(context, turn, 128, 3200ms, 0ms);
-            pbf_move_right_joystick(context, 128, 255, 960ms, 0ms);
+            pbf_move_right_joystick(context, {0, -1}, 960ms, 0ms);
             pbf_move_right_joystick(context, turn, 128, 3200ms, 0ms);
-            pbf_move_right_joystick(context, 128, 0, 1600ms, 0ms);
+            pbf_move_right_joystick(context, {0, +1}, 1600ms, 0ms);
             pbf_move_right_joystick(context, turn, 128, 3200ms, 0ms);
         }
         context.wait_for_all_requests();
@@ -76,7 +76,7 @@ FlagNavigationAir::FlagNavigationAir(
     register_state_command(State::WYRDEER_BASCULEGION_OFF, [this](){
         m_stream.log("Switching from Wyrdeer/Basculegion (off) to Braviary (on)...");
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms);
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
@@ -91,8 +91,8 @@ FlagNavigationAir::FlagNavigationAir(
     register_state_command(State::URSALUNA_OFF, [this](){
         m_stream.log("Switching from Ursaluna (off) to Braviary (on)...");
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
-//            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms);
+//            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms);
 //            pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
@@ -100,7 +100,7 @@ FlagNavigationAir::FlagNavigationAir(
     register_state_command(State::URSALUNA_ON, [this](){
         m_stream.log("Switching from Ursaluna (on) to Braviary (on)...");
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms);
 //            pbf_press_dpad(context, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
@@ -108,7 +108,7 @@ FlagNavigationAir::FlagNavigationAir(
     register_state_command(State::SNEASLER_OFF, [this](){
         m_stream.log("Switching from Sneasler (off) to Braviary (on)...");
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_LEFT, 20, 50);
+            pbf_press_dpad(context, DPAD_LEFT, 160ms, 400ms);
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
@@ -117,7 +117,7 @@ FlagNavigationAir::FlagNavigationAir(
         m_stream.log("Switching from Sneasler (on) to Braviary (on)...");
         m_looking_straight_ahead.store(false, std::memory_order_release);
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_move_left_joystick(context, 128, 0, 125, 0);
+            pbf_move_left_joystick(context, 128, 0, 1000ms, 0ms);
             pbf_press_dpad(context, DPAD_LEFT, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
@@ -134,7 +134,7 @@ FlagNavigationAir::FlagNavigationAir(
         m_stream.log("Getting on Sneasler...");
         m_looking_straight_ahead.store(false, std::memory_order_release);
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_press_button(context, BUTTON_A, 20, 230);
+            pbf_press_button(context, BUTTON_A, 160ms, 1840ms);
         });
         return false;
     });
@@ -191,7 +191,7 @@ FlagNavigationAir::FlagNavigationAir(
                 m_looking_straight_ahead.store(true, std::memory_order_release);
 //                cout << "State::DASH_LEFT: m_looking_straight_ahead = true" << endl;
             }
-//            pbf_press_button(context, BUTTON_B, 10, 0);
+//            pbf_press_button(context, BUTTON_B, 80ms, 0ms);
             double shift = 0;
             double distance, flag_x, flag_y;
             if (m_flag.get(distance, flag_x, flag_y)){
@@ -233,7 +233,7 @@ FlagNavigationAir::FlagNavigationAir(
                 m_looking_straight_ahead.store(true, std::memory_order_release);
 //                cout << "State::DASH_LEFT: m_looking_straight_ahead = true" << endl;
             }
-//            pbf_press_button(context, BUTTON_Y, 10, 0);
+//            pbf_press_button(context, BUTTON_Y, 80ms, 0ms);
             double shift = 0;
             double distance, flag_x, flag_y;
             if (m_flag.get(distance, flag_x, flag_y)){
@@ -255,7 +255,12 @@ FlagNavigationAir::FlagNavigationAir(
             context.wait_for_all_requests();
             double distance, flag_x, flag_y;
             if (m_flag.get(distance, flag_x, flag_y)){
-                pbf_move_right_joystick(context, 0, 128, (uint16_t)(85 * (0.5 - flag_x)), 0);
+                pbf_move_right_joystick(
+                    context,
+                    {-1, 0},
+                    Milliseconds((int64_t)(640 * (0.5 - flag_x))),
+                    0ms
+                );
             }
         });
         m_looking_straight_ahead.store(false, std::memory_order_release);
@@ -268,7 +273,12 @@ FlagNavigationAir::FlagNavigationAir(
             context.wait_for_all_requests();
             double distance, flag_x, flag_y;
             if (m_flag.get(distance, flag_x, flag_y)){
-                pbf_move_right_joystick(context, 255, 128, (uint16_t)(85 * (flag_x - 0.5)), 0);
+                pbf_move_right_joystick(
+                    context,
+                    {+1, 0},
+                    Milliseconds((int64_t)(640 * (flag_x - 0.5))),
+                    0ms
+                );
             }
         });
         m_looking_straight_ahead.store(false, std::memory_order_release);

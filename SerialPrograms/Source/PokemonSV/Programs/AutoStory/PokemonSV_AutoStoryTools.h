@@ -514,8 +514,8 @@ void move_camera_until_yolo_object_detected(
     ProControllerContext& context, 
     YOLOv5Detector& yolo_detector, 
     const std::string& target_label,
-    uint8_t initial_x_move, 
-    uint16_t initial_hold_ticks, 
+    uint8_t initial_x_move,
+    Milliseconds initial_hold,
     uint16_t max_rounds = 50
 );
 

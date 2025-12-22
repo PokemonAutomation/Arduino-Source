@@ -98,30 +98,30 @@ void connect_to_internet_from_menu(const ProgramInfo& info, VideoStream& stream,
         switch (ret){
         case 0:
             stream.log("Detected overworld. (unexpected)", COLOR_RED);
-            pbf_press_button(context, BUTTON_X, 20, 105);
+            pbf_press_button(context, BUTTON_X, 160ms, 840ms);
             continue;
         case 1:
             stream.log("Detected main menu.");
             if (connected){
                 return;
             }else{
-                pbf_press_button(context, BUTTON_L, 20, 105);
+                pbf_press_button(context, BUTTON_L, 160ms, 840ms);
             }
             continue;
         case 2:
             stream.log("Detected dialog.");
             connected = true;
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 3:
             stream.log("Already connected to internet.");
             connected = true;
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 4:
             stream.log("Detected news menu...");
             connected = true;
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 5:
             stream.log("Detected battle menu...");
@@ -177,31 +177,31 @@ void connect_to_internet_from_overworld(const ProgramInfo& info, VideoStream& st
             if (connected){
                 return;
             }else{
-                pbf_press_button(context, BUTTON_X, 20, 105);
+                pbf_press_button(context, BUTTON_X, 160ms, 840ms);
                 continue;
             }
         case 1:
             stream.log("Detected main menu.");
             if (connected){
-                pbf_press_button(context, BUTTON_B, 20, 105);
+                pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             }else{
-                pbf_press_button(context, BUTTON_L, 20, 105);
+                pbf_press_button(context, BUTTON_L, 160ms, 840ms);
             }
             continue;
         case 2:
             stream.log("Detected dialog.");
             connected = true;
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 3:
             stream.log("Already connected to internet.");
             connected = true;
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 4:
             stream.log("Detected news menu...");
             connected = true;
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 5:
             stream.log("Detected battle menu...");

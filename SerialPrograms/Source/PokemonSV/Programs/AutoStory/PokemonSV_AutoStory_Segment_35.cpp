@@ -114,7 +114,7 @@ void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     128, 0, 40, 20, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 40, 50);
+                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
@@ -135,7 +135,7 @@ void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     128, 0, 40, 20, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 40, 50);
+                pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
@@ -154,7 +154,7 @@ void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     128, 0, 40, 20, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 40, 50);
+                pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
@@ -173,7 +173,7 @@ void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     128, 0, 40, 20, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 40, 50);
+                pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
@@ -192,7 +192,7 @@ void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     128, 0, 40, 20, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 40, 50);
+                pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
@@ -211,13 +211,13 @@ void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     128, 0, 40, 20, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 40, 50);
+                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 120, {CallbackEnum::OVERWORLD, CallbackEnum::BLACK_DIALOG_BOX});
-        pbf_move_left_joystick(context, 128, 0, 100, 50);
+        pbf_move_left_joystick(context, 128, 0, 800ms, 400ms);
         pbf_move_left_joystick(context, 255, 70, 300, 50);
         mash_button_till_overworld(env.console, context, BUTTON_A);
         // clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 120, {CallbackEnum::OVERWORLD, CallbackEnum::BLACK_DIALOG_BOX, CallbackEnum::PROMPT_DIALOG});
@@ -400,9 +400,9 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }
         );
 
-        pbf_press_button(context, BUTTON_L, 20, 50);
+        pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "rock-3", 255, 10);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "rock-3", 255, 80ms);
 
         // align to rock-3.  center-y: 0.291667   center-x: 0.501563
         move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-3", 0.291667,
@@ -460,7 +460,7 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }
         );
 
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "tree-1", 0, 70);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "tree-1", 0, 560ms);
 
         // align to tree-1.   center-y: 0.390278   center-x: 0.5
         move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-1", 0.390278,
@@ -515,7 +515,7 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }
         );
 
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "rock-5", 255, 50);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "rock-5", 255, 400ms);
 
         // align to rock-5.  center-y: 0.206944   center-x: 0.600000
         move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-5", 0.206944,
@@ -543,7 +543,7 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }
         );
 
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "rock-6", 255, 50);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "rock-6", 255, 400ms);
 
         
 
@@ -630,7 +630,7 @@ void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             true
         );
         
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "station-door-1", 0, 50);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "station-door-1", 0, 400ms);
         move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "station-door-1", 0.5,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);

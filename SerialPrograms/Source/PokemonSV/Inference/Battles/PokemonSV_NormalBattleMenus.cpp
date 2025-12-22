@@ -134,7 +134,7 @@ std::set<std::string> read_singles_opponent(
             }
             stream.log("Detected battle menu. Opening status...");
             battle_menu_seen = true;
-            pbf_press_button(context, BUTTON_Y, 20, 105);
+            pbf_press_button(context, BUTTON_Y, 160ms, 840ms);
             continue;
 
         case 1:

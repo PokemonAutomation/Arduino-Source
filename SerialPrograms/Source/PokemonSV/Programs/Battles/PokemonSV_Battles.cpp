@@ -60,25 +60,25 @@ void auto_heal_from_menu_or_overworld(
             if (healed && return_to_overworld){
                 return;
             }
-            pbf_press_button(context, BUTTON_X, 20, 230);
+            pbf_press_button(context, BUTTON_X, 160ms, 1840ms);
             continue;
         case 1:
             stream.log("Detected main menu.");
             if (!healed){
                 main_menu.move_cursor(info, stream, context, MenuSide::LEFT, party_slot, false);
-                pbf_press_button(context, BUTTON_MINUS, 20, 230);
+                pbf_press_button(context, BUTTON_MINUS, 160ms, 1840ms);
                 healed = true;
                 continue;
             }
             if (!return_to_overworld){
                 return;
             }
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         case 2:
             stream.log("Detected dialog.");
             healed = true;
-            pbf_press_button(context, BUTTON_B, 20, 105);
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
             continue;
         default:
             OperationFailedException::fire(

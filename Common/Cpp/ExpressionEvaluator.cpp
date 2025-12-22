@@ -339,33 +339,8 @@ int64_t parse_expression(
     return stack[0];
 }
 
-const std::map<std::string, int64_t>& SYMBOLS(){
-    static const std::map<std::string, int64_t> SYMBOLS{
-        {"TICKS_PER_SECOND", 125},
-    };
-    return SYMBOLS;
-}
 
 
-uint32_t parse_ticks_ui32(const std::string& expression){
-    int64_t x = parse_expression(SYMBOLS(), expression);
-    if (x < 0){
-        throw ParseException("Value cannot be negative.");
-    }
-    if ((int32_t)x != x){
-        throw ParseException("Overflow");
-    }
-    return (int32_t)x;
-}
-
-
-int32_t parse_ticks_i32(const std::string& expression){
-    int64_t x = parse_expression(SYMBOLS(), expression);
-    if ((int32_t)x != x){
-        throw ParseException("Overflow");
-    }
-    return (int32_t)x;
-}
 
 
 }

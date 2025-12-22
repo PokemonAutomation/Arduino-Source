@@ -172,7 +172,7 @@ DailyHighlightRNG::DailyHighlightRNG()
 }
 
 void DailyHighlightRNG::move_to_trader(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
-    pbf_move_right_joystick(context, 255, 128, 460ms, 80ms);
+    pbf_move_right_joystick(context, {+1, 0}, 460ms, 80ms);
     pbf_move_left_joystick(context, 128, 0, 1280ms, 80ms);
 }
 
@@ -569,8 +569,8 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, ProControll
     if (FIX_TIME_WHEN_DONE) {
         pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
         home_to_date_time(env.console, context, false);
-        pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+        pbf_press_button(context, BUTTON_A, 160ms, 840ms);
         pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         resume_game_from_home(env.console, context);
     }

@@ -1300,10 +1300,10 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
         // move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-tera", 0.294444);
         // move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "tree-tera", 0.604688);
 direction.change_direction(env.program_info(), env.console, context, 3.855289);
-            pbf_move_left_joystick(context, 128, 0, 200, 50);
+            pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.056395);
-            pbf_move_left_joystick(context, 128, 0, 250, 50);
+            pbf_move_left_joystick(context, 128, 0, 2000ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.749788);
             pbf_move_left_joystick(context, 128, 0, 680, 50);

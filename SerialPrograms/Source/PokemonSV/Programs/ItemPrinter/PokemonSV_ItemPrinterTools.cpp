@@ -54,14 +54,14 @@ void item_printer_start_print(
             return;
         case 1: // prompt
             stream.log("Confirming material selection...");
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             continue;
         case 2:{    // material
             ItemPrinterJobsDetector detector(COLOR_RED);
             VideoOverlaySet overlays(stream.overlay());
             detector.make_overlays(overlays);
             detector.set_print_jobs(stream, context, (uint8_t)jobs);
-            pbf_press_button(context, BUTTON_X, 20, 230);
+            pbf_press_button(context, BUTTON_X, 160ms, 1840ms);
             continue;
         }
         default:
@@ -101,7 +101,7 @@ ItemPrinterPrizeResult item_printer_finish_print(
             return prize_result;
         case 1: // handle
         case 2: // dialog
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             continue;
         case 3:{    // result
             stream.log("Result screen detected.");

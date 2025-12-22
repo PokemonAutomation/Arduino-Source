@@ -139,7 +139,7 @@ void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, ProContr
 
     env.log("Step 6: 5 Right.");
     ssf_press_button(context, BUTTON_B, 0ms, 800ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 100, 50);
+    pbf_press_dpad(context, DPAD_RIGHT, 800ms, 400ms);
 
     pbf_press_button(context, BUTTON_A, 20, 40);
     context.wait_for_all_requests();

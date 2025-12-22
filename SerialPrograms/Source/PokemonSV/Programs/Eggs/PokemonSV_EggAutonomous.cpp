@@ -326,7 +326,7 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
     if (LOCATION == EggAutoLocation::ZeroGate) {
         picnic_at_zero_gate(env.program_info(), env.console, context);
     } else {
-        pbf_press_button(context, BUTTON_L, 50, 40);
+        pbf_press_button(context, BUTTON_L, 400ms, 320ms);
         picnic_from_overworld(env.program_info(), env.console, context);
     }
     // Now we are at picnic. We are at one end of picnic table while the egg basket is at the other end
@@ -678,10 +678,10 @@ void EggAutonomous::reset_position_to_flying_spot(SingleSwitchProgramEnvironment
     // Use map to fly back to the flying spot
     open_map_from_overworld(env.program_info(), env.console, context);
     if (LOCATION == EggAutoLocation::ZeroGate) {
-        pbf_move_left_joystick(context, 128, 160, 20, 50);
+        pbf_move_left_joystick(context, 128, 160, 160ms, 400ms);
     } else { //lighthouse
         pbf_move_left_joystick(context, 130, 0, 150ms, 50ms);
-        pbf_press_button(context, BUTTON_ZL, 40, 100);
+        pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
     }
     fly_to_overworld_from_map(env.program_info(), env.console, context);
 }

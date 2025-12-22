@@ -80,9 +80,9 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
-        pbf_press_button(context, BUTTON_L, 30, 10);
-        pbf_move_left_joystick(context, 128, 0, 400, 50);
-        pbf_move_left_joystick(context, 0, 128, 130, 50);
+        pbf_press_button(context, BUTTON_L, 240ms, 80ms);
+        pbf_move_left_joystick(context, 128, 0, 3200ms, 400ms);
+        pbf_move_left_joystick(context, {-1, 0}, 1040ms, 400ms);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms);
 
         // now in elevator
