@@ -6,14 +6,19 @@
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
+#include "PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h" //TODO: change/remove later
+#include "PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.h"
+//#include "PokemonLZA/Programs/PokemonLZA_DonutBerrySession.h"
 #include "PokemonLZA_DonutOptionsTest.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -80,7 +85,6 @@ void DonutOptionsTest::program(SingleSwitchProgramEnvironment& env, ProControlle
 
     //Validate number of selected berries
     env.log("Checking berry count.");
-
     size_t num_berries = 0;
     std::vector<std::unique_ptr<DonutBerriesTableRow>> berries_table = BERRIES.copy_snapshot();
     num_berries = berries_table.size();
@@ -90,6 +94,14 @@ void DonutOptionsTest::program(SingleSwitchProgramEnvironment& env, ProControlle
     }
     env.log("Number of berries validated.", COLOR_BLACK);
 
+    //Berries map
+    std::map<std::string, uint8_t> processed_berries;
+    for (const std::unique_ptr<DonutBerriesTableRow>& row : berries_table){
+        const std::string& table_item = row->berry.slug();
+        if (std::find(DONUT_BERRIES_SLUGS().begin(), DONUT_BERRIES_SLUGS().end(), table_item) != DONUT_BERRIES_SLUGS().end()) {
+            processed_berries[table_item]++;
+        }
+    }
 
     //Print table to log to check
     std::vector<std::unique_ptr<FlavorPowerTableRow>> wanted_powers_table = FLAVOR_POWERS.copy_snapshot();
@@ -97,6 +109,16 @@ void DonutOptionsTest::program(SingleSwitchProgramEnvironment& env, ProControlle
         FlavorPowerTableEntry table_line = row->snapshot();
         env.log(table_line.to_str());
     }
+    //TODO: Validate powers. The "All Types" type only applies to catching and sparkling powers. Move and resist do not have "All Types"
+    //Are people even going to target move and resist power? Big Haul/Item Berry/Alpha/Sparkling seems more likely.
+
+
+
+    //add_sandwich_ingredients(env.console, context, language, std::move(processed_berries));
+
+
+
+
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

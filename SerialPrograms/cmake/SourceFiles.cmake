@@ -1599,6 +1599,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_IvJudgeReader.cpp
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_IvJudgeReader.h
+    Source/PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.cpp
+    Source/PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.h
     Source/PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.cpp
     Source/PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h
     Source/PokemonLZA/Inference/Map/PokemonLZA_LocationNameReader.cpp
