@@ -377,7 +377,7 @@ WallClock make_sandwich_material_farm(
                 // Orient camera to look at same direction as player character
                 pbf_press_button(context, BUTTON_L, 50, 40);
                 // look left
-                pbf_move_right_joystick(context, 0, 128, 120, 0);
+                pbf_move_right_joystick(context, {-1, 0}, 960ms, 0ms);
                 // move toward clearing besides the pokecenter
                 pbf_move_left_joystick(context, 128, 0, 300, 0);
 
@@ -425,7 +425,7 @@ void move_to_start_position_for_letsgo0(
     // Orient camera to look at same direction as player character
     pbf_press_button(context, BUTTON_L, 50, 40);
     // look left
-    pbf_move_right_joystick(context, 0, 128, 120, 10);
+    pbf_move_right_joystick(context, {-1, 0}, 960ms, 80ms);
     // move toward clearing besides the pokecenter
     pbf_move_left_joystick(context, 128, 0, 300, 10);
 
@@ -479,7 +479,7 @@ void move_to_start_position_for_letsgo1(
     // Orient camera to look at same direction as player character
     pbf_press_button(context, BUTTON_L, 50, 40);
     // look left
-    pbf_move_right_joystick(context, 0, 128, 120, 10);
+    pbf_move_right_joystick(context, {-1, 0}, 960ms, 80ms);
     // move toward clearing besides the pokecenter
     pbf_move_left_joystick(context, 128, 0, 300, 10);
 

@@ -255,7 +255,12 @@ FlagNavigationAir::FlagNavigationAir(
             context.wait_for_all_requests();
             double distance, flag_x, flag_y;
             if (m_flag.get(distance, flag_x, flag_y)){
-                pbf_move_right_joystick(context, 0, 128, (uint16_t)(85 * (0.5 - flag_x)), 0);
+                pbf_move_right_joystick(
+                    context,
+                    {-1, 0},
+                    Milliseconds((int64_t)(640 * (0.5 - flag_x))),
+                    0ms
+                );
             }
         });
         m_looking_straight_ahead.store(false, std::memory_order_release);
@@ -268,7 +273,12 @@ FlagNavigationAir::FlagNavigationAir(
             context.wait_for_all_requests();
             double distance, flag_x, flag_y;
             if (m_flag.get(distance, flag_x, flag_y)){
-                pbf_move_right_joystick(context, 255, 128, (uint16_t)(85 * (flag_x - 0.5)), 0);
+                pbf_move_right_joystick(
+                    context,
+                    {+1, 0},
+                    Milliseconds((int64_t)(640 * (flag_x - 0.5))),
+                    0ms
+                );
             }
         });
         m_looking_straight_ahead.store(false, std::memory_order_release);

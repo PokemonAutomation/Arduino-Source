@@ -126,7 +126,7 @@ void withdraw_1st_column_from_overworld(VideoStream& stream, ProControllerContex
     pbf_press_button(context, BUTTON_Y, 20, 50);
     pbf_press_button(context, BUTTON_Y, 20, 50);
     pickup_column(context);
-    pbf_move_right_joystick(context, 0, 128, 160ms, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(context, {-1, 0}, 160ms, BOX_SCROLL_DELAY);
     pbf_move_right_joystick(context, {0, -1}, 160ms, BOX_SCROLL_DELAY);
     pbf_press_button(context, BUTTON_ZL, 160ms, BOX_PICKUP_DROP_DELAY);
     box_to_overworld(stream, context);

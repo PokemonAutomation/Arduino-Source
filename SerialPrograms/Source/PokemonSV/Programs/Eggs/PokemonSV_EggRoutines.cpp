@@ -587,7 +587,7 @@ void check_basket_to_collect_eggs(
 //                "check_basket_to_collect_eggs(): No state detected after 5 seconds."
 //            );
             stream.log("Rotating view and trying again...", COLOR_RED);
-            pbf_move_right_joystick(context, 0, 128, 30, 0);
+            pbf_move_right_joystick(context, {-1, 0}, 240ms, 0ms);
         }
 
     }
