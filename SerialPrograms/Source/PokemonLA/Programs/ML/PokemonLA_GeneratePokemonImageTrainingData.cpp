@@ -182,7 +182,7 @@ void GeneratePokemonImageTrainingData::select_starting_location(SingleSwitchProg
         break;
     case StartingLocation::COASTLANDS_COASTLANDS:
         env.log("Starting at Coastlands - Coastlands Camp");
-        pbf_move_left_joystick(context, 0, 40, 180, 10);
+        pbf_move_left_joystick(context, 0, 40, 1440ms, 80ms);
         break;
     case StartingLocation::HIGHLANDS_HIGHLANDS:
         env.log("Starting at Highlands - Highlands Camp");
@@ -202,7 +202,7 @@ void GeneratePokemonImageTrainingData::select_starting_location(SingleSwitchProg
         break;
     case StartingLocation::ICELANDS_ICEPEAK:
         env.log("Starting at Icelands - Icepeak Camp");
-        pbf_move_left_joystick(context, 20, 0, 180, 10);
+        pbf_move_left_joystick(context, 20, 0, 1440ms, 80ms);
         break;
     }
     context.wait_for_all_requests();

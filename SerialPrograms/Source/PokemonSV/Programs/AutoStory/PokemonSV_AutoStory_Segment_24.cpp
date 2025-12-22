@@ -118,11 +118,11 @@ void checkpoint_55(
             // now aligned to the wall next to the hole/passage
 
             // walk away from wall slightly
-            pbf_move_left_joystick(context, 128, 255, 50, 100);
+            pbf_move_left_joystick(context, 128, 255, 400ms, 800ms);
             get_on_ride(env.program_info(), env.console, context);
 
             direction.change_direction(env.program_info(), env.console, context, 0.366);
-            pbf_move_left_joystick(context, 128, 0, 250, 100);
+            pbf_move_left_joystick(context, 128, 0, 2000ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 2.565);
             // run at Orthworm. run into its second position as well.

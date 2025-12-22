@@ -372,8 +372,8 @@ WallClock make_sandwich_material_farm(
                 // the camera angle is different than when just flying to pokecenter
                 pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
-                // move up towards pokecenter counter        
-                pbf_move_left_joystick(context, 128, 255, 180, 10);
+                // move up towards pokecenter counter
+                pbf_move_left_joystick(context, 128, 255, 1440ms, 80ms);
                 // Orient camera to look at same direction as player character
                 pbf_press_button(context, BUTTON_L, 400ms, 320ms);
                 // look left
@@ -421,7 +421,7 @@ void move_to_start_position_for_letsgo0(
     pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
     // move up towards pokecenter counter        
-    pbf_move_left_joystick(context, 128, 255, 180, 10);
+    pbf_move_left_joystick(context, 128, 255, 1440ms, 80ms);
     // Orient camera to look at same direction as player character
     pbf_press_button(context, BUTTON_L, 400ms, 320ms);
     // look left
@@ -475,7 +475,7 @@ void move_to_start_position_for_letsgo1(
     pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
     // move up towards pokecenter counter        
-    pbf_move_left_joystick(context, 128, 255, 180, 10);
+    pbf_move_left_joystick(context, 128, 255, 1440ms, 80ms);
     // Orient camera to look at same direction as player character
     pbf_press_button(context, BUTTON_L, 400ms, 320ms);
     // look left

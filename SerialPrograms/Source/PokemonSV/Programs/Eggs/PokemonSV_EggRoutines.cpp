@@ -712,7 +712,7 @@ void hatch_eggs_at_area_three_lighthouse(
                         pbf_move_left_joystick(context, {-1, +1}, 400ms, 400ms);
                         //Get on your mount
                         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
-                        pbf_press_button(context, BUTTON_PLUS, 50, 100);
+                        pbf_press_button(context, BUTTON_PLUS, 400ms, 800ms);
                         //Go in deep, spawns outside the fence like to come in otherwise
                         pbf_move_left_joystick(context, 128, 0, 6000ms, 0ms);
                         pbf_move_left_joystick(context, {-1, +1}, 400ms, 400ms);
@@ -754,7 +754,7 @@ void hatch_eggs_anywhere(
 ){
     if (!already_on_ride){
         // At beginning, ride on Koraidon/Miradon and go off ramp:
-        pbf_press_button(context, BUTTON_PLUS, 50, 100);
+        pbf_press_button(context, BUTTON_PLUS, 400ms, 800ms);
         context.wait_for_all_requests();
     }
 
