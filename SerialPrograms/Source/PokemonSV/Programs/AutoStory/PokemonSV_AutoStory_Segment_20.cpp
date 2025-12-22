@@ -146,13 +146,7 @@ void checkpoint_43(
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                walk_forward_until_dialog(
-                    env.program_info(),
-                    env.console,
-                    context,
-                    NavigationMovementMode::DIRECTIONAL_ONLY,
-                    20000ms
-                );
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, 0, 0, 800ms, 400ms);
@@ -185,13 +179,7 @@ void checkpoint_44(
 
         // talk to receptionist
         env.console.log("Talk to Artazon gym receptionist.");
-        walk_forward_until_dialog(
-            env.program_info(),
-            env.console,
-            context,
-            NavigationMovementMode::DIRECTIONAL_SPAM_A,
-            10000ms
-        );
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
         pbf_move_left_joystick(context, 128, 255, 2400ms, 800ms);
@@ -202,13 +190,7 @@ void checkpoint_44(
         // talk to Sunflora NPC
         DirectionDetector direction;
         direction.change_direction(env.program_info(), env.console, context, 4.91);
-        walk_forward_until_dialog(
-            env.program_info(),
-            env.console,
-            context,
-            NavigationMovementMode::DIRECTIONAL_SPAM_A,
-            10000ms
-        );
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG});
 
         // realign to wall
@@ -539,13 +521,7 @@ void checkpoint_45(
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                walk_forward_until_dialog(
-                    env.program_info(),
-                    env.console,
-                    context,
-                    NavigationMovementMode::DIRECTIONAL_SPAM_A,
-                    20000ms
-                );
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, 0, 0, 800ms, 400ms);

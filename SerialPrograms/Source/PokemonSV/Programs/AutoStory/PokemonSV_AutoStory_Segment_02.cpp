@@ -85,7 +85,7 @@ void checkpoint_04(
         direction.change_direction(env.program_info(), env.console, context, 4.55);
         pbf_move_left_joystick(context, 128, 0, 600, 50);
         direction.change_direction(env.program_info(), env.console, context, 5.27);
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 160ms);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
 
         context.wait_for_all_requests();
         env.console.log("Starting battle...");

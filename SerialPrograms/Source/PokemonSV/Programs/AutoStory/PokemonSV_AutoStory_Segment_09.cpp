@@ -156,7 +156,7 @@ void checkpoint_17(
         context.wait_for_all_requests();
 
         // walk backwards until dialog
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20000ms, 128, 255);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20, 128, 255);
         env.console.log("Talk with Cassiopeia.");
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
@@ -277,7 +277,7 @@ void checkpoint_20(
         env.console.log("Leave dorm for schoolyard.");
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms, 128, 0);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 128, 0);
 
         env.console.log("Talk to Nemona, Arven, Cassiopeia.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 16, 

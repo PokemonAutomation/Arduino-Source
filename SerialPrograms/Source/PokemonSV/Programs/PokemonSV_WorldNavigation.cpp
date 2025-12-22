@@ -655,7 +655,7 @@ void walk_forward_until_dialog(
     VideoStream& stream,
     ProControllerContext& context,
     NavigationMovementMode movement_mode,
-    Milliseconds timeout,
+    uint16_t seconds_timeout,
     uint8_t x,
     uint8_t y
 ){
@@ -665,11 +665,11 @@ void walk_forward_until_dialog(
     int ret = run_until<ProControllerContext>(
         stream, context,
         [&](ProControllerContext& context){
-            ssf_press_left_joystick(context, x, y, 0ms, timeout);
+            ssf_press_left_joystick(context, x, y, 0, seconds_timeout * TICKS_PER_SECOND);
             if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
-                pbf_wait(context, timeout);
+                pbf_wait(context, seconds_timeout * TICKS_PER_SECOND);
             } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
-                pbf_mash_button(context, BUTTON_A, timeout);
+                pbf_mash_button(context, BUTTON_A, seconds_timeout * TICKS_PER_SECOND);
                 // for (size_t j = 0; j < seconds_timeout; j++){
                 //     pbf_press_button(context, BUTTON_A, 160ms, 840ms);
                 // }

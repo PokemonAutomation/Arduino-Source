@@ -135,7 +135,7 @@ void checkpoint_24(
         context.wait_for_all_requests();
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20000ms);
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, 0, 0, 100, 20);
@@ -145,7 +145,7 @@ void checkpoint_24(
         // enter gym building. talk go Nemona
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
         // talk to receptionist
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
         pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);
@@ -184,7 +184,7 @@ void checkpoint_25(
         // section 1.1. keep walking forward and talk to Olive roll NPC
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms);
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
             }
         );     
         mash_button_till_overworld(env.console, context, BUTTON_A);
@@ -207,7 +207,7 @@ void checkpoint_25(
 
         // section 5. battle first NPC
         direction.change_direction(env.program_info(), env.console, context,  1.485);
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms, 128, 20);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10, 128, 20);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
         env.console.log("Battle Olive Roll NPC 1.");
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
@@ -227,7 +227,7 @@ void checkpoint_25(
 
         // section 9. battle second NPC
         direction.change_direction(env.program_info(), env.console, context,  4.275);
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms, 128, 20);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10, 128, 20);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
         env.console.log("Battle Olive Roll NPC 2.");
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
@@ -261,7 +261,7 @@ void checkpoint_26(
         reset_game_from_home(env.program_info(), env.console, context);
 
         // talk to Olive roll NPC
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms, 128, 20);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10, 128, 20);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         // section 1
