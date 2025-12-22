@@ -107,7 +107,7 @@ void checkpoint_28(
             [&](ProControllerContext& context){
                 handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
                     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                        pbf_move_left_joystick(context, 128, 0, 10000ms, 800ms);
+                        pbf_move_left_joystick(context, {0, +1}, 10000ms, 800ms);
                     }, 
                     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                         pbf_move_left_joystick(context, 0, 0, 800ms, 160ms);

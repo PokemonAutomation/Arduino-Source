@@ -299,7 +299,7 @@ void AuctionFarmer::move_to_auctioneer(SingleSwitchProgramEnvironment& env, ProC
     while (tries < 10){
         if (!ONE_NPC){
             move_dialog_to_center(env, context, offer);
-            pbf_move_left_joystick(context, 128, 0, 480ms, 80ms);
+            pbf_move_left_joystick(context, {0, +1}, 480ms, 80ms);
         }
 
         pbf_press_button(context, BUTTON_A, 160ms, 800ms);

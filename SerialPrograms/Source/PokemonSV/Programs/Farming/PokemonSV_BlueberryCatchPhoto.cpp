@@ -53,7 +53,7 @@ CameraAngle quest_photo_navi(
             central_to_polar_rest(info, console, context);
 
             pbf_press_button(context, BUTTON_L, 80ms, 400ms);
-            pbf_move_left_joystick(context, 128, 0, 1840ms, 160ms);
+            pbf_move_left_joystick(context, {0, +1}, 1840ms, 160ms);
             pbf_move_left_joystick(context, {-1, 0}, 2000ms, 160ms);
 
             break;
@@ -125,7 +125,7 @@ CameraAngle quest_photo_navi(
             pbf_move_left_joystick(context, 255, 128, 160ms, 400ms);
 
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-            pbf_move_left_joystick(context, 128, 0, 800ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
 
             //Turn slightly for switch 1
             if (console.state().console_type() == ConsoleType::Switch1) {
@@ -402,7 +402,7 @@ void quest_catch_navi(
             pbf_move_left_joystick(context, 255, 128, 160ms, 400ms);
 
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-            pbf_move_left_joystick(context, 128, 0, 800ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
 
             //Turn slightly for switch 1
             if (console.state().console_type() == ConsoleType::Switch1) {
@@ -419,11 +419,11 @@ void quest_catch_navi(
             central_to_polar_rest(info, console, context);
 
             pbf_press_button(context, BUTTON_L, 80ms, 400ms);
-            pbf_move_left_joystick(context, 128, 0, 1840ms, 160ms);
+            pbf_move_left_joystick(context, {0, +1}, 1840ms, 160ms);
             pbf_move_left_joystick(context, {-1, 0}, 2000ms, 160ms);
 
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-            pbf_move_left_joystick(context, 128, 0, 1200ms, 160ms);
+            pbf_move_left_joystick(context, {0, +1}, 1200ms, 160ms);
 
             break;
 
@@ -465,7 +465,7 @@ void quest_catch_navi(
 
             pbf_move_left_joystick(context, 0, 0, 10, 20);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-            pbf_move_left_joystick(context, 128, 0, 400ms, 160ms);
+            pbf_move_left_joystick(context, {0, +1}, 400ms, 160ms);
 
             break;
         case BBQuests::catch_fairy:

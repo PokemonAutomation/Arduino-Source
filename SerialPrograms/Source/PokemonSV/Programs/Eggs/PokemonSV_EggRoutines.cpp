@@ -132,7 +132,7 @@ void do_egg_cycle_motion(
             // hatch circle:
             // Left joystick forward, right joystick right
             // click left joystick
-            ssf_press_left_joystick(context, 128, 0, 0ms, std::chrono::minutes(10));
+            ssf_press_left_joystick(context, {0, +1}, 0ms, std::chrono::minutes(10));
             ssf_press_right_joystick(context, 255, 128, 0ms, std::chrono::minutes(10));
             pbf_press_button(context, BUTTON_LCLICK, std::chrono::minutes(10), 0ms);
         },
@@ -282,7 +282,7 @@ void picnic_at_zero_gate(
     // Press L to move camera to face the same direction as the player character
     pbf_press_button(context, BUTTON_L, 400ms, 320ms);
     // Move forward
-    pbf_move_left_joystick(context, 128, 0, 1000ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 1000ms, 0ms);
 
     picnic_from_overworld(info, stream, context);
 }
@@ -294,7 +294,7 @@ bool eat_egg_sandwich_at_picnic(
     Language language
 ){
     // Move forward to table to make sandwich
-    pbf_move_left_joystick(context, 128, 0, 240ms, 320ms);
+    pbf_move_left_joystick(context, {0, +1}, 240ms, 320ms);
     context.wait_for_all_requests();
 
     clear_mons_in_front(env.program_info(), stream, context);
@@ -357,11 +357,11 @@ void collect_eggs_after_sandwich(
     // If we fail to reach the egg basket, we can then check that Camera support is on.
 
     //  Move forward to table
-    pbf_move_left_joystick(context, 128, 0, 640ms, 320ms);
+    pbf_move_left_joystick(context, {0, +1}, 640ms, 320ms);
     //  Move left
     pbf_move_left_joystick(context, {-1, 0}, 320ms, 320ms);
     //  Move forward to pass table
-    pbf_move_left_joystick(context, 128, 0, 640ms, 320ms);
+    pbf_move_left_joystick(context, {0, +1}, 640ms, 320ms);
     //  Move right
     pbf_move_left_joystick(context, 255, 128, 320ms, 680ms);
     //  Move back/right to align to basket
@@ -369,7 +369,7 @@ void collect_eggs_after_sandwich(
 
     //  Move closer to the basket, up to the table
     pbf_press_button(context, BUTTON_L, 160ms, 840ms);
-    pbf_move_left_joystick(context, 128, 0, 800ms, 320ms);
+    pbf_move_left_joystick(context, {0, +1}, 800ms, 320ms);
 
     //  face away from the table
     pbf_press_button(context, BUTTON_L, 160ms, 840ms);
@@ -380,33 +380,33 @@ void collect_eggs_after_sandwich(
     // this sequence will work with both Camera Support being Off and On
 
     //  Move forward to table
-    pbf_move_left_joystick(context, 128, 0, 320ms, 480ms);
+    pbf_move_left_joystick(context, {0, +1}, 320ms, 480ms);
 
     //  Move left
     pbf_move_left_joystick(context, {-1, 0}, 80ms, 480ms);
     pbf_press_button(context, BUTTON_L, 120ms, 480ms);
-    pbf_move_left_joystick(context, 128, 0, 320ms, 480ms);
+    pbf_move_left_joystick(context, {0, +1}, 320ms, 480ms);
 
     //  Move forward to pass table
     pbf_move_left_joystick(context, 255, 128, 80ms, 480ms);
     pbf_press_button(context, BUTTON_L, 120ms, 480ms);
-    pbf_move_left_joystick(context, 128, 0, 640ms, 480ms);
+    pbf_move_left_joystick(context, {0, +1}, 640ms, 480ms);
 
     //  Move right
     pbf_move_left_joystick(context, 255, 128, 80ms, 480ms);
     pbf_press_button(context, BUTTON_L, 120ms, 480ms);
-    pbf_move_left_joystick(context, 128, 0, 320ms, 480ms);
+    pbf_move_left_joystick(context, {0, +1}, 320ms, 480ms);
 
     //  Turn right to face basket
     pbf_move_left_joystick(context, 255, 128, 80ms, 480ms);
     pbf_press_button(context, BUTTON_L, 120ms, 480ms);
 
     //  Move closer to the basket, up to the table
-    pbf_move_left_joystick(context, 128, 0, 800ms, 480ms);
+    pbf_move_left_joystick(context, {0, +1}, 800ms, 480ms);
 
     //  back away from the table, then face forwards towards the basket again
     pbf_move_left_joystick(context, 128, 255, 200ms, 480ms);
-    pbf_move_left_joystick(context, 128, 0, 80ms, 480ms);
+    pbf_move_left_joystick(context, {0, +1}, 80ms, 480ms);
     pbf_press_button(context, BUTTON_L, 120ms, 480ms);   
 #endif
 
@@ -414,7 +414,7 @@ void collect_eggs_after_sandwich(
     //  Move left
     pbf_move_left_joystick(context, {-1, 0}, 320ms, 320ms);
     //  Move forward to pass table
-    pbf_move_left_joystick(context, 128, 0, 640ms, 320ms); // old value: 80
+    pbf_move_left_joystick(context, {0, +1}, 640ms, 320ms); // old value: 80
     //  Move right
     pbf_move_left_joystick(context, 255, 128, 400ms, 320ms);
     //  Move back to face basket
@@ -422,7 +422,7 @@ void collect_eggs_after_sandwich(
 
     //  Move closer to the basket.
     pbf_press_button(context, BUTTON_L, 160ms, 840ms);
-    pbf_move_left_joystick(context, 128, 0, 80ms, 320ms);
+    pbf_move_left_joystick(context, {0, +1}, 80ms, 320ms);
 #endif
 
 
@@ -658,7 +658,7 @@ void hatch_eggs_at_zero_gate(
                         // Press L to move camera to face the same direction as the player character
                         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
                         // Move forward
-                        pbf_move_left_joystick(context, 128, 0, 1600ms, 0ms);
+                        pbf_move_left_joystick(context, {0, +1}, 1600ms, 0ms);
                     }
                 },
                 {dialog}

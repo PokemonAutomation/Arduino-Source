@@ -103,7 +103,7 @@ void checkpoint_41(
         direction.change_direction(env.program_info(), env.console, context, 0.14);
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 128, 0, 1600ms, 800ms);
+                pbf_move_left_joystick(context, {0, +1}, 1600ms, 800ms);
         });        
 
         // section 2. walk until hit dialog
@@ -248,11 +248,11 @@ void checkpoint_41(
                 pbf_move_left_joystick(context, {-1, 0}, 800ms, 400ms);
                 pbf_move_left_joystick(context, 0, 0, 4000ms, 400ms);
                 direction.change_direction(env.program_info(), env.console, context, 2.795);
-                pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+                pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
                 direction.change_direction(env.program_info(), env.console, context, 4.747);
-                pbf_move_left_joystick(context, 128, 0, 4800ms, 400ms);
+                pbf_move_left_joystick(context, {0, +1}, 4800ms, 400ms);
                 direction.change_direction(env.program_info(), env.console, context, 5.479);
-                pbf_move_left_joystick(context, 128, 0, 3200ms, 400ms);
+                pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
                 direction.change_direction(env.program_info(), env.console, context, 0.33);                
                 pbf_move_left_joystick(context, 128, 0, 900, 50);
                 direction.change_direction(env.program_info(), env.console, context, 2.325);      

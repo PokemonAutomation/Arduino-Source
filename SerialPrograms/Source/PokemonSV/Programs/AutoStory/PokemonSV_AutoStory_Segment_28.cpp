@@ -117,7 +117,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         direction.change_direction(env.program_info(), env.console, context, 0.696613);
 
-        pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+        pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 150, 0, 120);
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
@@ -163,7 +163,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 DirectionDetector direction;
 
                 direction.change_direction(env.program_info(), env.console, context, 0.261697);
-                pbf_move_left_joystick(context, 128, 0, 80ms, 400ms);
+                pbf_move_left_joystick(context, {0, +1}, 80ms, 400ms);
                 
                 walk_forward_while_clear_front_path(env.program_info(), env.console, context, 100);
                 walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A);
@@ -181,7 +181,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 DirectionDetector direction;
 
                 direction.change_direction(env.program_info(), env.console, context, 0.611062);
-                pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+                pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, wait);
 
@@ -192,10 +192,10 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 5.860926);
-                pbf_move_left_joystick(context, 128, 0, 3200ms, 400ms);
+                pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
 
                 direction.change_direction(env.program_info(), env.console, context, 4.920249);
-                pbf_move_left_joystick(context, 128, 0, 800ms, 400ms);
+                pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, wait);
 
@@ -205,17 +205,17 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 5.707655);
-                pbf_move_left_joystick(context, 128, 0, 3200ms, 400ms);
+                pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 5.394366);
-                pbf_move_left_joystick(context, 128, 0, 3200ms, 400ms);
+                pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 0.979935);
-                pbf_move_left_joystick(context, 128, 0, 4000ms, 400ms);
+                pbf_move_left_joystick(context, {0, +1}, 4000ms, 400ms);
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, wait);
 
@@ -225,7 +225,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 1.869166);
-                pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+                pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
                 pbf_press_button(context, BUTTON_R, 20, 20);
                 pbf_wait(context, wait);
 
@@ -245,13 +245,13 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
                 try {
                     direction.change_direction(env.program_info(), env.console, context, 1.451616);
-                    pbf_move_left_joystick(context, 128, 0, 4000ms, 400ms);
+                    pbf_move_left_joystick(context, {0, +1}, 4000ms, 400ms);
                     pbf_press_button(context, BUTTON_R, 20, 20);
                     pbf_wait(context, wait);
                     
 
                     direction.change_direction(env.program_info(), env.console, context, 2.023052);
-                    pbf_move_left_joystick(context, 128, 0, 4000ms, 400ms);
+                    pbf_move_left_joystick(context, {0, +1}, 4000ms, 400ms);
                     pbf_press_button(context, BUTTON_R, 20, 20);
                     pbf_wait(context, wait);
                     
@@ -262,7 +262,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     pbf_wait(context, wait);
                     
                     direction.change_direction(env.program_info(), env.console, context, 0.609735);
-                    pbf_move_left_joystick(context, 128, 0, 1600ms, 400ms);
+                    pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
                     pbf_press_button(context, BUTTON_R, 20, 20);
                     pbf_wait(context, wait);
                 }catch (OperationFailedException&){
@@ -446,9 +446,9 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
                 128, 0, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 128, 0, 500ms, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, 500ms, 0ms);
             pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 1000ms);
-            pbf_move_left_joystick(context, 128, 0, 500ms, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, 500ms, 0ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );

@@ -107,7 +107,7 @@ void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, ProControl
         env.log("Current Attempts: " + tostr_u_commas(c));
 
         //Walk forward from teleportation point
-        pbf_move_left_joystick(context, 128, 0, 80ms, 40ms);
+        pbf_move_left_joystick(context, {0, +1}, 80ms, 40ms);
 
         //Jump and open paraglider
         pbf_press_button(context, BUTTON_X, 20, 80);

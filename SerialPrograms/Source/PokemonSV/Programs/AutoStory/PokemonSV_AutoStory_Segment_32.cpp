@@ -217,7 +217,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // Gym challenge now done
 
         direction.change_direction(env.program_info(), env.console, context, 2.336990);
-        pbf_move_left_joystick(context, 128, 0, 3200ms, 400ms);
+        pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 0.156705);
 

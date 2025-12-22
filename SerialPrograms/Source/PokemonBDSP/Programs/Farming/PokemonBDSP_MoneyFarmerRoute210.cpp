@@ -269,7 +269,7 @@ void MoneyFarmerRoute210::heal_at_center_and_return(
     pbf_move_left_joystick(context, 255, 128, 880ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 1000ms, 0ms);
     pbf_move_left_joystick(context, 255, 128, 840ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, 3000ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 3000ms, 0ms);
     pbf_move_left_joystick(context, 255, 128, 2400ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 3000ms, 0ms);
 

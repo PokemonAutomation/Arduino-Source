@@ -244,7 +244,7 @@ void checkpoint_19(
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
         // walk forward
-        pbf_move_left_joystick(context, 128, 0, 800ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 800ms, 800ms);
         // walk left towards bed
         pbf_move_left_joystick(context, {-1, 0}, 800ms, 800ms);
 

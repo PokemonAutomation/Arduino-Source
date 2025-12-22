@@ -204,7 +204,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                     if (WALK_DIRECTION.current_value() == 0){ // forward
                         env.console.overlay().add_log("Move Forward");
                         ssf_press_button(context, BUTTON_B, 0ms, 2*duration, 0ms);
-                        pbf_move_left_joystick(context, 128, 0, duration, 0ms);
+                        pbf_move_left_joystick(context, {0, +1}, duration, 0ms);
                         // run back
                         pbf_move_left_joystick(context, {0, -1}, duration + 750ms, 0ms);
                         run_back_until_found_bench(env, context);

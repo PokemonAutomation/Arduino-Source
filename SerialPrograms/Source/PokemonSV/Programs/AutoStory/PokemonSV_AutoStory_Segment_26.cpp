@@ -116,7 +116,7 @@ void checkpoint_61(
         DirectionDetector direction;
 
         direction.change_direction(env.program_info(), env.console, context, 0.278620);
-        pbf_move_left_joystick(context, 128, 0, 3200ms, 400ms);
+        pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
 
@@ -183,7 +183,7 @@ void checkpoint_62(
         pbf_press_button(context, BUTTON_L, 400ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 1.971173);
-        pbf_move_left_joystick(context, 128, 0, 4800ms, 400ms);
+        pbf_move_left_joystick(context, {0, +1}, 4800ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 3.191172);
         pbf_move_left_joystick(context, 128, 0, 300, 50);
@@ -347,9 +347,9 @@ void move_from_medali_to_glaseado_mountain(SingleSwitchProgramEnvironment& env, 
                 128, 0, 40, 20, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_move_left_joystick(context, 128, 0, 500ms, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, 500ms, 0ms);
             pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 1000ms);
-            pbf_move_left_joystick(context, 128, 0, 500ms, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, 500ms, 0ms);
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         }
     );

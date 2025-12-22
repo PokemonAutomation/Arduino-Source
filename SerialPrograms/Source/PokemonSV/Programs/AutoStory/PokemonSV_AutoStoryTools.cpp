@@ -1567,7 +1567,7 @@ void move_forward_until_yolo_object_above_min_size(
     uint16_t delay_after_lets_go
 ){
     context.wait_for_all_requests();
-    pbf_move_left_joystick(context, 128, 0, 80ms, 400ms); // move forward to align with camera
+    pbf_move_left_joystick(context, {0, +1}, 80ms, 400ms); // move forward to align with camera
 
     VideoOverlaySet overlays(env.console.overlay());
     bool seen_object = false;
@@ -1648,7 +1648,7 @@ void move_player_until_yolo_object_detected(
     uint16_t delay_after_lets_go
 ){
     context.wait_for_all_requests();
-    pbf_move_left_joystick(context, 128, 0, 80ms, 400ms); // move forward to align with camera
+    pbf_move_left_joystick(context, {0, +1}, 80ms, 400ms); // move forward to align with camera
 
     VideoOverlaySet overlays(env.console.overlay());
     bool found_target = false;

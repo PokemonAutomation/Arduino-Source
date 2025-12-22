@@ -74,7 +74,7 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, ProControllerC
         // Close menu
         pbf_press_button(context, BUTTON_B, 160ms, 800ms);
         // Character turn around to face the tent
-        pbf_move_left_joystick(context, 128, 0, 160ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 160ms, 800ms);
         // Press A to show the "how long do you rest" dialogue
         pbf_press_button(context, BUTTON_A, 10, 100);
         // Press A to show the time menu

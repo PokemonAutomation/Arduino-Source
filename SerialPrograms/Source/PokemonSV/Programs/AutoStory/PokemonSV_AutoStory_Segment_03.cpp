@@ -90,7 +90,7 @@ void checkpoint_05(
 
         DirectionDetector direction;
         direction.change_direction(env.program_info(), env.console, context, 1.92);
-        pbf_move_left_joystick(context, 128, 0, 7000ms, 400ms);
+        pbf_move_left_joystick(context, {0, +1}, 7000ms, 400ms);
         direction.change_direction(env.program_info(), env.console, context, 1.13);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
         
@@ -114,7 +114,7 @@ void checkpoint_06(
         context.wait_for_all_requests();
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 82, 60);
-        pbf_move_left_joystick(context, 128, 0, 6000ms, 160ms);
+        pbf_move_left_joystick(context, {0, +1}, 6000ms, 160ms);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 110, 10, 60);
         env.console.log("overworld_navigation: Go to Nemona.");
         overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 20, 20, true, true);

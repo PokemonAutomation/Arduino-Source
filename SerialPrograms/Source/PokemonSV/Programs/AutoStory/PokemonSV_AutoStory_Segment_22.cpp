@@ -118,7 +118,7 @@ void checkpoint_50(
         }
 
         direction.change_direction(env.program_info(), env.console, context, 0);
-        pbf_move_left_joystick(context, 128, 0, 1200ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 1200ms, 800ms);
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
@@ -194,7 +194,7 @@ void checkpoint_51(
 
         context.wait_for_all_requests();
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 50);
-        pbf_move_left_joystick(context, 128, 0, 3200ms, 800ms);        
+        pbf_move_left_joystick(context, {0, +1}, 3200ms, 800ms);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 170, 0, 60);
         pbf_move_left_joystick(context, 128, 0, 1800, 100);       
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 85, 60);

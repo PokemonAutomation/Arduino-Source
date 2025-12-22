@@ -334,11 +334,11 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(
             // to this location.
             pbf_press_button(context, BUTTON_L, 400ms, 320ms);
             // Move forward
-            pbf_move_left_joystick(context, 128, 0, 1440ms, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, 1440ms, 0ms);
             if (!SKIP_SANDWICH){
                 picnic_from_overworld(env.program_info(), env.console, context);
 
-                pbf_move_left_joystick(context, 128, 0, 240ms, 320ms);
+                pbf_move_left_joystick(context, {0, +1}, 240ms, 320ms);
                 enter_sandwich_recipe_list(env.program_info(), env.console, context);
                 make_sandwich_option(env, env.console, context, SANDWICH_OPTIONS);
                 last_sandwich_time = current_time();

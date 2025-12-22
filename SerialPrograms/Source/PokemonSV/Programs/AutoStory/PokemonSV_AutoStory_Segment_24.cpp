@@ -109,7 +109,7 @@ void checkpoint_55(
             }
 
             direction.change_direction(env.program_info(), env.console, context, 3.909067);
-            pbf_move_left_joystick(context, 128, 0, 8000ms, 800ms);
+            pbf_move_left_joystick(context, {0, +1}, 8000ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 5.061720);        
             pbf_move_left_joystick(context, 128, 0, 500, 100);
@@ -139,7 +139,7 @@ void checkpoint_55(
             // now aligned to corner.
 
             direction.change_direction(env.program_info(), env.console, context, 3.736);
-            pbf_move_left_joystick(context, 128, 0, 3200ms, 800ms);
+            pbf_move_left_joystick(context, {0, +1}, 3200ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 5.306);
             pbf_move_left_joystick(context, 128, 0, 700, 100);
@@ -186,10 +186,10 @@ void checkpoint_55(
             pbf_move_left_joystick(context, 128, 0, 600, 100);
 
             direction.change_direction(env.program_info(), env.console, context, 4.908646);
-            pbf_move_left_joystick(context, 128, 0, 2400ms, 800ms);
+            pbf_move_left_joystick(context, {0, +1}, 2400ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 1.169728);
-            pbf_move_left_joystick(context, 128, 0, 1600ms, 800ms);
+            pbf_move_left_joystick(context, {0, +1}, 1600ms, 800ms);
             pbf_move_left_joystick(context, 255, 0, 1600ms, 800ms);
             pbf_move_left_joystick(context, 0, 0, 1600ms, 800ms);
 
@@ -203,17 +203,17 @@ void checkpoint_55(
             get_on_ride(env.program_info(), env.console, context);
 
             // charge at orthworm
-            pbf_move_left_joystick(context, 128, 0, 408ms, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, 408ms, 0ms);
             pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, {0, +1}, {0, 0}, 102ms);
-            pbf_move_left_joystick(context, 128, 0, 1970ms, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, 1970ms, 0ms);
             pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, {0, +1}, {-1, 0}, 432ms);
-            pbf_move_left_joystick(context, 128, 0, 1993ms, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, 1993ms, 0ms);
             pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, {0, +1}, {-1, 0}, 301ms);
-            pbf_move_left_joystick(context, 128, 0, 307ms, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, 307ms, 0ms);
             pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, {0, +1}, {-1, 0}, 194ms);
-            pbf_move_left_joystick(context, 128, 0, 886ms, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, 886ms, 0ms);
             pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, {0, +1}, {-1, 0}, 626ms);
-            pbf_move_left_joystick(context, 128, 0, 2651ms, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, 2651ms, 0ms);
         });
 
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);

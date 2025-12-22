@@ -33,7 +33,7 @@ void inside_zero_gate_to_station(
         int ret = run_until<ProControllerContext>(
             stream, context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, 128, 0, 10000ms, 0ms);
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 0ms);
             },
             {dialog}
         );
@@ -202,7 +202,7 @@ void return_to_inside_zero_gate(
         [](ProControllerContext& context){
             pbf_move_left_joystick(context, 255, 32, 160ms, 840ms);
             pbf_mash_button(context, BUTTON_L, 60);
-            pbf_move_left_joystick(context, 128, 0, 10000ms, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, 10000ms, 0ms);
         },
         {black_screen}
     );
@@ -237,7 +237,7 @@ void return_to_inside_zero_gate_from_picnic(
         [](ProControllerContext& context){
             pbf_move_left_joystick(context, 128, 255, 100, 40);
             pbf_mash_button(context, BUTTON_L, 60);
-            pbf_move_left_joystick(context, 128, 0, 10000ms, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, 10000ms, 0ms);
         },
         {black_screen}
     );

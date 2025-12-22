@@ -103,7 +103,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
                 size_t stop = WALK_UP ? 30 : 60;
                 for (size_t c = 0; c < stop; c++){
                     if (WALK_UP){
-                        pbf_move_left_joystick(context, 128, 0, 1000ms, 0ms);
+                        pbf_move_left_joystick(context, {0, +1}, 1000ms, 0ms);
                     }
                     pbf_mash_button(context, BUTTON_ZL, 125);
                 }

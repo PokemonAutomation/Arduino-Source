@@ -118,7 +118,7 @@ void GimmighoulChestFarmer::navigate_to_gimmi(SingleSwitchProgramEnvironment& en
     pbf_wait(context, 100);
     context.wait_for_all_requests();
     //Walk into the wall
-    pbf_move_left_joystick(context, 128, 0, 1600ms, 800ms);
+    pbf_move_left_joystick(context, {0, +1}, 1600ms, 800ms);
     context.wait_for_all_requests();
     //Turn back
     pbf_move_left_joystick(context, 128, 255, 60, 100);
@@ -148,7 +148,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
         pbf_wait(context, 100);
         context.wait_for_all_requests();
         //Walk into the wall
-        pbf_move_left_joystick(context, 128, 0, 1600ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 1600ms, 800ms);
         context.wait_for_all_requests();
         //Press A in case there's already a chest
         //The remaining commands will run harmlessly during the battle intro if there is a chest

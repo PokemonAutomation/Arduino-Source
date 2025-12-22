@@ -81,7 +81,7 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     [&](size_t attempt_number){
 
         pbf_press_button(context, BUTTON_L, 240ms, 80ms);
-        pbf_move_left_joystick(context, 128, 0, 3200ms, 400ms);
+        pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
         pbf_move_left_joystick(context, {-1, 0}, 1040ms, 400ms);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
 

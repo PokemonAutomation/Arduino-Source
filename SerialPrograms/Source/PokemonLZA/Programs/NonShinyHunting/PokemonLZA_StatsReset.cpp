@@ -116,7 +116,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         pbf_move_left_joystick(context, 50, 128, 100ms, 500ms);
         pbf_mash_button(context, BUTTON_A, 5000ms);
 
-        pbf_move_left_joystick(context, 128, 0, 10s, 500ms);
+        pbf_move_left_joystick(context, {0, +1}, 10s, 500ms);
         pbf_mash_button(context, BUTTON_A, 30s);
 
         context.wait_for_all_requests();

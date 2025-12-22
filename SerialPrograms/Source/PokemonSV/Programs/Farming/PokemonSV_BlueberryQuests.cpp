@@ -625,7 +625,7 @@ void quest_travel_500(const ProgramInfo& info, VideoStream& stream, ProControlle
     context.wait_for_all_requests();
 
     pbf_move_left_joystick(context, 0, 0, 800ms, 160ms);
-    pbf_move_left_joystick(context, 128, 0, 1200ms, 160ms);
+    pbf_move_left_joystick(context, {0, +1}, 1200ms, 160ms);
     pbf_move_left_joystick(context, {-1, 0}, 1120ms, 160ms);
 
     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
@@ -716,7 +716,7 @@ void quest_tera_self_defeat(
 
     //Heal up and then reset position again.
     OverworldWatcher done_healing(console.logger(), COLOR_BLUE);
-    pbf_move_left_joystick(context, 128, 0, 800ms, 160ms);
+    pbf_move_left_joystick(context, {0, +1}, 800ms, 160ms);
 
     pbf_mash_button(context, BUTTON_A, 300);
     context.wait_for_all_requests();
@@ -759,7 +759,7 @@ void quest_sneak_up(
             pbf_move_left_joystick(context, 255, 128, 160ms, 400ms);
 
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-            pbf_move_left_joystick(context, 128, 0, 800ms, 400ms);
+            pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
 
             //Turn slightly for switch 1
             if (console.state().console_type() == ConsoleType::Switch1) {
@@ -881,7 +881,7 @@ void quest_wild_tera(
             if (console.state().console_type() == ConsoleType::Switch1) {
                 pbf_move_left_joystick(context, 50, 0, 160ms, 840ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-                pbf_move_left_joystick(context, 128, 0, 800ms, 400ms);
+                pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
             } else { //Switch 2
                 pbf_move_left_joystick(context, 20, 0, 160ms, 840ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 400ms);
@@ -935,7 +935,7 @@ void quest_wild_tera(
 
     //Heal up and then reset position again.
     OverworldWatcher done_healing(console.logger(), COLOR_BLUE);
-    pbf_move_left_joystick(context, 128, 0, 800ms, 160ms);
+    pbf_move_left_joystick(context, {0, +1}, 800ms, 160ms);
 
     pbf_mash_button(context, BUTTON_A, 300);
     context.wait_for_all_requests();
@@ -1010,9 +1010,9 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
             ssf_press_left_joystick(context, {-1, 0}, 1200ms, 400ms);
 
             ssf_press_button(context, BUTTON_A, 0ms, 1600ms, 0ms);
-            ssf_press_left_joystick(context, 128, 0, 0ms, 400ms);
+            ssf_press_left_joystick(context, {0, +1}, 0ms, 400ms);
             ssf_press_left_joystick(context, 128, 255, 400ms, 800ms);
-            ssf_press_left_joystick(context, 128, 0, 1200ms, 400ms);
+            ssf_press_left_joystick(context, {0, +1}, 1200ms, 400ms);
             pbf_wait(context, 400);
             context.wait_for_all_requests();
             break;
@@ -1078,7 +1078,7 @@ void quest_hatch_egg(
     central_to_savanna_plaza(info, console, context);
 
     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
-    pbf_move_left_joystick(context, 128, 0, 4000ms, 400ms);
+    pbf_move_left_joystick(context, {0, +1}, 4000ms, 400ms);
 
     pbf_move_left_joystick(context, {-1, 0}, 160ms, 400ms);
     pbf_press_button(context, BUTTON_L, 160ms, 400ms);
@@ -1151,10 +1151,10 @@ void quest_sandwich(
 
     picnic_from_overworld(env.program_info(), stream, context);
 
-    pbf_move_left_joystick(context, 128, 0, 240ms, 320ms);
+    pbf_move_left_joystick(context, {0, +1}, 240ms, 320ms);
     context.wait_for_all_requests();
 
-    pbf_move_left_joystick(context, 128, 0, 560ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 560ms, 0ms);
     enter_sandwich_recipe_list(env.program_info(), stream, context);
 
     std::map<std::string, uint8_t> fillings;
@@ -1356,7 +1356,7 @@ void quest_auto_battle(
 
         //Forward and right, stay in the battle court - safe zone
         pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-        pbf_move_left_joystick(context, 128, 0, 2000ms, 400ms);
+        pbf_move_left_joystick(context, {0, +1}, 2000ms, 400ms);
         pbf_move_left_joystick(context, 255, 128, 180, 50);
         pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
@@ -1370,7 +1370,7 @@ void quest_auto_battle(
         return_to_plaza(env.program_info(), stream, context);
 
         OverworldWatcher done_healing(stream.logger(), COLOR_BLUE);
-        pbf_move_left_joystick(context, 128, 0, 800ms, 160ms);
+        pbf_move_left_joystick(context, {0, +1}, 800ms, 160ms);
 
         pbf_mash_button(context, BUTTON_A, 300);
         context.wait_for_all_requests();
