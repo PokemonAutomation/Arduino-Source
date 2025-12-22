@@ -21,7 +21,7 @@ namespace PokemonSV{
 
 using namespace ML;
 
-static constexpr bool ENABLE_TEST  = true;
+static constexpr bool ENABLE_TEST  = false;
 
 struct AutoStoryStats : public StatsTracker{
     AutoStoryStats()
