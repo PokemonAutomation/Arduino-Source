@@ -14,11 +14,15 @@
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h" //TODO: change/remove later
+#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.h"
 //#include "PokemonLZA/Programs/PokemonLZA_DonutBerrySession.h"
 #include "PokemonLZA_DonutOptionsTest.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -41,7 +45,7 @@ DonutOptionsTest_Descriptor::DonutOptionsTest_Descriptor()
 DonutOptionsTest::DonutOptionsTest()
     : LANGUAGE(
         "<b>Game Language:</b>",
-        PokemonSwSh::IV_READER().languages(), //TODO: replace later or something
+        PokemonSwSh::IV_READER().languages(),
         LockMode::LOCK_WHILE_RUNNING,
         true
     )
@@ -94,13 +98,11 @@ void DonutOptionsTest::program(SingleSwitchProgramEnvironment& env, ProControlle
     }
     env.log("Number of berries validated.", COLOR_BLACK);
 
-    //Berries map
+    //Berries map for later selection
     std::map<std::string, uint8_t> processed_berries;
     for (const std::unique_ptr<DonutBerriesTableRow>& row : berries_table){
         const std::string& table_item = row->berry.slug();
-        if (std::find(DONUT_BERRIES_SLUGS().begin(), DONUT_BERRIES_SLUGS().end(), table_item) != DONUT_BERRIES_SLUGS().end()) {
-            processed_berries[table_item]++;
-        }
+        processed_berries[table_item]++;
     }
 
     //Print table to log to check

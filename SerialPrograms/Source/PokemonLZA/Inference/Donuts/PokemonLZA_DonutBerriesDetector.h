@@ -85,10 +85,7 @@ public:
     void make_overlays(VideoOverlaySet& items) const;
 
     std::array<ImageFloatBox, 8> berry_list_boxes(ImageFloatBox initial_box);
-
     ImageMatch::ImageMatchResult read_berry_page_with_icon_matcher(const ImageViewRGB32& screen, size_t index) const;
-
-    // The icon matcher only works on the selected item, because we want to remove the yellow / orange background
     ImageMatch::ImageMatchResult read_with_icon_matcher(const ImageViewRGB32& screen, const ImageFloatBox icon_box) const;
 
     OCR::StringMatchResult read_berry_page_with_ocr(
