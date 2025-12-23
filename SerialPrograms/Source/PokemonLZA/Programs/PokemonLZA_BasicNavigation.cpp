@@ -542,7 +542,7 @@ bool leave_zone_gate(ConsoleHandle& console, ProControllerContext& context){
 }
 
 
-int run_towards_wild_zone_gate(
+int run_towards_gate_with_A_button(
     ConsoleHandle& console, ProControllerContext& context,
     uint8_t run_direction_x, uint8_t run_direction_y,
     PokemonAutomation::Milliseconds run_time

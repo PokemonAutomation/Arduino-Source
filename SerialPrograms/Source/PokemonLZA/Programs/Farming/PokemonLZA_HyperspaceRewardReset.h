@@ -32,7 +32,6 @@ public:
 private:
     OCR::LanguageOCROption LANGUAGE;
     HyperspaceRewardTable TARGET_ITEMS;
-    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     EventNotificationOption NOTIFICATION_REWARD_MATCH;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;

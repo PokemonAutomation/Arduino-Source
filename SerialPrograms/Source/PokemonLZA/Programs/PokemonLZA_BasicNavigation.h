@@ -117,7 +117,7 @@ double get_angle_between_facing_directions(double dir1, double dir2);
 // If the program mashes A after leaving the zone, it will stuck talking to the npcs.
 bool leave_zone_gate(ConsoleHandle& console, ProControllerContext& context);
 
-// Run towards a wild zone until either button A is detected at specified box region,
+// Run towards a gate until either button A is detected at specified box region,
 // or day/night change happens. If day/night changes, it will wait until the transition
 // animation is done.
 // Return
@@ -125,7 +125,7 @@ bool leave_zone_gate(ConsoleHandle& console, ProControllerContext& context);
 // -  1 if day/night change happens
 // - -1 if it does not reach the gate in the end. Possible reasons are wrong run direction
 //   or get stuck by terrain or obstacle on the way
-int run_towards_wild_zone_gate(
+int run_towards_gate_with_A_button(
     ConsoleHandle& console, ProControllerContext& context,
     uint8_t run_direction_x, uint8_t run_direction_y,
     Milliseconds run_time
