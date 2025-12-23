@@ -217,7 +217,10 @@ void open_hyperspace_map(ConsoleHandle& console, ProControllerContext& context){
 }
 
 
-FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& context){
+FastTravelState fly_from_map(
+    ConsoleHandle& console, ProControllerContext& context,
+    std::shared_ptr<const ImageRGB32>* overworld_screen
+){
     console.log("Flying from map...");
     context.wait_for_all_requests();
     {
@@ -293,6 +296,10 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
             "fly_from_map(): Does not detect overworld after fast travel.",
             console
         );
+    }
+
+    if (overworld_screen != nullptr){
+        *overworld_screen = overworld.last_detected_frame();
     }
 
     return FastTravelState::SUCCESS;

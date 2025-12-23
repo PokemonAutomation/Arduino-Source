@@ -9,12 +9,14 @@
 
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 
 #include <array>
+#include <memory>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -83,6 +85,27 @@ public:
     )
          : DetectorToFinder("OverworldPartySelectionWatcher", hold_duration, color, overlay)
     {}
+
+    using DetectorToFinder<OverworldPartySelectionDetector>::process_frame;
+
+    // Override this function so that we can record the last frame where the detection is
+    // positive.
+    // This is useful for doing additional visual detection on the overworld screen.
+    virtual bool process_frame(const VideoSnapshot& frame) override;
+
+    // Return the last frame where the detection is positive.
+    // This is useful for doing additional visual detection on the overworld screen.
+    const std::shared_ptr<const ImageRGB32>& last_detected_frame() const { return m_last_detected_frame; }
+
+    virtual void reset_state() override {
+        DetectorToFinder<OverworldPartySelectionDetector>::reset_state();
+        m_last_detected_frame = nullptr;
+    }
+
+private:
+    // Record the last frame where the detection is positive.
+    // This is useful for doing additional visual detection on the overworld screen.
+    std::shared_ptr<const ImageRGB32> m_last_detected_frame;
 };
 
 class OverworldPartySelectionOverWatcher : public DetectorToFinder<OverworldPartySelectionDetector>{

@@ -56,13 +56,17 @@ bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_t
 void open_hyperspace_map(ConsoleHandle& console, ProControllerContext& context);
 
 // Starting at map view, press A to fast travel to the current selected fast travel location
+// overworld_screen: if not nullptr, return the overworld screen when the fly is over.
+//   This is useful for doing additional visual detection on the overworld screen. If fast travel
+//   failed, no change will be made to `overworld_screen`.
 // Return FastTravelState:
 // - SUCCESS: fast travel successful. After the function returns, the player character is on the overworld
 // - PURSUED: spotted and pursued by wild pokemon, cannot fast travel. After the function returns, the game
 //   is in fly map with the spotted dialog.
 // - NOT_AT_FLY_SPOT: the current map cursor is not on a fly spot, cannot fast travel. After the function
 //   returns, the game is in fly map.
-FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& context);
+FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& context,
+    std::shared_ptr<const ImageRGB32>* overworld_screen = nullptr);
 
 // Fast travel without moving map cursor.
 // This is useful to fast travel back to the wild zone gate while in the zone.
