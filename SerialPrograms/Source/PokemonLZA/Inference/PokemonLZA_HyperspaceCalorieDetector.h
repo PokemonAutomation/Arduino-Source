@@ -7,12 +7,14 @@
 #ifndef PokemonAutomation_PokemonLZA_HyperspaceCalorieDetector_H
 #define PokemonAutomation_PokemonLZA_HyperspaceCalorieDetector_H
 
-//#include <optional>
-#include "Common/Cpp/Color.h"
+
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonTools/VisualDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
+
+#include <list>
+#include <utility>
 
 namespace PokemonAutomation{
     class Logger;
@@ -47,6 +49,8 @@ public:
 private:
     uint16_t m_calorie_limit;
     WallClock m_start_of_detection = WallClock::min();
+    
+    std::list<std::pair<uint16_t, ImageRGB32>> m_last_calorie_images;
 };
 
 
