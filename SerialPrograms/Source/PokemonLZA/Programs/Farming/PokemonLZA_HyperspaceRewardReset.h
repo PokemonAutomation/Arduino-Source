@@ -7,9 +7,6 @@
 #ifndef PokemonAutomation_PokemonLZA_HyperspaceRewardReset_H
 #define PokemonAutomation_PokemonLZA_HyperspaceRewardReset_H
 
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/ButtonOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

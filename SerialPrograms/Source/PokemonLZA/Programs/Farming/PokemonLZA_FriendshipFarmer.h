@@ -15,14 +15,7 @@
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 
 namespace PokemonAutomation{
-
-template <typename Type> class ControllerContext;
-
 namespace NintendoSwitch{
-
-class ProController;
-using ProControllerContext = ControllerContext<ProController>;
-
 namespace PokemonLZA{
 
 class FriendshipFarmer_Descriptor : public SingleSwitchProgramDescriptor{
