@@ -372,7 +372,7 @@ void checkpoint_49(
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
             {ZoomChange::ZOOM_IN, 128, 128, 0ms},
-            {ZoomChange::ZOOM_IN, 128, 0, 800ms}
+            {ZoomChange::ZOOM_IN, 128, 0, 80ms}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
