@@ -1,0 +1,87 @@
+/*  Donut Berry Session
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#ifndef PokemonAutomation_PokemonLZA_BerrySession_H
+#define PokemonAutomation_PokemonLZA_BerrySession_H
+
+#include <map>
+#include <memory>
+#include "CommonFramework/Language.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
+#include "PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonLZA{
+
+class DonutBerriesReader;
+
+
+
+
+struct PageIngredients{
+    // the line index of the current selected ingredient, < BERRY_PAGE_LINES
+    int8_t selected = -1;
+    std::set<std::string> item[DonutBerriesReader::BERRY_PAGE_LINES];
+};
+
+
+class BerrySession{
+public:
+    ~BerrySession();
+    BerrySession(
+        VideoStream& stream, ProControllerContext& context,
+        Language language
+    );
+
+    //  Move to any ingredient in the set. Returns the ingredient it moved to.
+    //  Returns empty string if not found.
+    std::string move_to_ingredient(const std::set<std::string>& ingredients) const;
+
+    void add_ingredients(
+        VideoStream& stream, ProControllerContext& context,
+        std::map<std::string, uint8_t>&& ingredients
+    );
+
+
+public:
+    PageIngredients read_screen(std::shared_ptr<const ImageRGB32> screenshot) const;
+    PageIngredients read_current_page() const;
+    bool run_move_iteration(
+        std::string& slug, const std::set<std::string>& ingredients,
+        const PageIngredients& page
+    ) const;
+
+
+private:
+    VideoStream& m_stream;
+    ProControllerContext& m_context;
+    Language m_language;
+    VideoOverlaySet m_overlays;
+    int8_t m_num_confirmed;
+};
+
+
+
+//  Starting from the top of the fillings menu, gather all the ingredients.
+//  When this function returns, the game will be entering the phase where the
+//  user must stack the fillings.
+//  If any ingredient is not found or insuffient, it will OperationFailedException::fire.
+void add_donut_ingredients(
+    VideoStream& stream, ProControllerContext& context,
+    Language language,
+    std::map<std::string, uint8_t>&& fillings  //  {slug, quantity}
+);
+
+
+
+
+}
+}
+}
+#endif

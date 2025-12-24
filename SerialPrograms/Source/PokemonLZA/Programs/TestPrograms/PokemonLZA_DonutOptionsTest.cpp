@@ -16,7 +16,7 @@
 #include "PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.h"
-//#include "PokemonLZA/Programs/PokemonLZA_DonutBerrySession.h"
+#include "PokemonLZA/Programs/PokemonLZA_DonutBerrySession.h"
 #include "PokemonLZA_DonutOptionsTest.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 
@@ -102,8 +102,13 @@ void DonutOptionsTest::program(SingleSwitchProgramEnvironment& env, ProControlle
     std::map<std::string, uint8_t> processed_berries;
     for (const std::unique_ptr<DonutBerriesTableRow>& row : berries_table){
         const std::string& table_item = row->berry.slug();
+        env.log("Adding: " + table_item);
         processed_berries[table_item]++;
     }
+    //cout << "Processed Berries:" << endl;
+    //for (const auto& [key, value] : processed_berries){
+    //    std::cout << key << ": " << (int)value << endl;
+    //}
 
     //Print table to log to check
     std::vector<std::unique_ptr<FlavorPowerTableRow>> wanted_powers_table = FLAVOR_POWERS.copy_snapshot();
@@ -116,7 +121,7 @@ void DonutOptionsTest::program(SingleSwitchProgramEnvironment& env, ProControlle
 
 
 
-    //add_sandwich_ingredients(env.console, context, language, std::move(processed_berries));
+    add_donut_ingredients(env.console, context, language, std::move(processed_berries));
 
 
 
