@@ -50,6 +50,8 @@ public:
     virtual void log(std::string&& msg, Color color = Color()) override;
     virtual std::vector<std::string> get_last() const override;
 
+    virtual void rotate_log_file() override;
+
 private:
     static std::string normalize_newlines(const std::string& msg);
     static std::string to_file_str(const std::string& msg);

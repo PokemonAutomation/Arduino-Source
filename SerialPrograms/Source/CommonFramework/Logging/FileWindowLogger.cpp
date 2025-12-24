@@ -7,6 +7,7 @@
 #include <QCoreApplication>
 #include <QMenuBar>
 #include <QDir>
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Windows/DpiScaler.h"
@@ -309,6 +310,39 @@ void FileWindowLoggerWindow::on_config_value_changed(void* object){
 }
 
 
+void FileWindowLogger::rotate_log_file(){
+
+    static const uint64_t max_size = 1024 * 1024 * 50;
+    if (m_file.size() < max_size){
+        return;
+    }
+    
+    std::unique_lock<std::mutex> lg(m_lock);
+    lg.unlock();
+
+    if (m_file.isOpen()) {
+        m_file.close();
+    }
+
+    std::string log_name = USER_FILE_PATH() + (QCoreApplication::applicationName() + ".log").toStdString();
+    std::string backup_log_name = USER_FILE_PATH() + QCoreApplication::applicationName().toStdString() + "-" + now_to_filestring() + ".log";
+    if (QFile::exists(QString::fromStdString(log_name))) {
+        bool success = QFile::rename(QString::fromStdString(log_name), QString::fromStdString(backup_log_name));  // rename SerialPrograms.log to SerialPrograms-[date].log
+        if (!success) {
+            // Handle error (e.g., file locked by another process)
+        }
+    }
+
+    // Re-open the file (this creates a new, empty file)
+    // We use the same name as before, so the path is preserved
+    bool exists = m_file.exists();
+    bool opened = m_file.open(QIODevice::WriteOnly | QIODevice::Append);
+    if (!exists && opened){
+        std::string bom = "\xef\xbb\xbf";
+        m_file.write(bom.c_str(), bom.size());
+    }
+    lg.lock();
+}
 
 
 

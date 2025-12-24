@@ -27,6 +27,8 @@ public:
     virtual std::vector<std::string> get_last() const{
         return {};
     }
+
+    virtual void rotate_log_file() {};
 };
 
 
