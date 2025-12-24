@@ -114,7 +114,7 @@ void MegaShardFarmer::program(SingleSwitchProgramEnvironment& env, ProController
                 if (!SKIP_SHARDS){
                     //  Break all the shards.
                     uint8_t x = stats.rounds % 2 == 0 ? 128 - 32 : 128 + 32;
-                    ssf_press_right_joystick(context, x, 128, 0ms, 40000ms, 0ms);
+                    ssf_press_right_joystick_old(context, x, 128, 0ms, 40000ms, 0ms);
                     for (int c = 0; c < 40; c++){
                         ssf_press_button(context, BUTTON_ZL, 240ms, 400ms, 80ms);
                         pbf_press_button(context, BUTTON_B, 160ms, 520ms);

@@ -383,7 +383,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_press_button(context, BUTTON_B, 4800ms, 600ms);
                 pbf_press_button(context, BUTTON_Y, 1700ms, 500ms);
                 pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
-                pbf_move_right_joystick(context, 127, 255, 200ms, 500ms);
+                pbf_move_right_joystick(context, {0, -1}, 200ms, 500ms);
                 last_checked_tree = 4;
                 check_tree_no_stop(env, context);
 
@@ -396,7 +396,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_press_button(context, BUTTON_B, 500ms, 0ms);
                 pbf_press_button(context, BUTTON_Y, 2600ms, 0ms);
                 pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
-                pbf_move_right_joystick(context, 127, 255, 150ms, 500ms);
+                pbf_move_right_joystick(context, {0, -1}, 150ms, 500ms);
                 last_checked_tree = 5;
                 check_tree_no_stop(env, context);
 
@@ -409,7 +409,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_press_button(context, BUTTON_B, 1300ms, 0ms);
                 pbf_press_button(context, BUTTON_Y, 3200ms, 0ms);
                 pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
-                pbf_move_right_joystick(context, 127, 255, 150ms, 500ms);
+                pbf_move_right_joystick(context, {0, -1}, 150ms, 500ms);
                 last_checked_tree = 6;
                 break;
             case 2:
@@ -422,7 +422,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
                 pbf_move_left_joystick(context, 0, 127, 1500ms, 500ms);
                 pbf_press_button(context, BUTTON_ZL, 20, 20);
-                pbf_move_right_joystick(context, 127, 255, 500ms, 160ms);
+                pbf_move_right_joystick(context, {0, -1}, 500ms, 160ms);
                 last_checked_tree = 7;
                 check_tree_no_stop(env, context);
 
@@ -434,7 +434,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 enable_shiny_sound(context);
                 pbf_press_button(context, BUTTON_Y, 1700ms, 500ms);
                 pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
-                pbf_move_right_joystick(context, 127, 255, 500ms, 500ms);
+                pbf_move_right_joystick(context, {0, -1}, 500ms, 500ms);
                 last_checked_tree = 8;
                 check_tree_no_stop(env, context);
 
@@ -447,7 +447,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_press_button(context, BUTTON_B, 600ms, 0ms);
                 pbf_press_button(context, BUTTON_Y, 2000ms, 500ms);
                 pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
-                pbf_move_right_joystick(context, 127, 255, 200ms, 500ms);
+                pbf_move_right_joystick(context, {0, -1}, 200ms, 500ms);
                 last_checked_tree = 9;
                 check_tree_no_stop(env, context);
 
@@ -459,7 +459,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 enable_shiny_sound(context);
                 pbf_press_button(context, BUTTON_B, 2500ms, 0ms);
                 pbf_press_button(context, BUTTON_Y, 2500ms, 500ms);
-                pbf_move_right_joystick(context, 127, 255, 200ms, 500ms);
+                pbf_move_right_joystick(context, {0, -1}, 200ms, 500ms);
                 last_checked_tree = 10;
                 check_tree_no_stop(env, context);
 
@@ -472,7 +472,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_press_button(context, BUTTON_B, 1800ms, 0ms);
                 pbf_press_button(context, BUTTON_Y, 1800ms, 500ms);
                 pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
-                pbf_move_right_joystick(context, 127, 255, 300ms, 500ms);
+                pbf_move_right_joystick(context, {0, -1}, 300ms, 500ms);
                 last_checked_tree = 11;
                 break;
             case 3:
@@ -485,7 +485,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
                 pbf_move_left_joystick(context, 255, 127, 240ms, 500ms);
                 pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
-                pbf_move_right_joystick(context, 127, 255, 200ms, 500ms);
+                pbf_move_right_joystick(context, {0, -1}, 200ms, 500ms);
                 last_checked_tree = 12;
                 check_tree_no_stop(env, context);
 
@@ -497,7 +497,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 enable_shiny_sound(context);
                 pbf_press_button(context, BUTTON_B, 2000ms, 0ms);
                 pbf_press_button(context, BUTTON_Y, 3000ms, 0ms);
-                pbf_move_right_joystick(context, 127, 255, 200ms, 500ms);
+                pbf_move_right_joystick(context, {0, -1}, 200ms, 500ms);
                 last_checked_tree = 13;
                 check_tree_no_stop(env, context);
 
@@ -509,7 +509,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 context.wait_for_all_requests();
                 enable_shiny_sound(context);
                 pbf_move_left_joystick(context, 127, 0, 6600ms, 160ms);
-                pbf_move_right_joystick(context, 127, 255, 200ms, 500ms);
+                pbf_move_right_joystick(context, {0, -1}, 200ms, 500ms);
                 last_checked_tree = 14;
                 check_tree_no_stop(env, context);
 
@@ -523,7 +523,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
                 pbf_press_button(context, BUTTON_B, 1700ms, 0ms);
                 pbf_press_button(context, BUTTON_Y, 3000ms, 0ms);
-                pbf_move_right_joystick(context, 127, 255, 100ms, 500ms);
+                pbf_move_right_joystick(context, {0, -1}, 100ms, 500ms);
                 last_checked_tree = 15;
                 break;
             }
@@ -563,7 +563,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, ProController
             pbf_press_button(context, BUTTON_B, 7200ms, 0ms);
             pbf_press_button(context, BUTTON_Y, 4500ms, 0ms);
             pbf_move_left_joystick(context, 180, 0, 160ms, 500ms);
-            pbf_move_right_joystick(context, 127, 255, 200ms, 500ms);
+            pbf_move_right_joystick(context, {0, -1}, 200ms, 500ms);
             if (check_tree(env, context)){
                 tree_counter.tree[1]++;
             }
@@ -609,7 +609,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, ProController
             pbf_press_button(context, BUTTON_PLUS, 160ms, 1500ms);
             pbf_move_left_joystick(context, {-1, +1}, 160ms, 500ms);
             pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
-            pbf_move_right_joystick(context, 127, 255, 200ms, 500ms);
+            pbf_move_right_joystick(context, {0, -1}, 200ms, 500ms);
             if (check_tree(env, context)){
                 tree_counter.tree[5]++;
             }
@@ -692,7 +692,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, ProController
             pbf_press_button(context, BUTTON_PLUS, 160ms, 1300ms);
             pbf_press_button(context, BUTTON_PLUS, 160ms, 500ms);
             pbf_press_button(context, BUTTON_PLUS, 160ms, 1500ms);
-            pbf_move_right_joystick(context, 127, 255, 200ms, 500ms);
+            pbf_move_right_joystick(context, {0, -1}, 200ms, 500ms);
             if (check_tree(env, context)){
                 tree_counter.tree[13]++;
             }
@@ -707,7 +707,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, ProController
             pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
             pbf_move_left_joystick(context, 140, 255, 160ms, 160ms);
             pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
-            pbf_move_right_joystick(context, 140, 255, 200ms, 500ms);
+            pbf_move_right_joystick_old(context, 140, 255, 200ms, 500ms);
             if (check_tree(env, context)){
                 tree_counter.tree[14]++;
             }
@@ -723,7 +723,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, ProController
             pbf_press_button(context, BUTTON_PLUS, 160ms, 1500ms);
             pbf_move_left_joystick(context, 255, 135, 240ms, 500ms);
             pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
-            pbf_move_right_joystick(context, 127, 255, 200ms, 500ms);
+            pbf_move_right_joystick(context, {0, -1}, 200ms, 500ms);
             if (check_tree(env, context)){
                 tree_counter.tree[15]++;
             }

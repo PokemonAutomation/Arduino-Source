@@ -55,7 +55,7 @@ void route(
         pbf_press_button(context, BUTTON_PLUS, 160ms, 1500ms);
         pbf_move_left_joystick(context, 255, 127, 240ms, 500ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
-        pbf_move_right_joystick(context, 127, 255, 100ms, 500ms);
+        pbf_move_right_joystick(context, {0, -1}, 100ms, 500ms);
         break;
     case LeapPokemon::Cherrim:
         goto_camp_from_jubilife(
@@ -72,7 +72,7 @@ void route(
         pbf_press_button(context, BUTTON_PLUS, 160ms, 1500ms);
         pbf_move_left_joystick(context, 0, 127, 160ms, 160ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
-        pbf_move_right_joystick(context, 127, 255, 200ms, 500ms);
+        pbf_move_right_joystick(context, {0, -1}, 200ms, 500ms);
         break;
     case LeapPokemon::Cherubi:
         goto_camp_from_jubilife(
@@ -106,7 +106,7 @@ void route(
         pbf_move_left_joystick(context, 0, 220, 30, 30);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         pbf_move_left_joystick(context, 127, 0, 4000ms, 500ms);
-        pbf_move_right_joystick(context, 127, 255, 170ms, 1000ms);
+        pbf_move_right_joystick(context, {0, -1}, 170ms, 1000ms);
         break;
     case LeapPokemon::Pachirisu:
     case LeapPokemon::Vespiquen:
@@ -133,7 +133,7 @@ void route(
         pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
         pbf_move_left_joystick(context, 255, 100, 20, 20);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
-        pbf_move_right_joystick(context, 127, 255, 200ms, 500ms);
+        pbf_move_right_joystick(context, {0, -1}, 200ms, 500ms);
         break;
     case LeapPokemon::Geodude:
         goto_camp_from_jubilife(
@@ -148,7 +148,7 @@ void route(
         pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
         pbf_press_button(context, BUTTON_PLUS, 160ms, 500ms);
         pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
-        pbf_move_left_joystick(context, 127, 255, 20, 20);
+        pbf_move_left_joystick(context, {0, -1}, 160ms, 160ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         break;
     case LeapPokemon::Graveler:
@@ -183,7 +183,7 @@ void route(
         change_mount(stream, context, MountState::WYRDEER_ON);
         pbf_press_button(context, BUTTON_B, 6500ms, 1000ms);
         pbf_press_button(context, BUTTON_PLUS, 160ms, 500ms);
-        pbf_move_right_joystick(context, 127, 255, 200ms, 500ms);
+        pbf_move_right_joystick(context, {0, -1}, 200ms, 500ms);
         break;
     case LeapPokemon::Nosepass:
         goto_camp_from_jubilife(
@@ -196,7 +196,7 @@ void route(
         change_mount(stream, context, MountState::WYRDEER_ON);
         pbf_press_button(context, BUTTON_B, 2500ms, 1000ms);
         pbf_press_button(context, BUTTON_PLUS, 160ms, 500ms);
-        pbf_move_right_joystick(context, 127, 255, 200ms, 500ms);
+        pbf_move_right_joystick(context, {0, -1}, 200ms, 500ms);
         break;
     case LeapPokemon::Bergimite:
         goto_camp_from_jubilife(
@@ -209,7 +209,7 @@ void route(
         change_mount(stream, context, MountState::WYRDEER_ON);
         pbf_press_button(context, BUTTON_B, 3200ms, 1000ms);
         pbf_press_button(context, BUTTON_PLUS, 160ms, 500ms);
-        pbf_move_right_joystick(context, 127, 255, 200ms, 500ms);
+        pbf_move_right_joystick(context, {0, -1}, 200ms, 500ms);
         break;
     }
     context.wait_for_all_requests();

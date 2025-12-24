@@ -64,51 +64,51 @@ ImageFloatBox box(0.56, 0.724, 0.012, 0.024); // Create a box that contains both
 
 void TurnClockwiseSlow(ProControllerContext& context){ // One turn of stirring poffin at slow speed (clockwise)
     pbf_move_right_joystick(context, {0, -1}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 53, 231, 40ms, 0ms);
-    pbf_move_right_joystick(context, 6, 167, 40ms, 0ms);
-    pbf_move_right_joystick(context, 6, 88, 40ms, 0ms);
-    pbf_move_right_joystick(context, 53, 24, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 53, 231, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 6, 167, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 6, 88, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 53, 24, 40ms, 0ms);
     pbf_move_right_joystick(context, {0, +1}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 202, 24, 40ms, 0ms);
-    pbf_move_right_joystick(context, 249, 88, 40ms, 0ms);
-    pbf_move_right_joystick(context, 249, 167, 40ms, 0ms);
-    pbf_move_right_joystick(context, 202, 231, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 202, 24, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 249, 88, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 249, 167, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 202, 231, 40ms, 0ms);
 }
 
 void TurnClockwiseFast(ProControllerContext& context){ // Same as above, but faster for the end of the cooking session
     pbf_move_right_joystick(context, {0, -1}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 38, 218, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 38, 218, 40ms, 0ms);
     pbf_move_right_joystick(context, {-1, 0}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 38, 38, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 38, 38, 40ms, 0ms);
     pbf_move_right_joystick(context, {0, +1}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 218, 38, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 218, 38, 40ms, 0ms);
     pbf_move_right_joystick(context, {+1, 0}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 218, 218, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 218, 218, 40ms, 0ms);
 }
 
 
 void TurnCounterClockwiseSlow(ProControllerContext& context){ // One turn of stirring poffin (counter-clockwise)
     pbf_move_right_joystick(context, {0, -1}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 202, 231, 40ms, 0ms);
-    pbf_move_right_joystick(context, 249, 167, 40ms, 0ms);
-    pbf_move_right_joystick(context, 249, 88, 40ms, 0ms);
-    pbf_move_right_joystick(context, 202, 24, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 202, 231, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 249, 167, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 249, 88, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 202, 24, 40ms, 0ms);
     pbf_move_right_joystick(context, {0, +1}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 53, 24, 40ms, 0ms);
-    pbf_move_right_joystick(context, 6, 88, 40ms, 0ms);
-    pbf_move_right_joystick(context, 6, 167, 40ms, 0ms);
-    pbf_move_right_joystick(context, 53, 231, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 53, 24, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 6, 88, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 6, 167, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 53, 231, 40ms, 0ms);
 }
 
 void TurnCounterClockwiseFast(ProControllerContext& context){ // Same as above, but faster for the end of the cooking session
     pbf_move_right_joystick(context, {0, -1}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 218, 218, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 218, 218, 40ms, 0ms);
     pbf_move_right_joystick(context, {+1, 0}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 218, 38, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 218, 38, 40ms, 0ms);
     pbf_move_right_joystick(context, {0, +1}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 38, 38, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 38, 38, 40ms, 0ms);
     pbf_move_right_joystick(context, {-1, 0}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 38, 218, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 38, 218, 40ms, 0ms);
 }
 
 

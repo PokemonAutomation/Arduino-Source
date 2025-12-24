@@ -186,7 +186,7 @@ void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProC
             pbf_move_left_joystick(context, 239, 0, 800ms, 160ms);
             pbf_press_button(context, BUTTON_B, 2390, 0);
             pbf_press_button(context, BUTTON_Y, 380, 0);
-            pbf_move_right_joystick(context, 127, 255, 720ms, 160ms);
+            pbf_move_right_joystick(context, {0, -1}, 720ms, 160ms);
             check_tree_no_stop(env, context);
 
             env.console.log("Checking Tree 2");
@@ -196,7 +196,7 @@ void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProC
             enable_shiny_sound(context);
             pbf_press_button(context, BUTTON_B, 420, 0);
             pbf_press_button(context, BUTTON_Y, 380, 0);
-            pbf_move_right_joystick(context, 127, 255, 720ms, 160ms);
+            pbf_move_right_joystick(context, {0, -1}, 720ms, 160ms);
             check_tree_no_stop(env, context);
 
             env.console.log("Checking Tree 3");
@@ -206,7 +206,7 @@ void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProC
             enable_shiny_sound(context);
             pbf_press_button(context, BUTTON_B, 350, 0);
             pbf_press_button(context, BUTTON_Y, 380, 0);
-            pbf_move_right_joystick(context, 127, 255, 720ms, 160ms);
+            pbf_move_right_joystick(context, {0, -1}, 720ms, 160ms);
             check_tree_no_stop(env, context);
 
             env.console.log("Checking Tree 4");
@@ -216,7 +216,7 @@ void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProC
             enable_shiny_sound(context);
             pbf_press_button(context, BUTTON_B, 375, 0);
             pbf_press_button(context, BUTTON_Y, 380, 0);
-            pbf_move_right_joystick(context, 127, 255, 720ms, 160ms);
+            pbf_move_right_joystick(context, {0, -1}, 720ms, 160ms);
             check_tree_no_stop(env, context);
 
             env.console.log("Checking Tree 5");
@@ -226,7 +226,7 @@ void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProC
             enable_shiny_sound(context);
             pbf_press_button(context, BUTTON_B, 85, 0);
             pbf_press_button(context, BUTTON_Y, 380, 0);
-            pbf_move_right_joystick(context, 127, 255, 720ms, 160ms);
+            pbf_move_right_joystick(context, {0, -1}, 720ms, 160ms);
         },
         {
             {battle_menu_detector},

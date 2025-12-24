@@ -167,7 +167,7 @@ void InPlaceCatcher::run(
             [](ProControllerContext& context){
                 while (true){
                     for (int c = 0; c < 10; c++){
-                        ssf_press_right_joystick(context, 64, 128, 0ms, 1000ms, 0ms);
+                        ssf_press_right_joystick_old(context, 64, 128, 0ms, 1000ms, 0ms);
                         ssf_press_dpad(context, DpadPosition::DPAD_UP, 0ms, 160ms, 160ms);
                         pbf_mash_button(context, BUTTON_ZL, 1000ms);
                         pbf_press_button(context, BUTTON_ZL, 500ms, 0ms);

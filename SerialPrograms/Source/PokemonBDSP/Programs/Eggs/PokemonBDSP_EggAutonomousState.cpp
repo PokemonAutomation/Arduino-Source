@@ -167,8 +167,8 @@ void EggAutonomousState::withdraw_egg_column(){
     pbf_press_button(m_context, BUTTON_Y, 160ms, 400ms);
     pbf_press_button(m_context, BUTTON_Y, 160ms, 400ms);
     pickup_column(m_context);
-    pbf_move_right_joystick(m_context, 0, 128, 160ms, BOX_SCROLL_DELAY);
-    pbf_move_right_joystick(m_context, 128, 255, 160ms, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(m_context, {-1, 0}, 160ms, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(m_context, {0, -1}, 160ms, BOX_SCROLL_DELAY);
     pbf_press_button(m_context, BUTTON_ZL, 160ms, BOX_PICKUP_DROP_DELAY);
 
     m_eggs_in_column = 0;
@@ -179,8 +179,8 @@ bool EggAutonomousState::process_party(){
 
     const Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
 
-    pbf_move_right_joystick(m_context, 0, 128, 160ms, BOX_SCROLL_DELAY);
-    pbf_move_right_joystick(m_context, 128, 255, 160ms, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(m_context, {-1, 0}, 160ms, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(m_context, {0, -1}, 160ms, BOX_SCROLL_DELAY);
     pbf_wait(m_context, m_scroll_to_read_delay);
     m_context.wait_for_all_requests();
 //    m_env.wait_for(SCROLL_TO_READ_DELAY);
@@ -201,8 +201,8 @@ bool EggAutonomousState::process_party(){
     //  Run through the 5 hatchlings and release all the non-shinies.
     for (size_t c = 0; c < 5; c++){
         if (c != 0){
-            pbf_move_right_joystick(m_context, 128, 0, 160ms, BOX_SCROLL_DELAY);
-            pbf_move_right_joystick(m_context, 128, 255, 160ms, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(m_context, {0, +1}, 160ms, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(m_context, {0, -1}, 160ms, BOX_SCROLL_DELAY);
             pbf_wait(m_context, m_scroll_to_read_delay);
             m_context.wait_for_all_requests();
 //            m_env.wait_for(SCROLL_TO_READ_DELAY);
@@ -253,21 +253,21 @@ bool EggAutonomousState::process_party(){
             }
             pbf_press_button(m_context, BUTTON_ZL, 160ms, 840ms);
             pbf_press_button(m_context, BUTTON_ZL, 160ms, 840ms);
-            pbf_move_right_joystick(m_context, 128, 0, 160ms, 840ms);
-            pbf_move_right_joystick(m_context, 128, 0, 160ms, 840ms);
-            pbf_move_right_joystick(m_context, 128, 0, 160ms, 840ms);
-            pbf_move_right_joystick(m_context, 255, 128, 160ms, 840ms);
+            pbf_move_right_joystick(m_context, {0, +1}, 160ms, 840ms);
+            pbf_move_right_joystick(m_context, {0, +1}, 160ms, 840ms);
+            pbf_move_right_joystick(m_context, {0, +1}, 160ms, 840ms);
+            pbf_move_right_joystick(m_context, {+1, 0}, 160ms, 840ms);
             pbf_press_button(m_context, BUTTON_ZL, 160ms, 1840ms);
-            pbf_move_right_joystick(m_context, 0, 128, 160ms, 840ms);
-            pbf_move_right_joystick(m_context, 128, 0, 160ms, 840ms);
-            pbf_move_right_joystick(m_context, 128, 0, 160ms, 840ms);
+            pbf_move_right_joystick(m_context, {-1, 0}, 160ms, 840ms);
+            pbf_move_right_joystick(m_context, {0, +1}, 160ms, 840ms);
+            pbf_move_right_joystick(m_context, {0, +1}, 160ms, 840ms);
             pbf_press_button(m_context, BUTTON_ZL, 160ms, 840ms);
             pbf_press_button(m_context, BUTTON_B, 160ms, 1840ms);
             pbf_press_button(m_context, BUTTON_R, 160ms, GameSettings::instance().BOX_CHANGE_DELAY0);
-            pbf_move_right_joystick(m_context, 0, 128, 160ms, 840ms);
-            pbf_move_right_joystick(m_context, 128, 255, 160ms, 840ms);
-            pbf_move_right_joystick(m_context, 128, 255, 160ms, 840ms);
-            pbf_move_right_joystick(m_context, 128, 255, 160ms, 840ms);
+            pbf_move_right_joystick(m_context, {-1, 0}, 160ms, 840ms);
+            pbf_move_right_joystick(m_context, {0, -1}, 160ms, 840ms);
+            pbf_move_right_joystick(m_context, {0, -1}, 160ms, 840ms);
+            pbf_move_right_joystick(m_context, {0, -1}, 160ms, 840ms);
             m_babies_saved++;
             if (m_babies_saved >= m_max_keepers){
                 m_stream.log("Max keepers reached. Stopping program...");
@@ -280,8 +280,8 @@ bool EggAutonomousState::process_party(){
         }
     }
 
-    pbf_move_right_joystick(m_context, 128, 0, 160ms, BOX_SCROLL_DELAY);
-    pbf_move_right_joystick(m_context, 255, 128, 160ms, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(m_context, {0, +1}, 160ms, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(m_context, {+1, 0}, 160ms, BOX_SCROLL_DELAY);
     return false;
 }
 bool EggAutonomousState::process_batch(){

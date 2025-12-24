@@ -244,7 +244,7 @@ void DirectionDetector::change_direction(
             "push magnitude: " + std::to_string(push_x) +
             ", push duration: " +  std::to_string(push_duration.count()) + "ms"
         );
-        pbf_move_right_joystick(context, push_x, 128, push_duration, 800ms);
+        pbf_move_right_joystick_old(context, push_x, 128, push_duration, 800ms);
         i++;
     }
     

@@ -45,22 +45,22 @@ EventBeamFinder::EventBeamFinder()
 
 
 void EventBeamFinder::goto_near_den(ProControllerContext& context) const{
-    ssf_press_left_joystick(context, STICK_CENTER, STICK_MIN, 375, 375);
+    ssf_press_left_joystick_old(context, STICK_CENTER, STICK_MIN, 375, 375);
     pbf_wait(context, 50);
     ssf_press_button(context, BUTTON_PLUS, 800ms);
-    ssf_press_left_joystick(context, STICK_MAX, STICK_CENTER, 100, 5);
+    ssf_press_left_joystick_old(context, STICK_MAX, STICK_CENTER, 100, 5);
     ssf_press_button(context, BUTTON_L, 800ms);
     ssf_press_button(context, BUTTON_PLUS, 800ms);
-    ssf_press_left_joystick(context, STICK_CENTER, STICK_MIN, 370, 370);
+    ssf_press_left_joystick_old(context, STICK_CENTER, STICK_MIN, 370, 370);
 }
 void EventBeamFinder::goto_far_den(ProControllerContext& context) const{
-    ssf_press_left_joystick(context, STICK_CENTER, STICK_MIN, 992, 992);
+    ssf_press_left_joystick_old(context, STICK_CENTER, STICK_MIN, 992, 992);
     pbf_wait(context, 50);
     ssf_press_button(context, BUTTON_PLUS, 800ms);
-    ssf_press_left_joystick(context, STICK_MIN, STICK_CENTER, 100, 5);
+    ssf_press_left_joystick_old(context, STICK_MIN, STICK_CENTER, 100, 5);
     ssf_press_button(context, BUTTON_L, 800ms);
     ssf_press_button(context, BUTTON_PLUS, 800ms);
-    ssf_press_left_joystick(context, STICK_CENTER, STICK_MIN, 300, 300);
+    ssf_press_left_joystick_old(context, STICK_CENTER, STICK_MIN, 300, 300);
 }
 void EventBeamFinder::drop_wishing_piece(ProControllerContext& context) const{
     ssf_press_button(context, BUTTON_A, 1600ms, 80ms);

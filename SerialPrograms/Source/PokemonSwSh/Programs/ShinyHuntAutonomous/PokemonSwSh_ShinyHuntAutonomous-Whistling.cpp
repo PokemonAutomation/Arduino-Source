@@ -128,7 +128,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
                 [](ProControllerContext& context){
                     while (true){
                         pbf_mash_button(context, BUTTON_LCLICK, 1000ms);
-                        pbf_move_right_joystick(context, 192, 128, 1000ms, 0ms);
+                        pbf_move_right_joystick_old(context, 192, 128, 1000ms, 0ms);
                     }
                 },
                 {

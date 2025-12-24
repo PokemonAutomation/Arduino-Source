@@ -367,7 +367,7 @@ void overworld_navigation(
                             if (movement_mode == NavigationMovementMode::CLEAR_WITH_LETS_GO){
                                 walk_forward_while_clear_front_path(info, stream, context, forward_ticks, y);
                             }else{
-                                ssf_press_left_joystick(context, x, y, 0ms, Seconds(seconds_realign));
+                                ssf_press_left_joystick_old(context, x, y, 0ms, Seconds(seconds_realign));
                                 if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
                                     pbf_wait(context, Seconds(seconds_realign));
                                 } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
@@ -1841,11 +1841,11 @@ void move_camera_yolo(
             env.console.log("axis push: " + std::to_string(axis_push) + ", push duration: " +  std::to_string(push_duration.count()) + " ms");
             switch(axis){
             case CameraAxis::X:{
-                pbf_move_right_joystick(context, axis_push, 128, push_duration, 0ms);
+                pbf_move_right_joystick_old(context, axis_push, 128, push_duration, 0ms);
                 break;
             }
             case CameraAxis::Y:{
-                pbf_move_right_joystick(context, 128, axis_push, push_duration, 0ms);
+                pbf_move_right_joystick_old(context, 128, axis_push, push_duration, 0ms);
                 break;
             }
             default:
@@ -2003,7 +2003,7 @@ void move_camera_until_yolo_object_detected(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
 
                 if (round_num == 0){
-                    pbf_move_right_joystick(context, initial_x_move, 128, initial_hold, 400ms);
+                    pbf_move_right_joystick_old(context, initial_x_move, 128, initial_hold, 400ms);
                 }
                 context.wait_for_all_requests();
                 ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
@@ -2014,7 +2014,7 @@ void move_camera_until_yolo_object_detected(
 
                 
 
-                pbf_move_right_joystick(context, x_move, 128, 80ms, 400ms);
+                pbf_move_right_joystick_old(context, x_move, 128, 80ms, 400ms);
             });
             
         }catch (UnexpectedBattleException&){

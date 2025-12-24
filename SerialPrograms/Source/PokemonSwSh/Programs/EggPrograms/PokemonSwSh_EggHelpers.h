@@ -48,7 +48,7 @@ static void fly_home(ProControllerContext& context, char from_overworld){
         ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
     }
     ssf_press_button(context, BUTTON_A, 3200ms, 160ms);
-    ssf_press_right_joystick(context, 160, 96, 160ms, 160ms);
+    ssf_press_right_joystick_old(context, 160, 96, 160ms, 160ms);
     pbf_mash_button(context, BUTTON_A, 480);
 }
 
@@ -58,8 +58,8 @@ static void fly_home_goto_lady(ProControllerContext& context, char from_overworl
 
     //  Go to lady.
     //  If you change this, you MUST update "GO_TO_LADY_DURATION".
-    ssf_press_left_joystick(context, STICK_MIN, STICK_CENTER, 20, 10);
-    ssf_press_left_joystick(context, STICK_CENTER, STICK_MIN, 90, 45);
+    ssf_press_left_joystick_old(context, STICK_MIN, STICK_CENTER, 20, 10);
+    ssf_press_left_joystick_old(context, STICK_CENTER, STICK_MIN, 90, 45);
 }
 
 //  Assume the selected app in the menu is Twon Map.

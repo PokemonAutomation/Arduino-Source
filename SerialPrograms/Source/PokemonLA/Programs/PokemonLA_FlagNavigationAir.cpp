@@ -54,14 +54,14 @@ FlagNavigationAir::FlagNavigationAir(
     *this += m_dialog_detector;
 
     auto find_flag = [this](ProControllerContext& context){
-        uint8_t turn = m_flag_x <= 0.5 ? 0 : 255;
+        double turn = m_flag_x <= 0.5 ? -1 : +1;
         for (size_t c = 0; c < 2; c++){
             pbf_mash_button(context, BUTTON_ZL, 2000ms);
-            pbf_move_right_joystick(context, turn, 128, 3200ms, 0ms);
+            pbf_move_right_joystick(context, {turn, 0}, 3200ms, 0ms);
             pbf_move_right_joystick(context, {0, -1}, 960ms, 0ms);
-            pbf_move_right_joystick(context, turn, 128, 3200ms, 0ms);
+            pbf_move_right_joystick(context, {turn, 0}, 3200ms, 0ms);
             pbf_move_right_joystick(context, {0, +1}, 1600ms, 0ms);
-            pbf_move_right_joystick(context, turn, 128, 3200ms, 0ms);
+            pbf_move_right_joystick(context, {turn, 0}, 3200ms, 0ms);
         }
         context.wait_for_all_requests();
         m_find_flag_failed.store(true, std::memory_order_release);

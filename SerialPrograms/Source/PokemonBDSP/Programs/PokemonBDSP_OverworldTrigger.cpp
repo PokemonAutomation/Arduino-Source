@@ -67,13 +67,13 @@ void OverworldTrigger::run_trigger(ProControllerContext& context) const{
     Milliseconds mash_duration = normal_duration - 64ms;
     switch (TRIGGER_METHOD){
     case TriggerMethod::HORIZONTAL_NO_BIAS:
-        ssf_press_left_joystick(context,   0, 128, 0ms, normal_duration);
+        ssf_press_left_joystick(context, {-1, 0}, 0ms, normal_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
         ssf_press_left_joystick(context, {+1, 0}, 0ms, normal_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
         break;
     case TriggerMethod::HORIZONTAL_BIAS_LEFT:
-        ssf_press_left_joystick(context,   0, 128, 0ms, biased_duration);
+        ssf_press_left_joystick(context, {-1, 0}, 0ms, biased_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
         ssf_press_left_joystick(context, {+1, 0}, 0ms, normal_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
@@ -81,17 +81,17 @@ void OverworldTrigger::run_trigger(ProControllerContext& context) const{
     case TriggerMethod::HORIZONTAL_BIAS_RIGHT:
         ssf_press_left_joystick(context, {+1, 0}, 0ms, biased_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
-        ssf_press_left_joystick(context,   0, 128, 0ms, normal_duration);
+        ssf_press_left_joystick(context, {-1, 0}, 0ms, normal_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
         break;
     case TriggerMethod::VERTICAL_NO_BIAS:
-        ssf_press_left_joystick(context, 128,   0, 0ms, normal_duration);
+        ssf_press_left_joystick(context, {0, +1}, 0ms, normal_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
         ssf_press_left_joystick(context, {0, -1}, 0ms, normal_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
         break;
     case TriggerMethod::VERTICAL_BIAS_UP:
-        ssf_press_left_joystick(context, 128,   0, 0ms, biased_duration);
+        ssf_press_left_joystick(context, {0, +1}, 0ms, biased_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
         ssf_press_left_joystick(context, {0, -1}, 0ms, normal_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
@@ -99,7 +99,7 @@ void OverworldTrigger::run_trigger(ProControllerContext& context) const{
     case TriggerMethod::VERTICAL_BIAS_DOWN:
         ssf_press_left_joystick(context, {0, -1}, 0ms, biased_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
-        ssf_press_left_joystick(context, 128,   0, 0ms, normal_duration);
+        ssf_press_left_joystick(context, {0, +1}, 0ms, normal_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
         break;
     default:;
