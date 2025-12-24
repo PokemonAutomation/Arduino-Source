@@ -109,7 +109,6 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
     connect(
         m_actions_bar, &RunnablePanelActionBar::start_clicked,
         this, [&](ProgramState state){
-            global_logger_raw().rotate_log_file();
             std::string error;
             switch (state){
             case ProgramState::STOPPED:

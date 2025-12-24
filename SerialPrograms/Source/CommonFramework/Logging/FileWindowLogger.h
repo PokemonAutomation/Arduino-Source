@@ -50,10 +50,6 @@ public:
     virtual void log(std::string&& msg, Color color = Color()) override;
     virtual std::vector<std::string> get_last() const override;
 
-    // when SerialPrograms.log is above a certain size, rename it to SerialPrograms-[timestamp].log
-    // then create a new, empty SerialPrograms.log
-    virtual void rotate_log_file() override;
-
 private:
     static std::string normalize_newlines(const std::string& msg);
     static std::string to_file_str(const std::string& msg);
@@ -61,6 +57,11 @@ private:
 
     void internal_log(const std::string& msg, Color color);
     void thread_loop();
+
+    // when SerialPrograms.log is above a certain size, rename it to SerialPrograms-[timestamp].log
+    // then create a new, empty SerialPrograms.log
+    // this is only called from thread_loop(). So, we don't need to worry about synchronization because the thread loop is the only thread here.
+    void rotate_log_file();
 
 private:
     QFile m_file;
