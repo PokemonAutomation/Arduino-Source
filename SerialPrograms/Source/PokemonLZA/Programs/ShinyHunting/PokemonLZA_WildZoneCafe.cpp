@@ -11,7 +11,6 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Globals.h"
-// #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
@@ -178,7 +177,7 @@ void do_one_cafe_trip(
         break;
     }
 
-    int ret = run_towards_wild_zone_gate(env.console, context, move_x, move_y, Seconds(10));
+    int ret = run_towards_gate_with_A_button(env.console, context, move_x, move_y, Seconds(10));
     switch (ret){
     case 0: // Found button A. Reached the gate.
         break;
@@ -196,7 +195,7 @@ void do_one_cafe_trip(
                 env.console.overlay().add_log("Running Forward");
             }
             // Running forward or backward depends on character facing to go back to zone entrance
-            ret = run_towards_wild_zone_gate(env.console, context, move_x, move_y, Seconds(10));
+            ret = run_towards_gate_with_A_button(env.console, context, move_x, move_y, Seconds(10));
             if (ret != 0){
                 stats.errors++;
                 env.update_stats();

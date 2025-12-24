@@ -88,7 +88,7 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         // now in elevator
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
-        pbf_move_left_joystick(context, 255, 128, 70, 50);
+        pbf_move_left_joystick(context, {+1, 0}, 560ms, 400ms);
 
         // talk to the AI professor
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms);

@@ -61,9 +61,9 @@ void return_to_plaza(const ProgramInfo& info, VideoStream& stream, ProController
 
                 //Now move toward center
                 if (laggy){
-                    pbf_move_left_joystick(context, 255, 255, 300, 40); //overshoot by a bit (still works even if not laggy)
+                    pbf_move_left_joystick(context, {+1, -1}, 2400ms, 320ms); //overshoot by a bit (still works even if not laggy)
                 }else{
-                    pbf_move_left_joystick(context, 255, 255, 250, 40); //250 is more accurate but 300 helps with lag
+                    pbf_move_left_joystick(context, {+1, -1}, 2000ms, 320ms); //250 is more accurate but 300 helps with lag
                 }
                 pbf_press_button(context, BUTTON_ZR, 40, 100);
 
@@ -183,9 +183,9 @@ void central_to_chargestone(const ProgramInfo& info, VideoStream& stream, ProCon
 void jump_glide_fly(
     VideoStream& stream, ProControllerContext& context,
     bool inverted_flight,
-    uint16_t hold_up,
-    uint16_t flight_wait,
-    uint16_t drop_time
+    Milliseconds hold_up,
+    Milliseconds flight_wait,
+    Milliseconds drop_time
 ){
     stream.log("Jump, glide, fly.");
 
@@ -194,13 +194,13 @@ void jump_glide_fly(
     ssf_press_button(context, BUTTON_B, 0ms, 160ms);
     pbf_wait(context, 100);
     context.wait_for_all_requests();
-    pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+    pbf_press_button(context, BUTTON_LCLICK, 400ms, 0ms);
 
 
     if (inverted_flight){
-        pbf_move_left_joystick(context, 128, 255, hold_up, 250);
+        pbf_move_left_joystick(context, {0, -1}, hold_up, 2000ms);
     }else{
-        pbf_move_left_joystick(context, 128, 0, hold_up, 250);
+        pbf_move_left_joystick(context, {0, +1}, hold_up, 2000ms);
     }
 
     pbf_wait(context, flight_wait);

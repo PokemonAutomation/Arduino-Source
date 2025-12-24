@@ -96,14 +96,14 @@ void checkpoint_54(
                     128, 0, 24, 8, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );          
 
         // marker 2. x=0.411979, y=0.730556
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
             FlyPoint::POKECENTER, 
             {0.411979, 0.730556}
         );        
@@ -114,14 +114,14 @@ void checkpoint_54(
                     128, 0, 40, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );         
         
         // marker 3. x=0.444792, y=0.640741. zoom out
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_OUT, 0, 0, 0}, 
+            {ZoomChange::ZOOM_OUT, 0, 0, 0ms}, 
             FlyPoint::POKECENTER, 
             {0.444792, 0.640741}
         ); 
@@ -133,16 +133,16 @@ void checkpoint_54(
                     128, 0, 24, 8, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
 
         // marker 4. blind marker placement
         realign_player_from_landmark(
-            env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 128, 255, 50},
-            {ZoomChange::ZOOM_IN, 150, 0, 112}
+            env.program_info(), env.console, context,
+            {ZoomChange::KEEP_ZOOM, 128, 255, 400ms},
+            {ZoomChange::ZOOM_IN, 150, 0, 896ms}
         ); 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -151,7 +151,7 @@ void checkpoint_54(
                     128, 0, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
@@ -159,8 +159,8 @@ void checkpoint_54(
         // marker 5. blind marker placement
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 128, 255, 50},
-            {ZoomChange::ZOOM_IN, 135, 0, 107}
+            {ZoomChange::KEEP_ZOOM, 128, 255, 400ms},
+            {ZoomChange::ZOOM_IN, 135, 0, 856ms}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -169,7 +169,7 @@ void checkpoint_54(
                     128, 0, 16, 8, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );  
@@ -177,8 +177,8 @@ void checkpoint_54(
         // marker 6. blind marker placement
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 128, 255, 50},
-            {ZoomChange::ZOOM_IN, 120, 0, 95}
+            {ZoomChange::KEEP_ZOOM, 128, 255, 400ms},
+            {ZoomChange::ZOOM_IN, 120, 0, 760ms}
         ); 
         
 
@@ -190,7 +190,7 @@ void checkpoint_54(
                     128, 0, 16, 8, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );            
@@ -206,7 +206,7 @@ void checkpoint_54(
                     128, 0, 16, 8, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         ); 
@@ -214,7 +214,7 @@ void checkpoint_54(
 
         // marker 7. x=0.505729, y=0.675926
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 128, 255, 30}, 
+            {ZoomChange::KEEP_ZOOM, 128, 255, 240ms},
             FlyPoint::POKECENTER, 
             {0.505729, 0.675926}
         );
@@ -225,14 +225,14 @@ void checkpoint_54(
                     128, 0, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
 
         // marker 8.  x=0.591146, y=0.575926,
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
             FlyPoint::POKECENTER, 
             {0.591146, 0.575926}
         );
@@ -243,14 +243,14 @@ void checkpoint_54(
                     128, 0, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
 
         // marker 9. at crossroads. x=0.723958, y=0.55463
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
             FlyPoint::POKECENTER, 
             {0.723958, 0.55463}
         );
@@ -261,14 +261,14 @@ void checkpoint_54(
                     128, 0, 40, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
 
         // marker 10. x=0.752604, y=0.643519
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
             FlyPoint::POKECENTER, 
             {0.752604, 0.643519}
         );
@@ -280,7 +280,7 @@ void checkpoint_54(
                     128, 0, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
@@ -288,7 +288,7 @@ void checkpoint_54(
 
         // marker 11. x=0.752083, y=0.702778
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
             FlyPoint::POKECENTER, 
             {0.752083, 0.702778}
         ); 
@@ -300,14 +300,14 @@ void checkpoint_54(
                     128, 0, 16, 8, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
 
         // marker 12. x=0.685417, y=0.748148
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
             FlyPoint::POKECENTER, 
             {0.685417, 0.748148}
         ); 
@@ -319,7 +319,7 @@ void checkpoint_54(
                     128, 0, 16, 8, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );

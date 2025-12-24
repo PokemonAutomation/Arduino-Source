@@ -10,6 +10,7 @@
 #include <exception>
 #include <map>
 #include <atomic>
+//#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 
 #include <iostream>
@@ -125,7 +126,7 @@ void ListenerSet<ListenerType>::add(ListenerType& listener){
 #ifdef PA_DEBUG_ListenerSet
     auto scope = m_sanitizer.check_scope();
 #endif
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, "ListenerSet::add()");
     auto ret = m_listeners.emplace(
         std::piecewise_construct,
         std::forward_as_tuple(&listener),
@@ -154,7 +155,7 @@ void ListenerSet<ListenerType>::remove(ListenerType& listener) noexcept{
     bool printed = false;
 
     while (true){
-        WriteSpinLock lg(m_lock);
+        WriteSpinLock lg(m_lock, "ListenerSet::remove()");
         auto iter = m_listeners.find(&listener);
         if (iter == m_listeners.end()){
             return;
@@ -260,7 +261,7 @@ void ListenerSet<ListenerType>::run_method(Function function, Args&&... args){
     Node* node = m_list;
     while (node){
         {
-            ReadSpinLock lg(node->lock);
+            ReadSpinLock lg(node->lock, "ListenerSet::run_method()");
 
 #ifdef PA_DEBUG_ListenerSet
             node->sanitizer.check_usage();

@@ -257,7 +257,7 @@ void MoneyFarmerRoute210::heal_at_center_and_return(
     logger.log("Returning to trainers...");
     pbf_move_left_joystick(context, {0, -1}, 6000ms, 0ms);
     pbf_move_left_joystick(context, {+1, 0}, 480ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, 1600ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 1600ms, 0ms);
     pbf_move_left_joystick(context, {+1, 0}, 6000ms, 0ms);
 
     pbf_press_button(context, BUTTON_R, 10, 150);
@@ -383,7 +383,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
             }
             pbf_press_dpad(context, DPAD_DOWN, 75, 0);
         }
-        pbf_press_dpad(context, DPAD_LEFT, 200, 0);
+        pbf_press_dpad(context, DPAD_LEFT, 1600ms, 0ms);
 
         context.wait_for_all_requests();
         stats.m_searches++;

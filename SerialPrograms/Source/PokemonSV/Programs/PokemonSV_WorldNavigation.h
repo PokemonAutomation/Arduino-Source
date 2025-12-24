@@ -73,7 +73,7 @@ struct MoveCursor{
     ZoomChange zoom_change;
     uint8_t move_x;
     uint8_t move_y;
-    uint16_t move_duration;
+    Milliseconds move_duration;
 };
 
 //  From map, press A to fly to a travel spot.

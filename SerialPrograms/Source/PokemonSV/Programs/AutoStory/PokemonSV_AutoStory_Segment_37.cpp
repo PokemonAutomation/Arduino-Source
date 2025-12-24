@@ -92,7 +92,7 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         // arrived at research station 1
 
-        pbf_move_left_joystick(context, 0, 255, 2400ms, 800ms);
+        pbf_move_left_joystick(context, {-1, -1}, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving research station
         wait_for_overworld(env.program_info(), env.console, context, 30);
@@ -280,7 +280,7 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         // walked off cliff. now move backwards
 
-        pbf_move_left_joystick(context, 128, 255, 800, 50); // move forward to align with camera
+        pbf_move_left_joystick(context, {0, -1}, 6400ms, 400ms); // move forward to align with camera
 
         pbf_press_button(context, BUTTON_L, 240ms, 100ms);
 

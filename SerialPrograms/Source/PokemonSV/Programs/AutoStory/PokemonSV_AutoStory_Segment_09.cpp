@@ -129,7 +129,7 @@ void checkpoint_16(
         context.wait_for_all_requests();
 
         // walk forward
-        pbf_move_left_joystick(context, 128, 0, 600, 100);
+        pbf_move_left_joystick(context, {0, +1}, 4800ms, 800ms);
         // turn left 
         pbf_move_left_joystick(context, {-1, 0}, 160ms, 800ms);
 

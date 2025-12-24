@@ -478,8 +478,8 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 
                 //  Fix our position.
                 if (fix_position){
-                    pbf_move_left_joystick(context, 128, 255, 150, 0);
-                    pbf_move_left_joystick(context, 128, 0, 200, 0);
+                    pbf_move_left_joystick(context, {0, -1}, 1200ms, 0ms);
+                    pbf_move_left_joystick(context, 128, 0, 1600ms, 0ms);
                 }
 
                 context.wait_for_all_requests();

@@ -120,7 +120,7 @@ int run_from_battle(
         case 1:
             stream.log("Detected battle menu...");
             battle_menu.move_to_slot(stream, context, 3);
-//            pbf_press_dpad(context, DPAD_DOWN, 250, 0);
+//            pbf_press_dpad(context, DPAD_DOWN, 2000ms, 0ms);
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             pbf_press_button(context, BUTTON_B, 160ms, 1000ms);
             attempts++;
@@ -184,7 +184,7 @@ int run_from_battle(
             }
 
             battle_menu.move_to_slot(stream, context, 3);
-//            pbf_press_dpad(context, DPAD_DOWN, 250, 0);
+//            pbf_press_dpad(context, DPAD_DOWN, 2000ms, 0ms);
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             pbf_press_button(context, BUTTON_B, 160ms, 1000ms);
             attempts++;

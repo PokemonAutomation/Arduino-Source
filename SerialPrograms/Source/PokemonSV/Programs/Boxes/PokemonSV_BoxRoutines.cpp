@@ -135,10 +135,10 @@ void change_view_to_judge(
 // Moving to left/right box is blind sequence. To prevent game dropping button inputs,
 // press the button longer.
 void move_to_left_box(ProControllerContext& context){
-    pbf_press_button(context, BUTTON_L, 60, 100);
+    pbf_press_button(context, BUTTON_L, 480ms, 800ms);
 }
 void move_to_right_box(ProControllerContext& context){
-    pbf_press_button(context, BUTTON_R, 60, 100);
+    pbf_press_button(context, BUTTON_R, 480ms, 800ms);
 }
 
 namespace{

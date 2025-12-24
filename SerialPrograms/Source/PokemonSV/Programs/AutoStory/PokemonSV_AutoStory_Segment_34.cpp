@@ -89,7 +89,7 @@ void checkpoint_90(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
         // Fly to Academy
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 230, 80}, FlyPoint::FAST_TRAVEL);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 230, 640ms}, FlyPoint::FAST_TRAVEL);
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 255, 100);
 
@@ -100,7 +100,7 @@ void checkpoint_90(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     128, 0, 30, 30, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
@@ -195,14 +195,14 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     128, 0, 60, 60, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
 
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 0, 0}, FlyPoint::FAST_TRAVEL);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 0, 0ms}, FlyPoint::FAST_TRAVEL);
 
 
     });   
@@ -211,7 +211,7 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 void checkpoint_92(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 145, 255, 350}, FlyPoint::FAST_TRAVEL);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 145, 255, 2800ms}, FlyPoint::FAST_TRAVEL);
         handle_unexpected_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {-1, 0}, 1000ms, 100ms);
@@ -222,7 +222,7 @@ void checkpoint_92(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // leave the inside of the lighthouse and go outside
         pbf_move_left_joystick(context, {0, -1}, 800ms, 400ms);
         pbf_move_left_joystick(context, {-1, 0}, 2400ms, 400ms);
-        pbf_move_left_joystick(context, 255, 255, 800ms, 400ms);
+        pbf_move_left_joystick(context, {+1, -1}, 800ms, 400ms);
 
         pbf_wait(context, 3000ms);
         // wait for overworld after building
@@ -240,7 +240,7 @@ void checkpoint_92(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0}, FlyPoint::POKECENTER);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, FlyPoint::POKECENTER);
     });   
 }
 

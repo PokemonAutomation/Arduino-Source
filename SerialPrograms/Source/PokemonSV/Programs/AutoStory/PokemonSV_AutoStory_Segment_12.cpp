@@ -87,8 +87,8 @@ void checkpoint_28(
         DirectionDetector direction;
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms});
         }
 
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
@@ -110,7 +110,7 @@ void checkpoint_28(
                         pbf_move_left_joystick(context, {0, +1}, 10000ms, 800ms);
                     }, 
                     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                        pbf_move_left_joystick(context, 0, 0, 800ms, 160ms);
+                        pbf_move_left_joystick(context, {-1, +1}, 800ms, 160ms);
                     },
                     5, 3
                 );     

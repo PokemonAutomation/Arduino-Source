@@ -44,11 +44,12 @@ public:
         CUSTOMISED_MACRO = 255,
     };
 
-    private:
+private:
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
     ShinySoundDetectedActionOption SHINY_DETECTED;
     EnumDropdownOption<Route> ROUTE;
     SimpleIntegerOption<uint64_t> NUM_RESETS;
+    SimpleIntegerOption<uint16_t> MIN_CALORIE_REMAINING;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;

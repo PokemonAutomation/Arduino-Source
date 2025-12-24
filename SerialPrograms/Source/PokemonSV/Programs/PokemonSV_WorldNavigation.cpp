@@ -326,8 +326,8 @@ void place_marker_offset_from_flypoint(
             }
             uint8_t move_x1 = move_cursor_near_flypoint.move_x;
             uint8_t move_y1 = move_cursor_near_flypoint.move_y;
-            uint16_t move_duration1 = move_cursor_near_flypoint.move_duration;
-            pbf_move_left_joystick(context, move_x1, move_y1, move_duration1, 1 * TICKS_PER_SECOND);
+            Milliseconds move_duration1 = move_cursor_near_flypoint.move_duration;
+            pbf_move_left_joystick(context, move_x1, move_y1, move_duration1, 1000ms);
 
             move_cursor_to_position_offset_from_flypoint(info, stream, context, fly_point, {marker_offset.x, marker_offset.y});
 
@@ -572,7 +572,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, VideoStream& stre
     stream.log("No PokeCenter icon overlapping with the player character on the max warpable level");
     stream.overlay().add_log("No overlapping PokeCenter");
     // press B to close the destination menu item
-    pbf_press_button(context, BUTTON_B, 60, 100);
+    pbf_press_button(context, BUTTON_B, 480ms, 800ms);
 
 
     // Part 3: Tries to detect a pokecenter that is further away from the player, while at max warpable level
@@ -660,7 +660,7 @@ void walk_forward_until_dialog(
     uint8_t y
 ){
 
-    DialogBoxWatcher        dialog(COLOR_RED, true);
+    DialogBoxWatcher dialog(COLOR_RED, true);
     context.wait_for_all_requests();
     int ret = run_until<ProControllerContext>(
         stream, context,

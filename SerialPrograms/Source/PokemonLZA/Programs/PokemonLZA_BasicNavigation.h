@@ -56,13 +56,17 @@ bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_t
 void open_hyperspace_map(ConsoleHandle& console, ProControllerContext& context);
 
 // Starting at map view, press A to fast travel to the current selected fast travel location
+// overworld_screen: if not nullptr, return the overworld screen when the fly is over.
+//   This is useful for doing additional visual detection on the overworld screen. If fast travel
+//   failed, no change will be made to `overworld_screen`.
 // Return FastTravelState:
 // - SUCCESS: fast travel successful. After the function returns, the player character is on the overworld
 // - PURSUED: spotted and pursued by wild pokemon, cannot fast travel. After the function returns, the game
 //   is in fly map with the spotted dialog.
 // - NOT_AT_FLY_SPOT: the current map cursor is not on a fly spot, cannot fast travel. After the function
 //   returns, the game is in fly map.
-FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& context);
+FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& context,
+    std::shared_ptr<const ImageRGB32>* overworld_screen = nullptr);
 
 // Fast travel without moving map cursor.
 // This is useful to fast travel back to the wild zone gate while in the zone.
@@ -113,7 +117,7 @@ double get_angle_between_facing_directions(double dir1, double dir2);
 // If the program mashes A after leaving the zone, it will stuck talking to the npcs.
 bool leave_zone_gate(ConsoleHandle& console, ProControllerContext& context);
 
-// Run towards a wild zone until either button A is detected at specified box region,
+// Run towards a gate until either button A is detected at specified box region,
 // or day/night change happens. If day/night changes, it will wait until the transition
 // animation is done.
 // Return
@@ -121,7 +125,7 @@ bool leave_zone_gate(ConsoleHandle& console, ProControllerContext& context);
 // -  1 if day/night change happens
 // - -1 if it does not reach the gate in the end. Possible reasons are wrong run direction
 //   or get stuck by terrain or obstacle on the way
-int run_towards_wild_zone_gate(
+int run_towards_gate_with_A_button(
     ConsoleHandle& console, ProControllerContext& context,
     uint8_t run_direction_x, uint8_t run_direction_y,
     Milliseconds run_time

@@ -94,7 +94,7 @@ bool enter_sandwich_recipe_list(
         case 0:
             stream.log("Detected picnic. Maybe button A press dropped.");
             // walk forward and press A again
-            pbf_move_left_joystick(context, 128, 0, 100, 40);
+            pbf_move_left_joystick(context, {0, +1}, 800ms, 320ms);
             pbf_press_button(context, BUTTON_A, 20, 80);
             continue;
         case 1:
@@ -301,7 +301,7 @@ bool move_then_recover_sandwich_hand_position(
     // center the cursor
     if(SandwichHandType::FREE == hand_type){
         // move to bottom right corner,
-        pbf_move_left_joystick(context, 255, 255, move_1, 800ms);
+        pbf_move_left_joystick(context, {+1, -1}, move_1, 800ms);
         // move to left slightly
         pbf_move_left_joystick(context, {-1, 0}, move_2, 800ms);
         context.wait_for_all_requests();
@@ -441,7 +441,7 @@ HandMoveData move_sandwich_hand_and_check_if_plates_empty(
                 overlay_set.clear();
                 overlay_set.add(COLOR_RED, hand_bb_debug);
                 overlay_set.add(COLOR_BLUE, expanded_hand_bb_debug);
-                pbf_move_left_joystick(context, 0, 0, 5000ms, 800ms);  // move hand to screen edge
+                pbf_move_left_joystick(context, {-1, +1}, 5000ms, 800ms);  // move hand to screen edge
                 context.wait_for_all_requests();
             }
         #endif
@@ -451,7 +451,7 @@ HandMoveData move_sandwich_hand_and_check_if_plates_empty(
             // move hand to edge of screen, while still holding A
             if (SandwichHandType::GRABBING == hand_type){
                 pbf_controller_state(context, BUTTON_A, DPAD_NONE, 0, 0, 128, 128, 5000ms);
-                pbf_press_button(context, BUTTON_A, 200, 0);
+                pbf_press_button(context, BUTTON_A, 1600ms, 0ms);
                 // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 128, 128, 128, 800ms);
             }
         #endif

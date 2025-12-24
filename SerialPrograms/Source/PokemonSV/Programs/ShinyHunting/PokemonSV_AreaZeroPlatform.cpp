@@ -153,7 +153,7 @@ void inside_zero_gate_to_platform(
     //  Don't jump to avoid spawn.
     pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
     pbf_move_left_joystick(context, {0, +1}, 5000ms, 0ms);
-    ssf_press_button(context, BUTTON_B, 0, 50);
+    ssf_press_button(context, BUTTON_B, 0ms, 400ms);
     pbf_move_left_joystick(context, {0, +1}, 2000ms, 0ms);
     pbf_move_left_joystick(context, 160, 0, 4800ms, 0ms);
     pbf_move_left_joystick(context, {0, +1}, 15000ms, 0ms);
@@ -169,7 +169,7 @@ void inside_zero_gate_to_platform(
     ssf_press_button(context, BUTTON_B, 125, 100);
 
     //  Fly
-    ssf_press_button(context, BUTTON_B, 0, 50);
+    ssf_press_button(context, BUTTON_B, 0ms, 400ms);
 
     pbf_move_left_joystick(context, 144, 0, 1150, 0);
     pbf_move_left_joystick(context, 128, 0, 125, NAVIGATE_TO_PLATFORM.MIDAIR_PAUSE_TIME);
@@ -187,7 +187,7 @@ void inside_zero_gate_to_platform(
     ssf_press_button(context, BUTTON_B, 125, 100);
 
     //  Fly
-    ssf_press_button(context, BUTTON_B, 0, 50);
+    ssf_press_button(context, BUTTON_B, 0ms, 400ms);
 
     pbf_move_left_joystick(context, 144, 0, 1150, 0);
     pbf_move_left_joystick(context, 128, 0, 125, NAVIGATE_TO_PLATFORM.MIDAIR_PAUSE_TIME);
@@ -223,7 +223,7 @@ void inside_zero_gate_to_platform(
 //        ssf_press_button(context, BUTTON_B, 0, 20);
 //        pbf_move_left_joystick(context, {0, +1}, 375, 250);
         pbf_move_left_joystick(context, 164, 0, 1000ms, settings.MIDAIR_PAUSE_TIME0);
-        pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+        pbf_press_button(context, BUTTON_LCLICK, 400ms, 0ms);
         ssf_press_right_joystick(context, {0, -1}, 0ms, 12000ms);
         pbf_move_left_joystick(context, {0, -1}, 12800ms, 1000ms);
 
@@ -376,7 +376,7 @@ void area_zero_platform_run_path1(
         context.wait_for_all_requests();
 
         find_and_center_on_sky(env, stream, context);
-        pbf_move_left_joystick(context, 128, 0, 50, 0);
+        pbf_move_left_joystick(context, 128, 0, 400ms, 0ms);
         pbf_press_button(context, BUTTON_L, 160ms, 240ms);
 
         //  Move forward.

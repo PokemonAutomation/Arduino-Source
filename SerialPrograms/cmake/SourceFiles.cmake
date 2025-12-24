@@ -1643,6 +1643,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/PokemonLZA_Panels.h
     Source/PokemonLZA/PokemonLZA_Settings.cpp
     Source/PokemonLZA/PokemonLZA_Settings.h
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_DonutMaker.cpp
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_DonutMaker.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_FriendshipFarmer.cpp
     Source/PokemonLZA/Programs/Farming/PokemonLZA_FriendshipFarmer.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_HyperspaceRewardReset.cpp

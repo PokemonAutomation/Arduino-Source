@@ -573,7 +573,7 @@ void return_to_academy_after_loss(
     pbf_press_button(context, BUTTON_PLUS, 400ms, 320ms);
     pbf_press_button(context, BUTTON_B, 400ms, 320ms); //Trying to jump/glide over npc spawns
     pbf_press_button(context, BUTTON_B, 400ms, 320ms);
-    pbf_move_left_joystick(context, 128, 0, 500, 0);
+    pbf_move_left_joystick(context, {0, +1}, 4000ms, 0ms);
     pbf_press_button(context, BUTTON_B, 400ms, 320ms);
     pbf_press_button(context, BUTTON_B, 400ms, 320ms);
 
@@ -581,7 +581,7 @@ void return_to_academy_after_loss(
     int ret_black_lost = run_until<ProControllerContext>(
         stream, context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, 128, 0, 5000, 0);
+            pbf_move_left_joystick(context, {0, +1}, 40000ms, 0ms);
         },
         { black_screen }
         );
@@ -601,7 +601,7 @@ void return_to_academy_after_loss(
     //Move to tournament entry
     pbf_move_left_joystick(context, {0, +1}, 4000ms, 0ms);
     pbf_move_left_joystick(context, {-1, 0}, 800ms, 0ms);
-    pbf_move_left_joystick(context, 255, 0, 800ms, 0ms);
+    pbf_move_left_joystick(context, {+1, +1}, 800ms, 0ms);
     context.wait_for_all_requests();
 }
 
@@ -615,7 +615,7 @@ void go_to_academy_fly_point(ProgramEnvironment& env, VideoStream& stream, ProCo
         open_map_from_overworld(env.program_info(), stream, context);
         pbf_press_button(context, BUTTON_ZR, 400ms, 320ms);
         pbf_move_left_joystick(context, 200, 0, 47, 25);  
-        // pbf_move_left_joystick(context, 187, 0, 50, 0);
+        // pbf_move_left_joystick(context, 187, 0, 400ms, 0ms);
         numAttempts++;
         isFlySuccessful = fly_to_overworld_from_map(env.program_info(), stream, context, true);
         if (!isFlySuccessful){

@@ -7,6 +7,7 @@
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonLZA_OverworldPartySelectionDetector.h"
@@ -120,7 +121,13 @@ uint8_t OverworldPartySelectionDetector::selected_party_idx() const{
 }
 
 
-
+bool OverworldPartySelectionWatcher::process_frame(const VideoSnapshot& frame){
+    const bool detected = process_frame(*frame.frame, frame.timestamp);
+    if (detected){
+        m_last_detected_frame = frame.frame;
+    }
+    return detected;
+}
 
 }
 }

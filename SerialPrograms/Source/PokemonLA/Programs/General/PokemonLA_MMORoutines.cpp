@@ -115,7 +115,7 @@ std::set<std::string> enter_region_and_read_MMO(
     goto_camp_from_jubilife(env, env.console, context, location, fresh_from_reset);
 
     // Open map
-    pbf_press_button(context, BUTTON_MINUS, 50, 100);
+    pbf_press_button(context, BUTTON_MINUS, 400ms, 800ms);
     context.wait_for_all_requests();
 
     // Take a photo of the map before 
@@ -146,7 +146,7 @@ std::set<std::string> enter_region_and_read_MMO(
 
     // Fix Missions & Requests tab:
     if (is_map_mission_tab_raised(question_mark_image)){
-        pbf_press_button(context, BUTTON_R, 50, 100);
+        pbf_press_button(context, BUTTON_R, 400ms, 800ms);
         context.wait_for_all_requests();
         question_mark_image = env.console.video().snapshot();
     }

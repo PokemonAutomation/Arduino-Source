@@ -152,7 +152,7 @@ FlagNavigationAir::FlagNavigationAir(
         m_active_command->dispatch([this](ProControllerContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
-                pbf_move_left_joystick(context, 128, 0, 160, 0);
+                pbf_move_left_joystick(context, {0, +1}, 1280ms, 0ms);
                 context.wait_for_all_requests();
                 m_looking_straight_ahead_timestamp.store(current_time());
                 m_looking_straight_ahead.store(true, std::memory_order_release);
@@ -167,7 +167,7 @@ FlagNavigationAir::FlagNavigationAir(
         m_active_command->dispatch([this](ProControllerContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
-                pbf_move_left_joystick(context, 128, 0, 160, 0);
+                pbf_move_left_joystick(context, {0, +1}, 1280ms, 0ms);
                 context.wait_for_all_requests();
                 m_looking_straight_ahead_timestamp.store(current_time());
                 m_looking_straight_ahead.store(true, std::memory_order_release);
@@ -185,7 +185,7 @@ FlagNavigationAir::FlagNavigationAir(
 //            cout << "Straight ahead = " << m_looking_straight_ahead.load(std::memory_order_acquire) << endl;
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
 //                pbf_wait(context, 1000ms);
-                pbf_move_left_joystick(context, 128, 0, 160, 0);
+                pbf_move_left_joystick(context, {0, +1}, 1280ms, 0ms);
                 context.wait_for_all_requests();
                 m_looking_straight_ahead_timestamp.store(current_time());
                 m_looking_straight_ahead.store(true, std::memory_order_release);
@@ -211,7 +211,7 @@ FlagNavigationAir::FlagNavigationAir(
         m_active_command->dispatch([this](ProControllerContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
-                pbf_move_left_joystick(context, 128, 0, 160, 0);
+                pbf_move_left_joystick(context, {0, +1}, 1280ms, 0ms);
                 context.wait_for_all_requests();
                 m_looking_straight_ahead_timestamp.store(current_time());
                 m_looking_straight_ahead.store(true, std::memory_order_release);
@@ -227,7 +227,7 @@ FlagNavigationAir::FlagNavigationAir(
         m_active_command->dispatch([this](ProControllerContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
-                pbf_move_left_joystick(context, 128, 0, 160, 0);
+                pbf_move_left_joystick(context, {0, +1}, 1280ms, 0ms);
                 context.wait_for_all_requests();
                 m_looking_straight_ahead_timestamp.store(current_time());
                 m_looking_straight_ahead.store(true, std::memory_order_release);

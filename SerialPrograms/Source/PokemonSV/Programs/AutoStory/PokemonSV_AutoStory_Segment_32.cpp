@@ -99,8 +99,8 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 150});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 150});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 1200ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 1200ms});
         }
         
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 140, 70);
@@ -116,14 +116,14 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     128, 0, 50, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
 
         // {0.326042, 0.438889}
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 0, 0, 0}, 
+            {ZoomChange::ZOOM_IN, 0, 0, 0ms}, 
             FlyPoint::POKECENTER, 
             {0.326042, 0.438889}
         );
@@ -134,7 +134,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                     128, 0, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 0, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
@@ -148,7 +148,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
                 pbf_move_left_joystick(context, 0, 0, 300, 50); // move left
-                pbf_move_left_joystick(context, 255, 128, 60, 50); // move right. center on door
+                pbf_move_left_joystick(context, {+1, 0}, 480ms, 400ms); // move right. center on door
                 pbf_move_left_joystick(context, 128, 0, 300, 50);  // move forward
             }
         );
@@ -169,7 +169,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
         direction.change_direction(env.program_info(), env.console, context, 4.413989);
-        pbf_move_left_joystick(context, 128, 0, 180, 50);
+        pbf_move_left_joystick(context, {0, +1}, 1440ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 5.516255);
 
@@ -227,7 +227,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
                 pbf_move_left_joystick(context, 0, 0, 300, 50); // move left
-                pbf_move_left_joystick(context, 255, 128, 60, 50); // move right. center on door
+                pbf_move_left_joystick(context, {+1, 0}, 480ms, 400ms); // move right. center on door
                 pbf_move_left_joystick(context, 128, 0, 300, 50);  // move forward
             }
         );
@@ -244,7 +244,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0}, FlyPoint::POKECENTER);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, FlyPoint::POKECENTER);
 
     });  
 }

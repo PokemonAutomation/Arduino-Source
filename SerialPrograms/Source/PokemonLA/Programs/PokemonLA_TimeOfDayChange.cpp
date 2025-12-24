@@ -66,7 +66,7 @@ void change_time_of_day_at_tent(
         break;
     
     case Camp::ICELANDS_SNOWFIELDS:
-        pbf_move_left_joystick(context, 80, 0, 150, 20);
+        pbf_move_left_joystick(context, 80, 0, 1200ms, 160ms);
         break;
 
     case Camp::ICELANDS_ICEPEAK:

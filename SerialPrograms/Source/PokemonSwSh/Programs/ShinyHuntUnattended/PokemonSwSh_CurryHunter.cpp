@@ -201,17 +201,17 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
                 pbf_move_left_joystick(context, 0x80, 0xff, SMALL_POKEMON, 0);
 
                 for (uint16_t i = 0; i<2; i++){
-                    pbf_move_left_joystick(context, 0x00, 0x80, 30, 0); // Left
+                    pbf_move_left_joystick(context, 0x00, 0x80, 240ms, 0ms); // Left
                     pbf_press_button(context, BUTTON_A, 5, 5);
-                    pbf_move_left_joystick(context, 0x00, 0x80, 30, 0); // Left
+                    pbf_move_left_joystick(context, 0x00, 0x80, 240ms, 0ms); // Left
                     pbf_press_button(context, BUTTON_A, 5, 5);
-                    pbf_move_left_joystick(context, 0x00, 0x80, 30, 0); // Left
+                    pbf_move_left_joystick(context, 0x00, 0x80, 240ms, 0ms); // Left
                     pbf_press_button(context, BUTTON_A, 5, 5);
-                    pbf_move_left_joystick(context, 0xff, 0x80, 30, 0); // Right
+                    pbf_move_left_joystick(context, 0xff, 0x80, 240ms, 0ms); // Right
                     pbf_press_button(context, BUTTON_A, 5, 5);
-                    pbf_move_left_joystick(context, 0xff, 0x80, 30, 0); // Right
+                    pbf_move_left_joystick(context, 0xff, 0x80, 240ms, 0ms); // Right
                     pbf_press_button(context, BUTTON_A, 5, 5);
-                    pbf_move_left_joystick(context, 0xff, 0x80, 30, 0); // Right
+                    pbf_move_left_joystick(context, 0xff, 0x80, 240ms, 0ms); // Right
                     pbf_press_button(context, BUTTON_A, 5, 5);
                 }
             

@@ -79,8 +79,8 @@ void checkpoint_29(
 
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms});
         }
 
         // align for long stretch 1, part 1
@@ -94,7 +94,7 @@ void checkpoint_29(
                     128, 0, 30, 15, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );            
@@ -102,8 +102,8 @@ void checkpoint_29(
         // align for long stretch 1, part 2
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 128, 255, 40},
-            {ZoomChange::KEEP_ZOOM, 80, 0, 75}
+            {ZoomChange::ZOOM_IN, 128, 255, 320ms},
+            {ZoomChange::KEEP_ZOOM, 80, 0, 600ms}
         );        
         
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
@@ -113,7 +113,7 @@ void checkpoint_29(
                     128, 0, 24, 12, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );         
@@ -122,8 +122,8 @@ void checkpoint_29(
  
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 128, 255, 60},
-            {ZoomChange::KEEP_ZOOM, 95, 0, 115}
+            {ZoomChange::ZOOM_IN, 128, 255, 480ms},
+            {ZoomChange::KEEP_ZOOM, 95, 0, 920ms}
         );
         
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
@@ -133,7 +133,7 @@ void checkpoint_29(
                     128, 0, 36, 12, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );  
@@ -141,8 +141,8 @@ void checkpoint_29(
         // align for long stretch 2
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 128, 255, 100},
-            {ZoomChange::KEEP_ZOOM, 0, 105, 65}
+            {ZoomChange::ZOOM_IN, 128, 255, 800ms},
+            {ZoomChange::KEEP_ZOOM, 0, 105, 520ms}
         );              
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
@@ -152,7 +152,7 @@ void checkpoint_29(
                     128, 0, 45, 15, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );  
@@ -160,8 +160,8 @@ void checkpoint_29(
         // align for long stretch 3, part 1
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 255, 128, 65},
-            {ZoomChange::KEEP_ZOOM, 0, 50, 87}
+            {ZoomChange::ZOOM_IN, 255, 128, 520ms},
+            {ZoomChange::KEEP_ZOOM, 0, 50, 696ms}
         ); 
 
         
@@ -172,7 +172,7 @@ void checkpoint_29(
                     128, 0, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );  
@@ -180,8 +180,8 @@ void checkpoint_29(
         // align for long stretch 3, part 2
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 255, 160, 65},
-            {ZoomChange::KEEP_ZOOM, 20, 0, 110}
+            {ZoomChange::ZOOM_IN, 255, 160, 520ms},
+            {ZoomChange::KEEP_ZOOM, 20, 0, 880ms}
         ); 
 
         
@@ -192,7 +192,7 @@ void checkpoint_29(
                     128, 0, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );            
@@ -200,8 +200,8 @@ void checkpoint_29(
         // align for long stretch 3, part 3
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 0, 60, 110},
-            {ZoomChange::KEEP_ZOOM, 255, 128, 115}
+            {ZoomChange::ZOOM_IN, 0, 60, 880ms},
+            {ZoomChange::KEEP_ZOOM, 255, 128, 920ms}
         );
 
 
@@ -212,7 +212,7 @@ void checkpoint_29(
                     128, 0, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
@@ -226,7 +226,7 @@ void checkpoint_29(
 
         //align for long stretch 3, part 4.  just prior to bridge. {0.339062, 0.612037}
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms},
             FlyPoint::POKECENTER, 
             {0.339062, 0.612037}
         );
@@ -239,7 +239,7 @@ void checkpoint_29(
                     128, 0, 36, 12, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );        
@@ -253,7 +253,7 @@ void checkpoint_29(
 
         // align to cross bridge   {0.385937, 0.615741}
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms},
             FlyPoint::POKECENTER, 
             {0.385937, 0.615741}
         );
@@ -290,7 +290,7 @@ void checkpoint_29(
                 // walk back to start position before bridge
                 //  {0.310937, 0.580556}      {0.310937, 0.589815}      {0.310937, 0.584259}
                 place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-                    {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+                    {ZoomChange::KEEP_ZOOM, 0, 0, 0ms},
                     FlyPoint::POKECENTER, 
                     {0.310937, 0.584259}
                 );
@@ -309,7 +309,7 @@ void checkpoint_29(
 
                 // align to cross bridge   {0.385937, 0.615741}
                 place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-                    {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+                    {ZoomChange::KEEP_ZOOM, 0, 0, 0ms},
                     FlyPoint::POKECENTER, 
                     {0.385937, 0.615741}
                 );
@@ -330,8 +330,8 @@ void checkpoint_29(
         // align for post-bridge section 1
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 0, 150, 60},
-            {ZoomChange::KEEP_ZOOM, 255, 60, 50} // {ZoomChange::KEEP_ZOOM, 255, 60, 50}
+            {ZoomChange::ZOOM_IN, 0, 150, 480ms},
+            {ZoomChange::KEEP_ZOOM, 255, 60, 400ms} // {ZoomChange::KEEP_ZOOM, 255, 60, 50}
         );
 
 
@@ -342,7 +342,7 @@ void checkpoint_29(
                     128, 0, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );
@@ -351,8 +351,8 @@ void checkpoint_29(
         // align for post-bridge section 2
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 0, 150, 60},
-            {ZoomChange::KEEP_ZOOM, 255, 105, 50}
+            {ZoomChange::ZOOM_IN, 0, 150, 480ms},
+            {ZoomChange::KEEP_ZOOM, 255, 105, 400ms}
         );
 
 
@@ -363,7 +363,7 @@ void checkpoint_29(
                     128, 0, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );       
@@ -371,8 +371,8 @@ void checkpoint_29(
         // align for post-bridge section 3. move up towards tree
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 0, 128, 50},
-            {ZoomChange::KEEP_ZOOM, 255, 90, 35}
+            {ZoomChange::ZOOM_IN, 0, 128, 400ms},
+            {ZoomChange::KEEP_ZOOM, 255, 90, 280ms}
         );
 
 
@@ -383,7 +383,7 @@ void checkpoint_29(
                     128, 0, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );       
@@ -391,8 +391,8 @@ void checkpoint_29(
         // align for post-bridge section 4
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 0, 128, 50},
-            {ZoomChange::KEEP_ZOOM, 255, 55, 25}
+            {ZoomChange::ZOOM_IN, 0, 128, 400ms},
+            {ZoomChange::KEEP_ZOOM, 255, 55, 200ms}
         );
 
 
@@ -403,7 +403,7 @@ void checkpoint_29(
                     128, 0, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );    
@@ -413,8 +413,8 @@ void checkpoint_29(
         // align for post-bridge section 5. set marker to pokecenter.
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 0, 128, 50},
-            {ZoomChange::KEEP_ZOOM, 128, 128, 0}
+            {ZoomChange::ZOOM_IN, 0, 128, 400ms},
+            {ZoomChange::KEEP_ZOOM, 128, 128, 0ms}
         );
 
 
@@ -425,7 +425,7 @@ void checkpoint_29(
                     128, 0, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 255, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );   

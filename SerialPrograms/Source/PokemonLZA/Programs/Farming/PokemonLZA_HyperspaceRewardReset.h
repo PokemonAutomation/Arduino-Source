@@ -7,9 +7,6 @@
 #ifndef PokemonAutomation_PokemonLZA_HyperspaceRewardReset_H
 #define PokemonAutomation_PokemonLZA_HyperspaceRewardReset_H
 
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/ButtonOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -35,7 +32,6 @@ public:
 private:
     OCR::LanguageOCROption LANGUAGE;
     HyperspaceRewardTable TARGET_ITEMS;
-    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     EventNotificationOption NOTIFICATION_REWARD_MATCH;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;

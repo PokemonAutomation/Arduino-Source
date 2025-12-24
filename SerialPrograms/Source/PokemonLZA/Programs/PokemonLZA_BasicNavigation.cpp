@@ -217,7 +217,10 @@ void open_hyperspace_map(ConsoleHandle& console, ProControllerContext& context){
 }
 
 
-FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& context){
+FastTravelState fly_from_map(
+    ConsoleHandle& console, ProControllerContext& context,
+    std::shared_ptr<const ImageRGB32>* overworld_screen
+){
     console.log("Flying from map...");
     context.wait_for_all_requests();
     {
@@ -295,6 +298,10 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
         );
     }
 
+    if (overworld_screen != nullptr){
+        *overworld_screen = overworld.last_detected_frame();
+    }
+
     return FastTravelState::SUCCESS;
 }
 
@@ -353,7 +360,7 @@ void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProController
         pbf_move_left_joystick(context, 110, 255, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_15:
-        pbf_move_left_joystick(context, 0, 0, 100ms, 0ms);
+        pbf_move_left_joystick(context, {-1, +1}, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_16:
         pbf_move_left_joystick(context, 220, 0, 100ms, 0ms);
@@ -535,7 +542,7 @@ bool leave_zone_gate(ConsoleHandle& console, ProControllerContext& context){
 }
 
 
-int run_towards_wild_zone_gate(
+int run_towards_gate_with_A_button(
     ConsoleHandle& console, ProControllerContext& context,
     uint8_t run_direction_x, uint8_t run_direction_y,
     PokemonAutomation::Milliseconds run_time

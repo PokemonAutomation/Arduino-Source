@@ -104,37 +104,37 @@ void checkpoint_55(
             DirectionDetector direction;
             if (attempt_number > 0 || ENABLE_TEST){
                 env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-                move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 50});
-                move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 100, 130}, FlyPoint::FAST_TRAVEL);
+                move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 400ms});
+                move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 100, 1040ms}, FlyPoint::FAST_TRAVEL);
             }
 
             direction.change_direction(env.program_info(), env.console, context, 3.909067);
             pbf_move_left_joystick(context, {0, +1}, 8000ms, 800ms);
 
-            direction.change_direction(env.program_info(), env.console, context, 5.061720);        
-            pbf_move_left_joystick(context, 128, 0, 500, 100);
-            pbf_move_left_joystick(context, 255, 0, 1600ms, 800ms);
+            direction.change_direction(env.program_info(), env.console, context, 5.061720);
+            pbf_move_left_joystick(context, {0, +1}, 4000ms, 800ms);
+            pbf_move_left_joystick(context, {+1, +1}, 1600ms, 800ms);
 
             // now aligned to the wall next to the hole/passage
 
             // walk away from wall slightly
-            pbf_move_left_joystick(context, 128, 255, 50, 100);
+            pbf_move_left_joystick(context, {0, -1}, 400ms, 800ms);
             get_on_ride(env.program_info(), env.console, context);
 
             direction.change_direction(env.program_info(), env.console, context, 0.366);
-            pbf_move_left_joystick(context, 128, 0, 250, 100);
+            pbf_move_left_joystick(context, {0, +1}, 2000ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 2.565);
             // run at Orthworm. run into its second position as well.
-            pbf_move_left_joystick(context, 128, 0, 50, 0);
+            pbf_move_left_joystick(context, {0, +1}, 400ms, 0ms);
             pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, {0, +1}, {0, 0}, 4000ms);
-            pbf_move_left_joystick(context, 255, 0, 300, 500);
+            pbf_move_left_joystick(context, {+1, +1}, 2400ms, 4000ms);
 
             get_off_ride(env.program_info(), env.console, context);
 
             direction.change_direction(env.program_info(), env.console, context, 0.261);
-            pbf_move_left_joystick(context, 128, 0, 500, 100);
-            pbf_move_left_joystick(context, 0, 0, 500, 100);
+            pbf_move_left_joystick(context, {0, +1}, 4000ms, 800ms);
+            pbf_move_left_joystick(context, 0, 0, 4000ms, 800ms);
 
             // now aligned to corner.
 
@@ -147,7 +147,7 @@ void checkpoint_55(
             
             direction.change_direction(env.program_info(), env.console, context, 4.988);
             pbf_move_left_joystick(context, 128, 0, 800, 100);
-            pbf_move_left_joystick(context, 255, 0, 500, 100);
+            pbf_move_left_joystick(context, {+1, +1}, 4000ms, 800ms);
 
             // now aligned to the wall next to the hole/passage   
 
@@ -155,7 +155,7 @@ void checkpoint_55(
             pbf_move_left_joystick(context, {0, -1}, 800ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 5.722795);
-            pbf_move_left_joystick(context, 128, 0, 600, 100);
+            pbf_move_left_joystick(context, {0, +1}, 4800ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 0.625226);
         });
@@ -177,21 +177,21 @@ void checkpoint_55(
             pbf_move_left_joystick(context, 128, 0, 900, 100);
 
             direction.change_direction(env.program_info(), env.console, context, 5.360763);
-            pbf_move_left_joystick(context, 128, 0, 500, 100);
+            pbf_move_left_joystick(context, {0, +1}, 4000ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 5.85);
             pbf_move_left_joystick(context, 128, 0, 700, 100);
 
             direction.change_direction(env.program_info(), env.console, context, 5.428);
-            pbf_move_left_joystick(context, 128, 0, 600, 100);
+            pbf_move_left_joystick(context, {0, +1}, 4800ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 4.908646);
             pbf_move_left_joystick(context, {0, +1}, 2400ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 1.169728);
             pbf_move_left_joystick(context, {0, +1}, 1600ms, 800ms);
-            pbf_move_left_joystick(context, 255, 0, 1600ms, 800ms);
-            pbf_move_left_joystick(context, 0, 0, 1600ms, 800ms);
+            pbf_move_left_joystick(context, {+1, +1}, 1600ms, 800ms);
+            pbf_move_left_joystick(context, {-1, +1}, 1600ms, 800ms);
 
             // now aligned to the wall next to the hole/passage   
 
@@ -239,11 +239,11 @@ void checkpoint_56(
     [&](size_t attempt_number){
         // fly back to East Province (Area Three) Watchtower. from Orthworm
         // this clears Pokemon in minimap
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0}, FlyPoint::FAST_TRAVEL);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, FlyPoint::FAST_TRAVEL);
 
         // marker 1
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
             FlyPoint::POKECENTER, 
             {0.769792, 0.725926}
         );
@@ -261,7 +261,7 @@ void checkpoint_56(
 
         // marker 2
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
             FlyPoint::POKECENTER, 
             {0.280208, 0.447222}
         );
@@ -279,7 +279,7 @@ void checkpoint_56(
 
         // marker 3
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 0, 128, 60}, 
+            {ZoomChange::ZOOM_IN, 0, 128, 480ms},
             FlyPoint::POKECENTER, 
             {0.354167, 0.375}
         );
@@ -297,7 +297,7 @@ void checkpoint_56(
 
         // marker 4
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 0, 128, 50}, 
+            {ZoomChange::ZOOM_IN, 0, 128, 400ms},
             FlyPoint::POKECENTER, 
             {0.497917, 0.274074}
         );
@@ -316,8 +316,8 @@ void checkpoint_56(
         // marker 5. set marker to pokecenter
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 0, 0, 0},
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0}
+            {ZoomChange::ZOOM_IN, 0, 0, 0ms},
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}
         );  
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
@@ -327,7 +327,7 @@ void checkpoint_56(
                     128, 0, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 255, 0, 320ms, 400ms);
+                pbf_move_left_joystick(context, {+1, +1}, 320ms, 400ms);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
         );             

@@ -326,7 +326,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
             pbf_press_button(context, BUTTON_L, 20, 23);
             if (ENABLE_FORWARD_RUN){
                 const std::pair<int, int>& direction = MANUVERS[consecutive_throw_attempts];
-                pbf_move_left_joystick(context, (uint8_t)direction.first, (uint8_t)direction.second, 50, 0);
+                pbf_move_left_joystick(context, (uint8_t)direction.first, (uint8_t)direction.second, 400ms, 0ms);
             }
             pbf_mash_button(context, BUTTON_ZR, 250);
             pbf_wait(context, 350);

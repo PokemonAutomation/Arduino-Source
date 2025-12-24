@@ -15,6 +15,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonLZA/Inference/PokemonLZA_HyperspaceCalorieDetector.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA_ShinyHunt_FlySpotReset.h"
@@ -74,10 +75,18 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
         Route::NO_MOVEMENT
     )
     , NUM_RESETS(
-        "<b>Hyperspace Resets:</b><br>Number of resets when running the Hyperspace Wild Zone route. Make sure to leave enough time to catch found shinies."
+        "<b>Max Hyperspace Resets:</b><br>Max number of resets when in Hyperspace. Set to zero to have no max reset limit. "
+        "Make sure to leave enough time to catch found shinies."
         "<br>Approximate Star/Cal. per reset: 1 Star/1 Cal, 2 Star/1-1.5 Cal., 3 Star/2-2.5 Cal., 4 Star/5 Cal., 5 Star/6 Cal.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        100, 1
+        100, 0 // default, min
+    )
+    , MIN_CALORIE_REMAINING(
+        "<b>Minimum Cal. allowed While Resetting in Hyperspace:</b><br>The program will stop if the Calorie number is at or below this value."
+        "<br>NOTE: the more star the hyperspace has the faster Calorie burns! Pick a minimum Calorie value that gives you enough time to catch shinies."
+        "<br>Approximate Star/Cal. per reset: 1 Star/1 Cal, 2 Star/1-1.5 Cal., 3 Star/2-2.5 Cal., 4 Star/5 Cal., 5 Star/6 Cal.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        120, 0, 9999 // default, min, max
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -91,12 +100,14 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(ROUTE);
     PA_ADD_OPTION(NUM_RESETS);
+    PA_ADD_OPTION(MIN_CALORIE_REMAINING);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 namespace {
 
+// Return if the loop should stop
 typedef std::function<void(SingleSwitchProgramEnvironment&, ProControllerContext&, ShinyHunt_FlySpotReset_Descriptor::Stats&, bool)> route_func;
 
 void route_default(
@@ -127,26 +138,6 @@ void route_default(
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "route_default(): Cannot fast travel after moving map cursor.",
-            env.console
-        );
-    }
-}
-
-void route_hyperspace_wild_zone(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
-    bool to_zoom_to_max){
-    open_hyperspace_map(env.console, context);
-    
-    // Fly from map to reset spawns
-    FastTravelState travel_status = fly_from_map(env.console, context);
-    if (travel_status != FastTravelState::SUCCESS){
-        stats.errors++;
-        env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "route_hyperspace_wild_zone(): Cannot fast travel after moving map cursor.",
             env.console
         );
     }
@@ -206,6 +197,67 @@ void route_alpha_pidgey(
     wait_until_overworld(env.console, context);
 }
 
+bool route_hyperspace_wild_zone(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
+    bool to_zoom_to_max,
+    SimpleIntegerOption<uint16_t>& MIN_CALORIE_REMAINING,
+    uint8_t& ready_to_stop_counter){
+    open_hyperspace_map(env.console, context);
+    
+    // Fly from map to reset spawns
+    std::shared_ptr<const ImageRGB32> overworld_screen;
+    FastTravelState travel_status = fly_from_map(env.console, context, &overworld_screen);
+    if (travel_status != FastTravelState::SUCCESS){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "route_hyperspace_wild_zone(): Cannot fast travel after moving map cursor.",
+            env.console
+        );
+    }
+
+    if (overworld_screen == nullptr){
+        throw InternalProgramError(&env.logger(), PA_CURRENT_FUNCTION, "overworld_screen is nullptr but FastTravelState is successful.");
+    }
+
+    HyperspaceCalorieDetector hyperspace_calorie_detector(env.logger());
+    if (!hyperspace_calorie_detector.detect(*overworld_screen)){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "route_hyperspace_wild_zone(): Cannot read Calorie number on screen.",
+            env.console
+        );
+    }
+
+    const uint16_t calorie_number = hyperspace_calorie_detector.calorie_number();
+    const uint16_t min_calorie = MIN_CALORIE_REMAINING;
+    const std::string log_msg = std::format("Calorie: {}/{}", calorie_number, min_calorie);
+    env.add_overlay_log(log_msg);
+    env.log(log_msg);
+    // `ready_to_stop_counter` serves as a "buffer zone" to ensure one wrong calorie detection won't stop
+    // the program early.
+    // Here we require the code to build up this `ready_to_stop_counter` counter when calorie is approaching
+    // the limit.
+    if (ready_to_stop_counter < 2 && calorie_number <= min_calorie + 12){
+        // We use "+12" because the 5-star Hyperspace burns about 6 Cal per sec and per reset. So we want
+        // to have enough time to build up `ready_to_stop_counter` to have value 2 when we reach min_calorie.
+        ready_to_stop_counter++;
+    } else if (ready_to_stop_counter >= 2 && calorie_number <= min_calorie){
+        // We've built up the ready_to_stop_counter so we can stop immidiately when detected calorie is lower
+        // than the threshodl.
+        return true;
+    } else if (ready_to_stop_counter > 0 && calorie_number > min_calorie + 12){
+        ready_to_stop_counter--;
+    }
+    return false;
+}
+
+
 } // namespace
 
 void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -237,7 +289,7 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
         route = route_default;
         break;
     case Route::HYPERSPACE_WILD_ZONE:
-        route = route_hyperspace_wild_zone;
+        // Need special handling
         break;
     case Route::WILD_ZONE_19:
         route = route_wild_zone_19;
@@ -255,13 +307,20 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
     
     uint64_t num_resets = 0;
     bool to_zoom_to_max = true;
+    uint8_t ready_to_stop_counter = 0;
     run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
             while (true){
                 context.wait_for_all_requests();
                 shiny_sound_handler.process_pending(context);
-                route(env, context, stats, to_zoom_to_max);
+
+                bool should_stop = false;
+                if (ROUTE == Route::HYPERSPACE_WILD_ZONE){
+                    should_stop = route_hyperspace_wild_zone(env, context, stats, to_zoom_to_max, MIN_CALORIE_REMAINING, ready_to_stop_counter);
+                } else{
+                    route(env, context, stats, to_zoom_to_max);
+                }
                 to_zoom_to_max = false;
                 num_resets++;
                 stats.resets++;
@@ -270,12 +329,14 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
                     send_program_status_notification(env, NOTIFICATION_STATUS);
                 }
 
-                uint64_t num_resets_temp = NUM_RESETS;
-                if (ROUTE == Route::HYPERSPACE_WILD_ZONE && num_resets >= num_resets_temp){
-                    env.log("Number of resets hit. Going to home to pause the game.");
-                    go_home(env.console, context);
+                if (should_stop){
                     break;
                 }
+                if (ROUTE == Route::HYPERSPACE_WILD_ZONE && NUM_RESETS > 0 && num_resets >= NUM_RESETS){
+                    env.log(std::format("Reached reset limit {}", static_cast<uint64_t>(NUM_RESETS)));
+                    break;
+                }
+
             } // end while
         },
         {{shiny_detector}}
@@ -286,6 +347,10 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
     shiny_sound_handler.process_pending(context);
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+
+    if (ROUTE == Route::HYPERSPACE_WILD_ZONE){
+        go_home(env.console, context);
+    }
 }
 
 
