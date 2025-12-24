@@ -50,6 +50,8 @@ public:
     virtual void log(std::string&& msg, Color color = Color()) override;
     virtual std::vector<std::string> get_last() const override;
 
+    // when SerialPrograms.log is above a certain size, rename it to SerialPrograms-[timestamp].log
+    // then create a new, empty SerialPrograms.log
     virtual void rotate_log_file() override;
 
 private:

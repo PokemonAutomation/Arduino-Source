@@ -329,7 +329,7 @@ void FileWindowLogger::rotate_log_file(){
     if (QFile::exists(QString::fromStdString(log_name))) {
         bool success = QFile::rename(QString::fromStdString(log_name), QString::fromStdString(backup_log_name));  // rename SerialPrograms.log to SerialPrograms-[date].log
         if (!success) {
-            // Handle error (e.g., file locked by another process)
+            // TODO: Handle error (e.g., file locked by another process)
         }
     }
 
