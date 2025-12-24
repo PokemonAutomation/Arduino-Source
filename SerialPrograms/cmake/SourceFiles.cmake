@@ -1659,6 +1659,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/Farming/PokemonLZA_MegaShardFarmer.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_RestaurantFarmer.cpp
     Source/PokemonLZA/Programs/Farming/PokemonLZA_RestaurantFarmer.h
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_WigglytuffFarmer.cpp
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_WigglytuffFarmer.h
     Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_StatsReset.cpp
     Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_StatsReset.h
     Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_WeatherFinder.cpp
