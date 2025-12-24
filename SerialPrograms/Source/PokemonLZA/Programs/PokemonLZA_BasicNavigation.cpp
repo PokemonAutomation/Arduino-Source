@@ -318,10 +318,10 @@ void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProController
     pbf_wait(context, 300ms);
     switch(zone){
     case WildZone::WILD_ZONE_1:
-        pbf_move_left_joystick(context, 0, 150, 120ms, 0ms);
+        pbf_move_left_joystick_old(context, 0, 150, 120ms, 0ms);
         break;
     case WildZone::WILD_ZONE_2:
-        pbf_move_left_joystick(context, 120, 0, 100ms, 0ms);
+        pbf_move_left_joystick_old(context, 120, 0, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_3:
         pbf_move_left_joystick(context, {0, +1}, 100ms, 0ms);
@@ -330,59 +330,59 @@ void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProController
         pbf_move_left_joystick(context, {+1, 0}, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_5:
-        pbf_move_left_joystick(context, 170, 0, 100ms, 0ms);
+        pbf_move_left_joystick_old(context, 170, 0, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_6:
-        pbf_move_left_joystick(context, 80, 0, 100ms, 0ms);
+        pbf_move_left_joystick_old(context, 80, 0, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_7:
-        pbf_move_left_joystick(context, 0, 100, 100ms, 0ms);
+        pbf_move_left_joystick_old(context, 0, 100, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_8:
-        pbf_move_left_joystick(context, 0, 160, 100ms, 0ms);
+        pbf_move_left_joystick_old(context, 0, 160, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_9:
-        pbf_move_left_joystick(context, 70, 0, 100ms, 0ms);
+        pbf_move_left_joystick_old(context, 70, 0, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_10:
-        pbf_move_left_joystick(context, 255, 90, 100ms, 0ms);
+        pbf_move_left_joystick_old(context, 255, 90, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_11:
-        pbf_move_left_joystick(context, 0, 40, 100ms, 0ms);
+        pbf_move_left_joystick_old(context, 0, 40, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_12:
-        pbf_move_left_joystick(context, 20, 0, 150ms, 0ms);
+        pbf_move_left_joystick_old(context, 20, 0, 150ms, 0ms);
         break;
     case WildZone::WILD_ZONE_13:
-        pbf_move_left_joystick(context, 0, 160, 100ms, 0ms);
+        pbf_move_left_joystick_old(context, 0, 160, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_14:
-        pbf_move_left_joystick(context, 110, 255, 100ms, 0ms);
+        pbf_move_left_joystick_old(context, 110, 255, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_15:
         pbf_move_left_joystick(context, {-1, +1}, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_16:
-        pbf_move_left_joystick(context, 220, 0, 100ms, 0ms);
+        pbf_move_left_joystick_old(context, 220, 0, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_17:
-        pbf_move_left_joystick(context, 210, 0, 100ms, 0ms);
+        pbf_move_left_joystick_old(context, 210, 0, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_18:
-        pbf_move_left_joystick(context, 20, 255, 100ms, 0ms);
+        pbf_move_left_joystick_old(context, 20, 255, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_19:
-        pbf_move_left_joystick(context, 80, 255, 100ms, 0ms);
+        pbf_move_left_joystick_old(context, 80, 255, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_20_NO_DISTORTION:
-        pbf_move_left_joystick(context, 0, 90, 140ms, 0ms);
+        pbf_move_left_joystick_old(context, 0, 90, 140ms, 0ms);
         break;
     case WildZone::WILD_ZONE_20_WITH_DISTORTION:
         // During the distortion happening on top of Lumiose Tower as part
         // of the Mega Dimension DLC story, the wild zone 20 fast travel
         // symbol on the map is moved to the entrance gate. So we only
         // need a tiny left joystick push.
-        pbf_move_left_joystick(context, 100, 100, 100ms, 0ms);
+        pbf_move_left_joystick_old(context, 100, 100, 100ms, 0ms);
         break;
     }
     pbf_wait(context, 300ms);
@@ -555,7 +555,7 @@ int run_towards_gate_with_A_button(
         [&](ProControllerContext& context){
             // running back
             ssf_press_button(context, BUTTON_B, 0ms, run_time, 0ms);
-            pbf_move_left_joystick(context, run_direction_x, run_direction_y, run_time, 0ms);
+            pbf_move_left_joystick_old(context, run_direction_x, run_direction_y, run_time, 0ms);
         },
         {{buttonA, overworld_gone}}
     );
@@ -585,7 +585,7 @@ int run_a_straight_path_in_overworld(
         console, context,
         [&](ProControllerContext& context){
             ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
-            pbf_move_left_joystick(context, direction_x, direction_y, duration, 0ms);
+            pbf_move_left_joystick_old(context, direction_x, direction_y, duration, 0ms);
         },
         {{overworld_gone}}
     );

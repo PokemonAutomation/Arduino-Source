@@ -155,54 +155,54 @@ void GeneratePokemonImageTrainingData::select_starting_location(SingleSwitchProg
         env.log("Starting at Jubilife Village");
         // at gate, face towards the gate
         pbf_move_left_joystick(context, {0, -1}, 1920ms, 240ms); // move backwards
-        pbf_move_left_joystick(context, 255, 150, 960ms, 480ms); // move to right
+        pbf_move_left_joystick_old(context, 255, 150, 960ms, 480ms); // move to right
         pbf_press_button(context, BUTTON_ZL, 30, 125); // rotate camera to point to where the character is facing
         pbf_move_left_joystick(context, {0, +1}, 5600ms, 240ms); // move forward
-        pbf_move_left_joystick(context, 255, 125, 240ms, 480ms); // move to right
+        pbf_move_left_joystick_old(context, 255, 125, 240ms, 480ms); // move to right
         break;
     case StartingLocation::FIELDLANDS_FIELDLANDS:
         env.log("Starting at Fieldlands - Fieldlands Camp");
-        pbf_move_left_joystick(context, 50, 0, 130, 10);
+        pbf_move_left_joystick_old(context, 50, 0, 130, 10);
         break;
     case StartingLocation::FIELDLANDS_HEIGHTS:
         env.log("Starting at Fieldlands - Heights Camp");
-        pbf_move_left_joystick(context, 40, 0, 165, 10);
+        pbf_move_left_joystick_old(context, 40, 0, 165, 10);
         break;
     case StartingLocation::MIRELANDS_MIRELANDS:
         env.log("Starting at Mirelands - Mirelands Camp");
-        pbf_move_left_joystick(context, 200, 0, 140, 10);
+        pbf_move_left_joystick_old(context, 200, 0, 140, 10);
         break;
     case StartingLocation::MIRELANDS_BOGBOUND:
         env.log("Starting at Mirelands - Bogbound Camp");
-        pbf_move_left_joystick(context, 0, 55, 215, 10);
+        pbf_move_left_joystick_old(context, 0, 55, 215, 10);
         break;
     case StartingLocation::COASTLANDS_BEACHSIDE:
         env.log("Starting at Coastlands - Beachside Camp");
-        pbf_move_left_joystick(context, 0, 35, 160, 10);
+        pbf_move_left_joystick_old(context, 0, 35, 160, 10);
         break;
     case StartingLocation::COASTLANDS_COASTLANDS:
         env.log("Starting at Coastlands - Coastlands Camp");
-        pbf_move_left_joystick(context, 0, 40, 1440ms, 80ms);
+        pbf_move_left_joystick_old(context, 0, 40, 1440ms, 80ms);
         break;
     case StartingLocation::HIGHLANDS_HIGHLANDS:
         env.log("Starting at Highlands - Highlands Camp");
-        pbf_move_left_joystick(context, 0, 20, 140, 10);
+        pbf_move_left_joystick_old(context, 0, 20, 140, 10);
         break;
     case StartingLocation::HIGHLANDS_MOUNTAIN:
         env.log("Starting at Highlands - Mountain Camp");
-        pbf_move_left_joystick(context, 0, 15, 800ms, 80ms);
+        pbf_move_left_joystick_old(context, 0, 15, 800ms, 80ms);
         break;
     case StartingLocation::HIGHLANDS_SUMMIT:
         env.log("Starting at Highlands - Summit Camp");
-        pbf_move_left_joystick(context, 10, 0, 150, 10);
+        pbf_move_left_joystick_old(context, 10, 0, 150, 10);
         break;
     case StartingLocation::ICELANDS_SNOWFIELDS:
         env.log("Starting at Icelands - Snowfields Camp");
-        pbf_move_left_joystick(context, 0, 20, 140, 10);
+        pbf_move_left_joystick_old(context, 0, 20, 140, 10);
         break;
     case StartingLocation::ICELANDS_ICEPEAK:
         env.log("Starting at Icelands - Icepeak Camp");
-        pbf_move_left_joystick(context, 20, 0, 1440ms, 80ms);
+        pbf_move_left_joystick_old(context, 20, 0, 1440ms, 80ms);
         break;
     }
     context.wait_for_all_requests();

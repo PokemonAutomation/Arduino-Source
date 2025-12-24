@@ -30,47 +30,47 @@ void change_time_of_day_at_tent(
     switch (camp)
     {
     case Camp::FIELDLANDS_FIELDLANDS:
-        pbf_move_left_joystick(context, 105, 0, 220, 20);
+        pbf_move_left_joystick_old(context, 105, 0, 220, 20);
         break;
     
     case Camp::FIELDLANDS_HEIGHTS:
-        pbf_move_left_joystick(context, 95, 0, 250, 20);
+        pbf_move_left_joystick_old(context, 95, 0, 250, 20);
         break;
     
     case Camp::MIRELANDS_MIRELANDS:
-        pbf_move_left_joystick(context, 70, 0, 180, 20);
+        pbf_move_left_joystick_old(context, 70, 0, 180, 20);
         break;
     
     case Camp::MIRELANDS_BOGBOUND:
-        pbf_move_left_joystick(context, 70, 0, 170, 20);
+        pbf_move_left_joystick_old(context, 70, 0, 170, 20);
         break;
     
     case Camp::COASTLANDS_BEACHSIDE:
-        pbf_move_left_joystick(context, 100, 0, 1040ms, 160ms);
+        pbf_move_left_joystick_old(context, 100, 0, 1040ms, 160ms);
         break;
     
     case Camp::COASTLANDS_COASTLANDS:
-        pbf_move_left_joystick(context, 75, 0, 160, 20);
+        pbf_move_left_joystick_old(context, 75, 0, 160, 20);
         break;
     
     case Camp::HIGHLANDS_HIGHLANDS:
-        pbf_move_left_joystick(context, 95, 0, 190, 20);
+        pbf_move_left_joystick_old(context, 95, 0, 190, 20);
         break;
     
     case Camp::HIGHLANDS_MOUNTAIN:
-        pbf_move_left_joystick(context, 60, 0, 190, 20);
+        pbf_move_left_joystick_old(context, 60, 0, 190, 20);
         break;
     
     case Camp::HIGHLANDS_SUMMIT:
-        pbf_move_left_joystick(context, 100, 0, 220, 20);
+        pbf_move_left_joystick_old(context, 100, 0, 220, 20);
         break;
     
     case Camp::ICELANDS_SNOWFIELDS:
-        pbf_move_left_joystick(context, 80, 0, 1200ms, 160ms);
+        pbf_move_left_joystick_old(context, 80, 0, 1200ms, 160ms);
         break;
 
     case Camp::ICELANDS_ICEPEAK:
-        pbf_move_left_joystick(context, 110, 0, 220, 20);
+        pbf_move_left_joystick_old(context, 110, 0, 220, 20);
         break;
     }
 

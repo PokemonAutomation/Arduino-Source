@@ -384,7 +384,7 @@ void EggAutonomousState::fetch_egg(){
     m_stream.log("Getting back on bike.");
     m_shortcut.run(m_context, 800ms);
     m_on_bike = true;
-    pbf_move_left_joystick(m_context, 0, 255, 1000ms, 0ms);
+    pbf_move_left_joystick(m_context, {-1, -1}, 1000ms, 0ms);
 }
 void EggAutonomousState::hatch_egg(){
     if (m_eggs_in_party == 0){

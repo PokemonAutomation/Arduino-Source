@@ -57,7 +57,7 @@ void return_to_plaza(const ProgramInfo& info, VideoStream& stream, ProController
 
                 //Move cursor to top left corner - even works when at Entrance fly point
                 pbf_press_button(context, BUTTON_ZL, 40, 100);
-                pbf_move_left_joystick(context, 0, 0, 500, 40);
+                pbf_move_left_joystick_old(context, 0, 0, 500, 40);
 
                 //Now move toward center
                 if (laggy){
@@ -125,7 +125,7 @@ void map_move_cursor_fly(
     for (int i = 0; i < 3; i++){
         try{
             open_map_from_overworld(info, stream, context);
-            pbf_move_left_joystick(context, x, y, hold, release);
+            pbf_move_left_joystick_old(context, x, y, hold, release);
             pbf_press_button(context, BUTTON_ZL, 40, 100);
             fly_to_overworld_from_map(info, stream, context);
             break;

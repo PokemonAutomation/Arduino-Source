@@ -327,7 +327,7 @@ void place_marker_offset_from_flypoint(
             uint8_t move_x1 = move_cursor_near_flypoint.move_x;
             uint8_t move_y1 = move_cursor_near_flypoint.move_y;
             Milliseconds move_duration1 = move_cursor_near_flypoint.move_duration;
-            pbf_move_left_joystick(context, move_x1, move_y1, move_duration1, 1000ms);
+            pbf_move_left_joystick_old(context, move_x1, move_y1, move_duration1, 1000ms);
 
             move_cursor_to_position_offset_from_flypoint(info, stream, context, fly_point, {marker_offset.x, marker_offset.y});
 
@@ -418,7 +418,7 @@ void move_cursor_to_position_offset_from_flypoint(const ProgramInfo& info, Video
         const uint8_t move_y = uint8_t(std::max(std::min(int(round(push_y + 128) + 0.5), 255), 0));
 
         const uint16_t push_time = std::max(uint16_t(magnitude * scale + 0.5), uint16_t(3));
-        pbf_move_left_joystick(context, move_x, move_y, push_time, 30);
+        pbf_move_left_joystick_old(context, move_x, move_y, push_time, 30);
         context.wait_for_all_requests();
     }
 
@@ -484,7 +484,7 @@ bool detect_closest_flypoint_and_move_map_cursor_there(
 
     stream.overlay().add_log("Move Cursor to PokeCenter", COLOR_WHITE);
     const uint16_t push_time = std::max(uint16_t(magnitude * scale + 0.5), uint16_t(3));
-    pbf_move_left_joystick(context, move_x, move_y, push_time, 30);
+    pbf_move_left_joystick_old(context, move_x, move_y, push_time, 30);
     context.wait_for_all_requests();
     return true;
 }
@@ -708,13 +708,13 @@ void walk_forward_while_clear_front_path(
     while (true){
 
         if (num_ticks_left < ticks_between_lets_go){
-            pbf_move_left_joystick(context, 128, y, num_ticks_left, 20);
+            pbf_move_left_joystick_old(context, 128, y, num_ticks_left, 20);
             context.wait_for_all_requests();
             stream.log("walk_forward_while_clear_front_path() ticks traveled: " + std::to_string(forward_ticks));
             break;
         }
 
-        pbf_move_left_joystick(context, 128, y, ticks_between_lets_go, 20);
+        pbf_move_left_joystick_old(context, 128, y, ticks_between_lets_go, 20);
         num_ticks_left -= ticks_between_lets_go;
 
         context.wait_for_all_requests();

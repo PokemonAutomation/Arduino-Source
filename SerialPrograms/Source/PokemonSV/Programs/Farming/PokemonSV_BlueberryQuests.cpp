@@ -657,7 +657,7 @@ void quest_tera_self_defeat(
         [&](ProControllerContext& context){
             central_to_canyon_plaza(info, console, context);
 
-            pbf_move_left_joystick(context, 205, 64, 160ms, 840ms);
+            pbf_move_left_joystick_old(context, 205, 64, 160ms, 840ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             //Drop on top of Kleavor (plenty of Scyther in the area as well)
@@ -750,7 +750,7 @@ void quest_sneak_up(
             //Savanna Plaza - Pride Rock
             central_to_savanna_plaza(info, console, context);
 
-            pbf_move_left_joystick(context, 220, 255, 80ms, 160ms);
+            pbf_move_left_joystick_old(context, 220, 255, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 4800ms, 3200ms, 3200ms);
@@ -870,7 +870,7 @@ void quest_wild_tera(
             //Canyon Rest Area
             central_to_canyon_rest(info, console, context);
 
-            pbf_move_left_joystick(context, 255, 180, 160ms, 840ms);
+            pbf_move_left_joystick_old(context, 255, 180, 160ms, 840ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 4000ms, 10400ms, 1200ms);
@@ -879,11 +879,11 @@ void quest_wild_tera(
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
 
             if (console.state().console_type() == ConsoleType::Switch1) {
-                pbf_move_left_joystick(context, 50, 0, 160ms, 840ms);
+                pbf_move_left_joystick_old(context, 50, 0, 160ms, 840ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 400ms);
                 pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
             } else { //Switch 2
-                pbf_move_left_joystick(context, 20, 0, 160ms, 840ms);
+                pbf_move_left_joystick_old(context, 20, 0, 160ms, 840ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 400ms);
             }
 
@@ -998,7 +998,7 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
             pbf_press_button(context, BUTTON_Y, 320ms, 400ms);
             rinsed_once = true;
             //Move slightly right, as the showerhead is at an angle
-            pbf_move_left_joystick(context, 255, 0, 30, 30);
+            pbf_move_left_joystick_old(context, 255, 0, 30, 30);
             context.wait_for_all_requests();
             break;
         case 2:

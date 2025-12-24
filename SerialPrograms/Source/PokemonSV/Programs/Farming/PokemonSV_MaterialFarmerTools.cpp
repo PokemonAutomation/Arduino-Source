@@ -673,7 +673,7 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, VideoStream&
         // move cursor to Blueberry academy fast travel point (up-left)
         // try different magnitudes of cursor push with each failure.
         int push_magnitude = 105 + adjustment_table[numAttempts];
-        pbf_move_left_joystick(context, 64, 64, (uint16_t)push_magnitude, 50);
+        pbf_move_left_joystick_old(context, 64, 64, (uint16_t)push_magnitude, 50);
 
         // press A to fly to Blueberry academy
         isFlySuccessful = fly_to_overworld_from_map(info, stream, context, true);
@@ -708,7 +708,7 @@ void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, VideoS
         numAttempts++;
 
         // move toward entrance gates
-        pbf_move_left_joystick(context, 190, 0, 1600ms, 400ms);
+        pbf_move_left_joystick_old(context, 190, 0, 1600ms, 400ms);
 
         context.wait_for_all_requests();
 
@@ -766,7 +766,7 @@ void move_from_league_club_entrance_to_item_printer(const ProgramInfo& info, Vid
     context.wait_for_all_requests();
 
     // move forwards towards table next to item printer
-    pbf_move_left_joystick(context, 120, 0, 1600ms, 400ms);
+    pbf_move_left_joystick_old(context, 120, 0, 1600ms, 400ms);
 
     // look left towards item printer
     pbf_move_left_joystick(context, {-1, 0}, 80ms, 400ms);
@@ -789,7 +789,7 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Video
     pbf_press_button(context, BUTTON_L, 400ms, 400ms);
 
     // move forward towards door
-    pbf_move_left_joystick(context, 128, 0, 700, 50);
+    pbf_move_left_joystick_old(context, 128, 0, 700, 50);
 
     context.wait_for_all_requests();
 
@@ -855,7 +855,7 @@ void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, VideoStream
         // move cursor up-left
         // try different magnitudes of cursor push with each failure.
         int push_magnitude = 168 + adjustment_table[numAttempts];
-        pbf_move_left_joystick(context, 112, 0, (uint16_t)push_magnitude, 50);
+        pbf_move_left_joystick_old(context, 112, 0, (uint16_t)push_magnitude, 50);
 
         // press A to fly to North province area 3
         isFlySuccessful = fly_to_overworld_from_map(info, stream, context, true);

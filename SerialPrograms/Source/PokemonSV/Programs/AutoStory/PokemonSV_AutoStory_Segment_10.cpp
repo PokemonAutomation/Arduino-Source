@@ -100,7 +100,7 @@ void checkpoint_21(
         context.wait_for_all_requests();
         pbf_press_button(context, BUTTON_L, 20, 20);
         // move forward
-        pbf_move_left_joystick(context, 128, 0, 30, 100);
+        pbf_move_left_joystick_old(context, 128, 0, 30, 100);
         // get on ride
         get_on_ride(env.program_info(), env.console, context);
         // turn left
@@ -112,7 +112,7 @@ void checkpoint_21(
         pbf_move_left_joystick(context, {0, +1}, 3200ms, 800ms);
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 70);
-        pbf_move_left_joystick(context, 128, 0, 700, 100);
+        pbf_move_left_joystick_old(context, 128, 0, 700, 100);
 
         // turn towards wall
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 50);

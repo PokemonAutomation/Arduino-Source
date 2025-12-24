@@ -203,7 +203,7 @@ ImageFloatBox OliveDetector::align_to_olive(
         if (std::abs(diff_from_center) < 0.05){
             wait_ticks = 100;
         }
-        pbf_move_left_joystick(context, push_x, 128, push_duration, wait_ticks);
+        pbf_move_left_joystick_old(context, push_x, 128, push_duration, wait_ticks);
         prev_push_direction = push_direction;
         
 
@@ -282,7 +282,7 @@ Milliseconds OliveDetector::push_olive_forward(
                 "/" + std::to_string(total_forward_distance.count()) + " ms"
             );
             stream.log("Push the olive.");
-            pbf_move_left_joystick(context, 128, 0, push_olive, 7000ms);
+            pbf_move_left_joystick(context, {0, +1}, push_olive, 7000ms);
             
             walked += push_olive;
             ImageFloatBox olive_box_2 = get_olive_floatbox(stream, context, rgb_gap, area_to_check);
@@ -381,7 +381,7 @@ Milliseconds OliveDetector::walk_up_to_olive(
         if (olive_y > 0.4){
             wait = 800ms;
         }        
-        pbf_move_left_joystick(context, 128, 0, push_duration, wait);
+        pbf_move_left_joystick(context, {0, +1}, push_duration, wait);
     }    
 
     throw_and_log<OliveActionFailedException>(

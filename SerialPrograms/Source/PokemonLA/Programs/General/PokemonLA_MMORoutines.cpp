@@ -141,7 +141,7 @@ std::set<std::string> enter_region_and_read_MMO(
     }
 
     // Move cursor away so that it does not show a text box that occludes MMO sprites.
-    pbf_move_left_joystick(context, map_cursor_move_x, map_cursor_move_y, map_cursor_move_duration, 30);
+    pbf_move_left_joystick_old(context, map_cursor_move_x, map_cursor_move_y, map_cursor_move_duration, 30);
     context.wait_for_all_requests();
 
     // Fix Missions & Requests tab:
@@ -242,7 +242,7 @@ std::set<std::string> enter_region_and_read_MMO(
     }
 
     // Move cursor away so that it does not show a text box that occludes MMO sprites.
-    pbf_move_left_joystick(context, map_cursor_move_x, map_cursor_move_y, map_cursor_move_duration, 30);
+    pbf_move_left_joystick_old(context, map_cursor_move_x, map_cursor_move_y, map_cursor_move_duration, 30);
     context.wait_for_all_requests();
 
     std::set<std::string> found;

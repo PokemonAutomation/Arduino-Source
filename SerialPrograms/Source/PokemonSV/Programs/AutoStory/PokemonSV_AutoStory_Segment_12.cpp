@@ -94,9 +94,9 @@ void checkpoint_28(
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 direction.change_direction(env.program_info(), env.console, context, 2.71);
-                pbf_move_left_joystick(context, 128, 0, 375, 100);
+                pbf_move_left_joystick_old(context, 128, 0, 375, 100);
                 direction.change_direction(env.program_info(), env.console, context, 1.26);
-                pbf_move_left_joystick(context, 128, 0, 1750, 100);                
+                pbf_move_left_joystick_old(context, 128, 0, 1750, 100);
         });        
        
         direction.change_direction(env.program_info(), env.console, context, 2.73);
@@ -142,9 +142,9 @@ void checkpoint_28(
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
-        pbf_move_left_joystick(context, 128, 0, 450, 100);
+        pbf_move_left_joystick_old(context, 128, 0, 450, 100);
         direction.change_direction(env.program_info(), env.console, context, 1.26);
-        pbf_move_left_joystick(context, 128, 0, 1600, 100);
+        pbf_move_left_joystick_old(context, 128, 0, 1600, 100);
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
        
     });

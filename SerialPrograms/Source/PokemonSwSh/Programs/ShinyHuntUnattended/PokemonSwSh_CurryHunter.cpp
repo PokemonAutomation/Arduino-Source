@@ -172,46 +172,46 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
                 }
             );
 
-            //  Default implementation of the "attract curry Pokemon" routine. 
-            pbf_move_left_joystick(context, 0x80, 0x00, 40, 5);     //  Move up a bit to avoid talking to your pokemon.
+            //  Default implementation of the "attract curry Pokemon" routine.
+            pbf_move_left_joystick_old(context, 0x80, 0x00, 40, 5);     //  Move up a bit to avoid talking to your pokemon.
             pbf_press_button(context, BUTTON_A, 5, 5);
-            pbf_move_left_joystick(context, 0xff, 0x80, 55, 0);     //  Right
+            pbf_move_left_joystick_old(context, 0xff, 0x80, 55, 0);     //  Right
             for (uint16_t i = 0;  i< 2; i++){
-                pbf_move_left_joystick(context, 0x00, 0x80, 27, 0); //  Left
+                pbf_move_left_joystick_old(context, 0x00, 0x80, 27, 0); //  Left
                 pbf_press_button(context, BUTTON_A, 5, 5);
-                pbf_move_left_joystick(context, 0x00, 0x80, 27, 0); //  Left
+                pbf_move_left_joystick_old(context, 0x00, 0x80, 27, 0); //  Left
                 pbf_press_button(context, BUTTON_A, 5, 5);
-                pbf_move_left_joystick(context, 0x00, 0x80, 27, 0); //  Left
+                pbf_move_left_joystick_old(context, 0x00, 0x80, 27, 0); //  Left
                 pbf_press_button(context, BUTTON_A, 5, 5);
-                pbf_move_left_joystick(context, 0x00, 0x80, 27, 0); //  Left
+                pbf_move_left_joystick_old(context, 0x00, 0x80, 27, 0); //  Left
                 pbf_press_button(context, BUTTON_A, 5, 5);
-                pbf_move_left_joystick(context, 0xff, 0x80, 27, 0); //  Right
+                pbf_move_left_joystick_old(context, 0xff, 0x80, 27, 0); //  Right
                 pbf_press_button(context, BUTTON_A, 5, 5);
-                pbf_move_left_joystick(context, 0xff, 0x80, 27, 0); //  Right
+                pbf_move_left_joystick_old(context, 0xff, 0x80, 27, 0); //  Right
                 pbf_press_button(context, BUTTON_A, 5, 5);
-                pbf_move_left_joystick(context, 0xff, 0x80, 27, 0); //  Right
+                pbf_move_left_joystick_old(context, 0xff, 0x80, 27, 0); //  Right
                 pbf_press_button(context, BUTTON_A, 5, 5);
-                pbf_move_left_joystick(context, 0xff, 0x80, 27, 0); //  Right
+                pbf_move_left_joystick_old(context, 0xff, 0x80, 27, 0); //  Right
                 pbf_press_button(context, BUTTON_A, 5, 5);
             }
 
 
             //  This routine gives better odds of attracting a low Pokemon if the option is enabled.
             if (SMALL_POKEMON>0){
-                pbf_move_left_joystick(context, 0x80, 0xff, SMALL_POKEMON, 0);
+                pbf_move_left_joystick_old(context, 0x80, 0xff, SMALL_POKEMON, 0);
 
                 for (uint16_t i = 0; i<2; i++){
-                    pbf_move_left_joystick(context, 0x00, 0x80, 240ms, 0ms); // Left
+                    pbf_move_left_joystick_old(context, 0x00, 0x80, 240ms, 0ms); // Left
                     pbf_press_button(context, BUTTON_A, 5, 5);
-                    pbf_move_left_joystick(context, 0x00, 0x80, 240ms, 0ms); // Left
+                    pbf_move_left_joystick_old(context, 0x00, 0x80, 240ms, 0ms); // Left
                     pbf_press_button(context, BUTTON_A, 5, 5);
-                    pbf_move_left_joystick(context, 0x00, 0x80, 240ms, 0ms); // Left
+                    pbf_move_left_joystick_old(context, 0x00, 0x80, 240ms, 0ms); // Left
                     pbf_press_button(context, BUTTON_A, 5, 5);
-                    pbf_move_left_joystick(context, 0xff, 0x80, 240ms, 0ms); // Right
+                    pbf_move_left_joystick_old(context, 0xff, 0x80, 240ms, 0ms); // Right
                     pbf_press_button(context, BUTTON_A, 5, 5);
-                    pbf_move_left_joystick(context, 0xff, 0x80, 240ms, 0ms); // Right
+                    pbf_move_left_joystick_old(context, 0xff, 0x80, 240ms, 0ms); // Right
                     pbf_press_button(context, BUTTON_A, 5, 5);
-                    pbf_move_left_joystick(context, 0xff, 0x80, 240ms, 0ms); // Right
+                    pbf_move_left_joystick_old(context, 0xff, 0x80, 240ms, 0ms); // Right
                     pbf_press_button(context, BUTTON_A, 5, 5);
                 }
             
@@ -290,9 +290,9 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         //  If you talked to the curry Pokemon too early, you can end up talking to one of your Pokemon
         //  Once you reach this part of the program. The following sequence ensures that you
         //  Are in a correct state to cook again.
-        pbf_move_left_joystick(context, 0xff, 0x80, 125, 5);
-        pbf_move_left_joystick(context, 0x80, 0x00, 125, 5);
-        pbf_move_left_joystick(context, 0x80, 0x00, 5, 50);
+        pbf_move_left_joystick_old(context, 0xff, 0x80, 125, 5);
+        pbf_move_left_joystick_old(context, 0x80, 0x00, 125, 5);
+        pbf_move_left_joystick_old(context, 0x80, 0x00, 5, 50);
         pbf_press_button(context, BUTTON_A, 5, 250);    //  Wait 2 seconds to be sure the following X press won't be dropped.
 
         //  And now we cook another curry.

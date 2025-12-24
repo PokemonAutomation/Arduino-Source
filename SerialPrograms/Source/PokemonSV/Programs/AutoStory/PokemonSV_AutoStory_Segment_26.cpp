@@ -186,11 +186,11 @@ void checkpoint_62(
         pbf_move_left_joystick(context, {0, +1}, 4800ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 3.191172);
-        pbf_move_left_joystick(context, 128, 0, 300, 50);
+        pbf_move_left_joystick_old(context, 128, 0, 300, 50);
 
          
         direction.change_direction(env.program_info(), env.console, context, 5.114177);  // old 4.975295
-        pbf_move_left_joystick(context, 128, 0, 300, 50);
+        pbf_move_left_joystick_old(context, 128, 0, 300, 50);
 
         pbf_wait(context, 3000ms);
         // wait for overworld after entering Eatery

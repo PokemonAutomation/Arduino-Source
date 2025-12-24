@@ -1262,12 +1262,12 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
     }    
 
     if (TEST_PBF_LEFT_JOYSTICK){
-        pbf_move_left_joystick(context, X_MOVE, Y_MOVE, HOLD_TICKS, RELEASE_TICKS);
+        pbf_move_left_joystick_old(context, X_MOVE, Y_MOVE, HOLD_TICKS, RELEASE_TICKS);
         return;
     } 
 
     if (TEST_PBF_JOYSTICK2){
-        pbf_move_left_joystick(context, X_MOVE2, Y_MOVE2, HOLD_TICKS2, RELEASE_TICKS2);
+        pbf_move_left_joystick_old(context, X_MOVE2, Y_MOVE2, HOLD_TICKS2, RELEASE_TICKS2);
         return;
     }            
 
@@ -1306,10 +1306,10 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
         pbf_move_left_joystick(context, {0, +1}, 2000ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 3.749788);
-        pbf_move_left_joystick(context, 128, 0, 680, 50);
+        pbf_move_left_joystick_old(context, 128, 0, 680, 50);
 
         direction.change_direction(env.program_info(), env.console, context, 1.589021);
-        pbf_move_left_joystick(context, 128, 0, 1200, 50);
+        pbf_move_left_joystick_old(context, 128, 0, 1200, 50);
         
 
         return;

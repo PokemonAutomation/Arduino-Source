@@ -213,7 +213,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, ProControl
 void MoneyFarmerRoute212::heal_at_center_and_return(VideoStream& stream, ProControllerContext& context, uint8_t pp[4]){
     stream.overlay().add_log("Heal at " + STRING_POKEMON + " Center", COLOR_WHITE);
     stream.log("Healing " + STRING_POKEMON + " at Hearthome City " + STRING_POKEMON + " Center.");
-    pbf_move_left_joystick(context, 125, 0, 6000ms, 0ms);
+    pbf_move_left_joystick_old(context, 125, 0, 6000ms, 0ms);
     pbf_mash_button(context, BUTTON_ZL, 3000ms);
 //    ssf_mash_AZs(context, 3000ms);
     pbf_mash_button(context, BUTTON_B, 10000ms);
@@ -224,18 +224,18 @@ void MoneyFarmerRoute212::heal_at_center_and_return(VideoStream& stream, ProCont
     pbf_move_left_joystick(context, {0, -1}, 8000ms, 0ms);
     pbf_move_left_joystick(context, {+1, 0}, 3040ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 2400ms, 0ms);
-    pbf_move_left_joystick(context,   0, 128, 4800ms, 0ms);
+    pbf_move_left_joystick(context, {-1, 0}, 4800ms, 0ms);
     pbf_move_left_joystick(context, {+1, 0}, 600ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 11000ms, 0ms);
     pbf_move_left_joystick(context, {+1, 0}, 1000ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 1600ms, 0ms);
-    pbf_move_left_joystick(context,   0, 128, 1600ms, 0ms);
+    pbf_move_left_joystick(context, {-1, 0}, 1600ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 400ms, 0ms);
-    pbf_move_left_joystick(context,   0, 128, 1000ms, 0ms);
+    pbf_move_left_joystick(context, {-1, 0}, 1000ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 1000ms, 0ms);
     pbf_move_left_joystick(context, {+1, 0}, 2000ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 1600ms, 0ms);
-    pbf_move_left_joystick(context,   0, 128, 720ms, 0ms);
+    pbf_move_left_joystick(context, {-1, 0}, 720ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 1600ms, 0ms);
     pbf_move_left_joystick(context, {+1, 0}, 1000ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 1600ms, 0ms);

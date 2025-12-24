@@ -140,7 +140,7 @@ void checkpoint_86(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         DirectionDetector direction;
         // minimap should be clear of Pokemon within Mesagoza
         direction.change_direction(env.program_info(), env.console, context, 1.222127);
-        pbf_move_left_joystick(context, 128, 0, 1100, 50);
+        pbf_move_left_joystick_old(context, 128, 0, 1100, 50);
 
         get_on_ride(env.program_info(), env.console, context);
         direction.change_direction(env.program_info(), env.console, context, 1.484555);

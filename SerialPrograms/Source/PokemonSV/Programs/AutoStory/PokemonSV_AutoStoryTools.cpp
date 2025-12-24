@@ -287,7 +287,7 @@ void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerC
         });
 
         pbf_press_button(context, BUTTON_ZR, 160ms, 840ms);
-        pbf_move_left_joystick(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
+        pbf_move_left_joystick_old(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
         pbf_press_button(context, BUTTON_A, 160ms, 840ms);
         pbf_press_button(context, BUTTON_A, 160ms, 840ms);
 
@@ -310,7 +310,7 @@ void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerC
         pbf_press_button(context, BUTTON_L, 160ms, 840ms);
         return;
     case PlayerRealignMode::REALIGN_NO_MARKER:
-        pbf_move_left_joystick(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
+        pbf_move_left_joystick_old(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
         pbf_press_button(context, BUTTON_L, 160ms, 840ms);
         return;
     }  
@@ -1208,7 +1208,7 @@ void realign_player_from_landmark(
             uint8_t move_x1 = move_cursor_near_landmark.move_x;
             uint8_t move_y1 = move_cursor_near_landmark.move_y;
             Milliseconds move_duration1 = move_cursor_near_landmark.move_duration;
-            pbf_move_left_joystick(context, move_x1, move_y1, move_duration1, 1000ms);
+            pbf_move_left_joystick_old(context, move_x1, move_y1, move_duration1, 1000ms);
 
             // move cursor to pokecenter
             double push_scale = 0.29 * adjustment_table[try_count];
@@ -1244,7 +1244,7 @@ void realign_player_from_landmark(
             uint8_t move_x2 = move_cursor_to_target.move_x;
             uint8_t move_y2 = move_cursor_to_target.move_y;
             Milliseconds move_duration2 = move_cursor_to_target.move_duration;
-            pbf_move_left_joystick(context, move_x2, move_y2, move_duration2, 1000ms);
+            pbf_move_left_joystick_old(context, move_x2, move_y2, move_duration2, 1000ms);
 
             // place down marker
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
@@ -1338,7 +1338,7 @@ void move_cursor_towards_flypoint_and_go_there(
             uint8_t move_x1 = move_cursor_near_flypoint.move_x;
             uint8_t move_y1 = move_cursor_near_flypoint.move_y;
             Milliseconds move_duration1 = move_cursor_near_flypoint.move_duration;
-            pbf_move_left_joystick(context, move_x1, move_y1, move_duration1, 1000ms);
+            pbf_move_left_joystick_old(context, move_x1, move_y1, move_duration1, 1000ms);
 
             double push_scale = 0.29 * adjustment_table[try_count];
             if (!fly_to_visible_closest_flypoint_cur_zoom_level(info, stream, context, fly_point, push_scale)){
@@ -1504,7 +1504,7 @@ void move_player_forward(
                     }
                 }else{
                     pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
-                    pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);    
+                    pbf_move_left_joystick_old(context, 128, y, forward_ticks, delay_after_forward_move);
                 }
             });
         }catch (UnexpectedBattleException&){
@@ -1603,7 +1603,7 @@ void move_forward_until_yolo_object_above_min_size(
                     return; // stop when the target is above a certain size. i.e. we are close enough to the target.
                 }
             
-                pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+                pbf_move_left_joystick_old(context, 128, y, forward_ticks, 0);
                 // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
                 // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
             });
@@ -1666,7 +1666,7 @@ void move_player_until_yolo_object_detected(
 
                 
 
-                pbf_move_left_joystick(context, x, y, forward_ticks, 0);
+                pbf_move_left_joystick_old(context, x, y, forward_ticks, 0);
                 // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
                 // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
             });
@@ -1721,7 +1721,7 @@ void move_forward_until_yolo_object_not_detected(
                 }
             }
             
-            pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+            pbf_move_left_joystick_old(context, 128, y, forward_ticks, 0);
             // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
             // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
         });
@@ -1934,11 +1934,11 @@ bool move_player_to_realign_via_yolo(
             // env.console.log("object_x_pos: " + std::to_string(object_x_pos));
             env.console.log("x push: " + std::to_string(x_push) + ", push duration: " +  std::to_string(push_duration));
             if (i == 0){
-                pbf_move_left_joystick(context, x_push, 128, 80ms, 400ms);
+                pbf_move_left_joystick_old(context, x_push, 128, 80ms, 400ms);
                 pbf_press_button(context, BUTTON_R, 160ms, 840ms);
             }
             
-            pbf_move_left_joystick(context, x_push, 128, push_duration, 0);
+            pbf_move_left_joystick_old(context, x_push, 128, push_duration, 0);
             
         });
 

@@ -552,7 +552,7 @@ HandMoveData move_sandwich_hand_and_check_if_plates_empty(
 //                pbf_controller_state(context, BUTTON_A, DPAD_NONE, joystick_x, joystick_y, 128, 128, 20);
                 ssf_press_button(context, BUTTON_A, 0ms, 8000ms, 0ms);
             }
-            pbf_move_left_joystick(context, joystick_x, joystick_y, 20, 0);
+            pbf_move_left_joystick_old(context, joystick_x, joystick_y, 20, 0);
         });
         
         stream.log("Moved joystick");

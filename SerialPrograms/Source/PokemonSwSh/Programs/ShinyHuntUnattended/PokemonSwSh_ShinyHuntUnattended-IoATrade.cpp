@@ -131,7 +131,7 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, P
         pbf_mash_button(context, BUTTON_A, FLY_DURATION0);
 
         //  Move to Beartic.
-        pbf_move_left_joystick(context, 240, 0, MOVE_DURATION0, 0ms);
+        pbf_move_left_joystick_old(context, 240, 0, MOVE_DURATION0, 0ms);
 
         pbf_wait(context, START_TO_RUN_DELAY0);
 

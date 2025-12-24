@@ -135,7 +135,7 @@ bool donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     bool zoom_to_max = false;
     open_map(env.console, context, zoom_to_max);
     // Move map cursor upwards a little bit
-    pbf_move_left_joystick(context, 128, 64, 100ms, 200ms);
+    pbf_move_left_joystick_old(context, 128, 64, 100ms, 200ms);
     // Press Y to load fast travel locaiton menu. The cursor should now points to Vert Pokemon Center
     pbf_press_button(context, BUTTON_Y, 125ms, 200ms);
     // Move one menu item up to select Hotel Z
@@ -203,7 +203,7 @@ bool donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     // Roll forward twice
     pbf_press_button(context, BUTTON_Y, 100ms, 1s);
     pbf_press_button(context, BUTTON_Y, 100ms, 1s);
-    pbf_move_left_joystick(context, 0, 128, 500ms, 100ms);
+    pbf_move_left_joystick(context, {-1, 0}, 500ms, 100ms);
     context.wait_for_all_requests();
 
 

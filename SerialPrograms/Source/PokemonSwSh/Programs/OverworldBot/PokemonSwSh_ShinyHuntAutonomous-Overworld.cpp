@@ -325,7 +325,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
         stream, context,
         [&](ProControllerContext& context){
             //  Move to target.
-            pbf_move_left_joystick(
+            pbf_move_left_joystick_old(
                 context,
                 trajectory.joystick_x,
                 trajectory.joystick_y,

@@ -93,12 +93,12 @@ UnownFinder::UnownFinder()
 
 void ruins_entrance_route(ProControllerContext& context){
     pbf_wait(context, 500ms);
-    pbf_move_left_joystick(context, 139, 120, 80ms, 80ms);
+    pbf_move_left_joystick_old(context, 139, 120, 80ms, 80ms);
     pbf_wait(context, 1300ms);
 
     pbf_press_button(context, BUTTON_B, 9500ms, 80ms);
     pbf_wait(context, 800ms);
-    pbf_move_left_joystick(context, 110, 90, 20, 10);
+    pbf_move_left_joystick_old(context, 110, 90, 20, 10);
 
     pbf_press_dpad(context, DPAD_LEFT, 80ms, 80ms);
     pbf_press_button(context, BUTTON_PLUS, 80ms, 80ms);

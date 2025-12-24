@@ -31,7 +31,7 @@ void pbf_press_dpad(ProControllerContext& context, DpadPosition position, uint16
 void pbf_press_dpad(ProControllerContext& context, DpadPosition position, Milliseconds hold, Milliseconds release){
     ssf_press_dpad(context, position, hold + release, hold, 0ms);
 }
-void pbf_move_left_joystick(ProControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
+void pbf_move_left_joystick_old(ProControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
     uint32_t delay = (uint32_t)hold_ticks + release_ticks;
     if ((uint16_t)delay == delay){
         ssf_press_left_joystick_old(context, x, y, (uint16_t)delay, hold_ticks, 0);
@@ -40,7 +40,7 @@ void pbf_move_left_joystick(ProControllerContext& context, uint8_t x, uint8_t y,
         ssf_do_nothing(context, release_ticks * 8ms);
     }
 }
-void pbf_move_left_joystick(ProControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release){
+void pbf_move_left_joystick_old(ProControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release){
     ssf_press_left_joystick_old(context, x, y, hold + release, hold, 0ms);
 }
 void pbf_move_left_joystick(ProControllerContext& context, const JoystickPosition& position, Milliseconds hold, Milliseconds release){
