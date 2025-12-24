@@ -38,13 +38,13 @@ std::vector<WaterfillObject> find_objects_inplace(PackedBinaryMatrix_IB& matrix,
 #ifdef PA_ARCH_x86
 #ifdef PA_AutoDispatch_x64_17_Skylake
     case BinaryMatrixType::i64x64_x64_AVX512:
-        if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
+        if (CPU_CAPABILITY_CURRENT().OK_19_IceLake){
             return find_objects_inplace_64x64_x64_AVX512GF(matrix, min_area);
         }else{
             return find_objects_inplace_64x64_x64_AVX512(matrix, min_area);
         }
     case BinaryMatrixType::i64x32_x64_AVX512:
-        if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
+        if (CPU_CAPABILITY_CURRENT().OK_19_IceLake){
             return find_objects_inplace_64x32_x64_AVX512GF(matrix, min_area);
         }else{
             return find_objects_inplace_64x32_x64_AVX512(matrix, min_area);

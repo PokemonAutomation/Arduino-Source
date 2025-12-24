@@ -58,7 +58,7 @@ size_t filter_rgb32_range(
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image is too large. more than 2^32 pixels.");
     }
 #ifdef PA_AutoDispatch_x64_17_Skylake
-    if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
+    if (CPU_CAPABILITY_CURRENT().OK_17_Skylake){
         return filter_rgb32_range_x64_AVX512(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
@@ -68,7 +68,7 @@ size_t filter_rgb32_range(
     }
 #endif
 #ifdef PA_AutoDispatch_x64_13_Haswell
-    if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
+    if (CPU_CAPABILITY_CURRENT().OK_13_Haswell){
         return filter_rgb32_range_x64_AVX2(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
@@ -78,7 +78,7 @@ size_t filter_rgb32_range(
     }
 #endif
 #ifdef PA_AutoDispatch_x64_08_Nehalem
-    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
+    if (CPU_CAPABILITY_CURRENT().OK_08_Nehalem){
         return filter_rgb32_range_x64_SSE42(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
@@ -88,7 +88,7 @@ size_t filter_rgb32_range(
     }
 #endif
 #ifdef PA_AutoDispatch_arm64_20_M1
-    if (CPU_CAPABILITY_CURRENT.OK_M1){
+    if (CPU_CAPABILITY_CURRENT().OK_M1){
         return filter_rgb32_range_arm64_NEON(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
@@ -135,25 +135,25 @@ void filter_rgb32_range(
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image is too large. more than 2^32 pixels.");
     }
 #ifdef PA_AutoDispatch_x64_17_Skylake
-    if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
+    if (CPU_CAPABILITY_CURRENT().OK_17_Skylake){
         filter_rgb32_range_x64_AVX512(image, bytes_per_row, width, height, filter, filter_count);
         return;
     }
 #endif
 #ifdef PA_AutoDispatch_x64_13_Haswell
-    if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
+    if (CPU_CAPABILITY_CURRENT().OK_13_Haswell){
         filter_rgb32_range_x64_AVX2(image, bytes_per_row, width, height, filter, filter_count);
         return;
     }
 #endif
 #ifdef PA_AutoDispatch_x64_08_Nehalem
-    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
+    if (CPU_CAPABILITY_CURRENT().OK_08_Nehalem){
         filter_rgb32_range_x64_SSE42(image, bytes_per_row, width, height, filter, filter_count);
         return;
     }
 #endif
 #ifdef PA_AutoDispatch_arm64_20_M1
-    if (CPU_CAPABILITY_CURRENT.OK_M1){
+    if (CPU_CAPABILITY_CURRENT().OK_M1){
         filter_rgb32_range_arm64_NEON(image, bytes_per_row, width, height, filter, filter_count);
         return;
     }
@@ -223,7 +223,7 @@ size_t to_blackwhite_rgb32_range(
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image is too large. more than 2^32 pixels.");
     }
 #ifdef PA_AutoDispatch_x64_17_Skylake
-    if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
+    if (CPU_CAPABILITY_CURRENT().OK_17_Skylake){
         return to_blackwhite_rgb32_range_x64_AVX512(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
@@ -233,7 +233,7 @@ size_t to_blackwhite_rgb32_range(
     }
 #endif
 #ifdef PA_AutoDispatch_x64_13_Haswell
-    if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
+    if (CPU_CAPABILITY_CURRENT().OK_13_Haswell){
         return to_blackwhite_rgb32_range_x64_AVX2(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
@@ -243,7 +243,7 @@ size_t to_blackwhite_rgb32_range(
     }
 #endif
 #ifdef PA_AutoDispatch_x64_08_Nehalem
-    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
+    if (CPU_CAPABILITY_CURRENT().OK_08_Nehalem){
         return to_blackwhite_rgb32_range_x64_SSE42(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
@@ -253,7 +253,7 @@ size_t to_blackwhite_rgb32_range(
     }
 #endif
 #ifdef PA_AutoDispatch_arm64_20_M1
-    if (CPU_CAPABILITY_CURRENT.OK_M1){
+    if (CPU_CAPABILITY_CURRENT().OK_M1){
         return to_blackwhite_rgb32_range_arm64_NEON(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
@@ -298,22 +298,22 @@ void to_blackwhite_rgb32_range(
     ToBlackWhiteRgb32RangeFilter* filter, size_t filter_count
 ){
 #ifdef PA_AutoDispatch_x64_17_Skylake
-    if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
+    if (CPU_CAPABILITY_CURRENT().OK_17_Skylake){
         return to_blackwhite_rgb32_range_x64_AVX512(image, bytes_per_row, width, height, filter, filter_count);
     }
 #endif
 #ifdef PA_AutoDispatch_x64_13_Haswell
-    if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
+    if (CPU_CAPABILITY_CURRENT().OK_13_Haswell){
         return to_blackwhite_rgb32_range_x64_AVX2(image, bytes_per_row, width, height, filter, filter_count);
     }
 #endif
 #ifdef PA_AutoDispatch_x64_08_Nehalem
-    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
+    if (CPU_CAPABILITY_CURRENT().OK_08_Nehalem){
         return to_blackwhite_rgb32_range_x64_SSE42(image, bytes_per_row, width, height, filter, filter_count);
     }
 #endif
 #ifdef PA_AutoDispatch_arm64_20_M1
-    if (CPU_CAPABILITY_CURRENT.OK_M1){
+    if (CPU_CAPABILITY_CURRENT().OK_M1){
         return to_blackwhite_rgb32_range_arm64_NEON(image, bytes_per_row, width, height, filter, filter_count);
     }
 #endif

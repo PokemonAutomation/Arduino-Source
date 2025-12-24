@@ -52,7 +52,7 @@ size_t filter_rgb32_euclidean(
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image is too large. more than 2^32 pixels.");
     }
 #ifdef PA_AutoDispatch_x64_17_Skylake
-    if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
+    if (CPU_CAPABILITY_CURRENT().OK_17_Skylake){
         return filter_rgb32_euclidean_x64_AVX512(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
@@ -62,7 +62,7 @@ size_t filter_rgb32_euclidean(
     }
 #endif
 #ifdef PA_AutoDispatch_x64_13_Haswell
-    if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
+    if (CPU_CAPABILITY_CURRENT().OK_13_Haswell){
         return filter_rgb32_euclidean_x64_AVX2(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
@@ -72,7 +72,7 @@ size_t filter_rgb32_euclidean(
     }
 #endif
 #ifdef PA_AutoDispatch_x64_08_Nehalem
-    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
+    if (CPU_CAPABILITY_CURRENT().OK_08_Nehalem){
         return filter_rgb32_euclidean_x64_SSE42(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
@@ -82,7 +82,7 @@ size_t filter_rgb32_euclidean(
     }
 #endif
 #ifdef PA_AutoDispatch_arm64_20_M1
-    if (CPU_CAPABILITY_CURRENT.OK_M1){
+    if (CPU_CAPABILITY_CURRENT().OK_M1){
         return filter_rgb32_euclidean_ARM64_NEON(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,

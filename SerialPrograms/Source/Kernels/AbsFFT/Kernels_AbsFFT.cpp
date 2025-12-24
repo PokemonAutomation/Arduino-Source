@@ -31,13 +31,13 @@ void fft_abs(int k, float* abs, float* real){
     }
 
 #ifdef PA_AutoDispatch_x64_13_Haswell
-    if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
+    if (CPU_CAPABILITY_CURRENT().OK_13_Haswell){
         fft_abs_x86_AVX2(k, abs, real);
         return;
     }
 #endif
 #ifdef PA_AutoDispatch_x64_08_Nehalem
-    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
+    if (CPU_CAPABILITY_CURRENT().OK_08_Nehalem){
         fft_abs_x86_SSE41(k, abs, real);
         return;
     }

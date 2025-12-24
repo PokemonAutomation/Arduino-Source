@@ -18,20 +18,20 @@ namespace Kernels{
 BinaryMatrixType get_BinaryMatrixType(){
 
 #ifdef PA_ARCH_x86
-//    if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
+//    if (CPU_CAPABILITY_CURRENT().OK_19_IceLake){
 //        return BinaryMatrixType::i64x32_x64_AVX512;
 //    }
-    if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
+    if (CPU_CAPABILITY_CURRENT().OK_17_Skylake){
         return BinaryMatrixType::i64x32_x64_AVX512;
     }
-    if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
+    if (CPU_CAPABILITY_CURRENT().OK_13_Haswell){
         return BinaryMatrixType::i64x16_x64_AVX2;
     }
-    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
+    if (CPU_CAPABILITY_CURRENT().OK_08_Nehalem){
         return BinaryMatrixType::i64x8_x64_SSE42;
     }
 #elif PA_ARCH_arm64
-    if (CPU_CAPABILITY_CURRENT.OK_M1){
+    if (CPU_CAPABILITY_CURRENT().OK_M1){
         return BinaryMatrixType::arm64x8_x64_NEON;
     }
 #endif

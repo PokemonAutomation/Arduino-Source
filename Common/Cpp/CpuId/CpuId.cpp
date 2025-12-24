@@ -32,7 +32,10 @@ const std::vector<CpuCapabilityOption>& AVAILABLE_CAPABILITIES(){
 
 namespace PokemonAutomation{
 
-CPU_Features CPU_CAPABILITY_CURRENT = CPU_CAPABILITY_NATIVE;
+CPU_Features& CPU_CAPABILITY_CURRENT(){
+    static CPU_Features ret = CPU_CAPABILITY_NATIVE();
+    return ret;
+}
 
 IntegerEnumDropdownDatabase make_CAPABILITIES_DATABASE(){
     IntegerEnumDropdownDatabase ret;

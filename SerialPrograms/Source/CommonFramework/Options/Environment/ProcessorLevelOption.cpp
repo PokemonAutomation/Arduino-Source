@@ -84,7 +84,7 @@ void ProcessorLevelOption::set_global(size_t index){
     if ((size_t)index >= LIST.size()){
         return;
     }
-    CPU_CAPABILITY_CURRENT = LIST[index].features;
+    CPU_CAPABILITY_CURRENT() = LIST[index].features;
     global_logger_tagged().log(std::string("Processor capability set to: ") + LIST[index].display, COLOR_BLUE);
 }
 

@@ -45,7 +45,7 @@ void pixel_sum_sqr(
     const uint32_t* alpha, size_t alpha_bytes_per_row
 ){
 #ifdef PA_AutoDispatch_x64_17_Skylake
-    if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
+    if (CPU_CAPABILITY_CURRENT().OK_17_Skylake){
         pixel_sum_sqr_x64_AVX512(
             sums,
             width, height,
@@ -56,7 +56,7 @@ void pixel_sum_sqr(
     }
 #endif
 #ifdef PA_AutoDispatch_x64_13_Haswell
-    if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
+    if (CPU_CAPABILITY_CURRENT().OK_13_Haswell){
         pixel_sum_sqr_x64_AVX2(
             sums,
             width, height,
@@ -67,7 +67,7 @@ void pixel_sum_sqr(
     }
 #endif
 #ifdef PA_AutoDispatch_x64_08_Nehalem
-    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
+    if (CPU_CAPABILITY_CURRENT().OK_08_Nehalem){
         pixel_sum_sqr_x64_SSE41(
             sums,
             width, height,

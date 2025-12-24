@@ -635,7 +635,7 @@ int test_kernels_Waterfill(const ImageViewRGB32& image){
     bool gt_computed = false;
 
 #ifdef PA_AutoDispatch_arm64_20_M1
-    if (CPU_CAPABILITY_CURRENT.OK_M1){
+    if (CPU_CAPABILITY_CURRENT().OK_M1){
         using Waterfill_64x8_Default = Kernels::Waterfill::Waterfill_64xH_Default<Kernels::BinaryTile_64x8_arm64_NEON>;
         gt_objects = Kernels::Waterfill::find_objects_inplace<Kernels::BinaryTile_64x8_arm64_NEON, Waterfill_64x8_Default>(
             static_cast<Kernels::PackedBinaryMatrix_64x8_arm64_NEON&>(gt_matrix_ib).get(),

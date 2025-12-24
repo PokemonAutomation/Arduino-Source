@@ -100,11 +100,11 @@ struct CPU_Features{
 };
 
 
-extern const CPU_Features CPU_CAPABILITY_NOTHING;
-extern const CPU_Features CPU_CAPABILITY_09_NEHALEM;
-extern const CPU_Features CPU_CAPABILITY_13_Haswell;
-extern const CPU_Features CPU_CAPABILITY_17_Skylake;
-extern const CPU_Features CPU_CAPABILITY_19_IceLake;
+extern const CPU_Features& CPU_CAPABILITY_NOTHING();
+extern const CPU_Features& CPU_CAPABILITY_09_NEHALEM();
+extern const CPU_Features& CPU_CAPABILITY_13_Haswell();
+extern const CPU_Features& CPU_CAPABILITY_17_Skylake();
+extern const CPU_Features& CPU_CAPABILITY_19_IceLake();
 
 
 
