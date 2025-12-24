@@ -82,7 +82,7 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-lab.onnx");
 
         pbf_move_left_joystick(context, {0, -1}, 1600ms, 800ms);
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 10, 255, 128);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 10000ms, 255, 128);
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
         pbf_press_dpad(context, DPAD_DOWN, 13, 20);
         pbf_press_dpad(context, DPAD_DOWN, 13, 20);
@@ -93,7 +93,7 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
 
         // heal at the bed
         pbf_move_left_joystick(context, {0, +1}, 2400ms, 800ms);
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10, 255, 128);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms, 255, 128);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::OVERWORLD});
 
         // leave Station 2
@@ -183,7 +183,7 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         );
 
         // walked off cliff. now move backwards
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 128, 255);  // move backwards until dialog detected
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms, 128, 255);  // move backwards until dialog detected
 
 
         mash_button_till_overworld(env.console, context, BUTTON_A);
@@ -294,7 +294,7 @@ void checkpoint_103(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         pbf_move_left_joystick(context, 128, 0, 300, 50);
         pbf_move_left_joystick(context, {+1, 0}, 1600ms, 400ms);
 
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 10);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 10000ms);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
     }, false);

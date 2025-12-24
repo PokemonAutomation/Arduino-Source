@@ -166,7 +166,7 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         wait_for_overworld(env.program_info(), env.console, context);
 
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30000ms);
 
         mash_button_till_overworld(env.console, context, BUTTON_A);
 

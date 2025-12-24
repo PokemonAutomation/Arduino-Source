@@ -559,7 +559,7 @@ void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 120, {CallbackEnum::OVERWORLD, CallbackEnum::BLACK_DIALOG_BOX});
         pbf_move_left_joystick(context, {0, +1}, 800ms, 0ms);
         // disable Lock at Station 4
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20000ms);
         mash_button_till_overworld(env.console, context, BUTTON_A);  // black dialog, prompt
 
         

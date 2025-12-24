@@ -83,7 +83,7 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         pbf_press_button(context, BUTTON_L, 240ms, 80ms);
         pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
         pbf_move_left_joystick(context, {-1, 0}, 1040ms, 400ms);
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms);
 
         // now in elevator
         mash_button_till_overworld(env.console, context, BUTTON_A);
@@ -91,12 +91,12 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         pbf_move_left_joystick(context, {+1, 0}, 560ms, 400ms);
 
         // talk to the AI professor
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         // put the book in the machine
         pbf_press_button(context, BUTTON_L, 30, 10);
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms);
 
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 120, {CallbackEnum::BATTLE, CallbackEnum::PROMPT_DIALOG, CallbackEnum::DIALOG_ARROW});

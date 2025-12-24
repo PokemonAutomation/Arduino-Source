@@ -114,8 +114,8 @@ void checkpoint_35(
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
         pbf_move_left_joystick(context, 128, 0, 120, 100);     
-        direction.change_direction(env.program_info(), env.console, context, 5.11);
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
+        direction.change_direction(env.program_info(), env.console, context, 5.11);  
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20000ms);
         mash_button_till_overworld(env.console, context, BUTTON_A);
        
     });
