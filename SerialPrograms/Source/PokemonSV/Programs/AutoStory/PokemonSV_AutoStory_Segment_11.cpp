@@ -469,7 +469,7 @@ void checkpoint_26(
                     pbf_move_left_joystick(context, 128, 0, 150, 50);
                     pbf_wait(context, 7000ms);
                     context.wait_for_all_requests();
-                    duration_to_walk_for_section3_1 = 160ms;
+                    duration_to_walk_for_section3_1 = 1600ms;
                 }else{ // FAILED_PUSH_OLIVE_TOTAL_DISTANCE, 
                     throw e;
                 }
@@ -630,3 +630,4 @@ void checkpoint_27(
 }
 }
 }
+
