@@ -830,7 +830,7 @@ void make_two_herbs_sandwich(
     }
 
     // Mesh button A to select the first pick
-    pbf_mash_button(context, BUTTON_A, 80);
+    pbf_mash_button_old(context, BUTTON_A, 80);
     context.wait_for_all_requests();
 
     finish_two_herbs_sandwich(env, stream, context);
@@ -1361,7 +1361,7 @@ void run_sandwich_maker(
         expand_box(hand_box),
         center_plate
     );
-    pbf_mash_button(context, BUTTON_A, 125 * 5);
+    pbf_mash_button(context, BUTTON_A, 5000ms);
 
     env.log("Hand end box " + box_to_string(end_box));
     env.log("Built sandwich", COLOR_BLACK);

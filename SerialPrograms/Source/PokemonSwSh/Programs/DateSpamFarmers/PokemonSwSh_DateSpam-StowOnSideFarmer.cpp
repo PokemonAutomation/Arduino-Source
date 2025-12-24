@@ -71,12 +71,12 @@ void StowOnSideFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
         if (context->performance_class() == ControllerPerformanceClass::SysbotBase){
             pbf_wait(context, 90);
         }else{
-            pbf_mash_button(context, BUTTON_B, 90);
+            pbf_mash_button_old(context, BUTTON_B, 90);
         }
 
         ssf_press_button_ptv(context, BUTTON_A, 160ms);
-        pbf_mash_button(context, BUTTON_ZL, 385);
-        pbf_mash_button(context, BUTTON_B, 700);
+        pbf_mash_button_old(context, BUTTON_ZL, 385);
+        pbf_mash_button_old(context, BUTTON_B, 700);
 
         if (SAVE_ITERATIONS0 != 0){
             save_count++;

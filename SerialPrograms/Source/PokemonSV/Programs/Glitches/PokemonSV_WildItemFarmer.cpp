@@ -149,7 +149,7 @@ void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, ProControll
             }
         );
         if (move_overwrites >= 2){
-            pbf_mash_button(context, BUTTON_B, 50);
+            pbf_mash_button_old(context, BUTTON_B, 50);
             return;
         }
 
@@ -236,7 +236,7 @@ bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, ProCo
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 500);
+                pbf_mash_button_old(context, BUTTON_B, 500);
             },
             {battle_menu}
         );
@@ -328,7 +328,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
                 const std::pair<int, int>& direction = MANUVERS[consecutive_throw_attempts];
                 pbf_move_left_joystick_old(context, (uint8_t)direction.first, (uint8_t)direction.second, 400ms, 0ms);
             }
-            pbf_mash_button(context, BUTTON_ZR, 250);
+            pbf_mash_button(context, BUTTON_ZR, 2000ms);
             pbf_wait(context, 350);
 
             consecutive_throw_attempts++;
@@ -374,7 +374,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
                 }else{
                     stats.errors++;
                     env.update_stats();
-                    pbf_mash_button(context, BUTTON_B, 125);
+                    pbf_mash_button(context, BUTTON_B, 1000ms);
                 }
             }else{
                 env.log("Attempt to select a move.");
@@ -383,7 +383,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
                 }else{
                     stats.errors++;
                     env.update_stats();
-                    pbf_mash_button(context, BUTTON_B, 125);
+                    pbf_mash_button(context, BUTTON_B, 1000ms);
                 }
             }
             continue;
@@ -393,7 +393,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
             if (current_time() - std::chrono::seconds(5) < last_trick_attempt){
                 env.log("Unable to use move. Assume out of PP.");
                 trick_PP = 0;
-                pbf_mash_button(context, BUTTON_B, 30);
+                pbf_mash_button_old(context, BUTTON_B, 30);
                 continue;
             }
             if (move_select.move_to_slot(env.console, context, 0)){
@@ -403,7 +403,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
             }else{
                 stats.errors++;
                 env.update_stats();
-                pbf_mash_button(context, BUTTON_B, 125);
+                pbf_mash_button(context, BUTTON_B, 1000ms);
             }
             continue;
 

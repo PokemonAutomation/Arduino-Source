@@ -49,7 +49,7 @@ static void fly_home(ProControllerContext& context, char from_overworld){
     }
     ssf_press_button(context, BUTTON_A, 3200ms, 160ms);
     ssf_press_right_joystick_old(context, 160, 96, 160ms, 160ms);
-    pbf_mash_button(context, BUTTON_A, 480);
+    pbf_mash_button_old(context, BUTTON_A, 480);
 }
 
 //  Assume the selected app in the menu is Twon Map.

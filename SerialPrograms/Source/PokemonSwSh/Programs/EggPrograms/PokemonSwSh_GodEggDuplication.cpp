@@ -77,7 +77,7 @@ void GodEggDuplication::collect_godegg(ProControllerContext& context, uint8_t pa
         ssf_press_dpad_ptv(context, DPAD_DOWN, 80ms);
     }
     ssf_press_button_ptv(context, BUTTON_A, 2400ms);
-    pbf_mash_button(context, BUTTON_B, 500);
+    pbf_mash_button_old(context, BUTTON_B, 500);
 }
 void GodEggDuplication::run_program(Logger& logger, ProControllerContext& context, uint16_t attempts) const{
     if (attempts == 0){

@@ -123,7 +123,7 @@ CatchResults throw_balls(
                 "BasicCatcher: Found " + ball_slug + " with amount " +
                 std::to_string(num_balls)
             );
-            pbf_mash_button(context, BUTTON_ZL, 125);
+            pbf_mash_button(context, BUTTON_ZL, 1000ms);
             context.wait_for_all_requests();
         }
         balls_used++;

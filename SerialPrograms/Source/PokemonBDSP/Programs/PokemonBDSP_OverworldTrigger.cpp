@@ -156,7 +156,7 @@ bool OverworldTrigger::find_encounter(VideoStream& stream, ProControllerContext&
         const uint16_t move_pokemon_menu_item_delay = 30;
         pbf_press_dpad(context, DPAD_DOWN, 20, move_pokemon_menu_item_delay);
         //  Use sweet scent
-        pbf_mash_button(context, BUTTON_ZL, 30);
+        pbf_mash_button_old(context, BUTTON_ZL, 30);
 
         ret = wait_until(
             stream, context, std::chrono::seconds(30),

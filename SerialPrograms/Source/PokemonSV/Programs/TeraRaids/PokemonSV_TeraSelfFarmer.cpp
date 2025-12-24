@@ -291,7 +291,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
         }
 
         pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
-        pbf_mash_button(context, BUTTON_A, 250);
+        pbf_mash_button(context, BUTTON_A, 2000ms);
         bool raid_won = run_raid(env, context);
         {
             std::stringstream ss;

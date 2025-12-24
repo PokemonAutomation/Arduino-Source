@@ -141,7 +141,7 @@ void save_game_tutorial(
     }    
 
     save_game_from_menu(info, stream, context);
-    pbf_mash_button(context, BUTTON_B, 200);
+    pbf_mash_button_old(context, BUTTON_B, 200);
 
 }
 

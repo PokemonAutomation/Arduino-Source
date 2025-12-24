@@ -493,7 +493,7 @@ void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, ProContr
         flee_battle(env.console, context);
         
         //Close out dialog box
-        pbf_mash_button(context, BUTTON_B, 250);
+        pbf_mash_button(context, BUTTON_B, 2000ms);
         context.wait_for_all_requests();
         
         //Exit and re-enter the room

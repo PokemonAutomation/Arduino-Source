@@ -90,7 +90,7 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         context.wait_for_all_requests();
 
         //mash past other dialog
-        pbf_mash_button(context, BUTTON_A, 360);
+        pbf_mash_button_old(context, BUTTON_A, 360);
             
         //wait for start
         context.wait_for(std::chrono::milliseconds(13000));
@@ -108,7 +108,7 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 700);
+                pbf_mash_button_old(context, BUTTON_B, 700);
             },
             {overworld}
         );

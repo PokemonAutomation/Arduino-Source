@@ -123,7 +123,7 @@ void checkpoint_08(
         }
 
         // only press A when the sandwich is selected
-        pbf_mash_button(context, BUTTON_A, 100);
+        pbf_mash_button_old(context, BUTTON_A, 100);
 
         env.console.log("Miraidon/Koraidon eats the sandwich.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 35, {});  // long animation

@@ -414,7 +414,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
 //                snapshot->save("noprompt.png");
                 stats.errors++;
                 env.update_stats();
-                pbf_mash_button(context, BUTTON_B, 500);
+                pbf_mash_button_old(context, BUTTON_B, 500);
                 continue;
             }
 
@@ -1013,7 +1013,7 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
                     env.console, snapshot, context,
                     happiny_dust_row_num
                 );
-                pbf_mash_button(context, BUTTON_B, 100);
+                pbf_mash_button_old(context, BUTTON_B, 100);
                 return num_happiny_dust;
             }
             

@@ -114,7 +114,7 @@ void from_professor_return_to_jubilife(
             break;
         case 2:
             stream.log("Backing out of Pokedex...");
-            pbf_mash_button(context, BUTTON_B, 20);
+            pbf_mash_button_old(context, BUTTON_B, 20);
             break;
         default:
             OperationFailedException::fire(
@@ -357,7 +357,7 @@ void goto_camp_from_jubilife(
         const DpadPosition dir = (location.reverse_sub_menu_direction ? DPAD_UP : DPAD_DOWN);
         pbf_press_dpad(context, dir, 160ms, 240ms);
     }
-    pbf_mash_button(context, BUTTON_A, 125);
+    pbf_mash_button(context, BUTTON_A, 1000ms);
 
     BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.6});
     int ret = wait_until(
@@ -445,13 +445,13 @@ void goto_camp_from_overworld(
             );
             if (ret >= 0){
                 stream.log("Flying back to camp...");
-                pbf_mash_button(context, BUTTON_A, 125);
+                pbf_mash_button(context, BUTTON_A, 1000ms);
                 break;
             }
             stream.log("Unable to fly. Are you under attack?", COLOR_RED);
         }
 
-        pbf_mash_button(context, BUTTON_B, 125);
+        pbf_mash_button(context, BUTTON_B, 1000ms);
         grace_period = std::chrono::seconds(5);
     }
 
@@ -542,12 +542,12 @@ void fast_travel_from_overworld(
                     const DpadPosition dir = (location.reverse_sub_menu_direction ? DPAD_UP : DPAD_DOWN);
                     pbf_press_dpad(context, dir, 160ms, 240ms);
                 }
-                pbf_mash_button(context, BUTTON_A, 125);
+                pbf_mash_button(context, BUTTON_A, 1000ms);
                 break;
             }
         }
 
-        pbf_mash_button(context, BUTTON_B, 125);
+        pbf_mash_button(context, BUTTON_B, 1000ms);
         grace_period = std::chrono::seconds(5);
     }
     BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.6});

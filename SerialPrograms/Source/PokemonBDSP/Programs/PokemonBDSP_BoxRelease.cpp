@@ -46,7 +46,7 @@ void release(ProControllerContext& context){
     pbf_move_right_joystick(context, {0, +1}, 160ms, 80ms);
     pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
     pbf_move_right_joystick(context, {0, -1}, 160ms, 80ms);
-    pbf_mash_button(context, BUTTON_ZL, 120);
+    pbf_mash_button_old(context, BUTTON_ZL, 120);
     pbf_wait(context, 30);
 }
 void release_box(ProControllerContext& context, Milliseconds box_scroll_delay){

@@ -176,7 +176,7 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
         // Enter tera raid battle alone
         pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
-        pbf_mash_button(context, BUTTON_A, 250);
+        pbf_mash_button(context, BUTTON_A, 2000ms);
         context.wait_for_all_requests();
 //        overlay_set.clear();
         env.console.log("Entering tera raid...");

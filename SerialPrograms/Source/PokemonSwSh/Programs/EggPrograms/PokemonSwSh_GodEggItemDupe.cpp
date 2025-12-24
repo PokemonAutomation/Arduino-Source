@@ -89,7 +89,7 @@ void GodEggItemDupe::collect_godegg(
         ssf_press_dpad_ptv(context, DPAD_DOWN, 80ms);
     }
     ssf_press_button_ptv(context, BUTTON_A, 2400ms);
-    pbf_mash_button(context, BUTTON_B, 500);
+    pbf_mash_button_old(context, BUTTON_B, 500);
 
     //  Enter box
     ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
@@ -128,7 +128,7 @@ void GodEggItemDupe::collect_godegg(
         box_to_menu(context);
         ssf_press_button(context, BUTTON_B, 2000ms, 50ms);
     }else{
-        pbf_mash_button(context, BUTTON_B, 700);
+        pbf_mash_button_old(context, BUTTON_B, 700);
     }
 }
 void GodEggItemDupe::run_program(Logger& logger, ProControllerContext& context, uint16_t attempts) const{

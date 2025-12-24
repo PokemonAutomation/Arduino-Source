@@ -658,7 +658,7 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, VideoStream&
     const std::array<int, maxAttempts + 1> adjustment_table =  {0, 0, 0, 4, -4, 8, -8, 16, -16, 0, 0, 0};
     while (!isFlySuccessful && numAttempts < maxAttempts){
         // close all menus
-        pbf_mash_button(context, BUTTON_B, 100);
+        pbf_mash_button_old(context, BUTTON_B, 100);
 
         numAttempts++;
 
@@ -700,7 +700,7 @@ void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, VideoS
 
     while (!isSuccessful && numAttempts < maxAttempts){
         if (numAttempts > 0){ // failed at least once
-            pbf_mash_button(context, BUTTON_B, 100);
+            pbf_mash_button_old(context, BUTTON_B, 100);
             open_map_from_overworld(info, stream, context);
             fly_to_overworld_from_map(info, stream, context, false);
         }
@@ -737,7 +737,7 @@ void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, VideoS
             continue;            
         }
         // press A
-        pbf_mash_button(context, BUTTON_A, 100);
+        pbf_mash_button_old(context, BUTTON_A, 100);
 
         // check for overworld
         OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
@@ -811,7 +811,7 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Video
     }
 
     // press A
-    pbf_mash_button(context, BUTTON_A, 100);    
+    pbf_mash_button_old(context, BUTTON_A, 100);
 
     // check for overworld
     OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
@@ -842,7 +842,7 @@ void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, VideoStream
         numAttempts++;
 
         // close all menus
-        pbf_mash_button(context, BUTTON_B, 100);
+        pbf_mash_button_old(context, BUTTON_B, 100);
 
         open_map_from_overworld(info, stream, context);
 

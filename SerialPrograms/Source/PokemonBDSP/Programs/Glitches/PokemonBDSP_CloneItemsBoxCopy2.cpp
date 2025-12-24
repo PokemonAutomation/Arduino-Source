@@ -98,7 +98,7 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, ProControl
 //    uint16_t POKEMON_TO_MENU_DELAY = GameSettings::instance().POKEMON_TO_MENU_DELAY;
 
     //  Connect the controller.
-    pbf_mash_button(context, BUTTON_RCLICK, 50);
+    pbf_mash_button(context, BUTTON_RCLICK, 400ms);
 
     //  Enter box system.
     menu_to_box(context);

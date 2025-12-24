@@ -68,7 +68,7 @@ void GimmighoulRoamingFarmer::program(SingleSwitchProgramEnvironment& env, ProCo
     for (uint32_t c = 0; c < SKIPS; c++){
         //  Grab coin assuming there is one
         env.log("Fetch Attempts: " + tostr_u_commas(c));
-        pbf_mash_button(context, BUTTON_A, 90);
+        pbf_mash_button_old(context, BUTTON_A, 90);
         pbf_wait(context, 2000ms);
 
         //  Save the game

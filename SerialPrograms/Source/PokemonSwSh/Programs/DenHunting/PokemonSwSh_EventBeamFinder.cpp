@@ -66,15 +66,15 @@ void EventBeamFinder::drop_wishing_piece(ProControllerContext& context) const{
     ssf_press_button(context, BUTTON_A, 1600ms, 80ms);
     ssf_press_button(context, BUTTON_A, 1200ms, 80ms);
     ssf_press_button(context, BUTTON_A, 40ms);
-    pbf_mash_button(context, BUTTON_B, 500);
+    pbf_mash_button_old(context, BUTTON_B, 500);
     ssf_press_button(context, BUTTON_A, WAIT_TIME_IN_DEN0, 80ms);
-    pbf_mash_button(context, BUTTON_B, 600);
+    pbf_mash_button_old(context, BUTTON_B, 600);
 }
 void EventBeamFinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
-        pbf_mash_button(context, BUTTON_B, 700);
+        pbf_mash_button_old(context, BUTTON_B, 700);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
     }
@@ -83,7 +83,7 @@ void EventBeamFinder::program(SingleSwitchProgramEnvironment& env, ProController
     while (true){
         //  Fly back to daycare.
         ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
-        pbf_mash_button(context, BUTTON_A, 700);
+        pbf_mash_button_old(context, BUTTON_A, 700);
 
         //  Goto den.
         if (parity){

@@ -101,7 +101,7 @@ bool run_battle_menu(
             return true;
         }else{
             stream.log("Unable to move to battle slot.", COLOR_RED);
-            pbf_mash_button(context, BUTTON_B, 125);
+            pbf_mash_button(context, BUTTON_B, 1000ms);
             return false;
         }
     case SinglesMoveType::Run:
@@ -110,7 +110,7 @@ bool run_battle_menu(
             return true;
         }else{
             stream.log("Unable to move to run option.", COLOR_RED);
-            pbf_mash_button(context, BUTTON_B, 125);
+            pbf_mash_button(context, BUTTON_B, 1000ms);
             return false;
         }
     }
@@ -241,7 +241,7 @@ bool run_pokemon(
                 );
             }
             stream.log("Unable to detect any state for 2 minutes. Mashing B...", COLOR_RED);
-            pbf_mash_button(context, BUTTON_B, 250);
+            pbf_mash_button(context, BUTTON_B, 2000ms);
         }
 
 
@@ -304,7 +304,7 @@ bool run_singles_battle(
                 pbf_press_dpad(context, DPAD_DOWN, 160ms, 840ms);
                 pbf_press_button(context, BUTTON_A, 160ms, 840ms);
                 pbf_press_button(context, BUTTON_A, 160ms, 840ms);
-                pbf_mash_button(context, BUTTON_B, 250);
+                pbf_mash_button(context, BUTTON_B, 2000ms);
                 pbf_wait(context, 50);
                 continue;
             default:

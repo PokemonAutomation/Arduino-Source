@@ -99,7 +99,7 @@ bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool s
     AdvanceBattleDialogWatcher legendary_appeared(COLOR_YELLOW);
 
     stream.log("Starting battle.");
-    pbf_mash_button(context, BUTTON_A, 540);
+    pbf_mash_button_old(context, BUTTON_A, 540);
     context.wait_for_all_requests();
 
     int res = run_until<ProControllerContext>(

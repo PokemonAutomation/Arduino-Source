@@ -123,7 +123,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, ProControllerC
             break;
         case 1:
             env.log("Battle finished!", COLOR_BLUE);
-            pbf_mash_button(context, BUTTON_B, 250);
+            pbf_mash_button(context, BUTTON_B, 2000ms);
             return false;
         case 2:
             env.log("Detected move learn!", COLOR_BLUE);
@@ -135,7 +135,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, ProControllerC
             return true;
         case 3:
             env.log("Detected possible overworld!", COLOR_BLUE);
-            pbf_mash_button(context, BUTTON_B, 250);
+            pbf_mash_button(context, BUTTON_B, 2000ms);
             return false;
         default:
             env.log("Timed out.", COLOR_RED);

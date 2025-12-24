@@ -210,14 +210,14 @@ void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment
         env.log("Dialog not detected.");
     }
     //  Yes, ready
-    pbf_mash_button(context, BUTTON_A, 400);
+    pbf_mash_button_old(context, BUTTON_A, 400);
     context.wait_for_all_requests();
 
     //  Mash B until next dialog select
     int retPrompt = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_B, 10000);
+            pbf_mash_button_old(context, BUTTON_B, 10000);
         },
         { prompt_detector }
         );
@@ -229,7 +229,7 @@ void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment
     context.wait_for_all_requests();
 
     //  Pick an option to continue
-    pbf_mash_button(context, BUTTON_A, 400);
+    pbf_mash_button_old(context, BUTTON_A, 400);
     context.wait_for_all_requests();
 
     //  Mash B until next dialog select (again)
@@ -237,7 +237,7 @@ void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment
     int retPrompt2 = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_B, 10000);
+            pbf_mash_button_old(context, BUTTON_B, 10000);
         },
         { prompt_detector }
     );
@@ -249,14 +249,14 @@ void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment
     context.wait_for_all_requests();
 
     //  Pick an option to continue
-    pbf_mash_button(context, BUTTON_A, 400);
+    pbf_mash_button_old(context, BUTTON_A, 400);
     context.wait_for_all_requests();
 
     //  Now keep going until the battle starts
     int ret_battle = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_B, 10000);
+            pbf_mash_button_old(context, BUTTON_B, 10000);
         },
         { battle_menu }
     );
@@ -281,7 +281,7 @@ void StatsResetEventBattle::enter_battle_pecharunt(SingleSwitchProgramEnvironmen
     }else{
         env.log("Dialog not detected.");
     }
-    pbf_mash_button(context, BUTTON_A, 400);
+    pbf_mash_button_old(context, BUTTON_A, 400);
     context.wait_for_all_requests();
 
     //  Do you want to challenge the strange pokemon?
@@ -292,7 +292,7 @@ void StatsResetEventBattle::enter_battle_pecharunt(SingleSwitchProgramEnvironmen
         env.log("Dialog not detected.");
     }
     //  Mash through, answer Yes.
-    pbf_mash_button(context, BUTTON_A, 500);
+    pbf_mash_button_old(context, BUTTON_A, 500);
     context.wait_for_all_requests();
 
     //  Mash B until the battle starts
@@ -300,7 +300,7 @@ void StatsResetEventBattle::enter_battle_pecharunt(SingleSwitchProgramEnvironmen
     int ret_battle = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_B, 10000);
+            pbf_mash_button_old(context, BUTTON_B, 10000);
         },
         { battle_menu }
         );
@@ -405,7 +405,7 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, ProC
             env.update_stats();
             env.log("Unable to read ball quantity.", COLOR_RED);
         }
-        pbf_mash_button(context, BUTTON_A, 125);
+        pbf_mash_button(context, BUTTON_A, 1000ms);
         context.wait_for_all_requests();
 
         stats.catches++;

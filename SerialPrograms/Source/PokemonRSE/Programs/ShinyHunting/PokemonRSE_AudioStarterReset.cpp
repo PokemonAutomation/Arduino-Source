@@ -132,7 +132,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
             );
             break;
         }
-        pbf_mash_button(context, BUTTON_A, 540);
+        pbf_mash_button_old(context, BUTTON_A, 540);
         context.wait_for_all_requests();
 
         env.log("Starter selected. Checking for shiny Poochyena.");

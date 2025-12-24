@@ -179,7 +179,7 @@ void ShinyHuntCustomPath::do_non_listen_action(
         break;
     }
     case PathAction::CENTER_CAMERA:{
-        pbf_mash_button(context, BUTTON_ZL, 200);
+        pbf_mash_button_old(context, BUTTON_ZL, 200);
         break;
     }
     case PathAction::JUMP:{

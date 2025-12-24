@@ -166,7 +166,7 @@ int read_BP(const ProgramInfo& info, VideoStream& stream, ProControllerContext& 
     );
 
     //Close panel
-    pbf_mash_button(context, BUTTON_B, 100);
+    pbf_mash_button_old(context, BUTTON_B, 100);
     context.wait_for_all_requests();
 
     return OCR::read_number(stream.logger(), BP_value);
@@ -215,7 +215,7 @@ std::vector<BBQuests> read_quests(
     }
 
     //Close quest list
-    pbf_mash_button(context, BUTTON_B, 100);
+    pbf_mash_button_old(context, BUTTON_B, 100);
     context.wait_for_all_requests();
 
     return quest_list;
@@ -589,7 +589,7 @@ void quest_make_tm(const ProgramInfo& info, VideoStream& stream, ProControllerCo
         if (make_tm == 0){
             stream.log("Craftable TM found. Making TM");
 
-            pbf_mash_button(context, BUTTON_A, 220);
+            pbf_mash_button_old(context, BUTTON_A, 220);
             context.wait_for_all_requests();
         }else{
             stream.log("Failed to find craftable TM!");
@@ -601,7 +601,7 @@ void quest_make_tm(const ProgramInfo& info, VideoStream& stream, ProControllerCo
     int exit = run_until<ProControllerContext>(
         stream, context,
         [&](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_B, 2000);
+            pbf_mash_button_old(context, BUTTON_B, 2000);
         },
         {{ overworld }}
     );
@@ -718,13 +718,13 @@ void quest_tera_self_defeat(
     OverworldWatcher done_healing(console.logger(), COLOR_BLUE);
     pbf_move_left_joystick(context, {0, +1}, 800ms, 160ms);
 
-    pbf_mash_button(context, BUTTON_A, 300);
+    pbf_mash_button_old(context, BUTTON_A, 300);
     context.wait_for_all_requests();
 
     int exit = run_until<ProControllerContext>(
         console, context,
         [&](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_B, 2000);
+            pbf_mash_button_old(context, BUTTON_B, 2000);
         },
         {{ done_healing }}
     );
@@ -937,13 +937,13 @@ void quest_wild_tera(
     OverworldWatcher done_healing(console.logger(), COLOR_BLUE);
     pbf_move_left_joystick(context, {0, +1}, 800ms, 160ms);
 
-    pbf_mash_button(context, BUTTON_A, 300);
+    pbf_mash_button_old(context, BUTTON_A, 300);
     context.wait_for_all_requests();
 
     int exit = run_until<ProControllerContext>(
         console, context,
         [&](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_B, 2000);
+            pbf_mash_button_old(context, BUTTON_B, 2000);
         },
         {{ done_healing }}
     );
@@ -989,7 +989,7 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
         switch (ret){
         case 0:
             stream.log("Wash button found!");
-            pbf_mash_button(context, BUTTON_X, 150);
+            pbf_mash_button_old(context, BUTTON_X, 150);
             pbf_wait(context, 200);
             context.wait_for_all_requests();
             break;
@@ -1287,7 +1287,7 @@ void quest_tera_raid(
     pbf_press_button(context, BUTTON_A, 160ms, 840ms);
     pbf_press_button(context, BUTTON_A, 160ms, 840ms);
     pbf_press_dpad(context, DPAD_UP, 80ms, 80ms);
-    pbf_mash_button(context, BUTTON_A, 250);
+    pbf_mash_button(context, BUTTON_A, 2000ms);
 
     bool win = run_tera_battle(env, console, context, BBQ_OPTIONS.BATTLE_AI);
     if (win){
@@ -1372,13 +1372,13 @@ void quest_auto_battle(
         OverworldWatcher done_healing(stream.logger(), COLOR_BLUE);
         pbf_move_left_joystick(context, {0, +1}, 800ms, 160ms);
 
-        pbf_mash_button(context, BUTTON_A, 300);
+        pbf_mash_button_old(context, BUTTON_A, 300);
         context.wait_for_all_requests();
 
         int exit = run_until<ProControllerContext>(
             stream, context,
             [&](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 2000);
+                pbf_mash_button_old(context, BUTTON_B, 2000);
             },
             { { done_healing } }
             );

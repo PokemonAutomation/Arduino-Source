@@ -284,7 +284,7 @@ void checkpoint_20(
             {CallbackEnum::PROMPT_DIALOG, CallbackEnum::BLACK_DIALOG_BOX}); // max time between dialog: 11
         
         // mash A to get through the Random A press that you need. when the Nemona shows you a Poke Gym.
-        pbf_mash_button(context, BUTTON_A, 250);
+        pbf_mash_button(context, BUTTON_A, 2000ms);
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_TUTORIAL, 20, 
             {CallbackEnum::TUTORIAL, CallbackEnum::PROMPT_DIALOG, CallbackEnum::BLACK_DIALOG_BOX});

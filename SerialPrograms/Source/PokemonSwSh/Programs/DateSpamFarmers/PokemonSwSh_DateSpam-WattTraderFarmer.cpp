@@ -178,7 +178,7 @@ void WattTraderFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
         pbf_mash_button(context, BUTTON_B, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0.get() - 120ms);
 
         home_roll_date_enter_game_autorollback(env.console, context, year);
-        pbf_mash_button(context, BUTTON_B, 90);
+        pbf_mash_button_old(context, BUTTON_B, 90);
         stats.day_skips++;
             env.update_stats();
     }

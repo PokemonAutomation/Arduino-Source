@@ -40,7 +40,7 @@ void return_to_plaza(const ProgramInfo& info, VideoStream& stream, ProController
                 int ret_overworld = run_until<ProControllerContext>(
                     stream, context,
                     [&](ProControllerContext& context){
-                        pbf_mash_button(context, BUTTON_B, 10000);
+                        pbf_mash_button_old(context, BUTTON_B, 10000);
                     },
                     {overworld}
                 );

@@ -126,7 +126,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             );
             break;
         }
-        pbf_mash_button(context, BUTTON_A, 540);
+        pbf_mash_button_old(context, BUTTON_A, 540);
         context.wait_for_all_requests();
 
         env.log("Starting battle.");
@@ -136,7 +136,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 1000);
+                pbf_mash_button_old(context, BUTTON_B, 1000);
             },
             {battle_menu}
         );

@@ -139,7 +139,7 @@ void PoffinCooker::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         pbf_press_dpad(context, DPAD_DOWN, 5, 50);
         pbf_press_button(context, BUTTON_A, 5, 50);
         pbf_press_button(context, BUTTON_A, 5, 50);
-        pbf_mash_button(context, BUTTON_A, 150); // Mash here to make sure the final button press isn't dropped
+        pbf_mash_button(context, BUTTON_A, 1200ms); // Mash here to make sure the final button press isn't dropped
 
         // Wait a bit less than 10 seconds for the cinematic to happen then cook.
         pbf_wait(context, 1050);

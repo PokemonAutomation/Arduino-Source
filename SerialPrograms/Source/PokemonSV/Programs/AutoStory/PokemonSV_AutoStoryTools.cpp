@@ -1500,7 +1500,7 @@ void move_player_forward(
                     ssf_press_left_joystick(context, {0, +1}, 0ms, 800ms, 0ms);
 
                     if (mash_A){ // mashing A and Let's go aren't compatible. you end up talking to your Let's go pokemon if you mash A.
-                        pbf_mash_button(context, BUTTON_A, forward_ticks);
+                        pbf_mash_button_old(context, BUTTON_A, forward_ticks);
                     }
                 }else{
                     pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);

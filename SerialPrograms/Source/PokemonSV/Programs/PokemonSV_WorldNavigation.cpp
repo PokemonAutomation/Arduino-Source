@@ -155,7 +155,7 @@ void picnic_from_overworld(const ProgramInfo& info, VideoStream& stream, ProCont
                     stream
                 );
             }
-            pbf_mash_button(context, BUTTON_A, 125); // mash button A to enter picnic mode
+            pbf_mash_button(context, BUTTON_A, 1000ms); // mash button A to enter picnic mode
             continue;
         case 2:
             stream.log("Detected picnic.");
@@ -209,7 +209,7 @@ void leave_picnic(const ProgramInfo& info, VideoStream& stream, ProControllerCon
 
     // We have now the prompt to asking for confirmation of leaving picnic.
     // Mash A to confirm
-    pbf_mash_button(context, BUTTON_A, 150);
+    pbf_mash_button_old(context, BUTTON_A, 150);
     context.wait_for_all_requests();
     
     // Wait for overworld:
@@ -978,7 +978,7 @@ void run_battle_press_A(
             break;
         case CallbackEnum::NEXT_POKEMON:
             stream.log("run_battle_press_A: Detected prompt for bringing in next pokemon. Keep current pokemon.");
-            pbf_mash_button(context, BUTTON_B, 100);
+            pbf_mash_button_old(context, BUTTON_B, 100);
             break;
         case CallbackEnum::SWAP_MENU:
             OperationFailedException::fire(
@@ -988,11 +988,11 @@ void run_battle_press_A(
             );    
         case CallbackEnum::SELECT_MOVE_TARGET:
             stream.log("run_battle_press_A: Detected arrows to select move target. Press A.");
-            pbf_mash_button(context, BUTTON_A, 100);
+            pbf_mash_button_old(context, BUTTON_A, 100);
             break;
         case CallbackEnum::BATTLE_BAG:
             stream.log("run_battle_press_A: Detected Bag. Press B. Hold Dpad Up so cursor is back on 'Battle'.");
-            pbf_mash_button(context, BUTTON_B, 100);
+            pbf_mash_button_old(context, BUTTON_B, 100);
             pbf_press_dpad(context, DPAD_UP, 2000ms, 100ms);
             break;
         default:
@@ -1043,7 +1043,7 @@ void select_top_move(VideoStream& stream, ProControllerContext& context, size_t 
         stream.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
         pbf_press_dpad(context, DPAD_DOWN, 20, 40);
     }
-    pbf_mash_button(context, BUTTON_A, 100);
+    pbf_mash_button_old(context, BUTTON_A, 100);
 
 }
 

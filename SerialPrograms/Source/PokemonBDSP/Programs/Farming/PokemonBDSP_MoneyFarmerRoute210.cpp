@@ -218,7 +218,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
             break;
         case 1:
             env.log("Battle finished!", COLOR_BLUE);
-            pbf_mash_button(context, BUTTON_B, 250);
+            pbf_mash_button(context, BUTTON_B, 2000ms);
             return false;
         case 2:
             env.log("Detected move learn!", COLOR_BLUE);
@@ -399,7 +399,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
                 {{tracker}}
             );
             need_to_charge = true;
-            pbf_mash_button(context, BUTTON_B, 250);
+            pbf_mash_button(context, BUTTON_B, 2000ms);
 
             bubbles = tracker.reactions();
             if (bubbles.empty()){

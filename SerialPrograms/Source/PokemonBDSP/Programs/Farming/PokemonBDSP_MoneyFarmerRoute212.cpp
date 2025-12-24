@@ -167,7 +167,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, ProControl
             for (uint8_t move_slot = 0; move_slot < slot; move_slot++){
                 pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
             }
-            pbf_mash_button(context, BUTTON_ZL, 250);
+            pbf_mash_button(context, BUTTON_ZL, 2000ms);
             pp[slot]--;
             env.log("Used move at slot " + std::to_string(slot+1) + ". " + std::to_string(pp[slot]) + " PP left.", COLOR_BLUE);
 
@@ -176,7 +176,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, ProControl
         case 1:
             env.log("Battle finished!", COLOR_BLUE);
             env.console.overlay().add_log("Battle finished", COLOR_WHITE);
-            pbf_mash_button(context, BUTTON_B, 250);
+            pbf_mash_button(context, BUTTON_B, 2000ms);
             return false;
 //        case 1:
 //            env.log("Dialog detected! Battle finished?", COLOR_BLUE);
@@ -354,7 +354,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, ProContro
                 {{tracker}}
             );
             need_to_charge = true;
-            pbf_mash_button(context, BUTTON_B, 250);
+            pbf_mash_button(context, BUTTON_B, 2000ms);
 
             dimensions = tracker.dimensions();
             bubbles = tracker.reactions();

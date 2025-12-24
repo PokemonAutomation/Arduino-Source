@@ -106,10 +106,10 @@ void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, ProCo
         pbf_press_dpad(context, DPAD_RIGHT, 1, 0);
 
         // Mash button to talk to pokemon
-        pbf_mash_button(context, BUTTON_ZL, 500);
+        pbf_mash_button_old(context, BUTTON_ZL, 500);
 
         // Mash button to end talking to pokemon
-        pbf_mash_button(context, BUTTON_B, 500);
+        pbf_mash_button_old(context, BUTTON_B, 500);
 
         stats.m_attempts++;
     }

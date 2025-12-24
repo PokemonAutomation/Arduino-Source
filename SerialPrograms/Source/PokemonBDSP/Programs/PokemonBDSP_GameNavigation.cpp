@@ -27,7 +27,7 @@ void save_game(ProControllerContext& context){
 }
 void menu_to_box(ProControllerContext& context){
     Milliseconds MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY0;
-    pbf_mash_button(context, BUTTON_ZL, 30);
+    pbf_mash_button_old(context, BUTTON_ZL, 30);
     if (MENU_TO_POKEMON_DELAY > 240ms){
         pbf_wait(context, MENU_TO_POKEMON_DELAY - 240ms);
     }

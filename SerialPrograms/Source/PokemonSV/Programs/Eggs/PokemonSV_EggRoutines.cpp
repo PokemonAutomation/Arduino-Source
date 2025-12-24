@@ -98,7 +98,7 @@ void handle_egg_hatching(
         [](ProControllerContext& context){
             ssf_press_right_joystick(context, {-1, 0}, 0ms, 760ms);
             for(int i = 0; i < 60; i++){
-                pbf_mash_button(context, BUTTON_A, 125);
+                pbf_mash_button(context, BUTTON_A, 1000ms);
             }
         },
         {overworld}
@@ -192,7 +192,7 @@ void order_compote_du_fils(
             if (paid){
                 // This is a dialog box after we have paid the food.
                 // Mash A to clear any remaining dialog before a very long eating animation.
-                pbf_mash_button(context, BUTTON_A, 300);
+                pbf_mash_button_old(context, BUTTON_A, 300);
                 context.wait_for_all_requests();
                 eating = true;
             }else{
@@ -242,7 +242,7 @@ void order_compote_du_fils(
     }
 
     // Now leaving the restaurant
-    pbf_mash_button(context, BUTTON_B, 90);
+    pbf_mash_button_old(context, BUTTON_B, 90);
     pbf_wait(context, 100);
     while(true){
         context.wait_for_all_requests();

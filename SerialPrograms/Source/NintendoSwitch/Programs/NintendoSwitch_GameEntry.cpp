@@ -115,15 +115,15 @@ void close_game_from_home_blind(ConsoleHandle& console, ProControllerContext& co
     // regardless of whether the game is initially open or closed.
 
                                                     // if game initially open.  |  if game initially closed
-    pbf_mash_button(context, BUTTON_X, 100);        // - Close game.            |  - does nothing
+    pbf_mash_button_old(context, BUTTON_X, 100);        // - Close game.            |  - does nothing
     ssf_press_dpad_ptv(context, DPAD_DOWN);         // - Does nothing.          |  - moves selector away from the closed game to avoid opening it.
     ssf_press_dpad_ptv(context, DPAD_DOWN);         // - Does nothing.          |  - Press Down a second time in case we drop one.
-    pbf_mash_button(context, BUTTON_A, 50);         // - Confirm close game.    |  - opens an app on the home screen (e.g. Online)
+    pbf_mash_button_old(context, BUTTON_A, 50);         // - Confirm close game.    |  - opens an app on the home screen (e.g. Online)
     go_home(console, context);                      // - Does nothing.          |  - goes back to home screen.
 
     // fail-safe against button drops and unexpected error messages.
-    pbf_mash_button(context, BUTTON_X, 50);
-    pbf_mash_button(context, BUTTON_B, 350);
+    pbf_mash_button_old(context, BUTTON_X, 50);
+    pbf_mash_button_old(context, BUTTON_B, 350);
 }
 
 void close_game_from_home_blind(ConsoleHandle& console, JoyconContext& context){

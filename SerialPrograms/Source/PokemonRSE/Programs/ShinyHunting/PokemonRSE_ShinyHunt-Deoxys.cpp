@@ -251,7 +251,7 @@ void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, ProController
         flee_battle(env.console, context);
 
         //After pressing the flee button, additional dialog box pops up for Deoxys
-        pbf_mash_button(context, BUTTON_B, 250);
+        pbf_mash_button(context, BUTTON_B, 2000ms);
         context.wait_for_all_requests();
         
         //Walk down from the triangle rock to the ship.

@@ -121,7 +121,7 @@ int16_t throw_ball(
             break;
         case 1:
             stream.log("Detected move select. Backing out...");
-            pbf_mash_button(context, BUTTON_B, 125);
+            pbf_mash_button(context, BUTTON_B, 1000ms);
             break;
         case 2:
             stream.log("Tera catch menu. Opening up ball selection...");
@@ -131,7 +131,7 @@ int16_t throw_ball(
         default:
             if (quantity > 0){
                 stream.log("Throwing ball...", COLOR_BLUE);
-                pbf_mash_button(context, BUTTON_A, 30);
+                pbf_mash_button_old(context, BUTTON_A, 30);
                 return quantity;
             }
             if (quantity == 0){
@@ -244,7 +244,7 @@ CatchResults basic_catcher(
                 return CatchResults{CatchResult::OUT_OF_BALLS, balls_used};
             }
 #endif
-            pbf_mash_button(context, BUTTON_B, 500);
+            pbf_mash_button_old(context, BUTTON_B, 500);
             balls_used++;
             if (on_throw_lambda){
                 on_throw_lambda();

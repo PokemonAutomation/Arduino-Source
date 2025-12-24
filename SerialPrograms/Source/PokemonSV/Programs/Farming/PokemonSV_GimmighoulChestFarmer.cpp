@@ -166,7 +166,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
     while(c < PP){
         //  Press A to enter battle, assuming there is a chest
         env.log("Fetch Attempts: " + tostr_u_commas(c));
-        pbf_mash_button(context, BUTTON_A, 125);
+        pbf_mash_button(context, BUTTON_A, 1000ms);
         pbf_wait(context, 125); //Wait extra to make sure the overworld map vanishes
         context.wait_for_all_requests();
 
@@ -188,7 +188,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
 
             if (ret == 0){
                 //  Attack using your first move
-                pbf_mash_button(context, BUTTON_A, 90);
+                pbf_mash_button_old(context, BUTTON_A, 90);
                 c++;
                 context.wait_for_all_requests();
                 OverworldWatcher overworld(env.console, COLOR_RED);
@@ -223,7 +223,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
                     { battle_menu }
                 );
                 if (ret == 0){
-                    pbf_mash_button(context, BUTTON_A, 90);
+                    pbf_mash_button_old(context, BUTTON_A, 90);
                     c++;
                     context.wait_for_all_requests();
                     ret2 = wait_until(

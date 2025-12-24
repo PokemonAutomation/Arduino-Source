@@ -122,7 +122,7 @@ void TradeBot::trade_slot(
     ssf_press_button(context, BUTTON_PLUS, 1600ms);
     ssf_press_button(context, BUTTON_B, 1000ms, 80ms);
     ssf_press_button(context, BUTTON_A, 400ms, 80ms);
-    pbf_mash_button(context, BUTTON_B, 400);
+    pbf_mash_button_old(context, BUTTON_B, 400);
 
     pbf_wait(context, SEARCH_DELAY0);
 

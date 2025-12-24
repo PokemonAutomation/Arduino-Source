@@ -217,7 +217,7 @@ void ShinyHuntMew::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         flee_battle(env.console, context);
 
         //Close dialog
-        pbf_mash_button(context, BUTTON_B, 250);
+        pbf_mash_button(context, BUTTON_B, 2000ms);
         context.wait_for_all_requests();
 
         exit_mew(env, context);

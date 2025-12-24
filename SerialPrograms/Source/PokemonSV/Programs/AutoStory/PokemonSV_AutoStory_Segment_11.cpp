@@ -234,7 +234,7 @@ void checkpoint_25(
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         // section 10. leave Olive roll
-        pbf_mash_button(context, BUTTON_Y, 100);
+        pbf_mash_button_old(context, BUTTON_Y, 100);
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 15, {CallbackEnum::PROMPT_DIALOG});
         wait_for_overworld(env.program_info(), env.console, context);

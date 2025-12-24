@@ -63,7 +63,7 @@ void pbf_move_right_joystick_old(ProControllerContext& context, uint8_t x, uint8
 void pbf_move_right_joystick(ProControllerContext& context, const JoystickPosition& position, Milliseconds hold, Milliseconds release){
     ssf_press_right_joystick(context, position, hold + release, hold, 0ms);
 }
-void pbf_mash_button(ProControllerContext& context, Button button, uint16_t ticks){
+void pbf_mash_button_old(ProControllerContext& context, Button button, uint16_t ticks){
     ssf_mash1_button(context, button, ticks * 8ms);
 }
 void pbf_mash_button(ProControllerContext& context, Button button, Milliseconds duration){

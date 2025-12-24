@@ -278,7 +278,7 @@ void checkpoint_29(
                 break;
 
             }catch(OperationFailedException&){ // try again if fall into water
-                pbf_mash_button(context, BUTTON_A, 250);
+                pbf_mash_button(context, BUTTON_A, 2000ms);
 
                 // // walk back to start position before bridge
                 // realign_player_from_landmark(

@@ -338,7 +338,7 @@ void add_sandwich_ingredients(
         pbf_press_button(context, BUTTON_PLUS, 160ms, 1840ms);
     }
 
-    pbf_mash_button(context, BUTTON_A, 125);
+    pbf_mash_button(context, BUTTON_A, 1000ms);
 }
 
 

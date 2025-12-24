@@ -105,7 +105,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
 //        home_to_date_time(context, true, true);
 //        neutral_date_skip(context);
 //        settings_to_enter_game(context, true);
-        pbf_mash_button(context, BUTTON_B, 90);
+        pbf_mash_button_old(context, BUTTON_B, 90);
         context.wait_for_all_requests();
 
         {

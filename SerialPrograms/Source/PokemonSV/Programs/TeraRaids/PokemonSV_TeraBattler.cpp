@@ -297,7 +297,7 @@ bool run_tera_battle(
                 continue;
             case BattleMenuResult::BATTLE_WON:
                 stream.log("Detected a win!", COLOR_BLUE);
-                pbf_mash_button(context, BUTTON_B, 30);
+                pbf_mash_button_old(context, BUTTON_B, 30);
                 return true;
             case BattleMenuResult::BATTLE_LOST:
                 stream.log("Detected a loss!", COLOR_ORANGE);
@@ -333,11 +333,11 @@ bool run_tera_battle(
             continue;
         case 4:
             stream.log("Detected item rewards menu!", COLOR_BLUE);
-            pbf_mash_button(context, BUTTON_B, 30);
+            pbf_mash_button_old(context, BUTTON_B, 30);
             return true;
         case 5:
             stream.log("Detected catch menu!", COLOR_BLUE);
-            pbf_mash_button(context, BUTTON_B, 30);
+            pbf_mash_button_old(context, BUTTON_B, 30);
             return true;
         case 6:
             stream.log("Detected a loss!", COLOR_ORANGE);
@@ -352,7 +352,7 @@ bool run_tera_battle(
                 );
             }
             stream.log("Unable to detect any state for 2 minutes. Mashing B...", COLOR_RED);
-            pbf_mash_button(context, BUTTON_B, 250);
+            pbf_mash_button(context, BUTTON_B, 2000ms);
         }
     }
 

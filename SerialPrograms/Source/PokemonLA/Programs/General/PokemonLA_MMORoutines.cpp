@@ -180,7 +180,7 @@ std::set<std::string> enter_region_and_read_MMO(
     // Now go to Mai to see the reviewed map
     goto_Mai_from_camp(env.logger(), context, camp);
 
-    pbf_mash_button(context, BUTTON_A, 350);
+    pbf_mash_button_old(context, BUTTON_A, 350);
     context.wait_for_all_requests();
 
     // Wait for the last dialog box before the MMO pokemon sprites are revealed.

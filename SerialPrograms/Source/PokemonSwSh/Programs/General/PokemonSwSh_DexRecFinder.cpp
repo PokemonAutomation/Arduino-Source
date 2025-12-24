@@ -186,7 +186,7 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         home_to_date_time(env.console, context, true);
         neutral_date_skip(env.console, context);
         settings_to_enter_game(context, true);
-        pbf_mash_button(context, BUTTON_B, 90);
+        pbf_mash_button_old(context, BUTTON_B, 90);
         ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
 
         if (FILTERS.enabled()){

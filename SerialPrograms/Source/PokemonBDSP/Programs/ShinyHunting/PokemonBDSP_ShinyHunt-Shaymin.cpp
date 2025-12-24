@@ -172,7 +172,7 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, ProControlle
         lead_tracker.report_result(result_own.shiny_type);
 
         //  Clear dialogs.
-        pbf_mash_button(context, BUTTON_B, 75);
+        pbf_mash_button_old(context, BUTTON_B, 75);
 
         //  Hop on bike, ride down to seabreak path
 //        SHORTCUT.run(env.console, 0);

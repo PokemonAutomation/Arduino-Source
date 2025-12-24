@@ -331,7 +331,7 @@ bool RideCloner101::run_post_win(
             if (quantity < 0){
                 console.log("Unable to read ball quantity.", COLOR_RED);
             }
-            pbf_mash_button(context, BUTTON_A, 125);
+            pbf_mash_button(context, BUTTON_A, 1000ms);
 
             continue;
         }
@@ -492,7 +492,7 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             }
 
             pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
-            pbf_mash_button(context, BUTTON_A, 250);
+            pbf_mash_button(context, BUTTON_A, 2000ms);
 
             bool win = run_tera_battle(env, env.console, context, BATTLE_AI);
 

@@ -365,8 +365,8 @@ void EggAutonomousState::fetch_egg(){
         run_until<ProControllerContext>(
             m_stream, m_context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_ZL, 500);
-                pbf_mash_button(context, BUTTON_B, 500);
+                pbf_mash_button_old(context, BUTTON_ZL, 500);
+                pbf_mash_button_old(context, BUTTON_B, 500);
             },
             {{received}}
         );

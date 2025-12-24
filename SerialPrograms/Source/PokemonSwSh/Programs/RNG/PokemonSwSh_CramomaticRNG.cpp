@@ -285,7 +285,7 @@ void CramomaticRNG::leave_to_overworld_and_interact(SingleSwitchProgramEnvironme
     pbf_press_button(context, BUTTON_B, 2000ms, 40ms);
     pbf_press_button(context, BUTTON_B, 10, 70);
 
-    pbf_mash_button(context, BUTTON_A, 320);
+    pbf_mash_button_old(context, BUTTON_A, 320);
     pbf_wait(context, 125);
 }
 

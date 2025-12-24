@@ -118,7 +118,7 @@ void run_fossil_batch(
         }else{
             ssf_mash_AZs(context, 3200ms);
         }
-        pbf_mash_button(
+        pbf_mash_button_old(
             context,
             BUTTON_B,
             GameSettings::instance().AUTO_DEPOSIT ? 1400 : 1520

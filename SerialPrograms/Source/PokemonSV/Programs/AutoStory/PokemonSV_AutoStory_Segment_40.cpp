@@ -122,17 +122,17 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE_DIALOG_ARROW, 120, {CallbackEnum::DIALOG_ARROW}, false);
 
-        pbf_mash_button(context, BUTTON_A, 50);
+        pbf_mash_button_old(context, BUTTON_A, 50);
 
 
         wait_for_gradient_arrow(env.program_info(), env.console, context, {0.75, 0.62, 0.05, 0.35}, 30);
 
         pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-        pbf_mash_button(context, BUTTON_A, 20);
+        pbf_mash_button_old(context, BUTTON_A, 20);
 
         pbf_wait(context, 1000ms);
         pbf_press_dpad(context, DPAD_UP, 13, 20);
-        pbf_mash_button(context, BUTTON_A, 500);
+        pbf_mash_button_old(context, BUTTON_A, 500);
 
         env.console.log("Battle AI Professor's Koraidon/Miraidon.");
         SinglesMoveEntry move4{SinglesMoveType::Move4, false}; // Koraidon/Miraidon: Tera Blast
