@@ -27,6 +27,7 @@
 #include "Programs/Farming/PokemonLZA_FriendshipFarmer.h"
 #include "Programs/Farming/PokemonLZA_InPlaceCatcher.h"
 #include "Programs/Farming/PokemonLZA_HyperspaceRewardReset.h"
+#include "Programs/Farming/PokemonLZA_WigglytuffFarmer.h"
 
 //  Shiny Hunting
 #include "Programs/ShinyHunting/PokemonLZA_AutoFossil.h"
@@ -85,6 +86,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     if (IS_BETA_VERSION){
         ret.emplace_back(make_single_switch_program<HyperspaceRewardReset_Descriptor, HyperspaceRewardReset>());
         ret.emplace_back(make_single_switch_program<DonutMaker_Descriptor, DonutMaker>());
+        ret.emplace_back(make_single_switch_program<WigglytuffFarmer_Descriptor, WigglytuffFarmer>());
     }
 
     ret.emplace_back("---- Shiny Hunting ----");
