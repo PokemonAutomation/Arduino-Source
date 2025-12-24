@@ -2,6 +2,7 @@
  *
  * D++, A Lightweight C++ library for Discord
  *
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright 2021 Craig Edwards and D++ contributors 
  * (https://github.com/brainboxdotcc/DPP/graphs/contributors)
  *
@@ -22,12 +23,21 @@
 #include <dpp/export.h>
 #include <string>
 #include <map>
+#include <list>
 #include <vector>
 #include <variant>
 #include <dpp/sslclient.h>
+#include <dpp/version.h>
+#include <dpp/stringops.h>
 
 namespace dpp {
 
+static inline const std::string http_version = "DiscordBot (https://github.com/brainboxdotcc/DPP, "
+                                                + to_hex(DPP_VERSION_MAJOR, false) + "."
+                                                + to_hex(DPP_VERSION_MINOR, false) + "."
+                                                + to_hex(DPP_VERSION_PATCH, false) + ")";
+
+static inline constexpr const char* DISCORD_HOST = "https://discord.com";
 
 /**
  * @brief HTTP connection status
@@ -86,6 +96,7 @@ struct multipart_content {
 	 * @brief Multipart body
 	 */
 	std::string body;
+
 	/**
 	 * @brief MIME type
 	 */
@@ -101,14 +112,17 @@ struct http_connect_info {
 	 * @brief True if the connection should be SSL
 	 */
 	bool is_ssl;
+
 	/**
 	 * @brief The request scheme, e.g. 'https' or 'http'
 	 */
 	std::string scheme;
+
 	/**
 	 * @brief The request hostname part, e.g. 'discord.com'
 	 */
 	std::string hostname;
+
 	/**
 	 * @brief The port number, either determined from the scheme,
 	 * or from the part of the hostname after a colon ":" character
@@ -120,8 +134,7 @@ struct http_connect_info {
  * @brief Implements a HTTPS socket client based on the SSL client.
  * @note plaintext HTTP without SSL is also supported via a "downgrade" setting
  */
-class DPP_EXPORT https_client : public ssl_client
-{
+class DPP_EXPORT https_client : public ssl_client {
 	/**
 	 * @brief Current connection state
 	 */
@@ -166,6 +179,11 @@ class DPP_EXPORT https_client : public ssl_client
 	uint16_t status;
 
 	/**
+	 * @brief The HTTP protocol to use
+	 */
+	std::string http_protocol;
+
+	/**
 	 * @brief Time at which the request should be abandoned
 	 */
 	time_t timeout;
@@ -189,7 +207,7 @@ class DPP_EXPORT https_client : public ssl_client
 	 * @brief Headers from the server's response, e.g. RateLimit
 	 * headers, cookies, etc.
 	 */
-	std::map<std::string, std::string> response_headers;
+	std::multimap<std::string, std::string> response_headers;
 
 	/**
 	 * @brief Handle input buffer
@@ -200,7 +218,6 @@ class DPP_EXPORT https_client : public ssl_client
 	bool do_buffer(std::string& buffer);
 
 protected:
-
 	/**
 	 * @brief Start the connection
 	 */
@@ -213,7 +230,6 @@ protected:
 	http_state get_state();
 
 public:
-
 	/**
 	 * @brief Connect to a specific HTTP(S) server and complete a request.
 	 * 
@@ -233,13 +249,14 @@ public:
 	 * @param extra_headers Additional request headers, e.g. user-agent, authorization, etc
 	 * @param plaintext_connection Set to true to make the connection plaintext (turns off SSL)
 	 * @param request_timeout How many seconds before the connection is considered failed if not finished
+	 * @param http_protocol Request HTTP protocol
 	 */
-        https_client(const std::string &hostname, uint16_t port = 443, const std::string &urlpath = "/", const std::string &verb = "GET", const std::string &req_body = "", const http_headers& extra_headers = {}, bool plaintext_connection = false, uint16_t request_timeout = 5);
+        https_client(const std::string &hostname, uint16_t port = 443, const std::string &urlpath = "/", const std::string &verb = "GET", const std::string &req_body = "", const http_headers& extra_headers = {}, bool plaintext_connection = false, uint16_t request_timeout = 5, const std::string &protocol = "1.1");
 
 	/**
 	 * @brief Destroy the https client object
 	 */
-        virtual ~https_client();
+        virtual ~https_client() = default;
 
 	/**
 	 * @brief Build a multipart content from a set of files and some json
@@ -247,9 +264,10 @@ public:
 	 * @param json The json content
 	 * @param filenames File names of files to send
 	 * @param contents Contents of each of the files to send
+	 * @param mimetypes MIME types of each of the files to send
 	 * @return multipart mime content and headers
 	 */
-	static multipart_content build_multipart(const std::string &json, const std::vector<std::string>& filenames = {}, const std::vector<std::string>& contents = {});
+	static multipart_content build_multipart(const std::string &json, const std::vector<std::string>& filenames = {}, const std::vector<std::string>& contents = {}, const std::vector<std::string>& mimetypes = {});
 
 	/**
 	 * @brief Processes incoming data from the SSL socket input buffer.
@@ -272,16 +290,36 @@ public:
 	 * @brief Get a HTTP response header
 	 * 
 	 * @param header_name Header name to find, case insensitive
-	 * @return Header content or empty string if not found
+	 * @return Header content or empty string if not found.
+	 * If multiple values have the same header_name, this will return one of them.
+	 * @see get_header_count to determine if multiple are present
+	 * @see get_header_list to retrieve all entries of the same header_name
 	 */
 	const std::string get_header(std::string header_name) const;
+
+	/**
+	 * @brief Get the number of headers with the same header name
+	 *
+	 * @param header_name
+	 * @return the number of headers with this count
+	 */
+	size_t get_header_count(std::string header_name) const;
+
+
+	/**
+	 * @brief Get a set of HTTP response headers with a common name
+	 *
+	 * @param header_name
+	 * @return A list of headers with the same name, or an empty list if not found
+	 */
+	const std::list<std::string> get_header_list(std::string header_name) const;
 
 	/**
 	 * @brief Get all HTTP response headers
 	 * 
 	 * @return headers as a map
 	 */
-	const std::map<std::string, std::string> get_headers() const;
+	const std::multimap<std::string, std::string> get_headers() const;
  
 	/**
 	 * @brief Get the response content
@@ -313,4 +351,4 @@ public:
 
 };
 
-};
+} // namespace dpp

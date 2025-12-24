@@ -3,6 +3,7 @@
 #define DPP_CLIENT_H
 
 #ifdef PA_DPP
+#include <thread>
 #include <atomic>
 #include <dpp/dpp.h>
 #include <Integrations/DppIntegration/DppCommandHandler.h>
