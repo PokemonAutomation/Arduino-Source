@@ -312,7 +312,7 @@ void FileWindowLoggerWindow::on_config_value_changed(void* object){
 
 void FileWindowLogger::rotate_log_file(){
 
-    static const uint64_t max_size = 1024 * 1024 * 50;
+    static const qint64 max_size = 1024 * 1024 * 50;
     if (m_file.size() < max_size){
         return;
     }
