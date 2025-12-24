@@ -90,8 +90,8 @@ void checkpoint_37(
         DirectionDetector direction;
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 255, 128, 50});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, 128, 80});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 255, 128, 400ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, 128, 640ms});
         }
 
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
@@ -135,7 +135,7 @@ void checkpoint_38(
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 180, 170});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 180, 1360ms});
         DirectionDetector direction;
         // recently flew a significant distance, so minimap should be clear of Pokemon
         
@@ -191,7 +191,7 @@ void checkpoint_38(
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
         // fly to Porto Marinada pokecenter
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 80, 150});        
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 80, 1200ms});
 
     });
 

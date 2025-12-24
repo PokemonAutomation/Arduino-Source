@@ -118,8 +118,8 @@ void checkpoint_33(
 
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 80, 255, 85});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 180, 0, 85});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 80, 255, 680ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 180, 0, 680ms});
         }
 
         // section 1
@@ -131,8 +131,8 @@ void checkpoint_33(
         // section 2
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 0, 80},
-            {ZoomChange::ZOOM_IN, 5, 230, 145}
+            {ZoomChange::KEEP_ZOOM, 255, 0, 640ms},
+            {ZoomChange::ZOOM_IN, 5, 230, 1160ms}
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -141,8 +141,8 @@ void checkpoint_33(
         // section 3
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 0, 60},
-            {ZoomChange::ZOOM_IN, 5, 205, 100}
+            {ZoomChange::KEEP_ZOOM, 255, 0, 480ms},
+            {ZoomChange::ZOOM_IN, 5, 205, 800ms}
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -151,8 +151,8 @@ void checkpoint_33(
         // section 4
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 128, 255, 40},
-            {ZoomChange::KEEP_ZOOM, 255, 0, 110}
+            {ZoomChange::ZOOM_IN, 128, 255, 320ms},
+            {ZoomChange::KEEP_ZOOM, 255, 0, 880ms}
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -298,8 +298,8 @@ void checkpoint_34(
         // section 1
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 128, 40},
-            {ZoomChange::ZOOM_IN, 230, 0, 100}
+            {ZoomChange::KEEP_ZOOM, 0, 128, 320ms},
+            {ZoomChange::ZOOM_IN, 230, 0, 800ms}
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -308,8 +308,8 @@ void checkpoint_34(
         // section 2
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 100, 30},
-            {ZoomChange::ZOOM_IN, 0, 240, 40}
+            {ZoomChange::KEEP_ZOOM, 255, 100, 240ms},
+            {ZoomChange::ZOOM_IN, 0, 240, 320ms}
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -318,8 +318,8 @@ void checkpoint_34(
         // section 3. set marker to pokecenter
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0},
-            {ZoomChange::ZOOM_IN, 0, 0, 0}
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms},
+            {ZoomChange::ZOOM_IN, 0, 0, 0ms}
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 

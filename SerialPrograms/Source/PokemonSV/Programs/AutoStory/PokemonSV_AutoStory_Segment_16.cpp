@@ -91,8 +91,8 @@ void checkpoint_35(
         
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms});
         }
 
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
@@ -114,7 +114,7 @@ void checkpoint_35(
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
         pbf_move_left_joystick(context, 128, 0, 120, 100);     
-        direction.change_direction(env.program_info(), env.console, context, 5.11);  
+        direction.change_direction(env.program_info(), env.console, context, 5.11);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
         mash_button_till_overworld(env.console, context, BUTTON_A);
        
@@ -136,7 +136,7 @@ void checkpoint_36(
         // At this startpoint, no Pokemon show up on minimap/map
 
         // fly from Cascaraffa Gym to Cascaraffa North Pokecenter
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 100, 0, 80});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 100, 0, 640ms});
 
         // section 1
         // warning: can't reliably set the marker when in Cascarrafa, possibly due to too many NPCs. worse when sandstorm is up.
@@ -151,8 +151,8 @@ void checkpoint_36(
         // section 2
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 80},
-            {ZoomChange::ZOOM_IN, 255, 255, 110}
+            {ZoomChange::KEEP_ZOOM, 0, 0, 640ms},
+            {ZoomChange::ZOOM_IN, 255, 255, 880ms}
         );
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -161,8 +161,8 @@ void checkpoint_36(
         // section 3
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 40},
-            {ZoomChange::ZOOM_IN, 255, 128, 45}
+            {ZoomChange::KEEP_ZOOM, 0, 0, 320ms},
+            {ZoomChange::ZOOM_IN, 255, 128, 360ms}
         );
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -174,8 +174,8 @@ void checkpoint_36(
         // section 4. set marker to pokecenter
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0},
-            {ZoomChange::ZOOM_IN, 0, 0, 0}
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms},
+            {ZoomChange::ZOOM_IN, 0, 0, 0ms}
         );      
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 

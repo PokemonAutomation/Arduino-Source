@@ -162,7 +162,7 @@ void checkpoint_02(
         pbf_move_left_joystick(context,   0,   0, 3000ms, 160ms);
         pbf_move_left_joystick(context,   0, 128, 3000ms, 160ms);
         pbf_move_left_joystick(context, {0, -1}, 4000ms, 160ms);
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 0, 128);        
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 0, 128);
         
         env.console.log("clear_dialog: Talk with Clavell at living room.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {});
