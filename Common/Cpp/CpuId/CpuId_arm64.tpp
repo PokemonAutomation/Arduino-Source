@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 #include <sys/sysctl.h>
+#include <iostream>
 
 #include "CpuId.h"
 
@@ -18,12 +19,20 @@ const char* PA_ARCH_STRING = "arm64";
 uint64_t detect_NEON()
 {
     // https://developer.apple.com/documentation/kernel/1387446-sysctlbyname/determining_instruction_set_characteristics
+    // But this developer webpage may be out of date.
+    
     uint64_t available = 0;
     size_t size = sizeof(available);
 
-    if (sysctlbyname("hw.optional.AdvSIMD", &available, &size, NULL, 0) < 0)
-    {
-        perror("sysctl");
+    // Since certain macOS version "hw.optional.AdvSIMD" no longer works, so to be safe
+    // we check all three sysctl attributes.
+    if (sysctlbyname("hw.optional.AdvSIMD", &available, &size, NULL, 0) < 0){
+        if (sysctlbyname("hw.optional.neon", &available, &size, NULL, 0) < 0){
+            if (sysctlbyname("hw.optional.arm.AdvSIMD", &available, &size, NULL, 0) < 0){
+                std::cerr << "Error querying ARM SIMD set availability using macOS sysctl API" << std::endl;
+                return 0;
+            }
+        }
     }
     return available;
 }

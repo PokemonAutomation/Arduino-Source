@@ -161,7 +161,6 @@ int main(int argc, char *argv[]){
 
     setup_crash_handler();
 
-
     int ret = run_program(argc, argv);
 
 
