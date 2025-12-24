@@ -50,7 +50,7 @@ void fast_reset_game(
     Milliseconds enter_game_mash, Milliseconds enter_game_wait
 ){
     //  Fastest setting. No internet needed and no update menu.
-    ssf_mash1_button(context, BUTTON_X, 50);
+    ssf_mash1_button(context, BUTTON_X, 400ms);
 
     //  Use mashing to ensure that the X press succeeds. If it fails, the SR
     //  will fail and can kill a den for the autohosts.

@@ -19,8 +19,8 @@ void eggfetcher_loop(ProControllerContext& context){
     ssf_press_button(context, BUTTON_A, 1360ms);
     ssf_press_button(context, BUTTON_A, 1360ms);
     ssf_press_left_joystick_old(context, STICK_MIN, STICK_CENTER, 50, 390);
-    ssf_mash1_button(context, BUTTON_B, 90);
-    ssf_do_nothing(context, 300);
+    ssf_mash1_button(context, BUTTON_B, 720ms);
+    ssf_do_nothing(context, 2400ms);
 
     ssf_press_left_joystick_old(context, 192, STICK_MIN, 120, 120);
     ssf_press_left_joystick_old(context, STICK_MAX, STICK_MIN, 120, 120);
@@ -61,8 +61,8 @@ void travel_back_to_lady(ProControllerContext& context){
     ssf_press_left_joystick_old(context, STICK_CENTER, STICK_MAX, 30, 30);
     ssf_press_left_joystick_old(context, STICK_MAX, 144, 260, 260);
     ssf_press_left_joystick_old(context, STICK_MIN, STICK_CENTER, 50, 400);
-    ssf_mash1_button(context, BUTTON_B, 100);
-    ssf_do_nothing(context, 300);
+    ssf_mash1_button(context, BUTTON_B, 800ms);
+    ssf_do_nothing(context, 2400ms);
     ssf_press_left_joystick_old(context, 192, STICK_MIN, 120, 120);
     ssf_press_left_joystick_old(context, STICK_MAX, STICK_MIN, 120, 120);
 }

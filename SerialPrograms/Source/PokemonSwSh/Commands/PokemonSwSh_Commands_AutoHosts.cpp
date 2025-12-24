@@ -71,7 +71,7 @@ void home_to_add_friends(
         ssf_issue_scroll_ptv(context, SSF_SCROLL_UP);
     }
 
-    ssf_do_nothing(context, 50);
+    ssf_do_nothing(context, 400ms);
     ssf_issue_scroll_ptv(context, DPAD_RIGHT);
     while (scroll_down--){
         ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);

@@ -26,7 +26,7 @@ static void release(ProControllerContext& context){
     ssf_press_dpad_ptv(context, DPAD_DOWN, 120ms, 80ms);
 //    ssf_press_button(context, BUTTON_A, 150);
 //    ssf_press_button(context, BUTTON_A, 40);
-    ssf_mash_AZs(context, 230);
+    ssf_mash_AZs(context, 1840ms);
 }
 static void release_box(ProControllerContext& context){
     for (uint8_t row = 0; row < 5; row++){

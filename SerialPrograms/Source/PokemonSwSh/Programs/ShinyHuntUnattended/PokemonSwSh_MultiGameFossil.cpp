@@ -87,7 +87,7 @@ void run_fossil_batch(
 #if 1
     for (uint16_t c = 0; c < batch.revives; c++){
 #if 1
-        ssf_mash_AZs(context, 170);
+        ssf_mash_AZs(context, 1360ms);
         pbf_wait(context, 65);
 #else
         ssf_mash_AZs(context, 50);

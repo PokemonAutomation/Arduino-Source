@@ -14,7 +14,7 @@ namespace NintendoSwitch{
 
 
 void pbf_wait(ProControllerContext& context, uint16_t ticks){
-    ssf_do_nothing(context, ticks);
+    ssf_do_nothing(context, ticks * 8ms);
 }
 void pbf_wait(ProControllerContext& context, Milliseconds duration){
     ssf_do_nothing(context, duration);
@@ -37,7 +37,7 @@ void pbf_move_left_joystick(ProControllerContext& context, uint8_t x, uint8_t y,
         ssf_press_left_joystick_old(context, x, y, (uint16_t)delay, hold_ticks, 0);
     }else{
         ssf_press_left_joystick_old(context, x, y, hold_ticks, hold_ticks, 0);
-        ssf_do_nothing(context, release_ticks);
+        ssf_do_nothing(context, release_ticks * 8ms);
     }
 }
 void pbf_move_left_joystick(ProControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release){
@@ -64,7 +64,7 @@ void pbf_move_right_joystick(ProControllerContext& context, const JoystickPositi
     ssf_press_right_joystick(context, position, hold + release, hold, 0ms);
 }
 void pbf_mash_button(ProControllerContext& context, Button button, uint16_t ticks){
-    ssf_mash1_button(context, button, ticks);
+    ssf_mash1_button(context, button, ticks * 8ms);
 }
 void pbf_mash_button(ProControllerContext& context, Button button, Milliseconds duration){
     ssf_mash1_button(context, button, duration);

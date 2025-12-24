@@ -120,7 +120,7 @@ void GodEggItemDupe::collect_godegg(
         ssf_press_dpad_ptv(context, DPAD_DOWN, 120ms);
         ssf_press_button(context, BUTTON_A, 1000ms, 160ms);
         ssf_press_dpad_ptv(context, DPAD_UP, 80ms);
-        ssf_mash_AZs(context, 180);
+        ssf_mash_AZs(context, 1440ms);
     }
 
     //  Back out to menu.
