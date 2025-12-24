@@ -79,8 +79,6 @@ ImageMatchResult CroppedImageDictionaryMatcher::match(
         }
     }
 
-
-
     for (const auto& item : m_database){
         for (const ImageViewRGB32& crop : crops){
             double alpha = item.second.diff(crop);
@@ -88,8 +86,6 @@ ImageMatchResult CroppedImageDictionaryMatcher::match(
             results.clear_beyond_spread(alpha_spread);
         }
     }
-
-
 
 #if 0
     Color background;

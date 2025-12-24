@@ -13,8 +13,10 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA_DonutMaker.h"
@@ -70,10 +72,66 @@ DonutMaker::DonutMaker()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
+// Press A to talk to Ansha and keep pressing A until reach the berry selection menu
+void open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
+
+    // press button A to start talking to Ansha
+    pbf_press_button(context, BUTTON_A, 100ms, 200ms);
+    context.wait_for_all_requests();
+    
+    WallClock start = current_time();
+    while(current_time() - start <= Seconds(120)){
+        FlatWhiteDialogWatcher white_dialog(COLOR_WHITE, &env.console.overlay());
+        SelectionArrowWatcher arrow(
+            COLOR_GREEN, &env.console.overlay(),
+            SelectionArrowType::RIGHT,
+            {0.591, 0.579, 0.231, 0.105}
+        );
+        DonutBerriesSelectionWatcher berry_selection(0);
+
+        int ret = wait_until(env.console, context, std::chrono::seconds(3),
+            {white_dialog, arrow, berry_selection});
+        switch (ret){
+        case 0:
+            env.log("Detected white dialog. Go to next dialog");
+            pbf_press_button(context, BUTTON_A, 100ms, 200ms);
+            break;
+        case 1:
+            env.log("Detected selection arrow. Go to next dialog");
+            pbf_press_button(context, BUTTON_A, 100ms, 200ms);
+            break;
+        case 2:
+            env.log("Berry selection menu shown.");
+            env.add_overlay_log("Found Berry Selection Menu");
+            return;
+        default:
+            stats.errors++;
+            env.update_stats();
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "donut_maker(): Unable to detect white dialog, selection arrow or berry menu after talking to Ansha.",
+                env.console
+            );
+        } // end switch(ret)
+        context.wait_for_all_requests();
+    } // end while(true)
+
+    stats.errors++;
+    env.update_stats();
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "donut_maker(): 2 minutes passed yet unable to reach berry menu after taking to Ansha.",
+        env.console
+    );
+}
+
 
 // Return true if it should stop
 // Start the iteration at closest pokemon center
 bool donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
+
     bool zoom_to_max = false;
     open_map(env.console, context, zoom_to_max);
     // Move map cursor upwards a little bit
@@ -93,6 +151,8 @@ bool donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& 
         {overworld}
     );
     if (ret != 0){
+        stats.errors++;
+        env.update_stats();
         OperationFailedException::fire(
            ErrorReport::SEND_ERROR_REPORT,
             "donut_maker(): Unable to find overworld after fast traveling from Vert Pokemon Cenetr after 30 sec.",
@@ -103,6 +163,8 @@ bool donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     ret = run_towards_gate_with_A_button(env.console, context, 128, 0, Seconds(5));
     if (ret == 1){
         if (run_towards_gate_with_A_button(env.console, context, 128, 0, Seconds(5)) != 0){
+            stats.errors++;
+            env.update_stats();
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "donut_maker(): Cannot reach Hotel Z gate after day/night change.",
@@ -110,6 +172,8 @@ bool donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& 
             );
         }
     } else if (ret != 0){
+        stats.errors++;
+        env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "donut_maker(): Cannot reach Hotel Z gate after fast travel.",
@@ -147,25 +211,19 @@ bool donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, button_A_box, &env.console.overlay());
     ret = wait_until(env.console, context, std::chrono::seconds(3), {buttonA});
     if (ret != 0){
+        stats.errors++;
+        env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "donut_maker(): Unable to find button A facing Ansha.",
             env.console
         );
     }
-    // press button A to start talking to Ansha
-    pbf_press_button(context, BUTTON_A, 100ms, 200ms);
-    context.wait_for_all_requests();
-    FlatWhiteDialogWatcher white_dialog(COLOR_WHITE, &env.console.overlay());
-    ret = wait_until(env.console, context, std::chrono::seconds(2), {white_dialog});
-    if (ret != 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "donut_maker(): Unable to detect white dialog after talking to Ansha.",
-            env.console
-        );
-    }
-    return true;
+
+    open_berry_menu_from_ansha(env, context);
+
+
+    return true; // XXX
 
     return false;
 }

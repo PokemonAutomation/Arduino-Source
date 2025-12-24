@@ -26,7 +26,7 @@ class DonutBerriesSelectionDetector : public StaticScreenDetector{
 public:
     // menu_index: which row of the selection arrow should be on. Range: [0, 7]:
     // there are at most 8 rows on screen.
-    DonutBerriesSelectionDetector(size_t menu_index, Color color = COLOR_RED);
+    DonutBerriesSelectionDetector(size_t menu_index);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
@@ -36,12 +36,14 @@ private:
 };
 class DonutBerriesSelectionWatcher : public DetectorToFinder<DonutBerriesSelectionDetector>{
 public:
-    DonutBerriesSelectionWatcher(size_t menu_index, Color color = COLOR_RED)
-         : DetectorToFinder("DonutBerriesSelectionWatcher", std::chrono::milliseconds(250), menu_index, color)
+    DonutBerriesSelectionWatcher(size_t menu_index)
+         : DetectorToFinder("DonutBerriesSelectionWatcher", std::chrono::milliseconds(250), menu_index)
     {}
 };
 
 
+// Call `ImageMatchResult match(image, alpha_spread)` to find which berry is the input image.
+// The berry sprites and their slugs are defined in `DONUT_BERRIES_DATABASE()`
 class DonutBerriesMatcher : public ImageMatch::CroppedImageDictionaryMatcher{
 public:
     DonutBerriesMatcher(const std::vector<double>& min_euclidean_distance = {100, 150, 200});

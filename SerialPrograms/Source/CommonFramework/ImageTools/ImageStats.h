@@ -31,7 +31,7 @@ FloatPixel image_average(const ImageViewRGB32& image);
 FloatPixel image_stddev(const ImageViewRGB32& image);
 ImageStats image_stats(const ImageViewRGB32& image);
 
-
+// Get stats on the one-pixel-wide border of the image
 ImageStats image_border_stats(const ImageViewRGB32& image);
 
 
