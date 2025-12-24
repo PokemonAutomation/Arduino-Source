@@ -34,7 +34,7 @@ void DonutBerriesSelectionDetector::make_overlays(VideoOverlaySet& items) const{
 bool DonutBerriesSelectionDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 symbol = extract_box_reference(screen, m_symbol_box);
     //symbol.save("image.png");
-    if (is_solid(symbol, { 0.4375, 0.268, 0.295 })){
+    if (is_solid(symbol, { 0.4375, 0.268, 0.295 }, 0.1, 40)){
         //symbol.save("image.png");
         return true;
     }

@@ -21,11 +21,8 @@ namespace PokemonLZA{
 
 class DonutBerriesReader;
 
-
-
-
 struct PageIngredients{
-    // the line index of the current selected ingredient, < BERRY_PAGE_LINES
+    // the line index of the current selected berry, < BERRY_PAGE_LINES
     int8_t selected = -1;
     std::set<std::string> item[DonutBerriesReader::BERRY_PAGE_LINES];
 };
@@ -39,7 +36,7 @@ public:
         Language language
     );
 
-    //  Move to any ingredient in the set. Returns the ingredient it moved to.
+    //  Move to any berry in the set. Returns the berry it moved to.
     //  Returns empty string if not found.
     std::string move_to_ingredient(const std::set<std::string>& ingredients) const;
 

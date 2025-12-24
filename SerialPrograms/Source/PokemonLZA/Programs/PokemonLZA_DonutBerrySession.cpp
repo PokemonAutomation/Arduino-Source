@@ -14,9 +14,9 @@
 #include "PokemonLZA_DonutBerrySession.h"
 #include "Common/Cpp/PrettyPrint.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -42,19 +42,19 @@ BerrySession::BerrySession(
 
 PageIngredients BerrySession::read_screen(std::shared_ptr<const ImageRGB32> screen) const{
     PageIngredients ret;
-    ImageFloatBox box;
     
-    size_t slot = 0;
-    for (size_t i = 0; i <= 8; i++) {
+    int slot = 0;
+    for (int i = 0; i < 8; i++) {
         DonutBerriesSelectionWatcher arrow(i);
         //cout << "menu index: " << i << endl;
         if (arrow.detect(*screen)) {
+            //cout << "detected in slot: " << i << endl;
             slot = i;
             break;
         }
     }
     ret.selected = (int8_t)slot;
-    cout << "slot = " << (int)ret.selected << endl;
+    //cout << "selected slot = " << (int)ret.selected << endl;
     if (ret.selected < 0 || ret.selected >= 8){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -88,7 +88,7 @@ PageIngredients BerrySession::read_screen(std::shared_ptr<const ImageRGB32> scre
         0, DonutBerriesReader::BERRY_PAGE_LINES + 1
     );
 
-#if 0
+#if 0 //Todo: Image match isn't the best since quantity covers it
     do{
         std::set<std::string>& ocr_result = ret.item[ret.selected];
 
@@ -156,7 +156,7 @@ bool BerrySession::run_move_iteration(
     for (size_t c = 0; c < DonutBerriesReader::BERRY_PAGE_LINES; c++){
         for (const std::string& item : page.item[c]){
             auto iter = ingredients.find(item);
-            if (iter != ingredients.end()){
+            if (ingredients.find(item) != ingredients.end()) {
                 found_ingredients[c] = item;
             }
         }
@@ -174,6 +174,9 @@ bool BerrySession::run_move_iteration(
     }else{
         target_line_index = found_ingredients.begin()->first;
     }
+    
+    //cout << "current index: " << current_index << endl;
+    //cout << "target line index: " << target_line_index << endl;
 
     const std::string& item = found_ingredients[target_line_index];
 
@@ -187,6 +190,7 @@ bool BerrySession::run_move_iteration(
     m_stream.log("Found desired ingredient " + item + " on current page. Moving towards it...", COLOR_BLUE);
 
     //  Move to it.
+
     while (current_index < target_line_index){
         pbf_press_dpad(m_context, DPAD_DOWN, 10, 30);
         current_index++;
@@ -220,6 +224,7 @@ std::string BerrySession::move_to_ingredient(const std::set<std::string>& ingred
             }else{
                 return found_ingredient;
             }
+            continue;
         }
 
         size_t current = page.selected;
@@ -235,16 +240,12 @@ std::string BerrySession::move_to_ingredient(const std::set<std::string>& ingred
             }
         }
 
-        m_stream.log("Ingredient not found on current page. Scrolling down.", COLOR_ORANGE);
+        m_stream.log("Ingredient not found on current page. Scrolling up.", COLOR_ORANGE);
 
         //  Not found on page. Scroll to next screen
         pbf_press_dpad(m_context, DPAD_RIGHT, 10, 30);
-
-        //while (current < DonutBerriesReader::BERRY_PAGE_LINES - 1){
-        //    pbf_press_dpad(m_context, DPAD_DOWN, 10, 30);
-        //    current++;
-        //}
-
+        m_context.wait_for_all_requests();
+        m_context.wait_for(std::chrono::milliseconds(180));
     }
     return "";
 }
@@ -285,7 +286,7 @@ void BerrySession::add_ingredients(
             context.wait_for_all_requests();
             iter->second--;
 
-            /* Todo: Image match isn't the best since quantity covers it
+            /* Todo: Image match isn't the best since B button covers it
             bool ingredient_added = false;
             for (int attempt = 0; attempt < 5; attempt++){
                 pbf_press_button(context, BUTTON_A, 160ms, 840ms);
@@ -325,20 +326,10 @@ void add_donut_ingredients(
     Language language,
     std::map<std::string, uint8_t>&& fillings
 ){
-    {
-        BerrySession session(stream, context, language);
-        session.add_ingredients(stream, context, std::move(fillings));
-    }
-    {
-        BerrySession session(stream, context, language);
-        // If there are herbs, we search first from bottom
-        if (std::any_of(fillings.begin(), fillings.end(), [&](const auto& p){return p.first.find("hyper") != std::string::npos;})){
-            pbf_press_dpad(context, DPAD_UP, 160ms, 840ms);
-        }
-        session.add_ingredients(stream, context, std::move(fillings));
-        pbf_press_button(context, BUTTON_PLUS, 160ms, 1840ms);
-    }
-    pbf_press_button(context, BUTTON_PLUS, 160ms, 1840ms);
+    BerrySession session(stream, context, language);
+    //pbf_press_dpad(context, DPAD_UP, 160ms, 840ms);
+    session.add_ingredients(stream, context, std::move(fillings));
+    //pbf_press_button(context, BUTTON_PLUS, 160ms, 1840ms);
 }
 
 
