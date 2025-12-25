@@ -16,9 +16,9 @@
 #include "CommonFramework/Options/ResolutionOption.h"
 #include "FileWindowLogger.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -58,6 +58,9 @@ FileWindowLogger::FileWindowLogger(const std::string& path)
     if (!exists && opened){
         std::string bom = "\xef\xbb\xbf";
         m_file.write(bom.c_str(), bom.size());
+        cout << "Write log to new file " << path << endl;
+    }else{
+        cout << "Write log to existing file " << path << endl;
     }
 
     m_thread = Thread([this]{
