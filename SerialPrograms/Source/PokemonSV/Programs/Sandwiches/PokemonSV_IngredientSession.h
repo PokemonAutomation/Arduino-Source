@@ -20,8 +20,6 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-class SandwichIngredientReader;
-
 
 // Detection output of one ingredient menu page: cursor position and detected ingredients per line.
 // Returned by IngredientSession::read_screen()/read_current_page()
