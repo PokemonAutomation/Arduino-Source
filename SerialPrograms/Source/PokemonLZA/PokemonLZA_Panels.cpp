@@ -41,6 +41,7 @@
 #include "Programs/ShinyHunting/PokemonLZA_ShuttleRun.h"
 #include "Programs/ShinyHunting/PokemonLZA_SewerHunter.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.h"
+#include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_Terrakion.h"
 
 //  Non-Shiny Hunting
 #include "Programs/NonShinyHunting/PokemonLZA_StatsReset.h"
@@ -100,6 +101,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHunt_HelioptileHunter_Descriptor, ShinyHunt_HelioptileHunter>());
     if (IS_BETA_VERSION){
         ret.emplace_back(make_single_switch_program<ShinyHunt_ShuttleRun_Descriptor, ShinyHunt_ShuttleRun>());
+        ret.emplace_back(make_single_switch_program<ShinyHunt_Terrakion_Descriptor, ShinyHunt_Terrakion>());
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<ShinyHunt_HyperspaceLegendary_Descriptor, ShinyHunt_HyperspaceLegendary>());

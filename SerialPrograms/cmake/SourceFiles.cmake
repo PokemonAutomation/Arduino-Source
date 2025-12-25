@@ -1719,6 +1719,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_Terrakion.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_Terrakion.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShuttleRun.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShuttleRun.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneCafe.cpp
