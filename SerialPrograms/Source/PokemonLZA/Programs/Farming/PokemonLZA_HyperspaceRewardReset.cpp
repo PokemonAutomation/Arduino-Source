@@ -170,14 +170,14 @@ bool HyperspaceRewardReset::check_reward(SingleSwitchProgramEnvironment& env, Pr
     for (const auto& r : result.results){
         env.console.log("Found reward: " + r.second.token);
         if (TARGET_ITEMS.find_item(r.second.token)){
-            env.log("Reward matched");
+            env.log("Reward Matched");
 
             stats.matches++;
             env.update_stats();
 
             send_program_notification(
                 env, NOTIFICATION_REWARD_MATCH,
-                COLOR_GREEN, "Reward matched",
+                COLOR_GREEN, "Reward Matched",
                 {
                     { "Item:", get_hyperspace_reward_name(r.second.token).display_name() },
                 }

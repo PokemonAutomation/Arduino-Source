@@ -40,8 +40,9 @@ bool gamemenu_to_ingame(
         stream.log("Waiting to enter game...");
         int ret = run_until<ProControllerContext>(
             stream, context,
-            [](ProControllerContext& context){
+            [=](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 2s);
+                pbf_wait(context, enter_game_timeout);
             },
             {{detector}}
         );
