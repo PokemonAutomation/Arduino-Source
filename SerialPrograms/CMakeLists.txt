@@ -689,3 +689,6 @@ endif() # end WIN32
 if (QT_MAJOR GREATER_EQUAL 6)
     qt_finalize_target(SerialPrograms)
 endif()
+
+# Add command-line executable (GUI-free) from subdirectory
+include(Source/CommandLine/CommandLineExecutable.cmake)

@@ -1,8 +1,10 @@
 # This CMake file defines all the code file paths as the CMake variables
 # For the main CMake file, see CMakeLists.txt
 
-# the executable needs the dark style format file
+# the GUI executable needs the dark style format file
 set(EXECUTABLE_SOURCES "Source/CommonFramework/Main.cpp" "../3rdParty/qdarkstyle/dark/darkstyle.qrc")
+
+# Note: Command-line executable sources are now defined in Source/CommandLine/CMakeLists.txt
 
 file(GLOB LIBRARY_SOURCES
     ../3rdParty/ONNX/OnnxToolsPA.h
