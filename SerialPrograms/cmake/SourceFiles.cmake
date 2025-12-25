@@ -1706,8 +1706,6 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneCafe.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h
-    Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_DonutOptionsTest.cpp
-    Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_DonutOptionsTest.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.cpp
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.cpp
