@@ -84,7 +84,7 @@ void CaughtPokemonScreen::leave_summary(){
 
     switch (result){
     case 0:
-        pbf_wait(m_context, 125);
+        pbf_wait(m_context, 1000ms);
         m_context.wait_for_all_requests();
         break;
     default:

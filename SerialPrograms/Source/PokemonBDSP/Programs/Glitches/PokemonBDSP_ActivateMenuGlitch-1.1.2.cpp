@@ -59,9 +59,9 @@ void trigger_menu(VideoStream& stream, ProControllerContext& context){
                 for (size_t c = 0; c < 42; c++){
                     pbf_controller_state(context, BUTTON_ZL, DPAD_NONE, {0, 0}, {0, 0}, 8ms);
                     pbf_controller_state(context, BUTTON_R | BUTTON_ZL, DPAD_NONE, {0, 0}, {0, 0}, 40ms);
-                    pbf_wait(context, 3);
+                    pbf_wait(context, 24ms);
                 }
-                pbf_wait(context, 125);
+                pbf_wait(context, 1000ms);
                 pbf_press_button(context, BUTTON_R, 160ms, 840ms);
             }
         },

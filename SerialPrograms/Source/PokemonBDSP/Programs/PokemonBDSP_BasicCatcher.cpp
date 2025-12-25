@@ -251,7 +251,7 @@ CatchResults basic_catcher(
                 );
             }
             stream.log("BasicCatcher: The wild " + STRING_POKEMON + " was caught by " + pokeball_str, COLOR_BLUE);
-            pbf_wait(context, 50);
+            pbf_wait(context, 400ms);
             results.result = CatchResult::POKEMON_CAUGHT;
             break; //  Continue the loop.
         case 2:

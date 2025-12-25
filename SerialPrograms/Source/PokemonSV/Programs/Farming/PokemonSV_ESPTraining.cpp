@@ -80,7 +80,7 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, ProControllerCont
 
         //Yes let's train
         pbf_press_button(context, BUTTON_A, 80ms, 400ms);
-        pbf_wait(context, 100);
+        pbf_wait(context, 800ms);
         context.wait_for_all_requests();
 
         //What mode? - Knockout

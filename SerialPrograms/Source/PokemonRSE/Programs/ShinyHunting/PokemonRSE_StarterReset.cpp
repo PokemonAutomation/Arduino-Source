@@ -176,7 +176,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         //Check second party member - used for testing with hacked in shiny starter
         //pbf_press_dpad(context, DPAD_DOWN, 320ms, 640ms);
 
-        pbf_wait(context, 125);
+        pbf_wait(context, 1000ms);
         context.wait_for_all_requests();
 
         VideoSnapshot screen = env.console.video().snapshot();

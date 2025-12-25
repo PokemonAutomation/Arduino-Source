@@ -395,7 +395,7 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, VideoStream& st
     if (ret == 0){
         stream.log("Detected Recently Battled menu icon.");
         pbf_mash_button_old(context, BUTTON_A, 150);
-        pbf_wait(context, 200);
+        pbf_wait(context, 1600ms);
     }else{
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,

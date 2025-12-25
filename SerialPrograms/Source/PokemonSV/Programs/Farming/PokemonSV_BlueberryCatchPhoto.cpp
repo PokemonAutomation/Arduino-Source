@@ -63,7 +63,7 @@ CameraAngle quest_photo_navi(
             //Polar Outdoor Classroom 1 - fixed Horsea
             central_to_polar_class1(info, console, context);
 
-            pbf_wait(context, 200);
+            pbf_wait(context, 1600ms);
             context.wait_for_all_requests();
 
             pbf_press_button(context, BUTTON_L, 80ms, 400ms);
@@ -86,12 +86,12 @@ CameraAngle quest_photo_navi(
             ssf_press_button(context, BUTTON_B, 0ms, 160ms, 80ms);
             ssf_press_button(context, BUTTON_B, 0ms, 160ms);
 
-            pbf_wait(context, 100);
+            pbf_wait(context, 800ms);
             context.wait_for_all_requests();
 
             pbf_move_left_joystick(context, {0, +1}, 1200ms, 160ms);
             pbf_press_button(context, BUTTON_B, 160ms, 160ms);
-            pbf_wait(context, 200);
+            pbf_wait(context, 1600ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
             context.wait_for_all_requests();
 
@@ -245,7 +245,7 @@ CameraAngle quest_photo_navi(
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
             pbf_move_left_joystick(context, {0, +1}, 1200ms, 400ms);
             pbf_move_left_joystick_old(context, 180, 0, 160ms, 400ms);
-            pbf_wait(context, 200); //Give it time to spawn/load.
+            pbf_wait(context, 1600ms); //Give it time to spawn/load.
             context.wait_for_all_requests();
 
             angle = CameraAngle::down;
@@ -306,7 +306,7 @@ void quest_photo(
                 OverworldWatcher overworld(console.logger(), COLOR_BLUE);
 
                 pbf_press_dpad(context, DPAD_DOWN, 400ms, 160ms);
-                pbf_wait(context, 100);
+                pbf_wait(context, 800ms);
                 context.wait_for_all_requests();
 
                 if (move_camera == CameraAngle::up){
@@ -441,12 +441,12 @@ void quest_catch_navi(
             ssf_press_button(context, BUTTON_B, 0ms, 160ms, 80ms);
             ssf_press_button(context, BUTTON_B, 0ms, 160ms);
 
-            pbf_wait(context, 100);
+            pbf_wait(context, 800ms);
             context.wait_for_all_requests();
 
             pbf_move_left_joystick_old(context, 128, 0, 350, 20);
             pbf_press_button(context, BUTTON_B, 160ms, 160ms);
-            pbf_wait(context, 200);
+            pbf_wait(context, 1600ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             break;
@@ -542,7 +542,7 @@ void quest_catch_navi(
             } else {
                 pbf_move_left_joystick_old(context, 128, 0, 960ms, 160ms);
             }
-            pbf_wait(context, 400);
+            pbf_wait_old(context, 400);
             context.wait_for_all_requests();
 
             break;
@@ -559,7 +559,7 @@ void quest_catch_navi(
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 800ms, 4400ms, 2400ms);
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
-            pbf_wait(context, 300);
+            pbf_wait(context, 2400ms);
             context.wait_for_all_requests();
 
             break;
@@ -605,7 +605,7 @@ void quest_catch_navi(
             ssf_press_button(context, BUTTON_ZR, 0ms, 1600ms);
             ssf_press_button(context, BUTTON_ZL, 800ms, 400ms);
             ssf_press_button(context, BUTTON_ZL, 1200ms, 400ms);
-            pbf_wait(context, 200);
+            pbf_wait(context, 1600ms);
             context.wait_for_all_requests();
             pbf_press_button(context, BUTTON_ZR, 160ms, 400ms); //Withdraw pokemon
 
@@ -614,7 +614,7 @@ void quest_catch_navi(
             ssf_press_button(context, BUTTON_ZR, 0ms, 1600ms);
             ssf_press_button(context, BUTTON_ZL, 800ms, 400ms);
             ssf_press_button(context, BUTTON_ZL, 1200ms, 400ms);
-            pbf_wait(context, 200);
+            pbf_wait(context, 1600ms);
             context.wait_for_all_requests();
             pbf_press_button(context, BUTTON_ZR, 160ms, 400ms); //Withdraw pokemon
 
@@ -652,7 +652,7 @@ void quest_catch_navi(
     ssf_press_button(context, BUTTON_ZL, 800ms, 400ms);
     ssf_press_button(context, BUTTON_ZL, 1200ms, 400ms);
 
-    pbf_wait(context, 300);
+    pbf_wait(context, 2400ms);
     context.wait_for_all_requests();
 
 }
@@ -797,7 +797,7 @@ void quest_catch_handle_battle(
                             console, context,
                             [&](ProControllerContext& context){
                                 pbf_press_button(context, BUTTON_A, 80ms, 400ms);
-                                pbf_wait(context, 100);
+                                pbf_wait(context, 800ms);
                                 context.wait_for_all_requests();
                             },
                             { move_watcher }
@@ -811,7 +811,7 @@ void quest_catch_handle_battle(
                         context.wait_for_all_requests();
                         move_select.move_to_slot(console, context, 3);
                         pbf_mash_button_old(context, BUTTON_A, 150);
-                        pbf_wait(context, 100);
+                        pbf_wait(context, 800ms);
                         context.wait_for_all_requests();
 
                         //Check for battle menu
@@ -853,7 +853,7 @@ void quest_catch_handle_battle(
                 case 1:
                     console.log("Detected fainted Pokemon. Switching to next living Pokemon...");
                     pbf_press_button(context, BUTTON_A, 160ms, 400ms);
-                    pbf_wait(context, 100);
+                    pbf_wait(context, 800ms);
                     context.wait_for_all_requests();
                     if (swap.move_to_slot(console, context, switch_party_slot)){
                         pbf_mash_button(context, BUTTON_A, 3000ms);
@@ -1003,7 +1003,7 @@ void wild_battle_tera(
                     console.log("Turn 1: Tera.");
                     //Open move menu
                     pbf_press_button(context, BUTTON_A, 80ms, 400ms);
-                    pbf_wait(context, 100);
+                    pbf_wait(context, 800ms);
                     context.wait_for_all_requests();
 
                     pbf_press_button(context, BUTTON_R, 160ms, 400ms);
@@ -1032,7 +1032,7 @@ void wild_battle_tera(
                 case 1:
                     console.log("Detected fainted Pokemon. Switching to next living Pokemon...");
                     pbf_press_button(context, BUTTON_A, 160ms, 400ms);
-                    pbf_wait(context, 100);
+                    pbf_wait(context, 800ms);
                     context.wait_for_all_requests();
                     if (swap.move_to_slot(console, context, switch_party_slot)){
                         pbf_mash_button(context, BUTTON_A, 3000ms);

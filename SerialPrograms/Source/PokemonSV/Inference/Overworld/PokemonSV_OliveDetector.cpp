@@ -198,7 +198,7 @@ ImageFloatBox OliveDetector::align_to_olive(
         uint8_t push_x = uint8_t(std::max(std::min(int(128 + (push_direction * push_magnitude)), 255), 0));
         stream.log("scale_factor: " + std::to_string(scale_factor));
         stream.log("push x: " + std::to_string(push_x) + ", push duration: " +  std::to_string(push_duration));
-        // pbf_wait(context, 100);
+        // pbf_wait(context, 800ms);
         uint16_t wait_ticks = 50;
         if (std::abs(diff_from_center) < 0.05){
             wait_ticks = 100;

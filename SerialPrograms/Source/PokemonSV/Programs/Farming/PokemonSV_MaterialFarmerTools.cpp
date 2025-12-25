@@ -444,7 +444,7 @@ void move_to_start_position_for_letsgo0(
     pbf_press_button(context, BUTTON_B, 50, 10);     //  in case one is dropped.
     pbf_press_button(context, BUTTON_LCLICK, 400ms, 0ms);
     // you automatically move forward without pressing any buttons. so just wait
-    pbf_wait(context, 1400);
+    pbf_wait_old(context, 1400);
 
     // Glide forward
     // pbf_move_left_joystick(context, {0, +1}, 20000ms, 80ms);
@@ -502,7 +502,7 @@ void move_to_start_position_for_letsgo1(
 
     // you automatically move forward  when flying without pressing any buttons. 
     // so, just wait.
-    pbf_wait(context, 2200);
+    pbf_wait_old(context, 2200);
 
     // arrived at start position. stop flying
     pbf_press_button(context, BUTTON_B, 50, 400);
@@ -528,15 +528,15 @@ void move_to_start_position_for_letsgo1(
 
 // wait, then move forward quickly
 void lets_go_movement0(ProControllerContext& context){
-    pbf_wait(context, 500);
+    pbf_wait(context, 4000ms);
     pbf_move_left_joystick(context, {0, +1}, 1600ms, 80ms);
 }
 
 // wait, then move forward quickly, then wait some more.
 void lets_go_movement1(ProControllerContext& context){
-    pbf_wait(context, 500);
+    pbf_wait(context, 4000ms);
     pbf_move_left_joystick(context, {0, +1}, 800ms, 80ms);
-    pbf_wait(context, 100);
+    pbf_wait(context, 800ms);
 }
 
 

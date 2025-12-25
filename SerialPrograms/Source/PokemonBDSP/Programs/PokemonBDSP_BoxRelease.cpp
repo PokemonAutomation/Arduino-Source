@@ -47,7 +47,7 @@ void release(ProControllerContext& context){
     pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
     pbf_move_right_joystick(context, {0, -1}, 160ms, 80ms);
     pbf_mash_button_old(context, BUTTON_ZL, 120);
-    pbf_wait(context, 30);
+    pbf_wait(context, 240ms);
 }
 void release_box(ProControllerContext& context, Milliseconds box_scroll_delay){
     for (uint8_t row = 0; row < 5; row++){
@@ -82,7 +82,7 @@ void release_boxes(
         pbf_move_right_joystick(context, {0, -1}, 160ms, box_scroll_delay);
         pbf_move_right_joystick(context, {+1, 0}, 160ms, box_scroll_delay);
         pbf_move_right_joystick(context, {+1, 0}, 160ms, box_scroll_delay);
-        pbf_wait(context, 50);
+        pbf_wait(context, 400ms);
         pbf_press_button(context, BUTTON_R, 160ms, box_change_delay);
         release_box(context, box_scroll_delay);
     }

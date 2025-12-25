@@ -119,7 +119,7 @@ bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool s
                     stream
                 );
             }
-            pbf_wait(context, 125);
+            pbf_wait(context, 1000ms);
             context.wait_for_all_requests();
         },
         {{shiny_detector}}
@@ -152,7 +152,7 @@ bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool s
                 stream
             );
         }
-        pbf_wait(context, 125);
+        pbf_wait(context, 1000ms);
         context.wait_for_all_requests();
     }
 

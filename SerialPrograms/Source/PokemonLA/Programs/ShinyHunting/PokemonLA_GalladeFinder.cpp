@@ -137,7 +137,7 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProContro
 
                 // camera align
                 pbf_press_button(context, BUTTON_ZL, 20, 0); // camera align
-                pbf_wait(context, 70);
+                pbf_wait_old(context, 70);
 
                 context.wait_for_all_requests();
                 destination_time = current_time();

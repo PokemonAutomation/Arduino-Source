@@ -352,7 +352,7 @@ void goto_camp_from_jubilife(
             );
         }
     }
-    pbf_wait(context, 50);
+    pbf_wait(context, 400ms);
     for (size_t c = 0; c < location.warp_sub_slot; c++){
         const DpadPosition dir = (location.reverse_sub_menu_direction ? DPAD_UP : DPAD_DOWN);
         pbf_press_dpad(context, dir, 160ms, 240ms);
@@ -532,7 +532,7 @@ void fast_travel_from_overworld(
             );
             if (ret >= 0){
                 stream.log("Fast traveling...");
-                pbf_wait(context, 50);
+                pbf_wait(context, 400ms);
                 if (location.warp_slot != 0){
                     for (size_t c = 0; c < location.warp_slot; c++){
                         pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);

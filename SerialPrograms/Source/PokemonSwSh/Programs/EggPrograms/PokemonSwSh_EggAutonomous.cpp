@@ -527,7 +527,7 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
             for (size_t i_hatched = 0; i_hatched < 2; i_hatched++){
                 pbf_press_button(context, BUTTON_A, 20, 150);
             }
-            pbf_wait(context, 200);
+            pbf_wait(context, 1600ms);
         },
         {
             egg_arrow_detector,
@@ -635,7 +635,7 @@ bool EggAutonomous::process_hatched_pokemon(
         BoxNatureDetector nature_detector(env.console.overlay());
 
         for (size_t i_hatched = 0; i_hatched < 5; i_hatched++){
-            pbf_wait(context, 50); // wait for a while to make sure the pokemon stats are loaded.
+            pbf_wait(context, 400ms); // wait for a while to make sure the pokemon stats are loaded.
             context.wait_for_all_requests();
             auto screen = env.console.video().snapshot();
 

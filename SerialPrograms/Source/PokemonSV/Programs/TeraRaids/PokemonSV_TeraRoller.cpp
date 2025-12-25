@@ -208,7 +208,7 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 env.console.overlay().add_log("Shiny!", COLOR_GREEN);
                 stats.m_shinies += 1;
 
-                pbf_wait(context, 500); // Wait enough time for the Pokemon sprite to load
+                pbf_wait(context, 4000ms); // Wait enough time for the Pokemon sprite to load
                 context.wait_for_all_requests();
                 send_encounter_notification(
                     env,
@@ -235,7 +235,7 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         env.console.overlay().add_log("Not shiny", COLOR_WHITE);
         leave_phone_to_overworld(env.program_info(), env.console, context);
 
-        pbf_wait(context, 50);
+        pbf_wait(context, 400ms);
     }
 
     env.update_stats();

@@ -573,7 +573,7 @@ PokemonDetails AutoMultiSpawn::go_to_spawn_point_and_try_focusing_pokemon(
 ){
     // From camp fly to the spawn point, focus on a target pokemon and start a battle
     change_mount(env.console, context, MountState::BRAVIARY_ON);
-    pbf_wait(context, 40);
+    pbf_wait_old(context, 40);
     
     // Move to spawn location on Braviary
     pbf_move_left_joystick_old(context, 255, 165, 1200ms, 0ms); // 170
@@ -595,7 +595,7 @@ PokemonDetails AutoMultiSpawn::go_to_spawn_point_and_try_focusing_pokemon(
     // In case the character hits a tree and change the Braviary mount state due to the hit,
     // use visual feedback to makse sure the character is now dismounted.
     change_mount(env.console, context, MountState::BRAVIARY_OFF);
-    pbf_wait(context, 50);
+    pbf_wait(context, 400ms);
     
     // Move forward on foot
     pbf_move_left_joystick(context, {0, +1}, 1280ms, 0ms);
@@ -620,7 +620,7 @@ PokemonDetails AutoMultiSpawn::go_to_spawn_point_and_try_focusing_pokemon(
 
         if (i + 1 < max_focus_try){
             env.log("Try another focus attempt.");
-            pbf_wait(context, 200);
+            pbf_wait(context, 1600ms);
             context.wait_for_all_requests();
         }
 

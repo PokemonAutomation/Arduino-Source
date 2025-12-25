@@ -110,7 +110,7 @@ void accept_FRs(
             GameSettings::instance().EXIT_SWITCH_POKEMON0
         );
     }
-    pbf_wait(context, 300);
+    pbf_wait(context, 2400ms);
 }
 
 

@@ -126,7 +126,7 @@ void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, ProController
                 pbf_press_button(context, BUTTON_A, 80ms, 80ms);
             }
         }else{
-            pbf_wait(context, 250);
+            pbf_wait(context, 2000ms);
         }
 
         // increment stats

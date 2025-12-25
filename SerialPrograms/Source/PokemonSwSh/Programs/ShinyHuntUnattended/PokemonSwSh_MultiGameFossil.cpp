@@ -88,7 +88,7 @@ void run_fossil_batch(
     for (uint16_t c = 0; c < batch.revives; c++){
 #if 1
         ssf_mash_AZs(context, 1360ms);
-        pbf_wait(context, 65);
+        pbf_wait_old(context, 65);
 #else
         ssf_mash_AZs(context, 50);
         pbf_wait(context, 140);
@@ -124,7 +124,7 @@ void run_fossil_batch(
             GameSettings::instance().AUTO_DEPOSIT ? 1400 : 1520
         );
     }
-    pbf_wait(context, 100);
+    pbf_wait(context, 800ms);
 #endif
 
     if (!save_and_exit){

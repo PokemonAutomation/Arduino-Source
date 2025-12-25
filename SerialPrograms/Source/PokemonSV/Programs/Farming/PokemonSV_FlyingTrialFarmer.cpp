@@ -225,7 +225,7 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, ProControll
                 pbf_move_left_joystick_old(context, 115, get_final_y_axis(   0), 1000ms, 0ms);
                 pbf_wait(context,  7000ms);
                 pbf_move_left_joystick_old(context, 128, get_final_y_axis(  52), 2000ms, 0ms);
-                pbf_wait(context,  780);
+                pbf_wait_old(context,  780);
                 pbf_move_left_joystick_old(context,   0, get_final_y_axis(   0), 3000ms, 0ms);
                 break;
             case FlightPath::BACK_ENTRY_STRAIGHT:
@@ -257,7 +257,7 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, ProControll
                 pbf_move_left_joystick_old(context,  40, get_final_y_axis( -78), 1920ms, 0ms);
                 pbf_wait(context,  1000ms);
                 pbf_move_left_joystick_old(context, 128, get_final_y_axis( -78), 1280ms, 0ms);
-                pbf_wait(context,  2550);
+                pbf_wait_old(context,  2550);
                 pbf_move_left_joystick_old(context, 255, get_final_y_axis(  80), 2000ms, 0ms);
                 pbf_wait(context,  9000ms);
                 break;

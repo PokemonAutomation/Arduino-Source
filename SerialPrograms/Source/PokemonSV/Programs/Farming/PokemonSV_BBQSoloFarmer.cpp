@@ -141,7 +141,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         quests_to_do.clear();
 
         //Fix the time to prevent running out of years
-        pbf_wait(context, 250);
+        pbf_wait(context, 2000ms);
         context.wait_for_all_requests();
         go_home(env.console, context);
         home_to_date_time(env.console, context, false);

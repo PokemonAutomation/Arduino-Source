@@ -44,7 +44,7 @@ void run_select_pokemon(
     std::string options[3];
 
 //    //  Wait for bottom row to reload.
-//    pbf_wait(context, 50);
+//    pbf_wait(context, 400ms);
 //    context.wait_for_all_requests();
 
     //  Read the bottom two options first.

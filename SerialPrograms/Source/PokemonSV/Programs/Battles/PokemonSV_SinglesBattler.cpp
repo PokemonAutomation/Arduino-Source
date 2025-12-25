@@ -305,7 +305,7 @@ bool run_singles_battle(
                 pbf_press_button(context, BUTTON_A, 160ms, 840ms);
                 pbf_press_button(context, BUTTON_A, 160ms, 840ms);
                 pbf_mash_button(context, BUTTON_B, 2000ms);
-                pbf_wait(context, 50);
+                pbf_wait(context, 400ms);
                 continue;
             default:
                 OperationFailedException::fire(

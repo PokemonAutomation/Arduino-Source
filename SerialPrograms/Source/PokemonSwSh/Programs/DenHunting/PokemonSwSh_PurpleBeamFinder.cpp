@@ -150,7 +150,7 @@ bool PurpleBeamFinder::run(SingleSwitchProgramEnvironment& env, ProControllerCon
     env.log("Detected initial prompt.");
 
     pbf_mash_button_old(context, BUTTON_A, 50);
-    pbf_wait(context, 100);
+    pbf_wait(context, 800ms);
     context.wait_for_all_requests();
 
     ret = run_until<ProControllerContext>(

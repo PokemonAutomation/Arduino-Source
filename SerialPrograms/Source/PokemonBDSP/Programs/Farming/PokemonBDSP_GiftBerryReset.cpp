@@ -121,7 +121,7 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
         // Press ZL three times to advance dialog with npc
         for (int i = 0; i < 3; i++){
             pbf_mash_button_old(context, BUTTON_ZL, 30);
-            pbf_wait(context, 150);
+            pbf_wait(context, 1200ms);
         }
         context.wait_for_all_requests();
 

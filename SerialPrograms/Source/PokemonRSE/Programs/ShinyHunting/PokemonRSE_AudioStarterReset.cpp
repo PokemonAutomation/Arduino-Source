@@ -149,7 +149,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
                 if (ret == 0) {
                     env.log("Advance arrow detected.");
                 }
-                pbf_wait(context, 125);
+                pbf_wait(context, 1000ms);
                 context.wait_for_all_requests();
             },
             {{pooch_detector}}
@@ -187,7 +187,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
                 if (ret == 0) {
                     env.log("Battle menu detecteed!");
                 }
-                pbf_wait(context, 125);
+                pbf_wait(context, 1000ms);
                 context.wait_for_all_requests();
             },
             {{starter_detector}}

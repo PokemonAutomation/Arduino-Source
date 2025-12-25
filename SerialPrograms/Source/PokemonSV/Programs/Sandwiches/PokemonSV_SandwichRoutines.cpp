@@ -1073,7 +1073,7 @@ void run_sandwich_maker(
     //Wait for labels to appear
     stream.log("Waiting for labels to appear.", COLOR_BLACK);
     stream.overlay().add_log("Waiting for labels to appear.", COLOR_WHITE);
-    pbf_wait(context, 300);
+    pbf_wait(context, 2400ms);
     context.wait_for_all_requests();
 
     //Now read in plate labels and store which plate has what

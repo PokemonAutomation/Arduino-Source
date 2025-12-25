@@ -162,7 +162,7 @@ void picnic_from_overworld(const ProgramInfo& info, VideoStream& stream, ProCont
             stream.overlay().add_log("Start picnic", COLOR_WHITE);
             // extra wait to make sure by the end the player can move.
             // the player throwing out pokeballs animation is long.
-            pbf_wait(context, 1000);
+            pbf_wait_old(context, 1000);
             context.wait_for_all_requests();
             return;
         default:

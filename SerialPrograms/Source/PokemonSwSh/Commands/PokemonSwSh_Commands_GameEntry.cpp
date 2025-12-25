@@ -98,7 +98,7 @@ void settings_to_enter_game_den_lobby(
     Milliseconds exit_switch_pokemon_delay
 ){
     settings_to_enter_game(context, fast);
-    pbf_wait(context, 90);
+    pbf_wait(context, 720ms);
     if (tolerate_update_menu){
         //  home                home
 //        ssf_press_button2(BUTTON_HOME, 800ms, 80ms);
@@ -118,7 +118,7 @@ void settings_to_enter_game_den_lobby(
         ssf_press_button(context, BUTTON_A, exit_switch_pokemon_delay);
         //  lobby-switch        lobby-switch
     }else{
-        pbf_wait(context, 50);
+        pbf_wait(context, 400ms);
     }
 }
 void start_game_from_home(

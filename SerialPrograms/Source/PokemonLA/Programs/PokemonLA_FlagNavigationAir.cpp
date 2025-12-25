@@ -258,7 +258,7 @@ FlagNavigationAir::FlagNavigationAir(
     register_state_command(State::TURN_LEFT, [this](){
         m_stream.log("Turning Left...");
         m_active_command->dispatch([this](ProControllerContext& context){
-            pbf_wait(context, 150);
+            pbf_wait(context, 1200ms);
             context.wait_for_all_requests();
             double distance, flag_x, flag_y;
             if (m_flag.get(distance, flag_x, flag_y)){
@@ -276,7 +276,7 @@ FlagNavigationAir::FlagNavigationAir(
     register_state_command(State::TURN_RIGHT, [this](){
         m_stream.log("Turning Right...");
         m_active_command->dispatch([this](ProControllerContext& context){
-            pbf_wait(context, 150);
+            pbf_wait(context, 1200ms);
             context.wait_for_all_requests();
             double distance, flag_x, flag_y;
             if (m_flag.get(distance, flag_x, flag_y)){

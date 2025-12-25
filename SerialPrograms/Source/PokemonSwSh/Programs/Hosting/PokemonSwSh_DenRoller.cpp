@@ -108,7 +108,7 @@ void DenRoller::ring_bell(ProControllerContext& context, int count) const{
     for (int c = 0; c < count; c++){
         pbf_press_button(context, BUTTON_LCLICK, 40ms, 80ms);
     }
-    pbf_wait(context, 200);
+    pbf_wait(context, 1600ms);
 }
 
 void DenRoller::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){

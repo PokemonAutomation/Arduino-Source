@@ -399,7 +399,7 @@ void checkpoint_44(
                 pbf_press_button(context, BUTTON_A, 400ms, 400ms);
                 pbf_press_button(context, BUTTON_A, 400ms, 400ms); // extra press in case one is dropped
                 pbf_press_button(context, BUTTON_A, 400ms, 400ms);
-                pbf_wait(context, 250);
+                pbf_wait(context, 2000ms);
                 press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
                 check_num_sunflora_found(env, context, 8);  
                 pbf_wait(context, 3000ms);

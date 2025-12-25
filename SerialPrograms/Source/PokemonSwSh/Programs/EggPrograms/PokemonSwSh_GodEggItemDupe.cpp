@@ -67,10 +67,10 @@ void GodEggItemDupe::collect_godegg(
     bool map_to_pokemon,
     bool pokemon_to_map
 ) const{
-    pbf_wait(context, 50);
+    pbf_wait(context, 400ms);
     ssf_press_button_ptv(context, BUTTON_B, 800ms);
     ssf_press_button_ptv(context, BUTTON_B, 800ms);
-    pbf_wait(context, 225);
+    pbf_wait_old(context, 225);
 
     //  "You received an Egg from the Nursery worker!"
     ssf_press_button_ptv(context, BUTTON_B, 2400ms);

@@ -286,7 +286,7 @@ void CramomaticRNG::leave_to_overworld_and_interact(SingleSwitchProgramEnvironme
     pbf_press_button(context, BUTTON_B, 10, 70);
 
     pbf_mash_button_old(context, BUTTON_A, 320);
-    pbf_wait(context, 125);
+    pbf_wait(context, 1000ms);
 }
 
 void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool sport){

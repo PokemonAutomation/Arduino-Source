@@ -243,7 +243,7 @@ void order_compote_du_fils(
 
     // Now leaving the restaurant
     pbf_mash_button_old(context, BUTTON_B, 90);
-    pbf_wait(context, 100);
+    pbf_wait(context, 800ms);
     while(true){
         context.wait_for_all_requests();
 

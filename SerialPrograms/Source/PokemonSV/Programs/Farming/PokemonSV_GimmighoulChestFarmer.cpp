@@ -115,7 +115,7 @@ void GimmighoulChestFarmer::navigate_to_gimmi(SingleSwitchProgramEnvironment& en
     pbf_press_button(context, BUTTON_L, 400ms, 320ms);
     pbf_move_left_joystick(context, {0, +1}, 18800ms, 0ms);
     pbf_press_button(context, BUTTON_L, 400ms, 320ms);
-    pbf_wait(context, 100);
+    pbf_wait(context, 800ms);
     context.wait_for_all_requests();
     //Walk into the wall
     pbf_move_left_joystick(context, {0, +1}, 1600ms, 800ms);
@@ -145,7 +145,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
         pbf_move_left_joystick(context, {0, +1}, 18800ms, 0ms);
         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
-        pbf_wait(context, 100);
+        pbf_wait(context, 800ms);
         context.wait_for_all_requests();
         //Walk into the wall
         pbf_move_left_joystick(context, {0, +1}, 1600ms, 800ms);
@@ -167,7 +167,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
         //  Press A to enter battle, assuming there is a chest
         env.log("Fetch Attempts: " + tostr_u_commas(c));
         pbf_mash_button(context, BUTTON_A, 1000ms);
-        pbf_wait(context, 125); //Wait extra to make sure the overworld map vanishes
+        pbf_wait(context, 1000ms); //Wait extra to make sure the overworld map vanishes
         context.wait_for_all_requests();
 
         OverworldWatcher battleStarting(env.console, COLOR_RED);

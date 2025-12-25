@@ -190,7 +190,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
                 env.log("Timed out waiting for selection prompt.", COLOR_RED);
                 consecutive_failures++;
             }
-            pbf_wait(context, 50);
+            pbf_wait(context, 400ms);
             pbf_press_dpad(context, DPAD_UP, 80ms, 400ms);
             pbf_press_button(context, BUTTON_ZL, 80ms, 5000ms);
             context.wait_for_all_requests();

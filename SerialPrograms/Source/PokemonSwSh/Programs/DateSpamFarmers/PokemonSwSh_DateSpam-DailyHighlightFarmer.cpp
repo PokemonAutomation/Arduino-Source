@@ -69,7 +69,7 @@ void DailyHighlightFarmer::program(SingleSwitchProgramEnvironment& env, ProContr
         env.log("Fetch Attempts: " + tostr_u_commas(c));
         home_roll_date_enter_game_autorollback(env.console, context, year);
         if (context->performance_class() == ControllerPerformanceClass::SysbotBase){
-            pbf_wait(context, 90);
+            pbf_wait(context, 720ms);
         }else{
             pbf_mash_button_old(context, BUTTON_B, 90);
         }

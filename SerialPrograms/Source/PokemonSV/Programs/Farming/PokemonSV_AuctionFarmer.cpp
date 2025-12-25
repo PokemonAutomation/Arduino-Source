@@ -601,7 +601,7 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             }
 
             env.update_stats();
-            pbf_wait(context, 125);
+            pbf_wait(context, 1000ms);
             context.wait_for_all_requests();
         }
     }

@@ -252,7 +252,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
             pbf_press_button(context, BUTTON_A, 80ms, 400ms);
             move_select.move_to_slot(env.console, context, 1);
             pbf_press_button(context, BUTTON_A, 80ms, 400ms);
-            pbf_wait(context, 100);
+            pbf_wait(context, 800ms);
             context.wait_for_all_requests();
 
             pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
@@ -341,7 +341,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
         env.log("Attempting to terastillize.");
         //Open move menu
         pbf_press_button(context, BUTTON_A, 80ms, 400ms);
-        pbf_wait(context, 100);
+        pbf_wait(context, 800ms);
         context.wait_for_all_requests();
 
         pbf_press_button(context, BUTTON_R, 160ms, 400ms);
@@ -427,7 +427,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
 
         //Close dialog and then check money
         pbf_press_button(context, BUTTON_B, 80ms, 400ms);
-        pbf_wait(context, 100);
+        pbf_wait(context, 800ms);
         context.wait_for_all_requests();
 
         check_money(env, context);
@@ -524,12 +524,12 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
     if (ret_dialog == 0){
         env.log("Dialog detected.");
     }
-    pbf_wait(context, 300);
+    pbf_wait(context, 2400ms);
     context.wait_for_all_requests();
 
     //Next dialog is prize dialog - wait until all dialog has appeared then check prize
     pbf_press_button(context, BUTTON_A, 80ms, 800ms);
-    pbf_wait(context, 100);
+    pbf_wait(context, 800ms);
     context.wait_for_all_requests();
 
     check_prize(env, context);
@@ -564,7 +564,7 @@ void return_to_academy_after_loss(
     go_to_academy_fly_point(env, stream, context);
 
 
-    pbf_wait(context, 100);
+    pbf_wait(context, 800ms);
     context.wait_for_all_requests();
 
     env.log("At academy fly point. Heading back to doors.");

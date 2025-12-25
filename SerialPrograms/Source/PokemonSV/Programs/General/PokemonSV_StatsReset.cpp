@@ -339,7 +339,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
                     env.console, context,
                     [&](ProControllerContext& context){
                         pbf_press_button(context, BUTTON_A, 80ms, 400ms);
-                        pbf_wait(context, 100);
+                        pbf_wait(context, 800ms);
                         context.wait_for_all_requests();
                     },
                     { move_watcher }
@@ -353,7 +353,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
                     context.wait_for_all_requests();
                     move_select.move_to_slot(env.console, context, move_slot);
                     pbf_mash_button_old(context, BUTTON_A, 150);
-                    pbf_wait(context, 100);
+                    pbf_wait(context, 800ms);
                     context.wait_for_all_requests();
                     table_turn++;
 
