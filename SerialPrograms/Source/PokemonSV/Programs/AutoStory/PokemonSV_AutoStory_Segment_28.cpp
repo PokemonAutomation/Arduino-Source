@@ -165,7 +165,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 direction.change_direction(env.program_info(), env.console, context, 0.261697);
                 pbf_move_left_joystick(context, {0, +1}, 80ms, 400ms);
                 
-                walk_forward_while_clear_front_path(env.program_info(), env.console, context, 100);
+                walk_forward_while_clear_front_path(env.program_info(), env.console, context, 800ms);
                 walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A);
             }
         );

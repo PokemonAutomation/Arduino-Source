@@ -696,31 +696,31 @@ void walk_forward_while_clear_front_path(
     const ProgramInfo& info, 
     VideoStream& stream,
     ProControllerContext& context,
-    uint16_t forward_ticks,
+    Milliseconds forward_duration,
     uint8_t y,
-    uint16_t ticks_between_lets_go,
-    uint16_t delay_after_lets_go
+    Milliseconds duration_between_lets_go,
+    Milliseconds delay_after_lets_go
 ){
     context.wait_for_all_requests();
-    pbf_press_button_old(context, BUTTON_R, 20, delay_after_lets_go);
+    pbf_press_button(context, BUTTON_R, 160ms, delay_after_lets_go);
 
-    uint16_t num_ticks_left = forward_ticks;
+    Milliseconds milliseconds_left = forward_duration;
     while (true){
 
-        if (num_ticks_left < ticks_between_lets_go){
-            pbf_move_left_joystick_old(context, 128, y, num_ticks_left, 20);
+        if (milliseconds_left < duration_between_lets_go){
+            pbf_move_left_joystick_old(context, 128, y, milliseconds_left, 160ms);
             context.wait_for_all_requests();
-            stream.log("walk_forward_while_clear_front_path() ticks traveled: " + std::to_string(forward_ticks));
+            stream.log("walk_forward_while_clear_front_path() ticks traveled: " + std::to_string(forward_duration.count()));
             break;
         }
 
-        pbf_move_left_joystick_old(context, 128, y, ticks_between_lets_go, 20);
-        num_ticks_left -= ticks_between_lets_go;
+        pbf_move_left_joystick_old(context, 128, y, duration_between_lets_go, 160ms);
+        milliseconds_left -= duration_between_lets_go;
 
         context.wait_for_all_requests();
-        stream.log("walk_forward_while_clear_front_path() ticks traveled: " + std::to_string(forward_ticks - num_ticks_left));
+        stream.log("walk_forward_while_clear_front_path() ticks traveled: " + std::to_string(forward_duration.count() - milliseconds_left.count()));
 
-        pbf_press_button_old(context, BUTTON_R, 20, delay_after_lets_go);
+        pbf_press_button(context, BUTTON_R, 160ms, delay_after_lets_go);
         
 
     }
