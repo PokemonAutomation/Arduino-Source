@@ -14,6 +14,7 @@
 namespace PokemonAutomation{
 
 
+// Abstract base class as a logger interface
 class Logger{
 public:
     virtual void log(const std::string& msg, Color color = Color()) = 0;
