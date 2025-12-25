@@ -106,7 +106,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 140, 70);
 
         direction.change_direction(env.program_info(), env.console, context, 3.104878);
-        pbf_move_left_joystick_old(context, 128, 0, 4160ms, 400ms);
+        pbf_move_left_joystick(context, {0, +1}, 4160ms, 400ms);
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
@@ -149,7 +149,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
                 pbf_move_left_joystick_old(context, 0, 0, 2400ms, 400ms); // move left
                 pbf_move_left_joystick(context, {+1, 0}, 480ms, 400ms); // move right. center on door
-                pbf_move_left_joystick_old(context, 128, 0, 2400ms, 400ms);  // move forward
+                pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);  // move forward
             }
         );
 
@@ -228,7 +228,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
                 pbf_move_left_joystick_old(context, 0, 0, 2400ms, 400ms); // move left
                 pbf_move_left_joystick(context, {+1, 0}, 480ms, 400ms); // move right. center on door
-                pbf_move_left_joystick_old(context, 128, 0, 2400ms, 400ms);  // move forward
+                pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);  // move forward
             }
         );
 

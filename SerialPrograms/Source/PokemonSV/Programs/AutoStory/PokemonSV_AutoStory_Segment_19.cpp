@@ -244,7 +244,7 @@ void checkpoint_41(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_right_joystick(context, {+1, 0}, 800ms, 400ms);
                 direction.change_direction(env.program_info(), env.console, context, 4.467);
-                pbf_move_left_joystick_old(context, 128, 0, 5600ms, 400ms);
+                pbf_move_left_joystick(context, {0, +1}, 5600ms, 400ms);
                 pbf_move_left_joystick(context, {-1, 0}, 800ms, 400ms);
                 pbf_move_left_joystick(context, {-1, +1}, 4000ms, 400ms);
                 direction.change_direction(env.program_info(), env.console, context, 2.795);
@@ -254,7 +254,7 @@ void checkpoint_41(
                 direction.change_direction(env.program_info(), env.console, context, 5.479);
                 pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
                 direction.change_direction(env.program_info(), env.console, context, 0.33);                
-                pbf_move_left_joystick_old(context, 128, 0, 7200ms, 400ms);
+                pbf_move_left_joystick(context, {0, +1}, 7200ms, 400ms);
                 direction.change_direction(env.program_info(), env.console, context, 2.325);      
         });        
         overworld_navigation(env.program_info(), env.console, context, 

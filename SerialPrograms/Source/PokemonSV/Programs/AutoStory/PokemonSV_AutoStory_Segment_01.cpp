@@ -197,7 +197,7 @@ void checkpoint_03(
         context.wait_for_all_requests();
         DirectionDetector direction;
         direction.change_direction(env.program_info(), env.console, context, 4.62);
-        pbf_move_left_joystick_old(context, 128, 0, 28800ms, 400ms);
+        pbf_move_left_joystick(context, {0, +1}, 28800ms, 400ms);
         pbf_move_left_joystick(context, {-1, 0}, 240ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 4.62);
@@ -219,7 +219,7 @@ void checkpoint_03(
             break;
         case StarterChoice::QUAXLY:
             env.console.log("Picking Quaxly...");
-            pbf_move_left_joystick_old(context, 128, 0, 640ms, 160ms);
+            pbf_move_left_joystick(context, {0, +1}, 640ms, 160ms);
             break;
         }
         pbf_press_button(context, BUTTON_A, 160ms, 840ms); // choose the starter

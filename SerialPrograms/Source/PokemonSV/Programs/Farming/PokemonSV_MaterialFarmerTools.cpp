@@ -789,7 +789,7 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Video
     pbf_press_button(context, BUTTON_L, 400ms, 400ms);
 
     // move forward towards door
-    pbf_move_left_joystick_old(context, 128, 0, 5600ms, 400ms);
+    pbf_move_left_joystick(context, {0, +1}, 5600ms, 400ms);
 
     context.wait_for_all_requests();
 

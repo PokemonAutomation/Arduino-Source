@@ -121,7 +121,7 @@ void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         pbf_move_left_joystick(context, {0, +1}, 4000ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 3.786414);
-        pbf_move_left_joystick_old(context, 128, 0, 8800ms, 400ms);
+        pbf_move_left_joystick(context, {0, +1}, 8800ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 4.747153);
         pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
@@ -251,7 +251,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
     pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
 
     direction.change_direction(env.program_info(), env.console, context, 2.463760);
-    pbf_move_left_joystick_old(context, 128, 0, 8800ms, 400ms);
+    pbf_move_left_joystick(context, {0, +1}, 8800ms, 400ms);
 
      
     // marker 1 {0.585938, 0.236111}

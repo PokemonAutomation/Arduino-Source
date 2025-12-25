@@ -376,7 +376,7 @@ void area_zero_platform_run_path1(
         context.wait_for_all_requests();
 
         find_and_center_on_sky(env, stream, context);
-        pbf_move_left_joystick_old(context, 128, 0, 400ms, 0ms);
+        pbf_move_left_joystick(context, {0, +1}, 400ms, 0ms);
         pbf_press_button(context, BUTTON_L, 160ms, 240ms);
 
         //  Move forward.
@@ -433,7 +433,7 @@ void direction_to_stick(
 }
 void choose_path(
     Logger& logger,
-    uint8_t& x, uint8_t& y, uint16_t& duration,
+    uint8_t& x, uint8_t& y, Milliseconds& duration,
     double platform_x, double platform_y
 ){
     double diff_x = platform_x - 0.62;
@@ -442,7 +442,10 @@ void choose_path(
     logger.log("Move Direction: x = " + tostr_default(diff_x) + ", y = " + tostr_default(diff_y), COLOR_BLUE);
 
     direction_to_stick(x, y, diff_x, diff_y);
-    duration = (uint16_t)std::min<double>(std::sqrt(diff_x*diff_x + diff_y*diff_y) * 125 * 12, 400);
+    duration = std::min(
+        (Milliseconds)(int64_t)(std::sqrt(diff_x*diff_x + diff_y*diff_y) * 12000),
+        3200ms
+    );
 }
 void turn_angle(ProControllerContext& context, double angle_radians){
     uint8_t turn_x, turn_y;
@@ -461,7 +464,7 @@ void area_zero_platform_run_path2(
     pbf_mash_button(context, BUTTON_L, 480ms);
 
     double platform_x, platform_y;
-    uint16_t duration;
+    Milliseconds duration;
     uint8_t move_x, move_y;
     use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](ProControllerContext& context){
 
@@ -488,9 +491,9 @@ void area_zero_platform_run_path2(
         pbf_mash_button(context, BUTTON_L, 480ms);
 //        pbf_wait(context, 1250);
     });
-    use_lets_go_to_clear_in_front(stream, context, tracker, duration > 100, [&](ProControllerContext& context){
+    use_lets_go_to_clear_in_front(stream, context, tracker, duration > 800ms, [&](ProControllerContext& context){
         stream.log("Making location correction...");
-        pbf_move_left_joystick_old(context, 128, 0, duration, 0);
+        pbf_move_left_joystick(context, {0, +1}, duration, 0ms);
 
         //  Optimization, calculate angle to aim you back at the sky.
         //  This speeds up the "find_and_center_on_sky()" call.

@@ -291,7 +291,7 @@ void checkpoint_103(SingleSwitchProgramEnvironment& env, ProControllerContext& c
             }
         ); 
 
-        pbf_move_left_joystick_old(context, 128, 0, 2400ms, 400ms);
+        pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
         pbf_move_left_joystick(context, {+1, 0}, 1600ms, 400ms);
 
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 10000ms);

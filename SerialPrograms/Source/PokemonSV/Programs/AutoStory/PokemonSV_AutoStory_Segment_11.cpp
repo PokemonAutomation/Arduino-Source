@@ -124,9 +124,9 @@ void checkpoint_24(
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 direction.change_direction(env.program_info(), env.console, context, 2.71);
-                pbf_move_left_joystick_old(context, 128, 0, 3000ms, 800ms);
+                pbf_move_left_joystick(context, {0, +1}, 3000ms, 800ms);
                 direction.change_direction(env.program_info(), env.console, context, 1.26);
-                pbf_move_left_joystick_old(context, 128, 0, 14000ms, 800ms);
+                pbf_move_left_joystick(context, {0, +1}, 14000ms, 800ms);
         });        
        
         direction.change_direction(env.program_info(), env.console, context, 2.73);
@@ -153,9 +153,9 @@ void checkpoint_24(
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
-        pbf_move_left_joystick_old(context, 128, 0, 3600ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 3600ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 1.26);
-        pbf_move_left_joystick_old(context, 128, 0, 12800ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 12800ms, 800ms);
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
         
 
@@ -192,14 +192,14 @@ void checkpoint_25(
         context.wait_for_all_requests();
 
         // section 2
-        pbf_move_left_joystick_old(context, 128, 0, 10400ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 10400ms, 800ms);
 
         // section 3
         DirectionDetector direction;
         // we just hope the minimap Direction isn't covered
 
         direction.change_direction(env.program_info(), env.console, context, 6.0);
-        pbf_move_left_joystick_old(context, 128, 0, 5600ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 5600ms, 800ms);
 
         // section 4. align to corner
         direction.change_direction(env.program_info(), env.console, context,  4.69);
@@ -219,7 +219,7 @@ void checkpoint_25(
 
         // section 7
         direction.change_direction(env.program_info(), env.console, context,  1.327);
-        pbf_move_left_joystick_old(context, 128, 0, 5600ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 5600ms, 800ms);
 
         // section 8
         direction.change_direction(env.program_info(), env.console, context,  6.106);
@@ -309,7 +309,7 @@ void checkpoint_26(
         direction.change_direction(env.program_info(), env.console, context,  4.328);
         pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
         direction.change_direction(env.program_info(), env.console, context,  1.22);
-        pbf_move_left_joystick_old(context, 128, 0, 600ms, 400ms);
+        pbf_move_left_joystick(context, {0, +1}, 600ms, 400ms);
 
         // section 2.1 nudge olive straight
         size_t MAX_ATTEMPTS_SECTION_2_1 = 2;
@@ -433,7 +433,7 @@ void checkpoint_26(
         direction.change_direction(env.program_info(), env.console, context,  4.5);
         pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
         direction.change_direction(env.program_info(), env.console, context, 5.86);
-        pbf_move_left_joystick_old(context, 128, 0, 2400ms, 400ms);
+        pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
         direction.change_direction(env.program_info(), env.console, context,  2.76);
         pbf_move_left_joystick(context, {0, +1}, 400ms, 400ms);
 
@@ -517,7 +517,7 @@ void checkpoint_26(
 
         // section 3b. realign using fence.
         direction.change_direction(env.program_info(), env.console, context,  3.0);
-        pbf_move_left_joystick_old(context, 128, 0, 600ms, 400ms);
+        pbf_move_left_joystick(context, {0, +1}, 600ms, 400ms);
         direction.change_direction(env.program_info(), env.console, context,  1.17);
         pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
 
