@@ -192,11 +192,11 @@ bool BerrySession::run_move_iteration(
     //  Move to it.
 
     while (current_index < target_line_index){
-        pbf_press_dpad(m_context, DPAD_DOWN, 10, 30);
+        pbf_press_dpad(m_context, DPAD_DOWN, 80ms, 240ms);
         current_index++;
     }
     while (current_index > target_line_index){
-        pbf_press_dpad(m_context, DPAD_UP, 10, 30);
+        pbf_press_dpad(m_context, DPAD_UP, 80ms, 240ms);
         current_index--;
     }
     m_context.wait_for_all_requests();
@@ -243,7 +243,7 @@ std::string BerrySession::move_to_ingredient(const std::set<std::string>& ingred
         m_stream.log("Ingredient not found on current page. Scrolling up.", COLOR_ORANGE);
 
         //  Not found on page. Scroll to next screen
-        pbf_press_dpad(m_context, DPAD_RIGHT, 10, 30);
+        pbf_press_dpad(m_context, DPAD_RIGHT, 80ms, 240ms);
         m_context.wait_for_all_requests();
         m_context.wait_for(std::chrono::milliseconds(180));
     }
