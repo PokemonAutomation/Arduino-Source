@@ -122,7 +122,7 @@ void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             pbf_move_left_joystick(context, {0, +1}, 2000ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.749788);
-            pbf_move_left_joystick_old(context, 128, 0, 680, 50);
+            pbf_move_left_joystick_old(context, 128, 0, 5440ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 1.589021);
             pbf_move_left_joystick(context, {0, +1}, 4800ms, 400ms);
@@ -248,7 +248,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             pbf_move_left_joystick(context, {0, +1}, 2000ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.749788);
-            pbf_move_left_joystick_old(context, 128, 0, 680, 50);
+            pbf_move_left_joystick_old(context, 128, 0, 5440ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 1.589021);
             pbf_move_left_joystick(context, {0, +1}, 4800ms, 400ms);
@@ -309,10 +309,10 @@ void checkpoint_77(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             pbf_move_left_joystick(context, {0, +1}, 2000ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.749788);
-            pbf_move_left_joystick_old(context, 128, 0, 680, 50);
+            pbf_move_left_joystick_old(context, 128, 0, 5440ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 1.589021);
-            pbf_move_left_joystick_old(context, 128, 0, 1200, 50);
+            pbf_move_left_joystick_old(context, 128, 0, 9600ms, 400ms);
             
             // direction.change_direction(env.program_info(), env.console, context, 1.343606);   //1.327724
            

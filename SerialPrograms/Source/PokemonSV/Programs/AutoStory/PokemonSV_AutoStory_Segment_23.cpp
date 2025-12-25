@@ -84,7 +84,7 @@ void checkpoint_54(
         // flew from Levincia Gym to Levincia North Pokecenter.
         
         direction.change_direction(env.program_info(), env.console, context, 1.341);
-        pbf_move_left_joystick_old(context, 128, 0, 450, 100);
+        pbf_move_left_joystick_old(context, 128, 0, 3600ms, 800ms);
 
         // marker 1
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 160, 0, 35);

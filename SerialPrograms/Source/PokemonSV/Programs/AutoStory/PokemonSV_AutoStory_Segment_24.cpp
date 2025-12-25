@@ -142,11 +142,11 @@ void checkpoint_55(
             pbf_move_left_joystick(context, {0, +1}, 3200ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 5.306);
-            pbf_move_left_joystick_old(context, 128, 0, 700, 100);
+            pbf_move_left_joystick_old(context, 128, 0, 5600ms, 800ms);
 
             
             direction.change_direction(env.program_info(), env.console, context, 4.988);
-            pbf_move_left_joystick_old(context, 128, 0, 800, 100);
+            pbf_move_left_joystick_old(context, 128, 0, 6400ms, 800ms);
             pbf_move_left_joystick(context, {+1, +1}, 4000ms, 800ms);
 
             // now aligned to the wall next to the hole/passage   
@@ -174,13 +174,13 @@ void checkpoint_55(
             // we hope minimap is clear of Pokemon, after Orthworm phase 1
 
             direction.change_direction(env.program_info(), env.console, context, 5.042435);
-            pbf_move_left_joystick_old(context, 128, 0, 900, 100);
+            pbf_move_left_joystick_old(context, 128, 0, 7200ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 5.360763);
             pbf_move_left_joystick(context, {0, +1}, 4000ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 5.85);
-            pbf_move_left_joystick_old(context, 128, 0, 700, 100);
+            pbf_move_left_joystick_old(context, 128, 0, 5600ms, 800ms);
 
             direction.change_direction(env.program_info(), env.console, context, 5.428);
             pbf_move_left_joystick(context, {0, +1}, 4800ms, 800ms);

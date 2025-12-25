@@ -218,7 +218,7 @@ void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 120, {CallbackEnum::OVERWORLD, CallbackEnum::BLACK_DIALOG_BOX});
         pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
-        pbf_move_left_joystick_old(context, 255, 70, 300, 50);
+        pbf_move_left_joystick_old(context, 255, 70, 2400ms, 400ms);
         mash_button_till_overworld(env.console, context, BUTTON_A);
         // clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 120, {CallbackEnum::OVERWORLD, CallbackEnum::BLACK_DIALOG_BOX, CallbackEnum::PROMPT_DIALOG});
 
