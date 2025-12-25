@@ -131,7 +131,7 @@ void route(
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, 6250ms, 160ms);
         pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
-        pbf_move_left_joystick_old(context, 255, 100, 20, 20);
+        pbf_move_left_joystick_old(context, 255, 100, 160ms, 160ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         pbf_move_right_joystick(context, {0, -1}, 200ms, 500ms);
         break;
@@ -141,7 +141,7 @@ void route(
             TravelLocations::instance().Fieldlands_Heights,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 200, 255, 20, 20);
+        pbf_move_left_joystick_old(context, 200, 255, 160ms, 160ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, 3750ms, 160ms);
@@ -157,7 +157,7 @@ void route(
             TravelLocations::instance().Highlands_Highlands,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 255, 145, 20, 20);
+        pbf_move_left_joystick_old(context, 255, 145, 160ms, 160ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         pbf_move_left_joystick_old(context, 127, 0, 5000ms, 500ms);
         break;

@@ -183,7 +183,7 @@ void ThreeSegmentDudunsparceFinder::program(SingleSwitchProgramEnvironment& env,
     ThreeSegmentDudunsparceFinder_Descriptor::Stats& stats = env.current_stats<ThreeSegmentDudunsparceFinder_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 10, 100);
+    pbf_press_button(context, BUTTON_L, 80ms, 800ms);
 
     try{
         for(uint8_t i = 0; i < 6; i++){

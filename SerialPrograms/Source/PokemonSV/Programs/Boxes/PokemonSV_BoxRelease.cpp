@@ -82,7 +82,7 @@ void release_one_pokemon(
             //  Disambiguate with mark change.
             if (change_marks.detect(screenshot)){
                 stream.log("Detected mark change.", COLOR_RED);
-                pbf_press_button(context, BUTTON_B, 20, 20);
+                pbf_press_button(context, BUTTON_B, 160ms, 160ms);
                 expected = 0;
                 continue;
             }
@@ -98,7 +98,7 @@ void release_one_pokemon(
                 consecutive_box_neutrals++;
 //                cout << "consecutive_box_neutrals = " << consecutive_box_neutrals << endl;
                 if (consecutive_box_neutrals >= 5){
-                    pbf_press_button(context, BUTTON_B, 20, 20);
+                    pbf_press_button(context, BUTTON_B, 160ms, 160ms);
                     expected = 0;
                     continue;
                 }
@@ -111,7 +111,7 @@ void release_one_pokemon(
                 }
                 release_attempted = false;
                 release_completed = false;
-                pbf_press_button(context, BUTTON_A, 20, 20);
+                pbf_press_button(context, BUTTON_A, 160ms, 160ms);
                 expected = 1;
                 continue;
             }else{
@@ -144,7 +144,7 @@ void release_one_pokemon(
                 errors++;
             }
             pbf_press_dpad(context, DPAD_UP, 80ms, 80ms);
-            pbf_press_button(context, BUTTON_A, 20, 20);
+            pbf_press_button(context, BUTTON_A, 160ms, 160ms);
             release_attempted = true;
             expected = 3;
             continue;
@@ -156,7 +156,7 @@ void release_one_pokemon(
                 errors++;
             }
             pbf_press_dpad(context, DPAD_UP, 80ms, 80ms);
-            pbf_press_button(context, BUTTON_A, 20, 20);
+            pbf_press_button(context, BUTTON_A, 160ms, 160ms);
             release_completed = true;
             expected = 0;
             continue;

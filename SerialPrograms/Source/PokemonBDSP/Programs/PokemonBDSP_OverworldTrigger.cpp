@@ -136,25 +136,25 @@ bool OverworldTrigger::find_encounter(VideoStream& stream, ProControllerContext&
 
         //  Go to the pokemon that knows Sweet Scent
         const size_t location = SWEET_SCENT_POKEMON_LOCATION.current_value();
-        const uint16_t change_pokemon_delay = 20;
+        const Milliseconds change_pokemon_delay = 160ms;
         if (location >= 1 && location <= 3){
             const size_t move_down_times = location;
             for(size_t i = 0; i < move_down_times; ++i){
-                pbf_press_dpad(context, DPAD_DOWN, 20, change_pokemon_delay);
+                pbf_press_dpad(context, DPAD_DOWN, 160ms, change_pokemon_delay);
             }
         }else if (location >= 1){ // for location 4 and 5
             const size_t move_down_times = 6 - location;
             for (size_t i = 0; i < move_down_times; ++i){
-                pbf_press_dpad(context, DPAD_UP, 20, change_pokemon_delay);
+                pbf_press_dpad(context, DPAD_UP, 160ms, change_pokemon_delay);
             }
         }
 
         //  Open the pokemon menu of the selected pokemon
-        const uint16_t pokemon_to_pokemon_menu_delay = 30;
-        pbf_press_button(context, BUTTON_ZL, 20, pokemon_to_pokemon_menu_delay);
+        const Milliseconds pokemon_to_pokemon_menu_delay = 240ms;
+        pbf_press_button(context, BUTTON_ZL, 160ms, pokemon_to_pokemon_menu_delay);
         //  Move down one menuitem to select "Sweet Scent"
-        const uint16_t move_pokemon_menu_item_delay = 30;
-        pbf_press_dpad(context, DPAD_DOWN, 20, move_pokemon_menu_item_delay);
+        const Milliseconds move_pokemon_menu_item_delay = 240ms;
+        pbf_press_dpad(context, DPAD_DOWN, 160ms, move_pokemon_menu_item_delay);
         //  Use sweet scent
         pbf_mash_button_old(context, BUTTON_ZL, 30);
 

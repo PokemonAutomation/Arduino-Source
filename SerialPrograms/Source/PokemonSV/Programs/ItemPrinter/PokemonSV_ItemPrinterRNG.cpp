@@ -371,7 +371,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
             env.log("Detected prompt dialog.");
             go_home(env.console, context);
             home_to_date_time(env.console, context, true);
-            pbf_press_button(context, BUTTON_A, 10, 30);
+            pbf_press_button(context, BUTTON_A, 80ms, 240ms);
             context.wait_for_all_requests();
             next_wait_time = std::chrono::seconds(5);
             continue;
@@ -991,7 +991,7 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
 
         case 2:{
             env.log("Detected prompt dialog. Entering item printer.");
-            pbf_press_button(context, BUTTON_A, 10, 30);
+            pbf_press_button(context, BUTTON_A, 80ms, 240ms);
             context.wait_for_all_requests();
             continue;
         }

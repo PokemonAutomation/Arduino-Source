@@ -389,7 +389,7 @@ void ClaimMysteryGift::program(SingleSwitchProgramEnvironment& env, ProControlle
 
 
     // Connect controller
-    pbf_press_button(context, BUTTON_L, 20, 20);
+    pbf_press_button(context, BUTTON_L, 160ms, 160ms);
 
 
     if (STARTING_POINT == StartingPoint::NEW_GAME){

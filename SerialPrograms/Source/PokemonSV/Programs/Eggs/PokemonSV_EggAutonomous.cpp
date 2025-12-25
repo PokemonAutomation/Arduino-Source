@@ -198,7 +198,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     assert_16_9_720p_min(env.logger(), env.console);
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 10, 100);
+    pbf_press_button(context, BUTTON_L, 80ms, 800ms);
 
     {
         // reset_position_to_flying_spot(env, context);

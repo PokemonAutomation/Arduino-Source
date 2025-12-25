@@ -126,7 +126,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
                 for (size_t c = 0; c < 17; c++){
                     pbf_press_dpad(context, DPAD_UP, 5, 10);
                     pbf_press_button(context, BUTTON_ZL, 80ms, 80ms);
-                    pbf_press_dpad(context, DPAD_RIGHT, 20, 10);
+                    pbf_press_dpad(context, DPAD_RIGHT, 160ms, 80ms);
                     pbf_press_button(context, BUTTON_ZL, 80ms, 80ms);
                 }
             },
@@ -293,8 +293,8 @@ void MoneyFarmerRoute210::fly_to_center_heal_and_return(
     logger.log("Flying back to Hearthome City to heal.");
     pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
     pbf_press_button(context, BUTTON_PLUS, 10, 240);
-    pbf_press_dpad(context, DPAD_LEFT, 10, 60);
-    pbf_press_dpad(context, DPAD_LEFT, 10, 60);
+    pbf_press_dpad(context, DPAD_LEFT, 80ms, 480ms);
+    pbf_press_dpad(context, DPAD_LEFT, 80ms, 480ms);
     pbf_mash_button(context, BUTTON_ZL, 12000ms);
     heal_at_center_and_return(logger, context, pp0, pp1);
 }

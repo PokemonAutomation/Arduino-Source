@@ -52,11 +52,11 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     while (true){
         pbf_press_button(context, BUTTON_A, 10, 90);
         if (CATEGORY_ROTATION){
-            pbf_press_dpad(context, DPAD_RIGHT, 10, 40);
+            pbf_press_dpad(context, DPAD_RIGHT, 80ms, 320ms);
         }
         pbf_press_button(context, BUTTON_A, 10, 90);
         pbf_press_button(context, BUTTON_A, 10, 90);
-        pbf_press_dpad(context, DPAD_DOWN, 10, 40);
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 320ms);
     }
 }
 

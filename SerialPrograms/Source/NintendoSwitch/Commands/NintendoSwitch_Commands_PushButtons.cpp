@@ -71,7 +71,7 @@ void pbf_mash_button(ProControllerContext& context, Button button, Milliseconds 
 }
 
 void grip_menu_connect_go_home(ProControllerContext& context){
-    pbf_press_button(context, BUTTON_L | BUTTON_R, 10, 40);
+    pbf_press_button(context, BUTTON_L | BUTTON_R, 80ms, 320ms);
     pbf_press_button(context, BUTTON_A, 10, 140);
     pbf_press_button(context, BUTTON_HOME, 80ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 }

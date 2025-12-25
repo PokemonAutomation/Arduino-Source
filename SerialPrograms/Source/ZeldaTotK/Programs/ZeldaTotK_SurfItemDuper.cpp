@@ -109,7 +109,7 @@ void SurfItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         pbf_press_button(context, BUTTON_A, 80ms, 80ms);
 
         //Now press Y (sort) and B (exit) at the same time
-        pbf_press_button(context, BUTTON_B | BUTTON_Y, 10, 40);
+        pbf_press_button(context, BUTTON_B | BUTTON_Y, 80ms, 320ms);
 
         //Drop to the ground
         pbf_press_button(context, BUTTON_B, 160ms, 400ms);

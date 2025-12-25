@@ -226,7 +226,7 @@ void run_autohost(
     //  Select a move.
     if (move_slot > 0){
         pbf_wait(context, delay_to_select_move);
-        pbf_press_button(context, BUTTON_A, 20, 80);
+        pbf_press_button(context, BUTTON_A, 160ms, 640ms);
         if (dynamax){
             pbf_press_dpad(context, DPAD_LEFT, 160ms, 240ms);
             pbf_press_button(context, BUTTON_A, 20, 60);
@@ -234,13 +234,13 @@ void run_autohost(
         for (uint8_t c = 1; c < move_slot; c++){
             pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
         }
-        pbf_press_button(context, BUTTON_A, 20, 80);
+        pbf_press_button(context, BUTTON_A, 160ms, 640ms);
 
         // Disable the troll hosting option if the dynamax is set to TRUE.
         if (!dynamax && troll_hosting > 0){
-            pbf_press_dpad(context, DPAD_DOWN, 20, 80);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 640ms);
             for (uint8_t c = 0; c < troll_hosting; c++){
-                pbf_press_dpad(context, DPAD_RIGHT, 20, 80);
+                pbf_press_dpad(context, DPAD_RIGHT, 160ms, 640ms);
             }
         }
 

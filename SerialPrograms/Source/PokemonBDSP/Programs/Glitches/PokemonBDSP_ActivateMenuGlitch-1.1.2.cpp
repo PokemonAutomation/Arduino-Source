@@ -121,8 +121,8 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProCont
     pbf_wait(context, 3000ms);
 
     //  Move to escalator.
-    pbf_press_dpad(context, DPAD_UP, 20, 125);
-    pbf_press_dpad(context, DPAD_UP, 20, 125);
+    pbf_press_dpad(context, DPAD_UP, 160ms, 1000ms);
+    pbf_press_dpad(context, DPAD_UP, 160ms, 1000ms);
     pbf_move_left_joystick(context, {+1, 0}, 2000ms, 5000ms);
 
     //  Re-enter escalator.

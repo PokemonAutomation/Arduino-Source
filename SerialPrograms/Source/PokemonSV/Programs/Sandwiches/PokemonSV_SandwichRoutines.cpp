@@ -67,7 +67,7 @@ bool enter_sandwich_recipe_list(
     stream.log("Opening sandwich menu at picnic table.");
 
     // Firt, try pressing button A to bring up the menu to make sandwich
-    pbf_press_button(context, BUTTON_A, 20, 80);
+    pbf_press_button(context, BUTTON_A, 160ms, 640ms);
 
     WallClock start = current_time();
     bool opened_table_menu = false;
@@ -95,7 +95,7 @@ bool enter_sandwich_recipe_list(
             stream.log("Detected picnic. Maybe button A press dropped.");
             // walk forward and press A again
             pbf_move_left_joystick(context, {0, +1}, 800ms, 320ms);
-            pbf_press_button(context, BUTTON_A, 20, 80);
+            pbf_press_button(context, BUTTON_A, 160ms, 640ms);
             continue;
         case 1:
             stream.log("Detected \"make a sandwich\" menu item selection arrrow.");
@@ -114,7 +114,7 @@ bool enter_sandwich_recipe_list(
                 stream.overlay().add_log("No ingredient!", COLOR_RED);
                 return false;
             }
-            pbf_press_button(context, BUTTON_A, 20, 80);
+            pbf_press_button(context, BUTTON_A, 160ms, 640ms);
             continue;
         default:
             dump_image_and_throw_recoverable_exception(info, stream, "NotEnterSandwichList",
@@ -1168,7 +1168,7 @@ void run_sandwich_maker(
         stream.log("Re-centering plates if needed.");
         stream.overlay().add_log("Re-centering plates if needed.");
         for (int i = 0; i < (plates - 3); i++){
-            pbf_press_button(context, BUTTON_L, 20, 80);
+            pbf_press_button(context, BUTTON_L, 160ms, 640ms);
         }
 
         //If a label fails to read it'll cause issues down the line
@@ -1272,7 +1272,7 @@ void run_sandwich_maker(
             case 3: case 4: case 5: case 6:
                 //Press R the appropriate number of times
                 for (int k = 2; k < plate_index.at(j); k++){
-                    pbf_press_button(context, BUTTON_R, 20, 80);
+                    pbf_press_button(context, BUTTON_R, 160ms, 640ms);
                 }
                 target_plate = left_plate;
                 target_plate_label = SandwichPlateDetector::Side::LEFT;
@@ -1331,7 +1331,7 @@ void run_sandwich_maker(
 
             //Reset plate positions
             for (int k = 2; k < plate_index.at(j); k++){
-                pbf_press_button(context, BUTTON_L, 20, 80);
+                pbf_press_button(context, BUTTON_L, 160ms, 640ms);
             }
         }
     }

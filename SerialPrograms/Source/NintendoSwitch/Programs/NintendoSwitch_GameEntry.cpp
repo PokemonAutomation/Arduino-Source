@@ -265,7 +265,7 @@ void resume_game_from_home(
             if (ret == 0){
                 console.log("Detected update window.", COLOR_RED);
 
-                pbf_press_dpad(context, DPAD_UP, 5, 0);
+                pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);
                 pbf_press_button(context, BUTTON_A, 10, 500);
                 context.wait_for_all_requests();
                 continue;
@@ -486,7 +486,7 @@ void start_game_from_home_with_inference(
             break;
         case 2:
             console.log("Detected update menu.", COLOR_RED);
-            pbf_press_dpad(context, DPAD_UP, 5, 0);
+            pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case 3:

@@ -435,8 +435,8 @@ void overworld_navigation(
                     "overworld_navigation(): Unexpectedly detected dialog.",
                     stream
                 );
-            }          
-            pbf_press_button(context, BUTTON_A, 20, 20);
+            }
+            pbf_press_button(context, BUTTON_A, 160ms, 160ms);
             break;
         case 2: // marker
             stream.log("overworld_navigation: Detected marker.");
@@ -460,7 +460,7 @@ void overworld_navigation(
 
 void config_option(ProControllerContext& context, int change_option_value){
     for (int i = 0; i < change_option_value; i++){
-        pbf_press_dpad(context, DPAD_RIGHT, 13, 20);
+        pbf_press_dpad(context, DPAD_RIGHT, 104ms, 160ms);
     }
     pbf_press_dpad(context, DPAD_DOWN,  13, 20);
 }
@@ -478,10 +478,10 @@ void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContex
     // enter Pokemon summary screen
     pbf_press_button(context, BUTTON_A, 160ms, 5000ms);
     pbf_press_dpad(context, DPAD_RIGHT, 120ms, 1000ms);
-    pbf_press_button(context, BUTTON_Y, 20, 40);
+    pbf_press_button(context, BUTTON_Y, 160ms, 320ms);
 
     // select move 1
-    pbf_press_button(context, BUTTON_A, 20, 40);  
+    pbf_press_button(context, BUTTON_A, 160ms, 320ms);  
     pbf_press_dpad(context, DPAD_DOWN,  15, 40);
     pbf_press_dpad(context, DPAD_DOWN,  15, 40);
     // extra button presses to avoid drops
@@ -489,7 +489,7 @@ void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContex
     pbf_press_dpad(context, DPAD_DOWN,  15, 40);
 
     // select move 3. swap move 1 and move 3.
-    pbf_press_button(context, BUTTON_A, 20, 40);    
+    pbf_press_button(context, BUTTON_A, 160ms, 320ms);    
 
     // confirm that Ember/Leafage/Water Gun is in slot 1
     context.wait_for_all_requests();
@@ -523,7 +523,7 @@ void confirm_lead_pokemon_moves(SingleSwitchProgramEnvironment& env, ProControll
     // enter Pokemon summary screen
     pbf_press_button(context, BUTTON_A, 160ms, 5000ms);
     pbf_press_dpad(context, DPAD_RIGHT, 120ms, 1000ms);
-    pbf_press_button(context, BUTTON_Y, 20, 40);
+    pbf_press_button(context, BUTTON_Y, 160ms, 320ms);
 
     // confirm that moves are: Moonblast, Mystical Fire, Psychic, Misty Terrain
     context.wait_for_all_requests();
@@ -1134,7 +1134,7 @@ void get_off_ride(const ProgramInfo& info, VideoStream& stream, ProControllerCon
 }
 
 void get_on_or_off_ride(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, bool get_on){
-    pbf_press_button(context, BUTTON_PLUS, 20, 20);
+    pbf_press_button(context, BUTTON_PLUS, 160ms, 160ms);
 
     WallClock start = current_time();
     while (get_on != is_ride_active(info, stream, context)){

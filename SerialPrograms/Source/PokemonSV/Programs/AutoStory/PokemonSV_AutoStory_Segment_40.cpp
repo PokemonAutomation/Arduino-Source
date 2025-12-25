@@ -127,11 +127,11 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
 
         wait_for_gradient_arrow(env.program_info(), env.console, context, {0.75, 0.62, 0.05, 0.35}, 30);
 
-        pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+        pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
         pbf_mash_button_old(context, BUTTON_A, 20);
 
         pbf_wait(context, 1000ms);
-        pbf_press_dpad(context, DPAD_UP, 13, 20);
+        pbf_press_dpad(context, DPAD_UP, 104ms, 160ms);
         pbf_mash_button_old(context, BUTTON_A, 500);
 
         env.console.log("Battle AI Professor's Koraidon/Miraidon.");
@@ -156,7 +156,7 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
             env.console, context,
             [](ProControllerContext& context){
                 for (int i = 0; i < 10; i++){
-                    pbf_press_button(context, BUTTON_X, 20, 250);
+                    pbf_press_button(context, BUTTON_X, 160ms, 2000ms);
                 }
             },
             {tutorial}

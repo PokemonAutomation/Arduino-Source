@@ -221,11 +221,11 @@ bool IngredientSession::run_move_iteration(
     // Move cursor to target ingredient
     m_stream.log("Found desired ingredient " + item + " on current page. Moving towards it...", COLOR_BLUE);
     while (current_index < target_line_index){
-        pbf_press_dpad(m_context, DPAD_DOWN, 10, 30);
+        pbf_press_dpad(m_context, DPAD_DOWN, 80ms, 240ms);
         current_index++;
     }
     while (current_index > target_line_index){
-        pbf_press_dpad(m_context, DPAD_UP, 10, 30);
+        pbf_press_dpad(m_context, DPAD_UP, 80ms, 240ms);
         current_index--;
     }
     m_context.wait_for_all_requests();
@@ -280,7 +280,7 @@ std::string IngredientSession::move_to_ingredient(const std::map<std::string, ui
 
         m_stream.log("Ingredient not found on current page. Jumping down.", COLOR_ORANGE);
         // Press DPAD_RIGHT to jump to the next screen to have a full page of ingredients to check
-        pbf_press_dpad(m_context, DPAD_RIGHT, 10, 30);
+        pbf_press_dpad(m_context, DPAD_RIGHT, 80ms, 240ms);
         m_context.wait_for_all_requests();
         m_context.wait_for(std::chrono::milliseconds(180));
     }

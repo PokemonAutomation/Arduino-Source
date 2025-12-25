@@ -90,7 +90,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     }else{
-        pbf_press_button(context, BUTTON_R, 5, 50);
+        pbf_press_button(context, BUTTON_R, 40ms, 400ms);
     }
 
 
@@ -292,7 +292,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         //  Are in a correct state to cook again.
         pbf_move_left_joystick_old(context, 0xff, 0x80, 125, 5);
         pbf_move_left_joystick_old(context, 0x80, 0x00, 125, 5);
-        pbf_move_left_joystick_old(context, 0x80, 0x00, 5, 50);
+        pbf_move_left_joystick_old(context, 0x80, 0x00, 40ms, 400ms);
         pbf_press_button(context, BUTTON_A, 5, 250);    //  Wait 2 seconds to be sure the following X press won't be dropped.
 
         //  And now we cook another curry.

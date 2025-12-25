@@ -86,7 +86,7 @@ void checkpoint_12(
         context.wait_for_all_requests();
 
         // re-orient camera
-        pbf_press_button(context, BUTTON_L, 20, 20);
+        pbf_press_button(context, BUTTON_L, 160ms, 160ms);
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 walk_forward_while_clear_front_path(env.program_info(), env.console, context, 35);

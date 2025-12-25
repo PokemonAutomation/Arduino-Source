@@ -56,7 +56,7 @@ void return_to_plaza(const ProgramInfo& info, VideoStream& stream, ProController
                 }
 
                 //Move cursor to top left corner - even works when at Entrance fly point
-                pbf_press_button(context, BUTTON_ZL, 40, 100);
+                pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
                 pbf_move_left_joystick_old(context, 0, 0, 500, 40);
 
                 //Now move toward center
@@ -65,7 +65,7 @@ void return_to_plaza(const ProgramInfo& info, VideoStream& stream, ProController
                 }else{
                     pbf_move_left_joystick(context, {+1, -1}, 2000ms, 320ms); //250 is more accurate but 300 helps with lag
                 }
-                pbf_press_button(context, BUTTON_ZR, 40, 100);
+                pbf_press_button(context, BUTTON_ZR, 320ms, 800ms);
 
                 try{
                     //The only pokecenter on the map is Central Plaza
@@ -126,7 +126,7 @@ void map_move_cursor_fly(
         try{
             open_map_from_overworld(info, stream, context);
             pbf_move_left_joystick_old(context, x, y, hold, release);
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
+            pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
             fly_to_overworld_from_map(info, stream, context);
             break;
         }

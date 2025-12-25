@@ -528,7 +528,7 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
     context.wait_for_all_requests();
 
     //Next dialog is prize dialog - wait until all dialog has appeared then check prize
-    pbf_press_button(context, BUTTON_A, 10, 100);
+    pbf_press_button(context, BUTTON_A, 80ms, 800ms);
     pbf_wait(context, 100);
     context.wait_for_all_requests();
 

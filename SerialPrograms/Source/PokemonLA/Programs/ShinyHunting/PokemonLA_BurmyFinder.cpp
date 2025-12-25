@@ -421,7 +421,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_press_button(context, BUTTON_Y, 4200ms, 0ms);
                 pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
                 pbf_move_left_joystick_old(context, 0, 127, 1500ms, 500ms);
-                pbf_press_button(context, BUTTON_ZL, 20, 20);
+                pbf_press_button(context, BUTTON_ZL, 160ms, 160ms);
                 pbf_move_right_joystick(context, {0, -1}, 500ms, 160ms);
                 last_checked_tree = 7;
                 check_tree_no_stop(env, context);
@@ -478,7 +478,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
             case 3:
                 //============ Tree 12=============//
                 env.console.log("Checking tree: 12");
-                pbf_move_left_joystick_old(context, 148, 255, 20, 20);
+                pbf_move_left_joystick_old(context, 148, 255, 160ms, 160ms);
                 change_mount(env.console, context, MountState::BRAVIARY_ON);
                 pbf_press_button(context, BUTTON_B, 9700ms, 160ms);
                 pbf_press_button(context, BUTTON_Y, 2200ms, 160ms);
@@ -491,7 +491,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
 
                 //============ Tree 13=============//
                 env.console.log("Checking tree: 13");
-                pbf_move_left_joystick_old(context, 148, 0, 20, 20);
+                pbf_move_left_joystick_old(context, 148, 0, 160ms, 160ms);
                 change_mount(env.console, context, MountState::BRAVIARY_ON);
                 context.wait_for_all_requests();
                 enable_shiny_sound(context);
@@ -637,7 +637,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, ProController
             change_mount(env.console, context, MountState::BRAVIARY_ON);
             pbf_press_button(context, BUTTON_B, 8800ms, 0ms);
             pbf_press_button(context, BUTTON_Y, 4400ms, 0ms);
-            pbf_press_button(context, BUTTON_PLUS, 20, 20);
+            pbf_press_button(context, BUTTON_PLUS, 160ms, 160ms);
             if (check_tree(env, context)){
                 tree_counter.tree[8]++;
             }
@@ -650,7 +650,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, ProController
             change_mount(env.console, context, MountState::BRAVIARY_ON);
             pbf_press_button(context, BUTTON_B, 11700ms, 0ms);
             pbf_press_button(context, BUTTON_Y, 3800ms, 0ms);
-            pbf_press_button(context, BUTTON_PLUS, 20, 20);
+            pbf_press_button(context, BUTTON_PLUS, 160ms, 160ms);
             if (check_tree(env, context)){
                 tree_counter.tree[8]++;
             }
@@ -663,7 +663,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, ProController
             change_mount(env.console, context, MountState::BRAVIARY_ON);
             pbf_press_button(context, BUTTON_B, 10400ms, 0ms);
             pbf_press_button(context, BUTTON_Y, 3800ms, 0ms);
-            pbf_press_button(context, BUTTON_PLUS, 20, 20);
+            pbf_press_button(context, BUTTON_PLUS, 160ms, 160ms);
             if (check_tree(env, context)){
                 tree_counter.tree[8]++;
             }
@@ -676,7 +676,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, ProController
             change_mount(env.console, context, MountState::BRAVIARY_ON);
             pbf_press_button(context, BUTTON_B, 11400ms, 0ms);
             pbf_press_button(context, BUTTON_Y, 3800ms, 0ms);
-            pbf_press_button(context, BUTTON_PLUS, 20, 20);
+            pbf_press_button(context, BUTTON_PLUS, 160ms, 160ms);
             if (check_tree(env, context)){
                 tree_counter.tree[11]++;
             }
@@ -701,7 +701,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, ProController
         if (last_tree < 14){
             env.console.log("Heading to Tree 14");
             go_to_height_camp(env, context);
-            pbf_move_left_joystick_old(context, 108, 255, 20, 20);
+            pbf_move_left_joystick_old(context, 108, 255, 160ms, 160ms);
             change_mount(env.console, context, MountState::BRAVIARY_ON);
             pbf_press_button(context, BUTTON_B, 8700ms, 1000ms);
             pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);

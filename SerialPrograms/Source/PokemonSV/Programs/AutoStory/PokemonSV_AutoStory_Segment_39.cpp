@@ -84,8 +84,8 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         pbf_move_left_joystick(context, {0, -1}, 1600ms, 800ms);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 10000ms, 255, 128);
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
-        pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-        pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+        pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
+        pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
 
         // go to Station 2
         pbf_mash_button_old(context, BUTTON_A, 50);

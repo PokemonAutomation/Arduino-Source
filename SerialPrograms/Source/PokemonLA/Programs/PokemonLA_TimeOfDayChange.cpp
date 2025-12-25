@@ -34,7 +34,7 @@ void change_time_of_day_at_tent(
         break;
     
     case Camp::FIELDLANDS_HEIGHTS:
-        pbf_move_left_joystick_old(context, 95, 0, 250, 20);
+        pbf_move_left_joystick_old(context, 95, 0, 2000ms, 160ms);
         break;
     
     case Camp::MIRELANDS_MIRELANDS:
@@ -108,7 +108,7 @@ void change_time_of_day_at_tent(
         dpad_dir = DPAD_UP;
     }
     for(int i = 0; i < num_movements; i++){
-        pbf_press_dpad(context, dpad_dir, 30, 70);
+        pbf_press_dpad(context, dpad_dir, 240ms, 560ms);
     }
 
     // Press A to start resting

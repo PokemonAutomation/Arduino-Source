@@ -126,9 +126,9 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         wait_for_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078}, 10);
 
         env.console.log("Leave dorm for schoolyard.");
-        pbf_press_dpad(context, DPAD_UP, 13, 20);
-        pbf_press_dpad(context, DPAD_LEFT, 13, 20);
-        pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+        pbf_press_dpad(context, DPAD_UP, 104ms, 160ms);
+        pbf_press_dpad(context, DPAD_LEFT, 104ms, 160ms);
+        pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
         wait_for_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.790, 0.047, 0.078}, 10);
         pbf_mash_button(context, BUTTON_A, 1000ms);
 
@@ -158,9 +158,9 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         wait_for_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078}, 10);
 
         env.console.log("Leave dorm for Director's office.");
-        pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-        pbf_press_dpad(context, DPAD_RIGHT, 13, 20);
-        pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+        pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
+        pbf_press_dpad(context, DPAD_RIGHT, 104ms, 160ms);
+        pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
         wait_for_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.345, 0.047, 0.078}, 10);
         pbf_mash_button(context, BUTTON_A, 1000ms);
 

@@ -58,8 +58,8 @@ void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, ProCont
     pbf_mash_button(context, BUTTON_B, 5000ms);
 
 
-    pbf_press_button(context, BUTTON_R, 5, 0);
-    pbf_press_dpad(context, DPAD_RIGHT, 10, 115);
+    pbf_press_button(context, BUTTON_R, 40ms, 0ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 80ms, 920ms);
     pbf_press_button(context, BUTTON_ZL, 80ms, 0ms);
     context.wait_for_all_requests();
     MapWatcher detector;

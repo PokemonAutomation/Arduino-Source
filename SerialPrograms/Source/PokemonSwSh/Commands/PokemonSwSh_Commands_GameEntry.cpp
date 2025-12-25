@@ -164,7 +164,7 @@ void start_game_from_home(
                 ssf_issue_scroll_ptv(context, DPAD_RIGHT, 160ms, 160ms);
             }
         }
-        pbf_press_button(context, BUTTON_A, 20, 20);        //  Enter game
+        pbf_press_button(context, BUTTON_A, 160ms, 160ms);        //  Enter game
 
         //  Switch to mashing ZR instead of A to get into the game.
         //  Mash your way into the game.

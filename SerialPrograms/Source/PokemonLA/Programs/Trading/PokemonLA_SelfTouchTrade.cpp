@@ -130,14 +130,14 @@ bool SelfTouchTrade::move_to_next(Logger& logger, ProControllerContext& host, ui
 
     logger.log("Moving to next slot.");
     if (col < 5){
-        pbf_press_dpad(host, DPAD_RIGHT, 20, 140);
+        pbf_press_dpad(host, DPAD_RIGHT, 160ms, 1120ms);
         col++;
         return false;
     }
     if (row < 4){
         pbf_press_dpad(host, DPAD_RIGHT, 160ms, 840ms);
         pbf_press_dpad(host, DPAD_RIGHT, 160ms, 840ms);
-        pbf_press_dpad(host, DPAD_DOWN, 20, 140);
+        pbf_press_dpad(host, DPAD_DOWN, 160ms, 1120ms);
         col = 0;
         row++;
         return false;
@@ -145,7 +145,7 @@ bool SelfTouchTrade::move_to_next(Logger& logger, ProControllerContext& host, ui
     pbf_press_button(host, BUTTON_R, 160ms, 1840ms);
     pbf_press_dpad(host, DPAD_RIGHT, 160ms, 840ms);
     pbf_press_dpad(host, DPAD_RIGHT, 160ms, 840ms);
-    pbf_press_dpad(host, DPAD_DOWN, 20, 140);
+    pbf_press_dpad(host, DPAD_DOWN, 160ms, 1120ms);
     col = 0;
     row = 0;
     return true;

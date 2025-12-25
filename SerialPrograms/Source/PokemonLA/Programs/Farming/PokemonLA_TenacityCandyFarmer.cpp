@@ -255,7 +255,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Pro
                 // Change opponent to Froslass as Froslass is fast and Avalugg is slow.
                 // So better to finish Forslass first so that we may move immediately to finish Avalugg
                 // without taking damage.
-                pbf_press_button(context, BUTTON_ZL, 10, 100);
+                pbf_press_button(context, BUTTON_ZL, 80ms, 800ms);
             }
 
             // Press A to select moves

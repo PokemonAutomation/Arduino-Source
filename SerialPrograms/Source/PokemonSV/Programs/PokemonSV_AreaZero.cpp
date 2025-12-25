@@ -187,7 +187,7 @@ void return_to_outside_zero_gate(
     VideoStream& stream, ProControllerContext& context
 ){
     open_map_from_overworld(info, stream, context);
-    pbf_move_left_joystick_old(context, 96, 96, 5, 50);
+    pbf_move_left_joystick_old(context, 96, 96, 40ms, 400ms);
     fly_to_overworld_from_map(info, stream, context);
 }
 void return_to_inside_zero_gate(

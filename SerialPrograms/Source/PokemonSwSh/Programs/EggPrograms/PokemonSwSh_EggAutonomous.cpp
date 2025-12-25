@@ -762,8 +762,8 @@ bool EggAutonomous::process_hatched_pokemon(
                 dialog_detector.make_overlays(dialog_overlay_set);
 
                 // Move cursor upward two times to point to "Release" menu item
-                pbf_press_dpad(context, DPAD_UP, 20, 20);
-                pbf_press_dpad(context, DPAD_UP, 20, 20);
+                pbf_press_dpad(context, DPAD_UP, 160ms, 160ms);
+                pbf_press_dpad(context, DPAD_UP, 160ms, 160ms);
 
                 // Press A to release
                 pbf_press_button(context, BUTTON_A, 160ms, 840ms);

@@ -188,7 +188,13 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, ProControllerContext&
 }
 
 //Move the cursor to the given coordinates, knowing current pos via the cursor struct
-[[nodiscard]] BoxCursor move_cursor_to(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const BoxCursor& cur_cursor, const BoxCursor& dest_cursor, uint16_t GAME_DELAY){
+[[nodiscard]] BoxCursor move_cursor_to(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    const BoxCursor& cur_cursor,
+    const BoxCursor& dest_cursor,
+    uint16_t GAME_DELAY
+){
 
     std::ostringstream ss;
     ss << "Moving cursor from " << cur_cursor << " to " << dest_cursor;

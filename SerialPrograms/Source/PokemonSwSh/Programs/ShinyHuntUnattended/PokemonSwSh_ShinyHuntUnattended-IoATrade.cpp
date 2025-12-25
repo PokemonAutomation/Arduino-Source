@@ -89,9 +89,9 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, P
     for (uint32_t c = 0; ; c++){
         env.log("Starting Trade: " + tostr_u_commas(c + 1));
 
-        pbf_press_button(context, BUTTON_A, 10, 100);
-        pbf_press_button(context, BUTTON_A, 10, 60);
-        pbf_press_button(context, BUTTON_A, 10, 100);
+        pbf_press_button(context, BUTTON_A, 80ms, 800ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 480ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 800ms);
         pbf_press_button(context, BUTTON_A, 80ms, 400ms);
         pbf_press_button(context, BUTTON_A, 80ms, GameSettings::instance().POKEMON_TO_BOX_DELAY0);
         pbf_press_dpad(context, DPAD_LEFT, 80ms, 80ms);
@@ -124,8 +124,8 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, P
         pbf_press_button(context, BUTTON_A, 10, 350);
 
         //  Fly to Route 10.
-        pbf_press_button(context, BUTTON_L, 10, 100);
-        pbf_press_button(context, BUTTON_L, 10, 100);
+        pbf_press_button(context, BUTTON_L, 80ms, 800ms);
+        pbf_press_button(context, BUTTON_L, 80ms, 800ms);
         pbf_press_dpad(context, DPAD_RIGHT, 15, 10);
         pbf_press_dpad(context, DPAD_DOWN, 30, 10);
         pbf_mash_button(context, BUTTON_A, FLY_DURATION0);

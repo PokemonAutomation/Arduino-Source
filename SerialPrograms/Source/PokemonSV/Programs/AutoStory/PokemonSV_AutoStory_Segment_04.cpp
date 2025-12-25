@@ -109,7 +109,7 @@ void checkpoint_08(
             env.console, context,
             [](ProControllerContext& context){
                 for (int i = 0; i < 10; i++){
-                    pbf_press_dpad(context, DPAD_UP, 20, 250);
+                    pbf_press_dpad(context, DPAD_UP, 160ms, 2000ms);
                 }
             },
             {arrow}
@@ -185,7 +185,7 @@ void checkpoint_08(
                 pbf_move_left_joystick_old(context, 128, 20, 2000ms, 160ms);
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 255, 90, 20);
                 pbf_move_left_joystick_old(context, 128, 20, 8000ms, 8000ms);
-                pbf_press_button(context, BUTTON_L, 20, 20);
+                pbf_press_button(context, BUTTON_L, 160ms, 160ms);
             }
         );
         

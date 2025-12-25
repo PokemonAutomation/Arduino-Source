@@ -92,7 +92,7 @@ void from_professor_return_to_jubilife(
             stream, context,
             [](ProControllerContext& context){
                 for (size_t c = 0; c < 20; c++){
-                    pbf_press_button(context, BUTTON_A, 20, 125);
+                    pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
                 }
             },
             {
@@ -110,7 +110,7 @@ void from_professor_return_to_jubilife(
             return;
         case 1:
             stream.log("Detected report research option...");
-            pbf_press_button(context, BUTTON_A, 20, 125);
+            pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
             break;
         case 2:
             stream.log("Backing out of Pokedex...");
@@ -280,7 +280,7 @@ void goto_camp_from_jubilife(
         if (current_region == location.region){
             break;
         }
-        pbf_press_dpad(context, direction, 20, 40);
+        pbf_press_dpad(context, direction, 160ms, 320ms);
         context.wait_for_all_requests();
     }
     if (current_region != location.region){

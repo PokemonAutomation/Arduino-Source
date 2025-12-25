@@ -90,7 +90,7 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     EggFetcher_Descriptor::Stats& stats = env.current_stats<EggFetcher_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 10, 100);
+    pbf_press_button(context, BUTTON_L, 80ms, 800ms);
 
     size_t num_eggs_collected = 0;
 

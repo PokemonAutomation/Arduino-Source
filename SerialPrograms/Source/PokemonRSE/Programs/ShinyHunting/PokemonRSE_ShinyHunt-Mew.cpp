@@ -112,7 +112,7 @@ void ShinyHuntMew::enter_mew(SingleSwitchProgramEnvironment& env, ProControllerC
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_UP, 250, 20);
+            pbf_press_dpad(context, DPAD_UP, 2000ms, 160ms);
             pbf_wait(context, 300);
         },
         {enter_area}
@@ -171,7 +171,7 @@ void ShinyHuntMew::exit_mew(SingleSwitchProgramEnvironment& env, ProControllerCo
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_DOWN, 250, 20);
+            pbf_press_dpad(context, DPAD_DOWN, 2000ms, 160ms);
             pbf_wait(context, 300);
         },
         {exit_area}

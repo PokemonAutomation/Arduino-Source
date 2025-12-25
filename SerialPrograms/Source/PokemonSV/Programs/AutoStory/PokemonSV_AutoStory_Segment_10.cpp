@@ -98,7 +98,7 @@ void checkpoint_21(
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
 
         context.wait_for_all_requests();
-        pbf_press_button(context, BUTTON_L, 20, 20);
+        pbf_press_button(context, BUTTON_L, 160ms, 160ms);
         // move forward
         pbf_move_left_joystick_old(context, 128, 0, 30, 100);
         // get on ride
@@ -219,7 +219,7 @@ void checkpoint_23(
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 110, 0, 30);
 
         overworld_navigation(env.program_info(), env.console, context, 
-            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY,
             128, 0, 20, 10);
 
         // section 2
@@ -286,7 +286,7 @@ void checkpoint_23(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 20, 10); 
+                    128, 0, 20, 10);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, 0}, 320ms, 400ms);

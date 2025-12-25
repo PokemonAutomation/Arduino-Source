@@ -54,7 +54,7 @@ void CaughtPokemonScreen::enter_summary(){
         return;
     }
 
-    pbf_press_button(m_context, BUTTON_A, 10, 100);
+    pbf_press_button(m_context, BUTTON_A, 80ms, 800ms);
     pbf_press_dpad(m_context, DPAD_DOWN, 80ms, 400ms);
     pbf_press_button(m_context, BUTTON_A, 80ms, 0ms);
     m_context.wait_for_all_requests();

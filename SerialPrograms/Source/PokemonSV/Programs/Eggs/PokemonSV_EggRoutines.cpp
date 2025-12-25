@@ -552,13 +552,13 @@ void check_basket_to_collect_eggs(
             if (last_prompt != 0){
                 stream.log("Detected 2nd consecutive prompt. (unexpected)", COLOR_RED);
                 //  Repeat the previous button press.
-                pbf_press_button(context, last_prompt, 20, 80);
+                pbf_press_button(context, last_prompt, 160ms, 640ms);
                 continue;
             }
 
             if (pending_refuse){
                 stream.log("Confirming refused egg...");
-                pbf_press_button(context, BUTTON_A, 20, 80);
+                pbf_press_button(context, BUTTON_A, 160ms, 640ms);
                 pending_refuse = false;
                 continue;
             }
@@ -569,13 +569,13 @@ void check_basket_to_collect_eggs(
                 std::string msg = std::to_string(num_eggs_collected) + "/" + std::to_string(max_eggs);
                 stream.log("Found an egg " + msg + ". Keeping...");
                 stream.overlay().add_log("Egg " + msg, COLOR_GREEN);
-                pbf_press_button(context, BUTTON_A, 20, 80);
+                pbf_press_button(context, BUTTON_A, 160ms, 640ms);
                 
                 last_prompt = BUTTON_A;
             }else{
                 stream.log("Found an egg! But we already have enough...");
                 stream.overlay().add_log("Full. Skip egg.", COLOR_WHITE);
-                pbf_press_button(context, BUTTON_B, 20, 80);
+                pbf_press_button(context, BUTTON_B, 160ms, 640ms);
                 last_prompt = BUTTON_B;
                 pending_refuse = true;
             }

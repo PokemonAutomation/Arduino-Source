@@ -199,18 +199,18 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProCo
 
     //  Move to page.
     for (int8_t c = 0; c < menu_location.page; c++){
-        pbf_press_dpad(context, DPAD_UP, 10, 60);
-        pbf_press_dpad(context, DPAD_UP, 10, 60);
-        pbf_press_button(context, BUTTON_A, 10, 100);
+        pbf_press_dpad(context, DPAD_UP, 80ms, 480ms);
+        pbf_press_dpad(context, DPAD_UP, 80ms, 480ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 800ms);
     }
 
     //  Move to slot.
     for (int8_t c = 0; c < menu_location.index; c++){
-        pbf_press_dpad(context, DPAD_DOWN, 10, 60);
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 480ms);
     }
 
     // Press the button to select the opponent
-    pbf_press_button(context, BUTTON_A, 10, 115);
+    pbf_press_button(context, BUTTON_A, 80ms, 920ms);
     pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
 

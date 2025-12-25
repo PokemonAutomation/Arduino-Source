@@ -324,7 +324,7 @@ std::vector<BBQuests> process_quest_list(
                             
                             //Move cursor down to quest
                             for (int i = 0; i < questpos; i++) {
-                                pbf_press_dpad(context, DPAD_DOWN, 20, 20);
+                                pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
                                 pbf_wait(context, 100);
                                 context.wait_for_all_requests();
                             }
@@ -384,7 +384,7 @@ std::vector<BBQuests> process_quest_list(
             pbf_press_button(context, BUTTON_A, 160ms, 400ms); //Yes.
             pbf_wait(context, 100);
             context.wait_for_all_requests();
-            pbf_press_dpad(context, DPAD_DOWN, 20, 20);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
             pbf_wait(context, 100);
             context.wait_for_all_requests();
         }
@@ -577,7 +577,7 @@ void quest_make_tm(const ProgramInfo& info, VideoStream& stream, ProControllerCo
 
                     //not craftable, close and move on to next
                     pbf_press_button(context, BUTTON_A, 160ms, 400ms);
-                    pbf_press_dpad(context, DPAD_RIGHT, 20, 20);
+                    pbf_press_dpad(context, DPAD_RIGHT, 160ms, 160ms);
                     pbf_wait(context, 100);
                     context.wait_for_all_requests();
                 }
@@ -611,7 +611,7 @@ void quest_make_tm(const ProgramInfo& info, VideoStream& stream, ProControllerCo
     context.wait_for_all_requests();
     
     open_map_from_overworld(info, stream, context);
-    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
     fly_to_overworld_from_map(info, stream, context);
     context.wait_for_all_requests();
 }
@@ -639,7 +639,7 @@ void quest_travel_500(const ProgramInfo& info, VideoStream& stream, ProControlle
     context.wait_for_all_requests();
 
     open_map_from_overworld(info, stream, context);
-    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
     fly_to_overworld_from_map(info, stream, context);
     context.wait_for_all_requests();
 }
@@ -732,7 +732,7 @@ void quest_tera_self_defeat(
         console.log("Overworld detected.");
     }
     open_map_from_overworld(info, console, context);
-    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
     fly_to_overworld_from_map(info, console, context);
 }
 
@@ -951,7 +951,7 @@ void quest_wild_tera(
         console.log("Overworld detected.");
     }
     open_map_from_overworld(info, console, context);
-    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
     fly_to_overworld_from_map(info, console, context);
 }
 
@@ -1386,7 +1386,7 @@ void quest_auto_battle(
             stream.log("Overworld detected.");
         }
         open_map_from_overworld(env.program_info(), stream, context);
-        pbf_press_button(context, BUTTON_ZL, 40, 100);
+        pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
         fly_to_overworld_from_map(env.program_info(), stream, context);
     }
 }

@@ -90,7 +90,7 @@ CameraAngle quest_photo_navi(
             context.wait_for_all_requests();
 
             pbf_move_left_joystick(context, {0, +1}, 1200ms, 160ms);
-            pbf_press_button(context, BUTTON_B, 20, 20);
+            pbf_press_button(context, BUTTON_B, 160ms, 160ms);
             pbf_wait(context, 200);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
             context.wait_for_all_requests();
@@ -445,7 +445,7 @@ void quest_catch_navi(
             context.wait_for_all_requests();
 
             pbf_move_left_joystick_old(context, 128, 0, 350, 20);
-            pbf_press_button(context, BUTTON_B, 20, 20);
+            pbf_press_button(context, BUTTON_B, 160ms, 160ms);
             pbf_wait(context, 200);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
@@ -540,7 +540,7 @@ void quest_catch_navi(
             if (console.state().console_type() == ConsoleType::Switch1) {
                 pbf_move_left_joystick(context, {0, +1}, 800ms, 160ms);
             } else {
-                pbf_move_left_joystick_old(context, 128, 0, 120, 20);
+                pbf_move_left_joystick_old(context, 128, 0, 960ms, 160ms);
             }
             pbf_wait(context, 400);
             context.wait_for_all_requests();
@@ -970,7 +970,7 @@ void quest_catch(
         console.log("Overworld detected.");
     }
     open_map_from_overworld(info, console, context);
-    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
     fly_to_overworld_from_map(info, console, context);
     context.wait_for_all_requests();
 }

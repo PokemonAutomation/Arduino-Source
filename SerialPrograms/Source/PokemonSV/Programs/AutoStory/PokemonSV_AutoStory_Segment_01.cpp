@@ -242,7 +242,7 @@ void checkpoint_03(
             env.console, context,
             [](ProControllerContext& context){
                 for (int i = 0; i < 10; i++){
-                    pbf_press_button(context, BUTTON_X, 20, 250);
+                    pbf_press_button(context, BUTTON_X, 160ms, 2000ms);
                 }
             },
             {tutorial}

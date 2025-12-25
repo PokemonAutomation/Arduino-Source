@@ -174,13 +174,13 @@ bool CloneItems101::clone_item(ProgramEnvironment& env, VideoStream& stream, Pro
             try{
                 if (item_held){
                     main_menu.move_cursor(env.program_info(), stream, context, MenuSide::RIGHT, 1, true);
-                    pbf_press_button(context, BUTTON_A, 20, 20);
+                    pbf_press_button(context, BUTTON_A, 160ms, 160ms);
                 }else{
                     main_menu.move_cursor(env.program_info(), stream, context, MenuSide::LEFT, 1, true);
                     pbf_press_button(context, BUTTON_A, 160ms, 400ms);
                     pbf_press_dpad(context, DPAD_UP, 80ms, 80ms);
-                    pbf_press_dpad(context, DPAD_UP, 20, 10);
-                    pbf_press_button(context, BUTTON_A, 20, 20);
+                    pbf_press_dpad(context, DPAD_UP, 160ms, 80ms);
+                    pbf_press_button(context, BUTTON_A, 160ms, 160ms);
                 }
             }catch (OperationFailedException& e){
                 e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
@@ -195,7 +195,7 @@ bool CloneItems101::clone_item(ProgramEnvironment& env, VideoStream& stream, Pro
         case 3:
             stream.log("Detected 6th slot select return. (unexpected)", COLOR_RED);
             stats.m_errors++;
-            pbf_press_button(context, BUTTON_A, 20, 20);
+            pbf_press_button(context, BUTTON_A, 160ms, 160ms);
             continue;
         case 4:
             stream.log("Detected 6th slot select back. (unexpected)", COLOR_RED);
@@ -210,13 +210,13 @@ bool CloneItems101::clone_item(ProgramEnvironment& env, VideoStream& stream, Pro
 
             //  Confirmation prompt for returning your ride back to ride form.
             if (return_to_ride_prompt.detect(snapshot)){
-                pbf_press_button(context, BUTTON_A, 20, 20);
+                pbf_press_button(context, BUTTON_A, 160ms, 160ms);
                 item_held = true;
                 continue;
             }
 
             //  No other recognized ambiguities.
-            pbf_press_button(context, BUTTON_B, 20, 20);
+            pbf_press_button(context, BUTTON_B, 160ms, 160ms);
             continue;
         }
         case 6:{
@@ -232,12 +232,12 @@ bool CloneItems101::clone_item(ProgramEnvironment& env, VideoStream& stream, Pro
 
             //  Not on the battle teams.
             if (!battle_team.detect(snapshot)){
-                pbf_press_button(context, BUTTON_X, 20, 10);
-                pbf_press_button(context, BUTTON_X, 20, 10);
+                pbf_press_button(context, BUTTON_X, 160ms, 80ms);
+                pbf_press_button(context, BUTTON_X, 160ms, 80ms);
                 continue;
             }
 
-            pbf_press_button(context, BUTTON_L, 20, 40);
+            pbf_press_button(context, BUTTON_L, 160ms, 320ms);
             pbf_press_button(context, BUTTON_A, 160ms, 400ms);
             pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
             pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);

@@ -23,7 +23,7 @@ bool heal_by_global_room(VideoStream& stream, ProControllerContext& context){
     pbf_press_button(context, BUTTON_Y, 10, overworld_to_room_delay);
 
     // Go to global room.
-    pbf_press_dpad(context, DPAD_RIGHT, 10, 100);
+    pbf_press_dpad(context, DPAD_RIGHT, 80ms, 800ms);
 
     // Press ZL until we are at:
     // - "Would you like to enter the Global Room?" To select: "Yes" and other options.

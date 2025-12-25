@@ -60,14 +60,14 @@ BattleMenuResult run_battle_menu(
     case TeraMoveType::Move3:
     case TeraMoveType::Move4:
         if (battle_menu.move_to_slot(stream, context, 0)){
-            pbf_press_button(context, BUTTON_A, 20, 10);
+            pbf_press_button(context, BUTTON_A, 160ms, 80ms);
         }
         break;
     case TeraMoveType::Cheer_AllOut:
     case TeraMoveType::Cheer_HangTough:
     case TeraMoveType::Cheer_HealUp:
         if (battle_menu.move_to_slot(stream, context, 1)){
-            pbf_press_button(context, BUTTON_A, 20, 10);
+            pbf_press_button(context, BUTTON_A, 160ms, 80ms);
         }
         break;
     }
@@ -90,12 +90,12 @@ bool run_cheer_select(
         index = 2;
         break;
     default:
-        pbf_press_button(context, BUTTON_B, 20, 10);
+        pbf_press_button(context, BUTTON_B, 160ms, 80ms);
         return false;
     }
     if (cheer_select_menu.move_to_slot(stream, context, index)){
         std::lock_guard<std::mutex> lg(tera_battle_throttle_lock);
-        pbf_press_button(context, BUTTON_A, 20, 40);
+        pbf_press_button(context, BUTTON_A, 160ms, 320ms);
         context.wait_for_all_requests();
     }
     return true;
@@ -122,7 +122,7 @@ bool run_move_select(
         index = 3;
         break;
     default:
-        pbf_press_button(context, BUTTON_B, 20, 10);
+        pbf_press_button(context, BUTTON_B, 160ms, 80ms);
         return false;
     }
 
@@ -130,7 +130,7 @@ bool run_move_select(
     //  probably disabled. Select a different move.
     if (consecutive_move_select > 3){
         stream.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
-//        pbf_press_dpad(context, DPAD_DOWN, 20, 40);
+//        pbf_press_dpad(context, DPAD_DOWN, 160ms, 320ms);
         index++;
         if (index >= 4){
             index = 0;
@@ -157,7 +157,7 @@ bool run_move_select(
     }while (false);
 
     if (move_select_menu.move_to_slot(stream, context, index)){
-        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 160ms, 80ms);
     }
     return true;
 }
@@ -173,12 +173,12 @@ bool run_target_select(
     case TeraMoveType::Move4:{
         target_select_menu.move_to_slot(stream, context, (uint8_t)move.target);
         std::lock_guard<std::mutex> lg(tera_battle_throttle_lock);
-        pbf_press_button(context, BUTTON_A, 20, 40);
+        pbf_press_button(context, BUTTON_A, 160ms, 320ms);
         context.wait_for_all_requests();
         return true;
     }
     default:
-        pbf_press_button(context, BUTTON_B, 20, 10);
+        pbf_press_button(context, BUTTON_B, 160ms, 80ms);
         return false;
     }
 }

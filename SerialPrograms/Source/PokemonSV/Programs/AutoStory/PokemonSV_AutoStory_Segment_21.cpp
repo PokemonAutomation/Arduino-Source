@@ -174,19 +174,19 @@ void checkpoint_48(
 
                 direction.change_direction(env.program_info(), env.console, context, 2.50);
                 pbf_move_left_joystick_old(context, 128, 0, 300, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
 
                 direction.change_direction(env.program_info(), env.console, context, 3.54);
                 pbf_move_left_joystick_old(context, 128, 0, 300, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
 
                 direction.change_direction(env.program_info(), env.console, context, 1.76);
                 pbf_move_left_joystick_old(context, 128, 0, 300, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
@@ -194,12 +194,12 @@ void checkpoint_48(
 
                 direction.change_direction(env.program_info(), env.console, context, 1.97);
                 pbf_move_left_joystick_old(context, 128, 0, 300, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 2.60);
                 pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
 
@@ -209,18 +209,18 @@ void checkpoint_48(
 
                 direction.change_direction(env.program_info(), env.console, context, 0.82);
                 pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 2.13);
                 pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
 
                 direction.change_direction(env.program_info(), env.console, context, 1.97);
                 pbf_move_left_joystick(context, {0, +1}, 4000ms, 400ms);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 3.02);
@@ -229,12 +229,12 @@ void checkpoint_48(
 
                 direction.change_direction(env.program_info(), env.console, context, 3.87);
                 pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 4.56);
                 pbf_move_left_joystick_old(context, 128, 0, 300, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 try {
@@ -243,22 +243,22 @@ void checkpoint_48(
 
                     direction.change_direction(env.program_info(), env.console, context, 5.18);
                     pbf_move_left_joystick_old(context, 128, 0, 300, 50);
-                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                     pbf_wait(context, wait);
 
                     direction.change_direction(env.program_info(), env.console, context, 5.66);
                     pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
-                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                     pbf_wait(context, wait);
 
                     direction.change_direction(env.program_info(), env.console, context, 5.24);
                     pbf_move_left_joystick(context, {0, +1}, 4800ms, 400ms);
-                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                     pbf_wait(context, wait);
 
                     direction.change_direction(env.program_info(), env.console, context, 5.45);
                     pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
-                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                     pbf_wait(context, wait);
                     
                     pbf_wait(context, 20000ms);

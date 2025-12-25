@@ -110,13 +110,13 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
 
         switch (TARGET) {
         case Target::treecko:
-            pbf_press_dpad(context, DPAD_LEFT, 40, 100);
+            pbf_press_dpad(context, DPAD_LEFT, 320ms, 800ms);
             break;
         case Target::torchic:
             //Default cursor position, do nothing.
             break;
         case Target::mudkip:
-            pbf_press_dpad(context, DPAD_RIGHT, 40, 100);
+            pbf_press_dpad(context, DPAD_RIGHT, 320ms, 800ms);
             break;
         default:
             OperationFailedException::fire(

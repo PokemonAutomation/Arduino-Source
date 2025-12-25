@@ -250,11 +250,11 @@ void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
             switch(game_title){
             case GameTitle::SCARLET:
-                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+                pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
                 break;
             case GameTitle::VIOLET:
-                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+                pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
+                pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
                 break;
             default:
                 throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "We don't know what game we are playing. We should know at this point.");
@@ -264,7 +264,7 @@ void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             
             // talk to Rika 3. Came to become a Champion
             clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
-            pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+            pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
             pbf_mash_button(context, BUTTON_A, 1000ms);
 
             // talk to Rika 4. Become stronger
@@ -273,18 +273,18 @@ void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
             // talk to Rika 5. Difficult gym: Alfornada
             clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
-            pbf_press_dpad(context, DPAD_UP, 13, 20);
+            pbf_press_dpad(context, DPAD_UP, 104ms, 160ms);
             pbf_mash_button(context, BUTTON_A, 1000ms);
 
             // talk to Rika 6. Difficult gym leader name: Tulip
             clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
-            pbf_press_dpad(context, DPAD_UP, 13, 20);
+            pbf_press_dpad(context, DPAD_UP, 104ms, 160ms);
             pbf_mash_button(context, BUTTON_A, 1000ms);
 
             // talk to Rika 7. Difficult gym leader type: Psychic
             clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
-            pbf_press_dpad(context, DPAD_UP, 13, 20);
-            pbf_press_dpad(context, DPAD_UP, 13, 20);
+            pbf_press_dpad(context, DPAD_UP, 104ms, 160ms);
+            pbf_press_dpad(context, DPAD_UP, 104ms, 160ms);
             pbf_mash_button(context, BUTTON_A, 1000ms);
 
             // talk to Rika 8. Starter pokemon: Grass/Fire/Water
@@ -293,11 +293,11 @@ void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             case StarterChoice::SPRIGATITO:
                 break;
             case StarterChoice::FUECOCO:
-                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+                pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
                 break;
             case StarterChoice::QUAXLY:
-                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+                pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
+                pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
                 break;
             default:
                 throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid starter pokemon type. This shouldn't happen.");
@@ -305,7 +305,7 @@ void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }
             size_t num_extra_clicks = attempt_number % 3;  // we add extra clicks when attempt_number > 0, to account for the fact that the user might not be enterint the correct starter.
             for (size_t i = 0; i < num_extra_clicks; i++){
-                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+                pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
             }
 
             pbf_mash_button(context, BUTTON_A, 1000ms);

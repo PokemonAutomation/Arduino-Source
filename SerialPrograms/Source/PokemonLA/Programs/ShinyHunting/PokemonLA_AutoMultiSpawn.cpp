@@ -536,7 +536,7 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
         }else if (num_removed_pokemon < num_to_despawn){
 
             // Press A to select moves
-            pbf_press_button(context, BUTTON_A, 10, 100);
+            pbf_press_button(context, BUTTON_A, 80ms, 800ms);
             context.wait_for_all_requests();
             use_next_move_with_pp(env.console, context, 0, cur_move);
             continue;

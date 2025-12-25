@@ -179,7 +179,7 @@ CramomaticRNG::CramomaticRNG()
 
 void CramomaticRNG::navigate_to_party(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     pbf_press_button(context, BUTTON_X, 10, 125);
-    pbf_press_button(context, BUTTON_A, 20, 10);
+    pbf_press_button(context, BUTTON_A, 160ms, 80ms);
     pbf_wait(context, 2000ms);
 }
 
@@ -307,16 +307,16 @@ void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, ProCont
 
     // select the apricorn(s)
     pbf_wait(context, 1000ms);
-    pbf_press_button(context, BUTTON_A, 10, 30);
+    pbf_press_button(context, BUTTON_A, 80ms, 240ms);
     if (sport){
-        pbf_press_dpad(context, DPAD_DOWN, 20, 10);
+        pbf_press_dpad(context, DPAD_DOWN, 160ms, 80ms);
     }
-    pbf_press_button(context, BUTTON_A, 10, 30);
-    pbf_press_button(context, BUTTON_A, 10, 30);
+    pbf_press_button(context, BUTTON_A, 80ms, 240ms);
+    pbf_press_button(context, BUTTON_A, 80ms, 240ms);
     if (sport){
-        pbf_press_dpad(context, DPAD_UP, 20, 10);
+        pbf_press_dpad(context, DPAD_UP, 160ms, 80ms);
     }
-    pbf_press_button(context, BUTTON_A, 10, 30);
+    pbf_press_button(context, BUTTON_A, 80ms, 240ms);
 
     pbf_mash_button(context, BUTTON_A, 5000ms);
 }

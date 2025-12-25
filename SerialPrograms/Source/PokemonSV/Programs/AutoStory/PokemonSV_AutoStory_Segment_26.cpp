@@ -205,15 +205,15 @@ void checkpoint_62(
         pbf_press_button(context, BUTTON_A, 400ms, 400ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
         // medium serving
-        pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+        pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
         pbf_press_button(context, BUTTON_A, 400ms, 400ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
         // extra crispy
-        pbf_press_dpad(context, DPAD_UP, 13, 20);
+        pbf_press_dpad(context, DPAD_UP, 104ms, 160ms);
         pbf_press_button(context, BUTTON_A, 400ms, 400ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
         // lemon
-        pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+        pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
         pbf_press_button(context, BUTTON_A, 400ms, 400ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD}, false);
 

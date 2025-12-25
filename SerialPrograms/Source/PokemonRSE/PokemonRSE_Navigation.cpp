@@ -28,7 +28,7 @@ void soft_reset(const ProgramInfo& info, VideoStream& stream, ProControllerConte
     pbf_mash_button(context, BUTTON_PLUS, GameSettings::instance().START_BUTTON_MASH0);
     context.wait_for_all_requests();
 
-    pbf_press_button(context, BUTTON_A, 20, 40);
+    pbf_press_button(context, BUTTON_A, 160ms, 320ms);
 
     //Wait for game to load in
     BlackScreenOverWatcher detector(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
@@ -52,9 +52,9 @@ void soft_reset(const ProgramInfo& info, VideoStream& stream, ProControllerConte
 
 void flee_battle(VideoStream& stream, ProControllerContext& context) {
     stream.log("Navigate to Run.");
-    pbf_press_dpad(context, DPAD_RIGHT, 20, 20);
-    pbf_press_dpad(context, DPAD_DOWN, 20, 20);
-    pbf_press_button(context, BUTTON_A, 20, 40);
+    pbf_press_dpad(context, DPAD_RIGHT, 160ms, 160ms);
+    pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
+    pbf_press_button(context, BUTTON_A, 160ms, 320ms);
 
     AdvanceBattleDialogWatcher ran_away(COLOR_YELLOW);
     int ret2 = wait_until(

@@ -167,9 +167,9 @@ bool MainMenuDetector::move_cursor(
         //  Wrong side.
         if (current.first != side){
             if (current.first == MenuSide::LEFT){
-                pbf_press_dpad(context, DPAD_RIGHT, 20, 10);
+                pbf_press_dpad(context, DPAD_RIGHT, 160ms, 80ms);
             }else{
-                pbf_press_dpad(context, DPAD_LEFT, 20, 10);
+                pbf_press_dpad(context, DPAD_LEFT, 160ms, 80ms);
             }
             continue;
         }
@@ -187,7 +187,7 @@ bool MainMenuDetector::move_cursor(
                     pbf_press_dpad(context, DPAD_UP, 80ms, 80ms);
                 }
             }
-            pbf_press_dpad(context, DPAD_UP, 20, 10);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 80ms);
         }else{
             if (fast){
                 diff = rows - diff;
@@ -195,7 +195,7 @@ bool MainMenuDetector::move_cursor(
                     pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
                 }
             }
-            pbf_press_dpad(context, DPAD_DOWN, 20, 10);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 80ms);
         }
     }
 }

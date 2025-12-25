@@ -531,7 +531,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, VideoStream& stre
     
     while(true){
         try {
-            pbf_press_button(context, BUTTON_ZR, 40, 100);
+            pbf_press_button(context, BUTTON_ZR, 320ms, 800ms);
             // try different magnitudes of cursor push with each failure.
             double push_scale = 0.29 * adjustment_table[try_count];
             // std::cout << "push_scale: " << std::to_string(push_scale) << std::endl;
@@ -560,8 +560,8 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, VideoStream& stre
     // Zoom out to the max warpable level and try pressing on the player character.
     stream.log("Zoom to max map level to try searching for Pokecenter again.");
     stream.overlay().add_log("Pokecenter Icon occluded");
-    pbf_press_button(context, BUTTON_ZL, 40, 100);
-    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
+    pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
 
     const bool check_fly_menuitem = true;
     if (fly_to_overworld_from_map(info, stream, context, check_fly_menuitem)){
@@ -605,7 +605,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, VideoStream& stre
             press_Bs_to_back_to_overworld(info, stream, context);
             open_map_from_overworld(info, stream, context);
             // zoom out to max warpable level
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
+            pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
         }
     }
 }
@@ -736,7 +736,7 @@ bool attempt_fly_to_overlapping_flypoint(
         try {
             open_map_from_overworld(info, stream, context, false);
             context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
+            pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
 
             return fly_to_overworld_from_map(info, stream, context, true);
 
@@ -785,11 +785,11 @@ void heal_at_pokecenter(
     uint16_t seconds_timeout = 60;
 
     // re-orient camera
-    pbf_press_button(context, BUTTON_L, 20, 20);
+    pbf_press_button(context, BUTTON_L, 160ms, 160ms);
     // move towards pokecenter
     pbf_move_left_joystick(context, {0, -1}, 800ms, 160ms);
     // re-orient camera
-    pbf_press_button(context, BUTTON_L, 20, 20); 
+    pbf_press_button(context, BUTTON_L, 160ms, 160ms);
 
     bool seen_prompt = false;
 
@@ -1041,7 +1041,7 @@ void select_top_move(VideoStream& stream, ProControllerContext& context, size_t 
     if (consecutive_move_select > 3){
         // to handle case where move is disabled/out of PP/taunted
         stream.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
-        pbf_press_dpad(context, DPAD_DOWN, 20, 40);
+        pbf_press_dpad(context, DPAD_DOWN, 160ms, 320ms);
     }
     pbf_mash_button_old(context, BUTTON_A, 100);
 

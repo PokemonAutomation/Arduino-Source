@@ -133,8 +133,8 @@ bool NuggetFarmerHighlands::run_iteration(
 //                pbf_press_button(context, BUTTON_B, 350, 80);
                 pbf_press_button(context, BUTTON_B, 80, 0);
                 for (size_t c = 0; c < 7; c++){
-                    pbf_press_button(context, BUTTON_A | BUTTON_B, 5, 0);
-                    pbf_press_button(context, BUTTON_B, 5, 0);
+                    pbf_press_button(context, BUTTON_A | BUTTON_B, 40ms, 0ms);
+                    pbf_press_button(context, BUTTON_B, 40ms, 0ms);
                 }
                 pbf_press_button(context, BUTTON_B, 200, 80);
                 pbf_wait(context, 80);

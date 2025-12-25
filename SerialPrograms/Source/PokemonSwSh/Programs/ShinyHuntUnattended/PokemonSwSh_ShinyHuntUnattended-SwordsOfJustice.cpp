@@ -91,8 +91,8 @@ void ShinyHuntUnattendedSwordsOfJustice::program(SingleSwitchProgramEnvironment&
         pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
         pbf_press_button(context, BUTTON_A, 80ms, ENTER_CAMP_DELAY0);
         if (AIRPLANE_MODE){
-            pbf_press_button(context, BUTTON_A, 10, 100);
-            pbf_press_button(context, BUTTON_A, 10, 100);
+            pbf_press_button(context, BUTTON_A, 80ms, 800ms);
+            pbf_press_button(context, BUTTON_A, 80ms, 800ms);
         }
         pbf_press_button(context, BUTTON_X, 80ms, 400ms);
         pbf_press_dpad(context, DPAD_LEFT, 80ms, 80ms);

@@ -232,8 +232,8 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, ProControlle
         env.console.video().snapshot()
     );
     while (true){
-        pbf_press_button(context, BUTTON_B, 20, 20);
-        pbf_press_button(context, BUTTON_LCLICK, 20, 20);
+        pbf_press_button(context, BUTTON_B, 160ms, 160ms);
+        pbf_press_button(context, BUTTON_LCLICK, 160ms, 160ms);
     }
 }
 

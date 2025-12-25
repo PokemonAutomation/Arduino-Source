@@ -58,7 +58,7 @@ size_t switch_pokemon(
     }
     // Move past leading fainted pokemon
     for(size_t i = 0; i < pokemon_to_switch_to; i++){
-        pbf_press_dpad(context, DPAD_DOWN, 20, 80);
+        pbf_press_dpad(context, DPAD_DOWN, 160ms, 640ms);
     }
 
     while(true){
@@ -90,7 +90,7 @@ size_t switch_pokemon(
         // Fist hit B to clear the "cannot send pokemon" dialogue
         pbf_press_button(context, BUTTON_B, 160ms, 800ms);
         // Move to the next pokemon
-        pbf_press_dpad(context, DPAD_DOWN, 20, 80);
+        pbf_press_dpad(context, DPAD_DOWN, 160ms, 640ms);
     }
 
     return pokemon_to_switch_to;

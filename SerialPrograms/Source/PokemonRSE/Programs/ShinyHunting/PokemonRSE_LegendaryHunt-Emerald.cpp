@@ -88,7 +88,7 @@ void LegendaryHuntEmerald::reset_regi(SingleSwitchProgramEnvironment& env, ProCo
         env.console, context,
         [](ProControllerContext& context){
             ssf_press_button(context, BUTTON_B, 0ms, 960ms);
-            pbf_press_dpad(context, DPAD_DOWN, 120, 20);
+            pbf_press_dpad(context, DPAD_DOWN, 960ms, 160ms);
             pbf_wait(context, 300);
         },
         {exit_area}
@@ -112,7 +112,7 @@ void LegendaryHuntEmerald::reset_regi(SingleSwitchProgramEnvironment& env, ProCo
     int ret2 = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_UP, 120, 20);
+            pbf_press_dpad(context, DPAD_UP, 960ms, 160ms);
             pbf_wait(context, 300);
         },
         {enter_area}
@@ -227,7 +227,7 @@ void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, Pr
 void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     //Turn down. Take 1 step.
     ssf_press_button(context, BUTTON_B, 0ms, 160ms);
-    pbf_press_dpad(context, DPAD_DOWN, 20, 20);
+    pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
 
     //Turn right. Take 9 steps.
     ssf_press_button(context, BUTTON_B, 0ms, 1280ms);
@@ -312,7 +312,7 @@ void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, Pro
     pbf_press_dpad(context, DPAD_LEFT, 160, 20);
 
     ssf_press_button(context, BUTTON_B, 0ms, 160ms);
-    pbf_press_dpad(context, DPAD_UP, 20, 20);
+    pbf_press_dpad(context, DPAD_UP, 160ms, 160ms);
 
     context.wait_for_all_requests();
 }

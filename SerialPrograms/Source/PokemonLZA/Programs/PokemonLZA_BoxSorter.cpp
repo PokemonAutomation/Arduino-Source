@@ -209,13 +209,13 @@ void sort(
                 //moving cursor to the pokemon to pick it up
                 bool holding_pokemon = false;
                 cur_cursor = move_cursor_to(env, context, cur_cursor, cursor, holding_pokemon);
-                pbf_press_button(context, BUTTON_Y, 10, 60);
+                pbf_press_button(context, BUTTON_Y, 80ms, 480ms);
                 context.wait_for_all_requests();
 
                 //moving to destination to place it or swap it
                 holding_pokemon = true;
                 cur_cursor = move_cursor_to(env, context, cur_cursor, cursor_s, holding_pokemon);
-                pbf_press_button(context, BUTTON_Y, 10, 60);
+                pbf_press_button(context, BUTTON_Y, 80ms, 480ms);
                 context.wait_for_all_requests();
 
                 std::swap(boxes_data[poke_nb_s], boxes_data[poke_nb]);
