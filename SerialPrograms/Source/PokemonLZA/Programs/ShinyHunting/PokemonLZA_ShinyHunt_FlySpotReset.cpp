@@ -19,6 +19,7 @@
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
+#include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA_ShinyHunt_FlySpotReset.h"
 
 namespace PokemonAutomation {
@@ -112,9 +113,9 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
 namespace {
 
 // Return if the loop should stop
-typedef std::function<void(SingleSwitchProgramEnvironment&, ProControllerContext&, ShinyHunt_FlySpotReset_Descriptor::Stats&, bool)> route_func;
+typedef std::function<bool(SingleSwitchProgramEnvironment&, ProControllerContext&, ShinyHunt_FlySpotReset_Descriptor::Stats&, bool)> route_func;
 
-void route_default(
+bool route_default(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
@@ -145,9 +146,10 @@ void route_default(
             env.console
         );
     }
+    return false;
 }
 
-void route_wild_zone_19(
+bool route_wild_zone_19(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
@@ -165,9 +167,10 @@ void route_wild_zone_19(
         fly_from_map(env.console, context);
     }
     wait_until_overworld(env.console, context, 50s);
+    return false;
 }
 
-void route_alpha_pidgey(
+bool route_alpha_pidgey(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
@@ -199,6 +202,7 @@ void route_alpha_pidgey(
         fly_from_map(env.console, context);
     }
     wait_until_overworld(env.console, context);
+    return false;
 }
 
 bool route_hyperspace_wild_zone(
@@ -262,7 +266,7 @@ bool route_hyperspace_wild_zone(
 }
 
 
-void route_alpha_patrat(
+bool route_alpha_patrat(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
@@ -291,10 +295,11 @@ void route_alpha_patrat(
             env.console);
     }
     wait_until_overworld(env.console, context, 50s);
+    return false;
 }
 
 
-void route_alpha_pikachu(
+bool route_alpha_pikachu(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
@@ -317,7 +322,32 @@ void route_alpha_pikachu(
     }
     if (ret == 0){
         wait_until_overworld(env.console, context, 50s);
-        //TODO: reset game if still get caught by wild pokémon
+        {
+            AlertEyeOverWatcher eye_watcher(COLOR_YELLOW, &env.console.overlay());
+            ret = wait_until(env.console, context, 2s, {{eye_watcher}});
+        }
+        if (ret < 0) { // still get caught by wild pokémon after day/night change
+            stats.errors++;
+            env.update_stats();
+            env.add_overlay_log("Error after DNC. Reset Game", COLOR_YELLOW);
+            go_home(env.console, context);
+            reset_game_from_home(env, env.console, context);
+            {
+                BlackScreenOverWatcher black_screen(COLOR_CYAN);
+                ret = wait_until(env.console, context, 30s, {{black_screen}}); // wait for incoming day/night change
+            }
+            if (ret < 0) {
+                stats.errors++;
+                env.update_stats();
+                env.add_overlay_log("Unable to detect DNC after reset", COLOR_RED);
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Unable to detect day/night change after reset",
+                    env.console);
+            }
+            wait_until_overworld(env.console, context); // wait till day/night change over
+            return true; // reset to_zoom_to_max
+        }
     }
     {
         AlertEyeOverWatcher eye_watcher(COLOR_WHITE, &env.console.overlay());
@@ -340,7 +370,7 @@ void route_alpha_pikachu(
     pbf_move_left_joystick_old(context, 148, 20, 100ms, 200ms);
     if (fly_from_map(env.console, context) == FastTravelState::SUCCESS) {
         wait_until_overworld(env.console, context);
-        return;
+        return false;
     } else {
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -416,9 +446,8 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
                 if (ROUTE == Route::HYPERSPACE_WILD_ZONE){
                     should_stop = route_hyperspace_wild_zone(env, context, stats, to_zoom_to_max, MIN_CALORIE_REMAINING, ready_to_stop_counter);
                 } else{
-                    route(env, context, stats, to_zoom_to_max);
+                    to_zoom_to_max = route(env, context, stats, to_zoom_to_max);
                 }
-                to_zoom_to_max = false;
                 num_resets++;
                 stats.resets++;
                 env.update_stats();
