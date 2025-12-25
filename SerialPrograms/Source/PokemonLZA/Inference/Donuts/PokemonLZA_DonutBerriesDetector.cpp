@@ -33,7 +33,9 @@ void DonutBerriesSelectionDetector::make_overlays(VideoOverlaySet& items) const{
 
 bool DonutBerriesSelectionDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 symbol = extract_box_reference(screen, m_symbol_box);
-    if (is_solid(symbol, { 0.4375, 0.268, 0.295 }, 0.2, 40)){
+    //symbol.save("image.png");
+    if (is_solid(symbol, { 0.4375, 0.268, 0.295 }, 0.1, 20)){
+        //symbol.save("image.png");
         return true;
     }
     return false;
@@ -133,11 +135,12 @@ ImageMatch::ImageMatchResult DonutBerriesReader::read_berry_page_with_icon_match
 ImageMatch::ImageMatchResult DonutBerriesReader::read_with_icon_matcher(const ImageViewRGB32& screen, const ImageFloatBox icon_box) const{
     // Get a crop of the berry icon
     ImageViewRGB32 image = extract_box_reference(screen, icon_box);
-//    image.save("image" + std::to_string(icon_box.x) + ".png");
+    //ImageRGB32 filtered_image = filter_rgb32_range(image, 0xffdfaf00, 0xffffef20, Color(0x00000000), true);
+    //image.save("image" + std::to_string(icon_box.x) + ".png");
 
     ImageMatch::ImageMatchResult results;
     results = DONUT_BERRIES_MATCHER().match(image, ALPHA_SPREAD);
-//  results.clear_beyond_alpha(MAX_ALPHA);
+    //results.clear_beyond_alpha(MAX_ALPHA);
 
     return results;
 }
