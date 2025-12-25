@@ -36,6 +36,7 @@ public:
 private:
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
     SimpleIntegerOption<uint16_t> THRESHOLD;
+    BooleanCheckBoxOption SAVE_ON_START;
     ShinySoundDetectedActionOption SHINY_DETECTED;
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;

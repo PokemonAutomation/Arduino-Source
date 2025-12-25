@@ -69,6 +69,7 @@ std::unique_ptr<StatsTracker> ShinyHunt_Terrakion_Descriptor::make_stats() const
 
 ShinyHunt_Terrakion::ShinyHunt_Terrakion()
     : THRESHOLD("<b>Calorie Threshold:</b><br>Stop resetting and check Terrakion when this many calories remain", LockMode::UNLOCK_WHILE_RUNNING, 400, 200, 4800)
+    , SAVE_ON_START("<b>Save on Start:</b><br>Save the game when starting the program. Each cycle will start at the calorie count at the time of the save", LockMode::LOCK_WHILE_RUNNING, true)
     , SHINY_DETECTED("Shiny Detected", "", "1000 ms", ShinySoundDetectedAction::STOP_PROGRAM)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -80,6 +81,7 @@ ShinyHunt_Terrakion::ShinyHunt_Terrakion()
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(THRESHOLD);
+    PA_ADD_OPTION(SAVE_ON_START);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -254,6 +256,11 @@ void ShinyHunt_Terrakion::program(SingleSwitchProgramEnvironment& env, ProContro
             error_coefficient
         );
     });
+
+    if (SAVE_ON_START) {
+        save_game_to_menu(env.console, context);
+        pbf_mash_button(context, BUTTON_B, 2000ms);
+    }
 
     run_until<ProControllerContext>(
         env.console, context,
