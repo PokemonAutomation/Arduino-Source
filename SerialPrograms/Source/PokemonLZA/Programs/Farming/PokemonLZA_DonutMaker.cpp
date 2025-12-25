@@ -8,17 +8,22 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
+#include "PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
 #include "PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
+#include "PokemonLZA/Programs/PokemonLZA_DonutBerrySession.h"
 #include "PokemonLZA_DonutMaker.h"
 
 namespace PokemonAutomation {
@@ -60,7 +65,27 @@ std::unique_ptr<StatsTracker> DonutMaker_Descriptor::make_stats() const{
 
 
 DonutMaker::DonutMaker()
-    : NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
+    : LANGUAGE(
+        "<b>Game Language:</b>",
+        PokemonSwSh::IV_READER().languages(),
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
+    , BERRIES("<b>Berries:</b><br>The berries used to make the donut. Minimum 3 berries, maximum 8 berries.")
+    , NUM_POWER_REQUIRED(
+        "<b>Number of Powers to Match:</b><br>How many of a donut's powers must be in the the table below. Minimum 1, maximum 3. "
+        "<br>Ex. For a target donut of Big Haul Lv.3, Berry Lv.3, and any or none for the 3rd power, set the number as 2."
+        "<br>Then, in the flavor powers table, make sure to add Big Haul Lv.3 and Berry Lv. 3.",
+        LockMode::LOCK_WHILE_RUNNING,
+        1, 1, 3
+        )
+    //, NUM_DONUTS(
+    //    "<b>Number of Donuts:</b><br>The number of donuts to make.",
+    //    LockMode::LOCK_WHILE_RUNNING,
+    //    1, 1
+    //)
+    , GO_HOME_WHEN_DONE(false)
+    , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
         &NOTIFICATION_PROGRAM_FINISH,
@@ -68,12 +93,47 @@ DonutMaker::DonutMaker()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-    // TODO: Add options here using PA_ADD_OPTION()
+    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(BERRIES);
+    PA_ADD_OPTION(NUM_POWER_REQUIRED);
+    PA_ADD_OPTION(FLAVOR_POWERS);
+    //PA_ADD_OPTION(NUM_DONUTS); //TODO: Add looping. Navigate back to PC and heal to make backup save.
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
+void DonutMaker::add_berries_in_menu_and_start(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+    //DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
+
+    env.log("Checking berry count.");
+    size_t num_berries = 0;
+    std::vector<std::unique_ptr<DonutBerriesTableRow>> berries_table = BERRIES.copy_snapshot();
+    num_berries = berries_table.size();
+
+    if (num_berries < 3 || num_berries > 8) {
+        throw UserSetupError(env.console, "Must have at least 3 berries and no more than 8 berries.");
+    }
+    env.log("Number of berries validated.", COLOR_BLACK);
+
+    //Berries map for selection
+    std::map<std::string, uint8_t> processed_berries;
+    for (const std::unique_ptr<DonutBerriesTableRow>& row : berries_table){
+        const std::string& table_item = row->berry.slug();
+        env.log("Adding: " + table_item);
+        processed_berries[table_item]++;
+    }
+    //cout << "Processed Berries:" << endl;
+    //for (const auto& [key, value] : processed_berries){
+    //    std::cout << key << ": " << (int)value << endl;
+    //}
+
+    add_donut_ingredients(env.console, context, LANGUAGE, std::move(processed_berries));
+
+    //TODO: skip animation
+}
+
 // Press A to talk to Ansha and keep pressing A until reach the berry selection menu
-void open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void DonutMaker::open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
     // press button A to start talking to Ansha
@@ -129,7 +189,7 @@ void open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env, ProControll
 
 // Return true if it should stop
 // Start the iteration at closest pokemon center
-bool donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
     bool zoom_to_max = false;
@@ -155,7 +215,7 @@ bool donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& 
         env.update_stats();
         OperationFailedException::fire(
            ErrorReport::SEND_ERROR_REPORT,
-            "donut_maker(): Unable to find overworld after fast traveling from Vert Pokemon Cenetr after 30 sec.",
+            "donut_maker(): Unable to find overworld after fast traveling from Vert Pokemon Center after 30 sec.",
             env.console
         );
     }
@@ -221,7 +281,7 @@ bool donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     }
 
     open_berry_menu_from_ansha(env, context);
-
+    add_berries_in_menu_and_start(env, context);
 
     return true; // XXX
 
@@ -234,9 +294,22 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     assert_16_9_1080p_min(env.logger(), env.console);
 
+    if (LANGUAGE == Language::None){
+        throw UserSetupError(env.console, "Must set game language option to read berries and flavor powers.");
+    }
+
+    //Print table to log to check
+    std::vector<std::unique_ptr<FlavorPowerTableRow>> wanted_powers_table = FLAVOR_POWERS.copy_snapshot();
+    for (const std::unique_ptr<FlavorPowerTableRow>& row : wanted_powers_table){
+        FlavorPowerTableEntry table_line = row->snapshot();
+        env.log(table_line.to_str());
+    }
+    //TODO: Validate powers. The "All Types" type only applies to catching and sparkling powers. Move and resist do not have "All Types"
+    //Are people even going to target move and resist power? Big Haul/Item Berry/Alpha/Sparkling seems more likely.
+    //also TODO: powers table to however we're going to check it once that is written
+
     //  Mash button B to let Switch register the controller
     pbf_mash_button(context, BUTTON_B, 500ms);
-
 
     while(true){
         const bool should_stop = donut_iteration(env, context);
@@ -247,6 +320,10 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             break;
         }
     }
+
+
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 
