@@ -44,10 +44,10 @@ void goto_professor(Logger& logger, ProControllerContext& context, Camp camp){
         pbf_move_left_joystick_old(context, 255, 96, 1000ms, 0ms);
         return;
     case Camp::COASTLANDS_COASTLANDS:
-        pbf_move_left_joystick_old(context, 255, 48, 105, 0);
+        pbf_move_left_joystick_old(context, 255, 48, 840ms, 0ms);
         return;
     case Camp::HIGHLANDS_HIGHLANDS:
-        pbf_move_left_joystick_old(context, 255, 64, 176, 0);
+        pbf_move_left_joystick_old(context, 255, 64, 1408ms, 0ms);
         return;
     case Camp::HIGHLANDS_MOUNTAIN:
         pbf_move_left_joystick_old(context, 255, 32, 1000ms, 0ms);
@@ -59,7 +59,7 @@ void goto_professor(Logger& logger, ProControllerContext& context, Camp camp){
         pbf_move_left_joystick_old(context, 255, 56, 1000ms, 0ms);
         return;
     case Camp::ICELANDS_ICEPEAK:
-        pbf_move_left_joystick_old(context, 255, 48, 75, 0);
+        pbf_move_left_joystick_old(context, 255, 48, 600ms, 0ms);
         return;
     default:
         throw InternalProgramError(
@@ -578,15 +578,15 @@ void goto_Mai_from_camp(
         pbf_move_left_joystick_old(context, 85, 255, 2400ms, 0ms);
         return;
     case Camp::MIRELANDS_MIRELANDS:
-        pbf_move_left_joystick_old(context, 0, 120, 310, 0);
+        pbf_move_left_joystick_old(context, 0, 120, 2480ms, 0ms);
         return;
     case Camp::COASTLANDS_BEACHSIDE:
         // 255, 150 -170, 600 too long
-        pbf_move_left_joystick_old(context, 255, 165, 550, 0);
+        pbf_move_left_joystick_old(context, 255, 165, 4400ms, 0ms);
         return;
     case Camp::HIGHLANDS_HIGHLANDS:
         // 255, 150 - 170
-        pbf_move_left_joystick_old(context, 255, 165, 370, 0);
+        pbf_move_left_joystick_old(context, 255, 165, 2960ms, 0ms);
         return;
     case Camp::ICELANDS_SNOWFIELDS:
         pbf_move_left_joystick_old(context, 255, 124, 2000ms, 0ms);

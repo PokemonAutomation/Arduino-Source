@@ -112,7 +112,7 @@ void checkpoint_21(
         pbf_move_left_joystick(context, {0, +1}, 3200ms, 800ms);
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 70);
-        pbf_move_left_joystick_old(context, 128, 0, 700, 100);
+        pbf_move_left_joystick_old(context, 128, 0, 5600ms, 800ms);
 
         // turn towards wall
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 50);

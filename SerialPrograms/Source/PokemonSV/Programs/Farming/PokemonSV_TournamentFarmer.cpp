@@ -614,7 +614,7 @@ void go_to_academy_fly_point(ProgramEnvironment& env, VideoStream& stream, ProCo
     while (!isFlySuccessful && numAttempts < maxAttempts ){
         open_map_from_overworld(env.program_info(), stream, context);
         pbf_press_button(context, BUTTON_ZR, 400ms, 320ms);
-        pbf_move_left_joystick_old(context, 200, 0, 47, 25);
+        pbf_move_left_joystick_old(context, 200, 0, 376ms, 200ms);
         // pbf_move_left_joystick(context, 187, 0, 400ms, 0ms);
         numAttempts++;
         isFlySuccessful = fly_to_overworld_from_map(env.program_info(), stream, context, true);

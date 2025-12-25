@@ -30,7 +30,7 @@ void change_time_of_day_at_tent(
     switch (camp)
     {
     case Camp::FIELDLANDS_FIELDLANDS:
-        pbf_move_left_joystick_old(context, 105, 0, 220, 20);
+        pbf_move_left_joystick_old(context, 105, 0, 1760ms, 160ms);
         break;
     
     case Camp::FIELDLANDS_HEIGHTS:
@@ -38,11 +38,11 @@ void change_time_of_day_at_tent(
         break;
     
     case Camp::MIRELANDS_MIRELANDS:
-        pbf_move_left_joystick_old(context, 70, 0, 180, 20);
+        pbf_move_left_joystick_old(context, 70, 0, 1440ms, 160ms);
         break;
     
     case Camp::MIRELANDS_BOGBOUND:
-        pbf_move_left_joystick_old(context, 70, 0, 170, 20);
+        pbf_move_left_joystick_old(context, 70, 0, 1360ms, 160ms);
         break;
     
     case Camp::COASTLANDS_BEACHSIDE:
@@ -50,19 +50,19 @@ void change_time_of_day_at_tent(
         break;
     
     case Camp::COASTLANDS_COASTLANDS:
-        pbf_move_left_joystick_old(context, 75, 0, 160, 20);
+        pbf_move_left_joystick_old(context, 75, 0, 1280ms, 160ms);
         break;
     
     case Camp::HIGHLANDS_HIGHLANDS:
-        pbf_move_left_joystick_old(context, 95, 0, 190, 20);
+        pbf_move_left_joystick_old(context, 95, 0, 1520ms, 160ms);
         break;
     
     case Camp::HIGHLANDS_MOUNTAIN:
-        pbf_move_left_joystick_old(context, 60, 0, 190, 20);
+        pbf_move_left_joystick_old(context, 60, 0, 1520ms, 160ms);
         break;
     
     case Camp::HIGHLANDS_SUMMIT:
-        pbf_move_left_joystick_old(context, 100, 0, 220, 20);
+        pbf_move_left_joystick_old(context, 100, 0, 1760ms, 160ms);
         break;
     
     case Camp::ICELANDS_SNOWFIELDS:
@@ -70,7 +70,7 @@ void change_time_of_day_at_tent(
         break;
 
     case Camp::ICELANDS_ICEPEAK:
-        pbf_move_left_joystick_old(context, 110, 0, 220, 20);
+        pbf_move_left_joystick_old(context, 110, 0, 1760ms, 160ms);
         break;
     }
 
