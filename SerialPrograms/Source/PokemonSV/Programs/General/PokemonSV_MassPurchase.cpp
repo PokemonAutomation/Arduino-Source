@@ -201,7 +201,7 @@ void PokemonSV::MassPurchase::program(SingleSwitchProgramEnvironment& env, ProCo
             pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
 
             if (PAY_LP){
-                pbf_press_dpad(context, DPAD_DOWN, 5, 105);
+                pbf_press_dpad_old(context, DPAD_DOWN, 5, 105);
             }
 
             pbf_press_button(context, BUTTON_A, 160ms, 1840ms);

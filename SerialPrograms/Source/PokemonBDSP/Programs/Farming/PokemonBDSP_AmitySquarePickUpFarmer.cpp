@@ -103,7 +103,7 @@ void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, ProCo
         pbf_wait(context, WAIT_TIME_FOR_POKEMON0);
 
         // Face toward your pokemon.
-        pbf_press_dpad(context, DPAD_RIGHT, 1, 0);
+        pbf_press_dpad(context, DPAD_RIGHT, 8ms, 0ms);  //  This works? It's not too short?
 
         // Mash button to talk to pokemon
         pbf_mash_button_old(context, BUTTON_ZL, 500);

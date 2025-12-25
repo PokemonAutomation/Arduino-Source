@@ -124,10 +124,10 @@ void GenerateDexModelSession::iterate_form(const std::string& slug, bool shiny, 
     //  Stills
     for (size_t y = 0; y < m_vertical_frames; y++){
         for (size_t x = 0; x < m_horizontal_frames; x++){
-            pbf_press_dpad(m_context, DPAD_RIGHT, step, 50);
+            pbf_press_dpad_old(m_context, DPAD_RIGHT, step, 50);
             save_image(slug, shiny, form_index, image_index++);
         }
-        pbf_press_dpad(m_context, DPAD_DOWN, step, 50);
+        pbf_press_dpad_old(m_context, DPAD_DOWN, step, 50);
     }
     pbf_press_dpad(m_context, DPAD_UP, 1000ms, 0ms);
 
@@ -135,13 +135,13 @@ void GenerateDexModelSession::iterate_form(const std::string& slug, bool shiny, 
     pbf_press_button(m_context, BUTTON_A, 160ms, 240ms);
     for (size_t y = 0; y < m_vertical_frames; y++){
         for (size_t x = 0; x < m_horizontal_frames; x++){
-            pbf_press_dpad(m_context, DPAD_RIGHT, step, 50);
+            pbf_press_dpad_old(m_context, DPAD_RIGHT, step, 50);
             for (size_t t = 0; t < m_animation_frames; t++){
                 save_image(slug, shiny, form_index, image_index++);
                 m_context.wait_for(std::chrono::milliseconds(500));
             }
         }
-        pbf_press_dpad(m_context, DPAD_DOWN, step, 50);
+        pbf_press_dpad_old(m_context, DPAD_DOWN, step, 50);
     }
     pbf_press_dpad(m_context, DPAD_UP, 1000ms, 0ms);
 }

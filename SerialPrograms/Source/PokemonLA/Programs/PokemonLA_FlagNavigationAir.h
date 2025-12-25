@@ -40,9 +40,6 @@ private:
 
 
 private:
-    static const uint16_t GET_ON_MOUNT_TIME = 125;
-    static const uint16_t GET_ON_BRAVIARY_TIME = 280;
-
     enum class State{
         UNKNOWN,
         WYRDEER_BASCULEGION_OFF,

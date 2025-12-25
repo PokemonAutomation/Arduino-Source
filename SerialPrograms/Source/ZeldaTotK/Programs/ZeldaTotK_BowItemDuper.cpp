@@ -89,7 +89,7 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         // zr to pull out bow
         pbf_press_button(context, BUTTON_ZR, 12, 12);
         // dpad up to try to fuse the item, release for a while to make sure fused
-        pbf_press_dpad(context, DPAD_UP, 20, 200);
+        pbf_press_dpad_old(context, DPAD_UP, 20, 200);
         
         // then go ahead and enter the menu and do the various menuing in order to actually perform glitch
         pbf_press_button(context, BUTTON_PLUS, 160ms, 80ms);

@@ -200,7 +200,7 @@ void run_autohost(
     );
 
     //  Start Raid
-    pbf_press_dpad(context, DPAD_UP, 5, 45);
+    pbf_press_dpad_old(context, DPAD_UP, 5, 45);
 
     //  Mash A until it's time to close the game.
     if (console.video().snapshot()){
@@ -229,7 +229,7 @@ void run_autohost(
         pbf_press_button(context, BUTTON_A, 160ms, 640ms);
         if (dynamax){
             pbf_press_dpad(context, DPAD_LEFT, 160ms, 240ms);
-            pbf_press_button(context, BUTTON_A, 20, 60);
+            pbf_press_button(context, BUTTON_A, 160ms, 480ms);
         }
         for (uint8_t c = 1; c < move_slot; c++){
             pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);

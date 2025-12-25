@@ -95,7 +95,7 @@ void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, ProContr
     pbf_press_dpad(context, DPAD_LEFT, 80ms, 400ms);
     pbf_press_dpad(context, DPAD_LEFT, 80ms, 400ms);
 
-    pbf_press_dpad(context, DPAD_DOWN, 10, 80);
+    pbf_press_dpad_old(context, DPAD_DOWN, 10, 80);
 
     pbf_press_button(context, BUTTON_A, 160ms, 320ms);
     context.wait_for_all_requests();
@@ -108,7 +108,7 @@ void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, ProContr
     pbf_press_dpad(context, DPAD_RIGHT, 80ms, 400ms);
 
     ssf_press_button(context, BUTTON_B, 0ms, 720ms);
-    pbf_press_dpad(context, DPAD_UP, 90, 50);
+    pbf_press_dpad_old(context, DPAD_UP, 90, 50);
 
     pbf_press_button(context, BUTTON_A, 160ms, 320ms);
     context.wait_for_all_requests();
@@ -121,7 +121,7 @@ void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, ProContr
     pbf_press_dpad(context, DPAD_RIGHT, 80ms, 400ms);
 
     ssf_press_button(context, BUTTON_B, 0ms, 720ms);
-    pbf_press_dpad(context, DPAD_DOWN, 90, 50);
+    pbf_press_dpad_old(context, DPAD_DOWN, 90, 50);
 
     pbf_press_button(context, BUTTON_A, 160ms, 320ms);
     context.wait_for_all_requests();
@@ -132,7 +132,7 @@ void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, ProContr
     pbf_press_dpad(context, DPAD_UP, 80ms, 400ms);
 
     ssf_press_button(context, BUTTON_B, 0ms, 920ms);
-    pbf_press_dpad(context, DPAD_LEFT, 115, 50);
+    pbf_press_dpad_old(context, DPAD_LEFT, 115, 50);
 
     pbf_press_button(context, BUTTON_A, 160ms, 320ms);
     context.wait_for_all_requests();
@@ -159,14 +159,14 @@ void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, ProContr
     pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
 
     ssf_press_button(context, BUTTON_B, 0ms, 640ms);
-    pbf_press_dpad(context, DPAD_LEFT, 80, 50);
+    pbf_press_dpad_old(context, DPAD_LEFT, 80, 50);
 
     pbf_press_button(context, BUTTON_A, 160ms, 320ms);
     context.wait_for_all_requests();
 
     env.log("Step 8: 7 Right.");
     ssf_press_button(context, BUTTON_B, 0ms, 920ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 115, 50);
+    pbf_press_dpad_old(context, DPAD_RIGHT, 115, 50);
 
     pbf_press_button(context, BUTTON_A, 160ms, 320ms);
     context.wait_for_all_requests();
@@ -184,7 +184,7 @@ void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, ProContr
 
     env.log("Step 10: 4 Up.");
     ssf_press_button(context, BUTTON_B, 0ms, 640ms);
-    pbf_press_dpad(context, DPAD_UP, 80, 80);
+    pbf_press_dpad_old(context, DPAD_UP, 80, 80);
     context.wait_for_all_requests();
 }
 

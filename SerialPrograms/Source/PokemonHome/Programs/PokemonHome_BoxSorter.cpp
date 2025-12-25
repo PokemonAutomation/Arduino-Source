@@ -98,35 +98,35 @@ BoxSorter::BoxSorter()
         "<b>Number of Boxes to Sort:</b>",
         LockMode::LOCK_WHILE_RUNNING,
         1, 1, MAX_BOXES
-        )
+    )
     , VIDEO_DELAY(
           "<b>Capture Card Delay:</b>",
           LockMode::LOCK_WHILE_RUNNING,
-          50
-          )
+          "400 ms"
+    )
     , GAME_DELAY(
           "<b>" + STRING_POKEMON + " Home App Delay:</b>",
           LockMode::LOCK_WHILE_RUNNING,
-          30
-          )
+          "240 ms"
+    )
     , SORT_TABLE(
           "<b>Sort Order Rules:</b><br>Sort order rules will be applied top to bottom."
-          )
+    )
     , OUTPUT_FILE(
           false,
           "<b>Output File:</b><br>JSON file basename to catalogue box info found by the program.",
           LockMode::LOCK_WHILE_RUNNING,
           "box_order",
           "box_order"
-          )
+    )
     , DRY_RUN(
           "<b>Dry Run:</b><br>Catalogue and make sorting plan without execution. Check output at <output_file>.json and <output_file>-sorted.json)",
           LockMode::LOCK_WHILE_RUNNING,
           false
-          )
+    )
     , NOTIFICATIONS({
           &NOTIFICATION_PROGRAM_FINISH
-      })
+    })
 {
     PA_ADD_OPTION(BOX_NUMBER); //number of box to check and sort
     PA_ADD_OPTION(VIDEO_DELAY); //delay for every input that need video feedback, user will be able to modify this to enhance capture card delay compatibility
@@ -140,7 +140,11 @@ BoxSorter::BoxSorter()
 
 // Move the red cursor to the first slot of the box
 // If the cursor is not add the first slot, move the cursor to the left and up one row at a time until it is at the first slot. 
-bool go_to_first_slot(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint16_t VIDEO_DELAY){
+bool go_to_first_slot(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    Milliseconds VIDEO_DELAY
+){
     ImageFloatBox first_slot_cursor_box(0.07, 0.15, 0.01, 0.01); //cursor position of the first slot of the box
     VideoSnapshot screen = env.console.video().snapshot();
     FloatPixel first_slot_cursor_color = image_stats(extract_box_reference(screen, first_slot_cursor_box)).average;
@@ -153,7 +157,7 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, ProControllerContext&
         bool cursor_found = false;
         for (uint8_t rows = 0; rows < 7; rows++){
             for (uint8_t column = 0; column < 5; column++){
-                pbf_press_dpad(context, DPAD_LEFT, 10, VIDEO_DELAY);
+                pbf_press_dpad(context, DPAD_LEFT, 80ms, VIDEO_DELAY);
                 context.wait_for_all_requests();
                 screen = env.console.video().snapshot();
                 first_slot_cursor_color = image_stats(extract_box_reference(screen, first_slot_cursor_box)).average;
@@ -165,7 +169,7 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, ProControllerContext&
                 }
             }
             if(!cursor_found){
-                pbf_press_dpad(context, DPAD_UP, 10, VIDEO_DELAY);
+                pbf_press_dpad(context, DPAD_UP, 80ms, VIDEO_DELAY);
                 context.wait_for_all_requests();
                 screen = env.console.video().snapshot();
                 first_slot_cursor_color = image_stats(extract_box_reference(screen, first_slot_cursor_box)).average;
@@ -193,7 +197,7 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, ProControllerContext&
     ProControllerContext& context,
     const BoxCursor& cur_cursor,
     const BoxCursor& dest_cursor,
-    uint16_t GAME_DELAY
+    Milliseconds GAME_DELAY
 ){
 
     std::ostringstream ss;
@@ -202,29 +206,29 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
     // TODO: shortest path movement though pages, boxes
     for (size_t i = cur_cursor.box; i < dest_cursor.box; ++i){
-        pbf_press_button(context, BUTTON_R, 10, GAME_DELAY+30);
+        pbf_press_button(context, BUTTON_R, 80ms, GAME_DELAY + 240ms);
     }
     for (size_t i = dest_cursor.box; i < cur_cursor.box; ++i){
-        pbf_press_button(context, BUTTON_L, 10, GAME_DELAY+30);
+        pbf_press_button(context, BUTTON_L, 80ms, GAME_DELAY + 240ms);
     }
 
 
     // direct nav up or down through rows
     if (!(cur_cursor.row == 0 && dest_cursor.row == 4) && !(dest_cursor.row == 0 && cur_cursor.row == 4)){
         for (size_t i = cur_cursor.row; i < dest_cursor.row; ++i){
-            pbf_press_dpad(context, DPAD_DOWN, 10, GAME_DELAY);
+            pbf_press_dpad(context, DPAD_DOWN, 80ms, GAME_DELAY);
         }
         for (size_t i = dest_cursor.row; i < cur_cursor.row; ++i){
-            pbf_press_dpad(context, DPAD_UP, 10, GAME_DELAY);
+            pbf_press_dpad(context, DPAD_UP, 80ms, GAME_DELAY);
         }
     }else{ // wrap around is faster to move between first or last row
         if (cur_cursor.row == 0 && dest_cursor.row == 4){
             for (size_t i = 0; i <= 2; ++i){
-                pbf_press_dpad(context, DPAD_UP, 10, GAME_DELAY);
+                pbf_press_dpad(context, DPAD_UP, 80ms, GAME_DELAY);
             }
         }else{
             for (size_t i = 0; i <= 2; ++i){
-                pbf_press_dpad(context, DPAD_DOWN, 10, GAME_DELAY);
+                pbf_press_dpad(context, DPAD_DOWN, 80ms, GAME_DELAY);
             }
         }
     }
@@ -232,20 +236,20 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, ProControllerContext&
     // direct nav forward or backward through columns
     if ((dest_cursor.column > cur_cursor.column && dest_cursor.column - cur_cursor.column <= 3) || (cur_cursor.column > dest_cursor.column && cur_cursor.column - dest_cursor.column <= 3)){
         for (size_t i = cur_cursor.column; i < dest_cursor.column; ++i){
-            pbf_press_dpad(context, DPAD_RIGHT, 10, GAME_DELAY);
+            pbf_press_dpad(context, DPAD_RIGHT, 80ms, GAME_DELAY);
         }
         for (size_t i = dest_cursor.column; i < cur_cursor.column; ++i){
-            pbf_press_dpad(context, DPAD_LEFT, 10, GAME_DELAY);
+            pbf_press_dpad(context, DPAD_LEFT, 80ms, GAME_DELAY);
         }
     }else{ // wrap around is faster if direct movement is more than 3 away
         if (dest_cursor.column > cur_cursor.column){
             for (size_t i = 0; i < BOX_COLS - (dest_cursor.column - cur_cursor.column); ++i){
-                pbf_press_dpad(context, DPAD_LEFT, 10, GAME_DELAY);
+                pbf_press_dpad(context, DPAD_LEFT, 80ms, GAME_DELAY);
             }
         }
         if (cur_cursor.column > dest_cursor.column){
             for (size_t i = 0; i < BOX_COLS - (cur_cursor.column - dest_cursor.column); ++i){
-                pbf_press_dpad(context, DPAD_RIGHT, 10, GAME_DELAY);
+                pbf_press_dpad(context, DPAD_RIGHT, 80ms, GAME_DELAY);
             }
         }
     }
@@ -270,7 +274,7 @@ void sort(
     std::vector<std::optional<CollectedPokemonInfo>> boxes_sorted,
     BoxSorter_Descriptor::Stats& stats,
     BoxCursor& cur_cursor,
-    uint16_t GAME_DELAY
+    Milliseconds GAME_DELAY
 ){
     env.log("Start sorting...");
     env.add_overlay_log("Start Sorting...");
@@ -304,11 +308,11 @@ void sort(
 
                 //moving cursor to the pokemon to pick it up
                 cur_cursor = move_cursor_to(env, context, cur_cursor, cursor, GAME_DELAY);
-                pbf_press_button(context, BUTTON_Y, 10, GAME_DELAY+30);
+                pbf_press_button(context, BUTTON_Y, 80ms, GAME_DELAY + 240ms);
 
                 //moving to destination to place it or swap it
                 cur_cursor = move_cursor_to(env, context, cur_cursor, cursor_s, GAME_DELAY);
-                pbf_press_button(context, BUTTON_Y, 10, GAME_DELAY+30);
+                pbf_press_button(context, BUTTON_Y, 80ms, GAME_DELAY + 240ms);
 
                 context.wait_for_all_requests();
 
@@ -504,7 +508,7 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     video_overlay_set.add(COLOR_BLUE, select_check);
     if(image_value.r <= image_value.g + image_value.b){
         for (int var = 0; var < 5; ++var){
-            pbf_press_button(context, BUTTON_B, 10, GAME_DELAY+10);
+            pbf_press_button(context, BUTTON_B, 80ms, GAME_DELAY.get() + 80ms);
         }
         context.wait_for_all_requests();
         context.wait_for(std::chrono::milliseconds(VIDEO_DELAY));
@@ -513,7 +517,7 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         env.console.log("Color detected from the select square: " + image_value.to_string());
         if(image_value.r <= image_value.g + image_value.b){
             for (int i = 0; i < 2; ++i){
-                pbf_press_button(context, BUTTON_ZR, 10, VIDEO_DELAY+30); //additional delay because this animation is slower than the rest
+                pbf_press_button(context, BUTTON_ZR, 80ms, VIDEO_DELAY.get() + 240ms); //additional delay because this animation is slower than the rest
                 context.wait_for_all_requests();
                 screen = env.console.video().snapshot();
                 image_value = image_stats(extract_box_reference(screen, select_check)).average;
@@ -542,7 +546,7 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     for (size_t box_idx = 0; box_idx < BOX_NUMBER; box_idx++){
         if(box_idx != 0){
             // Press button R to move to next box
-            pbf_press_button(context, BUTTON_R, 10, VIDEO_DELAY+100);
+            pbf_press_button(context, BUTTON_R, 80ms, VIDEO_DELAY.get() + 800ms);
         }else{
             // Moving the cursor until it goes to the first slot
             if(!go_to_first_slot(env, context, VIDEO_DELAY)){
@@ -570,10 +574,10 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
             env.add_overlay_log("Checking Summary...");
 
-            pbf_press_button(context, BUTTON_A, 10, GAME_DELAY);
+            pbf_press_button(context, BUTTON_A, 80ms, GAME_DELAY);
             context.wait_for_all_requests();
             video_overlay_set.clear();
-            pbf_press_dpad(context, DPAD_DOWN, 10, GAME_DELAY);
+            pbf_press_dpad(context, DPAD_DOWN, 80ms, GAME_DELAY);
             pbf_press_button(context, BUTTON_A, 80ms, 100ms);
             context.wait_for_all_requests();
             int ret = wait_until(env.console, context, Seconds(5), {summary_screen_watcher});

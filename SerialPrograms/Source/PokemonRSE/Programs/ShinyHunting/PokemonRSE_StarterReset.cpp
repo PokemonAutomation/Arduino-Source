@@ -149,8 +149,8 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         }
 
         //Open the summary and check the color of the number
-        pbf_press_dpad(context, DPAD_DOWN, 40, 80);
-        pbf_press_button(context, BUTTON_A, 40, 80);
+        pbf_press_dpad(context, DPAD_DOWN, 320ms, 640ms);
+        pbf_press_button(context, BUTTON_A, 320ms, 640ms);
 
         BlackScreenOverWatcher detector(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
         int ret2 = wait_until(
@@ -170,11 +170,11 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         }
 
         pbf_press_button(context, BUTTON_A, 20, 180);
-        pbf_press_dpad(context, DPAD_DOWN, 40, 80);
-        pbf_press_button(context, BUTTON_A, 40, 80);
+        pbf_press_dpad(context, DPAD_DOWN, 320ms, 640ms);
+        pbf_press_button(context, BUTTON_A, 320ms, 640ms);
 
         //Check second party member - used for testing with hacked in shiny starter
-        //pbf_press_dpad(context, DPAD_DOWN, 40, 80);
+        //pbf_press_dpad(context, DPAD_DOWN, 320ms, 640ms);
 
         pbf_wait(context, 125);
         context.wait_for_all_requests();

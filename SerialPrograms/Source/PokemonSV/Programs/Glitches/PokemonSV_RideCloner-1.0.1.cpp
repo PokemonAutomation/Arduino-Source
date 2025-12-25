@@ -343,7 +343,7 @@ bool RideCloner101::run_post_win(
             console.log("Detected add-to-party prompt.");
             add_to_party_menu = true;
             if (result == TeraResult::NO_DETECTION){
-                pbf_press_dpad(context, DPAD_DOWN, 20, 60);
+                pbf_press_dpad(context, DPAD_DOWN, 160ms, 480ms);
             }
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             continue;

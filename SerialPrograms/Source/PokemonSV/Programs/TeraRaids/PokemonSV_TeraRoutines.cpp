@@ -686,7 +686,7 @@ TeraResult exit_tera_win_by_catching(
         case 3:
             stream.log("Detected add-to-party prompt.");
             if (result == TeraResult::NO_DETECTION){
-                pbf_press_dpad(context, DPAD_DOWN, 20, 60);
+                pbf_press_dpad(context, DPAD_DOWN, 160ms, 480ms);
 //                pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             }else{
                 pbf_press_button(context, BUTTON_B, 160ms, 840ms);

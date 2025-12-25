@@ -162,7 +162,7 @@ void ShinyHuntMew::exit_mew(SingleSwitchProgramEnvironment& env, ProControllerCo
     pbf_press_dpad(context, DPAD_DOWN, 400ms, 160ms);
 
     ssf_press_button(context, BUTTON_B, 0ms, 720ms);
-    pbf_press_dpad(context, DPAD_LEFT, 90, 20);
+    pbf_press_dpad(context, DPAD_LEFT, 720ms, 160ms);
 
     ssf_press_button(context, BUTTON_B, 0ms, 800ms);
     pbf_press_dpad(context, DPAD_DOWN, 800ms, 160ms);

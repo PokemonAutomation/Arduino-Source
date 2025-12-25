@@ -786,7 +786,7 @@ void navigate_school_layout_menu(
         context,
         [dpad_button](ProControllerContext& context){
             for (int i = 0; i < 3; i++){
-                pbf_press_dpad(context, dpad_button, 20, 500);
+                pbf_press_dpad_old(context, dpad_button, 20, 500);
             }
         },
         { arrow_end }        

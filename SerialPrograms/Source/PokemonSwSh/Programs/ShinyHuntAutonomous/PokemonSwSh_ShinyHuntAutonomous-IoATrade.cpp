@@ -114,7 +114,7 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, P
         env.update_stats();
 
         pbf_press_button(context, BUTTON_A, 160ms, 800ms);
-        pbf_press_button(context, BUTTON_A, 20, 60);
+        pbf_press_button(context, BUTTON_A, 160ms, 480ms);
         pbf_press_button(context, BUTTON_A, 160ms, 800ms);
         pbf_press_button(context, BUTTON_A, 160ms, 400ms);
         pbf_press_button(context, BUTTON_A, 160ms, GameSettings::instance().POKEMON_TO_BOX_DELAY0);

@@ -20,6 +20,13 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
+
+//const Milliseconds GET_ON_MOUNT_TIME = 1000ms;
+const Milliseconds GET_ON_BRAVIARY_TIME = 2240ms;
+
+
+
+
 FlagNavigationAir::FlagNavigationAir(
     ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     uint16_t stop_radius,
@@ -77,14 +84,14 @@ FlagNavigationAir::FlagNavigationAir(
         m_stream.log("Switching from Wyrdeer/Basculegion (off) to Braviary (on)...");
         m_active_command->dispatch([](ProControllerContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms);
-            pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
+            pbf_press_button(context, BUTTON_PLUS, 160ms, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
     register_state_command(State::WYRDEER_BASCULEGION_ON, [this](){
         m_stream.log("Switching from Wyrdeer/Basculegion (on) to Braviary (on)...");
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
@@ -109,7 +116,7 @@ FlagNavigationAir::FlagNavigationAir(
         m_stream.log("Switching from Sneasler (off) to Braviary (on)...");
         m_active_command->dispatch([](ProControllerContext& context){
             pbf_press_dpad(context, DPAD_LEFT, 160ms, 400ms);
-            pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
+            pbf_press_button(context, BUTTON_PLUS, 160ms, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
@@ -118,7 +125,7 @@ FlagNavigationAir::FlagNavigationAir(
         m_looking_straight_ahead.store(false, std::memory_order_release);
         m_active_command->dispatch([](ProControllerContext& context){
             pbf_move_left_joystick(context, {0, +1}, 1000ms, 0ms);
-            pbf_press_dpad(context, DPAD_LEFT, 20, GET_ON_BRAVIARY_TIME);
+            pbf_press_dpad(context, DPAD_LEFT, 160ms, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
@@ -126,7 +133,7 @@ FlagNavigationAir::FlagNavigationAir(
         m_stream.log("Switching from Braviary (off) to Braviary (on)...");
         m_looking_straight_ahead.store(false, std::memory_order_release);
         m_active_command->dispatch([](ProControllerContext& context){
-            pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
+            pbf_press_button(context, BUTTON_PLUS, 160ms, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });

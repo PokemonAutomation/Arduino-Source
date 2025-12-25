@@ -100,7 +100,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
 
     //  Select the cooking option.
     pbf_press_button(context, BUTTON_X, 5, 125);
-    pbf_press_dpad(context, DPAD_RIGHT, 5, 100);
+    pbf_press_dpad_old(context, DPAD_RIGHT, 5, 100);
     pbf_press_button(context, BUTTON_A, 5, 125);
     pbf_press_button(context, BUTTON_A, 5, 300);
 
@@ -114,7 +114,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         //  Which berries do you want to use?
         pbf_press_button(context, BUTTON_A, 5, 75);     //  Get rid of the pop-up menu.
         pbf_press_button(context, BUTTON_A, 5, 75);
-        pbf_press_dpad(context, DPAD_UP, 5, 75);
+        pbf_press_dpad_old(context, DPAD_UP, 5, 75);
         pbf_press_button(context, BUTTON_A, 5, 125);
         pbf_press_button(context, BUTTON_PLUS, 5, 200); //  125. english text is longer.
         pbf_press_button(context, BUTTON_A, 5, 1000);   //  Berries are now selected as well.

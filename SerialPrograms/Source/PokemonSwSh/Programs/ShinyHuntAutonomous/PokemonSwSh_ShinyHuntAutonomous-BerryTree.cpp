@@ -162,7 +162,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
 
     home_to_date_time(env.console, context, false);
     pbf_press_button(context, BUTTON_A, 5, 5);
-    pbf_press_button(context, BUTTON_A, 5, 10);
+    pbf_press_button(context, BUTTON_A, 40ms, 80ms);
     pbf_press_button(context, BUTTON_HOME, 80ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 
     if (!GO_HOME_WHEN_DONE){

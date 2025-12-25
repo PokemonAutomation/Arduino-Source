@@ -449,7 +449,7 @@ bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment
         switch (ret){
         case 0:
             env.console.log("Detected add-to-party prompt.");
-            pbf_press_dpad(context, DPAD_DOWN, 20, 60);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 480ms);
             continue;
         case 1:
             env.console.log("Detected cursor over view summary.");
