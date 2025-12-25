@@ -156,7 +156,7 @@ void GeneratePokemonImageTrainingData::select_starting_location(SingleSwitchProg
         // at gate, face towards the gate
         pbf_move_left_joystick(context, {0, -1}, 1920ms, 240ms); // move backwards
         pbf_move_left_joystick_old(context, 255, 150, 960ms, 480ms); // move to right
-        pbf_press_button(context, BUTTON_ZL, 30, 125); // rotate camera to point to where the character is facing
+        pbf_press_button_old(context, BUTTON_ZL, 30, 125); // rotate camera to point to where the character is facing
         pbf_move_left_joystick(context, {0, +1}, 5600ms, 240ms); // move forward
         pbf_move_left_joystick_old(context, 255, 125, 240ms, 480ms); // move to right
         break;

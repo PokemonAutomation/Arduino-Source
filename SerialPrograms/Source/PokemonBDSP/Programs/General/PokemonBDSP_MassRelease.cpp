@@ -71,7 +71,7 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env, ProControllerCont
     env.update_stats();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     Milliseconds box_scroll_delay = GameSettings::instance().BOX_SCROLL_DELAY0;
     Milliseconds box_change_delay = GameSettings::instance().BOX_CHANGE_DELAY0;

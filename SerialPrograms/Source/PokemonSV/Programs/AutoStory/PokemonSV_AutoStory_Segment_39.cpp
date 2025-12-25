@@ -279,11 +279,11 @@ void checkpoint_103(SingleSwitchProgramEnvironment& env, ProControllerContext& c
 
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_press_button(context, BUTTON_L, 30, 10);
+                pbf_press_button(context, BUTTON_L, 240ms, 80ms);
                 pbf_move_left_joystick(context, {+1, 0}, 560ms, 400ms);
 
                 pbf_move_left_joystick_old(context, 110, 0, 80ms, 400ms);
-                pbf_press_button(context, BUTTON_L, 30, 10);
+                pbf_press_button(context, BUTTON_L, 240ms, 80ms);
 
                 pbf_move_left_joystick(context, {0, +1}, 4800ms, 400ms);
                 wait_for_overworld(env.program_info(), env.console, context, 30);

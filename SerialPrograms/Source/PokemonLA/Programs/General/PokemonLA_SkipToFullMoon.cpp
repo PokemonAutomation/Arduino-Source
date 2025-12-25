@@ -47,7 +47,7 @@ SkipToFullMoon::SkipToFullMoon()
 
 void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     while (true){
         // Open menu

@@ -93,7 +93,7 @@ void DaySkipperJPN::run_switch1(SingleSwitchProgramEnvironment& env, ProControll
     uint32_t remaining_skips = SKIPS;
 
     //  Connect
-    pbf_press_button(context, BUTTON_ZR, 5, 5);
+    pbf_press_button(context, BUTTON_ZR, 40ms, 40ms);
 
     //  Setup starting state.
     init_view(context);
@@ -152,7 +152,7 @@ void DaySkipperJPN::run_switch2(SingleSwitchProgramEnvironment& env, ProControll
     uint32_t remaining_skips = SKIPS;
 
     //  Connect
-    pbf_press_button(context, BUTTON_ZR, 5, 5);
+    pbf_press_button(context, BUTTON_ZR, 40ms, 40ms);
 
     //  Setup starting state.
     init_view(context);

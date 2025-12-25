@@ -19,8 +19,8 @@ namespace PokemonBDSP{
 bool heal_by_global_room(VideoStream& stream, ProControllerContext& context){
     stream.overlay().add_log("Heal by Global Room", COLOR_WHITE);
     // Go to union room menu.
-    const uint16_t overworld_to_room_delay = 125;
-    pbf_press_button(context, BUTTON_Y, 10, overworld_to_room_delay);
+    const Milliseconds overworld_to_room_delay = 1000ms;
+    pbf_press_button(context, BUTTON_Y, 80ms, overworld_to_room_delay);
 
     // Go to global room.
     pbf_press_dpad(context, DPAD_RIGHT, 80ms, 800ms);
@@ -32,7 +32,7 @@ bool heal_by_global_room(VideoStream& stream, ProControllerContext& context){
         stream, context,
         [](ProControllerContext& context){
             for (int i = 0; i < 5; i++){
-                pbf_press_button(context, BUTTON_ZL, 10, 125);
+                pbf_press_button(context, BUTTON_ZL, 80ms, 1000ms);
             }
         },
         {{arrow}}
@@ -46,7 +46,7 @@ bool heal_by_global_room(VideoStream& stream, ProControllerContext& context){
     }
 
     // Select "Yes"
-    pbf_press_button(context, BUTTON_ZL, 10, 125);
+    pbf_press_button(context, BUTTON_ZL, 80ms, 1000ms);
     
     // Then mash B to leave Union Room
     pbf_mash_button_old(context, BUTTON_B, 400);

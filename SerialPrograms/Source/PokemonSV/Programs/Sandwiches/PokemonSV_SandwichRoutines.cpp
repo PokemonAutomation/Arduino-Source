@@ -224,7 +224,7 @@ bool select_sandwich_recipe(
 
     if (found_recipe){
         // Press A to enter the pick selection 
-        pbf_press_button(context, BUTTON_A, 30, 100);
+        pbf_press_button(context, BUTTON_A, 240ms, 800ms);
 //        context.wait_for_all_requests();
 
         SandwichIngredientArrowWatcher pick_selection(0, COLOR_YELLOW);
@@ -237,11 +237,11 @@ bool select_sandwich_recipe(
 
             if (ret == 0){
                 stream.log("Detected recipe selection. Dropped Button A?");
-                pbf_press_button(context, BUTTON_A, 30, 100);
+                pbf_press_button(context, BUTTON_A, 240ms, 800ms);
                 continue;
             }else if (ret == 1){
                 stream.log("Detected pick selection.");
-                pbf_press_button(context, BUTTON_A, 30, 100);
+                pbf_press_button(context, BUTTON_A, 240ms, 800ms);
                 continue;
             }else{
                 stream.log("Entered sandwich minigame.");
@@ -552,7 +552,7 @@ HandMoveData move_sandwich_hand_and_check_if_plates_empty(
 //                pbf_controller_state(context, BUTTON_A, DPAD_NONE, joystick_x, joystick_y, 128, 128, 20);
                 ssf_press_button(context, BUTTON_A, 0ms, 8000ms, 0ms);
             }
-            pbf_move_left_joystick_old(context, joystick_x, joystick_y, 20, 0);
+            pbf_move_left_joystick_old(context, joystick_x, joystick_y, 160ms, 0ms);
         });
         
         stream.log("Moved joystick");
@@ -1145,7 +1145,7 @@ void run_sandwich_maker(
         //this differs from the game layout: far right is 5 and far far left/right is 6 in game
         //however as long as we stay internally consistent with this numbering it will work
         for (int i = 0; i < (plates - 3); i++){
-            pbf_press_button(context, BUTTON_R, 20, 180);
+            pbf_press_button_old(context, BUTTON_R, 20, 180);
             context.wait_for_all_requests();
 
             screen = stream.video().snapshot();

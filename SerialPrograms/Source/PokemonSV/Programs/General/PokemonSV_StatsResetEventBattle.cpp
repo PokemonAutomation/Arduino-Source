@@ -388,7 +388,7 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, ProC
     if (ret == 0){
         env.log("Catch prompt detected.");
 
-        pbf_press_button(context, BUTTON_A, 20, 150);
+        pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
         context.wait_for_all_requests();
 
         BattleBallReader reader(env.console, LANGUAGE);

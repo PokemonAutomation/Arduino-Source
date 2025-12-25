@@ -188,7 +188,7 @@ bool use_lets_go_to_clear_in_front(
     int ret = run_until<ProControllerContext>(
         stream, context,
         [](ProControllerContext& context){
-            pbf_press_button(context, BUTTON_R, 20, 200);
+            pbf_press_button(context, BUTTON_R, 160ms, 1600ms);
         },
         {bubble}
     );

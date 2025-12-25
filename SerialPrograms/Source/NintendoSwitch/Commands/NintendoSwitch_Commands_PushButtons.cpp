@@ -19,7 +19,7 @@ void pbf_wait_old(ProControllerContext& context, uint16_t ticks){
 void pbf_wait(ProControllerContext& context, Milliseconds duration){
     ssf_do_nothing(context, duration);
 }
-void pbf_press_button(ProControllerContext& context, Button button, uint16_t hold_ticks, uint16_t release_ticks){
+void pbf_press_button_old(ProControllerContext& context, Button button, uint16_t hold_ticks, uint16_t release_ticks){
     ssf_press_button(context, button, (hold_ticks + release_ticks) * 8ms, hold_ticks * 8ms, 0ms);
 }
 void pbf_press_button(ProControllerContext& context, Button button, Milliseconds hold, Milliseconds release){
@@ -46,17 +46,6 @@ void pbf_move_left_joystick_old(ProControllerContext& context, uint8_t x, uint8_
 void pbf_move_left_joystick(ProControllerContext& context, const JoystickPosition& position, Milliseconds hold, Milliseconds release){
     ssf_press_left_joystick(context, position, hold + release, hold, 0ms);
 }
-#if 0
-void pbf_move_right_joystick(ProControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
-    uint32_t delay = (uint32_t)hold_ticks + release_ticks;
-    if ((uint16_t)delay == delay){
-        ssf_press_right_joystick(context, x, y, (uint16_t)delay, hold_ticks, 0);
-    }else{
-        ssf_press_right_joystick(context, x, y, hold_ticks, hold_ticks, 0);
-        ssf_do_nothing(context, release_ticks);
-    }
-}
-#endif
 void pbf_move_right_joystick_old(ProControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release){
     ssf_press_right_joystick_old(context, x, y, hold + release, hold, 0ms);
 }
@@ -72,7 +61,7 @@ void pbf_mash_button(ProControllerContext& context, Button button, Milliseconds 
 
 void grip_menu_connect_go_home(ProControllerContext& context){
     pbf_press_button(context, BUTTON_L | BUTTON_R, 80ms, 320ms);
-    pbf_press_button(context, BUTTON_A, 10, 140);
+    pbf_press_button(context, BUTTON_A, 80ms, 1120ms);
     pbf_press_button(context, BUTTON_HOME, 80ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 }
 

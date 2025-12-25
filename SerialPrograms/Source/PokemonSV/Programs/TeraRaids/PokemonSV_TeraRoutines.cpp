@@ -54,8 +54,8 @@ bool open_raid(VideoStream& stream, ProControllerContext& context){
             [](ProControllerContext& context){
                 //  Do 2 presses in quick succession in case one drops or is
                 //  needed to connect the controller.
-                pbf_press_button(context, BUTTON_A, 5, 5);
-                pbf_press_button(context, BUTTON_A, 20, 355);
+                pbf_press_button(context, BUTTON_A, 40ms, 40ms);
+                pbf_press_button_old(context, BUTTON_A, 20, 355);
             },
             {
                 card_detector,
@@ -134,7 +134,7 @@ void open_hosting_lobby(
             int ret = run_until<ProControllerContext>(
                 stream, context,
                 [](ProControllerContext& context){
-                    pbf_press_button(context, BUTTON_B, 20, 980);
+                    pbf_press_button_old(context, BUTTON_B, 20, 980);
                 },
                 {overworld}
             );
@@ -544,7 +544,7 @@ void exit_tera_win_by_catching(
             screenshot = stream.video().snapshot();
 
             catch_menu.move_to_slot(stream, context, 0);
-            pbf_press_button(context, BUTTON_A, 20, 150);
+            pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
             context.wait_for_all_requests();
 
             BattleBallReader reader(stream, language);
@@ -660,7 +660,7 @@ TeraResult exit_tera_win_by_catching(
             screenshot = stream.video().snapshot();
 
             catch_menu.move_to_slot(stream, context, 0);
-            pbf_press_button(context, BUTTON_A, 20, 150);
+            pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
             context.wait_for_all_requests();
 
             BattleBallReader reader(stream, language);

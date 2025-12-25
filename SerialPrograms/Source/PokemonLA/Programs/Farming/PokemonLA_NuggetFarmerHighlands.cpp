@@ -127,26 +127,26 @@ bool NuggetFarmerHighlands::run_iteration(
             env.console, context,
             [](ProControllerContext& context){
                 pbf_move_left_joystick_old(context, 0, 212, 400ms, 0ms);
-                pbf_press_button(context, BUTTON_B, 492, 80);
+                pbf_press_button_old(context, BUTTON_B, 492, 80);
 
                 pbf_move_left_joystick_old(context, 224, 0, 400ms, 0ms);
 //                pbf_press_button(context, BUTTON_B, 350, 80);
-                pbf_press_button(context, BUTTON_B, 80, 0);
+                pbf_press_button_old(context, BUTTON_B, 80, 0);
                 for (size_t c = 0; c < 7; c++){
                     pbf_press_button(context, BUTTON_A | BUTTON_B, 40ms, 0ms);
                     pbf_press_button(context, BUTTON_B, 40ms, 0ms);
                 }
-                pbf_press_button(context, BUTTON_B, 200, 80);
+                pbf_press_button_old(context, BUTTON_B, 200, 80);
                 pbf_wait_old(context, 80);
 
                 pbf_move_left_joystick_old(context, 0, 64, 400ms, 0ms);
-                pbf_press_button(context, BUTTON_B, 250, 80);
+                pbf_press_button_old(context, BUTTON_B, 250, 80);
 
                 pbf_move_left_joystick_old(context, 0, 48, 400ms, 0ms);
                 pbf_press_button(context, BUTTON_B, 2000ms, 0ms);
 
                 pbf_move_left_joystick_old(context, 64, 255, 400ms, 0ms);
-                pbf_press_button(context, BUTTON_B, 150, 250);
+                pbf_press_button_old(context, BUTTON_B, 150, 250);
 
             },
             {
@@ -218,7 +218,7 @@ void NuggetFarmerHighlands::program(SingleSwitchProgramEnvironment& env, ProCont
     NuggetFarmerHighlands_Descriptor::Stats& stats = env.current_stats<NuggetFarmerHighlands_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     // Put a save here so that when the program reloads from error it won't break.
     save_game_from_overworld(env, env.console, context);

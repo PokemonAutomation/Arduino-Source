@@ -64,7 +64,7 @@ size_t switch_pokemon(
     while(true){
         // Choose the next pokemon to battle.
         pbf_press_button(context, BUTTON_A, 160ms, 800ms);
-        pbf_press_button(context, BUTTON_A, 20, 150);
+        pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
         context.wait_for_all_requests();
 
         // Check whether we can send this pokemon to battle:
@@ -106,14 +106,14 @@ void use_move_blindly(
     // Select move styles
     if (style == MoveStyle::Agile){
         // Agile style
-        pbf_press_button(context, BUTTON_L, 10, 125);
+        pbf_press_button(context, BUTTON_L, 80ms, 1000ms);
     }else if (style == MoveStyle::Strong){
         // Strong style
-        pbf_press_button(context, BUTTON_R, 10, 125);
+        pbf_press_button(context, BUTTON_R, 80ms, 1000ms);
     }
 
     // Use the move
-    pbf_press_button(context, BUTTON_A, 10, 125);
+    pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
 
     stream.log(
         "Using pokemon " + std::to_string(cur_pokemon) + " move " + std::to_string(cur_move) +

@@ -95,7 +95,7 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         // put the book in the machine
-        pbf_press_button(context, BUTTON_L, 30, 10);
+        pbf_press_button(context, BUTTON_L, 240ms, 80ms);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms);
 
 

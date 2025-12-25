@@ -32,7 +32,7 @@ void route(
             TravelLocations::instance().Coastlands_Beachside,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 238, 255, 30, 30);
+        pbf_move_left_joystick_old(context, 238, 255, 240ms, 240ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, 20000ms, 1000ms);
@@ -47,7 +47,7 @@ void route(
             TravelLocations::instance().Fieldlands_Heights,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 170, 255, 30, 30);
+        pbf_move_left_joystick_old(context, 170, 255, 240ms, 240ms);
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, 6350ms, 160ms);
         pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
@@ -63,7 +63,7 @@ void route(
             TravelLocations::instance().Highlands_Mountain,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 255, 35, 30, 30);
+        pbf_move_left_joystick_old(context, 255, 35, 240ms, 240ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, 3350ms, 1000ms);
@@ -80,7 +80,7 @@ void route(
             TravelLocations::instance().Fieldlands_Arena,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 255, 152, 30, 30);
+        pbf_move_left_joystick_old(context, 255, 152, 240ms, 240ms);
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, 25500ms, 1000ms);
         pbf_press_button(context, BUTTON_PLUS, 160ms, 500ms);
@@ -103,7 +103,7 @@ void route(
             TravelLocations::instance().Highlands_Mountain,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 0, 220, 30, 30);
+        pbf_move_left_joystick_old(context, 0, 220, 240ms, 240ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         pbf_move_left_joystick_old(context, 127, 0, 4000ms, 500ms);
         pbf_move_right_joystick(context, {0, -1}, 170ms, 1000ms);
@@ -115,7 +115,7 @@ void route(
             TravelLocations::instance().Mirelands_Bogbound,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 0, 170, 30, 30);
+        pbf_move_left_joystick_old(context, 0, 170, 240ms, 240ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, 10200ms, 160ms);
@@ -127,7 +127,7 @@ void route(
             TravelLocations::instance().Fieldlands_Fieldlands,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 110, 255, 30, 30);
+        pbf_move_left_joystick_old(context, 110, 255, 240ms, 240ms);
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, 6250ms, 160ms);
         pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
@@ -294,11 +294,11 @@ bool check_tree_or_ore_for_battle(VideoStream& stream, ProControllerContext& con
 }
 
 void exit_battle(VideoStream& stream, ProControllerContext& context, ExitBattleMethod exit_method){
-//    pbf_press_button(context, BUTTON_B, 20, 225);
+//    pbf_press_button(context, BUTTON_B, 160ms, 1800ms);
 
     if (exit_method == ExitBattleMethod::RunAway){
         stream.log("Running from battle...");
-        pbf_press_button(context, BUTTON_B, 20, 225);
+        pbf_press_button(context, BUTTON_B, 160ms, 1800ms);
         pbf_press_button(context, BUTTON_A, 160ms, 4300ms);
         context.wait_for_all_requests();
         return;

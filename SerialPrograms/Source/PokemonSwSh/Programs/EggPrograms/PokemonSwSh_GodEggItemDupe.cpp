@@ -178,7 +178,7 @@ void GodEggItemDupe::program(SingleSwitchProgramEnvironment& env, ProControllerC
             3200ms
         );
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
     }
 
     run_program(env.console, context, MAX_FETCH_ATTEMPTS);

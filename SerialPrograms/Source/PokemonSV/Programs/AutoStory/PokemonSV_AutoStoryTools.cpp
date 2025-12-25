@@ -372,7 +372,7 @@ void overworld_navigation(
                                     pbf_wait(context, Seconds(seconds_realign));
                                 } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
                                     for (size_t j = 0; j < 5 * seconds_realign; j++){
-                                        pbf_press_button(context, BUTTON_A, 20, 5);
+                                        pbf_press_button_old(context, BUTTON_A, 20, 5);
                                     }
                                 }
                             }
@@ -1109,7 +1109,7 @@ bool is_ride_active(const ProgramInfo& info, VideoStream& stream, ProControllerC
             );
 
             bool is_ride_active = !is_black(ride_indicator); // ride is active if the ride indicator isn't black.
-            pbf_press_button(context, BUTTON_B, 30, 100);
+            pbf_press_button(context, BUTTON_B, 240ms, 800ms);
             press_Bs_to_back_to_overworld(info, stream, context, 7);
             if (is_ride_active){
                 stream.log("Ride is active.");
@@ -1145,7 +1145,7 @@ void get_on_or_off_ride(const ProgramInfo& info, VideoStream& stream, ProControl
                 stream
             );
         }        
-        pbf_press_button(context, BUTTON_PLUS, 30, 100);
+        pbf_press_button(context, BUTTON_PLUS, 240ms, 800ms);
     }
 }
 
@@ -1503,7 +1503,7 @@ void move_player_forward(
                         pbf_mash_button_old(context, BUTTON_A, forward_ticks);
                     }
                 }else{
-                    pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
+                    pbf_press_button_old(context, BUTTON_R, 20, delay_after_lets_go);
                     pbf_move_left_joystick_old(context, 128, y, forward_ticks, delay_after_forward_move);
                 }
             });

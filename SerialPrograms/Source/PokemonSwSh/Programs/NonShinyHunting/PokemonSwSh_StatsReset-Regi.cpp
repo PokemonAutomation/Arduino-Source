@@ -123,7 +123,7 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env, ProControllerC
             1600ms
         );
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
     }
 
     StatsResetRegi_Descriptor::Stats& stats = env.current_stats<StatsResetRegi_Descriptor::Stats>();

@@ -43,7 +43,7 @@ void egg_spin_with_A(ProControllerContext& context, Milliseconds duration){
 
 void pickup_column(ProControllerContext& context){
 //    const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
-    pbf_press_button(context, BUTTON_ZL, 20, 50);
+    pbf_press_button(context, BUTTON_ZL, 160ms, 400ms);
     for (size_t c = 0; c < 30; c++){
         ssf_issue_scroll(context, DPAD_DOWN, 24ms);
     }
@@ -80,8 +80,8 @@ void withdraw_1st_column_from_overworld(ProControllerContext& context){
     const Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
     const Milliseconds BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY0;
     overworld_to_box(context);
-    pbf_press_button(context, BUTTON_Y, 20, 50);
-    pbf_press_button(context, BUTTON_Y, 20, 50);
+    pbf_press_button(context, BUTTON_Y, 160ms, 400ms);
+    pbf_press_button(context, BUTTON_Y, 160ms, 400ms);
     pickup_column(context);
     pbf_move_right_joystick(context, {-1, 0}, 160ms, BOX_SCROLL_DELAY);
     pbf_move_right_joystick(context, {0, -1}, 160ms, BOX_SCROLL_DELAY);
@@ -92,8 +92,8 @@ void deposit_party_to_column(ProControllerContext& context, uint8_t column){
     const Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
     const Milliseconds BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY0;
     overworld_to_box(context);
-    pbf_press_button(context, BUTTON_Y, 20, 50);
-    pbf_press_button(context, BUTTON_Y, 20, 50);
+    pbf_press_button(context, BUTTON_Y, 160ms, 400ms);
+    pbf_press_button(context, BUTTON_Y, 160ms, 400ms);
     pbf_move_right_joystick(context, {-1, 0}, 160ms, BOX_SCROLL_DELAY);
     pbf_move_right_joystick(context, {0, -1}, 160ms, BOX_SCROLL_DELAY);
 

@@ -360,7 +360,7 @@ void checkpoint_53(
     [&](size_t attempt_number){
 
         // realign camera. 
-        pbf_press_button(context, BUTTON_L, 30, 30);
+        pbf_press_button(context, BUTTON_L, 240ms, 240ms);
 
         // walk backwards into the Gym building
         pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);

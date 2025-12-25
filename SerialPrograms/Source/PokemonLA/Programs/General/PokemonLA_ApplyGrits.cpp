@@ -114,7 +114,7 @@ void ApplyGrits::ApplyGritsOnOnePokemon(SingleSwitchProgramEnvironment& env, Pro
 
 void ApplyGrits::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     size_t num_pokemon = NUM_POKEMON.current_value();
     for(size_t i = 0; i < num_pokemon; i++){

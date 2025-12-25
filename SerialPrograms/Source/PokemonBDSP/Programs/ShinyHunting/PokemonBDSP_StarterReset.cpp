@@ -107,7 +107,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     std::shared_ptr<const ImageRGB32> briefcase = std::make_shared<const ImageRGB32>(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 40ms, 40ms);
 
     size_t consecutive_failures = 0;
 

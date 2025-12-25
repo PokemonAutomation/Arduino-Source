@@ -121,10 +121,10 @@ void PoffinCooker::program(SingleSwitchProgramEnvironment& env, ProControllerCon
 
     env.log("Select the cooking option");
     //  Select the cooking option.
-    pbf_press_button(context, BUTTON_A, 5, 100);
-    pbf_press_button(context, BUTTON_A, 5, 175);
-    pbf_press_button(context, BUTTON_A, 5, 75);
-    pbf_press_button(context, BUTTON_A, 5, 100);
+    pbf_press_button_old(context, BUTTON_A, 5, 100);
+    pbf_press_button_old(context, BUTTON_A, 5, 175);
+    pbf_press_button(context, BUTTON_A, 40ms, 600ms);
+    pbf_press_button_old(context, BUTTON_A, 5, 100);
 
 
     for (uint16_t c = 0; c < MAX_COOK_ATTEMPTS; c++){
@@ -190,9 +190,9 @@ void PoffinCooker::program(SingleSwitchProgramEnvironment& env, ProControllerCon
 
         if (c < MAX_COOK_ATTEMPTS - 1){
             env.log("Prepare for the next iteration");
-            pbf_press_button(context, BUTTON_A, 5, 125);
-            pbf_press_button(context, BUTTON_A, 5, 125);
-            pbf_press_button(context, BUTTON_A, 5, 125);                
+            pbf_press_button(context, BUTTON_A, 40ms, 1000ms);
+            pbf_press_button(context, BUTTON_A, 40ms, 1000ms);
+            pbf_press_button(context, BUTTON_A, 40ms, 1000ms);
         }
         stats.m_attempts++;
     }

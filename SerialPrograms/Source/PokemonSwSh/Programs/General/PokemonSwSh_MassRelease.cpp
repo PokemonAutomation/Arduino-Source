@@ -53,7 +53,7 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, DODGE_SYSTEM_UPDATE_WINDOW);
     }else{
-        pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+        pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
     }
 
     release_boxes(context, BOXES_TO_RELEASE);

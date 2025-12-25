@@ -165,7 +165,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, ProControll
     uint32_t remaining_skips = SKIPS;
 
     //  Connect
-    pbf_press_button(context, BUTTON_ZL, 5, 5);
+    pbf_press_button(context, BUTTON_ZL, 40ms, 40ms);
 
     DateTime start_date = START_DATE;
 

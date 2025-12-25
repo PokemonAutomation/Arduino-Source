@@ -59,7 +59,7 @@ void DailyHighlightFarmer::program(SingleSwitchProgramEnvironment& env, ProContr
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
         ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 160ms);
     }
 
@@ -74,7 +74,7 @@ void DailyHighlightFarmer::program(SingleSwitchProgramEnvironment& env, ProContr
             pbf_mash_button_old(context, BUTTON_B, 90);
         }
 
-        pbf_press_button(context, BUTTON_A, 10, 110);
+        pbf_press_button_old(context, BUTTON_A, 10, 110);
         pbf_press_button(context, BUTTON_ZL, 80ms, 320ms);
         pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
         pbf_mash_button_old(context, BUTTON_ZL, 400);

@@ -100,7 +100,7 @@ void checkpoint_21(
         context.wait_for_all_requests();
         pbf_press_button(context, BUTTON_L, 160ms, 160ms);
         // move forward
-        pbf_move_left_joystick_old(context, 128, 0, 30, 100);
+        pbf_move_left_joystick_old(context, 128, 0, 240ms, 800ms);
         // get on ride
         get_on_ride(env.program_info(), env.console, context);
         // turn left

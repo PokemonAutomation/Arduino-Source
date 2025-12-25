@@ -57,7 +57,7 @@ void clear_mons_in_front(
                 context.wait_for_all_requests();
                 context.wait_for(std::chrono::seconds(30));
                 stream.log("A " + Pokemon::STRING_POKEMON + " is standing in the way. Whistling and waiting 30 seconds...", COLOR_RED);
-                pbf_press_button(context, BUTTON_R, 20, 0);
+                pbf_press_button(context, BUTTON_R, 160ms, 0ms);
             }
         },
         {button}
@@ -168,7 +168,7 @@ void order_compote_du_fils(
     // We start this function when we enter the restaurant without pressing any button.
 
     // Se we first press A to clear a dialog:
-    pbf_press_button(context, BUTTON_A, 30, 100);
+    pbf_press_button(context, BUTTON_A, 240ms, 800ms);
 
     bool paid = false;
     bool eating = false;
@@ -196,7 +196,7 @@ void order_compote_du_fils(
                 context.wait_for_all_requests();
                 eating = true;
             }else{
-                pbf_press_button(context, BUTTON_A, 30, 100);
+                pbf_press_button(context, BUTTON_A, 240ms, 800ms);
             }
             break;
         case 1:
@@ -206,12 +206,12 @@ void order_compote_du_fils(
             break;
         case 2:
             stream.log("Detected the dish we want.");
-            pbf_press_button(context, BUTTON_A, 30, 100);
+            pbf_press_button(context, BUTTON_A, 240ms, 800ms);
             break;
         case 3:
             stream.log("Detected the payment prompt.");
             stream.overlay().add_log("Pay dish", COLOR_WHITE);
-            pbf_press_button(context, BUTTON_A, 30, 100);
+            pbf_press_button(context, BUTTON_A, 240ms, 800ms);
             paid = true;
             break;
         default:
@@ -228,7 +228,7 @@ void order_compote_du_fils(
             stream, context,
             [](ProControllerContext& context){
                 for(int i = 0; i < 60; i++){
-                    pbf_press_button(context, BUTTON_A, 25, 100);
+                    pbf_press_button_old(context, BUTTON_A, 25, 100);
                 }
             },
             {{dialog_watcher}}
@@ -255,7 +255,7 @@ void order_compote_du_fils(
             {dialog_watcher, overworld}
         );
         if (ret == 0){
-            pbf_press_button(context, BUTTON_A, 30, 100);
+            pbf_press_button(context, BUTTON_A, 240ms, 800ms);
             continue;
         }else if (ret == 1){
             return; // outside restaurant

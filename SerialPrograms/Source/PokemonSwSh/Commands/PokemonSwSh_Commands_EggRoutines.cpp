@@ -58,7 +58,7 @@ void travel_to_spin_location(ProControllerContext& context){
     ssf_press_left_joystick_old(context, STICK_MAX, STICK_MAX, 400ms, 400ms);
 }
 void travel_back_to_lady(ProControllerContext& context){
-    ssf_press_left_joystick_old(context, STICK_CENTER, STICK_MAX, 30, 30);
+    ssf_press_left_joystick_old(context, STICK_CENTER, STICK_MAX, 240ms, 240ms);
     ssf_press_left_joystick_old(context, STICK_MAX, 144, 260, 260);
     ssf_press_left_joystick_old(context, STICK_MIN, STICK_CENTER, 50, 400);
     ssf_mash1_button(context, BUTTON_B, 800ms);

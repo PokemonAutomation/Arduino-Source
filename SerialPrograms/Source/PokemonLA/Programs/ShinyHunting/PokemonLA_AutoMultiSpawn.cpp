@@ -88,7 +88,7 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
 
     // First, let controller press ZL non-stop to start focusing on a pokemon
     session.dispatch([](ProControllerContext& context){
-        pbf_press_button(context, BUTTON_ZL, 10000, 0);
+        pbf_press_button_old(context, BUTTON_ZL, 10000, 0);
     });
 
     // We try at most 4 focus change attempts
@@ -183,7 +183,7 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
             // Press A to change focus.
             session.dispatch([](ProControllerContext& context){
                 pbf_press_button(context, BUTTON_ZL | BUTTON_A, 240ms, 0ms);
-                pbf_press_button(context, BUTTON_ZL, 10000, 0);
+                pbf_press_button_old(context, BUTTON_ZL, 10000, 0);
             });
 
             // Wait some time to let the button A press executed, the game focused on another pokemon
@@ -280,7 +280,7 @@ void AutoMultiSpawn::program(SingleSwitchProgramEnvironment& env, ProControllerC
     StartProgramChecks::check_performance_class_wired_or_wireless(context);
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     MultiSpawn spawn = SPAWN;
     const int max_num_despawn = MAX_DESPAWN_COUNT[(size_t)spawn];
@@ -546,7 +546,7 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
         // We removed exactly what we need.
         // Escape battle
         env.log("Running from battle...");
-        pbf_press_button(context, BUTTON_B, 20, 225);
+        pbf_press_button(context, BUTTON_B, 160ms, 1800ms);
         pbf_press_button(context, BUTTON_A, 160ms, 800ms);
         context.wait_for_all_requests();
         ArcPhoneDetector escape_detector(env.console, env.console, std::chrono::milliseconds(100), stop_on_detected);
@@ -587,10 +587,10 @@ PokemonDetails AutoMultiSpawn::go_to_spawn_point_and_try_focusing_pokemon(
         change_mount(env.console, context, MountState::BRAVIARY_ON);
     }
 
-    // pbf_press_button(context, BUTTON_PLUS, 20, 150); // jump down from Braviary
+    // pbf_press_button(context, BUTTON_PLUS, 160ms, 1200ms); // jump down from Braviary
     // for(int i = 0; i < 2; i++){
     //     pbf_press_button(context, BUTTON_PLUS, 160ms, 400ms); // Call back Braviary to stop falling
-    //     pbf_press_button(context, BUTTON_PLUS, 20, 150); // fall down again
+    //     pbf_press_button(context, BUTTON_PLUS, 160ms, 1200ms); // fall down again
     // }
     // In case the character hits a tree and change the Braviary mount state due to the hit,
     // use visual feedback to makse sure the character is now dismounted.

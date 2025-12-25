@@ -208,7 +208,7 @@ void checkpoint_44(
                 check_num_sunflora_found(env, context, 1);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick_old(context, 128, 0, 30, 100);
+                pbf_move_left_joystick_old(context, 128, 0, 240ms, 800ms);
             },
             3
         );
@@ -222,7 +222,7 @@ void checkpoint_44(
                 check_num_sunflora_found(env, context, 2);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick_old(context, 128, 0, 30, 100);
+                pbf_move_left_joystick_old(context, 128, 0, 240ms, 800ms);
             },
             3
         );        
@@ -236,7 +236,7 @@ void checkpoint_44(
                 check_num_sunflora_found(env, context, 3);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick_old(context, 128, 0, 30, 100);
+                pbf_move_left_joystick_old(context, 128, 0, 240ms, 800ms);
             },
             3
         );              
@@ -266,7 +266,7 @@ void checkpoint_44(
                 check_num_sunflora_found(env, context, 4);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick_old(context, 128, 0, 30, 100);
+                pbf_move_left_joystick_old(context, 128, 0, 240ms, 800ms);
             },
             3
         );        
@@ -294,7 +294,7 @@ void checkpoint_44(
                 check_num_sunflora_found(env, context, 5);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick_old(context, 128, 0, 30, 100);
+                pbf_move_left_joystick_old(context, 128, 0, 240ms, 800ms);
             },
             3
         );        
@@ -317,7 +317,7 @@ void checkpoint_44(
                 check_num_sunflora_found(env, context, 6);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick_old(context, 128, 0, 30, 100);
+                pbf_move_left_joystick_old(context, 128, 0, 240ms, 800ms);
             },
             3
         );        
@@ -375,7 +375,7 @@ void checkpoint_44(
                 check_num_sunflora_found(env, context, 7);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick_old(context, 128, 0, 30, 100);
+                pbf_move_left_joystick_old(context, 128, 0, 240ms, 800ms);
             },
             3
         );           
@@ -405,7 +405,7 @@ void checkpoint_44(
                 pbf_wait(context, 3000ms);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick_old(context, 128, 0, 30, 100);
+                pbf_move_left_joystick_old(context, 128, 0, 240ms, 800ms);
             },
             3
         );        
@@ -436,7 +436,7 @@ void checkpoint_44(
                 check_num_sunflora_found(env, context, 9);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick_old(context, 128, 0, 30, 100);
+                pbf_move_left_joystick_old(context, 128, 0, 240ms, 800ms);
             },
             3
         );
@@ -453,7 +453,7 @@ void checkpoint_44(
                 check_num_sunflora_found(env, context, 10);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick_old(context, 128, 0, 30, 100);
+                pbf_move_left_joystick_old(context, 128, 0, 240ms, 800ms);
             },
             3
         );

@@ -175,7 +175,7 @@ void UnownFinder::program(SingleSwitchProgramEnvironment& env, ProControllerCont
     UnownFinder_Descriptor::Stats& stats = env.current_stats<UnownFinder_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
 
     bool fresh_from_reset = false;

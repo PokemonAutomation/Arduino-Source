@@ -998,7 +998,7 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
             pbf_press_button(context, BUTTON_Y, 320ms, 400ms);
             rinsed_once = true;
             //Move slightly right, as the showerhead is at an angle
-            pbf_move_left_joystick_old(context, 255, 0, 30, 30);
+            pbf_move_left_joystick_old(context, 255, 0, 240ms, 240ms);
             context.wait_for_all_requests();
             break;
         case 2:

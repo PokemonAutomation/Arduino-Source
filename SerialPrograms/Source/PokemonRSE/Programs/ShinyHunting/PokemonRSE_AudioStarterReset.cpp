@@ -112,7 +112,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
         });
 
         env.log("Opening bag and selecting starter.");
-        pbf_press_button(context, BUTTON_A, 40, 180);
+        pbf_press_button_old(context, BUTTON_A, 40, 180);
 
         switch (TARGET) {
         case Target::treecko:
@@ -177,7 +177,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
             env.console, context,
             [&](ProControllerContext& context) {
                 env.log("Sending out selected starter.");
-                pbf_press_button(context, BUTTON_A, 40, 40);
+                pbf_press_button_old(context, BUTTON_A, 40, 40);
 
                 int ret = wait_until(
                     env.console, context,

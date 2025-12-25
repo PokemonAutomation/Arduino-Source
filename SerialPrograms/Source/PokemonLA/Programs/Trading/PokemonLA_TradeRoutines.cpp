@@ -47,7 +47,7 @@ void trade_current_pokemon(
     ImageMatchWatcher box_detector(std::move(box_image.frame), {0.02, 0.15, 0.15, 0.80}, 50);
 
     {
-        pbf_press_button(context, BUTTON_A, 20, 0);
+        pbf_press_button(context, BUTTON_A, 160ms, 0ms);
         context.wait_for_all_requests();
         ButtonDetector detector(
             stream.logger(), stream.overlay(),
@@ -88,7 +88,7 @@ void trade_current_pokemon(
     }
 
     //  Start trade.
-    pbf_press_button(context, BUTTON_A, 20, 0);
+    pbf_press_button(context, BUTTON_A, 160ms, 0ms);
 
     //  Wait for black screen.
     {

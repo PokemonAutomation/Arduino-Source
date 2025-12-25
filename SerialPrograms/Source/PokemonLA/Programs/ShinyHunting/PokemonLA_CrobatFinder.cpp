@@ -159,7 +159,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
                 // TO CROBAT PORTION
                 pbf_press_button(context, BUTTON_B, 1050ms, 640ms); // sprint forward for a split second
                 pbf_move_left_joystick_old(context, 255, 150, 80ms, 160ms); // rotate slightly right
-                pbf_press_button(context, BUTTON_ZL, 20, 70); // align camera
+                pbf_press_button_old(context, BUTTON_ZL, 20, 70); // align camera
 
                 context.wait_for_all_requests();
                 destination_time = current_time();
@@ -189,7 +189,7 @@ void CrobatFinder::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     CrobatFinder_Descriptor::Stats& stats = env.current_stats<CrobatFinder_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     while (true){
         env.update_stats();

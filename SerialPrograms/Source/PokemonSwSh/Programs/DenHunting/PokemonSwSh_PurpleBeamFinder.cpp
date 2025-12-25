@@ -156,7 +156,7 @@ bool PurpleBeamFinder::run(SingleSwitchProgramEnvironment& env, ProControllerCon
     ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            pbf_press_button(context, BUTTON_A, 10, 300);
+            pbf_press_button_old(context, BUTTON_A, 10, 300);
         },
         { arrow_detector }
     );
@@ -207,7 +207,7 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, ProControlle
         resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         pbf_mash_button_old(context, BUTTON_B, 100);
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
     }
     context.wait_for_all_requests();
 

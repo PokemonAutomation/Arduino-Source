@@ -168,7 +168,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
             battle_menu_seen = true;
 
             {
-                pbf_press_button(context, BUTTON_ZL, 10, 125);
+                pbf_press_button(context, BUTTON_ZL, 80ms, 1000ms);
                 uint8_t slot = 0;
                 for (; slot < 4; slot++){
                     if (pp0[slot] != 0){
@@ -186,13 +186,13 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
                 for (uint8_t move_slot = 0; move_slot < slot; move_slot++){
                     pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
                 }
-                pbf_press_button(context, BUTTON_ZL, 10, 125);
-                pbf_press_button(context, BUTTON_ZL, 10, 375);
+                pbf_press_button(context, BUTTON_ZL, 80ms, 1000ms);
+                pbf_press_button_old(context, BUTTON_ZL, 10, 375);
                 pp0[slot]--;
             }
 
             {
-                pbf_press_button(context, BUTTON_ZL, 10, 125);
+                pbf_press_button(context, BUTTON_ZL, 80ms, 1000ms);
                 uint8_t slot = 0;
                 for (; slot < 4; slot++){
                     if (pp1[slot] != 0){
@@ -210,8 +210,8 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
                 for (uint8_t move_slot = 0; move_slot < slot; move_slot++){
                     pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
                 }
-                pbf_press_button(context, BUTTON_ZL, 10, 125);
-                pbf_press_button(context, BUTTON_ZL, 10, 375);
+                pbf_press_button(context, BUTTON_ZL, 80ms, 1000ms);
+                pbf_press_button_old(context, BUTTON_ZL, 10, 375);
                 pp1[slot]--;
             }
 
@@ -260,7 +260,7 @@ void MoneyFarmerRoute210::heal_at_center_and_return(
     pbf_move_left_joystick(context, {0, +1}, 1600ms, 0ms);
     pbf_move_left_joystick(context, {+1, 0}, 6000ms, 0ms);
 
-    pbf_press_button(context, BUTTON_R, 10, 150);
+    pbf_press_button_old(context, BUTTON_R, 10, 150);
     pbf_mash_button(context, BUTTON_ZL, 6000ms);
 
     pbf_move_left_joystick(context, {0, -1}, 240ms, 0ms);
@@ -292,7 +292,7 @@ void MoneyFarmerRoute210::fly_to_center_heal_and_return(
 ){
     logger.log("Flying back to Hearthome City to heal.");
     pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
-    pbf_press_button(context, BUTTON_PLUS, 10, 240);
+    pbf_press_button_old(context, BUTTON_PLUS, 10, 240);
     pbf_press_dpad(context, DPAD_LEFT, 80ms, 480ms);
     pbf_press_dpad(context, DPAD_LEFT, 80ms, 480ms);
     pbf_mash_button(context, BUTTON_ZL, 12000ms);
@@ -356,7 +356,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
     };
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 40ms, 40ms);
 
     bool need_to_charge = true;
     if (START_LOCATION == StartLocation::CelesticTown){

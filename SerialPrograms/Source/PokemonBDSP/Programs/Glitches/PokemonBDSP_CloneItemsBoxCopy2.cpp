@@ -112,14 +112,14 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, ProControl
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         //  Select 1st mon.
-        pbf_press_button(context, BUTTON_ZL, 20, 50);
+        pbf_press_button(context, BUTTON_ZL, 160ms, 400ms);
 
         //  Enter box system again.
         overworld_to_box(context);
 
 #if 0
         //  Detach all items.
-        pbf_press_button(context, BUTTON_X, 20, 50);
+        pbf_press_button(context, BUTTON_X, 160ms, 400ms);
         detach_box(context, BOX_SCROLL_DELAY);
 
         //  Back to previous menu.
@@ -134,8 +134,8 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, ProControl
 
 #else
         //  Move entire box to a new box.
-        pbf_press_button(context, BUTTON_Y, 20, 50);
-        pbf_press_button(context, BUTTON_Y, 20, 50);
+        pbf_press_button(context, BUTTON_Y, 160ms, 400ms);
+        pbf_press_button(context, BUTTON_Y, 160ms, 400ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, BOX_PICKUP_DROP_DELAY);
         for (size_t c = 0; c < 10; c++){
             pbf_move_right_joystick(context, {+1, 0}, 40ms, 24ms);

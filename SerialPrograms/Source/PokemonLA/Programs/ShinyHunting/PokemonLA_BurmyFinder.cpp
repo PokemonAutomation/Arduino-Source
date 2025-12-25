@@ -160,7 +160,7 @@ bool BurmyFinder::handle_battle(SingleSwitchProgramEnvironment& env, ProControll
     BurmyFinder_Descriptor::Stats& stats = env.current_stats<BurmyFinder_Descriptor::Stats>();
 
     PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
-    pbf_press_button(context, BUTTON_B, 20, 225);
+    pbf_press_button(context, BUTTON_B, 160ms, 1800ms);
     context.wait_for_all_requests();
 
     if (pokemon.name_candidates.find("burmy") == pokemon.name_candidates.end()){
@@ -367,7 +367,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_move_left_joystick_old(context, 0, 95, 1000ms, 0ms);
                 context.wait_for_all_requests();
                 enable_shiny_sound(context);
-                pbf_press_button(context, BUTTON_B, 110, 0);
+                pbf_press_button_old(context, BUTTON_B, 110, 0);
                 pbf_press_button(context, BUTTON_Y, 2300ms, 0ms);
                 pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
                 pbf_move_right_joystick(context, {0, -1}, 100ms, 300ms);
@@ -686,7 +686,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, ProController
         if (last_tree < 13){
             env.console.log("Heading to Tree 13");
             go_to_height_camp(env, context);
-            pbf_move_left_joystick_old(context, 104, 255, 30, 30);
+            pbf_move_left_joystick_old(context, 104, 255, 240ms, 240ms);
             change_mount(env.console, context, MountState::BRAVIARY_ON);
             pbf_press_button(context, BUTTON_B, 11000ms, 1000ms);
             pbf_press_button(context, BUTTON_PLUS, 160ms, 1300ms);
@@ -715,7 +715,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, ProController
         if (last_tree < 15){
             env.console.log("Heading to Tree 15");
             go_to_height_camp(env, context);
-            pbf_move_left_joystick_old(context, 160, 255, 30, 30);
+            pbf_move_left_joystick_old(context, 160, 255, 240ms, 240ms);
             change_mount(env.console, context, MountState::BRAVIARY_ON);
             pbf_press_button(context, BUTTON_B, 6350ms, 160ms);
             pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
@@ -826,7 +826,7 @@ void BurmyFinder::program(SingleSwitchProgramEnvironment& env, ProControllerCont
     BurmyFinder_Descriptor::Stats& stats = env.current_stats<BurmyFinder_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     TreeCounter counters;
 

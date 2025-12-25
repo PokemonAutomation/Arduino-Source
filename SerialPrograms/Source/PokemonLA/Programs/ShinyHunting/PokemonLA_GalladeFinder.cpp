@@ -136,7 +136,7 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProContro
                 pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, {0, -1}, {0, 0}, 1800ms);
 
                 // camera align
-                pbf_press_button(context, BUTTON_ZL, 20, 0); // camera align
+                pbf_press_button(context, BUTTON_ZL, 160ms, 0ms); // camera align
                 pbf_wait_old(context, 70);
 
                 context.wait_for_all_requests();
@@ -172,7 +172,7 @@ void GalladeFinder::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     GalladeFinder_Descriptor::Stats& stats = env.current_stats<GalladeFinder_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     while (true){
         env.update_stats();

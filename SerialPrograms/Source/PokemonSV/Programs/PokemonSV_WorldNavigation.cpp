@@ -44,7 +44,7 @@ namespace PokemonSV{
 bool fly_to_overworld_from_map(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, bool check_fly_menuitem){
     context.wait_for_all_requests();
     // Press A to bring up the promp dialog on choosing "Fly here", "Set as destination", "Never mind".
-    pbf_press_button(context, BUTTON_A, 20, 130);
+    pbf_press_button_old(context, BUTTON_A, 20, 130);
 
     WallClock start = current_time();
     while (true){
@@ -82,16 +82,16 @@ bool fly_to_overworld_from_map(const ProgramInfo& info, VideoStream& stream, Pro
         case 1: // map
             stream.log("Detected map. Pressing A to open map menu.");
             // Press A to bring up the promp dialog on choosing "Fly here", "Set as destination", "Never mind".
-            pbf_press_button(context, BUTTON_A, 20, 130);
+            pbf_press_button_old(context, BUTTON_A, 20, 130);
             continue;
         case 2: // spot_dialog_watcher or flyMenuItemWatcher
             stream.log("Detected fly here prompt dialog.");
             stream.overlay().add_log("Fly");
-            pbf_press_button(context, BUTTON_A, 20, 130);
+            pbf_press_button_old(context, BUTTON_A, 20, 130);
             continue;
         case 3: //confirm_watcher
             stream.log("Detected fly confirmation prompt.");
-            pbf_press_button(context, BUTTON_A, 20, 130);
+            pbf_press_button_old(context, BUTTON_A, 20, 130);
             continue;
         case 4: //battle
             stream.log("Detected battle.");
@@ -180,7 +180,7 @@ void leave_picnic(const ProgramInfo& info, VideoStream& stream, ProControllerCon
     stream.log("Leaving picnic...");
     stream.overlay().add_log("Leaving picnic", COLOR_WHITE);
 
-    pbf_press_button(context, BUTTON_Y, 30, 100);
+    pbf_press_button(context, BUTTON_Y, 240ms, 800ms);
     for(int i = 0; i < 5; i++){
         PromptDialogWatcher prompt(COLOR_RED, {0.595, 0.517, 0.273, 0.131});
         context.wait_for_all_requests();
@@ -204,7 +204,7 @@ void leave_picnic(const ProgramInfo& info, VideoStream& stream, ProControllerCon
         }
 
         // prompt not found, maybe button Y dropped?
-        pbf_press_button(context, BUTTON_Y, 30, 100);
+        pbf_press_button(context, BUTTON_Y, 240ms, 800ms);
     }
 
     // We have now the prompt to asking for confirmation of leaving picnic.
@@ -702,7 +702,7 @@ void walk_forward_while_clear_front_path(
     uint16_t delay_after_lets_go
 ){
     context.wait_for_all_requests();
-    pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
+    pbf_press_button_old(context, BUTTON_R, 20, delay_after_lets_go);
 
     uint16_t num_ticks_left = forward_ticks;
     while (true){
@@ -720,7 +720,7 @@ void walk_forward_while_clear_front_path(
         context.wait_for_all_requests();
         stream.log("walk_forward_while_clear_front_path() ticks traveled: " + std::to_string(forward_ticks - num_ticks_left));
 
-        pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
+        pbf_press_button_old(context, BUTTON_R, 20, delay_after_lets_go);
         
 
     }

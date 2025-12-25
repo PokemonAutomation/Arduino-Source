@@ -100,7 +100,7 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
     }
 
     WallDuration PERIOD = std::chrono::hours(TIME_ROLLBACK_HOURS);
@@ -136,7 +136,7 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
         pbf_press_button(context, BUTTON_X, 160ms, 400ms);
         pbf_press_dpad(context, DPAD_LEFT, 160ms, 160ms);
         env.log("Starting Encounter: " + tostr_u_commas(stats.encounters() + 1));
-        pbf_press_button(context, BUTTON_A, 20, 0);
+        pbf_press_button(context, BUTTON_A, 160ms, 0ms);
         context.wait_for_all_requests();
 
         {

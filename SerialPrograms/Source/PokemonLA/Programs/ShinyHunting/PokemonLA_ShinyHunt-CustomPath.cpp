@@ -261,7 +261,7 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, ProContro
     ShinyHuntCustomPath_Descriptor::Stats& stats = env.current_stats<ShinyHuntCustomPath_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     if (TEST_PATH){
         // Run the test path immediately

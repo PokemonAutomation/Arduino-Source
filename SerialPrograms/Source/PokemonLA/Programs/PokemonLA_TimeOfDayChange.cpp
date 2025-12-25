@@ -75,7 +75,7 @@ void change_time_of_day_at_tent(
     }
 
     // Press A to interact with tent
-    pbf_press_button(context, BUTTON_A, 30, 30);
+    pbf_press_button(context, BUTTON_A, 240ms, 240ms);
     context.wait_for_all_requests();
 
     const bool stop_on_detected = true;
@@ -96,7 +96,7 @@ void change_time_of_day_at_tent(
 
     // Press A to clear the dialog box, and show the time menu
     // pbf_wait(context, 40);
-    pbf_press_button(context, BUTTON_A, 30, 80);
+    pbf_press_button_old(context, BUTTON_A, 30, 80);
     stream.log("Change time of day to " + std::string(TIME_OF_DAY_NAMES[int(target_time)]));
 
     // Move down the menu to find the target time
@@ -112,7 +112,7 @@ void change_time_of_day_at_tent(
     }
 
     // Press A to start resting
-    pbf_press_button(context, BUTTON_A, 30, 100);
+    pbf_press_button(context, BUTTON_A, 240ms, 800ms);
     context.wait_for_all_requests();
 
     // Wait for the dialog box to show up
@@ -128,7 +128,7 @@ void change_time_of_day_at_tent(
     }
 
     // Press A again to clear the dialog box
-    pbf_press_button(context, BUTTON_A, 30, 100);
+    pbf_press_button(context, BUTTON_A, 240ms, 800ms);
 
     context.wait_for_all_requests();
 }

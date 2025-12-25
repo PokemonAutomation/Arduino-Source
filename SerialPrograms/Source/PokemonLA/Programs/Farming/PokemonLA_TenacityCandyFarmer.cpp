@@ -107,7 +107,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Pro
     // Move down the menu box to select Path of Tenacity
     pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
     // Press A to select Path of Tenacity
-    pbf_press_button(context, BUTTON_A, 20, 200);
+    pbf_press_button(context, BUTTON_A, 160ms, 1600ms);
 
     // Press A repeatedly to show the opponenet team selection menu box.
     // Note: in different languages, there are different number of dialogue boxes to clear to show the team selection menu.
@@ -119,7 +119,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Pro
             env.console, context,
             [&](ProControllerContext& context){
                 for (size_t c = 0; c < 10; c++){
-                    pbf_press_button(context, BUTTON_A, 20, 150);
+                    pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
                 }
             },
             {
@@ -259,7 +259,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Pro
             }
 
             // Press A to select moves
-            pbf_press_button(context, BUTTON_A, 10, 125);
+            pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
             context.wait_for_all_requests();
 
             // Choose move to use!
@@ -346,7 +346,7 @@ void TenacityCandyFarmer::program(SingleSwitchProgramEnvironment& env, ProContro
     TenacityCandyFarmer_Descriptor::Stats& stats = env.current_stats<TenacityCandyFarmer_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     // {
     //     // ImageRGB32 image("./scripts/LA_switch_pokemon_Kuro.png");

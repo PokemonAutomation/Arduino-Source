@@ -78,7 +78,7 @@ PokedexTasksReader::PokedexTasksReader(){}
 
 void PokedexTasksReader::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     std::ofstream output_file("output.txt");
 

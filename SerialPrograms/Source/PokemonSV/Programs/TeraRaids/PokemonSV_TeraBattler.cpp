@@ -245,7 +245,7 @@ bool run_tera_battle(
             [](ProControllerContext& context){
                 for (size_t c = 0; c < 4; c++){
                     pbf_wait(context, 30000ms);
-                    pbf_press_button(context, BUTTON_B, 20, 0);
+                    pbf_press_button(context, BUTTON_B, 160ms, 0ms);
                 }
             },
             {

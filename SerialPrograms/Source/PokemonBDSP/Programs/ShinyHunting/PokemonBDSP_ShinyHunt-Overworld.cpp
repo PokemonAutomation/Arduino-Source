@@ -109,7 +109,7 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, ProControl
     LeadingShinyTracker lead_tracker(env.console);
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 40ms, 40ms);
 
     //  Encounter Loop
     while (true){

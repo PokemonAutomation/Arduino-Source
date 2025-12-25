@@ -316,7 +316,7 @@ bool RideCloner101::run_post_win(
             console.log("Detected catch prompt.");
             screenshot = console.video().snapshot();
 
-            pbf_press_button(context, BUTTON_A, 20, 150);
+            pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
             context.wait_for_all_requests();
 
             BattleBallReader reader(console, LANGUAGE);

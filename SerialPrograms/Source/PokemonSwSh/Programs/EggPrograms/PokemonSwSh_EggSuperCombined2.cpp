@@ -115,7 +115,7 @@ void EggSuperCombined2::program(SingleSwitchProgramEnvironment& env, ProControll
             3200ms
         );
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
     }
 
     //  Mass Release

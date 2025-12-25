@@ -172,10 +172,10 @@ void run_autohost(
         }
         if (!code.empty()){
             env.log("Next Raid Code: " + code);
-            pbf_press_button(context, BUTTON_PLUS, 5, 145);
+            pbf_press_button_old(context, BUTTON_PLUS, 5, 145);
             FastCodeEntry::numberpad_enter_code(console, context, code, true);
             pbf_wait_old(context, 180);
-            pbf_press_button(context, BUTTON_A, 5, 95);
+            pbf_press_button_old(context, BUTTON_A, 5, 95);
         }
         context.wait_for_all_requests();
 
@@ -244,7 +244,7 @@ void run_autohost(
             }
         }
 
-        pbf_press_button(context, BUTTON_A, 20, 980);
+        pbf_press_button_old(context, BUTTON_A, 20, 980);
     }
 }
 

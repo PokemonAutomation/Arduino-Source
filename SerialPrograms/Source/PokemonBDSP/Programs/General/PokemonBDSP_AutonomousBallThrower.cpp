@@ -107,7 +107,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, ProCont
     env.update_stats();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     bool pokemon_caught = false;
     while (!pokemon_caught){

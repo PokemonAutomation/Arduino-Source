@@ -40,7 +40,7 @@ void trade_current_pokemon(
     VideoSnapshot box_image = stream.video().snapshot();
     ImageMatchWatcher box_detector(std::move(box_image.frame), {0.02, 0.10, 0.15, 0.80}, 50);
 
-//    pbf_press_button(context, BUTTON_ZL, 20, 0);
+//    pbf_press_button(context, BUTTON_ZL, 160ms, 0ms);
 
 #if 0
     while (true){
@@ -59,13 +59,13 @@ void trade_current_pokemon(
             stream.log("Detected trade prompt.");
             context.wait_for(std::chrono::milliseconds(100));
             tracker.check_unrecoverable_error(stream);
-            pbf_press_button(context, BUTTON_ZL, 20, 0);
+            pbf_press_button(context, BUTTON_ZL, 160ms, 0ms);
             continue;
         case 1:
             stream.log("Detected trade confirm prompt.");
             context.wait_for(std::chrono::milliseconds(100));
             tracker.check_unrecoverable_error(stream);
-            pbf_press_button(context, BUTTON_ZL, 20, 0);
+            pbf_press_button(context, BUTTON_ZL, 160ms, 0ms);
             break;
         default:
             stats.m_errors++;
@@ -76,7 +76,7 @@ void trade_current_pokemon(
 #endif
 
     //  Start trade.
-//    pbf_press_button(context, BUTTON_ZL, 20, 0);
+//    pbf_press_button(context, BUTTON_ZL, 160ms, 0ms);
 
     //  Wait for black screen.
     {

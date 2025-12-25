@@ -417,7 +417,7 @@ void leave_phone_to_overworld(const ProgramInfo& info, VideoStream& stream, ProC
         stream, context,
         [](ProControllerContext& context){
             for (size_t i = 0; i < 10; i++){
-                pbf_press_button(context, BUTTON_Y, 20, 1000);
+                pbf_press_button_old(context, BUTTON_Y, 20, 1000);
             }
         },
         {overworld, battle, arrow}

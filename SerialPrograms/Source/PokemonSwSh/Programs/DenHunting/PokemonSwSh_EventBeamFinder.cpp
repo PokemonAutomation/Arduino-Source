@@ -76,7 +76,7 @@ void EventBeamFinder::program(SingleSwitchProgramEnvironment& env, ProController
         resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         pbf_mash_button_old(context, BUTTON_B, 700);
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
     }
 
     bool parity = false;

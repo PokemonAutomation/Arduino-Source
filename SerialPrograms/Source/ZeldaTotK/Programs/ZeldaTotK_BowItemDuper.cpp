@@ -87,9 +87,9 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         // it has been adjusted and modified by denvoros#0001
 
         // zr to pull out bow
-        pbf_press_button(context, BUTTON_ZR, 12, 12);
+        pbf_press_button_old(context, BUTTON_ZR, 12, 12);
         // dpad up to try to fuse the item, release for a while to make sure fused
-        pbf_press_dpad_old(context, DPAD_UP, 20, 200);
+        pbf_press_dpad(context, DPAD_UP, 160ms, 1600ms);
         
         // then go ahead and enter the menu and do the various menuing in order to actually perform glitch
         pbf_press_button(context, BUTTON_PLUS, 160ms, 80ms);
@@ -101,11 +101,11 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         // now go to other bow and equip
         pbf_press_dpad(context, DPAD_RIGHT, 80ms, 40ms);
         pbf_press_button(context, BUTTON_A, 80ms, 80ms);
-        pbf_press_button(context, BUTTON_A, 10, 15);
+        pbf_press_button_old(context, BUTTON_A, 10, 15);
 
         // NOW WE HAVE TO PRESS PLUS AS FAST AS POSSIBLE
         pbf_press_button(context, BUTTON_PLUS, 24ms, TICK_DELAY0);
-        pbf_press_button(context, BUTTON_PLUS, 3, 3);
+        pbf_press_button_old(context, BUTTON_PLUS, 3, 3);
 
         // navigate back to the "current" bow, then drop it
         pbf_press_dpad(context, DPAD_LEFT, 80ms, 40ms);

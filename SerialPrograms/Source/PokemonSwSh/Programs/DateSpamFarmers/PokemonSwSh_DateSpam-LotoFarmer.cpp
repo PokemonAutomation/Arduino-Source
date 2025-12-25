@@ -60,7 +60,7 @@ void LotoFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
         ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 160ms);
     }
 
@@ -74,8 +74,8 @@ void LotoFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             pbf_mash_button_old(context, BUTTON_B, 90);
         }
 
-        pbf_press_button(context, BUTTON_A, 10, 90);
-        pbf_press_button(context, BUTTON_B, 10, 70);
+        pbf_press_button(context, BUTTON_A, 80ms, 720ms);
+        pbf_press_button_old(context, BUTTON_B, 10, 70);
         ssf_press_dpad_ptv(context, DPAD_DOWN, 120ms);
         pbf_mash_button_old(context, BUTTON_ZL, 490);
         pbf_mash_button(context, BUTTON_B, MASH_B_DURATION0);

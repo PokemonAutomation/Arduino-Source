@@ -89,7 +89,7 @@ IngoBattleGrinder::IngoBattleGrinder()
 
 bool IngoBattleGrinder::start_dialog(VideoStream& stream, ProControllerContext& context){
     // First press A to start talking with Ingo.
-    pbf_press_button(context, BUTTON_A, 20, 150);
+    pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
     context.wait_for_all_requests();
 
     {
@@ -118,7 +118,7 @@ bool IngoBattleGrinder::start_dialog(VideoStream& stream, ProControllerContext& 
             stream, context,
             [&](ProControllerContext& context){
                 for (size_t c = 0; c < 10; c++){
-                    pbf_press_button(context, BUTTON_A, 20, 150);
+                    pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
                 }
             },
             {
@@ -146,7 +146,7 @@ bool IngoBattleGrinder::start_dialog(VideoStream& stream, ProControllerContext& 
         }
     }
 
-    pbf_press_button(context, BUTTON_A, 20, 150);
+    pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
     context.wait_for_all_requests();
 
     ButtonDetector button2(
@@ -160,7 +160,7 @@ bool IngoBattleGrinder::start_dialog(VideoStream& stream, ProControllerContext& 
         stream, context,
         [&](ProControllerContext& context){
             for (size_t c = 0; c < 5; c++){
-                pbf_press_button(context, BUTTON_A, 20, 150);
+                pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
             }
         },
         {{button2}}
@@ -295,7 +295,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProCo
                 }
 
                 // Press A to select moves
-                pbf_press_button(context, BUTTON_A, 10, 125);
+                pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
                 context.wait_for_all_requests();
 
                 // Use move. 
@@ -376,7 +376,7 @@ void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, ProControll
     IngoBattleGrinder_Descriptor::Stats& stats = env.current_stats<IngoBattleGrinder_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     // {
     //     // ImageRGB32 image("./scripts/LA_switch_pokemon_Kuro.png");

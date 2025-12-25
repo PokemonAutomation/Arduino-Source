@@ -105,7 +105,7 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, P
             4000ms
         );
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
     }
 
     ShinyHuntTracker& stats = env.current_stats<ShinyHuntTracker>();
@@ -128,7 +128,7 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, P
 
         //  View summary.
         pbf_press_button(context, BUTTON_A, 160ms, 800ms);
-        pbf_press_button(context, BUTTON_A, 20, 0);
+        pbf_press_button(context, BUTTON_A, 160ms, 0ms);
         context.wait_for_all_requests();
 
         SummaryShinySymbolDetector::Detection detection;

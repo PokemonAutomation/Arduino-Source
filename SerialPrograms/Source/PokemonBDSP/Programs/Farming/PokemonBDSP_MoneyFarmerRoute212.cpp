@@ -148,7 +148,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, ProControl
             env.console.overlay().add_log("Choose move", COLOR_BLUE);
             battle_menu_seen = true;
 
-            pbf_press_button(context, BUTTON_ZL, 10, 125);
+            pbf_press_button(context, BUTTON_ZL, 80ms, 1000ms);
 
             uint8_t slot = 0;
             for (; slot < 4; slot++){
@@ -252,7 +252,7 @@ void MoneyFarmerRoute212::fly_to_center_heal_and_return(VideoStream& stream, Pro
     stream.log("Flying back to Hearthome City to heal.");
     stream.overlay().add_log("Fly to Hearthome City", COLOR_WHITE);
     pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
-    pbf_press_button(context, BUTTON_PLUS, 10, 240);
+    pbf_press_button_old(context, BUTTON_PLUS, 10, 240);
     pbf_press_dpad(context, DPAD_UP, 80ms, 480ms);
     pbf_press_dpad(context, DPAD_UP, 80ms, 480ms);
     pbf_mash_button(context, BUTTON_ZL, 12000ms);
@@ -310,7 +310,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, ProContro
     };
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 40ms, 40ms);
 
     bool need_to_charge = true;
     if (START_LOCATION == StartLocation::Hearthome){

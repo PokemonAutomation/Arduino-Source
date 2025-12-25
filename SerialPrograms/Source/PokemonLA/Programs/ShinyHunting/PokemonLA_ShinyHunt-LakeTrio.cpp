@@ -117,7 +117,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, ProControll
 
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 40ms, 40ms);
 
     size_t consecutive_errors = 0;
 

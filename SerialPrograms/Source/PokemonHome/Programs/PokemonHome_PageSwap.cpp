@@ -46,7 +46,7 @@ void PageSwap::program(SingleSwitchProgramEnvironment& env, ProControllerContext
         grip_menu_connect_go_home(context);
         PokemonSwSh::resume_game_no_interact(env.console, context, DODGE_SYSTEM_UPDATE_WINDOW);
     }else{
-        pbf_press_button(context, BUTTON_RCLICK, 5, 5);
+        pbf_press_button(context, BUTTON_RCLICK, 40ms, 40ms);
     }
 
     const Milliseconds PICKUP_DELAY = 2000ms;

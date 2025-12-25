@@ -123,8 +123,8 @@ void withdraw_1st_column_from_overworld(VideoStream& stream, ProControllerContex
     const Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
     const Milliseconds BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY0;
     overworld_to_box(stream, context);
-    pbf_press_button(context, BUTTON_Y, 20, 50);
-    pbf_press_button(context, BUTTON_Y, 20, 50);
+    pbf_press_button(context, BUTTON_Y, 160ms, 400ms);
+    pbf_press_button(context, BUTTON_Y, 160ms, 400ms);
     pickup_column(context);
     pbf_move_right_joystick(context, {-1, 0}, 160ms, BOX_SCROLL_DELAY);
     pbf_move_right_joystick(context, {0, -1}, 160ms, BOX_SCROLL_DELAY);
@@ -135,7 +135,7 @@ void withdraw_1st_column_from_overworld(VideoStream& stream, ProControllerContex
 
 
 void release(VideoStream& stream, ProControllerContext& context){
-    pbf_press_button(context, BUTTON_ZL, 20, 50);
+    pbf_press_button(context, BUTTON_ZL, 160ms, 400ms);
     pbf_move_right_joystick(context, {0, +1}, 160ms, 240ms);
     pbf_move_right_joystick(context, {0, +1}, 160ms, 240ms);
     pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
