@@ -144,23 +144,23 @@ void checkpoint_38(
                 direction.change_direction(env.program_info(), env.console, context, 0.3491);
                 pbf_move_left_joystick(context, {0, +1}, 3200ms, 800ms);
                 direction.change_direction(env.program_info(), env.console, context, 5.075911);
-                pbf_move_left_joystick_old(context, 128, 0, 525, 100);
+                pbf_move_left_joystick_old(context, 128, 0, 4200ms, 800ms);
         });
 
         direction.change_direction(env.program_info(), env.console, context, 3.771252);
         get_on_ride(env.program_info(), env.console, context);
         // walk towards elevator
-        pbf_move_left_joystick_old(context, 128, 0, 700, 100);
+        pbf_move_left_joystick_old(context, 128, 0, 5600ms, 800ms);
         // jump to ensure you get on elevator
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 1600ms);
         pbf_wait(context, 3000ms);
         // wait for overworld to reappear after stepping off elevator
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
-        pbf_move_left_joystick_old(context, 128, 0, 120, 100);
+        pbf_move_left_joystick_old(context, 128, 0, 960ms, 800ms);
 
         direction.change_direction(env.program_info(), env.console, context, 5.11);  
-        pbf_move_left_joystick_old(context, 128, 0, 1600, 100);
+        pbf_move_left_joystick_old(context, 128, 0, 12800ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 3.2245);          
         
         

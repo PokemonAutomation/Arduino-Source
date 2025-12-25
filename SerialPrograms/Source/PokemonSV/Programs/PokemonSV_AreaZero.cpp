@@ -274,7 +274,7 @@ void inside_zero_gate_to_secret_cave_entrance(
 
     context.wait_for(std::chrono::seconds(3));
 
-    pbf_move_left_joystick_old(context, 0, 208, 30, 50);
+    pbf_move_left_joystick_old(context, 0, 208, 240ms, 400ms);
     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
 

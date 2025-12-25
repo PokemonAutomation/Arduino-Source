@@ -162,23 +162,23 @@ void GeneratePokemonImageTrainingData::select_starting_location(SingleSwitchProg
         break;
     case StartingLocation::FIELDLANDS_FIELDLANDS:
         env.log("Starting at Fieldlands - Fieldlands Camp");
-        pbf_move_left_joystick_old(context, 50, 0, 130, 10);
+        pbf_move_left_joystick_old(context, 50, 0, 1040ms, 80ms);
         break;
     case StartingLocation::FIELDLANDS_HEIGHTS:
         env.log("Starting at Fieldlands - Heights Camp");
-        pbf_move_left_joystick_old(context, 40, 0, 165, 10);
+        pbf_move_left_joystick_old(context, 40, 0, 1320ms, 80ms);
         break;
     case StartingLocation::MIRELANDS_MIRELANDS:
         env.log("Starting at Mirelands - Mirelands Camp");
-        pbf_move_left_joystick_old(context, 200, 0, 140, 10);
+        pbf_move_left_joystick_old(context, 200, 0, 1120ms, 80ms);
         break;
     case StartingLocation::MIRELANDS_BOGBOUND:
         env.log("Starting at Mirelands - Bogbound Camp");
-        pbf_move_left_joystick_old(context, 0, 55, 215, 10);
+        pbf_move_left_joystick_old(context, 0, 55, 1720ms, 80ms);
         break;
     case StartingLocation::COASTLANDS_BEACHSIDE:
         env.log("Starting at Coastlands - Beachside Camp");
-        pbf_move_left_joystick_old(context, 0, 35, 160, 10);
+        pbf_move_left_joystick_old(context, 0, 35, 1280ms, 80ms);
         break;
     case StartingLocation::COASTLANDS_COASTLANDS:
         env.log("Starting at Coastlands - Coastlands Camp");
@@ -186,7 +186,7 @@ void GeneratePokemonImageTrainingData::select_starting_location(SingleSwitchProg
         break;
     case StartingLocation::HIGHLANDS_HIGHLANDS:
         env.log("Starting at Highlands - Highlands Camp");
-        pbf_move_left_joystick_old(context, 0, 20, 140, 10);
+        pbf_move_left_joystick_old(context, 0, 20, 1120ms, 80ms);
         break;
     case StartingLocation::HIGHLANDS_MOUNTAIN:
         env.log("Starting at Highlands - Mountain Camp");
@@ -194,11 +194,11 @@ void GeneratePokemonImageTrainingData::select_starting_location(SingleSwitchProg
         break;
     case StartingLocation::HIGHLANDS_SUMMIT:
         env.log("Starting at Highlands - Summit Camp");
-        pbf_move_left_joystick_old(context, 10, 0, 150, 10);
+        pbf_move_left_joystick_old(context, 10, 0, 1200ms, 80ms);
         break;
     case StartingLocation::ICELANDS_SNOWFIELDS:
         env.log("Starting at Icelands - Snowfields Camp");
-        pbf_move_left_joystick_old(context, 0, 20, 140, 10);
+        pbf_move_left_joystick_old(context, 0, 20, 1120ms, 80ms);
         break;
     case StartingLocation::ICELANDS_ICEPEAK:
         env.log("Starting at Icelands - Icepeak Camp");

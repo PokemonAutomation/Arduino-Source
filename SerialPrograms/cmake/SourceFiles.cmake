@@ -1671,6 +1671,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/PokemonLZA_BoxSorter.h
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.h
+    Source/PokemonLZA/Programs/PokemonLZA_DonutBerrySession.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_DonutBerrySession.h
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.cpp
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.h
     Source/PokemonLZA/Programs/PokemonLZA_Locations.h

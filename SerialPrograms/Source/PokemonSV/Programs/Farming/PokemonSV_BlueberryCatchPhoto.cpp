@@ -67,7 +67,7 @@ CameraAngle quest_photo_navi(
             context.wait_for_all_requests();
 
             pbf_press_button(context, BUTTON_L, 80ms, 400ms);
-            pbf_move_left_joystick_old(context, 255, 50, 180, 20);
+            pbf_move_left_joystick_old(context, 255, 50, 1440ms, 160ms);
 
             angle = CameraAngle::down;
 
@@ -78,7 +78,7 @@ CameraAngle quest_photo_navi(
             //Coastal Plaza - Exeggutor-A
             central_to_coastal_plaza(info, console, context);
 
-            pbf_move_left_joystick_old(context, 0, 115, 400, 20);
+            pbf_move_left_joystick_old(context, 0, 115, 3200ms, 160ms);
 
             //Jump down
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
@@ -433,7 +433,7 @@ void quest_catch_navi(
             //Coastal Plaza - Exeggutor-A
             central_to_coastal_plaza(info, console, context);
 
-            pbf_move_left_joystick_old(context, 0, 115, 400, 20);
+            pbf_move_left_joystick_old(context, 0, 115, 3200ms, 160ms);
 
             //Jump down
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
@@ -444,7 +444,7 @@ void quest_catch_navi(
             pbf_wait(context, 800ms);
             context.wait_for_all_requests();
 
-            pbf_move_left_joystick_old(context, 128, 0, 350, 20);
+            pbf_move_left_joystick_old(context, 128, 0, 2800ms, 160ms);
             pbf_press_button(context, BUTTON_B, 160ms, 160ms);
             pbf_wait(context, 1600ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
@@ -520,16 +520,16 @@ void quest_catch_navi(
             pbf_move_left_joystick_old(context, 255, 40, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            pbf_move_left_joystick_old(context, 128, 0, 500, 20);
+            pbf_move_left_joystick_old(context, 128, 0, 4000ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             pbf_move_left_joystick(context, {+1, +1}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
             if (console.state().console_type() == ConsoleType::Switch1) {
-                pbf_move_left_joystick_old(context, 128, 0, 200, 20);
+                pbf_move_left_joystick_old(context, 128, 0, 1600ms, 160ms);
             } else {
-                pbf_move_left_joystick_old(context, 128, 0, 170, 20);
+                pbf_move_left_joystick_old(context, 128, 0, 1360ms, 160ms);
             }
 
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
@@ -629,7 +629,7 @@ void quest_catch_navi(
             //Lapras - Tera Bug
             central_to_polar_rest(info, console, context);
             pbf_press_button(context, BUTTON_L, 80ms, 400ms);
-            pbf_move_left_joystick_old(context, 128, 0, 230, 20);
+            pbf_move_left_joystick_old(context, 128, 0, 1840ms, 160ms);
             pbf_move_left_joystick(context, {-1, 0}, 2400ms, 160ms);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
             pbf_move_left_joystick_old(context, 20, 0, 160ms, 400ms);

@@ -627,7 +627,7 @@ PokemonDetails AutoMultiSpawn::go_to_spawn_point_and_try_focusing_pokemon(
         if (i == 2 && nun_pokemon_left == 1){
             // If its' only one pokemon to despawn, then we don't need to worry about scare multiple pokemon at once.
             // We can move closer.
-            pbf_move_left_joystick_old(context, 128, 0, 150, 60);
+            pbf_move_left_joystick_old(context, 128, 0, 1200ms, 480ms);
             context.wait_for_all_requests();
         }
     }
