@@ -121,10 +121,10 @@ void PoffinCooker::program(SingleSwitchProgramEnvironment& env, ProControllerCon
 
     env.log("Select the cooking option");
     //  Select the cooking option.
-    pbf_press_button_old(context, BUTTON_A, 5, 100);
-    pbf_press_button_old(context, BUTTON_A, 5, 175);
+    pbf_press_button(context, BUTTON_A, 40ms, 800ms);
+    pbf_press_button(context, BUTTON_A, 40ms, 1400ms);
     pbf_press_button(context, BUTTON_A, 40ms, 600ms);
-    pbf_press_button_old(context, BUTTON_A, 5, 100);
+    pbf_press_button(context, BUTTON_A, 40ms, 800ms);
 
 
     for (uint16_t c = 0; c < MAX_COOK_ATTEMPTS; c++){

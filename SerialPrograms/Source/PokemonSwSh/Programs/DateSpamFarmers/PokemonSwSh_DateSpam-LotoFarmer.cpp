@@ -75,7 +75,7 @@ void LotoFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         }
 
         pbf_press_button(context, BUTTON_A, 80ms, 720ms);
-        pbf_press_button_old(context, BUTTON_B, 10, 70);
+        pbf_press_button(context, BUTTON_B, 80ms, 560ms);
         ssf_press_dpad_ptv(context, DPAD_DOWN, 120ms);
         pbf_mash_button(context, BUTTON_ZL, 3920ms);
         pbf_mash_button(context, BUTTON_B, MASH_B_DURATION0);

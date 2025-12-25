@@ -55,9 +55,9 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         // Press B to be asked whether to leave menu
         // Press B to not leave
 
-        pbf_press_button_old(context, BUTTON_A, 10, 120);
-        pbf_press_button_old(context, BUTTON_A, 10, 130);
-        pbf_press_button_old(context, BUTTON_B, 10, 120);
+        pbf_press_button(context, BUTTON_A, 80ms, 960ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 1040ms);
+        pbf_press_button(context, BUTTON_B, 80ms, 960ms);
         pbf_press_button(context, BUTTON_B, 80ms, 480ms);
 
         // Move to the next clothing in the same category

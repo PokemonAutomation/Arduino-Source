@@ -74,7 +74,7 @@ void DailyHighlightFarmer::program(SingleSwitchProgramEnvironment& env, ProContr
             pbf_mash_button(context, BUTTON_B, 720ms);
         }
 
-        pbf_press_button_old(context, BUTTON_A, 10, 110);
+        pbf_press_button(context, BUTTON_A, 80ms, 880ms);
         pbf_press_button(context, BUTTON_ZL, 80ms, 320ms);
         pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
         pbf_mash_button(context, BUTTON_ZL, 3200ms);

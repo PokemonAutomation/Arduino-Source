@@ -23,7 +23,7 @@ namespace PokemonRSE{
 
 void soft_reset(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     // A + B + Select + Start
-    pbf_press_button_old(context, BUTTON_B | BUTTON_Y | BUTTON_MINUS | BUTTON_PLUS, 10, 180);
+    pbf_press_button(context, BUTTON_B | BUTTON_Y | BUTTON_MINUS | BUTTON_PLUS, 80ms, 1440ms);
 
     pbf_mash_button(context, BUTTON_PLUS, GameSettings::instance().START_BUTTON_MASH0);
     context.wait_for_all_requests();
@@ -72,7 +72,7 @@ void flee_battle(VideoStream& stream, ProControllerContext& context) {
         );
     }
 
-    pbf_press_button_old(context, BUTTON_A, 40, 40);
+    pbf_press_button(context, BUTTON_A, 320ms, 320ms);
     BlackScreenOverWatcher battle_over(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     int ret3 = wait_until(
         stream, context,
@@ -135,7 +135,7 @@ bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool s
         //Send out lead, no shiny detection needed.
         BattleMenuWatcher battle_menu(COLOR_RED);
         stream.log("Sending out lead Pokemon.");
-        pbf_press_button_old(context, BUTTON_A, 40, 40);
+        pbf_press_button(context, BUTTON_A, 320ms, 320ms);
 
         int ret = wait_until(
             stream, context,

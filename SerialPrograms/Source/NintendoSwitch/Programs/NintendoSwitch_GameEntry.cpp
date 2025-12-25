@@ -266,7 +266,7 @@ void resume_game_from_home(
                 console.log("Detected update window.", COLOR_RED);
 
                 pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);
-                pbf_press_button_old(context, BUTTON_A, 10, 500);
+                pbf_press_button(context, BUTTON_A, 80ms, 4000ms);
                 context.wait_for_all_requests();
                 continue;
             }
@@ -381,7 +381,7 @@ void start_game_from_home_blind(
 
         //  If the update menu isn't there, these will get swallowed by the opening
         //  animation for the select user menu.
-        pbf_press_button_old(context, BUTTON_A, 10, 175);   //  Choose game
+        pbf_press_button(context, BUTTON_A, 80ms, 1400ms);   //  Choose game
         pbf_press_dpad(context, DPAD_UP, 80ms, 0ms);    //  Skip the update window.
         move_to_user(context, user_slot);
     }
@@ -391,7 +391,7 @@ void start_game_from_home_blind(
         //  Mash your way into the game.
         pbf_mash_button(context, BUTTON_A, start_game_mash);
     }else{
-        pbf_press_button_old(context, BUTTON_A, 10, 175);   //  Enter select user menu.
+        pbf_press_button(context, BUTTON_A, 80ms, 1400ms);   //  Enter select user menu.
         move_to_user(context, user_slot);
         ssf_press_button_ptv(context, BUTTON_A, 160ms); //  Enter game
 

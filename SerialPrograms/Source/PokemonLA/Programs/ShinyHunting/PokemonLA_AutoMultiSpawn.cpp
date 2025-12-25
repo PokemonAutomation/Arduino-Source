@@ -88,7 +88,7 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
 
     // First, let controller press ZL non-stop to start focusing on a pokemon
     session.dispatch([](ProControllerContext& context){
-        pbf_press_button_old(context, BUTTON_ZL, 10000, 0);
+        pbf_press_button(context, BUTTON_ZL, 80000ms, 0ms);
     });
 
     // We try at most 4 focus change attempts
@@ -183,7 +183,7 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
             // Press A to change focus.
             session.dispatch([](ProControllerContext& context){
                 pbf_press_button(context, BUTTON_ZL | BUTTON_A, 240ms, 0ms);
-                pbf_press_button_old(context, BUTTON_ZL, 10000, 0);
+                pbf_press_button(context, BUTTON_ZL, 80000ms, 0ms);
             });
 
             // Wait some time to let the button A press executed, the game focused on another pokemon

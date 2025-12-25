@@ -127,26 +127,26 @@ bool NuggetFarmerHighlands::run_iteration(
             env.console, context,
             [](ProControllerContext& context){
                 pbf_move_left_joystick_old(context, 0, 212, 400ms, 0ms);
-                pbf_press_button_old(context, BUTTON_B, 492, 80);
+                pbf_press_button(context, BUTTON_B, 3936ms, 640ms);
 
                 pbf_move_left_joystick_old(context, 224, 0, 400ms, 0ms);
 //                pbf_press_button(context, BUTTON_B, 350, 80);
-                pbf_press_button_old(context, BUTTON_B, 80, 0);
+                pbf_press_button(context, BUTTON_B, 640ms, 0ms);
                 for (size_t c = 0; c < 7; c++){
                     pbf_press_button(context, BUTTON_A | BUTTON_B, 40ms, 0ms);
                     pbf_press_button(context, BUTTON_B, 40ms, 0ms);
                 }
-                pbf_press_button_old(context, BUTTON_B, 200, 80);
+                pbf_press_button(context, BUTTON_B, 1600ms, 640ms);
                 pbf_wait_old(context, 80);
 
                 pbf_move_left_joystick_old(context, 0, 64, 400ms, 0ms);
-                pbf_press_button_old(context, BUTTON_B, 250, 80);
+                pbf_press_button(context, BUTTON_B, 2000ms, 640ms);
 
                 pbf_move_left_joystick_old(context, 0, 48, 400ms, 0ms);
                 pbf_press_button(context, BUTTON_B, 2000ms, 0ms);
 
                 pbf_move_left_joystick_old(context, 64, 255, 400ms, 0ms);
-                pbf_press_button_old(context, BUTTON_B, 150, 250);
+                pbf_press_button(context, BUTTON_B, 1200ms, 2000ms);
 
             },
             {

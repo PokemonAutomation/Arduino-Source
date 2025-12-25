@@ -437,11 +437,11 @@ void move_to_start_position_for_letsgo0(
     pbf_press_button(context, BUTTON_PLUS, 400ms, 400ms);
 
     // Jump
-    pbf_press_button_old(context, BUTTON_B, 125, 100);
+    pbf_press_button(context, BUTTON_B, 1000ms, 800ms);
 
     // Fly 
-    pbf_press_button_old(context, BUTTON_B, 50, 10); //  Double up this press
-    pbf_press_button_old(context, BUTTON_B, 50, 10);     //  in case one is dropped.
+    pbf_press_button(context, BUTTON_B, 400ms, 80ms); //  Double up this press
+    pbf_press_button(context, BUTTON_B, 400ms, 80ms);     //  in case one is dropped.
     pbf_press_button(context, BUTTON_LCLICK, 400ms, 0ms);
     // you automatically move forward without pressing any buttons. so just wait
     pbf_wait_old(context, 1400);
@@ -450,7 +450,7 @@ void move_to_start_position_for_letsgo0(
     // pbf_move_left_joystick(context, {0, +1}, 20000ms, 80ms);
 
     // arrived at start position. stop flying
-    pbf_press_button_old(context, BUTTON_B, 50, 400);
+    pbf_press_button(context, BUTTON_B, 400ms, 3200ms);
     // get off ride
     pbf_press_button(context, BUTTON_PLUS, 400ms, 400ms);
 
@@ -493,10 +493,10 @@ void move_to_start_position_for_letsgo1(
     pbf_press_button(context, BUTTON_PLUS, 400ms, 400ms);
 
     // Jump
-    pbf_press_button_old(context, BUTTON_B, 125, 30);
+    pbf_press_button(context, BUTTON_B, 1000ms, 240ms);
 
     // Fly 
-    pbf_press_button_old(context, BUTTON_B, 50, 10);
+    pbf_press_button(context, BUTTON_B, 400ms, 80ms);
     pbf_press_button(context, BUTTON_B, 400ms, 400ms); // Double click in case of drop
     pbf_press_button(context, BUTTON_LCLICK, 400ms, 0ms);
 
@@ -505,15 +505,15 @@ void move_to_start_position_for_letsgo1(
     pbf_wait_old(context, 2200);
 
     // arrived at start position. stop flying
-    pbf_press_button_old(context, BUTTON_B, 50, 400);
+    pbf_press_button(context, BUTTON_B, 400ms, 3200ms);
     // get off ride
     pbf_press_button(context, BUTTON_PLUS, 400ms, 400ms);
 
     // extra B presses to ensure we stop flying, in case the previous B press
     // was dropped. This way, you eventually reset back to Pokecenter, instead
     // of flying until an exception is thrown.
-    pbf_press_button_old(context, BUTTON_B, 50, 10);
-    pbf_press_button_old(context, BUTTON_B, 50, 10);
+    pbf_press_button(context, BUTTON_B, 400ms, 80ms);
+    pbf_press_button(context, BUTTON_B, 400ms, 80ms);
 
     // look right
     // pbf_move_right_joystick(context, {+1, 0}, 160ms, 80ms);
@@ -665,7 +665,7 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, VideoStream&
         open_map_from_overworld(info, stream, context);
 
         // change from Paldea map to Blueberry map
-        pbf_press_button_old(context, BUTTON_L, 50, 300);
+        pbf_press_button(context, BUTTON_L, 400ms, 2400ms);
 
         // move cursor to bottom right corner
         pbf_move_left_joystick(context, {+1, -1}, 5000ms, 400ms);
@@ -847,10 +847,10 @@ void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, VideoStream
         open_map_from_overworld(info, stream, context);
 
         // change from Blueberry map to Paldea map
-        pbf_press_button_old(context, BUTTON_R, 50, 300);
+        pbf_press_button(context, BUTTON_R, 400ms, 2400ms);
 
         // zoom out
-        pbf_press_button_old(context, BUTTON_ZL, 25, 200);
+        pbf_press_button(context, BUTTON_ZL, 200ms, 1600ms);
 
         // move cursor up-left
         // try different magnitudes of cursor push with each failure.

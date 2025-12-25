@@ -44,7 +44,7 @@ namespace PokemonSV{
 bool fly_to_overworld_from_map(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, bool check_fly_menuitem){
     context.wait_for_all_requests();
     // Press A to bring up the promp dialog on choosing "Fly here", "Set as destination", "Never mind".
-    pbf_press_button_old(context, BUTTON_A, 20, 130);
+    pbf_press_button(context, BUTTON_A, 160ms, 1040ms);
 
     WallClock start = current_time();
     while (true){
@@ -82,16 +82,16 @@ bool fly_to_overworld_from_map(const ProgramInfo& info, VideoStream& stream, Pro
         case 1: // map
             stream.log("Detected map. Pressing A to open map menu.");
             // Press A to bring up the promp dialog on choosing "Fly here", "Set as destination", "Never mind".
-            pbf_press_button_old(context, BUTTON_A, 20, 130);
+            pbf_press_button(context, BUTTON_A, 160ms, 1040ms);
             continue;
         case 2: // spot_dialog_watcher or flyMenuItemWatcher
             stream.log("Detected fly here prompt dialog.");
             stream.overlay().add_log("Fly");
-            pbf_press_button_old(context, BUTTON_A, 20, 130);
+            pbf_press_button(context, BUTTON_A, 160ms, 1040ms);
             continue;
         case 3: //confirm_watcher
             stream.log("Detected fly confirmation prompt.");
-            pbf_press_button_old(context, BUTTON_A, 20, 130);
+            pbf_press_button(context, BUTTON_A, 160ms, 1040ms);
             continue;
         case 4: //battle
             stream.log("Detected battle.");

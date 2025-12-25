@@ -127,7 +127,7 @@ void save_game_tutorial(
         [](ProControllerContext& context){
             pbf_wait(context, 4000ms); // avoiding pressing X if menu already open
             for (size_t i = 0; i < 10; i++){
-                pbf_press_button_old(context, BUTTON_X, 20, 500);
+                pbf_press_button(context, BUTTON_X, 160ms, 4000ms);
             }
         },
         {menu}

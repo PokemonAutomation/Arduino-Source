@@ -96,7 +96,7 @@ void change_time_of_day_at_tent(
 
     // Press A to clear the dialog box, and show the time menu
     // pbf_wait(context, 40);
-    pbf_press_button_old(context, BUTTON_A, 30, 80);
+    pbf_press_button(context, BUTTON_A, 240ms, 640ms);
     stream.log("Change time of day to " + std::string(TIME_OF_DAY_NAMES[int(target_time)]));
 
     // Move down the menu to find the target time

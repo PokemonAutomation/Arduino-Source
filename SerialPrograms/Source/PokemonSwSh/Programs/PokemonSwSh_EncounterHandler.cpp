@@ -293,7 +293,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
             pbf_mash_button(m_context, BUTTON_B, 2000ms);
             pbf_press_button(m_context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0); //  Save game.
             pbf_press_button(m_context, BUTTON_R, 160ms, 1200ms);
-            pbf_press_button_old(m_context, BUTTON_A, 10, 500);
+            pbf_press_button(m_context, BUTTON_A, 80ms, 4000ms);
             break;
         case CatchResult::POKEMON_FAINTED:
             pbf_mash_button(m_context, BUTTON_B, 2000ms);

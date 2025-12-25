@@ -228,7 +228,7 @@ void order_compote_du_fils(
             stream, context,
             [](ProControllerContext& context){
                 for(int i = 0; i < 60; i++){
-                    pbf_press_button_old(context, BUTTON_A, 25, 100);
+                    pbf_press_button(context, BUTTON_A, 200ms, 800ms);
                 }
             },
             {{dialog_watcher}}

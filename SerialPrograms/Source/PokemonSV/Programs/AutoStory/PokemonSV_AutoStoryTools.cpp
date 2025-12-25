@@ -372,7 +372,7 @@ void overworld_navigation(
                                     pbf_wait(context, Seconds(seconds_realign));
                                 } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
                                     for (size_t j = 0; j < 5 * seconds_realign; j++){
-                                        pbf_press_button_old(context, BUTTON_A, 20, 5);
+                                        pbf_press_button(context, BUTTON_A, 160ms, 40ms);
                                     }
                                 }
                             }

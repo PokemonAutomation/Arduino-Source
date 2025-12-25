@@ -252,7 +252,7 @@ void MoneyFarmerRoute212::fly_to_center_heal_and_return(VideoStream& stream, Pro
     stream.log("Flying back to Hearthome City to heal.");
     stream.overlay().add_log("Fly to Hearthome City", COLOR_WHITE);
     pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
-    pbf_press_button_old(context, BUTTON_PLUS, 10, 240);
+    pbf_press_button(context, BUTTON_PLUS, 80ms, 1920ms);
     pbf_press_dpad(context, DPAD_UP, 80ms, 480ms);
     pbf_press_dpad(context, DPAD_UP, 80ms, 480ms);
     pbf_mash_button(context, BUTTON_ZL, 12000ms);
