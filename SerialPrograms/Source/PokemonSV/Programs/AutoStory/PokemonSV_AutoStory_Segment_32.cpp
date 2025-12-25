@@ -177,7 +177,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
 
         //mash past other dialog
-        pbf_mash_button_old(context, BUTTON_A, 360);
+        pbf_mash_button(context, BUTTON_A, 2880ms);
             
         //wait for start
         context.wait_for(std::chrono::milliseconds(30000));
@@ -198,7 +198,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         pbf_wait(context, 10000ms);
 
         //mash past other dialog
-        pbf_mash_button_old(context, BUTTON_A, 360);
+        pbf_mash_button(context, BUTTON_A, 2880ms);
             
         //wait for start
         context.wait_for(std::chrono::milliseconds(8000));

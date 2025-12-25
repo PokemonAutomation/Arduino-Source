@@ -114,7 +114,7 @@ void from_professor_return_to_jubilife(
             break;
         case 2:
             stream.log("Backing out of Pokedex...");
-            pbf_mash_button_old(context, BUTTON_B, 20);
+            pbf_mash_button(context, BUTTON_B, 160ms);
             break;
         default:
             OperationFailedException::fire(

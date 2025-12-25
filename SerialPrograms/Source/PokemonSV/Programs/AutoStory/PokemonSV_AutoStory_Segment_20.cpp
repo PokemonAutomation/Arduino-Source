@@ -204,7 +204,7 @@ void checkpoint_44(
         pbf_move_left_joystick(context, {0, +1}, 2400ms, 800ms);
         handle_failed_action(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_mash_button_old(context, BUTTON_A, 500);
+                pbf_mash_button(context, BUTTON_A, 4000ms);
                 check_num_sunflora_found(env, context, 1);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -218,7 +218,7 @@ void checkpoint_44(
         pbf_move_left_joystick_old(context, 128, 0, 960ms, 800ms);
         handle_failed_action(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_mash_button_old(context, BUTTON_A, 500);
+                pbf_mash_button(context, BUTTON_A, 4000ms);
                 check_num_sunflora_found(env, context, 2);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -232,7 +232,7 @@ void checkpoint_44(
         pbf_move_left_joystick_old(context, 128, 0, 960ms, 800ms);
         handle_failed_action(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_mash_button_old(context, BUTTON_A, 500);
+                pbf_mash_button(context, BUTTON_A, 4000ms);
                 check_num_sunflora_found(env, context, 3);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -262,7 +262,7 @@ void checkpoint_44(
         pbf_move_left_joystick(context, {0, +1}, 480ms, 800ms);
         handle_failed_action(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_mash_button_old(context, BUTTON_A, 500);
+                pbf_mash_button(context, BUTTON_A, 4000ms);
                 check_num_sunflora_found(env, context, 4);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -290,7 +290,7 @@ void checkpoint_44(
         pbf_move_left_joystick_old(context, 128, 0, 720ms, 800ms);  // todo: adjust this. 80 -> 90?
         handle_failed_action(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_mash_button_old(context, BUTTON_A, 500);
+                pbf_mash_button(context, BUTTON_A, 4000ms);
                 check_num_sunflora_found(env, context, 5);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -313,7 +313,7 @@ void checkpoint_44(
         direction.change_direction(env.program_info(), env.console, context, 3.86);
         handle_failed_action(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_mash_button_old(context, BUTTON_A, 500);
+                pbf_mash_button(context, BUTTON_A, 4000ms);
                 check_num_sunflora_found(env, context, 6);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -371,7 +371,7 @@ void checkpoint_44(
         pbf_move_left_joystick_old(context, 128, 0, 1040ms, 800ms);
         handle_failed_action(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_mash_button_old(context, BUTTON_A, 500);
+                pbf_mash_button(context, BUTTON_A, 4000ms);
                 check_num_sunflora_found(env, context, 7);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -432,7 +432,7 @@ void checkpoint_44(
         pbf_move_left_joystick(context, {0, +1}, 4800ms, 800ms);
         handle_failed_action(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_mash_button_old(context, BUTTON_A, 500);
+                pbf_mash_button(context, BUTTON_A, 4000ms);
                 check_num_sunflora_found(env, context, 9);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -449,7 +449,7 @@ void checkpoint_44(
         pbf_move_left_joystick(context, {0, +1}, 2000ms, 800ms);
         handle_failed_action(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_mash_button_old(context, BUTTON_A, 500);
+                pbf_mash_button(context, BUTTON_A, 4000ms);
                 check_num_sunflora_found(env, context, 10);
             },
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){

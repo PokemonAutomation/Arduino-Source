@@ -138,7 +138,7 @@ bool PurpleBeamFinder::run(SingleSwitchProgramEnvironment& env, ProControllerCon
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            pbf_mash_button_old(context, BUTTON_A, 1000);
+            pbf_mash_button(context, BUTTON_A, 8000ms);
         },
         { arrow_detector }
     );
@@ -149,7 +149,7 @@ bool PurpleBeamFinder::run(SingleSwitchProgramEnvironment& env, ProControllerCon
     }
     env.log("Detected initial prompt.");
 
-    pbf_mash_button_old(context, BUTTON_A, 50);
+    pbf_mash_button(context, BUTTON_A, 400ms);
     pbf_wait(context, 800ms);
     context.wait_for_all_requests();
 
@@ -205,7 +205,7 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, ProControlle
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
-        pbf_mash_button_old(context, BUTTON_B, 100);
+        pbf_mash_button(context, BUTTON_B, 800ms);
     }else{
         pbf_press_button(context, BUTTON_B, 40ms, 40ms);
     }

@@ -71,13 +71,13 @@ void LotoFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         if (context->performance_class() == ControllerPerformanceClass::SysbotBase){
             pbf_wait(context, 720ms);
         }else{
-            pbf_mash_button_old(context, BUTTON_B, 90);
+            pbf_mash_button(context, BUTTON_B, 720ms);
         }
 
         pbf_press_button(context, BUTTON_A, 80ms, 720ms);
         pbf_press_button_old(context, BUTTON_B, 10, 70);
         ssf_press_dpad_ptv(context, DPAD_DOWN, 120ms);
-        pbf_mash_button_old(context, BUTTON_ZL, 490);
+        pbf_mash_button(context, BUTTON_ZL, 3920ms);
         pbf_mash_button(context, BUTTON_B, MASH_B_DURATION0);
 
         //  Tap HOME and quickly spam B. The B spamming ensures that we don't

@@ -192,7 +192,7 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, ProControll
         int ret_entry = run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){
-                pbf_mash_button_old(context, BUTTON_A, 10000);
+                pbf_mash_button(context, BUTTON_A, 80000ms);
             },
             { black_screen }
         );

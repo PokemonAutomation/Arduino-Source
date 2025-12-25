@@ -331,7 +331,7 @@ void quest_photo(
                 int exit = run_until<ProControllerContext>(
                     console, context,
                     [&](ProControllerContext& context){
-                        pbf_mash_button_old(context, BUTTON_B, 2000);
+                        pbf_mash_button(context, BUTTON_B, 16000ms);
                     },
                     {{ overworld }}
                 );
@@ -706,10 +706,10 @@ void quest_catch_throw_ball(
 
     //Throw ball
     console.log("Throwing ball.");
-    pbf_mash_button_old(context, BUTTON_A, 150);
+    pbf_mash_button(context, BUTTON_A, 1200ms);
     context.wait_for_all_requests();
 
-    pbf_mash_button_old(context, BUTTON_B, 900);
+    pbf_mash_button(context, BUTTON_B, 7200ms);
     context.wait_for_all_requests();
 }
 
@@ -765,7 +765,7 @@ void quest_catch_handle_battle(
                     pbf_mash_button(context, BUTTON_B, 1000ms);
                     context.wait_for_all_requests();
 
-                    pbf_mash_button_old(context, BUTTON_A, 300);
+                    pbf_mash_button(context, BUTTON_A, 2400ms);
                     context.wait_for_all_requests();
 
                     tera_target = true;
@@ -810,7 +810,7 @@ void quest_catch_handle_battle(
 
                         context.wait_for_all_requests();
                         move_select.move_to_slot(console, context, 3);
-                        pbf_mash_button_old(context, BUTTON_A, 150);
+                        pbf_mash_button(context, BUTTON_A, 1200ms);
                         pbf_wait(context, 800ms);
                         context.wait_for_all_requests();
 
@@ -833,7 +833,7 @@ void quest_catch_handle_battle(
                         }
                     }else{
                         //Wild pokemon's turn/wait for catch animation
-                        pbf_mash_button_old(context, BUTTON_B, 900);
+                        pbf_mash_button(context, BUTTON_B, 7200ms);
                         context.wait_for_all_requests();
                     }
                 }
@@ -956,13 +956,13 @@ void quest_catch(
     OverworldWatcher done_healing(console.logger(), COLOR_BLUE);
     pbf_move_left_joystick(context, {0, +1}, 800ms, 160ms);
 
-    pbf_mash_button_old(context, BUTTON_A, 300);
+    pbf_mash_button(context, BUTTON_A, 2400ms);
     context.wait_for_all_requests();
 
     int exit = run_until<ProControllerContext>(
         console, context,
         [&](ProControllerContext& context){
-            pbf_mash_button_old(context, BUTTON_B, 2000);
+            pbf_mash_button(context, BUTTON_B, 16000ms);
         },
         {{ done_healing }}
     );

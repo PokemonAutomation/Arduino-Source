@@ -49,7 +49,7 @@ bool heal_by_global_room(VideoStream& stream, ProControllerContext& context){
     pbf_press_button(context, BUTTON_ZL, 80ms, 1000ms);
     
     // Then mash B to leave Union Room
-    pbf_mash_button_old(context, BUTTON_B, 400);
+    pbf_mash_button(context, BUTTON_B, 3200ms);
 
     context.wait_for_all_requests();
     stream.overlay().add_log("Heal complete", COLOR_WHITE);

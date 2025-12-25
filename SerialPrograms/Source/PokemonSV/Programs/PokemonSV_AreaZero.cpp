@@ -201,7 +201,7 @@ void return_to_inside_zero_gate(
         stream, context,
         [](ProControllerContext& context){
             pbf_move_left_joystick_old(context, 255, 32, 160ms, 840ms);
-            pbf_mash_button_old(context, BUTTON_L, 60);
+            pbf_mash_button(context, BUTTON_L, 480ms);
             pbf_move_left_joystick(context, {0, +1}, 10000ms, 0ms);
         },
         {black_screen}
@@ -236,7 +236,7 @@ void return_to_inside_zero_gate_from_picnic(
         stream, context,
         [](ProControllerContext& context){
             pbf_move_left_joystick(context, {0, -1}, 800ms, 320ms);
-            pbf_mash_button_old(context, BUTTON_L, 60);
+            pbf_mash_button(context, BUTTON_L, 480ms);
             pbf_move_left_joystick(context, {0, +1}, 10000ms, 0ms);
         },
         {black_screen}
