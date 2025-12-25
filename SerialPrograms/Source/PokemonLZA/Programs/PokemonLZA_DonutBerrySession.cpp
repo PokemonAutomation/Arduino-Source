@@ -155,7 +155,7 @@ bool BerrySession::run_move_iteration(
     std::map<size_t, std::string> found_ingredients;
     for (size_t c = 0; c < DonutBerriesReader::BERRY_PAGE_LINES; c++){
         for (const std::string& item : page.item[c]){
-            auto iter = ingredients.find(item);
+            //auto iter = ingredients.find(item);
             if (ingredients.find(item) != ingredients.end()) {
                 found_ingredients[c] = item;
             }
