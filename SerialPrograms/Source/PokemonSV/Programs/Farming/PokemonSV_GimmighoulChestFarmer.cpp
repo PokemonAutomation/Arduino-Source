@@ -108,7 +108,7 @@ GimmighoulChestFarmer::GimmighoulChestFarmer()
 void GimmighoulChestFarmer::navigate_to_gimmi(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     //Cursor is already in position
     fly_to_overworld_from_map(env.program_info(), env.console, context);
-    pbf_move_left_joystick_old(context, 0, 0, 158, 0);
+    pbf_move_left_joystick_old(context, 0, 0, 1264ms, 0ms);
     pbf_press_button(context, BUTTON_L, 400ms, 320ms);
     pbf_move_left_joystick(context, {0, +1}, 800ms, 0ms);
     //Climb ladder
@@ -138,7 +138,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
         //Set starting position by flying - must fly to East Province (Area One) Watchtower, do not move from fly point
         open_map_from_overworld(env.program_info(), env.console, context);
         fly_to_overworld_from_map(env.program_info(), env.console, context);
-        pbf_move_left_joystick_old(context, 0, 0, 158, 0);
+        pbf_move_left_joystick_old(context, 0, 0, 1264ms, 0ms);
         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
         pbf_move_left_joystick(context, {0, +1}, 800ms, 0ms);
         //Climb ladder

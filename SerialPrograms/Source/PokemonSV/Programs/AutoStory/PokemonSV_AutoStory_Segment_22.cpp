@@ -196,7 +196,7 @@ void checkpoint_51(
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 50);
         pbf_move_left_joystick(context, {0, +1}, 3200ms, 800ms);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 170, 0, 60);
-        pbf_move_left_joystick_old(context, 128, 0, 1800, 100);
+        pbf_move_left_joystick_old(context, 128, 0, 14400ms, 800ms);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 85, 60);
         
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
@@ -340,7 +340,7 @@ void checkpoint_52(
 
         // select Clavell 3
         pbf_move_left_joystick(context, {+1, +1}, 2000ms, 480ms);
-        pbf_move_left_joystick_old(context, 85, 255, 80, 100);
+        pbf_move_left_joystick_old(context, 85, 255, 640ms, 800ms);
 
         mash_button_till_overworld(env.console, context, BUTTON_A);
 

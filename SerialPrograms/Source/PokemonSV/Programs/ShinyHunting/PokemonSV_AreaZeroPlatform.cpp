@@ -499,7 +499,7 @@ void area_zero_platform_run_path2(
         turn_angle(context, angle1);
 
         find_and_center_on_sky(env, stream, context);
-        pbf_move_left_joystick_old(context, 96, 0, 40, 0);
+        pbf_move_left_joystick_old(context, 96, 0, 320ms, 0ms);
         pbf_mash_button_old(context, BUTTON_L, 60);
     });
 
@@ -515,7 +515,7 @@ void area_zero_platform_run_path2(
             pbf_move_left_joystick_old(context, 255, 255, 160ms, 160ms);
             pbf_mash_button_old(context, BUTTON_L, 60);
             find_and_center_on_sky(env, stream, context);
-            pbf_move_left_joystick_old(context, 96, 0, 40, 0);
+            pbf_move_left_joystick_old(context, 96, 0, 320ms, 0ms);
             pbf_mash_button_old(context, BUTTON_L, 60);
         });
     }
