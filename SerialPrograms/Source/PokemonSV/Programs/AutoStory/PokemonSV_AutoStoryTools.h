@@ -396,10 +396,10 @@ void move_player_forward(
     std::function<void()>&& recovery_action,
     bool use_lets_go = false,
     bool mash_A = false,
-    uint16_t forward_ticks = 100, 
+    Milliseconds forward_duration = Milliseconds(800), 
     uint8_t y = 0, 
-    uint16_t delay_after_forward_move = 50, 
-    uint16_t delay_after_lets_go = 105
+    Milliseconds delay_after_forward_move = Milliseconds(400), 
+    Milliseconds delay_after_lets_go = Milliseconds(840)
 );
 
 // get the box of the target object

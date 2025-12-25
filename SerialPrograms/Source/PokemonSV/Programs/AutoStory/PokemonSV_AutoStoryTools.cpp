@@ -1484,10 +1484,10 @@ void move_player_forward(
     std::function<void()>&& recovery_action,
     bool use_lets_go,
     bool mash_A,
-    uint16_t forward_ticks, 
+    Milliseconds forward_duration, 
     uint8_t y, 
-    uint16_t delay_after_forward_move, 
-    uint16_t delay_after_lets_go
+    Milliseconds delay_after_forward_move, 
+    Milliseconds delay_after_lets_go
 ){
 
     context.wait_for_all_requests();
@@ -1496,15 +1496,15 @@ void move_player_forward(
             do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 if (!use_lets_go){
-                    // pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+                    // pbf_move_left_joystick(context, 128, y, forward_duration, 0);
                     ssf_press_left_joystick(context, {0, +1}, 0ms, 800ms, 0ms);
 
                     if (mash_A){ // mashing A and Let's go aren't compatible. you end up talking to your Let's go pokemon if you mash A.
-                        pbf_mash_button_old(context, BUTTON_A, forward_ticks);
+                        pbf_mash_button(context, BUTTON_A, forward_duration);
                     }
                 }else{
-                    pbf_press_button_old(context, BUTTON_R, 20, delay_after_lets_go);
-                    pbf_move_left_joystick_old(context, 128, y, forward_ticks, delay_after_forward_move);
+                    pbf_press_button(context, BUTTON_R, 160ms, delay_after_lets_go);
+                    pbf_move_left_joystick_old(context, 128, y, forward_duration, delay_after_forward_move);
                 }
             });
         }catch (UnexpectedBattleException&){

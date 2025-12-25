@@ -325,7 +325,7 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         }
 
         // end tree session
-        pbf_mash_button_old(context, BUTTON_B, iteration_attempts > 1 ? 800 : 600);
+        pbf_mash_button(context, BUTTON_B, iteration_attempts > 1 ? 6400ms : 4800ms);
 
         c += iteration_attempts;
 

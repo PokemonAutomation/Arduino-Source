@@ -74,7 +74,6 @@ void pbf_move_right_joystick    (ProControllerContext& context, const JoystickPo
 //  Mash a Switch controller button (excluding D-Pad) repeatedly for `ticks` ticks.
 //  The buttons are defined in Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h. Examples include BUTTON_A, BUTTON_ZL.
 //  The buttons also include clicking joysticks: BUTTON_LCLICK, BUTTON_RCLICK.
-void pbf_mash_button_old        (ProControllerContext& context, Button button, uint16_t ticks);
 void pbf_mash_button            (ProControllerContext& context, Button button, Milliseconds duration);
 
 //void start_program_flash        (ProControllerContext& context, uint16_t ticks);
