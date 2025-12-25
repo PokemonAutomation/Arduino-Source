@@ -235,7 +235,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
         
         //Use happy hour
         env.log("Using Happy Hour.");
-        pbf_mash_button_old(context, BUTTON_A, 300);
+        pbf_mash_button(context, BUTTON_A, 2400ms);
         context.wait_for_all_requests();
 
         //If not already dead, use memento and die
@@ -272,7 +272,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
                         );
                         if (ret_memento == 0){
                             env.log("Attempting to use Memento.");
-                            pbf_mash_button_old(context, BUTTON_A, 300);
+                            pbf_mash_button(context, BUTTON_A, 2400ms);
                             context.wait_for_all_requests();
                         }
                     }
@@ -310,7 +310,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
 
         //Select 2nd pokemon from swap menu and send it out
         fainted.move_to_slot(env.console, context, 1);
-        pbf_mash_button_old(context, BUTTON_A, 300);
+        pbf_mash_button(context, BUTTON_A, 2400ms);
         context.wait_for_all_requests();
 
         //Check for battle menu to ensure it's sent out
@@ -433,7 +433,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
         check_money(env, context);
 
         //Clear any remaining dialog
-        pbf_mash_button_old(context, BUTTON_B, 300);
+        pbf_mash_button(context, BUTTON_B, 2400ms);
         context.wait_for_all_requests();
     }else{
         env.log("Timed out during battle. Stuck, crashed, or took over 30 turns.", COLOR_RED);
@@ -509,7 +509,7 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
     int ret_black_won = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            pbf_mash_button_old(context, BUTTON_B, 10000);
+            pbf_mash_button(context, BUTTON_B, 80000ms);
         },
         { black_screen }
         );
@@ -539,7 +539,7 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
     int ret_over = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            pbf_mash_button_old(context, BUTTON_B, 700);
+            pbf_mash_button(context, BUTTON_B, 5600ms);
         },
         { overworld }
         );
@@ -621,7 +621,7 @@ void go_to_academy_fly_point(ProgramEnvironment& env, VideoStream& stream, ProCo
         if (!isFlySuccessful){
             env.log("Unsuccessful fly attempt.");
         }
-        pbf_mash_button_old(context, BUTTON_B, 100);
+        pbf_mash_button(context, BUTTON_B, 800ms);
     }
 
     if(!isFlySuccessful){
@@ -690,14 +690,14 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
         }else{
             env.log("Dialog not detected.");
         }
-        pbf_mash_button_old(context, BUTTON_A, 400);
+        pbf_mash_button(context, BUTTON_A, 3200ms);
         context.wait_for_all_requests();
 
         NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
         int ret_battle = run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){
-                pbf_mash_button_old(context, BUTTON_B, 10000); //it takes a while to load and start
+                pbf_mash_button(context, BUTTON_B, 80000ms); //it takes a while to load and start
             },
             { battle_menu }
         );
@@ -749,7 +749,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
                 env.log("Final battle of the tournament complete, checking for overworld/loss.");
 
                 //Clear dialog, mash B
-                pbf_mash_button_old(context, BUTTON_B, 400);
+                pbf_mash_button(context, BUTTON_B, 3200ms);
                 context.wait_for_all_requests();
 
                 OverworldWatcher overworld2(env.console, COLOR_RED);

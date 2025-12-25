@@ -830,7 +830,7 @@ void make_two_herbs_sandwich(
     }
 
     // Mesh button A to select the first pick
-    pbf_mash_button_old(context, BUTTON_A, 80);
+    pbf_mash_button(context, BUTTON_A, 640ms);
     context.wait_for_all_requests();
 
     finish_two_herbs_sandwich(env, stream, context);

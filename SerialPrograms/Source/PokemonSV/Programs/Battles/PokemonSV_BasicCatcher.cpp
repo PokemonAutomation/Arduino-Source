@@ -131,7 +131,7 @@ int16_t throw_ball(
         default:
             if (quantity > 0){
                 stream.log("Throwing ball...", COLOR_BLUE);
-                pbf_mash_button_old(context, BUTTON_A, 30);
+                pbf_mash_button(context, BUTTON_A, 240ms);
                 return quantity;
             }
             if (quantity == 0){
@@ -244,7 +244,7 @@ CatchResults basic_catcher(
                 return CatchResults{CatchResult::OUT_OF_BALLS, balls_used};
             }
 #endif
-            pbf_mash_button_old(context, BUTTON_B, 500);
+            pbf_mash_button(context, BUTTON_B, 4000ms);
             balls_used++;
             if (on_throw_lambda){
                 on_throw_lambda();

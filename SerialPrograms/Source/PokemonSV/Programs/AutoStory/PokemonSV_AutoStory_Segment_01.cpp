@@ -230,7 +230,7 @@ void checkpoint_03(
         env.console.log("clear_dialog: Stop when detect prompt to give nickname to starter.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 20, {CallbackEnum::PROMPT_DIALOG});
 
-        pbf_mash_button_old(context, BUTTON_B, 100);  // Don't give a nickname
+        pbf_mash_button(context, BUTTON_B, 800ms);  // Don't give a nickname
         env.console.log("clear_dialog: Talk to Nemona and Clavell. Stop when detect overworld.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 20, {CallbackEnum::OVERWORLD});
         

@@ -192,7 +192,7 @@ void order_compote_du_fils(
             if (paid){
                 // This is a dialog box after we have paid the food.
                 // Mash A to clear any remaining dialog before a very long eating animation.
-                pbf_mash_button_old(context, BUTTON_A, 300);
+                pbf_mash_button(context, BUTTON_A, 2400ms);
                 context.wait_for_all_requests();
                 eating = true;
             }else{
@@ -242,7 +242,7 @@ void order_compote_du_fils(
     }
 
     // Now leaving the restaurant
-    pbf_mash_button_old(context, BUTTON_B, 90);
+    pbf_mash_button(context, BUTTON_B, 720ms);
     pbf_wait(context, 800ms);
     while(true){
         context.wait_for_all_requests();

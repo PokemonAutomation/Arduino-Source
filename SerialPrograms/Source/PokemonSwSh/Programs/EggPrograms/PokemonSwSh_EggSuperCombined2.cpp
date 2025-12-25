@@ -128,7 +128,7 @@ void EggSuperCombined2::program(SingleSwitchProgramEnvironment& env, ProControll
     for (uint8_t c = 0; c <= BOXES_TO_SKIP; c++){
         ssf_press_button(context, BUTTON_R, 480ms);
     }
-    pbf_mash_button_old(context, BUTTON_B, 600);
+    pbf_mash_button(context, BUTTON_B, 4800ms);
 
     session.eggcombined2_body(env.console, context);
 

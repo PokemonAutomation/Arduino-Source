@@ -188,7 +188,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
 
             if (ret == 0){
                 //  Attack using your first move
-                pbf_mash_button_old(context, BUTTON_A, 90);
+                pbf_mash_button(context, BUTTON_A, 720ms);
                 c++;
                 context.wait_for_all_requests();
                 OverworldWatcher overworld(env.console, COLOR_RED);
@@ -223,7 +223,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
                     { battle_menu }
                 );
                 if (ret == 0){
-                    pbf_mash_button_old(context, BUTTON_A, 90);
+                    pbf_mash_button(context, BUTTON_A, 720ms);
                     c++;
                     context.wait_for_all_requests();
                     ret2 = wait_until(

@@ -85,7 +85,7 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
         pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
 
-        pbf_mash_button_old(context, BUTTON_A, 50);
+        pbf_mash_button(context, BUTTON_A, 400ms);
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
 

@@ -177,7 +177,7 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, ProControll
             }else{
                 env.log("Dialog not detected.");
             }
-            pbf_mash_button_old(context, BUTTON_A, 400);
+            pbf_mash_button(context, BUTTON_A, 3200ms);
             context.wait_for_all_requests();
         }
         {
@@ -185,7 +185,7 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, ProControll
             int ret = run_until<ProControllerContext>(
                 env.console, context,
                 [](ProControllerContext& context){
-                    pbf_mash_button_old(context, BUTTON_B, 10000); //it takes a while to load and start
+                    pbf_mash_button(context, BUTTON_B, 80000ms); //it takes a while to load and start
                 },
                 {battle_menu}
             );

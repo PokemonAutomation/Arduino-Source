@@ -71,14 +71,14 @@ void DailyHighlightFarmer::program(SingleSwitchProgramEnvironment& env, ProContr
         if (context->performance_class() == ControllerPerformanceClass::SysbotBase){
             pbf_wait(context, 720ms);
         }else{
-            pbf_mash_button_old(context, BUTTON_B, 90);
+            pbf_mash_button(context, BUTTON_B, 720ms);
         }
 
         pbf_press_button_old(context, BUTTON_A, 10, 110);
         pbf_press_button(context, BUTTON_ZL, 80ms, 320ms);
         pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
-        pbf_mash_button_old(context, BUTTON_ZL, 400);
-        pbf_mash_button_old(context, BUTTON_B, 700);
+        pbf_mash_button(context, BUTTON_ZL, 3200ms);
+        pbf_mash_button(context, BUTTON_B, 5600ms);
 
         if (SAVE_ITERATIONS0 != 0){
             save_count++;

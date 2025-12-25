@@ -88,7 +88,7 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
 
         // go to Station 2
-        pbf_mash_button_old(context, BUTTON_A, 50);
+        pbf_mash_button(context, BUTTON_A, 400ms);
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
         // heal at the bed

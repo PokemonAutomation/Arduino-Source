@@ -138,7 +138,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Pro
     pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
     pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
     // Select Pearl Plan to start Path of Tenacity
-    pbf_mash_button_old(context, BUTTON_A, 200);
+    pbf_mash_button(context, BUTTON_A, 1600ms);
     context.wait_for_all_requests();
 
     // First opponent, Lian:

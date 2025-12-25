@@ -448,7 +448,7 @@ void turn_angle(ProControllerContext& context, double angle_radians){
     uint8_t turn_x, turn_y;
     direction_to_stick(turn_x, turn_y, -std::sin(angle_radians), std::cos(angle_radians));
     pbf_move_left_joystick_old(context, turn_x, turn_y, 40, 20);
-    pbf_mash_button_old(context, BUTTON_L, 60);
+    pbf_mash_button(context, BUTTON_L, 480ms);
 }
 
 void area_zero_platform_run_path2(
@@ -458,7 +458,7 @@ void area_zero_platform_run_path2(
     uint64_t iteration_count
 ){
     stream.log("Look forward and fire...");
-    pbf_mash_button_old(context, BUTTON_L, 60);
+    pbf_mash_button(context, BUTTON_L, 480ms);
 
     double platform_x, platform_y;
     uint16_t duration;
@@ -470,7 +470,7 @@ void area_zero_platform_run_path2(
         find_and_center_on_sky(env, stream, context);
         context.wait_for(std::chrono::seconds(1));
         pbf_move_left_joystick(context, {0, -1}, 320ms, 680ms);
-        pbf_mash_button_old(context, BUTTON_L, 60);
+        pbf_mash_button(context, BUTTON_L, 480ms);
 
         pbf_move_right_joystick(context, {0, -1}, 2000ms, 0ms);
         context.wait_for_all_requests();
@@ -485,7 +485,7 @@ void area_zero_platform_run_path2(
         choose_path(stream.logger(), move_x, move_y, duration, platform_x, platform_y);
 
         pbf_move_left_joystick_old(context, move_x, move_y, 40, 20);
-        pbf_mash_button_old(context, BUTTON_L, 60);
+        pbf_mash_button(context, BUTTON_L, 480ms);
 //        pbf_wait(context, 1250);
     });
     use_lets_go_to_clear_in_front(stream, context, tracker, duration > 100, [&](ProControllerContext& context){
@@ -500,23 +500,23 @@ void area_zero_platform_run_path2(
 
         find_and_center_on_sky(env, stream, context);
         pbf_move_left_joystick_old(context, 96, 0, 40, 0);
-        pbf_mash_button_old(context, BUTTON_L, 60);
+        pbf_mash_button(context, BUTTON_L, 480ms);
     });
 
     //  One in every 4 iterations: Clear wall of spawns.
     if (iteration_count % 4 == 0){
         stream.log("Turning along wall...");
         pbf_move_left_joystick(context, {-1, -1}, 160ms, 160ms);
-        pbf_mash_button_old(context, BUTTON_L, 60);
+        pbf_mash_button(context, BUTTON_L, 480ms);
         use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](ProControllerContext& context){
             context.wait_for(std::chrono::milliseconds(1000));
 
             stream.log("Turning back to sky.");
             pbf_move_left_joystick_old(context, 255, 255, 160ms, 160ms);
-            pbf_mash_button_old(context, BUTTON_L, 60);
+            pbf_mash_button(context, BUTTON_L, 480ms);
             find_and_center_on_sky(env, stream, context);
             pbf_move_left_joystick_old(context, 96, 0, 40, 0);
-            pbf_mash_button_old(context, BUTTON_L, 60);
+            pbf_mash_button(context, BUTTON_L, 480ms);
         });
     }
 
