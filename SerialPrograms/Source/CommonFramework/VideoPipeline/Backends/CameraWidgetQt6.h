@@ -32,6 +32,11 @@ namespace CameraQt6QVideoSink{
 
 class CameraBackend : public PokemonAutomation::CameraBackend{
 public:
+    // Get all cameras' info.
+    // Note: to avoid freezing the UI while launching the application, the camera backend when
+    // constructed, use a separate thread to query and load camera info. If you call
+    // `get_all_cameras()` immidiately after the backend is constructed, it may not give you
+    // all cameras' info.
     virtual std::vector<CameraInfo> get_all_cameras() const override;
     virtual std::string get_camera_name(const CameraInfo& info) const override;
 

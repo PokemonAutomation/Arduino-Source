@@ -24,6 +24,11 @@ public:
         return self;
     }
 
+    // Get all camera devices' info.
+    // Note: to avoid freezing the UI while launching the application, the camera backend when
+    // constructed, use a separate thread to query and load camera info. If you call
+    // `get_all_cameras()` immidiately after the GlobalMediaServices singleton is constructed,
+    // it may not give you all cameras' info.
     QList<QCameraDevice> get_all_cameras(){
         ReadSpinLock lg(m_camera_lock);
         return m_cameras;
