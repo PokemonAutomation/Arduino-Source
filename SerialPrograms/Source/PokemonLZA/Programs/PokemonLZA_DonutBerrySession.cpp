@@ -32,7 +32,7 @@ BerrySession::BerrySession(
     , m_context(context)
     , m_language(language)
     , m_overlays(stream.overlay())
-    , m_num_confirmed(0)
+    //, m_num_confirmed(0)
 {
     DonutBerriesReader reader(COLOR_CYAN);
     reader.make_overlays(m_overlays);

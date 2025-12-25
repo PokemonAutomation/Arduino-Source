@@ -60,7 +60,7 @@ private:
     ProControllerContext& m_context;
     Language m_language;
     VideoOverlaySet m_overlays;
-    int8_t m_num_confirmed;
+    //int8_t m_num_confirmed;
 };
 
 
