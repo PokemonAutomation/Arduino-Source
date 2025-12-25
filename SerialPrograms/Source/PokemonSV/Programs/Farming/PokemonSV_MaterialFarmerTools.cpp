@@ -444,7 +444,7 @@ void move_to_start_position_for_letsgo0(
     pbf_press_button_old(context, BUTTON_B, 50, 10);     //  in case one is dropped.
     pbf_press_button(context, BUTTON_LCLICK, 400ms, 0ms);
     // you automatically move forward without pressing any buttons. so just wait
-    pbf_wait_old(context, 1400);
+    pbf_wait(context, 11200ms);
 
     // Glide forward
     // pbf_move_left_joystick(context, {0, +1}, 20000ms, 80ms);
@@ -502,7 +502,7 @@ void move_to_start_position_for_letsgo1(
 
     // you automatically move forward  when flying without pressing any buttons. 
     // so, just wait.
-    pbf_wait_old(context, 2200);
+    pbf_wait(context, 17600ms);
 
     // arrived at start position. stop flying
     pbf_press_button_old(context, BUTTON_B, 50, 400);

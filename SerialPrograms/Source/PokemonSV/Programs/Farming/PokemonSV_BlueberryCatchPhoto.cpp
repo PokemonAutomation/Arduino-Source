@@ -542,7 +542,7 @@ void quest_catch_navi(
             } else {
                 pbf_move_left_joystick(context, {0, +1}, 960ms, 160ms);
             }
-            pbf_wait_old(context, 400);
+            pbf_wait(context, 3200ms);
             context.wait_for_all_requests();
 
             break;

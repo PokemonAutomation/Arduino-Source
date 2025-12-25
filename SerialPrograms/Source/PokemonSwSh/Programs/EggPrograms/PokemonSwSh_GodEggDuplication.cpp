@@ -58,7 +58,7 @@ void GodEggDuplication::collect_godegg(ProControllerContext& context, uint8_t pa
     pbf_wait(context, 400ms);
     ssf_press_button_ptv(context, BUTTON_B, 800ms);
     ssf_press_button_ptv(context, BUTTON_B, 800ms);
-    pbf_wait_old(context, 225);
+    pbf_wait(context, 1800ms);
 
     //  "You received an Egg from the Nursery worker!"
     ssf_press_button_ptv(context, BUTTON_B, 2400ms);
