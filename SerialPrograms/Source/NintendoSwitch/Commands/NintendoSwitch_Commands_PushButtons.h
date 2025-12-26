@@ -28,7 +28,6 @@ using namespace std::chrono_literals;
 
 
 //  Wait for this many ticks on the Switch.
-void pbf_wait_old       (ProControllerContext& context, uint16_t ticks);
 void pbf_wait           (ProControllerContext& context, Milliseconds duration);
 
 //  Press a Switch controller button (excluding D-Pad). Hold the button for `hold_ticks`, then release it for `release_ticks`.
