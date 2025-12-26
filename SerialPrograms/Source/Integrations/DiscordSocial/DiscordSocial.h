@@ -2,6 +2,7 @@
 #ifndef DISCORD_SOCIAL_H
 #define DISCORD_SOCIAL_H
 
+#include <thread>
 #include <atomic>
 #include <discord_social_sdk/discordpp.h>
 #include "Common/Cpp/AbstractLogger.h"

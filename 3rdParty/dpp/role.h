@@ -2,6 +2,7 @@
  *
  * D++, A Lightweight C++ library for Discord
  *
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright 2021 Craig Edwards and D++ contributors 
  * (https://github.com/brainboxdotcc/DPP/graphs/contributors)
  *
@@ -22,7 +23,7 @@
 #include <variant>
 #include <dpp/export.h>
 #include <dpp/managed.h>
-#include <dpp/nlohmann/json_fwd.hpp>
+#include <dpp/json_fwd.h>
 #include <dpp/permissions.h>
 #include <dpp/guild.h>
 #include <dpp/json_interface.h>
@@ -31,10 +32,13 @@ namespace dpp {
 
 /** Various flags related to dpp::role */
 enum role_flags : uint8_t {
-	r_hoist =		0b00000001, //!< Hoisted role
+	r_hoist =		0b00000001, //!< Hoisted role (if the role is pinned in the user listing)
 	r_managed =		0b00000010, //!< Managed role (introduced by a bot or application)
-	r_mentionable =		0b00000100, //!< Mentionable with a ping
-	r_premium_subscriber =	0b00001000, //!< This is set for the role given to nitro 
+	r_mentionable =		0b00000100, //!< Whether this role is mentionable with a ping
+	r_premium_subscriber =	0b00001000, //!< Whether this is the guild's booster role
+	r_available_for_purchase = 0b00010000, //!< Whether the role is available for purchase
+	r_guild_connections = 0b00100000, //!< Whether the role is a guild's linked role
+	r_in_prompt			= 0b01000000, //!< Whether the role can be selected by members in an onboarding prompt
 };
 
 /**
@@ -45,49 +49,96 @@ enum role_flags : uint8_t {
  * ID as the guild's ID. This is the base permission set applied to all users where no other role or override
  * applies, and is the starting value of the bit mask looped through to calculate channel permissions.
  */
-class DPP_EXPORT role : public managed, public json_interface<role>  {
+class DPP_EXPORT role : public managed, public json_interface<role> {
+protected:
+	friend struct json_interface<role>;
+
+	/**
+	 * @brief Fill this role from json.
+	 * 
+	 * @param j The json data
+	 * @return A reference to self
+	 */
+	role& fill_from_json_impl(nlohmann::json* j);
+
+	/**
+	 * @brief Build a json from this object.
+	 * 
+	 * @param with_id true if the ID is to be included in the json
+	 * @return The json of the role
+	 */
+	virtual json to_json_impl(bool with_id = false) const;
+
 public:
 	/**
 	 * @brief Role name
 	 * Between 1 and 100 characters.
 	 */
-	std::string name;
+	std::string name{};
 	/**
 	 * @brief Guild ID
 	 */
-	snowflake guild_id;
+	snowflake guild_id{0};
 	/**
 	 * @brief Role colour.
 	 * A colour of 0 means no colour. If you want a black role,
 	 * you must use the value 0x000001.
 	 */
-	uint32_t colour;
+	uint32_t colour{0};
 	/** Role position */
-	uint8_t position;
+	uint8_t position{0};
 	/** Role permissions bitmask values from dpp::permissions */
-	permission permissions;
+	permission permissions{};
 	/** Role flags from dpp::role_flags */
-	uint8_t flags;
+	uint8_t flags{0};
 	/** Integration id if any (e.g. role is a bot's role created when it was invited) */
-	snowflake integration_id;
+	snowflake integration_id{};
 	/** Bot id if any (e.g. role is a bot's role created when it was invited) */
-	snowflake bot_id;
+	snowflake bot_id{};
+	/** The id of the role's subscription sku and listing */
+	snowflake subscription_listing_id{};
 	/** The unicode emoji used for the role's icon, can be an empty string */
-	std::string unicode_emoji;
-	/** The role icon hash, can be an empty string */
-	utility::iconhash icon;
-	/** Image data for the role icon (if any) */
-	std::string* image_data;
+	std::string unicode_emoji{};
+	/** The role icon */
+	utility::icon icon{};
 
 	/**
 	 * @brief Construct a new role object
 	 */
-	role();
+	role() = default;
+
+	/**
+	 * @brief Construct a new role object.
+	 *
+	 * @param rhs Role object to copy
+	 */
+	role(const role& rhs) = default;
+
+	/**
+	 * @brief Construct a new role object.
+	 *
+	 * @param rhs Role object to move
+	 */
+	role(role&& rhs) = default;
+
+	/**
+	 * @brief Copy another role object
+	 *
+	 * @param rhs Role object to copy
+	 */
+	role &operator=(const role& rhs) = default;
+
+	/**
+	 * @brief Move from another role object
+	 *
+	 * @param rhs Role object to copy
+	 */
+	role &operator=(role&& rhs) = default;
 
 	/**
 	 * @brief Destroy the role object
 	 */
-	virtual ~role();
+	virtual ~role() = default;
 
 	/**
 	* @brief Create a mentionable role.
@@ -156,13 +207,7 @@ public:
 	 */
 	role& set_guild_id(snowflake gid);
 
-	/**
-	 * @brief Fill this role from json.
-	 * 
-	 * @param j The json data
-	 * @return A reference to self
-	 */
-	role& fill_from_json(nlohmann::json* j);
+	using json_interface<role>::fill_from_json;
 
 	/**
 	 * @brief Fill this role from json.
@@ -174,14 +219,6 @@ public:
 	role& fill_from_json(snowflake guild_id, nlohmann::json* j);
 
 	/**
-	 * @brief Build a json string from this object.
-	 * 
-	 * @param with_id true if the ID is to be included in the json text
-	 * @return The json of the role
-	 */
-	virtual std::string build_json(bool with_id = false) const;
-
-	/**
 	 * @brief Get the mention/ping for the role
 	 * 
 	 * @return std::string mention
@@ -189,21 +226,32 @@ public:
 	std::string get_mention() const;
 
 	/**
-	 * @brief Returns the role's icon if they have one, otherwise returns an empty string
+	 * @brief Returns the role's icon url if they have one, otherwise returns an empty string
 	 *
-	 * @param size The size of the icon in pixels. It can be any power of two between 16 and 4096. If not specified, the default sized icon is returned.
-	 * @return std::string icon url or empty string
+	 * @param size The size of the icon in pixels. It can be any power of two between 16 and 4096,
+	 * otherwise the default sized icon is returned.
+	 * @param format The format to use for the avatar. It can be one of `i_webp`, `i_jpg` or `i_png`.
+	 * @return std::string icon url or an empty string, if required attributes are missing or an invalid format was passed
 	 */
-	std::string get_icon_url(uint16_t size = 0) const;
+	std::string get_icon_url(uint16_t size = 0, const image_type format = i_png) const;
 
 	/**
-	 * @brief Load an image into the object as base64
-	 * 
+	 * @brief Load a role icon
+	 *
 	 * @param image_blob Image binary data
-	 * @param type Type of image
+	 * @param type Type of image. It can be one of `i_gif`, `i_jpg` or `i_png`.
 	 * @return emoji& Reference to self
 	 */
-	role& load_image(const std::string &image_blob, const image_type type);
+	role& load_image(std::string_view image_blob, const image_type type);
+
+	/**
+	 * @brief Load a role icon
+	 *
+	 * @param image_blob Image binary data
+	 * @param type Type of image. It can be one of `i_gif`, `i_jpg` or `i_png`.
+	 * @return emoji& Reference to self
+	 */
+	role& load_image(const std::byte* data, uint32_t size, const image_type type);
 
 	/**
 	 * @brief Operator less than, used for checking if a role is below another.
@@ -266,6 +314,26 @@ public:
 	 * @return bool True if the role is managed (introduced for a bot or other application by Discord)
 	 */
 	bool is_managed() const;
+	/**
+	 * @brief True if the role is the guild's Booster role
+	 * @return bool whether the role is the premium subscriber, AKA "boost", role for the guild
+	 */
+	bool is_premium_subscriber() const;
+	/**
+	 * @brief True if the role is available for purchase
+	 * @return bool whether this role is available for purchase
+	 */
+	bool is_available_for_purchase() const;
+	/**
+	 * @brief True if the role is a linked role
+	 * @return bool True if the role is a linked role
+	 */
+	bool is_linked() const;
+	/**
+	 * @brief True if the role can be selected by members in an onboarding prompt
+	 * @return bool True if the role can be selected by members in an onboarding prompt
+	 */
+	bool is_selectable_in_prompt() const;
 	/**
 	 * @brief True if has create instant invite permission
 	 * @note Having the administrator permission causes this method to always return true
@@ -548,6 +616,41 @@ public:
 	 * @return bool True if user has the moderate users permission or is administrator.
 	 */
 	bool has_moderate_members() const;
+	/**
+	 * @brief True if has the view creator monetization analytics permission.
+	 * @note Having the administrator permission causes this method to always return true
+	 * Channel specific overrides may apply to permissions.
+	 * @return bool True if user has the view creator monetization analytics permission or is administrator.
+	 */
+	bool has_view_creator_monetization_analytics() const;
+	/**
+	 * @brief True if has the use soundboard permission.
+	 * @note Having the administrator permission causes this method to always return true
+	 * Channel specific overrides may apply to permissions.
+	 * @return bool True if user has the use soundboard permission or is administrator.
+	 */
+	bool has_use_soundboard() const;
+	/**
+	 * @brief True if has the use external sounds permission.
+	 * @note Having the administrator permission causes this method to always return true
+	 * Channel specific overrides may apply to permissions.
+	 * @return bool True if user has the use external sounds permission or is administrator.
+	 */
+	bool has_use_external_sounds() const;
+	/**
+	 * @brief True if has the send voice messages permission.
+	 * @note Having the administrator permission causes this method to always return true
+	 * Channel specific overrides may apply to permissions.
+	 * @return bool True if user has the send voice messages permission or is administrator.
+	 */
+	bool has_send_voice_messages() const;
+	/**
+	 * @brief True if has permission to use clyde AI.
+	 * @note Having the administrator permission causes this method to always return true
+	 * Channel specific overrides may apply to permissions.
+	 * @return bool True if user has the clyde AI permission or is administrator.
+	 */
+	bool has_use_clyde_ai() const;
 
 	/**
 	 * @brief Get guild members who have this role
@@ -577,12 +680,29 @@ enum application_role_connection_metadata_type : uint8_t {
  * @brief Application Role Connection Metadata. Represents a role connection metadata for an dpp::application
  */
 class DPP_EXPORT application_role_connection_metadata : public json_interface<application_role_connection_metadata> {
+protected:
+	friend struct json_interface<application_role_connection_metadata>;
+
+	/** Fill this record from json.
+	 * @param j The json to fill this record from
+	 * @return Reference to self
+	 */
+	application_role_connection_metadata& fill_from_json_impl(nlohmann::json* j);
+
+	/**
+	 * @brief Convert to JSON
+	 *
+	 * @param with_id include ID in output
+	 * @return json JSON output
+	 */
+	virtual json to_json_impl(bool with_id = false) const;
+
 public:
 	application_role_connection_metadata_type type; //!< Type of metadata value
-	std::string key; //!< Dictionary key for the metadata field (must be `a-z`, `0-9`, or `_` characters; max 50 characters)
-	std::string name; //!< Name of the metadata field (max 100 characters)
+	std::string key; //!< Dictionary key for the metadata field (must be `a-z`, `0-9`, or `_` characters; 1-50 characters)
+	std::string name; //!< Name of the metadata field (1-100 characters)
 	std::map<std::string, std::string> name_localizations; //!< Translations of the name
-	std::string description; //!< Description of the metadata field (max 200 characters)
+	std::string description; //!< Description of the metadata field (1-200 characters)
 	std::map<std::string, std::string> description_localizations; //!< Translations of the description
 
 	/**
@@ -591,26 +711,29 @@ public:
 	application_role_connection_metadata();
 
 	virtual ~application_role_connection_metadata() = default;
-
-	/** Fill this record from json.
-	 * @param j The json to fill this record from
-	 * @return Reference to self
-	 */
-	application_role_connection_metadata& fill_from_json(nlohmann::json* j);
-
-	/**
-	 * @brief Convert to JSON string
-	 *
-	 * @param with_id include ID in output
-	 * @return std::string JSON output
-	 */
-	virtual std::string build_json(bool with_id = false) const;
 };
 
 /**
  * @brief The application role connection that an application has attached to a user.
  */
 class DPP_EXPORT application_role_connection : public json_interface<application_role_connection> {
+protected:
+	friend struct json_interface<application_role_connection>;
+
+	/** Fill this record from json.
+	 * @param j The json to fill this record from
+	 * @return Reference to self
+	 */
+	application_role_connection& fill_from_json_impl(nlohmann::json* j);
+
+	/**
+	 * @brief Convert to JSON
+	 *
+	 * @param with_id include ID in output
+	 * @return json JSON output
+	 */
+	virtual json to_json_impl(bool with_id = false) const;
+
 public:
 	std::string platform_name; //!< Optional: The vanity name of the platform a bot has connected (max 50 characters)
 	std::string platform_username; //!< Optional: The username on the platform a bot has connected (max 100 characters)
@@ -622,20 +745,6 @@ public:
 	application_role_connection();
 
 	virtual ~application_role_connection() = default;
-
-	/** Fill this record from json.
-	 * @param j The json to fill this record from
-	 * @return Reference to self
-	 */
-	application_role_connection& fill_from_json(nlohmann::json* j);
-
-	/**
-	 * @brief Convert to JSON string
-	 *
-	 * @param with_id include ID in output
-	 * @return std::string JSON output
-	 */
-	virtual std::string build_json(bool with_id = false) const;
 };
 
 /** A group of roles */
@@ -644,5 +753,5 @@ typedef std::unordered_map<snowflake, role> role_map;
 /** A group of application_role_connection_metadata objects */
 typedef std::vector<application_role_connection_metadata> application_role_connection_metadata_list;
 
-};
+} // namespace dpp
 

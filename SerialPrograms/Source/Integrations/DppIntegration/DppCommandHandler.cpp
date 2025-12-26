@@ -143,7 +143,7 @@ void Handler::send_message(cluster& bot, embed& embed, const std::string& channe
                 if (path.find(".txt") == std::string::npos){
                     embed.set_image("attachment://" + file->filename());
                 }
-            }catch (dpp::exception e){
+            }catch (dpp::exception& e){
                 log_dpp("Exception thrown while reading screenshot data: " + (std::string)e.what(), "send_message()", ll_error);
             }
         }
@@ -168,7 +168,7 @@ void Handler::update_response(const dpp::command_source& src, dpp::embed& embed,
             data = utility::read_file(file->filepath());
             m.add_file(file->filename(), data);
             embed.set_image("attachment://" + file->filename());
-        }catch (dpp::exception e){
+        }catch (dpp::exception& e){
             log_dpp("Exception thrown while reading screenshot data: " + (std::string)e.what(), "send_message()", ll_error);
         }
     }
