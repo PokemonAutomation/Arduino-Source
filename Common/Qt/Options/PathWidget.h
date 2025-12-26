@@ -18,6 +18,9 @@ namespace PokemonAutomation{
 
 class PathCellWidget : public QWidget, public ConfigWidget{
 public:
+    using ParentOption = PathCell;
+
+public:
     ~PathCellWidget();
     PathCellWidget(QWidget& parent, PathCell& value);
 
@@ -36,6 +39,9 @@ private:
 
 
 class PathOptionWidget : public QWidget, public ConfigWidget{
+public:
+    using ParentOption = PathOption;
+
 public:
     ~PathOptionWidget();
     PathOptionWidget(QWidget& parent, PathOption& value);

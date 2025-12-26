@@ -21,6 +21,9 @@ namespace PokemonAutomation{
 
 class GroupWidget : public QWidget, public ConfigWidget{
 public:
+    using ParentOption = GroupOption;
+
+public:
     ~GroupWidget();
     GroupWidget(QWidget& parent, GroupOption& value);
 

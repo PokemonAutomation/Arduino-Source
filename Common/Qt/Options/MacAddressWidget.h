@@ -18,6 +18,9 @@ namespace PokemonAutomation{
 
 class MacAddressCellWidget : public QLineEdit, public ConfigWidget{
 public:
+    using ParentOption = MacAddressCell;
+
+public:
     ~MacAddressCellWidget();
     MacAddressCellWidget(QWidget& parent, MacAddressCell& value);
 

@@ -16,6 +16,9 @@ namespace PokemonAutomation{
 
 class FloatingPointCellWidget : public QLineEdit, public ConfigWidget{
 public:
+    using ParentOption = FloatingPointCell;
+
+public:
     ~FloatingPointCellWidget();
     FloatingPointCellWidget(QWidget& parent, FloatingPointCell& value, bool sanitize);
 
@@ -28,6 +31,9 @@ private:
 
 
 class FloatingPointOptionWidget : public QWidget, public ConfigWidget{
+public:
+    using ParentOption = FloatingPointOption;
+
 public:
     ~FloatingPointOptionWidget();
     FloatingPointOptionWidget(QWidget& parent, FloatingPointOption& value);

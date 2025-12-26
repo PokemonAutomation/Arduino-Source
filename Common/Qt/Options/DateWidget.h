@@ -18,6 +18,9 @@ namespace PokemonAutomation{
 
 class DateTimeCellWidget : public QDateTimeEdit, public ConfigWidget{
 public:
+    using ParentOption = DateTimeCell;
+
+public:
     ~DateTimeCellWidget();
     DateTimeCellWidget(QWidget& parent, DateTimeCell& value);
 
@@ -34,6 +37,9 @@ private:
 
 
 class DateTimeOptionWidget : public QWidget, public ConfigWidget{
+public:
+    using ParentOption = DateTimeOption;
+
 public:
     DateTimeOptionWidget(QWidget& parent, DateTimeOption& value);
 

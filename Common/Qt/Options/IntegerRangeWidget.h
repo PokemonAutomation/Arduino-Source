@@ -18,6 +18,9 @@ namespace PokemonAutomation{
 template <typename Type>
 class IntegerRangeCellWidget : public QWidget, public ConfigWidget{
 public:
+    using ParentOption = IntegerRangeCell<Type>;
+
+public:
     ~IntegerRangeCellWidget();
     IntegerRangeCellWidget(QWidget& parent, IntegerRangeCell<Type>& value);
 
