@@ -142,7 +142,7 @@ void start_game_from_home(
     if (tolerate_update_menu){
         //  If the update menu isn't there, these will get swallowed by the opening
         //  animation for the select user menu.
-        pbf_press_button_old(context, BUTTON_A, 20, 35);    //  Choose game
+        pbf_press_button(context, BUTTON_A, 160ms, 280ms);    //  Choose game
         pbf_press_dpad(context, DPAD_UP, 160ms, 0ms);   //  Skip the update window.
     }
 
@@ -153,7 +153,7 @@ void start_game_from_home(
         //  Mash your way into the game.
         pbf_mash_button(context, BUTTON_A, START_GAME_MASH);
     }else{
-        pbf_press_button_old(context, BUTTON_A, 20, 160);     //  Enter select user menu.
+        pbf_press_button(context, BUTTON_A, 160ms, 1280ms);     //  Enter select user menu.
         if (user_slot != 0){
             //  Move to correct user.
             for (uint8_t c = 0; c < 8; c++){

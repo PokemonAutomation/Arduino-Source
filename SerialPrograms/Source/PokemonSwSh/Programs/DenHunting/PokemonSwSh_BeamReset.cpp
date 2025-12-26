@@ -63,19 +63,19 @@ void BeamReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     while (true){
         //  Talk to den.
-        pbf_press_button_old(context, BUTTON_A, 10, 450);
+        pbf_press_button(context, BUTTON_A, 80ms, 3600ms);
         if (EXTRA_LINE){
-            pbf_press_button_old(context, BUTTON_A, 10, 300);
+            pbf_press_button(context, BUTTON_A, 80ms, 2400ms);
         }
-        pbf_press_button_old(context, BUTTON_A, 10, 300);
+        pbf_press_button(context, BUTTON_A, 80ms, 2400ms);
 
         //  Drop wishing piece.
-        pbf_press_button_old(context, BUTTON_A, 10, 70);
+        pbf_press_button(context, BUTTON_A, 80ms, 560ms);
         ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 160ms);
 
         for (uint16_t c = 0; c < 4; c++){
             pbf_press_button(context, BUTTON_HOME, 80ms, 80ms);
-            pbf_press_button_old(context, BUTTON_HOME, 10, 220);
+            pbf_press_button(context, BUTTON_HOME, 80ms, 1760ms);
         }
         pbf_wait(context, DELAY_BEFORE_RESET0);
 

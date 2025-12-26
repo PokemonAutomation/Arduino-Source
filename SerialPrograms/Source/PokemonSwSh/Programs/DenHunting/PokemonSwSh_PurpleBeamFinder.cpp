@@ -156,7 +156,7 @@ bool PurpleBeamFinder::run(SingleSwitchProgramEnvironment& env, ProControllerCon
     ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            pbf_press_button_old(context, BUTTON_A, 10, 300);
+            pbf_press_button(context, BUTTON_A, 80ms, 2400ms);
         },
         { arrow_detector }
     );

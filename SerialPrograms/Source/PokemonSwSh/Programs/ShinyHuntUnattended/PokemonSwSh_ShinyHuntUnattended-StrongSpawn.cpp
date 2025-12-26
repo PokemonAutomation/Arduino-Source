@@ -73,11 +73,11 @@ void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env
         //  If the update menu isn't there, these will get swallowed by the opening
         //  animation for the select user menu.
         if (ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST){
-            pbf_press_button_old(context, BUTTON_A, 5, 35);     //  Choose game
+            pbf_press_button(context, BUTTON_A, 40ms, 280ms);     //  Choose game
             pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);    //  Skip the update window.
         }
 
-        pbf_press_button_old(context, BUTTON_A, 10, 180);   //  Enter select user menu.
+        pbf_press_button(context, BUTTON_A, 80ms, 1440ms);   //  Enter select user menu.
         pbf_press_button(context, BUTTON_A, 80ms, 80ms);    //  Enter game
 
         //  Switch to mashing ZR instead of A to get into the game.

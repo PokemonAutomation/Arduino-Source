@@ -121,7 +121,7 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, P
         }else{
             pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
         }
-        pbf_press_button_old(context, BUTTON_A, 10, 350);
+        pbf_press_button(context, BUTTON_A, 80ms, 2800ms);
 
         //  Fly to Route 10.
         pbf_press_button(context, BUTTON_L, 80ms, 800ms);

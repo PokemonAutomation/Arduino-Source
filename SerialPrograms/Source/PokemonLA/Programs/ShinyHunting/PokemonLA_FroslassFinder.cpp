@@ -115,7 +115,7 @@ void FroslassFinder::run_iteration(
 
     //Setup
     pbf_move_left_joystick_old(context, 108, 255, 160ms, 160ms);
-    pbf_press_button_old(context, BUTTON_ZL, 10, 10);
+    pbf_press_button(context, BUTTON_ZL, 80ms, 80ms);
     pbf_wait(context, 500ms);
     change_mount(env.console, context, MountState::BRAVIARY_ON);
     pbf_wait(context, 500ms);

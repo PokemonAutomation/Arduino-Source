@@ -117,7 +117,7 @@ void SizeChecker::enter_check_mode(SingleSwitchProgramEnvironment& env, ProContr
         case 0: // dialog
         case 1: // overworld
         case 2: // prompt
-            pbf_press_button_old(context, BUTTON_A, 20, 5);
+            pbf_press_button(context, BUTTON_A, 160ms, 40ms);
             continue;
         case 3: // box
             return;
@@ -175,7 +175,7 @@ void SizeChecker::exit_check_mode(SingleSwitchProgramEnvironment& env, ProContro
                 screen
             );
         case 1: // dialog
-            pbf_press_button_old(context, BUTTON_A, 20, 5);
+            pbf_press_button(context, BUTTON_A, 160ms, 40ms);
             continue;
         case 2: // overworld
             return;

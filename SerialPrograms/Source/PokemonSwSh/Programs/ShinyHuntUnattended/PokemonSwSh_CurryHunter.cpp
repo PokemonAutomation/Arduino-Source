@@ -102,22 +102,22 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
     pbf_press_button(context, BUTTON_X, 40ms, 1000ms);
     pbf_press_dpad_old(context, DPAD_RIGHT, 5, 100);
     pbf_press_button(context, BUTTON_A, 40ms, 1000ms);
-    pbf_press_button_old(context, BUTTON_A, 5, 300);
+    pbf_press_button(context, BUTTON_A, 40ms, 2400ms);
 
 
     for (uint32_t it = 0; it < ITERATIONS; it++){
         //  Which ingredient do you want to use?
         pbf_press_button(context, BUTTON_A, 40ms, 600ms);     //  Get rid of the pop-up menu.
-        pbf_press_button_old(context, BUTTON_A, 5, 150);    //  75. english text is longer.
-        pbf_press_button_old(context, BUTTON_A, 5, 100);    //  Ingredient is now selected.
+        pbf_press_button(context, BUTTON_A, 40ms, 1200ms);    //  75. english text is longer.
+        pbf_press_button(context, BUTTON_A, 40ms, 800ms);    //  Ingredient is now selected.
 
         //  Which berries do you want to use?
         pbf_press_button(context, BUTTON_A, 40ms, 600ms);     //  Get rid of the pop-up menu.
         pbf_press_button(context, BUTTON_A, 40ms, 600ms);
         pbf_press_dpad(context, DPAD_UP, 40ms, 600ms);
         pbf_press_button(context, BUTTON_A, 40ms, 1000ms);
-        pbf_press_button_old(context, BUTTON_PLUS, 5, 200); //  125. english text is longer.
-        pbf_press_button_old(context, BUTTON_A, 5, 1000);   //  Berries are now selected as well.
+        pbf_press_button(context, BUTTON_PLUS, 40ms, 1600ms); //  125. english text is longer.
+        pbf_press_button(context, BUTTON_A, 40ms, 8000ms);   //  Berries are now selected as well.
 
 
         //  Around 17 seconds of A mashing for the first curry cooking phase.
@@ -127,7 +127,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
 
         //  Slowing down to not burn the curry.
         for (uint16_t c = 0; c < 300; c = c + 25){
-            pbf_press_button_old(context, BUTTON_A, 5, 20);
+            pbf_press_button(context, BUTTON_A, 40ms, 160ms);
         }
         pbf_wait(context, 1360ms);
 
@@ -149,11 +149,11 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
 
         //  Last step for the curry cooking part.
         pbf_wait(context, 3400ms);
-        pbf_press_button_old(context, BUTTON_A, 5, 2250);
+        pbf_press_button(context, BUTTON_A, 40ms, 18000ms);
 
         //  Press A when it shows your curry, and its class.
-        pbf_press_button_old(context, BUTTON_A, 5, 1500);
-        pbf_press_button_old(context, BUTTON_A, 5, 500);
+        pbf_press_button(context, BUTTON_A, 40ms, 12000ms);
+        pbf_press_button(context, BUTTON_A, 40ms, 4000ms);
         // You are now back to the camping with your 6 Pokemon, and hopefully a curry Pokemon.
 
         {
@@ -222,7 +222,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
 
             //  Record the encounter.
             if (TAKE_VIDEO){
-                pbf_press_button_old(context, BUTTON_CAPTURE, 250, 500);
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 4000ms);
             }else{
                 pbf_wait(context, 6000ms);
             }
@@ -235,22 +235,22 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
             //  Automatically focuses on it, while it doesn't do that for your pokemons.
 
             //  "a [wild pokemon] came to your camp !"
-            pbf_press_button_old(context, BUTTON_A, 5, 250);
+            pbf_press_button(context, BUTTON_A, 40ms, 2000ms);
 
             //  "[wild pokemon] seems to want to come with you!"
-            pbf_press_button_old(context, BUTTON_A, 5, 200);
+            pbf_press_button(context, BUTTON_A, 40ms, 1600ms);
 
             //  "do you want to adopt it ?"
-            pbf_press_button_old(context, BUTTON_A, 5, 200);
+            pbf_press_button(context, BUTTON_A, 40ms, 1600ms);
 
             //  "you adopted [wild pokemon]!"
-            pbf_press_button_old(context, BUTTON_A, 5, 200);
+            pbf_press_button(context, BUTTON_A, 40ms, 1600ms);
 
             //  "[wild pokemon] entered into a poke ball"
-            pbf_press_button_old(context, BUTTON_A, 5, 800);
+            pbf_press_button(context, BUTTON_A, 40ms, 6400ms);
 
             //  "[wild pokemon] has been sent to the PC"
-            pbf_press_button_old(context, BUTTON_A, 5, 375);
+            pbf_press_button(context, BUTTON_A, 40ms, 3000ms);
 
 
             context.wait_for_all_requests();
@@ -282,7 +282,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
             stats.m_attempts++;
             env.update_stats();
             if (shininess != ShinyType::NOT_SHINY){
-                pbf_press_button_old(context, BUTTON_CAPTURE, 250, 500);
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 4000ms);
             }
         }
 
@@ -293,12 +293,12 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         pbf_move_left_joystick_old(context, 0xff, 0x80, 125, 5);
         pbf_move_left_joystick_old(context, 0x80, 0x00, 125, 5);
         pbf_move_left_joystick_old(context, 0x80, 0x00, 40ms, 400ms);
-        pbf_press_button_old(context, BUTTON_A, 5, 250);    //  Wait 2 seconds to be sure the following X press won't be dropped.
+        pbf_press_button(context, BUTTON_A, 40ms, 2000ms);    //  Wait 2 seconds to be sure the following X press won't be dropped.
 
         //  And now we cook another curry.
         pbf_press_button(context, BUTTON_X, 40ms, 1000ms);
         pbf_press_button(context, BUTTON_A, 40ms, 1000ms);
-        pbf_press_button_old(context, BUTTON_A, 5, 300);
+        pbf_press_button(context, BUTTON_A, 40ms, 2400ms);
     }
 
 

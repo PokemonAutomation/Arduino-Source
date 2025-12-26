@@ -549,11 +549,11 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
             if (console.index() != host_index){
                 //  Do 2 presses in quick succession in case one drops or is
                 //  needed to connect the controller.
-                pbf_press_button_old(context, BUTTON_X, 5, 5);
+                pbf_press_button(context, BUTTON_X, 40ms, 40ms);
                 pbf_press_button(context, BUTTON_X, 160ms, 840ms);
                 save_game_from_menu(env.program_info(), console, context);
             }else{
-                pbf_press_button_old(context, BUTTON_L, 5, 5);
+                pbf_press_button(context, BUTTON_L, 40ms, 40ms);
             }
         });
     }

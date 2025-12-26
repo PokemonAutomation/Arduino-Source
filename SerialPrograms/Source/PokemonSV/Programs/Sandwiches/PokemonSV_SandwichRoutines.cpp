@@ -1145,7 +1145,7 @@ void run_sandwich_maker(
         //this differs from the game layout: far right is 5 and far far left/right is 6 in game
         //however as long as we stay internally consistent with this numbering it will work
         for (int i = 0; i < (plates - 3); i++){
-            pbf_press_button_old(context, BUTTON_R, 20, 180);
+            pbf_press_button(context, BUTTON_R, 160ms, 1440ms);
             context.wait_for_all_requests();
 
             screen = stream.video().snapshot();

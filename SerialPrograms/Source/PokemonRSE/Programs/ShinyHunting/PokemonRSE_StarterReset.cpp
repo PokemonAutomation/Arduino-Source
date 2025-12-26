@@ -106,7 +106,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     bool shiny_starter = false;
     while (!shiny_starter) {
         env.log("Opening bag and selecting starter.");
-        pbf_press_button_old(context, BUTTON_A, 40, 180);
+        pbf_press_button(context, BUTTON_A, 320ms, 1440ms);
 
         switch (TARGET) {
         case Target::treecko:
@@ -169,7 +169,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             );
         }
 
-        pbf_press_button_old(context, BUTTON_A, 20, 180);
+        pbf_press_button(context, BUTTON_A, 160ms, 1440ms);
         pbf_press_dpad(context, DPAD_DOWN, 320ms, 640ms);
         pbf_press_button(context, BUTTON_A, 320ms, 640ms);
 

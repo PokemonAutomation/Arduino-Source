@@ -27,7 +27,7 @@ void run_away_with_lights(ProControllerContext& context){
 void enter_summary(ProControllerContext& context, bool regi_move_right){
     pbf_press_dpad(context, DPAD_DOWN, 80ms, 0ms);
     pbf_press_button(context, BUTTON_A, 80ms, 2000ms);
-    pbf_press_button_old(context, BUTTON_A, 10, 200);
+    pbf_press_button(context, BUTTON_A, 80ms, 1600ms);
     if (regi_move_right){
         pbf_move_left_joystick(context, {+1, 0}, 160ms, 240ms);
     }
@@ -72,7 +72,7 @@ void close_game_if_overworld(
 
     //  Close and restart game.
     close_game_from_home(console, context);
-    pbf_press_button_old(context, BUTTON_HOME, 10, 190);
+    pbf_press_button(context, BUTTON_HOME, 80ms, 1520ms);
 }
 
 

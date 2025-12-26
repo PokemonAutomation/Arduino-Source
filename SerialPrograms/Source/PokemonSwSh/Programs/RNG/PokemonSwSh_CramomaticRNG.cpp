@@ -283,7 +283,7 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
 
 void CramomaticRNG::leave_to_overworld_and_interact(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     pbf_press_button(context, BUTTON_B, 2000ms, 40ms);
-    pbf_press_button_old(context, BUTTON_B, 10, 70);
+    pbf_press_button(context, BUTTON_B, 80ms, 560ms);
 
     pbf_mash_button(context, BUTTON_A, 2560ms);
     pbf_wait(context, 1000ms);
@@ -338,7 +338,7 @@ std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvi
 
     while (presses < 30 && !arrow_detected){
         presses++;
-        pbf_press_button_old(context, BUTTON_B, 10, 165);
+        pbf_press_button(context, BUTTON_B, 80ms, 1320ms);
         context.wait_for_all_requests();
 
         VideoSnapshot screen = env.console.video().snapshot();

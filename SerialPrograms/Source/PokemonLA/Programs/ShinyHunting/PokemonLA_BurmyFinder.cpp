@@ -367,7 +367,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_move_left_joystick_old(context, 0, 95, 1000ms, 0ms);
                 context.wait_for_all_requests();
                 enable_shiny_sound(context);
-                pbf_press_button_old(context, BUTTON_B, 110, 0);
+                pbf_press_button(context, BUTTON_B, 880ms, 0ms);
                 pbf_press_button(context, BUTTON_Y, 2300ms, 0ms);
                 pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
                 pbf_move_right_joystick(context, {0, -1}, 100ms, 300ms);
