@@ -27,6 +27,7 @@ public:
         Type default_value, Type current_value
     );
 
+
 public:
     SimpleIntegerCell(
         LockMode lock_while_running,
@@ -56,14 +57,19 @@ public:
     virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
 
+
 public:
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
+    static ConfigUiFactory<SimpleIntegerCell> m_ui_factory;
+
+    virtual UiWrapper make_UiComponent(void* params) override{
+        return run_factory(m_ui_factory, *this, params);
+    }
+
 
 protected:
     struct Data;
     Pimpl<Data> m_data;
 };
-
 
 
 
@@ -78,6 +84,7 @@ public:
         Type min_value, Type max_value,
         Type default_value, Type current_value
     );
+
 
 public:
     SimpleIntegerOption(
@@ -98,12 +105,30 @@ public:
 
     const std::string& label() const{ return m_label; }
 
+
 public:
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
+    static ConfigUiFactory<SimpleIntegerOption> m_ui_factory;
+
+    virtual UiWrapper make_UiComponent(void* params) override{
+        return run_factory(m_ui_factory, *this, params);
+    }
+
 
 private:
     const std::string m_label;
 };
+
+
+
+
+
+template <typename Type>
+ConfigUiFactory<SimpleIntegerCell<Type>> SimpleIntegerCell<Type>::m_ui_factory;
+template <typename Type>
+ConfigUiFactory<SimpleIntegerOption<Type>> SimpleIntegerOption<Type>::m_ui_factory;
+
+
+
 
 
 

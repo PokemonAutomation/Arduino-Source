@@ -11,6 +11,7 @@
 #include "Common/Compiler.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Containers/Pimpl.h"
+#include "Common/Cpp/UiWrapper.h"
 
 class QWidget;
 
@@ -137,7 +138,8 @@ protected:
 
 
 public:
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) = 0;
+    virtual UiWrapper make_UiComponent(void* params){ return UiWrapper(); }
+    virtual ConfigWidget* make_QtWidget(QWidget& parent){ return nullptr; }
 
 private:
     struct Data;
@@ -145,6 +147,28 @@ private:
 
     LifetimeSanitizer m_lifetime_sanitizer;
 };
+
+
+
+
+
+//
+//  Helpers for implementations.
+//
+
+template <typename OptionType>
+using ConfigUiFactory = UiWrapper (*)(OptionType& option, void* params);
+
+template <typename OptionType>
+UiWrapper run_factory(const ConfigUiFactory<OptionType>& factory, OptionType& option, void* params){
+    if (factory){
+        return factory(option, params);
+    }
+    return UiWrapper();
+}
+
+
+
 
 
 

@@ -5,6 +5,7 @@
  */
 
 #include <QWidget>
+#include "Common/Cpp/Exceptions.h"
 #include "ConfigWidget.h"
 
 //#include <iostream>
@@ -12,6 +13,33 @@
 //using std::endl;
 
 namespace PokemonAutomation{
+
+
+
+ConfigWidget* ConfigWidget::make_from_option(ConfigOption& option, QWidget* parent){
+    ConfigWidget* widget = nullptr;
+
+    //  This always returns a widget that is owned by a parent.
+    //  So the pointer can be released here.
+    UiWrapper wrapper = option.make_UiComponent(parent);
+    if (wrapper){
+        widget = dynamic_cast<ConfigWidget*>(wrapper.get());
+    }
+    if (widget){
+        return widget;
+    }
+
+    widget = option.make_QtWidget(*parent);
+    if (widget){
+        return widget;
+    }
+
+    if (widget == nullptr){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unable to construct ConfigWidget.");
+    }
+
+    return widget;
+}
 
 
 ConfigWidget::~ConfigWidget(){

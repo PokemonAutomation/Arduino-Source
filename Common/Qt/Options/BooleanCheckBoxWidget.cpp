@@ -13,14 +13,8 @@ namespace PokemonAutomation{
 
 
 
-
-ConfigWidget* BooleanCheckBoxCell::make_QtWidget(QWidget& parent){
-    return new BooleanCheckBoxCellWidget(parent, *this);
-}
-ConfigWidget* BooleanCheckBoxOption::make_QtWidget(QWidget& parent){
-    return new BooleanCheckBoxOptionWidget(parent, *this);
-}
-
+template class ConfigWidgetInitializer<BooleanCheckBoxCell, BooleanCheckBoxCellWidget>;
+template class ConfigWidgetInitializer<BooleanCheckBoxOption, BooleanCheckBoxOptionWidget>;
 
 
 

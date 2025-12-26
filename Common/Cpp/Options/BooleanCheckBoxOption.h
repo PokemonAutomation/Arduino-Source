@@ -23,6 +23,7 @@ public:
         bool default_value, bool current_value
     );
 
+
 public:
     BooleanCheckBoxCell(
         LockMode lock_while_running,
@@ -40,7 +41,14 @@ public:
 
     virtual void restore_defaults() override;
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
+
+public:
+    static ConfigUiFactory<BooleanCheckBoxCell> m_ui_factory;
+
+    virtual UiWrapper make_UiComponent(void* params) override{
+        return run_factory(m_ui_factory, *this, params);
+    }
+
 
 protected:
     struct Data;
@@ -67,7 +75,14 @@ public:
     const std::string& label() const{ return m_label; }
     using BooleanCheckBoxCell::operator=;
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
+
+public:
+    static ConfigUiFactory<BooleanCheckBoxOption> m_ui_factory;
+
+    virtual UiWrapper make_UiComponent(void* params) override{
+        return run_factory(m_ui_factory, *this, params);
+    }
+
 
 private:
     const std::string m_label;

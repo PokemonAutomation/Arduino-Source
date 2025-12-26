@@ -23,7 +23,12 @@ namespace PokemonAutomation{
 //  ConfigWidget's derived classes need to inherit a QWidget or its derived class
 //  and pass *this as the widget in ConfigWidget(m_valuie, widget) so a ConfigWidget
 //  pointer can get the actual QWidget.
-class ConfigWidget : protected ConfigOption::Listener{
+class ConfigWidget : public UiComponent, protected ConfigOption::Listener{
+public:
+    //  Temporary for refactoring.
+    static ConfigWidget* make_from_option(ConfigOption& option, QWidget* parent);
+
+
 public:
     virtual ~ConfigWidget();
     ConfigWidget(ConfigOption& m_value);
@@ -45,6 +50,7 @@ public:
     void update_visibility(bool program_is_running);
     void update_all(bool program_is_running);
 
+
 protected:
     //  Overwrite ConfigOption::Listener::on_config_visibility_changed().
     //  Called when the listened config option's visibility is changed.
@@ -56,11 +62,38 @@ protected:
     virtual void on_config_visibility_changed() override;
     virtual void on_program_state_changed(bool program_is_running) override;
 
+
 protected:
     ConfigOption& m_value;
     QWidget* m_widget = nullptr;
     bool m_program_is_running = false;
 };
+
+
+
+
+
+//
+//  Helpers for implementations.
+//
+
+template <typename ConfigOptionType, typename ConfigWidgetType>
+class ConfigWidgetInitializer{
+public:
+    ConfigWidgetInitializer(){
+        ConfigOptionType::m_ui_factory = [](ConfigOptionType& option, void* params){
+            QWidget* parent = (QWidget*)params;
+            return UiWrapper(parent == nullptr, new ConfigWidgetType(*parent, option));
+        };
+    }
+
+    static ConfigWidgetInitializer initializer;
+};
+
+template <typename ConfigOptionType, typename ConfigWidgetType>
+ConfigWidgetInitializer<ConfigOptionType, ConfigWidgetType> ConfigWidgetInitializer<ConfigOptionType, ConfigWidgetType>::initializer;
+
+
 
 
 

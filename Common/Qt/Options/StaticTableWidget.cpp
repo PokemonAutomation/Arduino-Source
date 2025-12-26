@@ -67,7 +67,10 @@ StaticTableWidget::StaticTableWidget(QWidget& parent, StaticTableOption& value)
     for (size_t r = 0; r < table.size(); r++){
         std::vector<ConfigOption*> cells = table[r]->make_cells();
         for (size_t c = 0; c < cells.size(); c++){
-            m_table->setCellWidget((int)r, (int)c, &cells[c]->make_QtWidget(*this)->widget());
+            m_table->setCellWidget(
+                (int)r, (int)c,
+                &ConfigWidget::make_from_option(*cells[c], &parent)->widget()
+            );
         }
     }
 
