@@ -68,7 +68,7 @@ std::unique_ptr<StatsTracker> ShinyHunt_Terrakion_Descriptor::make_stats() const
 
 
 ShinyHunt_Terrakion::ShinyHunt_Terrakion()
-    : THRESHOLD("<b>Calorie Threshold:</b><br>Stop resetting and check Terrakion when this many calories remain", LockMode::UNLOCK_WHILE_RUNNING, 400, 200, 4800)
+    : THRESHOLD("<b>Calorie Threshold:</b><br>Stop resetting and check Terrakion when this many calories remain", LockMode::UNLOCK_WHILE_RUNNING, 800, 200, 4800)
     , SAVE_ON_START("<b>Save on Start:</b><br>Save the game when starting the program. Each cycle will start at the calorie count at the time of the save", LockMode::LOCK_WHILE_RUNNING, true)
     , SHINY_DETECTED("Shiny Detected", "", "1000 ms", ShinySoundDetectedAction::STOP_PROGRAM)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
@@ -279,7 +279,7 @@ void ShinyHunt_Terrakion::program(SingleSwitchProgramEnvironment& env, ProContro
                     route_reset_terrakion(env, context, stats);
                 }
                 env.update_stats();
-                if (stats.resets.load(std::memory_order_relaxed) % 10 == 0){
+                if (stats.resets.load(std::memory_order_relaxed) % 100 == 0){
                     send_program_status_notification(env, NOTIFICATION_STATUS);
                 }
             }
