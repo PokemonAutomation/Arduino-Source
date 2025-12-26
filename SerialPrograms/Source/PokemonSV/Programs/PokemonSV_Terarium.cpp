@@ -125,7 +125,7 @@ void map_move_cursor_fly(
     for (int i = 0; i < 3; i++){
         try{
             open_map_from_overworld(info, stream, context);
-            pbf_move_left_joystick_old(context, x, y, hold, release);
+            pbf_move_left_joystick_old1(context, x, y, hold, release);
             pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
             fly_to_overworld_from_map(info, stream, context);
             break;

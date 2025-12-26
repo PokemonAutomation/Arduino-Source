@@ -287,7 +287,7 @@ void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerC
         });
 
         pbf_press_button(context, BUTTON_ZR, 160ms, 840ms);
-        pbf_move_left_joystick_old(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
+        pbf_move_left_joystick_old1(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
         pbf_press_button(context, BUTTON_A, 160ms, 840ms);
         pbf_press_button(context, BUTTON_A, 160ms, 840ms);
 
@@ -310,7 +310,7 @@ void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerC
         pbf_press_button(context, BUTTON_L, 160ms, 840ms);
         return;
     case PlayerRealignMode::REALIGN_NO_MARKER:
-        pbf_move_left_joystick_old(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
+        pbf_move_left_joystick_old1(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
         pbf_press_button(context, BUTTON_L, 160ms, 840ms);
         return;
     }  
@@ -1603,7 +1603,7 @@ void move_forward_until_yolo_object_above_min_size(
                     return; // stop when the target is above a certain size. i.e. we are close enough to the target.
                 }
             
-                pbf_move_left_joystick_old(context, 128, y, forward_ticks, 0);
+                pbf_move_left_joystick_old1(context, 128, y, forward_ticks, 0);
                 // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
                 // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
             });
@@ -1666,7 +1666,7 @@ void move_player_until_yolo_object_detected(
 
                 
 
-                pbf_move_left_joystick_old(context, x, y, forward_ticks, 0);
+                pbf_move_left_joystick_old1(context, x, y, forward_ticks, 0);
                 // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
                 // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
             });
@@ -1721,7 +1721,7 @@ void move_forward_until_yolo_object_not_detected(
                 }
             }
             
-            pbf_move_left_joystick_old(context, 128, y, forward_ticks, 0);
+            pbf_move_left_joystick_old1(context, 128, y, forward_ticks, 0);
             // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
             // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
         });
@@ -1938,7 +1938,7 @@ bool move_player_to_realign_via_yolo(
                 pbf_press_button(context, BUTTON_R, 160ms, 840ms);
             }
             
-            pbf_move_left_joystick_old(context, x_push, 128, push_duration, 0);
+            pbf_move_left_joystick_old1(context, x_push, 128, push_duration, 0);
             
         });
 

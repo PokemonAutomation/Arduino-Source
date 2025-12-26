@@ -203,7 +203,7 @@ ImageFloatBox OliveDetector::align_to_olive(
         if (std::abs(diff_from_center) < 0.05){
             wait_ticks = 100;
         }
-        pbf_move_left_joystick_old(context, push_x, 128, push_duration, wait_ticks);
+        pbf_move_left_joystick_old1(context, push_x, 128, push_duration, wait_ticks);
         prev_push_direction = push_direction;
         
 

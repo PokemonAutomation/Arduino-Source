@@ -418,7 +418,7 @@ void move_cursor_to_position_offset_from_flypoint(const ProgramInfo& info, Video
         const uint8_t move_y = uint8_t(std::max(std::min(int(round(push_y + 128) + 0.5), 255), 0));
 
         const uint16_t push_time = std::max(uint16_t(magnitude * scale + 0.5), uint16_t(3));
-        pbf_move_left_joystick_old(context, move_x, move_y, push_time, 30);
+        pbf_move_left_joystick_old1(context, move_x, move_y, push_time, 30);
         context.wait_for_all_requests();
     }
 
@@ -484,7 +484,7 @@ bool detect_closest_flypoint_and_move_map_cursor_there(
 
     stream.overlay().add_log("Move Cursor to PokeCenter", COLOR_WHITE);
     const uint16_t push_time = std::max(uint16_t(magnitude * scale + 0.5), uint16_t(3));
-    pbf_move_left_joystick_old(context, move_x, move_y, push_time, 30);
+    pbf_move_left_joystick_old1(context, move_x, move_y, push_time, 30);
     context.wait_for_all_requests();
     return true;
 }

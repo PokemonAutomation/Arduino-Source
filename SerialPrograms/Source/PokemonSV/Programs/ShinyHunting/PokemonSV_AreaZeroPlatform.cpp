@@ -450,7 +450,7 @@ void choose_path(
 void turn_angle(ProControllerContext& context, double angle_radians){
     uint8_t turn_x, turn_y;
     direction_to_stick(turn_x, turn_y, -std::sin(angle_radians), std::cos(angle_radians));
-    pbf_move_left_joystick_old(context, turn_x, turn_y, 40, 20);
+    pbf_move_left_joystick_old1(context, turn_x, turn_y, 40, 20);
     pbf_mash_button(context, BUTTON_L, 480ms);
 }
 
@@ -487,7 +487,7 @@ void area_zero_platform_run_path2(
 
         choose_path(stream.logger(), move_x, move_y, duration, platform_x, platform_y);
 
-        pbf_move_left_joystick_old(context, move_x, move_y, 40, 20);
+        pbf_move_left_joystick_old1(context, move_x, move_y, 40, 20);
         pbf_mash_button(context, BUTTON_L, 480ms);
 //        pbf_wait(context, 1250);
     });
