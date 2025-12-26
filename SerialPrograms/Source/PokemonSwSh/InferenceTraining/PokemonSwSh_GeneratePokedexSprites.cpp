@@ -119,8 +119,7 @@ void GenerateDexModelSession::save_image(const std::string& slug, bool is_shiny,
 void GenerateDexModelSession::iterate_form(const std::string& slug, bool shiny, size_t form_index){
     size_t image_index = 0;
 
-    uint16_t step_ticks = 160 / (uint16_t)m_horizontal_frames + 1;
-    Milliseconds step = step_ticks * 8ms;
+    Milliseconds step = 1280ms / m_horizontal_frames + 8ms;
 
     //  Stills
     for (size_t y = 0; y < m_vertical_frames; y++){
