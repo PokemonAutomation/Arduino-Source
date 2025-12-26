@@ -12,6 +12,10 @@
 namespace PokemonAutomation{
 
 
+ConfigUiFactory<StaticTextOption> StaticTextOption::m_ui_factory;
+ConfigUiFactory<SectionDividerOption> SectionDividerOption::m_ui_factory;
+
+
 
 struct StaticTextOption::Data{
     mutable SpinLock m_lock;
@@ -27,7 +31,7 @@ struct StaticTextOption::Data{
 
 StaticTextOption::~StaticTextOption() = default;
 StaticTextOption::StaticTextOption(std::string label, bool text_wrapping)
-    : ConfigOption(LockMode::UNLOCK_WHILE_RUNNING)
+    : ConfigOptionImpl<StaticTextOption>(LockMode::UNLOCK_WHILE_RUNNING)
     , m_data(CONSTRUCT_TOKEN, std::move(label), text_wrapping)
 {}
 #if 0

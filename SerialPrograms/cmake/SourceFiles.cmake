@@ -106,6 +106,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Options/ButtonOption.cpp
     ../Common/Cpp/Options/ButtonOption.h
     ../Common/Cpp/Options/CheckboxDropdownDatabase.h
+    ../Common/Cpp/Options/CheckboxDropdownOption.cpp
     ../Common/Cpp/Options/CheckboxDropdownOption.h
     ../Common/Cpp/Options/CheckboxDropdownOption.tpp
     ../Common/Cpp/Options/ColorOption.cpp
@@ -178,6 +179,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/StringTools.h
     ../Common/Cpp/Time.cpp
     ../Common/Cpp/Time.h
+    ../Common/Cpp/UiWrapper.h
     ../Common/Cpp/Unicode.cpp
     ../Common/Cpp/Unicode.h
     ../Common/Cpp/ValueDebouncer.h
@@ -367,6 +369,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Notifications/EventNotificationOption.h
     Source/CommonFramework/Notifications/EventNotificationsTable.cpp
     Source/CommonFramework/Notifications/EventNotificationsTable.h
+    Source/CommonFramework/Notifications/EventNotificationWidget.cpp
+    Source/CommonFramework/Notifications/EventNotificationWidget.h
     Source/CommonFramework/Notifications/MessageAttachment.cpp
     Source/CommonFramework/Notifications/MessageAttachment.h
     Source/CommonFramework/Notifications/ProgramInfo.h
@@ -715,6 +719,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
+    Source/Integrations/DiscordIntegrationSettingsWidget.cpp
+    Source/Integrations/DiscordIntegrationSettingsWidget.h
     Source/Integrations/DiscordIntegrationTable.cpp
     Source/Integrations/DiscordIntegrationTable.h
     Source/Integrations/DiscordSettingsOption.cpp
@@ -1456,6 +1462,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.h
     Source/PokemonLA/Options/PokemonLA_TravelLocation.cpp
     Source/PokemonLA/Options/PokemonLA_TravelLocation.h
+    Source/PokemonLA/Options/QtWidgets/PokemonLA_CustomPathTableWidget.cpp
+    Source/PokemonLA/Options/QtWidgets/PokemonLA_CustomPathTableWidget.h
     Source/PokemonLA/Panels_PokemonLA.cpp
     Source/PokemonLA/Panels_PokemonLA.h
     Source/PokemonLA/PokemonLA_Locations.cpp
@@ -2554,6 +2562,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h
     Source/PokemonSwSh/ShinyHuntTracker.cpp
     Source/PokemonSwSh/ShinyHuntTracker.h
+    Source/StaticRegistration.h
+    Source/StaticRegistrationQt.cpp
     Source/Tests/CommandLineTests.cpp
     Source/Tests/CommandLineTests.h
     Source/Tests/CommonFramework_Tests.cpp

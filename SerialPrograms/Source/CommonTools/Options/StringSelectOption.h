@@ -80,7 +80,7 @@ bool load_json_to_string_select_database(const JsonValue& json, StringSelectData
 
 //  Config option that creates a cell where users can select a string from
 //  its dropdown menu. It is best to put this cell in a table widget.
-class StringSelectCell : public ConfigOption{
+class StringSelectCell : public ConfigOptionImpl<StringSelectCell>{
 public:
     ~StringSelectCell();
     StringSelectCell(const StringSelectCell&) = delete;
@@ -123,8 +123,6 @@ public:
 
     virtual void restore_defaults() override;
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
-
 private:
     struct Data;
     Pimpl<Data> m_data;
@@ -135,7 +133,7 @@ private:
 //  a sring. Different from StringSelectCell which is typically used 
 //  in a table, StringSelectOption is considered a standalone option
 //  that comes with its own label.
-class StringSelectOption : public StringSelectCell{
+class StringSelectOption : public ConfigOptionImpl<StringSelectOption, StringSelectCell>{
 public:
     StringSelectOption(
         std::string label,
@@ -143,7 +141,11 @@ public:
         LockMode lock_while_running,
         size_t default_index
     )
-        : StringSelectCell(database, lock_while_running, default_index)
+        : ConfigOptionImpl<StringSelectOption, StringSelectCell>(
+            database,
+            lock_while_running,
+            default_index
+        )
         , m_label(std::move(label))
     {}
     StringSelectOption(
@@ -152,12 +154,15 @@ public:
         LockMode lock_while_running,
         const std::string& default_slug
     )
-        : StringSelectCell(database, lock_while_running, default_slug)
+        : ConfigOptionImpl<StringSelectOption, StringSelectCell>(
+            database,
+            lock_while_running,
+            default_slug
+        )
         , m_label(std::move(label))
     {}
 
     const std::string& label() const{ return m_label; }
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     std::string m_label;

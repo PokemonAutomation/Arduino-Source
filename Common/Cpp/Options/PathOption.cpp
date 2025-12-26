@@ -12,6 +12,12 @@
 namespace PokemonAutomation{
 
 
+ConfigUiFactory<PathCell> PathCell::m_ui_factory;
+ConfigUiFactory<PathOption> PathOption::m_ui_factory;
+
+
+
+
 struct PathCell::Data{
     const std::string m_default;
     const std::string m_filter_string;
@@ -42,7 +48,7 @@ PathCell::PathCell(
     std::string filter_string,
     std::string placeholder_text
 )
-    : ConfigOption(lock_while_program_is_running)
+    : ConfigOptionImpl<PathCell>(lock_while_program_is_running)
     , m_data(CONSTRUCT_TOKEN, std::move(default_value), std::move(filter_string), std::move(placeholder_text))
 {}
 
@@ -110,7 +116,12 @@ PathOption::PathOption(
     std::string filter_string,
     std::string placeholder_text
 )
-     : PathCell(lock_while_program_is_running, default_value, filter_string, placeholder_text)
+     : ConfigOptionImpl<PathOption, PathCell>(
+        lock_while_program_is_running,
+        default_value,
+        filter_string,
+        placeholder_text
+    )
      , m_label(std::move(label))
 {}
 

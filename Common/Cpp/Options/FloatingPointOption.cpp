@@ -19,6 +19,12 @@
 namespace PokemonAutomation{
 
 
+ConfigUiFactory<FloatingPointCell> FloatingPointCell::m_ui_factory;
+ConfigUiFactory<FloatingPointOption> FloatingPointOption::m_ui_factory;
+
+
+
+
 struct FloatingPointCell::Data{
     const double m_min_value;
     const double m_max_value;
@@ -40,7 +46,7 @@ struct FloatingPointCell::Data{
 
 FloatingPointCell::~FloatingPointCell() = default;
 FloatingPointCell::FloatingPointCell(const FloatingPointCell& x)
-    : ConfigOption(x)
+    : ConfigOptionImpl<FloatingPointCell>(x)
     , m_data(CONSTRUCT_TOKEN, x.min_value(), x.max_value(), x.default_value(), x)
 {}
 FloatingPointCell::FloatingPointCell(
@@ -48,7 +54,7 @@ FloatingPointCell::FloatingPointCell(
     double min_value, double max_value,
     double default_value, double current_value
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<FloatingPointCell>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, min_value, max_value, default_value, current_value)
 {}
 
@@ -59,7 +65,7 @@ FloatingPointCell::FloatingPointCell(
     double min_value,
     double max_value
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<FloatingPointCell>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, min_value, max_value, default_value, default_value)
 {}
 
@@ -151,7 +157,12 @@ FloatingPointOption::FloatingPointOption(
     double min_value,
     double max_value
 )
-    : FloatingPointCell(lock_while_running, default_value, min_value, max_value)
+    : ConfigOptionImpl<FloatingPointOption, FloatingPointCell>(
+        lock_while_running,
+        default_value,
+        min_value,
+        max_value
+    )
     , m_label(std::move(label))
 {}
 

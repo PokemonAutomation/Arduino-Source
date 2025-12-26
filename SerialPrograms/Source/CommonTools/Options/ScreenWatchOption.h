@@ -12,29 +12,29 @@
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 struct VideoSnapshot;
 class ScreenWatchOption;
 
 
-class ScreenWatchDisplay : public ConfigOption{
+class ScreenWatchDisplay : public ConfigOptionImpl<ScreenWatchDisplay>{
 public:
     ScreenWatchDisplay(ScreenWatchOption& option)
         : m_option(option)
     {}
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
-
     ScreenWatchOption& m_option;
 };
-class ScreenWatchButtons : public ConfigOption{
+class ScreenWatchButtons : public ConfigOptionImpl<ScreenWatchButtons>{
 public:
     ScreenWatchButtons(ScreenWatchOption& option)
         : m_option(option)
     {}
-
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
     ScreenWatchOption& m_option;
 };

@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 
 
 template <typename Type>
-class IntegerRangeCell : public ConfigOption{
+class IntegerRangeCell : public ConfigOptionImpl<IntegerRangeCell<Type>>{
 public:
     ~IntegerRangeCell();
     IntegerRangeCell(const IntegerRangeCell& x);
@@ -50,13 +50,13 @@ public:
 //    virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
 
-public:
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 protected:
     struct Data;
     Pimpl<Data> m_data;
 };
+
+
 
 
 

@@ -16,6 +16,12 @@
 namespace PokemonAutomation{
 
 
+ConfigUiFactory<IntegerEnumDropdownCell> IntegerEnumDropdownCell::m_ui_factory;
+ConfigUiFactory<IntegerEnumDropdownOption> IntegerEnumDropdownOption::m_ui_factory;
+
+
+
+
 struct IntegerEnumDropdownCell::Data{
     const IntegerEnumDropdownDatabase& m_database;
     const size_t m_default;
@@ -33,7 +39,7 @@ struct IntegerEnumDropdownCell::Data{
 
 IntegerEnumDropdownCell::~IntegerEnumDropdownCell() = default;
 IntegerEnumDropdownCell::IntegerEnumDropdownCell(const IntegerEnumDropdownCell& x)
-    : ConfigOption(x)
+    : ConfigOptionImpl<IntegerEnumDropdownCell>(x)
     , m_data(CONSTRUCT_TOKEN, x.database(), x.default_value(), x.current_value())
 {}
 IntegerEnumDropdownCell::IntegerEnumDropdownCell(
@@ -41,7 +47,7 @@ IntegerEnumDropdownCell::IntegerEnumDropdownCell(
     LockMode lock_while_running,
     size_t default_value, size_t current_value
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<IntegerEnumDropdownCell>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, database, default_value, current_value)
 {
     if (database.find(default_value) == nullptr){
@@ -56,7 +62,7 @@ IntegerEnumDropdownCell::IntegerEnumDropdownCell(
     LockMode lock_while_running,
     size_t default_value
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<IntegerEnumDropdownCell>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, database, default_value, default_value)
 {
     if (database.find(default_value) == nullptr){

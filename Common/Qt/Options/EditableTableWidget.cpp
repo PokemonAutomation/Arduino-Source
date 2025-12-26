@@ -22,9 +22,7 @@
 namespace PokemonAutomation{
 
 
-ConfigWidget* EditableTableOption::make_QtWidget(QWidget& parent){
-    return new EditableTableWidget(parent, *this);
-}
+template class RegisterConfigWidget<EditableTableWidget>;
 
 
 
@@ -237,7 +235,7 @@ void EditableTableWidget::update_value(){
                 //  QTableWidget for some reason forces the visibility of its
                 //  cells to visible.
 //                cout << "make cell widget" << endl;
-                QWidget* widget = &cells[c]->make_QtWidget(*m_table)->widget();
+                QWidget* widget = &ConfigWidget::make_from_option(*cells[c], m_table)->widget();
                 QWidget* cell_widget = new QWidget(this);
                 QVBoxLayout* layout = new QVBoxLayout(cell_widget);
                 layout->setContentsMargins(0, 0, 0, 0);

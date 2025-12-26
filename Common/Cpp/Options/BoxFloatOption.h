@@ -13,7 +13,7 @@
 namespace PokemonAutomation{
 
 
-class BoxFloatOption : public ConfigOption{
+class BoxFloatOption : public ConfigOptionImpl<BoxFloatOption>{
 public:
     ~BoxFloatOption();
     BoxFloatOption(
@@ -42,8 +42,6 @@ public:
 
     virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
-
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 
 private:

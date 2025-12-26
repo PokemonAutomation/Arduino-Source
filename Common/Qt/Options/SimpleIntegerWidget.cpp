@@ -135,6 +135,25 @@ template class SimpleIntegerOptionWidget<int16_t>;
 template class SimpleIntegerOptionWidget<int32_t>;
 template class SimpleIntegerOptionWidget<int64_t>;
 
+template class RegisterConfigWidget<SimpleIntegerCellWidget<uint8_t>>;
+template class RegisterConfigWidget<SimpleIntegerCellWidget<uint16_t>>;
+template class RegisterConfigWidget<SimpleIntegerCellWidget<uint32_t>>;
+template class RegisterConfigWidget<SimpleIntegerCellWidget<uint64_t>>;
+template class RegisterConfigWidget<SimpleIntegerCellWidget<int8_t>>;
+template class RegisterConfigWidget<SimpleIntegerCellWidget<int16_t>>;
+template class RegisterConfigWidget<SimpleIntegerCellWidget<int32_t>>;
+template class RegisterConfigWidget<SimpleIntegerCellWidget<int64_t>>;
+
+template class RegisterConfigWidget<SimpleIntegerOptionWidget<uint8_t>>;
+template class RegisterConfigWidget<SimpleIntegerOptionWidget<uint16_t>>;
+template class RegisterConfigWidget<SimpleIntegerOptionWidget<uint32_t>>;
+template class RegisterConfigWidget<SimpleIntegerOptionWidget<uint64_t>>;
+template class RegisterConfigWidget<SimpleIntegerOptionWidget<int8_t>>;
+template class RegisterConfigWidget<SimpleIntegerOptionWidget<int16_t>>;
+template class RegisterConfigWidget<SimpleIntegerOptionWidget<int32_t>>;
+template class RegisterConfigWidget<SimpleIntegerOptionWidget<int64_t>>;
+
+
 
 //  This is stupid.
 #ifdef __APPLE__

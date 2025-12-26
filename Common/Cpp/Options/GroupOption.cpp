@@ -5,7 +5,6 @@
  */
 
 #include <atomic>
-#include "Common/Compiler.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
@@ -16,6 +15,7 @@
 //using std::endl;
 
 namespace PokemonAutomation{
+
 
 
 struct GroupOption::Data{
@@ -45,7 +45,7 @@ GroupOption::GroupOption(
     EnableMode enable_mode,
     bool show_restore_defaults_button
 )
-    : BatchOption(lock_while_program_is_running)
+    : ConfigOptionImpl<GroupOption, BatchOption>(lock_while_program_is_running)
     , m_data(CONSTRUCT_TOKEN, std::move(label), enable_mode, show_restore_defaults_button)
 {}
 

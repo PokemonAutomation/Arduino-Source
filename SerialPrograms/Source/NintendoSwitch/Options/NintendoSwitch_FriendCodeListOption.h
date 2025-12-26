@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class FriendCodeListOption : public ConfigOption{
+class FriendCodeListOption : public ConfigOptionImpl<FriendCodeListOption>{
 public:
     FriendCodeListOption(std::string label, std::vector<std::string> default_lines);
 
@@ -29,8 +29,6 @@ public:
     virtual JsonValue to_json() const override;
 
     virtual void restore_defaults() override;
-
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     friend class FriendCodeListWidget;

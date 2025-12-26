@@ -17,10 +17,7 @@
 namespace PokemonAutomation{
 
 
-
-ConfigWidget* TextEditOption::make_QtWidget(QWidget& parent){
-    return new TextEditWidget(parent, *this);
-}
+template class RegisterConfigWidget<TextEditWidget>;
 
 
 

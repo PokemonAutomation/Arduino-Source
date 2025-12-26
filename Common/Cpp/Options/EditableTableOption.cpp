@@ -17,6 +17,10 @@
 namespace PokemonAutomation{
 
 
+ConfigUiFactory<EditableTableOption> EditableTableOption::m_ui_factory;
+
+
+
 //EditableTableRow::EditableTableRow(void*)
 //    : m_parent(nullptr)
 //    , m_index((size_t)0 - 1)
@@ -84,7 +88,7 @@ EditableTableOption::EditableTableOption(
     LockMode lock_while_running,
     std::vector<std::unique_ptr<EditableTableRow>> default_value
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<EditableTableOption>(lock_while_running)
     , m_label(std::move(label))
     , m_enable_saveload(true)
     , m_default(std::move(default_value))
@@ -97,7 +101,7 @@ EditableTableOption::EditableTableOption(
     bool enable_saveload,
     std::vector<std::unique_ptr<EditableTableRow>> default_value
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<EditableTableOption>(lock_while_running)
     , m_label(std::move(label))
     , m_enable_saveload(enable_saveload)
     , m_default(std::move(default_value))

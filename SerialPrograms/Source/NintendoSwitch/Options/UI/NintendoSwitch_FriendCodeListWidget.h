@@ -18,6 +18,9 @@ namespace NintendoSwitch{
 
 class FriendCodeListWidget : public QWidget, public ConfigWidget{
 public:
+    using ParentOption = FriendCodeListOption;
+
+public:
     ~FriendCodeListWidget();
     FriendCodeListWidget(QWidget& parent, FriendCodeListOption& value);
 

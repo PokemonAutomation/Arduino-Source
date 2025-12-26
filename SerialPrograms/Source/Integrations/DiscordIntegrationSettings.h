@@ -19,12 +19,14 @@ namespace PokemonAutomation{
 namespace Integration{
 
 
-class DiscordIntegrationSettingsOption : public GroupOption, private ConfigOption::Listener{
+class DiscordIntegrationSettingsOption
+    : public ConfigOptionImpl<DiscordIntegrationSettingsOption, GroupOption>
+    , private ConfigOption::Listener
+{
 public:
     ~DiscordIntegrationSettingsOption();
     DiscordIntegrationSettingsOption();
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
     virtual void on_config_value_changed(void* object) override;
 
     BooleanCheckBoxOption run_on_start;

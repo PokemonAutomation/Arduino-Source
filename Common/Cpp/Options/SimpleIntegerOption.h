@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 
 template <typename Type>
-class SimpleIntegerCell : public ConfigOption{
+class SimpleIntegerCell : public ConfigOptionImpl<SimpleIntegerCell<Type>>{
 public:
     ~SimpleIntegerCell();
     SimpleIntegerCell(const SimpleIntegerCell& x);
@@ -26,6 +26,7 @@ public:
         Type min_value, Type max_value,
         Type default_value, Type current_value
     );
+
 
 public:
     SimpleIntegerCell(
@@ -56,8 +57,6 @@ public:
     virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
 
-public:
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 protected:
     struct Data;
@@ -67,9 +66,8 @@ protected:
 
 
 
-
 template <typename Type>
-class SimpleIntegerOption : public SimpleIntegerCell<Type>{
+class SimpleIntegerOption : public ConfigOptionImpl<SimpleIntegerOption<Type>, SimpleIntegerCell<Type>>{
 public:
     SimpleIntegerOption(const SimpleIntegerOption& x) = delete;
     SimpleIntegerOption(
@@ -78,6 +76,7 @@ public:
         Type min_value, Type max_value,
         Type default_value, Type current_value
     );
+
 
 public:
     SimpleIntegerOption(
@@ -98,12 +97,16 @@ public:
 
     const std::string& label() const{ return m_label; }
 
-public:
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     const std::string m_label;
 };
+
+
+
+
+
+
 
 
 

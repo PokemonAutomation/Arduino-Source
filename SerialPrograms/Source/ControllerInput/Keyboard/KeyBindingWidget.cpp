@@ -17,10 +17,7 @@
 namespace PokemonAutomation{
 
 
-
-ConfigWidget* KeyboardHidBindingCell::make_QtWidget(QWidget& parent){
-    return new KeyboardHidBindingCellWidget(parent, *this);
-}
+template class RegisterConfigWidget<KeyboardHidBindingCellWidget>;
 
 
 

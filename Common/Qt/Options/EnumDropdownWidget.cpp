@@ -13,12 +13,8 @@
 namespace PokemonAutomation{
 
 
-ConfigWidget* IntegerEnumDropdownCell::make_QtWidget(QWidget& parent){
-    return new EnumDropdownCellWidget(parent, *this);
-}
-ConfigWidget* IntegerEnumDropdownOption::make_QtWidget(QWidget& parent){
-    return new EnumDropdownOptionWidget(parent, *this);
-}
+template class RegisterConfigWidget<EnumDropdownCellWidget>;
+template class RegisterConfigWidget<EnumDropdownOptionWidget>;
 
 
 

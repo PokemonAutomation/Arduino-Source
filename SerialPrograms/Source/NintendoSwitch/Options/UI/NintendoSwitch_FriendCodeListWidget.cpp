@@ -10,12 +10,10 @@
 #include "NintendoSwitch_FriendCodeListWidget.h"
 
 namespace PokemonAutomation{
+
+template class RegisterConfigWidget<NintendoSwitch::FriendCodeListWidget>;
+
 namespace NintendoSwitch{
-
-
-ConfigWidget* FriendCodeListOption::make_QtWidget(QWidget& parent){
-    return new FriendCodeListWidget(parent, *this);
-}
 
 
 

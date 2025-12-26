@@ -19,7 +19,6 @@ namespace Integration{
 class DiscordMessageSettingsOption : public BatchOption{
 public:
     DiscordMessageSettingsOption();
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
     StringOption instance_name;
     StringOption user_id;

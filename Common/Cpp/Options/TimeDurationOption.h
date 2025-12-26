@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 
 
 template <typename Type>
-class TimeDurationCell : public ConfigOption{
+class TimeDurationCell : public ConfigOptionImpl<TimeDurationCell<Type>>{
 public:
     ~TimeDurationCell();
     TimeDurationCell(const TimeDurationCell& x) = delete;
@@ -78,8 +78,6 @@ public:
     virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
-
 
 protected:
     struct Data;
@@ -89,21 +87,26 @@ protected:
 
 
 template <typename Type>
-class TimeDurationOption : public TimeDurationCell<Type>{
+class TimeDurationOption : public ConfigOptionImpl<TimeDurationOption<Type>, TimeDurationCell<Type>>{
 public:
     template <class... Args>
     TimeDurationOption(std::string label, Args&&... args)
-        : TimeDurationCell<Type>(std::forward<Args>(args)...)
+        : ConfigOptionImpl<TimeDurationOption<Type>, TimeDurationCell<Type>>(
+            std::forward<Args>(args)...
+        )
         , m_label(std::move(label))
     {}
 
     const std::string& label() const{ return m_label; }
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     const std::string m_label;
 };
+
+
+
+
 
 
 
@@ -141,7 +144,6 @@ public:
         )
     {}
 };
-
 
 
 

@@ -16,6 +16,12 @@
 namespace PokemonAutomation{
 
 
+ConfigUiFactory<BooleanCheckBoxCell> BooleanCheckBoxCell::m_ui_factory;
+ConfigUiFactory<BooleanCheckBoxOption> BooleanCheckBoxOption::m_ui_factory;
+
+
+
+
 struct BooleanCheckBoxCell::Data{
     const bool m_default;
     std::atomic<bool> m_current;
@@ -28,21 +34,21 @@ struct BooleanCheckBoxCell::Data{
 
 BooleanCheckBoxCell::~BooleanCheckBoxCell() = default;
 BooleanCheckBoxCell::BooleanCheckBoxCell(const BooleanCheckBoxCell& x)
-    : ConfigOption(x)
+    : ConfigOptionImpl<BooleanCheckBoxCell>(x)
     , m_data(CONSTRUCT_TOKEN, x.default_value(), x.current_value())
 {}
 BooleanCheckBoxCell::BooleanCheckBoxCell(
     LockMode lock_while_running,
     bool default_value, bool current_value
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<BooleanCheckBoxCell>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, default_value, current_value)
 {}
 BooleanCheckBoxCell::BooleanCheckBoxCell(
     LockMode lock_while_running,
     bool default_value
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<BooleanCheckBoxCell>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, default_value, default_value)
 {}
 
@@ -81,7 +87,7 @@ BooleanCheckBoxOption::BooleanCheckBoxOption(
     LockMode lock_while_running,
     bool default_value
 )
-    : BooleanCheckBoxCell(lock_while_running, default_value)
+    : ConfigOptionImpl<BooleanCheckBoxOption, BooleanCheckBoxCell>(lock_while_running, default_value)
     , m_label(std::move(label))
 {}
 BooleanCheckBoxOption::BooleanCheckBoxOption(
@@ -89,7 +95,7 @@ BooleanCheckBoxOption::BooleanCheckBoxOption(
     LockMode lock_while_running,
     bool default_value, bool value
 )
-    : BooleanCheckBoxCell(lock_while_running, default_value, value)
+    : ConfigOptionImpl<BooleanCheckBoxOption, BooleanCheckBoxCell>(lock_while_running, default_value, value)
     , m_label(std::move(label))
 {}
 

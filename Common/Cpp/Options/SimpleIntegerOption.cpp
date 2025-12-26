@@ -10,22 +10,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "SimpleIntegerOption.h"
 
-#include "Common/Qt/Options/SimpleIntegerWidget.h"
-
 namespace PokemonAutomation{
-
-
-
-
-template <typename Type>
-ConfigWidget* SimpleIntegerCell<Type>::make_QtWidget(QWidget& parent){
-    return new SimpleIntegerCellWidget<Type>(parent, *this);
-}
-template <typename Type>
-ConfigWidget* SimpleIntegerOption<Type>::make_QtWidget(QWidget& parent){
-    return new SimpleIntegerOptionWidget<Type>(parent, *this);
-}
-
 
 
 template <typename Type>
@@ -50,7 +35,7 @@ template <typename Type>
 SimpleIntegerCell<Type>::~SimpleIntegerCell() = default;
 template <typename Type>
 SimpleIntegerCell<Type>::SimpleIntegerCell(const SimpleIntegerCell& x)
-    : ConfigOption(x)
+    : ConfigOptionImpl<SimpleIntegerCell<Type>>(x)
     , m_data(CONSTRUCT_TOKEN, x.min_value(), x.max_value(), x.default_value(), x.current_value())
 {}
 template <typename Type>
@@ -59,7 +44,7 @@ SimpleIntegerCell<Type>::SimpleIntegerCell(
     Type min_value, Type max_value,
     Type default_value, Type current_value
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<SimpleIntegerCell<Type>>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, min_value, max_value, default_value, current_value)
 {}
 
@@ -68,7 +53,7 @@ SimpleIntegerCell<Type>::SimpleIntegerCell(
     LockMode lock_while_running,
     Type default_value
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<SimpleIntegerCell<Type>>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, std::numeric_limits<Type>::min(), std::numeric_limits<Type>::max(), default_value, default_value)
 {}
 template <typename Type>
@@ -76,7 +61,7 @@ SimpleIntegerCell<Type>::SimpleIntegerCell(
     LockMode lock_while_running,
     Type default_value, Type min_value
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<SimpleIntegerCell<Type>>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, min_value, std::numeric_limits<Type>::max(), default_value, default_value)
 {}
 template <typename Type>
@@ -84,7 +69,7 @@ SimpleIntegerCell<Type>::SimpleIntegerCell(
     LockMode lock_while_running,
     Type default_value, Type min_value, Type max_value
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<SimpleIntegerCell<Type>>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, min_value, max_value, default_value, default_value)
 {}
 
@@ -118,7 +103,7 @@ std::string SimpleIntegerCell<Type>::set(Type x){
         return std::string();
     }
     if (x != m_data->m_current.exchange(x, std::memory_order_relaxed)){
-        report_value_changed(this);
+        this->report_value_changed(this);
     }
     return std::string();
 }
@@ -164,7 +149,13 @@ SimpleIntegerOption<Type>::SimpleIntegerOption(
     Type min_value, Type max_value,
     Type default_value, Type current_value
 )
-    : SimpleIntegerCell<Type>(lock_while_running, min_value, max_value, default_value, current_value)
+    : ConfigOptionImpl<SimpleIntegerOption<Type>, SimpleIntegerCell<Type>>(
+        lock_while_running,
+        min_value,
+        max_value,
+        default_value,
+        current_value
+    )
     , m_label(std::move(label))
 {}
 template <typename Type>
@@ -173,7 +164,10 @@ SimpleIntegerOption<Type>::SimpleIntegerOption(
     LockMode lock_while_running,
     Type default_value
 )
-    : SimpleIntegerCell<Type>(lock_while_running, default_value)
+    : ConfigOptionImpl<SimpleIntegerOption<Type>, SimpleIntegerCell<Type>>(
+        lock_while_running,
+        default_value
+    )
     , m_label(std::move(label))
 {}
 template <typename Type>
@@ -182,7 +176,11 @@ SimpleIntegerOption<Type>::SimpleIntegerOption(
     LockMode lock_while_running,
     Type default_value, Type min_value
 )
-    : SimpleIntegerCell<Type>(lock_while_running, default_value, min_value)
+    : ConfigOptionImpl<SimpleIntegerOption<Type>, SimpleIntegerCell<Type>>(
+        lock_while_running,
+        default_value,
+        min_value
+    )
     , m_label(std::move(label))
 {}
 template <typename Type>
@@ -191,7 +189,12 @@ SimpleIntegerOption<Type>::SimpleIntegerOption(
     LockMode lock_while_running,
     Type default_value, Type min_value, Type max_value
 )
-    : SimpleIntegerCell<Type>(lock_while_running, default_value, min_value, max_value)
+    : ConfigOptionImpl<SimpleIntegerOption<Type>, SimpleIntegerCell<Type>>(
+        lock_while_running,
+        default_value,
+        min_value,
+        max_value
+    )
     , m_label(std::move(label))
 {}
 

@@ -17,6 +17,11 @@
 namespace PokemonAutomation{
 
 
+ConfigUiFactory<FixedCodeOption> FixedCodeOption::m_ui_factory;
+
+
+
+
 struct FixedCodeOption::Data{
     std::string m_label;
     const size_t m_digits;

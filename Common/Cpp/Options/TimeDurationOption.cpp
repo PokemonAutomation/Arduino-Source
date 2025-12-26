@@ -9,7 +9,6 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Qt/Options/TimeDurationWidget.h"
 #include "TimeDurationOption.h"
 
 //#include <iostream>
@@ -17,6 +16,7 @@
 //using std::endl;
 
 namespace PokemonAutomation{
+
 
 
 template <typename Type>
@@ -129,7 +129,7 @@ TimeDurationCell<Type>::TimeDurationCell(
     Type min_value, Type max_value,
     std::string default_value
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<TimeDurationCell<Type>>(lock_while_running)
     , m_data(
         CONSTRUCT_TOKEN,
         std::move(units), show_summary,
@@ -144,7 +144,7 @@ TimeDurationCell<Type>::TimeDurationCell(
     LockMode lock_while_running,
     std::string default_value
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<TimeDurationCell<Type>>(lock_while_running)
     , m_data(
         CONSTRUCT_TOKEN,
         std::move(units), true,
@@ -159,7 +159,7 @@ TimeDurationCell<Type>::TimeDurationCell(
     Type min_value,
     std::string default_value
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<TimeDurationCell<Type>>(lock_while_running)
     , m_data(
         CONSTRUCT_TOKEN,
         std::move(units), true,
@@ -175,7 +175,7 @@ TimeDurationCell<Type>::TimeDurationCell(
     Type min_value, Type max_value,
     std::string default_value
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<TimeDurationCell<Type>>(lock_while_running)
     , m_data(
         CONSTRUCT_TOKEN,
         std::move(units), true,
@@ -232,7 +232,7 @@ std::string TimeDurationCell<Type>::set(std::string text){
         data.m_value = value;
         data.m_error.clear();
     }
-    report_value_changed(this);
+    this->report_value_changed(this);
     return error;
 }
 
@@ -275,7 +275,7 @@ void TimeDurationCell<Type>::load_json(const JsonValue& json){
         data.m_current = *str;
         data.m_error = data.process(data.m_current, data.m_value);
     }
-    report_value_changed(this);
+    this->report_value_changed(this);
 }
 template <typename Type>
 JsonValue TimeDurationCell<Type>::to_json() const{
@@ -298,26 +298,10 @@ void TimeDurationCell<Type>::restore_defaults(){
         data.m_current = data.m_default;
         data.m_error = data.process(data.m_current, data.m_value);
     }
-    report_value_changed(this);
+    this->report_value_changed(this);
 }
 
 
-
-
-
-
-
-
-
-template <typename Type>
-ConfigWidget* TimeDurationCell<Type>::make_QtWidget(QWidget& parent){
-    return new TimeDurationCellWidget<Type>(parent, *this);
-}
-
-template <typename Type>
-ConfigWidget* TimeDurationOption<Type>::make_QtWidget(QWidget& parent){
-    return new TimeDurationOptionWidget<Type>(parent, *this);
-}
 
 
 
@@ -327,7 +311,6 @@ template class TimeDurationCell<std::chrono::milliseconds>;
 template class TimeDurationCell<std::chrono::microseconds>;
 template class TimeDurationOption<std::chrono::milliseconds>;
 template class TimeDurationOption<std::chrono::microseconds>;
-
 
 
 

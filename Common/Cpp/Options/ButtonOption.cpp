@@ -15,6 +15,10 @@
 namespace PokemonAutomation{
 
 
+ConfigUiFactory<ButtonCell> ButtonCell::m_ui_factory;
+ConfigUiFactory<ButtonOption> ButtonOption::m_ui_factory;
+
+
 struct ButtonCell::Data{
     std::atomic<Enabled> m_state;
 
@@ -47,7 +51,7 @@ struct ButtonCell::Data{
 
 ButtonCell::~ButtonCell() = default;
 ButtonCell::ButtonCell(const ButtonCell& x)
-    : ConfigOption(x)
+    : ConfigOptionImpl<ButtonCell>(x)
     , m_data(
         CONSTRUCT_TOKEN,
         x.m_data->m_state,
@@ -61,7 +65,7 @@ ButtonCell::ButtonCell(
     int button_height,
     int text_size
 )
-    : ConfigOption(LockMode::UNLOCK_WHILE_RUNNING)
+    : ConfigOptionImpl<ButtonCell>(LockMode::UNLOCK_WHILE_RUNNING)
     , m_data(CONSTRUCT_TOKEN, ButtonCell::ENABLED, std::move(text), button_height, text_size)
 {}
 ButtonCell::ButtonCell(
@@ -70,7 +74,7 @@ ButtonCell::ButtonCell(
     int button_height,
     int text_size
 )
-    : ConfigOption(LockMode::UNLOCK_WHILE_RUNNING)
+    : ConfigOptionImpl<ButtonCell>(LockMode::UNLOCK_WHILE_RUNNING)
     , m_data(CONSTRUCT_TOKEN, state, std::move(text), button_height, text_size)
 {}
 
@@ -145,7 +149,7 @@ ButtonOption::ButtonOption(
     int button_height,
     int text_size
 )
-    : ButtonCell(std::move(text), button_height, text_size)
+    : ConfigOptionImpl<ButtonOption, ButtonCell>(std::move(text), button_height, text_size)
     , m_data(CONSTRUCT_TOKEN, std::move(label))
 {}
 ButtonOption::ButtonOption(
@@ -155,7 +159,7 @@ ButtonOption::ButtonOption(
     int button_height,
     int text_size
 )
-    : ButtonCell(state, std::move(text), button_height, text_size)
+    : ConfigOptionImpl<ButtonOption, ButtonCell>(state, std::move(text), button_height, text_size)
     , m_data(CONSTRUCT_TOKEN, std::move(label))
 {}
 

@@ -19,6 +19,11 @@
 namespace PokemonAutomation{
 
 
+ConfigUiFactory<StaticTableOption> StaticTableOption::m_ui_factory;
+
+
+
+
 StaticTableRow::StaticTableRow(std::string slug)
     : m_slug(std::move(slug))
 {}
@@ -217,7 +222,7 @@ StaticTableOption::StaticTableOption(
     LockMode lock_while_program_is_running,
     bool enable_saveload
 )
-    : ConfigOption(lock_while_program_is_running)
+    : ConfigOptionImpl<StaticTableOption>(lock_while_program_is_running)
     , m_data(CONSTRUCT_TOKEN, std::move(label), enable_saveload)
 {}
 void StaticTableOption::add_row(std::unique_ptr<StaticTableRow> row){

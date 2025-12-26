@@ -128,23 +128,24 @@ LabelImages_Widget::LabelImages_Widget(
     // add GPU checkbox row
     QHBoxLayout* use_gpu_row = new QHBoxLayout();
     scroll_layout->addLayout(use_gpu_row);
-    ConfigWidget* gpu_checkbox_widget = program.USE_GPU_FOR_EMBEDDER_SESSION.make_QtWidget(*scroll_inner);
+
+    ConfigWidget* gpu_checkbox_widget = ConfigWidget::make_from_option(program.USE_GPU_FOR_EMBEDDER_SESSION, scroll_inner);
     use_gpu_row->addWidget(&gpu_checkbox_widget->widget(), 2);    
 
     // add Color selection dropdown
     QHBoxLayout* selected_color_choice_row = new QHBoxLayout();
     scroll_layout->addLayout(selected_color_choice_row);
-    ConfigWidget* selected_color_choice_widget = program.SELECTED_ANNO_COLOR.make_QtWidget(*scroll_inner);
+    ConfigWidget* selected_color_choice_widget = ConfigWidget::make_from_option(program.SELECTED_ANNO_COLOR, scroll_inner);
     selected_color_choice_row->addWidget(&selected_color_choice_widget->widget(), 2); 
 
     QHBoxLayout* unselected_color_choice_row = new QHBoxLayout();
     scroll_layout->addLayout(unselected_color_choice_row);
-    ConfigWidget* unselected_color_choice_widget = program.UNSELECTED_ANNO_COLOR.make_QtWidget(*scroll_inner);
+    ConfigWidget* unselected_color_choice_widget = ConfigWidget::make_from_option(program.UNSELECTED_ANNO_COLOR, scroll_inner);
     unselected_color_choice_row->addWidget(&unselected_color_choice_widget->widget(), 2); 
 
     QHBoxLayout* current_drawn_box_row = new QHBoxLayout();
     scroll_layout->addLayout(current_drawn_box_row);
-    ConfigWidget* current_drawn_box_widget = program.CURRENT_DRAWN_BOX.make_QtWidget(*scroll_inner);
+    ConfigWidget* current_drawn_box_widget = ConfigWidget::make_from_option(program.CURRENT_DRAWN_BOX, scroll_inner);
     current_drawn_box_row->addWidget(&current_drawn_box_widget->widget(), 2); 
 
     // add compute embedding button

@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 
 
-class LabelCellOption : public ConfigOption{
+class LabelCellOption : public ConfigOptionImpl<LabelCellOption>{
 public:
     ~LabelCellOption();
 
@@ -50,7 +50,6 @@ public:
 
     virtual void restore_defaults() override{}
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     struct Data;

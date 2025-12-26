@@ -16,13 +16,9 @@
 namespace PokemonAutomation{
 
 
-ConfigWidget* StringCell::make_QtWidget(QWidget& parent){
-    return new StringCellWidget(parent, *this);
-}
+template class RegisterConfigWidget<StringCellWidget>;
+template class RegisterConfigWidget<StringOptionWidget>;
 
-ConfigWidget* StringOption::make_QtWidget(QWidget& parent){
-    return new StringOptionWidget(parent, *this);
-}
 
 
 

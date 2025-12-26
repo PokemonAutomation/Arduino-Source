@@ -57,7 +57,7 @@ private:
 
 
 //  This is the table itself.
-class StaticTableOption : public ConfigOption{
+class StaticTableOption : public ConfigOptionImpl<StaticTableOption>{
 public:
     ~StaticTableOption();
     StaticTableOption(
@@ -91,8 +91,6 @@ public:
     bool saveload_enabled() const;
     virtual std::vector<std::string> make_header() const = 0;
 
-public:
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     struct Data;
@@ -100,16 +98,6 @@ private:
 };
 
 
-#if 0
-//  Convenience helper class that's type-aware.
-template <typename RowType>
-class StaticTableOption_t : public StaticTableOption{
-public:
-    using StaticTableOption::StaticTableOption;
-
-
-};
-#endif
 
 
 

@@ -17,13 +17,8 @@
 namespace PokemonAutomation{
 
 
-
-ConfigWidget* FloatingPointCell::make_QtWidget(QWidget& parent){
-    return new FloatingPointCellWidget(parent, *this, true);
-}
-ConfigWidget* FloatingPointOption::make_QtWidget(QWidget& parent){
-    return new FloatingPointOptionWidget(parent, *this);
-}
+template class RegisterConfigWidget<FloatingPointCellWidget>;
+template class RegisterConfigWidget<FloatingPointOptionWidget>;
 
 
 
