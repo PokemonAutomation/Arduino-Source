@@ -282,7 +282,7 @@ void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& c
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
             },
             5,
-            100,
+            800ms,
             0, 128
         );
 
@@ -435,7 +435,7 @@ void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& c
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
             },
             5,
-            100,
+            800ms,
             0, 128
         );
 

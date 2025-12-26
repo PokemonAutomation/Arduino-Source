@@ -117,10 +117,12 @@ void map_move_cursor_fly(
     const ProgramInfo& info,
     VideoStream& stream, ProControllerContext& context,
     uint8_t x, uint8_t y,
-    uint8_t hold, uint8_t release,
+    uint8_t hold_ticks, uint8_t release_ticks,
     std::string location
 ){
     stream.log("Attempting to fly to " + location + ".");
+    Milliseconds hold = hold_ticks * 8ms;
+    Milliseconds release = release_ticks * 8ms;
 
     for (int i = 0; i < 3; i++){
         try{

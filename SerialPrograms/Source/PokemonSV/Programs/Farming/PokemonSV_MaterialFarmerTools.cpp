@@ -672,8 +672,9 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, VideoStream&
 
         // move cursor to Blueberry academy fast travel point (up-left)
         // try different magnitudes of cursor push with each failure.
-        int push_magnitude = 105 + adjustment_table[numAttempts];
-        pbf_move_left_joystick_old(context, 64, 64, (uint16_t)push_magnitude, 50);
+        int push_magnitude_ticks = 105 + adjustment_table[numAttempts];
+        Milliseconds push_magnitude = push_magnitude_ticks * 8ms;
+        pbf_move_left_joystick_old(context, 64, 64, push_magnitude, 400ms);
 
         // press A to fly to Blueberry academy
         isFlySuccessful = fly_to_overworld_from_map(info, stream, context, true);
@@ -854,8 +855,9 @@ void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, VideoStream
 
         // move cursor up-left
         // try different magnitudes of cursor push with each failure.
-        int push_magnitude = 168 + adjustment_table[numAttempts];
-        pbf_move_left_joystick_old(context, 112, 0, (uint16_t)push_magnitude, 50);
+        int push_magnitude_ticks = 168 + adjustment_table[numAttempts];
+        Milliseconds push_magnitude = push_magnitude_ticks * 8ms;
+        pbf_move_left_joystick_old(context, 112, 0, push_magnitude, 400ms);
 
         // press A to fly to North province area 3
         isFlySuccessful = fly_to_overworld_from_map(info, stream, context, true);
