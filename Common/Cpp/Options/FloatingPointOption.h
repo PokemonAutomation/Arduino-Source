@@ -14,7 +14,7 @@
 namespace PokemonAutomation{
 
 
-class FloatingPointCell : public ConfigOption{
+class FloatingPointCell : public ConfigOptionImpl<FloatingPointCell>{
 public:
     ~FloatingPointCell();
     FloatingPointCell(const FloatingPointCell& x);
@@ -47,7 +47,6 @@ public:
     virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     struct Data;
@@ -55,7 +54,7 @@ private:
 };
 
 
-class FloatingPointOption : public FloatingPointCell{
+class FloatingPointOption : public ConfigOptionImpl<FloatingPointOption, FloatingPointCell>{
 public:
     FloatingPointOption(const FloatingPointOption& x) = delete;
 
@@ -69,7 +68,6 @@ public:
 
     const std::string& label() const{ return m_label; }
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     const std::string m_label;

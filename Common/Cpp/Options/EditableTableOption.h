@@ -70,7 +70,7 @@ private:
 
 
 //  This is the table itself.
-class EditableTableOption : public ConfigOption{
+class EditableTableOption : public ConfigOptionImpl<EditableTableOption>{
 public:
     EditableTableOption(
         std::string label,
@@ -84,6 +84,7 @@ public:
         std::vector<std::unique_ptr<EditableTableRow>> default_value = {}
     );
     void set_default(std::vector<std::unique_ptr<EditableTableRow>> default_value);
+
 
 public:
     const std::string& label() const{ return m_label; }
@@ -157,6 +158,7 @@ public:
     virtual std::string check_validity() const override;
     virtual void restore_defaults() override final;
 
+
 public:
     bool saveload_enabled() const{ return m_enable_saveload; }
     virtual std::vector<std::string> make_header() const = 0;
@@ -168,8 +170,6 @@ public:
     void clone_row(const EditableTableRow& row);
     void remove_row(EditableTableRow& row);
 
-public:
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     const std::string m_label;

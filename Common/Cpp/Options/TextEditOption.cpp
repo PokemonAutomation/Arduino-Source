@@ -13,6 +13,7 @@
 namespace PokemonAutomation{
 
 
+
 struct TextEditOption::Data{
     const std::string m_label;
     const std::string m_default;
@@ -63,7 +64,7 @@ TextEditOption::TextEditOption(
     std::string placeholder_text,
     bool signal_all_text_changes
 )
-    : ConfigOption(lock_while_program_is_running)
+    : ConfigOptionImpl<TextEditOption>(lock_while_program_is_running)
     , m_data(CONSTRUCT_TOKEN, std::move(label), std::move(default_value), std::move(placeholder_text), signal_all_text_changes)
 {}
 #if 0

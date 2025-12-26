@@ -13,7 +13,7 @@
 namespace PokemonAutomation{
 
 
-class PathCell : public ConfigOption{
+class PathCell : public ConfigOptionImpl<PathCell>{
 public:
     ~PathCell();
     PathCell(
@@ -39,10 +39,10 @@ public:
 
     virtual void restore_defaults() override;
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 protected:
     virtual void sanitize(std::string& str){}
+
 
 private:
     struct Data;
@@ -50,7 +50,7 @@ private:
 };
 
 
-class PathOption : public PathCell{
+class PathOption : public ConfigOptionImpl<PathOption, PathCell>{
 public:
     PathOption(
         std::string label,
@@ -62,7 +62,6 @@ public:
 
     const std::string& label() const{ return m_label; }
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     const std::string m_label;

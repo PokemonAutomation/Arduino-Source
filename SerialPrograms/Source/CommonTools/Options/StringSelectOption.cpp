@@ -196,7 +196,7 @@ StringSelectCell::StringSelectCell(
     LockMode lock_while_running,
     size_t default_index
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<StringSelectCell>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, database, default_index)
 {}
 StringSelectCell::StringSelectCell(
@@ -204,7 +204,7 @@ StringSelectCell::StringSelectCell(
     LockMode lock_while_running,
     const std::string& default_slug
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<StringSelectCell>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, database, default_slug)
 {}
 

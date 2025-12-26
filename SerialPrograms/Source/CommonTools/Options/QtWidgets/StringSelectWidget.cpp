@@ -13,20 +13,15 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "StringSelectWidget.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
 
-
-ConfigWidget* StringSelectCell::make_QtWidget(QWidget& parent){
-    return new StringSelectCellWidget(parent, *this);
-}
-ConfigWidget* StringSelectOption::make_QtWidget(QWidget& parent){
-    return new StringSelectOptionWidget(parent, *this);
-}
+template class RegisterConfigWidget<StringSelectCellWidget>;
+template class RegisterConfigWidget<StringSelectOptionWidget>;
 
 
 

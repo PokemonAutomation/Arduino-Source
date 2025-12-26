@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/Json/JsonValue.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh_DateToucher.h"
@@ -27,7 +26,7 @@ TimeRollbackHoursOption::TimeRollbackHoursOption()
 
 
 TouchDateIntervalOption::TouchDateIntervalOption()
-    : m_hours(
+    : SimpleIntegerOption<uint8_t>(
         "<b>Rollover Prevention:</b><br>Prevent a date-skip by touching the date every this many hours. If set to zero, this feature is disabled.",
         LockMode::LOCK_WHILE_RUNNING,
         4, 0, 11
@@ -37,29 +36,14 @@ TouchDateIntervalOption::TouchDateIntervalOption()
 }
 
 
-void TouchDateIntervalOption::load_json(const JsonValue& json){
-    m_hours.load_json(json);
-}
-JsonValue TouchDateIntervalOption::to_json() const{
-    return m_hours.to_json();
-}
-std::string TouchDateIntervalOption::check_validity() const{
-    return m_hours.check_validity();
-}
-void TouchDateIntervalOption::restore_defaults(){
-    m_hours.restore_defaults();
-}
 void TouchDateIntervalOption::reset_state(){
     WriteSpinLock lg(m_lock);
     m_last_touch = WallClock::min();
 }
-ConfigWidget* TouchDateIntervalOption::make_QtWidget(QWidget& parent){
-    return m_hours.make_QtWidget(parent);
-}
 
 
 bool TouchDateIntervalOption::ok_to_touch_now(){
-    uint8_t hours = m_hours;
+    uint8_t hours = *this;
     if (hours == 0){
         return false;
     }

@@ -29,7 +29,7 @@ struct BatchOption::Data{
 
 BatchOption::~BatchOption() = default;
 BatchOption::BatchOption(LockMode lock_while_program_is_running, bool horizontal)
-    : ConfigOption(lock_while_program_is_running)
+    : ConfigOptionImpl<BatchOption>(lock_while_program_is_running)
     , m_data(CONSTRUCT_TOKEN, horizontal)
 {}
 void BatchOption::add_option(ConfigOption& option, std::string serialization_string){

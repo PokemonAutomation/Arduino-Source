@@ -19,7 +19,7 @@ template <typename FlagEnum>
 class CheckboxDropdownDatabase;
 
 
-class CheckboxDropdownBase : public ConfigOption{
+class CheckboxDropdownBase : public ConfigOptionImpl<CheckboxDropdownBase>{
 public:
     CheckboxDropdownBase(std::string label)
         : m_label(std::move(label))
@@ -34,7 +34,6 @@ public:
     virtual void clear_index(size_t index) = 0;
     virtual void toggle_index(size_t index) = 0;
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 protected:
     std::string m_label;

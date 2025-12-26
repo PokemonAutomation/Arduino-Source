@@ -18,7 +18,6 @@ namespace Integration{
 
 
 
-
 DiscordMessageSettingsOption::DiscordMessageSettingsOption()
     : BatchOption(LockMode::LOCK_WHILE_RUNNING)
     , instance_name(
@@ -49,16 +48,8 @@ DiscordMessageSettingsOption::DiscordMessageSettingsOption()
 //        PA_ADD_OPTION(message);
 //    }
 }
-class DiscordMessageSettingsOptionUI : public BatchWidget{
-public:
-    DiscordMessageSettingsOptionUI(QWidget& parent, DiscordMessageSettingsOption& value);
-};
-DiscordMessageSettingsOptionUI::DiscordMessageSettingsOptionUI(QWidget& parent, DiscordMessageSettingsOption& value)
-    : BatchWidget(parent, value)
-{}
-ConfigWidget* DiscordMessageSettingsOption::make_QtWidget(QWidget& parent){
-    return new DiscordMessageSettingsOptionUI(parent, *this);
-}
+
+
 
 
 

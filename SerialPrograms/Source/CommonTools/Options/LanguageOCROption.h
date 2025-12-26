@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 namespace OCR{
 
 
-class LanguageOCRCell : public ConfigOption{
+class LanguageOCRCell : public ConfigOptionImpl<LanguageOCRCell>{
 public:
     LanguageOCRCell(
         const LanguageSet& languages,
@@ -37,8 +37,6 @@ public:
     virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
-
 private:
     friend class LanguageOCRCellWidget;
 
@@ -52,7 +50,7 @@ private:
 
 
 
-class LanguageOCROption : public LanguageOCRCell{
+class LanguageOCROption : public ConfigOptionImpl<LanguageOCROption, LanguageOCRCell>{
 public:
     LanguageOCROption(
         std::string label,
@@ -62,8 +60,6 @@ public:
     );
 
     const std::string& label() const{ return m_label; }
-
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     friend class LanguageOCROptionWidget;

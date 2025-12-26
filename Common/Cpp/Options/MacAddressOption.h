@@ -19,7 +19,7 @@ std::string write_MAC_address(size_t length, const uint8_t* address);
 void parse_MAC_address(size_t length, uint8_t* address, const std::string& str);
 
 
-class MacAddressCell : public ConfigOption{
+class MacAddressCell : public ConfigOptionImpl<MacAddressCell>{
 public:
     ~MacAddressCell();
     MacAddressCell(const MacAddressCell& x);
@@ -29,6 +29,7 @@ public:
         size_t bytes,
         uint8_t* current_value
     );
+
 
 public:
     size_t bytes() const;
@@ -45,8 +46,6 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
-public:
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 protected:
     struct Data;

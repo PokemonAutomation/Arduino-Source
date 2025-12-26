@@ -24,7 +24,7 @@ LanguageOCRCell::LanguageOCRCell(
     LockMode lock_while_running,
     bool required
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<LanguageOCRCell>(lock_while_running)
     , m_default(0)
     , m_current(0)
 {
@@ -120,7 +120,11 @@ LanguageOCROption::LanguageOCROption(
     LockMode lock_while_running,
     bool required
 )
-    : LanguageOCRCell(languages, lock_while_running, required)
+    : ConfigOptionImpl<LanguageOCROption, LanguageOCRCell>(
+        languages,
+        lock_while_running,
+        required
+    )
     , m_label(std::move(label))
 {}
 

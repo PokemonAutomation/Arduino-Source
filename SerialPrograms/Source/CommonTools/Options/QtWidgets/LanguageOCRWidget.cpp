@@ -18,16 +18,11 @@
 //using std::endl;
 
 namespace PokemonAutomation{
+
+template class RegisterConfigWidget<OCR::LanguageOCRCellWidget>;
+template class RegisterConfigWidget<OCR::LanguageOCROptionWidget>;
+
 namespace OCR{
-
-
-
-ConfigWidget* LanguageOCRCell::make_QtWidget(QWidget& parent){
-    return new LanguageOCRCellWidget(parent, *this);
-}
-ConfigWidget* LanguageOCROption::make_QtWidget(QWidget& parent){
-    return new LanguageOCROptionWidget(parent, *this);
-}
 
 
 

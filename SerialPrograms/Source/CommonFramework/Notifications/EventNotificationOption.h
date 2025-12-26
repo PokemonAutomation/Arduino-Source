@@ -20,10 +20,9 @@ namespace PokemonAutomation{
 class EventNotificationOption;
 
 
-class TestMessageButton : public ConfigOption{
+class TestMessageButton : public ConfigOptionImpl<TestMessageButton>{
 public:
     TestMessageButton(EventNotificationOption& p_option);
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
     EventNotificationOption& option;
 };

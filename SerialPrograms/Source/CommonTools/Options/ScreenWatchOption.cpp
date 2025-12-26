@@ -29,7 +29,10 @@ ScreenWatchOption::ScreenWatchOption(
     double default_x, double default_y,
     double default_width, double default_height
 )
-    : GroupOption(std::move(label), LockMode::UNLOCK_WHILE_RUNNING)
+    : GroupOption(
+        std::move(label),
+        LockMode::UNLOCK_WHILE_RUNNING
+    )
     , MONITOR_INDEX(
         "<b>Monitor Index:</b> For multi-monitor setups, this lets you choose which monitor to watch.",
         LockMode::UNLOCK_WHILE_RUNNING,

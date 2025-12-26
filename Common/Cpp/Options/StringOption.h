@@ -13,7 +13,7 @@
 namespace PokemonAutomation{
 
 
-class StringCell : public ConfigOption{
+class StringCell : public ConfigOptionImpl<StringCell>{
 public:
     ~StringCell();
     StringCell(
@@ -40,10 +40,10 @@ public:
 
     virtual void restore_defaults() override;
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 protected:
     virtual void sanitize(std::string& str){}
+
 
 private:
     struct Data;
@@ -51,7 +51,7 @@ private:
 };
 
 
-class StringOption : public StringCell{
+class StringOption : public ConfigOptionImpl<StringOption, StringCell>{
 public:
     StringOption(
         bool is_password,
@@ -64,7 +64,6 @@ public:
 
     const std::string& label() const{ return m_label; }
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     const std::string m_label;

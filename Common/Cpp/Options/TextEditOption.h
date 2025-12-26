@@ -13,7 +13,7 @@
 namespace PokemonAutomation{
 
 
-class TextEditOption : public ConfigOption{
+class TextEditOption : public ConfigOptionImpl<TextEditOption>{
 public:
     //  Listeners for when the user focuses on this box.
     struct FocusListener{
@@ -47,7 +47,6 @@ public:
 
     virtual void restore_defaults() override;
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     struct Data;

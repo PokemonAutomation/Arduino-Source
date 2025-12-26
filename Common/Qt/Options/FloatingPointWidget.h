@@ -20,7 +20,7 @@ public:
 
 public:
     ~FloatingPointCellWidget();
-    FloatingPointCellWidget(QWidget& parent, FloatingPointCell& value, bool sanitize);
+    FloatingPointCellWidget(QWidget& parent, FloatingPointCell& value, bool sanitize = true);
 
     virtual void update_value() override;
     virtual void on_config_value_changed(void* object) override;

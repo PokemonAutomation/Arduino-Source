@@ -9,54 +9,17 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/LabelCellOption.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "EventNotificationOption.h"
 
-#include <QFont>
-#include <QPushButton>
-#include "Common/Qt/Options/ConfigWidget.h"
-
 namespace PokemonAutomation{
 
 
-class TestButtonWidget : public ConfigWidget{
-public:
-    TestButtonWidget(QWidget& parent, TestMessageButton& value)
-        : ConfigWidget(value)
-    {
-        QPushButton* button = new QPushButton(&parent);
-        m_widget = button;
-
-        QFont font;
-        font.setBold(true);
-        button->setFont(font);
-        button->setText("Send Test Message");
-
-        button->connect(
-            button, &QPushButton::clicked,
-            button, [&](bool){
-                send_raw_program_notification(
-                    global_logger_tagged(), value.option,
-                    COLOR_GREEN,
-                    ProgramInfo("Test Message"),
-                    "Notification Test",
-                    {
-                        {"Event Type:", value.option.label()},
-                    }
-                );
-            }
-        );
-    }
-};
 TestMessageButton::TestMessageButton(EventNotificationOption& p_option)
-    : ConfigOption(LockMode::UNLOCK_WHILE_RUNNING)
+    : ConfigOptionImpl<TestMessageButton>(LockMode::UNLOCK_WHILE_RUNNING)
     , option(p_option)
 {}
-ConfigWidget* TestMessageButton::make_QtWidget(QWidget& parent){
-    return new TestButtonWidget(parent, *this);
-}
 
 
 

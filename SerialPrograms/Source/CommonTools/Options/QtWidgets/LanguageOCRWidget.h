@@ -20,6 +20,9 @@ namespace OCR{
 
 class LanguageOCRCellWidget : public QWidget, public ConfigWidget{
 public:
+    using ParentOption = LanguageOCRCell;
+
+public:
     LanguageOCRCellWidget(QWidget& parent, LanguageOCRCell& value);
 
     virtual void update_value() override;
@@ -36,6 +39,9 @@ private:
 
 
 class LanguageOCROptionWidget : public QWidget, public ConfigWidget{
+public:
+    using ParentOption = LanguageOCROption;
+
 public:
     ~LanguageOCROptionWidget();
     LanguageOCROptionWidget(QWidget& parent, LanguageOCROption& value);

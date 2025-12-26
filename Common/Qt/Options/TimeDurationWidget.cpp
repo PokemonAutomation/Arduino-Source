@@ -164,6 +164,11 @@ template class TimeDurationOptionWidget<std::chrono::milliseconds>;
 template class TimeDurationOptionWidget<std::chrono::microseconds>;
 
 
+template class RegisterConfigWidget<TimeDurationCellWidget<std::chrono::milliseconds>>;
+template class RegisterConfigWidget<TimeDurationCellWidget<std::chrono::microseconds>>;
+template class RegisterConfigWidget<TimeDurationOptionWidget<std::chrono::milliseconds>>;
+template class RegisterConfigWidget<TimeDurationOptionWidget<std::chrono::microseconds>>;
+
 
 
 }

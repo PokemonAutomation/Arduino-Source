@@ -9,9 +9,7 @@
 namespace PokemonAutomation{
 
 
-ConfigWidget* CheckboxDropdownBase::make_QtWidget(QWidget& parent){
-    return new CheckboxDropdownCellWidget(parent, *this);
-}
+template class RegisterConfigWidget<CheckboxDropdownCellWidget>;
 
 
 

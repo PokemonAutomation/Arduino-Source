@@ -15,6 +15,10 @@
 namespace PokemonAutomation{
 
 
+template class RegisterConfigWidget<MacAddressCellWidget>;
+
+
+
 MacAddressCellWidget::~MacAddressCellWidget(){
     m_value.remove_listener(*this);
 }
