@@ -4,6 +4,7 @@
  *
  */
 
+#include <string.h>
 #include <mutex>
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Json/JsonValue.h"
