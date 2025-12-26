@@ -376,8 +376,7 @@ AutoStory_Descriptor::AutoStory_Descriptor()
         "Progress through the mainstory of SV.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

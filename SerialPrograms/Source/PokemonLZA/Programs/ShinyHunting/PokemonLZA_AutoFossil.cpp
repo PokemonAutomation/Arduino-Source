@@ -51,8 +51,7 @@ AutoFossil_Descriptor::AutoFossil_Descriptor()
         "Automatically revive fossils.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

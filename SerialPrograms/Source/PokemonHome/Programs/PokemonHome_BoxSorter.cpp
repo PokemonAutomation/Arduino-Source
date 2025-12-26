@@ -68,8 +68,7 @@ BoxSorter_Descriptor::BoxSorter_Descriptor()
         "Order boxes of " + STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct BoxSorter_Descriptor::Stats : public StatsTracker{

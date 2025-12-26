@@ -29,8 +29,7 @@ AudioStarterReset_Descriptor::AudioStarterReset_Descriptor()
         "Soft reset for a shiny starter. Ruby and Sapphire only.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

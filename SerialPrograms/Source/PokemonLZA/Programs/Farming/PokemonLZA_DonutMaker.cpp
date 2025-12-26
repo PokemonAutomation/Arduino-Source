@@ -39,8 +39,9 @@ DonutMaker_Descriptor::DonutMaker_Descriptor()
         "Donut Maker",
         "Programs/PokemonLZA/DonutMaker.html",
         "TODO: Add description",
-        ProgramControllerClass::StandardController_NoRestrictions, FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS, {}
+        ProgramControllerClass::StandardController_NoRestrictions,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

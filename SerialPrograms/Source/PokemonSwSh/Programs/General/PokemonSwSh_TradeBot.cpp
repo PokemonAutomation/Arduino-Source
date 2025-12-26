@@ -30,8 +30,7 @@ TradeBot_Descriptor::TradeBot_Descriptor()
         "Surprise trade with a code for hosting giveaways.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

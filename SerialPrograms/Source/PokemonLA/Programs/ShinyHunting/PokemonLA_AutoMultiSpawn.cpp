@@ -207,8 +207,7 @@ AutoMultiSpawn_Descriptor::AutoMultiSpawn_Descriptor()
         "Advance a path in MultiSpawn shiny hunting method.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

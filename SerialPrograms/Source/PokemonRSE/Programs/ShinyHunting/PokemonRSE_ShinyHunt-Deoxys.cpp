@@ -31,8 +31,7 @@ ShinyHuntDeoxys_Descriptor::ShinyHuntDeoxys_Descriptor()
         "Use the Run Away method to shiny hunt Deoxys in Emerald.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

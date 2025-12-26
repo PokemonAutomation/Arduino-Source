@@ -24,8 +24,7 @@ ParaglideItemDuper_Descriptor::ParaglideItemDuper_Descriptor()
         "Use the Paraglide Menu Sort glitch to duplicate items.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

@@ -25,8 +25,7 @@ BowItemDuper_Descriptor::BowItemDuper_Descriptor()
         "Use the Bow Swap Glitch to farm any fusable items.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

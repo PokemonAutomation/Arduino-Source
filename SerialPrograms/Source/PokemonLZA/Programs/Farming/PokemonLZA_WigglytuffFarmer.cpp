@@ -34,8 +34,7 @@ WigglytuffFarmer_Descriptor::WigglytuffFarmer_Descriptor()
         "Farm the Side Mission 157 (DLC) for money.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class WigglytuffFarmer_Descriptor::Stats : public StatsTracker{

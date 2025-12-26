@@ -73,7 +73,7 @@ ShinyHunt_WildZoneEntrance_Descriptor::ShinyHunt_WildZoneEntrance_Descriptor()
         "Programs/PokemonLZA/ShinyHunt-WildZoneEntrance.html",
         "Shiny hunt by repeatedly entering Wild Zone from its entrance.",
         ProgramControllerClass::StandardController_NoRestrictions, FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS, {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class ShinyHunt_WildZoneEntrance_Descriptor::Stats : public StatsTracker{

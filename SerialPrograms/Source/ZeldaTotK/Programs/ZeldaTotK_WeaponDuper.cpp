@@ -23,8 +23,7 @@ WeaponDuper_Descriptor::WeaponDuper_Descriptor()
         "Use a glitch to duplicate your weapons (Bows, Shields and Swords)",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

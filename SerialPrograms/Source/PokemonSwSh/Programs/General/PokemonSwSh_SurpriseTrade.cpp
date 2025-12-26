@@ -28,8 +28,7 @@ SurpriseTrade_Descriptor::SurpriseTrade_Descriptor()
         "Surprise trade away boxes of " + STRING_POKEMON,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

@@ -31,8 +31,7 @@ LegendaryHuntEmerald_Descriptor::LegendaryHuntEmerald_Descriptor()
         "Use the Run Away method to shiny hunt legendaries in Emerald.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

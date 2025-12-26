@@ -31,8 +31,7 @@ MegaShardFarmer_Descriptor::MegaShardFarmer_Descriptor()
         "Farm the mega shards behind Restaurant Le Yeah.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class MegaShardFarmer_Descriptor::Stats : public StatsTracker{

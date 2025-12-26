@@ -67,8 +67,7 @@ JacintheInfiniteFarmer_Descriptor::JacintheInfiniteFarmer_Descriptor()
         "Farm Jacinthe Infinite for exp and money.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class JacintheInfiniteFarmer_Descriptor::Stats : public StatsTracker{

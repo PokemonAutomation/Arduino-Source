@@ -37,8 +37,7 @@ ShinyHunt_BenchSit_Descriptor::ShinyHunt_BenchSit_Descriptor()
         "Shiny hunt by repeatedly sitting on a bench to reset spawns.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class ShinyHunt_BenchSit_Descriptor::Stats : public StatsTracker{

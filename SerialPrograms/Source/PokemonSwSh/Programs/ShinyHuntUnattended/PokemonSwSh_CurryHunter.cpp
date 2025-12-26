@@ -31,8 +31,7 @@ CurryHunter_Descriptor::CurryHunter_Descriptor()
         "<font color=\"red\">(This program cannot detect shinies. You must check manually or with " + STRING_POKEMON + " HOME.)</font>",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::OPTIONAL_,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct CurryHunter_Descriptor::Stats : public ShinyHuntTracker{

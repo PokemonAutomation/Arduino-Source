@@ -31,8 +31,7 @@ ShinyHuntMew_Descriptor::ShinyHuntMew_Descriptor()
         "Use the Run Away method to shiny hunt Mew in Emerald.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

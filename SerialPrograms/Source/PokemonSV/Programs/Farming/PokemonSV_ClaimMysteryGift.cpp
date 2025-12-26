@@ -49,8 +49,7 @@ ClaimMysteryGift_Descriptor::ClaimMysteryGift_Descriptor()
         "Claim the Mystery Gift in SV.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

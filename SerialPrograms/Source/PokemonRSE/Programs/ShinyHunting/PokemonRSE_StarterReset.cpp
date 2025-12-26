@@ -31,8 +31,7 @@ StarterReset_Descriptor::StarterReset_Descriptor()
         "Soft reset for a shiny starter. Ruby and Sapphire only.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 
