@@ -91,7 +91,7 @@ void checkpoint_90(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // Fly to Academy
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 230, 640ms}, FlyPoint::FAST_TRAVEL);
 
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 255, 100);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 255, 800ms);
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -228,7 +228,7 @@ void checkpoint_92(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // wait for overworld after building
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 190, 50);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 190, 400ms);
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 
             128, 0, 30, 30, false);

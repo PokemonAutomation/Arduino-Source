@@ -92,7 +92,7 @@ void checkpoint_12(
                 walk_forward_while_clear_front_path(env.program_info(), env.console, context, 280ms);
 
                 // place the marker elsewhere
-                realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 128, 50);
+                realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 128, 400ms);
 
                 DirectionDetector direction;
                 direction.change_direction(info, env.console, context, 0);

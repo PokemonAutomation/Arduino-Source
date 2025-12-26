@@ -80,12 +80,12 @@ void checkpoint_11(
         context.wait_for_all_requests();
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                realign_player(info, stream, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 210, 100);
+                realign_player(info, stream, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 210, 800ms);
                 pbf_move_left_joystick(context, {0, +1}, 1496ms, 160ms);
                 pbf_move_left_joystick(context, {-1, 0}, 240ms, 8000ms);
                 pbf_move_left_joystick(context, {0, +1}, 1000ms, 2000ms);
 
-                realign_player(info, stream, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 60, 200);
+                realign_player(info, stream, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 60, 1600ms);
             }
         );     
 

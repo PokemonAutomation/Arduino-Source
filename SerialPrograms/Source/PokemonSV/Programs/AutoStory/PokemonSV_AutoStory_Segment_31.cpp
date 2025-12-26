@@ -351,7 +351,7 @@ void beat_team_star_fighting1(SingleSwitchProgramEnvironment& env, ProController
     }
 
     // marker 1
-    realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 190, 30);
+    realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 190, 240ms);
 
     handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -396,7 +396,7 @@ void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProController
     context.wait_for_all_requests();
     do_action_and_monitor_for_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 220, 255, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 220, 255, 400ms);
             walk_forward_while_clear_front_path(env.program_info(), env.console, context, 800ms);
             walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A);
         }
@@ -611,7 +611,7 @@ void move_from_fighting_base_to_north_province_area_two(SingleSwitchProgramEnvir
     // marker 2. set marker past pokecenter
     handle_unexpected_battles(env.program_info(), env.console, context,
     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 60, 50);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 60, 400ms);
     });      
     overworld_navigation(env.program_info(), env.console, context, 
         NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -633,7 +633,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
     do_action_and_monitor_for_battles(env.program_info(), env.console, context,
     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
         // marker 1
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 140, 255, 30);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 140, 255, 240ms);
         direction.change_direction(env.program_info(), env.console, context, 4.047990);
         pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
@@ -819,7 +819,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
     // marker 9. set marker past pokecenter
     handle_unexpected_battles(env.program_info(), env.console, context,
     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 120, 255, 50);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 120, 255, 400ms);
     });      
     overworld_navigation(env.program_info(), env.console, context, 
         NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 

@@ -225,7 +225,7 @@ void checkpoint_74(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
 
         // remove old marker, then place new one
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 50);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 400ms);
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
                 {ZoomChange::KEEP_ZOOM, 128, 255, 280ms},
                 FlyPoint::POKECENTER, 
@@ -448,7 +448,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
     // marker 11. set marker past pokecenter
     handle_unexpected_battles(env.program_info(), env.console, context,
     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 210, 0, 50);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 210, 0, 400ms);
     });      
     overworld_navigation(env.program_info(), env.console, context, 
         NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 

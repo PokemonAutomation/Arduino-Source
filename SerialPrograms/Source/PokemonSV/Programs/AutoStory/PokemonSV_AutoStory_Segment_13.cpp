@@ -84,7 +84,7 @@ void checkpoint_29(
         }
 
         // align for long stretch 1, part 1
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 70, 0, 60);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 70, 0, 480ms);
 
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
@@ -434,7 +434,7 @@ void checkpoint_29(
         // align for post-bridge section 6. set marker past pokecenter
         handle_unexpected_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 200, 30);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 200, 240ms);
         });
                 // realign_player_from_landmark(
                 //     env.program_info(), env.console, context, 

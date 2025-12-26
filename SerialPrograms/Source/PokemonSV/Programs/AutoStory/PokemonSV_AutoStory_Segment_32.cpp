@@ -103,7 +103,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 1200ms});
         }
         
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 140, 70);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 140, 560ms);
 
         direction.change_direction(env.program_info(), env.console, context, 3.104878);
         pbf_move_left_joystick(context, {0, +1}, 4160ms, 400ms);

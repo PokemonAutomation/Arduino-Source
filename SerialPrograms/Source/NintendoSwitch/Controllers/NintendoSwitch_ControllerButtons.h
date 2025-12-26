@@ -14,11 +14,6 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-//  Legacy tick type. This comes from the refresh rate of the wired controller.
-//  One second = 125 ticks. Thus each tick is 8 milliseconds.
-constexpr uint16_t TICKS_PER_SECOND = 125;
-
-
 //  Buttons
 constexpr size_t TOTAL_BUTTONS = 25;
 using ButtonFlagType = uint32_t;

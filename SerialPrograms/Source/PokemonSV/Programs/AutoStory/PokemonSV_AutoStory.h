@@ -12,6 +12,7 @@
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/StringOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/StringSelectOption.h"
 #include "CommonTools/Options/LanguageOCROption.h"
@@ -124,7 +125,7 @@ private:
     EnumDropdownOption<PlayerRealignMode> REALIGN_MODE;
     SimpleIntegerOption<uint8_t> X_REALIGN;
     SimpleIntegerOption<uint8_t> Y_REALIGN;
-    SimpleIntegerOption<uint16_t> REALIGN_DURATION;
+    MillisecondsOption REALIGN_DURATION;
 
     BooleanCheckBoxOption ENABLE_MISC_TEST;    
     SimpleIntegerOption<uint16_t> FORWARD_TICKS;

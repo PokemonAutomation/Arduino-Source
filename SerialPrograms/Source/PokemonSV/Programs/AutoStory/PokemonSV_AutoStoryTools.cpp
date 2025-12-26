@@ -274,7 +274,8 @@ bool confirm_marker_present(
 
 void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     PlayerRealignMode realign_mode,
-    uint8_t move_x, uint8_t move_y, uint16_t move_duration
+    uint8_t move_x, uint8_t move_y,
+    Milliseconds move_duration
 ){
     stream.log("Realigning player direction...");
     switch (realign_mode){
@@ -287,7 +288,7 @@ void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerC
         });
 
         pbf_press_button(context, BUTTON_ZR, 160ms, 840ms);
-        pbf_move_left_joystick_old(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
+        pbf_move_left_joystick_old(context, move_x, move_y, move_duration, 1000ms);
         pbf_press_button(context, BUTTON_A, 160ms, 840ms);
         pbf_press_button(context, BUTTON_A, 160ms, 840ms);
 
@@ -310,7 +311,7 @@ void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerC
         pbf_press_button(context, BUTTON_L, 160ms, 840ms);
         return;
     case PlayerRealignMode::REALIGN_NO_MARKER:
-        pbf_move_left_joystick_old(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
+        pbf_move_left_joystick_old(context, move_x, move_y, move_duration, 1000ms);
         pbf_press_button(context, BUTTON_L, 160ms, 840ms);
         return;
     }  
@@ -334,7 +335,7 @@ void overworld_navigation(
         seconds_realign = seconds_timeout;
         should_realign = false;
     }
-    uint16_t forward_ticks = seconds_realign * TICKS_PER_SECOND;
+    Milliseconds forward_duration = seconds_realign * 1000ms;
     // WallClock start = current_time();
 
     if (stop_condition == NavigationStopCondition::STOP_MARKER){
@@ -365,7 +366,7 @@ void overworld_navigation(
                         stream, context,
                         [&](ProControllerContext& context){
                             if (movement_mode == NavigationMovementMode::CLEAR_WITH_LETS_GO){
-                                walk_forward_while_clear_front_path(info, stream, context, forward_ticks*8ms, y);
+                                walk_forward_while_clear_front_path(info, stream, context, forward_duration, y);
                             }else{
                                 ssf_press_left_joystick_old(context, x, y, 0ms, Seconds(seconds_realign));
                                 if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){

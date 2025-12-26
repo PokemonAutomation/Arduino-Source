@@ -176,7 +176,7 @@ void checkpoint_25(
         context.wait_for_all_requests();
 
         // section 1. align to Olive roll NPC
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 157, 0, 40);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 157, 0, 320ms);
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
             128, 0, 40, 10);

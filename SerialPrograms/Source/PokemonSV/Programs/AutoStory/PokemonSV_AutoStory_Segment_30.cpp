@@ -102,7 +102,7 @@ void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             // we can get around this by either placing down a marker, or by zooming out so that that section isn't white snow.
             // place down marker in this case
 
-            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 210, 255, 40);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 210, 255, 320ms);
             // place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
             //     {ZoomChange::ZOOM_IN, 255, 200, 300}, 
             //     FlyPoint::POKECENTER, 
@@ -173,8 +173,8 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // place down a marker in this case.
 
         // remove old marker, then place new one
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 0, 0);
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 180, 45);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 0, 0ms);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 180, 360ms);
 
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 0, 240ms});
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 200, 255, 880ms});
@@ -291,8 +291,8 @@ void checkpoint_77(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // place down a marker in this case.
 
         // remove old marker, then place new one
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 0, 0);
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 180, 45);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 0, 0ms);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 180, 360ms);
 
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 0, 240ms});
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 200, 255, 880ms});
@@ -425,7 +425,7 @@ void move_from_glaseado_gym_to_north_province_area_one(SingleSwitchProgramEnviro
     // marker 5. set marker past pokecenter
     handle_unexpected_battles(env.program_info(), env.console, context,
     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 255, 50);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 255, 400ms);
     });      
     overworld_navigation(env.program_info(), env.console, context, 
         NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 

@@ -141,7 +141,7 @@ void checkpoint_36(
         // section 1
         // warning: can't reliably set the marker when in Cascarrafa, possibly due to too many NPCs. worse when sandstorm is up.
         // what happens is that the program doesn't reliably push the cursor as much as it should
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 135, 410);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 135, 3280ms);
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
             128, 0, 60, 20, false);
@@ -182,7 +182,7 @@ void checkpoint_36(
             128, 0, 20, 10, false);   
 
         // section 5. set marker past pokecenter
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 100, 30);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 100, 240ms);
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
             128, 15, 12, 12, false);     

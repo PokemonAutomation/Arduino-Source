@@ -81,7 +81,7 @@ void checkpoint_08(
 
         context.wait_for_all_requests();
 
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 70, 100);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 70, 800ms);
         env.console.log("overworld_navigation: Go to cliff.");
         overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 30, 30, true, true);
 
@@ -136,9 +136,9 @@ void checkpoint_08(
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {0, +1}, 4800ms, 400ms);
-                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 150, 20, 20);
+                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 150, 20, 160ms);
                 pbf_move_left_joystick(context, {0, +1}, 8000ms, 400ms);
-                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 160, 20, 20);
+                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 160, 20, 160ms);
                 walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms, 128, 0);                
             }
         );  
@@ -153,7 +153,7 @@ void checkpoint_08(
                 stream.log("Rock break");
                 stream.overlay().add_log("Rock break", COLOR_WHITE);
                 pbf_move_left_joystick_old(context, 128, 20, 3000ms, 160ms);
-                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 230, 25, 30);
+                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 230, 25, 240ms);
                 pbf_move_left_joystick(context, {0, +1}, 2000ms, 5000ms);
 
                 // Houndour wave
@@ -161,19 +161,19 @@ void checkpoint_08(
                 stream.log("Houndour wave");
                 stream.overlay().add_log("Houndour wave", COLOR_WHITE);
                 // walk to room entrance
-                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 150, 15, 30);
+                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 150, 15, 240ms);
                 pbf_move_left_joystick_old(context, 128, 20, 4000ms, 2000ms);
 
-                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 210, 15, 30);
+                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 210, 15, 240ms);
                 pbf_move_left_joystick_old(context, 128, 20, 3000ms, 2000ms);
                 pbf_move_left_joystick_old(context, 128, 20, 2000ms, 2000ms);
                 pbf_move_left_joystick_old(context, 128, 20, 6000ms, 2000ms);
 
-                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 200, 25, 20);
+                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 200, 25, 160ms);
                 pbf_move_left_joystick_old(context, 128, 20, 4000ms, 2000ms);
                 pbf_move_left_joystick_old(context, 128, 20, 4000ms, 2000ms);
 
-                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 210, 25, 25);
+                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 210, 25, 200ms);
                 pbf_move_left_joystick_old(context, 128, 20, 6000ms, 20000ms);
 
                 // Houndoom encounter
@@ -181,9 +181,9 @@ void checkpoint_08(
                 stream.log("Houndoom encounter");
                 stream.overlay().add_log("Houndoom encounter", COLOR_WHITE);
                 pbf_move_left_joystick_old(context, 128, 20, 4000ms, 160ms);
-                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 245, 20, 20);
+                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 245, 20, 160ms);
                 pbf_move_left_joystick_old(context, 128, 20, 2000ms, 160ms);
-                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 255, 90, 20);
+                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 255, 90, 160ms);
                 pbf_move_left_joystick_old(context, 128, 20, 8000ms, 8000ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 160ms);
             }

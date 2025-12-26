@@ -159,7 +159,8 @@ void realign_player(
     const ProgramInfo& info,
     VideoStream& stream, ProControllerContext& context,
     PlayerRealignMode realign_mode,
-    uint8_t move_x = 0, uint8_t move_y = 0, uint16_t move_duration = 0
+    uint8_t move_x = 0, uint8_t move_y = 0,
+    Milliseconds move_duration = Milliseconds(0)
 );
 
 

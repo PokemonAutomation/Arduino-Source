@@ -595,11 +595,11 @@ AutoStory::AutoStory()
         "--Y_REALIGN:<br>y = 0 : up, y = 128 : neutral, y = 255 : down.",
         LockMode::UNLOCK_WHILE_RUNNING,
         128
-    )     
+    )
     , REALIGN_DURATION(
         "--REALIGN_DURATION",
         LockMode::UNLOCK_WHILE_RUNNING,
-        0
+        "0 ms"
     )
     , ENABLE_MISC_TEST(
         "<b>TEST: Miscellaneous test code:</b>",
@@ -1277,7 +1277,7 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
         GO_HOME_WHEN_DONE.run_end_of_program(context);
         return;
     }
-    
+
 
     if (ENABLE_TEST_REALIGN){
         // clear realign marker
