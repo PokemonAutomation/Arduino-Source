@@ -77,14 +77,16 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
     , NUM_RESETS(
         "<b>Max Hyperspace Resets:</b><br>Max number of resets when in Hyperspace. Set to zero to have no max reset limit. "
         "Make sure to leave enough time to catch found shinies."
-        "<br>Approximate Star/Cal. per reset: 1 Star/1 Cal., 2 Star/1.6 Cal., 3 Star/3.5 Cal., 4 Star/7.5 Cal., 5 Star/10 Cal.",
+        "<br>Cal. per sec: 1 Star: 1 Cal./s, 2 Star: 1.6 Cal./s, 3 Star: 3.5 Cal./s, 4 Star: 7.5 Cal./s, 5 Star: 10 Cal./s. "
+        "Each reset takes between 0.6-1.0 sec of the timer.",
         LockMode::UNLOCK_WHILE_RUNNING,
         100, 0 // default, min
     )
     , MIN_CALORIE_REMAINING(
         "<b>Minimum Cal. allowed While Resetting in Hyperspace:</b><br>The program will stop if the Calorie number is at or below this value."
         "<br>NOTE: the more star the hyperspace has the faster Calorie burns! Pick a minimum Calorie value that gives you enough time to catch shinies."
-        "<br>Approximate Star/Cal. per reset: 1 Star/1 Cal., 2 Star/1.6 Cal., 3 Star/3.5 Cal., 4 Star/7.5 Cal., 5 Star/10 Cal.",
+        "<br>Cal. per sec: 1 Star: 1 Cal./s, 2 Star: 1.6 Cal./s, 3 Star: 3.5 Cal./s, 4 Star: 7.5 Cal./s, 5 Star: 10 Cal./s"
+        "Each reset takes between 0.6-1.0 sec of the timer.",
         LockMode::UNLOCK_WHILE_RUNNING,
         120, 0, 9999 // default, min, max
     )
