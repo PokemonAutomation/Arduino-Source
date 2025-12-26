@@ -2,6 +2,7 @@
  *
  * D++, A Lightweight C++ library for Discord
  *
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright 2021 Craig Edwards and D++ contributors 
  * (https://github.com/brainboxdotcc/DPP/graphs/contributors)
  *
@@ -36,31 +37,69 @@ namespace dpp {
  * @brief Error values. Most of these are currently unused in https_client.
  */
 enum http_error {
-	/// Request successful
+	/**
+	 * @brief Request successful.
+	 */
 	h_success = 0,
-	/// Status unknown
+
+	/**
+	 * @brief Status unknown.
+	 */
 	h_unknown,
-	/// Connect failed
+
+	/**
+	 * @brief Connect failed.
+	 */
 	h_connection,
-	/// Invalid local ip address
+
+	/**
+	 * @brief Invalid local ip address.
+	 */
 	h_bind_ip_address,
-	/// Read error
+
+	/**
+	 * @brief Read error.
+	 */
 	h_read,
-	/// Write error
+
+	/**
+	 * @brief Write error.
+	 */
 	h_write,
-	/// Too many 30x redirects
+
+	/**
+	 * @brief Too many 30x redirects.
+	 */
 	h_exceed_redirect_count,
-	/// Request cancelled
+
+	/**
+	 * @brief Request cancelled.
+	 */
 	h_canceled,
-	/// SSL connection error
+
+	/**
+	 * @brief SSL connection error.
+	 */
 	h_ssl_connection,
-	/// SSL cert loading error
+
+	/**
+	 * @brief SSL cert loading error.
+	 */
 	h_ssl_loading_certs,
-	/// SSL server verification error
+
+	/**
+	 * @brief SSL server verification error.
+	 */
 	h_ssl_server_verification,
-	/// Unsupported multipart boundary characters
+
+	/**
+	 * @brief Unsupported multipart boundary characters.
+	 */
 	h_unsupported_multipart_boundary_chars,
-	/// Compression error
+
+	/**
+	 * @brief Compression error.
+	 */
 	h_compression,
 };
 
@@ -69,32 +108,67 @@ enum http_error {
  * rate limit figures, and returned request body.
  */
 struct DPP_EXPORT http_request_completion_t {
-	/** @brief HTTP headers of response */
-	std::map<std::string, std::string> headers;
-	/** @brief HTTP status, e.g. 200 = OK, 404 = Not found, 429 = Rate limited */
+	/**
+	 * @brief HTTP headers of response.
+	 */
+	std::multimap<std::string, std::string> headers;
+
+	/**
+	 * @brief HTTP status.
+	 * e.g. 200 = OK, 404 = Not found, 429 = Rate limited, etc.
+	 */
 	uint16_t status = 0;
-	/** @brief Error status (e.g. if the request could not connect at all) */
+
+	/**
+	 * @brief Error status.
+	 * e.g. if the request could not connect at all.
+	 */
 	http_error error = h_success;
-	/** @brief Ratelimit bucket */
+
+	/**
+	 * @brief Ratelimit bucket.
+	 */
 	std::string ratelimit_bucket;
-	/** @brief Ratelimit limit of requests */
+
+	/**
+	 * @brief Ratelimit limit of requests.
+	 */
 	uint64_t ratelimit_limit = 0;
-	/** @brief Ratelimit remaining requests */
+
+	/**
+	 * @brief Ratelimit remaining requests.
+	 */
 	uint64_t ratelimit_remaining = 0;
-	/** @brief Ratelimit reset after (seconds) */
+
+	/**
+	 * @brief Ratelimit reset after (seconds).
+	 */
 	uint64_t ratelimit_reset_after = 0;
-	/** @brief Ratelimit retry after (seconds) */
+
+	/**
+	 * @brief Ratelimit retry after (seconds).
+	 */
 	uint64_t ratelimit_retry_after = 0;
-	/** @brief True if this request has caused us to be globally rate limited */
+
+	/**
+	 * @brief True if this request has caused us to be globally rate limited.
+	 */
 	bool ratelimit_global = false;
-	/** @brief Reply body */
+
+	/**
+	 * @brief Reply body.
+	 */
 	std::string body;
-	/** @brief Ping latency */
+
+	/**
+	 * @brief Ping latency.
+	 */
 	double latency;
 };
 
 /**
  * @brief Results of HTTP requests are called back to these std::function types.
+ *
  * @note Returned http_completion_events are called ASYNCHRONOUSLY in your
  * code which means they execute in a separate thread. The completion events
  * arrive in order.
@@ -105,15 +179,29 @@ typedef std::function<void(const http_request_completion_t&)> http_completion_ev
  * @brief Various types of http method supported by the Discord API
  */
 enum http_method {
-	/// GET
+	/**
+	 * @brief GET.
+	 */
 	m_get,
-	/// POST
+
+	/**
+	 * @brief POST.
+	 */
 	m_post,
-	/// PUT
+
+	/**
+	 * @brief PUT.
+	 */
 	m_put,
-	/// PATCH
+
+	/**
+	 * @brief PATCH.
+	 */
 	m_patch,
-	/// DELETE
+
+	/**
+	 * @brief DELETE.
+	 */
 	m_delete
 };
 
@@ -128,46 +216,82 @@ enum http_method {
  * request_queue class.
  */
 class DPP_EXPORT http_request {
-	/** @brief Completion callback */
+	/**
+	 * @brief Completion callback.
+	 */
 	http_completion_event complete_handler;
-	/** @brief True if request has been made */
+
+	/**
+	 * @brief True if request has been made.
+	 */
 	bool completed;
-	/** @brief True for requests that are not going to discord (rate limits code skipped) */
+
+	/**
+	 * @brief True for requests that are not going to discord (rate limits code skipped).
+	 */
 	bool non_discord;
 public:
-	/** @brief Endpoint name e.g. /api/users */
+	/**
+	 * @brief Endpoint name
+	 * e.g. /api/users.
+	 */
 	std::string endpoint;
-	/** @brief Major and minor parameters */
+
+	/**
+	 * @brief Major and minor parameters.
+	 */
 	std::string parameters;
-	/** @brief Postdata for POST and PUT */
+
+	/**
+	 * @brief Postdata for POST and PUT.
+	 */
 	std::string postdata;
-	/** @brief HTTP method for request */
+
+	/**
+	 * @brief HTTP method for request.
+	 */
 	http_method method;
-	/** @brief Audit log reason for Discord requests, if non-empty */
+
+	/**
+	 * @brief Audit log reason for Discord requests, if non-empty.
+	 */
 	std::string reason;
-	/** @brief Upload file name (server side) */
+
+	/**
+	 * @brief Upload file name (server side).
+	 */
 	std::vector<std::string> file_name;
-	/** @brief Upload file contents (binary) */
+
+	/**
+	 * @brief Upload file contents (binary).
+	 */
 	std::vector<std::string> file_content;
-	/** @brief Request mime type */
+
+	/**
+	 * @brief Upload file mime types.
+	 * application/octet-stream if unspecified.
+	 */
+	std::vector<std::string> file_mimetypes;
+
+	/**
+	 * @brief Request mime type.
+	 */
 	std::string mimetype;
-	/** @brief Request headers (non-discord requests only) */
+
+	/**
+	 * @brief Request headers (non-discord requests only).
+	 */
 	std::multimap<std::string, std::string> req_headers;
-	/** @brief Waiting for rate limit to expire */
+
+	/**
+	 * @brief Waiting for rate limit to expire.
+	 */
 	bool waiting;
 
 	/**
-	 * @brief Constructor. When constructing one of these objects it should be passed to request_queue::post_request().
-	 * @param _endpoint The API endpoint, e.g. /api/guilds
-	 * @param _parameters Major and minor parameters for the endpoint e.g. a user id or guild id
-	 * @param completion completion event to call when done
-	 * @param _postdata Data to send in POST and PUT requests
-	 * @param method The HTTP method to use from dpp::http_method
-	 * @param audit_reason Audit log reason to send, empty to send none
-	 * @param filename The filename (server side) of any uploaded file
-	 * @param filecontent The binary content of any uploaded file for the request
+	 * @brief HTTP protocol.
 	 */
-	http_request(const std::string &_endpoint, const std::string &_parameters, http_completion_event completion, const std::string &_postdata = "", http_method method = m_get, const std::string &audit_reason = "", const std::string &filename = "", const std::string &filecontent = "");
+	std::string protocol;
 
 	/**
 	 * @brief Constructor. When constructing one of these objects it should be passed to request_queue::post_request().
@@ -179,8 +303,25 @@ public:
 	 * @param audit_reason Audit log reason to send, empty to send none
 	 * @param filename The filename (server side) of any uploaded file
 	 * @param filecontent The binary content of any uploaded file for the request
+	 * @param filemimetype The MIME type of any uploaded file for the request
+	 * @param http_protocol HTTP protocol
 	 */
-	http_request(const std::string &_endpoint, const std::string &_parameters, http_completion_event completion, const std::string &_postdata = "", http_method method = m_get, const std::string &audit_reason = "", const std::vector<std::string> &filename = {}, const std::vector<std::string> &filecontent = {});
+	http_request(const std::string &_endpoint, const std::string &_parameters, http_completion_event completion, const std::string &_postdata = "", http_method method = m_get, const std::string &audit_reason = "", const std::string &filename = "", const std::string &filecontent = "", const std::string &filemimetype = "", const std::string &http_protocol = "1.1");
+
+	/**
+	 * @brief Constructor. When constructing one of these objects it should be passed to request_queue::post_request().
+	 * @param _endpoint The API endpoint, e.g. /api/guilds
+	 * @param _parameters Major and minor parameters for the endpoint e.g. a user id or guild id
+	 * @param completion completion event to call when done
+	 * @param _postdata Data to send in POST and PUT requests
+	 * @param method The HTTP method to use from dpp::http_method
+	 * @param audit_reason Audit log reason to send, empty to send none
+	 * @param filename The filename (server side) of any uploaded file
+	 * @param filecontent The binary content of any uploaded file for the request
+	 * @param filemimetypes The MIME type of any uploaded file for the request
+	 * @param http_protocol HTTP protocol
+	 */
+	http_request(const std::string &_endpoint, const std::string &_parameters, http_completion_event completion, const std::string &_postdata = "", http_method method = m_get, const std::string &audit_reason = "", const std::vector<std::string> &filename = {}, const std::vector<std::string> &filecontent = {}, const std::vector<std::string> &filemimetypes = {}, const std::string &http_protocol = "1.1");
 
 	/**
 	 * @brief Constructor. When constructing one of these objects it should be passed to request_queue::post_request().
@@ -190,8 +331,9 @@ public:
 	 * @param _postdata Data to send in POST and PUT requests
 	 * @param _mimetype POST data mime type
 	 * @param _headers HTTP headers to send
+	 * @param http_protocol HTTP protocol
 	 */
-	http_request(const std::string &_url, http_completion_event completion, http_method method = m_get, const std::string &_postdata = "", const std::string &_mimetype = "text/plain", const std::multimap<std::string, std::string> &_headers = {});
+	http_request(const std::string &_url, http_completion_event completion, http_method method = m_get, const std::string &_postdata = "", const std::string &_mimetype = "text/plain", const std::multimap<std::string, std::string> &_headers = {}, const std::string &http_protocol = "1.1");
 
 	/**
 	 * @brief Destroy the http request object
@@ -219,15 +361,29 @@ public:
  * each endpoint.
  */
 struct DPP_EXPORT bucket_t {
-	/** @brief Request limit */
+	/**
+	 * @brief Request limit.
+	 */
 	uint64_t limit;
-	/** @brief Requests remaining */
+
+	/**
+	 * @brief Requests remaining.
+	 */
 	uint64_t remaining;
-	/** @brief Ratelimit of this bucket resets after this many seconds */
+
+	/**
+	 * @brief Rate-limit of this bucket resets after this many seconds.
+	 */
 	uint64_t reset_after;
-	/** @brief Ratelimit of this bucket can be retried after this many seconds */
+
+	/**
+	 * @brief Rate-limit of this bucket can be retried after this many seconds.
+	 */
 	uint64_t retry_after;
-	/** @brief Timestamp this buckets counters were updated */
+
+	/**
+	 * @brief Timestamp this buckets counters were updated.
+	 */
 	time_t timestamp;
 };
 
@@ -243,47 +399,47 @@ struct DPP_EXPORT bucket_t {
 class DPP_EXPORT in_thread {
 private:
 	/**
-	 * @brief True if ending
+	 * @brief True if ending.
 	 */
 	bool terminating;
 
 	/**
-	 * @brief Request queue that owns this in_thread
+	 * @brief Request queue that owns this in_thread.
 	 */
 	class request_queue* requests;
 
 	/**
-	 * @brief The cluster that owns this in_thread
+	 * @brief The cluster that owns this in_thread.
 	 */
 	class cluster* creator;
 
 	/**
-	 * @brief Inbound queue mutex thread safety
+	 * @brief Inbound queue mutex thread safety.
 	 */
 	std::shared_mutex in_mutex;
 
 	/**
-	 * @brief Inbound queue thread
+	 * @brief Inbound queue thread.
 	 */
 	std::thread* in_thr;
 
 	/**
-	 * @brief Inbound queue condition, signalled when there are requests to fulfill
+	 * @brief Inbound queue condition, signalled when there are requests to fulfill.
 	 */
 	std::condition_variable in_ready;
 
 	/**
-	 * @brief Ratelimit bucket counters
+	 * @brief Rate-limit bucket counters.
 	 */
 	std::map<std::string, bucket_t> buckets;
 
 	/**
-	 * @brief Queue of requests to be made
+	 * @brief Queue of requests to be made.
 	 */
 	std::map<std::string, std::vector<http_request*>> requests_in;
 
 	/**
-	 * @brief Inbound queue thread loop
+	 * @brief Inbound queue thread loop.
 	 * @param index Thread index
 	 */
 	void in_loop(uint32_t index);
@@ -355,7 +511,8 @@ protected:
 	std::thread* out_thread;
 
 	/**
-	 * @brief Outbound queue condition, signalled when there are requests completed to call callbacks for
+	 * @brief Outbound queue condition.
+	 * Signalled when there are requests completed to call callbacks for.
 	 */
 	std::condition_variable out_ready;
 
@@ -391,7 +548,9 @@ protected:
 	bool globally_ratelimited;
 
 	/**
-	 * @brief How many seconds we are globally rate limited for, if globally_ratelimited is true
+	 * @brief How many seconds we are globally rate limited for
+	 *
+	 * @note Only if globally_ratelimited is true.
 	 */
 	uint64_t globally_limited_for;
 
@@ -454,4 +613,4 @@ public:
 	bool is_globally_ratelimited() const;
 };
 
-};
+} // namespace dpp

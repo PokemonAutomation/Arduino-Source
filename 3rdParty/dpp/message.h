@@ -27,7 +27,7 @@
 #include <dpp/guild.h>
 #include <optional>
 #include <variant>
-#include <dpp/nlohmann/json_fwd.hpp>
+#include <dpp/json_fwd.h>
 #include <dpp/json_interface.h>
 
 namespace dpp {
@@ -52,6 +52,43 @@ enum component_type : uint8_t {
 	cot_mentionable_selectmenu = 7,
 	/// Select menu for channels
 	cot_channel_selectmenu = 8,
+};
+
+/**
+ * @brief An emoji for a component (select menus included).
+ *
+ * To set an emoji on your button, you must set one of either the name or id fields.
+ * The easiest way is to use the dpp::component::set_emoji method.
+ *
+ * @note This is a **very** scaled down version of dpp::emoji, we advise that you refrain from using this.
+ */
+struct component_emoji {
+	/**
+	 * @brief The name of the emoji.
+	 *
+	 * For built in unicode emojis, set this to the
+	 * actual unicode value of the emoji e.g. "😄"
+	 * and not for example ":smile:"
+	 */
+	std::string name{""};
+
+	/**
+	 * @brief The emoji ID value for emojis that are custom
+	 * ones belonging to a guild.
+	 *
+	 * The same rules apply as with other emojis,
+	 * that the bot must be on the guild where the emoji resides
+	 * and it must be available for use
+	 * (e.g. not disabled due to lack of boosts, etc)
+	 */
+	dpp::snowflake id{0};
+
+	/**
+	 * @brief Is the emoji animated?
+	 *
+	 * @note Only applies to custom emojis.
+	 */
+	bool animated{false};
 };
 
 /**
@@ -81,54 +118,65 @@ enum component_style : uint8_t {
 };
 
 /**
+ * Represents the type of a dpp::component_default_value
+ *
+ * @note They're different to discord's value types
+ */
+enum component_default_value_type: uint8_t {
+	cdt_user = 0,
+	cdt_role = 1,
+	cdt_channel = 2,
+};
+
+/**
+ * @brief A Default value structure for components
+ */
+struct DPP_EXPORT component_default_value {
+	/**
+	 * @brief The type this default value represents
+	 */
+	component_default_value_type type;
+	/**
+	 * @brief Default value. ID of a user, role, or channel
+	 */
+	dpp::snowflake id;
+};
+
+/**
  * @brief An option for a select component
  */
 struct DPP_EXPORT select_option : public json_interface<select_option> {
+protected:
+	friend struct json_interface<select_option>;
+
+	/** Read class values from json object
+	 * @param j A json object to read from
+	 * @return A reference to self
+	 */
+	select_option& fill_from_json_impl(nlohmann::json* j);
+
+public:
 	/**
-	 * @brief Label for option
+	 * @brief User-facing name of the option
 	 */
 	std::string label;
 	/**
-	 * @brief Value for option
+	 * @brief Dev-defined value of the option
 	 */
 	std::string value;
 	/**
-	 * @brief Description of option
+	 * @brief Additional description of the option
 	 */
 	std::string description;
 	/**
 	 * @brief True if option is the default option
 	 */
 	bool is_default;
+
 	/**
-	 * @brief Emoji definition. To set an emoji on your button
-	 * you must set one of either the name or id fields.
-	 * The easiest way is to use the component::set_emoji
-	 * method.
+	 * @brief The emoji for the select option.
 	 */
-	struct inner_select_emoji {
-		/**
-		 * @brief Set the name field to the name of the emoji.
-		 * For built in unicode emojis, set this to the
-		 * actual unicode value of the emoji e.g. "😄"
-		 * and not for example ":smile:"
-		 */
-		std::string name;
-		/**
-		 * @brief The emoji ID value for emojis that are custom
-		 * ones belonging to a guild. The same rules apply
-		 * as with other emojis, that the bot must be on
-		 * the guild where the emoji resides and it must
-		 * be available for use (e.g. not disabled due to
-		 * lack of boosts etc)
-		 */
-		dpp::snowflake id = 0;
-		/**
-		 * @brief True if the emoji is animated. Only applies to
-		 * custom emojis.
-		 */
-		bool animated = false;
-	} emoji;
+	component_emoji emoji;
 
 	/**
 	 * @brief Construct a new select option object
@@ -198,12 +246,6 @@ struct DPP_EXPORT select_option : public json_interface<select_option> {
 	 * @return select_option& reference to self for chaining
 	 */
 	select_option& set_animated(bool anim);
-
-	/** Read class values from json object
-	 * @param j A json object to read from
-	 * @return A reference to self
-	 */
-	select_option& fill_from_json(nlohmann::json* j);
 };
 
 /**
@@ -219,6 +261,15 @@ struct DPP_EXPORT select_option : public json_interface<select_option> {
  * object is an action row and the child objects are buttons.
  */
 class DPP_EXPORT component : public json_interface<component> {
+protected:
+	friend struct json_interface<component>;
+
+	/** Read class values from json object
+	 * @param j A json object to read from
+	 * @return A reference to self
+	 */
+	component& fill_from_json_impl(nlohmann::json* j);
+
 public:
 	/** Component type, either a button or action row
 	 */
@@ -256,12 +307,12 @@ public:
 	 */
 	std::string placeholder;
 
-	/** Minimum number of items that must be chosen for a select menu.
+	/** Minimum number of items that must be chosen for a select menu (0-25).
 	 * Default is -1 to not set this
 	 */
 	int32_t min_values;
 
-	/** Maximum number of items that can be chosen for a select menu.
+	/** Maximum number of items that can be chosen for a select menu (0-25).
 	 * Default is -1 to not set this
 	 */
 	int32_t max_values;
@@ -282,6 +333,13 @@ public:
 	 */
 	std::vector<uint8_t> channel_types;
 
+	/**
+	 * List of default values for auto-populated select menu components. The amount of default values must be in the range defined by dpp::component::min_value and dpp::component::max_values.
+	 *
+	 * @note Only available for auto-populated select menu components, which include dpp::cot_user_selectmenu, dpp::cot_role_selectmenu, dpp::cot_mentionable_selectmenu, and dpp::cot_channel_selectmenu components.
+	 */
+	std::vector<component_default_value> default_values;
+
 	/** Disabled flag (for buttons)
 	 */
 	bool disabled;
@@ -295,31 +353,10 @@ public:
 	 */
 	std::variant<std::monostate, std::string, int64_t, double> value;
 
-	/** Emoji definition. To set an emoji on your button
-	 * you must set one of either the name or id fields.
-	 * The easiest way is to use the component::set_emoji
-	 * method.
+	/**
+	 * @brief The emoji for this component.
 	 */
-	struct inner_emoji {
-		/** Set the name field to the name of the emoji.
-		 * For built in unicode emojis, set this to the
-		 * actual unicode value of the emoji e.g. "😄"
-		 * and not for example ":smile:"
-		 */
-		std::string name;
-		/** The emoji ID value for emojis that are custom
-		 * ones belonging to a guild. The same rules apply
-		 * as with other emojis, that the bot must be on
-		 * the guild where the emoji resides and it must
-		 * be available for use (e.g. not disabled due to
-		 * lack of boosts etc)
-		 */
-		dpp::snowflake id;
-		/** True if the emoji is animated. Only applies to
-		 * custom emojis.
-		 */
-		bool animated;
-	} emoji;
+	component_emoji emoji;
 
 	/** Constructor
 	 */
@@ -441,33 +478,33 @@ public:
 	component& set_placeholder(const std::string &placeholder);
 
 	/**
-	 * @brief Set the min value
+	 * @brief Set the minimum number of items that must be chosen for a select menu
 	 * 
-	 * @param min_values min value to set
+	 * @param min_values min value to set (0-25)
 	 * @return component& Reference to self
 	 */
 	component& set_min_values(uint32_t min_values);
 
 	/**
-	 * @brief Set the max value
+	 * @brief Set the maximum number of items that can be chosen for a select menu
 	 * 
-	 * @param max_values max value to set (0 - 25)
+	 * @param max_values max value to set (0-25)
 	 * @return component& Reference to self
 	 */
 	component& set_max_values(uint32_t max_values);
 
 	/**
-	 * @brief Set the min length of text input
+	 * @brief Set the minimum input length for a text input
 	 * 
-	 * @param min_l min value to set (0 - 25)
+	 * @param min_l min length to set (0-4000)
 	 * @return component& Reference to self
 	 */
 	component& set_min_length(uint32_t min_l);
 
 	/**
-	 * @brief Set the max length of text input
+	 * @brief Set the maximum input length for a text input
 	 * 
-	 * @param max_l max value to set
+	 * @param max_l max length to set (1-4000)
 	 * @return component& Reference to self
 	 */
 	component& set_max_length(uint32_t max_l);
@@ -491,6 +528,14 @@ public:
 	component& add_component(const component& c);
 
 	/**
+ 	 * @brief Add a default value.
+ 	 *
+ 	 * @param id Default value. ID of a user, role, or channel
+ 	 * @param type The type this default value represents
+ 	 */
+	component& add_default_value(const snowflake id, const component_default_value_type type);
+
+	/**
 	 * @brief Set the emoji of the current sub-component.
 	 * Only valid for buttons. Adding an emoji to a component
 	 * will automatically set this components type to
@@ -508,13 +553,6 @@ public:
 	 * @return component& Reference to self
 	 */
 	component& set_emoji(const std::string& name, dpp::snowflake id = 0, bool animated = false);
-
-	/** Read class values from json object
-	 * @param j A json object to read from
-	 * @return A reference to self
-	 */
-	component& fill_from_json(nlohmann::json* j);
-
 };
 
 /**
@@ -523,7 +561,7 @@ public:
 struct DPP_EXPORT embed_footer {
 	/** Footer text */
 	std::string text;
-	/** Footer icon url */
+	/** Footer icon url (only supports http(s) and attachments) */
 	std::string icon_url;
 	/** Proxied icon url */
 	std::string proxy_url;
@@ -577,9 +615,9 @@ struct DPP_EXPORT embed_provider {
 struct DPP_EXPORT embed_author {
 	/** Author name */
 	std::string name;
-	/** Author url */
+	/** Author url (only supports http(s)) */
 	std::string url;
-	/** Author icon url */
+	/** Author icon url (only supports http(s) and attachments) */
 	std::string icon_url;
 	/** Proxied icon url */
 	std::string proxy_icon_url;
@@ -589,9 +627,9 @@ struct DPP_EXPORT embed_author {
  * @brief A dpp::embed may contain zero or more fields
  */
 struct DPP_EXPORT embed_field {
-	/** Name of field */
+	/** Name of field (max length 256) */
 	std::string name;
-	/** Value of field (max length 1000) */
+	/** Value of field (max length 1024) */
 	std::string value;
 	/** True if the field is to be displayed inline */
 	bool is_inline;
@@ -612,7 +650,7 @@ struct DPP_EXPORT embed {
 	/** Optional: timestamp of embed content */
 	time_t				timestamp;
 	/** Optional: color code of the embed */
-	uint32_t			color;
+	std::optional<uint32_t>			color;
 	/** Optional: footer information */
 	std::optional<embed_footer>	footer;
 	/** Optional: image information */
@@ -659,7 +697,7 @@ struct DPP_EXPORT embed {
 
 	 /** Set the footer of the embed. Returns the embed itself so these method calls may be "chained"
 	  * @param text string to set as footer text. It will be truncated to the maximum length of 2048 UTF-8 characters.
-	  * @param icon_url an url to set as footer icon url
+	  * @param icon_url an url to set as footer icon url (only supports http(s) and attachments)
 	  * @return A reference to self
 	  */
 	embed& set_footer(const std::string& text, const std::string& icon_url);
@@ -669,6 +707,12 @@ struct DPP_EXPORT embed {
 	 * @return A reference to self
 	 */
 	embed& set_color(uint32_t col);
+
+	/** Set embed colour. Returns the embed itself so these method calls may be "chained"
+	 * @param col The colour of the embed
+	 * @return A reference to self
+	 */
+	embed& set_colour(uint32_t col);
 
 	/** Set embed timestamp. Returns the embed itself so these method calls may be "chained"
 	 * @param tstamp The timestamp to show in the footer, should be in UTC
@@ -698,8 +742,8 @@ struct DPP_EXPORT embed {
 
 	/** Set embed author. Returns the embed itself so these method calls may be "chained"
 	 * @param name The name of the author. It will be truncated to the maximum length of 256 UTF-8 characters.
-	 * @param url The url of the author
-	 * @param icon_url The icon URL of the author
+	 * @param url The url of the author (only supports http(s))
+	 * @param icon_url The icon URL of the author (only supports http(s) and attachments)
 	 * @return A reference to self
 	 */
 	embed& set_author(const std::string& name, const std::string& url, const std::string& icon_url);
@@ -712,7 +756,7 @@ struct DPP_EXPORT embed {
 	embed& set_provider(const std::string& name, const std::string& url);
 
 	/** Set embed image. Returns the embed itself so these method calls may be "chained"
-	 * @param url The embed image URL
+	 * @param url The embed image URL (only supports http(s) and attachments)
 	 * @return A reference to self
 	 */
 	embed& set_image(const std::string& url);
@@ -724,7 +768,7 @@ struct DPP_EXPORT embed {
 	embed& set_video(const std::string& url);
 
 	/** Set embed thumbnail. Returns the embed itself so these method calls may be "chained"
-	 * @param url The embed thumbnail url
+	 * @param url The embed thumbnail url (only supports http(s) and attachments)
 	 * @return A reference to self
 	 */
 	embed& set_thumbnail(const std::string& url);
@@ -734,14 +778,22 @@ struct DPP_EXPORT embed {
  * @brief Represents a reaction to a dpp::message
  */
 struct DPP_EXPORT reaction {
-	/** Number of times this reaction has been added */
+	/** Total number of times this emoji has been used to react (including super reacts) */
 	uint32_t count;
-	/** Reaction was from the bot's id */
-	bool me;
+	/** Count of super reactions */
+	uint32_t count_burst;
+	/** Count of normal reactions */
+	uint32_t count_normal;
 	/** ID of emoji for reaction */
 	snowflake emoji_id;
 	/** Name of emoji, if applicable */
 	std::string emoji_name;
+	/** Whether your bot reacted using this emoji */
+	bool me;
+	/** Whether your bot super-reacted using this emoji */
+	bool me_burst;
+	/** HEX colors used for super reaction. Stored as integers */
+	std::vector<uint32_t> burst_colors;
 
 	/**
 	 * @brief Constructs a new reaction object.
@@ -758,6 +810,14 @@ struct DPP_EXPORT reaction {
 	 * @brief Destructs the reaction object.
 	 */
 	~reaction() = default;
+};
+
+/**
+ * @brief Bitmask flags for a dpp::attachment
+ */
+enum attachment_flags : uint8_t {
+	/// this attachment has been edited using the remix feature on mobile
+	a_is_remix = 1 << 2,
 };
 
 /**
@@ -784,6 +844,12 @@ struct DPP_EXPORT attachment {
 	std::string content_type;
 	/** Whether this attachment is ephemeral, if applicable */
 	bool ephemeral;
+	/** The duration of the audio file (currently for voice messages) */
+	double duration_secs;
+	/** base64 encoded bytearray representing a sampled waveform (currently for voice messages) */
+	std::string waveform;
+	/** Flags. Made of bits in dpp::attachment_flags */
+	uint8_t		flags;
 	/** Owning message */
 	struct message* owner;
 
@@ -814,13 +880,20 @@ struct DPP_EXPORT attachment {
 	 * itself has an owning cluster, this method will throw a dpp::logic_exception when called.
 	 */
 	void download(http_completion_event callback) const;
+	
+	/**
+	 * @brief Returns true if remixed
+	 * 
+	 * @return true if remixed
+	 */
+	bool is_remix() const;
 };
 
 /**
  * @brief Represents the type of a sticker
  */
 enum sticker_type : uint8_t {
-	/// Nitro pack sticker
+	/// An official sticker in a pack
 	st_standard = 1,
 	/// Guild sticker
 	st_guild = 2
@@ -832,13 +905,30 @@ enum sticker_type : uint8_t {
 enum sticker_format : uint8_t {
 	sf_png = 1,
 	sf_apng = 2,
-	sf_lottie = 3
+	sf_lottie = 3,
+	sf_gif = 4,
 };
 
 /**
  * @brief Represents stickers received in messages
  */
 struct DPP_EXPORT sticker : public managed, public json_interface<sticker> {
+protected:
+	friend struct json_interface<sticker>;
+
+	/** Read class values from json object
+	 * @param j A json object to read from
+	 * @return A reference to self
+	 */
+	sticker& fill_from_json_impl(nlohmann::json* j);
+
+	/** Build JSON from this object.
+	 * @param with_id True if the ID is to be set in the JSON structure
+	 * @return The JSON of the invite
+	 */
+	virtual json to_json_impl(bool with_id = true) const;
+
+public:
 	/** Optional: for standard stickers, id of the pack the sticker is from
 	 */
 	snowflake	pack_id;
@@ -881,25 +971,12 @@ struct DPP_EXPORT sticker : public managed, public json_interface<sticker> {
 
 	virtual ~sticker() = default;
 
-	/** Read class values from json object
-	 * @param j A json object to read from
-	 * @return A reference to self
-	 */
-	sticker& fill_from_json(nlohmann::json* j);
-
-	/** Build JSON from this object.
-	 * @param with_id True if the ID is to be set in the JSON structure
-	 * @return The JSON text of the invite
-	 */
-	virtual std::string build_json(bool with_id = true) const;
-
 	/**
-	 * @brief Get the sticker url
+	 * @brief Get the sticker url.
 	 *
-	 * @param accept_lottie Whether to allow that [lottie](https://airbnb.io/lottie/#/) (json format) can be returned or not
-	 * @return std::string The sticker url or an empty string when its a lottie and accept_lottie is false
+	 * @return std::string The sticker url or an empty string, if the id is empty
 	 */
-	std::string get_url(bool accept_lottie = true) const;
+	std::string get_url() const;
 
 	/**
 	 * @brief Set the filename
@@ -923,6 +1000,22 @@ struct DPP_EXPORT sticker : public managed, public json_interface<sticker> {
  * @brief Represents a sticker pack (the built in groups of stickers that all nitro users get to use)
  */
 struct DPP_EXPORT sticker_pack : public managed, public json_interface<sticker_pack> {
+protected:
+	friend struct json_interface<sticker_pack>;
+
+	/** Read class values from json object
+	 * @param j A json object to read from
+	 * @return A reference to self
+	 */
+	sticker_pack& fill_from_json_impl(nlohmann::json* j);
+
+	/** Build JSON from this object.
+	 * @param with_id True if the ID is to be set in the JSON structure
+	 * @return The JSON of the invite
+	 */
+	virtual json to_json_impl(bool with_id = true) const;
+
+public:
 	/// the stickers in the pack
 	std::map<snowflake, sticker> stickers;
 	/// name of the sticker pack
@@ -942,19 +1035,6 @@ struct DPP_EXPORT sticker_pack : public managed, public json_interface<sticker_p
 	sticker_pack();
 
 	virtual ~sticker_pack() = default;
-
-	/** Read class values from json object
-	 * @param j A json object to read from
-	 * @return A reference to self
-	 */
-	sticker_pack& fill_from_json(nlohmann::json* j);
-
-	/** Build JSON from this object.
-	 * @param with_id True if the ID is to be set in the JSON structure
-	 * @return The JSON text of the invite
-	 */
-	virtual std::string build_json(bool with_id = true) const;
-
 };
 
 /**
@@ -979,6 +1059,10 @@ enum message_flags : uint16_t {
 	m_loading = 1 << 7,
 	/// this message failed to mention some roles and add their members to the thread
 	m_thread_mention_failed = 1 << 8,
+	/// this message will not trigger push and desktop notifications
+	m_suppress_notifications = 1 << 12,
+	/// this message is a voice message
+	m_is_voice_message = 1 << 13,
 };
 
 /**
@@ -1015,7 +1099,7 @@ namespace embed_type {
 	 * @brief Auto moderation filter
 	 */
 	const std::string emt_automod = "auto_moderation_message";
-};
+} // namespace embed_type
 
 /**
  * @brief Message types for dpp::message::type
@@ -1069,6 +1153,20 @@ enum message_type {
 	mt_context_menu_command 			= 23,
 	/// Auto moderation action
 	mt_auto_moderation_action			= 24,
+	/// Role subscription purchase
+	mt_role_subscription_purchase		= 25,
+	/// Interaction premium upsell
+	mt_interaction_premium_upsell		= 26,
+	/// Stage start
+	mt_stage_start						= 27,
+	/// Stage end
+	mt_stage_end						= 28,
+	/// Stage speaker
+	mt_stage_speaker					= 29,
+	/// Stage topic
+	mt_stage_topic						= 31,
+	/// Guild application premium subscription
+	mt_application_premium_subscription	= 32,
 };
 
 /**
@@ -1119,12 +1217,63 @@ struct DPP_EXPORT cache_policy_t {
 	 * @brief Caching policy for roles
 	 */
 	cache_policy_setting_t role_policy = cp_aggressive;
+
+	/**
+	 * @brief Caching policy for roles
+	 */
+	cache_policy_setting_t channel_policy = cp_aggressive;
+
+	/**
+	 * @brief Caching policy for roles
+	 */
+	cache_policy_setting_t guild_policy = cp_aggressive;
+};
+
+/**
+ * @brief Contains a set of predefined cache policies for use when constructing a dpp::cluster
+ */
+namespace cache_policy {
+
+	/**
+	 * @brief A shortcut constant for all caching enabled for use in dpp::cluster constructor
+	 */
+	inline constexpr cache_policy_t cpol_default = { cp_aggressive, cp_aggressive, cp_aggressive, cp_aggressive, cp_aggressive };
+
+	/**
+	 * @brief A shortcut constant for a more balanced caching policy for use in dpp::cluster constructor
+	 */
+	inline constexpr cache_policy_t cpol_balanced = { cp_lazy, cp_lazy, cp_lazy, cp_aggressive, cp_aggressive };
+
+	/**
+	 * @brief A shortcut constant for all caching disabled for use in dpp::cluster constructor
+	 */
+	inline constexpr cache_policy_t cpol_none = { cp_none, cp_none, cp_none, cp_none, cp_none };
+
 };
 
 /**
  * @brief Represents messages sent and received on Discord
  */
-struct DPP_EXPORT message : public managed {
+struct DPP_EXPORT message : public managed, json_interface<message> {
+protected:
+	friend struct json_interface<message>;
+
+	/** Read class values from json object
+	 * @param j A json object to read from
+	 * @return A reference to self
+	 */
+	inline message& fill_from_json_impl(nlohmann::json *j) {
+		return fill_from_json(j, {cp_aggressive, cp_aggressive, cp_aggressive});
+	}
+
+	/** Build a JSON from this object.
+	 * @param with_id True if an ID is to be included in the JSON
+	 * @return JSON
+	 */
+	inline json to_json_impl(bool with_id = false) const {
+		return to_json(with_id, false);
+	}
+public:
 	/** id of the channel the message was sent in */
 	snowflake	   channel_id;
 	/** Optional: id of the guild the message was sent in */
@@ -1150,7 +1299,7 @@ struct DPP_EXPORT message : public managed {
 	std::vector<channel> mention_channels;
 	/** any attached files */
 	std::vector<attachment> attachments;
-	/** zero or more dpp::embed objects */
+	/** Up to 10 dpp::embed objects */
 	std::vector<embed> embeds;
 	/** Optional: reactions to the message */
 	std::vector<reaction> reactions;
@@ -1166,6 +1315,9 @@ struct DPP_EXPORT message : public managed {
 
 	/** File content to upload (raw binary) */
 	std::vector<std::string>	filecontent;
+
+	/** Mime type of files to upload */
+	std::vector<std::string>	filemimetype;
 
 	/**
 	 * @brief Reference to another message, e.g. a reply
@@ -1310,12 +1462,15 @@ struct DPP_EXPORT message : public managed {
 	 */
 	message& set_allowed_mentions(bool _parse_users, bool _parse_roles, bool _parse_everyone, bool _replied_user, const std::vector<snowflake> &users, const std::vector<snowflake> &roles);
 
+	using json_interface<message>::fill_from_json;
+	using json_interface<message>::to_json;
+
 	/** Fill this object from json.
 	 * @param j JSON object to fill from
 	 * @param cp Cache policy for user records, whether or not we cache users when a message is received
 	 * @return A reference to self
 	 */
-	message& fill_from_json(nlohmann::json* j, cache_policy_t cp = {cp_aggressive, cp_aggressive, cp_aggressive});
+	message& fill_from_json(nlohmann::json* j, cache_policy_t cp);
 
 	/** Build JSON from this object.
 	 * @param with_id True if the ID is to be included in the built JSON
@@ -1323,7 +1478,7 @@ struct DPP_EXPORT message : public managed {
 	 * This will exclude some fields that are not valid in interactions at this time.
 	 * @return The JSON text of the message
 	 */
-	virtual std::string build_json(bool with_id = false, bool is_interaction_response = false) const;
+	virtual json to_json(bool with_id, bool is_interaction_response) const;
 
 	/**
 	 * @brief Returns true if the message was crossposted to other servers
@@ -1389,6 +1544,20 @@ struct DPP_EXPORT message : public managed {
 	bool is_thread_mention_failed() const;
 
 	/**
+	 * @brief True if the message will not trigger push and desktop notifications
+	 *
+	 * @return True if notifications suppressed
+	 */
+	bool suppress_notifications() const;
+
+	/**
+	 * @brief True if the message is a voice message
+	 *
+	 * @return True if voice message
+	 */
+	bool is_voice_message() const;
+
+	/**
 	 * @brief Add a component (button) to message
 	 * 
 	 * @param c component to add
@@ -1443,9 +1612,10 @@ struct DPP_EXPORT message : public managed {
 	 *
 	 * @param filename filename
 	 * @param filecontent raw file content contained in std::string
+	 * @param filemimetype optional mime type of the file
 	 * @return message& reference to self
 	 */
-	message& add_file(const std::string &filename, const std::string &filecontent);
+	message& add_file(const std::string &filename, const std::string &filecontent, const std::string &filemimetype = "");
 
 	/**
 	 * @brief Set the message content
@@ -1477,6 +1647,20 @@ struct DPP_EXPORT message : public managed {
 	 * @return true if message is a DM
 	 */
 	bool is_dm() const;
+
+	/**
+	 * @brief Returns true if message has remixed attachment
+	 * 
+	 * @return true if message has remixed attachment
+	 */
+	bool has_remix_attachment() const;
+
+	/**
+	 * @brief Returns URL to message 
+	 * 
+	 * @return string of URL to message
+	 */
+	std::string get_url() const;
 };
 
 /** A group of messages */
@@ -1488,4 +1672,4 @@ typedef std::unordered_map<snowflake, sticker> sticker_map;
 /** A group of sticker packs */
 typedef std::unordered_map<snowflake, sticker_pack> sticker_pack_map;
 
-};
+} // namespace dpp

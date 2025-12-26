@@ -2,6 +2,7 @@
  *
  * D++, A Lightweight C++ library for Discord
  *
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright 2021 Craig Edwards and D++ contributors 
  * (https://github.com/brainboxdotcc/DPP/graphs/contributors)
  *
@@ -32,7 +33,7 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <dpp/nlohmann/json_fwd.hpp>
+#include <dpp/json_fwd.h>
 #include <dpp/wsclient.h>
 #include <dpp/dispatcher.h>
 #include <dpp/cluster.h>
@@ -48,13 +49,37 @@
 #include <functional>
 #include <chrono>
 
-using json = nlohmann::json;
-
 struct OpusDecoder;
 struct OpusEncoder;
 struct OpusRepacketizer;
 
 namespace dpp {
+
+class audio_mixer;
+
+// !TODO: change these to constexpr and rename every occurrence across the codebase
+#define AUDIO_TRACK_MARKER (uint16_t)0xFFFF
+
+#define AUDIO_OVERLAP_SLEEP_SAMPLES 30
+
+inline constexpr size_t send_audio_raw_max_length = 11520;
+
+/*
+* @brief For holding a moving average of the number of current voice users, for applying a smooth gain ramp.
+*/
+struct DPP_EXPORT moving_averager {
+	moving_averager() = default;
+
+	moving_averager(uint64_t collection_count_new);
+
+	moving_averager operator+=(int64_t value);
+
+	operator float();
+
+protected:
+	std::deque<int64_t> values{};
+	uint64_t collectionCount{};
+};
 
 // Forward declaration
 class cluster;
@@ -68,21 +93,23 @@ struct DPP_EXPORT voice_out_packet {
 	 * Generally these will be RTP.
 	 */
 	std::string packet;
+
 	/**
 	 * @brief Duration of packet
 	 */
 	uint64_t duration;
 };
 
-#define AUDIO_TRACK_MARKER (uint16_t)0xFFFF
-
-#define AUDIO_OVERLAP_SLEEP_SAMPLES 30
-
 /** @brief Implements a discord voice connection.
  * Each discord_voice_client connects to one voice channel and derives from a websocket client.
  */
 class DPP_EXPORT discord_voice_client : public websocket_client
 {
+	/**
+	 * @brief Clean up resources
+	 */
+	void cleanup();
+
 	/**
 	 * @brief Mutex for outbound packet stream
 	 */
@@ -112,6 +139,11 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 	 * @brief Last connect time of voice session
 	 */
 	time_t connect_time;
+
+	/*
+	* @brief For mixing outgoing voice data.
+	*/
+	std::unique_ptr<audio_mixer> mixer;
 
 	/**
 	 * @brief IP of UDP/RTP endpoint
@@ -158,6 +190,7 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 		 * voice payload.
 		 */
 		rtp_seq_t seq;
+
 		/**
 		 * @brief The timestamp of the RTP packet that generated this voice
 		 * payload.
@@ -166,6 +199,7 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 		 * number wraps around.
 		 */
 		rtp_timestamp_t timestamp;
+
 		/**
 		 * @brief The event payload that voice handlers receive.
 		 */
@@ -195,6 +229,7 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 			rtp_seq_t min_seq, max_seq;
 			rtp_timestamp_t min_timestamp, max_timestamp;
 		} range;
+
 		/**
 		 * @brief The queue of parked voice payloads.
 		 * 
@@ -203,10 +238,12 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 		 * are parked and sorted in this queue.
 		 */
 		std::priority_queue<voice_payload> parked_payloads;
+
 		/**
 		 * @brief The decoder ctls to be set on the decoder.
 		 */
 		std::vector<std::function<void(OpusDecoder&)>> pending_decoder_ctls;
+
 		/**
 		 * @brief libopus decoder
 		 *
@@ -220,6 +257,7 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 	 * @brief Thread used to deliver incoming voice data to handlers.
 	 */
 	std::thread voice_courier;
+
 	/**
 	 * @brief Shared state between this voice client and the courier thread.
 	 */
@@ -228,16 +266,19 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 		 * @brief Protects all following members.
 		 */
 		std::mutex mtx;
+
 		/**
 		 * @brief Signaled when there is a new payload to deliver or terminating state has changed.
 		 */
 		std::condition_variable signal_iteration;
+
 		/**
 		 * @brief Voice buffers to be reported to handler, grouped by speaker.
 		 *
 		 * Buffers are parked here and flushed every 500ms.
 		 */
 		std::map<snowflake, voice_payload_parking_lot> parked_voice_payloads;
+
 		/**
 		 * @brief Used to signal termination.
 		 *
@@ -245,6 +286,7 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 		 */
 		bool terminating = false;
 	} voice_courier_shared_state;
+
 	/**
 	 * @brief The run loop of the voice courier thread.
 	 */
@@ -398,6 +440,7 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 	 * @brief Called by ssl_client when there is data to be
 	 * read. At this point we insert that data into the
 	 * input queue.
+	 * @throw dpp::voice_exception if voice support is not compiled into D++
 	 */
 	void read_ready();
 
@@ -466,6 +509,21 @@ public:
 	bool terminating;
 
 	/**
+	 * @brief The gain value for the end of the current voice iteration.
+	 */
+	float end_gain;
+
+	/**
+	 * @brief The gain value for the current voice iteration.
+	 */
+	float current_gain;
+
+	/**
+	 * @brief The amount to increment each successive sample for, for the current voice iteration.
+	 */
+	float increment;
+
+	/**
 	 * @brief Heartbeat interval for sending heartbeat keepalive
 	 */
 	uint32_t heartbeat_interval;
@@ -494,6 +552,11 @@ public:
 	 * @brief Server ID
 	 */
 	snowflake server_id;
+
+	/**
+	 * @brief Moving averager.
+	 */
+	moving_averager moving_average;
 
 	/**
 	 * @brief Channel ID
@@ -629,7 +692,7 @@ public:
 	/**
 	 * @brief Send raw audio to the voice channel.
 	 * 
-	 * You should send an audio packet of 11520 bytes.
+	 * You should send an audio packet of `send_audio_raw_max_length` (11520) bytes.
 	 * Note that this function can be costly as it has to opus encode
 	 * the PCM audio on the fly, and also encrypt it with libsodium.
 	 * 
@@ -638,18 +701,26 @@ public:
 	 * ready to send and know its length it is advisable to call this
 	 * method multiple times to enqueue the entire stream audio so that
 	 * it is all encoded at once (unless you have set use_opus to false).
-	 * Constantly calling this from the dpp::on_voice_buffer_send callback
-	 * can and will eat a TON of cpu!
+	 * **Constantly calling this from dpp::cluster::on_voice_buffer_send
+	 * can, and will, eat a TON of cpu!**
 	 * 
 	 * @param audio_data Raw PCM audio data. Channels are interleaved,
 	 * with each channel's amplitude being a 16 bit value.
 	 * 
-	 * The audio data should be 48000Hz signed 16 bit audio.
+	 * @warning **The audio data needs to be 48000Hz signed 16 bit audio, otherwise, the audio will come through incorrectly!**
 	 * 
 	 * @param length The length of the audio data. The length should
 	 * be a multiple of 4 (2x 16 bit stereo channels) with a maximum
-	 * length of 11520, which is a complete opus frame at highest
-	 * quality.
+	 * length of `send_audio_raw_max_length`, which is a complete opus
+	 * frame at highest quality.
+	 *
+	 * Generally when you're streaming and you know there will be
+	 * more packet to come you should always provide packet data with
+	 * length of `send_audio_raw_max_length`.
+	 * Silence packet will be appended if length is less than
+	 * `send_audio_raw_max_length` as discord expects to receive such
+	 * specific packet size. This can cause gaps in your stream resulting
+	 * in distorted audio if you have more packet to send later on.
 	 * 
 	 * @return discord_voice_client& Reference to self
 	 * 
@@ -864,5 +935,5 @@ public:
 	std::string discover_ip();
 };
 
-};
+} // namespace dpp
 
