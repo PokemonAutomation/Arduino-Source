@@ -162,7 +162,10 @@ else()
     target_sources(SerialPrograms PRIVATE ../IconResource/IconResource.rc)
 endif()
 
-target_link_libraries(SerialPrograms PRIVATE SerialProgramsLib)
+target_link_libraries(
+    SerialPrograms PRIVATE
+    $<LINK_LIBRARY:WHOLE_ARCHIVE,SerialProgramsLib>
+)
 
 # Add source code exclusive to the internal repo and add C++ macro of official release
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../Internal/SerialPrograms/Internal0.cpp")

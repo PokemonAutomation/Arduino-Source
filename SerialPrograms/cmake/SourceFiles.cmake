@@ -10,7 +10,6 @@ file(GLOB LIBRARY_SOURCES
     ../3rdParty/QtWavFile/WavFile.h
     ../3rdParty/TesseractPA/TesseractPA.cpp
     ../3rdParty/TesseractPA/TesseractPA.h
-    ../3rdParty/qdarkstyle/dark/darkstyle.qrc
     ../Common/CRC32.cpp
     ../Common/CRC32.h
     ../Common/Compiler.h
