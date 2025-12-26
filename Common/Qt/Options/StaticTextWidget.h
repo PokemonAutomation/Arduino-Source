@@ -19,6 +19,9 @@ namespace PokemonAutomation{
 
 class StaticTextWidget : public QWidget, public ConfigWidget{
 public:
+    using ParentOption = StaticTextOption;
+
+public:
     ~StaticTextWidget();
     StaticTextWidget(QWidget& parent, StaticTextOption& value);
 
@@ -32,6 +35,9 @@ private:
 
 
 class SectionDividerWidget : public QWidget, public ConfigWidget{
+public:
+    using ParentOption = SectionDividerOption;
+
 public:
     ~SectionDividerWidget();
     SectionDividerWidget(QWidget& parent, SectionDividerOption& value);

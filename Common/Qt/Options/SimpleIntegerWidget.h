@@ -18,6 +18,9 @@ namespace PokemonAutomation{
 template <typename Type>
 class SimpleIntegerCellWidget : public QLineEdit, public ConfigWidget{
 public:
+    using ParentOption = SimpleIntegerCell<Type>;
+
+public:
     ~SimpleIntegerCellWidget();
     SimpleIntegerCellWidget(QWidget& parent, SimpleIntegerCell<Type>& value);
 
@@ -32,6 +35,9 @@ private:
 
 template <typename Type>
 class SimpleIntegerOptionWidget : public QWidget, public ConfigWidget{
+public:
+    using ParentOption = SimpleIntegerOption<Type>;
+
 public:
     ~SimpleIntegerOptionWidget();
     SimpleIntegerOptionWidget(QWidget& parent, SimpleIntegerOption<Type>& value);

@@ -18,6 +18,9 @@ namespace PokemonAutomation{
 
 class FixedCodeWidget : public QWidget, public ConfigWidget{
 public:
+    using ParentOption = FixedCodeOption;
+
+public:
     ~FixedCodeWidget();
     FixedCodeWidget(QWidget& parent, FixedCodeOption& value);
 

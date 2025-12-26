@@ -19,6 +19,9 @@ namespace PokemonAutomation{
 
 class TextEditWidget : public QWidget, public ConfigWidget{
 public:
+    using ParentOption = TextEditOption;
+
+public:
     ~TextEditWidget();
     TextEditWidget(QWidget& parent, TextEditOption& value);
 

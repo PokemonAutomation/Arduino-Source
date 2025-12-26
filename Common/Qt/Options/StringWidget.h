@@ -17,6 +17,9 @@ namespace PokemonAutomation{
 
 class StringCellWidget : public QLineEdit, public ConfigWidget{
 public:
+    using ParentOption = StringCell;
+
+public:
     ~StringCellWidget();
     StringCellWidget(QWidget& parent, StringCell& value);
 
@@ -31,6 +34,9 @@ private:
 
 
 class StringOptionWidget : public QWidget, public ConfigWidget{
+public:
+    using ParentOption = StringOption;
+
 public:
     ~StringOptionWidget();
     StringOptionWidget(QWidget& parent, StringOption& value);

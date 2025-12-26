@@ -18,6 +18,9 @@ class AutoHeightTableWidget;
 
 class StaticTableWidget : public QWidget, public ConfigWidget{
 public:
+    using ParentOption = StaticTableOption;
+
+public:
     ~StaticTableWidget();
     StaticTableWidget(QWidget& parent, StaticTableOption& value);
 
