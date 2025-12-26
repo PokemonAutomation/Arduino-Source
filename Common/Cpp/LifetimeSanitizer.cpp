@@ -21,24 +21,40 @@ namespace PokemonAutomation{
 
 
 #ifdef PA_SANITIZER_ENABLE
-
 //#define PA_SANITIZER_PRINT_ALL
-const std::set<std::string> SANITIZER_FILTER = {
-//    "MultiSwitchProgramSession",
-//    "MultiSwitchProgramWidget2",
-//    "VideoSource",
-};
-
-SpinLock sanitizer_lock;
-std::set<const LifetimeSanitizer*> sanitizer_map;
 
 
 std::atomic<bool> LifetimeSanitizer_disabled(false);
 
+
+struct LifetimeSanitizerFields{
+    std::set<std::string> filter;
+
+    SpinLock lock;
+    std::set<const LifetimeSanitizer*> map;
+
+    LifetimeSanitizerFields()
+        : filter({
+//        "MultiSwitchProgramSession",
+//        "MultiSwitchProgramWidget2",
+//        "VideoSource",
+        })
+    {}
+};
+
+LifetimeSanitizerFields& sanitizer_fields(){
+    static LifetimeSanitizerFields fields;
+    return fields;
+}
+
+
+
+
+
 void LifetimeSanitizer::disable(){
-    WriteSpinLock lg(sanitizer_lock);
+    WriteSpinLock lg(sanitizer_fields().lock);
     LifetimeSanitizer_disabled.store(true, std::memory_order_relaxed);
-    sanitizer_map.clear();
+    sanitizer_fields().map.clear();
 }
 
 PA_NO_INLINE void LifetimeSanitizer::terminate_with_dump(){
@@ -104,13 +120,16 @@ void LifetimeSanitizer::check_usage() const{
     if (LifetimeSanitizer_disabled.load(std::memory_order_relaxed)){
         return;
     }
-    ReadSpinLock lg(sanitizer_lock);
-    auto iter = sanitizer_map.find(this);
-    if (iter == sanitizer_map.end()){
+
+    LifetimeSanitizerFields& fields = sanitizer_fields();
+
+    ReadSpinLock lg(fields.lock);
+    auto iter = fields.map.find(this);
+    if (iter == fields.map.end()){
         std::cerr << "Use non-existent: " << this << std::endl;
         terminate_with_dump();
     }
-    if (SANITIZER_FILTER.contains(m_name)){
+    if (fields.filter.contains(m_name)){
         std::cout << "LifetimeSanitizer - Using: " << this << " : " << m_name << std::endl;
     }
     if (m_token != SANITIZER_TOKEN || m_self != this){
@@ -122,13 +141,16 @@ void LifetimeSanitizer::start_using() const{
     if (LifetimeSanitizer_disabled.load(std::memory_order_relaxed)){
         return;
     }
-    ReadSpinLock lg(sanitizer_lock);
-    auto iter = sanitizer_map.find(this);
-    if (iter == sanitizer_map.end()){
+
+    LifetimeSanitizerFields& fields = sanitizer_fields();
+
+    ReadSpinLock lg(fields.lock);
+    auto iter = fields.map.find(this);
+    if (iter == fields.map.end()){
         std::cerr << "Start using non-existent: " << this << std::endl;
         terminate_with_dump();
     }
-    if (SANITIZER_FILTER.contains(m_name)){
+    if (fields.filter.contains(m_name)){
         std::cout << "LifetimeSanitizer - Start using: " << this << " : " << m_name << std::endl;
     }
     if (m_token != SANITIZER_TOKEN || m_self != this){
@@ -141,13 +163,16 @@ void LifetimeSanitizer::done_using() const{
     if (LifetimeSanitizer_disabled.load(std::memory_order_relaxed)){
         return;
     }
-    ReadSpinLock lg(sanitizer_lock);
-    auto iter = sanitizer_map.find(this);
-    if (iter == sanitizer_map.end()){
+
+    LifetimeSanitizerFields& fields = sanitizer_fields();
+
+    ReadSpinLock lg(fields.lock);
+    auto iter = fields.map.find(this);
+    if (iter == fields.map.end()){
         std::cerr << "Done using non-existent: " << this << std::endl;
         terminate_with_dump();
     }
-    if (SANITIZER_FILTER.contains(m_name)){
+    if (fields.filter.contains(m_name)){
         std::cout << "LifetimeSanitizer - Done using: " << this << " : " << m_name << std::endl;
     }
     if (m_token != SANITIZER_TOKEN || m_self != this){
@@ -159,34 +184,38 @@ void LifetimeSanitizer::done_using() const{
 
 
 void LifetimeSanitizer::internal_construct(const char* name){
-    WriteSpinLock lg(sanitizer_lock);
-    if (SANITIZER_FILTER.contains(name)){
+    LifetimeSanitizerFields& fields = sanitizer_fields();
+
+    WriteSpinLock lg(fields.lock);
+    if (fields.filter.contains(name)){
         std::cout << "LifetimeSanitizer - Allocating: " << this << " : " << name << std::endl;
     }
 
-    auto iter = sanitizer_map.find(this);
-    if (iter != sanitizer_map.end()){
+    auto iter = fields.map.find(this);
+    if (iter != fields.map.end()){
         std::cerr << "LifetimeSanitizer - Double allocation: " << this << " : " << name << std::endl;
         terminate_with_dump();
     }
-    sanitizer_map.insert(this);
+    fields.map.insert(this);
 
     m_token = SANITIZER_TOKEN;
     m_self = this;
     m_name = name;
 }
 void LifetimeSanitizer::internal_destruct(){
-    WriteSpinLock lg(sanitizer_lock);
-    if (SANITIZER_FILTER.contains(m_name)){
+    LifetimeSanitizerFields& fields = sanitizer_fields();
+
+    WriteSpinLock lg(fields.lock);
+    if (fields.filter.contains(m_name)){
         std::cout << "LifetimeSanitizer - Freeing: " << this << " : " << m_name << std::endl;
     }
 
-    auto iter = sanitizer_map.find(this);
-    if (iter == sanitizer_map.end()){
+    auto iter = fields.map.find(this);
+    if (iter == fields.map.end()){
         std::cerr << "LifetimeSanitizer - Free non-existent: " << this << " : " << m_name << std::endl;
         terminate_with_dump();
     }
-    sanitizer_map.erase(this);
+    fields.map.erase(this);
 
     if (m_token != SANITIZER_TOKEN || m_self != this){
         std::cerr << "LifetimeSanitizer - Free non-existent: " << this << " : " << m_name << std::endl;

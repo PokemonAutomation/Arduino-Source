@@ -90,7 +90,6 @@ private:
 
 
 
-EventNotificationOption EggAutonomousState::m_notification_noop("", false, false);
 
 
 EggAutonomousState::EggAutonomousState(
@@ -150,7 +149,7 @@ void EggAutonomousState::process_shiny(const ImageViewRGB32& screen){
     m_env.update_stats();
     send_encounter_notification(
         m_env,
-        m_notification_noop,
+        EventNotificationOption_NOOP(),
         m_notification_shiny,
         false, true, {{{}, ShinyType::UNKNOWN_SHINY}}, std::nan(""),
         screen
