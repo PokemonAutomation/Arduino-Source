@@ -160,6 +160,7 @@ int main(int argc, char *argv[]){
     set_program_path(argv[0]);
 #endif
 
+    //  So far, this is only needed on Mac where static initialization is fucked up.
     PokemonAutomation::register_all_statics();
 
     setup_crash_handler();
