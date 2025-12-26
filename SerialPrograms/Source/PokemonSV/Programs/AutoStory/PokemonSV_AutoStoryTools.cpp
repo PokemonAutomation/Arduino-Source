@@ -274,8 +274,9 @@ bool confirm_marker_present(
 
 void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     PlayerRealignMode realign_mode,
-    uint8_t move_x, uint8_t move_y, uint16_t move_duration
+    uint8_t move_x, uint8_t move_y, uint16_t move_duration_ticks
 ){
+    Milliseconds move_duration = move_duration_ticks * 8ms;
     stream.log("Realigning player direction...");
     switch (realign_mode){
     case PlayerRealignMode::REALIGN_NEW_MARKER:
@@ -287,7 +288,7 @@ void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerC
         });
 
         pbf_press_button(context, BUTTON_ZR, 160ms, 840ms);
-        pbf_move_left_joystick_old1(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
+        pbf_move_left_joystick_old(context, move_x, move_y, move_duration, 1000ms);
         pbf_press_button(context, BUTTON_A, 160ms, 840ms);
         pbf_press_button(context, BUTTON_A, 160ms, 840ms);
 
@@ -310,7 +311,7 @@ void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerC
         pbf_press_button(context, BUTTON_L, 160ms, 840ms);
         return;
     case PlayerRealignMode::REALIGN_NO_MARKER:
-        pbf_move_left_joystick_old1(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
+        pbf_move_left_joystick_old(context, move_x, move_y, move_duration, 1000ms);
         pbf_press_button(context, BUTTON_L, 160ms, 840ms);
         return;
     }  
@@ -1561,10 +1562,10 @@ void move_forward_until_yolo_object_above_min_size(
     const std::string& target_label,
     double min_width, double min_height,
     std::function<void()>&& recovery_action, 
-    uint16_t forward_ticks, 
+    Milliseconds forward_duration, 
     uint8_t y, 
-    uint16_t delay_after_forward_move, 
-    uint16_t delay_after_lets_go
+    Milliseconds delay_after_forward_move, 
+    Milliseconds delay_after_lets_go
 ){
     context.wait_for_all_requests();
     pbf_move_left_joystick(context, {0, +1}, 80ms, 400ms); // move forward to align with camera
@@ -1603,7 +1604,7 @@ void move_forward_until_yolo_object_above_min_size(
                     return; // stop when the target is above a certain size. i.e. we are close enough to the target.
                 }
             
-                pbf_move_left_joystick_old1(context, 128, y, forward_ticks, 0);
+                pbf_move_left_joystick_old(context, 128, y, forward_duration, 0ms);
                 // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
                 // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
             });
@@ -1641,11 +1642,11 @@ void move_player_until_yolo_object_detected(
     const std::string& target_label,   
     std::function<void()>&& recovery_action, 
     uint16_t max_rounds, 
-    uint16_t forward_ticks, 
+    Milliseconds forward_duration, 
     uint8_t x, 
     uint8_t y, 
-    uint16_t delay_after_forward_move, 
-    uint16_t delay_after_lets_go
+    Milliseconds delay_after_forward_move, 
+    Milliseconds delay_after_lets_go
 ){
     context.wait_for_all_requests();
     pbf_move_left_joystick(context, {0, +1}, 80ms, 400ms); // move forward to align with camera
@@ -1666,7 +1667,7 @@ void move_player_until_yolo_object_detected(
 
                 
 
-                pbf_move_left_joystick_old1(context, x, y, forward_ticks, 0);
+                pbf_move_left_joystick_old(context, x, y, forward_duration, 0ms);
                 // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
                 // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
             });
@@ -1697,10 +1698,10 @@ void move_forward_until_yolo_object_not_detected(
     const std::string& target_label,   
     size_t times_not_seen_threshold,
     std::function<void()>&& recovery_action, 
-    uint16_t forward_ticks, 
+    Milliseconds forward_duration, 
     uint8_t y, 
-    uint16_t delay_after_forward_move, 
-    uint16_t delay_after_lets_go
+    Milliseconds delay_after_forward_move, 
+    Milliseconds delay_after_lets_go
 ){
     VideoOverlaySet overlays(env.console.overlay());
     bool target_visible = true;
@@ -1721,7 +1722,7 @@ void move_forward_until_yolo_object_not_detected(
                 }
             }
             
-            pbf_move_left_joystick_old1(context, 128, y, forward_ticks, 0);
+            pbf_move_left_joystick_old(context, 128, y, forward_duration, 0ms);
             // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
             // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
         });
@@ -1925,20 +1926,21 @@ bool move_player_to_realign_via_yolo(
             // }
             double push_magnitude_scale_factor = 60 / std::sqrt(std::abs(diff));
 
-            uint16_t push_duration = std::max(uint16_t(std::abs(diff * duration_scale_factor)), uint16_t(8));
+            uint16_t push_duration_ticks = std::max(uint16_t(std::abs(diff * duration_scale_factor)), uint16_t(8));
+            Milliseconds push_duration = push_duration_ticks * 8ms;
             int16_t push_direction = (diff > 0) ? -1 : 1;
             double push_magnitude = std::max(double(std::abs(diff * push_magnitude_scale_factor)), double(15)); 
             uint8_t x_push = uint8_t(std::max(std::min(int(128 + (push_direction * push_magnitude)), 255), 0));
 
             // env.console.log("object_x: {" + std::to_string(target_box.x) + ", " + std::to_string(target_box.y) + ", " + std::to_string(target_box.width) + ", " + std::to_string(target_box.height) + "}");
             // env.console.log("object_x_pos: " + std::to_string(object_x_pos));
-            env.console.log("x push: " + std::to_string(x_push) + ", push duration: " +  std::to_string(push_duration));
+            env.console.log("x push: " + std::to_string(x_push) + ", push duration: " +  std::to_string(push_duration.count()) + "ms");
             if (i == 0){
                 pbf_move_left_joystick_old(context, x_push, 128, 80ms, 400ms);
                 pbf_press_button(context, BUTTON_R, 160ms, 840ms);
             }
             
-            pbf_move_left_joystick_old1(context, x_push, 128, push_duration, 0);
+            pbf_move_left_joystick_old(context, x_push, 128, push_duration, 0ms);
             
         });
 

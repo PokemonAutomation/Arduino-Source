@@ -1262,12 +1262,12 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
     }    
 
     if (TEST_PBF_LEFT_JOYSTICK){
-        pbf_move_left_joystick_old1(context, X_MOVE, Y_MOVE, HOLD_TICKS, RELEASE_TICKS);
+        pbf_move_left_joystick_old(context, X_MOVE, Y_MOVE, HOLD_TICKS * 8ms, RELEASE_TICKS * 8ms);
         return;
     } 
 
     if (TEST_PBF_JOYSTICK2){
-        pbf_move_left_joystick_old1(context, X_MOVE2, Y_MOVE2, HOLD_TICKS2, RELEASE_TICKS2);
+        pbf_move_left_joystick_old(context, X_MOVE2, Y_MOVE2, HOLD_TICKS2 * 8ms, RELEASE_TICKS2 * 8ms);
         return;
     }            
 

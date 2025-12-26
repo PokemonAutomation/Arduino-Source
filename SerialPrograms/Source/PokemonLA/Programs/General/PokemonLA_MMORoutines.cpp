@@ -64,7 +64,7 @@ std::set<std::string> enter_region_and_read_MMO(
     // MMO question marks. So we have to move the map cursor away after we land in the region.
     uint8_t map_cursor_move_x = 0;
     uint8_t map_cursor_move_y = 0;
-    const int map_cursor_move_duration = 50;
+    const Milliseconds map_cursor_move_duration = 400ms;
 
     for(size_t i = 0; i < 5; i++){
         if (mmo_name == MMO_NAMES()[i]){
@@ -141,7 +141,7 @@ std::set<std::string> enter_region_and_read_MMO(
     }
 
     // Move cursor away so that it does not show a text box that occludes MMO sprites.
-    pbf_move_left_joystick_old1(context, map_cursor_move_x, map_cursor_move_y, map_cursor_move_duration, 30);
+    pbf_move_left_joystick_old(context, map_cursor_move_x, map_cursor_move_y, map_cursor_move_duration, 240ms);
     context.wait_for_all_requests();
 
     // Fix Missions & Requests tab:
@@ -242,7 +242,7 @@ std::set<std::string> enter_region_and_read_MMO(
     }
 
     // Move cursor away so that it does not show a text box that occludes MMO sprites.
-    pbf_move_left_joystick_old1(context, map_cursor_move_x, map_cursor_move_y, map_cursor_move_duration, 30);
+    pbf_move_left_joystick_old(context, map_cursor_move_x, map_cursor_move_y, map_cursor_move_duration, 240ms);
     context.wait_for_all_requests();
 
     std::set<std::string> found;

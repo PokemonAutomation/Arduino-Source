@@ -117,15 +117,17 @@ void map_move_cursor_fly(
     const ProgramInfo& info,
     VideoStream& stream, ProControllerContext& context,
     uint8_t x, uint8_t y,
-    uint8_t hold, uint8_t release,
+    uint8_t hold_ticks, uint8_t release_ticks,
     std::string location
 ){
     stream.log("Attempting to fly to " + location + ".");
+    Milliseconds hold = hold_ticks * 8ms;
+    Milliseconds release = release_ticks * 8ms;
 
     for (int i = 0; i < 3; i++){
         try{
             open_map_from_overworld(info, stream, context);
-            pbf_move_left_joystick_old1(context, x, y, hold, release);
+            pbf_move_left_joystick_old(context, x, y, hold, release);
             pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
             fly_to_overworld_from_map(info, stream, context);
             break;
