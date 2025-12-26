@@ -290,6 +290,10 @@ bool EventNotificationOption::ok_to_send_now(Logger& logger){
 }
 
 
+EventNotificationOption& EventNotificationOption_NOOP(){
+    static EventNotificationOption ret("", false, false);
+    return ret;
+}
 
 
 

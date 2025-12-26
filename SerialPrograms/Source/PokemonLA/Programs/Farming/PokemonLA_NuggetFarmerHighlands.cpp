@@ -137,7 +137,7 @@ bool NuggetFarmerHighlands::run_iteration(
                     pbf_press_button(context, BUTTON_B, 40ms, 0ms);
                 }
                 pbf_press_button(context, BUTTON_B, 1600ms, 640ms);
-                pbf_wait_old(context, 80);
+                pbf_wait(context, 640ms);
 
                 pbf_move_left_joystick_old(context, 0, 64, 400ms, 0ms);
                 pbf_press_button(context, BUTTON_B, 2000ms, 640ms);

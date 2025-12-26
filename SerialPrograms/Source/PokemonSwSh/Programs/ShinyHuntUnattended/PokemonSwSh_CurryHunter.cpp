@@ -129,7 +129,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         for (uint16_t c = 0; c < 300; c = c + 25){
             pbf_press_button(context, BUTTON_A, 40ms, 160ms);
         }
-        pbf_wait_old(context, 170);
+        pbf_wait(context, 1360ms);
 
 
         //  Do circles with the joystick. Each circle has ten positions.
@@ -148,7 +148,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
 
 
         //  Last step for the curry cooking part.
-        pbf_wait_old(context, 425);
+        pbf_wait(context, 3400ms);
         pbf_press_button(context, BUTTON_A, 40ms, 18000ms);
 
         //  Press A when it shows your curry, and its class.
@@ -224,7 +224,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
             if (TAKE_VIDEO){
                 pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 4000ms);
             }else{
-                pbf_wait_old(context, 750);
+                pbf_wait(context, 6000ms);
             }
 
 

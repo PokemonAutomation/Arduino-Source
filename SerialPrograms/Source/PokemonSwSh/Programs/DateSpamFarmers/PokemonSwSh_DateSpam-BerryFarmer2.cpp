@@ -144,7 +144,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
     BerryFarmer2_Descriptor::Stats& stats = env.current_stats<BerryFarmer2_Descriptor::Stats>();
 
     // wait some time in order to not detect rustling from previous fetch attempt
-    pbf_wait_old(context, 80);
+    pbf_wait(context, 640ms);
     context.wait_for_all_requests();
 
     BerryTreeRustlingSoundDetector initial_rustling_detector(

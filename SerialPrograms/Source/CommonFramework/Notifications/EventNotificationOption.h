@@ -79,6 +79,9 @@ private:
 };
 
 
+EventNotificationOption& EventNotificationOption_NOOP();
+
+
 
 }
 #endif

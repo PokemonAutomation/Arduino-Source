@@ -174,7 +174,7 @@ void run_autohost(
             env.log("Next Raid Code: " + code);
             pbf_press_button(context, BUTTON_PLUS, 40ms, 1160ms);
             FastCodeEntry::numberpad_enter_code(console, context, code, true);
-            pbf_wait_old(context, 180);
+            pbf_wait(context, 1440ms);
             pbf_press_button(context, BUTTON_A, 40ms, 760ms);
         }
         context.wait_for_all_requests();

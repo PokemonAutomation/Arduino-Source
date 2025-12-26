@@ -48,7 +48,7 @@ Xoroshiro128PlusState find_rng_state(
             break;
         }
         stream.overlay().add_log(text, COLOR_BLUE);
-        pbf_wait_old(context, 180);
+        pbf_wait(context, 1440ms);
 
         if (i < 64){
             last_bits0 += last_bit << (63 - i);
@@ -121,7 +121,7 @@ std::pair<Xoroshiro128PlusState, uint64_t> refind_rng_state_and_animations(
             break;
         }
         stream.overlay().add_log(text, COLOR_BLUE);
-        pbf_wait_old(context, 180);
+        pbf_wait(context, 1440ms);
 
         std::vector<bool>::iterator last_bit_start = std::search(last_bit_sequence.begin(), last_bit_sequence.end(), sequence.begin(), sequence.end());
         possible_indices = 0;

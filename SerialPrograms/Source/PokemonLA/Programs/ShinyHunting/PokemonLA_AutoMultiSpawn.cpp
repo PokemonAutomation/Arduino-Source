@@ -573,7 +573,7 @@ PokemonDetails AutoMultiSpawn::go_to_spawn_point_and_try_focusing_pokemon(
 ){
     // From camp fly to the spawn point, focus on a target pokemon and start a battle
     change_mount(env.console, context, MountState::BRAVIARY_ON);
-    pbf_wait_old(context, 40);
+    pbf_wait(context, 320ms);
     
     // Move to spawn location on Braviary
     pbf_move_left_joystick_old(context, 255, 165, 1200ms, 0ms); // 170

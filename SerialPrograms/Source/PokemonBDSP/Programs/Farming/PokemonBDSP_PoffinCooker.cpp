@@ -142,7 +142,7 @@ void PoffinCooker::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         pbf_mash_button(context, BUTTON_A, 1200ms); // Mash here to make sure the final button press isn't dropped
 
         // Wait a bit less than 10 seconds for the cinematic to happen then cook.
-        pbf_wait_old(context, 1050);
+        pbf_wait(context, 8400ms);
         context.wait_for_all_requests();
 
         env.log("Stir slowly for the first part");
@@ -186,7 +186,7 @@ void PoffinCooker::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         }
 
         // Final animation when the cooking session is over
-        pbf_wait_old(context, 750);
+        pbf_wait(context, 6000ms);
 
         if (c < MAX_COOK_ATTEMPTS - 1){
             env.log("Prepare for the next iteration");

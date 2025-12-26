@@ -205,7 +205,7 @@ void hold_one_column(const ProgramInfo& info, VideoStream& stream, ProController
         ssf_press_left_joystick(context, {0, -1}, 32ms, 40ms, 24ms);
     }
     // Hold rest of the party
-    pbf_wait_old(context, 60);
+    pbf_wait(context, 480ms);
     // We cannot detect whether this Button A will be dropped or not.
     // So we have to go blind here.
     pbf_press_button(context, BUTTON_A, 400ms, 320ms);

@@ -13,9 +13,6 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void pbf_wait_old(ProControllerContext& context, uint16_t ticks){
-    ssf_do_nothing(context, ticks * 8ms);
-}
 void pbf_wait(ProControllerContext& context, Milliseconds duration){
     ssf_do_nothing(context, duration);
 }
