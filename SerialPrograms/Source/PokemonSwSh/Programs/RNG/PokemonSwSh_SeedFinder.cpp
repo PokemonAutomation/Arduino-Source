@@ -121,7 +121,7 @@ void SeedFinder::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             1600ms
         );
     }else{
-        pbf_press_dpad_old(context, DPAD_LEFT, 5, 5);
+        pbf_press_dpad(context, DPAD_LEFT, 40ms, 40ms);
     }
 
 
