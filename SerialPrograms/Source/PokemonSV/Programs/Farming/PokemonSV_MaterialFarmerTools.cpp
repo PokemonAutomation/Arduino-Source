@@ -655,7 +655,9 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, VideoStream&
     // the push magnitude can range from 69 to 85 (range of 16). 
     // On each failure, try increasing/decreasing the push by 1/4 of the max range,
     // then 1/2 of the range, then the full range, then back to re-attempts with no adjustment
-    const std::array<int, maxAttempts + 1> adjustment_table =  {0, 0, 0, 4, -4, 8, -8, 16, -16, 0, 0, 0};
+    const std::array<Milliseconds, maxAttempts + 1> adjustment_table = {
+        0ms, 0ms, 0ms, 32ms, -32ms, 64ms, -64ms, 128ms, -128ms, 0ms, 0ms, 0ms
+    };
     while (!isFlySuccessful && numAttempts < maxAttempts){
         // close all menus
         pbf_mash_button(context, BUTTON_B, 800ms);
@@ -672,8 +674,9 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, VideoStream&
 
         // move cursor to Blueberry academy fast travel point (up-left)
         // try different magnitudes of cursor push with each failure.
-        int push_magnitude_ticks = 105 + adjustment_table[numAttempts];
-        Milliseconds push_magnitude = push_magnitude_ticks * 8ms;
+//        int push_magnitude_ticks = 105 + adjustment_table[numAttempts];
+//        Milliseconds push_magnitude = push_magnitude_ticks * 8ms;
+        Milliseconds push_magnitude = 840ms + adjustment_table[numAttempts];
         pbf_move_left_joystick_old(context, 64, 64, push_magnitude, 400ms);
 
         // press A to fly to Blueberry academy

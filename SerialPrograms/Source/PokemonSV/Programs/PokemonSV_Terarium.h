@@ -23,7 +23,7 @@ void map_move_cursor_fly(
     const ProgramInfo& info,
     VideoStream& stream, ProControllerContext& context,
     uint8_t x, uint8_t y,
-    uint8_t hold, uint8_t release,
+    Milliseconds hold, Milliseconds release,
     std::string location
 );
 

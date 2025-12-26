@@ -59,9 +59,11 @@ CurryHunter::CurryHunter()
         "2000 ms"
     )
     , SMALL_POKEMON(
-        "<b>Small " + STRING_POKEMON + ":</b><br>If there are small " + STRING_POKEMON + ", increase this number by 240. You may have to adjust the number and check what works best for your area.",
+        "<b>Walk forward for Small " + STRING_POKEMON + ":</b><br>"
+        "If there are small " + STRING_POKEMON +
+        ", increase this number by 240 ms. You may have to adjust the number and check what works best for your area.",
         LockMode::LOCK_WHILE_RUNNING,
-        0
+        "0 ms"
     )
     , TAKE_VIDEO(
         "<b>Take Videos:</b><br>Take a video after each cooking iteration. This will spam your album with videos.",
@@ -197,8 +199,8 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
 
 
             //  This routine gives better odds of attracting a low Pokemon if the option is enabled.
-            if (SMALL_POKEMON>0){
-                pbf_move_left_joystick_old(context, 0x80, 0xff, Milliseconds(SMALL_POKEMON), 0ms);
+            if (SMALL_POKEMON.get() > 0ms){
+                pbf_move_left_joystick_old(context, 0x80, 0xff, SMALL_POKEMON, 0ms);
 
                 for (uint16_t i = 0; i<2; i++){
                     pbf_move_left_joystick_old(context, 0x00, 0x80, 240ms, 0ms); // Left

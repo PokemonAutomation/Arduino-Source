@@ -110,7 +110,7 @@ void ControllerWithScheduler::issue_left_joystick(
     execute_schedule(cancellable, schedule);
     if (m_logging_throttler){
         m_logger.log(
-            "issue_left_joystick(): (" + std::to_string(position.x) + "," + std::to_string(position.y) + ")" +
+            "issue_left_joystick(): (" + tostr_fixed(position.x, 3) + "," + tostr_fixed(position.y, 3) + ")" +
             ", delay = " + std::to_string(delay.count()) + "ms" +
             ", hold = " + std::to_string(hold.count()) + "ms" +
             ", cooldown = " + std::to_string(cooldown.count()) + "ms",
