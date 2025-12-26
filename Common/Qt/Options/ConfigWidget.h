@@ -9,6 +9,8 @@
 
 #include "Common/Cpp/Options/ConfigOption.h"
 
+class QWidget;
+
 namespace PokemonAutomation{
 
 
@@ -25,7 +27,6 @@ namespace PokemonAutomation{
 //  pointer can get the actual QWidget.
 class ConfigWidget : public UiComponent, protected ConfigOption::Listener{
 public:
-    //  Temporary for refactoring.
     static ConfigWidget* make_from_option(ConfigOption& option, QWidget* parent);
 
 

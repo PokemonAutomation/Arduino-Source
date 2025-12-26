@@ -31,8 +31,8 @@ CustomPathTableWidget::CustomPathTableWidget(QWidget& parent, CustomPathTableFro
     // EditableTableBaseWidget inherits QWidget.
     // Since it's a QWidget, we don't need to care about its memory ownership after its parent is set (as `this`).
 
-    m_travel_location = value.TRAVEL_LOCATION.make_QtWidget(*this);
-    m_table_widget = value.PATH.make_QtWidget(*this);
+    m_travel_location = ConfigWidget::make_from_option(value.TRAVEL_LOCATION, this);
+    m_table_widget = ConfigWidget::make_from_option(value.PATH, this);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);

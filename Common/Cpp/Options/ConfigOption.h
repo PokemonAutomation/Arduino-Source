@@ -13,8 +13,6 @@
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/UiWrapper.h"
 
-class QWidget;
-
 namespace PokemonAutomation{
 
 class JsonValue;
@@ -139,7 +137,6 @@ protected:
 
 public:
     virtual UiWrapper make_UiComponent(void* params) = 0;
-    ConfigWidget* make_QtWidget(QWidget& parent);
 
 private:
     struct Data;
@@ -159,7 +156,13 @@ private:
 template <typename OptionType>
 using ConfigUiFactory = UiWrapper (*)(OptionType& option, void* params);
 
-
+//
+//  This is a convenience class that implementations should inherit from instead
+//  of directly inheriting from ConfigOption or another option type.
+//
+//  This provides the per-type UI factory as well as the "make_UiComponent"
+//  override. This saves a ton of copy-paste as those are the same eveywhere.
+//
 template <typename ConfigType, typename ParentType = ConfigOption>
 class ConfigOptionImpl : public ParentType{
 public:

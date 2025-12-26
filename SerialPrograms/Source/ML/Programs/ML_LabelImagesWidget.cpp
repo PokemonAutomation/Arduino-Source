@@ -112,14 +112,14 @@ LabelImages_Widget::LabelImages_Widget(
     scroll_layout->addLayout(annotation_row);
 
     // add a dropdown menu for user to pick whether to choose from pokemon form label or custom label
-    ConfigWidget* label_type_widget = program.LABEL_TYPE.make_QtWidget(*scroll_inner);
+    ConfigWidget* label_type_widget = ConfigWidget::make_from_option(program.LABEL_TYPE, scroll_inner);
     annotation_row->addWidget(&label_type_widget->widget(), 0);
 
-    ConfigWidget* pokemon_label_widget = program.FORM_LABEL.make_QtWidget(*scroll_inner);
+    ConfigWidget* pokemon_label_widget = ConfigWidget::make_from_option(program.FORM_LABEL, scroll_inner);
     annotation_row->addWidget(&pokemon_label_widget->widget(), 2);
-    ConfigWidget* custom_label_widget = program.CUSTOM_SET_LABEL.make_QtWidget(*scroll_inner);
+    ConfigWidget* custom_label_widget = ConfigWidget::make_from_option(program.CUSTOM_SET_LABEL, scroll_inner);
     annotation_row->addWidget(&custom_label_widget->widget(), 2);
-    ConfigWidget* manual_input_label_widget = program.MANUAL_LABEL.make_QtWidget(*scroll_inner);
+    ConfigWidget* manual_input_label_widget = ConfigWidget::make_from_option(program.MANUAL_LABEL, scroll_inner);
     annotation_row->addWidget(&manual_input_label_widget->widget(), 2);
     QPushButton* load_custom_set_button = new QPushButton("Load Custom Set", scroll_inner);
     annotation_row->addWidget(load_custom_set_button, 2);

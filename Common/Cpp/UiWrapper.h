@@ -25,20 +25,11 @@ public:
 //  Lightweight smart pointer to avoid pulling in <memory>.
 class UiWrapper{
 public:
-    UiWrapper()
-        : m_owns(false)
-        , m_component(nullptr)
-    {}
-    UiWrapper(bool take_ownership, UiComponent* component)
-        : m_owns(take_ownership)
-        , m_component(component)
-    {}
     ~UiWrapper(){
         if (m_owns){
             delete m_component;
         }
     }
-
     UiWrapper(UiWrapper&& x)
         : m_owns(x.m_owns)
         , m_component(x.m_component)
@@ -58,6 +49,25 @@ public:
     }
     UiWrapper(const UiWrapper& x) = delete;
     void operator=(const UiWrapper& x) = delete;
+
+
+public:
+    UiWrapper()
+        : m_owns(false)
+        , m_component(nullptr)
+    {}
+    UiWrapper(bool take_ownership, UiComponent* component)
+        : m_owns(take_ownership)
+        , m_component(component)
+    {}
+
+    bool is_owning() const{
+        return m_owns;
+    }
+    UiComponent* release(){
+        m_owns = false;
+        return m_component;
+    }
 
 
 public:
