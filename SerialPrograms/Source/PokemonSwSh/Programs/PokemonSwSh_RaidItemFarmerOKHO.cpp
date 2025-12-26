@@ -160,7 +160,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
         );
 
         //  Start Raid
-        pbf_press_dpad_old(host, DPAD_UP, 5, 45);
+        pbf_press_dpad(host, DPAD_UP, 40ms, 360ms);
 
         host.wait_for_all_requests();
         env.run_in_parallel(

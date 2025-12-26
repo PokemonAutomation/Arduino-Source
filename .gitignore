@@ -4,6 +4,7 @@ SerialPrograms/bin/
 
 discord_social_sdk_win/
 discord_partner_sdk.dll
+3rdPartyBinaries/discord_social_sdk_mac/
 
 # macOS hidden system file
 .DS_Store

@@ -397,7 +397,7 @@ void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProController
     do_action_and_monitor_for_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 220, 255, 50);
-            walk_forward_while_clear_front_path(env.program_info(), env.console, context, 100);
+            walk_forward_while_clear_front_path(env.program_info(), env.console, context, 800ms);
             walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A);
         }
     );
@@ -736,7 +736,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         // walk towards wall
         direction.change_direction(env.program_info(), env.console, context, 2.949863);
 
-        walk_forward_while_clear_front_path(env.program_info(), env.console, context, 700);
+        walk_forward_while_clear_front_path(env.program_info(), env.console, context, 5600ms);
 
         // back away from wall and get on ride
         pbf_move_left_joystick(context, {0, -1}, 400ms, 400ms);

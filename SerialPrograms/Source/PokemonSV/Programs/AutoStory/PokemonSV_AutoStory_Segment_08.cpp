@@ -104,7 +104,7 @@ void checkpoint_13(
 
             context.wait_for_all_requests();
             realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 80, 50);
-            walk_forward_while_clear_front_path(info, env.console, context, 500);
+            walk_forward_while_clear_front_path(info, env.console, context, 4000ms);
             walk_forward_until_dialog(info, env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30000ms);
         });
 

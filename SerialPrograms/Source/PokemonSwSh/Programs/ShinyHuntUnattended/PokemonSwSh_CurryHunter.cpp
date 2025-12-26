@@ -100,7 +100,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
 
     //  Select the cooking option.
     pbf_press_button(context, BUTTON_X, 40ms, 1000ms);
-    pbf_press_dpad_old(context, DPAD_RIGHT, 5, 100);
+    pbf_press_dpad(context, DPAD_RIGHT, 40ms, 800ms);
     pbf_press_button(context, BUTTON_A, 40ms, 1000ms);
     pbf_press_button(context, BUTTON_A, 40ms, 2400ms);
 

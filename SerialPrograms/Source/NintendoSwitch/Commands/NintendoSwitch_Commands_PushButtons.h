@@ -34,7 +34,6 @@ void pbf_wait           (ProControllerContext& context, Milliseconds duration);
 //  The buttons are defined in NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h. Examples include BUTTON_A, BUTTON_ZL.
 //  The buttons also include clicking joysticks: BUTTON_LCLICK, BUTTON_RCLICK.
 //  D-Pad buttons and directional movements of joysticks are controlled by separate functions.
-void pbf_press_button_old   (ProControllerContext& context, Button button, uint16_t hold_ticks, uint16_t release_ticks);
 void pbf_press_button       (ProControllerContext& context, Button button, Milliseconds hold, Milliseconds release);
 
 //  Press a Switch controller D-Pad button. Hold the button for `hold_ticks`, then release it for `release_ticks`.

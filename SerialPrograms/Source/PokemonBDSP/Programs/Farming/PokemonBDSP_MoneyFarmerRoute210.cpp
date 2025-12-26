@@ -273,8 +273,8 @@ void MoneyFarmerRoute210::heal_at_center_and_return(
     pbf_move_left_joystick(context, {+1, 0}, 2400ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 3000ms, 0ms);
 
-    pbf_press_dpad_old(context, DPAD_RIGHT, 375, 0);
-    pbf_press_dpad_old(context, DPAD_LEFT, 375, 0);
+    pbf_press_dpad(context, DPAD_RIGHT, 3000ms, 0ms);
+    pbf_press_dpad(context, DPAD_LEFT, 3000ms, 0ms);
     pbf_press_dpad(context, DPAD_DOWN, 1000ms, 0ms);
 
     pp0[0] = MON0_MOVE1_PP;
@@ -376,12 +376,12 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
 
         if (need_to_charge){
             pbf_move_left_joystick(context, {+1, 0}, 1120ms, 0ms);
-            pbf_press_dpad_old(context, DPAD_UP, 85, 0);
+            pbf_press_dpad(context, DPAD_UP, 680ms, 0ms);
             for (size_t c = 0; c < 7; c++){
                 pbf_move_left_joystick(context, {-1, 0},  1120ms, 0ms);
                 pbf_move_left_joystick(context, {+1, 0}, 1120ms, 0ms);
             }
-            pbf_press_dpad_old(context, DPAD_DOWN, 75, 0);
+            pbf_press_dpad(context, DPAD_DOWN, 600ms, 0ms);
         }
         pbf_press_dpad(context, DPAD_LEFT, 1600ms, 0ms);
 

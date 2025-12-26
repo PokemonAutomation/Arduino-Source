@@ -365,7 +365,7 @@ void overworld_navigation(
                         stream, context,
                         [&](ProControllerContext& context){
                             if (movement_mode == NavigationMovementMode::CLEAR_WITH_LETS_GO){
-                                walk_forward_while_clear_front_path(info, stream, context, forward_ticks, y);
+                                walk_forward_while_clear_front_path(info, stream, context, forward_ticks*8ms, y);
                             }else{
                                 ssf_press_left_joystick_old(context, x, y, 0ms, Seconds(seconds_realign));
                                 if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
@@ -462,7 +462,7 @@ void config_option(ProControllerContext& context, int change_option_value){
     for (int i = 0; i < change_option_value; i++){
         pbf_press_dpad(context, DPAD_RIGHT, 104ms, 160ms);
     }
-    pbf_press_dpad_old(context, DPAD_DOWN,  13, 20);
+    pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
 }
 
 void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language){
@@ -482,11 +482,11 @@ void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     // select move 1
     pbf_press_button(context, BUTTON_A, 160ms, 320ms);  
-    pbf_press_dpad_old(context, DPAD_DOWN,  15, 40);
-    pbf_press_dpad_old(context, DPAD_DOWN,  15, 40);
+    pbf_press_dpad(context, DPAD_DOWN, 120ms, 320ms);
+    pbf_press_dpad(context, DPAD_DOWN, 120ms, 320ms);
     // extra button presses to avoid drops
-    pbf_press_dpad_old(context, DPAD_DOWN,  15, 40);
-    pbf_press_dpad_old(context, DPAD_DOWN,  15, 40);
+    pbf_press_dpad(context, DPAD_DOWN, 120ms, 320ms);
+    pbf_press_dpad(context, DPAD_DOWN, 120ms, 320ms);
 
     // select move 3. swap move 1 and move 3.
     pbf_press_button(context, BUTTON_A, 160ms, 320ms);    

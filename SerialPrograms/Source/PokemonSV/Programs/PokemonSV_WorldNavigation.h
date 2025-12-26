@@ -144,18 +144,18 @@ void walk_forward_until_dialog(
 );
 
 // walk forward while using lets go to clear the path
-// forward_ticks: number of ticks to walk forward
+// forward_duration: number of ticks to walk forward
 // y = 0: walks forward. y = 128: stand in place. y = 255: walk backwards (towards camera)
-// ticks_between_lets_go: number of ticks between firing off Let's go to clear the path from wild pokemon
-// delay_after_lets_go: number of ticks to wait after firing off Let's go.
+// duration_between_lets_go: milliseconds between firing off Let's go to clear the path from wild pokemon
+// delay_after_lets_go: milliseconds to wait after firing off Let's go.
 void walk_forward_while_clear_front_path(
     const ProgramInfo& info, 
     VideoStream& stream,
     ProControllerContext& context,
-    uint16_t forward_ticks,
+    Milliseconds forward_duration,
     uint8_t y = 0,
-    uint16_t ticks_between_lets_go = 125,
-    uint16_t delay_after_lets_go = 250
+    Milliseconds duration_between_lets_go = Milliseconds(1000),
+    Milliseconds delay_after_lets_go = Milliseconds(2000)
 );
 
 // fly to the pokecenter that overlaps with the player on the map, and return true.
