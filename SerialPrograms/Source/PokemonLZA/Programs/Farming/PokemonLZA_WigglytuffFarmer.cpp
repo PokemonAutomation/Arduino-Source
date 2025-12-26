@@ -114,7 +114,7 @@ bool WigglytuffFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
 
         int ret = wait_until(
             env.console, context,
-            10000ms,
+            30000ms,
             {
                 buttonA, // 0
                 arrow,   // 1
@@ -156,7 +156,7 @@ bool WigglytuffFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
             env.update_stats();
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "run_lobby(): No recognized state after 10 seconds.",
+                "run_lobby(): No recognized state after 30 seconds.",
                 env.console
             );
         }
