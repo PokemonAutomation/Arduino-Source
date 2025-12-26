@@ -135,23 +135,23 @@ template class SimpleIntegerOptionWidget<int16_t>;
 template class SimpleIntegerOptionWidget<int32_t>;
 template class SimpleIntegerOptionWidget<int64_t>;
 
-template class ConfigWidgetInitializer<SimpleIntegerCell<uint8_t>, SimpleIntegerCellWidget<uint8_t>>;
-template class ConfigWidgetInitializer<SimpleIntegerCell<uint16_t>, SimpleIntegerCellWidget<uint16_t>>;
-template class ConfigWidgetInitializer<SimpleIntegerCell<uint32_t>, SimpleIntegerCellWidget<uint32_t>>;
-template class ConfigWidgetInitializer<SimpleIntegerCell<uint64_t>, SimpleIntegerCellWidget<uint64_t>>;
-template class ConfigWidgetInitializer<SimpleIntegerCell<int8_t>, SimpleIntegerCellWidget<int8_t>>;
-template class ConfigWidgetInitializer<SimpleIntegerCell<int16_t>, SimpleIntegerCellWidget<int16_t>>;
-template class ConfigWidgetInitializer<SimpleIntegerCell<int32_t>, SimpleIntegerCellWidget<int32_t>>;
-template class ConfigWidgetInitializer<SimpleIntegerCell<int64_t>, SimpleIntegerCellWidget<int64_t>>;
+template class RegisterConfigWidget<SimpleIntegerCellWidget<uint8_t>>;
+template class RegisterConfigWidget<SimpleIntegerCellWidget<uint16_t>>;
+template class RegisterConfigWidget<SimpleIntegerCellWidget<uint32_t>>;
+template class RegisterConfigWidget<SimpleIntegerCellWidget<uint64_t>>;
+template class RegisterConfigWidget<SimpleIntegerCellWidget<int8_t>>;
+template class RegisterConfigWidget<SimpleIntegerCellWidget<int16_t>>;
+template class RegisterConfigWidget<SimpleIntegerCellWidget<int32_t>>;
+template class RegisterConfigWidget<SimpleIntegerCellWidget<int64_t>>;
 
-template class ConfigWidgetInitializer<SimpleIntegerOption<uint8_t>, SimpleIntegerOptionWidget<uint8_t>>;
-template class ConfigWidgetInitializer<SimpleIntegerOption<uint16_t>, SimpleIntegerOptionWidget<uint16_t>>;
-template class ConfigWidgetInitializer<SimpleIntegerOption<uint32_t>, SimpleIntegerOptionWidget<uint32_t>>;
-template class ConfigWidgetInitializer<SimpleIntegerOption<uint64_t>, SimpleIntegerOptionWidget<uint64_t>>;
-template class ConfigWidgetInitializer<SimpleIntegerOption<int8_t>, SimpleIntegerOptionWidget<int8_t>>;
-template class ConfigWidgetInitializer<SimpleIntegerOption<int16_t>, SimpleIntegerOptionWidget<int16_t>>;
-template class ConfigWidgetInitializer<SimpleIntegerOption<int32_t>, SimpleIntegerOptionWidget<int32_t>>;
-template class ConfigWidgetInitializer<SimpleIntegerOption<int64_t>, SimpleIntegerOptionWidget<int64_t>>;
+template class RegisterConfigWidget<SimpleIntegerOptionWidget<uint8_t>>;
+template class RegisterConfigWidget<SimpleIntegerOptionWidget<uint16_t>>;
+template class RegisterConfigWidget<SimpleIntegerOptionWidget<uint32_t>>;
+template class RegisterConfigWidget<SimpleIntegerOptionWidget<uint64_t>>;
+template class RegisterConfigWidget<SimpleIntegerOptionWidget<int8_t>>;
+template class RegisterConfigWidget<SimpleIntegerOptionWidget<int16_t>>;
+template class RegisterConfigWidget<SimpleIntegerOptionWidget<int32_t>>;
+template class RegisterConfigWidget<SimpleIntegerOptionWidget<int64_t>>;
 
 
 

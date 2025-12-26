@@ -77,21 +77,23 @@ protected:
 //  Helpers for implementations.
 //
 
-template <typename ConfigOptionType, typename ConfigWidgetType>
-class ConfigWidgetInitializer{
+template <typename ConfigWidgetType>
+class RegisterConfigWidget{
+    using ConfigOptionType = typename ConfigWidgetType::ParentOption;
+
 public:
-    ConfigWidgetInitializer(){
+    RegisterConfigWidget(){
         ConfigOptionType::m_ui_factory = [](ConfigOptionType& option, void* params){
             QWidget* parent = (QWidget*)params;
             return UiWrapper(parent == nullptr, new ConfigWidgetType(*parent, option));
         };
     }
 
-    static ConfigWidgetInitializer initializer;
+    static RegisterConfigWidget initializer;
 };
 
-template <typename ConfigOptionType, typename ConfigWidgetType>
-ConfigWidgetInitializer<ConfigOptionType, ConfigWidgetType> ConfigWidgetInitializer<ConfigOptionType, ConfigWidgetType>::initializer;
+template <typename ConfigWidgetType>
+RegisterConfigWidget<ConfigWidgetType> RegisterConfigWidget<ConfigWidgetType>::initializer;
 
 
 

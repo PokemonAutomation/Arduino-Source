@@ -13,8 +13,8 @@ namespace PokemonAutomation{
 
 
 
-template class ConfigWidgetInitializer<BooleanCheckBoxCell, BooleanCheckBoxCellWidget>;
-template class ConfigWidgetInitializer<BooleanCheckBoxOption, BooleanCheckBoxOptionWidget>;
+template class RegisterConfigWidget<BooleanCheckBoxCellWidget>;
+template class RegisterConfigWidget<BooleanCheckBoxOptionWidget>;
 
 
 
