@@ -15,10 +15,6 @@
 namespace PokemonAutomation{
 
 
-ConfigUiFactory<ButtonCell> ButtonCell::m_ui_factory;
-ConfigUiFactory<ButtonOption> ButtonOption::m_ui_factory;
-
-
 struct ButtonCell::Data{
     std::atomic<Enabled> m_state;
 

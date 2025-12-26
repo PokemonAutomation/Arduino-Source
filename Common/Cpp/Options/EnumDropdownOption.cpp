@@ -16,10 +16,6 @@
 namespace PokemonAutomation{
 
 
-ConfigUiFactory<IntegerEnumDropdownCell> IntegerEnumDropdownCell::m_ui_factory;
-ConfigUiFactory<IntegerEnumDropdownOption> IntegerEnumDropdownOption::m_ui_factory;
-
-
 
 
 struct IntegerEnumDropdownCell::Data{

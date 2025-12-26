@@ -9,7 +9,4 @@
 namespace PokemonAutomation{
 
 
-ConfigUiFactory<CheckboxDropdownBase> CheckboxDropdownBase::m_ui_factory;
-
-
 }

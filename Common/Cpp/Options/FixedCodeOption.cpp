@@ -17,9 +17,6 @@
 namespace PokemonAutomation{
 
 
-ConfigUiFactory<FixedCodeOption> FixedCodeOption::m_ui_factory;
-
-
 
 
 struct FixedCodeOption::Data{

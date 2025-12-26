@@ -15,9 +15,6 @@
 namespace PokemonAutomation{
 
 
-ConfigUiFactory<RandomCodeOption> RandomCodeOption::m_ui_factory;
-
-
 
 RaidCodeOption::~RaidCodeOption() = default;
 RaidCodeOption::RaidCodeOption(size_t total_digits)

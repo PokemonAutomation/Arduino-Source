@@ -13,10 +13,6 @@
 namespace PokemonAutomation{
 
 
-ConfigUiFactory<TextEditOption> TextEditOption::m_ui_factory;
-
-
-
 
 struct TextEditOption::Data{
     const std::string m_label;

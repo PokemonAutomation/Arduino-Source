@@ -13,11 +13,6 @@
 namespace PokemonAutomation{
 
 
-ConfigUiFactory<DateTimeCell> DateTimeCell::m_ui_factory;
-ConfigUiFactory<DateTimeOption> DateTimeOption::m_ui_factory;
-
-
-
 
 
 bool DateTimeCell::is_valid(const DateTime& date) const{

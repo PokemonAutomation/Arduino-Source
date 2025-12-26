@@ -17,9 +17,6 @@
 namespace PokemonAutomation{
 
 
-ConfigUiFactory<EditableTableOption> EditableTableOption::m_ui_factory;
-
-
 
 //EditableTableRow::EditableTableRow(void*)
 //    : m_parent(nullptr)

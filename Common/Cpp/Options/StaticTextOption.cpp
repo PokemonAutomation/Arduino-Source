@@ -12,10 +12,6 @@
 namespace PokemonAutomation{
 
 
-ConfigUiFactory<StaticTextOption> StaticTextOption::m_ui_factory;
-ConfigUiFactory<SectionDividerOption> SectionDividerOption::m_ui_factory;
-
-
 
 struct StaticTextOption::Data{
     mutable SpinLock m_lock;

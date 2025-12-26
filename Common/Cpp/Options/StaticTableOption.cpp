@@ -19,10 +19,6 @@
 namespace PokemonAutomation{
 
 
-ConfigUiFactory<StaticTableOption> StaticTableOption::m_ui_factory;
-
-
-
 
 StaticTableRow::StaticTableRow(std::string slug)
     : m_slug(std::move(slug))

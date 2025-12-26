@@ -16,11 +16,6 @@
 namespace PokemonAutomation{
 
 
-ConfigUiFactory<MacAddressCell> MacAddressCell::m_ui_factory;
-
-
-
-
 
 
 std::string write_MAC_address(size_t length, const uint8_t* address){

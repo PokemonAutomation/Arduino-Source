@@ -12,11 +12,6 @@
 namespace PokemonAutomation{
 
 
-ConfigUiFactory<StringCell> StringCell::m_ui_factory;
-ConfigUiFactory<StringOption> StringOption::m_ui_factory;
-
-
-
 
 struct StringCell::Data{
     const bool m_is_password;

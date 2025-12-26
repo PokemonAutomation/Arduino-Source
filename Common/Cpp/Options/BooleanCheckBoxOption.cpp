@@ -16,10 +16,6 @@
 namespace PokemonAutomation{
 
 
-ConfigUiFactory<BooleanCheckBoxCell> BooleanCheckBoxCell::m_ui_factory;
-ConfigUiFactory<BooleanCheckBoxOption> BooleanCheckBoxOption::m_ui_factory;
-
-
 
 
 struct BooleanCheckBoxCell::Data{

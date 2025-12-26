@@ -10,9 +10,6 @@
 namespace PokemonAutomation{
 
 
-ConfigUiFactory<ColorCell> ColorCell::m_ui_factory;
-
-
 ColorCell::ColorCell(const ColorCell& x)
     : ConfigOptionImpl<ColorCell>(x)
     , m_default_value(x.m_default_value)

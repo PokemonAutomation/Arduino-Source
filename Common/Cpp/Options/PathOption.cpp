@@ -12,11 +12,6 @@
 namespace PokemonAutomation{
 
 
-ConfigUiFactory<PathCell> PathCell::m_ui_factory;
-ConfigUiFactory<PathOption> PathOption::m_ui_factory;
-
-
-
 
 struct PathCell::Data{
     const std::string m_default;

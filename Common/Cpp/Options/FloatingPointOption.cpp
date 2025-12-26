@@ -19,10 +19,6 @@
 namespace PokemonAutomation{
 
 
-ConfigUiFactory<FloatingPointCell> FloatingPointCell::m_ui_factory;
-ConfigUiFactory<FloatingPointOption> FloatingPointOption::m_ui_factory;
-
-
 
 
 struct FloatingPointCell::Data{
