@@ -335,7 +335,7 @@ void overworld_navigation(
         seconds_realign = seconds_timeout;
         should_realign = false;
     }
-    uint16_t forward_ticks = seconds_realign * TICKS_PER_SECOND;
+    Milliseconds forward_duration = seconds_realign * 1000ms;
     // WallClock start = current_time();
 
     if (stop_condition == NavigationStopCondition::STOP_MARKER){
@@ -353,8 +353,6 @@ void overworld_navigation(
         if (stop_condition == NavigationStopCondition::STOP_MARKER){
             callbacks.emplace_back(marker);
         }
-        // uint16_t ticks_passed = std::chrono::duration_cast<std::chrono::milliseconds>(current_time() - start).count() * TICKS_PER_SECOND / 1000;
-        // forward_ticks = seconds_realign * TICKS_PER_SECOND - ticks_passed;
 
         int ret = run_until<ProControllerContext>(
             stream, context,
@@ -366,7 +364,7 @@ void overworld_navigation(
                         stream, context,
                         [&](ProControllerContext& context){
                             if (movement_mode == NavigationMovementMode::CLEAR_WITH_LETS_GO){
-                                walk_forward_while_clear_front_path(info, stream, context, forward_ticks*8ms, y);
+                                walk_forward_while_clear_front_path(info, stream, context, forward_duration, y);
                             }else{
                                 ssf_press_left_joystick_old(context, x, y, 0ms, Seconds(seconds_realign));
                                 if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
