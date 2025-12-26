@@ -710,7 +710,7 @@ void walk_forward_while_clear_front_path(
         if (milliseconds_left < duration_between_lets_go){
             pbf_move_left_joystick_old(context, 128, y, milliseconds_left, 160ms);
             context.wait_for_all_requests();
-            stream.log("walk_forward_while_clear_front_path() ticks traveled: " + std::to_string(forward_duration.count()));
+            stream.log("walk_forward_while_clear_front_path() duration traveled: " + std::to_string(forward_duration.count()) + "ms");
             break;
         }
 
@@ -718,7 +718,7 @@ void walk_forward_while_clear_front_path(
         milliseconds_left -= duration_between_lets_go;
 
         context.wait_for_all_requests();
-        stream.log("walk_forward_while_clear_front_path() ticks traveled: " + std::to_string(forward_duration.count() - milliseconds_left.count()));
+        stream.log("walk_forward_while_clear_front_path() duration traveled: " + std::to_string(forward_duration.count() - milliseconds_left.count()) + "ms");
 
         pbf_press_button(context, BUTTON_R, 160ms, delay_after_lets_go);
         
