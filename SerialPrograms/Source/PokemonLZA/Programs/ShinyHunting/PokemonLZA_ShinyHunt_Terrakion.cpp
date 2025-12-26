@@ -234,6 +234,8 @@ void route_check_terrakion(SingleSwitchProgramEnvironment& env, ProControllerCon
     pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
     pbf_move_left_joystick(context, {1, 1}, 80ms, 160ms);
     pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
 
     env.add_overlay_log("Checking for Shiny");
     env.log("Checking shiny status of Terrakion.");
