@@ -365,7 +365,7 @@ void overworld_navigation(
                         stream, context,
                         [&](ProControllerContext& context){
                             if (movement_mode == NavigationMovementMode::CLEAR_WITH_LETS_GO){
-                                walk_forward_while_clear_front_path(info, stream, context, forward_ticks, y);
+                                walk_forward_while_clear_front_path(info, stream, context, forward_ticks*8ms, y);
                             }else{
                                 ssf_press_left_joystick_old(context, x, y, 0ms, Seconds(seconds_realign));
                                 if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){

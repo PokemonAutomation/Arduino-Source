@@ -158,7 +158,7 @@ void checkpoint_48(
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 240, 50);
-                walk_forward_while_clear_front_path(env.program_info(), env.console, context, 300);
+                walk_forward_while_clear_front_path(env.program_info(), env.console, context, 2400ms);
                 walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A);
             }
         );
