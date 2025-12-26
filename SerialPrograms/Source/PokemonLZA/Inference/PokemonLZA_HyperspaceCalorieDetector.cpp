@@ -60,6 +60,10 @@ HyperspaceCalorieLimitWatcher::HyperspaceCalorieLimitWatcher(Logger& logger, uin
 , m_calorie_limit(calorie_limit)
 {}
 
+void HyperspaceCalorieLimitWatcher::make_overlays(VideoOverlaySet& items) const{
+    HyperspaceCalorieDetector::make_overlays(items);
+}
+
 bool HyperspaceCalorieLimitWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     bool detected = detect(frame);
     if (!detected){

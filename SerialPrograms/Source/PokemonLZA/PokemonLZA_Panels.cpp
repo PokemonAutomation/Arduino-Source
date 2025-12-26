@@ -37,6 +37,7 @@
 #include "Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h"
 #include "Programs/ShinyHunting/PokemonLZA_WildZoneCafe.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.h"
+#include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_HyperspaceLegendary.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShuttleRun.h"
 #include "Programs/ShinyHunting/PokemonLZA_SewerHunter.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.h"
@@ -95,6 +96,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHunt_WildZoneEntrance_Descriptor, ShinyHunt_WildZoneEntrance>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_WildZoneCafe_Descriptor, ShinyHunt_WildZoneCafe>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_FlySpotReset_Descriptor, ShinyHunt_FlySpotReset>());
+    ret.emplace_back(make_single_switch_program<ShinyHunt_HyperspaceLegendary_Descriptor, ShinyHunt_HyperspaceLegendary>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_SewerHunter_Descriptor, ShinyHunt_SewerHunter>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_HelioptileHunter_Descriptor, ShinyHunt_HelioptileHunter>());
     if (IS_BETA_VERSION){
