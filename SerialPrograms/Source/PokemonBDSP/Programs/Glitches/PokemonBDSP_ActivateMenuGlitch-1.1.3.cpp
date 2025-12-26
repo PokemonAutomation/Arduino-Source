@@ -80,7 +80,7 @@ void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, ProCont
     context.wait_for(std::chrono::seconds(1));
 
     //  Move bolder and cursor to Celestial town.
-    pbf_press_dpad_old(context, DPAD_RIGHT, 30, 95);
+    pbf_press_dpad(context, DPAD_RIGHT, 240ms, 760ms);
 
     //  Bring up menu
     pbf_press_button(context, BUTTON_ZL, 160ms, FLY_A_TO_X_DELAY0.get() - 160ms);

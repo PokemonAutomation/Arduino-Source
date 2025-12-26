@@ -200,7 +200,7 @@ void run_autohost(
     );
 
     //  Start Raid
-    pbf_press_dpad_old(context, DPAD_UP, 5, 45);
+    pbf_press_dpad(context, DPAD_UP, 40ms, 360ms);
 
     //  Mash A until it's time to close the game.
     if (console.video().snapshot()){
