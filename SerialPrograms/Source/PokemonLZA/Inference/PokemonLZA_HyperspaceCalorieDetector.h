@@ -44,6 +44,8 @@ class HyperspaceCalorieLimitWatcher : public HyperspaceCalorieDetector, public V
 public:
     HyperspaceCalorieLimitWatcher(Logger& logger, uint16_t calorie_limit);
 
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:

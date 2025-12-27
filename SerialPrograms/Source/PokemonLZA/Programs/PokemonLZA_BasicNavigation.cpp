@@ -548,7 +548,7 @@ int run_towards_gate_with_A_button(
     PokemonAutomation::Milliseconds run_time
 ){
     const ImageFloatBox button_A_box{0.3, 0.2, 0.4, 0.7};
-    ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, button_A_box, &console.overlay());
+    ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, button_A_box, &console.overlay(), Milliseconds(200));
     OverworldPartySelectionOverWatcher overworld_gone(COLOR_WHITE, &console.overlay(), std::chrono::milliseconds(400));
     const int ret = run_until<ProControllerContext>(
         console, context,
