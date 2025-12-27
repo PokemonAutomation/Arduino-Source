@@ -83,6 +83,7 @@ void register_all_statics(){
     RegisterConfigWidget<PathCellWidget>();
     RegisterConfigWidget<PathOptionWidget>();
     RegisterConfigWidget<RandomCodeWidget>();
+    RegisterConfigWidget<SimpleIntegerCellWidget<size_t>>();
     RegisterConfigWidget<SimpleIntegerCellWidget<uint8_t>>();
     RegisterConfigWidget<SimpleIntegerCellWidget<uint16_t>>();
     RegisterConfigWidget<SimpleIntegerCellWidget<uint32_t>>();
