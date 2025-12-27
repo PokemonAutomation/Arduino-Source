@@ -57,7 +57,18 @@ PABotBase::PABotBase(
     m_retransmit_thread = Thread([this]{
         run_with_catch(
             "PABotBase::retransmit_thread()",
-            [this]{ retransmit_thread(); }
+            [this]{
+                try{
+                    retransmit_thread();
+                }catch (ConnectionException& e){
+                    {
+                        ReadSpinLock lg(m_state_lock, "PABotBase::retransmit_thread()");
+                        m_error_message = e.to_str();
+                    }
+                    m_error.store(true, std::memory_order_release);
+                    m_cv.notify_all();
+                }
+            }
         );
     });
 }
@@ -123,7 +134,11 @@ void PABotBase::stop(std::string error_message){
 //        try_issue_request<PABB_MSG_REQUEST_STOP>(params);
 //        m_state.store(State::STOPPING, std::memory_order_release);
         BotBaseMessage stop_request(PABB_MSG_REQUEST_STOP, std::string((char*)&params, sizeof(params)));
-        send_message(stop_request, false);
+        try{
+            send_message(stop_request, false);
+        }catch (...){
+            m_logger.log("Unable to send stop signal.", COLOR_RED);
+        }
     }
 
     //  Must call this to stop the receiver thread from making any more async

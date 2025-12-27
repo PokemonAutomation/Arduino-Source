@@ -33,6 +33,7 @@ public:
     {}
     SerialConnection(const std::string& name, const std::wstring& wname, uint32_t baud_rate)
         : m_exit(false)
+        , m_consecutive_errors(0)
     {
         m_handle = CreateFileW(
             (L"\\\\.\\" + wname).c_str(),
@@ -126,11 +127,12 @@ public:
     }
 
 private:
-    void process_error(const std::string& message){
-        m_errors++;
-        if (m_errors < 100 || m_errors % 1000 == 0){
-            serial_debug_log(message);
-        }
+    void process_error(const std::string& message, bool allow_throw){
+        WriteSpinLock lg(m_error_lock);
+
+        size_t consecutive_errors = m_consecutive_errors.fetch_add(1);
+
+        serial_debug_log(message);
 
         std::string clear_error;
         DWORD comm_error;
@@ -141,8 +143,9 @@ private:
             clear_error = "ClearCommError error flag = " + std::to_string(comm_error);
         }
 
-        if (m_errors < 100 || m_errors % 1000 == 0){
-            serial_debug_log(clear_error);
+        serial_debug_log(clear_error);
+        if (consecutive_errors >= 100 && allow_throw){
+            throw ConnectionException(nullptr, "Serial Connection failed.");
         }
     }
 
@@ -158,14 +161,18 @@ private:
 //        std::cout << "start write" << std::endl;
 //        auto start = current_time();
         DWORD written;
-        if (WriteFile(m_handle, data, (DWORD)bytes, &written, nullptr) == 0 || bytes != written){
-            DWORD error = GetLastError();
-            process_error(
-                "Failed to write: " + std::to_string(written) +
-                " / " + std::to_string(bytes) +
-                ", error = " + std::to_string(error)
-            );
+        if (WriteFile(m_handle, data, (DWORD)bytes, &written, nullptr) != 0 && bytes == written){
+            m_consecutive_errors.store(0, std::memory_order_release);
+            return;
         }
+
+        DWORD error = GetLastError();
+        process_error(
+            "Failed to write: " + std::to_string(written) +
+            " / " + std::to_string(bytes) +
+            ", error = " + std::to_string(error),
+            true
+        );
 //        auto stop = current_time();
 //        cout << "WriteFile() : " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count() << endl;
 
@@ -182,7 +189,7 @@ private:
             DWORD read;
             if (ReadFile(m_handle, buffer, 32, &read, nullptr) == 0){
                 DWORD error = GetLastError();
-                process_error("ReadFile() failed. Error = " + std::to_string(error));
+                process_error("ReadFile() failed. Error = " + std::to_string(error), false);
             }
 //            auto stop = current_time();
 //            cout << "ReadFile() : " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count() << endl;
@@ -194,6 +201,7 @@ private:
             }
 #endif
             if (read != 0){
+                m_consecutive_errors.store(0, std::memory_order_release);
                 on_recv(buffer, read);
                 last_recv = current_time();
                 continue;
@@ -219,8 +227,9 @@ private:
 private:
     HANDLE m_handle;
     std::atomic<bool> m_exit;
-    uint64_t m_errors = 0;
+    std::atomic<size_t> m_consecutive_errors;
     SpinLock m_send_lock;
+    SpinLock m_error_lock;
     Thread m_listener;
 };
 

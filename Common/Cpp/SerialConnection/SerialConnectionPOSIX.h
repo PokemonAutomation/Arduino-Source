@@ -148,10 +148,16 @@ public:
         m_listener.join();
     }
 
+
 private:
     virtual void send(const void* data, size_t bytes){
         WriteSpinLock lg(m_send_lock, "SerialConnection::send()");
-        bytes = write(m_fd, data, bytes);
+        size_t sent = write(m_fd, data, bytes);
+        if (sent != bytes){
+            process_error("send() Failed: " + std::to_string(sent) + " / " + std::to_string(bytes), true);
+        }else{
+            m_consecutive_errors.store(0, std::memory_order_release);
+        }
     }
 
     void recv_loop(){
@@ -159,17 +165,32 @@ private:
         while (!m_exit.load(std::memory_order_acquire)){
             ssize_t actual = read(m_fd, buffer, sizeof(buffer));
             if (actual > 0){
+                m_consecutive_errors.store(0, std::memory_order_release);
                 on_recv(buffer, actual);
             }
         }
     }
     
 
+private:
+    void process_error(const std::string& message, bool allow_throw){
+        WriteSpinLock lg(m_error_lock);
+
+        size_t consecutive_errors = m_consecutive_errors.fetch_add(1);
+
+        serial_debug_log(message);
+        if (consecutive_errors >= 100 && allow_throw){
+            throw ConnectionException(nullptr, "Serial Connection failed.");
+        }
+    }
+
 
 private:
     int m_fd;
     std::atomic<bool> m_exit;
+    std::atomic<size_t> m_consecutive_errors;
     SpinLock m_send_lock;
+    SpinLock m_error_lock;
     Thread m_listener;
 };
 

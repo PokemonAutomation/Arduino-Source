@@ -32,7 +32,6 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
-#include "Controllers/SerialPABotBase/Connection/MessageLogger.h"
 #include "Controllers/SerialPABotBase/Connection/PABotBaseConnection.h"
 #include "BotBase.h"
 #include "BotBaseMessage.h"
@@ -41,7 +40,7 @@
 namespace PokemonAutomation{
 
 
-class PABotBase : public BotBaseController, public PABotBaseConnection{
+class PABotBase final : public BotBaseController, public PABotBaseConnection{
     static const seqnum_t MAX_SEQNUM_GAP = (seqnum_t)-1 >> 2;
 
 public:
