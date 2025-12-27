@@ -284,7 +284,7 @@ void ShinyHunt_Terrakion::program(SingleSwitchProgramEnvironment& env, ProContro
                     }else{
                         route_reset_terrakion(env, context, stats);
                     }
-                }catch (OperationFailedException& e){
+                }catch (OperationFailedException&){
                     consecutive_failures++;
                     env.log("Consecutive failures: " + std::to_string(consecutive_failures), COLOR_RED);
                     if (consecutive_failures >= 3){
