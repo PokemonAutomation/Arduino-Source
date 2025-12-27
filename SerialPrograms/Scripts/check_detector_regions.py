@@ -136,14 +136,16 @@ raw_image = image.copy()
 
 # ==================================================================
 # LZA box system cursor detection
-# triangle_upper_edge_width = 0.008
-# traingle_full_height = 0.026
-# for row in range(6):
-# 	y = 0.122 if row == 0 else 0.333 + (0.797 - 0.331)/ 4.0 * (row-1)
-# 	for col in range(6):
-# 		x = 0.058 + col*(0.386 - 0.059)/5.0
-# 		# add_infer_box_to_image(raw_image, x, y, 0.018, traingle_full_height, image)
-# 		add_infer_box_to_image(raw_image, x+0.011, y-0.009, 0.023, 0.031, image)
+for row in range(6):
+	y = 0.122 if row == 0 else (0.333 + (0.797 - 0.331)/ 4.0 * (row-1))
+	for col in range(6):
+		x = 0.058 + col*(0.386 - 0.059)/5.0
+		# non-held positions
+		# add_infer_box_to_image(raw_image, x, y, 0.018, 0.026, image)
+		# held positions
+		# add_infer_box_to_image(raw_image, x+0.011, y-0.010, 0.023, 0.032, image)
+		# narrow gap to detect holding
+		add_infer_box_to_image(raw_image, x+0.011, y+0.010, 0.023, 0.004, image)
 
 # Pixel (x,y) = (775, 136), (0.404, 0.126), rgb=[255,188,245,71] hsv=[ 80 181 245]
 # Pixel (x,y) = (759, 135), (0.395, 0.125), rgb=[255,182,233,70] hsv=[ 81 178 233]

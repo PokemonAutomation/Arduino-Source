@@ -165,11 +165,12 @@ BoxDetector::BoxDetector(Color color, VideoOverlay* overlay)
     , m_plus_button(color, ButtonType::ButtonPlus, {0.581, 0.940, 0.310, 0.046}, overlay)
 {
     for(size_t row = 0; row < 6; row++){
-         double y = (row == 0 ? 0.122 : 0.333 + (0.797 - 0.331)/ 4.0 * (row-1));
+        double y = (row == 0 ? 0.122 : 0.333 + (0.797 - 0.331)/ 4.0 * (row-1));
         for(size_t col = 0; col < 6; col++){
             double x = 0.058 + col * (0.386 - 0.059)/5.0;
             m_arrow_boxes.emplace_back(x, y, 0.018, 0.026);
-            m_lifted_arrow_boxes.emplace_back(x+0.011, y-0.010, 0.023, 0.032);
+            // m_lifted_arrow_boxes.emplace_back(x+0.011, y-0.010, 0.023, 0.032);
+            m_gaps_for_lifted.emplace_back(x+0.011, y+0.010, 0.023, 0.004);
         }
     }
 }
@@ -184,7 +185,11 @@ void BoxDetector::make_overlays(VideoOverlaySet& items) const{
 
 // detect arrow's white interior first
 // then use subobject template matcher BoxCellSelectionArrowMatcher to detect the whole arrow
-bool BoxDetector::detect_at_cell(const Resolution& screen_resolution, const ImageViewRGB32& image_crop){
+bool BoxDetector::detect_at_cell(uint8_t cell_idx, const ImageViewRGB32& screen){
+#if 0
+    const auto& box = (m_holding_pokemon ? m_lifted_arrow_boxes[cell_idx] : m_arrow_boxes[cell_idx]);
+    ImageViewRGB32 image_crop = extract_box_reference(screen, box);
+
     if (m_holding_pokemon){
         // If the box cursor is holding a pokemon, it will be a green downard arrow with white interior.
         // This green arrow may appear on top of the bottom part of a pokemon on the upper row of the box.
@@ -195,7 +200,7 @@ bool BoxDetector::detect_at_cell(const Resolution& screen_resolution, const Imag
             {combine_rgb(170, 230, 50), combine_rgb(200, 255, 100)},
             {combine_rgb(140, 180, 0), combine_rgb(200, 255, 100)},
         };
-        const double screen_rel_size = (screen_resolution.height / 1080.0);
+        const double screen_rel_size = (screen.height() / 1080.0);
         const size_t min_area = static_cast<size_t>(250 * screen_rel_size * screen_rel_size);
         const double rmsd_threshold = 70.0;
         const bool detected = match_template_by_waterfill(
@@ -213,6 +218,25 @@ bool BoxDetector::detect_at_cell(const Resolution& screen_resolution, const Imag
             return true;
         }
     }
+#else
+    if (m_holding_pokemon){
+        // If the box cursor is holding a pokemon, it will be a green downward arrow with white interior.
+        // This green arrow may appear on top of the bottom part of a pokemon on the upper row of the box.
+        // If the pokemon above has white bottom part, like a regular-color Spewpa, the arrrow white interior
+        // blends in with the Spewpa white color and make it impossible to find the arrow interior using
+        // waterfill. If the held pokemon is green (e.g. shiny Scizor) it will blend with the green part of
+        // the arrow, making waterfill impossible. So we have to use this alternative detection:
+        // Use the stddev of a cross section of the green-white arrow.
+        // If there is an arrow, the bright green and white color makes the stddev quite high (>= 100)
+        // while without the arrow, it is the background, which are the blurred overworld view which
+        // typically has stddev lower than 50.
+        ImageViewRGB32 image_crop = extract_box_reference(screen, m_gaps_for_lifted[cell_idx]);
+        const auto stats = image_stats(image_crop);
+        return stats.stddev.sum() > 80;
+    }
+
+    ImageViewRGB32 image_crop = extract_box_reference(screen, m_arrow_boxes[cell_idx]);
+#endif
 
     // The box curosr either is not holding a pokemon, or it is holding a pokemon but the background of the cursor
     // happens to be green (bottom part of a green pokemon) failing the arrow green part waterfill detection.
@@ -327,16 +351,15 @@ bool BoxDetector::detect(const ImageViewRGB32& screen){
             }
             cout << "row = " << (int)row << ", col = " << (int)col << endl;
 #endif
-            const auto& box = (m_holding_pokemon ? m_lifted_arrow_boxes[cell_idx] : m_arrow_boxes[cell_idx]);
-            ImageViewRGB32 image_crop = extract_box_reference(screen, box);
             // image_crop.save("cell_" + std::to_string(row) + "_" + std::to_string(col) + ".png");
-            const uint8_t debug_cell_row = 255, debug_cell_col = 255;
+            const uint8_t debug_cell_row = PreloadSettings::debug().BOX_SYSTEM_CELL_ROW;
+            const uint8_t debug_cell_col = PreloadSettings::debug().BOX_SYSTEM_CELL_COL;
             if (row == debug_cell_row && col == debug_cell_col){
                 debug_switch = true;
                 cout << "start debugging switch at " << int(row) << ", " << int(col) << endl;
                 PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING = true;
             }
-            const bool detected = detect_at_cell(screen.size(), image_crop);
+            const bool detected = detect_at_cell(cell_idx, screen);
             if (row == debug_cell_row && col == debug_cell_col){
                 debug_switch = false;
                 PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING = false;

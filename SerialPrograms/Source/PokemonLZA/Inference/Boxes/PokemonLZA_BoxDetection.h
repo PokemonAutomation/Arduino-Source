@@ -68,14 +68,18 @@ public:
 
 private:
     // called for each box cell to check if the selection arrow is above that cell
-    bool detect_at_cell(const Resolution& screen_resolution, const ImageViewRGB32& image_crop);
+    bool detect_at_cell(uint8_t cell_idx, const ImageViewRGB32& screen);
 
     bool m_holding_pokemon = false;
     Color m_color;
 
     ButtonDetector m_plus_button;
-    std::vector<ImageFloatBox> m_arrow_boxes;  // all 6 x 6 potential locations of the arrow interiors on box view
-    std::vector<ImageFloatBox> m_lifted_arrow_boxes;  // all 6 x 6 potential locations of the arrow interiors on box view when lifting/holding a pokemon
+    // all 6 x 6 potential locations of the arrow interiors on box view
+    std::vector<ImageFloatBox> m_arrow_boxes;
+    // all 6 x 6 potential locations of the arrow interiors on box view when lifting/holding a pokemon
+    // std::vector<ImageFloatBox> m_lifted_arrow_boxes;
+    // all 6 x 6 gaps between box rows to detect when lifting/holding a pokemon
+    std::vector<ImageFloatBox> m_gaps_for_lifted;
     uint8_t m_found_row = 0;
     uint8_t m_found_col = 0;
     bool m_debug_mode = false;

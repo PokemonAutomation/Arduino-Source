@@ -54,9 +54,19 @@ public:
 
 
 struct DebugSettings{
+    // Debug color stats like those in:
+    // - CommonFramework/ImageTools/ImageStats.cpp
     bool COLOR_CHECK = false;
+    // Debug image tempalte matching like those in:
+    // - CommonTools/ImageMatch/WaterfillTemplateMatcher.cpp
     bool IMAGE_TEMPLATE_MATCHING = false;
+    // Debug image dictionary matching like those in:
+    // - CommonTools/ImageMatch/CroppedImageDictionaryMatcher.cpp
     bool IMAGE_DICTIONARY_MATCHING = false;
+    // Debug box system detection to only debug on a box cell at row:
+    int8_t BOX_SYSTEM_CELL_ROW = -1;
+    // Debug box system detection to only debug on a box cell at col:
+    int8_t BOX_SYSTEM_CELL_COL = -1;
 };
 
 
