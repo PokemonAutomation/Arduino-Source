@@ -19,13 +19,11 @@ namespace PokemonAutomation{
 
 
 
-template <typename Type>
-SimpleIntegerCellWidget<Type>::~SimpleIntegerCellWidget(){
+SimpleIntegerCellWidget::~SimpleIntegerCellWidget(){
     m_value.remove_listener(*this);
 }
-template <typename Type>
-SimpleIntegerCellWidget<Type>::SimpleIntegerCellWidget(QWidget& parent, SimpleIntegerCell<Type>& value)
-    : QLineEdit(QString::number(value), &parent)
+SimpleIntegerCellWidget::SimpleIntegerCellWidget(QWidget& parent, SimpleIntegerCellBase& value)
+    : QLineEdit(QString::number(value.current_value()), &parent)
     , ConfigWidget(value, *this)
     , m_value(value)
 {
@@ -37,7 +35,7 @@ SimpleIntegerCellWidget<Type>::SimpleIntegerCellWidget(QWidget& parent, SimpleIn
         this, &QLineEdit::textChanged,
         this, [this](const QString& text){
             bool ok;
-            Type current = (Type)text.toLong(&ok);
+            NativeType current = (NativeType)text.toLong(&ok);
             QPalette palette;
             if (ok && m_value.check_validity(current).empty()){
                 palette.setColor(QPalette::Text, Qt::black);
@@ -51,29 +49,27 @@ SimpleIntegerCellWidget<Type>::SimpleIntegerCellWidget(QWidget& parent, SimpleIn
         this, &QLineEdit::editingFinished,
         this, [this](){
             bool ok;
-            if (std::is_unsigned_v<Type>){
+            if (std::is_unsigned_v<NativeType>){
                 uint64_t current = this->text().toULongLong(&ok);
                 current = std::max<uint64_t>(current, m_value.min_value());
                 current = std::min<uint64_t>(current, m_value.max_value());
                 this->setText(QString::number(current));
-                m_value.set((Type)current);
+                m_value.set((NativeType)current);
             }else{
                 int64_t current = this->text().toLongLong(&ok);
                 current = std::max<int64_t>(current, m_value.min_value());
                 current = std::min<int64_t>(current, m_value.max_value());
                 this->setText(QString::number(current));
-                m_value.set((Type)current);
+                m_value.set((NativeType)current);
             }
         }
     );
     value.add_listener(*this);
 }
-template <typename Type>
-void SimpleIntegerCellWidget<Type>::update_value(){
-    this->setText(QString::number(m_value));
+void SimpleIntegerCellWidget::update_value(){
+    this->setText(QString::number(m_value.current_value()));
 }
-template <typename Type>
-void SimpleIntegerCellWidget<Type>::on_config_value_changed(void* object){
+void SimpleIntegerCellWidget::on_config_value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         update_value();
     }, Qt::QueuedConnection);
@@ -85,15 +81,13 @@ void SimpleIntegerCellWidget<Type>::on_config_value_changed(void* object){
 
 
 
-template <typename Type>
-SimpleIntegerOptionWidget<Type>::~SimpleIntegerOptionWidget(){
+SimpleIntegerOptionWidget::~SimpleIntegerOptionWidget(){
     m_value.remove_listener(*this);
 }
-template <typename Type>
-SimpleIntegerOptionWidget<Type>::SimpleIntegerOptionWidget(QWidget& parent, SimpleIntegerOption<Type>& value)
+SimpleIntegerOptionWidget::SimpleIntegerOptionWidget(QWidget& parent, SimpleIntegerOptionBase& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
-    , m_cell(new SimpleIntegerCellWidget<Type>(*this, value))
+    , m_cell(new SimpleIntegerCellWidget(*this, value))
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -106,60 +100,16 @@ SimpleIntegerOptionWidget<Type>::SimpleIntegerOptionWidget(QWidget& parent, Simp
     layout->addWidget(m_cell, 1);
     value.add_listener(*this);
 }
-template <typename Type>
-void SimpleIntegerOptionWidget<Type>::update_value(){
+void SimpleIntegerOptionWidget::update_value(){
     m_cell->update_value();
 }
-template <typename Type>
-void SimpleIntegerOptionWidget<Type>::on_config_value_changed(void* object){
+void SimpleIntegerOptionWidget::on_config_value_changed(void* object){
     m_cell->on_config_value_changed(object);
 }
 
 
 
-template class SimpleIntegerCellWidget<uint8_t>;
-template class SimpleIntegerCellWidget<uint16_t>;
-template class SimpleIntegerCellWidget<uint32_t>;
-template class SimpleIntegerCellWidget<uint64_t>;
-template class SimpleIntegerCellWidget<int8_t>;
-template class SimpleIntegerCellWidget<int16_t>;
-template class SimpleIntegerCellWidget<int32_t>;
-template class SimpleIntegerCellWidget<int64_t>;
 
-template class SimpleIntegerOptionWidget<uint8_t>;
-template class SimpleIntegerOptionWidget<uint16_t>;
-template class SimpleIntegerOptionWidget<uint32_t>;
-template class SimpleIntegerOptionWidget<uint64_t>;
-template class SimpleIntegerOptionWidget<int8_t>;
-template class SimpleIntegerOptionWidget<int16_t>;
-template class SimpleIntegerOptionWidget<int32_t>;
-template class SimpleIntegerOptionWidget<int64_t>;
-
-template class RegisterConfigWidget<SimpleIntegerCellWidget<uint8_t>>;
-template class RegisterConfigWidget<SimpleIntegerCellWidget<uint16_t>>;
-template class RegisterConfigWidget<SimpleIntegerCellWidget<uint32_t>>;
-template class RegisterConfigWidget<SimpleIntegerCellWidget<uint64_t>>;
-template class RegisterConfigWidget<SimpleIntegerCellWidget<int8_t>>;
-template class RegisterConfigWidget<SimpleIntegerCellWidget<int16_t>>;
-template class RegisterConfigWidget<SimpleIntegerCellWidget<int32_t>>;
-template class RegisterConfigWidget<SimpleIntegerCellWidget<int64_t>>;
-
-template class RegisterConfigWidget<SimpleIntegerOptionWidget<uint8_t>>;
-template class RegisterConfigWidget<SimpleIntegerOptionWidget<uint16_t>>;
-template class RegisterConfigWidget<SimpleIntegerOptionWidget<uint32_t>>;
-template class RegisterConfigWidget<SimpleIntegerOptionWidget<uint64_t>>;
-template class RegisterConfigWidget<SimpleIntegerOptionWidget<int8_t>>;
-template class RegisterConfigWidget<SimpleIntegerOptionWidget<int16_t>>;
-template class RegisterConfigWidget<SimpleIntegerOptionWidget<int32_t>>;
-template class RegisterConfigWidget<SimpleIntegerOptionWidget<int64_t>>;
-
-
-
-//  This is stupid.
-#ifdef __APPLE__
-template class SimpleIntegerCellWidget<size_t>;
-template class SimpleIntegerOptionWidget<size_t>;
-#endif
 
 
 }

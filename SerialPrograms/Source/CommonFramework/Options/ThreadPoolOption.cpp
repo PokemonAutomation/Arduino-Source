@@ -31,7 +31,9 @@ ThreadPoolOption::ThreadPoolOption(
     , HARDWARE_THREADS(
         "<b>Hardware Threads:</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
-        std::thread::hardware_concurrency()
+        std::thread::hardware_concurrency(),
+        1,
+        std::numeric_limits<decltype(std::thread::hardware_concurrency())>::max()
     )
     , m_description(std::move(description))
     , PRIORITY("<b>Thread Priority:</b>", default_priority)
