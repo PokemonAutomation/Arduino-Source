@@ -19,9 +19,6 @@ void pbf_wait(ProControllerContext& context, Milliseconds duration){
 void pbf_press_button(ProControllerContext& context, Button button, Milliseconds hold, Milliseconds release){
     ssf_press_button(context, button, hold + release, hold, 0ms);
 }
-void pbf_press_dpad_old(ProControllerContext& context, DpadPosition position, uint16_t hold_ticks, uint16_t release_ticks){
-    ssf_press_dpad(context, position, (hold_ticks + release_ticks) * 8ms, hold_ticks * 8ms, 0ms);
-}
 void pbf_press_dpad(ProControllerContext& context, DpadPosition position, Milliseconds hold, Milliseconds release){
     ssf_press_dpad(context, position, hold + release, hold, 0ms);
 }
