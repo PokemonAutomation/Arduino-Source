@@ -137,6 +137,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Options/PathOption.h
     ../Common/Cpp/Options/RandomCodeOption.cpp
     ../Common/Cpp/Options/RandomCodeOption.h
+    ../Common/Cpp/Options/SimpleIntegerOptionBase.h
     ../Common/Cpp/Options/SimpleIntegerOption.cpp
     ../Common/Cpp/Options/SimpleIntegerOption.h
     ../Common/Cpp/Options/StaticTableOption.cpp
