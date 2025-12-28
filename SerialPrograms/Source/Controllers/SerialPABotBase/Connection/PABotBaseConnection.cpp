@@ -7,7 +7,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/CRC32.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
-//#include "Controllers/SerialPABotBase/Connection/MessageConverter.h"
 #include "BotBaseMessage.h"
 #include "PABotBaseConnection.h"
 

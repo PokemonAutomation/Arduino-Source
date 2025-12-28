@@ -687,8 +687,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/SerialPABotBase/Connection/BotBase.cpp
     Source/Controllers/SerialPABotBase/Connection/BotBase.h
     Source/Controllers/SerialPABotBase/Connection/BotBaseMessage.h
-    Source/Controllers/SerialPABotBase/Connection/MessageConverter.cpp
-    Source/Controllers/SerialPABotBase/Connection/MessageConverter.h
     Source/Controllers/SerialPABotBase/Connection/MessageLogger.cpp
     Source/Controllers/SerialPABotBase/Connection/MessageLogger.h
     Source/Controllers/SerialPABotBase/Connection/MessageSniffer.h
@@ -696,18 +694,22 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/SerialPABotBase/Connection/PABotBase.h
     Source/Controllers/SerialPABotBase/Connection/PABotBaseConnection.cpp
     Source/Controllers/SerialPABotBase/Connection/PABotBaseConnection.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Acks.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_CommandQueue.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_ControllerMode.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Errors.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Info.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Misc.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_StaticRequests.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_HID_Keyboard.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_NS_WiredController.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_NS1_OemControllers.h
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_HID_Keyboard.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_HID_Keyboard.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_OemControllers.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_OemControllers.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_WiredController.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_WiredController.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h
