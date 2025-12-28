@@ -207,6 +207,9 @@ private:
     // the path to get the YOLOv5 YAML config file to export images and finished annotations to
     // YOLO dataset.
     std::string m_yolo_config_file_path;
+
+    // track whether annotations are currently hidden
+    bool m_annotations_hidden = false;
 };
 
 

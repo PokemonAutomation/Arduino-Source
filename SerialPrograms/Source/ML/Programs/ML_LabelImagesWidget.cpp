@@ -95,6 +95,9 @@ LabelImages_Widget::LabelImages_Widget(
     QPushButton* next_anno_button = new QPushButton("Next Annotation", scroll_inner);
     button_row->addWidget(next_anno_button, 1);
 
+    m_hide_annotation_button = new QPushButton("Hide Annotation", scroll_inner);
+    button_row->addWidget(m_hide_annotation_button, 1);
+
     QPushButton* save_anno_button = new QPushButton("Save Annotation", scroll_inner);
     button_row->addWidget(save_anno_button, 1);
 
@@ -169,6 +172,15 @@ LabelImages_Widget::LabelImages_Widget(
     });
     connect(next_anno_button, &QPushButton::clicked, this, [this](bool){
         this->m_program.select_next_annotation();
+    });
+    connect(m_hide_annotation_button, &QPushButton::clicked, this, [this](bool){
+        m_program.m_annotations_hidden = !m_program.m_annotations_hidden;
+        if (m_program.m_annotations_hidden){
+            m_hide_annotation_button->setText("Show Annotation");
+        } else {
+            m_hide_annotation_button->setText("Hide Annotation");
+        }
+        m_program.update_rendered_objects();
     });
     connect(open_anno_folder_button, &QPushButton::clicked, this, [this](bool){
         this->m_program.save_annotation_to_file();
