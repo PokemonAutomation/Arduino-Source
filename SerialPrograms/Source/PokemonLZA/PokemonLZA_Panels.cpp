@@ -41,7 +41,6 @@
 #include "Programs/ShinyHunting/PokemonLZA_ShuttleRun.h"
 #include "Programs/ShinyHunting/PokemonLZA_SewerHunter.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.h"
-#include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_Terrakion.h"
 
 //  Non-Shiny Hunting
 #include "Programs/NonShinyHunting/PokemonLZA_StatsReset.h"
