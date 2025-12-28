@@ -35,6 +35,10 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
     enum class Legendary{
+        // LATIAS,
+        // LATIOS,
+        // COBALION,
+        TERRAKION,
         VIRIZION
     };
 
@@ -44,6 +48,7 @@ private:
     EnumDropdownOption<Legendary> LEGENDARY;
     SimpleIntegerOption<uint64_t> MAX_ROUNDS;
     SimpleIntegerOption<uint16_t> MIN_CALORIE_REMAINING;
+    BooleanCheckBoxOption SAVE_ON_START;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;
