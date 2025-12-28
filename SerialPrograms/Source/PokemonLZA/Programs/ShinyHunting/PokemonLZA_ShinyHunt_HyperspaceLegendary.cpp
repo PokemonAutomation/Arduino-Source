@@ -147,7 +147,7 @@ bool route_virizion(
     const uint16_t min_calorie = MIN_CALORIE_REMAINING;
 
     // running forward
-    Milliseconds duration(5000);
+    Milliseconds duration(4400);
 
     HyperspaceCalorieLimitWatcher calorie_watcher(env.logger(), min_calorie);
     const int ret = run_until<ProControllerContext>(
@@ -155,10 +155,11 @@ bool route_virizion(
         [&](ProControllerContext& context){
             // running forward
             ssf_press_button(context, BUTTON_B, 0ms, 2*duration, 0ms);
-            // Add 500 ms to avoid any drift using the balustrade
-            pbf_move_left_joystick(context, {0, +1}, duration + 500ms, 0ms);
+            // Add 30 ms to avoid any drift using the balustrade
+            pbf_move_left_joystick(context, {0, +1}, duration + 30ms, 0ms);
             // run back
             pbf_move_left_joystick(context, {0, -1}, duration, 0ms);
+            pbf_wait(context, 100ms);
         },
         {{calorie_watcher}}
     );
@@ -181,7 +182,7 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
     assert_16_9_720p_min(env.logger(), env.console);
 
     // Mash button B to let Switch register the controller
-    pbf_mash_button(context, BUTTON_B, 500ms);
+    pbf_mash_button(context, BUTTON_B, 200ms);
 
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats = env.current_stats<ShinyHunt_HyperspaceLegendary_Descriptor::Stats>();
 
