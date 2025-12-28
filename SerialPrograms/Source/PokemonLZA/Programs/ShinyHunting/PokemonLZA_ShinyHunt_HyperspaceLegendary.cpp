@@ -327,6 +327,11 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
             );
     }
 
+    if (SAVE_ON_START){
+        save_game_to_menu(env.console, context);
+        pbf_mash_button(context, BUTTON_B, 2000ms);
+    }
+
     int consecutive_failures = 0;
     run_until<ProControllerContext>(
         env.console, context,
