@@ -23,11 +23,13 @@ namespace ML{
 
 // Compute embeddings for all images in a folder. Only support .png, .jpg and .jpeg filename extensions so far.
 // This can be very slow!
+// It skips existing embedding files.
 void compute_embeddings_for_folder(const std::string& embedding_model_path, const std::string& image_folder_path, bool use_gpu_for_embedder_session);
 
 
 class SAMEmbedderSession{
 public:
+    // NOTE: it may throw `MLModelSessionCreationError` if failed to create session.
     SAMEmbedderSession(const std::string& model_path, bool use_gpu);
 
     // Given an image of shape SAM_EMBEDDER_INPUT_IMAGE_WIDTH x SAM_EMBEDDER_INPUT_IMAGE_HEIGHT, RGB channel order,

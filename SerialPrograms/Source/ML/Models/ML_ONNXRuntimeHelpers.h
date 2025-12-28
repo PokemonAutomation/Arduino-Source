@@ -29,6 +29,7 @@ Ort::SessionOptions create_session_options(const std::string& model_cache_path, 
 // Create an ONNX Session. It will also update the model cache on macOS if necessary.
 // model_cache_path: the path to store model caches. This path must be the same path
 //   used in `create_session_options()` to construct the passed-in session options so.
+// NOTE: it may throw `MLModelSessionCreationError` if failed to create session.
 Ort::Session create_session(const Ort::Env& env, const Ort::SessionOptions& so,
     const std::string& model_path, const std::string& model_cache_path);
 
