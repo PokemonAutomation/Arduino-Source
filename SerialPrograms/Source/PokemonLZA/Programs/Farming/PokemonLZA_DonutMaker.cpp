@@ -209,9 +209,9 @@ void DonutMaker::animation_to_donut(SingleSwitchProgramEnvironment& env, ProCont
     env.add_overlay_log("Detected Flavor Power Screen");
 
     // Wait for the UI animation for revealing flavor powers to play out
-    pbf_wait(context, Seconds(5));
+    pbf_wait(context, Seconds(3));
     context.wait_for_all_requests();
-    env.add_overlay_log("Reading Flavor Powers");
+    env.add_overlay_log("Read Flavor Powers");
 #endif
 }
 
