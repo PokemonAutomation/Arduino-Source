@@ -18,6 +18,7 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
 #include "PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.h"
+#include "PokemonLZA/Inference/Donuts/PokemonLZA_DonutPowerDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
@@ -103,6 +104,66 @@ DonutMaker::DonutMaker()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
+bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+    env.log("Reading in table of desired powers.");
+    std::vector<std::string> power_table;
+    std::vector<std::unique_ptr<FlavorPowerTableRow>> wanted_powers_table = FLAVOR_POWERS.copy_snapshot();
+    for (const std::unique_ptr<FlavorPowerTableRow>& row : wanted_powers_table){
+        FlavorPowerTableEntry table_line = row->snapshot();
+        power_table.push_back(table_line.to_str());
+        env.log(table_line.to_str());
+    }
+
+    env.log("Reading powers and counting up hits.");
+    uint8_t num_hits = 0;
+    VideoSnapshot screen = env.console.video().snapshot();
+    for (int i = 0; i < 3; i++) {
+        DonutPowerDetector read_power(env.logger(), COLOR_GREEN, LANGUAGE, i);
+        if ((std::find(power_table.begin(), power_table.end(), read_power.detect_quest(screen)) != power_table.end())) {
+            env.log("Match found!");
+            num_hits++;
+        } else {
+            env.log("No match found.");
+        }
+    }
+
+    if (num_hits >= NUM_POWER_REQUIRED) {
+        return true;
+    }
+
+    return false;
+}
+
+void DonutMaker::animation_to_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+    DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
+
+    WhiteScreenOverWatcher animation_skip(COLOR_BLUE);
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [&](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_A, Seconds(3));
+            pbf_wait(context, Seconds(30));
+        },
+        {animation_skip}
+    );
+    context.wait_for_all_requests();
+    if (ret != 0){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+           ErrorReport::SEND_ERROR_REPORT,
+            "donut_maker(): Unable to skip donut making animation.",
+            env.console
+        );
+    }
+
+    //Press A and wait a bit for powers to appear
+    pbf_wait(context, Seconds(3));
+    pbf_press_button(context, BUTTON_A, 100ms, 200ms);
+    pbf_wait(context, Seconds(3));
+    context.wait_for_all_requests();
+}
+
 void DonutMaker::add_berries_in_menu_and_start(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     //DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
@@ -123,8 +184,7 @@ void DonutMaker::add_berries_in_menu_and_start(SingleSwitchProgramEnvironment& e
     //}
 
     add_donut_ingredients(env.console, context, LANGUAGE, std::move(processed_berries));
-
-    //TODO: skip animation
+    animation_to_donut(env, context);
 }
 
 // Press A to talk to Ansha and keep pressing A until reach the berry selection menu
@@ -289,9 +349,7 @@ bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControl
     open_berry_menu_from_ansha(env, context);
     add_berries_in_menu_and_start(env, context);
 
-    return true; // XXX
-
-    return false;
+    return match_powers(env, context);
 }
 
 
@@ -313,11 +371,11 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     }
 
     //Print table to log to check
-    std::vector<std::unique_ptr<FlavorPowerTableRow>> wanted_powers_table = FLAVOR_POWERS.copy_snapshot();
-    for (const std::unique_ptr<FlavorPowerTableRow>& row : wanted_powers_table){
-        FlavorPowerTableEntry table_line = row->snapshot();
-        env.log(table_line.to_str());
-    }
+    //std::vector<std::unique_ptr<FlavorPowerTableRow>> wanted_powers_table = FLAVOR_POWERS.copy_snapshot();
+    //for (const std::unique_ptr<FlavorPowerTableRow>& row : wanted_powers_table){
+    //    FlavorPowerTableEntry table_line = row->snapshot();
+    //    env.log(table_line.to_str());
+    //}
     //TODO: Validate powers. The "All Types" type only applies to catching and sparkling powers. Move and resist do not have "All Types"
     //Are people even going to target move and resist power? Big Haul/Item Berry/Alpha/Sparkling seems more likely.
     //also TODO: powers table to however we're going to check it once that is written

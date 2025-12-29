@@ -243,7 +243,7 @@ std::string BerrySession::move_to_ingredient(const std::set<std::string>& ingred
         m_stream.log("Ingredient not found on current page. Scrolling up.", COLOR_ORANGE);
 
         //  Not found on page. Scroll to next screen
-        pbf_press_dpad(m_context, DPAD_LEFT, 80ms, 240ms); //Start from bottom, scroll UP for more hyperspace berries
+        pbf_press_dpad(m_context, DPAD_RIGHT, 80ms, 240ms);
         m_context.wait_for_all_requests();
         m_context.wait_for(std::chrono::milliseconds(180));
     }
