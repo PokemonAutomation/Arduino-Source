@@ -103,10 +103,11 @@ DonutMaker::DonutMaker()
     , NOTIFICATION_DONUT_FOUND(
         "Donut Found",
         true, true, ImageAttachmentMode::JPG,
-        {"Notifs", "Showcase"}
+        {"Notifs"}
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
+        &NOTIFICATION_DONUT_FOUND,
         &NOTIFICATION_STATUS,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_RECOVERABLE,
