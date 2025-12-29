@@ -15,20 +15,11 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "IntegerRangeOption.h"
 
-#include "Common/Qt/Options/IntegerRangeWidget.h"
-
 //#include <iostream>
 //using std::cout;
 //using std::endl;
 
 namespace PokemonAutomation{
-
-
-
-template <typename Type>
-ConfigWidget* IntegerRangeCell<Type>::make_QtWidget(QWidget& parent){
-    return new IntegerRangeCellWidget<Type>(parent, *this);
-}
 
 
 
@@ -85,7 +76,7 @@ template <typename Type>
 IntegerRangeCell<Type>::~IntegerRangeCell() = default;
 template <typename Type>
 IntegerRangeCell<Type>::IntegerRangeCell(const IntegerRangeCell& x)
-    : ConfigOption(x)
+    : ConfigOptionImpl<IntegerRangeCell<Type>>(x)
     , m_data(
         CONSTRUCT_TOKEN,
         x.lo_min_value(), x.lo_max_value(), x.lo_default_value(), x.lo_current_value(),
@@ -98,7 +89,7 @@ IntegerRangeCell<Type>::IntegerRangeCell(
     Type lo_min_value, Type lo_max_value, Type lo_default_value, Type lo_current_value,
     Type hi_min_value, Type hi_max_value, Type hi_default_value, Type hi_current_value
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<IntegerRangeCell<Type>>(lock_while_running)
     , m_data(
         CONSTRUCT_TOKEN,
         lo_min_value, lo_max_value, lo_default_value, lo_current_value,
@@ -167,7 +158,7 @@ void IntegerRangeCell<Type>::set_lo(Type lo){
     //  need to check for lo. If this condition fails, we were already in a bad
     //  state to begin with.
     if (current_lo != lo){
-        report_value_changed(this);
+        this->report_value_changed(this);
     }
 }
 template <typename Type>
@@ -190,7 +181,7 @@ void IntegerRangeCell<Type>::set_hi(Type hi){
     //  need to check for hi. If this condition fails, we were already in a bad
     //  state to begin with.
     if (current_hi != hi){
-        report_value_changed(this);
+        this->report_value_changed(this);
     }
 }
 template <typename Type>
@@ -214,7 +205,7 @@ void IntegerRangeCell<Type>::set(Type lo, Type hi){
         }
     }
     if (current_lo != lo || current_hi != hi){
-        report_value_changed(this);
+        this->report_value_changed(this);
     }
 }
 

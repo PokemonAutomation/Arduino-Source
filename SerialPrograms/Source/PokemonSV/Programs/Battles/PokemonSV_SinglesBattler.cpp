@@ -46,7 +46,7 @@ bool run_move_select(
         index = 3;
         break;
     default:
-        pbf_press_button(context, BUTTON_B, 20, 10);
+        pbf_press_button(context, BUTTON_B, 160ms, 80ms);
         return false;
     }
 
@@ -54,7 +54,7 @@ bool run_move_select(
     //  probably disabled. Select a different move.
     if (consecutive_move_select > 3){
         stream.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
-//        pbf_press_dpad(context, DPAD_DOWN, 20, 40);
+//        pbf_press_dpad(context, DPAD_DOWN, 160ms, 320ms);
         index++;
         if (index >= 4){
             index = 0;
@@ -79,7 +79,7 @@ bool run_move_select(
     context.wait_for_all_requests();
 
     if (move_select_menu.move_to_slot(stream, context, index)){
-        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 160ms, 80ms);
     }
     return true;
 }
@@ -97,20 +97,20 @@ bool run_battle_menu(
     case SinglesMoveType::Move3:
     case SinglesMoveType::Move4:
         if (battle_menu.move_to_slot(stream, context, 0)){
-            pbf_press_button(context, BUTTON_A, 20, 10);
+            pbf_press_button(context, BUTTON_A, 160ms, 80ms);
             return true;
         }else{
             stream.log("Unable to move to battle slot.", COLOR_RED);
-            pbf_mash_button(context, BUTTON_B, 125);
+            pbf_mash_button(context, BUTTON_B, 1000ms);
             return false;
         }
     case SinglesMoveType::Run:
         if (battle_menu.move_to_slot(stream, context, 3)){
-            pbf_press_button(context, BUTTON_A, 20, 10);
+            pbf_press_button(context, BUTTON_A, 160ms, 80ms);
             return true;
         }else{
             stream.log("Unable to move to run option.", COLOR_RED);
-            pbf_mash_button(context, BUTTON_B, 125);
+            pbf_mash_button(context, BUTTON_B, 1000ms);
             return false;
         }
     }
@@ -216,10 +216,10 @@ bool run_pokemon(
         case 2:
             if (trainer_battle){
                 stream.log("Detected switch prompt...", COLOR_BLUE);
-                pbf_press_button(context, BUTTON_B, 20, 10);
+                pbf_press_button(context, BUTTON_B, 160ms, 80ms);
             }else{
                 stream.log("Detected own " + STRING_POKEMON + " fainted...", COLOR_ORANGE);
-                pbf_press_button(context, BUTTON_A, 20, 10);
+                pbf_press_button(context, BUTTON_A, 160ms, 80ms);
             }
             continue;
         case 3:
@@ -241,7 +241,7 @@ bool run_pokemon(
                 );
             }
             stream.log("Unable to detect any state for 2 minutes. Mashing B...", COLOR_RED);
-            pbf_mash_button(context, BUTTON_B, 250);
+            pbf_mash_button(context, BUTTON_B, 2000ms);
         }
 
 
@@ -304,8 +304,8 @@ bool run_singles_battle(
                 pbf_press_dpad(context, DPAD_DOWN, 160ms, 840ms);
                 pbf_press_button(context, BUTTON_A, 160ms, 840ms);
                 pbf_press_button(context, BUTTON_A, 160ms, 840ms);
-                pbf_mash_button(context, BUTTON_B, 250);
-                pbf_wait(context, 50);
+                pbf_mash_button(context, BUTTON_B, 2000ms);
+                pbf_wait(context, 400ms);
                 continue;
             default:
                 OperationFailedException::fire(

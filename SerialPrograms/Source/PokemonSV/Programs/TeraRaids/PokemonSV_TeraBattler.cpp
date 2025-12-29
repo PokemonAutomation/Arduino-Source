@@ -60,14 +60,14 @@ BattleMenuResult run_battle_menu(
     case TeraMoveType::Move3:
     case TeraMoveType::Move4:
         if (battle_menu.move_to_slot(stream, context, 0)){
-            pbf_press_button(context, BUTTON_A, 20, 10);
+            pbf_press_button(context, BUTTON_A, 160ms, 80ms);
         }
         break;
     case TeraMoveType::Cheer_AllOut:
     case TeraMoveType::Cheer_HangTough:
     case TeraMoveType::Cheer_HealUp:
         if (battle_menu.move_to_slot(stream, context, 1)){
-            pbf_press_button(context, BUTTON_A, 20, 10);
+            pbf_press_button(context, BUTTON_A, 160ms, 80ms);
         }
         break;
     }
@@ -90,12 +90,12 @@ bool run_cheer_select(
         index = 2;
         break;
     default:
-        pbf_press_button(context, BUTTON_B, 20, 10);
+        pbf_press_button(context, BUTTON_B, 160ms, 80ms);
         return false;
     }
     if (cheer_select_menu.move_to_slot(stream, context, index)){
         std::lock_guard<std::mutex> lg(tera_battle_throttle_lock);
-        pbf_press_button(context, BUTTON_A, 20, 40);
+        pbf_press_button(context, BUTTON_A, 160ms, 320ms);
         context.wait_for_all_requests();
     }
     return true;
@@ -122,7 +122,7 @@ bool run_move_select(
         index = 3;
         break;
     default:
-        pbf_press_button(context, BUTTON_B, 20, 10);
+        pbf_press_button(context, BUTTON_B, 160ms, 80ms);
         return false;
     }
 
@@ -130,7 +130,7 @@ bool run_move_select(
     //  probably disabled. Select a different move.
     if (consecutive_move_select > 3){
         stream.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
-//        pbf_press_dpad(context, DPAD_DOWN, 20, 40);
+//        pbf_press_dpad(context, DPAD_DOWN, 160ms, 320ms);
         index++;
         if (index >= 4){
             index = 0;
@@ -157,7 +157,7 @@ bool run_move_select(
     }while (false);
 
     if (move_select_menu.move_to_slot(stream, context, index)){
-        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 160ms, 80ms);
     }
     return true;
 }
@@ -173,12 +173,12 @@ bool run_target_select(
     case TeraMoveType::Move4:{
         target_select_menu.move_to_slot(stream, context, (uint8_t)move.target);
         std::lock_guard<std::mutex> lg(tera_battle_throttle_lock);
-        pbf_press_button(context, BUTTON_A, 20, 40);
+        pbf_press_button(context, BUTTON_A, 160ms, 320ms);
         context.wait_for_all_requests();
         return true;
     }
     default:
-        pbf_press_button(context, BUTTON_B, 20, 10);
+        pbf_press_button(context, BUTTON_B, 160ms, 80ms);
         return false;
     }
 }
@@ -245,7 +245,7 @@ bool run_tera_battle(
             [](ProControllerContext& context){
                 for (size_t c = 0; c < 4; c++){
                     pbf_wait(context, 30000ms);
-                    pbf_press_button(context, BUTTON_B, 20, 0);
+                    pbf_press_button(context, BUTTON_B, 160ms, 0ms);
                 }
             },
             {
@@ -297,7 +297,7 @@ bool run_tera_battle(
                 continue;
             case BattleMenuResult::BATTLE_WON:
                 stream.log("Detected a win!", COLOR_BLUE);
-                pbf_mash_button(context, BUTTON_B, 30);
+                pbf_mash_button(context, BUTTON_B, 240ms);
                 return true;
             case BattleMenuResult::BATTLE_LOST:
                 stream.log("Detected a loss!", COLOR_ORANGE);
@@ -333,11 +333,11 @@ bool run_tera_battle(
             continue;
         case 4:
             stream.log("Detected item rewards menu!", COLOR_BLUE);
-            pbf_mash_button(context, BUTTON_B, 30);
+            pbf_mash_button(context, BUTTON_B, 240ms);
             return true;
         case 5:
             stream.log("Detected catch menu!", COLOR_BLUE);
-            pbf_mash_button(context, BUTTON_B, 30);
+            pbf_mash_button(context, BUTTON_B, 240ms);
             return true;
         case 6:
             stream.log("Detected a loss!", COLOR_ORANGE);
@@ -352,7 +352,7 @@ bool run_tera_battle(
                 );
             }
             stream.log("Unable to detect any state for 2 minutes. Mashing B...", COLOR_RED);
-            pbf_mash_button(context, BUTTON_B, 250);
+            pbf_mash_button(context, BUTTON_B, 2000ms);
         }
     }
 

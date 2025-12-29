@@ -117,16 +117,16 @@ void checkpoint_24(
         DirectionDetector direction;
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms});
         }
 
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 direction.change_direction(env.program_info(), env.console, context, 2.71);
-                pbf_move_left_joystick(context, 128, 0, 375, 100);
+                pbf_move_left_joystick(context, {0, +1}, 3000ms, 800ms);
                 direction.change_direction(env.program_info(), env.console, context, 1.26);
-                pbf_move_left_joystick(context, 128, 0, 1750, 100);                
+                pbf_move_left_joystick(context, {0, +1}, 14000ms, 800ms);
         });        
        
         direction.change_direction(env.program_info(), env.console, context, 2.73);
@@ -135,7 +135,7 @@ void checkpoint_24(
         context.wait_for_all_requests();
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20000ms);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {-1, +1}, 800ms, 160ms);
@@ -145,7 +145,7 @@ void checkpoint_24(
         // enter gym building. talk go Nemona
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
         // talk to receptionist
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
         pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);
@@ -153,9 +153,9 @@ void checkpoint_24(
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
-        pbf_move_left_joystick(context, 128, 0, 450, 100);
+        pbf_move_left_joystick(context, {0, +1}, 3600ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 1.26);
-        pbf_move_left_joystick(context, 128, 0, 1600, 100);
+        pbf_move_left_joystick(context, {0, +1}, 12800ms, 800ms);
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
         
 
@@ -184,7 +184,7 @@ void checkpoint_25(
         // section 1.1. keep walking forward and talk to Olive roll NPC
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms);
             }
         );     
         mash_button_till_overworld(env.console, context, BUTTON_A);
@@ -192,14 +192,14 @@ void checkpoint_25(
         context.wait_for_all_requests();
 
         // section 2
-        pbf_move_left_joystick(context, 128, 0, 1300, 100);
+        pbf_move_left_joystick(context, {0, +1}, 10400ms, 800ms);
 
         // section 3
         DirectionDetector direction;
         // we just hope the minimap Direction isn't covered
 
         direction.change_direction(env.program_info(), env.console, context, 6.0);
-        pbf_move_left_joystick(context, 128, 0, 700, 100);
+        pbf_move_left_joystick(context, {0, +1}, 5600ms, 800ms);
 
         // section 4. align to corner
         direction.change_direction(env.program_info(), env.console, context,  4.69);
@@ -207,7 +207,7 @@ void checkpoint_25(
 
         // section 5. battle first NPC
         direction.change_direction(env.program_info(), env.console, context,  1.485);
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10, 128, 20);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms, 128, 20);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
         env.console.log("Battle Olive Roll NPC 1.");
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
@@ -219,7 +219,7 @@ void checkpoint_25(
 
         // section 7
         direction.change_direction(env.program_info(), env.console, context,  1.327);
-        pbf_move_left_joystick(context, 128, 0, 700, 100);
+        pbf_move_left_joystick(context, {0, +1}, 5600ms, 800ms);
 
         // section 8
         direction.change_direction(env.program_info(), env.console, context,  6.106);
@@ -227,14 +227,14 @@ void checkpoint_25(
 
         // section 9. battle second NPC
         direction.change_direction(env.program_info(), env.console, context,  4.275);
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10, 128, 20);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms, 128, 20);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
         env.console.log("Battle Olive Roll NPC 2.");
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         // section 10. leave Olive roll
-        pbf_mash_button(context, BUTTON_Y, 100);
+        pbf_mash_button(context, BUTTON_Y, 800ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 15, {CallbackEnum::PROMPT_DIALOG});
         wait_for_overworld(env.program_info(), env.console, context);
@@ -261,18 +261,18 @@ void checkpoint_26(
         reset_game_from_home(env.program_info(), env.console, context);
 
         // talk to Olive roll NPC
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10, 128, 20);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms, 128, 20);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         // section 1
         pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
         OliveDetector green(env.console);
         size_t MAX_ATTEMPTS_SECTION_1 = 2;
-        uint16_t ticks_to_walk_for_section1 = 650;
-        uint16_t push_strength_section_1 = 75;
+        Milliseconds duration_to_walk_for_section1 = 5200ms;
+        Milliseconds push_strength_section_1 = 600ms;
         for (size_t i = 0; i < MAX_ATTEMPTS_SECTION_1; i++){
             try{
-                green.push_olive_forward(env.program_info(), env.console, context, 4.38, ticks_to_walk_for_section1, push_strength_section_1);
+                green.push_olive_forward(env.program_info(), env.console, context, 4.38, duration_to_walk_for_section1, push_strength_section_1);
                 // green.align_to_olive(env.program_info(), env.console, context, 4.38);
                 green.walk_up_to_olive(env.program_info(), env.console, context, 4.38);
                 break;
@@ -290,8 +290,8 @@ void checkpoint_26(
                     pbf_move_left_joystick(context, {0, -1}, 1600ms, 400ms);
                     pbf_wait(context, 5000ms);
                     context.wait_for_all_requests();
-                    ticks_to_walk_for_section1 = 100;
-                    push_strength_section_1 = 50;               
+                    duration_to_walk_for_section1 = 800ms;
+                    push_strength_section_1 = 400ms;
                 }else{ // FAILED_PUSH_OLIVE_TOTAL_DISTANCE
                     throw e;
                 }
@@ -309,13 +309,13 @@ void checkpoint_26(
         direction.change_direction(env.program_info(), env.console, context,  4.328);
         pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
         direction.change_direction(env.program_info(), env.console, context,  1.22);
-        pbf_move_left_joystick(context, 128, 0, 75, 50);
+        pbf_move_left_joystick(context, {0, +1}, 600ms, 400ms);
 
         // section 2.1 nudge olive straight
         size_t MAX_ATTEMPTS_SECTION_2_1 = 2;
         for (size_t i = 0; i < MAX_ATTEMPTS_SECTION_2_1; i++){
             try{
-                green.push_olive_forward(env.program_info(), env.console, context, 5.95, 50, 50);
+                green.push_olive_forward(env.program_info(), env.console, context, 5.95, 400ms, 400ms);
                 break;
             }catch (OliveActionFailedException& e){
                 if (i >= MAX_ATTEMPTS_SECTION_2_1-1){
@@ -350,7 +350,7 @@ void checkpoint_26(
         // uint16_t ticks_walked_section2_2 = 0;
         for (size_t i = 0; i < MAX_ATTEMPTS_SECTION_2_2; i++){
             try{
-                green.push_olive_forward(env.program_info(), env.console, context, 5.8, 250, 50);
+                green.push_olive_forward(env.program_info(), env.console, context, 5.8, 2000ms, 400ms);
                 break;
             }catch (OliveActionFailedException& e){
                 if (i >= MAX_ATTEMPTS_SECTION_2_2-1){
@@ -364,7 +364,7 @@ void checkpoint_26(
                     // push olive parallel to fence
                     green.align_to_olive(env.program_info(), env.console, context, 4.28, 20);
                     green.walk_up_to_olive(env.program_info(), env.console, context, 4.28);
-                    green.push_olive_forward(env.program_info(), env.console, context, 4.28, 100);
+                    green.push_olive_forward(env.program_info(), env.console, context, 4.28, 800ms);
                     green.align_to_olive(env.program_info(), env.console, context, 4.28, 20);
                     green.walk_up_to_olive(env.program_info(), env.console, context, 4.28);
                     // back off
@@ -399,11 +399,11 @@ void checkpoint_26(
         pbf_move_left_joystick(context, {0, -1}, 4000ms, 400ms);
 
         // section 2.3 push olive past first NPC
-        uint16_t ticks_to_walk_for_section2_3 = 950;
+        Milliseconds duration_to_walk_for_section2_3 = 7600ms;
         size_t MAX_ATTEMPTS = 2;
         for (size_t i = 0; i < MAX_ATTEMPTS; i++){
             try{
-                green.push_olive_forward(env.program_info(), env.console, context, 5.95, ticks_to_walk_for_section2_3, 75, 10);
+                green.push_olive_forward(env.program_info(), env.console, context, 5.95, duration_to_walk_for_section2_3, 600ms, 10);
                 // green.align_to_olive(env.program_info(), env.console, context, 5.95, 10);
                 green.walk_up_to_olive(env.program_info(), env.console, context, 5.95, 10);                
                 break;
@@ -433,16 +433,23 @@ void checkpoint_26(
         direction.change_direction(env.program_info(), env.console, context,  4.5);
         pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
         direction.change_direction(env.program_info(), env.console, context, 5.86);
-        pbf_move_left_joystick(context, 128, 0, 300, 50);
+        pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
         direction.change_direction(env.program_info(), env.console, context,  2.76);
         pbf_move_left_joystick(context, {0, +1}, 400ms, 400ms);
 
         // section 3.1 push olive across the hump
-        uint16_t ticks_to_walk_for_section3_1 = 350;
-        uint16_t ticks_walked_section3_1 = 0;
+        Milliseconds duration_to_walk_for_section3_1 = 2800ms;
+        Milliseconds duration_walked_section3_1 = 0ms;
         for (size_t i = 0; i < MAX_ATTEMPTS; i++){
             try{
-                ticks_walked_section3_1 = green.push_olive_forward(env.program_info(), env.console, context, 1.27, ticks_to_walk_for_section3_1, 125);
+                duration_walked_section3_1 = green.push_olive_forward(
+                    env.program_info(),
+                    env.console,
+                    context,
+                    1.27,
+                    duration_to_walk_for_section3_1,
+                    1000ms
+                );
                 break;
             }catch (OliveActionFailedException& e){
                 // may have failed to push the olive past the hump. and walked past it
@@ -455,14 +462,14 @@ void checkpoint_26(
                     pbf_move_left_joystick(context, {0, +1}, 400ms, 400ms);  // move forward slight in case the olive is undetectable since it's right in front of the character
                     pbf_wait(context, 5000ms);
                     context.wait_for_all_requests();                    
-                    ticks_to_walk_for_section3_1 = 200;
+                    duration_to_walk_for_section3_1 = 1600ms;
                 }else if (e.m_fail_reason == OliveFail::FAILED_WALK_TO_OLIVE || e.m_fail_reason == OliveFail::OLIVE_STUCK){
                     // try moving back and then ramming forward
                     pbf_move_left_joystick(context, {0, -1}, 400ms, 400ms);
                     pbf_move_left_joystick(context, {0, +1}, 1200ms, 400ms);
                     pbf_wait(context, 7000ms);
                     context.wait_for_all_requests();
-                    ticks_to_walk_for_section3_1 = 200;
+                    duration_to_walk_for_section3_1 = 1600ms;
                 }else{ // FAILED_PUSH_OLIVE_TOTAL_DISTANCE, 
                     throw e;
                 }
@@ -472,14 +479,14 @@ void checkpoint_26(
 
         
         // section 3.2 push olive across the hump and into fence
-        uint16_t total_ticks_to_walk_for_section3 = 550;
-        uint16_t ticks_to_walk_for_section3_2 = 0;
-        if (ticks_walked_section3_1 < total_ticks_to_walk_for_section3){
-            ticks_to_walk_for_section3_2 = (total_ticks_to_walk_for_section3 - ticks_walked_section3_1);
+        Milliseconds total_duration_to_walk_for_section3 = 4400ms;
+        Milliseconds duration_to_walk_for_section3_2 = 0ms;
+        if (duration_walked_section3_1 < total_duration_to_walk_for_section3){
+            duration_to_walk_for_section3_2 = (total_duration_to_walk_for_section3 - duration_walked_section3_1);
         }
         for (size_t i = 0; i < MAX_ATTEMPTS; i++){
             try{
-                green.push_olive_forward(env.program_info(), env.console, context, 1.27, ticks_to_walk_for_section3_2, 125);
+                green.push_olive_forward(env.program_info(), env.console, context, 1.27, duration_to_walk_for_section3_2, 1000ms);
                 pbf_move_left_joystick(context, {0, -1}, 800ms, 400ms);
                 green.align_to_olive(env.program_info(), env.console, context, 1.27);
                 green.walk_up_to_olive(env.program_info(), env.console, context, 1.27);
@@ -493,7 +500,7 @@ void checkpoint_26(
                     pbf_move_left_joystick(context, {0, -1}, 1600ms, 400ms);
                     pbf_wait(context, 7000ms);
                     context.wait_for_all_requests();                    
-                    ticks_to_walk_for_section3_2 += 200;
+                    duration_to_walk_for_section3_2 += 1600ms;
                 }else if (e.m_fail_reason == OliveFail::FAILED_WALK_TO_OLIVE || e.m_fail_reason == OliveFail::OLIVE_STUCK){
                     // try moving back and then ramming forward
                     pbf_move_left_joystick(context, {0, -1}, 400ms, 400ms);
@@ -510,7 +517,7 @@ void checkpoint_26(
 
         // section 3b. realign using fence.
         direction.change_direction(env.program_info(), env.console, context,  3.0);
-        pbf_move_left_joystick(context, 128, 0, 75, 50);
+        pbf_move_left_joystick(context, {0, +1}, 600ms, 400ms);
         direction.change_direction(env.program_info(), env.console, context,  1.17);
         pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
 
@@ -519,7 +526,7 @@ void checkpoint_26(
             try{
                 green.align_to_olive(env.program_info(), env.console, context, 6.0);
                 green.walk_up_to_olive(env.program_info(), env.console, context, 6.0);                
-                green.push_olive_forward(env.program_info(), env.console, context, 6.0, 50, 50);
+                green.push_olive_forward(env.program_info(), env.console, context, 6.0, 400ms, 400ms);
                 break;
             }catch (OliveActionFailedException& e){
                 // may have failed to push the olive. and walked past it
@@ -547,10 +554,10 @@ void checkpoint_26(
             [&](ProControllerContext& context){
                 for (size_t i = 0; i < MAX_ATTEMPTS_SECTION_4; i++){
                     try{
-                        green.push_olive_forward(env.program_info(), env.console, context, 6.0, 250, 75, 20, {0, 0.3, 1.0, 0.40}, false);
-                        green.push_olive_forward(env.program_info(), env.console, context, 5.8, 100, 75, 20, {0, 0.3, 1.0, 0.40}, false);
-                        green.push_olive_forward(env.program_info(), env.console, context, 6.0, 200, 75, 20, {0, 0.3, 1.0, 0.40}, false);
-                        green.push_olive_forward(env.program_info(), env.console, context, 6.1, 200, 75, 20, {0, 0.3, 1.0, 0.40}, false);                        
+                        green.push_olive_forward(env.program_info(), env.console, context, 6.0, 2000ms, 600ms, 20, {0, 0.3, 1.0, 0.40}, false);
+                        green.push_olive_forward(env.program_info(), env.console, context, 5.8, 800ms, 600ms, 20, {0, 0.3, 1.0, 0.40}, false);
+                        green.push_olive_forward(env.program_info(), env.console, context, 6.0, 1600ms, 600ms, 20, {0, 0.3, 1.0, 0.40}, false);
+                        green.push_olive_forward(env.program_info(), env.console, context, 6.1, 1600ms, 600ms, 20, {0, 0.3, 1.0, 0.40}, false);
                         break;
                     }catch (OliveActionFailedException& e){
                         // may have failed to push the olive. and walked past it
@@ -565,7 +572,7 @@ void checkpoint_26(
                             pbf_wait(context, 7000ms);
                             context.wait_for_all_requests();
                             // then push angled towards the right
-                            green.push_olive_forward(env.program_info(), env.console, context, 5.8, 100, 75, 20, {0, 0.3, 1.0, 0.40}, false);                            
+                            green.push_olive_forward(env.program_info(), env.console, context, 5.8, 800ms, 600ms, 20, {0, 0.3, 1.0, 0.40}, false);
                         }else{ // FAILED_PUSH_OLIVE_TOTAL_DISTANCE, 
                             throw e;
                         }
@@ -610,7 +617,7 @@ void checkpoint_27(
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 40});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 320ms});
 
     });
 
@@ -623,3 +630,4 @@ void checkpoint_27(
 }
 }
 }
+

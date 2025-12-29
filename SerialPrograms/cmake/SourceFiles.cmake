@@ -10,7 +10,6 @@ file(GLOB LIBRARY_SOURCES
     ../3rdParty/QtWavFile/WavFile.h
     ../3rdParty/TesseractPA/TesseractPA.cpp
     ../3rdParty/TesseractPA/TesseractPA.h
-    ../3rdParty/qdarkstyle/dark/darkstyle.qrc
     ../Common/CRC32.cpp
     ../Common/CRC32.h
     ../Common/Compiler.h
@@ -107,6 +106,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Options/ButtonOption.cpp
     ../Common/Cpp/Options/ButtonOption.h
     ../Common/Cpp/Options/CheckboxDropdownDatabase.h
+    ../Common/Cpp/Options/CheckboxDropdownOption.cpp
     ../Common/Cpp/Options/CheckboxDropdownOption.h
     ../Common/Cpp/Options/CheckboxDropdownOption.tpp
     ../Common/Cpp/Options/ColorOption.cpp
@@ -137,6 +137,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Options/PathOption.h
     ../Common/Cpp/Options/RandomCodeOption.cpp
     ../Common/Cpp/Options/RandomCodeOption.h
+    ../Common/Cpp/Options/SimpleIntegerOptionBase.h
     ../Common/Cpp/Options/SimpleIntegerOption.cpp
     ../Common/Cpp/Options/SimpleIntegerOption.h
     ../Common/Cpp/Options/StaticTableOption.cpp
@@ -179,6 +180,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/StringTools.h
     ../Common/Cpp/Time.cpp
     ../Common/Cpp/Time.h
+    ../Common/Cpp/UiWrapper.h
     ../Common/Cpp/Unicode.cpp
     ../Common/Cpp/Unicode.h
     ../Common/Cpp/ValueDebouncer.h
@@ -368,6 +370,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Notifications/EventNotificationOption.h
     Source/CommonFramework/Notifications/EventNotificationsTable.cpp
     Source/CommonFramework/Notifications/EventNotificationsTable.h
+    Source/CommonFramework/Notifications/EventNotificationWidget.cpp
+    Source/CommonFramework/Notifications/EventNotificationWidget.h
     Source/CommonFramework/Notifications/MessageAttachment.cpp
     Source/CommonFramework/Notifications/MessageAttachment.h
     Source/CommonFramework/Notifications/ProgramInfo.h
@@ -683,8 +687,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/SerialPABotBase/Connection/BotBase.cpp
     Source/Controllers/SerialPABotBase/Connection/BotBase.h
     Source/Controllers/SerialPABotBase/Connection/BotBaseMessage.h
-    Source/Controllers/SerialPABotBase/Connection/MessageConverter.cpp
-    Source/Controllers/SerialPABotBase/Connection/MessageConverter.h
     Source/Controllers/SerialPABotBase/Connection/MessageLogger.cpp
     Source/Controllers/SerialPABotBase/Connection/MessageLogger.h
     Source/Controllers/SerialPABotBase/Connection/MessageSniffer.h
@@ -692,18 +694,22 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/SerialPABotBase/Connection/PABotBase.h
     Source/Controllers/SerialPABotBase/Connection/PABotBaseConnection.cpp
     Source/Controllers/SerialPABotBase/Connection/PABotBaseConnection.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Acks.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_CommandQueue.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_ControllerMode.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Errors.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Info.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Misc.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_StaticRequests.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_HID_Keyboard.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_NS_WiredController.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_NS1_OemControllers.h
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_HID_Keyboard.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_HID_Keyboard.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_OemControllers.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_OemControllers.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_WiredController.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_WiredController.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h
@@ -716,6 +722,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
+    Source/Integrations/DiscordIntegrationSettingsWidget.cpp
+    Source/Integrations/DiscordIntegrationSettingsWidget.h
     Source/Integrations/DiscordIntegrationTable.cpp
     Source/Integrations/DiscordIntegrationTable.h
     Source/Integrations/DiscordSettingsOption.cpp
@@ -1457,6 +1465,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.h
     Source/PokemonLA/Options/PokemonLA_TravelLocation.cpp
     Source/PokemonLA/Options/PokemonLA_TravelLocation.h
+    Source/PokemonLA/Options/QtWidgets/PokemonLA_CustomPathTableWidget.cpp
+    Source/PokemonLA/Options/QtWidgets/PokemonLA_CustomPathTableWidget.h
     Source/PokemonLA/Panels_PokemonLA.cpp
     Source/PokemonLA/Panels_PokemonLA.h
     Source/PokemonLA/PokemonLA_Locations.cpp
@@ -1599,6 +1609,15 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_IvJudgeReader.cpp
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_IvJudgeReader.h
+    Source/PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.cpp
+    Source/PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.h
+<<<<<<< HEAD
+    Source/PokemonLZA/Inference/Donuts/PokemonLZA_DonutPowerDetector.cpp
+    Source/PokemonLZA/Inference/Donuts/PokemonLZA_DonutPowerDetector.h
+=======
+    Source/PokemonLZA/Inference/Donuts/PokemonLZA_FlavorPowerScreenDetector.cpp
+    Source/PokemonLZA/Inference/Donuts/PokemonLZA_FlavorPowerScreenDetector.h
+>>>>>>> 363ca9c8a (Add donut power screen detector)
     Source/PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.cpp
     Source/PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h
     Source/PokemonLZA/Inference/Map/PokemonLZA_LocationNameReader.cpp
@@ -1643,6 +1662,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/PokemonLZA_Panels.h
     Source/PokemonLZA/PokemonLZA_Settings.cpp
     Source/PokemonLZA/PokemonLZA_Settings.h
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_DonutMaker.cpp
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_DonutMaker.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_FriendshipFarmer.cpp
     Source/PokemonLZA/Programs/Farming/PokemonLZA_FriendshipFarmer.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_HyperspaceRewardReset.cpp
@@ -1655,6 +1676,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/Farming/PokemonLZA_MegaShardFarmer.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_RestaurantFarmer.cpp
     Source/PokemonLZA/Programs/Farming/PokemonLZA_RestaurantFarmer.h
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_WigglytuffFarmer.cpp
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_WigglytuffFarmer.h
     Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_StatsReset.cpp
     Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_StatsReset.h
     Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_WeatherFinder.cpp
@@ -1665,6 +1688,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/PokemonLZA_BoxSorter.h
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.h
+    Source/PokemonLZA/Programs/PokemonLZA_DonutBerrySession.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_DonutBerrySession.h
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.cpp
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.h
     Source/PokemonLZA/Programs/PokemonLZA_Locations.h
@@ -1688,6 +1713,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HyperspaceLegendary.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HyperspaceLegendary.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.cpp
@@ -1698,8 +1725,6 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneCafe.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h
-    Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_DonutOptionsTest.cpp
-    Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_DonutOptionsTest.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.cpp
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.cpp
@@ -2549,6 +2574,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h
     Source/PokemonSwSh/ShinyHuntTracker.cpp
     Source/PokemonSwSh/ShinyHuntTracker.h
+    Source/StaticRegistration.h
+    Source/StaticRegistrationQt.cpp
     Source/Tests/CommandLineTests.cpp
     Source/Tests/CommandLineTests.h
     Source/Tests/CommonFramework_Tests.cpp

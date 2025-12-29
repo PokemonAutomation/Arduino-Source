@@ -18,12 +18,13 @@ struct ButtonListener{
 };
 
 
-class ButtonCell : public ConfigOption{
+class ButtonCell : public ConfigOptionImpl<ButtonCell>{
 public:
     enum Enabled : bool{
         DISABLED,
         ENABLED,
     };
+
 
 public:
     virtual ~ButtonCell();
@@ -45,6 +46,7 @@ public:
     void add_listener(ButtonListener& listener);
     void remove_listener(ButtonListener& listener);
 
+
 public:
     bool is_enabled() const;
     void set_enabled(bool enabled);
@@ -62,8 +64,6 @@ public:
 
 //    virtual void restore_defaults() override;
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
-
 
 
 protected:
@@ -73,7 +73,7 @@ protected:
 
 
 
-class ButtonOption : public ButtonCell{
+class ButtonOption : public ConfigOptionImpl<ButtonOption, ButtonCell>{
 public:
     virtual ~ButtonOption();
     ButtonOption(const ButtonOption& x) = delete;
@@ -93,8 +93,6 @@ public:
 
     std::string label() const;
     void set_label(std::string label);
-
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 
 private:

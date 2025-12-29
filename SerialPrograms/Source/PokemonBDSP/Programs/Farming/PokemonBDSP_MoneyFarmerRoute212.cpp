@@ -148,7 +148,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, ProControl
             env.console.overlay().add_log("Choose move", COLOR_BLUE);
             battle_menu_seen = true;
 
-            pbf_press_button(context, BUTTON_ZL, 10, 125);
+            pbf_press_button(context, BUTTON_ZL, 80ms, 1000ms);
 
             uint8_t slot = 0;
             for (; slot < 4; slot++){
@@ -167,7 +167,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, ProControl
             for (uint8_t move_slot = 0; move_slot < slot; move_slot++){
                 pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
             }
-            pbf_mash_button(context, BUTTON_ZL, 250);
+            pbf_mash_button(context, BUTTON_ZL, 2000ms);
             pp[slot]--;
             env.log("Used move at slot " + std::to_string(slot+1) + ". " + std::to_string(pp[slot]) + " PP left.", COLOR_BLUE);
 
@@ -176,7 +176,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, ProControl
         case 1:
             env.log("Battle finished!", COLOR_BLUE);
             env.console.overlay().add_log("Battle finished", COLOR_WHITE);
-            pbf_mash_button(context, BUTTON_B, 250);
+            pbf_mash_button(context, BUTTON_B, 2000ms);
             return false;
 //        case 1:
 //            env.log("Dialog detected! Battle finished?", COLOR_BLUE);
@@ -213,7 +213,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, ProControl
 void MoneyFarmerRoute212::heal_at_center_and_return(VideoStream& stream, ProControllerContext& context, uint8_t pp[4]){
     stream.overlay().add_log("Heal at " + STRING_POKEMON + " Center", COLOR_WHITE);
     stream.log("Healing " + STRING_POKEMON + " at Hearthome City " + STRING_POKEMON + " Center.");
-    pbf_move_left_joystick(context, 125, 0, 6000ms, 0ms);
+    pbf_move_left_joystick_old(context, 125, 0, 6000ms, 0ms);
     pbf_mash_button(context, BUTTON_ZL, 3000ms);
 //    ssf_mash_AZs(context, 3000ms);
     pbf_mash_button(context, BUTTON_B, 10000ms);
@@ -224,18 +224,18 @@ void MoneyFarmerRoute212::heal_at_center_and_return(VideoStream& stream, ProCont
     pbf_move_left_joystick(context, {0, -1}, 8000ms, 0ms);
     pbf_move_left_joystick(context, {+1, 0}, 3040ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 2400ms, 0ms);
-    pbf_move_left_joystick(context,   0, 128, 4800ms, 0ms);
+    pbf_move_left_joystick(context, {-1, 0}, 4800ms, 0ms);
     pbf_move_left_joystick(context, {+1, 0}, 600ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 11000ms, 0ms);
     pbf_move_left_joystick(context, {+1, 0}, 1000ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 1600ms, 0ms);
-    pbf_move_left_joystick(context,   0, 128, 1600ms, 0ms);
+    pbf_move_left_joystick(context, {-1, 0}, 1600ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 400ms, 0ms);
-    pbf_move_left_joystick(context,   0, 128, 1000ms, 0ms);
+    pbf_move_left_joystick(context, {-1, 0}, 1000ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 1000ms, 0ms);
     pbf_move_left_joystick(context, {+1, 0}, 2000ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 1600ms, 0ms);
-    pbf_move_left_joystick(context,   0, 128, 720ms, 0ms);
+    pbf_move_left_joystick(context, {-1, 0}, 720ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 1600ms, 0ms);
     pbf_move_left_joystick(context, {+1, 0}, 1000ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 1600ms, 0ms);
@@ -252,9 +252,9 @@ void MoneyFarmerRoute212::fly_to_center_heal_and_return(VideoStream& stream, Pro
     stream.log("Flying back to Hearthome City to heal.");
     stream.overlay().add_log("Fly to Hearthome City", COLOR_WHITE);
     pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
-    pbf_press_button(context, BUTTON_PLUS, 10, 240);
-    pbf_press_dpad(context, DPAD_UP, 10, 60);
-    pbf_press_dpad(context, DPAD_UP, 10, 60);
+    pbf_press_button(context, BUTTON_PLUS, 80ms, 1920ms);
+    pbf_press_dpad(context, DPAD_UP, 80ms, 480ms);
+    pbf_press_dpad(context, DPAD_UP, 80ms, 480ms);
     pbf_mash_button(context, BUTTON_ZL, 12000ms);
     heal_at_center_and_return(stream, context, pp);
 }
@@ -310,7 +310,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, ProContro
     };
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 40ms, 40ms);
 
     bool need_to_charge = true;
     if (START_LOCATION == StartLocation::Hearthome){
@@ -354,7 +354,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, ProContro
                 {{tracker}}
             );
             need_to_charge = true;
-            pbf_mash_button(context, BUTTON_B, 250);
+            pbf_mash_button(context, BUTTON_B, 2000ms);
 
             dimensions = tracker.dimensions();
             bubbles = tracker.reactions();

@@ -25,8 +25,7 @@ BowItemDuper_Descriptor::BowItemDuper_Descriptor()
         "Use the Bow Swap Glitch to farm any fusable items.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 
@@ -87,12 +86,12 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         // it has been adjusted and modified by denvoros#0001
 
         // zr to pull out bow
-        pbf_press_button(context, BUTTON_ZR, 12, 12);
+        pbf_press_button(context, BUTTON_ZR, 96ms, 96ms);
         // dpad up to try to fuse the item, release for a while to make sure fused
-        pbf_press_dpad(context, DPAD_UP, 20, 200);
+        pbf_press_dpad(context, DPAD_UP, 160ms, 1600ms);
         
         // then go ahead and enter the menu and do the various menuing in order to actually perform glitch
-        pbf_press_button(context, BUTTON_PLUS, 20, 10);
+        pbf_press_button(context, BUTTON_PLUS, 160ms, 80ms);
 
         // drop current bow
         pbf_press_button(context, BUTTON_A, 80ms, 80ms);
@@ -101,11 +100,11 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         // now go to other bow and equip
         pbf_press_dpad(context, DPAD_RIGHT, 80ms, 40ms);
         pbf_press_button(context, BUTTON_A, 80ms, 80ms);
-        pbf_press_button(context, BUTTON_A, 10, 15);
+        pbf_press_button(context, BUTTON_A, 80ms, 120ms);
 
         // NOW WE HAVE TO PRESS PLUS AS FAST AS POSSIBLE
         pbf_press_button(context, BUTTON_PLUS, 24ms, TICK_DELAY0);
-        pbf_press_button(context, BUTTON_PLUS, 3, 3);
+        pbf_press_button(context, BUTTON_PLUS, 24ms, 24ms);
 
         // navigate back to the "current" bow, then drop it
         pbf_press_dpad(context, DPAD_LEFT, 80ms, 40ms);
@@ -122,8 +121,8 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         pbf_wait(context, 300ms);
 
         // pick up both bows
-        pbf_press_button(context, BUTTON_A, 20, 10);
-        pbf_press_button(context, BUTTON_A, 20, 20);
+        pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+        pbf_press_button(context, BUTTON_A, 160ms, 160ms);
 
         // turn back around and wait before reopening menu
         pbf_move_left_joystick(context, {0, -1}, 24ms, 80ms);
@@ -136,7 +135,7 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         // reset the cursor location, then go back to overworld to start again
         pbf_press_dpad(context, DPAD_LEFT, 80ms, 40ms);
 
-        pbf_press_button(context, BUTTON_PLUS, 20, 40);
+        pbf_press_button(context, BUTTON_PLUS, 160ms, 320ms);
         // NOTE: needs a short buffer between runs to make sure new bow is ready
 
         // wait for everything before we try anything else

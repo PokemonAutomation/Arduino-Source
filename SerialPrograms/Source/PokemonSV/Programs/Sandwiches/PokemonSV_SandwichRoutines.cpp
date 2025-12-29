@@ -67,7 +67,7 @@ bool enter_sandwich_recipe_list(
     stream.log("Opening sandwich menu at picnic table.");
 
     // Firt, try pressing button A to bring up the menu to make sandwich
-    pbf_press_button(context, BUTTON_A, 20, 80);
+    pbf_press_button(context, BUTTON_A, 160ms, 640ms);
 
     WallClock start = current_time();
     bool opened_table_menu = false;
@@ -95,7 +95,7 @@ bool enter_sandwich_recipe_list(
             stream.log("Detected picnic. Maybe button A press dropped.");
             // walk forward and press A again
             pbf_move_left_joystick(context, {0, +1}, 800ms, 320ms);
-            pbf_press_button(context, BUTTON_A, 20, 80);
+            pbf_press_button(context, BUTTON_A, 160ms, 640ms);
             continue;
         case 1:
             stream.log("Detected \"make a sandwich\" menu item selection arrrow.");
@@ -114,7 +114,7 @@ bool enter_sandwich_recipe_list(
                 stream.overlay().add_log("No ingredient!", COLOR_RED);
                 return false;
             }
-            pbf_press_button(context, BUTTON_A, 20, 80);
+            pbf_press_button(context, BUTTON_A, 160ms, 640ms);
             continue;
         default:
             dump_image_and_throw_recoverable_exception(info, stream, "NotEnterSandwichList",
@@ -224,7 +224,7 @@ bool select_sandwich_recipe(
 
     if (found_recipe){
         // Press A to enter the pick selection 
-        pbf_press_button(context, BUTTON_A, 30, 100);
+        pbf_press_button(context, BUTTON_A, 240ms, 800ms);
 //        context.wait_for_all_requests();
 
         SandwichIngredientArrowWatcher pick_selection(0, COLOR_YELLOW);
@@ -237,11 +237,11 @@ bool select_sandwich_recipe(
 
             if (ret == 0){
                 stream.log("Detected recipe selection. Dropped Button A?");
-                pbf_press_button(context, BUTTON_A, 30, 100);
+                pbf_press_button(context, BUTTON_A, 240ms, 800ms);
                 continue;
             }else if (ret == 1){
                 stream.log("Detected pick selection.");
-                pbf_press_button(context, BUTTON_A, 30, 100);
+                pbf_press_button(context, BUTTON_A, 240ms, 800ms);
                 continue;
             }else{
                 stream.log("Entered sandwich minigame.");
@@ -552,7 +552,7 @@ HandMoveData move_sandwich_hand_and_check_if_plates_empty(
 //                pbf_controller_state(context, BUTTON_A, DPAD_NONE, joystick_x, joystick_y, 128, 128, 20);
                 ssf_press_button(context, BUTTON_A, 0ms, 8000ms, 0ms);
             }
-            pbf_move_left_joystick(context, joystick_x, joystick_y, 20, 0);
+            pbf_move_left_joystick_old(context, joystick_x, joystick_y, 160ms, 0ms);
         });
         
         stream.log("Moved joystick");
@@ -830,7 +830,7 @@ void make_two_herbs_sandwich(
     }
 
     // Mesh button A to select the first pick
-    pbf_mash_button(context, BUTTON_A, 80);
+    pbf_mash_button(context, BUTTON_A, 640ms);
     context.wait_for_all_requests();
 
     finish_two_herbs_sandwich(env, stream, context);
@@ -1073,7 +1073,7 @@ void run_sandwich_maker(
     //Wait for labels to appear
     stream.log("Waiting for labels to appear.", COLOR_BLACK);
     stream.overlay().add_log("Waiting for labels to appear.", COLOR_WHITE);
-    pbf_wait(context, 300);
+    pbf_wait(context, 2400ms);
     context.wait_for_all_requests();
 
     //Now read in plate labels and store which plate has what
@@ -1145,7 +1145,7 @@ void run_sandwich_maker(
         //this differs from the game layout: far right is 5 and far far left/right is 6 in game
         //however as long as we stay internally consistent with this numbering it will work
         for (int i = 0; i < (plates - 3); i++){
-            pbf_press_button(context, BUTTON_R, 20, 180);
+            pbf_press_button(context, BUTTON_R, 160ms, 1440ms);
             context.wait_for_all_requests();
 
             screen = stream.video().snapshot();
@@ -1168,7 +1168,7 @@ void run_sandwich_maker(
         stream.log("Re-centering plates if needed.");
         stream.overlay().add_log("Re-centering plates if needed.");
         for (int i = 0; i < (plates - 3); i++){
-            pbf_press_button(context, BUTTON_L, 20, 80);
+            pbf_press_button(context, BUTTON_L, 160ms, 640ms);
         }
 
         //If a label fails to read it'll cause issues down the line
@@ -1272,7 +1272,7 @@ void run_sandwich_maker(
             case 3: case 4: case 5: case 6:
                 //Press R the appropriate number of times
                 for (int k = 2; k < plate_index.at(j); k++){
-                    pbf_press_button(context, BUTTON_R, 20, 80);
+                    pbf_press_button(context, BUTTON_R, 160ms, 640ms);
                 }
                 target_plate = left_plate;
                 target_plate_label = SandwichPlateDetector::Side::LEFT;
@@ -1331,7 +1331,7 @@ void run_sandwich_maker(
 
             //Reset plate positions
             for (int k = 2; k < plate_index.at(j); k++){
-                pbf_press_button(context, BUTTON_L, 20, 80);
+                pbf_press_button(context, BUTTON_L, 160ms, 640ms);
             }
         }
     }
@@ -1361,7 +1361,7 @@ void run_sandwich_maker(
         expand_box(hand_box),
         center_plate
     );
-    pbf_mash_button(context, BUTTON_A, 125 * 5);
+    pbf_mash_button(context, BUTTON_A, 5000ms);
 
     env.log("Hand end box " + box_to_string(end_box));
     env.log("Built sandwich", COLOR_BLACK);

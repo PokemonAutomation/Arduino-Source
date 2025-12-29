@@ -128,7 +128,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             3200ms
         );
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
     }
 
     bool party_is_empty = true;
@@ -148,7 +148,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             fly_home(context, false);
 
             //  Travel to spin location.
-            pbf_move_left_joystick(context, STICK_MAX, STICK_CENTER, TRAVEL_RIGHT_DURATION, 0ms);
+            pbf_move_left_joystick_old(context, STICK_MAX, STICK_CENTER, TRAVEL_RIGHT_DURATION, 0ms);
 
             //  Spin
 #if 0

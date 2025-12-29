@@ -35,8 +35,7 @@ BBQSoloFarmer_Descriptor::BBQSoloFarmer_Descriptor()
         "Farm Blueberry Quests in the Terarium for BP.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct BBQSoloFarmer_Descriptor::Stats : public StatsTracker{
@@ -141,7 +140,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         quests_to_do.clear();
 
         //Fix the time to prevent running out of years
-        pbf_wait(context, 250);
+        pbf_wait(context, 2000ms);
         context.wait_for_all_requests();
         go_home(env.console, context);
         home_to_date_time(env.console, context, false);

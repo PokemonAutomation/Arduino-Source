@@ -107,21 +107,21 @@ void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
         // fly_to_overworld_from_map() may fail since the snowy background on the map will false positive the destinationMenuItemWatcher (MapDestinationMenuDetector at box {0.523000, 0.680000, 0.080000, 0.010000}), which causes the fly to fail
         // we can get around this by either placing down a marker, or by zooming out so that that section isn't white snow.
-        place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 128, 255, 35}, 
+        place_marker_offset_from_flypoint(env.program_info(), env.console, context,
+            {ZoomChange::KEEP_ZOOM, 128, 255, 280ms},
             FlyPoint::POKECENTER, 
             {0.54375, 0.662037}
         );
 
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 75});
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 75});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 600ms});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 600ms});
 
 
         direction.change_direction(env.program_info(), env.console, context, 1.536225);
         pbf_move_left_joystick(context, {0, +1}, 4000ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 3.786414);
-        pbf_move_left_joystick(context, 128, 0, 1100, 50);
+        pbf_move_left_joystick(context, {0, +1}, 8800ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 4.747153);
         pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
@@ -134,7 +134,7 @@ void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30000ms);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, +1}, 800ms, 400ms); // if to the left of the door, will move right and enter
@@ -147,7 +147,7 @@ void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         // speak to gym receptionist
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20000ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
 
@@ -167,7 +167,7 @@ void checkpoint_72(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         DirectionDetector direction;
         // Minimap should be clear of Pokemon, since we haven't opened the map, since we cleared the Pokemon in checkpoint 71
         direction.change_direction(env.program_info(), env.console, context, 2.462858);  // 2.496149  // 2.479418
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20000ms);
 
         // speak to MC Sledge
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::BATTLE, CallbackEnum:: DIALOG_ARROW});
@@ -197,7 +197,7 @@ void checkpoint_73(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30000ms);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
                 pbf_move_left_joystick(context, {+1, 0}, 1600ms, 400ms); // if to the left of the door, will move right
@@ -227,13 +227,13 @@ void checkpoint_74(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // remove old marker, then place new one
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 50);
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-                {ZoomChange::KEEP_ZOOM, 128, 255, 35}, 
+                {ZoomChange::KEEP_ZOOM, 128, 255, 280ms},
                 FlyPoint::POKECENTER, 
                 {0.54375, 0.662037}
             );
 
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 75});
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 75});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 600ms});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 600ms});
         
 
         move_from_montenevera_to_glaseado_gym(env, context);
@@ -251,12 +251,12 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
     pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
 
     direction.change_direction(env.program_info(), env.console, context, 2.463760);
-    pbf_move_left_joystick(context, 128, 0, 1100, 50);
+    pbf_move_left_joystick(context, {0, +1}, 8800ms, 400ms);
 
      
     // marker 1 {0.585938, 0.236111}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 128, 255, 20}, 
+        {ZoomChange::KEEP_ZOOM, 128, 255, 160ms},
         FlyPoint::POKECENTER, 
         {0.585938, 0.236111}
     );
@@ -275,7 +275,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
 
     // marker 2 cross bridge   {0.719271, 0.585185}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 128, 255, 30}, 
+        {ZoomChange::KEEP_ZOOM, 128, 255, 240ms},
         FlyPoint::POKECENTER, 
         {0.719271, 0.585185}
     );
@@ -300,7 +300,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
 
     // marker 3           {0.73125, 0.481481}    {0.7375, 0.488889}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 128, 255, 30}, 
+        {ZoomChange::KEEP_ZOOM, 128, 255, 240ms},
         FlyPoint::POKECENTER, 
         {0.7375, 0.488889}
     );
@@ -319,7 +319,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
 
     // marker 4     {0.691146, 0.347222}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.691146, 0.347222}
     );
@@ -337,7 +337,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
 
     // marker 5      {0.632292, 0.376852}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.632292, 0.376852}
     );
@@ -356,7 +356,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
 
     // marker 6     {0.61875, 0.432407}       {0.610417, 0.42037}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.610417, 0.42037}
     );
@@ -374,7 +374,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
 
     // marker 7          {0.613542, 0.540741}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.613542, 0.540741}
     );
@@ -392,7 +392,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
 
     // marker 8          {0.588021, 0.578704}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.588021, 0.578704}
     );
@@ -410,7 +410,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
 
     // marker 9         {0.579167, 0.610185}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_IN, 0, 0, 0}, 
+        {ZoomChange::ZOOM_IN, 0, 0, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.579167, 0.610185}
     );
@@ -428,7 +428,7 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
 
     // marker 10. end up next to Pokecenter        {0.520833, 0.443519}     {0.490625, 0.4}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_IN, 0, 0, 0}, 
+        {ZoomChange::ZOOM_IN, 0, 0, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.490625, 0.4}
     );

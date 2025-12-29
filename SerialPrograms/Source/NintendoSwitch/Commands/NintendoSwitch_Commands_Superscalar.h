@@ -25,7 +25,6 @@ using namespace std::chrono_literals;
 
 
 void ssf_flush_pipeline (ProControllerContext& context);
-void ssf_do_nothing     (ProControllerContext& context, uint16_t ticks);
 void ssf_do_nothing     (ProControllerContext& context, Milliseconds duration);
 
 
@@ -41,12 +40,12 @@ void ssf_press_dpad(
 );
 
 
-void ssf_press_left_joystick(
+void ssf_press_left_joystick_old(
     ProControllerContext& context,
     uint8_t x, uint8_t y,
     uint16_t delay, uint16_t hold, uint8_t cool = 0
 );
-void ssf_press_left_joystick(
+void ssf_press_left_joystick_old(
     ProControllerContext& context,
     uint8_t x, uint8_t y,
     Milliseconds delay, Milliseconds hold, Milliseconds cool = 0ms
@@ -56,14 +55,7 @@ void ssf_press_left_joystick(
     const JoystickPosition& position,
     Milliseconds delay, Milliseconds hold, Milliseconds cool = 0ms
 );
-#if 0
-void ssf_press_right_joystick(
-    ProControllerContext& context,
-    uint8_t x, uint8_t y,
-    uint16_t delay, uint16_t hold, uint8_t cool = 0
-);
-#endif
-void ssf_press_right_joystick(
+void ssf_press_right_joystick_old(
     ProControllerContext& context,
     uint8_t x, uint8_t y,
     Milliseconds delay, Milliseconds hold, Milliseconds cool = 0ms
@@ -75,13 +67,8 @@ void ssf_press_right_joystick(
 );
 
 
-void ssf_mash1_button   (ProControllerContext& context, Button button, uint16_t ticks);
 void ssf_mash1_button   (ProControllerContext& context, Button button, Milliseconds duration);
-
-void ssf_mash2_button   (ProControllerContext& context, Button button0, Button button1, uint16_t ticks);
 void ssf_mash2_button   (ProControllerContext& context, Button button0, Button button1, Milliseconds duration);
-
-void ssf_mash_AZs       (ProControllerContext& context, uint16_t ticks);
 void ssf_mash_AZs       (ProControllerContext& context, Milliseconds duration);
 
 
@@ -190,11 +177,6 @@ void ssf_press_button(
     JoyconContext& context,
     Button button,
     Milliseconds delay, Milliseconds hold = 48ms, Milliseconds cool = 24ms
-);
-void ssf_press_joystick(
-    JoyconContext& context,
-    uint8_t x, uint8_t y,
-    Milliseconds delay, Milliseconds hold, Milliseconds cool = 0ms
 );
 void ssf_press_joystick(
     JoyconContext& context,

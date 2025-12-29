@@ -120,8 +120,8 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
         env.console.log("Talking to berry npc.");
         // Press ZL three times to advance dialog with npc
         for (int i = 0; i < 3; i++){
-            pbf_mash_button(context, BUTTON_ZL, 30);
-            pbf_wait(context, 150);
+            pbf_mash_button(context, BUTTON_ZL, 240ms);
+            pbf_wait(context, 1200ms);
         }
         context.wait_for_all_requests();
 

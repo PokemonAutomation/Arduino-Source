@@ -67,13 +67,13 @@ void OverworldTrigger::run_trigger(ProControllerContext& context) const{
     Milliseconds mash_duration = normal_duration - 64ms;
     switch (TRIGGER_METHOD){
     case TriggerMethod::HORIZONTAL_NO_BIAS:
-        ssf_press_left_joystick(context,   0, 128, 0ms, normal_duration);
+        ssf_press_left_joystick(context, {-1, 0}, 0ms, normal_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
         ssf_press_left_joystick(context, {+1, 0}, 0ms, normal_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
         break;
     case TriggerMethod::HORIZONTAL_BIAS_LEFT:
-        ssf_press_left_joystick(context,   0, 128, 0ms, biased_duration);
+        ssf_press_left_joystick(context, {-1, 0}, 0ms, biased_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
         ssf_press_left_joystick(context, {+1, 0}, 0ms, normal_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
@@ -81,17 +81,17 @@ void OverworldTrigger::run_trigger(ProControllerContext& context) const{
     case TriggerMethod::HORIZONTAL_BIAS_RIGHT:
         ssf_press_left_joystick(context, {+1, 0}, 0ms, biased_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
-        ssf_press_left_joystick(context,   0, 128, 0ms, normal_duration);
+        ssf_press_left_joystick(context, {-1, 0}, 0ms, normal_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
         break;
     case TriggerMethod::VERTICAL_NO_BIAS:
-        ssf_press_left_joystick(context, 128,   0, 0ms, normal_duration);
+        ssf_press_left_joystick(context, {0, +1}, 0ms, normal_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
         ssf_press_left_joystick(context, {0, -1}, 0ms, normal_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
         break;
     case TriggerMethod::VERTICAL_BIAS_UP:
-        ssf_press_left_joystick(context, 128,   0, 0ms, biased_duration);
+        ssf_press_left_joystick(context, {0, +1}, 0ms, biased_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
         ssf_press_left_joystick(context, {0, -1}, 0ms, normal_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
@@ -99,7 +99,7 @@ void OverworldTrigger::run_trigger(ProControllerContext& context) const{
     case TriggerMethod::VERTICAL_BIAS_DOWN:
         ssf_press_left_joystick(context, {0, -1}, 0ms, biased_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
-        ssf_press_left_joystick(context, 128,   0, 0ms, normal_duration);
+        ssf_press_left_joystick(context, {0, +1}, 0ms, normal_duration);
         ssf_mash1_button(context, BUTTON_B, mash_duration);
         break;
     default:;
@@ -136,27 +136,27 @@ bool OverworldTrigger::find_encounter(VideoStream& stream, ProControllerContext&
 
         //  Go to the pokemon that knows Sweet Scent
         const size_t location = SWEET_SCENT_POKEMON_LOCATION.current_value();
-        const uint16_t change_pokemon_delay = 20;
+        const Milliseconds change_pokemon_delay = 160ms;
         if (location >= 1 && location <= 3){
             const size_t move_down_times = location;
             for(size_t i = 0; i < move_down_times; ++i){
-                pbf_press_dpad(context, DPAD_DOWN, 20, change_pokemon_delay);
+                pbf_press_dpad(context, DPAD_DOWN, 160ms, change_pokemon_delay);
             }
         }else if (location >= 1){ // for location 4 and 5
             const size_t move_down_times = 6 - location;
             for (size_t i = 0; i < move_down_times; ++i){
-                pbf_press_dpad(context, DPAD_UP, 20, change_pokemon_delay);
+                pbf_press_dpad(context, DPAD_UP, 160ms, change_pokemon_delay);
             }
         }
 
         //  Open the pokemon menu of the selected pokemon
-        const uint16_t pokemon_to_pokemon_menu_delay = 30;
-        pbf_press_button(context, BUTTON_ZL, 20, pokemon_to_pokemon_menu_delay);
+        const Milliseconds pokemon_to_pokemon_menu_delay = 240ms;
+        pbf_press_button(context, BUTTON_ZL, 160ms, pokemon_to_pokemon_menu_delay);
         //  Move down one menuitem to select "Sweet Scent"
-        const uint16_t move_pokemon_menu_item_delay = 30;
-        pbf_press_dpad(context, DPAD_DOWN, 20, move_pokemon_menu_item_delay);
+        const Milliseconds move_pokemon_menu_item_delay = 240ms;
+        pbf_press_dpad(context, DPAD_DOWN, 160ms, move_pokemon_menu_item_delay);
         //  Use sweet scent
-        pbf_mash_button(context, BUTTON_ZL, 30);
+        pbf_mash_button(context, BUTTON_ZL, 240ms);
 
         ret = wait_until(
             stream, context, std::chrono::seconds(30),

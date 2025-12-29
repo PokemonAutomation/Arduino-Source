@@ -128,7 +128,7 @@ void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, ProCo
                 to_switch_pokemon = false;
             }else{
                 // Press A to select moves
-                pbf_press_button(context, BUTTON_A, 10, 125);
+                pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
                 context.wait_for_all_requests();
                 
                 const MoveStyle style = MoveStyle::NoStyle;
@@ -188,7 +188,7 @@ void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, P
             env.console.log("Our turn!", COLOR_BLUE);
 
             // Press A to select moves
-            pbf_press_button(context, BUTTON_A, 10, 125);
+            pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
             context.wait_for_all_requests();
             
             const MoveStyle style = POKEMON_ACTIONS.get_style(cur_pokemon);
@@ -204,7 +204,7 @@ void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, P
                 env.console.log("No PP. Switch Pokemon.", COLOR_RED);
 
                 // Press B to leave move selection menu
-                pbf_press_button(context, BUTTON_B, 10, 125);
+                pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
 
                 // Go to the switching pokemon screen:
                 pbf_press_dpad(context, DPAD_DOWN, 160ms, 800ms);
@@ -239,7 +239,7 @@ void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, ProContro
     }
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     env.update_stats();
     send_program_status_notification(env, NOTIFICATION_STATUS);

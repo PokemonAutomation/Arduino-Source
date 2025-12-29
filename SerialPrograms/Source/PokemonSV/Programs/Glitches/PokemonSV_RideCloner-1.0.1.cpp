@@ -316,7 +316,7 @@ bool RideCloner101::run_post_win(
             console.log("Detected catch prompt.");
             screenshot = console.video().snapshot();
 
-            pbf_press_button(context, BUTTON_A, 20, 150);
+            pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
             context.wait_for_all_requests();
 
             BattleBallReader reader(console, LANGUAGE);
@@ -331,7 +331,7 @@ bool RideCloner101::run_post_win(
             if (quantity < 0){
                 console.log("Unable to read ball quantity.", COLOR_RED);
             }
-            pbf_mash_button(context, BUTTON_A, 125);
+            pbf_mash_button(context, BUTTON_A, 1000ms);
 
             continue;
         }
@@ -343,7 +343,7 @@ bool RideCloner101::run_post_win(
             console.log("Detected add-to-party prompt.");
             add_to_party_menu = true;
             if (result == TeraResult::NO_DETECTION){
-                pbf_press_dpad(context, DPAD_DOWN, 20, 60);
+                pbf_press_dpad(context, DPAD_DOWN, 160ms, 480ms);
             }
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             continue;
@@ -479,7 +479,7 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                 //  Fix our position.
                 if (fix_position){
                     pbf_move_left_joystick(context, {0, -1}, 1200ms, 0ms);
-                    pbf_move_left_joystick(context, 128, 0, 1600ms, 0ms);
+                    pbf_move_left_joystick(context, {0, +1}, 1600ms, 0ms);
                 }
 
                 context.wait_for_all_requests();
@@ -492,7 +492,7 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             }
 
             pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
-            pbf_mash_button(context, BUTTON_A, 250);
+            pbf_mash_button(context, BUTTON_A, 2000ms);
 
             bool win = run_tera_battle(env, env.console, context, BATTLE_AI);
 

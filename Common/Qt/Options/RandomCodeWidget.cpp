@@ -15,10 +15,9 @@
 namespace PokemonAutomation{
 
 
+template class RegisterConfigWidget<RandomCodeWidget>;
 
-ConfigWidget* RandomCodeOption::make_QtWidget(QWidget& parent){
-    return new RandomCodeWidget(parent, *this);
-}
+
 
 
 RandomCodeWidget::~RandomCodeWidget(){

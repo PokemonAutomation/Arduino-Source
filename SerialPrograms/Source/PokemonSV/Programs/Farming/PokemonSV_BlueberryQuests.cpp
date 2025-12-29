@@ -147,7 +147,7 @@ int read_BP(const ProgramInfo& info, VideoStream& stream, ProControllerContext& 
         [&](ProControllerContext& context){
             for (int i = 0; i < 6; i++) { //try 6 times
                 pbf_press_dpad(context, DPAD_RIGHT, 400ms, 160ms);
-                pbf_wait(context, 200);
+                pbf_wait(context, 1600ms);
                 context.wait_for_all_requests();
             }
         },
@@ -166,7 +166,7 @@ int read_BP(const ProgramInfo& info, VideoStream& stream, ProControllerContext& 
     );
 
     //Close panel
-    pbf_mash_button(context, BUTTON_B, 100);
+    pbf_mash_button(context, BUTTON_B, 800ms);
     context.wait_for_all_requests();
 
     return OCR::read_number(stream.logger(), BP_value);
@@ -186,7 +186,7 @@ std::vector<BBQuests> read_quests(
         [&](ProControllerContext& context){
             for (int i = 0; i < 6; i++) { //try 6 times
                 pbf_press_dpad(context, DPAD_RIGHT, 400ms, 160ms);
-                pbf_wait(context, 200);
+                pbf_wait(context, 1600ms);
                 context.wait_for_all_requests();
             }
         },
@@ -215,7 +215,7 @@ std::vector<BBQuests> read_quests(
     }
 
     //Close quest list
-    pbf_mash_button(context, BUTTON_B, 100);
+    pbf_mash_button(context, BUTTON_B, 800ms);
     context.wait_for_all_requests();
 
     return quest_list;
@@ -255,7 +255,7 @@ std::vector<BBQuests> process_quest_list(
                         [&](ProControllerContext& context){
                             for (int i = 0; i < 6; i++){
                                 pbf_press_dpad(context, DPAD_RIGHT, 400ms, 160ms);
-                                pbf_wait(context, 200);
+                                pbf_wait(context, 1600ms);
                                 context.wait_for_all_requests();
                             }
                         },
@@ -268,7 +268,7 @@ std::vector<BBQuests> process_quest_list(
                     
                     pbf_press_button(context, BUTTON_A, 160ms, 400ms);
                     pbf_press_button(context, BUTTON_A, 160ms, 400ms);
-                    pbf_wait(context, 100);
+                    pbf_wait(context, 800ms);
                     context.wait_for_all_requests();
 
                     rerolled = true;
@@ -311,7 +311,7 @@ std::vector<BBQuests> process_quest_list(
                                 [&](ProControllerContext& context){
                                     for (int i = 0; i < 6; i++){
                                         pbf_press_dpad(context, DPAD_RIGHT, 400ms, 160ms);
-                                        pbf_wait(context, 200);
+                                        pbf_wait(context, 1600ms);
                                         context.wait_for_all_requests();
                                     }
                                 },
@@ -324,15 +324,15 @@ std::vector<BBQuests> process_quest_list(
                             
                             //Move cursor down to quest
                             for (int i = 0; i < questpos; i++) {
-                                pbf_press_dpad(context, DPAD_DOWN, 20, 20);
-                                pbf_wait(context, 100);
+                                pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
+                                pbf_wait(context, 800ms);
                                 context.wait_for_all_requests();
                             }
                             
                             //Reroll
                             pbf_press_button(context, BUTTON_A, 160ms, 400ms);
                             pbf_press_button(context, BUTTON_A, 160ms, 400ms);
-                            pbf_wait(context, 100);
+                            pbf_wait(context, 800ms);
                             context.wait_for_all_requests();
 
                             //Prevent error/rerolling again at the end (allows program to read the rerolled quests)
@@ -368,7 +368,7 @@ std::vector<BBQuests> process_quest_list(
             [&](ProControllerContext& context){
                 for (int i = 0; i < 6; i++){
                     pbf_press_dpad(context, DPAD_RIGHT, 400ms, 160ms);
-                    pbf_wait(context, 200);
+                    pbf_wait(context, 1600ms);
                     context.wait_for_all_requests();
                 }
             },
@@ -382,10 +382,10 @@ std::vector<BBQuests> process_quest_list(
         for (string::size_type i = 0; i < quest_list.size(); i++){
             pbf_press_button(context, BUTTON_A, 160ms, 400ms);
             pbf_press_button(context, BUTTON_A, 160ms, 400ms); //Yes.
-            pbf_wait(context, 100);
+            pbf_wait(context, 800ms);
             context.wait_for_all_requests();
-            pbf_press_dpad(context, DPAD_DOWN, 20, 20);
-            pbf_wait(context, 100);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
+            pbf_wait(context, 800ms);
             context.wait_for_all_requests();
         }
         //Close quest panel - mash b
@@ -555,7 +555,7 @@ void quest_make_tm(const ProgramInfo& info, VideoStream& stream, ProControllerCo
         [&](ProControllerContext& context){
             for (int i = 0; i < 10; i++){
                 pbf_press_button(context, BUTTON_A, 160ms, 400ms);
-                pbf_wait(context, 200);
+                pbf_wait(context, 1600ms);
                 context.wait_for_all_requests();
             }
         },
@@ -572,13 +572,13 @@ void quest_make_tm(const ProgramInfo& info, VideoStream& stream, ProControllerCo
                 for (int i = 0; i < 229; i++) { //229 is max number of TMs
                     //click on tm
                     pbf_press_button(context, BUTTON_A, 160ms, 400ms);
-                    pbf_wait(context, 100);
+                    pbf_wait(context, 800ms);
                     context.wait_for_all_requests();
 
                     //not craftable, close and move on to next
                     pbf_press_button(context, BUTTON_A, 160ms, 400ms);
-                    pbf_press_dpad(context, DPAD_RIGHT, 20, 20);
-                    pbf_wait(context, 100);
+                    pbf_press_dpad(context, DPAD_RIGHT, 160ms, 160ms);
+                    pbf_wait(context, 800ms);
                     context.wait_for_all_requests();
                 }
             },
@@ -589,7 +589,7 @@ void quest_make_tm(const ProgramInfo& info, VideoStream& stream, ProControllerCo
         if (make_tm == 0){
             stream.log("Craftable TM found. Making TM");
 
-            pbf_mash_button(context, BUTTON_A, 220);
+            pbf_mash_button(context, BUTTON_A, 1760ms);
             context.wait_for_all_requests();
         }else{
             stream.log("Failed to find craftable TM!");
@@ -601,7 +601,7 @@ void quest_make_tm(const ProgramInfo& info, VideoStream& stream, ProControllerCo
     int exit = run_until<ProControllerContext>(
         stream, context,
         [&](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_B, 2000);
+            pbf_mash_button(context, BUTTON_B, 16000ms);
         },
         {{ overworld }}
     );
@@ -611,7 +611,7 @@ void quest_make_tm(const ProgramInfo& info, VideoStream& stream, ProControllerCo
     context.wait_for_all_requests();
     
     open_map_from_overworld(info, stream, context);
-    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
     fly_to_overworld_from_map(info, stream, context);
     context.wait_for_all_requests();
 }
@@ -639,7 +639,7 @@ void quest_travel_500(const ProgramInfo& info, VideoStream& stream, ProControlle
     context.wait_for_all_requests();
 
     open_map_from_overworld(info, stream, context);
-    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
     fly_to_overworld_from_map(info, stream, context);
     context.wait_for_all_requests();
 }
@@ -657,7 +657,7 @@ void quest_tera_self_defeat(
         [&](ProControllerContext& context){
             central_to_canyon_plaza(info, console, context);
 
-            pbf_move_left_joystick(context, 205, 64, 160ms, 840ms);
+            pbf_move_left_joystick_old(context, 205, 64, 160ms, 840ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             //Drop on top of Kleavor (plenty of Scyther in the area as well)
@@ -671,7 +671,7 @@ void quest_tera_self_defeat(
             ssf_press_button(context, BUTTON_ZL, 800ms, 400ms);
             ssf_press_button(context, BUTTON_ZL, 1200ms, 400ms);
 
-            pbf_wait(context, 300);
+            pbf_wait(context, 2400ms);
             context.wait_for_all_requests();
 
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
@@ -718,13 +718,13 @@ void quest_tera_self_defeat(
     OverworldWatcher done_healing(console.logger(), COLOR_BLUE);
     pbf_move_left_joystick(context, {0, +1}, 800ms, 160ms);
 
-    pbf_mash_button(context, BUTTON_A, 300);
+    pbf_mash_button(context, BUTTON_A, 2400ms);
     context.wait_for_all_requests();
 
     int exit = run_until<ProControllerContext>(
         console, context,
         [&](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_B, 2000);
+            pbf_mash_button(context, BUTTON_B, 16000ms);
         },
         {{ done_healing }}
     );
@@ -732,7 +732,7 @@ void quest_tera_self_defeat(
         console.log("Overworld detected.");
     }
     open_map_from_overworld(info, console, context);
-    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
     fly_to_overworld_from_map(info, console, context);
 }
 
@@ -750,7 +750,7 @@ void quest_sneak_up(
             //Savanna Plaza - Pride Rock
             central_to_savanna_plaza(info, console, context);
 
-            pbf_move_left_joystick(context, 220, 255, 80ms, 160ms);
+            pbf_move_left_joystick_old(context, 220, 255, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 4800ms, 3200ms, 3200ms);
@@ -771,7 +771,7 @@ void quest_sneak_up(
             ssf_press_button(context, BUTTON_ZL, 800ms, 400ms);
             ssf_press_button(context, BUTTON_ZL, 1200ms, 400ms);
 
-            pbf_wait(context, 300);
+            pbf_wait(context, 2400ms);
             context.wait_for_all_requests();
 
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
@@ -870,7 +870,7 @@ void quest_wild_tera(
             //Canyon Rest Area
             central_to_canyon_rest(info, console, context);
 
-            pbf_move_left_joystick(context, 255, 180, 160ms, 840ms);
+            pbf_move_left_joystick_old(context, 255, 180, 160ms, 840ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 4000ms, 10400ms, 1200ms);
@@ -879,11 +879,11 @@ void quest_wild_tera(
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
 
             if (console.state().console_type() == ConsoleType::Switch1) {
-                pbf_move_left_joystick(context, 50, 0, 160ms, 840ms);
+                pbf_move_left_joystick_old(context, 50, 0, 160ms, 840ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 400ms);
                 pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
             } else { //Switch 2
-                pbf_move_left_joystick(context, 20, 0, 160ms, 840ms);
+                pbf_move_left_joystick_old(context, 20, 0, 160ms, 840ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 400ms);
             }
 
@@ -891,7 +891,7 @@ void quest_wild_tera(
             ssf_press_button(context, BUTTON_ZL, 800ms, 400ms);
             ssf_press_button(context, BUTTON_ZL, 1200ms, 400ms);
 
-            pbf_wait(context, 300);
+            pbf_wait(context, 2400ms);
             context.wait_for_all_requests();
 
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
@@ -937,13 +937,13 @@ void quest_wild_tera(
     OverworldWatcher done_healing(console.logger(), COLOR_BLUE);
     pbf_move_left_joystick(context, {0, +1}, 800ms, 160ms);
 
-    pbf_mash_button(context, BUTTON_A, 300);
+    pbf_mash_button(context, BUTTON_A, 2400ms);
     context.wait_for_all_requests();
 
     int exit = run_until<ProControllerContext>(
         console, context,
         [&](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_B, 2000);
+            pbf_mash_button(context, BUTTON_B, 16000ms);
         },
         {{ done_healing }}
     );
@@ -951,7 +951,7 @@ void quest_wild_tera(
         console.log("Overworld detected.");
     }
     open_map_from_overworld(info, console, context);
-    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
     fly_to_overworld_from_map(info, console, context);
 }
 
@@ -989,8 +989,8 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
         switch (ret){
         case 0:
             stream.log("Wash button found!");
-            pbf_mash_button(context, BUTTON_X, 150);
-            pbf_wait(context, 200);
+            pbf_mash_button(context, BUTTON_X, 1200ms);
+            pbf_wait(context, 1600ms);
             context.wait_for_all_requests();
             break;
         case 1:
@@ -998,7 +998,7 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
             pbf_press_button(context, BUTTON_Y, 320ms, 400ms);
             rinsed_once = true;
             //Move slightly right, as the showerhead is at an angle
-            pbf_move_left_joystick(context, 255, 0, 30, 30);
+            pbf_move_left_joystick_old(context, 255, 0, 240ms, 240ms);
             context.wait_for_all_requests();
             break;
         case 2:
@@ -1013,7 +1013,7 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
             ssf_press_left_joystick(context, {0, +1}, 0ms, 400ms);
             ssf_press_left_joystick(context, {0, -1}, 400ms, 800ms);
             ssf_press_left_joystick(context, {0, +1}, 1200ms, 400ms);
-            pbf_wait(context, 400);
+            pbf_wait(context, 3200ms);
             context.wait_for_all_requests();
             break;
         }
@@ -1038,7 +1038,7 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
                 ssf_press_left_joystick(context, {0, +1}, 0ms, 400ms);
                 ssf_press_left_joystick(context, {0, -1}, 400ms, 800ms);
                 ssf_press_left_joystick(context, {0, +1}, 1200ms, 400ms);
-                pbf_wait(context, 400);
+                pbf_wait(context, 3200ms);
                 context.wait_for_all_requests();
             }
         },
@@ -1287,7 +1287,7 @@ void quest_tera_raid(
     pbf_press_button(context, BUTTON_A, 160ms, 840ms);
     pbf_press_button(context, BUTTON_A, 160ms, 840ms);
     pbf_press_dpad(context, DPAD_UP, 80ms, 80ms);
-    pbf_mash_button(context, BUTTON_A, 250);
+    pbf_mash_button(context, BUTTON_A, 2000ms);
 
     bool win = run_tera_battle(env, console, context, BBQ_OPTIONS.BATTLE_AI);
     if (win){
@@ -1351,7 +1351,7 @@ void quest_auto_battle(
         central_to_chargestone(env.program_info(), stream, context);
 
         //Wait for spawns
-        pbf_wait(context, 375);
+        pbf_wait(context, 3000ms);
         context.wait_for_all_requests();
 
         //Forward and right, stay in the battle court - safe zone
@@ -1362,7 +1362,7 @@ void quest_auto_battle(
 
         use_lets_go_to_clear_in_front(stream, context, tracker, false, [&](ProControllerContext& context){
             pbf_move_left_joystick(context, {0, -1}, 1440ms, 400ms);
-            pbf_wait(context, 1500);
+            pbf_wait(context, 12000ms);
             context.wait_for_all_requests();
             });
 
@@ -1372,13 +1372,13 @@ void quest_auto_battle(
         OverworldWatcher done_healing(stream.logger(), COLOR_BLUE);
         pbf_move_left_joystick(context, {0, +1}, 800ms, 160ms);
 
-        pbf_mash_button(context, BUTTON_A, 300);
+        pbf_mash_button(context, BUTTON_A, 2400ms);
         context.wait_for_all_requests();
 
         int exit = run_until<ProControllerContext>(
             stream, context,
             [&](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 2000);
+                pbf_mash_button(context, BUTTON_B, 16000ms);
             },
             { { done_healing } }
             );
@@ -1386,7 +1386,7 @@ void quest_auto_battle(
             stream.log("Overworld detected.");
         }
         open_map_from_overworld(env.program_info(), stream, context);
-        pbf_press_button(context, BUTTON_ZL, 40, 100);
+        pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
         fly_to_overworld_from_map(env.program_info(), stream, context);
     }
 }

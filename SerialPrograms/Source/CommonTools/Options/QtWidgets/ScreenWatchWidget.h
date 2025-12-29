@@ -24,7 +24,7 @@ class ScreenWatchWidget;
 
 class ScreenWatchDisplayWidget : public QWidget{
 public:
-    ScreenWatchDisplayWidget(ScreenWatchOption& option, ScreenWatchWidget& parent);
+    ScreenWatchDisplayWidget(ScreenWatchWidget& parent, ScreenWatchOption& option);
     ~ScreenWatchDisplayWidget();
     void paintEvent(QPaintEvent* event) override;
 
@@ -43,7 +43,10 @@ private:
 
 class ScreenWatchWidget : public WidgetStackFixedAspectRatio, public ConfigWidget{
 public:
-    ScreenWatchWidget(ScreenWatchDisplay& option, QWidget& parent);
+    using ParentOption = ScreenWatchDisplay;
+
+public:
+    ScreenWatchWidget(QWidget& parent, ScreenWatchDisplay& option);
 
 private:
     QWidget* m_widget;
@@ -52,7 +55,10 @@ private:
 
 class ScreenWatchButtonWidget : public QWidget, public ConfigWidget{
 public:
-    ScreenWatchButtonWidget(ScreenWatchOption& option, QWidget& parent);
+    using ParentOption = ScreenWatchButtons;
+
+public:
+    ScreenWatchButtonWidget(QWidget& parent, ScreenWatchButtons& option);
 };
 
 

@@ -14,9 +14,7 @@
 namespace PokemonAutomation{
 
 
-ConfigWidget* FixedCodeOption::make_QtWidget(QWidget& parent){
-    return new FixedCodeWidget(parent, *this);
-}
+template class RegisterConfigWidget<FixedCodeWidget>;
 
 
 

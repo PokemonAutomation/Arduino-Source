@@ -29,8 +29,7 @@ AudioStarterReset_Descriptor::AudioStarterReset_Descriptor()
         "Soft reset for a shiny starter. Ruby and Sapphire only.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 
@@ -112,17 +111,17 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
         });
 
         env.log("Opening bag and selecting starter.");
-        pbf_press_button(context, BUTTON_A, 40, 180);
+        pbf_press_button(context, BUTTON_A, 320ms, 1440ms);
 
         switch (TARGET) {
         case Target::treecko:
-            pbf_press_dpad(context, DPAD_LEFT, 40, 100);
+            pbf_press_dpad(context, DPAD_LEFT, 320ms, 800ms);
             break;
         case Target::torchic:
             //Default cursor position, do nothing.
             break;
         case Target::mudkip:
-            pbf_press_dpad(context, DPAD_RIGHT, 40, 100);
+            pbf_press_dpad(context, DPAD_RIGHT, 320ms, 800ms);
             break;
         default:
             OperationFailedException::fire(
@@ -132,7 +131,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
             );
             break;
         }
-        pbf_mash_button(context, BUTTON_A, 540);
+        pbf_mash_button(context, BUTTON_A, 4320ms);
         context.wait_for_all_requests();
 
         env.log("Starter selected. Checking for shiny Poochyena.");
@@ -149,7 +148,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
                 if (ret == 0) {
                     env.log("Advance arrow detected.");
                 }
-                pbf_wait(context, 125);
+                pbf_wait(context, 1000ms);
                 context.wait_for_all_requests();
             },
             {{pooch_detector}}
@@ -177,7 +176,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
             env.console, context,
             [&](ProControllerContext& context) {
                 env.log("Sending out selected starter.");
-                pbf_press_button(context, BUTTON_A, 40, 40);
+                pbf_press_button(context, BUTTON_A, 320ms, 320ms);
 
                 int ret = wait_until(
                     env.console, context,
@@ -187,7 +186,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
                 if (ret == 0) {
                     env.log("Battle menu detecteed!");
                 }
-                pbf_wait(context, 125);
+                pbf_wait(context, 1000ms);
                 context.wait_for_all_requests();
             },
             {{starter_detector}}

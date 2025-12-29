@@ -11,7 +11,6 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Globals.h"
-// #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
@@ -39,7 +38,7 @@ ShinyHunt_WildZoneCafe_Descriptor::ShinyHunt_WildZoneCafe_Descriptor()
         "Programs/PokemonLZA/ShinyHunt-WildZoneCafe.html",
         "Shiny hunt by repeatedly entering Wild Zone cafe.",
         ProgramControllerClass::StandardController_NoRestrictions, FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS, {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 
@@ -130,11 +129,11 @@ void do_one_cafe_trip(
             switch(cafe){
             case WildZoneCafe::CAFE_BATAILLE:
                 env.log("Move to Cafe Bataille icon");
-                pbf_move_left_joystick(context, 148, 20, 100ms, 0ms);
+                pbf_move_left_joystick_old(context, 148, 20, 100ms, 0ms);
                 break;
             case WildZoneCafe::CAFE_ULTIMO:
                 env.log("Move to Cafe Ultimo icon");
-                pbf_move_left_joystick(context, 50, 100, 100ms, 0ms);
+                pbf_move_left_joystick_old(context, 50, 100, 100ms, 0ms);
                 break;
             }
             pbf_wait(context, 300ms);
@@ -178,7 +177,7 @@ void do_one_cafe_trip(
         break;
     }
 
-    int ret = run_towards_wild_zone_gate(env.console, context, move_x, move_y, Seconds(10));
+    int ret = run_towards_gate_with_A_button(env.console, context, move_x, move_y, Seconds(10));
     switch (ret){
     case 0: // Found button A. Reached the gate.
         break;
@@ -196,7 +195,7 @@ void do_one_cafe_trip(
                 env.console.overlay().add_log("Running Forward");
             }
             // Running forward or backward depends on character facing to go back to zone entrance
-            ret = run_towards_wild_zone_gate(env.console, context, move_x, move_y, Seconds(10));
+            ret = run_towards_gate_with_A_button(env.console, context, move_x, move_y, Seconds(10));
             if (ret != 0){
                 stats.errors++;
                 env.update_stats();
@@ -246,11 +245,11 @@ void do_one_cafe_trip(
     switch(cafe){
     case WildZoneCafe::CAFE_BATAILLE:
         env.log("Move to Cafe Bataille icon from zone gate");
-        pbf_move_left_joystick(context, 96, 160, 100ms, 0ms);
+        pbf_move_left_joystick_old(context, 96, 160, 100ms, 0ms);
         break;
     case WildZoneCafe::CAFE_ULTIMO:
         env.log("Move to Cafe Ultimo icon from zone gate");
-        pbf_move_left_joystick(context, 190, 144, 100ms, 0ms);
+        pbf_move_left_joystick_old(context, 190, 144, 100ms, 0ms);
         break;
     }
     pbf_wait(context, 300ms);

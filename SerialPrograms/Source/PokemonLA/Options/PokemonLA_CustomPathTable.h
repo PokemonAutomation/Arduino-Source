@@ -108,13 +108,11 @@ private:
 
 
 // A program option to build a custom path to navigate the map
-class CustomPathTableFromJubilife : public BatchOption{
+class CustomPathTableFromJubilife : public ConfigOptionImpl<CustomPathTableFromJubilife, BatchOption>{
 public:
     CustomPathTableFromJubilife();
 
     const WildTravelLocationOption& travel_location() const{ return TRAVEL_LOCATION; }
-
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 public:
     friend class CustomPathTableWidget;

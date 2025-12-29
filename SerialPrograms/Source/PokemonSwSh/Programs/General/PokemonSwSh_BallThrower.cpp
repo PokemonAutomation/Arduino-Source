@@ -39,13 +39,13 @@ void BallThrower::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         grip_menu_connect_go_home(context);
         pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().HOME_TO_GAME_DELAY0);
     }else{
-        pbf_press_button(context, BUTTON_X, 5, 5);
+        pbf_press_button(context, BUTTON_X, 40ms, 40ms);
     }
 
     while (true){
         pbf_press_button(context, BUTTON_X, 400ms, 400ms);
         pbf_press_button(context, BUTTON_A, 400ms, 400ms);
-        pbf_mash_button(context, BUTTON_B, 100);
+        pbf_mash_button(context, BUTTON_B, 800ms);
     }
 
     pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);

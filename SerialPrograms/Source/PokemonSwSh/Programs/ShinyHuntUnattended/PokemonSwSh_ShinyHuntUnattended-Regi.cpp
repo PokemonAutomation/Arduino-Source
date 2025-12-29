@@ -80,7 +80,7 @@ void ShinyHuntUnattendedRegi::program(SingleSwitchProgramEnvironment& env, ProCo
             1600ms
         );
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
     }
 
     uint16_t correct_count = 0;
@@ -104,8 +104,8 @@ void ShinyHuntUnattendedRegi::program(SingleSwitchProgramEnvironment& env, ProCo
         //  Do the light puzzle.
         run_regi_light_puzzle(env.console, context, REGI_NAME, c);
 
-        pbf_press_button(context, BUTTON_A, 10, 100);
-        pbf_press_button(context, BUTTON_A, 10, 100);
+        pbf_press_button(context, BUTTON_A, 80ms, 800ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 800ms);
         Milliseconds start_to_run_delay = START_TO_RUN_DELAY0;
         if (start_to_run_delay >= 4000ms){
             //  Extra A press to fix A parity if the lights were messed up.

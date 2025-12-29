@@ -20,10 +20,11 @@ namespace PokemonAutomation{
 
 
 //  This is the typeless class that uses an integer for the enum value.
-class IntegerEnumDropdownCell : public ConfigOption{
+class IntegerEnumDropdownCell : public ConfigOptionImpl<IntegerEnumDropdownCell>{
 public:
     ~IntegerEnumDropdownCell();
     IntegerEnumDropdownCell(const IntegerEnumDropdownCell& x);
+
 
 public:
     IntegerEnumDropdownCell(
@@ -59,7 +60,6 @@ public:
 
     virtual void restore_defaults() override;
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     struct Data;
@@ -106,7 +106,7 @@ public:
 
 
 
-class IntegerEnumDropdownOption : private IntegerEnumDropdownDatabase, public IntegerEnumDropdownCell{
+class IntegerEnumDropdownOption : private IntegerEnumDropdownDatabase, public ConfigOptionImpl<IntegerEnumDropdownOption, IntegerEnumDropdownCell>{
 public:
     IntegerEnumDropdownOption(const IntegerEnumDropdownOption& x) = delete;
     IntegerEnumDropdownOption(
@@ -116,7 +116,7 @@ public:
         size_t default_value
     )
         : IntegerEnumDropdownDatabase(nullptr)
-        , IntegerEnumDropdownCell(database, lock_while_running, default_value)
+        , ConfigOptionImpl<IntegerEnumDropdownOption, IntegerEnumDropdownCell>(database, lock_while_running, default_value)
         , m_label(std::move(label))
     {}
     // you can construct IntegerEnumDropdownDatabase using initializer list:
@@ -132,12 +132,12 @@ public:
         size_t default_value
     )
         : IntegerEnumDropdownDatabase(std::move(database))
-        , IntegerEnumDropdownCell(*this, lock_while_running, default_value)
+        , ConfigOptionImpl<IntegerEnumDropdownOption, IntegerEnumDropdownCell>(*this, lock_while_running, default_value)
         , m_label(std::move(label))
     {}
 
     const std::string& label() const{ return m_label; }
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
+
 
 private:
     const std::string m_label;

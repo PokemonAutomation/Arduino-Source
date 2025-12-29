@@ -190,7 +190,7 @@ void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env, ProControlle
     ShinyHuntFlagPin_Descriptor::Stats& stats = env.current_stats<ShinyHuntFlagPin_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     bool fresh_from_reset = false;
     while (true){

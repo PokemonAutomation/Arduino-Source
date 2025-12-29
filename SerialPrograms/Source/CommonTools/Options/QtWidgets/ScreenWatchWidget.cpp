@@ -15,22 +15,18 @@
 #include <QGuiApplication>
 #include "ScreenWatchWidget.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
 
-ConfigWidget* ScreenWatchDisplay::make_QtWidget(QWidget& parent){
-    return new ScreenWatchWidget(*this, parent);
-}
-ConfigWidget* ScreenWatchButtons::make_QtWidget(QWidget& parent){
-    return new ScreenWatchButtonWidget(m_option, parent);
-}
+template class RegisterConfigWidget<ScreenWatchWidget>;
+template class RegisterConfigWidget<ScreenWatchButtonWidget>;
 
 
-ScreenWatchDisplayWidget::ScreenWatchDisplayWidget(ScreenWatchOption& option, ScreenWatchWidget& parent)
+ScreenWatchDisplayWidget::ScreenWatchDisplayWidget(ScreenWatchWidget& parent, ScreenWatchOption& option)
     : QWidget(&parent)
     , m_holder(parent)
     , m_option(option)
@@ -81,11 +77,11 @@ void ScreenWatchDisplayWidget::thread_loop(){
     }
 }
 
-ScreenWatchWidget::ScreenWatchWidget(ScreenWatchDisplay& option, QWidget& parent)
+ScreenWatchWidget::ScreenWatchWidget(QWidget& parent, ScreenWatchDisplay& option)
     : WidgetStackFixedAspectRatio(parent, ADJUST_HEIGHT_TO_WIDTH)
     , ConfigWidget(option, *this)
 {
-    m_widget = new ScreenWatchDisplayWidget(option.m_option, *this);
+    m_widget = new ScreenWatchDisplayWidget(*this, option.m_option);
     add_widget(*m_widget);
     m_overlay = new VideoOverlayWidget(*this, option.m_option.overlay());
     add_widget(*m_overlay);
@@ -175,7 +171,7 @@ private:
 
 
 
-ScreenWatchButtonWidget::ScreenWatchButtonWidget(ScreenWatchOption& option, QWidget& parent)
+ScreenWatchButtonWidget::ScreenWatchButtonWidget(QWidget& parent, ScreenWatchButtons& option)
     : QWidget(&parent)
     , ConfigWidget(option, *this)
 {
@@ -194,13 +190,13 @@ ScreenWatchButtonWidget::ScreenWatchButtonWidget(ScreenWatchOption& option, QWid
     connect(
         draw_box, &QPushButton::clicked,
         this, [&](bool){
-            qsizetype index = (qsizetype)option.MONITOR_INDEX;
+            qsizetype index = (qsizetype)option.m_option.MONITOR_INDEX;
             auto screens = QGuiApplication::screens();
             if (screens.size() <= index){
                 return;
             }
 
-            SelectorOverlay w(option, *this, *screens[index]);
+            SelectorOverlay w(option.m_option, *this, *screens[index]);
             w.exec();
 
             ImageFloatBox box = w.get_box();
@@ -208,20 +204,20 @@ ScreenWatchButtonWidget::ScreenWatchButtonWidget(ScreenWatchOption& option, QWid
                 return;
             }
 
-            option.X.set(box.x);
-            option.Y.set(box.y);
-            option.WIDTH.set(box.width);
-            option.HEIGHT.set(box.height);
+            option.m_option.X.set(box.x);
+            option.m_option.Y.set(box.y);
+            option.m_option.WIDTH.set(box.width);
+            option.m_option.HEIGHT.set(box.height);
         }
     );
 
     connect(
         reset_button, &QPushButton::clicked,
         this, [&](bool){
-            option.X.set(0.0);
-            option.Y.set(0.0);
-            option.WIDTH.set(1.0);
-            option.HEIGHT.set(1.0);
+            option.m_option.X.set(0.0);
+            option.m_option.Y.set(0.0);
+            option.m_option.WIDTH.set(1.0);
+            option.m_option.HEIGHT.set(1.0);
         }
     );
 }

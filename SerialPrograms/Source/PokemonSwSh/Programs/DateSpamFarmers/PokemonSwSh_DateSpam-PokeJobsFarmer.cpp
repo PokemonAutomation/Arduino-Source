@@ -72,8 +72,8 @@ PokeJobsFarmer::PokeJobsFarmer()
 
 static void enter_jobs(ProControllerContext& context, uint16_t index){
     // Enter menu
-    pbf_press_button(context, BUTTON_A, 10, 90);
-    pbf_press_button(context, BUTTON_B, 10, 90);
+    pbf_press_button(context, BUTTON_A, 80ms, 720ms);
+    pbf_press_button(context, BUTTON_B, 80ms, 720ms);
     // Select entry
     for (uint16_t i = 1; i < index; i++){
         ssf_press_dpad_ptv(context, DPAD_DOWN, 160ms);
@@ -116,7 +116,7 @@ void PokeJobsFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
             // Select all Pokemons
             env.log("#### Select all");
-            pbf_press_button(context, BUTTON_X, 10, 90);
+            pbf_press_button(context, BUTTON_X, 80ms, 720ms);
 
             // Send to Poke Job
             env.log("#### Send to " + STRING_POKEJOB);

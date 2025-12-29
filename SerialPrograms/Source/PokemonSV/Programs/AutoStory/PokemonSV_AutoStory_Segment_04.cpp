@@ -92,7 +92,7 @@ void checkpoint_08(
         context.wait_for_all_requests();
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {});
         env.console.log("Go to Legendary pokemon laying on the beach.");
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30000ms);
 
         env.console.log("clear_dialog: Offer Miraidon/Koraidon a sandwich.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {});
@@ -109,7 +109,7 @@ void checkpoint_08(
             env.console, context,
             [](ProControllerContext& context){
                 for (int i = 0; i < 10; i++){
-                    pbf_press_dpad(context, DPAD_UP, 20, 250);
+                    pbf_press_dpad(context, DPAD_UP, 160ms, 2000ms);
                 }
             },
             {arrow}
@@ -123,7 +123,7 @@ void checkpoint_08(
         }
 
         // only press A when the sandwich is selected
-        pbf_mash_button(context, BUTTON_A, 100);
+        pbf_mash_button(context, BUTTON_A, 800ms);
 
         env.console.log("Miraidon/Koraidon eats the sandwich.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 35, {});  // long animation
@@ -137,9 +137,9 @@ void checkpoint_08(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {0, +1}, 4800ms, 400ms);
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 150, 20, 20);
-                pbf_move_left_joystick(context, 128, 0, 1000, 50);
+                pbf_move_left_joystick(context, {0, +1}, 8000ms, 400ms);
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 160, 20, 20);
-                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 128, 0);                
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms, 128, 0);                
             }
         );  
 
@@ -152,7 +152,7 @@ void checkpoint_08(
                 context.wait_for_all_requests();
                 stream.log("Rock break");
                 stream.overlay().add_log("Rock break", COLOR_WHITE);
-                pbf_move_left_joystick(context, 128, 20, 3000ms, 160ms);
+                pbf_move_left_joystick_old(context, 128, 20, 3000ms, 160ms);
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 230, 25, 30);
                 pbf_move_left_joystick(context, {0, +1}, 2000ms, 5000ms);
 
@@ -162,35 +162,35 @@ void checkpoint_08(
                 stream.overlay().add_log("Houndour wave", COLOR_WHITE);
                 // walk to room entrance
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 150, 15, 30);
-                pbf_move_left_joystick(context, 128, 20, 4000ms, 2000ms);
+                pbf_move_left_joystick_old(context, 128, 20, 4000ms, 2000ms);
 
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 210, 15, 30);
-                pbf_move_left_joystick(context, 128, 20, 3000ms, 2000ms);
-                pbf_move_left_joystick(context, 128, 20, 2000ms, 2000ms);
-                pbf_move_left_joystick(context, 128, 20, 6000ms, 2000ms);
+                pbf_move_left_joystick_old(context, 128, 20, 3000ms, 2000ms);
+                pbf_move_left_joystick_old(context, 128, 20, 2000ms, 2000ms);
+                pbf_move_left_joystick_old(context, 128, 20, 6000ms, 2000ms);
 
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 200, 25, 20);
-                pbf_move_left_joystick(context, 128, 20, 4000ms, 2000ms);
-                pbf_move_left_joystick(context, 128, 20, 4000ms, 2000ms);
+                pbf_move_left_joystick_old(context, 128, 20, 4000ms, 2000ms);
+                pbf_move_left_joystick_old(context, 128, 20, 4000ms, 2000ms);
 
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 210, 25, 25);
-                pbf_move_left_joystick(context, 128, 20, 6000ms, 20000ms);
+                pbf_move_left_joystick_old(context, 128, 20, 6000ms, 20000ms);
 
                 // Houndoom encounter
                 context.wait_for_all_requests();
                 stream.log("Houndoom encounter");
                 stream.overlay().add_log("Houndoom encounter", COLOR_WHITE);
-                pbf_move_left_joystick(context, 128, 20, 4000ms, 160ms);
+                pbf_move_left_joystick_old(context, 128, 20, 4000ms, 160ms);
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 245, 20, 20);
-                pbf_move_left_joystick(context, 128, 20, 2000ms, 160ms);
+                pbf_move_left_joystick_old(context, 128, 20, 2000ms, 160ms);
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 255, 90, 20);
-                pbf_move_left_joystick(context, 128, 20, 8000ms, 8000ms);
-                pbf_press_button(context, BUTTON_L, 20, 20);
+                pbf_move_left_joystick_old(context, 128, 20, 8000ms, 8000ms);
+                pbf_press_button(context, BUTTON_L, 160ms, 160ms);
             }
         );
         
         env.console.log("overworld_navigation: Go to Houndoom.");
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 128, 0);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms, 128, 0);
         
         mash_button_till_overworld(env.console, context, BUTTON_A);
 

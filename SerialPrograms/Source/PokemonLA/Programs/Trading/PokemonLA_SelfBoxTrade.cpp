@@ -84,7 +84,7 @@ bool SelfBoxTrade::move_to_next(
     env.log("Moving to next slot.");
     if (col < 5){
         env.run_in_parallel(scope, [](ConsoleHandle& console, ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 140);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 1120ms);
         });
         col++;
         return false;
@@ -93,7 +93,7 @@ bool SelfBoxTrade::move_to_next(
         env.run_in_parallel(scope, [](ConsoleHandle& console, ProControllerContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 160ms, 840ms);
             pbf_press_dpad(context, DPAD_RIGHT, 160ms, 840ms);
-            pbf_press_dpad(context, DPAD_DOWN, 20, 140);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 1120ms);
         });
         col = 0;
         row++;
@@ -103,7 +103,7 @@ bool SelfBoxTrade::move_to_next(
         pbf_press_button(context, BUTTON_R, 160ms, 1840ms);
         pbf_press_dpad(context, DPAD_RIGHT, 160ms, 840ms);
         pbf_press_dpad(context, DPAD_RIGHT, 160ms, 840ms);
-        pbf_press_dpad(context, DPAD_DOWN, 20, 140);
+        pbf_press_dpad(context, DPAD_DOWN, 160ms, 1120ms);
     });
     col = 0;
     row = 0;

@@ -49,7 +49,7 @@ TurboMacro::TurboMacro()
 void TurboMacro::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
 
     //  Connect the controller.
-    //pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    //pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     for (uint32_t c = 0; c < LOOP; c++){
         TABLE.run(scope, env.console.controller());

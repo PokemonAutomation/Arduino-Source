@@ -67,10 +67,10 @@ void GodEggItemDupe::collect_godegg(
     bool map_to_pokemon,
     bool pokemon_to_map
 ) const{
-    pbf_wait(context, 50);
+    pbf_wait(context, 400ms);
     ssf_press_button_ptv(context, BUTTON_B, 800ms);
     ssf_press_button_ptv(context, BUTTON_B, 800ms);
-    pbf_wait(context, 225);
+    pbf_wait(context, 1800ms);
 
     //  "You received an Egg from the Nursery worker!"
     ssf_press_button_ptv(context, BUTTON_B, 2400ms);
@@ -89,7 +89,7 @@ void GodEggItemDupe::collect_godegg(
         ssf_press_dpad_ptv(context, DPAD_DOWN, 80ms);
     }
     ssf_press_button_ptv(context, BUTTON_A, 2400ms);
-    pbf_mash_button(context, BUTTON_B, 500);
+    pbf_mash_button(context, BUTTON_B, 4000ms);
 
     //  Enter box
     ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
@@ -120,7 +120,7 @@ void GodEggItemDupe::collect_godegg(
         ssf_press_dpad_ptv(context, DPAD_DOWN, 120ms);
         ssf_press_button(context, BUTTON_A, 1000ms, 160ms);
         ssf_press_dpad_ptv(context, DPAD_UP, 80ms);
-        ssf_mash_AZs(context, 180);
+        ssf_mash_AZs(context, 1440ms);
     }
 
     //  Back out to menu.
@@ -128,7 +128,7 @@ void GodEggItemDupe::collect_godegg(
         box_to_menu(context);
         ssf_press_button(context, BUTTON_B, 2000ms, 50ms);
     }else{
-        pbf_mash_button(context, BUTTON_B, 700);
+        pbf_mash_button(context, BUTTON_B, 5600ms);
     }
 }
 void GodEggItemDupe::run_program(Logger& logger, ProControllerContext& context, uint16_t attempts) const{
@@ -178,7 +178,7 @@ void GodEggItemDupe::program(SingleSwitchProgramEnvironment& env, ProControllerC
             3200ms
         );
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
     }
 
     run_program(env.console, context, MAX_FETCH_ATTEMPTS);

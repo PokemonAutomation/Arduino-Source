@@ -44,7 +44,7 @@ void run_select_pokemon(
     std::string options[3];
 
 //    //  Wait for bottom row to reload.
-//    pbf_wait(context, 50);
+//    pbf_wait(context, 400ms);
 //    context.wait_for_all_requests();
 
     //  Read the bottom two options first.
@@ -61,7 +61,7 @@ void run_select_pokemon(
     }
 
     //  Scroll down one to move the arrow off the top row. Then we can read it.
-    pbf_press_dpad(context, DPAD_DOWN, 10, 80);
+    pbf_press_dpad(context, DPAD_DOWN, 80ms, 640ms);
     context.wait_for_all_requests();
     screen = stream.video().snapshot();
     options[0] = reader.read_option(screen, 0);

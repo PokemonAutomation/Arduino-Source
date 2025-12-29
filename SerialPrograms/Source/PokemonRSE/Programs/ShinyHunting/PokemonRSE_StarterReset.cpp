@@ -31,8 +31,7 @@ StarterReset_Descriptor::StarterReset_Descriptor()
         "Soft reset for a shiny starter. Ruby and Sapphire only.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 
@@ -106,17 +105,17 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     bool shiny_starter = false;
     while (!shiny_starter) {
         env.log("Opening bag and selecting starter.");
-        pbf_press_button(context, BUTTON_A, 40, 180);
+        pbf_press_button(context, BUTTON_A, 320ms, 1440ms);
 
         switch (TARGET) {
         case Target::treecko:
-            pbf_press_dpad(context, DPAD_LEFT, 40, 100);
+            pbf_press_dpad(context, DPAD_LEFT, 320ms, 800ms);
             break;
         case Target::torchic:
             //Default cursor position, do nothing.
             break;
         case Target::mudkip:
-            pbf_press_dpad(context, DPAD_RIGHT, 40, 100);
+            pbf_press_dpad(context, DPAD_RIGHT, 320ms, 800ms);
             break;
         default:
             OperationFailedException::fire(
@@ -126,7 +125,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             );
             break;
         }
-        pbf_mash_button(context, BUTTON_A, 540);
+        pbf_mash_button(context, BUTTON_A, 4320ms);
         context.wait_for_all_requests();
 
         env.log("Starting battle.");
@@ -136,7 +135,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 1000);
+                pbf_mash_button(context, BUTTON_B, 8000ms);
             },
             {battle_menu}
         );
@@ -149,8 +148,8 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         }
 
         //Open the summary and check the color of the number
-        pbf_press_dpad(context, DPAD_DOWN, 40, 80);
-        pbf_press_button(context, BUTTON_A, 40, 80);
+        pbf_press_dpad(context, DPAD_DOWN, 320ms, 640ms);
+        pbf_press_button(context, BUTTON_A, 320ms, 640ms);
 
         BlackScreenOverWatcher detector(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
         int ret2 = wait_until(
@@ -169,14 +168,14 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             );
         }
 
-        pbf_press_button(context, BUTTON_A, 20, 180);
-        pbf_press_dpad(context, DPAD_DOWN, 40, 80);
-        pbf_press_button(context, BUTTON_A, 40, 80);
+        pbf_press_button(context, BUTTON_A, 160ms, 1440ms);
+        pbf_press_dpad(context, DPAD_DOWN, 320ms, 640ms);
+        pbf_press_button(context, BUTTON_A, 320ms, 640ms);
 
         //Check second party member - used for testing with hacked in shiny starter
-        //pbf_press_dpad(context, DPAD_DOWN, 40, 80);
+        //pbf_press_dpad(context, DPAD_DOWN, 320ms, 640ms);
 
-        pbf_wait(context, 125);
+        pbf_wait(context, 1000ms);
         context.wait_for_all_requests();
 
         VideoSnapshot screen = env.console.video().snapshot();

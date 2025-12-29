@@ -18,6 +18,7 @@
 #include "PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h"
 #include "PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
+#include "PokemonLZA/Inference/Donuts/PokemonLZA_FlavorPowerScreenDetector.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "PokemonLZA_Tests.h"
 #include "TestUtils.h"
@@ -626,6 +627,13 @@ int test_pokemonLZA_HyperspaceCalorieDetector(const ImageViewRGB32& image, int e
 
     TEST_RESULT_EQUAL((int)detected_calorie, expected_calorie);
 
+    return 0;
+}
+
+int test_pokemonLZA_FlavorPowerScreenDetector(const ImageViewRGB32& image, bool target){
+    FlavorPowerScreenDetector detector;
+    bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
     return 0;
 }
 

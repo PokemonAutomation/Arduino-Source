@@ -274,8 +274,9 @@ bool confirm_marker_present(
 
 void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     PlayerRealignMode realign_mode,
-    uint8_t move_x, uint8_t move_y, uint16_t move_duration
+    uint8_t move_x, uint8_t move_y, uint16_t move_duration_ticks
 ){
+    Milliseconds move_duration = move_duration_ticks * 8ms;
     stream.log("Realigning player direction...");
     switch (realign_mode){
     case PlayerRealignMode::REALIGN_NEW_MARKER:
@@ -287,7 +288,7 @@ void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerC
         });
 
         pbf_press_button(context, BUTTON_ZR, 160ms, 840ms);
-        pbf_move_left_joystick(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
+        pbf_move_left_joystick_old(context, move_x, move_y, move_duration, 1000ms);
         pbf_press_button(context, BUTTON_A, 160ms, 840ms);
         pbf_press_button(context, BUTTON_A, 160ms, 840ms);
 
@@ -310,7 +311,7 @@ void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerC
         pbf_press_button(context, BUTTON_L, 160ms, 840ms);
         return;
     case PlayerRealignMode::REALIGN_NO_MARKER:
-        pbf_move_left_joystick(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
+        pbf_move_left_joystick_old(context, move_x, move_y, move_duration, 1000ms);
         pbf_press_button(context, BUTTON_L, 160ms, 840ms);
         return;
     }  
@@ -334,7 +335,7 @@ void overworld_navigation(
         seconds_realign = seconds_timeout;
         should_realign = false;
     }
-    uint16_t forward_ticks = seconds_realign * TICKS_PER_SECOND;
+    Milliseconds forward_duration = seconds_realign * 1000ms;
     // WallClock start = current_time();
 
     if (stop_condition == NavigationStopCondition::STOP_MARKER){
@@ -352,8 +353,6 @@ void overworld_navigation(
         if (stop_condition == NavigationStopCondition::STOP_MARKER){
             callbacks.emplace_back(marker);
         }
-        // uint16_t ticks_passed = std::chrono::duration_cast<std::chrono::milliseconds>(current_time() - start).count() * TICKS_PER_SECOND / 1000;
-        // forward_ticks = seconds_realign * TICKS_PER_SECOND - ticks_passed;
 
         int ret = run_until<ProControllerContext>(
             stream, context,
@@ -365,14 +364,14 @@ void overworld_navigation(
                         stream, context,
                         [&](ProControllerContext& context){
                             if (movement_mode == NavigationMovementMode::CLEAR_WITH_LETS_GO){
-                                walk_forward_while_clear_front_path(info, stream, context, forward_ticks, y);
+                                walk_forward_while_clear_front_path(info, stream, context, forward_duration, y);
                             }else{
-                                ssf_press_left_joystick(context, x, y, 0ms, Seconds(seconds_realign));
+                                ssf_press_left_joystick_old(context, x, y, 0ms, Seconds(seconds_realign));
                                 if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
                                     pbf_wait(context, Seconds(seconds_realign));
                                 } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
                                     for (size_t j = 0; j < 5 * seconds_realign; j++){
-                                        pbf_press_button(context, BUTTON_A, 20, 5);
+                                        pbf_press_button(context, BUTTON_A, 160ms, 40ms);
                                     }
                                 }
                             }
@@ -435,8 +434,8 @@ void overworld_navigation(
                     "overworld_navigation(): Unexpectedly detected dialog.",
                     stream
                 );
-            }          
-            pbf_press_button(context, BUTTON_A, 20, 20);
+            }
+            pbf_press_button(context, BUTTON_A, 160ms, 160ms);
             break;
         case 2: // marker
             stream.log("overworld_navigation: Detected marker.");
@@ -460,9 +459,9 @@ void overworld_navigation(
 
 void config_option(ProControllerContext& context, int change_option_value){
     for (int i = 0; i < change_option_value; i++){
-        pbf_press_dpad(context, DPAD_RIGHT, 13, 20);
+        pbf_press_dpad(context, DPAD_RIGHT, 104ms, 160ms);
     }
-    pbf_press_dpad(context, DPAD_DOWN,  13, 20);
+    pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
 }
 
 void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language){
@@ -478,18 +477,18 @@ void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContex
     // enter Pokemon summary screen
     pbf_press_button(context, BUTTON_A, 160ms, 5000ms);
     pbf_press_dpad(context, DPAD_RIGHT, 120ms, 1000ms);
-    pbf_press_button(context, BUTTON_Y, 20, 40);
+    pbf_press_button(context, BUTTON_Y, 160ms, 320ms);
 
     // select move 1
-    pbf_press_button(context, BUTTON_A, 20, 40);  
-    pbf_press_dpad(context, DPAD_DOWN,  15, 40);
-    pbf_press_dpad(context, DPAD_DOWN,  15, 40);
+    pbf_press_button(context, BUTTON_A, 160ms, 320ms);  
+    pbf_press_dpad(context, DPAD_DOWN, 120ms, 320ms);
+    pbf_press_dpad(context, DPAD_DOWN, 120ms, 320ms);
     // extra button presses to avoid drops
-    pbf_press_dpad(context, DPAD_DOWN,  15, 40); 
-    pbf_press_dpad(context, DPAD_DOWN,  15, 40);
+    pbf_press_dpad(context, DPAD_DOWN, 120ms, 320ms);
+    pbf_press_dpad(context, DPAD_DOWN, 120ms, 320ms);
 
     // select move 3. swap move 1 and move 3.
-    pbf_press_button(context, BUTTON_A, 20, 40);    
+    pbf_press_button(context, BUTTON_A, 160ms, 320ms);    
 
     // confirm that Ember/Leafage/Water Gun is in slot 1
     context.wait_for_all_requests();
@@ -523,7 +522,7 @@ void confirm_lead_pokemon_moves(SingleSwitchProgramEnvironment& env, ProControll
     // enter Pokemon summary screen
     pbf_press_button(context, BUTTON_A, 160ms, 5000ms);
     pbf_press_dpad(context, DPAD_RIGHT, 120ms, 1000ms);
-    pbf_press_button(context, BUTTON_Y, 20, 40);
+    pbf_press_button(context, BUTTON_Y, 160ms, 320ms);
 
     // confirm that moves are: Moonblast, Mystical Fire, Psychic, Misty Terrain
     context.wait_for_all_requests();
@@ -1109,7 +1108,7 @@ bool is_ride_active(const ProgramInfo& info, VideoStream& stream, ProControllerC
             );
 
             bool is_ride_active = !is_black(ride_indicator); // ride is active if the ride indicator isn't black.
-            pbf_press_button(context, BUTTON_B, 30, 100);
+            pbf_press_button(context, BUTTON_B, 240ms, 800ms);
             press_Bs_to_back_to_overworld(info, stream, context, 7);
             if (is_ride_active){
                 stream.log("Ride is active.");
@@ -1134,7 +1133,7 @@ void get_off_ride(const ProgramInfo& info, VideoStream& stream, ProControllerCon
 }
 
 void get_on_or_off_ride(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, bool get_on){
-    pbf_press_button(context, BUTTON_PLUS, 20, 20);
+    pbf_press_button(context, BUTTON_PLUS, 160ms, 160ms);
 
     WallClock start = current_time();
     while (get_on != is_ride_active(info, stream, context)){
@@ -1145,7 +1144,7 @@ void get_on_or_off_ride(const ProgramInfo& info, VideoStream& stream, ProControl
                 stream
             );
         }        
-        pbf_press_button(context, BUTTON_PLUS, 30, 100);
+        pbf_press_button(context, BUTTON_PLUS, 240ms, 800ms);
     }
 }
 
@@ -1207,8 +1206,8 @@ void realign_player_from_landmark(
             }
             uint8_t move_x1 = move_cursor_near_landmark.move_x;
             uint8_t move_y1 = move_cursor_near_landmark.move_y;
-            uint16_t move_duration1 = move_cursor_near_landmark.move_duration;
-            pbf_move_left_joystick(context, move_x1, move_y1, move_duration1, 1 * TICKS_PER_SECOND);
+            Milliseconds move_duration1 = move_cursor_near_landmark.move_duration;
+            pbf_move_left_joystick_old(context, move_x1, move_y1, move_duration1, 1000ms);
 
             // move cursor to pokecenter
             double push_scale = 0.29 * adjustment_table[try_count];
@@ -1243,8 +1242,8 @@ void realign_player_from_landmark(
             }
             uint8_t move_x2 = move_cursor_to_target.move_x;
             uint8_t move_y2 = move_cursor_to_target.move_y;
-            uint16_t move_duration2 = move_cursor_to_target.move_duration;
-            pbf_move_left_joystick(context, move_x2, move_y2, move_duration2, 1 * TICKS_PER_SECOND);
+            Milliseconds move_duration2 = move_cursor_to_target.move_duration;
+            pbf_move_left_joystick_old(context, move_x2, move_y2, move_duration2, 1000ms);
 
             // place down marker
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
@@ -1337,8 +1336,8 @@ void move_cursor_towards_flypoint_and_go_there(
             }
             uint8_t move_x1 = move_cursor_near_flypoint.move_x;
             uint8_t move_y1 = move_cursor_near_flypoint.move_y;
-            uint16_t move_duration1 = move_cursor_near_flypoint.move_duration;
-            pbf_move_left_joystick(context, move_x1, move_y1, move_duration1, 1 * TICKS_PER_SECOND);
+            Milliseconds move_duration1 = move_cursor_near_flypoint.move_duration;
+            pbf_move_left_joystick_old(context, move_x1, move_y1, move_duration1, 1000ms);
 
             double push_scale = 0.29 * adjustment_table[try_count];
             if (!fly_to_visible_closest_flypoint_cur_zoom_level(info, stream, context, fly_point, push_scale)){
@@ -1484,10 +1483,10 @@ void move_player_forward(
     std::function<void()>&& recovery_action,
     bool use_lets_go,
     bool mash_A,
-    uint16_t forward_ticks, 
+    Milliseconds forward_duration, 
     uint8_t y, 
-    uint16_t delay_after_forward_move, 
-    uint16_t delay_after_lets_go
+    Milliseconds delay_after_forward_move, 
+    Milliseconds delay_after_lets_go
 ){
 
     context.wait_for_all_requests();
@@ -1496,15 +1495,15 @@ void move_player_forward(
             do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 if (!use_lets_go){
-                    // pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+                    // pbf_move_left_joystick(context, 128, y, forward_duration, 0);
                     ssf_press_left_joystick(context, {0, +1}, 0ms, 800ms, 0ms);
 
                     if (mash_A){ // mashing A and Let's go aren't compatible. you end up talking to your Let's go pokemon if you mash A.
-                        pbf_mash_button(context, BUTTON_A, forward_ticks);
+                        pbf_mash_button(context, BUTTON_A, forward_duration);
                     }
                 }else{
-                    pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
-                    pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);    
+                    pbf_press_button(context, BUTTON_R, 160ms, delay_after_lets_go);
+                    pbf_move_left_joystick_old(context, 128, y, forward_duration, delay_after_forward_move);
                 }
             });
         }catch (UnexpectedBattleException&){
@@ -1561,10 +1560,10 @@ void move_forward_until_yolo_object_above_min_size(
     const std::string& target_label,
     double min_width, double min_height,
     std::function<void()>&& recovery_action, 
-    uint16_t forward_ticks, 
+    Milliseconds forward_duration, 
     uint8_t y, 
-    uint16_t delay_after_forward_move, 
-    uint16_t delay_after_lets_go
+    Milliseconds delay_after_forward_move, 
+    Milliseconds delay_after_lets_go
 ){
     context.wait_for_all_requests();
     pbf_move_left_joystick(context, {0, +1}, 80ms, 400ms); // move forward to align with camera
@@ -1603,7 +1602,7 @@ void move_forward_until_yolo_object_above_min_size(
                     return; // stop when the target is above a certain size. i.e. we are close enough to the target.
                 }
             
-                pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+                pbf_move_left_joystick_old(context, 128, y, forward_duration, 0ms);
                 // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
                 // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
             });
@@ -1641,11 +1640,11 @@ void move_player_until_yolo_object_detected(
     const std::string& target_label,   
     std::function<void()>&& recovery_action, 
     uint16_t max_rounds, 
-    uint16_t forward_ticks, 
+    Milliseconds forward_duration, 
     uint8_t x, 
     uint8_t y, 
-    uint16_t delay_after_forward_move, 
-    uint16_t delay_after_lets_go
+    Milliseconds delay_after_forward_move, 
+    Milliseconds delay_after_lets_go
 ){
     context.wait_for_all_requests();
     pbf_move_left_joystick(context, {0, +1}, 80ms, 400ms); // move forward to align with camera
@@ -1666,7 +1665,7 @@ void move_player_until_yolo_object_detected(
 
                 
 
-                pbf_move_left_joystick(context, x, y, forward_ticks, 0);
+                pbf_move_left_joystick_old(context, x, y, forward_duration, 0ms);
                 // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
                 // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
             });
@@ -1697,10 +1696,10 @@ void move_forward_until_yolo_object_not_detected(
     const std::string& target_label,   
     size_t times_not_seen_threshold,
     std::function<void()>&& recovery_action, 
-    uint16_t forward_ticks, 
+    Milliseconds forward_duration, 
     uint8_t y, 
-    uint16_t delay_after_forward_move, 
-    uint16_t delay_after_lets_go
+    Milliseconds delay_after_forward_move, 
+    Milliseconds delay_after_lets_go
 ){
     VideoOverlaySet overlays(env.console.overlay());
     bool target_visible = true;
@@ -1721,7 +1720,7 @@ void move_forward_until_yolo_object_not_detected(
                 }
             }
             
-            pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+            pbf_move_left_joystick_old(context, 128, y, forward_duration, 0ms);
             // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
             // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
         });
@@ -1841,11 +1840,11 @@ void move_camera_yolo(
             env.console.log("axis push: " + std::to_string(axis_push) + ", push duration: " +  std::to_string(push_duration.count()) + " ms");
             switch(axis){
             case CameraAxis::X:{
-                pbf_move_right_joystick(context, axis_push, 128, push_duration, 0ms);
+                pbf_move_right_joystick_old(context, axis_push, 128, push_duration, 0ms);
                 break;
             }
             case CameraAxis::Y:{
-                pbf_move_right_joystick(context, 128, axis_push, push_duration, 0ms);
+                pbf_move_right_joystick_old(context, 128, axis_push, push_duration, 0ms);
                 break;
             }
             default:
@@ -1925,20 +1924,21 @@ bool move_player_to_realign_via_yolo(
             // }
             double push_magnitude_scale_factor = 60 / std::sqrt(std::abs(diff));
 
-            uint16_t push_duration = std::max(uint16_t(std::abs(diff * duration_scale_factor)), uint16_t(8));
+            uint16_t push_duration_ticks = std::max(uint16_t(std::abs(diff * duration_scale_factor)), uint16_t(8));
+            Milliseconds push_duration = push_duration_ticks * 8ms;
             int16_t push_direction = (diff > 0) ? -1 : 1;
             double push_magnitude = std::max(double(std::abs(diff * push_magnitude_scale_factor)), double(15)); 
             uint8_t x_push = uint8_t(std::max(std::min(int(128 + (push_direction * push_magnitude)), 255), 0));
 
             // env.console.log("object_x: {" + std::to_string(target_box.x) + ", " + std::to_string(target_box.y) + ", " + std::to_string(target_box.width) + ", " + std::to_string(target_box.height) + "}");
             // env.console.log("object_x_pos: " + std::to_string(object_x_pos));
-            env.console.log("x push: " + std::to_string(x_push) + ", push duration: " +  std::to_string(push_duration));
+            env.console.log("x push: " + std::to_string(x_push) + ", push duration: " +  std::to_string(push_duration.count()) + "ms");
             if (i == 0){
-                pbf_move_left_joystick(context, x_push, 128, 80ms, 400ms);
+                pbf_move_left_joystick_old(context, x_push, 128, 80ms, 400ms);
                 pbf_press_button(context, BUTTON_R, 160ms, 840ms);
             }
             
-            pbf_move_left_joystick(context, x_push, 128, push_duration, 0);
+            pbf_move_left_joystick_old(context, x_push, 128, push_duration, 0ms);
             
         });
 
@@ -2003,7 +2003,7 @@ void move_camera_until_yolo_object_detected(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
 
                 if (round_num == 0){
-                    pbf_move_right_joystick(context, initial_x_move, 128, initial_hold, 400ms);
+                    pbf_move_right_joystick_old(context, initial_x_move, 128, initial_hold, 400ms);
                 }
                 context.wait_for_all_requests();
                 ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
@@ -2014,7 +2014,7 @@ void move_camera_until_yolo_object_detected(
 
                 
 
-                pbf_move_right_joystick(context, x_move, 128, 80ms, 400ms);
+                pbf_move_right_joystick_old(context, x_move, 128, 80ms, 400ms);
             });
             
         }catch (UnexpectedBattleException&){

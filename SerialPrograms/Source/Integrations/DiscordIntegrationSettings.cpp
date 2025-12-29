@@ -4,9 +4,6 @@
  *
  */
 
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QPushButton>
 #include "Common/Qt/StringToolsQt.h"
 //#include "CommonFramework/Globals.h"
 //#include "CommonFramework/GlobalSettingsPanel.h"
@@ -25,7 +22,7 @@ DiscordIntegrationSettingsOption::~DiscordIntegrationSettingsOption(){
     this->remove_listener(*this);
 }
 DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
-    : GroupOption(
+    : ConfigOptionImpl<DiscordIntegrationSettingsOption, GroupOption>(
         "Discord Integration Settings",
         LockMode::LOCK_WHILE_RUNNING,
         GroupOption::EnableMode::DEFAULT_DISABLED
@@ -105,58 +102,6 @@ void DiscordIntegrationSettingsOption::on_config_value_changed([[maybe_unused]] 
 #endif
 }
 
-
-class DiscordIntegrationSettingsWidget : public GroupWidget{
-public:
-    DiscordIntegrationSettingsWidget(QWidget& parent, DiscordIntegrationSettingsOption& value);
-};
-ConfigWidget* DiscordIntegrationSettingsOption::make_QtWidget(QWidget& parent){
-    return new DiscordIntegrationSettingsWidget(parent, *this);
-}
-
-DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& parent, DiscordIntegrationSettingsOption& value)
-    : GroupWidget(parent, value)
-{
-#ifdef PA_DPP
-
-    QWidget* control_buttons = new QWidget(this);
-    m_options_layout->insertWidget(0, control_buttons);
-
-    QHBoxLayout* layout = new QHBoxLayout(control_buttons);
-    layout->setContentsMargins(5, 5, 5, 5);
-
-    QLabel* text = new QLabel("<b>Bot Control:</b>", control_buttons);
-    layout->addWidget(text, 2);
-    text->setWordWrap(true);
-
-    QPushButton* button_start = new QPushButton("Start Bot", this);
-    layout->addWidget(button_start, 1);
-
-    QPushButton* button_stop = new QPushButton("Stop Bot", this);
-    layout->addWidget(button_stop, 1);
-
-    QFont font = button_start->font();
-    font.setBold(true);
-    button_start->setFont(font);
-    button_stop->setFont(font);
-
-    connect(
-        button_start, &QPushButton::clicked,
-        this, [this, &value](bool){
-            DppClient::Client::instance().connect();
-            value.on_config_value_changed(this);
-        }
-    );
-    connect(
-        button_stop, &QPushButton::clicked,
-        this, [this, &value](bool){
-            DppClient::Client::instance().disconnect();
-            value.on_config_value_changed(this);
-        }
-    );
-
-#endif
-}
 
 
 

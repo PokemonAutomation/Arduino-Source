@@ -2,6 +2,7 @@
  *
  * D++, A Lightweight C++ library for Discord
  *
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright 2021 Craig Edwards and D++ contributors 
  * (https://github.com/brainboxdotcc/DPP/graphs/contributors)
  *
@@ -22,7 +23,7 @@
 #include <dpp/export.h>
 #include <dpp/snowflake.h>
 #include <dpp/managed.h>
-#include <dpp/nlohmann/json_fwd.hpp>
+#include <dpp/json_fwd.h>
 #include <unordered_map>
 #include <dpp/json_interface.h>
 
@@ -42,7 +43,26 @@ enum stage_privacy_level : uint8_t {
  * @brief A stage instance.
  * Stage instances are like a conference facility, with moderators/speakers and listeners.
  */
-struct DPP_EXPORT stage_instance : public managed, public json_interface<stage_instance>  {
+struct DPP_EXPORT stage_instance : public managed, public json_interface<stage_instance> {
+protected:
+	friend struct json_interface<stage_instance>;
+
+	/**
+	 * @brief Serialise a stage_instance object rom json
+	 *
+	 * @return stage_instance& a reference to self
+	 */
+	 stage_instance& fill_from_json_impl(const nlohmann::json* j);
+
+	/**
+	 * @brief Build json for this object
+	 *
+	 * @param with_id include ID
+	 * @return json Json of this object
+	 */
+	virtual json to_json_impl(bool with_id = false) const;
+
+public:
 	/// The guild id of the associated Stage channel
 	snowflake guild_id;
 	/// The id of the associated Stage channel
@@ -63,24 +83,9 @@ struct DPP_EXPORT stage_instance : public managed, public json_interface<stage_i
 	 * @brief Destroy the stage_instance object
 	 */
 	~stage_instance() = default;
-
-	/**
-	 * @brief Serialise a stage_instance object rom json
-	 *
-	 * @return stage_instance& a reference to self
-	 */
-	 stage_instance& fill_from_json(const nlohmann::json* j);
-
-	/**
-	 * @brief Build json for this object
-	 *
-	 * @param with_id include ID
-	 * @return std::string Dumped json of this object
-	 */
-	virtual std::string build_json(bool with_id = false) const;
 };
 
 /** A group of stage instances */
 typedef std::unordered_map<snowflake, stage_instance> stage_instance_map;
 
-};
+} // namespace dpp

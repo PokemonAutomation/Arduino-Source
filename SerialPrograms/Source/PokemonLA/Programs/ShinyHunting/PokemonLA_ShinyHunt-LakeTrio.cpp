@@ -117,7 +117,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, ProControll
 
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 40ms, 40ms);
 
     size_t consecutive_errors = 0;
 
@@ -135,11 +135,11 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, ProControll
         reset = true;
 
         env.console.log("Entering cave...");
-        pbf_move_left_joystick(context, 160, 0, 400ms, 0ms);
-        pbf_move_left_joystick(context, 96, 0, 400ms, 0ms);
-        pbf_move_left_joystick(context, 160, 0, 400ms, 0ms);
-        pbf_move_left_joystick(context, 96, 0, 400ms, 0ms);
-        pbf_mash_button(context, BUTTON_A, 125);
+        pbf_move_left_joystick_old(context, 160, 0, 400ms, 0ms);
+        pbf_move_left_joystick_old(context, 96, 0, 400ms, 0ms);
+        pbf_move_left_joystick_old(context, 160, 0, 400ms, 0ms);
+        pbf_move_left_joystick_old(context, 96, 0, 400ms, 0ms);
+        pbf_mash_button(context, BUTTON_A, 1000ms);
         context.wait_for_all_requests();
 
 

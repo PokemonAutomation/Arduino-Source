@@ -33,8 +33,7 @@ ShinyHunt_OverworldReset_Descriptor::ShinyHunt_OverworldReset_Descriptor()
         "Shiny hunt by soft-resetting a " + STRING_POKEMON + " that spawns next to you.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class ShinyHunt_OverworldReset_Descriptor::Stats : public StatsTracker{

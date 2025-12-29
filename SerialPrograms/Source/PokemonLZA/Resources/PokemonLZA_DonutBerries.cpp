@@ -18,8 +18,11 @@ namespace PokemonLZA{
 
 std::vector<std::string> make_DONUT_BERRIES_SLUGS(){
     std::vector<std::string> ret;
-    for (const auto& item : DONUT_BERRIES_DATABASE()){
-        ret.emplace_back(item.first);
+    std::string path = RESOURCE_PATH() + "PokemonLZA/Donuts/donut_berry_list.json";
+    JsonValue json = load_json_file(path);
+    JsonArray& berry_array = json.to_array_throw(path);
+    for(const auto& obj : berry_array){
+        ret.push_back(obj.to_string_throw());
     }
     return ret;
 }

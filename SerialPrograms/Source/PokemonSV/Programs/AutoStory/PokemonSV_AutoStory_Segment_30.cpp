@@ -108,8 +108,8 @@ void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             //     FlyPoint::POKECENTER, 
             //     {0.404687, 0.261111}
             // );
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 0, 30});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 200, 255, 110});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 0, 240ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 200, 255, 880ms});
         }
         
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
@@ -122,7 +122,7 @@ void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             pbf_move_left_joystick(context, {0, +1}, 2000ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.749788);
-            pbf_move_left_joystick(context, 128, 0, 680, 50);
+            pbf_move_left_joystick(context, {0, +1}, 5440ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 1.589021);
             pbf_move_left_joystick(context, {0, +1}, 4800ms, 400ms);
@@ -131,7 +131,7 @@ void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
             handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
                 [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                    walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
+                    walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30000ms);
                 }, 
                 [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                     pbf_move_left_joystick(context, {-1, +1}, 1200ms, 400ms); // move left
@@ -148,7 +148,7 @@ void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         // speak to gym receptionist
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20000ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
 
@@ -176,8 +176,8 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 0, 0);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 180, 45);
 
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 0, 30});
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 200, 255, 110});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 0, 240ms});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 200, 255, 880ms});
         
         DirectionDetector direction;
         
@@ -190,7 +190,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             direction.change_direction(env.program_info(), env.console, context, 2.513925);
 
             // talk to 
-            walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
+            walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30000ms);
 
         });
 
@@ -234,7 +234,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // pokemon are cleared from minimap after the Snow Slope run
 
         // fly back to Glaseado Gym Pokecenter
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 0, 0}, FlyPoint::POKECENTER);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 0, 0ms}, FlyPoint::POKECENTER);
 
 
         // walk back to gym building
@@ -248,7 +248,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             pbf_move_left_joystick(context, {0, +1}, 2000ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.749788);
-            pbf_move_left_joystick(context, 128, 0, 680, 50);
+            pbf_move_left_joystick(context, {0, +1}, 5440ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 1.589021);
             pbf_move_left_joystick(context, {0, +1}, 4800ms, 400ms);
@@ -257,7 +257,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
             handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
                 [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                    walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
+                    walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30000ms);
                 }, 
                 [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
                     pbf_move_left_joystick(context, {-1, +1}, 1200ms, 400ms); // move left
@@ -294,8 +294,8 @@ void checkpoint_77(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 0, 0);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 180, 45);
 
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 0, 30});
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 200, 255, 110});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 0, 240ms});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 200, 255, 880ms});
 
         DirectionDetector direction;
 
@@ -309,10 +309,10 @@ void checkpoint_77(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             pbf_move_left_joystick(context, {0, +1}, 2000ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.749788);
-            pbf_move_left_joystick(context, 128, 0, 680, 50);
+            pbf_move_left_joystick(context, {0, +1}, 5440ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 1.589021);
-            pbf_move_left_joystick(context, 128, 0, 1200, 50);
+            pbf_move_left_joystick(context, {0, +1}, 9600ms, 400ms);
             
             // direction.change_direction(env.program_info(), env.console, context, 1.343606);   //1.327724
            
@@ -331,7 +331,7 @@ void move_from_glaseado_gym_to_north_province_area_one(SingleSwitchProgramEnviro
 
     // marker 0      {0.460938, 0.310185}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_IN, 0, 0, 0}, 
+        {ZoomChange::ZOOM_IN, 0, 0, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.460938, 0.310185}
     );
@@ -350,7 +350,7 @@ void move_from_glaseado_gym_to_north_province_area_one(SingleSwitchProgramEnviro
 
     // marker 1     {0.33125, 0.314815}      {0.297396, 0.322222}        {0.313021, 0.322222}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_IN, 0, 0, 0}, 
+        {ZoomChange::ZOOM_IN, 0, 0, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.313021, 0.322222}
     );
@@ -368,7 +368,7 @@ void move_from_glaseado_gym_to_north_province_area_one(SingleSwitchProgramEnviro
 
     // marker 2         {0.222396, 0.413889}         {0.253646, 0.386111}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_IN, 0, 0, 0}, 
+        {ZoomChange::ZOOM_IN, 0, 0, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.253646, 0.386111}
     );
@@ -388,7 +388,7 @@ void move_from_glaseado_gym_to_north_province_area_one(SingleSwitchProgramEnviro
 
     // marker 3   {0.80625, 0.574074}        {0.803125, 0.615741}       {0.794792, 0.614815}        (0.794792, 0.609259).
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 255, 0, 50}, 
+        {ZoomChange::KEEP_ZOOM, 255, 0, 400ms},
         FlyPoint::POKECENTER, 
         {0.794792, 0.609259}
     );
@@ -407,8 +407,8 @@ void move_from_glaseado_gym_to_north_province_area_one(SingleSwitchProgramEnviro
     // marker 4. set marker to pokecenter
     realign_player_from_landmark(
         env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 255, 128, 80},
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0}
+        {ZoomChange::KEEP_ZOOM, 255, 128, 640ms},
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}
     );  
     handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){

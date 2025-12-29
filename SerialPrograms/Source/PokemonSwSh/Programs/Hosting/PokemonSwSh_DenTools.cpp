@@ -116,7 +116,7 @@ void roll_den(
         //  Enter game
         if (console.video().snapshot()){
             console.log("Entering game using inference...");
-            pbf_press_button(context, BUTTON_HOME, 10, 90);
+            pbf_press_button(context, BUTTON_HOME, 80ms, 720ms);
             NintendoSwitch::resume_game_from_home(console, context);
         }else{
             console.log("Entering game without inference...", COLOR_RED);

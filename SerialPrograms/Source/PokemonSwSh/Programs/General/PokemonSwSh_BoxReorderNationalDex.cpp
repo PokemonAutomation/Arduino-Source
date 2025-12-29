@@ -142,8 +142,7 @@ BoxReorderNationalDex_Descriptor::BoxReorderNationalDex_Descriptor()
         "Order boxes of " + STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 
@@ -180,7 +179,7 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, ProCont
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, DODGE_SYSTEM_UPDATE_WINDOW);
     }else{
-        pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+        pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
     }
 
     // Read all the pokemon and return a list of their slugs in the current box order.

@@ -349,7 +349,7 @@ StateMachineAction throw_balls(
     }
 
     BattleBallReader reader(stream, language);
-    pbf_press_button(context, BUTTON_A, 50, 75);
+    pbf_press_button(context, BUTTON_A, 400ms, 600ms);
     context.wait_for_all_requests();
 
     int16_t balls = move_to_ball(reader, stream, context, ball);

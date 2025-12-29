@@ -16,12 +16,10 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-ConfigWidget* ButtonCell::make_QtWidget(QWidget& parent){
-    return new ButtonCellWidget(parent, *this);
-}
-ConfigWidget* ButtonOption::make_QtWidget(QWidget& parent){
-    return new ButtonOptionWidget(parent, *this);
-}
+template class RegisterConfigWidget<ButtonCellWidget>;
+template class RegisterConfigWidget<ButtonOptionWidget>;
+
+
 
 
 ButtonCellWidget::~ButtonCellWidget(){

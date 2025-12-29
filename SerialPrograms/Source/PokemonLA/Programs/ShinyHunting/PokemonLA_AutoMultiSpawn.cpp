@@ -88,7 +88,7 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
 
     // First, let controller press ZL non-stop to start focusing on a pokemon
     session.dispatch([](ProControllerContext& context){
-        pbf_press_button(context, BUTTON_ZL, 10000, 0);
+        pbf_press_button(context, BUTTON_ZL, 80000ms, 0ms);
     });
 
     // We try at most 4 focus change attempts
@@ -183,7 +183,7 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
             // Press A to change focus.
             session.dispatch([](ProControllerContext& context){
                 pbf_press_button(context, BUTTON_ZL | BUTTON_A, 240ms, 0ms);
-                pbf_press_button(context, BUTTON_ZL, 10000, 0);
+                pbf_press_button(context, BUTTON_ZL, 80000ms, 0ms);
             });
 
             // Wait some time to let the button A press executed, the game focused on another pokemon
@@ -207,8 +207,7 @@ AutoMultiSpawn_Descriptor::AutoMultiSpawn_Descriptor()
         "Advance a path in MultiSpawn shiny hunting method.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 
@@ -280,7 +279,7 @@ void AutoMultiSpawn::program(SingleSwitchProgramEnvironment& env, ProControllerC
     StartProgramChecks::check_performance_class_wired_or_wireless(context);
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     MultiSpawn spawn = SPAWN;
     const int max_num_despawn = MAX_DESPAWN_COUNT[(size_t)spawn];
@@ -536,7 +535,7 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
         }else if (num_removed_pokemon < num_to_despawn){
 
             // Press A to select moves
-            pbf_press_button(context, BUTTON_A, 10, 100);
+            pbf_press_button(context, BUTTON_A, 80ms, 800ms);
             context.wait_for_all_requests();
             use_next_move_with_pp(env.console, context, 0, cur_move);
             continue;
@@ -546,7 +545,7 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
         // We removed exactly what we need.
         // Escape battle
         env.log("Running from battle...");
-        pbf_press_button(context, BUTTON_B, 20, 225);
+        pbf_press_button(context, BUTTON_B, 160ms, 1800ms);
         pbf_press_button(context, BUTTON_A, 160ms, 800ms);
         context.wait_for_all_requests();
         ArcPhoneDetector escape_detector(env.console, env.console, std::chrono::milliseconds(100), stop_on_detected);
@@ -573,12 +572,12 @@ PokemonDetails AutoMultiSpawn::go_to_spawn_point_and_try_focusing_pokemon(
 ){
     // From camp fly to the spawn point, focus on a target pokemon and start a battle
     change_mount(env.console, context, MountState::BRAVIARY_ON);
-    pbf_wait(context, 40);
+    pbf_wait(context, 320ms);
     
     // Move to spawn location on Braviary
-    pbf_move_left_joystick(context, 255, 165, 1200ms, 0ms); // 170
+    pbf_move_left_joystick_old(context, 255, 165, 1200ms, 0ms); // 170
     pbf_press_button(context, BUTTON_B, 1600ms, 80ms);
-    pbf_mash_button(context, BUTTON_B, 1500); // 1450
+    pbf_mash_button(context, BUTTON_B, 12000ms); // 1450
 
     // Descend down from the air:
     for(int i = 0; i < 2 ; i++){
@@ -587,15 +586,15 @@ PokemonDetails AutoMultiSpawn::go_to_spawn_point_and_try_focusing_pokemon(
         change_mount(env.console, context, MountState::BRAVIARY_ON);
     }
 
-    // pbf_press_button(context, BUTTON_PLUS, 20, 150); // jump down from Braviary
+    // pbf_press_button(context, BUTTON_PLUS, 160ms, 1200ms); // jump down from Braviary
     // for(int i = 0; i < 2; i++){
     //     pbf_press_button(context, BUTTON_PLUS, 160ms, 400ms); // Call back Braviary to stop falling
-    //     pbf_press_button(context, BUTTON_PLUS, 20, 150); // fall down again
+    //     pbf_press_button(context, BUTTON_PLUS, 160ms, 1200ms); // fall down again
     // }
     // In case the character hits a tree and change the Braviary mount state due to the hit,
     // use visual feedback to makse sure the character is now dismounted.
     change_mount(env.console, context, MountState::BRAVIARY_OFF);
-    pbf_wait(context, 50);
+    pbf_wait(context, 400ms);
     
     // Move forward on foot
     pbf_move_left_joystick(context, {0, +1}, 1280ms, 0ms);
@@ -620,14 +619,14 @@ PokemonDetails AutoMultiSpawn::go_to_spawn_point_and_try_focusing_pokemon(
 
         if (i + 1 < max_focus_try){
             env.log("Try another focus attempt.");
-            pbf_wait(context, 200);
+            pbf_wait(context, 1600ms);
             context.wait_for_all_requests();
         }
 
         if (i == 2 && nun_pokemon_left == 1){
             // If its' only one pokemon to despawn, then we don't need to worry about scare multiple pokemon at once.
             // We can move closer.
-            pbf_move_left_joystick(context, 128, 0, 150, 60);
+            pbf_move_left_joystick(context, {0, +1}, 1200ms, 480ms);
             context.wait_for_all_requests();
         }
     }

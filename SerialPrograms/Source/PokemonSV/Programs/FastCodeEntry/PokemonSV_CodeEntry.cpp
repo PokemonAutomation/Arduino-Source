@@ -149,7 +149,7 @@ void enter_code(
         auto* procon = context->cast<ProController>();
         if (procon){
             ProControllerContext subcontext(context, *procon);
-            pbf_press_button(subcontext, BUTTON_R | BUTTON_L, 5, 3);
+            pbf_press_button(subcontext, BUTTON_R | BUTTON_L, 40ms, 24ms);
         }
     }
 

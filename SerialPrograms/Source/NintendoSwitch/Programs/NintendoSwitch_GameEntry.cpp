@@ -115,15 +115,15 @@ void close_game_from_home_blind(ConsoleHandle& console, ProControllerContext& co
     // regardless of whether the game is initially open or closed.
 
                                                     // if game initially open.  |  if game initially closed
-    pbf_mash_button(context, BUTTON_X, 100);        // - Close game.            |  - does nothing
+    pbf_mash_button(context, BUTTON_X, 800ms);        // - Close game.            |  - does nothing
     ssf_press_dpad_ptv(context, DPAD_DOWN);         // - Does nothing.          |  - moves selector away from the closed game to avoid opening it.
     ssf_press_dpad_ptv(context, DPAD_DOWN);         // - Does nothing.          |  - Press Down a second time in case we drop one.
-    pbf_mash_button(context, BUTTON_A, 50);         // - Confirm close game.    |  - opens an app on the home screen (e.g. Online)
+    pbf_mash_button(context, BUTTON_A, 400ms);         // - Confirm close game.    |  - opens an app on the home screen (e.g. Online)
     go_home(console, context);                      // - Does nothing.          |  - goes back to home screen.
 
     // fail-safe against button drops and unexpected error messages.
-    pbf_mash_button(context, BUTTON_X, 50);
-    pbf_mash_button(context, BUTTON_B, 350);
+    pbf_mash_button(context, BUTTON_X, 400ms);
+    pbf_mash_button(context, BUTTON_B, 2800ms);
 }
 
 void close_game_from_home_blind(ConsoleHandle& console, JoyconContext& context){
@@ -265,8 +265,8 @@ void resume_game_from_home(
             if (ret == 0){
                 console.log("Detected update window.", COLOR_RED);
 
-                pbf_press_dpad(context, DPAD_UP, 5, 0);
-                pbf_press_button(context, BUTTON_A, 10, 500);
+                pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);
+                pbf_press_button(context, BUTTON_A, 80ms, 4000ms);
                 context.wait_for_all_requests();
                 continue;
             }
@@ -381,7 +381,7 @@ void start_game_from_home_blind(
 
         //  If the update menu isn't there, these will get swallowed by the opening
         //  animation for the select user menu.
-        pbf_press_button(context, BUTTON_A, 10, 175);   //  Choose game
+        pbf_press_button(context, BUTTON_A, 80ms, 1400ms);   //  Choose game
         pbf_press_dpad(context, DPAD_UP, 80ms, 0ms);    //  Skip the update window.
         move_to_user(context, user_slot);
     }
@@ -391,7 +391,7 @@ void start_game_from_home_blind(
         //  Mash your way into the game.
         pbf_mash_button(context, BUTTON_A, start_game_mash);
     }else{
-        pbf_press_button(context, BUTTON_A, 10, 175);   //  Enter select user menu.
+        pbf_press_button(context, BUTTON_A, 80ms, 1400ms);   //  Enter select user menu.
         move_to_user(context, user_slot);
         ssf_press_button_ptv(context, BUTTON_A, 160ms); //  Enter game
 
@@ -486,7 +486,7 @@ void start_game_from_home_with_inference(
             break;
         case 2:
             console.log("Detected update menu.", COLOR_RED);
-            pbf_press_dpad(context, DPAD_UP, 5, 0);
+            pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case 3:
@@ -683,7 +683,7 @@ void from_home_close_and_reopen_game(
 #endif
 
     //  Fastest setting. No internet needed and no update menu.
-    ssf_mash1_button(context, BUTTON_X, 50);
+    ssf_mash1_button(context, BUTTON_X, 400ms);
 
     //  Use mashing to ensure that the X press succeeds. If it fails, the SR
     //  will fail and can kill a den for the autohosts.

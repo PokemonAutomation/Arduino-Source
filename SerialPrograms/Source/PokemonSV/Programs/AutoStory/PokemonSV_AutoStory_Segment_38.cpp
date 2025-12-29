@@ -86,7 +86,7 @@ void checkpoint_100(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         // wait for overworld after leaving research station
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
-        pbf_move_right_joystick(context, 128, 160, 240ms, 0ms);  // adjust camera so that head doesn't cover the rock.
+        pbf_move_right_joystick_old(context, 128, 160, 240ms, 0ms);  // adjust camera so that head doesn't cover the rock.
 
 
 
@@ -282,7 +282,7 @@ void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& c
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
             },
             5,
-            100,
+            800ms,
             0, 128
         );
 
@@ -397,7 +397,7 @@ void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& c
             }
         );
 
-        pbf_move_right_joystick(context, 128, 160, 240ms, 0ms);  // adjust camera so that head doesn't cover the crystal.
+        pbf_move_right_joystick_old(context, 128, 160, 240ms, 0ms);  // adjust camera so that head doesn't cover the crystal.
   
         move_camera_until_yolo_object_detected(env, context, yolo_detector, "crystal-4-5", 255, 240ms);
 
@@ -435,7 +435,7 @@ void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& c
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
             },
             5,
-            100,
+            800ms,
             0, 128
         );
 
@@ -559,7 +559,7 @@ void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 120, {CallbackEnum::OVERWORLD, CallbackEnum::BLACK_DIALOG_BOX});
         pbf_move_left_joystick(context, {0, +1}, 800ms, 0ms);
         // disable Lock at Station 4
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20000ms);
         mash_button_till_overworld(env.console, context, BUTTON_A);  // black dialog, prompt
 
         

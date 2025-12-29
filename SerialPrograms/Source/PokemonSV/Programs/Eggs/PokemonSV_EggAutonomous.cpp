@@ -198,7 +198,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     assert_16_9_720p_min(env.logger(), env.console);
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 10, 100);
+    pbf_press_button(context, BUTTON_L, 80ms, 800ms);
 
     {
         // reset_position_to_flying_spot(env, context);
@@ -678,9 +678,9 @@ void EggAutonomous::reset_position_to_flying_spot(SingleSwitchProgramEnvironment
     // Use map to fly back to the flying spot
     open_map_from_overworld(env.program_info(), env.console, context);
     if (LOCATION == EggAutoLocation::ZeroGate) {
-        pbf_move_left_joystick(context, 128, 160, 160ms, 400ms);
+        pbf_move_left_joystick_old(context, 128, 160, 160ms, 400ms);
     } else { //lighthouse
-        pbf_move_left_joystick(context, 130, 0, 150ms, 50ms);
+        pbf_move_left_joystick_old(context, 130, 0, 150ms, 50ms);
         pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
     }
     fly_to_overworld_from_map(env.program_info(), env.console, context);

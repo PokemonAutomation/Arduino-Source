@@ -96,8 +96,8 @@ void checkpoint_41(
         DirectionDetector direction;
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 60});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 60});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 480ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 480ms});
         }
 
         direction.change_direction(env.program_info(), env.console, context, 0.14);
@@ -115,7 +115,7 @@ void checkpoint_41(
 
         //{0.242708, 0.690741}
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 128, 128, 0}, 
+            {ZoomChange::KEEP_ZOOM, 128, 128, 0ms},
             FlyPoint::FAST_TRAVEL, 
             {0.242708, 0.690741}
         );
@@ -151,7 +151,7 @@ void checkpoint_41(
         // section 4
         // {0.793229, 0.643519}
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 128, 30}, 
+            {ZoomChange::KEEP_ZOOM, 255, 128, 240ms},
             FlyPoint::POKECENTER, 
             {0.793229, 0.643519}
         );
@@ -171,7 +171,7 @@ void checkpoint_41(
         // section 5
         // {0.710938, 0.584259}
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 128, 30}, 
+            {ZoomChange::KEEP_ZOOM, 255, 128, 240ms},
             FlyPoint::POKECENTER, 
             {0.710938, 0.584259}
         );
@@ -190,7 +190,7 @@ void checkpoint_41(
         // section 6
         //{0.670312, 0.678704}
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 128, 128, 0}, 
+            {ZoomChange::KEEP_ZOOM, 128, 128, 0ms},
             FlyPoint::POKECENTER, 
             {0.670312, 0.678704}
         );
@@ -210,8 +210,8 @@ void checkpoint_41(
          // section 7. walk up to Klawf on the lower wall, so it moves to the high ground
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 150, 50},
-            {ZoomChange::ZOOM_IN, 0, 40, 110}
+            {ZoomChange::KEEP_ZOOM, 255, 150, 400ms},
+            {ZoomChange::ZOOM_IN, 0, 40, 880ms}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -228,7 +228,7 @@ void checkpoint_41(
         // section 8. walk up to Klawf on lower wall
         //  {0.666667, 0.238889}
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 128, 0, 30}, 
+            {ZoomChange::KEEP_ZOOM, 128, 0, 240ms},
             FlyPoint::POKECENTER, 
             {0.666667, 0.238889}
         );
@@ -244,7 +244,7 @@ void checkpoint_41(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_right_joystick(context, {+1, 0}, 800ms, 400ms);
                 direction.change_direction(env.program_info(), env.console, context, 4.467);
-                pbf_move_left_joystick(context, 128, 0, 700, 50);
+                pbf_move_left_joystick(context, {0, +1}, 5600ms, 400ms);
                 pbf_move_left_joystick(context, {-1, 0}, 800ms, 400ms);
                 pbf_move_left_joystick(context, {-1, +1}, 4000ms, 400ms);
                 direction.change_direction(env.program_info(), env.console, context, 2.795);
@@ -254,7 +254,7 @@ void checkpoint_41(
                 direction.change_direction(env.program_info(), env.console, context, 5.479);
                 pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
                 direction.change_direction(env.program_info(), env.console, context, 0.33);                
-                pbf_move_left_joystick(context, 128, 0, 900, 50);
+                pbf_move_left_joystick(context, {0, +1}, 7200ms, 400ms);
                 direction.change_direction(env.program_info(), env.console, context, 2.325);      
         });        
         overworld_navigation(env.program_info(), env.console, context, 
@@ -306,8 +306,8 @@ void checkpoint_42(
         // section 1
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 180, 50},
-            {ZoomChange::ZOOM_IN, 0, 80, 110}
+            {ZoomChange::KEEP_ZOOM, 255, 180, 400ms},
+            {ZoomChange::ZOOM_IN, 0, 80, 880ms}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -324,8 +324,8 @@ void checkpoint_42(
         // section 2
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 150, 50},
-            {ZoomChange::ZOOM_IN, 0, 80, 38}
+            {ZoomChange::KEEP_ZOOM, 255, 150, 400ms},
+            {ZoomChange::ZOOM_IN, 0, 80, 304ms}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -342,8 +342,8 @@ void checkpoint_42(
         // section 3
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0},
-            {ZoomChange::ZOOM_IN, 65, 0, 45}
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms},
+            {ZoomChange::ZOOM_IN, 65, 0, 360ms}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -360,8 +360,8 @@ void checkpoint_42(
         // section 4. set marker to pokecenter
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0},
-            {ZoomChange::ZOOM_IN, 0, 0, 0}
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms},
+            {ZoomChange::ZOOM_IN, 0, 0, 0ms}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){

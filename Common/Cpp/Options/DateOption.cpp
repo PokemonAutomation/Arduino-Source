@@ -15,7 +15,6 @@ namespace PokemonAutomation{
 
 
 
-
 bool DateTimeCell::is_valid(const DateTime& date) const{
     if (date.year < 0){
         return false;
@@ -55,7 +54,7 @@ DateTimeCell::DateTimeCell(
     const DateTime& min_value, const DateTime& max_value,
     const DateTime& default_value
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<DateTimeCell>(lock_while_running)
     , m_level(level)
     , m_min_value(min_value)
     , m_max_value(max_value)
@@ -168,7 +167,13 @@ DateTimeOption::DateTimeOption(
     const DateTime& min_value, const DateTime& max_value,
     const DateTime& default_value
 )
-    : DateTimeCell(lock_while_running, level, min_value, max_value, default_value)
+    : ConfigOptionImpl<DateTimeOption, DateTimeCell>(
+        lock_while_running,
+        level,
+        min_value,
+        max_value,
+        default_value
+    )
     , m_label(std::move(label))
 {}
 

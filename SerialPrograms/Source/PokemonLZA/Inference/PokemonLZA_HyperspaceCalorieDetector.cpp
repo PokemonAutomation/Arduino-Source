@@ -4,6 +4,7 @@
  *
  */
 
+ #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -59,6 +60,10 @@ HyperspaceCalorieLimitWatcher::HyperspaceCalorieLimitWatcher(Logger& logger, uin
 , m_calorie_limit(calorie_limit)
 {}
 
+void HyperspaceCalorieLimitWatcher::make_overlays(VideoOverlaySet& items) const{
+    HyperspaceCalorieDetector::make_overlays(items);
+}
+
 bool HyperspaceCalorieLimitWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     bool detected = detect(frame);
     if (!detected){
@@ -69,6 +74,25 @@ bool HyperspaceCalorieLimitWatcher::process_frame(const ImageViewRGB32& frame, W
     if (calorie > m_calorie_limit){
         m_start_of_detection = WallClock::min();
         return false;
+    }
+
+    // Debug possible Calorie number reading failure:
+    if (m_last_calorie_images.size() == 0){
+        m_last_calorie_images.emplace_front(calorie, frame.copy());
+    }else{
+        uint16_t last_calorie = m_last_calorie_images.front().first;
+        if (calorie > last_calorie){
+            // calorie shouldn't go up!
+            for(const auto& p : m_last_calorie_images){
+                p.second.save(DEBUG_PATH() + "/HyperspaceCalorieLimitWatcher/PossibleWrongCalorie_" + std::to_string(p.first) + ".png");
+            }
+        }
+        else if (calorie < last_calorie){
+            m_last_calorie_images.emplace_front(calorie, frame.copy());
+            if (m_last_calorie_images.size() > 3){
+                m_last_calorie_images.pop_back();
+            }
+        }
     }
 
     if (m_start_of_detection == WallClock::min()){

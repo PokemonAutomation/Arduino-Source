@@ -15,32 +15,38 @@ namespace PokemonAutomation{
 
 
 
-template <typename Type>
 class SimpleIntegerCellWidget : public QLineEdit, public ConfigWidget{
 public:
+    using ParentOption = SimpleIntegerCellBase;
+    using NativeType = ParentOption::NativeType;
+
+public:
     ~SimpleIntegerCellWidget();
-    SimpleIntegerCellWidget(QWidget& parent, SimpleIntegerCell<Type>& value);
+    SimpleIntegerCellWidget(QWidget& parent, SimpleIntegerCellBase& value);
 
     virtual void update_value() override;
     virtual void on_config_value_changed(void* object) override;
 
 private:
-    SimpleIntegerCell<Type>& m_value;
+    SimpleIntegerCellBase& m_value;
 };
 
 
 
-template <typename Type>
 class SimpleIntegerOptionWidget : public QWidget, public ConfigWidget{
 public:
+    using ParentOption = SimpleIntegerOptionBase;
+    using NativeType = ParentOption::NativeType;
+
+public:
     ~SimpleIntegerOptionWidget();
-    SimpleIntegerOptionWidget(QWidget& parent, SimpleIntegerOption<Type>& value);
+    SimpleIntegerOptionWidget(QWidget& parent, SimpleIntegerOptionBase& value);
 
     virtual void update_value() override;
     virtual void on_config_value_changed(void* object) override;
 
 private:
-    SimpleIntegerCellWidget<Type>* m_cell;
+    SimpleIntegerCellWidget* m_cell;
 };
 
 

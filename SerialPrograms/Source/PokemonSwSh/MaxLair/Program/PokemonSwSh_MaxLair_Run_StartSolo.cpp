@@ -108,7 +108,7 @@ bool start_adventure(
         stream, context,
         [](ProControllerContext& context){
             for (size_t c = 0; c < 180; c++){
-                pbf_press_button(context, BUTTON_A, 10, 115);
+                pbf_press_button(context, BUTTON_A, 80ms, 920ms);
                 context.wait_for_all_requests();
             }
         },

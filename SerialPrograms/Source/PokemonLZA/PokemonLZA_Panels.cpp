@@ -20,12 +20,14 @@
 #include "Programs/Trading/PokemonLZA_SelfBoxTrade.h"
 
 //  Farming
+#include "Programs/Farming/PokemonLZA_DonutMaker.h"
 #include "Programs/Farming/PokemonLZA_RestaurantFarmer.h"
 #include "Programs/Farming/PokemonLZA_MegaShardFarmer.h"
 #include "Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.h"
 #include "Programs/Farming/PokemonLZA_FriendshipFarmer.h"
 #include "Programs/Farming/PokemonLZA_InPlaceCatcher.h"
 #include "Programs/Farming/PokemonLZA_HyperspaceRewardReset.h"
+#include "Programs/Farming/PokemonLZA_WigglytuffFarmer.h"
 
 //  Shiny Hunting
 #include "Programs/ShinyHunting/PokemonLZA_AutoFossil.h"
@@ -35,6 +37,7 @@
 #include "Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h"
 #include "Programs/ShinyHunting/PokemonLZA_WildZoneCafe.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.h"
+#include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_HyperspaceLegendary.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShuttleRun.h"
 #include "Programs/ShinyHunting/PokemonLZA_SewerHunter.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.h"
@@ -48,7 +51,6 @@
 #include "Programs/TestPrograms/PokemonLZA_MoveBoxArrow.h"
 #include "Programs/TestPrograms/PokemonLZA_TestBoxCellInfo.h"
 #include "InferenceTraining/PokemonLZA_GenerateLocationNameOCR.h"
-#include "Programs/TestPrograms/PokemonLZA_DonutOptionsTest.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -73,6 +75,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<PostKillCatcher_Descriptor, PostKillCatcher>());
     if (IS_BETA_VERSION){
         ret.emplace_back(make_single_switch_program<BoxSorter_Descriptor, BoxSorter>());
+        ret.emplace_back(make_single_switch_program<WeatherFinder_Descriptor, WeatherFinder>());
     }
 
     ret.emplace_back("---- Farming ----");
@@ -82,6 +85,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<FriendshipFarmer_Descriptor, FriendshipFarmer>());
     ret.emplace_back(make_single_switch_program<InPlaceCatcher_Descriptor, InPlaceCatcher>());
     if (IS_BETA_VERSION){
+        ret.emplace_back(make_single_switch_program<WigglytuffFarmer_Descriptor, WigglytuffFarmer>());
         ret.emplace_back(make_single_switch_program<HyperspaceRewardReset_Descriptor, HyperspaceRewardReset>());
     }
 
@@ -93,13 +97,13 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHunt_WildZoneCafe_Descriptor, ShinyHunt_WildZoneCafe>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_FlySpotReset_Descriptor, ShinyHunt_FlySpotReset>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_SewerHunter_Descriptor, ShinyHunt_SewerHunter>());
+    ret.emplace_back(make_single_switch_program<ShinyHunt_HelioptileHunter_Descriptor, ShinyHunt_HelioptileHunter>());
     if (IS_BETA_VERSION){
         ret.emplace_back(make_single_switch_program<ShinyHunt_ShuttleRun_Descriptor, ShinyHunt_ShuttleRun>());
-        ret.emplace_back(make_single_switch_program<ShinyHunt_HelioptileHunter_Descriptor, ShinyHunt_HelioptileHunter>());
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back(make_single_switch_program<ShinyHunt_HyperspaceLegendary_Descriptor, ShinyHunt_HyperspaceLegendary>());
         ret.emplace_back(make_single_switch_program<BeldumHunter_Descriptor, BeldumHunter>());
-        ret.emplace_back(make_single_switch_program<WeatherFinder_Descriptor, WeatherFinder>());
     }
 
 //    ret.emplace_back("---- Non-Shiny Hunting ----");
@@ -115,7 +119,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back(make_single_switch_program<MoveBoxArrow_Descriptor, MoveBoxArrow>());
         ret.emplace_back(make_single_switch_program<TestBoxCellInfo_Descriptor, TestBoxCellInfo>());
         ret.emplace_back(make_single_switch_program<GenerateLocationNameOCR_Descriptor, GenerateLocationNameOCR>());
-        ret.emplace_back(make_single_switch_program<DonutOptionsTest_Descriptor, DonutOptionsTest>());
+        ret.emplace_back(make_single_switch_program<DonutMaker_Descriptor, DonutMaker>());
     }
     return ret;
 }

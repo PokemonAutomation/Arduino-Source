@@ -82,7 +82,6 @@ private:
     VideoStream& m_stream;
     ProControllerContext& m_context;
     EggAutonomousStats& m_stats;
-    static EventNotificationOption m_notification_noop;
     EventNotificationOption& m_notification_nonshiny_keep;
     EventNotificationOption& m_notification_shiny;
     Milliseconds m_scroll_to_read_delay;

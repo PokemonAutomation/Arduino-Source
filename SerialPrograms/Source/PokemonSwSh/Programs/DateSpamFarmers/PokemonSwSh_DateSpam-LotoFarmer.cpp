@@ -60,7 +60,7 @@ void LotoFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
         ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 160ms);
     }
 
@@ -69,15 +69,15 @@ void LotoFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         env.log("Fetch Attempts: " + tostr_u_commas(c));
         home_roll_date_enter_game_autorollback(env.console, context, year);
         if (context->performance_class() == ControllerPerformanceClass::SysbotBase){
-            pbf_wait(context, 90);
+            pbf_wait(context, 720ms);
         }else{
-            pbf_mash_button(context, BUTTON_B, 90);
+            pbf_mash_button(context, BUTTON_B, 720ms);
         }
 
-        pbf_press_button(context, BUTTON_A, 10, 90);
-        pbf_press_button(context, BUTTON_B, 10, 70);
+        pbf_press_button(context, BUTTON_A, 80ms, 720ms);
+        pbf_press_button(context, BUTTON_B, 80ms, 560ms);
         ssf_press_dpad_ptv(context, DPAD_DOWN, 120ms);
-        pbf_mash_button(context, BUTTON_ZL, 490);
+        pbf_mash_button(context, BUTTON_ZL, 3920ms);
         pbf_mash_button(context, BUTTON_B, MASH_B_DURATION0);
 
         //  Tap HOME and quickly spam B. The B spamming ensures that we don't

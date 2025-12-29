@@ -67,7 +67,6 @@ HyperspaceRewardReset::HyperspaceRewardReset()
         true
     )
     , TARGET_ITEMS("<b>Items:</b>")
-    , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_REWARD_MATCH("Matching Reward", true, false, ImageAttachmentMode::JPG, { "Notifs" })
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -79,7 +78,6 @@ HyperspaceRewardReset::HyperspaceRewardReset()
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(TARGET_ITEMS);
-    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -172,14 +170,14 @@ bool HyperspaceRewardReset::check_reward(SingleSwitchProgramEnvironment& env, Pr
     for (const auto& r : result.results){
         env.console.log("Found reward: " + r.second.token);
         if (TARGET_ITEMS.find_item(r.second.token)){
-            env.log("Reward matched");
+            env.log("Reward Matched");
 
             stats.matches++;
             env.update_stats();
 
             send_program_notification(
                 env, NOTIFICATION_REWARD_MATCH,
-                COLOR_GREEN, "Reward matched",
+                COLOR_GREEN, "Reward Matched",
                 {
                     { "Item:", get_hyperspace_reward_name(r.second.token).display_name() },
                 }
@@ -224,7 +222,7 @@ void HyperspaceRewardReset::program(SingleSwitchProgramEnvironment& env, ProCont
     }
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
-    GO_HOME_WHEN_DONE.run_end_of_program(context);
+    go_home(env.console, context);
 }
 
 }

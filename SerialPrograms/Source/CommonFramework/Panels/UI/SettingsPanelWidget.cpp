@@ -56,9 +56,8 @@ QWidget* SettingsPanelWidget::make_options(QWidget& parent){
     QVBoxLayout* options_layout = new QVBoxLayout(options_widget);
     options_layout->setAlignment(Qt::AlignTop);
 
-
     SettingsPanelInstance& instance = static_cast<SettingsPanelInstance&>(m_instance);
-    m_options = static_cast<BatchWidget*>(instance.m_options.make_QtWidget(parent));
+    m_options = static_cast<BatchWidget*>(ConfigWidget::make_from_option(instance.m_options, &parent));
     options_layout->addWidget(m_options);
     options_layout->addStretch();
 

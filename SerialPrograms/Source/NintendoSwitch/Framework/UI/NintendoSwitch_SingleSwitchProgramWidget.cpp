@@ -93,7 +93,7 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
         );
         scroll_layout->addWidget(m_system);
 
-        m_options = option.options().make_QtWidget(*this);
+        m_options = ConfigWidget::make_from_option(option.options(), this);
         scroll_layout->addWidget(&m_options->widget());
 
         scroll_layout->addStretch(1);

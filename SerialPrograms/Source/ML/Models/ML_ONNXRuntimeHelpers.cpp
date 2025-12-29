@@ -18,6 +18,7 @@
 #include "3rdParty/ONNX/OnnxToolsPA.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Compiler.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "ML_ONNXRuntimeHelpers.h"
 
 namespace fs = std::filesystem;
@@ -151,12 +152,19 @@ Ort::Session create_session(const Ort::Env& env, const Ort::SessionOptions& so,
     std::string file_hash;
     std::tie(write_flag_file, file_hash) = clean_up_old_model_cache(model_cache_path, model_path);
     
-    Ort::Session session{env, str_to_onnx_str(model_path).c_str(), so};
-    // when Ort::Ssssion is created, if possible, it will create a model cache
-    if (write_flag_file){
-        write_cache_flag_file(model_cache_path, file_hash);
+    auto& logger = global_logger_command_line();
+    logger.log("Creating Ort::session from model " + model_path);
+    try{
+        Ort::Session session{env, str_to_onnx_str(model_path).c_str(), so};
+        logger.log("Ort::Session created");
+        // when Ort::Ssssion is created, if possible, it will create a model cache
+        if (write_flag_file){
+            write_cache_flag_file(model_cache_path, file_hash);
+        }
+        return session;
+    }catch(...){
+        throw MLModelSessionCreationError(&logger, model_path);
     }
-    return session;
 }
 
 

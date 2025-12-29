@@ -79,11 +79,11 @@ void ApplyGrits::ApplyGritsOnOnePokemon(SingleSwitchProgramEnvironment& env, Pro
 
         // Move down the pokemon list
         for(size_t i = 0; i < pokemon_index; i++){
-            pbf_press_dpad(context, DPAD_DOWN, 20, 80);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 640ms);
         }
 
         // Select the pokemon
-        pbf_press_button(context, BUTTON_A, 20, 80);
+        pbf_press_button(context, BUTTON_A, 160ms, 640ms);
 
         // For each of the size pokemon attributes: HP, Attack, Defense, Sp. Atk, Sp. Def, Speed
         for(size_t attr_index = 0; attr_index < 6; attr_index++){
@@ -114,7 +114,7 @@ void ApplyGrits::ApplyGritsOnOnePokemon(SingleSwitchProgramEnvironment& env, Pro
 
 void ApplyGrits::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     size_t num_pokemon = NUM_POKEMON.current_value();
     for(size_t i = 0; i < num_pokemon; i++){

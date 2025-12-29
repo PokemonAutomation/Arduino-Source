@@ -50,8 +50,8 @@ void FastCodeEntry::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 
     pbf_wait(context, INITIAL_DELAY0);
 
-    pbf_press_button(context, BUTTON_PLUS, 5, 5);
-    pbf_press_button(context, BUTTON_PLUS, 5, 5);
+    pbf_press_button(context, BUTTON_PLUS, 40ms, 40ms);
+    pbf_press_button(context, BUTTON_PLUS, 40ms, 40ms);
     NintendoSwitch::FastCodeEntry::numberpad_enter_code(env.console, context, code, true);
 }
 

@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 
 
 
-class KeyboardHidBindingCell : public ConfigOption{
+class KeyboardHidBindingCell : public ConfigOptionImpl<KeyboardHidBindingCell>{
 public:
     ~KeyboardHidBindingCell();
     KeyboardHidBindingCell(LockMode lock_while_program_is_running);
@@ -29,8 +29,6 @@ public:
     virtual JsonValue to_json() const override;
 
     virtual void restore_defaults() override;
-
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 
 public:

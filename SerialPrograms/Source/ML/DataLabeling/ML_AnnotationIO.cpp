@@ -5,13 +5,6 @@
  *  Functions for IO of annotation related files
  */
 
-#include <fstream>
-#include <iostream>
-#include <map>
-#include <sstream>
-#include <QDirIterator>
-#include <QDir>
-#include <QMessageBox>
 
 #include "Common/Cpp/Json/JsonTools.h"
 #include "Common/Cpp/Json/JsonArray.h"
@@ -22,6 +15,16 @@
 #include "ML_AnnotationIO.h"
 #include "ML_SegmentAnythingModelConstants.h"
 #include "ML_ObjectAnnotation.h"
+
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <sstream>
+#include <algorithm>
+#include <QDirIterator>
+#include <QDir>
+#include <QMessageBox>
+
 
 namespace fs = std::filesystem;
 using std::cout, std::endl;
@@ -87,6 +90,7 @@ std::vector<std::string> find_images_in_folder(const std::string& folder_path, b
     }
     std::cout << "Found " << all_image_paths.size() << " images " << (recursive ? "recursively " : "") << 
         "in folder " << folder_path << std::endl;
+    std::sort(all_image_paths.begin(), all_image_paths.end());
     return all_image_paths;
 }
 

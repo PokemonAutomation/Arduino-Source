@@ -137,7 +137,13 @@ void checkpoint_80(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 void checkpoint_81(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, 170, 550}, FlyPoint::POKECENTER);
+        move_cursor_towards_flypoint_and_go_there(
+            env.program_info(),
+            env.console,
+            context,
+            {ZoomChange::ZOOM_OUT, 0, 170, 4400ms},
+            FlyPoint::POKECENTER
+        );
         move_from_west_province_area_one_north_to_alfornada(env, context);
     });
 }
@@ -156,8 +162,8 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
     DirectionDetector direction;
     if (attempt_number > 0 || ENABLE_TEST){
         env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 100});
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 100});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 800ms});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 800ms});
     }
 
     do_action_and_monitor_for_battles(env.program_info(), env.console, context,
@@ -171,7 +177,7 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
 
     // marker 1     {0.825, 0.361111}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 255, 255, 30}, 
+        {ZoomChange::KEEP_ZOOM, 255, 255, 240ms},
         FlyPoint::POKECENTER, 
         {0.825, 0.361111}
     );
@@ -189,7 +195,7 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
 
     // marker 2             {0.839062, 0.267593}  {0.834896, 0.267593}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms},
         FlyPoint::POKECENTER, 
         {0.834896, 0.267593}
     );
@@ -209,7 +215,7 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
 
     // marker 3             {0.764583, 0.244444}            (0.775000, 0.250000).
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms},
         FlyPoint::POKECENTER, 
         {0.775000, 0.250000}
     );
@@ -227,7 +233,7 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
 
     // marker 4    {0.604167, 0.326852}    {0.597396, 0.32037}    {0.600521, 0.325}    {0.589583, 0.319444}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_OUT, 0, 0, 0}, 
+        {ZoomChange::ZOOM_OUT, 0, 0, 0ms},
         FlyPoint::POKECENTER, 
         {0.597396, 0.32037}
     );
@@ -245,7 +251,7 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
 
     // marker 5    enter bamboo forest      keep zoom{0.679688, 0.19537}   zoom out  {0.571875, 0.360185}   
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_OUT, 0, 0, 0}, 
+        {ZoomChange::ZOOM_OUT, 0, 0, 0ms},
         FlyPoint::POKECENTER, 
         {0.571875, 0.360185}
     );
@@ -263,7 +269,7 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
 
     // marker 6     {0.668229, 0.336111}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 128, 0, 20}, 
+        {ZoomChange::KEEP_ZOOM, 128, 0, 160ms},
         FlyPoint::POKECENTER, 
         {0.668229, 0.336111}
     );
@@ -281,7 +287,7 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
 
     // marker 7      {0.496354, 0.20463}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_IN, 255, 100, 80}, 
+        {ZoomChange::ZOOM_IN, 255, 100, 640ms},
         FlyPoint::POKECENTER, 
         {0.496354, 0.20463}
     );
@@ -299,7 +305,7 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
 
     // marker 8      {0.428125, 0.483333}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_IN, 255, 0, 50}, 
+        {ZoomChange::ZOOM_IN, 255, 0, 400ms},
         FlyPoint::POKECENTER, 
         {0.428125, 0.483333}
     );
@@ -321,7 +327,7 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
 
     // place marker past pokecenter   {0.25625, 0.566667}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 80, 50}, 
+        {ZoomChange::KEEP_ZOOM, 0, 80, 400ms},
         FlyPoint::POKECENTER, 
         {0.25625, 0.566667}
     );
@@ -340,8 +346,8 @@ void beat_team_star_fighting1(SingleSwitchProgramEnvironment& env, ProController
 
     if (attempt_number > 0 || ENABLE_TEST){
         env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 80});
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 80});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 640ms});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 640ms});
     }
 
     // marker 1
@@ -361,7 +367,7 @@ void beat_team_star_fighting1(SingleSwitchProgramEnvironment& env, ProController
 
     // marker 2. navigate to gate    {0.244792, 0.37037}     {0.244792, 0.359259}        {0.265625, 0.371296}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_OUT, 255, 128, 0}, 
+        {ZoomChange::ZOOM_OUT, 255, 128, 0ms},
         FlyPoint::POKECENTER, 
         {0.265625, 0.371296}
     );
@@ -391,7 +397,7 @@ void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProController
     do_action_and_monitor_for_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 220, 255, 50);
-            walk_forward_while_clear_front_path(env.program_info(), env.console, context, 100);
+            walk_forward_while_clear_front_path(env.program_info(), env.console, context, 800ms);
             walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A);
         }
     );
@@ -408,37 +414,37 @@ void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProController
 
             direction.change_direction(env.program_info(), env.console, context, 3.837821);
             pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
             pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
             pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
 
             direction.change_direction(env.program_info(), env.console, context, 3.683419);
-            pbf_move_left_joystick(context, 128, 0, 300, 50);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
             pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 3.577637);
             pbf_move_left_joystick(context, {0, +1}, 4000ms, 400ms);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
 
             pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 4.204571);
             pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
             
             pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
@@ -446,103 +452,103 @@ void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProController
 
             direction.change_direction(env.program_info(), env.console, context, 3.737641);
             pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 3.368991);
             pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 3.473130);
-            pbf_move_left_joystick(context, 128, 0, 700, 50);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_move_left_joystick(context, {0, +1}, 5600ms, 400ms);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 3.213118);
             pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 3.787068);
             pbf_move_left_joystick(context, {0, +1}, 4000ms, 400ms);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
 
             direction.change_direction(env.program_info(), env.console, context,  3.997072);
             pbf_move_left_joystick(context, {0, +1}, 4000ms, 400ms);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
-            pbf_move_left_joystick(context, 128, 0, 300, 50);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
             pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 5.200063);
             pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 5.883155);
-            pbf_move_left_joystick(context, 128, 0, 300, 50);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
             pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 6.089752);
             pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
-            pbf_move_left_joystick(context, 128, 0, 300, 50);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 0.369203);
             pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
             direction.change_direction(env.program_info(), env.console, context, 5.515246);
             pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
             pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
-            pbf_press_button(context, BUTTON_R, 20, 20);
+            pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
             try {
                 direction.change_direction(env.program_info(), env.console, context, 4.941664);
                 pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 6.140720);
                 pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 5.096584);
-                pbf_move_left_joystick(context, 128, 0, 300, 50);
+                pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
 
 
                 direction.change_direction(env.program_info(), env.console, context, 5.201017);
-                pbf_move_left_joystick(context, 128, 0, 1200, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_move_left_joystick(context, {0, +1}, 9600ms, 400ms);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 0);
-                pbf_move_left_joystick(context, 128, 0, 00, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_move_left_joystick(context, {0, +1}, 0ms, 400ms);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
             }catch (OperationFailedException&){
                 env.console.log("Failed to change direction, but it's possibly due to clearing the challenge.");
@@ -552,7 +558,7 @@ void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProController
             // ///////////////
             // direction.change_direction(env.program_info(), env.console, context, 0);
             // pbf_move_left_joystick(context, 128, 0, 00, 50);
-            // pbf_press_button(context, BUTTON_R, 20, 20);
+            // pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             // pbf_wait(context, wait);
 
             
@@ -587,8 +593,8 @@ void move_from_fighting_base_to_north_province_area_two(SingleSwitchProgramEnvir
     // marker 1. set marker to pokecenter
     realign_player_from_landmark(
         env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_IN, 0, 0, 0},
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0}
+        {ZoomChange::ZOOM_IN, 0, 0, 0ms},
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}
     );  
     handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -647,7 +653,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
 
     // marker 2      zoom in{0.605729, 0.30463}, zoom out{0.684375, 0.616667}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_OUT, 0, 150, 15}, 
+        {ZoomChange::ZOOM_OUT, 0, 150, 120ms},
         FlyPoint::POKECENTER, 
         {0.684375, 0.616667}
     );
@@ -665,7 +671,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
 
     // marker 3  {0.767708, 0.45}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 255, 255, 60}, 
+        {ZoomChange::KEEP_ZOOM, 255, 255, 480ms},
         FlyPoint::POKECENTER, 
         {0.767708, 0.45}
     );
@@ -684,7 +690,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
 
     // marker 4   {0.763021, 0.253704}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms},
         FlyPoint::POKECENTER, 
         {0.763021, 0.253704}
     );
@@ -702,7 +708,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
 
     // marker 5  {0.780729, 0.216667}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms},
         FlyPoint::POKECENTER, 
         {0.780729, 0.216667}
     );
@@ -720,7 +726,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
 
     // marker 6. place the marker at the top of the cliff. {0.633333, 0.304630}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_OUT, 0, 0, 0}, 
+        {ZoomChange::ZOOM_OUT, 0, 0, 0ms},
         FlyPoint::POKECENTER, 
         {0.633333, 0.304630}
     );
@@ -730,7 +736,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         // walk towards wall
         direction.change_direction(env.program_info(), env.console, context, 2.949863);
 
-        walk_forward_while_clear_front_path(env.program_info(), env.console, context, 700);
+        walk_forward_while_clear_front_path(env.program_info(), env.console, context, 5600ms);
 
         // back away from wall and get on ride
         pbf_move_left_joystick(context, {0, -1}, 400ms, 400ms);
@@ -775,7 +781,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
 
     // marker 7 {0.501042, 0.738889}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 200, 30}, 
+        {ZoomChange::KEEP_ZOOM, 0, 200, 240ms},
         FlyPoint::POKECENTER, 
         {0.501042, 0.738889}
     );
@@ -794,8 +800,8 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
     // marker 8. set marker to pokecenter
     realign_player_from_landmark(
         env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 128, 255, 30},
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0}
+        {ZoomChange::KEEP_ZOOM, 128, 255, 240ms},
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}
     ); 
 
     handle_when_stationary_in_overworld(env.program_info(), env.console, context, 

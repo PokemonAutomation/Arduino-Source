@@ -371,7 +371,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
             env.log("Detected prompt dialog.");
             go_home(env.console, context);
             home_to_date_time(env.console, context, true);
-            pbf_press_button(context, BUTTON_A, 10, 30);
+            pbf_press_button(context, BUTTON_A, 80ms, 240ms);
             context.wait_for_all_requests();
             next_wait_time = std::chrono::seconds(5);
             continue;
@@ -414,7 +414,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
 //                snapshot->save("noprompt.png");
                 stats.errors++;
                 env.update_stats();
-                pbf_mash_button(context, BUTTON_B, 500);
+                pbf_mash_button(context, BUTTON_B, 4000ms);
                 continue;
             }
 
@@ -991,7 +991,7 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
 
         case 2:{
             env.log("Detected prompt dialog. Entering item printer.");
-            pbf_press_button(context, BUTTON_A, 10, 30);
+            pbf_press_button(context, BUTTON_A, 80ms, 240ms);
             context.wait_for_all_requests();
             continue;
         }
@@ -1013,7 +1013,7 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
                     env.console, snapshot, context,
                     happiny_dust_row_num
                 );
-                pbf_mash_button(context, BUTTON_B, 100);
+                pbf_mash_button(context, BUTTON_B, 800ms);
                 return num_happiny_dust;
             }
             

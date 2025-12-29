@@ -46,7 +46,7 @@ OrbeetleAttackAnimationDetector::Detection OrbeetleAttackAnimationDetector::run(
 
 
     //  Play the attack animation.
-    pbf_press_button(m_context, BUTTON_RCLICK, 10, 155);
+    pbf_press_button(m_context, BUTTON_RCLICK, 80ms, 1240ms);
     m_context.wait_for_all_requests();
 
 

@@ -15,25 +15,11 @@ namespace NintendoSwitch{
 void ssf_flush_pipeline(ProControllerContext& context){
     context->issue_barrier(&context);
 }
-void ssf_do_nothing(ProControllerContext& context, uint16_t ticks){
-    context->issue_nop(&context, ticks*8ms);
-}
 void ssf_do_nothing(ProControllerContext& context, Milliseconds duration){
     context->issue_nop(&context, duration);
 }
 
 
-void ssf_press_button(
-    ProControllerContext& context,
-    Button button,
-    uint16_t delay, uint16_t hold, uint8_t cool
-){
-    context->issue_buttons(
-        &context,
-        delay*8ms, hold*8ms, cool*8ms,
-        button
-    );
-}
 void ssf_press_button(
     ProControllerContext& context,
     Button button,
@@ -45,23 +31,12 @@ void ssf_press_button(
 void ssf_press_dpad(
     ProControllerContext& context,
     DpadPosition position,
-    uint16_t delay, uint16_t hold, uint8_t cool
-){
-    context->issue_dpad(
-        &context,
-        delay*8ms, hold*8ms, cool*8ms,
-        position
-    );
-}
-void ssf_press_dpad(
-    ProControllerContext& context,
-    DpadPosition position,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){
     context->issue_dpad(&context, delay, hold, cool, position);
 }
 
-void ssf_press_left_joystick(
+void ssf_press_left_joystick_old(
     ProControllerContext& context,
     uint8_t x, uint8_t y,
     uint16_t delay, uint16_t hold, uint8_t cool
@@ -75,7 +50,7 @@ void ssf_press_left_joystick(
         }
     );
 }
-void ssf_press_left_joystick(
+void ssf_press_left_joystick_old(
     ProControllerContext& context,
     uint8_t x, uint8_t y,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
@@ -95,21 +70,7 @@ void ssf_press_left_joystick(
 ){
     context->issue_left_joystick(&context, delay, hold, cool, position);
 }
-void ssf_press_right_joystick(
-    ProControllerContext& context,
-    uint8_t x, uint8_t y,
-    uint16_t delay, uint16_t hold, uint8_t cool
-){
-    context->issue_right_joystick(
-        &context,
-        delay*8ms, hold*8ms, cool*8ms,
-        {
-            JoystickTools::linear_u8_to_float(x),
-            -JoystickTools::linear_u8_to_float(y)
-        }
-    );
-}
-void ssf_press_right_joystick(
+void ssf_press_right_joystick_old(
     ProControllerContext& context,
     uint8_t x, uint8_t y,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
@@ -132,20 +93,11 @@ void ssf_press_right_joystick(
 
 
 
-void ssf_mash1_button(ProControllerContext& context, Button button, uint16_t ticks){
-    context->issue_mash_button(&context, ticks*8ms, button);
-}
 void ssf_mash1_button(ProControllerContext& context, Button button, Milliseconds duration){
     context->issue_mash_button(&context, duration, button);
 }
-void ssf_mash2_button(ProControllerContext& context, Button button0, Button button1, uint16_t ticks){
-    context->issue_mash_button(&context, ticks*8ms, button0, button1);
-}
 void ssf_mash2_button(ProControllerContext& context, Button button0, Button button1, Milliseconds duration){
     context->issue_mash_button(&context, duration, button0, button1);
-}
-void ssf_mash_AZs(ProControllerContext& context, uint16_t ticks){
-    context->issue_mash_AZs(&context, ticks*8ms);
 }
 void ssf_mash_AZs(ProControllerContext& context, Milliseconds duration){
     context->issue_mash_AZs(&context, duration);
@@ -191,19 +143,6 @@ void ssf_press_button(
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){
     context->issue_buttons(&context, delay, hold, cool, button);
-}
-void ssf_press_joystick(
-    JoyconContext& context,
-    uint8_t x, uint8_t y,
-    Milliseconds delay, Milliseconds hold, Milliseconds cool
-){
-    context->issue_joystick(
-        &context, delay, hold, cool,
-        {
-            JoystickTools::linear_u8_to_float(x),
-            -JoystickTools::linear_u8_to_float(y)
-        }
-    );
 }
 void ssf_press_joystick(
     JoyconContext& context,

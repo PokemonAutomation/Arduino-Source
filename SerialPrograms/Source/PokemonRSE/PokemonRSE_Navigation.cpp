@@ -23,12 +23,12 @@ namespace PokemonRSE{
 
 void soft_reset(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     // A + B + Select + Start
-    pbf_press_button(context, BUTTON_B | BUTTON_Y | BUTTON_MINUS | BUTTON_PLUS, 10, 180);
+    pbf_press_button(context, BUTTON_B | BUTTON_Y | BUTTON_MINUS | BUTTON_PLUS, 80ms, 1440ms);
 
     pbf_mash_button(context, BUTTON_PLUS, GameSettings::instance().START_BUTTON_MASH0);
     context.wait_for_all_requests();
 
-    pbf_press_button(context, BUTTON_A, 20, 40);
+    pbf_press_button(context, BUTTON_A, 160ms, 320ms);
 
     //Wait for game to load in
     BlackScreenOverWatcher detector(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
@@ -52,9 +52,9 @@ void soft_reset(const ProgramInfo& info, VideoStream& stream, ProControllerConte
 
 void flee_battle(VideoStream& stream, ProControllerContext& context) {
     stream.log("Navigate to Run.");
-    pbf_press_dpad(context, DPAD_RIGHT, 20, 20);
-    pbf_press_dpad(context, DPAD_DOWN, 20, 20);
-    pbf_press_button(context, BUTTON_A, 20, 40);
+    pbf_press_dpad(context, DPAD_RIGHT, 160ms, 160ms);
+    pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
+    pbf_press_button(context, BUTTON_A, 160ms, 320ms);
 
     AdvanceBattleDialogWatcher ran_away(COLOR_YELLOW);
     int ret2 = wait_until(
@@ -72,7 +72,7 @@ void flee_battle(VideoStream& stream, ProControllerContext& context) {
         );
     }
 
-    pbf_press_button(context, BUTTON_A, 40, 40);
+    pbf_press_button(context, BUTTON_A, 320ms, 320ms);
     BlackScreenOverWatcher battle_over(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     int ret3 = wait_until(
         stream, context,
@@ -99,7 +99,7 @@ bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool s
     AdvanceBattleDialogWatcher legendary_appeared(COLOR_YELLOW);
 
     stream.log("Starting battle.");
-    pbf_mash_button(context, BUTTON_A, 540);
+    pbf_mash_button(context, BUTTON_A, 4320ms);
     context.wait_for_all_requests();
 
     int res = run_until<ProControllerContext>(
@@ -119,7 +119,7 @@ bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool s
                     stream
                 );
             }
-            pbf_wait(context, 125);
+            pbf_wait(context, 1000ms);
             context.wait_for_all_requests();
         },
         {{shiny_detector}}
@@ -135,7 +135,7 @@ bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool s
         //Send out lead, no shiny detection needed.
         BattleMenuWatcher battle_menu(COLOR_RED);
         stream.log("Sending out lead Pokemon.");
-        pbf_press_button(context, BUTTON_A, 40, 40);
+        pbf_press_button(context, BUTTON_A, 320ms, 320ms);
 
         int ret = wait_until(
             stream, context,
@@ -152,7 +152,7 @@ bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool s
                 stream
             );
         }
-        pbf_wait(context, 125);
+        pbf_wait(context, 1000ms);
         context.wait_for_all_requests();
     }
 

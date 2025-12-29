@@ -80,7 +80,7 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, ProControllerCont
 
         //Yes let's train
         pbf_press_button(context, BUTTON_A, 80ms, 400ms);
-        pbf_wait(context, 100);
+        pbf_wait(context, 800ms);
         context.wait_for_all_requests();
 
         //What mode? - Knockout
@@ -90,7 +90,7 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         context.wait_for_all_requests();
 
         //mash past other dialog
-        pbf_mash_button(context, BUTTON_A, 360);
+        pbf_mash_button(context, BUTTON_A, 2880ms);
             
         //wait for start
         context.wait_for(std::chrono::milliseconds(13000));
@@ -108,7 +108,7 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 700);
+                pbf_mash_button(context, BUTTON_B, 5600ms);
             },
             {overworld}
         );

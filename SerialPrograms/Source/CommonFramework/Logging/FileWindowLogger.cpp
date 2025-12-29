@@ -7,6 +7,7 @@
 #include <QCoreApplication>
 #include <QMenuBar>
 #include <QDir>
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Windows/DpiScaler.h"
@@ -15,9 +16,9 @@
 #include "CommonFramework/Options/ResolutionOption.h"
 #include "FileWindowLogger.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -57,6 +58,9 @@ FileWindowLogger::FileWindowLogger(const std::string& path)
     if (!exists && opened){
         std::string bom = "\xef\xbb\xbf";
         m_file.write(bom.c_str(), bom.size());
+        cout << "Write log to new file " << path << endl;
+    }else{
+        cout << "Write log to existing file " << path << endl;
     }
 
     m_thread = Thread([this]{
@@ -196,6 +200,7 @@ void FileWindowLogger::thread_loop(){
         m_queue.pop_front();
 
         lg.unlock();
+        rotate_log_file();
         internal_log(msg, color);
         lg.lock();
 
@@ -204,6 +209,38 @@ void FileWindowLogger::thread_loop(){
         }
     }
 }
+
+void FileWindowLogger::rotate_log_file(){
+
+    static const qint64 max_size = 1024 * 1024 * 50;
+    if (m_file.size() < max_size){
+        return;
+    }
+
+    if (m_file.isOpen()) {
+        m_file.close();
+    }
+
+    QString log_name = QString::fromStdString(USER_FILE_PATH() + QCoreApplication::applicationName().toStdString() + ".log");
+    QString backup_log_name = QString::fromStdString(USER_FILE_PATH() + QCoreApplication::applicationName().toStdString() + "-" + now_to_filestring() + ".log");
+    if (QFile::exists(log_name)) {
+        bool success = QFile::rename(log_name, backup_log_name);  // rename SerialPrograms.log to SerialPrograms-[date].log
+        if (!success) {
+            // TODO: Handle error (e.g., file locked by another process)
+        }
+    }
+
+    // Re-open the file (this creates a new, empty file)
+    // We use the same name as before, so the path is preserved
+    bool exists = m_file.exists();
+    bool opened = m_file.open(QIODevice::WriteOnly | QIODevice::Append);
+    if (!exists && opened){
+        std::string bom = "\xef\xbb\xbf";
+        m_file.write(bom.c_str(), bom.size());
+    }
+}
+
+
 
 
 

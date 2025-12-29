@@ -247,7 +247,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         return true;
     case EncounterAction::RunAway:
         //  Fast run-away sequence to save time.
-        pbf_press_dpad(m_context, DPAD_UP, 20, 0);
+        pbf_press_dpad(m_context, DPAD_UP, 160ms, 0ms);
         m_context.wait_for_all_requests();
 
         run_from_battle(m_stream, m_context, exit_battle_time);

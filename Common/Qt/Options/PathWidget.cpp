@@ -14,13 +14,9 @@
 namespace PokemonAutomation{
 
 
-ConfigWidget* PathCell::make_QtWidget(QWidget& parent){
-    return new PathCellWidget(parent, *this);
-}
+template class RegisterConfigWidget<PathCellWidget>;
+template class RegisterConfigWidget<PathOptionWidget>;
 
-ConfigWidget* PathOption::make_QtWidget(QWidget& parent){
-    return new PathOptionWidget(parent, *this);
-}
 
 
 

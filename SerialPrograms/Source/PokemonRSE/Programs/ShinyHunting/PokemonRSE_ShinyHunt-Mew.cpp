@@ -31,8 +31,7 @@ ShinyHuntMew_Descriptor::ShinyHuntMew_Descriptor()
         "Use the Run Away method to shiny hunt Mew in Emerald.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 
@@ -112,8 +111,8 @@ void ShinyHuntMew::enter_mew(SingleSwitchProgramEnvironment& env, ProControllerC
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_UP, 250, 20);
-            pbf_wait(context, 300);
+            pbf_press_dpad(context, DPAD_UP, 2000ms, 160ms);
+            pbf_wait(context, 2400ms);
         },
         {enter_area}
     );
@@ -162,7 +161,7 @@ void ShinyHuntMew::exit_mew(SingleSwitchProgramEnvironment& env, ProControllerCo
     pbf_press_dpad(context, DPAD_DOWN, 400ms, 160ms);
 
     ssf_press_button(context, BUTTON_B, 0ms, 720ms);
-    pbf_press_dpad(context, DPAD_LEFT, 90, 20);
+    pbf_press_dpad(context, DPAD_LEFT, 720ms, 160ms);
 
     ssf_press_button(context, BUTTON_B, 0ms, 800ms);
     pbf_press_dpad(context, DPAD_DOWN, 800ms, 160ms);
@@ -171,8 +170,8 @@ void ShinyHuntMew::exit_mew(SingleSwitchProgramEnvironment& env, ProControllerCo
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_DOWN, 250, 20);
-            pbf_wait(context, 300);
+            pbf_press_dpad(context, DPAD_DOWN, 2000ms, 160ms);
+            pbf_wait(context, 2400ms);
         },
         {exit_area}
     );
@@ -217,7 +216,7 @@ void ShinyHuntMew::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         flee_battle(env.console, context);
 
         //Close dialog
-        pbf_mash_button(context, BUTTON_B, 250);
+        pbf_mash_button(context, BUTTON_B, 2000ms);
         context.wait_for_all_requests();
 
         exit_mew(env, context);

@@ -55,10 +55,10 @@ GodEggDuplication::GodEggDuplication()
 
 
 void GodEggDuplication::collect_godegg(ProControllerContext& context, uint8_t party_slot) const{
-    pbf_wait(context, 50);
+    pbf_wait(context, 400ms);
     ssf_press_button_ptv(context, BUTTON_B, 800ms);
     ssf_press_button_ptv(context, BUTTON_B, 800ms);
-    pbf_wait(context, 225);
+    pbf_wait(context, 1800ms);
 
     //  "You received an Egg from the Nursery worker!"
     ssf_press_button_ptv(context, BUTTON_B, 2400ms);
@@ -77,7 +77,7 @@ void GodEggDuplication::collect_godegg(ProControllerContext& context, uint8_t pa
         ssf_press_dpad_ptv(context, DPAD_DOWN, 80ms);
     }
     ssf_press_button_ptv(context, BUTTON_A, 2400ms);
-    pbf_mash_button(context, BUTTON_B, 500);
+    pbf_mash_button(context, BUTTON_B, 4000ms);
 }
 void GodEggDuplication::run_program(Logger& logger, ProControllerContext& context, uint16_t attempts) const{
     if (attempts == 0){
@@ -126,7 +126,7 @@ void GodEggDuplication::program(SingleSwitchProgramEnvironment& env, ProControll
             3200ms
         );
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
     }
 
     run_program(env.console, context, MAX_FETCH_ATTEMPTS);

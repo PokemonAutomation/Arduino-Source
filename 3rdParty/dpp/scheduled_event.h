@@ -2,6 +2,7 @@
  *
  * D++, A Lightweight C++ library for Discord
  *
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright 2021 Craig Edwards and D++ contributors 
  * (https://github.com/brainboxdotcc/DPP/graphs/contributors)
  *
@@ -24,7 +25,7 @@
 #include <dpp/managed.h>
 #include <dpp/user.h>
 #include <dpp/guild.h>
-#include <dpp/nlohmann/json_fwd.hpp>
+#include <dpp/json_fwd.h>
 #include <dpp/json_interface.h>
 
 namespace dpp {
@@ -95,12 +96,31 @@ struct DPP_EXPORT event_member {
  * @brief A scheduled event
  */
 struct DPP_EXPORT scheduled_event : public managed, public json_interface<scheduled_event> {
+protected:
+	friend struct json_interface<scheduled_event>;
+
+	/**
+	 * @brief Serialise a scheduled_event object from json
+	 *
+	 * @return scheduled_event& a reference to self
+	 */
+	scheduled_event& fill_from_json_impl(const nlohmann::json* j);
+
+	/**
+	 * @brief Build json for this object
+	 * @param with_id Include id field in json
+	 *
+	 * @return std::string Json of this object
+	 */
+	json to_json_impl(bool with_id = false) const;
+
+public:
 	snowflake		guild_id;		//!< the guild id which the scheduled event belongs to
 	snowflake		channel_id;		//!< the channel id in which the scheduled event will be hosted, or null if scheduled entity type is EXTERNAL (may be empty)
 	snowflake		creator_id;		//!< Optional: the id of the user that created the scheduled event
 	std::string		name;			//!< the name of the scheduled event
 	std::string		description;		//!< Optional: the description of the scheduled event (1-1000 characters)
-	std::string		image;			//!< the image of the scheduled event (may be empty)
+	utility::icon		image;			//!< the image of the scheduled event (may be empty)
 	time_t			scheduled_start_time;	//!< the time the scheduled event will start
 	time_t			scheduled_end_time;	//!< the time the scheduled event will end, or null if the event does not have a scheduled time to end (may be empty)
 	event_privacy_level	privacy_level;		//!< the privacy level of the scheduled event
@@ -115,11 +135,6 @@ struct DPP_EXPORT scheduled_event : public managed, public json_interface<schedu
 	 * @brief Create a scheduled_event object
 	 */
 	scheduled_event();
-
-	/**
-	 * @brief Destroy the scheduled_event object
-	 */
-	~scheduled_event() = default;
 
 	/**
 	 * @brief Set the name of the event
@@ -195,19 +210,22 @@ struct DPP_EXPORT scheduled_event : public managed, public json_interface<schedu
 	scheduled_event& set_end_time(time_t t);
 
 	/**
-	 * @brief Serialise a scheduled_event object from json
+	 * @brief Load an image for the event cover
 	 *
-	 * @return scheduled_event& a reference to self
+	 * @param image_blob Image binary data
+	 * @param type Type of image. It can be one of `i_gif`, `i_jpg` or `i_png`.
+	 * @return emoji& Reference to self
 	 */
-	scheduled_event& fill_from_json(const nlohmann::json* j);
+	scheduled_event& load_image(std::string_view image_blob, const image_type type);
 
 	/**
-	 * @brief Build json for this object
-	 * @param with_id Include id field in json
+	 * @brief Load an image for the event cover
 	 *
-	 * @return std::string Dumped json of this object
+	 * @param image_blob Image binary data
+	 * @param type Type of image. It can be one of `i_gif`, `i_jpg` or `i_png`.
+	 * @return emoji& Reference to self
 	 */
-	virtual std::string build_json(bool with_id = false) const;
+	scheduled_event& load_image(const std::byte* data, uint32_t size, const image_type type);
 };
 
 /**
@@ -221,4 +239,4 @@ typedef std::unordered_map<snowflake, scheduled_event> scheduled_event_map;
 typedef std::unordered_map<snowflake, event_member> event_member_map;
 
 
-};
+} // namespace dpp

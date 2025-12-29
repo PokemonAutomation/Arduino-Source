@@ -116,10 +116,10 @@ void AutoStory_Checkpoint_89::run_checkpoint(SingleSwitchProgramEnvironment& env
 void checkpoint_85(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 50, 320}, FlyPoint::FAST_TRAVEL);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 50, 2560ms}, FlyPoint::FAST_TRAVEL);
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 80);
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30000ms);
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::BATTLE, CallbackEnum:: DIALOG_ARROW});
 
@@ -127,7 +127,7 @@ void checkpoint_85(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 0, 0}, FlyPoint::FAST_TRAVEL);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 0, 0ms}, FlyPoint::FAST_TRAVEL);
     });  
 }
 
@@ -140,7 +140,7 @@ void checkpoint_86(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         DirectionDetector direction;
         // minimap should be clear of Pokemon within Mesagoza
         direction.change_direction(env.program_info(), env.console, context, 1.222127);
-        pbf_move_left_joystick(context, 128, 0, 1100, 50);
+        pbf_move_left_joystick(context, {0, +1}, 8800ms, 400ms);
 
         get_on_ride(env.program_info(), env.console, context);
         direction.change_direction(env.program_info(), env.console, context, 1.484555);
@@ -155,7 +155,7 @@ void checkpoint_86(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         // marker 1    {0.429688, 0.299074}
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
             FlyPoint::POKECENTER, 
             {0.429688, 0.299074}
         );
@@ -174,7 +174,7 @@ void checkpoint_86(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         // marker 2    {0.482812, 0.378704}
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 0, 0, 50}, 
+            {ZoomChange::ZOOM_IN, 0, 0, 400ms},
             FlyPoint::POKECENTER, 
             {0.482812, 0.378704}
         );
@@ -193,7 +193,7 @@ void checkpoint_86(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         // marker 3    {0.638021, 0.676852}
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 50}, 
+            {ZoomChange::KEEP_ZOOM, 0, 0, 400ms},
             FlyPoint::POKECENTER, 
             {0.638021, 0.676852}
         );
@@ -228,7 +228,7 @@ void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                walk_forward_while_clear_front_path(env.program_info(), env.console, context, 100);
+                walk_forward_while_clear_front_path(env.program_info(), env.console, context, 800ms);
                 walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A);
             }
         );
@@ -250,11 +250,11 @@ void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
             switch(game_title){
             case GameTitle::SCARLET:
-                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+                pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
                 break;
             case GameTitle::VIOLET:
-                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+                pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
+                pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
                 break;
             default:
                 throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "We don't know what game we are playing. We should know at this point.");
@@ -264,7 +264,7 @@ void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             
             // talk to Rika 3. Came to become a Champion
             clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
-            pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+            pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
             pbf_mash_button(context, BUTTON_A, 1000ms);
 
             // talk to Rika 4. Become stronger
@@ -273,18 +273,18 @@ void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
             // talk to Rika 5. Difficult gym: Alfornada
             clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
-            pbf_press_dpad(context, DPAD_UP, 13, 20);
+            pbf_press_dpad(context, DPAD_UP, 104ms, 160ms);
             pbf_mash_button(context, BUTTON_A, 1000ms);
 
             // talk to Rika 6. Difficult gym leader name: Tulip
             clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
-            pbf_press_dpad(context, DPAD_UP, 13, 20);
+            pbf_press_dpad(context, DPAD_UP, 104ms, 160ms);
             pbf_mash_button(context, BUTTON_A, 1000ms);
 
             // talk to Rika 7. Difficult gym leader type: Psychic
             clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
-            pbf_press_dpad(context, DPAD_UP, 13, 20);
-            pbf_press_dpad(context, DPAD_UP, 13, 20);
+            pbf_press_dpad(context, DPAD_UP, 104ms, 160ms);
+            pbf_press_dpad(context, DPAD_UP, 104ms, 160ms);
             pbf_mash_button(context, BUTTON_A, 1000ms);
 
             // talk to Rika 8. Starter pokemon: Grass/Fire/Water
@@ -293,11 +293,11 @@ void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             case StarterChoice::SPRIGATITO:
                 break;
             case StarterChoice::FUECOCO:
-                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+                pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
                 break;
             case StarterChoice::QUAXLY:
-                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+                pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
+                pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
                 break;
             default:
                 throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid starter pokemon type. This shouldn't happen.");
@@ -305,7 +305,7 @@ void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }
             size_t num_extra_clicks = attempt_number % 3;  // we add extra clicks when attempt_number > 0, to account for the fact that the user might not be enterint the correct starter.
             for (size_t i = 0; i < num_extra_clicks; i++){
-                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+                pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
             }
 
             pbf_mash_button(context, BUTTON_A, 1000ms);
@@ -333,7 +333,7 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms); // straight
         pbf_move_left_joystick(context, {+1, 0}, 400ms, 400ms); // right
         
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
 
 
@@ -364,7 +364,7 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         auto_heal_from_menu_or_overworld(env.program_info(), env.console, context, 0, true);
 
         // engage next battle
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW, CallbackEnum::PROMPT_DIALOG});
 
         env.console.log("Battle Elite Four 2.");  // select move 2, which should be a fire move. to battle the steel trainer
@@ -385,7 +385,7 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         auto_heal_from_menu_or_overworld(env.program_info(), env.console, context, 0, true);
 
         // engage next battle
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW, CallbackEnum::PROMPT_DIALOG});
 
         env.console.log("Battle Elite Four 3.");
@@ -395,7 +395,7 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         // engage next battle
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW, CallbackEnum::PROMPT_DIALOG});
 
         env.console.log("Battle Elite Four 4.");
@@ -410,7 +410,7 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 void checkpoint_89(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW, CallbackEnum::PROMPT_DIALOG});
 
         env.console.log("Battle Geeta.");

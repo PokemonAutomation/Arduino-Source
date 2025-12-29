@@ -4,7 +4,7 @@
  *
  */
 
-#include <QString>
+
 #include "Common/Cpp/Time.h"
 #include "Logger.h"
 
@@ -13,7 +13,7 @@
 namespace PokemonAutomation{
 
 
-Logger& global_logger_tagged(){
+TaggedLogger& global_logger_tagged(){
     static TaggedLogger logger(global_logger_raw(), "Global");
     return logger;
 }

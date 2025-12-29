@@ -143,7 +143,7 @@ void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env, ProControll
     PostMMOSpawnReset_Descriptor::Stats& stats = env.current_stats<PostMMOSpawnReset_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     while (true){
         env.update_stats();

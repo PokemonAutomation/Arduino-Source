@@ -394,8 +394,8 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, VideoStream& st
     );
     if (ret == 0){
         stream.log("Detected Recently Battled menu icon.");
-        pbf_mash_button(context, BUTTON_A, 150);
-        pbf_wait(context, 200);
+        pbf_mash_button(context, BUTTON_A, 1200ms);
+        pbf_wait(context, 1600ms);
     }else{
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -417,7 +417,7 @@ void leave_phone_to_overworld(const ProgramInfo& info, VideoStream& stream, ProC
         stream, context,
         [](ProControllerContext& context){
             for (size_t i = 0; i < 10; i++){
-                pbf_press_button(context, BUTTON_Y, 20, 1000);
+                pbf_press_button(context, BUTTON_Y, 160ms, 8000ms);
             }
         },
         {overworld, battle, arrow}
@@ -433,7 +433,7 @@ void leave_phone_to_overworld(const ProgramInfo& info, VideoStream& stream, ProC
         );  
     case 2:
         stream.log("Stuck in battle status screen.");
-        pbf_mash_button(context, BUTTON_B, 200);
+        pbf_mash_button(context, BUTTON_B, 1600ms);
         throw_and_log<UnexpectedBattleException>(
             stream.logger(), ErrorReport::SEND_ERROR_REPORT,
             "leave_phone_to_overworld(): Unexpectedly detected battle.",
@@ -786,7 +786,7 @@ void navigate_school_layout_menu(
         context,
         [dpad_button](ProControllerContext& context){
             for (int i = 0; i < 3; i++){
-                pbf_press_dpad(context, dpad_button, 20, 500);
+                pbf_press_dpad(context, dpad_button, 160ms, 4000ms);
             }
         },
         { arrow_end }        

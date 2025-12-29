@@ -178,30 +178,30 @@ void PokemonSV::MassPurchase::program(SingleSwitchProgramEnvironment& env, ProCo
             if (qt_val <= 500){
                 uint16_t current = 1;
                 while (current + 10 <= qt_val){
-                    pbf_press_dpad(context, DPAD_RIGHT, 20, 10);
+                    pbf_press_dpad(context, DPAD_RIGHT, 160ms, 80ms);
                     current += 10;
                 }
                 while (current < qt_val){
-                    pbf_press_dpad(context, DPAD_UP, 20, 10);
+                    pbf_press_dpad(context, DPAD_UP, 160ms, 80ms);
                     current++;
                 }
             }else{
                 uint16_t current = 999;
-                pbf_press_dpad(context, DPAD_LEFT, 20, 10);
+                pbf_press_dpad(context, DPAD_LEFT, 160ms, 80ms);
                 while (current >= qt_val + 10){
-                    pbf_press_dpad(context, DPAD_LEFT, 20, 10);
+                    pbf_press_dpad(context, DPAD_LEFT, 160ms, 80ms);
                     current -= 10;
                 }
                 while (current > qt_val){
-                    pbf_press_dpad(context, DPAD_DOWN, 20, 10);
+                    pbf_press_dpad(context, DPAD_DOWN, 160ms, 80ms);
                     current--;
                 }
             }
 
-            pbf_press_button(context, BUTTON_A, 20, 125);
+            pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
 
             if (PAY_LP){
-                pbf_press_dpad(context, DPAD_DOWN, 5, 105);
+                pbf_press_dpad(context, DPAD_DOWN, 40ms, 840ms);
             }
 
             pbf_press_button(context, BUTTON_A, 160ms, 1840ms);

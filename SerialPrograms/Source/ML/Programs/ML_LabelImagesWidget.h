@@ -22,6 +22,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 
 class QLabel;
+class QPushButton;
 
 namespace PokemonAutomation{
 namespace ML{
@@ -72,10 +73,13 @@ private:
     ImageAnnotationDisplaySession& m_display_session;
 
     ImageAnnotationDisplayWidget* m_image_display_widget;
-    
+
     // show the info about the loaded image embedding data corresponding to the currently
     // displayed image
     QLabel* m_embedding_info_label = nullptr;
+
+    // button to toggle annotation visibility
+    QPushButton* m_hide_annotation_button = nullptr;
 
     // TODO: see if we can use
     // Common/Cpp/Options/BoxFloatOption.h and Common/Qt/Options/BoxFloatWidget.h as UI options

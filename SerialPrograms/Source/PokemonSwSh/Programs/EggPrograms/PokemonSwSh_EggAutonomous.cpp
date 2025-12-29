@@ -207,7 +207,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             3200ms
         );
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
     }
 
     if (DEBUG_PROCESSING_HATCHED){ // only for debugging
@@ -525,9 +525,9 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
         env.console, context,
         [](ProControllerContext& context){
             for (size_t i_hatched = 0; i_hatched < 2; i_hatched++){
-                pbf_press_button(context, BUTTON_A, 20, 150);
+                pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
             }
-            pbf_wait(context, 200);
+            pbf_wait(context, 1600ms);
         },
         {
             egg_arrow_detector,
@@ -635,7 +635,7 @@ bool EggAutonomous::process_hatched_pokemon(
         BoxNatureDetector nature_detector(env.console.overlay());
 
         for (size_t i_hatched = 0; i_hatched < 5; i_hatched++){
-            pbf_wait(context, 50); // wait for a while to make sure the pokemon stats are loaded.
+            pbf_wait(context, 400ms); // wait for a while to make sure the pokemon stats are loaded.
             context.wait_for_all_requests();
             auto screen = env.console.video().snapshot();
 
@@ -762,15 +762,15 @@ bool EggAutonomous::process_hatched_pokemon(
                 dialog_detector.make_overlays(dialog_overlay_set);
 
                 // Move cursor upward two times to point to "Release" menu item
-                pbf_press_dpad(context, DPAD_UP, 20, 20);
-                pbf_press_dpad(context, DPAD_UP, 20, 20);
+                pbf_press_dpad(context, DPAD_UP, 160ms, 160ms);
+                pbf_press_dpad(context, DPAD_UP, 160ms, 160ms);
 
                 // Press A to release
                 pbf_press_button(context, BUTTON_A, 160ms, 840ms);
                 // Move cursor from "Not release" to "release".
                 pbf_press_dpad(context, DPAD_UP, 160ms, 240ms);
                 // Press A to confirm release, wait for a while to let the next dialog box pop up.
-                pbf_press_button(context, BUTTON_A, 20, 200);
+                pbf_press_button(context, BUTTON_A, 160ms, 1600ms);
 
                 context.wait_for_all_requests();
                 ret = wait_until(

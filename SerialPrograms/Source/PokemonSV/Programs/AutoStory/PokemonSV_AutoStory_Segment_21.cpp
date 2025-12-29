@@ -118,8 +118,8 @@ void checkpoint_48(
         DirectionDetector direction;
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 50});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 50});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 400ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 400ms});
         }
 
         direction.change_direction(env.program_info(), env.console, context, 2.06);
@@ -158,7 +158,7 @@ void checkpoint_48(
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 240, 50);
-                walk_forward_while_clear_front_path(env.program_info(), env.console, context, 300);
+                walk_forward_while_clear_front_path(env.program_info(), env.console, context, 2400ms);
                 walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A);
             }
         );
@@ -173,33 +173,33 @@ void checkpoint_48(
                 Milliseconds wait = 8000ms;
 
                 direction.change_direction(env.program_info(), env.console, context, 2.50);
-                pbf_move_left_joystick(context, 128, 0, 300, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
 
                 direction.change_direction(env.program_info(), env.console, context, 3.54);
-                pbf_move_left_joystick(context, 128, 0, 300, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
 
                 direction.change_direction(env.program_info(), env.console, context, 1.76);
-                pbf_move_left_joystick(context, 128, 0, 300, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
 
 
                 direction.change_direction(env.program_info(), env.console, context, 1.97);
-                pbf_move_left_joystick(context, 128, 0, 300, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 2.60);
                 pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
 
@@ -209,18 +209,18 @@ void checkpoint_48(
 
                 direction.change_direction(env.program_info(), env.console, context, 0.82);
                 pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 2.13);
                 pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
 
                 direction.change_direction(env.program_info(), env.console, context, 1.97);
                 pbf_move_left_joystick(context, {0, +1}, 4000ms, 400ms);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 3.02);
@@ -229,12 +229,12 @@ void checkpoint_48(
 
                 direction.change_direction(env.program_info(), env.console, context, 3.87);
                 pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 4.56);
-                pbf_move_left_joystick(context, 128, 0, 300, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 try {
@@ -242,23 +242,23 @@ void checkpoint_48(
                     pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
 
                     direction.change_direction(env.program_info(), env.console, context, 5.18);
-                    pbf_move_left_joystick(context, 128, 0, 300, 50);
-                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
+                    pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                     pbf_wait(context, wait);
 
                     direction.change_direction(env.program_info(), env.console, context, 5.66);
                     pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
-                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                     pbf_wait(context, wait);
 
                     direction.change_direction(env.program_info(), env.console, context, 5.24);
                     pbf_move_left_joystick(context, {0, +1}, 4800ms, 400ms);
-                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                     pbf_wait(context, wait);
 
                     direction.change_direction(env.program_info(), env.console, context, 5.45);
                     pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
-                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                     pbf_wait(context, wait);
                     
                     pbf_wait(context, 20000ms);
@@ -305,8 +305,8 @@ void checkpoint_49(
         // marker 1
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 128, 30},
-            {ZoomChange::ZOOM_IN, 0, 90, 90}
+            {ZoomChange::KEEP_ZOOM, 255, 128, 240ms},
+            {ZoomChange::ZOOM_IN, 0, 90, 720ms}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -323,8 +323,8 @@ void checkpoint_49(
         // marker 2
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 128, 0, 30},
-            {ZoomChange::ZOOM_IN, 128, 255, 30}
+            {ZoomChange::KEEP_ZOOM, 128, 0, 240ms},
+            {ZoomChange::ZOOM_IN, 128, 255, 240ms}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -341,8 +341,8 @@ void checkpoint_49(
         // marker 3
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 180, 50},
-            {ZoomChange::ZOOM_IN, 0, 70, 175}
+            {ZoomChange::KEEP_ZOOM, 255, 180, 400ms},
+            {ZoomChange::ZOOM_IN, 0, 70, 1400ms}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -359,8 +359,8 @@ void checkpoint_49(
         // marker 4
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 180, 50},
-            {ZoomChange::ZOOM_IN, 0, 50, 185}
+            {ZoomChange::KEEP_ZOOM, 255, 180, 400ms},
+            {ZoomChange::ZOOM_IN, 0, 50, 1480ms}
         );  
         // walk until you run into the wall
         overworld_navigation(env.program_info(), env.console, context, 
@@ -371,8 +371,8 @@ void checkpoint_49(
         // marker 5. put marker on other side of bridge
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 128, 128, 0},
-            {ZoomChange::ZOOM_IN, 128, 0, 10}
+            {ZoomChange::ZOOM_IN, 128, 128, 0ms},
+            {ZoomChange::ZOOM_IN, 128, 0, 80ms}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){

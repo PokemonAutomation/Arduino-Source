@@ -89,7 +89,7 @@ void checkpoint_90(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
         // Fly to Academy
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 230, 80}, FlyPoint::FAST_TRAVEL);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 230, 640ms}, FlyPoint::FAST_TRAVEL);
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 255, 100);
 
@@ -126,9 +126,9 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         wait_for_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078}, 10);
 
         env.console.log("Leave dorm for schoolyard.");
-        pbf_press_dpad(context, DPAD_UP, 13, 20);
-        pbf_press_dpad(context, DPAD_LEFT, 13, 20);
-        pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+        pbf_press_dpad(context, DPAD_UP, 104ms, 160ms);
+        pbf_press_dpad(context, DPAD_LEFT, 104ms, 160ms);
+        pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
         wait_for_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.790, 0.047, 0.078}, 10);
         pbf_mash_button(context, BUTTON_A, 1000ms);
 
@@ -158,15 +158,15 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         wait_for_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078}, 10);
 
         env.console.log("Leave dorm for Director's office.");
-        pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-        pbf_press_dpad(context, DPAD_RIGHT, 13, 20);
-        pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+        pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
+        pbf_press_dpad(context, DPAD_RIGHT, 104ms, 160ms);
+        pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
         wait_for_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.345, 0.047, 0.078}, 10);
         pbf_mash_button(context, BUTTON_A, 1000ms);
 
         wait_for_overworld(env.program_info(), env.console, context);
 
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30000ms);
 
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
@@ -202,7 +202,7 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 0, 0}, FlyPoint::FAST_TRAVEL);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 0, 0ms}, FlyPoint::FAST_TRAVEL);
 
 
     });   
@@ -211,7 +211,7 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 void checkpoint_92(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 145, 255, 350}, FlyPoint::FAST_TRAVEL);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 145, 255, 2800ms}, FlyPoint::FAST_TRAVEL);
         handle_unexpected_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {-1, 0}, 1000ms, 100ms);
@@ -240,7 +240,7 @@ void checkpoint_92(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0}, FlyPoint::POKECENTER);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, FlyPoint::POKECENTER);
     });   
 }
 

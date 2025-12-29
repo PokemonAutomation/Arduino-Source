@@ -126,12 +126,12 @@ bool TeraRaidSearchDetector::move_cursor_to_search(
 //        cout << "diff_x = " << diff_x << endl;
         if (diff_x < -0.1 || diff_x > 0.5){
             target_reached = false;
-            pbf_press_dpad(context, DPAD_LEFT, 20, 10);
+            pbf_press_dpad(context, DPAD_LEFT, 160ms, 80ms);
             continue;
         }
         if (diff_x > 0.1 || diff_x < -0.5){
             target_reached = false;
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 10);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 80ms);
             continue;
         }
 
@@ -139,7 +139,7 @@ bool TeraRaidSearchDetector::move_cursor_to_search(
 //        cout << "diff_y = " << diff_y << endl;
         if (std::abs(diff_y) > 0.3){
             target_reached = false;
-            pbf_press_dpad(context, DPAD_DOWN, 20, 10);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 80ms);
             continue;
         }
 

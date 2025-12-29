@@ -30,7 +30,7 @@ ShinyHunt_SewerHunter_Descriptor::ShinyHunt_SewerHunter_Descriptor()
         "Programs/PokemonLZA/ShinyHunt-SewerHunter.html",
         "Shiny hunt in two sewer subzones",
         ProgramControllerClass::StandardController_NoRestrictions, FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS, {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class ShinyHunt_SewerHunter_Descriptor::Stats : public StatsTracker{

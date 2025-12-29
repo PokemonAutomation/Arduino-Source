@@ -50,8 +50,7 @@ BoxSorter_Descriptor::BoxSorter_Descriptor()
         "Order boxes of " + STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct BoxSorter_Descriptor::Stats : public StatsTracker{
@@ -116,13 +115,13 @@ BoxSorter::BoxSorter()
     ss << "Moving cursor from " << cur_cursor << " to " << dest_cursor;
     env.console.log(ss.str());
 
-    uint16_t GAME_DELAY = 30;
+    Milliseconds GAME_DELAY = 240ms;
     // TODO: shortest path movement though pages, boxes
     for (size_t i = cur_cursor.box; i < dest_cursor.box; ++i){
-        pbf_press_button(context, BUTTON_R, 10, GAME_DELAY+30);
+        pbf_press_button(context, BUTTON_R, 80ms, GAME_DELAY + 240ms);
     }
     for (size_t i = dest_cursor.box; i < cur_cursor.box; ++i){
-        pbf_press_button(context, BUTTON_L, 10, GAME_DELAY+30);
+        pbf_press_button(context, BUTTON_L, 80ms, GAME_DELAY + 240ms);
     }
 
     BoxDetector box_detector(COLOR_RED, &env.console.overlay());
@@ -209,13 +208,13 @@ void sort(
                 //moving cursor to the pokemon to pick it up
                 bool holding_pokemon = false;
                 cur_cursor = move_cursor_to(env, context, cur_cursor, cursor, holding_pokemon);
-                pbf_press_button(context, BUTTON_Y, 10, 60);
+                pbf_press_button(context, BUTTON_Y, 80ms, 480ms);
                 context.wait_for_all_requests();
 
                 //moving to destination to place it or swap it
                 holding_pokemon = true;
                 cur_cursor = move_cursor_to(env, context, cur_cursor, cursor_s, holding_pokemon);
-                pbf_press_button(context, BUTTON_Y, 10, 60);
+                pbf_press_button(context, BUTTON_Y, 80ms, 480ms);
                 context.wait_for_all_requests();
 
                 std::swap(boxes_data[poke_nb_s], boxes_data[poke_nb]);
@@ -247,7 +246,7 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     std::ostringstream ss;
 
-    uint16_t VIDEO_DELAY = 50;
+    Milliseconds VIDEO_DELAY = 400ms;
 
     BoxDetector box_detector(COLOR_RED, &env.console.overlay());
     // BoxPageInfoWatcher info_watcher(&env.console.overlay());
@@ -267,7 +266,7 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     for (size_t box_idx = 0; box_idx < NUM_BOXES; box_idx++){
         if(box_idx != 0){
             // Press button R to move to next box
-            pbf_press_button(context, BUTTON_R, 10, VIDEO_DELAY+100);
+            pbf_press_button(context, BUTTON_R, 80ms, VIDEO_DELAY + 800ms);
         }else{
             // Moving the cursor to the first slot in the box
             box_detector.move_cursor(env.program_info(), env.console, context, 1, 0);

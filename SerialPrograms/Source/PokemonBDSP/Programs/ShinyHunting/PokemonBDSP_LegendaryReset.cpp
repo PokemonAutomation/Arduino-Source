@@ -79,7 +79,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
     LeadingShinyTracker lead_tracker(env.console);
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 40ms, 40ms);
 
     bool reset = false;
     while (true){
@@ -105,7 +105,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
                     if (WALK_UP){
                         pbf_move_left_joystick(context, {0, +1}, 1000ms, 0ms);
                     }
-                    pbf_mash_button(context, BUTTON_ZL, 125);
+                    pbf_mash_button(context, BUTTON_ZL, 1000ms);
                 }
             },
             {

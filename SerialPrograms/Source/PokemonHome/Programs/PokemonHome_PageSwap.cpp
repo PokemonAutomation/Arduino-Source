@@ -46,57 +46,57 @@ void PageSwap::program(SingleSwitchProgramEnvironment& env, ProControllerContext
         grip_menu_connect_go_home(context);
         PokemonSwSh::resume_game_no_interact(env.console, context, DODGE_SYSTEM_UPDATE_WINDOW);
     }else{
-        pbf_press_button(context, BUTTON_RCLICK, 5, 5);
+        pbf_press_button(context, BUTTON_RCLICK, 40ms, 40ms);
     }
 
-    const uint16_t PICKUP_DELAY = 250;
-    const uint16_t SCROLL_DELAY = 20;
+    const Milliseconds PICKUP_DELAY = 2000ms;
+    const Milliseconds SCROLL_DELAY = 160ms;
 
     for (uint8_t i = 0; i < 2; i++){
         for (uint8_t j = 0; j < 3; j++){
-            pbf_press_button(context, BUTTON_Y, 10, PICKUP_DELAY);
+            pbf_press_button(context, BUTTON_Y, 80ms, PICKUP_DELAY);
             for (uint8_t c = 0; c < 6; c++){
-                pbf_press_dpad(context, DPAD_RIGHT, 10, SCROLL_DELAY);
+                pbf_press_dpad(context, DPAD_RIGHT, 80ms, SCROLL_DELAY);
             }
-            pbf_press_button(context, BUTTON_Y, 10, PICKUP_DELAY);
-            pbf_press_dpad(context, DPAD_RIGHT, 10, SCROLL_DELAY);
-            pbf_press_button(context, BUTTON_Y, 10, PICKUP_DELAY);
+            pbf_press_button(context, BUTTON_Y, 80ms, PICKUP_DELAY);
+            pbf_press_dpad(context, DPAD_RIGHT, 80ms, SCROLL_DELAY);
+            pbf_press_button(context, BUTTON_Y, 80ms, PICKUP_DELAY);
             for (uint8_t c = 0; c < 6; c++){
-                pbf_press_dpad(context, DPAD_LEFT, 10, SCROLL_DELAY);
+                pbf_press_dpad(context, DPAD_LEFT, 80ms, SCROLL_DELAY);
             }
-            pbf_press_button(context, BUTTON_Y, 10, PICKUP_DELAY);
-            pbf_press_dpad(context, DPAD_RIGHT, 10, SCROLL_DELAY);
+            pbf_press_button(context, BUTTON_Y, 80ms, PICKUP_DELAY);
+            pbf_press_dpad(context, DPAD_RIGHT, 80ms, SCROLL_DELAY);
         }
-        pbf_press_dpad(context, DPAD_DOWN, 10, SCROLL_DELAY);
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, SCROLL_DELAY);
         for (uint8_t j = 0; j < 3; j++){
-            pbf_press_button(context, BUTTON_Y, 10, PICKUP_DELAY);
+            pbf_press_button(context, BUTTON_Y, 80ms, PICKUP_DELAY);
             for (uint8_t c = 0; c < 6; c++){
-                pbf_press_dpad(context, DPAD_LEFT, 10, SCROLL_DELAY);
+                pbf_press_dpad(context, DPAD_LEFT, 80ms, SCROLL_DELAY);
             }
-            pbf_press_button(context, BUTTON_Y, 10, PICKUP_DELAY);
-            pbf_press_dpad(context, DPAD_RIGHT, 10, SCROLL_DELAY);
-            pbf_press_button(context, BUTTON_Y, 10, PICKUP_DELAY);
+            pbf_press_button(context, BUTTON_Y, 80ms, PICKUP_DELAY);
+            pbf_press_dpad(context, DPAD_RIGHT, 80ms, SCROLL_DELAY);
+            pbf_press_button(context, BUTTON_Y, 80ms, PICKUP_DELAY);
             for (uint8_t c = 0; c < 6; c++){
-                pbf_press_dpad(context, DPAD_RIGHT, 10, SCROLL_DELAY);
+                pbf_press_dpad(context, DPAD_RIGHT, 80ms, SCROLL_DELAY);
             }
-            pbf_press_button(context, BUTTON_Y, 10, PICKUP_DELAY);
-            pbf_press_dpad(context, DPAD_RIGHT, 10, SCROLL_DELAY);
+            pbf_press_button(context, BUTTON_Y, 80ms, PICKUP_DELAY);
+            pbf_press_dpad(context, DPAD_RIGHT, 80ms, SCROLL_DELAY);
         }
-        pbf_press_dpad(context, DPAD_DOWN, 10, SCROLL_DELAY);
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, SCROLL_DELAY);
     }
     for (uint8_t j = 0; j < 3; j++){
-        pbf_press_button(context, BUTTON_Y, 10, PICKUP_DELAY);
+        pbf_press_button(context, BUTTON_Y, 80ms, PICKUP_DELAY);
         for (uint8_t c = 0; c < 6; c++){
-            pbf_press_dpad(context, DPAD_RIGHT, 10, SCROLL_DELAY);
+            pbf_press_dpad(context, DPAD_RIGHT, 80ms, SCROLL_DELAY);
         }
-        pbf_press_button(context, BUTTON_Y, 10, PICKUP_DELAY);
-        pbf_press_dpad(context, DPAD_RIGHT, 10, SCROLL_DELAY);
-        pbf_press_button(context, BUTTON_Y, 10, PICKUP_DELAY);
+        pbf_press_button(context, BUTTON_Y, 80ms, PICKUP_DELAY);
+        pbf_press_dpad(context, DPAD_RIGHT, 80ms, SCROLL_DELAY);
+        pbf_press_button(context, BUTTON_Y, 80ms, PICKUP_DELAY);
         for (uint8_t c = 0; c < 6; c++){
-            pbf_press_dpad(context, DPAD_LEFT, 10, SCROLL_DELAY);
+            pbf_press_dpad(context, DPAD_LEFT, 80ms, SCROLL_DELAY);
         }
-        pbf_press_button(context, BUTTON_Y, 10, PICKUP_DELAY);
-        pbf_press_dpad(context, DPAD_RIGHT, 10, SCROLL_DELAY);
+        pbf_press_button(context, BUTTON_Y, 80ms, PICKUP_DELAY);
+        pbf_press_dpad(context, DPAD_RIGHT, 80ms, SCROLL_DELAY);
     }
 }
 

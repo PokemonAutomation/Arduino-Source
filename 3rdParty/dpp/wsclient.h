@@ -2,6 +2,7 @@
  *
  * D++, A Lightweight C++ library for Discord
  *
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright 2021 Craig Edwards and D++ contributors 
  * (https://github.com/brainboxdotcc/DPP/graphs/contributors)
  *
@@ -36,6 +37,7 @@ enum websocket_protocol_t : uint8_t {
 	 * @brief JSON data, text, UTF-8 character set
 	 */
 	ws_json = 0,
+	
 	/**
 	 * @brief Erlang Term Format (ETF) binary protocol
 	 */
@@ -64,12 +66,35 @@ enum ws_state : uint8_t {
  */
 enum ws_opcode : uint8_t
 {
-        OP_CONTINUATION = 0x00,	//!< Continuation
-        OP_TEXT = 0x01,		//!< Text frame
-        OP_BINARY = 0x02,	//!< Binary frame
-        OP_CLOSE = 0x08,	//!< Close notification with close code
-        OP_PING = 0x09,		//!< Low level ping
-        OP_PONG = 0x0a		//!< Low level pong
+	/**
+	 * @brief Continuation.
+	 */
+        OP_CONTINUATION = 0x00,
+
+	/**
+	 * @brief Text frame.
+	 */
+        OP_TEXT = 0x01,
+
+	/**
+	 * @brief Binary frame.
+	 */
+        OP_BINARY = 0x02,
+
+	/**
+	 * @brief Close notification with close code.
+	 */
+        OP_CLOSE = 0x08,
+
+	/**
+	 * @brief Low level ping.
+	 */
+        OP_PING = 0x09,
+
+	/**
+	 * @brief Low level pong.
+	 */
+        OP_PONG = 0x0a
 };
 
 /**
@@ -163,7 +188,7 @@ public:
 	/**
 	 * @brief Destroy the websocket client object
 	 */
-        virtual ~websocket_client();
+        virtual ~websocket_client() = default;
 
 	/**
 	 * @brief Write to websocket. Encapsulates data in frames if the status is CONNECTED.
@@ -209,4 +234,4 @@ public:
 	void send_close_packet();
 };
 
-};
+} // namespace dpp

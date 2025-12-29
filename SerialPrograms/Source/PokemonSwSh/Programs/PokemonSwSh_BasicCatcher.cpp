@@ -95,7 +95,7 @@ CatchResults throw_balls(
         {
             BattleBallReader reader(stream, language);
 
-            pbf_mash_button(context, BUTTON_X, 125);
+            pbf_mash_button(context, BUTTON_X, 1000ms);
             context.wait_for_all_requests();
 
             bool success = move_to_ball(reader, stream, context, ball_slug);
@@ -103,7 +103,7 @@ CatchResults throw_balls(
                 return {CatchResult::OUT_OF_BALLS, balls_used};
             }
 
-            pbf_mash_button(context, BUTTON_A, 125);
+            pbf_mash_button(context, BUTTON_A, 1000ms);
             context.wait_for_all_requests();
         }
         balls_used++;

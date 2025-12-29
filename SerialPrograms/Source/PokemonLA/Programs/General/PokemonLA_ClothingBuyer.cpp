@@ -40,7 +40,7 @@ ClothingBuyer::ClothingBuyer()
 
 void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     while (true){
         // If this clothing is not bought:
@@ -55,17 +55,17 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         // Press B to be asked whether to leave menu
         // Press B to not leave
 
-        pbf_press_button(context, BUTTON_A, 10, 120);
-        pbf_press_button(context, BUTTON_A, 10, 130);
-        pbf_press_button(context, BUTTON_B, 10, 120);
-        pbf_press_button(context, BUTTON_B, 10, 60);
+        pbf_press_button(context, BUTTON_A, 80ms, 960ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 1040ms);
+        pbf_press_button(context, BUTTON_B, 80ms, 960ms);
+        pbf_press_button(context, BUTTON_B, 80ms, 480ms);
 
         // Move to the next clothing in the same category
-        pbf_press_dpad(context, DPAD_DOWN, 10, 40);
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 320ms);
 
         // Move to the next category
         if (CATEGORY_ROTATION){
-            pbf_press_button(context, BUTTON_R, 10, 40);
+            pbf_press_button(context, BUTTON_R, 80ms, 320ms);
         }
     }
 }

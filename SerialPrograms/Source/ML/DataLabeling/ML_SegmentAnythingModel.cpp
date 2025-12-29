@@ -14,6 +14,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include "3rdParty/ONNX/OnnxToolsPA.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Globals.h"
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"
 #include "ML_SegmentAnythingModelConstants.h"
@@ -203,7 +204,15 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
     }
 
     bool use_gpu = use_gpu_for_embedder_session;
-    std::unique_ptr<SAMEmbedderSession> embedding_session = make_unique<SAMEmbedderSession>(embedding_model_path, use_gpu);
+    std::unique_ptr<SAMEmbedderSession> embedding_session;
+    try{
+        embedding_session = make_unique<SAMEmbedderSession>(embedding_model_path, use_gpu);
+    } catch(MLModelSessionCreationError& e){
+        QMessageBox box;
+        box.warning(nullptr, "Unable To Create Model Session",
+            QString::fromStdString(e.message() + ". Try using CPU?"));
+        return;
+    }
     std::vector<float> output_image_embedding;
     for (size_t i = 0; i < all_image_paths.size(); i++){
         const auto& image_path = all_image_paths[i];

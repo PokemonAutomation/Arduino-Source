@@ -31,8 +31,7 @@ ShinyHuntDeoxys_Descriptor::ShinyHuntDeoxys_Descriptor()
         "Use the Run Away method to shiny hunt Deoxys in Emerald.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 
@@ -86,7 +85,7 @@ ShinyHuntDeoxys::ShinyHuntDeoxys()
 
 void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     env.log("Step 1: Press A from below.");
-    pbf_press_button(context, BUTTON_A, 20, 40);
+    pbf_press_button(context, BUTTON_A, 160ms, 320ms);
 
     env.log("Step 2: 5 Left, 1 Down.");
     pbf_press_dpad(context, DPAD_LEFT, 80ms, 400ms);
@@ -95,9 +94,9 @@ void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, ProContr
     pbf_press_dpad(context, DPAD_LEFT, 80ms, 400ms);
     pbf_press_dpad(context, DPAD_LEFT, 80ms, 400ms);
 
-    pbf_press_dpad(context, DPAD_DOWN, 10, 80);
+    pbf_press_dpad(context, DPAD_DOWN, 80ms, 640ms);
 
-    pbf_press_button(context, BUTTON_A, 20, 40);
+    pbf_press_button(context, BUTTON_A, 160ms, 320ms);
     context.wait_for_all_requests();
 
     env.log("Step 3: 5 Right, 5 Up.");
@@ -108,9 +107,9 @@ void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, ProContr
     pbf_press_dpad(context, DPAD_RIGHT, 80ms, 400ms);
 
     ssf_press_button(context, BUTTON_B, 0ms, 720ms);
-    pbf_press_dpad(context, DPAD_UP, 90, 50);
+    pbf_press_dpad(context, DPAD_UP, 720ms, 400ms);
 
-    pbf_press_button(context, BUTTON_A, 20, 40);
+    pbf_press_button(context, BUTTON_A, 160ms, 320ms);
     context.wait_for_all_requests();
 
     env.log("Step 4: 5 Right, 5 Down");
@@ -121,9 +120,9 @@ void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, ProContr
     pbf_press_dpad(context, DPAD_RIGHT, 80ms, 400ms);
 
     ssf_press_button(context, BUTTON_B, 0ms, 720ms);
-    pbf_press_dpad(context, DPAD_DOWN, 90, 50);
+    pbf_press_dpad(context, DPAD_DOWN, 720ms, 400ms);
 
-    pbf_press_button(context, BUTTON_A, 20, 40);
+    pbf_press_button(context, BUTTON_A, 160ms, 320ms);
     context.wait_for_all_requests();
 
     env.log("Step 5: 3 Up, 7 Left");
@@ -132,16 +131,16 @@ void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, ProContr
     pbf_press_dpad(context, DPAD_UP, 80ms, 400ms);
 
     ssf_press_button(context, BUTTON_B, 0ms, 920ms);
-    pbf_press_dpad(context, DPAD_LEFT, 115, 50);
+    pbf_press_dpad(context, DPAD_LEFT, 920ms, 400ms);
 
-    pbf_press_button(context, BUTTON_A, 20, 40);
+    pbf_press_button(context, BUTTON_A, 160ms, 320ms);
     context.wait_for_all_requests();
 
     env.log("Step 6: 5 Right.");
     ssf_press_button(context, BUTTON_B, 0ms, 800ms);
     pbf_press_dpad(context, DPAD_RIGHT, 800ms, 400ms);
 
-    pbf_press_button(context, BUTTON_A, 20, 40);
+    pbf_press_button(context, BUTTON_A, 160ms, 320ms);
     context.wait_for_all_requests();
 
     env.log("Step 7: 3 Left, 2 Down.");
@@ -152,23 +151,23 @@ void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, ProContr
     ssf_press_button(context, BUTTON_B, 0ms, 480ms);
     pbf_press_dpad(context, DPAD_DOWN, 480ms, 400ms);
 
-    pbf_press_button(context, BUTTON_A, 20, 40);
+    pbf_press_button(context, BUTTON_A, 160ms, 320ms);
     context.wait_for_all_requests();
 
     env.log("Step 8: 1 Down, 4 Left.");
     pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
 
     ssf_press_button(context, BUTTON_B, 0ms, 640ms);
-    pbf_press_dpad(context, DPAD_LEFT, 80, 50);
+    pbf_press_dpad(context, DPAD_LEFT, 640ms, 400ms);
 
-    pbf_press_button(context, BUTTON_A, 20, 40);
+    pbf_press_button(context, BUTTON_A, 160ms, 320ms);
     context.wait_for_all_requests();
 
     env.log("Step 8: 7 Right.");
     ssf_press_button(context, BUTTON_B, 0ms, 920ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 115, 50);
+    pbf_press_dpad(context, DPAD_RIGHT, 920ms, 400ms);
 
-    pbf_press_button(context, BUTTON_A, 20, 40);
+    pbf_press_button(context, BUTTON_A, 160ms, 320ms);
     context.wait_for_all_requests();
 
     env.log("Step 9: 4 Left, Down 1.");
@@ -179,12 +178,12 @@ void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, ProContr
 
     pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
 
-    pbf_press_button(context, BUTTON_A, 20, 40);
+    pbf_press_button(context, BUTTON_A, 160ms, 320ms);
     context.wait_for_all_requests();
 
     env.log("Step 10: 4 Up.");
     ssf_press_button(context, BUTTON_B, 0ms, 640ms);
-    pbf_press_dpad(context, DPAD_UP, 80, 80);
+    pbf_press_dpad(context, DPAD_UP, 640ms, 640ms);
     context.wait_for_all_requests();
 }
 
@@ -251,7 +250,7 @@ void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, ProController
         flee_battle(env.console, context);
 
         //After pressing the flee button, additional dialog box pops up for Deoxys
-        pbf_mash_button(context, BUTTON_B, 250);
+        pbf_mash_button(context, BUTTON_B, 2000ms);
         context.wait_for_all_requests();
         
         //Walk down from the triangle rock to the ship.

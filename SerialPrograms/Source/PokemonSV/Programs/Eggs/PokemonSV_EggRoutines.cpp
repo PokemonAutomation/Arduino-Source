@@ -57,7 +57,7 @@ void clear_mons_in_front(
                 context.wait_for_all_requests();
                 context.wait_for(std::chrono::seconds(30));
                 stream.log("A " + Pokemon::STRING_POKEMON + " is standing in the way. Whistling and waiting 30 seconds...", COLOR_RED);
-                pbf_press_button(context, BUTTON_R, 20, 0);
+                pbf_press_button(context, BUTTON_R, 160ms, 0ms);
             }
         },
         {button}
@@ -98,7 +98,7 @@ void handle_egg_hatching(
         [](ProControllerContext& context){
             ssf_press_right_joystick(context, {-1, 0}, 0ms, 760ms);
             for(int i = 0; i < 60; i++){
-                pbf_mash_button(context, BUTTON_A, 125);
+                pbf_mash_button(context, BUTTON_A, 1000ms);
             }
         },
         {overworld}
@@ -168,7 +168,7 @@ void order_compote_du_fils(
     // We start this function when we enter the restaurant without pressing any button.
 
     // Se we first press A to clear a dialog:
-    pbf_press_button(context, BUTTON_A, 30, 100);
+    pbf_press_button(context, BUTTON_A, 240ms, 800ms);
 
     bool paid = false;
     bool eating = false;
@@ -192,11 +192,11 @@ void order_compote_du_fils(
             if (paid){
                 // This is a dialog box after we have paid the food.
                 // Mash A to clear any remaining dialog before a very long eating animation.
-                pbf_mash_button(context, BUTTON_A, 300);
+                pbf_mash_button(context, BUTTON_A, 2400ms);
                 context.wait_for_all_requests();
                 eating = true;
             }else{
-                pbf_press_button(context, BUTTON_A, 30, 100);
+                pbf_press_button(context, BUTTON_A, 240ms, 800ms);
             }
             break;
         case 1:
@@ -206,12 +206,12 @@ void order_compote_du_fils(
             break;
         case 2:
             stream.log("Detected the dish we want.");
-            pbf_press_button(context, BUTTON_A, 30, 100);
+            pbf_press_button(context, BUTTON_A, 240ms, 800ms);
             break;
         case 3:
             stream.log("Detected the payment prompt.");
             stream.overlay().add_log("Pay dish", COLOR_WHITE);
-            pbf_press_button(context, BUTTON_A, 30, 100);
+            pbf_press_button(context, BUTTON_A, 240ms, 800ms);
             paid = true;
             break;
         default:
@@ -228,7 +228,7 @@ void order_compote_du_fils(
             stream, context,
             [](ProControllerContext& context){
                 for(int i = 0; i < 60; i++){
-                    pbf_press_button(context, BUTTON_A, 25, 100);
+                    pbf_press_button(context, BUTTON_A, 200ms, 800ms);
                 }
             },
             {{dialog_watcher}}
@@ -242,8 +242,8 @@ void order_compote_du_fils(
     }
 
     // Now leaving the restaurant
-    pbf_mash_button(context, BUTTON_B, 90);
-    pbf_wait(context, 100);
+    pbf_mash_button(context, BUTTON_B, 720ms);
+    pbf_wait(context, 800ms);
     while(true){
         context.wait_for_all_requests();
 
@@ -255,7 +255,7 @@ void order_compote_du_fils(
             {dialog_watcher, overworld}
         );
         if (ret == 0){
-            pbf_press_button(context, BUTTON_A, 30, 100);
+            pbf_press_button(context, BUTTON_A, 240ms, 800ms);
             continue;
         }else if (ret == 1){
             return; // outside restaurant
@@ -278,7 +278,7 @@ void picnic_at_zero_gate(
     pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
     // Move right to make player character facing away from Aera Zero observation station
-    pbf_move_left_joystick(context, 255, 32, 400ms, 400ms);
+    pbf_move_left_joystick_old(context, 255, 32, 400ms, 400ms);
     // Press L to move camera to face the same direction as the player character
     pbf_press_button(context, BUTTON_L, 400ms, 320ms);
     // Move forward
@@ -552,13 +552,13 @@ void check_basket_to_collect_eggs(
             if (last_prompt != 0){
                 stream.log("Detected 2nd consecutive prompt. (unexpected)", COLOR_RED);
                 //  Repeat the previous button press.
-                pbf_press_button(context, last_prompt, 20, 80);
+                pbf_press_button(context, last_prompt, 160ms, 640ms);
                 continue;
             }
 
             if (pending_refuse){
                 stream.log("Confirming refused egg...");
-                pbf_press_button(context, BUTTON_A, 20, 80);
+                pbf_press_button(context, BUTTON_A, 160ms, 640ms);
                 pending_refuse = false;
                 continue;
             }
@@ -569,13 +569,13 @@ void check_basket_to_collect_eggs(
                 std::string msg = std::to_string(num_eggs_collected) + "/" + std::to_string(max_eggs);
                 stream.log("Found an egg " + msg + ". Keeping...");
                 stream.overlay().add_log("Egg " + msg, COLOR_GREEN);
-                pbf_press_button(context, BUTTON_A, 20, 80);
+                pbf_press_button(context, BUTTON_A, 160ms, 640ms);
                 
                 last_prompt = BUTTON_A;
             }else{
                 stream.log("Found an egg! But we already have enough...");
                 stream.overlay().add_log("Full. Skip egg.", COLOR_WHITE);
-                pbf_press_button(context, BUTTON_B, 20, 80);
+                pbf_press_button(context, BUTTON_B, 160ms, 640ms);
                 last_prompt = BUTTON_B;
                 pending_refuse = true;
             }
@@ -729,7 +729,7 @@ void hatch_eggs_at_area_three_lighthouse(
                 stream.log("Reset location by flying back to lighthouse.");
                 // Use map to fly back to the flying spot
                 open_map_from_overworld(info, stream, context);
-                pbf_move_left_joystick(context, 200, 0, 160ms, 400ms);
+                pbf_move_left_joystick_old(context, 200, 0, 160ms, 400ms);
                 fly_to_overworld_from_map(info, stream, context);
                 continue;
             }
@@ -785,7 +785,7 @@ void reset_position_at_zero_gate(
     // Use map to fly back to the flying spot
     open_map_from_overworld(info, stream, context);
 
-    pbf_move_left_joystick(context, 128, 160, 160ms, 400ms);
+    pbf_move_left_joystick_old(context, 128, 160, 160ms, 400ms);
 
     fly_to_overworld_from_map(info, stream, context);
 }

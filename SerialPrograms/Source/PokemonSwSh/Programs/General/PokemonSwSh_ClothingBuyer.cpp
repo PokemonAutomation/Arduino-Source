@@ -46,17 +46,17 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     }else{
-        pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+        pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
     }
 
     while (true){
-        pbf_press_button(context, BUTTON_A, 10, 90);
+        pbf_press_button(context, BUTTON_A, 80ms, 720ms);
         if (CATEGORY_ROTATION){
-            pbf_press_dpad(context, DPAD_RIGHT, 10, 40);
+            pbf_press_dpad(context, DPAD_RIGHT, 80ms, 320ms);
         }
-        pbf_press_button(context, BUTTON_A, 10, 90);
-        pbf_press_button(context, BUTTON_A, 10, 90);
-        pbf_press_dpad(context, DPAD_DOWN, 10, 40);
+        pbf_press_button(context, BUTTON_A, 80ms, 720ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 720ms);
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 320ms);
     }
 }
 

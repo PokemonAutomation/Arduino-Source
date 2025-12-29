@@ -73,7 +73,7 @@ ShinyHunt_WildZoneEntrance_Descriptor::ShinyHunt_WildZoneEntrance_Descriptor()
         "Programs/PokemonLZA/ShinyHunt-WildZoneEntrance.html",
         "Shiny hunt by repeatedly entering Wild Zone from its entrance.",
         ProgramControllerClass::StandardController_NoRestrictions, FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS, {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class ShinyHunt_WildZoneEntrance_Descriptor::Stats : public StatsTracker{
@@ -179,7 +179,7 @@ void go_to_entrance(
         starting_direction = get_facing_direction(env.console, context);
         joystick_x = 145;
     }
-    int ret = run_towards_wild_zone_gate(env.console, context, joystick_x, 0, 10s);
+    int ret = run_towards_gate_with_A_button(env.console, context, joystick_x, 0, 10s);
     switch(ret){
     case 0: // detected button A. Reached gate
         break;
@@ -188,7 +188,7 @@ void go_to_entrance(
             get_angle_between_facing_directions(starting_direction, get_facing_direction(env.console, context)) > 2.5){
             joystick_x = 128; // we've already turned. Just need to go forward to enter the zone
         }
-        ret = run_towards_wild_zone_gate(env.console, context, joystick_x, 0, 10s);
+        ret = run_towards_gate_with_A_button(env.console, context, joystick_x, 0, 10s);
         if (ret != 0){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
@@ -321,7 +321,7 @@ void leave_zone_and_reset_spawns(
     
     const double starting_direction = get_facing_direction(env.console, context);
 
-    int ret = run_towards_wild_zone_gate(env.console, context, 128, 255, walk_time_in_zone);
+    int ret = run_towards_gate_with_A_button(env.console, context, 128, 255, walk_time_in_zone);
     switch (ret){
     case 0: // Found button A. Reached the gate.
         break;
@@ -352,7 +352,7 @@ void leave_zone_and_reset_spawns(
             }
 
             // Running forward or backward depends on character facing to go back to zone entrance
-            ret = run_towards_wild_zone_gate(env.console, context, 128, joystick_y, walk_time_in_zone);
+            ret = run_towards_gate_with_A_button(env.console, context, 128, joystick_y, walk_time_in_zone);
             if (ret != 0){
                 stats.errors++;
                 env.update_stats();

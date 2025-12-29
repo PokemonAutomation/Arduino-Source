@@ -46,6 +46,8 @@ public:
 
 public:
     ImageRGB32 copy() const;
+    // Call QImage::save() to save image to file. Return whether the save is successful.
+    // If the path includes nonexistent folders, save() will create it first.
     bool save(const std::string& path) const;
     ImageRGB32 scale_to(size_t width, size_t height) const;
 

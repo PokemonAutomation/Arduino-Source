@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 
 
 
-class StaticTextOption : public ConfigOption{
+class StaticTextOption : public ConfigOptionImpl<StaticTextOption>{
 public:
     ~StaticTextOption();
     StaticTextOption(std::string label, bool text_wrapping = true);
@@ -28,7 +28,6 @@ public:
 
     virtual void restore_defaults() override{}
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     struct Data;
@@ -37,7 +36,7 @@ private:
 
 
 
-class SectionDividerOption : public ConfigOption{
+class SectionDividerOption : public ConfigOptionImpl<SectionDividerOption>{
 public:
     ~SectionDividerOption();
     SectionDividerOption(std::string label, bool text_wrapping = true);
@@ -51,7 +50,6 @@ public:
 
     virtual void restore_defaults() override{}
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     struct Data;

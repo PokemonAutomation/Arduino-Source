@@ -131,9 +131,9 @@ bool PokePortalDetector::move_cursor(
 
         int diff = (7 + current - row) % 7;
         if (diff < 4){
-            pbf_press_dpad(context, DPAD_UP, 20, 10);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 80ms);
         }else{
-            pbf_press_dpad(context, DPAD_DOWN, 20, 10);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 80ms);
         }
     }
 }

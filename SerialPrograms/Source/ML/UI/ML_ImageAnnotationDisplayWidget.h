@@ -62,6 +62,8 @@ public:
     //  Shortkey implemented:
     //  - z: move to the previous image in current image folder
     //  - x: move to the next image in current image folder
+    //  - Shift+Z: move back 10 images in current image folder
+    //  - Shift+X: move forward 10 images in current image folder
     virtual void key_release(QKeyEvent* event) override;
 
     //  Overwrites CommandReceiver::focus_in().
@@ -95,6 +97,8 @@ private:
     ImageAnnotationSourceSelectorWidget* m_selector_widget;
 
     CommandReceiver* m_command_receiver;
+
+    bool m_shift_pressed = false;
 };
 
 

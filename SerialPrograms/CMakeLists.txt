@@ -162,7 +162,10 @@ else()
     target_sources(SerialPrograms PRIVATE ../IconResource/IconResource.rc)
 endif()
 
-target_link_libraries(SerialPrograms PRIVATE SerialProgramsLib)
+target_link_libraries(
+    SerialPrograms PRIVATE
+    $<LINK_LIBRARY:WHOLE_ARCHIVE,SerialProgramsLib>
+)
 
 # Add source code exclusive to the internal repo and add C++ macro of official release
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../Internal/SerialPrograms/Internal0.cpp")
@@ -273,7 +276,7 @@ if (WIN32)
     )
 
     add_library(discord_lib IMPORTED UNKNOWN)
-    target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/discord_social_sdk_win/)
+    target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/discord_social_sdk/)
     set_target_properties(discord_lib PROPERTIES
         IMPORTED_LOCATION_RELEASE           ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/discord_social_sdk_win/lib/release/discord_partner_sdk.lib
         IMPORTED_LOCATION_DEBUG             ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/discord_social_sdk_win/lib/debug/discord_partner_sdk.lib
@@ -450,7 +453,7 @@ else() # macOS and Linux
         target_link_libraries(SerialProgramsLib PUBLIC ${LEPTONICA_LINK_LIBRARIES})
     endif()
 
-    pkg_search_module(DPP dpp=10.0.22)
+    pkg_search_module(DPP dpp=10.0.28)
     if (DPP_FOUND) # enable dpp integration
         target_compile_definitions(SerialProgramsLib PUBLIC PA_DPP)
         ## to build against headers within this repo and properly set flags ##
@@ -461,6 +464,28 @@ else() # macOS and Linux
     endif()
 
     if (APPLE)
+        set(DISCORD_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_mac.zip")
+        set(DISCORD_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_mac")
+        set(DISCORD_LIB_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_mac/lib/release/libdiscord_partner_sdk.dylib")
+    else()
+        set(DISCORD_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_linux.zip")
+        set(DISCORD_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_linux")
+        set(DISCORD_LIB_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_linux/lib/release/libdiscord_partner_sdk.so")
+    endif()
+
+    if (NOT EXISTS "${DISCORD_DIR}")
+        message(STATUS "Discord SDK not found, extracting from zip...")
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} -E tar xf "${DISCORD_ZIP}"
+            WORKING_DIRECTORY "${REPO_ROOT_DIR}/3rdPartyBinaries"
+        )
+    endif()
+
+    target_compile_definitions(SerialProgramsLib PUBLIC PA_SOCIAL_SDK)
+    target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/discord_social_sdk/)
+    target_link_libraries(SerialProgramsLib PRIVATE ${DISCORD_LIB_RELEASE})
+
+    if(APPLE)
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
         # on macOS, need this framework to query OS API to control display sleep and system sleep behavior
         target_link_libraries(SerialProgramsLib PRIVATE "-framework IOKit -framework CoreFoundation")

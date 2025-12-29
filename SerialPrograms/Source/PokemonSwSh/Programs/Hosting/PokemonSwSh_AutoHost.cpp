@@ -172,10 +172,10 @@ void run_autohost(
         }
         if (!code.empty()){
             env.log("Next Raid Code: " + code);
-            pbf_press_button(context, BUTTON_PLUS, 5, 145);
+            pbf_press_button(context, BUTTON_PLUS, 40ms, 1160ms);
             FastCodeEntry::numberpad_enter_code(console, context, code, true);
-            pbf_wait(context, 180);
-            pbf_press_button(context, BUTTON_A, 5, 95);
+            pbf_wait(context, 1440ms);
+            pbf_press_button(context, BUTTON_A, 40ms, 760ms);
         }
         context.wait_for_all_requests();
 
@@ -200,7 +200,7 @@ void run_autohost(
     );
 
     //  Start Raid
-    pbf_press_dpad(context, DPAD_UP, 5, 45);
+    pbf_press_dpad(context, DPAD_UP, 40ms, 360ms);
 
     //  Mash A until it's time to close the game.
     if (console.video().snapshot()){
@@ -226,25 +226,25 @@ void run_autohost(
     //  Select a move.
     if (move_slot > 0){
         pbf_wait(context, delay_to_select_move);
-        pbf_press_button(context, BUTTON_A, 20, 80);
+        pbf_press_button(context, BUTTON_A, 160ms, 640ms);
         if (dynamax){
             pbf_press_dpad(context, DPAD_LEFT, 160ms, 240ms);
-            pbf_press_button(context, BUTTON_A, 20, 60);
+            pbf_press_button(context, BUTTON_A, 160ms, 480ms);
         }
         for (uint8_t c = 1; c < move_slot; c++){
             pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
         }
-        pbf_press_button(context, BUTTON_A, 20, 80);
+        pbf_press_button(context, BUTTON_A, 160ms, 640ms);
 
         // Disable the troll hosting option if the dynamax is set to TRUE.
         if (!dynamax && troll_hosting > 0){
-            pbf_press_dpad(context, DPAD_DOWN, 20, 80);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 640ms);
             for (uint8_t c = 0; c < troll_hosting; c++){
-                pbf_press_dpad(context, DPAD_RIGHT, 20, 80);
+                pbf_press_dpad(context, DPAD_RIGHT, 160ms, 640ms);
             }
         }
 
-        pbf_press_button(context, BUTTON_A, 20, 980);
+        pbf_press_button(context, BUTTON_A, 160ms, 7840ms);
     }
 }
 

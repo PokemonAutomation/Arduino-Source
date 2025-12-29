@@ -93,6 +93,11 @@ void LabelImages_OverlayManager::update_rendered_annotations(){
         m_overlay_set.add(enum_to_color(m_program.CURRENT_DRAWN_BOX), {m_program.X, m_program.Y, m_program.WIDTH, m_program.HEIGHT});
     }
 
+    // If annotations are hidden, don't render them
+    if (m_program.m_annotations_hidden){
+        return;
+    }
+
     const auto& annotations = m_program.m_annotations;
     const size_t& m_selected = m_program.m_selected_obj_idx;
 

@@ -167,7 +167,7 @@ void attach_item_from_box(
                     return;
                 }
                 attach_attempted = false;
-                pbf_press_button(context, BUTTON_A, 20, 20);
+                pbf_press_button(context, BUTTON_A, 160ms, 160ms);
                 expected = 1;
                 continue;
             }else{
@@ -196,7 +196,7 @@ void attach_item_from_box(
                 errors++;
             }
 
-            pbf_press_dpad(context, DPAD_DOWN, 20, 20);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
             pbf_press_button(context, BUTTON_A, 160ms, 240ms);
 
             expected = 3;

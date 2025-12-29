@@ -83,7 +83,7 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         pbf_press_button(context, BUTTON_L, 240ms, 80ms);
         pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
         pbf_move_left_joystick(context, {-1, 0}, 1040ms, 400ms);
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms);
 
         // now in elevator
         mash_button_till_overworld(env.console, context, BUTTON_A);
@@ -91,12 +91,12 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         pbf_move_left_joystick(context, {+1, 0}, 560ms, 400ms);
 
         // talk to the AI professor
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         // put the book in the machine
-        pbf_press_button(context, BUTTON_L, 30, 10);
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
+        pbf_press_button(context, BUTTON_L, 240ms, 80ms);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10000ms);
 
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 120, {CallbackEnum::BATTLE, CallbackEnum::PROMPT_DIALOG, CallbackEnum::DIALOG_ARROW});
@@ -122,17 +122,17 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE_DIALOG_ARROW, 120, {CallbackEnum::DIALOG_ARROW}, false);
 
-        pbf_mash_button(context, BUTTON_A, 50);
+        pbf_mash_button(context, BUTTON_A, 400ms);
 
 
         wait_for_gradient_arrow(env.program_info(), env.console, context, {0.75, 0.62, 0.05, 0.35}, 30);
 
-        pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-        pbf_mash_button(context, BUTTON_A, 20);
+        pbf_press_dpad(context, DPAD_DOWN, 104ms, 160ms);
+        pbf_mash_button(context, BUTTON_A, 160ms);
 
         pbf_wait(context, 1000ms);
-        pbf_press_dpad(context, DPAD_UP, 13, 20);
-        pbf_mash_button(context, BUTTON_A, 500);
+        pbf_press_dpad(context, DPAD_UP, 104ms, 160ms);
+        pbf_mash_button(context, BUTTON_A, 4000ms);
 
         env.console.log("Battle AI Professor's Koraidon/Miraidon.");
         SinglesMoveEntry move4{SinglesMoveType::Move4, false}; // Koraidon/Miraidon: Tera Blast
@@ -156,7 +156,7 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
             env.console, context,
             [](ProControllerContext& context){
                 for (int i = 0; i < 10; i++){
-                    pbf_press_button(context, BUTTON_X, 20, 250);
+                    pbf_press_button(context, BUTTON_X, 160ms, 2000ms);
                 }
             },
             {tutorial}

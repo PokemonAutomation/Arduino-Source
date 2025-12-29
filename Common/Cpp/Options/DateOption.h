@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 
 
 
-class DateTimeCell : public ConfigOption{
+class DateTimeCell : public ConfigOptionImpl<DateTimeCell>{
 public:
     enum Level{
         DATE,
@@ -44,6 +44,7 @@ public:
     virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
 
+
 public:
     static DateTime from_json(const JsonValue& json);
     static JsonValue to_json(const DateTime& date);
@@ -51,10 +52,10 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     bool is_valid(const DateTime& date) const;
+
 
 private:
     const Level m_level;
@@ -67,7 +68,7 @@ private:
 };
 
 
-class DateTimeOption : public DateTimeCell{
+class DateTimeOption : public ConfigOptionImpl<DateTimeOption, DateTimeCell>{
 public:
     DateTimeOption(
         std::string label,
@@ -79,7 +80,6 @@ public:
 
     const std::string& label() const{ return m_label; }
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     const std::string m_label;

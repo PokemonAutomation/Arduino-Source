@@ -111,8 +111,8 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         DirectionDetector direction;
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 50});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 50});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 400ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 400ms});
         }
 
         direction.change_direction(env.program_info(), env.console, context, 0.696613);
@@ -165,7 +165,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 direction.change_direction(env.program_info(), env.console, context, 0.261697);
                 pbf_move_left_joystick(context, {0, +1}, 80ms, 400ms);
                 
-                walk_forward_while_clear_front_path(env.program_info(), env.console, context, 100);
+                walk_forward_while_clear_front_path(env.program_info(), env.console, context, 800ms);
                 walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A);
             }
         );
@@ -182,13 +182,13 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
                 direction.change_direction(env.program_info(), env.console, context, 0.611062);
                 pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
 
                 direction.change_direction(env.program_info(), env.console, context, 5.550472);
-                pbf_move_left_joystick(context, 128, 0, 300, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 5.860926);
@@ -196,74 +196,74 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
                 direction.change_direction(env.program_info(), env.console, context, 4.920249);
                 pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 0.402877);
-                pbf_move_left_joystick(context, 128, 0, 300, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 5.707655);
                 pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 5.394366);
                 pbf_move_left_joystick(context, {0, +1}, 3200ms, 400ms);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 0.979935);
                 pbf_move_left_joystick(context, {0, +1}, 4000ms, 400ms);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context,  1.552260);
-                pbf_move_left_joystick(context, 128, 0, 300, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 direction.change_direction(env.program_info(), env.console, context, 1.869166);
                 pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
 
                 direction.change_direction(env.program_info(), env.console, context, 0.769966);
-                pbf_move_left_joystick(context, 128, 0, 300, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
                 
 
                 direction.change_direction(env.program_info(), env.console, context, 6.127338);
-                pbf_move_left_joystick(context, 128, 0, 300, 50);
-                pbf_press_button(context, BUTTON_R, 20, 20);
+                pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);
+                pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 pbf_wait(context, wait);
 
 
                 try {
                     direction.change_direction(env.program_info(), env.console, context, 1.451616);
                     pbf_move_left_joystick(context, {0, +1}, 4000ms, 400ms);
-                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                     pbf_wait(context, wait);
                     
 
                     direction.change_direction(env.program_info(), env.console, context, 2.023052);
                     pbf_move_left_joystick(context, {0, +1}, 4000ms, 400ms);
-                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                     pbf_wait(context, wait);
                     
 
                     direction.change_direction(env.program_info(), env.console, context, 1.13517);
-                    pbf_move_left_joystick(context, 128, 0, 1000, 50);
-                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_move_left_joystick(context, {0, +1}, 8000ms, 400ms);
+                    pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                     pbf_wait(context, wait);
                     
                     direction.change_direction(env.program_info(), env.console, context, 0.609735);
                     pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
-                    pbf_press_button(context, BUTTON_R, 20, 20);
+                    pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                     pbf_wait(context, wait);
                 }catch (OperationFailedException&){
                     env.console.log("Failed to change direction, but it's possibly due to clearing the challenge.");
@@ -275,7 +275,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
                 // direction.change_direction(env.program_info(), env.console, context, 0);
                 // pbf_move_left_joystick(context, 128, 0, 00, 50);
-                // pbf_press_button(context, BUTTON_R, 20, 20);
+                // pbf_press_button(context, BUTTON_R, 160ms, 160ms);
                 // pbf_wait(context, wait);
 
 
@@ -305,11 +305,11 @@ void checkpoint_70(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     [&](size_t attempt_number){
         context.wait_for_all_requests();
         // fly back to North Province Area Three
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0}, FlyPoint::POKECENTER);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, FlyPoint::POKECENTER);
 
         // fly back to Glaseado Mountain Pokecenter
         // this clears Pokemon in minimap
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, 0, 0}, FlyPoint::POKECENTER);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, 0, 0ms}, FlyPoint::POKECENTER);
 
         move_from_glaseado_mountain_to_montenevera(env, context);
 
@@ -323,7 +323,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
 
     // marker 1         {0.745313, 0.637037}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.745313, 0.637037}
     );
@@ -341,7 +341,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
     
     // marker 2       x=0.225521, y=0.380556. {0.229687, 0.37037}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 255, 0, 50}, 
+        {ZoomChange::KEEP_ZOOM, 255, 0, 400ms},
         FlyPoint::POKECENTER, 
         {0.229687, 0.37037}
     );
@@ -359,7 +359,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
 
     // marker 3       x=0.396354, y=0.69537.  x=0.396875, y=0.725926
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 255, 200, 50}, 
+        {ZoomChange::KEEP_ZOOM, 255, 200, 400ms},
         FlyPoint::POKECENTER, 
         {0.396875, 0.725926}
     );
@@ -377,7 +377,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
 
     // marker 4       (0.409896, 0.65)
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.409896, 0.65}
     );
@@ -396,7 +396,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
     
     // marker 5        {0.509896, 0.639815}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.509896, 0.639815}
     );
@@ -414,7 +414,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
 
     // marker 6         {0.508333, 0.566667}   {0.521875, 0.483333}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_IN, 128, 255, 20}, 
+        {ZoomChange::ZOOM_IN, 128, 255, 160ms},
         FlyPoint::POKECENTER, 
         {0.508333, 0.566667}
     );
@@ -432,7 +432,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
 
     // marker 7         {0.508333, 0.566667}   {0.521875, 0.483333}  {0.529687, 0.483333}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_IN, 0, 0, 0}, 
+        {ZoomChange::ZOOM_IN, 0, 0, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.529687, 0.483333}
     );

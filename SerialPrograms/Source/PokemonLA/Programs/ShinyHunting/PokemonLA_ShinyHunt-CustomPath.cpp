@@ -179,7 +179,7 @@ void ShinyHuntCustomPath::do_non_listen_action(
         break;
     }
     case PathAction::CENTER_CAMERA:{
-        pbf_mash_button(context, BUTTON_ZL, 200);
+        pbf_mash_button(context, BUTTON_ZL, 1600ms);
         break;
     }
     case PathAction::JUMP:{
@@ -261,7 +261,7 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, ProContro
     ShinyHuntCustomPath_Descriptor::Stats& stats = env.current_stats<ShinyHuntCustomPath_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     if (TEST_PATH){
         // Run the test path immediately

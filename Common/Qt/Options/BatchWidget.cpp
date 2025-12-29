@@ -11,10 +11,9 @@
 namespace PokemonAutomation{
 
 
+template class RegisterConfigWidget<BatchWidget>;
 
-ConfigWidget* BatchOption::make_QtWidget(QWidget& parent){
-    return new BatchWidget(parent, *this);
-}
+
 
 
 
@@ -38,7 +37,7 @@ BatchWidget::BatchWidget(QWidget& parent, BatchOption& value)
     }
 
     for (auto& item : value.options()){
-        m_options.emplace_back(item->make_QtWidget(parent));
+        m_options.emplace_back(ConfigWidget::make_from_option(*item, &parent));
         if (value.horizontal()){
             m_options.back()->widget().setContentsMargins(3, 0, 3, 0);
         }else{

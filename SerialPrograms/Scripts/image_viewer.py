@@ -130,7 +130,8 @@ class ImageViewer:
 		
 		crop_stddev = np.sqrt(  np.clip(crop_sqr_sum - (np.square(crop_sum) / num_pixels), 0, None) / (num_pixels-1))
 
-		avg_sum = np.sum(crop_avg)
+		# [0:3] to remove alpha channel
+		avg_sum = np.sum(crop_avg[0:3])
 		avg_ratio = [1/3., 1/3., 1/3.] if avg_sum == 0. else crop_avg / avg_sum
 		avg_ratio = np.array([avg_ratio[2], avg_ratio[1], avg_ratio[0]])
 		x = rect[0] / self.width

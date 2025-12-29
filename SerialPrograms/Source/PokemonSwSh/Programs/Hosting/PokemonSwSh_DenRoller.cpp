@@ -106,9 +106,9 @@ DenRoller::DenRoller()
 
 void DenRoller::ring_bell(ProControllerContext& context, int count) const{
     for (int c = 0; c < count; c++){
-        pbf_press_button(context, BUTTON_LCLICK, 5, 10);
+        pbf_press_button(context, BUTTON_LCLICK, 40ms, 80ms);
     }
-    pbf_wait(context, 200);
+    pbf_wait(context, 1600ms);
 }
 
 void DenRoller::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -117,7 +117,7 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
         ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 160ms);
     }
 

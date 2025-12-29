@@ -8,6 +8,7 @@
 #include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ImageResolution.h"
+#include "StaticRegistration.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "VideoPipeline/Backends/MediaServicesQt6.h"
 #include "Globals.h"
@@ -159,8 +160,10 @@ int main(int argc, char *argv[]){
     set_program_path(argv[0]);
 #endif
 
-    setup_crash_handler();
+    //  So far, this is only needed on Mac where static initialization is fucked up.
+    PokemonAutomation::register_all_statics();
 
+    setup_crash_handler();
 
     int ret = run_program(argc, argv);
 

@@ -13,7 +13,7 @@
 namespace PokemonAutomation{
 
 
-class FixedCodeOption : public ConfigOption{
+class FixedCodeOption : public ConfigOptionImpl<FixedCodeOption>{
 public:
     ~FixedCodeOption();
     FixedCodeOption(
@@ -38,7 +38,6 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     struct Data;

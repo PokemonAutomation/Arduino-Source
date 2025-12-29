@@ -153,22 +153,22 @@ bool StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, ProController
     switch (TARGET){
     case Target::TreasuresOfRuin:
         //~30 seconds to start battle?
-        pbf_mash_button(context, BUTTON_A, 3250);
+        pbf_mash_button(context, BUTTON_A, 26000ms);
         context.wait_for_all_requests();
         break;
     case Target::LoyalThree:
         //Mash through dialog box
-        pbf_mash_button(context, BUTTON_B, 1300);
+        pbf_mash_button(context, BUTTON_B, 10400ms);
         context.wait_for_all_requests();
         break;
     case Target::Snacksworth:
         //The same as generic, but Snacksworth legendaries are not in the dex and skip the caught/summary/add to party menu.
-        pbf_mash_button(context, BUTTON_B, 250);
+        pbf_mash_button(context, BUTTON_B, 2000ms);
         context.wait_for_all_requests();
         break;
     case Target::Generic:
         //Mash A to initiate battle
-        pbf_mash_button(context, BUTTON_A, 90);
+        pbf_mash_button(context, BUTTON_A, 720ms);
         context.wait_for_all_requests();
         break;
     default:
@@ -220,7 +220,7 @@ void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, ProControll
         }
 
         //Mash B to exit anything else
-        pbf_mash_button(context, BUTTON_B, 125);
+        pbf_mash_button(context, BUTTON_B, 1000ms);
         context.wait_for_all_requests();
 
         //Press X to open Ball menu
@@ -299,14 +299,14 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
 
                     //Throw ball
                     env.log("Throwing Quick Ball.");
-                    pbf_mash_button(context, BUTTON_A, 150);
+                    pbf_mash_button(context, BUTTON_A, 1200ms);
                     context.wait_for_all_requests();
 
                     quickball_thrown = true;
 
                     stats.balls++;
                     env.update_stats();
-                    pbf_mash_button(context, BUTTON_B, 900);
+                    pbf_mash_button(context, BUTTON_B, 7200ms);
                     context.wait_for_all_requests();
                 }else if (switch_party_slot == 1 && !move_table.empty() && table_turn < move_table.size()){
                     //Lead pokemon not fainted and table has not been completed
@@ -339,7 +339,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
                     env.console, context,
                     [&](ProControllerContext& context){
                         pbf_press_button(context, BUTTON_A, 80ms, 400ms);
-                        pbf_wait(context, 100);
+                        pbf_wait(context, 800ms);
                         context.wait_for_all_requests();
                     },
                     { move_watcher }
@@ -352,8 +352,8 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
 
                     context.wait_for_all_requests();
                     move_select.move_to_slot(env.console, context, move_slot);
-                    pbf_mash_button(context, BUTTON_A, 150);
-                    pbf_wait(context, 100);
+                    pbf_mash_button(context, BUTTON_A, 1200ms);
+                    pbf_wait(context, 800ms);
                     context.wait_for_all_requests();
                     table_turn++;
 
@@ -404,7 +404,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
 
                     //Throw ball
                     env.log("Throwing selected ball.");
-                    pbf_mash_button(context, BUTTON_A, 150);
+                    pbf_mash_button(context, BUTTON_A, 1200ms);
                     context.wait_for_all_requests();
 
                     //Check for battle menu
@@ -418,13 +418,13 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
                     );
                     if (ret == 0){
                         env.console.log("Battle menu detected early. Using first attack.");
-                        pbf_mash_button(context, BUTTON_A, 250);
+                        pbf_mash_button(context, BUTTON_A, 2000ms);
                         context.wait_for_all_requests();
                     }else{
                         //Wild pokemon's turn/wait for catch animation
                         stats.balls++;
                         env.update_stats();
-                        pbf_mash_button(context, BUTTON_B, 900);
+                        pbf_mash_button(context, BUTTON_B, 7200ms);
                         context.wait_for_all_requests();
                     }
                 }
@@ -612,7 +612,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             int retOver = run_until<ProControllerContext>(
                 env.console, context,
                 [](ProControllerContext& context){
-                    pbf_mash_button(context, BUTTON_B, 10000);
+                    pbf_mash_button(context, BUTTON_B, 80000ms);
                 },
                 { overworld }
                 );

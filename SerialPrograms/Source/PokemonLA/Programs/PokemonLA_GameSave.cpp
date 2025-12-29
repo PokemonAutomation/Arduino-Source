@@ -68,7 +68,7 @@ bool save_game_from_overworld(
     stream.overlay().add_log("Saving game...", COLOR_WHITE);
 
     // Press DPAD_UP to open menu
-    pbf_press_dpad(context, DPAD_UP, 20, 120);
+    pbf_press_dpad(context, DPAD_UP, 160ms, 960ms);
     context.wait_for_all_requests();
     auto snapshot = stream.video().snapshot();
     if (save_tab_disabled(snapshot)){
@@ -85,7 +85,7 @@ bool save_game_from_overworld(
             found = true;
             break;
         }
-        pbf_press_button(context, BUTTON_ZR, 20, 80);
+        pbf_press_button(context, BUTTON_ZR, 160ms, 640ms);
         context.wait_for_all_requests();
         snapshot = stream.video().snapshot();
     }

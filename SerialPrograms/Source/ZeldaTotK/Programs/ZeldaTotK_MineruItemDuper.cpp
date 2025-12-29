@@ -24,8 +24,7 @@ MineruItemDuper_Descriptor::MineruItemDuper_Descriptor()
         "Use the Mineru Menu Sort glitch to duplicate items.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 
@@ -126,7 +125,7 @@ void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, ProController
                 pbf_press_button(context, BUTTON_A, 80ms, 80ms);
             }
         }else{
-            pbf_wait(context, 250);
+            pbf_wait(context, 2000ms);
         }
 
         // increment stats

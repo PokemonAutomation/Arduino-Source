@@ -91,13 +91,19 @@ public:
         Detector::make_overlays(items);
     }
 
+    // Pull the two overloaded functions of process_frame() from base class VisualInferenceCallback
+    // So that the user of `DetectorToFinder()` can use process_frame(const VideoSnapshot& frame) along
+    // side process_frame(const ImageViewRGB32& frame, WallClock timestamp) overridden below.
+    // If we don't have this declaration, user of DetectorToFinder can only see the single overridden
+    // `process_frame()` defined below.
+    using VisualInferenceCallback::process_frame;
+
     //  If m_finder_type is PRESENT, return true only when it is consecutively detected for the duration.
     //  If m_finder_type is GONE, return true only when it is consecutively not detected for the duration.
     //  If m_finder_type is CONSISTENT, return true when it is consecutively detected, or consecutively not detected
     //    for the duration.
     //  Before returning True, this->commit_state() is called to lock-in the detection result if lock-in mechanism
     //    is implemented.
-    using VisualInferenceCallback::process_frame;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override{
         switch (m_finder_type){
         case FinderType::PRESENT:

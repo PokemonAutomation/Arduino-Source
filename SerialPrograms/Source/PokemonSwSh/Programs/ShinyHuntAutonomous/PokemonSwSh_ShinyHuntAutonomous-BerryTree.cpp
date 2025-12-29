@@ -85,7 +85,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
     }
 
     ShinyHuntTracker& stats = env.current_stats<ShinyHuntTracker>();
@@ -105,7 +105,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
 //        home_to_date_time(context, true, true);
 //        neutral_date_skip(context);
 //        settings_to_enter_game(context, true);
-        pbf_mash_button(context, BUTTON_B, 90);
+        pbf_mash_button(context, BUTTON_B, 720ms);
         context.wait_for_all_requests();
 
         {
@@ -161,8 +161,8 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
     pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
 
     home_to_date_time(env.console, context, false);
-    pbf_press_button(context, BUTTON_A, 5, 5);
-    pbf_press_button(context, BUTTON_A, 5, 10);
+    pbf_press_button(context, BUTTON_A, 40ms, 40ms);
+    pbf_press_button(context, BUTTON_A, 40ms, 80ms);
     pbf_press_button(context, BUTTON_HOME, 80ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 
     if (!GO_HOME_WHEN_DONE){

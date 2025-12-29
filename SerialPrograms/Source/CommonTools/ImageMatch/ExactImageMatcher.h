@@ -16,7 +16,7 @@ namespace ImageMatch{
 
 //  Match images against a template image.
 //  Before matching, resize the input image to the template shape and scale template brightness to
-//  match the input image. Alpha channels as used as masks in matching.
+//  match the input image. The template alpha channel is used as masks in matching.
 //  No other treatment like tolerating translation or scaling based on stddevs, hence the name "Exact".
 class ExactImageMatcher{
     ExactImageMatcher(ExactImageMatcher&&) = default;

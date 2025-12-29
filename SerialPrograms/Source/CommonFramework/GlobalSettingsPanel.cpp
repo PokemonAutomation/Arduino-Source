@@ -90,6 +90,8 @@ void PreloadSettings::load(const JsonValue& json){
         debug_obj->read_boolean(DEBUG.COLOR_CHECK, "COLOR_CHECK");
         debug_obj->read_boolean(DEBUG.IMAGE_TEMPLATE_MATCHING, "IMAGE_TEMPLATE_MATCHING");
         debug_obj->read_boolean(DEBUG.IMAGE_DICTIONARY_MATCHING, "IMAGE_DICTIONARY_MATCHING");
+        debug_obj->read_integer(DEBUG.BOX_SYSTEM_CELL_ROW, "BOX_SYSTEM_CELL_ROW");
+        debug_obj->read_integer(DEBUG.BOX_SYSTEM_CELL_COL, "BOX_SYSTEM_CELL_COL");
     }
 }
 
@@ -397,6 +399,8 @@ JsonValue GlobalSettings::to_json() const{
     debug_obj["COLOR_CHECK"] = debug_settings.COLOR_CHECK;
     debug_obj["IMAGE_TEMPLATE_MATCHING"] = debug_settings.IMAGE_TEMPLATE_MATCHING;
     debug_obj["IMAGE_DICTIONARY_MATCHING"] = debug_settings.IMAGE_DICTIONARY_MATCHING;
+    debug_obj["BOX_SYSTEM_CELL_ROW"] = debug_settings.BOX_SYSTEM_CELL_ROW;
+    debug_obj["BOX_SYSTEM_CELL_COL"] = debug_settings.BOX_SYSTEM_CELL_COL;
     obj["DEBUG"] = std::move(debug_obj);
 
     return obj;

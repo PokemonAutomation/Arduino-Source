@@ -59,9 +59,9 @@ void trigger_menu(VideoStream& stream, ProControllerContext& context){
                 for (size_t c = 0; c < 42; c++){
                     pbf_controller_state(context, BUTTON_ZL, DPAD_NONE, {0, 0}, {0, 0}, 8ms);
                     pbf_controller_state(context, BUTTON_R | BUTTON_ZL, DPAD_NONE, {0, 0}, {0, 0}, 40ms);
-                    pbf_wait(context, 3);
+                    pbf_wait(context, 24ms);
                 }
-                pbf_wait(context, 125);
+                pbf_wait(context, 1000ms);
                 pbf_press_button(context, BUTTON_R, 160ms, 840ms);
             }
         },
@@ -121,8 +121,8 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProCont
     pbf_wait(context, 3000ms);
 
     //  Move to escalator.
-    pbf_press_dpad(context, DPAD_UP, 20, 125);
-    pbf_press_dpad(context, DPAD_UP, 20, 125);
+    pbf_press_dpad(context, DPAD_UP, 160ms, 1000ms);
+    pbf_press_dpad(context, DPAD_UP, 160ms, 1000ms);
     pbf_move_left_joystick(context, {+1, 0}, 2000ms, 5000ms);
 
     //  Re-enter escalator.

@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 
 
 
-class ColorCell : public ConfigOption{
+class ColorCell : public ConfigOptionImpl<ColorCell>{
 public:
     ColorCell(const ColorCell& x);
     ColorCell(
@@ -34,8 +34,6 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
     virtual void restore_defaults() override;
-
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 
 private:

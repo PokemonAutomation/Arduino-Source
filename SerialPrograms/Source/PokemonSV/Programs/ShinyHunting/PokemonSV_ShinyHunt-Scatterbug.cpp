@@ -422,7 +422,7 @@ void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& 
             use_lets_go_to_clear_in_front(console, context, *m_encounter_tracker, throw_ball_if_bubble, [&](ProControllerContext& context){
                 // Do the following movement while the Let's Go pokemon clearing wild pokemon.
                 // Slowly Moving forward
-                pbf_move_left_joystick(context, 128, 105, 800, 0);
+                pbf_move_left_joystick_old(context, 128, 105, 6400ms, 0ms);
             });
         }
     };

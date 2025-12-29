@@ -178,8 +178,8 @@ CramomaticRNG::CramomaticRNG()
 }
 
 void CramomaticRNG::navigate_to_party(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    pbf_press_button(context, BUTTON_X, 10, 125);
-    pbf_press_button(context, BUTTON_A, 20, 10);
+    pbf_press_button(context, BUTTON_X, 80ms, 1000ms);
+    pbf_press_button(context, BUTTON_A, 160ms, 80ms);
     pbf_wait(context, 2000ms);
 }
 
@@ -283,10 +283,10 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
 
 void CramomaticRNG::leave_to_overworld_and_interact(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     pbf_press_button(context, BUTTON_B, 2000ms, 40ms);
-    pbf_press_button(context, BUTTON_B, 10, 70);
+    pbf_press_button(context, BUTTON_B, 80ms, 560ms);
 
-    pbf_mash_button(context, BUTTON_A, 320);
-    pbf_wait(context, 125);
+    pbf_mash_button(context, BUTTON_A, 2560ms);
+    pbf_wait(context, 1000ms);
 }
 
 void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool sport){
@@ -307,16 +307,16 @@ void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, ProCont
 
     // select the apricorn(s)
     pbf_wait(context, 1000ms);
-    pbf_press_button(context, BUTTON_A, 10, 30);
+    pbf_press_button(context, BUTTON_A, 80ms, 240ms);
     if (sport){
-        pbf_press_dpad(context, DPAD_DOWN, 20, 10);
+        pbf_press_dpad(context, DPAD_DOWN, 160ms, 80ms);
     }
-    pbf_press_button(context, BUTTON_A, 10, 30);
-    pbf_press_button(context, BUTTON_A, 10, 30);
+    pbf_press_button(context, BUTTON_A, 80ms, 240ms);
+    pbf_press_button(context, BUTTON_A, 80ms, 240ms);
     if (sport){
-        pbf_press_dpad(context, DPAD_UP, 20, 10);
+        pbf_press_dpad(context, DPAD_UP, 160ms, 80ms);
     }
-    pbf_press_button(context, BUTTON_A, 10, 30);
+    pbf_press_button(context, BUTTON_A, 80ms, 240ms);
 
     pbf_mash_button(context, BUTTON_A, 5000ms);
 }
@@ -338,7 +338,7 @@ std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvi
 
     while (presses < 30 && !arrow_detected){
         presses++;
-        pbf_press_button(context, BUTTON_B, 10, 165);
+        pbf_press_button(context, BUTTON_B, 80ms, 1320ms);
         context.wait_for_all_requests();
 
         VideoSnapshot screen = env.console.video().snapshot();
@@ -402,7 +402,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             1600ms
         );
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
     }
 
     static const std::set<std::string> APRIBALLS{

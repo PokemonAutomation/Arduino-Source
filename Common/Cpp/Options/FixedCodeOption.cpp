@@ -17,6 +17,8 @@
 namespace PokemonAutomation{
 
 
+
+
 struct FixedCodeOption::Data{
     std::string m_label;
     const size_t m_digits;

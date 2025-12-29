@@ -71,7 +71,7 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env, ProControllerCont
     env.update_stats();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     Milliseconds box_scroll_delay = GameSettings::instance().BOX_SCROLL_DELAY0;
     Milliseconds box_change_delay = GameSettings::instance().BOX_CHANGE_DELAY0;
@@ -87,7 +87,7 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env, ProControllerCont
             pbf_press_dpad(context, DPAD_DOWN, 160ms, box_scroll_delay);
             pbf_press_dpad(context, DPAD_RIGHT, 160ms, box_scroll_delay);
             pbf_press_dpad(context, DPAD_RIGHT, 160ms, box_scroll_delay);
-            pbf_wait(context, 50);
+            pbf_wait(context, 400ms);
             pbf_press_button(context, BUTTON_R, 160ms, box_change_delay);
             release_box(context, box_scroll_delay);
             stats.m_boxes_released++;

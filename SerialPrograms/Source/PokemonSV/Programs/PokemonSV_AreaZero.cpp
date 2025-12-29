@@ -96,7 +96,7 @@ void inside_zero_gate_to_station(
 
     if (heal_at_station){
         stream.log("Moving to bed to heal.");
-        pbf_move_left_joystick(context, 144, 0, 4000ms, 0ms);
+        pbf_move_left_joystick_old(context, 144, 0, 4000ms, 0ms);
         ssf_press_left_joystick(context, {+1, 0}, 0ms, 1000ms);
         bool healed = false;
         while (true){
@@ -149,7 +149,7 @@ void inside_zero_gate_to_station(
             stream, context,
             [=](ProControllerContext& context){
                 if (heal_at_station){
-                    pbf_move_left_joystick(context, 96, 255, 60000ms, 0ms);
+                    pbf_move_left_joystick_old(context, 96, 255, 60000ms, 0ms);
                 }else{
                     pbf_move_left_joystick(context, {-1, -1}, 60000ms, 0ms);
                 }
@@ -187,7 +187,7 @@ void return_to_outside_zero_gate(
     VideoStream& stream, ProControllerContext& context
 ){
     open_map_from_overworld(info, stream, context);
-    pbf_move_left_joystick(context, 96, 96, 5, 50);
+    pbf_move_left_joystick_old(context, 96, 96, 40ms, 400ms);
     fly_to_overworld_from_map(info, stream, context);
 }
 void return_to_inside_zero_gate(
@@ -200,8 +200,8 @@ void return_to_inside_zero_gate(
     int ret = run_until<ProControllerContext>(
         stream, context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, 255, 32, 160ms, 840ms);
-            pbf_mash_button(context, BUTTON_L, 60);
+            pbf_move_left_joystick_old(context, 255, 32, 160ms, 840ms);
+            pbf_mash_button(context, BUTTON_L, 480ms);
             pbf_move_left_joystick(context, {0, +1}, 10000ms, 0ms);
         },
         {black_screen}
@@ -236,7 +236,7 @@ void return_to_inside_zero_gate_from_picnic(
         stream, context,
         [](ProControllerContext& context){
             pbf_move_left_joystick(context, {0, -1}, 800ms, 320ms);
-            pbf_mash_button(context, BUTTON_L, 60);
+            pbf_mash_button(context, BUTTON_L, 480ms);
             pbf_move_left_joystick(context, {0, +1}, 10000ms, 0ms);
         },
         {black_screen}
@@ -274,7 +274,7 @@ void inside_zero_gate_to_secret_cave_entrance(
 
     context.wait_for(std::chrono::seconds(3));
 
-    pbf_move_left_joystick(context, 0, 208, 30, 50);
+    pbf_move_left_joystick_old(context, 0, 208, 240ms, 400ms);
     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
 
@@ -304,9 +304,9 @@ void inside_zero_gate_to_secret_cave_entrance(
     ssf_press_button(context, BUTTON_B, 0ms, 160ms);        //  case one is dropped.
 
     pbf_move_left_joystick(context, {0, +1}, 2000ms, 0ms);
-    pbf_move_left_joystick(context, 112, 0, 2000ms, 0ms);
+    pbf_move_left_joystick_old(context, 112, 0, 2000ms, 0ms);
     pbf_move_left_joystick(context, {0, +1}, 6016ms, 0ms);
-    pbf_move_left_joystick(context, 96, 0, 2400ms, 0ms);
+    pbf_move_left_joystick_old(context, 96, 0, 2400ms, 0ms);
     pbf_move_left_joystick(context, {0, +1}, 5040ms, 2000ms);
 
 //    context.wait_for_all_requests();
@@ -320,7 +320,7 @@ void inside_zero_gate_to_secret_cave_entrance(
     ssf_press_button(context, BUTTON_B, 0ms, 160ms, 80ms);  //  Double up this press in
     ssf_press_button(context, BUTTON_B, 0ms, 160ms);        //  case one is dropped.
 
-    pbf_move_left_joystick(context, 48, 0, 1600ms, 0ms);
+    pbf_move_left_joystick_old(context, 48, 0, 1600ms, 0ms);
     pbf_move_left_joystick(context, {0, +1}, 2000ms, 0ms);
 
 

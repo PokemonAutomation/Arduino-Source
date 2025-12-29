@@ -87,8 +87,8 @@ void run_fossil_batch(
 #if 1
     for (uint16_t c = 0; c < batch.revives; c++){
 #if 1
-        ssf_mash_AZs(context, 170);
-        pbf_wait(context, 65);
+        ssf_mash_AZs(context, 1360ms);
+        pbf_wait(context, 520ms);
 #else
         ssf_mash_AZs(context, 50);
         pbf_wait(context, 140);
@@ -121,10 +121,10 @@ void run_fossil_batch(
         pbf_mash_button(
             context,
             BUTTON_B,
-            GameSettings::instance().AUTO_DEPOSIT ? 1400 : 1520
+            GameSettings::instance().AUTO_DEPOSIT ? 11200ms : 12160ms
         );
     }
-    pbf_wait(context, 100);
+    pbf_wait(context, 800ms);
 #endif
 
     if (!save_and_exit){
@@ -147,7 +147,7 @@ void MultiGameFossil::program(SingleSwitchProgramEnvironment& env, ProController
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
         ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 160ms);
     }
 

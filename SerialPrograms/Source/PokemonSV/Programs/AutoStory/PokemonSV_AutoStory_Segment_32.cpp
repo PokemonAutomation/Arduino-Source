@@ -99,14 +99,14 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 150});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 150});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 1200ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 1200ms});
         }
         
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 140, 70);
 
         direction.change_direction(env.program_info(), env.console, context, 3.104878);
-        pbf_move_left_joystick(context, 128, 0, 520, 50);
+        pbf_move_left_joystick(context, {0, +1}, 4160ms, 400ms);
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
@@ -123,7 +123,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         // {0.326042, 0.438889}
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 0, 0, 0}, 
+            {ZoomChange::ZOOM_IN, 0, 0, 0ms}, 
             FlyPoint::POKECENTER, 
             {0.326042, 0.438889}
         );
@@ -142,21 +142,21 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         direction.change_direction(env.program_info(), env.console, context, 0.225386); //  0.225386
 
-        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
-            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context,
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30000ms);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                pbf_move_left_joystick(context, 0, 0, 300, 50); // move left
+                pbf_move_left_joystick_old(context, 0, 0, 2400ms, 400ms); // move left
                 pbf_move_left_joystick(context, {+1, 0}, 480ms, 400ms); // move right. center on door
-                pbf_move_left_joystick(context, 128, 0, 300, 50);  // move forward
+                pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);  // move forward
             }
         );
 
         // speak to Nemona
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30000ms);
         
         // speak to receptionist
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
@@ -173,11 +173,11 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         direction.change_direction(env.program_info(), env.console, context, 5.516255);
 
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30000ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
 
         //mash past other dialog
-        pbf_mash_button(context, BUTTON_A, 360);
+        pbf_mash_button(context, BUTTON_A, 2880ms);
             
         //wait for start
         context.wait_for(std::chrono::milliseconds(30000));
@@ -198,7 +198,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         pbf_wait(context, 10000ms);
 
         //mash past other dialog
-        pbf_mash_button(context, BUTTON_A, 360);
+        pbf_mash_button(context, BUTTON_A, 2880ms);
             
         //wait for start
         context.wait_for(std::chrono::milliseconds(8000));
@@ -223,12 +223,12 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30000ms);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
-                pbf_move_left_joystick(context, 0, 0, 300, 50); // move left
+                pbf_move_left_joystick_old(context, 0, 0, 2400ms, 400ms); // move left
                 pbf_move_left_joystick(context, {+1, 0}, 480ms, 400ms); // move right. center on door
-                pbf_move_left_joystick(context, 128, 0, 300, 50);  // move forward
+                pbf_move_left_joystick(context, {0, +1}, 2400ms, 400ms);  // move forward
             }
         );
 
@@ -244,7 +244,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         pbf_wait(context, 3000ms);
         // wait for overworld after leaving gym
         wait_for_overworld(env.program_info(), env.console, context, 30);
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0}, FlyPoint::POKECENTER);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, FlyPoint::POKECENTER);
 
     });  
 }

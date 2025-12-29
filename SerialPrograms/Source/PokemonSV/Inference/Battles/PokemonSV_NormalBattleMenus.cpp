@@ -162,12 +162,12 @@ std::set<std::string> read_singles_opponent(
                 }
             }
 
-            pbf_mash_button(context, BUTTON_B, 125);
+            pbf_mash_button(context, BUTTON_B, 1000ms);
             continue;
 
         default:
             stream.log("No recognized state. Mashing B...", COLOR_RED);
-            pbf_mash_button(context, BUTTON_B, 250);
+            pbf_mash_button(context, BUTTON_B, 2000ms);
         }
     }
 

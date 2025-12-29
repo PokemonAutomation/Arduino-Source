@@ -17,10 +17,7 @@
 namespace PokemonAutomation{
 
 
-
-ConfigWidget* BoxFloatOption::make_QtWidget(QWidget& parent){
-    return new BoxFloatWidget(parent, *this);
-}
+template class RegisterConfigWidget<BoxFloatWidget>;
 
 
 

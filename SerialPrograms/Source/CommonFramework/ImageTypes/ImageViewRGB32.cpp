@@ -4,9 +4,13 @@
  *
  */
 
+#include <QDir>
+#include <QFileInfo>
 #include <QImage>
+
 #include <opencv2/core/mat.hpp>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "ImageRGB32.h"
 #include "ImageViewRGB32.h"
 
@@ -23,9 +27,25 @@ ImageRGB32 ImageViewRGB32::copy() const{
     ret.copy_from(*this);
     return ret;
 }
+
 bool ImageViewRGB32::save(const std::string& path) const{
-    return to_QImage_ref().save(QString::fromStdString(path));
+    QString filepath = QString::fromStdString(path);
+    QFileInfo fileInfo(filepath);
+    QDir dir = fileInfo.dir();
+
+    if (!dir.exists()) {
+        if (!dir.mkpath(".")) { // Create the path (the "." refers to the dir path itself)
+            global_logger_tagged().log("Failed to create directory for saving image:" + dir.absolutePath().toStdString());
+            return false;
+        }
+    }
+    const bool success = to_QImage_ref().save(QString::fromStdString(path));
+    if (!success){
+        global_logger_tagged().log("Failed to save image to:" + path);
+    }
+    return success;
 }
+
 ImageRGB32 ImageViewRGB32::scale_to(size_t width, size_t height) const{
     return scaled_to_QImage(width, height);
 }

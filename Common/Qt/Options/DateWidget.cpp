@@ -17,13 +17,8 @@ namespace PokemonAutomation{
 
 
 
-
-ConfigWidget* DateTimeCell::make_QtWidget(QWidget& parent){
-    return new DateTimeCellWidget(parent, *this);
-}
-ConfigWidget* DateTimeOption::make_QtWidget(QWidget& parent){
-    return new DateTimeOptionWidget(parent, *this);
-}
+template class RegisterConfigWidget<DateTimeCellWidget>;
+template class RegisterConfigWidget<DateTimeOptionWidget>;
 
 
 

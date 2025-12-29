@@ -41,8 +41,7 @@ ShinyHunt_HelioptileHunter_Descriptor::ShinyHunt_HelioptileHunter_Descriptor()
         "Hunts for Helioptile in Wild Zone by entering and resetting, checking for the right weather.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 
@@ -125,7 +124,7 @@ void find_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& con
 
 void reach_bench(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     //Go to poke center
-    pbf_move_left_joystick(context, 110, 0, 100ms, 200ms);
+    pbf_move_left_joystick_old(context, 110, 0, 100ms, 200ms);
     pbf_press_button(context, BUTTON_A, 500ms, 500ms);
     pbf_press_button(context, BUTTON_A, 500ms, 500ms);
     pbf_wait(context, 3000ms);
@@ -154,7 +153,7 @@ void reach_gate(
 }
 
 void reach_wild_zone(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
-    pbf_move_left_joystick(context, 140, 255, 200ms, 200ms);
+    pbf_move_left_joystick_old(context, 140, 255, 200ms, 200ms);
     pbf_press_button(context, BUTTON_A, 500ms, 500ms);
     pbf_press_button(context, BUTTON_A, 500ms, 500ms);
     pbf_wait(context, 2000ms);

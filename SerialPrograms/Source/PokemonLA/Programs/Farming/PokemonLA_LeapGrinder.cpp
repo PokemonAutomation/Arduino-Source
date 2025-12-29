@@ -204,7 +204,7 @@ bool LeapGrinder::run_iteration(
         stats.leaps++;
 
         PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
-        pbf_press_button(context, BUTTON_B, 20, 225);
+        pbf_press_button(context, BUTTON_B, 160ms, 1800ms);
         context.wait_for_all_requests();
 
         env.console.log("Looking for: " + POKEMON.slug());
@@ -300,7 +300,7 @@ void LeapGrinder::program(SingleSwitchProgramEnvironment& env, ProControllerCont
     LeapGrinder_Descriptor::Stats& stats = env.current_stats<LeapGrinder_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     bool fresh_from_reset = false;
     while (true){

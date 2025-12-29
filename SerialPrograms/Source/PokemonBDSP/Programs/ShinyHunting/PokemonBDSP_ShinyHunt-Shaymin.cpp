@@ -141,7 +141,7 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, ProControlle
     LeadingShinyTracker lead_tracker(env.console);
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 40ms, 40ms);
 
     //  Encounter Loop
     while (true){
@@ -172,7 +172,7 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, ProControlle
         lead_tracker.report_result(result_own.shiny_type);
 
         //  Clear dialogs.
-        pbf_mash_button(context, BUTTON_B, 75);
+        pbf_mash_button(context, BUTTON_B, 600ms);
 
         //  Hop on bike, ride down to seabreak path
 //        SHORTCUT.run(env.console, 0);

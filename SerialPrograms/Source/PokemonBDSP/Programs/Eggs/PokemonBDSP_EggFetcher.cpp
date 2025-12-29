@@ -94,8 +94,8 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         pbf_move_left_joystick(context, {+1, 0}, 480ms, 0ms);
 
         //  Fetch egg.
-        pbf_mash_button(context, BUTTON_ZL, 600);
-        pbf_mash_button(context, BUTTON_B, 520);
+        pbf_mash_button(context, BUTTON_ZL, 4800ms);
+        pbf_mash_button(context, BUTTON_B, 4160ms);
         pbf_move_left_joystick(context, {-1, -1}, 1000ms, 0ms);
         SHORTCUT.run(context, 800ms);
 

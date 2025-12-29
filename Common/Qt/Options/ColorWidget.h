@@ -20,6 +20,9 @@ namespace PokemonAutomation{
 
 class ColorCellWidget : public QWidget, public ConfigWidget{
 public:
+    using ParentOption = ColorCell;
+
+public:
     ~ColorCellWidget();
     ColorCellWidget(QWidget& parent, ColorCell& value);
 

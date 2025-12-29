@@ -71,7 +71,7 @@ void home_to_add_friends(
         ssf_issue_scroll_ptv(context, SSF_SCROLL_UP);
     }
 
-    ssf_do_nothing(context, 50);
+    ssf_do_nothing(context, 400ms);
     ssf_issue_scroll_ptv(context, DPAD_RIGHT);
     while (scroll_down--){
         ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
@@ -99,7 +99,7 @@ void accept_FRs(
     //  Return to Switch Home menu. (or game)
     if (console.video().snapshot()){
         console.log("Entering game using inference...");
-        pbf_press_button(context, BUTTON_HOME, 20, 180);
+        pbf_press_button(context, BUTTON_HOME, 160ms, 1440ms);
         NintendoSwitch::resume_game_from_home(console, context);
     }else{
         console.log("Entering game without inference...", COLOR_RED);
@@ -110,7 +110,7 @@ void accept_FRs(
             GameSettings::instance().EXIT_SWITCH_POKEMON0
         );
     }
-    pbf_wait(context, 300);
+    pbf_wait(context, 2400ms);
 }
 
 

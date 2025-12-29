@@ -92,7 +92,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         switch (ret){
         case 0:
                 env.log("Item already purchased or incompatible hairstyle.");
-                pbf_press_button(context, BUTTON_A, 10, 100);
+                pbf_press_button(context, BUTTON_A, 80ms, 800ms);
 
                 retP = wait_until(
                     env.console, context,
@@ -120,12 +120,12 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 
             if (USE_LP){
                 env.log("Using LP.");
-                pbf_press_dpad(context, DPAD_DOWN, 10, 100);
+                pbf_press_dpad(context, DPAD_DOWN, 80ms, 800ms);
             }
             env.log("Purchasing.");
             //Purchase, then wait a bit more for wear prompt detector.
-            pbf_press_button(context, BUTTON_A, 10, 100);
-            pbf_wait(context, 100);
+            pbf_press_button(context, BUTTON_A, 80ms, 800ms);
+            pbf_wait(context, 800ms);
             context.wait_for_all_requests();
 
             int retWear = wait_until(
@@ -137,11 +137,11 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             case 0:
                 if (!WEAR_NEW_CLOTHES){
                     env.log("Do not wear new clothes.");
-                    pbf_press_dpad(context, DPAD_DOWN, 10, 100);
+                    pbf_press_dpad(context, DPAD_DOWN, 80ms, 800ms);
                 }else{
                     env.log("Wear new clothes.");
                 }
-                pbf_press_button(context, BUTTON_A, 10, 100);
+                pbf_press_button(context, BUTTON_A, 80ms, 800ms);
                 env.log("Clothing purchased. Selecting next item.");
                 send_program_status_notification(
                     env, NOTIFICATION_STATUS_UPDATE,
@@ -157,7 +157,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                     );
                     finish_program = true;
                 }else{
-                    pbf_press_button(context, BUTTON_A, 10, 100);
+                    pbf_press_button(context, BUTTON_A, 80ms, 800ms);
                     retHairstyle = wait_until(
                         env.console, context,
                         std::chrono::seconds(2),
@@ -199,9 +199,9 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         }
 
         env.log("Moving on to next item.");
-        pbf_press_dpad(context, DPAD_DOWN, 10, 100);
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 800ms);
         //Wait to load a bit for next item
-        pbf_wait(context, 100);
+        pbf_wait(context, 800ms);
         context.wait_for_all_requests();
 
         ClothingTopWatcher top_item(COLOR_YELLOW);
@@ -215,8 +215,8 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             env.log("Reached top of category.");
             if (NUM_CATEGORY > 1){
                 env.log("Category rotation set. Moving to next category.");
-                pbf_press_dpad(context, DPAD_RIGHT, 10, 100);
-                pbf_wait(context, 100);
+                pbf_press_dpad(context, DPAD_RIGHT, 80ms, 800ms);
+                pbf_wait(context, 800ms);
                 context.wait_for_all_requests();
                 category_rotation_count++;
             }else{

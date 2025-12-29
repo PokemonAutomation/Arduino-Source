@@ -124,9 +124,9 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
             [](ProControllerContext& context){
                 pbf_press_button(context, BUTTON_ZL, 80ms, 80ms);
                 for (size_t c = 0; c < 17; c++){
-                    pbf_press_dpad(context, DPAD_UP, 5, 10);
+                    pbf_press_dpad(context, DPAD_UP, 40ms, 80ms);
                     pbf_press_button(context, BUTTON_ZL, 80ms, 80ms);
-                    pbf_press_dpad(context, DPAD_RIGHT, 20, 10);
+                    pbf_press_dpad(context, DPAD_RIGHT, 160ms, 80ms);
                     pbf_press_button(context, BUTTON_ZL, 80ms, 80ms);
                 }
             },
@@ -168,7 +168,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
             battle_menu_seen = true;
 
             {
-                pbf_press_button(context, BUTTON_ZL, 10, 125);
+                pbf_press_button(context, BUTTON_ZL, 80ms, 1000ms);
                 uint8_t slot = 0;
                 for (; slot < 4; slot++){
                     if (pp0[slot] != 0){
@@ -186,13 +186,13 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
                 for (uint8_t move_slot = 0; move_slot < slot; move_slot++){
                     pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
                 }
-                pbf_press_button(context, BUTTON_ZL, 10, 125);
-                pbf_press_button(context, BUTTON_ZL, 10, 375);
+                pbf_press_button(context, BUTTON_ZL, 80ms, 1000ms);
+                pbf_press_button(context, BUTTON_ZL, 80ms, 3000ms);
                 pp0[slot]--;
             }
 
             {
-                pbf_press_button(context, BUTTON_ZL, 10, 125);
+                pbf_press_button(context, BUTTON_ZL, 80ms, 1000ms);
                 uint8_t slot = 0;
                 for (; slot < 4; slot++){
                     if (pp1[slot] != 0){
@@ -210,15 +210,15 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
                 for (uint8_t move_slot = 0; move_slot < slot; move_slot++){
                     pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
                 }
-                pbf_press_button(context, BUTTON_ZL, 10, 125);
-                pbf_press_button(context, BUTTON_ZL, 10, 375);
+                pbf_press_button(context, BUTTON_ZL, 80ms, 1000ms);
+                pbf_press_button(context, BUTTON_ZL, 80ms, 3000ms);
                 pp1[slot]--;
             }
 
             break;
         case 1:
             env.log("Battle finished!", COLOR_BLUE);
-            pbf_mash_button(context, BUTTON_B, 250);
+            pbf_mash_button(context, BUTTON_B, 2000ms);
             return false;
         case 2:
             env.log("Detected move learn!", COLOR_BLUE);
@@ -250,7 +250,7 @@ void MoneyFarmerRoute210::heal_at_center_and_return(
     uint8_t pp0[4], uint8_t pp1[4]
 ){
     logger.log("Healing " + STRING_POKEMON + " Celestic Town " + STRING_POKEMON + " Center.");
-    pbf_move_left_joystick(context, 125, 0, 6000ms, 0ms);
+    pbf_move_left_joystick_old(context, 125, 0, 6000ms, 0ms);
     pbf_mash_button(context, BUTTON_ZL, 3000ms);
     pbf_mash_button(context, BUTTON_B, 10000ms);
 
@@ -260,7 +260,7 @@ void MoneyFarmerRoute210::heal_at_center_and_return(
     pbf_move_left_joystick(context, {0, +1}, 1600ms, 0ms);
     pbf_move_left_joystick(context, {+1, 0}, 6000ms, 0ms);
 
-    pbf_press_button(context, BUTTON_R, 10, 150);
+    pbf_press_button(context, BUTTON_R, 80ms, 1200ms);
     pbf_mash_button(context, BUTTON_ZL, 6000ms);
 
     pbf_move_left_joystick(context, {0, -1}, 240ms, 0ms);
@@ -273,8 +273,8 @@ void MoneyFarmerRoute210::heal_at_center_and_return(
     pbf_move_left_joystick(context, {+1, 0}, 2400ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 3000ms, 0ms);
 
-    pbf_press_dpad(context, DPAD_RIGHT, 375, 0);
-    pbf_press_dpad(context, DPAD_LEFT, 375, 0);
+    pbf_press_dpad(context, DPAD_RIGHT, 3000ms, 0ms);
+    pbf_press_dpad(context, DPAD_LEFT, 3000ms, 0ms);
     pbf_press_dpad(context, DPAD_DOWN, 1000ms, 0ms);
 
     pp0[0] = MON0_MOVE1_PP;
@@ -292,9 +292,9 @@ void MoneyFarmerRoute210::fly_to_center_heal_and_return(
 ){
     logger.log("Flying back to Hearthome City to heal.");
     pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
-    pbf_press_button(context, BUTTON_PLUS, 10, 240);
-    pbf_press_dpad(context, DPAD_LEFT, 10, 60);
-    pbf_press_dpad(context, DPAD_LEFT, 10, 60);
+    pbf_press_button(context, BUTTON_PLUS, 80ms, 1920ms);
+    pbf_press_dpad(context, DPAD_LEFT, 80ms, 480ms);
+    pbf_press_dpad(context, DPAD_LEFT, 80ms, 480ms);
     pbf_mash_button(context, BUTTON_ZL, 12000ms);
     heal_at_center_and_return(logger, context, pp0, pp1);
 }
@@ -356,7 +356,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
     };
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 40ms, 40ms);
 
     bool need_to_charge = true;
     if (START_LOCATION == StartLocation::CelesticTown){
@@ -376,12 +376,12 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
 
         if (need_to_charge){
             pbf_move_left_joystick(context, {+1, 0}, 1120ms, 0ms);
-            pbf_press_dpad(context, DPAD_UP, 85, 0);
+            pbf_press_dpad(context, DPAD_UP, 680ms, 0ms);
             for (size_t c = 0; c < 7; c++){
                 pbf_move_left_joystick(context, {-1, 0},  1120ms, 0ms);
                 pbf_move_left_joystick(context, {+1, 0}, 1120ms, 0ms);
             }
-            pbf_press_dpad(context, DPAD_DOWN, 75, 0);
+            pbf_press_dpad(context, DPAD_DOWN, 600ms, 0ms);
         }
         pbf_press_dpad(context, DPAD_LEFT, 1600ms, 0ms);
 
@@ -399,7 +399,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
                 {{tracker}}
             );
             need_to_charge = true;
-            pbf_mash_button(context, BUTTON_B, 250);
+            pbf_mash_button(context, BUTTON_B, 2000ms);
 
             bubbles = tracker.reactions();
             if (bubbles.empty()){

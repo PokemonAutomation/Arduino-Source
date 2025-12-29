@@ -37,7 +37,7 @@ public:
 
 
 
-class RandomCodeOption : public ConfigOption{
+class RandomCodeOption : public ConfigOptionImpl<RandomCodeOption>{
 public:
     ~RandomCodeOption();
     RandomCodeOption(size_t total_digits);
@@ -58,7 +58,6 @@ public:
     virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     struct Data;

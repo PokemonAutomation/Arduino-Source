@@ -11,8 +11,7 @@
 #include "Common/Compiler.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Containers/Pimpl.h"
-
-class QWidget;
+#include "Common/Cpp/UiWrapper.h"
 
 namespace PokemonAutomation{
 
@@ -137,7 +136,7 @@ protected:
 
 
 public:
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) = 0;
+    virtual UiWrapper make_UiComponent(void* params) = 0;
 
 private:
     struct Data;
@@ -145,6 +144,43 @@ private:
 
     LifetimeSanitizer m_lifetime_sanitizer;
 };
+
+
+
+
+
+//
+//  Helpers for implementations.
+//
+
+template <typename OptionType>
+using ConfigUiFactory = UiWrapper (*)(OptionType& option, void* params);
+
+//
+//  This is a convenience class that implementations should inherit from instead
+//  of directly inheriting from ConfigOption or another option type.
+//
+//  This provides the per-type UI factory as well as the "make_UiComponent"
+//  override. This saves a ton of copy-paste as those are the same eveywhere.
+//
+template <typename ConfigType, typename ParentType = ConfigOption>
+class ConfigOptionImpl : public ParentType{
+public:
+    using ParentType::ParentType;
+
+    virtual UiWrapper make_UiComponent(void* params) override{
+        if (m_ui_factory){
+            return m_ui_factory(static_cast<ConfigType&>(*this), params);
+        }
+        return UiWrapper();
+    }
+
+    static ConfigUiFactory<ConfigType> m_ui_factory;
+};
+
+template <typename ConfigType, typename ParentType>
+ConfigUiFactory<ConfigType> ConfigOptionImpl<ConfigType, ParentType>::m_ui_factory;
+
 
 
 

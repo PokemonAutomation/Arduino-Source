@@ -20,7 +20,7 @@
  ************************************************************************************/
 #pragma once
 #include <dpp/export.h>
-#include <dpp/nlohmann/json_fwd.hpp>
+#include <dpp/json_fwd.h>
 #include <dpp/snowflake.h>
 #include <dpp/managed.h>
 #include <dpp/utility.h>
@@ -33,67 +33,91 @@ namespace dpp {
  */
 enum user_flags : uint32_t {
 	/// User is a bot
-	u_bot =				0b00000000000000000000001,
+	u_bot =				0b00000000000000000000000000000001,
 	/// User is a system user (Clyde!)
-	u_system =			0b00000000000000000000010,
+	u_system =			0b00000000000000000000000000000010,
 	/// User has multi-factor authentication enabled
-	u_mfa_enabled =			0b00000000000000000000100,
+	u_mfa_enabled =			0b00000000000000000000000000000100,
 	/// User is verified (verified email address)
-	u_verified =			0b00000000000000000001000,
+	u_verified =			0b00000000000000000000000000001000,
 	/// User has full nitro
-	u_nitro_full =			0b00000000000000000010000,
+	u_nitro_full =			0b00000000000000000000000000010000,
 	/// User has nitro classic
-	u_nitro_classic =		0b00000000000000000100000,
+	u_nitro_classic =		0b00000000000000000000000000100000,
 	/// User is discord staff
-	u_discord_employee =		0b00000000000000001000000,
+	u_discord_employee =		0b00000000000000000000000001000000,
 	/// User owns a partnered server
-	u_partnered_owner =		0b00000000000000010000000,
+	u_partnered_owner =		0b00000000000000000000000010000000,
 	/// User is a member of hypesquad events
-	u_hypesquad_events =		0b00000000000000100000000,
+	u_hypesquad_events =		0b00000000000000000000000100000000,
 	/// User has BugHunter level 1
-	u_bughunter_1 =			0b00000000000001000000000,
+	u_bughunter_1 =			0b00000000000000000000001000000000,
 	/// User is a member of House Bravery
-	u_house_bravery =		0b00000000000010000000000,
+	u_house_bravery =		0b00000000000000000000010000000000,
 	/// User is a member of House Brilliance
-	u_house_brilliance =		0b00000000000100000000000,
+	u_house_brilliance =		0b00000000000000000000100000000000,
 	/// User is a member of House Balance
-	u_house_balance =		0b00000000001000000000000,
+	u_house_balance =		0b00000000000000000001000000000000,
 	/// User is an early supporter
-	u_early_supporter =		0b00000000010000000000000,
+	u_early_supporter =		0b00000000000000000010000000000000,
 	/// User is a team user
-	u_team_user =			0b00000000100000000000000,
+	u_team_user =			0b00000000000000000100000000000000,
 	/// User is has Bug Hunter level 2
-	u_bughunter_2 =			0b00000001000000000000000,
+	u_bughunter_2 =			0b00000000000000001000000000000000,
 	/// User is a verified bot
-	u_verified_bot =		0b00000010000000000000000,
+	u_verified_bot =		0b00000000000000010000000000000000,
 	/// User has the Early Verified Bot Developer badge
-	u_verified_bot_dev =	 	0b00000100000000000000000,
+	u_verified_bot_dev =	 	0b00000000000000100000000000000000,
 	/// User's icon is animated
-	u_animated_icon =		0b00001000000000000000000,
+	u_animated_icon =		0b00000000000001000000000000000000,
 	/// User is a certified moderator
-	u_certified_moderator =		0b00010000000000000000000,
+	u_certified_moderator =		0b00000000000010000000000000000000,
 	/// User is a bot using HTTP interactions (shows online even when not connected to a websocket)
-	u_bot_http_interactions =	0b00100000000000000000000,
+	u_bot_http_interactions =	0b00000000000100000000000000000000,
 	/// User has nitro basic
-	u_nitro_basic = 			0b01000000000000000000000,
+	u_nitro_basic = 			0b00000000001000000000000000000000,
 	/// User has the active developer badge
-	u_active_developer =		0b10000000000000000000000,
+	u_active_developer =		0b00000000010000000000000000000000,
+	/// User's banner is animated
+	u_animated_banner =			0b00000000100000000000000000000000,
 };
 
 /**
  * @brief Represents a user on discord. May or may not be a member of a dpp::guild.
  */
-class DPP_EXPORT user : public managed, public json_interface<user>  {
+class DPP_EXPORT user : public managed, public json_interface<user> {
+protected:
+	friend struct json_interface<user>;
+
+	/** Fill this record from json.
+	 * @param j The json to fill this record from
+	 * @return Reference to self
+	 */
+	user& fill_from_json_impl(nlohmann::json* j);
+
+	/**
+	 * @brief Convert to JSON
+	 *
+	 * @param with_id include ID in output
+	 * @return json JSON output
+	 */
+	virtual json to_json_impl(bool with_id = true) const;
+
 public:
 	/** Discord username */
 	std::string username;
+	/** Global display name */
+	std::string global_name;
 	/** Avatar hash */
 	utility::iconhash avatar;
+	/** Avatar decoration hash */
+	utility::iconhash avatar_decoration;
 	/** Flags built from a bitmask of values in dpp::user_flags */
 	uint32_t flags;
 	/** Discriminator (aka tag), 4 digits usually displayed with leading zeroes.
 	 *
-	 * @note To print the discriminator with leading zeroes, use format_username()
+	 * @note To print the discriminator with leading zeroes, use format_username().
+	 * 0 for users that have migrated to the new username format.
 	 */
 	uint16_t discriminator;
 	/** Reference count of how many guilds this user is in */
@@ -107,7 +131,7 @@ public:
 	/**
 	 * @brief Destroy the user object
 	 */
-	virtual ~user();
+	virtual ~user() = default;
 
 	/**
 	* @brief Create a mentionable user.
@@ -116,27 +140,36 @@ public:
 	*/
 	static std::string get_mention(const snowflake& id);
 
-	/** Fill this record from json.
-	 * @param j The json to fill this record from
-	 * @return Reference to self
-	 */
-	user& fill_from_json(nlohmann::json* j);
-
 	/**
-	 * @brief Convert to JSON string
-	 * 
-	 * @param with_id include ID in output
-	 * @return std::string JSON output
-	 */
-	virtual std::string build_json(bool with_id = true) const;
-
-	/**
-	 * @brief Get the avatar url of the user object
+	 * @brief Get the avatar url of the user
 	 *
-	 * @param size The size of the avatar in pixels. It can be any power of two between 16 and 4096. if not specified, the default sized avatar is returned.
-	 * @return std::string avatar url. If the user doesn't have an avatar, the default user avatar url is returned
+	 * @note If the user doesn't have an avatar, the default user avatar url is returned which is always in `png` format!
+	 *
+	 * @param size The size of the avatar in pixels. It can be any power of two between 16 and 4096,
+	 * otherwise the default sized avatar is returned.
+	 * @param format The format to use for the avatar. It can be one of `i_webp`, `i_jpg`, `i_png` or `i_gif`.
+	 * When passing `i_gif`, it returns an empty string for non-animated images. Consider using the `prefer_animated` parameter instead.
+	 * @param prefer_animated Whether you prefer gif format.
+	 * If true, it'll return gif format whenever the image is available as animated.
+	 * @return std::string avatar url or an empty string, if required attributes are missing or an invalid format was passed
 	 */
-	std::string get_avatar_url(uint16_t size = 0) const;
+	std::string get_avatar_url(uint16_t size = 0, const image_type format = i_png, bool prefer_animated = true) const;
+
+	/**
+	 * @brief Get the default avatar url of the user. This is calculated by the discriminator.
+	 *
+	 * @return std::string avatar url or an empty string, if the discriminator is empty
+	 */
+	std::string get_default_avatar_url() const;
+
+	/**
+	 * @brief Get the avatar decoration url of the user if they have one, otherwise returns an empty string.
+	 *
+	 * @param size The size of the avatar decoration in pixels. It can be any power of two between 16 and 4096,
+	 * otherwise the default sized avatar decoration is returned.
+	 * @return std::string avatar url or an empty string
+	 */
+	std::string get_avatar_decoration_url(uint16_t size = 0) const;
 
 	/**
 	 * @brief Return a ping/mention for the user
@@ -144,6 +177,13 @@ public:
 	 * @return std::string mention
 	 */
 	std::string get_mention() const;
+
+	/**
+	 * @brief Returns URL to user 
+	 * 
+	 * @return string of URL to user
+	 */
+	std::string get_url() const;
 
 	/**
 	 * @brief Return true if user has the active Developer badge
@@ -289,7 +329,7 @@ public:
 	bool has_animated_icon() const;
 
 	/**
-	 * @brief Format a username into user#discriminator
+	 * @brief Format a username into user\#discriminator
 	 * 
 	 * For example Brain#0001
 	 * 
@@ -304,26 +344,29 @@ public:
  * which bots do not normally have.
  */
 class DPP_EXPORT user_identified : public user, public json_interface<user_identified> {
+protected:
+	friend struct json_interface<user_identified>;
+
+	/** Fill this record from json.
+	 * @param j The json to fill this record from
+	 * @return Reference to self
+	 */
+	user_identified& fill_from_json_impl(nlohmann::json* j);
+
+	/**
+	 * @brief Convert to JSON
+	 *
+	 * @param with_id include ID in output
+	 * @return json JSON output
+	 */
+	virtual json to_json_impl(bool with_id = true) const;
+
 public:
 	std::string		locale;		//!< Optional: the user's chosen language option identify
 	std::string		email;		//!< Optional: the user's email  email (may be empty)
 	utility::iconhash	banner;		//!< Optional: the user's banner hash    identify (may be empty)
 	uint32_t		accent_color;	//!< Optional: the user's banner color encoded as an integer representation of hexadecimal color code    identify (may be empty)
 	bool			verified;	//!< Optional: whether the email on this account has been verified       email
-	
-	/** Fill this record from json.
-	 * @param j The json to fill this record from
-	 * @return Reference to self
-	 */
-	user_identified& fill_from_json(nlohmann::json* j);
-
-	/**
-	 * @brief Convert to JSON string
-	 * 
-	 * @param with_id include ID in output
-	 * @return std::string JSON output
-	 */
-	virtual std::string build_json(bool with_id = true) const;
 
 	/**
 	 * @brief Construct a new user identified object
@@ -331,17 +374,40 @@ public:
 	user_identified();
 
 	/**
+	 * @brief Construct a new user identified object from a user object
+	 * 
+	 * @param u user object
+	 */
+	user_identified(const user& u);
+
+	/**
 	 * @brief Destroy the user identified object
 	 */
-	virtual ~user_identified();
+	virtual ~user_identified() = default;
+
+	using json_interface<user_identified>::fill_from_json;
+	using json_interface<user_identified>::build_json;
+	using json_interface<user_identified>::to_json;
+
+	/**
+	 * @brief Return true if user has an animated banner
+	 *
+	 * @return true if banner is animated (gif)
+	 */
+	bool has_animated_banner() const;
 
 	/**
 	 * @brief Get the user identified's banner url if they have one, otherwise returns an empty string
 	 *
-	 * @param size The size of the banner in pixels. It can be any power of two between 16 and 4096. if not specified, the default sized banner is returned.
-	 * @return std::string banner url or empty string
+	 * @param size The size of the banner in pixels. It can be any power of two between 16 and 4096,
+	 * otherwise the default sized banner is returned.
+	 * @param format The format to use for the avatar. It can be one of `i_webp`, `i_jpg`, `i_png` or `i_gif`.
+	 * When passing `i_gif`, it returns an empty string for non-animated images. Consider using the `prefer_animated` parameter instead.
+	 * @param prefer_animated Whether you prefer gif format.
+	 * If true, it'll return gif format whenever the image is available as animated.
+	 * @return std::string banner url or an empty string, if required attributes are missing or an invalid format was passed
 	 */
-	std::string get_banner_url(uint16_t size = 0) const;
+	std::string get_banner_url(uint16_t size = 0, const image_type format = i_png, bool prefer_animated = true) const;
 
 };
 
@@ -368,4 +434,4 @@ void from_json(const nlohmann::json& j, user_identified& u);
 /** A group of users */
 typedef std::unordered_map<snowflake, user> user_map;
 
-};
+} // namespace dpp

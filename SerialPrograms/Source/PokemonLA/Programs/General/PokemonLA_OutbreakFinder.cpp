@@ -232,7 +232,7 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
     if (current_region != MapRegion::JUBILIFE && current_region != MapRegion::RETREAT){
         // MapRegion starts with None and JUBILIFE. Skip those two, so -2.
         size_t current_wild_area_index = (int)current_region - 2;
-        pbf_press_dpad(context, DPAD_RIGHT, 20, 40);
+        pbf_press_dpad(context, DPAD_RIGHT, 160ms, 320ms);
         context.wait_for_all_requests();
         auto new_mmo_read = question_mark_detector.detect_MMO_on_hisui_map(env.console.video().snapshot());
         mmo_appears[current_wild_area_index] = new_mmo_read[current_wild_area_index];
@@ -295,7 +295,7 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
             }
         }
 
-        pbf_press_dpad(context, DPAD_RIGHT, 20, 40);
+        pbf_press_dpad(context, DPAD_RIGHT, 160ms, 320ms);
         context.wait_for_all_requests();
     }
 
@@ -329,13 +329,13 @@ void OutbreakFinder::goto_region_and_return(
 
         if (current_region == MapRegion::JUBILIFE){
             // Move to fieldlands
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 40);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 320ms);
         }else if (current_region == MapRegion::RETREAT){
             // Move to icelands
-            pbf_press_dpad(context, DPAD_LEFT, 20, 40);
+            pbf_press_dpad(context, DPAD_LEFT, 160ms, 320ms);
         }else{
             // Cannot read current region. Try move to another region
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 40);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 320ms);
         }
         context.wait_for_all_requests();
     }
@@ -383,7 +383,7 @@ void OutbreakFinder::goto_region_and_return(
             env.console, context,
             [](ProControllerContext& context){
                 for (size_t c = 0; c < 10; c++){
-                    pbf_press_button(context, BUTTON_A, 20, 125);
+                    pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
                 }
             },
             {{button_detector}}

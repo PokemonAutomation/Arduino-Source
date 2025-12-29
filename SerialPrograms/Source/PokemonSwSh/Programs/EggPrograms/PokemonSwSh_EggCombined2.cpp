@@ -101,7 +101,7 @@ void EggCombined2::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             3200ms
         );
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
     }
 
     session.eggcombined2_body(env.console, context);

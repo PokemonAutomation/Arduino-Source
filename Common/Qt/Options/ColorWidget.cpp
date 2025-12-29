@@ -12,9 +12,10 @@
 namespace PokemonAutomation{
 
 
-ConfigWidget* ColorCell::make_QtWidget(QWidget& parent){
-    return new ColorCellWidget(parent, *this);
-}
+template class RegisterConfigWidget<ColorCellWidget>;
+
+
+
 
 
 ColorCellWidget::~ColorCellWidget(){

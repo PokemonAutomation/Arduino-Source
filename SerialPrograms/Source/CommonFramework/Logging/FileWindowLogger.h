@@ -58,6 +58,11 @@ private:
     void internal_log(const std::string& msg, Color color);
     void thread_loop();
 
+    // when SerialPrograms.log is above a certain size, rename it to SerialPrograms-[timestamp].log
+    // then create a new, empty SerialPrograms.log
+    // this is only called from thread_loop(). So, we don't need to worry about synchronization because the thread loop is the only thread here.
+    void rotate_log_file();
+
 private:
     QFile m_file;
     size_t m_max_queue_size;

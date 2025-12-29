@@ -32,9 +32,12 @@ public:
 
     //  Return true if the inference session should stop.
     //  You must override at least one of the overloaded `process_frame()`.
+    //  The base class's implementation is just calling the other overloaded
+    //  `process_frame(const ImageViewRGB32& frame, WallClock timestamp)`.
     virtual bool process_frame(const VideoSnapshot& frame);
     //  Return true if the inference session should stop.
     //  You must override at least one of the overloaded `process_frame()`.
+    //  The base class's implementation throws `InternalProgramError`.
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp);
 
 };

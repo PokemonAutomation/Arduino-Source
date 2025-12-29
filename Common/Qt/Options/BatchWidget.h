@@ -18,6 +18,9 @@ namespace PokemonAutomation{
 //  Construct using a BatchOption.
 class BatchWidget : public QWidget, public ConfigWidget{
 public:
+    using ParentOption = BatchOption;
+
+public:
     ~BatchWidget();
     BatchWidget(QWidget& parent, BatchOption& value);
 

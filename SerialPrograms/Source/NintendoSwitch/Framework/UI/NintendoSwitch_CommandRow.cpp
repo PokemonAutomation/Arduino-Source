@@ -52,7 +52,7 @@ CommandRow::CommandRow(
     layout0->addLayout(layout1, CONSOLE_SETTINGS_STRETCH_L0_RIGHT);
     layout1->setContentsMargins(0, 0, 0, 0);
 
-    ConfigWidget* console_type_box = console_type.make_QtWidget(*this);
+    ConfigWidget* console_type_box = ConfigWidget::make_from_option(console_type, this);
     layout1->addWidget(&console_type_box->widget());
 
 

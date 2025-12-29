@@ -135,9 +135,13 @@ std::string FlavorPowerTableEntry::to_str() const{
         break;
     }
 
-    if (power == Flavor_Powers::catching || power == Flavor_Powers::sparkling) {
+    if (power == Flavor_Powers::catching || power == Flavor_Powers::sparkling || power == Flavor_Powers::move || power == Flavor_Powers::resistance) {
         switch (pokemon_type) {
         case Power_Pokemon_Types::all:
+            if (power == Flavor_Powers::move || power == Flavor_Powers::resistance) {
+                selected_power += "all-types-INVALID-SELECTION-";
+                break;
+            }
             selected_power += "all-types-";
             break;
         case Power_Pokemon_Types::normal:
@@ -196,7 +200,7 @@ std::string FlavorPowerTableEntry::to_str() const{
             break;
         }
     }
-    else if (power == Flavor_Powers::move || power == Flavor_Powers::resistance) {
+    else if (power == Flavor_Powers::item) {
         switch (item_type) {
         case Power_Item_Types::berries:
             selected_power += "berries-";
@@ -222,10 +226,13 @@ std::string FlavorPowerTableEntry::to_str() const{
     switch (level) {
     case Power_Level::one:
         selected_power += "1";
+        break;
     case Power_Level::two:
         selected_power += "2";
+        break;
     case Power_Level::three:
         selected_power += "3";
+        break;
     }
 
     return selected_power;

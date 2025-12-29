@@ -144,7 +144,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
     BerryFarmer2_Descriptor::Stats& stats = env.current_stats<BerryFarmer2_Descriptor::Stats>();
 
     // wait some time in order to not detect rustling from previous fetch attempt
-    pbf_wait(context, 80);
+    pbf_wait(context, 640ms);
     context.wait_for_all_requests();
 
     BerryTreeRustlingSoundDetector initial_rustling_detector(
@@ -250,8 +250,8 @@ uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env
 
     while ((current_rustling == Rustling::Slow || current_rustling == Rustling::No) && no_rustling < 3) { 
         /* Slow or No rustling, not in Battle! */
-        pbf_mash_button(context, BUTTON_ZL, 240);
-        pbf_mash_button(context, BUTTON_B, 10);
+        pbf_mash_button(context, BUTTON_ZL, 1920ms);
+        pbf_mash_button(context, BUTTON_B, 80ms);
         attempts++;
         stats.shakes++;
 
@@ -268,7 +268,7 @@ uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env
     if (current_rustling == Rustling::Fast){
         // this is the last tree interaction for this time skip
         pbf_mash_button(context, BUTTON_ZL, SECONDARY_ATTEMPT_MASH_TIME0);
-        pbf_mash_button(context, BUTTON_B, 10);
+        pbf_mash_button(context, BUTTON_B, 80ms);
         attempts++;
         stats.shakes++;
         current_rustling = check_rustling(env, context);
@@ -286,7 +286,7 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
         ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 160ms);
     }
 
@@ -303,8 +303,8 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         home_roll_date_enter_game_autorollback(env.console, context, year);
         stats.days++;
         // Interact with the tree
-        pbf_mash_button(context, BUTTON_ZL, 375);
-        pbf_mash_button(context, BUTTON_B, 10);
+        pbf_mash_button(context, BUTTON_ZL, 3000ms);
+        pbf_mash_button(context, BUTTON_B, 80ms);
         stats.shakes++;
 
         // Rustling after the first fetch attempt
@@ -325,7 +325,7 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         }
 
         // end tree session
-        pbf_mash_button(context, BUTTON_B, iteration_attempts > 1 ? 800 : 600);
+        pbf_mash_button(context, BUTTON_B, iteration_attempts > 1 ? 6400ms : 4800ms);
 
         c += iteration_attempts;
 

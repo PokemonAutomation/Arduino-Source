@@ -4,12 +4,11 @@
  *
  */
 
+#include <string.h>
 #include <mutex>
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "MacAddressOption.h"
-
-#include "Common/Qt/Options/MacAddressWidget.h"
 
 //#include <iostream>
 //using std::cout;
@@ -17,11 +16,6 @@
 
 namespace PokemonAutomation{
 
-
-
-ConfigWidget* MacAddressCell::make_QtWidget(QWidget& parent){
-    return new MacAddressCellWidget(parent, *this);
-}
 
 
 
@@ -77,7 +71,7 @@ struct MacAddressCell::Data{
 
 MacAddressCell::~MacAddressCell() = default;
 MacAddressCell::MacAddressCell(const MacAddressCell& x)
-    : ConfigOption(x)
+    : ConfigOptionImpl<MacAddressCell>(x)
     , m_data(CONSTRUCT_TOKEN, x.m_data->m_current.size(), x.m_data->m_current.data())
 {}
 void MacAddressCell::operator=(const MacAddressCell& x){
@@ -98,7 +92,7 @@ MacAddressCell::MacAddressCell(
     size_t bytes,
     uint8_t* current_value
 )
-    : ConfigOption(lock_while_running)
+    : ConfigOptionImpl<MacAddressCell>(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, bytes, current_value)
 {}
 

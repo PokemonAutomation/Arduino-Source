@@ -2,6 +2,7 @@
  *
  * D++, A Lightweight C++ library for Discord
  *
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright 2021 Craig Edwards and D++ contributors 
  * (https://github.com/brainboxdotcc/DPP/graphs/contributors)
  *
@@ -26,7 +27,7 @@
 #include <dpp/utility.h>
 #include <dpp/voicestate.h>
 #include <dpp/message.h>
-#include <dpp/nlohmann/json_fwd.hpp>
+#include <dpp/json_fwd.h>
 #include <dpp/permissions.h>
 #include <dpp/json_interface.h>
 #include <unordered_map>
@@ -36,27 +37,81 @@ namespace dpp {
 
 /** @brief Flag integers as received from and sent to discord */
 enum channel_type : uint8_t {
-	CHANNEL_TEXT		= 0,	//!< a text channel within a server
-	DM			= 1,	//!< a direct message between users
-	CHANNEL_VOICE		= 2,	//!< a voice channel within a server
+	/**
+	 * @brief A text channel within a server.
+	 */
+	CHANNEL_TEXT = 0,
+
+	/**
+	 * @brief A direct message between users.
+	 */
+	DM = 1,
+
+	/**
+	 * @brief A voice channel within a server.
+	 */
+	CHANNEL_VOICE = 2,
+
 	/**
 	 * @brief a direct message between multiple users
-	 * @deprecated this channel type was intended to be used with the now deprecated GameBridge SDK. Existing group dms with bots will continue to function, but newly created channels will be unusable
+	 * @deprecated this channel type was intended to be used with the now deprecated GameBridge SDK.
+	 * Existing group dms with bots will continue to function, but newly created channels will be unusable.
 	 */
-	GROUP_DM		= 3,
-	CHANNEL_CATEGORY	= 4,	//!< an organizational category that contains up to 50 channels
-	CHANNEL_ANNOUNCEMENT	= 5,	//!< a channel that users can follow and crosspost into their own server
+	GROUP_DM = 3,
+
 	/**
-	 * @brief a channel in which game developers can sell their game on Discord
-	 * @deprecated store channels are deprecated by Discord
+	 * @brief An organizational category that contains up to 50 channels.
 	 */
-	CHANNEL_STORE		= 6,
-	CHANNEL_ANNOUNCEMENT_THREAD	= 10,	//!< a temporary sub-channel within a GUILD_ANNOUNCEMENT channel
-	CHANNEL_PUBLIC_THREAD	= 11,	//!< a temporary sub-channel within a GUILD_TEXT or GUILD_FORUM channel
-	CHANNEL_PRIVATE_THREAD	= 12,	//!< a temporary sub-channel within a GUILD_TEXT channel that is only viewable by those invited and those with the MANAGE_THREADS permission
-	CHANNEL_STAGE		= 13,	//!< a "stage" channel, like a voice channel with one authorised speaker
-	CHANNEL_DIRECTORY	= 14,   //!< the channel in a [hub](https://support.discord.com/hc/en-us/articles/4406046651927-Discord-Student-Hubs-FAQ) containing the listed servers
-	CHANNEL_FORUM		= 15	//!< forum channel that can only contain threads
+	CHANNEL_CATEGORY = 4,
+
+	/**
+	 * @brief A channel that users can follow and cross-post into their own server.
+	 */
+	CHANNEL_ANNOUNCEMENT = 5,
+
+	/**
+	 * @brief A channel in which game developers can sell their game on Discord.
+	 * @deprecated Store channels are deprecated by Discord.
+	 */
+	CHANNEL_STORE = 6,
+
+	/**
+	 * @brief A temporary sub-channel within a `GUILD_ANNOUNCEMENT` channel.
+	 */
+	CHANNEL_ANNOUNCEMENT_THREAD = 10,
+
+	/**
+	 * @brief A temporary sub-channel within a `GUILD_TEXT` or `GUILD_FORUM` channel.
+	 */
+	CHANNEL_PUBLIC_THREAD = 11,
+
+	/**
+	 * @brief A temporary sub-channel within a `GUILD_TEXT` channel
+	 * that is only viewable by those invited and those with the `MANAGE_THREADS` permission.
+	 */
+	CHANNEL_PRIVATE_THREAD = 12,
+
+	/**
+	 * @brief A "stage" channel, like a voice channel with one authorised speaker.
+	 */
+	CHANNEL_STAGE = 13,
+
+	/**
+	 * @brief The channel in a hub containing the listed servers.
+	 *
+	 * @see https://support.discord.com/hc/en-us/articles/4406046651927-Discord-Student-Hubs-FAQ
+	 */
+	CHANNEL_DIRECTORY = 14,
+
+	/**
+	 * @brief Forum channel that can only contain threads.
+	 */
+	CHANNEL_FORUM = 15,
+
+	/**
+	 * @brief Media channel that can only contain threads, similar to forum channels.
+	 */
+	CHANNEL_MEDIA = 16,
 };
 
 /** @brief Our flags as stored in the object
@@ -65,36 +120,52 @@ enum channel_type : uint8_t {
  * shuffle these values upwards by one bit.
  */
 enum channel_flags : uint16_t {
-	/// NSFW Gated Channel
+	/* Note that bits 1 to 4 are used for the channel type mask */
+	/**
+	 * @brief NSFW Gated Channel
+	 */
 	c_nsfw =		0b0000000000010000,
-	/// Video quality forced to 720p
-	c_video_quality_720p =	0b0000000000100000,
-	/// Lock permissions (only used when updating channel positions)
-	c_lock_permissions =	0b0000000001000000,
-	/// Thread is pinned to the top of its parent forum channel
-	c_pinned_thread =	0b0000000010000000,
-	/// Whether a tag is required to be specified when creating a thread in a forum channel. Tags are specified in the thread::applied_tags field.
-	c_require_tag =		0b0000000100000000,
-	/* Note that the 9th and 10th bit are used for the forum layout type */
-};
 
-/**
- * @brief The flags in discord channel's raw "flags" field. We use these for serialisation only, right now. Might be better to create a new field than to make the existing channel::flags from uint8_t to uint16_t, if discord adds more flags in future.
- */
-enum discord_channel_flags : uint8_t {
-	/// Thread is pinned to the top of its parent forum channel
-	dc_pinned_thread = 1 << 1,
-	/// Whether a tag is required to be specified when creating a thread in a forum channel. Tags are specified in the thread::applied_tags field.
-	dc_require_tag =   1 << 4,
+	/**
+	 * @brief Video quality forced to 720p
+	 */
+	c_video_quality_720p =	0b0000000000100000,
+
+	/**
+	 * @brief Lock permissions (only used when updating channel positions)
+	 */
+	c_lock_permissions =	0b0000000001000000,
+
+	/**
+	 * @brief Thread is pinned to the top of its parent forum or media channel
+	 */
+	c_pinned_thread =	0b0000000010000000,
+
+	/**
+	 * @brief Whether a tag is required to be specified when creating a thread in a forum or media channel.
+	 * Tags are specified in the thread::applied_tags field.
+	 */
+	c_require_tag =		0b0000000100000000,
+
+	/* Note that the 9th and 10th bit are used for the forum layout type. */
+	/**
+	 * @brief When set hides the embedded media download options. Available only for media channels
+	 */
+	c_hide_media_download_options = 0b0001000000000000,
 };
 
 /**
  * @brief Types for sort posts in a forum channel
  */
 enum default_forum_sort_order_t : uint8_t {
-	/// Sort forum posts by activity (default)
+	/**
+	 * @brief Sort forum posts by activity (default)
+	 */
 	so_latest_activity = 0,
-	/// Sort forum posts by creation time (from most recent to oldest)
+
+	/**
+	 * @brief Sort forum posts by creation time (from most recent to oldest)
+	 */
 	so_creation_date = 1,
 };
 
@@ -102,18 +173,34 @@ enum default_forum_sort_order_t : uint8_t {
  * @brief Types of forum layout views that indicates how the threads in a forum channel will be displayed for users by default
  */
 enum forum_layout_type : uint8_t {
-	fl_not_set = 0, //!< No default has been set for the forum channel
-	fl_list_view = 1, //!< Display posts as a list
-	fl_gallery_view = 2, //!< Display posts as a collection of tiles
+	/**
+	 * @brief No default has been set for the forum channel
+	 */
+	fl_not_set = 0,
+
+	/**
+	 * @brief Display posts as a list
+	 */
+	fl_list_view = 1,
+
+	/**
+	 * @brief Display posts as a collection of tiles
+	 */
+	fl_gallery_view = 2,
 };
 
 /**
  * @brief channel permission overwrite types
  */
 enum overwrite_type : uint8_t {
-	/// Role
+	/**
+	 * @brief Role
+	 */
 	ot_role = 0,
-	/// Member
+
+	/**
+	 * @brief Member
+	 */
 	ot_member = 1
 };
 
@@ -121,13 +208,24 @@ enum overwrite_type : uint8_t {
  * @brief Channel permission overwrites
  */
 struct DPP_EXPORT permission_overwrite {
-	/// ID of the role or the member
+	/**
+	 * @brief ID of the role or the member
+	 */
 	snowflake id;
-	/// Bitmask of allowed permissions
+
+	/**
+	 * @brief Bitmask of allowed permissions
+	 */
 	permission allow;
-	/// Bitmask of denied permissions
+
+	/**
+	 * @brief Bitmask of denied permissions
+	 */
 	permission deny;
-	/// Type of overwrite. See dpp::overwrite_type
+
+	/**
+	 * @brief Type of overwrite. See dpp::overwrite_type
+	 */
 	uint8_t type;
 
 	/**
@@ -150,15 +248,30 @@ struct DPP_EXPORT permission_overwrite {
  * @brief metadata for threads
  */
 struct DPP_EXPORT thread_metadata {
-	/// Timestamp when the thread's archive status was last changed, used for calculating recent activity
+	/**
+	 * @brief Timestamp when the thread's archive status was last changed, used for calculating recent activity.
+	 */
 	time_t archive_timestamp;
-	/// The duration in minutes to automatically archive the thread after recent activity, can be set to: 60, 1440, 4320, 10080
+
+	/**
+	 * @brief The duration in minutes to automatically archive the thread after recent activity (60, 1440, 4320, 10080).
+	 */
 	uint16_t auto_archive_duration;
-	/// Whether a thread is archived
+
+	/**
+	 * @brief Whether a thread is archived
+	 */
 	bool archived;
-	/// Whether a thread is locked. When a thread is locked, only users with `MANAGE_THREADS` can unarchive it
+
+	/**
+	 * @brief Whether a thread is locked. When a thread is locked,
+	 * only users with `MANAGE_THREADS` can un-archive it.
+	 */
 	bool locked;
-	/// Whether non-moderators can add other non-moderators. Only for private threads
+
+	/**
+	 * @brief Whether non-moderators can add other non-moderators. Only for private threads.
+	 */
 	bool invitable;
 };
 
@@ -167,47 +280,101 @@ struct DPP_EXPORT thread_metadata {
  * Defined as an enum to fit into 1 byte. Internally it'll be translated to minutes to match the API
  */
 enum auto_archive_duration_t : uint8_t {
-	/// Auto archive duration of 1 hour. (60 minutes)
+	/**
+	 * @brief Auto archive duration of 1 hour (60 minutes).
+	 */
 	arc_1_hour = 1,
-	/// Auto archive duration of 1 day. (1440 minutes)
+
+	/**
+	 * @brief Auto archive duration of 1 day (1440 minutes).
+	 */
 	arc_1_day = 2,
-	/// Auto archive duration of 3 days. (4320 minutes)
+
+	/**
+	 * @brief Auto archive duration of 3 days (4320 minutes).
+	 */
 	arc_3_days = 3,
-	/// Auto archive duration of 1 week. (10080 minutes)
+
+	/**
+	 * @brief Auto archive duration of 1 week (10080 minutes).
+	 */
 	arc_1_week = 4,
 };
 
 /**
  * @brief represents membership of a user with a thread
  */
-struct DPP_EXPORT thread_member  
-{
-	/// ID of the thread member is part of
-	snowflake thread_id;
-	/// ID of the member
-	snowflake user_id;
-	/// The time when user last joined the thread
-	time_t joined;
-	/// Any user-thread settings, currently only used for notifications
-	uint32_t flags;
+struct DPP_EXPORT thread_member : public json_interface<thread_member> {
+protected:
+	friend struct json_interface<thread_member>;
 
 	/**
 	 * @brief Read struct values from a json object 
 	 * @param j json to read values from
 	 * @return A reference to self	
 	 */
-	 thread_member& fill_from_json(nlohmann::json* j);
+	thread_member& fill_from_json_impl(nlohmann::json* j);
+
+public:
+	/**
+	 * @brief ID of the thread member is part of.
+	 */
+	snowflake thread_id;
+
+	/**
+	 * @brief ID of the member.
+	 */
+	snowflake user_id;
+
+	/**
+	 * @brief The time when user last joined the thread.
+	 */
+	time_t joined;
+
+	/**
+	 * @brief Any user-thread settings, currently only used for notifications.
+	 */
+	uint32_t flags;
 };
 
 /**
- * @brief Represents a tag that is able to be applied to a thread in a forum channel
+ * @brief Represents a tag that is able to be applied to a thread in a forum or media channel
  */
-struct DPP_EXPORT forum_tag : public managed {
-	/** The name of the tag (0-20 characters) */
+struct DPP_EXPORT forum_tag : public managed, public json_interface<forum_tag> {
+protected:
+	friend struct json_interface<forum_tag>;
+
+	/**
+	 * @brief Read struct values from a json object
+	 * @param j json to read values from
+	 * @return A reference to self
+	 */
+	forum_tag& fill_from_json_impl(nlohmann::json* j);
+
+	/**
+	 * @brief Build json for this forum_tag object
+	 *
+	 * @param with_id include the ID in the json
+	 * @return json JSON object
+	 */
+	json to_json_impl(bool with_id = false) const;
+
+public:
+	/**
+	 * @brief The name of the tag (0-20 characters).
+	 */
 	std::string name;
-	/** The emoji of the tag. Contains either nothing, the id of a guild's custom emoji or the unicode character of the emoji */
+
+	/**
+	 * @brief The emoji of the tag.
+	 * Contains either nothing, the id of a guild's custom emoji or the unicode character of the emoji.
+	 */
 	std::variant<std::monostate, snowflake, std::string> emoji;
-	/** Whether this tag can only be added to or removed from threads by a member with the `MANAGE_THREADS` permission */
+
+	/**
+	 * @brief Whether this tag can only be added to or removed from threads
+	 * by a member with the `MANAGE_THREADS` permission.
+	 */
 	bool moderated;
 
 	/** Constructor */
@@ -221,22 +388,7 @@ struct DPP_EXPORT forum_tag : public managed {
 	forum_tag(const std::string& name);
 
 	/** Destructor */
-	virtual ~forum_tag();
-
-	/**
-	 * @brief Read struct values from a json object
-	 * @param j json to read values from
-	 * @return A reference to self
-	 */
-	forum_tag& fill_from_json(nlohmann::json* j);
-
-	/**
-	 * @brief Build json for this forum_tag object
-	 *
-	 * @param with_id include the ID in the json
-	 * @return std::string JSON string
-	 */
-	std::string build_json(bool with_id = false) const;
+	virtual ~forum_tag() = default;
 
 	/**
 	 * @brief Set name of this forum_tag object
@@ -249,7 +401,9 @@ struct DPP_EXPORT forum_tag : public managed {
 	forum_tag& set_name(const std::string& name);
 };
 
-/** @brief A group of thread member objects*/
+/**
+ * @brief A group of thread member objects. the key is the user_id of the dpp::thread_member
+ */
 typedef std::unordered_map<snowflake, thread_member> thread_member_map;
 
 /**
@@ -257,52 +411,91 @@ typedef std::unordered_map<snowflake, thread_member> thread_member_map;
  * There are one of these for every channel type except threads. Threads are
  * special snowflakes. Get it? A Discord pun. Hahaha. .... I'll get my coat.
  */ 
-class DPP_EXPORT channel : public managed, public json_interface<channel>  {
+class DPP_EXPORT channel : public managed, public json_interface<channel> {
+protected:
+	friend struct json_interface<channel>;
+
+	/** Read class values from json object
+	 * @param j A json object to read from
+	 * @return A reference to self
+	 */
+	channel& fill_from_json_impl(nlohmann::json* j);
+
+	/**
+	 * @brief Build json for this channel object
+	 *
+	 * @param with_id include the ID in the json
+	 * @return json JSON object
+	 */
+	virtual json to_json_impl(bool with_id = false) const;
+
 public:
-	/** Channel name (1-100 characters) */
+	/**
+	 * @brief Channel name (1-100 characters).
+	 */
 	std::string name;
 
-	/** Channel topic (0-4096 characters for forum channels, 0-1024 characters for all others) */
+	/**
+	 * @brief Channel topic (0-4096 characters for forum and media channels, 0-1024 characters for all others).
+	 */
 	std::string topic;
 
 	/**
-	 * @brief Voice region if set for voice channel, otherwise empty string
+	 * @brief Voice region if set for voice channel, otherwise empty string.
 	 */
 	std::string rtc_region;
 
-	/** DM recipients */
+	/**
+	 * @brief DM recipients.
+	 */
 	std::vector<snowflake> recipients;
 
-	/** Permission overwrites to apply to base permissions */
+	/**
+	 * @brief Permission overwrites to apply to base permissions.
+	 */
 	std::vector<permission_overwrite> permission_overwrites;
 
-	/** A set of tags that can be used in a forum channel */
+	/**
+	 * @brief A set of tags that can be used in a forum or media channel.
+	 */
 	std::vector<forum_tag> available_tags;
 
 	/**
-	 * @brief The emoji to show as the default reaction button on a forum post.
-	 * Contains either nothing, the id of a guild's custom emoji or the unicode character of the emoji
+	 * @brief The emoji to show as the default reaction button on a thread in a forum or media channel.
+	 * Contains either nothing, the id of a guild's custom emoji or the unicode character of the emoji.
 	 */
 	std::variant<std::monostate, snowflake, std::string> default_reaction;
 
 	/**
-	 * @brief Channel icon (for group DMs)
+	 * @brief Channel icon (for group DMs).
 	 */
 	utility::iconhash icon;
 
-	/** User ID of the creator for group DMs or threads */
+	/**
+	 * @brief User ID of the creator for group DMs or threads.
+	 */
 	snowflake owner_id;
 
-	/** Parent ID (for guild channels: id of the parent category, for threads: id of the text channel this thread was created) */
+	/**
+	 * @brief Parent ID (for guild channels: id of the parent category, for threads: id of the text channel this thread was created).
+	 */
 	snowflake parent_id;
 
-	/** Guild id of the guild that owns the channel */
+	/**
+	 * @brief Guild id of the guild that owns the channel.
+	 */
 	snowflake guild_id;
 
-	/** ID of last message to be sent to the channel (may not point to an existing or valid message or thread) */
+	/**
+	 * @brief ID of last message to be sent to the channel.
+	 *
+	 * @warning may not point to an existing or valid message/thread.
+	 */
 	snowflake last_message_id;
 
-	/** Timestamp of last pinned message */
+	/**
+	 * @brief Timestamp of last pinned message.
+	 */
 	time_t last_pin_timestamp;
 
 	/**
@@ -313,31 +506,47 @@ public:
 	 */
 	permission permissions;
 
-	/** Sorting position, lower number means higher up the list */
+	/**
+	 * @brief Sorting position, lower number means higher up the list
+	 */
 	uint16_t position;
 
-	/** the bitrate (in kilobits) of the voice channel */
+	/**
+	 * @brief The bitrate (in kilobits) of the voice channel.
+	 */
 	uint16_t bitrate;
 
-	/** amount of seconds a user has to wait before sending another message (0-21600); bots, as well as users with the permission manage_messages or manage_channel, are unaffected*/
+	/**
+	 * @brief Amount of seconds a user has to wait before sending another message (0-21600).
+	 * Bots, as well as users with the permission manage_messages or manage_channel, are unaffected
+	 */
 	uint16_t rate_limit_per_user;
 
-	/** The initial `rate_limit_per_user` to set on newly created threads in a channel. This field is copied to the thread at creation time and does not live update */
+	/**
+	 * @brief The initial `rate_limit_per_user` to set on newly created threads in a channel.
+	 * This field is copied to the thread at creation time and does not live update.
+	 */
 	uint16_t default_thread_rate_limit_per_user;
 
 	/**
 	 * @brief Default duration, copied onto newly created threads. Used by the clients, not the API.
-	 * Threads will stop showing in the channel list after the specified period of inactivity. Defaults to dpp::arc_1_day
+	 * Threads will stop showing in the channel list after the specified period of inactivity. Defaults to dpp::arc_1_day.
 	 */
 	auto_archive_duration_t default_auto_archive_duration;
 
-	/** the default sort order type used to order posts in forum channels */
+	/**
+	 * @brief The default sort order type used to order posts in forum and media channels.
+	 */
 	default_forum_sort_order_t default_sort_order;
 
-	/** Flags bitmap (dpp::channel_flags) */
+	/**
+	 * @brief Flags bitmap (dpp::channel_flags)
+	 */
 	uint16_t flags;
-	
-	/** Maximum user limit for voice channels (0-99) */
+
+	/**
+	 * @brief Maximum user limit for voice channels (0-99)
+	 */
 	uint8_t user_limit;
 
 	/** Constructor */
@@ -352,20 +561,6 @@ public:
 	* @return std::string The formatted mention of the channel.
 	*/
 	static std::string get_mention(const snowflake& id);
-
-	/** Read class values from json object
-	 * @param j A json object to read from
-	 * @return A reference to self
-	 */
-	 channel& fill_from_json(nlohmann::json* j);
-
-	/**
-	 * @brief Build json for this channel object
-	 * 
-	 * @param with_id include the ID in the json
-	 * @return std::string JSON string
-	 */
-	virtual std::string build_json(bool with_id = false) const;
 
 	/**
 	 * @brief Set name of this channel object
@@ -403,6 +598,14 @@ public:
 	 * @return Reference to self, so these method calls may be chained
 	 */
 	channel& set_default_forum_layout(forum_layout_type layout_type);
+
+	/**
+	 * @brief Set the default forum sort order for the forum channel
+	 *
+	 * @param sort_order The sort order
+	 * @return Reference to self, so these method calls may be chained
+	 */
+	channel& set_default_sort_order(default_forum_sort_order_t sort_order);
 
 	/**
 	 * @brief Set flags for this channel object
@@ -494,16 +697,39 @@ public:
 	channel& set_rate_limit_per_user(const uint16_t rate_limit_per_user);
 
 	/**
-	 * @brief Add a permission_overwrite to this channel object
-	 * 
-	 * @param id ID of the role or the member you want to add overwrite for
-	 * @param type type of overwrite
-	 * @param allowed_permissions bitmask of allowed permissions (refer to enum dpp::permissions) for this user/role in this channel
-	 * @param denied_permissions bitmask of denied permissions (refer to enum dpp::permissions) for this user/role in this channel
+	 * @brief Add permission overwrites for a user or role.
+	 * If the channel already has permission overwrites for the passed target, the existing ones will be adjusted by the passed permissions
 	 *
-	 * @return Reference to self, so these method calls may be chained 
+	 * @param target ID of the role or the member you want to adjust overwrites for
+	 * @param type type of overwrite
+	 * @param allowed_permissions bitmask of dpp::permissions you want to allow for this user/role in this channel. Note: You can use the dpp::permission class
+	 * @param denied_permissions bitmask of dpp::permissions you want to deny for this user/role in this channel. Note: You can use the dpp::permission class
+	 *
+	 * @return Reference to self, so these method calls may be chained
 	 */
-	channel& add_permission_overwrite(const snowflake id, const overwrite_type type, const uint64_t allowed_permissions, const uint64_t denied_permissions);
+	channel& add_permission_overwrite(const snowflake target, const overwrite_type type, const uint64_t allowed_permissions, const uint64_t denied_permissions);
+	/**
+	 * @brief Set permission overwrites for a user or role on this channel object. Old permission overwrites for the target will be overwritten
+	 *
+	 * @param target ID of the role or the member you want to set overwrites for
+	 * @param type type of overwrite
+	 * @param allowed_permissions bitmask of allowed dpp::permissions for this user/role in this channel. Note: You can use the dpp::permission class
+	 * @param denied_permissions bitmask of denied dpp::permissions for this user/role in this channel. Note: You can use the dpp::permission class
+	 *
+	 * @return Reference to self, so these method calls may be chained
+	 *
+	 * @note If both `allowed_permissions` and `denied_permissions` parameters are 0, the permission overwrite for the target will be removed
+	 */
+	channel& set_permission_overwrite(const snowflake target, const overwrite_type type, const uint64_t allowed_permissions, const uint64_t denied_permissions);
+	/**
+	 * @brief Remove channel specific permission overwrites of a user or role
+	 *
+	 * @param target ID of the role or the member you want to remove permission overwrites of
+	 * @param type type of overwrite
+	 *
+	 * @return Reference to self, so these method calls may be chained
+	 */
+	channel& remove_permission_overwrite(const snowflake target, const overwrite_type type);
 
 	/**
 	 * @brief Get the channel type
@@ -574,10 +800,19 @@ public:
 	/**
 	 * @brief Get the channel's icon url (if its a group DM), otherwise returns an empty string
 	 *
-	 * @param size The size of the icon in pixels. It can be any power of two between 16 and 4096. if not specified, the default sized icon is returned.
-	 * @return std::string icon url or empty string
+	 * @param size The size of the icon in pixels. It can be any power of two between 16 and 4096,
+	 * otherwise the default sized icon is returned.
+	 * @param format The format to use for the avatar. It can be one of `i_webp`, `i_jpg` or `i_png`.
+	 * @return std::string icon url or an empty string, if required attributes are missing or an invalid format was passed
 	 */
-	std::string get_icon_url(uint16_t size = 0) const;
+	std::string get_icon_url(uint16_t size = 0, const image_type format = i_png) const;
+
+	/**
+	 * @brief Returns string of URL to channel
+	 * 
+	 * @return string of URL to channel
+	 */
+	std::string get_url() const;
 
 	/**
 	 * @brief Returns true if the channel is NSFW gated
@@ -637,6 +872,13 @@ public:
 	bool is_forum() const;
 
 	/**
+	 * @brief Returns true if the channel is a media channel
+	 *
+	 * @return true if media channel
+	 */
+	bool is_media_channel() const;
+
+	/**
 	 * @brief Returns true if the channel is an announcement channel
 	 * 
 	 * @return true if announcement channel
@@ -686,27 +928,59 @@ public:
 	 */
 	bool is_tag_required() const;
 
+	/**
+	 * @brief Returns true if embedded media download options are hidden in a media channel
+	 *
+	 * @return true, if embedded media download options are hidden in a media channel
+	 */
+	bool is_download_options_hidden() const;
+
 };
 
 /** @brief A definition of a discord thread.
  * A thread is a superset of a channel. Not to be confused with `std::thread`!
  */
-class DPP_EXPORT thread : public channel {
+class DPP_EXPORT thread : public channel, public json_interface<thread> {
+protected:
+	friend struct json_interface<thread>;
+
+	/** Read class values from json object
+	 * @param j A json object to read from
+	 * @return A reference to self
+	 */
+	thread& fill_from_json_impl(nlohmann::json* j);
+
+	/**
+	 * @brief Build json for this thread object
+	 *
+	 * @param with_id include the ID in the json
+	 * @return std::string JSON string
+	 */
+	json to_json_impl(bool with_id = false) const override;
+
 public:
+	using json_interface<thread>::fill_from_json;
+	using json_interface<thread>::build_json;
+	using json_interface<thread>::to_json;
+
 	/**
 	 * @brief Thread member of current user if joined to the thread.
 	 * Note this is only set by certain api calls otherwise contains default data
 	 */
 	thread_member member;
 
-	/** Thread metadata (threads) */
+	/**
+	 * @brief Thread metadata (threads)
+	 */
 	thread_metadata metadata;
 
-	/** Created message. Only filled within the cluster::thread_create_in_forum() method */
+	/**
+	 * @brief Created message. Only filled within the cluster::thread_create_in_forum() method
+	 */
 	message msg;
 
 	/**
-	 * A list of dpp::forum_tag IDs that have been applied to a thread in a forum channel
+	 * @brief A list of dpp::forum_tag IDs that have been applied to a thread in a forum or media channel.
 	 */
 	std::vector<snowflake> applied_tags;
 
@@ -722,7 +996,9 @@ public:
 	 */
 	uint8_t message_count;
 
-	/** Approximate count of members in a thread (threads) */
+	/**
+	 * @brief Approximate count of members in a thread (stops counting at 50)
+	 */
 	uint8_t member_count;
 
 	/**
@@ -751,25 +1027,10 @@ public:
 	 */
 	bool is_private_thread() const;
 
-	/** Read class values from json object
-	 * @param j A json object to read from
-	 * @return A reference to self
-	 */
-	thread& fill_from_json(nlohmann::json* j);
-
 	/**
 	 * @brief Destroy the thread object
 	 */
-	virtual ~thread();
-
-	/**
-	 * @brief Build json for this thread object
-	 * 
-	 * @param with_id include the ID in the json
-	 * @return std::string JSON string
-	 */
-	std::string build_json(bool with_id = false) const;
-
+	virtual ~thread() = default;
 };
 
 
@@ -799,5 +1060,25 @@ typedef std::unordered_map<snowflake, channel> channel_map;
  */
 typedef std::unordered_map<snowflake, thread> thread_map;
 
+/**
+ * @brief A thread alongside the bot's optional thread_member object tied to it
+ */
+struct active_thread_info {
+	/**
+	 * @brief The thread object
+	 */
+	thread active_thread;
+
+	/**
+	 * @brief The bot as a thread member, only present if the bot is in the thread
+	 */
+	std::optional<thread_member> bot_member;
 };
+
+/**
+ * @brief A map of threads alongside optionally the thread_member tied to the bot if it is in the thread. The map's key is the thread id. Returned from the cluster::threads_get_active method
+ */
+using active_threads = std::map<snowflake, active_thread_info>;
+
+} // namespace dpp
 

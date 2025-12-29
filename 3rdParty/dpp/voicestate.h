@@ -2,6 +2,7 @@
  *
  * D++, A Lightweight C++ library for Discord
  *
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright 2021 Craig Edwards and D++ contributors 
  * (https://github.com/brainboxdotcc/DPP/graphs/contributors)
  *
@@ -21,7 +22,7 @@
 #pragma once
 #include <dpp/export.h>
 #include <dpp/snowflake.h>
-#include <dpp/nlohmann/json_fwd.hpp>
+#include <dpp/json_fwd.h>
 #include <unordered_map>
 #include <dpp/json_interface.h>
 
@@ -46,6 +47,17 @@ enum voicestate_flags {
  * or via dpp::channel::get_voice_members
  */
 class DPP_EXPORT voicestate : public json_interface<voicestate> {
+protected:
+	friend struct json_interface<voicestate>;
+
+	/**
+	 * @brief Fill voicestate object from json data
+	 * 
+	 * @param j JSON data to fill from
+	 * @return voicestate& Reference to self
+	 */
+	voicestate& fill_from_json_impl(nlohmann::json* j);
+
 public:
 	class discord_client*	shard;             //!< Owning shard
 	snowflake		guild_id;          //!< Optional: the guild id this voice state is for
@@ -64,22 +76,6 @@ public:
 	 * @brief Destroy the voicestate object
 	 */
 	virtual ~voicestate() = default;
-
-	/**
-	 * @brief Fill voicestate object from json data
-	 * 
-	 * @param j JSON data to fill from
-	 * @return voicestate& Reference to self
-	 */
-	voicestate& fill_from_json(nlohmann::json* j);
-
-	/**
-	 * @brief Build json representation of the object
-	 * 
-	 * @param with_id Add ID to output
-	 * @return std::string JSON string
-	 */
-	virtual std::string build_json(bool with_id = false) const;
 
 	/// Return true if the user is deafened by the server
 	bool is_deaf() const;
@@ -107,4 +103,4 @@ public:
 /** A container of voicestates */
 typedef std::unordered_map<std::string, voicestate> voicestate_map;
 
-};
+} // namespace dpp

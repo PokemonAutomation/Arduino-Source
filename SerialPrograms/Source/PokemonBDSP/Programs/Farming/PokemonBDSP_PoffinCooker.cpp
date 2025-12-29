@@ -64,51 +64,51 @@ ImageFloatBox box(0.56, 0.724, 0.012, 0.024); // Create a box that contains both
 
 void TurnClockwiseSlow(ProControllerContext& context){ // One turn of stirring poffin at slow speed (clockwise)
     pbf_move_right_joystick(context, {0, -1}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 53, 231, 40ms, 0ms);
-    pbf_move_right_joystick(context, 6, 167, 40ms, 0ms);
-    pbf_move_right_joystick(context, 6, 88, 40ms, 0ms);
-    pbf_move_right_joystick(context, 53, 24, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 53, 231, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 6, 167, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 6, 88, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 53, 24, 40ms, 0ms);
     pbf_move_right_joystick(context, {0, +1}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 202, 24, 40ms, 0ms);
-    pbf_move_right_joystick(context, 249, 88, 40ms, 0ms);
-    pbf_move_right_joystick(context, 249, 167, 40ms, 0ms);
-    pbf_move_right_joystick(context, 202, 231, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 202, 24, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 249, 88, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 249, 167, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 202, 231, 40ms, 0ms);
 }
 
 void TurnClockwiseFast(ProControllerContext& context){ // Same as above, but faster for the end of the cooking session
     pbf_move_right_joystick(context, {0, -1}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 38, 218, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 38, 218, 40ms, 0ms);
     pbf_move_right_joystick(context, {-1, 0}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 38, 38, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 38, 38, 40ms, 0ms);
     pbf_move_right_joystick(context, {0, +1}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 218, 38, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 218, 38, 40ms, 0ms);
     pbf_move_right_joystick(context, {+1, 0}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 218, 218, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 218, 218, 40ms, 0ms);
 }
 
 
 void TurnCounterClockwiseSlow(ProControllerContext& context){ // One turn of stirring poffin (counter-clockwise)
     pbf_move_right_joystick(context, {0, -1}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 202, 231, 40ms, 0ms);
-    pbf_move_right_joystick(context, 249, 167, 40ms, 0ms);
-    pbf_move_right_joystick(context, 249, 88, 40ms, 0ms);
-    pbf_move_right_joystick(context, 202, 24, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 202, 231, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 249, 167, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 249, 88, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 202, 24, 40ms, 0ms);
     pbf_move_right_joystick(context, {0, +1}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 53, 24, 40ms, 0ms);
-    pbf_move_right_joystick(context, 6, 88, 40ms, 0ms);
-    pbf_move_right_joystick(context, 6, 167, 40ms, 0ms);
-    pbf_move_right_joystick(context, 53, 231, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 53, 24, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 6, 88, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 6, 167, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 53, 231, 40ms, 0ms);
 }
 
 void TurnCounterClockwiseFast(ProControllerContext& context){ // Same as above, but faster for the end of the cooking session
     pbf_move_right_joystick(context, {0, -1}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 218, 218, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 218, 218, 40ms, 0ms);
     pbf_move_right_joystick(context, {+1, 0}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 218, 38, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 218, 38, 40ms, 0ms);
     pbf_move_right_joystick(context, {0, +1}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 38, 38, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 38, 38, 40ms, 0ms);
     pbf_move_right_joystick(context, {-1, 0}, 40ms, 0ms);
-    pbf_move_right_joystick(context, 38, 218, 40ms, 0ms);
+    pbf_move_right_joystick_old(context, 38, 218, 40ms, 0ms);
 }
 
 
@@ -121,28 +121,28 @@ void PoffinCooker::program(SingleSwitchProgramEnvironment& env, ProControllerCon
 
     env.log("Select the cooking option");
     //  Select the cooking option.
-    pbf_press_button(context, BUTTON_A, 5, 100);
-    pbf_press_button(context, BUTTON_A, 5, 175);
-    pbf_press_button(context, BUTTON_A, 5, 75);
-    pbf_press_button(context, BUTTON_A, 5, 100);
+    pbf_press_button(context, BUTTON_A, 40ms, 800ms);
+    pbf_press_button(context, BUTTON_A, 40ms, 1400ms);
+    pbf_press_button(context, BUTTON_A, 40ms, 600ms);
+    pbf_press_button(context, BUTTON_A, 40ms, 800ms);
 
 
     for (uint16_t c = 0; c < MAX_COOK_ATTEMPTS; c++){
 
         env.log("Select the 4 berries to use");
         // Select the first four berries to cook and confirm the selection.
-        pbf_press_button(context, BUTTON_A, 5, 50);
-        pbf_press_dpad(context, DPAD_DOWN, 5, 50);
-        pbf_press_button(context, BUTTON_A, 5, 50);
-        pbf_press_dpad(context, DPAD_DOWN, 5, 50);        
-        pbf_press_button(context, BUTTON_A, 5, 50);
-        pbf_press_dpad(context, DPAD_DOWN, 5, 50);
-        pbf_press_button(context, BUTTON_A, 5, 50);
-        pbf_press_button(context, BUTTON_A, 5, 50);
-        pbf_mash_button(context, BUTTON_A, 150); // Mash here to make sure the final button press isn't dropped
+        pbf_press_button(context, BUTTON_A, 40ms, 400ms);
+        pbf_press_dpad(context, DPAD_DOWN, 40ms, 400ms);
+        pbf_press_button(context, BUTTON_A, 40ms, 400ms);
+        pbf_press_dpad(context, DPAD_DOWN, 40ms, 400ms);
+        pbf_press_button(context, BUTTON_A, 40ms, 400ms);
+        pbf_press_dpad(context, DPAD_DOWN, 40ms, 400ms);
+        pbf_press_button(context, BUTTON_A, 40ms, 400ms);
+        pbf_press_button(context, BUTTON_A, 40ms, 400ms);
+        pbf_mash_button(context, BUTTON_A, 1200ms); // Mash here to make sure the final button press isn't dropped
 
         // Wait a bit less than 10 seconds for the cinematic to happen then cook.
-        pbf_wait(context, 1050);
+        pbf_wait(context, 8400ms);
         context.wait_for_all_requests();
 
         env.log("Stir slowly for the first part");
@@ -186,13 +186,13 @@ void PoffinCooker::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         }
 
         // Final animation when the cooking session is over
-        pbf_wait(context, 750);
+        pbf_wait(context, 6000ms);
 
         if (c < MAX_COOK_ATTEMPTS - 1){
             env.log("Prepare for the next iteration");
-            pbf_press_button(context, BUTTON_A, 5, 125);
-            pbf_press_button(context, BUTTON_A, 5, 125);
-            pbf_press_button(context, BUTTON_A, 5, 125);                
+            pbf_press_button(context, BUTTON_A, 40ms, 1000ms);
+            pbf_press_button(context, BUTTON_A, 40ms, 1000ms);
+            pbf_press_button(context, BUTTON_A, 40ms, 1000ms);
         }
         stats.m_attempts++;
     }

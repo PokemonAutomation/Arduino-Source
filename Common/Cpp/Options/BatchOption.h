@@ -14,7 +14,7 @@
 namespace PokemonAutomation{
 
 // A ConfigOption that groups one or more options.
-class BatchOption : public ConfigOption{
+class BatchOption : public ConfigOptionImpl<BatchOption>{
 public:
     ~BatchOption();
     BatchOption(LockMode lock_while_program_is_running, bool horizontal = false);
@@ -37,8 +37,6 @@ public:
     virtual void reset_state() override;
 
     virtual void report_program_state(bool program_is_running) override;
-
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
     bool horizontal() const;
     FixedLimitVector<ConfigOption*> options() const;

@@ -123,7 +123,7 @@ CatchResults throw_balls(
                 "BasicCatcher: Found " + ball_slug + " with amount " +
                 std::to_string(num_balls)
             );
-            pbf_mash_button(context, BUTTON_ZL, 125);
+            pbf_mash_button(context, BUTTON_ZL, 1000ms);
             context.wait_for_all_requests();
         }
         balls_used++;
@@ -251,7 +251,7 @@ CatchResults basic_catcher(
                 );
             }
             stream.log("BasicCatcher: The wild " + STRING_POKEMON + " was caught by " + pokeball_str, COLOR_BLUE);
-            pbf_wait(context, 50);
+            pbf_wait(context, 400ms);
             results.result = CatchResult::POKEMON_CAUGHT;
             break; //  Continue the loop.
         case 2:

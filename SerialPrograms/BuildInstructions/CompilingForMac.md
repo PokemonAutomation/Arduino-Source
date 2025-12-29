@@ -140,12 +140,12 @@ brew tap-new --no-git <yourname>/libdpp # change <yourname> to any desired name,
 ```
 Copy the formula into the tap:
 ```shell
-cp <SOURCE_DIR_ROOT>/3rdPartyBinaries/libdpp@10.0.22.rb $(brew --prefix)/Library/Taps/<yourname>/homebrew-libdpp/Formula/ # change <SOURCE_DIR_ROOT> to where *Arduino-Source* located
+cp <SOURCE_DIR_ROOT>/3rdPartyBinaries/libdpp@10.0.28.rb $(brew --prefix)/Library/Taps/<yourname>/homebrew-libdpp/Formula/ # change <SOURCE_DIR_ROOT> to where *Arduino-Source* located
 ```
 And then install it with:
 ```shell
 brew unlink libdpp # if you have already install the official one
-brew install libdpp@10.0.22
+brew install libdpp@10.0.28
 ```
 
 ### Verify Clang Version
@@ -247,7 +247,7 @@ This makes a new folder called "build_mac" in "Arduino-Source" and moves the Ter
 
 Execute the command in Terminal:
 ```
-cmake ../SerialPrograms/ -DUNIX_LINK_TESSERACT:BOOL=true -DCMAKE_BUILD_TYPE:STRING=Release -Wall
+cmake ../SerialPrograms/ -DCMAKE_BUILD_TYPE:STRING=Release -Wall
 ```
 This command uses CMake to configure our code to prepare for compilation. If successful, it should print texts like
 ```
@@ -285,11 +285,6 @@ If you're opening the program for the first time, MacOS may ask for Camera and M
 
 <img src="Images/Mac/compiled-app.png" alt="A photo of the compiled SerialPrograms app" width="460" height="218">
 
-### Computer Battery Setting
-
-When you plan to run the program for a long period of time, you need to prevent your Mac from going to sleep.
-
-Go to System Preferences App -> Battery -> select the checker box "Prevent your Mac from automatically sleeping when the display is off".
 
 Enjoy shiny hunting!
 

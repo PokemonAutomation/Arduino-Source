@@ -12,6 +12,7 @@
 namespace PokemonAutomation{
 
 
+
 struct StringCell::Data{
     const bool m_is_password;
     const std::string m_default;
@@ -46,7 +47,7 @@ StringCell::StringCell(
     std::string placeholder_text,
     bool signal_all_text_changes
 )
-    : ConfigOption(lock_while_program_is_running)
+    : ConfigOptionImpl<StringCell>(lock_while_program_is_running)
     , m_data(CONSTRUCT_TOKEN, is_password, std::move(default_value), std::move(placeholder_text), signal_all_text_changes)
 {}
 
@@ -118,7 +119,13 @@ StringOption::StringOption(
     std::string placeholder_text,
     bool signal_all_text_changes
 )
-     : StringCell(is_password, lock_while_program_is_running, default_value, placeholder_text, signal_all_text_changes)
+     : ConfigOptionImpl<StringOption, StringCell>(
+        is_password,
+        lock_while_program_is_running,
+        default_value,
+        placeholder_text,
+        signal_all_text_changes
+    )
      , m_label(std::move(label))
 {}
 

@@ -13,7 +13,7 @@
 namespace PokemonAutomation{
 
 
-class GroupOption : public BatchOption{
+class GroupOption : public ConfigOptionImpl<GroupOption, BatchOption>{
 public:
     enum class EnableMode{
         ALWAYS_ENABLED,
@@ -42,11 +42,11 @@ public:
 
     virtual void restore_defaults() override;
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 public:
     //  Callbacks
     virtual void on_set_enabled(bool enabled);
+
 
 private:
     struct Data;

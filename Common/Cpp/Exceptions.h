@@ -152,6 +152,20 @@ private:
 };
 
 
+//  These are thrown if failed to create an ML model session. They
+//  are usually due to unable to load ML model files or not enough GPU
+//  memory.
+class MLModelSessionCreationError : public Exception{
+public:
+    // If logger is not nullptr, call logger to write error message in the constructor.
+    // Otherwise, write error message to std::cerr.
+    MLModelSessionCreationError(Logger* logger, std::string model_path);
+    virtual const char* name() const override{ return "MLModelCreationError"; }
+    virtual std::string message() const override;
+private:
+    std::string m_model_path;
+};
+
 
 
 

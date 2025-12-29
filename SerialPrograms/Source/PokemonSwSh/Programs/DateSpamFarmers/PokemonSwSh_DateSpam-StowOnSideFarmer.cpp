@@ -59,7 +59,7 @@ void StowOnSideFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
         ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 160ms);
     }
 
@@ -69,14 +69,14 @@ void StowOnSideFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
         env.log("Fetch Attempts: " + tostr_u_commas(c));
         home_roll_date_enter_game_autorollback(env.console, context, year);
         if (context->performance_class() == ControllerPerformanceClass::SysbotBase){
-            pbf_wait(context, 90);
+            pbf_wait(context, 720ms);
         }else{
-            pbf_mash_button(context, BUTTON_B, 90);
+            pbf_mash_button(context, BUTTON_B, 720ms);
         }
 
         ssf_press_button_ptv(context, BUTTON_A, 160ms);
-        pbf_mash_button(context, BUTTON_ZL, 385);
-        pbf_mash_button(context, BUTTON_B, 700);
+        pbf_mash_button(context, BUTTON_ZL, 3080ms);
+        pbf_mash_button(context, BUTTON_B, 5600ms);
 
         if (SAVE_ITERATIONS0 != 0){
             save_count++;

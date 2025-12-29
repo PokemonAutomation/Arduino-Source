@@ -376,8 +376,7 @@ AutoStory_Descriptor::AutoStory_Descriptor()
         "Progress through the mainstory of SV.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 
@@ -1262,12 +1261,12 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
     }    
 
     if (TEST_PBF_LEFT_JOYSTICK){
-        pbf_move_left_joystick(context, X_MOVE, Y_MOVE, HOLD_TICKS, RELEASE_TICKS);
+        pbf_move_left_joystick_old(context, X_MOVE, Y_MOVE, HOLD_TICKS * 8ms, RELEASE_TICKS * 8ms);
         return;
     } 
 
     if (TEST_PBF_JOYSTICK2){
-        pbf_move_left_joystick(context, X_MOVE2, Y_MOVE2, HOLD_TICKS2, RELEASE_TICKS2);
+        pbf_move_left_joystick_old(context, X_MOVE2, Y_MOVE2, HOLD_TICKS2 * 8ms, RELEASE_TICKS2 * 8ms);
         return;
     }            
 
@@ -1306,10 +1305,10 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
         pbf_move_left_joystick(context, {0, +1}, 2000ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 3.749788);
-        pbf_move_left_joystick(context, 128, 0, 680, 50);
+        pbf_move_left_joystick(context, {0, +1}, 5440ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 1.589021);
-        pbf_move_left_joystick(context, 128, 0, 1200, 50);
+        pbf_move_left_joystick(context, {0, +1}, 9600ms, 400ms);
         
 
         return;
@@ -1343,7 +1342,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     }
 
     // Connect controller
-    pbf_press_button(context, BUTTON_L, 20, 20);
+    pbf_press_button(context, BUTTON_L, 160ms, 160ms);
 
     if (ENABLE_ADVANCED_MODE){
         env.console.log("Start Checkpoint " + ALL_AUTO_STORY_CHECKPOINT_LIST()[get_start_checkpoint_index()]->name(), COLOR_ORANGE);        

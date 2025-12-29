@@ -40,8 +40,7 @@ RestaurantFarmer_Descriptor::RestaurantFarmer_Descriptor()
         "Farm the restaurants for exp, items, and money.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class RestaurantFarmer_Descriptor::Stats : public StatsTracker{

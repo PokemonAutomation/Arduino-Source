@@ -63,11 +63,11 @@ CameraAngle quest_photo_navi(
             //Polar Outdoor Classroom 1 - fixed Horsea
             central_to_polar_class1(info, console, context);
 
-            pbf_wait(context, 200);
+            pbf_wait(context, 1600ms);
             context.wait_for_all_requests();
 
             pbf_press_button(context, BUTTON_L, 80ms, 400ms);
-            pbf_move_left_joystick(context, 255, 50, 180, 20);
+            pbf_move_left_joystick_old(context, 255, 50, 1440ms, 160ms);
 
             angle = CameraAngle::down;
 
@@ -78,7 +78,7 @@ CameraAngle quest_photo_navi(
             //Coastal Plaza - Exeggutor-A
             central_to_coastal_plaza(info, console, context);
 
-            pbf_move_left_joystick(context, 0, 115, 400, 20);
+            pbf_move_left_joystick_old(context, 0, 115, 3200ms, 160ms);
 
             //Jump down
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
@@ -86,12 +86,12 @@ CameraAngle quest_photo_navi(
             ssf_press_button(context, BUTTON_B, 0ms, 160ms, 80ms);
             ssf_press_button(context, BUTTON_B, 0ms, 160ms);
 
-            pbf_wait(context, 100);
+            pbf_wait(context, 800ms);
             context.wait_for_all_requests();
 
             pbf_move_left_joystick(context, {0, +1}, 1200ms, 160ms);
-            pbf_press_button(context, BUTTON_B, 20, 20);
-            pbf_wait(context, 200);
+            pbf_press_button(context, BUTTON_B, 160ms, 160ms);
+            pbf_wait(context, 1600ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
             context.wait_for_all_requests();
 
@@ -102,7 +102,7 @@ CameraAngle quest_photo_navi(
             //Canyon Plaza - Golett
             central_to_canyon_plaza(info, console, context);
 
-            pbf_move_left_joystick(context, 210, 128, 80ms, 160ms);
+            pbf_move_left_joystick_old(context, 210, 128, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 4800ms, 2000ms, 3200ms);
@@ -116,7 +116,7 @@ CameraAngle quest_photo_navi(
             //Savanna Plaza - Pride Rock
             central_to_savanna_plaza(info, console, context);
 
-            pbf_move_left_joystick(context, 220, 255, 80ms, 160ms);
+            pbf_move_left_joystick_old(context, 220, 255, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 4800ms, 3200ms, 3200ms);
@@ -139,7 +139,7 @@ CameraAngle quest_photo_navi(
             //Kleavor
             central_to_canyon_plaza(info, console, context);
 
-            pbf_move_left_joystick(context, 205, 64, 160ms, 840ms);
+            pbf_move_left_joystick_old(context, 205, 64, 160ms, 840ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8000ms, 12000ms, 2400ms);
@@ -154,7 +154,7 @@ CameraAngle quest_photo_navi(
             open_map_from_overworld(info, console, context);
             fly_to_overworld_from_map(info, console, context);
 
-            pbf_move_left_joystick(context, 0, 80, 80ms, 160ms);
+            pbf_move_left_joystick_old(context, 0, 80, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 16000ms, 12000ms, 1600ms);
@@ -219,7 +219,7 @@ CameraAngle quest_photo_navi(
             central_to_canyon_plaza(info, console, context);
             pbf_move_left_joystick(context, {-1, 0}, 3200ms, 160ms);
             pbf_press_button(context, BUTTON_L, 80ms, 400ms);
-            pbf_move_left_joystick(context, 0, 100, 160ms, 400ms);
+            pbf_move_left_joystick_old(context, 0, 100, 160ms, 400ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1600ms, 4000ms, 6400ms);
@@ -244,8 +244,8 @@ CameraAngle quest_photo_navi(
             }
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
             pbf_move_left_joystick(context, {0, +1}, 1200ms, 400ms);
-            pbf_move_left_joystick(context, 180, 0, 160ms, 400ms);
-            pbf_wait(context, 200); //Give it time to spawn/load.
+            pbf_move_left_joystick_old(context, 180, 0, 160ms, 400ms);
+            pbf_wait(context, 1600ms); //Give it time to spawn/load.
             context.wait_for_all_requests();
 
             angle = CameraAngle::down;
@@ -306,7 +306,7 @@ void quest_photo(
                 OverworldWatcher overworld(console.logger(), COLOR_BLUE);
 
                 pbf_press_dpad(context, DPAD_DOWN, 400ms, 160ms);
-                pbf_wait(context, 100);
+                pbf_wait(context, 800ms);
                 context.wait_for_all_requests();
 
                 if (move_camera == CameraAngle::up){
@@ -331,7 +331,7 @@ void quest_photo(
                 int exit = run_until<ProControllerContext>(
                     console, context,
                     [&](ProControllerContext& context){
-                        pbf_mash_button(context, BUTTON_B, 2000);
+                        pbf_mash_button(context, BUTTON_B, 16000ms);
                     },
                     {{ overworld }}
                 );
@@ -393,7 +393,7 @@ void quest_catch_navi(
             //Savanna Plaza - Pride Rock
             central_to_savanna_plaza(info, console, context);
 
-            pbf_move_left_joystick(context, 220, 255, 80ms, 160ms);
+            pbf_move_left_joystick_old(context, 220, 255, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 4800ms, 3200ms, 3200ms);
@@ -433,7 +433,7 @@ void quest_catch_navi(
             //Coastal Plaza - Exeggutor-A
             central_to_coastal_plaza(info, console, context);
 
-            pbf_move_left_joystick(context, 0, 115, 400, 20);
+            pbf_move_left_joystick_old(context, 0, 115, 3200ms, 160ms);
 
             //Jump down
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
@@ -441,12 +441,12 @@ void quest_catch_navi(
             ssf_press_button(context, BUTTON_B, 0ms, 160ms, 80ms);
             ssf_press_button(context, BUTTON_B, 0ms, 160ms);
 
-            pbf_wait(context, 100);
+            pbf_wait(context, 800ms);
             context.wait_for_all_requests();
 
-            pbf_move_left_joystick(context, 128, 0, 350, 20);
-            pbf_press_button(context, BUTTON_B, 20, 20);
-            pbf_wait(context, 200);
+            pbf_move_left_joystick(context, {0, +1}, 2800ms, 160ms);
+            pbf_press_button(context, BUTTON_B, 160ms, 160ms);
+            pbf_wait(context, 1600ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             break;
@@ -456,7 +456,7 @@ void quest_catch_navi(
             //Canyon Plaza - Golett
             central_to_canyon_plaza(info, console, context);
 
-            pbf_move_left_joystick(context, 210, 128, 80ms, 160ms);
+            pbf_move_left_joystick_old(context, 210, 128, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 4800ms, 2400ms, 3200ms);
@@ -476,7 +476,7 @@ void quest_catch_navi(
             open_map_from_overworld(info, console, context);
             fly_to_overworld_from_map(info, console, context);
 
-            pbf_move_left_joystick(context, 0, 80, 80ms, 160ms);
+            pbf_move_left_joystick_old(context, 0, 80, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 16000ms, 12000ms, 1600ms);
@@ -494,7 +494,7 @@ void quest_catch_navi(
             central_to_canyon_plaza(info, console, context);
             pbf_move_left_joystick(context, {-1, 0}, 3200ms, 160ms);
             pbf_press_button(context, BUTTON_L, 80ms, 400ms);
-            pbf_move_left_joystick(context, 0, 100, 160ms, 400ms);
+            pbf_move_left_joystick_old(context, 0, 100, 160ms, 400ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1600ms, 4000ms, 6400ms);
@@ -506,7 +506,7 @@ void quest_catch_navi(
 
             central_to_canyon_plaza(info, console, context);
 
-            pbf_move_left_joystick(context, 205, 64, 160ms, 840ms);
+            pbf_move_left_joystick_old(context, 205, 64, 160ms, 840ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8000ms, 13200ms, 4000ms);
@@ -517,19 +517,19 @@ void quest_catch_navi(
             //Vullaby/Mandibuzz
             central_to_savanna_plaza(info, console, context);
 
-            pbf_move_left_joystick(context, 255, 40, 80ms, 160ms);
+            pbf_move_left_joystick_old(context, 255, 40, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-            pbf_move_left_joystick(context, 128, 0, 500, 20);
+            pbf_move_left_joystick(context, {0, +1}, 4000ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             pbf_move_left_joystick(context, {+1, +1}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
             if (console.state().console_type() == ConsoleType::Switch1) {
-                pbf_move_left_joystick(context, 128, 0, 200, 20);
+                pbf_move_left_joystick(context, {0, +1}, 1600ms, 160ms);
             } else {
-                pbf_move_left_joystick(context, 128, 0, 170, 20);
+                pbf_move_left_joystick(context, {0, +1}, 1360ms, 160ms);
             }
 
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
@@ -540,9 +540,9 @@ void quest_catch_navi(
             if (console.state().console_type() == ConsoleType::Switch1) {
                 pbf_move_left_joystick(context, {0, +1}, 800ms, 160ms);
             } else {
-                pbf_move_left_joystick(context, 128, 0, 120, 20);
+                pbf_move_left_joystick(context, {0, +1}, 960ms, 160ms);
             }
-            pbf_wait(context, 400);
+            pbf_wait(context, 3200ms);
             context.wait_for_all_requests();
 
             break;
@@ -553,13 +553,13 @@ void quest_catch_navi(
             open_map_from_overworld(info, console, context);
             fly_to_overworld_from_map(info, console, context);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-            pbf_move_left_joystick(context, 70, 0, 80ms, 160ms);
+            pbf_move_left_joystick_old(context, 70, 0, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 800ms, 4400ms, 2400ms);
 
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
-            pbf_wait(context, 300);
+            pbf_wait(context, 2400ms);
             context.wait_for_all_requests();
 
             break;
@@ -605,7 +605,7 @@ void quest_catch_navi(
             ssf_press_button(context, BUTTON_ZR, 0ms, 1600ms);
             ssf_press_button(context, BUTTON_ZL, 800ms, 400ms);
             ssf_press_button(context, BUTTON_ZL, 1200ms, 400ms);
-            pbf_wait(context, 200);
+            pbf_wait(context, 1600ms);
             context.wait_for_all_requests();
             pbf_press_button(context, BUTTON_ZR, 160ms, 400ms); //Withdraw pokemon
 
@@ -614,7 +614,7 @@ void quest_catch_navi(
             ssf_press_button(context, BUTTON_ZR, 0ms, 1600ms);
             ssf_press_button(context, BUTTON_ZL, 800ms, 400ms);
             ssf_press_button(context, BUTTON_ZL, 1200ms, 400ms);
-            pbf_wait(context, 200);
+            pbf_wait(context, 1600ms);
             context.wait_for_all_requests();
             pbf_press_button(context, BUTTON_ZR, 160ms, 400ms); //Withdraw pokemon
 
@@ -629,10 +629,10 @@ void quest_catch_navi(
             //Lapras - Tera Bug
             central_to_polar_rest(info, console, context);
             pbf_press_button(context, BUTTON_L, 80ms, 400ms);
-            pbf_move_left_joystick(context, 128, 0, 230, 20);
+            pbf_move_left_joystick(context, {0, +1}, 1840ms, 160ms);
             pbf_move_left_joystick(context, {-1, 0}, 2400ms, 160ms);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-            pbf_move_left_joystick(context, 20, 0, 160ms, 400ms);
+            pbf_move_left_joystick_old(context, 20, 0, 160ms, 400ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 5600ms, 13600ms, 2400ms);
@@ -652,7 +652,7 @@ void quest_catch_navi(
     ssf_press_button(context, BUTTON_ZL, 800ms, 400ms);
     ssf_press_button(context, BUTTON_ZL, 1200ms, 400ms);
 
-    pbf_wait(context, 300);
+    pbf_wait(context, 2400ms);
     context.wait_for_all_requests();
 
 }
@@ -679,7 +679,7 @@ void quest_catch_throw_ball(
         }
 
         //Mash B to exit anything else
-        pbf_mash_button(context, BUTTON_B, 125);
+        pbf_mash_button(context, BUTTON_B, 1000ms);
         context.wait_for_all_requests();
 
         //Press X to open Ball menu
@@ -706,10 +706,10 @@ void quest_catch_throw_ball(
 
     //Throw ball
     console.log("Throwing ball.");
-    pbf_mash_button(context, BUTTON_A, 150);
+    pbf_mash_button(context, BUTTON_A, 1200ms);
     context.wait_for_all_requests();
 
-    pbf_mash_button(context, BUTTON_B, 900);
+    pbf_mash_button(context, BUTTON_B, 7200ms);
     context.wait_for_all_requests();
 }
 
@@ -762,10 +762,10 @@ void quest_catch_handle_battle(
 
                 if (ball_exists == ""){
                     console.log("Could not find ball reader. Tera battle. Using first attack.");
-                    pbf_mash_button(context, BUTTON_B, 125);
+                    pbf_mash_button(context, BUTTON_B, 1000ms);
                     context.wait_for_all_requests();
 
-                    pbf_mash_button(context, BUTTON_A, 300);
+                    pbf_mash_button(context, BUTTON_A, 2400ms);
                     context.wait_for_all_requests();
 
                     tera_target = true;
@@ -797,7 +797,7 @@ void quest_catch_handle_battle(
                             console, context,
                             [&](ProControllerContext& context){
                                 pbf_press_button(context, BUTTON_A, 80ms, 400ms);
-                                pbf_wait(context, 100);
+                                pbf_wait(context, 800ms);
                                 context.wait_for_all_requests();
                             },
                             { move_watcher }
@@ -810,8 +810,8 @@ void quest_catch_handle_battle(
 
                         context.wait_for_all_requests();
                         move_select.move_to_slot(console, context, 3);
-                        pbf_mash_button(context, BUTTON_A, 150);
-                        pbf_wait(context, 100);
+                        pbf_mash_button(context, BUTTON_A, 1200ms);
+                        pbf_wait(context, 800ms);
                         context.wait_for_all_requests();
 
                         //Check for battle menu
@@ -833,7 +833,7 @@ void quest_catch_handle_battle(
                         }
                     }else{
                         //Wild pokemon's turn/wait for catch animation
-                        pbf_mash_button(context, BUTTON_B, 900);
+                        pbf_mash_button(context, BUTTON_B, 7200ms);
                         context.wait_for_all_requests();
                     }
                 }
@@ -853,7 +853,7 @@ void quest_catch_handle_battle(
                 case 1:
                     console.log("Detected fainted Pokemon. Switching to next living Pokemon...");
                     pbf_press_button(context, BUTTON_A, 160ms, 400ms);
-                    pbf_wait(context, 100);
+                    pbf_wait(context, 800ms);
                     context.wait_for_all_requests();
                     if (swap.move_to_slot(console, context, switch_party_slot)){
                         pbf_mash_button(context, BUTTON_A, 3000ms);
@@ -956,13 +956,13 @@ void quest_catch(
     OverworldWatcher done_healing(console.logger(), COLOR_BLUE);
     pbf_move_left_joystick(context, {0, +1}, 800ms, 160ms);
 
-    pbf_mash_button(context, BUTTON_A, 300);
+    pbf_mash_button(context, BUTTON_A, 2400ms);
     context.wait_for_all_requests();
 
     int exit = run_until<ProControllerContext>(
         console, context,
         [&](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_B, 2000);
+            pbf_mash_button(context, BUTTON_B, 16000ms);
         },
         {{ done_healing }}
     );
@@ -970,7 +970,7 @@ void quest_catch(
         console.log("Overworld detected.");
     }
     open_map_from_overworld(info, console, context);
-    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
     fly_to_overworld_from_map(info, console, context);
     context.wait_for_all_requests();
 }
@@ -1003,7 +1003,7 @@ void wild_battle_tera(
                     console.log("Turn 1: Tera.");
                     //Open move menu
                     pbf_press_button(context, BUTTON_A, 80ms, 400ms);
-                    pbf_wait(context, 100);
+                    pbf_wait(context, 800ms);
                     context.wait_for_all_requests();
 
                     pbf_press_button(context, BUTTON_R, 160ms, 400ms);
@@ -1032,7 +1032,7 @@ void wild_battle_tera(
                 case 1:
                     console.log("Detected fainted Pokemon. Switching to next living Pokemon...");
                     pbf_press_button(context, BUTTON_A, 160ms, 400ms);
-                    pbf_wait(context, 100);
+                    pbf_wait(context, 800ms);
                     context.wait_for_all_requests();
                     if (swap.move_to_slot(console, context, switch_party_slot)){
                         pbf_mash_button(context, BUTTON_A, 3000ms);

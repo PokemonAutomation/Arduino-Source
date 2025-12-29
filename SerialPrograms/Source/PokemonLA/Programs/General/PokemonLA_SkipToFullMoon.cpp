@@ -47,11 +47,11 @@ SkipToFullMoon::SkipToFullMoon()
 
 void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     while (true){
         // Open menu
-        pbf_press_dpad(context, DPAD_UP, 20, 120);
+        pbf_press_dpad(context, DPAD_UP, 160ms, 960ms);
         context.wait_for_all_requests();
 
         const auto compatibility = detect_item_compatibility(env.console.video().snapshot());
@@ -76,11 +76,11 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, ProControllerC
         // Character turn around to face the tent
         pbf_move_left_joystick(context, {0, +1}, 160ms, 800ms);
         // Press A to show the "how long do you rest" dialogue
-        pbf_press_button(context, BUTTON_A, 10, 100);
+        pbf_press_button(context, BUTTON_A, 80ms, 800ms);
         // Press A to show the time menu
-        pbf_press_button(context, BUTTON_A, 10, 30);
+        pbf_press_button(context, BUTTON_A, 80ms, 240ms);
         // Move the selection to "Until nightfall"
-        pbf_press_dpad(context, DPAD_UP, 10, 30);
+        pbf_press_dpad(context, DPAD_UP, 80ms, 240ms);
         pbf_press_dpad(context, DPAD_UP, 80ms, 400ms);
 
         // Press A to sleep to next night
@@ -110,7 +110,7 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, ProControllerC
             [](ProControllerContext& local_context){
                 // pbf_mash_button(local_context, BUTTON_B, 7000ms);
                 for(size_t i = 0; i < 15; i++){
-                     pbf_press_button(local_context, BUTTON_B, 20, 80);
+                     pbf_press_button(local_context, BUTTON_B, 160ms, 640ms);
                 }
             },
             {{arc_phone_detector}}

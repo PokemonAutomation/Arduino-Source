@@ -33,8 +33,8 @@ BraviaryHeightGlitch::BraviaryHeightGlitch(){}
 void BraviaryHeightGlitch::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     while (true){
         pbf_press_button(context, BUTTON_Y, 240ms, 0ms);
-        pbf_press_button(context, BUTTON_PLUS, 30, 10);
-        pbf_press_button(context, BUTTON_PLUS, 30, 30);
+        pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);
+        pbf_press_button(context, BUTTON_PLUS, 240ms, 240ms);
     }
 }
 

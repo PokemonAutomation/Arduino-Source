@@ -54,8 +54,8 @@ bool open_raid(VideoStream& stream, ProControllerContext& context){
             [](ProControllerContext& context){
                 //  Do 2 presses in quick succession in case one drops or is
                 //  needed to connect the controller.
-                pbf_press_button(context, BUTTON_A, 5, 5);
-                pbf_press_button(context, BUTTON_A, 20, 355);
+                pbf_press_button(context, BUTTON_A, 40ms, 40ms);
+                pbf_press_button(context, BUTTON_A, 160ms, 2840ms);
             },
             {
                 card_detector,
@@ -134,7 +134,7 @@ void open_hosting_lobby(
             int ret = run_until<ProControllerContext>(
                 stream, context,
                 [](ProControllerContext& context){
-                    pbf_press_button(context, BUTTON_B, 20, 980);
+                    pbf_press_button(context, BUTTON_B, 160ms, 7840ms);
                 },
                 {overworld}
             );
@@ -465,8 +465,8 @@ void exit_tera_win_without_catching(
             stream.log("Detected catch prompt.");
             catch_menu.move_to_slot(stream, context, 1);
 //            pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
-            pbf_mash_button(context, BUTTON_A, 30);
-            pbf_mash_button(context, BUTTON_B, 125);
+            pbf_mash_button(context, BUTTON_A, 240ms);
+            pbf_mash_button(context, BUTTON_B, 1000ms);
             continue;
         case 1:
             stream.log("Detected possible (A) Next button.");
@@ -544,7 +544,7 @@ void exit_tera_win_by_catching(
             screenshot = stream.video().snapshot();
 
             catch_menu.move_to_slot(stream, context, 0);
-            pbf_press_button(context, BUTTON_A, 20, 150);
+            pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
             context.wait_for_all_requests();
 
             BattleBallReader reader(stream, language);
@@ -559,7 +559,7 @@ void exit_tera_win_by_catching(
             if (quantity < 0){
                 stream.log("Unable to read ball quantity.", COLOR_RED);
             }
-            pbf_mash_button(context, BUTTON_A, 125);
+            pbf_mash_button(context, BUTTON_A, 1000ms);
 
             continue;
         }
@@ -660,7 +660,7 @@ TeraResult exit_tera_win_by_catching(
             screenshot = stream.video().snapshot();
 
             catch_menu.move_to_slot(stream, context, 0);
-            pbf_press_button(context, BUTTON_A, 20, 150);
+            pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
             context.wait_for_all_requests();
 
             BattleBallReader reader(stream, language);
@@ -675,7 +675,7 @@ TeraResult exit_tera_win_by_catching(
             if (quantity < 0){
                 stream.log("Unable to read ball quantity.", COLOR_RED);
             }
-            pbf_mash_button(context, BUTTON_A, 125);
+            pbf_mash_button(context, BUTTON_A, 1000ms);
 
             continue;
         }
@@ -686,7 +686,7 @@ TeraResult exit_tera_win_by_catching(
         case 3:
             stream.log("Detected add-to-party prompt.");
             if (result == TeraResult::NO_DETECTION){
-                pbf_press_dpad(context, DPAD_DOWN, 20, 60);
+                pbf_press_dpad(context, DPAD_DOWN, 160ms, 480ms);
 //                pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             }else{
                 pbf_press_button(context, BUTTON_B, 160ms, 840ms);

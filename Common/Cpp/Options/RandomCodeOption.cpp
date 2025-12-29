@@ -10,7 +10,6 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/CodeValidator.h"
-#include "Common/Qt/Options/ConfigWidget.h"
 #include "RandomCodeOption.h"
 
 namespace PokemonAutomation{

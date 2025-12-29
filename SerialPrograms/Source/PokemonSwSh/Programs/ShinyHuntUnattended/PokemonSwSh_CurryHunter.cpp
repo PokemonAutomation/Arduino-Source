@@ -31,8 +31,7 @@ CurryHunter_Descriptor::CurryHunter_Descriptor()
         "<font color=\"red\">(This program cannot detect shinies. You must check manually or with " + STRING_POKEMON + " HOME.)</font>",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::OPTIONAL_,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct CurryHunter_Descriptor::Stats : public ShinyHuntTracker{
@@ -59,9 +58,11 @@ CurryHunter::CurryHunter()
         "2000 ms"
     )
     , SMALL_POKEMON(
-        "<b>Small " + STRING_POKEMON + ":</b><br>If there are small " + STRING_POKEMON + ", increase this number by 30. You may have to adjust the number and check what works best for your area.",
+        "<b>Walk forward for Small " + STRING_POKEMON + ":</b><br>"
+        "If there are small " + STRING_POKEMON +
+        ", increase this number by 240 ms. You may have to adjust the number and check what works best for your area.",
         LockMode::LOCK_WHILE_RUNNING,
-        0
+        "0 ms"
     )
     , TAKE_VIDEO(
         "<b>Take Videos:</b><br>Take a video after each cooking iteration. This will spam your album with videos.",
@@ -90,7 +91,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     }else{
-        pbf_press_button(context, BUTTON_R, 5, 50);
+        pbf_press_button(context, BUTTON_R, 40ms, 400ms);
     }
 
 
@@ -99,61 +100,61 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
 
 
     //  Select the cooking option.
-    pbf_press_button(context, BUTTON_X, 5, 125);
-    pbf_press_dpad(context, DPAD_RIGHT, 5, 100);
-    pbf_press_button(context, BUTTON_A, 5, 125);
-    pbf_press_button(context, BUTTON_A, 5, 300);
+    pbf_press_button(context, BUTTON_X, 40ms, 1000ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 40ms, 800ms);
+    pbf_press_button(context, BUTTON_A, 40ms, 1000ms);
+    pbf_press_button(context, BUTTON_A, 40ms, 2400ms);
 
 
     for (uint32_t it = 0; it < ITERATIONS; it++){
         //  Which ingredient do you want to use?
-        pbf_press_button(context, BUTTON_A, 5, 75);     //  Get rid of the pop-up menu.
-        pbf_press_button(context, BUTTON_A, 5, 150);    //  75. english text is longer.
-        pbf_press_button(context, BUTTON_A, 5, 100);    //  Ingredient is now selected.
+        pbf_press_button(context, BUTTON_A, 40ms, 600ms);     //  Get rid of the pop-up menu.
+        pbf_press_button(context, BUTTON_A, 40ms, 1200ms);    //  75. english text is longer.
+        pbf_press_button(context, BUTTON_A, 40ms, 800ms);    //  Ingredient is now selected.
 
         //  Which berries do you want to use?
-        pbf_press_button(context, BUTTON_A, 5, 75);     //  Get rid of the pop-up menu.
-        pbf_press_button(context, BUTTON_A, 5, 75);
-        pbf_press_dpad(context, DPAD_UP, 5, 75);
-        pbf_press_button(context, BUTTON_A, 5, 125);
-        pbf_press_button(context, BUTTON_PLUS, 5, 200); //  125. english text is longer.
-        pbf_press_button(context, BUTTON_A, 5, 1000);   //  Berries are now selected as well.
+        pbf_press_button(context, BUTTON_A, 40ms, 600ms);     //  Get rid of the pop-up menu.
+        pbf_press_button(context, BUTTON_A, 40ms, 600ms);
+        pbf_press_dpad(context, DPAD_UP, 40ms, 600ms);
+        pbf_press_button(context, BUTTON_A, 40ms, 1000ms);
+        pbf_press_button(context, BUTTON_PLUS, 40ms, 1600ms); //  125. english text is longer.
+        pbf_press_button(context, BUTTON_A, 40ms, 8000ms);   //  Berries are now selected as well.
 
 
         //  Around 17 seconds of A mashing for the first curry cooking phase.
         for (uint16_t c = 0; c < 2100; c = c + 10){
-            pbf_press_button(context, BUTTON_A, 5, 5);
+            pbf_press_button(context, BUTTON_A, 40ms, 40ms);
         }
 
         //  Slowing down to not burn the curry.
         for (uint16_t c = 0; c < 300; c = c + 25){
-            pbf_press_button(context, BUTTON_A, 5, 20);
+            pbf_press_button(context, BUTTON_A, 40ms, 160ms);
         }
-        pbf_wait(context, 170);
+        pbf_wait(context, 1360ms);
 
 
         //  Do circles with the joystick. Each circle has ten positions.
         for (uint16_t i = 0; i < 2350; i = i + 50){
             pbf_move_right_joystick(context, {0, -1}, 40ms, 0ms);
-            pbf_move_right_joystick(context, 202, 231, 40ms, 0ms);
-            pbf_move_right_joystick(context, 249, 167, 40ms, 0ms);
-            pbf_move_right_joystick(context, 249, 88, 40ms, 0ms);
-            pbf_move_right_joystick(context, 202, 24, 40ms, 0ms);
+            pbf_move_right_joystick_old(context, 202, 231, 40ms, 0ms);
+            pbf_move_right_joystick_old(context, 249, 167, 40ms, 0ms);
+            pbf_move_right_joystick_old(context, 249, 88, 40ms, 0ms);
+            pbf_move_right_joystick_old(context, 202, 24, 40ms, 0ms);
             pbf_move_right_joystick(context, {0, +1}, 40ms, 0ms);
-            pbf_move_right_joystick(context, 53, 24, 40ms, 0ms);
-            pbf_move_right_joystick(context, 6, 88, 40ms, 0ms);
-            pbf_move_right_joystick(context, 6, 167, 40ms, 0ms);
-            pbf_move_right_joystick(context, 53, 231, 40ms, 0ms);
+            pbf_move_right_joystick_old(context, 53, 24, 40ms, 0ms);
+            pbf_move_right_joystick_old(context, 6, 88, 40ms, 0ms);
+            pbf_move_right_joystick_old(context, 6, 167, 40ms, 0ms);
+            pbf_move_right_joystick_old(context, 53, 231, 40ms, 0ms);
         }
 
 
         //  Last step for the curry cooking part.
-        pbf_wait(context, 425);
-        pbf_press_button(context, BUTTON_A, 5, 2250);
+        pbf_wait(context, 3400ms);
+        pbf_press_button(context, BUTTON_A, 40ms, 18000ms);
 
         //  Press A when it shows your curry, and its class.
-        pbf_press_button(context, BUTTON_A, 5, 1500);
-        pbf_press_button(context, BUTTON_A, 5, 500);
+        pbf_press_button(context, BUTTON_A, 40ms, 12000ms);
+        pbf_press_button(context, BUTTON_A, 40ms, 4000ms);
         // You are now back to the camping with your 6 Pokemon, and hopefully a curry Pokemon.
 
         {
@@ -172,47 +173,47 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
                 }
             );
 
-            //  Default implementation of the "attract curry Pokemon" routine. 
-            pbf_move_left_joystick(context, 0x80, 0x00, 40, 5);     //  Move up a bit to avoid talking to your pokemon.
-            pbf_press_button(context, BUTTON_A, 5, 5);
-            pbf_move_left_joystick(context, 0xff, 0x80, 55, 0);     //  Right
+            //  Default implementation of the "attract curry Pokemon" routine.
+            pbf_move_left_joystick_old(context, 0x80, 0x00, 320ms, 40ms);     //  Move up a bit to avoid talking to your pokemon.
+            pbf_press_button(context, BUTTON_A, 40ms, 40ms);
+            pbf_move_left_joystick_old(context, 0xff, 0x80, 440ms, 0ms);     //  Right
             for (uint16_t i = 0;  i< 2; i++){
-                pbf_move_left_joystick(context, 0x00, 0x80, 27, 0); //  Left
-                pbf_press_button(context, BUTTON_A, 5, 5);
-                pbf_move_left_joystick(context, 0x00, 0x80, 27, 0); //  Left
-                pbf_press_button(context, BUTTON_A, 5, 5);
-                pbf_move_left_joystick(context, 0x00, 0x80, 27, 0); //  Left
-                pbf_press_button(context, BUTTON_A, 5, 5);
-                pbf_move_left_joystick(context, 0x00, 0x80, 27, 0); //  Left
-                pbf_press_button(context, BUTTON_A, 5, 5);
-                pbf_move_left_joystick(context, 0xff, 0x80, 27, 0); //  Right
-                pbf_press_button(context, BUTTON_A, 5, 5);
-                pbf_move_left_joystick(context, 0xff, 0x80, 27, 0); //  Right
-                pbf_press_button(context, BUTTON_A, 5, 5);
-                pbf_move_left_joystick(context, 0xff, 0x80, 27, 0); //  Right
-                pbf_press_button(context, BUTTON_A, 5, 5);
-                pbf_move_left_joystick(context, 0xff, 0x80, 27, 0); //  Right
-                pbf_press_button(context, BUTTON_A, 5, 5);
+                pbf_move_left_joystick_old(context, 0x00, 0x80, 216ms, 0ms); //  Left
+                pbf_press_button(context, BUTTON_A, 40ms, 40ms);
+                pbf_move_left_joystick_old(context, 0x00, 0x80, 216ms, 0ms); //  Left
+                pbf_press_button(context, BUTTON_A, 40ms, 40ms);
+                pbf_move_left_joystick_old(context, 0x00, 0x80, 216ms, 0ms); //  Left
+                pbf_press_button(context, BUTTON_A, 40ms, 40ms);
+                pbf_move_left_joystick_old(context, 0x00, 0x80, 216ms, 0ms); //  Left
+                pbf_press_button(context, BUTTON_A, 40ms, 40ms);
+                pbf_move_left_joystick_old(context, 0xff, 0x80, 216ms, 0ms); //  Right
+                pbf_press_button(context, BUTTON_A, 40ms, 40ms);
+                pbf_move_left_joystick_old(context, 0xff, 0x80, 216ms, 0ms); //  Right
+                pbf_press_button(context, BUTTON_A, 40ms, 40ms);
+                pbf_move_left_joystick_old(context, 0xff, 0x80, 216ms, 0ms); //  Right
+                pbf_press_button(context, BUTTON_A, 40ms, 40ms);
+                pbf_move_left_joystick_old(context, 0xff, 0x80, 216ms, 0ms); //  Right
+                pbf_press_button(context, BUTTON_A, 40ms, 40ms);
             }
 
 
             //  This routine gives better odds of attracting a low Pokemon if the option is enabled.
-            if (SMALL_POKEMON>0){
-                pbf_move_left_joystick(context, 0x80, 0xff, SMALL_POKEMON, 0);
+            if (SMALL_POKEMON.get() > 0ms){
+                pbf_move_left_joystick_old(context, 0x80, 0xff, SMALL_POKEMON, 0ms);
 
                 for (uint16_t i = 0; i<2; i++){
-                    pbf_move_left_joystick(context, 0x00, 0x80, 240ms, 0ms); // Left
-                    pbf_press_button(context, BUTTON_A, 5, 5);
-                    pbf_move_left_joystick(context, 0x00, 0x80, 240ms, 0ms); // Left
-                    pbf_press_button(context, BUTTON_A, 5, 5);
-                    pbf_move_left_joystick(context, 0x00, 0x80, 240ms, 0ms); // Left
-                    pbf_press_button(context, BUTTON_A, 5, 5);
-                    pbf_move_left_joystick(context, 0xff, 0x80, 240ms, 0ms); // Right
-                    pbf_press_button(context, BUTTON_A, 5, 5);
-                    pbf_move_left_joystick(context, 0xff, 0x80, 240ms, 0ms); // Right
-                    pbf_press_button(context, BUTTON_A, 5, 5);
-                    pbf_move_left_joystick(context, 0xff, 0x80, 240ms, 0ms); // Right
-                    pbf_press_button(context, BUTTON_A, 5, 5);
+                    pbf_move_left_joystick_old(context, 0x00, 0x80, 240ms, 0ms); // Left
+                    pbf_press_button(context, BUTTON_A, 40ms, 40ms);
+                    pbf_move_left_joystick_old(context, 0x00, 0x80, 240ms, 0ms); // Left
+                    pbf_press_button(context, BUTTON_A, 40ms, 40ms);
+                    pbf_move_left_joystick_old(context, 0x00, 0x80, 240ms, 0ms); // Left
+                    pbf_press_button(context, BUTTON_A, 40ms, 40ms);
+                    pbf_move_left_joystick_old(context, 0xff, 0x80, 240ms, 0ms); // Right
+                    pbf_press_button(context, BUTTON_A, 40ms, 40ms);
+                    pbf_move_left_joystick_old(context, 0xff, 0x80, 240ms, 0ms); // Right
+                    pbf_press_button(context, BUTTON_A, 40ms, 40ms);
+                    pbf_move_left_joystick_old(context, 0xff, 0x80, 240ms, 0ms); // Right
+                    pbf_press_button(context, BUTTON_A, 40ms, 40ms);
                 }
             
             }
@@ -222,9 +223,9 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
 
             //  Record the encounter.
             if (TAKE_VIDEO){
-                pbf_press_button(context, BUTTON_CAPTURE, 250, 500);
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 4000ms);
             }else{
-                pbf_wait(context, 750);
+                pbf_wait(context, 6000ms);
             }
 
 
@@ -235,22 +236,22 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
             //  Automatically focuses on it, while it doesn't do that for your pokemons.
 
             //  "a [wild pokemon] came to your camp !"
-            pbf_press_button(context, BUTTON_A, 5, 250);
+            pbf_press_button(context, BUTTON_A, 40ms, 2000ms);
 
             //  "[wild pokemon] seems to want to come with you!"
-            pbf_press_button(context, BUTTON_A, 5, 200);
+            pbf_press_button(context, BUTTON_A, 40ms, 1600ms);
 
             //  "do you want to adopt it ?"
-            pbf_press_button(context, BUTTON_A, 5, 200);
+            pbf_press_button(context, BUTTON_A, 40ms, 1600ms);
 
             //  "you adopted [wild pokemon]!"
-            pbf_press_button(context, BUTTON_A, 5, 200);
+            pbf_press_button(context, BUTTON_A, 40ms, 1600ms);
 
             //  "[wild pokemon] entered into a poke ball"
-            pbf_press_button(context, BUTTON_A, 5, 800);
+            pbf_press_button(context, BUTTON_A, 40ms, 6400ms);
 
             //  "[wild pokemon] has been sent to the PC"
-            pbf_press_button(context, BUTTON_A, 5, 375);
+            pbf_press_button(context, BUTTON_A, 40ms, 3000ms);
 
 
             context.wait_for_all_requests();
@@ -282,7 +283,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
             stats.m_attempts++;
             env.update_stats();
             if (shininess != ShinyType::NOT_SHINY){
-                pbf_press_button(context, BUTTON_CAPTURE, 250, 500);
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 4000ms);
             }
         }
 
@@ -290,15 +291,15 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         //  If you talked to the curry Pokemon too early, you can end up talking to one of your Pokemon
         //  Once you reach this part of the program. The following sequence ensures that you
         //  Are in a correct state to cook again.
-        pbf_move_left_joystick(context, 0xff, 0x80, 125, 5);
-        pbf_move_left_joystick(context, 0x80, 0x00, 125, 5);
-        pbf_move_left_joystick(context, 0x80, 0x00, 5, 50);
-        pbf_press_button(context, BUTTON_A, 5, 250);    //  Wait 2 seconds to be sure the following X press won't be dropped.
+        pbf_move_left_joystick_old(context, 0xff, 0x80, 1000ms, 40ms);
+        pbf_move_left_joystick_old(context, 0x80, 0x00, 1000ms, 40ms);
+        pbf_move_left_joystick_old(context, 0x80, 0x00, 40ms, 400ms);
+        pbf_press_button(context, BUTTON_A, 40ms, 2000ms);    //  Wait 2 seconds to be sure the following X press won't be dropped.
 
         //  And now we cook another curry.
-        pbf_press_button(context, BUTTON_X, 5, 125);
-        pbf_press_button(context, BUTTON_A, 5, 125);
-        pbf_press_button(context, BUTTON_A, 5, 300);
+        pbf_press_button(context, BUTTON_X, 40ms, 1000ms);
+        pbf_press_button(context, BUTTON_A, 40ms, 1000ms);
+        pbf_press_button(context, BUTTON_A, 40ms, 2400ms);
     }
 
 

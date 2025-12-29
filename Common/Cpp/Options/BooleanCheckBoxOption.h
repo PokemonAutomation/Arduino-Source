@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 
 
 
-class BooleanCheckBoxCell : public ConfigOption{
+class BooleanCheckBoxCell : public ConfigOptionImpl<BooleanCheckBoxCell>{
 public:
     ~BooleanCheckBoxCell();
     BooleanCheckBoxCell(const BooleanCheckBoxCell& x);
@@ -22,6 +22,7 @@ public:
         LockMode lock_while_running,
         bool default_value, bool current_value
     );
+
 
 public:
     BooleanCheckBoxCell(
@@ -40,7 +41,6 @@ public:
 
     virtual void restore_defaults() override;
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 protected:
     struct Data;
@@ -50,7 +50,7 @@ protected:
 
 
 
-class BooleanCheckBoxOption : public BooleanCheckBoxCell{
+class BooleanCheckBoxOption : public ConfigOptionImpl<BooleanCheckBoxOption, BooleanCheckBoxCell>{
 public:
     BooleanCheckBoxOption(const BooleanCheckBoxOption& x) = delete;
     BooleanCheckBoxOption(
@@ -67,7 +67,6 @@ public:
     const std::string& label() const{ return m_label; }
     using BooleanCheckBoxCell::operator=;
 
-    virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 private:
     const std::string m_label;
