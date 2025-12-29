@@ -120,10 +120,7 @@ bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProController
     for (int i = 0; i < 3; i++) {
         DonutPowerDetector read_power(env.logger(), COLOR_GREEN, LANGUAGE, i);
         if ((std::find(power_table.begin(), power_table.end(), read_power.detect_quest(screen)) != power_table.end())) {
-            env.log("Match found!");
             num_hits++;
-        } else {
-            env.log("No match found.");
         }
     }
 
