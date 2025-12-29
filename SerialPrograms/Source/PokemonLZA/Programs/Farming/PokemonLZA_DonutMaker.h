@@ -38,7 +38,7 @@ public:
 private:
     bool match_powers(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void animation_to_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    void add_berries_in_menu_and_start(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void add_berries_and_make_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     bool donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 

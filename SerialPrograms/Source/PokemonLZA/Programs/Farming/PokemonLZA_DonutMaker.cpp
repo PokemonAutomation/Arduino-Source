@@ -173,7 +173,7 @@ void DonutMaker::animation_to_donut(SingleSwitchProgramEnvironment& env, ProCont
     context.wait_for_all_requests();
 }
 
-void DonutMaker::add_berries_in_menu_and_start(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void DonutMaker::add_berries_and_make_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     //DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
     env.log("Checking berry count.");
@@ -357,8 +357,8 @@ bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControl
     }
 
     open_berry_menu_from_ansha(env, context);
-    // Add berries from menu and start making donut
-    add_berries_in_menu_and_start(env, context);
+    // Add berries from menu and make a donut. Stop at flavor power screen.
+    add_berries_and_make_donut(env, context);
 
     // Read flavor power and check if they match user requirement:
     if (match_powers(env, context)){
