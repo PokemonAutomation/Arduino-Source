@@ -19,6 +19,7 @@
 #include "PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
 #include "PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.h"
 #include "PokemonLZA/Inference/Donuts/PokemonLZA_DonutPowerDetector.h"
+#include "PokemonLZA/Inference/Donuts/PokemonLZA_FlavorPowerScreenDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
@@ -27,8 +28,14 @@
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_DonutBerrySession.h"
 #include "PokemonLZA_DonutMaker.h"
-
 #include <format>
+
+// After pressing + to send the berries to Ansha:
+// - A white button dialog window, pressing A to clear
+// - An animation of Ansha making donut with Hoopa. End with her showing the donut. pressing A during
+//   the animatino clears the animation. Press A to end the fully played animation
+// - Ansha claps while the donut presenatation animation plays. Flavor power shows after a coupld of seconds
+
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -146,6 +153,7 @@ bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProController
 void DonutMaker::animation_to_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
+#if 0
     WhiteScreenOverWatcher animation_skip(COLOR_BLUE);
     int ret = run_until<ProControllerContext>(
         env.console, context,
@@ -171,6 +179,40 @@ void DonutMaker::animation_to_donut(SingleSwitchProgramEnvironment& env, ProCont
     pbf_press_button(context, BUTTON_A, 100ms, 200ms);
     pbf_wait(context, Seconds(3));
     context.wait_for_all_requests();
+#else
+    // Safe initial mashing to clear dialogs
+    pbf_mash_button(context, BUTTON_A, Seconds(3));
+    context.wait_for_all_requests();
+
+    env.add_overlay_log("Waiting for Flavor Power Screen...");
+
+    FlavorPowerScreenWatcher flavor_power_screen_watcher;
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [](ProControllerContext& context){
+            for(int i = 0; i < 20; i++){
+                pbf_press_button(context, BUTTON_A, 100ms, 400ms);
+            }
+        },
+        {{flavor_power_screen_watcher}}
+    );
+    if (ret != 0){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "donut_maker(): Unable to find the donut flavor power screen.",
+            env.console
+        );
+    }
+    env.log("Found donut flavor power screen");
+    env.add_overlay_log("Detected Flavor Power Screen");
+
+    // Wait for the UI animation for revealing flavor powers to play out
+    pbf_wait(context, Seconds(5));
+    context.wait_for_all_requests();
+    env.add_overlay_log("Reading Flavor Powers");
+#endif
 }
 
 void DonutMaker::add_berries_and_make_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
@@ -260,7 +302,7 @@ void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProContr
     // Move map cursor upwards a little bit so that the cursor locks onto the pokecenter.
     // This is needed so that in the fast travel location menu the Hotel Z is one row near
     // the default position on the menu.
-    pbf_move_left_joystick_old(context, 128, 64, 100ms, 200ms);
+    pbf_move_left_joystick_old(context, 128, 64, 100ms, 400ms);
     // Press Y to load fast travel locaiton menu. The cursor should now points to Vert Pokemon Center
     pbf_press_button(context, BUTTON_Y, 100ms, 500ms);
     // Move one menu item up to select Hotel Z
@@ -364,7 +406,7 @@ bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControl
     if (match_powers(env, context)){
         return true;
     }
-
+    
     go_home(env.console, context);
     const bool backup_save = true;
     if (!reset_game_from_home(env, env.console, context, backup_save)){
