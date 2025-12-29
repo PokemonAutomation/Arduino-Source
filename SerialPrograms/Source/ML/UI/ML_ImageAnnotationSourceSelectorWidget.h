@@ -33,7 +33,11 @@ class ImageAnnotationDisplaySession;
 //    - The images are ordered by what QDirIterator returns. It's order may not be what you display
 //      on OS.
 //  - Button "Prev Image in Folder": click to load the previous image: "3/40 in folder" -> "2/40"
+//    (wraps to last image if at the beginning)
 //  - Button "Next Image in Folder": click to load the next image: "3/40 in folder" -> "4/40"
+//    (wraps to first image if at the end)
+// - The two above buttons also have associated hotkeys that are implemented in
+//   ML_ImageAnnotationDisplayWidget.cpp
 class ImageAnnotationSourceSelectorWidget : public QWidget, public VideoSession::StateListener{
 public:
     ~ImageAnnotationSourceSelectorWidget();
@@ -42,12 +46,11 @@ public:
     // Get the folder path of the current loaded image
     std::string image_folder_path() const { return m_image_folder_path; }
 
-    // Change image source to be the previous image.
-    // This is what gets called when click "Prev Image in Folder" button
-    void go_to_previous_image();
-    // Change image source to be the next image.
-    // This is what gets called when click "Next Image in Folder" button
-    void go_to_next_image();
+    // Jump to an image by index offset from current position.
+    // Positive offset moves forward, negative offset moves backward.
+    // Wraps around: going before the first image wraps to the last image,
+    // and going past the last image wraps to the first image.
+    void go_to_image_by_index_offset(int offset);
 
 private:
     //  Overwrites VideoSession::StateListener::post_startup().

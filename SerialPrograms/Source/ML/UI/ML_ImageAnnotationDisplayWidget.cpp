@@ -100,6 +100,11 @@ void ImageAnnotationDisplayWidget::key_press(QKeyEvent* event){
     if (m_command_receiver){
         m_command_receiver->key_press(event);
     }
+
+    // Track Shift key state
+    if (event->key() == Qt::Key::Key_Shift){
+        m_shift_pressed = true;
+    }
 }
 
 void ImageAnnotationDisplayWidget::key_release(QKeyEvent* event){
@@ -109,10 +114,28 @@ void ImageAnnotationDisplayWidget::key_release(QKeyEvent* event){
         m_command_receiver->key_release(event);
     }
 
+    // Handle Shift key release
+    if (event->key() == Qt::Key::Key_Shift){
+        m_shift_pressed = false;
+    }
+
+    // Handle image navigation shortcuts
     if (event->key() == Qt::Key::Key_Z){
-        m_selector_widget->go_to_previous_image();
+        if (m_shift_pressed){
+            // Shift+Z: go back 10 images
+            m_selector_widget->go_to_image_by_index_offset(-10);
+        } else {
+            // Z: go to previous image
+            m_selector_widget->go_to_image_by_index_offset(-1);
+        }
     } else if (event->key() == Qt::Key::Key_X){
-        m_selector_widget->go_to_next_image();
+        if (m_shift_pressed){
+            // Shift+X: go forward 10 images
+            m_selector_widget->go_to_image_by_index_offset(10);
+        } else {
+            // X: go to next image
+            m_selector_widget->go_to_image_by_index_offset(1);
+        }
     }
 }
 
