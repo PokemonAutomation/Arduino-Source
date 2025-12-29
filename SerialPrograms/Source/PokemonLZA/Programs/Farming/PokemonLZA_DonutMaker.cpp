@@ -22,6 +22,7 @@
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
+#include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_DonutBerrySession.h"
@@ -250,9 +251,10 @@ void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProContr
     // the default position on the menu.
     pbf_move_left_joystick_old(context, 128, 64, 100ms, 200ms);
     // Press Y to load fast travel locaiton menu. The cursor should now points to Vert Pokemon Center
-    pbf_press_button(context, BUTTON_Y, 125ms, 200ms);
+    pbf_press_button(context, BUTTON_Y, 125ms, 300ms);
     // Move one menu item up to select Hotel Z
-    pbf_press_dpad(context, DPAD_UP, 125ms, 200ms);
+    pbf_press_dpad(context, DPAD_UP, 50ms, 200ms);
+    context.wait_for_all_requests();
 
     OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
     int ret = run_until<ProControllerContext>(
@@ -346,7 +348,22 @@ bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControl
     open_berry_menu_from_ansha(env, context);
     add_berries_in_menu_and_start(env, context);
 
-    return match_powers(env, context);
+    if (match_powers(env, context)){
+        return true;
+    }
+
+    go_home(env.console, context);
+    const bool backup_save = true;
+    if (!reset_game_from_home(env, env.console, context, backup_save)){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "donut_maker(): Cannot reset game from Switch Home screen.",
+            env.console
+        );
+    }
+    return false;
 }
 
 

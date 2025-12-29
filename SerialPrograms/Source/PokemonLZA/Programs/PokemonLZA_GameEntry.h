@@ -37,6 +37,11 @@ bool reset_game_from_home(
     Milliseconds enter_game_timeout,
     Milliseconds post_wait_time
 );
+
+//  From Switch Home menu, start game and wait until the player character
+//  appears in game.
+//  post_wait_time: how many ticks to wait after the black screen
+//  (shown when loading the map) is over.
 bool reset_game_from_home(
     ProgramEnvironment& env,
     ConsoleHandle& console, ProControllerContext& context,
