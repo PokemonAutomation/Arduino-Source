@@ -85,6 +85,7 @@ bool reset_game_from_home(
 
     if (backup_save){
         console.log("Loading backup save!");
+        console.overlay().add_log("Use Backup Save");
         pbf_wait(context, 1000ms);
         ssf_press_dpad(context, DPAD_UP, 0ms, 200ms);
         ssf_press_button(context, BUTTON_B | BUTTON_X, 1000ms, 200ms);
