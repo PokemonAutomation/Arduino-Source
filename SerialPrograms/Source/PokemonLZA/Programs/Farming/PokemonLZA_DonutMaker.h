@@ -51,6 +51,7 @@ private:
     //SimpleIntegerOption<uint8_t> NUM_DONUTS;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
+    EventNotificationOption NOTIFICATION_DONUT_FOUND;
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;
 };

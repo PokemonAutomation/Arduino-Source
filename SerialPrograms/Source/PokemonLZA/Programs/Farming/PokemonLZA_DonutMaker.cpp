@@ -49,7 +49,7 @@ DonutMaker_Descriptor::DonutMaker_Descriptor()
         "PokemonLZA:DonutMaker", STRING_POKEMON + " LZA",
         "Donut Maker",
         "Programs/PokemonLZA/DonutMaker.html",
-        "TODO: Add description",
+        "Make donuts and reset until desired flavor powers are found.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
@@ -59,14 +59,17 @@ DonutMaker_Descriptor::DonutMaker_Descriptor()
 class DonutMaker_Descriptor::Stats : public StatsTracker{
 public:
     Stats()
-        : resets(m_stats["Resets"])
+        : matched(m_stats["Donuts Matched"])
+        , resets(m_stats["Resets"])
         , errors(m_stats["Errors"])
     {
         // TODO: Add more stats here
+        m_display_order.emplace_back("Donuts Matched");
         m_display_order.emplace_back("Resets");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
 
+    std::atomic<uint64_t>& matched;
     std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& errors;
 };
@@ -97,8 +100,14 @@ DonutMaker::DonutMaker()
     //    1, 1
     //)
     , GO_HOME_WHEN_DONE(false)
+    , NOTIFICATION_DONUT_FOUND(
+        "Donut Found",
+        true, true, ImageAttachmentMode::JPG,
+        {"Notifs"}
+    )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
+        &NOTIFICATION_DONUT_FOUND,
         &NOTIFICATION_STATUS,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_RECOVERABLE,
@@ -117,6 +126,8 @@ DonutMaker::DonutMaker()
 // Read flavor power and check if they match user requirement.
 // Return true if the user requirement is fulfilled.
 bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+    DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
+
     env.log("Reading in table of desired powers.");
     std::vector<std::string> power_table;
     std::vector<std::unique_ptr<FlavorPowerTableRow>> wanted_powers_table = FLAVOR_POWERS.copy_snapshot();
@@ -125,6 +136,8 @@ bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProController
         power_table.push_back(table_line.to_str());
         env.log(table_line.to_str());
     }
+    //TODO: Validate powers? The "All Types" type only applies to catching and sparkling powers. Move and resist do not have "All Types"
+    //Are people even going to target move and resist power? Big Haul/Item Berry/Alpha/Sparkling seems more likely.
 
     env.log("Reading powers and counting up hits.");
     uint8_t num_hits = 0;
@@ -144,6 +157,9 @@ bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProController
     }
 
     if (num_hits >= NUM_POWER_REQUIRED) {
+        stats.matched++;
+        env.update_stats();
+        send_program_status_notification(env, NOTIFICATION_DONUT_FOUND, "Match found!", screen, true);
         return true;
     }
 
@@ -438,16 +454,6 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             throw UserSetupError(env.console, "Must have at least 3 berries and no more than 8 berries.");
         }
     }
-
-    //Print table to log to check
-    //std::vector<std::unique_ptr<FlavorPowerTableRow>> wanted_powers_table = FLAVOR_POWERS.copy_snapshot();
-    //for (const std::unique_ptr<FlavorPowerTableRow>& row : wanted_powers_table){
-    //    FlavorPowerTableEntry table_line = row->snapshot();
-    //    env.log(table_line.to_str());
-    //}
-    //TODO: Validate powers. The "All Types" type only applies to catching and sparkling powers. Move and resist do not have "All Types"
-    //Are people even going to target move and resist power? Big Haul/Item Berry/Alpha/Sparkling seems more likely.
-    //also TODO: powers table to however we're going to check it once that is written
 
     //  Mash button B to let Switch register the controller
     pbf_mash_button(context, BUTTON_B, 200ms);
