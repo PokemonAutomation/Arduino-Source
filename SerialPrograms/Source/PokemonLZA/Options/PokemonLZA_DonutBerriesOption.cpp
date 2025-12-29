@@ -135,71 +135,14 @@ std::string FlavorPowerTableEntry::to_str() const{
         break;
     }
 
-    if (power == Flavor_Powers::catching || power == Flavor_Powers::sparkling) {
+    if (power == Flavor_Powers::catching || power == Flavor_Powers::sparkling || power == Flavor_Powers::move || power == Flavor_Powers::resistance) {
         switch (pokemon_type) {
         case Power_Pokemon_Types::all:
+            if (power == Flavor_Powers::move || power == Flavor_Powers::resistance) {
+                selected_power += "all-types-INVALID-SELECTION-";
+                break;
+            }
             selected_power += "all-types-";
-            break;
-        case Power_Pokemon_Types::normal:
-            selected_power += "normal-";
-            break;
-        case Power_Pokemon_Types::fire:
-            selected_power += "fire-";
-            break;
-        case Power_Pokemon_Types::water:
-            selected_power += "water-";
-            break;
-        case Power_Pokemon_Types::electric:
-            selected_power += "electric-";
-            break;
-        case Power_Pokemon_Types::grass:
-            selected_power += "grass-";
-            break;
-        case Power_Pokemon_Types::ice:
-            selected_power += "ice-";
-            break;
-        case Power_Pokemon_Types::fighting:
-            selected_power += "fighting-";
-            break;
-        case Power_Pokemon_Types::poison:
-            selected_power += "poison-";
-            break;
-        case Power_Pokemon_Types::ground:
-            selected_power += "ground-";
-            break;
-        case Power_Pokemon_Types::flying:
-            selected_power += "flying-";
-            break;
-        case Power_Pokemon_Types::psychic:
-            selected_power += "psychic-";
-            break;
-        case Power_Pokemon_Types::bug:
-            selected_power += "bug-";
-            break;
-        case Power_Pokemon_Types::rock:
-            selected_power += "rock-";
-            break;
-        case Power_Pokemon_Types::ghost:
-            selected_power += "ghost-";
-            break;
-        case Power_Pokemon_Types::dragon:
-            selected_power += "dragon-";
-            break;
-        case Power_Pokemon_Types::dark:
-            selected_power += "dark-";
-            break;
-        case Power_Pokemon_Types::steel:
-            selected_power += "steel-";
-            break;
-        case Power_Pokemon_Types::fairy:
-            selected_power += "fairy-";
-            break;
-        }
-    }
-    else if (power == Flavor_Powers::move || power == Flavor_Powers::resistance) {
-        switch (pokemon_type) {
-        case Power_Pokemon_Types::all:
-            selected_power += "all-types-INVALID-SELECTION-";
             break;
         case Power_Pokemon_Types::normal:
             selected_power += "normal-";
@@ -283,10 +226,13 @@ std::string FlavorPowerTableEntry::to_str() const{
     switch (level) {
     case Power_Level::one:
         selected_power += "1";
+        break;
     case Power_Level::two:
         selected_power += "2";
+        break;
     case Power_Level::three:
         selected_power += "3";
+        break;
     }
 
     return selected_power;
