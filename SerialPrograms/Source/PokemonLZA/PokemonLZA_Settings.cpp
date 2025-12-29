@@ -28,10 +28,10 @@ GameSettings::GameSettings()
         LockMode::LOCK_WHILE_RUNNING,
         "40 s"
     )
-    , ENTER_GAME_WAIT(
+    , ENTER_GAME_WAIT0(
         "<b>Enter Game Wait:</b><br>Wait this long for the game to enter the overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        "15 s"
+        "60 s"
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -41,7 +41,7 @@ GameSettings::GameSettings()
 
     PA_ADD_STATIC(m_start_game_timings);
     PA_ADD_OPTION(START_GAME_WAIT);
-    PA_ADD_OPTION(ENTER_GAME_WAIT);
+    PA_ADD_OPTION(ENTER_GAME_WAIT0);
 
     PA_ADD_STATIC(m_advanced_options);
 }

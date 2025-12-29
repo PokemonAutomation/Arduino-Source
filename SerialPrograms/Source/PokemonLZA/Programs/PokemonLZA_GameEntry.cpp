@@ -112,7 +112,7 @@ bool reset_game_from_home(
     return reset_game_from_home(
         env, console, context,
         backup_save,
-        GameSettings::instance().ENTER_GAME_WAIT,
+        GameSettings::instance().ENTER_GAME_WAIT0,
         post_wait_time
     );
 }
