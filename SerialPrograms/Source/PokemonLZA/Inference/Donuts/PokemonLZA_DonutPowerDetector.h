@@ -49,8 +49,9 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
 
-    // Return detected quest string. Return empty string if not detected
-    std::string detect_quest(const ImageViewRGB32& screen) const;
+    // Return detected power string. Return empty string if not detected.
+    // Return empty string if no power text found.
+    std::string detect_power(const ImageViewRGB32& screen) const;
 
 protected:
     Logger& m_logger;

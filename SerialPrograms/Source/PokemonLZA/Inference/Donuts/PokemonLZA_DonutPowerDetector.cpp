@@ -70,10 +70,10 @@ void DonutPowerDetector::make_overlays(VideoOverlaySet& items) const{
 }
 
 bool DonutPowerDetector::detect(const ImageViewRGB32& screen){
-    return !detect_quest(screen).empty();
+    return !detect_power(screen).empty();
 }
 
-std::string DonutPowerDetector::detect_quest(const ImageViewRGB32& screen) const{
+std::string DonutPowerDetector::detect_power(const ImageViewRGB32& screen) const{
     std::multimap<double, OCR::StringMatchData> results;
     /*
     ImageRGB32 quest_label = to_blackwhite_rgb32_range(
@@ -82,7 +82,7 @@ std::string DonutPowerDetector::detect_quest(const ImageViewRGB32& screen) const
         combine_rgb(198, 198, 198), combine_rgb(255, 255, 255)
     );*/
     ImageViewRGB32 quest_label = extract_box_reference(screen, m_box);
-    quest_label.save("quest_label.png");
+    // quest_label.save("quest_label.png");
 
     OCR::StringMatchResult ocr_result = DonutPowerReader::instance().read_substring(
         m_logger, m_language, quest_label,
@@ -104,7 +104,7 @@ std::string DonutPowerDetector::detect_quest(const ImageViewRGB32& screen) const
     if (results.size() > 1){
         throw_and_log<OperationFailedException>(
             m_logger, ErrorReport::SEND_ERROR_REPORT,
-            "DonutPowerDetector::detect_quest(): Unable to read selected item. Ambiguous or multiple results.\n" + language_warning(m_language)
+            "DonutPowerDetector::detect_power(): Unable to read selected item. Ambiguous or multiple results.\n" + language_warning(m_language)
         );
     }
 
@@ -126,7 +126,7 @@ void DonutPowerWatcher::make_overlays(VideoOverlaySet& items) const{
 }
 
 bool DonutPowerWatcher::process_frame(const ImageViewRGB32& screen, WallClock timestamp){
-    m_quest_name = m_detector.detect_quest(screen);
+    m_quest_name = m_detector.detect_power(screen);
     if (m_quest_name.empty()){
         return false;
     }

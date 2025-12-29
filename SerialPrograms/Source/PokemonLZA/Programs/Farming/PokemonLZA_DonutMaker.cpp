@@ -28,6 +28,8 @@
 #include "PokemonLZA/Programs/PokemonLZA_DonutBerrySession.h"
 #include "PokemonLZA_DonutMaker.h"
 
+#include <format>
+
 namespace PokemonAutomation {
 namespace NintendoSwitch {
 namespace PokemonLZA {
@@ -105,6 +107,8 @@ DonutMaker::DonutMaker()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
+// Read flavor power and check if they match user requirement.
+// Return true if the user requirement is fulfilled.
 bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     env.log("Reading in table of desired powers.");
     std::vector<std::string> power_table;
@@ -120,7 +124,14 @@ bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProController
     VideoSnapshot screen = env.console.video().snapshot();
     for (int i = 0; i < 3; i++) {
         DonutPowerDetector read_power(env.logger(), COLOR_GREEN, LANGUAGE, i);
-        if ((std::find(power_table.begin(), power_table.end(), read_power.detect_quest(screen)) != power_table.end())) {
+        const std::string power = read_power.detect_power(screen);
+        if (power.empty()){
+            env.add_overlay_log(std::format("{}: Empty", i+1));
+            continue;
+        }
+        env.add_overlay_log(std::format("{}: {}", i+1, power));
+        
+        if ((std::find(power_table.begin(), power_table.end(), power) != power_table.end())) {
             num_hits++;
         }
     }
@@ -251,9 +262,9 @@ void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProContr
     // the default position on the menu.
     pbf_move_left_joystick_old(context, 128, 64, 100ms, 200ms);
     // Press Y to load fast travel locaiton menu. The cursor should now points to Vert Pokemon Center
-    pbf_press_button(context, BUTTON_Y, 125ms, 300ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 500ms);
     // Move one menu item up to select Hotel Z
-    pbf_press_dpad(context, DPAD_UP, 50ms, 200ms);
+    pbf_press_dpad(context, DPAD_UP, 50ms, 600ms);
     context.wait_for_all_requests();
 
     OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
@@ -346,8 +357,10 @@ bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControl
     }
 
     open_berry_menu_from_ansha(env, context);
+    // Add berries from menu and start making donut
     add_berries_in_menu_and_start(env, context);
 
+    // Read flavor power and check if they match user requirement:
     if (match_powers(env, context)){
         return true;
     }

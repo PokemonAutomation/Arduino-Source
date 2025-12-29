@@ -282,8 +282,9 @@ void BerrySession::add_ingredients(
         auto iter = ingredients.find(found);
         DonutBerriesReader reader;
         while (iter->second > 0){
-            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+            pbf_press_button(context, BUTTON_A, 160ms, 500ms);
             context.wait_for_all_requests();
+            stream.overlay().add_log("Add " + name.display_name());
             iter->second--;
 
             /* Todo: Image match isn't the best since B button covers it
