@@ -5,6 +5,7 @@
  */
 
 #include <iostream>
+#include <format>
 #include "Exceptions.h"
 
 namespace PokemonAutomation{
