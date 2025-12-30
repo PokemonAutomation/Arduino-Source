@@ -242,15 +242,10 @@ void DonutMaker::add_berries_and_make_donut(SingleSwitchProgramEnvironment& env,
     std::map<std::string, uint8_t> processed_berries;
     for (const std::unique_ptr<DonutBerriesTableRow>& row : berries_table){
         const std::string& table_item = row->berry.slug();
-        env.log("Adding: " + table_item);
         processed_berries[table_item]++;
     }
-    //cout << "Processed Berries:" << endl;
-    //for (const auto& [key, value] : processed_berries){
-    //    std::cout << key << ": " << (int)value << endl;
-    //}
 
-    add_donut_ingredients(env.console, context, LANGUAGE, std::move(processed_berries));
+    add_donut_berries(env.console, context, LANGUAGE, std::move(processed_berries));
     animation_to_donut(env, context);
 }
 
@@ -357,7 +352,7 @@ void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProContr
                 "donut_maker(): Cannot reach Hotel Z gate after day/night change.",
                 env.console
             );
-            overworld.last_detected_frame()->save("debug_overworld_detection.png");
+            // overworld.last_detected_frame()->save("debug_overworld_detection.png");
         }
     } else if (ret != 0){
         stats.errors++;
@@ -367,7 +362,7 @@ void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProContr
             "donut_maker(): Cannot reach Hotel Z gate after fast travel.",
             env.console
         );
-        overworld.last_detected_frame()->save("debug_overworld_detection.png");
+        // overworld.last_detected_frame()->save("debug_overworld_detection.png");
     }
 
     // Mash button A to enter the hotel.

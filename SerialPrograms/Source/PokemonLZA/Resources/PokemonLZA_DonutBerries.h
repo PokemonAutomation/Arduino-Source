@@ -17,6 +17,7 @@ namespace NintendoSwitch{
 namespace PokemonLZA{
 
 
+// Vector of donut berry slugs in the order as shown in-game when making donuts
 const std::vector<std::string>& DONUT_BERRIES_SLUGS();
 
 class DonutBerries{

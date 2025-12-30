@@ -36,21 +36,23 @@ public:
         Language language
     );
 
-    //  Move to any berry in the set. Returns the berry it moved to.
-    //  Returns empty string if not found.
-    std::string move_to_ingredient(const std::set<std::string>& ingredients) const;
-
-    void add_ingredients(
+    void add_berries(
         VideoStream& stream, ProControllerContext& context,
-        std::map<std::string, uint8_t>&& ingredients
+        const std::map<std::string, uint8_t>& berries
     );
 
 
 public:
     PageIngredients read_screen(std::shared_ptr<const ImageRGB32> screenshot) const;
     PageIngredients read_current_page() const;
+
+    
+    //  Move to any berry in the set. Returns the berry it moved to.
+    //  Returns empty string if not found.
+    std::string move_to_ingredient(const std::string& berry, bool move_topdown) const;
+
     bool run_move_iteration(
-        std::string& slug, const std::set<std::string>& ingredients,
+        std::string& slug, const std::string& berry,
         const PageIngredients& page
     ) const;
 
@@ -65,14 +67,12 @@ private:
 
 
 
-//  Starting from the top of the fillings menu, gather all the ingredients.
-//  When this function returns, the game will be entering the phase where the
-//  user must stack the fillings.
-//  If any ingredient is not found or insuffient, it will OperationFailedException::fire.
-void add_donut_ingredients(
+//  Read string to move to each target berry and add them to make donut.
+//  When this function returns, the berries are all confirmed with button plus.
+void add_donut_berries(
     VideoStream& stream, ProControllerContext& context,
     Language language,
-    std::map<std::string, uint8_t>&& fillings  //  {slug, quantity}
+    const std::map<std::string, uint8_t>& berries  //  {slug, quantity}
 );
 
 

@@ -145,147 +145,172 @@ PageIngredients BerrySession::read_current_page() const{
     return read_screen(m_stream.video().snapshot());
 }
 
-//  Returns true if a desired ingredient is found somewhere on the page.
-//  "slug" is set the desired ingredient if the cursor is already on it.
+//  Returns true if the target berry is found somewhere on the page.
+//  "slug" is set the target berry if the cursor is already on it.
 bool BerrySession::run_move_iteration(
-    std::string& slug, const std::set<std::string>& ingredients,
+    std::string& slug, const std::string& berry,
     const PageIngredients& page
 ) const{
     size_t current_index = page.selected;
-    std::map<size_t, std::string> found_ingredients;
+    size_t found_location = SIZE_MAX;
     for (size_t c = 0; c < DonutBerriesReader::BERRY_PAGE_LINES; c++){
         for (const std::string& item : page.item[c]){
-            //auto iter = ingredients.find(item);
-            if (ingredients.find(item) != ingredients.end()) {
-                found_ingredients[c] = item;
+            if (berry == item) {
+                found_location = c;
+                break;
             }
+        }
+        if (found_location != SIZE_MAX){
+            break;
         }
     }
 
-    if (found_ingredients.size() == 0){
+    if (found_location == SIZE_MAX){
         return false;
     }
-
-    size_t target_line_index = 0;
-    if (std::all_of(found_ingredients.begin(), found_ingredients.end(), [&](const auto& p){return p.first <= current_index;})){
-        // If the current cursor is below all the found ingredients,
-        // we should move to the closest ingredient, which is also at the lowest line among found ingredients.
-        target_line_index = found_ingredients.rbegin()->first;
-    }else{
-        target_line_index = found_ingredients.begin()->first;
-    }
     
-    //cout << "current index: " << current_index << endl;
-    //cout << "target line index: " << target_line_index << endl;
-
-    const std::string& item = found_ingredients[target_line_index];
-
     //  Cursor is already on matching ingredient.
-    if (current_index == target_line_index){
-        m_stream.log("Desired ingredient " + item + " is selected!", COLOR_BLUE);
-        slug = item;
+    if (current_index == found_location){
+        m_stream.log("Desired " + berry + " is selected!", COLOR_BLUE);
+        slug = berry;
         return true;
     }
 
-    m_stream.log("Found desired ingredient " + item + " on current page. Moving towards it...", COLOR_BLUE);
+    m_stream.log("Found desired " + berry + " on current page. Moving towards it...", COLOR_BLUE);
 
     //  Move to it.
-
-    while (current_index < target_line_index){
-        pbf_press_dpad(m_context, DPAD_DOWN, 80ms, 240ms);
+    while (current_index < found_location){
+        pbf_press_dpad(m_context, DPAD_DOWN, 80ms, 200ms);
         current_index++;
     }
-    while (current_index > target_line_index){
-        pbf_press_dpad(m_context, DPAD_UP, 80ms, 240ms);
+    while (current_index > found_location){
+        pbf_press_dpad(m_context, DPAD_UP, 80ms, 200ms);
         current_index--;
     }
     m_context.wait_for_all_requests();
-    m_context.wait_for(std::chrono::seconds(1));
-    // slug = item;
+    m_context.wait_for(Milliseconds(500));
     return true;
 }
 
 
-std::string BerrySession::move_to_ingredient(const std::set<std::string>& ingredients) const{
-    if (ingredients.empty()){
-        m_stream.log("No desired ingredients.", COLOR_RED);
-        return "";
-    }
-
+std::string BerrySession::move_to_ingredient(const std::string& berry, bool move_topdown) const{
     size_t not_found_count = 0;
     while (true){
         m_context.wait_for_all_requests();
-        m_context.wait_for(std::chrono::milliseconds(500));
         PageIngredients page = read_current_page();
         std::string found_ingredient;
-        if (run_move_iteration(found_ingredient, ingredients, page)){
+        if (run_move_iteration(found_ingredient, berry, page)){
             if (found_ingredient.empty()){
+                m_context.wait_for(std::chrono::milliseconds(100));
                 continue;
-            }else{
-                return found_ingredient;
             }
-            continue;
+            return found_ingredient;
         }
 
         size_t current = page.selected;
-        if (current == DonutBerriesReader::BERRY_PAGE_LINES - 1){
+        if ((move_topdown && current == DonutBerriesReader::BERRY_PAGE_LINES - 1) || 
+            (!move_topdown && current == 0)){
             not_found_count++;
             if (not_found_count >= 2){
-                m_stream.log("Ingredient not found anywhere.", COLOR_RED);
+                m_stream.log("Berry not found anywhere.", COLOR_RED);
                 return "";
-            }else{
-                m_stream.log("End of page reached without finding ingredient. Wrapping back to beginning.", COLOR_ORANGE);
-                pbf_press_dpad(m_context, DPAD_DOWN, 160ms, 840ms);
-                continue;
             }
+            m_stream.log("End of page reached without finding " + berry + ". Wrapping back.", COLOR_ORANGE);
         }
 
-        m_stream.log("Ingredient not found on current page. Scrolling up.", COLOR_ORANGE);
+        m_stream.log("Ingredient not found on current page. Jump to next page.", COLOR_ORANGE);
 
-        //  Not found on page. Scroll to next screen
-        pbf_press_dpad(m_context, DPAD_RIGHT, 80ms, 240ms);
+        //  Not found on page. Jump to next screen
+        pbf_press_dpad(m_context, move_topdown ? DPAD_RIGHT : DPAD_LEFT, 80ms, 240ms);
         m_context.wait_for_all_requests();
-        m_context.wait_for(std::chrono::milliseconds(180));
+        m_context.wait_for(std::chrono::milliseconds(100));
     }
     return "";
 }
 
 
-void BerrySession::add_ingredients(
+void BerrySession::add_berries(
     VideoStream& stream, ProControllerContext& context,
-    std::map<std::string, uint8_t>&& ingredients
+    const std::map<std::string, uint8_t>& berries
 ){
-    //  "ingredients" will be what we still need.
-    //  Each time we add an ingredient, it will be removed from the map.
-    //  Loop until there's nothing left.
-    while (!ingredients.empty()){
-        std::set<std::string> remaining;
-        for (const auto& item : ingredients){
-            remaining.insert(item.first);
-        }
+    std::map<std::string, size_t> BERRY_ORDER;
+    for (size_t i = 0; i < DONUT_BERRIES_SLUGS().size(); i++){
+        BERRY_ORDER.emplace(DONUT_BERRIES_SLUGS()[i], i);
+    }
+    const size_t NUM_NORMAL_BERRIES = DONUT_BERRIES_SLUGS().size() / 2;
+    const size_t NUM_HYPER_BERRIES = NUM_NORMAL_BERRIES;
 
-        std::string found = this->move_to_ingredient(remaining);
+    bool all_hyper_berries = true;
+    bool all_normal_berries = true;
+    std::string log_msg = "Berries to add: ";
+    for(const auto& p : berries){
+        log_msg += p.first + ": " + std::to_string(p.second) + ", ";
+        if (BERRY_ORDER.find(p.first) == BERRY_ORDER.end()){
+            throw InternalProgramError(&stream.logger(), 
+                PA_CURRENT_FUNCTION, "unknown berry slug " + p.first);
+        }
+        if (p.first.starts_with("hyper-")){
+            all_normal_berries = false;
+        } else{
+            all_hyper_berries = false;
+        }
+    }
+    stream.log(log_msg.substr(0, log_msg.size() - 2)); // -2 to remove the trailing ", "
+
+    // Compute whether we should go from top to bottom or bottom to top to search for berries:
+    
+    std::vector<std::pair<std::string, uint8_t>> ordered_berries;
+
+    for (size_t i = 0; i < DONUT_BERRIES_SLUGS().size(); i++){
+        const auto& berry_slug = DONUT_BERRIES_SLUGS()[i];
+        auto it = berries.find(berry_slug);
+        if (it != berries.end()){
+            ordered_berries.emplace_back(berry_slug, it->second);
+        }
+    }
+    const size_t total_movement_topdown = BERRY_ORDER[ordered_berries.back().first] - (all_hyper_berries ? NUM_NORMAL_BERRIES : 0);
+    const size_t total_movment_bottomup = BERRY_ORDER.size() - BERRY_ORDER[ordered_berries.front().first] - (all_normal_berries ? NUM_HYPER_BERRIES : 0);
+    bool move_topdown = total_movement_topdown <= total_movment_bottomup;
+    if (all_hyper_berries && move_topdown){
+        // Press minus button twice to change to Hyperspace berry-only menu
+        pbf_press_button(context, BUTTON_MINUS, 100ms, 500ms);
+        pbf_press_button(context, BUTTON_MINUS, 100ms, 700ms);
+        context.wait_for_all_requests();
+    } else if (all_normal_berries && !move_topdown){
+        // Press minus button once to change to normal berry-only menu
+        pbf_press_button(context, BUTTON_MINUS, 100ms, 700ms);
+        context.wait_for_all_requests();
+    }
+    
+    if (move_topdown){
+        // reverse the order so that we can pop back
+        std::reverse(ordered_berries.begin(), ordered_berries.end());
+    } else{
+        // Move to bottom
+        pbf_press_dpad(context, DPAD_UP, 100ms, 500ms);
+        context.wait_for_all_requests();
+    }
+
+    while (!ordered_berries.empty()){
+        const auto& back = ordered_berries.back();
+        std::string found = this->move_to_ingredient(back.first, move_topdown);
         if (found.empty()){
-            const DonutBerries& name = get_berry_name(*remaining.begin());
+            const DonutBerries& name = get_berry_name(berries.begin()->first);
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Unable to find ingredient: \"" + name.display_name() + "\" - Did you run out?",
+                "Unable to find Berry: \"" + name.display_name() + "\" - Did you run out?",
                 stream
             );
         }
 
         const DonutBerries& name = get_berry_name(found);
-        stream.log("Add " + name.display_name() + " as ingredient", COLOR_BLUE);
+        stream.log("Adding " + name.display_name() + " x " + std::to_string(back.second), COLOR_BLUE);
 
-        //  If you don't have enough ingredient, it errors out instead of proceeding 
-        //  with less than the desired quantity.
-        auto iter = ingredients.find(found);
         DonutBerriesReader reader;
-        while (iter->second > 0){
-            pbf_press_button(context, BUTTON_A, 160ms, 500ms);
+        for(size_t i = 0; i < back.second; i++){
+            pbf_press_button(context, BUTTON_A, 160ms, 400ms);
             context.wait_for_all_requests();
             stream.overlay().add_log("Add " + name.display_name());
-            iter->second--;
 
             /* Todo: Image match isn't the best since B button covers it
             bool ingredient_added = false;
@@ -316,21 +341,21 @@ void BerrySession::add_ingredients(
             }
             */
         }
-        ingredients.erase(iter);
-    }
+        ordered_berries.pop_back();
+    } // end while (!ordered_berries.empty())
 }
 
 
 
-void add_donut_ingredients(
+void add_donut_berries(
     VideoStream& stream, ProControllerContext& context,
     Language language,
-    std::map<std::string, uint8_t>&& fillings
+    const std::map<std::string, uint8_t>& berries
 ){
     BerrySession session(stream, context, language);
-    pbf_press_dpad(context, DPAD_UP, 160ms, 840ms); //Starting from the bottom, assuming users want hyperspace berries
-    session.add_ingredients(stream, context, std::move(fillings));
+    session.add_berries(stream, context, berries);
     pbf_press_button(context, BUTTON_PLUS, 160ms, 1840ms);
+    context.wait_for_all_requests();
 }
 
 
