@@ -707,7 +707,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, ProController
             pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
             pbf_move_left_joystick(context, {+0.094, -1}, 160ms, 160ms);
             pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
-            pbf_move_right_joystick_old(context, 140, 255, 200ms, 500ms);
+            pbf_move_right_joystick(context, {+0.094, -1}, 200ms, 500ms);
             if (check_tree(env, context)){
                 tree_counter.tree[14]++;
             }
