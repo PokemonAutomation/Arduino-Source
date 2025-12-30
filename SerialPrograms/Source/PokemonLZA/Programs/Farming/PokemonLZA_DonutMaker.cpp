@@ -265,10 +265,20 @@ void DonutMaker::open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env,
             SelectionArrowType::RIGHT,
             {0.591, 0.579, 0.231, 0.105}
         );
+        SelectionArrowWatcher dreams_alpha_delta(
+            COLOR_GREEN, &env.console.overlay(),
+            SelectionArrowType::RIGHT,
+            {0.591, 0.517, 0.231, 0.105}
+        );
+        SelectionArrowWatcher omega(
+            COLOR_GREEN, &env.console.overlay(),
+            SelectionArrowType::RIGHT,
+            {0.591, 0.450, 0.231, 0.105}
+        );
         DonutBerriesSelectionWatcher berry_selection(0);
 
         int ret = wait_until(env.console, context, std::chrono::seconds(3),
-            {white_dialog, arrow, berry_selection});
+            {white_dialog, arrow, berry_selection, dreams_alpha_delta, omega});
         switch (ret){
         case 0:
             env.log("Detected white dialog. Go to next dialog");
@@ -282,6 +292,10 @@ void DonutMaker::open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env,
             env.log("Berry selection menu shown.");
             env.add_overlay_log("Found Berry Selection Menu");
             return;
+        case 3: case 4:
+            env.log("Detected selection arrow for Bad Dreams/Alpha/Omega/Delta recipe.");
+            pbf_press_dpad(context, DPAD_DOWN, 100ms, 200ms);
+            break;
         default:
             stats.errors++;
             env.update_stats();
