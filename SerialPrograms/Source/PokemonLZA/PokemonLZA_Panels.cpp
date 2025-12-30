@@ -73,9 +73,10 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<StallBuyer_Descriptor, StallBuyer>());
     ret.emplace_back(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
     ret.emplace_back(make_single_switch_program<PostKillCatcher_Descriptor, PostKillCatcher>());
+    ret.emplace_back(make_single_switch_program<BoxSorter_Descriptor, BoxSorter>());
+    ret.emplace_back(make_single_switch_program<WeatherFinder_Descriptor, WeatherFinder>());
     if (IS_BETA_VERSION){
-        ret.emplace_back(make_single_switch_program<BoxSorter_Descriptor, BoxSorter>());
-        ret.emplace_back(make_single_switch_program<WeatherFinder_Descriptor, WeatherFinder>());
+        ret.emplace_back(make_single_switch_program<DonutMaker_Descriptor, DonutMaker>());
     }
 
     ret.emplace_back("---- Farming ----");
@@ -84,9 +85,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<JacintheInfiniteFarmer_Descriptor, JacintheInfiniteFarmer>());
     ret.emplace_back(make_single_switch_program<FriendshipFarmer_Descriptor, FriendshipFarmer>());
     ret.emplace_back(make_single_switch_program<InPlaceCatcher_Descriptor, InPlaceCatcher>());
+    ret.emplace_back(make_single_switch_program<WigglytuffFarmer_Descriptor, WigglytuffFarmer>());
+    ret.emplace_back(make_single_switch_program<HyperspaceRewardReset_Descriptor, HyperspaceRewardReset>());
     if (IS_BETA_VERSION){
-        ret.emplace_back(make_single_switch_program<WigglytuffFarmer_Descriptor, WigglytuffFarmer>());
-        ret.emplace_back(make_single_switch_program<HyperspaceRewardReset_Descriptor, HyperspaceRewardReset>());
     }
 
     ret.emplace_back("---- Shiny Hunting ----");
@@ -119,7 +120,6 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back(make_single_switch_program<MoveBoxArrow_Descriptor, MoveBoxArrow>());
         ret.emplace_back(make_single_switch_program<TestBoxCellInfo_Descriptor, TestBoxCellInfo>());
         ret.emplace_back(make_single_switch_program<GenerateLocationNameOCR_Descriptor, GenerateLocationNameOCR>());
-        ret.emplace_back(make_single_switch_program<DonutMaker_Descriptor, DonutMaker>());
     }
     return ret;
 }
