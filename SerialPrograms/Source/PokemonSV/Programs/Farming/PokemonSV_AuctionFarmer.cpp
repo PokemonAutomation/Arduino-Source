@@ -6,6 +6,7 @@
 
 //#include <iostream>
 #include <unordered_map>
+#include "Controllers/JoystickTools.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
@@ -343,12 +344,14 @@ void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, P
                 break;
             }
 
-            uint8_t distance_x = (uint8_t)(center_x * 255);
-            uint8_t distance_y = (uint8_t)(center_y * 255);
-            env.console.log(std::to_string(distance_x));
-            env.console.log(std::to_string(distance_y));
+            uint8_t distance_x_u8 = (uint8_t)(center_x * 255);
+            uint8_t distance_y_u8 = (uint8_t)(center_y * 255);
+            double distance_x_float = JoystickTools::linear_u8_to_float(distance_x_u8);
+            double distance_y_float = JoystickTools::linear_u8_to_float(distance_y_u8);
+            env.console.log(std::to_string(distance_x_float));
+            env.console.log(std::to_string(distance_y_float));
 
-            pbf_move_right_joystick_old(context, distance_x, distance_y, 160ms, 160ms);
+            pbf_move_right_joystick(context, {distance_x_float, distance_y_float}, 160ms, 160ms);
 
             break;
         }

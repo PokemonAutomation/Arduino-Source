@@ -4,6 +4,7 @@
  *
  */
 
+#include "Controllers/JoystickTools.h"
 #include "Common/Cpp/PrettyPrint.h" 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/UnexpectedBattleException.h"
@@ -1833,18 +1834,19 @@ void move_camera_yolo(
             );
             int16_t push_direction = (diff > 0) ? -1 : 1;
             double push_magnitude = std::max(double(std::abs(diff * push_magnitude_scale_factor)), double(15)); 
-            uint8_t axis_push = uint8_t(std::max(std::min(int(128 + (push_direction * push_magnitude)), 255), 0));
+            uint8_t axis_push_u8 = uint8_t(std::max(std::min(int(128 + (push_direction * push_magnitude)), 255), 0));
+            double axis_push_float = JoystickTools::linear_u8_to_float(axis_push_u8);
 
             // env.console.log("object_x: {" + std::to_string(target_box.x) + ", " + std::to_string(target_box.y) + ", " + std::to_string(target_box.width) + ", " + std::to_string(target_box.height) + "}");
             // env.console.log("object_x_pos: " + std::to_string(object_x_pos));
-            env.console.log("axis push: " + std::to_string(axis_push) + ", push duration: " +  std::to_string(push_duration.count()) + " ms");
+            env.console.log("axis push: " + std::to_string(axis_push_float) + ", push duration: " +  std::to_string(push_duration.count()) + " ms");
             switch(axis){
             case CameraAxis::X:{
-                pbf_move_right_joystick_old(context, axis_push, 128, push_duration, 0ms);
+                pbf_move_right_joystick(context, {axis_push_float, 0}, push_duration, 0ms);
                 break;
             }
             case CameraAxis::Y:{
-                pbf_move_right_joystick_old(context, 128, axis_push, push_duration, 0ms);
+                pbf_move_right_joystick(context, {0, axis_push_float}, push_duration, 0ms);
                 break;
             }
             default:
@@ -1989,21 +1991,21 @@ void move_camera_until_yolo_object_detected(
     ProControllerContext& context, 
     YOLOv5Detector& yolo_detector, 
     const std::string& target_label,
-    uint8_t initial_x_move, 
+    double initial_x_move, 
     Milliseconds initial_hold,
     uint16_t max_rounds
 ){
     VideoOverlaySet overlays(env.console.overlay());
     bool found_target = false;
     size_t round_num = 0;
-    uint8_t x_move = initial_x_move > 128 ? 255 : 0;
+    double x_move = initial_x_move > 0 ? +1 : -1;
     while(!found_target){
         try{
             do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
 
                 if (round_num == 0){
-                    pbf_move_right_joystick_old(context, initial_x_move, 128, initial_hold, 400ms);
+                    pbf_move_right_joystick(context, {initial_x_move, 0}, initial_hold, 400ms);
                 }
                 context.wait_for_all_requests();
                 ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
@@ -2014,7 +2016,7 @@ void move_camera_until_yolo_object_detected(
 
                 
 
-                pbf_move_right_joystick_old(context, x_move, 128, 80ms, 400ms);
+                pbf_move_right_joystick(context, {x_move, 0}, 80ms, 400ms);
             });
             
         }catch (UnexpectedBattleException&){

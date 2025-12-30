@@ -209,7 +209,7 @@ void checkpoint_100(SingleSwitchProgramEnvironment& env, ProControllerContext& c
             }
         );
 
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "cave-archway-1", 255, 480ms);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "cave-archway-1", +1, 480ms);
 
         move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "cave-archway-1", 0.5,
             [&](){
@@ -314,7 +314,7 @@ void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& c
             }
         );
 
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "crystal-4-3", 255, 480ms);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "crystal-4-3", +1, 480ms);
 
         
 
@@ -399,7 +399,7 @@ void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& c
 
         pbf_move_right_joystick_old(context, 128, 160, 240ms, 0ms);  // adjust camera so that head doesn't cover the crystal.
   
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "crystal-4-5", 255, 240ms);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "crystal-4-5", +1, 240ms);
 
 
         // align to crystal-4-5.  

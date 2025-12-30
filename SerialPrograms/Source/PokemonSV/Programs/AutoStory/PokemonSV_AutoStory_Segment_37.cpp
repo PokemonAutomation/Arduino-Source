@@ -131,7 +131,7 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         pbf_press_button(context, BUTTON_L, 240ms, 100ms);
 
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "waterfall-3-1", 0, 800ms);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "waterfall-3-1", -1, 800ms);
 
 
 
@@ -257,7 +257,7 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
         pbf_move_right_joystick(context, {0, -1}, 1600ms, 0ms);
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "beyond-cliff-3", 255, 240ms);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "beyond-cliff-3", +1, 240ms);
 
         move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "beyond-cliff-3", 0.5,
             [&](){
@@ -284,7 +284,7 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         pbf_press_button(context, BUTTON_L, 240ms, 100ms);
 
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "station-3", 0, 800ms);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "station-3", -1, 800ms);
 
 
         move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "station-3", 0.5,
