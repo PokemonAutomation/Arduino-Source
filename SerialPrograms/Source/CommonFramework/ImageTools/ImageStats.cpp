@@ -63,6 +63,7 @@ ImageStats image_stats(const ImageViewRGB32& image){
 
     FloatPixel average = sum / (double)sums.count;
 
+    // (\sum (x_i^2) - (\sum x_i)^2 / n) / (n-1)
     FloatPixel variance = (sqr - sum*sum / (double)sums.count) / ((double)sums.count - 1);
     FloatPixel stddev = FloatPixel(
         std::sqrt(variance.r),

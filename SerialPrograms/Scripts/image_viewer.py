@@ -85,7 +85,7 @@ class ImageViewer:
 			self.buffer = cv2.rectangle(self.buffer, (rect[0], rect[1]), (rect[2], rect[3]), color, width)
 
 	def _render(self) -> None:
-		self.update_buffer();
+		self.update_buffer()
 		cv2.imshow(self.window_name, self.buffer)
 		# self.fullscreen = False
 
@@ -119,7 +119,7 @@ class ImageViewer:
 		print(msg)
 
 	def _print_rect(self, i, rect):
-		crop = self.image[rect[1]:rect[3], rect[0]:rect[2]].astype(float) / 255.0
+		crop = self.image[rect[1]:rect[3], rect[0]:rect[2]].astype(float)
 		num_pixels = crop.shape[0] * crop.shape[1]
 		# crop_sum shape: (4), 4 is channel count
 		crop_sum = np.sum(crop, (0, 1))
@@ -128,7 +128,7 @@ class ImageViewer:
 		# crop_sqr_sum shape: (4), 4 is channel count
 		crop_sqr_sum = np.sum(np.square(crop), (0, 1))
 		
-		crop_stddev = np.sqrt(  np.clip(crop_sqr_sum - (np.square(crop_sum) / num_pixels), 0, None) / (num_pixels-1))
+		crop_stddev = np.sqrt(np.clip(crop_sqr_sum - (np.square(crop_sum) / num_pixels), 0, None) / (num_pixels-1))
 
 		# [0:3] to remove alpha channel
 		avg_sum = np.sum(crop_avg[0:3])

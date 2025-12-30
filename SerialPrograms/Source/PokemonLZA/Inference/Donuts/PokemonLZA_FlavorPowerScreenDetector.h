@@ -32,6 +32,7 @@ private:
     const ImageFloatBox m_top_pink_area;
     const ImageFloatBox m_left_white_area;
     const ImageFloatBox m_bottom_white_area;
+    const ImageFloatBox m_donut_area;
 };
 
 class FlavorPowerScreenWatcher : public DetectorToFinder<FlavorPowerScreenDetector>{

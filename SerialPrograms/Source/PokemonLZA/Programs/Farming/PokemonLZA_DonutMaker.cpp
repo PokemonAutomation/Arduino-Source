@@ -343,6 +343,8 @@ void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProContr
             env.console
         );
     }
+    context.wait_for(100ms); // extra 0.1 sec to let game give player control
+    env.log("Detected overworld. Fast traveled from Pokecenter to Hotel Zone");
 
     ret = run_towards_gate_with_A_button(env.console, context, 128, 0, Seconds(5));
     if (ret == 1){  // day night change happens during running
@@ -355,6 +357,7 @@ void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProContr
                 "donut_maker(): Cannot reach Hotel Z gate after day/night change.",
                 env.console
             );
+            overworld.last_detected_frame()->save("debug_overworld_detection.png");
         }
     } else if (ret != 0){
         stats.errors++;
@@ -364,6 +367,7 @@ void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProContr
             "donut_maker(): Cannot reach Hotel Z gate after fast travel.",
             env.console
         );
+        overworld.last_detected_frame()->save("debug_overworld_detection.png");
     }
 
     // Mash button A to enter the hotel.
