@@ -9,6 +9,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
@@ -121,43 +122,43 @@ class LegendaryRoute {
 public:
     virtual ~LegendaryRoute() = default;
 
-    // The route used to reset and respawn the legendary
+    // A wrapper function to repeatedly run the reset route and exit when min calorie is reached
     virtual void reset(
         SingleSwitchProgramEnvironment& env,
         ProControllerContext& context,
         ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
         SimpleIntegerOption<uint16_t>& MIN_CALORIE_REMAINING){
 
-        const uint16_t min_calorie = MIN_CALORIE_REMAINING;
+        while (true){
+            const uint16_t min_calorie = MIN_CALORIE_REMAINING;
+            HyperspaceCalorieDetector calorie_detector(env.logger());
 
-        HyperspaceCalorieLimitWatcher calorie_watcher(env.logger(), min_calorie);
-        const int ret = run_until<ProControllerContext>(
-            env.console, context,
-            [&](ProControllerContext& context){
-                while (true){
-                    reset_route(env, context, stats);
-
-                    stats.resets++;
-                    env.update_stats();
-
-                    uint16_t calorie_number = calorie_watcher.calorie_number();
-                    const std::string log_msg = std::format("Calorie: {}/{}", calorie_number, min_calorie);
-                    env.add_overlay_log(log_msg);
-                    env.log(log_msg);
-                }
-            },
-            {{calorie_watcher}}
-        );
-        if (ret < 0){
-            stats.errors++;
+            reset_route(env, context, stats);
+            context.wait_for_all_requests();
+            stats.resets++;
             env.update_stats();
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                std::string(typeid(*this).name()) + " reset(): Error during reset loop.",
-                env.console
-            );
+
+            VideoSnapshot screen = env.console.video().snapshot();
+            bool valid_calorie_count = calorie_detector.detect(screen);
+            if (!valid_calorie_count){
+                stats.errors++;
+                env.update_stats();
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    std::string(typeid(*this).name()) + " reset(): Error detecting calorie count.",
+                    env.console
+                );
+            }
+            uint16_t calorie_number = calorie_detector.calorie_number();
+
+            const std::string log_msg = std::format("Calorie: {}/{}", calorie_number, min_calorie);
+            env.add_overlay_log(log_msg);
+            env.log(log_msg);
+            if (calorie_number <= min_calorie){
+                env.log("min calorie reached");
+                break;
+            }
         }
-        env.log("min calorie reached");
     }
 
     // Unique route used to reset each respective legendary, to be implemented by subclasses
