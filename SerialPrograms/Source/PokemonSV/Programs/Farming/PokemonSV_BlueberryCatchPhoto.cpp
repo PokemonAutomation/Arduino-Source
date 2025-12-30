@@ -67,7 +67,7 @@ CameraAngle quest_photo_navi(
             context.wait_for_all_requests();
 
             pbf_press_button(context, BUTTON_L, 80ms, 400ms);
-            pbf_move_left_joystick_old(context, 255, 50, 1440ms, 160ms);
+            pbf_move_left_joystick(context, {+1, +0.609}, 1440ms, 160ms);
 
             angle = CameraAngle::down;
 
@@ -78,7 +78,7 @@ CameraAngle quest_photo_navi(
             //Coastal Plaza - Exeggutor-A
             central_to_coastal_plaza(info, console, context);
 
-            pbf_move_left_joystick_old(context, 0, 115, 3200ms, 160ms);
+            pbf_move_left_joystick(context, {-1, +0.102}, 3200ms, 160ms);
 
             //Jump down
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
@@ -102,7 +102,7 @@ CameraAngle quest_photo_navi(
             //Canyon Plaza - Golett
             central_to_canyon_plaza(info, console, context);
 
-            pbf_move_left_joystick_old(context, 210, 128, 80ms, 160ms);
+            pbf_move_left_joystick(context, {+0.646, 0}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 4800ms, 2000ms, 3200ms);
@@ -116,7 +116,7 @@ CameraAngle quest_photo_navi(
             //Savanna Plaza - Pride Rock
             central_to_savanna_plaza(info, console, context);
 
-            pbf_move_left_joystick_old(context, 220, 255, 80ms, 160ms);
+            pbf_move_left_joystick(context, {+0.724, -1}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 4800ms, 3200ms, 3200ms);
@@ -139,7 +139,7 @@ CameraAngle quest_photo_navi(
             //Kleavor
             central_to_canyon_plaza(info, console, context);
 
-            pbf_move_left_joystick_old(context, 205, 64, 160ms, 840ms);
+            pbf_move_left_joystick(context, {+0.606, +0.5}, 160ms, 840ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8000ms, 12000ms, 2400ms);
@@ -154,7 +154,7 @@ CameraAngle quest_photo_navi(
             open_map_from_overworld(info, console, context);
             fly_to_overworld_from_map(info, console, context);
 
-            pbf_move_left_joystick_old(context, 0, 80, 80ms, 160ms);
+            pbf_move_left_joystick(context, {-1, +0.375}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 16000ms, 12000ms, 1600ms);
@@ -219,7 +219,7 @@ CameraAngle quest_photo_navi(
             central_to_canyon_plaza(info, console, context);
             pbf_move_left_joystick(context, {-1, 0}, 3200ms, 160ms);
             pbf_press_button(context, BUTTON_L, 80ms, 400ms);
-            pbf_move_left_joystick_old(context, 0, 100, 160ms, 400ms);
+            pbf_move_left_joystick(context, {-1, +0.219}, 160ms, 400ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1600ms, 4000ms, 6400ms);
@@ -244,7 +244,7 @@ CameraAngle quest_photo_navi(
             }
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
             pbf_move_left_joystick(context, {0, +1}, 1200ms, 400ms);
-            pbf_move_left_joystick_old(context, 180, 0, 160ms, 400ms);
+            pbf_move_left_joystick(context, {+0.409, +1}, 160ms, 400ms);
             pbf_wait(context, 1600ms); //Give it time to spawn/load.
             context.wait_for_all_requests();
 
@@ -393,7 +393,7 @@ void quest_catch_navi(
             //Savanna Plaza - Pride Rock
             central_to_savanna_plaza(info, console, context);
 
-            pbf_move_left_joystick_old(context, 220, 255, 80ms, 160ms);
+            pbf_move_left_joystick(context, {+0.724, -1}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 4800ms, 3200ms, 3200ms);
@@ -433,7 +433,7 @@ void quest_catch_navi(
             //Coastal Plaza - Exeggutor-A
             central_to_coastal_plaza(info, console, context);
 
-            pbf_move_left_joystick_old(context, 0, 115, 3200ms, 160ms);
+            pbf_move_left_joystick(context, {-1, +0.102}, 3200ms, 160ms);
 
             //Jump down
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
@@ -456,7 +456,7 @@ void quest_catch_navi(
             //Canyon Plaza - Golett
             central_to_canyon_plaza(info, console, context);
 
-            pbf_move_left_joystick_old(context, 210, 128, 80ms, 160ms);
+            pbf_move_left_joystick(context, {+0.646, 0}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 4800ms, 2400ms, 3200ms);
@@ -476,7 +476,7 @@ void quest_catch_navi(
             open_map_from_overworld(info, console, context);
             fly_to_overworld_from_map(info, console, context);
 
-            pbf_move_left_joystick_old(context, 0, 80, 80ms, 160ms);
+            pbf_move_left_joystick(context, {-1, +0.375}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 16000ms, 12000ms, 1600ms);
@@ -494,7 +494,7 @@ void quest_catch_navi(
             central_to_canyon_plaza(info, console, context);
             pbf_move_left_joystick(context, {-1, 0}, 3200ms, 160ms);
             pbf_press_button(context, BUTTON_L, 80ms, 400ms);
-            pbf_move_left_joystick_old(context, 0, 100, 160ms, 400ms);
+            pbf_move_left_joystick(context, {-1, +0.219}, 160ms, 400ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1600ms, 4000ms, 6400ms);
@@ -506,7 +506,7 @@ void quest_catch_navi(
 
             central_to_canyon_plaza(info, console, context);
 
-            pbf_move_left_joystick_old(context, 205, 64, 160ms, 840ms);
+            pbf_move_left_joystick(context, {+0.606, +0.5}, 160ms, 840ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8000ms, 13200ms, 4000ms);
@@ -517,7 +517,7 @@ void quest_catch_navi(
             //Vullaby/Mandibuzz
             central_to_savanna_plaza(info, console, context);
 
-            pbf_move_left_joystick_old(context, 255, 40, 80ms, 160ms);
+            pbf_move_left_joystick(context, {+1, +0.688}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             pbf_move_left_joystick(context, {0, +1}, 4000ms, 160ms);
@@ -553,7 +553,7 @@ void quest_catch_navi(
             open_map_from_overworld(info, console, context);
             fly_to_overworld_from_map(info, console, context);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-            pbf_move_left_joystick_old(context, 70, 0, 80ms, 160ms);
+            pbf_move_left_joystick(context, {-0.453, +1}, 80ms, 160ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 800ms, 4400ms, 2400ms);
@@ -632,7 +632,7 @@ void quest_catch_navi(
             pbf_move_left_joystick(context, {0, +1}, 1840ms, 160ms);
             pbf_move_left_joystick(context, {-1, 0}, 2400ms, 160ms);
             pbf_press_button(context, BUTTON_L, 160ms, 400ms);
-            pbf_move_left_joystick_old(context, 20, 0, 160ms, 400ms);
+            pbf_move_left_joystick(context, {-0.844, +1}, 160ms, 400ms);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 5600ms, 13600ms, 2400ms);

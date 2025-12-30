@@ -57,7 +57,7 @@ void return_to_plaza(const ProgramInfo& info, VideoStream& stream, ProController
 
                 //Move cursor to top left corner - even works when at Entrance fly point
                 pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
-                pbf_move_left_joystick_old(context, 0, 0, 4000ms, 320ms);
+                pbf_move_left_joystick(context, {-1, +1}, 4000ms, 320ms);
 
                 //Now move toward center
                 if (laggy){

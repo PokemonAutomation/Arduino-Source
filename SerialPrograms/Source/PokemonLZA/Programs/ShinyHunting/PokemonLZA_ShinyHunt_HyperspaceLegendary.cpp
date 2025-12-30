@@ -122,7 +122,7 @@ void route_default(
     }
 
     // Move map cursor upwards a little bit
-    pbf_move_left_joystick_old(context, 128, 64, 100ms, 200ms);
+    pbf_move_left_joystick(context, {0, +0.5}, 100ms, 200ms);
 
     // Fly from map to reset spawns
     FastTravelState travel_status = fly_from_map(env.console, context);

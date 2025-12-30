@@ -255,7 +255,7 @@ void checkpoint_52(
 
         // select Clavell 1
         pbf_move_left_joystick(context, {+1, +1}, 2000ms, 480ms);
-        pbf_move_left_joystick_old(context, 10, 255, 800ms, 800ms);
+        pbf_move_left_joystick(context, {-0.922, -1}, 800ms, 800ms);
         pbf_mash_button(context, BUTTON_A, 1000ms);
 
         // mash B until detect battle 1
@@ -296,7 +296,7 @@ void checkpoint_52(
 
         // select Clavell 2
         pbf_move_left_joystick(context, {-1, +1}, 3000ms, 480ms);
-        pbf_move_left_joystick_old(context, 255, 250, 800ms, 800ms);
+        pbf_move_left_joystick(context, {+1, -0.961}, 800ms, 800ms);
         pbf_mash_button(context, BUTTON_A, 1000ms);
 
         // mash B until detect battle 2
@@ -340,7 +340,7 @@ void checkpoint_52(
 
         // select Clavell 3
         pbf_move_left_joystick(context, {+1, +1}, 2000ms, 480ms);
-        pbf_move_left_joystick_old(context, 85, 255, 640ms, 800ms);
+        pbf_move_left_joystick(context, {-0.336, -1}, 640ms, 800ms);
 
         mash_button_till_overworld(env.console, context, BUTTON_A);
 

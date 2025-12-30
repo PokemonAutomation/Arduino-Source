@@ -712,7 +712,7 @@ void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, VideoS
         numAttempts++;
 
         // move toward entrance gates
-        pbf_move_left_joystick_old(context, 190, 0, 1600ms, 400ms);
+        pbf_move_left_joystick(context, {+0.488, +1}, 1600ms, 400ms);
 
         context.wait_for_all_requests();
 
@@ -770,7 +770,7 @@ void move_from_league_club_entrance_to_item_printer(const ProgramInfo& info, Vid
     context.wait_for_all_requests();
 
     // move forwards towards table next to item printer
-    pbf_move_left_joystick_old(context, 120, 0, 1600ms, 400ms);
+    pbf_move_left_joystick(context, {-0.062, +1}, 1600ms, 400ms);
 
     // look left towards item printer
     pbf_move_left_joystick(context, {-1, 0}, 80ms, 400ms);

@@ -134,7 +134,7 @@ void checkpoint_55(
 
             direction.change_direction(env.program_info(), env.console, context, 0.261);
             pbf_move_left_joystick(context, {0, +1}, 4000ms, 800ms);
-            pbf_move_left_joystick_old(context, 0, 0, 4000ms, 800ms);
+            pbf_move_left_joystick(context, {-1, +1}, 4000ms, 800ms);
 
             // now aligned to corner.
 

@@ -318,10 +318,10 @@ void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProController
     pbf_wait(context, 300ms);
     switch(zone){
     case WildZone::WILD_ZONE_1:
-        pbf_move_left_joystick_old(context, 0, 150, 120ms, 0ms);
+        pbf_move_left_joystick(context, {-1, -0.173}, 120ms, 0ms);
         break;
     case WildZone::WILD_ZONE_2:
-        pbf_move_left_joystick_old(context, 120, 0, 100ms, 0ms);
+        pbf_move_left_joystick(context, {-0.062, +1}, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_3:
         pbf_move_left_joystick(context, {0, +1}, 100ms, 0ms);
@@ -330,59 +330,59 @@ void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProController
         pbf_move_left_joystick(context, {+1, 0}, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_5:
-        pbf_move_left_joystick_old(context, 170, 0, 100ms, 0ms);
+        pbf_move_left_joystick(context, {+0.331, +1}, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_6:
-        pbf_move_left_joystick_old(context, 80, 0, 100ms, 0ms);
+        pbf_move_left_joystick(context, {-0.375, +1}, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_7:
-        pbf_move_left_joystick_old(context, 0, 100, 100ms, 0ms);
+        pbf_move_left_joystick(context, {-1, +0.219}, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_8:
-        pbf_move_left_joystick_old(context, 0, 160, 100ms, 0ms);
+        pbf_move_left_joystick(context, {-1, -0.252}, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_9:
-        pbf_move_left_joystick_old(context, 70, 0, 100ms, 0ms);
+        pbf_move_left_joystick(context, {-0.453, +1}, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_10:
-        pbf_move_left_joystick_old(context, 255, 90, 100ms, 0ms);
+        pbf_move_left_joystick(context, {+1, +0.297}, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_11:
-        pbf_move_left_joystick_old(context, 0, 40, 100ms, 0ms);
+        pbf_move_left_joystick(context, {-1, +0.688}, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_12:
-        pbf_move_left_joystick_old(context, 20, 0, 150ms, 0ms);
+        pbf_move_left_joystick(context, {-0.844, +1}, 150ms, 0ms);
         break;
     case WildZone::WILD_ZONE_13:
-        pbf_move_left_joystick_old(context, 0, 160, 100ms, 0ms);
+        pbf_move_left_joystick(context, {-1, -0.252}, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_14:
-        pbf_move_left_joystick_old(context, 110, 255, 100ms, 0ms);
+        pbf_move_left_joystick(context, {-0.141, -1}, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_15:
         pbf_move_left_joystick(context, {-1, +1}, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_16:
-        pbf_move_left_joystick_old(context, 220, 0, 100ms, 0ms);
+        pbf_move_left_joystick(context, {+0.724, +1}, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_17:
-        pbf_move_left_joystick_old(context, 210, 0, 100ms, 0ms);
+        pbf_move_left_joystick(context, {+0.646, +1}, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_18:
-        pbf_move_left_joystick_old(context, 20, 255, 100ms, 0ms);
+        pbf_move_left_joystick(context, {-0.844, -1}, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_19:
-        pbf_move_left_joystick_old(context, 80, 255, 100ms, 0ms);
+        pbf_move_left_joystick(context, {-0.375, -1}, 100ms, 0ms);
         break;
     case WildZone::WILD_ZONE_20_NO_DISTORTION:
-        pbf_move_left_joystick_old(context, 0, 90, 140ms, 0ms);
+        pbf_move_left_joystick(context, {-1, +0.297}, 140ms, 0ms);
         break;
     case WildZone::WILD_ZONE_20_WITH_DISTORTION:
         // During the distortion happening on top of Lumiose Tower as part
         // of the Mega Dimension DLC story, the wild zone 20 fast travel
         // symbol on the map is moved to the entrance gate. So we only
         // need a tiny left joystick push.
-        pbf_move_left_joystick_old(context, 100, 100, 100ms, 0ms);
+        pbf_move_left_joystick(context, {-0.219, +0.219}, 100ms, 0ms);
         break;
     }
     pbf_wait(context, 300ms);

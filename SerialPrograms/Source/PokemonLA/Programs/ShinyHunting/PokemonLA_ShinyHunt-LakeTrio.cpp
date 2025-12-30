@@ -135,10 +135,10 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, ProControll
         reset = true;
 
         env.console.log("Entering cave...");
-        pbf_move_left_joystick_old(context, 160, 0, 400ms, 0ms);
-        pbf_move_left_joystick_old(context, 96, 0, 400ms, 0ms);
-        pbf_move_left_joystick_old(context, 160, 0, 400ms, 0ms);
-        pbf_move_left_joystick_old(context, 96, 0, 400ms, 0ms);
+        pbf_move_left_joystick(context, {+0.252, +1}, 400ms, 0ms);
+        pbf_move_left_joystick(context, {-0.25, +1}, 400ms, 0ms);
+        pbf_move_left_joystick(context, {+0.252, +1}, 400ms, 0ms);
+        pbf_move_left_joystick(context, {-0.25, +1}, 400ms, 0ms);
         pbf_mash_button(context, BUTTON_A, 1000ms);
         context.wait_for_all_requests();
 

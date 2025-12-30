@@ -30,47 +30,47 @@ void change_time_of_day_at_tent(
     switch (camp)
     {
     case Camp::FIELDLANDS_FIELDLANDS:
-        pbf_move_left_joystick_old(context, 105, 0, 1760ms, 160ms);
+        pbf_move_left_joystick(context, {-0.18, +1}, 1760ms, 160ms);
         break;
     
     case Camp::FIELDLANDS_HEIGHTS:
-        pbf_move_left_joystick_old(context, 95, 0, 2000ms, 160ms);
+        pbf_move_left_joystick(context, {-0.258, +1}, 2000ms, 160ms);
         break;
     
     case Camp::MIRELANDS_MIRELANDS:
-        pbf_move_left_joystick_old(context, 70, 0, 1440ms, 160ms);
+        pbf_move_left_joystick(context, {-0.453, +1}, 1440ms, 160ms);
         break;
     
     case Camp::MIRELANDS_BOGBOUND:
-        pbf_move_left_joystick_old(context, 70, 0, 1360ms, 160ms);
+        pbf_move_left_joystick(context, {-0.453, +1}, 1360ms, 160ms);
         break;
     
     case Camp::COASTLANDS_BEACHSIDE:
-        pbf_move_left_joystick_old(context, 100, 0, 1040ms, 160ms);
+        pbf_move_left_joystick(context, {-0.219, +1}, 1040ms, 160ms);
         break;
     
     case Camp::COASTLANDS_COASTLANDS:
-        pbf_move_left_joystick_old(context, 75, 0, 1280ms, 160ms);
+        pbf_move_left_joystick(context, {-0.414, +1}, 1280ms, 160ms);
         break;
     
     case Camp::HIGHLANDS_HIGHLANDS:
-        pbf_move_left_joystick_old(context, 95, 0, 1520ms, 160ms);
+        pbf_move_left_joystick(context, {-0.258, +1}, 1520ms, 160ms);
         break;
     
     case Camp::HIGHLANDS_MOUNTAIN:
-        pbf_move_left_joystick_old(context, 60, 0, 1520ms, 160ms);
+        pbf_move_left_joystick(context, {-0.531, +1}, 1520ms, 160ms);
         break;
     
     case Camp::HIGHLANDS_SUMMIT:
-        pbf_move_left_joystick_old(context, 100, 0, 1760ms, 160ms);
+        pbf_move_left_joystick(context, {-0.219, +1}, 1760ms, 160ms);
         break;
     
     case Camp::ICELANDS_SNOWFIELDS:
-        pbf_move_left_joystick_old(context, 80, 0, 1200ms, 160ms);
+        pbf_move_left_joystick(context, {-0.375, +1}, 1200ms, 160ms);
         break;
 
     case Camp::ICELANDS_ICEPEAK:
-        pbf_move_left_joystick_old(context, 110, 0, 1760ms, 160ms);
+        pbf_move_left_joystick(context, {-0.141, +1}, 1760ms, 160ms);
         break;
     }
 

@@ -278,7 +278,7 @@ void picnic_at_zero_gate(
     pbf_press_button(context, BUTTON_L, 400ms, 320ms);
 
     // Move right to make player character facing away from Aera Zero observation station
-    pbf_move_left_joystick_old(context, 255, 32, 400ms, 400ms);
+    pbf_move_left_joystick(context, {+1, +0.75}, 400ms, 400ms);
     // Press L to move camera to face the same direction as the player character
     pbf_press_button(context, BUTTON_L, 400ms, 320ms);
     // Move forward
@@ -729,7 +729,7 @@ void hatch_eggs_at_area_three_lighthouse(
                 stream.log("Reset location by flying back to lighthouse.");
                 // Use map to fly back to the flying spot
                 open_map_from_overworld(info, stream, context);
-                pbf_move_left_joystick_old(context, 200, 0, 160ms, 400ms);
+                pbf_move_left_joystick(context, {+0.567, +1}, 160ms, 400ms);
                 fly_to_overworld_from_map(info, stream, context);
                 continue;
             }
@@ -785,7 +785,7 @@ void reset_position_at_zero_gate(
     // Use map to fly back to the flying spot
     open_map_from_overworld(info, stream, context);
 
-    pbf_move_left_joystick_old(context, 128, 160, 160ms, 400ms);
+    pbf_move_left_joystick(context, {0, -0.252}, 160ms, 400ms);
 
     fly_to_overworld_from_map(info, stream, context);
 }

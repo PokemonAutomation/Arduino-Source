@@ -104,7 +104,7 @@ void route_alpha_pidgeot(SingleSwitchProgramEnvironment& env, ProControllerConte
     if (ret == 0){
         wait_until_overworld(env.console, context, 50s);
         open_map(env.console, context, false);
-        pbf_move_left_joystick_old(context, 148, 108, 100ms, 200ms);
+        pbf_move_left_joystick(context, {+0.157, +0.156}, 100ms, 200ms);
         if (fly_from_map(env.console, context) == FastTravelState::NOT_AT_FLY_SPOT) {
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,

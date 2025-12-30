@@ -97,7 +97,7 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::OVERWORLD});
 
         // leave Station 2
-        pbf_move_left_joystick_old(context, 50, 255, 1040ms, 160ms);
+        pbf_move_left_joystick(context, {-0.609, -1}, 1040ms, 160ms);
 
         pbf_move_left_joystick(context, {0, -1}, 3200ms, 800ms);
         pbf_wait(context, 3000ms);
@@ -282,7 +282,7 @@ void checkpoint_103(SingleSwitchProgramEnvironment& env, ProControllerContext& c
                 pbf_press_button(context, BUTTON_L, 240ms, 80ms);
                 pbf_move_left_joystick(context, {+1, 0}, 560ms, 400ms);
 
-                pbf_move_left_joystick_old(context, 110, 0, 80ms, 400ms);
+                pbf_move_left_joystick(context, {-0.141, +1}, 80ms, 400ms);
                 pbf_press_button(context, BUTTON_L, 240ms, 80ms);
 
                 pbf_move_left_joystick(context, {0, +1}, 4800ms, 400ms);
