@@ -4,7 +4,6 @@
  *
  */
 
-#include "Controllers/JoystickTools.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -239,9 +238,8 @@ void DirectionDetector::change_direction(
             64ms
         );
         int16_t push_direction = (diff > 0) ? -1 : 1;
-        double push_magnitude = std::max(double((128 * push_magnitude_scale_factor) / (i + 1)), double(15)); // push less with each iteration/attempt
-        uint8_t push_x_u8 = uint8_t(std::max(std::min(int(128 + (push_direction * push_magnitude)), 255), 0));
-        double push_x_float = JoystickTools::linear_u8_to_float(push_x_u8);
+        double push_magnitude = std::max(push_magnitude_scale_factor / (i + 1), 0.117); // push less with each iteration/attempt
+        double push_x_float = std::max(std::min(push_direction * push_magnitude, +1.0), -1.0);
         stream.log(
             "push magnitude: " + std::to_string(push_x_float) +
             ", push duration: " +  std::to_string(push_duration.count()) + "ms"

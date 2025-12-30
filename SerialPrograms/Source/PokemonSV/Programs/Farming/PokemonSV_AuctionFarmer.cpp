@@ -6,7 +6,6 @@
 
 //#include <iostream>
 #include <unordered_map>
-#include "Controllers/JoystickTools.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
