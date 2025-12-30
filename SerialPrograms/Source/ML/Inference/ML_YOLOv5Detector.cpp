@@ -37,47 +37,32 @@ YOLOv5Detector::YOLOv5Detector(const std::string& model_path)
     if (!model_path.ends_with(".onnx")){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, 
             "Error: YOLOv5 model path must end with .onnx. But got " + model_path + ".");
-
-        // std::cerr << "Error: wrong model path extension: " << model_path << ". It must be .onnx" << std::endl;
-        // QMessageBox box;
-        // box.critical(nullptr, "Wrong Model Extension",
-        //     QString::fromStdString("YOLOv5 model path must end with .onnx. But got " + model_path + "."));
-        // return;
     }
 
     std::string label_file_path = model_path.substr(0, model_path.size() - 5) + "_label.txt";
     std::vector<std::string> labels;
-    if (!std::filesystem::exists(label_file_path)){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, 
-            "Error: YOLOv5 label file path " + label_file_path + " does not exist.");
+    if (std::filesystem::exists(label_file_path)){
+        std::ifstream label_file(label_file_path);
+        if (!label_file.is_open()){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, 
+                "Error: YOLOv5 label file " + label_file_path + " cannot be opened.");
 
-        // std::cerr << "Error: no such YOLOv5 label file path " << label_file_path << "." << std::endl;
-        // QMessageBox box;
-        // box.critical(nullptr, "YOLOv5 Label File Does Not Exist",
-        //     QString::fromStdString("YOLOv5 label file path " + label_file_path + " does not exist."));
-        // return;
-    }
-    std::ifstream label_file(label_file_path);
-    if (!label_file.is_open()){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, 
-            "Error: YOLOv5 label file " + label_file_path + " cannot be opened.");
-
-        // std::cerr << "Error: failed to open YOLOv5 label file " << label_file_path << "." << std::endl;
-        // QMessageBox box;
-        // box.critical(nullptr, "Cannot Open YOLOv5 Label File",
-        //     QString::fromStdString("YOLOv5 label file " + label_file_path + " cannot be opened."));
-        // return;
-    }
-    std::string line;
-    while (std::getline(label_file, line)){
-        line = StringTools::strip(line);
-        if (line.empty() || line[0] == '#'){
-            continue;
+            // std::cerr << "Error: failed to open YOLOv5 label file " << label_file_path << "." << std::endl;
+            // QMessageBox box;
+            // box.critical(nullptr, "Cannot Open YOLOv5 Label File",
+            //     QString::fromStdString("YOLOv5 label file " + label_file_path + " cannot be opened."));
+            // return;
         }
-        labels.push_back(line);
+        std::string line;
+        while (std::getline(label_file, line)){
+            line = StringTools::strip(line);
+            if (line.empty() || line[0] == '#'){
+                continue;
+            }
+            labels.push_back(line);
+        }
+        label_file.close();
     }
-    label_file.close();
-
     m_yolo_session = std::make_unique<YOLOv5Session>(m_model_path, std::move(labels), m_use_gpu);
 }
 

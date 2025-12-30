@@ -7,16 +7,90 @@
 
 
 #include <string>
+#include <sstream>
+#include <map>
 //#include <iostream>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/dnn.hpp>
 #include "3rdParty/ONNX/OnnxToolsPA.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"
 #include "ML_YOLOv5Model.h"
 
 namespace PokemonAutomation{
 namespace ML{
+
+
+// Parse YOLO metadata "names" field to extract label names
+// Expected format: "names: {0: 'label0', 1: 'label1', 2: 'label2', ...}"
+std::vector<std::string> parse_yolo_metadata_names(const std::string& metadata_value){
+    std::vector<std::string> label_names;
+    std::map<int, std::string> label_map;
+
+    // Find the opening brace
+    size_t brace_start = metadata_value.find('{');
+    size_t brace_end = metadata_value.rfind('}');
+
+    if (brace_start == std::string::npos || brace_end == std::string::npos){
+        return label_names;  // Return empty vector if format is invalid
+    }
+
+    std::string content = metadata_value.substr(brace_start + 1, brace_end - brace_start - 1);
+
+    // Parse entries like "0: 'label0', 1: 'label1', ..."
+    size_t pos = 0;
+    while (pos < content.size()){
+        // Find the index
+        size_t colon_pos = content.find(':', pos);
+        if (colon_pos == std::string::npos){
+            break;
+        }
+
+        // Extract index
+        std::string index_str = content.substr(pos, colon_pos - pos);
+        // Trim whitespace
+        index_str.erase(0, index_str.find_first_not_of(" \t\n\r"));
+        index_str.erase(index_str.find_last_not_of(" \t\n\r") + 1);
+
+        int index = std::stoi(index_str);
+
+        // Find the label name (between quotes)
+        size_t quote1 = content.find('\'', colon_pos);
+        if (quote1 == std::string::npos){
+            quote1 = content.find('"', colon_pos);  // Try double quotes
+        }
+        if (quote1 == std::string::npos){
+            break;
+        }
+
+        size_t quote2 = content.find(content[quote1], quote1 + 1);  // Find matching quote
+        if (quote2 == std::string::npos){
+            break;
+        }
+
+        std::string label = content.substr(quote1 + 1, quote2 - quote1 - 1);
+        label_map[index] = label;
+
+        // Move to next entry
+        pos = content.find(',', quote2);
+        if (pos == std::string::npos){
+            break;
+        }
+        pos++;  // Skip the comma
+    }
+
+    // Convert map to vector (in order)
+    for (const auto& pair : label_map){
+        if (pair.first != (int)label_names.size()){
+            throw std::runtime_error("YOLO metadata labels are not sequential. Expected index " +
+                std::to_string(label_names.size()) + " but found " + std::to_string(pair.first));
+        }
+        label_names.push_back(pair.second);
+    }
+
+    return label_names;
+}
 
 
 std::tuple<int, int, double, double> resize_image_with_border(
@@ -68,6 +142,34 @@ YOLOv5Session::YOLOv5Session(const std::string& model_path, std::vector<std::str
 , m_output_names{m_session.GetOutputNames()}
 , m_model_input(3*YOLO5_INPUT_IMAGE_SIZE*YOLO5_INPUT_IMAGE_SIZE)
 {
+    // If no label names were provided, try to extract them from model metadata
+    if (m_label_names.empty()){
+        try {
+            Ort::ModelMetadata metadata = m_session.GetModelMetadata();
+            Ort::AllocatorWithDefaultOptions allocator;
+
+            // Look for "names" key in custom metadata
+            Ort::AllocatedStringPtr names_value = metadata.LookupCustomMetadataMapAllocated("names", allocator);
+
+            if (names_value){
+                std::string names_str(names_value.get());
+                global_logger_tagged().log("YOLOv5: Found label metadata: " + names_str, COLOR_PURPLE);
+
+                m_label_names = parse_yolo_metadata_names(names_str);
+
+                if (!m_label_names.empty()){
+                    global_logger_tagged().log("YOLOv5: Extracted " + std::to_string(m_label_names.size()) +
+                                             " labels from model metadata", COLOR_GREEN);
+                }
+            } else {
+                global_logger_tagged().log("YOLOv5: No 'names' metadata found in model", COLOR_ORANGE);
+            }
+        } catch (const std::exception& e){
+            global_logger_tagged().log("YOLOv5: Failed to extract labels from metadata: " + std::string(e.what()), COLOR_RED);
+            // Continue without metadata labels - the validation below will catch if we still need them
+        }
+    }
+
     if (m_session.GetOutputCount() != 1){
         throw std::runtime_error("YOLOv5 model does not have the correct output count, found count " + std::to_string(m_session.GetOutputCount()));
     }
@@ -79,8 +181,8 @@ YOLOv5Session::YOLOv5Session(const std::string& model_path, std::vector<std::str
     m_output_shape[2] = output_dims[2];
     if (output_dims[2] - 5 != static_cast<int>(m_label_names.size())){
         throw std::runtime_error(
-            "YOLOv5 model has " + std::to_string(output_dims[2]-5) + 
-            " output labels but YOLOv5Session was initialized with " + std::to_string(label_names.size()) + " labels"
+            "YOLOv5 model has " + std::to_string(output_dims[2]-5) +
+            " output labels but YOLOv5Session was initialized with " + std::to_string(m_label_names.size()) + " labels"
         );
     }
     m_model_output.resize(YOLO5_NUM_CANDIDATES * m_output_shape[2]);
