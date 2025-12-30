@@ -329,7 +329,7 @@ void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, P
         context.wait_for_all_requests();
         std::vector<std::pair<AuctionOffer, ImageFloatBox>> offers = check_offers(env, context);
 
-        for (std::pair<AuctionOffer, ImageFloatBox> offer : offers){
+        for (const std::pair<AuctionOffer, ImageFloatBox>& offer : offers){
             if (offer.first.item != wanted.item){
                 continue;
             }
@@ -344,10 +344,8 @@ void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, P
                 break;
             }
 
-            uint8_t distance_x_u8 = (uint8_t)(center_x * 255);
-            uint8_t distance_y_u8 = (uint8_t)(center_y * 255);
-            double distance_x_float = JoystickTools::linear_u8_to_float(distance_x_u8);
-            double distance_y_float = JoystickTools::linear_u8_to_float(distance_y_u8);
+            double distance_x_float = center_x * 2 - 1;
+            double distance_y_float = center_y * 2 - 1;
             env.console.log(std::to_string(distance_x_float));
             env.console.log(std::to_string(distance_y_float));
 
