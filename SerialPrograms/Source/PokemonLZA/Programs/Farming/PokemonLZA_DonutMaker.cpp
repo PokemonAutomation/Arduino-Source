@@ -313,7 +313,7 @@ void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProContr
     // Move map cursor upwards a little bit so that the cursor locks onto the pokecenter.
     // This is needed so that in the fast travel location menu the Hotel Z is one row near
     // the default position on the menu.
-    pbf_move_left_joystick_old(context, 128, 64, 100ms, 400ms);
+    pbf_move_left_joystick(context, {0, +0.5}, 100ms, 400ms);
     // Press Y to load fast travel locaiton menu. The cursor should now points to Vert Pokemon Center
     pbf_press_button(context, BUTTON_Y, 100ms, 500ms);
     // Move one menu item up to select Hotel Z

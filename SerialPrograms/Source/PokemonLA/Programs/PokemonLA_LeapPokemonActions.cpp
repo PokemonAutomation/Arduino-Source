@@ -32,14 +32,14 @@ void route(
             TravelLocations::instance().Coastlands_Beachside,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 238, 255, 240ms, 240ms);
+        pbf_move_left_joystick(context, {+0.866, -1}, 240ms, 240ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, 20000ms, 1000ms);
         pbf_press_button(context, BUTTON_PLUS, 1000ms, 500ms);
-        pbf_move_left_joystick_old(context, 255, 160, 240ms, 500ms);
+        pbf_move_left_joystick(context, {+1, -0.252}, 240ms, 500ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
-        pbf_move_left_joystick_old(context, 127, 0, 3000ms, 1000ms);
+        pbf_move_left_joystick(context, {-0.008, +1}, 3000ms, 1000ms);
         break;
     case LeapPokemon::Burmy:
         goto_camp_from_jubilife(
@@ -47,13 +47,13 @@ void route(
             TravelLocations::instance().Fieldlands_Heights,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 170, 255, 240ms, 240ms);
+        pbf_move_left_joystick(context, {+0.331, -1}, 240ms, 240ms);
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, 6350ms, 160ms);
         pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
         pbf_press_button(context, BUTTON_PLUS, 160ms, 500ms);
         pbf_press_button(context, BUTTON_PLUS, 160ms, 1500ms);
-        pbf_move_left_joystick_old(context, 255, 127, 240ms, 500ms);
+        pbf_move_left_joystick(context, {+1, +0.008}, 240ms, 500ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         pbf_move_right_joystick(context, {0, -1}, 100ms, 500ms);
         break;
@@ -63,14 +63,14 @@ void route(
             TravelLocations::instance().Highlands_Mountain,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 255, 35, 240ms, 240ms);
+        pbf_move_left_joystick(context, {+1, +0.727}, 240ms, 240ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, 3350ms, 1000ms);
         pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
         pbf_press_button(context, BUTTON_PLUS, 160ms, 500ms);
         pbf_press_button(context, BUTTON_PLUS, 160ms, 1500ms);
-        pbf_move_left_joystick_old(context, 0, 127, 160ms, 160ms);
+        pbf_move_left_joystick(context, {-1, +0.008}, 160ms, 160ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         pbf_move_right_joystick(context, {0, -1}, 200ms, 500ms);
         break;
@@ -80,7 +80,7 @@ void route(
             TravelLocations::instance().Fieldlands_Arena,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 255, 152, 240ms, 240ms);
+        pbf_move_left_joystick(context, {+1, -0.189}, 240ms, 240ms);
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, 25500ms, 1000ms);
         pbf_press_button(context, BUTTON_PLUS, 160ms, 500ms);
@@ -91,7 +91,7 @@ void route(
             TravelLocations::instance().Fieldlands_Arena,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 57, 255, 160ms, 500ms);
+        pbf_move_left_joystick(context, {-0.555, -1}, 160ms, 500ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, 2750ms, 1000ms);
@@ -103,9 +103,9 @@ void route(
             TravelLocations::instance().Highlands_Mountain,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 0, 220, 240ms, 240ms);
+        pbf_move_left_joystick(context, {-1, -0.724}, 240ms, 240ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
-        pbf_move_left_joystick_old(context, 127, 0, 4000ms, 500ms);
+        pbf_move_left_joystick(context, {-0.008, +1}, 4000ms, 500ms);
         pbf_move_right_joystick(context, {0, -1}, 170ms, 1000ms);
         break;
     case LeapPokemon::Pachirisu:
@@ -115,7 +115,7 @@ void route(
             TravelLocations::instance().Mirelands_Bogbound,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 0, 170, 240ms, 240ms);
+        pbf_move_left_joystick(context, {-1, -0.331}, 240ms, 240ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, 10200ms, 160ms);
@@ -127,11 +127,11 @@ void route(
             TravelLocations::instance().Fieldlands_Fieldlands,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 110, 255, 240ms, 240ms);
+        pbf_move_left_joystick(context, {-0.141, -1}, 240ms, 240ms);
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, 6250ms, 160ms);
         pbf_press_button(context, BUTTON_PLUS, 160ms, 1000ms);
-        pbf_move_left_joystick_old(context, 255, 100, 160ms, 160ms);
+        pbf_move_left_joystick(context, {+1, +0.219}, 160ms, 160ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         pbf_move_right_joystick(context, {0, -1}, 200ms, 500ms);
         break;
@@ -141,7 +141,7 @@ void route(
             TravelLocations::instance().Fieldlands_Heights,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 200, 255, 160ms, 160ms);
+        pbf_move_left_joystick(context, {+0.567, -1}, 160ms, 160ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, 3750ms, 160ms);
@@ -157,9 +157,9 @@ void route(
             TravelLocations::instance().Highlands_Highlands,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 255, 145, 160ms, 160ms);
+        pbf_move_left_joystick(context, {+1, -0.134}, 160ms, 160ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
-        pbf_move_left_joystick_old(context, 127, 0, 5000ms, 500ms);
+        pbf_move_left_joystick(context, {-0.008, +1}, 5000ms, 500ms);
         break;
     case LeapPokemon::Bonsly:
         goto_camp_from_jubilife(
@@ -167,10 +167,10 @@ void route(
             TravelLocations::instance().Mirelands_DiamondSettlement,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 0, 150, 160ms, 500ms);
+        pbf_move_left_joystick(context, {-1, -0.173}, 160ms, 500ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         change_mount(stream, context, MountState::BRAVIARY_ON);
-        pbf_move_left_joystick_old(context, 127, 0, 10000ms, 500ms);
+        pbf_move_left_joystick(context, {-0.008, +1}, 10000ms, 500ms);
         break;
     case LeapPokemon::Bronzor:
         goto_camp_from_jubilife(
@@ -178,7 +178,7 @@ void route(
             TravelLocations::instance().Highlands_Mountain,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 55, 255, 160ms, 500ms);
+        pbf_move_left_joystick(context, {-0.57, -1}, 160ms, 500ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         change_mount(stream, context, MountState::WYRDEER_ON);
         pbf_press_button(context, BUTTON_B, 6500ms, 1000ms);
@@ -191,7 +191,7 @@ void route(
             TravelLocations::instance().Highlands_Summit,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 255, 175, 160ms, 500ms);
+        pbf_move_left_joystick(context, {+1, -0.37}, 160ms, 500ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         change_mount(stream, context, MountState::WYRDEER_ON);
         pbf_press_button(context, BUTTON_B, 2500ms, 1000ms);
@@ -204,7 +204,7 @@ void route(
             TravelLocations::instance().Icelands_Snowfields,
             fresh_from_reset
         );
-        pbf_move_left_joystick_old(context, 115, 255, 160ms, 500ms);
+        pbf_move_left_joystick(context, {-0.102, -1}, 160ms, 500ms);
         pbf_press_button(context, BUTTON_ZL, 160ms, 500ms);
         change_mount(stream, context, MountState::WYRDEER_ON);
         pbf_press_button(context, BUTTON_B, 3200ms, 1000ms);

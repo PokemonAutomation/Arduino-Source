@@ -197,7 +197,7 @@ void inside_zero_gate_to_platform(
 
 #if 1
     //  Jump on the downhill to improve chance of clearing things.
-    pbf_move_left_joystick_old(context, 192, 0, 160ms, 840ms);
+    pbf_move_left_joystick(context, {+0.5, +1}, 160ms, 840ms);
     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
     ssf_press_button(context, BUTTON_LCLICK, 0ms, 4000ms);
@@ -216,13 +216,13 @@ void inside_zero_gate_to_platform(
 
     if (!flying_unlocked){
 //        ssf_press_left_joystick(context, {0, +1}, 375, 875);
-        pbf_move_left_joystick_old(context, 144, 0, 5600ms, 0ms);
+        pbf_move_left_joystick(context, {+0.126, +1}, 5600ms, 0ms);
         pbf_move_left_joystick(context, {0, +1}, 1000ms, settings.MIDAIR_PAUSE_TIME0);
         pbf_move_left_joystick(context, {0, +1}, 7000ms, 2000ms);
     }else{
 //        ssf_press_button(context, BUTTON_B, 0, 20);
 //        pbf_move_left_joystick(context, {0, +1}, 375, 250);
-        pbf_move_left_joystick_old(context, 164, 0, 1000ms, settings.MIDAIR_PAUSE_TIME0);
+        pbf_move_left_joystick(context, {+0.283, +1}, 1000ms, settings.MIDAIR_PAUSE_TIME0);
         pbf_press_button(context, BUTTON_LCLICK, 400ms, 0ms);
         ssf_press_right_joystick(context, {0, -1}, 0ms, 12000ms);
         pbf_move_left_joystick(context, {0, -1}, 12800ms, 1000ms);
@@ -296,7 +296,7 @@ void area_zero_platform_run_path0(
     use_lets_go_to_clear_in_front(stream, context, tracker, false, [&](ProControllerContext& context){
         find_and_center_on_sky(env, stream, context);
         pbf_move_right_joystick(context, {0, -1}, 640ms, 0ms);
-        pbf_move_left_joystick_old(context, 176, 255, 240ms, 0ms);
+        pbf_move_left_joystick(context, {+0.378, -1}, 240ms, 0ms);
         pbf_press_button(context, BUTTON_L, 160ms, 400ms);
     });
 
@@ -353,7 +353,7 @@ void area_zero_platform_run_path1(
     use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](ProControllerContext& context){
         find_and_center_on_sky(env, stream, context);
         pbf_move_right_joystick(context, {0, -1}, 640ms, 0ms);
-        pbf_move_left_joystick_old(context, 192, 255, 480ms, 0ms);
+        pbf_move_left_joystick(context, {+0.5, -1}, 480ms, 0ms);
     });
 
     //  Clear path to the wall.
@@ -502,7 +502,7 @@ void area_zero_platform_run_path2(
         turn_angle(context, angle1);
 
         find_and_center_on_sky(env, stream, context);
-        pbf_move_left_joystick_old(context, 96, 0, 320ms, 0ms);
+        pbf_move_left_joystick(context, {-0.25, +1}, 320ms, 0ms);
         pbf_mash_button(context, BUTTON_L, 480ms);
     });
 
@@ -515,10 +515,10 @@ void area_zero_platform_run_path2(
             context.wait_for(std::chrono::milliseconds(1000));
 
             stream.log("Turning back to sky.");
-            pbf_move_left_joystick_old(context, 255, 255, 160ms, 160ms);
+            pbf_move_left_joystick(context, {+1, -1}, 160ms, 160ms);
             pbf_mash_button(context, BUTTON_L, 480ms);
             find_and_center_on_sky(env, stream, context);
-            pbf_move_left_joystick_old(context, 96, 0, 320ms, 0ms);
+            pbf_move_left_joystick(context, {-0.25, +1}, 320ms, 0ms);
             pbf_mash_button(context, BUTTON_L, 480ms);
         });
     }

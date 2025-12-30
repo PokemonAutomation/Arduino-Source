@@ -113,7 +113,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
         pbf_move_right_joystick(context, {0, +1}, 500ms, 500ms);
         pbf_move_right_joystick(context, {0, +1}, 500ms, 500ms);
-        pbf_move_left_joystick_old(context, 50, 128, 100ms, 500ms);
+        pbf_move_left_joystick(context, {-0.609, 0}, 100ms, 500ms);
         pbf_mash_button(context, BUTTON_A, 5000ms);
 
         pbf_move_left_joystick(context, {0, +1}, 10s, 500ms);

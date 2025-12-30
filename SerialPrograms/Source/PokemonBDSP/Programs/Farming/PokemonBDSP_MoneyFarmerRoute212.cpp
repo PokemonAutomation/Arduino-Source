@@ -213,7 +213,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, ProControl
 void MoneyFarmerRoute212::heal_at_center_and_return(VideoStream& stream, ProControllerContext& context, uint8_t pp[4]){
     stream.overlay().add_log("Heal at " + STRING_POKEMON + " Center", COLOR_WHITE);
     stream.log("Healing " + STRING_POKEMON + " at Hearthome City " + STRING_POKEMON + " Center.");
-    pbf_move_left_joystick_old(context, 125, 0, 6000ms, 0ms);
+    pbf_move_left_joystick(context, {-0.023, +1}, 6000ms, 0ms);
     pbf_mash_button(context, BUTTON_ZL, 3000ms);
 //    ssf_mash_AZs(context, 3000ms);
     pbf_mash_button(context, BUTTON_B, 10000ms);

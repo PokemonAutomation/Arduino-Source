@@ -575,7 +575,7 @@ PokemonDetails AutoMultiSpawn::go_to_spawn_point_and_try_focusing_pokemon(
     pbf_wait(context, 320ms);
     
     // Move to spawn location on Braviary
-    pbf_move_left_joystick_old(context, 255, 165, 1200ms, 0ms); // 170
+    pbf_move_left_joystick(context, {+1, -0.291}, 1200ms, 0ms); // 170
     pbf_press_button(context, BUTTON_B, 1600ms, 80ms);
     pbf_mash_button(context, BUTTON_B, 12000ms); // 1450
 

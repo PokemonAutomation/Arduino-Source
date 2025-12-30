@@ -130,7 +130,7 @@ void route_default(
     }
 
     // Move map cursor upwards a little bit
-    pbf_move_left_joystick_old(context, 128, 64, 100ms, 200ms);
+    pbf_move_left_joystick(context, {0, +0.5}, 100ms, 200ms);
 
     // Fly from map to reset spawns
     FastTravelState travel_status = fly_from_map(env.console, context);
@@ -152,14 +152,14 @@ void route_wild_zone_19(
     bool to_zoom_to_max){
     if (run_a_straight_path_in_overworld(env.console, context, 0, 80, 6500ms) == 0) {
         open_map(env.console, context, to_zoom_to_max);
-        pbf_move_left_joystick_old(context, 64, 144, 100ms, 100ms);
+        pbf_move_left_joystick(context, {-0.5, -0.126}, 100ms, 100ms);
         if (fly_from_map(env.console, context) == FastTravelState::NOT_AT_FLY_SPOT) {
-            pbf_move_left_joystick_old(context, 128, 192, 100ms, 100ms);
+            pbf_move_left_joystick(context, {0, -0.5}, 100ms, 100ms);
             fly_from_map(env.console, context);
         }
     } else {
         open_map(env.console, context, to_zoom_to_max);
-        pbf_move_left_joystick_old(context, 64, 128, 100ms, 100ms);
+        pbf_move_left_joystick(context, {-0.5, 0}, 100ms, 100ms);
         fly_from_map(env.console, context);
     }
     wait_until_overworld(env.console, context, 50s);

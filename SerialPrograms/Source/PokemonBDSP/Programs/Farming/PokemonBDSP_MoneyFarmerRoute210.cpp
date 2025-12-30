@@ -250,7 +250,7 @@ void MoneyFarmerRoute210::heal_at_center_and_return(
     uint8_t pp0[4], uint8_t pp1[4]
 ){
     logger.log("Healing " + STRING_POKEMON + " Celestic Town " + STRING_POKEMON + " Center.");
-    pbf_move_left_joystick_old(context, 125, 0, 6000ms, 0ms);
+    pbf_move_left_joystick(context, {-0.023, +1}, 6000ms, 0ms);
     pbf_mash_button(context, BUTTON_ZL, 3000ms);
     pbf_mash_button(context, BUTTON_B, 10000ms);
 

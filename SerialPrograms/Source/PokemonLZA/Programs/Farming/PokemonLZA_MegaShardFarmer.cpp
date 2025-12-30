@@ -91,18 +91,18 @@ void MegaShardFarmer::program(SingleSwitchProgramEnvironment& env, ProController
             env.console, context,
             [&](ProControllerContext& context){
                 //  Travel to alley with logs of mega shards.
-                pbf_move_left_joystick_old(context, 0, 96, 400ms, 400ms);
+                pbf_move_left_joystick(context, {-1, +0.25}, 400ms, 400ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 440ms);
                 pbf_move_left_joystick(context, {0, +1}, 3000ms, 400ms);
                 pbf_move_left_joystick(context, {+1, 0}, 400ms, 400ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 440ms);
                 pbf_move_left_joystick(context, {0, +1}, 2500ms, 400ms);
-                pbf_move_left_joystick_old(context, 255, 64, 400ms, 400ms);
+                pbf_move_left_joystick(context, {+1, +0.5}, 400ms, 400ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 440ms);
                 pbf_move_left_joystick(context, {0, +1}, 2000ms, 0ms);
-                pbf_move_left_joystick_old(context, 160, 0, 1000ms, 0ms);
+                pbf_move_left_joystick(context, {+0.252, +1}, 1000ms, 0ms);
                 pbf_move_left_joystick(context, {0, +1}, 2000ms, 0ms);
-                pbf_move_left_joystick_old(context, 160, 0, 1500ms, 1000ms);
+                pbf_move_left_joystick(context, {+0.252, +1}, 1500ms, 1000ms);
 
                 //  Move camera up.
                 pbf_move_right_joystick(context, {0, +1}, 800ms, 0ms);
@@ -144,8 +144,8 @@ void MegaShardFarmer::fly_back(SingleSwitchProgramEnvironment& env, ProControlle
         pbf_move_right_joystick(context, {0, -1}, 80ms, 80ms);
 
         //  Tap the stick to lock on to Le Yeah if you're already on top of it.
-        pbf_move_left_joystick_old(context, 128, 192, 40ms, 120ms);
-        pbf_move_left_joystick_old(context, 128, 64, 40ms, 500ms);
+        pbf_move_left_joystick(context, {0, -0.5}, 40ms, 120ms);
+        pbf_move_left_joystick(context, {0, +0.5}, 40ms, 500ms);
 
         if (fly_from_map(env.console, context) == FastTravelState::SUCCESS){
             return;

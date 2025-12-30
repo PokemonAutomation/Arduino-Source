@@ -678,9 +678,9 @@ void EggAutonomous::reset_position_to_flying_spot(SingleSwitchProgramEnvironment
     // Use map to fly back to the flying spot
     open_map_from_overworld(env.program_info(), env.console, context);
     if (LOCATION == EggAutoLocation::ZeroGate) {
-        pbf_move_left_joystick_old(context, 128, 160, 160ms, 400ms);
+        pbf_move_left_joystick(context, {0, -0.252}, 160ms, 400ms);
     } else { //lighthouse
-        pbf_move_left_joystick_old(context, 130, 0, 150ms, 50ms);
+        pbf_move_left_joystick(context, {+0.016, +1}, 150ms, 50ms);
         pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
     }
     fly_to_overworld_from_map(env.program_info(), env.console, context);

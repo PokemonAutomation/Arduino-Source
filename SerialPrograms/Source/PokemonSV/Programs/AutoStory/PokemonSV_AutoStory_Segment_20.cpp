@@ -256,7 +256,7 @@ void checkpoint_44(
         direction.change_direction(env.program_info(), env.console, context, 1.55);
         pbf_move_left_joystick(context, {0, +1}, 1600ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 1.69);
-        pbf_move_left_joystick_old(context, 0, 0, 4000ms, 800ms);
+        pbf_move_left_joystick(context, {-1, +1}, 4000ms, 800ms);
 
         direction.change_direction(env.program_info(), env.console, context, 5.85);
         pbf_move_left_joystick(context, {0, +1}, 480ms, 800ms);
@@ -276,13 +276,13 @@ void checkpoint_44(
         direction.change_direction(env.program_info(), env.console, context, 1.59);
         pbf_move_left_joystick(context, {0, +1}, 1600ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 1.79);
-        pbf_move_left_joystick_old(context, 0, 0, 4000ms, 800ms);
+        pbf_move_left_joystick(context, {-1, +1}, 4000ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 6.055);        
         pbf_move_left_joystick(context, {0, +1}, 3200ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 5.06);   
         pbf_move_left_joystick(context, {0, +1}, 4800ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 4.38);   
-        pbf_move_left_joystick_old(context, 0, 0, 5600ms, 800ms);
+        pbf_move_left_joystick(context, {-1, +1}, 5600ms, 800ms);
 
         direction.change_direction(env.program_info(), env.console, context, 2.53);   
         pbf_move_left_joystick(context, {0, +1}, 1280ms, 800ms);
@@ -304,7 +304,7 @@ void checkpoint_44(
         direction.change_direction(env.program_info(), env.console, context, 4.2);
         pbf_move_left_joystick(context, {0, +1}, 1600ms, 800ms);
         direction.change_direction(env.program_info(), env.console, context, 4.38);   
-        pbf_move_left_joystick_old(context, 0, 0, 5600ms, 800ms);
+        pbf_move_left_joystick(context, {-1, +1}, 5600ms, 800ms);
 
         direction.change_direction(env.program_info(), env.console, context, 0.96);
         pbf_move_left_joystick(context, {0, +1}, 2000ms, 800ms);

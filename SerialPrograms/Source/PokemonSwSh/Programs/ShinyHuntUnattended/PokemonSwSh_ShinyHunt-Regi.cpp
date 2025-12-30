@@ -24,68 +24,68 @@ void move_to_corner(
         pbf_move_left_joystick(context, {0, -1}, 2400ms, TRANSITION_DELAY);
 
         //  Navigate back into the corner.
-        pbf_move_left_joystick_old(context, 255, 64, 1600ms, 0ms);
-        pbf_move_left_joystick_old(context, 120, 0, 2000ms, 0ms);
-        pbf_move_left_joystick_old(context, 255, 100, 1200ms, 80ms);
+        pbf_move_left_joystick(context, {+1, +0.5}, 1600ms, 0ms);
+        pbf_move_left_joystick(context, {-0.062, +1}, 2000ms, 0ms);
+        pbf_move_left_joystick(context, {+1, +0.219}, 1200ms, 80ms);
     }else{
         //  Move to corner.
-        pbf_move_left_joystick_old(context, 255, 100, 2400ms, 80ms);
+        pbf_move_left_joystick(context, {+1, +0.219}, 2400ms, 80ms);
     }
 }
 
 
 void regirock(ProControllerContext& context){
-    pbf_move_left_joystick_old(context, 0, 232, 1352ms, 0ms);
+    pbf_move_left_joystick(context, {-1, -0.819}, 1352ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 1080ms, 0ms);
     pbf_move_left_joystick(context, {-1, 0}, 872ms, 0ms);
     pbf_move_left_joystick(context, {0, +1}, 1120ms, 0ms);
-    pbf_move_left_joystick_old(context, 226, 255, 720ms, 0ms);
+    pbf_move_left_joystick(context, {+0.772, -1}, 720ms, 0ms);
     pbf_move_left_joystick(context, {0, +1}, 160ms, 0ms);
     pbf_mash_button(context, BUTTON_A, 5000ms);
     pbf_move_left_joystick(context, {0, +1}, 1600ms, 0ms);
 }
 void regice(ProControllerContext& context){
-    pbf_move_left_joystick_old(context, 80, 255, 1456ms, 0ms);
+    pbf_move_left_joystick(context, {-0.375, -1}, 1456ms, 0ms);
     pbf_move_left_joystick(context, {-1, 0}, 912ms, 0ms);
     pbf_move_left_joystick(context, {0, -1}, 448ms, 0ms);
-    pbf_move_left_joystick_old(context, 32, 0, 608ms, 0ms);
+    pbf_move_left_joystick(context, {-0.75, +1}, 608ms, 0ms);
     pbf_move_left_joystick(context, {-1, 0}, 432ms, 0ms);
-    pbf_move_left_joystick_old(context, 255, 68, 1224ms, 0ms);
+    pbf_move_left_joystick(context, {+1, +0.469}, 1224ms, 0ms);
     pbf_move_left_joystick(context, {0, +1}, 160ms, 0ms);
     pbf_mash_button(context, BUTTON_A, 5000ms);
     pbf_move_left_joystick(context, {0, +1}, 1360ms, 0ms);
 }
 void registeel(ProControllerContext& context){
-    pbf_move_left_joystick_old(context, 0, 232, 1352ms, 0ms);
-    pbf_move_left_joystick_old(context, 192, 255, 512ms, 0ms);
-    pbf_move_left_joystick_old(context, 64, 255, 512ms, 0ms);
+    pbf_move_left_joystick(context, {-1, -0.819}, 1352ms, 0ms);
+    pbf_move_left_joystick(context, {+0.5, -1}, 512ms, 0ms);
+    pbf_move_left_joystick(context, {-0.5, -1}, 512ms, 0ms);
     pbf_move_left_joystick(context, {-1, 0}, 880ms, 0ms);
-    pbf_move_left_joystick_old(context, 64, 0, 544ms, 0ms);
-    pbf_move_left_joystick_old(context, 192, 0, 528ms, 0ms);
-    pbf_move_left_joystick_old(context, 230, 255, 720ms, 0ms);
+    pbf_move_left_joystick(context, {-0.5, +1}, 544ms, 0ms);
+    pbf_move_left_joystick(context, {+0.5, +1}, 528ms, 0ms);
+    pbf_move_left_joystick(context, {+0.803, -1}, 720ms, 0ms);
     pbf_move_left_joystick(context, {0, +1}, 400ms, 0ms);
     pbf_mash_button(context, BUTTON_A, 5000ms);
     pbf_move_left_joystick(context, {0, +1}, 2000ms, 0ms);
 }
 void regieleki(ProControllerContext& context){
-    pbf_move_left_joystick_old(context, 16, 255, 1296ms, 0ms);
-    pbf_move_left_joystick_old(context, 64, 255, 416ms, 0ms);
-    pbf_move_left_joystick_old(context, 200, 255, 416ms, 0ms);
-    pbf_move_left_joystick_old(context, 0, 50, 976ms, 0ms);
-    pbf_move_left_joystick_old(context, 0, 206, 744ms, 0ms);
-    pbf_move_left_joystick_old(context, 208, 0, 624ms, 0ms);
-    pbf_move_left_joystick_old(context, 60, 0, 640ms, 0ms);
+    pbf_move_left_joystick(context, {-0.875, -1}, 1296ms, 0ms);
+    pbf_move_left_joystick(context, {-0.5, -1}, 416ms, 0ms);
+    pbf_move_left_joystick(context, {+0.567, -1}, 416ms, 0ms);
+    pbf_move_left_joystick(context, {-1, +0.609}, 976ms, 0ms);
+    pbf_move_left_joystick(context, {-1, -0.614}, 744ms, 0ms);
+    pbf_move_left_joystick(context, {+0.63, +1}, 624ms, 0ms);
+    pbf_move_left_joystick(context, {-0.531, +1}, 640ms, 0ms);
     pbf_mash_button(context, BUTTON_A, 5000ms);
-    pbf_move_left_joystick_old(context, 216, 0, 1360ms, 0ms);
+    pbf_move_left_joystick(context, {+0.693, +1}, 1360ms, 0ms);
 }
 void regidrago(ProControllerContext& context){
-    pbf_move_left_joystick_old(context, 16, 255, 1280ms, 0ms);
-    pbf_move_left_joystick_old(context, 72, 255, 400ms, 0ms);
-    pbf_move_left_joystick_old(context, 48, 255, 848ms, 0ms);
+    pbf_move_left_joystick(context, {-0.875, -1}, 1280ms, 0ms);
+    pbf_move_left_joystick(context, {-0.438, -1}, 400ms, 0ms);
+    pbf_move_left_joystick(context, {-0.625, -1}, 848ms, 0ms);
     pbf_move_left_joystick(context, {0, +1}, 384ms, 0ms);
-    pbf_move_left_joystick_old(context, 0, 56, 480ms, 0ms);
-    pbf_move_left_joystick_old(context, 64, 0, 480ms, 0ms);
-    pbf_move_left_joystick_old(context, 255, 152, 640ms, 0ms);
+    pbf_move_left_joystick(context, {-1, +0.562}, 480ms, 0ms);
+    pbf_move_left_joystick(context, {-0.5, +1}, 480ms, 0ms);
+    pbf_move_left_joystick(context, {+1, -0.189}, 640ms, 0ms);
     pbf_move_left_joystick(context, {0, +1}, 160ms, 0ms);
     pbf_mash_button(context, BUTTON_A, 5000ms);
     pbf_move_left_joystick(context, {0, +1}, 1440ms, 0ms);

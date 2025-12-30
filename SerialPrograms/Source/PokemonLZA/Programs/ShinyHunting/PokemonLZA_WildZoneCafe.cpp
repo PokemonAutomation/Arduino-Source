@@ -129,11 +129,11 @@ void do_one_cafe_trip(
             switch(cafe){
             case WildZoneCafe::CAFE_BATAILLE:
                 env.log("Move to Cafe Bataille icon");
-                pbf_move_left_joystick_old(context, 148, 20, 100ms, 0ms);
+                pbf_move_left_joystick(context, {+0.157, +0.844}, 100ms, 0ms);
                 break;
             case WildZoneCafe::CAFE_ULTIMO:
                 env.log("Move to Cafe Ultimo icon");
-                pbf_move_left_joystick_old(context, 50, 100, 100ms, 0ms);
+                pbf_move_left_joystick(context, {-0.609, +0.219}, 100ms, 0ms);
                 break;
             }
             pbf_wait(context, 300ms);
@@ -245,11 +245,11 @@ void do_one_cafe_trip(
     switch(cafe){
     case WildZoneCafe::CAFE_BATAILLE:
         env.log("Move to Cafe Bataille icon from zone gate");
-        pbf_move_left_joystick_old(context, 96, 160, 100ms, 0ms);
+        pbf_move_left_joystick(context, {-0.25, -0.252}, 100ms, 0ms);
         break;
     case WildZoneCafe::CAFE_ULTIMO:
         env.log("Move to Cafe Ultimo icon from zone gate");
-        pbf_move_left_joystick_old(context, 190, 144, 100ms, 0ms);
+        pbf_move_left_joystick(context, {+0.488, -0.126}, 100ms, 0ms);
         break;
     }
     pbf_wait(context, 300ms);

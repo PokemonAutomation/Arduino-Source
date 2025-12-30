@@ -378,8 +378,8 @@ void DailyHighlightRNG::prepare_game_state(SingleSwitchProgramEnvironment& env, 
     pbf_press_button(context, BUTTON_A, 160ms, 4000ms);
 
     // Fly to Snowslide Slope
-    pbf_move_left_joystick_old(context, 200, 210, 160ms, 160ms);
-    pbf_move_left_joystick_old(context, 150, 165, 160ms, 160ms);
+    pbf_move_left_joystick(context, {+0.567, -0.646}, 160ms, 160ms);
+    pbf_move_left_joystick(context, {+0.173, -0.291}, 160ms, 160ms);
     pbf_mash_button(context, BUTTON_A, 1500ms);
     return_to_overworld(env, context);
 }

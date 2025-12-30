@@ -121,7 +121,7 @@ void checkpoint_02(
         context.wait_for_all_requests();
         env.console.log("Go downstairs, get stopped by Skwovet");
         env.console.overlay().add_log("Go downstairs, get stopped by Skwovet", COLOR_WHITE);
-        pbf_move_left_joystick_old(context, 128,   0, 3000ms, 160ms);
+        pbf_move_left_joystick(context, {0, +1}, 3000ms, 160ms);
         pbf_move_left_joystick(context, {-1, 0}, 3000ms, 160ms);
         pbf_move_left_joystick(context, {0, -1}, 3000ms, 160ms);
         pbf_wait(context, 5000ms);
@@ -139,7 +139,7 @@ void checkpoint_02(
         context.wait_for_all_requests();
         env.console.log("Go to the front door, talk with Clavell");
         env.console.overlay().add_log("Go to the front door, talk with Clavell", COLOR_WHITE);
-        pbf_move_left_joystick_old(context, 230, 200, 2000ms, 160ms);
+        pbf_move_left_joystick(context, {+0.803, -0.567}, 2000ms, 160ms);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms, 255, 128);
         
         env.console.log("clear_dialog: Talk with Clavell at front door.");
@@ -149,17 +149,17 @@ void checkpoint_02(
         env.console.log("Go upstairs, dress up");
         env.console.overlay().add_log("Go upstairs, dress up", COLOR_WHITE);
         pbf_move_left_joystick(context, {+1, 0}, 2000ms, 160ms);
-        pbf_move_left_joystick_old(context, 185,  10, 1000ms, 160ms);
-        pbf_move_left_joystick_old(context, 128,   0, 4000ms, 160ms);
+        pbf_move_left_joystick(context, {+0.449, +0.922}, 1000ms, 160ms);
+        pbf_move_left_joystick(context, {0, +1}, 4000ms, 160ms);
         pbf_move_left_joystick(context, {+1, 0}, 4000ms, 160ms);
-        pbf_move_left_joystick_old(context, 110, 200, 3000ms, 160ms);
+        pbf_move_left_joystick(context, {-0.141, -0.567}, 3000ms, 160ms);
         pbf_move_left_joystick(context, {+1, 0}, 2000ms, 160ms);
         pbf_mash_button(context, BUTTON_A, 20000ms);
 
         context.wait_for_all_requests();
         env.console.log("Go to the living room, talk with Clavell");
         env.console.overlay().add_log("Go to the living room, talk with Clavell", COLOR_WHITE);
-        pbf_move_left_joystick_old(context,   0,   0, 3000ms, 160ms);
+        pbf_move_left_joystick(context, {-1, +1}, 3000ms, 160ms);
         pbf_move_left_joystick(context, {-1, 0}, 3000ms, 160ms);
         pbf_move_left_joystick(context, {0, -1}, 4000ms, 160ms);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms, 0, 128);
@@ -211,11 +211,11 @@ void checkpoint_03(
         switch(starter_choice){
         case StarterChoice::SPRIGATITO:
             env.console.log("Picking Sprigatito...");
-            pbf_move_left_joystick_old(context, 75, 0, 640ms, 160ms);
+            pbf_move_left_joystick(context, {-0.414, +1}, 640ms, 160ms);
             break;
         case StarterChoice::FUECOCO:
             env.console.log("Picking Fuecoco...");
-            pbf_move_left_joystick_old(context, 180, 0, 640ms, 160ms);
+            pbf_move_left_joystick(context, {+0.409, +1}, 640ms, 160ms);
             break;
         case StarterChoice::QUAXLY:
             env.console.log("Picking Quaxly...");
