@@ -349,7 +349,7 @@ void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, P
             env.console.log(std::to_string(distance_x_float));
             env.console.log(std::to_string(distance_y_float));
 
-            pbf_move_right_joystick(context, {distance_x_float, distance_y_float}, 160ms, 160ms);
+            pbf_move_right_joystick(context, {distance_x_float, -distance_y_float}, 160ms, 160ms);
 
             break;
         }
