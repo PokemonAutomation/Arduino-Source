@@ -396,7 +396,7 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         pbf_press_button(context, BUTTON_L, 160ms, 400ms);
 
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "rock-3", 255, 80ms);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "rock-3", +1, 80ms);
 
         // align to rock-3.  center-y: 0.291667   center-x: 0.501563
         move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-3", 0.291667,
@@ -454,7 +454,7 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }
         );
 
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "tree-1", 0, 560ms);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "tree-1", -1, 560ms);
 
         // align to tree-1.   center-y: 0.390278   center-x: 0.5
         move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-1", 0.390278,
@@ -509,7 +509,7 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }
         );
 
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "rock-5", 255, 400ms);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "rock-5", +1, 400ms);
 
         // align to rock-5.  center-y: 0.206944   center-x: 0.600000
         move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-5", 0.206944,
@@ -537,7 +537,7 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }
         );
 
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "rock-6", 255, 400ms);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "rock-6", +1, 400ms);
 
         
 
@@ -624,7 +624,7 @@ void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             true
         );
         
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "station-door-1", 0, 400ms);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "station-door-1", -1, 400ms);
         move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "station-door-1", 0.5,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
