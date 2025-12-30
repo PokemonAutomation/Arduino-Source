@@ -86,7 +86,7 @@ void checkpoint_100(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         // wait for overworld after leaving research station
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
-        pbf_move_right_joystick_old(context, 128, 160, 240ms, 0ms);  // adjust camera so that head doesn't cover the rock.
+        pbf_move_right_joystick(context, {0, -0.252}, 240ms, 0ms);  // adjust camera so that head doesn't cover the rock.
 
 
 
@@ -397,7 +397,7 @@ void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& c
             }
         );
 
-        pbf_move_right_joystick_old(context, 128, 160, 240ms, 0ms);  // adjust camera so that head doesn't cover the crystal.
+        pbf_move_right_joystick(context, {0, -0.252}, 240ms, 0ms);  // adjust camera so that head doesn't cover the crystal.
   
         move_camera_until_yolo_object_detected(env, context, yolo_detector, "crystal-4-5", 255, 240ms);
 
