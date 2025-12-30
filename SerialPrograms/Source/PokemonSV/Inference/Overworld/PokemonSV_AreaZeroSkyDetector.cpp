@@ -153,9 +153,7 @@ void find_and_center_on_sky(
         if (sky_x < 0.45){
             if (state != OverworldState::TurningLeft){
                 stream.log("Centering the sky... Moving left.");
-                uint8_t magnitude = (uint8_t)((0.5 - sky_x) * 96 + 31);
-                uint8_t x_u8 = 128 - magnitude;
-                double x_float = JoystickTools::linear_u8_to_float(x_u8);
+                double x_float = (sky_x - 0.5) * 0.75 - 0.25;
                 Milliseconds duration((int64_t)((0.5 - sky_x) * 1000 + 160));
                 session.dispatch([=](ProControllerContext& context){
                     pbf_move_right_joystick(context, {x_float, 0}, duration, 0ms);
@@ -167,9 +165,7 @@ void find_and_center_on_sky(
         if (sky_x > 0.55){
             if (state != OverworldState::TurningRight){
                 stream.log("Centering the sky... Moving Right.");
-                uint8_t magnitude = (uint8_t)((sky_x - 0.5) * 96 + 31);
-                uint8_t x_u8 = 128 + magnitude;
-                double x_float = JoystickTools::linear_u8_to_float(x_u8);
+                double x_float = (sky_x - 0.5) * 0.75 + 0.25;
                 Milliseconds duration((int64_t)((sky_x - 0.5) * 1000 + 160));
                 session.dispatch([=](ProControllerContext& context){
                     pbf_move_right_joystick(context, {x_float, 0}, duration, 0ms);
