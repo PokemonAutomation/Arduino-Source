@@ -55,6 +55,7 @@ void SnapshotManager::convert(uint64_t seqnum, QVideoFrame frame, WallClock time
         }catch (...){}
     }
 
+    ObjectsToGC objects_to_gc;
     {
         std::lock_guard<std::mutex> lg(m_lock);
 //        cout << "SnapshotManager::convert() - post convert: " << seqnum << endl;
@@ -70,9 +71,10 @@ void SnapshotManager::convert(uint64_t seqnum, QVideoFrame frame, WallClock time
                 dispatch_conversion(seqnum, std::move(frame), timestamp);
             }
         }
-    }
 
-    cleanup();
+        objects_to_gc = cleanup();
+    }
+    objects_to_gc.destroy_now();
 
     {
         std::lock_guard<std::mutex> lg(m_lock);
@@ -134,47 +136,51 @@ void SnapshotManager::push_new_screenshot(uint64_t seqnum, VideoSnapshot snapsho
     m_converted_snapshot = std::move(snapshot);
     m_converted_seqnum = seqnum;
 }
-void SnapshotManager::cleanup(){
-    //  We do this in 2 passes. First we walk through both sets and move all the
-    //  stale objects out. Then we release the lock and destroy all the stale
-    //  objects. This minimizes the amount of time the lock is held.
+void SnapshotManager::ObjectsToGC::destroy_now(){
+    tasks_to_free.clear();
+    snapshots_to_free.clear();
+}
+SnapshotManager::ObjectsToGC SnapshotManager::cleanup(){
+    //  Must call under the lock!
 
-    std::vector<std::unique_ptr<AsyncTask>> tasks_to_free;
-    std::vector<VideoSnapshot> snapshots_to_free;
+    //  Grab and return all objects that are ready to be garbage collected.
 
-    //  Pass 1: Move all stale objects out.
-    {
-        std::lock_guard<std::mutex> lg(m_lock);
+    ObjectsToGC ret;
 
-        //  Cleanup finished tasks.
-        while (!m_pending_conversions.empty()){
-            auto iter = m_pending_conversions.begin();
-            if (iter->second->is_finished()){
-                tasks_to_free.emplace_back(std::move(iter->second));
-                m_pending_conversions.erase(iter);
-            }else{
-                break;
-            }
-        }
-
-        //  Walk through the snapshot archive and clear out everything with only
-        //  one reference.
-        for (auto iter = m_converted_snapshot_archive.begin(); iter != m_converted_snapshot_archive.end();){
-            if (iter->second.frame.use_count() <= 1){
-                snapshots_to_free.emplace_back(std::move(iter->second));
-                iter = m_converted_snapshot_archive.erase(iter);
-            }else{
-                ++iter;
-            }
+    //  Cleanup finished tasks.
+    while (!m_pending_conversions.empty()){
+        auto iter = m_pending_conversions.begin();
+        if (iter->second->is_finished()){
+            ret.tasks_to_free.emplace_back(std::move(iter->second));
+            m_pending_conversions.erase(iter);
+        }else{
+            break;
         }
     }
 
-    //  Pass 2: Destroy the stale objects.
-    //  Implicitly destroyed here.
+    //  Walk through the snapshot archive and clear out everything with only
+    //  one reference.
+    for (auto iter = m_converted_snapshot_archive.begin(); iter != m_converted_snapshot_archive.end();){
+        if (iter->second.frame.use_count() <= 1){
+            ret.snapshots_to_free.emplace_back(std::move(iter->second));
+            iter = m_converted_snapshot_archive.erase(iter);
+        }else{
+            ++iter;
+        }
+    }
+
+    return ret;
 }
 
 
 VideoSnapshot SnapshotManager::snapshot_latest_blocking(){
+    ObjectsToGC objects_to_gc;
+    {
+        std::unique_lock<std::mutex> lg(m_lock);
+        objects_to_gc = cleanup();
+    }
+    objects_to_gc.destroy_now();
+
     std::unique_lock<std::mutex> lg(m_lock);
 
 //    cout << "snapshot_latest_blocking()" << endl;
@@ -220,14 +226,13 @@ VideoSnapshot SnapshotManager::snapshot_latest_blocking(){
         throw;
     }
 
-
     if (timestamp > m_converted_snapshot.timestamp){
-        push_new_screenshot(seqnum, std::move(snapshot));
+        push_new_screenshot(seqnum, snapshot);
         m_cv.notify_all();
     }
 
 //    cout << "snapshot_latest_blocking(): Convert Now - Done" << endl;
-    return m_converted_snapshot;
+    return snapshot;
 }
 
 VideoSnapshot SnapshotManager::snapshot_recent_nonblocking(WallClock min_time){

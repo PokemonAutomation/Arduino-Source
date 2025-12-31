@@ -35,7 +35,14 @@ private:
     void dispatch_conversion(uint64_t seqnum, QVideoFrame frame, WallClock timestamp) noexcept;
 
     void push_new_screenshot(uint64_t seqnum, VideoSnapshot snapshot);
-    void cleanup();
+
+    struct ObjectsToGC{
+        std::vector<std::unique_ptr<AsyncTask>> tasks_to_free;
+        std::vector<VideoSnapshot> snapshots_to_free;
+
+        void destroy_now();
+    };
+    ObjectsToGC cleanup();
 
 private:
     Logger& m_logger;
