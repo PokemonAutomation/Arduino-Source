@@ -1791,7 +1791,7 @@ void move_camera_yolo(
             }
             case CameraAxis::Y:{
                 double object_y_pos = target_box.y + target_box.height/2;
-                diff =  target_line - object_y_pos;
+                diff =  object_y_pos - target_line;
                 break;
             }
             default:
