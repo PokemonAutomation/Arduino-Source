@@ -389,8 +389,8 @@ void move_cursor_to_position_offset_from_flypoint(const ProgramInfo& info, Video
         const double dif_x = (closest_icon_x - expected_x) * 1920;
         const double dif_y = (closest_icon_y - expected_y) * 1080;
         const double magnitude = std::max(std::sqrt(closest_dist2), 1.0);
-        double push_x = dif_x * 64 / magnitude;
-        double push_y = dif_y * 64 / magnitude;
+        double push_x = dif_x * 0.5 / magnitude;
+        double push_y = dif_y * 0.5 / magnitude;
 
         double scale = 0.29;
         if (closest_dist2 < 1000){ // if we're already very close to the target, reduce push velocity and push duration
@@ -414,12 +414,12 @@ void move_cursor_to_position_offset_from_flypoint(const ProgramInfo& info, Video
             break;
         }
 
-        const uint8_t move_x = uint8_t(std::max(std::min(int(round(push_x + 128) + 0.5), 255), 0));
-        const uint8_t move_y = uint8_t(std::max(std::min(int(round(push_y + 128) + 0.5), 255), 0));
+        const double move_x = std::max(std::min(push_x, 1.0), -1.0);
+        const double move_y = -std::max(std::min(push_y, 1.0), -1.0);
 
         const uint16_t push_time_ticks = std::max(uint16_t(magnitude * scale + 0.5), uint16_t(3));
         Milliseconds push_time = push_time_ticks * 8ms;
-        pbf_move_left_joystick_old(context, move_x, move_y, push_time, 240ms);
+        pbf_move_left_joystick(context, {move_x, move_y}, push_time, 240ms);
         context.wait_for_all_requests();
     }
 
@@ -475,18 +475,18 @@ bool detect_closest_flypoint_and_move_map_cursor_there(
     const double dif_x = (closest_icon_x - center_x) * 1920/ screen_width;
     const double dif_y = (closest_icon_y - center_y) * 1080/ screen_height;
     const double magnitude = std::max(std::sqrt(max_dist), 1.0);
-    const double push_x = dif_x * 64 / magnitude, push_y = dif_y * 64 / magnitude;
+    const double push_x = dif_x * 0.5 / magnitude, push_y = dif_y * 0.5 / magnitude;
 
     // 0.5 is too large, 0.25 a little too small, 0.30 is a bit too much for a far-away pokecenter
     const double scale = push_scale;
 
-    const uint8_t move_x = uint8_t(std::max(std::min(int(round(push_x + 128) + 0.5), 255), 0));
-    const uint8_t move_y = uint8_t(std::max(std::min(int(round(push_y + 128) + 0.5), 255), 0));
+    const double move_x = std::max(std::min(push_x, +1.0), -1.0);
+    const double move_y = -std::max(std::min(push_y, +1.0), -1.0);
 
     stream.overlay().add_log("Move Cursor to PokeCenter", COLOR_WHITE);
     const uint16_t push_time_ticks = std::max(uint16_t(magnitude * scale + 0.5), uint16_t(3));
     Milliseconds push_time = push_time_ticks * 8ms;
-    pbf_move_left_joystick_old(context, move_x, move_y, push_time, 240ms);
+    pbf_move_left_joystick(context, {move_x, move_y}, push_time, 240ms);
     context.wait_for_all_requests();
     return true;
 }

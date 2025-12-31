@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include "Controllers/JoystickTools.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -317,25 +318,25 @@ void area_zero_platform_run_path0(
         find_and_center_on_sky(env, stream, context);
         pbf_move_right_joystick(context, {0, -1}, 560ms, 0ms);
 
-        uint8_t x = 128;
+        double x = 0;
         switch (iteration_count % 4){
         case 0:
-            x = 96;
+            x = -0.25;
             duration = 2000ms;
             break;
         case 1:
-            x = 112;
+            x = -0.125;
             break;
         case 2:
-            x = 128;
+            x = 0;
             break;
         case 3:
-            x = 112;
+            x = -0.125;
             break;
         }
 
         ssf_press_button(context, BUTTON_L, 0ms, 160ms);
-        pbf_move_left_joystick_old(context, x, 0, duration, 0ms);
+        pbf_move_left_joystick(context, {x, +1}, duration, 0ms);
     });
     use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](ProControllerContext& context){
         pbf_move_left_joystick(context, {0, -1}, duration, 4000ms);
@@ -381,24 +382,24 @@ void area_zero_platform_run_path1(
 
         //  Move forward.
 
-        uint8_t x = 128;
+        double x = 0;
         switch (iteration_count % 4){
         case 0:
-            x = 96;
+            x = -0.25;
             duration = 2000ms;
             break;
         case 1:
-            x = 112;
+            x = -0.125;
             break;
         case 2:
-            x = 128;
+            x = 0;
             break;
         case 3:
-            x = 112;
+            x = -0.125;
             break;
         }
 
-        pbf_move_left_joystick_old(context, x, 0, duration, 0ms);
+        pbf_move_left_joystick(context, {x, +1}, duration, 0ms);
     });
 
     stream.log("Run backwards and wait...");
@@ -450,7 +451,7 @@ void choose_path(
 void turn_angle(ProControllerContext& context, double angle_radians){
     uint8_t turn_x, turn_y;
     direction_to_stick(turn_x, turn_y, -std::sin(angle_radians), std::cos(angle_radians));
-    pbf_move_left_joystick_old(context, turn_x, turn_y, 320ms, 160ms);
+    pbf_move_left_joystick(context, {JoystickTools::linear_u8_to_float(turn_x), -JoystickTools::linear_u8_to_float(turn_y)}, 320ms, 160ms);
     pbf_mash_button(context, BUTTON_L, 480ms);
 }
 
@@ -487,7 +488,7 @@ void area_zero_platform_run_path2(
 
         choose_path(stream.logger(), move_x, move_y, duration, platform_x, platform_y);
 
-        pbf_move_left_joystick_old(context, move_x, move_y, 320ms, 160ms);
+        pbf_move_left_joystick(context, {JoystickTools::linear_u8_to_float(move_x), JoystickTools::linear_u8_to_float(move_y)}, 320ms, 160ms);
         pbf_mash_button(context, BUTTON_L, 480ms);
 //        pbf_wait(context, 1250);
     });

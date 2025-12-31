@@ -1922,23 +1922,23 @@ bool move_player_to_realign_via_yolo(
             // if (std::abs(diff) < 0.05){
             //     duration_scale_factor /= 2;
             // }
-            double push_magnitude_scale_factor = 60 / std::sqrt(std::abs(diff));
+            double push_magnitude_scale_factor = 0.46875 / std::sqrt(std::abs(diff));
 
             uint16_t push_duration_ticks = std::max(uint16_t(std::abs(diff * duration_scale_factor)), uint16_t(8));
             Milliseconds push_duration = push_duration_ticks * 8ms;
             int16_t push_direction = (diff > 0) ? -1 : 1;
-            double push_magnitude = std::max(double(std::abs(diff * push_magnitude_scale_factor)), double(15)); 
-            uint8_t x_push = uint8_t(std::max(std::min(int(128 + (push_direction * push_magnitude)), 255), 0));
+            double push_magnitude = std::max(double(std::abs(diff * push_magnitude_scale_factor)), 0.117); 
+            double x_push = std::max(std::min(push_direction * push_magnitude, +1.0), -1.0);
 
             // env.console.log("object_x: {" + std::to_string(target_box.x) + ", " + std::to_string(target_box.y) + ", " + std::to_string(target_box.width) + ", " + std::to_string(target_box.height) + "}");
             // env.console.log("object_x_pos: " + std::to_string(object_x_pos));
             env.console.log("x push: " + std::to_string(x_push) + ", push duration: " +  std::to_string(push_duration.count()) + "ms");
             if (i == 0){
-                pbf_move_left_joystick_old(context, x_push, 128, 80ms, 400ms);
+                pbf_move_left_joystick(context, {x_push, 0}, 80ms, 400ms);
                 pbf_press_button(context, BUTTON_R, 160ms, 840ms);
             }
             
-            pbf_move_left_joystick_old(context, x_push, 128, push_duration, 0ms);
+            pbf_move_left_joystick(context, {x_push, 0}, push_duration, 0ms);
             
         });
 

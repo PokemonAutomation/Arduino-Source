@@ -148,7 +148,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             fly_home(context, false);
 
             //  Travel to spin location.
-            pbf_move_left_joystick_old(context, STICK_MAX, STICK_CENTER, TRAVEL_RIGHT_DURATION, 0ms);
+            pbf_move_left_joystick(context, {+1, 0}, TRAVEL_RIGHT_DURATION, 0ms);
 
             //  Spin
 #if 0

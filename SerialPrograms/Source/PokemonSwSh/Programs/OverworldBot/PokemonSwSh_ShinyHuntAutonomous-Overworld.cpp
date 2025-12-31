@@ -5,6 +5,7 @@
  */
 
 #include <cmath>
+#include "Controllers/JoystickTools.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -298,6 +299,8 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
     );
 
     const Trajectory& trajectory = target.second.trajectory;
+    double stick_x = JoystickTools::linear_u8_to_float(trajectory.joystick_x);
+    double stick_y = -JoystickTools::linear_u8_to_float(trajectory.joystick_y);
     double angle = std::atan2(
         (double)trajectory.joystick_y - 128,
         (double)trajectory.joystick_x - 128
@@ -325,10 +328,9 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
         stream, context,
         [&](ProControllerContext& context){
             //  Move to target.
-            pbf_move_left_joystick_old(
+            pbf_move_left_joystick(
                 context,
-                trajectory.joystick_x,
-                trajectory.joystick_y,
+                {stick_x, stick_y},
                 duration, 0ms
             );
 

@@ -62,8 +62,8 @@ std::set<std::string> enter_region_and_read_MMO(
     // on map. But when you land in a region, the initial location is a camp, the map cursor
     // will show a text box "xxx Camp - Take a rest or do some crafting". This may occlude some
     // MMO question marks. So we have to move the map cursor away after we land in the region.
-    uint8_t map_cursor_move_x = 0;
-    uint8_t map_cursor_move_y = 0;
+    double map_cursor_move_x = 0;
+    double map_cursor_move_y = 0;
     const Milliseconds map_cursor_move_duration = 400ms;
 
     for(size_t i = 0; i < 5; i++){
@@ -73,36 +73,36 @@ std::set<std::string> enter_region_and_read_MMO(
                 region = MapRegion::FIELDLANDS;
                 location = TravelLocations::instance().Fieldlands_Fieldlands;
                 camp = Camp::FIELDLANDS_FIELDLANDS;
-                map_cursor_move_x = 128;
-                map_cursor_move_y = 0;
+                map_cursor_move_x = 0;
+                map_cursor_move_y = +1;
                 break;
             case 1:
                 region = MapRegion::MIRELANDS;
                 location = TravelLocations::instance().Mirelands_Mirelands;
                 camp = Camp::MIRELANDS_MIRELANDS;
-                map_cursor_move_x = 0;
-                map_cursor_move_y = 128;
+                map_cursor_move_x = -1;
+                map_cursor_move_y = 0;
                 break;
             case 2:
                 region = MapRegion::COASTLANDS;
                 location = TravelLocations::instance().Coastlands_Beachside;
                 camp = Camp::COASTLANDS_BEACHSIDE;
-                map_cursor_move_x = 0;
-                map_cursor_move_y = 128;
+                map_cursor_move_x = -1;
+                map_cursor_move_y = 0;
                 break;
             case 3:
                 region = MapRegion::HIGHLANDS;
                 location = TravelLocations::instance().Highlands_Highlands;
                 camp = Camp::HIGHLANDS_HIGHLANDS;
-                map_cursor_move_x = 128;
-                map_cursor_move_y = 255;
+                map_cursor_move_x = 0;
+                map_cursor_move_y = -1;
                 break;
             case 4:
                 region = MapRegion::ICELANDS;
                 location = TravelLocations::instance().Icelands_Snowfields;
                 camp = Camp::ICELANDS_SNOWFIELDS;
-                map_cursor_move_x = 128;
-                map_cursor_move_y = 255;
+                map_cursor_move_x = 0;
+                map_cursor_move_y = -1;
                 break;
             }
         }
@@ -141,7 +141,7 @@ std::set<std::string> enter_region_and_read_MMO(
     }
 
     // Move cursor away so that it does not show a text box that occludes MMO sprites.
-    pbf_move_left_joystick_old(context, map_cursor_move_x, map_cursor_move_y, map_cursor_move_duration, 240ms);
+    pbf_move_left_joystick(context, {map_cursor_move_x, map_cursor_move_y}, map_cursor_move_duration, 240ms);
     context.wait_for_all_requests();
 
     // Fix Missions & Requests tab:
@@ -242,7 +242,7 @@ std::set<std::string> enter_region_and_read_MMO(
     }
 
     // Move cursor away so that it does not show a text box that occludes MMO sprites.
-    pbf_move_left_joystick_old(context, map_cursor_move_x, map_cursor_move_y, map_cursor_move_duration, 240ms);
+    pbf_move_left_joystick(context, {map_cursor_move_x, map_cursor_move_y}, map_cursor_move_duration, 240ms);
     context.wait_for_all_requests();
 
     std::set<std::string> found;
