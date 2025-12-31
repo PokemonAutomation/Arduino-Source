@@ -158,8 +158,8 @@ void checkpoint_22(
         // section 1
         realign_player_from_landmark(
             env.program_info(), env.console, context,
-            {ZoomChange::ZOOM_IN, 0, 128, 640ms},
-            {ZoomChange::KEEP_ZOOM, 255, 80, 296ms}
+            {ZoomChange::ZOOM_IN, -1, 0, 640ms},
+            {ZoomChange::KEEP_ZOOM, +1, +0.375, 296ms}
         );
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -168,8 +168,8 @@ void checkpoint_22(
         // section 2
         realign_player_from_landmark(
             env.program_info(), env.console, context,
-            {ZoomChange::ZOOM_IN, 0, 128, 320ms},
-            {ZoomChange::KEEP_ZOOM, 255, 255, 216ms}
+            {ZoomChange::ZOOM_IN, -1, 0, 320ms},
+            {ZoomChange::KEEP_ZOOM, +1, -1, 216ms}
         );        
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -178,8 +178,8 @@ void checkpoint_22(
         // section 3. set marker to pokecenter
         realign_player_from_landmark(
             env.program_info(), env.console, context,
-            {ZoomChange::ZOOM_IN, 128, 128, 0ms},
-            {ZoomChange::KEEP_ZOOM, 128, 128, 0ms}
+            {ZoomChange::ZOOM_IN, 0, 0, 0ms},
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}
         );         
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -225,8 +225,8 @@ void checkpoint_23(
         // section 2
         realign_player_from_landmark(
             env.program_info(), env.console, context,
-            {ZoomChange::ZOOM_IN, 0, 128, 640ms},
-            {ZoomChange::KEEP_ZOOM, 255, 95, 800ms}
+            {ZoomChange::ZOOM_IN, -1, 0, 640ms},
+            {ZoomChange::KEEP_ZOOM, +1, +0.258, 800ms}
         );         
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -243,8 +243,8 @@ void checkpoint_23(
         // section 3
         realign_player_from_landmark(
             env.program_info(), env.console, context,
-            {ZoomChange::ZOOM_IN, 0, 128, 640ms},
-            {ZoomChange::KEEP_ZOOM, 255, 75, 520ms}
+            {ZoomChange::ZOOM_IN, -1, 0, 640ms},
+            {ZoomChange::KEEP_ZOOM, +1, +0.414, 520ms}
         );              
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -261,8 +261,8 @@ void checkpoint_23(
         // section 4
         realign_player_from_landmark(
             env.program_info(), env.console, context,
-            {ZoomChange::ZOOM_IN, 0, 128, 400ms},
-            {ZoomChange::KEEP_ZOOM, 255, 180, 136ms}
+            {ZoomChange::ZOOM_IN, -1, 0, 400ms},
+            {ZoomChange::KEEP_ZOOM, +1, -0.409, 136ms}
         );              
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -279,8 +279,8 @@ void checkpoint_23(
         // section 5. set marker to pokecenter
         realign_player_from_landmark(
             env.program_info(), env.console, context,
-            {ZoomChange::ZOOM_IN, 128, 128, 0ms},
-            {ZoomChange::KEEP_ZOOM, 128, 128, 0ms}
+            {ZoomChange::ZOOM_IN, 0, 0, 0ms},
+            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}
         );              
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){

@@ -113,8 +113,8 @@ void checkpoint_50(
         DirectionDetector direction;
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 255, 560ms});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 80, 640ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, +1, -1, 560ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, -1, +0.375, 640ms});
         }
 
         direction.change_direction(env.program_info(), env.console, context, 0);
@@ -138,8 +138,8 @@ void checkpoint_50(
         // marker 2
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 50, 400ms},
-            {ZoomChange::ZOOM_IN, 0, 100, 480ms}
+            {ZoomChange::KEEP_ZOOM, +1, +0.609, 400ms},
+            {ZoomChange::ZOOM_IN, -1, +0.219, 480ms}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -158,8 +158,8 @@ void checkpoint_50(
         // marker 3
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 128, 160ms},
-            {ZoomChange::ZOOM_IN, 0, 0, 0ms}
+            {ZoomChange::KEEP_ZOOM, +1, 0, 160ms},
+            {ZoomChange::ZOOM_IN, -1, +1, 0ms}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -381,7 +381,7 @@ void checkpoint_53(
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
         // fly to Levincia (North) Pokecenter
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 100, 0, 400ms});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, -0.219, +1, 400ms});
 
     });
 

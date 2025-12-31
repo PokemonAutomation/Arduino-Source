@@ -87,8 +87,8 @@ void checkpoint_30(
         
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 255, 800ms});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 800ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, +1, -1, 800ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, -1, +1, 800ms});
         }
 
         heal_at_pokecenter(env.program_info(), env.console, context);
@@ -103,8 +103,8 @@ void checkpoint_30(
         // section 2
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 255, 200, 1600ms},
-            {ZoomChange::KEEP_ZOOM, 0, 65, 1760ms}
+            {ZoomChange::ZOOM_IN, +1, -0.567, 1600ms},
+            {ZoomChange::KEEP_ZOOM, -1, +0.492, 1760ms}
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -113,8 +113,8 @@ void checkpoint_30(
         // section 3
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 255, 200, 1600ms},
-            {ZoomChange::KEEP_ZOOM, 0, 80, 1880ms}
+            {ZoomChange::ZOOM_IN, +1, -0.567, 1600ms},
+            {ZoomChange::KEEP_ZOOM, -1, +0.375, 1880ms}
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -123,8 +123,8 @@ void checkpoint_30(
         // section 4. walk until Arven dialog
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 255, 200, 1600ms},
-            {ZoomChange::KEEP_ZOOM, 0, 60, 2240ms}
+            {ZoomChange::ZOOM_IN, +1, -0.567, 1600ms},
+            {ZoomChange::KEEP_ZOOM, -1, +0.531, 2240ms}
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -141,8 +141,8 @@ void checkpoint_30(
         // section 6
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 0, 0, 0ms},
-            {ZoomChange::KEEP_ZOOM, 0, 20, 520ms}
+            {ZoomChange::ZOOM_IN, -1, +1, 0ms},
+            {ZoomChange::KEEP_ZOOM, -1, +0.844, 520ms}
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -153,8 +153,8 @@ void checkpoint_30(
         // section 7
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 0, 0, 0ms},
-            {ZoomChange::KEEP_ZOOM, 0, 30, 640ms}
+            {ZoomChange::ZOOM_IN, -1, +1, 0ms},
+            {ZoomChange::KEEP_ZOOM, -1, +0.766, 640ms}
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -163,8 +163,8 @@ void checkpoint_30(
         // section 8. enter left side of boulder field
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 255, 255, 400ms},
-            {ZoomChange::KEEP_ZOOM, 0, 40, 760ms}
+            {ZoomChange::ZOOM_IN, +1, -1, 400ms},
+            {ZoomChange::KEEP_ZOOM, -1, +0.688, 760ms}
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -177,8 +177,8 @@ void checkpoint_30(
         // section 9. go to middle-right of boulder field
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 255, 255, 400ms},
-            {ZoomChange::KEEP_ZOOM, 0, 15, 880ms}
+            {ZoomChange::ZOOM_IN, +1, -1, 400ms},
+            {ZoomChange::KEEP_ZOOM, -1, +0.883, 880ms}
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -191,8 +191,8 @@ void checkpoint_30(
         // section 10. walk up right edge
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 255, 255, 640ms},
-            {ZoomChange::KEEP_ZOOM, 0, 12, 1040ms}
+            {ZoomChange::ZOOM_IN, +1, -1, 640ms},
+            {ZoomChange::KEEP_ZOOM, -1, +0.906, 1040ms}
         );      
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -212,8 +212,8 @@ void checkpoint_30(
         // section 11
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 255, 255, 800ms},
-            {ZoomChange::KEEP_ZOOM, 0, 5, 1200ms}
+            {ZoomChange::ZOOM_IN, +1, -1, 800ms},
+            {ZoomChange::KEEP_ZOOM, -1, +0.961, 1200ms}
         );      
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -222,8 +222,8 @@ void checkpoint_30(
         // section 12. reach the top. battle Bombirdier
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 255, 255, 800ms},
-            {ZoomChange::KEEP_ZOOM, 50, 0, 1360ms}
+            {ZoomChange::ZOOM_IN, +1, -1, 800ms},
+            {ZoomChange::KEEP_ZOOM, -0.609, +1, 1360ms}
         );
         try{
             overworld_navigation(env.program_info(), env.console, context, 
@@ -271,8 +271,8 @@ void checkpoint_31(
         // section 1. fall down the mountain
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 255, 80, 1440ms},
-            {ZoomChange::KEEP_ZOOM, 0, 170, 960ms}
+            {ZoomChange::ZOOM_IN, +1, +0.375, 1440ms},
+            {ZoomChange::KEEP_ZOOM, -1, -0.331, 960ms}
         );        
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -280,8 +280,8 @@ void checkpoint_31(
         // section 2
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 255, 80, 800ms},
-            {ZoomChange::KEEP_ZOOM, 0, 255, 440ms}
+            {ZoomChange::ZOOM_IN, +1, +0.375, 800ms},
+            {ZoomChange::KEEP_ZOOM, -1, -1, 440ms}
         );  
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -289,8 +289,8 @@ void checkpoint_31(
         // section 3. align to pokecenter
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 255, 0, 320ms},
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}
+            {ZoomChange::ZOOM_IN, +1, +1, 320ms},
+            {ZoomChange::KEEP_ZOOM, -1, +1, 0ms}
         );  
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 

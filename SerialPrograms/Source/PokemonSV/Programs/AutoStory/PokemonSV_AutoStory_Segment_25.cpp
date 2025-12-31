@@ -115,15 +115,15 @@ void checkpoint_59(
 
         // marker 1  {0.795312, 0.626852}
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
+            {ZoomChange::KEEP_ZOOM, -1, +1, 0ms}, 
             FlyPoint::FAST_TRAVEL, 
             {0.795312, 0.626852}
         );
 
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 180, 1040ms});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 70, 1040ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, +1, -0.409, 1040ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, -1, +0.453, 1040ms});
         }
         
 
@@ -141,7 +141,7 @@ void checkpoint_59(
 
         // marker 2   {0.672396, 0.532407}
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 0, 0, 0ms}, 
+            {ZoomChange::ZOOM_IN, -1, +1, 0ms}, 
             FlyPoint::POKECENTER, 
             {0.672396, 0.532407}
         );
@@ -163,7 +163,7 @@ void checkpoint_59(
 
         // marker 3   {0.685417, 0.571296}
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
+            {ZoomChange::KEEP_ZOOM, -1, +1, 0ms}, 
             FlyPoint::POKECENTER, 
             {0.685417, 0.571296}
         );
@@ -324,7 +324,7 @@ void checkpoint_60(
     [&](size_t attempt_number){
         // fly back to Porto Marinada Pokecenter from Team Star Poison
         // this clears Pokemon in minimap
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, 128, 4800ms}, FlyPoint::POKECENTER);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, -1, 0, 4800ms}, FlyPoint::POKECENTER);
 
 
         move_from_porto_marinada_to_medali(env, context);
@@ -352,7 +352,7 @@ void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, Pro
 
     // marker 2.   x=0.3875, y=0.60463
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_OUT, 0, 0, 0ms},
+        {ZoomChange::ZOOM_OUT, -1, +1, 0ms},
         FlyPoint::POKECENTER, 
         {0.3875, 0.60463}
     );        
@@ -371,7 +371,7 @@ void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, Pro
     
     // marker 3.  : x=0.316146, y=0.623148
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_OUT, 0, 0, 0ms},
+        {ZoomChange::ZOOM_OUT, -1, +1, 0ms},
         FlyPoint::POKECENTER, 
         {0.316146, 0.623148}
     );        
@@ -391,7 +391,7 @@ void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, Pro
 
     // marker 4. cross bridge 1  x=0.310417, y=0.712963. 
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_OUT, 0, 0, 0ms},
+        {ZoomChange::ZOOM_OUT, -1, +1, 0ms},
         FlyPoint::POKECENTER, 
         {0.310417, 0.712963}
     );        
@@ -414,7 +414,7 @@ void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, Pro
 
     // marker 5.  : x=0.582292, y=0.692593
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_OUT, 0, 0, 0ms},
+        {ZoomChange::ZOOM_OUT, -1, +1, 0ms},
         FlyPoint::POKECENTER, 
         {0.582292, 0.692593}
     );        
@@ -434,7 +434,7 @@ void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, Pro
 
     // marker 6. cross bridge 2 :   x=0.555208, y=0.627778
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_OUT, 0, 0, 0ms},
+        {ZoomChange::ZOOM_OUT, -1, +1, 0ms},
         FlyPoint::POKECENTER, 
         {0.555208, 0.627778}
     );        
@@ -456,7 +456,7 @@ void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, Pro
 
     // marker 7.  :  x=0.678646, y=0.669444
     place_marker_offset_from_flypoint(env.program_info(), env.console, context,
-        {ZoomChange::KEEP_ZOOM, 255, 255, 240ms},
+        {ZoomChange::KEEP_ZOOM, +1, -1, 240ms},
         FlyPoint::POKECENTER, 
         {0.678646, 0.669444}
     );        
@@ -474,7 +474,7 @@ void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, Pro
 
     // marker 8.  :  x=0.533333, y=0.640741
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 255, 255, 400ms},
+        {ZoomChange::KEEP_ZOOM, +1, -1, 400ms},
         FlyPoint::POKECENTER, 
         {0.533333, 0.640741}
     );        
@@ -494,8 +494,8 @@ void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, Pro
     // marker 9. set marker to pokecenter
     realign_player_from_landmark(
         env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_IN, 128, 255, 400ms},
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}
+        {ZoomChange::ZOOM_IN, 0, -1, 400ms},
+        {ZoomChange::KEEP_ZOOM, -1, +1, 0ms}
     );  
     handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){

@@ -106,8 +106,8 @@ void checkpoint_64(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 1440ms});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 1440ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, -1, 1440ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, +1, 1440ms});
         }
 
         move_from_glaseado_mountain_to_casseroya_watchtower3(env, context, attempt_number);
@@ -122,8 +122,8 @@ void checkpoint_65(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 128, 0ms}, FlyPoint::POKECENTER);
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 128, 0ms}, FlyPoint::FAST_TRAVEL);
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, FlyPoint::POKECENTER);
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, FlyPoint::FAST_TRAVEL);
         }
 
         move_from_casseroya_watchtower3_to_dondozo_titan(env, context);
@@ -147,7 +147,7 @@ void checkpoint_67(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // fly to Glaseado Mountain Pokecenter from Dondozo
         // this clears Pokemon in minimap
 
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, 0, 0ms}, FlyPoint::POKECENTER);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, -1, +1, 0ms}, FlyPoint::POKECENTER);
         move_from_glaseado_mountain_to_north_province_area_three(env, context);
 
     }); 
@@ -164,8 +164,8 @@ void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnv
     DirectionDetector direction;
     if (attempt_number > 0 || ENABLE_TEST){
         env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 100, 255, 480ms});
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 0, 480ms});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, -0.219, -1, 480ms});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, +1, 480ms});
     }
 
     direction.change_direction(env.program_info(), env.console, context, 1.448679);
@@ -175,7 +175,7 @@ void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnv
 
     // marker 1   x=0.548438, y=0.273148
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_OUT, 0, 0, 0ms}, 
+        {ZoomChange::ZOOM_OUT, -1, +1, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.548438, 0.273148}
     );
@@ -196,7 +196,7 @@ void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnv
 
     // marker 2.    :  x=0.693229, y=0.459259
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
+        {ZoomChange::KEEP_ZOOM, -1, +1, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.693229, 0.459259}
     );        
@@ -223,7 +223,7 @@ void move_from_casseroya_watchtower3_to_dondozo_titan(SingleSwitchProgramEnviron
     
     // marker 1     x=0.779167, y=0.274074
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
+        {ZoomChange::KEEP_ZOOM, -1, +1, 0ms}, 
         FlyPoint::POKECENTER, 
         {0.779167, 0.274074}
     );
@@ -244,7 +244,7 @@ void move_from_casseroya_watchtower3_to_dondozo_titan(SingleSwitchProgramEnviron
 
     // marker 2.    :   x=0.76875, y=0.298148
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
+        {ZoomChange::KEEP_ZOOM, -1, +1, 0ms}, 
         FlyPoint::FAST_TRAVEL, 
         {0.76875, 0.298148}
     );        
@@ -255,7 +255,7 @@ void move_from_casseroya_watchtower3_to_dondozo_titan(SingleSwitchProgramEnviron
 
     // marker 3.    :   x=0.752604, y=0.401852
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
+        {ZoomChange::KEEP_ZOOM, -1, +1, 0ms}, 
         FlyPoint::FAST_TRAVEL, 
         {0.752604, 0.401852}
     );        
@@ -278,7 +278,7 @@ void move_from_dondozo_titan_phase1_to_phase2(SingleSwitchProgramEnvironment& en
     
     // marker 1      x=0.832292, y=0.54537
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
+        {ZoomChange::KEEP_ZOOM, -1, +1, 0ms}, 
         FlyPoint::FAST_TRAVEL, 
         {0.832292, 0.54537}
     );
@@ -291,7 +291,7 @@ void move_from_dondozo_titan_phase1_to_phase2(SingleSwitchProgramEnvironment& en
 
     // marker 2       x=0.393229, y=0.748148
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_IN, 0, 0, 0ms}, 
+        {ZoomChange::ZOOM_IN, -1, +1, 0ms}, 
         FlyPoint::FAST_TRAVEL, 
         {0.393229, 0.748148}
     );
@@ -302,7 +302,7 @@ void move_from_dondozo_titan_phase1_to_phase2(SingleSwitchProgramEnvironment& en
 
     // marker 3. go to Dondozo/Tatsugiri part 2       x=0.55625, y=0.324074
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 128, 255, 320ms},
+        {ZoomChange::KEEP_ZOOM, 0, -1, 320ms},
         FlyPoint::FAST_TRAVEL, 
         {0.55625, 0.324074}
     );
@@ -332,8 +332,8 @@ void move_from_glaseado_mountain_to_north_province_area_three(SingleSwitchProgra
     // marker 1. set marker to pokecenter
     realign_player_from_landmark(
         env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 128, 0, 400ms},
-        {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}
+        {ZoomChange::KEEP_ZOOM, 0, +1, 400ms},
+        {ZoomChange::KEEP_ZOOM, -1, +1, 0ms}
     );  
     handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){

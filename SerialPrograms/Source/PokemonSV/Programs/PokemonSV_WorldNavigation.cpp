@@ -324,10 +324,10 @@ void place_marker_offset_from_flypoint(
             case ZoomChange::KEEP_ZOOM:
                 break;
             }
-            uint8_t move_x1 = move_cursor_near_flypoint.move_x;
-            uint8_t move_y1 = move_cursor_near_flypoint.move_y;
+            double move_x1 = move_cursor_near_flypoint.move_x;
+            double move_y1 = move_cursor_near_flypoint.move_y;
             Milliseconds move_duration1 = move_cursor_near_flypoint.move_duration;
-            pbf_move_left_joystick_old(context, move_x1, move_y1, move_duration1, 1000ms);
+            pbf_move_left_joystick(context, {move_x1, move_y1}, move_duration1, 1000ms);
 
             move_cursor_to_position_offset_from_flypoint(info, stream, context, fly_point, {marker_offset.x, marker_offset.y});
 

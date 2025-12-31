@@ -71,8 +71,8 @@ enum class ZoomChange{
 
 struct MoveCursor{
     ZoomChange zoom_change;
-    uint8_t move_x;
-    uint8_t move_y;
+    double move_x;
+    double move_y;
     Milliseconds move_duration;
 };
 
