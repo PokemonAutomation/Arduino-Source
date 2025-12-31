@@ -22,6 +22,7 @@ namespace NintendoSwitch{
 namespace PokemonLZA{
 
 
+// Detects Calorie number in Hyperspace using number OCR.
 class HyperspaceCalorieDetector : public StaticScreenDetector{
 public:
     HyperspaceCalorieDetector(Logger& logger);
@@ -40,12 +41,30 @@ private:
     uint16_t m_calorie_number = 0;
 };
 
+// A watcher to run until it reads a valid OCR number.
+class HyperspaceCalorieWatcher : public HyperspaceCalorieDetector, public VisualInferenceCallback{
+public:
+    HyperspaceCalorieWatcher(Logger& logger);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+
+private:
+};
+
+
+// A watcher to stop the inference session when a target Calorie limit is OCRed.
+// It has some robustness logic to ensure occasional wrong number OCR won't
+// lead to an early stop of the inference session and also saves potential
+// screenshots of wrong OCR to debug folder.
 class HyperspaceCalorieLimitWatcher : public HyperspaceCalorieDetector, public VisualInferenceCallback{
 public:
     HyperspaceCalorieLimitWatcher(Logger& logger, uint16_t calorie_limit);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
 
+    // Return true in `process_frame()` when the calorie limit is reached.
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:

@@ -7,6 +7,7 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
@@ -41,16 +42,19 @@ ShinyHunt_HyperspaceLegendary_Descriptor::ShinyHunt_HyperspaceLegendary_Descript
 class ShinyHunt_HyperspaceLegendary_Descriptor::Stats : public StatsTracker{
 public:
     Stats()
-        : resets(m_stats["Resets"])
+        : spawns(m_stats["Spawns"])
+        , game_resets(m_stats["Game Resets"])
         , shinies(m_stats["Shiny Sounds"])
         , errors(m_stats["Errors"])
     {
-        m_display_order.emplace_back("Resets");
+        m_display_order.emplace_back("Spawns");
+        m_display_order.emplace_back("Game Resets");
         m_display_order.emplace_back("Shiny Sounds");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
 
-    std::atomic<uint64_t>& resets;
+    std::atomic<uint64_t>& spawns;
+    std::atomic<uint64_t>& game_resets;
     std::atomic<uint64_t>& shinies;
     std::atomic<uint64_t>& errors;
 };
@@ -68,13 +72,6 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
         },
         LockMode::LOCK_WHILE_RUNNING,
         Legendary::VIRIZION
-    )
-    , MAX_ROUNDS(
-        "<b>Max Rounds:</b><br>Max number of spawn attempts. Set to zero to have no max round limit. "
-        "Make sure to leave enough time to catch found shinies."
-        "<br>Cal. per sec: 1 Star: 1 Cal./s, 2 Star: 1.6 Cal./s, 3 Star: 3.5 Cal./s, 4 Star: 7.5 Cal./s, 5 Star: 10 Cal./s.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        100, 0 // default, min
     )
     , MIN_CALORIE_REMAINING(
         "<b>Minimum Cal. allowed:</b><br>The program will stop if the Calorie number is at or below this value."
@@ -94,7 +91,6 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(LEGENDARY);
-    PA_ADD_OPTION(MAX_ROUNDS);
     PA_ADD_OPTION(MIN_CALORIE_REMAINING);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -102,75 +98,58 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
 
 namespace {
 
-// Return if the loop should stop
-typedef std::function<void(SingleSwitchProgramEnvironment&, ProControllerContext&, ShinyHunt_HyperspaceLegendary_Descriptor::Stats&, bool)> route_func;
-
-void route_default(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats){
-    // Open map
-    bool can_fast_travel = open_map(env.console, context);
-    if (!can_fast_travel){
-        stats.errors++;
-        env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "route_default(): Cannot open map for fast travel.",
-            env.console
-        );
-    }
-
-    // Move map cursor upwards a little bit
-    pbf_move_left_joystick(context, {0, +0.5}, 100ms, 200ms);
-
-    // Fly from map to reset spawns
-    FastTravelState travel_status = fly_from_map(env.console, context);
-    if (travel_status != FastTravelState::SUCCESS){
-        stats.errors++;
-        env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "route_default(): Cannot fast travel after moving map cursor.",
-            env.console
-        );
-    }
-}
-
-bool route_virizion(
+bool hunt_virizion(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
-    SimpleIntegerOption<uint16_t>& MIN_CALORIE_REMAINING,
-    uint8_t& ready_to_stop_counter){
+    SimpleIntegerOption<uint16_t>& MIN_CALORIE_REMAINING){
 
     const uint16_t min_calorie = MIN_CALORIE_REMAINING;
 
     // running forward
-    Milliseconds duration(4400);
+    const Milliseconds run_duration(4400);
 
-    HyperspaceCalorieLimitWatcher calorie_watcher(env.logger(), min_calorie);
-    const int ret = run_until<ProControllerContext>(
-        env.console, context,
-        [&](ProControllerContext& context){
-            // running forward
-            ssf_press_button(context, BUTTON_B, 0ms, 2*duration, 0ms);
-            // Add 30 ms to avoid any drift using the balustrade
-            pbf_move_left_joystick(context, {0, +1}, duration + 30ms, 0ms);
-            // run back
-            pbf_move_left_joystick(context, {0, -1}, duration, 0ms);
-            pbf_wait(context, 100ms);
-        },
-        {{calorie_watcher}}
-    );
-    uint16_t calorie_number = calorie_watcher.calorie_number();
-    const std::string log_msg = std::format("Calorie: {}/{}", calorie_number, min_calorie);
-    env.add_overlay_log(log_msg);
-    env.log(log_msg);
-    if (ret == 0){
-        env.log("min calorie reached");
-        return true;
+    HyperspaceCalorieWatcher calorie_watcher(env.logger());
+    while(true){
+        // running forward
+        ssf_press_button(context, BUTTON_B, 0ms, 2*run_duration, 0ms);
+        // Add 30 ms to avoid any drift using the balustrade
+        pbf_move_left_joystick(context, {0, +1}, run_duration + 30ms, 0ms);
+        // run back
+        pbf_move_left_joystick(context, {0, -1}, run_duration, 0ms);
+        // Wait for a short time to allow the game to register the next button B press
+        pbf_wait(context, 100ms);
+    
+        int ret = wait_until(
+            env.console, context, std::chrono::seconds(1), {calorie_watcher}
+        );
+        if (ret < 0){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "hunt_Virizion(): does not detect Calorie number after waiting for a second",
+                env.console
+            );
+        }
+
+        const uint16_t calorie_number = calorie_watcher.calorie_number();
+        const std::string log_msg = std::format("Calorie: {}/{}", calorie_number, min_calorie);
+        env.add_overlay_log(log_msg);
+        env.log(log_msg);
+        if (calorie_number <= min_calorie){
+            env.log("min calorie reached");
+            break;
+        }
     }
+
+    // We have done enough shuttle runs to refresh Virizion spawns.
+    // Now run towards it to check shiny!
+    
+    // Push left joystick rightward to let the character face right
+    pbf_move_left_joystick(context, {+1, 0}, 100ms, 0ms);
+    // Roll once to leave the balcony area
+    pbf_press_button(context, BUTTON_Y, 100ms, 1s);
+    // Run downstairs towards the trash bin
+    pbf_move_left_joystick(context, {0, +1}, Seconds(5), 0ms);
 
     return false;
 }
@@ -195,14 +174,10 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
         env.console.overlay().add_log("Shiny Sound Detected!", COLOR_YELLOW);
 
         return shiny_sound_handler.on_shiny_sound(
-            env, env.console,
-            stats.shinies,
-            error_coefficient
+            env, env.console, stats.shinies, error_coefficient
         );
     });
 
-    uint64_t num_resets = 0;
-    uint8_t ready_to_stop_counter = 0;
     run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
@@ -212,7 +187,7 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
 
                 bool should_stop = false;
                 if (LEGENDARY == Legendary::VIRIZION){
-                    should_stop = route_virizion(env, context, stats, MIN_CALORIE_REMAINING, ready_to_stop_counter);
+                    should_stop = hunt_virizion(env, context, stats, MIN_CALORIE_REMAINING);
                 } else{
                     OperationFailedException::fire(
                         ErrorReport::SEND_ERROR_REPORT,
@@ -220,18 +195,11 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
                         env.console
                     );
                 }
-                num_resets++;
-                stats.resets++;
+                stats.game_resets++;
                 env.update_stats();
-                if (stats.resets.load(std::memory_order_relaxed) % 10 == 0){
-                    send_program_status_notification(env, NOTIFICATION_STATUS);
-                }
+                send_program_status_notification(env, NOTIFICATION_STATUS);
 
                 if (should_stop){
-                    break;
-                }
-                if (MAX_ROUNDS > 0 && num_resets >= MAX_ROUNDS){
-                    env.log(std::format("Reached reset limit {}", static_cast<uint64_t>(MAX_ROUNDS)));
                     break;
                 }
 

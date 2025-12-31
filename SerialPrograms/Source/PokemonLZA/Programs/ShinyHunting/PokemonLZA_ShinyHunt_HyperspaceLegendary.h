@@ -42,7 +42,6 @@ private:
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
     ShinySoundDetectedActionOption SHINY_DETECTED;
     EnumDropdownOption<Legendary> LEGENDARY;
-    SimpleIntegerOption<uint64_t> MAX_ROUNDS;
     SimpleIntegerOption<uint16_t> MIN_CALORIE_REMAINING;
 
     EventNotificationOption NOTIFICATION_STATUS;

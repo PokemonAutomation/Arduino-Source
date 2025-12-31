@@ -54,6 +54,17 @@ bool HyperspaceCalorieDetector::detect(const ImageViewRGB32& screen){
     return true;
 }
 
+HyperspaceCalorieWatcher::HyperspaceCalorieWatcher(Logger& logger)
+: HyperspaceCalorieDetector(logger), VisualInferenceCallback("HyperspaceCalorieWatcher")
+{}
+
+void HyperspaceCalorieWatcher::make_overlays(VideoOverlaySet& items) const{
+    HyperspaceCalorieDetector::make_overlays(items);
+}
+
+bool HyperspaceCalorieWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+    return detect(frame);
+}
 
 HyperspaceCalorieLimitWatcher::HyperspaceCalorieLimitWatcher(Logger& logger, uint16_t calorie_limit)
 : HyperspaceCalorieDetector(logger), VisualInferenceCallback("HyperspaceCalorieLimitWatcher")
