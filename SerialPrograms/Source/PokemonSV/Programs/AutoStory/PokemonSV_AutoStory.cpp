@@ -585,22 +585,22 @@ AutoStory::AutoStory()
         false
     )     
     , X_MOVE(
-        "--X_MOVE:<br>x = 0 : left, x = 128 : neutral, x = 255 : right.",
+        "--X_MOVE:<br>x = -1 : left, x = 0 : neutral, x = +1 : right.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        128
+        0
     )     
     , Y_MOVE(
-        "--Y_MOVE:<br>y = 0 : up, y = 128 : neutral, y = 255 : down.",
+        "--Y_MOVE:<br>y = -1 : down, y = 0 : neutral, y = +1 : up.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        128
+        0
     )   
-    , HOLD_TICKS(
-        "--HOLD_TICKS:",
+    , HOLD(
+        "--HOLD (ms):",
         LockMode::UNLOCK_WHILE_RUNNING,
         0
     )    
-    , RELEASE_TICKS(
-        "--RELEASE_TICKS:",
+    , RELEASE(
+        "--RELEASE (ms):",
         LockMode::UNLOCK_WHILE_RUNNING,
         0
     )
@@ -610,22 +610,22 @@ AutoStory::AutoStory()
         false
     )     
     , X_MOVE2(
-        "--X_MOVE:<br>x = 0 : left, x = 128 : neutral, x = 255 : right.",
+        "--X_MOVE:<br>x = -1 : left, x = 0 : neutral, x = +1 : right.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        128
+        0
     )     
     , Y_MOVE2(
-        "--Y_MOVE:<br>y = 0 : up, y = 128 : neutral, y = 255 : down.",
+        "--Y_MOVE:<br>y = -1 : down, y = 0 : neutral, y = +1 : up.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        128
+        0
     )   
-    , HOLD_TICKS2(
-        "--HOLD_TICKS:",
+    , HOLD2(
+        "--HOLD (ms):",
         LockMode::UNLOCK_WHILE_RUNNING,
         0
     )    
-    , RELEASE_TICKS2(
-        "--RELEASE_TICKS:",
+    , RELEASE2(
+        "--RELEASE (ms):",
         LockMode::UNLOCK_WHILE_RUNNING,
         0
     )    
@@ -715,14 +715,14 @@ AutoStory::AutoStory()
         PA_ADD_OPTION(TEST_PBF_LEFT_JOYSTICK);
         PA_ADD_OPTION(X_MOVE);
         PA_ADD_OPTION(Y_MOVE);
-        PA_ADD_OPTION(HOLD_TICKS);
-        PA_ADD_OPTION(RELEASE_TICKS);  
+        PA_ADD_OPTION(HOLD);
+        PA_ADD_OPTION(RELEASE);  
 
         PA_ADD_OPTION(TEST_PBF_JOYSTICK2);
         PA_ADD_OPTION(X_MOVE2);
         PA_ADD_OPTION(Y_MOVE2);
-        PA_ADD_OPTION(HOLD_TICKS2);
-        PA_ADD_OPTION(RELEASE_TICKS2);              
+        PA_ADD_OPTION(HOLD2);
+        PA_ADD_OPTION(RELEASE2);              
 
         PA_ADD_OPTION(ENABLE_TEST_CHECKPOINTS);
         PA_ADD_OPTION(START_CHECKPOINT);
@@ -733,7 +733,6 @@ AutoStory::AutoStory()
 
 
         PA_ADD_OPTION(ENABLE_MISC_TEST);
-        // PA_ADD_OPTION(FORWARD_TICKS);  
         PA_ADD_OPTION(m_advanced_options_end);
     }
 
@@ -849,25 +848,25 @@ void AutoStory::on_config_value_changed(void* object){
     if (TEST_PBF_LEFT_JOYSTICK){
         X_MOVE.set_visibility(ConfigOptionState::ENABLED);
         Y_MOVE.set_visibility(ConfigOptionState::ENABLED);
-        HOLD_TICKS.set_visibility(ConfigOptionState::ENABLED);
-        RELEASE_TICKS.set_visibility(ConfigOptionState::ENABLED);
+        HOLD.set_visibility(ConfigOptionState::ENABLED);
+        RELEASE.set_visibility(ConfigOptionState::ENABLED);
     }else{
         X_MOVE.set_visibility(ConfigOptionState::DISABLED);
         Y_MOVE.set_visibility(ConfigOptionState::DISABLED);
-        HOLD_TICKS.set_visibility(ConfigOptionState::DISABLED);
-        RELEASE_TICKS.set_visibility(ConfigOptionState::DISABLED);      
+        HOLD.set_visibility(ConfigOptionState::DISABLED);
+        RELEASE.set_visibility(ConfigOptionState::DISABLED);      
     }   
 
     if (TEST_PBF_JOYSTICK2){
         X_MOVE2.set_visibility(ConfigOptionState::ENABLED);
         Y_MOVE2.set_visibility(ConfigOptionState::ENABLED);
-        HOLD_TICKS2.set_visibility(ConfigOptionState::ENABLED);
-        RELEASE_TICKS2.set_visibility(ConfigOptionState::ENABLED);
+        HOLD2.set_visibility(ConfigOptionState::ENABLED);
+        RELEASE2.set_visibility(ConfigOptionState::ENABLED);
     }else{
         X_MOVE2.set_visibility(ConfigOptionState::DISABLED);
         Y_MOVE2.set_visibility(ConfigOptionState::DISABLED);
-        HOLD_TICKS2.set_visibility(ConfigOptionState::DISABLED);
-        RELEASE_TICKS2.set_visibility(ConfigOptionState::DISABLED);      
+        HOLD2.set_visibility(ConfigOptionState::DISABLED);
+        RELEASE2.set_visibility(ConfigOptionState::DISABLED);      
     }     
 
 
@@ -1213,12 +1212,12 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
     }    
 
     if (TEST_PBF_LEFT_JOYSTICK){
-        pbf_move_left_joystick_old(context, X_MOVE, Y_MOVE, HOLD_TICKS * 8ms, RELEASE_TICKS * 8ms);
+        pbf_move_left_joystick(context, {X_MOVE, Y_MOVE}, Milliseconds(HOLD), Milliseconds(RELEASE));
         return;
     } 
 
     if (TEST_PBF_JOYSTICK2){
-        pbf_move_left_joystick_old(context, X_MOVE2, Y_MOVE2, HOLD_TICKS2 * 8ms, RELEASE_TICKS2 * 8ms);
+        pbf_move_left_joystick(context, {X_MOVE2, Y_MOVE2}, Milliseconds(HOLD2), Milliseconds(RELEASE2));
         return;
     }            
 
