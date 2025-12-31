@@ -104,18 +104,18 @@ void checkpoint_21(
         // get on ride
         get_on_ride(env.program_info(), env.console, context);
         // turn left
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NO_MARKER, 0, 128, 50);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NO_MARKER, -1, 0, 400ms);
         // move forward
         pbf_move_left_joystick(context, {0, +1}, 800ms, 800ms);
 
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 200, 70);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, -0.567, 560ms);
         pbf_move_left_joystick(context, {0, +1}, 3200ms, 800ms);
 
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 70);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, 0, 560ms);
         pbf_move_left_joystick(context, {0, +1}, 5600ms, 800ms);
 
         // turn towards wall
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 50);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, +1, 400ms);
         pbf_move_left_joystick(context, {0, +1}, 1600ms, 800ms);
         // run and jump over wall
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 800ms);
@@ -188,7 +188,7 @@ void checkpoint_22(
         // section 3. set marker past pokecenter
         handle_unexpected_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 70, 30);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, +0.453, 240ms);
         });            
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
@@ -216,7 +216,7 @@ void checkpoint_23(
         // the landmark Pokecenter is far enough away from startpoint, that the map Pokemon don't cover it.
 
         // section 1
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 110, 0, 30);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -0.141, +1, 240ms);
 
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY,
@@ -297,7 +297,7 @@ void checkpoint_23(
         // section 6. set marker past pokecenter
         handle_unexpected_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 110, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, +0.141, 400ms);
         });   
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 

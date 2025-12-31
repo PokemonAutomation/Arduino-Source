@@ -113,9 +113,9 @@ void checkpoint_06(
 
         context.wait_for_all_requests();
 
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 82, 60);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -0.688, +0.359, 480ms);
         pbf_move_left_joystick(context, {0, +1}, 6000ms, 160ms);
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 110, 10, 60);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -0.141, +0.922, 480ms);
         env.console.log("overworld_navigation: Go to Nemona.");
         overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 20, 20, true, true);
         
@@ -153,13 +153,13 @@ void checkpoint_07(
         env.console.log("Move to cliff");
         env.console.overlay().add_log("Move to cliff", COLOR_WHITE);
 
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 70, 100);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +1, +0.453, 800ms);
         env.console.log("overworld_navigation: Go to cliff.");
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
             135, 0, 24, 12, true, true);
 
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 80);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, +1, 640ms);
         handle_when_stationary_in_overworld(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 

@@ -120,11 +120,6 @@ private:
     SimpleIntegerOption<uint16_t> START_LOOP;
     SimpleIntegerOption<uint16_t> END_LOOP;
 
-    BooleanCheckBoxOption ENABLE_TEST_REALIGN;    
-    EnumDropdownOption<PlayerRealignMode> REALIGN_MODE;
-    SimpleIntegerOption<uint8_t> X_REALIGN;
-    SimpleIntegerOption<uint8_t> Y_REALIGN;
-    SimpleIntegerOption<uint16_t> REALIGN_DURATION;
 
     BooleanCheckBoxOption ENABLE_MISC_TEST;    
     SimpleIntegerOption<uint16_t> FORWARD_TICKS;

@@ -96,7 +96,7 @@ void checkpoint_37(
 
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 255, 50);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, -1, 400ms);
 
                 // section 1
                 direction.change_direction(env.program_info(), env.console, context, 1.606);
@@ -112,7 +112,7 @@ void checkpoint_37(
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
             128, 0, 30, 10, false);          
         // section 3. set marker to shop/Kofu
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 140, 27);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, -0.094, 216ms);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20000ms);
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::PROMPT_DIALOG, CallbackEnum::DIALOG_ARROW});

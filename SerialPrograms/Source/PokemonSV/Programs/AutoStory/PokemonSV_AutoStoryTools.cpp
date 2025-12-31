@@ -274,9 +274,8 @@ bool confirm_marker_present(
 
 void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     PlayerRealignMode realign_mode,
-    uint8_t move_x, uint8_t move_y, uint16_t move_duration_ticks
+    double move_x, double move_y, Milliseconds move_duration
 ){
-    Milliseconds move_duration = move_duration_ticks * 8ms;
     stream.log("Realigning player direction...");
     switch (realign_mode){
     case PlayerRealignMode::REALIGN_NEW_MARKER:
@@ -288,7 +287,7 @@ void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerC
         });
 
         pbf_press_button(context, BUTTON_ZR, 160ms, 840ms);
-        pbf_move_left_joystick_old(context, move_x, move_y, move_duration, 1000ms);
+        pbf_move_left_joystick(context, {move_x, move_y}, move_duration, 1000ms);
         pbf_press_button(context, BUTTON_A, 160ms, 840ms);
         pbf_press_button(context, BUTTON_A, 160ms, 840ms);
 
@@ -311,7 +310,7 @@ void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerC
         pbf_press_button(context, BUTTON_L, 160ms, 840ms);
         return;
     case PlayerRealignMode::REALIGN_NO_MARKER:
-        pbf_move_left_joystick_old(context, move_x, move_y, move_duration, 1000ms);
+        pbf_move_left_joystick(context, {move_x, move_y}, move_duration, 1000ms);
         pbf_press_button(context, BUTTON_L, 160ms, 840ms);
         return;
     }  

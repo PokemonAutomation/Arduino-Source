@@ -106,7 +106,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         context.wait_for_all_requests();
         // move the marker elsewhere, away from North
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 255, 50);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, -1, 400ms);
 
         DirectionDetector direction;
         if (attempt_number > 0 || ENABLE_TEST){
@@ -119,7 +119,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         pbf_move_left_joystick(context, {0, +1}, 1600ms, 400ms);
 
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 150, 0, 120);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +0.173, +1, 960ms);
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
@@ -135,7 +135,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // talk to Clavell
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG});
 
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 0, 100);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, +1, 800ms);
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 

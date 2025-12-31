@@ -89,7 +89,7 @@ void checkpoint_09(
 
         context.wait_for_all_requests();
 
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 110, 50);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +1, +0.141, 400ms);
         env.console.log("overworld_navigation: Go to Arven at the tower.");
         
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
@@ -131,7 +131,7 @@ void checkpoint_10(
         env.console.overlay().add_log("Lighthouse view", COLOR_WHITE);
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 110, 100);
+                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NEW_MARKER, +0.803, +0.141, 800ms);
                 pbf_move_left_joystick(context, {0, +1}, 6000ms, 8000ms);
                 pbf_move_left_joystick(context, {0, +1}, 4000ms, 160ms);
             }

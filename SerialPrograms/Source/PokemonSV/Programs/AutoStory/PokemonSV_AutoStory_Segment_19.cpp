@@ -237,7 +237,7 @@ void checkpoint_41(
             128, 0, 10, 10, false);        
 
         // move the marker so it doesn't cover North in the minimap
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 128, 50);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +1, 0, 400ms);
 
         // section 9
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
@@ -378,7 +378,7 @@ void checkpoint_42(
         // section 5. set marker past pokecenter
         handle_unexpected_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 255, 30);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +1, -1, 240ms);
         });      
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 

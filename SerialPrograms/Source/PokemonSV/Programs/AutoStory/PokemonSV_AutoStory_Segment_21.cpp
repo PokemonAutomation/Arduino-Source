@@ -113,7 +113,7 @@ void checkpoint_48(
     [&](size_t attempt_number){
 
         context.wait_for_all_requests();
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 110, 100);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, +0.141, 800ms);
 
         DirectionDetector direction;
         if (attempt_number > 0 || ENABLE_TEST){
@@ -142,7 +142,7 @@ void checkpoint_48(
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         // move towards Team Star base gate
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 20, 255, 40);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -0.844, -1, 320ms);
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
             128, 0, 40, 20, false);
@@ -157,7 +157,7 @@ void checkpoint_48(
         context.wait_for_all_requests();
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 240, 50);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, -0.882, 400ms);
                 walk_forward_while_clear_front_path(env.program_info(), env.console, context, 2400ms);
                 walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A);
             }
@@ -390,7 +390,7 @@ void checkpoint_49(
         // marker 6. set marker past pokecenter
         handle_unexpected_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 255, 30);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +1, -1, 240ms);
         });      
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
