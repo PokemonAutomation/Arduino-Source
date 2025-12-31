@@ -265,9 +265,14 @@ void TcpSysbotBase_Connection::process_message(const std::string& message, WallC
 }
 void TcpSysbotBase_Connection::set_mode(const std::string& sbb_version){
     if (sbb_version.rfind("2.", 0) == 0){
+#if 1
+        set_status_line1("sbb2 is no longer supported. Please upgrade to sbb3.", COLOR_RED);
+        return;
+#else
         m_logger.log("Detected sbb2. Using old (slow) command set.", COLOR_ORANGE);
         write_data("configure mainLoopSleepTime 0\r\n");
         m_supports_command_queue.store(false, std::memory_order_relaxed);
+#endif
     }else if (sbb_version.rfind("3.", 0) == 0){
         m_logger.log("Detected sbb3. Using CC command queue.", COLOR_BLUE);
         if (NintendoSwitch::ConsoleSettings::instance().ENABLE_SBB3_LOGGING){
