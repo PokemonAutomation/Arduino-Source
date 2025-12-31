@@ -152,9 +152,9 @@ void route_wild_zone_19(
     bool to_zoom_to_max){
     if (run_a_straight_path_in_overworld(env.console, context, 0, 80, 6500ms) == 0) {
         open_map(env.console, context, to_zoom_to_max);
-        pbf_move_left_joystick(context, {-0.5, -0.126}, 100ms, 100ms);
+        pbf_move_left_joystick(context, {-0.375, -1}, 100ms, 100ms);
         if (fly_from_map(env.console, context) == FastTravelState::NOT_AT_FLY_SPOT) {
-            pbf_move_left_joystick(context, {0, -0.5}, 100ms, 100ms);
+            pbf_move_left_joystick(context, {-0.375, 0.75}, 100ms, 100ms);
             fly_from_map(env.console, context);
         }
     } else {
