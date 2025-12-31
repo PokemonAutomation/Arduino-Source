@@ -11,6 +11,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -51,15 +52,16 @@ bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
     cv::Mat frame_mat_bgra = screen.to_opencv_Mat();
     cv::Mat frame_mat_rgb;
     cv::cvtColor(frame_mat_bgra, frame_mat_rgb, cv::COLOR_BGRA2RGB);
-    
-    m_output_boxes.clear();
+
+    // Run inference without holding the lock
+    std::vector<YOLOv5Session::DetectionBox> temp_boxes;
 
     // fall back to CPU if fails with GPU.
     for(size_t i = 0; i < 2; i++){
         try{
             // if (m_use_gpu){ throw Ort::Exception("Testing.", ORT_FAIL); }  // to simulate GPU/CPU failure
             // If fails with GPU, fall back to CPU.
-            m_yolo_session->run(frame_mat_rgb, m_output_boxes);
+            m_yolo_session->run(frame_mat_rgb, temp_boxes);
             break;
         }catch(Ort::Exception& e){
             if (m_use_gpu){
@@ -80,8 +82,19 @@ bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
         }
     }
 
+    // Only lock when swapping results
+    bool has_detections = temp_boxes.size() > 0;
+    {
+        WriteSpinLock lg(m_output_lock, "YOLOv5Detector::detect()");
+        m_output_boxes = std::move(temp_boxes);
+    }
 
-    return m_output_boxes.size() > 0;
+    return has_detections;
+}
+
+std::vector<YOLOv5Session::DetectionBox> YOLOv5Detector::detected_boxes(){
+    ReadSpinLock lg(m_output_lock, "YOLOv5Detector::detected_boxes()");
+    return m_output_boxes;
 }
 
 
