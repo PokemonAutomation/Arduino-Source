@@ -658,8 +658,8 @@ void walk_forward_until_dialog(
     ProControllerContext& context,
     NavigationMovementMode movement_mode,
     Milliseconds timeout,
-    uint8_t x,
-    uint8_t y
+    double x,
+    double y
 ){
 
     DialogBoxWatcher dialog(COLOR_RED, true);
@@ -667,7 +667,7 @@ void walk_forward_until_dialog(
     int ret = run_until<ProControllerContext>(
         stream, context,
         [&](ProControllerContext& context){
-            ssf_press_left_joystick_old(context, x, y, 0ms, timeout);
+            ssf_press_left_joystick(context, {x, y}, 0ms, timeout);
             if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
                 pbf_wait(context, timeout);
             } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
@@ -699,7 +699,7 @@ void walk_forward_while_clear_front_path(
     VideoStream& stream,
     ProControllerContext& context,
     Milliseconds forward_duration,
-    uint8_t y,
+    double y,
     Milliseconds duration_between_lets_go,
     Milliseconds delay_after_lets_go
 ){
@@ -710,13 +710,13 @@ void walk_forward_while_clear_front_path(
     while (true){
 
         if (milliseconds_left < duration_between_lets_go){
-            pbf_move_left_joystick_old(context, 128, y, milliseconds_left, 160ms);
+            pbf_move_left_joystick(context, {0, y}, milliseconds_left, 160ms);
             context.wait_for_all_requests();
             stream.log("walk_forward_while_clear_front_path() duration traveled: " + std::to_string(forward_duration.count()) + "ms");
             break;
         }
 
-        pbf_move_left_joystick_old(context, 128, y, duration_between_lets_go, 160ms);
+        pbf_move_left_joystick(context, {0, y}, duration_between_lets_go, 160ms);
         milliseconds_left -= duration_between_lets_go;
 
         context.wait_for_all_requests();

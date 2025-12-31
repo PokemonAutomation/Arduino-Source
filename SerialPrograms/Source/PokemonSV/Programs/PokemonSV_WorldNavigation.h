@@ -139,8 +139,8 @@ void walk_forward_until_dialog(
     ProControllerContext& context,
     NavigationMovementMode movement_mode,
     Milliseconds timeout = Milliseconds(10000),
-    uint8_t x = 128,
-    uint8_t y = 0
+    double x = 0,
+    double y = +1
 );
 
 // walk forward while using lets go to clear the path
@@ -153,7 +153,7 @@ void walk_forward_while_clear_front_path(
     VideoStream& stream,
     ProControllerContext& context,
     Milliseconds forward_duration,
-    uint8_t y = 0,
+    double y = +1,
     Milliseconds duration_between_lets_go = Milliseconds(1000),
     Milliseconds delay_after_lets_go = Milliseconds(2000)
 );
