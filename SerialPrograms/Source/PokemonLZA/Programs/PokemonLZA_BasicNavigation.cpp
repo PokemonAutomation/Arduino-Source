@@ -544,7 +544,7 @@ bool leave_zone_gate(ConsoleHandle& console, ProControllerContext& context){
 
 int run_towards_gate_with_A_button(
     ConsoleHandle& console, ProControllerContext& context,
-    uint8_t run_direction_x, uint8_t run_direction_y,
+    double run_direction_x, double run_direction_y,
     PokemonAutomation::Milliseconds run_time
 ){
     const ImageFloatBox button_A_box{0.3, 0.2, 0.4, 0.7};
@@ -555,7 +555,7 @@ int run_towards_gate_with_A_button(
         [&](ProControllerContext& context){
             // running back
             ssf_press_button(context, BUTTON_B, 0ms, run_time, 0ms);
-            pbf_move_left_joystick_old(context, run_direction_x, run_direction_y, run_time, 0ms);
+            pbf_move_left_joystick(context, {run_direction_x, run_direction_y}, run_time, 0ms);
         },
         {{buttonA, overworld_gone}}
     );
@@ -577,7 +577,7 @@ int run_towards_gate_with_A_button(
 
 int run_a_straight_path_in_overworld(
     ConsoleHandle& console, ProControllerContext& context,
-    uint8_t direction_x, uint8_t direction_y,
+    double direction_x, double direction_y,
     PokemonAutomation::Milliseconds duration
 ){
     OverworldPartySelectionOverWatcher overworld_gone(COLOR_WHITE, &console.overlay(), std::chrono::milliseconds(400));
@@ -585,7 +585,7 @@ int run_a_straight_path_in_overworld(
         console, context,
         [&](ProControllerContext& context){
             ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
-            pbf_move_left_joystick_old(context, direction_x, direction_y, duration, 0ms);
+            pbf_move_left_joystick(context, {direction_x, direction_y}, duration, 0ms);
         },
         {{overworld_gone}}
     );

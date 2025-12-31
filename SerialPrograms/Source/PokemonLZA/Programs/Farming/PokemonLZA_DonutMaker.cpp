@@ -355,10 +355,10 @@ void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProContr
     context.wait_for(100ms); // extra 0.1 sec to let game give player control
     env.log("Detected overworld. Fast traveled from Pokecenter to Hotel Zone");
 
-    ret = run_towards_gate_with_A_button(env.console, context, 128, 0, Seconds(5));
+    ret = run_towards_gate_with_A_button(env.console, context, 0, +1, Seconds(5));
     if (ret == 1){  // day night change happens during running
         // As day night change has ended, try running towards door again
-        if (run_towards_gate_with_A_button(env.console, context, 128, 0, Seconds(5)) != 0){
+        if (run_towards_gate_with_A_button(env.console, context, 0, +1, Seconds(5)) != 0){
             stats.errors++;
             env.update_stats();
             OperationFailedException::fire(

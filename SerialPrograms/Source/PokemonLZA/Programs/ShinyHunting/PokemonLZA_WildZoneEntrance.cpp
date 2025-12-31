@@ -172,23 +172,23 @@ void go_to_entrance(
     WildZone wildzone
 ){
     double starting_direction = 0;
-    uint8_t joystick_x = 128;
+    double joystick_x = 0;
     if (wildzone == WildZone::WILD_ZONE_1){
         // The fast travel point of Wild Zone 1 does not face the zone entrance directly. We need
         // to turn a little bit to the right
         starting_direction = get_facing_direction(env.console, context);
-        joystick_x = 145;
+        joystick_x = 0.133;
     }
-    int ret = run_towards_gate_with_A_button(env.console, context, joystick_x, 0, 10s);
+    int ret = run_towards_gate_with_A_button(env.console, context, joystick_x, +1, 10s);
     switch(ret){
     case 0: // detected button A. Reached gate
         break;
     case 1: // day/night change happened.
         if (wildzone == WildZone::WILD_ZONE_1 && 
             get_angle_between_facing_directions(starting_direction, get_facing_direction(env.console, context)) > 2.5){
-            joystick_x = 128; // we've already turned. Just need to go forward to enter the zone
+            joystick_x = 0; // we've already turned. Just need to go forward to enter the zone
         }
-        ret = run_towards_gate_with_A_button(env.console, context, joystick_x, 0, 10s);
+        ret = run_towards_gate_with_A_button(env.console, context, joystick_x, +1, 10s);
         if (ret != 0){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
@@ -321,7 +321,7 @@ void leave_zone_and_reset_spawns(
     
     const double starting_direction = get_facing_direction(env.console, context);
 
-    int ret = run_towards_gate_with_A_button(env.console, context, 128, 255, walk_time_in_zone);
+    int ret = run_towards_gate_with_A_button(env.console, context, 0, -1, walk_time_in_zone);
     switch (ret){
     case 0: // Found button A. Reached the gate.
         break;
@@ -332,17 +332,17 @@ void leave_zone_and_reset_spawns(
             env.log("Facing direction difference after day/night change: " + tostr_fixed(direction_change, 0) + " deg, from "
                 + tostr_fixed(starting_direction, 0) + " to " + tostr_fixed(cur_direction, 0) + " deg");
             
-            uint8_t joystick_y = 0;
+            double joystick_y = +1;
             if (direction_change > 150.0){
                 // we are facing towards the gate
                 env.log("Running forward");
                 env.console.overlay().add_log("Running Forward");
-                joystick_y = 0;
+                joystick_y = +1;
             }else if(direction_change < 30.0){
                 // we are facing away from the gate
                 env.log("Running back");
                 env.console.overlay().add_log("Running Back");
-                joystick_y = 255;
+                joystick_y = -1;
             }else{
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
@@ -352,7 +352,7 @@ void leave_zone_and_reset_spawns(
             }
 
             // Running forward or backward depends on character facing to go back to zone entrance
-            ret = run_towards_gate_with_A_button(env.console, context, 128, joystick_y, walk_time_in_zone);
+            ret = run_towards_gate_with_A_button(env.console, context, 0, joystick_y, walk_time_in_zone);
             if (ret != 0){
                 stats.errors++;
                 env.update_stats();

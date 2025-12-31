@@ -165,15 +165,15 @@ void do_one_cafe_trip(
     env.console.overlay().add_log("Escaping to Entrance");
     const double starting_direction = get_facing_direction(env.console, context);
 
-    uint8_t move_x = 0, move_y = 0;
+    double move_x = -1, move_y = +1;
     switch(cafe){
     case WildZoneCafe::CAFE_BATAILLE:
         env.log("Move to zone gate from Cafe Bataille");
-        move_x = 255; move_y = 160;
+        move_x = +1; move_y = -0.25;
         break;
     case WildZoneCafe::CAFE_ULTIMO:
         env.log("Move to zone gate from Cafe Ultimo");
-        move_x = 128; move_y = 255;
+        move_x = 0; move_y = -1;
         break;
     }
 
@@ -190,7 +190,7 @@ void do_one_cafe_trip(
 
             if (direction_change > 30){
                 // we are already facing the gate
-                move_x = 128; move_y = 0;
+                move_x = 0; move_y = +1;
                 env.log("Running forward");
                 env.console.overlay().add_log("Running Forward");
             }
