@@ -32,7 +32,7 @@ Trajectory get_trajectory_int(int delta_x, int delta_y){
 
     if (delta_x < 0){
         Trajectory entry = get_trajectory_int(-delta_x, delta_y);
-        entry.joystick_x = (uint8_t)(256 - entry.joystick_x);
+        entry.joystick_fx = -entry.joystick_fx;
         return entry;
     }
 
@@ -53,43 +53,22 @@ Trajectory get_trajectory_float(double delta_x, double delta_y){
     Trajectory corner10 = get_trajectory_int(int_x, int_y + 1);
     Trajectory corner00 = get_trajectory_int(int_x + 1, int_y + 1);
 
-    double top_x = corner11.joystick_x * (1.0 - frac_x) + corner01.joystick_x * frac_x;
-    double bot_x = corner10.joystick_x * (1.0 - frac_x) + corner00.joystick_x * frac_x;
+    double top_x = corner11.joystick_fx * (1.0 - frac_x) + corner01.joystick_fx * frac_x;
+    double bot_x = corner10.joystick_fx * (1.0 - frac_x) + corner00.joystick_fx * frac_x;
     double x = top_x * (1.0 - frac_y) + bot_x * frac_y;
 //    cout << "top_x = " << top_x << endl;
 //    cout << "bot_x = " << bot_x << endl;
 //    cout << "x = " << x << endl;
 
-    double top_y = corner11.joystick_y * (1.0 - frac_y) + corner10.joystick_y * frac_y;
-    double bot_y = corner01.joystick_y * (1.0 - frac_y) + corner00.joystick_y * frac_y;
+    double top_y = corner11.joystick_fy * (1.0 - frac_y) + corner10.joystick_fy * frac_y;
+    double bot_y = corner01.joystick_fy * (1.0 - frac_y) + corner00.joystick_fy * frac_y;
     double y = top_y * (1.0 - frac_x) + bot_y * frac_x;
 
-    double top_d = corner11.distance_in_ticks * (1.0 - frac_x) + corner01.distance_in_ticks * frac_x;
-    double bot_d = corner10.distance_in_ticks * (1.0 - frac_x) + corner00.distance_in_ticks * frac_x;
+    double top_d = corner11.distance_in_millis.count() * (1.0 - frac_x) + corner01.distance_in_millis.count() * frac_x;
+    double bot_d = corner10.distance_in_millis.count() * (1.0 - frac_x) + corner00.distance_in_millis.count() * frac_x;
     double d = top_d * (1.0 - frac_y) + bot_d * frac_y;
 
-    x -= 128;
-    y -= 128;
-    double scale = std::max(std::abs(x), std::abs(y));
-    if (scale == 0){
-        x = 128;
-        y = 128;
-    }else{
-        scale = 128 / scale;
-        x *= scale;
-        y *= scale;
-    }
-    x += 128;
-    y += 128;
-
-    d = std::max(d, 0.0);
-    d = std::min(d, 65535.);
-    x = std::max(x, 0.0);
-    y = std::max(y, 0.0);
-    x = std::min(x, 255.);
-    y = std::min(y, 255.);
-
-    return Trajectory{(uint16_t)d, (uint8_t)x, (uint8_t)y};
+    return Trajectory{nullptr, Milliseconds((int64_t)d), x, y};
 }
 
 

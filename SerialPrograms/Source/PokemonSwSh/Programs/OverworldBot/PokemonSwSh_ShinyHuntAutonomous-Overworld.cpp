@@ -5,7 +5,6 @@
  */
 
 #include <cmath>
-#include "Controllers/JoystickTools.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -299,18 +298,15 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
     );
 
     const Trajectory& trajectory = target.second.trajectory;
-    double stick_x = JoystickTools::linear_u8_to_float(trajectory.joystick_x);
-    double stick_y = -JoystickTools::linear_u8_to_float(trajectory.joystick_y);
-    double angle = std::atan2(
-        (double)trajectory.joystick_y - 128,
-        (double)trajectory.joystick_x - 128
-    ) * 57.295779513082320877;
+    double stick_x = trajectory.joystick_fx;
+    double stick_y = trajectory.joystick_fy;
+    double angle = std::atan2(stick_y, stick_x) * 57.295779513082320877;
     stream.log(
-        "Trajectory: Distance = " + std::to_string(trajectory.distance_in_ticks) +
-        ", Direction = " + tostr_default(-angle) + " degrees"
+        "Trajectory: Distance = " + std::to_string(trajectory.distance_in_millis.count()) +
+        "ms, Direction = " + tostr_default(angle) + " degrees"
     );
 
-    Milliseconds duration = (trajectory.distance_in_ticks + 16) * 8ms;
+    Milliseconds duration = trajectory.distance_in_millis + 128ms;
     duration = std::min<Milliseconds>(duration, MAX_MOVE_DURATION0);
 
 
@@ -336,12 +332,12 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
 
             //  Circle Maneuver
             if (TARGET_CIRCLING){
-                if (trajectory.joystick_y < 64 &&
-                    64 <= trajectory.joystick_x && trajectory.joystick_x <= 192
+                if (trajectory.joystick_fy > 0.5 &&
+                    -0.5 <= trajectory.joystick_fx && trajectory.joystick_fx <= 0.5
                 ){
-                    move_in_circle_up(context, trajectory.joystick_x > 128);
+                    move_in_circle_up(context, trajectory.joystick_fx > 0);
                 }else{
-                    move_in_circle_down(context, trajectory.joystick_x <= 128);
+                    move_in_circle_down(context, trajectory.joystick_fx <= 0);
                 }
             }
         },

@@ -108,7 +108,7 @@ void OverworldTargetTracker::populate_targets(
             }
             overlap += (max_x - min_x) * (max_y - min_y);
         }
-        double score = targets[c].trajectory.distance_in_ticks / overlap;
+        double score = targets[c].trajectory.distance_in_millis.count() / (overlap * 8);
         scored_targets.emplace(score, targets[c]);
 //        cout << "    " << score << " = "
 //             << (int)targets[c].trajectory.joystick_x << ", "
