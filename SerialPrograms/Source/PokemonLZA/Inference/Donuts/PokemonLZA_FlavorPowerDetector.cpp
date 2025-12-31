@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -20,6 +21,7 @@
 // #include "CommonTools/ImageMatch/ImageMatchResult.h"
 // #include "CommonTools/ImageMatch/CroppedImageDictionaryMatcher.h"
 
+#include <format>
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -137,18 +139,20 @@ int FlavorPowerIconDetector::detect(const ImageViewRGB32& screen){
 FlavorPowerDetector::FlavorPowerDetector(Logger& logger, Color color, Language language, int position)
     : m_logger(logger), m_color(color), m_language(language)
     , m_position(position), m_ocr_box(0.131, 0.759 + 0.045*position, 0.260, 0.043)
+    , m_icon_detector(logger, position)
 {}
 
 void FlavorPowerDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_ocr_box);
+    m_icon_detector.make_overlays(items);
 }
 
 bool FlavorPowerDetector::detect(const ImageViewRGB32& screen){
     return !detect_power(screen).empty();
 }
 
-std::string FlavorPowerDetector::detect_power(const ImageViewRGB32& screen) const{
-    std::multimap<double, OCR::StringMatchData> results;
+std::string FlavorPowerDetector::detect_power(const ImageViewRGB32& screen){
+    std::multimap<double, std::string> results;
     /*
     ImageRGB32 quest_label = to_blackwhite_rgb32_range(
         extract_box_reference(screen, m_ocr_box),
@@ -166,7 +170,13 @@ std::string FlavorPowerDetector::detect_power(const ImageViewRGB32& screen) cons
     ocr_result.clear_beyond_spread(FlavorPowerReader::MAX_LOG10P_SPREAD);
     if (!ocr_result.results.empty()){
         for (const auto& result : ocr_result.results){
-            results.emplace(result.first, result.second);
+            if (result.second.token.size() <= 1){
+                throw InternalProgramError(
+                    &m_logger, PA_CURRENT_FUNCTION,
+                    "FlavorPowerDetector::detect_power(): OCR match result has near empty output. Got " + result.second.original_text
+                );
+            }
+            results.emplace(result.first, result.second.token);
         }
             
     }
@@ -174,17 +184,73 @@ std::string FlavorPowerDetector::detect_power(const ImageViewRGB32& screen) cons
     if (results.empty()){
         return "";
     }
+    else if (results.size() == 1){
+        return results.begin()->second;
+    }
 
-    if (results.size() > 1){
+    // More than one match result. Use Flavor Power Icon detector to disambiguate
+
+    // Check if all results are the same except for the last character
+    std::string base_string;
+    bool all_same_except_last = true;
+
+    for (const auto& result : results){
+        const std::string& slug = result.second;
+        // Get the base string (all except last character)
+        std::string current_base = slug.substr(0, slug.length() - 1);
+
+        if (base_string.empty()){
+            base_string = current_base;
+        } else if (base_string != current_base){
+            all_same_except_last = false;
+            break;
+        }
+    }
+
+    auto get_all_results = [&]() -> std::string{
+        std::string ret = "";
+        for (const auto& result : results){
+            ret += std::format("({}: {}), ", result.first, result.second);
+        }
+        return ret.substr(0, ret.size() - 2); // -2 to remove the last ", "
+    };
+
+    if (!all_same_except_last){
         throw_and_log<OperationFailedException>(
             m_logger, ErrorReport::SEND_ERROR_REPORT,
-            "FlavorPowerDetector::detect_power(): Unable to read selected item. Ambiguous or multiple results.\n" + language_warning(m_language)
+            "FlavorPowerDetector::detect_power(): Unable to read selected item. "
+            "Ambiguous or multiple results: " + get_all_results() + "\n" + 
+            language_warning(m_language)
         );
     }
 
-    return results.begin()->second.token;
+    // All results differ only in last character, use icon detector to disambiguate
+    const int detected_power_level = m_icon_detector.detect(screen);
+    if (detected_power_level <= 0){
+        throw_and_log<OperationFailedException>(
+            m_logger, ErrorReport::SEND_ERROR_REPORT,
+            "FlavorPowerDetector::detect_power(): Unable to detect power level icon "
+            "despite getting OCR text: " + get_all_results() + ".\n" +
+            language_warning(m_language)
+        );
+    }
+    // Convert power level (1, 2, 3) to character ('1', '2', '3')
+    char expected_last_char = '0' + detected_power_level;
+    // Find the result with matching last character
+    for (const auto& result : results){
+        const std::string& slug = result.second;
+        if (!slug.empty() && slug.back() == expected_last_char){
+            return slug;
+        }
+    }
+    throw_and_log<OperationFailedException>(
+        m_logger, ErrorReport::SEND_ERROR_REPORT,
+        "FlavorPowerDetector::detect_power(): Detected power level icon is "
+        + std::to_string(detected_power_level)
+        + " while getting mismatched power OCR: " + get_all_results() + 
+        ".\n" + language_warning(m_language)
+    );
 }
-
 
 
 FlavorPowerWatcher::~FlavorPowerWatcher() = default;

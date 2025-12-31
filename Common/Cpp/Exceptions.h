@@ -121,6 +121,7 @@ private:
 //  These are thrown for logic errors. They are always bugs.
 class InternalProgramError : public Exception{
 public:
+    // location: use `PA_CURRENT_FUNCTION`
     InternalProgramError(Logger* logger, const char* location, std::string message);
     virtual const char* name() const override{ return "InternalProgramError"; }
     virtual std::string message() const override;

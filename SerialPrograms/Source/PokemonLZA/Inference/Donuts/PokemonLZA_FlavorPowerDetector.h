@@ -52,7 +52,7 @@ public:
 
     // Return detected power string. Return empty string if not detected.
     // Return empty string if no power text found.
-    std::string detect_power(const ImageViewRGB32& screen) const;
+    std::string detect_power(const ImageViewRGB32& screen);
 
 protected:
     Logger& m_logger;
@@ -60,6 +60,8 @@ protected:
     Language m_language;
     int m_position;
     ImageFloatBox m_ocr_box;
+
+    FlavorPowerIconDetector m_icon_detector;
 };
 
 // Detect the quest in a given position
