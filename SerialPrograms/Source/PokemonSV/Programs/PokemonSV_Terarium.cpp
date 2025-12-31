@@ -116,7 +116,7 @@ void return_to_plaza(const ProgramInfo& info, VideoStream& stream, ProController
 void map_move_cursor_fly(
     const ProgramInfo& info,
     VideoStream& stream, ProControllerContext& context,
-    uint8_t x, uint8_t y,
+    double x, double y,
     Milliseconds hold, Milliseconds release,
     std::string location
 ){
@@ -125,7 +125,7 @@ void map_move_cursor_fly(
     for (int i = 0; i < 3; i++){
         try{
             open_map_from_overworld(info, stream, context);
-            pbf_move_left_joystick_old(context, x, y, hold, release);
+            pbf_move_left_joystick(context, {x, y}, hold, release);
             pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
             fly_to_overworld_from_map(info, stream, context);
             break;
@@ -145,39 +145,39 @@ void map_move_cursor_fly(
 }
 
 void central_to_polar_rest(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-    map_move_cursor_fly(info, stream, context, 75, 0, 1840ms, 160ms, "Polar Rest Area");
+    map_move_cursor_fly(info, stream, context, -0.414, +1, 1840ms, 160ms, "Polar Rest Area");
 }
 
 void central_to_polar_class1(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-    map_move_cursor_fly(info, stream, context, 0, 20, 1200ms, 160ms, "Polar Classroom 1");
+    map_move_cursor_fly(info, stream, context, -1, +0.844, 1200ms, 160ms, "Polar Classroom 1");
 }
 
 void central_to_polar_plaza(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-    map_move_cursor_fly(info, stream, context, 20, 25, 1960ms, 160ms, "Polar Plaza");
+    map_move_cursor_fly(info, stream, context, -0.844, +0.805, 1960ms, 160ms, "Polar Plaza");
 }
 
 void central_to_coastal_plaza(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-    map_move_cursor_fly(info, stream, context, 180, 0, 1680ms, 160ms, "Coastal Plaza");
+    map_move_cursor_fly(info, stream, context, +0.409, +1, 1680ms, 160ms, "Coastal Plaza");
 }
 
 void central_to_canyon_plaza(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-    map_move_cursor_fly(info, stream, context, 0, 255, 1720ms, 160ms, "Canyon Plaza");
+    map_move_cursor_fly(info, stream, context, -1, -1, 1720ms, 160ms, "Canyon Plaza");
 }
 
 void central_to_savanna_plaza(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-    map_move_cursor_fly(info, stream, context, 165, 255, 1440ms, 160ms, "Savanna Plaza");
+    map_move_cursor_fly(info, stream, context, +0.291, -1, 1440ms, 160ms, "Savanna Plaza");
 }
 
 void central_to_canyon_rest(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-    map_move_cursor_fly(info, stream, context, 0, 140, 1280ms, 160ms, "Canyon Rest Area");
+    map_move_cursor_fly(info, stream, context, -1, -0.094, 1280ms, 160ms, "Canyon Rest Area");
 }
 
 void central_to_savanna_class(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-    map_move_cursor_fly(info, stream, context, 255, 220, 1120ms, 160ms, "Savanna Classroom");
+    map_move_cursor_fly(info, stream, context, +1, -0.724, 1120ms, 160ms, "Savanna Classroom");
 }
 
 void central_to_chargestone(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-    map_move_cursor_fly(info, stream, context, 0, 135, 1040ms, 160ms, "Chargestone Cavern");
+    map_move_cursor_fly(info, stream, context, -1, -0.055, 1040ms, 160ms, "Chargestone Cavern");
 }
 
 void jump_glide_fly(
