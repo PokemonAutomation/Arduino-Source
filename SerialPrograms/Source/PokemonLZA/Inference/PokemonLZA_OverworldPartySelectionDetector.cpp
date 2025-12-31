@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Exceptions/FatalProgramException.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -83,6 +84,9 @@ void OverworldPartySelectionDetector::make_overlays(VideoOverlaySet& items) cons
 bool OverworldPartySelectionDetector::detect(const ImageViewRGB32& screen){
     m_detected_up_idx = INVALID_PARTY_IDX, m_detected_down_idx = INVALID_PARTY_IDX;
     for(uint8_t i = 0; i < 6; i++){
+        if (i == PreloadSettings::debug().BOX_SYSTEM_CELL_COL){
+            PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING = true;
+        }
         if (m_debug_mode || m_detected_up_idx == INVALID_PARTY_IDX){
             if (m_dpad_ups[i].detect(screen) || m_dpad_up_interiors[i].detect(screen)){
                 if (m_debug_mode && m_dpad_up_interiors[i].detect(screen)){
@@ -110,6 +114,9 @@ bool OverworldPartySelectionDetector::detect(const ImageViewRGB32& screen){
                 }
                 m_detected_down_idx = i;
             }
+        }
+        if (i == PreloadSettings::debug().BOX_SYSTEM_CELL_COL){
+            PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING = false;
         }
     }
 

@@ -77,12 +77,12 @@ public:
     }
     static const ButtonMatcher& DpadUpInterior(){
         const bool match_black_interior = true;
-        static ButtonMatcher matcher(ButtonType::ButtonDpadUpInterior, 10, 10, 80, match_black_interior);
+        static ButtonMatcher matcher(ButtonType::ButtonDpadUpInterior, 10, 10, 120, match_black_interior);
         return matcher;
     }
     static const ButtonMatcher& DpadDownInterior(){
         const bool match_black_interior = true;
-        static ButtonMatcher matcher(ButtonType::ButtonDpadDownInterior, 10, 10, 80, match_black_interior);
+        static ButtonMatcher matcher(ButtonType::ButtonDpadDownInterior, 10, 10, 120, match_black_interior);
         return matcher;
     }
 
@@ -218,9 +218,10 @@ bool ButtonDetector::detect(const ImageViewRGB32& screen){
     const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = [&]() -> std::vector<std::pair<uint32_t, uint32_t>>{
         if (match_button_black_interior(m_button_type)){
             return {
-                {0xff000000, 0xff202020},
                 {0xff000000, 0xff404040},
+                {0xff000000, 0xff505050},
                 {0xff000000, 0xff606060},
+                {0xff000000, 0xff707070},
             };
         }
         return {
