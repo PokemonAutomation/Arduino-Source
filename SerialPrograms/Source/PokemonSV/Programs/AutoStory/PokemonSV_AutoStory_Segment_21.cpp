@@ -118,8 +118,8 @@ void checkpoint_48(
         DirectionDetector direction;
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 400ms});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 400ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, -1, 400ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, +1, 400ms});
         }
 
         direction.change_direction(env.program_info(), env.console, context, 2.06);
@@ -305,8 +305,8 @@ void checkpoint_49(
         // marker 1
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 128, 240ms},
-            {ZoomChange::ZOOM_IN, 0, 90, 720ms}
+            {ZoomChange::KEEP_ZOOM, +1, 0, 240ms},
+            {ZoomChange::ZOOM_IN, -1, +0.297, 720ms}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -323,8 +323,8 @@ void checkpoint_49(
         // marker 2
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 128, 0, 240ms},
-            {ZoomChange::ZOOM_IN, 128, 255, 240ms}
+            {ZoomChange::KEEP_ZOOM, 0, +1, 240ms},
+            {ZoomChange::ZOOM_IN, 0, -1, 240ms}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -341,8 +341,8 @@ void checkpoint_49(
         // marker 3
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 180, 400ms},
-            {ZoomChange::ZOOM_IN, 0, 70, 1400ms}
+            {ZoomChange::KEEP_ZOOM, +1, -0.409, 400ms},
+            {ZoomChange::ZOOM_IN, -1, +0.453, 1400ms}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -359,8 +359,8 @@ void checkpoint_49(
         // marker 4
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 180, 400ms},
-            {ZoomChange::ZOOM_IN, 0, 50, 1480ms}
+            {ZoomChange::KEEP_ZOOM, +1, -0.409, 400ms},
+            {ZoomChange::ZOOM_IN, -1, +0.609, 1480ms}
         );  
         // walk until you run into the wall
         overworld_navigation(env.program_info(), env.console, context, 
@@ -371,8 +371,8 @@ void checkpoint_49(
         // marker 5. put marker on other side of bridge
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 128, 128, 0ms},
-            {ZoomChange::ZOOM_IN, 128, 0, 80ms}
+            {ZoomChange::ZOOM_IN, 0, 0, 0ms},
+            {ZoomChange::ZOOM_IN, 0, +1, 80ms}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){

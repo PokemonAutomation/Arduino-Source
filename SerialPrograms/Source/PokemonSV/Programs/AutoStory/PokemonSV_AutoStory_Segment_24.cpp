@@ -104,8 +104,8 @@ void checkpoint_55(
             DirectionDetector direction;
             if (attempt_number > 0 || ENABLE_TEST){
                 env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-                move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 400ms});
-                move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 100, 1040ms}, FlyPoint::FAST_TRAVEL);
+                move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, +1, 0, 400ms});
+                move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, -1, +0.219, 1040ms}, FlyPoint::FAST_TRAVEL);
             }
 
             direction.change_direction(env.program_info(), env.console, context, 3.909067);
@@ -239,11 +239,11 @@ void checkpoint_56(
     [&](size_t attempt_number){
         // fly back to East Province (Area Three) Watchtower. from Orthworm
         // this clears Pokemon in minimap
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, FlyPoint::FAST_TRAVEL);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, -1, +1, 0ms}, FlyPoint::FAST_TRAVEL);
 
         // marker 1
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
+            {ZoomChange::KEEP_ZOOM, -1, +1, 0ms}, 
             FlyPoint::POKECENTER, 
             {0.769792, 0.725926}
         );
@@ -261,7 +261,7 @@ void checkpoint_56(
 
         // marker 2
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, 
+            {ZoomChange::KEEP_ZOOM, -1, +1, 0ms}, 
             FlyPoint::POKECENTER, 
             {0.280208, 0.447222}
         );
@@ -279,7 +279,7 @@ void checkpoint_56(
 
         // marker 3
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 0, 128, 480ms},
+            {ZoomChange::ZOOM_IN, -1, 0, 480ms},
             FlyPoint::POKECENTER, 
             {0.354167, 0.375}
         );
@@ -297,7 +297,7 @@ void checkpoint_56(
 
         // marker 4
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 0, 128, 400ms},
+            {ZoomChange::ZOOM_IN, -1, 0, 400ms},
             FlyPoint::POKECENTER, 
             {0.497917, 0.274074}
         );
@@ -316,8 +316,8 @@ void checkpoint_56(
         // marker 5. set marker to pokecenter
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
-            {ZoomChange::ZOOM_IN, 0, 0, 0ms},
-            {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}
+            {ZoomChange::ZOOM_IN, -1, +1, 0ms},
+            {ZoomChange::KEEP_ZOOM, -1, +1, 0ms}
         );  
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
