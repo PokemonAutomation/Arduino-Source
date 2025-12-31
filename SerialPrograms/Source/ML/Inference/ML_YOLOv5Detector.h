@@ -23,9 +23,7 @@ namespace ML{
 
 class YOLOv5Detector : public StaticScreenDetector{
 public:
-    // - model_path: path to the onnx model file. The label name file should be the same
-    //   file path and basename and with _label.txt suffix.
-    //   e.g. .../yolo.onnx, .../yolo_label.txt
+    // - model_path: path to the onnx model file.
     // If model loading fails, InternalProgramError exception is thrown
     YOLOv5Detector(const std::string& model_path);
     virtual ~YOLOv5Detector();

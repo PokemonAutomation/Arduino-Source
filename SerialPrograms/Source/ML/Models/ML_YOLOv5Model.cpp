@@ -132,9 +132,8 @@ std::tuple<int, int, double, double> resize_image_with_border(
 }
 
 
-YOLOv5Session::YOLOv5Session(const std::string& model_path, std::vector<std::string> label_names, bool use_gpu)
-: m_label_names(std::move(label_names))
-, m_env{create_ORT_env()}
+YOLOv5Session::YOLOv5Session(const std::string& model_path, bool use_gpu)
+: m_env{create_ORT_env()}
 , m_session_options(create_session_options(ML_MODEL_CACHE_PATH() + "YOLOv5", use_gpu))
 , m_session{create_session(m_env, m_session_options, model_path, ML_MODEL_CACHE_PATH() + "YOLOv5")}
 , m_memory_info{Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)}
@@ -142,36 +141,34 @@ YOLOv5Session::YOLOv5Session(const std::string& model_path, std::vector<std::str
 , m_output_names{m_session.GetOutputNames()}
 , m_model_input(3*YOLO5_INPUT_IMAGE_SIZE*YOLO5_INPUT_IMAGE_SIZE)
 {
-    // If no label names were provided, try to extract them from model metadata
-    if (m_label_names.empty()){
-        try {
-            Ort::ModelMetadata metadata = m_session.GetModelMetadata();
-            Ort::AllocatorWithDefaultOptions allocator;
+    // Extract YOLO labels from model metadata
+    try {
+        Ort::ModelMetadata metadata = m_session.GetModelMetadata();
+        Ort::AllocatorWithDefaultOptions allocator;
 
-            // Look for "names" key in custom metadata
-            Ort::AllocatedStringPtr names_value = metadata.LookupCustomMetadataMapAllocated("names", allocator);
+        // Look for "names" key in custom metadata
+        Ort::AllocatedStringPtr names_value = metadata.LookupCustomMetadataMapAllocated("names", allocator);
 
-            if (names_value){
-                std::string names_str(names_value.get());
-                global_logger_tagged().log("YOLOv5: Found label metadata: " + names_str, COLOR_PURPLE);
+        if (names_value){
+            std::string names_str(names_value.get());
+            global_logger_tagged().log("YOLOv5: Found label metadata: " + names_str, COLOR_PURPLE);
 
-                m_label_names = parse_yolo_metadata_names(names_str);
+            m_label_names = parse_yolo_metadata_names(names_str);
 
-                if (!m_label_names.empty()){
-                    global_logger_tagged().log("YOLOv5: Extracted " + std::to_string(m_label_names.size()) +
-                                             " labels from model metadata", COLOR_GREEN);
-                }
-            } else {
-                global_logger_tagged().log("YOLOv5: No 'names' metadata found in model", COLOR_ORANGE);
+            if (!m_label_names.empty()){
+                global_logger_tagged().log("YOLOv5: Extracted " + std::to_string(m_label_names.size()) +
+                                            " labels from model metadata", COLOR_GREEN);
             }
-        } catch (const std::exception& e){
-            global_logger_tagged().log("YOLOv5: Failed to extract labels from metadata: " + std::string(e.what()), COLOR_RED);
-            // Continue without metadata labels - the validation below will catch if we still need them
+        } else {
+            throw std::runtime_error("YOLOv5 model does not have 'names' metadata to extract labels from");
         }
+    } catch (const std::exception& e){
+        throw std::runtime_error("YOLOv5: Failed to extract labels from metadata: " + std::string(e.what()));
     }
 
     if (m_session.GetOutputCount() != 1){
-        throw std::runtime_error("YOLOv5 model does not have the correct output count, found count " + std::to_string(m_session.GetOutputCount()));
+        throw std::runtime_error("YOLOv5 model does not have the correct output count, found count " + 
+            std::to_string(m_session.GetOutputCount()));
     }
 
     std::vector<int64_t> output_dims = m_session.GetOutputTypeInfo(0).GetTensorTypeAndShapeInfo().GetShape();

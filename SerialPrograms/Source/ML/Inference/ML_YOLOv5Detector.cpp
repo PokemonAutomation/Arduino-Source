@@ -40,30 +40,7 @@ YOLOv5Detector::YOLOv5Detector(const std::string& model_path)
     }
 
     std::string label_file_path = model_path.substr(0, model_path.size() - 5) + "_label.txt";
-    std::vector<std::string> labels;
-    if (std::filesystem::exists(label_file_path)){
-        std::ifstream label_file(label_file_path);
-        if (!label_file.is_open()){
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, 
-                "Error: YOLOv5 label file " + label_file_path + " cannot be opened.");
-
-            // std::cerr << "Error: failed to open YOLOv5 label file " << label_file_path << "." << std::endl;
-            // QMessageBox box;
-            // box.critical(nullptr, "Cannot Open YOLOv5 Label File",
-            //     QString::fromStdString("YOLOv5 label file " + label_file_path + " cannot be opened."));
-            // return;
-        }
-        std::string line;
-        while (std::getline(label_file, line)){
-            line = StringTools::strip(line);
-            if (line.empty() || line[0] == '#'){
-                continue;
-            }
-            labels.push_back(line);
-        }
-        label_file.close();
-    }
-    m_yolo_session = std::make_unique<YOLOv5Session>(m_model_path, std::move(labels), m_use_gpu);
+    m_yolo_session = std::make_unique<YOLOv5Session>(m_model_path, m_use_gpu);
 }
 
 bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
@@ -89,7 +66,7 @@ bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
                 std::cerr << "Warning: YOLO session failed using the GPU. Will reattempt with the CPU.\n" << e.what() << std::endl;
                 m_use_gpu = false;
                 std::vector<std::string> labels = m_yolo_session->get_label_names();
-                m_yolo_session = std::make_unique<YOLOv5Session>(m_model_path, std::move(labels), m_use_gpu);
+                m_yolo_session = std::make_unique<YOLOv5Session>(m_model_path, m_use_gpu);
             }else{
                 throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Error: YOLO session failed even when using the CPU." + std::string(e.what()));
             }

@@ -28,7 +28,7 @@ public:
         size_t label_idx;
     };
 
-    YOLOv5Session(const std::string& model_path, std::vector<std::string> label_names, bool use_gpu);
+    YOLOv5Session(const std::string& model_path, bool use_gpu);
 
     void run(const cv::Mat& input_image, std::vector<DetectionBox>& detections);
 
