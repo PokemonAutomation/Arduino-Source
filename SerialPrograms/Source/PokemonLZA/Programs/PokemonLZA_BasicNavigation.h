@@ -127,7 +127,7 @@ bool leave_zone_gate(ConsoleHandle& console, ProControllerContext& context);
 //   or get stuck by terrain or obstacle on the way
 int run_towards_gate_with_A_button(
     ConsoleHandle& console, ProControllerContext& context,
-    uint8_t run_direction_x, uint8_t run_direction_y,
+    double run_direction_x, double run_direction_y,
     Milliseconds run_time
 );
 
@@ -138,7 +138,7 @@ int run_towards_gate_with_A_button(
 // - -1 it ran for full *duration* without a day/night change
 int run_a_straight_path_in_overworld(
     ConsoleHandle& console, ProControllerContext& context,
-    uint8_t direction_x, uint8_t direction_y,
+    double direction_x, double direction_y,
     PokemonAutomation::Milliseconds duration
 );
 
