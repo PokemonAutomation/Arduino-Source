@@ -29,14 +29,13 @@ namespace NintendoSwitch{
 namespace PokemonLZA{
 
 
+// OCR flavor power texts
 class DonutPowerReader : public OCR::SmallDictionaryMatcher{
 public:
     static constexpr double MAX_LOG10P = -1.40;
     static constexpr double MAX_LOG10P_SPREAD = 0.50;
 
 public:
-    DonutPowerReader();
-
     static DonutPowerReader& instance();
 
     OCR::StringMatchResult read_substring(
@@ -47,6 +46,8 @@ public:
         double min_text_ratio = 0.01, double max_text_ratio = 0.50
     ) const;
 
+private:
+    DonutPowerReader();
 };
 
 
@@ -73,10 +74,22 @@ OCR::StringMatchResult DonutPowerReader::read_substring(
 }
 
 
+class DonutPowerSpriteDetector {
+public:
+    DonutPowerSpriteDetector(int position);
+
+private:
+    ImageFloatBox m_empty_space_after_number;
+};
+
+DonutPowerSpriteDetector::DonutPowerSpriteDetector(int position)
+    : m_empty_space_after_number(0.113, 0.775 + 0.045*position, 0.005, 0.013){}
+
+
 
 DonutPowerDetector::DonutPowerDetector(Logger& logger, Color color, Language language, int position)
     : m_logger(logger), m_color(color), m_language(language)
-    , m_position(position), m_ocr_box(0.131, 0.759 + 45*position, 0.260, 0.043)
+    , m_position(position), m_ocr_box(0.131, 0.759 + 0.045*position, 0.260, 0.043)
 {}
 
 void DonutPowerDetector::make_overlays(VideoOverlaySet& items) const{
