@@ -397,7 +397,7 @@ void move_player_forward(
     bool use_lets_go = false,
     bool mash_A = false,
     Milliseconds forward_duration = Milliseconds(800), 
-    uint8_t y = 0, 
+    double y = +1, 
     Milliseconds delay_after_forward_move = Milliseconds(400), 
     Milliseconds delay_after_lets_go = Milliseconds(840)
 );
@@ -426,7 +426,7 @@ void move_forward_until_yolo_object_above_min_size(
     double min_width, double min_height,
     std::function<void()>&& recovery_action, 
     Milliseconds forward_duration = Milliseconds(800), 
-    uint8_t y = 0, 
+    double y = +1, 
     Milliseconds delay_after_forward_move = Milliseconds(400), 
     Milliseconds delay_after_lets_go = Milliseconds(840)
 );
@@ -443,8 +443,8 @@ void move_player_until_yolo_object_detected(
     std::function<void()>&& recovery_action, 
     uint16_t max_rounds, 
     Milliseconds forward_duration = Milliseconds(800),
-    uint8_t x = 128, 
-    uint8_t y = 0, 
+    double x = 0, 
+    double y = +1, 
     Milliseconds delay_after_forward_move = Milliseconds(400), 
     Milliseconds delay_after_lets_go = Milliseconds(840)
 );
@@ -461,7 +461,7 @@ void move_forward_until_yolo_object_not_detected(
     size_t times_not_seen_threshold,
     std::function<void()>&& recovery_action, 
     Milliseconds forward_duration = Milliseconds(800), 
-    uint8_t y = 0, 
+    double y = +1, 
     Milliseconds delay_after_forward_move = Milliseconds(400), 
     Milliseconds delay_after_lets_go = Milliseconds(840)
 );

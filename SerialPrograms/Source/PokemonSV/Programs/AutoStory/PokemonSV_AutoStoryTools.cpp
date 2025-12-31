@@ -1484,7 +1484,7 @@ void move_player_forward(
     bool use_lets_go,
     bool mash_A,
     Milliseconds forward_duration, 
-    uint8_t y, 
+    double y, 
     Milliseconds delay_after_forward_move, 
     Milliseconds delay_after_lets_go
 ){
@@ -1503,7 +1503,7 @@ void move_player_forward(
                     }
                 }else{
                     pbf_press_button(context, BUTTON_R, 160ms, delay_after_lets_go);
-                    pbf_move_left_joystick_old(context, 128, y, forward_duration, delay_after_forward_move);
+                    pbf_move_left_joystick(context, {0, y}, forward_duration, delay_after_forward_move);
                 }
             });
         }catch (UnexpectedBattleException&){
@@ -1561,7 +1561,7 @@ void move_forward_until_yolo_object_above_min_size(
     double min_width, double min_height,
     std::function<void()>&& recovery_action, 
     Milliseconds forward_duration, 
-    uint8_t y, 
+    double y, 
     Milliseconds delay_after_forward_move, 
     Milliseconds delay_after_lets_go
 ){
@@ -1602,7 +1602,7 @@ void move_forward_until_yolo_object_above_min_size(
                     return; // stop when the target is above a certain size. i.e. we are close enough to the target.
                 }
             
-                pbf_move_left_joystick_old(context, 128, y, forward_duration, 0ms);
+                pbf_move_left_joystick(context, {0, y}, forward_duration, 0ms);
                 // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
                 // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
             });
@@ -1641,8 +1641,8 @@ void move_player_until_yolo_object_detected(
     std::function<void()>&& recovery_action, 
     uint16_t max_rounds, 
     Milliseconds forward_duration, 
-    uint8_t x, 
-    uint8_t y, 
+    double x, 
+    double y, 
     Milliseconds delay_after_forward_move, 
     Milliseconds delay_after_lets_go
 ){
@@ -1665,7 +1665,7 @@ void move_player_until_yolo_object_detected(
 
                 
 
-                pbf_move_left_joystick_old(context, x, y, forward_duration, 0ms);
+                pbf_move_left_joystick(context, {x, y}, forward_duration, 0ms);
                 // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
                 // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
             });
@@ -1697,7 +1697,7 @@ void move_forward_until_yolo_object_not_detected(
     size_t times_not_seen_threshold,
     std::function<void()>&& recovery_action, 
     Milliseconds forward_duration, 
-    uint8_t y, 
+    double y, 
     Milliseconds delay_after_forward_move, 
     Milliseconds delay_after_lets_go
 ){
@@ -1720,7 +1720,7 @@ void move_forward_until_yolo_object_not_detected(
                 }
             }
             
-            pbf_move_left_joystick_old(context, 128, y, forward_duration, 0ms);
+            pbf_move_left_joystick(context, {0, y}, forward_duration, 0ms);
             // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
             // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
         });
