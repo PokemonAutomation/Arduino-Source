@@ -404,8 +404,8 @@ HandMoveData move_sandwich_hand_and_check_if_plates_empty(
     stream.log("Start moving sandwich hand: " + SANDWICH_HAND_TYPE_NAMES(hand_type)
         + " start box " + box_to_string(start_box) + " end box " + box_to_string(end_box));
 
-    uint8_t joystick_x = 128;
-    uint8_t joystick_y = 128;
+    double joystick_x = 0;
+    double joystick_y = 0;
 
     SandwichHandWatcher hand_watcher(hand_type, start_box);
 
@@ -520,7 +520,7 @@ HandMoveData move_sandwich_hand_and_check_if_plates_empty(
 
         // We assume for a screen distance of 4 (1/4 of the width), we can use max joystick push, 128.
         // So for distance of value 1.0, we multiply by 32 to get joystick push
-        double target_joystick_push = std::min(distance * 32, 128.0);
+        double target_joystick_push = std::min(distance * 0.25, 1.0);
 
         std::pair<double, double> push(real_dif.first * target_joystick_push / distance, real_dif.second * target_joystick_push / distance);
         // console.log("push force " + std::to_string(push.first) + ", " + std::to_string(push.second));
@@ -541,8 +541,8 @@ HandMoveData move_sandwich_hand_and_check_if_plates_empty(
             push.second += damped_push_offset.second;
         }
 
-        joystick_x = (uint8_t) std::max(std::min(int(push.first + 0.5) + 128, 255), 0);
-        joystick_y = (uint8_t) std::max(std::min(int(push.second + 0.5) + 128, 255), 0);
+        joystick_x = std::max(std::min(push.first, +1.0), -1.0);
+        joystick_y = -std::max(std::min(push.second, +1.0), -1.0);
         // console.log("joystick push " + std::to_string(joystick_x) + ", " + std::to_string(joystick_y));
 
         // Dispatch a new series of commands that overwrites the last ones
@@ -552,7 +552,7 @@ HandMoveData move_sandwich_hand_and_check_if_plates_empty(
 //                pbf_controller_state(context, BUTTON_A, DPAD_NONE, joystick_x, joystick_y, 128, 128, 20);
                 ssf_press_button(context, BUTTON_A, 0ms, 8000ms, 0ms);
             }
-            pbf_move_left_joystick_old(context, joystick_x, joystick_y, 160ms, 0ms);
+            pbf_move_left_joystick(context, {joystick_x, joystick_y}, 160ms, 0ms);
         });
         
         stream.log("Moved joystick");

@@ -257,10 +257,10 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
     assert_16_9_720p_min(env.logger(), env.console);
     WildItemFarmer_Descriptor::Stats& stats = env.current_stats<WildItemFarmer_Descriptor::Stats>();
 
-    const std::vector<std::pair<int, int>> MANUVERS{
-        {128, 0},
-        {96, 0},
-        {160, 0},
+    const std::vector<std::pair<double, double>> MANUVERS{
+        {0, +1},
+        {-0.25, +1},
+        {+0.25, +1},
     };
 
     uint16_t items_cloned = 0;
@@ -325,8 +325,8 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControl
 
             pbf_press_button(context, BUTTON_L, 160ms, 184ms);
             if (ENABLE_FORWARD_RUN){
-                const std::pair<int, int>& direction = MANUVERS[consecutive_throw_attempts];
-                pbf_move_left_joystick_old(context, (uint8_t)direction.first, (uint8_t)direction.second, 400ms, 0ms);
+                const std::pair<double, double>& direction = MANUVERS[consecutive_throw_attempts];
+                pbf_move_left_joystick(context, {direction.first, direction.second}, 400ms, 0ms);
             }
             pbf_mash_button(context, BUTTON_ZR, 2000ms);
             pbf_wait(context, 2800ms);

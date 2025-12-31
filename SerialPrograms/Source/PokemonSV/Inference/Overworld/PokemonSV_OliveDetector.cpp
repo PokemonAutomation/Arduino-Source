@@ -195,8 +195,8 @@ ImageFloatBox OliveDetector::align_to_olive(
 
         uint16_t push_duration_ticks = std::max(uint16_t((std::abs(diff_from_center) + 0.02) * scale_factor / (olive_y)), uint16_t(15));
         Milliseconds push_duration = push_duration_ticks * 8ms;
-        double push_magnitude = 128; // std::max(double(128 / (i + 1)), double(20)); // push less with each iteration/attempt
-        uint8_t push_x = uint8_t(std::max(std::min(int(128 + (push_direction * push_magnitude)), 255), 0));
+        double push_magnitude = 1; // std::max(double(128 / (i + 1)), double(20)); // push less with each iteration/attempt
+        double push_x = std::max(std::min(push_direction * push_magnitude, 1.0), -1.0);
         stream.log("scale_factor: " + std::to_string(scale_factor));
         stream.log("push x: " + std::to_string(push_x) + ", push duration: " +  std::to_string(push_duration.count()) + "ms");
         // pbf_wait(context, 800ms);
@@ -205,7 +205,7 @@ ImageFloatBox OliveDetector::align_to_olive(
             wait_ticks = 100;
         }
         Milliseconds wait_duration = wait_ticks * 8ms;
-        pbf_move_left_joystick_old(context, push_x, 128, push_duration, wait_duration);
+        pbf_move_left_joystick(context, {push_x, 0}, push_duration, wait_duration);
         prev_push_direction = push_direction;
         
 
