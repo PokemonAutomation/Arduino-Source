@@ -70,19 +70,7 @@ void ssf_press_left_joystick(
 ){
     context->issue_left_joystick(&context, delay, hold, cool, position);
 }
-void ssf_press_right_joystick_old(
-    ProControllerContext& context,
-    uint8_t x, uint8_t y,
-    Milliseconds delay, Milliseconds hold, Milliseconds cool
-){
-    context->issue_right_joystick(
-        &context, delay, hold, cool,
-        {
-            JoystickTools::linear_u8_to_float(x),
-            -JoystickTools::linear_u8_to_float(y)
-        }
-    );
-}
+
 void ssf_press_right_joystick(
     ProControllerContext& context,
     const JoystickPosition& position,

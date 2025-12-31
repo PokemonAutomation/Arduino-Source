@@ -48,7 +48,7 @@ static void fly_home(ProControllerContext& context, char from_overworld){
         ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
     }
     ssf_press_button(context, BUTTON_A, 3200ms, 160ms);
-    ssf_press_right_joystick_old(context, 160, 96, 160ms, 160ms);
+    ssf_press_right_joystick(context, {0.25, 0.25}, 160ms, 160ms);
     pbf_mash_button(context, BUTTON_A, 3840ms);
 }
 
