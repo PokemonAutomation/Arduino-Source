@@ -4,7 +4,6 @@
  *
  */
 
-#include "Controllers/JoystickTools.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"

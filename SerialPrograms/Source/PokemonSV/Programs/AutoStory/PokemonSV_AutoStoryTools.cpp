@@ -4,7 +4,6 @@
  *
  */
 
-#include "Controllers/JoystickTools.h"
 #include "Common/Cpp/PrettyPrint.h" 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/UnexpectedBattleException.h"
@@ -1792,7 +1791,7 @@ void move_camera_yolo(
             }
             case CameraAxis::Y:{
                 double object_y_pos = target_box.y + target_box.height/2;
-                diff =  target_line - object_y_pos;
+                diff =  object_y_pos - target_line;
                 break;
             }
             default:
@@ -1814,14 +1813,14 @@ void move_camera_yolo(
                 if (std::abs(diff) < 0.05){
                     duration_scale_factor /= 2;
                 }
-                push_magnitude_scale_factor = 60 / std::sqrt(std::abs(diff));
+                push_magnitude_scale_factor = 0.46875 / std::sqrt(std::abs(diff));
                 break;
             case CameraAxis::Y:
                 duration_scale_factor = 400 / std::sqrt(std::abs(diff));
                 if (std::abs(diff) < 0.1){
                     duration_scale_factor *= 0.5;
                 }
-                push_magnitude_scale_factor = 60 / std::sqrt(std::abs(diff));
+                push_magnitude_scale_factor = 0.46875 / std::sqrt(std::abs(diff));
                 break;
             
             default:
@@ -1833,20 +1832,19 @@ void move_camera_yolo(
                 64ms
             );
             int16_t push_direction = (diff > 0) ? -1 : 1;
-            double push_magnitude = std::max(double(std::abs(diff * push_magnitude_scale_factor)), double(15)); 
-            uint8_t axis_push_u8 = uint8_t(std::max(std::min(int(128 + (push_direction * push_magnitude)), 255), 0));
-            double axis_push_float = JoystickTools::linear_u8_to_float(axis_push_u8);
+            double push_magnitude = std::max(std::abs(diff * push_magnitude_scale_factor), 0.117); 
+            double axis_push = std::max(std::min(push_direction * push_magnitude, +1.0), -1.0);
 
             // env.console.log("object_x: {" + std::to_string(target_box.x) + ", " + std::to_string(target_box.y) + ", " + std::to_string(target_box.width) + ", " + std::to_string(target_box.height) + "}");
             // env.console.log("object_x_pos: " + std::to_string(object_x_pos));
-            env.console.log("axis push: " + std::to_string(axis_push_float) + ", push duration: " +  std::to_string(push_duration.count()) + " ms");
+            env.console.log("axis push: " + std::to_string(axis_push) + ", push duration: " +  std::to_string(push_duration.count()) + " ms");
             switch(axis){
             case CameraAxis::X:{
-                pbf_move_right_joystick(context, {axis_push_float, 0}, push_duration, 0ms);
+                pbf_move_right_joystick(context, {axis_push, 0}, push_duration, 0ms);
                 break;
             }
             case CameraAxis::Y:{
-                pbf_move_right_joystick(context, {0, axis_push_float}, push_duration, 0ms);
+                pbf_move_right_joystick(context, {0, axis_push}, push_duration, 0ms);
                 break;
             }
             default:
