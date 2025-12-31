@@ -233,7 +233,7 @@ void checkpoint_52(
         pbf_move_left_joystick(context, {0, -1}, 2400ms, 800ms);
         pbf_wait(context, 3000ms);
         // wait for dialog after leaving gym
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20000ms, 128, 255);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20000ms, 0, -1);
         
         WhiteTriangleWatcher white_triangle(COLOR_RED, ImageFloatBox(0.948773, 0.034156, 0.013874, 0.024668));
         // mash A until detect top right white triangle 1
