@@ -185,7 +185,7 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 20, 10, false);
+                0, +1, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -203,7 +203,7 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 20, 10, false);
+                0, +1, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
@@ -223,7 +223,7 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 20, 10, false);
+                0, +1, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -241,7 +241,7 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 30, 10, false);
+                0, +1, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -259,7 +259,7 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 20, 10, false);
+                0, +1, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -277,7 +277,7 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 20, 10, false);
+                0, +1, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
@@ -295,7 +295,7 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 40, 10, false);
+                0, +1, 40, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -313,7 +313,7 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 30, 30, false);
+                0, +1, 30, 30, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -334,7 +334,7 @@ void move_from_north_province_area_one_to_north_province_area_two(SingleSwitchPr
 
     overworld_navigation(env.program_info(), env.console, context, 
         NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
-        128, 0, 20, 20, false); 
+        0, +1, 20, 20, false); 
 
     fly_to_overlapping_flypoint(env.program_info(), env.console, context); 
 
@@ -357,7 +357,7 @@ void beat_team_star_fighting1(SingleSwitchProgramEnvironment& env, ProController
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 40, 20, false);
+                0, +1, 40, 20, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -376,7 +376,7 @@ void beat_team_star_fighting1(SingleSwitchProgramEnvironment& env, ProController
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 40, 20, false);
+                0, +1, 40, 20, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -600,7 +600,7 @@ void move_from_fighting_base_to_north_province_area_two(SingleSwitchProgramEnvir
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 20, 10, false);
+                0, +1, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -615,7 +615,7 @@ void move_from_fighting_base_to_north_province_area_two(SingleSwitchProgramEnvir
     });      
     overworld_navigation(env.program_info(), env.console, context, 
         NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
-        128, 15, 12, 12, false);           // can't wrap in handle_when_stationary_in_overworld(), since we expect to be stationary when walking into the pokecenter
+        0, +0.883, 12, 12, false);           // can't wrap in handle_when_stationary_in_overworld(), since we expect to be stationary when walking into the pokecenter
         
 
     fly_to_overlapping_flypoint(env.program_info(), env.console, context); 
@@ -643,7 +643,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 20, 10, false);
+                0, +1, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
@@ -661,7 +661,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 24, 8, false);
+                0, +1, 24, 8, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
@@ -679,7 +679,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 60, 10, false);
+                0, +1, 60, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
@@ -698,7 +698,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 30, 10, false);
+                0, +1, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
@@ -716,7 +716,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 20, 10, false);
+                0, +1, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
@@ -770,7 +770,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 20, 10, false);
+                0, +1, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
@@ -789,7 +789,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 30, 10, false);
+                0, +1, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
@@ -808,7 +808,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 40, 10, false);
+                0, +1, 40, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
@@ -823,7 +823,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
     });      
     overworld_navigation(env.program_info(), env.console, context, 
         NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
-        128, 15, 12, 12, false);           // can't wrap in handle_when_stationary_in_overworld(), since we expect to be stationary when walking into the pokecenter
+        0, +0.883, 12, 12, false);           // can't wrap in handle_when_stationary_in_overworld(), since we expect to be stationary when walking into the pokecenter
         
 
     fly_to_overlapping_flypoint(env.program_info(), env.console, context); 

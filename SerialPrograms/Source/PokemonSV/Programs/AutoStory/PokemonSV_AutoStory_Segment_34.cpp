@@ -97,7 +97,7 @@ void checkpoint_90(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 30, 30, false);
+                    0, +1, 30, 30, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
@@ -192,7 +192,7 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 
-                    128, 0, 60, 60, false);
+                    0, +1, 60, 60, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
@@ -231,7 +231,7 @@ void checkpoint_92(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, -0.488, 400ms);
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 
-            128, 0, 30, 30, false);
+            0, +1, 30, 30, false);
         
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW, CallbackEnum::PROMPT_DIALOG});

@@ -126,7 +126,7 @@ void checkpoint_33(
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -0.609, +1, 200ms);
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10, false);           
+            0, +1, 20, 10, false);           
 
         // section 2
         realign_player_from_landmark(
@@ -136,7 +136,7 @@ void checkpoint_33(
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10, false);        
+            0, +1, 20, 10, false);        
 
         // section 3
         realign_player_from_landmark(
@@ -146,7 +146,7 @@ void checkpoint_33(
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10, false); 
+            0, +1, 20, 10, false); 
 
         // section 4
         realign_player_from_landmark(
@@ -156,7 +156,7 @@ void checkpoint_33(
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10, false);        
+            0, +1, 20, 10, false);        
 
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
@@ -164,7 +164,7 @@ void checkpoint_33(
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +1, -1, 400ms);
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 30, 30, false);       
+            0, +1, 30, 30, false);       
 
         // battle team star grunts
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::PROMPT_DIALOG, CallbackEnum::DIALOG_ARROW});
@@ -177,7 +177,7 @@ void checkpoint_33(
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +1, -1, 400ms);
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 
-            128, 0, 20, 20, false);       
+            0, +1, 20, 20, false);       
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG, CallbackEnum::TUTORIAL});
         NoMinimapWatcher no_minimap(env.console.logger(), COLOR_RED, Milliseconds(250));
@@ -303,7 +303,7 @@ void checkpoint_34(
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 40, 10, false);   
+            0, +1, 40, 10, false);   
         
         // section 2
         realign_player_from_landmark(
@@ -313,7 +313,7 @@ void checkpoint_34(
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10, false);        
+            0, +1, 20, 10, false);        
 
         // section 3. set marker to pokecenter
         realign_player_from_landmark(
@@ -323,13 +323,13 @@ void checkpoint_34(
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10, false);    
+            0, +1, 20, 10, false);    
 
         // section 4. set marker past pokecenter
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +1, +0.688, 800ms);
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 15, 12, 12, false);     
+            0, +0.883, 12, 12, false);     
 
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
        

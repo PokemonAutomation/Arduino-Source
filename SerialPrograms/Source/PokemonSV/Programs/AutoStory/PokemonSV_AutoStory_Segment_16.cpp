@@ -144,7 +144,7 @@ void checkpoint_36(
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, -0.055, 3280ms);
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 60, 20, false);
+            0, +1, 60, 20, false);
         // talk to Arven over phone
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
@@ -156,7 +156,7 @@ void checkpoint_36(
         );
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 60, 20, false);
+            0, +1, 60, 20, false);
 
         // section 3
         realign_player_from_landmark(
@@ -166,7 +166,7 @@ void checkpoint_36(
         );
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 30, 10, false);
+            0, +1, 30, 10, false);
         
         // cutscene with Kofu looking at flowers
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);            
@@ -179,13 +179,13 @@ void checkpoint_36(
         );      
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10, false);   
+            0, +1, 20, 10, false);   
 
         // section 5. set marker past pokecenter
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, +0.219, 240ms);
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 15, 12, 12, false);     
+            0, +0.883, 12, 12, false);     
 
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);           
        

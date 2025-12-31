@@ -117,7 +117,7 @@ void checkpoint_06(
         pbf_move_left_joystick(context, {0, +1}, 6000ms, 160ms);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -0.141, +0.922, 480ms);
         env.console.log("overworld_navigation: Go to Nemona.");
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 20, 20, true, true);
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, +1, 20, 20, true, true);
         
         context.wait_for_all_requests();
         env.console.log("clear_dialog: Talk with Nemona to start catch tutorial. Stop when detect battle.");
@@ -157,14 +157,14 @@ void checkpoint_07(
         env.console.log("overworld_navigation: Go to cliff.");
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            135, 0, 24, 12, true, true);
+            +0.055, +1, 24, 12, true, true);
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, +1, 640ms);
         handle_when_stationary_in_overworld(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 24, 12, true, true);
+                    0, +1, 24, 12, true, true);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {-1, 0}, 320ms, 400ms);

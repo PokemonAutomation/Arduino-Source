@@ -131,7 +131,7 @@ void checkpoint_59(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 20, 10, false);
+                    0, +1, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {-1, 0}, 320ms, 400ms);
@@ -150,7 +150,7 @@ void checkpoint_59(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 40, 20, false);
+                    0, +1, 40, 20, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
                 pbf_move_left_joystick(context, {-1, 0}, 320ms, 400ms);
@@ -172,7 +172,7 @@ void checkpoint_59(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 20, 20, false);
+                    0, +1, 20, 20, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
                 pbf_move_left_joystick(context, {-1, 0}, 320ms, 400ms);
@@ -342,7 +342,7 @@ void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, Pro
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 40, 10, false);
+                0, +1, 40, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -360,7 +360,7 @@ void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, Pro
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 40, 10, false);
+                0, +1, 40, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
@@ -379,7 +379,7 @@ void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, Pro
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 40, 10, false);
+                0, +1, 40, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
@@ -399,7 +399,7 @@ void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, Pro
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 40, 20, false);
+                0, +1, 40, 20, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {0, +1}, 500ms, 0ms);
@@ -422,7 +422,7 @@ void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, Pro
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 60, 10, false);
+                0, +1, 60, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
@@ -442,7 +442,7 @@ void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, Pro
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 20, 10, false);
+                0, +1, 20, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {0, +1}, 500ms, 0ms);
@@ -464,7 +464,7 @@ void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, Pro
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 40, 10, false);
+                0, +1, 40, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
@@ -482,7 +482,7 @@ void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, Pro
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 40, 10, false);
+                0, +1, 40, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
@@ -501,7 +501,7 @@ void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, Pro
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 30, 10, false);
+                0, +1, 30, 10, false);
         }, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(context, {-1, -1}, 320ms, 400ms);
@@ -516,7 +516,7 @@ void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, Pro
     });      
     overworld_navigation(env.program_info(), env.console, context, 
         NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
-        128, 15, 12, 12, false);           // can't wrap in handle_when_stationary_in_overworld(), since we expect to be stationary when walking into the pokecenter
+        0, +0.883, 12, 12, false);           // can't wrap in handle_when_stationary_in_overworld(), since we expect to be stationary when walking into the pokecenter
         
 
     fly_to_overlapping_flypoint(env.program_info(), env.console, context); 

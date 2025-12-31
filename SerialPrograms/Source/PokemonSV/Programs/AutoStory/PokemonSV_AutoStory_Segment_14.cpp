@@ -97,7 +97,7 @@ void checkpoint_30(
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +1, 0, 136ms);
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10, false);    
+            0, +1, 20, 10, false);    
 
 
         // section 2
@@ -108,7 +108,7 @@ void checkpoint_30(
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10, false);
+            0, +1, 20, 10, false);
 
         // section 3
         realign_player_from_landmark(
@@ -118,7 +118,7 @@ void checkpoint_30(
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10, false);
+            0, +1, 20, 10, false);
 
         // section 4. walk until Arven dialog
         realign_player_from_landmark(
@@ -128,7 +128,7 @@ void checkpoint_30(
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10, false);
+            0, +1, 20, 10, false);
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 30, {CallbackEnum::OVERWORLD, CallbackEnum::BLACK_DIALOG_BOX});
 
@@ -136,7 +136,7 @@ void checkpoint_30(
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 18, 6, false);        
+            0, +1, 18, 6, false);        
 
         // section 6
         realign_player_from_landmark(
@@ -146,7 +146,7 @@ void checkpoint_30(
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10, false);
+            0, +1, 20, 10, false);
 
         get_on_ride(env.program_info(), env.console, context);
 
@@ -158,7 +158,7 @@ void checkpoint_30(
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10, false);
+            0, +1, 20, 10, false);
 
         // section 8. enter left side of boulder field
         realign_player_from_landmark(
@@ -168,7 +168,7 @@ void checkpoint_30(
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 18, 6, false); 
+            0, +1, 18, 6, false); 
 
         // section 8.1. move up
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, +1, 400ms);
@@ -182,7 +182,7 @@ void checkpoint_30(
         );          
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 40, 5, false);  
+            0, +1, 40, 5, false);  
 
         // // section 9.1. go to right edge of boulder field
         // realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +0.094, +1, 400ms);        
@@ -196,14 +196,14 @@ void checkpoint_30(
         );      
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 40, 5, false);  
+            0, +1, 40, 5, false);  
 
         // section 10.1 walk up right edge. until hit rock
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, +0.883, 400ms);          
 
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            140, 0, 10, 5, false);        
+            +0.094, +1, 10, 5, false);        
 
         // section 10.2. move away from rock.
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -0.375, -1, 400ms);  
@@ -217,7 +217,7 @@ void checkpoint_30(
         );      
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 40, 5, false);  
+            0, +1, 40, 5, false);  
 
         // section 12. reach the top. battle Bombirdier
         realign_player_from_landmark(
@@ -228,7 +228,7 @@ void checkpoint_30(
         try{
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_BATTLE, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 0, 40, 5, false);   
+                0, +1, 40, 5, false);   
         }catch (OperationFailedException& e){ 
             (void) e;
             // likely attempted to open/close phone to realign, but failed
@@ -237,7 +237,7 @@ void checkpoint_30(
             // keep waiting until battle detected.
             overworld_navigation(env.program_info(), env.console, context, 
                 NavigationStopCondition::STOP_BATTLE, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                128, 128, 30, 30, false);          
+                0, 0, 30, 30, false);          
 
         }       
 
@@ -276,7 +276,7 @@ void checkpoint_31(
         );        
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 50, 10, false); 
+            0, +1, 50, 10, false); 
         // section 2
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
@@ -285,7 +285,7 @@ void checkpoint_31(
         );  
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 40, 10, false);         
+            0, +1, 40, 10, false);         
         // section 3. align to pokecenter
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
@@ -294,7 +294,7 @@ void checkpoint_31(
         );  
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 40, 10, false);      
+            0, +1, 40, 10, false);      
 
         // section 4. set marker past pokecenter
         handle_unexpected_battles(env.program_info(), env.console, context,
@@ -303,7 +303,7 @@ void checkpoint_31(
         });
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 15, 12, 12, false);   
+            0, +0.883, 12, 12, false);   
 
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
        

@@ -324,7 +324,7 @@ void overworld_navigation(
     ProControllerContext& context,
     NavigationStopCondition stop_condition,
     NavigationMovementMode movement_mode,
-    uint8_t x, uint8_t y,
+    double x, double y,
     uint16_t seconds_timeout, uint16_t seconds_realign, 
     bool auto_heal,
     bool detect_wipeout
@@ -365,7 +365,7 @@ void overworld_navigation(
                             if (movement_mode == NavigationMovementMode::CLEAR_WITH_LETS_GO){
                                 walk_forward_while_clear_front_path(info, stream, context, forward_duration, y);
                             }else{
-                                ssf_press_left_joystick_old(context, x, y, 0ms, Seconds(seconds_realign));
+                                ssf_press_left_joystick(context, {x, y}, 0ms, Seconds(seconds_realign));
                                 if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
                                     pbf_wait(context, Seconds(seconds_realign));
                                 } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
