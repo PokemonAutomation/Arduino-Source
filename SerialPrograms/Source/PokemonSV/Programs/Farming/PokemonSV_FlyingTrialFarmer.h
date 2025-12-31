@@ -51,7 +51,7 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     bool run_rewards(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    uint8_t get_final_y_axis(int8_t delta_y);
+    double get_final_y_axis(double delta_y);
 };
 
 
