@@ -235,7 +235,7 @@ std::string FlavorPowerDetector::detect_power(const ImageViewRGB32& screen){
         );
     }
     // Convert power level (1, 2, 3) to character ('1', '2', '3')
-    char expected_last_char = '0' + detected_power_level;
+    char expected_last_char = (char)('0' + detected_power_level);
     // Find the result with matching last character
     for (const auto& result : results){
         const std::string& slug = result.second;
