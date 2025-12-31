@@ -393,7 +393,6 @@ AutoStory::~AutoStory(){
     STARTPOINT_MAINSTORY.remove_listener(*this);
     ENDPOINT_MAINSTORY.remove_listener(*this);    
     ENABLE_TEST_CHECKPOINTS.remove_listener(*this);
-    ENABLE_TEST_REALIGN.remove_listener(*this);
     ENABLE_MISC_TEST.remove_listener(*this);
     TEST_PBF_LEFT_JOYSTICK.remove_listener(*this);
     TEST_PBF_JOYSTICK2.remove_listener(*this);
@@ -570,36 +569,6 @@ AutoStory::AutoStory()
         LockMode::UNLOCK_WHILE_RUNNING,
         11
     )      
-    , ENABLE_TEST_REALIGN(
-        "<b>TEST: realign_player():</b>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
-    )   
-    , REALIGN_MODE(
-        "--REALIGN_MODE:",
-        {
-            {PlayerRealignMode::REALIGN_NEW_MARKER,            "realign_new",       "Realign New Marker"},
-            {PlayerRealignMode::REALIGN_NO_MARKER,     "realign_no",     "Realign No Marker"},
-            {PlayerRealignMode::REALIGN_OLD_MARKER,          "realign_old",     "Realign Old Marker"},
-        },
-        LockMode::UNLOCK_WHILE_RUNNING,
-        PlayerRealignMode::REALIGN_NEW_MARKER
-    )    
-    , X_REALIGN(
-        "--X_REALIGN:<br>x = 0 : left, x = 128 : neutral, x = 255 : right.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        128
-    )    
-    , Y_REALIGN(
-        "--Y_REALIGN:<br>y = 0 : up, y = 128 : neutral, y = 255 : down.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        128
-    )     
-    , REALIGN_DURATION(
-        "--REALIGN_DURATION",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        0
-    )
     , ENABLE_MISC_TEST(
         "<b>TEST: Miscellaneous test code:</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -762,11 +731,6 @@ AutoStory::AutoStory()
         PA_ADD_OPTION(START_LOOP);
         PA_ADD_OPTION(END_LOOP);
 
-        // PA_ADD_OPTION(ENABLE_TEST_REALIGN);
-        // PA_ADD_OPTION(REALIGN_MODE);
-        // PA_ADD_OPTION(X_REALIGN);
-        // PA_ADD_OPTION(Y_REALIGN);
-        // PA_ADD_OPTION(REALIGN_DURATION);
 
         PA_ADD_OPTION(ENABLE_MISC_TEST);
         // PA_ADD_OPTION(FORWARD_TICKS);  
@@ -821,7 +785,6 @@ AutoStory::AutoStory()
     ENABLE_ADVANCED_MODE.add_listener(*this); 
 
     ENABLE_TEST_CHECKPOINTS.add_listener(*this);
-    ENABLE_TEST_REALIGN.add_listener(*this);
     ENABLE_MISC_TEST.add_listener(*this);
     TEST_PBF_LEFT_JOYSTICK.add_listener(*this);
     TEST_PBF_JOYSTICK2.add_listener(*this);
@@ -876,17 +839,6 @@ void AutoStory::on_config_value_changed(void* object){
         END_LOOP.set_visibility(ConfigOptionState::DISABLED);
     }
 
-    if (ENABLE_TEST_REALIGN){
-        REALIGN_MODE.set_visibility(ConfigOptionState::ENABLED);
-        X_REALIGN.set_visibility(ConfigOptionState::ENABLED);
-        Y_REALIGN.set_visibility(ConfigOptionState::ENABLED);
-        REALIGN_DURATION.set_visibility(ConfigOptionState::ENABLED);
-    }else{
-        REALIGN_MODE.set_visibility(ConfigOptionState::DISABLED);
-        X_REALIGN.set_visibility(ConfigOptionState::DISABLED);
-        Y_REALIGN.set_visibility(ConfigOptionState::DISABLED);
-        REALIGN_DURATION.set_visibility(ConfigOptionState::DISABLED);        
-    }
 
     if (ENABLE_MISC_TEST){
         FORWARD_TICKS.set_visibility(ConfigOptionState::ENABLED);
@@ -1276,14 +1228,7 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
         GO_HOME_WHEN_DONE.run_end_of_program(context);
         return;
     }
-    
 
-    if (ENABLE_TEST_REALIGN){
-        // clear realign marker
-        // realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 128, 0);
-        realign_player(env.program_info(), env.console, context, REALIGN_MODE, X_REALIGN, Y_REALIGN, REALIGN_DURATION);
-        return;
-    }
 
     if (ENABLE_MISC_TEST){
         // walk_forward_while_clear_front_path(env.program_info(), env.console, context, FORWARD_TICKS);
@@ -1325,7 +1270,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
 
     // test code
-    if (TEST_FLYPOINT_LOCATIONS || TEST_MOVE_CURSOR_OFFSET_FROM_FLYPOINT || ENABLE_TEST_CHECKPOINTS || ENABLE_TEST_REALIGN || ENABLE_MISC_TEST || TEST_PBF_LEFT_JOYSTICK || TEST_PBF_JOYSTICK2 || TEST_CHANGE_DIRECTION || TEST_CURRENT_DIRECTION){
+    if (TEST_FLYPOINT_LOCATIONS || TEST_MOVE_CURSOR_OFFSET_FROM_FLYPOINT || ENABLE_TEST_CHECKPOINTS || ENABLE_MISC_TEST || TEST_PBF_LEFT_JOYSTICK || TEST_PBF_JOYSTICK2 || TEST_CHANGE_DIRECTION || TEST_CURRENT_DIRECTION){
         test_code(env, context);
         return;
     }

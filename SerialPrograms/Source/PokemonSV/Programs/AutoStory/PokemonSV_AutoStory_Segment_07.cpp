@@ -92,11 +92,11 @@ void checkpoint_12(
                 walk_forward_while_clear_front_path(env.program_info(), env.console, context, 280ms);
 
                 // place the marker elsewhere
-                realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 128, 50);
+                realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +1, 0, 400ms);
 
                 DirectionDetector direction;
                 direction.change_direction(info, env.console, context, 0);
-                walk_forward_while_clear_front_path(info, env.console, context, 26400ms, 0, 1000ms, 1000ms);
+                walk_forward_while_clear_front_path(info, env.console, context, 26400ms, +1, 1000ms, 1000ms);
 
                 // check we're not still at the Los Platos Pokecenter.
                 confirm_no_overlapping_flypoint(info, env.console, context);
@@ -106,9 +106,9 @@ void checkpoint_12(
                 press_Bs_to_back_to_overworld(info, env.console, context, 7);
 
                 direction.change_direction(info, env.console, context, 0.29);
-                walk_forward_while_clear_front_path(info, env.console, context, 9600ms, 0, 1000ms, 1000ms);
+                walk_forward_while_clear_front_path(info, env.console, context, 9600ms, +1, 1000ms, 1000ms);
                 direction.change_direction(info, env.console, context, 0.61);
-                walk_forward_while_clear_front_path(info, env.console, context, 9600ms, 0, 1000ms, 1000ms);
+                walk_forward_while_clear_front_path(info, env.console, context, 9600ms, +1, 1000ms, 1000ms);
 
                 fly_to_overlapping_flypoint(info, env.console, context);
             }

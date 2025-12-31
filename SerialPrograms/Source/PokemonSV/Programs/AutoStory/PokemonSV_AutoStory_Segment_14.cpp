@@ -94,7 +94,7 @@ void checkpoint_30(
         heal_at_pokecenter(env.program_info(), env.console, context);
 
         // section 1
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 128, 17);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +1, 0, 136ms);
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
             128, 0, 20, 10, false);    
@@ -171,7 +171,7 @@ void checkpoint_30(
             128, 0, 18, 6, false); 
 
         // section 8.1. move up
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 0, 50);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, +1, 400ms);
         pbf_move_left_joystick(context, {0, +1}, 800ms, 800ms);
 
         // section 9. go to middle-right of boulder field
@@ -185,7 +185,7 @@ void checkpoint_30(
             128, 0, 40, 5, false);  
 
         // // section 9.1. go to right edge of boulder field
-        // realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 140, 0, 50);        
+        // realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +0.094, +1, 400ms);        
         // pbf_move_left_joystick(context, {0, +1}, 1600ms, 800ms);
 
         // section 10. walk up right edge
@@ -199,14 +199,14 @@ void checkpoint_30(
             128, 0, 40, 5, false);  
 
         // section 10.1 walk up right edge. until hit rock
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 15, 50);          
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, +0.883, 400ms);          
 
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
             140, 0, 10, 5, false);        
 
         // section 10.2. move away from rock.
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 80, 255, 50);  
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -0.375, -1, 400ms);  
         pbf_move_left_joystick(context, {0, +1}, 1600ms, 800ms);
 
         // section 11
@@ -299,7 +299,7 @@ void checkpoint_31(
         // section 4. set marker past pokecenter
         handle_unexpected_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 60, 40);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +1, +0.531, 320ms);
         });
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 

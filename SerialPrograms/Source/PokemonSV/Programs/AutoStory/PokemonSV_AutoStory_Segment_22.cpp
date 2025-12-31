@@ -108,7 +108,7 @@ void checkpoint_50(
         
         context.wait_for_all_requests();
         // set down marker 1
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 60, 50);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +1, +0.531, 400ms);
 
         DirectionDetector direction;
         if (attempt_number > 0 || ENABLE_TEST){
@@ -193,11 +193,11 @@ void checkpoint_51(
     [&](size_t attempt_number){
 
         context.wait_for_all_requests();
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 50);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, 0, 400ms);
         pbf_move_left_joystick(context, {0, +1}, 3200ms, 800ms);
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 170, 0, 60);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +0.331, +1, 480ms);
         pbf_move_left_joystick(context, {0, +1}, 14400ms, 800ms);
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 85, 60);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +1, +0.336, 480ms);
         
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){

@@ -103,7 +103,7 @@ void checkpoint_13(
             fly_to_overlapping_flypoint(info, env.console, context);
 
             context.wait_for_all_requests();
-            realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 80, 50);
+            realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -1, +0.375, 400ms);
             walk_forward_while_clear_front_path(info, env.console, context, 4000ms);
             walk_forward_until_dialog(info, env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30000ms);
         });
@@ -137,19 +137,19 @@ void checkpoint_14(
 
         context.wait_for_all_requests();
         // realign diagonally to the left
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 80, 0, 100);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, -0.375, +1, 800ms);
         // walk forward so you're off center
         pbf_move_left_joystick(context, {0, +1}, 800ms, 800ms);
         // realign going straight
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 100);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, +1, 800ms);
         // walk forward, while still off center
         pbf_move_left_joystick(context, {0, +1}, 16000ms, 800ms);
         // realign diagonally to the right
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 178, 0, 100);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +0.394, +1, 800ms);
         // walk forward so you're closer to the center
         pbf_move_left_joystick(context, {0, +1}, 1200ms, 800ms);
         // realign going straight
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 100);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, +1, 800ms);
         // walk forward until hit dialog at top of stairs
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60000ms);
         // clear dialog until battle. with prompt, battle
@@ -184,11 +184,11 @@ void checkpoint_15(
 
         context.wait_for_all_requests();
         // realign diagonally to the right
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 178, 0, 100);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +0.394, +1, 800ms);
         // walk forward so you're closer to the center
         pbf_move_left_joystick(context, {0, +1}, 800ms, 800ms);
         // realign going straight
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 100);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, +1, 800ms);
         // walk forward up stairs
         pbf_move_left_joystick(context, {0, +1}, 8000ms, 800ms);
         // realign going straight

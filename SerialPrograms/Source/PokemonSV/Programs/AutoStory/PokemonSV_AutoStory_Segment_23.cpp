@@ -87,7 +87,7 @@ void checkpoint_54(
         pbf_move_left_joystick(context, {0, +1}, 3600ms, 800ms);
 
         // marker 1
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 160, 0, 35);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +0.252, +1, 280ms);
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
