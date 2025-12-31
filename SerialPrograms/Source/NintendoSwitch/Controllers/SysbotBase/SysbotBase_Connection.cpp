@@ -54,8 +54,8 @@ TcpSysbotBase_Connection::TcpSysbotBase_Connection(
     , m_last_ping_send(WallClock::min())
     , m_last_ping_receive(WallClock::min())
 {
-    m_controller_list.emplace_back(ControllerType::NintendoSwitch_WiredProController);
-    m_current_controller = ControllerType::NintendoSwitch_WiredProController;
+    m_controller_list.emplace_back(ControllerType::NintendoSwitch_WiredController);
+    m_current_controller = ControllerType::NintendoSwitch_WiredController;
 
     QHostAddress address;
     int port;
