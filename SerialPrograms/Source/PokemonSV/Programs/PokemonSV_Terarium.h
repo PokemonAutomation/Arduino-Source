@@ -22,7 +22,7 @@ void return_to_plaza(const ProgramInfo& info, VideoStream& stream, ProController
 void map_move_cursor_fly(
     const ProgramInfo& info,
     VideoStream& stream, ProControllerContext& context,
-    uint8_t x, uint8_t y,
+    double x, double y,
     Milliseconds hold, Milliseconds release,
     std::string location
 );
