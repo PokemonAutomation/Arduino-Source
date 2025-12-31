@@ -413,28 +413,19 @@ void area_zero_platform_run_path1(
 
 
 void direction_to_stick(
-    uint8_t& joystick_x, uint8_t& joystick_y,
+    double& joystick_x, double& joystick_y,
     double direction_x, double direction_y
 ){
 //    cout << "direction = " << direction_x << ", " << direction_y << endl;
 
     double scale = std::max(std::abs(direction_x), std::abs(direction_y));
-    direction_x = 128 / scale * direction_x + 128;
-    direction_y = 128 / scale * direction_y + 128;
 
-//    cout << "joystick = " << direction_x << ", " << direction_y << endl;
-
-    direction_x = std::min(direction_x, 255.);
-    direction_x = std::max(direction_x, 0.);
-    direction_y = std::min(direction_y, 255.);
-    direction_y = std::max(direction_y, 0.);
-
-    joystick_x = (uint8_t)direction_x;
-    joystick_y = (uint8_t)direction_y;
+    joystick_x =  (direction_x / scale);
+    joystick_y = -(direction_y / scale);
 }
 void choose_path(
     Logger& logger,
-    uint8_t& x, uint8_t& y, Milliseconds& duration,
+    double& x, double& y, Milliseconds& duration,
     double platform_x, double platform_y
 ){
     double diff_x = platform_x - 0.62;
@@ -449,9 +440,9 @@ void choose_path(
     );
 }
 void turn_angle(ProControllerContext& context, double angle_radians){
-    uint8_t turn_x, turn_y;
+    double turn_x, turn_y;
     direction_to_stick(turn_x, turn_y, -std::sin(angle_radians), std::cos(angle_radians));
-    pbf_move_left_joystick(context, {JoystickTools::linear_u8_to_float(turn_x), -JoystickTools::linear_u8_to_float(turn_y)}, 320ms, 160ms);
+    pbf_move_left_joystick(context, {turn_x, turn_y}, 320ms, 160ms);
     pbf_mash_button(context, BUTTON_L, 480ms);
 }
 
@@ -466,7 +457,7 @@ void area_zero_platform_run_path2(
 
     double platform_x, platform_y;
     Milliseconds duration;
-    uint8_t move_x, move_y;
+    double move_x, move_y;
     use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](ProControllerContext& context){
 
         stream.log("Find the sky, turn around and fire.");
@@ -488,7 +479,7 @@ void area_zero_platform_run_path2(
 
         choose_path(stream.logger(), move_x, move_y, duration, platform_x, platform_y);
 
-        pbf_move_left_joystick(context, {JoystickTools::linear_u8_to_float(move_x), JoystickTools::linear_u8_to_float(move_y)}, 320ms, 160ms);
+        pbf_move_left_joystick(context, {move_x, move_y}, 320ms, 160ms);
         pbf_mash_button(context, BUTTON_L, 480ms);
 //        pbf_wait(context, 1250);
     });
@@ -498,7 +489,7 @@ void area_zero_platform_run_path2(
 
         //  Optimization, calculate angle to aim you back at the sky.
         //  This speeds up the "find_and_center_on_sky()" call.
-        double angle0 = std::atan2(move_x - 128., 128. - move_y);
+        double angle0 = std::atan2(move_x, -move_y);
         double angle1 = angle0 >= 0 ? 6.2831853071795864769 - angle0 : -6.2831853071795864769 - angle0;
         turn_angle(context, angle1);
 
