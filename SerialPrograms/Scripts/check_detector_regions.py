@@ -33,6 +33,22 @@ print(f"Size: {width} x {height}")
 raw_image = image.copy()
 
 # ==================================================================
+# LZA Donut flavor power icon
+for i in range(3):
+    # Empty space after a subtype-free power icon
+    add_infer_box_to_image(raw_image, 0.1125, 0.7745 + 0.046*i,0.005,0.013, image)
+    # Number of a subtype-free power icon
+    # add_infer_box_to_image(raw_image, 0.102, 0.77 + 0.046*i,0.011,0.02, image)
+    # Nummber of a subtype power icon
+    # add_infer_box_to_image(raw_image, 0.108, 0.77 + 0.046*i,0.011,0.02, image)
+    # add_infer_box_to_image(raw_image, 0.081, 0.764 + 0.045*i, 0.043, 0.034, image)
+
+# ==================================================================
+# LZA Donut flavor power text
+# for i in range(3):
+#     add_infer_box_to_image(raw_image, 0.131, 0.759 + 0.045*i, 0.260, 0.043, image)
+
+# ==================================================================
 # LZA Donut Berry Selection
 #add_infer_box_to_image(raw_image, 0.001, 0.245, 0.006, 0.070, image)
 #add_infer_box_to_image(raw_image, 0.001, 0.332, 0.006, 0.070, image)
@@ -136,16 +152,16 @@ raw_image = image.copy()
 
 # ==================================================================
 # LZA box system cursor detection
-for row in range(6):
-	y = 0.122 if row == 0 else (0.333 + (0.797 - 0.331)/ 4.0 * (row-1))
-	for col in range(6):
-		x = 0.058 + col*(0.386 - 0.059)/5.0
-		# non-held positions
-		# add_infer_box_to_image(raw_image, x, y, 0.018, 0.026, image)
-		# held positions
-		# add_infer_box_to_image(raw_image, x+0.011, y-0.010, 0.023, 0.032, image)
-		# narrow gap to detect holding
-		add_infer_box_to_image(raw_image, x+0.011, y+0.010, 0.023, 0.004, image)
+# for row in range(6):
+# 	y = 0.122 if row == 0 else (0.333 + (0.797 - 0.331)/ 4.0 * (row-1))
+# 	for col in range(6):
+# 		x = 0.058 + col*(0.386 - 0.059)/5.0
+# 		# non-held positions
+# 		# add_infer_box_to_image(raw_image, x, y, 0.018, 0.026, image)
+# 		# held positions
+# 		# add_infer_box_to_image(raw_image, x+0.011, y-0.010, 0.023, 0.032, image)
+# 		# narrow gap to detect holding
+# 		add_infer_box_to_image(raw_image, x+0.011, y+0.010, 0.023, 0.004, image)
 
 # Pixel (x,y) = (775, 136), (0.404, 0.126), rgb=[255,188,245,71] hsv=[ 80 181 245]
 # Pixel (x,y) = (759, 135), (0.395, 0.125), rgb=[255,182,233,70] hsv=[ 81 178 233]

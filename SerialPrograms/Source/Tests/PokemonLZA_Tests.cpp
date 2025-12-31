@@ -6,6 +6,8 @@
 
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "PokemonLZA/Inference/Donuts/PokemonLZA_FlavorPowerDetector.h"
+#include "PokemonLZA/Inference/Donuts/PokemonLZA_FlavorPowerScreenDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
@@ -18,7 +20,6 @@
 #include "PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h"
 #include "PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
-#include "PokemonLZA/Inference/Donuts/PokemonLZA_FlavorPowerScreenDetector.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "PokemonLZA_Tests.h"
 #include "TestUtils.h"
@@ -630,10 +631,49 @@ int test_pokemonLZA_HyperspaceCalorieDetector(const ImageViewRGB32& image, int e
     return 0;
 }
 
-int test_pokemonLZA_FlavorPowerScreenDetector(const ImageViewRGB32& image, bool target){
+int test_pokemonLZA_FlavorPowerScreenDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
+    // two words: <language> <True/False>
+    if (words.size() < 2){
+        cerr << "Error: not enough number of words in the filename. Found only " << words.size() << "." << endl;
+        return 1;
+    }
+
+    Language language = language_code_to_enum(words[words.size() - 2]);
+    if (language == Language::None || language == Language::EndOfList){
+        cerr << "Error: language word " << words[words.size() - 2] << " is wrong." << endl;
+        return 1;
+    }
+
+    bool is_flavor_screen = false;
+    if (parse_bool(words[words.size() - 1], is_flavor_screen) == false){
+        cerr << "Error: word " << words[words.size() - 1] << " is wrong. Must be True or False." << endl;
+        return 1;
+    }
+
     FlavorPowerScreenDetector detector;
     bool result = detector.detect(image);
-    TEST_RESULT_EQUAL(result, target);
+    TEST_RESULT_EQUAL(result, is_flavor_screen);
+    if (!result){
+        return 0;
+    }
+
+    for(int i = 0; i < 3; i ++){
+        FlavorPowerIconDetector power_icon_detector(global_logger_command_line(), i);
+        FlavorPowerDetector power_detector(global_logger_command_line(), COLOR_RED, language, i);
+        std::string power_slug = power_detector.detect_power(image);
+        int power_level = power_icon_detector.detect(image);
+        if (power_slug == ""){
+            if (power_level > 0){
+                cerr << "Error: OCR reads no power but power icon detector gets " << power_level << endl;
+                return 1;
+            }
+        }
+        // power slug is sth like "sparkling-power-ground-3" which ends with the power level character
+        else if (power_slug.back() - '1' + 1 != power_level){
+            cerr << "Error: OCR reads power " << power_slug << " but power icon detector gets power level " << power_level << endl;
+            return 1;
+        }
+    }
     return 0;
 }
 

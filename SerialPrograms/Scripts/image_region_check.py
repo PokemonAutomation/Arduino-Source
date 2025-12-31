@@ -97,8 +97,9 @@ def add_infer_box_to_image(
 	color=(0,0,255)
 ) -> np.ndarray:
 	stats = _get_stats(image, x, y, w, h)
-	ratio = stats.color_ratio
-	print(f"Add infer box: ({x:0.4f}, {y:0.4f}, {w:0.4f}, {h:0.4f}), {stats.to_str()}")
+	width_p = int(w * image.shape[1] + 0.5)
+	height_p = int(h * image.shape[0] + 0.5)
+	print(f"Add infer box: ({x:0.4f}, {y:0.4f}, {w:0.4f}, {h:0.4f}), {width_p} x {height_p}, {stats.to_str()}")
 	return add_rect(rendered_image, x, y, w, h, color)
 
 def _color_matched(

@@ -1611,13 +1611,10 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_IvJudgeReader.h
     Source/PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.cpp
     Source/PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.h
-<<<<<<< HEAD
-    Source/PokemonLZA/Inference/Donuts/PokemonLZA_DonutPowerDetector.cpp
-    Source/PokemonLZA/Inference/Donuts/PokemonLZA_DonutPowerDetector.h
-=======
+    Source/PokemonLZA/Inference/Donuts/PokemonLZA_FlavorPowerDetector.cpp
+    Source/PokemonLZA/Inference/Donuts/PokemonLZA_FlavorPowerDetector.h
     Source/PokemonLZA/Inference/Donuts/PokemonLZA_FlavorPowerScreenDetector.cpp
     Source/PokemonLZA/Inference/Donuts/PokemonLZA_FlavorPowerScreenDetector.h
->>>>>>> 363ca9c8a (Add donut power screen detector)
     Source/PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.cpp
     Source/PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h
     Source/PokemonLZA/Inference/Map/PokemonLZA_LocationNameReader.cpp

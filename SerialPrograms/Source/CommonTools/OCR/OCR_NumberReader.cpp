@@ -130,7 +130,6 @@ std::string read_number_waterfill_no_normalization(
 
 //    static int c = 0;
 //    filtered.save("zztest-" + std::to_string(c++) + ".png");
-//    int i = 0;
 
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(filtered, 0xff000000, 0xff7f7f7f);
 
@@ -170,6 +169,8 @@ std::string read_number_waterfill_no_normalization(
             ocr_text += ocr[0];
         }else if (check_empty_string){
             logger.log("OCR fail: one of characters read as empty string.", COLOR_RED);
+            // static int i = 0;
+            // padded.save("zztest-cropped" + std::to_string(c) + "-" + std::to_string(i++) + ".png");
             return "";
         }
     }

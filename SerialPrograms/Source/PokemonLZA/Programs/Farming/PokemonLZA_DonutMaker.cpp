@@ -18,7 +18,7 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
 #include "PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.h"
-#include "PokemonLZA/Inference/Donuts/PokemonLZA_DonutPowerDetector.h"
+#include "PokemonLZA/Inference/Donuts/PokemonLZA_FlavorPowerDetector.h"
 #include "PokemonLZA/Inference/Donuts/PokemonLZA_FlavorPowerScreenDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
@@ -143,7 +143,7 @@ bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProController
     uint8_t num_hits = 0;
     VideoSnapshot screen = env.console.video().snapshot();
     for (int i = 0; i < 3; i++) {
-        DonutPowerDetector read_power(env.logger(), COLOR_GREEN, LANGUAGE, i);
+        FlavorPowerDetector read_power(env.logger(), COLOR_GREEN, LANGUAGE, i);
         const std::string power = read_power.detect_power(screen);
         if (power.empty()){
             env.add_overlay_log(std::format("{}: Empty", i+1));

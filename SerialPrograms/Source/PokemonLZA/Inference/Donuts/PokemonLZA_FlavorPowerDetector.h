@@ -1,11 +1,11 @@
-/*  Donut Power Detector
+/*  Flavor Power Detector
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_PokemonLZA_DonutPowerDetector_H
-#define PokemonAutomation_PokemonLZA_DonutPowerDetector_H
+#ifndef PokemonAutomation_PokemonLZA_FlavorPowerDetector_H
+#define PokemonAutomation_PokemonLZA_FlavorPowerDetector_H
 
 #include <array>
 #include "Common/Cpp/Color.h"
@@ -21,10 +21,31 @@ namespace NintendoSwitch{
 namespace PokemonLZA{
 
 
-class DonutPowerDetector : public StaticScreenDetector{
+// Detect donut power icons
+class FlavorPowerIconDetector{
+public:
+    FlavorPowerIconDetector(Logger& logger, int position);
+
+    void make_overlays(VideoOverlaySet& items) const;
+
+    // Currently the only implementation is to detect the flavor power level (1-3)
+    // If no such power at this row, return -1.
+    int detect(const ImageViewRGB32& screen);
+
+private:
+    Logger& m_logger;
+    ImageFloatBox m_icon_box;
+    ImageFloatBox m_empty_space_after_number;
+    ImageFloatBox m_subtype_free_number_box;
+    ImageFloatBox m_subtype_number_box;
+};
+
+
+// Use OCR to detect donut flavor power texts
+class FlavorPowerDetector : public StaticScreenDetector{
 public:
     // position: 0, 1 or 2. We have at most three powers on one donut.
-    DonutPowerDetector(Logger& logger, Color color, Language language, int position);
+    FlavorPowerDetector(Logger& logger, Color color, Language language, int position);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
@@ -42,10 +63,10 @@ protected:
 };
 
 // Detect the quest in a given position
-class DonutPowerWatcher : public VisualInferenceCallback{
+class FlavorPowerWatcher : public VisualInferenceCallback{
 public:
-    ~DonutPowerWatcher();
-    DonutPowerWatcher(Logger& logger, Color color, Language language, int position);
+    ~FlavorPowerWatcher();
+    FlavorPowerWatcher(Logger& logger, Color color, Language language, int position);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
@@ -54,7 +75,7 @@ public:
 
 
 protected:
-    DonutPowerDetector m_detector;
+    FlavorPowerDetector m_detector;
     std::string m_quest_name;
 };
 
