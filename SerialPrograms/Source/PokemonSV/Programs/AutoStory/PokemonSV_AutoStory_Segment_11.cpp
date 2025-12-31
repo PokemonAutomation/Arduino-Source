@@ -179,7 +179,7 @@ void checkpoint_25(
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +0.228, +1, 320ms);
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 40, 10);
+            0, +1, 40, 10);
         
         // section 1.1. keep walking forward and talk to Olive roll NPC
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,

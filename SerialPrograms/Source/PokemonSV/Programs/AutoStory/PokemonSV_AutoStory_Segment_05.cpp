@@ -96,7 +96,7 @@ void checkpoint_09(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 60, 30, true, true);
+                    0, +1, 60, 30, true, true);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {-1, 0}, 320ms, 400ms);
@@ -140,7 +140,7 @@ void checkpoint_10(
         direction.change_direction(env.program_info(), env.console, context, 5.41);
 
         env.console.log("overworld_navigation: Go to Nemona on the lighthouse.");
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 128, 0, 20, 20, true, true);
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 0, +1, 20, 20, true, true);
 
         mash_button_till_overworld(env.console, context, BUTTON_A);
 

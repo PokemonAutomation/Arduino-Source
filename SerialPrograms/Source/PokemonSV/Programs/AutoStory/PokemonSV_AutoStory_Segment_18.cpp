@@ -105,7 +105,7 @@ void checkpoint_39(
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +1, -0.803, 960ms);
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 60, 10, false);         
+            0, +1, 60, 10, false);         
 
         // section 3. enter circle
         realign_player_from_landmark(
@@ -116,7 +116,7 @@ void checkpoint_39(
 
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 60, 10, false);         
+            0, +1, 60, 10, false);         
 
         DialogBoxWatcher        dialog(COLOR_RED, true);
 
@@ -139,7 +139,7 @@ void checkpoint_39(
                     );           
                     overworld_navigation(env.program_info(), env.console, context, 
                         NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                        128, 0, 36, 12, false);  
+                        0, +1, 36, 12, false);  
 
 
                     // std::cout << "11:00" << std::endl;
@@ -150,7 +150,7 @@ void checkpoint_39(
                     );           
                     overworld_navigation(env.program_info(), env.console, context, 
                         NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                        128, 0, 30, 10, false);       
+                        0, +1, 30, 10, false);       
 
 
                     // std::cout << "10:00" << std::endl;
@@ -161,7 +161,7 @@ void checkpoint_39(
                     );           
                     overworld_navigation(env.program_info(), env.console, context, 
                         NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                        128, 0, 30, 10, false);            
+                        0, +1, 30, 10, false);            
 
                     // std::cout << "7:00" << std::endl;
                     realign_player_from_landmark(
@@ -171,7 +171,7 @@ void checkpoint_39(
                     );           
                     overworld_navigation(env.program_info(), env.console, context, 
                         NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                        128, 0, 48, 12, false);            
+                        0, +1, 48, 12, false);            
 
                     // std::cout << "6:00" << std::endl;
                     realign_player_from_landmark(
@@ -181,7 +181,7 @@ void checkpoint_39(
                     );           
                     overworld_navigation(env.program_info(), env.console, context, 
                         NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                        128, 0, 30, 10, false);    
+                        0, +1, 30, 10, false);    
 
                     // std::cout << "2:00" << std::endl;
                     realign_player_from_landmark(
@@ -191,7 +191,7 @@ void checkpoint_39(
                     );           
                     overworld_navigation(env.program_info(), env.console, context, 
                         NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                        128, 0, 50, 10, false);    
+                        0, +1, 50, 10, false);    
                 }                 
 
             },
@@ -221,7 +221,7 @@ void checkpoint_39(
         );           
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10, false);  
+            0, +1, 20, 10, false);  
 
         // section 6
         realign_player_from_landmark(
@@ -232,7 +232,7 @@ void checkpoint_39(
 
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 40, 40, false);        
+            0, +1, 40, 40, false);        
 
         // battle the titan phase 2
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE});  
@@ -283,7 +283,7 @@ void checkpoint_40(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 30, 10, false);
+                    0, +1, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, 0}, 320ms, 400ms);
@@ -301,7 +301,7 @@ void checkpoint_40(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 30, 10, false);
+                    0, +1, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, 0}, 320ms, 400ms);
@@ -319,7 +319,7 @@ void checkpoint_40(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 30, 10, false);
+                    0, +1, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {-1, +1}, 320ms, 400ms);
@@ -338,7 +338,7 @@ void checkpoint_40(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 20, 10, false);
+                    0, +1, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, +1}, 320ms, 400ms);
@@ -353,7 +353,7 @@ void checkpoint_40(
         });      
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 15, 12, 12, false);           // can't wrap in handle_when_stationary_in_overworld(), since we expect to be stationary when walking into the pokecenter
+            0, +0.883, 12, 12, false);           // can't wrap in handle_when_stationary_in_overworld(), since we expect to be stationary when walking into the pokecenter
           
 
         fly_to_overlapping_flypoint(env.program_info(), env.console, context); 

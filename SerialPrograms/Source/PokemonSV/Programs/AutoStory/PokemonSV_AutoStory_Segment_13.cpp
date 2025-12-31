@@ -91,7 +91,7 @@ void checkpoint_29(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 30, 15, false);
+                    0, +1, 30, 15, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -110,7 +110,7 @@ void checkpoint_29(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 24, 12, false);
+                    0, +1, 24, 12, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -130,7 +130,7 @@ void checkpoint_29(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 36, 12, false);
+                    0, +1, 36, 12, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -149,7 +149,7 @@ void checkpoint_29(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 45, 15, false);
+                    0, +1, 45, 15, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -169,7 +169,7 @@ void checkpoint_29(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 20, 10, false);
+                    0, +1, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -189,7 +189,7 @@ void checkpoint_29(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 30, 10, false);
+                    0, +1, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -209,7 +209,7 @@ void checkpoint_29(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 30, 10, false);
+                    0, +1, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -236,7 +236,7 @@ void checkpoint_29(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 36, 12, false);
+                    0, +1, 36, 12, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -273,7 +273,7 @@ void checkpoint_29(
             try {
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::CLEAR_WITH_LETS_GO, 
-                    128, 0, 20, 20, false);         
+                    0, +1, 20, 20, false);         
 
                 break;
 
@@ -297,7 +297,7 @@ void checkpoint_29(
 
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::CLEAR_WITH_LETS_GO, 
-                    128, 0, 20, 20, false);          
+                    0, +1, 20, 20, false);          
 
 
                 // // align to cross bridge
@@ -339,7 +339,7 @@ void checkpoint_29(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 20, 10, false);
+                    0, +1, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -360,7 +360,7 @@ void checkpoint_29(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 20, 10, false);
+                    0, +1, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -380,7 +380,7 @@ void checkpoint_29(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 20, 10, false);
+                    0, +1, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -400,7 +400,7 @@ void checkpoint_29(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 20, 10, false);
+                    0, +1, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -422,7 +422,7 @@ void checkpoint_29(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 30, 10, false);
+                    0, +1, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, -1}, 320ms, 400ms);
@@ -444,7 +444,7 @@ void checkpoint_29(
 
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 15, 12, 12, false);    
+            0, +0.883, 12, 12, false);    
 
 
 

@@ -571,7 +571,7 @@ void checkpoint_46(
         );        
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 80, 20, false);  
+            0, +1, 80, 20, false);  
 
         // section 2. set marker past pokecenter
         handle_unexpected_battles(env.program_info(), env.console, context,
@@ -580,7 +580,7 @@ void checkpoint_46(
         });      
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 15, 12, 12, false);             
+            0, +0.883, 12, 12, false);             
        
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
 

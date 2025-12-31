@@ -169,7 +169,7 @@ void realign_player(
 void overworld_navigation(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     NavigationStopCondition stop_condition,
     NavigationMovementMode movement_mode,
-    uint8_t x, uint8_t y,
+    double x, double y,
     uint16_t seconds_timeout = 60, uint16_t seconds_realign = 60,
     bool auto_heal = false,
     bool detect_wipeout = false

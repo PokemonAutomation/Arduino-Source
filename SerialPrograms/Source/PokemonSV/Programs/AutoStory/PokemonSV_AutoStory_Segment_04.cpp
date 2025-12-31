@@ -83,7 +83,7 @@ void checkpoint_08(
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +0.803, +0.453, 800ms);
         env.console.log("overworld_navigation: Go to cliff.");
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 30, 30, true, true);
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, +1, 30, 30, true, true);
 
         env.console.log("Look over the injured Miraidon/Koraidon on the beach.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5, {});

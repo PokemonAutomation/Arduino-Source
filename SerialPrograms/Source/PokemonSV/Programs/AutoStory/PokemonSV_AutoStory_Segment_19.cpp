@@ -123,7 +123,7 @@ void checkpoint_41(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 20, 10, false);
+                    0, +1, 20, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {-1, 0}, 320ms, 400ms);
@@ -140,7 +140,7 @@ void checkpoint_41(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 30, 10, false);
+                    0, +1, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {-1, 0}, 320ms, 400ms);
@@ -159,7 +159,7 @@ void checkpoint_41(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 40, 20, false);
+                    0, +1, 40, 20, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {0, -1}, 400ms, 400ms);
@@ -179,7 +179,7 @@ void checkpoint_41(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 40, 10, false);
+                    0, +1, 40, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {-1, 0}, 320ms, 400ms);
@@ -198,7 +198,7 @@ void checkpoint_41(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 24, 8, false);
+                    0, +1, 24, 8, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {0, -1}, 400ms, 400ms);
@@ -217,7 +217,7 @@ void checkpoint_41(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 30, 10, false);
+                    0, +1, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, 0}, 320ms, 400ms);
@@ -234,7 +234,7 @@ void checkpoint_41(
         );
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 10, 10, false);        
+            0, +1, 10, 10, false);        
 
         // move the marker so it doesn't cover North in the minimap
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, +1, 0, 400ms);
@@ -259,7 +259,7 @@ void checkpoint_41(
         });        
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_BATTLE, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 25, 25, false);
+            0, +1, 25, 25, false);
 
 
         // battle Klawf phase 1
@@ -274,7 +274,7 @@ void checkpoint_41(
         });         
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 35, 35, false);
+            0, +1, 35, 35, false);
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 30, {CallbackEnum::BATTLE});
         // Klawf battle phase 2
@@ -313,7 +313,7 @@ void checkpoint_42(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 24, 12, false);
+                    0, +1, 24, 12, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {-1, 0}, 320ms, 400ms);
@@ -331,7 +331,7 @@ void checkpoint_42(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 36, 12, false);
+                    0, +1, 36, 12, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, 0}, 320ms, 400ms);
@@ -349,7 +349,7 @@ void checkpoint_42(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 24, 12, false);
+                    0, +1, 24, 12, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {+1, 0}, 320ms, 400ms);
@@ -367,7 +367,7 @@ void checkpoint_42(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 30, 10, false);
+                    0, +1, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {-1, 0}, 320ms, 400ms);
@@ -382,7 +382,7 @@ void checkpoint_42(
         });      
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 15, 12, 12, false);           // can't wrap in handle_when_stationary_in_overworld(), since we expect to be stationary when walking into the pokecenter
+            0, +0.883, 12, 12, false);           // can't wrap in handle_when_stationary_in_overworld(), since we expect to be stationary when walking into the pokecenter
           
 
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);  

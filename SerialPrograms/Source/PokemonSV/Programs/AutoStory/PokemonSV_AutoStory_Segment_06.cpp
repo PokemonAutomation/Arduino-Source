@@ -94,7 +94,7 @@ void checkpoint_11(
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 75, 75, true, true);
+                    0, +1, 75, 75, true, true);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, {-1, 0}, 320ms, 400ms);
