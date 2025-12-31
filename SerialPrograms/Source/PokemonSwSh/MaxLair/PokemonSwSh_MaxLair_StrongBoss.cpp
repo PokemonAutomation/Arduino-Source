@@ -111,7 +111,7 @@ MaxLairStrongBoss::MaxLairStrongBoss()
     , MIN_WIN_RATE(
         "<b>Minimum Win Rate:</b><br>"
         "Keep the path if the win rate stays above this ratio. This is done by resetting the host.",
-        LockMode::LOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         0.75, 0, 1.0
     )
     , CONSOLES(MaxLairStrongBoss_ConsoleFactory())
@@ -168,7 +168,7 @@ public:
     EndBattleDecider_StrongBoss(
         Logger& logger,
         const Consoles& consoles, size_t host_index,
-        double min_win_ratio
+        const FloatingPointOption& min_win_ratio
     )
         : m_logger(logger)
         , m_consoles(consoles)
@@ -224,7 +224,7 @@ private:
     Logger& m_logger;
     const Consoles& m_consoles;
     size_t m_host_index;
-    double m_min_win_ratio;
+    const FloatingPointOption& m_min_win_ratio;
 };
 
 
