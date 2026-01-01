@@ -22,9 +22,6 @@ void pbf_press_button(ProControllerContext& context, Button button, Milliseconds
 void pbf_press_dpad(ProControllerContext& context, DpadPosition position, Milliseconds hold, Milliseconds release){
     ssf_press_dpad(context, position, hold + release, hold, 0ms);
 }
-void pbf_move_left_joystick_old(ProControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release){
-    ssf_press_left_joystick_old(context, x, y, hold + release, hold, 0ms);
-}
 void pbf_move_left_joystick(ProControllerContext& context, const JoystickPosition& position, Milliseconds hold, Milliseconds release){
     ssf_press_left_joystick(context, position, hold + release, hold, 0ms);
 }

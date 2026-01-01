@@ -40,16 +40,6 @@ void ssf_press_dpad(
 );
 
 
-void ssf_press_left_joystick_old(
-    ProControllerContext& context,
-    uint8_t x, uint8_t y,
-    uint16_t delay, uint16_t hold, uint8_t cool = 0
-);
-void ssf_press_left_joystick_old(
-    ProControllerContext& context,
-    uint8_t x, uint8_t y,
-    Milliseconds delay, Milliseconds hold, Milliseconds cool = 0ms
-);
 void ssf_press_left_joystick(
     ProControllerContext& context,
     const JoystickPosition& position,

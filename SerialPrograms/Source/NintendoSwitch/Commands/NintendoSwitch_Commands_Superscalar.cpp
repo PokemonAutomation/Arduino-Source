@@ -36,33 +36,6 @@ void ssf_press_dpad(
     context->issue_dpad(&context, delay, hold, cool, position);
 }
 
-void ssf_press_left_joystick_old(
-    ProControllerContext& context,
-    uint8_t x, uint8_t y,
-    uint16_t delay, uint16_t hold, uint8_t cool
-){
-    context->issue_left_joystick(
-        &context,
-        delay*8ms, hold*8ms, cool*8ms,
-        {
-            JoystickTools::linear_u8_to_float(x),
-            -JoystickTools::linear_u8_to_float(y)
-        }
-    );
-}
-void ssf_press_left_joystick_old(
-    ProControllerContext& context,
-    uint8_t x, uint8_t y,
-    Milliseconds delay, Milliseconds hold, Milliseconds cool
-){
-    context->issue_left_joystick(
-        &context, delay, hold, cool,
-        {
-            JoystickTools::linear_u8_to_float(x),
-            -JoystickTools::linear_u8_to_float(y)
-        }
-    );
-}
 void ssf_press_left_joystick(
     ProControllerContext& context,
     const JoystickPosition& position,
