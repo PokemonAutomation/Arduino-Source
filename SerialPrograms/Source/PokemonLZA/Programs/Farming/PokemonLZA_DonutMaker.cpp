@@ -94,11 +94,12 @@ DonutMaker::DonutMaker()
         LockMode::LOCK_WHILE_RUNNING,
         1, 1, 3
         )
-    //, NUM_DONUTS(
-    //    "<b>Number of Donuts:</b><br>The number of donuts to make.",
-    //    LockMode::LOCK_WHILE_RUNNING,
-    //    1, 1
-    //)
+    , NUM_DONUTS(
+       "<b>Number of Donuts:</b><br>The number of donuts to make."
+       "<br>Make sure you have enough berries to make this many donuts.",
+       LockMode::LOCK_WHILE_RUNNING,
+       0, 1, 999
+    )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_DONUT_FOUND(
         "Donut Found",
@@ -117,8 +118,8 @@ DonutMaker::DonutMaker()
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(BERRIES);
     PA_ADD_OPTION(NUM_POWER_REQUIRED);
+    PA_ADD_OPTION(NUM_DONUTS);
     PA_ADD_OPTION(FLAVOR_POWERS);
-    //PA_ADD_OPTION(NUM_DONUTS); //TODO: Add looping. Navigate back to PC and heal to make backup save.
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -406,6 +407,49 @@ void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProContr
     context.wait_for_all_requests();
 }
 
+// Create a new backup save after making a donut to keep
+void save_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
+
+    env.log("Creating new backup save to keep the last made donut.");
+
+    // Stop talking to Ansha
+    pbf_mash_button(context, BUTTON_B, Seconds(4));
+    context.wait_for_all_requests();
+
+    bool zoom_to_max = false;
+    open_map(env.console, context, zoom_to_max);
+    // Move map cursor upwards a little bit so that the cursor locks onto Hotel Z.
+    // This is needed so that in the fast travel location menu the pokecenter is one row near
+    // the default position on the menu.
+    pbf_move_left_joystick(context, {0, +0.5}, 100ms, 400ms);
+    // Press Y to load fast travel locaiton menu. The cursor should now points to Hotel Z
+    pbf_press_button(context, BUTTON_Y, 100ms, 500ms);
+    // Move one menu item down to select Hotel Z
+    pbf_press_dpad(context, DPAD_DOWN, 50ms, 600ms);
+    context.wait_for_all_requests();
+
+    OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [&](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_A, Seconds(10));
+            pbf_wait(context, Seconds(30)); // 30 sec to wait out potential day night change
+        },
+        {overworld}
+    );
+    if (ret != 0){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+           ErrorReport::SEND_ERROR_REPORT,
+            "donut_maker(): Unable to find overworld after fast traveling from Hotel Z after 30 sec.",
+            env.console
+        );
+    }
+    context.wait_for(3000ms); // extra 3 seconds to allow the autosave to complete
+    env.log("Detected overworld. Fast traveled from Hotel Z to Pokecenter");
+}
 
 // Return true if it should stop
 // Start the iteration at closest pokemon center
@@ -477,7 +521,10 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         env.update_stats();
 
         if (should_stop){
-            break;
+            save_donut(env, context);
+            if (NUM_DONUTS != 0 && stats.matched.load() >= NUM_DONUTS){
+                break;
+            }
         }
     }
 
