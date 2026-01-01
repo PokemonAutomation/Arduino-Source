@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <map>
+#include <format>
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Qt/StringToolsQt.h"
@@ -44,6 +45,7 @@ std::string run_number_normalization(const std::string& input){
         //  Common misreads.
         {'|', '1'},
         {']', '1'},
+        {'[', '6'},
         {'l', '1'},
         {'i', '1'},
         {'A', '4'},
@@ -129,7 +131,7 @@ std::string read_number_waterfill_no_normalization(
     );
 
 //    static int c = 0;
-//    filtered.save("zztest-" + std::to_string(c++) + ".png");
+//    filtered.save(std::format("zztest-{:#x}-{:#x}-{}.png", rgb32_min, rgb32_max, c++));
 
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(filtered, 0xff000000, 0xff7f7f7f);
 

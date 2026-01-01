@@ -222,11 +222,11 @@ bool BoxDexNumberDetector::detect(const ImageViewRGB32& screen){
         const size_t min_digit_area = dex_image_crop.height()*dex_image_crop.height() / 25;
         return OCR::read_number_waterfill_multifilter(m_logger, dex_image_crop,
             {
-                {0x0, 0xff202020},
-                {0x0, 0xff404040},
-                {0x0, 0xff606060},
+                {0x0, 0xff707070},
                 {0x0, 0xff808080},
+                {0x0, 0xff909090},
                 {0x0, 0xffA0A0A0},
+                {0x0, 0xffB0B0B0},
             },
             text_inside_range, prioritize_numeric_only_results, width_max, min_digit_area
         );
