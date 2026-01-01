@@ -9,6 +9,7 @@
 
 #include <functional>
 #include "ML/Inference/ML_YOLOv5Detector.h"
+#include "ML/Inference/ML_YOLONavigation.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -402,17 +403,6 @@ void move_player_forward(
     Milliseconds delay_after_lets_go = Milliseconds(840)
 );
 
-// get the box of the target object
-// if multiple objects have the same label, choose the one with the highest score
-// return ImageFloatBox{-1, -1, -1, -1} if target object not found
-ImageFloatBox get_yolo_box(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
-    VideoOverlaySet& overlays,
-    YOLOv5Detector& yolo_detector, 
-    const std::string& target_label
-);
-
 // move forward until detected object is a certain width and height on screen (min_size)
 // walk forward forward_ticks each time
 // if caught in battle, run recovery_action
@@ -466,23 +456,6 @@ void move_forward_until_yolo_object_not_detected(
     Milliseconds delay_after_lets_go = Milliseconds(840)
 );
 
-enum class CameraAxis{
-    X,
-    Y,
-};
-
-// move the camera along `axis` until the target object is aligned with target_line
-// if caught in battle, run recovery_action
-// throw exception if never detected yolo object
-void move_camera_yolo(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
-    CameraAxis axis,
-    YOLOv5Detector& yolo_detector, 
-    const std::string& target_label,
-    double target_line,
-    std::function<void()>&& recovery_action
-);
 
 // move the player sideways until the target object is aligned with x_target
 // throw exception if never detected yolo object

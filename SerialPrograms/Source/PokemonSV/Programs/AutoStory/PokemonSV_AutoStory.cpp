@@ -1175,8 +1175,8 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
         VideoOverlaySet overlays(env.console.overlay());
         YOLOv5Detector yolo_detector(RESOURCE_PATH() + std::string(YOLO_PATH));
         
-        // ImageFloatBox target_box = 
-        get_yolo_box(env, context, overlays, yolo_detector, TARGET_LABEL);
+        // ImageFloatBox target_box =
+        get_highest_confident_yolo_box(env, context, overlays, yolo_detector, TARGET_LABEL);
 
         context.wait_for(Milliseconds(1000));
         return;
