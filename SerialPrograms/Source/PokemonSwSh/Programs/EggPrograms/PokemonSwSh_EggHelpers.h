@@ -58,8 +58,8 @@ static void fly_home_goto_lady(ProControllerContext& context, char from_overworl
 
     //  Go to lady.
     //  If you change this, you MUST update "GO_TO_LADY_DURATION".
-    ssf_press_left_joystick_old(context, STICK_MIN, STICK_CENTER, 160ms, 80ms);
-    ssf_press_left_joystick_old(context, STICK_CENTER, STICK_MIN, 90, 45);
+    ssf_press_left_joystick(context, {-1, 0}, 160ms, 80ms);
+    ssf_press_left_joystick(context, {0, +1}, 720ms, 360ms);
 }
 
 //  Assume the selected app in the menu is Twon Map.
