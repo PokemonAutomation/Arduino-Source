@@ -411,7 +411,7 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
     });
 
     while (true){
-        run_until<ProControllerContext>(
+        const int ret = run_until<ProControllerContext>(
             env.console, context,
             [&](ProControllerContext& context){
                 if (LEGENDARY == Legendary::VIRIZION){
@@ -430,7 +430,7 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
         ); // end run_until()
         shiny_detector.throw_if_no_sound();
 
-        if (SHINY_DETECTED.on_shiny_sound(
+        if (ret == 0 && SHINY_DETECTED.on_shiny_sound(
             env, env.console, context,
             shiny_count,
             shiny_coefficient
