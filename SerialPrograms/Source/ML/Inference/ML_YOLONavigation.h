@@ -27,13 +27,6 @@ enum class CameraAxis{
     Y,
 };
 
-// Placeholder for navigation functions to be migrated from PokemonSV AutoStoryTools
-// Functions will include:
-// - move_camera_yolo(): Align camera to object position
-// - move_player_to_realign_via_yolo(): Move player sideways to align with object
-// - move_forward_until_yolo_object_above_min_size(): Approach object until desired size
-// - move_player_until_yolo_object_detected(): Search for object by moving player
-// - move_camera_until_yolo_object_detected(): Search for object by panning camera
 
 // Get the box of the target object with the highest confidence score.
 // If multiple objects have the same label, choose the one with the highest score.
