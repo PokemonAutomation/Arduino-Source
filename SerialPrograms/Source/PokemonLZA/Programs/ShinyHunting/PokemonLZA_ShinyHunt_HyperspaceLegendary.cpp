@@ -143,12 +143,13 @@ bool route_virizion(
     ProControllerContext& context,
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
     SimpleIntegerOption<uint16_t>& MIN_CALORIE_REMAINING,
+    SimpleIntegerOption<uint16_t> MAX_ROUNDS,
     uint8_t& ready_to_stop_counter){
 
     const uint16_t min_calorie = MIN_CALORIE_REMAINING;
 
     // running forward
-    Milliseconds duration(4400);
+    //Milliseconds duration(4400);
 
     HyperspaceCalorieLimitWatcher calorie_watcher(env.logger(), min_calorie);
     const int ret = run_until<ProControllerContext>(
@@ -286,3 +287,4 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
 }  // namespace PokemonLZA
 }  // namespace NintendoSwitch
 }  // namespace PokemonAutomation
+
