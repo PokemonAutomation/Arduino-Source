@@ -72,7 +72,7 @@ std::unique_ptr<StatsTracker> ShinyHunt_HyperspaceLegendary_Descriptor::make_sta
 
 
 ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
-    : SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY)
+    : SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::STOP_PROGRAM)
     , LEGENDARY("<b>Hunt Route:</b>",
         {
             {Legendary::VIRIZION,  "virizion",  "Virizion"},
@@ -105,6 +105,7 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
 
 namespace {
 
+// Return true if the Calorie number on screen <= min_calorie
 bool check_calorie(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -135,6 +136,7 @@ bool check_calorie(
 }
 
 
+// Wait until the warp pad is detected
 void detect_warp_pad(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats){
 
@@ -164,7 +166,12 @@ void detect_warp_pad(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 
-bool hunt_terrakion(
+// Use teleport pad to refresh Terrakion spawns until MIN_CALORIE is reached.
+// Then move close to Terrakion so the shiny sound detector (from the caller level)
+// can detect shiny and stop program.
+// This function always returns false to mean it will not require the program to
+// stop, as it relies on the shiny sound detector from the caller level.
+void hunt_terrakion(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
@@ -223,12 +230,11 @@ bool hunt_terrakion(
     pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
 
     context.wait_for_all_requests();
-
-    return false;
 }
 
-
-bool hunt_virizion_balcony(
+// TODO: WIP: use OpenCV to traverse the alley to move to check
+// Virizion.
+void hunt_virizion_balcony(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
@@ -309,12 +315,13 @@ bool hunt_virizion_balcony(
         },
         {{yolo_watcher}}
     );
-
-    return true;
 }
 
 
-bool hunt_virizion_rooftop(
+// Use shuttle run on rooftop to refresh Virizion spawns until MIN_CALORIE is reached.
+// Then move close to Virizion so the shiny sound detector (from the caller level)
+// can detect shiny and stop program
+void hunt_virizion_rooftop(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
@@ -378,8 +385,6 @@ bool hunt_virizion_rooftop(
     pbf_controller_state(context, BUTTON_A, DPAD_NONE, {0.0, 1.0}, {0.0, 0.0}, 2500ms);
     run_forward(5s);
     context.wait_for_all_requests();
-
-    return false;
 }
 
 
@@ -393,55 +398,57 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
 
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats = env.current_stats<ShinyHunt_HyperspaceLegendary_Descriptor::Stats>();
 
-    ShinySoundHandler shiny_sound_handler(SHINY_DETECTED);
-
+    uint8_t shiny_count = 0;
+    float shiny_coefficient = 1.0;
     PokemonLA::ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool {
         //  Warning: This callback will be run from a different thread than this function.
+        shiny_count++;
         stats.shinies++;
         env.update_stats();
         env.console.overlay().add_log("Shiny Sound Detected!", COLOR_YELLOW);
-
-        return shiny_sound_handler.on_shiny_sound(
-            env, env.console, stats.shinies, error_coefficient
-        );
+        shiny_coefficient = error_coefficient;
+        return true;
     });
 
-    run_until<ProControllerContext>(
-        env.console, context,
-        [&](ProControllerContext& context){
-            while (true){
-                bool should_stop = false;
+    while (true){
+        run_until<ProControllerContext>(
+            env.console, context,
+            [&](ProControllerContext& context){
                 if (LEGENDARY == Legendary::VIRIZION){
-                    should_stop = hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH);
-                } else{
+                    hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH);
+                } else if (LEGENDARY == Legendary::TERRAKION){
+                    hunt_terrakion(env, context, stats, MIN_CALORIE_TO_CATCH);
+                } else {
                     OperationFailedException::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "legendary hunt not implemented",
                         env.console
                     );
                 }
+            },
+            {{shiny_detector}}
+        ); // end run_until()
+        shiny_detector.throw_if_no_sound();
 
-                context.wait_for_all_requests();
-                shiny_sound_handler.process_pending(context);
+        if (SHINY_DETECTED.on_shiny_sound(
+            env, env.console, context,
+            shiny_count,
+            shiny_coefficient
+        )){
+            break;
+        }
 
-                if (should_stop){
-                    break;
-                }
-
-                go_home(env.console, context);
-                reset_game_from_home(env, env.console, context);
-                stats.game_resets++;
-                env.update_stats();
-                if (stats.game_resets % 10 == 0){
-                    send_program_status_notification(env, NOTIFICATION_STATUS);
-                }
-            } // end while
-        },
-        {{shiny_detector}}
-    );
+        // no shiny sound detected or no shiny legendary detected. Reset game
+        go_home(env.console, context);
+        reset_game_from_home(env, env.console, context);
+        stats.game_resets++;
+        env.update_stats();
+        if (stats.game_resets % 10 == 0){
+            send_program_status_notification(env, NOTIFICATION_STATUS);
+        }
+    } // end while (true)
 
     go_home(env.console, context);
-
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
