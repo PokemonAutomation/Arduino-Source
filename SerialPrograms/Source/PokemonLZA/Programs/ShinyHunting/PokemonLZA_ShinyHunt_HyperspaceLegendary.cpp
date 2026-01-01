@@ -224,7 +224,9 @@ bool hunt_virizion_rooftop(
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
     SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH){
 
-    const uint16_t min_calorie = MIN_CALORIE_TO_CATCH + 15 + 22;
+    // Spawn refreshing loop takes 15 sec. Going to check Virizion takes 22 sec.
+    // 10 for 10 cal per sec
+    const uint16_t min_calorie = MIN_CALORIE_TO_CATCH + (15 + 22) * 10;
 
     // running forward
     // const Milliseconds run_duration(4400);
