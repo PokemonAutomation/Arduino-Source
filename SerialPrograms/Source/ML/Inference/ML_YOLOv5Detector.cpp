@@ -133,7 +133,7 @@ bool YOLOv5Watcher::process_frame(const ImageViewRGB32& frame, WallClock timesta
 }
 
 
-std::vector<YOLOv5Session::DetectionBox> YOLOv5Watcher::detected_boxes(){
+std::vector<YOLOv5Watcher::DetectionBox> YOLOv5Watcher::detected_boxes(){
     ReadSpinLock lg(m_output_lock, "YOLOv5Watcher::detected_boxes()");
     return m_output_boxes;
 }
