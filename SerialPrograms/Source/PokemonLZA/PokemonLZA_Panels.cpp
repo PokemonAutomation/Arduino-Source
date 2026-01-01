@@ -75,8 +75,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<PostKillCatcher_Descriptor, PostKillCatcher>());
     ret.emplace_back(make_single_switch_program<BoxSorter_Descriptor, BoxSorter>());
     ret.emplace_back(make_single_switch_program<WeatherFinder_Descriptor, WeatherFinder>());
+    ret.emplace_back(make_single_switch_program<DonutMaker_Descriptor, DonutMaker>());
     if (IS_BETA_VERSION){
-        ret.emplace_back(make_single_switch_program<DonutMaker_Descriptor, DonutMaker>());
     }
 
     ret.emplace_back("---- Farming ----");
