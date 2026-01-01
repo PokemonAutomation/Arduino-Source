@@ -66,6 +66,11 @@ protected:
 //        cout << "fx = " << fx << ", fy = " << fy << endl;
         double mag_squared = fx*fx + fy*fy;
 
+        fx = std::min(fx, +1.0);
+        fx = std::max(fx, -1.0);
+        fy = std::min(fy, +1.0);
+        fy = std::max(fy, -1.0);
+
         uint16_t wx, wy;
         if (mag_squared == 0){
             wx = 2048;
