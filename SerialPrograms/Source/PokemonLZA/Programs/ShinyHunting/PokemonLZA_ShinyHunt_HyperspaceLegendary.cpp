@@ -77,6 +77,7 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
     , LEGENDARY("<b>Legendary " + STRING_POKEMON + ":</b>",
         {
             {Legendary::COBALION, "cobalion", "Cobalion"},
+            {Legendary::TERRAKION, "terrakion", "Terrakion"},
             {Legendary::VIRIZION,  "virizion",  "Virizion"},
         },
         LockMode::LOCK_WHILE_RUNNING,
