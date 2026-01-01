@@ -12,6 +12,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
+#include "ML/Inference/ML_YOLOv5Detector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
@@ -19,13 +20,18 @@
 #include "PokemonLZA/Inference/PokemonLZA_HyperspaceCalorieDetector.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
+#include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA_ShinyHunt_HyperspaceLegendary.h"
+
+#include <format>
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
 namespace PokemonLZA {
 
 using namespace Pokemon;
+using ML::YOLOv5Watcher;
+using DetectionBox = ML::YOLOv5Session::DetectionBox;
 
 
 ShinyHunt_HyperspaceLegendary_Descriptor::ShinyHunt_HyperspaceLegendary_Descriptor()
@@ -104,6 +110,9 @@ bool hunt_virizion(
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
     SimpleIntegerOption<uint16_t>& MIN_CALORIE_REMAINING){
 
+    std::string model_path = "PokemonLZA/YOLO/Virizion.onnx";
+    YOLOv5Watcher yolo_watcher(env.console.overlay(), model_path);
+
     const uint16_t min_calorie = MIN_CALORIE_REMAINING;
 
     // running forward
@@ -119,6 +128,7 @@ bool hunt_virizion(
         pbf_move_left_joystick(context, {0, -1}, run_duration, 0ms);
         // Wait for a short time to allow the game to register the next button B press
         pbf_wait(context, 100ms);
+        context.wait_for_all_requests();
     
         int ret = wait_until(
             env.console, context, std::chrono::seconds(1), {calorie_watcher}
@@ -137,10 +147,13 @@ bool hunt_virizion(
         env.log(log_msg);
         if (calorie_number <= min_calorie){
             env.log("min calorie reached");
+            env.add_overlay_log("Min Calorie Reached");
             break;
         }
     }
 
+    env.log("Move to check Virizion");
+    env.add_overlay_log("To Check Virision");
     // We have done enough shuttle runs to refresh Virizion spawns.
     // Now run towards it to check shiny!
     
@@ -148,10 +161,45 @@ bool hunt_virizion(
     pbf_move_left_joystick(context, {+1, 0}, 100ms, 0ms);
     // Roll once to leave the balcony area
     pbf_press_button(context, BUTTON_Y, 100ms, 1s);
-    // Run downstairs towards the trash bin
-    pbf_move_left_joystick(context, {0, +1}, Seconds(5), 0ms);
+    context.wait_for_all_requests();
 
-    return false;
+    size_t trash_bin_idx = yolo_watcher.label_index("trash-bin");
+
+    run_until<ProControllerContext>(
+        env.console, context,
+        [&](ProControllerContext& context){
+            // Run downstairs towards the trash bin
+            ssf_press_button(context, BUTTON_B, 0ms, Seconds(1), 0ms);
+            pbf_move_left_joystick(context, {0, +1}, Seconds(5), 0ms);
+            context.wait_for_all_requests();
+
+            while(true){
+                const std::vector<DetectionBox>& detections = yolo_watcher.detected_boxes();
+                const DetectionBox* detection = find_detection(detections, trash_bin_idx);
+                if (detection == nullptr){
+                    context.wait_for(100ms);
+                    continue;
+                }
+
+                double center_x = detection->box.x + detection->box.width/2;
+
+                env.log("Found trash bin");
+                env.add_overlay_log(std::format("Found Trash Bin at {:.2f}", center_x));
+                if (0.45 <= center_x && center_x <= 0.55){
+                    // We are facing the trash bin, stop
+                    env.add_overlay_log("Facing Trash Bin");
+                    break;
+                }
+                double dir_x = (center_x < 0.5 ? -0.5 : 0.5);
+                int duration = static_cast<int>(std::fabs(center_x - 0.5) * 1000);
+                pbf_move_right_joystick(context, {dir_x, 0.0}, Milliseconds(duration), 0ms);
+                context.wait_for_all_requests();
+            }
+        },
+        {{yolo_watcher}}
+    );
+
+    return true;
 }
 
 
@@ -182,9 +230,6 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
         env.console, context,
         [&](ProControllerContext& context){
             while (true){
-                context.wait_for_all_requests();
-                shiny_sound_handler.process_pending(context);
-
                 bool should_stop = false;
                 if (LEGENDARY == Legendary::VIRIZION){
                     should_stop = hunt_virizion(env, context, stats, MIN_CALORIE_REMAINING);
@@ -195,22 +240,23 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
                         env.console
                     );
                 }
-                stats.game_resets++;
-                env.update_stats();
-                send_program_status_notification(env, NOTIFICATION_STATUS);
+
+                context.wait_for_all_requests();
+                shiny_sound_handler.process_pending(context);
 
                 if (should_stop){
                     break;
                 }
 
+                go_home(env.console, context);
+                reset_game_from_home(env, env.console, context);
+                stats.game_resets++;
+                env.update_stats();
+                send_program_status_notification(env, NOTIFICATION_STATUS);
             } // end while
         },
         {{shiny_detector}}
     );
-
-    //  Shiny sound detected and user requested stopping the program when
-    //  detected shiny sound.
-    shiny_sound_handler.process_pending(context);
 
     go_home(env.console, context);
 

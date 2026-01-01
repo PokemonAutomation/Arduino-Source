@@ -28,11 +28,23 @@ namespace PokemonAutomation{
 namespace ML{
 
 
+namespace {
+    // Add prefix RESOURCE_PATH() to path if needed so caller can simply
+    // provide a path relative to RESOURCE_PATH()
+    std::string to_resource_filepath(const std::string& path){
+        std::string resource_path = RESOURCE_PATH() + path;
+        std::cout << "Got resource path " << resource_path << std::endl;
+        if (std::filesystem::exists(resource_path)){
+            return resource_path;
+        }
+        return path;
+    }
+}
+
 YOLOv5Detector::~YOLOv5Detector() = default;
 
-
 YOLOv5Detector::YOLOv5Detector(const std::string& model_path)
-    : m_model_path(model_path)
+    : m_model_path(to_resource_filepath(model_path))
     , m_use_gpu(true)
 {
     if (!model_path.ends_with(".onnx")){
@@ -53,15 +65,14 @@ bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
     cv::Mat frame_mat_rgb;
     cv::cvtColor(frame_mat_bgra, frame_mat_rgb, cv::COLOR_BGRA2RGB);
 
-    // Run inference without holding the lock
-    std::vector<YOLOv5Session::DetectionBox> temp_boxes;
+    m_output_boxes.clear();
 
     // fall back to CPU if fails with GPU.
     for(size_t i = 0; i < 2; i++){
         try{
             // if (m_use_gpu){ throw Ort::Exception("Testing.", ORT_FAIL); }  // to simulate GPU/CPU failure
             // If fails with GPU, fall back to CPU.
-            m_yolo_session->run(frame_mat_rgb, temp_boxes);
+            m_yolo_session->run(frame_mat_rgb, m_output_boxes);
             break;
         }catch(Ort::Exception& e){
             if (m_use_gpu){
@@ -83,20 +94,16 @@ bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
     }
 
     // Only lock when swapping results
-    bool has_detections = temp_boxes.size() > 0;
-    {
-        WriteSpinLock lg(m_output_lock, "YOLOv5Detector::detect()");
-        m_output_boxes = std::move(temp_boxes);
-    }
-
-    return has_detections;
+    return m_output_boxes.size() > 0;
 }
 
-std::vector<YOLOv5Session::DetectionBox> YOLOv5Detector::detected_boxes(){
-    ReadSpinLock lg(m_output_lock, "YOLOv5Detector::detected_boxes()");
-    return m_output_boxes;
+const std::string& YOLOv5Detector::label_name(size_t label_idx) const{
+    return m_yolo_session->label_name(label_idx);
 }
 
+size_t YOLOv5Detector::label_index(const std::string& label_name) const{
+    return m_yolo_session->label_index(label_name);
+}
 
 YOLOv5Watcher::YOLOv5Watcher(VideoOverlay& overlay, const std::string& model_path)
     : VisualInferenceCallback("YOLOv5")
@@ -117,10 +124,19 @@ bool YOLOv5Watcher::process_frame(const ImageViewRGB32& frame, WallClock timesta
         std::string text = m_detector.session()->label_name(box.label_idx) + ": " + tostr_fixed(box.score, 2);
         m_overlay_set.add(COLOR_RED, box.box, text);
     }
+
+    {
+        WriteSpinLock lg(m_output_lock, "YOLOv5Watcher::process_frame()");
+        m_output_boxes = std::move(m_detector.detected_boxes());
+    }
     return false;
 }
 
 
+std::vector<YOLOv5Session::DetectionBox> YOLOv5Watcher::detected_boxes(){
+    ReadSpinLock lg(m_output_lock, "YOLOv5Watcher::detected_boxes()");
+    return m_output_boxes;
+}
 
 
 

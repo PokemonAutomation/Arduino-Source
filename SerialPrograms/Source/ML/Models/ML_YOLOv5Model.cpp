@@ -279,6 +279,24 @@ void YOLOv5Session::run(const cv::Mat& input_image, std::vector<YOLOv5Session::D
 }
 
 
+size_t YOLOv5Session::label_index(const std::string& label_name) const{
+    for(size_t i = 0; i < m_label_names.size(); i++){
+        if (label_name == m_label_names[i]){
+            return i;
+        }
+    }
+    return SIZE_MAX;
+}
+
+const YOLOv5Session::DetectionBox* find_detection(const std::vector<YOLOv5Session::DetectionBox>& detection, size_t label_idx){
+    for(const auto& box : detection){
+        if (box.label_idx == label_idx){
+            return &box;
+        }
+    }
+    return nullptr;
+}
+
 
 }
 }
