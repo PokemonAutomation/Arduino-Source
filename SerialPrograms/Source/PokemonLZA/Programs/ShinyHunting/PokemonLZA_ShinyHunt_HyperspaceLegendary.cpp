@@ -17,6 +17,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_HyperspaceCalorieDetector.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
@@ -133,11 +134,106 @@ bool check_calorie(
     return false;
 }
 
+
+void detect_warp_pad(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats){
+
+    ButtonWatcher ButtonA(
+        COLOR_RED,
+        ButtonType::ButtonA,
+        {0.4, 0.1, 0.2, 0.8},
+        &env.console.overlay()
+    );
+
+    int ret = wait_until(
+        env.console, context, 10s,
+        {ButtonA}
+    );
+    if (ret < 0){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "route_terrakion_reset(): Cannot detect warp pad after 10 seconds",
+            env.console
+        );
+    }else{
+        env.log("Detected warp pad.");
+        // env.console.overlay().add_log("Warp Pad Detected");
+    }
+}
+
+
+bool hunt_terrakion(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
+    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
+{
+
+    // Spawn refreshing loop takes 3 sec. Going to check Virizion takes 8 sec.
+    // 10 for 10 cal per sec
+    const uint16_t min_calorie = MIN_CALORIE_TO_CATCH + (3 + 8) * 10;
+
+    HyperspaceCalorieWatcher calorie_watcher(env.logger());
+    while(true){
+        // Warp away from Terrakion to despawn
+        detect_warp_pad(env, context, stats);
+        pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+
+        // Warp towards Terrakion
+        detect_warp_pad(env, context, stats);
+        pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+
+        // Roll and roll back on Terrakion's roof to respawn
+        detect_warp_pad(env, context, stats);
+        pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+        pbf_move_left_joystick(context, {0, -1}, 80ms, 160ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+        
+        context.wait_for_all_requests();
+
+        stats.spawns++;
+        env.update_stats();
+        if (check_calorie(env, context, calorie_watcher, min_calorie)){
+            break;
+        }
+    }
+
+    // Use warp pads to reset position
+    detect_warp_pad(env, context, stats);
+    pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+    detect_warp_pad(env, context, stats);
+    pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+    detect_warp_pad(env, context, stats);
+
+    // Roll to Terrakion to trigger potential shiny sound
+    env.log("Move to check Terrakion.");
+    env.add_overlay_log("To Check Terrakion");
+
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_move_left_joystick(context, {-1, 1}, 80ms, 160ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_move_left_joystick(context, {0, 1}, 80ms, 500ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_move_left_joystick(context, {1, 1}, 80ms, 160ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+
+    context.wait_for_all_requests();
+
+    return false;
+}
+
+
 bool hunt_virizion_balcony(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
-    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH){
+    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
+{
 
     std::string model_path = "PokemonLZA/YOLO/Virizion.onnx";
     YOLOv5Watcher yolo_watcher(env.console.overlay(), model_path);
@@ -222,14 +318,12 @@ bool hunt_virizion_rooftop(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
-    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH){
+    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
+{
 
     // Spawn refreshing loop takes 15 sec. Going to check Virizion takes 22 sec.
     // 10 for 10 cal per sec
     const uint16_t min_calorie = MIN_CALORIE_TO_CATCH + (15 + 22) * 10;
-
-    // running forward
-    // const Milliseconds run_duration(4400);
 
     auto climb_ladder = [&](Milliseconds hold){
         pbf_move_left_joystick(context, {0.0, 1.0}, hold, 0ms);
@@ -265,9 +359,6 @@ bool hunt_virizion_rooftop(
             break;
         }
     }
-    
-    env.log("Move to check Virizion");
-    env.add_overlay_log("To Check Virizion");
 
     // This movement to Virizion takes about 22 sec
     pbf_press_button(context, BUTTON_A, 100ms, 500ms);
@@ -276,6 +367,11 @@ bool hunt_virizion_rooftop(
     change_character_facing_direction(0.0, -1.0); // face backwards
     // align camera to face what character is facing
     pbf_press_button(context, BUTTON_L, 200ms, 800ms);
+    
+    context.wait_for_all_requests();    
+    env.log("Move to check Virizion");
+    env.add_overlay_log("To Check Virizion");
+
     run_forward(2600ms);
     pbf_wait(context, 1s); // wait for drop to lower level
     run_changing_direction(3000ms, -0.15);
