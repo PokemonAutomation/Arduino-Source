@@ -7,12 +7,10 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
-#include "ML/Inference/ML_YOLOv5Detector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
@@ -23,15 +21,11 @@
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA_ShinyHunt_HyperspaceLegendary.h"
 
-#include <format>
-
 namespace PokemonAutomation {
 namespace NintendoSwitch {
 namespace PokemonLZA {
 
 using namespace Pokemon;
-using ML::YOLOv5Watcher;
-using DetectionBox = ML::YOLOv5Session::DetectionBox;
 
 
 ShinyHunt_HyperspaceLegendary_Descriptor::ShinyHunt_HyperspaceLegendary_Descriptor()
@@ -48,19 +42,16 @@ ShinyHunt_HyperspaceLegendary_Descriptor::ShinyHunt_HyperspaceLegendary_Descript
 class ShinyHunt_HyperspaceLegendary_Descriptor::Stats : public StatsTracker{
 public:
     Stats()
-        : spawns(m_stats["Spawns"])
-        , game_resets(m_stats["Game Resets"])
+        : resets(m_stats["Resets"])
         , shinies(m_stats["Shiny Sounds"])
         , errors(m_stats["Errors"])
     {
-        m_display_order.emplace_back("Spawns");
-        m_display_order.emplace_back("Game Resets");
+        m_display_order.emplace_back("Resets");
         m_display_order.emplace_back("Shiny Sounds");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
 
-    std::atomic<uint64_t>& spawns;
-    std::atomic<uint64_t>& game_resets;
+    std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& shinies;
     std::atomic<uint64_t>& errors;
 };
@@ -78,6 +69,13 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
         },
         LockMode::LOCK_WHILE_RUNNING,
         Legendary::VIRIZION
+    )
+    , MAX_ROUNDS(
+        "<b>Max Rounds:</b><br>Max number of spawn attempts. Set to zero to have no max round limit. "
+        "Make sure to leave enough time to catch found shinies."
+        "<br>Cal. per sec: 1 Star: 1 Cal./s, 2 Star: 1.6 Cal./s, 3 Star: 3.5 Cal./s, 4 Star: 7.5 Cal./s, 5 Star: 10 Cal./s.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        100, 0 // default, min
     )
     , MIN_CALORIE_REMAINING(
         "<b>Minimum Cal. allowed:</b><br>The program will stop if the Calorie number is at or below this value."
@@ -97,6 +95,7 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(LEGENDARY);
+    PA_ADD_OPTION(MAX_ROUNDS);
     PA_ADD_OPTION(MIN_CALORIE_REMAINING);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -104,100 +103,109 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
 
 namespace {
 
-bool hunt_virizion(
+// Return if the loop should stop
+typedef std::function<void(SingleSwitchProgramEnvironment&, ProControllerContext&, ShinyHunt_HyperspaceLegendary_Descriptor::Stats&, bool)> route_func;
+
+void route_default(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats){
+    // Open map
+    bool can_fast_travel = open_map(env.console, context);
+    if (!can_fast_travel){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "route_default(): Cannot open map for fast travel.",
+            env.console
+        );
+    }
+
+    // Move map cursor upwards a little bit
+    pbf_move_left_joystick(context, {0, +0.5}, 100ms, 200ms);
+
+    // Fly from map to reset spawns
+    FastTravelState travel_status = fly_from_map(env.console, context);
+    if (travel_status != FastTravelState::SUCCESS){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "route_default(): Cannot fast travel after moving map cursor.",
+            env.console
+        );
+    }
+}
+
+bool route_virizion(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
-    SimpleIntegerOption<uint16_t>& MIN_CALORIE_REMAINING){
-
-    std::string model_path = "PokemonLZA/YOLO/Virizion.onnx";
-    YOLOv5Watcher yolo_watcher(env.console.overlay(), model_path);
+    SimpleIntegerOption<uint16_t>& MIN_CALORIE_REMAINING,
+    uint8_t& ready_to_stop_counter){
 
     const uint16_t min_calorie = MIN_CALORIE_REMAINING;
 
     // running forward
-    const Milliseconds run_duration(4400);
+    Milliseconds duration(4400);
 
-    HyperspaceCalorieWatcher calorie_watcher(env.logger());
-    while(true){
-        // running forward
-        ssf_press_button(context, BUTTON_B, 0ms, 2*run_duration, 0ms);
-        // Add 30 ms to avoid any drift using the balustrade
-        pbf_move_left_joystick(context, {0, +1}, run_duration + 30ms, 0ms);
-        // run back
-        pbf_move_left_joystick(context, {0, -1}, run_duration, 0ms);
-        // Wait for a short time to allow the game to register the next button B press
-        pbf_wait(context, 100ms);
-        context.wait_for_all_requests();
-    
-        int ret = wait_until(
-            env.console, context, std::chrono::seconds(1), {calorie_watcher}
-        );
-        if (ret < 0){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "hunt_Virizion(): does not detect Calorie number after waiting for a second",
-                env.console
-            );
-        }
-
-        const uint16_t calorie_number = calorie_watcher.calorie_number();
-        const std::string log_msg = std::format("Calorie: {}/{}", calorie_number, min_calorie);
-        env.add_overlay_log(log_msg);
-        env.log(log_msg);
-        if (calorie_number <= min_calorie){
-            env.log("min calorie reached");
-            env.add_overlay_log("Min Calorie Reached");
-            break;
-        }
-    }
-
-    env.log("Move to check Virizion");
-    env.add_overlay_log("To Check Virision");
-    // We have done enough shuttle runs to refresh Virizion spawns.
-    // Now run towards it to check shiny!
-    
-    // Push left joystick rightward to let the character face right
-    pbf_move_left_joystick(context, {+1, 0}, 100ms, 0ms);
-    // Roll once to leave the balcony area
-    pbf_press_button(context, BUTTON_Y, 100ms, 1s);
-    context.wait_for_all_requests();
-
-    size_t trash_bin_idx = yolo_watcher.label_index("trash-bin");
-
-    run_until<ProControllerContext>(
+    HyperspaceCalorieLimitWatcher calorie_watcher(env.logger(), min_calorie);
+    const int ret = run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
-            // Run downstairs towards the trash bin
-            ssf_press_button(context, BUTTON_B, 0ms, Seconds(1), 0ms);
-            pbf_move_left_joystick(context, {0, +1}, Seconds(5), 0ms);
-            context.wait_for_all_requests();
-
-            while(true){
-                const std::vector<DetectionBox>& detections = yolo_watcher.detected_boxes();
-                const DetectionBox* detection = find_detection(detections, trash_bin_idx);
-                if (detection == nullptr){
-                    context.wait_for(100ms);
-                    continue;
-                }
-
-                double center_x = detection->box.x + detection->box.width/2;
-
-                env.log("Found trash bin");
-                env.add_overlay_log(std::format("Found Trash Bin at {:.2f}", center_x));
-                if (0.45 <= center_x && center_x <= 0.55){
-                    // We are facing the trash bin, stop
-                    env.add_overlay_log("Facing Trash Bin");
-                    break;
-                }
-                double dir_x = (center_x < 0.5 ? -0.5 : 0.5);
-                int duration = static_cast<int>(std::fabs(center_x - 0.5) * 1000);
-                pbf_move_right_joystick(context, {dir_x, 0.0}, Milliseconds(duration), 0ms);
-                context.wait_for_all_requests();
-            }
+            // running forward
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 536ms, 0ms);
+            pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, {0.000, 1.000}, {1.000, -0.000}, 173ms);
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 348ms, 0ms);
+            pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, {0.000, 1.000}, {-1.000, -0.000}, 38ms);
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 572ms, 0ms);
+            pbf_controller_state(context, BUTTON_A, DPAD_NONE, {0.000, 1.000}, {0.000, -0.000}, 716ms);
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 385ms, 0ms);
+            pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, {0.000, 1.000}, {-1.000, -0.000}, 123ms);
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 178ms, 0ms);
+            pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0.000, 1.000}, {0.000, -0.000}, 212ms);
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 1634ms, 0ms);
+            pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, {0.000, 1.000}, {-1.000, -0.000}, 91ms);
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 994ms, 0ms);
+            pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0.000, 1.000}, {0.000, -0.000}, 221ms);
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 844ms, 0ms);
+            pbf_controller_state(context, BUTTON_A, DPAD_NONE, {0.000, 1.000}, {0.000, -0.000}, 155ms);
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 81ms, 0ms);
+            pbf_controller_state(context, BUTTON_A, DPAD_NONE, {0.000, 1.000}, {0.000, -0.000}, 116ms);
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 67ms, 0ms);
+            pbf_controller_state(context, BUTTON_A, DPAD_NONE, {0.000, 1.000}, {0.000, -0.000}, 111ms);
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 78ms, 0ms);
+            pbf_controller_state(context, BUTTON_A, DPAD_NONE, {0.000, 1.000}, {0.000, -0.000}, 111ms);
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 72ms, 0ms);
+            pbf_controller_state(context, BUTTON_A, DPAD_NONE, {0.000, 1.000}, {0.000, -0.000}, 112ms);
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 78ms, 0ms);
+            pbf_controller_state(context, BUTTON_A, DPAD_NONE, {0.000, 1.000}, {0.000, -0.000}, 134ms);
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 78ms, 0ms);
+            pbf_controller_state(context, BUTTON_A, DPAD_NONE, {0.000, 1.000}, {0.000, -0.000}, 132ms);
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 71ms, 0ms);
+            pbf_controller_state(context, BUTTON_A, DPAD_NONE, {0.000, 1.000}, {0.000, -0.000}, 132ms);
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 68ms, 0ms);
+            pbf_controller_state(context, BUTTON_A, DPAD_NONE, {0.000, 1.000}, {0.000, -0.000}, 134ms);
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 66ms, 0ms);
+            pbf_controller_state(context, BUTTON_A, DPAD_NONE, {0.000, 1.000}, {0.000, -0.000}, 131ms);
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 1925ms, 0ms);
+            pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0.000, 1.000}, {0.000, -0.000}, 174ms);
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 1321ms, 0ms);
+            pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, {0.000, 1.000}, {0.000, -1.000}, 1389ms);
+            pbf_move_left_joystick(context, {0.000000, 1.000000}, 196ms, 0ms);
+            pbf_wait(context, 3337ms);
         },
-        {{yolo_watcher}}
+        {{calorie_watcher}}
     );
+    uint16_t calorie_number = calorie_watcher.calorie_number();
+    const std::string log_msg = std::format("Calorie: {}/{}", calorie_number, min_calorie);
+    env.add_overlay_log(log_msg);
+    env.log(log_msg);
+    if (ret == 0){
+        env.log("min calorie reached");
+        return true;
+    }
 
     return true;
 }
@@ -222,41 +230,52 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
         env.console.overlay().add_log("Shiny Sound Detected!", COLOR_YELLOW);
 
         return shiny_sound_handler.on_shiny_sound(
-            env, env.console, stats.shinies, error_coefficient
+            env, env.console,
+            stats.shinies,
+            error_coefficient
         );
     });
 
+    uint64_t num_resets = 0;
+    uint8_t ready_to_stop_counter = 0;
     run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
             while (true){
-                bool should_stop = false;
-                if (LEGENDARY == Legendary::VIRIZION){
-                    should_stop = hunt_virizion(env, context, stats, MIN_CALORIE_REMAINING);
-                } else{
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
-                        "legendary hunt not implemented",
-                        env.console
-                    );
-                }
-
                 context.wait_for_all_requests();
                 shiny_sound_handler.process_pending(context);
 
-                if (should_stop){
+                bool should_reset = route_virizion(
+                    env, context, stats, MIN_CALORIE_REMAINING, ready_to_stop_counter
+                    );
+
+                if (!should_reset){
                     break;
                 }
 
                 go_home(env.console, context);
                 reset_game_from_home(env, env.console, context);
-                stats.game_resets++;
+
+                num_resets++;
+                stats.resets++;
                 env.update_stats();
-                send_program_status_notification(env, NOTIFICATION_STATUS);
-            } // end while
+
+                if (num_resets % 10 == 0){
+                    send_program_status_notification(env, NOTIFICATION_STATUS);
+                }
+
+                if (MAX_ROUNDS > 0 && num_resets >= MAX_ROUNDS){
+                    env.log("Reached reset limit.");
+                    break;
+                }
+            }
         },
         {{shiny_detector}}
-    );
+        );
+
+    //  Shiny sound detected and user requested stopping the program when
+    //  detected shiny sound.
+    shiny_sound_handler.process_pending(context);
 
     go_home(env.console, context);
 
