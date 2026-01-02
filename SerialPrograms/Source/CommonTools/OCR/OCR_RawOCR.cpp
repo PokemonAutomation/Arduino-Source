@@ -48,8 +48,8 @@ public:
 
     // Perform OCR on the given image. Thread-safe - can be called concurrently.
     // Checkout pattern: (1) acquire idle instance from pool (or create new one if none available),
-    // (2) run OCR without holding lock, (3) return instance to idle pool.
-    std::string run(const ImageViewRGB32& image){
+    // (2) configure PSM, (3) run OCR without holding lock, (4) return instance to idle pool.
+    std::string run(const ImageViewRGB32& image, int psm){
         TesseractAPI* instance;
         // Checkout: Try to get an idle instance, create new one if the idle pool is empty.
         while (true){
@@ -64,6 +64,10 @@ public:
             // No idle instance available - create a new one.
             add_instance();
         }
+
+        // Configure PSM before OCR (safe to call between images on same instance).
+        // PSM is page segmentation mode for Tessearct.
+        instance->set_page_seg_mode(psm);
 
         // Perform OCR without holding the lock (allows concurrent OCR operations).
 //        auto start = current_time();
@@ -175,7 +179,7 @@ struct OcrGlobals{
 };
 
 
-std::string ocr_read(Language language, const ImageViewRGB32& image){
+std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode psm){
 //    static size_t c = 0;
 //    image.save("ocr-" + std::to_string(c++) + ".png");
 
@@ -196,7 +200,7 @@ std::string ocr_read(Language language, const ImageViewRGB32& image){
         }
     }
     // Delegate to pool (which has its own locking for instance management).
-    return iter->second.run(image);
+    return iter->second.run(image, static_cast<int>(psm));
 }
 
 

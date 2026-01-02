@@ -213,6 +213,9 @@ bool BoxDexNumberDetector::detect(const ImageViewRGB32& screen){
     
     const int dex_number = [&](){
         const ImageViewRGB32 dex_image_crop = extract_box_reference(screen, m_dex_number_box);
+        return OCR::read_number(m_logger, dex_image_crop);
+
+#if 0
         const bool text_inside_range = true;
         const bool prioritize_numeric_only_results = true;
         const size_t width_max = SIZE_MAX;
@@ -222,14 +225,13 @@ bool BoxDexNumberDetector::detect(const ImageViewRGB32& screen){
         const size_t min_digit_area = dex_image_crop.height()*dex_image_crop.height() / 25;
         return OCR::read_number_waterfill_multifilter(m_logger, dex_image_crop,
             {
-                {0x0, 0xff707070},
                 {0x0, 0xff808080},
                 {0x0, 0xff909090},
                 {0x0, 0xffA0A0A0},
-                {0x0, 0xffB0B0B0},
             },
             text_inside_range, prioritize_numeric_only_results, width_max, min_digit_area
         );
+#endif
     }();
     if (dex_number <= 0 || dex_number > static_cast<int>(max_dex_number)) {
         m_dex_number = 0;

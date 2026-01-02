@@ -82,7 +82,7 @@ std::string run_number_normalization(const std::string& input){
 
 
 int read_number(Logger& logger, const ImageViewRGB32& image, Language language){
-    std::string ocr_text = OCR::ocr_read(language, image);
+    std::string ocr_text = OCR::ocr_read(language, image, OCR::PageSegMode::SINGLE_LINE);
     std::string normalized = run_number_normalization(ocr_text);
 
     std::string str;
@@ -107,10 +107,15 @@ int read_number(Logger& logger, const ImageViewRGB32& image, Language language){
 // Run OCR on each individual character in the string of numbers.
 // Return empty string if OCR fails.
 //
-// text_inside_range: binary filter is applied to the image so that any pixels within the color range will be turned black, and everything else will be white
-// width_max: return empty string if any character's width is greater than width_max (likely means that two characters are touching, and so are treated as one large character)
-// min_digit_area: if a character has area (aka pixel count) smaller than this value (likely noise or punctuations), skip this character
-// check_empty_string: if set to true, return empty string (and stop evaluation) if any character returns an empty string from OCR
+// - text_inside_range: binary filter is applied to the image so that any pixels within
+//   the color range will be turned black, and everything else will be white
+// - width_max: return empty string if any character's width is greater than width_max
+//   (likely means that two characters are touching, and so are treated as one large
+//   character)
+// - min_digit_area: if a character has area (aka pixel count) smaller than this value
+//   (likely noise or punctuations), skip this character
+// - check_empty_string: if set to true, return empty string (and stop evaluation) if
+//   any character returns an empty string from OCR
 std::string read_number_waterfill_no_normalization(
     Logger& logger, const ImageViewRGB32& image,
     uint32_t rgb32_min, uint32_t rgb32_max,    
@@ -163,7 +168,7 @@ std::string read_number_waterfill_no_normalization(
         }
 
         ImageRGB32 padded = pad_image(cropped, 1 * cropped.width(), 0xffffffff);
-        std::string ocr = OCR::ocr_read(Language::English, padded);
+        std::string ocr = OCR::ocr_read(Language::English, padded, OCR::PageSegMode::SINGLE_CHAR);
 
 //        padded.save("zztest-cropped" + std::to_string(c) + "-" + std::to_string(i++) + ".png");
         // std::cout << ocr[0] << std::endl;

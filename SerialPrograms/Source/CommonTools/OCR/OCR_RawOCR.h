@@ -15,6 +15,29 @@ namespace PokemonAutomation{
 namespace OCR{
 
 
+// Tesseract page segmentation modes.
+// These correspond to tesseract::PageSegMode enum values.
+enum class PageSegMode : int {
+    // Fully automatic page segmentation but no OSD.
+    // OSD stands for Orientation and script detection.
+    // This mode is the default mode for Tesseract command line interface, but
+    // not the default for C++ API.
+    AUTO = 3,      
+    // Single column of text of variable sizes    
+    SINGLE_COLUMN = 4,
+    // Assume a single uniform block of text.
+    // This mode is the default mode for Tesseract C++ API and what our
+    // Tesseract wrapper uses as default.
+    SINGLE_BLOCK = 6,
+    // Treat the image as a single text line 
+    SINGLE_LINE = 7,
+    // Treat the image as a single word
+    SINGLE_WORD = 8,
+    // Treat the image as a single character
+    SINGLE_CHAR = 10,
+};
+
+
 // Check if Tesseract training data exists for the given language.
 bool language_available(Language language);
 
@@ -25,7 +48,14 @@ bool language_available(Language language);
 //  multiple concurrent calls without delay or queueing.
 //  It creates a new Tesseract instances if no available idle instance. You can
 //  call `ensure_instances()` to pre-warm to pool with a given number of instances.
-std::string ocr_read(Language language, const ImageViewRGB32& image);
+//
+//  psm: Page segmentation mode - controls how Tesseract interprets the image layout.
+//       Defaults to SINGLE_BLOCK (Tesseract C++ API's default) for best performance.
+std::string ocr_read(
+    Language language,
+    const ImageViewRGB32& image,
+    PageSegMode psm = PageSegMode::SINGLE_BLOCK
+);
 
 
 //  Pre-warm the Tesseract API instance pool for a language by ensuring a minimum
