@@ -75,6 +75,7 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
     : SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::STOP_PROGRAM)
     , LEGENDARY("<b>Hunt Route:</b>",
         {
+            {Legendary::COBALION, "cobalion", "Cobalion"},
             {Legendary::VIRIZION,  "virizion",  "Virizion"},
         },
         LockMode::LOCK_WHILE_RUNNING,
@@ -165,6 +166,50 @@ void detect_warp_pad(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     }
 }
 
+void hunt_cobalion(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
+    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
+{
+
+    // Spawn refreshing loop takes 14 sec. Going to check Cobalion takes 13 sec.
+    // 10 for 10 cal per sec
+    const uint16_t min_calorie = MIN_CALORIE_TO_CATCH + (14 + 13) * 10;
+
+    HyperspaceCalorieWatcher calorie_watcher(env.logger());
+    while(true){
+        // run to the right to spawn in Cobalion
+        ssf_press_button(context, BUTTON_B, 0ms, 6000ms, 0ms);
+        pbf_move_left_joystick(context, {+1, 0}, 7000ms, 0ms); 
+        pbf_wait(context, 100ms);
+        // run to the left to despawn
+        // add 20ms to try to ensure drift never prevents despawning
+        ssf_press_button(context, BUTTON_B, 0ms, 6000ms, 0ms);
+        pbf_move_left_joystick(context, {-1, 0}, 7020ms, 0ms);
+        pbf_wait(context, 100ms);
+
+        context.wait_for_all_requests();
+
+        stats.spawns++;
+        env.update_stats();
+        if (check_calorie(env, context, calorie_watcher, min_calorie)){
+            break;
+        }
+    }
+
+    // Run to Cobalion to trigger potential shiny sound
+    env.log("Move to check Cobalion.");
+    env.add_overlay_log("To Check Cobalion");
+
+    // run right to line up with Cobalion
+    ssf_press_button(context, BUTTON_B, 0ms, 10000ms, 0ms);
+    pbf_move_left_joystick(context, {+1, 0}, 8370ms, 0ms); 
+    // run forward to trigger potential shiny sound
+    pbf_move_left_joystick(context, {0, +1}, 4500ms, 0ms); 
+
+    context.wait_for_all_requests();
+}
 
 // Use teleport pad to refresh Terrakion spawns until MIN_CALORIE is reached.
 // Then move close to Terrakion so the shiny sound detector (from the caller level)
@@ -418,6 +463,8 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
                     hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH);
                 } else if (LEGENDARY == Legendary::TERRAKION){
                     hunt_terrakion(env, context, stats, MIN_CALORIE_TO_CATCH);
+                } else if (LEGENDARY == Legendary::COBALION){
+                    hunt_cobalion(env, context, stats, MIN_CALORIE_TO_CATCH);
                 } else {
                     OperationFailedException::fire(
                         ErrorReport::SEND_ERROR_REPORT,
