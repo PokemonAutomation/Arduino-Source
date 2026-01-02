@@ -131,7 +131,7 @@ public:
         Params params;
         memcpy(&params, body.data(), sizeof(params));
         ret += ": " + std::string(body.data() + sizeof(uint32_t), body.size() - sizeof(uint32_t));
-        ret += ": " + tostr_hex(params.value);
+        ret += ": 0x" + tostr_hex(params.value);
         return ret;
     }
 };
