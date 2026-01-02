@@ -205,12 +205,6 @@ void BoxDexNumberDetector::make_overlays(VideoOverlaySet& items) const{
 bool BoxDexNumberDetector::detect(const ImageViewRGB32& screen){
     const size_t max_dex_number = std::max(LUMIOSE_DEX_SLUGS().size(), HYPERSPACE_DEX_SLUGS().size());
 
-    // const bool in_range_black = false;
-    // const ImageRGB32 black_white_dex_image_crop = to_blackwhite_rgb32_range(dex_image_crop, in_range_black, 0xff808080, 0xffffffff);
-    // black_white_dex_image_crop.save("blackwhite_number.png");
-    // const int dex_number = OCR::read_number(m_logger, black_white_dex_image_crop);
-    // const int dex_number = OCR::read_number_waterfill(m_logger, dex_image_crop, 0xff808080, 0xffffffff, false);
-    
     const int dex_number = [&](){
         const ImageViewRGB32 dex_image_crop = extract_box_reference(screen, m_dex_number_box);
         return OCR::read_number(m_logger, dex_image_crop);
