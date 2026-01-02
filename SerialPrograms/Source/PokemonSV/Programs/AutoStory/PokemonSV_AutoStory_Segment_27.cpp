@@ -68,7 +68,7 @@ void AutoStory_Segment_27::run_segment(
 
 std::string AutoStory_Checkpoint_64::name() const{ return "064 - " + AutoStory_Segment_27().name(); }
 std::string AutoStory_Checkpoint_64::start_text() const{ return "At Glaseado Mountain Pokecenter";}
-std::string AutoStory_Checkpoint_64::end_text() const{ return "At Casseroya Watchtower 3";}
+std::string AutoStory_Checkpoint_64::end_text() const{ return "At Glaseado Mountain Pokecenter";}
 void AutoStory_Checkpoint_64::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_64(env, context, options.notif_status_update, stats);
 }
@@ -104,13 +104,7 @@ void checkpoint_64(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     [&](size_t attempt_number){
         context.wait_for_all_requests();
 
-        if (attempt_number > 0 || ENABLE_TEST){
-            env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, -1, 1440ms});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, +1, 1440ms});
-        }
-
-        move_from_glaseado_mountain_to_casseroya_watchtower3(env, context, attempt_number);
+        // empty checkpoint
 
     });         
 }
@@ -122,9 +116,11 @@ void checkpoint_65(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, FlyPoint::POKECENTER);
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0ms}, FlyPoint::FAST_TRAVEL);
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, -1, 1440ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, +1, 1440ms});
         }
+
+        move_from_glaseado_mountain_to_casseroya_watchtower3(env, context, attempt_number);
 
         move_from_casseroya_watchtower3_to_dondozo_titan(env, context);
         
