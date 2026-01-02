@@ -53,6 +53,7 @@ SerialPABotBase_OemController::SerialPABotBase_OemController(
     connection.add_message_printer<MessageType_NS1_OemControllerStateButtons>();
     connection.add_message_printer<MessageType_NS1_OemControllerStateFull>();
     connection.add_message_printer<MessageType_NS1_OemControllerRumble>();
+    connection.add_message_printer<MessageType_NS1_OemControllerUsbDisallowed>();
 
 
     switch (controller_type){
