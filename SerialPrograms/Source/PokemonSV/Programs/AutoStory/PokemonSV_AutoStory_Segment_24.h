@@ -52,7 +52,7 @@ public:
 
 
 
-// start: At East Province (Area Three) Watchtower.
+// start: Defeated Levincia Gym (Electric). At Levincia (North) Pokecenter.
 // end: Beat Orthworm phase 1 and 2
 void checkpoint_55(
     SingleSwitchProgramEnvironment& env,
