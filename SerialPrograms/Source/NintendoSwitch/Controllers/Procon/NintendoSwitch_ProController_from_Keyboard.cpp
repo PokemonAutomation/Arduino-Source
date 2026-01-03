@@ -16,6 +16,15 @@ namespace NintendoSwitch{
 std::vector<std::unique_ptr<EditableTableRow>> ProControllerFromKeyboardTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
 
+    ret.emplace_back(make_mapping("Dpad Up",            KeyboardKey::KEY_I,      ProControllerDeltas{.dpad_x =  0, .dpad_y = -1}));
+    ret.emplace_back(make_mapping("Dpad Up+Right",      KeyboardKey::KEY_O,      ProControllerDeltas{.dpad_x = +1, .dpad_y = -1}));
+    ret.emplace_back(make_mapping("Dpad Right",         KeyboardKey::KEY_L,      ProControllerDeltas{.dpad_x = +1, .dpad_y =  0}));
+    ret.emplace_back(make_mapping("Dpad Down+Right",    KeyboardKey::KEY_COMMA,  ProControllerDeltas{.dpad_x = +1, .dpad_y = +1}));
+    ret.emplace_back(make_mapping("Dpad Down",          KeyboardKey::KEY_K,      ProControllerDeltas{.dpad_x =  0, .dpad_y = +1}));
+    ret.emplace_back(make_mapping("Dpad Down+Left",     KeyboardKey::KEY_M,      ProControllerDeltas{.dpad_x = -1, .dpad_y = +1}));
+    ret.emplace_back(make_mapping("Dpad Left",          KeyboardKey::KEY_J,      ProControllerDeltas{.dpad_x = -1, .dpad_y =  0}));
+    ret.emplace_back(make_mapping("Dpad Up+Left",       KeyboardKey::KEY_U,      ProControllerDeltas{.dpad_x = -1, .dpad_y = -1}));
+
     ret.emplace_back(make_mapping("Dpad Up",            KeyboardKey::KEY_KP_8,      ProControllerDeltas{.dpad_x =  0, .dpad_y = -1}));
     ret.emplace_back(make_mapping("Dpad Up+Right",      KeyboardKey::KEY_KP_9,      ProControllerDeltas{.dpad_x = +1, .dpad_y = -1}));
     ret.emplace_back(make_mapping("Dpad Right",         KeyboardKey::KEY_KP_6,      ProControllerDeltas{.dpad_x = +1, .dpad_y =  0}));
