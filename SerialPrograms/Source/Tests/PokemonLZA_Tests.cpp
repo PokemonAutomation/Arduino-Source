@@ -22,6 +22,7 @@
 #include "PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "SerialPrograms/Source/CommonFramework/GlobalSettingsPanel.h"
 #include "PokemonLZA_Tests.h"
 #include "TestUtils.h"
 #include <iostream>
@@ -727,38 +728,37 @@ int test_pokemonLZA_DonutBerriesReader(const std::string& filepath){
 
     ImageRGB32 image(filepath);
 
-// #define GENERATE_DONUT_BERRIES_GROUND_TRUTH
-#ifdef GENERATE_DONUT_BERRIES_GROUND_TRUTH
-    // Ground truth generation mode: read berry names and write to file
-    cout << "Generating ground truth for: " << filepath << endl;
+    if (PreloadSettings::debug().GENERATE_TEST_GOLDEN_FILES){
+        // Golden file generation mode: read berry names and write to file
+        cout << "Generating golden file for: " << filepath << endl;
 
-    std::filesystem::path target_berries_path = parent_dir / ("_" + base_name + ".txt");
-    std::ofstream output_file(target_berries_path);
-    if (!output_file.is_open()){
-        cerr << "Error: cannot open output file " << target_berries_path << " for writing" << endl;
-        return 1;
-    }
-
-    DonutBerriesReader reader;
-    for (size_t i = 0; i < DonutBerriesReader::BERRY_PAGE_LINES; ++i){
-        OCR::StringMatchResult results = reader.read_berry_page_with_ocr(image, global_logger_command_line(), language, i);
-
-        if (results.results.empty()){
-            cerr << "Warning: No berry detected via OCR at slot " << i << endl;
-            output_file << "unknown-berry" << endl;
-        } else {
-            std::string best_match_ocr = results.results.begin()->second.token;
-            output_file << best_match_ocr << endl;
-            cout << "  Slot " << i << ": " << best_match_ocr << endl;
+        std::filesystem::path target_berries_path = parent_dir / ("_" + base_name + ".txt");
+        std::ofstream output_file(target_berries_path);
+        if (!output_file.is_open()){
+            cerr << "Error: cannot open output file " << target_berries_path << " for writing" << endl;
+            return 1;
         }
+
+        DonutBerriesReader reader;
+        for (size_t i = 0; i < DonutBerriesReader::BERRY_PAGE_LINES; ++i){
+            OCR::StringMatchResult results = reader.read_berry_page_with_ocr(image, global_logger_command_line(), language, i);
+
+            if (results.results.empty()){
+                cerr << "Warning: No berry detected via OCR at slot " << i << endl;
+                output_file << "unknown-berry" << endl;
+            } else {
+                std::string best_match_ocr = results.results.begin()->second.token;
+                output_file << best_match_ocr << endl;
+                cout << "  Slot " << i << ": " << best_match_ocr << endl;
+            }
+        }
+
+        output_file.close();
+        cout << "Golden file saved to: " << target_berries_path << endl;
+        return 0;
     }
-
-    output_file.close();
-    cout << "Ground truth saved to: " << target_berries_path << endl;
-    return 0;
-
-#else
-    // Normal testing mode: load ground truth and verify
+    
+    // Normal testing mode: load golden file and verify
     std::filesystem::path target_berries_path = parent_dir / ("_" + base_name + ".txt");
     std::vector<std::string> target_berries;
     if (load_slug_list(target_berries_path.string(), target_berries) == false){
@@ -789,7 +789,6 @@ int test_pokemonLZA_DonutBerriesReader(const std::string& filepath){
     }
 
     return 0;
-#endif
 }
 
 

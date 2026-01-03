@@ -92,6 +92,7 @@ void PreloadSettings::load(const JsonValue& json){
         debug_obj->read_boolean(DEBUG.IMAGE_DICTIONARY_MATCHING, "IMAGE_DICTIONARY_MATCHING");
         debug_obj->read_integer(DEBUG.BOX_SYSTEM_CELL_ROW, "BOX_SYSTEM_CELL_ROW");
         debug_obj->read_integer(DEBUG.BOX_SYSTEM_CELL_COL, "BOX_SYSTEM_CELL_COL");
+        debug_obj->read_boolean(DEBUG.GENERATE_TEST_GOLDEN_FILES, "GENERATE_TEST_GOLDEN_FILES");
     }
 }
 
@@ -401,6 +402,7 @@ JsonValue GlobalSettings::to_json() const{
     debug_obj["IMAGE_DICTIONARY_MATCHING"] = debug_settings.IMAGE_DICTIONARY_MATCHING;
     debug_obj["BOX_SYSTEM_CELL_ROW"] = debug_settings.BOX_SYSTEM_CELL_ROW;
     debug_obj["BOX_SYSTEM_CELL_COL"] = debug_settings.BOX_SYSTEM_CELL_COL;
+    debug_obj["GENERATE_TEST_GOLDEN_FILES"] = debug_settings.GENERATE_TEST_GOLDEN_FILES;
     obj["DEBUG"] = std::move(debug_obj);
 
     return obj;
