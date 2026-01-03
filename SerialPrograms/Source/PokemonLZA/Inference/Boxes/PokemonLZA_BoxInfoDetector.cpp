@@ -207,9 +207,9 @@ bool BoxDexNumberDetector::detect(const ImageViewRGB32& screen){
 
     const int dex_number = [&](){
         const ImageViewRGB32 dex_image_crop = extract_box_reference(screen, m_dex_number_box);
-        return OCR::read_number(m_logger, dex_image_crop);
-
 #if 0
+        return OCR::read_number(m_logger, dex_image_crop);
+#else
         const bool text_inside_range = true;
         const bool prioritize_numeric_only_results = true;
         const size_t width_max = SIZE_MAX;
