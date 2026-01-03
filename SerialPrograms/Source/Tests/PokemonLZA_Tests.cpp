@@ -638,7 +638,13 @@ int test_pokemonLZA_FlavorPowerScreenDetector(const ImageViewRGB32& image, const
         return 1;
     }
 
-    Language language = language_code_to_enum(words[words.size() - 2]);
+    std::string code = words[words.size() - 2];
+    if (code == "chiSim"){
+        code = "chi_sim";
+    } else if (code == "chiTra"){
+        code = "chi_tra";
+    }
+    Language language = language_code_to_enum(code);
     if (language == Language::None || language == Language::EndOfList){
         cerr << "Error: language word " << words[words.size() - 2] << " is wrong." << endl;
         return 1;
