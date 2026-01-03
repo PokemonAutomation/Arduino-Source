@@ -47,6 +47,8 @@ int test_pokemonLZA_HyperspaceCalorieDetector(const ImageViewRGB32& image, int e
 
 int test_pokemonLZA_FlavorPowerScreenDetector(const ImageViewRGB32& image, const std::vector<std::string>& words);
 
+int test_pokemonLZA_DonutBerriesReader(const std::string& filepath);
+
  }
 
  #endif
