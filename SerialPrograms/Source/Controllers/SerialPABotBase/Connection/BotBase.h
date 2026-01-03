@@ -23,8 +23,8 @@ class BotBaseControllerContext;
 class BotBaseController : public Cancellable::CancelListener{
 public:
     struct Listener{
-        virtual void on_info_message(const BotBaseMessage& message){};
-        virtual void on_error_message(const BotBaseMessage& message){};
+        virtual void on_info_message(const BotBaseMessage& message) noexcept{};
+        virtual void on_error_message(const BotBaseMessage& message) noexcept{};
     };
     void add_listener(Listener& listener){
         m_listeners.add(listener);
