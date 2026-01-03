@@ -9,7 +9,8 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
-#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+//#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
@@ -87,9 +88,11 @@ OCR::StringMatchResult DonutBerriesOCR::read_substring(
     const ImageViewRGB32& image,
     double min_text_ratio, double max_text_ratio
 ) const{
-    return match_substring_from_image(
-        &logger, language, image, 
+    return match_substring_from_image_multifiltered(
+        &logger, language, image,
+        OCR::BLACK_OR_WHITE_TEXT_FILTERS(),
         MAX_LOG10P, MAX_LOG10P_SPREAD,
+        0.01, 0.50,
         OCR::PageSegMode::SINGLE_LINE
     );
 }

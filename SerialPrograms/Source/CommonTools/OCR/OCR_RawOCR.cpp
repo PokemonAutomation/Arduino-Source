@@ -200,7 +200,11 @@ std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode
         }
     }
     // Delegate to pool (which has its own locking for instance management).
-    return iter->second.run(image, static_cast<int>(psm));
+    std::string ret = iter->second.run(image, static_cast<int>(psm));
+
+//    global_logger_tagged().log(ret);
+
+    return ret;
 }
 
 
