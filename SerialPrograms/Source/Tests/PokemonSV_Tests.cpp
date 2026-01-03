@@ -5,9 +5,7 @@
  */
 
 
-#include <QDir>
-#include <QFileInfo>
-#include <QString>
+#include <filesystem>
 
 #include "Common/Compiler.h"
 #include "PokemonSV_Tests.h"
@@ -396,15 +394,14 @@ int test_pokemonSV_SandwichIngredientsDetector(const ImageViewRGB32& image, cons
 
 int test_pokemonSV_SandwichIngredientReader(const std::string& filepath){
     // three words: <current ingredient page "Fillings" or "Condiments"> <language> <current selected ingredient index 0 to 9>
-    
+
     // the target ingredient list is stored in an auxiliary txt file with filename: _<filepath_basename>.txt
 
-    const QString full_path(QString::fromStdString(filepath));
-    const QFileInfo fileinfo(full_path);
-    const QString filename = fileinfo.fileName();
-    const QDir parent_dir = fileinfo.dir();
+    std::filesystem::path file_path(filepath);
+    std::string filename = file_path.filename().string();
+    std::filesystem::path parent_dir = file_path.parent_path();
+    std::string base_name = file_path.stem().string();
 
-    const std::string base_name = fileinfo.baseName().toStdString();
     const std::vector<std::string> words = parse_words(base_name);
 
     if (words.size() < 3){
@@ -433,13 +430,13 @@ int test_pokemonSV_SandwichIngredientReader(const std::string& filepath){
         return 1;
     }
 
-    const QString target_ingredients_path = parent_dir.filePath("_" + fileinfo.baseName() + ".txt");
+    std::filesystem::path target_ingredients_path = parent_dir / ("_" + base_name + ".txt");
     std::vector<std::string> target_ingredients;
-    if (load_slug_list(target_ingredients_path.toStdString(), target_ingredients) == false){
+    if (load_slug_list(target_ingredients_path.string(), target_ingredients) == false){
         return 1;
     }
     if (target_ingredients.size() != 10){
-        cerr << "Error: need to have exactly 10 ingredients in " << target_ingredients_path.toStdString() << endl;
+        cerr << "Error: need to have exactly 10 ingredients in " << target_ingredients_path << endl;
     }
 
     ImageRGB32 image(filepath);
