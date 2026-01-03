@@ -348,7 +348,14 @@ void hunt_virizion_rooftop(
         pbf_move_left_joystick(context, {left_joystick_x, left_joystick_y}, 500ms, 0ms);
     };
     auto run_changing_direction = [&](Milliseconds hold, double right_joystick_x){
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0.0, 1.0}, {right_joystick_x, 0.0}, hold);
+        ssf_press_button(context, BUTTON_B, 0ms, hold, 0ms);
+        ssf_press_left_joystick(context, {0, +1}, 0ms, hold, 0ms);
+        ssf_press_right_joystick(context, {right_joystick_x, 0}, 0ms, hold, 0ms);
+        ssf_mash1_button(context, BUTTON_A, hold);
+    };
+    auto rotom_glide = [&](Milliseconds hold){
+        ssf_press_left_joystick(context, {0, +1}, 0ms, hold, 0ms);
+        ssf_mash1_button(context, BUTTON_A, hold);
     };
 
     // Starting facing the ladder
@@ -358,7 +365,7 @@ void hunt_virizion_rooftop(
         pbf_press_button(context, BUTTON_A, 100ms, 500ms); // hop on ladder
         climb_ladder(2800ms);
         run_forward(2500ms);
-        run_backward(use_switch1_timings ? 3100ms : 3000ms);
+        run_backward(use_switch1_timings ? 3050ms : 3000ms);
         pbf_wait(context, use_switch1_timings ? 1100ms : 1s); // wait for drop to lower level
         run_backward(2000ms);
         run_forward(2500ms);
@@ -387,7 +394,7 @@ void hunt_virizion_rooftop(
     run_forward(use_switch1_timings ? 2700ms : 2600ms);
     pbf_wait(context, use_switch1_timings ? 1100ms : 1s); // wait for drop to lower level
     run_changing_direction(3000ms, -0.15);
-    pbf_controller_state(context, BUTTON_A, DPAD_NONE, {0.0, 1.0}, {0.0, 0.0}, 2500ms);
+    rotom_glide(use_switch1_timings ? 2600ms : 2500ms);
     run_forward(5s);
     context.wait_for_all_requests();
 }
