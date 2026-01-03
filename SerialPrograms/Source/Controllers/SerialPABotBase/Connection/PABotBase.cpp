@@ -499,6 +499,13 @@ void PABotBase::process_command_finished(BotBaseMessage message){
 void PABotBase::on_recv_message(BotBaseMessage message){
     auto scope_check = m_sanitizer.check_scope();
 
+    if (PABB_MSG_IS_INFO(message.type)){
+        m_listeners.run_method(&Listener::on_info_message, message);
+    }
+    if (PABB_MSG_IS_ERROR(message.type)){
+        m_listeners.run_method(&Listener::on_error_message, message);
+    }
+
     switch (message.type){
     case PABB_MSG_ACK_COMMAND:
         process_ack_command<pabb_MsgAckCommand>(std::move(message));
