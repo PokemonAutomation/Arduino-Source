@@ -15,6 +15,7 @@
 #include "ML/Inference/ML_YOLOv5Detector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
@@ -331,7 +332,8 @@ void hunt_virizion_rooftop(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
-    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
+    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH,
+    bool& use_switch1_timings)
 {
     auto climb_ladder = [&](Milliseconds hold){
         pbf_move_left_joystick(context, {0.0, 1.0}, hold, 0ms);
@@ -356,8 +358,8 @@ void hunt_virizion_rooftop(
         pbf_press_button(context, BUTTON_A, 100ms, 500ms); // hop on ladder
         climb_ladder(2800ms);
         run_forward(2500ms);
-        run_backward(3000ms);
-        pbf_wait(context, 1s); // wait for drop to lower level
+        run_backward(use_switch1_timings ? 3100ms : 3000ms);
+        pbf_wait(context, use_switch1_timings ? 1100ms : 1s); // wait for drop to lower level
         run_backward(2000ms);
         run_forward(2500ms);
         context.wait_for_all_requests();
@@ -382,8 +384,8 @@ void hunt_virizion_rooftop(
     env.log("Move to check Virizion");
     env.add_overlay_log("To Check Virizion");
 
-    run_forward(2600ms);
-    pbf_wait(context, 1s); // wait for drop to lower level
+    run_forward(use_switch1_timings ? 2700ms : 2600ms);
+    pbf_wait(context, use_switch1_timings ? 1100ms : 1s); // wait for drop to lower level
     run_changing_direction(3000ms, -0.15);
     pbf_controller_state(context, BUTTON_A, DPAD_NONE, {0.0, 1.0}, {0.0, 0.0}, 2500ms);
     run_forward(5s);
@@ -413,12 +415,21 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
         return true;
     });
 
+    // check whether this is Switch 1 or 2.
+    ConsoleType console_type = env.console.state().console_type();
+    if (console_type == ConsoleType::Unknown){
+        env.add_overlay_log("Detecting console type");
+        env.console.log("Unknown Switch type. Try to detect.");
+        console_type = detect_console_type_from_in_game(env.console, context);
+    }
+    bool use_switch1_timings = is_switch1(console_type);
+
     while (true){
         const int ret = run_until<ProControllerContext>(
             env.console, context,
             [&](ProControllerContext& context){
                 if (LEGENDARY == Legendary::VIRIZION){
-                    hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH);
+                    hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH, use_switch1_timings);
                 } else if (LEGENDARY == Legendary::TERRAKION){
                     hunt_terrakion(env, context, stats, MIN_CALORIE_TO_CATCH);
                 } else {
