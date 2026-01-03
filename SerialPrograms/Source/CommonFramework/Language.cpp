@@ -10,8 +10,10 @@
 
 namespace PokemonAutomation{
 
-
-
+// Language metadata mapping. random_match_chance represents OCR false-positive probability:
+// - Latin alphabets (eng, spa, fra, etc.): 1/5 (higher confusion between similar characters)
+// - CJK scripts (jpn, kor): 1/10 (fewer similar glyphs)
+// - Chinese variants: 1/100 (more complex character set, lower random match rate)
 const std::map<Language, LanguageData> LANGUAGE_DATA{
     {Language::None,                {"none",    "None",                     0}},
     {Language::English,             {"eng",     "English",                  1. / 5}},
@@ -63,6 +65,7 @@ const LanguageData& language_data(Language language){
     return iter->second;
 }
 
+// Build reverse lookup map from language code string to enum
 std::map<std::string, Language> build_code_to_enum_map(){
     std::map<std::string, Language> ret;
     for (auto& iter : LANGUAGE_DATA){
