@@ -287,6 +287,16 @@ public:
         return ret;
     }
 };
+class MessageType_NS1_OemControllerUsbDisallowed : public BotBaseMessageType{
+public:
+    MessageType_NS1_OemControllerUsbDisallowed()
+        : BotBaseMessageType(
+            "PABB_MSG_INFO_NS1_OEM_CONTROLLER_USB_DISALLOWED",
+            PABB_MSG_INFO_NS1_OEM_CONTROLLER_USB_DISALLOWED,
+            0
+        )
+    {}
+};
 
 
 

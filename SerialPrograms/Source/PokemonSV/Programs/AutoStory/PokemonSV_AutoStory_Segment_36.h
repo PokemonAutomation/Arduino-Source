@@ -44,10 +44,10 @@ public:
 
 
 // start: Inside Area Zero Station 1. Deactivated the locks.
-// end: Outside Area Zero Station 2. Defeated Scream Tail/Iron Bundle.
+// end: Inside Area Zero Station 2. Deactivated the locks.
 void checkpoint_96(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
-// start: Outside Area Zero Station 2. Defeated Scream Tail/Iron Bundle.
+// start: Inside Area Zero Station 2. Deactivated the locks.
 // end: Inside Area Zero Station 2. Deactivated the locks.
 void checkpoint_97(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 

@@ -72,7 +72,7 @@ void AutoStory_Checkpoint_93::run_checkpoint(SingleSwitchProgramEnvironment& env
 
 std::string AutoStory_Checkpoint_94::name() const{ return "094 - " + AutoStory_Segment_35().name(); }
 std::string AutoStory_Checkpoint_94::start_text() const{ return AutoStory_Checkpoint_93().end_text();}
-std::string AutoStory_Checkpoint_94::end_text() const{ return "Outside Area Zero Station 1. Defeated Glimmora.";}
+std::string AutoStory_Checkpoint_94::end_text() const{ return "Inside Area Zero Station 1. Deactivated the locks.";}
 void AutoStory_Checkpoint_94::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_94(env, context, options.notif_status_update, stats);
 }
@@ -606,17 +606,7 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
 
-
-
-    }, false);
-}
-
-void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](size_t attempt_number){
-        
-
-        YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/station-door-1.onnx");
+        YOLOv5Detector yolo_detector2(RESOURCE_PATH() + "PokemonSV/YOLO/station-door-1.onnx");
         move_player_forward(env, context, 4,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
@@ -624,8 +614,8 @@ void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             true
         );
         
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "station-door-1", -1, 400ms);
-        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "station-door-1", 0.5,
+        move_camera_until_yolo_object_detected(env, context, yolo_detector2, "station-door-1", -1, 400ms);
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector2, "station-door-1", 0.5,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
                 pbf_move_left_joystick(context, {0, +1}, 80ms, 400ms); // move forward to align with camera
@@ -640,6 +630,15 @@ void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // disable Lock at Station 1
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20000ms);
         mash_button_till_overworld(env.console, context, BUTTON_A);     // prompt, black dialog, 
+
+
+    }, false);
+}
+
+void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+        // empty checkpoint
         
         
 

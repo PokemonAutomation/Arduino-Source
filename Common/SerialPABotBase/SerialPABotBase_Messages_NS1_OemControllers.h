@@ -42,6 +42,8 @@ typedef struct{
     pabb_NintendoSwitch_Rumble rumble;
 } PABB_PACK pabb_MsgInfo_NS1_OemController_Rumble;
 
+#define PABB_MSG_INFO_NS1_OEM_CONTROLLER_USB_DISALLOWED     0x31
+
 
 
 #define PABB_MSG_REQUEST_NS1_OEM_CONTROLLER_READ_SPI        0x60

@@ -73,7 +73,7 @@ std::unique_ptr<StatsTracker> ShinyHunt_HyperspaceLegendary_Descriptor::make_sta
 
 ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
     : SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::STOP_PROGRAM)
-    , LEGENDARY("<b>Hunt Route:</b>",
+    , LEGENDARY("<b>Legendary " + STRING_POKEMON + ":</b>",
         {
             {Legendary::COBALION, "cobalion", "Cobalion"},
             {Legendary::VIRIZION,  "virizion",  "Virizion"},
@@ -111,7 +111,8 @@ bool check_calorie(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     HyperspaceCalorieWatcher& calorie_watcher,
-    uint16_t min_calorie
+    uint16_t min_calorie,
+    uint16_t additional_calorie_buffer
 ){
     int ret = wait_until(
         env.console, context, std::chrono::seconds(1), {calorie_watcher}
@@ -128,9 +129,14 @@ bool check_calorie(
     const std::string log_msg = std::format("Calorie: {}/{}", calorie_number, min_calorie);
     env.add_overlay_log(log_msg);
     env.log(log_msg);
-    if (calorie_number <= min_calorie){
-        env.log("min calorie reached");
-        env.add_overlay_log("Min Calorie Reached");
+    if (calorie_number <= min_calorie + additional_calorie_buffer){
+        if (additional_calorie_buffer == 0){
+            env.log("min calorie reached");
+            env.add_overlay_log("Min Calorie Reached");
+        } else{
+            env.log("Close to min Calorie");
+            env.add_overlay_log("Close to Min Calorie");
+        }
         return true;
     }
     return false;
@@ -222,11 +228,6 @@ void hunt_terrakion(
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
     SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
 {
-
-    // Spawn refreshing loop takes 3 sec. Going to check Virizion takes 8 sec.
-    // 10 for 10 cal per sec
-    const uint16_t min_calorie = MIN_CALORIE_TO_CATCH + (3 + 8) * 10;
-
     HyperspaceCalorieWatcher calorie_watcher(env.logger());
     while(true){
         // Warp away from Terrakion to despawn
@@ -247,7 +248,10 @@ void hunt_terrakion(
 
         stats.spawns++;
         env.update_stats();
-        if (check_calorie(env, context, calorie_watcher, min_calorie)){
+
+        // Spawn refreshing loop takes 3 sec. Going to check Virizion takes 8 sec.
+        // 10 for 10 cal per sec
+        if (check_calorie(env, context, calorie_watcher, MIN_CALORIE_TO_CATCH, (3 + 8) * 10)){
             break;
         }
     }
@@ -277,6 +281,7 @@ void hunt_terrakion(
     context.wait_for_all_requests();
 }
 
+#if 0
 // TODO: WIP: use OpenCV to traverse the alley to move to check
 // Virizion.
 void hunt_virizion_balcony(
@@ -361,6 +366,7 @@ void hunt_virizion_balcony(
         {{yolo_watcher}}
     );
 }
+#endif
 
 
 // Use shuttle run on rooftop to refresh Virizion spawns until MIN_CALORIE is reached.
@@ -372,11 +378,6 @@ void hunt_virizion_rooftop(
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
     SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
 {
-
-    // Spawn refreshing loop takes 15 sec. Going to check Virizion takes 22 sec.
-    // 10 for 10 cal per sec
-    const uint16_t min_calorie = MIN_CALORIE_TO_CATCH + (15 + 22) * 10;
-
     auto climb_ladder = [&](Milliseconds hold){
         pbf_move_left_joystick(context, {0.0, 1.0}, hold, 0ms);
     };
@@ -407,7 +408,9 @@ void hunt_virizion_rooftop(
         context.wait_for_all_requests();
         stats.spawns++;
         env.update_stats();
-        if (check_calorie(env, context, calorie_watcher, min_calorie)){
+        // Spawn refreshing loop takes 15 sec. Going to check Virizion takes 22 sec.
+        // 10 for 10 cal per sec
+        if (check_calorie(env, context, calorie_watcher, MIN_CALORIE_TO_CATCH, (15 + 22) * 10)){
             break;
         }
     }

@@ -44,7 +44,6 @@ public:
         Logger& logger,
         Language language,
         const ImageViewRGB32& image,
-        const std::vector<OCR::TextColorRange>& text_color_ranges,
         double min_text_ratio = 0.01, double max_text_ratio = 0.50
     ) const;
 
@@ -66,12 +65,12 @@ OCR::StringMatchResult FlavorPowerReader::read_substring(
     Logger& logger,
     Language language,
     const ImageViewRGB32& image,
-    const std::vector<OCR::TextColorRange>& text_color_ranges,
     double min_text_ratio, double max_text_ratio
 ) const{
-    return match_substring_from_image_multifiltered(
-        &logger, language, image, text_color_ranges,
-        MAX_LOG10P, MAX_LOG10P_SPREAD, min_text_ratio, max_text_ratio
+    return match_substring_from_image(
+        &logger, language, image,
+        MAX_LOG10P, MAX_LOG10P_SPREAD,
+        OCR::PageSegMode::SINGLE_LINE
     );
 }
 
@@ -152,6 +151,10 @@ bool FlavorPowerDetector::detect(const ImageViewRGB32& screen){
 }
 
 std::string FlavorPowerDetector::detect_power(const ImageViewRGB32& screen){
+    const int detected_power_level = m_icon_detector.detect(screen);
+    if (detected_power_level < 0){ // empty flavor power text
+        return "";
+    }
     std::multimap<double, std::string> results;
     /*
     ImageRGB32 quest_label = to_blackwhite_rgb32_range(
@@ -163,8 +166,7 @@ std::string FlavorPowerDetector::detect_power(const ImageViewRGB32& screen){
     // quest_label.save("quest_label.png");
 
     OCR::StringMatchResult ocr_result = FlavorPowerReader::instance().read_substring(
-        m_logger, m_language, quest_label,
-        OCR::BLACK_TEXT_FILTERS()
+        m_logger, m_language, quest_label
     );
     ocr_result.clear_beyond_log10p(FlavorPowerReader::MAX_LOG10P);
     ocr_result.clear_beyond_spread(FlavorPowerReader::MAX_LOG10P_SPREAD);
@@ -188,6 +190,14 @@ std::string FlavorPowerDetector::detect_power(const ImageViewRGB32& screen){
         return results.begin()->second;
     }
 
+    auto get_all_results = [&]() -> std::string{
+        std::string ret = "";
+        for (const auto& result : results){
+            ret += std::format("({}: {}), ", result.first, result.second);
+        }
+        return ret.substr(0, ret.size() - 2); // -2 to remove the last ", "
+    };
+
     // More than one match result. Use Flavor Power Icon detector to disambiguate
 
     // Check if all results are the same except for the last character
@@ -207,14 +217,6 @@ std::string FlavorPowerDetector::detect_power(const ImageViewRGB32& screen){
         }
     }
 
-    auto get_all_results = [&]() -> std::string{
-        std::string ret = "";
-        for (const auto& result : results){
-            ret += std::format("({}: {}), ", result.first, result.second);
-        }
-        return ret.substr(0, ret.size() - 2); // -2 to remove the last ", "
-    };
-
     if (!all_same_except_last){
         throw_and_log<OperationFailedException>(
             m_logger, ErrorReport::SEND_ERROR_REPORT,
@@ -225,15 +227,7 @@ std::string FlavorPowerDetector::detect_power(const ImageViewRGB32& screen){
     }
 
     // All results differ only in last character, use icon detector to disambiguate
-    const int detected_power_level = m_icon_detector.detect(screen);
-    if (detected_power_level <= 0){
-        throw_and_log<OperationFailedException>(
-            m_logger, ErrorReport::SEND_ERROR_REPORT,
-            "FlavorPowerDetector::detect_power(): Unable to detect power level icon "
-            "despite getting OCR text: " + get_all_results() + ".\n" +
-            language_warning(m_language)
-        );
-    }
+    
     // Convert power level (1, 2, 3) to character ('1', '2', '3')
     char expected_last_char = (char)('0' + detected_power_level);
     // Find the result with matching last character

@@ -36,18 +36,40 @@ StringMatchResult DictionaryMatcher::match_substring(
     return dictionary(language).match_substring(text, log10p_spread);
 }
 
+
+
+OCR::StringMatchResult DictionaryMatcher::match_substring_from_image(
+    Logger* logger,
+    Language language,
+    const ImageViewRGB32& image,
+    double max_log10p, double log10p_spread,
+    OCR::PageSegMode psm
+) const{
+    OCR::StringMatchResult ret = OCR::dictionary_OCR(
+        language, *this, image,
+        log10p_spread, psm
+    );
+    if (logger){
+        ret.log(*logger, max_log10p);
+    }
+    ret.clear_beyond_log10p(max_log10p);
+    return ret;
+}
+
 OCR::StringMatchResult DictionaryMatcher::match_substring_from_image_multifiltered(
     Logger* logger,
     Language language,
     const ImageViewRGB32& image,
     const std::vector<OCR::TextColorRange>& text_color_ranges,
     double max_log10p, double log10p_spread,
-    double min_text_ratio, double max_text_ratio
+    double min_text_ratio, double max_text_ratio,
+    OCR::PageSegMode psm
 ) const{
     OCR::StringMatchResult ret = OCR::multifiltered_OCR(
         language, *this, image,
         text_color_ranges,
-        log10p_spread, min_text_ratio, max_text_ratio
+        log10p_spread, min_text_ratio, max_text_ratio,
+        psm
     );
     if (logger){
         ret.log(*logger, max_log10p);

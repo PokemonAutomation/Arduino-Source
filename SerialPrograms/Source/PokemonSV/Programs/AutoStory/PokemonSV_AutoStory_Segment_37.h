@@ -44,10 +44,10 @@ public:
 
 
 // start: Inside Area Zero Station 2. Deactivated the locks.
-// end: Outside Area Zero Station 3. Defeated Great Tusk/Iron Treads.
+// end: Inside Area Zero Station 3. Deactivated the locks.
 void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
-// start: Outside Area Zero Station 3. Defeated Great Tusk/Iron Treads.
+// start: Inside Area Zero Station 3. Deactivated the locks.
 // end: Inside Area Zero Station 3. Deactivated the locks.
 void checkpoint_99(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
