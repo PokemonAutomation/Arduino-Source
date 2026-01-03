@@ -85,13 +85,12 @@ OCR::StringMatchResult DonutBerriesOCR::read_substring(
     Logger& logger,
     Language language,
     const ImageViewRGB32& image,
-    const std::vector<OCR::TextColorRange>& text_color_ranges,
     double min_text_ratio, double max_text_ratio
 ) const{
-    return match_substring_from_image_multifiltered(
-        &logger, language, image, text_color_ranges,
+    return match_substring_from_image(
+        &logger, language, image, 
         MAX_LOG10P, MAX_LOG10P_SPREAD,
-        min_text_ratio, max_text_ratio
+        OCR::PageSegMode::SINGLE_LINE
     );
 }
 
@@ -162,7 +161,7 @@ OCR::StringMatchResult DonutBerriesReader::read_with_ocr(
     //image.save("image.png");
 
     OCR::StringMatchResult results;
-    results = DonutBerriesOCR::instance().read_substring(logger, language, image, OCR::BLACK_OR_WHITE_TEXT_FILTERS());
+    results = DonutBerriesOCR::instance().read_substring(logger, language, image);
 
     return results;
 }
