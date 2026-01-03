@@ -98,7 +98,7 @@ DonutMaker::DonutMaker()
        "<b>Number of Donuts:</b><br>The number of donuts to make."
        "<br>Make sure you have enough berries to make this many donuts.",
        LockMode::LOCK_WHILE_RUNNING,
-       0, 1, 999
+       1, 1, 999
     )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_DONUT_FOUND(
@@ -521,10 +521,10 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         env.update_stats();
 
         if (should_stop){
-            save_donut(env, context);
-            if (NUM_DONUTS != 0 && stats.matched.load() >= NUM_DONUTS){
+            if (stats.matched.load() >= NUM_DONUTS){
                 break;
             }
+            save_donut(env, context);
         }
     }
 
