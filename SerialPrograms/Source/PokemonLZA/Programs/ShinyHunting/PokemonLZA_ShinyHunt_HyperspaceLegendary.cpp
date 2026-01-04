@@ -23,6 +23,7 @@
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
+#include "PokemonLZA/Programs/PokemonLZA_HyperspaceNavigation.h"
 #include "PokemonLZA_ShinyHunt_HyperspaceLegendary.h"
 
 #include <format>
@@ -107,73 +108,6 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
 
 namespace {
 
-// Return true if the Calorie number on screen <= min_calorie
-bool check_calorie(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    HyperspaceCalorieWatcher& calorie_watcher,
-    uint16_t min_calorie,
-    uint16_t additional_calorie_buffer
-){
-    int ret = wait_until(
-        env.console, context, std::chrono::seconds(1), {calorie_watcher}
-    );
-    if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "hunt_virizion_balcony(): does not detect Calorie number after waiting for a second",
-            env.console
-        );
-    }
-
-    const uint16_t calorie_number = calorie_watcher.calorie_number();
-    const std::string log_msg = std::format("Calorie: {}/{}", calorie_number, min_calorie);
-    env.add_overlay_log(log_msg);
-    env.log(log_msg);
-    if (calorie_number <= min_calorie + additional_calorie_buffer){
-        if (additional_calorie_buffer == 0){
-            env.log("min calorie reached");
-            env.add_overlay_log("Min Calorie Reached");
-        } else{
-            env.log("Close to min Calorie");
-            env.add_overlay_log("Close to Min Calorie");
-        }
-        return true;
-    }
-    return false;
-}
-
-
-// Wait until the warp pad is detected
-void detect_warp_pad(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats){
-
-    ButtonWatcher ButtonA(
-        COLOR_RED,
-        ButtonType::ButtonA,
-        {0.4, 0.1, 0.2, 0.8},
-        &env.console.overlay()
-    );
-
-    int ret = wait_until(
-        env.console, context, 10s,
-        {ButtonA}
-    );
-    if (ret < 0){
-        stats.errors++;
-        env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "route_terrakion_reset(): Cannot detect warp pad after 10 seconds",
-            env.console
-        );
-    }else{
-        env.log("Detected warp pad.");
-        // env.console.overlay().add_log("Warp Pad Detected");
-    }
-}
-
-
 // Use teleport pad to refresh Terrakion spawns until MIN_CALORIE is reached.
 // Then move close to Terrakion so the shiny sound detector (from the caller level)
 // can detect shiny and stop program.
@@ -185,18 +119,17 @@ void hunt_terrakion(
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
     SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
 {
-    HyperspaceCalorieWatcher calorie_watcher(env.logger());
     while(true){
         // Warp away from Terrakion to despawn
-        detect_warp_pad(env, context, stats);
+        detect_warp_pad(env.console, context);
         pbf_press_button(context, BUTTON_A, 160ms, 80ms);
 
         // Warp towards Terrakion
-        detect_warp_pad(env, context, stats);
+        detect_warp_pad(env.console, context);
         pbf_press_button(context, BUTTON_A, 160ms, 80ms);
 
         // Roll and roll back on Terrakion's roof to respawn
-        detect_warp_pad(env, context, stats);
+        detect_warp_pad(env.console, context);
         pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
         pbf_move_left_joystick(context, {0, -1}, 80ms, 160ms);
         pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
@@ -208,17 +141,17 @@ void hunt_terrakion(
 
         // Spawn refreshing loop takes 3 sec. Going to check Virizion takes 8 sec.
         // 10 for 10 cal per sec
-        if (check_calorie(env, context, calorie_watcher, MIN_CALORIE_TO_CATCH, (3 + 8) * 10)){
+        if (check_calorie(env.console, context, MIN_CALORIE_TO_CATCH, (3 + 8) * 10)){
             break;
         }
     }
 
     // Use warp pads to reset position
-    detect_warp_pad(env, context, stats);
+    detect_warp_pad(env.console, context);
     pbf_press_button(context, BUTTON_A, 160ms, 80ms);
-    detect_warp_pad(env, context, stats);
+    detect_warp_pad(env.console, context);
     pbf_press_button(context, BUTTON_A, 160ms, 80ms);
-    detect_warp_pad(env, context, stats);
+    detect_warp_pad(env.console, context);
 
     // Roll to Terrakion to trigger potential shiny sound
     env.log("Move to check Terrakion.");
@@ -256,7 +189,6 @@ void hunt_virizion_balcony(
     // running forward
     const Milliseconds run_duration(4400);
 
-    HyperspaceCalorieWatcher calorie_watcher(env.logger());
     while(true){
         // running forward
         ssf_press_button(context, BUTTON_B, 0ms, 2*run_duration, 0ms);
@@ -271,7 +203,7 @@ void hunt_virizion_balcony(
         stats.spawns++;
         env.update_stats();
     
-        if (check_calorie(env, context, calorie_watcher, min_calorie)){
+        if (check_calorie(env.console, context, min_calorie)){
             break;
         }
     }
@@ -360,7 +292,6 @@ void hunt_virizion_rooftop(
     };
 
     // Starting facing the ladder
-    HyperspaceCalorieWatcher calorie_watcher(env.logger());
     // This loop takes about 15 sec
     while(true){
         pbf_press_button(context, BUTTON_A, 100ms, 500ms); // hop on ladder
@@ -375,7 +306,7 @@ void hunt_virizion_rooftop(
         env.update_stats();
         // Spawn refreshing loop takes 15 sec. Going to check Virizion takes 22 sec.
         // 10 for 10 cal per sec
-        if (check_calorie(env, context, calorie_watcher, MIN_CALORIE_TO_CATCH, (15 + 22) * 10)){
+        if (check_calorie(env.console, context, MIN_CALORIE_TO_CATCH, (15 + 22) * 10)){
             break;
         }
     }

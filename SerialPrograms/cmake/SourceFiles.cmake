@@ -1683,6 +1683,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_WeatherFinder.h
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h
+    Source/PokemonLZA/Programs/PokemonLZA_HyperspaceNavigation.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_HyperspaceNavigation.h
     Source/PokemonLZA/Programs/PokemonLZA_BoxSorter.cpp
     Source/PokemonLZA/Programs/PokemonLZA_BoxSorter.h
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.cpp
@@ -1712,6 +1714,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HyperspaceHunter.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HyperspaceHunter.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HyperspaceLegendary.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HyperspaceLegendary.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.cpp
