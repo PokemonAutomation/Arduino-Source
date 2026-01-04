@@ -323,7 +323,7 @@ void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProContr
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
     bool zoom_to_max = false;
-    open_map(env.console, context, zoom_to_max);
+    open_map(env.console, context, zoom_to_max, true);
     // Move map cursor upwards a little bit so that the cursor locks onto the pokecenter.
     // This is needed so that in the fast travel location menu the Hotel Z is one row near
     // the default position on the menu.
