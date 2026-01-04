@@ -521,6 +521,7 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         const bool should_stop = donut_iteration(env, context);
         stats.resets++;
         env.update_stats();
+        send_program_status_notification(env, NOTIFICATION_STATUS);
 
         if (should_stop){
             if (stats.matched.load() >= NUM_DONUTS){
