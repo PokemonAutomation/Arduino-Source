@@ -9,6 +9,7 @@
 #define PokemonAutomation_PokemonLZA_HyperspaceNavigation_H
 
 #include <cstdint>
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
