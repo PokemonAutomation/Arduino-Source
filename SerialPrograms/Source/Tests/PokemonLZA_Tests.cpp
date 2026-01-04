@@ -707,6 +707,7 @@ int test_pokemonLZA_FlavorPowerScreenDetector(const std::string& filepath){
     std::filesystem::path target_powers_path = parent_dir / ("_" + base_name + ".txt");
     std::vector<std::string> expected_powers;
     if (load_slug_list(target_powers_path.string(), expected_powers) == false){
+        cout << "Loading slug list " << target_powers_path << " failed." << endl;
         return 1;
     }
     if (expected_powers.size() != 3){
