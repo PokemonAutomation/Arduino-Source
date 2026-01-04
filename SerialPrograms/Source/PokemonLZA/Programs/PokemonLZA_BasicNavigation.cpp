@@ -171,7 +171,7 @@ bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_t
 }
 
 void open_hyperspace_map(ConsoleHandle& console, ProControllerContext& context){
-    pbf_press_button(context, BUTTON_PLUS, 240ms, 40ms);
+    pbf_press_button(context, BUTTON_PLUS, 240ms, 40ms); 
     context.wait_for_all_requests();
     console.log("Opening Hyperspace Map...");
     console.overlay().add_log("Open Hyperspace Map");
@@ -219,7 +219,8 @@ void open_hyperspace_map(ConsoleHandle& console, ProControllerContext& context){
 
 FastTravelState fly_from_map(
     ConsoleHandle& console, ProControllerContext& context,
-    std::shared_ptr<const ImageRGB32>* overworld_screen
+    std::shared_ptr<const ImageRGB32>* overworld_screen,
+    Button mash_while_waiting
 ){
     console.log("Flying from map...");
     context.wait_for_all_requests();
@@ -260,13 +261,16 @@ FastTravelState fly_from_map(
         }
     }
 
-    OverworldPartySelectionWatcher overworld(COLOR_WHITE, &console.overlay());
+    OverworldPartySelectionWatcher overworld(COLOR_WHITE, &console.overlay(), 0ms);
     BlueDialogWatcher blue_dialog(COLOR_BLUE, &console.overlay());
-    int ret = wait_until(
-        console, context, 30s,  // set 30sec to be long enough for Switch 1 to load the overworld
-        {overworld, blue_dialog}
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [&](ProControllerContext& context) {
+            pbf_mash_button(context, mash_while_waiting, 30s);
+        },
+        { {overworld} }
     );
-    switch (ret){
+    switch (ret) {
     case 0:
         console.log("Flying from map... Done!");
         console.overlay().add_log("Fast Travel Done");
@@ -275,12 +279,12 @@ FastTravelState fly_from_map(
         console.log("Detected blue dialog. Rare by probably too many button A mashing to trigger return to Lumiose dialog while teleporting to Hyperspace portal");
         ret = run_until<ProControllerContext>(
             console, context,
-            [](ProControllerContext& context){
+            [](ProControllerContext& context) {
                 pbf_mash_button(context, BUTTON_B, 5s);
             },
-            {{overworld}}
+            { {overworld} }
         );
-        if (ret != 0){
+        if (ret != 0) {
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "fly_from_map(): Does not detect overworld after encountering blue dialog.",
@@ -297,8 +301,7 @@ FastTravelState fly_from_map(
             console
         );
     }
-
-    if (overworld_screen != nullptr){
+    if (overworld_screen != nullptr) {
         *overworld_screen = overworld.last_detected_frame();
     }
 

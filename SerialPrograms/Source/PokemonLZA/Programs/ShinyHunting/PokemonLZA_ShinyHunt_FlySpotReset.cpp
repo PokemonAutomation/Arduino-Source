@@ -210,7 +210,7 @@ bool route_hyperspace_wild_zone(
     
     // Fly from map to reset spawns
     std::shared_ptr<const ImageRGB32> overworld_screen;
-    FastTravelState travel_status = fly_from_map(env.console, context, &overworld_screen);
+    FastTravelState travel_status = fly_from_map(env.console, context, &overworld_screen, BUTTON_PLUS);
     if (travel_status != FastTravelState::SUCCESS){
         stats.errors++;
         env.update_stats();
@@ -224,7 +224,7 @@ bool route_hyperspace_wild_zone(
     if (overworld_screen == nullptr){
         throw InternalProgramError(&env.logger(), PA_CURRENT_FUNCTION, "overworld_screen is nullptr but FastTravelState is successful.");
     }
-
+    
     HyperspaceCalorieDetector hyperspace_calorie_detector(env.logger());
     if (!hyperspace_calorie_detector.detect(*overworld_screen)){
         stats.errors++;

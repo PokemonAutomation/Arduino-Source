@@ -66,7 +66,7 @@ void open_hyperspace_map(ConsoleHandle& console, ProControllerContext& context);
 // - NOT_AT_FLY_SPOT: the current map cursor is not on a fly spot, cannot fast travel. After the function
 //   returns, the game is in fly map.
 FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& context,
-    std::shared_ptr<const ImageRGB32>* overworld_screen = nullptr);
+    std::shared_ptr<const ImageRGB32>* overworld_screen = nullptr, Button mash_while_waiting = BUTTON_NONE);
 
 // Fast travel without moving map cursor.
 // This is useful to fast travel back to the wild zone gate while in the zone.
