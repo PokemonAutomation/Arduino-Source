@@ -33,6 +33,17 @@
 	#error "D++ Requires a C++17 compatible C++ compiler. Please ensure that you have enabled C++17 in your compiler flags."
 #endif
 
+/* If not using c++20, define DPP_CPP17_COMPAT and DPP_NO_CORO if DPP_NO_CORO is not already defined.
+ */
+#if !(defined(__cplusplus) && __cplusplus >= 202002L) && !(defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)
+	#define DPP_CPP17_COMPAT
+	#if !defined(DPP_CORO) || !DPP_CORO // Allow overriding this because why not
+		#ifndef DPP_NO_CORO
+			#define DPP_NO_CORO
+		#endif
+	#endif
+#endif
+
 #ifndef DPP_STATIC
 	/* Dynamic linked build as shared object or dll */
 	#ifdef DPP_BUILD
@@ -115,10 +126,10 @@ extern bool DPP_EXPORT validate_configuration();
 
 }
 
-#ifndef _WIN32
-	#define SOCKET int
-#else
-	#define NOMINMAX
+#ifdef _WIN32
+	#ifndef NOMINMAX
+		#define NOMINMAX
+	#endif
 
 	#include <WinSock2.h>
 #endif
