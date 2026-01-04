@@ -323,8 +323,9 @@ void DonutMaker::open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env,
 void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
-    bool zoom_to_max = false;
-    open_map(env.console, context, zoom_to_max, true);
+    const bool zoom_to_max = false;
+    const bool require_icons = false;
+    open_map(env.console, context, zoom_to_max, require_icons);
     // Move map cursor upwards a little bit so that the cursor locks onto the pokecenter.
     // This is needed so that in the fast travel location menu the Hotel Z is one row near
     // the default position on the menu.
@@ -417,8 +418,9 @@ void save_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& conte
     pbf_mash_button(context, BUTTON_B, Seconds(4));
     context.wait_for_all_requests();
 
-    bool zoom_to_max = false;
-    open_map(env.console, context, zoom_to_max);
+    const bool zoom_to_max = false;
+    const bool require_icons = false;
+    open_map(env.console, context, zoom_to_max, require_icons);
     // Move map cursor upwards a little bit so that the cursor locks onto Hotel Z.
     // This is needed so that in the fast travel location menu the pokecenter is one row near
     // the default position on the menu.
