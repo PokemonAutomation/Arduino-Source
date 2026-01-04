@@ -212,7 +212,7 @@ void WeatherFinder::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     while (true) {
         env.log("Looking for " + weatherName + " " + std::string(isDay ? "day" : "night"));
         
-        open_map(env.console, context);
+        open_map(env.console, context, false, true);
         VideoSnapshot screen = env.console.video().snapshot();
         
         bool result = detector.detect(screen);

@@ -136,7 +136,7 @@ void MegaShardFarmer::program(SingleSwitchProgramEnvironment& env, ProController
 void MegaShardFarmer::fly_back(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     while (true){
         const bool zoom_to_max = false;
-        open_map(env.console, context, zoom_to_max);
+        open_map(env.console, context, zoom_to_max, false);
 
         //  Middle Zoom
         pbf_move_right_joystick(context, {0, +1}, 80ms, 80ms);

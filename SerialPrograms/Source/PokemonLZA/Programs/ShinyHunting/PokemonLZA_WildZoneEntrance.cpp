@@ -216,7 +216,7 @@ void fast_travel_outside_zone(
     bool map_already_opened = false
 ){
     if (!map_already_opened){
-        if (!open_map(env.console, context, to_max_zoom_level_on_map)){
+        if (!open_map(env.console, context, to_max_zoom_level_on_map, true)){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "fast_travel_outside_zone(): Fast travel disabled from supposedly outside the entrance." + extra_error_msg,
