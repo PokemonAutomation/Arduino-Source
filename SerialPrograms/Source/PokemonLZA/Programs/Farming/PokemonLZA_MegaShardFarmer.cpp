@@ -148,13 +148,12 @@ void MegaShardFarmer::fly_back(SingleSwitchProgramEnvironment& env, ProControlle
             pbf_move_left_joystick(context, {0, -0.5}, 40ms, 120ms);
             pbf_move_left_joystick(context, {0, +0.5}, 40ms, 500ms);
         }else{
-            pbf_move_left_joystick(context, {-0.5, 0}, 40ms, 500ms);
+            pbf_move_left_joystick(context, {-0.5, -0.5}, 80ms, 500ms);
         }
 
         if (fly_from_map(env.console, context) == FastTravelState::SUCCESS){
             return;
         }else{
-            failed++;
             pbf_mash_button(context, BUTTON_B, 5000ms);
         }
     }
