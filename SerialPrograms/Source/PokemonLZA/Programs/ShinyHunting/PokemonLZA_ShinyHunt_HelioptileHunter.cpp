@@ -85,7 +85,7 @@ ShinyHunt_HelioptileHunter::ShinyHunt_HelioptileHunter()
 
 bool proper_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     
-    open_map(env.console, context, true);
+    open_map(env.console, context, true, true);
 
     WeatherIconDetector sunnyDetector(
         WeatherIconType::Sunny,

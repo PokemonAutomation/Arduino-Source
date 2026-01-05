@@ -9,6 +9,7 @@
 
 #include <string>
 #include "Common/Cpp/CancellableScope.h"
+#include "Common/Cpp/ListenerSet.h"
 
 namespace PokemonAutomation{
 
@@ -20,6 +21,18 @@ class BotBaseControllerContext;
 
 
 class BotBaseController : public Cancellable::CancelListener{
+public:
+    struct Listener{
+        virtual void on_info_message(const BotBaseMessage& message) noexcept{};
+        virtual void on_error_message(const BotBaseMessage& message) noexcept{};
+    };
+    void add_listener(Listener& listener){
+        m_listeners.add(listener);
+    }
+    void remove_listener(Listener& listener){
+        m_listeners.remove(listener);
+    }
+
 public:
     using ContextType = BotBaseControllerContext;
 
@@ -68,6 +81,8 @@ public:
         Cancellable* cancelled = nullptr
     ) = 0;
 
+protected:
+    ListenerSet<Listener> m_listeners;
 };
 
 

@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.h"
 #include "PokemonLZA/Inference/Donuts/PokemonLZA_FlavorPowerDetector.h"
 #include "PokemonLZA/Inference/Donuts/PokemonLZA_FlavorPowerScreenDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
@@ -21,14 +22,13 @@
 #include "PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "SerialPrograms/Source/CommonFramework/GlobalSettingsPanel.h"
 #include "PokemonLZA_Tests.h"
 #include "TestUtils.h"
 #include <iostream>
 #include <fstream>
 #include <map>
-#include <QDir>
-#include <QFileInfo>
-#include <QString>
+#include <filesystem>
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -359,18 +359,18 @@ int test_pokemonLZA_MapIconDetector(const std::string& filepath){
     // Each line in the txt file has format: "<MapIconType> <count>"
     // For example: "PokemonCenter 2" means there should be 2 Pokemon Centers detected
 
-    const QString full_path(QString::fromStdString(filepath));
-    const QFileInfo fileinfo(full_path);
-    const QString filename = fileinfo.fileName();
-    const QDir parent_dir = fileinfo.dir();
+    std::filesystem::path file_path(filepath);
+    std::string filename = file_path.filename().string();
+    std::filesystem::path parent_dir = file_path.parent_path();
+    std::string base_name = file_path.stem().string();
 
-    const QString target_detections_path = parent_dir.filePath("_" + fileinfo.baseName() + ".txt");
+    std::filesystem::path target_detections_path = parent_dir / ("_" + base_name + ".txt");
 
     // Load expected detections from txt file
     std::map<MapIconType, int> expected_counts;
-    std::ifstream file(target_detections_path.toStdString());
+    std::ifstream file(target_detections_path);
     if (!file.is_open()){
-        cerr << "Error: cannot open target detection file " << target_detections_path.toStdString() << endl;
+        cerr << "Error: cannot open target detection file " << target_detections_path << endl;
         return 1;
     }
 
@@ -384,7 +384,7 @@ int test_pokemonLZA_MapIconDetector(const std::string& filepath){
         // Parse line: "<MapIconType> <count>"
         size_t space_pos = line.find(' ');
         if (space_pos == std::string::npos){
-            cerr << "Error: invalid line format in " << target_detections_path.toStdString() << ": " << line << endl;
+            cerr << "Error: invalid line format in " << target_detections_path << ": " << line << endl;
             return 1;
         }
 
@@ -393,7 +393,7 @@ int test_pokemonLZA_MapIconDetector(const std::string& filepath){
 
         int count = 0;
         if (parse_int(count_str, count) == false){
-            cerr << "Error: invalid count in " << target_detections_path.toStdString() << ": " << count_str << endl;
+            cerr << "Error: invalid count in " << target_detections_path << ": " << count_str << endl;
             return 1;
         }
 
@@ -401,7 +401,7 @@ int test_pokemonLZA_MapIconDetector(const std::string& filepath){
             MapIconType type = string_to_map_icon_type(type_str);
             expected_counts[type] = count;
         }catch (const std::exception&){
-            cerr << "Error: unknown MapIconType in " << target_detections_path.toStdString() << ": " << type_str << endl;
+            cerr << "Error: unknown MapIconType in " << target_detections_path << ": " << type_str << endl;
             return 1;
         }
     }
@@ -461,9 +461,9 @@ int test_pokemonLZA_MapIconDetector(const std::string& filepath){
 
 #ifdef SAVE_DEBUG_IMAGE
     // Save debug image
-    const QString debug_path = parent_dir.filePath("_" + fileinfo.baseName() + "_debug.png");
-    debug_image.save(debug_path.toStdString());
-    cout << "Debug image saved to: " << debug_path.toStdString() << endl;
+    std::filesystem::path debug_path = parent_dir / ("_" + base_name + "_debug.png");
+    debug_image.save(debug_path.string());
+    cout << "Debug image saved to: " << debug_path << endl;
 #endif
 
     // test detection
@@ -631,49 +631,235 @@ int test_pokemonLZA_HyperspaceCalorieDetector(const ImageViewRGB32& image, int e
     return 0;
 }
 
-int test_pokemonLZA_FlavorPowerScreenDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
-    // two words: <language> <True/False>
+int test_pokemonLZA_FlavorPowerScreenDetector(const std::string& filepath){
+    // Expected filename format: <...>_<language>.png
+    // Where language is a language code (eng, jpn, chiSim, chiTra, etc.)
+    // The ground truth power slugs are in _<basename>.txt, one slug per line (3 lines total)
+    // Each line can be "empty" (no power) or a power slug like "sparkling-power-ground-3"
+    //
+    // To generate ground truth files, set GENERATE_TEST_GOLDEN_FILES to true in settings
+
+    std::filesystem::path file_path(filepath);
+    std::string filename = file_path.filename().string();
+    std::filesystem::path parent_dir = file_path.parent_path();
+    std::string base_name = file_path.stem().string();
+
+    const std::vector<std::string> words = parse_words(base_name);
+
+    if (words.size() < 1){
+        cerr << "Error: not enough number of words in the filename. Found only " << words.size() << "." << endl;
+        return 1;
+    }
+
+    std::string code = words[words.size() - 1];
+    if (code == "chiSim"){
+        code = "chi_sim";
+    } else if (code == "chiTra"){
+        code = "chi_tra";
+    }
+    Language language = language_code_to_enum(code);
+    if (language == Language::None || language == Language::EndOfList){
+        cerr << "Error: language word " << words[words.size() - 1] << " is wrong." << endl;
+        return 1;
+    }
+
+    ImageRGB32 image(filepath);
+
+    // First check if this is a flavor power screen
+    FlavorPowerScreenDetector screen_detector;
+    bool is_flavor_screen = screen_detector.detect(image);
+
+    if (!is_flavor_screen){
+        cerr << "Error: FlavorPowerScreenDetector did not detect flavor power screen." << endl;
+        return 1;
+    }
+
+    if (PreloadSettings::debug().GENERATE_TEST_GOLDEN_FILES){
+        // Golden file generation mode: detect all powers and write to file
+        cout << "Generating golden file for: " << filepath << endl;
+
+        std::filesystem::path target_powers_path = parent_dir / ("_" + base_name + ".txt");
+        std::ofstream output_file(target_powers_path);
+        if (!output_file.is_open()){
+            cerr << "Error: cannot open output file " << target_powers_path << " for writing" << endl;
+            return 1;
+        }
+
+        for (int i = 0; i < 3; i++){
+            FlavorPowerDetector power_detector(global_logger_command_line(), COLOR_RED, language, i);
+            std::string power_slug = power_detector.detect_power(image);
+
+            if (power_slug.empty()){
+                output_file << "empty" << endl;
+                cout << "  Slot " << i << ": empty" << endl;
+            } else {
+                output_file << power_slug << endl;
+                cout << "  Slot " << i << ": " << power_slug << endl;
+            }
+        }
+
+        output_file.close();
+        cout << "Golden file saved to: " << target_powers_path << endl;
+        return 0;
+    }
+
+    // Normal testing mode: load golden file and verify
+    std::filesystem::path target_powers_path = parent_dir / ("_" + base_name + ".txt");
+    std::vector<std::string> expected_powers;
+    if (load_slug_list(target_powers_path.string(), expected_powers) == false){
+        cout << "Loading slug list " << target_powers_path << " failed." << endl;
+        return 1;
+    }
+    if (expected_powers.size() != 3){
+        cerr << "Error: need to have exactly 3 power slots in " << target_powers_path << endl;
+        return 1;
+    }
+
+    for (int i = 0; i < 3; i++){
+        FlavorPowerIconDetector power_icon_detector(global_logger_command_line(), i);
+        FlavorPowerDetector power_detector(global_logger_command_line(), COLOR_RED, language, i);
+
+        std::string detected_power_slug = power_detector.detect_power(image);
+        int detected_power_level = power_icon_detector.detect(image);
+
+        std::string expected_power = expected_powers[i];
+
+        // Check against expected power
+        if (expected_power == "empty"){
+            if (!detected_power_slug.empty()){
+                cerr << "Error: Slot " << i << " - expected empty but OCR detected: " << detected_power_slug << endl;
+                return 1;
+            }
+            if (detected_power_level > 0){
+                cerr << "Error: Slot " << i << " - expected empty but icon detector detected level: " << detected_power_level << endl;
+                return 1;
+            }
+        } else {
+            TEST_RESULT_COMPONENT_EQUAL(detected_power_slug, expected_power, "power slug for slot " + std::to_string(i));
+
+            // Verify that power level from icon matches the slug
+            // power slug is sth like "sparkling-power-ground-3" which ends with the power level character
+            if (detected_power_slug.empty()){
+                cerr << "Error: Slot " << i << " - OCR detected empty but expected: " << expected_power << endl;
+                return 1;
+            }
+            int expected_level = detected_power_slug.back() - '1' + 1;
+            if (detected_power_level != expected_level){
+                cerr << "Error: Slot " << i << " - OCR reads power " << detected_power_slug
+                     << " but power icon detector gets power level " << detected_power_level << endl;
+                return 1;
+            }
+        }
+    }
+
+    return 0;
+}
+
+int test_pokemonLZA_DonutBerriesReader(const std::string& filepath){
+    // Expected filename format: <...>_<language>_<selected_berry_index>.png
+    // Where language is a language code (eng, jpn, etc.)
+    // Where selected_berry_index is 0-7 (since there are 8 berry lines on a page)
+    // The ground truth berry slugs are in _<basename>.txt, one slug per line (8 lines total)
+    //
+    // To generate ground truth files, uncomment the following line and rebuild:
+    // #define GENERATE_DONUT_BERRIES_GROUND_TRUTH
+
+    std::filesystem::path file_path(filepath);
+    std::string filename = file_path.filename().string();
+    std::filesystem::path parent_dir = file_path.parent_path();
+    std::string base_name = file_path.stem().string();
+
+    const std::vector<std::string> words = parse_words(base_name);
+
     if (words.size() < 2){
         cerr << "Error: not enough number of words in the filename. Found only " << words.size() << "." << endl;
         return 1;
     }
 
-    Language language = language_code_to_enum(words[words.size() - 2]);
+    std::string code = words[words.size() - 2];
+    if (code == "chiSim"){
+        code = "chi_sim";
+    } else if (code == "chiTra"){
+        code = "chi_tra";
+    }
+    Language language = language_code_to_enum(code);
     if (language == Language::None || language == Language::EndOfList){
         cerr << "Error: language word " << words[words.size() - 2] << " is wrong." << endl;
         return 1;
     }
 
-    bool is_flavor_screen = false;
-    if (parse_bool(words[words.size() - 1], is_flavor_screen) == false){
-        cerr << "Error: word " << words[words.size() - 1] << " is wrong. Must be True or False." << endl;
+    size_t selected_berry = 0;
+    if (parse_size_t(words[words.size() - 1], selected_berry) == false){
+        cerr << "Error: word " << words[words.size() - 1] << " is wrong. Must be int of range [0, 7]. " << endl;
+        return 1;
+    }
+    if (selected_berry >= DonutBerriesReader::BERRY_PAGE_LINES){
+        cerr << "Error: selected_berry must be in range [0, " << DonutBerriesReader::BERRY_PAGE_LINES - 1 << "], got " << selected_berry << "." << endl;
         return 1;
     }
 
-    FlavorPowerScreenDetector detector;
-    bool result = detector.detect(image);
-    TEST_RESULT_EQUAL(result, is_flavor_screen);
-    if (!result){
-        return 0;
-    }
+    ImageRGB32 image(filepath);
 
-    for(int i = 0; i < 3; i ++){
-        FlavorPowerIconDetector power_icon_detector(global_logger_command_line(), i);
-        FlavorPowerDetector power_detector(global_logger_command_line(), COLOR_RED, language, i);
-        std::string power_slug = power_detector.detect_power(image);
-        int power_level = power_icon_detector.detect(image);
-        if (power_slug == ""){
-            if (power_level > 0){
-                cerr << "Error: OCR reads no power but power icon detector gets " << power_level << endl;
-                return 1;
-            }
-        }
-        // power slug is sth like "sparkling-power-ground-3" which ends with the power level character
-        else if (power_slug.back() - '1' + 1 != power_level){
-            cerr << "Error: OCR reads power " << power_slug << " but power icon detector gets power level " << power_level << endl;
+    if (PreloadSettings::debug().GENERATE_TEST_GOLDEN_FILES){
+        // Golden file generation mode: read berry names and write to file
+        cout << "Generating golden file for: " << filepath << endl;
+
+        std::filesystem::path target_berries_path = parent_dir / ("_" + base_name + ".txt");
+        std::ofstream output_file(target_berries_path);
+        if (!output_file.is_open()){
+            cerr << "Error: cannot open output file " << target_berries_path << " for writing" << endl;
             return 1;
         }
+
+        DonutBerriesReader reader;
+        for (size_t i = 0; i < DonutBerriesReader::BERRY_PAGE_LINES; ++i){
+            OCR::StringMatchResult results = reader.read_berry_page_with_ocr(image, global_logger_command_line(), language, i);
+
+            if (results.results.empty()){
+                cerr << "Warning: No berry detected via OCR at slot " << i << endl;
+                output_file << "unknown-berry" << endl;
+            } else {
+                std::string best_match_ocr = results.results.begin()->second.token;
+                output_file << best_match_ocr << endl;
+                cout << "  Slot " << i << ": " << best_match_ocr << endl;
+            }
+        }
+
+        output_file.close();
+        cout << "Golden file saved to: " << target_berries_path << endl;
+        return 0;
     }
+    
+    // Normal testing mode: load golden file and verify
+    std::filesystem::path target_berries_path = parent_dir / ("_" + base_name + ".txt");
+    std::vector<std::string> target_berries;
+    if (load_slug_list(target_berries_path.string(), target_berries) == false){
+        return 1;
+    }
+    if (target_berries.size() != DonutBerriesReader::BERRY_PAGE_LINES){
+        cerr << "Error: need to have exactly " << DonutBerriesReader::BERRY_PAGE_LINES << " berries in " << target_berries_path << endl;
+        return 1;
+    }
+
+    DonutBerriesReader reader;
+    for (size_t i = 0; i < DonutBerriesReader::BERRY_PAGE_LINES; ++i){
+        // Test DonutBerriesSelectionDetector - should only detect at selected_berry index
+        DonutBerriesSelectionDetector selection_detector(i);
+        bool is_selected = selection_detector.detect(image);
+        bool expected_selected = (i == selected_berry);
+        TEST_RESULT_COMPONENT_EQUAL(is_selected, expected_selected, "selection detector : berry slot " + std::to_string(i));
+
+        // Test OCR for all berries
+        OCR::StringMatchResult results = reader.read_berry_page_with_ocr(image, global_logger_command_line(), language, i);
+
+        if (results.results.empty()){
+            cerr << "No berry detected via OCR" << endl;
+            return 1;
+        }
+        std::string best_match_ocr = results.results.begin()->second.token;
+        TEST_RESULT_COMPONENT_EQUAL(best_match_ocr, target_berries[i], "ocr : berry slot " + std::to_string(i));
+    }
+
     return 0;
 }
 

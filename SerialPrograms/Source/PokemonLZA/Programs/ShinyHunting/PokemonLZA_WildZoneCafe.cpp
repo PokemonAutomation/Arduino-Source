@@ -121,7 +121,7 @@ void do_one_cafe_trip(
 
         // Open map is robust against day/night change. So after open_map()
         // we are sure we are in map view
-        bool can_fast_travel = open_map(env.console, context, to_zoom_to_max);
+        bool can_fast_travel = open_map(env.console, context, to_zoom_to_max, true);
         to_zoom_to_max = false;
 
         if (can_fast_travel){
@@ -228,7 +228,7 @@ void do_one_cafe_trip(
     shiny_sound_handler.process_pending(context);
 
     // do a fast travel back to cafe
-    bool can_fast_travel = open_map(env.console, context, to_zoom_to_max);
+    bool can_fast_travel = open_map(env.console, context, to_zoom_to_max, true);
     if (!can_fast_travel){
         // cannot fast travel outside zone. Chased by wild pokemon that used Dig?
         stats.errors++;

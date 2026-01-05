@@ -24,8 +24,6 @@ namespace PokemonAutomation{
 namespace OCR{
 
 
-
-
 bool language_available(Language language){
     std::string path = RESOURCE_PATH();
     path += "Tesseract/";
@@ -36,7 +34,9 @@ bool language_available(Language language){
 }
 
 
-
+// Thread-safe object pool for TesseractAPI instances for a specific language.
+// Allows concurrent OCR operations by maintaining multiple Tesseract instances that can be
+// checked out, used, and returned. Instances are created lazily on demand.
 class TesseractPool{
 public:
     TesseractPool(Language language)
@@ -46,8 +46,12 @@ public:
         )
     {}
 
-    std::string run(const ImageViewRGB32& image){
+    // Perform OCR on the given image. Thread-safe - can be called concurrently.
+    // Checkout pattern: (1) acquire idle instance from pool (or create new one if none available),
+    // (2) configure PSM, (3) run OCR without holding lock, (4) return instance to idle pool.
+    std::string run(const ImageViewRGB32& image, int psm){
         TesseractAPI* instance;
+        // Checkout: Try to get an idle instance, create new one if the idle pool is empty.
         while (true){
             {
                 WriteSpinLock lg(m_lock, "TesseractPool::run()");
@@ -57,9 +61,15 @@ public:
                     break;
                 }
             }
+            // No idle instance available - create a new one.
             add_instance();
         }
 
+        // Configure PSM before OCR (safe to call between images on same instance).
+        // PSM is page segmentation mode for Tessearct.
+        instance->set_page_seg_mode(psm);
+
+        // Perform OCR without holding the lock (allows concurrent OCR operations).
 //        auto start = current_time();
         TesseractString str = instance->read32(
             (const unsigned char*)image.data(),
@@ -69,7 +79,7 @@ public:
         );
 //        auto end = current_time();
 //        cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << endl;
-
+        // Checkin: Return instance to the idle pool.
         {
             WriteSpinLock lg(m_lock, "TesseractPool::run()");
             m_idle.emplace_back(instance);
@@ -80,6 +90,8 @@ public:
             : str.c_str();
     }
 
+    // Create a new TesseractAPI instance and add it to the pool.
+    // Thread-safe - can be called concurrently (using `m_lock` when modifying the pool).
     void add_instance(){
         //  Check for non-ascii characters in path.
         for (char ch : m_training_data_path){
@@ -94,6 +106,7 @@ public:
         global_logger_tagged().log(
             "Initializing TesseractAPI (" + m_language_code + "): " + m_training_data_path
         );
+        // Create instance outside lock (initialization is expensive).
         std::unique_ptr<TesseractAPI> api(
             new TesseractAPI(m_training_data_path.c_str(), m_language_code.c_str())
         );
@@ -101,6 +114,7 @@ public:
             throw InternalSystemError(nullptr, PA_CURRENT_FUNCTION, "Could not initialize TesseractAPI.");
         }
 
+        // Add to pool under lock.
         WriteSpinLock lg(m_lock, "TesseractPool::run()");
 
         m_instances.emplace_back(std::move(api));
@@ -112,6 +126,8 @@ public:
         }
     }
 
+    // Pre-allocate a minimum number of instances to avoid lazy initialization during runtime.
+    // Useful for warming up the pool before heavy OCR workloads.
     void ensure_instances(size_t instances){
         size_t current_instances;
         while (true){
@@ -129,16 +145,6 @@ public:
 #ifdef __APPLE__
 #ifdef UNIX_LINK_TESSERACT
     ~TesseractPool(){
-        // As of Feb 05, 2022, the newest Tesseract (5.0.1) installed by HomeBrew on macOS
-        // has a bug that will crash the program when deleting internal Tesseract API instances,
-        // giving error: 
-        // libc++abi.dylib: terminating with uncaught exception of type std::__1::system_error: mutex lock failed: Invalid argument
-        // A similar issue is posted on Tesseract Github: https://github.com/tesseract-ocr/tesseract/issues/3655
-        // There is no way of using HomeBrew to reinstall the older version.
-        // Fortunately this class TesseractPool will not get built and destroyed repeatedly in
-        // runtime. It will only get initialized once for each supported language. So I am able
-        // to use this ugly workaround by not deleting the Tesseract API instances.
-        std::cout << "Warning: not release Tesseract API instance due to mutex bug similar to https://github.com/tesseract-ocr/tesseract/issues/3655" << std::endl;
         for(auto& api : m_instances){
             api.release();
         }
@@ -150,14 +156,21 @@ private:
     const std::string& m_language_code;
     const std::string m_training_data_path;
 
+    // Concurrency: m_lock protects both m_instances and m_idle vectors.
     SpinLock m_lock;
+    // Owns all created Tesseract instances.
     std::vector<std::unique_ptr<TesseractAPI>> m_instances;
+    // Current idle Tesseract instances in `m_instances`.
     std::vector<TesseractAPI*> m_idle;
 };
 
+// Global singleton managing TesseractPools for all languages.
+// Two-level concurrency model:
+//   Level 1: ocr_pool_lock protects the map (language -> pool creation/lookup)
+//   Level 2: Each TesseractPool has its own m_lock (instance checkout/checkin)
 struct OcrGlobals{
-    SpinLock ocr_pool_lock;
-    std::map<Language, TesseractPool> ocr_pool;
+    SpinLock ocr_pool_lock;                       // Protects ocr_pool map.
+    std::map<Language, TesseractPool> ocr_pool;   // One pool per language.
 
     static OcrGlobals& instance(){
         static OcrGlobals globals;
@@ -166,8 +179,7 @@ struct OcrGlobals{
 };
 
 
-
-std::string ocr_read(Language language, const ImageViewRGB32& image){
+std::string ocr_read(Language language, const ImageViewRGB32& image, PageSegMode psm){
 //    static size_t c = 0;
 //    image.save("ocr-" + std::to_string(c++) + ".png");
 
@@ -178,6 +190,7 @@ std::string ocr_read(Language language, const ImageViewRGB32& image){
     OcrGlobals& globals = OcrGlobals::instance();
     std::map<Language, TesseractPool>& ocr_pool = globals.ocr_pool;
 
+    // Get or create the pool for this language (lock only during map access).
     std::map<Language, TesseractPool>::iterator iter;
     {
         WriteSpinLock lg(globals.ocr_pool_lock, "ocr_read()");
@@ -186,8 +199,15 @@ std::string ocr_read(Language language, const ImageViewRGB32& image){
             iter = ocr_pool.emplace(language, language).first;
         }
     }
-    return iter->second.run(image);
+    // Delegate to pool (which has its own locking for instance management).
+    std::string ret = iter->second.run(image, static_cast<int>(psm));
+
+//    global_logger_tagged().log(ret);
+
+    return ret;
 }
+
+
 void ensure_instances(Language language, size_t instances){
     if (language == Language::None){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to call OCR without a language.");
@@ -196,6 +216,7 @@ void ensure_instances(Language language, size_t instances){
     OcrGlobals& globals = OcrGlobals::instance();
     std::map<Language, TesseractPool>& ocr_pool = globals.ocr_pool;
 
+    // Get or create the pool for this language.
     std::map<Language, TesseractPool>::iterator iter;
     {
         WriteSpinLock lg(globals.ocr_pool_lock, "ocr_read()");
@@ -204,13 +225,15 @@ void ensure_instances(Language language, size_t instances){
             iter = ocr_pool.emplace(language, language).first;
         }
     }
+    // Delegate to pool's ensure_instances (which handles its own locking).
     iter->second.ensure_instances(instances);
 }
+
 void clear_cache(){
     OcrGlobals& globals = OcrGlobals::instance();
     std::map<Language, TesseractPool>& ocr_pool = globals.ocr_pool;
     WriteSpinLock lg(globals.ocr_pool_lock, "ocr_clear_cache()");
-    ocr_pool.clear();
+    ocr_pool.clear();  // Destroys all pools and their instances.
 }
 
 

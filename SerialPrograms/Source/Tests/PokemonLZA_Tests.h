@@ -45,7 +45,9 @@ int test_pokemonLZA_MapDetector(const ImageViewRGB32& image, bool target);
 
 int test_pokemonLZA_HyperspaceCalorieDetector(const ImageViewRGB32& image, int expected_calorie);
 
-int test_pokemonLZA_FlavorPowerScreenDetector(const ImageViewRGB32& image, const std::vector<std::string>& words);
+int test_pokemonLZA_FlavorPowerScreenDetector(const std::string& filepath);
+
+int test_pokemonLZA_DonutBerriesReader(const std::string& filepath);
 
  }
 

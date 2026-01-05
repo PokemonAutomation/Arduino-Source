@@ -53,6 +53,7 @@ SerialPABotBase_OemController::SerialPABotBase_OemController(
     connection.add_message_printer<MessageType_NS1_OemControllerStateButtons>();
     connection.add_message_printer<MessageType_NS1_OemControllerStateFull>();
     connection.add_message_printer<MessageType_NS1_OemControllerRumble>();
+    connection.add_message_printer<MessageType_NS1_OemControllerUsbDisallowed>();
 
 
     switch (controller_type){
@@ -105,8 +106,11 @@ SerialPABotBase_OemController::SerialPABotBase_OemController(
     m_status_thread.reset(new SerialPABotBase::ControllerStatusThread(
         connection, *this
     ));
+
+    m_serial->add_listener(*this);
 }
 SerialPABotBase_OemController::~SerialPABotBase_OemController(){
+    m_serial->remove_listener(*this);
     stop();
 }
 void SerialPABotBase_OemController::stop(){
@@ -493,12 +497,33 @@ void SerialPABotBase_OemController::update_status(Cancellable& cancellable){
     );
 #endif
 
-    m_handle.set_status_line1(str);
+    WriteSpinLock lg(m_error_lock);
+    if (m_error_string.empty()){
+        m_handle.set_status_line1(str);
+    }else{
+        m_handle.set_status_line1(m_error_string, COLOR_RED);
+    }
 }
 
-void SerialPABotBase_OemController::stop_with_error(std::string message){
+void SerialPABotBase_OemController::stop_with_error(std::string message) noexcept{
     SerialPABotBase_Controller::stop_with_error(std::move(message));
 }
+
+
+void SerialPABotBase_OemController::on_info_message(const BotBaseMessage& message) noexcept{
+    switch (message.type){
+    case PABB_MSG_INFO_NS1_OEM_CONTROLLER_USB_DISALLOWED:{
+        WriteSpinLock lg(m_error_lock);
+        m_error_string = "Please enable \"Pro Controller Wired Communication\" in the Switch settings.";
+        return;
+    }
+    }
+}
+void SerialPABotBase_OemController::on_error_message(const BotBaseMessage& message) noexcept{
+}
+
+
+
 
 
 

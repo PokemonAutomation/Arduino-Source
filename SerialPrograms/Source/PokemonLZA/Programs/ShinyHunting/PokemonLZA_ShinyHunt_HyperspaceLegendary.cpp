@@ -15,12 +15,15 @@
 #include "ML/Inference/ML_YOLOv5Detector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_HyperspaceCalorieDetector.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
+#include "PokemonLZA/Programs/PokemonLZA_HyperspaceNavigation.h"
 #include "PokemonLZA_ShinyHunt_HyperspaceLegendary.h"
 
 #include <format>
@@ -71,9 +74,10 @@ std::unique_ptr<StatsTracker> ShinyHunt_HyperspaceLegendary_Descriptor::make_sta
 
 
 ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
-    : SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY)
-    , LEGENDARY("<b>Hunt Route:</b>",
+    : SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::STOP_PROGRAM)
+    , LEGENDARY("<b>Legendary " + STRING_POKEMON + ":</b>",
         {
+            {Legendary::TERRAKION, "terrakion", "Terrakion"},
             {Legendary::VIRIZION,  "virizion",  "Virizion"},
         },
         LockMode::LOCK_WHILE_RUNNING,
@@ -104,40 +108,78 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
 
 namespace {
 
-bool check_calorie(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    HyperspaceCalorieWatcher& calorie_watcher,
-    uint16_t min_calorie
-){
-    int ret = wait_until(
-        env.console, context, std::chrono::seconds(1), {calorie_watcher}
-    );
-    if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "hunt_virizion_balcony(): does not detect Calorie number after waiting for a second",
-            env.console
-        );
-    }
-
-    const uint16_t calorie_number = calorie_watcher.calorie_number();
-    const std::string log_msg = std::format("Calorie: {}/{}", calorie_number, min_calorie);
-    env.add_overlay_log(log_msg);
-    env.log(log_msg);
-    if (calorie_number <= min_calorie){
-        env.log("min calorie reached");
-        env.add_overlay_log("Min Calorie Reached");
-        return true;
-    }
-    return false;
-}
-
-bool hunt_virizion_balcony(
+// Use teleport pad to refresh Terrakion spawns until MIN_CALORIE is reached.
+// Then move close to Terrakion so the shiny sound detector (from the caller level)
+// can detect shiny and stop program.
+// This function always returns false to mean it will not require the program to
+// stop, as it relies on the shiny sound detector from the caller level.
+void hunt_terrakion(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
-    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH){
+    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
+{
+    while(true){
+        // Warp away from Terrakion to despawn
+        detect_warp_pad(env.console, context);
+        pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+
+        // Warp towards Terrakion
+        detect_warp_pad(env.console, context);
+        pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+
+        // Roll and roll back on Terrakion's roof to respawn
+        detect_warp_pad(env.console, context);
+        pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+        pbf_move_left_joystick(context, {0, -1}, 80ms, 160ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+        
+        context.wait_for_all_requests();
+
+        stats.spawns++;
+        env.update_stats();
+
+        // Spawn refreshing loop takes 3 sec. Going to check Virizion takes 8 sec.
+        // 10 for 10 cal per sec
+        if (check_calorie(env.console, context, MIN_CALORIE_TO_CATCH, (3 + 8) * 10)){
+            break;
+        }
+    }
+
+    // Use warp pads to reset position
+    detect_warp_pad(env.console, context);
+    pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+    detect_warp_pad(env.console, context);
+    pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+    detect_warp_pad(env.console, context);
+
+    // Roll to Terrakion to trigger potential shiny sound
+    env.log("Move to check Terrakion.");
+    env.add_overlay_log("To Check Terrakion");
+
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_move_left_joystick(context, {-1, 1}, 80ms, 160ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_move_left_joystick(context, {0, 1}, 80ms, 500ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_move_left_joystick(context, {1, 1}, 80ms, 160ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+
+    context.wait_for_all_requests();
+}
+
+#if 0
+// TODO: WIP: use OpenCV to traverse the alley to move to check
+// Virizion.
+void hunt_virizion_balcony(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
+    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
+{
 
     std::string model_path = "PokemonLZA/YOLO/Virizion.onnx";
     YOLOv5Watcher yolo_watcher(env.console.overlay(), model_path);
@@ -147,7 +189,6 @@ bool hunt_virizion_balcony(
     // running forward
     const Milliseconds run_duration(4400);
 
-    HyperspaceCalorieWatcher calorie_watcher(env.logger());
     while(true){
         // running forward
         ssf_press_button(context, BUTTON_B, 0ms, 2*run_duration, 0ms);
@@ -162,7 +203,7 @@ bool hunt_virizion_balcony(
         stats.spawns++;
         env.update_stats();
     
-        if (check_calorie(env, context, calorie_watcher, min_calorie)){
+        if (check_calorie(env.console, context, min_calorie)){
             break;
         }
     }
@@ -213,24 +254,20 @@ bool hunt_virizion_balcony(
         },
         {{yolo_watcher}}
     );
-
-    return true;
 }
+#endif
 
 
-bool hunt_virizion_rooftop(
+// Use shuttle run on rooftop to refresh Virizion spawns until MIN_CALORIE is reached.
+// Then move close to Virizion so the shiny sound detector (from the caller level)
+// can detect shiny and stop program
+void hunt_virizion_rooftop(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
-    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH){
-
-    // Spawn refreshing loop takes 15 sec. Going to check Virizion takes 22 sec.
-    // 10 for 10 cal per sec
-    const uint16_t min_calorie = MIN_CALORIE_TO_CATCH + (15 + 22) * 10;
-
-    // running forward
-    // const Milliseconds run_duration(4400);
-
+    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH,
+    bool& use_switch1_timings)
+{
     auto climb_ladder = [&](Milliseconds hold){
         pbf_move_left_joystick(context, {0.0, 1.0}, hold, 0ms);
     };
@@ -244,30 +281,35 @@ bool hunt_virizion_rooftop(
         pbf_move_left_joystick(context, {left_joystick_x, left_joystick_y}, 500ms, 0ms);
     };
     auto run_changing_direction = [&](Milliseconds hold, double right_joystick_x){
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0.0, 1.0}, {right_joystick_x, 0.0}, hold);
+        ssf_press_button(context, BUTTON_B, 0ms, hold, 0ms);
+        ssf_press_left_joystick(context, {0, +1}, 0ms, hold, 0ms);
+        ssf_press_right_joystick(context, {right_joystick_x, 0}, 0ms, hold, 0ms);
+        ssf_mash1_button(context, BUTTON_A, hold);
+    };
+    auto rotom_glide = [&](Milliseconds hold){
+        ssf_press_left_joystick(context, {0, +1}, 0ms, hold, 0ms);
+        ssf_mash1_button(context, BUTTON_A, hold);
     };
 
     // Starting facing the ladder
-    HyperspaceCalorieWatcher calorie_watcher(env.logger());
     // This loop takes about 15 sec
     while(true){
         pbf_press_button(context, BUTTON_A, 100ms, 500ms); // hop on ladder
         climb_ladder(2800ms);
         run_forward(2500ms);
-        run_backward(3000ms);
-        pbf_wait(context, 1s); // wait for drop to lower level
+        run_backward(use_switch1_timings ? 3050ms : 3000ms);
+        pbf_wait(context, use_switch1_timings ? 1100ms : 1s); // wait for drop to lower level
         run_backward(2000ms);
         run_forward(2500ms);
         context.wait_for_all_requests();
         stats.spawns++;
         env.update_stats();
-        if (check_calorie(env, context, calorie_watcher, min_calorie)){
+        // Spawn refreshing loop takes 15 sec. Going to check Virizion takes 22 sec.
+        // 10 for 10 cal per sec
+        if (check_calorie(env.console, context, MIN_CALORIE_TO_CATCH, (15 + 22) * 10)){
             break;
         }
     }
-    
-    env.log("Move to check Virizion");
-    env.add_overlay_log("To Check Virizion");
 
     // This movement to Virizion takes about 22 sec
     pbf_press_button(context, BUTTON_A, 100ms, 500ms);
@@ -276,14 +318,17 @@ bool hunt_virizion_rooftop(
     change_character_facing_direction(0.0, -1.0); // face backwards
     // align camera to face what character is facing
     pbf_press_button(context, BUTTON_L, 200ms, 800ms);
-    run_forward(2600ms);
-    pbf_wait(context, 1s); // wait for drop to lower level
+    
+    context.wait_for_all_requests();    
+    env.log("Move to check Virizion");
+    env.add_overlay_log("To Check Virizion");
+
+    run_forward(use_switch1_timings ? 2700ms : 2600ms);
+    pbf_wait(context, use_switch1_timings ? 1100ms : 1s); // wait for drop to lower level
     run_changing_direction(3000ms, -0.15);
-    pbf_controller_state(context, BUTTON_A, DPAD_NONE, {0.0, 1.0}, {0.0, 0.0}, 2500ms);
+    rotom_glide(use_switch1_timings ? 2600ms : 2500ms);
     run_forward(5s);
     context.wait_for_all_requests();
-
-    return false;
 }
 
 
@@ -297,55 +342,66 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
 
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats = env.current_stats<ShinyHunt_HyperspaceLegendary_Descriptor::Stats>();
 
-    ShinySoundHandler shiny_sound_handler(SHINY_DETECTED);
-
+    uint8_t shiny_count = 0;
+    float shiny_coefficient = 1.0;
     PokemonLA::ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool {
         //  Warning: This callback will be run from a different thread than this function.
+        shiny_count++;
         stats.shinies++;
         env.update_stats();
         env.console.overlay().add_log("Shiny Sound Detected!", COLOR_YELLOW);
-
-        return shiny_sound_handler.on_shiny_sound(
-            env, env.console, stats.shinies, error_coefficient
-        );
+        shiny_coefficient = error_coefficient;
+        return true;
     });
 
-    run_until<ProControllerContext>(
-        env.console, context,
-        [&](ProControllerContext& context){
-            while (true){
-                bool should_stop = false;
+    // check whether this is Switch 1 or 2.
+    ConsoleType console_type = env.console.state().console_type();
+    if (console_type == ConsoleType::Unknown){
+        env.add_overlay_log("Detecting console type");
+        env.console.log("Unknown Switch type. Try to detect.");
+        console_type = detect_console_type_from_in_game(env.console, context);
+    }
+    bool use_switch1_timings = is_switch1(console_type);
+
+    while (true){
+        const int ret = run_until<ProControllerContext>(
+            env.console, context,
+            [&](ProControllerContext& context){
                 if (LEGENDARY == Legendary::VIRIZION){
-                    should_stop = hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH);
-                } else{
+                    hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH, use_switch1_timings);
+                } else if (LEGENDARY == Legendary::TERRAKION){
+                    hunt_terrakion(env, context, stats, MIN_CALORIE_TO_CATCH);
+                } else {
                     OperationFailedException::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "legendary hunt not implemented",
                         env.console
                     );
                 }
+            },
+            {{shiny_detector}}
+        ); // end run_until()
+        shiny_detector.throw_if_no_sound();
 
-                context.wait_for_all_requests();
-                shiny_sound_handler.process_pending(context);
+        if (ret == 0 && SHINY_DETECTED.on_shiny_sound(
+            env, env.console, context,
+            shiny_count,
+            shiny_coefficient
+        )){
+            break;
+        }
 
-                if (should_stop){
-                    break;
-                }
-
-                go_home(env.console, context);
-                reset_game_from_home(env, env.console, context);
-                stats.game_resets++;
-                env.update_stats();
-                if (stats.game_resets % 10 == 0){
-                    send_program_status_notification(env, NOTIFICATION_STATUS);
-                }
-            } // end while
-        },
-        {{shiny_detector}}
-    );
+        // no shiny sound detected or no shiny legendary detected. Reset game
+        go_home(env.console, context);
+        reset_game_from_home(env, env.console, context);
+        stats.game_resets++;
+        env.update_stats();
+        if (stats.game_resets % 10 == 0){
+            send_program_status_notification(env, NOTIFICATION_STATUS);
+        }
+    } // end while (true)
 
     go_home(env.console, context);
-
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 

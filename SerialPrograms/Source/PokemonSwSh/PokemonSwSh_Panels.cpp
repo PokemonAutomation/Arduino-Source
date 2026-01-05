@@ -187,6 +187,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_multi_switch_program<MaxLairStrongBoss_Descriptor, MaxLairStrongBoss>());
     ret.emplace_back(make_multi_switch_program<MaxLairBossFinder_Descriptor, MaxLairBossFinder>());
 
+#if 0
     ret.emplace_back("---- Deprecated Programs ----");
     ret.emplace_back(make_single_switch_program<BallThrower_Descriptor, BallThrower>());
     ret.emplace_back(make_single_switch_program<BeamReset_Descriptor, BeamReset>());
@@ -197,6 +198,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedStrongSpawn_Descriptor, ShinyHuntUnattendedStrongSpawn>());
     ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedRegigigas2_Descriptor, ShinyHuntUnattendedRegigigas2>());
     ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedIoATrade_Descriptor, ShinyHuntUnattendedIoATrade>());
+#endif
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Untested/Beta/WIP ----");

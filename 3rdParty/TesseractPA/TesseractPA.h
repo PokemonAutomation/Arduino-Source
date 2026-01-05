@@ -64,6 +64,10 @@ TESSERACT_EXPORT char* TesseractAPI_read_bitmap(
     size_t bytes_per_pixel, size_t bytes_per_line,
     size_t ppi
 );
+TESSERACT_EXPORT void TesseractAPI_set_page_seg_mode(
+    TesseractAPI_internal* api,
+    int psm
+);
 TESSERACT_EXPORT void Tesseract_delete(char* text);
 
 
@@ -138,6 +142,12 @@ public:
     {}
 
     bool valid() const{ return m_api != nullptr; }
+
+    void set_page_seg_mode(int psm){
+#ifdef PA_TESSERACT
+        TesseractAPI_set_page_seg_mode(m_api, psm);
+#endif
+    }
 
 //    TesseractString read(const char* filepath){
 //#ifdef PA_TESSERACT

@@ -58,6 +58,9 @@ char* TesseractAPI_read_bitmap(
     api->m_api.SetSourceResolution((int)ppi);
     return api->m_api.GetUTF8Text();
 }
+void TesseractAPI_set_page_seg_mode(TesseractAPI_internal* api, int psm){
+    api->m_api.SetPageSegMode(static_cast<tesseract::PageSegMode>(psm));
+}
 void Tesseract_delete(char* text){
     delete[] text;
 }

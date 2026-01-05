@@ -12,6 +12,8 @@
 
 namespace PokemonAutomation{
 
+class ImageRGB32;
+
 template <typename Type> class ControllerContext;
 struct ImageFloatBox;
 
@@ -44,16 +46,18 @@ enum class FastTravelState{
 // Will repeatedly pressing button + to ensure the map is opened.
 // Robust against day/night changes: if there is a day/night chane before opening the map,
 // it will keep trying to open the map until day/night change finishes.
-// zoom_to_max: whether to go to max zoom level after opening the map
-// Return True if you are not chased by wild pokemon and can fast travel, False otherwise.
-// Note the function uses flyable fast travel icons on map to detect if you are being chased. This
-// means for most reliable detection, set zoom_to_max to True.
-bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_to_max = false);
-
-// Press button + to open Hyperspace Lumiose map.
-// Will repeatedly pressing button + to ensure the map is opened.
-// It does not detect whether the player can fast travel or not.
-void open_hyperspace_map(ConsoleHandle& console, ProControllerContext& context);
+// - zoom_to_max: whether to go to max zoom level after opening the map
+// - require_icons: will detect flyable fast travel icons on map to find out if you are being
+//   chased by wild pokemon. If being chased, return false. For more reliable detection of icons,
+//   set zoom_to_max to True.
+// Return false when `require_icons` is true and no flyable icons are detected on map. Return
+// true otherwise.
+bool open_map(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    bool zoom_to_max,
+    bool require_icons
+);
 
 // Starting at map view, press A to fast travel to the current selected fast travel location
 // overworld_screen: if not nullptr, return the overworld screen when the fly is over.
@@ -65,8 +69,11 @@ void open_hyperspace_map(ConsoleHandle& console, ProControllerContext& context);
 //   is in fly map with the spotted dialog.
 // - NOT_AT_FLY_SPOT: the current map cursor is not on a fly spot, cannot fast travel. After the function
 //   returns, the game is in fly map.
-FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& context,
-    std::shared_ptr<const ImageRGB32>* overworld_screen = nullptr);
+FastTravelState fly_from_map(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    std::shared_ptr<const ImageRGB32>* overworld_screen = nullptr
+);
 
 // Fast travel without moving map cursor.
 // This is useful to fast travel back to the wild zone gate while in the zone.

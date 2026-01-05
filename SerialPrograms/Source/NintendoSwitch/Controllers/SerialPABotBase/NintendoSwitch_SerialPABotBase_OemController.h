@@ -24,7 +24,8 @@ namespace NintendoSwitch{
 
 class SerialPABotBase_OemController :
     public SerialPABotBase_Controller,
-    private SerialPABotBase::ControllerStatusThreadCallback
+    private SerialPABotBase::ControllerStatusThreadCallback,
+    private BotBaseController::Listener
 {
 public:
     SerialPABotBase_OemController(
@@ -124,7 +125,10 @@ protected:
 
 private:
     virtual void update_status(Cancellable& cancellable) override;
-    virtual void stop_with_error(std::string message) override;
+    virtual void stop_with_error(std::string message) noexcept override;
+
+    virtual void on_info_message(const BotBaseMessage& message) noexcept override;
+    virtual void on_error_message(const BotBaseMessage& message) noexcept override;
 
 
 protected:

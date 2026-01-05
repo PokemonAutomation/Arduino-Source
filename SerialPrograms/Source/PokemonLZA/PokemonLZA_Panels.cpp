@@ -37,6 +37,7 @@
 #include "Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h"
 #include "Programs/ShinyHunting/PokemonLZA_WildZoneCafe.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.h"
+#include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_HyperspaceHunter.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_HyperspaceLegendary.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShuttleRun.h"
 #include "Programs/ShinyHunting/PokemonLZA_SewerHunter.h"
@@ -75,6 +76,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<PostKillCatcher_Descriptor, PostKillCatcher>());
     ret.emplace_back(make_single_switch_program<BoxSorter_Descriptor, BoxSorter>());
     ret.emplace_back(make_single_switch_program<WeatherFinder_Descriptor, WeatherFinder>());
+    ret.emplace_back(make_single_switch_program<HyperspaceRewardReset_Descriptor, HyperspaceRewardReset>());
     ret.emplace_back(make_single_switch_program<DonutMaker_Descriptor, DonutMaker>());
     if (IS_BETA_VERSION){
     }
@@ -86,7 +88,6 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<FriendshipFarmer_Descriptor, FriendshipFarmer>());
     ret.emplace_back(make_single_switch_program<InPlaceCatcher_Descriptor, InPlaceCatcher>());
     ret.emplace_back(make_single_switch_program<WigglytuffFarmer_Descriptor, WigglytuffFarmer>());
-    ret.emplace_back(make_single_switch_program<HyperspaceRewardReset_Descriptor, HyperspaceRewardReset>());
     if (IS_BETA_VERSION){
     }
 
@@ -103,6 +104,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back(make_single_switch_program<ShinyHunt_ShuttleRun_Descriptor, ShinyHunt_ShuttleRun>());
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back(make_single_switch_program<ShinyHunt_HyperspaceHunter_Descriptor, ShinyHunt_HyperspaceHunter>());
         ret.emplace_back(make_single_switch_program<ShinyHunt_HyperspaceLegendary_Descriptor, ShinyHunt_HyperspaceLegendary>());
         ret.emplace_back(make_single_switch_program<BeldumHunter_Descriptor, BeldumHunter>());
     }

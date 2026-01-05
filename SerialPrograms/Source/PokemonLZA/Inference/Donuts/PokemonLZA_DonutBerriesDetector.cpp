@@ -9,7 +9,8 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
-#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+//#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
@@ -32,13 +33,9 @@ void DonutBerriesSelectionDetector::make_overlays(VideoOverlaySet& items) const{
 }
 
 bool DonutBerriesSelectionDetector::detect(const ImageViewRGB32& screen){
+    // Match the pink bar:
     ImageViewRGB32 symbol = extract_box_reference(screen, m_symbol_box);
-    //symbol.save("image.png");
-    if (is_solid(symbol, { 0.4375, 0.268, 0.295 }, 0.1, 20)){
-        //symbol.save("image.png");
-        return true;
-    }
-    return false;
+    return is_solid(symbol, { 0.4375, 0.268, 0.295 }, 0.05, 10);
 }
 
 
@@ -89,13 +86,14 @@ OCR::StringMatchResult DonutBerriesOCR::read_substring(
     Logger& logger,
     Language language,
     const ImageViewRGB32& image,
-    const std::vector<OCR::TextColorRange>& text_color_ranges,
     double min_text_ratio, double max_text_ratio
 ) const{
     return match_substring_from_image_multifiltered(
-        &logger, language, image, text_color_ranges,
+        &logger, language, image,
+        OCR::BLACK_OR_WHITE_TEXT_FILTERS(),
         MAX_LOG10P, MAX_LOG10P_SPREAD,
-        min_text_ratio, max_text_ratio
+        0.01, 0.50,
+        OCR::PageSegMode::SINGLE_LINE
     );
 }
 
@@ -166,7 +164,7 @@ OCR::StringMatchResult DonutBerriesReader::read_with_ocr(
     //image.save("image.png");
 
     OCR::StringMatchResult results;
-    results = DonutBerriesOCR::instance().read_substring(logger, language, image, OCR::BLACK_OR_WHITE_TEXT_FILTERS());
+    results = DonutBerriesOCR::instance().read_substring(logger, language, image);
 
     return results;
 }
