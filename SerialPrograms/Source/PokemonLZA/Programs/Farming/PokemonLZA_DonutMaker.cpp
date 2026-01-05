@@ -278,8 +278,17 @@ void DonutMaker::open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env,
         );
         DonutBerriesSelectionWatcher berry_selection(0);
 
-        int ret = wait_until(env.console, context, std::chrono::seconds(3),
-            {white_dialog, arrow, berry_selection, dreams_alpha_delta, omega});
+        int ret = wait_until(
+            env.console, context,
+            std::chrono::seconds(30),
+            {
+                white_dialog,
+                arrow,
+                berry_selection,
+                dreams_alpha_delta,
+                omega,
+            }
+        );
         switch (ret){
         case 0:
             env.log("Detected white dialog. Go to next dialog");
