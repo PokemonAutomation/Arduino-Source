@@ -4,7 +4,7 @@
  *
  */
 
-//#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -134,7 +134,7 @@ void MegaShardFarmer::program(SingleSwitchProgramEnvironment& env, ProController
 
 }
 void MegaShardFarmer::fly_back(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    while (true){
+    for (int failed = 0; failed < 3; failed++){
         const bool zoom_to_max = false;
         open_map(env.console, context, zoom_to_max, false);
 
@@ -144,17 +144,29 @@ void MegaShardFarmer::fly_back(SingleSwitchProgramEnvironment& env, ProControlle
         pbf_move_right_joystick(context, {0, -1}, 80ms, 80ms);
 
         //  Tap the stick to lock on to Le Yeah if you're already on top of it.
-        pbf_move_left_joystick(context, {0, -0.5}, 40ms, 120ms);
-        pbf_move_left_joystick(context, {0, +0.5}, 40ms, 500ms);
+        if (failed == 0){
+            pbf_move_left_joystick(context, {0, -0.5}, 40ms, 120ms);
+            pbf_move_left_joystick(context, {0, +0.5}, 40ms, 500ms);
+        }else{
+            pbf_move_left_joystick(context, {-0.5, 0}, 40ms, 500ms);
+        }
 
         if (fly_from_map(env.console, context) == FastTravelState::SUCCESS){
             return;
         }else{
-            MegaShardFarmer_Descriptor::Stats& stats = env.current_stats<MegaShardFarmer_Descriptor::Stats>();
-            stats.errors++;
+            failed++;
             pbf_mash_button(context, BUTTON_B, 5000ms);
         }
     }
+
+    MegaShardFarmer_Descriptor::Stats& stats = env.current_stats<MegaShardFarmer_Descriptor::Stats>();
+    stats.errors++;
+    env.update_stats();
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "Failed to fly 3 times in the row.",
+        env.console
+    );
 }
 
 
