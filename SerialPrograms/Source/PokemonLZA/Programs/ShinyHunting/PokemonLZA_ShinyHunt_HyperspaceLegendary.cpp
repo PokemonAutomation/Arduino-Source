@@ -122,10 +122,12 @@ void hunt_latios(
     // Warp to rooftop to see Latios
     pbf_press_button(context, BUTTON_A, 160ms, 80ms);
     context.wait_for_all_requests();
-
-    // Roll to Latios to trigger potential shiny sound
-    
     detect_warp_pad(env.console, context);
+
+    stats.spawns++;
+    env.update_stats();
+    // Roll to Latios to trigger potential shiny sound
+
 
     pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
     pbf_wait(context, 500ms); // wait for falling down
@@ -173,6 +175,9 @@ void hunt_cobalion(
     // run right to line up with Cobalion
     ssf_press_button(context, BUTTON_B, 0ms, 10000ms, 0ms);
     pbf_move_left_joystick(context, {+1, 0}, 8370ms, 0ms); 
+    context.wait_for_all_requests();
+    stats.spawns++;
+    env.update_stats();
     // run forward to trigger potential shiny sound
     pbf_move_left_joystick(context, {0, +1}, 4500ms, 0ms); 
 
@@ -227,7 +232,6 @@ void hunt_terrakion(
     detect_warp_pad(env.console, context);
     pbf_press_button(context, BUTTON_A, 160ms, 80ms);
     context.wait_for_all_requests();
-
     detect_warp_pad(env.console, context);
 
     // Roll to Terrakion to trigger potential shiny sound
@@ -235,6 +239,10 @@ void hunt_terrakion(
     env.add_overlay_log("To Check Terrakion");
 
     pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    context.wait_for_all_requests();
+    stats.spawns++;
+    env.update_stats();
+
     pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
     pbf_move_left_joystick(context, {-1, 1}, 80ms, 160ms);
     pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
@@ -396,7 +404,7 @@ void hunt_virizion_rooftop(
     // align camera to face what character is facing
     pbf_press_button(context, BUTTON_L, 200ms, 800ms);
     
-    context.wait_for_all_requests();    
+    context.wait_for_all_requests();
     env.log("Move to check Virizion");
     env.add_overlay_log("To Check Virizion");
 
@@ -404,6 +412,9 @@ void hunt_virizion_rooftop(
     pbf_wait(context, use_switch1_only_timings ? 1100ms : 1s); // wait for drop to lower level
     run_changing_direction(3000ms, -0.15);
     rotom_glide(use_switch1_only_timings ? 2600ms : 2500ms);
+    context.wait_for_all_requests();
+    stats.spawns++;
+    env.update_stats();
     run_forward(5s);
     context.wait_for_all_requests();
 }
