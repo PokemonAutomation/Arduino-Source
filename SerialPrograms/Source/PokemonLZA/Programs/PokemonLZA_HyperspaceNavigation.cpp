@@ -66,7 +66,8 @@ void detect_warp_pad(
         COLOR_RED,
         ButtonType::ButtonA,
         {0.4, 0.1, 0.2, 0.8},
-        &console.overlay()
+        &console.overlay(),
+        Milliseconds(100)
     );
 
     int ret = wait_until(

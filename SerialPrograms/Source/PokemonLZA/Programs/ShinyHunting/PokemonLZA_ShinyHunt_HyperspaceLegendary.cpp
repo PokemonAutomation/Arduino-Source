@@ -77,6 +77,7 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
     : SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::STOP_PROGRAM)
     , LEGENDARY("<b>Legendary " + STRING_POKEMON + ":</b>",
         {
+            {Legendary::LATIOS, "latios", "Latios"},
             {Legendary::COBALION, "cobalion", "Cobalion"},
             {Legendary::TERRAKION, "terrakion", "Terrakion"},
             {Legendary::VIRIZION,  "virizion",  "Virizion"},
@@ -108,6 +109,32 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
 }
 
 namespace {
+
+
+// We save at warp pad and spawn Latios only once per game reset
+void hunt_latios(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
+    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
+{
+    detect_warp_pad(env.console, context);
+    // Warp to rooftop to see Latios
+    pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+    context.wait_for_all_requests();
+
+    // Roll to Latios to trigger potential shiny sound
+    
+    detect_warp_pad(env.console, context);
+
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_wait(context, 500ms); // wait for falling down
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    // pbf_wait(context, 1s);
+    context.wait_for_all_requests();
+}
+
 
 void hunt_cobalion(
     SingleSwitchProgramEnvironment& env,
@@ -167,10 +194,12 @@ void hunt_terrakion(
         // Warp away from Terrakion to despawn
         detect_warp_pad(env.console, context);
         pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+        context.wait_for_all_requests();
 
         // Warp towards Terrakion
         detect_warp_pad(env.console, context);
         pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+        context.wait_for_all_requests();
 
         // Roll and roll back on Terrakion's roof to respawn
         detect_warp_pad(env.console, context);
@@ -193,8 +222,12 @@ void hunt_terrakion(
     // Use warp pads to reset position
     detect_warp_pad(env.console, context);
     pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+    context.wait_for_all_requests();
+
     detect_warp_pad(env.console, context);
     pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+    context.wait_for_all_requests();
+
     detect_warp_pad(env.console, context);
 
     // Roll to Terrakion to trigger potential shiny sound
@@ -310,7 +343,7 @@ void hunt_virizion_rooftop(
     ProControllerContext& context,
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
     SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH,
-    bool& use_switch1_timings)
+    bool& use_switch1_only_timings)
 {
     auto climb_ladder = [&](Milliseconds hold){
         pbf_move_left_joystick(context, {0.0, 1.0}, hold, 0ms);
@@ -341,8 +374,8 @@ void hunt_virizion_rooftop(
         pbf_press_button(context, BUTTON_A, 100ms, 500ms); // hop on ladder
         climb_ladder(2800ms);
         run_forward(2500ms);
-        run_backward(use_switch1_timings ? 3050ms : 3000ms);
-        pbf_wait(context, use_switch1_timings ? 1100ms : 1s); // wait for drop to lower level
+        run_backward(use_switch1_only_timings ? 3050ms : 3000ms);
+        pbf_wait(context, use_switch1_only_timings ? 1100ms : 1s); // wait for drop to lower level
         run_backward(2000ms);
         run_forward(2500ms);
         context.wait_for_all_requests();
@@ -367,10 +400,10 @@ void hunt_virizion_rooftop(
     env.log("Move to check Virizion");
     env.add_overlay_log("To Check Virizion");
 
-    run_forward(use_switch1_timings ? 2700ms : 2600ms);
-    pbf_wait(context, use_switch1_timings ? 1100ms : 1s); // wait for drop to lower level
+    run_forward(use_switch1_only_timings ? 2700ms : 2600ms);
+    pbf_wait(context, use_switch1_only_timings ? 1100ms : 1s); // wait for drop to lower level
     run_changing_direction(3000ms, -0.15);
-    rotom_glide(use_switch1_timings ? 2600ms : 2500ms);
+    rotom_glide(use_switch1_only_timings ? 2600ms : 2500ms);
     run_forward(5s);
     context.wait_for_all_requests();
 }
@@ -398,21 +431,27 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
         return true;
     });
 
-    // check whether this is Switch 1 or 2.
-    ConsoleType console_type = env.console.state().console_type();
-    if (console_type == ConsoleType::Unknown){
-        env.add_overlay_log("Detecting console type");
-        env.console.log("Unknown Switch type. Try to detect.");
-        console_type = detect_console_type_from_in_game(env.console, context);
+    bool use_switch1_only_timings = false;
+    // VIRIZION huntig requires different timings between Switch 1 and 2
+    if (LEGENDARY == Legendary::VIRIZION){
+        // check whether this is Switch 1 or 2.
+        ConsoleType console_type = env.console.state().console_type();
+        if (console_type == ConsoleType::Unknown){
+            env.add_overlay_log("Detecting Console Type");
+            env.console.log("Unknown Switch type. Try to detect.");
+            console_type = detect_console_type_from_in_game(env.console, context);
+        }
+        use_switch1_only_timings = is_switch1(console_type);
     }
-    bool use_switch1_timings = is_switch1(console_type);
 
     while (true){
         const int ret = run_until<ProControllerContext>(
             env.console, context,
             [&](ProControllerContext& context){
-                if (LEGENDARY == Legendary::VIRIZION){
-                    hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH, use_switch1_timings);
+                if (LEGENDARY == Legendary::LATIOS){
+                    hunt_latios(env, context, stats, MIN_CALORIE_TO_CATCH);
+                } else if (LEGENDARY == Legendary::VIRIZION){
+                    hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH, use_switch1_only_timings);
                 } else if (LEGENDARY == Legendary::TERRAKION){
                     hunt_terrakion(env, context, stats, MIN_CALORIE_TO_CATCH);
                 } else if (LEGENDARY == Legendary::COBALION){
@@ -428,6 +467,7 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
             {{shiny_detector}}
         ); // end run_until()
         shiny_detector.throw_if_no_sound();
+        shiny_detector.clear();
 
         if (ret == 0 && SHINY_DETECTED.on_shiny_sound(
             env, env.console, context,
