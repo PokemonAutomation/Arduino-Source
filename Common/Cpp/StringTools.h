@@ -33,6 +33,11 @@ std::string capitalize(const std::string& str);
 // Uncapitalize each word in str. Words are separated by space characters.
 std::string uncapitalize(const std::string& str);
 
+// Convert std::u32string to utf8 std::string.
+// We cannot print or cout std::u32string directly until we upgrade to C++23.
+// There used to be a converter in STL (std::wstring_convert) but that was deprecated since C++17.
+std::string u32string_to_utf8(const std::u32string& u32str);
+
 
 }
 }
