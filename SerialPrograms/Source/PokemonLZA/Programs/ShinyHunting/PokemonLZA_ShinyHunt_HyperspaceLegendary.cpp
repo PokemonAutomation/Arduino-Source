@@ -412,7 +412,6 @@ void hunt_virizion_rooftop(
     pbf_wait(context, use_switch1_only_timings ? 1100ms : 1s); // wait for drop to lower level
     run_changing_direction(3000ms, -0.15);
     rotom_glide(use_switch1_only_timings ? 2600ms : 2500ms);
-    context.wait_for_all_requests();
     stats.spawns++;
     env.update_stats();
     run_forward(5s);
