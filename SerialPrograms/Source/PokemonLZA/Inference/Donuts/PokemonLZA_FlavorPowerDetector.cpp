@@ -67,9 +67,10 @@ OCR::StringMatchResult FlavorPowerReader::read_substring(
     const ImageViewRGB32& image,
     double min_text_ratio, double max_text_ratio
 ) const{
-    return match_substring_from_image(
-        &logger, language, image,
+    return match_substring_from_image_multifiltered(
+        &logger, language, image, OCR::BLACK_TEXT_FILTERS(),
         MAX_LOG10P, MAX_LOG10P_SPREAD,
+        min_text_ratio, max_text_ratio,
         OCR::PageSegMode::SINGLE_LINE
     );
 }

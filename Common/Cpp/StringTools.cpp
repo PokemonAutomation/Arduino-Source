@@ -98,6 +98,36 @@ std::string uncapitalize(const std::string& str){
     return result;
 }
 
+std::string u32string_to_utf8(const std::u32string& u32str){
+    std::string result;
+    result.reserve(u32str.size() * 4); // UTF-8 can be up to 4 bytes per character
+
+    for (char32_t c : u32str){
+        if (c <= 0x7F){
+            // 1-byte character (ASCII)
+            result += static_cast<char>(c);
+        } else if (c <= 0x7FF){
+            // 2-byte character
+            result += static_cast<char>(0xC0 | ((c >> 6) & 0x1F));
+            result += static_cast<char>(0x80 | (c & 0x3F));
+        } else if (c <= 0xFFFF){
+            // 3-byte character
+            result += static_cast<char>(0xE0 | ((c >> 12) & 0x0F));
+            result += static_cast<char>(0x80 | ((c >> 6) & 0x3F));
+            result += static_cast<char>(0x80 | (c & 0x3F));
+        } else if (c <= 0x10FFFF){
+            // 4-byte character
+            result += static_cast<char>(0xF0 | ((c >> 18) & 0x07));
+            result += static_cast<char>(0x80 | ((c >> 12) & 0x3F));
+            result += static_cast<char>(0x80 | ((c >> 6) & 0x3F));
+            result += static_cast<char>(0x80 | (c & 0x3F));
+        }
+        // Invalid characters are skipped
+    }
+
+    return result;
+}
+
 
 }
 }
