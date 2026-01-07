@@ -169,6 +169,10 @@
 #include "Common/CRC32/pabb_CRC32.h"
 #include "Common/PABotBase2/PABotBase2_PacketParser.h"
 #include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
+#include "Controllers/PABotBase2/PABotBase2_CC_RequestQueue.h"
+#include "ML/Inference/ML_PaddleOCRPipeline.h"
+
+
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -695,7 +699,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
+#if 1
+    const std::string det_path = RESOURCE_PATH() + "ML/PP-OCRv5_server_det_infer.onnx";
+    const std::string rec_path = RESOURCE_PATH() + "ML/PP-OCRv5_server_rec_infer.onnx";
+    const std::string dict_path = RESOURCE_PATH() + "ML/PP-OCRv5_server_rec_infer.yml";
+    ML::PaddleOCRPipeline paddle_ocr(det_path, rec_path, dict_path);
 
+#endif
 
 #if 0
     std::string move_results = "Move Effectiveness:";
