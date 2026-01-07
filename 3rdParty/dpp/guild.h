@@ -34,6 +34,7 @@
 namespace dpp {
 
 class channel;
+class cluster;
 
 /* Note from Archie: I'd like to move this soon (dpp::guild::region) and allow users to use a region enum.
  * This would make it easier for people to be able to alter a channel region without having to get the text right.
@@ -519,6 +520,14 @@ public:
 	 * @return false user has not rejoined
 	 */
 	bool has_rejoined() const;
+
+	/**
+	 * @brief Is this user also the guild member?
+	 * @return true if the user is the guild owner.
+	 * @return false if the user is not the guild owner or the guild is not in the cache.
+	 * @note If the guild cache is disabled, this function will always return false.
+	 */
+	bool is_guild_owner() const;
 
 	/**
 	 * @brief Returns true if the user has completed onboarding
@@ -1277,15 +1286,17 @@ public:
 	/**
 	 * @brief Connect to a voice channel another guild member is in
 	 *
+	 * @param owner Cluster the user's shard is on
 	 * @param user_id User id to join
 	 * @param self_mute True if the bot should mute itself
 	 * @param self_deaf True if the bot should deafen itself
+	 * @param dave True to enable DAVE E2EE
 	 * @return True if the user specified is in a vc, false if they aren't
 	 * @note This is NOT a synchronous blocking call! The bot isn't instantly ready to send or listen for audio,
 	 * as we have to wait for the connection to the voice server to be established!
 	 * e.g. wait for dpp::cluster::on_voice_ready event, and then send the audio within that event.
 	 */
-	bool connect_member_voice(snowflake user_id, bool self_mute = false, bool self_deaf = false);
+	bool connect_member_voice(const cluster& owner, snowflake user_id, bool self_mute = false, bool self_deaf = false, bool dave = true);
 
 	/**
 	 * @brief Get the banner url of the guild if it have one, otherwise returns an empty string
@@ -1990,7 +2001,7 @@ public:
 	/**
 	 * @brief Set guild_id of this onboarding object
 	 *
-	 * @param guild_id Guild ID to set
+	 * @param id Guild ID to set
 	 * @return Reference to self, so these method calls may be chained
 	 */
 	onboarding& set_guild_id(const snowflake id);
@@ -2038,4 +2049,4 @@ typedef std::unordered_map<snowflake, guild_member> guild_member_map;
  */
 guild_member DPP_EXPORT find_guild_member(const snowflake guild_id, const snowflake user_id);
 
-} // namespace dpp
+}
