@@ -10,7 +10,7 @@
 #include <format>
 #include <sstream>
 #include <iomanip>
-#include "CommonFramework/Logging/Logger.h"
+#include <iostream>
 #include "Exceptions.h"
 #include "PrettyPrint.h"
 
@@ -178,7 +178,7 @@ std::string tostr_default(double x){
     std::string old_str = tostr_default_old(x);
     std::string new_str = std::format("{:.6g}", x);
     if (old_str != new_str && !std::isnan(x)){
-        global_logger_tagged().log(std::format("tostr_default(): Mismatch between old and new implementation. {} vs {}", old_str, new_str), COLOR_RED);
+        std::cout << std::format("tostr_default(): Mismatch between old and new implementation. {} vs {}", old_str, new_str) << std::endl;
     }
     return old_str;
 }
@@ -193,7 +193,7 @@ std::string tostr_fixed(double x, int precision){
     std::string old_str = tostr_fixed_old(x, precision);
     std::string new_str = std::format("{:.{}f}", x, precision);
     if (old_str != new_str && !std::isnan(x)) {
-        global_logger_tagged().log(std::format("tostr_fixed(): Mismatch between old and new implementation. {} vs {}", old_str, new_str), COLOR_RED);
+        std::cout << std::format("tostr_fixed(): Mismatch between old and new implementation. {} vs {}", old_str, new_str) << std::endl;
     }
     return old_str;
 }
