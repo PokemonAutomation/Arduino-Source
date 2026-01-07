@@ -954,6 +954,8 @@ file(GLOB LIBRARY_SOURCES
     Source/ML/DataLabeling/ML_SegmentAnythingModel.cpp
     Source/ML/DataLabeling/ML_SegmentAnythingModel.h
     Source/ML/DataLabeling/ML_SegmentAnythingModelConstants.h
+    Source/ML/Inference/ML_PaddleOCRPipeline.cpp
+    Source/ML/Inference/ML_PaddleOCRPipeline.h
     Source/ML/Inference/ML_YOLOv5Detector.cpp
     Source/ML/Inference/ML_YOLOv5Detector.h
     Source/ML/Inference/ML_YOLONavigation.cpp
