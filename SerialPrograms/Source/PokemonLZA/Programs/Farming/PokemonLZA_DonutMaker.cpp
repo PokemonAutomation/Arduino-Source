@@ -375,6 +375,31 @@ void load_backup_save(SingleSwitchProgramEnvironment& env, ProControllerContext&
     }
 }
 
+void exit_menu_to_overworld(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
+
+    env.log("Exiting menu to overworld.");
+
+    OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [&](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_B, Seconds(10));
+            pbf_wait(context, Seconds(30)); // 30 sec to wait out potential day night change
+        },
+        {overworld}
+    );
+    if (ret != 0){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+           ErrorReport::SEND_ERROR_REPORT,
+            "donut_maker(): Unable to find overworld after exiting menu.",
+            env.console
+        );
+    }
+}
+
 void reset_map_filter_state(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     env.log("Resetting fast travel map filters.");
 
@@ -387,7 +412,7 @@ void reset_map_filter_state(SingleSwitchProgramEnvironment& env, ProControllerCo
     pbf_press_button(context, BUTTON_A, 100ms, 500ms);
 
     // Close out of map
-    pbf_mash_button(context, BUTTON_B, Seconds(4));
+    exit_menu_to_overworld(env, context);
     context.wait_for_all_requests();
 
     // The filters should now be set to "Facilities" and hovering over Centrico Plaza
@@ -460,7 +485,7 @@ void save_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& conte
     env.log("Creating new backup save to keep the last made donut.");
 
     // Stop talking to Ansha
-    pbf_mash_button(context, BUTTON_B, Seconds(4));
+    exit_menu_to_overworld(env, context);
     context.wait_for_all_requests();
 
     // Fast travel to anywhere to set a new backup save after making a donut to keep
