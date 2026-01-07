@@ -133,7 +133,7 @@ void hunt_latios(
     pbf_wait(context, 500ms); // wait for falling down
     pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
     pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
-    // pbf_wait(context, 1s);
+    pbf_wait(context, 500ms);
     context.wait_for_all_requests();
 }
 
