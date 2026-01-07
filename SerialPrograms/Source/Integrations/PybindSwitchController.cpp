@@ -33,7 +33,7 @@ public:
     void wait_for_ready(){
         std::unique_lock<std::mutex> lg(m_wait_lock);
         m_cv.wait(lg, [this]{
-            return m_procon.load(std::memory_order_acquire) && m_controller->is_ready();
+            return m_controller && m_controller->is_ready();
         });
     }
 
@@ -46,27 +46,15 @@ public:
         );
         ProController* procon = dynamic_cast<ProController*>(m_controller.get());
         if (procon == nullptr){
-            m_error = "Incompatible controller type.";
-            return;
+            m_connection->set_status_line1("Incompatible controller type.", COLOR_RED);
+        }else{
+            m_procon.store(procon, std::memory_order_release);
         }
-        m_procon.store(procon, std::memory_order_release);
 
         {
             std::unique_lock<std::mutex> lg(m_wait_lock);
         }
         m_cv.notify_all();
-    }
-    virtual void status_text_changed(
-        ControllerConnection& connection, const std::string& text
-    ) override{
-        WriteSpinLock lg(m_lock);
-        m_status = text;
-    }
-    virtual void on_error(
-        ControllerConnection& connection, const std::string& text
-    ) override{
-        WriteSpinLock lg(m_lock);
-        m_error = text;
     }
 
     ProController* controller(){
@@ -80,10 +68,6 @@ public:
     std::unique_ptr<ControllerConnection> m_connection;
     std::unique_ptr<AbstractController> m_controller;
     std::atomic<ProController*> m_procon;
-
-    mutable SpinLock m_lock;
-    std::string m_status;
-    std::string m_error;
 
     std::mutex m_wait_lock;
     std::condition_variable m_cv;
