@@ -595,6 +595,9 @@ if (WIN32)
     set(DISCORD_DLL_DEBUG "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win/bin/debug/discord_partner_sdk.dll")
     set(DISCORD_DLL_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win/bin/release/discord_partner_sdk.dll")
 
+    set(DPP_DEBUG_DLL "${REPO_ROOT_DIR}/3rdPartyBinaries/dpp_debug/dpp.dll")
+    set(DPP_RELEASE_DLL "${REPO_ROOT_DIR}/3rdPartyBinaries/dpp_release/dpp.dll")
+
     if(QT_DEPLOY_FILES)
         # Run windeployqt if Qt DLLs are missing
         if(WINDEPLOYQT_EXECUTABLE AND NOT EXISTS "${WIN_DEPLOY_DIR}/Qt6Core.dll")
@@ -637,6 +640,15 @@ if (WIN32)
             WORKING_DIRECTORY "${REPO_ROOT_DIR}/3rdPartyBinaries"
         )
     endif()
+
+    # Copy dpp dll
+    add_custom_command(
+        TARGET SerialPrograms POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Copying dpp DLL"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<IF:$<CONFIG:Debug>,${DPP_DEBUG_DLL},${DPP_RELEASE_DLL}>"
+            "${WIN_DEPLOY_DIR}/dpp.dll"
+)
 
     # Extract OpenCV debug DLL if missing
     if (NOT EXISTS "${OPENCV_DEBUG_DLL}")
