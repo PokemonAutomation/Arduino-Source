@@ -160,7 +160,7 @@
 #include "Common/Cpp/Options/CheckboxDropdownOption.h"
 #include "Common/Cpp/Options/CheckboxDropdownOption.tpp"
 
-
+#include "Integrations/PybindSwitchController.h"
 
 
 #include <QPixmap>
@@ -171,9 +171,24 @@
 using std::cout;
 using std::endl;
 
-
 using namespace PokemonAutomation::Kernels;
 using namespace PokemonAutomation::Kernels::Waterfill;
+
+
+
+
+namespace PokemonAutomation{
+
+
+
+
+
+
+
+
+
+
+}
 
 
 
@@ -292,6 +307,13 @@ public:
 
 
 
+
+
+
+
+
+
+
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -313,6 +335,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     // JoyconContext context(scope, console.controller<JoyconController>());
     VideoOverlaySet overlays(overlay);
 
+
+    {
+        PybindSwitchProController controller("COM12");
+        controller.push_button(1000, 200, 800, BUTTON_B);
+        controller.wait_for_all_requests();
+    }
 
 
 
