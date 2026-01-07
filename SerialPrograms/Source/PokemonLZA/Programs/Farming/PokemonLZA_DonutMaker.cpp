@@ -375,28 +375,32 @@ void load_backup_save(SingleSwitchProgramEnvironment& env, ProControllerContext&
     }
 }
 
-// Set a backup save as a starting point to reset to before making the donuts
-void set_starting_state(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    env.log("Setting starting backup save before making donuts.");
+void reset_map_filter_state(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    env.log("Resetting fast travel map filters.");
 
-    // Fly to the place that the cursor is currently hovering over
-    // It does not matter where, it is just done to create a backup save
-    fast_travel_to_index(env, context, 0);
-    context.wait_for(5000ms); // Wait for backup save to complete
+    open_map(env.console, context, false, false);
+    // Press Y and - to open fast travel filter menu
+    pbf_press_button(context, BUTTON_Y, 100ms, 500ms);
+    pbf_press_button(context, BUTTON_MINUS, 100ms, 500ms);
+    // Press Down and A to select "Facilities" filter
+    pbf_press_dpad(context, DPAD_DOWN, 100ms, 500ms);
+    pbf_press_button(context, BUTTON_A, 100ms, 500ms);
 
-    // Load the backup save that was just created to reset fast travel menu filters
-    // This is important in the case that the first donut is kept
-    load_backup_save(env, context);
-    env.log("Donut Maker starting state is set.");
+    // Close out of map
+    pbf_mash_button(context, BUTTON_B, Seconds(4));
+    context.wait_for_all_requests();
+
+    // The filters should now be set to "Facilities" and hovering over Centrico Plaza
+    env.log("Fast travel map filters reset.");
 }
 
-// Move from pokecenter to in front of Ansha with button A shown
+// Move to in front of Ansha with button A shown
 void move_to_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
     fast_travel_to_index(env, context, 3); // Fast travel to Hotel Z
     context.wait_for(100ms); // Wait for player control to return
-    env.log("Detected overworld. Fast traveled from Pokecenter to Hotel Zone");
+    env.log("Detected overworld. Fast traveled to Hotel Zone");
 
     int ret = run_towards_gate_with_A_button(env.console, context, 0, +1, Seconds(5));
     if (ret == 1){  // day night change happens during running
@@ -517,7 +521,7 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     //  Mash button B to let Switch register the controller
     pbf_mash_button(context, BUTTON_B, 200ms);
 
-    set_starting_state(env, context);
+    reset_map_filter_state(env, context);
     while(true){
         const bool should_stop = donut_iteration(env, context);
         stats.resets++;
