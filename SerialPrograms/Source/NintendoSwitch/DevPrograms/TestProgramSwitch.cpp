@@ -160,7 +160,7 @@
 #include "Common/Cpp/Options/CheckboxDropdownOption.h"
 #include "Common/Cpp/Options/CheckboxDropdownOption.tpp"
 //#include "Integrations/PybindSwitchController.h"
-#include "Controllers/PABotbase2/PABotBase2_CC_RequestQueue.h"
+#include "Controllers/PABotBase2/PABotBase2_CC_RequestQueue.h"
 
 
 #include <QPixmap>
