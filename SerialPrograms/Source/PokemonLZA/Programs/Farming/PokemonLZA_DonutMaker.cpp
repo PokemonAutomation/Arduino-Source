@@ -502,7 +502,7 @@ void save_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& conte
     // fast_travel_to_index(env, context, 0, 3000ms);
 }
 
-// Return true if it should stop
+// Return true if a donut match is found
 bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
@@ -557,12 +557,12 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     reset_map_filter_state(env, context);
     while(true){
-        const bool should_stop = donut_iteration(env, context);
+        const bool found_match = donut_iteration(env, context);
         stats.resets++;
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS);
 
-        if (should_stop){
+        if (found_match){
             if (stats.matched.load() >= NUM_DONUTS){
                 break;
             }
