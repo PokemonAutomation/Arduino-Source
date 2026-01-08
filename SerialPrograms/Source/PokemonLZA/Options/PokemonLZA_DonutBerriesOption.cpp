@@ -212,7 +212,7 @@ std::string FlavorPowerTableEntry::to_str() const{
             selected_power += "treasure-";
             break;
         case Power_Item_Types::pokeballs:
-            selected_power += "poke-balls-";
+            selected_power += "poké-balls-";
             break;
         case Power_Item_Types::special:
             selected_power += "special-";
