@@ -441,20 +441,32 @@ GameTitle get_game_title(SingleSwitchProgramEnvironment& env, ProControllerConte
     enter_menu_from_overworld(env.program_info(), env.console, context, 0, MenuSide::RIGHT);
     context.wait_for_all_requests();
 
-    VideoSnapshot screen = env.console.video().snapshot();
-    ImageFloatBox box = {0.03, 0.94, 0.40, 0.04};
-    ImageStats bottom_stats = image_stats(extract_box_reference(screen, box));
+    for (size_t i = 0; i < 10; i++){
+        VideoSnapshot screen = env.console.video().snapshot();
+        ImageFloatBox box = {0.03, 0.94, 0.40, 0.04};
+        ImageStats bottom_stats = image_stats(extract_box_reference(screen, box));
 
-    if (is_solid(bottom_stats, {0.648549, 0.2861580, 0.0652928}, 0.15, 25)){
-        game_title = GameTitle::SCARLET;
-        env.console.log("Game title detected: Scarlet");
-    } else if (is_solid(bottom_stats, {0.367816, 0.0746615, 0.5575230}, 0.15, 25)){
-        game_title = GameTitle::VIOLET;
-        env.console.log("Game title detected: Violet");
+        if (is_solid(bottom_stats, {0.648549, 0.2861580, 0.0652928}, 0.15, 25)){
+            game_title = GameTitle::SCARLET;
+            env.console.log("Game title detected: Scarlet");
+            break;
+        } else if (is_solid(bottom_stats, {0.367816, 0.0746615, 0.5575230}, 0.15, 25)){
+            game_title = GameTitle::VIOLET;
+            env.console.log("Game title detected: Violet");
+            break;
+        }
+
+        env.console.log("Unable to detect game title. Wait some time.");
+        context.wait_for(Seconds(2));
     }
 
     if (game_title == GameTitle::UNKNOWN){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unable to determine what game we are playing. The color of the bottom bar in the Pokemon Summary page doesn't match of the expected colors.");
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "get_game_title(): Unable to determine what game we are playing. "
+            "The color of the bottom bar in the Pokemon Summary page doesn't match any of the expected colors.",
+            env.console
+        );  
     }
 
     return game_title;
