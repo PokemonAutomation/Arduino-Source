@@ -12,6 +12,9 @@
 #include <string>
 #include <vector>
 #include <onnxruntime_cxx_api.h>
+#include <opencv2/opencv.hpp>
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 
 
 
@@ -25,7 +28,7 @@ public:
 
     void Run(const std::string& img_path);
 
-    std::string Recognize(cv::Mat& crop);
+    std::string Recognize(const ImageViewRGB32& image, const ImageFloatBox& box);
 
 private:
     void LoadDictionary(const std::string& path);
@@ -40,6 +43,10 @@ private:
 std::vector<float> PreprocessNCHW(cv::Mat& img);
 
 std::string DecodeCTC(float* data, const std::vector<int64_t>& shape, const std::vector<std::string>& dict);
+
+cv::Mat imageviewrgb32_to_cv_mat(const ImageViewRGB32& image);
+
+cv::Rect ImageFloatBox_to_cv_Rect(size_t width, size_t height, const ImageFloatBox& box);
 
 
 }
