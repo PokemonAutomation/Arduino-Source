@@ -4,14 +4,14 @@
  *
  */
 
-#include "Common/Compiler.h"
-#include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Cpp/Json/JsonArray.h"
-#include "Common/Cpp/Json/JsonObject.h"
-#include "CommonFramework/Globals.h"
+//#include "Common/Compiler.h"
+//#include "Common/Cpp/Json/JsonValue.h"
+//#include "Common/Cpp/Json/JsonArray.h"
+//#include "Common/Cpp/Json/JsonObject.h"
+//#include "CommonFramework/Globals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
-#include "Pokemon/Resources/Pokemon_PokeballNames.h"
+//#include "Pokemon/Resources/Pokemon_PokeballNames.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
 #include "PokemonSwSh_MaxLair_Options_BossAction.h"
@@ -49,7 +49,7 @@ BossActionRow::BossActionRow(std::string slug, const std::string& name_slug, con
 
 
 BossActionTable::BossActionTable()
-    : StaticTableOption("<b>Boss Actions:</b>", LockMode::LOCK_WHILE_RUNNING)
+    : StaticTableOption("<b>Boss Actions:</b>", LockMode::UNLOCK_WHILE_RUNNING)
 {
     for (const auto& item : all_bosses_by_dex()){
 //        cout << item.second << endl;
