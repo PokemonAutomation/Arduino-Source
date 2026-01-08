@@ -23,6 +23,8 @@ public:
     PybindSwitchProController(const std::string& port_name);
     ~PybindSwitchProController();
 
+    bool wait_for_ready(uint64_t timeout_millis);
+
     bool is_ready() const;
     std::string current_status() const;
 

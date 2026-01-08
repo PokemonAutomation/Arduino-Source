@@ -12,6 +12,10 @@
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "PybindSwitchController.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
@@ -30,14 +34,18 @@ public:
         m_connection->remove_status_listener(*this);
     }
 
-    void wait_for_ready(){
-        std::unique_lock<std::mutex> lg(m_wait_lock);
-        m_cv.wait(lg, [this]{
-            return m_controller && m_controller->is_ready();
+    bool wait_for_ready(uint64_t timeout_millis){
+        std::unique_lock<std::mutex> lg(m_lock);
+        m_cv.wait_for(lg, Milliseconds(timeout_millis), [this]{
+            return m_connected;
         });
+        ProController* procon = m_procon.load(std::memory_order_relaxed);
+        return procon != nullptr && procon->is_ready();
     }
 
     virtual void post_connection_ready(ControllerConnection& connection) override{
+//        cout << "post_connection_ready()" << endl;
+
         m_controller = m_descriptor.make_controller(
             m_logger,
             connection,
@@ -46,13 +54,16 @@ public:
         );
         ProController* procon = dynamic_cast<ProController*>(m_controller.get());
         if (procon == nullptr){
+//            cout << "post_connection_ready() - incompatible" << endl;
             m_connection->set_status_line1("Incompatible controller type.", COLOR_RED);
         }else{
+//            cout << "post_connection_ready() - good" << endl;
             m_procon.store(procon, std::memory_order_release);
         }
 
         {
-            std::unique_lock<std::mutex> lg(m_wait_lock);
+            std::unique_lock<std::mutex> lg(m_lock);
+            m_connected = true;
         }
         m_cv.notify_all();
     }
@@ -69,7 +80,8 @@ public:
     std::unique_ptr<AbstractController> m_controller;
     std::atomic<ProController*> m_procon;
 
-    std::mutex m_wait_lock;
+    std::mutex m_lock;
+    bool m_connected = false;
     std::condition_variable m_cv;
 };
 
@@ -79,10 +91,14 @@ public:
 PybindSwitchProController::PybindSwitchProController(const std::string& port_name){
     PybindSwitchProControllerInternal* internal = new PybindSwitchProControllerInternal(port_name);
     m_internals = internal;
-    internal->wait_for_ready();
 }
 PybindSwitchProController::~PybindSwitchProController(){
     delete (PybindSwitchProControllerInternal*)m_internals;
+}
+
+bool PybindSwitchProController::wait_for_ready(uint64_t timeout_millis){
+    PybindSwitchProControllerInternal* internal = (PybindSwitchProControllerInternal*)m_internals;
+    return internal->wait_for_ready(timeout_millis);
 }
 
 bool PybindSwitchProController::is_ready() const{

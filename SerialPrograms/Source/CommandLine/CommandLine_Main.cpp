@@ -7,8 +7,6 @@
  */
 
 #include <iostream>
-#include <thread>
-#include <chrono>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Logging/OutputRedirector.h"
@@ -47,6 +45,7 @@ int main(int argc, char* argv[]){
         logger.log("Creating PybindSwitchProController with port: " + port_name);
 
         PybindSwitchProController controller(port_name);
+        controller.wait_for_ready(5000);
 
         // Check if controller is ready
         if (controller.is_ready()) {
