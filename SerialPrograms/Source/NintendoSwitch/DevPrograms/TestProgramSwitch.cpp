@@ -770,6 +770,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     const std::string dict_path = RESOURCE_PATH() + "ML/PP-OCRv5_server_rec_infer.yml";
     ML::PaddleOCRPipeline paddle_ocr(det_path, rec_path, dict_path);
 
+    auto snapshot = feed.snapshot();
+    std::string text = paddle_ocr.Recognize(snapshot, {0, 0, 1, 1});
+
 #endif
 
 #if 0

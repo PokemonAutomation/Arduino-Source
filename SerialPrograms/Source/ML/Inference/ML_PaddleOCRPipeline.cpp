@@ -8,7 +8,8 @@
 #include <iostream>
 #include <fstream>
 #include <numeric>
-#include <opencv2/opencv.hpp>
+#include <limits>
+#include "Common/Cpp/Exceptions.h"
 #include "ML_PaddleOCRPipeline.h"
 
 namespace PokemonAutomation{
@@ -24,6 +25,7 @@ PaddleOCRPipeline::PaddleOCRPipeline(std::string det_path, std::string rec_path,
 }
 
 void PaddleOCRPipeline::Run(const std::string& img_path) {
+    #if 0
     cv::Mat img = cv::imread(img_path);
     if (img.empty()) return;
 
@@ -36,6 +38,7 @@ void PaddleOCRPipeline::Run(const std::string& img_path) {
         std::string text = Recognize(cropped);
         std::cout << "Detected Text: " << text << std::endl;
     }
+    #endif
 }
 
 
@@ -47,7 +50,12 @@ void PaddleOCRPipeline::LoadDictionary(const std::string& path) {
     while (std::getline(fs, line)) m_dictionary.push_back(line);
 }
 
-std::string PaddleOCRPipeline::Recognize(cv::Mat& crop) {
+std::string PaddleOCRPipeline::Recognize(const ImageViewRGB32& image, const ImageFloatBox& box) {
+
+    cv::Mat cv_image = imageviewrgb32_to_cv_mat(image);
+    cv::Rect cv_box = ImageFloatBox_to_cv_Rect(image.width(), image.height(), box);
+    cv::Mat crop = cv_image(cv_box);
+
     // Preprocess: Resize to height 48, maintain aspect ratio
     cv::Mat rec_input;
     cv::resize(crop, rec_input, cv::Size(320, 48)); // Fixed size for simplicity
@@ -194,6 +202,33 @@ std::string DecodeCTC(const float* data, const std::vector<int64_t>& shape, cons
     return text;
 }
 #endif
+
+template <typename _Tp>
+_Tp safe_convert(size_t value) {
+    if (value > static_cast<size_t>(std::numeric_limits<_Tp>::max())) {
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "safe_convert: Value too large for template type _Tp.");
+    }
+    return static_cast<_Tp>(value);
+}
+
+// Assumes QImage is in Format_RGB888 or Format_BGR888
+cv::Mat imageviewrgb32_to_cv_mat(const ImageViewRGB32& image) {
+    return cv::Mat(safe_convert<int>(image.height()), 
+                   safe_convert<int>(image.width()), 
+                   CV_8UC4, 
+                   static_cast<void*>(const_cast<uint32_t*>(image.data())),
+                   image.bytes_per_row());
+}
+
+cv::Rect ImageFloatBox_to_cv_Rect(size_t width, size_t height, const ImageFloatBox& box){
+    ImagePixelBox pixelbox = floatbox_to_pixelbox(width, height, box);
+    
+    return cv::Rect(safe_convert<int>(pixelbox.min_x), 
+                    safe_convert<int>(pixelbox.min_y), 
+                    safe_convert<int>(pixelbox.width()), 
+                    safe_convert<int>(pixelbox.height()));
+}
+
 
 
 }
