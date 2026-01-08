@@ -159,8 +159,8 @@
 #include "Common/Cpp/Options/CheckboxDropdownDatabase.h"
 #include "Common/Cpp/Options/CheckboxDropdownOption.h"
 #include "Common/Cpp/Options/CheckboxDropdownOption.tpp"
-
-#include "Integrations/PybindSwitchController.h"
+//#include "Integrations/PybindSwitchController.h"
+#include "Controllers/PABotbase2/PABotBase2_CC_RequestQueue.h"
 
 
 #include <QPixmap>
@@ -309,6 +309,13 @@ public:
 
 
 
+class LogSender : public StreamSender{
+public:
+    virtual size_t send(const void* data, size_t bytes) override{
+        cout << PABotBase2::dump_packet((const pabb2_PacketHeader*)data) << endl;
+        return bytes;
+    }
+};
 
 
 
@@ -335,13 +342,46 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     // JoyconContext context(scope, console.controller<JoyconController>());
     VideoOverlaySet overlays(overlay);
 
+    LogSender sender;
+    PABotBase2::RequestQueue queue(logger, sender, 16, 64);
 
+    try{
+        cout << queue.send_str("asdfqwe") << endl;
+        cout << queue.send_str("wer") << endl;
+    }catch (...){
+        cout << "Caught Exception" << endl;
+    }
+
+    cout << "Dumping queue... 0" << endl;
+    cout << queue.dump_queue(true) << endl;
+
+    {
+        queue.report_acked(2);
+        cout << "Dumping queue... 3" << endl;
+        cout << queue.dump_queue(true) << endl;
+    }
+    {
+        queue.report_acked(4294967295);
+        cout << "Dumping queue... 2" << endl;
+        cout << queue.dump_queue(true) << endl;
+    }
+    {
+        queue.report_acked(4294967291);
+        cout << "Dumping queue... 1" << endl;
+        cout << queue.dump_queue(true) << endl;
+    }
+
+
+
+
+
+#if 0
     {
         PybindSwitchProController controller("COM12");
         controller.push_button(1000, 200, 800, BUTTON_B);
         controller.wait_for_all_requests();
     }
-
+#endif
 
 
 
