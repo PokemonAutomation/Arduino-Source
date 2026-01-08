@@ -95,8 +95,8 @@ DonutMaker::DonutMaker()
         1, 1, 3
         )
     , NUM_DONUTS(
-       "<b>Number of Donuts:</b><br>The number of donuts to make."
-       "<br>Make sure you have enough berries to make this many donuts.",
+       "<b>Number of Donuts:</b><br>The program continues resetting and making donuts of required powers until this many donuts of required powers are made."
+       "<br>Make sure you have enough berries to make this many donuts. The program will fail when not given enough berries.",
        LockMode::LOCK_WHILE_RUNNING,
        1, 1, 999
     )
