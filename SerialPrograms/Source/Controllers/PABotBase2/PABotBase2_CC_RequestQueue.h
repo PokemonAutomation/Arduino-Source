@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PABotBase2_CC_RequestQueue_H
 #define PokemonAutomation_PABotBase2_CC_RequestQueue_H
 
+#include <cstring>
 #include <vector>
 #include <map>
 #include "Common/Cpp/AbstractLogger.h"
@@ -104,3 +105,4 @@ private:
 }
 }
 #endif
+
