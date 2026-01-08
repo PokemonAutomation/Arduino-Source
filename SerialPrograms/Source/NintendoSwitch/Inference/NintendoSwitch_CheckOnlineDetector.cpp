@@ -1,4 +1,4 @@
-/*  Detect Home
+/*  Check Online Detector
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -6,7 +6,7 @@
 
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
-#include "NintendoSwitch_DetectHome.h"
+#include "NintendoSwitch_CheckOnlineDetector.h"
 
 //#include <iostream>
 //using std::cout;
@@ -14,18 +14,6 @@
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -110,34 +98,6 @@ bool CheckOnlineDetector::detect(const ImageViewRGB32& screen){
 
     return !m_invert;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

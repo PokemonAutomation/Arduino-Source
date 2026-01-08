@@ -230,6 +230,8 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"Kernels_CompressRGB32ToBinaryEuclidean", std::bind(image_void_detector_helper, test_kernels_CompressRGB32ToBinaryEuclidean, _1)},
     {"Kernels_Waterfill", std::bind(image_void_detector_helper, test_kernels_Waterfill, _1)},
     {"CommonFramework_BlackBorderDetector", std::bind(image_bool_detector_helper, test_CommonFramework_BlackBorderDetector, _1)},
+    {"NintendoSwitch_CheckOnlineDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_CheckOnlineDetector, _1)},
+    {"NintendoSwitch_FailedToConnectDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_FailedToConnectDetector, _1)},
     {"NintendoSwitch_UpdatePopupDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_UpdatePopupDetector, _1)},
     {"PokemonSwSh_YCommMenuDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_YCommMenuDetector, _1)},
     {"PokemonSwSh_MaxLair_BattleMenuDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_MaxLair_BattleMenuDetector, _1)},

@@ -107,7 +107,7 @@
 #include "Common/Cpp/Concurrency/Watchdog.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
 //#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
-#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.h"

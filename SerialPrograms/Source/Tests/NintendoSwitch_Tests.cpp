@@ -12,6 +12,8 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
 #include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_FailedToConnectDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 #include "NintendoSwitch_Tests.h"
 #include "TestUtils.h"
@@ -25,7 +27,20 @@ namespace PokemonAutomation{
 
 using namespace NintendoSwitch;
 
-// using namespace NintendoSwitch::PokemonLA;
+int test_NintendoSwitch_CheckOnlineDetector(const ImageViewRGB32& image, bool target){
+    CheckOnlineDetector detector{};
+    bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
+int test_NintendoSwitch_FailedToConnectDetector(const ImageViewRGB32& image, bool target){
+    FailedToConnectDetector detector{};
+    bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
 int test_NintendoSwitch_UpdatePopupDetector(const ImageViewRGB32& image, bool target){
     auto& logger = global_logger_command_line();
     DummyBotBase botbase(logger);
