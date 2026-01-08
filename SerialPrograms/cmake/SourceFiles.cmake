@@ -4,7 +4,7 @@
 # the GUI executable needs the dark style format file
 set(EXECUTABLE_SOURCES "Source/CommonFramework/Main.cpp" "../3rdParty/qdarkstyle/dark/darkstyle.qrc")
 
-# Note: Command-line executable sources are now defined in Source/CommandLine/CMakeLists.txt
+# Note: Command-line executable sources are defined in Source/CommandLine/CommandLineExecutable.cmake
 
 file(GLOB LIBRARY_SOURCES
     ../3rdParty/ONNX/OnnxToolsPA.h
