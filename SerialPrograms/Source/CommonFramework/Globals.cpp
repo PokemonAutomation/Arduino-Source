@@ -138,10 +138,10 @@ std::string get_runtime_base_path(){
     //  On MacOS, find the writable application support directory
     if (QSysInfo::productType() == "macos" || QSysInfo::productType() == "osx"){
         // QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) returns
-        // "/Users/$USERNAME/Library/Application Support/SerialPrograms/UserSettings", the parent folder
+        // "/Users/$USERNAME/Library/Application Support", the parent folder
         // to hold application-specific persistent data.
         // QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) returns
-        // "/Users/$USERNAME/Library/Application Support/SerialPrograms/UserSettings/SerialPrograms",
+        // "/Users/$USERNAME/Library/Application Support/SerialPrograms",
         // the folder where we store persistent data.
         QString appSupportPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
         QDir dir(appSupportPath);
