@@ -10,7 +10,7 @@
 #include <vector>
 #include <map>
 #include "Common/Cpp/AbstractLogger.h"
-#include "Common/PABotBase2/PABotbase2_Connection.h"
+#include "Common/PABotBase2/PABotBase2_Connection.h"
 
 namespace PokemonAutomation{
 
@@ -41,16 +41,18 @@ public:
         uint32_t receiver_buffer_size
     );
 
-    void reset(){
-        //  TODO
-    }
+    void reset();
 
     //  Send the specified data to the stream.
+    //
+    //  Returns false if queue has reached max size.
+    //
     //  This is strong exception safe:
     //    - If it throws, it's as if nothing happened.
     //    - If it returns, the data will have entered the queue, but it may not
     //      have been successfully sent. If it failed to send, it will be
     //      picked up on the next retransmit run.
+    //
     bool send_data(const uint8_t* data, size_t bytes);
 
     void report_acked(uint32_t stream_offset);
@@ -83,8 +85,8 @@ private:
     size_t m_receiver_buffer_size;
     size_t m_max_data_per_packet;
 
-    uint32_t m_stream_offset_head = (uint32_t)-5;
-    uint32_t m_stream_offset_tail = (uint32_t)-5;
+    uint32_t m_stream_offset_head = 0;
+    uint32_t m_stream_offset_tail = 0;
 
     struct Entry{
         size_t stream_bytes;

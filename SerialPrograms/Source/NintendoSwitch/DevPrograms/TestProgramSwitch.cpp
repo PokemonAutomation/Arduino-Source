@@ -356,17 +356,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     cout << queue.dump_queue(true) << endl;
 
     {
-        queue.report_acked(2);
+        queue.report_acked(0);
         cout << "Dumping queue... 3" << endl;
         cout << queue.dump_queue(true) << endl;
     }
     {
-        queue.report_acked(4294967295);
+        queue.report_acked(4);
         cout << "Dumping queue... 2" << endl;
         cout << queue.dump_queue(true) << endl;
     }
     {
-        queue.report_acked(4294967291);
+        queue.report_acked(7);
         cout << "Dumping queue... 1" << endl;
         cout << queue.dump_queue(true) << endl;
     }

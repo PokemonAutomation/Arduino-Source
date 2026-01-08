@@ -85,6 +85,34 @@ RequestQueue::RequestQueue(
     }
 }
 
+void RequestQueue::reset(){
+    size_t crced_data = sizeof(pabb2_PacketHeader);
+    size_t packet_size = crced_data + sizeof(uint32_t);
+
+    std::vector<uint8_t> packet(packet_size);
+
+    pabb2_PacketHeader header{
+        PABB2_CONNECTION_PACKET_MAGIC_NUMBER,
+        PABB2_CONNECTION_PACKET_OPCODE_SEND_DATA,
+        (uint16_t)packet_size
+    };
+    memcpy(packet.data(), &header, sizeof(header));
+
+    uint32_t crc32 = pabb_crc32(0xffffffff, packet.data(), crced_data);
+    memcpy(packet.data() + crced_data, &crc32, sizeof(uint32_t));
+
+    std::map<uint32_t, Entry> packets;
+
+    Entry& entry = packets[0];
+    entry.stream_bytes = 0;
+    entry.packet = std::move(packet);
+
+    //  Now we commit the reset.
+    m_unacked_packets = std::move(packets);
+
+    m_sender.send(entry.packet.data(), entry.packet.size());
+}
+
 std::string RequestQueue::dump_queue(bool ascii) const{
     std::string str;
     str += "Head: " + std::to_string(m_stream_offset_head) + "\n";
