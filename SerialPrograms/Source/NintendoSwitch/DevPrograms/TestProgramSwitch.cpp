@@ -765,13 +765,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 #if 1
+
+    ImageRGB32 image1("detect-dialog.png");
     const std::string det_path = RESOURCE_PATH() + "ML/PP-OCRv5_server_det_infer.onnx";
-    const std::string rec_path = RESOURCE_PATH() + "ML/PP-OCRv5_server_rec_infer.onnx";
-    const std::string dict_path = RESOURCE_PATH() + "ML/PP-OCRv5_server_rec_infer.yml";
+    const std::string rec_path = RESOURCE_PATH() + "ML/rec.onnx";
+    const std::string dict_path = RESOURCE_PATH() + "ML/dict.txt";
     ML::PaddleOCRPipeline paddle_ocr(det_path, rec_path, dict_path);
 
-    auto snapshot = feed.snapshot();
-    std::string text = paddle_ocr.Recognize(snapshot, {0, 0, 1, 1});
+    // auto snapshot = feed.snapshot();
+    std::string text = paddle_ocr.Recognize(image1, {0.278313, 0.761803, 0.420482, 0.045064});
+    cout << text << endl;
 
 #endif
 
