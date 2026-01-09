@@ -470,7 +470,7 @@ void move_to_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     WallClock end_time = current_time();
     const auto duration = end_time - start_time;
     // Due to day/night change may eating the mashing button A sequence, we may still be outside the hotel!
-    if (duration >= 16s){
+    if (duration >= 10s){
         // mash A again to make sure we are inside the hotel
         pbf_mash_button(context, BUTTON_A, Seconds(2));
         context.wait_for_all_requests();
