@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Fail if tabs are found in source files
         # Exclude specific file types if necessary (e.g., binaries, .md files, etc.)
