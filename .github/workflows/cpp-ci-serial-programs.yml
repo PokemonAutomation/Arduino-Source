@@ -33,7 +33,7 @@ jobs:
             # Excluded because macos default toolset is already clang
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         submodules: 'recursive'
     - uses: jurplel/install-qt-action@v4
@@ -62,7 +62,7 @@ jobs:
       run: |
         del SerialPrograms/bin/RelWithDebInfo/SerialProgramsLib.lib
         echo https://github.com/${{github.repository}}/commit/${{github.sha}} > SerialPrograms/bin/RelWithDebInfo/version.txt
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v6
       if: startsWith(matrix.os, 'windows')
       with:
         name: Serial Programs (os=${{ matrix.os }} - compiler=${{ matrix.compiler }} - qt_version=${{ matrix.qt_version }})
