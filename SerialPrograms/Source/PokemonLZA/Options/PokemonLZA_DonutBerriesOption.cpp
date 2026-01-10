@@ -469,6 +469,9 @@ std::string FlavorPowerTableEntry::get_single_flavor_power_string(int power_inde
     case Flavor_Powers::spdef:
         selected_power += "sp-def-power-";
         break;
+    default:
+        selected_power += "INVALID-";
+        break;
     }
 
     switch (level) {
@@ -489,6 +492,9 @@ std::string FlavorPowerTableEntry::get_single_flavor_power_string(int power_inde
         break;
     case Power_Level::two_three:
         selected_power += "23";
+        break;
+    default:
+        selected_power += "INVALID";
         break;
     }
     return selected_power;

@@ -36,11 +36,11 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    bool match_powers(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    bool match_powers(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::vector<uint16_t>& match_counts);
     void animation_to_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void add_berries_and_make_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    bool donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    bool donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::vector<uint16_t>& match_counts);
 
 private:
 
