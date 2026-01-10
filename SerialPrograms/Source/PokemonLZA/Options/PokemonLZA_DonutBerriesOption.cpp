@@ -170,6 +170,8 @@ std::string FlavorPowerTableEntry::get_single_flavor_power_string(int power_inde
         power = power_3;
         level = level_3;
         break;
+    default:
+        return "INVALID";
     }
 
     switch (power){
