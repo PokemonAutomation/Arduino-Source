@@ -90,6 +90,13 @@ DonutMaker::DonutMaker()
         true
     )
     , BERRIES("<b>Berries:</b><br>The berries used to make the donut. Minimum 3 berries, maximum 8 berries.")
+    , MAX_KEEPERS(
+        "<b>Maximum Number of Donuts to Keep:</b><br>"
+        "This takes precedent over the limits set in the Donuts table."
+        "<br>Make sure you have enough berries to make this many donuts. The program will fail when not given enough berries.",
+        LockMode::LOCK_WHILE_RUNNING,
+        1, 1, 999
+    )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_DONUT_FOUND(
         "Donut Found",
@@ -107,6 +114,7 @@ DonutMaker::DonutMaker()
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(BERRIES);
+    PA_ADD_OPTION(MAX_KEEPERS);
     PA_ADD_OPTION(FLAVOR_POWERS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -219,16 +227,17 @@ bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProController
         env.log("Match found!");
         stats.matched++;
         env.update_stats();
-        // send_program_status_notification(env, NOTIFICATION_DONUT_FOUND, "Match found!", screen, true);
+        if (should_keep){
+            stats.kept++;
+            env.update_stats();
+            send_program_status_notification(env, NOTIFICATION_DONUT_FOUND, "Match found! Keeping donut.", screen, true);
+            return true;
+        } else {
+            env.log("Matched donut exceeds all keep limits.");
+        }
     }
-    if (should_keep){
-        stats.kept++;
-        env.update_stats();
-        send_program_status_notification(env, NOTIFICATION_DONUT_FOUND, "Keeping donut.", screen, true);
-    } else {
-        env.log("Discarding donut.");
-    }
-    return match_found && should_keep;
+    env.log("Discarding donut.");
+    return false;
 }
 
 void DonutMaker::animation_to_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
@@ -566,6 +575,22 @@ void save_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& conte
     // fast_travel_to_index(env, context, 0, 3000ms);
 }
 
+// Check if all user defined limits are reached or the global max keepers limit is reached
+bool DonutMaker::should_stop(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::vector<uint16_t>& match_counts){
+    int total_kept = 0;
+    bool limit_reached = true;
+    for (size_t i = 0; i < match_counts.size(); i++){
+        if (match_counts[i] < FLAVOR_POWERS.snapshot()[i].limit){
+            limit_reached = false;
+        }
+        total_kept += match_counts[i];
+    }
+    if (total_kept >= MAX_KEEPERS){
+        return true;
+    }
+    return limit_reached;
+}
+
 // Return true if a donut match is found
 bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::vector<uint16_t>& match_counts) {
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
@@ -629,6 +654,9 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         send_program_status_notification(env, NOTIFICATION_STATUS);
 
         if (should_keep){
+            if (should_stop(env, context, match_counts)){
+                break;
+            }
             save_donut(env, context);
         }
     }
