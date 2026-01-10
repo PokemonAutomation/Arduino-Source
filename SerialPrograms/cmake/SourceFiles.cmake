@@ -1048,14 +1048,16 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h
     Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.h
+    Source/NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.cpp
+    Source/NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_CloseGameDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_CloseGameDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_DateChangeDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_DateChangeDetector.h
-    Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.cpp
-    Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.h
+    Source/NintendoSwitch/Inference/NintendoSwitch_FailedToConnectDetector.cpp
+    Source/NintendoSwitch/Inference/NintendoSwitch_FailedToConnectDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.cpp

@@ -1,26 +1,18 @@
-/*  Detect Home
+/*  Check Online Detector
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *
- *      This file is in the process of being split up and refactored.
- *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_DetectHome_H
-#define PokemonAutomation_NintendoSwitch_DetectHome_H
+#ifndef PokemonAutomation_NintendoSwitch_CheckOnlineDetector_H
+#define PokemonAutomation_NintendoSwitch_CheckOnlineDetector_H
 
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-
-
-
-
 
 
 
@@ -48,6 +40,7 @@ public:
          : DetectorToFinder("CheckOnlineWatcher", std::chrono::milliseconds(250), color, invert)
     {}
 };
+
 
 
 }
