@@ -28,8 +28,9 @@ extern "C" {
 
 typedef struct{
     uint8_t magic_number;
+    uint8_t seqnum;
+    uint8_t packet_bytes;
     uint8_t opcode;
-    uint16_t packet_bytes;
 } pabb2_PacketHeader;
 
 #define PABB2_CONNECTION_PACKET_OPCODE_INVALID              0x00
@@ -42,13 +43,14 @@ typedef struct{
 
 typedef struct{
     uint8_t magic_number;
+    uint8_t seqnum;
+    uint8_t packet_bytes;
     uint8_t opcode;
-    uint16_t packet_bytes;
-    uint32_t stream_offset;
+    uint16_t stream_offset;
 } pabb2_PacketHeaderData;
 
-#define PABB2_CONNECTION_PACKET_OPCODE_REQUEST_DATA         0x20
-#define PABB2_CONNECTION_PACKET_OPCODE_SEND_DATA            0x90
+#define PABB2_CONNECTION_PACKET_OPCODE_STREAM_REQUEST       0x20
+#define PABB2_CONNECTION_PACKET_OPCODE_STREAM_DATA          0x90
 
 
 

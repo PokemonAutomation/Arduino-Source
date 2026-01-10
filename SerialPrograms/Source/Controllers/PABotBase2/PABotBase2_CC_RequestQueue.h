@@ -10,7 +10,11 @@
 #include <cstring>
 #include <vector>
 #include <map>
+#include <mutex>
+#include <condition_variable>
+#include "Common/Cpp/Time.h"
 #include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Concurrency/Thread.h"
 #include "Common/PABotBase2/PABotBase2_Connection.h"
 
 namespace PokemonAutomation{
@@ -39,8 +43,10 @@ public:
         Logger& logger,
         StreamSender& sender,
         uint16_t max_packet_size,
-        uint32_t receiver_buffer_size
+        uint32_t receiver_buffer_size,
+        WallDuration retransmit_timeout = Milliseconds(100)
     );
+    ~RequestQueue();
 
     void reset();
 
@@ -56,7 +62,7 @@ public:
     //
     bool send_data(const uint8_t* data, size_t bytes);
 
-    void report_acked(uint32_t stream_offset);
+    void report_acked(uint16_t stream_offset);
 
 
 public:
@@ -70,30 +76,39 @@ public:
 
 private:
     std::vector<uint8_t> make_data_packet(
-        uint32_t stream_offset,
+        uint16_t stream_offset,
         const uint8_t* data, size_t bytes
     ) const;
 
     void send_data_small(const uint8_t* data, size_t bytes);
     void send_data_large(const uint8_t* data, size_t bytes);
 
+    void retransmit_thread();
+
 
 private:
     Logger& m_logger;
     StreamSender& m_sender;
 
-    size_t m_max_packet_size;
-    size_t m_receiver_buffer_size;
-    size_t m_max_data_per_packet;
+    const size_t m_max_packet_size;
+    const size_t m_receiver_buffer_size;
+    const size_t m_max_data_per_packet;
+    const WallDuration m_retransmit_timeout;
 
-    uint32_t m_stream_offset_head = 0;
-    uint32_t m_stream_offset_tail = 0;
+    uint16_t m_stream_offset_head = 0;
+    uint16_t m_stream_offset_tail = 0;
 
     struct Entry{
         size_t stream_bytes;
         std::vector<uint8_t> packet;
+        WallClock last_sent;
     };
-    std::map<uint32_t, Entry> m_unacked_packets;
+    std::map<uint16_t, Entry> m_unacked_packets;
+
+    mutable std::mutex m_lock;
+    std::condition_variable m_cv;
+    bool m_stopping = false;
+    Thread m_thread;
 };
 
 

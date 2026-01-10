@@ -1,72 +1,13 @@
 /*  CRC32
  * 
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  * 
  */
 
-#include "CRC32.h"
+#include "pabb_CRC32_Basic.h"
 
-uint32_t pabb_crc32_byte_basic(uint32_t crc, uint8_t byte){
-    crc ^= byte;
-    crc = (crc & 1) ? (crc >> 1) ^ 0x82f63b78 : crc >> 1;
-    crc = (crc & 1) ? (crc >> 1) ^ 0x82f63b78 : crc >> 1;
-    crc = (crc & 1) ? (crc >> 1) ^ 0x82f63b78 : crc >> 1;
-    crc = (crc & 1) ? (crc >> 1) ^ 0x82f63b78 : crc >> 1;
-    crc = (crc & 1) ? (crc >> 1) ^ 0x82f63b78 : crc >> 1;
-    crc = (crc & 1) ? (crc >> 1) ^ 0x82f63b78 : crc >> 1;
-    crc = (crc & 1) ? (crc >> 1) ^ 0x82f63b78 : crc >> 1;
-    crc = (crc & 1) ? (crc >> 1) ^ 0x82f63b78 : crc >> 1;
-    return crc;
-}
-uint32_t pabb_crc32_basic(uint32_t crc, const void* data, size_t length){
-    const char* ptr = (const char*)data;
-    for (size_t c = 0; c < length; c++){
-        crc = pabb_crc32_byte_basic(crc, ptr[c]);
-    }
-    return crc;
-}
-
-
-#if __AVR__
-#include <avr/pgmspace.h>
-#else
-#define PROGMEM
-#endif
-#if 0   //  defined __AVR_ATmega16U2__
-//  4-bit table (we used to use this on atmega16u2 because 8-bit is too much of memory hog)
-const uint32_t PROGMEM CRC32_TABLE4[] = {
-    0x00000000, 0x105ec76f, 0x20bd8ede, 0x30e349b1,
-    0x417b1dbc, 0x5125dad3, 0x61c69362, 0x7198540d,
-    0x82f63b78, 0x92a8fc17, 0xa24bb5a6, 0xb21572c9,
-    0xc38d26c4, 0xd3d3e1ab, 0xe330a81a, 0xf36e6f75,
-};
-void iterate_table(uint32_t* crc, uint8_t nibble){
-#if __AVR__
-    uint32_t entry;
-    memcpy_P(&entry, CRC32_TABLE4 + (((uint8_t)*crc ^ nibble) & 0x0f), sizeof(uint32_t));
-    *crc = entry ^ (*crc >> 4);
-#else
-    *crc = CRC32_TABLE4[((uint8_t)*crc ^ nibble) & 0x0f] ^ (*crc >> 4);
-#endif
-}
-//uint32_t pabb_crc32_byte_table(uint32_t crc, uint8_t byte){
-//    iterate_table(&crc, byte);
-//    iterate_table(&crc, byte >> 4);
-//    return crc;
-//}
-uint32_t pabb_crc32_table(uint32_t crc, const void* str, size_t length){
-    const char* ptr = (const char*)str;
-    for (size_t c = 0; c < length; c++){
-//        crc = pabb_crc32_byte_table(crc, ptr[c]);
-        uint8_t byte = ptr[c];
-        iterate_table(&crc, byte);
-        iterate_table(&crc, byte >> 4);
-    }
-    return crc;
-}
-#else
 //  8-bit table
-const uint32_t PROGMEM CRC32_TABLE8[] = {
+const uint32_t PABB_CRC32_TABLE8[] = {
     0x00000000, 0xf26b8303, 0xe13b70f7, 0x1350f3f4, 0xc79a971f, 0x35f1141c, 0x26a1e7e8, 0xd4ca64eb,
     0x8ad958cf, 0x78b2dbcc, 0x6be22838, 0x9989ab3b, 0x4d43cfd0, 0xbf284cd3, 0xac78bf27, 0x5e133c24,
     0x105ec76f, 0xe235446c, 0xf165b798, 0x030e349b, 0xd7c45070, 0x25afd373, 0x36ff2087, 0xc494a384,
@@ -100,34 +41,17 @@ const uint32_t PROGMEM CRC32_TABLE8[] = {
     0xf36e6f75, 0x0105ec76, 0x12551f82, 0xe03e9c81, 0x34f4f86a, 0xc69f7b69, 0xd5cf889d, 0x27a40b9e,
     0x79b737ba, 0x8bdcb4b9, 0x988c474d, 0x6ae7c44e, 0xbe2da0a5, 0x4c4623a6, 0x5f16d052, 0xad7d5351,
 };
-uint32_t pabb_crc32_byte_table(uint32_t crc, uint8_t byte){
-    uint32_t entry;
-#if __AVR__
-    memcpy_P(&entry, CRC32_TABLE8 + ((uint8_t)crc ^ byte), sizeof(uint32_t));
-#else
-    entry = CRC32_TABLE8[(uint8_t)crc ^ byte];
-#endif
-    return entry ^ (crc >> 8);
+
+
+void pabb_crc32_byte(uint32_t* crc, uint8_t data){
+    *crc = PABB_CRC32_TABLE8[(uint8_t)*crc ^ data] ^ (*crc >> 8);
 }
-uint32_t pabb_crc32_table(uint32_t crc, const void* data, size_t length){
-    const char* ptr = (const char*)data;
-    for (size_t c = 0; c < length; c++){
-        uint32_t entry;
-#if __AVR__
-        memcpy_P(&entry, CRC32_TABLE8 + ((uint8_t)crc ^ (uint8_t)ptr[c]), sizeof(uint32_t));
-#else
-        entry = CRC32_TABLE8[(uint8_t)crc ^ (uint8_t)ptr[c]];
-#endif
-        crc = entry ^ (crc >> 8);
+void pabb_crc32_buffer(uint32_t* crc, const void* data, uint8_t length){
+    const uint8_t* ptr = (const uint8_t*)data;
+    uint32_t tmp = *crc;
+    while (length--){
+        tmp = PABB_CRC32_TABLE8[(uint8_t)tmp ^ (uint8_t)*ptr] ^ (tmp >> 8);
+        ptr++;
     }
-    return crc;
-}
-#endif
-
-
-
-void pabb_crc32_write_to_message(const void* data, size_t full_message_length){
-    const char* ptr = (const char*)data;
-    size_t length_before_crc = full_message_length - sizeof(uint32_t);
-    *(uint32_t*)(ptr + length_before_crc) = pabb_crc32(0xffffffff, ptr, length_before_crc);
+    *crc = tmp;
 }

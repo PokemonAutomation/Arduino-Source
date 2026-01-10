@@ -5,7 +5,7 @@
  */
 
 #include <chrono>
-#include "Common/CRC32.h"
+#include "Common/CRC32/pabb_CRC32.h"
 #include "CommonFramework/Logging/Logger.h"
 //#include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Panels/PanelTools.h"
@@ -407,8 +407,9 @@ ControllerProfile ControllerSettingsTable::random_profile(ControllerType control
     ControllerProfile profile;
 
     uint64_t seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    seed = pabb_crc32(0, &seed, sizeof(seed));
-    seed %= DATABASE.size();
+    uint32_t crc32 = 0;
+    pabb_crc32_buffer(&crc32, &seed, sizeof(seed));
+    seed = crc32 % DATABASE.size();
 
     DATABASE[(size_t)seed]->write_to_profile(profile, controller);
     return profile;
