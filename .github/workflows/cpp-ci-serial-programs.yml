@@ -35,6 +35,7 @@ jobs:
     steps:
     - uses: actions/checkout@v6
       with:
+        path: 'Arduino-Source'
         submodules: 'recursive'
     - uses: jurplel/install-qt-action@v4
       with:
@@ -52,7 +53,7 @@ jobs:
         brew install opencv onnxruntime
     - name: Generate binaries
       run: |
-        cd SerialPrograms
+        cd Arduino-Source/SerialPrograms
         mkdir bin
         cd bin
         cmake .. -DQT_MAJOR:STRING=${{ matrix.qt_version_major }} ${{ matrix.cmake_additional_param }}
@@ -60,10 +61,26 @@ jobs:
     - name: Prepare upload folder
       if: startsWith(matrix.os, 'windows')
       run: |
-        del SerialPrograms/bin/RelWithDebInfo/SerialProgramsLib.lib
-        echo https://github.com/${{github.repository}}/commit/${{github.sha}} > SerialPrograms/bin/RelWithDebInfo/version.txt
+        echo https://github.com/${{github.repository}}/commit/${{github.sha}} > Arduino-Source/SerialPrograms/bin/RelWithDebInfo/version.txt
     - uses: actions/upload-artifact@v6
       if: startsWith(matrix.os, 'windows')
       with:
         name: Serial Programs (os=${{ matrix.os }} - compiler=${{ matrix.compiler }} - qt_version=${{ matrix.qt_version }})
-        path: SerialPrograms/bin/RelWithDebInfo
+        path: Arduino-Source/SerialPrograms/bin/RelWithDebInfo
+    - uses: actions/checkout@v6
+      with:
+        repository: 'PokemonAutomation/CommandLineTests'
+        path: 'CommandLineTests'
+    - name: Run tests
+      if: startsWith(matrix.os, 'windows')
+      shell: pwsh
+      run: |
+        cd Arduino-Source/SerialPrograms/bin
+        robocopy ../../../CommandLineTests . /s /XD .git
+        $process = Start-Process -FilePath "./RelWithDebInfo/SerialPrograms.exe" `
+                                 -ArgumentList "--force-run-tests" `
+                                 -NoNewWindow -Wait -PassThru
+        if ($process.ExitCode -ne 0) {
+            Write-Error "Tests failed with exit code $($process.ExitCode)"
+            exit 1
+        }

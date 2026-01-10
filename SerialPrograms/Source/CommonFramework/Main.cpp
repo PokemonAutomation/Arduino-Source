@@ -108,6 +108,12 @@ int run_program(int argc, char *argv[]){
         logger.log(error.message(), COLOR_RED);
     }
 
+    for (size_t i = 0; i < argc; i++){
+        if (strcmp(argv[i], "--force-run-tests") == 0){
+            GlobalSettings::instance().COMMAND_LINE_TEST_MODE = true;
+        }
+    }
+
     if (GlobalSettings::instance().COMMAND_LINE_TEST_MODE){
         return run_command_line_tests();
     }
