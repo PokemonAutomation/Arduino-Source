@@ -17,69 +17,133 @@ namespace NintendoSwitch{
 namespace PokemonLZA{
 
 enum class Flavor_Powers {
+    // Subjective ordering by group
+    any,
+
+    sparkling_any,
+    sparkling_all,
+    sparkling_normal,
+    sparkling_fire,
+    sparkling_water,
+    sparkling_electric,
+    sparkling_grass,
+    sparkling_ice,
+    sparkling_fighting,
+    sparkling_poison,
+    sparkling_ground,
+    sparkling_flying,
+    sparkling_psychic,
+    sparkling_bug,
+    sparkling_rock,
+    sparkling_ghost,
+    sparkling_dragon,
+    sparkling_dark,
+    sparkling_steel,
+    sparkling_fairy,
+
     alpha,
     humungo,
     teensy,
-    sparkling,
-    atk,
-    spatk,
-    move,
-    speed,
+
+    item_berries,
+    item_candies,
+    item_treasure,
+    item_pokeballs,
+    item_special,
+    item_coins,
     bighaul,
-    item,
     megacharge,
     megaconserve,
+
+    catching_any,
+    catching_all,
+    catching_normal,
+    catching_fire,
+    catching_water,
+    catching_electric,
+    catching_grass,
+    catching_ice,
+    catching_fighting,
+    catching_poison,
+    catching_ground,
+    catching_flying,
+    catching_psychic,
+    catching_bug,
+    catching_rock,
+    catching_ghost,
+    catching_dragon,
+    catching_dark,
+    catching_steel,
+    catching_fairy,
+    encounter,
+
+    move_any,
+    move_normal,
+    move_fire,
+    move_water,
+    move_electric,
+    move_grass,
+    move_ice,
+    move_fighting,
+    move_poison,
+    move_ground,
+    move_flying,
+    move_psychic,
+    move_bug,
+    move_rock,
+    move_ghost,
+    move_dragon,
+    move_dark,
+    move_steel,
+    move_fairy,
+    atk,
+    spatk,
+    speed,
+
+    resistance_any,
+    resistance_normal,
+    resistance_fire,
+    resistance_water,
+    resistance_electric,
+    resistance_grass,
+    resistance_ice,
+    resistance_fighting,
+    resistance_poison,
+    resistance_ground,
+    resistance_flying,
+    resistance_psychic,
+    resistance_bug,
+    resistance_rock,
+    resistance_ghost,
+    resistance_dragon,
+    resistance_dark,
+    resistance_steel,
+    resistance_fairy,
     def,
     spdef,
-    resistance,
-    encounter,
-    catching,
-};
-
-enum class Power_Pokemon_Types {
-    all, //Accept only the All type (ex. Sparkling Power: All Types (Lv. 3)) Applies to catching and sparkling, but not move or resist
-    normal,
-    fire,
-    water,
-    electric,
-    grass,
-    ice,
-    fighting,
-    poison,
-    ground,
-    flying,
-    psychic,
-    bug,
-    rock,
-    ghost,
-    dragon,
-    dark,
-    steel,
-    fairy,
-};
-
-enum class Power_Item_Types {
-    berries,
-    candies,
-    treasure,
-    pokeballs,
-    special,
-    coins,
 };
 
 enum class Power_Level{
+    any,
     one,
     two,
     three,
+    one_two,
+    two_three,
 };
 
 struct FlavorPowerTableEntry{
-    Flavor_Powers power;
-    Power_Pokemon_Types pokemon_type;
-    Power_Item_Types item_type;
-    Power_Level level;
+    uint16_t limit;
+    Flavor_Powers power_1;
+    Power_Level level_1;
+    Flavor_Powers power_2;
+    Power_Level level_2;
+    Flavor_Powers power_3;
+    Power_Level level_3;
 
     std::string to_str() const;
+    std::vector<std::string> get_entry_flavor_power_strings() const;
+    std::string get_single_flavor_power_string(int power_index) const;
 };
 
 
@@ -120,13 +184,13 @@ public:
     FlavorPowerTableEntry snapshot() const;
 
 private:
-    virtual void on_config_value_changed(void* object) override;
-
-private:
-    EnumDropdownCell<Flavor_Powers> power;
-    EnumDropdownCell<Power_Pokemon_Types> type_pokemon;
-    EnumDropdownCell<Power_Item_Types> type_item;
-    EnumDropdownCell<Power_Level> level;
+    SimpleIntegerCell<uint16_t> limit;
+    EnumDropdownCell<Flavor_Powers> power_1;
+    EnumDropdownCell<Power_Level> level_1;
+    EnumDropdownCell<Flavor_Powers> power_2;
+    EnumDropdownCell<Power_Level> level_2;
+    EnumDropdownCell<Flavor_Powers> power_3;
+    EnumDropdownCell<Power_Level> level_3;
 };
 
 
