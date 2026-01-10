@@ -177,7 +177,6 @@ public:
 //Donut Flavor Power selection
 class FlavorPowerTableRow : public EditableTableRow, public ConfigOption::Listener{
 public:
-    ~FlavorPowerTableRow();
     FlavorPowerTableRow(EditableTableOption& parent_table);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
