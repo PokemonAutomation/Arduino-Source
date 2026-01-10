@@ -45,6 +45,7 @@ enum class Flavor_Powers {
     humungo,
     teensy,
 
+    item_any,
     item_berries,
     item_candies,
     item_treasure,

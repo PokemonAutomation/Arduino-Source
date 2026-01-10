@@ -41,6 +41,7 @@ const EnumDropdownDatabase<Flavor_Powers>& flavor_power_enum_database(){
         {Flavor_Powers::humungo,    "humungo",      "Humungo"},
         {Flavor_Powers::teensy,     "teensy",       "Teensy"},
 
+        {Flavor_Powers::item_any,       "item-any",         "Item: *"},
         {Flavor_Powers::item_berries,   "item-berries",     "Item: Berries"},
         {Flavor_Powers::item_candies,   "item-candies",     "Item: Candies"},
         {Flavor_Powers::item_treasure,  "item-treasure",    "Item: Treasure"},
@@ -247,6 +248,9 @@ std::string FlavorPowerTableEntry::get_single_flavor_power_string(int power_inde
         selected_power += "teensy-power-";
         break;
 
+    case Flavor_Powers::item_any:
+        selected_power += "item-power-any-";
+        break;
     case Flavor_Powers::item_berries:
         selected_power += "item-power-berries-";
         break;
