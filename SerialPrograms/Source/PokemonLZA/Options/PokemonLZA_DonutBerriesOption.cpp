@@ -560,11 +560,6 @@ std::vector<std::unique_ptr<EditableTableRow>> DonutBerriesTable::make_defaults(
 
 
 
-FlavorPowerTableRow::~FlavorPowerTableRow(){
-    power_1.remove_listener(*this);
-    power_2.remove_listener(*this);
-    power_3.remove_listener(*this);
-}
 FlavorPowerTableRow::FlavorPowerTableRow(EditableTableOption& parent_table)
     : EditableTableRow(parent_table)
     , limit(LockMode::LOCK_WHILE_RUNNING, 1, 999, 1, 1)
@@ -582,11 +577,6 @@ FlavorPowerTableRow::FlavorPowerTableRow(EditableTableOption& parent_table)
     PA_ADD_OPTION(level_2);
     PA_ADD_OPTION(power_3);
     PA_ADD_OPTION(level_3);
-
-    FlavorPowerTableRow::on_config_value_changed(this);
-    power_1.add_listener(*this);
-    power_2.add_listener(*this);
-    power_3.add_listener(*this);
 }
 std::unique_ptr<EditableTableRow> FlavorPowerTableRow::clone() const{
     std::unique_ptr<FlavorPowerTableRow> ret(new FlavorPowerTableRow(parent()));
