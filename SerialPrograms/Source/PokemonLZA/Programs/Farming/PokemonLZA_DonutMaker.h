@@ -46,9 +46,7 @@ private:
 
     OCR::LanguageOCROption LANGUAGE;
     DonutBerriesTable BERRIES;
-    SimpleIntegerOption<uint8_t> NUM_POWER_REQUIRED;
     FlavorPowerTable FLAVOR_POWERS;
-    SimpleIntegerOption<uint16_t> NUM_DONUTS;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     EventNotificationOption NOTIFICATION_DONUT_FOUND;
