@@ -60,16 +60,19 @@ class DonutMaker_Descriptor::Stats : public StatsTracker{
 public:
     Stats()
         : matched(m_stats["Donuts Matched"])
+        , kept(m_stats["Donuts Kept"])
         , resets(m_stats["Resets"])
         , errors(m_stats["Errors"])
     {
         // TODO: Add more stats here
         m_display_order.emplace_back("Donuts Matched");
+        m_display_order.emplace_back("Donuts Kept");
         m_display_order.emplace_back("Resets");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
 
     std::atomic<uint64_t>& matched;
+    std::atomic<uint64_t>& kept;
     std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& errors;
 };
@@ -169,8 +172,9 @@ bool donut_matches_powers(SingleSwitchProgramEnvironment& env, std::vector<std::
 }
 
 // Read flavor power and check if they match user requirement.
+// Keep or discard the donut depending on the user defined limit.
 // Return true if the user requirement is fulfilled.
-bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::vector<uint16_t>& match_counts) {
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
     env.log("Reading in table of desired powers.");
@@ -199,16 +203,32 @@ bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProController
         donut_results.push_back(power);
     }
 
-    for (const std::vector<std::string>& powers_entry : powers_table){
-        if (donut_matches_powers(env, donut_results, powers_entry)){
-            env.log("Match found!");
-            stats.matched++;
-            env.update_stats();
-            send_program_status_notification(env, NOTIFICATION_DONUT_FOUND, "Match found!", screen, true);
-            return true;
+    bool match_found = false;
+    bool should_keep = false;
+    for (size_t i = 0; i < powers_table.size(); i++){
+        if (donut_matches_powers(env, donut_results, powers_table[i])){
+            match_found = true;
+            match_counts[i]++;
+            if (match_counts[i] <= FLAVOR_POWERS.snapshot()[i].limit){
+                env.log("Keeping donut: " + std::to_string(match_counts[i]) + " / " + std::to_string(FLAVOR_POWERS.snapshot()[i].limit) + " for table entry " + std::to_string(i+1));
+                should_keep = true;
+            }
         }
     }
-    return false;
+    if (match_found){
+        env.log("Match found!");
+        stats.matched++;
+        env.update_stats();
+        // send_program_status_notification(env, NOTIFICATION_DONUT_FOUND, "Match found!", screen, true);
+    }
+    if (should_keep){
+        stats.kept++;
+        env.update_stats();
+        send_program_status_notification(env, NOTIFICATION_DONUT_FOUND, "Keeping donut.", screen, true);
+    } else {
+        env.log("Discarding donut.");
+    }
+    return match_found && should_keep;
 }
 
 void DonutMaker::animation_to_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
@@ -547,7 +567,7 @@ void save_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& conte
 }
 
 // Return true if a donut match is found
-bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::vector<uint16_t>& match_counts) {
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
     move_to_ansha(env, context);
@@ -569,8 +589,8 @@ bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControl
     // Add berries from menu and make a donut. Stop at flavor power screen.
     add_berries_and_make_donut(env, context);
 
-    // Read flavor power and check if they match user requirement:
-    if (match_powers(env, context)){
+    // Read flavor power and check if they match user requirement and should be kept:
+    if (match_powers(env, context, match_counts)){
         return true;
     }
 
@@ -600,13 +620,15 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     pbf_mash_button(context, BUTTON_B, 200ms);
 
     reset_map_filter_state(env, context);
+
+    std::vector<uint16_t> match_counts(FLAVOR_POWERS.snapshot().size(), 0);
     while(true){
-        const bool found_match = donut_iteration(env, context);
+        const bool should_keep = donut_iteration(env, context, match_counts);
         stats.resets++;
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS);
 
-        if (found_match){
+        if (should_keep){
             save_donut(env, context);
         }
     }
