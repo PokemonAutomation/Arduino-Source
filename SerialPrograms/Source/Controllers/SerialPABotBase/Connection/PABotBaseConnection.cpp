@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/CRC32.h"
+#include "Common/CRC32/pabb_CRC32.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 #include "BotBaseMessage.h"
 #include "PABotBaseConnection.h"
@@ -176,7 +176,8 @@ void PABotBaseConnection::on_recv(const void* data, size_t bytes){
         //  Verify checksum
         {
             //  Calculate checksum.
-            uint32_t checksumA = pabb_crc32(0xffffffff, &message[0], length - sizeof(uint32_t));
+            uint32_t checksumA = 0xffffffff;
+            pabb_crc32_buffer(&checksumA, &message[0], length - sizeof(uint32_t));
 
             //  Read the checksum from the message.
             uint32_t checksumE = ((uint32_t*)(&message[0] + length))[-1];

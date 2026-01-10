@@ -27,11 +27,11 @@ public:
         return m_handle.protocol_version();
     }
 
-    void stop_with_error(std::string error_message){
-        {
+    void stop_with_error(std::string error_message) noexcept{
+        try{
             WriteSpinLock lg(m_error_lock);
             m_error_string = error_message;
-        }
+        }catch (...){}
         m_serial->stop(std::move(error_message));
     }
 

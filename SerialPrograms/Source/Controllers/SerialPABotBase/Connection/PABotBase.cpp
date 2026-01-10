@@ -111,7 +111,7 @@ void PABotBase::stop(std::string error_message){
     }
 
     if (!error_message.empty()){
-        ReadSpinLock lg(m_state_lock, "PABotBase::stop()");
+        WriteSpinLock lg(m_state_lock, "PABotBase::stop()");
         m_error_message = std::move(error_message);
     }
 

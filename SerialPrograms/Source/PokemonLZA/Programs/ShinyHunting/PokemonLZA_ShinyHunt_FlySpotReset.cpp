@@ -85,8 +85,9 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
     , MIN_CALORIE_REMAINING(
         "<b>Minimum Cal. allowed While Resetting in Hyperspace:</b><br>The program will stop if the Calorie number is at or below this value."
         "<br>NOTE: the more star the hyperspace has the faster Calorie burns! Pick a minimum Calorie value that gives you enough time to catch shinies."
-        "<br>Cal. per sec: 1 Star: 1 Cal./s, 2 Star: 1.6 Cal./s, 3 Star: 3.5 Cal./s, 4 Star: 7.5 Cal./s, 5 Star: 10 Cal./s"
-        "Each reset takes between 0.6-1.0 sec of the timer.",
+        "<br>Cal. per sec: 1 Star: 1 Cal./s, 2 Star: 1.6 Cal./s, 3 Star: 3.5 Cal./s, 4 Star: 7.5 Cal./s, 5 Star: 10 Cal./s. "
+        "Each reset takes between 0.6-1.0 sec of the timer."
+        "<br>Use a donut with AT LEAST ONE flavor power for the program to read Calorie number correctly.",
         LockMode::UNLOCK_WHILE_RUNNING,
         120, 0, 9999 // default, min, max
     )
@@ -110,15 +111,23 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
 namespace {
 
 // Return if the loop should stop
-typedef std::function<void(SingleSwitchProgramEnvironment&, ProControllerContext&, ShinyHunt_FlySpotReset_Descriptor::Stats&, bool)> route_func;
+using route_func = std::function<
+    void(
+        SingleSwitchProgramEnvironment&,
+        ProControllerContext&,
+        ShinyHunt_FlySpotReset_Descriptor::Stats&,
+        bool
+    )
+>;
 
 void route_default(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
-    bool to_zoom_to_max){
+    bool to_zoom_to_max
+){
     // Open map
-    bool can_fast_travel = open_map(env.console, context, to_zoom_to_max);
+    bool can_fast_travel = open_map(env.console, context, to_zoom_to_max, false);
     if (!can_fast_travel){
         stats.errors++;
         env.update_stats();
@@ -151,14 +160,14 @@ void route_wild_zone_19(
     ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
     bool to_zoom_to_max){
     if (run_a_straight_path_in_overworld(env.console, context, -1, 0.375, 6500ms) == 0) {
-        open_map(env.console, context, to_zoom_to_max);
+        open_map(env.console, context, to_zoom_to_max, true);
         pbf_move_left_joystick(context, {-0.375, -1}, 100ms, 100ms);
         if (fly_from_map(env.console, context) == FastTravelState::NOT_AT_FLY_SPOT) {
             pbf_move_left_joystick(context, {-0.375, 0.75}, 100ms, 100ms);
             fly_from_map(env.console, context);
         }
     } else {
-        open_map(env.console, context, to_zoom_to_max);
+        open_map(env.console, context, to_zoom_to_max, true);
         pbf_move_left_joystick(context, {-0.5, 0}, 100ms, 100ms);
         fly_from_map(env.console, context);
     }
@@ -190,7 +199,7 @@ void route_alpha_pidgey(
     if (ret == 0){
         wait_until_overworld(env.console, context, 50s);
     }
-    open_map(env.console, context, to_zoom_to_max);
+    open_map(env.console, context, to_zoom_to_max, true);
     pbf_move_left_joystick(context, {0, -1}, 200ms, 100ms);
     if (fly_from_map(env.console, context) == FastTravelState::NOT_AT_FLY_SPOT) {
         pbf_move_left_joystick(context, {+1, 0}, 100ms, 100ms);
@@ -205,8 +214,9 @@ bool route_hyperspace_wild_zone(
     ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
     bool to_zoom_to_max,
     SimpleIntegerOption<uint16_t>& MIN_CALORIE_REMAINING,
-    uint8_t& ready_to_stop_counter){
-    open_hyperspace_map(env.console, context);
+    uint8_t& ready_to_stop_counter
+){
+    open_map(env.console, context, false, false);
     
     // Fly from map to reset spawns
     std::shared_ptr<const ImageRGB32> overworld_screen;
@@ -319,7 +329,12 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
 
                 bool should_stop = false;
                 if (ROUTE == Route::HYPERSPACE_WILD_ZONE){
-                    should_stop = route_hyperspace_wild_zone(env, context, stats, to_zoom_to_max, MIN_CALORIE_REMAINING, ready_to_stop_counter);
+                    should_stop = route_hyperspace_wild_zone(
+                        env, context, stats,
+                        to_zoom_to_max,
+                        MIN_CALORIE_REMAINING,
+                        ready_to_stop_counter
+                    );
                 } else{
                     route(env, context, stats, to_zoom_to_max);
                 }

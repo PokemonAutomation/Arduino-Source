@@ -94,11 +94,12 @@ DonutMaker::DonutMaker()
         LockMode::LOCK_WHILE_RUNNING,
         1, 1, 3
         )
-    //, NUM_DONUTS(
-    //    "<b>Number of Donuts:</b><br>The number of donuts to make.",
-    //    LockMode::LOCK_WHILE_RUNNING,
-    //    1, 1
-    //)
+    , NUM_DONUTS(
+       "<b>Number of Donuts:</b><br>The program continues resetting and making donuts of required powers until this many donuts of required powers are made."
+       "<br>Make sure you have enough berries to make this many donuts. The program will fail when not given enough berries.",
+       LockMode::LOCK_WHILE_RUNNING,
+       1, 1, 999
+    )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_DONUT_FOUND(
         "Donut Found",
@@ -117,8 +118,8 @@ DonutMaker::DonutMaker()
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(BERRIES);
     PA_ADD_OPTION(NUM_POWER_REQUIRED);
+    PA_ADD_OPTION(NUM_DONUTS);
     PA_ADD_OPTION(FLAVOR_POWERS);
-    //PA_ADD_OPTION(NUM_DONUTS); //TODO: Add looping. Navigate back to PC and heal to make backup save.
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -277,8 +278,17 @@ void DonutMaker::open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env,
         );
         DonutBerriesSelectionWatcher berry_selection(0);
 
-        int ret = wait_until(env.console, context, std::chrono::seconds(3),
-            {white_dialog, arrow, berry_selection, dreams_alpha_delta, omega});
+        int ret = wait_until(
+            env.console, context,
+            std::chrono::seconds(30),
+            {
+                white_dialog,
+                arrow,
+                berry_selection,
+                dreams_alpha_delta,
+                omega,
+            }
+        );
         switch (ret){
         case 0:
             env.log("Detected white dialog. Go to next dialog");
@@ -317,27 +327,27 @@ void DonutMaker::open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env,
     );
 }
 
-
-// Move from pokecenter to in front of Ansha with button A shown
-void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+// A generic function to fast travel to an index in the fast travel menu and watch for overworld
+void fast_travel_to_index(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int location_index=0){
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
+    env.log("Fast traveling to location at index " + std::to_string(location_index));
     bool zoom_to_max = false;
-    open_map(env.console, context, zoom_to_max);
-    // Move map cursor upwards a little bit so that the cursor locks onto the pokecenter.
-    // This is needed so that in the fast travel location menu the Hotel Z is one row near
-    // the default position on the menu.
-    pbf_move_left_joystick(context, {0, +0.5}, 100ms, 400ms);
-    // Press Y to load fast travel locaiton menu. The cursor should now points to Vert Pokemon Center
+    const bool require_icons = false;
+    open_map(env.console, context, zoom_to_max, require_icons);
+    
+    // Press Y to load fast travel locaiton menu
     pbf_press_button(context, BUTTON_Y, 100ms, 500ms);
-    // Move one menu item up to select Hotel Z
-    pbf_press_dpad(context, DPAD_UP, 50ms, 600ms);
     context.wait_for_all_requests();
 
     OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
+            // Move cursor to desired location index
+            for (int i = 0; i < location_index; i++){
+                pbf_press_dpad(context, DPAD_DOWN, 50ms, 500ms);
+            }
             pbf_mash_button(context, BUTTON_A, Seconds(10));
             pbf_wait(context, Seconds(30)); // 30 sec to wait out potential day night change
         },
@@ -348,14 +358,85 @@ void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProContr
         env.update_stats();
         OperationFailedException::fire(
            ErrorReport::SEND_ERROR_REPORT,
-            "donut_maker(): Unable to find overworld after fast traveling from Vert Pokemon Center after 30 sec.",
+            "donut_maker(): Unable to find overworld after fast traveling to location index " + std::to_string(location_index),
             env.console
         );
     }
-    context.wait_for(100ms); // extra 0.1 sec to let game give player control
-    env.log("Detected overworld. Fast traveled from Pokecenter to Hotel Zone");
+    env.log("Detected overworld. Fast traveled to location index " + std::to_string(location_index));
+}
 
-    ret = run_towards_gate_with_A_button(env.console, context, 0, +1, Seconds(5));
+// Exit the game and load the backup save
+void load_backup_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
+
+    env.log("Making backup save.");
+
+    go_home(env.console, context);
+    const bool backup_save = true;
+    if (!reset_game_from_home(env, env.console, context, backup_save)){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "donut_maker(): Cannot reset game from Switch Home screen.",
+            env.console
+        );
+    }
+}
+
+void exit_menu_to_overworld(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
+
+    env.log("Exiting menu to overworld.");
+
+    OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [&](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_B, Seconds(10));
+            pbf_wait(context, Seconds(30)); // 30 sec to wait out potential day night change
+        },
+        {overworld}
+    );
+    if (ret != 0){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+           ErrorReport::SEND_ERROR_REPORT,
+            "donut_maker(): Unable to find overworld after exiting menu.",
+            env.console
+        );
+    }
+}
+
+void reset_map_filter_state(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    env.log("Resetting fast travel map filters.");
+
+    open_map(env.console, context, false, false);
+    // Press Y and - to open fast travel filter menu
+    pbf_press_button(context, BUTTON_Y, 100ms, 500ms);
+    pbf_press_button(context, BUTTON_MINUS, 100ms, 500ms);
+    // Press Down and A to select "Facilities" filter
+    pbf_press_dpad(context, DPAD_DOWN, 100ms, 500ms);
+    pbf_press_button(context, BUTTON_A, 100ms, 500ms);
+
+    // Close out of map
+    exit_menu_to_overworld(env, context);
+    context.wait_for_all_requests();
+
+    // The filters should now be set to "Facilities" and hovering over Centrico Plaza
+    env.log("Fast travel map filters reset.");
+}
+
+// Move to in front of Ansha with button A shown
+void move_to_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
+
+    fast_travel_to_index(env, context, 3); // Fast travel to Hotel Z
+    context.wait_for(100ms); // Wait for player control to return
+    env.log("Detected overworld. Fast traveled to Hotel Zone");
+
+    int ret = run_towards_gate_with_A_button(env.console, context, 0, +1, Seconds(5));
     if (ret == 1){  // day night change happens during running
         // As day night change has ended, try running towards door again
         if (run_towards_gate_with_A_button(env.console, context, 0, +1, Seconds(5)) != 0){
@@ -389,7 +470,7 @@ void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProContr
     WallClock end_time = current_time();
     const auto duration = end_time - start_time;
     // Due to day/night change may eating the mashing button A sequence, we may still be outside the hotel!
-    if (duration >= 16s){
+    if (duration >= 10s){
         // mash A again to make sure we are inside the hotel
         pbf_mash_button(context, BUTTON_A, Seconds(2));
         context.wait_for_all_requests();
@@ -406,13 +487,26 @@ void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProContr
     context.wait_for_all_requests();
 }
 
+// Create a new backup save after making a donut to keep
+void save_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    // DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
-// Return true if it should stop
-// Start the iteration at closest pokemon center
+    env.log("Creating new backup save to keep the last made donut.");
+
+    // Stop talking to Ansha
+    exit_menu_to_overworld(env, context);
+    context.wait_for_all_requests();
+
+    // Fast travel to anywhere to set a new backup save after making a donut to keep
+    // Removed this since it's likely redundant because the program always fast travels to Hotel Z before making a donut
+    // fast_travel_to_index(env, context, 0, 3000ms);
+}
+
+// Return true if a donut match is found
 bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
-    move_from_pokecenter_to_ansha(env, context);
+    move_to_ansha(env, context);
 
     const ImageFloatBox button_A_box{0.3, 0.2, 0.4, 0.7};
     ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, button_A_box, &env.console.overlay());
@@ -435,18 +529,8 @@ bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControl
     if (match_powers(env, context)){
         return true;
     }
-    
-    go_home(env.console, context);
-    const bool backup_save = true;
-    if (!reset_game_from_home(env, env.console, context, backup_save)){
-        stats.errors++;
-        env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "donut_maker(): Cannot reset game from Switch Home screen.",
-            env.console
-        );
-    }
+
+    load_backup_save(env, context);
     return false;
 }
 
@@ -471,16 +555,20 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     //  Mash button B to let Switch register the controller
     pbf_mash_button(context, BUTTON_B, 200ms);
 
+    reset_map_filter_state(env, context);
     while(true){
-        const bool should_stop = donut_iteration(env, context);
+        const bool found_match = donut_iteration(env, context);
         stats.resets++;
         env.update_stats();
+        send_program_status_notification(env, NOTIFICATION_STATUS);
 
-        if (should_stop){
-            break;
+        if (found_match){
+            if (stats.matched.load() >= NUM_DONUTS){
+                break;
+            }
+            save_donut(env, context);
         }
     }
-
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

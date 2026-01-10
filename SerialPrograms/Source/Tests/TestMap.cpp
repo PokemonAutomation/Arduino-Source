@@ -230,6 +230,8 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"Kernels_CompressRGB32ToBinaryEuclidean", std::bind(image_void_detector_helper, test_kernels_CompressRGB32ToBinaryEuclidean, _1)},
     {"Kernels_Waterfill", std::bind(image_void_detector_helper, test_kernels_Waterfill, _1)},
     {"CommonFramework_BlackBorderDetector", std::bind(image_bool_detector_helper, test_CommonFramework_BlackBorderDetector, _1)},
+    {"NintendoSwitch_CheckOnlineDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_CheckOnlineDetector, _1)},
+    {"NintendoSwitch_FailedToConnectDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_FailedToConnectDetector, _1)},
     {"NintendoSwitch_UpdatePopupDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_UpdatePopupDetector, _1)},
     {"PokemonSwSh_YCommMenuDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_YCommMenuDetector, _1)},
     {"PokemonSwSh_MaxLair_BattleMenuDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_MaxLair_BattleMenuDetector, _1)},
@@ -304,7 +306,7 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonLZA_DirectionArrowDetector", std::bind(image_int_detector_helper, test_pokemonLZA_DirectionArrowDetector, _1)},
     {"PokemonLZA_MapDetector", std::bind(image_bool_detector_helper, test_pokemonLZA_MapDetector, _1)},
     {"PokemonLZA_HyperspaceCalorieDetector", std::bind(image_int_detector_helper, test_pokemonLZA_HyperspaceCalorieDetector, _1)},
-    {"PokemonLZA_FlavorPowerScreenDetector", std::bind(image_words_detector_helper, test_pokemonLZA_FlavorPowerScreenDetector, _1)},
+    {"PokemonLZA_FlavorPowerScreenDetector", test_pokemonLZA_FlavorPowerScreenDetector},
     {"PokemonLZA_DonutBerriesReader", test_pokemonLZA_DonutBerriesReader},
 };
 

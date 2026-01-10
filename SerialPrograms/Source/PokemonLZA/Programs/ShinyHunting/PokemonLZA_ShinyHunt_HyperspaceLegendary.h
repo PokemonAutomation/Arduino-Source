@@ -35,6 +35,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
     enum class Legendary{
+        LATIOS,
+        COBALION,
         TERRAKION,
         VIRIZION,
     };

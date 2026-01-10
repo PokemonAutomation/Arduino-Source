@@ -13,6 +13,8 @@ namespace PokemonAutomation{
 
 class ImageViewRGB32;
 
+int test_NintendoSwitch_CheckOnlineDetector(const ImageViewRGB32& image, bool target);
+int test_NintendoSwitch_FailedToConnectDetector(const ImageViewRGB32& image, bool target);
 int test_NintendoSwitch_UpdatePopupDetector(const ImageViewRGB32& image, bool target);
 
 }

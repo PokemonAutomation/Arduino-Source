@@ -34,7 +34,7 @@
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
-#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
@@ -159,8 +159,8 @@
 #include "Common/Cpp/Options/CheckboxDropdownDatabase.h"
 #include "Common/Cpp/Options/CheckboxDropdownOption.h"
 #include "Common/Cpp/Options/CheckboxDropdownOption.tpp"
-
-
+//#include "Integrations/PybindSwitchController.h"
+#include "Controllers/PABotBase2/PABotBase2_CC_RequestQueue.h"
 
 
 #include <QPixmap>
@@ -171,9 +171,24 @@
 using std::cout;
 using std::endl;
 
-
 using namespace PokemonAutomation::Kernels;
 using namespace PokemonAutomation::Kernels::Waterfill;
+
+
+
+
+namespace PokemonAutomation{
+
+
+
+
+
+
+
+
+
+
+}
 
 
 
@@ -292,6 +307,20 @@ public:
 
 
 
+
+
+class LogSender : public StreamSender{
+public:
+    virtual size_t send(const void* data, size_t bytes) override{
+        cout << PABotBase2::dump_packet((const pabb2_PacketHeader*)data) << endl;
+        return bytes;
+    }
+};
+
+
+
+
+
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -313,7 +342,46 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     // JoyconContext context(scope, console.controller<JoyconController>());
     VideoOverlaySet overlays(overlay);
 
+    LogSender sender;
+    PABotBase2::RequestQueue queue(logger, sender, 16, 64);
 
+    try{
+        cout << queue.send_str("asdfqwe") << endl;
+        cout << queue.send_str("wer") << endl;
+    }catch (...){
+        cout << "Caught Exception" << endl;
+    }
+
+    cout << "Dumping queue... 0" << endl;
+    cout << queue.dump_queue(true) << endl;
+
+    {
+        queue.report_acked(0);
+        cout << "Dumping queue... 3" << endl;
+        cout << queue.dump_queue(true) << endl;
+    }
+    {
+        queue.report_acked(4);
+        cout << "Dumping queue... 2" << endl;
+        cout << queue.dump_queue(true) << endl;
+    }
+    {
+        queue.report_acked(7);
+        cout << "Dumping queue... 1" << endl;
+        cout << queue.dump_queue(true) << endl;
+    }
+
+
+
+
+
+#if 0
+    {
+        PybindSwitchProController controller("COM12");
+        controller.push_button(1000, 200, 800, BUTTON_B);
+        controller.wait_for_all_requests();
+    }
+#endif
 
 
 

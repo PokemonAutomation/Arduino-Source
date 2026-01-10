@@ -1,8 +1,10 @@
 # This CMake file defines all the code file paths as the CMake variables
 # For the main CMake file, see CMakeLists.txt
 
-# the executable needs the dark style format file
+# the GUI executable needs the dark style format file
 set(EXECUTABLE_SOURCES "Source/CommonFramework/Main.cpp" "../3rdParty/qdarkstyle/dark/darkstyle.qrc")
+
+# Note: Command-line executable sources are defined in Source/CommandLine/CommandLineExecutable.cmake
 
 file(GLOB LIBRARY_SOURCES
     ../3rdParty/ONNX/OnnxToolsPA.h
@@ -10,8 +12,6 @@ file(GLOB LIBRARY_SOURCES
     ../3rdParty/QtWavFile/WavFile.h
     ../3rdParty/TesseractPA/TesseractPA.cpp
     ../3rdParty/TesseractPA/TesseractPA.h
-    ../Common/CRC32.cpp
-    ../Common/CRC32.h
     ../Common/Compiler.h
     ../Common/ControllerStates/HID_Keyboard_State.h
     ../Common/ControllerStates/NintendoSwitch_OemController_State.c
@@ -184,6 +184,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Unicode.cpp
     ../Common/Cpp/Unicode.h
     ../Common/Cpp/ValueDebouncer.h
+    ../Common/CRC32/pabb_CRC32.c
+    ../Common/CRC32/pabb_CRC32.h
     ../Common/Qt/AutoHeightTable.cpp
     ../Common/Qt/AutoHeightTable.h
     ../Common/Qt/AutoWidthLineEdit.cpp
@@ -252,6 +254,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/TimeQt.h
     ../Common/Qt/WidgetStackFixedAspectRatio.cpp
     ../Common/Qt/WidgetStackFixedAspectRatio.h
+    ../Common/PABotBase2/PABotBase2_Connection.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_HID_Keyboard.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS1_OemControllers.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS_WiredController.h
@@ -681,6 +684,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/JoystickTools.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h
+    Source/Controllers/PABotBase2/PABotBase2_CC_RequestQueue.cpp
+    Source/Controllers/PABotBase2/PABotBase2_CC_RequestQueue.h
     Source/Controllers/Schedulers/ControllerWithScheduler.h
     Source/Controllers/Schedulers/SuperscalarScheduler.cpp
     Source/Controllers/Schedulers/SuperscalarScheduler.h
@@ -744,6 +749,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Integrations/IntegrationsAPI.h
     Source/Integrations/ProgramTracker.cpp
     Source/Integrations/ProgramTracker.h
+    Source/Integrations/PybindSwitchController.cpp
+    Source/Integrations/PybindSwitchController.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch.h
@@ -1041,14 +1048,16 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h
     Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.h
+    Source/NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.cpp
+    Source/NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_CloseGameDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_CloseGameDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_DateChangeDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_DateChangeDetector.h
-    Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.cpp
-    Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.h
+    Source/NintendoSwitch/Inference/NintendoSwitch_FailedToConnectDetector.cpp
+    Source/NintendoSwitch/Inference/NintendoSwitch_FailedToConnectDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.cpp
@@ -1683,6 +1692,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_WeatherFinder.h
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h
+    Source/PokemonLZA/Programs/PokemonLZA_HyperspaceNavigation.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_HyperspaceNavigation.h
     Source/PokemonLZA/Programs/PokemonLZA_BoxSorter.cpp
     Source/PokemonLZA/Programs/PokemonLZA_BoxSorter.h
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.cpp
@@ -1712,6 +1723,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HyperspaceHunter.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HyperspaceHunter.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HyperspaceLegendary.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HyperspaceLegendary.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.cpp

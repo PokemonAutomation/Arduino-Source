@@ -6,8 +6,11 @@
 
 #include <stdio.h>
 #include <chrono>
+#include <cmath>
+#include <format>
 #include <sstream>
 #include <iomanip>
+#include <iostream>
 #include "Exceptions.h"
 #include "PrettyPrint.h"
 
@@ -166,17 +169,33 @@ std::string tostr_bytes(uint64_t bytes){
 
 
 
-std::string tostr_default(double x){
+std::string tostr_default_old(double x){
     std::ostringstream ss;
     ss << x;
     return ss.str();
 }
-std::string tostr_fixed(double x, int precision){
+std::string tostr_default(double x){
+    std::string old_str = tostr_default_old(x);
+    std::string new_str = std::format("{:.6g}", x);
+    if (old_str != new_str && !std::isnan(x)){
+        std::cout << std::format("tostr_default(): Mismatch between old and new implementation. {} vs {}", old_str, new_str) << std::endl;
+    }
+    return old_str;
+}
+std::string tostr_fixed_old(double x, int precision){
     std::ostringstream out;
     out << std::setprecision(precision);
     out << std::fixed;
     out << x;
     return out.str();
+}
+std::string tostr_fixed(double x, int precision){
+    std::string old_str = tostr_fixed_old(x, precision);
+    std::string new_str = std::format("{:.{}f}", x, precision);
+    if (old_str != new_str && !std::isnan(x)) {
+        std::cout << std::format("tostr_fixed(): Mismatch between old and new implementation. {} vs {}", old_str, new_str) << std::endl;
+    }
+    return old_str;
 }
 
 

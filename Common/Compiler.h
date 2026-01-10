@@ -8,7 +8,9 @@
 #define PokemonAutomation_Compiler_H
 
 //#include <stddef.h>
+#ifdef __cplusplus
 namespace PokemonAutomation{
+#endif
 
 
 #define PA_ALIGNMENT    64
@@ -19,11 +21,14 @@ namespace PokemonAutomation{
 
 #define PA_NO_INLINE        __declspec(noinline)
 #define PA_FORCE_INLINE     inline __forceinline
+
+#ifdef __cplusplus
 template <typename type> using r_ptr  = type *__restrict;
 template <typename type> using c_ptr  = type const*__restrict;
 template <typename type> using r_ref  = type &__restrict;
 template <typename type> using c_ref  = type const&__restrict;
 template <typename type> using r_rref = type &&__restrict;
+#endif
 
 //using ssize_t = ptrdiff_t;
 
@@ -40,11 +45,14 @@ template <typename type> using r_rref = type &&__restrict;
 
 #define PA_NO_INLINE        __attribute__ ((noinline))
 #define PA_FORCE_INLINE     inline __attribute__ ((always_inline))
+
+#ifdef __cplusplus
 template <typename type> using r_ptr  = type *__restrict__;
 template <typename type> using c_ptr  = type const*__restrict__;
 template <typename type> using r_ref  = type &__restrict__;
 template <typename type> using c_ref  = type const&__restrict__;
 template <typename type> using r_rref = type &&__restrict__;
+#endif
 
 // Align a struct on x-byte boundary.
 // It's the minimum alignment for a struct or a struct member.
@@ -66,5 +74,7 @@ template <typename type> using r_rref = type &&__restrict__;
 
 
 
+#ifdef __cplusplus
 }
+#endif
 #endif

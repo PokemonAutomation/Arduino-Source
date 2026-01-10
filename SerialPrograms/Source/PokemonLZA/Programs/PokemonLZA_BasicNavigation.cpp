@@ -99,7 +99,12 @@ bool save_game_to_menu(ConsoleHandle& console, ProControllerContext& context){
 
 
 
-bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_to_max){
+bool open_map(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    bool zoom_to_max,
+    bool require_icons
+){
     pbf_press_button(context, BUTTON_PLUS, 240ms, 40ms);
     context.wait_for_all_requests();
     console.log("Opening Map...");
@@ -150,9 +155,9 @@ bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_t
                     5000ms,
                     {map_detector}
                 );
-                return map_detector.detected_map_icons().size();
             }
-            return map_detector.detected_map_icons().size() > 0;
+
+            return !require_icons || map_detector.detected_map_icons().size() > 0;
         default:
             console.log("Map not found. Press + again", COLOR_ORANGE);
             pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);
@@ -170,57 +175,9 @@ bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_t
     );
 }
 
-void open_hyperspace_map(ConsoleHandle& console, ProControllerContext& context){
-    pbf_press_button(context, BUTTON_PLUS, 240ms, 40ms); 
-    context.wait_for_all_requests();
-    console.log("Opening Hyperspace Map...");
-    console.overlay().add_log("Open Hyperspace Map");
-    
-    WallClock deadline = current_time() + 30s;
-
-    const ImageFloatBox icon_region{0.0, 0.089, 1.0, 0.911};
-    MapIconDetector flyable_hyperspace_entry_wild_icon(COLOR_ORANGE, MapIconType::HyperspaceEntryWild, icon_region, &console.overlay());
-    MapIconDetector flyable_hyperspace_entry_battle_icon(COLOR_ORANGE, MapIconType::HyperspaceEntryBattle, icon_region, &console.overlay());
-
-    MapWatcher map_detector(COLOR_RED, &console.overlay());
-    map_detector.attach_map_icon_detector(flyable_hyperspace_entry_wild_icon);
-    map_detector.attach_map_icon_detector(flyable_hyperspace_entry_battle_icon);
-
-    do{
-        map_detector.reset_state();
-
-        int ret = wait_until(
-            console, context,
-            5000ms,
-            {map_detector}
-        );
-        switch (ret){
-        case 0:
-            console.log("Detected map!", COLOR_BLUE);
-            console.overlay().add_log("Map Detected");
-            return;
-        default:
-            console.log("Map not found. Press + again", COLOR_ORANGE);
-            pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);
-            console.overlay().add_log("Map not Found. Press + Again");
-            context.wait_for_all_requests();
-        }
-
-    }while (current_time() < deadline);
-
-    console.overlay().add_log("Failed to Open Hyperspace Map After 30 sec", COLOR_RED);
-    OperationFailedException::fire(
-        ErrorReport::SEND_ERROR_REPORT,
-        "open_map(): Unable to find map after 30 seconds.",
-        console
-    );
-}
-
-
 FastTravelState fly_from_map(
     ConsoleHandle& console, ProControllerContext& context,
-    std::shared_ptr<const ImageRGB32>* overworld_screen,
-    Button mash_while_waiting
+    std::shared_ptr<const ImageRGB32>* overworld_screen
 ){
     console.log("Flying from map...");
     context.wait_for_all_requests();
@@ -261,16 +218,13 @@ FastTravelState fly_from_map(
         }
     }
 
-    OverworldPartySelectionWatcher overworld(COLOR_WHITE, &console.overlay(), 0ms);
+    OverworldPartySelectionWatcher overworld(COLOR_WHITE, &console.overlay());
     BlueDialogWatcher blue_dialog(COLOR_BLUE, &console.overlay());
-    int ret = run_until<ProControllerContext>(
-        console, context,
-        [&](ProControllerContext& context) {
-            pbf_mash_button(context, mash_while_waiting, 30s);
-        },
-        { {overworld} }
+    int ret = wait_until(
+        console, context, 30s,  // set 30sec to be long enough for Switch 1 to load the overworld
+        {overworld, blue_dialog}
     );
-    switch (ret) {
+    switch (ret){
     case 0:
         console.log("Flying from map... Done!");
         console.overlay().add_log("Fast Travel Done");
@@ -279,12 +233,12 @@ FastTravelState fly_from_map(
         console.log("Detected blue dialog. Rare by probably too many button A mashing to trigger return to Lumiose dialog while teleporting to Hyperspace portal");
         ret = run_until<ProControllerContext>(
             console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 5s);
             },
-            { {overworld} }
+            {{overworld}}
         );
-        if (ret != 0) {
+        if (ret != 0){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "fly_from_map(): Does not detect overworld after encountering blue dialog.",
@@ -301,7 +255,8 @@ FastTravelState fly_from_map(
             console
         );
     }
-    if (overworld_screen != nullptr) {
+
+    if (overworld_screen != nullptr){
         *overworld_screen = overworld.last_detected_frame();
     }
 
@@ -309,7 +264,7 @@ FastTravelState fly_from_map(
 }
 
 FastTravelState open_map_and_fly_in_place(ConsoleHandle& console, ProControllerContext& context, bool zoom_to_max){
-    bool can_fast_travel = open_map(console, context, zoom_to_max);
+    bool can_fast_travel = open_map(console, context, zoom_to_max, true);
     if (!can_fast_travel){
         return FastTravelState::PURSUED;
     }

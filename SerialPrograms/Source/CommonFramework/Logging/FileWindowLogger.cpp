@@ -24,7 +24,15 @@ namespace PokemonAutomation{
 
 
 Logger& global_logger_raw(){
-    static FileWindowLogger logger(USER_FILE_PATH() + (QCoreApplication::applicationName() + ".log").toStdString());
+    auto get_log_filepath = [&](){
+        QString application_name(QCoreApplication::applicationName());
+        if (application_name.size() == 0){
+            application_name = "SerialPrograms";
+        }
+        return USER_FILE_PATH() + (application_name + ".log").toStdString();
+    };
+    
+    static FileWindowLogger logger(get_log_filepath());
     return logger;
 }
 
