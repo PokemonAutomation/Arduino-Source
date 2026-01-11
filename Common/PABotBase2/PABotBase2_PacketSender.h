@@ -80,10 +80,9 @@ bool pabb2_PacketSender_remove(pabb2_PacketSender* self, uint8_t seqnum);
 
 //
 //  Send a packet with the specified opcode and extra data after the header.
-//  Return a pointer to the header if successful.
-//  Returns NULL if queue is full.
+//  Returns true if successful. (enters the queue)
 //
-const pabb2_PacketHeader* pabb2_PacketSender_send_packet(
+bool pabb2_PacketSender_send_packet(
     pabb2_PacketSender* self,
     uint8_t opcode, uint8_t extra_bytes, const void* extra_data
 );

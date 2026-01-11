@@ -7,6 +7,9 @@
 #include <string.h>
 #include "PABotBase2_StreamCoalescer.h"
 
+#include <stdio.h>  //  REMOVE
+#include "PABotBase2_ConnectionDebug.h" //  REMOVE
+
 void pabb2_StreamCoalescer_init(pabb2_StreamCoalescer* self){
     self->slot_head = 0;
     self->slot_tail = 0;
@@ -76,6 +79,9 @@ void pabb2_StreamCoalescer_pop_leading_finished(pabb2_StreamCoalescer* self){
 void pabb2_StreamCoalescer_push_packet(pabb2_StreamCoalescer* self, uint8_t seqnum){
     uint8_t slot_head = self->slot_head;
 
+    printf("enter ---------------------\n");
+    pabb2_StreamCoalescer_print(self, false);
+
     //  Either before (old retransmit) or too far in future.
     if ((uint8_t)(seqnum - slot_head) >= PABB2_StreamCoalescer_SLOTS){
         return;
@@ -93,6 +99,10 @@ void pabb2_StreamCoalescer_push_packet(pabb2_StreamCoalescer* self, uint8_t seqn
 
     //  Pop all finished slots at the head of the queue.
     pabb2_StreamCoalescer_pop_leading_finished(self);
+
+
+    printf("exit ---------------------\n");
+    pabb2_StreamCoalescer_print(self, false);
 }
 
 bool pabb2_StreamCoalescer_push_stream(pabb2_StreamCoalescer* self, const pabb2_PacketHeaderData* packet){

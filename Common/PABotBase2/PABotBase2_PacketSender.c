@@ -8,6 +8,9 @@
 #include "Common/CRC32/pabb_CRC32.h"
 #include "PABotBase2_PacketSender.h"
 
+//  REMOVE
+#include <stdio.h>
+#include "PABotBase2_ConnectionDebug.h"
 
 void pabb2_PacketSender_init(
     pabb2_PacketSender* self,
@@ -67,17 +70,17 @@ bool pabb2_PacketSender_remove(pabb2_PacketSender* self, uint8_t seqnum){
     }
 }
 
-const pabb2_PacketHeader* pabb2_PacketSender_send_packet(
+bool pabb2_PacketSender_send_packet(
     pabb2_PacketSender* self,
     uint8_t opcode, uint8_t extra_bytes, const void* extra_data
 ){
     pabb2_PacketHeader* packet = pabb2_PacketSender_reserve_packet(self, opcode, extra_bytes);
     if (packet == NULL){
-        return NULL;
+        return false;
     }
     memcpy(packet + 1, extra_data, extra_bytes);
     pabb2_PacketSender_commit_packet(self, packet);
-    return packet;
+    return true;
 }
 
 pabb2_PacketHeader* pabb2_PacketSender_reserve_packet(

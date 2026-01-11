@@ -160,11 +160,15 @@
 #include "Common/Cpp/Options/CheckboxDropdownOption.h"
 #include "Common/Cpp/Options/CheckboxDropdownOption.tpp"
 //#include "Integrations/PybindSwitchController.h"
-#include "Controllers/PABotBase2/PABotBase2_CC_RequestQueue.h"
 #include "Common/PABotBase2/PABotBase2_ConnectionDebug.h"
 #include "Common/PABotBase2/PABotBase2_PacketSender.h"
 #include "Common/PABotBase2/PABotBase2_StreamCoalescer.h"
-#include "Controllers/PABotBase2/PABotBase2_CC_PacketSender.h"
+#include "Common/Cpp/StreamConnections/StreamInterface.h"
+#include "Common/Cpp/StreamConnections/StreamConnection.h"
+#include "Common/Cpp/ListenerSet.h"
+#include "Common/CRC32/pabb_CRC32.h"
+#include "Common/PABotBase2/PABotBase2_PacketParser.h"
+#include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -369,6 +373,86 @@ struct DataPacket : pabb2_PacketHeaderData{
 
 
 
+class MockConnection : public StreamConnection{
+public:
+    MockConnection()
+        : m_thread([this]{ thread_body(); })
+    {}
+    ~MockConnection(){
+        {
+            std::lock_guard<std::mutex> lg(m_lock);
+            m_stopping = true;
+        }
+        m_cv.notify_all();
+        m_thread.join();
+    }
+
+    virtual size_t send(const void* data, size_t bytes) override{
+        const pabb2_PacketHeader* packet = (const pabb2_PacketHeader*)data;
+        cout << "Sending: ";
+        pabb2_PacketHeader_print(packet, false);
+        fflush(stdout);
+
+        WallClock now = current_time();
+
+        struct{
+            pabb2_PacketHeader header;
+            uint8_t crc[sizeof(uint32_t)];
+        } response;
+        response.header.magic_number = PABB2_CONNECTION_PACKET_MAGIC_NUMBER;
+        response.header.seqnum = packet->seqnum;
+        response.header.packet_bytes = sizeof(response);
+        response.header.opcode = PABB2_CONNECTION_PACKET_OPCODE_ACK;
+        pabb_crc32_write_to_message(&response, sizeof(response));
+
+        {
+            std::lock_guard<std::mutex> lg(m_lock);
+//            cout << "enqueuing" << endl;
+            m_send_schedule.insert({
+                now + 500ms,
+                std::string((char*)&response, (char*)&response + sizeof(response))
+            });
+        }
+        m_cv.notify_all();
+
+        return bytes;
+    }
+
+
+private:
+    void thread_body(){
+        while (!m_stopping){
+            std::unique_lock<std::mutex> lg(m_lock);
+
+            while (!m_send_schedule.empty()){
+                auto iter = m_send_schedule.begin();
+                if (current_time() < iter->first){
+                    m_cv.wait_until(lg, iter->first);
+                    continue;
+                }
+                std::string& packet = iter->second;
+                cout << "Receiving: ";
+                pabb2_PacketHeader_print((const pabb2_PacketHeader*)packet.data(), false);
+                fflush(stdout);
+                on_recv(packet.data(), packet.size());
+                m_send_schedule.erase(iter);
+            }
+
+            m_cv.wait(lg);
+        }
+    }
+
+
+private:
+    std::multimap<WallClock, std::string> m_send_schedule;
+
+    std::mutex m_lock;
+    std::condition_variable m_cv;
+    bool m_stopping = false;
+    Thread m_thread;
+};
+
+
 
 
 
@@ -401,12 +485,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-    LogSender data_sender;
+    MockConnection unreliable_connection;
     {
-        PABotBase2::PacketSender sender(logger, data_sender, 1s);
+        ReliableStreamConnection connection(logger, unreliable_connection, 1s);
 
-        cout << sender.send_packet(1) << endl;
-        cout << sender.send_packet(2) << endl;
+        cout << connection.send_request(0x20) << endl;
+//        cout << connection.send_request(0x21) << endl;
 
 
         scope.wait_for(10s);
