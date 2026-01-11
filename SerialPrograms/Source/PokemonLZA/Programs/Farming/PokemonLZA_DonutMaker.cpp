@@ -158,9 +158,11 @@ bool flavor_tokens_are_subset(const std::vector<std::string>& subset, const std:
     return true;
 }
 
-// Check if a donut matches an individual table entry
+// Check if a donut matches an individual table entry. Each table entry has three target powers.
 bool donut_matches_powers(SingleSwitchProgramEnvironment& env, std::vector<std::string>& donut_powers, const std::vector<std::string>& target_powers){
     for (const std::string& target_power : target_powers){
+        // `target_power` can be a specific power like "item-power-berries-3" or a slug to match
+        // any possible power (or no power): "any-power-any".
         std::vector<std::string> target_tokens = get_flavor_power_tokens(target_power);
         bool matched = false;
         for (const std::string& donut_power : donut_powers){
@@ -213,6 +215,7 @@ bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProController
 
     bool match_found = false;
     bool should_keep = false;
+    // Each power table row:
     for (size_t i = 0; i < powers_table.size(); i++){
         if (donut_matches_powers(env, donut_results, powers_table[i])){
             match_found = true;
