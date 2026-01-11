@@ -67,12 +67,30 @@ bool pabb2_PacketSender_remove(pabb2_PacketSender* self, uint8_t seqnum){
     }
 }
 
-pabb2_PacketHeader* pabb2_PacketSender_reserve_packet(pabb2_PacketSender* self, uint8_t bytes){
+const pabb2_PacketHeader* pabb2_PacketSender_send_packet(
+    pabb2_PacketSender* self,
+    uint8_t opcode, uint8_t extra_bytes, const void* extra_data
+){
+    pabb2_PacketHeader* packet = pabb2_PacketSender_reserve_packet(self, opcode, extra_bytes);
+    if (packet == NULL){
+        return NULL;
+    }
+    memcpy(packet + 1, extra_data, extra_bytes);
+    pabb2_PacketSender_commit_packet(self, packet);
+    return packet;
+}
+
+pabb2_PacketHeader* pabb2_PacketSender_reserve_packet(
+    pabb2_PacketSender* self,
+    uint8_t opcode, uint8_t extra_bytes
+){
     //  No slots available.
     uint8_t slots_used = self->slot_tail - self->slot_head;
     if (slots_used == PABB2_ConnectionSender_SLOTS){
         return NULL;
     }
+
+    uint8_t packet_bytes = extra_bytes + sizeof(pabb2_PacketHeader) + sizeof(uint32_t);
 
     size_t buffer_head = self->buffer_head;
     size_t buffer_tail = self->buffer_tail;
@@ -94,7 +112,7 @@ pabb2_PacketHeader* pabb2_PacketSender_reserve_packet(pabb2_PacketSender* self, 
             capacity = buffer_head - buffer_tail;
         }else{
             capacity = PABB2_ConnectionSender_BUFFER_SIZE - buffer_tail;
-            if (capacity < bytes){
+            if (capacity < packet_bytes){
                 offset = 0;
                 capacity = buffer_head;
                 buffer_tail = 0;
@@ -103,11 +121,11 @@ pabb2_PacketHeader* pabb2_PacketSender_reserve_packet(pabb2_PacketSender* self, 
     }
 
     //  There is no contiguous space large enough.
-    if (capacity < bytes){
+    if (capacity < packet_bytes){
         return NULL;
     }
 
-    buffer_tail += bytes;
+    buffer_tail += packet_bytes;
     if (buffer_tail == PABB2_ConnectionSender_BUFFER_SIZE){
         buffer_tail = 0;
     }
@@ -117,16 +135,18 @@ pabb2_PacketHeader* pabb2_PacketSender_reserve_packet(pabb2_PacketSender* self, 
 
     pabb2_PacketHeader* ret = (pabb2_PacketHeader*)(self->buffer + offset);
 
+    ret->magic_number = PABB2_CONNECTION_PACKET_MAGIC_NUMBER;
     ret->seqnum = self->slot_tail++;
-    ret->packet_bytes = bytes;
+    ret->packet_bytes = packet_bytes;
+    ret->opcode = opcode;
 
     return ret;
 }
 
 void pabb2_PacketSender_commit_packet(pabb2_PacketSender* self, pabb2_PacketHeader* packet){
-    packet->magic_number = PABB2_CONNECTION_PACKET_MAGIC_NUMBER;
-
     pabb_crc32_write_to_message(packet, packet->packet_bytes);
+
+    self->sender(self->sender_context, packet, packet->packet_bytes);
 
     //  In order to save memory, we repurpose the magic number as a timer to
     //  track when it should be retransmitted. However, it will be set back to

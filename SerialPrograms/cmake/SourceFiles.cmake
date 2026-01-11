@@ -176,6 +176,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Stopwatch.h
     ../Common/Cpp/StreamConverters.cpp
     ../Common/Cpp/StreamConverters.h
+    ../Common/Cpp/StreamInterface.h
     ../Common/Cpp/StringTools.cpp
     ../Common/Cpp/StringTools.h
     ../Common/Cpp/Time.cpp
@@ -690,6 +691,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/JoystickTools.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h
+    Source/Controllers/PABotBase2/PABotBase2_CC_PacketSender.cpp
+    Source/Controllers/PABotBase2/PABotBase2_CC_PacketSender.h
     Source/Controllers/PABotBase2/PABotBase2_CC_RequestQueue.cpp
     Source/Controllers/PABotBase2/PABotBase2_CC_RequestQueue.h
     Source/Controllers/Schedulers/ControllerWithScheduler.h

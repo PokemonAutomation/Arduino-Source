@@ -164,6 +164,7 @@
 #include "Common/PABotBase2/PABotBase2_ConnectionDebug.h"
 #include "Common/PABotBase2/PABotBase2_PacketSender.h"
 #include "Common/PABotBase2/PABotBase2_StreamCoalescer.h"
+#include "Controllers/PABotBase2/PABotBase2_CC_PacketSender.h"
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -315,7 +316,9 @@ class LogSender : public StreamSender{
 public:
     virtual size_t send(const void* data, size_t bytes) override{
 //        cout << PABotBase2::dump_packet((const pabb2_PacketHeader*)data) << endl;
+        cout << "Sending: ";
         pabb2_PacketHeader_print((const pabb2_PacketHeader*)data, false);
+        fflush(stdout);
         return bytes;
     }
 };
@@ -366,6 +369,16 @@ struct DataPacket : pabb2_PacketHeaderData{
 
 
 
+
+
+
+
+
+
+
+
+
+
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -388,7 +401,19 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-#if 1
+    LogSender data_sender;
+    {
+        PABotBase2::PacketSender sender(logger, data_sender, 1s);
+
+        cout << sender.send_packet(1) << endl;
+        cout << sender.send_packet(2) << endl;
+
+
+        scope.wait_for(10s);
+        cout << "================ End Test ================" << endl;
+    }
+
+#if 0
     DataPacket packet;
     pabb2_StreamCoalescer coalescer;
     pabb2_StreamCoalescer_init(&coalescer);

@@ -37,7 +37,7 @@ typedef struct{
     uint16_t stream_tail;
 
     //  0       =   Not received yet.
-    //  0-254   =   Received stream packet. # of the size.
+    //  0-254   =   Received stream packet. # is the size.
     //  255     =   Received non-stream packet.
     uint8_t lengths[PABB2_StreamCoalescer_SLOTS];
 

@@ -4,19 +4,14 @@
  * 
  */
 
-#ifndef PokemonAutomation_StreamInterface_H
-#define PokemonAutomation_StreamInterface_H
+#ifndef PokemonAutomation_StreamConnectionInterface_H
+#define PokemonAutomation_StreamConnectionInterface_H
 
 #include <mutex>
 #include <set>
+#include "Common/Cpp/StreamInterface.h"
 
 namespace PokemonAutomation{
-
-
-class StreamListener{
-public:
-    virtual void on_recv(const void* data, size_t bytes) = 0;
-};
 
 
 class StreamConnection{

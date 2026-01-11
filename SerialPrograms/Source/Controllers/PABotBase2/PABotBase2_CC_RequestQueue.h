@@ -14,21 +14,11 @@
 #include <condition_variable>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/StreamInterface.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "Common/PABotBase2/PABotBase2_Connection.h"
 
 namespace PokemonAutomation{
-
-
-struct StreamSender{
-    virtual size_t send(const void* data, size_t bytes) = 0;
-};
-#if 0
-struct StreamListener{
-    virtual void recv(const void* data, size_t bytes) = 0;
-};
-#endif
-
 namespace PABotBase2{
 
 

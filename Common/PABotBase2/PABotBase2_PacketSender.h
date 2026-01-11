@@ -70,9 +70,23 @@ void pabb2_PacketSender_init(
     void* sender_context
 );
 
+inline uint8_t pabb2_PacketSender_size(pabb2_PacketSender* self){
+    return self->slot_tail - self->slot_head;
+}
+
 //  Remove the packet corresponding to the specified seqnum from the queue.
 //  Returns true is successful, false if seqnum is not in the queue.
 bool pabb2_PacketSender_remove(pabb2_PacketSender* self, uint8_t seqnum);
+
+//
+//  Send a packet with the specified opcode and extra data after the header.
+//  Return a pointer to the header if successful.
+//  Returns NULL if queue is full.
+//
+const pabb2_PacketHeader* pabb2_PacketSender_send_packet(
+    pabb2_PacketSender* self,
+    uint8_t opcode, uint8_t extra_bytes, const void* extra_data
+);
 
 //
 //  Send a single packet in two parts:
@@ -80,7 +94,9 @@ bool pabb2_PacketSender_remove(pabb2_PacketSender* self, uint8_t seqnum);
 //      2.  Commit the packet to the queue.
 //
 //  On success, "reserve()" will return a pointer to the packet to be filled.
-//  "seqnum", and "packet_bytes" are prefilled and should not be modified.
+//  All fields of the packet header are already filled and should not be
+//  modified by the user. The user should only populate the bytes that follow
+//  the header.
 //
 //  On fail, reserve will return a null pointer. No changes are made to the
 //  queue on failure. Failures will happen if there is insufficient space in
@@ -93,7 +109,10 @@ bool pabb2_PacketSender_remove(pabb2_PacketSender* self, uint8_t seqnum);
 //  function can be called on this queue. It is undefined behavior to separate
 //  "reserve()" and "commit()" with another function on the same queue.
 //
-pabb2_PacketHeader* pabb2_PacketSender_reserve_packet(pabb2_PacketSender* self, uint8_t bytes);
+pabb2_PacketHeader* pabb2_PacketSender_reserve_packet(
+    pabb2_PacketSender* self,
+    uint8_t opcode, uint8_t extra_bytes
+);
 void pabb2_PacketSender_commit_packet(pabb2_PacketSender* self, pabb2_PacketHeader* packet);
 
 //
