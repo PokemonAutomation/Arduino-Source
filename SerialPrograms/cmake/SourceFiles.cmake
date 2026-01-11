@@ -255,6 +255,12 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/WidgetStackFixedAspectRatio.cpp
     ../Common/Qt/WidgetStackFixedAspectRatio.h
     ../Common/PABotBase2/PABotBase2_Connection.h
+    ../Common/PABotBase2/PABotBase2_ConnectionDebug.c
+    ../Common/PABotBase2/PABotBase2_ConnectionDebug.h
+    ../Common/PABotBase2/PABotBase2_PacketSender.c
+    ../Common/PABotBase2/PABotBase2_PacketSender.h
+    ../Common/PABotBase2/PABotBase2_StreamCoalescer.c
+    ../Common/PABotBase2/PABotBase2_StreamCoalescer.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_HID_Keyboard.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS1_OemControllers.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS_WiredController.h

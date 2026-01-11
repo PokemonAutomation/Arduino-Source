@@ -161,7 +161,9 @@
 #include "Common/Cpp/Options/CheckboxDropdownOption.tpp"
 //#include "Integrations/PybindSwitchController.h"
 #include "Controllers/PABotBase2/PABotBase2_CC_RequestQueue.h"
-
+#include "Common/PABotBase2/PABotBase2_ConnectionDebug.h"
+#include "Common/PABotBase2/PABotBase2_PacketSender.h"
+#include "Common/PABotBase2/PABotBase2_StreamCoalescer.h"
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -312,12 +314,55 @@ public:
 class LogSender : public StreamSender{
 public:
     virtual size_t send(const void* data, size_t bytes) override{
-        cout << PABotBase2::dump_packet((const pabb2_PacketHeader*)data) << endl;
+//        cout << PABotBase2::dump_packet((const pabb2_PacketHeader*)data) << endl;
+        pabb2_PacketHeader_print((const pabb2_PacketHeader*)data, false);
         return bytes;
     }
 };
 
+void fp_LogSender(void* context, const void* data, size_t bytes){
+    ((LogSender*)context)->send(data, bytes);
+}
 
+#if 0
+std::string dump(const pabb2_PacketSender& sender){
+    std::string str;
+    str += "---------------\n";
+    str += "Slot Head: " + std::to_string(sender.slot_head) + "\n";
+    str += "Slot Tail: " + std::to_string(sender.slot_tail) + "\n";
+    str += "Buffer Head: " + std::to_string(sender.buffer_head) + "\n";
+    str += "Buffer Tail: " + std::to_string(sender.buffer_tail) + "\n";
+    for (uint8_t seqnum = sender.slot_head; seqnum != sender.slot_tail; seqnum++){
+        size_t offset = ~sender.offsets[seqnum & PABB2_ConnectionSender_SLOTS_MASK];
+        str += "Offset = " + std::to_string(offset) + "\n";
+        str += PABotBase2::dump_packet((const pabb2_PacketHeader*)(sender.buffer + offset));
+        str += "\n";
+    }
+    return str;
+}
+#endif
+
+struct DataPacket : pabb2_PacketHeaderData{
+    char data[256];
+
+    void set(uint8_t seqnum, uint16_t stream_offset, const char* str){
+        const size_t OVERHEAD = sizeof(pabb2_PacketHeaderData) + sizeof(uint32_t);
+        const size_t MAX_SIZE = 256 - OVERHEAD;
+
+        size_t size = strlen(str);
+        if (size >= MAX_SIZE){
+            cout << "Data is too large." << endl;
+            size = MAX_SIZE;
+        }
+
+        this->magic_number = PABB2_CONNECTION_PACKET_MAGIC_NUMBER;
+        this->seqnum = seqnum;
+        this->packet_bytes = (uint8_t)(size + OVERHEAD);
+        this->opcode = PABB2_CONNECTION_PACKET_OPCODE_STREAM_DATA;
+        this->stream_offset = stream_offset;
+        memcpy(data, str, size);
+    }
+};
 
 
 
@@ -342,6 +387,161 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     // JoyconContext context(scope, console.controller<JoyconController>());
     VideoOverlaySet overlays(overlay);
 
+
+#if 1
+    DataPacket packet;
+    pabb2_StreamCoalescer coalescer;
+    pabb2_StreamCoalescer_init(&coalescer);
+
+    coalescer.stream_head = 32;
+    coalescer.stream_tail = 32;
+
+    packet.set(3, 32, "asdf");
+    cout << pabb2_StreamCoalescer_push_stream(&coalescer, &packet) << endl;
+
+    pabb2_StreamCoalescer_push_packet(&coalescer, 1);
+    pabb2_StreamCoalescer_push_packet(&coalescer, 2);
+    pabb2_StreamCoalescer_print(&coalescer, true);
+
+    pabb2_StreamCoalescer_push_packet(&coalescer, 0);
+    pabb2_StreamCoalescer_print(&coalescer, true);
+
+    packet.set(5, 60, "qwersdfg");
+    cout << pabb2_StreamCoalescer_push_stream(&coalescer, &packet) << endl;
+    pabb2_StreamCoalescer_print(&coalescer, true);
+
+    packet.set(4, 36, "01234567890123456789abcd");
+    cout << pabb2_StreamCoalescer_push_stream(&coalescer, &packet) << endl;
+
+    pabb2_StreamCoalescer_print(&coalescer, true);
+
+
+    char buffer[100] = {};
+
+    cout << "read = " << pabb2_StreamCoalescer_read(&coalescer, buffer, 1) << endl;
+    cout << buffer << endl;
+
+    pabb2_StreamCoalescer_print(&coalescer, true);
+
+    cout << "read = " << pabb2_StreamCoalescer_read(&coalescer, buffer, 10) << endl;
+    cout << buffer << endl;
+
+    pabb2_StreamCoalescer_print(&coalescer, true);
+
+    cout << "read = " << pabb2_StreamCoalescer_read(&coalescer, buffer, 100) << endl;
+    cout << buffer << endl;
+
+    pabb2_StreamCoalescer_print(&coalescer, true);
+#endif
+
+
+#if 0
+    LogSender sender;
+    pabb2_PacketSender queue;
+    pabb2_PacketSender_init(&queue, fp_LogSender, &sender);
+
+    cout << pabb2_PacketSender_send_stream(&queue, "asdf", 4) << endl;
+    cout << pabb2_PacketSender_send_stream(&queue, "qwer", 4) << endl;
+    cout << pabb2_PacketSender_send_stream(&queue, "zxcv", 4) << endl;
+    pabb2_PacketSender_remove(&queue, 0);
+
+    cout << pabb2_PacketSender_send_stream(&queue, "01234567890123456789", 20) << endl;
+//    cout << pabb2_PacketSender_send_stream(&queue, "sdfg", 4) << endl;
+//    cout << pabb2_PacketSender_send_stream(&queue, "xcvb", 4) << endl;
+
+    pabb2_PacketSender_print(&queue, true);
+
+    pabb2_PacketSender_remove(&queue, 0);
+    cout << pabb2_PacketSender_send_stream(&queue, "sdfgh", 5) << endl;
+    cout << pabb2_PacketSender_send_stream(&queue, "xcvb", 4) << endl;
+
+    pabb2_PacketSender_print(&queue, true);
+#endif
+
+
+#if 0
+    LogSender sender;
+    pabb2_PacketSender queue;
+    pabb2_PacketSender_init(&queue);
+
+    pabb2_PacketHeader* packet;
+
+    packet = pabb2_PacketSender_reserve_packet(&queue, 16);
+    if (packet){
+        packet->opcode = 1;
+        pabb2_PacketSender_commit_packet(&queue, packet);
+        sender.send(packet, packet->packet_bytes);
+    }else{
+        cout << "Reserve Failed" << endl;
+    }
+
+    packet = pabb2_PacketSender_reserve_packet(&queue, 16);
+    if (packet){
+        packet->opcode = 2;
+        pabb2_PacketSender_commit_packet(&queue, packet);
+        sender.send(packet, packet->packet_bytes);
+    }else{
+        cout << "Reserve Failed" << endl;
+    }
+
+    packet = pabb2_PacketSender_reserve_packet(&queue, 16);
+    if (packet){
+        packet->opcode = 3;
+        pabb2_PacketSender_commit_packet(&queue, packet);
+        sender.send(packet, packet->packet_bytes);
+    }else{
+        cout << "Reserve Failed" << endl;
+    }
+
+    packet = pabb2_PacketSender_reserve_packet(&queue, 15);
+    if (packet){
+        packet->opcode = 4;
+        pabb2_PacketSender_commit_packet(&queue, packet);
+        sender.send(packet, packet->packet_bytes);
+    }else{
+        cout << "Reserve Failed" << endl;
+    }
+
+    packet = pabb2_PacketSender_reserve_packet(&queue, 16);
+    if (packet){
+        packet->opcode = 5;
+        pabb2_PacketSender_commit_packet(&queue, packet);
+        sender.send(packet, packet->packet_bytes);
+    }else{
+        cout << "Reserve Failed" << endl;
+    }
+
+    cout << dump(queue) << endl;
+
+#if 1
+    pabb2_PacketSender_remove(&queue, 0);
+    packet = pabb2_PacketSender_reserve_packet(&queue, 16);
+    if (packet){
+        packet->opcode = 6;
+        pabb2_PacketSender_commit_packet(&queue, packet);
+        sender.send(packet, packet->packet_bytes);
+    }else{
+        cout << "Reserve Failed" << endl;
+    }
+
+    cout << dump(queue) << endl;
+#endif
+
+    packet = pabb2_PacketSender_reserve_packet(&queue, 16);
+    if (packet){
+        packet->opcode = 7;
+        pabb2_PacketSender_commit_packet(&queue, packet);
+        sender.send(packet, packet->packet_bytes);
+    }else{
+        cout << "Reserve Failed" << endl;
+    }
+
+
+#endif
+
+
+
+#if 0
     LogSender sender;
     PABotBase2::RequestQueue queue(logger, sender, 16, 64);
 
@@ -355,6 +555,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     cout << "Dumping queue... 0" << endl;
     cout << queue.dump_queue(true) << endl;
 
+#if 0
     {
         queue.report_acked(0);
         cout << "Dumping queue... 3" << endl;
@@ -365,12 +566,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         cout << "Dumping queue... 2" << endl;
         cout << queue.dump_queue(true) << endl;
     }
+#endif
     {
         queue.report_acked(7);
         cout << "Dumping queue... 1" << endl;
         cout << queue.dump_queue(true) << endl;
     }
-
+#endif
 
 
 
