@@ -19,6 +19,7 @@ namespace OCR{
 
 std::u32string normalize_utf32(const std::string& text){
     QString qstr = QString::fromStdString(text);
+    qstr = QString::fromStdU32String(run_character_reductions(qstr.toStdU32String()));
     qstr = qstr.normalized(QString::NormalizationForm_KD);
     std::u32string u32 = remove_non_alphanumeric(qstr.toStdU32String());
     u32 = run_character_reductions(u32);
