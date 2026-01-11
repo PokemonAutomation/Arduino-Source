@@ -12,6 +12,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
 #include "PokemonLZA_DonutBerrySession.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "Common/Cpp/PrettyPrint.h"
 
 //#include <iostream>
@@ -286,9 +287,20 @@ void BerrySession::add_berries(
         // reverse the order so that we can pop back
         std::reverse(ordered_berries.begin(), ordered_berries.end());
     } else{
-        // Move to bottom
+        // Move cursr to bottom of the list
         pbf_press_dpad(context, DPAD_UP, 100ms, 500ms);
         context.wait_for_all_requests();
+
+        // A controller bug could appear here:
+        // In normal cases, we call pbf_press_dpad(...DPAD_UP...); context.wait_for_all_requests();
+        // then start searching berries from bottom up. But sometimes the controller will ignore the "wait" command
+        // and read the current berry page before DPAD_UP has taken effect. This will break the program as it cannot
+        // find the berries on the last page.
+        // The code has a fail-safe: if it fails to find the berry, it will go through the entire list again. But
+        // this takes a lot of time.
+        // So instead, here we just wait until the berry selection moves to the bottom of the page:
+        DonutBerriesSelectionWatcher bottom_berry_selection(DonutBerriesSelectionDetector::LAST_BERRY_PAGE_ROW);
+        wait_until(stream, context, std::chrono::seconds(5), {bottom_berry_selection});
     }
 
     while (!ordered_berries.empty()){
