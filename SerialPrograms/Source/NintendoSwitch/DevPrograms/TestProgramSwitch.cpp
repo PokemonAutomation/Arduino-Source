@@ -773,7 +773,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ML::PaddleOCRPipeline paddle_ocr(det_path, rec_path, dict_path);
 
     // auto snapshot = feed.snapshot();
-    std::string text = paddle_ocr.Recognize(image1, {0.278313, 0.761803, 0.420482, 0.045064});
+    std::string text = paddle_ocr.Recognize(image1, {0.275904, 0.821888, 0.404819, 0.047210});
     cout << text << endl;
 
 #endif

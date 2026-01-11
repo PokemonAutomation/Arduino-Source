@@ -40,11 +40,12 @@ private:
 
 };
 
+// convert HCW (height, width, channels) to NCHW (batch N, channels C, height H, width W)
 std::vector<float> PreprocessNCHW(cv::Mat& img);
 
 std::string DecodeCTC(float* data, const std::vector<int64_t>& shape, const std::vector<std::string>& dict);
 
-cv::Mat imageviewrgb32_to_cv_mat(const ImageViewRGB32& image);
+cv::Mat imageviewrgb32_to_cv_mat_rgb(const ImageViewRGB32& image);
 
 cv::Rect ImageFloatBox_to_cv_Rect(size_t width, size_t height, const ImageFloatBox& box);
 

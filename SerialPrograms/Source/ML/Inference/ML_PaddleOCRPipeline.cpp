@@ -54,44 +54,26 @@ void PaddleOCRPipeline::LoadDictionary(const std::string& path) {
 
 std::string PaddleOCRPipeline::Recognize(const ImageViewRGB32& image, const ImageFloatBox& box) {
 
-    cv::Mat cv_image = imageviewrgb32_to_cv_mat(image);
+    // 1. Convert Image to OpenCV image (cv::mat) and crop
+    cv::Mat cv_image = imageviewrgb32_to_cv_mat_rgb(image);
     cv::Rect cv_box = ImageFloatBox_to_cv_Rect(image.width(), image.height(), box);
     cv::Mat crop = cv_image(cv_box);
-    cv::Mat crop_3ch;
-    cv::cvtColor(crop, crop_3ch, cv::COLOR_BGRA2RGB);
-
-    #if 0
-    // Preprocess: Resize to height 48, maintain aspect ratio
-    cv::Mat rec_input;
-    cv::resize(crop, rec_input, cv::Size(320, 48)); // Fixed size for simplicity
-    rec_input.convertTo(rec_input, CV_32FC3, 1.0 / 255.0);
-
-    // Normalize and convert to NCHW
-    std::vector<float> input_tensor_values = PreprocessNCHW(rec_input);
-    // in 2026, the standard input shape for PaddleOCR recognition models (such as PP-OCRv4 or the latest PP-OCRv5 versions) is typically: {1, 3, 48, 320}
-    std::vector<int64_t> shape = {1, 3, 48, 320};
-
-    auto input_tensor = Ort::Value::CreateTensor<float>(memory_info, input_tensor_values.data(), 
-                                                        input_tensor_values.size(), shape.data(), shape.size());
-
-                                                        
-    #endif
-    // If Dynamic: The shape is expressed as {1, 3, 48, -1}. In your C++ code, you would calculate the width based on the aspect ratio of the cropped box:
-    // Formula: 
-    // NewWidth = OriginalWidth * 48/OriginalHeight: 
-    // Constraint: Many models require the width to be a multiple of 4 or 8.
-
-   // dynamic width
-        // 1. Calculate dynamic width (maintain aspect ratio)
+    
+    // 2a. Calculate dynamic width (maintain aspect ratio)
+    // the model shape is {1, 3, 48, dynamic_width}. Note that the height is fixed at 48 pixels
+    // the input image must be scaled to match the height of 48, for the neural network
     int target_h = 48;
-    float aspect_ratio = (float)crop_3ch.cols / (float)crop_3ch.rows;
+    float aspect_ratio = (float)crop.cols / (float)crop.rows;
     int target_w = static_cast<int>(target_h * aspect_ratio);
     
-    // target_w = std::max(32, (target_w / 8) * 8);  // no need to round to 32 for recognition, only for detection
-
-    // 2. Preprocess: Resize and Normalize
+    // 2b. Resize
     cv::Mat resized;
-    cv::resize(crop_3ch, resized, cv::Size(target_w, target_h));
+    cv::resize(crop, resized, cv::Size(target_w, target_h));
+
+    // 3. Normalize
+    // convert UC3 8-bit [0,255] to 32FC3 float [-1,1]
+    // output = (Input * Scale) + Shift = (old_pixel * 2/255) - 1. This transforms [0,255] to range [-1.0, 1.0]
+    // TODO: determine if normalizing to [-1,1] is preferred or to perform ImageNet normalization (mean = [0.485, 0.456, 0.406] and std = [0.229, 0.224, 0.225])
     resized.convertTo(resized, CV_32FC3, 2.0 / 255.0, -1.0);
     
     // 3. Convert HWC to NCHW
@@ -106,28 +88,20 @@ std::string PaddleOCRPipeline::Recognize(const ImageViewRGB32& image, const Imag
         input_shape.data(), input_shape.size()
     );
 
-                      
-    #if 0
-    // Create the allocator
+    // 6. Get input and output names from the model                      
     Ort::AllocatorWithDefaultOptions allocator;    
-
     // Get Input Name
     Ort::AllocatedStringPtr input_name_ptr = rec_session.GetInputNameAllocated(0, allocator);
-    const char* input_name = input_name_ptr.get();
+    const char* input_name = input_name_ptr.get();  // "x"
 
     // Get Output Name
     Ort::AllocatedStringPtr output_name_ptr = rec_session.GetOutputNameAllocated(0, allocator);
-    const char* output_name = output_name_ptr.get();
-    #endif
+    const char* output_name = output_name_ptr.get();  // fetch_name_0 is the output name as per Netron
 
-    // const char* input_names[] = {"x"};
-    // const char* output_names[] = {"softmax_0.tmp_0"}; // Check your model output name
+    const char* input_names[] = {input_name};
+    const char* output_names[] = {output_name};  
 
-    const char* input_names[] = {"x"};
-    const char* output_names[] = {"fetch_name_0"};  // this is the output name as per Netron
-
-
-    // auto outputs = rec_session.Run(Ort::RunOptions{nullptr}, input_name, &input_tensor, 1, output_name, 1);
+    // 7. Run the recognition session
     auto outputs = rec_session.Run(
         Ort::RunOptions{nullptr}, 
         input_names,   // char** 
@@ -163,7 +137,7 @@ std::string DecodeCTC(float* data, const std::vector<int64_t>& shape, const std:
         size_t argmax = std::distance(row, std::max_element(row, row + num_cls));
 
         // 2. CTC Decoding Rules:
-        // Rule A: Index 0 is the CTC Blank. SKIP it.
+        // Rule A: Index 0 is the CTC Blank. Skip it.
         // Rule B: Skip consecutive duplicate characters (e.g., "aa" -> "a").
         if (argmax > 0 && argmax != last_index) {
             // Index 1 from the model maps to the 1st line of your .txt file (Vector index 0)
@@ -177,31 +151,6 @@ std::string DecodeCTC(float* data, const std::vector<int64_t>& shape, const std:
     return text;
 }
 
-#if 0
-std::string DecodeCTC(const float* data, const std::vector<int64_t>& shape, const std::vector<std::string>& dict) {
-    std::string text = "";
-    int seq_len = static_cast<int>(shape[1]);
-    int num_classes = static_cast<int>(shape[2]);
-    int last_index = -1;
-
-    for (int i = 0; i < seq_len; ++i) {
-        // 1. Find the index with the maximum probability (Argmax)
-        const float* row = data + (i * num_classes);
-        int argmax_idx = std::distance(row, std::max_element(row, row + num_classes));
-
-        // 2. CTC Logic: 
-        // - Index 0 is the "blank" token in PaddleOCR
-        // - Ignore consecutive duplicates (e.g., "aa" becomes "a")
-        if (argmax_idx > 0 && argmax_idx != last_index) {
-            if (argmax_idx < dict.size()) {
-                text += dict[argmax_idx];
-            }
-        }
-        last_index = argmax_idx;
-    }
-    return text;
-}
-#endif
 
 template <typename _Tp>
 _Tp safe_convert(size_t value) {
@@ -211,13 +160,20 @@ _Tp safe_convert(size_t value) {
     return static_cast<_Tp>(value);
 }
 
-// Assumes QImage is in Format_RGB888 or Format_BGR888
-cv::Mat imageviewrgb32_to_cv_mat(const ImageViewRGB32& image) {
-    return cv::Mat(safe_convert<int>(image.height()), 
-                   safe_convert<int>(image.width()), 
-                   CV_8UC4, 
-                   static_cast<void*>(const_cast<uint32_t*>(image.data())),
-                   image.bytes_per_row());
+// Convert ImageViewRGB32 (ARGB) to CV Mat (RGB). Create a new copy of the image.
+cv::Mat imageviewrgb32_to_cv_mat_rgb(const ImageViewRGB32& image) {
+    // 1. Wrap the existing 4-channel data without copying memory
+    cv::Mat bgra_wrap(safe_convert<int>(image.height()), 
+                      safe_convert<int>(image.width()), 
+                      CV_8UC4, 
+                      static_cast<void*>(const_cast<uint32_t*>(image.data())),
+                      image.bytes_per_row());
+
+    // 2. Convert and copy to a new 3-channel RGB Mat
+    cv::Mat rgb;
+    cv::cvtColor(bgra_wrap, rgb, cv::COLOR_BGRA2RGB);
+
+    return rgb;
 }
 
 cv::Rect ImageFloatBox_to_cv_Rect(size_t width, size_t height, const ImageFloatBox& box){
