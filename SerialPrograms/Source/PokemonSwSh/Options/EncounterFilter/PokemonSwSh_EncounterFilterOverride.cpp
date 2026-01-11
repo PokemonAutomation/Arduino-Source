@@ -30,6 +30,7 @@ EncounterFilterOverride::EncounterFilterOverride(EditableTableOption& parent_tab
     : EditableTableRow(parent_table)
     , pokemon(COMBINED_DEX_NAMES(), LockMode::UNLOCK_WHILE_RUNNING, "rookidee")
     , shininess(static_cast<EncounterFilterTable&>(parent_table).rare_stars)
+    , pokeball(LockMode::UNLOCK_WHILE_RUNNING)
     , ball_limit(LockMode::UNLOCK_WHILE_RUNNING, 40, 1, 999)
 {
     PA_ADD_OPTION(pokemon);
