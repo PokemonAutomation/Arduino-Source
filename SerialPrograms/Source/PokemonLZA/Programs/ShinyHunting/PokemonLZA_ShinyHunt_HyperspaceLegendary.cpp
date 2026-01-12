@@ -77,6 +77,7 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
     : SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::STOP_PROGRAM)
     , LEGENDARY("<b>Legendary " + STRING_POKEMON + ":</b>",
         {
+            {Legendary::LATIAS, "latias", "Latias"},
             {Legendary::LATIOS, "latios", "Latios"},
             {Legendary::COBALION, "cobalion", "Cobalion"},
             {Legendary::TERRAKION, "terrakion", "Terrakion"},
@@ -110,6 +111,168 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
 
 namespace {
 
+// Start at the ladder up to Latias and use it to fix the position and camera angle
+// Run a route to the other side of the roof and begin a shuttle run to respawn Latias repeatedly
+// Route back to Latias to trigger a potential shiny sound when calories are low
+void hunt_latias(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
+    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
+{
+    // Start at the ladder and use it to fix the position and camera angle
+    // Run a route to get to the reset cycle start point
+    detect_interactable(env.console, context); // This should be renamed
+    pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
+    pbf_move_left_joystick(context, {0, -0.5}, 80ms, 1200ms);
+
+    // Roll backwards to align against the edge of the Munna roof
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Roll left on the overhang to get to the far corner
+    ssf_press_left_joystick(context, {-0.5, 0}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    // Slightly longer due to falling off a ledge
+    pbf_press_button(context, BUTTON_Y, 100ms, 1200ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    // Roll to align against the bulkhead
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Roll down the corridor next to the bulkhead
+    ssf_press_left_joystick(context, {0, -0.5}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Roll towards the corner of the Kirlia rooftop
+    ssf_press_left_joystick(context, {-0.5, 0}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Rolling at this angle puts you at the very edge of the lower corner roof, at the start of the reset path
+    ssf_press_left_joystick(context, {-0.20, +0.5}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    // Fall down 2 roof levels
+    pbf_press_button(context, BUTTON_Y, 100ms, 1200ms);
+
+    // Adjust the camera angle to face the direction of the reset path
+    pbf_move_left_joystick(context, {+0.357, +0.5}, 500ms, 500ms);
+    pbf_press_button(context, BUTTON_L, 80ms, 160ms);
+
+    // Climb up from the overhang to the lower corner rooftop
+    pbf_move_left_joystick(context, {0, +1}, 500ms, 1200ms);
+
+    // Start of actual reset cycle
+    while (true){
+        // Roll to the edge of the lower corner rooftop
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+        // Climb onto the upper rooftop
+        pbf_move_left_joystick(context, {0, +1}, 500ms, 1200ms);
+
+        // Roll forward and align against the far chimney
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+        // Latias spawns here
+
+        // Roll back to the start on the lower corner rooftop
+        ssf_press_left_joystick(context, {0, -0.5}, 0ms, 500ms, 0ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1200ms);
+        // Latias despawns here
+
+        // Turn back around to face the chimney
+        ssf_press_left_joystick(context, {0, +0.5}, 0ms, 500ms, 0ms);
+
+        const uint16_t min_calorie = MIN_CALORIE_TO_CATCH + (15 + 30) * 10;
+        if (check_calorie(env.console, context, min_calorie)){
+            break;
+        }
+    }
+
+    // Roll and climb onto the upper rooftop
+    pbf_move_left_joystick(context, {0, +1}, 500ms, 1200ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_move_left_joystick(context, {0, +1}, 500ms, 1200ms);
+
+    // Roll to the right, next to the Kirlia rooftop
+    ssf_press_left_joystick(context, {+0.5, 0}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Climb onto the Kirlia rooftop
+    pbf_move_left_joystick(context, {0, -1}, 500ms, 1200ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Roll right towards the bulkhead
+    ssf_press_left_joystick(context, {+0.5, 0}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Adjust the camera angle back to the original angle
+    pbf_move_left_joystick(context, {-0.357, +0.5}, 80ms, 160ms);
+    pbf_press_button(context, BUTTON_L, 80ms, 160ms);
+
+    // Climb onto the next rooftop
+    ssf_press_left_joystick(context, {+0.5, 0}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Roll towards the Munna rooftop
+    pbf_move_left_joystick(context, {+1, 0}, 500ms, 1200ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Climb onto the Munna rooftop and roll
+    pbf_move_left_joystick(context, {+1, 0}, 500ms, 1200ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Roll back towards the ladder
+    ssf_press_left_joystick(context, {0, +0.5}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    context.wait_for_all_requests();
+
+    // Snap to the ladder by moving and watching for the A button prompt
+    ButtonWatcher ButtonA(
+        COLOR_RED,
+        ButtonType::ButtonA,
+        {0.4, 0.1, 0.2, 0.8},
+        &env.console.overlay(),
+        Milliseconds(100)
+    );
+    const int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [&](ProControllerContext& context){
+            pbf_move_left_joystick(context, {+0.5, +1}, 5000ms, 0ms);
+        },
+        {{ButtonA}}
+    );
+    if (ret < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "hunt_latias(): Cannot detect ladder after 5 seconds",
+            env.console
+        );
+    } else {
+        env.console.log("Detected ladder.");
+    }
+
+    // Run to Latias to trigger a potential shiny sound
+    env.log("Move to check Latias.");
+    env.add_overlay_log("To Check Latias");
+    pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+    ssf_press_left_joystick(context, {0, +1}, 0ms, 4000ms, 0ms);
+    pbf_mash_button(context, BUTTON_Y, 4000ms);
+    context.wait_for_all_requests();
+}
 
 // We save at warp pad and spawn Latios only once per game reset
 void hunt_latios(
@@ -118,11 +281,11 @@ void hunt_latios(
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
     SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
 {
-    detect_warp_pad(env.console, context);
+    detect_interactable(env.console, context);
     // Warp to rooftop to see Latios
     pbf_press_button(context, BUTTON_A, 160ms, 80ms);
     context.wait_for_all_requests();
-    detect_warp_pad(env.console, context);
+    detect_interactable(env.console, context);
 
     stats.spawns++;
     env.update_stats();
@@ -197,17 +360,17 @@ void hunt_terrakion(
 {
     while(true){
         // Warp away from Terrakion to despawn
-        detect_warp_pad(env.console, context);
+        detect_interactable(env.console, context);
         pbf_press_button(context, BUTTON_A, 160ms, 80ms);
         context.wait_for_all_requests();
 
         // Warp towards Terrakion
-        detect_warp_pad(env.console, context);
+        detect_interactable(env.console, context);
         pbf_press_button(context, BUTTON_A, 160ms, 80ms);
         context.wait_for_all_requests();
 
         // Roll and roll back on Terrakion's roof to respawn
-        detect_warp_pad(env.console, context);
+        detect_interactable(env.console, context);
         pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
         pbf_move_left_joystick(context, {0, -1}, 80ms, 160ms);
         pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
@@ -225,14 +388,14 @@ void hunt_terrakion(
     }
 
     // Use warp pads to reset position
-    detect_warp_pad(env.console, context);
+    detect_interactable(env.console, context);
     pbf_press_button(context, BUTTON_A, 160ms, 80ms);
     context.wait_for_all_requests();
 
-    detect_warp_pad(env.console, context);
+    detect_interactable(env.console, context);
     pbf_press_button(context, BUTTON_A, 160ms, 80ms);
     context.wait_for_all_requests();
-    detect_warp_pad(env.console, context);
+    detect_interactable(env.console, context);
 
     // Roll to Terrakion to trigger potential shiny sound
     env.log("Move to check Terrakion.");
@@ -458,7 +621,9 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
         const int ret = run_until<ProControllerContext>(
             env.console, context,
             [&](ProControllerContext& context){
-                if (LEGENDARY == Legendary::LATIOS){
+                if (LEGENDARY == Legendary::LATIAS){
+                    hunt_latias(env, context, stats, MIN_CALORIE_TO_CATCH);
+                } else if (LEGENDARY == Legendary::LATIOS){
                     hunt_latios(env, context, stats, MIN_CALORIE_TO_CATCH);
                 } else if (LEGENDARY == Legendary::VIRIZION){
                     hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH, use_switch1_only_timings);
