@@ -9,15 +9,49 @@
 #include <fstream>
 #include <numeric>
 #include <limits>
+#include "CommonFramework/Globals.h"
 #include "Common/Cpp/Exceptions.h"
 #include "ML_PaddleOCRPipeline.h"
 
 namespace PokemonAutomation{
 namespace ML{
 
-PaddleOCRPipeline::PaddleOCRPipeline(std::string det_path, std::string rec_path, std::string dict_path)
+
+static std::pair<std::string, std::string> get_paths(Language language){
+    std::string base = RESOURCE_PATH() + "ML/";
+    switch(language){
+    case Language::None:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to call OCR without a language.");
+    case Language::English:
+        return {base + "english/rec.onnx", base + "english/dict.txt"};
+    case Language::Japanese:
+        return {base + "chinese/rec.onnx", base + "chinese/dict.txt"};
+    case Language::Spanish:
+        return {base + "latin/rec.onnx", base + "latin/dict.txt"};
+    case Language::French:
+        return {base + "latin/rec.onnx", base + "latin/dict.txt"};
+    case Language::German:
+        return {base + "latin/rec.onnx", base + "latin/dict.txt"};   
+    case Language::Italian:
+        return {base + "latin/rec.onnx", base + "latin/dict.txt"};   
+    case Language::Korean:
+        return {base + "korean/rec.onnx", base + "korean/dict.txt"};  
+    case Language::ChineseSimplified:
+        return {base + "chinese/rec.onnx", base + "chinese/dict.txt"};
+    case Language::ChineseTraditional:
+        return {base + "chinese/rec.onnx", base + "chinese/dict.txt"}; 
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to call OCR on an unknown language.");
+    }
+}
+
+PaddleOCRPipeline::PaddleOCRPipeline(Language language)
+    : PaddleOCRPipeline(get_paths(language).first, get_paths(language).second)
+{}
+
+PaddleOCRPipeline::PaddleOCRPipeline(std::string rec_path, std::string dict_path)
     : env(ORT_LOGGING_LEVEL_WARNING, "PaddleOCR")
-        , det_session(env, std::wstring(det_path.begin(), det_path.end()).c_str(), Ort::SessionOptions{})
+        // , det_session(env, std::wstring(det_path.begin(), det_path.end()).c_str(), Ort::SessionOptions{})
         , rec_session(env, std::wstring(rec_path.begin(), rec_path.end()).c_str(), Ort::SessionOptions{})
         , memory_info(Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault)) 
 {
@@ -52,23 +86,25 @@ void PaddleOCRPipeline::LoadDictionary(const std::string& path) {
     }
 }
 
-std::string PaddleOCRPipeline::Recognize(const ImageViewRGB32& image, const ImageFloatBox& box) {
+std::string PaddleOCRPipeline::Recognize(const ImageViewRGB32& image) {
 
-    // 1. Convert Image to OpenCV image (cv::mat) and crop
+    // 1. Convert Image to OpenCV image (cv::mat)
     cv::Mat cv_image = imageviewrgb32_to_cv_mat_rgb(image);
+    #if 0
     cv::Rect cv_box = ImageFloatBox_to_cv_Rect(image.width(), image.height(), box);
     cv::Mat crop = cv_image(cv_box);
+    #endif
     
     // 2a. Calculate dynamic width (maintain aspect ratio)
     // the model shape is {1, 3, 48, dynamic_width}. Note that the height is fixed at 48 pixels
     // the input image must be scaled to match the height of 48, for the neural network
     int target_h = 48;
-    float aspect_ratio = (float)crop.cols / (float)crop.rows;
+    float aspect_ratio = (float)cv_image.cols / (float)cv_image.rows;
     int target_w = static_cast<int>(target_h * aspect_ratio);
     
     // 2b. Resize
     cv::Mat resized;
-    cv::resize(crop, resized, cv::Size(target_w, target_h));
+    cv::resize(cv_image, resized, cv::Size(target_w, target_h));
 
     // 3. Normalize
     // convert UC3 8-bit [0,255] to 32FC3 float [-1,1]
