@@ -101,6 +101,8 @@ std::string PaddleOCRPipeline::Recognize(const ImageViewRGB32& image) {
     int target_h = 48;
     float aspect_ratio = (float)cv_image.cols / (float)cv_image.rows;
     int target_w = static_cast<int>(target_h * aspect_ratio);
+
+    if (target_w <= 0) return "";
     
     // 2b. Resize
     cv::Mat resized;
@@ -124,14 +126,19 @@ std::string PaddleOCRPipeline::Recognize(const ImageViewRGB32& image) {
     // 4. Define Dynamic Shape
     std::vector<int64_t> input_shape = {1, 3, target_h, target_w};
 
-    // 5. Create Tensor with the specific dynamic shape
+    // 5. Create tensor with its own managed memory
+    Ort::AllocatorWithDefaultOptions allocator;    
     auto input_tensor = Ort::Value::CreateTensor<float>(
-        memory_info, input_tensor_values.data(), input_tensor_values.size(), 
-        input_shape.data(), input_shape.size()
+        allocator, input_shape.data(), input_shape.size()
     );
 
+    // Copy your processed data into that memory
+    std::memcpy(input_tensor.GetTensorMutableData<float>(), 
+                input_tensor_values.data(), 
+                input_tensor_values.size() * sizeof(float));
+
     // 6. Get input and output names from the model                      
-    Ort::AllocatorWithDefaultOptions allocator;    
+    
     // Get Input Name
     Ort::AllocatedStringPtr input_name_ptr = rec_session.GetInputNameAllocated(0, allocator);
     const char* input_name = input_name_ptr.get();  // "x"
