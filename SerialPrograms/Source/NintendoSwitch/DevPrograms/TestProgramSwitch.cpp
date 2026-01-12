@@ -767,11 +767,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #if 1
 
     ImageRGB32 image1(IMAGE_PATH);
-    ImageViewRGB32 cropped = extract_box_reference(image1, ImageFloatBox{0.275904, 0.821888, 0.404819, 0.047210});
-    ML::PaddleOCRPipeline paddle_ocr(Language::English);
+    ImageViewRGB32 cropped = extract_box_reference(image1, ImageFloatBox{0.128957, 0.764092, 0.123095, 0.029228});
+    ML::PaddleOCRPipeline paddle_ocr(Language::Korean);
 
     // auto snapshot = feed.snapshot();
-    std::string text = paddle_ocr.Recognize(image1);
+    std::string text = paddle_ocr.Recognize(cropped);
     cout << text << endl;
 
 #endif

@@ -128,6 +128,7 @@ std::string PaddleOCRPipeline::Recognize(const ImageViewRGB32& image) {
     // Mean: [0.485, 0.456, 0.406], Std: [0.229, 0.224, 0.225]
     if (!(m_language == Language::ChineseSimplified || 
         m_language == Language::ChineseTraditional ||
+        m_language == Language::Japanese ||
         m_language == Language::Korean))
     {
         cv::Scalar mean(0.485, 0.456, 0.406);
