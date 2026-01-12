@@ -46,14 +46,15 @@ static std::pair<std::string, std::string> get_paths(Language language){
 }
 
 PaddleOCRPipeline::PaddleOCRPipeline(Language language)
-    : PaddleOCRPipeline(get_paths(language).first, get_paths(language).second)
+    : PaddleOCRPipeline(language, get_paths(language).first, get_paths(language).second)
 {}
 
-PaddleOCRPipeline::PaddleOCRPipeline(std::string rec_path, std::string dict_path)
+PaddleOCRPipeline::PaddleOCRPipeline(Language language, std::string rec_path, std::string dict_path)
     : env(ORT_LOGGING_LEVEL_WARNING, "PaddleOCR")
         // , det_session(env, std::wstring(det_path.begin(), det_path.end()).c_str(), Ort::SessionOptions{})
         , rec_session(env, std::wstring(rec_path.begin(), rec_path.end()).c_str(), Ort::SessionOptions{})
         , memory_info(Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault)) 
+        , m_language(language)
 {
     LoadDictionary(dict_path);
 }
@@ -113,12 +114,16 @@ std::string PaddleOCRPipeline::Recognize(const ImageViewRGB32& image) {
     // output = (Input * Scale) = (old_pixel * 1/255). This transforms [0,255] to range [0, 1]
     // TODO: determine if normalizing to [-1,1] is preferred or to perform ImageNet normalization (mean = [0.485, 0.456, 0.406] and std = [0.229, 0.224, 0.225])
     resized.convertTo(resized, CV_32FC3, 1.0 / 255.0);
-    // 3b. Apply Mean/Std (Standard for PaddleOCR)
+    // 3b. Apply Mean/Std (Standard for PaddleOCR). except for Chinese
     // Mean: [0.485, 0.456, 0.406], Std: [0.229, 0.224, 0.225]
-    cv::Scalar mean(0.485, 0.456, 0.406);
-    cv::Scalar std(0.229, 0.224, 0.225);
-    cv::subtract(resized, mean, resized);
-    cv::divide(resized, std, resized);
+    if (!(m_language == Language::ChineseSimplified || 
+        m_language == Language::ChineseTraditional))
+    {
+        cv::Scalar mean(0.485, 0.456, 0.406);
+        cv::Scalar std(0.229, 0.224, 0.225);
+        cv::subtract(resized, mean, resized);
+        cv::divide(resized, std, resized);
+    }
     
     // 3. Convert HWC to NCHW
     std::vector<float> input_tensor_values = PreprocessNCHW(resized);

@@ -26,7 +26,7 @@ namespace ML{
 class PaddleOCRPipeline {
 public:
     PaddleOCRPipeline(Language language);
-    PaddleOCRPipeline(std::string rec_path, std::string dict_path);
+    PaddleOCRPipeline(Language language, std::string rec_path, std::string dict_path);
 
     void Run(const std::string& img_path);
 
@@ -40,6 +40,7 @@ private:
     Ort::Session rec_session;
     Ort::MemoryInfo memory_info;
     std::vector<std::string> m_dictionary;    
+    Language m_language;
 
 };
 
