@@ -58,7 +58,7 @@ bool check_calorie(
 }
 
 // Wait until the warp pad is detected
-void detect_warp_pad(
+void detect_interactable(
     ConsoleHandle& console,
     ProControllerContext& context
 ){
@@ -77,7 +77,7 @@ void detect_warp_pad(
     if (ret < 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "detect_warp_pad(): Cannot detect warp pad after 5 seconds",
+            "detect_interactable_pad(): Cannot detect interactable after 5 seconds",
             console
         );
     } else {
