@@ -162,16 +162,16 @@ void loop_adventures(
             return;
         case AdventureResult::START_ERROR:
             restart_count++;
-            if (restart_count == 3){
+            if (restart_count == 10){
                 report_error(
                     &env.logger(),
                     env.program_info(),
                     "Error",
-                    {{"Message:", "Failed to start adventure 3 times in the row."}}
+                    {{"Message:", "Failed to start adventure 10 times in the row."}}
                 );
                 throw_and_log<OperationFailedException>(
                     env.logger(), ErrorReport::SEND_ERROR_REPORT,
-                    "Failed to start adventure 3 times in the row."
+                    "Failed to start adventure 10 times in the row."
                 );
             }
             env.log("Failed to start adventure. Resetting all Switches...", COLOR_RED);
