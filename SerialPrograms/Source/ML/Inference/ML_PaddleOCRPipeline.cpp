@@ -57,6 +57,16 @@ PaddleOCRPipeline::PaddleOCRPipeline(Language language, std::string rec_path, st
         , m_language(language)
 {
     LoadDictionary(dict_path);
+    
+    // Get input and output names from the model                      
+    // Get Input Name
+    Ort::AllocatorWithDefaultOptions allocator;
+    Ort::AllocatedStringPtr input_name_ptr = rec_session.GetInputNameAllocated(0, allocator);
+    m_input_name = input_name_ptr.get();  // "x"
+
+    // Get Output Name
+    Ort::AllocatedStringPtr output_name_ptr = rec_session.GetOutputNameAllocated(0, allocator);
+    m_output_name = output_name_ptr.get();  // fetch_name_0 is the output name as per Netron
 }
 
 void PaddleOCRPipeline::Run(const std::string& img_path) {
@@ -142,18 +152,8 @@ std::string PaddleOCRPipeline::Recognize(const ImageViewRGB32& image) {
                 input_tensor_values.data(), 
                 input_tensor_values.size() * sizeof(float));
 
-    // 6. Get input and output names from the model                      
-    
-    // Get Input Name
-    Ort::AllocatedStringPtr input_name_ptr = rec_session.GetInputNameAllocated(0, allocator);
-    const char* input_name = input_name_ptr.get();  // "x"
-
-    // Get Output Name
-    Ort::AllocatedStringPtr output_name_ptr = rec_session.GetOutputNameAllocated(0, allocator);
-    const char* output_name = output_name_ptr.get();  // fetch_name_0 is the output name as per Netron
-
-    const char* input_names[] = {input_name};
-    const char* output_names[] = {output_name};  
+    const char* input_names[] = {m_input_name};
+    const char* output_names[] = {m_output_name};  
 
     // 7. Run the recognition session
     auto outputs = rec_session.Run(
