@@ -217,7 +217,7 @@ void hunt_latias(
         // Turn back to around
         ssf_press_left_joystick(context, {0, +0.5}, 0ms, 500ms, 0ms);
 
-        const uint16_t min_calorie = MIN_CALORIE_TO_CATCH + (15 + 30) * 10;
+        const uint16_t min_calorie = MIN_CALORIE_TO_CATCH + 55 * 10;
         if (check_calorie(env.console, context, min_calorie)){
             break;
         }
