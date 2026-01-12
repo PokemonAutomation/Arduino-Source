@@ -766,12 +766,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 #if 1
 
-    ImageRGB32 image1("detect-dialog.png");
+    ImageRGB32 image1(IMAGE_PATH);
     ImageViewRGB32 cropped = extract_box_reference(image1, ImageFloatBox{0.275904, 0.821888, 0.404819, 0.047210});
     ML::PaddleOCRPipeline paddle_ocr(Language::English);
 
     // auto snapshot = feed.snapshot();
-    std::string text = paddle_ocr.Recognize(cropped);
+    std::string text = paddle_ocr.Recognize(image1);
     cout << text << endl;
 
 #endif

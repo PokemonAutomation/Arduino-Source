@@ -19,7 +19,6 @@ namespace OCR{
 struct StringMatchResult;
 class DictionaryMatcher;
 
-static constexpr bool USE_PADDLE_OCR = true;
 
 struct TextColorRange{
     uint32_t mins;

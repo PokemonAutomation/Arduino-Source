@@ -107,10 +107,16 @@ std::string PaddleOCRPipeline::Recognize(const ImageViewRGB32& image) {
     cv::resize(cv_image, resized, cv::Size(target_w, target_h));
 
     // 3. Normalize
-    // convert UC3 8-bit [0,255] to 32FC3 float [-1,1]
-    // output = (Input * Scale) + Shift = (old_pixel * 2/255) - 1. This transforms [0,255] to range [-1.0, 1.0]
+    // convert UC3 8-bit [0,255] to 32FC3 float [0,1], then use ImageNet Normalization
+    // output = (Input * Scale) = (old_pixel * 1/255). This transforms [0,255] to range [0, 1]
     // TODO: determine if normalizing to [-1,1] is preferred or to perform ImageNet normalization (mean = [0.485, 0.456, 0.406] and std = [0.229, 0.224, 0.225])
-    resized.convertTo(resized, CV_32FC3, 2.0 / 255.0, -1.0);
+    resized.convertTo(resized, CV_32FC3, 1.0 / 255.0);
+    // 3b. Apply Mean/Std (Standard for PaddleOCR)
+    // Mean: [0.485, 0.456, 0.406], Std: [0.229, 0.224, 0.225]
+    cv::Scalar mean(0.485, 0.456, 0.406);
+    cv::Scalar std(0.229, 0.224, 0.225);
+    cv::subtract(resized, mean, resized);
+    cv::divide(resized, std, resized);
     
     // 3. Convert HWC to NCHW
     std::vector<float> input_tensor_values = PreprocessNCHW(resized);

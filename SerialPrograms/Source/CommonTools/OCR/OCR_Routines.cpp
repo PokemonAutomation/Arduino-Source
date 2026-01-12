@@ -16,6 +16,9 @@
 // using std::cout;
 // using std::endl;
 
+static constexpr bool USE_PADDLE_OCR = true;
+
+
 namespace PokemonAutomation{
 namespace OCR{
 
@@ -41,6 +44,10 @@ StringMatchResult multifiltered_OCR(
 
     double pixels_inv = 1. / (image.width() * image.height());
 
+    #if 1
+    ML::PaddleOCRPipeline paddle_ocr(language);
+    #endif
+
     //  Run all the filters.
     SpinLock lock;
     StringMatchResult ret;
@@ -50,8 +57,7 @@ StringMatchResult multifiltered_OCR(
 
             std::string text;
             if (USE_PADDLE_OCR){
-                ML::PaddleOCRPipeline paddle_ocr(language);
-                text = paddle_ocr.Recognize(image);
+                text = paddle_ocr.Recognize(filtered.first);
             }else{
                 text = ocr_read(language, filtered.first, psm);
             }
