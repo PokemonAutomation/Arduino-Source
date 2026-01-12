@@ -220,7 +220,7 @@ bool route_hyperspace_wild_zone(
     
     // Fly from map to reset spawns
     std::shared_ptr<const ImageRGB32> overworld_screen;
-    FastTravelState travel_status = fly_from_map(env.console, context, &overworld_screen, BUTTON_PLUS);
+    FastTravelState travel_status = fly_from_map(env.console, context, &overworld_screen);
     if (travel_status != FastTravelState::SUCCESS){
         stats.errors++;
         env.update_stats();

@@ -9,6 +9,8 @@
 #include "Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range.h"
 #include "Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean.h"
 #include "Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness.h"
+#include "CommonFramework/ImageTypes/ImageViewHSV32.h"
+#include "CommonFramework/ImageTypes/ImageHSV32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "ImageFilter.h"
@@ -218,6 +220,19 @@ ImageRGB32 filter_green(
     return ret;
 }
 
-
+ImageRGB32 to_blackwhite_hsv32_range(
+    const ImageViewHSV32& image,
+    bool in_range_black,
+    uint32_t mins, uint32_t maxs
+) {
+    ImageRGB32 ret(image.width(), image.height());
+    Kernels::to_blackwhite_rgb32_range(
+        image.data(), image.bytes_per_row(), image.width(), image.height(),
+        ret.data(), ret.bytes_per_row(),
+        in_range_black,
+        mins, maxs
+    );
+    return ret;
+}
 
 }
