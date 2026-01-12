@@ -5,6 +5,7 @@
  */
 
 #include <chrono>
+#include <set>
 #include "Common/CRC32/pabb_CRC32.h"
 #include "CommonFramework/Logging/Logger.h"
 //#include "CommonFramework/PersistentSettings.h"
@@ -15,6 +16,7 @@
 //#include <iostream>
 //using std::cout;
 //using std::endl;
+//#include "Common/Cpp/PrettyPrint.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -236,6 +238,7 @@ const EnumDropdownDatabase<ControllerType>& ControllerSettingsType_Database(){
 
 
 ControllerSettingsRow::~ControllerSettingsRow(){
+    randomize.remove_listener(static_cast<ButtonListener&>(*this));
     official_color.remove_listener(*this);
 #if 1
     right_grip.remove_listener(*this);
@@ -245,7 +248,7 @@ ControllerSettingsRow::~ControllerSettingsRow(){
 #endif
     controller.remove_listener(*this);
 }
-ControllerSettingsRow::ControllerSettingsRow(EditableTableOption& parent_table)
+ControllerSettingsRow::ControllerSettingsRow(EditableTableOption& parent_table, bool random_profile)
     : EditableTableRow(parent_table)
     , name(false, LockMode::UNLOCK_WHILE_RUNNING, "", "COM3")
     , controller_mac_address(LockMode::UNLOCK_WHILE_RUNNING, 6, nullptr)
@@ -279,6 +282,7 @@ ControllerSettingsRow::ControllerSettingsRow(EditableTableOption& parent_table)
         LockMode::UNLOCK_WHILE_RUNNING,
         0
     )
+    , randomize("Randomize")
     , m_pending_official_load(0)
 {
     add_option(name, "Name");
@@ -288,9 +292,12 @@ ControllerSettingsRow::ControllerSettingsRow(EditableTableOption& parent_table)
     add_option(body_color, "Body");
     add_option(left_grip, "Left Grip");
     add_option(right_grip, "Right Grip");
+    add_option(randomize, "Randomize");
     add_option(official_color, "Official Color");
 
-    set_profile(ControllerSettingsTable::random_profile(controller));
+    if (random_profile){
+        set_profile(ControllerSettingsTable::random_profile(controller, nullptr));
+    }
 
     controller.add_listener(*this);
 #if 1
@@ -300,6 +307,7 @@ ControllerSettingsRow::ControllerSettingsRow(EditableTableOption& parent_table)
     right_grip.add_listener(*this);
 #endif
     official_color.add_listener(*this);
+    randomize.add_listener(static_cast<ButtonListener&>(*this));
 }
 std::unique_ptr<EditableTableRow> ControllerSettingsRow::clone() const{
     std::unique_ptr<ControllerSettingsRow> ret(new ControllerSettingsRow(parent()));
@@ -365,6 +373,9 @@ void ControllerSettingsRow::on_config_value_changed(void* object){
     }
 
 }
+void ControllerSettingsRow::on_press(){
+    set_profile(ControllerSettingsTable::random_profile(controller, nullptr));
+}
 
 
 
@@ -395,23 +406,106 @@ std::vector<std::string> ControllerSettingsTable::make_header() const{
         "Body",
         "Left Grip",
         "Right Grip",
+        "",
         "Quick Select",
     };
 }
 
 
+uint32_t invert_RGB32(uint32_t x){
+    uint8_t r = (uint8_t)(x >> 16);
+    uint8_t g = (uint8_t)(x >>  8);
+    uint8_t b = (uint8_t)(x >>  0);
+    r = 255 - r;
+    g = 255 - g;
+    b = 255 - b;
+    return
+        ((uint32_t)r << 16) |
+        ((uint32_t)g <<  8) |
+        ((uint32_t)b <<  0);
+}
+bool is_white(uint32_t x){
+    uint8_t r = (uint8_t)(x >> 16);
+    uint8_t g = (uint8_t)(x >>  8);
+    uint8_t b = (uint8_t)(x >>  0);
+    return r >= 0xf0 && g >= 0xf0 && b >= 0xf0;
+}
+bool is_black(uint32_t x){
+    uint8_t r = (uint8_t)(x >> 16);
+    uint8_t g = (uint8_t)(x >>  8);
+    uint8_t b = (uint8_t)(x >>  0);
+    return r < 0x10 && g < 0x10 && b < 0x10;
+}
 
-ControllerProfile ControllerSettingsTable::random_profile(ControllerType controller){
+
+ControllerProfile ControllerSettingsTable::random_profile(
+    ControllerType controller,
+    const uint8_t* mac_address
+){
     const std::vector<const ControllerColors*>& DATABASE = OFFICIAL_CONTROLLER_COLORS();
+
+    //  Ban all colors are the similar to the stock colors.
+    static const std::set<std::string> BLACK_LIST{
+        "Developer Black",
+        "Stock: Grey / Grey",
+        "Procon: Stock Black",
+        "Procon: Monster Hunter Rise",
+        "Procon: Monster Hunter Sunbreak",
+    };
 
     ControllerProfile profile;
 
-    uint64_t seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    uint32_t crc32 = 0;
-    pabb_crc32_buffer(&crc32, &seed, sizeof(seed));
-    seed = crc32 % DATABASE.size();
+    uint32_t seed = 0;
+    while (true){
+        if (mac_address){
+            pabb_crc32_buffer(&seed, mac_address, 6 * sizeof(uint8_t));
+        }else{
+            uint64_t seed64 = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+            pabb_crc32_buffer(&seed, &seed64, sizeof(seed64));
+        }
 
-    DATABASE[(size_t)seed]->write_to_profile(profile, controller);
+        size_t index = seed % DATABASE.size();
+//        cout << "index = " << index << endl;
+
+        DATABASE[index]->write_to_profile(profile, controller);
+        if (BLACK_LIST.contains(profile.official_name)){
+            continue;
+        }
+
+//        cout << "name: " << profile.official_name << endl;
+
+        if (seed & 0x80000000){
+            profile.official_name.clear();
+            std::swap(profile.body_color, profile.button_color);
+        }
+        if (seed & 0x40000000){
+            profile.official_name.clear();
+            profile.body_color = invert_RGB32(profile.body_color);
+        }
+        if (seed & 0x20000000){
+            profile.official_name.clear();
+            profile.left_grip = invert_RGB32(profile.left_grip);
+        }
+        if (seed & 0x10000000){
+            profile.official_name.clear();
+            profile.right_grip = invert_RGB32(profile.right_grip);
+        }
+
+        //  Run blacklists.
+        if (is_black(profile.left_grip)){
+            continue;
+        }
+        if (is_black(profile.right_grip)){
+            continue;
+        }
+
+        break;
+    }
+
+//    cout << tostr_hex(profile.body_color) << endl;
+//    cout << tostr_hex(profile.left_grip) << endl;
+//    cout << tostr_hex(profile.right_grip) << endl;
+
     return profile;
 }
 ControllerProfile ControllerSettingsTable::get_or_make_profile(
@@ -473,9 +567,9 @@ ControllerProfile ControllerSettingsTable::get_or_make_profile(
 
     global_logger_tagged().log("ControllerSettingsTable: Creating new profile...");
 
-    profile = random_profile(controller);
+    profile = random_profile(controller, mac_address);
 
-    std::unique_ptr<ControllerSettingsRow> row(new ControllerSettingsRow(*this));
+    std::unique_ptr<ControllerSettingsRow> row(new ControllerSettingsRow(*this, false));
     row->name.set(name);
     row->controller_mac_address.set(mac_address);
     row->controller.set(controller);
