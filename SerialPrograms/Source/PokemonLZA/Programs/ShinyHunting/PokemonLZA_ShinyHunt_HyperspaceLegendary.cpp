@@ -202,6 +202,10 @@ void hunt_latias(
         pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
         // Lataias spawns here
 
+        context.wait_for_all_requests();
+        stats.spawns++;
+        env.update_stats();
+
         // Roll back to the start
         ssf_press_left_joystick(context, {0, -0.5}, 0ms, 500ms, 0ms);
         pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
@@ -263,6 +267,8 @@ void hunt_latias(
     pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
 
     context.wait_for_all_requests();
+    stats.spawns++;
+    env.update_stats();
 
     // Snap to the ladder by detecting the A button prompt
     ButtonWatcher ButtonA(
