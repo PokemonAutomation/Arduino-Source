@@ -13,6 +13,7 @@
 #include <vector>
 #include <onnxruntime_cxx_api.h>
 #include <opencv2/opencv.hpp>
+#include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 
@@ -24,17 +25,19 @@ namespace ML{
 
 class PaddleOCRPipeline {
 public:
-    PaddleOCRPipeline(std::string det_path, std::string rec_path, std::string dict_path);
+    PaddleOCRPipeline(Language language);
+    PaddleOCRPipeline(std::string rec_path, std::string dict_path);
 
     void Run(const std::string& img_path);
 
-    std::string Recognize(const ImageViewRGB32& image, const ImageFloatBox& box);
+    std::string Recognize(const ImageViewRGB32& image);
 
 private:
     void LoadDictionary(const std::string& path);
 
     Ort::Env env;
-    Ort::Session det_session, rec_session;
+    // Ort::Session det_session;
+    Ort::Session rec_session;
     Ort::MemoryInfo memory_info;
     std::vector<std::string> m_dictionary;    
 
