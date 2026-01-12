@@ -78,6 +78,7 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
     , LEGENDARY("<b>Legendary " + STRING_POKEMON + ":</b>",
         {
             {Legendary::LATIOS, "latios", "Latios"},
+            {Legendary::LATIAS, "latias", "Latias"},
             {Legendary::COBALION, "cobalion", "Cobalion"},
             {Legendary::TERRAKION, "terrakion", "Terrakion"},
             {Legendary::VIRIZION,  "virizion",  "Virizion"},
@@ -134,6 +135,166 @@ void hunt_latios(
     pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
     pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
     pbf_wait(context, 500ms);
+    context.wait_for_all_requests();
+}
+
+
+void hunt_latias(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
+    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
+{
+    // Start at the ladder and use it to fix the position and camera angle
+    detect_warp_pad(env.console, context); // This should be renamed
+    pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
+    pbf_move_left_joystick(context, {0, -0.5}, 80ms, 1200ms);
+
+    // Roll backwards to align against the roof edge
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Roll left on the overhang to get to the far corner
+    ssf_press_left_joystick(context, {-0.5, 0}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    // Slightly longer due to falling
+    pbf_press_button(context, BUTTON_Y, 100ms, 1200ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    // Roll to align against bulkhead
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Roll down the corrider next to the bulkhead
+    ssf_press_left_joystick(context, {0, -0.5}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Roll towards the corner of the rooftop
+    ssf_press_left_joystick(context, {-0.5, 0}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Rolling at this angle puts you at the very edge of the roof, at the start of the reset path
+    ssf_press_left_joystick(context, {-0.20, +0.5}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    // Falls down 2 levels
+    pbf_press_button(context, BUTTON_Y, 100ms, 1200ms);
+
+    // Adjust the camera angle to face the direction of the reset path
+    pbf_move_left_joystick(context, {+0.357, +0.5}, 500ms, 500ms);
+    pbf_press_button(context, BUTTON_L, 80ms, 160ms);
+
+    // Climb up from the overhang to the lower rooftop
+    pbf_move_left_joystick(context, {0, +1}, 500ms, 1200ms);
+    
+    // Start of actual reset cycle
+    while (true){
+        // Roll to the edge fo the lower rooftop
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+        // Climb onto the upper rooftop
+        pbf_move_left_joystick(context, {0, +1}, 500ms, 1200ms);
+
+        // Roll forward and align against the far chimney
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+        // Lataias spawns here
+
+        // Roll back to the start
+        ssf_press_left_joystick(context, {0, -0.5}, 0ms, 500ms, 0ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1200ms);
+        // Latias despawns here
+
+        // Turn back to around
+        ssf_press_left_joystick(context, {0, +0.5}, 0ms, 500ms, 0ms);
+
+        const uint16_t min_calorie = MIN_CALORIE_TO_CATCH + (15 + 30) * 10;
+        if (check_calorie(env.console, context, min_calorie)){
+            break;
+        }
+    }
+
+    // Roll and climb onto the upper rooftop
+    pbf_move_left_joystick(context, {0, +1}, 500ms, 1200ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_move_left_joystick(context, {0, +1}, 500ms, 1200ms);
+
+    // Roll to the right, next to the rooftop with the bulkhead
+    ssf_press_left_joystick(context, {+0.5, 0}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Climb onto the rooftop with the bulkhead
+    pbf_move_left_joystick(context, {0, -1}, 500ms, 1200ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Roll right towards the next rooftop
+    ssf_press_left_joystick(context, {+0.5, 0}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Adjust the camera angle back to the original angle
+    pbf_move_left_joystick(context, {-0.357, +0.5}, 80ms, 160ms);
+    pbf_press_button(context, BUTTON_L, 80ms, 160ms);
+
+    // Climb onto the next rooftop
+    ssf_press_left_joystick(context, {+0.5, 0}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Roll towards the Munna rooftop
+    pbf_move_left_joystick(context, {+1, 0}, 500ms, 1200ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Climb the Munna rooftop and roll forward
+    pbf_move_left_joystick(context, {+1, 0}, 500ms, 1200ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Roll back towards the ladder
+    ssf_press_left_joystick(context, {0, +0.5}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    context.wait_for_all_requests();
+
+    // Snap to the ladder by detecting the A button prompt
+    ButtonWatcher ButtonA(
+        COLOR_RED,
+        ButtonType::ButtonA,
+        {0.4, 0.1, 0.2, 0.8},
+        &env.console.overlay(),
+        Milliseconds(100)
+    );
+    const int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [&](ProControllerContext& context){
+            pbf_move_left_joystick(context, {+0.5, +1}, 5000ms, 0ms);
+        },
+        {{ButtonA}}
+    ); 
+    if (ret < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "detect_warp_pad(): Cannot detect ladder after 5 seconds",
+            env.console
+        );
+    } else {
+        env.console.log("Detected ladder.");
+    }
+
+    // Run to Latias to trigger potential shiny sound
+    env.log("Move to check Latias.");
+    env.add_overlay_log("To Check Latias");
+    pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+    ssf_press_left_joystick(context, {0, +1}, 0ms, 4000ms, 0ms);
+    pbf_mash_button(context, BUTTON_Y, 4000ms);
     context.wait_for_all_requests();
 }
 
@@ -460,6 +621,8 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
             [&](ProControllerContext& context){
                 if (LEGENDARY == Legendary::LATIOS){
                     hunt_latios(env, context, stats, MIN_CALORIE_TO_CATCH);
+                } else if (LEGENDARY == Legendary::LATIAS){
+                    hunt_latias(env, context, stats, MIN_CALORIE_TO_CATCH);
                 } else if (LEGENDARY == Legendary::VIRIZION){
                     hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH, use_switch1_only_timings);
                 } else if (LEGENDARY == Legendary::TERRAKION){
