@@ -93,24 +93,52 @@ void PaddleOCRPipeline::LoadDictionary(const std::string& path) {
 std::string PaddleOCRPipeline::Recognize(const ImageViewRGB32& image) {
 
     // 1. Convert Image to OpenCV image (cv::mat)
-    cv::Mat cv_image = imageviewrgb32_to_cv_mat_rgb(image);
-    #if 0
-    cv::Rect cv_box = ImageFloatBox_to_cv_Rect(image.width(), image.height(), box);
-    cv::Mat crop = cv_image(cv_box);
-    #endif
+    cv::Mat cv_image_rgb = imageviewrgb32_to_cv_mat_rgb(image);
+    
+    // 1b. Whitespace Trimming Logic
+    cv::Mat gray;
+    cv::cvtColor(cv_image_rgb, gray, cv::COLOR_BGR2GRAY);
+
+    // Invert image for findNonZero: text becomes white (255), background black (0)
+    cv::Mat binary_inv;
+    cv::threshold(gray, binary_inv, 254, 255, cv::THRESH_BINARY_INV);
+
+    // Find coordinates of all text pixels
+    std::vector<cv::Point> nonZeroCoords;
+    cv::findNonZero(binary_inv, nonZeroCoords);
+
+    cv::Mat cropped_image;
+    if (!nonZeroCoords.empty()) {
+        // Get the minimal bounding rectangle for the text
+        cv::Rect boundingBox = cv::boundingRect(nonZeroCoords);
+        
+        // Add a small buffer/padding around the box if needed (optional)
+        boundingBox.x = std::max(0, boundingBox.x - 2);
+        boundingBox.y = std::max(0, boundingBox.y - 2);
+        boundingBox.width = std::min(cv_image_rgb.cols - boundingBox.x, boundingBox.width + 4);
+        boundingBox.height = std::min(cv_image_rgb.rows - boundingBox.y, boundingBox.height + 4);
+
+        // Crop the original color image
+        cropped_image = cv_image_rgb(boundingBox);
+        // static int i = 0;
+        // cv::imwrite("output" + std::to_string(i) + ".png", cropped_image);
+        // i++;
+    } else {
+        return ""; // Return empty string if no text is detected in the region
+    }
     
     // 2a. Calculate dynamic width (maintain aspect ratio)
     // the model shape is {1, 3, 48, dynamic_width}. Note that the height is fixed at 48 pixels
     // the input image must be scaled to match the height of 48, for the neural network
     int target_h = 48;
-    float aspect_ratio = (float)cv_image.cols / (float)cv_image.rows;
+    float aspect_ratio = (float)cropped_image.cols / (float)cropped_image.rows;
     int target_w = static_cast<int>(target_h * aspect_ratio);
 
     if (target_w <= 0) return "";
     
     // 2b. Resize
     cv::Mat resized;
-    cv::resize(cv_image, resized, cv::Size(target_w, target_h));
+    cv::resize(cropped_image, resized, cv::Size(target_w, target_h));
 
     // 3. Normalize
     // convert UC3 8-bit [0,255] to 32FC3 float [0,1], then use ImageNet Normalization
