@@ -55,18 +55,11 @@ PaddleOCRPipeline::PaddleOCRPipeline(Language language, std::string rec_path, st
         , rec_session(env, std::wstring(rec_path.begin(), rec_path.end()).c_str(), Ort::SessionOptions{})
         , memory_info(Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault)) 
         , m_language(language)
+        , m_input_name(rec_session.GetInputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
+        , m_output_name(rec_session.GetOutputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
 {
     LoadDictionary(dict_path);
     
-    // Get input and output names from the model                      
-    // Get Input Name
-    Ort::AllocatorWithDefaultOptions allocator;
-    Ort::AllocatedStringPtr input_name_ptr = rec_session.GetInputNameAllocated(0, allocator);
-    m_input_name = input_name_ptr.get();  // "x"
-
-    // Get Output Name
-    Ort::AllocatedStringPtr output_name_ptr = rec_session.GetOutputNameAllocated(0, allocator);
-    m_output_name = output_name_ptr.get();  // fetch_name_0 is the output name as per Netron
 }
 
 void PaddleOCRPipeline::Run(const std::string& img_path) {
@@ -154,21 +147,24 @@ std::string PaddleOCRPipeline::Recognize(const ImageViewRGB32& image) {
                 input_tensor_values.data(), 
                 input_tensor_values.size() * sizeof(float));
 
-    const char* input_names[] = {m_input_name};
-    const char* output_names[] = {m_output_name};  
+    const char* input_names[] = {m_input_name.c_str()};
+    const char* output_names[] = {m_output_name.c_str()};  
 
-    // 7. Run the recognition session
-    auto outputs = rec_session.Run(
-        Ort::RunOptions{nullptr}, 
-        input_names,   // char** 
-        &input_tensor, // Ort::Value* (array of 1)
-        1,             // input_count
-        output_names,  // char**
-        1              // output_count
-    );
-    std::cout << "Inference successful for width: " << target_w << std::endl;
-
-    return DecodeCTC(outputs[0].GetTensorMutableData<float>(), outputs[0].GetTensorTypeAndShapeInfo().GetShape(), m_dictionary);
+    try {
+        // 7. Run the recognition session
+        auto outputs = rec_session.Run(
+            Ort::RunOptions{nullptr}, 
+            input_names,   // char** 
+            &input_tensor, // Ort::Value* (array of 1)
+            1,             // input_count
+            output_names,  // char**
+            1              // output_count
+        );
+        return DecodeCTC(outputs[0].GetTensorMutableData<float>(), outputs[0].GetTensorTypeAndShapeInfo().GetShape(), m_dictionary);
+    }catch(Ort::Exception& e){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "PaddleOCRPipeline::Recognize(): Failed." + std::string(e.what()));
+    }
+    
 }
 
 
@@ -219,11 +215,7 @@ _Tp safe_convert(size_t value) {
 // Convert ImageViewRGB32 (ARGB) to CV Mat (RGB). Create a new copy of the image.
 cv::Mat imageviewrgb32_to_cv_mat_rgb(const ImageViewRGB32& image) {
     // 1. Wrap the existing 4-channel data without copying memory
-    cv::Mat bgra_wrap(safe_convert<int>(image.height()), 
-                      safe_convert<int>(image.width()), 
-                      CV_8UC4, 
-                      static_cast<void*>(const_cast<uint32_t*>(image.data())),
-                      image.bytes_per_row());
+    cv::Mat bgra_wrap = image.to_opencv_Mat();
 
     // 2. Convert and copy to a new 3-channel RGB Mat
     cv::Mat rgb;
