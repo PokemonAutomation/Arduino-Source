@@ -190,6 +190,10 @@ void hunt_latias1(
         // Turn back around to face the chimney
         ssf_press_left_joystick(context, {0, +0.5}, 0ms, 500ms, 0ms);
 
+        context.wait_for_all_requests();
+        stats.spawns++;
+        env.update_stats();
+
         const uint16_t min_calorie = MIN_CALORIE_TO_CATCH + (15 + 30) * 10;
         if (check_calorie(env.console, context, min_calorie)){
             break;
@@ -273,6 +277,8 @@ void hunt_latias1(
     ssf_press_left_joystick(context, {0, +1}, 0ms, 4000ms, 0ms);
     pbf_mash_button(context, BUTTON_Y, 4000ms);
     context.wait_for_all_requests();
+    stats.spawns++;
+    env.update_stats();
 }
 
 // We save at warp pad and spawn Latios only once per game reset
