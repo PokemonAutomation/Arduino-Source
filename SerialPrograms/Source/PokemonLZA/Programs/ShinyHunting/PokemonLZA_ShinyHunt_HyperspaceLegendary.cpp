@@ -77,9 +77,9 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
     : SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::STOP_PROGRAM)
     , LEGENDARY("<b>Legendary " + STRING_POKEMON + ":</b>",
         {
-            {Legendary::LATIAS, "latias", "Latias"},
+            {Legendary::LATIAS1, "latias1", "Latias Option 1"},
             {Legendary::LATIOS, "latios", "Latios"},
-            {Legendary::LATIAS, "latias", "Latias"},
+            {Legendary::LATIAS2, "latias2", "Latias Option 2"},
             {Legendary::COBALION, "cobalion", "Cobalion"},
             {Legendary::TERRAKION, "terrakion", "Terrakion"},
             {Legendary::VIRIZION,  "virizion",  "Virizion"},
@@ -115,7 +115,7 @@ namespace {
 // Start at the ladder up to Latias and use it to fix the position and camera angle
 // Run a route to the other side of the roof and begin a shuttle run to respawn Latias repeatedly
 // Route back to Latias to trigger a potential shiny sound when calories are low
-void hunt_latias(
+void hunt_latias1(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
@@ -302,14 +302,14 @@ void hunt_latios(
 }
 
 
-void hunt_latias(
+void hunt_latias2(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
     SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
 {
     // Start at the ladder and use it to fix the position and camera angle
-    detect_warp_pad(env.console, context); // This should be renamed
+    detect_interactable(env.console, context); // This should be renamed
     pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
     pbf_move_left_joystick(context, {0, -0.5}, 80ms, 1200ms);
 
@@ -789,12 +789,12 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
         const int ret = run_until<ProControllerContext>(
             env.console, context,
             [&](ProControllerContext& context){
-                if (LEGENDARY == Legendary::LATIAS){
-                    hunt_latias(env, context, stats, MIN_CALORIE_TO_CATCH);
+                if (LEGENDARY == Legendary::LATIAS1){
+                    hunt_latias1(env, context, stats, MIN_CALORIE_TO_CATCH);
                 } else if (LEGENDARY == Legendary::LATIOS){
                     hunt_latios(env, context, stats, MIN_CALORIE_TO_CATCH);
-                } else if (LEGENDARY == Legendary::LATIAS){
-                    hunt_latias(env, context, stats, MIN_CALORIE_TO_CATCH);
+                } else if (LEGENDARY == Legendary::LATIAS2){
+                    hunt_latias2(env, context, stats, MIN_CALORIE_TO_CATCH);
                 } else if (LEGENDARY == Legendary::VIRIZION){
                     hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH, use_switch1_only_timings);
                 } else if (LEGENDARY == Legendary::TERRAKION){
