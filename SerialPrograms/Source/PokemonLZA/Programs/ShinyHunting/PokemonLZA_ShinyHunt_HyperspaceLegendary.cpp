@@ -162,7 +162,7 @@ void hunt_latias(
 
     // Climb up from the overhang to the lower corner rooftop
     pbf_move_left_joystick(context, {0, +1}, 500ms, 1200ms);
-    
+
     // Start of actual reset cycle
     while (true){
         // Roll to the edge of the lower corner rooftop
@@ -259,7 +259,7 @@ void hunt_latias(
             pbf_move_left_joystick(context, {+0.5, +1}, 5000ms, 0ms);
         },
         {{ButtonA}}
-    ); 
+    );
     if (ret < 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -316,7 +316,7 @@ void hunt_cobalion(
     while(true){
         // run to the right to spawn in Cobalion
         ssf_press_button(context, BUTTON_B, 0ms, 6000ms, 0ms);
-        pbf_move_left_joystick(context, {+1, 0}, 7000ms, 0ms); 
+        pbf_move_left_joystick(context, {+1, 0}, 7000ms, 0ms);
         pbf_wait(context, 100ms);
         // run to the left to despawn
         // add 20ms to try to ensure drift never prevents despawning
@@ -331,7 +331,7 @@ void hunt_cobalion(
         // Spawn refreshing loop takes 14 sec. Going to check Cobalion takes 13 sec.
         // 10 for 10 cal per sec
         const uint16_t min_calorie = MIN_CALORIE_TO_CATCH + (14 + 13) * 10;
-    
+
         if (check_calorie(env.console, context, min_calorie)){
             break;
         }
@@ -342,13 +342,14 @@ void hunt_cobalion(
     env.add_overlay_log("To Check Cobalion");
 
     // run right to line up with Cobalion
-    ssf_press_button(context, BUTTON_B, 0ms, 10000ms, 0ms);
-    pbf_move_left_joystick(context, {+1, 0}, 8370ms, 0ms); 
+    ssf_press_button(context, BUTTON_B, 0ms, 6000ms, 0ms);
+    pbf_move_left_joystick(context, {+1, 0}, 8370ms, 0ms);
     context.wait_for_all_requests();
     stats.spawns++;
     env.update_stats();
     // run forward to trigger potential shiny sound
-    pbf_move_left_joystick(context, {0, +1}, 5000ms, 0ms); 
+    ssf_press_button(context, BUTTON_B, 0ms, 3000ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 4500ms, 0ms);
     pbf_wait(context, 500ms);
 
     context.wait_for_all_requests();
@@ -381,7 +382,7 @@ void hunt_terrakion(
         pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
         pbf_move_left_joystick(context, {0, -1}, 80ms, 160ms);
         pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
-        
+
         context.wait_for_all_requests();
 
         stats.spawns++;
@@ -457,7 +458,7 @@ void hunt_virizion_balcony(
 
         stats.spawns++;
         env.update_stats();
-    
+
         if (check_calorie(env.console, context, min_calorie)){
             break;
         }
@@ -467,7 +468,7 @@ void hunt_virizion_balcony(
     env.add_overlay_log("To Check Virision");
     // We have done enough shuttle runs to refresh Virizion spawns.
     // Now run towards it to check shiny!
-    
+
     // Push left joystick rightward to let the character face right
     pbf_move_left_joystick(context, {+1, 0}, 100ms, 0ms);
     // Roll once to leave the balcony area
@@ -573,7 +574,7 @@ void hunt_virizion_rooftop(
     change_character_facing_direction(0.0, -1.0); // face backwards
     // align camera to face what character is facing
     pbf_press_button(context, BUTTON_L, 200ms, 800ms);
-    
+
     context.wait_for_all_requests();
     env.log("Move to check Virizion");
     env.add_overlay_log("To Check Virizion");
