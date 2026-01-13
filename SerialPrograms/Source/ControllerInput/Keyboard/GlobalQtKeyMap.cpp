@@ -33,14 +33,14 @@ QtKeyMap::QtKey QtKeyMap::record(const QKeyEvent& event){
 
 //    cout << "key: " << ret.key << ", keypad = " << ret.keypad << endl;
 
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     m_map[native_key].insert(ret);
 
     return ret;
 }
 
 std::set<QtKeyMap::QtKey> QtKeyMap::get_QtKeys(uint32_t native_key) const{
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     auto iter = m_map.find(native_key);
     if (iter != m_map.end()){
         return iter->second;

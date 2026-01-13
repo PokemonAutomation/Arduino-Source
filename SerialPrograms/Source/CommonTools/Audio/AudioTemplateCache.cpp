@@ -26,7 +26,7 @@ AudioTemplateCache& AudioTemplateCache::instance(){
 
 
 const AudioTemplate* AudioTemplateCache::get_nothrow_internal(const std::string& full_path_no_ext, size_t sample_rate){
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     auto iter = m_cache.find(full_path_no_ext);
     if (iter != m_cache.end()){
         return &iter->second;

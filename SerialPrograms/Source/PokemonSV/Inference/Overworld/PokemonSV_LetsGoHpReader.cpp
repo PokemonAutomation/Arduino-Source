@@ -34,13 +34,13 @@ void LetsGoHpWatcher::make_overlays(VideoOverlaySet& items) const{
 
 void LetsGoHpWatcher::clear(){
 //    m_last_known_value.store(-1, std::memory_order_relaxed);
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     m_history.clear();
 }
 double LetsGoHpWatcher::last_known_value() const{
     std::vector<double> sorted;
     {
-        ReadSpinLock lg(m_lock);
+        ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
 
         //  No history.
         if (m_history.empty()){
@@ -76,7 +76,7 @@ bool LetsGoHpWatcher::process_frame(const ImageViewRGB32& frame, WallClock times
     }
 //    m_last_known_value.store(hp, std::memory_order_relaxed);
 
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     if (m_history.empty()){
         m_history.emplace_back(timestamp, hp);
         return false;

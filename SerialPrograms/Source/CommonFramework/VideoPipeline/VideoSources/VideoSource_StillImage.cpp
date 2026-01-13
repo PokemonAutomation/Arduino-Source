@@ -24,16 +24,16 @@ bool VideoSourceDescriptor_StillImage::operator==(const VideoSourceDescriptor& x
 
     std::string other_path = static_cast<const VideoSourceDescriptor_StillImage&>(x).m_path;
 
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     return m_path == other_path;
 }
 
 std::string VideoSourceDescriptor_StillImage::path() const{
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     return m_path;
 }
 void VideoSourceDescriptor_StillImage::set_path(std::string path){
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     m_path = std::move(path);
 }
 
@@ -50,12 +50,12 @@ void VideoSourceDescriptor_StillImage::load_json(const JsonValue& json){
 //    cout << "load_json: " << m_path << endl;
     const std::string* name = json.to_string();
     if (name != nullptr){
-        WriteSpinLock lg(m_lock);
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_path = *name;
     }
 }
 JsonValue VideoSourceDescriptor_StillImage::to_json() const{
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     return m_path;
 }
 

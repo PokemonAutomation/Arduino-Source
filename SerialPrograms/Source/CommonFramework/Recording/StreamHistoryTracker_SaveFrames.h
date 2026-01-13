@@ -95,7 +95,7 @@ StreamHistoryTracker::StreamHistoryTracker(
 {}
 
 void StreamHistoryTracker::set_window(std::chrono::seconds window){
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     m_window = window;
     clear_old();
 }
@@ -104,7 +104,7 @@ void StreamHistoryTracker::on_samples(const float* samples, size_t frames){
         return;
     }
     WallClock now = current_time();
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
 //    cout << "on_samples() = " << m_audio.size() << endl;
     m_audio.emplace_back(std::make_shared<AudioBlock>(
         now, samples, frames * m_audio_samples_per_frame
@@ -117,7 +117,7 @@ void StreamHistoryTracker::on_frame(std::shared_ptr<VideoFrame> frame){
     //  due to them caching uncompressed bitmaps.
 //    return;   //  TODO
 
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
 //    cout << "on_frame() = " << m_frames.size() << endl;
     m_frames.emplace_back(std::move(frame));
     clear_old();
@@ -130,7 +130,7 @@ void StreamHistoryTracker::clear_old(){
     WallClock now = current_time();
     WallClock threshold = now - m_window;
 
-//    WriteSpinLock lg(m_lock);
+//    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
 //    cout << "enter" << endl;
     while (!m_audio.empty()){
 //        cout << "audio.size() = " << m_audio.size() << endl;
@@ -169,7 +169,7 @@ bool StreamHistoryTracker::save(Logger& logger, const std::string& filename) con
     std::deque<std::shared_ptr<VideoFrame>> frames;
     {
         //  Fast copy the current state of the stream.
-        WriteSpinLock lg(m_lock);
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_audio.empty() && m_frames.empty()){
             return false;
         }
