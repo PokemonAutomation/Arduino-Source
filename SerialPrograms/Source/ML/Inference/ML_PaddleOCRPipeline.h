@@ -39,10 +39,10 @@ private:
     // Ort::Session det_session;
     Ort::Session rec_session;
     Ort::MemoryInfo memory_info;
-    std::vector<std::string> m_dictionary;    
     Language m_language;
-    const char* m_input_name;
-    const char* m_output_name;
+    std::string m_input_name;
+    std::string m_output_name;
+    std::vector<std::string> m_dictionary;    
 
 };
 
