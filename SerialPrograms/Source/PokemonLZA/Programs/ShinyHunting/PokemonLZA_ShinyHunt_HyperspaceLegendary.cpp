@@ -78,8 +78,8 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
     , LEGENDARY("<b>Legendary " + STRING_POKEMON + ":</b>",
         {
             {Legendary::LATIAS1, "latias1", "Latias Option 1"},
-            {Legendary::LATIOS, "latios", "Latios"},
             {Legendary::LATIAS2, "latias2", "Latias Option 2"},
+            {Legendary::LATIOS, "latios", "Latios"},
             {Legendary::COBALION, "cobalion", "Cobalion"},
             {Legendary::TERRAKION, "terrakion", "Terrakion"},
             {Legendary::VIRIZION,  "virizion",  "Virizion"},
@@ -123,7 +123,7 @@ void hunt_latias1(
 {
     // Start at the ladder and use it to fix the position and camera angle
     // Run a route to get to the reset cycle start point
-    detect_interactable(env.console, context); // This should be renamed
+    detect_interactable(env.console, context);
     pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
     pbf_move_left_joystick(context, {0, -0.5}, 80ms, 1200ms);
 
@@ -309,7 +309,7 @@ void hunt_latias2(
     SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
 {
     // Start at the ladder and use it to fix the position and camera angle
-    detect_interactable(env.console, context); // This should be renamed
+    detect_interactable(env.console, context);
     pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
     pbf_move_left_joystick(context, {0, -0.5}, 80ms, 1200ms);
 
@@ -791,10 +791,10 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
             [&](ProControllerContext& context){
                 if (LEGENDARY == Legendary::LATIAS1){
                     hunt_latias1(env, context, stats, MIN_CALORIE_TO_CATCH);
-                } else if (LEGENDARY == Legendary::LATIOS){
-                    hunt_latios(env, context, stats, MIN_CALORIE_TO_CATCH);
                 } else if (LEGENDARY == Legendary::LATIAS2){
                     hunt_latias2(env, context, stats, MIN_CALORIE_TO_CATCH);
+                } else if (LEGENDARY == Legendary::LATIOS){
+                    hunt_latios(env, context, stats, MIN_CALORIE_TO_CATCH);
                 } else if (LEGENDARY == Legendary::VIRIZION){
                     hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH, use_switch1_only_timings);
                 } else if (LEGENDARY == Legendary::TERRAKION){
