@@ -169,7 +169,6 @@
 #include "Common/CRC32/pabb_CRC32.h"
 #include "Common/PABotBase2/PABotBase2_PacketParser.h"
 #include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
-#include "Controllers/PABotBase2/PABotBase2_CC_RequestQueue.h"
 #include "ML/Inference/ML_PaddleOCRPipeline.h"
 
 
