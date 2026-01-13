@@ -247,6 +247,7 @@ TestProgram::TestProgram()
         false
     )
     , IMAGE_PATH(false, "Path to image for testing", LockMode::UNLOCK_WHILE_RUNNING, "default.png", "default.png")
+    , FLOAT("Float option:", LockMode::UNLOCK_WHILE_RUNNING, 0) 
     , STATIC_TEXT("Test text...")
     , BOX("Box", LockMode::UNLOCK_WHILE_RUNNING, 0, 0, 1, 1)
     , BUTTONS("Buttons", ProController_Button_Database(), LockMode::UNLOCK_WHILE_RUNNING, BUTTON_NONE)
@@ -271,6 +272,7 @@ TestProgram::TestProgram()
     PA_ADD_OPTION(LANGUAGE);
 //    PA_ADD_OPTION(CONSOLE_MODEL);
     PA_ADD_OPTION(IMAGE_PATH);
+    PA_ADD_OPTION(FLOAT);
     PA_ADD_OPTION(STATIC_TEXT);
     PA_ADD_OPTION(BOX);
     PA_ADD_OPTION(BUTTONS);
@@ -766,9 +768,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 #if 1
 
-    ImageRGB32 image1(IMAGE_PATH);
-    ImageViewRGB32 cropped = extract_box_reference(image1, ImageFloatBox{0.128957, 0.764092, 0.123095, 0.029228});
-    ML::PaddleOCRPipeline paddle_ocr(Language::Korean);
+    // ImageRGB32 image1(IMAGE_PATH);
+    auto image1 = feed.snapshot();
+    ImageViewRGB32 cropped = extract_box_reference(image1, ImageFloatBox{BOX.x(), BOX.y(), BOX.width(), BOX.height()});
+    ML::PaddleOCRPipeline paddle_ocr(LANGUAGE);
 
     // auto snapshot = feed.snapshot();
     std::string text = paddle_ocr.Recognize(cropped);
