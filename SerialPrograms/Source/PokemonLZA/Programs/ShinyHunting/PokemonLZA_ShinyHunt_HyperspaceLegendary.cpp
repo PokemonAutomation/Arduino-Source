@@ -77,14 +77,14 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
     : SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::STOP_PROGRAM)
     , LEGENDARY("<b>Legendary " + STRING_POKEMON + ":</b>",
         {
-            {Legendary::LATIOS, "latios", "Latios"},
             {Legendary::LATIAS, "latias", "Latias"},
+            {Legendary::LATIOS, "latios", "Latios"},
             {Legendary::COBALION, "cobalion", "Cobalion"},
             {Legendary::TERRAKION, "terrakion", "Terrakion"},
             {Legendary::VIRIZION,  "virizion",  "Virizion"},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        Legendary::VIRIZION
+        Legendary::LATIAS
     )
     , MIN_CALORIE_TO_CATCH(
         "<b>Minimum Cal. Reserved to Catch Legendary:</b><br>If applicable, the program will stop refreshing the Legendary spawn to give this amount of Calorie left for catching the Legendary."
@@ -110,33 +110,6 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
 }
 
 namespace {
-
-// We save at warp pad and spawn Latios only once per game reset
-void hunt_latios(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
-    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
-{
-    detect_interactable(env.console, context);
-    // Warp to rooftop to see Latios
-    pbf_press_button(context, BUTTON_A, 160ms, 80ms);
-    context.wait_for_all_requests();
-    detect_interactable(env.console, context);
-
-    stats.spawns++;
-    env.update_stats();
-    // Roll to Latios to trigger potential shiny sound
-
-
-    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
-    pbf_wait(context, 500ms); // wait for falling down
-    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
-    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
-    pbf_wait(context, 500ms);
-    context.wait_for_all_requests();
-}
-
 
 // Start at the ladder up to Latias and use it to fix the position and camera angle
 // Run a route to the other side of the roof and begin a shuttle run to respawn Latias repeatedly
@@ -303,6 +276,33 @@ void hunt_latias(
     pbf_press_button(context, BUTTON_A, 160ms, 80ms);
     ssf_press_left_joystick(context, {0, +1}, 0ms, 4000ms, 0ms);
     pbf_mash_button(context, BUTTON_Y, 4000ms);
+    context.wait_for_all_requests();
+}
+
+
+// We save at warp pad and spawn Latios only once per game reset
+void hunt_latios(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
+    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
+{
+    detect_interactable(env.console, context);
+    // Warp to rooftop to see Latios
+    pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+    context.wait_for_all_requests();
+    detect_interactable(env.console, context);
+
+    stats.spawns++;
+    env.update_stats();
+    // Roll to Latios to trigger potential shiny sound
+
+
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_wait(context, 500ms); // wait for falling down
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_wait(context, 500ms);
     context.wait_for_all_requests();
 }
 
@@ -628,10 +628,11 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
         const int ret = run_until<ProControllerContext>(
             env.console, context,
             [&](ProControllerContext& context){
-                if (LEGENDARY == Legendary::LATIOS){
-                    hunt_latios(env, context, stats, MIN_CALORIE_TO_CATCH);
-                } else if (LEGENDARY == Legendary::LATIAS){
+                if (LEGENDARY == Legendary::LATIAS){
                     hunt_latias(env, context, stats, MIN_CALORIE_TO_CATCH);
+                }
+                else if (LEGENDARY == Legendary::LATIOS){
+                    hunt_latios(env, context, stats, MIN_CALORIE_TO_CATCH);
                 } else if (LEGENDARY == Legendary::VIRIZION){
                     hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH, use_switch1_only_timings);
                 } else if (LEGENDARY == Legendary::TERRAKION){
