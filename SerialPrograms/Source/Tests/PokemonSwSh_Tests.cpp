@@ -104,7 +104,7 @@ int test_pokemonSwSh_YCommIconDetector(const ImageViewRGB32& image, bool target)
 int test_pokemonSwSh_RotomPhoneMenuArrowFinder(const ImageViewRGB32& image, int target){
     auto overlay = DummyVideoOverlay();
     RotomPhoneMenuArrowFinder finder(overlay);
-    int result = finder.detect(image);
+    int result = finder.detect_index(image);
 
     TEST_RESULT_EQUAL(result, target);
     return 0;
