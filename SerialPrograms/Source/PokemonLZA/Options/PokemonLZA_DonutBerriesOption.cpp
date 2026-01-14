@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
 #include "PokemonLZA_DonutBerriesOption.h"
@@ -171,7 +172,10 @@ std::string FlavorPowerTableEntry::get_single_flavor_power_string(int power_inde
         level = level_3;
         break;
     default:
-        return "INVALID";
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION, 
+            "Invalid power index: " + std::to_string(power_index)
+        );
     }
 
     switch (power){
@@ -476,8 +480,10 @@ std::string FlavorPowerTableEntry::get_single_flavor_power_string(int power_inde
         selected_power += "sp-def-power-";
         break;
     default:
-        selected_power += "INVALID-";
-        break;
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION, 
+            "Invalid flavor power: " + std::to_string(static_cast<int>(power))
+        );
     }
 
     switch (level) {
@@ -500,8 +506,10 @@ std::string FlavorPowerTableEntry::get_single_flavor_power_string(int power_inde
         selected_power += "23";
         break;
     default:
-        selected_power += "INVALID";
-        break;
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION, 
+            "Invalid power level: " + std::to_string(static_cast<int>(level))
+        );
     }
     return selected_power;
 }
