@@ -111,7 +111,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         context.wait_for_all_requests();
 
         overworld_to_main_menu(env.console, context);
-        pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
+        open_map(env.console, context, false, false);
         pbf_move_right_joystick(context, {0, +1}, 500ms, 500ms);
         pbf_move_right_joystick(context, {0, +1}, 500ms, 500ms);
         pbf_move_left_joystick(context, {-0.609, 0}, 100ms, 500ms);
