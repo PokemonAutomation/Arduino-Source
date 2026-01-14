@@ -35,10 +35,10 @@ public:
 private:
     void LoadDictionary(const std::string& path);
 
-    Ort::Env env;
+    Ort::Env m_env;
     // Ort::Session det_session;
-    Ort::Session rec_session;
-    Ort::MemoryInfo memory_info;
+    Ort::Session m_rec_session;
+    // Ort::MemoryInfo memory_info;
     Language m_language;
     std::string m_input_name;
     std::string m_output_name;
