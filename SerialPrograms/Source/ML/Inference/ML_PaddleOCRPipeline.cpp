@@ -11,6 +11,7 @@
 #include <limits>
 #include "CommonFramework/Globals.h"
 #include "Common/Cpp/Exceptions.h"
+#include "ML/Models/ML_ONNXRuntimeHelpers.h"
 #include "ML_PaddleOCRPipeline.h"
 
 namespace PokemonAutomation{
@@ -50,13 +51,13 @@ PaddleOCRPipeline::PaddleOCRPipeline(Language language)
 {}
 
 PaddleOCRPipeline::PaddleOCRPipeline(Language language, std::string rec_path, std::string dict_path)
-    : env(ORT_LOGGING_LEVEL_WARNING, "PaddleOCR")
-        // , det_session(env, std::wstring(det_path.begin(), det_path.end()).c_str(), Ort::SessionOptions{})
-        , rec_session(env, std::wstring(rec_path.begin(), rec_path.end()).c_str(), Ort::SessionOptions{})
-        , memory_info(Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault)) 
-        , m_language(language)
-        , m_input_name(rec_session.GetInputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
-        , m_output_name(rec_session.GetOutputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
+    : m_env{create_ORT_env()}
+    // , det_session(env, std::wstring(det_path.begin(), det_path.end()).c_str(), Ort::SessionOptions{})
+    , m_rec_session(create_session(m_env, Ort::SessionOptions{}, rec_path, ML_MODEL_CACHE_PATH() + "PaddleOCRPipeline/"))
+    // , memory_info(Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault)) 
+    , m_language(language)
+    , m_input_name(m_rec_session.GetInputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
+    , m_output_name(m_rec_session.GetOutputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
 {
     LoadDictionary(dict_path);
     
@@ -145,7 +146,7 @@ std::string PaddleOCRPipeline::Recognize(const ImageViewRGB32& image) {
     // output = (Input * Scale) = (old_pixel * 1/255). This transforms [0,255] to range [0, 1]
     // TODO: determine if normalizing to [-1,1] is preferred or to perform ImageNet normalization (mean = [0.485, 0.456, 0.406] and std = [0.229, 0.224, 0.225])
     resized.convertTo(resized, CV_32FC3, 1.0 / 255.0);
-    #if 0
+    
     // 3b. Apply Mean/Std (Standard for PaddleOCR). except for Chinese
     // Mean: [0.485, 0.456, 0.406], Std: [0.229, 0.224, 0.225]
     if (!(m_language == Language::ChineseSimplified || 
@@ -153,12 +154,14 @@ std::string PaddleOCRPipeline::Recognize(const ImageViewRGB32& image) {
         m_language == Language::Japanese ||
         m_language == Language::Korean))
     {
+        #if 0
         cv::Scalar mean(0.485, 0.456, 0.406);
         cv::Scalar std(0.229, 0.224, 0.225);
         cv::subtract(resized, mean, resized);
         cv::divide(resized, std, resized);
+        #endif
     }
-    #endif
+    
     
     // 3. Convert HWC to NCHW
     std::vector<float> input_tensor_values = PreprocessNCHW(resized);
@@ -182,7 +185,7 @@ std::string PaddleOCRPipeline::Recognize(const ImageViewRGB32& image) {
 
     try {
         // 7. Run the recognition session
-        auto outputs = rec_session.Run(
+        auto outputs = m_rec_session.Run(
             Ort::RunOptions{nullptr}, 
             input_names,   // char** 
             &input_tensor, // Ort::Value* (array of 1)
