@@ -6,6 +6,7 @@
 
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "ML/Inference/ML_PaddleOCRPipeline.h"
 #include "OCR_RawOCR.h"
@@ -16,7 +17,6 @@
 // using std::cout;
 // using std::endl;
 
-static constexpr bool USE_PADDLE_OCR = true;
 
 
 namespace PokemonAutomation{
@@ -44,9 +44,12 @@ StringMatchResult multifiltered_OCR(
 
     double pixels_inv = 1. / (image.width() * image.height());
 
-    #if 1
-    ML::PaddleOCRPipeline paddle_ocr(language);
-    #endif
+    bool use_paddle_ocr = GlobalSettings::instance().USE_PADDLE_OCR;
+    std::unique_ptr<ML::PaddleOCRPipeline> paddle_ocr;
+    if (use_paddle_ocr) {
+        // Initialize only if the setting is enabled
+        paddle_ocr = std::make_unique<ML::PaddleOCRPipeline>(language);
+    }
 
     //  Run all the filters.
     SpinLock lock;
@@ -56,8 +59,8 @@ StringMatchResult multifiltered_OCR(
             const std::pair<ImageRGB32, size_t>& filtered = filtered_images[index];
 
             std::string text;
-            if (USE_PADDLE_OCR){
-                text = paddle_ocr.Recognize(filtered.first);
+            if (use_paddle_ocr) {
+                text = paddle_ocr->Recognize(filtered.first);
             }else{
                 text = ocr_read(language, filtered.first, psm);
             }
@@ -113,7 +116,7 @@ StringMatchResult dictionary_OCR(
 
     //  Run all the filters.
     std::string text;
-    if (USE_PADDLE_OCR){
+    if (GlobalSettings::instance().USE_PADDLE_OCR){
         ML::PaddleOCRPipeline paddle_ocr(language);
         text = paddle_ocr.Recognize(image);
     }else{
