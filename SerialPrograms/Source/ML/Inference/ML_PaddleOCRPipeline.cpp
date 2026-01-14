@@ -19,7 +19,7 @@ namespace ML{
 
 
 static std::pair<std::string, std::string> get_paths(Language language){
-    std::string base = RESOURCE_PATH() + "ML/";
+    std::string base = RESOURCE_PATH() + "PaddleOCR/";
     switch(language){
     case Language::None:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to call OCR without a language.");
@@ -59,11 +59,11 @@ PaddleOCRPipeline::PaddleOCRPipeline(Language language, std::string rec_path, st
     , m_input_name(m_rec_session.GetInputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
     , m_output_name(m_rec_session.GetOutputNameAllocated(0, Ort::AllocatorWithDefaultOptions{}).get())
 {
-    LoadDictionary(dict_path);
+    load_dictionary(dict_path);
     
 }
 
-void PaddleOCRPipeline::Run(const std::string& img_path) {
+void PaddleOCRPipeline::run(const std::string& img_path) {
     #if 0
     cv::Mat img = cv::imread(img_path);
     if (img.empty()) return;
@@ -74,7 +74,7 @@ void PaddleOCRPipeline::Run(const std::string& img_path) {
 
     for (auto& box : boxes) {
         cv::Mat cropped = img(box);
-        std::string text = Recognize(cropped);
+        std::string text = recognize(cropped);
         std::cout << "Detected Text: " << text << std::endl;
     }
     #endif
@@ -82,7 +82,7 @@ void PaddleOCRPipeline::Run(const std::string& img_path) {
 
 
 
-void PaddleOCRPipeline::LoadDictionary(const std::string& path) {
+void PaddleOCRPipeline::load_dictionary(const std::string& path) {
     std::ifstream fs(path);
     std::string line;
     // m_dictionary.push_back("blank"); // CTC blank index
@@ -91,7 +91,7 @@ void PaddleOCRPipeline::LoadDictionary(const std::string& path) {
     }
 }
 
-std::string PaddleOCRPipeline::Recognize(const ImageViewRGB32& image) {
+std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image) {
 
     // 1. Convert Image to OpenCV image (cv::mat)
     cv::Mat cv_image_rgb = imageviewrgb32_to_cv_mat_rgb(image);
@@ -164,7 +164,7 @@ std::string PaddleOCRPipeline::Recognize(const ImageViewRGB32& image) {
     
     
     // 3. Convert HWC to NCHW
-    std::vector<float> input_tensor_values = PreprocessNCHW(resized);
+    std::vector<float> input_tensor_values = preprocess_NCHW(resized);
 
     // 4. Define Dynamic Shape
     std::vector<int64_t> input_shape = {1, 3, target_h, target_w};
@@ -193,15 +193,15 @@ std::string PaddleOCRPipeline::Recognize(const ImageViewRGB32& image) {
             output_names,  // char**
             1              // output_count
         );
-        return DecodeCTC(outputs[0].GetTensorMutableData<float>(), outputs[0].GetTensorTypeAndShapeInfo().GetShape(), m_dictionary);
+        return decode_CTC(outputs[0].GetTensorMutableData<float>(), outputs[0].GetTensorTypeAndShapeInfo().GetShape(), m_dictionary);
     }catch(Ort::Exception& e){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "PaddleOCRPipeline::Recognize(): Failed." + std::string(e.what()));
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "PaddleOCRPipeline::recognize(): Failed." + std::string(e.what()));
     }
     
 }
 
 
-std::vector<float> PreprocessNCHW(cv::Mat& img) {
+std::vector<float> preprocess_NCHW(cv::Mat& img) {
     std::vector<float> dst(img.rows * img.cols * 3);
     for (int c = 0; c < 3; ++c) {
         for (int i = 0; i < img.rows * img.cols; ++i) {
@@ -211,7 +211,7 @@ std::vector<float> PreprocessNCHW(cv::Mat& img) {
     return dst;
 }
 
-std::string DecodeCTC(float* data, const std::vector<int64_t>& shape, const std::vector<std::string>& dict) {
+std::string decode_CTC(float* data, const std::vector<int64_t>& shape, const std::vector<std::string>& dict) {
     std::string text = "";
     size_t seq_len = static_cast<size_t>(shape[1]);
     int64_t num_cls = shape[2];

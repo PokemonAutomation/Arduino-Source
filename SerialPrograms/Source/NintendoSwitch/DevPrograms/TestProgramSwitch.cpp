@@ -774,7 +774,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ML::PaddleOCRPipeline paddle_ocr(LANGUAGE);
 
     // auto snapshot = feed.snapshot();
-    std::string text = paddle_ocr.Recognize(cropped);
+    std::string text = paddle_ocr.recognize(cropped);
     cout << text << endl;
 
 #endif
