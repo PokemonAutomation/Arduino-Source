@@ -60,7 +60,7 @@ StringMatchResult multifiltered_OCR(
 
             std::string text;
             if (use_paddle_ocr) {
-                text = paddle_ocr->Recognize(filtered.first);
+                text = paddle_ocr->recognize(filtered.first);
             }else{
                 text = ocr_read(language, filtered.first, psm);
             }
@@ -118,7 +118,7 @@ StringMatchResult dictionary_OCR(
     std::string text;
     if (GlobalSettings::instance().USE_PADDLE_OCR){
         ML::PaddleOCRPipeline paddle_ocr(language);
-        text = paddle_ocr.Recognize(image);
+        text = paddle_ocr.recognize(image);
     }else{
         text = ocr_read(language, image, psm);
     }
