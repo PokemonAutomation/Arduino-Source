@@ -218,7 +218,7 @@ public:
                 _mm512_setr_epi64(64, 63, 62, 61, 60, 59, 58, 57),
                 _mm512_set1_epi64(shift_y)
             );
-            __m512i r0 = _mm512_maskz_load_epi64(mask, (const int64_t*)(src + shift_y));
+            __m512i r0 = _mm512_maskz_loadu_epi64(mask, (const int64_t*)(src + shift_y));
             r0 = _mm512_srlv_epi64(r0, shift);
             r0 = _mm512_or_si512(r0, _mm512_load_si512((__m256i*)dest));
             _mm512_store_si512((__m256i*)dest, r0);
@@ -242,7 +242,7 @@ public:
                 _mm512_setr_epi64(64, 63, 62, 61, 60, 59, 58, 57),
                 _mm512_set1_epi64(shift_y)
             );
-            __m512i r0 = _mm512_maskz_load_epi64(mask, (const int64_t*)(src + shift_y));
+            __m512i r0 = _mm512_maskz_loadu_epi64(mask, (const int64_t*)(src + shift_y));
             r0 = _mm512_sllv_epi64(r0, shift);
             r0 = _mm512_or_si512(r0, _mm512_load_si512((__m256i*)dest));
             _mm512_store_si512((__m256i*)dest, r0);
@@ -261,7 +261,7 @@ public:
                 _mm512_set1_epi64(align),
                 _mm512_setr_epi64(7, 6, 5, 4, 3, 2, 1, 0)
             );
-            __m512i r0 = _mm512_maskz_load_epi64(mask, (const int64_t*)src);
+            __m512i r0 = _mm512_maskz_loadu_epi64(mask, (const int64_t*)src);
             r0 = _mm512_srlv_epi64(r0, shift);
             r0 = _mm512_or_si512(r0, _mm512_load_si512((__m512i*)(dest + shift_y)));
             _mm512_store_si512((__m512i*)(dest + shift_y), r0);
@@ -290,7 +290,7 @@ public:
                 _mm512_set1_epi64(align),
                 _mm512_setr_epi64(7, 6, 5, 4, 3, 2, 1, 0)
             );
-            __m512i r0 = _mm512_maskz_load_epi64(mask, (const int64_t*)src);
+            __m512i r0 = _mm512_maskz_loadu_epi64(mask, (const int64_t*)src);
             r0 = _mm512_sllv_epi64(r0, shift);
             r0 = _mm512_or_si512(r0, _mm512_load_si512((__m512i*)(dest + shift_y)));
             _mm512_store_si512((__m512i*)(dest + shift_y), r0);
