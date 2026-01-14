@@ -25,6 +25,7 @@
 #include <string>
 #include <map>
 #include <variant>
+#include <thread>
 #include <dpp/snowflake.h>
 #include <dpp/dispatcher.h>
 #include <dpp/misc-enum.h>
@@ -40,7 +41,6 @@
 #include <dpp/cache.h>
 #include <dpp/intents.h>
 #include <dpp/discordevents.h>
-#include <dpp/sync.h>
 #include <algorithm>
 #include <iostream>
 #include <shared_mutex>
@@ -48,8 +48,17 @@
 #include <dpp/restresults.h>
 #include <dpp/event_router.h>
 #include <dpp/coro/async.h>
+#include <dpp/socketengine.h>
 
 namespace dpp {
+
+/**
+ * @brief Pass this value into the constructor of dpp::cluster for the shard count to create a cluster with no shards.
+ * A cluster with no shards does not connect to a websocket, but can still use the event loop to dispatch HTTPS API
+ * requests to Discord. This is useful for bots that do not need to receive websocket events as it will save a lot of
+ * resources.
+ */
+constexpr uint32_t NO_SHARDS = ~0U;
 
 /**
  * @brief Types of startup for cluster::start()
@@ -124,26 +133,85 @@ class DPP_EXPORT cluster {
 	shard_list shards;
 
 	/**
-	 * @brief List of all active registered timers
+	 * @brief List of shards waiting for reconnection
 	 */
-	timer_reg_t timer_list;
+	reconnect_list reconnections;
 
 	/**
-	 * @brief List of timers by time
+	 * @brief Ephemeral list of deleted timer ids
+	 */
+	timers_deleted_t deleted_timers;
+
+	/**
+	 * @brief Priority queue of of timers by time
 	 */
 	timer_next_t next_timer;
 
 	/**
-	 * @brief Tick active timers
+	 * @brief Mutex to work with named_commands and synchronize read write access
 	 */
-	void tick_timers();
+	std::shared_mutex named_commands_mutex;
 
 	/**
-	 * @brief Reschedule a timer for its next tick
-	 * 
-	 * @param t Timer to reschedule
+	 * @brief Mutex for protection of shards list
 	 */
-	void timer_reschedule(timer_t* t);
+	mutable std::shared_mutex shards_mutex;
+
+	/**
+	 * @brief Typedef for slashcommand handler type
+	 */
+	using slashcommand_handler_t = std::function<void(const slashcommand_t &)>;
+
+#ifndef DPP_NO_CORO
+	/**
+	 * @brief Typedef for coroutines based slashcommand handler type
+	 */
+	using co_slashcommand_handler_t = std::function<dpp::task<void>(const slashcommand_t&)>;
+
+	/**
+	 * @brief Typedef for variant of coroutines based slashcommand handler type and regular version of it
+	 */
+	using slashcommand_handler_variant = std::variant<slashcommand_handler_t,co_slashcommand_handler_t>;
+
+	/**
+	 * @brief Container to store relation between command name and it's handler
+	 */
+	std::map<std::string,slashcommand_handler_variant> named_commands;
+#else
+	/**
+	 * @brief Container to store relation between command name and it's handler
+	 */
+	std::map<std::string,slashcommand_handler_t> named_commands;
+#endif
+	/**
+	 * @brief Thread pool
+	 */
+	std::unique_ptr<thread_pool> pool{nullptr};
+
+	/**
+	 * @brief Used to spawn the socket engine into its own thread if
+	 * the cluster is started with dpp::st_return. It is unused otherwise.
+	 */
+	std::thread engine_thread;
+
+	/**
+	 * @brief Protection mutex for timers
+	 */
+	std::mutex timer_guard;
+
+	/**
+	 * @brief Webhook server if enabled
+	 */
+	struct discord_webhook_server* webhook_server{nullptr};
+
+	/**
+	 * @brief Mark a shard as requiring reconnection.
+	 * Destructs the old shard in 5 seconds and creates a new one attempting to resume.
+	 *
+	 * @param shard_id Shard ID
+	 */
+	void add_reconnect(uint32_t shard_id);
+
 public:
 	/**
 	 * @brief Current bot token for all shards on this cluster and all commands sent via HTTP
@@ -198,9 +266,33 @@ public:
 	websocket_protocol_t ws_mode;
 
 	/**
-	 * @brief Condition variable notified when the cluster is terminating.
+	 * @brief Atomic bool to set to true when the cluster is terminating.
+	 *
+	 * D++ itself does not set this value, it is for library users to set if they want
+	 * the cluster to terminate outside of a flow where they may have simple access to
+	 * destruct the cluster object.
 	 */
-	std::condition_variable terminating;
+	std::atomic_bool terminating{false};
+
+	/**
+	 * @brief The time (in seconds) that a request is allowed to take.
+	 */
+	uint16_t request_timeout = 60;
+
+	/**
+	 * @brief Socket engine instance
+	 */
+	std::unique_ptr<socket_engine_base> socketengine;
+
+	/**
+	 * @brief Constructor for creating a cluster without a token.
+	 * A cluster created without a token has no shards, and just runs the event loop. You can use this to make asynchronous
+	 * HTTP requests via e.g. dpp::cluster::request without having to connect to a websocket to receive shard events.
+	 * @param pool_threads The number of threads to allocate for the thread pool. This defaults to half your system concurrency and if set to a number less than 4, will default to 4.
+	 * All callbacks and events are placed into the thread pool. The bigger you make this pool (but generally no bigger than your number of cores), the more your bot will scale.
+	 * @throw dpp::exception Thrown on windows, if WinSock fails to initialise, or on any other system if a dpp::request_queue fails to construct
+	 */
+	explicit cluster(uint32_t pool_threads = std::thread::hardware_concurrency() / 2);
 
 	/**
 	 * @brief Constructor for creating a cluster. All but the token are optional.
@@ -212,11 +304,34 @@ public:
 	 * @param maxclusters The total number of clusters that are active, which may be on separate processes or even separate machines.
 	 * @param compressed Whether or not to use compression for shards on this cluster. Saves a ton of bandwidth at the cost of some CPU
 	 * @param policy Set the caching policy for the cluster, either lazy (only cache users/members when they message the bot) or aggressive (request whole member lists on seeing new guilds too)
-	 * @param request_threads The number of threads to allocate for making HTTP requests to Discord. This defaults to 12. You can increase this at runtime via the object returned from get_rest().
-	 * @param request_threads_raw The number of threads to allocate for making HTTP requests to sites outside of Discord. This defaults to 1. You can increase this at runtime via the object returned from get_raw_rest().
+	 * @param pool_threads The number of threads to allocate for the thread pool. This defaults to half your system concurrency and if set to a number less than 4, will default to 4.
+	 * All callbacks and events are placed into the thread pool. The bigger you make this pool (but generally no bigger than your number of cores), the more your bot will scale.
 	 * @throw dpp::exception Thrown on windows, if WinSock fails to initialise, or on any other system if a dpp::request_queue fails to construct
 	 */
-	cluster(const std::string& token, uint32_t intents = i_default_intents, uint32_t shards = 0, uint32_t cluster_id = 0, uint32_t maxclusters = 1, bool compressed = true, cache_policy_t policy = cache_policy::cpol_default, uint32_t request_threads = 12, uint32_t request_threads_raw = 1);
+	cluster(const std::string& token, uint32_t intents = i_default_intents, uint32_t shards = 0, uint32_t cluster_id = 0, uint32_t maxclusters = 1, bool compressed = true, cache_policy_t policy = cache_policy::cpol_default, uint32_t pool_threads = std::thread::hardware_concurrency() / 2);
+
+	/**
+	 * @brief Create a webhook server for receiving interactions
+	 * @note This should be considered mutually exclusive with delivery of interaction events via shards.
+	 * @param discord_public_key Public key for the application from the application dashboard page
+	 * @param address address to bind to, use "0.0.0.0" to bind to all local addresses
+	 * @param port port to bind to. You should generally use a port > 1024.
+	 * @param ssl_private_key Private key PEM file for HTTPS/SSL. If empty, a plaintext server is created
+	 * @param ssl_public_key Public key PEM file for HTTPS/SSL. If empty, a plaintext server is created
+	 */
+	cluster& enable_webhook_server(const std::string& discord_public_key, const std::string_view address, uint16_t port,  const std::string& ssl_private_key = "", const std::string& ssl_public_key = "");
+
+	/**
+	 * @brief Place some arbitrary work into the thread pool for execution when time permits.
+	 *
+	 * Work units are fetched into threads on the thread pool from the queue in order of priority,
+	 * lowest numeric values first. Low numeric values should be reserved for API replies from Discord,
+	 * guild creation events, etc.
+	 *
+	 * @param priority Priority of the work unit
+	 * @param task Task to queue
+	 */
+	void queue_work(int priority, work_unit task);
 
 	/**
 	 * @brief dpp::cluster is non-copyable
@@ -274,6 +389,11 @@ public:
 	cluster& set_websocket_protocol(websocket_protocol_t mode);
 
 	/**
+	 * @brief Tick active timers
+	 */
+	void tick_timers();
+
+	/**
 	 * @brief Set the audit log reason for the next REST call to be made.
 	 * This is set per-thread, so you must ensure that if you call this method, your request that
 	 * is associated with the reason happens on the same thread where you set the reason.
@@ -325,7 +445,7 @@ public:
 	 *
 	 * @return cluster& Reference to self for chaining.
 	 */
-	cluster& set_default_gateway(std::string& default_gateway);
+	cluster& set_default_gateway(const std::string& default_gateway);
 
 	/**
 	 * @brief Log a message to whatever log the user is using.
@@ -346,6 +466,33 @@ public:
 	 */
 	timer start_timer(timer_callback_t on_tick, uint64_t frequency, timer_callback_t on_stop = {});
 
+#ifndef DPP_NO_CORO
+	/**
+	 * @brief Start a coroutine timer. Every `frequency` seconds, the callback is called.
+	 * 
+	 * @param on_tick The callback lambda to call for this timer when ticked
+	 * @param on_stop The callback lambda to call for this timer when it is stopped
+	 * @param frequency How often to tick the timer in seconds
+	 * @return timer A handle to the timer, used to remove that timer later
+	 */
+	template <std::invocable<timer> T, std::invocable<timer> U = std::function<void(timer)>>
+	requires (dpp::awaitable_type<typename std::invoke_result<T, timer>::type>)
+	timer start_timer(T&& on_tick, uint64_t frequency, U&& on_stop = {}) {
+		std::function<void(timer)> ticker = [fun = std::forward<T>(on_tick)](timer t) mutable -> dpp::job {
+			co_await std::invoke(fun, t);
+		};
+		std::function<void(timer)> stopper;
+		if constexpr (dpp::awaitable_type<typename std::invoke_result<U, timer>::type>) {
+			stopper = [fun = std::forward<U>(on_stop)](timer t) mutable -> dpp::job {
+				co_await std::invoke(fun, t);
+			};
+		} else {
+			stopper = std::forward<U>(on_stop);
+		}
+		return start_timer(std::move(ticker), frequency, std::move(stopper));
+	}
+#endif
+
 	/**
 	 * @brief Stop a ticking timer
 	 * 
@@ -355,7 +502,7 @@ public:
 	 */
 	bool stop_timer(timer t);
 
-#ifdef DPP_CORO
+#ifndef DPP_NO_CORO
 	/**
 	 * @brief Get an awaitable to wait a certain amount of seconds. Use the co_await keyword on its return value to suspend the coroutine until the timer ends
 	 *
@@ -396,7 +543,7 @@ public:
 	 *
 	 * @param return_after If true the bot will return to your program after starting shards, if false this function will never return.
 	 */
-	void start(bool return_after = true);
+	void start(start_type return_after = st_wait);
 
 	/**
 	 * @brief Set the presence for all shards on the cluster
@@ -411,16 +558,90 @@ public:
 	 * @param id Shard ID
 	 * @return discord_client* shard, or null
 	 */
-	discord_client* get_shard(uint32_t id);
+	discord_client* get_shard(uint32_t id) const;
 
 	/**
 	 * @brief Get the list of shards
 	 *
-	 * @return shard_list& Reference to map of shards for this cluster
+	 * @return shard_list map of shards for this cluster
 	 */
-	const shard_list& get_shards();
+	shard_list get_shards() const;
+
+	/**
+	 * @brief Sets the request timeout.
+	 *
+	 * @param timeout The length of time (in seconds) that requests are allowed to take. Default: 20.
+	 *
+	 * @return cluster& Reference to self for chaining.
+	 */
+	cluster& set_request_timeout(uint16_t timeout);
 
 	/* Functions for attaching to event handlers */
+
+	/**
+	 * @brief Register a slash command handler.
+	 *
+	 * @param name The name of the slash command to register
+	 * @param handler A handler function of type `slashcommand_handler_t`
+	 *
+	 * @return bool Returns `true` if the command was registered successfully, or `false` if
+	 * the command with the same name already exists
+	 */
+	template <typename F>
+	std::enable_if_t<utility::callable_returns_v<F, void, const slashcommand_t&>, bool> register_command(const std::string& name, F&& handler) {
+		std::unique_lock lk(named_commands_mutex);
+		auto [_, inserted] = named_commands.try_emplace(name, std::forward<F>(handler));
+		return inserted;
+	}
+
+	/**
+	 * @brief Get the number of currently active HTTP(S) requests active in the cluster.
+	 * This total includes all in-flight API requests and calls to dpp::cluster::request().
+	 * Note that once a request is passed to the thread pool it is no longer counted here.
+	 * @return Total active request count
+	 */
+	size_t active_requests();
+
+#ifndef DPP_NO_CORO
+	/**
+	 * @brief Register a coroutine-based slash command handler.
+	 *
+	 * @param name The name of the slash command to register.
+	 * @param handler A coroutine handler function of type `co_slashcommand_handler_t`.
+	 *
+	 * @return bool Returns `true` if the command was registered successfully, or `false` if
+	 * the command with the same name already exists.
+	 */
+	template <typename F>
+	requires (utility::callable_returns<F, dpp::task<void>, const slashcommand_t&>)
+	bool register_command(const std::string& name, F&& handler) {
+		std::unique_lock lk(named_commands_mutex);
+		auto [_, inserted] = named_commands.try_emplace(name, std::in_place_type<co_slashcommand_handler_t>, std::forward<F>(handler));
+		return inserted;
+	}
+#endif
+
+	/**
+	 * @brief Unregister a slash command.
+	 *
+	 * This function unregisters (removes) a previously registered slash command by name.
+	 * If the command is successfully removed, it returns `true`.
+	 *
+	 * @param name The name of the slash command to unregister.
+	 *
+	 * @return bool Returns `true` if the command was successfully unregistered, or `false`
+	 * if the command was not found.
+	 */
+	bool unregister_command(const std::string& name);
+
+	/**
+	 * @brief on voice channel effect send event
+	 *
+	 * @see https://discord.com/developers/docs/events/gateway-events#voice-channel-effect-send
+	 * @note Use operator() to attach a lambda to this event, and the detach method to detach the listener using the returned ID.
+	 * The function signature for this event takes a single `const` reference of type voice_channel_effect_send_t&, and returns void.
+	 */
+	event_router_t<voice_channel_effect_send_t> on_voice_channel_effect_send;
 
 	/**
 	 * @brief on voice state update event
@@ -431,7 +652,16 @@ public:
 	 */
 	event_router_t<voice_state_update_t> on_voice_state_update;
 
-	
+	/**
+	 * @brief on voice client platform event
+	 * After a client connects, or on joining a vc, you will receive the platform type of each client. This is either desktop
+	 * or mobile.
+	 *
+	 * @note Use operator() to attach a lambda to this event, and the detach method to detach the listener using the returned ID.
+	 * The function signature for this event takes a single `const` reference of type voice_client_disconnect_t&, and returns void.
+	 */
+	event_router_t<voice_client_platform_t> on_voice_client_platform;
+
 	/**
 	 * @brief on voice client disconnect event
 	 *
@@ -460,6 +690,14 @@ public:
 	 * The function signature for this event takes a single `const` reference of type log_t&, and returns void.
 	 */
 	event_router_t<log_t> on_log;
+
+	/**
+	 * @brief Called when a file descriptor is removed from the socket engine
+	 *
+	 * @note Use operator() to attach a lambda to this event, and the detach method to detach the listener using the returned ID.
+	 * The function signature for this event takes a single `const` reference of type socket_close_t&, and returns void.
+	 */
+	event_router_t<socket_close_t> on_socket_close;
 
 	/**
 	 * @brief on guild join request delete.
@@ -993,6 +1231,24 @@ public:
 	event_router_t<message_create_t> on_message_create;
 
 	/**
+	 * @brief Called when a vote is added to a message poll.
+	 *
+	 * @see https://discord.com/developers/docs/topics/gateway-events#message-poll-vote-add
+	 * @note Use operator() to attach a lambda to this event, and the detach method to detach the listener using the returned ID.
+	 * The function signature for this event takes a single `const` reference of type message_poll_vote_add_t&, and returns void.
+	 */
+	event_router_t<message_poll_vote_add_t> on_message_poll_vote_add;
+
+	/**
+	 * @brief Called when a vote is removed from a message poll.
+	 *
+	 * @see https://discord.com/developers/docs/topics/gateway-events#message-poll-vote-remove
+	 * @note Use operator() to attach a lambda to this event, and the detach method to detach the listener using the returned ID.
+	 * The function signature for this event takes a single `const` reference of type message_poll_vote_remove_t&, and returns void.
+	 */
+	event_router_t<message_poll_vote_remove_t> on_message_poll_vote_remove;
+
+	/**
 	 * @brief Called when a guild audit log entry is created.
 	 *
 	 * @see https://discord.com/developers/docs/topics/gateway-events#guild-audit-log-entry-create
@@ -1205,7 +1461,7 @@ public:
 	/**
 	 * @brief Called when packets are sent from the voice buffer.
 	 * The voice buffer contains packets that are already encoded with Opus and encrypted
-	 * with Sodium, and merged into packets by the repacketizer, which is done in the
+	 * with XChaCha20-Poly1305, and merged into packets by the repacketizer, which is done in the
 	 * dpp::discord_voice_client::send_audio method. You should use the buffer size properties
 	 * of dpp::voice_buffer_send_t to determine if you should fill the buffer with more
 	 * content.
@@ -1216,17 +1472,6 @@ public:
 	 * The function signature for this event takes a single `const` reference of type voice_buffer_send_t&, and returns void.
 	 */
 	event_router_t<voice_buffer_send_t> on_voice_buffer_send;
-
-	
-	/**
-	 * @brief Called when a user is talking on a voice channel.
-	 *
-	 * @warning If the cache policy has disabled guild caching, the pointer to the guild in this event may be nullptr.
-	 *
-	 * @note Use operator() to attach a lambda to this event, and the detach method to detach the listener using the returned ID.
-	 * The function signature for this event takes a single `const` reference of type voice_user_talking_t&, and returns void.
-	 */
-	event_router_t<voice_user_talking_t> on_voice_user_talking;
 
 	
 	/**
@@ -1368,11 +1613,9 @@ public:
 	 * @param method Method, e.g. GET, POST
 	 * @param postdata Post data (usually JSON encoded)
 	 * @param callback Function to call when the HTTP call completes. The callback parameter will contain amongst other things, the decoded json.
-	 * @param filename List of filenames to post for POST requests (for uploading files)
-	 * @param filecontent List of file content to post for POST requests (for uploading files)
-	 * @param filemimetypes List of mime types for each file to post for POST requests (for uploading files)
+	 * @param file_data List of files to post for POST requests (for uploading files)
 	 */
-	void post_rest_multipart(const std::string &endpoint, const std::string &major_parameters, const std::string &parameters, http_method method, const std::string &postdata, json_encode_t callback, const std::vector<std::string> &filename = {}, const std::vector<std::string>& filecontent = {}, const std::vector<std::string>& filemimetypes = {});
+	void post_rest_multipart(const std::string &endpoint, const std::string &major_parameters, const std::string &parameters, http_method method, const std::string &postdata, json_encode_t callback, const std::vector<message_file_data> &file_data = {});
 
 	/**
 	 * @brief Make a HTTP(S) request. For use when wanting asynchronous access to HTTP APIs outside of Discord.
@@ -1421,7 +1664,7 @@ public:
 	void interaction_response_get_original(const std::string &token, command_completion_event_t callback = utility::log_error());
 
 	/**
-	 * @brief Create a followup message to a slash command
+	 * @brief Create a followup message for an interaction
 	 *
 	 * @see https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response
 	 * @param token Token for the interaction webhook
@@ -1429,10 +1672,10 @@ public:
 	 * @param callback Function to call when the API call completes.
 	 * On success the callback will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
 	 */
-	void interaction_followup_create(const std::string &token, const message &m, command_completion_event_t callback);
+	void interaction_followup_create(const std::string &token, const message &m, command_completion_event_t callback = utility::log_error());
 
 	/**
-	 * @brief Edit original followup message to a slash command
+	 * @brief Edit original followup message for an interaction
 	 * This is an alias for cluster::interaction_response_edit
 	 * @see cluster::interaction_response_edit
 	 * 
@@ -1454,7 +1697,7 @@ public:
 	void interaction_followup_delete(const std::string &token, command_completion_event_t callback = utility::log_error());
 
 	/**
-	 * @brief Edit followup message to a slash command
+	 * @brief Edit followup message for an interaction
 	 * The message ID in the message you pass should be correctly set to that of a followup message you previously sent
 	 *
 	 * @see https://discord.com/developers/docs/interactions/receiving-and-responding#edit-followup-message
@@ -1466,7 +1709,7 @@ public:
 	void interaction_followup_edit(const std::string &token, const message &m, command_completion_event_t callback = utility::log_error());
 
 	/**
-	 * @brief Get the followup message to a slash command
+	 * @brief Get the followup message for an interaction
 	 *
 	 * @see https://discord.com/developers/docs/interactions/receiving-and-responding#get-followup-message
 	 * @param token Token for the interaction webhook
@@ -1477,7 +1720,7 @@ public:
 	void interaction_followup_get(const std::string &token, snowflake message_id, command_completion_event_t callback);
 	
 	/**
-	 * @brief Get the original followup message to a slash command
+	 * @brief Get the original followup message for an interaction
 	 * This is an alias for cluster::interaction_response_get_original
 	 * @see cluster::interaction_response_get_original
 	 * 
@@ -1772,6 +2015,15 @@ public:
 	void message_edit(const struct message &m, command_completion_event_t callback = utility::log_error());
 
 	/**
+	 * @brief Edit the flags of a message on a channel. The callback function is called when the message has been edited
+	 *
+	 * @param m Message to edit the flags of
+	 * @param callback Function to call when the API call completes.
+	 * On success the callback will contain a dpp::message object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
+	 */
+	void message_edit_flags(const struct message &m, command_completion_event_t callback = utility::log_error());
+
+	/**
 	 * @brief Add a reaction to a message. The reaction string must be either an `emojiname:id` or a unicode character.
 	 *
 	 * @see https://discord.com/developers/docs/resources/channel#create-reaction
@@ -1942,6 +2194,54 @@ public:
 	void message_delete_bulk(const std::vector<snowflake> &message_ids, snowflake channel_id, command_completion_event_t callback = utility::log_error());
 
 	/**
+	 * @brief Get a list of users that voted for this specific answer.
+	 *
+	 * @param m Message that contains the poll to retrieve the answers from
+	 * @param answer_id ID of the answer to retrieve votes from (see poll_answer::answer_id)
+	 * @param after Users after this ID should be retrieved if this is set to non-zero
+	 * @param limit This number of users maximum should be returned, up to 100
+	 * @param callback Function to call when the API call completes.
+	 * @see https://discord.com/developers/docs/resources/poll#get-answer-voters
+	 * On success the callback will contain a dpp::user_map object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
+	 */
+	void poll_get_answer_voters(const message& m, uint32_t answer_id, snowflake after, uint64_t limit, command_completion_event_t callback = utility::log_error());
+
+	/**
+	 * @brief Get a list of users that voted for this specific answer.
+	 *
+	 * @param message_id ID of the message with the poll to retrieve the answers from
+	 * @param channel_id ID of the channel with the poll to retrieve the answers from
+	 * @param answer_id ID of the answer to retrieve votes from (see poll_answer::answer_id)
+	 * @param after Users after this ID should be retrieved if this is set to non-zero
+	 * @param limit This number of users maximum should be returned, up to 100
+	 * @param callback Function to call when the API call completes.
+	 * @see https://discord.com/developers/docs/resources/poll#get-answer-voters
+	 * On success the callback will contain a dpp::user_map object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
+	 */
+	void poll_get_answer_voters(snowflake message_id, snowflake channel_id, uint32_t answer_id, snowflake after, uint64_t limit, command_completion_event_t callback = utility::log_error());
+
+	/**
+	 * @brief Immediately end a poll.
+	 *
+	 * @param m Message that contains the poll
+	 * @param callback Function to call when the API call completes.
+	 * @see https://discord.com/developers/docs/resources/poll#end-poll
+	 * On success the callback will contain a dpp::message object representing the message containing the poll in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
+	 */
+	void poll_end(const message &m, command_completion_event_t callback = utility::log_error());
+
+	/**
+	 * @brief Immediately end a poll.
+	 *
+	 * @param message_id ID of the message with the poll to end
+	 * @param channel_id ID of the channel with the poll to end
+	 * @param callback Function to call when the API call completes.
+	 * @see https://discord.com/developers/docs/resources/poll#end-poll
+	 * On success the callback will contain a dpp::message object representing the message containing the poll in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
+	 */
+	void poll_end(snowflake message_id, snowflake channel_id, command_completion_event_t callback = utility::log_error());
+
+	/**
 	 * @brief Get a channel
 	 *
 	 * @see https://discord.com/developers/docs/resources/channel#get-channel
@@ -2009,8 +2309,8 @@ public:
 	 * @note This method supports audit log reasons set by the cluster::set_audit_reason() method.
 	 * @param c Channel to set permissions for
 	 * @param overwrite_id Overwrite to change (a user or role ID)
-	 * @param allow allow permissions bitmask
-	 * @param deny deny permissions bitmask
+	 * @param allow Bitmask of allowed permissions (refer to enum dpp::permissions)
+	 * @param deny Bitmask of denied permissions (refer to enum dpp::permissions)
 	 * @param member true if the overwrite_id is a user id, false if it is a channel id
 	 * @param callback Function to call when the API call completes.
 	 * On success the callback will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
@@ -2024,8 +2324,8 @@ public:
 	 * @note This method supports audit log reasons set by the cluster::set_audit_reason() method.
 	 * @param channel_id ID of the channel to set permissions for
 	 * @param overwrite_id Overwrite to change (a user or role ID)
-	 * @param allow allow permissions bitmask
-	 * @param deny deny permissions bitmask
+	 * @param allow Bitmask of allowed permissions (refer to enum dpp::permissions)
+	 * @param deny Bitmask of denied permissions (refer to enum dpp::permissions)
 	 * @param member true if the overwrite_id is a user id, false if it is a channel id
 	 * @param callback Function to call when the API call completes.
 	 * On success the callback will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
@@ -2089,9 +2389,20 @@ public:
 	 * @see https://discord.com/developers/docs/resources/channel#get-pinned-messages
 	 * @param channel_id Channel ID to get pins for
 	 * @param callback Function to call when the API call completes.
-	 * On success the callback will contain a dpp::message_map object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
+	 * On success the callback will contain a dpp::message_pin_map object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
 	 */
 	void channel_pins_get(snowflake channel_id, command_completion_event_t callback);
+
+	/**
+	 * @brief Get a channel's pins
+	 * @see https://discord.com/developers/docs/resources/channel#get-pinned-messages
+	 * @param channel_id Channel ID to get pins for
+	 * @param before Get messages pinned before this timestamp.
+	 * @param limit Max number of pins to return (1-50). Defaults to 50 if not set.
+	 * @param callback Function to call when the API call completes.
+	 * On success the callback will contain a dpp::message_pin_map object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
+	 */
+	void channel_pins_get(snowflake channel_id, std::optional<time_t> before, std::optional<uint64_t> limit, command_completion_event_t callback);
 
 	/**
 	 * @brief Adds a recipient to a Group DM using their access token
@@ -2392,6 +2703,19 @@ public:
 	void guild_member_timeout(snowflake guild_id, snowflake user_id, time_t communication_disabled_until, command_completion_event_t callback = utility::log_error());
 
 	/**
+	 * @brief Remove the timeout of a guild member.
+	 * A shortcut for guild_member_timeout(guild_id, user_id, 0, callback)
+	 * Fires a `Guild Member Update` Gateway event.
+	 * @see https://discord.com/developers/docs/resources/guild#modify-guild-member
+	 * @note This method supports audit log reasons set by the cluster::set_audit_reason() method.
+	 * @param guild_id Guild ID to remove the member timeout from
+	 * @param user_id User ID to remove the timeout for
+	 * @param callback Function to call when the API call completes.
+	 * On success the callback will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
+	 */
+	void guild_member_timeout_remove(snowflake guild_id, snowflake user_id, command_completion_event_t callback = utility::log_error());
+
+	/**
 	 * @brief Add guild ban
 	 *
 	 * Create a guild ban, and optionally delete previous messages sent by the banned user.
@@ -2487,7 +2811,7 @@ public:
 	 * @param callback Function to call when the API call completes.
 	 * On success the callback will contain a dpp::dtemplate object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
 	 */
-	void guild_template_create(snowflake guild_id, const std::string &name, const std::string &description, command_completion_event_t callback);
+	void guild_template_create(snowflake guild_id, const std::string &name, const std::string &description, command_completion_event_t callback = utility::log_error());
 
 	/**
 	 * @brief Syncs the template to the guild's current state.
@@ -2630,6 +2954,55 @@ public:
 	 * On success the callback will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
 	 */
 	void guild_emoji_delete(snowflake guild_id, snowflake emoji_id, command_completion_event_t callback = utility::log_error());
+
+	/**
+	 * @brief List all Application Emojis
+	 *
+	 * @see https://discord.com/developers/docs/resources/emoji#list-application-emojis
+	 * @param callback Function to call when the API call completes.
+	 * On success the callback will contain a dpp::emoji_map object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
+	 */
+	void application_emojis_get(command_completion_event_t callback = utility::log_error());
+
+	/**
+	 * @brief Get an Application Emoji
+	 *
+	 * @see https://discord.com/developers/docs/resources/emoji#get-application-emoji
+	 * @param emoji_id The ID of the Emoji to get.
+	 * @param callback Function to call when the API call completes.
+	 * On success the callback will contain a dpp::emoji object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
+	 */
+	void application_emoji_get(snowflake emoji_id, command_completion_event_t callback = utility::log_error());
+
+	/**
+	 * @brief Create an Application Emoji
+	 *
+	 * @see https://discord.com/developers/docs/resources/emoji#create-application-emoji
+	 * @param newemoji The emoji to create
+	 * @param callback Function to call when the API call completes.
+	 * On success the callback will contain a dpp::emoji object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
+	 */
+	void application_emoji_create(const class emoji& newemoji, command_completion_event_t callback = utility::log_error());
+
+	/**
+	 * @brief Edit an Application Emoji
+	 *
+	 * @see https://discord.com/developers/docs/resources/emoji#modify-application-emoji
+	 * @param newemoji The emoji to edit
+	 * @param callback Function to call when the API call completes.
+	 * On success the callback will contain a dpp::emoji object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
+	 */
+	void application_emoji_edit(const class emoji& newemoji, command_completion_event_t callback = utility::log_error());
+
+	/**
+	 * @brief Delete an Application Emoji
+	 *
+	 * @see https://discord.com/developers/docs/resources/emoji#delete-application-emoji
+	 * @param emoji_id The emoji's ID to delete.
+	 * @param callback Function to call when the API call completes.
+	 * On success the callback will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
+	 */
+	void application_emoji_delete(snowflake emoji_id, command_completion_event_t callback = utility::log_error());
 
 	/**
 	 * @brief Get prune counts
@@ -2784,7 +3157,7 @@ public:
 	 * @brief Get the guild's onboarding configuration
 	 *
 	 * @see https://discord.com/developers/docs/resources/guild#get-guild-onboarding
-	 * @param o The onboarding object
+	 * @param guild_id The guild to pull the onboarding configuration from.
 	 * @param callback Function to call when the API call completes.
 	 * On success the callback will contain a dpp::onboarding object in confirmation_callback_t::value filled to match the vanity url. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
 	 */
@@ -3141,11 +3514,16 @@ public:
 	 * @note This method supports audit log reasons set by the cluster::set_audit_reason() method.
 	 * @see https://discord.com/developers/docs/resources/guild#modify-current-member
 	 * @param guild_id Guild ID to change on
-	 * @param nickname New nickname, or empty string to clear nickname
+	 * @param nickname New nickname, or empty string to clear nickname.
+	 * @param banner_blob New banner, or empty string to clear banner.
+	 * @param banner_type Type of image for new banner.
+	 * @param avatar_blob New avatar, or empty string to clear avatar.
+	 * @param avatar_type Type of image for new avatar.
+	 * @param bio New bio, or empty string to clear bio
 	 * @param callback Function to call when the API call completes.
 	 * On success the callback will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
 	 */
-	void guild_current_member_edit(snowflake guild_id, const std::string &nickname, command_completion_event_t callback = utility::log_error());
+	void guild_current_member_edit(snowflake guild_id, const std::string& nickname, const std::string& banner_blob, const image_type banner_type, const std::string& avatar_blob, const image_type avatar_type, const std::string& bio, command_completion_event_t callback = utility::log_error());
 
 	/**
 	 * @brief Get current user's connections (linked accounts, e.g. steam, xbox).
@@ -3166,19 +3544,24 @@ public:
 	void current_user_get_guilds(command_completion_event_t callback);
 
 	/**
-	 * @brief Edit current (bot) user
+	 * @brief Edit current (bot) user.
 	 *
-	 * Modifies the current member in a guild. Returns the updated guild_member object on success.
-	 * Fires a `Guild Member Update` Gateway event.
+	 * Modify the requester's user account settings. Returns a dpp::user object on success.
+	 * Fires a User Update Gateway event.
+	 *
+	 * @note There appears to be no limit to the image size, however, if your image cannot be processed/uploaded in time, you will receive a malformed http request.
+	 *
 	 * @see https://discord.com/developers/docs/resources/user#modify-current-user
 	 * @param nickname Nickname to set
-	 * @param image_blob Avatar data to upload (NOTE: Very heavily rate limited!)
-	 * @param type Type of image for avatar. It can be one of `i_gif`, `i_jpg` or `i_png`.
+	 * @param avatar_blob Avatar data to upload
+	 * @param avatar_type Type of image for avatar. It can be one of `i_gif`, `i_jpg` or `i_png`.
+	 * @param banner_blob Banner data to upload
+	 * @param banner_type Type of image for Banner. It can be one of `i_gif`, `i_jpg` or `i_png`.
 	 * @param callback Function to call when the API call completes.
 	 * On success the callback will contain a dpp::user object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
  	 * @throw dpp::length_exception Image data is larger than the maximum size of 256 kilobytes
 	 */
-	void current_user_edit(const std::string &nickname, const std::string& image_blob = "", const image_type type = i_png, command_completion_event_t callback = utility::log_error());
+	void current_user_edit(const std::string &nickname, const std::string& avatar_blob = "", const image_type avatar_type = i_png, const std::string& banner_blob = "", const image_type banner_type = i_png, command_completion_event_t callback = utility::log_error());
 
 	/**
 	 * @brief Get current user DM channels
@@ -3423,7 +3806,7 @@ public:
 
 	/**
 	 * @brief Get all guild stickers
-	 * @see https://discord.com/developers/docs/resources/sticker#get-guild-stickers
+	 * @see https://discord.com/developers/docs/resources/sticker#list-guild-stickers
 	 * @param guild_id Guild ID of the guild where the sticker is
 	 * @param callback Function to call when the API call completes.
 	 * On success the callback will contain a dpp::sticker_map object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
@@ -3432,7 +3815,7 @@ public:
 
 	/**
 	 * @brief Get a list of available sticker packs
-	 * @see https://discord.com/developers/docs/resources/sticker#list-nitro-sticker-packs
+	 * @see https://discord.com/developers/docs/resources/sticker#list-sticker-packs
 	 * @param callback Function to call when the API call completes.
 	 * On success the callback will contain a dpp::sticker_pack_map object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
 	 */
@@ -3583,6 +3966,16 @@ public:
 	void current_user_set_voice_state(snowflake guild_id, snowflake channel_id, bool suppress = false, time_t request_to_speak_timestamp = 0, command_completion_event_t callback = utility::log_error());
 
 	/**
+	 * @brief Get the bot's voice state in a guild without a Gateway connection
+	 *
+	 * @see https://discord.com/developers/docs/resources/voice#get-current-user-voice-state
+	 * @param guild_id Guild to get the voice state for
+	 * @param callback Function to call when the API call completes.
+	 * On success the callback will contain a dpp::voicestate object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
+	 */
+	void current_user_get_voice_state(snowflake guild_id, command_completion_event_t callback);
+
+	/**
 	 * @brief Set a user's voice state on a stage channel
 	 *
 	 * **Caveats**
@@ -3604,6 +3997,17 @@ public:
 	 * On success the callback will contain a dpp::scheduled_event object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
 	 */
 	void user_set_voice_state(snowflake user_id, snowflake guild_id, snowflake channel_id, bool suppress = false, command_completion_event_t callback = utility::log_error());
+
+	/**
+	 * @brief Get a user's voice state in a guild without a Gateway connection
+	 *
+	 * @see https://discord.com/developers/docs/resources/voice#get-user-voice-state
+	 * @param guild_id Guild to get the voice state for
+	 * @param user_id The user to get the voice state of
+	 * @param callback Function to call when the API call completes.
+	 * On success the callback will contain a dpp::voicestate object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
+	 */
+	void user_get_voice_state(snowflake guild_id, snowflake user_id, command_completion_event_t callback);
 
 	/**
 	 * @brief Get all auto moderation rules for a guild
@@ -3695,6 +4099,16 @@ public:
 	void entitlement_test_delete(snowflake entitlement_id, command_completion_event_t callback = utility::log_error());
 
 	/**
+	 * @brief For One-Time Purchase consumable SKUs, marks a given entitlement for the user as consumed.
+	 *
+	 * @see https://discord.com/developers/docs/monetization/entitlements#consume-an-entitlement
+	 * @param entitlement_id The entitlement to mark as consumed.
+	 * @param callback Function to call when the API call completes.
+	 * On success the callback will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
+	 */
+	void entitlement_consume(snowflake entitlement_id, command_completion_event_t callback = utility::log_error());
+
+	/**
 	 * @brief Returns all SKUs for a given application.
 	 * @note Because of how Discord's SKU and subscription systems work, you will see two SKUs for your premium offering.
 	 * For integration and testing entitlements, you should use the SKU with type: 5.
@@ -3705,11 +4119,21 @@ public:
 	 */
 	void skus_get(command_completion_event_t callback = utility::log_error());
 
-#include <dpp/cluster_sync_calls.h>
-#ifdef DPP_CORO
-#include <dpp/cluster_coro_calls.h>
+	/**
+	 * @brief Set the status of a voice channel.
+	 *
+	 * @see https://github.com/discord/discord-api-docs/pull/6400 (please replace soon).
+	 * @param channel_id The channel to update.
+	 * @param status The new status for the channel.
+	 * @param callback Function to call when the API call completes.
+	 * On success the callback will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
+	 */
+	void channel_set_voice_status(snowflake channel_id, const std::string& status, command_completion_event_t callback = utility::log_error());
+
+#ifndef DPP_NO_CORO
+	#include <dpp/cluster_coro_calls.h>
 #endif
 
 };
 
-} // namespace dpp
+}
