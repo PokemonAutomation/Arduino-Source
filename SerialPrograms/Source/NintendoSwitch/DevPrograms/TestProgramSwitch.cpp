@@ -169,6 +169,9 @@
 #include "Common/CRC32/pabb_CRC32.h"
 #include "Common/PABotBase2/PABotBase2_PacketParser.h"
 #include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
+#include "ML/Inference/ML_PaddleOCRPipeline.h"
+
+
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -242,6 +245,7 @@ TestProgram::TestProgram()
         false
     )
     , IMAGE_PATH(false, "Path to image for testing", LockMode::UNLOCK_WHILE_RUNNING, "default.png", "default.png")
+    , FLOAT("Float option:", LockMode::UNLOCK_WHILE_RUNNING, 0) 
     , STATIC_TEXT("Test text...")
     , BOX("Box", LockMode::UNLOCK_WHILE_RUNNING, 0, 0, 1, 1)
     , BUTTONS("Buttons", ProController_Button_Database(), LockMode::UNLOCK_WHILE_RUNNING, BUTTON_NONE)
@@ -266,6 +270,7 @@ TestProgram::TestProgram()
     PA_ADD_OPTION(LANGUAGE);
 //    PA_ADD_OPTION(CONSOLE_MODEL);
     PA_ADD_OPTION(IMAGE_PATH);
+    PA_ADD_OPTION(FLOAT);
     PA_ADD_OPTION(STATIC_TEXT);
     PA_ADD_OPTION(BOX);
     PA_ADD_OPTION(BUTTONS);
@@ -695,7 +700,18 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
+#if 1
 
+    // ImageRGB32 image1(IMAGE_PATH);
+    auto image1 = feed.snapshot();
+    ImageViewRGB32 cropped = extract_box_reference(image1, ImageFloatBox{BOX.x(), BOX.y(), BOX.width(), BOX.height()});
+    ML::PaddleOCRPipeline paddle_ocr(LANGUAGE);
+
+    // auto snapshot = feed.snapshot();
+    std::string text = paddle_ocr.recognize(cropped);
+    cout << text << endl;
+
+#endif
 
 #if 0
     std::string move_results = "Move Effectiveness:";

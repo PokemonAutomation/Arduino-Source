@@ -6,7 +6,9 @@
 
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonTools/Images/ImageFilter.h"
+#include "ML/Inference/ML_PaddleOCRPipeline.h"
 #include "OCR_RawOCR.h"
 #include "OCR_DictionaryMatcher.h"
 #include "OCR_Routines.h"
@@ -14,6 +16,8 @@
 // #include <iostream>
 // using std::cout;
 // using std::endl;
+
+
 
 namespace PokemonAutomation{
 namespace OCR{
@@ -40,6 +44,13 @@ StringMatchResult multifiltered_OCR(
 
     double pixels_inv = 1. / (image.width() * image.height());
 
+    bool use_paddle_ocr = GlobalSettings::instance().USE_PADDLE_OCR;
+    std::unique_ptr<ML::PaddleOCRPipeline> paddle_ocr;
+    if (use_paddle_ocr) {
+        // Initialize only if the setting is enabled
+        paddle_ocr = std::make_unique<ML::PaddleOCRPipeline>(language);
+    }
+
     //  Run all the filters.
     SpinLock lock;
     StringMatchResult ret;
@@ -47,7 +58,13 @@ StringMatchResult multifiltered_OCR(
         [&](size_t index){
             const std::pair<ImageRGB32, size_t>& filtered = filtered_images[index];
 
-            std::string text = ocr_read(language, filtered.first, psm);
+            std::string text;
+            if (use_paddle_ocr) {
+                text = paddle_ocr->recognize(filtered.first);
+            }else{
+                text = ocr_read(language, filtered.first, psm);
+            }
+            
             // cout << "multifiltered_OCR: " << index << " -> " << text << endl;
             // filtered.first.save("test_" + std::to_string(index) + ".png");
 
@@ -98,7 +115,13 @@ StringMatchResult dictionary_OCR(
     }
 
     //  Run all the filters.
-    std::string text = ocr_read(language, image, psm);
+    std::string text;
+    if (GlobalSettings::instance().USE_PADDLE_OCR){
+        ML::PaddleOCRPipeline paddle_ocr(language);
+        text = paddle_ocr.recognize(image);
+    }else{
+        text = ocr_read(language, image, psm);
+    }
 
     // cout << "dictionary_OCR: " << text << endl;
     // image.save("test_dictionary_OCR.png");
