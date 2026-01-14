@@ -79,8 +79,8 @@ void pabb2_StreamCoalescer_pop_leading_finished(pabb2_StreamCoalescer* self){
 void pabb2_StreamCoalescer_push_packet(pabb2_StreamCoalescer* self, uint8_t seqnum){
     uint8_t slot_head = self->slot_head;
 
-    printf("enter ---------------------\n");
-    pabb2_StreamCoalescer_print(self, false);
+//    printf("enter ---------------------\n");
+//    pabb2_StreamCoalescer_print(self, false);
 
     //  Either before (old retransmit) or too far in future.
     if ((uint8_t)(seqnum - slot_head) >= PABB2_StreamCoalescer_SLOTS){
@@ -101,8 +101,8 @@ void pabb2_StreamCoalescer_push_packet(pabb2_StreamCoalescer* self, uint8_t seqn
     pabb2_StreamCoalescer_pop_leading_finished(self);
 
 
-    printf("exit ---------------------\n");
-    pabb2_StreamCoalescer_print(self, false);
+//    printf("exit ---------------------\n");
+//    pabb2_StreamCoalescer_print(self, false);
 }
 
 bool pabb2_StreamCoalescer_push_stream(pabb2_StreamCoalescer* self, const pabb2_PacketHeaderData* packet){

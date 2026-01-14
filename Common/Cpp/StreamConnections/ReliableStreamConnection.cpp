@@ -25,8 +25,8 @@ ReliableStreamConnection::ReliableStreamConnection(
     , m_unreliable_connection(unreliable_connection)
     , m_retransmit_timeout(retransmit_timeout)
 {
-    pabb2_PacketSender_init(&m_reliable_sender, &ReliableStreamConnection::send_raw, this);
-    pabb2_PacketParser_init(&m_parser, &ReliableStreamConnection::on_packet, this);
+    pabb2_PacketSender_init(&m_reliable_sender, this, &ReliableStreamConnection::send_raw);
+    pabb2_PacketParser_init(&m_parser);
     pabb2_StreamCoalescer_init(&m_stream_coalescer);
 
     m_retransmit_thread = Thread([this]{ retransmit_thread(); });
@@ -120,7 +120,7 @@ void ReliableStreamConnection::retransmit_thread(){
 void ReliableStreamConnection::on_packet(const pabb2_PacketHeader* packet){
     uint8_t status = packet->magic_number;
 
-    cout << "on_packet(): seqnum = " << (int)packet->seqnum << ", opcode = " << (int)packet->opcode << endl;
+//    cout << "on_packet(): seqnum = " << (int)packet->seqnum << ", opcode = " << (int)packet->opcode << endl;
 
     switch (status){
     case PABB2_PacketParser_RESULT_VALID:
@@ -185,7 +185,7 @@ void ReliableStreamConnection::on_packet(const pabb2_PacketHeader* packet){
         return;
     }
     case PABB2_CONNECTION_PACKET_OPCODE_ACK:
-        cout << "Received ack" << endl;
+//        cout << "Received ack" << endl;
         pabb2_PacketSender_remove(&m_reliable_sender, packet->seqnum);
         return;
     default:

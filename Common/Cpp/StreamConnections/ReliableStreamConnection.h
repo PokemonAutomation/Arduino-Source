@@ -42,9 +42,9 @@ private:
 
     void send_ack(uint8_t seqnum);
 
-    static void send_raw(void* context, const void* data, size_t bytes){
+    static size_t send_raw(void* context, const void* data, size_t bytes){
         ReliableStreamConnection& self = *(ReliableStreamConnection*)context;
-        self.m_unreliable_connection.send(data, bytes);
+        return self.m_unreliable_connection.send(data, bytes);
     }
     void retransmit_thread();
 
@@ -53,7 +53,11 @@ private:
     //  Receive
 
     virtual void on_recv(const void* data, size_t bytes) override{
-        pabb2_PacketParser_push_bytes(&m_parser, (const uint8_t*)data, bytes);
+        pabb2_PacketParser_push_bytes(
+            &m_parser,
+            this, &ReliableStreamConnection::on_packet,
+            (const uint8_t*)data, bytes
+        );
     }
     static void on_packet(void* context, const pabb2_PacketHeader* packet){
         ReliableStreamConnection& self = *(ReliableStreamConnection*)context;
@@ -63,7 +67,9 @@ private:
 
 
 
-private:
+//private:  //  REMOVE
+public:
+
     Logger& m_logger;
     StreamConnection& m_unreliable_connection;
     const WallDuration m_retransmit_timeout;

@@ -169,6 +169,7 @@
 #include "Common/CRC32/pabb_CRC32.h"
 #include "Common/PABotBase2/PABotBase2_PacketParser.h"
 #include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
+#include "Common/PABotBase2/PABotbase2_ReliableStreamConnection.h"
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -372,6 +373,9 @@ struct DataPacket : pabb2_PacketHeaderData{
 };
 
 
+pabb2_StreamCoalescer* coalescer;
+
+
 
 class MockConnection : public StreamConnection{
 public:
@@ -389,9 +393,11 @@ public:
 
     virtual size_t send(const void* data, size_t bytes) override{
         const pabb2_PacketHeader* packet = (const pabb2_PacketHeader*)data;
+#if 0
         cout << "Sending: ";
         pabb2_PacketHeader_print(packet, false);
         fflush(stdout);
+#endif
 
         WallClock now = current_time();
 
@@ -405,14 +411,32 @@ public:
         response.header.opcode = PABB2_CONNECTION_PACKET_OPCODE_ACK;
         pabb_crc32_write_to_message(&response, sizeof(response));
 
-        {
-            std::lock_guard<std::mutex> lg(m_lock);
-//            cout << "enqueuing" << endl;
-            m_send_schedule.insert({
-                now + 500ms,
-                std::string((char*)&response, (char*)&response + sizeof(response))
-            });
+        std::lock_guard<std::mutex> lg(m_lock);
+
+        if (packet->opcode == PABB2_CONNECTION_PACKET_OPCODE_STREAM_DATA){
+            uint8_t stream_size = packet->packet_bytes - sizeof(pabb2_PacketHeaderData) - sizeof(uint32_t);
+            for (uint8_t c = 0; c < stream_size; c++){
+                char expected = '0' + m_offset % 10;
+                char actual = ((const char*)packet)[sizeof(pabb2_PacketHeaderData) + c];
+                if (expected != actual){
+                    cout << "Mismatch at: " << m_offset << ", expected = " << expected << ", actual = " << actual << endl;
+
+                    pabb2_StreamCoalescer_print(coalescer, true);
+
+                    system("pause");
+                }
+                m_offset++;
+            }
+
         }
+
+
+
+//        cout << "enqueuing" << endl;
+        m_send_schedule.insert({
+            now + 500ms,
+            std::string((char*)&response, (char*)&response + sizeof(response))
+        });
         m_cv.notify_all();
 
         return bytes;
@@ -431,9 +455,11 @@ private:
                     continue;
                 }
                 std::string& packet = iter->second;
+#if 0
                 cout << "Receiving: ";
                 pabb2_PacketHeader_print((const pabb2_PacketHeader*)packet.data(), false);
                 fflush(stdout);
+#endif
                 on_recv(packet.data(), packet.size());
                 m_send_schedule.erase(iter);
             }
@@ -446,12 +472,20 @@ private:
 private:
     std::multimap<WallClock, std::string> m_send_schedule;
 
+    uint64_t m_offset = 0;
+
     std::mutex m_lock;
     std::condition_variable m_cv;
     bool m_stopping = false;
     Thread m_thread;
 };
 
+
+
+
+//void on_packet(void* context, const pabb2_PacketHeader* packet){
+//
+//}
 
 
 
@@ -484,18 +518,38 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     // JoyconContext context(scope, console.controller<JoyconController>());
     VideoOverlaySet overlays(overlay);
 
+#if 0
+    CloseGameWatcher close_game(console);
+    close_game.make_overlays(overlays);
 
+    auto snapshot = feed.snapshot();
+    cout << close_game.detect(snapshot) << endl;
+#endif
+
+
+#if 1
     MockConnection unreliable_connection;
     {
-        ReliableStreamConnection connection(logger, unreliable_connection, 1s);
+        ReliableStreamConnection connection(logger, unreliable_connection, 100s);
+
+        coalescer = &connection.m_stream_coalescer;
+
 
         cout << connection.send_request(0x20) << endl;
 //        cout << connection.send_request(0x21) << endl;
+
+        while (true){
+            scope.throw_if_cancelled();
+            cout << "Sent = " << connection.send("0123456789", 10) << endl;
+            pabb2_PacketSender_print(&connection.m_reliable_sender, true);
+            scope.wait_for(50ms);
+        }
 
 
         scope.wait_for(10s);
         cout << "================ End Test ================" << endl;
     }
+#endif
 
 #if 0
     DataPacket packet;

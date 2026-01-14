@@ -260,8 +260,12 @@ file(GLOB LIBRARY_SOURCES
     ../Common/PABotBase2/PABotBase2_Connection.h
     ../Common/PABotBase2/PABotBase2_ConnectionDebug.c
     ../Common/PABotBase2/PABotBase2_ConnectionDebug.h
+    ../Common/PABotBase2/PABotBase2_PacketParser.c
+    ../Common/PABotBase2/PABotBase2_PacketParser.h
     ../Common/PABotBase2/PABotBase2_PacketSender.c
     ../Common/PABotBase2/PABotBase2_PacketSender.h
+    ../Common/PABotBase2/PABotbase2_ReliableStreamConnection.c
+    ../Common/PABotBase2/PABotbase2_ReliableStreamConnection.h
     ../Common/PABotBase2/PABotBase2_StreamCoalescer.c
     ../Common/PABotBase2/PABotBase2_StreamCoalescer.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_HID_Keyboard.h
