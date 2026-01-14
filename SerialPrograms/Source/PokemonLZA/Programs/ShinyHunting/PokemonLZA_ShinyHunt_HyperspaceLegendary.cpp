@@ -343,13 +343,14 @@ void hunt_cobalion(
 
     // run right to line up with Cobalion
     ssf_press_button(context, BUTTON_B, 0ms, 6000ms, 0ms);
-    pbf_move_left_joystick(context, {+1, 0}, 8370ms, 0ms);
+    pbf_move_left_joystick(context, {+1, 0}, 8200ms, 0ms);
     context.wait_for_all_requests();
     stats.spawns++;
     env.update_stats();
     // run forward to trigger potential shiny sound
+    pbf_wait(context, 100ms);
     ssf_press_button(context, BUTTON_B, 0ms, 3000ms, 0ms);
-    pbf_move_left_joystick(context, {0, +1}, 4500ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 4800ms, 0ms);
     pbf_wait(context, 500ms);
 
     context.wait_for_all_requests();
