@@ -184,8 +184,8 @@ public:
             );
             __m512i r0 = _mm512_maskz_loadu_epi64(mask, (const int64_t*)(src + shift_y));
             r0 = _mm512_srlv_epi64(r0, shift);
-            r0 = _mm512_or_si512(r0, _mm512_load_si512((__m256i*)dest));
-            _mm512_store_si512((__m256i*)dest, r0);
+            r0 = _mm512_or_si512(r0, _mm512_load_si512((__m512i*)dest));
+            _mm512_store_si512((__m512i*)dest, r0);
         }
     }
     void copy_to_shift_np(BinaryTile_64x32_x64_AVX512& tile, size_t shift_x, size_t shift_y) const{
@@ -208,8 +208,8 @@ public:
             );
             __m512i r0 = _mm512_maskz_loadu_epi64(mask, (const int64_t*)(src + shift_y));
             r0 = _mm512_sllv_epi64(r0, shift);
-            r0 = _mm512_or_si512(r0, _mm512_load_si512((__m256i*)dest));
-            _mm512_store_si512((__m256i*)dest, r0);
+            r0 = _mm512_or_si512(r0, _mm512_load_si512((__m512i*)dest));
+            _mm512_store_si512((__m512i*)dest, r0);
         }
     }
     void copy_to_shift_pn(BinaryTile_64x32_x64_AVX512& tile, size_t shift_x, size_t shift_y) const{
