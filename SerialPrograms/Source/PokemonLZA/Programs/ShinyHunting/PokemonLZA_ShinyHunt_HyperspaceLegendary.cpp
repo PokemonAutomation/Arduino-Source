@@ -694,8 +694,10 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
                 [&](ProControllerContext& context) {
                     if (LEGENDARY == Legendary::LATIAS){
                         hunt_latias(env, context, stats, MIN_CALORIE_TO_CATCH);
-                    } else if (LEGENDARY == Legendary::LATIOS){
+                    }
+                    else if (LEGENDARY == Legendary::LATIOS) {
                         hunt_latios(env, context, stats, MIN_CALORIE_TO_CATCH);
+                    }
                     else if (LEGENDARY == Legendary::VIRIZION) {
                         hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH, use_switch1_only_timings);
                     }
