@@ -130,9 +130,9 @@ namespace {
         ImageViewRGB32 full_image = ImageViewRGB32(env.console.video().snapshot());
         ImagePixelBox latias_search_zone = ImagePixelBox(
             static_cast<size_t>(full_image.width() * 0.4),
-            static_cast<size_t>(full_image.height() * 0.2),
-            static_cast<size_t>(full_image.width() * 0.6),
-            static_cast<size_t>(full_image.height() * 0.4));
+                static_cast<size_t>(full_image.height() * 0.2),
+                    static_cast<size_t>(full_image.width() * 0.6),
+                        static_cast<size_t>(full_image.height() * 0.4));
         ImageViewRGB32 cropped_image = extract_box_reference(full_image, latias_search_zone);
         ImageHSV32 cropped_hsv_image = ImageHSV32(cropped_image);
         ImageViewHSV32 cropped_hsv_image_view = ImageViewHSV32(
@@ -140,7 +140,7 @@ namespace {
             cropped_hsv_image.bytes_per_row(),
             cropped_hsv_image.width(),
             cropped_hsv_image.height());
-        ImageRGB32 filtered_image_nonshiny = to_blackwhite_hsv32_range(cropped_hsv_image_view, false, 0xff006051, 0xff25ffd2);
+        ImageRGB32 filtered_image_nonshiny = to_blackwhite_hsv32_range(cropped_hsv_image_view, false, 0xffe76051, 0xffffffd2);
         ImageRGB32 filtered_image_shiny = to_blackwhite_hsv32_range(cropped_hsv_image_view, false, 0xff0d3d51, 0xff37ffd2);
         double nonshiny_result = image_average(filtered_image_nonshiny).r;
         double shiny_result = image_average(filtered_image_shiny).r;
