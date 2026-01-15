@@ -152,8 +152,13 @@ public:
 private:
     virtual size_t send(const void* data, size_t bytes){
         WriteSpinLock lg(m_send_lock, "SerialConnection::send()");
-        size_t sent = write(m_fd, data, bytes);
-        if (sent != bytes){
+        ssize_t sent = write(m_fd, data, bytes);
+        if (sent < 0){
+            int error = errno;
+            process_error("send() Failed. errno = " + std::to_string(error), true);
+            return 0;
+        }
+        if ((size_t)sent != bytes){
             process_error("send() Failed: " + std::to_string(sent) + " / " + std::to_string(bytes), true);
         }else{
             m_consecutive_errors.store(0, std::memory_order_release);
