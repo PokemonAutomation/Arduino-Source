@@ -51,7 +51,7 @@ jobs:
         sudo apt update
         sudo apt upgrade
         sudo apt install libopencv-dev
-        sudo apt install ./Arduino-Source/3rdPartyBinaries/libdpp-10.0.28-linux-x64.deb
+        sudo apt install ./Arduino-Source/3rdPartyBinaries/libdpp-894c18f65c713bb36b63031598142e4789226062-linux.deb
     - name: Install dependencies
       if: startsWith(matrix.os, 'mac')
       run: |
@@ -59,8 +59,8 @@ jobs:
         brew tap-new --no-git PA/libdpp
         FORMULA_DIR="$(brew --repo PA/libdpp)/Formula"
         mkdir -p "$FORMULA_DIR"
-        cp Arduino-Source/3rdPartyBinaries/libdpp@10.0.28.rb "$FORMULA_DIR/"
-        brew install libdpp@10.0.28
+        cp Arduino-Source/3rdPartyBinaries/libdpp@894c18f65c713bb36b63031598142e4789226062.rb "$FORMULA_DIR/"
+        brew install libdpp@894c18f65c713bb36b63031598142e4789226062
     - name: Generate binaries
       run: |
         cd Arduino-Source/SerialPrograms

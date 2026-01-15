@@ -1,8 +1,8 @@
-class LibdppAT10028 < Formula
+class LibdppAT894c18f65c713bb36b63031598142e4789226062 < Formula
   desc "C++ Discord API Bot Library"
   homepage "https://github.com/brainboxdotcc/DPP"
-  url "https://github.com/brainboxdotcc/DPP/releases/download/v10.0.28/DPP-10.0.28.tar.gz"
-  sha256 "aa0c16a1583f649f28ec7739c941e9f2bf9c891c0b87ef8278420618f8bacd46"
+  url "http://github.com/brainboxdotcc/DPP/archive/894c18f65c713bb36b63031598142e4789226062.tar.gz"
+  sha256 "CFB89232E1CE71C3ADE02EC3871015D73A99F3C402A0498E608F7246787A7E5A"
   license "Apache-2.0"
 
   depends_on "cmake" => :build

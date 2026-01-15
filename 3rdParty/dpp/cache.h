@@ -250,7 +250,7 @@ public:
 	 */
 	size_t bytes() {
 		std::shared_lock l(cache_mutex);
-		return sizeof(this) + (cache_map->bucket_count() * sizeof(size_t));
+		return sizeof(*this) + (cache_map->bucket_count() * sizeof(size_t));
 	}
 
 };
@@ -270,5 +270,5 @@ cache_decl(role, find_role, get_role_cache, get_role_count);
 cache_decl(channel, find_channel, get_channel_cache, get_channel_count);
 cache_decl(emoji, find_emoji, get_emoji_cache, get_emoji_count);
 
-} // namespace dpp
+}
 
