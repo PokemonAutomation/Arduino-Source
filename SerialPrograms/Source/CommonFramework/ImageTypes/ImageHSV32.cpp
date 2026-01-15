@@ -80,7 +80,7 @@ uint32_t hsv_to_rgb(uint32_t p){
     double Hf = 0;
     if (delta > 0){
         if (M == r){
-            Hf = fmod((g - b)/(double)delta, 6.0);
+            Hf = fmod(fmod((g - b)/(double)delta, 6.0)+6.0, 6.0);
         }else if (M == g){
             Hf = (b - r)/(double)delta + 2.0;
         }else{
