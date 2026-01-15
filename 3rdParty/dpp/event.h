@@ -100,8 +100,6 @@ event_decl(message_create,MESSAGE_CREATE);
 event_decl(message_update,MESSAGE_UPDATE);
 event_decl(message_delete,MESSAGE_DELETE);
 event_decl(message_delete_bulk,MESSAGE_DELETE_BULK);
-event_decl(message_poll_vote_add,MESSAGE_POLL_VOTE_ADD);
-event_decl(message_poll_vote_remove,MESSAGE_POLL_VOTE_REMOVE);
 
 /* Presence/typing */
 event_decl(presence_update,PRESENCE_UPDATE);
@@ -122,7 +120,6 @@ event_decl(invite_delete,INVITE_DELETE);
 
 /* Voice */
 event_decl(voice_state_update,VOICE_STATE_UPDATE);
-event_decl(voice_channel_effect_send,VOICE_CHANNEL_EFFECT_SEND);
 event_decl(voice_server_update,VOICE_SERVER_UPDATE);
 
 /* Webhooks */
@@ -157,4 +154,4 @@ event_decl(entitlement_create, ENTITLEMENT_CREATE);
 event_decl(entitlement_update, ENTITLEMENT_UPDATE);
 event_decl(entitlement_delete, ENTITLEMENT_DELETE);
 
-}
+} // namespace dpp::events

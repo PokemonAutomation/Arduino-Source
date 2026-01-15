@@ -39,7 +39,6 @@
 #include <dpp/cluster.h>
 #include <dpp/discordevents.h>
 #include <dpp/socket.h>
-#include <dpp/socketengine.h>
 #include <queue>
 #include <thread>
 #include <deque>
@@ -49,7 +48,6 @@
 #include <future>
 #include <functional>
 #include <chrono>
-#include <set>
 
 struct OpusDecoder;
 struct OpusEncoder;
@@ -57,27 +55,7 @@ struct OpusRepacketizer;
 
 namespace dpp {
 
-/**
- * @brief Sample rate for OPUS (48khz)
- */
-[[maybe_unused]] inline constexpr int32_t opus_sample_rate_hz = 48000;
-
-/**
- * @brief Channel count for OPUS (stereo)
- */
-[[maybe_unused]] inline constexpr int32_t opus_channel_count = 2;
-
-/**
- * @brief Discord voice protocol version
- */
-[[maybe_unused]] inline constexpr uint8_t voice_protocol_version = 8;
-
-
 class audio_mixer;
-
-namespace dave::mls {
-	class session;
-}
 
 // !TODO: change these to constexpr and rename every occurrence across the codebase
 #define AUDIO_TRACK_MARKER (uint16_t)0xFFFF
@@ -85,10 +63,6 @@ namespace dave::mls {
 #define AUDIO_OVERLAP_SLEEP_SAMPLES 30
 
 inline constexpr size_t send_audio_raw_max_length = 11520;
-
-inline constexpr size_t secret_key_size = 32;
-
-struct dave_state;
 
 /*
 * @brief For holding a moving average of the number of current voice users, for applying a smooth gain ramp.
@@ -126,115 +100,6 @@ struct DPP_EXPORT voice_out_packet {
 	uint64_t duration;
 };
 
-/**
- * @brief Supported DAVE (Discord Audio Visual Encryption) protocol versions
- */
-enum dave_version_t : uint8_t {
-	/**
-	 * @brief DAVE disabled (default for now)
-	 */
-	dave_version_none = 0,
-	/**
-	 * @brief DAVE enabled, version 1 (E2EE encryption on top of openssl)
-	 */
-	dave_version_1 = 1,
-};
-
-/**
- * @brief Discord voice websocket opcode types
- */
-enum voice_websocket_opcode_t : uint8_t {
-	voice_opcode_connection_identify = 0,
-	voice_opcode_connection_select_protocol = 1,
-	voice_opcode_connection_ready = 2,
-	voice_opcode_connection_heartbeat = 3,
-	voice_opcode_connection_description = 4,
-	voice_opcode_client_speaking = 5,
-	voice_opcode_connection_heartbeat_ack = 6,
-	voice_opcode_connection_resume = 7,
-	voice_opcode_connection_hello = 8,
-	voice_opcode_connection_resumed = 9,
-	voice_opcode_multiple_clients_connect = 11,
-	voice_opcode_client_disconnect = 13,
-	voice_opcode_media_sink = 15,
-	voice_client_flags = 18,
-	voice_client_platform = 20,
-	voice_client_dave_prepare_transition = 21,
-	voice_client_dave_execute_transition = 22,
-	voice_client_dave_transition_ready = 23,
-	voice_client_dave_prepare_epoch = 24,
-	voice_client_dave_mls_external_sender = 25,
-	voice_client_dave_mls_key_package = 26,
-	voice_client_dave_mls_proposals = 27,
-	voice_client_dave_mls_commit_message = 28,
-	voice_client_dave_announce_commit_transition = 29,
-	voice_client_dave_mls_welcome = 30,
-	voice_client_dave_mls_invalid_commit_welcome = 31,
-};
-
-/**
- * @brief DAVE E2EE Binary frame header
- */
-struct dave_binary_header_t {
-	/**
-	 * @brief Sequence number
-	 */
-	uint16_t seq;
-
-	/**
-	 * @brief Opcode type
-	 */
-	uint8_t opcode;
-
-	/**
-	 * @brief Data package, an opaque structure passed to the
-	 * Discord libdave functions.
-	 */
-	std::vector<uint8_t> package;
-
-	/**
-	 * @brief Fill binary header from inbound buffer
-	 * @param buffer inbound websocket buffer
-	 */
-	dave_binary_header_t(const std::string& buffer);
-
-	/**
-	 * Get the data package from the packed binary frame, as a vector of uint8_t
-	 * for use in the libdave functions
-	 * @return data blob
-	 */
-	[[nodiscard]] std::vector<uint8_t> get_data() const;
-
-	/**
-	 * Get transition ID for process_commit and process_welcome
-	 *
-	 * @return Transition ID
-	 */
-	[[nodiscard]] uint16_t get_transition_id() const;
-
-private:
-	/**
-	 * @brief Transition id, only valid when the opcode is
-	 * commit and welcome state. Use get_transition_id() to obtain value.
-	 */
-	uint16_t transition_id;
-};
-
-/**
- * @brief A callback for obtaining a user's privacy code.
- * The privacy code is returned as the parameter to the function.
- *
- * This is a callback function because DAVE requires use of a very resource
- * intensive SCRYPT call, which uses lots of ram and cpu and take significant
- * time.
- */
-using privacy_code_callback_t = std::function<void(const std::string&)>;
-
-/**
- * @brief A callback for a full reconnection after the voice client disconnects due to error.
- */
-using full_reconnection_callback_t = std::function<void()>;
-
 /** @brief Implements a discord voice connection.
  * Each discord_voice_client connects to one voice channel and derives from a websocket client.
  */
@@ -244,11 +109,6 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 	 * @brief Clean up resources
 	 */
 	void cleanup();
-
-	/**
-	 * @brief A frame of silence packet
-	 */
-	static constexpr uint8_t silence_packet[3] = { 0xf8, 0xff, 0xfe };
 
 	/**
 	 * @brief Mutex for outbound packet stream
@@ -261,21 +121,24 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 	std::shared_mutex queue_mutex;
 
 	/**
-	 * @brief Our public IP address
-	 *
-	 * Use discord_voice_client::discover_ip() to access this value
-	 */
-	std::string external_ip;
-
-	/**
 	 * @brief Queue of outbound messages
 	 */
 	std::deque<std::string> message_queue;
 
 	/**
+	 * @brief Thread this connection is executing on
+	 */
+	std::thread* runner;
+
+	/**
+	 * @brief Run shard loop under a thread
+	 */
+	void thread_run();
+
+	/**
 	 * @brief Last connect time of voice session
 	 */
-	time_t connect_time{};
+	time_t connect_time;
 
 	/*
 	* @brief For mixing outgoing voice data.
@@ -290,12 +153,12 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 	/**
 	 * @brief Port number of UDP/RTP endpoint
 	 */
-	uint16_t port{};
+	uint16_t port;
 
 	/**
 	 * @brief SSRC value 
 	 */
-	uint64_t ssrc{};
+	uint64_t ssrc;
 
 	/**
 	 * @brief List of supported audio encoding modes
@@ -305,7 +168,7 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 	/**
 	 * @brief Timescale in nanoseconds
 	 */
-	uint64_t timescale{};
+	uint64_t timescale;
 
 	/**
 	 * @brief Output buffer
@@ -432,43 +295,19 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 	/**
 	 * @brief If true, audio packet sending is paused
 	 */
-	bool paused{};
-
-	/**
-	 * @brief Whether has sent 5 frame of silence before stopping on pause.
-	 *
-	 * This is to avoid unintended Opus interpolation with subsequent transmissions.
-	 */
-	bool sent_stop_frames{};
-
-	/**
-	 * @brief Number of times we have tried to reconnect in the last few seconds
-	 */
-	size_t times_looped{0};
-
-	/**
-	 * @brief Last time we reconnected
-	 */
-	time_t last_loop_time{0};
+	bool paused;
 
 #ifdef HAVE_VOICE
 	/**
 	 * @brief libopus encoder
 	 */
-	OpusEncoder* encoder{};
+	OpusEncoder* encoder;
 
 	/**
 	 * @brief libopus repacketizer
 	 * (merges frames into one packet)
 	 */
-	OpusRepacketizer* repacketizer{};
-
-	/**
-	 * @brief This holds the state information for DAVE E2EE.
-	 * it is only allocated if E2EE is active on the voice channel.
-	 */
-	std::unique_ptr<dave_state> mls_state;
-
+	OpusRepacketizer* repacketizer;
 #else
 	/**
 	 * @brief libopus encoder
@@ -480,73 +319,32 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 	 * (merges frames into one packet)
 	 */
 	void* repacketizer;
-
-	/**
-	 * @brief This holds the state information for DAVE E2EE.
-	 * it is only allocated if E2EE is active on the voice channel.
-	 */
-	std::unique_ptr<int> mls_state{};
 #endif
-
-	/**
-	 * @brief The list of users that have E2EE potentially enabled for
-	 * DAVE protocol.
-	 */
-	std::set<dpp::snowflake> dave_mls_user_list;
-
-	/**
-	 * @brief The list of users that have left the voice channel but
-	 * not yet removed from MLS group.
-	 */
-	std::set<dpp::snowflake> dave_mls_pending_remove_list;
 
 	/**
 	 * @brief File descriptor for UDP connection
 	 */
-	dpp::socket fd{};
+	dpp::socket fd;
 
 	/**
 	 * @brief Secret key for encrypting voice.
-	 * If it has been sent, this contains a sequence of exactly 32 bytes
-	 * (secret_key_size) and has_secret_key is set to true.
+	 * If it has been sent, this is non-null and points to a 
+	 * sequence of exactly 32 bytes.
 	 */
-	std::array<uint8_t, secret_key_size> secret_key{};
-
-	/**
-	 * @brief True if the voice client has a secret key
-	 */
-	bool has_secret_key{false};
+	uint8_t* secret_key;
 
 	/**
 	 * @brief Sequence number of outbound audio. This is incremented
 	 * once per frame sent.
 	 */
-	uint16_t sequence{};
-
-	/**
-	 * @brief Last received sequence from gateway.
-	 *
-	 * Needed for heartbeat and resume payload.
-	 */
-	int32_t receive_sequence{};
+	uint16_t sequence;
 
 	/**
 	 * @brief Timestamp value used in outbound audio. Each packet
 	 * has the timestamp value which is incremented to match
 	 * how many frames are sent.
 	 */
-	uint32_t timestamp{};
-
-	/**
-	 * @brief Each packet should have a nonce, a 32-bit incremental
-	 * integer value appended to payload.
-	 *
-	 * We should keep track of this value and increment it for each
-	 * packet sent.
-	 *
-	 * Current initial value is hardcoded to 1.
-	 */
-	uint32_t packet_nonce{};
+	uint32_t timestamp;
 
 	/**
 	 * @brief Last sent packet high-resolution timestamp
@@ -556,7 +354,7 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 	/**
 	 * @brief Fraction of the sleep that was not executed after the last audio packet was sent
 	 */
-	std::chrono::nanoseconds last_sleep_remainder{};
+	std::chrono::nanoseconds last_sleep_remainder;
 
 	/**
 	 * @brief Maps receiving ssrc to user id
@@ -568,7 +366,7 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 	 * When this moves from false to true, this causes the
 	 * client to send the 'talking' notification to the websocket.
 	 */
-	bool sending{};
+	bool sending;
 
 	/**
 	 * @brief Number of track markers in the buffer. For example if there
@@ -579,7 +377,7 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 	 * If the buffer is empty, there are zero tracks in the
 	 * buffer.
 	 */
-	uint32_t tracks{};
+	uint32_t tracks;
 
 	/**
 	 * @brief Meta data associated with each track.
@@ -591,21 +389,7 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 	/** 
 	 * @brief Encoding buffer for opus repacketizer and encode
 	 */
-	uint8_t encode_buffer[65536]{};
-
-	/**
-	 * @brief DAVE - Discord Audio Visual Encryption
-	 * Used for E2EE encryption. dave_protocol_none is
-	 * the default right now.
-	 */
-	dave_version_t dave_version;
-
-	/**
-	 * @brief Destination address for where packets go
-	 * on the UDP socket
-	 */
-	address_t destination{};
-
+	uint8_t encode_buffer[65536];
 
 	/**
 	 * @brief Send data to UDP socket immediately.
@@ -627,7 +411,25 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 	int udp_recv(char* data, size_t max_length);
 
 	/**
-	 * @brief Called by socketengine when the socket is ready
+	 * @brief This hooks the ssl_client, returning the file
+	 * descriptor if we want to send buffered data, or
+	 * -1 if there is nothing to send
+	 * 
+	 * @return int file descriptor or -1
+	 */
+	dpp::socket want_write();
+
+	/**
+	 * @brief This hooks the ssl_client, returning the file
+	 * descriptor if we want to receive buffered data, or
+	 * -1 if we are not wanting to receive
+	 * 
+	 * @return int file descriptor or -1
+	 */
+	dpp::socket want_read();
+
+	/**
+	 * @brief Called by ssl_client when the socket is ready
 	 * for writing, at this point we pick the head item off
 	 * the buffer and send it. So long as it doesn't error
 	 * completely, we pop it off the head of the queue.
@@ -635,7 +437,7 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 	void write_ready();
 
 	/**
-	 * @brief Called by socketengine when there is data to be
+	 * @brief Called by ssl_client when there is data to be
 	 * read. At this point we insert that data into the
 	 * input queue.
 	 * @throw dpp::voice_exception if voice support is not compiled into D++
@@ -648,10 +450,8 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 	 * @param packet packet data
 	 * @param len length of packet
 	 * @param duration duration of opus packet
-	 * @param send_now send this packet right away without buffering.
-	 * Do NOT set send_now to true outside write_ready.
 	 */
-	void send(const char* packet, size_t len, uint64_t duration, bool send_now = false);
+	void send(const char* packet, size_t len, uint64_t duration);
 
 	/**
 	 * @brief Queue a message to be sent via the websocket
@@ -690,60 +490,53 @@ class DPP_EXPORT discord_voice_client : public websocket_client
 	 */
 	size_t encode(uint8_t *input, size_t inDataSize, uint8_t *output, size_t &outDataSize);
 
-	/**
-	 * Updates DAVE MLS ratchets for users in the VC
-	 * @param force True to force updating of ratchets regardless of state
-	 */
-	void update_ratchets(bool force = false);
-
-	/**
-	 * @brief Called in constructor and on reconnection of websocket
-	 */
-	void setup();
-
-	/**
-	 * @brief Events for UDP Socket IO
-	 */
-	dpp::socket_events udp_events;
-
 public:
 
 	/**
 	 * @brief Owning cluster
 	 */
-	class dpp::cluster* creator{};
+	class dpp::cluster* creator;
 
-	full_reconnection_callback_t reconnection_callback;
+	/**
+	 * @brief This needs to be static, we only initialise libsodium once per program start,
+	 * so initialising it on first use in a voice connection is best.
+	 */
+	static bool sodium_initialised;
 
 	/**
 	 * @brief True when the thread is shutting down
 	 */
-	bool terminating{};
+	bool terminating;
 
 	/**
 	 * @brief The gain value for the end of the current voice iteration.
 	 */
-	float end_gain{};
+	float end_gain;
 
 	/**
 	 * @brief The gain value for the current voice iteration.
 	 */
-	float current_gain{};
+	float current_gain;
 
 	/**
 	 * @brief The amount to increment each successive sample for, for the current voice iteration.
 	 */
-	float increment{};
+	float increment;
 
 	/**
 	 * @brief Heartbeat interval for sending heartbeat keepalive
 	 */
-	uint32_t heartbeat_interval{};
+	uint32_t heartbeat_interval;
 
 	/**
 	 * @brief Last voice channel websocket heartbeat
 	 */
-	time_t last_heartbeat{};
+	time_t last_heartbeat;
+
+	/**
+	 * @brief Thread ID
+	 */
+	std::thread::native_handle_type thread_id;
 
 	/**
 	 * @brief Discord voice session token
@@ -771,10 +564,7 @@ public:
 	snowflake channel_id;
 
 	/**
-	 * @brief The audio type to be sent.
-	 *
-	 * @note On Windows, the default type is overlap audio.
-	 * On all other platforms, it is recorded audio.
+	 * @brief The audio type to be sent. The default type is recorded audio.
 	 *
 	 * If the audio is recorded, the sending of audio packets is throttled.
 	 * Otherwise, if the audio is live, the sending is not throttled.
@@ -804,15 +594,10 @@ public:
 	 */
 	enum send_audio_type_t
 	{
-		satype_recorded_audio,
-		satype_live_audio,
+	    satype_recorded_audio,
+	    satype_live_audio,
 		satype_overlap_audio
-	} send_audio_type =
-#ifdef _WIN32
-	satype_overlap_audio;
-#else
-	satype_recorded_audio;
-#endif
+	} send_audio_type = satype_recorded_audio;
 
 	/**
 	 * @brief Sets the gain for the specified user.
@@ -839,13 +624,13 @@ public:
 	 * @param severity The log level from dpp::loglevel
 	 * @param msg The log message to output
 	 */
-	virtual void log(dpp::loglevel severity, const std::string &msg) const override;
+	virtual void log(dpp::loglevel severity, const std::string &msg) const;
 
 	/**
 	 * @brief Fires every second from the underlying socket I/O loop, used for sending heartbeats
 	 * @throw dpp::exception if the socket needs to disconnect
 	 */
-	virtual void one_second_timer() override;
+	virtual void one_second_timer();
 
 	/**
 	 * @brief voice client is ready to stream audio.
@@ -869,48 +654,38 @@ public:
 	 */
 	dpp::utility::uptime get_uptime();
 
-	/**
-	 * @brief The time (in milliseconds) between each interval when parsing audio.
-	 *
-	 * @warning You should only change this if you know what you're doing. It is set to 500ms by default.
-	 */
-	uint16_t iteration_interval{500};
-
 	/** Constructor takes shard id, max shards and token.
 	 * @param _cluster The cluster which owns this voice connection, for related logging, REST requests etc
-	 * @param _reconnection_callback The callback this voice client calls if the voice connection was closed due to error
 	 * @param _channel_id The channel id to identify the voice connection as
 	 * @param _server_id The server id (guild id) to identify the voice connection as
 	 * @param _token The voice session token to use for identifying to the websocket
 	 * @param _session_id The voice session id to identify with
 	 * @param _host The voice server hostname to connect to (hostname:port format)
-	 * @param enable_dave Enable DAVE E2EE
-	 * @throw dpp::voice_exception Opus failed to initialise, or D++ is not compiled with voice support
+	 * @throw dpp::voice_exception Sodium or Opus failed to initialise, or D++ is not compiled with voice support
 	 */
-	discord_voice_client(dpp::cluster* _cluster, full_reconnection_callback_t _reconnection_callback, snowflake _channel_id, snowflake _server_id, const std::string &_token, const std::string &_session_id, const std::string &_host, bool enable_dave = true);
+	discord_voice_client(dpp::cluster* _cluster, snowflake _channel_id, snowflake _server_id, const std::string &_token, const std::string &_session_id, const std::string &_host);
 
 	/**
 	 * @brief Destroy the discord voice client object
 	 */
-	virtual ~discord_voice_client() override;
+	virtual ~discord_voice_client();
 
 	/**
 	 * @brief Handle JSON from the websocket.
 	 * @param buffer The entire buffer content from the websocket client
-	 * @param opcode Frame type, e.g. OP_TEXT, OP_BINARY
 	 * @return bool True if a frame has been handled
 	 * @throw dpp::exception If there was an error processing the frame, or connection to UDP socket failed
 	 */
-	virtual bool handle_frame(const std::string &buffer, ws_opcode opcode) override;
+	virtual bool handle_frame(const std::string &buffer);
 
 	/**
 	 * @brief Handle a websocket error.
 	 * @param errorcode The error returned from the websocket
 	 */
-	virtual void error(uint32_t errorcode) override;
+	virtual void error(uint32_t errorcode);
 
 	/**
-	 * @brief Start and monitor websocket I/O
+	 * @brief Start and monitor I/O loop
 	 */
 	void run();
 
@@ -919,7 +694,7 @@ public:
 	 * 
 	 * You should send an audio packet of `send_audio_raw_max_length` (11520) bytes.
 	 * Note that this function can be costly as it has to opus encode
-	 * the PCM audio on the fly, and also encrypt it with openssl.
+	 * the PCM audio on the fly, and also encrypt it with libsodium.
 	 * 
 	 * @note Because this function encrypts and encodes packets before
 	 * pushing them onto the output queue, if you have a complete stream
@@ -959,7 +734,7 @@ public:
 	 * Some containers such as .ogg may contain OPUS
 	 * encoded data already. In this case, we don't need to encode the
 	 * frames using opus here. We can bypass the codec, only applying 
-	 * openssl to the stream.
+	 * libsodium to the stream.
 	 * 
 	 * @param opus_packet Opus packets. Discord expects opus frames 
 	 * to be encoded at 48000Hz
@@ -969,10 +744,6 @@ public:
 	 * @param duration Generally duration is 2.5, 5, 10, 20, 40 or 60
 	 * if the timescale is 1000000 (1ms) 
 	 * 
-	 * @param send_now Send this packet right away without buffering,
-	 * this will skip duration calculation for the packet being sent
-	 * and only safe to be set to true in write_ready.
-	 *
 	 * @return discord_voice_client& Reference to self
 	 * 
 	 * @note It is your responsibility to ensure that packets of data 
@@ -983,7 +754,7 @@ public:
 	 * 
 	 * @throw dpp::voice_exception If data length is invalid or voice support not compiled into D++
 	 */
-	discord_voice_client& send_audio_opus(const uint8_t* opus_packet, const size_t length, uint64_t duration, bool send_now = false);
+	discord_voice_client& send_audio_opus(uint8_t* opus_packet, const size_t length, uint64_t duration);
 
 	/**
 	 * @brief Send opus packets to the voice channel
@@ -991,7 +762,7 @@ public:
 	 * Some containers such as .ogg may contain OPUS
 	 * encoded data already. In this case, we don't need to encode the
 	 * frames using opus here. We can bypass the codec, only applying 
-	 * opens to the stream.
+	 * libsodium to the stream.
 	 * 
 	 * Duration is calculated internally
 	 * 
@@ -1010,7 +781,7 @@ public:
 	 * 
 	 * @throw dpp::voice_exception If data length is invalid or voice support not compiled into D++
 	 */
-	discord_voice_client& send_audio_opus(const uint8_t* opus_packet, const size_t length);
+	discord_voice_client& send_audio_opus(uint8_t* opus_packet, const size_t length);
 
 	/**
 	 * @brief Send silence to the voice channel
@@ -1022,19 +793,6 @@ public:
 	 * @throw dpp::voice_exception if voice support is not compiled into D++
 	 */
 	discord_voice_client& send_silence(const uint64_t duration);
-
-	/**
-	 * @brief Send stop frames to the voice channel.
-	 *
-	 * @param send_now send this packet right away without buffering.
-	 * Do NOT set send_now to true outside write_ready.
-	 * Also make sure you're not locking stream_mutex if you
-	 * don't set send_now to true.
-	 * 
-	 * @return discord_voice_client& Reference to self
-	 * @throw dpp::voice_exception if voice support is not compiled into D++
-	 */
-	discord_voice_client& send_stop_frames(bool send_now = false);
 
 	/**
 	 * @brief Sets the audio type that will be sent with send_audio_* methods.
@@ -1085,22 +843,6 @@ public:
 	 * @return reference to self
 	 */
 	discord_voice_client& stop_audio();
-
-	/**
-	 * @brief Change the iteration interval time.
-	 *
-	 * @param interval The time (in milliseconds) between each interval when parsing audio.
-	 *
-	 * @return Reference to self.
-	 */
-	discord_voice_client& set_iteration_interval(uint16_t interval);
-
-	/**
-	 * @brief Get the iteration interval time (in milliseconds).
-	 *
-	 * @return iteration_interval
-	 */
-	uint16_t get_iteration_interval();
 
 	/**
 	 * @brief Returns true if we are playing audio
@@ -1191,83 +933,7 @@ public:
 	 * for a single packet from Discord's voice servers.
 	 */
 	std::string discover_ip();
-
-	/**
-	 * @brief Returns true if end-to-end encryption is enabled
-	 * for the active voice call (Discord Audio Visual
-	 * Encryption, a.k.a. DAVE).
-	 *
-	 * @return True if end-to-end encrypted
-	 */
-	bool is_end_to_end_encrypted() const;
-
-	/**
-	 * @brief Returns the privacy code for the end to end encryption
-	 * scheme ("DAVE"). if end-to-end encryption is not active,
-	 * or is not yet established, this will return an empty
-	 * string.
-	 *
-	 * @return A sequence of six five-digit integers which
-	 * can be matched against the Discord client, in the
-	 * privacy tab for the properties of the voice call.
-	 */
-	std::string get_privacy_code() const;
-
-	/**
-	 * @brief Returns the privacy code for a given user by id,
-	 * if they are in the voice call, and enc-to-end encryption
-	 * is enabled.
-	 *
-	 * @param user User ID to fetch the privacy code for
-	 * @param callback Callback to call with the privacy code when
-	 * the creation of the code is complete.
-	 * @warning This call spawns a thread, as getting a user's
-	 * privacy code is a CPU-intensive and memory-intensive operation
-	 * which internally uses scrypt.
-	 */
-	void get_user_privacy_code(const dpp::snowflake user, privacy_code_callback_t callback) const;
-
-	/**
-	 * @brief Notify gateway ready for a DAVE transition.
-	 *
-	 * Fires Voice Ready event when appropriate.
-	 *
-	 * https://daveprotocol.com/#commit-handling
-	 *
-	 * @param data Websocket frame data
-	 */
-	void ready_for_transition(const std::string &data);
-
-	/**
-	 * @brief Reset dave session, send voice_client_dave_mls_invalid_commit_welcome
-	 * payload with current transition Id and our new key package to gateway.
-	 *
-	 * https://daveprotocol.com/#recovery-from-invalid-commit-or-welcome
-	 */
-	void recover_from_invalid_commit_welcome();
-
-	/**
-	 * @brief Execute pending protocol upgrade/downgrade to/from dave.
-	 * @return true if did an upgrade/downgrade
-	 */
-	bool execute_pending_upgrade_downgrade();
-
-	/**
-	 * @brief Reset dave session and prepare initial session group.
-	 */
-	void reinit_dave_mls_group();
-
-	/**
-	 * @brief Process roster map from commit/welcome.
-	 * @param rmap Roster map
-	 */
-	void process_mls_group_rosters(const std::map<uint64_t, std::vector<uint8_t>>& rmap);
-
-	/**
-	 * @brief Called on websocket disconnection
-	 */
-	void on_disconnect() override;
 };
 
-}
+} // namespace dpp
 

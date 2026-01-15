@@ -24,13 +24,11 @@
 
 #include <immintrin.h>
 #include <numeric>
-#include <cstdint>
-#include <limits>
 
 namespace dpp {
 
 	using avx_float = __m128;
-
+	
 	/**
 	 * @brief A class for audio mixing operations using AVX instructions.
 	 */
@@ -75,10 +73,7 @@ namespace dpp {
 		}
 
 	protected:
-		/**
-		 * @brief Array for storing the values to be loaded/stored.
-		 */
-		alignas(16) float values[byte_blocks_per_register]{};
+		alignas(16) float values[byte_blocks_per_register]{};///< Array for storing the values to be loaded/stored.
 
 		/**
 		 * @brief Stores values from a 128-bit AVX vector to a storage location.
@@ -107,6 +102,6 @@ namespace dpp {
 		}
 	};
 
-}
+} // namespace dpp
 
 #endif
