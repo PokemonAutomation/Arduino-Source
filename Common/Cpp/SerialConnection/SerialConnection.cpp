@@ -4,6 +4,7 @@
  *
  */
 
+#include <mutex>
 #include <iostream>
 #include "Common/Cpp/Time.h"
 #include "SerialConnection.h"

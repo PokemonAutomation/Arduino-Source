@@ -33,14 +33,14 @@ void FriendCodeListOption::load_json(const JsonValue& json){
         lines.emplace_back(*str);
     }
     {
-        WriteSpinLock lg(m_lock);
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_lines = std::move(lines);
     }
     report_value_changed(this);
 }
 JsonValue FriendCodeListOption::to_json() const{
     JsonArray list;
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     for (const std::string& line : m_lines){
         list.push_back(line);
     }
@@ -48,7 +48,7 @@ JsonValue FriendCodeListOption::to_json() const{
 }
 void FriendCodeListOption::restore_defaults(){
     {
-        WriteSpinLock lg(m_lock);
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_lines = m_default;
     }
     report_value_changed(this);
@@ -80,17 +80,17 @@ void FriendCodeListOption::set(const std::string& text){
         lines.emplace_back(std::move(line));
     }
     {
-        WriteSpinLock lg(m_lock);
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_lines = std::move(lines);
     }
     report_value_changed(this);
 }
 std::vector<std::string> FriendCodeListOption::lines() const{
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     return m_lines;
 }
 std::vector<std::string> FriendCodeListOption::list() const{
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     std::vector<std::string> ret;
     for (const auto& item : m_lines){
         std::string line = parse(item);

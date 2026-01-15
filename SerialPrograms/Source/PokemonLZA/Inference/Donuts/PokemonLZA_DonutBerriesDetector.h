@@ -24,7 +24,10 @@ namespace PokemonLZA{
 // Detect the vertical pink bar on the left of the selected berry's row in the donut maker.
 class DonutBerriesSelectionDetector : public StaticScreenDetector{
 public:
-    // menu_index: which row of the selection arrow should be on. Range: [0, 7]:
+    // Index of the last row of the berry page when making a donut
+    static constexpr size_t LAST_BERRY_PAGE_ROW = 7;
+    
+    // menu_index: which row of the selection arrow should be on. Range: [0, LAST_BERRY_PAGE_ROW]:
     // there are at most 8 rows on screen.
     DonutBerriesSelectionDetector(size_t menu_index);
 

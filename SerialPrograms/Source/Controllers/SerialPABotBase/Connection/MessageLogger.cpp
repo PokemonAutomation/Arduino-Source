@@ -28,7 +28,7 @@ void SerialLogger::log(const std::string& msg, Color color){
 
 bool SerialLogger::ok_to_log(){
     WallClock now = current_time();
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     while (!m_history.empty()){
         if (now - m_history.front() < std::chrono::seconds(1)){
             break;

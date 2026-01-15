@@ -9,9 +9,9 @@
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch_CloseGameDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -21,7 +21,7 @@ namespace NintendoSwitch{
 CloseGameDetector::CloseGameDetector(ConsoleHandle& console, Color color)
     : m_color(color)
     , m_top_box(0.226358, 0.272648, 0.407445, 0.033989)
-    , m_left_box(0.225, 0.275, 0.01995, 0.350)
+    , m_left_box(0.225, 0.275, 0.015, 0.350)
     , m_close_game_text_row(0.330986, 0.649052, 0.342052, 0.051878)
 {}
 void CloseGameDetector::make_overlays(VideoOverlaySet& items) const{
@@ -68,6 +68,8 @@ bool CloseGameDetector::detect(const ImageViewRGB32& screen){
 
     if (white){ // if top is white, ensure left is also white
         if (!is_white(stats_top) || !is_white(stats_left)){
+//            cout << "top = " << stats_top.stddev << " / " << stats_top.average << endl;
+//            cout << "left = " << stats_left.stddev << " / " << stats_left.average << endl;
 //            cout << "asdf" << endl;
             return false;
         }
@@ -80,7 +82,7 @@ bool CloseGameDetector::detect(const ImageViewRGB32& screen){
 
     // ensure top and left are the same color.
     if (euclidean_distance(stats_top.average, stats_left.average) > 20){
-//        cout << "qwer = " << euclidean_distance(stats_bottom_row.average, stats_bottom_row.average) << endl;
+//        cout << "qwer = " << euclidean_distance(stats_top.average, stats_left.average) << endl;
         return false;
     }
 

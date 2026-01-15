@@ -27,7 +27,7 @@ SuperscalarScheduler::SuperscalarScheduler(
 
 
 void SuperscalarScheduler::clear() noexcept{
-//    SpinLockGuard lg(m_lock);
+//    WriteSpinLock lg(m_lock);
 //    m_logger.log("Clearing schedule...");
     WallClock now = current_time();
     m_local_start = now;
@@ -116,7 +116,7 @@ bool SuperscalarScheduler::iterate_schedule(Schedule& schedule){
     entry.duration = duration;
     entry.state = std::move(state);
 
-//    SpinLockGuard lg(m_lock);
+//    WriteSpinLock lg(m_lock);
 
     WallClock now = current_time();
     m_local_last_activity = now;

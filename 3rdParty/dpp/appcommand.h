@@ -19,6 +19,7 @@
  *
  ************************************************************************************/
 #pragma once
+#include <dpp/integration.h>
 #include <dpp/export.h>
 #include <dpp/snowflake.h>
 #include <dpp/managed.h>
@@ -39,9 +40,13 @@ namespace dpp {
  * This value represents that maximum. interaction_response::add_autocomplete_choice does not allow
  * adding more than this number of elements to the vector.
  */
-#ifndef AUTOCOMPLETE_MAX_CHOICES
-	#define AUTOCOMPLETE_MAX_CHOICES 25
-#endif
+inline constexpr size_t AUTOCOMPLETE_MAX_CHOICES = 25;
+
+/**
+ * @brief Discords default attachment size limit is 10MiB, and will be used in case
+ * an interaction does not contain its attachment size limit.
+ */
+inline constexpr uint32_t DEFAULT_ATTACHMENT_SIZE_LIMIT = 10 * 1024 * 1024;
 
 /**
  * @brief Represents command option types.
@@ -443,6 +448,9 @@ enum interaction_response_type {
 	 * @see https://discord.com/developers/docs/monetization/entitlements#premiumrequired-interaction-response
 	 * @note Not available for autocomplete and ping interactions.
 	 * @warning This response does not support using `content`, `embeds`, or `attachments`, so reply with no data when using this!
+	 *
+	 * @depreciated Replaced with buttons with a style of cos_premium
+	 * This interaction type may stop working at any point
 	 */
 	ir_premium_required = 10,
 };
@@ -600,6 +608,36 @@ public:
 	 * @param _components Components to add to the modal form
 	 */
 	interaction_modal_response(const std::string& _custom_id, const std::string& _title, const std::vector<component> _components = {});
+
+	/**
+	 * @brief Copy constructor
+	 *
+	 * @param other The object to copy from
+	 */
+	interaction_modal_response(const interaction_modal_response& other) = default;
+
+	/**
+	 * @brief Copy assignment operator
+	 *
+	 * @param other The object to copy from
+	 * @return interaction_modal_response& reference to self
+	 */
+	interaction_modal_response& operator=(const interaction_modal_response& other) = default;
+
+	/**
+	 * @brief Move constructor
+	 *
+	 * @param other The object to move from
+	 */
+	interaction_modal_response(interaction_modal_response&& other) noexcept = default;
+
+	/**
+	 * @brief Move assignment operator
+	 *
+	 * @param other The object to move from
+	 * @return interaction_modal_response& reference to self
+	 */
+	interaction_modal_response& operator=(interaction_modal_response&& other) noexcept = default;
 
 	/**
 	 * @brief Set the custom id
@@ -770,6 +808,26 @@ enum interaction_type {
 	it_modal_submit = 5,
 };
 
+/*
+* @brief Context type where the interaction can be used or triggered from, e.g. guild, user etc
+*/
+enum interaction_context_type {
+	/**
+	 * @brief Interaction can be used within servers
+	 */
+	itc_guild = 0,
+
+	/**
+	 * @brief Interaction can be used within DMs with the app's bot user
+	 */
+	itc_bot_dm = 1,
+
+	/**
+	 * @brief Interaction can be used within Group DMs and DMs other than the app's bot user
+	 */
+	itc_private_channel = 2,
+};
+
 /**
  * @brief Right-click context menu types
  */
@@ -918,7 +976,7 @@ protected:
 	 * @brief Get a resolved object from the resolved set
 	 * 
 	 * @tparam T type of object to retrieve
-	 * @tparam C container defintion for resolved container
+	 * @tparam C container definition for resolved container
 	 * @param id Snowflake ID
 	 * @param resolved_set container for the type
 	 * @return const T& retrieved type
@@ -949,6 +1007,16 @@ protected:
 	virtual json to_json_impl(bool with_id = false) const;
 
 public:
+	/**
+	 * @brief Context where the interaction was triggered from
+	 */
+	std::map<application_integration_types, snowflake> authorizing_integration_owners;
+
+	/**
+	 * @brief Context where the interaction was triggered from
+	 */
+	std::optional<interaction_context_type> context;
+
 	/**
 	 * @brief ID of the application this interaction is for.
 	 */
@@ -1028,6 +1096,11 @@ public:
 	 * @brief Guild's locale (language) - for guild interactions only.
 	 */
 	std::string guild_locale;
+
+	/**
+	 * @brief Attachment size limit in bytes for this interaction. Will be the discord default if not provided by the interaction.
+	 */
+	uint32_t attachment_size_limit;
 
 	/**
 	 * @brief Cache policy from cluster.
@@ -1191,6 +1264,30 @@ public:
 	 * is not for a command.
 	 */
 	std::string get_command_name() const;
+
+	/**
+	 * @brief Get the user who installed the application for a given type.
+	 * @param type Type of installation for the command, e.g. dpp::ait_guild_install or
+	 * dpp::ait_user_install.
+	 * @return The snowflake of the user. In the event this type is not allowed for the
+	 * given command, this will return a default-initialised snowflake with value 0.
+	 */
+	dpp::snowflake get_authorizing_integration_owner(application_integration_types type) const;
+
+	/**
+	 * @brief Returns true if this interaction occurred as a user-app interaction, e.g.
+	 * within a DM or group DM, added to the user not a guild.
+	 * @return true if a user-app interaction
+	 */
+	bool is_user_app_interaction() const;
+
+	/**
+	 * @brief Returns true if this interaction occurred as a guild-invited interaction, e.g.
+	 * within a guild's channel, or a DM of a user in that guild.
+	 * @return true if a guild interaction
+	 */
+	bool is_guild_interaction() const;
+
 };
 
 /**
@@ -1418,9 +1515,20 @@ public:
 	permission default_member_permissions;
 
 	/**
+	 * @brief Installation contexts where the command is available, only for globally-scoped commands. Defaults to your app's configured contexts
+	 */
+	std::vector<application_integration_types> integration_types;
+
+	/**
+	 * @brief Interaction context(s) where the command can be used, only for globally-scoped commands. By default, all interaction context types included for new commands.
+	 */
+	std::vector<interaction_context_type> contexts;
+
+	/**
 	 * @brief True if this command should be allowed in a DM
 	 * D++ defaults this to false. Cannot be set to true in a guild
 	 * command, only a global command.
+	 * @deprecated Use dpp::slashcommand_t::set_interaction_contexts instead
 	 */
 	bool dm_permission;
 
@@ -1487,7 +1595,8 @@ public:
 	/**
 	 * @brief Set the default permissions of the slash command
 	 * 
-	 * @param defaults default permissions to set. This is a permission bitmask of bits from dpp::permissions
+	 * @param defaults default permissions to set. This is a permission bitmask of bits from dpp::permissions.
+	 * This is also an AND list, which means the user must have **all** specified permissions to use the command.
 	 * @note You can set it to 0 to disable the command for everyone except admins by default
 	 *
 	 * @return slashcommand& reference to self for chaining of calls
@@ -1541,6 +1650,14 @@ public:
 	slashcommand& set_application_id(snowflake i);
 
 	/**
+	 * @brief Set the interaction contexts for the command
+	 *
+	 * @param contexts the contexts to set
+	 * @return slashcommand& reference to self for chaining of calls
+	 */
+	slashcommand& set_interaction_contexts(std::vector<interaction_context_type> contexts);
+
+	/**
 	 * @brief Adds a permission to the command
 	 *
 	 * @param p permission to add
@@ -1588,4 +1705,4 @@ typedef std::unordered_map<snowflake, slashcommand> slashcommand_map;
  */
 typedef std::unordered_map<snowflake, guild_command_permissions> guild_command_permissions_map;
 
-} // namespace dpp
+}

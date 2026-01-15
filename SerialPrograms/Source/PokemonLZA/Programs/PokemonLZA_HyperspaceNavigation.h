@@ -32,7 +32,7 @@ bool check_calorie(
 
 // Wait until the warp pad is detected on screen
 // Throws OperationFailedException if warp pad is not detected within 5 seconds
-void detect_warp_pad(
+void detect_interactable(
     ConsoleHandle& console,
     ProControllerContext& context
 );

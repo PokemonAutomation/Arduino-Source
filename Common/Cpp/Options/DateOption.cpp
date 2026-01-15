@@ -73,11 +73,11 @@ DateTimeCell::DateTimeCell(
 }
 
 DateTimeCell::operator DateTime() const{
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     return m_current;
 }
 DateTime DateTimeCell::get() const{
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     return m_current;
 }
 std::string DateTimeCell::set(const DateTime& x){
@@ -86,7 +86,7 @@ std::string DateTimeCell::set(const DateTime& x){
         return err;
     }
     {
-        WriteSpinLock lg(m_lock);
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (x == m_current){
             return std::string();
         }
@@ -103,7 +103,7 @@ std::string DateTimeCell::check_validity(const DateTime& x) const{
     return std::string();
 }
 std::string DateTimeCell::check_validity() const{
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     return check_validity(m_current);
 }
 void DateTimeCell::restore_defaults(){
@@ -143,7 +143,7 @@ void DateTimeCell::load_json(const JsonValue& json){
         return;
     }
     {
-        WriteSpinLock lg(m_lock);
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_current = date;
     }
     report_value_changed(this);
@@ -151,7 +151,7 @@ void DateTimeCell::load_json(const JsonValue& json){
 JsonValue DateTimeCell::to_json() const{
     DateTime current;
     {
-        ReadSpinLock lg(m_lock);
+        ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         current = m_current;
     }
     return to_json(current);

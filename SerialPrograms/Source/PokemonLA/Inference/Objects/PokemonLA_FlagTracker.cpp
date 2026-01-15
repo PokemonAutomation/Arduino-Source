@@ -33,7 +33,7 @@ bool FlagTracker::get(
     double& distance, double& x, double& y,
     WallClock timestamp
 ) const{
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
 
     //  If history is empty or stale, return no detection.
     if (m_history.empty() || m_history.back().timestamp + std::chrono::milliseconds(500) < timestamp){
@@ -110,7 +110,7 @@ bool FlagTracker::process_frame(const ImageViewRGB32& frame, WallClock timestamp
     }
 
 
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
 
     //  Clear out old history.
     WallClock threshold = timestamp - std::chrono::seconds(2);

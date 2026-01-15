@@ -157,7 +157,7 @@ StreamHistoryTracker::StreamHistoryTracker(
 }
 
 void StreamHistoryTracker::set_window(std::chrono::seconds window){
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     m_window = window;
 }
 

@@ -114,7 +114,7 @@ void VideoOverlaySession::set_enabled_log(bool enabled){
 //
 
 void VideoOverlaySession::add_stat(OverlayStat& stat){
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     auto map_iter = m_stats.find(&stat);
     if (map_iter != m_stats.end()){
         return;
@@ -131,7 +131,7 @@ void VideoOverlaySession::add_stat(OverlayStat& stat){
     }
 }
 void VideoOverlaySession::remove_stat(OverlayStat& stat){
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     auto iter = m_stats.find(&stat);
     if (iter == m_stats.end()){
         return;
@@ -142,7 +142,7 @@ void VideoOverlaySession::remove_stat(OverlayStat& stat){
 }
 
 std::vector<OverlayStatSnapshot> VideoOverlaySession::stats() const{
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     return m_stat_lines;
 }
 
@@ -180,7 +180,7 @@ void VideoOverlaySession::remove_box(const OverlayBox& box){
     m_listeners.run_method(&ContentListener::on_overlay_update_boxes, ptr);
 }
 std::vector<OverlayBox> VideoOverlaySession::boxes() const{
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     std::vector<OverlayBox> ret;
     for (const auto& item : m_boxes){
         ret.emplace_back(*item);
@@ -222,7 +222,7 @@ void VideoOverlaySession::remove_text(const OverlayText& text){
     m_listeners.run_method(&ContentListener::on_overlay_update_text, ptr);
 }
 std::vector<OverlayText> VideoOverlaySession::texts() const{
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     std::vector<OverlayText> ret;
     for (const auto& item : m_texts){
         ret.emplace_back(*item);
@@ -264,7 +264,7 @@ void VideoOverlaySession::remove_image(const OverlayImage& image){
     m_listeners.run_method(&ContentListener::on_overlay_update_images, ptr);
 }
 std::vector<OverlayImage> VideoOverlaySession::images() const{
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     std::vector<OverlayImage> ret;
     for (const auto& item : m_images){
         ret.emplace_back(*item);
@@ -310,7 +310,7 @@ void VideoOverlaySession::clear_log(){
     m_listeners.run_method(&ContentListener::on_overlay_update_log, ptr);
 }
 std::vector<OverlayLogLine> VideoOverlaySession::log_texts() const{
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     std::vector<OverlayLogLine> ret;
     for (const auto& item : m_log_texts){
         ret.emplace_back(item);

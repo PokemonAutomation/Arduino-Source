@@ -25,7 +25,7 @@ OutputRedirector::~OutputRedirector(){
 
 
 OutputRedirector::int_type OutputRedirector::overflow(int_type ch){
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     m_old_buf->sputc((char)ch);
     m_old_buf->pubsync();
     m_buffer += (char)ch;
@@ -36,7 +36,7 @@ OutputRedirector::int_type OutputRedirector::overflow(int_type ch){
     return ch;
 }
 std::streamsize OutputRedirector::xsputn(const char_type* s, std::streamsize count){
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     m_old_buf->sputn(s, count);
     m_buffer.append(s, count);
     if (!m_buffer.empty() && m_buffer.back() == '\n'){

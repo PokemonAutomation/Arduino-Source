@@ -16,7 +16,7 @@
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Thread.h"
-#include "StreamInterface.h"
+#include "Common/Cpp/StreamConnections/StreamConnection.h"
 
 namespace PokemonAutomation{
 
@@ -150,7 +150,7 @@ public:
 
 
 private:
-    virtual void send(const void* data, size_t bytes){
+    virtual size_t send(const void* data, size_t bytes){
         WriteSpinLock lg(m_send_lock, "SerialConnection::send()");
         size_t sent = write(m_fd, data, bytes);
         if (sent != bytes){
@@ -158,6 +158,7 @@ private:
         }else{
             m_consecutive_errors.store(0, std::memory_order_release);
         }
+        return sent;
     }
 
     void recv_loop(){

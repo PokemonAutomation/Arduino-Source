@@ -16,6 +16,7 @@
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_IvJudgeReader.h"
 #include "PokemonLZA_StatsReset.h"
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
+#include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_MenuNavigation.h"
 
 namespace PokemonAutomation{
@@ -110,13 +111,13 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         context.wait_for_all_requests();
 
         overworld_to_main_menu(env.console, context);
-        pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
+        open_map(env.console, context, false, false);
         pbf_move_right_joystick(context, {0, +1}, 500ms, 500ms);
         pbf_move_right_joystick(context, {0, +1}, 500ms, 500ms);
         pbf_move_left_joystick(context, {-0.609, 0}, 100ms, 500ms);
-        pbf_mash_button(context, BUTTON_A, 5000ms);
+        fly_from_map(env.console, context);
 
-        pbf_move_left_joystick(context, {0, +1}, 10s, 500ms);
+        pbf_move_left_joystick(context, {0, +1}, 8s, 500ms);
         pbf_mash_button(context, BUTTON_A, 30s);
 
         context.wait_for_all_requests();

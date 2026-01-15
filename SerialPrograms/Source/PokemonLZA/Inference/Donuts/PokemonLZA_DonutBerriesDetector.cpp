@@ -43,6 +43,8 @@ const DonutBerriesMatcher& DONUT_BERRIES_MATCHER(){
     static DonutBerriesMatcher matcher;
     return matcher;
 }
+
+
 DonutBerriesMatcher::DonutBerriesMatcher(const std::vector<double>& min_euclidean_distance)
     : CroppedImageDictionaryMatcher({0, 1})
 {

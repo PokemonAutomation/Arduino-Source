@@ -60,16 +60,19 @@ class DonutMaker_Descriptor::Stats : public StatsTracker{
 public:
     Stats()
         : matched(m_stats["Donuts Matched"])
+        , kept(m_stats["Donuts Kept"])
         , resets(m_stats["Resets"])
         , errors(m_stats["Errors"])
     {
         // TODO: Add more stats here
         m_display_order.emplace_back("Donuts Matched");
+        m_display_order.emplace_back("Donuts Kept");
         m_display_order.emplace_back("Resets");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
 
     std::atomic<uint64_t>& matched;
+    std::atomic<uint64_t>& kept;
     std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& errors;
 };
@@ -87,18 +90,12 @@ DonutMaker::DonutMaker()
         true
     )
     , BERRIES("<b>Berries:</b><br>The berries used to make the donut. Minimum 3 berries, maximum 8 berries.")
-    , NUM_POWER_REQUIRED(
-        "<b>Number of Powers to Match:</b><br>How many of a donut's powers must be in the the table below. Minimum 1, maximum 3. "
-        "<br>Ex. For a target donut of Big Haul Lv.3, Berry Lv.3, and any or none for the 3rd power, set the number as 2."
-        "<br>Then, in the flavor powers table, make sure to add Big Haul Lv.3 and Berry Lv. 3.",
+    , MAX_KEEPERS(
+        "<b>Maximum Number of Donuts to Keep:</b><br>"
+        "This takes precedent over the limits set in the Donuts table."
+        "<br>Make sure you have enough berries to make this many donuts. The program will fail when not given enough berries.",
         LockMode::LOCK_WHILE_RUNNING,
-        1, 1, 3
-        )
-    , NUM_DONUTS(
-       "<b>Number of Donuts:</b><br>The program continues resetting and making donuts of required powers until this many donuts of required powers are made."
-       "<br>Make sure you have enough berries to make this many donuts. The program will fail when not given enough berries.",
-       LockMode::LOCK_WHILE_RUNNING,
-       1, 1, 999
+        1, 1, 999
     )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_DONUT_FOUND(
@@ -117,33 +114,95 @@ DonutMaker::DonutMaker()
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(BERRIES);
-    PA_ADD_OPTION(NUM_POWER_REQUIRED);
-    PA_ADD_OPTION(NUM_DONUTS);
+    PA_ADD_OPTION(MAX_KEEPERS);
     PA_ADD_OPTION(FLAVOR_POWERS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
+// Split flavor power notation into its individual tokens
+std::vector<std::string> get_flavor_power_tokens(const std::string& power_string){
+    std::vector<std::string> tokens;
+    size_t start = 0;
+    size_t end = power_string.find('-');
+    while (end != std::string::npos){
+        tokens.push_back(power_string.substr(start, end - start));
+        start = end + 1;
+        end = power_string.find('-', start);
+    }
+    tokens.push_back(power_string.substr(start));
+    return tokens;
+}
+
+// Check if all flavor tokens are in the donut flavor tokens
+// Apply some extra logic for "any" token and the special level tokens
+bool flavor_tokens_are_subset(const std::vector<std::string>& subset, const std::vector<std::string>& superset){
+    for (const std::string& token : subset){
+        if (token == "any"){
+            continue;
+        }
+        else if (token == "12"){
+            if (std::find(superset.begin(), superset.end(), "1") == superset.end() && std::find(superset.begin(), superset.end(), "2") == superset.end()){
+                return false;
+            }
+        }
+        else if (token == "23"){
+            if (std::find(superset.begin(), superset.end(), "2") == superset.end() && std::find(superset.begin(), superset.end(), "3") == superset.end()){
+                return false;
+            }
+        }
+        else if (std::find(superset.begin(), superset.end(), token) == superset.end()){
+            return false;
+        }
+    }
+    return true;
+}
+
+// Check if a donut matches an individual table entry. Each table entry has three target powers.
+bool donut_matches_powers(SingleSwitchProgramEnvironment& env, std::vector<std::string>& donut_powers, const std::vector<std::string>& target_powers){
+    for (const std::string& target_power : target_powers){
+        // `target_power` can be a specific power like "item-power-berries-3" or a slug to match
+        // any possible power (or no power): "any-power-any".
+        std::vector<std::string> target_tokens = get_flavor_power_tokens(target_power);
+        bool matched = false;
+        for (const std::string& donut_power : donut_powers){
+            env.log("Comparing target power " + target_power + " with donut power " + donut_power);
+            std::vector<std::string> donut_tokens = get_flavor_power_tokens(donut_power);
+            if (flavor_tokens_are_subset(target_tokens, donut_tokens)){
+                env.log("Power matched!");
+                matched = true;
+                break;
+            }
+        }
+        if (!matched){
+            return false;
+        }
+    }
+    return true;
+}
+
 // Read flavor power and check if they match user requirement.
+// Keep or discard the donut depending on the user defined limit.
 // Return true if the user requirement is fulfilled.
-bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::vector<uint16_t>& match_counts) {
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
     env.log("Reading in table of desired powers.");
-    std::vector<std::string> power_table;
+
+    std::vector<std::vector<std::string>> powers_table;
     std::vector<std::unique_ptr<FlavorPowerTableRow>> wanted_powers_table = FLAVOR_POWERS.copy_snapshot();
     for (const std::unique_ptr<FlavorPowerTableRow>& row : wanted_powers_table){
         FlavorPowerTableEntry table_line = row->snapshot();
-        power_table.push_back(table_line.to_str());
+        powers_table.push_back(table_line.get_entry_flavor_power_strings());
         env.log(table_line.to_str());
     }
     //TODO: Validate powers? The "All Types" type only applies to catching and sparkling powers. Move and resist do not have "All Types"
     //Are people even going to target move and resist power? Big Haul/Item Berry/Alpha/Sparkling seems more likely.
 
-    env.log("Reading powers and counting up hits.");
-    uint8_t num_hits = 0;
+    env.log("Checking donut powers against table.");
     VideoSnapshot screen = env.console.video().snapshot();
-    for (int i = 0; i < 3; i++) {
+    std::vector<std::string> donut_results;
+    for (int i = 0; i < 3; i++){
         FlavorPowerDetector read_power(env.logger(), COLOR_GREEN, LANGUAGE, i);
         const std::string power = read_power.detect_power(screen);
         if (power.empty()){
@@ -151,19 +210,36 @@ bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProController
             continue;
         }
         env.add_overlay_log(std::format("{}: {}", i+1, power));
-        
-        if ((std::find(power_table.begin(), power_table.end(), power) != power_table.end())) {
-            num_hits++;
+        donut_results.push_back(power);
+    }
+
+    bool match_found = false;
+    bool should_keep = false;
+    // Each power table row:
+    for (size_t i = 0; i < powers_table.size(); i++){
+        if (donut_matches_powers(env, donut_results, powers_table[i])){
+            match_found = true;
+            match_counts[i]++;
+            if (match_counts[i] <= FLAVOR_POWERS.snapshot()[i].limit){
+                env.log("Keeping donut: " + std::to_string(match_counts[i]) + " / " + std::to_string(FLAVOR_POWERS.snapshot()[i].limit) + " for table entry " + std::to_string(i+1));
+                should_keep = true;
+            }
         }
     }
-
-    if (num_hits >= NUM_POWER_REQUIRED) {
+    if (match_found){
+        env.log("Match found!");
         stats.matched++;
         env.update_stats();
-        send_program_status_notification(env, NOTIFICATION_DONUT_FOUND, "Match found!", screen, true);
-        return true;
+        if (should_keep){
+            stats.kept++;
+            env.update_stats();
+            send_program_status_notification(env, NOTIFICATION_DONUT_FOUND, "Match found! Keeping donut.", screen, true);
+            return true;
+        } else {
+            env.log("Matched donut exceeds all keep limits.");
+        }
     }
-
+    env.log("Discarding donut.");
     return false;
 }
 
@@ -502,8 +578,24 @@ void save_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& conte
     // fast_travel_to_index(env, context, 0, 3000ms);
 }
 
+// Check if all user defined limits are reached or the global max keepers limit is reached
+bool DonutMaker::should_stop(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::vector<uint16_t>& match_counts){
+    int total_kept = 0;
+    bool limit_reached = true;
+    for (size_t i = 0; i < match_counts.size(); i++){
+        if (match_counts[i] < FLAVOR_POWERS.snapshot()[i].limit){
+            limit_reached = false;
+        }
+        total_kept += match_counts[i];
+    }
+    if (total_kept >= MAX_KEEPERS){
+        return true;
+    }
+    return limit_reached;
+}
+
 // Return true if a donut match is found
-bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::vector<uint16_t>& match_counts) {
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
     move_to_ansha(env, context);
@@ -525,8 +617,8 @@ bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControl
     // Add berries from menu and make a donut. Stop at flavor power screen.
     add_berries_and_make_donut(env, context);
 
-    // Read flavor power and check if they match user requirement:
-    if (match_powers(env, context)){
+    // Read flavor power and check if they match user requirement and should be kept:
+    if (match_powers(env, context, match_counts)){
         return true;
     }
 
@@ -556,14 +648,16 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     pbf_mash_button(context, BUTTON_B, 200ms);
 
     reset_map_filter_state(env, context);
+
+    std::vector<uint16_t> match_counts(FLAVOR_POWERS.snapshot().size(), 0);
     while(true){
-        const bool found_match = donut_iteration(env, context);
+        const bool should_keep = donut_iteration(env, context, match_counts);
         stats.resets++;
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS);
 
-        if (found_match){
-            if (stats.matched.load() >= NUM_DONUTS){
+        if (should_keep){
+            if (should_stop(env, context, match_counts)){
                 break;
             }
             save_donut(env, context);

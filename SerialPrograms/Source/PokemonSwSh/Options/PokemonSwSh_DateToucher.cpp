@@ -37,7 +37,7 @@ TouchDateIntervalOption::TouchDateIntervalOption()
 
 
 void TouchDateIntervalOption::reset_state(){
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     m_last_touch = WallClock::min();
 }
 
@@ -48,7 +48,7 @@ bool TouchDateIntervalOption::ok_to_touch_now(){
         return false;
     }
     auto now = current_time();
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     if (now < m_last_touch + std::chrono::hours(hours)){
         return false;
     }

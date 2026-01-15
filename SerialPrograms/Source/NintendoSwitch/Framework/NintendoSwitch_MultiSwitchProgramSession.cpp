@@ -42,7 +42,7 @@ MultiSwitchProgramSession::MultiSwitchProgramSession(MultiSwitchProgramOption& o
     , m_scope(nullptr)
     , m_sanitizer("MultiSwitchProgramSession")
 {
-//    WriteSpinLock lg(m_lock);
+//    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     m_option.instance().update_active_consoles(option.system().count());
     m_system.add_listener(*this);
 }

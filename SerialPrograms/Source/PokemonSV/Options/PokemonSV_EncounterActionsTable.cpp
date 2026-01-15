@@ -58,7 +58,7 @@ EncounterActionsRow::EncounterActionsRow(EditableTableOption& parent_table)
         LockMode::UNLOCK_WHILE_RUNNING,
         EncounterActionsAction::STOP_PROGRAM
     )
-    , pokeball("poke-ball")
+    , pokeball(LockMode::UNLOCK_WHILE_RUNNING, "poke-ball")
     , ball_limit(LockMode::UNLOCK_WHILE_RUNNING, 40, 1, 999)
 {
     PA_ADD_OPTION(pokemon);

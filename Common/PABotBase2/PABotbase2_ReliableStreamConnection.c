@@ -1,0 +1,97 @@
+/*  PABotBase2 Reliable Stream Connection
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#include <stdio.h>  //  REMOVE
+#include "PABotbase2_ReliableStreamConnection.h"
+
+
+void pabb2_ReliableStreamConnection_init(
+    pabb2_ReliableStreamConnection* self,
+    void* unreliable_connection,
+    pabb2_fp_StreamSend unreliable_send,
+    pabb2_fp_StreamRecv unreliable_recv
+){
+    self->unreliable_connection = unreliable_connection;
+    self->unreliable_send = unreliable_send;
+    self->unreliable_recv = unreliable_recv;
+
+    pabb2_PacketSender_init(&self->reliable_sender, unreliable_connection, unreliable_send);
+    pabb2_PacketParser_init(&self->parser);
+    pabb2_StreamCoalescer_init(&self->stream_coalescer);
+}
+
+void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* self){
+    const pabb2_PacketHeader* packet = pabb2_PacketParser_pull_bytes(
+        &self->parser,
+        self->unreliable_connection, self->unreliable_recv
+    );
+    if (packet == NULL){
+        pabb2_PacketSender_iterate_retransmits(&self->reliable_sender);
+        return;
+    }
+
+    //  Check the packet status.
+    switch (packet->magic_number){
+    case PABB2_PacketParser_RESULT_VALID:
+        break;
+    case PABB2_PacketParser_RESULT_INVALID:
+        printf("PABB2_PacketParser_RESULT_INVALID\n");
+        pabb2_PacketSender_send_info(
+            &self->reliable_sender,
+            packet->seqnum,
+            PABB2_CONNECTION_PACKET_OPCODE_INVALID_LENGTH
+        );
+        return;
+    case PABB2_PacketParser_RESULT_CHECKSUM_FAIL:
+        printf("PABB2_PacketParser_RESULT_CHECKSUM_FAIL\n");
+        pabb2_PacketSender_send_info(
+            &self->reliable_sender,
+            packet->seqnum,
+            PABB2_CONNECTION_PACKET_OPCODE_INVALID_CHECKSUM_FAIL
+        );
+        return;
+    default:
+        printf("Internal Error: Unrecognized packet state.\n");
+        return;
+    }
+
+    //  Now handle the different opcodes.
+    switch (packet->opcode){
+    case PABB2_CONNECTION_PACKET_OPCODE_QUERY_PACKET_SIZE:
+        pabb2_PacketSender_send_ack_u16(
+            &self->reliable_sender,
+            packet->seqnum,
+            PABB2_MAX_INCOMING_PACKET_SIZE
+        );
+        return;
+    case PABB2_CONNECTION_PACKET_OPCODE_QUERY_BUFFER_SLOTS:
+        pabb2_PacketSender_send_ack_u16(
+            &self->reliable_sender,
+            packet->seqnum,
+            PABB2_StreamCoalescer_SLOTS
+        );
+        return;
+    case PABB2_CONNECTION_PACKET_OPCODE_QUERY_BUFFER_BYTES:
+        pabb2_PacketSender_send_ack_u16(
+            &self->reliable_sender,
+            packet->seqnum,
+            PABB2_StreamCoalescer_BUFFER_SIZE
+        );
+        return;
+    case PABB2_CONNECTION_PACKET_OPCODE_STREAM_DATA:
+        if (pabb2_StreamCoalescer_push_stream(&self->stream_coalescer, (const pabb2_PacketHeaderData*)packet)){
+            pabb2_PacketSender_send_ack(&self->reliable_sender, packet->seqnum);
+        }
+        return;
+    default:
+        pabb2_PacketSender_send_info(
+            &self->reliable_sender,
+            packet->seqnum,
+            PABB2_CONNECTION_PACKET_OPCODE_UNKNOWN_OPCODE
+        );
+    }
+}
+

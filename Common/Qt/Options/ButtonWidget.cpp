@@ -26,21 +26,16 @@ ButtonCellWidget::~ButtonCellWidget(){
     m_value.remove_listener(*this);
 }
 ButtonCellWidget::ButtonCellWidget(QWidget& parent, ButtonCell& value)
-    : QWidget(&parent)
+    : QPushButton(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
-    , m_button(new QPushButton(this))
 {
-    QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(m_button);
-
     ButtonCellWidget::update_value();
 
 //    cout << "height = " << this->height() << endl;
 
     connect(
-        m_button, &QPushButton::pressed,
+        this, &QPushButton::pressed,
         this, [this]{
             m_value.press_button();
 //            cout << "Press: " << this->font().pointSize() << endl;
@@ -51,19 +46,19 @@ ButtonCellWidget::ButtonCellWidget(QWidget& parent, ButtonCell& value)
 }
 
 void ButtonCellWidget::update_value(){
-    m_button->setText(QString::fromStdString(m_value.text()));
+    this->setText(QString::fromStdString(m_value.text()));
 
     int button_size = m_value.button_height();
     if (button_size > 0){
-        m_button->setFixedHeight(button_size);
+        this->setFixedHeight(button_size);
     }
 
     int text_size = m_value.text_size();
     if (text_size > 0){
-        QFont font = m_button->font();
+        QFont font = this->font();
         font.setPointSize(text_size);
 //        font.setPointSize(16);
-        m_button->setFont(font);
+        this->setFont(font);
 //        cout << "Post set: " << this->font().pointSize() << endl;
     }
 //    cout << "Update: " << this->font().pointSize() << endl;

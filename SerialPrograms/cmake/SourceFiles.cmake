@@ -166,7 +166,10 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/SerialConnection/SerialConnection.h
     ../Common/Cpp/SerialConnection/SerialConnectionPOSIX.h
     ../Common/Cpp/SerialConnection/SerialConnectionWinAPI.h
-    ../Common/Cpp/SerialConnection/StreamInterface.h
+    ../Common/Cpp/StreamConnections/ReliableStreamConnection.cpp
+    ../Common/Cpp/StreamConnections/ReliableStreamConnection.h
+    ../Common/Cpp/StreamConnections/StreamConnection.h
+    ../Common/Cpp/StreamConnections/StreamInterface.h
     ../Common/Cpp/Sockets/AbstractClientSocket.h
     ../Common/Cpp/Sockets/ClientSocket.cpp
     ../Common/Cpp/Sockets/ClientSocket.h
@@ -255,6 +258,16 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/WidgetStackFixedAspectRatio.cpp
     ../Common/Qt/WidgetStackFixedAspectRatio.h
     ../Common/PABotBase2/PABotBase2_Connection.h
+    ../Common/PABotBase2/PABotBase2_ConnectionDebug.c
+    ../Common/PABotBase2/PABotBase2_ConnectionDebug.h
+    ../Common/PABotBase2/PABotBase2_PacketParser.c
+    ../Common/PABotBase2/PABotBase2_PacketParser.h
+    ../Common/PABotBase2/PABotBase2_PacketSender.c
+    ../Common/PABotBase2/PABotBase2_PacketSender.h
+    ../Common/PABotBase2/PABotbase2_ReliableStreamConnection.c
+    ../Common/PABotBase2/PABotbase2_ReliableStreamConnection.h
+    ../Common/PABotBase2/PABotBase2_StreamCoalescer.c
+    ../Common/PABotBase2/PABotBase2_StreamCoalescer.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_HID_Keyboard.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS1_OemControllers.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS_WiredController.h
@@ -684,8 +697,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/JoystickTools.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h
-    Source/Controllers/PABotBase2/PABotBase2_CC_RequestQueue.cpp
-    Source/Controllers/PABotBase2/PABotBase2_CC_RequestQueue.h
     Source/Controllers/Schedulers/ControllerWithScheduler.h
     Source/Controllers/Schedulers/SuperscalarScheduler.cpp
     Source/Controllers/Schedulers/SuperscalarScheduler.h
