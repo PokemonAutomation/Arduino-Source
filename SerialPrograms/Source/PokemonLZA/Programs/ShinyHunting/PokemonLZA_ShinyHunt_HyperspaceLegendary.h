@@ -39,7 +39,7 @@ public:
         COBALION,
         TERRAKION,
         VIRIZION,
-        LATIAS,
+        LATIAS_ALT,
     };
 
 private:

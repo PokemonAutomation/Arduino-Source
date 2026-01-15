@@ -88,7 +88,7 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
             {Legendary::COBALION, "cobalion", "Cobalion"},
             {Legendary::TERRAKION, "terrakion", "Terrakion"},
             {Legendary::VIRIZION,  "virizion",  "Virizion"},
-            {Legendary::LATIAS, "latias", "Latias"},
+            {Legendary::LATIAS_ALT, "latias_alt", "Latias_Alt"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         Legendary::VIRIZION
@@ -118,7 +118,7 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
 
 namespace {
 // Save on the rooftop, facing the Latias spawning platform, but without having it spawned
-    bool hunt_latias(SingleSwitchProgramEnvironment& env,
+    bool hunt_latias_alt(SingleSwitchProgramEnvironment& env,
         ProControllerContext& context,
         ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats)
     {
@@ -507,8 +507,8 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
     }
 
     while (true){
-        if (LEGENDARY == Legendary::LATIAS) {
-            if (hunt_latias(env, context, stats)) {
+        if (LEGENDARY == Legendary::LATIAS_ALT) {
+            if (hunt_latias_alt(env, context, stats)) {
                 break; // shiny found
             }
         }
@@ -527,9 +527,6 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
                     }
                     else if (LEGENDARY == Legendary::COBALION) {
                         hunt_cobalion(env, context, stats, MIN_CALORIE_TO_CATCH);
-                    }
-                    else if (LEGENDARY == Legendary::LATIAS) {
-                        hunt_latias(env, context, stats);
                     }
                     else {
                         OperationFailedException::fire(
