@@ -118,6 +118,8 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
 
 namespace {
 // Save on the rooftop, facing the Latias spawning platform, but without having it spawned
+// Note that this program is different from other PLZA legendary programs in that it uses image analysis to identify the shiny.
+// Additionally, respawning is accomplished by resetting the game, so there is no need to track calories.
     bool hunt_latias_alt(SingleSwitchProgramEnvironment& env,
         ProControllerContext& context,
         ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats)
@@ -145,10 +147,10 @@ namespace {
         double nonshiny_result = image_average(filtered_image_nonshiny).r;
         double shiny_result = image_average(filtered_image_shiny).r;
         
-        filtered_image_nonshiny.save("filtered_nonshiny.png");
+        /*filtered_image_nonshiny.save("filtered_nonshiny.png");
         filtered_image_shiny.save("filtered_shiny.png");
         cropped_image.save("cropped.png");
-        env.console.log("Saved images for Latias reset", COLOR_MAGENTA);
+        env.console.log("Saved images for Latias reset", COLOR_MAGENTA);*/
         env.console.log(std::format("Score for non-shiny Latias: {}", nonshiny_result), COLOR_MAGENTA);
         env.console.log(std::format("Score for shiny Latias: {}", shiny_result), COLOR_MAGENTA);
 
@@ -156,10 +158,12 @@ namespace {
 
         // For now, return true (triggering program stop) if a shiny is detected or a non-shiny is not detected
         if (nonshiny_result < 0.18 || shiny_result > 0.18) {
+            env.console.log("Shiny Latias identified or regular Latias not identified. Stopping program.", COLOR_MAGENTA);
             return true;
         }
         else {
             return false;
+            env.console.log("Non-shiny Latias identified. Resetting the game.", COLOR_MAGENTA);
         }
 }
 

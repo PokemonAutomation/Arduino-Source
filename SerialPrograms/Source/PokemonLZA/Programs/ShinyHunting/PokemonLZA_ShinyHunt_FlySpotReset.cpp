@@ -234,7 +234,7 @@ bool route_hyperspace_wild_zone(
     if (overworld_screen == nullptr){
         throw InternalProgramError(&env.logger(), PA_CURRENT_FUNCTION, "overworld_screen is nullptr but FastTravelState is successful.");
     }
-    
+
     HyperspaceCalorieDetector hyperspace_calorie_detector(env.logger());
     if (!hyperspace_calorie_detector.detect(*overworld_screen)){
         stats.errors++;
