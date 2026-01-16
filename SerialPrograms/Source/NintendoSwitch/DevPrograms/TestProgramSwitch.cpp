@@ -170,6 +170,7 @@
 #include "Common/PABotBase2/PABotBase2_PacketParser.h"
 #include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
 #include "Common/PABotBase2/PABotbase2_ReliableStreamConnection.h"
+#include "Common/Cpp/StreamConnections/MockDevice.h"
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -483,16 +484,6 @@ private:
 
 
 
-//void on_packet(void* context, const pabb2_PacketHeader* packet){
-//
-//}
-
-
-
-
-
-
-
 
 
 
@@ -518,6 +509,25 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     // JoyconContext context(scope, console.controller<JoyconController>());
     VideoOverlaySet overlays(overlay);
 
+
+    {
+        MockDevice device;
+
+        ReliableStreamConnection connection(
+            logger,
+            device,
+            10s
+        );
+
+
+
+        context.wait_for(60s);
+    }
+
+
+
+
+
 #if 0
     CloseGameWatcher close_game(console);
     close_game.make_overlays(overlays);
@@ -527,7 +537,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 1
+#if 0
     MockConnection unreliable_connection;
     {
         ReliableStreamConnection connection(logger, unreliable_connection, 100s);
