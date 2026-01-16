@@ -134,7 +134,7 @@ private:
         }
     }
 
-    void thread_loop(const std::string& address, uint16_t port){
+    void thread_loop(const std::string address, uint16_t port){
         try{
             thread_loop_internal(address, port);
         }catch (...){
