@@ -163,8 +163,8 @@ namespace {
             return true;
         }
         else {
-            return false;
             env.console.log("Non-shiny Latias identified. Resetting the game.", COLOR_MAGENTA);
+            return false;
         }
 }
 // Start at the ladder up to Latias and use it to fix the position and camera angle
