@@ -106,6 +106,25 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
     PA_ADD_OPTION(MIN_CALORIE_REMAINING);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
+
+    ROUTE.add_listener(*this);
+}
+
+ShinyHunt_FlySpotReset::~ShinyHunt_FlySpotReset(){
+    ROUTE.remove_listener(*this);
+}
+
+
+void ShinyHunt_FlySpotReset::on_config_value_changed(void* object){
+    if (object == &ROUTE){
+        if (ROUTE == Route::HYPERSPACE_WILD_ZONE){
+            NUM_RESETS.set_visibility(ConfigOptionState::ENABLED);
+            MIN_CALORIE_REMAINING.set_visibility(ConfigOptionState::ENABLED);
+        } else{
+            NUM_RESETS.set_visibility(ConfigOptionState::HIDDEN);
+            MIN_CALORIE_REMAINING.set_visibility(ConfigOptionState::HIDDEN);
+        }
+    }
 }
 
 namespace {
