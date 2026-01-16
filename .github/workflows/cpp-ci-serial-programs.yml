@@ -65,7 +65,8 @@ jobs:
     - name: Prepare upload folder
       if: startsWith(matrix.os, 'windows')
       run: |
-        echo https://github.com/${{github.repository}}/commit/${{github.sha}} > Arduino-Source/SerialPrograms/bin/RelWithDebInfo/version.txt
+        cd Arduino-Source
+        echo https://github.com/${{github.repository}}/commit/${{github.sha}} > SerialPrograms/bin/RelWithDebInfo/version.txt
     - uses: actions/upload-artifact@v6
       if: startsWith(matrix.os, 'windows')
       with:
