@@ -1879,7 +1879,7 @@ void confirm_titan_battle(SingleSwitchProgramEnvironment& env, ProControllerCont
         // cout << "hp_bar_stats.average.sum(): " << hp_bar_stats.average.sum() << endl;    
         // expected color is green: {R 25-32, G 255, B 32-76}  {30, 255, 55}. total = 30+255+55 = 340
         // 30/340, 255/340, 55/340
-        is_green_hp_bar = is_solid(hp_bar_stats, {0.088235, 0.75, 0.161765}, 0.15, 30);
+        is_green_hp_bar = is_solid(hp_bar_stats, {0.088235, 0.75, 0.161765}, 0.25, 30);
         if (is_green_hp_bar){
             break;
         }
