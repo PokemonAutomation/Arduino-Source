@@ -60,8 +60,8 @@ public:
         }
         try{
             m_state.store(State::CONNECTING, std::memory_order_relaxed);
-            m_thread = Thread([=, this]{
-                thread_loop(address, port);
+            m_thread = Thread([addr = std::move(address), port, this] {
+                thread_loop(std::move(addr), port);
             });
         }catch (...){
             m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
@@ -134,9 +134,9 @@ private:
         }
     }
 
-    void thread_loop(const std::string address, uint16_t port){
+    void thread_loop(std::string address, uint16_t port){
         try{
-            thread_loop_internal(address, port);
+            thread_loop_internal(std::move(address), port);
         }catch (...){
             try{
                 std::cout << "ClientSocket_POSIX(): An exception was thrown from the receive thread." << std::endl;
@@ -144,7 +144,7 @@ private:
         }
     }
 
-    void thread_loop_internal(const std::string& address, uint16_t port){
+    void thread_loop_internal(std::string address, uint16_t port){
         m_listeners.run_method(&Listener::on_thread_start);
 
         {
