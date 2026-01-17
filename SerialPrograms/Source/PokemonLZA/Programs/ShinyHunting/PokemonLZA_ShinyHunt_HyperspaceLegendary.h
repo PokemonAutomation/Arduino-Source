@@ -36,6 +36,7 @@ public:
 
     enum class Legendary{
         LATIAS,
+        LATIAS_ALT,
         LATIOS,
         COBALION,
         TERRAKION,

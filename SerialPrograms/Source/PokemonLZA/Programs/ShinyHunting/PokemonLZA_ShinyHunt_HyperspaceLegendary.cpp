@@ -5,11 +5,18 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/ImageTypes/ImageHSV32.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/ImageTypes/ImageViewHSV32.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "ML/Inference/ML_YOLOv5Detector.h"
@@ -77,11 +84,12 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
     : SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::STOP_PROGRAM)
     , LEGENDARY("<b>Legendary " + STRING_POKEMON + ":</b>",
         {
-            {Legendary::LATIAS, "latias", "Latias"},
-            {Legendary::LATIOS, "latios", "Latios"},
-            {Legendary::COBALION, "cobalion", "Cobalion"},
-            {Legendary::TERRAKION, "terrakion", "Terrakion"},
-            {Legendary::VIRIZION,  "virizion",  "Virizion"},
+            {Legendary::LATIAS, "latias", "Latias: Shuttle Run"},
+            {Legendary::LATIAS_ALT, "latias-game-reset", "Latias: Game Reset"},
+            {Legendary::LATIOS, "latios", "Latios: Game Reset"},
+            {Legendary::COBALION, "cobalion", "Cobalion: Shuttle Run"},
+            {Legendary::TERRAKION, "terrakion", "Terrakion: Shuttle Run"},
+            {Legendary::VIRIZION,  "virizion",  "Virizion: Shuttle Run"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         Legendary::LATIAS
@@ -89,6 +97,7 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
     , MIN_CALORIE_TO_CATCH(
         "<b>Minimum Cal. Reserved to Catch Legendary:</b><br>If applicable, the program will stop refreshing the Legendary spawn to give this amount of Calorie left for catching the Legendary."
         "<br>NOTE: use 5-star donut for best catch chance and enough time in the Legendary hyperspace."
+        "<br>NOTE: not required for Game Reset programs."
         "<br>Cal. per sec: 1 Star: 1 Cal./s, 2 Star: 1.6 Cal./s, 3 Star: 3.5 Cal./s, 4 Star: 7.5 Cal./s, 5 Star: 10 Cal./s",
         LockMode::UNLOCK_WHILE_RUNNING,
         600, 0, 9999 // default, min, max
@@ -110,7 +119,55 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
 }
 
 namespace {
+// Save on the rooftop, facing the Latias spawning platform, but without having it spawned
+// Note that this program is different from other PLZA legendary programs in that it uses image analysis to identify the shiny.
+// Additionally, respawning is accomplished by resetting the game, so there is no need to track calories.
+    bool hunt_latias_alt(SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context,
+        ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats)
+    {
+        stats.spawns++;
+        pbf_press_button(context, BUTTON_Y, 160ms, 2000ms);
+        context.wait_for_all_requests();
 
+        // Capture an image of the screen region that Latias should spawn in and visually assess whether it's shiny.
+        ImageViewRGB32 full_image = ImageViewRGB32(env.console.video().snapshot());
+        ImagePixelBox latias_search_zone = ImagePixelBox(
+            static_cast<size_t>(full_image.width() * 0.4),
+                static_cast<size_t>(full_image.height() * 0.2),
+                    static_cast<size_t>(full_image.width() * 0.6),
+                        static_cast<size_t>(full_image.height() * 0.4));
+        ImageViewRGB32 cropped_image = extract_box_reference(full_image, latias_search_zone);
+        ImageHSV32 cropped_hsv_image = ImageHSV32(cropped_image);
+        ImageViewHSV32 cropped_hsv_image_view = ImageViewHSV32(
+            cropped_hsv_image.data(),
+            cropped_hsv_image.bytes_per_row(),
+            cropped_hsv_image.width(),
+            cropped_hsv_image.height());
+        ImageRGB32 filtered_image_nonshiny = to_blackwhite_hsv32_range(cropped_hsv_image_view, false, 0xffe76051, 0xffffffd2);
+        ImageRGB32 filtered_image_shiny = to_blackwhite_hsv32_range(cropped_hsv_image_view, false, 0xff0d3d51, 0xff37ffd2);
+        double nonshiny_result = image_average(filtered_image_nonshiny).r;
+        double shiny_result = image_average(filtered_image_shiny).r;
+        
+        /*filtered_image_nonshiny.save("filtered_nonshiny.png");
+        filtered_image_shiny.save("filtered_shiny.png");
+        cropped_image.save("cropped.png");
+        env.console.log("Saved images for Latias reset", COLOR_MAGENTA);*/
+        env.console.log(std::format("Score for non-shiny Latias: {}", nonshiny_result), COLOR_MAGENTA);
+        env.console.log(std::format("Score for shiny Latias: {}", shiny_result), COLOR_MAGENTA);
+
+        env.update_stats();
+
+        // For now, return true (triggering program stop) if a shiny is detected or a non-shiny is not detected
+        if (nonshiny_result < 0.18 || shiny_result > 0.18) {
+            env.console.log("Shiny Latias identified or regular Latias not identified. Stopping program.", COLOR_MAGENTA);
+            return true;
+        }
+        else {
+            env.console.log("Non-shiny Latias identified. Resetting the game.", COLOR_MAGENTA);
+            return false;
+        }
+}
 // Start at the ladder up to Latias and use it to fix the position and camera angle
 // Run a route to the other side of the roof and begin a shuttle run to respawn Latias repeatedly
 // Route back to Latias to trigger a potential shiny sound when calories are low
@@ -627,38 +684,50 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
     }
 
     while (true){
-        const int ret = run_until<ProControllerContext>(
-            env.console, context,
-            [&](ProControllerContext& context){
-                if (LEGENDARY == Legendary::LATIAS){
-                    hunt_latias(env, context, stats, MIN_CALORIE_TO_CATCH);
-                } else if (LEGENDARY == Legendary::LATIOS){
-                    hunt_latios(env, context, stats, MIN_CALORIE_TO_CATCH);
-                } else if (LEGENDARY == Legendary::VIRIZION){
-                    hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH, use_switch1_only_timings);
-                } else if (LEGENDARY == Legendary::TERRAKION){
-                    hunt_terrakion(env, context, stats, MIN_CALORIE_TO_CATCH);
-                } else if (LEGENDARY == Legendary::COBALION){
-                    hunt_cobalion(env, context, stats, MIN_CALORIE_TO_CATCH);
-                } else {
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
-                        "legendary hunt not implemented",
-                        env.console
-                    );
-                }
-            },
-            {{shiny_detector}}
-        ); // end run_until()
-        shiny_detector.throw_if_no_sound();
-        shiny_detector.clear();
+        if (LEGENDARY == Legendary::LATIAS_ALT) {
+            if (hunt_latias_alt(env, context, stats)) {
+                break; // shiny found
+            }
+        }
+        else {
+            const int ret = run_until<ProControllerContext>(
+                env.console, context,
+                [&](ProControllerContext& context) {
+                    if (LEGENDARY == Legendary::LATIAS){
+                        hunt_latias(env, context, stats, MIN_CALORIE_TO_CATCH);
+                    }
+                    else if (LEGENDARY == Legendary::LATIOS) {
+                        hunt_latios(env, context, stats, MIN_CALORIE_TO_CATCH);
+                    }
+                    else if (LEGENDARY == Legendary::VIRIZION) {
+                        hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH, use_switch1_only_timings);
+                    }
+                    else if (LEGENDARY == Legendary::TERRAKION) {
+                        hunt_terrakion(env, context, stats, MIN_CALORIE_TO_CATCH);
+                    }
+                    else if (LEGENDARY == Legendary::COBALION) {
+                        hunt_cobalion(env, context, stats, MIN_CALORIE_TO_CATCH);
+                    }
+                    else {
+                        OperationFailedException::fire(
+                            ErrorReport::SEND_ERROR_REPORT,
+                            "legendary hunt not implemented",
+                            env.console
+                        );
+                    }
+                },
+                { {shiny_detector} }
+            ); // end run_until()
+            shiny_detector.throw_if_no_sound();
+            shiny_detector.clear();
 
-        if (ret == 0 && SHINY_DETECTED.on_shiny_sound(
-            env, env.console, context,
-            shiny_count,
-            shiny_coefficient
-        )){
-            break;
+            if (ret == 0 && SHINY_DETECTED.on_shiny_sound(
+                env, env.console, context,
+                shiny_count,
+                shiny_coefficient
+            )) {
+                break;
+            }
         }
 
         // no shiny sound detected or no shiny legendary detected. Reset game
