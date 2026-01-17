@@ -134,18 +134,26 @@ namespace {
         ImageViewRGB32 full_image = ImageViewRGB32(env.console.video().snapshot());
         ImagePixelBox latias_search_zone = ImagePixelBox(
             static_cast<size_t>(full_image.width() * 0.4),
-                static_cast<size_t>(full_image.height() * 0.2),
-                    static_cast<size_t>(full_image.width() * 0.6),
-                        static_cast<size_t>(full_image.height() * 0.4));
+            static_cast<size_t>(full_image.height() * 0.2),
+            static_cast<size_t>(full_image.width() * 0.6),
+            static_cast<size_t>(full_image.height() * 0.4)
+        );
         ImageViewRGB32 cropped_image = extract_box_reference(full_image, latias_search_zone);
         ImageHSV32 cropped_hsv_image = ImageHSV32(cropped_image);
         ImageViewHSV32 cropped_hsv_image_view = ImageViewHSV32(
             cropped_hsv_image.data(),
             cropped_hsv_image.bytes_per_row(),
             cropped_hsv_image.width(),
-            cropped_hsv_image.height());
-        ImageRGB32 filtered_image_nonshiny = to_blackwhite_hsv32_range(cropped_hsv_image_view, false, 0xffe76051, 0xffffffd2);
-        ImageRGB32 filtered_image_shiny = to_blackwhite_hsv32_range(cropped_hsv_image_view, false, 0xff0d3d51, 0xff37ffd2);
+            cropped_hsv_image.height()
+        );
+        ImageRGB32 filtered_image_nonshiny = to_blackwhite_hsv32_range(
+            cropped_hsv_image_view, false,
+            0xffe76051, 0xffffffd2
+        );
+        ImageRGB32 filtered_image_shiny = to_blackwhite_hsv32_range(
+            cropped_hsv_image_view, false,
+            0xff0d3d51, 0xff37ffd2
+        );
         double nonshiny_result = image_average(filtered_image_nonshiny).r;
         double shiny_result = image_average(filtered_image_shiny).r;
         
@@ -580,7 +588,8 @@ void hunt_virizion_rooftop(
     ProControllerContext& context,
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
     SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH,
-    bool& use_switch1_only_timings)
+    bool& use_switch1_only_timings
+)
 {
     auto climb_ladder = [&](Milliseconds hold){
         pbf_move_left_joystick(context, {0.0, 1.0}, hold, 0ms);
@@ -688,27 +697,21 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
             if (hunt_latias_alt(env, context, stats)) {
                 break; // shiny found
             }
-        }
-        else {
+        }else {
             const int ret = run_until<ProControllerContext>(
                 env.console, context,
                 [&](ProControllerContext& context) {
                     if (LEGENDARY == Legendary::LATIAS){
                         hunt_latias(env, context, stats, MIN_CALORIE_TO_CATCH);
-                    }
-                    else if (LEGENDARY == Legendary::LATIOS) {
+                    }else if (LEGENDARY == Legendary::LATIOS) {
                         hunt_latios(env, context, stats, MIN_CALORIE_TO_CATCH);
-                    }
-                    else if (LEGENDARY == Legendary::VIRIZION) {
+                    }else if (LEGENDARY == Legendary::VIRIZION) {
                         hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH, use_switch1_only_timings);
-                    }
-                    else if (LEGENDARY == Legendary::TERRAKION) {
+                    }else if (LEGENDARY == Legendary::TERRAKION) {
                         hunt_terrakion(env, context, stats, MIN_CALORIE_TO_CATCH);
-                    }
-                    else if (LEGENDARY == Legendary::COBALION) {
+                    }else if (LEGENDARY == Legendary::COBALION) {
                         hunt_cobalion(env, context, stats, MIN_CALORIE_TO_CATCH);
-                    }
-                    else {
+                    }else{
                         OperationFailedException::fire(
                             ErrorReport::SEND_ERROR_REPORT,
                             "legendary hunt not implemented",
