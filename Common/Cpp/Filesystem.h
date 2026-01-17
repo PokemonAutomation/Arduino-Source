@@ -97,6 +97,17 @@ public:
     Path stem() const{
         return m_path.stem();
     }
+    //  Return the extension of the filename component.
+    //  "/foo/bar.txt" -> ".txt"
+    //  "/foo/bar." -> "."
+    //  "/foo/bar" -> ""
+    //  "/foo/.bar" -> ""
+    //  "/foo/..bar" -> ".bar"
+    //  "/foo/." -> ""
+    //  "/foo/.." -> ""
+    Path extension() const{
+        return m_path.extension();
+    }
 
 public:
     Path& replace_extension(const Path& replacement){
@@ -140,6 +151,30 @@ inline auto remove_all(const Path& path){
 //  Copy a file.
 inline bool copy_file(const Path& from, const Path& to){
     return std::filesystem::copy_file(from.stdpath(), to.stdpath());
+}
+
+//  Return the size of a file in bytes.
+//  Throw std::filesystem::filesystem_error on underlying OS API errors
+inline std::uintmax_t file_size(const Path& path){
+    return std::filesystem::file_size(path.stdpath());
+}
+
+//  Return the size of a file in bytes.
+//  If an error occurs, set `ec`. Execute `ec.clear()` if no errors occur.
+inline std::uintmax_t file_size(const Path& path, std::error_code& ec){
+    return std::filesystem::file_size(path.stdpath(), ec);
+}
+
+//  Rename a file or directory.
+//  Throw std::filesystem::filesystem_error on underlying OS API errors
+inline void rename(const Path& old_path, const Path& new_path){
+    std::filesystem::rename(old_path.stdpath(), new_path.stdpath());
+}
+
+//  Rename a file or directory.
+//  If an error occurs, set `ec`. Execute `ec.clear()` if no errors occur.
+inline void rename(const Path& old_path, const Path& new_path, std::error_code& ec){
+    std::filesystem::rename(old_path.stdpath(), new_path.stdpath(), ec);
 }
 
 

@@ -94,6 +94,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/LifetimeSanitizer.h
     ../Common/Cpp/ListenerSet.h
     ../Common/Cpp/Logging/AbstractLogger.h
+    ../Common/Cpp/Logging/FileLogger.cpp
+    ../Common/Cpp/Logging/FileLogger.h
     ../Common/Cpp/Logging/LastLogTracker.cpp
     ../Common/Cpp/Logging/LastLogTracker.h
     ../Common/Cpp/Logging/OutputRedirector.cpp
