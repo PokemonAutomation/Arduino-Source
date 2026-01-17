@@ -84,12 +84,12 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
     : SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::STOP_PROGRAM)
     , LEGENDARY("<b>Legendary " + STRING_POKEMON + ":</b>",
         {
-            {Legendary::LATIAS, "latias", "Latias"},
-            {Legendary::LATIOS, "latios", "Latios"},
-            {Legendary::COBALION, "cobalion", "Cobalion"},
-            {Legendary::TERRAKION, "terrakion", "Terrakion"},
-            {Legendary::VIRIZION,  "virizion",  "Virizion"},
-            {Legendary::LATIAS_ALT, "latias_alt", "Latias_Alt"},
+            {Legendary::LATIAS, "latias", "Latias: Shuttle Run"},
+            {Legendary::LATIAS_ALT, "latias-game-reset", "Latias: Game Reset"},
+            {Legendary::LATIOS, "latios", "Latios: Game Reset"},
+            {Legendary::COBALION, "cobalion", "Cobalion: Shuttle Run"},
+            {Legendary::TERRAKION, "terrakion", "Terrakion: Shuttle Run"},
+            {Legendary::VIRIZION,  "virizion",  "Virizion: Shuttle Run"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         Legendary::LATIAS
@@ -97,6 +97,7 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
     , MIN_CALORIE_TO_CATCH(
         "<b>Minimum Cal. Reserved to Catch Legendary:</b><br>If applicable, the program will stop refreshing the Legendary spawn to give this amount of Calorie left for catching the Legendary."
         "<br>NOTE: use 5-star donut for best catch chance and enough time in the Legendary hyperspace."
+        "<br>NOTE: not required for Game Reset programs."
         "<br>Cal. per sec: 1 Star: 1 Cal./s, 2 Star: 1.6 Cal./s, 3 Star: 3.5 Cal./s, 4 Star: 7.5 Cal./s, 5 Star: 10 Cal./s",
         LockMode::UNLOCK_WHILE_RUNNING,
         600, 0, 9999 // default, min, max
