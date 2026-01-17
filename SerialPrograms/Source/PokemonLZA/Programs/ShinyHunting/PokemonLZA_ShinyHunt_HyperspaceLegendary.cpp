@@ -119,63 +119,66 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
 }
 
 namespace {
+
 // Save on the rooftop, facing the Latias spawning platform, but without having it spawned
 // Note that this program is different from other PLZA legendary programs in that it uses image analysis to identify the shiny.
 // Additionally, respawning is accomplished by resetting the game, so there is no need to track calories.
-    bool hunt_latias_alt(SingleSwitchProgramEnvironment& env,
-        ProControllerContext& context,
-        ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats)
-    {
-        stats.spawns++;
-        pbf_press_button(context, BUTTON_Y, 160ms, 2000ms);
-        context.wait_for_all_requests();
+bool hunt_latias_alt(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats)
+{
+    stats.spawns++;
+    pbf_press_button(context, BUTTON_Y, 160ms, 2000ms);
+    context.wait_for_all_requests();
 
-        // Capture an image of the screen region that Latias should spawn in and visually assess whether it's shiny.
-        ImageViewRGB32 full_image = ImageViewRGB32(env.console.video().snapshot());
-        ImagePixelBox latias_search_zone = ImagePixelBox(
-            static_cast<size_t>(full_image.width() * 0.4),
-            static_cast<size_t>(full_image.height() * 0.2),
-            static_cast<size_t>(full_image.width() * 0.6),
-            static_cast<size_t>(full_image.height() * 0.4)
-        );
-        ImageViewRGB32 cropped_image = extract_box_reference(full_image, latias_search_zone);
-        ImageHSV32 cropped_hsv_image = ImageHSV32(cropped_image);
-        ImageViewHSV32 cropped_hsv_image_view = ImageViewHSV32(
-            cropped_hsv_image.data(),
-            cropped_hsv_image.bytes_per_row(),
-            cropped_hsv_image.width(),
-            cropped_hsv_image.height()
-        );
-        ImageRGB32 filtered_image_nonshiny = to_blackwhite_hsv32_range(
-            cropped_hsv_image_view, false,
-            0xffe76051, 0xffffffd2
-        );
-        ImageRGB32 filtered_image_shiny = to_blackwhite_hsv32_range(
-            cropped_hsv_image_view, false,
-            0xff0d3d51, 0xff37ffd2
-        );
-        double nonshiny_result = image_average(filtered_image_nonshiny).r;
-        double shiny_result = image_average(filtered_image_shiny).r;
-        
-        /*filtered_image_nonshiny.save("filtered_nonshiny.png");
-        filtered_image_shiny.save("filtered_shiny.png");
-        cropped_image.save("cropped.png");
-        env.console.log("Saved images for Latias reset", COLOR_MAGENTA);*/
-        env.console.log(std::format("Score for non-shiny Latias: {}", nonshiny_result), COLOR_MAGENTA);
-        env.console.log(std::format("Score for shiny Latias: {}", shiny_result), COLOR_MAGENTA);
+    // Capture an image of the screen region that Latias should spawn in and visually assess whether it's shiny.
+    ImageViewRGB32 full_image = ImageViewRGB32(env.console.video().snapshot());
+    ImagePixelBox latias_search_zone = ImagePixelBox(
+        static_cast<size_t>(full_image.width() * 0.4),
+        static_cast<size_t>(full_image.height() * 0.2),
+        static_cast<size_t>(full_image.width() * 0.6),
+        static_cast<size_t>(full_image.height() * 0.4)
+    );
+    ImageViewRGB32 cropped_image = extract_box_reference(full_image, latias_search_zone);
+    ImageHSV32 cropped_hsv_image = ImageHSV32(cropped_image);
+    ImageViewHSV32 cropped_hsv_image_view = ImageViewHSV32(
+        cropped_hsv_image.data(),
+        cropped_hsv_image.bytes_per_row(),
+        cropped_hsv_image.width(),
+        cropped_hsv_image.height()
+    );
+    ImageRGB32 filtered_image_nonshiny = to_blackwhite_hsv32_range(
+        cropped_hsv_image_view, false,
+        0xffe76051, 0xffffffd2
+    );
+    ImageRGB32 filtered_image_shiny = to_blackwhite_hsv32_range(
+        cropped_hsv_image_view, false,
+        0xff0d3d51, 0xff37ffd2
+    );
+    double nonshiny_result = image_average(filtered_image_nonshiny).r;
+    double shiny_result = image_average(filtered_image_shiny).r;
+    
+    /*filtered_image_nonshiny.save("filtered_nonshiny.png");
+    filtered_image_shiny.save("filtered_shiny.png");
+    cropped_image.save("cropped.png");
+    env.console.log("Saved images for Latias reset", COLOR_MAGENTA);*/
+    env.console.log(std::format("Score for non-shiny Latias: {}", nonshiny_result), COLOR_MAGENTA);
+    env.console.log(std::format("Score for shiny Latias: {}", shiny_result), COLOR_MAGENTA);
 
-        env.update_stats();
+    env.update_stats();
 
-        // For now, return true (triggering program stop) if a shiny is detected or a non-shiny is not detected
-        if (nonshiny_result < 0.18 || shiny_result > 0.18) {
-            env.console.log("Shiny Latias identified or regular Latias not identified. Stopping program.", COLOR_MAGENTA);
-            return true;
-        }
-        else {
-            env.console.log("Non-shiny Latias identified. Resetting the game.", COLOR_MAGENTA);
-            return false;
-        }
+    // For now, return true (triggering program stop) if a shiny is detected or a non-shiny is not detected
+    if (nonshiny_result < 0.18 || shiny_result > 0.18) {
+        env.console.log("Shiny Latias identified or regular Latias not identified. Stopping program.", COLOR_MAGENTA);
+        return true;
+    }
+    else {
+        env.console.log("Non-shiny Latias identified. Resetting the game.", COLOR_MAGENTA);
+        return false;
+    }
 }
+
+
 // Start at the ladder up to Latias and use it to fix the position and camera angle
 // Run a route to the other side of the roof and begin a shuttle run to respawn Latias repeatedly
 // Route back to Latias to trigger a potential shiny sound when calories are low
