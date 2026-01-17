@@ -455,12 +455,15 @@ else() # macOS and Linux
 
     pkg_search_module(DPP dpp=10.0.28)
     if (DPP_FOUND) # enable dpp integration
+        message(STATUS "Compiling with DPP integration enabled")
         target_compile_definitions(SerialProgramsLib PUBLIC PA_DPP)
         ## to build against headers within this repo and properly set flags ##
         ## don't enable the following line ##
         # target_include_directories(SerialProgramsLib PRIVATE ${DPP_INCLUDE_DIRS})
         target_link_directories(SerialProgramsLib PUBLIC ${DPP_LIBRARY_DIRS})
         target_link_libraries(SerialProgramsLib PUBLIC ${DPP_LIBRARIES})
+    else()
+        message(NOTICE "Compiling with DPP integration disabled")
     endif()
 
     if (APPLE)
