@@ -17,8 +17,8 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/Images/ImageFilter.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "ML/Inference/ML_YOLOv5Detector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
@@ -664,7 +664,8 @@ void hunt_virizion_rooftop(
 
 void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
-
+    HyperspaceCalorieDetector::warm_ocr();
+    
     // Mash button B to let Switch register the controller
     pbf_mash_button(context, BUTTON_B, 200ms);
 

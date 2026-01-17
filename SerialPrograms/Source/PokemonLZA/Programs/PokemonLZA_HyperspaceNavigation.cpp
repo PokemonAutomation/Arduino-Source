@@ -30,12 +30,12 @@ bool check_calorie(
 ){
     HyperspaceCalorieWatcher calorie_watcher(console.logger());
     int ret = wait_until(
-        console, context, std::chrono::seconds(1), {calorie_watcher}
+        console, context, std::chrono::seconds(5), {calorie_watcher}
     );
     if (ret < 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "check_calorie(): does not detect Calorie number after waiting for a second",
+            "check_calorie(): does not detect Calorie number after waiting for five seconds",
             console
         );
     }

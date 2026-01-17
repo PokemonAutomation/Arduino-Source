@@ -353,6 +353,7 @@ void ShinyHunt_HyperspaceHunter::program(SingleSwitchProgramEnvironment& env, Pr
         }
     }
     assert_16_9_720p_min(env.logger(), env.console);
+    HyperspaceCalorieDetector::warm_ocr();
 
     // Mash button B to let Switch register the controller
     pbf_mash_button(context, BUTTON_B, 500ms);
