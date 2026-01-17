@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonLA_FlagTracker_H
 
 #include <deque>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "PokemonLA_WhiteObjectDetector.h"
 #include "PokemonLA_FlagDetector.h"

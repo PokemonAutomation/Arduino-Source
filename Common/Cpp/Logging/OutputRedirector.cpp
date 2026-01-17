@@ -4,25 +4,23 @@
  *
  */
 
-#include <ostream>
 #include "OutputRedirector.h"
 
 namespace PokemonAutomation{
 
 
-OutputRedirector::OutputRedirector(std::ostream& stream, std::string tag, Color color)
+OutputRedirector::OutputRedirector(std::ostream& stream, Logger& logger, std::string tag, Color color)
     : m_stream(stream)
     , m_old_buf(stream.rdbuf())
-    , m_logger(global_logger_raw(), tag)
+    , m_logger(logger, std::move(tag))
     , m_color(color)
 {
     stream.rdbuf(this);
 }
+
 OutputRedirector::~OutputRedirector(){
-    this->m_stream.rdbuf(this->m_old_buf);
+    m_stream.rdbuf(m_old_buf);
 }
-
-
 
 OutputRedirector::int_type OutputRedirector::overflow(int_type ch){
     WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
@@ -35,6 +33,7 @@ OutputRedirector::int_type OutputRedirector::overflow(int_type ch){
     }
     return ch;
 }
+
 std::streamsize OutputRedirector::xsputn(const char_type* s, std::streamsize count){
     WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     m_old_buf->sputn(s, count);

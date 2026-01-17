@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "PokemonSV_OverworldSensors.h"
 

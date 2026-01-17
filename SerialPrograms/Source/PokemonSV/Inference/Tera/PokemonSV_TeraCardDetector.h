@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSV_TeraCardDetector_H
 
 #include "Common/Cpp/Color.h"
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/VisualDetector.h"
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"

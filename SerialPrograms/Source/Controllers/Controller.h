@@ -8,7 +8,7 @@
 #define PokemonAutomation_Controllers_Controller_H
 
 #include "Common/Compiler.h"
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/CancellableScope.h"

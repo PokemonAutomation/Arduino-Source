@@ -4,7 +4,7 @@
 
 #include <dpp/dpp.h>
 #include <atomic>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 
 namespace PokemonAutomation{
 namespace Integration{

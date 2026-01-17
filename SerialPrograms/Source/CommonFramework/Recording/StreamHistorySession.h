@@ -9,7 +9,7 @@
 #ifndef PokemonAutomation_StreamHistorySession_H
 #define PokemonAutomation_StreamHistorySession_H
 
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/VideoPipeline/VideoSession.h"
