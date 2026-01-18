@@ -168,6 +168,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/SerialConnection/SerialConnectionWinAPI.h
     ../Common/Cpp/StreamConnections/MockDevice.cpp
     ../Common/Cpp/StreamConnections/MockDevice.h
+    ../Common/Cpp/StreamConnections/PABotBase2_MessageDumper.cpp
+    ../Common/Cpp/StreamConnections/PABotBase2_MessageDumper.h
     ../Common/Cpp/StreamConnections/ReliableStreamConnection.cpp
     ../Common/Cpp/StreamConnections/ReliableStreamConnection.h
     ../Common/Cpp/StreamConnections/StreamConnection.h

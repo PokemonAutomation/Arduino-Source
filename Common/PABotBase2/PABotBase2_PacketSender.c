@@ -37,7 +37,7 @@ bool pabb2_PacketSender_remove(pabb2_PacketSender* self, uint8_t seqnum){
         }
         offset = ~offset;
         pabb2_PacketHeader* packet = (pabb2_PacketHeader*)(self->buffer + offset);
-        packet->opcode = PABB2_CONNECTION_PACKET_OPCODE_INVALID;
+        packet->opcode = PABB2_CONNECTION_OPCODE_INVALID;
     }
 
     //  Not the front.
@@ -64,7 +64,7 @@ bool pabb2_PacketSender_remove(pabb2_PacketSender* self, uint8_t seqnum){
         pabb2_PacketHeader* packet = (pabb2_PacketHeader*)(self->buffer + offset);
 
         //  Packet hasn't been acked yet. We can't go further.
-        if (packet->opcode != PABB2_CONNECTION_PACKET_OPCODE_INVALID){
+        if (packet->opcode != PABB2_CONNECTION_OPCODE_INVALID){
             return true;
         }
     }
@@ -138,7 +138,7 @@ pabb2_PacketHeader* pabb2_PacketSender_reserve_packet(
 
     pabb2_PacketHeader* ret = (pabb2_PacketHeader*)(self->buffer + offset);
 
-    ret->magic_number = PABB2_CONNECTION_PACKET_MAGIC_NUMBER;
+    ret->magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     ret->seqnum = self->slot_tail++;
     ret->packet_bytes = packet_bytes;
     ret->opcode = opcode;
@@ -234,10 +234,10 @@ size_t pabb2_PacketSender_send_stream(
 
         //  Build the packet header.
         pabb2_PacketHeaderData* packet = (pabb2_PacketHeaderData*)(self->buffer + offset);
-        packet->magic_number = PABB2_CONNECTION_PACKET_MAGIC_NUMBER;
+        packet->magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
         packet->seqnum = self->slot_tail++;
         packet->packet_bytes = (uint8_t)packet_bytes;  //  256 overflows to 0
-        packet->opcode = PABB2_CONNECTION_PACKET_OPCODE_STREAM_DATA;
+        packet->opcode = PABB2_CONNECTION_OPCODE_STREAM_DATA;
         memcpy(&packet->stream_offset, &self->stream_offset, sizeof(uint16_t));   //  May be misaligned.
 
         //  Copy stream data.
@@ -279,14 +279,14 @@ bool pabb2_PacketSender_iterate_retransmits(pabb2_PacketSender* self){
         pabb2_PacketHeader* packet = (pabb2_PacketHeader*)(self->buffer + offset);
 
         //  Retransmit if it hasn't been acked already and is old enough.
-        if (packet->opcode != PABB2_CONNECTION_PACKET_OPCODE_INVALID &&
+        if (packet->opcode != PABB2_CONNECTION_OPCODE_INVALID &&
             seqnum - packet->magic_number >= PABB2_ConnectionSender_RETRANSMIT_COUNTER
         ){
-            packet->magic_number = PABB2_CONNECTION_PACKET_MAGIC_NUMBER;
+            packet->magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
             uint8_t packet_bytes = packet->packet_bytes;
 
             //  REMOVE
-            printf("Retransmitting...\n");
+            printf("Retransmitting: %u\n", packet->seqnum);
             fflush(stdout);
 
             self->unreliable_sender_send(
@@ -315,7 +315,7 @@ void pabb2_PacketSender_send_info(pabb2_PacketSender* self, uint8_t seqnum, uint
         pabb2_PacketHeader header;
         uint8_t crc32[sizeof(uint32_t)];
     } packet;
-    packet.header.magic_number = PABB2_CONNECTION_PACKET_MAGIC_NUMBER;
+    packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
     packet.header.opcode = opcode;
@@ -327,10 +327,10 @@ void pabb2_PacketSender_send_ack(pabb2_PacketSender* self, uint8_t seqnum){
         pabb2_PacketHeader header;
         uint8_t crc32[sizeof(uint32_t)];
     } packet;
-    packet.header.magic_number = PABB2_CONNECTION_PACKET_MAGIC_NUMBER;
+    packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
-    packet.header.opcode = PABB2_CONNECTION_PACKET_OPCODE_ACK;
+    packet.header.opcode = PABB2_CONNECTION_OPCODE_ACK;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet));
 }
@@ -339,10 +339,10 @@ void pabb2_PacketSender_send_ack_u8(pabb2_PacketSender* self, uint8_t seqnum, ui
         pabb2_PacketHeader_Ack_u8 header;
         uint8_t crc32[sizeof(uint32_t)];
     } packet;
-    packet.header.magic_number = PABB2_CONNECTION_PACKET_MAGIC_NUMBER;
+    packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
-    packet.header.opcode = PABB2_CONNECTION_PACKET_OPCODE_ACK_u8;
+    packet.header.opcode = PABB2_CONNECTION_OPCODE_ACK_u8;
     packet.header.data = data;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet));
@@ -352,10 +352,10 @@ void pabb2_PacketSender_send_ack_u16(pabb2_PacketSender* self, uint8_t seqnum, u
         pabb2_PacketHeader_Ack_u16 header;
         uint8_t crc32[sizeof(uint32_t)];
     } packet;
-    packet.header.magic_number = PABB2_CONNECTION_PACKET_MAGIC_NUMBER;
+    packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
-    packet.header.opcode = PABB2_CONNECTION_PACKET_OPCODE_ACK_u16;
+    packet.header.opcode = PABB2_CONNECTION_OPCODE_ACK_u16;
     packet.header.data = data;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet));
@@ -365,10 +365,10 @@ void pabb2_PacketSender_send_ack_u32(pabb2_PacketSender* self, uint8_t seqnum, u
         pabb2_PacketHeader_Ack_u32 header;
         uint8_t crc32[sizeof(uint32_t)];
     } packet;
-    packet.header.magic_number = PABB2_CONNECTION_PACKET_MAGIC_NUMBER;
+    packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
-    packet.header.opcode = PABB2_CONNECTION_PACKET_OPCODE_ACK_u32;
+    packet.header.opcode = PABB2_CONNECTION_OPCODE_ACK_u32;
     packet.header.data = data;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet));

@@ -32,7 +32,7 @@ const pabb2_PacketHeader* pabb2_PacketParser_pull_bytes(
 
         //  Valid magic byte.
         uint8_t* buffer = self->buffer;
-        if (buffer[0] == PABB2_CONNECTION_PACKET_MAGIC_NUMBER){
+        if (buffer[0] == PABB2_CONNECTION_MAGIC_NUMBER){
             break;
         }
 
@@ -48,7 +48,7 @@ const pabb2_PacketHeader* pabb2_PacketParser_pull_bytes(
             }
 
             //  Magic byte found.
-            if (buffer[c] == PABB2_CONNECTION_PACKET_MAGIC_NUMBER){
+            if (buffer[c] == PABB2_CONNECTION_MAGIC_NUMBER){
                 break;
             }
         }
@@ -127,7 +127,7 @@ void pabb2_PacketParser_push_bytes(
 
     while (bytes > 0){
 //        cout << "bytes left: " << bytes << endl;
-        if (index == 0 && data[0] != PABB2_CONNECTION_PACKET_MAGIC_NUMBER){
+        if (index == 0 && data[0] != PABB2_CONNECTION_MAGIC_NUMBER){
 //            cout << "Skipping invalid start of packet." << endl;
             data++;
             bytes--;

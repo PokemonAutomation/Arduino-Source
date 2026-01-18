@@ -32,6 +32,7 @@ public:
 
     virtual void stop() override;
 
+    //  Send stream data.
     virtual size_t send(const void* data, size_t bytes) override;
 
     bool send_request(uint8_t opcode);
@@ -42,23 +43,14 @@ private:
 
     void send_ack(uint8_t seqnum);
 
-    static size_t send_raw(void* context, const void* data, size_t bytes){
-        ReliableStreamConnection& self = *(ReliableStreamConnection*)context;
-        return self.m_unreliable_connection.send(data, bytes);
-    }
+    static size_t send_raw(void* context, const void* data, size_t bytes);
     void retransmit_thread();
 
 
 private:
     //  Receive
 
-    virtual void on_recv(const void* data, size_t bytes) override{
-        pabb2_PacketParser_push_bytes(
-            &m_parser,
-            this, &ReliableStreamConnection::on_packet,
-            (const uint8_t*)data, bytes
-        );
-    }
+    virtual void on_recv(const void* data, size_t bytes) override;
     static void on_packet(void* context, const pabb2_PacketHeader* packet){
         ReliableStreamConnection& self = *(ReliableStreamConnection*)context;
         self.on_packet(packet);
@@ -67,8 +59,8 @@ private:
 
 
 
-//private:  //  REMOVE
-public:
+private:
+//public:
 
     Logger& m_logger;
     StreamConnection& m_unreliable_connection;
@@ -77,6 +69,8 @@ public:
     pabb2_PacketSender m_reliable_sender;
     pabb2_PacketParser m_parser;
     pabb2_StreamCoalescer m_stream_coalescer;
+
+    std::string m_error;
 
     mutable std::mutex m_lock;
     std::condition_variable m_cv;

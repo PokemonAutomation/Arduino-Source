@@ -6,6 +6,10 @@
 
 #include "MockDevice.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -20,6 +24,7 @@ MockDevice::MockDevice()
     );
 
     m_device_thread = Thread([this]{ device_thread(); });
+    m_host_thread = Thread([this]{ host_recv_thread(); });
 }
 MockDevice::~MockDevice(){
     m_stopping.store(true, std::memory_order_release);
@@ -37,16 +42,23 @@ MockDevice::~MockDevice(){
 
 
 size_t MockDevice::device_send_serial(const void* data, size_t bytes){
-    WriteSpinLock lg(m_device_to_host_lock);
-    if (m_device_to_host_line.size() >= m_device_to_host_capacity){
-        return 0;
+    {
+        WriteSpinLock lg(m_device_to_host_lock);
+//        cout << "MockDevice::device_send_serial()" << endl;
+        if (m_device_to_host_line.size() >= m_device_to_host_capacity){
+            return 0;
+        }
+        bytes = std::min(bytes, m_device_to_host_capacity - m_device_to_host_line.size());
+        m_device_to_host_line.insert(
+            m_device_to_host_line.end(),
+            (const uint8_t*)data,
+            (const uint8_t*)data + bytes
+        );
     }
-    bytes = std::min(bytes, m_device_to_host_capacity - m_device_to_host_line.size());
-    m_device_to_host_line.insert(
-        m_device_to_host_line.end(),
-        (const uint8_t*)data,
-        (const uint8_t*)data + bytes
-    );
+    {
+        std::lock_guard<std::mutex> lg(m_host_lock);
+    }
+    m_host_cv.notify_all();
     return bytes;
 }
 size_t MockDevice::device_read_serial(void* data, size_t max_bytes){
@@ -61,16 +73,25 @@ size_t MockDevice::device_read_serial(void* data, size_t max_bytes){
 
 
 size_t MockDevice::send(const void* data, size_t bytes){
-    WriteSpinLock lg(m_host_to_device_lock);
-    if (m_host_to_device_line.size() >= m_host_to_device_capacity){
-        return 0;
+    {
+        WriteSpinLock lg(m_host_to_device_lock);
+//        cout << "MockDevice::send(const void* data, size_t bytes)" << endl;
+
+        if (m_host_to_device_line.size() >= m_host_to_device_capacity){
+            return 0;
+        }
+        bytes = std::min(bytes, m_host_to_device_capacity - m_host_to_device_line.size());
+        m_host_to_device_line.insert(
+            m_host_to_device_line.end(),
+            (const uint8_t*)data,
+            (const uint8_t*)data + bytes
+        );
     }
-    bytes = std::min(bytes, m_host_to_device_capacity - m_host_to_device_line.size());
-    m_host_to_device_line.insert(
-        m_host_to_device_line.end(),
-        (const uint8_t*)data,
-        (const uint8_t*)data + bytes
-    );
+    {
+        std::lock_guard<std::mutex> lg(m_device_lock);
+//        cout << "MockDevice::send(const void* data, size_t bytes) - notifying" << endl;
+    }
+    m_device_cv.notify_all();
     return bytes;
 }
 
@@ -78,8 +99,8 @@ size_t MockDevice::send(const void* data, size_t bytes){
 void MockDevice::device_thread(){
     std::unique_lock<std::mutex> lg(m_device_lock);
     while (!m_stopping.load(std::memory_order_relaxed)){
-        m_device_cv.wait(lg);
         pabb2_ReliableStreamConnection_run_events(&m_connection);
+        m_device_cv.wait(lg);
     }
 }
 void MockDevice::host_recv_thread(){
@@ -92,11 +113,13 @@ void MockDevice::host_recv_thread(){
                 data = std::vector<uint8_t>(m_device_to_host_line.begin(), m_device_to_host_line.end());
                 m_device_to_host_line.clear();
             }
+//            cout << "data.size() = " << data.size() << endl;
             if (data.empty()){
                 m_host_cv.wait(lg0);
                 continue;
             }
         }
+//        cout << "Passing data to host: " << data.size() << endl;
         on_recv(data.data(), data.size());
     }
 }

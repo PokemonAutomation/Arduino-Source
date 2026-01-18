@@ -5,6 +5,9 @@
  */
 
 #include "Common/CRC32/pabb_CRC32.h"
+#include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/StreamConnections/PABotBase2_MessageDumper.h"
 #include "ReliableStreamConnection.h"
 
 //  REMOVE
@@ -59,11 +62,18 @@ void ReliableStreamConnection::stop(){
 
 size_t ReliableStreamConnection::send(const void* data, size_t bytes){
     std::lock_guard<std::mutex> lg(m_lock);
+    if (!m_error.empty()){
+        throw ConnectionException(&m_logger, m_error);
+    }
     return pabb2_PacketSender_send_stream(&m_reliable_sender, data, bytes);
 }
 
 bool ReliableStreamConnection::send_request(uint8_t opcode){
     std::lock_guard<std::mutex> lg(m_lock);
+//    cout << "Sending: " << tostr_hex(opcode) << endl;
+    if (!m_error.empty()){
+        throw ConnectionException(&m_logger, m_error);
+    }
     return pabb2_PacketSender_send_packet(&m_reliable_sender, opcode, 0, nullptr);
 }
 
@@ -73,14 +83,22 @@ void ReliableStreamConnection::send_ack(uint8_t seqnum){
         pabb2_PacketHeader header;
         uint8_t crc[sizeof(uint32_t)];
     } packet;
-    packet.header.magic_number = PABB2_CONNECTION_PACKET_MAGIC_NUMBER;
+    packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
-    packet.header.opcode = PABB2_CONNECTION_PACKET_OPCODE_ACK;
+    packet.header.opcode = PABB2_CONNECTION_OPCODE_ACK;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
 
     std::lock_guard<std::mutex> lg(m_lock);
     m_unreliable_connection.send(&packet, sizeof(packet));
+}
+
+size_t ReliableStreamConnection::send_raw(void* context, const void* data, size_t bytes){
+    ReliableStreamConnection& self = *(ReliableStreamConnection*)context;
+
+    cout << "Sending: " << tostr((const pabb2_PacketHeader*)data) << endl;
+
+    return self.m_unreliable_connection.send(data, bytes);
 }
 
 void ReliableStreamConnection::retransmit_thread(){
@@ -117,10 +135,21 @@ void ReliableStreamConnection::retransmit_thread(){
 //  Receive Path
 //
 
+void ReliableStreamConnection::on_recv(const void* data, size_t bytes){
+    cout << "ReliableStreamConnection::on_recv(): " << bytes << endl;
+    pabb2_PacketParser_push_bytes(
+        &m_parser,
+        this, &ReliableStreamConnection::on_packet,
+        (const uint8_t*)data, bytes
+    );
+}
+
+
 void ReliableStreamConnection::on_packet(const pabb2_PacketHeader* packet){
     uint8_t status = packet->magic_number;
 
 //    cout << "on_packet(): seqnum = " << (int)packet->seqnum << ", opcode = " << (int)packet->opcode << endl;
+    cout << "Receive: " << tostr(packet) << endl;
 
     switch (status){
     case PABB2_PacketParser_RESULT_VALID:
@@ -146,7 +175,7 @@ void ReliableStreamConnection::on_packet(const pabb2_PacketHeader* packet){
     }
 
 
-    if (packet->opcode == PABB2_CONNECTION_PACKET_OPCODE_STREAM_DATA){
+    if (packet->opcode == PABB2_CONNECTION_OPCODE_STREAM_DATA){
         if (packet->packet_bytes < sizeof(pabb2_PacketHeaderData) + sizeof(uint32_t)){
             m_logger.log(
                 "[ReliableStreamConnection]: Received stream packet that is too small: " + std::to_string(packet->packet_bytes),
@@ -163,28 +192,31 @@ void ReliableStreamConnection::on_packet(const pabb2_PacketHeader* packet){
 
 
     switch (packet->opcode){
-    case PABB2_CONNECTION_PACKET_OPCODE_INVALID_LENGTH:{
+    case PABB2_CONNECTION_OPCODE_INVALID_LENGTH:{
         m_logger.log(
-            "[ReliableStreamConnection]: PABB2_CONNECTION_PACKET_OPCODE_INVALID_LENGTH: Device reported an invalid message length.",
+            "[ReliableStreamConnection]: PABB2_CONNECTION_OPCODE_INVALID_LENGTH: Device reported an invalid message length.",
             COLOR_RED
         );
         return;
     }
-    case PABB2_CONNECTION_PACKET_OPCODE_INVALID_CHECKSUM_FAIL:{
+    case PABB2_CONNECTION_OPCODE_INVALID_CHECKSUM_FAIL:{
         m_logger.log(
-            "[ReliableStreamConnection]: PABB2_CONNECTION_PACKET_OPCODE_INVALID_CHECKSUM_FAIL: Device reported a checksum mismatch.",
+            "[ReliableStreamConnection]: PABB2_CONNECTION_OPCODE_INVALID_CHECKSUM_FAIL: Device reported a checksum mismatch.",
             COLOR_RED
         );
         return;
     }
-    case PABB2_CONNECTION_PACKET_OPCODE_INVALID_OPCODE:{
+    case PABB2_CONNECTION_OPCODE_INVALID_OPCODE:{
         m_logger.log(
-            "[ReliableStreamConnection]: PABB2_CONNECTION_PACKET_OPCODE_INVALID_OPCODE: Device reported an invalid opcode.",
+            "[ReliableStreamConnection]: PABB2_CONNECTION_OPCODE_INVALID_OPCODE: Device reported an invalid opcode.",
             COLOR_RED
         );
         return;
     }
-    case PABB2_CONNECTION_PACKET_OPCODE_ACK:
+    case PABB2_CONNECTION_OPCODE_ACK:
+    case PABB2_CONNECTION_OPCODE_ACK_u8:
+    case PABB2_CONNECTION_OPCODE_ACK_u16:
+    case PABB2_CONNECTION_OPCODE_ACK_u32:
 //        cout << "Received ack" << endl;
         pabb2_PacketSender_remove(&m_reliable_sender, packet->seqnum);
         return;

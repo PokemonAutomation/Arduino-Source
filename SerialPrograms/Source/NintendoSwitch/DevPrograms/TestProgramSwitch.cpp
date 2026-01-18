@@ -364,10 +364,10 @@ struct DataPacket : pabb2_PacketHeaderData{
             size = MAX_SIZE;
         }
 
-        this->magic_number = PABB2_CONNECTION_PACKET_MAGIC_NUMBER;
+        this->magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
         this->seqnum = seqnum;
         this->packet_bytes = (uint8_t)(size + OVERHEAD);
-        this->opcode = PABB2_CONNECTION_PACKET_OPCODE_STREAM_DATA;
+        this->opcode = PABB2_CONNECTION_OPCODE_STREAM_DATA;
         this->stream_offset = stream_offset;
         memcpy(data, str, size);
     }
@@ -406,15 +406,15 @@ public:
             pabb2_PacketHeader header;
             uint8_t crc[sizeof(uint32_t)];
         } response;
-        response.header.magic_number = PABB2_CONNECTION_PACKET_MAGIC_NUMBER;
+        response.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
         response.header.seqnum = packet->seqnum;
         response.header.packet_bytes = sizeof(response);
-        response.header.opcode = PABB2_CONNECTION_PACKET_OPCODE_ACK;
+        response.header.opcode = PABB2_CONNECTION_OPCODE_ACK;
         pabb_crc32_write_to_message(&response, sizeof(response));
 
         std::lock_guard<std::mutex> lg(m_lock);
 
-        if (packet->opcode == PABB2_CONNECTION_PACKET_OPCODE_STREAM_DATA){
+        if (packet->opcode == PABB2_CONNECTION_OPCODE_STREAM_DATA){
             uint8_t stream_size = packet->packet_bytes - sizeof(pabb2_PacketHeaderData) - sizeof(uint32_t);
             for (uint8_t c = 0; c < stream_size; c++){
                 char expected = '0' + m_offset % 10;
@@ -519,6 +519,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
             10s
         );
 
+
+        connection.send_request(PABB2_CONNECTION_OPCODE_QUERY_VERSION);
 
 
         context.wait_for(60s);
