@@ -75,7 +75,11 @@ uint32_t utf8_to_unicode(const char*& str){
 }
 
 template <typename CharType>
-void append_to_utf8(std::basic_string<CharType>& str, uint32_t codepoint, const CharType* replacement){
+void append_to_utf8(
+    std::basic_string<CharType>& str,
+    uint32_t codepoint,
+    const CharType* replacement
+){
     if (codepoint <= 0x7f){
         str += (char)codepoint;
         return;
@@ -155,14 +159,14 @@ void append_to_utf16(std::u16string& str, uint32_t codepoint){
 //  Conversions
 //
 
-std::u8string str_to_utf8(const std::string& str){
+std::u8string utf8_to_utf8(const std::string& str){
     return std::u8string(str.begin(), str.end());
 }
 std::string utf8_to_str(const std::u8string& str){
     return std::string(str.begin(), str.end());
 }
 
-std::u16string str_to_utf16(const std::string& str){
+std::u16string utf8_to_utf16(const std::string& str){
     std::u16string out;
     const char* utf8 = str.c_str();
     const char* stop = utf8 + str.size();
@@ -180,7 +184,6 @@ std::u16string utr8_to_utf16(const std::u8string& str){
     }
     return out;
 }
-
 std::string utr16_to_str(const std::u16string& str){
     std::string out;
     const char16_t* utf16 = str.c_str();
@@ -200,11 +203,44 @@ std::u8string utr16_to_utf8(const std::u16string& str){
     return out;
 }
 
+std::u32string utf8_to_utf32(const std::string& str){
+    std::u32string out;
+    const char* utf8 = str.c_str();
+    const char* stop = utf8 + str.size();
+    while (utf8 < stop){
+        out += utf8_to_unicode(utf8);
+    }
+    return out;
+}
+std::u32string utf8_to_utf32(const std::u8string& str){
+    std::u32string out;
+    const char* utf8 = (const char*)str.c_str();
+    const char* stop = utf8 + str.size();
+    while (utf8 < stop){
+        out += utf8_to_unicode(utf8);
+    }
+    return out;
+}
+std::string utf32_to_str(const std::u32string& str){
+    std::string out;
+    for (char32_t ch : str){
+        append_to_utf8(out, ch, "\xef\xbf\xbd");
+    }
+    return out;
+}
+std::u8string utf32_to_utf8(const std::u32string& str){
+    std::u8string out;
+    for (char32_t ch : str){
+        append_to_utf8(out, ch, u8"\xef\xbf\xbd");
+    }
+    return out;
+}
+
 
 
 #ifdef _WIN32
-std::wstring str_to_wstr(const std::string& str){
-    std::u16string tmp(str_to_utf16(str));
+std::wstring utf8_to_wstr(const std::string& str){
+    std::u16string tmp(utf8_to_utf16(str));
     return std::wstring(tmp.begin(), tmp.end());
 }
 #endif

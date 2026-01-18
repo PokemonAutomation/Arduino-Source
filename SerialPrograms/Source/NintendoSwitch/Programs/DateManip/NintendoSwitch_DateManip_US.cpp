@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Qt/StringToolsQt.h"
+#include "Common/Cpp/Unicode.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
@@ -59,7 +59,7 @@ DateTime DateReader_US::read_date(Logger& logger, std::shared_ptr<const ImageRGB
         if (ampm_ocr.back() == '\n'){
             ampm_ocr.pop_back();
         }
-        std::string ampm = to_utf8(OCR::normalize_utf32(ampm_ocr));
+        std::string ampm = utf32_to_str(OCR::normalize_utf32(ampm_ocr));
 
         auto has_a = ampm.find('a') != std::string::npos;
         auto has_p = ampm.find('p') != std::string::npos;

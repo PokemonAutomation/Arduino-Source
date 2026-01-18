@@ -6,10 +6,9 @@
 
 #include <algorithm>
 #include <map>
-#include <format>
+#include "Common/Cpp/Unicode.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Qt/StringToolsQt.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
@@ -69,7 +68,7 @@ std::string run_number_normalization(const std::string& input){
     };
 
     std::string normalized;
-    for (char32_t ch : to_utf32(input)){
+    for (char32_t ch : utf8_to_utf32(input)){
         auto iter = SUBSTITUTION_TABLE.find(ch);
         if (iter == SUBSTITUTION_TABLE.end()){
             continue;

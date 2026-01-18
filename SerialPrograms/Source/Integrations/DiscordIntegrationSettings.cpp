@@ -4,9 +4,8 @@
  *
  */
 
+#include "Common/Cpp/Unicode.h"
 #include "Common/Qt/StringToolsQt.h"
-//#include "CommonFramework/Globals.h"
-//#include "CommonFramework/GlobalSettingsPanel.h"
 #include "Integrations/DppIntegration/DppClient.h"
 #include "DiscordIntegrationSettings.h"
 
@@ -111,7 +110,7 @@ void DiscordIntegrationSettingsOption::on_config_value_changed([[maybe_unused]] 
 std::string convert(const std::string& message){
     std::u32string ret;
     std::u32string block;
-    for (char32_t ch : to_utf32(message)){
+    for (char32_t ch : utf8_to_utf32(message)){
         switch (ch){
         case 38:
             if (block.empty() || block.back() != 64){
@@ -126,7 +125,7 @@ std::string convert(const std::string& message){
         block.clear();
     }
 
-    return to_utf8(ret);
+    return utf32_to_str(ret);
 }
 
 

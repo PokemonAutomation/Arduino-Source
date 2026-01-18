@@ -41,7 +41,7 @@ private:
 
 bool program_dump(Logger* logger, const std::string& filename, EXCEPTION_POINTERS* e){
     HandleHolder handle = CreateFileW(
-        str_to_wstr(filename).c_str(),
+        utf8_to_wstr(filename).c_str(),
         FILE_WRITE_ACCESS,
         FILE_SHARE_READ,
         nullptr,
