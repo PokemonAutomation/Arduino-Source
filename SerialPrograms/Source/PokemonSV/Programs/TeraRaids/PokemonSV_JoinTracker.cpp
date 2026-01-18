@@ -6,7 +6,7 @@
 
 #include <cmath>
 #include <QFile>
-#include "Common/Cpp/Unicode.h"
+#include "Common/Cpp/Strings/Unicode.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalSettingsPanel.h"

@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Unicode.h"
+#include "Common/Cpp/Strings/Unicode.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/Images/ImageFilter.h"

@@ -5,6 +5,7 @@
  */
 
 #include <filesystem>
+#include "Common/Cpp/Strings/Unicode.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -184,7 +185,7 @@ void GenerateDexModelSession::iterate_species(){
     m_processed_slugs.insert(slug);
 #endif
 
-    std::filesystem::create_directories(m_path + slug);
+    std::filesystem::create_directories(utf8_to_utf8(m_path + slug));
 
     size_t non_shiny_index = 0;
     size_t shiny_index = 0;

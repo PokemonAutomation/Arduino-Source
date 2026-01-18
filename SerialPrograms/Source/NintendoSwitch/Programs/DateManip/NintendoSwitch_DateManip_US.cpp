@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Unicode.h"
+#include "Common/Cpp/Strings/Unicode.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"

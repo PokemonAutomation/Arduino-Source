@@ -7,7 +7,7 @@
 #include <map>
 #include <QString>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Unicode.h"
+#include "Common/Cpp/Strings/Unicode.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/StringToolsQt.h"

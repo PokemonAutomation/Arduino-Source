@@ -10,7 +10,7 @@
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Cpp/StringTools.h"
+#include "Common/Cpp/Strings/StringTools.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "ML_AnnotationIO.h"
 #include "ML_SegmentAnythingModelConstants.h"

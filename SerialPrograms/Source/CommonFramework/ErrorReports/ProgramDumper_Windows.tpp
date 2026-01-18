@@ -9,8 +9,8 @@
 #include <Windows.h>
 #include <winioctl.h>
 #include <Dbghelp.h>
-#include "Common/Cpp/Unicode.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Strings/Unicode.h"
 #include "ErrorReports.h"
 #include "ProgramDumper.h"
 

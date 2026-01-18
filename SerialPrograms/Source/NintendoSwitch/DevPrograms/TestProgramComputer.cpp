@@ -72,7 +72,7 @@
 #include "CommonFramework/ImageTypes/ImageHSV32.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
-#include "Common/Cpp/StringTools.h"
+#include "Common/Cpp/Strings/StringTools.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 #include "Common/Cpp/Options/EnumDropdownDatabase.h"

@@ -5,6 +5,7 @@
 */
 
 #include "Common/Cpp/Time.h"
+#include "Common/Cpp/Strings/Unicode.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.h"
 #include "PokemonLZA/Inference/Donuts/PokemonLZA_FlavorPowerDetector.h"
@@ -359,12 +360,11 @@ int test_pokemonLZA_MapIconDetector(const std::string& filepath){
     // Each line in the txt file has format: "<MapIconType> <count>"
     // For example: "PokemonCenter 2" means there should be 2 Pokemon Centers detected
 
-    std::filesystem::path file_path(filepath);
-    std::string filename = file_path.filename().string();
+    std::filesystem::path file_path(utf8_to_utf8(filepath));
     std::filesystem::path parent_dir = file_path.parent_path();
-    std::string base_name = file_path.stem().string();
+    std::string base_name = utf8_to_str(file_path.stem().generic_u8string());
 
-    std::filesystem::path target_detections_path = parent_dir / ("_" + base_name + ".txt");
+    std::filesystem::path target_detections_path = parent_dir / utf8_to_utf8("_" + base_name + ".txt");
 
     // Load expected detections from txt file
     std::map<MapIconType, int> expected_counts;

@@ -6,7 +6,7 @@
 
 #include "NintendoSwitch_ControllerButtons.h"
 #include "Common/Cpp/EnumStringMap.h"
-#include "Common/Cpp/StringTools.h"
+#include "Common/Cpp/Strings/StringTools.h"
 
 //#include <iostream>
 //using std::cout;

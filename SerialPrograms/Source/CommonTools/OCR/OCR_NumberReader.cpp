@@ -6,7 +6,7 @@
 
 #include <algorithm>
 #include <map>
-#include "Common/Cpp/Unicode.h"
+#include "Common/Cpp/Strings/Unicode.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"

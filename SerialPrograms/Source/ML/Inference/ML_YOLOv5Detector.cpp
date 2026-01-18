@@ -16,7 +16,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Globals.h"
-#include "Common/Cpp/StringTools.h"
+#include "Common/Cpp/Strings/StringTools.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "ML_YOLOv5Detector.h"
 

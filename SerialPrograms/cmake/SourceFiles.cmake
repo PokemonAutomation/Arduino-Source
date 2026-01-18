@@ -189,13 +189,13 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Stopwatch.h
     ../Common/Cpp/StreamConverters.cpp
     ../Common/Cpp/StreamConverters.h
-    ../Common/Cpp/StringTools.cpp
-    ../Common/Cpp/StringTools.h
+    ../Common/Cpp/Strings/StringTools.cpp
+    ../Common/Cpp/Strings/StringTools.h
+    ../Common/Cpp/Strings/Unicode.cpp
+    ../Common/Cpp/Strings/Unicode.h
     ../Common/Cpp/Time.cpp
     ../Common/Cpp/Time.h
     ../Common/Cpp/UiWrapper.h
-    ../Common/Cpp/Unicode.cpp
-    ../Common/Cpp/Unicode.h
     ../Common/Cpp/ValueDebouncer.h
     ../Common/CRC32/pabb_CRC32.c
     ../Common/CRC32/pabb_CRC32.h

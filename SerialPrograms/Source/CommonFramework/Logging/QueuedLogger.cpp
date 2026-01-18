@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Unicode.h"
+#include "Common/Cpp/Strings/Unicode.h"
 #include "QueuedLogger.h"
 
 namespace PokemonAutomation{
