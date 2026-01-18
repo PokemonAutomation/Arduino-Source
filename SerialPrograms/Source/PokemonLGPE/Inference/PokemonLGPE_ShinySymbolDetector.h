@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonRSE_ShinyNumberDetector_H
 #define PokemonAutomation_PokemonRSE_ShinyNumberDetector_H
 
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logger/AbstractLogger.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 
 namespace PokemonAutomation{

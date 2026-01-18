@@ -5,7 +5,7 @@
  */
 
 #include <map>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logger/AbstractLogger.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"

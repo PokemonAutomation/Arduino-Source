@@ -12,7 +12,7 @@
 #include <map>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Time.h"
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logger/AbstractLogger.h"
 //#include "Common/Cpp/CancellableScope.h"
 
 namespace PokemonAutomation{

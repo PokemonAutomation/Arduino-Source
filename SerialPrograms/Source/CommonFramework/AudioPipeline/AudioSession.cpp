@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logger/AbstractLogger.h"
 #include "CommonFramework/GlobalServices.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "Backends/AudioPassthroughPairQtThread.h"

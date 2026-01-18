@@ -8,7 +8,7 @@
 #define PokemonAutomation_ProgramDumper_H
 
 #include <string>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logger/AbstractLogger.h"
 
 namespace PokemonAutomation{
 

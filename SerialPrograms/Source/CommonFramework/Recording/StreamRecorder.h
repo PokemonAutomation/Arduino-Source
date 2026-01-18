@@ -18,7 +18,7 @@
 #include <QMediaRecorder>
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Time.h"
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logger/AbstractLogger.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 
 //#include <iostream>

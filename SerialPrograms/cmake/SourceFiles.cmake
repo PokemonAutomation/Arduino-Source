@@ -17,7 +17,6 @@ file(GLOB LIBRARY_SOURCES
     ../Common/ControllerStates/NintendoSwitch_OemController_State.c
     ../Common/ControllerStates/NintendoSwitch_OemController_State.h
     ../Common/ControllerStates/NintendoSwitch_WiredController_State.h
-    ../Common/Cpp/AbstractLogger.h
     ../Common/Cpp/BitmapConversion.cpp
     ../Common/Cpp/BitmapConversion.h
     ../Common/Cpp/CancellableScope.cpp
@@ -92,6 +91,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/LifetimeSanitizer.cpp
     ../Common/Cpp/LifetimeSanitizer.h
     ../Common/Cpp/ListenerSet.h
+    ../Common/Cpp/Logger/AbstractLogger.h
     ../Common/Cpp/MemoryUtilization/MemoryUtilization.cpp
     ../Common/Cpp/MemoryUtilization/MemoryUtilization.h
     ../Common/Cpp/MemoryUtilization/MemoryUtilization_Linux.tpp

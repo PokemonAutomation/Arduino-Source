@@ -9,7 +9,7 @@
 
 #include <string>
 #include <vector>
-#include "Color.h"
+#include "Common/Cpp/Color.h"
 
 namespace PokemonAutomation{
 

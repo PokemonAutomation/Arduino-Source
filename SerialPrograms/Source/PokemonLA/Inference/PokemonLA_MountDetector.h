@@ -10,7 +10,7 @@
 #include <deque>
 #include <map>
 #include <atomic>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logger/AbstractLogger.h"
 //#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 //#include "CommonFramework/Logging/Logger.h"

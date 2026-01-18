@@ -18,7 +18,7 @@
 #define PokemonAutomation_VideoPipeline_VideoStream_H
 
 #include <string>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logger/AbstractLogger.h"
 #include "Common/Cpp/Containers/Pimpl.h"
 
 namespace PokemonAutomation{

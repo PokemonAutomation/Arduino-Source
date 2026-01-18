@@ -10,7 +10,7 @@
 #include <mutex>
 #include <condition_variable>
 #include "Common/Cpp/Time.h"
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logger/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "Common/PABotBase2/PABotBase2_PacketSender.h"
 #include "Common/PABotBase2/PABotBase2_PacketParser.h"

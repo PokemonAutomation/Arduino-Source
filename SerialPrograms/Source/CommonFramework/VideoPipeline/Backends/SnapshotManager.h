@@ -10,7 +10,7 @@
 #include <map>
 #include <mutex>
 #include <condition_variable>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logger/AbstractLogger.h"
 #include "CommonFramework/Tools/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "QVideoFrameCache.h"

@@ -10,7 +10,7 @@
 #define PokemonAutomation_StreamHistoryTracker_Null_H
 
 #include "Common/Compiler.h"
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logger/AbstractLogger.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 
 namespace PokemonAutomation{

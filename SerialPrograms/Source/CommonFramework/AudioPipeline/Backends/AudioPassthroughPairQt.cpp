@@ -5,7 +5,7 @@
  */
 
 //#include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logger/AbstractLogger.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 //#include "CommonFramework/AudioPipeline/AudioConstants.h"

@@ -10,7 +10,7 @@
 
 #include <array>
 #include <vector>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logger/AbstractLogger.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 
 namespace PokemonAutomation{

@@ -19,7 +19,7 @@
 #include <QMediaFormat>
 #include <QMediaRecorder>
 #include <QMediaCaptureSession>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logger/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 

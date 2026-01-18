@@ -9,7 +9,7 @@
 
 #include <string>
 #include "Common/Cpp/Color.h"
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logger/AbstractLogger.h"
 
 namespace PokemonAutomation{
 

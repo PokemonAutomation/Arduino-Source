@@ -11,7 +11,7 @@
 #include <string>
 #include <memory>
 #include <map>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logger/AbstractLogger.h"
 //#include "Common/Cpp/Json/JsonObject.h"
 #include "ControllerTypes.h"
 #include "Controller.h"
