@@ -91,7 +91,9 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/LifetimeSanitizer.cpp
     ../Common/Cpp/LifetimeSanitizer.h
     ../Common/Cpp/ListenerSet.h
-    ../Common/Cpp/Logger/AbstractLogger.h
+    ../Common/Cpp/Logging/AbstractLogger.h
+    ../Common/Cpp/Logging/TaggedLogger.cpp
+    ../Common/Cpp/Logging/TaggedLogger.h
     ../Common/Cpp/MemoryUtilization/MemoryUtilization.cpp
     ../Common/Cpp/MemoryUtilization/MemoryUtilization.h
     ../Common/Cpp/MemoryUtilization/MemoryUtilization_Linux.tpp

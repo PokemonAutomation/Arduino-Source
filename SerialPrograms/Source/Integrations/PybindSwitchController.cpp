@@ -6,6 +6,7 @@
 
 #include <mutex>
 #include <condition_variable>
+#include "Common/Cpp/Logging/TaggedLogger.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "Controllers/ControllerConnection.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h"
@@ -24,7 +25,7 @@ namespace NintendoSwitch{
 class PybindSwitchProControllerInternal final : public ControllerConnection::StatusListener{
 public:
     PybindSwitchProControllerInternal(const std::string& name)
-        : m_logger(global_logger_raw(), "[Pybind]")
+        : m_logger(global_logger_raw(), "Pybind")
         , m_descriptor(name)
         , m_connection(m_descriptor.open_connection(m_logger, false))
     {

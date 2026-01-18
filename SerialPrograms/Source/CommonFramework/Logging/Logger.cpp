@@ -6,6 +6,7 @@
 
 
 #include "Common/Cpp/Time.h"
+#include "Common/Cpp/Logging/TaggedLogger.h"
 #include "Logger.h"
 
 #include <iostream>
@@ -13,23 +14,9 @@
 namespace PokemonAutomation{
 
 
-TaggedLogger& global_logger_tagged(){
+Logger& global_logger_tagged(){
     static TaggedLogger logger(global_logger_raw(), "Global");
     return logger;
-}
-
-
-TaggedLogger::TaggedLogger(Logger& logger, std::string tag)
-    : m_logger(logger)
-    , m_tag(std::move(tag))
-{}
-
-void TaggedLogger::log(const std::string& msg, Color color){
-    std::string str =
-        current_time_to_str() +
-        " - [" + m_tag + "]: " +
-        msg;
-    m_logger.log(std::move(str), color);
 }
 
 

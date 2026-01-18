@@ -8,6 +8,7 @@
 #define PokemonAutomation_Logging_OutputRedirector_H
 
 #include <streambuf>
+#include "Common/Cpp/Logging/TaggedLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Logger.h"
 

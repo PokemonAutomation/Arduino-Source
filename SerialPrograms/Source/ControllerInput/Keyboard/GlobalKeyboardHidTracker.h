@@ -9,6 +9,7 @@
 
 #include <set>
 #include <condition_variable>
+#include "Common/Cpp/Logging/TaggedLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "CommonFramework/Logging/Logger.h"
