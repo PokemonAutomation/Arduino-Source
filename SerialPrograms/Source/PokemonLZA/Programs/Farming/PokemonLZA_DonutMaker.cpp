@@ -92,10 +92,10 @@ DonutMaker::DonutMaker()
     , BERRIES("<b>Berries:</b><br>The berries used to make the donut. Minimum 3 berries, maximum 8 berries.")
     , MAX_KEEPERS(
         "<b>Maximum Number of Donuts to Keep:</b><br>"
-        "This takes precedent over the limits set in the Donuts table."
+        "The program will stop when this many donuts are kept or all limits in the table are reached, whichever happens first."
         "<br>Make sure you have enough berries to make this many donuts. The program will fail when not given enough berries.",
         LockMode::LOCK_WHILE_RUNNING,
-        1, 1, 999
+        5, 1, 999
     )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_DONUT_FOUND(
