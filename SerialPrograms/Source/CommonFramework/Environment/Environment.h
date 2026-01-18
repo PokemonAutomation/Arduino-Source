@@ -8,7 +8,7 @@
 #define PokemonAutomation_Environment_H
 
 #include <string>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Options/EnumDropdownDatabase.h"
 
 #if _WIN32

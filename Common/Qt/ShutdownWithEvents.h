@@ -8,7 +8,7 @@
 #define PokemonAutomation_ShutdownWithEvents_H
 
 #include <QApplication>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 
 namespace PokemonAutomation{
 

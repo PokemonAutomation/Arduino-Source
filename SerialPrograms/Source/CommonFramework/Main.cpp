@@ -55,8 +55,8 @@ void set_working_directory(){
 int run_program(int argc, char *argv[]){
     QApplication application(argc, argv);
 
-    OutputRedirector redirect_stdout(std::cout, "stdout", Color());
-    OutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
+    GlobalOutputRedirector redirect_stdout(std::cout, "stdout", Color());
+    GlobalOutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
 
     Logger& logger = global_logger_tagged();
 

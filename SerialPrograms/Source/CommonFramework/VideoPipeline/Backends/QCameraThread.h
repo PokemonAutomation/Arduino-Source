@@ -9,7 +9,7 @@
 
 #include <QThread>
 #include <QCamera>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Qt/SpinWaitWithEvents.h"
 
 //#include <iostream>

@@ -17,7 +17,6 @@ file(GLOB LIBRARY_SOURCES
     ../Common/ControllerStates/NintendoSwitch_OemController_State.c
     ../Common/ControllerStates/NintendoSwitch_OemController_State.h
     ../Common/ControllerStates/NintendoSwitch_WiredController_State.h
-    ../Common/Cpp/AbstractLogger.h
     ../Common/Cpp/BitmapConversion.cpp
     ../Common/Cpp/BitmapConversion.h
     ../Common/Cpp/CancellableScope.cpp
@@ -92,6 +91,15 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/LifetimeSanitizer.cpp
     ../Common/Cpp/LifetimeSanitizer.h
     ../Common/Cpp/ListenerSet.h
+    ../Common/Cpp/Logging/AbstractLogger.h
+    ../Common/Cpp/Logging/FileLogger.cpp
+    ../Common/Cpp/Logging/FileLogger.h
+    ../Common/Cpp/Logging/LastLogTracker.cpp
+    ../Common/Cpp/Logging/LastLogTracker.h
+    ../Common/Cpp/Logging/OutputRedirector.cpp
+    ../Common/Cpp/Logging/OutputRedirector.h
+    ../Common/Cpp/Logging/TaggedLogger.cpp
+    ../Common/Cpp/Logging/TaggedLogger.h
     ../Common/Cpp/MemoryUtilization/MemoryUtilization.cpp
     ../Common/Cpp/MemoryUtilization/MemoryUtilization.h
     ../Common/Cpp/MemoryUtilization/MemoryUtilization_Linux.tpp
@@ -382,7 +390,6 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Logging/FileWindowLogger.h
     Source/CommonFramework/Logging/Logger.cpp
     Source/CommonFramework/Logging/Logger.h
-    Source/CommonFramework/Logging/OutputRedirector.cpp
     Source/CommonFramework/Logging/OutputRedirector.h
     Source/CommonFramework/Logging/QueuedLogger.cpp
     Source/CommonFramework/Logging/QueuedLogger.h

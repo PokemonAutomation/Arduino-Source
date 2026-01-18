@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_DialogTriangleDetector_H
 
 #include <atomic>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 

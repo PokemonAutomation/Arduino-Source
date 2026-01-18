@@ -9,7 +9,7 @@
 
 #include <string>
 #include <map>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 
 namespace PokemonAutomation{
 namespace OCR{
