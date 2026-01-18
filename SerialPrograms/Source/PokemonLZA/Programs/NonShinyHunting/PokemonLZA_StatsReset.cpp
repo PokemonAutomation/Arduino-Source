@@ -66,7 +66,8 @@ StatsReset::StatsReset()
     , POKEMON(
         "<b>Gift " + STRING_POKEMON + ":</b>",
         {
-            {GiftPokemon::FLOETTE, "floette", "Floette"},
+            {GiftPokemon::FLOETTE,  "floette",  "Floette" },
+            {GiftPokemon::MAGEARNA, "magearna", "Magearna"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         GiftPokemon::FLOETTE
@@ -110,15 +111,27 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         env.update_stats();
         context.wait_for_all_requests();
 
-        overworld_to_main_menu(env.console, context);
-        open_map(env.console, context, false, false);
-        pbf_move_right_joystick(context, {0, +1}, 500ms, 500ms);
-        pbf_move_right_joystick(context, {0, +1}, 500ms, 500ms);
-        pbf_move_left_joystick(context, {-0.609, 0}, 100ms, 500ms);
-        fly_from_map(env.console, context);
+        if (POKEMON == GiftPokemon::FLOETTE || POKEMON == GiftPokemon::MAGEARNA){
+            // fly to Quasartico, replace with OCR in the future
+            overworld_to_main_menu(env.console, context);
+            open_map(env.console, context, false, false);
+            pbf_move_right_joystick(context, {0, +1}, 500ms, 500ms);
+            pbf_move_right_joystick(context, {0, +1}, 500ms, 500ms);
+            pbf_move_left_joystick(context, {-0.609, 0}, 100ms, 500ms);
+            fly_from_map(env.console, context);
 
-        pbf_move_left_joystick(context, {0, +1}, 8s, 500ms);
-        pbf_mash_button(context, BUTTON_A, 30s);
+            // move to the door
+            pbf_move_left_joystick(context, {0, +1}, 8s, 500ms);
+            if (POKEMON == GiftPokemon::FLOETTE){
+                pbf_mash_button(context, BUTTON_A, 30s);
+            }
+            if (POKEMON == GiftPokemon::MAGEARNA){
+                pbf_mash_button(context, BUTTON_A, 4s);
+                pbf_move_left_joystick(context, {+0.1, +1}, 2s, 500ms);
+                pbf_mash_button(context, BUTTON_A, 30s);
+            }
+
+        }
 
         context.wait_for_all_requests();
         {
@@ -128,6 +141,8 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 [this](ProControllerContext& context){
                     if (POKEMON == GiftPokemon::FLOETTE){
                         pbf_mash_button(context, BUTTON_A, 60s);
+                    }else if (POKEMON == GiftPokemon::MAGEARNA){
+                        pbf_mash_button(context, BUTTON_A, 50s);
                     }else{
                         pbf_mash_button(context, BUTTON_A, 30s);
                     }
