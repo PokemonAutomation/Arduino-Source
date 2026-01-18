@@ -181,8 +181,8 @@ bool hunt_latias_alt(SingleSwitchProgramEnvironment& env,
 
 // Start at the ladder up to Latias and use it to fix the position and camera angle
 // Run a route to the other side of the roof and begin a shuttle run to respawn Latias repeatedly
-// Route back to Latias to trigger a potential shiny sound when calories are low
-void hunt_latias(
+// Route back to the ladder when calories are low
+void hunt_latias_route(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
@@ -310,9 +310,17 @@ void hunt_latias(
     pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
 
     context.wait_for_all_requests();
+    // The route back to the ladder also counts as a spawn attempt
     stats.spawns++;
     env.update_stats();
+}
 
+// Route back up to Latias to trigger a potential shiny sound
+void hunt_latias_check(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats)
+{
     // Snap to the ladder by moving and watching for the A button prompt
     ButtonWatcher ButtonA(
         COLOR_RED,
@@ -697,23 +705,26 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
     }
 
     while (true){
-        if (LEGENDARY == Legendary::LATIAS_ALT) {
-            if (hunt_latias_alt(env, context, stats)) {
+        if (LEGENDARY == Legendary::LATIAS_ALT){
+            if (hunt_latias_alt(env, context, stats)){
                 break; // shiny found
             }
-        }else {
+        }else{
+            if (LEGENDARY == Legendary::LATIAS){
+                hunt_latias_route(env, context, stats, MIN_CALORIE_TO_CATCH);
+            }
             const int ret = run_until<ProControllerContext>(
                 env.console, context,
                 [&](ProControllerContext& context) {
                     if (LEGENDARY == Legendary::LATIAS){
-                        hunt_latias(env, context, stats, MIN_CALORIE_TO_CATCH);
-                    }else if (LEGENDARY == Legendary::LATIOS) {
+                        hunt_latias_check(env, context, stats);
+                    }else if (LEGENDARY == Legendary::LATIOS){
                         hunt_latios(env, context, stats, MIN_CALORIE_TO_CATCH);
-                    }else if (LEGENDARY == Legendary::VIRIZION) {
+                    }else if (LEGENDARY == Legendary::VIRIZION){
                         hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH, use_switch1_only_timings);
-                    }else if (LEGENDARY == Legendary::TERRAKION) {
+                    }else if (LEGENDARY == Legendary::TERRAKION){
                         hunt_terrakion(env, context, stats, MIN_CALORIE_TO_CATCH);
-                    }else if (LEGENDARY == Legendary::COBALION) {
+                    }else if (LEGENDARY == Legendary::COBALION){
                         hunt_cobalion(env, context, stats, MIN_CALORIE_TO_CATCH);
                     }else{
                         OperationFailedException::fire(
@@ -724,7 +735,8 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
                     }
                 },
                 { {shiny_detector} }
-            ); // end run_until()
+            );
+
             shiny_detector.throw_if_no_sound();
             shiny_detector.clear();
 
