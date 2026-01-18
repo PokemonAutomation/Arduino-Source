@@ -66,7 +66,8 @@ StatsReset::StatsReset()
     , POKEMON(
         "<b>Gift " + STRING_POKEMON + ":</b>",
         {
-            {GiftPokemon::FLOETTE, "floette", "Floette"},
+            {GiftPokemon::FLOETTE,  "floette",  "Floette" },
+            {GiftPokemon::MAGEARNA, "magearna", "Magearna"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         GiftPokemon::FLOETTE
@@ -110,15 +111,31 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         env.update_stats();
         context.wait_for_all_requests();
 
-        overworld_to_main_menu(env.console, context);
-        open_map(env.console, context, false, false);
-        pbf_move_right_joystick(context, {0, +1}, 500ms, 500ms);
-        pbf_move_right_joystick(context, {0, +1}, 500ms, 500ms);
-        pbf_move_left_joystick(context, {-0.609, 0}, 100ms, 500ms);
-        fly_from_map(env.console, context);
+        if (POKEMON == GiftPokemon::FLOETTE){
+            overworld_to_main_menu(env.console, context);
+            open_map(env.console, context, false, false);
+            pbf_move_right_joystick(context, {0, +1}, 500ms, 500ms);
+            pbf_move_right_joystick(context, {0, +1}, 500ms, 500ms);
+            pbf_move_left_joystick(context, {-0.609, 0}, 100ms, 500ms);
+            fly_from_map(env.console, context);
 
-        pbf_move_left_joystick(context, {0, +1}, 8s, 500ms);
-        pbf_mash_button(context, BUTTON_A, 30s);
+            pbf_move_left_joystick(context, {0, +1}, 8s, 500ms);
+            pbf_mash_button(context, BUTTON_A, 30s);
+        }
+
+        if (POKEMON == GiftPokemon::MAGEARNA){
+            overworld_to_main_menu(env.console, context);
+            open_map(env.console, context, false, false);
+            pbf_move_right_joystick(context, {0, +1}, 500ms, 500ms);
+            pbf_move_right_joystick(context, {0, +1}, 500ms, 500ms);
+            pbf_move_left_joystick(context, {-0.609, 0}, 100ms, 500ms);
+            fly_from_map(env.console, context);
+
+            pbf_move_left_joystick(context, {0, +1}, 8s, 500ms);
+            pbf_mash_button(context, BUTTON_A, 3s);
+            pbf_move_left_joystick(context, {0, +1}, 4s, 500ms);
+            pbf_mash_button(context, BUTTON_A, 30s);
+        }
 
         context.wait_for_all_requests();
         {
@@ -128,6 +145,8 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 [this](ProControllerContext& context){
                     if (POKEMON == GiftPokemon::FLOETTE){
                         pbf_mash_button(context, BUTTON_A, 60s);
+                    }elif (POKEMON == GiftPokemon::FLOETTE){
+                        pbf_mash_button(context, BUTTON_A, 45s);
                     }else{
                         pbf_mash_button(context, BUTTON_A, 30s);
                     }
@@ -141,6 +160,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             }
         }
 
+        pbf_mash_button(context, BUTTON_B, 3s);
         overworld_to_box_system(env.console, context);
         pbf_press_button(context, BUTTON_RCLICK, 500ms, 500ms);
         stats.attempts++;
