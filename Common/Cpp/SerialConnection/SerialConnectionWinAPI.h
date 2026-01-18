@@ -29,7 +29,7 @@ class SerialConnection : public StreamConnection{
 public:
     //  UTF-8
     SerialConnection(const std::string& name, uint32_t baud_rate)
-        : SerialConnection(name, utf8_to_wstr(name), baud_rate)
+        : SerialConnection(name, str_to_wstr(name), baud_rate)
     {}
     SerialConnection(const std::string& name, const std::wstring& wname, uint32_t baud_rate)
         : m_exit(false)

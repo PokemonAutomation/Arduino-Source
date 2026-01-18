@@ -11,11 +11,28 @@
 
 namespace PokemonAutomation{
 
-std::u16string utf8_to_utf16(const std::string& str);
+
+
+//
+//  char* and std::string are UTF-8.
+//
+
+std::u8string str_to_utf8(const std::string& str);
+std::string utf8_to_str(const std::u8string& str);
+
+std::u16string str_to_utf16(const std::string& str);
+std::u16string utr8_to_utf16(const std::u8string& str);
+
+std::string utr16_to_str(const std::u16string& str);
+std::u8string utr16_to_utf8(const std::u16string& str);
+
+
 
 #ifdef _WIN32
-std::wstring utf8_to_wstr(const std::string& str);
+std::wstring str_to_wstr(const std::string& str);
 #endif
+
+
 
 }
 #endif

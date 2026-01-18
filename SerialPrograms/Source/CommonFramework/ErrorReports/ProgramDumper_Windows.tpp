@@ -41,7 +41,7 @@ private:
 
 bool program_dump(Logger* logger, const std::string& filename, EXCEPTION_POINTERS* e){
     HandleHolder handle = CreateFileW(
-        utf8_to_wstr(filename).c_str(),
+        str_to_wstr(filename).c_str(),
         FILE_WRITE_ACCESS,
         FILE_SHARE_READ,
         nullptr,
@@ -112,7 +112,7 @@ long WINAPI crash_handler(EXCEPTION_POINTERS* e){
 
     SendableErrorReport report;
 
-//    _wmkdir(utf8_to_wstr(ERROR_PATH_UNSENT).c_str());
+//    _wmkdir(str_to_wstr(ERROR_PATH_UNSENT).c_str());
     program_dump(nullptr, report.directory() + ERROR_DUMP_NAME, e);
     report.save_report_json(nullptr);
 
