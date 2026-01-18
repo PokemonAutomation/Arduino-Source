@@ -619,7 +619,8 @@ FlavorPowerTable::FlavorPowerTable()
         "Add all desired donuts to this table. "
         "The program will check the powers of a made donut and compare the powers to each row in the table."
         "<br>A keep limit can be set for each donut. Make sure you have enough berries to make this many donuts!"
-        "<br>Note that a donut with a power level of 3 will be included in the limit for donuts of \"Lv. 2 or 3\""
+        "<br>A single donut can match and count towards the limit of multiple entries in the table."
+        "<br>The order in which you list Flavor Powers 1, 2, and 3 does not matter."
         "<br>Note: \"All Types\" means the All Types Power in-game. \"*\" means match any type for the specified power",
         LockMode::LOCK_WHILE_RUNNING,
         make_defaults()
