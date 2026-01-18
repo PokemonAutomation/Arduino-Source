@@ -133,7 +133,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
             pbf_move_left_joystick(context, {0, +1}, 8s, 500ms);
             pbf_mash_button(context, BUTTON_A, 3s);
-            pbf_move_left_joystick(context, {0, +1}, 4s, 500ms);
+            pbf_move_left_joystick(context, {+0.1, +1}, 2s, 500ms);
             pbf_mash_button(context, BUTTON_A, 30s);
         }
 
@@ -145,8 +145,8 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 [this](ProControllerContext& context){
                     if (POKEMON == GiftPokemon::FLOETTE){
                         pbf_mash_button(context, BUTTON_A, 60s);
-                    }elif (POKEMON == GiftPokemon::FLOETTE){
-                        pbf_mash_button(context, BUTTON_A, 45s);
+                    }else if (POKEMON == GiftPokemon::MAGEARNA){
+                        pbf_mash_button(context, BUTTON_A, 50s);
                     }else{
                         pbf_mash_button(context, BUTTON_A, 30s);
                     }

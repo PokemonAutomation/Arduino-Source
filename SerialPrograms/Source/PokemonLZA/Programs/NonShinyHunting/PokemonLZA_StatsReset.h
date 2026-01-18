@@ -45,6 +45,7 @@ private:
 
     enum class GiftPokemon{
         FLOETTE,
+        MAGEARNA,
     };
     EnumDropdownOption<GiftPokemon> POKEMON;
 
