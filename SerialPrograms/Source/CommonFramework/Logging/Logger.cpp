@@ -4,12 +4,9 @@
  *
  */
 
-
-#include "Common/Cpp/Time.h"
+#include <iostream>
 #include "Common/Cpp/Logging/TaggedLogger.h"
 #include "Logger.h"
-
-#include <iostream>
 
 namespace PokemonAutomation{
 
@@ -20,11 +17,13 @@ Logger& global_logger_tagged(){
 }
 
 
-
+// A logger that writes to both the base logger and stdout.
+// Useful for command-line tests.
 class CommandLineLogger : public Logger{
 public:
     CommandLineLogger(Logger& logger)
-    : m_logger(logger) {}
+        : m_logger(logger)
+    {}
 
     virtual void log(const std::string& msg, Color color = Color()) override{
         std::cout << msg << std::endl;
@@ -41,7 +40,6 @@ public:
 
 private:
     Logger& m_logger;
-    std::string m_tag;
 };
 
 
@@ -52,4 +50,3 @@ Logger& global_logger_command_line(){
 
 
 }
-
