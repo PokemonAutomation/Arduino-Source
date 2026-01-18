@@ -94,6 +94,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Logging/AbstractLogger.h
     ../Common/Cpp/Logging/LastLogTracker.cpp
     ../Common/Cpp/Logging/LastLogTracker.h
+    ../Common/Cpp/Logging/OutputRedirector.cpp
+    ../Common/Cpp/Logging/OutputRedirector.h
     ../Common/Cpp/Logging/TaggedLogger.cpp
     ../Common/Cpp/Logging/TaggedLogger.h
     ../Common/Cpp/MemoryUtilization/MemoryUtilization.cpp
@@ -386,7 +388,6 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Logging/FileWindowLogger.h
     Source/CommonFramework/Logging/Logger.cpp
     Source/CommonFramework/Logging/Logger.h
-    Source/CommonFramework/Logging/OutputRedirector.cpp
     Source/CommonFramework/Logging/OutputRedirector.h
     Source/CommonFramework/Logging/QueuedLogger.cpp
     Source/CommonFramework/Logging/QueuedLogger.h
