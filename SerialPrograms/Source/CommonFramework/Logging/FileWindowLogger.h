@@ -15,6 +15,7 @@
 #include <QTextEdit>
 #include <QMainWindow>
 #include "Common/Cpp/Logging/AbstractLogger.h"
+#include "Common/Cpp/Logging/LastLogTracker.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 //#include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Concurrency/Thread.h"
@@ -22,20 +23,6 @@
 namespace PokemonAutomation{
 
 class FileWindowLoggerWindow;
-
-
-class LastLogTracker{
-public:
-    LastLogTracker(size_t max_lines = 10000)
-        : m_max_lines(max_lines)
-    {}
-    void operator+=(std::string line);
-    std::vector<std::string> snapshot() const;
-
-private:
-    size_t m_max_lines;
-    std::deque<std::string> m_lines;
-};
 
 
 class FileWindowLogger : public Logger{
