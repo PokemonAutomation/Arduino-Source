@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include <sstream>
-#include "Common/Cpp/Logger/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonTools/Images/ImageFilter.h"

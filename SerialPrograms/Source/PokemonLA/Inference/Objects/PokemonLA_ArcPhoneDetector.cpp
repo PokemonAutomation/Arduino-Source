@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Logger/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonTools/DetectedBoxes.h"
 #include "PokemonLA_ArcPhoneDetector.h"

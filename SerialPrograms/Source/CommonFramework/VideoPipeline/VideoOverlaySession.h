@@ -21,7 +21,7 @@
 #include <deque>
 #include <mutex>
 #include <condition_variable>
-#include "Common/Cpp/Logger/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"

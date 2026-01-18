@@ -9,7 +9,7 @@
 
 #include <chrono>
 #include <vector>
-#include "Common/Cpp/Logger/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Options/StaticTableOption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"

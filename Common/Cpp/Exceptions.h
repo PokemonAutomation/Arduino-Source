@@ -9,7 +9,7 @@
 
 #include <utility>
 #include "Common/Compiler.h"
-#include "Logger/AbstractLogger.h"
+#include "Logging/AbstractLogger.h"
 
 namespace PokemonAutomation{
 

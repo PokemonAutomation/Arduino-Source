@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <map>
 #include <format>
-#include "Common/Cpp/Logger/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Qt/StringToolsQt.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_RegiPatterns_H
 #define PokemonAutomation_PokemonSwSh_RegiPatterns_H
 
-#include "Common/Cpp/Logger/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Time.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "PokemonSwSh/Options/PokemonSwSh_RegiSelector.h"

@@ -28,7 +28,7 @@
 #include <map>
 #include <atomic>
 #include <condition_variable>
-#include "Common/Cpp/Logger/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"

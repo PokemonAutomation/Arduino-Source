@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "Common/Cpp/Logger/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/Language.h"
 #include "OCR_Routines.h"

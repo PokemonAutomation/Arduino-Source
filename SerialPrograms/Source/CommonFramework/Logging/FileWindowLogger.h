@@ -14,7 +14,7 @@
 #include <QFile>
 #include <QTextEdit>
 #include <QMainWindow>
-#include "Common/Cpp/Logger/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 //#include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Concurrency/Thread.h"

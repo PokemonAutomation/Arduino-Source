@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_SandwichPlateDetector_H
 #define PokemonAutomation_PokemonSV_SandwichPlateDetector_H
 
-#include "Common/Cpp/Logger/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"

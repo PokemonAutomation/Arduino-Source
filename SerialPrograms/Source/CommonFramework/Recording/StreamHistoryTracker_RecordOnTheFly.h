@@ -21,7 +21,7 @@
 #include <QMediaCaptureSession>
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Logger/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"

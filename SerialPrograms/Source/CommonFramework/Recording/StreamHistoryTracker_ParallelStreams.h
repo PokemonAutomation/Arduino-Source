@@ -13,7 +13,7 @@
 #define PokemonAutomation_StreamHistoryTracker_ParallelStreams_H
 
 #include <map>
-#include "Common/Cpp/Logger/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Qt/Redispatch.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"

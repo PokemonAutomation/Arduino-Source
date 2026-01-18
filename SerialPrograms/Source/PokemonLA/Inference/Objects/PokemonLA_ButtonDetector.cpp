@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Logger/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonTools/DetectedBoxes.h"
 #include "PokemonLA_ButtonDetector.h"
 
