@@ -2,8 +2,20 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *      We wrap "std::filesystem::path" to prevent accidental
- *  usage of std::string which is not portable.
+ *
+ *  We disllow direct use of "std::filesystem" because it's too easy to mess up
+ *  Unicode support.
+ *
+ *  In this project, we define "char*" and "std::string" as UTF-8. But this is
+ *  not what happens in Windows as it uses ANSI or whatever the locale is.
+ *
+ *  This applies to all standard library functions as well as Window's own APIs.
+ *
+ *  Therefore, we cannot pass "char*"/"std::string" into any libraries. But this
+ *  is too easy to do accidentally.
+ *
+ *  Therefore, we ban the direct use of "std::filesystem" in our code base and
+ *  wrap them instead.
  *
  */
 
@@ -20,16 +32,20 @@ namespace Filesystem{
 class Path{
 public:
     Path() = default;
+    Path(std::filesystem::path path)
+        : m_path(std::move(path))
+    {}
+
+    //  Construct assuming UTF-8 encoding.
     Path(const char* path)
         : m_path(utf8_to_utf8(path))
     {}
     Path(const std::string& path)
         : m_path(utf8_to_utf8(path))
     {}
+
+    //  Construct from UTF-8.
     Path(std::u8string path)
-        : m_path(std::move(path))
-    {}
-    Path(std::filesystem::path path)
         : m_path(std::move(path))
     {}
 
@@ -39,6 +55,7 @@ public:
 
 
 public:
+    //  Convert to the C++ path so it can be passed to other library functions.
     operator const std::filesystem::path&() const{
         return m_path;
     }
@@ -48,6 +65,7 @@ public:
 
 
 public:
+    //  Return path string as UTF-8.
     std::string string() const{
         return utf8_to_str(m_path.u8string());
     }
