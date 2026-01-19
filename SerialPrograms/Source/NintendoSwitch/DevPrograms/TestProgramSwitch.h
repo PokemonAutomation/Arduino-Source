@@ -14,6 +14,7 @@
 #include "Common/Cpp/Options/DateOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/BoxFloatOption.h"
+#include "Common/Cpp/Options/FloatingPointOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Options/LanguageOCROption.h"
@@ -73,6 +74,7 @@ private:
     OCR::LanguageOCROption LANGUAGE;
 
     StringOption IMAGE_PATH;
+    FloatingPointOption FLOAT;
 
     StaticTextOption STATIC_TEXT;
     BoxFloatOption BOX;
