@@ -50,7 +50,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt upgrade
-        sudo apt install libopencv-dev
+        sudo apt install libopencv-dev clang-tools
         sudo apt install ./Arduino-Source/3rdPartyBinaries/libdpp-10.0.28-linux-x64.deb
     - name: Install dependencies
       if: startsWith(matrix.os, 'mac')
@@ -68,6 +68,23 @@ jobs:
         cd bin
         cmake .. -DQT_MAJOR:STRING=${{ matrix.qt_version_major }} ${{ matrix.cmake_additional_param }}
         cmake --build . --config RelWithDebInfo --parallel 10
+    - name: Run clang query
+      if: startsWith(matrix.os, 'ubuntu')
+      run : |
+        cd Arduino-Source
+        echo 'set output dump                                                                   ' >> query.txt
+        echo 'match invocation(                                                                 ' >> query.txt
+        echo '  isExpansionInFileMatching("SerialPrograms/"),                                   ' >> query.txt
+        echo '  hasDeclaration(cxxConstructorDecl(ofClass(hasName("std::filesystem::path")))),  ' >> query.txt
+        echo '  hasArgument(0, hasType(asString("std::string")))                                ' >> query.txt
+        echo ')                                                                                 ' >> query.txt
+        files=$(jq -r '.[].file' SerialPrograms/bin/compile_commands.json)
+        echo "$files" | xargs --max-args=150 clang-query -p SerialPrograms/bin/ -f query.txt      >> output.txt
+        cat output.txt
+        if grep --silent "Match #" output.txt; then
+          echo "::error Forbidden std::filesystem::path construction detected!"
+          exit 1
+        fi
     - name: Prepare upload folder
       if: startsWith(matrix.os, 'windows')
       run: |

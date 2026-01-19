@@ -98,6 +98,10 @@ const size_t LOG_HISTORY_LINES = 10000;
 namespace{
 
 QString get_application_base_dir_path(){
+    // Add a dummy std::filesystem::path to trigger error
+    std::string str{};
+    std::filesystem::path{str};
+
     QString application_dir_path = qApp->applicationDirPath();
     if (application_dir_path.endsWith(".app/Contents/MacOS")){
         // a macOS bundle. Change working directory to the folder that hosts the .app folder.
