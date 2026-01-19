@@ -360,11 +360,11 @@ int test_pokemonLZA_MapIconDetector(const std::string& filepath){
     // Each line in the txt file has format: "<MapIconType> <count>"
     // For example: "PokemonCenter 2" means there should be 2 Pokemon Centers detected
 
-    Filesystem::Path file_path(utf8_to_utf8(filepath));
+    Filesystem::Path file_path(filepath);
     Filesystem::Path parent_dir = file_path.parent_path();
     std::string base_name = file_path.stem().string();
 
-    Filesystem::Path target_detections_path = parent_dir / utf8_to_utf8("_" + base_name + ".txt");
+    Filesystem::Path target_detections_path = parent_dir / ("_" + base_name + ".txt");
 
     // Load expected detections from txt file
     std::map<MapIconType, int> expected_counts;
