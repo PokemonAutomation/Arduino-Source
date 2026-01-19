@@ -615,6 +615,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonTools/OCR/OCR_LargeDictionaryMatcher.h
     Source/CommonTools/OCR/OCR_NumberReader.cpp
     Source/CommonTools/OCR/OCR_NumberReader.h
+    Source/CommonTools/OCR/OCR_RawPaddleOCR.cpp
+    Source/CommonTools/OCR/OCR_RawPaddleOCR.h
     Source/CommonTools/OCR/OCR_RawOCR.cpp
     Source/CommonTools/OCR/OCR_RawOCR.h
     Source/CommonTools/OCR/OCR_Routines.cpp

@@ -8,7 +8,7 @@
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonTools/Images/ImageFilter.h"
-#include "ML/Inference/ML_PaddleOCRPipeline.h"
+#include "OCR_RawPaddleOCR.h"
 #include "OCR_RawOCR.h"
 #include "OCR_DictionaryMatcher.h"
 #include "OCR_Routines.h"
@@ -45,11 +45,6 @@ StringMatchResult multifiltered_OCR(
     double pixels_inv = 1. / (image.width() * image.height());
 
     bool use_paddle_ocr = GlobalSettings::instance().USE_PADDLE_OCR;
-    std::unique_ptr<ML::PaddleOCRPipeline> paddle_ocr;
-    if (use_paddle_ocr) {
-        // Initialize only if the setting is enabled
-        paddle_ocr = std::make_unique<ML::PaddleOCRPipeline>(language);
-    }
 
     //  Run all the filters.
     SpinLock lock;
@@ -60,7 +55,7 @@ StringMatchResult multifiltered_OCR(
 
             std::string text;
             if (use_paddle_ocr) {
-                text = paddle_ocr->recognize(filtered.first);
+                text = paddle_ocr_read(language, filtered.first);
             }else{
                 text = ocr_read(language, filtered.first, psm);
             }
@@ -117,8 +112,7 @@ StringMatchResult dictionary_OCR(
     //  Run all the filters.
     std::string text;
     if (GlobalSettings::instance().USE_PADDLE_OCR){
-        ML::PaddleOCRPipeline paddle_ocr(language);
-        text = paddle_ocr.recognize(image);
+        text = paddle_ocr_read(language, image);
     }else{
         text = ocr_read(language, image, psm);
     }

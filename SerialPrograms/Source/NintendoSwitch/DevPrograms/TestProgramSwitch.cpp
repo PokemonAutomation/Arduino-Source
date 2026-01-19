@@ -172,6 +172,7 @@
 #include "Common/PABotBase2/PABotbase2_ReliableStreamConnection.h"
 #include "Common/Cpp/StreamConnections/MockDevice.h"
 #include "ML/Inference/ML_PaddleOCRPipeline.h"
+#include "CommonTools/OCR/OCR_RawPaddleOCR.h"
 
 
 
@@ -771,11 +772,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     // ImageRGB32 image1(IMAGE_PATH);
     auto image1 = feed.snapshot();
     ImageViewRGB32 cropped = extract_box_reference(image1, ImageFloatBox{BOX.x(), BOX.y(), BOX.width(), BOX.height()});
-    ML::PaddleOCRPipeline paddle_ocr(LANGUAGE);
 
     // auto snapshot = feed.snapshot();
-    std::string text = paddle_ocr.recognize(cropped);
+    std::string text = OCR::paddle_ocr_read(LANGUAGE, image1);
     cout << text << endl;
+
+    
 
 #endif
 
