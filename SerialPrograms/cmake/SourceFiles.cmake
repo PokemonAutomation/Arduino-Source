@@ -80,6 +80,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/ExpressionEvaluator.h
     ../Common/Cpp/Filesystem.cpp
     ../Common/Cpp/Filesystem.h
+    ../Common/Cpp/FileIO.cpp
+    ../Common/Cpp/FileIO.h
     ../Common/Cpp/ImageResolution.cpp
     ../Common/Cpp/ImageResolution.h
     ../Common/Cpp/Json/JsonArray.cpp
