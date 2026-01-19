@@ -774,7 +774,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ImageViewRGB32 cropped = extract_box_reference(image1, ImageFloatBox{BOX.x(), BOX.y(), BOX.width(), BOX.height()});
 
     // auto snapshot = feed.snapshot();
-    std::string text = OCR::paddle_ocr_read(LANGUAGE, image1);
+    std::string text = OCR::paddle_ocr_read(LANGUAGE, cropped);
     cout << text << endl;
 
     
