@@ -202,7 +202,7 @@ std::string BoxFloatOption::check_validity() const{
     if (x + width > 1.00000000001){
         return "x + width must be <= 1.0.";
     }
-    if (y + height > 00000000001){
+    if (y + height > 1.00000000001){
         return "y + height must be <= 1.0.";
     }
 
