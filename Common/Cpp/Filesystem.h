@@ -37,53 +37,66 @@ public:
         : m_path(std::move(path))
     {}
 
-    //  Construct assuming UTF-8 encoding.
+    //  Construct assuming input path is UTF-8 encoding.
     Path(const char* path)
         : m_path(utf8_to_utf8(path))
     {}
+    //  Construct assuming input path is UTF-8 encoding.
     Path(const std::string& path)
         : m_path(utf8_to_utf8(path))
     {}
 
-    //  Construct from UTF-8.
+    //  Construct from UTF-8 string.
     Path(std::u8string path)
         : m_path(std::move(path))
     {}
 
+    //  Clear path
     void clear(){
         m_path.clear();
     }
 
-
 public:
-    //  Convert to the C++ path so it can be passed to other library functions.
+    //  Implicit conversion to the C++ std::filesystem::path so it can be passed to other library functions.
     operator const std::filesystem::path&() const{
         return m_path;
     }
+    //  Explicit conversion to the C++ std::filesystem::path so it can be passed to other library functions.
     const std::filesystem::path& stdpath() const{
         return m_path;
     }
-
 
 public:
     //  Return path string as UTF-8.
     std::string string() const{
         return utf8_to_str(m_path.u8string());
     }
+    //  Return path string as UTF-8.
     std::u8string u8string() const{
         return m_path.u8string();
     }
 
+    //  Return the generic-format filename component of the path.
     Path filename() const{
         return m_path.filename();
     }
+    //  Return the path to the parent directory.
+    //  "/var/tmp/example.txt" -> "/var/tmp"
+    //  "/var/tmp/." -> "/var/tmp"
+    //  "/" -> "/"
     Path parent_path() const{
         return m_path.parent_path();
     }
+    //  Return the filename identified by the generic-format path stripped of its extension.
+    //  "/foo/bar.txt" -> "bar"
+    //  "/foo/bar" -> "bar"
+    //  "/foo/.bar" -> ".bar"
+    //  "foo.bar.baz.tar" -> "foo.bar.baz"
+    //  "/foo/." -> "."
+    //  "/foo/.." -> ".."
     Path stem() const{
         return m_path.stem();
     }
-
 
 public:
     Path& replace_extension(const Path& replacement){
@@ -91,35 +104,40 @@ public:
         return *this;
     }
 
-
 public:
     friend bool operator==(const Path& x, const Path& y){
         return x.m_path == y.m_path;
     }
 
-
-public:
+    //  Connect two path components with "/"
     friend Path operator/(const Path& x, const Path& y){
         return x.m_path / y.m_path;
     }
     friend std::ostream& operator<<(std::ostream& stream, const Path& x);
-
 
 private:
     std::filesystem::path m_path;
 };
 
 
-
+//  Whether a path exists.
 inline bool exists(const Path& path){
     return std::filesystem::exists(path.stdpath());
 }
+
+//  Create every missing directory along the path.
+//  If all related directories already exist, return false. Otherwise return true.
 inline bool create_directories(const Path& path){
     return std::filesystem::create_directories(path.stdpath());
 }
+
+//  Delete the contents of the path (if it is a directory) and the contents of all its subdirectories, recursively.
+//  Then delete the file/directory of path itself. Symlinks are not followed (symlink is removed, not its target).
 inline auto remove_all(const Path& path){
     return std::filesystem::remove_all(path.stdpath());
 }
+
+//  Copy a file.
 inline bool copy_file(const Path& from, const Path& to){
     return std::filesystem::copy_file(from.stdpath(), to.stdpath());
 }
