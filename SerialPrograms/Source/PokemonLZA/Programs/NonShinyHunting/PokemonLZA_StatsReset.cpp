@@ -167,7 +167,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             }
         }
 
-        if (POKEMON == GiftPokemon::MELTAN || POKEMON == GiftPokemon::MELMETAL){
+        if (POKEMON == GiftPokemon::MELTAN){
             // fly to Lysandre Café, replace with OCR in the future
             overworld_to_main_menu(env.console, context);
             open_map(env.console, context, false, false);
