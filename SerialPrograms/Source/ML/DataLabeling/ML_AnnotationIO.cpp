@@ -6,6 +6,7 @@
  */
 
 
+#include "Common/Cpp/Filesystem.h"
 #include "Common/Cpp/Json/JsonTools.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
@@ -26,7 +27,6 @@
 #include <QMessageBox>
 
 
-namespace fs = std::filesystem;
 using std::cout, std::endl;
 
 namespace PokemonAutomation{
@@ -179,10 +179,10 @@ void export_image_annotations_to_yolo_dataset(
     // convert images and annotations into new subfolders in the folder of the dataset config
     auto converted_folder_name = "exported-" + now_to_filestring();
 
-    const auto yolo_dataset_config_file = fs::path(yolo_dataset_path);
-    const fs::path yolo_dataset_folder = yolo_dataset_config_file.parent_path();
+    const auto yolo_dataset_config_file = Filesystem::Path(yolo_dataset_path);
+    const Filesystem::Path yolo_dataset_folder = yolo_dataset_config_file.parent_path();
     const auto target_folder = yolo_dataset_folder / converted_folder_name;
-    if (fs::exists(target_folder)){
+    if (Filesystem::exists(target_folder)){
         QMessageBox box;
         box.critical(nullptr, "Export Destination Folder Already Exists",
             QString::fromStdString("Folder " + target_folder.string() + " already exists."));
@@ -193,17 +193,17 @@ void export_image_annotations_to_yolo_dataset(
     cout << "Export to image folder: " << target_image_folder << endl;
     cout << "Export to label folder: " << target_label_folder << endl;
 
-    fs::create_directories(target_image_folder);
-    fs::create_directories(target_label_folder);
+    Filesystem::create_directories(target_image_folder);
+    Filesystem::create_directories(target_label_folder);
 
     std::set<std::string> missing_labels;
     bool copy_error = false;
     for(size_t i = 0; i < image_paths.size(); i++){
         const auto& image_path = image_paths[i];
-        const fs::path image_file(image_path);
+        const Filesystem::Path image_file(image_path);
 
-        fs::path anno_file = fs::path(image_file).replace_extension(".json");
-        if (!fs::exists(anno_file)){
+        Filesystem::Path anno_file = Filesystem::Path(image_file).replace_extension(".json");
+        if (!Filesystem::exists(anno_file)){
             QMessageBox box;
             box.critical(nullptr, "Cannot Find Annotation File",
                 QString::fromStdString("No annotation for " + image_path + "."));
@@ -212,8 +212,8 @@ void export_image_annotations_to_yolo_dataset(
 
         const auto target_image_file = target_image_folder / image_file.filename();
         try{
-            fs::copy_file(image_file, target_image_file);
-        }catch (fs::filesystem_error&){
+            Filesystem::copy_file(image_file, target_image_file);
+        }catch (std::filesystem::filesystem_error&){
             std::string message = "Cannot copy from " + image_file.string() + " to " + target_image_file.string() + 
                     ". Probably permission issue, source image is broken or target image path already exists due to image folder having same image filenames";
             std::cerr << message << std::endl;

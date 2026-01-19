@@ -16,12 +16,11 @@
 #include <fstream>
 #include <onnxruntime_cxx_api.h>
 #include "3rdParty/ONNX/OnnxToolsPA.h"
-#include "Common/Cpp/Exceptions.h"
 #include "Common/Compiler.h"
+#include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Filesystem.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "ML_ONNXRuntimeHelpers.h"
-
-namespace fs = std::filesystem;
 
 namespace PokemonAutomation{
 namespace ML{
@@ -113,12 +112,12 @@ std::pair<bool, std::string> clean_up_old_model_cache(const std::string& model_c
         return {true, ""};
     }
 
-    if (!fs::exists(fs::path(model_cache_path))){
+    if (!Filesystem::exists(model_cache_path)){
         return {true, file_hash};
     }
 
     const std::string flag_file_path = model_cache_path + "/HASH.txt";
-    if (fs::exists(fs::path(flag_file_path))){
+    if (Filesystem::exists(flag_file_path)){
         std::ifstream fin(flag_file_path);
         if (fin){
             std::string line;
@@ -130,17 +129,17 @@ std::pair<bool, std::string> clean_up_old_model_cache(const std::string& model_c
         }
     }
     // remove everything from model_cache_path
-    fs::remove_all(fs::path(model_cache_path));
+    Filesystem::remove_all(model_cache_path);
     return {true, file_hash};
 }
 
 
 void write_cache_flag_file(const std::string& model_cache_path, const std::string& hash){
-    if (!fs::exists(fs::path(model_cache_path))){
+    if (!Filesystem::exists(model_cache_path)){
         return;
     }
     const std::string flag_file_path = model_cache_path + "/HASH.txt";
-    std::ofstream fout(flag_file_path);
+    std::ofstream fout(Filesystem::Path(flag_file_path).stdpath());
     fout << hash;
 }
 
