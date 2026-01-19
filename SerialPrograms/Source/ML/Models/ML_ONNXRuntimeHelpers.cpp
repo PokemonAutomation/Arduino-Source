@@ -151,7 +151,7 @@ Ort::Session create_session(const Ort::Env& env, const Ort::SessionOptions& so,
     std::string file_hash;
     std::tie(write_flag_file, file_hash) = clean_up_old_model_cache(model_cache_path, model_path);
     
-    auto& logger = global_logger_command_line();
+    auto& logger = global_logger_tagged();
     logger.log("Creating Ort::session from model " + model_path);
     try{
         Ort::Session session{env, str_to_onnx_str(model_path).c_str(), so};

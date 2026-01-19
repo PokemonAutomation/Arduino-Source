@@ -7,7 +7,6 @@
 #include <QCoreApplication>
 #include <QMenuBar>
 #include <QDir>
-#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Windows/DpiScaler.h"
@@ -31,117 +30,64 @@ Logger& global_logger_raw(){
         }
         return USER_FILE_PATH() + (application_name + ".log").toStdString();
     };
-    
-    static FileWindowLogger logger(get_log_filepath());
+
+    static FileWindowLogger logger(get_log_filepath(), LOG_HISTORY_LINES);
     return logger;
 }
 
 
 FileWindowLogger::~FileWindowLogger(){
-    {
-        std::lock_guard<std::mutex> lg(m_lock);
-        m_stopping = true;
-        m_cv.notify_all();
-    }
-    m_thread.join();
+    m_file_logger.remove_listener(*this);
 }
-FileWindowLogger::FileWindowLogger(const std::string& path)
-    : m_file(QString::fromStdString(path))
-    , m_max_queue_size(LOG_HISTORY_LINES)
-    , m_stopping(false)
-{
-    bool exists = m_file.exists();
-    bool opened = m_file.open(QIODevice::WriteOnly | QIODevice::Append);
-    if (!exists && opened){
-        std::string bom = "\xef\xbb\xbf";
-        m_file.write(bom.c_str(), bom.size());
-        cout << "Write log to new file " << path << endl;
-    }else{
-        cout << "Write log to existing file " << path << endl;
-    }
 
-    m_thread = Thread([this]{
-        thread_loop();
-    });
+FileWindowLogger::FileWindowLogger(const std::string& path, size_t max_queue_size)
+    : m_file_logger(FileLoggerConfig{
+        .file_path = path,
+        .max_queue_size = max_queue_size,
+        .max_file_size_bytes = 50 * 1024 * 1024,  // 50MB
+        .last_log_max_lines = max_queue_size,
+    })
+{
+    m_file_logger.add_listener(*this);
 }
+
 void FileWindowLogger::operator+=(FileWindowLoggerWindow& widget){
-//    auto scope_check = m_sanitizer.check_scope();
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<std::mutex> lg(m_window_lock);
     m_windows.insert(&widget);
 }
+
 void FileWindowLogger::operator-=(FileWindowLoggerWindow& widget){
-//    auto scope_check = m_sanitizer.check_scope();
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<std::mutex> lg(m_window_lock);
     m_windows.erase(&widget);
 }
 
 void FileWindowLogger::log(const std::string& msg, Color color){
-//    auto scope_check = m_sanitizer.check_scope();
-    std::unique_lock<std::mutex> lg(m_lock);
-    m_last_log_tracker += msg;
-    m_cv.wait(lg, [this]{ return m_queue.size() < m_max_queue_size; });
-    m_queue.emplace_back(msg, color);
-    m_cv.notify_all();
+    m_file_logger.log(msg, color);
 }
+
 void FileWindowLogger::log(std::string&& msg, Color color){
-//    auto scope_check = m_sanitizer.check_scope();
-    std::unique_lock<std::mutex> lg(m_lock);
-    m_last_log_tracker += msg;
-    m_cv.wait(lg, [this]{ return m_queue.size() < m_max_queue_size; });
-    m_queue.emplace_back(std::move(msg), color);
-    m_cv.notify_all();
+    m_file_logger.log(std::move(msg), color);
 }
+
 std::vector<std::string> FileWindowLogger::get_last() const{
-//    auto scope_check = m_sanitizer.check_scope();
-    std::unique_lock<std::mutex> lg(m_lock);
-    return m_last_log_tracker.snapshot();
+    return m_file_logger.get_last();
 }
 
-
-std::string FileWindowLogger::normalize_newlines(const std::string& msg){
-    std::string str;
-    size_t index = 0;
-
-    while (true){
-        auto pos = msg.find("\r\n", index);
-        if (pos == std::string::npos){
-            str += msg.substr(index, pos);
-            break;
-        }else{
-            str += msg.substr(index, pos);
-            str += "\n";
-            index = pos + 2;
+void FileWindowLogger::on_log(const std::string& msg, Color color){
+    // This is called from FileLogger's background thread.
+    // Format the message for Qt display and send to all windows.
+    std::lock_guard<std::mutex> lg(m_window_lock);
+    if (!m_windows.empty()){
+        QString str = to_window_str(msg, color);
+        for (FileWindowLoggerWindow* window : m_windows){
+            window->log(str);
         }
     }
-
-    if (!str.empty() && str.back() == '\n'){
-        str.pop_back();
-    }
-
-    return str;
 }
-std::string FileWindowLogger::to_file_str(const std::string& msg){
-    //  Replace all newlines with:
-    //      <br>    for the output window.
-    //      \r\n    for the log file.
 
-    std::string str;
-    for (char ch : msg){
-        if (ch == '\n'){
-            str += "\r\n";
-            continue;
-        }
-        str += ch;
-    }
-    str += "\r\n";
-
-    return str;
-}
 QString FileWindowLogger::to_window_str(const std::string& msg, Color color){
-    //  Replace all newlines with:
-    //      <br>    for the output window.
-    //      \r\n    for the log file.
-
+    // Convert message to HTML for display in QTextEdit.
+    // Replace spaces with &nbsp; and newlines with <br>.
     std::string str;
     if (color){
         str += "<font color=\"" + QColor((uint32_t)color).name().toStdString() + "\">";
@@ -159,89 +105,10 @@ QString FileWindowLogger::to_window_str(const std::string& msg, Color color){
         }
         str += ch;
     }
-//    if (color){
-        str += "</font>";
-//    }
+    str += "</font>";
 
     return QString::fromStdString(str);
 }
-void FileWindowLogger::internal_log(const std::string& msg, Color color){
-//    auto scope_check = m_sanitizer.check_scope();
-    std::string line = normalize_newlines(msg);
-    {
-        if (!m_windows.empty()){
-            QString str = to_window_str(line, color);
-            for (FileWindowLoggerWindow* window : m_windows){
-                window->log(str);
-            }
-        }
-    }
-    {
-        m_file.write(to_file_str(msg).c_str());
-        m_file.flush();
-    }
-}
-void FileWindowLogger::thread_loop(){
-//    auto scope_check = m_sanitizer.check_scope();
-    std::unique_lock<std::mutex> lg(m_lock);
-    while (true){
-        m_cv.wait(lg, [&]{
-            return m_stopping || !m_queue.empty();
-        });
-        if (m_stopping){
-            break;
-        }
-        auto& item = m_queue.front();
-        std::string msg = std::move(item.first);
-        Color color = item.second;
-        m_queue.pop_front();
-
-        lg.unlock();
-        rotate_log_file();
-        internal_log(msg, color);
-        lg.lock();
-
-        if (m_queue.size() <= m_max_queue_size / 2){
-            m_cv.notify_all();
-        }
-    }
-}
-
-void FileWindowLogger::rotate_log_file(){
-
-    static const qint64 max_size = 1024 * 1024 * 50;
-    if (m_file.size() < max_size){
-        return;
-    }
-
-    if (m_file.isOpen()) {
-        m_file.close();
-    }
-
-    QString log_name = QString::fromStdString(USER_FILE_PATH() + QCoreApplication::applicationName().toStdString() + ".log");
-    QString backup_log_name = QString::fromStdString(USER_FILE_PATH() + QCoreApplication::applicationName().toStdString() + "-" + now_to_filestring() + ".log");
-    if (QFile::exists(log_name)) {
-        bool success = QFile::rename(log_name, backup_log_name);  // rename SerialPrograms.log to SerialPrograms-[date].log
-        if (!success) {
-            // TODO: Handle error (e.g., file locked by another process)
-        }
-    }
-
-    // Re-open the file (this creates a new, empty file)
-    // We use the same name as before, so the path is preserved
-    bool exists = m_file.exists();
-    bool opened = m_file.open(QIODevice::WriteOnly | QIODevice::Append);
-    if (!exists && opened){
-        std::string bom = "\xef\xbb\xbf";
-        m_file.write(bom.c_str(), bom.size());
-    }
-}
-
-
-
-
-
-
 
 
 FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget* parent)
@@ -273,7 +140,6 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget
     connect(
         this, &FileWindowLoggerWindow::signal_log,
         m_text, [this](QString msg){
-//            cout << "signal_log(): " << msg.toStdString() << endl;
             m_text->append(msg);
         }
     );
@@ -281,7 +147,7 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget
     GlobalSettings::instance().LOG_WINDOW_SIZE->WIDTH.add_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->HEIGHT.add_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->X_POS.add_listener(*this);
-    GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS.add_listener(*this);  
+    GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS.add_listener(*this);
 
     m_logger += *this;
     log("================================================================================");
@@ -292,17 +158,17 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget
     log(QString::fromStdString("Program resources folder: " + RESOURCE_PATH()));
     add_window(*this);
 }
+
 FileWindowLoggerWindow::~FileWindowLoggerWindow(){
     remove_window(*this);
     m_logger -= *this;
     GlobalSettings::instance().LOG_WINDOW_SIZE->WIDTH.remove_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->HEIGHT.remove_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->X_POS.remove_listener(*this);
-    GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS.remove_listener(*this);      
+    GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS.remove_listener(*this);
 }
 
 void FileWindowLoggerWindow::log(QString msg){
-//    cout << "FileWindowLoggerWindow::log(): " << msg.toStdString() << endl;
     emit signal_log(msg);
 }
 
@@ -314,7 +180,7 @@ void FileWindowLoggerWindow::resizeEvent(QResizeEvent* event){
 }
 
 void FileWindowLoggerWindow::moveEvent(QMoveEvent* event){
-    m_pending_move = true;    
+    m_pending_move = true;
     GlobalSettings::instance().LOG_WINDOW_SIZE->X_POS.set(x());
     GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS.set(y());
     m_pending_move = false;
@@ -338,27 +204,9 @@ void FileWindowLoggerWindow::on_config_value_changed(void* object){
                     move_y_within_screen_bounds(GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS)
                 );
             }
-        });        
+        });
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }
