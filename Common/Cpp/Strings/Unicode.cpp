@@ -198,7 +198,7 @@ std::u8string utr16_to_utf8(const std::u16string& str){
     const char16_t* utf16 = str.c_str();
     const char16_t* stop = utf16 + str.size();
     while (utf16 < stop){
-        append_to_utf8(out, utf16_to_unicode(utf16), u8"\xef\xbf\xbd");
+        append_to_utf8(out, utf16_to_unicode(utf16), u8"\ufffd");
     }
     return out;
 }
@@ -231,7 +231,7 @@ std::string utf32_to_str(const std::u32string& str){
 std::u8string utf32_to_utf8(const std::u32string& str){
     std::u8string out;
     for (char32_t ch : str){
-        append_to_utf8(out, ch, u8"\xef\xbf\xbd");
+        append_to_utf8(out, ch, u8"\ufffd");
     }
     return out;
 }
