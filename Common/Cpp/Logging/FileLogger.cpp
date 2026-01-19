@@ -190,7 +190,7 @@ void FileLogger::rotate_log_file(){
 
     // Re-open the file (creates a new, empty file)
     bool exists = Filesystem::exists(file_path);
-    m_file.open(file_path, std::ios::out | std::ios::app | std::ios::binary);
+    m_file.open(file_path.stdpath(), std::ios::out | std::ios::app | std::ios::binary);
     if (!exists && m_file.is_open()){
         const char bom[] = "\xef\xbb\xbf";
         m_file.write(bom, 3);
