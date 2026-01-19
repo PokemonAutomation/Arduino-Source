@@ -14,6 +14,8 @@
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_IvJudgeOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -46,8 +48,15 @@ private:
     enum class GiftPokemon{
         FLOETTE,
         MAGEARNA,
+        MELTAN,
+        // MELMETAL,
     };
     EnumDropdownOption<GiftPokemon> POKEMON;
+
+    SimpleIntegerOption<int8_t> RIGHT_SCROLLS;
+    MillisecondsOption SCROLL_HOLD;
+    MillisecondsOption SCROLL_RELEASE;
+    MillisecondsOption POST_THROW_WAIT;
 
     IVJudgeFilterOption HP;
     IVJudgeFilterOption ATTACK;
