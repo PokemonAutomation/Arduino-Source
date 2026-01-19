@@ -707,7 +707,12 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
     while (true){
         if (LEGENDARY == Legendary::LATIAS_ALT){
             if (hunt_latias_alt(env, context, stats)){
-                break; // shiny found
+                // shiny found
+                SHINY_DETECTED.on_shiny_sighted(
+                    env, env.console, context,
+                    shiny_count
+                );
+                break;
             }
         }else{
             if (LEGENDARY == Legendary::LATIAS){

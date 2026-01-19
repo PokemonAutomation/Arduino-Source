@@ -39,6 +39,22 @@ public:
         ShinySoundDetectedAction default_action
     );
 
+    // Handle shiny sighting according to ACTION.
+    // May log the sighting, take a video on Switch and send notification.
+    // Return whether to stop the program according to ACTION.
+    // Since this function may file button presses to record a video on Switch, it must be
+    // in the program thread that allows sending button presses.
+    bool on_shiny_sighted(
+        ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
+        size_t current_count
+    );
+
+    // Assuming a shiny is sighted, this function logs and sends a notification.
+    // This function is called by `on_shiny_sighted()`.
+    void send_shiny_sighted_notification(
+        ProgramEnvironment& env, VideoStream& stream
+    );
+
     // Handle shiny sound according to ACTION.
     // May log the sound, take a video on Switch and send notification.
     // Return whether to stop the program according to ACTION.
