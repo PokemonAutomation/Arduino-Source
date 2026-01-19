@@ -87,7 +87,8 @@ std::unique_ptr<StatsTracker> EggAutonomous_Descriptor::make_stats() const{
 
 
 EggAutonomous::EggAutonomous()
-    : GO_HOME_WHEN_DONE(false)
+    : STOP_AFTER_CURRENT("Egg Box is Empty")
+    , GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
         "<b>Game Language:</b>",
         IV_READER().languages(),
@@ -180,6 +181,7 @@ EggAutonomous::EggAutonomous()
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
     }
+    PA_ADD_OPTION(STOP_AFTER_CURRENT);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(EGG_SANDWICH);
@@ -197,6 +199,8 @@ EggAutonomous::EggAutonomous()
 void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
+    DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
+    
     //  Connect the controller.
     pbf_press_button(context, BUTTON_L, 80ms, 800ms);
 
@@ -310,6 +314,12 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             env.console.overlay().add_log("Max sandwich count: " + std::to_string(max_num_sandwiches), COLOR_PURPLE);
             env.log("Max num sandwiches reached: " + std::to_string(max_num_sandwiches), COLOR_PURPLE);
             break;
+        }
+
+        if (STOP_AFTER_CURRENT.should_stop()){
+            env.log("Round completed. Stopping program...");
+            env.console.overlay().add_log("Round complete", COLOR_WHITE);
+            throw ProgramFinishedException();
         }
         // end of one full picnic->hatch iteration
     } // end the full egg autonomous loop
