@@ -5,10 +5,13 @@
  */
 
 #include "Filesystem.h"
+#include <iostream>
 
-namespace PokemonAutomation{
+namespace PokemonAutomation::Filesystem{
 
-
+std::ostream& operator<<(std::ostream& stream, const Path& x){
+    return stream << x.m_path;
+}
 
 
 }

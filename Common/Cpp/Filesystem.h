@@ -23,6 +23,7 @@
 #define PokemonAutomation_Filesystem_H
 
 #include <filesystem>
+#include <iosfwd>
 #include "Common/Cpp/Strings/Unicode.h"
 
 namespace PokemonAutomation{
@@ -101,9 +102,7 @@ public:
     friend Path operator/(const Path& x, const Path& y){
         return x.m_path / y.m_path;
     }
-    friend std::ostream& operator<<(std::ostream& stream, const Path& x){
-        return stream << x.m_path;
-    }
+    friend std::ostream& operator<<(std::ostream& stream, const Path& x);
 
 
 private:
