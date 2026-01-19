@@ -28,7 +28,7 @@ FileLogger::FileLogger(FileLoggerConfig config)
 {
     Filesystem::Path file_path(m_config.file_path);
     bool exists = Filesystem::exists(file_path);
-    m_file.open(file_path, std::ios::out | std::ios::app | std::ios::binary);
+    m_file.open(file_path.stdpath(), std::ios::out | std::ios::app | std::ios::binary);
 
     if (!exists && m_file.is_open()){
         // Write UTF-8 BOM to new files
