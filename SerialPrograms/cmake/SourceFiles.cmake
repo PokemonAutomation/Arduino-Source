@@ -78,6 +78,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Exceptions.h
     ../Common/Cpp/ExpressionEvaluator.cpp
     ../Common/Cpp/ExpressionEvaluator.h
+    ../Common/Cpp/Filesystem.cpp
+    ../Common/Cpp/Filesystem.h
     ../Common/Cpp/ImageResolution.cpp
     ../Common/Cpp/ImageResolution.h
     ../Common/Cpp/Json/JsonArray.cpp

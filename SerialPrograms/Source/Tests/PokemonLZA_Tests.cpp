@@ -5,7 +5,7 @@
 */
 
 #include "Common/Cpp/Time.h"
-#include "Common/Cpp/Strings/Unicode.h"
+#include "Common/Cpp/Filesystem.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "PokemonLZA/Inference/Donuts/PokemonLZA_DonutBerriesDetector.h"
 #include "PokemonLZA/Inference/Donuts/PokemonLZA_FlavorPowerDetector.h"
@@ -360,15 +360,15 @@ int test_pokemonLZA_MapIconDetector(const std::string& filepath){
     // Each line in the txt file has format: "<MapIconType> <count>"
     // For example: "PokemonCenter 2" means there should be 2 Pokemon Centers detected
 
-    std::filesystem::path file_path(utf8_to_utf8(filepath));
-    std::filesystem::path parent_dir = file_path.parent_path();
-    std::string base_name = utf8_to_str(file_path.stem().generic_u8string());
+    Filesystem::Path file_path(utf8_to_utf8(filepath));
+    Filesystem::Path parent_dir = file_path.parent_path();
+    std::string base_name = file_path.stem().string();
 
-    std::filesystem::path target_detections_path = parent_dir / utf8_to_utf8("_" + base_name + ".txt");
+    Filesystem::Path target_detections_path = parent_dir / utf8_to_utf8("_" + base_name + ".txt");
 
     // Load expected detections from txt file
     std::map<MapIconType, int> expected_counts;
-    std::ifstream file(target_detections_path);
+    std::ifstream file(target_detections_path.stdpath());
     if (!file.is_open()){
         cerr << "Error: cannot open target detection file " << target_detections_path << endl;
         return 1;
@@ -461,7 +461,7 @@ int test_pokemonLZA_MapIconDetector(const std::string& filepath){
 
 #ifdef SAVE_DEBUG_IMAGE
     // Save debug image
-    std::filesystem::path debug_path = parent_dir / ("_" + base_name + "_debug.png");
+    FilesystemPath debug_path = parent_dir / ("_" + base_name + "_debug.png");
     debug_image.save(debug_path.string());
     cout << "Debug image saved to: " << debug_path << endl;
 #endif
@@ -639,9 +639,9 @@ int test_pokemonLZA_FlavorPowerScreenDetector(const std::string& filepath){
     //
     // To generate ground truth files, set GENERATE_TEST_GOLDEN_FILES to true in settings
 
-    std::filesystem::path file_path(filepath);
+    Filesystem::Path file_path(filepath);
     std::string filename = file_path.filename().string();
-    std::filesystem::path parent_dir = file_path.parent_path();
+    Filesystem::Path parent_dir = file_path.parent_path();
     std::string base_name = file_path.stem().string();
 
     const std::vector<std::string> words = parse_words(base_name);
@@ -678,8 +678,8 @@ int test_pokemonLZA_FlavorPowerScreenDetector(const std::string& filepath){
         // Golden file generation mode: detect all powers and write to file
         cout << "Generating golden file for: " << filepath << endl;
 
-        std::filesystem::path target_powers_path = parent_dir / ("_" + base_name + ".txt");
-        std::ofstream output_file(target_powers_path);
+        Filesystem::Path target_powers_path = parent_dir / ("_" + base_name + ".txt");
+        std::ofstream output_file(target_powers_path.stdpath());
         if (!output_file.is_open()){
             cerr << "Error: cannot open output file " << target_powers_path << " for writing" << endl;
             return 1;
@@ -704,7 +704,7 @@ int test_pokemonLZA_FlavorPowerScreenDetector(const std::string& filepath){
     }
 
     // Normal testing mode: load golden file and verify
-    std::filesystem::path target_powers_path = parent_dir / ("_" + base_name + ".txt");
+    Filesystem::Path target_powers_path = parent_dir / ("_" + base_name + ".txt");
     std::vector<std::string> expected_powers;
     if (load_slug_list(target_powers_path.string(), expected_powers) == false){
         cout << "Loading slug list " << target_powers_path << " failed." << endl;
@@ -764,9 +764,9 @@ int test_pokemonLZA_DonutBerriesReader(const std::string& filepath){
     // To generate ground truth files, uncomment the following line and rebuild:
     // #define GENERATE_DONUT_BERRIES_GROUND_TRUTH
 
-    std::filesystem::path file_path(filepath);
+    Filesystem::Path file_path(filepath);
     std::string filename = file_path.filename().string();
-    std::filesystem::path parent_dir = file_path.parent_path();
+    Filesystem::Path parent_dir = file_path.parent_path();
     std::string base_name = file_path.stem().string();
 
     const std::vector<std::string> words = parse_words(base_name);
@@ -804,8 +804,8 @@ int test_pokemonLZA_DonutBerriesReader(const std::string& filepath){
         // Golden file generation mode: read berry names and write to file
         cout << "Generating golden file for: " << filepath << endl;
 
-        std::filesystem::path target_berries_path = parent_dir / ("_" + base_name + ".txt");
-        std::ofstream output_file(target_berries_path);
+        Filesystem::Path target_berries_path = parent_dir / ("_" + base_name + ".txt");
+        std::ofstream output_file(target_berries_path.stdpath());
         if (!output_file.is_open()){
             cerr << "Error: cannot open output file " << target_berries_path << " for writing" << endl;
             return 1;
@@ -831,7 +831,7 @@ int test_pokemonLZA_DonutBerriesReader(const std::string& filepath){
     }
     
     // Normal testing mode: load golden file and verify
-    std::filesystem::path target_berries_path = parent_dir / ("_" + base_name + ".txt");
+    Filesystem::Path target_berries_path = parent_dir / ("_" + base_name + ".txt");
     std::vector<std::string> target_berries;
     if (load_slug_list(target_berries_path.string(), target_berries) == false){
         return 1;
