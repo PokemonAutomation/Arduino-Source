@@ -17,13 +17,20 @@
  *  Therefore, we ban the direct use of "std::filesystem" in our code base and
  *  wrap them instead.
  *
+ *  Since we are wrapping "std::filesytem", we also PIMPL it to reduce
+ *  compilation times.
+ *
  */
 
 #ifndef PokemonAutomation_Filesystem_H
 #define PokemonAutomation_Filesystem_H
 
-#include <filesystem>
-#include "Common/Cpp/Strings/Unicode.h"
+#include <string>
+#include "Common/Cpp/Containers/Pimpl.h"
+
+namespace std::filesystem{
+    class path;
+}
 
 namespace PokemonAutomation{
 namespace Filesystem{
@@ -31,99 +38,67 @@ namespace Filesystem{
 
 class Path{
 public:
-    Path() = default;
-    Path(std::filesystem::path path)
-        : m_path(std::move(path))
-    {}
+    ~Path();
+    Path(Path&&);
+    Path& operator=(Path&&);
+    Path(const Path&);
+    Path& operator=(const Path&);
+
+
+public:
+    Path();
+    Path(std::filesystem::path path);
 
     //  Construct assuming UTF-8 encoding.
-    Path(const char* path)
-        : m_path(utf8_to_utf8(path))
-    {}
-    Path(const std::string& path)
-        : m_path(utf8_to_utf8(path))
-    {}
+    Path(const char* path);
+    Path(const std::string& path);
 
     //  Construct from UTF-8.
-    Path(std::u8string path)
-        : m_path(std::move(path))
-    {}
+    Path(std::u8string path);
 
-    void clear(){
-        m_path.clear();
-    }
+    void clear();
 
 
 public:
     //  Convert to the C++ path so it can be passed to other library functions.
-    operator const std::filesystem::path&() const{
-        return m_path;
-    }
-    const std::filesystem::path& stdpath() const{
-        return m_path;
-    }
+    operator const std::filesystem::path&() const;
+    const std::filesystem::path& stdpath() const;
 
 
 public:
     //  Return path string as UTF-8.
-    std::string string() const{
-        return utf8_to_str(m_path.u8string());
-    }
-    std::u8string u8string() const{
-        return m_path.u8string();
-    }
+    std::string string() const;
+    std::u8string u8string() const;
 
-    Path filename() const{
-        return m_path.filename();
-    }
-    Path parent_path() const{
-        return m_path.parent_path();
-    }
-    Path stem() const{
-        return m_path.stem();
-    }
+    Path filename() const;
+    Path parent_path() const;
+    Path stem() const;
 
 
 public:
-    Path& replace_extension(const Path& replacement){
-        m_path.replace_extension(replacement);
-        return *this;
-    }
+    Path& replace_extension(const Path& replacement);
 
 
 public:
-    friend bool operator==(const Path& x, const Path& y){
-        return x.m_path == y.m_path;
-    }
+    friend bool operator==(const Path& x, const Path& y);
 
 
 public:
-    friend Path operator/(const Path& x, const Path& y){
-        return x.m_path / y.m_path;
-    }
-    friend std::ostream& operator<<(std::ostream& stream, const Path& x){
-        return stream << x.m_path;
-    }
+    friend Path operator/(const Path& x, const Path& y);
+    friend std::ostream& operator<<(std::ostream& stream, const Path& x);
 
 
 private:
-    std::filesystem::path m_path;
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 
 
-inline bool exists(const Path& path){
-    return std::filesystem::exists(path.stdpath());
-}
-inline bool create_directories(const Path& path){
-    return std::filesystem::create_directories(path.stdpath());
-}
-inline auto remove_all(const Path& path){
-    return std::filesystem::remove_all(path.stdpath());
-}
-inline bool copy_file(const Path& from, const Path& to){
-    return std::filesystem::copy_file(from.stdpath(), to.stdpath());
-}
+bool exists(const Path& path);
+bool create_directories(const Path& path);
+uintmax_t remove_all(const Path& path);
+bool copy_file(const Path& from, const Path& to);
 
 
 
