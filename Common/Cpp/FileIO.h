@@ -13,9 +13,8 @@
 #ifndef PokemonAutomation_FileIO_H
 #define PokemonAutomation_FileIO_H
 
-#include "Common/Cpp/Filesystem.h"
-#include <cstdio>
 #include <string>
+#include "Common/Cpp/Filesystem.h"
 
 namespace PokemonAutomation{
 
@@ -111,7 +110,7 @@ public:
     bool seek(int64_t offset, int whence);
 
 private:
-    FILE* m_file = nullptr;
+    void* m_file = nullptr;
 };
 
 

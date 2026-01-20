@@ -4,6 +4,7 @@
  *
  */
 
+#include <cstdio>
 #include "FileIO.h"
 
 #ifdef _WIN32
@@ -120,7 +121,7 @@ bool FileIO::open(const Filesystem::Path& path, FileMode mode){
 
 void FileIO::close(){
     if (m_file){
-        fclose(m_file);
+        fclose((FILE*)m_file);
         m_file = nullptr;
     }
 }
@@ -129,21 +130,21 @@ size_t FileIO::write(const void* data, size_t size){
     if (!m_file || size == 0){
         return 0;
     }
-    return fwrite(data, 1, size, m_file);
+    return fwrite(data, 1, size, (FILE*)m_file);
 }
 
 size_t FileIO::read(void* buffer, size_t size){
     if (!m_file || size == 0){
         return 0;
     }
-    return fread(buffer, 1, size, m_file);
+    return fread(buffer, 1, size, (FILE*)m_file);
 }
 
 bool FileIO::flush(){
     if (!m_file){
         return false;
     }
-    return fflush(m_file) == 0;
+    return fflush((FILE*)m_file) == 0;
 }
 
 int64_t FileIO::tell() const{
@@ -153,10 +154,10 @@ int64_t FileIO::tell() const{
 #ifdef _WIN32
     //  Windows: Use _ftelli64() for 64-bit file positions.
     //  ftell() returns long which is 32-bit on Windows, limiting to 2GB files.
-    return _ftelli64(m_file);
+    return _ftelli64((FILE*)m_file);
 #else
     //  POSIX: Use ftello() which returns off_t (64-bit on 64-bit systems).
-    return static_cast<int64_t>(ftello(m_file));
+    return static_cast<int64_t>(ftello((FILE*)m_file));
 #endif
 }
 
@@ -166,10 +167,10 @@ bool FileIO::seek(int64_t offset, int whence){
     }
 #ifdef _WIN32
     //  Windows: Use _fseeki64() for 64-bit file positions.
-    return _fseeki64(m_file, offset, whence) == 0;
+    return _fseeki64((FILE*)m_file, offset, whence) == 0;
 #else
     //  POSIX: Use fseeko() which accepts off_t (64-bit on 64-bit systems).
-    return fseeko(m_file, static_cast<off_t>(offset), whence) == 0;
+    return fseeko((FILE*)m_file, static_cast<off_t>(offset), whence) == 0;
 #endif
 }
 
