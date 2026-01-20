@@ -36,6 +36,7 @@ public:
 
 class StatsReset : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
+    ~StatsReset();
     StatsReset();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

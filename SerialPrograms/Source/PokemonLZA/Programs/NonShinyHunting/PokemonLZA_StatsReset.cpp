@@ -136,6 +136,10 @@ StatsReset::StatsReset()
     POKEMON.add_listener(*this);
 }
 
+StatsReset::~StatsReset(){
+    POKEMON.remove_listener(*this);
+}
+
 void StatsReset::on_config_value_changed(void* object){
     ConfigOptionState state = POKEMON == GiftPokemon::MELMETAL
                                   ? ConfigOptionState::ENABLED
