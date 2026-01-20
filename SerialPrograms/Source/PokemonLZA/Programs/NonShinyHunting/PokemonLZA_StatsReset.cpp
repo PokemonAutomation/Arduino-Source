@@ -75,7 +75,7 @@ StatsReset::StatsReset()
             {GiftPokemon::FLOETTE,  "floette",  "Floette" },
             {GiftPokemon::MAGEARNA, "magearna", "Magearna"},
             {GiftPokemon::MELTAN,   "meltan",   "Meltan"  },
-            // {GiftPokemon::MELMETAL, "melmetal", "Melmetal"},
+            {GiftPokemon::MELMETAL, "melmetal", "Melmetal"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         GiftPokemon::FLOETTE
@@ -131,9 +131,20 @@ StatsReset::StatsReset()
     PA_ADD_OPTION(SPEED);
 
     PA_ADD_OPTION(NOTIFICATIONS);
+
+    StatsReset::on_config_value_changed(this);
+    POKEMON.add_listener(*this);
 }
 
-
+void StatsReset::on_config_value_changed(void* object){
+    ConfigOptionState state = POKEMON == GiftPokemon::MELMETAL
+                                  ? ConfigOptionState::ENABLED
+                                  : ConfigOptionState::HIDDEN;
+    RIGHT_SCROLLS.set_visibility(state);
+    SCROLL_HOLD.set_visibility(state);
+    SCROLL_RELEASE.set_visibility(state);
+    POST_THROW_WAIT.set_visibility(state);
+}
 
 void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
@@ -167,7 +178,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             }
         }
 
-        if (POKEMON == GiftPokemon::MELTAN){
+        if (POKEMON == GiftPokemon::MELTAN || POKEMON == GiftPokemon::MELMETAL){
             // fly to Lysandre Café, replace with OCR in the future
             overworld_to_main_menu(env.console, context);
             open_map(env.console, context, false, false);
@@ -238,10 +249,44 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 pbf_wait(context, POST_THROW_WAIT);
                 pbf_mash_button(context, BUTTON_A, 10s);
             }
-            // if (POKEMON == GiftPokemon::MELMETAL){
-            //     // enter portal
-            //     // navigate to NPC
-            // }
+            if (POKEMON == GiftPokemon::MELMETAL){
+                // enter portal
+                pbf_press_button(context, BUTTON_A, 50ms, 1s);
+                pbf_press_dpad(context, DPAD_UP, 50ms, 500ms);
+                pbf_mash_button(context, BUTTON_A, 4s);
+
+                OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
+
+                context.wait_for_all_requests();
+                int ret = run_until<ProControllerContext>(
+                    env.console, context,
+                    [](ProControllerContext& context){
+                        pbf_mash_button(context, BUTTON_B, 30s);
+                    },
+                    {
+                        overworld,
+                    }
+                    );
+
+                if (ret == 0){
+                    env.log("Detected overworld");
+                    context.wait_for_all_requests();
+                }
+
+                pbf_press_button(context, BUTTON_L, 50ms, 500ms);
+                ssf_press_button(context, BUTTON_B, 0ms, 1000ms, 0ms);
+                pbf_move_left_joystick(context, {0, +1}, 2s, 1s);
+                pbf_move_left_joystick(context, {+1, 0}, 200ms, 500ms);
+                pbf_press_button(context, BUTTON_L, 50ms, 500ms);
+                ssf_press_button(context, BUTTON_B, 0ms, 1000ms, 0ms);
+                pbf_move_left_joystick(context, {0, +1}, 1s, 1s);
+                pbf_move_left_joystick(context, {-1, +1}, 200ms, 500ms);
+                pbf_press_button(context, BUTTON_L, 50ms, 500ms);
+                ssf_press_button(context, BUTTON_B, 0ms, 1000ms, 0ms);
+                pbf_move_left_joystick(context, {+0.05, +1}, 3s, 1s);
+
+                pbf_mash_button(context, BUTTON_A, 4s);
+            }
         }
 
         context.wait_for_all_requests();
@@ -251,7 +296,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             int result = run_until<ProControllerContext>(
                 env.console, context,
                 [this](ProControllerContext& context){
-                    if (POKEMON == GiftPokemon::FLOETTE){
+                    if (POKEMON == GiftPokemon::FLOETTE || POKEMON == GiftPokemon::MELMETAL){
                         pbf_mash_button(context, BUTTON_A, 60s);
                     }else if (POKEMON == GiftPokemon::MAGEARNA){
                         pbf_mash_button(context, BUTTON_A, 50s);

@@ -34,12 +34,13 @@ public:
 
 
 
-class StatsReset : public SingleSwitchProgramInstance{
+class StatsReset : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
     StatsReset();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
+    virtual void on_config_value_changed(void* object) override;
     StartInGripOrGameOption START_LOCATION;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
@@ -49,7 +50,7 @@ private:
         FLOETTE,
         MAGEARNA,
         MELTAN,
-        // MELMETAL,
+        MELMETAL,
     };
     EnumDropdownOption<GiftPokemon> POKEMON;
 
