@@ -253,7 +253,8 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 // enter portal
                 pbf_press_button(context, BUTTON_A, 50ms, 1s);
                 pbf_press_dpad(context, DPAD_UP, 50ms, 500ms);
-                pbf_mash_button(context, BUTTON_A, 4s);
+                pbf_mash_button(context, BUTTON_A, 5s);
+                pbf_press_button(context, BUTTON_PLUS, 5s, 500ms);
 
                 OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
 
