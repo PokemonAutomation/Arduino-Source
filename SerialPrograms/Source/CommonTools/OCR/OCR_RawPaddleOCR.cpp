@@ -50,7 +50,7 @@ public:
                 }
             }
             // No idle instance available - create a new one.
-            add_instance();
+            add_paddle_instance();
         }
 
         // Perform OCR without holding the lock (allows concurrent OCR operations).
@@ -72,7 +72,7 @@ public:
 
     // Create a new PaddleOCR instance and add it to the pool.
     // Thread-safe - can be called concurrently (using `m_lock` when modifying the pool).
-    void add_instance(){
+    void add_paddle_instance(){
 
         global_logger_tagged().log(
             "Initializing PaddleOCR (" + language_data(m_language).name + "): "
@@ -85,7 +85,7 @@ public:
         // }
 
         // Add to pool under lock.
-        WriteSpinLock lg(m_lock, "PaddlePool::add_instance()");
+        WriteSpinLock lg(m_lock, "PaddlePool::add_paddle_instance()");
 
         m_instances.emplace_back(std::move(api));
         try{
@@ -98,17 +98,17 @@ public:
 
     // Pre-allocate a minimum number of instances to avoid lazy initialization during runtime.
     // Useful for warming up the pool before heavy OCR workloads.
-    void ensure_instances(size_t instances){
+    void ensure_paddle_instances(size_t instances){
         size_t current_instances;
         while (true){
             {
-                ReadSpinLock lg(m_lock, "PaddlePool::ensure_instances()");
+                ReadSpinLock lg(m_lock, "PaddlePool::ensure_paddle_instances()");
                 current_instances = m_instances.size();
             }
             if (current_instances >= instances){
                 break;
             }
-            add_instance();
+            add_paddle_instance();
         }
     }
 
@@ -139,12 +139,12 @@ private:
 // Two-level concurrency model:
 //   Level 1: ocr_pool_lock protects the map (language -> pool creation/lookup)
 //   Level 2: Each PaddlePool has its own m_lock (instance checkout/checkin)
-struct OcrGlobals{
+struct PaddleOcrGlobals{
     SpinLock ocr_pool_lock;                       // Protects ocr_pool map.
     std::map<Language, PaddlePool> ocr_pool;   // One pool per language.
 
-    static OcrGlobals& instance(){
-        static OcrGlobals globals;
+    static PaddleOcrGlobals& instance(){
+        static PaddleOcrGlobals globals;
         return globals;
     }
 };
@@ -158,7 +158,7 @@ std::string paddle_ocr_read(Language language, const ImageViewRGB32& image){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to call OCR without a language.");
     }
 
-    OcrGlobals& globals = OcrGlobals::instance();
+    PaddleOcrGlobals& globals = PaddleOcrGlobals::instance();
     std::map<Language, PaddlePool>& ocr_pool = globals.ocr_pool;
 
     // Get or create the pool for this language (lock only during map access).
@@ -184,7 +184,7 @@ void ensure_paddle_ocr_instances(Language language, size_t instances){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to call OCR without a language.");
     }
 
-    OcrGlobals& globals = OcrGlobals::instance();
+    PaddleOcrGlobals& globals = PaddleOcrGlobals::instance();
     std::map<Language, PaddlePool>& ocr_pool = globals.ocr_pool;
 
     // Get or create the pool for this language.
@@ -196,12 +196,12 @@ void ensure_paddle_ocr_instances(Language language, size_t instances){
             iter = ocr_pool.emplace(language, language).first;
         }
     }
-    // Delegate to pool's ensure_instances (which handles its own locking).
-    iter->second.ensure_instances(instances);
+    // Delegate to pool's ensure_paddle_instances (which handles its own locking).
+    iter->second.ensure_paddle_instances(instances);
 }
 
 void clear_paddle_ocr_cache(){
-    OcrGlobals& globals = OcrGlobals::instance();
+    PaddleOcrGlobals& globals = PaddleOcrGlobals::instance();
     std::map<Language, PaddlePool>& ocr_pool = globals.ocr_pool;
     WriteSpinLock lg(globals.ocr_pool_lock, "clear_paddle_ocr_cache()");
     ocr_pool.clear();  // Destroys all pools and their instances.
