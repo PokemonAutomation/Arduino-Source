@@ -133,6 +133,17 @@ void FileLogger::thread_loop(){
             return m_stopping || !m_queue.empty();
         });
         if (m_stopping){
+            if (m_config.flush_when_exit && m_file.is_open()){
+                while (m_queue.size() > 0){
+                    std::string msg = std::move(m_queue.front().first);
+                    // Write to file
+                    std::string line = normalize_newlines(msg);
+                    std::string file_str = to_file_str(line);
+                    m_file.write(file_str.c_str(), file_str.size());
+                    m_queue.pop_front();
+                }
+                m_file.flush();
+            }
             break;
         }
         auto& item = m_queue.front();

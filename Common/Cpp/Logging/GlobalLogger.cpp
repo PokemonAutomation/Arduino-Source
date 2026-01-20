@@ -9,22 +9,26 @@
 namespace PokemonAutomation{
 
 
-static FileLoggerConfig _global_logger_config;
+// We should define this function at Main.cpp of each executable
+// that uses the Logging/ library.
+//
+// This function is required by Common/Cpp/Logging/GlobalLogger.h:global_logger_raw() to initialize
+// the global file logger.
+// This function is called the first time `global_logger_raw()` is called to initialize the static
+// local global file logger object.
+//
+// The advantage of such design is that:
+// - This forces each executable's main.cpp to define how the logger is configured.
+// - This ensures thread-safety on the global logger object. The static local `FileLogger` defined
+//   in `global_logger_raw()` is guaranteed by C++ to be thread-safe when constructed.
+FileLoggerConfig make_global_config();
 
-void initialize_global_logger(FileLoggerConfig config){
-    _global_logger_config = std::move(config);
-    // auto& logger = global_logger_raw();
-    // logger.log("Initialized logger with path " + config.file_path);
-}
 
 Logger& global_logger_raw(){
-    auto get_config = [&](){
-        if (_global_logger_config.file_path.size() == 0){
-            _global_logger_config.file_path = ".";
-        }
-        return _global_logger_config;
-    };
-    static FileLogger logger(get_config());
+    // Call a function `make_global_config()` that is not defined in 
+    // this Logging/ library! To use this global logger, you must
+    // define `make_global_config()` in the Main.cpp.
+    static FileLogger logger(make_global_config());
     return logger;
 }
 

@@ -14,17 +14,12 @@
 namespace PokemonAutomation{
 
 
-// Call this function at very beginning of the main function to initialize the global file logger.
-// Call `global_logger_raw()` to retrieve the global file logger afterwards.
-// If not called, a default logger with default file path of "." will be created.
-void initialize_global_logger(FileLoggerConfig config);
-
-
 // Return a global raw `FileLogger`. `FileLogger` is defined in FileLogger.h.
 // "raw" here means the logger does not add any timestamp or tags to the incoming log lines.
-// Suggest calling `initialize_global_logger()` at very beginning of the main function to
-// initialize the logger first. Otherwise a default logger with default file path of "."
-// will be created.
+//
+// To initialize the global logger, implement `FileLoggerConfig make_global_config()` at
+// Main.cpp to return the config for the global logger. If this function is not implemented,
+// the program will not compile.
 Logger& global_logger_raw();
 
 
