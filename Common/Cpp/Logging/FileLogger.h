@@ -31,7 +31,7 @@ struct FileLoggerConfig{
 };
 
 
-// A Qt-free file logger that:
+// A file logger that:
 // 1. Writes log messages to a file asynchronously via a background thread
 // 2. Supports log rotation when the file exceeds a configured size
 // 3. Notifies registered listeners when a log message is written (for UI integration)

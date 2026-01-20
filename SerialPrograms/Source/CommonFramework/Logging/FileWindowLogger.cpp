@@ -21,32 +21,17 @@ using std::endl;
 
 namespace PokemonAutomation{
 
-
-Logger& global_logger_raw(){
-    auto get_log_filepath = [&](){
-        QString application_name(QCoreApplication::applicationName());
-        if (application_name.size() == 0){
-            application_name = "SerialPrograms";
-        }
-        return USER_FILE_PATH() + (application_name + ".log").toStdString();
-    };
-
-    static FileWindowLogger logger(get_log_filepath(), LOG_HISTORY_LINES);
-    return logger;
+FileWindowLogger& global_file_window_logger(){
+    static FileWindowLogger file_winodw_logger;
+    return file_winodw_logger;
 }
-
 
 FileWindowLogger::~FileWindowLogger(){
     m_file_logger.remove_listener(*this);
 }
 
-FileWindowLogger::FileWindowLogger(const std::string& path, size_t max_queue_size)
-    : m_file_logger(FileLoggerConfig{
-        .file_path = path,
-        .max_queue_size = max_queue_size,
-        .max_file_size_bytes = 50 * 1024 * 1024,  // 50MB
-        .last_log_max_lines = max_queue_size,
-    })
+FileWindowLogger::FileWindowLogger()
+    : m_file_logger(dynamic_cast<FileLogger&>(global_logger_raw()))
 {
     m_file_logger.add_listener(*this);
 }
@@ -111,9 +96,9 @@ QString FileWindowLogger::to_window_str(const std::string& msg, Color color){
 }
 
 
-FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget* parent)
+FileWindowLoggerWindow::FileWindowLoggerWindow(QWidget* parent)
     : QMainWindow(parent)
-    , m_logger(logger)
+    , m_logger(global_file_window_logger())
 {
     if (objectName().isEmpty()){
         setObjectName(QString::fromUtf8("TextWindow"));

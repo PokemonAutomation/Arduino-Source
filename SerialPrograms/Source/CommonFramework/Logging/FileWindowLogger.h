@@ -19,6 +19,9 @@
 namespace PokemonAutomation{
 
 class FileWindowLoggerWindow;
+class FileWindowLogger;
+
+FileWindowLogger& global_file_window_logger();
 
 
 // A logger that writes to a file (via FileLogger) and can also display
@@ -33,7 +36,7 @@ public:
     // Construct a FileWindowLogger that writes to the given file path.
     // The max_queue_size parameter controls how many log messages can be
     // queued before the log() call blocks.
-    FileWindowLogger(const std::string& path, size_t max_queue_size);
+    FileWindowLogger();
 
     // Add/remove Qt windows that will display log messages.
     void operator+=(FileWindowLoggerWindow& widget);
@@ -53,7 +56,7 @@ private:
     static QString to_window_str(const std::string& msg, Color color);
 
 private:
-    FileLogger m_file_logger;
+    FileLogger& m_file_logger;
 
     std::mutex m_window_lock;
     std::set<FileWindowLoggerWindow*> m_windows;
@@ -66,7 +69,7 @@ class FileWindowLoggerWindow : public QMainWindow, public ConfigOption::Listener
     Q_OBJECT
 
 public:
-    FileWindowLoggerWindow(FileWindowLogger& logger, QWidget* parent = nullptr);
+    FileWindowLoggerWindow(QWidget* parent = nullptr);
     virtual ~FileWindowLoggerWindow();
 
     // Called by FileWindowLogger to display a log message.

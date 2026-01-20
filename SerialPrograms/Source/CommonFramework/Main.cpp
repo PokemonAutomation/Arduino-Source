@@ -55,6 +55,10 @@ void set_working_directory(){
 int run_program(int argc, char *argv[]){
     QApplication application(argc, argv);
 
+    initialize_global_logger(FileLoggerConfig{
+        .file_path = USER_FILE_PATH() + QCoreApplication::applicationName().toStdString() + ".log",
+    });
+
     GlobalOutputRedirector redirect_stdout(std::cout, "stdout", Color());
     GlobalOutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
 

@@ -209,7 +209,7 @@ MainWindow::MainWindow(QWidget* parent)
         );
     }
     {
-        m_output_window.reset(new FileWindowLoggerWindow((FileWindowLogger&)global_logger_raw()));
+        m_output_window.reset(new FileWindowLoggerWindow);
         QPushButton* output = new QPushButton("Output Window", support_box);
         buttons->addWidget(output);
         connect(
