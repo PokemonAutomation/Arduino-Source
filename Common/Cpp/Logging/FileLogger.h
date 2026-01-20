@@ -11,11 +11,11 @@
 #define PokemonAutomation_Logging_FileLogger_H
 
 #include <deque>
-#include <fstream>
 #include <mutex>
 #include <condition_variable>
 #include "AbstractLogger.h"
 #include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/FileIO.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "LastLogTracker.h"
 
@@ -92,8 +92,7 @@ private:
 
 private:
     FileLoggerConfig m_config;
-    std::ofstream m_file;
-    std::string m_current_file_size_approx;  // Approximate file size for rotation check
+    FileIO m_file;
 
     mutable std::mutex m_lock;
     std::condition_variable m_cv;

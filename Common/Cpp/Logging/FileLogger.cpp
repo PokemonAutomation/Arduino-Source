@@ -28,7 +28,7 @@ FileLogger::FileLogger(FileLoggerConfig config)
 {
     Filesystem::Path file_path(m_config.file_path);
     bool exists = Filesystem::exists(file_path);
-    m_file.open(file_path.stdpath(), std::ios::out | std::ios::app | std::ios::binary);
+    m_file.open(file_path, FileMode::APPEND | FileMode::BINARY);
 
     if (!exists && m_file.is_open()){
         // Write UTF-8 BOM to new files
@@ -119,7 +119,7 @@ void FileLogger::internal_log(const std::string& msg, Color color){
     // Write to file
     if (m_file.is_open()){
         std::string file_str = to_file_str(line);
-        m_file.write(file_str.c_str(), file_str.size());
+        m_file.write(file_str);
         // Flush every time so if the program crashes we will still have the latest log in the log file
         m_file.flush();
     }
@@ -190,7 +190,7 @@ void FileLogger::rotate_log_file(){
 
     // Re-open the file (creates a new, empty file)
     bool exists = Filesystem::exists(file_path);
-    m_file.open(file_path.stdpath(), std::ios::out | std::ios::app | std::ios::binary);
+    m_file.open(file_path, FileMode::APPEND | FileMode::BINARY);
     if (!exists && m_file.is_open()){
         const char bom[] = "\xef\xbb\xbf";
         m_file.write(bom, 3);
