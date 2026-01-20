@@ -143,7 +143,12 @@ private:
             clear_error = "ClearCommError error flag = " + std::to_string(comm_error);
         }
 
-        serial_debug_log(clear_error);
+        if (consecutive_errors <= 10){
+            serial_debug_log(message);
+        }
+        if (consecutive_errors == 10){
+            serial_debug_log("Further error messages will be suppressed.");
+        }
         if (consecutive_errors >= 100 && allow_throw){
             throw ConnectionException(nullptr, "Serial Connection failed.");
         }

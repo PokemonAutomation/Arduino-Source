@@ -253,6 +253,7 @@ private:
                 // Read error occurred
                 int error = errno;
                 process_error("read serial POSIX() failed. Error = " + std::to_string(error), false);
+                usleep(1000);
             }
             // actual == 0: timeout, no data received - just loop again to check m_exit
         }
