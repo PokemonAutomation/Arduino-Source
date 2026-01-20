@@ -7,6 +7,7 @@
 #include <QCoreApplication>
 #include <QMenuBar>
 #include <QDir>
+#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Windows/DpiScaler.h"
@@ -21,56 +22,14 @@ using std::endl;
 
 namespace PokemonAutomation{
 
-FileWindowLogger& global_file_window_logger(){
-    static FileWindowLogger file_winodw_logger;
-    return file_winodw_logger;
-}
 
-FileWindowLogger::~FileWindowLogger(){
-    m_file_logger.remove_listener(*this);
-}
-
-FileWindowLogger::FileWindowLogger()
-    : m_file_logger(dynamic_cast<FileLogger&>(global_logger_raw()))
-{
-    m_file_logger.add_listener(*this);
-}
-
-void FileWindowLogger::operator+=(FileWindowLoggerWindow& widget){
-    std::lock_guard<std::mutex> lg(m_window_lock);
-    m_windows.insert(&widget);
-}
-
-void FileWindowLogger::operator-=(FileWindowLoggerWindow& widget){
-    std::lock_guard<std::mutex> lg(m_window_lock);
-    m_windows.erase(&widget);
-}
-
-void FileWindowLogger::log(const std::string& msg, Color color){
-    m_file_logger.log(msg, color);
-}
-
-void FileWindowLogger::log(std::string&& msg, Color color){
-    m_file_logger.log(std::move(msg), color);
-}
-
-std::vector<std::string> FileWindowLogger::get_last() const{
-    return m_file_logger.get_last();
-}
-
-void FileWindowLogger::on_log(const std::string& msg, Color color){
+void FileWindowLoggerWindow::on_log(const std::string& msg, Color color){
     // This is called from FileLogger's background thread.
     // Format the message for Qt display and send to all windows.
-    std::lock_guard<std::mutex> lg(m_window_lock);
-    if (!m_windows.empty()){
-        QString str = to_window_str(msg, color);
-        for (FileWindowLoggerWindow* window : m_windows){
-            window->log(str);
-        }
-    }
+    emit signal_log(to_window_str(msg, color));
 }
 
-QString FileWindowLogger::to_window_str(const std::string& msg, Color color){
+QString FileWindowLoggerWindow::to_window_str(const std::string& msg, Color color){
     // Convert message to HTML for display in QTextEdit.
     // Replace spaces with &nbsp; and newlines with <br>.
     std::string str;
@@ -98,8 +57,9 @@ QString FileWindowLogger::to_window_str(const std::string& msg, Color color){
 
 FileWindowLoggerWindow::FileWindowLoggerWindow(QWidget* parent)
     : QMainWindow(parent)
-    , m_logger(global_file_window_logger())
+    , m_logger(dynamic_cast<FileLogger&>(global_logger_raw()))
 {
+    m_logger.add_listener(*this);
     if (objectName().isEmpty()){
         setObjectName(QString::fromUtf8("TextWindow"));
     }
@@ -134,7 +94,6 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(QWidget* parent)
     GlobalSettings::instance().LOG_WINDOW_SIZE->X_POS.add_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS.add_listener(*this);
 
-    m_logger += *this;
     log("================================================================================");
     log("<b>Window Startup...</b>");
     log("Current path: " + QDir::currentPath());
@@ -146,7 +105,7 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(QWidget* parent)
 
 FileWindowLoggerWindow::~FileWindowLoggerWindow(){
     remove_window(*this);
-    m_logger -= *this;
+    m_logger.remove_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->WIDTH.remove_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->HEIGHT.remove_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->X_POS.remove_listener(*this);
