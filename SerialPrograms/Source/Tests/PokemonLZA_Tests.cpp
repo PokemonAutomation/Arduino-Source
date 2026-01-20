@@ -834,6 +834,7 @@ int test_pokemonLZA_DonutBerriesReader(const std::string& filepath){
     Filesystem::Path target_berries_path = parent_dir / ("_" + base_name + ".txt");
     std::vector<std::string> target_berries;
     if (load_slug_list(target_berries_path.string(), target_berries) == false){
+        cerr << "Cannot load slug list from " << target_berries_path << endl;
         return 1;
     }
     if (target_berries.size() != DonutBerriesReader::BERRY_PAGE_LINES){
