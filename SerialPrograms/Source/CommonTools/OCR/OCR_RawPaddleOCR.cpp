@@ -4,21 +4,11 @@
  *
  */
 
-#include <memory>
-#include <deque>
-#include <QFile>
-#include <QDir>
 #include "ML/Inference/ML_PaddleOCRPipeline.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "CommonFramework/Globals.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "OCR_RawOCR.h"
-
-#include <iostream>
-using std::cout;
-using std::endl;
 
 namespace PokemonAutomation{
 namespace OCR{
