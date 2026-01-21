@@ -9,10 +9,9 @@
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
-#include "CommonTools/ImageMatch/ImageCropper.h"
-#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/OCR/OCR_SmallDictionaryMatcher.h"
@@ -112,7 +111,10 @@ int FlavorPowerIconDetector::detect(const ImageViewRGB32& screen){
         const bool prioritize_numeric_only_results = true;
         const size_t width_max = SIZE_MAX;
         const size_t min_digit_area = image_crop.height()*image_crop.height() / 10;
-        int number = OCR::read_number_waterfill_multifilter(m_logger, image_crop,
+        int number = OCR::read_number_waterfill_multifilter(
+            m_logger,
+            GlobalThreadPools::normal_inference(),
+            image_crop,
             {
                 {0xff000000, 0xff707070},
                 {0xff000000, 0xff808080},

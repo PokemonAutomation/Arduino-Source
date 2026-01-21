@@ -6,7 +6,6 @@
 
 #include <map>
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
@@ -142,6 +141,7 @@ int16_t ItemPrinterMaterialDetector::read_number(
     const size_t min_digit_area = 20;
     int16_t number = (int16_t)OCR::read_number_waterfill_multifilter(
         logger,
+        GlobalThreadPools::normal_inference(),
         cropped, filters,
         text_inside_range, prioritize_numeric_only_results,
         max_width,

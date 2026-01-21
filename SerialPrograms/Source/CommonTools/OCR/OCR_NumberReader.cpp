@@ -223,7 +223,9 @@ int read_number_waterfill(
 
 
 int read_number_waterfill_multifilter(
-    Logger& logger, const ImageViewRGB32& image,
+    Logger& logger,
+    ComputationThreadPool& thread_pool,
+    const ImageViewRGB32& image,
     std::vector<std::pair<uint32_t, uint32_t>> filters,    
     bool text_inside_range,
     bool prioritize_numeric_only_results, 
@@ -238,7 +240,7 @@ int read_number_waterfill_multifilter(
 
     SpinLock lock;
     std::map<int, uint8_t> candidates;
-    GlobalThreadPools::normal_inference().run_in_parallel(
+    thread_pool.run_in_parallel(
         [&](size_t index){
             std::pair<uint32_t, uint32_t> filter = filters[index];
 

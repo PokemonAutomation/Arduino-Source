@@ -7,9 +7,8 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Language.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonTools/Images/SolidColorTest.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/OCR/OCR_RawOCR.h"
 #include "PokemonLZA_HyperspaceCalorieDetector.h"
@@ -53,7 +52,9 @@ bool HyperspaceCalorieDetector::detect(const ImageViewRGB32& screen){
         {0xfff0f0f0, 0xffffffff},
     };
     int number = OCR::read_number_waterfill_multifilter(
-        m_logger, calorie_image_crop, filters,
+        m_logger,
+        GlobalThreadPools::realtime_inference(),
+        calorie_image_crop, filters,
         text_inside_range, prioritize_numeric_only_results, width_max, min_digit_area
     );
     if (number <= 0 || number > 9999){
