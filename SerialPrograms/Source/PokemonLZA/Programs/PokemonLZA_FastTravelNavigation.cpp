@@ -14,6 +14,51 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLZA{
+    
+
+const std::vector<ImageFloatBox>& FAST_TRAVEL_ARROW_BOXES(){
+    static const std::vector<ImageFloatBox> boxes = {
+        {0.014000, 0.242000, 0.033000, 0.066000},
+        {0.014000, 0.320000, 0.033000, 0.066000},
+        {0.014000, 0.398000, 0.033000, 0.066000},
+        {0.014000, 0.476000, 0.033000, 0.066000},
+        {0.014000, 0.554000, 0.033000, 0.066000},
+        {0.014000, 0.632000, 0.033000, 0.066000},
+        {0.014000, 0.710000, 0.033000, 0.066000}
+    };
+    return boxes;
+}
+
+const std::vector<ImageFloatBox>& FAST_TRAVEL_FILTER_ARROW_BOXES(){
+    static const std::vector<ImageFloatBox> boxes = {
+        {0.013000, 0.390000, 0.033000, 0.066000},
+        {0.013000, 0.463000, 0.033000, 0.066000},
+        {0.013000, 0.536000, 0.033000, 0.066000},
+        {0.013000, 0.608000, 0.033000, 0.066000},
+        {0.013000, 0.679000, 0.033000, 0.066000},
+        {0.013000, 0.752000, 0.033000, 0.066000}
+    };
+    return boxes;
+}
+
+int get_current_selector_index(
+    ConsoleHandle& console,
+    const std::vector<ImageFloatBox>& arrow_boxes
+){
+    const ImageViewRGB32& screen = console.video().snapshot();
+    for (size_t i = 0; i < arrow_boxes.size(); i++) {
+        SelectionArrowWatcher arrow(
+            COLOR_GREEN,
+            &console.overlay(),
+            SelectionArrowType::RIGHT,
+            arrow_boxes[i]
+        );
+        if (arrow.detect(screen)) {
+            return static_cast<int>(i);
+        }
+    }
+    return -1;
+}
 
 bool should_navigate_down(
     const LocationItem& current_selection,
@@ -64,23 +109,6 @@ bool navigate_to_destination_page_in_fast_travel_menu(
     return false;
 }
 
-int get_current_selector_index(
-    ConsoleHandle& console
-){
-    const ImageViewRGB32& screen = console.video().snapshot();
-    for (size_t i = 0; i < LocationNameReader::PAGE_SIZE; i++) {
-        SelectionArrowWatcher arrow(
-            COLOR_GREEN,
-            &console.overlay(),
-            SelectionArrowType::RIGHT,
-            {0.014000, 0.242000 + 0.078 * i, 0.033000, 0.066000}
-        );
-        if (arrow.detect(screen)) {
-            return static_cast<int>(i);
-        }
-    }
-    return -1;
-}
 
 int get_target_location_index_within_page(
     LocationItem& target_destination,
@@ -107,10 +135,11 @@ bool navigate_to_destination_within_page(
         if (target_index == -1){
             return false;
         }
-        int selector_index = get_current_selector_index(console);
+        int selector_index = get_current_selector_index(console, FAST_TRAVEL_ARROW_BOXES());
         if (selector_index == -1){
             return false;
         }
+        // The target location can move due to how the game scrolls the list
         if (selector_index == target_index){
             console.log("Found destination: " + target_destination.slug);
             return true;
@@ -148,6 +177,80 @@ bool navigate_to_destination_in_fast_travel_menu(
     return true;
 }
 
+bool set_fast_travel_menu_filter(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    FAST_TRAVEL_FILTER filter
+){
+    SelectionArrowWatcher first_filter_arrow(
+        COLOR_YELLOW,
+        &console.overlay(),
+        SelectionArrowType::RIGHT,
+        FAST_TRAVEL_FILTER_ARROW_BOXES().at(0)
+    );
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [&](ProControllerContext& context){
+            for(int i = 0; i < 4; i++){
+                pbf_mash_button(context, BUTTON_MINUS, 1000ms);
+            }
+        },
+        {first_filter_arrow}
+    );
+    switch (ret){
+    case 0:
+        console.log("Fast travel filter menu opened.");
+        break;
+    default:
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "set_fast_travel_menu_filter(): Unable to open fast travel filter menu.",
+            console
+        );
+    }
+
+    int target_filter_index = static_cast<int>(filter);
+    WallClock deadline = current_time() + 30s;
+    do {
+        int selected_filter_index = get_current_selector_index(console, FAST_TRAVEL_FILTER_ARROW_BOXES());
+        if (selected_filter_index == -1){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "set_fast_travel_menu_filter(): Unable to read current fast travel filter selection.",
+                console
+            );
+        }
+        if (selected_filter_index == target_filter_index){
+            SelectionArrowDetector selector_arrow_on_target(
+                COLOR_YELLOW,
+                &console.overlay(),
+                SelectionArrowType::RIGHT,
+                FAST_TRAVEL_FILTER_ARROW_BOXES().at(target_filter_index)
+            );
+            for (size_t i = 0; i < 4; i++){
+                pbf_press_button(context, BUTTON_A, 100ms, 1000ms);
+                context.wait_for_all_requests();
+                bool arrow_present = selector_arrow_on_target.detect(console.video().snapshot());
+                if (!arrow_present){
+                    console.log("Fast travel filter set.");
+                    return true;
+                }
+            }
+        }
+
+        int delta = target_filter_index - selected_filter_index;
+        for (; delta > 0; delta--){
+            pbf_press_dpad(context, DPAD_DOWN, 100ms, 200ms);
+        }
+        for (; delta < 0; delta--){
+            pbf_press_dpad(context, DPAD_UP, 100ms, 200ms);
+        }
+        context.wait_for_all_requests();
+    } while (current_time() < deadline);
+    console.log("Timeout setting fast travel filter.");
+    return false;
+}
+
 std::vector<LocationItem> read_current_page_location_items(ConsoleHandle& console, Language language){
     std::vector<LocationItem> locations(LocationNameReader::PAGE_SIZE);
     LocationNameReader location_name_reader;
@@ -169,7 +272,7 @@ std::vector<LocationItem> read_current_page_location_items(ConsoleHandle& consol
     return locations;
 }
 
-FastTravelState open_map_and_fly_to(ConsoleHandle& console, ProControllerContext& context, Language language, Location location, bool zoom_to_max){
+FastTravelState open_map_and_fly_to(ConsoleHandle& console, ProControllerContext& context, Language language, Location location, bool zoom_to_max, bool clear_filters){
     bool can_fast_travel = open_map(console, context, zoom_to_max, true);
     if (!can_fast_travel){
         return FastTravelState::PURSUED;
@@ -178,6 +281,17 @@ FastTravelState open_map_and_fly_to(ConsoleHandle& console, ProControllerContext
     // TODO: Add a watcher to detect the filter menu
     pbf_press_button(context, BUTTON_Y, 160ms, 1000ms);
     context.wait_for_all_requests();
+
+    if (clear_filters){
+        bool filters_cleared = set_fast_travel_menu_filter(console, context, FAST_TRAVEL_FILTER::ALL_TRAVEL_SPOTS);
+        if (!filters_cleared){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "open_map_and_fly_to(): Unable to clear fast travel filters.",
+                console
+            );
+        }
+    }
 
     LocationItem location_item = get_location_item_from_enum(location);
     std::string target_slug = location_item.slug;

@@ -85,6 +85,14 @@ enum class Location{
     HYPERSPACE_ENTRY_POINT
 };
 
+enum class FAST_TRAVEL_FILTER{
+    ALL_TRAVEL_SPOTS,
+    FACILITIES,
+    POKEMON_CENTERS,
+    CAFES,
+    ZONES
+};
+
 struct LocationItem{
     Location location;
     std::string slug;
