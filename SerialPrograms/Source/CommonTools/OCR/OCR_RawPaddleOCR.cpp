@@ -65,7 +65,7 @@ LanguageGroup language_to_languagegroup(Language language){
 //   ocr_pool_lock protects the map 
 struct PaddleOcrGlobals{
     SpinLock ocr_pool_lock;                       // Protects ocr_pool map.
-    std::map<LanguageGroup, std::shared_ptr<ML::PaddleOCRPipeline>> ocr_pool;   // One instance per language.
+    std::map<LanguageGroup, ML::PaddleOCRPipeline> ocr_pool;   // One instance per language.
 
     static PaddleOcrGlobals& instance(){
         static PaddleOcrGlobals globals;
@@ -73,7 +73,7 @@ struct PaddleOcrGlobals{
     }
 };
 
-std::shared_ptr<ML::PaddleOCRPipeline> ensure_paddle_ocr_instance(Language language){
+ML::PaddleOCRPipeline& ensure_paddle_ocr_instance(Language language){
     if (language == Language::None){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to call OCR without a language.");
     }
@@ -81,10 +81,10 @@ std::shared_ptr<ML::PaddleOCRPipeline> ensure_paddle_ocr_instance(Language langu
     LanguageGroup language_group = language_to_languagegroup(language);
 
     PaddleOcrGlobals& globals = PaddleOcrGlobals::instance();
-    std::map<LanguageGroup, std::shared_ptr<ML::PaddleOCRPipeline>>& ocr_pool = globals.ocr_pool;
+    std::map<LanguageGroup, ML::PaddleOCRPipeline>& ocr_pool = globals.ocr_pool;
 
     // Get or create the Paddle instance for this language.
-    std::map<LanguageGroup, std::shared_ptr<ML::PaddleOCRPipeline>>::iterator iter;
+    std::map<LanguageGroup, ML::PaddleOCRPipeline>::iterator iter;
     {
         WriteSpinLock lg(globals.ocr_pool_lock, "ensure_paddle_ocr_instances()");
         // std::lock_guard<std::mutex> lg(globals.ocr_pool_lock);
@@ -92,7 +92,7 @@ std::shared_ptr<ML::PaddleOCRPipeline> ensure_paddle_ocr_instance(Language langu
         if (iter == ocr_pool.end()){
             // This is creating a Paddle instance while under a lock; it isn't ideal if we need to run OCR on different languages at the same time. 
             // In practice, however, this doesn't really happen in our code base.
-            iter = ocr_pool.try_emplace(language_group, std::make_shared<ML::PaddleOCRPipeline>(language)).first;
+            iter = ocr_pool.try_emplace(language_group, language).first;
         }
     }
 
@@ -104,11 +104,11 @@ std::string paddle_ocr_read(Language language, const ImageViewRGB32& image){
 //    static size_t c = 0;
 //    image.save("ocr-" + std::to_string(c++) + ".png");
 
-    std::shared_ptr<ML::PaddleOCRPipeline> paddle_instance = ensure_paddle_ocr_instance(language);
+    ML::PaddleOCRPipeline& paddle_instance = ensure_paddle_ocr_instance(language);
     
     // Run inference with the paddle model. 
     // PaddleOCR with Onnx is threadsafe, so a single instance can be called by multiple threads.
-    std::string ret = paddle_instance->recognize(image);
+    std::string ret = paddle_instance.recognize(image);
 
 //    global_logger_tagged().log(ret);
 
@@ -120,7 +120,7 @@ std::string paddle_ocr_read(Language language, const ImageViewRGB32& image){
 
 void clear_paddle_ocr_cache(){
     PaddleOcrGlobals& globals = PaddleOcrGlobals::instance();
-    std::map<LanguageGroup, std::shared_ptr<ML::PaddleOCRPipeline>>& ocr_pool = globals.ocr_pool;
+    std::map<LanguageGroup, ML::PaddleOCRPipeline>& ocr_pool = globals.ocr_pool;
     WriteSpinLock lg(globals.ocr_pool_lock, "clear_paddle_ocr_cache()");
     // std::lock_guard<std::mutex> lg(globals.ocr_pool_lock);
     ocr_pool.clear();  // Destroys all pools and their instances.
