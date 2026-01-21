@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Pokemon_LocationNameReader_H
 #define PokemonAutomation_Pokemon_LocationNameReader_H
 
+#include <array>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/OCR/OCR_SmallDictionaryMatcher.h"
 #include "CommonTools/VisualDetector.h"
