@@ -10,7 +10,7 @@
 #include <mutex>
 #include <condition_variable>
 #include "Common/Cpp/Time.h"
-#include "Common/Cpp/Logging/AbstractLogger.h"
+#include "Common/Cpp/Logging/TaggedLogger.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "Common/PABotBase2/PABotBase2_PacketSender.h"
 #include "Common/PABotBase2/PABotBase2_PacketParser.h"
@@ -36,6 +36,7 @@ public:
     virtual size_t send(const void* data, size_t bytes) override;
 
     bool send_request(uint8_t opcode);
+//    void verify_version();
 
 
 private:

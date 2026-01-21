@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/PrettyPrint.h"
 #include "PABotBase2_MessageDumper.h"
 
 namespace PokemonAutomation{
@@ -21,20 +22,25 @@ std::string tostr(const pabb2_PacketHeader* header){
         str += std::to_string(header->seqnum);
         return str;
 
-    case PABB2_CONNECTION_OPCODE_QUERY_VERSION:
-        str += "PABB2_CONNECTION_OPCODE_QUERY_VERSION: seqnum = ";
+    case PABB2_CONNECTION_OPCODE_ASK_VERSION:
+        str += "PABB2_CONNECTION_OPCODE_ASK_VERSION: seqnum = ";
         str += std::to_string(header->seqnum);
         return str;
-    case PABB2_CONNECTION_OPCODE_QUERY_PACKET_SIZE:
-        str += "PABB2_CONNECTION_OPCODE_QUERY_PACKET_SIZE: seqnum = ";
+    case PABB2_CONNECTION_OPCODE_RET_VERSION:
+        str += "PABB2_CONNECTION_OPCODE_RET_VERSION: seqnum = ";
+        str += std::to_string(header->seqnum);
+        str += ", version = " + std::to_string(((const pabb2_PacketHeader_Ack_u32*)header)->data);
+        return str;
+    case PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE:
+        str += "PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE: seqnum = ";
         str += std::to_string(header->seqnum);
         return str;
-    case PABB2_CONNECTION_OPCODE_QUERY_BUFFER_SLOTS:
-        str += "PABB2_CONNECTION_OPCODE_QUERY_BUFFER_SLOTS: seqnum = ";
+    case PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS:
+        str += "PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS: seqnum = ";
         str += std::to_string(header->seqnum);
         return str;
-    case PABB2_CONNECTION_OPCODE_QUERY_BUFFER_BYTES:
-        str += "PABB2_CONNECTION_OPCODE_QUERY_BUFFER_BYTES: seqnum = ";
+    case PABB2_CONNECTION_OPCODE_ASK_QUERY_BUFFER:
+        str += "PABB2_CONNECTION_OPCODE_ASK_QUERY_BUFFER: seqnum = ";
         str += std::to_string(header->seqnum);
         return str;
 
@@ -45,29 +51,29 @@ std::string tostr(const pabb2_PacketHeader* header){
         str += ", bytes = " + std::to_string(header->packet_bytes - sizeof(pabb2_PacketHeaderData) - sizeof(uint32_t));
         return str;
     case PABB2_CONNECTION_OPCODE_STREAM_REQUEST:
-        str += "PABB2_CONNECTION_OPCODE_STREAM_REQUEST: seqnum = ";
+        str += "PABB2_CONNECTION_OPCODE_RET_STREAM: seqnum = ";
         str += std::to_string(header->seqnum);
         str += ", offset = " + std::to_string(((const pabb2_PacketHeaderData*)header)->stream_offset);
         return str;
 
-    case PABB2_CONNECTION_OPCODE_ACK:
-        str += "PABB2_CONNECTION_OPCODE_ACK: seqnum = ";
+    case PABB2_CONNECTION_OPCODE_RET:
+        str += "PABB2_CONNECTION_OPCODE_RET: seqnum = ";
         str += std::to_string(header->seqnum);
         return str;
-    case PABB2_CONNECTION_OPCODE_ACK_u8:
-        str += "PABB2_CONNECTION_OPCODE_ACK_u8: seqnum = ";
+    case PABB2_CONNECTION_OPCODE_RET_u8:
+        str += "PABB2_CONNECTION_OPCODE_RET_u8: seqnum = ";
         str += std::to_string(header->seqnum);
-        str += ", offset = " + std::to_string(((const pabb2_PacketHeader_Ack_u8*)header)->data);
+        str += ", data = " + std::to_string(((const pabb2_PacketHeader_Ack_u8*)header)->data);
         return str;
-    case PABB2_CONNECTION_OPCODE_ACK_u16:
-        str += "PABB2_CONNECTION_OPCODE_ACK_u16: seqnum = ";
+    case PABB2_CONNECTION_OPCODE_RET_u16:
+        str += "PABB2_CONNECTION_OPCODE_RET_u16: seqnum = ";
         str += std::to_string(header->seqnum);
-        str += ", offset = " + std::to_string(((const pabb2_PacketHeader_Ack_u16*)header)->data);
+        str += ", data = " + std::to_string(((const pabb2_PacketHeader_Ack_u16*)header)->data);
         return str;
-    case PABB2_CONNECTION_OPCODE_ACK_u32:
-        str += "PABB2_CONNECTION_OPCODE_ACK_u32: seqnum = ";
+    case PABB2_CONNECTION_OPCODE_RET_u32:
+        str += "PABB2_CONNECTION_OPCODE_RET_u32: seqnum = ";
         str += std::to_string(header->seqnum);
-        str += ", offset = " + std::to_string(((const pabb2_PacketHeader_Ack_u32*)header)->data);
+        str += ", data = " + std::to_string(((const pabb2_PacketHeader_Ack_u32*)header)->data);
         return str;
 
     case PABB2_CONNECTION_OPCODE_INVALID_LENGTH:
@@ -87,7 +93,7 @@ std::string tostr(const pabb2_PacketHeader* header){
         str += std::to_string(header->seqnum);
         return str;
     }
-    return str;
+    return "Unknown opcode: 0x" + tostr_hex(header->opcode);
 }
 
 

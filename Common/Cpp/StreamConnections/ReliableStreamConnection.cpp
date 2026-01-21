@@ -49,6 +49,7 @@ void ReliableStreamConnection::stop(){
             return;
         }
         m_stopping = true;
+        m_error = "Connection has been closed.";
     }
     m_cv.notify_all();
     m_retransmit_thread.join();
@@ -77,6 +78,34 @@ bool ReliableStreamConnection::send_request(uint8_t opcode){
     return pabb2_PacketSender_send_packet(&m_reliable_sender, opcode, 0, nullptr);
 }
 
+#if 0
+void ReliableStreamConnection::verify_version(){
+    uint8_t seqnum;
+
+    std::unique_lock<std::mutex> lg(m_lock);
+    while (true){
+        if (!m_error.empty()){
+            throw ConnectionException(&m_logger, m_error);
+        }
+        pabb2_PacketHeader* packet = pabb2_PacketSender_reserve_packet(
+            &m_reliable_sender,
+            PABB2_CONNECTION_OPCODE_ASK_VERSION,
+            0
+        );
+        if (packet == NULL){
+            m_cv.wait(lg);
+            continue;
+        }
+
+        seqnum = packet->seqnum;
+        pabb2_PacketSender_commit_packet(&m_reliable_sender, packet);
+        break;
+    }
+
+
+}
+#endif
+
 
 void ReliableStreamConnection::send_ack(uint8_t seqnum){
     struct{
@@ -86,7 +115,7 @@ void ReliableStreamConnection::send_ack(uint8_t seqnum){
     packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
-    packet.header.opcode = PABB2_CONNECTION_OPCODE_ACK;
+    packet.header.opcode = PABB2_CONNECTION_OPCODE_RET;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
 
     std::lock_guard<std::mutex> lg(m_lock);
@@ -213,10 +242,34 @@ void ReliableStreamConnection::on_packet(const pabb2_PacketHeader* packet){
         );
         return;
     }
-    case PABB2_CONNECTION_OPCODE_ACK:
-    case PABB2_CONNECTION_OPCODE_ACK_u8:
-    case PABB2_CONNECTION_OPCODE_ACK_u16:
-    case PABB2_CONNECTION_OPCODE_ACK_u32:
+    case PABB2_CONNECTION_OPCODE_RET_VERSION:{
+        pabb2_PacketSender_remove(&m_reliable_sender, packet->seqnum);
+        m_logger.log(tostr(packet), COLOR_DARKGREEN);
+        if (packet->packet_bytes < sizeof(pabb2_PacketHeader_Ack_u32) + sizeof(uint32_t)){
+            m_logger.log(
+                "[ReliableStreamConnection]: Version response is too small: " + std::to_string(packet->packet_bytes),
+                COLOR_RED
+            );
+            return;
+        }
+        const pabb2_PacketHeader_Ack_u32* message = (const pabb2_PacketHeader_Ack_u32*)packet;
+        uint32_t major_version = message->data / 100;
+        uint32_t minor_version = message->data % 100;
+        if (major_version != PABB2_CONNECTION_PROTOCOL_VERSION / 100 ||
+            minor_version < PABB2_CONNECTION_PROTOCOL_VERSION % 100
+        ){
+            m_error = "Incompatible protocol. Device: " + std::to_string(message->data) +
+                "\nPlease flash the .hex/.bin that came with this version of the program.";
+            m_logger.log("[ReliableStreamConnection]: " + m_error, COLOR_RED);
+            return;
+        }
+        m_logger.log("[ReliableStreamConnection]: Protocol is compatible.", COLOR_BLUE);
+        return;
+    }
+    case PABB2_CONNECTION_OPCODE_RET:
+    case PABB2_CONNECTION_OPCODE_RET_u8:
+    case PABB2_CONNECTION_OPCODE_RET_u16:
+    case PABB2_CONNECTION_OPCODE_RET_u32:
 //        cout << "Received ack" << endl;
         pabb2_PacketSender_remove(&m_reliable_sender, packet->seqnum);
         return;

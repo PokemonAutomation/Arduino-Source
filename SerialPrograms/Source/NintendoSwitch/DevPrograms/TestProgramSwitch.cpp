@@ -414,7 +414,7 @@ public:
         response.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
         response.header.seqnum = packet->seqnum;
         response.header.packet_bytes = sizeof(response);
-        response.header.opcode = PABB2_CONNECTION_OPCODE_ACK;
+        response.header.opcode = PABB2_CONNECTION_OPCODE_RET;
         pabb_crc32_write_to_message(&response, sizeof(response));
 
         std::lock_guard<std::mutex> lg(m_lock);
@@ -525,7 +525,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         );
 
 
-        connection.send_request(PABB2_CONNECTION_OPCODE_QUERY_VERSION);
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_VERSION);
 
 
         context.wait_for(60s);

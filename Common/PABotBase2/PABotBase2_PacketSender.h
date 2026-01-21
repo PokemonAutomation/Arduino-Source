@@ -142,7 +142,7 @@ void pabb2_PacketSender_send_info(pabb2_PacketSender* self, uint8_t seqnum, uint
 void pabb2_PacketSender_send_ack(pabb2_PacketSender* self, uint8_t seqnum);
 void pabb2_PacketSender_send_ack_u8(pabb2_PacketSender* self, uint8_t seqnum, uint8_t data);
 void pabb2_PacketSender_send_ack_u16(pabb2_PacketSender* self, uint8_t seqnum, uint16_t data);
-void pabb2_PacketSender_send_ack_u32(pabb2_PacketSender* self, uint8_t seqnum, uint32_t data);
+void pabb2_PacketSender_send_ack_u32(pabb2_PacketSender* self, uint8_t seqnum, uint8_t opcode, uint32_t data);
 
 
 

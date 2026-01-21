@@ -330,7 +330,7 @@ void pabb2_PacketSender_send_ack(pabb2_PacketSender* self, uint8_t seqnum){
     packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
-    packet.header.opcode = PABB2_CONNECTION_OPCODE_ACK;
+    packet.header.opcode = PABB2_CONNECTION_OPCODE_RET;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet));
 }
@@ -342,7 +342,7 @@ void pabb2_PacketSender_send_ack_u8(pabb2_PacketSender* self, uint8_t seqnum, ui
     packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
-    packet.header.opcode = PABB2_CONNECTION_OPCODE_ACK_u8;
+    packet.header.opcode = PABB2_CONNECTION_OPCODE_RET_u8;
     packet.header.data = data;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet));
@@ -355,12 +355,12 @@ void pabb2_PacketSender_send_ack_u16(pabb2_PacketSender* self, uint8_t seqnum, u
     packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
-    packet.header.opcode = PABB2_CONNECTION_OPCODE_ACK_u16;
+    packet.header.opcode = PABB2_CONNECTION_OPCODE_RET_u16;
     packet.header.data = data;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet));
 }
-void pabb2_PacketSender_send_ack_u32(pabb2_PacketSender* self, uint8_t seqnum, uint32_t data){
+void pabb2_PacketSender_send_ack_u32(pabb2_PacketSender* self, uint8_t seqnum, uint8_t opcode, uint32_t data){
     struct{
         pabb2_PacketHeader_Ack_u32 header;
         uint8_t crc32[sizeof(uint32_t)];
@@ -368,7 +368,7 @@ void pabb2_PacketSender_send_ack_u32(pabb2_PacketSender* self, uint8_t seqnum, u
     packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
-    packet.header.opcode = PABB2_CONNECTION_OPCODE_ACK_u32;
+    packet.header.opcode = opcode;
     packet.header.data = data;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet));
