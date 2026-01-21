@@ -10,6 +10,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "PokemonLZA_BasicNavigation.h"
+#include "PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h"
 #include "PokemonLZA/Inference/Map/PokemonLZA_LocationNameReader.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
@@ -82,13 +83,21 @@ bool navigate_to_destination_in_fast_travel_menu(
     LocationItem& target_destination
 );
 
-// Set the fast travel menu filter to the specified option
+// From the fast travel menu, set the fast travel menu filter to the specified option
 // Return true if the filter is set successfully
 // Return false if unable to set the filter
 bool set_fast_travel_menu_filter(
     ConsoleHandle& console,
     ProControllerContext& context,
     FAST_TRAVEL_FILTER filter
+);
+
+// From the map screen, open the fast travel menu
+// Return true if the fast travel menu is opened successfully
+// Return false if unable to open the fast travel menu
+bool open_fast_travel_menu(
+    ConsoleHandle& console,
+    ProControllerContext& context
 );
 
 // With the fast travel menu opened, read all visible locations in the menu
