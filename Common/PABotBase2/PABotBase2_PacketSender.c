@@ -15,8 +15,10 @@
 void pabb2_PacketSender_init(
     pabb2_PacketSender* self,
     void* unreliable_sender_context,
-    pabb2_fp_StreamSend unreliable_sender_send
+    pabb2_fp_StreamSend unreliable_sender_send,
+    uint8_t max_packet_size
 ){
+    self->max_packet_size = max_packet_size;
     self->slot_head = 0;
     self->slot_tail = 0;
     self->retransmit_seqnum = 0;
@@ -210,8 +212,10 @@ size_t pabb2_PacketSender_send_stream(
         }
 
         //  256 will overflow to 0 which is explicitly supported.
-        if (capacity > 256){
-            capacity = 256;
+        size_t max_packet_size = (uint8_t)(self->max_packet_size - 1);
+        max_packet_size++;
+        if (capacity > max_packet_size){
+            capacity = max_packet_size;
         }
 
         size_t current = bytes;
@@ -334,7 +338,7 @@ void pabb2_PacketSender_send_ack(pabb2_PacketSender* self, uint8_t seqnum){
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet));
 }
-void pabb2_PacketSender_send_ack_u8(pabb2_PacketSender* self, uint8_t seqnum, uint8_t data){
+void pabb2_PacketSender_send_ack_u8(pabb2_PacketSender* self, uint8_t seqnum, uint8_t opcode, uint8_t data){
     struct{
         pabb2_PacketHeader_Ack_u8 header;
         uint8_t crc32[sizeof(uint32_t)];
@@ -342,12 +346,12 @@ void pabb2_PacketSender_send_ack_u8(pabb2_PacketSender* self, uint8_t seqnum, ui
     packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
-    packet.header.opcode = PABB2_CONNECTION_OPCODE_RET_u8;
+    packet.header.opcode = opcode;
     packet.header.data = data;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet));
 }
-void pabb2_PacketSender_send_ack_u16(pabb2_PacketSender* self, uint8_t seqnum, uint16_t data){
+void pabb2_PacketSender_send_ack_u16(pabb2_PacketSender* self, uint8_t seqnum, uint8_t opcode, uint16_t data){
     struct{
         pabb2_PacketHeader_Ack_u16 header;
         uint8_t crc32[sizeof(uint32_t)];
@@ -355,7 +359,7 @@ void pabb2_PacketSender_send_ack_u16(pabb2_PacketSender* self, uint8_t seqnum, u
     packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
-    packet.header.opcode = PABB2_CONNECTION_OPCODE_RET_u16;
+    packet.header.opcode = opcode;
     packet.header.data = data;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet));

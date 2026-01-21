@@ -18,7 +18,12 @@ void pabb2_ReliableStreamConnection_init(
     self->unreliable_send = unreliable_send;
     self->unreliable_recv = unreliable_recv;
 
-    pabb2_PacketSender_init(&self->reliable_sender, unreliable_connection, unreliable_send);
+    pabb2_PacketSender_init(
+        &self->reliable_sender,
+        unreliable_connection,
+        unreliable_send,
+        PABB2_MAX_INCOMING_PACKET_SIZE
+    );
     pabb2_PacketParser_init(&self->parser);
     pabb2_StreamCoalescer_init(&self->stream_coalescer);
 }
@@ -72,20 +77,23 @@ void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* s
         pabb2_PacketSender_send_ack_u16(
             &self->reliable_sender,
             packet->seqnum,
+            PABB2_CONNECTION_OPCODE_RET_PACKET_SIZE,
             PABB2_MAX_INCOMING_PACKET_SIZE
         );
         return;
     case PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS:
-        pabb2_PacketSender_send_ack_u16(
+        pabb2_PacketSender_send_ack_u8(
             &self->reliable_sender,
             packet->seqnum,
+            PABB2_CONNECTION_OPCODE_RET_BUFFER_SLOTS,
             PABB2_StreamCoalescer_SLOTS
         );
         return;
-    case PABB2_CONNECTION_OPCODE_ASK_QUERY_BUFFER:
+    case PABB2_CONNECTION_OPCODE_ASK_BUFFER_BYTES:
         pabb2_PacketSender_send_ack_u16(
             &self->reliable_sender,
             packet->seqnum,
+            PABB2_CONNECTION_OPCODE_RET_BUFFER_BYTES,
             PABB2_StreamCoalescer_BUFFER_SIZE
         );
         return;

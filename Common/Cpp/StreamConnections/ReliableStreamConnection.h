@@ -35,7 +35,8 @@ public:
     //  Send stream data.
     virtual size_t send(const void* data, size_t bytes) override;
 
-    bool send_request(uint8_t opcode);
+    bool try_send_request(uint8_t opcode);
+    void send_request(uint8_t opcode);
 //    void verify_version();
 
 
@@ -58,6 +59,10 @@ private:
     }
     void on_packet(const pabb2_PacketHeader* packet);
 
+    void process_RET_VERSION(const pabb2_PacketHeader* packet);
+    void process_RET_PACKET_SIZE(const pabb2_PacketHeader* packet);
+    void process_RET_BUFFER_SLOTS(const pabb2_PacketHeader* packet);
+    void process_RET_BUFFER_BYTES(const pabb2_PacketHeader* packet);
 
 
 private:
@@ -70,6 +75,9 @@ private:
     pabb2_PacketSender m_reliable_sender;
     pabb2_PacketParser m_parser;
     pabb2_StreamCoalescer m_stream_coalescer;
+
+//    std::atomic<bool> m_version_verified;
+    uint8_t m_remote_slot_capacity;
 
     std::string m_error;
 

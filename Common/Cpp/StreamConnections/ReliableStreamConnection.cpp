@@ -5,7 +5,7 @@
  */
 
 #include "Common/CRC32/pabb_CRC32.h"
-#include "Common/Cpp/PrettyPrint.h"
+//#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/StreamConnections/PABotBase2_MessageDumper.h"
 #include "ReliableStreamConnection.h"
@@ -27,8 +27,15 @@ ReliableStreamConnection::ReliableStreamConnection(
     : m_logger(logger)
     , m_unreliable_connection(unreliable_connection)
     , m_retransmit_timeout(retransmit_timeout)
+//    , m_version_verified(false)
+    , m_remote_slot_capacity(1)
 {
-    pabb2_PacketSender_init(&m_reliable_sender, this, &ReliableStreamConnection::send_raw);
+    pabb2_PacketSender_init(
+        &m_reliable_sender,
+        this,
+        &ReliableStreamConnection::send_raw,
+        20
+    );
     pabb2_PacketParser_init(&m_parser);
     pabb2_StreamCoalescer_init(&m_stream_coalescer);
 
@@ -66,16 +73,36 @@ size_t ReliableStreamConnection::send(const void* data, size_t bytes){
     if (!m_error.empty()){
         throw ConnectionException(&m_logger, m_error);
     }
+    if (pabb2_PacketSender_slots_used(&m_reliable_sender) >= m_remote_slot_capacity){
+        return 0;
+    }
     return pabb2_PacketSender_send_stream(&m_reliable_sender, data, bytes);
 }
 
-bool ReliableStreamConnection::send_request(uint8_t opcode){
+bool ReliableStreamConnection::try_send_request(uint8_t opcode){
     std::lock_guard<std::mutex> lg(m_lock);
 //    cout << "Sending: " << tostr_hex(opcode) << endl;
     if (!m_error.empty()){
         throw ConnectionException(&m_logger, m_error);
     }
+    if (pabb2_PacketSender_slots_used(&m_reliable_sender) >= m_remote_slot_capacity){
+        return 0;
+    }
     return pabb2_PacketSender_send_packet(&m_reliable_sender, opcode, 0, nullptr);
+}
+void ReliableStreamConnection::send_request(uint8_t opcode){
+    std::unique_lock<std::mutex> lg(m_lock);
+    while (true){
+        if (!m_error.empty()){
+            throw ConnectionException(&m_logger, m_error);
+        }
+        if (pabb2_PacketSender_slots_used(&m_reliable_sender) < m_remote_slot_capacity &&
+            pabb2_PacketSender_send_packet(&m_reliable_sender, opcode, 0, nullptr)
+        ){
+            return;
+        }
+        m_cv.wait(lg);
+    }
 }
 
 #if 0
@@ -137,10 +164,10 @@ void ReliableStreamConnection::retransmit_thread(){
 
         m_cv.wait_until(lg, next_retransmit);
 
-        if (m_stopping){
+        if (m_stopping || !m_error.empty()){
             break;
         }
-        if (pabb2_PacketSender_size(&m_reliable_sender) == 0){
+        if (pabb2_PacketSender_slots_used(&m_reliable_sender) == 0){
             continue;
         }
         if (current_time() < next_retransmit){
@@ -172,6 +199,7 @@ void ReliableStreamConnection::on_recv(const void* data, size_t bytes){
         (const uint8_t*)data, bytes
     );
 }
+
 
 
 void ReliableStreamConnection::on_packet(const pabb2_PacketHeader* packet){
@@ -242,30 +270,15 @@ void ReliableStreamConnection::on_packet(const pabb2_PacketHeader* packet){
         );
         return;
     }
-    case PABB2_CONNECTION_OPCODE_RET_VERSION:{
-        pabb2_PacketSender_remove(&m_reliable_sender, packet->seqnum);
-        m_logger.log(tostr(packet), COLOR_DARKGREEN);
-        if (packet->packet_bytes < sizeof(pabb2_PacketHeader_Ack_u32) + sizeof(uint32_t)){
-            m_logger.log(
-                "[ReliableStreamConnection]: Version response is too small: " + std::to_string(packet->packet_bytes),
-                COLOR_RED
-            );
-            return;
-        }
-        const pabb2_PacketHeader_Ack_u32* message = (const pabb2_PacketHeader_Ack_u32*)packet;
-        uint32_t major_version = message->data / 100;
-        uint32_t minor_version = message->data % 100;
-        if (major_version != PABB2_CONNECTION_PROTOCOL_VERSION / 100 ||
-            minor_version < PABB2_CONNECTION_PROTOCOL_VERSION % 100
-        ){
-            m_error = "Incompatible protocol. Device: " + std::to_string(message->data) +
-                "\nPlease flash the .hex/.bin that came with this version of the program.";
-            m_logger.log("[ReliableStreamConnection]: " + m_error, COLOR_RED);
-            return;
-        }
-        m_logger.log("[ReliableStreamConnection]: Protocol is compatible.", COLOR_BLUE);
+    case PABB2_CONNECTION_OPCODE_RET_VERSION:
+        process_RET_VERSION(packet);
         return;
-    }
+    case PABB2_CONNECTION_OPCODE_RET_PACKET_SIZE:
+        process_RET_PACKET_SIZE(packet);
+        return;
+    case PABB2_CONNECTION_OPCODE_RET_BUFFER_SLOTS:
+        process_RET_BUFFER_SLOTS(packet);
+        return;
     case PABB2_CONNECTION_OPCODE_RET:
     case PABB2_CONNECTION_OPCODE_RET_u8:
     case PABB2_CONNECTION_OPCODE_RET_u16:
@@ -280,6 +293,81 @@ void ReliableStreamConnection::on_packet(const pabb2_PacketHeader* packet){
         );
         return;
     }
+}
+
+
+
+void ReliableStreamConnection::process_RET_VERSION(const pabb2_PacketHeader* packet){
+    m_logger.log(tostr(packet), COLOR_DARKGREEN);
+    do{
+        std::lock_guard<std::mutex> lg(m_lock);
+        if (packet->packet_bytes < sizeof(pabb2_PacketHeader_Ack_u32) + sizeof(uint32_t)){
+            m_error = "Version response is too small: " + std::to_string(packet->packet_bytes);
+            m_logger.log("[ReliableStreamConnection]: " + m_error, COLOR_RED);
+            break;
+        }
+
+        const pabb2_PacketHeader_Ack_u32* message = (const pabb2_PacketHeader_Ack_u32*)packet;
+        uint32_t major_version = message->data / 100;
+        uint32_t minor_version = message->data % 100;
+        if (major_version != PABB2_CONNECTION_PROTOCOL_VERSION / 100 ||
+            minor_version < PABB2_CONNECTION_PROTOCOL_VERSION % 100
+        ){
+            m_error = "Incompatible protocol. Remote: " + std::to_string(message->data);
+            m_logger.log("[ReliableStreamConnection]: " + m_error, COLOR_RED);
+            break;
+        }
+
+        m_logger.log("[ReliableStreamConnection]: Protocol is compatible.", COLOR_BLUE);
+        pabb2_PacketSender_remove(&m_reliable_sender, packet->seqnum);
+
+    }while (false);
+    m_cv.notify_all();
+}
+void ReliableStreamConnection::process_RET_PACKET_SIZE(const pabb2_PacketHeader* packet){
+    m_logger.log(tostr(packet), COLOR_DARKGREEN);
+    if (packet->packet_bytes < sizeof(pabb2_PacketHeader_Ack_u16) + sizeof(uint32_t)){
+        m_logger.log(
+            "[ReliableStreamConnection]: Packet size response is too small: " + std::to_string(packet->packet_bytes),
+            COLOR_RED
+        );
+        return;
+    }
+    const pabb2_PacketHeader_Ack_u16* message = (const pabb2_PacketHeader_Ack_u16*)packet;
+    m_logger.log(
+        "[ReliableStreamConnection]: Setting Packet Size to: " + std::to_string(message->data),
+        COLOR_BLUE
+    );
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        pabb2_PacketSender_remove(&m_reliable_sender, packet->seqnum);
+        m_reliable_sender.max_packet_size = (uint8_t)message->data;
+    }
+    m_cv.notify_all();
+}
+void ReliableStreamConnection::process_RET_BUFFER_SLOTS(const pabb2_PacketHeader* packet){
+    m_logger.log(tostr(packet), COLOR_DARKGREEN);
+    if (packet->packet_bytes < sizeof(pabb2_PacketHeader_Ack_u8) + sizeof(uint32_t)){
+        m_logger.log(
+            "[ReliableStreamConnection]: Buffer slot response is too small: " + std::to_string(packet->packet_bytes),
+            COLOR_RED
+        );
+        return;
+    }
+    const pabb2_PacketHeader_Ack_u8* message = (const pabb2_PacketHeader_Ack_u8*)packet;
+    m_logger.log(
+        "[ReliableStreamConnection]: Setting Buffer Slots to: " + std::to_string(message->data),
+        COLOR_BLUE
+    );
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        pabb2_PacketSender_remove(&m_reliable_sender, packet->seqnum);
+        m_remote_slot_capacity = std::min<uint8_t>(message->data, PABB2_ConnectionSender_SLOTS);
+    }
+    m_cv.notify_all();
+}
+void ReliableStreamConnection::process_RET_BUFFER_BYTES(const pabb2_PacketHeader* packet){
+
 }
 
 

@@ -524,8 +524,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
             10s
         );
 
-
         connection.send_request(PABB2_CONNECTION_OPCODE_ASK_VERSION);
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE);
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS);
 
 
         context.wait_for(60s);

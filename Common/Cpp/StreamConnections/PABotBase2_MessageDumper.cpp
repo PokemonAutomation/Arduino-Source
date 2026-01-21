@@ -31,17 +31,35 @@ std::string tostr(const pabb2_PacketHeader* header){
         str += std::to_string(header->seqnum);
         str += ", version = " + std::to_string(((const pabb2_PacketHeader_Ack_u32*)header)->data);
         return str;
+
     case PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE:
         str += "PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE: seqnum = ";
         str += std::to_string(header->seqnum);
         return str;
+    case PABB2_CONNECTION_OPCODE_RET_PACKET_SIZE:
+        str += "PABB2_CONNECTION_OPCODE_RET_PACKET_SIZE: seqnum = ";
+        str += std::to_string(header->seqnum);
+        str += ", bytes = " + std::to_string(((const pabb2_PacketHeader_Ack_u16*)header)->data);
+        return str;
+
     case PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS:
         str += "PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS: seqnum = ";
         str += std::to_string(header->seqnum);
         return str;
-    case PABB2_CONNECTION_OPCODE_ASK_QUERY_BUFFER:
-        str += "PABB2_CONNECTION_OPCODE_ASK_QUERY_BUFFER: seqnum = ";
+    case PABB2_CONNECTION_OPCODE_RET_BUFFER_SLOTS:
+        str += "PABB2_CONNECTION_OPCODE_RET_BUFFER_SLOTS: seqnum = ";
         str += std::to_string(header->seqnum);
+        str += ", slots = " + std::to_string(((const pabb2_PacketHeader_Ack_u8*)header)->data);
+        return str;
+
+    case PABB2_CONNECTION_OPCODE_ASK_BUFFER_BYTES:
+        str += "PABB2_CONNECTION_OPCODE_ASK_BUFFER_BYTES: seqnum = ";
+        str += std::to_string(header->seqnum);
+        return str;
+    case PABB2_CONNECTION_OPCODE_RET_BUFFER_BYTES:
+        str += "PABB2_CONNECTION_OPCODE_RET_BUFFER_BYTES: seqnum = ";
+        str += std::to_string(header->seqnum);
+        str += ", bytes = " + std::to_string(((const pabb2_PacketHeader_Ack_u16*)header)->data);
         return str;
 
     case PABB2_CONNECTION_OPCODE_STREAM_DATA:
