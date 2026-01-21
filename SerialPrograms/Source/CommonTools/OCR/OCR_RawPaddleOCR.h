@@ -21,13 +21,13 @@ namespace OCR{
 //  Pre-warm the PaddleOCR instance pool for a language. Ensure one instance exists.
 //  Avoids lazy initialization delays during runtime. Thread-safe.
 // returns a Paddle instance
-ML::PaddleOCRPipeline& ensure_paddle_ocr_instance(Language language);
+std::shared_ptr<ML::PaddleOCRPipeline> ensure_paddle_ocr_instance(Language language);
 
 //  OCR the image in the specified language.
 //  Main OCR entry point. Performs OCR on the image using the specified language.
 //  Thread-safe: internally uses a pool of PaddleOCR instances, able to accept
 //  multiple concurrent calls without delay or queueing.
-//  It creates a new PaddleOCR instance if no available idle instance. You can
+//  It creates one PaddleOCR instance for each language. You can
 //  call `ensure_instances()` to pre-warm to pool with a given number of instances.
 //
 std::string paddle_ocr_read(
