@@ -19,7 +19,6 @@
 #include "PokemonLZA/Inference/PokemonLZA_WeatherDetector.h"
 #include "PokemonLZA_ShinyHunt_HelioptileHunter.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
-#include "PokemonLZA/Programs/PokemonLZA_Locations.h"
 #include <cstddef>
 #include <string>
 

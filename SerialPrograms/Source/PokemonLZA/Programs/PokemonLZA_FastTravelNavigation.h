@@ -20,6 +20,21 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLZA{
 
+
+
+// The arrow box positions for fast travel menu items
+const std::vector<ImageFloatBox>& FAST_TRAVEL_ARROW_BOXES();
+
+// The arrow box positions for the fast travel menu filter
+const std::vector<ImageFloatBox>& FAST_TRAVEL_FILTER_ARROW_BOXES();
+
+// Get the index of the currently selected item in arrow_boxes using the SelectionArrowDetector
+// Return -1 if unable to determine the current selector index
+int get_current_selector_index(
+    ConsoleHandle& console,
+    const std::vector<ImageFloatBox>& arrow_boxes
+);
+
 // Determine whether it's better to navigate up or down in the fast travel menu
 bool should_navigate_down(
     const LocationItem& current_selection,
@@ -36,12 +51,6 @@ bool navigate_to_destination_page_in_fast_travel_menu(
     ProControllerContext& context,
     Language language,
     LocationItem& target_destination
-);
-
-// Get the index of the currently selected item using the SelectionArrowDetector
-// Return -1 if unable to determine the current selector index
-int get_current_selector_index(
-    ConsoleHandle& console
 );
 
 // Get the index of the target destination in the current page's location items
@@ -73,6 +82,15 @@ bool navigate_to_destination_in_fast_travel_menu(
     LocationItem& target_destination
 );
 
+// Set the fast travel menu filter to the specified option
+// Return true if the filter is set successfully
+// Return false if unable to set the filter
+bool set_fast_travel_menu_filter(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    FAST_TRAVEL_FILTER filter
+);
+
 // With the fast travel menu opened, read all visible locations in the menu
 // Use parallelized OCR to read the 7 items
 // Use the dictionary to get the information for each given display name
@@ -96,7 +114,8 @@ FastTravelState open_map_and_fly_to(
     ProControllerContext& context,
     Language language,
     Location location,
-    bool zoom_to_max = false
+    bool zoom_to_max = false,
+    bool clear_filters = false
 );
     
 }
