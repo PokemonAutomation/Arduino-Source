@@ -61,10 +61,8 @@ LanguageGroup language_to_languagegroup(Language language){
 }
 
 
-// Global singleton managing PaddlePools for all languages.
-// Two-level concurrency model:
-//   Level 1: ocr_pool_lock protects the map (language -> pool creation/lookup)
-//   Level 2: Each PaddlePool has its own m_lock (instance checkout/checkin)
+// Global singleton managing the single PaddleOCR instance for each language.
+//   ocr_pool_lock protects the map 
 struct PaddleOcrGlobals{
     SpinLock ocr_pool_lock;                       // Protects ocr_pool map.
     std::map<LanguageGroup, std::shared_ptr<ML::PaddleOCRPipeline>> ocr_pool;   // One instance per language.
