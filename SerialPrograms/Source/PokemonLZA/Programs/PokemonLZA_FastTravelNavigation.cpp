@@ -64,9 +64,9 @@ bool should_navigate_down(
     const LocationItem& current_selection,
     const LocationItem& target_destination
 ){
-    const uint8_t total_locations = LOCATION_ENUM_MAPPINGS().size();
-    uint8_t down_distance = (target_destination.index + total_locations - current_selection.index) % total_locations;
-    uint8_t up_distance = (current_selection.index + total_locations - target_destination.index) % total_locations;
+    const size_t total_locations = LOCATION_ENUM_MAPPINGS().size();
+    size_t down_distance = (target_destination.index + total_locations - current_selection.index) % total_locations;
+    size_t up_distance = (current_selection.index + total_locations - target_destination.index) % total_locations;
     return down_distance <= up_distance;
 }
 
@@ -76,10 +76,10 @@ bool navigate_to_destination_page_in_fast_travel_menu(
     Language language,
     LocationItem& target_destination
 ){
-    const uint8_t total_locations = LOCATION_ENUM_MAPPINGS().size();
-    const uint8_t max_pages_to_check = ((total_locations / LocationNameReader::PAGE_SIZE) + 1) * 2; // Loop through twice to be safe
+    const size_t total_locations = LOCATION_ENUM_MAPPINGS().size();
+    const size_t max_pages_to_check = ((total_locations / LocationNameReader::PAGE_SIZE) + 1) * 2; // Loop through twice to be safe
 
-    for (uint8_t page = 0; page < max_pages_to_check; page++){
+    for (size_t page = 0; page < max_pages_to_check; page++){
         LocationNameReader location_name_reader;
         std::vector<LocationItem> first_and_last_locations_on_page(2);
         GlobalThreadPools::normal_inference().run_in_parallel(
