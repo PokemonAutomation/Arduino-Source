@@ -251,6 +251,28 @@ bool set_fast_travel_menu_filter(
     return false;
 }
 
+bool open_fast_travel_menu(
+    ConsoleHandle& console,
+    ProControllerContext& context
+){
+    MapOverWatcher map_over(COLOR_RED, &console.overlay());
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [&](ProControllerContext& context){
+            pbf_press_button(context, BUTTON_Y, 160ms, 1000ms);
+        },
+        {map_over}
+    );
+    switch (ret){
+    case 0:
+        console.log("Fast travel menu opened.");
+        return true;
+    default:
+        console.log("Unable to open fast travel menu.");
+        return false;
+    }
+}
+
 std::vector<LocationItem> read_current_page_location_items(ConsoleHandle& console, Language language){
     std::vector<LocationItem> locations(LocationNameReader::PAGE_SIZE);
     LocationNameReader location_name_reader;
@@ -278,9 +300,14 @@ FastTravelState open_map_and_fly_to(ConsoleHandle& console, ProControllerContext
         return FastTravelState::PURSUED;
     }
 
-    // TODO: Add a watcher to detect the filter menu
-    pbf_press_button(context, BUTTON_Y, 160ms, 1000ms);
-    context.wait_for_all_requests();
+    bool fast_travel_menu_opened = open_fast_travel_menu(console, context);
+    if (!fast_travel_menu_opened){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "open_map_and_fly_to(): Unable to open fast travel menu.",
+            console
+        );
+    }
 
     if (clear_filters){
         bool filters_cleared = set_fast_travel_menu_filter(console, context, FAST_TRAVEL_FILTER::ALL_TRAVEL_SPOTS);
