@@ -66,7 +66,7 @@ LanguageGroup language_to_languagegroup(Language language){
 //   Level 1: ocr_pool_lock protects the map (language -> pool creation/lookup)
 //   Level 2: Each PaddlePool has its own m_lock (instance checkout/checkin)
 struct PaddleOcrGlobals{
-    std::mutex ocr_pool_lock;                       // Protects ocr_pool map.
+    SpinLock ocr_pool_lock;                       // Protects ocr_pool map.
     std::map<LanguageGroup, std::shared_ptr<ML::PaddleOCRPipeline>> ocr_pool;   // One instance per language.
 
     static PaddleOcrGlobals& instance(){
@@ -85,26 +85,15 @@ std::shared_ptr<ML::PaddleOCRPipeline> ensure_paddle_ocr_instance(Language langu
     PaddleOcrGlobals& globals = PaddleOcrGlobals::instance();
     std::map<LanguageGroup, std::shared_ptr<ML::PaddleOCRPipeline>>& ocr_pool = globals.ocr_pool;
 
-    // Check if a Paddle instance already exists for this language.
-    {
-        std::map<LanguageGroup, std::shared_ptr<ML::PaddleOCRPipeline>>::iterator iter;
-        // ReadSpinLock lg(globals.ocr_pool_lock, "ensure_paddle_ocr_instances(): lookup");
-        std::lock_guard<std::mutex> lg(globals.ocr_pool_lock);
-        iter = ocr_pool.find(language_group);
-        if (iter != ocr_pool.end()){
-            return iter->second;
-        }
-    }
-
-    // if Paddle instance didn't already exist, create a new one outside of the lock.
-    std::shared_ptr<ML::PaddleOCRPipeline> new_instance = std::make_shared<ML::PaddleOCRPipeline>(language);
-
+    // Get or create the Paddle instance for this language.
     std::map<LanguageGroup, std::shared_ptr<ML::PaddleOCRPipeline>>::iterator iter;
     {
-        // add to ocr_pool while under the lock
-        // WriteSpinLock lg(globals.ocr_pool_lock, "ensure_paddle_ocr_instances(): insertion");
-        std::lock_guard<std::mutex> lg(globals.ocr_pool_lock);
-        iter = ocr_pool.try_emplace(language_group, std::move(new_instance)).first;
+        WriteSpinLock lg(globals.ocr_pool_lock, "ensure_paddle_ocr_instances()");
+        // std::lock_guard<std::mutex> lg(globals.ocr_pool_lock);
+        iter = ocr_pool.find(language_group);
+        if (iter == ocr_pool.end()){
+            iter = ocr_pool.try_emplace(language_group, std::make_shared<ML::PaddleOCRPipeline>(language)).first;
+        }
     }
 
     return iter->second;
@@ -132,8 +121,8 @@ std::string paddle_ocr_read(Language language, const ImageViewRGB32& image){
 void clear_paddle_ocr_cache(){
     PaddleOcrGlobals& globals = PaddleOcrGlobals::instance();
     std::map<LanguageGroup, std::shared_ptr<ML::PaddleOCRPipeline>>& ocr_pool = globals.ocr_pool;
-    // WriteSpinLock lg(globals.ocr_pool_lock, "clear_paddle_ocr_cache()");
-    std::lock_guard<std::mutex> lg(globals.ocr_pool_lock);
+    WriteSpinLock lg(globals.ocr_pool_lock, "clear_paddle_ocr_cache()");
+    // std::lock_guard<std::mutex> lg(globals.ocr_pool_lock);
     ocr_pool.clear();  // Destroys all pools and their instances.
 }
 
