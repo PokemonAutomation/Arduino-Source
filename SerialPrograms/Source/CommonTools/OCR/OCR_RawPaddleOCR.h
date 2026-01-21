@@ -30,17 +30,17 @@ std::string paddle_ocr_read(
 );
 
 
-//  Pre-warm the PaddleOCR instance pool for a language by ensuring a minimum
-//  number of instances exist.
-//  Avoids lazy initialization delays during runtime. Thread-safe.
-//  Call this if you expect to need to do many OCR instances in parallel and you
-//  want to preload the OCR instances.
-void ensure_paddle_ocr_instances(Language language, size_t instances);
+// //  Pre-warm the PaddleOCR instance pool for a language by ensuring a minimum
+// //  number of instances exist.
+// //  Avoids lazy initialization delays during runtime. Thread-safe.
+// //  Call this if you expect to need to do many OCR instances in parallel and you
+// //  want to preload the OCR instances.
+// void ensure_paddle_ocr_instances(Language language, size_t instances);
 
-//  Clear all PaddleOCR instances for all languages. Used for cleanup or
-//  forcing re-initialization.
-//  This is not safe to call while in any OCR is still running!
-void clear_paddle_ocr_cache();
+// //  Clear all PaddleOCR instances for all languages. Used for cleanup or
+// //  forcing re-initialization.
+// //  This is not safe to call while in any OCR is still running!
+// void clear_paddle_ocr_cache();
 
 
 
