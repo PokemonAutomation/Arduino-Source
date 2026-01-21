@@ -92,6 +92,8 @@ std::shared_ptr<ML::PaddleOCRPipeline> ensure_paddle_ocr_instance(Language langu
         // std::lock_guard<std::mutex> lg(globals.ocr_pool_lock);
         iter = ocr_pool.find(language_group);
         if (iter == ocr_pool.end()){
+            // This is creating a Paddle instance while under a lock; it isn't ideal if we need to run OCR on different languages at the same time. 
+            // In practice, however, this doesn't really happen in our code base.
             iter = ocr_pool.try_emplace(language_group, std::make_shared<ML::PaddleOCRPipeline>(language)).first;
         }
     }
