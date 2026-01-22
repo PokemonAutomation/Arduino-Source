@@ -73,6 +73,7 @@ void pabb2_PacketSender_init(
     pabb2_fp_StreamSend unreliable_sender_send,
     uint8_t max_packet_size
 );
+void pabb2_PacketSender_reset(pabb2_PacketSender* self);
 
 inline uint8_t pabb2_PacketSender_slots_used(pabb2_PacketSender* self){
     return self->slot_tail - self->slot_head;
@@ -145,7 +146,7 @@ bool pabb2_PacketSender_iterate_retransmits(pabb2_PacketSender* self);
 //
 void pabb2_PacketSender_send_info(pabb2_PacketSender* self, uint8_t seqnum, uint8_t opcode);
 
-void pabb2_PacketSender_send_ack(pabb2_PacketSender* self, uint8_t seqnum);
+void pabb2_PacketSender_send_ack(pabb2_PacketSender* self, uint8_t seqnum, uint8_t opcode);
 void pabb2_PacketSender_send_ack_u8(pabb2_PacketSender* self, uint8_t seqnum, uint8_t opcode, uint8_t data);
 void pabb2_PacketSender_send_ack_u16(pabb2_PacketSender* self, uint8_t seqnum, uint8_t opcode, uint16_t data);
 void pabb2_PacketSender_send_ack_u32(pabb2_PacketSender* self, uint8_t seqnum, uint8_t opcode, uint32_t data);

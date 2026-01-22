@@ -36,6 +36,8 @@ typedef struct{
     uint16_t stream_head;
     uint16_t stream_tail;
 
+    bool stream_reset;
+
     //  0       =   Not received yet.
     //  0-254   =   Received stream packet. # is the size.
     //  255     =   Received non-stream packet.
@@ -48,6 +50,10 @@ typedef struct{
 
 
 void pabb2_StreamCoalescer_init(pabb2_StreamCoalescer* self);
+inline void pabb2_StreamCoalescer_reset(pabb2_StreamCoalescer* self){
+    pabb2_StreamCoalescer_init(self);
+    self->stream_reset = true;
+}
 
 void pabb2_StreamCoalescer_push_packet(pabb2_StreamCoalescer* self, uint8_t seqnum);
 
@@ -56,7 +62,9 @@ bool pabb2_StreamCoalescer_push_stream(pabb2_StreamCoalescer* self, const pabb2_
 
 //
 //  Read data from the stream.
+//
 //  Returns the # of bytes actually read.
+//  Returns (size_t)-1 if the stream has been reset.
 //  Returning less than "max_bytes" indicates the stream is out of usable data.
 //
 size_t pabb2_StreamCoalescer_read(pabb2_StreamCoalescer* self, void* data, size_t max_bytes);

@@ -43,7 +43,7 @@ public:
 private:
     //  Send
 
-    void send_ack(uint8_t seqnum);
+    void send_ack(uint8_t seqnum, uint8_t opcode);
 
     static size_t send_raw(void* context, const void* data, size_t bytes);
     void retransmit_thread();

@@ -59,7 +59,7 @@ void pabb2_PacketHeader_print(const pabb2_PacketHeader* packet, bool ascii){
     printf("\n");
 
     switch (packet->opcode){
-    case PABB2_CONNECTION_OPCODE_STREAM_DATA:{
+    case PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA:{
         const size_t OVERHEAD = sizeof(pabb2_PacketHeaderData) + sizeof(uint32_t);
         const pabb2_PacketHeaderData* stream_packet = (const pabb2_PacketHeaderData*)packet;
         if (packet_bytes < OVERHEAD){

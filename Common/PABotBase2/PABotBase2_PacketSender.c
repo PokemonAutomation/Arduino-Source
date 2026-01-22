@@ -19,15 +19,17 @@ void pabb2_PacketSender_init(
     uint8_t max_packet_size
 ){
     self->max_packet_size = max_packet_size;
+    self->unreliable_sender_context = unreliable_sender_context;
+    self->unreliable_sender_send = unreliable_sender_send;
+    pabb2_PacketSender_reset(self);
+}
+void pabb2_PacketSender_reset(pabb2_PacketSender* self){
     self->slot_head = 0;
     self->slot_tail = 0;
     self->retransmit_seqnum = 0;
-//    self->pending_stream = 0;
     self->stream_offset = 0;
     self->buffer_head = 0;
     self->buffer_tail = 0;
-    self->unreliable_sender_context = unreliable_sender_context;
-    self->unreliable_sender_send = unreliable_sender_send;
     memset(self->offsets, 0, sizeof(self->offsets));
 }
 
@@ -241,7 +243,7 @@ size_t pabb2_PacketSender_send_stream(
         packet->magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
         packet->seqnum = self->slot_tail++;
         packet->packet_bytes = (uint8_t)packet_bytes;  //  256 overflows to 0
-        packet->opcode = PABB2_CONNECTION_OPCODE_STREAM_DATA;
+        packet->opcode = PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA;
         memcpy(&packet->stream_offset, &self->stream_offset, sizeof(uint16_t));   //  May be misaligned.
 
         //  Copy stream data.
@@ -326,7 +328,7 @@ void pabb2_PacketSender_send_info(pabb2_PacketSender* self, uint8_t seqnum, uint
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet));
 }
-void pabb2_PacketSender_send_ack(pabb2_PacketSender* self, uint8_t seqnum){
+void pabb2_PacketSender_send_ack(pabb2_PacketSender* self, uint8_t seqnum, uint8_t opcode){
     struct{
         pabb2_PacketHeader header;
         uint8_t crc32[sizeof(uint32_t)];
@@ -334,7 +336,7 @@ void pabb2_PacketSender_send_ack(pabb2_PacketSender* self, uint8_t seqnum){
     packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
-    packet.header.opcode = PABB2_CONNECTION_OPCODE_RET;
+    packet.header.opcode = opcode;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet));
 }

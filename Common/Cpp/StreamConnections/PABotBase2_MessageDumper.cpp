@@ -17,8 +17,13 @@ std::string tostr(const pabb2_PacketHeader* header){
         str += "PABB2_CONNECTION_OPCODE_INVALID: seqnum = ";
         str += std::to_string(header->seqnum);
         return str;
-    case PABB2_CONNECTION_OPCODE_RESET:
-        str += "PABB2_CONNECTION_OPCODE_RESET: seqnum = ";
+
+    case PABB2_CONNECTION_OPCODE_ASK_RESET:
+        str += "PABB2_CONNECTION_OPCODE_ASK_RESET: seqnum = ";
+        str += std::to_string(header->seqnum);
+        return str;
+    case PABB2_CONNECTION_OPCODE_RET_RESET:
+        str += "PABB2_CONNECTION_OPCODE_RET_RESET: seqnum = ";
         str += std::to_string(header->seqnum);
         return str;
 
@@ -62,18 +67,19 @@ std::string tostr(const pabb2_PacketHeader* header){
         str += ", bytes = " + std::to_string(((const pabb2_PacketHeader_Ack_u16*)header)->data);
         return str;
 
-    case PABB2_CONNECTION_OPCODE_STREAM_DATA:
-        str += "PABB2_CONNECTION_OPCODE_STREAM_DATA: seqnum = ";
+    case PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA:
+        str += "PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA: seqnum = ";
         str += std::to_string(header->seqnum);
         str += ", offset = " + std::to_string(((const pabb2_PacketHeaderData*)header)->stream_offset);
         str += ", bytes = " + std::to_string(header->packet_bytes - sizeof(pabb2_PacketHeaderData) - sizeof(uint32_t));
         return str;
-    case PABB2_CONNECTION_OPCODE_STREAM_REQUEST:
+    case PABB2_CONNECTION_OPCODE_ASK_STREAM_REQUEST:
         str += "PABB2_CONNECTION_OPCODE_RET_STREAM: seqnum = ";
         str += std::to_string(header->seqnum);
         str += ", offset = " + std::to_string(((const pabb2_PacketHeaderData*)header)->stream_offset);
         return str;
 
+#if 0
     case PABB2_CONNECTION_OPCODE_RET:
         str += "PABB2_CONNECTION_OPCODE_RET: seqnum = ";
         str += std::to_string(header->seqnum);
@@ -93,6 +99,7 @@ std::string tostr(const pabb2_PacketHeader* header){
         str += std::to_string(header->seqnum);
         str += ", data = " + std::to_string(((const pabb2_PacketHeader_Ack_u32*)header)->data);
         return str;
+#endif
 
     case PABB2_CONNECTION_OPCODE_INVALID_LENGTH:
         str += "PABB2_CONNECTION_OPCODE_INVALID_LENGTH: seqnum = ";

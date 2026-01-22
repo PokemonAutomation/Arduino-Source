@@ -134,7 +134,7 @@ void ReliableStreamConnection::verify_version(){
 #endif
 
 
-void ReliableStreamConnection::send_ack(uint8_t seqnum){
+void ReliableStreamConnection::send_ack(uint8_t seqnum, uint8_t opcode){
     struct{
         pabb2_PacketHeader header;
         uint8_t crc[sizeof(uint32_t)];
@@ -142,7 +142,7 @@ void ReliableStreamConnection::send_ack(uint8_t seqnum){
     packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
-    packet.header.opcode = PABB2_CONNECTION_OPCODE_RET;
+    packet.header.opcode = opcode;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
 
     std::lock_guard<std::mutex> lg(m_lock);
@@ -232,7 +232,7 @@ void ReliableStreamConnection::on_packet(const pabb2_PacketHeader* packet){
     }
 
 
-    if (packet->opcode == PABB2_CONNECTION_OPCODE_STREAM_DATA){
+    if (packet->opcode == PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA){
         if (packet->packet_bytes < sizeof(pabb2_PacketHeaderData) + sizeof(uint32_t)){
             m_logger.log(
                 "[ReliableStreamConnection]: Received stream packet that is too small: " + std::to_string(packet->packet_bytes),
@@ -242,7 +242,7 @@ void ReliableStreamConnection::on_packet(const pabb2_PacketHeader* packet){
         }
         std::lock_guard<std::mutex> lg(m_lock);
         if (pabb2_StreamCoalescer_push_stream(&m_stream_coalescer, (const pabb2_PacketHeaderData*)packet)){
-            send_ack(packet->seqnum);
+            send_ack(packet->seqnum, PABB2_CONNECTION_OPCODE_RET_STREAM_DATA);
         }
         return;
     }
@@ -270,6 +270,9 @@ void ReliableStreamConnection::on_packet(const pabb2_PacketHeader* packet){
         );
         return;
     }
+    case PABB2_CONNECTION_OPCODE_RET_RESET:
+        pabb2_PacketSender_remove(&m_reliable_sender, packet->seqnum);
+        return;
     case PABB2_CONNECTION_OPCODE_RET_VERSION:
         process_RET_VERSION(packet);
         return;
@@ -279,6 +282,7 @@ void ReliableStreamConnection::on_packet(const pabb2_PacketHeader* packet){
     case PABB2_CONNECTION_OPCODE_RET_BUFFER_SLOTS:
         process_RET_BUFFER_SLOTS(packet);
         return;
+#if 0
     case PABB2_CONNECTION_OPCODE_RET:
     case PABB2_CONNECTION_OPCODE_RET_u8:
     case PABB2_CONNECTION_OPCODE_RET_u16:
@@ -286,6 +290,7 @@ void ReliableStreamConnection::on_packet(const pabb2_PacketHeader* packet){
 //        cout << "Received ack" << endl;
         pabb2_PacketSender_remove(&m_reliable_sender, packet->seqnum);
         return;
+#endif
     default:
         m_logger.log(
             "[ReliableStreamConnection]: UNKNOWN OPCODE: Device send an unknown opcode: " + std::to_string(packet->opcode),

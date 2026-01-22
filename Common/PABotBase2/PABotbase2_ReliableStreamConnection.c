@@ -65,6 +65,16 @@ void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* s
 
     //  Now handle the different opcodes.
     switch (packet->opcode){
+    case PABB2_CONNECTION_OPCODE_ASK_RESET:
+        pabb2_PacketSender_send_ack(
+            &self->reliable_sender,
+            packet->seqnum,
+            PABB2_CONNECTION_OPCODE_RET_RESET
+        );
+        pabb2_PacketSender_reset(&self->reliable_sender);
+        pabb2_PacketParser_reset(&self->parser);
+        pabb2_StreamCoalescer_reset(&self->stream_coalescer);
+        return;
     case PABB2_CONNECTION_OPCODE_ASK_VERSION:
         pabb2_PacketSender_send_ack_u32(
             &self->reliable_sender,
@@ -97,9 +107,13 @@ void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* s
             PABB2_StreamCoalescer_BUFFER_SIZE
         );
         return;
-    case PABB2_CONNECTION_OPCODE_STREAM_DATA:
+    case PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA:
         if (pabb2_StreamCoalescer_push_stream(&self->stream_coalescer, (const pabb2_PacketHeaderData*)packet)){
-            pabb2_PacketSender_send_ack(&self->reliable_sender, packet->seqnum);
+            pabb2_PacketSender_send_ack(
+                &self->reliable_sender,
+                packet->seqnum,
+                PABB2_CONNECTION_OPCODE_RET_STREAM_DATA
+            );
         }
         return;
     default:

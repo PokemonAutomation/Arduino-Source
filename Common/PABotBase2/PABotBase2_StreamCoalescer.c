@@ -15,6 +15,7 @@ void pabb2_StreamCoalescer_init(pabb2_StreamCoalescer* self){
     self->slot_tail = 0;
     self->stream_head = 0;
     self->stream_tail = 0;
+    self->stream_reset = false;
     memset(self->lengths, 0, sizeof(self->lengths));
 }
 
@@ -163,6 +164,11 @@ bool pabb2_StreamCoalescer_push_stream(pabb2_StreamCoalescer* self, const pabb2_
 }
 
 size_t pabb2_StreamCoalescer_read(pabb2_StreamCoalescer* self, void* data, size_t max_bytes){
+    if (self->stream_reset){
+        self->stream_reset = false;
+        return (size_t)-1;
+    }
+
     size_t read = 0;
 
     while (max_bytes > 0){
