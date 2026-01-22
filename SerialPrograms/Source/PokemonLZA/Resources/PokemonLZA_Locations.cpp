@@ -181,8 +181,8 @@ const std::vector<LocationItem>& LOCATION_ENUM_MAPPINGS(){
         {Location::WILD_ZONE_20_NO_DISTORTION,    "wild-zone-20",                   63},
         {Location::WILD_ZONE_20_WITH_DISTORTION,  "wild-zone-20",                   63},
         {Location::BATTLE_ZONE_1,                 "battle-zone-1",                  64},
-        {Location::BATTLE_ZONE_2,                 "battle-zone-2",                  64},
-        {Location::BATTLE_ZONE_3,                 "battle-zone-3",                  64},
+        {Location::BATTLE_ZONE_2,                 "battle-zone-2",                  65},
+        {Location::BATTLE_ZONE_3,                 "battle-zone-3",                  66},
         {Location::HYPERSPACE_ENTRY_POINT,        "hyperspace-entry-point",         0}, // Not a valid slug currently
     };
     return database;

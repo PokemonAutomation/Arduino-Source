@@ -96,18 +96,14 @@ bool navigate_to_destination_in_fast_travel_menu(
 );
 
 // From the fast travel menu, set the fast travel menu filter to the specified option
-// Return true if the filter is set successfully
-// Return false if unable to set the filter
-bool set_fast_travel_menu_filter(
+void set_fast_travel_menu_filter(
     ConsoleHandle& console,
     ProControllerContext& context,
     FAST_TRAVEL_FILTER filter
 );
 
 // From the map screen, open the fast travel menu
-// Return true if the fast travel menu is opened successfully
-// Return false if unable to open the fast travel menu
-bool open_fast_travel_menu(
+void open_fast_travel_menu(
     ConsoleHandle& console,
     ProControllerContext& context
 );
