@@ -13,11 +13,11 @@
 #include "CommonFramework/Recording/StreamHistoryOption.h"
 
 #if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
-//#include "StreamHistoryTracker_SaveFrames.h"
+#include "StreamHistoryTracker_SaveFrames.h"
 //#include "StreamHistoryTracker_RecordOnTheFly.h"
-#include "StreamHistoryTracker_ParallelStreams.h"
+// #include "StreamHistoryTracker_ParallelStreams.h"
 #else
-#include "StreamHistoryTracker_Null.h"
+// #include "StreamHistoryTracker_Null.h"
 #endif
 
 

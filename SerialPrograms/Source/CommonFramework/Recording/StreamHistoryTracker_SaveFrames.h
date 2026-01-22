@@ -49,22 +49,25 @@ struct AudioBlock{
 class StreamHistoryTracker{
 public:
     StreamHistoryTracker(
+        Logger& logger,
+        std::chrono::seconds window,
         size_t audio_samples_per_frame,
         size_t audio_frames_per_second,
-        std::chrono::seconds window
+        bool has_video
     );
     void set_window(std::chrono::seconds window);
 
-    bool save(Logger& logger, const std::string& filename) const;
+    bool save(const std::string& filename) const;
 
 public:
     void on_samples(const float* data, size_t frames);
-    void on_frame(std::shared_ptr<VideoFrame> frame);
+    void on_frame(std::shared_ptr<const VideoFrame> frame);
 
 private:
     void clear_old();
 
 private:
+    Logger& m_logger;
     mutable SpinLock m_lock;
     std::chrono::seconds m_window;
 
@@ -72,26 +75,31 @@ private:
     const size_t m_audio_frames_per_second;
     const size_t m_audio_samples_per_second;
     const double m_microseconds_per_sample;
+    const bool m_has_video;
 
     //  We use shared_ptr here so it's fast to snapshot when we need to copy
     //  everything asynchronously.
     std::deque<std::shared_ptr<AudioBlock>> m_audio;
-    std::deque<std::shared_ptr<VideoFrame>> m_frames;
+    std::deque<std::shared_ptr<const VideoFrame>> m_frames;
 };
 
 
 
 
 StreamHistoryTracker::StreamHistoryTracker(
+    Logger& logger,
+    std::chrono::seconds window,
     size_t audio_samples_per_frame,
     size_t audio_frames_per_second,
-    std::chrono::seconds window
+    bool has_video
 )
-    : m_window(window)
+    : m_logger(logger)
+    , m_window(window)
     , m_audio_samples_per_frame(audio_samples_per_frame)
     , m_audio_frames_per_second(audio_frames_per_second)
     , m_audio_samples_per_second(audio_samples_per_frame * audio_frames_per_second)
     , m_microseconds_per_sample(1. / (m_audio_samples_per_second * 1000000.))
+    , m_has_video(has_video)
 {}
 
 void StreamHistoryTracker::set_window(std::chrono::seconds window){
@@ -111,7 +119,7 @@ void StreamHistoryTracker::on_samples(const float* samples, size_t frames){
     ));
     clear_old();
 }
-void StreamHistoryTracker::on_frame(std::shared_ptr<VideoFrame> frame){
+void StreamHistoryTracker::on_frame(std::shared_ptr<const VideoFrame> frame){
     //  TODO: Find a more efficient way to buffer the frames.
     //  It takes almost 10GB of memory to store 30 seconds of QVideoFrames
     //  due to them caching uncompressed bitmaps.
@@ -162,11 +170,11 @@ void StreamHistoryTracker::clear_old(){
 
 
 
-bool StreamHistoryTracker::save(Logger& logger, const std::string& filename) const{
-    logger.log("Saving stream history...", COLOR_BLUE);
+bool StreamHistoryTracker::save(const std::string& filename) const{
+    m_logger.log("Saving stream history...", COLOR_BLUE);
 
     std::deque<std::shared_ptr<AudioBlock>> audio;
-    std::deque<std::shared_ptr<VideoFrame>> frames;
+    std::deque<std::shared_ptr<const VideoFrame>> frames;
     {
         //  Fast copy the current state of the stream.
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
@@ -285,7 +293,7 @@ bool StreamHistoryTracker::save(Logger& logger, const std::string& filename) con
 #endif
 
         if (current_time() - last_change > std::chrono::seconds(10)){
-            logger.log("Failed to record stream history: No progress made after 10 seconds.", COLOR_RED);
+            m_logger.log("Failed to record stream history: No progress made after 10 seconds.", COLOR_RED);
             success = false;
             break;
         }
@@ -294,7 +302,7 @@ bool StreamHistoryTracker::save(Logger& logger, const std::string& filename) con
     }
 
     recorder.stop();
-    logger.log("Done saving stream history...", COLOR_BLUE);
+    m_logger.log("Done saving stream history...", COLOR_BLUE);
 //    cout << recorder.duration() << endl;
 
 
