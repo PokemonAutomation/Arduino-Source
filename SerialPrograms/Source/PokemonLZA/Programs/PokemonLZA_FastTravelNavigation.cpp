@@ -76,10 +76,9 @@ bool navigate_to_destination_page_in_fast_travel_menu(
     Language language,
     const LocationItem& target_destination
 ){
-    const size_t total_locations = LOCATION_ENUM_MAPPINGS().size();
-    const size_t max_pages_to_check = ((total_locations / LocationNameReader::PAGE_SIZE) + 1) * 2; // Loop through twice to be safe
+    WallClock deadline = current_time() + 30s;
 
-    for (size_t page = 0; page < max_pages_to_check; page++){
+    do{
         LocationNameReader location_name_reader;
         std::vector<LocationItem> first_and_last_locations_on_page(2);
         GlobalThreadPools::normal_inference().run_in_parallel(
@@ -125,7 +124,7 @@ bool navigate_to_destination_page_in_fast_travel_menu(
             pbf_press_button(context, BUTTON_LEFT, 100ms, 500ms);
         }
         context.wait_for_all_requests();
-    }
+    } while (current_time() < deadline);
     return false;
 }
 
@@ -277,7 +276,7 @@ bool navigate_to_destination_in_fast_travel_menu(
     return true;
 }
 
-bool set_fast_travel_menu_filter(
+void set_fast_travel_menu_filter(
     ConsoleHandle& console,
     ProControllerContext& context,
     FAST_TRAVEL_FILTER filter
@@ -333,7 +332,7 @@ bool set_fast_travel_menu_filter(
                 bool arrow_present = selector_arrow_on_target.detect(console.video().snapshot());
                 if (!arrow_present){
                     console.log("Fast travel filter set.");
-                    return true;
+                    return;
                 }
             }
         }
@@ -347,11 +346,14 @@ bool set_fast_travel_menu_filter(
         }
         context.wait_for_all_requests();
     } while (current_time() < deadline);
-    console.log("Timeout setting fast travel filter.");
-    return false;
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "set_fast_travel_menu_filter(): Unable to set fast travel filter.",
+        console
+    );
 }
 
-bool open_fast_travel_menu(
+void open_fast_travel_menu(
     ConsoleHandle& console,
     ProControllerContext& context
 ){
@@ -366,10 +368,13 @@ bool open_fast_travel_menu(
     switch (ret){
     case 0:
         console.log("Fast travel menu opened.");
-        return true;
+        return;
     default:
-        console.log("Unable to open fast travel menu.");
-        return false;
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "open_fast_travel_menu(): Unable to open fast travel menu.",
+            console
+        );
     }
 }
 
@@ -399,30 +404,13 @@ FastTravelState open_map_and_fly_to(ConsoleHandle& console, ProControllerContext
     if (!can_fast_travel){
         return FastTravelState::PURSUED;
     }
-
-    bool fast_travel_menu_opened = open_fast_travel_menu(console, context);
-    if (!fast_travel_menu_opened){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "open_map_and_fly_to(): Unable to open fast travel menu.",
-            console
-        );
-    }
-
+    open_fast_travel_menu(console, context);
     if (clear_filters){
-        bool filters_cleared = set_fast_travel_menu_filter(console, context, FAST_TRAVEL_FILTER::ALL_TRAVEL_SPOTS);
-        if (!filters_cleared){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "open_map_and_fly_to(): Unable to clear fast travel filters.",
-                console
-            );
-        }
+        set_fast_travel_menu_filter(console, context, FAST_TRAVEL_FILTER::ALL_TRAVEL_SPOTS);
     }
 
     LocationItem location_item = get_location_item_from_enum(location);
     std::string target_slug = location_item.slug;
-    // uint8_t target_index = location_item.index;
     
     console.log("Fast traveling to " + target_slug);
 
@@ -446,7 +434,7 @@ FastTravelState open_map_and_fly_to(ConsoleHandle& console, ProControllerContext
     switch (ret){
     case 0:
         console.log("Fly confirmed to " + target_slug);
-        return FastTravelState::SUCCESS;
+        break;
     case 1:
         console.log("Pursued by wild pokemon while flying to " + target_slug);
         return FastTravelState::PURSUED;
