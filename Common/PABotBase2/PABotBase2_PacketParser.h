@@ -37,10 +37,10 @@ typedef struct{
 
 
 
-inline void pabb2_PacketParser_init(pabb2_PacketParser* self){
+static inline void pabb2_PacketParser_init(pabb2_PacketParser* self){
     self->index = 0;
 }
-inline void pabb2_PacketParser_reset(pabb2_PacketParser* self){
+static inline void pabb2_PacketParser_reset(pabb2_PacketParser* self){
     self->index = 0;
 }
 

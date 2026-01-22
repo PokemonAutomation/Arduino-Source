@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PABotBase2_ConnectionSender_H
-#define PokemonAutomation_PABotBase2_ConnectionSender_H
+#ifndef PokemonAutomation_PABotBase2_PacketSender_H
+#define PokemonAutomation_PABotBase2_PacketSender_H
 
 #include "PABotBase2_StreamInterface.h"
 #include "PABotBase2_Connection.h"
@@ -75,10 +75,10 @@ void pabb2_PacketSender_init(
 );
 void pabb2_PacketSender_reset(pabb2_PacketSender* self);
 
-inline uint8_t pabb2_PacketSender_slots_used(pabb2_PacketSender* self){
+static inline uint8_t pabb2_PacketSender_slots_used(pabb2_PacketSender* self){
     return self->slot_tail - self->slot_head;
 }
-inline size_t pabb2_PacketSender_buffer_used(pabb2_PacketSender* self){
+static inline size_t pabb2_PacketSender_buffer_used(pabb2_PacketSender* self){
     return self->buffer_tail - self->buffer_head;
 }
 

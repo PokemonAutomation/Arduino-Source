@@ -50,7 +50,7 @@ typedef struct{
 
 
 void pabb2_StreamCoalescer_init(pabb2_StreamCoalescer* self);
-inline void pabb2_StreamCoalescer_reset(pabb2_StreamCoalescer* self){
+static inline void pabb2_StreamCoalescer_reset(pabb2_StreamCoalescer* self){
     pabb2_StreamCoalescer_init(self);
     self->stream_reset = true;
 }
