@@ -10,6 +10,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "PokemonLZA_BasicNavigation.h"
+#include "PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.h"
 #include "PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h"
 #include "PokemonLZA/Inference/Map/PokemonLZA_LocationNameReader.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
@@ -57,7 +58,7 @@ bool navigate_to_destination_page_in_fast_travel_menu(
 // Get the index of the target destination in the current page's location items
 // Return -1 if not found
 int get_target_location_index_within_page(
-    LocationItem& target_destination,
+    const LocationItem& target_destination,
     const std::vector<LocationItem>& current_page_locations
 );
 
@@ -68,7 +69,18 @@ bool navigate_to_destination_within_page(
     ConsoleHandle& console,
     ProControllerContext& context,
     Language language,
-    LocationItem& target_destination
+    const LocationItem& target_destination
+);
+
+// Special handling for lumiouse-sewers-1 and lumiouse-sewers-2 since they have the same OCR result
+// Disambiguate using a detector on the background map
+// Return true if the target destination is found, hover over the option
+// Return false if the target destination is not found
+bool navigate_to_lumiose_sewers_location(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    Language language,
+    const LocationItem& target_destination
 );
 
 // Navigate to the target destination in the fast travel menu
@@ -80,7 +92,7 @@ bool navigate_to_destination_in_fast_travel_menu(
     ConsoleHandle& console,
     ProControllerContext& context,
     Language language,
-    LocationItem& target_destination
+    const LocationItem& target_destination
 );
 
 // From the fast travel menu, set the fast travel menu filter to the specified option

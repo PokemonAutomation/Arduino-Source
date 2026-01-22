@@ -74,7 +74,7 @@ bool navigate_to_destination_page_in_fast_travel_menu(
     ConsoleHandle& console,
     ProControllerContext& context,
     Language language,
-    LocationItem& target_destination
+    const LocationItem& target_destination
 ){
     const size_t total_locations = LOCATION_ENUM_MAPPINGS().size();
     const size_t max_pages_to_check = ((total_locations / LocationNameReader::PAGE_SIZE) + 1) * 2; // Loop through twice to be safe
@@ -93,12 +93,32 @@ bool navigate_to_destination_page_in_fast_travel_menu(
             },
             0, 2
         );
+        LocationItem top_location = first_and_last_locations_on_page[0];
+        LocationItem bottom_location = first_and_last_locations_on_page[1];
 
-        if (target_destination.index >= first_and_last_locations_on_page[0].index && target_destination.index <= first_and_last_locations_on_page[1].index){
-            console.log("Stopping at destination page between " + first_and_last_locations_on_page[0].slug + " and " + first_and_last_locations_on_page[1].slug);
+        // Workaround: lumiouse-sewers-1 and lumiouse-sewers-2 have the same OCR result, dont use them for paging
+        if (top_location.location == Location::LUMIOSE_SEWERS_1 || top_location.location == Location::LUMIOSE_SEWERS_2){
+            OCR::StringMatchResult result = location_name_reader.read_location_name(console.video().snapshot(), console.logger(), language, 1);
+            result.clear_beyond_log10p(LocationNameOCR::MAX_LOG10P);
+            result.clear_beyond_spread(LocationNameOCR::MAX_LOG10P_SPREAD);
+            for (auto& item : result.results){
+                top_location = get_location_item_from_slug(item.second.token);
+            }
+        }
+        if (bottom_location.location == Location::LUMIOSE_SEWERS_1 || bottom_location.location == Location::LUMIOSE_SEWERS_2){
+            OCR::StringMatchResult result = location_name_reader.read_location_name(console.video().snapshot(), console.logger(), language, LocationNameReader::PAGE_SIZE - 2);
+            result.clear_beyond_log10p(LocationNameOCR::MAX_LOG10P);
+            result.clear_beyond_spread(LocationNameOCR::MAX_LOG10P_SPREAD);
+            for (auto& item : result.results){
+                bottom_location = get_location_item_from_slug(item.second.token);
+            }
+        }
+
+        if (target_destination.index >= top_location.index && target_destination.index <= bottom_location.index){
+            console.log("Stopping at destination page between " + top_location.slug + " and " + bottom_location.slug);
             return true;
         }
-        bool navigate_down = should_navigate_down(first_and_last_locations_on_page[0], target_destination);
+        bool navigate_down = should_navigate_down(top_location, target_destination);
         if (navigate_down){
             pbf_press_button(context, BUTTON_RIGHT, 100ms, 500ms);
         }else{
@@ -111,7 +131,7 @@ bool navigate_to_destination_page_in_fast_travel_menu(
 
 
 int get_target_location_index_within_page(
-    LocationItem& target_destination,
+    const LocationItem& target_destination,
     const std::vector<LocationItem>& current_page_locations
 ){
     for (size_t index = 0; index < current_page_locations.size(); index++){
@@ -126,7 +146,7 @@ bool navigate_to_destination_within_page(
     ConsoleHandle& console,
     ProControllerContext& context,
     Language language,
-    LocationItem& target_destination
+    const LocationItem& target_destination
 ){
     WallClock deadline = current_time() + 30s;
     do{
@@ -158,12 +178,92 @@ bool navigate_to_destination_within_page(
     return false;
 }
 
+bool navigate_to_lumiose_sewers_location(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    Language language,
+    const LocationItem& target_destination
+){
+    LocationNameReader location_name_reader;
+    // Use this box to detect cafe woof icon to differentiate between lumiose-sewers-1 and lumiose-sewers-2
+    const ImageFloatBox& cafe_woof_box = {0.537000, 0.783000, 0.043000, 0.077000};
+    // Zoom in for detection
+    for(int i = 0; i < 5; i++){
+        pbf_move_right_joystick(context, {0, +1}, 100ms, 300ms); // Zoom in
+    }
+    // Set filter to facilities to reduce number of locations on the list
+    set_fast_travel_menu_filter(console, context, FAST_TRAVEL_FILTER::FACILITIES);
+    context.wait_for_all_requests();
+
+    WallClock deadline = current_time() + 60s;
+    do {
+        // Set selector to second to last spot
+        do {
+            int current_selector_index = get_current_selector_index(console, FAST_TRAVEL_ARROW_BOXES());
+            if (current_selector_index == -1){
+                return false;
+            }
+            if (current_selector_index == (LocationNameReader::PAGE_SIZE - 2)){
+                break;
+            }
+            // Only move down
+            int delta = (LocationNameReader::PAGE_SIZE - 2) - current_selector_index;
+            for (; delta > 0; delta--){
+                pbf_press_dpad(context, DPAD_DOWN, 100ms, 200ms);
+            }
+            context.wait_for_all_requests();
+        } while (current_time() < deadline);
+
+        // Read second to last spot only
+        LocationItem second_to_last_location;
+        OCR::StringMatchResult result = location_name_reader.read_location_name(console.video().snapshot(), console.logger(), language, LocationNameReader::PAGE_SIZE - 2);
+        result.clear_beyond_log10p(LocationNameOCR::MAX_LOG10P);
+        result.clear_beyond_spread(LocationNameOCR::MAX_LOG10P_SPREAD);
+        for (auto& item : result.results){
+            second_to_last_location = get_location_item_from_slug(item.second.token);
+        }
+        
+        // lumiose-sewers-# in position
+        if (second_to_last_location.location == Location::LUMIOSE_SEWERS_1 || second_to_last_location.location == Location::LUMIOSE_SEWERS_2){
+            console.log("Hovering over sewer location");
+            MapIconDetector cafe_woof_icon(COLOR_ORANGE, MapIconType::CafeFlyable, cafe_woof_box, &console.overlay());
+            // cafe woof icon detected means lumiose-sewers-1
+            if (cafe_woof_icon.detect(console.video().snapshot()) && target_destination.location == Location::LUMIOSE_SEWERS_1){
+                console.log("Lumiose Sewers 1 detected");
+                for(int i = 0; i < 5; i++){
+                    pbf_move_right_joystick(context, {0, -1}, 100ms, 300ms); // Zoom out
+                }
+                context.wait_for_all_requests();
+                return true;
+            }
+            // cafe woof icon not detected means lumiose-sewers-2
+            // there are no unobstructable icons near lumiose-sewers-2 to use for detection
+            else if (!cafe_woof_icon.detect(console.video().snapshot()) && target_destination.location == Location::LUMIOSE_SEWERS_2){
+                console.log("Lumiose Sewers 2 detected");
+                for(int i = 0; i < 5; i++){
+                    pbf_move_right_joystick(context, {0, -1}, 100ms, 300ms); // Zoom out
+                }
+                context.wait_for_all_requests();
+                return true;
+            }
+        }
+        pbf_press_dpad(context, DPAD_DOWN, 100ms, 200ms);
+        context.wait_for_all_requests();
+    } while (current_time() < deadline);
+    console.log("Timeout navigating to sewers location: " + target_destination.slug);
+    return false;
+}
+
 bool navigate_to_destination_in_fast_travel_menu(
     ConsoleHandle& console,
     ProControllerContext& context,
     Language language,
-    LocationItem& target_destination
+    const LocationItem& target_destination
 ){
+    // lumiose-sewers-1 and lumiose-sewers-2 have the same OCR result, handle that case separately here
+    if (target_destination.location == Location::LUMIOSE_SEWERS_1 || target_destination.location == Location::LUMIOSE_SEWERS_2){
+        return navigate_to_lumiose_sewers_location(console, context, language, target_destination);
+    }
     bool reached_destination_page = navigate_to_destination_page_in_fast_travel_menu(console, context, language, target_destination);
     if (!reached_destination_page){
         console.log("Unable to reach destination page for: " + target_destination.slug);
