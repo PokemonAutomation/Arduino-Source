@@ -10,6 +10,7 @@
 #ifndef PokemonAutomation_StreamHistoryTracker_SaveFrames_H
 #define PokemonAutomation_StreamHistoryTracker_SaveFrames_H
 
+#include <opencv2/opencv.hpp>
 #include <deque>
 #include <QCoreApplication>
 #include <QFileInfo>
@@ -19,14 +20,15 @@
 #include <QMediaFormat>
 #include <QMediaRecorder>
 #include <QMediaCaptureSession>
+#include <QScopeGuard>
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 
 namespace PokemonAutomation{
@@ -43,6 +45,11 @@ struct AudioBlock{
         : timestamp(p_timestamp)
         , samples(p_samples, p_samples + p_count)
     {}
+};
+
+struct CompressedVideoFrame{
+    WallClock timestamp;
+    std::vector<unsigned char> compressed_frame;
 };
 
 
@@ -81,6 +88,7 @@ private:
     //  everything asynchronously.
     std::deque<std::shared_ptr<AudioBlock>> m_audio;
     std::deque<std::shared_ptr<const VideoFrame>> m_frames;
+    std::deque<CompressedVideoFrame> m_compressed_frames;
 };
 
 
@@ -119,6 +127,59 @@ void StreamHistoryTracker::on_samples(const float* samples, size_t frames){
     ));
     clear_old();
 }
+
+std::vector<uchar> compress_video_frame(const QVideoFrame& const_frame) {
+    // Create a local non-const copy (cheap, uses explicit sharing)
+    QVideoFrame frame = const_frame;
+
+    // 1. Map the frame to CPU memory
+    if (!frame.map(QVideoFrame::ReadOnly)) {
+        return {};
+    }
+
+    // Ensure unmap() is called when this function exits (success or failure)
+    auto guard = qScopeGuard([&frame] { frame.unmap(); });
+
+    // 2. Convert to QImage (Qt 6.8+ handles internal conversions efficiently)
+    // For circular buffers, using a 3-channel RGB888 is common for OpenCV
+    QImage img = frame.toImage().convertToFormat(QImage::Format_RGB888);
+
+    // 3. Wrap QImage memory into a cv::Mat (No-copy)
+    // Note: OpenCV expects BGR by default, but QImage is RGB. 
+    // If color accuracy matters, use cv::cvtColor later or img.rgbSwapped().
+    cv::Mat mat(img.height(), img.width(), CV_8UC3, 
+                const_cast<unsigned char*>(img.bits()), img.bytesPerLine());
+
+    // 4. Compress using imencode
+    std::vector<uchar> compressed_buffer;
+    std::vector<int> params = {cv::IMWRITE_JPEG_QUALITY, 80}; // 0-100
+    
+    // Convert RGB to BGR before encoding because imencode expects BGR
+    cv::Mat bgr_Mat;
+    cv::cvtColor(mat, bgr_Mat, cv::COLOR_RGB2BGR);
+    
+    cv::imencode(".jpg", bgr_Mat, compressed_buffer, params);
+
+    return compressed_buffer; // Store this in your circular buffer
+}
+
+QVideoFrame decompress_video_frame(const std::vector<uchar> &compressed_buffer) {
+    if (compressed_buffer.empty()) return {};
+
+    // 1. Decompress JPEG buffer into a QImage
+    // fromData handles the JPEG header and decompression automatically
+    QImage img = QImage::fromData(compressed_buffer.data(), 
+                                  static_cast<int>(compressed_buffer.size()), 
+                                  "JPG");
+
+    if (img.isNull()) return {};
+
+    // 2. Use the new Qt 6.8 constructor
+    // This wraps the QImage into a QVideoFrame efficiently.
+    // If the format is compatible (like RGB888), it minimizes copies.
+    return QVideoFrame(img);
+}
+
 void StreamHistoryTracker::on_frame(std::shared_ptr<const VideoFrame> frame){
     //  TODO: Find a more efficient way to buffer the frames.
     //  It takes almost 10GB of memory to store 30 seconds of QVideoFrames
@@ -127,7 +188,9 @@ void StreamHistoryTracker::on_frame(std::shared_ptr<const VideoFrame> frame){
 
     WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
 //    cout << "on_frame() = " << m_frames.size() << endl;
-    m_frames.emplace_back(std::move(frame));
+    auto compressed_frame = compress_video_frame(frame->frame);
+    m_compressed_frames.emplace_back(CompressedVideoFrame{frame->timestamp, compressed_frame});
+    // m_frames.emplace_back(std::move(frame));
     clear_old();
 }
 
@@ -149,7 +212,7 @@ void StreamHistoryTracker::clear_old(){
             static_cast<std::chrono::microseconds::rep>((double)block.samples.size() * m_microseconds_per_sample)
         );
 
-        if (end_block < threshold){
+        if (end_block < threshold){  // todo: confirm if the audio deque clears properly
             m_audio.pop_front();
         }else{
             break;
@@ -157,9 +220,15 @@ void StreamHistoryTracker::clear_old(){
     }
 //    cout << "exit" << endl;
 
-    while (!m_frames.empty()){
-        if (m_frames.front()->timestamp < threshold){
-            m_frames.pop_front();
+    while (!m_compressed_frames.empty()){
+        // if (m_frames.front()->timestamp < threshold){
+        //     m_frames.pop_front();
+        // }else{
+        //     break;
+        // }
+
+        if (m_compressed_frames.front().timestamp < threshold){
+            m_compressed_frames.pop_front();
         }else{
             break;
         }
@@ -174,15 +243,15 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
     m_logger.log("Saving stream history...", COLOR_BLUE);
 
     std::deque<std::shared_ptr<AudioBlock>> audio;
-    std::deque<std::shared_ptr<const VideoFrame>> frames;
+    std::deque<CompressedVideoFrame> frames;
     {
         //  Fast copy the current state of the stream.
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-        if (m_audio.empty() && m_frames.empty()){
+        if (m_audio.empty() && m_compressed_frames.empty()){
             return false;
         }
         audio = m_audio;
-        frames = m_frames;
+        frames = m_compressed_frames;
     }
 
     //  Now that the lock is released, we can take our time encoding it.
