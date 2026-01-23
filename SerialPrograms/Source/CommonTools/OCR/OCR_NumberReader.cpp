@@ -44,6 +44,8 @@ std::string run_number_normalization(const std::string& input){
         {'9', '9'},
 
         //  Common misreads.
+        {'U', '0'},
+        {'u', '0'},
         {'|', '1'},
         {']', '1'},
         {'[', '6'},
@@ -144,6 +146,7 @@ std::string read_number_waterfill_no_normalization(
     );
 
 //    static int c = 0;
+//    int i = 0;
 //    filtered.save(std::format("zztest-{:#x}-{:#x}-{}.png", rgb32_min, rgb32_max, c++));
 
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(filtered, 0xff000000, 0xff7f7f7f);
@@ -183,8 +186,10 @@ std::string read_number_waterfill_no_normalization(
         }else{
             ocr = OCR::ocr_read(Language::English, padded, OCR::PageSegMode::SINGLE_CHAR); 
         }
+
 //        padded.save("zztest-cropped" + std::to_string(c) + "-" + std::to_string(i++) + ".png");
-        // std::cout << ocr[0] << std::endl;
+//        std::cout << ocr[0] << std::endl;
+
         if (!ocr.empty()){
             ocr_text += ocr[0];
         }else if (check_empty_string){
