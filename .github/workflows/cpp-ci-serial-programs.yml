@@ -37,6 +37,18 @@ jobs:
       with:
         path: 'Arduino-Source'
         submodules: 'recursive'
+    - name: Run checks for banned std::filesystem usage
+      if: startsWith(matrix.os, 'ubuntu')
+      run: |
+        cd Arduino-Source
+        matches=$(grep --recursive --exclude='Filesystem.h' 'filesystem' Common/ SerialPrograms/)
+        if [ -n "$matches" ]
+        then
+          echo "Banned usage of std::filesystem found in:"
+          echo "$matches"
+          exit 1
+        fi
+        echo "No banned usage of std::filesystem found"
     - uses: actions/checkout@v6
       with:
         repository: 'PokemonAutomation/CommandLineTests'
