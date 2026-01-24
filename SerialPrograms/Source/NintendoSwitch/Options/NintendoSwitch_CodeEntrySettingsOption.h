@@ -32,27 +32,21 @@ public:
 
 
 
-
-class DigitEntryTimingsOption : public GroupOption{
+class CodeboardTimingsOption : public GroupOption{
 public:
-    DigitEntryTimingsOption(bool switch2);
+    CodeboardTimingsOption(std::string label, bool switch2, bool wireless);
 
-public:
-    BooleanCheckBoxOption REORDERING;
-    MillisecondsOption TIME_UNIT;
-    MillisecondsOption HOLD;
-    MillisecondsOption COOLDOWN;
-};
-
-class KeyboardEntryTimingsOption : public GroupOption{
-public:
-    KeyboardEntryTimingsOption(bool switch2);
+private:
+    Milliseconds unit;
 
 public:
     BooleanCheckBoxOption REORDERING;
-    MillisecondsOption TIME_UNIT;
     MillisecondsOption HOLD;
     MillisecondsOption COOLDOWN;
+    MillisecondsOption PRESS_DELAY;
+    MillisecondsOption MOVE_DELAY;
+    MillisecondsOption SCROLL_DELAY;
+    MillisecondsOption WRAP_DELAY;
 };
 
 class KeyboardControllerTimingsOption : public GroupOption{
@@ -65,6 +59,7 @@ public:
     MillisecondsOption HOLD;
     MillisecondsOption COOLDOWN;
 };
+
 
 
 

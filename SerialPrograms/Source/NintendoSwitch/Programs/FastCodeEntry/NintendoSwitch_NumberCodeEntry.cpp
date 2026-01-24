@@ -243,6 +243,7 @@ void numberpad_enter_code(
         positions.emplace_back(iter->second);
     }
 
+    CodeEntryDelays delays;
 
     ConsoleType console_type = assume_console_type_is_ready
         ? console.state().console_type()
@@ -250,8 +251,18 @@ void numberpad_enter_code(
     bool switch2;
     if (is_switch1(console_type)){
         switch2 = false;
+        if (context->performance_class() == ControllerPerformanceClass::SerialPABotBase_Wired){
+            delays = ConsoleSettings::instance().CODEBOARD_ENTRY_SWITCH1_WIRED;
+        }else{
+            delays = ConsoleSettings::instance().CODEBOARD_ENTRY_SWITCH1_WIRELESS;
+        }
     }else if (is_switch2(console_type)){
         switch2 = true;
+        if (context->performance_class() == ControllerPerformanceClass::SerialPABotBase_Wired){
+            delays = ConsoleSettings::instance().CODEBOARD_ENTRY_SWITCH2_WIRED;
+        }else{
+            delays = ConsoleSettings::instance().CODEBOARD_ENTRY_SWITCH2_WIRELESS;
+        }
     }else{
         throw UserSetupError(
             console,
@@ -260,42 +271,11 @@ void numberpad_enter_code(
     }
 
 
-    //  Fetch the delays.
-
-    Milliseconds unit;
-    Milliseconds hold;
-    Milliseconds cool;
-    bool reordering;
-    if (switch2){
-        unit        = ConsoleSettings::instance().SWITCH2_DIGIT_ENTRY0.TIME_UNIT;
-        hold        = ConsoleSettings::instance().SWITCH2_DIGIT_ENTRY0.HOLD;
-        cool        = ConsoleSettings::instance().SWITCH2_DIGIT_ENTRY0.COOLDOWN;
-        reordering  = ConsoleSettings::instance().SWITCH2_DIGIT_ENTRY0.REORDERING;
-    }else{
-        unit        = ConsoleSettings::instance().SWITCH1_DIGIT_ENTRY0.TIME_UNIT;
-        hold        = ConsoleSettings::instance().SWITCH1_DIGIT_ENTRY0.HOLD;
-        cool        = ConsoleSettings::instance().SWITCH1_DIGIT_ENTRY0.COOLDOWN;
-        reordering  = ConsoleSettings::instance().SWITCH1_DIGIT_ENTRY0.REORDERING;
-    }
-
-    Milliseconds tv = context->timing_variation();
-    unit += tv;
-
-    CodeEntryDelays delays{
-        .hold = hold + tv,
-        .cool = cool,
-        .press_delay = unit,
-        .move_delay = unit,
-        .scroll_delay = unit,
-        .wrap_delay = 2*unit,
-    };
-
-
     //  Get all the possible paths.
     std::vector<std::vector<CodeEntryAction>> all_paths = numberpad_get_all_paths(
         {0, 0},
         positions.data(), positions.size(),
-        reordering
+        delays.reordering
     );
 
     //  Pick the best path.
