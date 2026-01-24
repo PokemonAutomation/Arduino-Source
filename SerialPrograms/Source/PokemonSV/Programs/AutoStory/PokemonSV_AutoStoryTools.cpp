@@ -759,9 +759,10 @@ void change_settings(SingleSwitchProgramEnvironment& env, ProControllerContext& 
         config_option(context, 1); // Helping Functions: Off
     }
 
-    pbf_mash_button(context, BUTTON_A, 1000ms);
+    pbf_mash_button(context, BUTTON_A, 500ms);
+    env.console.log("Confirm that we want to save the settings.");
     clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5, {CallbackEnum::PROMPT_DIALOG});
-    
+    env.console.log("Settings saved.");
 }
 
 void do_action_and_monitor_for_battles(
