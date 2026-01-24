@@ -239,11 +239,11 @@ std::vector<CodeEntryActionWithDelay> keyboard_get_best_path(
     Milliseconds best_time = Milliseconds::max();
     for (const std::vector<CodeEntryAction>& path : paths){
         std::vector<CodeEntryActionWithDelay> current_path;
-        codeboard_populate_delays(switch2, current_path, path, delays, optimize);
-        Milliseconds current_time = 0ms;
-        for (CodeEntryActionWithDelay& action : current_path){
-            current_time += action.delay;
-        }
+        Milliseconds current_time = codeboard_populate_delays(
+            switch2,
+            current_path,
+            path, delays, optimize
+        );
         if (best_time > current_time ||
             (best_time == current_time && best_path.size() > current_path.size())
         ){

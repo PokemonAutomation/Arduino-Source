@@ -203,14 +203,14 @@ std::vector<CodeEntryActionWithDelay> numberpad_get_best_path(
     Milliseconds best_time = Milliseconds::max();
     for (const std::vector<CodeEntryAction>& path : paths){
         std::vector<CodeEntryActionWithDelay> current_path;
-        codeboard_populate_delays(switch2, current_path, path, delays, optimize);
-        Milliseconds current_time = 0ms;
-        for (CodeEntryActionWithDelay& action : current_path){
-            current_time += action.delay;
-            if (action.action == CodeEntryAction::SCROLL_LEFT){
-//                action.delay =
-            }
-        }
+        Milliseconds current_time = codeboard_populate_delays(
+            switch2,
+            current_path,
+            path, delays, optimize
+        );
+
+//        cout << "Size = " << current_path.size() << ", cost = " << current_time.count() << endl;
+
         if (best_time > current_time ||
             (best_time == current_time && best_path.size() > current_path.size())
         ){

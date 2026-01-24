@@ -88,7 +88,8 @@ struct CodeEntryActionWithDelay{
 
 
 //  Given a path, optimize it and fully populate the delays.
-void codeboard_populate_delays(
+//  Return the cost of the path.
+Milliseconds codeboard_populate_delays(
     bool switch2,
     std::vector<CodeEntryActionWithDelay>& path_with_delays,
     const std::vector<CodeEntryAction>& path,
