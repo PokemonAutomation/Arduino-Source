@@ -104,6 +104,7 @@ public:
             if (!code.empty()){
                 const char* error = enter_code(
                     env, scope,
+                    false,
                     settings,
                     code, false,
                     false
@@ -128,6 +129,7 @@ void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope
     if (MODE == Mode::NORMAL || MODE == Mode::MYSTERY_GIFT){
         const char* error = enter_code(
             env, scope,
+            MODE == Mode::NORMAL,
             SETTINGS,
             CODE,
             MODE == Mode::MYSTERY_GIFT ? true : false,

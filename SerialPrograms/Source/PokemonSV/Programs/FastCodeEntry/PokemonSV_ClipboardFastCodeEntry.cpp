@@ -79,7 +79,7 @@ void ClipboardFastCodeEntry::program(MultiSwitchProgramEnvironment& env, Cancell
         std::string code = clipboard->text().toStdString();
 //        cout << code << endl;
         if (code != start_text && !code.empty()){
-            const char* error = enter_code(env, scope, SETTINGS, code, false, false);
+            const char* error = enter_code(env, scope, false, SETTINGS, code, false, false);
             if (error == nullptr){
                 return;
             }

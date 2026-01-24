@@ -117,7 +117,7 @@ void TradeBot::trade_slot(
     ssf_press_button(context, BUTTON_A, 40ms);
     ssf_press_button(context, BUTTON_B, 40ms);
 
-    FastCodeEntry::numberpad_enter_code(console, context, code, true);
+    FastCodeEntry::numberpad_enter_code(console, context, false, code, true);
     ssf_press_button(context, BUTTON_PLUS, 1600ms);
     ssf_press_button(context, BUTTON_B, 1000ms, 80ms);
     ssf_press_button(context, BUTTON_A, 400ms, 80ms);

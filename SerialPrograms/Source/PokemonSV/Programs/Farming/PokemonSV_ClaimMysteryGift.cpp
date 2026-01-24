@@ -162,6 +162,7 @@ void ClaimMysteryGift::enter_mystery_gift_code(SingleSwitchProgramEnvironment& e
     const FastCodeEntrySettings& settings = SETTINGS;
     enter_code(
         env.console, context,
+        false,
         settings.keyboard_layout[env.console.index()],
         normalized_code, force_keyboard_mode,
         !settings.skip_plus,

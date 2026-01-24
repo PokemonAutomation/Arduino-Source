@@ -28,8 +28,9 @@ namespace FastCodeEntry{
 
 void keyboard_enter_code(
     ConsoleHandle& console, AbstractControllerContext& context,
-    KeyboardLayout keyboard_layout, const std::string& code,
-    bool include_plus
+    bool assume_console_type_is_ready,
+    KeyboardLayout keyboard_layout,
+    const std::string& code, bool include_plus
 ){
     auto* keyboard = context->cast<StandardHid::Keyboard>();
     if (keyboard){
@@ -41,7 +42,12 @@ void keyboard_enter_code(
     auto* procon = context->cast<ProController>();
     if (procon){
         ProControllerContext subcontext(context);
-        keyboard_enter_code(console, subcontext, keyboard_layout, code, include_plus);
+        keyboard_enter_code(
+            console, subcontext,
+            assume_console_type_is_ready,
+            keyboard_layout,
+            code, include_plus
+        );
         return;
     }
 
@@ -56,8 +62,8 @@ void keyboard_enter_code(
 
 void keyboard_enter_code(
     ConsoleHandle& console, StandardHid::KeyboardContext& context,
-    KeyboardLayout keyboard_layout, const std::string& code,
-    bool include_plus
+    KeyboardLayout keyboard_layout,
+    const std::string& code, bool include_plus
 ){
     using namespace StandardHid;
 
@@ -253,8 +259,9 @@ std::vector<CodeEntryActionWithDelay> keyboard_get_best_path(
 
 void keyboard_enter_code(
     ConsoleHandle& console, ProControllerContext& context,
-    KeyboardLayout keyboard_layout, const std::string& code,
-    bool include_plus
+    bool assume_console_type_is_ready,
+    KeyboardLayout keyboard_layout,
+    const std::string& code, bool include_plus
 ){
     //  Calculate the coordinates.
     const std::map<char, KeyboardEntryPosition>& POSITION_MAP = KEYBOARD_POSITIONS(keyboard_layout);
@@ -271,7 +278,9 @@ void keyboard_enter_code(
     }
 
 
-    ConsoleType console_type = detect_console_type_from_in_game(console, context);
+    ConsoleType console_type = assume_console_type_is_ready
+        ? console.state().console_type()
+        : detect_console_type_from_in_game(console, context);
     bool switch2;
     if (is_switch1(console_type)){
         switch2 = false;

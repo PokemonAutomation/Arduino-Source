@@ -106,7 +106,13 @@ void wait_for_video_code_and_join(
         case VideoFceOcrMethod::TERA_CARD:
             code = read_raid_code(env.logger(), snapshot);
         }
-        const char* error = enter_code(env, scope, settings, code, false, false);
+        const char* error = enter_code(
+            env, scope,
+            false,
+            settings,
+            code, false,
+            false
+        );
         if (error == nullptr){
             break;
         }else{
@@ -173,7 +179,13 @@ void VideoFastCodeEntry::update_active_consoles(size_t switch_count){
 void VideoFastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     if (MODE == Mode::MANUAL){
         std::string code = read_raid_code(env.logger(), SCREEN_WATCHER.screenshot());
-        const char* error = enter_code(env, scope, SETTINGS, code, false, !SKIP_CONNECT_TO_CONTROLLER);
+        const char* error = enter_code(
+            env, scope,
+            true,
+            SETTINGS,
+            code, false,
+            !SKIP_CONNECT_TO_CONTROLLER
+        );
         if (error){
             env.log("No valid code found: " + std::string(error), COLOR_RED);
         }

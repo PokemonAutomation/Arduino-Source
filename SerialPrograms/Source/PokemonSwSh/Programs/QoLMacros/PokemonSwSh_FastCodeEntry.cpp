@@ -52,7 +52,11 @@ void FastCodeEntry::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 
     pbf_press_button(context, BUTTON_PLUS, 40ms, 40ms);
     pbf_press_button(context, BUTTON_PLUS, 40ms, 40ms);
-    NintendoSwitch::FastCodeEntry::numberpad_enter_code(env.console, context, code, true);
+    NintendoSwitch::FastCodeEntry::numberpad_enter_code(
+        env.console, context,
+        true,
+        code, true
+    );
 }
 
 
