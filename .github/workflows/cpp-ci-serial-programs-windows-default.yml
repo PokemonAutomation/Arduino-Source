@@ -1,0 +1,11 @@
+name: C++ CI Serial Programs Windows Default
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build:
+    uses: ./.github/workflows/cpp-ci-serial-programs-base.yml
+    with:
+      os: windows-2025
+      compiler: default
+      upload-build: true
+      run-tests: true

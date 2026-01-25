@@ -1,0 +1,144 @@
+name: C++ CI Serial Programs base
+on:
+  workflow_call:
+    inputs:
+      os: 
+        required: true
+        type: string
+
+      compiler:
+        required: true
+        type: string
+
+      upload-build:
+        type: boolean
+        default: false
+
+      run-tests:
+        type: boolean
+        default: false
+
+      run-clang-query:
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    runs-on: ${{inputs.os}}
+
+    steps:
+    - name: Set variables
+      shell: bash
+      run: |
+        if [[ "${{inputs.compiler}}" == "clang" ]]; then
+          if [[ "${{inputs.os}}" == windows* ]]; then
+            CMAKE_ADDITIONAL_FLAGS="-T ClangCL"
+          elif [[ "${{inputs.os}}" == ubuntu* ]]; then
+            CMAKE_ADDITIONAL_FLAGS="-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++"
+          fi
+        fi
+        echo "CMAKE_ADDITIONAL_FLAGS=$CMAKE_ADDITIONAL_FLAGS" >> $GITHUB_ENV
+
+        if [[ "${{inputs.os}}" == "windows*" ]]; then
+          UPLOAD_FOLDER="Arduino-Source/SerialPrograms/bin/RelWithDebInfo"
+        else
+          UPLOAD_FOLDER="Arduino-Source/SerialPrograms/bin"
+        fi
+        echo "UPLOAD_FOLDER=$UPLOAD_FOLDER" >> $GITHUB_ENV
+
+    - name: Checkout Arduino-Source
+      uses: actions/checkout@v6
+      with:
+        path: 'Arduino-Source'
+        submodules: 'recursive'
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.10.1'
+        modules: 'qtmultimedia qtserialport'
+
+    - name: Install dependencies (Ubuntu)
+      if: startsWith(inputs.os, 'ubuntu')
+      run: |
+        cd Arduino-Source
+        sudo apt update
+        sudo apt upgrade
+        sudo apt install clang-tools libopencv-dev
+
+        sudo apt install ./3rdPartyBinaries/libdpp-10.0.28-linux-x64.deb
+
+    - name: Install dependencies (Mac)
+      if: startsWith(inputs.os, 'mac')
+      run: |
+        cd Arduino-Source
+        brew install opencv onnxruntime
+
+        brew tap-new --no-git PA/libdpp
+        FORMULA_DIR="$(brew --repo PA/libdpp)/Formula"
+        mkdir -p "$FORMULA_DIR"
+        cp 3rdPartyBinaries/libdpp@10.0.28.rb "$FORMULA_DIR/"
+        brew install libdpp@10.0.28
+
+    - name: Generate binaries
+      run: |
+        cd Arduino-Source/SerialPrograms
+        mkdir bin
+        cd bin
+        cmake .. -DQT_MAJOR:STRING=6 ${{env.CMAKE_ADDITIONAL_FLAGS}}
+        cmake --build . --config RelWithDebInfo --parallel 10
+
+    - name: Prepare upload build
+      if: inputs.upload-build
+      shell: bash
+      run: |
+        echo https://github.com/${{github.repository}}/commit/${{github.sha}} > ${{env.UPLOAD_FOLDER}}/version.txt
+
+    - name: Upload Build
+      uses: actions/upload-artifact@v6
+      if: inputs.upload-build
+      with:
+        name: Serial Programs (os=${{inputs.os}} - compiler=${{inputs.compiler}})
+        path: ${{env.UPLOAD_FOLDER}}
+
+    - name: Checkout CommandLineTests
+      uses: actions/checkout@v6
+      if: inputs.run-tests
+      with:
+        repository: 'PokemonAutomation/CommandLineTests'
+        path: 'CommandLineTests'
+
+    - name: Run tests (Windows)
+      if: startsWith(inputs.os, 'windows') && inputs.run-tests
+      run: |
+        cd Arduino-Source/SerialPrograms/bin
+        $env:DISCORD_BOT_TOKEN = "Value"
+        $process = Start-Process -FilePath "./RelWithDebInfo/SerialPrograms.exe" `
+                                 -ArgumentList "--command-line-test-mode --command-line-test-folder ../../../CommandLineTests" `
+                                 -NoNewWindow -Wait -PassThru
+        if ($process.ExitCode -ne 0) {
+            Write-Error "Tests failed with exit code $($process.ExitCode)"
+            exit 1
+        }
+
+    - name: Run clang query
+      if: inputs.run-clang-query
+      run : |
+        cd Arduino-Source
+
+        cat << 'EOF' > query.txt
+        set output dump
+        match invocation(
+          isExpansionInFileMatching("SerialPrograms/"),
+          hasDeclaration(cxxConstructorDecl(ofClass(hasName("std::filesystem::path")))),
+          hasArgument(0, hasType(asString("std::string")))
+        )
+        EOF
+
+        files=$(jq -r '.[].file' SerialPrograms/bin/compile_commands.json)
+        echo "$files" | xargs --max-args=150 clang-query -p SerialPrograms/bin/ -f query.txt >> output.txt
+        cat output.txt
+        if grep --silent "Match #" output.txt; then
+          echo "::error Forbidden std::filesystem::path construction detected!"
+          exit 1
+        fi
