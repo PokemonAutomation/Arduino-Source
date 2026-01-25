@@ -39,7 +39,7 @@ jobs:
         fi
         echo "CMAKE_ADDITIONAL_FLAGS=$CMAKE_ADDITIONAL_FLAGS" >> $GITHUB_ENV
 
-        if [[ "${{inputs.os}}" == "windows*" ]]; then
+        if [[ "${{inputs.os}}" == windows* ]]; then
           UPLOAD_FOLDER="Arduino-Source/SerialPrograms/bin/RelWithDebInfo"
         else
           UPLOAD_FOLDER="Arduino-Source/SerialPrograms/bin"
@@ -112,7 +112,6 @@ jobs:
       if: startsWith(inputs.os, 'windows') && inputs.run-tests
       run: |
         cd Arduino-Source/SerialPrograms/bin
-        $env:DISCORD_BOT_TOKEN = "Value"
         $process = Start-Process -FilePath "./RelWithDebInfo/SerialPrograms.exe" `
                                  -ArgumentList "--command-line-test-mode --command-line-test-folder ../../../CommandLineTests" `
                                  -NoNewWindow -Wait -PassThru
