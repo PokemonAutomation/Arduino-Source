@@ -148,6 +148,21 @@ void ReliableStreamConnection::send_ack(uint8_t seqnum, uint8_t opcode){
     std::lock_guard<std::mutex> lg(m_lock);
     m_unreliable_connection.send(&packet, sizeof(packet));
 }
+void ReliableStreamConnection::send_ack_u16(uint8_t seqnum, uint8_t opcode, uint16_t data){
+    struct{
+        pabb2_PacketHeader_Ack_u16 header;
+        uint8_t crc[sizeof(uint32_t)];
+    } packet;
+    packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
+    packet.header.seqnum = seqnum;
+    packet.header.packet_bytes = sizeof(packet);
+    packet.header.opcode = opcode;
+    packet.header.data = data;
+    pabb_crc32_write_to_message(&packet, sizeof(packet));
+
+    std::lock_guard<std::mutex> lg(m_lock);
+    m_unreliable_connection.send(&packet, sizeof(packet));
+}
 
 size_t ReliableStreamConnection::send_raw(void* context, const void* data, size_t bytes){
     ReliableStreamConnection& self = *(ReliableStreamConnection*)context;
@@ -174,13 +189,13 @@ void ReliableStreamConnection::retransmit_thread(){
             continue;
         }
 
-        cout << "running retransmits" << endl;
+//        cout << "running retransmits" << endl;
 
         if (!pabb2_PacketSender_iterate_retransmits(&m_reliable_sender)){
-            cout << "nothing to do" << endl;
+//            cout << "nothing to do" << endl;
             next_retransmit = current_time() + m_retransmit_timeout;
         }else{
-            cout << "did something" << endl;
+//            cout << "did something" << endl;
         }
     }
 }
@@ -242,7 +257,11 @@ void ReliableStreamConnection::on_packet(const pabb2_PacketHeader* packet){
         }
         std::lock_guard<std::mutex> lg(m_lock);
         if (pabb2_StreamCoalescer_push_stream(&m_stream_coalescer, (const pabb2_PacketHeaderData*)packet)){
-            send_ack(packet->seqnum, PABB2_CONNECTION_OPCODE_RET_STREAM_DATA);
+            send_ack_u16(
+                packet->seqnum,
+                PABB2_CONNECTION_OPCODE_RET_STREAM_DATA,
+                pabb2_StreamCoalescer_bytes_available(&m_stream_coalescer)
+            );
         }
         return;
     }

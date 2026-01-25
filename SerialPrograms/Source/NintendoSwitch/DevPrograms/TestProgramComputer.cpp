@@ -141,6 +141,9 @@
 //#include "Common/SerialPABotBase/LightweightWallClock_StdChrono.h"
 #include "Common/Cpp/Options/MacAddressOption.h"
 #include "CommonTools/Images/ImageFilter.h"
+#include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
+#include "Common/PABotBase2/PABotbase2_ReliableStreamConnection.h"
+#include "Common/Cpp/StreamConnections/MockDevice.h"
 
 
 //#include <opencv2/core.hpp>
@@ -293,8 +296,29 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     using namespace std::chrono_literals;
 
+    [[maybe_unused]] Logger& logger = env.logger();
 
 
+
+#if 1
+    {
+        MockDevice device;
+
+        ReliableStreamConnection connection(
+            logger,
+            device,
+            1s
+        );
+
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_VERSION);
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE);
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS);
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_RESET);
+
+
+        scope.wait_for(60s);
+    }
+#endif
 
 
 

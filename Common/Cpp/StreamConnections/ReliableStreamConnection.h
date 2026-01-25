@@ -44,6 +44,7 @@ private:
     //  Send
 
     void send_ack(uint8_t seqnum, uint8_t opcode);
+    void send_ack_u16(uint8_t seqnum, uint8_t opcode, uint16_t data);
 
     static size_t send_raw(void* context, const void* data, size_t bytes);
     void retransmit_thread();

@@ -516,13 +516,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+
+#if 0
     {
         MockDevice device;
 
         ReliableStreamConnection connection(
             logger,
             device,
-            10s
+            1s
         );
 
         connection.send_request(PABB2_CONNECTION_OPCODE_ASK_VERSION);
@@ -533,7 +535,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
         context.wait_for(60s);
     }
-
+#endif
 
 
 
@@ -769,7 +771,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 1
+#if 0
 
     // ImageRGB32 image1(IMAGE_PATH);
     auto image1 = feed.snapshot();

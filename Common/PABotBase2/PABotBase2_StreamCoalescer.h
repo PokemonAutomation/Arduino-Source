@@ -15,11 +15,11 @@ extern "C" {
 
 
 #ifndef PABB2_StreamCoalescer_SLOTS
-#define PABB2_StreamCoalescer_SLOTS         4   //  Must be power-of-two, fits into uint8_t. (< 256)
+#define PABB2_StreamCoalescer_SLOTS         4   //  Must be power-of-two, fits into uint8_t. (max 128)
 #endif
 
 #ifndef PABB2_StreamCoalescer_BUFFER_SIZE
-#define PABB2_StreamCoalescer_BUFFER_SIZE   64  //  Must be power-of-two, fits into size_t.
+#define PABB2_StreamCoalescer_BUFFER_SIZE   64  //  Must be power-of-two, fits into uint16_t. (max 32768)
 #endif
 
 
@@ -54,6 +54,8 @@ static inline void pabb2_StreamCoalescer_reset(pabb2_StreamCoalescer* self){
     pabb2_StreamCoalescer_init(self);
     self->stream_reset = true;
 }
+
+uint16_t pabb2_StreamCoalescer_bytes_available(pabb2_StreamCoalescer* self);
 
 void pabb2_StreamCoalescer_push_packet(pabb2_StreamCoalescer* self, uint8_t seqnum);
 

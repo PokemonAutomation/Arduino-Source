@@ -50,15 +50,15 @@ typedef struct{
     uint8_t seqnum;
     uint8_t packet_bytes;
     uint8_t opcode;
-    uint16_t data;
-} PABB_PACK pabb2_PacketHeader_Ack_u16;
+    uint8_t data;
+} PABB_PACK pabb2_PacketHeader_Ack_u8;
 typedef struct{
     uint8_t magic_number;
     uint8_t seqnum;
     uint8_t packet_bytes;
     uint8_t opcode;
-    uint8_t data;
-} PABB_PACK pabb2_PacketHeader_Ack_u8;
+    uint16_t data;
+} PABB_PACK pabb2_PacketHeader_Ack_u16;
 typedef struct{
     uint8_t magic_number;
     uint8_t seqnum;

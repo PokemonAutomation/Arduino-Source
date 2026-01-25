@@ -6,9 +6,10 @@
 
 #include "MockDevice.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+//  REMOVE
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -77,6 +78,13 @@ size_t MockDevice::send(const void* data, size_t bytes){
         WriteSpinLock lg(m_host_to_device_lock);
 //        cout << "MockDevice::send(const void* data, size_t bytes)" << endl;
 
+#if 1
+        if (rand() % 10 < 2){
+            cout << "Dropping packet." << endl;
+            return 0;
+        }
+#endif
+
         if (m_host_to_device_line.size() >= m_host_to_device_capacity){
             return 0;
         }
@@ -86,6 +94,13 @@ size_t MockDevice::send(const void* data, size_t bytes){
             (const uint8_t*)data,
             (const uint8_t*)data + bytes
         );
+
+#if 1
+        if (rand() % 10 < 5){
+            cout << "Corrupting packet." << endl;
+            m_host_to_device_line[rand() % m_host_to_device_line.size()] = 0;
+        }
+#endif
     }
     {
         std::lock_guard<std::mutex> lg(m_device_lock);

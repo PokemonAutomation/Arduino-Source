@@ -44,20 +44,19 @@ const pabb2_PacketHeader* pabb2_PacketParser_pull_bytes(
             //  Magic byte never found.
             if (c == MIN_PACKET_SIZE){
                 self->index = 0;
-                continue;
+                break;
             }
 
             //  Magic byte found.
             if (buffer[c] == PABB2_CONNECTION_MAGIC_NUMBER){
-                break;
+                //  Shift the buffer up so that the magic byte is at the start.
+                memmove(self->buffer, self->buffer + c, MIN_PACKET_SIZE - c);
+                goto EndLoop;
             }
         }
-
-        //  Shift the buffer up so that the magic byte is at the start.
-        memmove(self->buffer, self->buffer + c, MIN_PACKET_SIZE - c);
-
-        break;
     }
+
+EndLoop:
 
     //  At this point, we have a complete and valid header.
 

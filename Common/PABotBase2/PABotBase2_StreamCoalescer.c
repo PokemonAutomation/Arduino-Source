@@ -77,6 +77,13 @@ void pabb2_StreamCoalescer_pop_leading_finished(pabb2_StreamCoalescer* self){
 }
 
 
+uint16_t pabb2_StreamCoalescer_bytes_available(pabb2_StreamCoalescer* self){
+    if (self->slot_head == self->slot_tail){
+        return PABB2_StreamCoalescer_BUFFER_SIZE;
+    }
+    return (self->stream_tail - self->stream_head) & PABB2_StreamCoalescer_BUFFER_MASK;
+}
+
 void pabb2_StreamCoalescer_push_packet(pabb2_StreamCoalescer* self, uint8_t seqnum){
     uint8_t slot_head = self->slot_head;
 
