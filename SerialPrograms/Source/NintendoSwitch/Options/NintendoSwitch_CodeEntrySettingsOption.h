@@ -12,6 +12,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Controllers/ControllerTypes.h"
 #include "NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_KeyboardEntryMappings.h"
 
 namespace PokemonAutomation{
@@ -34,9 +35,14 @@ public:
 
 class CodeboardTimingsOption : public GroupOption{
 public:
-    CodeboardTimingsOption(std::string label, bool switch2, bool wireless);
+    CodeboardTimingsOption(
+        std::string label,
+        bool switch2,
+        ControllerPerformanceClass performance_class
+    );
 
 private:
+    static Milliseconds get_unit_timing(ControllerPerformanceClass performance_class);
     Milliseconds unit;
 
 public:
