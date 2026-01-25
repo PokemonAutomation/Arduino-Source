@@ -305,15 +305,27 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
         MockDevice device;
 
         ReliableStreamConnection connection(
-            logger,
+            &scope,
+            logger, true,
             device,
             1s
         );
 
         connection.send_request(PABB2_CONNECTION_OPCODE_ASK_VERSION);
+        connection.wait_for_pending();
+
         connection.send_request(PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE);
+        connection.wait_for_pending();
+
         connection.send_request(PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS);
+        connection.wait_for_pending();
+
         connection.send_request(PABB2_CONNECTION_OPCODE_ASK_RESET);
+        connection.wait_for_pending();
+
+
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_VERSION);
+        connection.wait_for_pending();
 
 
         scope.wait_for(60s);

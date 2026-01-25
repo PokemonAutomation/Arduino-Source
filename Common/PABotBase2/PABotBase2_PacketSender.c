@@ -8,9 +8,8 @@
 #include "Common/CRC32/pabb_CRC32.h"
 #include "PABotBase2_PacketSender.h"
 
-//  REMOVE
-#include <stdio.h>
-#include "PABotBase2_ConnectionDebug.h"
+//#include <stdio.h>
+//#include "PABotBase2_ConnectionDebug.h"
 
 void pabb2_PacketSender_init(
     pabb2_PacketSender* self,
@@ -155,7 +154,8 @@ void pabb2_PacketSender_commit_packet(pabb2_PacketSender* self, pabb2_PacketHead
 
     self->unreliable_sender_send(
         self->unreliable_sender_context,
-        packet, packet->packet_bytes
+        packet, packet->packet_bytes,
+        false
     );
 
     //  In order to save memory, we repurpose the magic number as a timer to
@@ -186,7 +186,7 @@ size_t pabb2_PacketSender_send_stream(
         size_t offset;
 
         if (slots_used == 0){
-            printf("slots used: %u\n", slots_used);
+//            printf("slots used: %u\n", slots_used);
             //  We're empty. Rewind both to zero.
             capacity = PABB2_ConnectionSender_BUFFER_SIZE;
             offset = 0;
@@ -227,14 +227,14 @@ size_t pabb2_PacketSender_send_stream(
 
         size_t packet_bytes = current + OVERHEAD;
 
-        printf("buffer_tail: %zu, packet_bytes: %zu\n", buffer_tail, packet_bytes);
+//        printf("buffer_tail: %zu, packet_bytes: %zu\n", buffer_tail, packet_bytes);
 
         buffer_tail += packet_bytes;
         if (buffer_tail == PABB2_ConnectionSender_BUFFER_SIZE){
             buffer_tail = 0;
         }
         self->buffer_tail = buffer_tail;
-        printf("self->buffer_tail: %zu\n", self->buffer_tail);
+//        printf("self->buffer_tail: %zu\n", self->buffer_tail);
 
         self->offsets[self->slot_tail & PABB2_ConnectionSender_SLOTS_MASK] = ~offset;
 
@@ -255,7 +255,8 @@ size_t pabb2_PacketSender_send_stream(
         //  Send
         self->unreliable_sender_send(
             self->unreliable_sender_context,
-            packet, packet_bytes
+            packet, packet_bytes,
+            false
         );
 
         //  Set the retransmit timer.
@@ -291,14 +292,16 @@ bool pabb2_PacketSender_iterate_retransmits(pabb2_PacketSender* self){
             packet->magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
             uint8_t packet_bytes = packet->packet_bytes;
 
-            //  REMOVE
+#if 0
             printf("Retransmitting: %u\n", packet->seqnum);
             fflush(stdout);
+#endif
 
             self->unreliable_sender_send(
                 self->unreliable_sender_context,
                 packet,
-                packet_bytes == 0 ? (size_t)256 : (size_t)packet_bytes
+                packet_bytes == 0 ? (size_t)256 : (size_t)packet_bytes,
+                true
             );
             packet->magic_number = seqnum;
             return true;
@@ -326,7 +329,7 @@ void pabb2_PacketSender_send_info(pabb2_PacketSender* self, uint8_t seqnum, uint
     packet.header.packet_bytes = sizeof(packet);
     packet.header.opcode = opcode;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
-    self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet));
+    self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet), false);
 }
 void pabb2_PacketSender_send_ack(pabb2_PacketSender* self, uint8_t seqnum, uint8_t opcode){
     struct{
@@ -338,7 +341,7 @@ void pabb2_PacketSender_send_ack(pabb2_PacketSender* self, uint8_t seqnum, uint8
     packet.header.packet_bytes = sizeof(packet);
     packet.header.opcode = opcode;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
-    self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet));
+    self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet), false);
 }
 void pabb2_PacketSender_send_ack_u8(pabb2_PacketSender* self, uint8_t seqnum, uint8_t opcode, uint8_t data){
     struct{
@@ -351,7 +354,7 @@ void pabb2_PacketSender_send_ack_u8(pabb2_PacketSender* self, uint8_t seqnum, ui
     packet.header.opcode = opcode;
     packet.header.data = data;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
-    self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet));
+    self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet), false);
 }
 void pabb2_PacketSender_send_ack_u16(pabb2_PacketSender* self, uint8_t seqnum, uint8_t opcode, uint16_t data){
     struct{
@@ -364,7 +367,7 @@ void pabb2_PacketSender_send_ack_u16(pabb2_PacketSender* self, uint8_t seqnum, u
     packet.header.opcode = opcode;
     packet.header.data = data;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
-    self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet));
+    self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet), false);
 }
 void pabb2_PacketSender_send_ack_u32(pabb2_PacketSender* self, uint8_t seqnum, uint8_t opcode, uint32_t data){
     struct{
@@ -377,7 +380,7 @@ void pabb2_PacketSender_send_ack_u32(pabb2_PacketSender* self, uint8_t seqnum, u
     packet.header.opcode = opcode;
     packet.header.data = data;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
-    self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet));
+    self->unreliable_sender_send(self->unreliable_sender_context, &packet, sizeof(packet), false);
 }
 
 

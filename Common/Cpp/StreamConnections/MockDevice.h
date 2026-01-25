@@ -28,14 +28,21 @@ public:
 private:
     //  Call from device.
 
-    static size_t fp_device_send_serial(void* context, const void* data, size_t bytes){
-        return ((MockDevice*)context)->device_send_serial(data, bytes);
+    static size_t fp_device_send_serial(
+        void* context,
+        const void* data, size_t bytes,
+        bool is_retransmit
+    ){
+        return ((MockDevice*)context)->device_send_serial(data, bytes, is_retransmit);
     }
-    static size_t fp_device_read_serial(void* context, void* data, size_t max_bytes){
+    static size_t fp_device_read_serial(
+        void* context,
+        void* data, size_t max_bytes
+    ){
         return ((MockDevice*)context)->device_read_serial(data, max_bytes);
     }
 
-    size_t device_send_serial(const void* data, size_t bytes);
+    size_t device_send_serial(const void* data, size_t bytes, bool is_retransmit);
     size_t device_read_serial(void* data, size_t max_bytes);
 
 

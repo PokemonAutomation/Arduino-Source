@@ -11,6 +11,11 @@
 using std::cout;
 using std::endl;
 
+
+#define PABB2_DROP_HOST_TO_DEVICE   0.2
+#define PABB2_DROP_DEVICE_TO_HOST   0.2
+
+
 namespace PokemonAutomation{
 
 
@@ -42,19 +47,30 @@ MockDevice::~MockDevice(){
 }
 
 
-size_t MockDevice::device_send_serial(const void* data, size_t bytes){
+size_t MockDevice::device_send_serial(const void* data, size_t bytes, bool is_retransmit){
     {
         WriteSpinLock lg(m_device_to_host_lock);
 //        cout << "MockDevice::device_send_serial()" << endl;
         if (m_device_to_host_line.size() >= m_device_to_host_capacity){
             return 0;
         }
+
+        if ((rand() % 100) / 100. < PABB2_DROP_DEVICE_TO_HOST){
+            cout << "**Intentionally Dropping Packet: device -> host**" << endl;
+            return 0;
+        }
+
         bytes = std::min(bytes, m_device_to_host_capacity - m_device_to_host_line.size());
         m_device_to_host_line.insert(
             m_device_to_host_line.end(),
             (const uint8_t*)data,
             (const uint8_t*)data + bytes
         );
+
+        if ((rand() % 100) / 100. < PABB2_DROP_DEVICE_TO_HOST){
+            cout << "**Intentionally Corrupting Packet: device -> host**" << endl;
+            m_device_to_host_line[rand() % m_device_to_host_line.size()] = 0;
+        }
     }
     {
         std::lock_guard<std::mutex> lg(m_host_lock);
@@ -78,12 +94,10 @@ size_t MockDevice::send(const void* data, size_t bytes){
         WriteSpinLock lg(m_host_to_device_lock);
 //        cout << "MockDevice::send(const void* data, size_t bytes)" << endl;
 
-#if 1
-        if (rand() % 10 < 2){
-            cout << "Dropping packet." << endl;
+        if ((rand() % 100) / 100. < PABB2_DROP_HOST_TO_DEVICE){
+            cout << "**Intentionally Dropping Packet: host -> device**" << endl;
             return 0;
         }
-#endif
 
         if (m_host_to_device_line.size() >= m_host_to_device_capacity){
             return 0;
@@ -95,12 +109,10 @@ size_t MockDevice::send(const void* data, size_t bytes){
             (const uint8_t*)data + bytes
         );
 
-#if 1
-        if (rand() % 10 < 5){
-            cout << "Corrupting packet." << endl;
+        if ((rand() % 100) / 100. < PABB2_DROP_HOST_TO_DEVICE){
+            cout << "**Intentionally Corrupting Packet: host -> device**" << endl;
             m_host_to_device_line[rand() % m_host_to_device_line.size()] = 0;
         }
-#endif
     }
     {
         std::lock_guard<std::mutex> lg(m_device_lock);
