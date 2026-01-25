@@ -112,6 +112,8 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
             move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, -1, 400ms});
+            // fly_to_overworld_from_map() may fail since the snowy background on the map will false positive the destinationMenuItemWatcher (MapDestinationMenuDetector at box {0.523000, 0.680000, 0.080000, 0.010000}), which causes the fly to fail
+            // we can get around this by either placing down a marker, or by zooming out so that that section isn't white snow.
             move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, +1, 100ms});
         }
 
