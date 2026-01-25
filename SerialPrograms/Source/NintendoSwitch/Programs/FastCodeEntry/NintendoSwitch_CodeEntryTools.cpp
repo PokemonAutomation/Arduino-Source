@@ -7,14 +7,53 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch_CodeEntryTools.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace FastCodeEntry{
 
 
 
+Milliseconds calculate_path_time(
+    const CodeEntryDelays& delays,
+    const std::vector<CodeEntryActionWithDelay>& path
+){
+    Milliseconds full_cooldown = delays.hold + delays.cool;
 
-void codeboard_populate_delays(
+    Milliseconds ready_A = 0ms;
+    Milliseconds ready_move = 0ms;
+    Milliseconds ready_scroll = 0ms;
+
+    Milliseconds current = 0ms;
+
+    for (const CodeEntryActionWithDelay& action : path){
+        switch (action.action){
+        case CodeEntryAction::ENTER_CHAR:
+            current = std::max(current, ready_A);
+            ready_A = current + full_cooldown;
+            current += action.delay;
+            break;
+        case CodeEntryAction::SCROLL_LEFT:
+            current = std::max(current, ready_move);
+            ready_move = current + full_cooldown;
+            current += action.delay;
+            break;
+        default:
+            current = std::max(current, ready_scroll);
+            ready_scroll = current + full_cooldown;
+            current += action.delay;
+            break;
+        }
+    }
+
+    return current;
+}
+
+
+Milliseconds codeboard_populate_delays(
     bool switch2,
     std::vector<CodeEntryActionWithDelay>& path_with_delays,
     const std::vector<CodeEntryAction>& path,
@@ -45,40 +84,15 @@ void codeboard_populate_delays(
 
         path_with_delays[c].action = action;
         path_with_delays[c].delay = delay;
-    }
 
-
-    //  Pad out the stalls.
-    Milliseconds A_to_A_delay = std::max(delays.press_delay, delays.hold + delays.cool);
-    Milliseconds last_A_time = -1000ms;
-    Milliseconds current_time = 0ms;
-    for (size_t c = 1; c < path_with_delays.size(); c++){
-        CodeEntryActionWithDelay& previous = path_with_delays[c - 1];
-        CodeEntryActionWithDelay& current = path_with_delays[c];
-
-        //  The Switch doesn't like overlapping the scroll with the A press.
-        //  So we treat the left-scroll like an A press for timing purposes.
-
-        if (current.action == CodeEntryAction::ENTER_CHAR ||
-            (switch2 && current.action == CodeEntryAction::SCROLL_LEFT)
-        ){
-            Milliseconds time_since_last_A = current_time - last_A_time;
-            if (time_since_last_A < A_to_A_delay){
-                Milliseconds stall = A_to_A_delay - time_since_last_A;
-                previous.delay += stall;
-                current_time += stall;
-            }
-            last_A_time = current_time;
-        }
-
-        current_time += current.delay;
+//        cout << "    " << (int)action << " : " << delay.count() << endl;
     }
 
 
     //  Optimize
 
     if (!optimize || path_with_delays.empty() || switch2){
-        return;
+        return calculate_path_time(delays, path_with_delays);
     }
 
     //  These only work on the Switch 1.
@@ -99,6 +113,8 @@ void codeboard_populate_delays(
             previous.delay = 0ms;
         }
     }
+
+    return calculate_path_time(delays, path_with_delays);
 }
 
 

@@ -1,8 +1,10 @@
 # This CMake file defines all the code file paths as the CMake variables
 # For the main CMake file, see CMakeLists.txt
 
-# the executable needs the dark style format file
+# the GUI executable needs the dark style format file
 set(EXECUTABLE_SOURCES "Source/CommonFramework/Main.cpp" "../3rdParty/qdarkstyle/dark/darkstyle.qrc")
+
+# Note: Command-line executable sources are defined in Source/CommandLine/CommandLineExecutable.cmake
 
 file(GLOB LIBRARY_SOURCES
     ../3rdParty/ONNX/OnnxToolsPA.h
@@ -10,14 +12,11 @@ file(GLOB LIBRARY_SOURCES
     ../3rdParty/QtWavFile/WavFile.h
     ../3rdParty/TesseractPA/TesseractPA.cpp
     ../3rdParty/TesseractPA/TesseractPA.h
-    ../Common/CRC32.cpp
-    ../Common/CRC32.h
     ../Common/Compiler.h
     ../Common/ControllerStates/HID_Keyboard_State.h
     ../Common/ControllerStates/NintendoSwitch_OemController_State.c
     ../Common/ControllerStates/NintendoSwitch_OemController_State.h
     ../Common/ControllerStates/NintendoSwitch_WiredController_State.h
-    ../Common/Cpp/AbstractLogger.h
     ../Common/Cpp/BitmapConversion.cpp
     ../Common/Cpp/BitmapConversion.h
     ../Common/Cpp/CancellableScope.cpp
@@ -79,6 +78,10 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Exceptions.h
     ../Common/Cpp/ExpressionEvaluator.cpp
     ../Common/Cpp/ExpressionEvaluator.h
+    ../Common/Cpp/Filesystem.cpp
+    ../Common/Cpp/Filesystem.h
+    ../Common/Cpp/FileIO.cpp
+    ../Common/Cpp/FileIO.h
     ../Common/Cpp/ImageResolution.cpp
     ../Common/Cpp/ImageResolution.h
     ../Common/Cpp/Json/JsonArray.cpp
@@ -92,6 +95,15 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/LifetimeSanitizer.cpp
     ../Common/Cpp/LifetimeSanitizer.h
     ../Common/Cpp/ListenerSet.h
+    ../Common/Cpp/Logging/AbstractLogger.h
+    ../Common/Cpp/Logging/FileLogger.cpp
+    ../Common/Cpp/Logging/FileLogger.h
+    ../Common/Cpp/Logging/LastLogTracker.cpp
+    ../Common/Cpp/Logging/LastLogTracker.h
+    ../Common/Cpp/Logging/OutputRedirector.cpp
+    ../Common/Cpp/Logging/OutputRedirector.h
+    ../Common/Cpp/Logging/TaggedLogger.cpp
+    ../Common/Cpp/Logging/TaggedLogger.h
     ../Common/Cpp/MemoryUtilization/MemoryUtilization.cpp
     ../Common/Cpp/MemoryUtilization/MemoryUtilization.h
     ../Common/Cpp/MemoryUtilization/MemoryUtilization_Linux.tpp
@@ -166,7 +178,14 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/SerialConnection/SerialConnection.h
     ../Common/Cpp/SerialConnection/SerialConnectionPOSIX.h
     ../Common/Cpp/SerialConnection/SerialConnectionWinAPI.h
-    ../Common/Cpp/SerialConnection/StreamInterface.h
+    ../Common/Cpp/StreamConnections/MockDevice.cpp
+    ../Common/Cpp/StreamConnections/MockDevice.h
+    ../Common/Cpp/StreamConnections/PABotBase2_MessageDumper.cpp
+    ../Common/Cpp/StreamConnections/PABotBase2_MessageDumper.h
+    ../Common/Cpp/StreamConnections/ReliableStreamConnection.cpp
+    ../Common/Cpp/StreamConnections/ReliableStreamConnection.h
+    ../Common/Cpp/StreamConnections/StreamConnection.h
+    ../Common/Cpp/StreamConnections/StreamInterface.h
     ../Common/Cpp/Sockets/AbstractClientSocket.h
     ../Common/Cpp/Sockets/ClientSocket.cpp
     ../Common/Cpp/Sockets/ClientSocket.h
@@ -176,14 +195,16 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Stopwatch.h
     ../Common/Cpp/StreamConverters.cpp
     ../Common/Cpp/StreamConverters.h
-    ../Common/Cpp/StringTools.cpp
-    ../Common/Cpp/StringTools.h
+    ../Common/Cpp/Strings/StringTools.cpp
+    ../Common/Cpp/Strings/StringTools.h
+    ../Common/Cpp/Strings/Unicode.cpp
+    ../Common/Cpp/Strings/Unicode.h
     ../Common/Cpp/Time.cpp
     ../Common/Cpp/Time.h
     ../Common/Cpp/UiWrapper.h
-    ../Common/Cpp/Unicode.cpp
-    ../Common/Cpp/Unicode.h
     ../Common/Cpp/ValueDebouncer.h
+    ../Common/CRC32/pabb_CRC32.c
+    ../Common/CRC32/pabb_CRC32.h
     ../Common/Qt/AutoHeightTable.cpp
     ../Common/Qt/AutoHeightTable.h
     ../Common/Qt/AutoWidthLineEdit.cpp
@@ -252,6 +273,17 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/TimeQt.h
     ../Common/Qt/WidgetStackFixedAspectRatio.cpp
     ../Common/Qt/WidgetStackFixedAspectRatio.h
+    ../Common/PABotBase2/PABotBase2_Connection.h
+    ../Common/PABotBase2/PABotBase2_ConnectionDebug.c
+    ../Common/PABotBase2/PABotBase2_ConnectionDebug.h
+    ../Common/PABotBase2/PABotBase2_PacketParser.c
+    ../Common/PABotBase2/PABotBase2_PacketParser.h
+    ../Common/PABotBase2/PABotBase2_PacketSender.c
+    ../Common/PABotBase2/PABotBase2_PacketSender.h
+    ../Common/PABotBase2/PABotbase2_ReliableStreamConnection.c
+    ../Common/PABotBase2/PABotbase2_ReliableStreamConnection.h
+    ../Common/PABotBase2/PABotBase2_StreamCoalescer.c
+    ../Common/PABotBase2/PABotBase2_StreamCoalescer.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_HID_Keyboard.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS1_OemControllers.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS_WiredController.h
@@ -362,7 +394,6 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Logging/FileWindowLogger.h
     Source/CommonFramework/Logging/Logger.cpp
     Source/CommonFramework/Logging/Logger.h
-    Source/CommonFramework/Logging/OutputRedirector.cpp
     Source/CommonFramework/Logging/OutputRedirector.h
     Source/CommonFramework/Logging/QueuedLogger.cpp
     Source/CommonFramework/Logging/QueuedLogger.h
@@ -586,6 +617,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonTools/OCR/OCR_LargeDictionaryMatcher.h
     Source/CommonTools/OCR/OCR_NumberReader.cpp
     Source/CommonTools/OCR/OCR_NumberReader.h
+    Source/CommonTools/OCR/OCR_RawPaddleOCR.cpp
+    Source/CommonTools/OCR/OCR_RawPaddleOCR.h
     Source/CommonTools/OCR/OCR_RawOCR.cpp
     Source/CommonTools/OCR/OCR_RawOCR.h
     Source/CommonTools/OCR/OCR_Routines.cpp
@@ -744,6 +777,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Integrations/IntegrationsAPI.h
     Source/Integrations/ProgramTracker.cpp
     Source/Integrations/ProgramTracker.h
+    Source/Integrations/PybindSwitchController.cpp
+    Source/Integrations/PybindSwitchController.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch.h
@@ -925,6 +960,8 @@ file(GLOB LIBRARY_SOURCES
     Source/ML/DataLabeling/ML_SegmentAnythingModel.cpp
     Source/ML/DataLabeling/ML_SegmentAnythingModel.h
     Source/ML/DataLabeling/ML_SegmentAnythingModelConstants.h
+    Source/ML/Inference/ML_PaddleOCRPipeline.cpp
+    Source/ML/Inference/ML_PaddleOCRPipeline.h
     Source/ML/Inference/ML_YOLOv5Detector.cpp
     Source/ML/Inference/ML_YOLOv5Detector.h
     Source/ML/Inference/ML_YOLONavigation.cpp
@@ -1041,14 +1078,16 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h
     Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.h
+    Source/NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.cpp
+    Source/NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_CloseGameDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_CloseGameDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_DateChangeDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_DateChangeDetector.h
-    Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.cpp
-    Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.h
+    Source/NintendoSwitch/Inference/NintendoSwitch_FailedToConnectDetector.cpp
+    Source/NintendoSwitch/Inference/NintendoSwitch_FailedToConnectDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.cpp

@@ -177,7 +177,7 @@ bool start_raid_local(
         //  Enter code.
         if (!code.empty() && env.consoles.size() > 1){
             pbf_press_button(context, BUTTON_PLUS, 80ms, 1000ms);
-            FastCodeEntry::numberpad_enter_code(console, context, code, true);
+            FastCodeEntry::numberpad_enter_code(console, context, false, code, true);
             pbf_wait(context, 2000ms);
             pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
         }
@@ -187,7 +187,7 @@ bool start_raid_local(
     env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         //  Delay to prevent the Switches from forming separate lobbies.
         if (env.consoles.size() > 1 && console.index() != host.index()){
-            pbf_wait(context, 3000ms);
+            pbf_wait(context, 5000ms);
         }
         pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
     });
@@ -332,7 +332,7 @@ bool start_raid_host(
         //  Enter Code
         if (!code.empty()){
             pbf_press_button(context, BUTTON_PLUS, 80ms, 1000ms);
-            FastCodeEntry::numberpad_enter_code(console, context, code, true);
+            FastCodeEntry::numberpad_enter_code(console, context, false, code, true);
             pbf_wait(context, 2000ms);
             pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
         }

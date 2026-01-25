@@ -20,6 +20,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SwitchSystemSession_H
 #define PokemonAutomation_NintendoSwitch_SwitchSystemSession_H
 
+#include "Common/Cpp/Logging/TaggedLogger.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/VideoPipeline/VideoSession.h"

@@ -11,6 +11,7 @@
 #include "Common/Cpp/Options/ColorOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/MacAddressOption.h"
+#include "Common/Cpp/Options/ButtonOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
 #include "CommonTools/Options/StringSelectOption.h"
 #include "Controllers/ControllerTypes.h"
@@ -28,12 +29,15 @@ struct ControllerProfile{
     std::string official_name;
 };
 
-class ControllerSettingsRow : public EditableTableRow, public ConfigOption::Listener{
+class ControllerSettingsRow
+    : public EditableTableRow
+    , public ConfigOption::Listener
+    , private ButtonListener
+{
 public:
     ~ControllerSettingsRow();
-    ControllerSettingsRow(EditableTableOption& parent_table);
+    ControllerSettingsRow(EditableTableOption& parent_table, bool random_profile = true);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
-    virtual void on_config_value_changed(void* object) override;
 
     operator ControllerProfile() const{
         return {
@@ -52,6 +56,10 @@ public:
         official_color.set_by_slug(profile.official_name);
     }
 
+private:
+    virtual void on_config_value_changed(void* object) override;
+    virtual void on_press() override;
+
 public:
     StringCell name;
     MacAddressCell controller_mac_address;
@@ -61,6 +69,7 @@ public:
     ColorCell left_grip;
     ColorCell right_grip;
     StringSelectCell official_color;
+    ButtonCell randomize;
 
 private:
     std::atomic<size_t> m_pending_official_load;
@@ -72,7 +81,11 @@ public:
     ControllerSettingsTable();
     virtual std::vector<std::string> make_header() const override;
 
-    static ControllerProfile random_profile(ControllerType controller);
+    static ControllerProfile random_profile(
+        ControllerType controller,
+        const uint8_t* mac_address
+    );
+
     ControllerProfile get_or_make_profile(
         const uint8_t mac_address[6],
         const std::string& name,

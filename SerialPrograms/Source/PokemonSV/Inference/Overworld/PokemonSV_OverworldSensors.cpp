@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "PokemonSV_OverworldSensors.h"
 
@@ -28,7 +28,7 @@ bool ShinySoundTracker::last_detection(
     WallClock& timestamp, float& error,
     VideoSnapshot& screenshot
 ) const{
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     if (m_last_detection == WallClock::min()){
         return false;
     }
@@ -42,7 +42,7 @@ void ShinySoundTracker::on_shiny_detected(float error){
     WallClock threshold = now - std::chrono::seconds(1);
 
     //  Find the brightest frame.
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
 
     VideoSnapshot best_snapshot;
     double best_bright_portion = 0;
@@ -69,7 +69,7 @@ bool ShinySoundTracker::process_frame(const VideoSnapshot& frame){
         return false;
     }
 
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
 
     //  Clear old history.
     while (!m_history.empty() && m_history.front().timestamp + std::chrono::milliseconds(2000) < frame.timestamp){

@@ -9,10 +9,9 @@
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
-#include "CommonTools/ImageMatch/ImageCropper.h"
-#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/OCR/OCR_SmallDictionaryMatcher.h"
@@ -67,9 +66,18 @@ OCR::StringMatchResult FlavorPowerReader::read_substring(
     const ImageViewRGB32& image,
     double min_text_ratio, double max_text_ratio
 ) const{
-    return match_substring_from_image(
-        &logger, language, image,
+    OCR::StringMatchResult result = match_substring_from_image_multifiltered(
+        &logger, language, image, OCR::BLACK_TEXT_FILTERS(),
         MAX_LOG10P, MAX_LOG10P_SPREAD,
+        min_text_ratio, max_text_ratio,
+        OCR::PageSegMode::SINGLE_LINE
+    );
+    if (result.results.size() == 1){
+        return result;
+    }
+    logger.log("Multiple results from match_substring_from_image_multifiltered. Try direct OCR read without filtering:");
+    return match_substring_from_image(
+        &logger, language, image, MAX_LOG10P, MAX_LOG10P_SPREAD,
         OCR::PageSegMode::SINGLE_LINE
     );
 }
@@ -103,7 +111,10 @@ int FlavorPowerIconDetector::detect(const ImageViewRGB32& screen){
         const bool prioritize_numeric_only_results = true;
         const size_t width_max = SIZE_MAX;
         const size_t min_digit_area = image_crop.height()*image_crop.height() / 10;
-        int number = OCR::read_number_waterfill_multifilter(m_logger, image_crop,
+        int number = OCR::read_number_waterfill_multifilter(
+            m_logger,
+            GlobalThreadPools::normal_inference(),
+            image_crop,
             {
                 {0xff000000, 0xff707070},
                 {0xff000000, 0xff808080},

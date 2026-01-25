@@ -13,11 +13,11 @@
 #include "Common/Compiler.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Unicode.h"
 #include "Common/Cpp/PanicDump.h"
+#include "Common/Cpp/Strings/Unicode.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Thread.h"
-#include "StreamInterface.h"
+#include "Common/Cpp/StreamConnections/StreamConnection.h"
 
 namespace PokemonAutomation{
 
@@ -143,14 +143,19 @@ private:
             clear_error = "ClearCommError error flag = " + std::to_string(comm_error);
         }
 
-        serial_debug_log(clear_error);
+        if (consecutive_errors <= 10){
+            serial_debug_log(message);
+        }
+        if (consecutive_errors == 10){
+            serial_debug_log("Further error messages will be suppressed.");
+        }
         if (consecutive_errors >= 100 && allow_throw){
             throw ConnectionException(nullptr, "Serial Connection failed.");
         }
     }
 
 
-    virtual void send(const void* data, size_t bytes){
+    virtual size_t send(const void* data, size_t bytes){
         WriteSpinLock lg(m_send_lock, "SerialConnection::send()");
 #if 0
         for (size_t c = 0; c < bytes; c++){
@@ -163,7 +168,7 @@ private:
         DWORD written;
         if (WriteFile(m_handle, data, (DWORD)bytes, &written, nullptr) != 0 && bytes == written){
             m_consecutive_errors.store(0, std::memory_order_release);
-            return;
+            return written;
         }
 
         DWORD error = GetLastError();
@@ -177,6 +182,8 @@ private:
 //        cout << "WriteFile() : " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count() << endl;
 
 //        std::cout << "end send()" << std::endl;
+
+        return written;
     }
 
     void recv_loop(){

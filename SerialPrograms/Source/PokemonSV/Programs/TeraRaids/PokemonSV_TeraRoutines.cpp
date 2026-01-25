@@ -361,9 +361,10 @@ void join_raid(
             std::string code = raid_waiter.wait_for_raid_code();
             enter_code(
                 console, context,
+                false,
                 keyboard_layout,
-                code,
-                false, true, false
+                code, false, true,
+                false
             );
 
 #if 0

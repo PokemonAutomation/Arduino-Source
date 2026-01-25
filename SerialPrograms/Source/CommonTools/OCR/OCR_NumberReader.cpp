@@ -6,19 +6,20 @@
 
 #include <algorithm>
 #include <map>
-#include <format>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Strings/Unicode.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Qt/StringToolsQt.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonTools/Images/ImageManip.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "OCR_RawOCR.h"
+#include "OCR_RawPaddleOCR.h"
 #include "OCR_NumberReader.h"
 
 #include <iostream>
@@ -43,6 +44,8 @@ std::string run_number_normalization(const std::string& input){
         {'9', '9'},
 
         //  Common misreads.
+        {'U', '0'},
+        {'u', '0'},
         {'|', '1'},
         {']', '1'},
         {'[', '6'},
@@ -69,7 +72,7 @@ std::string run_number_normalization(const std::string& input){
     };
 
     std::string normalized;
-    for (char32_t ch : to_utf32(input)){
+    for (char32_t ch : utf8_to_utf32(input)){
         auto iter = SUBSTITUTION_TABLE.find(ch);
         if (iter == SUBSTITUTION_TABLE.end()){
             continue;
@@ -82,7 +85,14 @@ std::string run_number_normalization(const std::string& input){
 
 
 int read_number(Logger& logger, const ImageViewRGB32& image, Language language){
-    std::string ocr_text = OCR::ocr_read(language, image, OCR::PageSegMode::SINGLE_LINE);
+    bool use_paddle_ocr = false; // GlobalSettings::instance().USE_PADDLE_OCR;
+    std::string ocr_text;
+    if (use_paddle_ocr){
+        ocr_text = OCR::paddle_ocr_read(language, image);
+    }else{
+        ocr_text = OCR::ocr_read(language, image, OCR::PageSegMode::SINGLE_LINE);
+    }
+
     std::string normalized = run_number_normalization(ocr_text);
 
     std::string str;
@@ -136,6 +146,7 @@ std::string read_number_waterfill_no_normalization(
     );
 
 //    static int c = 0;
+//    int i = 0;
 //    filtered.save(std::format("zztest-{:#x}-{:#x}-{}.png", rgb32_min, rgb32_max, c++));
 
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(filtered, 0xff000000, 0xff7f7f7f);
@@ -168,10 +179,17 @@ std::string read_number_waterfill_no_normalization(
         }
 
         ImageRGB32 padded = pad_image(cropped, 1 * cropped.width(), 0xffffffff);
-        std::string ocr = OCR::ocr_read(Language::English, padded, OCR::PageSegMode::SINGLE_CHAR);
+        bool use_paddle_ocr = false; // GlobalSettings::instance().USE_PADDLE_OCR;
+        std::string ocr;
+        if (use_paddle_ocr){
+            ocr = OCR::paddle_ocr_read(Language::English, padded); 
+        }else{
+            ocr = OCR::ocr_read(Language::English, padded, OCR::PageSegMode::SINGLE_CHAR); 
+        }
 
 //        padded.save("zztest-cropped" + std::to_string(c) + "-" + std::to_string(i++) + ".png");
-        // std::cout << ocr[0] << std::endl;
+//        std::cout << ocr[0] << std::endl;
+
         if (!ocr.empty()){
             ocr_text += ocr[0];
         }else if (check_empty_string){
@@ -224,7 +242,9 @@ int read_number_waterfill(
 
 
 int read_number_waterfill_multifilter(
-    Logger& logger, const ImageViewRGB32& image,
+    Logger& logger,
+    ComputationThreadPool& thread_pool,
+    const ImageViewRGB32& image,
     std::vector<std::pair<uint32_t, uint32_t>> filters,    
     bool text_inside_range,
     bool prioritize_numeric_only_results, 
@@ -239,7 +259,7 @@ int read_number_waterfill_multifilter(
 
     SpinLock lock;
     std::map<int, uint8_t> candidates;
-    GlobalThreadPools::normal_inference().run_in_parallel(
+    thread_pool.run_in_parallel(
         [&](size_t index){
             std::pair<uint32_t, uint32_t> filter = filters[index];
 

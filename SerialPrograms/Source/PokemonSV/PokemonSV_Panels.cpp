@@ -138,6 +138,10 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHuntAreaZeroPlatform_Descriptor, ShinyHuntAreaZeroPlatform>());
     ret.emplace_back(make_single_switch_program<ShinyHuntScatterbug_Descriptor, ShinyHuntScatterbug>());
 
+    ret.emplace_back("---- Story Automation ----");
+    ret.emplace_back(make_single_switch_program<AutoStory_Descriptor, AutoStory>());
+    ret.emplace_back(make_single_switch_program<ClaimMysteryGift_Descriptor, ClaimMysteryGift>());
+
     ret.emplace_back("---- Glitches (v3.0.0) ----");
     ret.emplace_back(make_single_switch_program<WildItemFarmer_Descriptor, WildItemFarmer>());
 
@@ -145,19 +149,17 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<RideCloner101_Descriptor, RideCloner101>());
     ret.emplace_back(make_single_switch_program<CloneItems101_Descriptor, CloneItems101>());
 
-    ret.emplace_back("---- Public Betas ----");
-    ret.emplace_back(make_single_switch_program<AutoStory_Descriptor, AutoStory>());
-    ret.emplace_back(make_single_switch_program<ClaimMysteryGift_Descriptor, ClaimMysteryGift>());
+//    ret.emplace_back("---- Public Betas ----");
 
     ret.emplace_back("---- Deprecated Programs ----");
     ret.emplace_back(make_single_switch_program<AutoItemPrinter_Descriptor, AutoItemPrinter>());
 
-    if (PreloadSettings::instance().DEVELOPER_MODE || IS_BETA_VERSION){
-        ret.emplace_back("---- Untested/Beta/WIP ----");
-    }
-    if (IS_BETA_VERSION){
+//    if (PreloadSettings::instance().DEVELOPER_MODE || IS_BETA_VERSION){
+//        ret.emplace_back("---- Untested/Beta/WIP ----");
+//    }
+//    if (IS_BETA_VERSION){
 //        ret.emplace_back("---- Story Automation ----");
-    }
+//    }
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());

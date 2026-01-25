@@ -211,7 +211,9 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
 }
 
 void AudioPerSpectrumDetectorBase::clear(){
-    m_matcher->clear();
+    if (m_matcher != nullptr){
+        m_matcher->clear();
+    }
 }
 
 

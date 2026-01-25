@@ -11,6 +11,7 @@
 #include <condition_variable>
 #include <QNetworkReply>
 #include "Common/Cpp/Time.h"
+#include "Common/Cpp/Logging/TaggedLogger.h"
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"

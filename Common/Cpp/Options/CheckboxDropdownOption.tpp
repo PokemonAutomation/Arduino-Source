@@ -45,14 +45,14 @@ CheckboxDropdownCell<FlagEnum>::CheckboxDropdownCell(
 
 template <typename FlagEnum>
 FlagEnum CheckboxDropdownCell<FlagEnum>::current_value() const{
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     return m_current;
 }
 
 
 template <typename FlagEnum>
 std::string CheckboxDropdownCell<FlagEnum>::current_label() const{
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     if (!m_label.empty()){
         return m_label;
     }
@@ -79,13 +79,13 @@ std::string CheckboxDropdownCell<FlagEnum>::current_label() const{
 }
 template <typename FlagEnum>
 bool CheckboxDropdownCell<FlagEnum>::is_set(FlagEnum value) const{
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     return !is_empty(value & m_current);
 }
 template <typename FlagEnum>
 void CheckboxDropdownCell<FlagEnum>::replace_all(FlagEnum value){
     {
-        WriteSpinLock lg(m_lock);
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (m_current == value){
             return;
         }
@@ -100,7 +100,7 @@ void CheckboxDropdownCell<FlagEnum>::clear(){
 template <typename FlagEnum>
 void CheckboxDropdownCell<FlagEnum>::set_flag(FlagEnum value){
     {
-        WriteSpinLock lg(m_lock);
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (!is_empty(m_current & value)){
             return;
         }
@@ -111,7 +111,7 @@ void CheckboxDropdownCell<FlagEnum>::set_flag(FlagEnum value){
 template <typename FlagEnum>
 void CheckboxDropdownCell<FlagEnum>::clear_flag(FlagEnum value){
     {
-        WriteSpinLock lg(m_lock);
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         if (is_empty(m_current & value)){
             return;
         }
@@ -123,7 +123,7 @@ void CheckboxDropdownCell<FlagEnum>::clear_flag(FlagEnum value){
 template <typename FlagEnum>
 void CheckboxDropdownCell<FlagEnum>::toggle_flag(FlagEnum value){
     {
-        WriteSpinLock lg(m_lock);
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_current ^= value;
     }
     report_value_changed(this);
@@ -182,7 +182,7 @@ JsonValue CheckboxDropdownCell<FlagEnum>::to_json() const{
 
 template <typename FlagEnum>
 void CheckboxDropdownCell<FlagEnum>::restore_defaults(){
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     m_current = m_default;
 }
 

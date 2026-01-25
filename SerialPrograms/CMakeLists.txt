@@ -455,12 +455,15 @@ else() # macOS and Linux
 
     pkg_search_module(DPP dpp=10.0.28)
     if (DPP_FOUND) # enable dpp integration
+        message(STATUS "Compiling with DPP integration enabled")
         target_compile_definitions(SerialProgramsLib PUBLIC PA_DPP)
         ## to build against headers within this repo and properly set flags ##
         ## don't enable the following line ##
         # target_include_directories(SerialProgramsLib PRIVATE ${DPP_INCLUDE_DIRS})
         target_link_directories(SerialProgramsLib PUBLIC ${DPP_LIBRARY_DIRS})
         target_link_libraries(SerialProgramsLib PUBLIC ${DPP_LIBRARIES})
+    else()
+        message(NOTICE "Compiling with DPP integration disabled")
     endif()
 
     if (APPLE)
@@ -595,6 +598,9 @@ if (WIN32)
     set(DISCORD_DLL_DEBUG "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win/bin/debug/discord_partner_sdk.dll")
     set(DISCORD_DLL_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win/bin/release/discord_partner_sdk.dll")
 
+    set(DPP_DEBUG_DLL "${REPO_ROOT_DIR}/3rdPartyBinaries/dpp_debug/dpp.dll")
+    set(DPP_RELEASE_DLL "${REPO_ROOT_DIR}/3rdPartyBinaries/dpp_release/dpp.dll")
+
     if(QT_DEPLOY_FILES)
         # Run windeployqt if Qt DLLs are missing
         if(WINDEPLOYQT_EXECUTABLE AND NOT EXISTS "${WIN_DEPLOY_DIR}/Qt6Core.dll")
@@ -638,6 +644,15 @@ if (WIN32)
         )
     endif()
 
+    # Copy dpp dll
+    add_custom_command(
+        TARGET SerialPrograms POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Copying dpp DLL"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<IF:$<CONFIG:Debug>,${DPP_DEBUG_DLL},${DPP_RELEASE_DLL}>"
+            "${WIN_DEPLOY_DIR}/dpp.dll"
+)
+
     # Extract OpenCV debug DLL if missing
     if (NOT EXISTS "${OPENCV_DEBUG_DLL}")
         message(STATUS "OpenCV debug DLL not found, extracting from zip...")
@@ -677,3 +692,6 @@ endif() # end WIN32
 if (QT_MAJOR GREATER_EQUAL 6)
     qt_finalize_target(SerialPrograms)
 endif()
+
+# Add command-line executable (GUI-free) from subdirectory
+include(Source/CommandLine/CommandLineExecutable.cmake)

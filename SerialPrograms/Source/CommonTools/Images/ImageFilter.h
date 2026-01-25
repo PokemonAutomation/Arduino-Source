@@ -14,6 +14,8 @@
 
 namespace PokemonAutomation{
 
+class ImageViewHSV32;
+class ImageHSV32;
 class ImageViewRGB32;
 class ImageRGB32;
 
@@ -162,6 +164,16 @@ ImageRGB32 filter_green(
     uint8_t rgb_gap = 0
 );
 
+
+//  Convert an HSV-format image to black and white.
+//  Inside [mins, maxs] is white, otherwise it's black.
+//  Set "in_range_black" to true to invert the colors.
+//  Both white and black colors have alpha=255.
+ImageRGB32 to_blackwhite_hsv32_range(
+    const ImageViewHSV32& image,
+    bool in_range_black,
+    uint32_t mins, uint32_t maxs
+);
 
 
 }

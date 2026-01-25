@@ -30,12 +30,12 @@ bool check_calorie(
 ){
     HyperspaceCalorieWatcher calorie_watcher(console.logger());
     int ret = wait_until(
-        console, context, std::chrono::seconds(1), {calorie_watcher}
+        console, context, std::chrono::seconds(5), {calorie_watcher}
     );
     if (ret < 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "check_calorie(): does not detect Calorie number after waiting for a second",
+            "check_calorie(): does not detect Calorie number after waiting for five seconds",
             console
         );
     }
@@ -58,7 +58,7 @@ bool check_calorie(
 }
 
 // Wait until the warp pad is detected
-void detect_warp_pad(
+void detect_interactable(
     ConsoleHandle& console,
     ProControllerContext& context
 ){
@@ -66,7 +66,8 @@ void detect_warp_pad(
         COLOR_RED,
         ButtonType::ButtonA,
         {0.4, 0.1, 0.2, 0.8},
-        &console.overlay()
+        &console.overlay(),
+        Milliseconds(100)
     );
 
     int ret = wait_until(
@@ -76,7 +77,7 @@ void detect_warp_pad(
     if (ret < 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "detect_warp_pad(): Cannot detect warp pad after 5 seconds",
+            "detect_interactable_pad(): Cannot detect interactable after 5 seconds",
             console
         );
     } else {

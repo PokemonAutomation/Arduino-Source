@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Strings/Unicode.h"
 #include "Common/Qt/StringToolsQt.h"
 #include "OCR_StringMatchResult.h"
 
@@ -22,9 +23,9 @@ std::string StringMatchData::to_str() const{
         }
     }
     str += "\" -> ";
-    str += "\"" + to_utf8(normalized_text) + "\" -> ";
+    str += "\"" + utf32_to_str(normalized_text) + "\" -> ";
 
-    str += "(" + to_utf8(target) + "): ";
+    str += "(" + utf32_to_str(target) + "): ";
     str += "(" + token + ")";
     return str;
 }

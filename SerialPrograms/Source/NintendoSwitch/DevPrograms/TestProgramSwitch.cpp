@@ -34,7 +34,7 @@
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
-#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
@@ -159,7 +159,20 @@
 #include "Common/Cpp/Options/CheckboxDropdownDatabase.h"
 #include "Common/Cpp/Options/CheckboxDropdownOption.h"
 #include "Common/Cpp/Options/CheckboxDropdownOption.tpp"
-
+//#include "Integrations/PybindSwitchController.h"
+#include "Common/PABotBase2/PABotBase2_ConnectionDebug.h"
+#include "Common/PABotBase2/PABotBase2_PacketSender.h"
+#include "Common/PABotBase2/PABotBase2_StreamCoalescer.h"
+#include "Common/Cpp/StreamConnections/StreamInterface.h"
+#include "Common/Cpp/StreamConnections/StreamConnection.h"
+#include "Common/Cpp/ListenerSet.h"
+#include "Common/CRC32/pabb_CRC32.h"
+#include "Common/PABotBase2/PABotBase2_PacketParser.h"
+#include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
+#include "Common/PABotBase2/PABotbase2_ReliableStreamConnection.h"
+#include "Common/Cpp/StreamConnections/MockDevice.h"
+#include "ML/Inference/ML_PaddleOCRPipeline.h"
+#include "CommonTools/OCR/OCR_RawPaddleOCR.h"
 
 
 
@@ -171,9 +184,24 @@
 using std::cout;
 using std::endl;
 
-
 using namespace PokemonAutomation::Kernels;
 using namespace PokemonAutomation::Kernels::Waterfill;
+
+
+
+
+namespace PokemonAutomation{
+
+
+
+
+
+
+
+
+
+
+}
 
 
 
@@ -220,6 +248,7 @@ TestProgram::TestProgram()
         false
     )
     , IMAGE_PATH(false, "Path to image for testing", LockMode::UNLOCK_WHILE_RUNNING, "default.png", "default.png")
+    , FLOAT("Float option:", LockMode::UNLOCK_WHILE_RUNNING, 0) 
     , STATIC_TEXT("Test text...")
     , BOX("Box", LockMode::UNLOCK_WHILE_RUNNING, 0, 0, 1, 1)
     , BUTTONS("Buttons", ProController_Button_Database(), LockMode::UNLOCK_WHILE_RUNNING, BUTTON_NONE)
@@ -244,6 +273,7 @@ TestProgram::TestProgram()
     PA_ADD_OPTION(LANGUAGE);
 //    PA_ADD_OPTION(CONSOLE_MODEL);
     PA_ADD_OPTION(IMAGE_PATH);
+    PA_ADD_OPTION(FLOAT);
     PA_ADD_OPTION(STATIC_TEXT);
     PA_ADD_OPTION(BOX);
     PA_ADD_OPTION(BUTTONS);
@@ -292,6 +322,178 @@ public:
 
 
 
+
+
+class LogSender : public StreamSender{
+public:
+    virtual size_t send(const void* data, size_t bytes) override{
+//        cout << PABotBase2::dump_packet((const pabb2_PacketHeader*)data) << endl;
+        cout << "Sending: ";
+        pabb2_PacketHeader_print((const pabb2_PacketHeader*)data, false);
+        fflush(stdout);
+        return bytes;
+    }
+};
+
+void fp_LogSender(void* context, const void* data, size_t bytes){
+    ((LogSender*)context)->send(data, bytes);
+}
+
+#if 0
+std::string dump(const pabb2_PacketSender& sender){
+    std::string str;
+    str += "---------------\n";
+    str += "Slot Head: " + std::to_string(sender.slot_head) + "\n";
+    str += "Slot Tail: " + std::to_string(sender.slot_tail) + "\n";
+    str += "Buffer Head: " + std::to_string(sender.buffer_head) + "\n";
+    str += "Buffer Tail: " + std::to_string(sender.buffer_tail) + "\n";
+    for (uint8_t seqnum = sender.slot_head; seqnum != sender.slot_tail; seqnum++){
+        size_t offset = ~sender.offsets[seqnum & PABB2_ConnectionSender_SLOTS_MASK];
+        str += "Offset = " + std::to_string(offset) + "\n";
+        str += PABotBase2::dump_packet((const pabb2_PacketHeader*)(sender.buffer + offset));
+        str += "\n";
+    }
+    return str;
+}
+#endif
+
+struct DataPacket : pabb2_PacketHeaderData{
+    char data[256];
+
+    void set(uint8_t seqnum, uint16_t stream_offset, const char* str){
+        const size_t OVERHEAD = sizeof(pabb2_PacketHeaderData) + sizeof(uint32_t);
+        const size_t MAX_SIZE = 256 - OVERHEAD;
+
+        size_t size = strlen(str);
+        if (size >= MAX_SIZE){
+            cout << "Data is too large." << endl;
+            size = MAX_SIZE;
+        }
+
+        this->magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
+        this->seqnum = seqnum;
+        this->packet_bytes = (uint8_t)(size + OVERHEAD);
+        this->opcode = PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA;
+        this->stream_offset = stream_offset;
+        memcpy(data, str, size);
+    }
+};
+
+
+#if 0
+pabb2_StreamCoalescer* coalescer;
+
+
+class MockConnection : public StreamConnection{
+public:
+    MockConnection()
+        : m_thread([this]{ thread_body(); })
+    {}
+    ~MockConnection(){
+        {
+            std::lock_guard<std::mutex> lg(m_lock);
+            m_stopping = true;
+        }
+        m_cv.notify_all();
+        m_thread.join();
+    }
+
+    virtual size_t send(const void* data, size_t bytes) override{
+        const pabb2_PacketHeader* packet = (const pabb2_PacketHeader*)data;
+#if 0
+        cout << "Sending: ";
+        pabb2_PacketHeader_print(packet, false);
+        fflush(stdout);
+#endif
+
+        WallClock now = current_time();
+
+        struct{
+            pabb2_PacketHeader header;
+            uint8_t crc[sizeof(uint32_t)];
+        } response;
+        response.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
+        response.header.seqnum = packet->seqnum;
+        response.header.packet_bytes = sizeof(response);
+        response.header.opcode = PABB2_CONNECTION_OPCODE_RET;
+        pabb_crc32_write_to_message(&response, sizeof(response));
+
+        std::lock_guard<std::mutex> lg(m_lock);
+
+        if (packet->opcode == PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA){
+            uint8_t stream_size = packet->packet_bytes - sizeof(pabb2_PacketHeaderData) - sizeof(uint32_t);
+            for (uint8_t c = 0; c < stream_size; c++){
+                char expected = '0' + m_offset % 10;
+                char actual = ((const char*)packet)[sizeof(pabb2_PacketHeaderData) + c];
+                if (expected != actual){
+                    cout << "Mismatch at: " << m_offset << ", expected = " << expected << ", actual = " << actual << endl;
+
+                    pabb2_StreamCoalescer_print(coalescer, true);
+
+                    system("pause");
+                }
+                m_offset++;
+            }
+
+        }
+
+
+
+//        cout << "enqueuing" << endl;
+        m_send_schedule.insert({
+            now + 500ms,
+            std::string((char*)&response, (char*)&response + sizeof(response))
+        });
+        m_cv.notify_all();
+
+        return bytes;
+    }
+
+
+private:
+    void thread_body(){
+        while (!m_stopping){
+            std::unique_lock<std::mutex> lg(m_lock);
+
+            while (!m_send_schedule.empty()){
+                auto iter = m_send_schedule.begin();
+                if (current_time() < iter->first){
+                    m_cv.wait_until(lg, iter->first);
+                    continue;
+                }
+                std::string& packet = iter->second;
+#if 0
+                cout << "Receiving: ";
+                pabb2_PacketHeader_print((const pabb2_PacketHeader*)packet.data(), false);
+                fflush(stdout);
+#endif
+                on_recv(packet.data(), packet.size());
+                m_send_schedule.erase(iter);
+            }
+
+            m_cv.wait(lg);
+        }
+    }
+
+
+private:
+    std::multimap<WallClock, std::string> m_send_schedule;
+
+    uint64_t m_offset = 0;
+
+    std::mutex m_lock;
+    std::condition_variable m_cv;
+    bool m_stopping = false;
+    Thread m_thread;
+};
+#endif
+
+
+
+
+
+
+
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -315,8 +517,273 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
+#if 0
+    {
+        MockDevice device;
+
+        ReliableStreamConnection connection(
+            logger,
+            device,
+            1s
+        );
+
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_VERSION);
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE);
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS);
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_RESET);
 
 
+        context.wait_for(60s);
+    }
+#endif
+
+
+
+
+#if 0
+    CloseGameWatcher close_game(console);
+    close_game.make_overlays(overlays);
+
+    auto snapshot = feed.snapshot();
+    cout << close_game.detect(snapshot) << endl;
+#endif
+
+
+#if 0
+    MockConnection unreliable_connection;
+    {
+        ReliableStreamConnection connection(logger, unreliable_connection, 100s);
+
+        coalescer = &connection.m_stream_coalescer;
+
+
+        cout << connection.send_request(0x20) << endl;
+//        cout << connection.send_request(0x21) << endl;
+
+        while (true){
+            scope.throw_if_cancelled();
+            cout << "Sent = " << connection.send("0123456789", 10) << endl;
+            pabb2_PacketSender_print(&connection.m_reliable_sender, true);
+            scope.wait_for(50ms);
+        }
+
+
+        scope.wait_for(10s);
+        cout << "================ End Test ================" << endl;
+    }
+#endif
+
+#if 0
+    DataPacket packet;
+    pabb2_StreamCoalescer coalescer;
+    pabb2_StreamCoalescer_init(&coalescer);
+
+    coalescer.stream_head = 32;
+    coalescer.stream_tail = 32;
+
+    packet.set(3, 32, "asdf");
+    cout << pabb2_StreamCoalescer_push_stream(&coalescer, &packet) << endl;
+
+    pabb2_StreamCoalescer_push_packet(&coalescer, 1);
+    pabb2_StreamCoalescer_push_packet(&coalescer, 2);
+    pabb2_StreamCoalescer_print(&coalescer, true);
+
+    pabb2_StreamCoalescer_push_packet(&coalescer, 0);
+    pabb2_StreamCoalescer_print(&coalescer, true);
+
+    packet.set(5, 60, "qwersdfg");
+    cout << pabb2_StreamCoalescer_push_stream(&coalescer, &packet) << endl;
+    pabb2_StreamCoalescer_print(&coalescer, true);
+
+    packet.set(4, 36, "01234567890123456789abcd");
+    cout << pabb2_StreamCoalescer_push_stream(&coalescer, &packet) << endl;
+
+    pabb2_StreamCoalescer_print(&coalescer, true);
+
+
+    char buffer[100] = {};
+
+    cout << "read = " << pabb2_StreamCoalescer_read(&coalescer, buffer, 1) << endl;
+    cout << buffer << endl;
+
+    pabb2_StreamCoalescer_print(&coalescer, true);
+
+    cout << "read = " << pabb2_StreamCoalescer_read(&coalescer, buffer, 10) << endl;
+    cout << buffer << endl;
+
+    pabb2_StreamCoalescer_print(&coalescer, true);
+
+    cout << "read = " << pabb2_StreamCoalescer_read(&coalescer, buffer, 100) << endl;
+    cout << buffer << endl;
+
+    pabb2_StreamCoalescer_print(&coalescer, true);
+#endif
+
+
+#if 0
+    LogSender sender;
+    pabb2_PacketSender queue;
+    pabb2_PacketSender_init(&queue, fp_LogSender, &sender);
+
+    cout << pabb2_PacketSender_send_stream(&queue, "asdf", 4) << endl;
+    cout << pabb2_PacketSender_send_stream(&queue, "qwer", 4) << endl;
+    cout << pabb2_PacketSender_send_stream(&queue, "zxcv", 4) << endl;
+    pabb2_PacketSender_remove(&queue, 0);
+
+    cout << pabb2_PacketSender_send_stream(&queue, "01234567890123456789", 20) << endl;
+//    cout << pabb2_PacketSender_send_stream(&queue, "sdfg", 4) << endl;
+//    cout << pabb2_PacketSender_send_stream(&queue, "xcvb", 4) << endl;
+
+    pabb2_PacketSender_print(&queue, true);
+
+    pabb2_PacketSender_remove(&queue, 0);
+    cout << pabb2_PacketSender_send_stream(&queue, "sdfgh", 5) << endl;
+    cout << pabb2_PacketSender_send_stream(&queue, "xcvb", 4) << endl;
+
+    pabb2_PacketSender_print(&queue, true);
+#endif
+
+
+#if 0
+    LogSender sender;
+    pabb2_PacketSender queue;
+    pabb2_PacketSender_init(&queue);
+
+    pabb2_PacketHeader* packet;
+
+    packet = pabb2_PacketSender_reserve_packet(&queue, 16);
+    if (packet){
+        packet->opcode = 1;
+        pabb2_PacketSender_commit_packet(&queue, packet);
+        sender.send(packet, packet->packet_bytes);
+    }else{
+        cout << "Reserve Failed" << endl;
+    }
+
+    packet = pabb2_PacketSender_reserve_packet(&queue, 16);
+    if (packet){
+        packet->opcode = 2;
+        pabb2_PacketSender_commit_packet(&queue, packet);
+        sender.send(packet, packet->packet_bytes);
+    }else{
+        cout << "Reserve Failed" << endl;
+    }
+
+    packet = pabb2_PacketSender_reserve_packet(&queue, 16);
+    if (packet){
+        packet->opcode = 3;
+        pabb2_PacketSender_commit_packet(&queue, packet);
+        sender.send(packet, packet->packet_bytes);
+    }else{
+        cout << "Reserve Failed" << endl;
+    }
+
+    packet = pabb2_PacketSender_reserve_packet(&queue, 15);
+    if (packet){
+        packet->opcode = 4;
+        pabb2_PacketSender_commit_packet(&queue, packet);
+        sender.send(packet, packet->packet_bytes);
+    }else{
+        cout << "Reserve Failed" << endl;
+    }
+
+    packet = pabb2_PacketSender_reserve_packet(&queue, 16);
+    if (packet){
+        packet->opcode = 5;
+        pabb2_PacketSender_commit_packet(&queue, packet);
+        sender.send(packet, packet->packet_bytes);
+    }else{
+        cout << "Reserve Failed" << endl;
+    }
+
+    cout << dump(queue) << endl;
+
+#if 1
+    pabb2_PacketSender_remove(&queue, 0);
+    packet = pabb2_PacketSender_reserve_packet(&queue, 16);
+    if (packet){
+        packet->opcode = 6;
+        pabb2_PacketSender_commit_packet(&queue, packet);
+        sender.send(packet, packet->packet_bytes);
+    }else{
+        cout << "Reserve Failed" << endl;
+    }
+
+    cout << dump(queue) << endl;
+#endif
+
+    packet = pabb2_PacketSender_reserve_packet(&queue, 16);
+    if (packet){
+        packet->opcode = 7;
+        pabb2_PacketSender_commit_packet(&queue, packet);
+        sender.send(packet, packet->packet_bytes);
+    }else{
+        cout << "Reserve Failed" << endl;
+    }
+
+
+#endif
+
+
+
+#if 0
+    LogSender sender;
+    PABotBase2::RequestQueue queue(logger, sender, 16, 64);
+
+    try{
+        cout << queue.send_str("asdfqwe") << endl;
+        cout << queue.send_str("wer") << endl;
+    }catch (...){
+        cout << "Caught Exception" << endl;
+    }
+
+    cout << "Dumping queue... 0" << endl;
+    cout << queue.dump_queue(true) << endl;
+
+#if 0
+    {
+        queue.report_acked(0);
+        cout << "Dumping queue... 3" << endl;
+        cout << queue.dump_queue(true) << endl;
+    }
+    {
+        queue.report_acked(4);
+        cout << "Dumping queue... 2" << endl;
+        cout << queue.dump_queue(true) << endl;
+    }
+#endif
+    {
+        queue.report_acked(7);
+        cout << "Dumping queue... 1" << endl;
+        cout << queue.dump_queue(true) << endl;
+    }
+#endif
+
+
+
+
+#if 0
+    {
+        PybindSwitchProController controller("COM12");
+        controller.push_button(1000, 200, 800, BUTTON_B);
+        controller.wait_for_all_requests();
+    }
+#endif
+
+
+#if 0
+
+    // ImageRGB32 image1(IMAGE_PATH);
+    auto image1 = feed.snapshot();
+    ImageViewRGB32 cropped = extract_box_reference(image1, ImageFloatBox{BOX.x(), BOX.y(), BOX.width(), BOX.height()});
+
+    // auto snapshot = feed.snapshot();
+    std::string text = OCR::paddle_ocr_read(LANGUAGE, cropped);
+    cout << text << endl;
+
+    
+
+#endif
 
 #if 0
     std::string move_results = "Move Effectiveness:";

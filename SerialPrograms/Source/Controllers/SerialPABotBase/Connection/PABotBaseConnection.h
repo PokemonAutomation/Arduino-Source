@@ -17,7 +17,7 @@
 #include <memory>
 #include <deque>
 #include <map>
-#include "Common/Cpp/SerialConnection/StreamInterface.h"
+#include "Common/Cpp/StreamConnections/StreamConnection.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 #include "BotBase.h"
 

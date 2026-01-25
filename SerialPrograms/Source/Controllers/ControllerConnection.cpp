@@ -26,7 +26,7 @@ void ControllerConnection::remove_status_listener(StatusListener& listener){
 }
 
 std::string ControllerConnection::status_text() const{
-    SpinLockGuard lg(m_status_text_lock);
+    ReadSpinLock lg(m_status_text_lock);
     std::string str = m_status_line0;
     if (!str.empty() && !m_status_line1.empty()){
         str += "<br>";

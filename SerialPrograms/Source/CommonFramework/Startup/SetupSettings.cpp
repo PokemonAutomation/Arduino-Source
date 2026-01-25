@@ -13,7 +13,7 @@
 #include <QPermissions>
 #endif
 #endif
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "SetupSettings.h"

@@ -48,6 +48,7 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
 
     //  Port is invalid.
     if (info.isNull()){
+        logger.log("Serial port " + name + " is invalid. Maybe wrong port name?");
         return;
     }
 

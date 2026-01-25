@@ -189,7 +189,7 @@ bool start_raid_host_solo(
     std::string code = settings.RAID_CODE.get_code();
     if (!code.empty()){
         pbf_press_button(context, BUTTON_PLUS, 80ms, 1000ms);
-        FastCodeEntry::numberpad_enter_code(console, context, code, true);
+        FastCodeEntry::numberpad_enter_code(console, context, false, code, true);
         pbf_wait(context, 2000ms);
         pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
         context.wait_for_all_requests();

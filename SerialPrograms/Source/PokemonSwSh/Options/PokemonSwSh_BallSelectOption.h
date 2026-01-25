@@ -17,7 +17,10 @@ namespace PokemonSwSh{
 
 class PokemonBallSelectCell : public StringSelectCell{
 public:
-    PokemonBallSelectCell(const std::string& default_slug = "");
+    PokemonBallSelectCell(
+        LockMode lock_while_running,
+        const std::string& default_slug = ""
+    );
 };
 
 

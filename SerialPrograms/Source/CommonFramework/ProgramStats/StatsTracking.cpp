@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "StatsTracking.h"
 

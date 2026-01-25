@@ -58,6 +58,7 @@ EncounterFilterOverride::~EncounterFilterOverride(){
 EncounterFilterOverride::EncounterFilterOverride(EditableTableOption& parent_table)
     : EditableTableRow(parent_table)
     , pokemon(ALL_POKEMON_NAMES(), LockMode::UNLOCK_WHILE_RUNNING, "starly")
+    , pokeball(LockMode::UNLOCK_WHILE_RUNNING)
     , ball_limit(LockMode::UNLOCK_WHILE_RUNNING, 40, 1, 999)
 {
     PA_ADD_OPTION(pokemon);

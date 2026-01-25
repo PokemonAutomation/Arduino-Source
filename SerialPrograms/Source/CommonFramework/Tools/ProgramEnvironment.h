@@ -8,7 +8,7 @@
 #define PokemonAutomation_ProgramEnvironment_H
 
 #include "Common/Cpp/Containers/Pimpl.h"
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 
 namespace PokemonAutomation{
 

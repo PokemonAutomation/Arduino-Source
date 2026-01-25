@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Qt/StringToolsQt.h"
+#include "Common/Cpp/Strings/Unicode.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/Images/ImageFilter.h"
@@ -161,7 +161,7 @@ int8_t read_pp_text(Logger& logger, const ImageViewRGB32& image){
 
     std::string ocr_text = OCR::ocr_read(Language::English, processed);
 
-    ocr_text = to_utf8(OCR::run_character_reductions(to_utf32(ocr_text)));
+    ocr_text = utf32_to_str(OCR::run_character_reductions(utf8_to_utf32(ocr_text)));
     int8_t pp = parse_pp(ocr_text);
 
     std::string str;

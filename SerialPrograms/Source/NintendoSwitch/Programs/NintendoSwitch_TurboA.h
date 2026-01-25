@@ -7,7 +7,9 @@
 #ifndef PokemonAutomation_NintendoSwitch_TurboA_H
 #define PokemonAutomation_NintendoSwitch_TurboA_H
 
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -29,6 +31,8 @@ public:
 
 private:
     StartInGripOrGameOption START_LOCATION;
+    MillisecondsOption TIME_LIMIT;
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 };
 
 

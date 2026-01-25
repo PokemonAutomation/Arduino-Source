@@ -104,6 +104,7 @@ public:
 
 private:
     ButtonDetector m_right_stick_up_down_detector;
+    ImageFloatBox m_left_white_space_box, m_right_white_space_box;
 };
 class SomethingInBoxCellWatcher : public DetectorToFinder<SomethingInBoxCellDetector>{
 public:

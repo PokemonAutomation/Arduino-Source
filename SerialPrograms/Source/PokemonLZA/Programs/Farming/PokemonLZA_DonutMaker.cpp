@@ -60,16 +60,19 @@ class DonutMaker_Descriptor::Stats : public StatsTracker{
 public:
     Stats()
         : matched(m_stats["Donuts Matched"])
+        , kept(m_stats["Donuts Kept"])
         , resets(m_stats["Resets"])
         , errors(m_stats["Errors"])
     {
         // TODO: Add more stats here
         m_display_order.emplace_back("Donuts Matched");
+        m_display_order.emplace_back("Donuts Kept");
         m_display_order.emplace_back("Resets");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
 
     std::atomic<uint64_t>& matched;
+    std::atomic<uint64_t>& kept;
     std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& errors;
 };
@@ -87,18 +90,12 @@ DonutMaker::DonutMaker()
         true
     )
     , BERRIES("<b>Berries:</b><br>The berries used to make the donut. Minimum 3 berries, maximum 8 berries.")
-    , NUM_POWER_REQUIRED(
-        "<b>Number of Powers to Match:</b><br>How many of a donut's powers must be in the the table below. Minimum 1, maximum 3. "
-        "<br>Ex. For a target donut of Big Haul Lv.3, Berry Lv.3, and any or none for the 3rd power, set the number as 2."
-        "<br>Then, in the flavor powers table, make sure to add Big Haul Lv.3 and Berry Lv. 3.",
+    , MAX_KEEPERS(
+        "<b>Maximum Number of Donuts to Keep:</b><br>"
+        "The program will stop when this many donuts are kept or all limits in the table are reached, whichever happens first."
+        "<br>Make sure you have enough berries to make this many donuts. The program will fail when not given enough berries.",
         LockMode::LOCK_WHILE_RUNNING,
-        1, 1, 3
-        )
-    , NUM_DONUTS(
-       "<b>Number of Donuts:</b><br>The number of donuts to make."
-       "<br>Make sure you have enough berries to make this many donuts.",
-       LockMode::LOCK_WHILE_RUNNING,
-       1, 1, 999
+        5, 1, 999
     )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_DONUT_FOUND(
@@ -117,33 +114,95 @@ DonutMaker::DonutMaker()
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(BERRIES);
-    PA_ADD_OPTION(NUM_POWER_REQUIRED);
-    PA_ADD_OPTION(NUM_DONUTS);
+    PA_ADD_OPTION(MAX_KEEPERS);
     PA_ADD_OPTION(FLAVOR_POWERS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
+// Split flavor power notation into its individual tokens
+std::vector<std::string> get_flavor_power_tokens(const std::string& power_string){
+    std::vector<std::string> tokens;
+    size_t start = 0;
+    size_t end = power_string.find('-');
+    while (end != std::string::npos){
+        tokens.push_back(power_string.substr(start, end - start));
+        start = end + 1;
+        end = power_string.find('-', start);
+    }
+    tokens.push_back(power_string.substr(start));
+    return tokens;
+}
+
+// Check if all flavor tokens are in the donut flavor tokens
+// Apply some extra logic for "any" token and the special level tokens
+bool flavor_tokens_are_subset(const std::vector<std::string>& subset, const std::vector<std::string>& superset){
+    for (const std::string& token : subset){
+        if (token == "any"){
+            continue;
+        }
+        else if (token == "12"){
+            if (std::find(superset.begin(), superset.end(), "1") == superset.end() && std::find(superset.begin(), superset.end(), "2") == superset.end()){
+                return false;
+            }
+        }
+        else if (token == "23"){
+            if (std::find(superset.begin(), superset.end(), "2") == superset.end() && std::find(superset.begin(), superset.end(), "3") == superset.end()){
+                return false;
+            }
+        }
+        else if (std::find(superset.begin(), superset.end(), token) == superset.end()){
+            return false;
+        }
+    }
+    return true;
+}
+
+// Check if a donut matches an individual table entry. Each table entry has three target powers.
+bool donut_matches_powers(SingleSwitchProgramEnvironment& env, std::vector<std::string>& donut_powers, const std::vector<std::string>& target_powers){
+    for (const std::string& target_power : target_powers){
+        // `target_power` can be a specific power like "item-power-berries-3" or a slug to match
+        // any possible power (or no power): "any-power-any".
+        std::vector<std::string> target_tokens = get_flavor_power_tokens(target_power);
+        bool matched = false;
+        for (const std::string& donut_power : donut_powers){
+            env.log("Comparing target power " + target_power + " with donut power " + donut_power);
+            std::vector<std::string> donut_tokens = get_flavor_power_tokens(donut_power);
+            if (flavor_tokens_are_subset(target_tokens, donut_tokens)){
+                env.log("Power matched!");
+                matched = true;
+                break;
+            }
+        }
+        if (!matched){
+            return false;
+        }
+    }
+    return true;
+}
+
 // Read flavor power and check if they match user requirement.
+// Keep or discard the donut depending on the user defined limit.
 // Return true if the user requirement is fulfilled.
-bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::vector<uint16_t>& kept_counts) {
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
     env.log("Reading in table of desired powers.");
-    std::vector<std::string> power_table;
+
+    std::vector<std::vector<std::string>> powers_table;
     std::vector<std::unique_ptr<FlavorPowerTableRow>> wanted_powers_table = FLAVOR_POWERS.copy_snapshot();
     for (const std::unique_ptr<FlavorPowerTableRow>& row : wanted_powers_table){
         FlavorPowerTableEntry table_line = row->snapshot();
-        power_table.push_back(table_line.to_str());
+        powers_table.push_back(table_line.get_entry_flavor_power_strings());
         env.log(table_line.to_str());
     }
     //TODO: Validate powers? The "All Types" type only applies to catching and sparkling powers. Move and resist do not have "All Types"
     //Are people even going to target move and resist power? Big Haul/Item Berry/Alpha/Sparkling seems more likely.
 
-    env.log("Reading powers and counting up hits.");
-    uint8_t num_hits = 0;
+    env.log("Checking donut powers against table.");
     VideoSnapshot screen = env.console.video().snapshot();
-    for (int i = 0; i < 3; i++) {
+    std::vector<std::string> donut_results;
+    for (int i = 0; i < 3; i++){
         FlavorPowerDetector read_power(env.logger(), COLOR_GREEN, LANGUAGE, i);
         const std::string power = read_power.detect_power(screen);
         if (power.empty()){
@@ -151,19 +210,36 @@ bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProController
             continue;
         }
         env.add_overlay_log(std::format("{}: {}", i+1, power));
-        
-        if ((std::find(power_table.begin(), power_table.end(), power) != power_table.end())) {
-            num_hits++;
+        donut_results.push_back(power);
+    }
+
+    bool match_found = false;
+    bool should_keep = false;
+    // Each power table row:
+    for (size_t i = 0; i < powers_table.size(); i++){
+        if (donut_matches_powers(env, donut_results, powers_table[i])){
+            match_found = true;
+            if (kept_counts[i] < FLAVOR_POWERS.snapshot()[i].limit){
+                kept_counts[i]++;
+                env.log("Keeping donut: " + std::to_string(kept_counts[i]) + " / " + std::to_string(FLAVOR_POWERS.snapshot()[i].limit) + " for table entry " + std::to_string(i+1));
+                should_keep = true;
+            }
         }
     }
-
-    if (num_hits >= NUM_POWER_REQUIRED) {
+    if (match_found){
+        env.log("Match found!");
         stats.matched++;
         env.update_stats();
-        send_program_status_notification(env, NOTIFICATION_DONUT_FOUND, "Match found!", screen, true);
-        return true;
+        if (should_keep){
+            stats.kept++;
+            env.update_stats();
+            send_program_status_notification(env, NOTIFICATION_DONUT_FOUND, "Match found! Keeping donut.", screen, true);
+            return true;
+        } else {
+            env.log("Matched donut exceeds all keep limits.");
+        }
     }
-
+    env.log("Discarding donut.");
     return false;
 }
 
@@ -278,8 +354,17 @@ void DonutMaker::open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env,
         );
         DonutBerriesSelectionWatcher berry_selection(0);
 
-        int ret = wait_until(env.console, context, std::chrono::seconds(3),
-            {white_dialog, arrow, berry_selection, dreams_alpha_delta, omega});
+        int ret = wait_until(
+            env.console, context,
+            std::chrono::seconds(30),
+            {
+                white_dialog,
+                arrow,
+                berry_selection,
+                dreams_alpha_delta,
+                omega,
+            }
+        );
         switch (ret){
         case 0:
             env.log("Detected white dialog. Go to next dialog");
@@ -318,28 +403,27 @@ void DonutMaker::open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env,
     );
 }
 
-
-// Move from pokecenter to in front of Ansha with button A shown
-void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+// A generic function to fast travel to an index in the fast travel menu and watch for overworld
+void fast_travel_to_index(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int location_index=0){
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
-    const bool zoom_to_max = false;
+    env.log("Fast traveling to location at index " + std::to_string(location_index));
+    bool zoom_to_max = false;
     const bool require_icons = false;
     open_map(env.console, context, zoom_to_max, require_icons);
-    // Move map cursor upwards a little bit so that the cursor locks onto the pokecenter.
-    // This is needed so that in the fast travel location menu the Hotel Z is one row near
-    // the default position on the menu.
-    pbf_move_left_joystick(context, {0, +0.5}, 100ms, 400ms);
-    // Press Y to load fast travel locaiton menu. The cursor should now points to Vert Pokemon Center
+    
+    // Press Y to load fast travel locaiton menu
     pbf_press_button(context, BUTTON_Y, 100ms, 500ms);
-    // Move one menu item up to select Hotel Z
-    pbf_press_dpad(context, DPAD_UP, 50ms, 600ms);
     context.wait_for_all_requests();
 
     OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
+            // Move cursor to desired location index
+            for (int i = 0; i < location_index; i++){
+                pbf_press_dpad(context, DPAD_DOWN, 100ms, 500ms);
+            }
             pbf_mash_button(context, BUTTON_A, Seconds(10));
             pbf_wait(context, Seconds(30)); // 30 sec to wait out potential day night change
         },
@@ -350,14 +434,85 @@ void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProContr
         env.update_stats();
         OperationFailedException::fire(
            ErrorReport::SEND_ERROR_REPORT,
-            "donut_maker(): Unable to find overworld after fast traveling from Vert Pokemon Center after 30 sec.",
+            "donut_maker(): Unable to find overworld after fast traveling to location index " + std::to_string(location_index),
             env.console
         );
     }
-    context.wait_for(100ms); // extra 0.1 sec to let game give player control
-    env.log("Detected overworld. Fast traveled from Pokecenter to Hotel Zone");
+    env.log("Detected overworld. Fast traveled to location index " + std::to_string(location_index));
+}
 
-    ret = run_towards_gate_with_A_button(env.console, context, 0, +1, Seconds(5));
+// Exit the game and load the backup save
+void load_backup_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
+
+    env.log("Making backup save.");
+
+    go_home(env.console, context);
+    const bool backup_save = true;
+    if (!reset_game_from_home(env, env.console, context, backup_save)){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "donut_maker(): Cannot reset game from Switch Home screen.",
+            env.console
+        );
+    }
+}
+
+void exit_menu_to_overworld(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
+
+    env.log("Exiting menu to overworld.");
+
+    OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [&](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_B, Seconds(10));
+            pbf_wait(context, Seconds(30)); // 30 sec to wait out potential day night change
+        },
+        {overworld}
+    );
+    if (ret != 0){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+           ErrorReport::SEND_ERROR_REPORT,
+            "donut_maker(): Unable to find overworld after exiting menu.",
+            env.console
+        );
+    }
+}
+
+void reset_map_filter_state(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    env.log("Resetting fast travel map filters.");
+
+    open_map(env.console, context, false, false);
+    // Press Y and - to open fast travel filter menu
+    pbf_press_button(context, BUTTON_Y, 100ms, 500ms);
+    pbf_press_button(context, BUTTON_MINUS, 100ms, 500ms);
+    // Press Down and A to select "Facilities" filter
+    pbf_press_dpad(context, DPAD_DOWN, 100ms, 500ms);
+    pbf_press_button(context, BUTTON_A, 100ms, 500ms);
+
+    // Close out of map
+    exit_menu_to_overworld(env, context);
+    context.wait_for_all_requests();
+
+    // The filters should now be set to "Facilities" and hovering over Centrico Plaza
+    env.log("Fast travel map filters reset.");
+}
+
+// Move to in front of Ansha with button A shown
+void move_to_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
+
+    fast_travel_to_index(env, context, 3); // Fast travel to Hotel Z
+    context.wait_for(100ms); // Wait for player control to return
+    env.log("Detected overworld. Fast traveled to Hotel Zone");
+
+    int ret = run_towards_gate_with_A_button(env.console, context, 0, +1, Seconds(5));
     if (ret == 1){  // day night change happens during running
         // As day night change has ended, try running towards door again
         if (run_towards_gate_with_A_button(env.console, context, 0, +1, Seconds(5)) != 0){
@@ -391,7 +546,7 @@ void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProContr
     WallClock end_time = current_time();
     const auto duration = end_time - start_time;
     // Due to day/night change may eating the mashing button A sequence, we may still be outside the hotel!
-    if (duration >= 16s){
+    if (duration >= 10s){
         // mash A again to make sure we are inside the hotel
         pbf_mash_button(context, BUTTON_A, Seconds(2));
         context.wait_for_all_requests();
@@ -410,55 +565,40 @@ void move_from_pokecenter_to_ansha(SingleSwitchProgramEnvironment& env, ProContr
 
 // Create a new backup save after making a donut to keep
 void save_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
+    // DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
     env.log("Creating new backup save to keep the last made donut.");
 
     // Stop talking to Ansha
-    pbf_mash_button(context, BUTTON_B, Seconds(4));
+    exit_menu_to_overworld(env, context);
     context.wait_for_all_requests();
 
-    const bool zoom_to_max = false;
-    const bool require_icons = false;
-    open_map(env.console, context, zoom_to_max, require_icons);
-    // Move map cursor upwards a little bit so that the cursor locks onto Hotel Z.
-    // This is needed so that in the fast travel location menu the pokecenter is one row near
-    // the default position on the menu.
-    pbf_move_left_joystick(context, {0, +0.5}, 100ms, 400ms);
-    // Press Y to load fast travel locaiton menu. The cursor should now points to Hotel Z
-    pbf_press_button(context, BUTTON_Y, 100ms, 500ms);
-    // Move one menu item down to select Hotel Z
-    pbf_press_dpad(context, DPAD_DOWN, 50ms, 600ms);
-    context.wait_for_all_requests();
-
-    OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
-    int ret = run_until<ProControllerContext>(
-        env.console, context,
-        [&](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_A, Seconds(10));
-            pbf_wait(context, Seconds(30)); // 30 sec to wait out potential day night change
-        },
-        {overworld}
-    );
-    if (ret != 0){
-        stats.errors++;
-        env.update_stats();
-        OperationFailedException::fire(
-           ErrorReport::SEND_ERROR_REPORT,
-            "donut_maker(): Unable to find overworld after fast traveling from Hotel Z after 30 sec.",
-            env.console
-        );
-    }
-    context.wait_for(3000ms); // extra 3 seconds to allow the autosave to complete
-    env.log("Detected overworld. Fast traveled from Hotel Z to Pokecenter");
+    // Fast travel to anywhere to set a new backup save after making a donut to keep
+    // Removed this since it's likely redundant because the program always fast travels to Hotel Z before making a donut
+    // fast_travel_to_index(env, context, 0, 3000ms);
 }
 
-// Return true if it should stop
-// Start the iteration at closest pokemon center
-bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+// Check if all user defined limits are reached or the global max keepers limit is reached
+bool DonutMaker::should_stop(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::vector<uint16_t>& kept_counts){
+    int total_kept = 0;
+    bool limit_reached = true;
+    for (size_t i = 0; i < kept_counts.size(); i++){
+        if (kept_counts[i] < FLAVOR_POWERS.snapshot()[i].limit){
+            limit_reached = false;
+        }
+        total_kept += kept_counts[i];
+    }
+    if (total_kept >= MAX_KEEPERS){
+        return true;
+    }
+    return limit_reached;
+}
+
+// Return true if a donut match is found
+bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::vector<uint16_t>& kept_counts) {
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
-    move_from_pokecenter_to_ansha(env, context);
+    move_to_ansha(env, context);
 
     const ImageFloatBox button_A_box{0.3, 0.2, 0.4, 0.7};
     ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, button_A_box, &env.console.overlay());
@@ -477,22 +617,12 @@ bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControl
     // Add berries from menu and make a donut. Stop at flavor power screen.
     add_berries_and_make_donut(env, context);
 
-    // Read flavor power and check if they match user requirement:
-    if (match_powers(env, context)){
+    // Read flavor power and check if they match user requirement and should be kept:
+    if (match_powers(env, context, kept_counts)){
         return true;
     }
-    
-    go_home(env.console, context);
-    const bool backup_save = true;
-    if (!reset_game_from_home(env, env.console, context, backup_save)){
-        stats.errors++;
-        env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "donut_maker(): Cannot reset game from Switch Home screen.",
-            env.console
-        );
-    }
+
+    load_backup_save(env, context);
     return false;
 }
 
@@ -517,20 +647,22 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     //  Mash button B to let Switch register the controller
     pbf_mash_button(context, BUTTON_B, 200ms);
 
+    reset_map_filter_state(env, context);
+
+    std::vector<uint16_t> kept_counts(FLAVOR_POWERS.snapshot().size(), 0);
     while(true){
-        const bool should_stop = donut_iteration(env, context);
+        const bool should_keep = donut_iteration(env, context, kept_counts);
         stats.resets++;
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS);
 
-        if (should_stop){
-            if (stats.matched.load() >= NUM_DONUTS){
+        if (should_keep){
+            if (should_stop(env, context, kept_counts)){
                 break;
             }
             save_donut(env, context);
         }
     }
-
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

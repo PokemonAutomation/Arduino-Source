@@ -278,6 +278,7 @@ StringMatchResult match_substring(
         double token_length = item.first.size();
 
         size_t distance = levenshtein_distance_substring(item.first, normalized);
+
         size_t matched = token_length - distance;
         if (matched == 0){
             continue;

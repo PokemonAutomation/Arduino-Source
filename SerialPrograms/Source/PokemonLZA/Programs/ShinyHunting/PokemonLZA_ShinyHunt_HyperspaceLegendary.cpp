@@ -5,13 +5,20 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/ImageTypes/ImageHSV32.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/ImageTypes/ImageViewHSV32.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "ML/Inference/ML_YOLOv5Detector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
@@ -77,15 +84,20 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
     : SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::STOP_PROGRAM)
     , LEGENDARY("<b>Legendary " + STRING_POKEMON + ":</b>",
         {
-            {Legendary::TERRAKION, "terrakion", "Terrakion"},
-            {Legendary::VIRIZION,  "virizion",  "Virizion"},
+            {Legendary::LATIAS, "latias", "Latias: Shuttle Run"},
+            {Legendary::LATIAS_ALT, "latias-game-reset", "Latias: Game Reset"},
+            {Legendary::LATIOS, "latios", "Latios: Game Reset"},
+            {Legendary::COBALION, "cobalion", "Cobalion: Shuttle Run"},
+            {Legendary::TERRAKION, "terrakion", "Terrakion: Shuttle Run"},
+            {Legendary::VIRIZION,  "virizion",  "Virizion: Shuttle Run"},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        Legendary::VIRIZION
+        Legendary::LATIAS
     )
     , MIN_CALORIE_TO_CATCH(
         "<b>Minimum Cal. Reserved to Catch Legendary:</b><br>If applicable, the program will stop refreshing the Legendary spawn to give this amount of Calorie left for catching the Legendary."
         "<br>NOTE: use 5-star donut for best catch chance and enough time in the Legendary hyperspace."
+        "<br>NOTE: not required for Game Reset programs."
         "<br>Cal. per sec: 1 Star: 1 Cal./s, 2 Star: 1.6 Cal./s, 3 Star: 3.5 Cal./s, 4 Star: 7.5 Cal./s, 5 Star: 10 Cal./s",
         LockMode::UNLOCK_WHILE_RUNNING,
         600, 0, 9999 // default, min, max
@@ -108,6 +120,318 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
 
 namespace {
 
+// Save on the rooftop, facing the Latias spawning platform, but without having it spawned
+// Note that this program is different from other PLZA legendary programs in that it uses image analysis to identify the shiny.
+// Additionally, respawning is accomplished by resetting the game, so there is no need to track calories.
+bool hunt_latias_alt(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats)
+{
+    stats.spawns++;
+    pbf_press_button(context, BUTTON_Y, 160ms, 2000ms);
+    context.wait_for_all_requests();
+
+    // Capture an image of the screen region that Latias should spawn in and visually assess whether it's shiny.
+    ImageViewRGB32 full_image = ImageViewRGB32(env.console.video().snapshot());
+    ImagePixelBox latias_search_zone = ImagePixelBox(
+        static_cast<size_t>(full_image.width() * 0.4),
+        static_cast<size_t>(full_image.height() * 0.2),
+        static_cast<size_t>(full_image.width() * 0.6),
+        static_cast<size_t>(full_image.height() * 0.4)
+    );
+    ImageViewRGB32 cropped_image = extract_box_reference(full_image, latias_search_zone);
+    ImageHSV32 cropped_hsv_image = ImageHSV32(cropped_image);
+    ImageViewHSV32 cropped_hsv_image_view = ImageViewHSV32(
+        cropped_hsv_image.data(),
+        cropped_hsv_image.bytes_per_row(),
+        cropped_hsv_image.width(),
+        cropped_hsv_image.height()
+    );
+    ImageRGB32 filtered_image_nonshiny = to_blackwhite_hsv32_range(
+        cropped_hsv_image_view, false,
+        0xffe76051, 0xffffffd2
+    );
+    ImageRGB32 filtered_image_shiny = to_blackwhite_hsv32_range(
+        cropped_hsv_image_view, false,
+        0xff0d3d51, 0xff37ffd2
+    );
+    double nonshiny_result = image_average(filtered_image_nonshiny).r;
+    double shiny_result = image_average(filtered_image_shiny).r;
+    
+    /*filtered_image_nonshiny.save("filtered_nonshiny.png");
+    filtered_image_shiny.save("filtered_shiny.png");
+    cropped_image.save("cropped.png");
+    env.console.log("Saved images for Latias reset", COLOR_MAGENTA);*/
+    env.console.log(std::format("Score for non-shiny Latias: {}", nonshiny_result), COLOR_MAGENTA);
+    env.console.log(std::format("Score for shiny Latias: {}", shiny_result), COLOR_MAGENTA);
+
+    env.update_stats();
+
+    // For now, return true (triggering program stop) if a shiny is detected or a non-shiny is not detected
+    if (nonshiny_result < 0.18 || shiny_result > 0.18) {
+        env.console.log("Shiny Latias identified or regular Latias not identified. Stopping program.", COLOR_MAGENTA);
+        return true;
+    }
+    else {
+        env.console.log("Non-shiny Latias identified. Resetting the game.", COLOR_MAGENTA);
+        return false;
+    }
+}
+
+
+// Start at the ladder up to Latias and use it to fix the position and camera angle
+// Run a route to the other side of the roof and begin a shuttle run to respawn Latias repeatedly
+// Route back to the ladder when calories are low
+void hunt_latias_route(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
+    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
+{
+    // Start at the ladder and use it to fix the position and camera angle
+    detect_interactable(env.console, context);
+    pbf_press_button(context, BUTTON_A, 160ms, 1200ms);
+    pbf_move_left_joystick(context, {0, -0.5}, 80ms, 1200ms);
+
+    // Roll backwards to align against the edge of the Munna roof
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Roll left on the overhang to get to the far corner
+    ssf_press_left_joystick(context, {-0.5, 0}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    // Slightly longer due to falling off a ledge
+    pbf_press_button(context, BUTTON_Y, 100ms, 1200ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    // Roll to align against the bulkhead
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Roll down the corridor next to the bulkhead
+    ssf_press_left_joystick(context, {0, -0.5}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Roll towards the corner of the Kirlia rooftop
+    ssf_press_left_joystick(context, {-0.5, 0}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Rolling at this angle puts you at the very edge of the lower corner roof, at the start of the reset path
+    ssf_press_left_joystick(context, {-0.20, +0.5}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    // Fall down 2 roof levels
+    pbf_press_button(context, BUTTON_Y, 100ms, 1200ms);
+
+    // Adjust the camera angle to face the direction of the reset path
+    pbf_move_left_joystick(context, {+0.357, +0.5}, 500ms, 500ms);
+    pbf_press_button(context, BUTTON_L, 80ms, 160ms);
+
+    // Climb up from the overhang to the lower corner rooftop
+    pbf_move_left_joystick(context, {0, +1}, 500ms, 1200ms);
+
+    // Start of actual reset cycle
+    while (true){
+        // Roll to the edge of the lower corner rooftop
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+        // Climb onto the upper rooftop
+        pbf_move_left_joystick(context, {0, +1}, 500ms, 1200ms);
+
+        // Roll forward and align against the far chimney
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+        // Latias spawns here
+
+        context.wait_for_all_requests();
+        stats.spawns++;
+        env.update_stats();
+
+        // Roll back to the start on the lower corner rooftop
+        ssf_press_left_joystick(context, {0, -0.5}, 0ms, 500ms, 0ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1200ms);
+        // Latias despawns here
+
+        // Turn back around to face the chimney
+        ssf_press_left_joystick(context, {0, +0.5}, 0ms, 500ms, 0ms);
+
+        const uint16_t min_calorie = MIN_CALORIE_TO_CATCH + 55 * 10;
+        if (check_calorie(env.console, context, min_calorie)){
+            break;
+        }
+    }
+
+    // Roll and climb onto the upper rooftop
+    pbf_move_left_joystick(context, {0, +1}, 500ms, 1200ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_move_left_joystick(context, {0, +1}, 500ms, 1200ms);
+
+    // Roll to the right, next to the Kirlia rooftop
+    ssf_press_left_joystick(context, {+0.5, 0}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Climb onto the Kirlia rooftop
+    pbf_move_left_joystick(context, {0, -1}, 500ms, 1200ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Roll right towards the bulkhead
+    ssf_press_left_joystick(context, {+0.5, 0}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Adjust the camera angle back to the original angle
+    pbf_move_left_joystick(context, {-0.357, +0.5}, 80ms, 160ms);
+    pbf_press_button(context, BUTTON_L, 80ms, 160ms);
+
+    // Climb onto the next rooftop
+    ssf_press_left_joystick(context, {+0.5, 0}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Roll towards the Munna rooftop
+    pbf_move_left_joystick(context, {+1, 0}, 500ms, 1200ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Climb onto the Munna rooftop and roll
+    pbf_move_left_joystick(context, {+1, 0}, 500ms, 1200ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    // Roll back towards the ladder
+    ssf_press_left_joystick(context, {0, +0.5}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    context.wait_for_all_requests();
+    // The route back to the ladder also counts as a spawn attempt
+    stats.spawns++;
+    env.update_stats();
+}
+
+// Route back up to Latias to trigger a potential shiny sound
+void hunt_latias_check(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats)
+{
+    // Snap to the ladder by moving and watching for the A button prompt
+    ButtonWatcher ButtonA(
+        COLOR_RED,
+        ButtonType::ButtonA,
+        {0.4, 0.1, 0.2, 0.8},
+        &env.console.overlay(),
+        Milliseconds(100)
+    );
+    const int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [&](ProControllerContext& context){
+            pbf_move_left_joystick(context, {+0.5, +1}, 5000ms, 0ms);
+        },
+        {{ButtonA}}
+    );
+    if (ret < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "hunt_latias(): Cannot detect ladder after 5 seconds",
+            env.console
+        );
+    } else {
+        env.console.log("Detected ladder.");
+    }
+
+    // Run to Latias to trigger a potential shiny sound
+    env.log("Move to check Latias.");
+    env.add_overlay_log("To Check Latias");
+    pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+    ssf_press_left_joystick(context, {0, +1}, 0ms, 4000ms, 0ms);
+    pbf_mash_button(context, BUTTON_Y, 4000ms);
+    context.wait_for_all_requests();
+}
+
+
+// We save at warp pad and spawn Latios only once per game reset
+void hunt_latios(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
+    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
+{
+    detect_interactable(env.console, context);
+    // Warp to rooftop to see Latios
+    pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+    context.wait_for_all_requests();
+    detect_interactable(env.console, context);
+
+    stats.spawns++;
+    env.update_stats();
+    // Roll to Latios to trigger potential shiny sound
+
+
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_wait(context, 500ms); // wait for falling down
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    pbf_wait(context, 500ms);
+    context.wait_for_all_requests();
+}
+
+
+void hunt_cobalion(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
+    SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH)
+{
+    while(true){
+        // run to the right to spawn in Cobalion
+        ssf_press_button(context, BUTTON_B, 0ms, 6000ms, 0ms);
+        pbf_move_left_joystick(context, {+1, 0}, 7000ms, 0ms);
+        pbf_wait(context, 100ms);
+        // run to the left to despawn
+        // add 20ms to try to ensure drift never prevents despawning
+        ssf_press_button(context, BUTTON_B, 0ms, 6000ms, 0ms);
+        pbf_move_left_joystick(context, {-1, 0}, 7020ms, 0ms);
+        pbf_wait(context, 100ms);
+
+        context.wait_for_all_requests();
+
+        stats.spawns++;
+        env.update_stats();
+        // Spawn refreshing loop takes 14 sec. Going to check Cobalion takes 13 sec.
+        // 10 for 10 cal per sec
+        const uint16_t min_calorie = MIN_CALORIE_TO_CATCH + (14 + 13) * 10;
+
+        if (check_calorie(env.console, context, min_calorie)){
+            break;
+        }
+    }
+
+    // Run to Cobalion to trigger potential shiny sound
+    env.log("Move to check Cobalion.");
+    env.add_overlay_log("To Check Cobalion");
+
+    // run right to line up with Cobalion
+    ssf_press_button(context, BUTTON_B, 0ms, 6000ms, 0ms);
+    pbf_move_left_joystick(context, {+1, 0}, 8200ms, 0ms);
+    context.wait_for_all_requests();
+    stats.spawns++;
+    env.update_stats();
+    // run forward to trigger potential shiny sound
+    pbf_wait(context, 100ms);
+    ssf_press_button(context, BUTTON_B, 0ms, 3000ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 4800ms, 0ms);
+    pbf_wait(context, 500ms);
+
+    context.wait_for_all_requests();
+}
+
 // Use teleport pad to refresh Terrakion spawns until MIN_CALORIE is reached.
 // Then move close to Terrakion so the shiny sound detector (from the caller level)
 // can detect shiny and stop program.
@@ -121,19 +445,21 @@ void hunt_terrakion(
 {
     while(true){
         // Warp away from Terrakion to despawn
-        detect_warp_pad(env.console, context);
+        detect_interactable(env.console, context);
         pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+        context.wait_for_all_requests();
 
         // Warp towards Terrakion
-        detect_warp_pad(env.console, context);
+        detect_interactable(env.console, context);
         pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+        context.wait_for_all_requests();
 
         // Roll and roll back on Terrakion's roof to respawn
-        detect_warp_pad(env.console, context);
+        detect_interactable(env.console, context);
         pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
         pbf_move_left_joystick(context, {0, -1}, 80ms, 160ms);
         pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
-        
+
         context.wait_for_all_requests();
 
         stats.spawns++;
@@ -147,17 +473,24 @@ void hunt_terrakion(
     }
 
     // Use warp pads to reset position
-    detect_warp_pad(env.console, context);
+    detect_interactable(env.console, context);
     pbf_press_button(context, BUTTON_A, 160ms, 80ms);
-    detect_warp_pad(env.console, context);
+    context.wait_for_all_requests();
+
+    detect_interactable(env.console, context);
     pbf_press_button(context, BUTTON_A, 160ms, 80ms);
-    detect_warp_pad(env.console, context);
+    context.wait_for_all_requests();
+    detect_interactable(env.console, context);
 
     // Roll to Terrakion to trigger potential shiny sound
     env.log("Move to check Terrakion.");
     env.add_overlay_log("To Check Terrakion");
 
     pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    context.wait_for_all_requests();
+    stats.spawns++;
+    env.update_stats();
+
     pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
     pbf_move_left_joystick(context, {-1, 1}, 80ms, 160ms);
     pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
@@ -202,7 +535,7 @@ void hunt_virizion_balcony(
 
         stats.spawns++;
         env.update_stats();
-    
+
         if (check_calorie(env.console, context, min_calorie)){
             break;
         }
@@ -212,7 +545,7 @@ void hunt_virizion_balcony(
     env.add_overlay_log("To Check Virision");
     // We have done enough shuttle runs to refresh Virizion spawns.
     // Now run towards it to check shiny!
-    
+
     // Push left joystick rightward to let the character face right
     pbf_move_left_joystick(context, {+1, 0}, 100ms, 0ms);
     // Roll once to leave the balcony area
@@ -266,7 +599,8 @@ void hunt_virizion_rooftop(
     ProControllerContext& context,
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
     SimpleIntegerOption<uint16_t>& MIN_CALORIE_TO_CATCH,
-    bool& use_switch1_timings)
+    bool& use_switch1_only_timings
+)
 {
     auto climb_ladder = [&](Milliseconds hold){
         pbf_move_left_joystick(context, {0.0, 1.0}, hold, 0ms);
@@ -297,8 +631,8 @@ void hunt_virizion_rooftop(
         pbf_press_button(context, BUTTON_A, 100ms, 500ms); // hop on ladder
         climb_ladder(2800ms);
         run_forward(2500ms);
-        run_backward(use_switch1_timings ? 3050ms : 3000ms);
-        pbf_wait(context, use_switch1_timings ? 1100ms : 1s); // wait for drop to lower level
+        run_backward(use_switch1_only_timings ? 3050ms : 3000ms);
+        pbf_wait(context, use_switch1_only_timings ? 1100ms : 1s); // wait for drop to lower level
         run_backward(2000ms);
         run_forward(2500ms);
         context.wait_for_all_requests();
@@ -318,15 +652,17 @@ void hunt_virizion_rooftop(
     change_character_facing_direction(0.0, -1.0); // face backwards
     // align camera to face what character is facing
     pbf_press_button(context, BUTTON_L, 200ms, 800ms);
-    
-    context.wait_for_all_requests();    
+
+    context.wait_for_all_requests();
     env.log("Move to check Virizion");
     env.add_overlay_log("To Check Virizion");
 
-    run_forward(use_switch1_timings ? 2700ms : 2600ms);
-    pbf_wait(context, use_switch1_timings ? 1100ms : 1s); // wait for drop to lower level
+    run_forward(use_switch1_only_timings ? 2700ms : 2600ms);
+    pbf_wait(context, use_switch1_only_timings ? 1100ms : 1s); // wait for drop to lower level
     run_changing_direction(3000ms, -0.15);
-    rotom_glide(use_switch1_timings ? 2600ms : 2500ms);
+    rotom_glide(use_switch1_only_timings ? 2600ms : 2500ms);
+    stats.spawns++;
+    env.update_stats();
     run_forward(5s);
     context.wait_for_all_requests();
 }
@@ -336,7 +672,8 @@ void hunt_virizion_rooftop(
 
 void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
-
+    HyperspaceCalorieDetector::warm_ocr();
+    
     // Mash button B to let Switch register the controller
     pbf_mash_button(context, BUTTON_B, 200ms);
 
@@ -354,41 +691,67 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
         return true;
     });
 
-    // check whether this is Switch 1 or 2.
-    ConsoleType console_type = env.console.state().console_type();
-    if (console_type == ConsoleType::Unknown){
-        env.add_overlay_log("Detecting console type");
-        env.console.log("Unknown Switch type. Try to detect.");
-        console_type = detect_console_type_from_in_game(env.console, context);
+    bool use_switch1_only_timings = false;
+    // VIRIZION huntig requires different timings between Switch 1 and 2
+    if (LEGENDARY == Legendary::VIRIZION){
+        // check whether this is Switch 1 or 2.
+        ConsoleType console_type = env.console.state().console_type();
+        if (console_type == ConsoleType::Unknown){
+            env.add_overlay_log("Detecting Console Type");
+            env.console.log("Unknown Switch type. Try to detect.");
+            console_type = detect_console_type_from_in_game(env.console, context);
+        }
+        use_switch1_only_timings = is_switch1(console_type);
     }
-    bool use_switch1_timings = is_switch1(console_type);
 
     while (true){
-        const int ret = run_until<ProControllerContext>(
-            env.console, context,
-            [&](ProControllerContext& context){
-                if (LEGENDARY == Legendary::VIRIZION){
-                    hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH, use_switch1_timings);
-                } else if (LEGENDARY == Legendary::TERRAKION){
-                    hunt_terrakion(env, context, stats, MIN_CALORIE_TO_CATCH);
-                } else {
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
-                        "legendary hunt not implemented",
-                        env.console
-                    );
-                }
-            },
-            {{shiny_detector}}
-        ); // end run_until()
-        shiny_detector.throw_if_no_sound();
+        if (LEGENDARY == Legendary::LATIAS_ALT){
+            if (hunt_latias_alt(env, context, stats)){
+                // shiny found
+                SHINY_DETECTED.on_shiny_sighted(
+                    env, env.console, context,
+                    shiny_count
+                );
+                break;
+            }
+        }else{
+            if (LEGENDARY == Legendary::LATIAS){
+                hunt_latias_route(env, context, stats, MIN_CALORIE_TO_CATCH);
+            }
+            const int ret = run_until<ProControllerContext>(
+                env.console, context,
+                [&](ProControllerContext& context) {
+                    if (LEGENDARY == Legendary::LATIAS){
+                        hunt_latias_check(env, context, stats);
+                    }else if (LEGENDARY == Legendary::LATIOS){
+                        hunt_latios(env, context, stats, MIN_CALORIE_TO_CATCH);
+                    }else if (LEGENDARY == Legendary::VIRIZION){
+                        hunt_virizion_rooftop(env, context, stats, MIN_CALORIE_TO_CATCH, use_switch1_only_timings);
+                    }else if (LEGENDARY == Legendary::TERRAKION){
+                        hunt_terrakion(env, context, stats, MIN_CALORIE_TO_CATCH);
+                    }else if (LEGENDARY == Legendary::COBALION){
+                        hunt_cobalion(env, context, stats, MIN_CALORIE_TO_CATCH);
+                    }else{
+                        OperationFailedException::fire(
+                            ErrorReport::SEND_ERROR_REPORT,
+                            "legendary hunt not implemented",
+                            env.console
+                        );
+                    }
+                },
+                { {shiny_detector} }
+            );
 
-        if (ret == 0 && SHINY_DETECTED.on_shiny_sound(
-            env, env.console, context,
-            shiny_count,
-            shiny_coefficient
-        )){
-            break;
+            shiny_detector.throw_if_no_sound();
+            shiny_detector.clear();
+
+            if (ret == 0 && SHINY_DETECTED.on_shiny_sound(
+                env, env.console, context,
+                shiny_count,
+                shiny_coefficient
+            )) {
+                break;
+            }
         }
 
         // no shiny sound detected or no shiny legendary detected. Reset game

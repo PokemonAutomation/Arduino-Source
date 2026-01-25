@@ -12,11 +12,11 @@
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "Controllers/ControllerTypes.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
-#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_FailedToConnectDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_CloseGameDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_StartGameUserSelectDetector.h"
@@ -115,10 +115,10 @@ void close_game_from_home_blind(ConsoleHandle& console, ProControllerContext& co
     // regardless of whether the game is initially open or closed.
 
                                                     // if game initially open.  |  if game initially closed
-    pbf_mash_button(context, BUTTON_X, 800ms);        // - Close game.            |  - does nothing
+    pbf_mash_button(context, BUTTON_X, 800ms);      // - Close game.            |  - does nothing
     ssf_press_dpad_ptv(context, DPAD_DOWN);         // - Does nothing.          |  - moves selector away from the closed game to avoid opening it.
     ssf_press_dpad_ptv(context, DPAD_DOWN);         // - Does nothing.          |  - Press Down a second time in case we drop one.
-    pbf_mash_button(context, BUTTON_A, 400ms);         // - Confirm close game.    |  - opens an app on the home screen (e.g. Online)
+    pbf_mash_button(context, BUTTON_A, 400ms);      // - Confirm close game.    |  - opens an app on the home screen (e.g. Online)
     go_home(console, context);                      // - Does nothing.          |  - goes back to home screen.
 
     // fail-safe against button drops and unexpected error messages.
@@ -457,6 +457,7 @@ void start_game_from_home_with_inference(
         StartGameUserSelectWatcher user_select(console, COLOR_GREEN);
         UpdateMenuWatcher update_menu(console, COLOR_PURPLE);
         CheckOnlineWatcher check_online(COLOR_CYAN);
+        FailedToConnectWatcher failed_to_connect(COLOR_YELLOW);
         BlackScreenWatcher black_screen(COLOR_BLUE, {0.1, 0.15, 0.8, 0.7});
         context.wait_for_all_requests();
         int ret = wait_until(
@@ -467,6 +468,7 @@ void start_game_from_home_with_inference(
                 user_select,
                 update_menu,
                 check_online,
+                failed_to_connect,
                 black_screen,
             }
         );
@@ -476,7 +478,7 @@ void start_game_from_home_with_inference(
 
         switch (ret){
         case 0:
-            console.log("Detected home screen (again).", COLOR_RED);
+            console.log("Detected home screen (again).", COLOR_BLUE);
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case 1:
@@ -485,15 +487,19 @@ void start_game_from_home_with_inference(
             pbf_press_button(context, BUTTON_A, 80ms, start_game_wait);
             break;
         case 2:
-            console.log("Detected update menu.", COLOR_RED);
+            console.log("Detected update menu.", COLOR_BLUE);
             pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case 3:
-            console.log("Detected check online.", COLOR_RED);
+            console.log("Detected check online.", COLOR_BLUE);
             context.wait_for(std::chrono::seconds(1));
             break;
         case 4:
+            console.log("Detected failed to connect.", COLOR_BLUE);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+            break;
+        case 5:
             console.log("Detected black screen. Game started...");
             return;
         default:
@@ -558,6 +564,7 @@ void start_game_from_home_with_inference(
         StartGameUserSelectWatcher user_select(console, COLOR_GREEN);
         UpdateMenuWatcher update_menu(console, COLOR_PURPLE);
         CheckOnlineWatcher check_online(COLOR_CYAN);
+        FailedToConnectWatcher failed_to_connect(COLOR_YELLOW);
         BlackScreenWatcher black_screen(COLOR_BLUE);
         context.wait_for_all_requests();
         int ret = wait_until(
@@ -568,6 +575,7 @@ void start_game_from_home_with_inference(
                 user_select,
                 update_menu,
                 check_online,
+                failed_to_connect,
                 black_screen,
             }
         );
@@ -577,7 +585,7 @@ void start_game_from_home_with_inference(
 
         switch (ret){
         case 0:
-            console.log("Detected home screen (again).", COLOR_RED);
+            console.log("Detected home screen (again).", COLOR_BLUE);
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case 1:
@@ -586,15 +594,19 @@ void start_game_from_home_with_inference(
             pbf_press_button(context, BUTTON_A, 80ms, start_game_wait);
             break;
         case 2:
-            console.log("Detected update menu.", COLOR_RED);
+            console.log("Detected update menu.", COLOR_BLUE);
             pbf_move_joystick(context, {0, +1}, 50ms, 0ms);
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             break;
         case 3:
-            console.log("Detected check online.", COLOR_RED);
+            console.log("Detected check online.", COLOR_BLUE);
             context.wait_for(std::chrono::seconds(1));
             break;
         case 4:
+            console.log("Detected failed to connect.", COLOR_BLUE);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+            break;
+        case 5:
             console.log("Detected black screen. Game started...");
             return;
         default:

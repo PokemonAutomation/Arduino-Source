@@ -5,7 +5,7 @@
 #include <thread>
 #include <atomic>
 #include <discord_social_sdk/discordpp.h>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 
 namespace PokemonAutomation{

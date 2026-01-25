@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_MessageLogger_H
 #define PokemonAutomation_MessageLogger_H
 
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Containers/CircularBuffer.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"

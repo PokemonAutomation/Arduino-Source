@@ -4,13 +4,8 @@
  *
  */
 
-
-#include <filesystem>
-
 #include "Common/Compiler.h"
-#include "PokemonSV_Tests.h"
-#include "TestUtils.h"
-
+#include "Common/Cpp/Filesystem.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "CommonFramework/Logging/Logger.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
@@ -34,6 +29,8 @@
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/PokemonSV_ESPEmotionDetector.h"
+#include "TestUtils.h"
+#include "PokemonSV_Tests.h"
 
 #include <iostream>
 using std::cout;
@@ -397,9 +394,8 @@ int test_pokemonSV_SandwichIngredientReader(const std::string& filepath){
 
     // the target ingredient list is stored in an auxiliary txt file with filename: _<filepath_basename>.txt
 
-    std::filesystem::path file_path(filepath);
-    std::string filename = file_path.filename().string();
-    std::filesystem::path parent_dir = file_path.parent_path();
+    Filesystem::Path file_path(filepath);
+    Filesystem::Path parent_dir = file_path.parent_path();
     std::string base_name = file_path.stem().string();
 
     const std::vector<std::string> words = parse_words(base_name);
@@ -430,7 +426,7 @@ int test_pokemonSV_SandwichIngredientReader(const std::string& filepath){
         return 1;
     }
 
-    std::filesystem::path target_ingredients_path = parent_dir / ("_" + base_name + ".txt");
+    Filesystem::Path target_ingredients_path = parent_dir / ("_" + base_name + ".txt");
     std::vector<std::string> target_ingredients;
     if (load_slug_list(target_ingredients_path.string(), target_ingredients) == false){
         return 1;

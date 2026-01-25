@@ -64,7 +64,7 @@ public:
         return matcher;
     }
     static const ButtonMatcher& RightStickUpDown(){
-        static ButtonMatcher matcher(ButtonType::RightStickUpDown, 20, 20, 150);
+        static ButtonMatcher matcher(ButtonType::RightStickUpDown, 20, 20, 120);
         return matcher;
     }
     static const ButtonMatcher& DpadUp(){
@@ -91,8 +91,9 @@ public:
         size_t min_height = m_min_height * input_resolution.height / 2160;
 
         if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+            const double stddev_sum = image_stats(image).stddev.sum();
             std::cout << "???? ButtonMatcher::check_image() ???? min size " << min_width << " x " << min_height
-                 << " got " << image.width() << " x " << image.height() << std::endl;
+                 << " got " << image.width() << " x " << image.height() << " stddev_sum: " << stddev_sum << std::endl;
         }
         return image.width() >= min_width && image.height() >= min_height;
     };

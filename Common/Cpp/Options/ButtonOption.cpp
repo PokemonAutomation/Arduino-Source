@@ -8,7 +8,7 @@
 #include <atomic>
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Cpp/StringTools.h"
+#include "Common/Cpp/Strings/StringTools.h"
 //#include "Common/Cpp/Json/JsonValue.h"
 #include "ButtonOption.h"
 

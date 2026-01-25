@@ -4,10 +4,10 @@
  *
  */
 
+#include "Common/Cpp/Strings/Unicode.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "OCR_StringNormalization.h"
 #include "OCR_TextMatcher.h"
@@ -41,7 +41,9 @@ DictionaryOCR::DictionaryOCR(
             std::u32string normalized = normalize_utf32(candidate);
             std::set<std::string>& set = m_candidate_to_token[normalized];
             if (!set.empty()){
-                global_logger_tagged().log("DictionaryOCR - Duplicate Candidate: " + token + " (" + to_utf8(normalized) + ")");
+                global_logger_tagged().log(
+                    "DictionaryOCR - Duplicate Candidate: " + token + " (" + utf32_to_str(normalized) + ")"
+                );
 //                cout << "Duplicate Candidate: " << candidate << endl;
             }
             set.insert(token);
@@ -107,7 +109,7 @@ void DictionaryOCR::add_candidate(std::string token, const std::u32string& candi
     auto iter = m_candidate_to_token.find(candidate);
     if (iter == m_candidate_to_token.end()){
         //  New candidate. Add it to both maps.
-        m_database[token].emplace_back(to_utf8(candidate));
+        m_database[token].emplace_back(utf32_to_str(candidate));
         m_candidate_to_token[candidate].insert(std::move(token));
         return;
     }
@@ -116,7 +118,7 @@ void DictionaryOCR::add_candidate(std::string token, const std::u32string& candi
     std::set<std::string>& tokens = iter->second;
     if (tokens.find(token) == tokens.end()){
         //  Add to database only if it isn't already there.
-        m_database[token].emplace_back(to_utf8(candidate));
+        m_database[token].emplace_back(utf32_to_str(candidate));
     }
 
     tokens.insert(std::move(token));

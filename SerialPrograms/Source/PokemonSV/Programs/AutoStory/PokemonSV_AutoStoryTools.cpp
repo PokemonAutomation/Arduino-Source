@@ -759,9 +759,10 @@ void change_settings(SingleSwitchProgramEnvironment& env, ProControllerContext& 
         config_option(context, 1); // Helping Functions: Off
     }
 
-    pbf_mash_button(context, BUTTON_A, 1000ms);
+    pbf_mash_button(context, BUTTON_A, 500ms);
+    env.console.log("Confirm that we want to save the settings.");
     clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5, {CallbackEnum::PROMPT_DIALOG});
-    
+    env.console.log("Settings saved.");
 }
 
 void do_action_and_monitor_for_battles(
@@ -1879,7 +1880,7 @@ void confirm_titan_battle(SingleSwitchProgramEnvironment& env, ProControllerCont
         // cout << "hp_bar_stats.average.sum(): " << hp_bar_stats.average.sum() << endl;    
         // expected color is green: {R 25-32, G 255, B 32-76}  {30, 255, 55}. total = 30+255+55 = 340
         // 30/340, 255/340, 55/340
-        is_green_hp_bar = is_solid(hp_bar_stats, {0.088235, 0.75, 0.161765}, 0.15, 30);
+        is_green_hp_bar = is_solid(hp_bar_stats, {0.088235, 0.75, 0.161765}, 0.25, 30);
         if (is_green_hp_bar){
             break;
         }

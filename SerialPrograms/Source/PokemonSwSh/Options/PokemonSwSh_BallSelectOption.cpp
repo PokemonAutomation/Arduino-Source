@@ -44,11 +44,12 @@ const StringSelectDatabase& ALL_BALLS_SELECT_DATABASE(){
 
 
 PokemonBallSelectCell::PokemonBallSelectCell(
+    LockMode lock_while_running,
     const std::string& default_slug
 )
     : StringSelectCell(
         ALL_BALLS_SELECT_DATABASE(),
-        LockMode::LOCK_WHILE_RUNNING,
+        lock_while_running,
         default_slug
     )
 {}

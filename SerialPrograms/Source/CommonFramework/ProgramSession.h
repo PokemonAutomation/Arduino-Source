@@ -18,6 +18,7 @@
 
 #include <mutex>
 #include <atomic>
+#include "Common/Cpp/Logging/TaggedLogger.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Concurrency/Thread.h"

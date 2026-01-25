@@ -85,8 +85,9 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
     , MIN_CALORIE_REMAINING(
         "<b>Minimum Cal. allowed While Resetting in Hyperspace:</b><br>The program will stop if the Calorie number is at or below this value."
         "<br>NOTE: the more star the hyperspace has the faster Calorie burns! Pick a minimum Calorie value that gives you enough time to catch shinies."
-        "<br>Cal. per sec: 1 Star: 1 Cal./s, 2 Star: 1.6 Cal./s, 3 Star: 3.5 Cal./s, 4 Star: 7.5 Cal./s, 5 Star: 10 Cal./s"
-        "Each reset takes between 0.6-1.0 sec of the timer.",
+        "<br>Cal. per sec: 1 Star: 1 Cal./s, 2 Star: 1.6 Cal./s, 3 Star: 3.5 Cal./s, 4 Star: 7.5 Cal./s, 5 Star: 10 Cal./s. "
+        "Each reset takes between 0.6-1.0 sec of the timer."
+        "<br>Use a donut with AT LEAST ONE flavor power for the program to read Calorie number correctly.",
         LockMode::UNLOCK_WHILE_RUNNING,
         120, 0, 9999 // default, min, max
     )
@@ -105,6 +106,25 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
     PA_ADD_OPTION(MIN_CALORIE_REMAINING);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
+
+    ROUTE.add_listener(*this);
+}
+
+ShinyHunt_FlySpotReset::~ShinyHunt_FlySpotReset(){
+    ROUTE.remove_listener(*this);
+}
+
+
+void ShinyHunt_FlySpotReset::on_config_value_changed(void* object){
+    if (object == &ROUTE){
+        if (ROUTE == Route::HYPERSPACE_WILD_ZONE){
+            NUM_RESETS.set_visibility(ConfigOptionState::ENABLED);
+            MIN_CALORIE_REMAINING.set_visibility(ConfigOptionState::ENABLED);
+        } else{
+            NUM_RESETS.set_visibility(ConfigOptionState::HIDDEN);
+            MIN_CALORIE_REMAINING.set_visibility(ConfigOptionState::HIDDEN);
+        }
+    }
 }
 
 namespace {

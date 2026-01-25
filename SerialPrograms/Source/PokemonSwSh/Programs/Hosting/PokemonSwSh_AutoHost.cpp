@@ -173,7 +173,7 @@ void run_autohost(
         if (!code.empty()){
             env.log("Next Raid Code: " + code);
             pbf_press_button(context, BUTTON_PLUS, 40ms, 1160ms);
-            FastCodeEntry::numberpad_enter_code(console, context, code, true);
+            FastCodeEntry::numberpad_enter_code(console, context, false, code, true);
             pbf_wait(context, 1440ms);
             pbf_press_button(context, BUTTON_A, 40ms, 760ms);
         }

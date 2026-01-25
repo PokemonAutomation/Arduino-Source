@@ -55,10 +55,10 @@ public:
 
     TimingOptions TIMING_OPTIONS;
 
-    DigitEntryTimingsOption     SWITCH1_DIGIT_ENTRY0;
-    KeyboardEntryTimingsOption  SWITCH1_KEYBOARD_ENTRY0;
-    DigitEntryTimingsOption     SWITCH2_DIGIT_ENTRY0;
-    KeyboardEntryTimingsOption  SWITCH2_KEYBOARD_ENTRY0;
+    CodeboardTimingsOption CODEBOARD_ENTRY_SWITCH1_WIRED;
+    CodeboardTimingsOption CODEBOARD_ENTRY_SWITCH1_WIRELESS;
+    CodeboardTimingsOption CODEBOARD_ENTRY_SWITCH2_WIRED;
+    CodeboardTimingsOption CODEBOARD_ENTRY_SWITCH2_WIRELESS;
     KeyboardControllerTimingsOption KEYBOARD_CONTROLLER_TIMINGS;
 
     SectionDividerOption KEYBOARD_SECTION;

@@ -1,11 +1,12 @@
 #ifdef PA_SOCIAL_SDK
 #define DISCORDPP_IMPLEMENTATION
 
-#include "DiscordSocial.h"
+#include "Common/Cpp/Logging/TaggedLogger.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "Integrations/ProgramTracker.h"
-#include "../../CommonFramework/GlobalSettingsPanel.h"
-#include "../../CommonFramework/Globals.h"
+#include "DiscordSocial.h"
 
 using namespace discordpp;
 namespace PokemonAutomation{

@@ -13,7 +13,7 @@
 #define PokemonAutomation_StreamHistoryTracker_ParallelStreams_H
 
 #include <map>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Qt/Redispatch.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
@@ -55,7 +55,7 @@ public:
         update_streams(current_time());
     }
     void set_window(std::chrono::seconds window){
-        SpinLockGuard lg(m_lock);
+        WriteSpinLock lg(m_lock);
         m_window = window;
         update_streams(current_time());
     }
@@ -63,7 +63,7 @@ public:
     bool save(const std::string& filename){
         std::unique_ptr<StreamRecording> recording;
         {
-            SpinLockGuard lg(m_lock);
+            WriteSpinLock lg(m_lock);
             if (m_recordings.empty()){
                 m_logger.log("Cannot save stream history. Recording is not enabled.", COLOR_RED);
                 return false;
@@ -82,7 +82,7 @@ public:
 
     void on_samples(const float* samples, size_t frames){
         WallClock now = current_time();
-        SpinLockGuard lg(m_lock);
+        WriteSpinLock lg(m_lock);
         for (auto& item : m_recordings){
             item.second->push_samples(now, samples, frames);
         }
@@ -90,7 +90,7 @@ public:
     }
     void on_frame(std::shared_ptr<const VideoFrame> frame){
         WallClock now = current_time();
-        SpinLockGuard lg(m_lock);
+        WriteSpinLock lg(m_lock);
         for (auto& item : m_recordings){
             item.second->push_frame(frame);
         }

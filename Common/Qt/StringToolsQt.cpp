@@ -4,20 +4,11 @@
  *
  */
 
-#include <sstream>
 #include <QString>
 #include "StringToolsQt.h"
 
 namespace PokemonAutomation{
 
-
-
-std::u32string to_utf32(const std::string& str){
-    return QString::fromStdString(str).toStdU32String();
-}
-std::string to_utf8(const std::u32string& str){
-    return QString::fromStdU32String(str).toStdString();
-}
 
 
 std::string to_lower(const std::string& str){

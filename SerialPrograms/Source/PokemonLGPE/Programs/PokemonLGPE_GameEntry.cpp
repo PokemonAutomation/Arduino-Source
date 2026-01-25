@@ -14,7 +14,6 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
-//#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
 #include "PokemonLGPE/PokemonLGPE_Settings.h"
 #include "PokemonLGPE_GameEntry.h"
 

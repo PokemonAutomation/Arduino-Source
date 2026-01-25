@@ -58,10 +58,15 @@ struct FastCodeEntrySettings{
 
 
 
-const char* normalize_code(std::string& normalized_code, const std::string& code, bool override_mode = false);
+const char* normalize_code(
+    std::string& normalized_code,
+    const std::string& code,
+    bool override_mode = false
+);
 
 void enter_code(
     ConsoleHandle& console, AbstractControllerContext& context,
+    bool assume_console_type_is_ready,
     KeyboardLayout keyboard_layout,
     const std::string& normalized_code, bool force_keyboard_mode,
     bool include_plus,
@@ -70,6 +75,7 @@ void enter_code(
 template <typename ControllerContext>
 inline void enter_code(
     ConsoleHandle& console, ControllerContext& context,
+    bool assume_console_type_is_ready,
     KeyboardLayout keyboard_layout,
     const std::string& normalized_code, bool force_keyboard_mode,
     bool include_plus,
@@ -78,6 +84,7 @@ inline void enter_code(
     AbstractControllerContext subcontext(context);
     enter_code(
         console, subcontext,
+        assume_console_type_is_ready,
         keyboard_layout,
         normalized_code, force_keyboard_mode,
         include_plus,
@@ -87,6 +94,7 @@ inline void enter_code(
 
 const char* enter_code(
     MultiSwitchProgramEnvironment& env, CancellableScope& scope,
+    bool assume_console_type_is_ready,
     const FastCodeEntrySettings& settings,
     const std::string& code, bool force_keyboard_mode,
     bool connect_controller_press

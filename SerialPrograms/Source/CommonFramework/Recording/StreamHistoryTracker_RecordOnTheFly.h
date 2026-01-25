@@ -21,7 +21,7 @@
 #include <QMediaCaptureSession>
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
@@ -157,7 +157,7 @@ StreamHistoryTracker::StreamHistoryTracker(
 }
 
 void StreamHistoryTracker::set_window(std::chrono::seconds window){
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     m_window = window;
 }
 

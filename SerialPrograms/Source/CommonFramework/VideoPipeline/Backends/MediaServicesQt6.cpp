@@ -104,7 +104,7 @@ void GlobalMediaServices::refresh_cameras(){
         // LOCK ACQUISITION: Briefly acquire camera lock to update the cache
         // `m_cameras`. This is the ONLY place we write to `m_cameras`.
         {
-            WriteSpinLock lg(m_camera_lock);
+            WriteSpinLock lg(m_camera_lock, PA_CURRENT_FUNCTION);
             m_cameras = std::move(cameras);
         }
         // Camera lock released - readers can now see updated list

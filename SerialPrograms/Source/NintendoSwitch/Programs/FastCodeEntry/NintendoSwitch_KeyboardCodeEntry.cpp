@@ -28,8 +28,9 @@ namespace FastCodeEntry{
 
 void keyboard_enter_code(
     ConsoleHandle& console, AbstractControllerContext& context,
-    KeyboardLayout keyboard_layout, const std::string& code,
-    bool include_plus
+    bool assume_console_type_is_ready,
+    KeyboardLayout keyboard_layout,
+    const std::string& code, bool include_plus
 ){
     auto* keyboard = context->cast<StandardHid::Keyboard>();
     if (keyboard){
@@ -41,7 +42,12 @@ void keyboard_enter_code(
     auto* procon = context->cast<ProController>();
     if (procon){
         ProControllerContext subcontext(context);
-        keyboard_enter_code(console, subcontext, keyboard_layout, code, include_plus);
+        keyboard_enter_code(
+            console, subcontext,
+            assume_console_type_is_ready,
+            keyboard_layout,
+            code, include_plus
+        );
         return;
     }
 
@@ -56,8 +62,8 @@ void keyboard_enter_code(
 
 void keyboard_enter_code(
     ConsoleHandle& console, StandardHid::KeyboardContext& context,
-    KeyboardLayout keyboard_layout, const std::string& code,
-    bool include_plus
+    KeyboardLayout keyboard_layout,
+    const std::string& code, bool include_plus
 ){
     using namespace StandardHid;
 
@@ -233,11 +239,11 @@ std::vector<CodeEntryActionWithDelay> keyboard_get_best_path(
     Milliseconds best_time = Milliseconds::max();
     for (const std::vector<CodeEntryAction>& path : paths){
         std::vector<CodeEntryActionWithDelay> current_path;
-        codeboard_populate_delays(switch2, current_path, path, delays, optimize);
-        Milliseconds current_time = 0ms;
-        for (CodeEntryActionWithDelay& action : current_path){
-            current_time += action.delay;
-        }
+        Milliseconds current_time = codeboard_populate_delays(
+            switch2,
+            current_path,
+            path, delays, optimize
+        );
         if (best_time > current_time ||
             (best_time == current_time && best_path.size() > current_path.size())
         ){
@@ -253,8 +259,9 @@ std::vector<CodeEntryActionWithDelay> keyboard_get_best_path(
 
 void keyboard_enter_code(
     ConsoleHandle& console, ProControllerContext& context,
-    KeyboardLayout keyboard_layout, const std::string& code,
-    bool include_plus
+    bool assume_console_type_is_ready,
+    KeyboardLayout keyboard_layout,
+    const std::string& code, bool include_plus
 ){
     //  Calculate the coordinates.
     const std::map<char, KeyboardEntryPosition>& POSITION_MAP = KEYBOARD_POSITIONS(keyboard_layout);
@@ -270,13 +277,26 @@ void keyboard_enter_code(
         positions.emplace_back(iter->second);
     }
 
+    CodeEntryDelays delays;
 
-    ConsoleType console_type = detect_console_type_from_in_game(console, context);
+    ConsoleType console_type = assume_console_type_is_ready
+        ? console.state().console_type()
+        : detect_console_type_from_in_game(console, context);
     bool switch2;
     if (is_switch1(console_type)){
         switch2 = false;
+        if (context->performance_class() == ControllerPerformanceClass::SerialPABotBase_Wired){
+            delays = ConsoleSettings::instance().CODEBOARD_ENTRY_SWITCH1_WIRED;
+        }else{
+            delays = ConsoleSettings::instance().CODEBOARD_ENTRY_SWITCH1_WIRELESS;
+        }
     }else if (is_switch2(console_type)){
         switch2 = true;
+        if (context->performance_class() == ControllerPerformanceClass::SerialPABotBase_Wired){
+            delays = ConsoleSettings::instance().CODEBOARD_ENTRY_SWITCH2_WIRED;
+        }else{
+            delays = ConsoleSettings::instance().CODEBOARD_ENTRY_SWITCH2_WIRELESS;
+        }
     }else{
         throw UserSetupError(
             console,
@@ -284,42 +304,11 @@ void keyboard_enter_code(
         );
     }
 
-
-    //  Compute the delays.
-
-    Milliseconds unit;
-    Milliseconds hold;
-    Milliseconds cool;
-    bool reordering;
-    if (switch2){
-        unit        = ConsoleSettings::instance().SWITCH2_KEYBOARD_ENTRY0.TIME_UNIT;
-        hold        = ConsoleSettings::instance().SWITCH2_KEYBOARD_ENTRY0.HOLD;
-        cool        = ConsoleSettings::instance().SWITCH2_KEYBOARD_ENTRY0.COOLDOWN;
-        reordering  = ConsoleSettings::instance().SWITCH2_KEYBOARD_ENTRY0.REORDERING;
-    }else{
-        unit        = ConsoleSettings::instance().SWITCH1_KEYBOARD_ENTRY0.TIME_UNIT;
-        hold        = ConsoleSettings::instance().SWITCH1_KEYBOARD_ENTRY0.HOLD;
-        cool        = ConsoleSettings::instance().SWITCH1_KEYBOARD_ENTRY0.COOLDOWN;
-        reordering  = ConsoleSettings::instance().SWITCH1_KEYBOARD_ENTRY0.REORDERING;
-    }
-
-    Milliseconds tv = context->timing_variation();
-    unit += tv;
-
-    CodeEntryDelays delays{
-        .hold = hold + tv,
-        .cool = cool,
-        .press_delay = unit,
-        .move_delay = unit,
-        .scroll_delay = unit,
-        .wrap_delay = 2*unit,
-    };
-
     //  Get all the possible paths.
     std::vector<std::vector<CodeEntryAction>> all_paths = keyboard_get_all_paths(
         {0, 0},
         positions.data(), positions.size(),
-        reordering
+        delays.reordering
     );
 
     //  Pick the best path.

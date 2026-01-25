@@ -10,6 +10,7 @@
 #include <iostream>
 #include <filesystem>
 #include <cmath>
+#include "Common/Cpp/Filesystem.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonValue.h"
@@ -182,7 +183,7 @@ void LabelImages::init_sam_session(bool use_gpu){
     // , m_sam_session{RESOURCE_PATH() + "ML/sam_cpu.onnx"}
 
     const std::string sam_model_path = RESOURCE_PATH() + "ML/sam_cpu.onnx";
-    if (std::filesystem::exists(sam_model_path)){
+    if (Filesystem::exists(sam_model_path)){
         m_sam_session = std::make_unique<SAMSession>(sam_model_path, use_gpu);
     } else{
         std::cerr << "Error: no such SAM model path " << sam_model_path << "." << std::endl;
@@ -239,11 +240,11 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
     }
     
     // see if we can load the previously created labels
-    const std::string anno_filename = std::filesystem::path(image_path).filename().replace_extension(".json").string();
-    const std::string image_folder_path = std::filesystem::path(image_path).parent_path().string() + "/";
+    const std::string anno_filename = Filesystem::Path(image_path).filename().replace_extension(".json").string();
+    const std::string image_folder_path = Filesystem::Path(image_path).parent_path().string() + "/";
 
     m_annotation_file_path = image_folder_path + anno_filename;
-    if (!std::filesystem::exists(m_annotation_file_path)){
+    if (!Filesystem::exists(m_annotation_file_path)){
         cout << "Annotataion output path, " << m_annotation_file_path << " does not exist yet" << endl;
         return;
     }

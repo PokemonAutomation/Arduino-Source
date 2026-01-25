@@ -8,7 +8,7 @@
 #include <mutex>
 #include <condition_variable>
 #include "Common/Compiler.h"
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "PokemonSwSh_MaxLair_StateTracker.h"
 
 namespace PokemonAutomation{

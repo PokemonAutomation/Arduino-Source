@@ -2,34 +2,34 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
+ *  Convenience wrapper around Common/Cpp/Logging/OutputRedirector that
+ *  automatically uses the global logger.
  */
 
-#ifndef PokemonAutomation_Logging_OutputRedirector_H
-#define PokemonAutomation_Logging_OutputRedirector_H
+#ifndef PokemonAutomation_CommonFramework_Logging_OutputRedirector_H
+#define PokemonAutomation_CommonFramework_Logging_OutputRedirector_H
 
-#include <streambuf>
-#include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Logging/OutputRedirector.h"
 #include "Logger.h"
 
 namespace PokemonAutomation{
 
 
-class OutputRedirector : public std::basic_streambuf<char>{
+// Convenience class that redirects a stream to the global logger.
+// This is a thin wrapper around Common/Cpp/Logging/OutputRedirector that
+// automatically uses global_logger_raw() as the target logger.
+//
+// Example usage:
+//   OutputRedirector redirect_stdout(std::cout, "stdout", Color());
+//   OutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
+class GlobalOutputRedirector{
 public:
-    OutputRedirector(std::ostream& stream, std::string tag, Color color);
-    ~OutputRedirector();
+    GlobalOutputRedirector(std::ostream& stream, std::string tag, Color color)
+        : m_redirector(stream, global_logger_raw(), std::move(tag), color)
+    {}
 
 private:
-    virtual int_type overflow(int_type ch) override;
-    virtual std::streamsize xsputn(const char_type* s, std::streamsize count) override;
-
-private:
-    SpinLock m_lock;
-    std::ostream& m_stream;
-    std::streambuf* m_old_buf;
-    TaggedLogger m_logger;
-    Color m_color;
-    std::string m_buffer;
+    OutputRedirector m_redirector;
 };
 
 

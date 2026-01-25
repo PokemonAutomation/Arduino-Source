@@ -72,7 +72,7 @@
 #include "CommonFramework/ImageTypes/ImageHSV32.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
-#include "Common/Cpp/StringTools.h"
+#include "Common/Cpp/Strings/StringTools.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 #include "Common/Cpp/Options/EnumDropdownDatabase.h"
@@ -107,7 +107,7 @@
 #include "Common/Cpp/Concurrency/Watchdog.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
 //#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
-#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.h"
@@ -141,6 +141,9 @@
 //#include "Common/SerialPABotBase/LightweightWallClock_StdChrono.h"
 #include "Common/Cpp/Options/MacAddressOption.h"
 #include "CommonTools/Images/ImageFilter.h"
+#include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
+#include "Common/PABotBase2/PABotbase2_ReliableStreamConnection.h"
+#include "Common/Cpp/StreamConnections/MockDevice.h"
 
 
 //#include <opencv2/core.hpp>
@@ -293,8 +296,41 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     using namespace std::chrono_literals;
 
+    [[maybe_unused]] Logger& logger = env.logger();
 
 
+
+#if 1
+    {
+        MockDevice device;
+
+        ReliableStreamConnection connection(
+            &scope,
+            logger, true,
+            device,
+            1s
+        );
+
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_VERSION);
+        connection.wait_for_pending();
+
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE);
+        connection.wait_for_pending();
+
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS);
+        connection.wait_for_pending();
+
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_RESET);
+        connection.wait_for_pending();
+
+
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_VERSION);
+        connection.wait_for_pending();
+
+
+        scope.wait_for(60s);
+    }
+#endif
 
 
 

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_ConsoleState_H
 #define PokemonAutomation_NintendoSwitch_ConsoleState_H
 
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Containers/Pimpl.h"
 
 namespace PokemonAutomation{

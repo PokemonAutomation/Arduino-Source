@@ -1,0 +1,9 @@
+name: C++ CI Serial Programs Mac
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build:
+    uses: ./.github/workflows/cpp-ci-serial-programs-base.yml
+    with:
+      os: macos-15
+      compiler: default

@@ -1,0 +1,11 @@
+name: C++ CI Serial Programs Windows Clang
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build:
+    uses: ./.github/workflows/cpp-ci-serial-programs-base.yml
+    with:
+      os: windows-2025
+      compiler: clang
+      upload-build: true
+      run-tests: true

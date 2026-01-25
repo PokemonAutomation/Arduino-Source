@@ -14,6 +14,7 @@
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "Controllers/ControllerStateTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 #include "PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h"
@@ -54,6 +55,9 @@ private:
 
     SimpleIntegerOption<uint64_t> NUM_RESETS;
     SimpleIntegerOption<uint16_t> MIN_CALORIE_REMAINING;
+
+    // ControllerCommandTables PER_SPAWN_TABLE;
+    // ControllerCommandTables PER_CHECK_TABLE;
 
     // Shuttle Run only options
     MillisecondsOption FORWARD_RUN_TIME;

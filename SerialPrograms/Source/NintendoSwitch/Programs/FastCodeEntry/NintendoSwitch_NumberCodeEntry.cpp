@@ -27,8 +27,8 @@ namespace FastCodeEntry{
 
 void numberpad_enter_code(
     ConsoleHandle& console, AbstractControllerContext& context,
-    const std::string& code,
-    bool include_plus
+    bool assume_console_type_is_ready,
+    const std::string& code, bool include_plus
 ){
     auto* keyboard = dynamic_cast<StandardHid::Keyboard*>(&context.controller());
     if (keyboard){
@@ -40,7 +40,11 @@ void numberpad_enter_code(
     auto* procon = dynamic_cast<ProController*>(&context.controller());
     if (procon){
         ProControllerContext subcontext(context);
-        numberpad_enter_code(console, subcontext, code, include_plus);
+        numberpad_enter_code(
+            console, subcontext,
+            assume_console_type_is_ready,
+            code, include_plus
+        );
         return;
     }
 
@@ -48,63 +52,6 @@ void numberpad_enter_code(
         console, "Unsupported controller type."
     );
 }
-
-
-
-
-#if 0
-void numberpad_enter_code(
-    ConsoleHandle& console, StandardHid::KeyboardContext& context,
-    const std::string& code,
-    bool include_plus
-){
-    using namespace StandardHid;
-
-    Milliseconds delay = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.TIME_UNIT;
-    Milliseconds hold = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.HOLD;
-    Milliseconds cool = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.COOLDOWN;
-
-    static const std::map<char, KeyboardKey> MAP{
-        {0, KeyboardKey::KEY_KP_0},
-        {1, KeyboardKey::KEY_KP_1},
-        {2, KeyboardKey::KEY_KP_2},
-        {3, KeyboardKey::KEY_KP_3},
-        {4, KeyboardKey::KEY_KP_4},
-        {5, KeyboardKey::KEY_KP_5},
-        {6, KeyboardKey::KEY_KP_6},
-        {7, KeyboardKey::KEY_KP_7},
-        {8, KeyboardKey::KEY_KP_8},
-        {9, KeyboardKey::KEY_KP_9},
-        {'0', KeyboardKey::KEY_KP_0},
-        {'1', KeyboardKey::KEY_KP_1},
-        {'2', KeyboardKey::KEY_KP_2},
-        {'3', KeyboardKey::KEY_KP_3},
-        {'4', KeyboardKey::KEY_KP_4},
-        {'5', KeyboardKey::KEY_KP_5},
-        {'6', KeyboardKey::KEY_KP_6},
-        {'7', KeyboardKey::KEY_KP_7},
-        {'8', KeyboardKey::KEY_KP_8},
-        {'9', KeyboardKey::KEY_KP_9},
-    };
-
-    for (char ch : code){
-        auto iter = MAP.find(ch);
-        if (iter == MAP.end()){
-            throw_and_log<OperationFailedException>(
-                console, ErrorReport::NO_ERROR_REPORT,
-                "Invalid code character."
-            );
-        }
-        context->issue_key(&context, delay, hold, cool, iter->second);
-    }
-
-    if (include_plus){
-        context->issue_key(&context, delay, hold, cool, KeyboardKey::KEY_ENTER);
-        context->issue_key(&context, delay, hold, cool, KeyboardKey::KEY_ENTER);
-        context->issue_key(&context, delay, hold, cool, KeyboardKey::KEY_ENTER);
-    }
-}
-#endif
 
 
 
@@ -256,14 +203,14 @@ std::vector<CodeEntryActionWithDelay> numberpad_get_best_path(
     Milliseconds best_time = Milliseconds::max();
     for (const std::vector<CodeEntryAction>& path : paths){
         std::vector<CodeEntryActionWithDelay> current_path;
-        codeboard_populate_delays(switch2, current_path, path, delays, optimize);
-        Milliseconds current_time = 0ms;
-        for (CodeEntryActionWithDelay& action : current_path){
-            current_time += action.delay;
-            if (action.action == CodeEntryAction::SCROLL_LEFT){
-//                action.delay =
-            }
-        }
+        Milliseconds current_time = codeboard_populate_delays(
+            switch2,
+            current_path,
+            path, delays, optimize
+        );
+
+//        cout << "Size = " << current_path.size() << ", cost = " << current_time.count() << endl;
+
         if (best_time > current_time ||
             (best_time == current_time && best_path.size() > current_path.size())
         ){
@@ -279,8 +226,8 @@ std::vector<CodeEntryActionWithDelay> numberpad_get_best_path(
 
 void numberpad_enter_code(
     ConsoleHandle& console, ProControllerContext& context,
-    const std::string& code,
-    bool include_plus
+    bool assume_console_type_is_ready,
+    const std::string& code, bool include_plus
 ){
     //  Calculate the coordinates.
     const std::map<char, NumberEntryPosition>& POSITION_MAP = NUMBER_POSITIONS();
@@ -296,13 +243,26 @@ void numberpad_enter_code(
         positions.emplace_back(iter->second);
     }
 
+    CodeEntryDelays delays;
 
-    ConsoleType console_type = detect_console_type_from_in_game(console, context);
+    ConsoleType console_type = assume_console_type_is_ready
+        ? console.state().console_type()
+        : detect_console_type_from_in_game(console, context);
     bool switch2;
     if (is_switch1(console_type)){
         switch2 = false;
+        if (context->performance_class() == ControllerPerformanceClass::SerialPABotBase_Wired){
+            delays = ConsoleSettings::instance().CODEBOARD_ENTRY_SWITCH1_WIRED;
+        }else{
+            delays = ConsoleSettings::instance().CODEBOARD_ENTRY_SWITCH1_WIRELESS;
+        }
     }else if (is_switch2(console_type)){
         switch2 = true;
+        if (context->performance_class() == ControllerPerformanceClass::SerialPABotBase_Wired){
+            delays = ConsoleSettings::instance().CODEBOARD_ENTRY_SWITCH2_WIRED;
+        }else{
+            delays = ConsoleSettings::instance().CODEBOARD_ENTRY_SWITCH2_WIRELESS;
+        }
     }else{
         throw UserSetupError(
             console,
@@ -311,42 +271,11 @@ void numberpad_enter_code(
     }
 
 
-    //  Fetch the delays.
-
-    Milliseconds unit;
-    Milliseconds hold;
-    Milliseconds cool;
-    bool reordering;
-    if (switch2){
-        unit        = ConsoleSettings::instance().SWITCH2_DIGIT_ENTRY0.TIME_UNIT;
-        hold        = ConsoleSettings::instance().SWITCH2_DIGIT_ENTRY0.HOLD;
-        cool        = ConsoleSettings::instance().SWITCH2_DIGIT_ENTRY0.COOLDOWN;
-        reordering  = ConsoleSettings::instance().SWITCH2_DIGIT_ENTRY0.REORDERING;
-    }else{
-        unit        = ConsoleSettings::instance().SWITCH1_DIGIT_ENTRY0.TIME_UNIT;
-        hold        = ConsoleSettings::instance().SWITCH1_DIGIT_ENTRY0.HOLD;
-        cool        = ConsoleSettings::instance().SWITCH1_DIGIT_ENTRY0.COOLDOWN;
-        reordering  = ConsoleSettings::instance().SWITCH1_DIGIT_ENTRY0.REORDERING;
-    }
-
-    Milliseconds tv = context->timing_variation();
-    unit += tv;
-
-    CodeEntryDelays delays{
-        .hold = hold + tv,
-        .cool = cool,
-        .press_delay = unit,
-        .move_delay = unit,
-        .scroll_delay = unit,
-        .wrap_delay = 2*unit,
-    };
-
-
     //  Get all the possible paths.
     std::vector<std::vector<CodeEntryAction>> all_paths = numberpad_get_all_paths(
         {0, 0},
         positions.data(), positions.size(),
-        reordering
+        delays.reordering
     );
 
     //  Pick the best path.

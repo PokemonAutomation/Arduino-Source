@@ -121,7 +121,7 @@ AlertEyeTracker::AlertEyeTracker(Color color, VideoOverlay* overlay, WallDuratio
 {}
 
 bool AlertEyeTracker::currently_active() const{
-    ReadSpinLock lg(m_lock);
+    ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     return m_first_detection <= current_time() - m_min_duration;
 }
 
@@ -131,12 +131,12 @@ void AlertEyeTracker::make_overlays(VideoOverlaySet& items) const{
 
 bool AlertEyeTracker::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     if (!detect(frame)){
-        WriteSpinLock lg(m_lock);
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
         m_first_detection = WallClock::max();
         return false;
     }
 
-    WriteSpinLock lg(m_lock);
+    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     m_first_detection = std::min(m_first_detection, timestamp);
 
     return false;

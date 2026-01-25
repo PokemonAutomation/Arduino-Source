@@ -15,6 +15,7 @@
 #ifndef POKEMON_AUTOMATION_ML_ImageAnnotationDisplaySession_H
 #define POKEMON_AUTOMATION_ML_ImageAnnotationDisplaySession_H
 
+#include "Common/Cpp/Logging/TaggedLogger.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/VideoPipeline/VideoSession.h"

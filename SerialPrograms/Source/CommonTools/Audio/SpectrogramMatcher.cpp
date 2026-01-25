@@ -347,7 +347,6 @@ float SpectrogramMatcher::match(const std::vector<AudioSpectrum>& new_spectrums)
     for (const auto& s : m_spectrums){
         if (s.stamp != lastStamp - 1){
             std::cout << "Error: SpectrogramMatcher (" + m_name + ") spectrum timestamps are not continuous:" << std::endl;
-
             for(const auto& sp : m_spectrums){
                 std::cout << sp.stamp << ", ";
             }
@@ -396,6 +395,7 @@ void SpectrogramMatcher::clear(){
     m_spectrums.clear();
     m_spectrumNormSqrs.clear();
     m_lastStampTested = SIZE_MAX;
+    m_lastScale = 0.0;
 }
 
 
