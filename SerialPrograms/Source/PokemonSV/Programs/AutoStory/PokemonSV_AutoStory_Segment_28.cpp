@@ -112,7 +112,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         if (attempt_number > 0 || ENABLE_TEST){
             env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
             move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, -1, 400ms});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, +1, 400ms});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, +1, 100ms});
         }
 
         direction.change_direction(env.program_info(), env.console, context, 0.696613);
