@@ -582,7 +582,7 @@ std::vector<std::unique_ptr<EditableTableRow>> DonutBerriesTable::make_defaults(
 
 FlavorPowerTableRow::FlavorPowerTableRow(EditableTableOption& parent_table)
     : EditableTableRow(parent_table)
-    , limit(LockMode::LOCK_WHILE_RUNNING, 1, 999, 1, 1)
+    , limit(LockMode::LOCK_WHILE_RUNNING, 1, 0, 999)
     , power_1(flavor_power_enum_database(), LockMode::LOCK_WHILE_RUNNING, Flavor_Powers::alpha)
     , level_1(power_level_enum_database(), LockMode::LOCK_WHILE_RUNNING, Power_Level::three)
     , power_2(flavor_power_enum_database(), LockMode::LOCK_WHILE_RUNNING, Flavor_Powers::any)
