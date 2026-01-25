@@ -56,7 +56,7 @@ const pabb2_PacketHeader* pabb2_PacketParser_pull_bytes(
         }
     }
 
-EndLoop:
+EndLoop:;
 
     //  At this point, we have a complete and valid header.
 
