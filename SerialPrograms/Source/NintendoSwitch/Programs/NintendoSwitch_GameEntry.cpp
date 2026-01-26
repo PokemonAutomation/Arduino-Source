@@ -452,7 +452,7 @@ void start_game_from_home_with_inference(
 
     pbf_press_button(context, BUTTON_A, 160ms, 840ms);
 
-    while (true){
+    for (int c = 0; c < 20; c++){
         HomeMenuWatcher home(console, std::chrono::milliseconds(2000));
         StartGameUserSelectWatcher user_select(console, COLOR_GREEN);
         UpdateMenuWatcher update_menu(console, COLOR_PURPLE);
@@ -503,13 +503,16 @@ void start_game_from_home_with_inference(
             console.log("Detected black screen. Game started...");
             return;
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "start_game_from_home_with_inference(): No recognizable state after 30 seconds.",
-                console
-            );
+            console.log("start_game_from_home_with_inference(): No recognizable state after 30 seconds.", COLOR_RED);
+            pbf_press_button(context, BUTTON_HOME, 160ms, 840ms);
         }
     }
+
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "start_game_from_home_with_inference(): Failed to start game after 20 actions.",
+        console
+    );
 }
 void start_game_from_home_with_inference(
     ConsoleHandle& console, JoyconContext& context,
