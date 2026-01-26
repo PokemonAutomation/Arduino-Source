@@ -243,15 +243,15 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
     m_logger.log("Saving stream history...", COLOR_BLUE);
 
     std::deque<std::shared_ptr<AudioBlock>> audio;
-    std::deque<CompressedVideoFrame> frames;
+    std::deque<std::shared_ptr<const VideoFrame>> frames;
     {
         //  Fast copy the current state of the stream.
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-        if (m_audio.empty() && m_compressed_frames.empty()){
+        if (m_audio.empty() && m_frames.empty()){
             return false;
         }
         audio = m_audio;
-        frames = m_compressed_frames;
+        frames = m_frames;
     }
 
     //  Now that the lock is released, we can take our time encoding it.
