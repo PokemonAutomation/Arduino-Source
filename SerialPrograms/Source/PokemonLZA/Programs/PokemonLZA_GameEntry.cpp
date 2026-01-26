@@ -55,7 +55,12 @@ bool gamemenu_to_ingame(
     stream.log("Black screen detected");
 
     {
-        BlackScreenOverWatcher detector(COLOR_RED, {0.1, 0.04, 0.8, 0.3});
+        BlackScreenWatcher detector(
+            COLOR_RED,
+            {0.1, 0.04, 0.8, 0.3},
+            100, 10,
+            BlackScreenWatcher::FinderType::GONE
+        );
         int ret = wait_until(
             stream, context,
             std::chrono::milliseconds(enter_game_timeout),
