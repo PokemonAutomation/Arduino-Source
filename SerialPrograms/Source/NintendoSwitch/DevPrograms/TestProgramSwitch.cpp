@@ -517,6 +517,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
+    UpdateMenuWatcher update_menu(console, COLOR_PURPLE);
+    CheckOnlineWatcher check_online(COLOR_CYAN);
+    update_menu.make_overlays(overlays);
+    check_online.make_overlays(overlays);
+
+
+
+
 #if 0
     {
         MockDevice device;
