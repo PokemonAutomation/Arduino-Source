@@ -28,10 +28,11 @@ struct FileLoggerConfig{
     size_t max_queue_size = 10000;                  // Max pending log entries before blocking
     size_t max_file_size_bytes = 50 * 1024 * 1024;  // Max file size before rotation (50MB default)
     size_t last_log_max_lines = 10000;              // Max lines to keep in memory for get_last()
+    bool flush_when_exit = true;                    // Whether to save remaining logs to file when program exists
 };
 
 
-// A Qt-free file logger that:
+// A file logger that:
 // 1. Writes log messages to a file asynchronously via a background thread
 // 2. Supports log rotation when the file exceeds a configured size
 // 3. Notifies registered listeners when a log message is written (for UI integration)

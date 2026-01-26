@@ -7,6 +7,7 @@
 #include <QCoreApplication>
 #include <QMenuBar>
 #include <QDir>
+#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Windows/DpiScaler.h"
@@ -22,70 +23,13 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-Logger& global_logger_raw(){
-    auto get_log_filepath = [&](){
-        QString application_name(QCoreApplication::applicationName());
-        if (application_name.size() == 0){
-            application_name = "SerialPrograms";
-        }
-        return USER_FILE_PATH() + (application_name + ".log").toStdString();
-    };
-
-    static FileWindowLogger logger(get_log_filepath(), LOG_HISTORY_LINES);
-    return logger;
-}
-
-
-FileWindowLogger::~FileWindowLogger(){
-    m_file_logger.remove_listener(*this);
-}
-
-FileWindowLogger::FileWindowLogger(const std::string& path, size_t max_queue_size)
-    : m_file_logger(FileLoggerConfig{
-        .file_path = path,
-        .max_queue_size = max_queue_size,
-        .max_file_size_bytes = 50 * 1024 * 1024,  // 50MB
-        .last_log_max_lines = max_queue_size,
-    })
-{
-    m_file_logger.add_listener(*this);
-}
-
-void FileWindowLogger::operator+=(FileWindowLoggerWindow& widget){
-    std::lock_guard<std::mutex> lg(m_window_lock);
-    m_windows.insert(&widget);
-}
-
-void FileWindowLogger::operator-=(FileWindowLoggerWindow& widget){
-    std::lock_guard<std::mutex> lg(m_window_lock);
-    m_windows.erase(&widget);
-}
-
-void FileWindowLogger::log(const std::string& msg, Color color){
-    m_file_logger.log(msg, color);
-}
-
-void FileWindowLogger::log(std::string&& msg, Color color){
-    m_file_logger.log(std::move(msg), color);
-}
-
-std::vector<std::string> FileWindowLogger::get_last() const{
-    return m_file_logger.get_last();
-}
-
-void FileWindowLogger::on_log(const std::string& msg, Color color){
+void FileWindowLoggerWindow::on_log(const std::string& msg, Color color){
     // This is called from FileLogger's background thread.
     // Format the message for Qt display and send to all windows.
-    std::lock_guard<std::mutex> lg(m_window_lock);
-    if (!m_windows.empty()){
-        QString str = to_window_str(msg, color);
-        for (FileWindowLoggerWindow* window : m_windows){
-            window->log(str);
-        }
-    }
+    emit signal_log(to_window_str(msg, color));
 }
 
-QString FileWindowLogger::to_window_str(const std::string& msg, Color color){
+QString FileWindowLoggerWindow::to_window_str(const std::string& msg, Color color){
     // Convert message to HTML for display in QTextEdit.
     // Replace spaces with &nbsp; and newlines with <br>.
     std::string str;
@@ -111,10 +55,11 @@ QString FileWindowLogger::to_window_str(const std::string& msg, Color color){
 }
 
 
-FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget* parent)
+FileWindowLoggerWindow::FileWindowLoggerWindow(QWidget* parent)
     : QMainWindow(parent)
-    , m_logger(logger)
+    , m_logger(dynamic_cast<FileLogger&>(global_logger_raw()))
 {
+    m_logger.add_listener(*this);
     if (objectName().isEmpty()){
         setObjectName(QString::fromUtf8("TextWindow"));
     }
@@ -149,7 +94,6 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget
     GlobalSettings::instance().LOG_WINDOW_SIZE->X_POS.add_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS.add_listener(*this);
 
-    m_logger += *this;
     log("================================================================================");
     log("<b>Window Startup...</b>");
     log("Current path: " + QDir::currentPath());
@@ -161,7 +105,7 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget
 
 FileWindowLoggerWindow::~FileWindowLoggerWindow(){
     remove_window(*this);
-    m_logger -= *this;
+    m_logger.remove_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->WIDTH.remove_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->HEIGHT.remove_listener(*this);
     GlobalSettings::instance().LOG_WINDOW_SIZE->X_POS.remove_listener(*this);
