@@ -311,6 +311,8 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
             1s
         );
 
+        connection.reset();
+
         connection.send_request(PABB2_CONNECTION_OPCODE_ASK_VERSION);
         connection.wait_for_pending();
 
@@ -320,12 +322,8 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
         connection.send_request(PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS);
         connection.wait_for_pending();
 
-        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_RESET);
-        connection.wait_for_pending();
 
-
-        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_VERSION);
-        connection.wait_for_pending();
+        connection.send("asdf", 4);
 
 
         scope.wait_for(60s);

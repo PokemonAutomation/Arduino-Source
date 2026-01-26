@@ -11,10 +11,13 @@
 using std::cout;
 using std::endl;
 
-
+#if 0
 #define PABB2_DROP_HOST_TO_DEVICE   0.2
 #define PABB2_DROP_DEVICE_TO_HOST   0.2
-
+#else
+#define PABB2_DROP_HOST_TO_DEVICE   0
+#define PABB2_DROP_DEVICE_TO_HOST   0
+#endif
 
 namespace PokemonAutomation{
 

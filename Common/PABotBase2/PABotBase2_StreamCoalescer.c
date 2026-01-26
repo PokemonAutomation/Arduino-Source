@@ -7,10 +7,11 @@
 #include <string.h>
 #include "PABotBase2_StreamCoalescer.h"
 
-#include <stdio.h>  //  REMOVE
-#include "PABotBase2_ConnectionDebug.h" //  REMOVE
+//#include <stdio.h>  //  REMOVE
+//#include "PABotBase2_ConnectionDebug.h" //  REMOVE
 
 void pabb2_StreamCoalescer_init(pabb2_StreamCoalescer* self){
+//    printf("pabb2_StreamCoalescer_init(%p)\n", self);
     self->slot_head = 0;
     self->slot_tail = 0;
     self->stream_head = 0;
@@ -64,8 +65,11 @@ void pabb2_StreamCoalescer_pop_leading_finished(pabb2_StreamCoalescer* self){
     uint8_t slot_head = self->slot_head;
     uint8_t slot_tail = self->slot_tail;
 
+//    printf("pabb2_StreamCoalescer_pop_leading_finished()\n");
+
     while (slot_head != slot_tail){
         uint8_t* slot = &self->lengths[slot_head & PABB2_StreamCoalescer_SLOTS_MASK];
+//        printf("slot[%d] = %d\n", slot_head, *slot);
         if (*slot != 0xff){
             break;
         }
@@ -90,8 +94,11 @@ void pabb2_StreamCoalescer_push_packet(pabb2_StreamCoalescer* self, uint8_t seqn
 //    printf("enter ---------------------\n");
 //    pabb2_StreamCoalescer_print(self, false);
 
+//    printf("pabb2_StreamCoalescer_push_packet(%p): seqnum = %d, slot_head = %d\n", self, seqnum, slot_head);
+
     //  Either before (old retransmit) or too far in future.
     if ((uint8_t)(seqnum - slot_head) >= PABB2_StreamCoalescer_SLOTS){
+//        printf("Device: Packet is out of range.\n");
         return;
     }
 
@@ -118,12 +125,14 @@ bool pabb2_StreamCoalescer_push_stream(pabb2_StreamCoalescer* self, const pabb2_
 
     //  Zero does not fall through cleanly. So handle it here.
     if (stream_size == 0){
+//        printf("Device: stream_size == 0\n");
         pabb2_StreamCoalescer_push_packet(self, packet->seqnum);
         return true;
     }
 
     //  Data is larger than the entire buffer.
     if (stream_size > PABB2_StreamCoalescer_BUFFER_SIZE){
+//        printf("Device: stream_size > PABB2_StreamCoalescer_BUFFER_SIZE\n");
         return false;
     }
 
@@ -133,7 +142,9 @@ bool pabb2_StreamCoalescer_push_stream(pabb2_StreamCoalescer* self, const pabb2_
     //  Either before (old retransmit) or too far in future.
     {
         uint8_t diff = seqnum - slot_head;
+//        printf("seqnum = %d, slot_head = %d\n", seqnum, slot_head);
         if (diff >= PABB2_StreamCoalescer_SLOTS){
+//            printf("Device: In the past.\n");
             //  Negative means we're in the past and we can just ack.
             return diff & 0x80;
         }
@@ -146,6 +157,7 @@ bool pabb2_StreamCoalescer_push_stream(pabb2_StreamCoalescer* self, const pabb2_
 
     //  Too far ahead that it's beyond our window.
     if (stream_offset_e - self->stream_head > PABB2_StreamCoalescer_BUFFER_SIZE){
+//        printf("Device: To far in future.\n");
         return false;
     }
 

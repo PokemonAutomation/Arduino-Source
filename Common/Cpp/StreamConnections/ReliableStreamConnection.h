@@ -11,7 +11,7 @@
 #include <condition_variable>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/CancellableScope.h"
-#include "Common/Cpp/Logging/TaggedLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "Common/PABotBase2/PABotBase2_PacketSender.h"
 #include "Common/PABotBase2/PABotBase2_PacketParser.h"
@@ -42,12 +42,14 @@ public:
     virtual bool cancel(std::exception_ptr exception) noexcept override;
     void wait_for_pending();
 
+    void reset();
+
     //  Send stream data.
     virtual size_t send(const void* data, size_t bytes) override;
 
     bool try_send_request(uint8_t opcode);
     void send_request(uint8_t opcode);
-//    void verify_version();
+
 
 
 private:

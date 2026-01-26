@@ -82,6 +82,18 @@ void ReliableStreamConnection::wait_for_pending(){
 //  Send Path
 //
 
+void ReliableStreamConnection::reset(){
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        pabb2_PacketSender_reset(&m_reliable_sender);
+        pabb2_PacketParser_reset(&m_parser);
+        pabb2_StreamCoalescer_reset(&m_stream_coalescer);
+        throw_if_cancelled();
+        pabb2_PacketSender_send_packet(&m_reliable_sender, PABB2_CONNECTION_OPCODE_ASK_RESET, 0, nullptr);
+    }
+    m_cv.notify_all();
+    wait_for_pending();
+}
 size_t ReliableStreamConnection::send(const void* data, size_t bytes){
     std::lock_guard<std::mutex> lg(m_lock);
     throw_if_cancelled();
