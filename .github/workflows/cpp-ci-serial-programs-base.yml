@@ -92,6 +92,7 @@ jobs:
       if: inputs.upload-build
       shell: bash
       run: |
+        cd Arduino-Source
         echo https://github.com/${{github.repository}}/commit/${{github.sha}} > ${{env.UPLOAD_FOLDER}}/version.txt
 
     - name: Upload Build
