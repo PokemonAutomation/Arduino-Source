@@ -10,6 +10,7 @@
 #include "Common/Cpp/ImageResolution.h"
 #include "StaticRegistration.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "CommonFramework/Tools/GlobalThreadPoolsQt.h"
 #include "VideoPipeline/Backends/MediaServicesQt6.h"
 #include "Globals.h"
 #include "GlobalSettingsPanel.h"
@@ -161,6 +162,7 @@ int run_program(int argc, char *argv[]){
     int ret = application.exec();
 
     GlobalMediaServices::instance().stop();
+    GlobalThreadPools::qt_threadpool().stop();
 
     return ret;
 }
