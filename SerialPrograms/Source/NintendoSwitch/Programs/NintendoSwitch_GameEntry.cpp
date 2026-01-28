@@ -452,7 +452,7 @@ void start_game_from_home_with_inference(
 
     pbf_press_button(context, BUTTON_A, 160ms, 840ms);
 
-    WallClock deadline = current_time() + std::chrono::minutes(2);
+    WallClock deadline = current_time() + std::chrono::minutes(5);
     while (current_time() < deadline){
         HomeMenuWatcher home(console, std::chrono::milliseconds(2000));
         StartGameUserSelectWatcher user_select(console, COLOR_GREEN);
@@ -511,7 +511,7 @@ void start_game_from_home_with_inference(
 
     OperationFailedException::fire(
         ErrorReport::SEND_ERROR_REPORT,
-        "start_game_from_home_with_inference(): Failed to start game after 2 minutes.",
+        "start_game_from_home_with_inference(): Failed to start game after 5 minutes.",
         console
     );
 }
