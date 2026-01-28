@@ -290,9 +290,7 @@ void set_fast_travel_menu_filter(
     int ret = run_until<ProControllerContext>(
         console, context,
         [&](ProControllerContext& context){
-            for(int i = 0; i < 4; i++){
-                pbf_mash_button(context, BUTTON_MINUS, 1000ms);
-            }
+            pbf_mash_button(context, BUTTON_MINUS, 4s);
         },
         {first_filter_arrow}
     );
@@ -361,7 +359,7 @@ void open_fast_travel_menu(
     int ret = run_until<ProControllerContext>(
         console, context,
         [&](ProControllerContext& context){
-            pbf_press_button(context, BUTTON_Y, 160ms, 1000ms);
+            pbf_press_button(context, BUTTON_Y, 160ms, 10s);
         },
         {map_over}
     );
@@ -425,9 +423,7 @@ FastTravelState open_map_and_fly_to(ConsoleHandle& console, ProControllerContext
     int ret = run_until<ProControllerContext>(
         console, context,
         [&](ProControllerContext& context){
-            for(int i = 0; i < 4; i++){
-                pbf_mash_button(context, BUTTON_A, 1000ms);
-            }
+            pbf_mash_button(context, BUTTON_A, 4s);
         },
         {fly_confirmed, pursued_warning}
     );
