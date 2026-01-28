@@ -4,6 +4,7 @@
  *
  */
 
+#include <unordered_map>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
@@ -107,14 +108,10 @@ const std::string& parse_location_name(const std::string& display_name){
     return iter->second;
 }
 
-// Get all location slugs in a vector
-const std::vector<std::string>& LOCATION_SLUGS(){
-    return LocationNameDatabase::instance().slugs;
-}
-
 // Mapping between location enum, slug, and index in menu
 const std::vector<LocationItem>& LOCATION_ENUM_MAPPINGS(){
     static const std::vector<LocationItem> database{
+        {Location::HYPERSPACE_ENTRY_POINT,        "hyperspace-entry-point",         0}, // Not a valid slug currently
         {Location::CENTRICO_PLAZA,                "centrico-plaza",                  0},
         {Location::GARE_DE_LUMIOSE,               "gare-de-lumiose",                 1},
         {Location::POKEMON_RESEARCH_LAB,          "pokemon-research-lab",            2},
@@ -183,37 +180,54 @@ const std::vector<LocationItem>& LOCATION_ENUM_MAPPINGS(){
         {Location::BATTLE_ZONE_1,                 "battle-zone-1",                  64},
         {Location::BATTLE_ZONE_2,                 "battle-zone-2",                  65},
         {Location::BATTLE_ZONE_3,                 "battle-zone-3",                  66},
-        {Location::HYPERSPACE_ENTRY_POINT,        "hyperspace-entry-point",         0}, // Not a valid slug currently
     };
     return database;
 }
 
-// Get the whole LocationItem given a Location enum
-const LocationItem& get_location_item_from_enum(const Location location){
+// Create a hash map for fast lookup from Location enum to LocationItem
+static const std::unordered_map<Location, LocationItem> location_item_hash_map_by_enum = [](){
+    std::unordered_map<Location, LocationItem> hash_map;
     const std::vector<LocationItem>& database = LOCATION_ENUM_MAPPINGS();
     for (const LocationItem& item : database){
-        if (item.location == location){
-            return item;
-        }
+        hash_map[item.location] = item;
     }
-    throw InternalProgramError(
-        nullptr, PA_CURRENT_FUNCTION,
-        "Location enumnot found in database: Enum #" + std::to_string((int)location)
-    );
+    return hash_map;
+}();
+
+// Create a hash map for fast lookup from slug to LocationItem
+static const std::unordered_map<std::string, LocationItem> location_item_hash_map_by_slug = [](){
+    std::unordered_map<std::string, LocationItem> hash_map;
+    const std::vector<LocationItem>& database = LOCATION_ENUM_MAPPINGS();
+    for (const LocationItem& item : database){
+        // insert() will not overwrite the existing first entry
+        hash_map.insert({item.slug, item});
+    }
+    return hash_map;
+}();
+
+// Get the whole LocationItem given a Location enum
+const LocationItem& get_location_item_from_enum(const Location location){
+    auto iter = location_item_hash_map_by_enum.find(location);
+    if (iter == location_item_hash_map_by_enum.end()){
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "Location enum not found in database: Enum #" + std::to_string((int)location)
+        );
+    }
+    return iter->second;
 }
 
 // Get the whole LocationItem given a slug
+// WARNING: slugs can be shared for multiple entries, grab the first occurence
 const LocationItem& get_location_item_from_slug(const std::string& slug){
-    const std::vector<LocationItem>& database = LOCATION_ENUM_MAPPINGS();
-    for (const LocationItem& item : database){
-        if (item.slug == slug){
-            return item;
-        }
+    auto iter = location_item_hash_map_by_slug.find(slug);
+    if (iter == location_item_hash_map_by_slug.end()){
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "Location slug not found in database: " + slug
+        );
     }
-    throw InternalProgramError(
-        nullptr, PA_CURRENT_FUNCTION,
-        "Location slug not found in database: " + slug
-    );
+    return iter->second;
 }
 
 }
