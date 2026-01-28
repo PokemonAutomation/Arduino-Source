@@ -17,6 +17,7 @@ namespace NintendoSwitch{
 namespace PokemonLZA{
 
 enum class Location{
+    HYPERSPACE_ENTRY_POINT,
     CENTRICO_PLAZA,
     GARE_DE_LUMIOSE,
     POKEMON_RESEARCH_LAB,
@@ -85,7 +86,6 @@ enum class Location{
     BATTLE_ZONE_1,
     BATTLE_ZONE_2,
     BATTLE_ZONE_3,
-    HYPERSPACE_ENTRY_POINT
 };
 
 enum class FAST_TRAVEL_FILTER{
@@ -119,9 +119,6 @@ const Locations& get_location_name(const std::string& slug);
 
 // Search for the slug of a location given its English display name
 const std::string& parse_location_name(const std::string& display_name);
-
-// A list of all location slugs
-const std::vector<std::string>& LOCATION_SLUGS();
 
 // Map between Location enums and the slug for ease-of-use elsewhere
 const std::vector<LocationItem>& LOCATION_ENUM_MAPPINGS();
