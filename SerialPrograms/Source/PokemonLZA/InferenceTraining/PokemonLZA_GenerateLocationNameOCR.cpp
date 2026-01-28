@@ -44,7 +44,7 @@ GenerateLocationNameOCR_Descriptor::GenerateLocationNameOCR_Descriptor()
 GenerateLocationNameOCR::GenerateLocationNameOCR()
     : LANGUAGE(
         "<b>Game Language:</b>",
-        LocationNameReader::instance().languages(),
+        LocationNameOCR::instance().languages(),
         LockMode::LOCK_WHILE_RUNNING
     )
     , MODE(
@@ -66,7 +66,7 @@ void GenerateLocationNameOCR::read(
     Logger& logger,
     const ImageViewRGB32& image
 ) const{
-    OCR::StringMatchResult result = LocationNameReader::instance().read_substring(
+    OCR::StringMatchResult result = LocationNameOCR::instance().read_substring(
         logger, LANGUAGE, image,
         OCR::BLACK_OR_WHITE_TEXT_FILTERS()
     );

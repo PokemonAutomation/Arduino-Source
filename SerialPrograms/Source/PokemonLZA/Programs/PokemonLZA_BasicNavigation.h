@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonLZA_BasicNavigation_H
 
 #include "Common/Cpp/Time.h"
-#include "PokemonLZA/Programs/PokemonLZA_Locations.h"
+#include "PokemonLZA/Resources/PokemonLZA_Locations.h"
 
 namespace PokemonAutomation{
 
@@ -37,7 +37,8 @@ bool save_game_to_menu(ConsoleHandle& console, ProControllerContext& context);
 enum class FastTravelState{
     SUCCESS,      // Successfully did a fast travel
     PURSUED,      // Being spotted and pursued by wild pokemon
-    NOT_AT_FLY_SPOT  // the current map cursor is not on a fly spot
+    NOT_AT_FLY_SPOT,  // the current map cursor is not on a fly spot
+    NOT_FOUND     // Unable to find fast travel point, possibly not unlocked yet
     // Future work: in some main story session the fast travel is disabled. We will implement
     // that state if we need
 };
@@ -79,11 +80,15 @@ FastTravelState fly_from_map(
 // This is useful to fast travel back to the wild zone gate while in the zone.
 // This function basically just calls `open_map()` and `fly_from_map()`. See the comments of those two
 // functions for details.
-FastTravelState open_map_and_fly_in_place(ConsoleHandle& console, ProControllerContext& context, bool zoom_to_max = false);
+FastTravelState open_map_and_fly_in_place(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    bool zoom_to_max = false
+);
 
 // Blind movement of map cursor from zone entrance to that zone fast travel icon on map
 // this blind movement only works on max zoom level (fully zoomed out)!
-void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProControllerContext& context, WildZone zone);
+void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProControllerContext& context, Location zone);
 
 // Mash button B to leave map view and back to overworld
 // If there is a day/night change, this function will wait for day/night change to finish.
