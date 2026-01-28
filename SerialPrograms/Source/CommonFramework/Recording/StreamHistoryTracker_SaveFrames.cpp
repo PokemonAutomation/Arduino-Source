@@ -85,8 +85,9 @@ std::vector<uchar> compress_video_frame(const QVideoFrame& const_frame) {
 }
 
 
+#if 0
 class VideoGenerator : public QObject {
-    Q_OBJECT
+    // Q_OBJECT
 public:
     VideoGenerator(QVideoFrameInput *input, std::deque<CompressedVideoFrame> frames)
         : m_input(input), m_frames(frames){
@@ -131,7 +132,7 @@ private:
     QVideoFrameInput *m_input;
     std::deque<CompressedVideoFrame> m_frames;
 };
-
+#endif
 
 StreamHistoryTracker::StreamHistoryTracker(
     Logger& logger,
@@ -226,8 +227,6 @@ void StreamHistoryTracker::clear_old(){
 }
 
 
-
-
 bool StreamHistoryTracker::save(const std::string& filename) const{
     m_logger.log("Saving stream history...", COLOR_BLUE);
 
@@ -241,242 +240,283 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
         frames = m_compressed_frames;
     }
 
-    //  Now that the lock is released, we can take our time encoding it.
+    int width = 1920;
+    int height = 1080;
 
-    //  TODO
+    // 1. Initialize VideoWriter (e.g., MP4 with 30 FPS)
+    cv::VideoWriter writer(filename, cv::VideoWriter::fourcc('m', 'p', '4', 'v'), 
+                           30.0, cv::Size(width, height), true);
 
-#if 0
-    WallClock start = WallClock::max();
-    if (!frames.empty()){
-        start = std::min(start, frames.front()->timestamp);
+    if (!writer.isOpened()) {
+        throw std::runtime_error("Could not open video file for writing.");
     }
 
-#endif
-
-
-//    run_on_main_thread_and_wait([&]{
-
-    QVideoFrameFormat format(QSize(1920, 1080), QVideoFrameFormat::Format_ARGB8888);
-    QVideoFrameInput videoInput(format);
-
-//    cout << "frames = " << frames.size() << endl;
-
-    QMediaCaptureSession session;
-    QMediaRecorder recorder;
-    session.setVideoFrameInput(&videoInput);
-    session.setRecorder(&recorder);
-#if 1
-    recorder.setMediaFormat(QMediaFormat::MPEG4);
-#else
-    QMediaFormat video_format;
-    video_format.setAudioCodec(QMediaFormat::AudioCodec::AAC);
-//    video_format.setVideoCodec(QMediaFormat::VideoCodec::H264);
-    video_format.setFileFormat(QMediaFormat::MPEG4);
-    recorder.setMediaFormat(video_format);
-#endif
-    recorder.setQuality(QMediaRecorder::NormalQuality);
-
-    QFileInfo file(QString::fromStdString(filename));
-    recorder.setOutputLocation(
-        QUrl::fromLocalFile(file.absoluteFilePath())
-    );
-
-    VideoGenerator generator(&videoInput, frames);
-
-    QObject::connect(&generator, &VideoGenerator::finished, &recorder, &QMediaRecorder::stop);
-    QObject::connect(&recorder, &QMediaRecorder::recorderStateChanged, [](QMediaRecorder::RecorderState state){
-        if (state == QMediaRecorder::StoppedState) qApp->quit();
-    });
-
-    recorder.record();
-#if 0
-    WallClock last_change = current_time();
-    bool success = true;
-
-    while (!frames.empty()){
-#if 1
-        while (true){
-            if (frames.empty()){
-//                video_input.sendVideoFrame(QVideoFrame());
-//                session.setVideoFrameInput(nullptr);
-                break;
-            }
-            if (!video_input.sendVideoFrame((*frames.begin())->frame)){
-//                cout << "Failed Video: " << frames.size() << endl;
-                break;
-            }
-            frames.pop_front();
-            last_change = current_time();
-//            cout << "Pushed Video: " << frames.size() << endl;
-        }
-#endif
-        if (current_time() - last_change > std::chrono::seconds(10)){
-            m_logger.log("Failed to record stream history: No progress made after 10 seconds.", COLOR_RED);
-            success = false;
-            break;
-        }
-
-        QCoreApplication::processEvents();
+    // 2. Loop through your memory pointers
+    for (CompressedVideoFrame frame : frames) {
+        QVideoFrame video_frame = decompress_video_frame(frame.compressed_frame);
+        QImage img = video_frame.toImage().convertToFormat(QImage::Format_BGR888);
+         
+        cv::Mat mat(height, width, CV_8UC3, (void*)img.bits(), img.bytesPerLine());
+        
+        // 3. Write to video (Encoding happens here)
+        writer.write(mat);
     }
-#endif
+    // Writer automatically releases when going out of scope
 
-    recorder.stop();
     m_logger.log("Done saving stream history...", COLOR_BLUE);
-//    cout << recorder.duration() << endl;
-
-
-//    });
     return true;
 }
 
 
-#if 0
-bool StreamHistoryTracker::save(const std::string& filename) const{
-    m_logger.log("Saving stream history...", COLOR_BLUE);
+// bool StreamHistoryTracker::save(const std::string& filename) const{
+//     m_logger.log("Saving stream history...", COLOR_BLUE);
 
-    std::deque<std::shared_ptr<AudioBlock>> audio;
-    std::deque<std::shared_ptr<const VideoFrame>> frames;
-    {
-        //  Fast copy the current state of the stream.
-        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-        if (m_audio.empty() && m_frames.empty()){
-            return false;
-        }
-        audio = m_audio;
-        frames = m_frames;
-    }
+//     std::deque<CompressedVideoFrame> frames;
+//     {
+//         //  Fast copy the current state of the stream.
+//         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+//         if (m_compressed_frames.empty()){
+//             return false;
+//         }
+//         frames = m_compressed_frames;
+//     }
 
-    //  Now that the lock is released, we can take our time encoding it.
+//     //  Now that the lock is released, we can take our time encoding it.
 
-    //  TODO
+//     //  TODO
 
-#if 0
-    WallClock start = WallClock::max();
-    if (!audio.empty()){
-        start = std::min(start, audio.front()->timestamp);
-    }
-    if (!frames.empty()){
-        start = std::min(start, frames.front()->timestamp);
-    }
+// #if 0
+//     WallClock start = WallClock::max();
+//     if (!frames.empty()){
+//         start = std::min(start, frames.front()->timestamp);
+//     }
 
-#endif
+// #endif
 
 
-//    run_on_main_thread_and_wait([&]{
+// //    run_on_main_thread_and_wait([&]{
 
-    QAudioFormat audio_format;
-    audio_format.setChannelCount((int)m_audio_samples_per_frame);
-    audio_format.setChannelConfig(m_audio_samples_per_frame == 1 ? QAudioFormat::ChannelConfigMono : QAudioFormat::ChannelConfigStereo);
-    audio_format.setSampleRate((int)m_audio_frames_per_second);
-    audio_format.setSampleFormat(QAudioFormat::Float);
+//     QVideoFrameFormat format(QSize(1920, 1080), QVideoFrameFormat::Format_ARGB8888);
+//     QVideoFrameInput videoInput(format);
 
-//    cout << "audio_format = " << audio_format.isValid() << endl;
+// //    cout << "frames = " << frames.size() << endl;
 
-    QAudioBufferInput audio_input;
-    QVideoFrameInput video_input;
+//     QMediaCaptureSession session;
+//     QMediaRecorder recorder;
+//     session.setVideoFrameInput(&videoInput);
+//     session.setRecorder(&recorder);
+// #if 1
+//     recorder.setMediaFormat(QMediaFormat::MPEG4);
+// #else
+//     QMediaFormat video_format;
+//     video_format.setAudioCodec(QMediaFormat::AudioCodec::AAC);
+// //    video_format.setVideoCodec(QMediaFormat::VideoCodec::H264);
+//     video_format.setFileFormat(QMediaFormat::MPEG4);
+//     recorder.setMediaFormat(video_format);
+// #endif
+//     recorder.setQuality(QMediaRecorder::NormalQuality);
 
-//    cout << "audio = " << audio.size() << endl;
-//    cout << "frames = " << frames.size() << endl;
+//     QFileInfo file(QString::fromStdString(filename));
+//     recorder.setOutputLocation(
+//         QUrl::fromLocalFile(file.absoluteFilePath())
+//     );
 
-    QMediaCaptureSession session;
-    QMediaRecorder recorder;
-    session.setAudioBufferInput(&audio_input);
-    session.setVideoFrameInput(&video_input);
-    session.setRecorder(&recorder);
-#if 1
-    recorder.setMediaFormat(QMediaFormat::MPEG4);
-#else
-    QMediaFormat video_format;
-    video_format.setAudioCodec(QMediaFormat::AudioCodec::AAC);
-//    video_format.setVideoCodec(QMediaFormat::VideoCodec::H264);
-    video_format.setFileFormat(QMediaFormat::MPEG4);
-    recorder.setMediaFormat(video_format);
-#endif
-    recorder.setQuality(QMediaRecorder::NormalQuality);
+//     VideoGenerator generator(&videoInput, frames);
 
-    QFileInfo file(QString::fromStdString(filename));
-    recorder.setOutputLocation(
-        QUrl::fromLocalFile(file.absoluteFilePath())
-    );
+//     QObject::connect(&generator, &VideoGenerator::finished, &recorder, &QMediaRecorder::stop);
+//     QObject::connect(&recorder, &QMediaRecorder::recorderStateChanged, [](QMediaRecorder::RecorderState state){
+//         if (state == QMediaRecorder::StoppedState) qApp->quit();
+//     });
 
-    recorder.record();
+//     recorder.record();
+// #if 0
+//     WallClock last_change = current_time();
+//     bool success = true;
 
-    WallClock last_change = current_time();
-    QAudioBuffer audio_buffer;
-    bool success = true;
-    while (audio_buffer.isValid() || !frames.empty()){
-#if 1
-        while (true){
-            if (frames.empty()){
-//                video_input.sendVideoFrame(QVideoFrame());
-//                session.setVideoFrameInput(nullptr);
-                break;
-            }
-            if (!video_input.sendVideoFrame((*frames.begin())->frame)){
-//                cout << "Failed Video: " << frames.size() << endl;
-                break;
-            }
-            frames.pop_front();
-            last_change = current_time();
-//            cout << "Pushed Video: " << frames.size() << endl;
-        }
-#endif
-#if 1
-        while (true){
-            if (!audio_buffer.isValid()){
-                if (audio.empty()){
-//                    audio_input.sendAudioBuffer(QAudioBuffer());
-//                    session.setAudioBufferInput(nullptr);
-                    break;
-                }
-//                cout << "constructing audio buffer: " << audio.size() << endl;
-                const std::vector<float>& samples = audio.front()->samples;
-                QByteArray bytes((const char*)samples.data(), samples.size() * sizeof(float));
-                audio_buffer = QAudioBuffer(
-                    bytes, audio_format//,
-//                    std::chrono::duration_cast<std::chrono::microseconds>(audio.front()->timestamp - start).count()
-                );
-//                cout << "audio_buffer = " << audio_buffer.isValid() << endl;
-                audio.pop_front();
-            }
-            if (!audio_buffer.isValid()){
-                break;
-            }
-            if (!audio_input.sendAudioBuffer(audio_buffer)){
-//                cout << "Failed Audio: " << audio.size() << endl;
-//                cout << audio_input.captureSession() << endl;
-                break;
-            }
-            audio_buffer = QAudioBuffer();
-            last_change = current_time();
-//            cout << "Pushed audio: " << audio.size() << endl;
-        }
-#endif
+//     while (!frames.empty()){
+// #if 1
+//         while (true){
+//             if (frames.empty()){
+// //                video_input.sendVideoFrame(QVideoFrame());
+// //                session.setVideoFrameInput(nullptr);
+//                 break;
+//             }
+//             if (!video_input.sendVideoFrame((*frames.begin())->frame)){
+// //                cout << "Failed Video: " << frames.size() << endl;
+//                 break;
+//             }
+//             frames.pop_front();
+//             last_change = current_time();
+// //            cout << "Pushed Video: " << frames.size() << endl;
+//         }
+// #endif
+//         if (current_time() - last_change > std::chrono::seconds(10)){
+//             m_logger.log("Failed to record stream history: No progress made after 10 seconds.", COLOR_RED);
+//             success = false;
+//             break;
+//         }
 
-        if (current_time() - last_change > std::chrono::seconds(10)){
-            m_logger.log("Failed to record stream history: No progress made after 10 seconds.", COLOR_RED);
-            success = false;
-            break;
-        }
+//         QCoreApplication::processEvents();
+//     }
+// #endif
 
-        QCoreApplication::processEvents();
-    }
-
-    recorder.stop();
-    m_logger.log("Done saving stream history...", COLOR_BLUE);
-//    cout << recorder.duration() << endl;
+//     recorder.stop();
+//     m_logger.log("Done saving stream history...", COLOR_BLUE);
+// //    cout << recorder.duration() << endl;
 
 
-//    });
-    return success;
+// //    });
+//     return true;
+// }
+
+
+// #if 0
+// bool StreamHistoryTracker::save(const std::string& filename) const{
+//     m_logger.log("Saving stream history...", COLOR_BLUE);
+
+//     std::deque<std::shared_ptr<AudioBlock>> audio;
+//     std::deque<std::shared_ptr<const VideoFrame>> frames;
+//     {
+//         //  Fast copy the current state of the stream.
+//         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+//         if (m_audio.empty() && m_frames.empty()){
+//             return false;
+//         }
+//         audio = m_audio;
+//         frames = m_frames;
+//     }
+
+//     //  Now that the lock is released, we can take our time encoding it.
+
+//     //  TODO
+
+// #if 0
+//     WallClock start = WallClock::max();
+//     if (!audio.empty()){
+//         start = std::min(start, audio.front()->timestamp);
+//     }
+//     if (!frames.empty()){
+//         start = std::min(start, frames.front()->timestamp);
+//     }
+
+// #endif
+
+
+// //    run_on_main_thread_and_wait([&]{
+
+//     QAudioFormat audio_format;
+//     audio_format.setChannelCount((int)m_audio_samples_per_frame);
+//     audio_format.setChannelConfig(m_audio_samples_per_frame == 1 ? QAudioFormat::ChannelConfigMono : QAudioFormat::ChannelConfigStereo);
+//     audio_format.setSampleRate((int)m_audio_frames_per_second);
+//     audio_format.setSampleFormat(QAudioFormat::Float);
+
+// //    cout << "audio_format = " << audio_format.isValid() << endl;
+
+//     QAudioBufferInput audio_input;
+//     QVideoFrameInput video_input;
+
+// //    cout << "audio = " << audio.size() << endl;
+// //    cout << "frames = " << frames.size() << endl;
+
+//     QMediaCaptureSession session;
+//     QMediaRecorder recorder;
+//     session.setAudioBufferInput(&audio_input);
+//     session.setVideoFrameInput(&video_input);
+//     session.setRecorder(&recorder);
+// #if 1
+//     recorder.setMediaFormat(QMediaFormat::MPEG4);
+// #else
+//     QMediaFormat video_format;
+//     video_format.setAudioCodec(QMediaFormat::AudioCodec::AAC);
+// //    video_format.setVideoCodec(QMediaFormat::VideoCodec::H264);
+//     video_format.setFileFormat(QMediaFormat::MPEG4);
+//     recorder.setMediaFormat(video_format);
+// #endif
+//     recorder.setQuality(QMediaRecorder::NormalQuality);
+
+//     QFileInfo file(QString::fromStdString(filename));
+//     recorder.setOutputLocation(
+//         QUrl::fromLocalFile(file.absoluteFilePath())
+//     );
+
+//     recorder.record();
+
+//     WallClock last_change = current_time();
+//     QAudioBuffer audio_buffer;
+//     bool success = true;
+//     while (audio_buffer.isValid() || !frames.empty()){
+// #if 1
+//         while (true){
+//             if (frames.empty()){
+// //                video_input.sendVideoFrame(QVideoFrame());
+// //                session.setVideoFrameInput(nullptr);
+//                 break;
+//             }
+//             if (!video_input.sendVideoFrame((*frames.begin())->frame)){
+// //                cout << "Failed Video: " << frames.size() << endl;
+//                 break;
+//             }
+//             frames.pop_front();
+//             last_change = current_time();
+// //            cout << "Pushed Video: " << frames.size() << endl;
+//         }
+// #endif
+// #if 1
+//         while (true){
+//             if (!audio_buffer.isValid()){
+//                 if (audio.empty()){
+// //                    audio_input.sendAudioBuffer(QAudioBuffer());
+// //                    session.setAudioBufferInput(nullptr);
+//                     break;
+//                 }
+// //                cout << "constructing audio buffer: " << audio.size() << endl;
+//                 const std::vector<float>& samples = audio.front()->samples;
+//                 QByteArray bytes((const char*)samples.data(), samples.size() * sizeof(float));
+//                 audio_buffer = QAudioBuffer(
+//                     bytes, audio_format//,
+// //                    std::chrono::duration_cast<std::chrono::microseconds>(audio.front()->timestamp - start).count()
+//                 );
+// //                cout << "audio_buffer = " << audio_buffer.isValid() << endl;
+//                 audio.pop_front();
+//             }
+//             if (!audio_buffer.isValid()){
+//                 break;
+//             }
+//             if (!audio_input.sendAudioBuffer(audio_buffer)){
+// //                cout << "Failed Audio: " << audio.size() << endl;
+// //                cout << audio_input.captureSession() << endl;
+//                 break;
+//             }
+//             audio_buffer = QAudioBuffer();
+//             last_change = current_time();
+// //            cout << "Pushed audio: " << audio.size() << endl;
+//         }
+// #endif
+
+//         if (current_time() - last_change > std::chrono::seconds(10)){
+//             m_logger.log("Failed to record stream history: No progress made after 10 seconds.", COLOR_RED);
+//             success = false;
+//             break;
+//         }
+
+//         QCoreApplication::processEvents();
+//     }
+
+//     recorder.stop();
+//     m_logger.log("Done saving stream history...", COLOR_BLUE);
+// //    cout << recorder.duration() << endl;
+
+
+// //    });
+//     return success;
+// }
+// #endif
+
+
+
+
+
+
 }
-#endif
 
-
-
-
-
-
-}
-
-#include "StreamHistoryTracker_SaveFrames.moc" 
+// #include "StreamHistoryTracker_SaveFrames.moc" 
