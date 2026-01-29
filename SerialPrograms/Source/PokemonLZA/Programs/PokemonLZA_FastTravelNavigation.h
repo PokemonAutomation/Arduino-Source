@@ -48,6 +48,13 @@ bool should_navigate_down(
 // Return true when the page should contain the target destination based on indexes
 // Return false if no pages contain the target index in their range after checking all pages
 // This function does not own the validation of whether the target destination exists or not
+bool navigate_to_destination_page_in_fast_travel_menu_routine(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    Language language,
+    LocationItem& target_destination
+);
+
 bool navigate_to_destination_page_in_fast_travel_menu(
     ConsoleHandle& console,
     ProControllerContext& context,
@@ -65,6 +72,13 @@ int get_target_location_index_within_page(
 // Navigate to the target destination assuming we are on the correct page already
 // Return true if the target destination is found, hover over the option
 // Return false if the target destination is not found
+bool navigate_to_destination_within_page_routine(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    Language language,
+    const LocationItem& target_destination
+);
+
 bool navigate_to_destination_within_page(
     ConsoleHandle& console,
     ProControllerContext& context,
@@ -84,7 +98,7 @@ bool navigate_to_lumiose_sewers_location(
 );
 
 // Navigate to the target destination in the fast travel menu
-// Find the correct page first with navigate_to_destination_page_in_fast_travel_menu()
+// Find the correct page first with navigate_to_destination_page_in_fast_travel_menu_routine()
 // Then validate whether the target destination exists on the current page
 // Return true if the target destination is found on the current page, hover over the option
 // Return false if the target destination is not found on the current page
@@ -95,7 +109,19 @@ bool navigate_to_destination_in_fast_travel_menu(
     const LocationItem& target_destination
 );
 
+// Open the fast travel filters menu
+bool open_fast_travel_filters_menu(
+    ConsoleHandle& console,
+    ProControllerContext& context
+);
+
 // From the fast travel menu, set the fast travel menu filter to the specified option
+bool set_fast_travel_menu_filter_routine(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    FAST_TRAVEL_FILTER filter
+);
+
 void set_fast_travel_menu_filter(
     ConsoleHandle& console,
     ProControllerContext& context,

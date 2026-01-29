@@ -70,7 +70,7 @@ bool should_navigate_down(
     return down_distance <= up_distance;
 }
 
-bool navigate_to_destination_page_in_fast_travel_menu(
+bool navigate_to_destination_page_in_fast_travel_menu_routine(
     ConsoleHandle& console,
     ProControllerContext& context,
     Language language,
@@ -128,6 +128,26 @@ bool navigate_to_destination_page_in_fast_travel_menu(
     return false;
 }
 
+bool navigate_to_destination_page_in_fast_travel_menu(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    Language language,
+    const LocationItem& target_destination
+){
+    WallClock deadline = current_time() + 30s;
+    do{
+        navigate_to_destination_page_in_fast_travel_menu_routine(console, context, language, target_destination);
+
+        pbf_wait(context, 1s); // Account for video lag by making confirmation
+        context.wait_for_all_requests();
+
+        bool found = navigate_to_destination_page_in_fast_travel_menu_routine(console, context, language, target_destination);
+        if (found){
+            return true;
+        }
+    } while (current_time() < deadline);
+    return false;
+}
 
 int get_target_location_index_within_page(
     const LocationItem& target_destination,
@@ -141,7 +161,7 @@ int get_target_location_index_within_page(
     return -1;
 }
 
-bool navigate_to_destination_within_page(
+bool navigate_to_destination_within_page_routine(
     ConsoleHandle& console,
     ProControllerContext& context,
     Language language,
@@ -177,6 +197,27 @@ bool navigate_to_destination_within_page(
     return false;
 }
 
+bool navigate_to_destination_within_page(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    Language language,
+    const LocationItem& target_destination
+){
+    WallClock deadline = current_time() + 30s;
+    do{
+        navigate_to_destination_within_page_routine(console, context, language, target_destination);
+
+        pbf_wait(context, 1s); // Account for video lag by making confirmation
+        context.wait_for_all_requests();
+
+        bool found = navigate_to_destination_within_page_routine(console, context, language, target_destination);
+        if (found){
+            return true;
+        }
+    } while (current_time() < deadline);
+    return false;
+}
+
 bool navigate_to_lumiose_sewers_location(
     ConsoleHandle& console,
     ProControllerContext& context,
@@ -203,7 +244,11 @@ bool navigate_to_lumiose_sewers_location(
                 return false;
             }
             if (current_selector_index == (LocationNameReader::PAGE_SIZE - 2)){
-                break;
+                pbf_wait(context, 1s); // Account for video lag by making confirmation
+                context.wait_for_all_requests();
+                if (current_selector_index == (LocationNameReader::PAGE_SIZE - 2)){
+                    break;
+                }
             }
             // Only move down
             int delta = (LocationNameReader::PAGE_SIZE - 2) - current_selector_index;
@@ -228,22 +273,30 @@ bool navigate_to_lumiose_sewers_location(
             MapIconDetector cafe_woof_icon(COLOR_ORANGE, MapIconType::CafeFlyable, cafe_woof_box, &console.overlay());
             // cafe woof icon detected means lumiose-sewers-1
             if (cafe_woof_icon.detect(console.video().snapshot()) && target_destination.location == Location::LUMIOSE_SEWERS_1){
-                console.log("Lumiose Sewers 1 detected");
-                for(int i = 0; i < 5; i++){
-                    pbf_move_right_joystick(context, {0, -1}, 100ms, 300ms); // Zoom out
-                }
+                pbf_wait(context, 1s); // Account for video lag by making confirmation
                 context.wait_for_all_requests();
-                return true;
+                if (cafe_woof_icon.detect(console.video().snapshot())){
+                    console.log("Lumiose Sewers 1 detected");
+                    for(int i = 0; i < 5; i++){
+                        pbf_move_right_joystick(context, {0, -1}, 100ms, 300ms); // Zoom out
+                    }
+                    context.wait_for_all_requests();
+                    return true;
+                }
             }
             // cafe woof icon not detected means lumiose-sewers-2
             // there are no unobstructable icons near lumiose-sewers-2 to use for detection
             else if (!cafe_woof_icon.detect(console.video().snapshot()) && target_destination.location == Location::LUMIOSE_SEWERS_2){
-                console.log("Lumiose Sewers 2 detected");
-                for(int i = 0; i < 5; i++){
-                    pbf_move_right_joystick(context, {0, -1}, 100ms, 300ms); // Zoom out
-                }
+                pbf_wait(context, 1s); // Account for video lag by making confirmation
                 context.wait_for_all_requests();
-                return true;
+                if (!cafe_woof_icon.detect(console.video().snapshot())){
+                    console.log("Lumiose Sewers 2 detected");
+                    for(int i = 0; i < 5; i++){
+                        pbf_move_right_joystick(context, {0, -1}, 100ms, 300ms); // Zoom out
+                    }
+                    context.wait_for_all_requests();
+                    return true;
+                }
             }
         }
         pbf_press_dpad(context, DPAD_DOWN, 100ms, 200ms);
@@ -276,10 +329,9 @@ bool navigate_to_destination_in_fast_travel_menu(
     return true;
 }
 
-void set_fast_travel_menu_filter(
+bool open_fast_travel_filters_menu(
     ConsoleHandle& console,
-    ProControllerContext& context,
-    FAST_TRAVEL_FILTER filter
+    ProControllerContext& context
 ){
     SelectionArrowWatcher first_filter_arrow(
         COLOR_YELLOW,
@@ -297,32 +349,69 @@ void set_fast_travel_menu_filter(
     switch (ret){
     case 0:
         console.log("Fast travel filter menu opened.");
-        break;
+        return true;
     default:
+        return false;
+    }
+}
+
+bool set_fast_travel_menu_filter_routine(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    FAST_TRAVEL_FILTER filter
+){
+    int target_filter_index = static_cast<int>(filter);
+    WallClock deadline = current_time() + 30s;
+    do {
+        int selected_filter_index = get_current_selector_index(console, FAST_TRAVEL_FILTER_ARROW_BOXES());
+        if (selected_filter_index == -1){
+            return false;
+        }
+        if (selected_filter_index == target_filter_index){
+            return true;
+        }
+
+        int delta = target_filter_index - selected_filter_index;
+        for (; delta > 0; delta--){
+            pbf_press_dpad(context, DPAD_DOWN, 100ms, 200ms);
+        }
+        for (; delta < 0; delta--){
+            pbf_press_dpad(context, DPAD_UP, 100ms, 200ms);
+        }
+        context.wait_for_all_requests();
+    } while (current_time() < deadline);
+    return false;
+}
+
+void set_fast_travel_menu_filter(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    FAST_TRAVEL_FILTER filter
+){
+    WallClock deadline = current_time() + 30s;
+
+    bool filters_menu_opened = open_fast_travel_filters_menu(console, context);
+    if (!filters_menu_opened){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "set_fast_travel_menu_filter(): Unable to open fast travel filter menu.",
             console
         );
     }
+    do{
+        set_fast_travel_menu_filter_routine(console, context, filter);
 
-    int target_filter_index = static_cast<int>(filter);
-    WallClock deadline = current_time() + 30s;
-    do {
-        int selected_filter_index = get_current_selector_index(console, FAST_TRAVEL_FILTER_ARROW_BOXES());
-        if (selected_filter_index == -1){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "set_fast_travel_menu_filter(): Unable to read current fast travel filter selection.",
-                console
-            );
-        }
-        if (selected_filter_index == target_filter_index){
+        pbf_wait(context, 1s); // Account for video lag by making confirmation
+        context.wait_for_all_requests();
+
+        bool found = set_fast_travel_menu_filter_routine(console, context, filter);
+        if (found){
+            int target_arrow_index = static_cast<int>(filter);
             SelectionArrowDetector selector_arrow_on_target(
                 COLOR_YELLOW,
                 &console.overlay(),
                 SelectionArrowType::RIGHT,
-                FAST_TRAVEL_FILTER_ARROW_BOXES().at(target_filter_index)
+                FAST_TRAVEL_FILTER_ARROW_BOXES().at(target_arrow_index)
             );
             for (size_t i = 0; i < 4; i++){
                 pbf_press_button(context, BUTTON_A, 100ms, 1000ms);
@@ -334,15 +423,6 @@ void set_fast_travel_menu_filter(
                 }
             }
         }
-
-        int delta = target_filter_index - selected_filter_index;
-        for (; delta > 0; delta--){
-            pbf_press_dpad(context, DPAD_DOWN, 100ms, 200ms);
-        }
-        for (; delta < 0; delta--){
-            pbf_press_dpad(context, DPAD_UP, 100ms, 200ms);
-        }
-        context.wait_for_all_requests();
     } while (current_time() < deadline);
     OperationFailedException::fire(
         ErrorReport::SEND_ERROR_REPORT,
