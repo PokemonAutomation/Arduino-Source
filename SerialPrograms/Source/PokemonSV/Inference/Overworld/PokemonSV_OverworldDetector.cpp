@@ -64,8 +64,8 @@ bool OverworldDetector::detect(const ImageViewRGB32& screen){
 
 std::pair<double, double> OverworldDetector::locate_ball(const ImageViewRGB32& screen, bool strict_requirements) const{
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
-        {0xffc0a000, 0xffffff1f},
-        {0xffc0b000, 0xffffff1f},
+        {0xffa0a000, 0xffffff1f},
+        {0xffb0b000, 0xffffff1f},
         {0xffc0c000, 0xffffff1f},
         {0xffd0d000, 0xffffff1f},
         {0xffe0e000, 0xffffff1f},
@@ -222,3 +222,4 @@ bool OverworldWatcher::process_frame(const VideoSnapshot& frame){
 }
 }
 }
+
