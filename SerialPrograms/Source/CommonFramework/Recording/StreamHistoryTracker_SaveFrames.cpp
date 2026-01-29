@@ -32,7 +32,7 @@ namespace PokemonAutomation{
 
 
 
-QVideoFrame decompress_video_frame(const std::vector<uchar> &compressed_buffer) {
+QImage decompress_video_frame(const std::vector<uchar> &compressed_buffer) {
     if (compressed_buffer.empty()) return {};
 
     // 1. Decompress JPEG buffer into a QImage
@@ -43,10 +43,7 @@ QVideoFrame decompress_video_frame(const std::vector<uchar> &compressed_buffer) 
 
     if (img.isNull()) return {};
 
-    // 2. Use the new Qt 6.8 constructor
-    // This wraps the QImage into a QVideoFrame efficiently.
-    // If the format is compatible (like RGB888), it minimizes copies.
-    return QVideoFrame(img);
+    return img.convertToFormat(QImage::Format_BGR888);
 }
 
 std::vector<uchar> compress_video_frame(const QVideoFrame& const_frame) {
@@ -65,6 +62,12 @@ std::vector<uchar> compress_video_frame(const QVideoFrame& const_frame) {
     // For circular buffers, using a 3-channel RGB888 is common for OpenCV
     QImage img = frame.toImage().convertToFormat(QImage::Format_RGB888);
 
+    // downscale to 720p for smaller file size
+    int target_width = 1280;
+    int target_height = img.height() * target_width / img.width();
+    img = img.scaled(target_width, target_height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+
     // 3. Wrap QImage memory into a cv::Mat (No-copy)
     // Note: OpenCV expects BGR by default, but QImage is RGB. 
     // If color accuracy matters, use cv::cvtColor later or img.rgbSwapped().
@@ -73,7 +76,7 @@ std::vector<uchar> compress_video_frame(const QVideoFrame& const_frame) {
 
     // 4. Compress using imencode
     std::vector<uchar> compressed_buffer;
-    std::vector<int> params = {cv::IMWRITE_JPEG_QUALITY, 80}; // 0-100
+    std::vector<int> params = {cv::IMWRITE_JPEG_QUALITY, 50}; // 0-100
     
     // Convert RGB to BGR before encoding because imencode expects BGR
     cv::Mat bgr_Mat;
@@ -180,7 +183,7 @@ void StreamHistoryTracker::on_frame(std::shared_ptr<const VideoFrame> frame){
     WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
 //    cout << "on_frame() = " << m_frames.size() << endl;
     auto compressed_frame = compress_video_frame(frame->frame);
-    m_compressed_frames.emplace_back(CompressedVideoFrame{frame->timestamp, compressed_frame});
+    m_compressed_frames.emplace_back(CompressedVideoFrame{frame->timestamp, std::move(compressed_frame)});
     // m_frames.emplace_back(std::move(frame));
     clear_old();
 }
@@ -240,8 +243,16 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
         frames = m_compressed_frames;
     }
 
-    int width = 1920;
-    int height = 1080;
+    if (frames.empty()) return false;
+
+    // Use first frame to get size
+    // QVideoFrame first_video_frame = decompress_video_frame(frames.front().compressed_frame);
+    // QImage first_img = first_video_frame.toImage().convertToFormat(QImage::Format_BGR888);
+    QImage first_img = decompress_video_frame(frames.front().compressed_frame);
+    int width = first_img.width();
+    int height = first_img.height();
+
+    cout << width << endl;
 
     // 1. Initialize VideoWriter (e.g., MP4 with 30 FPS)
     cv::VideoWriter writer(filename, cv::VideoWriter::fourcc('m', 'p', '4', 'v'), 
@@ -253,8 +264,9 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
 
     // 2. Loop through your memory pointers
     for (CompressedVideoFrame frame : frames) {
-        QVideoFrame video_frame = decompress_video_frame(frame.compressed_frame);
-        QImage img = video_frame.toImage().convertToFormat(QImage::Format_BGR888);
+        // QVideoFrame video_frame = decompress_video_frame(frame.compressed_frame);
+        // QImage img = video_frame.toImage().convertToFormat(QImage::Format_BGR888);
+        QImage img = decompress_video_frame(frame.compressed_frame);
          
         cv::Mat mat(height, width, CV_8UC3, (void*)img.bits(), img.bytesPerLine());
         

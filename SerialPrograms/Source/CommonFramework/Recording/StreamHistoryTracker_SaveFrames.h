@@ -52,7 +52,7 @@ struct CompressedVideoFrame{
     std::vector<unsigned char> compressed_frame;
 };
 
-QVideoFrame decompress_video_frame(const std::vector<uchar> &compressed_buffer);
+QImage decompress_video_frame(const std::vector<uchar> &compressed_buffer);
 std::vector<uchar> compress_video_frame(const QVideoFrame& const_frame);
 
 class StreamHistoryTracker{
