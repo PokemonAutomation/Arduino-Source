@@ -152,6 +152,7 @@ StreamHistoryTracker::StreamHistoryTracker(
     , m_microseconds_per_sample(1. / (m_audio_samples_per_second * 1000000.))
     , m_has_video(has_video)
     , m_target_fps(15)
+    , m_frame_interval(1000000 / m_target_fps)
 {}
 
 void StreamHistoryTracker::set_window(std::chrono::seconds window){
@@ -160,6 +161,7 @@ void StreamHistoryTracker::set_window(std::chrono::seconds window){
     clear_old();
 }
 void StreamHistoryTracker::on_samples(const float* samples, size_t frames){
+    #if 0
     if (frames == 0){
         return;
     }
@@ -170,25 +172,31 @@ void StreamHistoryTracker::on_samples(const float* samples, size_t frames){
         now, samples, frames * m_audio_samples_per_frame
     ));
     clear_old();
+    #endif
 }
 
 
 
 
 void StreamHistoryTracker::on_frame(std::shared_ptr<const VideoFrame> frame){
-    //  TODO: Find a more efficient way to buffer the frames.
-    //  It takes almost 10GB of memory to store 30 seconds of QVideoFrames
-    //  due to them caching uncompressed bitmaps.
-//    return;   //  TODO
 
     WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
 //    cout << "on_frame() = " << m_frames.size() << endl;
-    m_frame_counter++;
-    size_t source_fps = 30;
-    size_t keep_nth_frame =  source_fps / m_target_fps;
-    // Only keep every nth frame
-    if (m_frame_counter % keep_nth_frame != 0){
-        return;
+
+    // Initialize on first frame
+    if (m_next_frame_time == WallClock{}){
+        m_next_frame_time = frame->timestamp;
+    }
+
+    // don't save every frame. only save frames as per m_target_fps
+    // Only save when we've crossed the next sampling boundary
+    if (frame->timestamp < m_next_frame_time){
+        return; // skip
+    }
+
+    // Advance by fixed intervals (NOT by arrival time)
+    while (m_next_frame_time <= frame->timestamp){
+        m_next_frame_time += std::chrono::microseconds(m_frame_interval);
     }
 
     auto compressed_frame = compress_video_frame(frame->frame);
@@ -201,9 +209,10 @@ void StreamHistoryTracker::on_frame(std::shared_ptr<const VideoFrame> frame){
 
 void StreamHistoryTracker::clear_old(){
     //  Must call under lock.
-    WallClock now = current_time();
-    WallClock threshold = now - m_window;
+    WallClock latest_frame = m_compressed_frames.back().timestamp;
+    WallClock threshold = latest_frame - m_window;
 
+    #if 0
 //    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
 //    cout << "enter" << endl;
     while (!m_audio.empty()){
@@ -221,15 +230,10 @@ void StreamHistoryTracker::clear_old(){
             break;
         }
     }
+    #endif
 //    cout << "exit" << endl;
 
     while (!m_compressed_frames.empty()){
-        // if (m_frames.front()->timestamp < threshold){
-        //     m_frames.pop_front();
-        // }else{
-        //     break;
-        // }
-
         if (m_compressed_frames.front().timestamp < threshold){
             m_compressed_frames.pop_front();
         }else{
@@ -251,6 +255,8 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
         }
         frames = m_compressed_frames;
     }
+
+    cout << "frames.size(): " << frames.size() << endl;
 
     if (frames.empty()) return false;
 
