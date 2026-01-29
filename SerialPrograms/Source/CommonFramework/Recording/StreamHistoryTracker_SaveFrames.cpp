@@ -151,6 +151,7 @@ StreamHistoryTracker::StreamHistoryTracker(
     , m_audio_samples_per_second(audio_samples_per_frame * audio_frames_per_second)
     , m_microseconds_per_sample(1. / (m_audio_samples_per_second * 1000000.))
     , m_has_video(has_video)
+    , m_target_fps(15)
 {}
 
 void StreamHistoryTracker::set_window(std::chrono::seconds window){
@@ -182,6 +183,14 @@ void StreamHistoryTracker::on_frame(std::shared_ptr<const VideoFrame> frame){
 
     WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
 //    cout << "on_frame() = " << m_frames.size() << endl;
+    m_frame_counter++;
+    size_t source_fps = 30;
+    size_t keep_nth_frame =  source_fps / m_target_fps;
+    // Only keep every nth frame
+    if (m_frame_counter % keep_nth_frame != 0){
+        return;
+    }
+
     auto compressed_frame = compress_video_frame(frame->frame);
     m_compressed_frames.emplace_back(CompressedVideoFrame{frame->timestamp, std::move(compressed_frame)});
     // m_frames.emplace_back(std::move(frame));
@@ -256,7 +265,7 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
 
     // 1. Initialize VideoWriter (e.g., MP4 with 30 FPS)
     cv::VideoWriter writer(filename, cv::VideoWriter::fourcc('m', 'p', '4', 'v'), 
-                           30.0, cv::Size(width, height), true);
+                           m_target_fps, cv::Size(width, height), true);
 
     if (!writer.isOpened()) {
         throw std::runtime_error("Could not open video file for writing.");
