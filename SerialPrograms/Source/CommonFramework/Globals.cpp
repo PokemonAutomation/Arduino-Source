@@ -23,10 +23,26 @@ namespace PokemonAutomation{
 //  misleading version information.
 //
 
-const bool IS_BETA_VERSION = true;
-const int PROGRAM_VERSION_MAJOR = 0;
-const int PROGRAM_VERSION_MINOR = 62;
-const int PROGRAM_VERSION_PATCH = 1;
+#ifndef PA_IS_BETA
+#define PA_IS_BETA true
+#endif
+
+#ifndef PA_VERSION_MAJOR
+#define PA_VERSION_MAJOR 0
+#endif
+
+#ifndef PA_VERSION_MINOR
+#define PA_VERSION_MINOR 62
+#endif
+
+#ifndef PA_VERSION_PATCH
+#define PA_VERSION_PATCH 1
+#endif
+
+const bool IS_BETA_VERSION = PA_IS_BETA;
+const int PROGRAM_VERSION_MAJOR = PA_VERSION_MAJOR;
+const int PROGRAM_VERSION_MINOR = PA_VERSION_MINOR;
+const int PROGRAM_VERSION_PATCH = PA_VERSION_PATCH;
 
 const std::string PROGRAM_VERSION_BASE =
     "v" + std::to_string(PROGRAM_VERSION_MAJOR) +
