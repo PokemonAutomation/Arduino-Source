@@ -830,8 +830,10 @@ void do_action_and_monitor_for_battles_early(
         {no_minimap}
     );
     if (ret == 0){  // if see no minimap. stop and see if we detect a battle. if so, throw Battl exception
+        stream.log("do_action_and_monitor_for_battles_early: Detected no mini-map. Possibly caught in a battle.");
         do_action_and_monitor_for_battles(info, stream, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            // wait 30 seconds to see if we detect a battle. If so, this throws an UnexpectedBattleException.
             pbf_wait(context, Seconds(30));
         });
 
