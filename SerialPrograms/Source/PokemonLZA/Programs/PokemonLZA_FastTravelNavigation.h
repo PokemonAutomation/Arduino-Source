@@ -22,19 +22,23 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLZA{
 
+// The arrow box position for all fast travel menu items
+const ImageFloatBox& FAST_TRAVEL_ARROW_BOX();
 
+// The arrow box position for the fast travel menu filter
+const ImageFloatBox& FAST_TRAVEL_FILTER_ARROW_BOX();
 
-// The arrow box positions for fast travel menu items
-const std::vector<ImageFloatBox>& FAST_TRAVEL_ARROW_BOXES();
-
-// The arrow box positions for the fast travel menu filter
-const std::vector<ImageFloatBox>& FAST_TRAVEL_FILTER_ARROW_BOXES();
+// The spacing between each item in the fast travel menu
+extern const double FAST_TRAVEL_SPACING;
+// The spacing between each item in the fast travel menu filter
+extern const double FAST_TRAVEL_FILTER_SPACING;
 
 // Get the index of the currently selected item in arrow_boxes using the SelectionArrowDetector
 // Return -1 if unable to determine the current selector index
 int get_current_selector_index(
     ConsoleHandle& console,
-    const std::vector<ImageFloatBox>& arrow_boxes
+    const ImageFloatBox& box,
+    double spacing
 );
 
 // Determine whether it's better to navigate up or down in the fast travel menu

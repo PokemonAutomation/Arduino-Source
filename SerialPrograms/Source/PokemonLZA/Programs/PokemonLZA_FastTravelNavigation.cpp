@@ -16,46 +16,41 @@ namespace NintendoSwitch{
 namespace PokemonLZA{
     
 
-const std::vector<ImageFloatBox>& FAST_TRAVEL_ARROW_BOXES(){
-    static const std::vector<ImageFloatBox> boxes = {
-        {0.014000, 0.242000, 0.033000, 0.066000},
-        {0.014000, 0.320000, 0.033000, 0.066000},
-        {0.014000, 0.398000, 0.033000, 0.066000},
-        {0.014000, 0.476000, 0.033000, 0.066000},
-        {0.014000, 0.554000, 0.033000, 0.066000},
-        {0.014000, 0.632000, 0.033000, 0.066000},
-        {0.014000, 0.710000, 0.033000, 0.066000}
-    };
-    return boxes;
+const ImageFloatBox& FAST_TRAVEL_ARROW_BOX(){
+    static const ImageFloatBox box(0.014000, 0.237500, 0.033000, 0.544400);
+    return box;
 }
 
-const std::vector<ImageFloatBox>& FAST_TRAVEL_FILTER_ARROW_BOXES(){
-    static const std::vector<ImageFloatBox> boxes = {
-        {0.013000, 0.390000, 0.033000, 0.066000},
-        {0.013000, 0.463000, 0.033000, 0.066000},
-        {0.013000, 0.536000, 0.033000, 0.066000},
-        {0.013000, 0.608000, 0.033000, 0.066000},
-        {0.013000, 0.679000, 0.033000, 0.066000},
-        {0.013000, 0.752000, 0.033000, 0.066000}
-    };
-    return boxes;
+const ImageFloatBox& FAST_TRAVEL_FILTER_ARROW_BOX(){
+    static const ImageFloatBox box(0.013000, 0.388800, 0.033000, 0.432400);
+    return box;
 }
+
+const double FAST_TRAVEL_SPACING = 0.025;
+const double FAST_TRAVEL_FILTER_SPACING = 0.0185;
 
 int get_current_selector_index(
     ConsoleHandle& console,
-    const std::vector<ImageFloatBox>& arrow_boxes
+    const ImageFloatBox& box,
+    double spacing
 ){
     const ImageViewRGB32& screen = console.video().snapshot();
-    for (size_t i = 0; i < arrow_boxes.size(); i++) {
-        SelectionArrowWatcher arrow(
-            COLOR_GREEN,
-            &console.overlay(),
-            SelectionArrowType::RIGHT,
-            arrow_boxes[i]
-        );
-        if (arrow.detect(screen)) {
-            return static_cast<int>(i);
-        }
+    SelectionArrowWatcher arrow(
+        COLOR_GREEN,
+        &console.overlay(),
+        SelectionArrowType::RIGHT,
+        box
+    );
+    if (arrow.detect(screen)) {
+        ImageFloatBox detected = arrow.last_detected();
+        double arrow_height = detected.height;
+        double stride = arrow_height + spacing;
+        double relative_y = detected.y - box.y - (spacing / 2.0);
+        int index = static_cast<int>(std::round(relative_y / stride));
+        console.log("Current selector index: " + std::to_string(index));
+        console.log("Detected arrow box: " + std::to_string(detected.x) + ", " + std::to_string(detected.y) + ", " + std::to_string(detected.width) + ", " + std::to_string(detected.height));
+        
+        return index;
     }
     return -1;
 }
@@ -174,7 +169,7 @@ bool navigate_to_destination_within_page_routine(
         if (target_index == -1){
             return false;
         }
-        int selector_index = get_current_selector_index(console, FAST_TRAVEL_ARROW_BOXES());
+        int selector_index = get_current_selector_index(console, FAST_TRAVEL_ARROW_BOX(), FAST_TRAVEL_SPACING);
         if (selector_index == -1){
             return false;
         }
@@ -239,7 +234,7 @@ bool navigate_to_lumiose_sewers_location(
     do {
         // Set selector to second to last spot
         do {
-            int current_selector_index = get_current_selector_index(console, FAST_TRAVEL_ARROW_BOXES());
+            int current_selector_index = get_current_selector_index(console, FAST_TRAVEL_ARROW_BOX(), FAST_TRAVEL_SPACING);
             if (current_selector_index == -1){
                 return false;
             }
@@ -333,18 +328,19 @@ bool open_fast_travel_filters_menu(
     ConsoleHandle& console,
     ProControllerContext& context
 ){
-    SelectionArrowWatcher first_filter_arrow(
-        COLOR_YELLOW,
-        &console.overlay(),
-        SelectionArrowType::RIGHT,
-        FAST_TRAVEL_FILTER_ARROW_BOXES().at(0)
+    ButtonGoneWatcher filters_not_open(
+        COLOR_RED,
+        ButtonType::ButtonMinus,
+        {0.026000, 0.787000, 0.022000, 0.038000},
+        &console.overlay()
     );
+
     int ret = run_until<ProControllerContext>(
         console, context,
         [&](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_MINUS, 4s);
         },
-        {first_filter_arrow}
+        {filters_not_open}
     );
     switch (ret){
     case 0:
@@ -363,7 +359,7 @@ bool set_fast_travel_menu_filter_routine(
     int target_filter_index = static_cast<int>(filter);
     WallClock deadline = current_time() + 30s;
     do {
-        int selected_filter_index = get_current_selector_index(console, FAST_TRAVEL_FILTER_ARROW_BOXES());
+        int selected_filter_index = get_current_selector_index(console, FAST_TRAVEL_FILTER_ARROW_BOX(), FAST_TRAVEL_FILTER_SPACING);
         if (selected_filter_index == -1){
             return false;
         }
@@ -406,21 +402,28 @@ void set_fast_travel_menu_filter(
 
         bool found = set_fast_travel_menu_filter_routine(console, context, filter);
         if (found){
-            int target_arrow_index = static_cast<int>(filter);
-            SelectionArrowDetector selector_arrow_on_target(
-                COLOR_YELLOW,
-                &console.overlay(),
-                SelectionArrowType::RIGHT,
-                FAST_TRAVEL_FILTER_ARROW_BOXES().at(target_arrow_index)
+            // int target_arrow_index = static_cast<int>(filter);
+            ButtonWatcher filters_button(
+                COLOR_RED,
+                ButtonType::ButtonMinus,
+                {0.026000, 0.787000, 0.022000, 0.038000},
+                &console.overlay()
             );
-            for (size_t i = 0; i < 4; i++){
-                pbf_press_button(context, BUTTON_A, 100ms, 1000ms);
-                context.wait_for_all_requests();
-                bool arrow_present = selector_arrow_on_target.detect(console.video().snapshot());
-                if (!arrow_present){
-                    console.log("Fast travel filter set.");
-                    return;
-                }
+            int ret = run_until<ProControllerContext>(
+                console, context,
+                [&](ProControllerContext& context){
+                    for (size_t i = 0; i < 4; i++){
+                        pbf_press_button(context, BUTTON_A, 100ms, 1000ms);
+                    }
+                },
+                {filters_button}
+            );
+            switch (ret){
+            case 0:
+                console.log("Fast travel filter set.");
+                return;
+            default:
+                break;
             }
         }
     } while (current_time() < deadline);
