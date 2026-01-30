@@ -185,6 +185,8 @@ void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContex
 // start and end in the overworld
 void confirm_lead_pokemon_moves(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language);
 
+void confirm_minimap_unlocked(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
 // run the given `action`. if detect a battle, stop the action, and throw exception
 void do_action_and_monitor_for_battles(
     const ProgramInfo& info, 

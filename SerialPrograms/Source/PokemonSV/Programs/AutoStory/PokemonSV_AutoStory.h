@@ -104,6 +104,7 @@ private:
     BooleanCheckBoxOption CHANGE_SETTINGS;    
     BooleanCheckBoxOption ENSURE_TIME_UNSYNCED;
     BooleanCheckBoxOption ENSURE_CORRECT_MOVES;
+    BooleanCheckBoxOption ENSURE_MINIMAP_UNLOCKED;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
