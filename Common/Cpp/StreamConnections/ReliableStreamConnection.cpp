@@ -7,6 +7,7 @@
 #include "Common/CRC32/pabb_CRC32.h"
 //#include "Common/Cpp/PrettyPrint.h"
 //#include "Common/Cpp/Exceptions.h"
+#include "Common/PABotBase2/PABotBase2_ConnectionDebug.h"
 #include "Common/Cpp/StreamConnections/PABotBase2_MessageDumper.h"
 #include "ReliableStreamConnection.h"
 
@@ -123,6 +124,12 @@ void ReliableStreamConnection::send_request(uint8_t opcode){
         }
         m_cv.wait(lg);
     }
+}
+
+void ReliableStreamConnection::print() const{
+    std::unique_lock<std::mutex> lg(m_lock);
+    pabb2_PacketSender_print(&m_reliable_sender, true);
+//    pabb2_StreamCoalescer_print(&m_stream_coalescer, true);
 }
 
 
@@ -283,6 +290,9 @@ void ReliableStreamConnection::on_packet(const pabb2_PacketHeader* packet){
     case PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA:
         process_ASK_STREAM_DATA(packet);
         return;
+    case PABB2_CONNECTION_OPCODE_RET_STREAM_DATA:
+        process_RET_STREAM_DATA(packet);
+        return;
     case PABB2_CONNECTION_OPCODE_RET_RESET:
         process_RET_RESET(packet);
         return;
@@ -432,6 +442,15 @@ void ReliableStreamConnection::process_ASK_STREAM_DATA(const pabb2_PacketHeader*
         PABB2_CONNECTION_OPCODE_RET_STREAM_DATA,
         pabb2_StreamCoalescer_bytes_available(&m_stream_coalescer)
     );
+    m_cv.notify_all();
+}
+void ReliableStreamConnection::process_RET_STREAM_DATA(const pabb2_PacketHeader* packet){
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+//        pabb2_PacketSender_print(&m_reliable_sender, true);
+        pabb2_PacketSender_remove(&m_reliable_sender, packet->seqnum);
+//        pabb2_PacketSender_print(&m_reliable_sender, true);
+    }
     m_cv.notify_all();
 }
 

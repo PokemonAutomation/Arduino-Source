@@ -51,6 +51,10 @@ public:
     void send_request(uint8_t opcode);
 
 
+public:
+    void print() const;
+
+
 
 private:
     //  Send
@@ -83,6 +87,7 @@ private:
     void process_RET_BUFFER_BYTES(const pabb2_PacketHeader* packet);
 
     void process_ASK_STREAM_DATA(const pabb2_PacketHeader* packet);
+    void process_RET_STREAM_DATA(const pabb2_PacketHeader* packet);
 
 
 private:

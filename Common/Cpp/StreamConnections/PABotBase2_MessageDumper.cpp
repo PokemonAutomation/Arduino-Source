@@ -73,6 +73,10 @@ std::string tostr(const pabb2_PacketHeader* header){
         str += ", offset = " + std::to_string(((const pabb2_PacketHeaderData*)header)->stream_offset);
         str += ", bytes = " + std::to_string(header->packet_bytes - sizeof(pabb2_PacketHeaderData) - sizeof(uint32_t));
         return str;
+    case PABB2_CONNECTION_OPCODE_RET_STREAM_DATA:
+        str += "PABB2_CONNECTION_OPCODE_RET_STREAM_REQUEST: seqnum = ";
+        str += std::to_string(header->seqnum);
+        return str;
     case PABB2_CONNECTION_OPCODE_ASK_STREAM_REQUEST:
         str += "PABB2_CONNECTION_OPCODE_RET_STREAM: seqnum = ";
         str += std::to_string(header->seqnum);

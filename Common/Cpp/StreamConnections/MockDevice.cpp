@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/PABotBase2/PABotBase2_ConnectionDebug.h"
 #include "MockDevice.h"
 
 //  REMOVE
@@ -47,6 +48,10 @@ MockDevice::~MockDevice(){
     m_host_cv.notify_all();
     m_device_thread.join();
     m_host_thread.join();
+}
+void MockDevice::print() const{
+    std::lock_guard<std::mutex> lg(m_device_lock);
+    pabb2_StreamCoalescer_print(&m_connection.stream_coalescer, true);
 }
 
 

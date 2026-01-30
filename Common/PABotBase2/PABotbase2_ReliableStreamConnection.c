@@ -115,7 +115,7 @@ void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* s
     case PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA:
 //        printf("Device: PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA\n");
         if (pabb2_StreamCoalescer_push_stream(&self->stream_coalescer, (const pabb2_PacketHeaderData*)packet)){
-            printf("Device: Succeeded push.\n");
+//            printf("Device: Succeeded push.\n");
             pabb2_PacketSender_send_ack_u16(
                 &self->reliable_sender,
                 packet->seqnum,

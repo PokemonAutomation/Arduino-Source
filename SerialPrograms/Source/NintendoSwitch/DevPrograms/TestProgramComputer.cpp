@@ -324,7 +324,18 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
         connection.send("asdf", 4);
+        connection.send("qwer", 4);
+        connection.send("zxcv", 4);
+        cout << "sent = " << connection.send("0123456789abcdef", 16) << endl;
+//        connection.send("0123456789abcdef", 16);
+//        connection.send("0123456789abcdef", 16);
+//        connection.send("0123456789abcdef", 16);
 
+        connection.print();
+
+        connection.wait_for_pending();
+
+        device.print();
 
         scope.wait_for(60s);
     }

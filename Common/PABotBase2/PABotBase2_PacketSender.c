@@ -248,6 +248,7 @@ size_t pabb2_PacketSender_send_stream(
 
         //  Copy stream data.
         memcpy(packet + 1, data, current);
+        self->stream_offset += (uint16_t)current;
 
         //  Build CRC
         pabb_crc32_write_to_message(packet, packet_bytes);
