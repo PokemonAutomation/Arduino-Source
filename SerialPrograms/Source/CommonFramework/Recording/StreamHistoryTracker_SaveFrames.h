@@ -10,25 +10,7 @@
 #ifndef PokemonAutomation_StreamHistoryTracker_SaveFrames_H
 #define PokemonAutomation_StreamHistoryTracker_SaveFrames_H
 
-// #include <opencv2/opencv.hpp>
 #include <deque>
-// #include <QCoreApplication>
-// #include <QFileInfo>
-// #include <QUrl>
-// #include <QAudioBufferInput>
-// #include <QVideoFrameInput>
-// #include <QMediaFormat>
-// #include <QMediaRecorder>
-// #include <QMediaCaptureSession>
-// #include <QScopeGuard>
-// #include "Common/Cpp/Logging/AbstractLogger.h"
-// #include "Common/Cpp/Concurrency/SpinLock.h"
-// #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
-
-
-// #include <iostream>
-// using std::cout;
-// using std::endl;
 
 
 namespace PokemonAutomation{
