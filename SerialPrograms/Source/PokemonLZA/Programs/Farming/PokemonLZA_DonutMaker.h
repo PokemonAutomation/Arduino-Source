@@ -37,7 +37,7 @@ public:
 
 private:
     bool match_powers(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::vector<uint16_t>& kept_counts);
-    bool should_stop(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::vector<uint16_t>& kept_counts);
+    bool should_stop(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::vector<uint16_t>& kept_counts, uint16_t total_kept);
     void animation_to_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void add_berries_and_make_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context);

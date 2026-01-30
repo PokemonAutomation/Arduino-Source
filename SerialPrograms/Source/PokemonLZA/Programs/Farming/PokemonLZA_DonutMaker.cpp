@@ -579,14 +579,12 @@ void save_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& conte
 }
 
 // Check if all user defined limits are reached or the global max keepers limit is reached
-bool DonutMaker::should_stop(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::vector<uint16_t>& kept_counts){
-    int total_kept = 0;
+bool DonutMaker::should_stop(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::vector<uint16_t>& kept_counts, uint16_t total_kept) {
     bool limit_reached = true;
     for (size_t i = 0; i < kept_counts.size(); i++){
         if (kept_counts[i] < FLAVOR_POWERS.snapshot()[i].limit){
             limit_reached = false;
         }
-        total_kept += kept_counts[i];
     }
     if (total_kept >= MAX_KEEPERS){
         return true;
@@ -650,6 +648,7 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     reset_map_filter_state(env, context);
 
     std::vector<uint16_t> kept_counts(FLAVOR_POWERS.snapshot().size(), 0);
+    uint16_t total_kept = 0;
     while(true){
         const bool should_keep = donut_iteration(env, context, kept_counts);
         stats.resets++;
@@ -657,7 +656,8 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         send_program_status_notification(env, NOTIFICATION_STATUS);
 
         if (should_keep){
-            if (should_stop(env, context, kept_counts)){
+            total_kept++;
+            if (should_stop(env, context, kept_counts, total_kept)){
                 break;
             }
             save_donut(env, context);
