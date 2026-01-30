@@ -49,6 +49,17 @@ public:
     };
     EnumDropdownOption<VideoQuality> VIDEO_QUALITY;
     SimpleIntegerOption<uint32_t> VIDEO_BITRATE;
+
+    enum class VideoFPS{
+        // MATCH_INPUT,
+        FPS_30,
+        FPS_15,
+        FPS_10,
+        FPS_05,
+        FPS_01,
+    };
+    EnumDropdownOption<VideoFPS> VIDEO_FPS;
+    SimpleIntegerOption<uint16_t> JPEG_QUALITY;
 };
 
 

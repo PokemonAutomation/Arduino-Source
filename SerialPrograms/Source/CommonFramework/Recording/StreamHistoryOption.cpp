@@ -17,15 +17,15 @@ StreamHistoryOption::StreamHistoryOption()
         true
     )
     , DESCRIPTION(
-        "Keep a record of the recent video+audio streams. This will allow video capture "
+        "Keep a record of the recent video streams. This will allow video capture "
         "for unexpected events.<br><br>"
-        "<font color=\"red\">Warning: This feature has a known memory leak. It will leak ~3GB per day per "
-        "video stream. You have been warned!</font>"
-        "<br><br>"
+        // "<font color=\"red\">Warning: This feature has a known memory leak. It will leak ~3GB per day per "
+        // "video stream. You have been warned!</font>"
+        // "<br><br>"
         "<font color=\"orange\">Warning: This feature is computationally expensive and "
         "will require a more powerful computer to run (especially for multi-Switch programs).<br>"
-        "Furthermore, the current implementation is inefficient as it will write a lot "
-        "of data to disk. This feature is still a work-in-progress."
+        // "Furthermore, the current implementation is inefficient as it will write a lot "
+        // "of data to disk. This feature is still a work-in-progress."
         "</font>"
     )
     , HISTORY_SECONDS(
@@ -80,13 +80,39 @@ StreamHistoryOption::StreamHistoryOption()
         LockMode::UNLOCK_WHILE_RUNNING,
         5000
     )
+    , VIDEO_FPS(
+        "<b>Video Frames per second:</b><br>"
+        "Lower = choppier video, smaller file size.<br>"
+        "Higher = smoother video, larger file size.",
+        {
+            // {VideoFPS::MATCH_INPUT,    "match",     "Match Input FPS"},
+            {VideoFPS::FPS_30,         "fps-30",          "30 FPS"},
+            {VideoFPS::FPS_15,      "fps-15",       "15 FPS"},
+            {VideoFPS::FPS_10,        "fps-10",         "10 FPS"},
+            {VideoFPS::FPS_05,   "fps-05",    "5 FPS"},
+            {VideoFPS::FPS_01,   "fps-01",    "1 FPS"},
+        },
+        LockMode::UNLOCK_WHILE_RUNNING,
+        VideoFPS::FPS_15
+    )
+    , JPEG_QUALITY(
+        "<b>JPEG Quality:</b><br>"
+        "Video frames are compressed into JPEGs to save space in RAM.<br>"
+        "Lower = lower quality, lower RAM usage.<br>"
+        "Higher = high quality, higher RAM usage.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        80,
+        0, 100
+    )
 {
     PA_ADD_STATIC(DESCRIPTION);
     PA_ADD_OPTION(HISTORY_SECONDS);
     PA_ADD_OPTION(RESOLUTION);
-    PA_ADD_OPTION(ENCODING_MODE);
-    PA_ADD_OPTION(VIDEO_QUALITY);
-    PA_ADD_OPTION(VIDEO_BITRATE);
+    PA_ADD_OPTION(VIDEO_FPS);
+    PA_ADD_OPTION(JPEG_QUALITY);
+    // PA_ADD_OPTION(ENCODING_MODE);
+    // PA_ADD_OPTION(VIDEO_QUALITY);
+    // PA_ADD_OPTION(VIDEO_BITRATE);
 
     StreamHistoryOption::on_config_value_changed(this);
 
