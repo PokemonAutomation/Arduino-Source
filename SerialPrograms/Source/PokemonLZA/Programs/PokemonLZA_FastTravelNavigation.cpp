@@ -47,9 +47,7 @@ int get_current_selector_index(
         double stride = arrow_height + spacing;
         double relative_y = detected.y - box.y - (spacing / 2.0);
         int index = static_cast<int>(std::round(relative_y / stride));
-        console.log("Current selector index: " + std::to_string(index));
-        console.log("Detected arrow box: " + std::to_string(detected.x) + ", " + std::to_string(detected.y) + ", " + std::to_string(detected.width) + ", " + std::to_string(detected.height));
-        
+        console.log("Current selector index: " + std::to_string(index));        
         return index;
     }
     return -1;
@@ -129,6 +127,8 @@ bool navigate_to_destination_page_in_fast_travel_menu(
     Language language,
     const LocationItem& target_destination
 ){
+    console.log("Navigating to destination page for: " + target_destination.slug);
+    console.overlay().add_log("Navigating to " + target_destination.slug + " page");
     WallClock deadline = current_time() + 30s;
     do{
         navigate_to_destination_page_in_fast_travel_menu_routine(console, context, language, target_destination);
@@ -198,6 +198,8 @@ bool navigate_to_destination_within_page(
     Language language,
     const LocationItem& target_destination
 ){
+    console.log("Navigating to destination within page for: " + target_destination.slug);
+    console.overlay().add_log("Navigating to " + target_destination.slug + " in page");
     WallClock deadline = current_time() + 30s;
     do{
         navigate_to_destination_within_page_routine(console, context, language, target_destination);
@@ -219,6 +221,8 @@ bool navigate_to_lumiose_sewers_location(
     Language language,
     const LocationItem& target_destination
 ){
+    console.log("Navigating to lumiose sewers location for: " + target_destination.slug);
+    console.overlay().add_log("Navigating to " + target_destination.slug);
     LocationNameReader location_name_reader;
     // Use this box to detect cafe woof icon to differentiate between lumiose-sewers-1 and lumiose-sewers-2
     const ImageFloatBox& cafe_woof_box = {0.537000, 0.783000, 0.043000, 0.077000};
@@ -307,6 +311,8 @@ bool navigate_to_destination_in_fast_travel_menu(
     Language language,
     const LocationItem& target_destination
 ){
+    console.log("Navigating to destination in fast travel menu: " + target_destination.slug);
+    console.overlay().add_log("Navigating to " + target_destination.slug);
     // lumiose-sewers-1 and lumiose-sewers-2 have the same OCR result, handle that case separately here
     if (target_destination.location == Location::LUMIOSE_SEWERS_1 || target_destination.location == Location::LUMIOSE_SEWERS_2){
         return navigate_to_lumiose_sewers_location(console, context, language, target_destination);
@@ -328,6 +334,8 @@ bool open_fast_travel_filters_menu(
     ConsoleHandle& console,
     ProControllerContext& context
 ){
+    console.log("Opening fast travel filters menu");
+    console.overlay().add_log("Opening filters menu");
     ButtonGoneWatcher filters_not_open(
         COLOR_RED,
         ButtonType::ButtonMinus,
@@ -384,6 +392,8 @@ void set_fast_travel_menu_filter(
     ProControllerContext& context,
     FAST_TRAVEL_FILTER filter
 ){
+    console.log("Setting fast travel menu filter to #" + std::to_string(static_cast<int>(filter)));
+    console.overlay().add_log("Setting filter to #" + std::to_string(static_cast<int>(filter)));
     WallClock deadline = current_time() + 30s;
 
     bool filters_menu_opened = open_fast_travel_filters_menu(console, context);
@@ -438,6 +448,8 @@ void open_fast_travel_menu(
     ConsoleHandle& console,
     ProControllerContext& context
 ){
+    console.log("Opening fast travel menu");
+    console.overlay().add_log("Opening fast travel menu");
     MapOverWatcher map_over(COLOR_RED, &console.overlay());
     int ret = run_until<ProControllerContext>(
         console, context,

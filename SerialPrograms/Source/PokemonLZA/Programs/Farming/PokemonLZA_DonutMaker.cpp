@@ -463,7 +463,7 @@ void exit_menu_to_overworld(SingleSwitchProgramEnvironment& env, ProControllerCo
 void reset_map_filter_state(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     env.log("Resetting fast travel map filters.");
 
-    open_map(env.console, context, false, false);
+    open_map(env.console, context, true, false);
     open_fast_travel_menu(env.console, context);
     set_fast_travel_menu_filter(env.console, context, FAST_TRAVEL_FILTER::ALL_TRAVEL_SPOTS);
 
