@@ -17,15 +17,15 @@ StreamHistoryOption::StreamHistoryOption()
         true
     )
     , DESCRIPTION(
-        "Keep a record of the recent video+audio streams. This will allow video capture "
+        "Keep a record of the recent video streams. This will allow video capture "
         "for unexpected events.<br><br>"
-        "<font color=\"red\">Warning: This feature has a known memory leak. It will leak ~3GB per day per "
-        "video stream. You have been warned!</font>"
-        "<br><br>"
+        // "<font color=\"red\">Warning: This feature has a known memory leak. It will leak ~3GB per day per "
+        // "video stream. You have been warned!</font>"
+        // "<br><br>"
         "<font color=\"orange\">Warning: This feature is computationally expensive and "
         "will require a more powerful computer to run (especially for multi-Switch programs).<br>"
-        "Furthermore, the current implementation is inefficient as it will write a lot "
-        "of data to disk. This feature is still a work-in-progress."
+        // "Furthermore, the current implementation is inefficient as it will write a lot "
+        // "of data to disk. This feature is still a work-in-progress."
         "</font>"
     )
     , HISTORY_SECONDS(
@@ -96,9 +96,10 @@ StreamHistoryOption::StreamHistoryOption()
         VideoFPS::FPS_15
     )
     , JPEG_QUALITY(
-        "<b>JPEG Quality (video frames are compressed into JPEGs to save space in RAM):</b><br>"
-        "Lower = lower quality, smaller file size.<br>"
-        "Higher = high quality, larger file size.",
+        "<b>JPEG Quality:</b><br>"
+        "Video frames are compressed into JPEGs to save space in RAM.<br>"
+        "Lower = lower quality, lower RAM usage.<br>"
+        "Higher = high quality, higher RAM usage.",
         LockMode::UNLOCK_WHILE_RUNNING,
         80,
         0, 100
