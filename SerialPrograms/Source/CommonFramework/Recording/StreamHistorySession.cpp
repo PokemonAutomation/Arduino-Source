@@ -17,7 +17,7 @@
 //#include "StreamHistoryTracker_RecordOnTheFly.h"
 // #include "StreamHistoryTracker_ParallelStreams.h"
 #else
-// #include "StreamHistoryTracker_Null.h"
+#include "StreamHistoryTracker_Null.h"
 #endif
 
 
