@@ -80,13 +80,38 @@ StreamHistoryOption::StreamHistoryOption()
         LockMode::UNLOCK_WHILE_RUNNING,
         5000
     )
+    , VIDEO_FPS(
+        "<b>Video Frames per second:</b><br>"
+        "Lower = choppier video, smaller file size.<br>"
+        "Higher = smoother video, larger file size.",
+        {
+            // {VideoFPS::MATCH_INPUT,    "match",     "Match Input FPS"},
+            {VideoFPS::FPS_30,         "fps-30",          "30 FPS"},
+            {VideoFPS::FPS_15,      "fps-15",       "15 FPS"},
+            {VideoFPS::FPS_10,        "fps-10",         "10 FPS"},
+            {VideoFPS::FPS_05,   "fps-05",    "5 FPS"},
+            {VideoFPS::FPS_01,   "fps-01",    "1 FPS"},
+        },
+        LockMode::UNLOCK_WHILE_RUNNING,
+        VideoFPS::FPS_15
+    )
+    , JPEG_QUALITY(
+        "<b>JPEG Quality (video frames are compressed into JPEGs to save space in RAM):</b><br>"
+        "Lower = lower quality, smaller file size.<br>"
+        "Higher = high quality, larger file size.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        80,
+        0, 100
+    )
 {
     PA_ADD_STATIC(DESCRIPTION);
     PA_ADD_OPTION(HISTORY_SECONDS);
     PA_ADD_OPTION(RESOLUTION);
-    PA_ADD_OPTION(ENCODING_MODE);
-    PA_ADD_OPTION(VIDEO_QUALITY);
-    PA_ADD_OPTION(VIDEO_BITRATE);
+    PA_ADD_OPTION(VIDEO_FPS);
+    PA_ADD_OPTION(JPEG_QUALITY);
+    // PA_ADD_OPTION(ENCODING_MODE);
+    // PA_ADD_OPTION(VIDEO_QUALITY);
+    // PA_ADD_OPTION(VIDEO_BITRATE);
 
     StreamHistoryOption::on_config_value_changed(this);
 

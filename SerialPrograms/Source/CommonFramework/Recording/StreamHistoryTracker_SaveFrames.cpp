@@ -18,9 +18,12 @@
 #include <QMediaRecorder>
 #include <QMediaCaptureSession>
 #include <QScopeGuard>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Recording/StreamHistoryOption.h"
 #include "StreamHistoryTracker_SaveFrames.h"
 
 #include <iostream>
@@ -62,8 +65,23 @@ std::vector<uchar> compress_video_frame(const QVideoFrame& const_frame) {
     // For circular buffers, using a 3-channel RGB888 is common for OpenCV
     QImage img = frame.toImage().convertToFormat(QImage::Format_RGB888);
 
+    int target_width;
+    const StreamHistoryOption& settings = GlobalSettings::instance().STREAM_HISTORY;
+    switch (settings.RESOLUTION){
+    case StreamHistoryOption::Resolution::MATCH_INPUT:
+        target_width = img.width();
+        break;
+    case StreamHistoryOption::Resolution::FORCE_720p:
+        target_width = 1280;
+        break;
+    case StreamHistoryOption::Resolution::FORCE_1080p:
+        target_width = 1920;
+        break;
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Resolution: Unknown enum.");                
+    }
+
     // downscale to 720p for smaller file size
-    int target_width = 1280;
     int target_height = img.height() * target_width / img.width();
     img = img.scaled(target_width, target_height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
@@ -76,7 +94,7 @@ std::vector<uchar> compress_video_frame(const QVideoFrame& const_frame) {
 
     // 4. Compress using imencode
     std::vector<uchar> compressed_buffer;
-    std::vector<int> params = {cv::IMWRITE_JPEG_QUALITY, 50}; // 0-100
+    std::vector<int> params = {cv::IMWRITE_JPEG_QUALITY, settings.JPEG_QUALITY}; // 0-100
     
     // Convert RGB to BGR before encoding because imencode expects BGR
     cv::Mat bgr_Mat;
@@ -85,6 +103,32 @@ std::vector<uchar> compress_video_frame(const QVideoFrame& const_frame) {
     cv::imencode(".jpg", bgr_Mat, compressed_buffer, params);
 
     return compressed_buffer; // Store this in your circular buffer
+}
+
+size_t get_target_fps(){
+    const StreamHistoryOption& settings = GlobalSettings::instance().STREAM_HISTORY;
+    size_t target_fps;
+    switch (settings.VIDEO_FPS){
+    case StreamHistoryOption::VideoFPS::FPS_30:
+        target_fps = 30;
+        break;
+    case StreamHistoryOption::VideoFPS::FPS_15:
+        target_fps = 15;
+        break;
+    case StreamHistoryOption::VideoFPS::FPS_10:
+        target_fps = 10;
+        break;
+    case StreamHistoryOption::VideoFPS::FPS_05:
+        target_fps = 5;
+        break;
+    case StreamHistoryOption::VideoFPS::FPS_01:
+        target_fps = 1;
+        break;
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "VideoFPS: Unknown enum.");                
+    }
+
+    return target_fps;
 }
 
 
@@ -151,7 +195,7 @@ StreamHistoryTracker::StreamHistoryTracker(
     , m_audio_samples_per_second(audio_samples_per_frame * audio_frames_per_second)
     , m_microseconds_per_sample(1. / (m_audio_samples_per_second * 1000000.))
     , m_has_video(has_video)
-    , m_target_fps(15)
+    , m_target_fps(get_target_fps())
     , m_frame_interval(1000000 / m_target_fps)
 {}
 
