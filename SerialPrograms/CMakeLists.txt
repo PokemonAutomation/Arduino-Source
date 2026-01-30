@@ -34,20 +34,11 @@ set(CMAKE_AUTOUIC ON)
 add_custom_target(build-time-make-directory ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory Assembly/)
 
-# Determine if this is an internal repo and normalize REPO_ROOT_DIR
-# CMAKE_CURRENT_SOURCE_DIR: the full path to this CmakeLists.txt
-# Find if "Arduino-Source-Internal" is in the path and store the find result to internal_repo_position
-string(FIND "${CMAKE_CURRENT_SOURCE_DIR}" "Arduino-Source-Internal" internal_repo_position)
-if(internal_repo_position EQUAL -1)  # no "Arduino-Source-Internal" in the path
-    # We are building the public repo, CMakeLists.txt is one level deep in the root repo dir
-    set(REPO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../")
-else()
-    # We are building the internal repo, CMakeLists.txt is three levels deep in the root repo dir
-    set(REPO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../")
-endif()
+# Internal repo or not, we're always building from the SerialPrograms folder
+set(REPO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../")
 
 # Determine environment
-if(DEFINED ENV{GITHUB_ACTIONS})
+if(DEFINED ENV{GITHUB_ACTIONS} OR DEFINED IS_AZURE_BUILD)
     message(STATUS "Detected CI environment, skipping qt deployment")
     set(QT_DEPLOY_FILES FALSE)
 else()
@@ -169,12 +160,29 @@ target_link_libraries(
 
 # Add source code exclusive to the internal repo and add C++ macro of official release
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../Internal/SerialPrograms/Internal0.cpp")
+    message(STATUS "Building internal SerialPrograms")
     target_compile_definitions(SerialProgramsLib PRIVATE PA_OFFICIAL)
     target_compile_definitions(SerialPrograms PRIVATE PA_OFFICIAL)
     target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.cpp)
     target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h)
     target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/Internal0.cpp)
     target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/Internal1.cpp)
+endif()
+
+if (IS_AZURE_BUILD)
+    target_compile_definitions(SerialProgramsLib PRIVATE
+        PA_VERSION_MAJOR=${VERSION_MAJOR}
+        PA_VERSION_MINOR=${VERSION_MINOR}
+        PA_VERSION_PATCH=${VERSION_PATCH}
+        PA_IS_BETA=${IS_BETA}
+    )
+
+    target_compile_definitions(SerialPrograms PRIVATE
+        PA_VERSION_MAJOR=${VERSION_MAJOR}
+        PA_VERSION_MINOR=${VERSION_MINOR}
+        PA_VERSION_PATCH=${VERSION_PATCH}
+        PA_IS_BETA=${IS_BETA}
+    )
 endif()
 
 # Function to apply common properties to both library and executable targets
@@ -614,8 +622,10 @@ if (WIN32)
             )
             add_custom_target(run_windeployqt DEPENDS $<TARGET_FILE:SerialPrograms>)
         else()
-            message(WARNING "windeployqt not found, skipping Qt deployment.")
+            add_custom_target(run_windeployqt COMMENT "Skipping windeployqt (not found)")
         endif()
+    else()
+        add_custom_target(run_windeployqt COMMENT "Skipping windeployqt (CI environment)")
     endif()
 
     # Copy Discord SDK DLL
@@ -651,7 +661,7 @@ if (WIN32)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "$<IF:$<CONFIG:Debug>,${DPP_DEBUG_DLL},${DPP_RELEASE_DLL}>"
             "${WIN_DEPLOY_DIR}/dpp.dll"
-)
+    )
 
     # Extract OpenCV debug DLL if missing
     if (NOT EXISTS "${OPENCV_DEBUG_DLL}")
