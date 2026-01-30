@@ -551,6 +551,22 @@ void confirm_lead_pokemon_moves(SingleSwitchProgramEnvironment& env, ProControll
 
 }
 
+void confirm_minimap_unlocked(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    DirectionDetector direction;
+    try{
+        direction.change_direction(env.program_info(), env.console, context, 3.02);
+        pbf_press_button(context, BUTTON_L, 200ms, 200ms);
+    }catch(OperationFailedException&){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "confirm_minimap_unlocked(): Unable to confirm that the minimap is unlocked. Likely because the direction cannot be detected. "
+            "If you manually confirm that the minimap is unlocked, you can disable this precheck in the program setting \"Pre-check: Ensure the minimap is unlocked\".",
+            env.console
+        );
+    }
+
+}
+
 void change_settings_prior_to_autostory_segment_mode(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t current_segment_num, Language language){
     // get index of `Options` in the Main Menu, which depends on where you are in Autostory
     int8_t options_index;  
