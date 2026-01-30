@@ -4,6 +4,7 @@
  *
  */
 
+#include <cmath>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
