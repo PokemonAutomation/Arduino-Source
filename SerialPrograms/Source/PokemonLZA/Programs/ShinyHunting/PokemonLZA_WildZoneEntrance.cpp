@@ -34,33 +34,33 @@ namespace PokemonAutomation::NintendoSwitch::PokemonLZA {
 using namespace Pokemon;
 
 WildZoneOption::WildZoneOption()
-    : EnumDropdownOption<WildZone>(
+    : EnumDropdownOption<Location>(
             "<b>Wild Zone:</b>",
             {
-                {WildZone::WILD_ZONE_1,  "wild-zone-1",  "Wild Zone 1"},
-                {WildZone::WILD_ZONE_2,  "wild-zone-2",  "Wild Zone 2"},
-                {WildZone::WILD_ZONE_3,  "wild-zone-3",  "Wild Zone 3"},
-                {WildZone::WILD_ZONE_4,  "wild-zone-4",  "Wild Zone 4"},
-                {WildZone::WILD_ZONE_5,  "wild-zone-5",  "Wild Zone 5"},
-                {WildZone::WILD_ZONE_6,  "wild-zone-6",  "Wild Zone 6"},
-                {WildZone::WILD_ZONE_7,  "wild-zone-7",  "Wild Zone 7"},
-                {WildZone::WILD_ZONE_8,  "wild-zone-8",  "Wild Zone 8"},
-                {WildZone::WILD_ZONE_9,  "wild-zone-9",  "Wild Zone 9"},
-                {WildZone::WILD_ZONE_10, "wild-zone-10", "Wild Zone 10"},
-                {WildZone::WILD_ZONE_11, "wild-zone-11", "Wild Zone 11"},
-                {WildZone::WILD_ZONE_12, "wild-zone-12", "Wild Zone 12"},
-                {WildZone::WILD_ZONE_13, "wild-zone-13", "Wild Zone 13"},
-                {WildZone::WILD_ZONE_14, "wild-zone-14", "Wild Zone 14"},
-                {WildZone::WILD_ZONE_15, "wild-zone-15", "Wild Zone 15"},
-                {WildZone::WILD_ZONE_16, "wild-zone-16", "Wild Zone 16"},
-                {WildZone::WILD_ZONE_17, "wild-zone-17", "Wild Zone 17"},
-                {WildZone::WILD_ZONE_18, "wild-zone-18", "Wild Zone 18"},
-                {WildZone::WILD_ZONE_19, "wild-zone-19", "Wild Zone 19"},
-                {WildZone::WILD_ZONE_20_NO_DISTORTION, "wild-zone-20", "Wild Zone 20 Without Distortion"},
-                {WildZone::WILD_ZONE_20_WITH_DISTORTION, "wild-zone-20-distortion", "Wild Zone 20 With Distortion"},
+                {Location::WILD_ZONE_1,  "wild-zone-1",  "Wild Zone 1"},
+                {Location::WILD_ZONE_2,  "wild-zone-2",  "Wild Zone 2"},
+                {Location::WILD_ZONE_3,  "wild-zone-3",  "Wild Zone 3"},
+                {Location::WILD_ZONE_4,  "wild-zone-4",  "Wild Zone 4"},
+                {Location::WILD_ZONE_5,  "wild-zone-5",  "Wild Zone 5"},
+                {Location::WILD_ZONE_6,  "wild-zone-6",  "Wild Zone 6"},
+                {Location::WILD_ZONE_7,  "wild-zone-7",  "Wild Zone 7"},
+                {Location::WILD_ZONE_8,  "wild-zone-8",  "Wild Zone 8"},
+                {Location::WILD_ZONE_9,  "wild-zone-9",  "Wild Zone 9"},
+                {Location::WILD_ZONE_10, "wild-zone-10", "Wild Zone 10"},
+                {Location::WILD_ZONE_11, "wild-zone-11", "Wild Zone 11"},
+                {Location::WILD_ZONE_12, "wild-zone-12", "Wild Zone 12"},
+                {Location::WILD_ZONE_13, "wild-zone-13", "Wild Zone 13"},
+                {Location::WILD_ZONE_14, "wild-zone-14", "Wild Zone 14"},
+                {Location::WILD_ZONE_15, "wild-zone-15", "Wild Zone 15"},
+                {Location::WILD_ZONE_16, "wild-zone-16", "Wild Zone 16"},
+                {Location::WILD_ZONE_17, "wild-zone-17", "Wild Zone 17"},
+                {Location::WILD_ZONE_18, "wild-zone-18", "Wild Zone 18"},
+                {Location::WILD_ZONE_19, "wild-zone-19", "Wild Zone 19"},
+                {Location::WILD_ZONE_20_NO_DISTORTION, "wild-zone-20", "Wild Zone 20 Without Distortion"},
+                {Location::WILD_ZONE_20_WITH_DISTORTION, "wild-zone-20-distortion", "Wild Zone 20 With Distortion"},
             },
             LockMode::LOCK_WHILE_RUNNING,
-            WildZone::WILD_ZONE_1
+            Location::WILD_ZONE_1
         )
     {}
         
@@ -169,11 +169,11 @@ void ShinyHunt_WildZoneEntrance::on_config_value_changed(void* object){
 void go_to_entrance(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    WildZone wildzone
+    Location wildzone
 ){
     double starting_direction = 0;
     double joystick_x = 0;
-    if (wildzone == WildZone::WILD_ZONE_1){
+    if (wildzone == Location::WILD_ZONE_1){
         // The fast travel point of Wild Zone 1 does not face the zone entrance directly. We need
         // to turn a little bit to the right
         starting_direction = get_facing_direction(env.console, context);
@@ -184,7 +184,7 @@ void go_to_entrance(
     case 0: // detected button A. Reached gate
         break;
     case 1: // day/night change happened.
-        if (wildzone == WildZone::WILD_ZONE_1 && 
+        if (wildzone == Location::WILD_ZONE_1 && 
             get_angle_between_facing_directions(starting_direction, get_facing_direction(env.console, context)) > 2.5){
             joystick_x = 0; // we've already turned. Just need to go forward to enter the zone
         }
@@ -210,7 +210,7 @@ void go_to_entrance(
 void fast_travel_outside_zone(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    WildZone wild_zone,
+    Location wild_zone,
     bool to_max_zoom_level_on_map,
     std::string extra_error_msg = "",
     bool map_already_opened = false
@@ -256,7 +256,7 @@ void leave_zone_and_reset_spawns(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     Milliseconds walk_time_in_zone,
-    WildZone wild_zone,
+    Location wild_zone,
     ShinySoundHandler& shiny_sound_handler,
     bool to_max_zoom_level_on_map
 ){
@@ -438,7 +438,7 @@ void do_one_wild_zone_trip(
     size_t movement_mode,
     Milliseconds walk_time_in_zone,
     bool running,
-    WildZone wild_zone,
+    Location wild_zone,
     ShinySoundHandler& shiny_sound_handler,
     bool to_max_zoom_level_on_map
 ){

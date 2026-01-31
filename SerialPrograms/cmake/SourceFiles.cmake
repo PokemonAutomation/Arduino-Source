@@ -1726,6 +1726,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_WeatherFinder.h
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h
+    Source/PokemonLZA/Programs/PokemonLZA_FastTravelNavigation.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_FastTravelNavigation.h
     Source/PokemonLZA/Programs/PokemonLZA_HyperspaceNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_HyperspaceNavigation.h
     Source/PokemonLZA/Programs/PokemonLZA_BoxSorter.cpp
@@ -1736,7 +1738,6 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/PokemonLZA_DonutBerrySession.h
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.cpp
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.h
-    Source/PokemonLZA/Programs/PokemonLZA_Locations.h
     Source/PokemonLZA/Programs/PokemonLZA_MegaShardFarmer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_MegaShardFarmer.h
     Source/PokemonLZA/Programs/PokemonLZA_MenuNavigation.cpp
@@ -1787,6 +1788,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Resources/PokemonLZA_DonutBerries.h
     Source/PokemonLZA/Resources/PokemonLZA_HyperspaceRewardNames.cpp
     Source/PokemonLZA/Resources/PokemonLZA_HyperspaceRewardNames.h
+    Source/PokemonLZA/Resources/PokemonLZA_Locations.cpp
+    Source/PokemonLZA/Resources/PokemonLZA_Locations.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.cpp

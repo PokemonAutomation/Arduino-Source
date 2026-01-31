@@ -74,11 +74,11 @@ ShinyHunt_WildZoneCafe::ShinyHunt_WildZoneCafe()
     : CAFE(
         "<b>Caf\u00e9:</b>",
         {
-            {WildZoneCafe::CAFE_BATAILLE, "cafe-bataille", "Wild Zone 6 - Caf\u00e9 Bataille"},
-            {WildZoneCafe::CAFE_ULTIMO, "cafe-ultimo", "Wild Zone 15 - Caf\u00e9 Ultimo"},
+            {Location::CAFE_BATAILLE, "cafe-bataille", "Wild Zone 6 - Caf\u00e9 Bataille"},
+            {Location::CAFE_ULTIMO, "cafe-ultimo", "Wild Zone 15 - Caf\u00e9 Ultimo"},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        WildZoneCafe::CAFE_BATAILLE
+        Location::CAFE_BATAILLE
     )
     , NUM_VISITS("<b>Number of Visits:</b><br>Stop after this many visits. 0 means no limit.", LockMode::UNLOCK_WHILE_RUNNING, 0)
     , SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY)
@@ -102,7 +102,7 @@ ShinyHunt_WildZoneCafe::ShinyHunt_WildZoneCafe()
 void do_one_cafe_trip(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    WildZoneCafe cafe,
+    Location cafe,
     ShinySoundHandler& shiny_sound_handler,
     bool to_zoom_to_max
 ){
@@ -127,14 +127,19 @@ void do_one_cafe_trip(
         if (can_fast_travel){
             pbf_wait(context, 300ms);
             switch(cafe){
-            case WildZoneCafe::CAFE_BATAILLE:
+            case Location::CAFE_BATAILLE:
                 env.log("Move to Cafe Bataille icon");
                 pbf_move_left_joystick(context, {+0.157, +0.844}, 100ms, 0ms);
                 break;
-            case WildZoneCafe::CAFE_ULTIMO:
+            case Location::CAFE_ULTIMO:
                 env.log("Move to Cafe Ultimo icon");
                 pbf_move_left_joystick(context, {-0.609, +0.219}, 100ms, 0ms);
                 break;
+            default:
+                throw InternalProgramError(
+                    nullptr, PA_CURRENT_FUNCTION,
+                    "do_one_cafe_trip(): Unsupported cafe location."
+                );
             }
             pbf_wait(context, 300ms);
             FastTravelState travel_status = fly_from_map(env.console, context);
@@ -167,14 +172,19 @@ void do_one_cafe_trip(
 
     double move_x = -1, move_y = +1;
     switch(cafe){
-    case WildZoneCafe::CAFE_BATAILLE:
+    case Location::CAFE_BATAILLE:
         env.log("Move to zone gate from Cafe Bataille");
         move_x = +1; move_y = -0.25;
         break;
-    case WildZoneCafe::CAFE_ULTIMO:
+    case Location::CAFE_ULTIMO:
         env.log("Move to zone gate from Cafe Ultimo");
         move_x = 0; move_y = -1;
         break;
+    default:
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "do_one_cafe_trip(): Unsupported cafe location."
+        );
     }
 
     int ret = run_towards_gate_with_A_button(env.console, context, move_x, move_y, Seconds(10));
@@ -243,14 +253,19 @@ void do_one_cafe_trip(
     // move map cursor to cafe:
     pbf_wait(context, 300ms);
     switch(cafe){
-    case WildZoneCafe::CAFE_BATAILLE:
+    case Location::CAFE_BATAILLE:
         env.log("Move to Cafe Bataille icon from zone gate");
         pbf_move_left_joystick(context, {-0.25, -0.252}, 100ms, 0ms);
         break;
-    case WildZoneCafe::CAFE_ULTIMO:
+    case Location::CAFE_ULTIMO:
         env.log("Move to Cafe Ultimo icon from zone gate");
         pbf_move_left_joystick(context, {+0.488, -0.126}, 100ms, 0ms);
         break;
+    default:
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "do_one_cafe_trip(): Unsupported cafe location."
+        );
     }
     pbf_wait(context, 300ms);
 

@@ -26,6 +26,7 @@
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
+#include "PokemonLZA/Programs/PokemonLZA_FastTravelNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_DonutBerrySession.h"
 #include "PokemonLZA_DonutMaker.h"
 #include <format>
@@ -415,48 +416,6 @@ void DonutMaker::open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env,
     );
 }
 
-// A generic function to fast travel to an index in the fast travel menu and watch for overworld
-void fast_travel_to_index(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    int location_index = 0
-){
-    DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
-
-    env.log("Fast traveling to location at index " + std::to_string(location_index));
-    bool zoom_to_max = false;
-    const bool require_icons = false;
-    open_map(env.console, context, zoom_to_max, require_icons);
-    
-    // Press Y to load fast travel locaiton menu
-    pbf_press_button(context, BUTTON_Y, 100ms, 500ms);
-    context.wait_for_all_requests();
-
-    OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
-    int ret = run_until<ProControllerContext>(
-        env.console, context,
-        [&](ProControllerContext& context){
-            // Move cursor to desired location index
-            for (int i = 0; i < location_index; i++){
-                pbf_press_dpad(context, DPAD_DOWN, 100ms, 500ms);
-            }
-            pbf_mash_button(context, BUTTON_A, Seconds(10));
-            pbf_wait(context, Seconds(30)); // 30 sec to wait out potential day night change
-        },
-        {overworld}
-    );
-    if (ret != 0){
-        stats.errors++;
-        env.update_stats();
-        OperationFailedException::fire(
-           ErrorReport::SEND_ERROR_REPORT,
-            "donut_maker(): Unable to find overworld after fast traveling to location index " + std::to_string(location_index),
-            env.console
-        );
-    }
-    env.log("Detected overworld. Fast traveled to location index " + std::to_string(location_index));
-}
-
 // Exit the game and load the backup save
 void load_backup_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
@@ -504,13 +463,9 @@ void exit_menu_to_overworld(SingleSwitchProgramEnvironment& env, ProControllerCo
 void reset_map_filter_state(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     env.log("Resetting fast travel map filters.");
 
-    open_map(env.console, context, false, false);
-    // Press Y and - to open fast travel filter menu
-    pbf_press_button(context, BUTTON_Y, 100ms, 500ms);
-    pbf_press_button(context, BUTTON_MINUS, 100ms, 500ms);
-    // Press Down and A to select "Facilities" filter
-    pbf_press_dpad(context, DPAD_DOWN, 100ms, 500ms);
-    pbf_press_button(context, BUTTON_A, 100ms, 500ms);
+    open_map(env.console, context, true, false);
+    open_fast_travel_menu(env.console, context);
+    set_fast_travel_menu_filter(env.console, context, FAST_TRAVEL_FILTER::ALL_TRAVEL_SPOTS);
 
     // Close out of map
     exit_menu_to_overworld(env, context);
@@ -521,10 +476,19 @@ void reset_map_filter_state(SingleSwitchProgramEnvironment& env, ProControllerCo
 }
 
 // Move to in front of Ansha with button A shown
-void move_to_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void DonutMaker::move_to_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
-    fast_travel_to_index(env, context, 3); // Fast travel to Hotel Z
+    FastTravelState travel_status = open_map_and_fly_to(env.console, context, LANGUAGE, Location::HOTEL_Z);
+    if (travel_status != FastTravelState::SUCCESS){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "donut_maker(): Cannot fast travel to Hotel Z.",
+            env.console
+        );
+    }
     context.wait_for(100ms); // Wait for player control to return
     env.log("Detected overworld. Fast traveled to Hotel Zone");
 
@@ -580,7 +544,7 @@ void move_to_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 }
 
 // Create a new backup save after making a donut to keep
-void save_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void DonutMaker::save_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     // DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
     env.log("Creating new backup save to keep the last made donut.");
@@ -588,10 +552,6 @@ void save_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& conte
     // Stop talking to Ansha
     exit_menu_to_overworld(env, context);
     context.wait_for_all_requests();
-
-    // Fast travel to anywhere to set a new backup save after making a donut to keep
-    // Removed this since it's likely redundant because the program always fast travels to Hotel Z before making a donut
-    // fast_travel_to_index(env, context, 0, 3000ms);
 }
 
 // Check if all user defined limits are reached or the global max keepers limit is reached
