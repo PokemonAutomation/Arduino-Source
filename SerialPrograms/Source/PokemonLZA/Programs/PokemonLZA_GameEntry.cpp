@@ -13,6 +13,8 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonLZA/PokemonLZA_Settings.h"
+#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA_GameEntry.h"
 
 namespace PokemonAutomation{
@@ -35,27 +37,57 @@ bool gamemenu_to_ingame(
     Milliseconds enter_game_timeout
 ){
     stream.log("Mashing A to enter game...");
-    {
-        BlackScreenWatcher detector(COLOR_RED, {0.1, 0.04, 0.8, 0.3});
-        stream.log("Waiting to enter game...");
+    while (true){
+        BlackScreenWatcher black_screen(COLOR_RED, {0.1, 0.04, 0.8, 0.3});
+        BlueDialogWatcher dialog(COLOR_YELLOW);
+        SelectionArrowWatcher arrow(
+            COLOR_BLUE,
+            &stream.overlay(),
+            SelectionArrowType::RIGHT,
+            {0.2, 0.5, 0.6, 0.3}
+        );
+        context.wait_for_all_requests();
+//        stream.log("Waiting to enter game...");
         int ret = run_until<ProControllerContext>(
             stream, context,
             [=](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 2s);
                 pbf_wait(context, enter_game_timeout);
             },
-            {{detector}}
+            {
+                black_screen,
+                dialog,
+                arrow,
+            }
         );
-        if (ret != 0){
+        switch (ret){
+        case 0:
+            stream.log("Detected black screen.", COLOR_BLUE);
+            break;
+        case 1:
+            stream.log("Detected dialog.", COLOR_BLUE);
+            pbf_press_button(context, BUTTON_B, 160ms, 240ms);
+            continue;
+        case 2:
+            stream.log("Detected backup save arrow.", COLOR_BLUE);
+            pbf_press_button(context, BUTTON_A, 160ms, 240ms);
+            continue;
+        default:
             stream.log("Timed out waiting for black screen.", COLOR_RED);
             return false;
         }
+        break;
     }
 
     stream.log("Black screen detected");
 
     {
-        BlackScreenOverWatcher detector(COLOR_RED, {0.1, 0.04, 0.8, 0.3});
+        BlackScreenWatcher detector(
+            COLOR_RED,
+            {0.1, 0.04, 0.8, 0.3},
+            100, 10,
+            BlackScreenWatcher::FinderType::GONE
+        );
         int ret = wait_until(
             stream, context,
             std::chrono::milliseconds(enter_game_timeout),

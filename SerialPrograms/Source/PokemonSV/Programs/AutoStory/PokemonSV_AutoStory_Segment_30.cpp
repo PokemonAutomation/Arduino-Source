@@ -234,6 +234,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // pokemon are cleared from minimap after the Snow Slope run
 
         // fly back to Glaseado Gym Pokecenter
+        // the problem with the snowy background is still there. but the marker placed previously is also still there
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, -1, +1, 0ms}, FlyPoint::POKECENTER);
 
 

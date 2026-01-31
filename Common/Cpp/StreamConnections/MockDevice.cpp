@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/PABotBase2/PABotBase2_ConnectionDebug.h"
 #include "MockDevice.h"
 
 //  REMOVE
@@ -11,10 +12,13 @@
 using std::cout;
 using std::endl;
 
-
+#if 0
 #define PABB2_DROP_HOST_TO_DEVICE   0.2
 #define PABB2_DROP_DEVICE_TO_HOST   0.2
-
+#else
+#define PABB2_DROP_HOST_TO_DEVICE   0
+#define PABB2_DROP_DEVICE_TO_HOST   0
+#endif
 
 namespace PokemonAutomation{
 
@@ -44,6 +48,10 @@ MockDevice::~MockDevice(){
     m_host_cv.notify_all();
     m_device_thread.join();
     m_host_thread.join();
+}
+void MockDevice::print() const{
+    std::lock_guard<std::mutex> lg(m_device_lock);
+    pabb2_StreamCoalescer_print(&m_connection.stream_coalescer, true);
 }
 
 

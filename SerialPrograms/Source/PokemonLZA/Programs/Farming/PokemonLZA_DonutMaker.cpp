@@ -159,7 +159,11 @@ bool flavor_tokens_are_subset(const std::vector<std::string>& subset, const std:
 }
 
 // Check if a donut matches an individual table entry. Each table entry has three target powers.
-bool donut_matches_powers(SingleSwitchProgramEnvironment& env, std::vector<std::string>& donut_powers, const std::vector<std::string>& target_powers){
+bool donut_matches_powers(
+    SingleSwitchProgramEnvironment& env,
+    std::vector<std::string>& donut_powers,
+    const std::vector<std::string>& target_powers
+){
     for (const std::string& target_power : target_powers){
         // `target_power` can be a specific power like "item-power-berries-3" or a slug to match
         // any possible power (or no power): "any-power-any".
@@ -184,7 +188,11 @@ bool donut_matches_powers(SingleSwitchProgramEnvironment& env, std::vector<std::
 // Read flavor power and check if they match user requirement.
 // Keep or discard the donut depending on the user defined limit.
 // Return true if the user requirement is fulfilled.
-bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::vector<uint16_t>& kept_counts) {
+bool DonutMaker::match_powers(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    std::vector<uint16_t>& kept_counts
+){
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
     env.log("Reading in table of desired powers.");
@@ -221,7 +229,11 @@ bool DonutMaker::match_powers(SingleSwitchProgramEnvironment& env, ProController
             match_found = true;
             if (kept_counts[i] < FLAVOR_POWERS.snapshot()[i].limit){
                 kept_counts[i]++;
-                env.log("Keeping donut: " + std::to_string(kept_counts[i]) + " / " + std::to_string(FLAVOR_POWERS.snapshot()[i].limit) + " for table entry " + std::to_string(i+1));
+                env.log(
+                    "Keeping donut: " + std::to_string(kept_counts[i]) + " / " +
+                    std::to_string(FLAVOR_POWERS.snapshot()[i].limit) +
+                    " for table entry " + std::to_string(i+1)
+                );
                 should_keep = true;
             }
         }
@@ -404,7 +416,11 @@ void DonutMaker::open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env,
 }
 
 // A generic function to fast travel to an index in the fast travel menu and watch for overworld
-void fast_travel_to_index(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int location_index=0){
+void fast_travel_to_index(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    int location_index = 0
+){
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
     env.log("Fast traveling to location at index " + std::to_string(location_index));
@@ -579,14 +595,17 @@ void save_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& conte
 }
 
 // Check if all user defined limits are reached or the global max keepers limit is reached
-bool DonutMaker::should_stop(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::vector<uint16_t>& kept_counts){
-    int total_kept = 0;
+bool DonutMaker::should_stop(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    const std::vector<uint16_t>& kept_counts,
+    uint16_t total_kept
+){
     bool limit_reached = true;
     for (size_t i = 0; i < kept_counts.size(); i++){
         if (kept_counts[i] < FLAVOR_POWERS.snapshot()[i].limit){
             limit_reached = false;
         }
-        total_kept += kept_counts[i];
     }
     if (total_kept >= MAX_KEEPERS){
         return true;
@@ -595,7 +614,11 @@ bool DonutMaker::should_stop(SingleSwitchProgramEnvironment& env, ProControllerC
 }
 
 // Return true if a donut match is found
-bool DonutMaker::donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::vector<uint16_t>& kept_counts) {
+bool DonutMaker::donut_iteration(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    std::vector<uint16_t>& kept_counts
+){
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
     move_to_ansha(env, context);
@@ -650,6 +673,7 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     reset_map_filter_state(env, context);
 
     std::vector<uint16_t> kept_counts(FLAVOR_POWERS.snapshot().size(), 0);
+    uint16_t total_kept = 0;
     while(true){
         const bool should_keep = donut_iteration(env, context, kept_counts);
         stats.resets++;
@@ -657,7 +681,8 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         send_program_status_notification(env, NOTIFICATION_STATUS);
 
         if (should_keep){
-            if (should_stop(env, context, kept_counts)){
+            total_kept++;
+            if (should_stop(env, context, kept_counts, total_kept)){
                 break;
             }
             save_donut(env, context);

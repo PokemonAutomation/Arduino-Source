@@ -307,7 +307,9 @@ void checkpoint_70(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     [&](size_t attempt_number){
         context.wait_for_all_requests();
         // fly back to North Province Area Three
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, -1, +1, 0ms}, FlyPoint::POKECENTER);
+        // fly_to_overworld_from_map() may fail since the snowy background on the map will false positive the destinationMenuItemWatcher (MapDestinationMenuDetector at box {0.523000, 0.680000, 0.080000, 0.010000}), which causes the fly to fail
+        // we can get around this by either placing down a marker, or by zooming out so that that section isn't white snow.
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, -1, +1, 0ms}, FlyPoint::POKECENTER);
 
         // fly back to Glaseado Mountain Pokecenter
         // this clears Pokemon in minimap

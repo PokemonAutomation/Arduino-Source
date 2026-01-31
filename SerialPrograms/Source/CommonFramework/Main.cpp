@@ -10,6 +10,7 @@
 #include "Common/Cpp/ImageResolution.h"
 #include "StaticRegistration.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "CommonFramework/Tools/GlobalThreadPoolsQt.h"
 #include "VideoPipeline/Backends/MediaServicesQt6.h"
 #include "Globals.h"
 #include "GlobalSettingsPanel.h"
@@ -161,6 +162,7 @@ int run_program(int argc, char *argv[]){
     int ret = application.exec();
 
     GlobalMediaServices::instance().stop();
+    GlobalThreadPools::qt_threadpool().stop();
 
     return ret;
 }
@@ -204,6 +206,20 @@ int main(int argc, char *argv[]){
     //  We must clear the OCR cache or it will crash on Linux when the library
     //  unloads before the cache is destructed from static memory.
     OCR::clear_cache();
+
+    cout << "Exiting main()..." << endl;
+
+
+//
+//  Workaround Qt 6.9 thread-adoption bug on Windows.
+//      https://github.com/PokemonAutomation/Arduino-Source/issues/570
+//      https://bugreports.qt.io/browse/QTBUG-131892
+//
+//  Program will hang after main() without this!
+//
+#if _WIN32 && (QT_VERSION_MAJOR * 1000000 + QT_VERSION_MINOR * 1000 + QT_VERSION_PATCH) > 6008003
+    exit(ret);
+#endif
 
     return ret;
 }

@@ -551,6 +551,22 @@ void confirm_lead_pokemon_moves(SingleSwitchProgramEnvironment& env, ProControll
 
 }
 
+void confirm_minimap_unlocked(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    DirectionDetector direction;
+    try{
+        direction.change_direction(env.program_info(), env.console, context, 3.02);
+        pbf_press_button(context, BUTTON_L, 200ms, 200ms);
+    }catch(OperationFailedException&){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "confirm_minimap_unlocked(): Unable to confirm that the minimap is unlocked. Likely because the direction cannot be detected. "
+            "If you manually confirm that the minimap is unlocked, you can disable this precheck in the program setting \"Pre-check: Ensure the minimap is unlocked\".",
+            env.console
+        );
+    }
+
+}
+
 void change_settings_prior_to_autostory_segment_mode(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t current_segment_num, Language language){
     // get index of `Options` in the Main Menu, which depends on where you are in Autostory
     int8_t options_index;  
@@ -814,8 +830,10 @@ void do_action_and_monitor_for_battles_early(
         {no_minimap}
     );
     if (ret == 0){  // if see no minimap. stop and see if we detect a battle. if so, throw Battl exception
+        stream.log("do_action_and_monitor_for_battles_early: Detected no mini-map. Possibly caught in a battle.");
         do_action_and_monitor_for_battles(info, stream, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            // wait 30 seconds to see if we detect a battle. If so, this throws an UnexpectedBattleException.
             pbf_wait(context, Seconds(30));
         });
 

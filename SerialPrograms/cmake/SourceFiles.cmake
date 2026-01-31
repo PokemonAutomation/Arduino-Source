@@ -215,6 +215,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/CollapsibleGroupBox.cpp
     ../Common/Qt/CollapsibleGroupBox.h
     ../Common/Qt/NoWheelComboBox.h
+    ../Common/Qt/QtThreadPool.cpp
+    ../Common/Qt/QtThreadPool.h
     ../Common/Qt/Options/BatchWidget.cpp
     ../Common/Qt/Options/BatchWidget.h
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp
@@ -478,6 +480,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Tools/FileDownloader.h
     Source/CommonFramework/Tools/GlobalThreadPools.cpp
     Source/CommonFramework/Tools/GlobalThreadPools.h
+    Source/CommonFramework/Tools/GlobalThreadPoolsQt.cpp
+    Source/CommonFramework/Tools/GlobalThreadPoolsQt.h
     Source/CommonFramework/Tools/ProgramEnvironment.cpp
     Source/CommonFramework/Tools/ProgramEnvironment.h
     Source/CommonFramework/Tools/StatAccumulator.cpp

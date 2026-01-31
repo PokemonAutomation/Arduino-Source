@@ -311,6 +311,8 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
             1s
         );
 
+        connection.reset();
+
         connection.send_request(PABB2_CONNECTION_OPCODE_ASK_VERSION);
         connection.wait_for_pending();
 
@@ -320,13 +322,20 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
         connection.send_request(PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS);
         connection.wait_for_pending();
 
-        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_RESET);
+
+        connection.send("asdf", 4);
+        connection.send("qwer", 4);
+        connection.send("zxcv", 4);
+        cout << "sent = " << connection.send("0123456789abcdef", 16) << endl;
+//        connection.send("0123456789abcdef", 16);
+//        connection.send("0123456789abcdef", 16);
+//        connection.send("0123456789abcdef", 16);
+
+        connection.print();
+
         connection.wait_for_pending();
 
-
-        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_VERSION);
-        connection.wait_for_pending();
-
+        device.print();
 
         scope.wait_for(60s);
     }

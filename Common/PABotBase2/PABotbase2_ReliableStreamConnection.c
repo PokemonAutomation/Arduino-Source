@@ -74,8 +74,10 @@ void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* s
         pabb2_PacketSender_reset(&self->reliable_sender);
         pabb2_PacketParser_reset(&self->parser);
         pabb2_StreamCoalescer_reset(&self->stream_coalescer);
+        pabb2_StreamCoalescer_push_packet(&self->stream_coalescer, 0);
         return;
     case PABB2_CONNECTION_OPCODE_ASK_VERSION:
+        pabb2_StreamCoalescer_push_packet(&self->stream_coalescer, packet->seqnum);
         pabb2_PacketSender_send_ack_u32(
             &self->reliable_sender,
             packet->seqnum,
@@ -84,6 +86,7 @@ void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* s
         );
         return;
     case PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE:
+        pabb2_StreamCoalescer_push_packet(&self->stream_coalescer, packet->seqnum);
         pabb2_PacketSender_send_ack_u16(
             &self->reliable_sender,
             packet->seqnum,
@@ -92,6 +95,7 @@ void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* s
         );
         return;
     case PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS:
+        pabb2_StreamCoalescer_push_packet(&self->stream_coalescer, packet->seqnum);
         pabb2_PacketSender_send_ack_u8(
             &self->reliable_sender,
             packet->seqnum,
@@ -100,6 +104,7 @@ void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* s
         );
         return;
     case PABB2_CONNECTION_OPCODE_ASK_BUFFER_BYTES:
+        pabb2_StreamCoalescer_push_packet(&self->stream_coalescer, packet->seqnum);
         pabb2_PacketSender_send_ack_u16(
             &self->reliable_sender,
             packet->seqnum,
@@ -108,14 +113,19 @@ void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* s
         );
         return;
     case PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA:
+//        printf("Device: PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA\n");
         if (pabb2_StreamCoalescer_push_stream(&self->stream_coalescer, (const pabb2_PacketHeaderData*)packet)){
+//            printf("Device: Succeeded push.\n");
             pabb2_PacketSender_send_ack_u16(
                 &self->reliable_sender,
                 packet->seqnum,
                 PABB2_CONNECTION_OPCODE_RET_STREAM_DATA,
                 pabb2_StreamCoalescer_bytes_available(&self->stream_coalescer)
             );
+        }else{
+            printf("Device: Failed to push.\n");
         }
+        fflush(stdout);
         return;
     default:
         pabb2_PacketSender_send_info(

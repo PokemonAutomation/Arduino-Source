@@ -24,6 +24,8 @@ public:
     MockDevice();
     ~MockDevice();
 
+    void print() const;
+
 
 private:
     //  Call from device.
@@ -70,11 +72,11 @@ private:
 
     std::atomic<bool> m_stopping;
 
-    std::mutex m_device_lock;
+    mutable std::mutex m_device_lock;
     std::condition_variable m_device_cv;
     Thread m_device_thread;
 
-    std::mutex m_host_lock;
+    mutable std::mutex m_host_lock;
     std::condition_variable m_host_cv;
     Thread m_host_thread;
 };
