@@ -19,7 +19,6 @@
 #include "PokemonLZA/Inference/PokemonLZA_WeatherDetector.h"
 #include "PokemonLZA_ShinyHunt_HelioptileHunter.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
-#include "PokemonLZA/Programs/PokemonLZA_Locations.h"
 #include <cstddef>
 #include <string>
 
@@ -207,7 +206,7 @@ void ShinyHunt_HelioptileHunter::program(SingleSwitchProgramEnvironment& env, Pr
                 hunt_loops = 0;
             } else {
                 env.log("Correct weather. Continuing");
-                move_map_cursor_from_entrance_to_zone(env.console, context, WildZone::WILD_ZONE_14);
+                move_map_cursor_from_entrance_to_zone(env.console, context, Location::WILD_ZONE_14);
                 fly_from_map(env.console, context);
             }   
 

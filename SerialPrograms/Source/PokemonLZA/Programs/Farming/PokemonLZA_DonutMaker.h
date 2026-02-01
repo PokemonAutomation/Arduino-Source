@@ -50,11 +50,9 @@ private:
     void animation_to_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void add_berries_and_make_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    bool donut_iteration(
-        SingleSwitchProgramEnvironment& env,
-        ProControllerContext& context,
-        std::vector<uint16_t>& kept_counts
-    );
+    void move_to_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void save_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    bool donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::vector<uint16_t>& kept_counts);
 
 private:
 
