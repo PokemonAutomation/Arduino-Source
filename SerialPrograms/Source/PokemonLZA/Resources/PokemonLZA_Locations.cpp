@@ -185,17 +185,21 @@ const std::vector<LocationItem>& LOCATION_ENUM_MAPPINGS(){
 }
 
 // Create a hash map for fast lookup from Location enum to LocationItem
-static const std::unordered_map<Location, LocationItem> location_item_hash_map_by_enum = [](){
+std::unordered_map<Location, LocationItem> make_LOCATION_ITEM_HASH_MAP_BY_ENUM(){
     std::unordered_map<Location, LocationItem> hash_map;
     const std::vector<LocationItem>& database = LOCATION_ENUM_MAPPINGS();
     for (const LocationItem& item : database){
         hash_map[item.location] = item;
     }
     return hash_map;
-}();
+};
+const std::unordered_map<Location, LocationItem>& LOCATION_ITEM_HASH_MAP_BY_ENUM(){
+    static const std::unordered_map<Location, LocationItem> ret = make_LOCATION_ITEM_HASH_MAP_BY_ENUM();
+    return ret;
+}
 
 // Create a hash map for fast lookup from slug to LocationItem
-static const std::unordered_map<std::string, LocationItem> location_item_hash_map_by_slug = [](){
+std::unordered_map<std::string, LocationItem> make_LOCATION_ITEM_HASH_MAP_BY_SLUG(){
     std::unordered_map<std::string, LocationItem> hash_map;
     const std::vector<LocationItem>& database = LOCATION_ENUM_MAPPINGS();
     for (const LocationItem& item : database){
@@ -203,12 +207,16 @@ static const std::unordered_map<std::string, LocationItem> location_item_hash_ma
         hash_map.insert({item.slug, item});
     }
     return hash_map;
-}();
+};
+const std::unordered_map<std::string, LocationItem>& LOCATION_ITEM_HASH_MAP_BY_SLUG(){
+    static const std::unordered_map<std::string, LocationItem> ret = make_LOCATION_ITEM_HASH_MAP_BY_SLUG();
+    return ret;
+}
 
 // Get the whole LocationItem given a Location enum
 const LocationItem& get_location_item_from_enum(const Location location){
-    auto iter = location_item_hash_map_by_enum.find(location);
-    if (iter == location_item_hash_map_by_enum.end()){
+    auto iter = LOCATION_ITEM_HASH_MAP_BY_ENUM().find(location);
+    if (iter == LOCATION_ITEM_HASH_MAP_BY_ENUM().end()){
         throw InternalProgramError(
             nullptr, PA_CURRENT_FUNCTION,
             "Location enum not found in database: Enum #" + std::to_string((int)location)
@@ -220,8 +228,8 @@ const LocationItem& get_location_item_from_enum(const Location location){
 // Get the whole LocationItem given a slug
 // WARNING: slugs can be shared for multiple entries, grab the first occurence
 const LocationItem& get_location_item_from_slug(const std::string& slug){
-    auto iter = location_item_hash_map_by_slug.find(slug);
-    if (iter == location_item_hash_map_by_slug.end()){
+    auto iter = LOCATION_ITEM_HASH_MAP_BY_SLUG().find(slug);
+    if (iter == LOCATION_ITEM_HASH_MAP_BY_SLUG().end()){
         throw InternalProgramError(
             nullptr, PA_CURRENT_FUNCTION,
             "Location slug not found in database: " + slug
