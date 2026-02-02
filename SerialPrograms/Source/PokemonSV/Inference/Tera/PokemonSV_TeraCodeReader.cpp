@@ -172,7 +172,7 @@ std::vector<WaterfillOCRResult> waterfill_OCR(
         ret.emplace_back(WaterfillOCRResult{std::move(item.second), ""});
     }
 
-    GlobalThreadPools::realtime_inference().run_in_parallel(
+    GlobalThreadPools::computation_realtime().run_in_parallel(
         [&](size_t index){
             WaterfillObject& object = ret[index].object;
             ImageRGB32 cropped = extract_box_reference(filtered, object).copy();

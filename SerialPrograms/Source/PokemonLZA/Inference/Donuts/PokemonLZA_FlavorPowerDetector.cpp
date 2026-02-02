@@ -113,7 +113,7 @@ int FlavorPowerIconDetector::detect(const ImageViewRGB32& screen){
         const size_t min_digit_area = image_crop.height()*image_crop.height() / 10;
         int number = OCR::read_number_waterfill_multifilter(
             m_logger,
-            GlobalThreadPools::normal_inference(),
+            GlobalThreadPools::computation_normal(),
             image_crop,
             {
                 {0xff000000, 0xff707070},

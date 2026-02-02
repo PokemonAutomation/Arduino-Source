@@ -14,7 +14,7 @@ namespace GlobalThreadPools{
 
 
 
-ComputationThreadPool& realtime_inference(){
+ComputationThreadPool& computation_realtime(){
     static ComputationThreadPool runner(
         [](){
             GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_POOL.PRIORITY.set_on_this_thread(global_logger_tagged());
@@ -23,7 +23,7 @@ ComputationThreadPool& realtime_inference(){
     );
     return runner;
 }
-ComputationThreadPool& normal_inference(){
+ComputationThreadPool& computation_normal(){
     static ComputationThreadPool runner(
         [](){
             GlobalSettings::instance().PERFORMANCE->NORMAL_THREAD_POOL.PRIORITY.set_on_this_thread(global_logger_tagged());
@@ -33,6 +33,24 @@ ComputationThreadPool& normal_inference(){
     return runner;
 }
 
+ComputationThreadPool& unlimited_realtime(){
+    static ComputationThreadPool runner(
+        [](){
+            GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_POOL.PRIORITY.set_on_this_thread(global_logger_tagged());
+        },
+        0, (size_t)-1
+    );
+    return runner;
+}
+ComputationThreadPool& unlimited_normal(){
+    static ComputationThreadPool runner(
+        [](){
+            GlobalSettings::instance().PERFORMANCE->NORMAL_THREAD_POOL.PRIORITY.set_on_this_thread(global_logger_tagged());
+        },
+        0, (size_t)-1
+    );
+    return runner;
+}
 
 
 

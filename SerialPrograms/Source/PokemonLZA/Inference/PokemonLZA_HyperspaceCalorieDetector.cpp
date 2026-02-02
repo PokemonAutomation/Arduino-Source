@@ -53,7 +53,7 @@ bool HyperspaceCalorieDetector::detect(const ImageViewRGB32& screen){
     };
     int number = OCR::read_number_waterfill_multifilter(
         m_logger,
-        GlobalThreadPools::realtime_inference(),
+        GlobalThreadPools::computation_realtime(),
         calorie_image_crop, filters,
         text_inside_range, prioritize_numeric_only_results, width_max, min_digit_area
     );

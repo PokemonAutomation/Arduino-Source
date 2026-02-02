@@ -167,7 +167,7 @@ VideoFastCodeEntry::VideoFastCodeEntry()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     //  Preload
-    GlobalThreadPools::realtime_inference().ensure_threads(6);
+    GlobalThreadPools::computation_realtime().ensure_threads(6);
     OCR::ensure_instances(Language::English, 6);
     preload_code_templates();
 }

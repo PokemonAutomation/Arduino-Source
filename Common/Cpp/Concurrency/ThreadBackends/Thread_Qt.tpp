@@ -28,7 +28,7 @@ struct Thread::Data : public QThread{
     }
     ~Data(){
 //        cout << "quitting: " << this << endl;
-//        quit();
+        quit();
 //        cout << "waiting: " << this << endl;
 //        while (!m_finished.load(std::memory_order_acquire)){
 //            wait(1000);

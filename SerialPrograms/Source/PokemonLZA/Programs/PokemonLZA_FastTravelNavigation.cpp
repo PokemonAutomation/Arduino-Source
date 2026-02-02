@@ -75,7 +75,7 @@ bool navigate_to_destination_page_in_fast_travel_menu_routine(
     do{
         LocationNameReader location_name_reader;
         std::vector<LocationItem> first_and_last_locations_on_page(2);
-        GlobalThreadPools::normal_inference().run_in_parallel(
+        GlobalThreadPools::computation_normal().run_in_parallel(
             [&](size_t index){
                 OCR::StringMatchResult result = location_name_reader.read_location_name(console.video().snapshot(), console.logger(), language, index * (LocationNameReader::PAGE_SIZE - 1));
                 result.clear_beyond_log10p(LocationNameOCR::MAX_LOG10P);
@@ -475,7 +475,7 @@ void open_fast_travel_menu(
 std::vector<LocationItem> read_current_page_location_items(ConsoleHandle& console, Language language){
     std::vector<LocationItem> locations(LocationNameReader::PAGE_SIZE);
     LocationNameReader location_name_reader;
-    GlobalThreadPools::normal_inference().run_in_parallel(
+    GlobalThreadPools::computation_normal().run_in_parallel(
         [&](size_t index){
             OCR::StringMatchResult result = location_name_reader.read_location_name(console.video().snapshot(), console.logger(), language, index);
             result.clear_beyond_log10p(LocationNameOCR::MAX_LOG10P);

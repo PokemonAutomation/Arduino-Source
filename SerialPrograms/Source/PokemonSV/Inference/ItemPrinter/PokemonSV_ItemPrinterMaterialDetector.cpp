@@ -141,7 +141,7 @@ int16_t ItemPrinterMaterialDetector::read_number(
     const size_t min_digit_area = 20;
     int16_t number = (int16_t)OCR::read_number_waterfill_multifilter(
         logger,
-        GlobalThreadPools::normal_inference(),
+        GlobalThreadPools::computation_normal(),
         cropped, filters,
         text_inside_range, prioritize_numeric_only_results,
         max_width,
@@ -169,7 +169,7 @@ int8_t ItemPrinterMaterialDetector::find_happiny_dust_row_index(
         int8_t total_rows = 10;
         
         SpinLock lock;
-        GlobalThreadPools::normal_inference().run_in_parallel(
+        GlobalThreadPools::computation_normal().run_in_parallel(
             [&](size_t index){
                 std::string material_name = detect_material_name(stream, snapshot, context, (int8_t)index);
                 if ("happiny-dust" == material_name){
@@ -282,7 +282,7 @@ std::vector<int8_t> ItemPrinterMaterialDetector::find_material_value_row_index(
     std::vector<int8_t> row_indexes;
     SpinLock lock;
 
-    GlobalThreadPools::normal_inference().run_in_parallel(
+    GlobalThreadPools::computation_normal().run_in_parallel(
         [&](size_t index){
             int16_t value = read_number(stream.logger(), snapshot, m_box_mat_value[index], (int8_t)index);
             if (value == material_value){

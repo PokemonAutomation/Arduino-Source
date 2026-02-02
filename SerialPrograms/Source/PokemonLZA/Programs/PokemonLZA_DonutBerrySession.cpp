@@ -68,7 +68,7 @@ PageIngredients BerrySession::read_screen(std::shared_ptr<const ImageRGB32> scre
     //  Read the names of every line and the sprite of the selected line.
     ImageMatch::ImageMatchResult image_result;
     DonutBerriesReader reader;
-    GlobalThreadPools::normal_inference().run_in_parallel(
+    GlobalThreadPools::computation_normal().run_in_parallel(
         [&](size_t index){
             if (index < DonutBerriesReader::BERRY_PAGE_LINES){
                 // Read text at line `index`

@@ -41,6 +41,9 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Concurrency/SpinLock.cpp
     ../Common/Cpp/Concurrency/SpinLock.h
     ../Common/Cpp/Concurrency/SpinPause.h
+    ../Common/Cpp/Concurrency/ThreadBackends/Thread_Qt.tpp
+    ../Common/Cpp/Concurrency/ThreadBackends/Thread_StdThread.tpp
+    ../Common/Cpp/Concurrency/ThreadBackends/Thread_StdThreadDetach.tpp
     ../Common/Cpp/Concurrency/Thread.cpp
     ../Common/Cpp/Concurrency/Thread.h
     ../Common/Cpp/Concurrency/Watchdog.cpp

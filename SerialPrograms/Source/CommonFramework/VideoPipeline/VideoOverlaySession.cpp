@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "VideoOverlaySession.h"
 
 //#include <iostream>
@@ -28,12 +29,15 @@ VideoOverlaySession::~VideoOverlaySession(){
         m_stopping = true;
     }
     m_stats_cv.notify_all();
-    m_stats_updater.join();
+//    m_stats_updater.join();
 }
 VideoOverlaySession::VideoOverlaySession(Logger& logger, VideoOverlayOption& option)
     : m_logger(logger)
     , m_option(option)
-    , m_stats_updater([this]{ stats_thread(); })
+    , m_stats_updater(GlobalThreadPools::unlimited_normal().blocking_dispatch(
+        [this]{ stats_thread(); }
+    ))
+//    , m_stats_updater([this]{ stats_thread(); })
 {}
 
 

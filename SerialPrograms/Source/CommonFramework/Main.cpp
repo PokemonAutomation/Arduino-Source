@@ -197,9 +197,11 @@ int main(int argc, char *argv[]){
     //  Stop the controllers.
     global_input_stop();
 
-    //  Force stop the thread pool
-    PokemonAutomation::GlobalThreadPools::realtime_inference().stop();
-    PokemonAutomation::GlobalThreadPools::normal_inference().stop();
+    //  Force stop the thread pools.
+    PokemonAutomation::GlobalThreadPools::computation_realtime().stop();
+    PokemonAutomation::GlobalThreadPools::computation_normal().stop();
+    PokemonAutomation::GlobalThreadPools::unlimited_realtime().stop();
+    PokemonAutomation::GlobalThreadPools::unlimited_normal().stop();
 
     PokemonAutomation::global_dispatcher.stop();
 

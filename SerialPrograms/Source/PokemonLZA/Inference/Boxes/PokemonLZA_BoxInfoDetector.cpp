@@ -220,7 +220,7 @@ bool BoxDexNumberDetector::detect(const ImageViewRGB32& screen){
         const size_t min_digit_area = dex_image_crop.height()*dex_image_crop.height() / 25;
         return OCR::read_number_waterfill_multifilter(
             m_logger,
-            GlobalThreadPools::normal_inference(),
+            GlobalThreadPools::computation_normal(),
             dex_image_crop,
             {
                 {0x0, 0xff808080},

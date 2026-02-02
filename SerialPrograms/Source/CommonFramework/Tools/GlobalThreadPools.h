@@ -13,9 +13,15 @@ namespace PokemonAutomation{
 namespace GlobalThreadPools{
 
 
+//  Computational thread pools.
+//  These are capped to their respective MAX_THREADS and may block.
+ComputationThreadPool& computation_realtime();
+ComputationThreadPool& computation_normal();
 
-ComputationThreadPool& realtime_inference();
-ComputationThreadPool& normal_inference();
+//  These are general purpose thread pools of unlimited size.
+//  Dispatching to these will never block.
+ComputationThreadPool& unlimited_realtime();
+ComputationThreadPool& unlimited_normal();
 
 
 

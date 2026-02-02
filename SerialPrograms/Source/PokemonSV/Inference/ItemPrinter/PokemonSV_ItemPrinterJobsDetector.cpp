@@ -56,7 +56,7 @@ std::pair<uint8_t, uint8_t> ItemPrinterJobsDetector::read_box(
     SpinLock lock;
     std::map<uint8_t, uint8_t> candidates;
 
-    GlobalThreadPools::normal_inference().run_in_parallel(
+    GlobalThreadPools::computation_normal().run_in_parallel(
         [&](size_t index){
             int num = OCR::read_number(logger, filtered[index].first);
             std::string str = std::to_string(num);
