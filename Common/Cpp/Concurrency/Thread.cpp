@@ -4,23 +4,11 @@
  *
  */
 
-//
-//  Workaround Qt 6.9 thread-adoption bug on Windows.
-//      https://github.com/PokemonAutomation/Arduino-Source/issues/570
-//      https://bugreports.qt.io/browse/QTBUG-131892
-//
+#include "Qt6.9ThreadBugWorkaround.h"
 
-#ifndef QT_CORE_LIB
-#include "ThreadBackends/Thread_StdThread.tpp"
-
+#ifdef PA_ENABLE_QT_ADOPTION_WORKAROUND
+#include "Backends/Thread_Qt.tpp"
+//#include "Backends/Thread_StdThreadDetach.tpp"
 #else
-
-#include <QtGlobal>
-
-#if _WIN32 && (QT_VERSION_MAJOR * 1000000 + QT_VERSION_MINOR * 1000 + QT_VERSION_PATCH) > 6008003
-#include "ThreadBackends/Thread_StdThreadDetach.tpp"
-#else
-#include "ThreadBackends/Thread_StdThread.tpp"
-#endif
-
+#include "Backends/Thread_StdThread.tpp"
 #endif

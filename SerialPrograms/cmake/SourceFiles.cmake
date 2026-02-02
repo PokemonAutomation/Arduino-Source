@@ -27,23 +27,26 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Concurrency/AsyncDispatcher.h
     ../Common/Cpp/Concurrency/AsyncTask.cpp
     ../Common/Cpp/Concurrency/AsyncTask.h
+    ../Common/Cpp/Concurrency/Backends/Thread_Qt.tpp
+    ../Common/Cpp/Concurrency/Backends/Thread_StdThread.tpp
+    ../Common/Cpp/Concurrency/Backends/Thread_StdThreadDetach.tpp
     ../Common/Cpp/Concurrency/ComputationThreadPool.cpp
     ../Common/Cpp/Concurrency/ComputationThreadPool.h
     ../Common/Cpp/Concurrency/ComputationThreadPoolCore.cpp
     ../Common/Cpp/Concurrency/ComputationThreadPoolCore.h
+    ../Common/Cpp/Concurrency/ConditionVariable.h
     ../Common/Cpp/Concurrency/FireForgetDispatcher.cpp
     ../Common/Cpp/Concurrency/FireForgetDispatcher.h
+    ../Common/Cpp/Concurrency/Mutex.h
     ../Common/Cpp/Concurrency/PeriodicScheduler.cpp
     ../Common/Cpp/Concurrency/PeriodicScheduler.h
+    ../Common/Cpp/Concurrency/Qt6.9ThreadBugWorkaround.h
     ../Common/Cpp/Concurrency/ReverseLockGuard.h
     ../Common/Cpp/Concurrency/ScheduledTaskRunner.cpp
     ../Common/Cpp/Concurrency/ScheduledTaskRunner.h
     ../Common/Cpp/Concurrency/SpinLock.cpp
     ../Common/Cpp/Concurrency/SpinLock.h
     ../Common/Cpp/Concurrency/SpinPause.h
-    ../Common/Cpp/Concurrency/ThreadBackends/Thread_Qt.tpp
-    ../Common/Cpp/Concurrency/ThreadBackends/Thread_StdThread.tpp
-    ../Common/Cpp/Concurrency/ThreadBackends/Thread_StdThreadDetach.tpp
     ../Common/Cpp/Concurrency/Thread.cpp
     ../Common/Cpp/Concurrency/Thread.h
     ../Common/Cpp/Concurrency/Watchdog.cpp

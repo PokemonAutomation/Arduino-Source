@@ -4,6 +4,7 @@
 #include <QFileInfo>
 //#include <QTextStream>
 #include <QMessageBox>
+#include "Common/Cpp/Concurrency/Qt6.9ThreadBugWorkaround.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
 #include "Common/Cpp/Exceptions.h"
@@ -219,7 +220,7 @@ int main(int argc, char *argv[]){
 //
 //  Program will hang after main() without this!
 //
-#if _WIN32 && (QT_VERSION_MAJOR * 1000000 + QT_VERSION_MINOR * 1000 + QT_VERSION_PATCH) > 6008003
+#ifdef PA_ENABLE_QT_ADOPTION_WORKAROUND
     exit(ret);
 #endif
 

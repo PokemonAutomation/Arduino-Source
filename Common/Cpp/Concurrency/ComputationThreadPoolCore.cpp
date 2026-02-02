@@ -34,7 +34,7 @@ ComputationThreadPoolCore::ComputationThreadPoolCore(
 
 void ComputationThreadPoolCore::stop() {
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         if (m_stopping) return;
         m_stopping = true;
         m_thread_cv.notify_all();
@@ -68,7 +68,7 @@ ComputationThreadPoolCore::~ComputationThreadPoolCore(){
 WallDuration ComputationThreadPoolCore::cpu_time() const{
     //  TODO: Don't lock the entire queue.
     WallDuration ret = WallDuration::zero();
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     for (const ThreadData& thread : m_threads){
 //        ret += thread_cpu_time(thread.handle);
         ret += thread.runtime.total();
@@ -78,14 +78,14 @@ WallDuration ComputationThreadPoolCore::cpu_time() const{
 
 
 void ComputationThreadPoolCore::ensure_threads(size_t threads){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     while (m_threads.size() < threads){
         spawn_thread();
     }
 }
 #if 0
 void ComputationThreadPoolCore::wait_for_everything(){
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
     m_dispatch_cv.wait(lg, [this]{
         return m_queue.size() + m_busy_count == 0;
     });
@@ -96,7 +96,7 @@ std::unique_ptr<AsyncTask> ComputationThreadPoolCore::blocking_dispatch(std::fun
     std::unique_ptr<AsyncTask> task(new AsyncTask(std::move(func)));
 
     {
-        std::unique_lock<std::mutex> lg(m_lock);
+        std::unique_lock<Mutex> lg(m_lock);
 
         m_dispatch_cv.wait(lg, [this]{
             return m_queue.size() + m_busy_count < m_max_threads;
@@ -112,7 +112,7 @@ std::unique_ptr<AsyncTask> ComputationThreadPoolCore::blocking_dispatch(std::fun
             AsyncTask* current = m_queue.front();
             m_queue.pop_front();
 
-            ReverseLockGuard<std::mutex> lg0(m_lock);
+            ReverseLockGuard<Mutex> lg0(m_lock);
             current->run();
         }
 #endif
@@ -126,7 +126,7 @@ std::unique_ptr<AsyncTask> ComputationThreadPoolCore::blocking_dispatch(std::fun
 std::unique_ptr<AsyncTask> ComputationThreadPoolCore::try_dispatch(std::function<void()>& func){
     std::unique_ptr<AsyncTask> task;
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
 
         if (m_queue.size() + m_busy_count >= m_max_threads){
             return nullptr;
@@ -180,7 +180,7 @@ void ComputationThreadPoolCore::run_in_parallel(
 
     {
         //  Enqueue all the tasks.
-        std::unique_lock<std::mutex> lg(m_lock);
+        std::unique_lock<Mutex> lg(m_lock);
         for (std::unique_ptr<AsyncTask>& task : tasks){
             m_queue.emplace_back(task.get())->report_started();
             m_thread_cv.notify_one();
@@ -192,7 +192,7 @@ void ComputationThreadPoolCore::run_in_parallel(
             AsyncTask* task = m_queue.front();
             m_queue.pop_front();
 
-            ReverseLockGuard<std::mutex> lg0(m_lock);
+            ReverseLockGuard<Mutex> lg0(m_lock);
             task->run();
         }
     }
@@ -234,7 +234,7 @@ void ComputationThreadPoolCore::thread_loop(ThreadData& data){
 
     data.runtime.start();
 
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
     m_busy_count++;
     while (!m_stopping){
 //        cout << "m_queue... " << m_queue.size() << endl;
@@ -253,7 +253,7 @@ void ComputationThreadPoolCore::thread_loop(ThreadData& data){
         AsyncTask* task = m_queue.front();
         m_queue.pop_front();
 
-        ReverseLockGuard<std::mutex> lg0(m_lock);
+        ReverseLockGuard<Mutex> lg0(m_lock);
         task->run();
     }
 }

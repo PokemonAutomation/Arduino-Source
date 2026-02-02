@@ -20,6 +20,8 @@
 #include <deque>
 #include "Common/Cpp/CpuUtilization/CpuUtilization.h"
 #include "Common/Cpp/Stopwatch.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "AsyncTask.h"
 
@@ -38,7 +40,7 @@ public:
     ~ComputationThreadPoolCore();
 
     size_t current_threads() const{
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         return m_threads.size();
     }
     size_t max_threads() const{
@@ -96,9 +98,12 @@ private:
 
     bool m_stopping;
     size_t m_busy_count;
-    mutable std::mutex m_lock;
-    std::condition_variable m_thread_cv;
-    std::condition_variable m_dispatch_cv;
+//    mutable std::mutex m_lock;
+//    std::condition_variable m_thread_cv;
+//    std::condition_variable m_dispatch_cv;
+    mutable Mutex m_lock;
+    ConditionVariable m_thread_cv;
+    ConditionVariable m_dispatch_cv;
 };
 
 
