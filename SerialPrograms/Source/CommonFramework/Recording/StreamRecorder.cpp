@@ -90,7 +90,7 @@ StreamRecording::StreamRecording(
 }
 StreamRecording::~StreamRecording(){
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_stopping = true;
 //        cout << "signalling: ~StreamRecording()" << endl;
         m_cv.notify_all();
@@ -107,7 +107,7 @@ StreamRecording::~StreamRecording(){
 bool StreamRecording::stop_and_save(const std::string& filename){
     auto scope_check = m_santizer.check_scope();
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_stopping = true;
 //        cout << "signalling: stop_and_save()" << endl;
         m_cv.notify_all();
@@ -134,7 +134,7 @@ void StreamRecording::push_samples(WallClock timestamp, const float* data, size_
     }
     WallClock threshold = timestamp - m_buffer_limit;
 
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     if (m_stopping){
         return;
     }
@@ -174,7 +174,7 @@ void StreamRecording::push_frame(std::shared_ptr<const VideoFrame> frame){
 //    cout << "push_frame(): " << frame->frame.startTime() << " - " << frame->frame.endTime() << endl;
     WallClock threshold = frame->timestamp - m_buffer_limit;
 
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     if (m_stopping){
         return;
     }
@@ -218,7 +218,7 @@ std::unique_ptr<QAudioBufferInput> StreamRecording::initialize_audio(){
     connect(
         m_audio_input, &QAudioBufferInput::readyToSendAudioBuffer,
         m_recorder, [this](){
-            std::lock_guard<std::mutex> lg(m_lock);
+            std::lock_guard<Mutex> lg(m_lock);
             m_cv.notify_all();
         },
         Qt::DirectConnection
@@ -273,7 +273,7 @@ std::unique_ptr<QVideoFrameInput> StreamRecording::initialize_video(){
     connect(
         m_video_input, &QVideoFrameInput::readyToSendVideoFrame,
         m_recorder, [this](){
-            std::lock_guard<std::mutex> lg(m_lock);
+            std::lock_guard<Mutex> lg(m_lock);
             m_cv.notify_all();
         },
         Qt::DirectConnection
@@ -306,7 +306,7 @@ void StreamRecording::internal_run(){
         m_recorder, &QMediaRecorder::recorderStateChanged,
         m_recorder, [this](QMediaRecorder::RecorderState state){
             if (state == QMediaRecorder::StoppedState){
-                std::lock_guard<std::mutex> lg(m_lock);
+                std::lock_guard<Mutex> lg(m_lock);
 //                cout << "signalling: StoppedState" << endl;
                 m_stopping = true;
                 m_cv.notify_all();
@@ -341,7 +341,7 @@ void StreamRecording::internal_run(){
         QCoreApplication::processEvents();
 
         {
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
             if (m_stopping){
                 break;
             }
@@ -385,7 +385,7 @@ void StreamRecording::internal_run(){
 //        cout << "After: " << m_video_input << endl;
 
         if (!progress_made){
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
             if (m_stopping){
                 break;
             }
@@ -415,7 +415,7 @@ void StreamRecording::run(){
         internal_run();
     }catch (...){
         m_logger.log("Exception thrown out of stream recorder...", COLOR_RED);
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_stopping = true;
     }
 }
@@ -499,7 +499,7 @@ StreamRecording2::~StreamRecording2(){
     stop();
 #else
     {
-        std::unique_lock<std::mutex> lg(m_lock);
+        std::unique_lock<Mutex> lg(m_lock);
         if (m_stopping){
             return;
         }
@@ -519,7 +519,7 @@ void StreamRecording2::stop(){
     auto scope_check = m_santizer.check_scope();
 
     {
-        std::unique_lock<std::mutex> lg(m_lock);
+        std::unique_lock<Mutex> lg(m_lock);
         if (m_stopping){
             return;
         }
@@ -563,7 +563,7 @@ void StreamRecording2::initialize_audio(){
         m_audio_input.get(), &QAudioBufferInput::readyToSendAudioBuffer,
         m_recorder.get(), [this](){
 //            cout << "readyToSendAudioBuffer()" << endl;
-//            std::lock_guard<std::mutex> lg(m_lock);
+//            std::lock_guard<Mutex> lg(m_lock);
 //            m_cv.notify_all();
             process();
         },
@@ -617,7 +617,7 @@ void StreamRecording2::initialize_video(){
         m_video_input.get(), &QVideoFrameInput::readyToSendVideoFrame,
         m_recorder.get(), [this](){
 //            cout << "readyToSendVideoFrame()" << endl;
-//            std::lock_guard<std::mutex> lg(m_lock);
+//            std::lock_guard<Mutex> lg(m_lock);
 //            m_cv.notify_all();
             process();
         },
@@ -638,7 +638,7 @@ void StreamRecording2::push_samples(WallClock timestamp, const float* data, size
     WallClock threshold = timestamp - m_buffer_limit;
 
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         if (m_stopping){
             return;
         }
@@ -681,7 +681,7 @@ void StreamRecording2::push_frame(std::shared_ptr<const VideoFrame> frame){
     WallClock threshold = frame->timestamp - m_buffer_limit;
 
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         if (m_stopping){
             return;
         }
@@ -738,7 +738,7 @@ void StreamRecording2::process(){
     bool progress_made;
     do{
         {
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
             if (m_stopping){
                 cout << "exit" << endl; //  REMOVE
                 break;

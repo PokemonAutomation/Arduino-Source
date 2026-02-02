@@ -15,7 +15,7 @@ void QueuedLogger::log(const char* msg, Color color){
     log(std::string(msg), color);
 }
 void QueuedLogger::log(const std::string& msg, Color color){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     m_queue.emplace_back(new Entry{
         current_time(),
         color,
@@ -28,7 +28,7 @@ void QueuedLogger::log(const QString& msg, Color color){
 }
 
 std::unique_ptr<QueuedLogger::Entry> QueuedLogger::get(){
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
     if (m_queue.empty()){
         m_cv.wait(lg);
     }
@@ -40,7 +40,7 @@ std::unique_ptr<QueuedLogger::Entry> QueuedLogger::get(){
     return entry;
 }
 void QueuedLogger::signal(){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     m_cv.notify_all();
 }
 #endif

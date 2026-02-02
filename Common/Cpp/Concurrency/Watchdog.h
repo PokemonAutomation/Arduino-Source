@@ -15,10 +15,10 @@
 #define PokemonAutomation_Watchdog_H
 
 #include <map>
-#include <mutex>
-#include <condition_variable>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 
 namespace PokemonAutomation{
@@ -67,7 +67,7 @@ private:
         WatchdogCallback& callback;
         std::chrono::milliseconds period;
         Schedule::iterator iter;
-        std::mutex lock;
+        Mutex lock;
 
         Entry(
             WatchdogCallback& p_callback,
@@ -90,9 +90,9 @@ private:
 
     //  Nothing should ever acquire both locks at once.
     SpinLock m_state_lock;
-    std::mutex m_sleep_lock;
+    Mutex m_sleep_lock;
 
-    std::condition_variable m_cv;
+    ConditionVariable m_cv;
     Thread m_thread;
 };
 

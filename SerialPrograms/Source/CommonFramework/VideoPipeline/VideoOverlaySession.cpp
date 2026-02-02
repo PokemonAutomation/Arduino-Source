@@ -25,7 +25,7 @@ void VideoOverlaySession::remove_listener(ContentListener& listener){
 
 VideoOverlaySession::~VideoOverlaySession(){
     {
-        std::lock_guard<std::mutex> lg(m_stats_lock);
+        std::lock_guard<Mutex> lg(m_stats_lock);
         m_stopping = true;
     }
     m_stats_cv.notify_all();
@@ -73,7 +73,7 @@ void VideoOverlaySession::set(const VideoOverlayOption& option){
 
 
 void VideoOverlaySession::stats_thread(){
-    std::unique_lock<std::mutex> lg(m_stats_lock);
+    std::unique_lock<Mutex> lg(m_stats_lock);
     while (!m_stopping){
         {
             std::vector<OverlayStatSnapshot> lines;

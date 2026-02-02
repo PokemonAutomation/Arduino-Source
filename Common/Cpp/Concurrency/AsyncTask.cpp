@@ -23,7 +23,7 @@ AsyncTask::~AsyncTask(){
     }
 
     {
-        std::unique_lock<std::mutex> lg(m_lock);
+        std::unique_lock<Mutex> lg(m_lock);
         m_cv.wait(lg, [this]{
             return m_state.load(std::memory_order_relaxed) != State::RUNNING;
         });
@@ -44,7 +44,7 @@ void AsyncTask::report_cancelled() noexcept{
 #endif
         m_state.store(State::FINISHED, std::memory_order_release);
         {
-            std::lock_guard<std::mutex> lg(m_lock);
+            std::lock_guard<Mutex> lg(m_lock);
         }
         m_cv.notify_all();
     }
@@ -58,7 +58,7 @@ void AsyncTask::run() noexcept{
         try{
             m_task();
         }catch (...){
-            std::lock_guard<std::mutex> lg(m_lock);
+            std::lock_guard<Mutex> lg(m_lock);
             m_exception = std::current_exception();
         }
     }

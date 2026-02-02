@@ -8,13 +8,14 @@
 #define PokemonAutomation_DiscordWebhook_H
 
 #include <deque>
-#include <condition_variable>
 #include <QNetworkReply>
 #include "Common/Cpp/Time.h"
-#include "Common/Cpp/Logging/TaggedLogger.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
-#include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Options/ScreenshotFormatOption.h"
+#include "Common/Cpp/Logging/TaggedLogger.h"
+//#include "CommonFramework/Logging/Logger.h"
+//#include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
 
 class QEventLoop;
@@ -76,10 +77,10 @@ private:
 private:
     TaggedLogger m_logger;
     std::atomic<bool> m_stopping;
-    std::mutex m_lock;
-    std::condition_variable m_cv;
+    Mutex m_lock;
+    ConditionVariable m_cv;
 
-    std::mutex m_send_lock;
+    Mutex m_send_lock;
     std::unique_ptr<QEventLoop> m_event_loop;
 
     std::deque<WallClock> m_sent;

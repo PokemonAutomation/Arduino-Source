@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_CommonTools_InterruptableCommands_H
 #define PokemonAutomation_CommonTools_InterruptableCommands_H
 
-#include <mutex>
-#include <condition_variable>
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 
@@ -74,8 +74,8 @@ private:
     ControllerType& m_controller;
     std::unique_ptr<CommandSet> m_current;
 
-    std::mutex m_lock;
-    std::condition_variable m_cv;
+    Mutex m_lock;
+    ConditionVariable m_cv;
     std::unique_ptr<AsyncTask> m_thread;
 
     LifetimeSanitizer m_sanitizer;

@@ -75,7 +75,7 @@ void SerialPABotBase_Keyboard::stop(){
 
 
 void SerialPABotBase_Keyboard::cancel_all_commands(){
-    std::lock_guard<std::mutex> lg(m_state_lock);
+    std::lock_guard<Mutex> lg(m_state_lock);
     if (!is_ready()){
         throw InvalidConnectionStateException(error_string());
     }
@@ -83,7 +83,7 @@ void SerialPABotBase_Keyboard::cancel_all_commands(){
     m_scheduler.clear_on_next();
 }
 void SerialPABotBase_Keyboard::replace_on_next_command(){
-    std::lock_guard<std::mutex> lg(m_state_lock);
+    std::lock_guard<Mutex> lg(m_state_lock);
     if (!is_ready()){
         throw InvalidConnectionStateException(error_string());
     }
@@ -94,9 +94,9 @@ void SerialPABotBase_Keyboard::replace_on_next_command(){
 
 void SerialPABotBase_Keyboard::wait_for_all(Cancellable* cancellable){
     SuperscalarScheduler::Schedule schedule;
-    std::lock_guard<std::mutex> lg0(m_issue_lock);
+    std::lock_guard<Mutex> lg0(m_issue_lock);
     {
-        std::lock_guard<std::mutex> lg1(m_state_lock);
+        std::lock_guard<Mutex> lg1(m_state_lock);
         m_logger.log("wait_for_all()", COLOR_DARKGREEN);
 
         if (!is_ready()){

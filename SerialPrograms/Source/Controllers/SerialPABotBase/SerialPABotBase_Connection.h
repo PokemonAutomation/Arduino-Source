@@ -9,8 +9,8 @@
 
 #include <memory>
 //#include <set>
-#include <mutex>
-#include <condition_variable>
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "Controllers/SerialPABotBase/Connection/BotBase.h"
 #include "Controllers/SerialPABotBase/Connection/PABotBase.h"
@@ -72,9 +72,9 @@ private:
 
     Thread m_status_thread;
     std::unique_ptr<PABotBase> m_botbase;
-    mutable std::mutex m_lock;
-    std::mutex m_sleep_lock;
-    std::condition_variable m_cv;
+    mutable Mutex m_lock;
+    Mutex m_sleep_lock;
+    ConditionVariable m_cv;
 };
 
 

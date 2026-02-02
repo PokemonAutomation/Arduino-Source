@@ -12,8 +12,8 @@
 
 #include <vector>
 #include <map>
-#include <mutex>
 #include <memory>
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "CommonFramework/Globals.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 #include "ProgramTrackerInterfaces.h"
@@ -74,7 +74,7 @@ public:
 private:
     struct ProgramData;
 
-    std::mutex m_lock;
+    Mutex m_lock;
     uint64_t m_program_instance_counter = 0;
     uint64_t m_console_instance_counter = 0;
     std::map<uint64_t, std::unique_ptr<ProgramData>> m_programs;

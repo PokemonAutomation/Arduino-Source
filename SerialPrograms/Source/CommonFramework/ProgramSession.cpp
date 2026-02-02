@@ -51,14 +51,14 @@ const std::string& ProgramSession::identifier() const{
     return m_descriptor.identifier();
 }
 std::string ProgramSession::current_stats() const{
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     if (m_current_stats){
         return m_current_stats->to_str(StatsTracker::DISPLAY_ON_SCREEN);
     }
     return "";
 }
 std::string ProgramSession::historical_stats() const{
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     if (m_historical_stats){
         return m_historical_stats->to_str(StatsTracker::DISPLAY_ON_SCREEN);
     }
@@ -70,11 +70,11 @@ WallClock ProgramSession::timestamp() const{
 
 
 void ProgramSession::report_stats_changed(){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     push_stats();
 }
 void ProgramSession::report_error(const std::string& message){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     push_error(message);
 }
 
@@ -144,7 +144,7 @@ void ProgramSession::update_historical_stats_with_current(){
 
 std::string ProgramSession::start_program(){
     m_logger.log("Received Program Start Request");
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
 
     ProgramState state = this->current_state();
     switch (state){
@@ -193,7 +193,7 @@ std::string ProgramSession::start_program(){
 std::string ProgramSession::stop_program(){
     m_logger.log("Received Stop Request");
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
 
         ProgramState state = this->current_state();
         switch (state){
@@ -226,14 +226,14 @@ std::string ProgramSession::stop_program(){
 
 void ProgramSession::run_program(){
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_current_stats = m_descriptor.make_stats();
         load_historical_stats();
         push_stats();
     }
     internal_run_program();
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         push_stats();
         update_historical_stats_with_current();
         set_state(ProgramState::STOPPED);

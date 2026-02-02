@@ -11,12 +11,12 @@
 
 #include <chrono>
 #include <map>
-#include <mutex>
-#include <condition_variable>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/EventRateTracker.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "AsyncDispatcher.h"
 
 namespace PokemonAutomation{
@@ -93,8 +93,8 @@ private:
     AsyncDispatcher& m_dispatcher;
 
     std::atomic<size_t> m_pending_waits;
-    std::mutex m_lock;
-    std::condition_variable m_cv;
+    Mutex m_lock;
+    ConditionVariable m_cv;
 
     mutable SpinLock m_stats_lock;
     UtilizationTracker m_utilization;

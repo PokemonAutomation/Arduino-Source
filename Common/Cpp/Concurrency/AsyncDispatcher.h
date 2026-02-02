@@ -15,8 +15,8 @@
 #include <vector>
 #include <deque>
 #include <functional>
-#include <mutex>
-#include <condition_variable>
+#include "Mutex.h"
+#include "ConditionVariable.h"
 #include "Thread.h"
 #include "AsyncTask.h"
 
@@ -54,8 +54,8 @@ private:
     std::vector<Thread> m_threads;
     bool m_stopping;
     size_t m_busy_count;
-    std::mutex m_lock;
-    std::condition_variable m_cv;
+    Mutex m_lock;
+    ConditionVariable m_cv;
 };
 
 

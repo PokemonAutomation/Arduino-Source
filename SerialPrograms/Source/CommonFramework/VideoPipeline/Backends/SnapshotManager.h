@@ -8,8 +8,8 @@
 #define PokemonAutomation_VideoPipeline_SnapshotManager_H
 
 #include <map>
-#include <mutex>
-#include <condition_variable>
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/Tools/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -48,8 +48,8 @@ private:
     Logger& m_logger;
     QVideoFrameCache& m_cache;
 
-    std::mutex m_lock;
-    std::condition_variable m_cv;
+    Mutex m_lock;
+    ConditionVariable m_cv;
 
     size_t m_active_conversions;
     std::map<uint64_t, std::unique_ptr<AsyncTask>> m_pending_conversions;

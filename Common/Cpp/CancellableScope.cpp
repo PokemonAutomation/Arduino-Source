@@ -7,12 +7,12 @@
 #include <exception>
 #include <set>
 #include <atomic>
-#include <mutex>
-#include <condition_variable>
 #include "Exceptions.h"
 #include "ListenerSet.h"
 #include "Containers/Pimpl.tpp"
 #include "Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "CancellableScope.h"
 
 //#include <iostream>
@@ -119,8 +119,8 @@ void Cancellable::detach() noexcept{
 struct CancellableScopeData{
     std::set<Cancellable*> children;
 
-    std::mutex lock;
-    std::condition_variable cv;
+    Mutex lock;
+    ConditionVariable cv;
 };
 
 
@@ -157,7 +157,7 @@ void CancellableScope::wait_until(WallClock stop){
     throw_if_cancelled();
     CancellableScopeData& data(*m_impl);
     {
-        std::unique_lock<std::mutex> lg(data.lock);
+        std::unique_lock<Mutex> lg(data.lock);
         data.cv.wait_until(
             lg, stop,
             [this, stop]{
@@ -172,7 +172,7 @@ void CancellableScope::wait_until_cancel(){
     throw_if_cancelled();
     CancellableScopeData& data(*m_impl);
     {
-        std::unique_lock<std::mutex> lg(data.lock);
+        std::unique_lock<Mutex> lg(data.lock);
         data.cv.wait(
             lg,
             [this]{
@@ -186,7 +186,7 @@ void CancellableScope::operator+=(Cancellable& cancellable){
 //    cout << "Attaching: " << &cancellable << endl;
     auto scope_check = m_sanitizer.check_scope();
     CancellableScopeData& data(*m_impl);
-    std::lock_guard<std::mutex> lg(data.lock);
+    std::lock_guard<Mutex> lg(data.lock);
     throw_if_cancelled();
     data.children.insert(&cancellable);
 }
@@ -194,7 +194,7 @@ void CancellableScope::operator-=(Cancellable& cancellable){
 //    cout << "Detaching: " << &cancellable << endl;
     auto scope_check = m_sanitizer.check_scope();
     CancellableScopeData& data(*m_impl);
-    std::lock_guard<std::mutex> lg(data.lock);
+    std::lock_guard<Mutex> lg(data.lock);
     data.children.erase(&cancellable);
 }
 

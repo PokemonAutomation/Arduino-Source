@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_ReliableStreamConnection_H
 #define PokemonAutomation_ReliableStreamConnection_H
 
-#include <mutex>
-#include <condition_variable>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "Common/PABotBase2/PABotBase2_PacketSender.h"
 #include "Common/PABotBase2/PABotBase2_PacketParser.h"
@@ -108,8 +108,8 @@ private:
 
     std::string m_error;
 
-    mutable std::mutex m_lock;
-    std::condition_variable m_cv;
+    mutable Mutex m_lock;
+    ConditionVariable m_cv;
     Thread m_retransmit_thread;
 };
 

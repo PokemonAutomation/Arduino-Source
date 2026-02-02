@@ -47,7 +47,7 @@ void ProController_SysbotBase::stop(){
         return;
     }
     {
-        std::lock_guard<std::mutex> lg(m_state_lock);
+        std::lock_guard<Mutex> lg(m_state_lock);
         m_cv.notify_all();
     }
 }
@@ -56,7 +56,7 @@ void ProController_SysbotBase::stop(){
 
 void ProController_SysbotBase::cancel_all_commands(){
 //    cout << "ProController_SysbotBase::cancel_all_commands()" << endl;
-    std::lock_guard<std::mutex> lg(m_state_lock);
+    std::lock_guard<Mutex> lg(m_state_lock);
     size_t queue_size = m_command_queue.size();
     m_next_state_change = WallClock::min();
     m_command_queue.clear();
@@ -66,7 +66,7 @@ void ProController_SysbotBase::cancel_all_commands(){
 }
 void ProController_SysbotBase::replace_on_next_command(){
 //    cout << "ProController_SysbotBase::replace_on_next_command - Enter()" << endl;
-    std::lock_guard<std::mutex> lg(m_state_lock);
+    std::lock_guard<Mutex> lg(m_state_lock);
     m_cv.notify_all();
     m_replace_on_next = true;
     m_scheduler.clear_on_next();
@@ -77,15 +77,15 @@ void ProController_SysbotBase::replace_on_next_command(){
 void ProController_SysbotBase::wait_for_all(Cancellable* cancellable){
 //    cout << "ProController_SysbotBase::wait_for_all - Enter()" << endl;
     SuperscalarScheduler::Schedule schedule;
-    std::lock_guard<std::mutex> lg0(m_issue_lock);
+    std::lock_guard<Mutex> lg0(m_issue_lock);
     {
-        std::lock_guard<std::mutex> lg1(m_state_lock);
+        std::lock_guard<Mutex> lg1(m_state_lock);
         m_logger.log("wait_for_all(): Command Queue Size = " + std::to_string(m_command_queue.size()), COLOR_DARKGREEN);
         m_scheduler.issue_wait_for_all(schedule);
     }
     execute_schedule(cancellable, schedule);
 
-    std::unique_lock<std::mutex> lg1(m_state_lock);
+    std::unique_lock<Mutex> lg1(m_state_lock);
     m_cv.wait(lg1, [this]{
         return m_next_state_change == WallClock::max() || m_replace_on_next;
     });
@@ -111,7 +111,7 @@ void ProController_SysbotBase::execute_state(
     }
 
     //  Wait until there is space.
-    std::unique_lock<std::mutex> lg(m_state_lock);
+    std::unique_lock<Mutex> lg(m_state_lock);
     m_cv.wait(lg, [this]{
         return m_command_queue.size() < QUEUE_SIZE || m_replace_on_next;
     });
@@ -271,7 +271,7 @@ void ProController_SysbotBase::thread_body(){
 
     ProControllerState current_state;
 
-    std::unique_lock<std::mutex> lg(m_state_lock);
+    std::unique_lock<Mutex> lg(m_state_lock);
     while (!m_stopping.load(std::memory_order_relaxed)){
         WallClock now = current_time();
 

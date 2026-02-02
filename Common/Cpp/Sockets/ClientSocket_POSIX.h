@@ -10,8 +10,6 @@
 #define PokemonAutomation_ClientSocket_POSIX_H
 
 #include <iostream>
-#include <mutex>
-#include <condition_variable>
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <netinet/in.h>
@@ -20,6 +18,8 @@
 #include <cerrno>
 #include <cstring>
 #include <signal.h>
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "AbstractClientSocket.h"
 
@@ -47,14 +47,14 @@ public:
 
     virtual void close() noexcept override{
         {
-            std::lock_guard<std::mutex> lg1(m_lock);
+            std::lock_guard<Mutex> lg1(m_lock);
             m_state.store(State::DESTRUCTING, std::memory_order_relaxed);
             m_cv.notify_all();
         }
     }
 
     virtual void connect(const std::string& address, uint16_t port) override{
-        std::lock_guard<std::mutex> lg1(m_lock);
+        std::lock_guard<Mutex> lg1(m_lock);
         if (m_state.load(std::memory_order_relaxed) != State::NOT_RUNNING){
             return;
         }
@@ -92,7 +92,7 @@ public:
                 continue;
             }
 
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
             if (state() == State::DESTRUCTING){
                 break;
             }
@@ -148,7 +148,7 @@ private:
         m_listeners.run_method(&Listener::on_thread_start);
 
         {
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
 
             sockaddr_in server;
             std::memset(&server, 0, sizeof(server));
@@ -215,7 +215,7 @@ Connected:
             ssize_t bytes;
             int error = 0;
             {
-                std::unique_lock<std::mutex> lg(m_lock);
+                std::unique_lock<Mutex> lg(m_lock);
                 State state = m_state.load(std::memory_order_relaxed);
                 if (state == State::DESTRUCTING){
                     return;
@@ -232,7 +232,7 @@ Connected:
                 continue;
             }
 
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
             if (state() == State::DESTRUCTING){
                 return;
             }
@@ -267,8 +267,8 @@ private:
 
     std::string m_error;
 
-    mutable std::mutex m_lock;
-    std::condition_variable m_cv;
+    mutable Mutex m_lock;
+    ConditionVariable m_cv;
     Thread m_thread;
 };
 

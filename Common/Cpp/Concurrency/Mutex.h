@@ -11,6 +11,7 @@
 
 #ifdef PA_ENABLE_QT_ADOPTION_WORKAROUND
 
+#include <mutex>
 #include <QMutex>
 namespace PokemonAutomation{
     using Mutex = QMutex;

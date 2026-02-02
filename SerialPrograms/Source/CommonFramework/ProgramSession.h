@@ -16,11 +16,11 @@
 #ifndef PokemonAutomation_CommonFramework_ProgramSession_H
 #define PokemonAutomation_CommonFramework_ProgramSession_H
 
-#include <mutex>
 #include <atomic>
 #include "Common/Cpp/Logging/TaggedLogger.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/ListenerSet.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Logging/Logger.h"
@@ -74,7 +74,7 @@ public:
     StatsTracker* current_stats_tracker(){ return m_current_stats.get(); }
     const StatsTracker* historical_stats_tracker() const{ return m_historical_stats.get(); }
 
-    std::mutex& program_lock() const{ return m_lock; }
+    Mutex& program_lock() const{ return m_lock; }
 
 
 public:
@@ -128,13 +128,13 @@ private:
     uint64_t m_instance_id = 0;
     TaggedLogger m_logger;
 
-    mutable std::mutex m_lock;
+    mutable Mutex m_lock;
 
     std::atomic<WallClock> m_timestamp;
     std::atomic<ProgramState> m_state;
     Thread m_thread;
 
-//    std::mutex m_stats_lock;
+//    Mutex m_stats_lock;
     std::unique_ptr<StatsTracker> m_historical_stats;
     std::unique_ptr<StatsTracker> m_current_stats;
 //    CancellableScope* m_scope = nullptr;

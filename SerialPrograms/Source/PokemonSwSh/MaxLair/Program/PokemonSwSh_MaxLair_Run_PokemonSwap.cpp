@@ -67,7 +67,7 @@ void run_swap_pokemon(
     bool swap = should_swap_with_newly_caught(stream.logger(), inferred, player_index, options);
     if (swap){
         stream.log("Choosing to swap for: " + options[1], COLOR_PURPLE);
-        std::lock_guard<std::mutex> lg(runtime.m_delay_lock);
+        std::lock_guard<Mutex> lg(runtime.m_delay_lock);
         pbf_mash_button(context, BUTTON_A, 1000ms);
         context.wait_for_all_requests();
     }else{

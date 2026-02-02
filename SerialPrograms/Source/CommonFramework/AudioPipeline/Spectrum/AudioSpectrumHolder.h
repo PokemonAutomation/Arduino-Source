@@ -8,11 +8,10 @@
 #define PokemonAutomation_AudioPipeline_AudioSpectrumHolder_H
 
 #include <list>
-#include <set>
-#include <mutex>
 #include <fstream>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/ListenerSet.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "Spectrograph.h"
@@ -108,7 +107,7 @@ private:
     // The head of the list is the most recent overlay added.
     std::list<std::tuple<size_t, size_t, Color>> m_overlay;
 
-    mutable std::mutex m_state_lock;
+    mutable Mutex m_state_lock;
     ListenerSet<Listener> m_listeners;
 };
 

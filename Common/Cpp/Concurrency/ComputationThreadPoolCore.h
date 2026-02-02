@@ -98,9 +98,6 @@ private:
 
     bool m_stopping;
     size_t m_busy_count;
-//    mutable std::mutex m_lock;
-//    std::condition_variable m_thread_cv;
-//    std::condition_variable m_dispatch_cv;
     mutable Mutex m_lock;
     ConditionVariable m_thread_cv;
     ConditionVariable m_dispatch_cv;

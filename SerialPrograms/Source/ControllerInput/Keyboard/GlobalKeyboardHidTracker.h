@@ -8,11 +8,11 @@
 #define PokemonAutomation_ControllerInput_Keyboard_GlobalKeyboardHidTracker_H
 
 #include <set>
-#include <condition_variable>
 #include "Common/Cpp/Logging/TaggedLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/Thread.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "ControllerInput/ControllerInput.h"
 //#include "KeyboardHidButtons.h"
 #include "KeyboardInput_State.h"
@@ -50,8 +50,8 @@ private:
 
     std::atomic<bool> m_stopping;
 
-    std::mutex m_sleep_lock;
-    std::condition_variable m_cv;
+    Mutex m_sleep_lock;
+    ConditionVariable m_cv;
     Thread m_thread;
 };
 

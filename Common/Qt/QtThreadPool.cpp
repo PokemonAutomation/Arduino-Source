@@ -35,7 +35,7 @@ public:
         m_cv.notify_all();
     }
     void wait(){
-        std::unique_lock<std::mutex> lg(m_parent.m_lock);
+        std::unique_lock<Mutex> lg(m_parent.m_lock);
         m_cv.wait(lg, [this]{ return m_lambda == nullptr; });
     }
 
@@ -45,7 +45,7 @@ private:
 //        exec();
         while (true){
             {
-                std::unique_lock<std::mutex> lg(m_parent.m_lock);
+                std::unique_lock<Mutex> lg(m_parent.m_lock);
                 if (m_parent.m_stopping){
                     break;
                 }
@@ -56,7 +56,7 @@ private:
             }
             m_lambda();
             {
-                std::lock_guard<std::mutex> lg(m_parent.m_lock);
+                std::lock_guard<Mutex> lg(m_parent.m_lock);
                 m_lambda = nullptr;
                 m_parent.m_available_threads.emplace_back(this);
                 m_cv.notify_all();
@@ -67,7 +67,7 @@ private:
 
     QWorkerThreadPool& m_parent;
     std::function<void()> m_lambda;
-    std::condition_variable m_cv;
+    ConditionVariable m_cv;
 };
 
 
@@ -80,7 +80,7 @@ QWorkerThreadPool::~QWorkerThreadPool(){
 
 void QWorkerThreadPool::stop(){
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_stopping = true;
     }
     m_cv.notify_all();
@@ -94,7 +94,7 @@ void QWorkerThreadPool::dispatch(std::function<void()> lambda){
     }
     QWorkerThread* thread;
     {
-        std::unique_lock<std::mutex> lg(m_lock);
+        std::unique_lock<Mutex> lg(m_lock);
         if (m_available_threads.empty()){
             m_available_threads.reserve(m_threads.size() + 1);
             auto& new_thread = m_threads.emplace_back(std::make_unique<QWorkerThread>(*this));
@@ -110,7 +110,7 @@ void QWorkerThreadPool::run_and_wait(std::function<void()> lambda){
     }
     QWorkerThread* thread;
     {
-        std::unique_lock<std::mutex> lg(m_lock);
+        std::unique_lock<Mutex> lg(m_lock);
         if (m_available_threads.empty()){
             m_available_threads.reserve(m_threads.size() + 1);
             auto& new_thread = m_threads.emplace_back(std::make_unique<QWorkerThread>(*this));

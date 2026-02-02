@@ -10,6 +10,8 @@
 #define PokemonAutomation_SerialPABotBase_StatusThread_H
 
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "SerialPABotBase_Connection.h"
 
 //#include <iostream>
@@ -48,7 +50,7 @@ public:
         }
         m_scope.cancel(nullptr);
         {
-            std::unique_lock<std::mutex> lg(m_sleep_lock);
+            std::unique_lock<Mutex> lg(m_sleep_lock);
             BotBaseController* botbase = m_connection.botbase();
             if (botbase){
                 botbase->on_cancellable_cancel();
@@ -82,7 +84,7 @@ private:
     //                settings.log_everything.store(true, std::memory_order_release);
                 }
 
-                std::unique_lock<std::mutex> lg(m_sleep_lock);
+                std::unique_lock<Mutex> lg(m_sleep_lock);
                 if (m_stopping.load(std::memory_order_relaxed) ||
                     m_error.load(std::memory_order_acquire) ||
                     !m_connection.is_ready()
@@ -127,7 +129,7 @@ private:
                 m_callback.stop_with_error(std::move(error));
             }
 
-            std::unique_lock<std::mutex> lg(m_sleep_lock);
+            std::unique_lock<Mutex> lg(m_sleep_lock);
             if (m_stopping.load(std::memory_order_relaxed) || !m_connection.is_ready()){
                 break;
             }
@@ -141,7 +143,7 @@ private:
         }
 
         {
-            std::unique_lock<std::mutex> lg(m_sleep_lock);
+            std::unique_lock<Mutex> lg(m_sleep_lock);
             m_cv.notify_all();
         }
         watchdog.join();
@@ -153,8 +155,8 @@ private:
     CancellableHolder<CancellableScope> m_scope;
     std::atomic<bool> m_stopping;
     std::atomic<bool> m_error;
-    std::mutex m_sleep_lock;
-    std::condition_variable m_cv;
+    Mutex m_sleep_lock;
+    ConditionVariable m_cv;
     Thread m_status_thread;
 };
 

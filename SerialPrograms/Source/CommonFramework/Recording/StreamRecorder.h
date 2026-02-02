@@ -18,6 +18,8 @@
 #include <QMediaRecorder>
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Time.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 
@@ -141,8 +143,8 @@ private:
     QAudioFormat m_audio_format;
     std::string m_filename;
 
-    std::mutex m_lock;
-    std::condition_variable m_cv;
+    Mutex m_lock;
+    ConditionVariable m_cv;
 
     bool m_stopping = false;
     WallClock m_last_drop;
@@ -202,7 +204,7 @@ private:
     QAudioFormat m_audio_format;
     std::string m_filename;
 
-    std::mutex m_lock;
+    Mutex m_lock;
 //    std::condition_variable m_cv;
 
     bool m_stopping = false;

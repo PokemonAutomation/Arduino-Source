@@ -80,7 +80,7 @@ public:
     virtual ~AllJoinedTracker(){}
 
     bool report_joined(){
-        std::unique_lock<std::mutex> lg(m_lock);
+        std::unique_lock<Mutex> lg(m_lock);
         m_counter++;
         if (m_counter >= m_consoles){
             m_cv.notify_all();
@@ -102,14 +102,14 @@ public:
         if (Cancellable::cancel(std::move(exception))){
             return true;
         }
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_cv.notify_all();
         return false;
     }
 
 private:
-    std::mutex m_lock;
-    std::condition_variable m_cv;
+    Mutex m_lock;
+    ConditionVariable m_cv;
 
     WallClock m_time_limit;
     size_t m_consoles;

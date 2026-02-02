@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_Concurrency_Qt69ThreadBugWorkaround_H
 #define PokemonAutomation_Concurrency_Qt69ThreadBugWorkaround_H
 
-
 //#define PA_ENABLE_QT_ADOPTION_WORKAROUND
 
 

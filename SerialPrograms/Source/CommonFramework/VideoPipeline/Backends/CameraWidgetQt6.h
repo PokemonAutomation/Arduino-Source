@@ -10,11 +10,11 @@
 #include <QtGlobal>
 #if QT_VERSION_MAJOR == 6
 
-#include <mutex>
 #include <QWidget>
 #include <QCameraDevice>
 #include <QMediaCaptureSession>
 #include <QVideoFrame>
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "CommonFramework/Tools/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/VideoSource.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
@@ -92,7 +92,7 @@ private:
     Logger& m_logger;
     Resolution m_resolution;
 
-    std::mutex m_snapshot_lock;
+    Mutex m_snapshot_lock;
 
     std::unique_ptr<QCameraThread> m_camera;
     std::unique_ptr<QVideoSink> m_video_sink;

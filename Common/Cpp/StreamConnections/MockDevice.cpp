@@ -39,10 +39,10 @@ MockDevice::MockDevice()
 MockDevice::~MockDevice(){
     m_stopping.store(true, std::memory_order_release);
     {
-        std::lock_guard<std::mutex> lg(m_device_lock);
+        std::lock_guard<Mutex> lg(m_device_lock);
     }
     {
-        std::lock_guard<std::mutex> lg(m_host_lock);
+        std::lock_guard<Mutex> lg(m_host_lock);
     }
     m_device_cv.notify_all();
     m_host_cv.notify_all();
@@ -50,7 +50,7 @@ MockDevice::~MockDevice(){
     m_host_thread.join();
 }
 void MockDevice::print() const{
-    std::lock_guard<std::mutex> lg(m_device_lock);
+    std::lock_guard<Mutex> lg(m_device_lock);
     pabb2_StreamCoalescer_print(&m_connection.stream_coalescer, true);
 }
 
@@ -81,7 +81,7 @@ size_t MockDevice::device_send_serial(const void* data, size_t bytes, bool is_re
         }
     }
     {
-        std::lock_guard<std::mutex> lg(m_host_lock);
+        std::lock_guard<Mutex> lg(m_host_lock);
     }
     m_host_cv.notify_all();
     return bytes;
@@ -123,7 +123,7 @@ size_t MockDevice::send(const void* data, size_t bytes){
         }
     }
     {
-        std::lock_guard<std::mutex> lg(m_device_lock);
+        std::lock_guard<Mutex> lg(m_device_lock);
 //        cout << "MockDevice::send(const void* data, size_t bytes) - notifying" << endl;
     }
     m_device_cv.notify_all();
@@ -132,7 +132,7 @@ size_t MockDevice::send(const void* data, size_t bytes){
 
 
 void MockDevice::device_thread(){
-    std::unique_lock<std::mutex> lg(m_device_lock);
+    std::unique_lock<Mutex> lg(m_device_lock);
     while (!m_stopping.load(std::memory_order_relaxed)){
         pabb2_ReliableStreamConnection_run_events(&m_connection);
         m_device_cv.wait(lg);
@@ -142,7 +142,7 @@ void MockDevice::host_recv_thread(){
     while (!m_stopping.load(std::memory_order_relaxed)){
         std::vector<uint8_t> data;
         {
-            std::unique_lock<std::mutex> lg0(m_host_lock);
+            std::unique_lock<Mutex> lg0(m_host_lock);
             {
                 WriteSpinLock lg1(m_device_to_host_lock);
                 data = std::vector<uint8_t>(m_device_to_host_line.begin(), m_device_to_host_line.end());

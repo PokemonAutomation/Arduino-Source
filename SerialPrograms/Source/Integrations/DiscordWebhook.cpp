@@ -42,10 +42,10 @@ DiscordWebhookSender::DiscordWebhookSender()
 DiscordWebhookSender::~DiscordWebhookSender(){
     m_stopping.store(true, std::memory_order_release);
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_cv.notify_all();
     }
-    std::lock_guard<std::mutex> lg(m_send_lock);
+    std::lock_guard<Mutex> lg(m_send_lock);
     if (m_event_loop){
         m_event_loop->exit();
     }
@@ -125,7 +125,7 @@ void DiscordWebhookSender::send(
 
 void DiscordWebhookSender::cleanup_stuck_requests(){
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         WallClock next = m_queue.next_event();
         if (next == WallClock::max()){
             return;
@@ -139,7 +139,7 @@ void DiscordWebhookSender::cleanup_stuck_requests(){
     }
 
     m_logger.log("Purging request that appears to be stuck.", COLOR_RED);
-    std::lock_guard<std::mutex> lg(m_send_lock);
+    std::lock_guard<Mutex> lg(m_send_lock);
     if (m_event_loop){
         m_event_loop->exit();
     }
@@ -153,7 +153,7 @@ void DiscordWebhookSender::throttle(){
     }
     if (!m_sent.empty() && m_sent.size() >= GlobalSettings::instance().DISCORD->webhooks.sends_per_second){
         m_logger.log("Throttling webhook messages due to rate limit...", COLOR_RED);
-        std::unique_lock<std::mutex> lg(m_lock);
+        std::unique_lock<Mutex> lg(m_lock);
         m_cv.wait_for(
             lg, duration,
             [&]{ return m_stopping.load(std::memory_order_relaxed) || m_sent.empty() || m_sent[0] + duration < now; }
@@ -195,7 +195,7 @@ void DiscordWebhookSender::internal_send(
     }
 
     {
-        std::lock_guard<std::mutex> lg(m_send_lock);
+        std::lock_guard<Mutex> lg(m_send_lock);
         m_event_loop.reset(new QEventLoop);
     }
 
@@ -247,12 +247,12 @@ void DiscordWebhookSender::internal_send(
 //            cout << "internal_send() - end" << endl;
         }
     }catch (...){
-        std::lock_guard<std::mutex> lg(m_send_lock);
+        std::lock_guard<Mutex> lg(m_send_lock);
         m_event_loop.reset();
         throw;
     }
 
-    std::lock_guard<std::mutex> lg(m_send_lock);
+    std::lock_guard<Mutex> lg(m_send_lock);
     m_event_loop.reset();
 }
 

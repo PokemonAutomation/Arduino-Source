@@ -38,8 +38,8 @@ private:
     void thread_loop();
 
 private:
-    mutable std::mutex m_lock;
-    std::condition_variable m_cv;
+    mutable Mutex m_lock;
+    ConditionVariable m_cv;
     bool m_stopped;
 
     std::multimap<WallClock, std::function<void()>> m_schedule;

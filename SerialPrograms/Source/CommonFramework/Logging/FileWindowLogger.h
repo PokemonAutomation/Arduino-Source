@@ -10,9 +10,9 @@
 #define PokemonAutomation_Logging_FileWindowLogger_H
 
 #include <set>
-#include <mutex>
 #include <QTextEdit>
 #include <QMainWindow>
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Logging/FileLogger.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 
@@ -55,7 +55,7 @@ private:
 private:
     FileLogger m_file_logger;
 
-    std::mutex m_window_lock;
+    Mutex m_window_lock;
     std::set<FileWindowLoggerWindow*> m_windows;
 };
 

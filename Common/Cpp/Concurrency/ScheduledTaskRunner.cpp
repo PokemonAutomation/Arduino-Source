@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 ScheduledTaskRunner::~ScheduledTaskRunner(){
 //    ScheduledTaskRunner::cancel(nullptr);
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
 //        cout << "ScheduledTaskRunner: (Destructor - start): " << this << endl;
         m_stopped = true;
         m_cv.notify_all();
@@ -34,18 +34,18 @@ ScheduledTaskRunner::ScheduledTaskRunner(AsyncDispatcher& dispatcher)
 //    cout << "ScheduledTaskRunner: (Constructor): " << this << endl;
 }
 size_t ScheduledTaskRunner::size() const{
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     return m_schedule.size();
 }
 WallClock ScheduledTaskRunner::next_event() const{
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     if (m_stopped || m_schedule.empty()){
         return WallClock::max();
     }
     return m_schedule.begin()->first;
 }
 void ScheduledTaskRunner::add_event(WallClock time, std::function<void()> callback){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     if (m_stopped){
         return;
     }
@@ -53,7 +53,7 @@ void ScheduledTaskRunner::add_event(WallClock time, std::function<void()> callba
     m_cv.notify_all();
 }
 void ScheduledTaskRunner::add_event(std::chrono::milliseconds time_from_now, std::function<void()> callback){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     if (m_stopped){
         return;
     }
@@ -65,13 +65,13 @@ bool ScheduledTaskRunner::cancel(std::exception_ptr exception) noexcept{
     if (Cancellable::cancel(std::move(exception))){
         return true;
     }
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     m_cv.notify_all();
     return false;
 }
 #endif
 void ScheduledTaskRunner::thread_loop(){
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
 //    cout << "ScheduledTaskRunner: (Starting thread loop): " << this << endl;
 //    WallClock last_check_timestamp = current_time();
     while (!m_stopped){

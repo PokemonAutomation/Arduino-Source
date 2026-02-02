@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSV_ItemPrinterRNGTable_H
 
 #include <deque>
-#include <mutex>
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/DateOption.h"
@@ -56,7 +56,7 @@ private:
     //  Brutal work-around for circular callback dependency.
     SpinLock m_pending_lock;
     std::deque<void*> m_pending;
-    std::mutex m_update_lock;
+    Mutex m_update_lock;
 };
 
 

@@ -11,9 +11,9 @@
 #define PokemonAutomation_Logging_FileLogger_H
 
 #include <deque>
-#include <mutex>
-#include <condition_variable>
 #include "AbstractLogger.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "Common/Cpp/FileIO.h"
 #include "Common/Cpp/ListenerSet.h"
@@ -94,8 +94,8 @@ private:
     FileLoggerConfig m_config;
     FileIO m_file;
 
-    mutable std::mutex m_lock;
-    std::condition_variable m_cv;
+    mutable Mutex m_lock;
+    ConditionVariable m_cv;
     LastLogTracker m_last_log_tracker;
     bool m_stopping;
     std::deque<std::pair<std::string, Color>> m_queue;

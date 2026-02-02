@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_StateTracker_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_StateTracker_H
 
-#include <mutex>
-#include <condition_variable>
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "PokemonSwSh_MaxLair_State.h"
 
@@ -84,8 +84,8 @@ private:
 
 
 private:
-    std::mutex m_lock;
-    std::condition_variable m_cv;
+    Mutex m_lock;
+    ConditionVariable m_cv;
 
     uint64_t m_state_epoch = 0;
 

@@ -7,10 +7,9 @@
 #ifndef PokemonAutomation_SystemSleep_H
 #define PokemonAutomation_SystemSleep_H
 
-#include <set>
 #include <atomic>
-#include <mutex>
 #include "Common/Cpp/ListenerSet.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
 
 #if _WIN32
 #define PA_ENABLE_SLEEP_SUPPRESS
@@ -75,7 +74,7 @@ public:
 protected:
     std::atomic<SleepSuppress> m_state;
 
-    std::mutex m_lock;
+    Mutex m_lock;
     ListenerSet<Listener> m_listeners;
 };
 

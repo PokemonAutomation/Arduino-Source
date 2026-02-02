@@ -22,7 +22,7 @@ ThreadUtilizationStat::ThreadUtilizationStat(ThreadHandle handle, std::string la
 {}
 
 OverlayStatSnapshot ThreadUtilizationStat::get_current(){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
 
     WallClock now = current_time();
     WallDuration clock = thread_cpu_time(m_handle);
@@ -49,7 +49,7 @@ ThreadPoolUtilizationStat::ThreadPoolUtilizationStat(const ComputationThreadPool
 {}
 
 OverlayStatSnapshot ThreadPoolUtilizationStat::get_current(){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
 
     WallClock now = current_time();
     WallDuration clock = m_thread_pool.cpu_time();

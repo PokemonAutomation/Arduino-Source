@@ -33,7 +33,7 @@ AsyncDispatcher::AsyncDispatcher(std::function<void()>&& new_thread_callback, si
 }
 AsyncDispatcher::~AsyncDispatcher(){
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_stopping = true;
         m_cv.notify_all();
     }
@@ -48,7 +48,7 @@ AsyncDispatcher::~AsyncDispatcher(){
 }
 
 void AsyncDispatcher::ensure_threads(size_t threads){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     while (m_threads.size() < threads){
         add_thread();
     }
@@ -64,7 +64,7 @@ void AsyncDispatcher::add_thread(){
 
 void AsyncDispatcher::dispatch_task(AsyncTask& task){
 //    cout << "dispatch_task() - enter" << endl;
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
 
     //  Enqueue task.
     m_queue.emplace_back(&task)->report_started();
@@ -102,7 +102,7 @@ void AsyncDispatcher::run_in_parallel(
     }
 
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
 
         //  Enqueue tasks.
         for (std::unique_ptr<AsyncTask>& task : tasks){
@@ -138,7 +138,7 @@ void AsyncDispatcher::thread_loop(){
     while (true){
         AsyncTask* task;
         {
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
             if (busy){
                 m_busy_count--;
                 busy = false;

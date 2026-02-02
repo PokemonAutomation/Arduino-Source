@@ -23,9 +23,9 @@ void ControllerWithScheduler::issue_buttons(
     Button button
 ){
     SuperscalarScheduler::Schedule schedule;
-    std::lock_guard<std::mutex> lg0(m_issue_lock);
+    std::lock_guard<Mutex> lg0(m_issue_lock);
     {
-        std::lock_guard<std::mutex> lg1(m_state_lock);
+        std::lock_guard<Mutex> lg1(m_state_lock);
         if (cancellable){
             cancellable->throw_if_cancelled();
         }
@@ -64,9 +64,9 @@ void ControllerWithScheduler::issue_dpad(
     DpadPosition position
 ){
     SuperscalarScheduler::Schedule schedule;
-    std::lock_guard<std::mutex> lg0(m_issue_lock);
+    std::lock_guard<Mutex> lg0(m_issue_lock);
     {
-        std::lock_guard<std::mutex> lg1(m_state_lock);
+        std::lock_guard<Mutex> lg1(m_state_lock);
         if (cancellable){
             cancellable->throw_if_cancelled();
         }
@@ -95,9 +95,9 @@ void ControllerWithScheduler::issue_left_joystick(
     auto command = std::make_unique<SwitchCommand_LeftJoystick>(position);
 
     SuperscalarScheduler::Schedule schedule;
-    std::lock_guard<std::mutex> lg0(m_issue_lock);
+    std::lock_guard<Mutex> lg0(m_issue_lock);
     {
-        std::lock_guard<std::mutex> lg1(m_state_lock);
+        std::lock_guard<Mutex> lg1(m_state_lock);
         if (cancellable){
             cancellable->throw_if_cancelled();
         }
@@ -126,9 +126,9 @@ void ControllerWithScheduler::issue_right_joystick(
     auto command = std::make_unique<SwitchCommand_RightJoystick>(position);
 
     SuperscalarScheduler::Schedule schedule;
-    std::lock_guard<std::mutex> lg0(m_issue_lock);
+    std::lock_guard<Mutex> lg0(m_issue_lock);
     {
-        std::lock_guard<std::mutex> lg1(m_state_lock);
+        std::lock_guard<Mutex> lg1(m_state_lock);
         if (cancellable){
             cancellable->throw_if_cancelled();
         }
@@ -159,9 +159,9 @@ void ControllerWithScheduler::issue_gyro(
     int16_t value
 ){
     SuperscalarScheduler::Schedule schedule;
-    std::lock_guard<std::mutex> lg0(m_issue_lock);
+    std::lock_guard<Mutex> lg0(m_issue_lock);
     {
-        std::lock_guard<std::mutex> lg1(m_state_lock);
+        std::lock_guard<Mutex> lg1(m_state_lock);
         if (cancellable){
             cancellable->throw_if_cancelled();
         }
@@ -195,9 +195,9 @@ void ControllerWithScheduler::issue_full_controller_state(
     const JoystickPosition& right_joystick
 ){
     SuperscalarScheduler::Schedule schedule;
-    std::lock_guard<std::mutex> lg0(m_issue_lock);
+    std::lock_guard<Mutex> lg0(m_issue_lock);
     {
-        std::lock_guard<std::mutex> lg1(m_state_lock);
+        std::lock_guard<Mutex> lg1(m_state_lock);
         if (cancellable){
             cancellable->throw_if_cancelled();
         }

@@ -366,7 +366,7 @@ void TeraLobbyNameWatcher::get_last_known_state(
     std::array<std::map<Language, std::string>, 4>& names,
     std::vector<TeraLobbyNameMatchResult>& bans
 ){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     names = m_last_known_names;
     bans = m_last_known_bans;
 }
@@ -426,7 +426,7 @@ bool TeraLobbyNameWatcher::process_frame(const ImageViewRGB32& frame, WallClock 
     }
 
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
 //        m_last_known_players.store(players, std::memory_order_relaxed);
         m_last_known_names = std::move(names);
         m_last_known_bans = std::move(match_list);

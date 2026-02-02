@@ -8,11 +8,11 @@
 #define PokemonAutomation_ClientSocket_Qt_H
 
 #include <iostream>
-#include <mutex>
-#include <condition_variable>
 #include <QThread>
 #include <QTcpSocket>
 //#include "Common/Cpp/Concurrency/SpinPause.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "AbstractClientSocket.h"
 
 //using std::cout;
@@ -29,7 +29,7 @@ class ClientSocket_Qt final : public QThread, public AbstractClientSocket{
         const void* data;
         size_t total_bytes;
         size_t bytes_sent;
-        std::mutex lock;
+        Mutex lock;
         std::condition_variable cv;
     };
 
@@ -42,7 +42,7 @@ public:
         start();
 
 //        cout << "ClientSocket_Qt() - waiting" << endl;
-        std::unique_lock<std::mutex> lg(m_lock);
+        std::unique_lock<Mutex> lg(m_lock);
         m_cv.wait(lg, [this]{ return m_socket != nullptr; });
     }
 
@@ -75,7 +75,7 @@ public:
 
         emit send(&send_data);
 
-        std::unique_lock<std::mutex> lg(send_data.lock);
+        std::unique_lock<Mutex> lg(send_data.lock);
         send_data.cv.wait(lg, [&]{
             return send_data.data == nullptr || m_socket == nullptr;
         });
@@ -184,7 +184,7 @@ private:
 
                 m_socket->flush();
 
-                std::lock_guard<std::mutex> lg(data.lock);
+                std::lock_guard<Mutex> lg(data.lock);
                 data.data = nullptr;
                 data.bytes_sent = sent;
                 data.cv.notify_all();
@@ -196,7 +196,7 @@ private:
 
 
         {
-            std::lock_guard<std::mutex> lg(m_lock);
+            std::lock_guard<Mutex> lg(m_lock);
             if (this->state() == State::DESTRUCTING){
                 return;
             }
@@ -207,15 +207,15 @@ private:
         exec();
 
         {
-            std::lock_guard<std::mutex> lg(m_lock);
+            std::lock_guard<Mutex> lg(m_lock);
             m_socket = nullptr;
         }
         m_cv.notify_all();
     }
 
 private:
-    std::mutex m_lock;
-    std::condition_variable m_cv;
+    Mutex m_lock;
+    ConditionVariable m_cv;
     QTcpSocket* m_socket;
 };
 

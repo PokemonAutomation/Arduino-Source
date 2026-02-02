@@ -10,7 +10,7 @@
 #ifndef PokemonAutomation_Controllers_ControllerWithScheduler_H
 #define PokemonAutomation_Controllers_ControllerWithScheduler_H
 
-#include <mutex>
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/RecursiveThrottler.h"
 #include "SuperscalarScheduler.h"
@@ -36,9 +36,9 @@ public:
 
     void issue_barrier(Cancellable* cancellable){
         SuperscalarScheduler::Schedule schedule;
-        std::lock_guard<std::mutex> lg0(m_issue_lock);
+        std::lock_guard<Mutex> lg0(m_issue_lock);
         {
-            std::lock_guard<std::mutex> lg1(m_state_lock);
+            std::lock_guard<Mutex> lg1(m_state_lock);
             m_scheduler.issue_wait_for_all(schedule);
         }
         execute_schedule(cancellable, schedule);
@@ -48,9 +48,9 @@ public:
     }
     void issue_nop(Cancellable* cancellable, Milliseconds duration){
         SuperscalarScheduler::Schedule schedule;
-        std::lock_guard<std::mutex> lg0(m_issue_lock);
+        std::lock_guard<Mutex> lg0(m_issue_lock);
         {
-            std::lock_guard<std::mutex> lg1(m_state_lock);
+            std::lock_guard<Mutex> lg1(m_state_lock);
             if (cancellable){
                 cancellable->throw_if_cancelled();
             }
@@ -92,11 +92,11 @@ protected:
 
     //  This lock makes sure that only one command is issued at a time. It can
     //  be held for long periods of time if the command queue is full.
-    std::mutex m_issue_lock;
+    Mutex m_issue_lock;
 
     //  This lock protects the state/fields of this class and subclasses.
     //  This lock is never held for a long time.
-    std::mutex m_state_lock;
+    Mutex m_state_lock;
 };
 
 

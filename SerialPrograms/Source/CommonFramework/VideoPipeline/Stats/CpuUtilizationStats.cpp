@@ -14,7 +14,7 @@ CpuUtilizationStat::CpuUtilizationStat()
     : m_last_clock(SystemCpuTime::now())
 {}
 OverlayStatSnapshot CpuUtilizationStat::get_current(){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
 
     WallClock now = current_time();
     SystemCpuTime current = SystemCpuTime::now();

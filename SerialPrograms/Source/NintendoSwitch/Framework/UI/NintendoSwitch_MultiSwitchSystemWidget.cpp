@@ -20,7 +20,7 @@ namespace NintendoSwitch{
 
 MultiSwitchSystemWidget::~MultiSwitchSystemWidget(){
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         for (SwitchSystemWidget* console : m_switches){
             delete console;
         }
@@ -72,7 +72,7 @@ MultiSwitchSystemWidget::MultiSwitchSystemWidget(
 #if 0
     //  Acquire the lock now and attach listener. This will block the session
     //  from changing the # of switches while we draw everything.
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     m_session.add_listener(*this);
 
     m_console_count_box->setCurrentIndex((int)(m_session.count() - m_session.min_switches()));
@@ -84,7 +84,7 @@ MultiSwitchSystemWidget::MultiSwitchSystemWidget(
 
 void MultiSwitchSystemWidget::shutdown(){
 //    cout << "MultiSwitchSystemWidget::shutdown()" << endl;
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     for (SwitchSystemWidget* console : m_switches){
         delete console;
     }
@@ -94,13 +94,13 @@ void MultiSwitchSystemWidget::shutdown(){
 }
 void MultiSwitchSystemWidget::startup(size_t switch_count){
 //    cout << "MultiSwitchSystemWidget::startup()" << endl;
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     redraw_videos(switch_count);
 }
 
 void MultiSwitchSystemWidget::redraw_videos(size_t count){
 //    cout << "MultiSwitchSystemWidget::redraw_videos()" << endl;
-//    std::lock_guard<std::mutex> lg(m_lock);
+//    std::lock_guard<Mutex> lg(m_lock);
 //    if (count == m_switches.size()){
 //        return;
 //    }

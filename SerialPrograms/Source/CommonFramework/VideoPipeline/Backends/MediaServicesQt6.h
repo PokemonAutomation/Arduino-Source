@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_VideoPipeline_MediaServicesQt6_H
 #define PokemonAutomation_VideoPipeline_MediaServicesQt6_H
 
-#include <mutex>
-#include <condition_variable>
 #include <QCameraDevice>
 #include <QMediaDevices>
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 
 namespace PokemonAutomation{
@@ -87,12 +87,12 @@ private:
     // - m_sleep_lock protects m_stopping and m_refresh_cameras flags
     // - m_cv allows worker thread to sleep until signaled by camera update events
     //   from QMediaDevices or from shut down request.
-    std::mutex m_sleep_lock;
+    Mutex m_sleep_lock;
     // m_sleep_lock and m_cv work together as a classic condition variable pattern:
     // - m_sleep_lock protects m_stopping and m_refresh_cameras flags
     // - m_cv allows worker thread to sleep until signaled by camera update events
     //   from QMediaDevices or from shut down request.
-    std::condition_variable m_cv;
+    ConditionVariable m_cv;
 
     // Worker thread flag (protected by m_sleep_lock):
     // Set by main thread to tell worker to exit.

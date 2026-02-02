@@ -99,7 +99,7 @@ private:
     AudioSpectrumHolder m_spectrum_holder;
     std::unique_ptr<AudioPassthroughPair> m_devices;
 
-    mutable std::mutex m_lock;
+    mutable Mutex m_lock;
 
     ListenerSet<StateListener> m_listeners;
 

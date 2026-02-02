@@ -102,7 +102,7 @@ SerialPABotBase_Connection::~SerialPABotBase_Connection(){
     }
     m_botbase->stop();
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_cv.notify_all();
     }
     m_status_thread.join();

@@ -90,7 +90,7 @@ TcpSysbotBase_Connection::~TcpSysbotBase_Connection(){
     m_socket.remove_listener(*this);
     m_socket.close();
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_cv.notify_all();
     }
     m_thread.join();
@@ -114,7 +114,7 @@ std::string pretty_print(uint64_t x){
 
 
 void TcpSysbotBase_Connection::thread_loop(){
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
     m_last_ping_send = current_time();
     while (true){
         ClientSocket::State state = m_socket.state();
@@ -208,7 +208,7 @@ void TcpSysbotBase_Connection::process_message(const std::string& message, WallC
         }
         set_status_line0("sys-botbase: Version " + str, COLOR_BLUE);
 
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_last_ping_receive = timestamp;
 
         if (m_last_ping_send != WallClock::min()){
@@ -241,7 +241,7 @@ void TcpSysbotBase_Connection::process_message(const std::string& message, WallC
         }
         size_t ping_seqnum = atoll(ptr);
 
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_last_ping_receive = timestamp;
         auto iter = m_active_pings.find(ping_seqnum);
         if (iter == m_active_pings.end()){

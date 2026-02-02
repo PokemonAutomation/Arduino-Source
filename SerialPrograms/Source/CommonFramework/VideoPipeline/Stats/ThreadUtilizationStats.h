@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_ThreadUtilizationStats_H
 #define PokemonAutomation_ThreadUtilizationStats_H
 
-#include <mutex>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/EventRateTracker.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/CpuUtilization/CpuUtilization.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayTypes.h"
 
@@ -30,7 +30,7 @@ private:
     ThreadHandle m_handle;
     std::string m_label;
 
-    std::mutex m_lock;
+    Mutex m_lock;
     WallDuration m_last_clock;
     UtilizationTracker m_tracker;
 
@@ -48,7 +48,7 @@ private:
     const ComputationThreadPool& m_thread_pool;
     std::string m_label;
 
-    std::mutex m_lock;
+    Mutex m_lock;
     WallDuration m_last_clock;
     UtilizationTracker m_tracker;
 

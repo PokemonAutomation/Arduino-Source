@@ -19,12 +19,12 @@
 #include <set>
 #include <map>
 #include <deque>
-#include <mutex>
-#include <condition_variable>
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "VideoOverlay.h"
@@ -153,8 +153,8 @@ private:
 
     bool m_stopping = false;
     std::vector<OverlayStatSnapshot> m_stat_lines;
-    std::mutex m_stats_lock;
-    std::condition_variable m_stats_cv;
+    Mutex m_stats_lock;
+    ConditionVariable m_stats_cv;
     std::unique_ptr<AsyncTask> m_stats_updater;
 //    Thread m_stats_updater;
 };

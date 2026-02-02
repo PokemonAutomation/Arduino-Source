@@ -10,8 +10,8 @@
 #include <functional>
 #include <atomic>
 #include <exception>
-#include <mutex>
-#include <condition_variable>
+#include "Mutex.h"
+#include "ConditionVariable.h"
 
 #define PA_SANITIZE_AsyncTask
 
@@ -59,7 +59,7 @@ public:
         auto scope = m_sanitizer.check_scope();
 #endif
         if (!is_finished()){
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
             m_cv.wait(lg, [this]{ return is_finished(); });
         }
         if (m_exception){
@@ -85,8 +85,8 @@ private:
     std::function<void()> m_task;
     std::atomic<State> m_state;
     std::exception_ptr m_exception;
-    mutable std::mutex m_lock;
-    std::condition_variable m_cv;
+    mutable Mutex m_lock;
+    ConditionVariable m_cv;
 
 #ifdef PA_SANITIZE_AsyncTask
     LifetimeSanitizer m_sanitizer;

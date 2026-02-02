@@ -68,7 +68,7 @@ private:
     MultiSwitchSystemOption& m_option;
     const uint64_t m_program_id;
 
-    std::mutex m_lock;
+    Mutex m_lock;
     bool m_switch_count_locked;
     FixedLimitVector<SwitchSystemSession> m_consoles;
     std::set<Listener*> m_listeners;

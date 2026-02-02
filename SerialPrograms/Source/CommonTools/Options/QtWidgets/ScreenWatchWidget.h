@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_CommonTools_Options_ScreenWatchWidget_H
 #define PokemonAutomation_CommonTools_Options_ScreenWatchWidget_H
 
-#include <mutex>
-#include <condition_variable>
 #include <QWidget>
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "Common/Qt/WidgetStackFixedAspectRatio.h"
 #include "Common/Qt/Options/ConfigWidget.h"
@@ -34,8 +34,8 @@ private:
 private:
     ScreenWatchWidget& m_holder;
     ScreenWatchOption& m_option;
-    std::mutex m_lock;
-    std::condition_variable m_cv;
+    Mutex m_lock;
+    ConditionVariable m_cv;
     bool m_stop;
     VideoSnapshot m_last_frame;
     Thread m_updater;

@@ -187,7 +187,7 @@ private:
     }
 
     void recv_loop(){
-//        std::lock_guard<std::mutex> lg(m_send_lock);
+//        std::lock_guard<Mutex> lg(m_send_lock);
         char buffer[32];
         auto last_recv = current_time();
         while (!m_exit.load(std::memory_order_acquire)){

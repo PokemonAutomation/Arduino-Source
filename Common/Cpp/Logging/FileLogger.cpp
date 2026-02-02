@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 
 FileLogger::~FileLogger(){
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_stopping = true;
         m_cv.notify_all();
     }
@@ -53,7 +53,7 @@ void FileLogger::remove_listener(Listener& listener){
 }
 
 void FileLogger::log(const std::string& msg, Color color){
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
     m_last_log_tracker += msg;
     m_cv.wait(lg, [this]{ return m_queue.size() < m_config.max_queue_size; });
     m_queue.emplace_back(msg, color);
@@ -61,7 +61,7 @@ void FileLogger::log(const std::string& msg, Color color){
 }
 
 void FileLogger::log(std::string&& msg, Color color){
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
     m_last_log_tracker += msg;
     m_cv.wait(lg, [this]{ return m_queue.size() < m_config.max_queue_size; });
     m_queue.emplace_back(std::move(msg), color);
@@ -69,7 +69,7 @@ void FileLogger::log(std::string&& msg, Color color){
 }
 
 std::vector<std::string> FileLogger::get_last() const{
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
     return m_last_log_tracker.snapshot();
 }
 
@@ -127,7 +127,7 @@ void FileLogger::internal_log(const std::string& msg, Color color){
 
 void FileLogger::thread_loop(){
     size_t file_size_check_counter = 100;
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
     while (true){
         m_cv.wait(lg, [&]{
             return m_stopping || !m_queue.empty();

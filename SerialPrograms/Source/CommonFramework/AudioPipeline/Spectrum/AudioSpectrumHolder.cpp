@@ -107,7 +107,7 @@ void AudioSpectrumHolder::remove_listener(Listener& listener){
 
 void AudioSpectrumHolder::clear(){
     {
-        std::lock_guard<std::mutex> lg(m_state_lock);
+        std::lock_guard<Mutex> lg(m_state_lock);
 
         m_freqVisStamps.assign(m_freqVisStamps.size(), SIZE_MAX);
 
@@ -160,7 +160,7 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
     WallClock timestamp = current_time();
 
     {
-        std::lock_guard<std::mutex> lg(m_state_lock);
+        std::lock_guard<Mutex> lg(m_state_lock);
 
         const AlignedVector<float>& output = *fft_output;
 
@@ -237,7 +237,7 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
 }
 void AudioSpectrumHolder::add_overlay(uint64_t starting_stamp, uint64_t end_stamp, Color color){
     {
-        std::lock_guard<std::mutex> lg(m_state_lock);
+        std::lock_guard<Mutex> lg(m_state_lock);
 
         m_overlay.emplace_front(std::forward_as_tuple(starting_stamp, end_stamp, color));
 
@@ -260,7 +260,7 @@ void AudioSpectrumHolder::add_overlay(uint64_t starting_stamp, uint64_t end_stam
 std::vector<AudioSpectrum> AudioSpectrumHolder::spectrums_since(uint64_t starting_stamp){
     std::vector<AudioSpectrum> spectrums;
 
-    std::lock_guard<std::mutex> lg(m_state_lock);
+    std::lock_guard<Mutex> lg(m_state_lock);
 
     for (const auto& ptr : m_spectrums){
         if (ptr.stamp >= starting_stamp){
@@ -274,7 +274,7 @@ std::vector<AudioSpectrum> AudioSpectrumHolder::spectrums_since(uint64_t startin
 std::vector<AudioSpectrum> AudioSpectrumHolder::spectrums_latest(size_t num_latest_spectrums){
     std::vector<AudioSpectrum> spectrums;
 
-    std::lock_guard<std::mutex> lg(m_state_lock);
+    std::lock_guard<Mutex> lg(m_state_lock);
 
     size_t i = 0;
     for (const auto& ptr : m_spectrums){
@@ -287,11 +287,11 @@ std::vector<AudioSpectrum> AudioSpectrumHolder::spectrums_latest(size_t num_late
     return spectrums;
 }
 AudioSpectrumHolder::SpectrumSnapshot AudioSpectrumHolder::get_last_spectrum() const{
-    std::lock_guard<std::mutex> lg(m_state_lock);
+    std::lock_guard<Mutex> lg(m_state_lock);
     return m_last_spectrum;
 }
 AudioSpectrumHolder::SpectrographSnapshot AudioSpectrumHolder::get_spectrograph() const{
-    std::lock_guard<std::mutex> lg(m_state_lock);
+    std::lock_guard<Mutex> lg(m_state_lock);
 
     SpectrographSnapshot ret;
     ret.image = m_spectrograph->to_image();
@@ -345,7 +345,7 @@ AudioSpectrumHolder::SpectrographSnapshot AudioSpectrumHolder::get_spectrograph(
 
 
 void AudioSpectrumHolder::saveAudioFrequenciesToDisk(bool enable){
-    std::lock_guard<std::mutex> lg(m_state_lock);
+    std::lock_guard<Mutex> lg(m_state_lock);
     if (enable){
         if (m_saveFreqToDisk == false){
             m_saveFreqToDisk = enable;

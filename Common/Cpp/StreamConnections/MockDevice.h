@@ -8,9 +8,9 @@
 #define PokemonAutomation_MockDevice_H
 
 #include <deque>
-#include <mutex>
-#include <condition_variable>
 #include "Common/Cpp/StreamConnections/StreamConnection.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "Common/PABotBase2/PABotbase2_ReliableStreamConnection.h"
 
@@ -72,12 +72,12 @@ private:
 
     std::atomic<bool> m_stopping;
 
-    mutable std::mutex m_device_lock;
-    std::condition_variable m_device_cv;
+    mutable Mutex m_device_lock;
+    ConditionVariable m_device_cv;
     Thread m_device_thread;
 
-    mutable std::mutex m_host_lock;
-    std::condition_variable m_host_cv;
+    mutable Mutex m_host_lock;
+    ConditionVariable m_host_cv;
     Thread m_host_thread;
 };
 

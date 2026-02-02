@@ -52,7 +52,7 @@ SingleSwitchProgramSession::~SingleSwitchProgramSession(){
 
 
 void SingleSwitchProgramSession::restore_defaults(){
-    std::lock_guard<std::mutex> lg(program_lock());
+    std::lock_guard<Mutex> lg(program_lock());
     if (current_state() != ProgramState::STOPPED){
         logger().log("Cannot change settings while program is running.", COLOR_RED);
         return;
@@ -68,7 +68,7 @@ std::string SingleSwitchProgramSession::check_validity() const{
 
 void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     {
-        std::lock_guard<std::mutex> lg(program_lock());
+        std::lock_guard<Mutex> lg(program_lock());
         std::string error = check_validity();
         if (!error.empty()){
             throw UserSetupError(logger(), std::move(error));
@@ -90,7 +90,7 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
 
     ControllerContext<AbstractController> context(scope, env.console.controller());
     {
-        std::lock_guard<std::mutex> lg(program_lock());
+        std::lock_guard<Mutex> lg(program_lock());
         if (current_state() != ProgramState::RUNNING){
             return;
         }
@@ -105,7 +105,7 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
         try{
             env.console.controller().cancel_all_commands();
         }catch (...){}
-        std::lock_guard<std::mutex> lg(program_lock());
+        std::lock_guard<Mutex> lg(program_lock());
         m_scope.store(nullptr, std::memory_order_release);
         throw;
     }
@@ -116,12 +116,12 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
     }
 #endif
 
-    std::lock_guard<std::mutex> lg(program_lock());
+    std::lock_guard<Mutex> lg(program_lock());
     m_scope.store(nullptr, std::memory_order_release);
 }
 void SingleSwitchProgramSession::internal_stop_program(){
     {
-        std::lock_guard<std::mutex> lg(program_lock());
+        std::lock_guard<Mutex> lg(program_lock());
         CancellableScope* scope = m_scope.load(std::memory_order_acquire);
         if (scope != nullptr){
             scope->cancel(std::make_exception_ptr(ProgramCancelledException()));

@@ -63,14 +63,14 @@ bool ReliableStreamConnection::cancel(std::exception_ptr exception) noexcept{
         return true;
     }
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_error = "Connection has been closed.";
     }
     m_cv.notify_all();
     return false;
 }
 void ReliableStreamConnection::wait_for_pending(){
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
     m_cv.wait(lg, [this]{
         return this->cancelled() || pabb2_PacketSender_slots_used(&m_reliable_sender) == 0;
     });
@@ -85,7 +85,7 @@ void ReliableStreamConnection::wait_for_pending(){
 
 void ReliableStreamConnection::reset(){
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         pabb2_PacketSender_reset(&m_reliable_sender);
         pabb2_PacketParser_reset(&m_parser);
         pabb2_StreamCoalescer_reset(&m_stream_coalescer);
@@ -96,7 +96,7 @@ void ReliableStreamConnection::reset(){
     wait_for_pending();
 }
 size_t ReliableStreamConnection::send(const void* data, size_t bytes){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     throw_if_cancelled();
     if (pabb2_PacketSender_slots_used(&m_reliable_sender) >= m_remote_slot_capacity){
         return 0;
@@ -105,7 +105,7 @@ size_t ReliableStreamConnection::send(const void* data, size_t bytes){
 }
 
 bool ReliableStreamConnection::try_send_request(uint8_t opcode){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
 //    cout << "Sending: " << tostr_hex(opcode) << endl;
     throw_if_cancelled();
     if (pabb2_PacketSender_slots_used(&m_reliable_sender) >= m_remote_slot_capacity){
@@ -114,7 +114,7 @@ bool ReliableStreamConnection::try_send_request(uint8_t opcode){
     return pabb2_PacketSender_send_packet(&m_reliable_sender, opcode, 0, nullptr);
 }
 void ReliableStreamConnection::send_request(uint8_t opcode){
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
     while (true){
         throw_if_cancelled();
         if (pabb2_PacketSender_slots_used(&m_reliable_sender) < m_remote_slot_capacity &&
@@ -127,7 +127,7 @@ void ReliableStreamConnection::send_request(uint8_t opcode){
 }
 
 void ReliableStreamConnection::print() const{
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
     pabb2_PacketSender_print(&m_reliable_sender, true);
 //    pabb2_StreamCoalescer_print(&m_stream_coalescer, true);
 }
@@ -144,7 +144,7 @@ void ReliableStreamConnection::send_ack(uint8_t seqnum, uint8_t opcode){
     packet.header.opcode = opcode;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
 
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     m_unreliable_connection.send(&packet, sizeof(packet));
 }
 void ReliableStreamConnection::send_ack_u16(uint8_t seqnum, uint8_t opcode, uint16_t data){
@@ -159,7 +159,7 @@ void ReliableStreamConnection::send_ack_u16(uint8_t seqnum, uint8_t opcode, uint
     packet.header.data = data;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
 
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     m_unreliable_connection.send(&packet, sizeof(packet));
 }
 
@@ -190,7 +190,7 @@ size_t ReliableStreamConnection::send_raw(
 void ReliableStreamConnection::retransmit_thread(){
     WallClock next_retransmit = current_time() + m_retransmit_timeout;
     while (true){
-        std::unique_lock<std::mutex> lg(m_lock);
+        std::unique_lock<Mutex> lg(m_lock);
         if (this->cancelled()){
             break;
         }
@@ -327,7 +327,7 @@ void ReliableStreamConnection::on_packet(const pabb2_PacketHeader* packet){
 
 void ReliableStreamConnection::process_RET_RESET(const pabb2_PacketHeader* packet){
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         pabb2_PacketSender_remove(&m_reliable_sender, packet->seqnum);
     }
     m_cv.notify_all();
@@ -335,7 +335,7 @@ void ReliableStreamConnection::process_RET_RESET(const pabb2_PacketHeader* packe
 void ReliableStreamConnection::process_RET_VERSION(const pabb2_PacketHeader* packet){
 //    m_logger.log(tostr(packet), COLOR_DARKGREEN);
     do{
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         if (packet->packet_bytes < sizeof(pabb2_PacketHeader_Ack_u32) + sizeof(uint32_t)){
             m_error = "Version response is too small: " + std::to_string(packet->packet_bytes);
             m_logger.log("[ReliableStreamConnection]: " + m_error, COLOR_RED);
@@ -374,7 +374,7 @@ void ReliableStreamConnection::process_RET_PACKET_SIZE(const pabb2_PacketHeader*
         COLOR_BLUE
     );
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         pabb2_PacketSender_remove(&m_reliable_sender, packet->seqnum);
         m_reliable_sender.max_packet_size = (uint8_t)message->data;
     }
@@ -395,7 +395,7 @@ void ReliableStreamConnection::process_RET_BUFFER_SLOTS(const pabb2_PacketHeader
         COLOR_BLUE
     );
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         pabb2_PacketSender_remove(&m_reliable_sender, packet->seqnum);
         m_remote_slot_capacity = std::min<uint8_t>(message->data, PABB2_ConnectionSender_SLOTS);
     }
@@ -415,7 +415,7 @@ void ReliableStreamConnection::process_RET_BUFFER_BYTES(const pabb2_PacketHeader
         COLOR_BLUE
     );
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         pabb2_PacketSender_remove(&m_reliable_sender, packet->seqnum);
         m_remote_buffer_capacity = std::min<uint16_t>(message->data, PABB2_ConnectionSender_BUFFER_SIZE);
     }
@@ -432,7 +432,7 @@ void ReliableStreamConnection::process_ASK_STREAM_DATA(const pabb2_PacketHeader*
         return;
     }
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         if (!pabb2_StreamCoalescer_push_stream(&m_stream_coalescer, (const pabb2_PacketHeaderData*)packet)){
             return;
         }
@@ -446,7 +446,7 @@ void ReliableStreamConnection::process_ASK_STREAM_DATA(const pabb2_PacketHeader*
 }
 void ReliableStreamConnection::process_RET_STREAM_DATA(const pabb2_PacketHeader* packet){
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
 //        pabb2_PacketSender_print(&m_reliable_sender, true);
         pabb2_PacketSender_remove(&m_reliable_sender, packet->seqnum);
 //        pabb2_PacketSender_print(&m_reliable_sender, true);

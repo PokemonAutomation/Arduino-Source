@@ -27,9 +27,10 @@
 #include <string.h>
 #include <map>
 #include <atomic>
-#include <condition_variable>
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 #include "Controllers/SerialPABotBase/Connection/PABotBaseConnection.h"
@@ -172,7 +173,7 @@ private:
     BotBaseMessage wait_for_request(uint64_t seqnum, Cancellable* cancelled = nullptr);
 
     //  Make we get notified of a cancellable cancels so we can wake up.
-    void cv_wait(Cancellable* cancellable, std::unique_lock<std::mutex>& lg);
+    void cv_wait(Cancellable* cancellable, std::unique_lock<Mutex>& lg);
 
 private:
     Logger& m_logger;
@@ -188,9 +189,9 @@ private:
 
     //  If you need both locks, always acquire m_sleep_lock first!
     SpinLock m_state_lock;
-    std::mutex m_sleep_lock;
+    Mutex m_sleep_lock;
 
-    std::condition_variable m_cv;
+    ConditionVariable m_cv;
     std::atomic<State> m_state;
     std::atomic<bool> m_error;
     std::string m_error_message;

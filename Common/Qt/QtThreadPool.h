@@ -8,9 +8,9 @@
 #define PokemonAutomation_QtThreadPool_H
 
 #include <vector>
-#include <mutex>
-#include <condition_variable>
 #include <QThread>
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 
 namespace PokemonAutomation{
 
@@ -36,8 +36,8 @@ private:
     std::vector<QWorkerThread*> m_available_threads;
     bool m_stopping = false;
 
-    std::mutex m_lock;
-    std::condition_variable m_cv;
+    Mutex m_lock;
+    ConditionVariable m_cv;
 };
 
 

@@ -170,8 +170,8 @@ double evaluate_hypothetical_team(
     double sum = 0;
     size_t count = 0;
 
-//    static std::mutex lock;
-//    std::lock_guard<std::mutex> lg(lock);
+//    static Mutex lock;
+//    std::lock_guard<Mutex> lg(lock);
 
 //    cout << team[0]->dump() << endl;
 //    cout << team[1]->dump() << endl;

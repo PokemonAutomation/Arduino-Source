@@ -52,12 +52,12 @@ FileWindowLogger::FileWindowLogger(const std::string& path, size_t max_queue_siz
 }
 
 void FileWindowLogger::operator+=(FileWindowLoggerWindow& widget){
-    std::lock_guard<std::mutex> lg(m_window_lock);
+    std::lock_guard<Mutex> lg(m_window_lock);
     m_windows.insert(&widget);
 }
 
 void FileWindowLogger::operator-=(FileWindowLoggerWindow& widget){
-    std::lock_guard<std::mutex> lg(m_window_lock);
+    std::lock_guard<Mutex> lg(m_window_lock);
     m_windows.erase(&widget);
 }
 
@@ -76,7 +76,7 @@ std::vector<std::string> FileWindowLogger::get_last() const{
 void FileWindowLogger::on_log(const std::string& msg, Color color){
     // This is called from FileLogger's background thread.
     // Format the message for Qt display and send to all windows.
-    std::lock_guard<std::mutex> lg(m_window_lock);
+    std::lock_guard<Mutex> lg(m_window_lock);
     if (!m_windows.empty()){
         QString str = to_window_str(msg, color);
         for (FileWindowLoggerWindow* window : m_windows){

@@ -71,7 +71,7 @@ AsyncCommandSession<ControllerType>::~AsyncCommandSession(){
 template <typename ControllerType>
 bool AsyncCommandSession<ControllerType>::command_is_running(){
     auto scope_check = m_sanitizer.check_scope();
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     return m_current != nullptr;
 }
 
@@ -79,7 +79,7 @@ template <typename ControllerType>
 void AsyncCommandSession<ControllerType>::stop_command(){
     auto scope_check = m_sanitizer.check_scope();
 
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
     if (cancelled()){
         return;
     }
@@ -104,7 +104,7 @@ void AsyncCommandSession<ControllerType>::dispatch(std::function<void(Controller
         m_controller, std::move(lambda)
     ));
 
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
     if (cancelled()){
         return;
     }
@@ -131,7 +131,7 @@ bool AsyncCommandSession<ControllerType>::cancel(std::exception_ptr exception) n
     if (Cancellable::cancel(exception)){
         return true;
     }
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     if (m_current != nullptr){
         m_current->context.cancel(std::move(exception));
     }
@@ -143,7 +143,7 @@ void AsyncCommandSession<ControllerType>::thread_loop(){
     while (true){
         CommandSet* current;
         {
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
             m_cv.wait(lg, [this]{
                 return cancelled() || m_current != nullptr;
             });
@@ -162,7 +162,7 @@ void AsyncCommandSession<ControllerType>::thread_loop(){
         //  it will deadlock.
         std::unique_ptr<CommandSet> done;
         {
-            std::lock_guard<std::mutex> lg(m_lock);
+            std::lock_guard<Mutex> lg(m_lock);
             done = std::move(m_current);
             m_cv.notify_all();
         }
@@ -176,7 +176,7 @@ void AsyncCommandSession<ControllerType>::thread_loop(){
 #if 0
 template <typename ControllerType>
 void AsyncCommandSession::stop_commands(){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     if (m_current){
         m_current->context.cancel_now();
     }
@@ -184,7 +184,7 @@ void AsyncCommandSession::stop_commands(){
 #endif
 template <typename ControllerType>
 void AsyncCommandSession<ControllerType>::wait(){
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
 //    cout << "wait() - start" << endl;
     m_cv.wait(lg, [this]{
         return m_current == nullptr;

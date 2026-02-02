@@ -27,7 +27,7 @@ bool EncounterWatcher::process_frame(const VideoSnapshot& frame){
     }
 
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         //  Clear old history.
         while (!m_history.empty() && m_history.front().timestamp + std::chrono::milliseconds(2000) < frame.timestamp){
             m_history.pop_front();
@@ -54,7 +54,7 @@ bool EncounterWatcher::process_spectrums(
     WallClock threshold = current_time() - std::chrono::seconds(1);
 
     //  Find the brightest frame.
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
 
     double best_bright_portion = 0;
     for (const VideoSnapshot& frame : m_history){

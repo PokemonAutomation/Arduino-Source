@@ -4,9 +4,9 @@
  *
  */
 
-#include <mutex>
 #include <QDir>
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -27,8 +27,8 @@ std::string dump_image_alone(
     const ProgramInfo& program_info, const std::string& label,
     const ImageViewRGB32& image
 ){
-    static std::mutex lock;
-    std::lock_guard<std::mutex> lg(lock);
+    static Mutex lock;
+    std::lock_guard<Mutex> lg(lock);
 
     QDir().mkdir(ERROR_PATH().c_str());
     std::string name = ERROR_PATH() + now_to_filestring();
