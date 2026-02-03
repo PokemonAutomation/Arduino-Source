@@ -257,10 +257,17 @@ void StreamHistoryTracker::on_frame(std::shared_ptr<const VideoFrame> frame){
         // don't save every frame. only save frames as per m_target_fps
         // Only save when we've crossed the next sampling boundary
         if (frame->timestamp < m_next_frame_time){
-            return; // skip
+            return; // skip frame
         }
 
         // Advance by fixed intervals
+        // Next frame time is anchored relative to the first frame's time, with increments by a multiple of m_frame_interval, 
+        // instead of being relative to the current frame's time. This prevents timing drift.
+
+        // If there is a massive jump in time (e.g. the stream pauses for 5 seconds), 
+        // the while loop advances the schedule multiple times until it is once again ahead of the 
+        // current timestamp. If this happens, there will be a matching gap in the saved frames. 
+        // We handle this gap by duplicating frames in the save() function, so that we maintain a constant frame rate.
         while (m_next_frame_time <= frame->timestamp){
             m_next_frame_time += std::chrono::microseconds(m_frame_interval);
         }
@@ -362,7 +369,7 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
 
     // 2. Loop through frames
     for (CompressedVideoFrame frame : frames) {
-        // Insert dummy frames if there is a gap due to dropping frames.
+        // Insert duplicate frames if there is a gap due to dropping frames.
         // Because VideoWriter can only handle a fixed frame rate.
         while (current_timeline + m_frame_interval < frame.timestamp) {
             // Decompress last known good frame and write again
