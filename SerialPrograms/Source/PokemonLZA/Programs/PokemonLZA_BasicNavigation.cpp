@@ -116,15 +116,11 @@ bool open_map(
     MapIconDetector pokecenter_icon(COLOR_RED, MapIconType::PokemonCenter, icon_region, &console.overlay());
     MapIconDetector flyable_building_icon(COLOR_BLACK, MapIconType::BuildingFlyable, icon_region, &console.overlay());
     MapIconDetector flayble_cafe_icon(COLOR_ORANGE, MapIconType::CafeFlyable, icon_region, &console.overlay());
-    MapIconDetector flyable_hyperspace_battle_zone_icon(COLOR_ORANGE, MapIconType::HyperspaceBattleZone, icon_region, &console.overlay());
-    MapIconDetector flyable_hyperspace_wild_zone_icon(COLOR_ORANGE, MapIconType::HyperspaceWildZone, icon_region, &console.overlay());
 
     MapWatcher map_detector(COLOR_RED, &console.overlay());
     map_detector.attach_map_icon_detector(pokecenter_icon);
     map_detector.attach_map_icon_detector(flyable_building_icon);
     map_detector.attach_map_icon_detector(flayble_cafe_icon);
-    map_detector.attach_map_icon_detector(flyable_hyperspace_battle_zone_icon);
-    map_detector.attach_map_icon_detector(flyable_hyperspace_wild_zone_icon);
 
     do{
         map_detector.reset_state();
