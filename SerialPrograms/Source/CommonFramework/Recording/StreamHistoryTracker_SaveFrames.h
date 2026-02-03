@@ -13,6 +13,7 @@
 #include <deque>
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "Common/Cpp/Concurrency/Thread.h"
 
 
 namespace PokemonAutomation{
@@ -82,7 +83,7 @@ private:
     std::deque<CompressedVideoFrame> m_compressed_frames;
     WallClock m_next_frame_time;
 
-    std::thread m_worker;
+    Thread m_worker;
     std::atomic<bool> m_stopping{false};
     
     // Queue for the worker thread

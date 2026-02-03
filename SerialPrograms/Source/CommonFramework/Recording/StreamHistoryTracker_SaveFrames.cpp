@@ -218,7 +218,7 @@ StreamHistoryTracker::StreamHistoryTracker(
     , m_target_fps(get_target_fps())
     , m_frame_interval(1000000 / m_target_fps)
 {
-    m_worker = std::thread(&StreamHistoryTracker::worker_loop, this);
+    m_worker = Thread([this]{ worker_loop(); });
 }
 
 void StreamHistoryTracker::set_window(std::chrono::seconds window){
