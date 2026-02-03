@@ -11,6 +11,8 @@
 #define PokemonAutomation_StreamHistoryTracker_SaveFrames_H
 
 #include <deque>
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 
 
 namespace PokemonAutomation{
@@ -84,8 +86,8 @@ private:
     std::atomic<bool> m_stopping{false};
     
     // Queue for the worker thread
-    std::mutex m_queue_lock;
-    std::condition_variable m_cv;
+    Mutex m_queue_lock;
+    ConditionVariable m_cv;
     std::deque<std::shared_ptr<const VideoFrame>> m_pending_frames;
 
     

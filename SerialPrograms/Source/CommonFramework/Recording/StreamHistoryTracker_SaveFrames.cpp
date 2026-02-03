@@ -21,7 +21,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Cpp/Concurrency/Mutex.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Recording/StreamHistoryOption.h"
@@ -60,7 +59,7 @@ QImage decompress_video_frame(const std::vector<uchar> &compressed_buffer) {
 }
 
 std::vector<uchar> compress_video_frame(const QVideoFrame& const_frame) {
-    simulate_cpu_load(100);  // for testing, what happens when the CPU is overwhelmed, and needs to drop frames.
+    // simulate_cpu_load(100);  // for testing, to see what happens when the CPU is overwhelmed, and needs to drop frames.
 
 
     // Create a local non-const copy (cheap, uses explicit sharing)
@@ -94,14 +93,14 @@ std::vector<uchar> compress_video_frame(const QVideoFrame& const_frame) {
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Resolution: Unknown enum.");                
     }
 
-    // downscale to 720p for smaller file size
+    // scale to target resolution
     int target_height = img.height() * target_width / img.width();
     img = img.scaled(target_width, target_height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
 
     // 3. Wrap QImage memory into a cv::Mat (No-copy)
     // Note: OpenCV expects BGR by default, but QImage is RGB. 
-    // If color accuracy matters, use cv::cvtColor later or img.rgbSwapped().
+    // we use cv::cvtColor later to fix this
     cv::Mat mat(img.height(), img.width(), CV_8UC3, 
                 const_cast<unsigned char*>(img.bits()), img.bytesPerLine());
 
@@ -115,7 +114,7 @@ std::vector<uchar> compress_video_frame(const QVideoFrame& const_frame) {
     
     cv::imencode(".jpg", bgr_Mat, compressed_buffer, params);
 
-    return compressed_buffer; // Store this in your circular buffer
+    return compressed_buffer; // Store this in the circular buffer
 }
 
 size_t get_target_fps(){
@@ -261,7 +260,7 @@ void StreamHistoryTracker::on_frame(std::shared_ptr<const VideoFrame> frame){
             return; // skip
         }
 
-        // Advance by fixed intervals (NOT by arrival time)
+        // Advance by fixed intervals
         while (m_next_frame_time <= frame->timestamp){
             m_next_frame_time += std::chrono::microseconds(m_frame_interval);
         }
@@ -344,8 +343,6 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
     if (frames.empty()) return false;
 
     // Use first frame to get size
-    // QVideoFrame first_video_frame = decompress_video_frame(frames.front().compressed_frame);
-    // QImage first_img = first_video_frame.toImage().convertToFormat(QImage::Format_BGR888);
     QImage first_img = decompress_video_frame(frames.front().compressed_frame);
     int width = first_img.width();
     int height = first_img.height();
@@ -360,15 +357,29 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
         throw std::runtime_error("Could not open video file for writing.");
     }
 
-    // 2. Loop through your memory pointers
+    std::vector<unsigned char> last_good_buffer = frames[0].compressed_frame;
+    WallClock current_timeline = frames[0].timestamp;
+
+    // 2. Loop through frames
     for (CompressedVideoFrame frame : frames) {
-        // QVideoFrame video_frame = decompress_video_frame(frame.compressed_frame);
-        // QImage img = video_frame.toImage().convertToFormat(QImage::Format_BGR888);
+        // Insert dummy frames if there is a gap due to dropping frames.
+        // Because VideoWriter can only handle a fixed frame rate.
+        while (current_timeline + m_frame_interval < frame.timestamp) {
+            // Decompress last known good frame and write again
+            QImage img = decompress_video_frame(last_good_buffer);
+            cv::Mat mat(height, width, CV_8UC3, (void*)img.bits(), img.bytesPerLine());
+            writer.write(mat);
+
+            current_timeline += m_frame_interval;  
+        }
+
         QImage img = decompress_video_frame(frame.compressed_frame);
          
         cv::Mat mat(height, width, CV_8UC3, (void*)img.bits(), img.bytesPerLine());
-        
-        // 3. Write to video (Encoding happens here)
+        last_good_buffer = frame.compressed_frame;
+        current_timeline = frame.timestamp;
+
+        // 3. Write to video
         writer.write(mat);
     }
     // Writer automatically releases when going out of scope
