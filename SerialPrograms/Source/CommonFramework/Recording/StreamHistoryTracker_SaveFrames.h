@@ -39,6 +39,7 @@ std::vector<uchar> compress_video_frame(const QVideoFrame& const_frame);
 
 class StreamHistoryTracker{
 public:
+    ~StreamHistoryTracker();
     StreamHistoryTracker(
         Logger& logger,
         std::chrono::seconds window,
@@ -56,8 +57,10 @@ public:
 
 private:
     void clear_old();
+    void worker_loop(); // The function that runs in the thread
 
 private:
+    static constexpr size_t MAX_PENDING_FRAMES = 10;
     Logger& m_logger;
     mutable SpinLock m_lock;
     std::chrono::seconds m_window;
@@ -76,6 +79,17 @@ private:
     std::deque<std::shared_ptr<const VideoFrame>> m_frames;
     std::deque<CompressedVideoFrame> m_compressed_frames;
     WallClock m_next_frame_time;
+
+    std::thread m_worker;
+    std::atomic<bool> m_stopping{false};
+    
+    // Queue for the worker thread
+    std::mutex m_queue_lock;
+    std::condition_variable m_cv;
+    std::deque<std::shared_ptr<const VideoFrame>> m_pending_frames;
+
+    
+
     
 };
 

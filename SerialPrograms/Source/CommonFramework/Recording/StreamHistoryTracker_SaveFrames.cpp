@@ -21,6 +21,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Recording/StreamHistoryOption.h"
@@ -34,6 +35,15 @@ using std::endl;
 namespace PokemonAutomation{
 
 
+
+void simulate_cpu_load(int milliseconds) {
+    auto start = std::chrono::steady_clock::now();
+    while (std::chrono::steady_clock::now() - start < std::chrono::milliseconds(milliseconds)) {
+        // Waste cycles with dummy math to prevent compiler optimization
+        double d = 1.0;
+        d = std::sqrt(d * 1.1);
+    }
+}
 
 QImage decompress_video_frame(const std::vector<uchar> &compressed_buffer) {
     if (compressed_buffer.empty()) return {};
@@ -50,6 +60,9 @@ QImage decompress_video_frame(const std::vector<uchar> &compressed_buffer) {
 }
 
 std::vector<uchar> compress_video_frame(const QVideoFrame& const_frame) {
+    simulate_cpu_load(100);  // for testing, what happens when the CPU is overwhelmed, and needs to drop frames.
+
+
     // Create a local non-const copy (cheap, uses explicit sharing)
     QVideoFrame frame = const_frame;
 
@@ -181,6 +194,14 @@ private:
 };
 #endif
 
+StreamHistoryTracker::~StreamHistoryTracker() {
+    m_stopping = true;
+    m_cv.notify_all();
+    if (m_worker.joinable()) {
+        m_worker.join();
+    }
+}
+
 StreamHistoryTracker::StreamHistoryTracker(
     Logger& logger,
     std::chrono::seconds window,
@@ -197,7 +218,9 @@ StreamHistoryTracker::StreamHistoryTracker(
     , m_has_video(has_video)
     , m_target_fps(get_target_fps())
     , m_frame_interval(1000000 / m_target_fps)
-{}
+{
+    m_worker = std::thread(&StreamHistoryTracker::worker_loop, this);
+}
 
 void StreamHistoryTracker::set_window(std::chrono::seconds window){
     WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
@@ -223,30 +246,46 @@ void StreamHistoryTracker::on_samples(const float* samples, size_t frames){
 
 
 void StreamHistoryTracker::on_frame(std::shared_ptr<const VideoFrame> frame){
+    {
+        WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+    //    cout << "on_frame() = " << m_frames.size() << endl;
 
-    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
-//    cout << "on_frame() = " << m_frames.size() << endl;
+        // Initialize on first frame
+        if (m_next_frame_time == WallClock{}){
+            m_next_frame_time = frame->timestamp;
+        }
 
-    // Initialize on first frame
-    if (m_next_frame_time == WallClock{}){
-        m_next_frame_time = frame->timestamp;
+        // don't save every frame. only save frames as per m_target_fps
+        // Only save when we've crossed the next sampling boundary
+        if (frame->timestamp < m_next_frame_time){
+            return; // skip
+        }
+
+        // Advance by fixed intervals (NOT by arrival time)
+        while (m_next_frame_time <= frame->timestamp){
+            m_next_frame_time += std::chrono::microseconds(m_frame_interval);
+        }
+    } // Release SpinLock before hitting the queue mutex
+
+
+    // auto compressed_frame = compress_video_frame(frame->frame);
+    // m_compressed_frames.emplace_back(CompressedVideoFrame{frame->timestamp, std::move(compressed_frame)});
+    // // m_frames.emplace_back(std::move(frame));
+    // clear_old();
+
+    {
+        std::lock_guard<Mutex> lock(m_queue_lock);
+
+        // Drop oldest if we are falling behind
+        if (m_pending_frames.size() >= MAX_PENDING_FRAMES) {
+            m_pending_frames.pop_front(); 
+            m_logger.log("Worker thread lagging: Frame dropped.", COLOR_RED);
+        }
+        m_pending_frames.emplace_back(std::move(frame));
+
     }
+    m_cv.notify_one();
 
-    // don't save every frame. only save frames as per m_target_fps
-    // Only save when we've crossed the next sampling boundary
-    if (frame->timestamp < m_next_frame_time){
-        return; // skip
-    }
-
-    // Advance by fixed intervals (NOT by arrival time)
-    while (m_next_frame_time <= frame->timestamp){
-        m_next_frame_time += std::chrono::microseconds(m_frame_interval);
-    }
-
-    auto compressed_frame = compress_video_frame(frame->frame);
-    m_compressed_frames.emplace_back(CompressedVideoFrame{frame->timestamp, std::move(compressed_frame)});
-    // m_frames.emplace_back(std::move(frame));
-    clear_old();
 }
 
 
@@ -336,6 +375,37 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
 
     m_logger.log("Done saving stream history...", COLOR_BLUE);
     return true;
+}
+
+
+void StreamHistoryTracker::worker_loop() {
+    while (!m_stopping) {
+        std::shared_ptr<const VideoFrame> frame;
+
+        // 1. Wait for a frame to process
+        {
+            std::unique_lock<Mutex> lock(m_queue_lock);
+            m_cv.wait(lock, [this] { return !m_pending_frames.empty() || m_stopping; });
+            
+            if (m_stopping && m_pending_frames.empty()) return;
+
+            frame = std::move(m_pending_frames.front());
+            m_pending_frames.pop_front();
+        }
+
+        // 2. Perform the expensive compression (Outside the lock)
+        auto compressed_data = compress_video_frame(frame->frame);
+
+        // 3. Move the result into the main storage
+        {
+            WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+            m_compressed_frames.emplace_back(CompressedVideoFrame{
+                frame->timestamp, 
+                std::move(compressed_data)
+            });
+            clear_old(); // Cleanup happens here
+        }
+    }
 }
 
 
