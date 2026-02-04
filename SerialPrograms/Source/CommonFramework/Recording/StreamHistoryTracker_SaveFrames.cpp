@@ -344,7 +344,7 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
         frames = m_compressed_frames;
     }
 
-    cout << "frames.size(): " << frames.size() << endl;
+    m_logger.log("Total frames to save: " + std::to_string(frames.size()));
 
     if (frames.empty()) return false;
 
@@ -353,7 +353,7 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
     int width = first_img.width();
     int height = first_img.height();
 
-    cout << width << endl;
+    m_logger.log("Frame size: " + std::to_string(width) + " x " + std::to_string(height));
 
     // 1. Initialize VideoWriter (e.g., MP4 with 30 FPS)
     cv::VideoWriter writer(filename, cv::VideoWriter::fourcc('m', 'p', '4', 'v'), 
@@ -365,11 +365,16 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
 
     std::vector<unsigned char> last_good_buffer = frames[0].compressed_frame;
 
+    size_t frame_index = 0;
     size_t frames_inserted = 0;
     WallClock start_time = frames[0].timestamp;
 
     // 2. Loop through frames
     for (CompressedVideoFrame frame : frames) {
+        if (frame_index % 100 == 0) {
+            m_logger.log("Saving frame " + std::to_string(frame_index) + " / " + std::to_string(frames.size()));
+        }
+
         // Insert duplicate frames if there is a gap due to dropping frames.
         // Because VideoWriter can only handle a fixed frame rate.
 
@@ -393,6 +398,7 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
 
         last_good_buffer = frame.compressed_frame;
         frames_inserted++;
+        frame_index++;
     }
     // Writer automatically releases when going out of scope
 
