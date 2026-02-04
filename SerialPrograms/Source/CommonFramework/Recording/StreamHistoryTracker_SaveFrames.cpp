@@ -364,29 +364,35 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
     }
 
     std::vector<unsigned char> last_good_buffer = frames[0].compressed_frame;
-    WallClock current_timeline = frames[0].timestamp;
+
+    size_t frames_inserted = 0;
+    WallClock start_time = frames[0].timestamp;
 
     // 2. Loop through frames
     for (CompressedVideoFrame frame : frames) {
         // Insert duplicate frames if there is a gap due to dropping frames.
         // Because VideoWriter can only handle a fixed frame rate.
-        while (current_timeline + m_frame_interval < frame.timestamp) {
+
+        // calculates the frame index that this timestamp SHOULD be at
+        double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(frame.timestamp - start_time).count();
+        double interval = std::chrono::duration_cast<std::chrono::milliseconds>(m_frame_interval).count();
+        size_t target_frame_index = (size_t)std::round(elapsed/interval);
+        // fill the gap with duplicate frames until we reach the target index
+        while (frames_inserted < target_frame_index) {
             // Decompress last known good frame and write again
             QImage img = decompress_video_frame(last_good_buffer);
             cv::Mat mat(height, width, CV_8UC3, (void*)img.bits(), img.bytesPerLine());
             writer.write(mat);
-
-            current_timeline += m_frame_interval;  
+            frames_inserted++;
         }
 
+        // 3. decompress frame and write to video
         QImage img = decompress_video_frame(frame.compressed_frame);
-         
         cv::Mat mat(height, width, CV_8UC3, (void*)img.bits(), img.bytesPerLine());
-        last_good_buffer = frame.compressed_frame;
-        current_timeline = frame.timestamp;
-
-        // 3. Write to video
         writer.write(mat);
+
+        last_good_buffer = frame.compressed_frame;
+        frames_inserted++;
     }
     // Writer automatically releases when going out of scope
 
