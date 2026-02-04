@@ -8,16 +8,15 @@
  */
 
 #include <opencv2/opencv.hpp>
-// #include <deque>
-#include <QCoreApplication>
-#include <QFileInfo>
-#include <QUrl>
-#include <QAudioBufferInput>
-#include <QVideoFrameInput>
-#include <QMediaFormat>
-#include <QMediaRecorder>
-#include <QMediaCaptureSession>
-#include <QScopeGuard>
+// #include <QCoreApplication>
+// #include <QFileInfo>
+// #include <QUrl>
+// #include <QAudioBufferInput>
+// #include <QVideoFrameInput>
+// #include <QMediaFormat>
+// #include <QMediaRecorder>
+// #include <QMediaCaptureSession>
+// #include <QScopeGuard>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
