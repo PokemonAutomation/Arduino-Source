@@ -5,6 +5,9 @@ SerialPrograms/bin/
 discord_social_sdk_win/
 discord_partner_sdk.dll
 3rdPartyBinaries/discord_social_sdk_mac/
+3rdPartyBinaries/onnxruntime-osx-arm64-*/
+3rdPartyBinaries/onnxruntime-osx-x86_64-*/
+
 
 # macOS hidden system file
 .DS_Store
