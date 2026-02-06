@@ -14,9 +14,9 @@ resources:
 
     - repository: Arduino-Source
       type: github
-      name: PokemonAutomation/Arduino-Source
-      endpoint: PokemonAutomation
-      ref: refs/heads/main
+      name: Koi-3088/Arduino-Source
+      endpoint: Koi-3088
+      ref: refs/heads/azure
 
 variables:
   - group: apple-signing
@@ -466,7 +466,7 @@ stages:
     versionMajor: ${{ parameters.versionMajor }}
     versionMinor: ${{ parameters.versionMinor }}
     versionPatch: ${{ parameters.versionPatch }}
-    telemetryRepo: PokemonAutomation/ServerConfigs-PA-SHA
+    telemetryRepo: Koi-3088/ServerConfigs-PA-SHA
     condition: and(succeeded(), eq('${{ parameters.targetOS }}', 'All'), ne('${{ parameters.buildType }}', 'Commit'))
 
 ##########################################
@@ -488,7 +488,7 @@ stages:
     versionMajor: ${{ parameters.versionMajor }}
     versionMinor: ${{ parameters.versionMinor }}
     versionPatch: ${{ parameters.versionPatch }}
-    targetRepo: 'PokemonAutomation/ComputerControl'
+    targetRepo: 'Koi-3088/ComputerControl'
     condition: and(succeeded(), eq('${{ parameters.targetOS }}', 'All'), or(eq('${{ parameters.buildType }}', 'Release'), eq('${{ parameters.buildType }}', 'Beta')))
 
 ##########################################
@@ -505,5 +505,5 @@ stages:
     versionMajor: ${{ parameters.versionMajor }}
     versionMinor: ${{ parameters.versionMinor }}
     versionPatch: ${{ parameters.versionPatch }}
-    versionRepo: PokemonAutomation/ComputerControl
+    versionRepo: Koi-3088/ComputerControl
     condition: and(succeeded(), eq('${{ parameters.targetOS }}', 'All'), ne('${{ parameters.buildType }}', 'Commit'))
