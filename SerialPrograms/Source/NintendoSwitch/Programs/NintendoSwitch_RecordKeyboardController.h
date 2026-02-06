@@ -12,6 +12,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
+#include "Common/Cpp/Options/StaticTextOption.h"
 //#include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -101,6 +102,8 @@ private:
     SimpleIntegerOption<uint32_t> LOOP;
     SimpleIntegerOption<uint32_t> WAIT;
     BooleanCheckBoxOption GENERATE_CPP_CODE_AFTER_RECORDING;
+
+    StaticTextOption USAGE_NOTE;
 
     std::vector<ControllerStateSnapshot> m_controller_history;
     

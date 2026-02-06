@@ -75,7 +75,12 @@ RecordKeyboardController::RecordKeyboardController()
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
+    , USAGE_NOTE(
+        "NOTE: Each keypress has a small amount of error when recorded/played back (approximately 8-15 ms). "
+        "I recommend fewer long button presses instead of many short button presses. "        
+    )
 {
+    PA_ADD_OPTION(USAGE_NOTE);
     PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(FILE_NAME);
     PA_ADD_OPTION(LOOP);
