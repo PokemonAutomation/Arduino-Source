@@ -151,7 +151,6 @@ void MultiSwitchProgramSession::internal_stop_program(){
 }
 void MultiSwitchProgramSession::internal_run_program(){
     auto ScopeCheck = m_sanitizer.check_scope();
-    GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread(logger());
     m_option.options().reset_state();
 
     SleepSuppressScope sleep_scope(GlobalSettings::instance().SLEEP_SUPPRESS->PROGRAM_RUNNING);

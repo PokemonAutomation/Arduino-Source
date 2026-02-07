@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "InterruptableCommands.h"
 
 //#include <iostream>
@@ -42,7 +43,7 @@ AsyncCommandSession<ControllerType>::CommandSet::CommandSet(
 
 template <typename ControllerType>
 AsyncCommandSession<ControllerType>::AsyncCommandSession(
-    CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
+    CancellableScope& scope, Logger& logger,
     ControllerType& controller
 )
     : m_logger(logger)
@@ -53,7 +54,9 @@ AsyncCommandSession<ControllerType>::AsyncCommandSession(
     attach(scope);
 
     //  Now start the thread. Destructor is guaranteed to run if this succeeds.
-    m_thread = dispatcher.dispatch([this]{ thread_loop(); });
+    m_thread = GlobalThreadPools::unlimited_realtime().blocking_dispatch(
+        [this]{ thread_loop(); }
+    );
 }
 template <typename ControllerType>
 AsyncCommandSession<ControllerType>::~AsyncCommandSession(){

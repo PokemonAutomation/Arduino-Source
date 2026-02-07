@@ -134,7 +134,6 @@ void SingleSwitchProgramSession::internal_stop_program(){
     }
 }
 void SingleSwitchProgramSession::internal_run_program(){
-    GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread(logger());
     m_option.options().reset_state();
 
     if (!m_system.controller_session().ready()){

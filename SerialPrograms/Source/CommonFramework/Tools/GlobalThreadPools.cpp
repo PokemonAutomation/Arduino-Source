@@ -36,7 +36,16 @@ ComputationThreadPool& computation_normal(){
 ComputationThreadPool& unlimited_realtime(){
     static ComputationThreadPool runner(
         [](){
-            GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_POOL.PRIORITY.set_on_this_thread(global_logger_tagged());
+            GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread(global_logger_tagged());
+        },
+        0
+    );
+    return runner;
+}
+ComputationThreadPool& unlimited_pivot(){
+    static ComputationThreadPool runner(
+        [](){
+            GlobalSettings::instance().PERFORMANCE->INFERENCE_PIVOT_PRIORITY.set_on_this_thread(global_logger_tagged());
         },
         0
     );

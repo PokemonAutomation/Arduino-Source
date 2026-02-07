@@ -82,7 +82,6 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
     AsyncCommandSession<ProController> session(
         context,
         env.console.logger(),
-        env.realtime_dispatcher(),
         env.console.controller<ProController>()
     );
 

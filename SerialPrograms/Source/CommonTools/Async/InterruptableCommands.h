@@ -25,7 +25,7 @@ class AsyncCommandSession final : private Cancellable{
 
 public:
     AsyncCommandSession(
-        CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
+        CancellableScope& scope, Logger& logger,
         ControllerType& controller
     );
     virtual ~AsyncCommandSession();

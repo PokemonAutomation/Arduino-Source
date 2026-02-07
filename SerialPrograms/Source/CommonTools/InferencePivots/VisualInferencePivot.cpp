@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "VisualInferencePivot.h"
 
@@ -40,8 +41,8 @@ struct VisualInferencePivot::PeriodicCallback{
 
 
 
-VisualInferencePivot::VisualInferencePivot(CancellableScope& scope, VideoFeed& feed, AsyncDispatcher& dispatcher)
-    : PeriodicRunner(dispatcher)
+VisualInferencePivot::VisualInferencePivot(CancellableScope& scope, VideoFeed& feed)
+    : PeriodicRunner(GlobalThreadPools::unlimited_pivot())
     , m_feed(feed)
 {
     attach(scope);

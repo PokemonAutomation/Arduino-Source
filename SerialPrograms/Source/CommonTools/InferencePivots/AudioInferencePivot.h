@@ -21,7 +21,7 @@ class AudioFeed;
 
 class AudioInferencePivot final : public PeriodicRunner, public OverlayStat{
 public:
-    AudioInferencePivot(CancellableScope& scope, AudioFeed& feed, AsyncDispatcher& dispatcher);
+    AudioInferencePivot(CancellableScope& scope, AudioFeed& feed);
     virtual ~AudioInferencePivot();
 
     //  If this callback returns true:

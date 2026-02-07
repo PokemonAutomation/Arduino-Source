@@ -17,7 +17,8 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
-#include "AsyncDispatcher.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
 
 namespace PokemonAutomation{
 
@@ -73,7 +74,7 @@ public:
     double current_utilization() const;
 
 protected:
-    PeriodicRunner(AsyncDispatcher& dispatcher);
+    PeriodicRunner(ComputationThreadPool& thread_pool);
     bool add_event(void* event, std::chrono::milliseconds period, WallClock start = current_time());
     void remove_event(void* event);
 
@@ -90,7 +91,7 @@ protected:
     void stop_thread();
 
 private:
-    AsyncDispatcher& m_dispatcher;
+    ComputationThreadPool& m_thread_pool;
 
     std::atomic<size_t> m_pending_waits;
     Mutex m_lock;

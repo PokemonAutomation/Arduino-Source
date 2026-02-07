@@ -22,7 +22,7 @@ class VideoFeed;
 
 class VisualInferencePivot final : public PeriodicRunner, public OverlayStat{
 public:
-    VisualInferencePivot(CancellableScope& scope, VideoFeed& feed, AsyncDispatcher& dispatcher);
+    VisualInferencePivot(CancellableScope& scope, VideoFeed& feed);
     virtual ~VisualInferencePivot();
 
     //  If this callback returns true:

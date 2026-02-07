@@ -73,7 +73,7 @@ public:
 
 
 public:
-    void initialize_inference_threads(CancellableScope& scope, AsyncDispatcher& dispatcher);
+    void initialize_inference_threads(CancellableScope& scope);
 
 
 private:

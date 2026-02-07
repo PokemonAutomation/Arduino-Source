@@ -45,7 +45,7 @@ private:
         : ProgramEnvironment(program_info, session, current_stats, historical_stats)
         , console(0, std::forward<Args>(args)...)
     {
-        console.initialize_inference_threads(scope, realtime_inference_dispatcher());
+        console.initialize_inference_threads(scope);
     }
 };
 

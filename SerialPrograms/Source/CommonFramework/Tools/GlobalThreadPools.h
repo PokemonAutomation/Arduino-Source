@@ -21,6 +21,7 @@ ComputationThreadPool& computation_normal();
 //  These are general purpose thread pools of unlimited size.
 //  Dispatching to these will never block.
 ComputationThreadPool& unlimited_realtime();
+ComputationThreadPool& unlimited_pivot();
 ComputationThreadPool& unlimited_normal();
 
 

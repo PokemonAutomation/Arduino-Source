@@ -104,8 +104,8 @@ private:
 
 
 
-PeriodicRunner::PeriodicRunner(AsyncDispatcher& dispatcher)
-    : m_dispatcher(dispatcher)
+PeriodicRunner::PeriodicRunner(ComputationThreadPool& thread_pool)
+    : m_thread_pool(thread_pool)
     , m_pending_waits(0)
 {}
 bool PeriodicRunner::add_event(void* event, std::chrono::milliseconds period, WallClock start){
@@ -117,7 +117,7 @@ bool PeriodicRunner::add_event(void* event, std::chrono::milliseconds period, Wa
 
     //  Thread not started yet. Do this first for strong exception safety.
     if (!m_runner){
-        m_runner = m_dispatcher.dispatch([this]{ thread_loop(); });
+        m_runner = m_thread_pool.blocking_dispatch([this]{ thread_loop(); });
     }
 
     bool ret = m_scheduler.add_event(event, period, start);

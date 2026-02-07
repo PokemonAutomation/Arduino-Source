@@ -46,7 +46,7 @@ void FileWindowLogger::stop(){
 
 FileWindowLogger::FileWindowLogger(const std::string& path, size_t max_queue_size)
     : m_file_logger(
-        GlobalThreadPools::unlimited_realtime(),
+        GlobalThreadPools::unlimited_normal(),
         FileLoggerConfig{
             .file_path = path,
             .max_queue_size = max_queue_size,

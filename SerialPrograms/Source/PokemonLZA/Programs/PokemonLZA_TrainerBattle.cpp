@@ -46,7 +46,6 @@ bool TrainerBattleState::attempt_one_attack(
     AsyncCommandSession<ProController> command(
         context,
         console.logger(),
-        env.realtime_dispatcher(),
         context
     );
 

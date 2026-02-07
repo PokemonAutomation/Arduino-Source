@@ -413,7 +413,6 @@ HandMoveData move_sandwich_hand_and_check_if_plates_empty(
     AsyncCommandSession<ProController> move_session(
         context,
         stream.logger(),
-        env.realtime_dispatcher(),
         context.controller()
     );
     
