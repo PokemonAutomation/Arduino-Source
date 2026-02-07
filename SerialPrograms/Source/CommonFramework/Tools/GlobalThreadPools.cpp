@@ -14,8 +14,8 @@ namespace GlobalThreadPools{
 
 
 
-ComputationThreadPool& computation_realtime(){
-    static ComputationThreadPool runner(
+ThreadPool& computation_realtime(){
+    static ThreadPool runner(
         [](){
             GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_POOL.PRIORITY.set_on_this_thread(global_logger_tagged());
         },
@@ -23,8 +23,8 @@ ComputationThreadPool& computation_realtime(){
     );
     return runner;
 }
-ComputationThreadPool& computation_normal(){
-    static ComputationThreadPool runner(
+ThreadPool& computation_normal(){
+    static ThreadPool runner(
         [](){
             GlobalSettings::instance().PERFORMANCE->NORMAL_THREAD_POOL.PRIORITY.set_on_this_thread(global_logger_tagged());
         },
@@ -33,8 +33,8 @@ ComputationThreadPool& computation_normal(){
     return runner;
 }
 
-ComputationThreadPool& unlimited_realtime(){
-    static ComputationThreadPool runner(
+ThreadPool& unlimited_realtime(){
+    static ThreadPool runner(
         [](){
             GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread(global_logger_tagged());
         },
@@ -42,8 +42,8 @@ ComputationThreadPool& unlimited_realtime(){
     );
     return runner;
 }
-ComputationThreadPool& unlimited_pivot(){
-    static ComputationThreadPool runner(
+ThreadPool& unlimited_pivot(){
+    static ThreadPool runner(
         [](){
             GlobalSettings::instance().PERFORMANCE->INFERENCE_PIVOT_PRIORITY.set_on_this_thread(global_logger_tagged());
         },
@@ -51,8 +51,8 @@ ComputationThreadPool& unlimited_pivot(){
     );
     return runner;
 }
-ComputationThreadPool& unlimited_normal(){
-    static ComputationThreadPool runner(
+ThreadPool& unlimited_normal(){
+    static ThreadPool runner(
         [](){
             GlobalSettings::instance().PERFORMANCE->NORMAL_THREAD_POOL.PRIORITY.set_on_this_thread(global_logger_tagged());
         },

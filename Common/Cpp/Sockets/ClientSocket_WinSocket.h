@@ -12,7 +12,7 @@
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
-#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "AbstractClientSocket.h"
 
 #pragma comment(lib, "Ws2_32.lib")
@@ -23,7 +23,7 @@ namespace PokemonAutomation{
 
 class ClientSocket_WinSocket final : public AbstractClientSocket{
 public:
-    ClientSocket_WinSocket(ComputationThreadPool& thread_pool)
+    ClientSocket_WinSocket(ThreadPool& thread_pool)
         : m_thread_pool(thread_pool)
         , m_socket(::socket(AF_INET, SOCK_STREAM, 0))
     {
@@ -234,7 +234,7 @@ Connected:
 
 
 private:
-    ComputationThreadPool& m_thread_pool;
+    ThreadPool& m_thread_pool;
     const SOCKET m_socket;
 
     std::string m_error;

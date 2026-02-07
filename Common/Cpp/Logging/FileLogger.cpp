@@ -12,7 +12,7 @@
 namespace PokemonAutomation{
 
 
-FileLogger::FileLogger(ComputationThreadPool& thread_pool, FileLoggerConfig config)
+FileLogger::FileLogger(ThreadPool& thread_pool, FileLoggerConfig config)
     : m_config(std::move(config))
     , m_last_log_tracker(m_config.last_log_max_lines)
     , m_stopping(false)

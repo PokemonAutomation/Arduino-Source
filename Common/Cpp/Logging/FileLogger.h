@@ -15,7 +15,7 @@
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
-#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "Common/Cpp/FileIO.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "LastLogTracker.h"
@@ -59,7 +59,7 @@ public:
     // Construct a FileLogger with the given configuration.
     // The log file is created if it doesn't exist, or appended to if it does.
     // A UTF-8 BOM is written to new files.
-    FileLogger(ComputationThreadPool& thread_pool, FileLoggerConfig config);
+    FileLogger(ThreadPool& thread_pool, FileLoggerConfig config);
 
     ~FileLogger();
     void stop();

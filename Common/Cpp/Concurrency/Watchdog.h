@@ -19,7 +19,7 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
-#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 
 namespace PokemonAutomation{
 
@@ -32,7 +32,7 @@ struct WatchdogCallback{
 
 class Watchdog{
 public:
-    Watchdog(ComputationThreadPool& thread_pool);
+    Watchdog(ThreadPool& thread_pool);
     ~Watchdog();
 
     void stop();

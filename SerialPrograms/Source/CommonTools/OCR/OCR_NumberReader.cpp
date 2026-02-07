@@ -243,7 +243,7 @@ int read_number_waterfill(
 
 int read_number_waterfill_multifilter(
     Logger& logger,
-    ComputationThreadPool& thread_pool,
+    ThreadPool& thread_pool,
     const ImageViewRGB32& image,
     std::vector<std::pair<uint32_t, uint32_t>> filters,    
     bool text_inside_range,

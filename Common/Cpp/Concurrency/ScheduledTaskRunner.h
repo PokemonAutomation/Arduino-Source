@@ -13,14 +13,14 @@
 #include "Common/Cpp/Time.h"
 //#include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
-#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 
 namespace PokemonAutomation{
 
 
 class ScheduledTaskRunner{
 public:
-    ScheduledTaskRunner(ComputationThreadPool& thread_pool);
+    ScheduledTaskRunner(ThreadPool& thread_pool);
     ~ScheduledTaskRunner();
     void stop();
 

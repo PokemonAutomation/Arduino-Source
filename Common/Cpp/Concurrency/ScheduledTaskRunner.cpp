@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 
 
 
-ScheduledTaskRunner::ScheduledTaskRunner(ComputationThreadPool& thread_pool)
+ScheduledTaskRunner::ScheduledTaskRunner(ThreadPool& thread_pool)
     : m_stopped(false)
     , m_runner(thread_pool.blocking_dispatch([this]{ thread_loop(); }))
 {

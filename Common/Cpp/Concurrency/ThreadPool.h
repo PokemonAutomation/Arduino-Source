@@ -1,4 +1,4 @@
-/*  Computation Thread Pool
+/*  Thread Pool
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -13,44 +13,36 @@
  *
  */
 
-#ifndef PokemonAutomation_ComputationThreadPoolCore_H
-#define PokemonAutomation_ComputationThreadPoolCore_H
+#ifndef PokemonAutomation_ThreadPool_H
+#define PokemonAutomation_ThreadPool_H
 
 #include <functional>
-#include <deque>
-#include "Common/Cpp/CpuUtilization/CpuUtilization.h"
-#include "Common/Cpp/Stopwatch.h"
-#include "Common/Cpp/Concurrency/Mutex.h"
-#include "Common/Cpp/Concurrency/ConditionVariable.h"
-#include "Common/Cpp/Concurrency/Thread.h"
-#include "AsyncTask.h"
+#include "Common/Cpp/Time.h"
+#include "Common/Cpp/Containers/Pimpl.h"
 
 namespace PokemonAutomation{
 
+class AsyncTask;
+class ThreadPoolCore;
 
 
-
-class ComputationThreadPoolCore final{
+class ThreadPool final{
 public:
-    ComputationThreadPoolCore(
+    ThreadPool(
         std::function<void()>&& new_thread_callback,
         size_t starting_threads,
-        size_t max_threads
+        size_t max_threads = (size_t)-1
     );
-    ~ComputationThreadPoolCore();
+    ~ThreadPool();
 
-    size_t current_threads() const{
-        std::lock_guard<Mutex> lg(m_lock);
-        return m_threads.size();
-    }
-    size_t max_threads() const{
-        return m_max_threads;
-    }
+    size_t current_threads() const;
+    size_t max_threads() const;
     WallDuration cpu_time() const;
 
     void ensure_threads(size_t threads);
 
     void stop();
+
 //    void wait_for_everything();
 
 
@@ -76,32 +68,13 @@ public:
 
 
 private:
-    struct ThreadData{
-        Thread thread;
-        ThreadHandle handle;
-        Stopwatch runtime;
-    };
-
-    void spawn_thread();
-    void spawn_threads();
-    void thread_loop(ThreadData& data);
-
-
-private:
-    struct Data;
-
-    std::function<void()> m_new_thread_callback;
-    size_t m_max_threads;
-    std::deque<AsyncTask*> m_queue;
-
-    std::deque<ThreadData> m_threads;
-
-    bool m_stopping;
-    size_t m_busy_count;
-    mutable Mutex m_lock;
-    ConditionVariable m_thread_cv;
-    ConditionVariable m_dispatch_cv;
+    Pimpl<ThreadPoolCore> m_core;
 };
+
+
+
+
+
 
 
 

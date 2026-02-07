@@ -21,7 +21,7 @@
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
-#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "AbstractClientSocket.h"
 
 namespace PokemonAutomation{
@@ -30,7 +30,7 @@ namespace PokemonAutomation{
 
 class ClientSocket_POSIX final : public AbstractClientSocket{
 public:
-    ClientSocket_POSIX(ComputationThreadPool& thread_pool)
+    ClientSocket_POSIX(ThreadPool& thread_pool)
         : m_thread_pool(thread_pool)
         , m_socket(socket(AF_INET, SOCK_STREAM, 0)){
         // Ignore SIGPIPE. Handle errors via errno instead
@@ -265,7 +265,7 @@ Connected:
 
 
 private:
-    ComputationThreadPool& m_thread_pool;
+    ThreadPool& m_thread_pool;
     const int m_socket;
 
     std::string m_error;

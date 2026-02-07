@@ -1,4 +1,4 @@
-/*  Computation Thread Pool
+/*  Thread Pool
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -7,7 +7,7 @@
 #include <thread>
 #include "Common/Cpp/PanicDump.h"
 #include "ReverseLockGuard.h"
-#include "ComputationThreadPoolCore.h"
+#include "ThreadPoolCore.h"
 
 //#include <iostream>
 //using std::cout;
@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 
 
-ComputationThreadPoolCore::ComputationThreadPoolCore(
+ThreadPoolCore::ThreadPoolCore(
     std::function<void()>&& new_thread_callback,
     size_t starting_threads,
     size_t max_threads
@@ -32,7 +32,7 @@ ComputationThreadPoolCore::ComputationThreadPoolCore(
     }
 }
 
-void ComputationThreadPoolCore::stop() {
+void ThreadPoolCore::stop() {
     {
         std::lock_guard<Mutex> lg(m_lock);
         if (m_stopping) return;
@@ -58,14 +58,14 @@ void ComputationThreadPoolCore::stop() {
 
 }
 
-ComputationThreadPoolCore::~ComputationThreadPoolCore(){
+ThreadPoolCore::~ThreadPoolCore(){
     stop();
 }
 
 
 
 
-WallDuration ComputationThreadPoolCore::cpu_time() const{
+WallDuration ThreadPoolCore::cpu_time() const{
     //  TODO: Don't lock the entire queue.
     WallDuration ret = WallDuration::zero();
     std::lock_guard<Mutex> lg(m_lock);
@@ -77,14 +77,14 @@ WallDuration ComputationThreadPoolCore::cpu_time() const{
 }
 
 
-void ComputationThreadPoolCore::ensure_threads(size_t threads){
+void ThreadPoolCore::ensure_threads(size_t threads){
     std::lock_guard<Mutex> lg(m_lock);
     while (m_threads.size() < threads){
         spawn_thread();
     }
 }
 #if 0
-void ComputationThreadPoolCore::wait_for_everything(){
+void ThreadPoolCore::wait_for_everything(){
     std::unique_lock<Mutex> lg(m_lock);
     m_dispatch_cv.wait(lg, [this]{
         return m_queue.size() + m_busy_count == 0;
@@ -92,7 +92,7 @@ void ComputationThreadPoolCore::wait_for_everything(){
 }
 #endif
 
-std::unique_ptr<AsyncTask> ComputationThreadPoolCore::blocking_dispatch(std::function<void()>&& func){
+std::unique_ptr<AsyncTask> ThreadPoolCore::blocking_dispatch(std::function<void()>&& func){
     std::unique_ptr<AsyncTask> task(new AsyncTask(std::move(func)));
 
     {
@@ -123,7 +123,7 @@ std::unique_ptr<AsyncTask> ComputationThreadPoolCore::blocking_dispatch(std::fun
 
     return task;
 }
-std::unique_ptr<AsyncTask> ComputationThreadPoolCore::try_dispatch(std::function<void()>& func){
+std::unique_ptr<AsyncTask> ThreadPoolCore::try_dispatch(std::function<void()>& func){
     std::unique_ptr<AsyncTask> task;
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -146,7 +146,7 @@ std::unique_ptr<AsyncTask> ComputationThreadPoolCore::try_dispatch(std::function
 }
 
 
-void ComputationThreadPoolCore::run_in_parallel(
+void ThreadPoolCore::run_in_parallel(
     const std::function<void(size_t index)>& func,
     size_t start, size_t end,
     size_t block_size
@@ -205,7 +205,7 @@ void ComputationThreadPoolCore::run_in_parallel(
 
 
 
-void ComputationThreadPoolCore::spawn_thread(){
+void ThreadPoolCore::spawn_thread(){
     //  Must call under lock.
     ThreadData& handle = m_threads.emplace_back();
     try{
@@ -220,12 +220,12 @@ void ComputationThreadPoolCore::spawn_thread(){
         throw;
     }
 }
-void ComputationThreadPoolCore::spawn_threads(){
+void ThreadPoolCore::spawn_threads(){
     while (m_threads.size() < std::min(m_queue.size() + m_busy_count, m_max_threads)){
         spawn_thread();
     }
 }
-void ComputationThreadPoolCore::thread_loop(ThreadData& data){
+void ThreadPoolCore::thread_loop(ThreadData& data){
     data.handle = current_thread_handle();
 
     if (m_new_thread_callback){

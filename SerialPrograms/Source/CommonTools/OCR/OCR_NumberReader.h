@@ -10,7 +10,7 @@
 #include <stdint.h>
 #include <vector>
 #include "CommonFramework/Language.h"
-#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 
 namespace PokemonAutomation{
     class Logger;
@@ -50,7 +50,7 @@ int read_number_waterfill(
 // log_line_index: adds an index prefix to the logging lines for logging purposes when calling this function in parallel.
 int read_number_waterfill_multifilter(
     Logger& logger,
-    ComputationThreadPool& thread_pool,
+    ThreadPool& thread_pool,
     const ImageViewRGB32& image,
     std::vector<std::pair<uint32_t, uint32_t>> filters,
     bool text_inside_range = true,

@@ -20,7 +20,7 @@
 
 namespace PokemonAutomation{
 
-class ComputationThreadPool;
+class ThreadPool;
 
 
 
@@ -37,7 +37,7 @@ class ClientSocket_Qt final : public QThread, public AbstractClientSocket{
 
 
 public:
-    ClientSocket_Qt(ComputationThreadPool&)
+    ClientSocket_Qt(ThreadPool&)
         : m_socket(nullptr)
     {
 //        cout << "ClientSocket_Qt()" << endl;

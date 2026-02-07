@@ -7,7 +7,7 @@
 #include <Windows.h>
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
-#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "SystemSleep.h"

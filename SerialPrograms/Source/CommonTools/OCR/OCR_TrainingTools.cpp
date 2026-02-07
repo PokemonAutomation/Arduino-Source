@@ -7,7 +7,7 @@
 #include <QDirIterator>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
-#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
@@ -111,7 +111,7 @@ void TrainingSession::generate_small_dictionary(
     OCR::SmallDictionaryMatcher baseline(ocr_json_file, !incremental);
     OCR::SmallDictionaryMatcher trained(ocr_json_file, !incremental);
 
-    ComputationThreadPool task_runner(
+    ThreadPool task_runner(
         [&](){ GlobalSettings::instance().PERFORMANCE->COMPUTE_PRIORITY.set_on_this_thread(m_logger); },
         0, threads
     );
@@ -198,7 +198,7 @@ void TrainingSession::generate_large_dictionary(
     OCR::LargeDictionaryMatcher baseline(ocr_json_directory + output_prefix, nullptr, !incremental);
     OCR::LargeDictionaryMatcher trained(ocr_json_directory + output_prefix, nullptr, !incremental);
 
-    ComputationThreadPool task_runner(
+    ThreadPool task_runner(
         [&](){ GlobalSettings::instance().PERFORMANCE->COMPUTE_PRIORITY.set_on_this_thread(m_logger); },
         0, threads
     );

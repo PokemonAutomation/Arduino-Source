@@ -104,7 +104,7 @@ private:
 
 
 
-PeriodicRunner::PeriodicRunner(ComputationThreadPool& thread_pool)
+PeriodicRunner::PeriodicRunner(ThreadPool& thread_pool)
     : m_thread_pool(thread_pool)
     , m_pending_waits(0)
 {}

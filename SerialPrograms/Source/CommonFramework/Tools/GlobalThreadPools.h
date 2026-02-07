@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_CommonTools_GlobalThreadPools_H
 #define PokemonAutomation_CommonTools_GlobalThreadPools_H
 
-#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 
 namespace PokemonAutomation{
 namespace GlobalThreadPools{
@@ -15,14 +15,14 @@ namespace GlobalThreadPools{
 
 //  Computational thread pools.
 //  These are capped to their respective MAX_THREADS and may block.
-ComputationThreadPool& computation_realtime();
-ComputationThreadPool& computation_normal();
+ThreadPool& computation_realtime();
+ThreadPool& computation_normal();
 
 //  These are general purpose thread pools of unlimited size.
 //  Dispatching to these will never block.
-ComputationThreadPool& unlimited_realtime();
-ComputationThreadPool& unlimited_pivot();
-ComputationThreadPool& unlimited_normal();
+ThreadPool& unlimited_realtime();
+ThreadPool& unlimited_pivot();
+ThreadPool& unlimited_normal();
 
 
 

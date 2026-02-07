@@ -5,7 +5,7 @@
  */
 
 //#include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "ThreadUtilizationStats.h"
 
 //#include <iostream>
@@ -41,7 +41,7 @@ OverlayStatSnapshot ThreadUtilizationStat::get_current(){
 
 
 
-ThreadPoolUtilizationStat::ThreadPoolUtilizationStat(const ComputationThreadPool& thread_pool, std::string label)
+ThreadPoolUtilizationStat::ThreadPoolUtilizationStat(const ThreadPool& thread_pool, std::string label)
     : m_thread_pool(thread_pool)
     , m_label(std::move(label))
     , m_last_clock(thread_pool.cpu_time())
