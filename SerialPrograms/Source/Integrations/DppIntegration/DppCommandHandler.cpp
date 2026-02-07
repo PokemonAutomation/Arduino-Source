@@ -19,6 +19,7 @@ namespace DppCommandHandler{
 user Handler::owner;
 Color Handler::color = COLOR_WHITE;
 
+
 void Handler::initialize(cluster& bot, commandhandler& handler){
     global_logger_tagged().log("Initializing DPP...");
 
@@ -130,7 +131,14 @@ void Handler::initialize(cluster& bot, commandhandler& handler){
     });
 }
 
-void Handler::send_message(cluster& bot, embed& embed, const std::string& channel, std::chrono::milliseconds delay, const std::string& msg, std::shared_ptr<PendingFileSend> file){
+void Handler::send_message(
+    cluster& bot,
+    embed& embed,
+    const std::string& channel,
+    std::chrono::milliseconds delay,
+    const std::string& msg,
+    std::shared_ptr<PendingFileSend> file
+){
     Handler::m_queue.add_event(delay > std::chrono::milliseconds(10000) ? std::chrono::milliseconds(0) : delay,
     [&bot, this, embed = std::move(embed), channel = channel, msg = msg, file = std::move(file)]() mutable {
         message m;

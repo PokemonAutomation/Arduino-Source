@@ -11,7 +11,6 @@
 
 namespace PokemonAutomation{
 
-class AsyncDispatcher;
 class StatsTracker;
 class ProgramSession;
 struct ProgramInfo;

@@ -45,6 +45,8 @@ private:
 
 
 public:
+    void stop();
+
     void send(
         Logger& logger,
         const QUrl& url, std::chrono::milliseconds delay,
@@ -84,7 +86,6 @@ private:
     std::unique_ptr<QEventLoop> m_event_loop;
 
     std::deque<WallClock> m_sent;
-    AsyncDispatcher m_dispatcher;
     ScheduledTaskRunner m_queue;
 };
 

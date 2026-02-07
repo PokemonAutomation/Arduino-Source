@@ -12,15 +12,17 @@
 #include <map>
 #include "Common/Cpp/Time.h"
 //#include "Common/Cpp/CancellableScope.h"
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
 
 namespace PokemonAutomation{
 
 
 class ScheduledTaskRunner{
 public:
+    ScheduledTaskRunner(ComputationThreadPool& thread_pool);
     ~ScheduledTaskRunner();
-    ScheduledTaskRunner(AsyncDispatcher& dispatcher);
+    void stop();
 
     //  Returns the # of events in the schedule.
     size_t size() const;

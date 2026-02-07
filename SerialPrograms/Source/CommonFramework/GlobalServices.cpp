@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 #include "Common/Cpp/Concurrency/Watchdog.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"

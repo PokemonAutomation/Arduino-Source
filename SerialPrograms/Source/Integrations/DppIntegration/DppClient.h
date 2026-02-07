@@ -23,6 +23,11 @@ public:
     ~Client();
     static Client& instance();
 
+    virtual void stop() override{
+        disconnect();
+        Handler::stop();
+    }
+
 public:
     bool is_initialized();
     bool is_running();

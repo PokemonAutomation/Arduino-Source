@@ -16,23 +16,31 @@ namespace PokemonAutomation{
 
 
 
+ScheduledTaskRunner::ScheduledTaskRunner(ComputationThreadPool& thread_pool)
+    : m_stopped(false)
+    , m_runner(thread_pool.blocking_dispatch([this]{ thread_loop(); }))
+{
+//    cout << "ScheduledTaskRunner: (Constructor): " << this << endl;
+}
 ScheduledTaskRunner::~ScheduledTaskRunner(){
+    stop();
+}
+void ScheduledTaskRunner::stop(){
+    if (!m_runner){
+        return;
+    }
 //    ScheduledTaskRunner::cancel(nullptr);
     {
         std::lock_guard<Mutex> lg(m_lock);
 //        cout << "ScheduledTaskRunner: (Destructor - start): " << this << endl;
         m_stopped = true;
-        m_cv.notify_all();
     }
+    m_cv.notify_all();
     m_runner.reset();
 //    cout << "ScheduledTaskRunner: (Destructor - end):   " << this << endl;
 }
-ScheduledTaskRunner::ScheduledTaskRunner(AsyncDispatcher& dispatcher)
-    : m_stopped(false)
-    , m_runner(dispatcher.dispatch([this]{ thread_loop(); }))
-{
-//    cout << "ScheduledTaskRunner: (Constructor): " << this << endl;
-}
+
+
 size_t ScheduledTaskRunner::size() const{
     std::lock_guard<Mutex> lg(m_lock);
     return m_schedule.size();

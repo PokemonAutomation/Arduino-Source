@@ -15,10 +15,10 @@
 //#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "DiscordSettingsOption.h"
 #include "DiscordWebhook.h"
 
@@ -35,16 +35,19 @@ namespace DiscordWebhook{
 DiscordWebhookSender::DiscordWebhookSender()
     : m_logger(global_logger_raw(), "DiscordWebhookSender")
     , m_stopping(false)
-    , m_dispatcher(nullptr, 1)
-    , m_queue(m_dispatcher)
+    , m_queue(GlobalThreadPools::unlimited_normal())
 {}
 
 DiscordWebhookSender::~DiscordWebhookSender(){
+    stop();
+}
+void DiscordWebhookSender::stop(){
+    m_queue.stop();
     m_stopping.store(true, std::memory_order_release);
     {
         std::lock_guard<Mutex> lg(m_lock);
-        m_cv.notify_all();
     }
+    m_cv.notify_all();
     std::lock_guard<Mutex> lg(m_send_lock);
     if (m_event_loop){
         m_event_loop->exit();

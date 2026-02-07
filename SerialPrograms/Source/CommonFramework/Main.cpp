@@ -35,6 +35,7 @@
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "CommonTools/OCR/OCR_RawOCR.h"
 #include "ControllerInput/ControllerInput.h"
+#include "Integrations/DiscordWebhook.h"
 #include "Windows/MainWindow.h"
 
 #include <iostream>
@@ -209,7 +210,7 @@ int main(int argc, char *argv[]){
 #endif
 
 #ifdef PA_DPP
-    Integration::DppClient::Client::instance().disconnect();
+    Integration::DppClient::Client::instance().stop();
 #endif
 
     //  We must clear the OCR cache or it will crash on Linux when the library
@@ -220,6 +221,7 @@ int main(int argc, char *argv[]){
     global_input_stop();
 
     //  Stop misc. services.
+    Integration::DiscordWebhook::DiscordWebhookSender::instance().stop();
     SystemSleepController::instance().stop();
     global_watchdog().stop();
     static_cast<FileWindowLogger&>(global_logger_raw()).stop();

@@ -7,15 +7,16 @@
 #ifndef PokemonAutomation_CommonTools_InterruptableCommands_H
 #define PokemonAutomation_CommonTools_InterruptableCommands_H
 
+#include <functional>
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/CancellableScope.h"
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 
 
 namespace PokemonAutomation{
 
 class Logger;
+class AsyncTask;
 class ProgramEnvironment;
 
 

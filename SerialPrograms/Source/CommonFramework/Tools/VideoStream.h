@@ -24,7 +24,6 @@
 namespace PokemonAutomation{
 
 class CancellableScope;
-class AsyncDispatcher;
 class Logger;
 class AudioFeed;
 class VideoFeed;
