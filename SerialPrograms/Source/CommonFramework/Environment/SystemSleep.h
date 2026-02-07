@@ -55,7 +55,7 @@ protected:
 public:
     static SystemSleepController& instance();
 
-    virtual void stop() = 0;
+    virtual void stop(){}
 
     SleepSuppress current_state() const;
 
