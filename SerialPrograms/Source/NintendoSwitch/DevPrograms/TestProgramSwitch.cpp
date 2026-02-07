@@ -517,6 +517,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
+    PokemonLA::EventDialogDetector detector(logger, overlay, true);
+
+    auto snapshot = feed.snapshot();
+    detector.process_frame(snapshot, current_time());
+
+
 #if 0
     UpdateMenuWatcher update_menu(console, COLOR_PURPLE);
     CheckOnlineWatcher check_online(COLOR_CYAN);

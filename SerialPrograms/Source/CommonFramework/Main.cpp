@@ -57,6 +57,24 @@ void set_working_directory(){
 }
 
 
+class ScopeExit{
+    ScopeExit(const ScopeExit&) = delete;
+    void operator=(const ScopeExit&) = delete;
+
+public:
+    template <typename Lambda>
+    ScopeExit(Lambda&& lambda)
+        : m_lambda(std::move(lambda))
+    {}
+    ~ScopeExit(){
+        m_lambda();
+    }
+
+private:
+    std::function<void()> m_lambda;
+};
+
+
 int run_program(int argc, char *argv[]){
     QApplication application(argc, argv);
 
@@ -88,6 +106,7 @@ int run_program(int argc, char *argv[]){
     QDir().mkpath(QString::fromStdString(SCREENSHOTS_PATH()));
 
     //  Preload all the cameras now so we don't hang the UI later on.
+    ScopeExit cameras([]{ GlobalMediaServices::instance().stop(); });
     get_all_cameras();
 
     //  Several novice developers struggled to build and run the program due to missing Resources folder.
@@ -163,11 +182,7 @@ int run_program(int argc, char *argv[]){
     w.raise(); // bring the window to front on macOS
     set_permissions(w);
 
-    int ret = application.exec();
-
-    GlobalMediaServices::instance().stop();
-
-    return ret;
+    return application.exec();
 }
 
 
