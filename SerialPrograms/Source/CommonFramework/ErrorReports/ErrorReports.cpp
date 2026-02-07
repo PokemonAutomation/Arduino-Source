@@ -10,15 +10,15 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/GlobalServices.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Environment/Environment.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "ProgramDumper.h"
 #include "ErrorReports.h"
 
@@ -385,9 +385,11 @@ std::unique_ptr<AsyncTask> send_all_unsent_reports(Logger& logger, bool allow_pr
 
     global_logger_tagged().log("Attempting to send " + std::to_string(reports.size()) + " error reports.", COLOR_PURPLE);
 
-    return global_async_dispatcher().dispatch([reports = std::move(reports)]{
-        send_reports(global_logger_tagged(), reports);
-    });
+    return GlobalThreadPools::unlimited_normal().blocking_dispatch(
+        [reports = std::move(reports)]{
+            send_reports(global_logger_tagged(), reports);
+        }
+    );
 #else
     return nullptr;
 #endif

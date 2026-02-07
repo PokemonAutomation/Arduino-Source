@@ -24,7 +24,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.h"
 #include "Common/Cpp/CpuId/CpuId.h"
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
