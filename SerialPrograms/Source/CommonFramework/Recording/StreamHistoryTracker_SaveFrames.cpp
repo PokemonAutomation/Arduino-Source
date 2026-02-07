@@ -216,6 +216,7 @@ StreamHistoryTracker::StreamHistoryTracker(
     , m_has_video(has_video)
     , m_target_fps(get_target_fps())
     , m_frame_interval(1000000 / m_target_fps)
+    , m_next_frame_time(WallClock::min())
 {
     m_worker = Thread([this]{ worker_loop(); });
 }
@@ -249,7 +250,7 @@ void StreamHistoryTracker::on_frame(std::shared_ptr<const VideoFrame> frame){
     //    cout << "on_frame() = " << m_frames.size() << endl;
 
         // Initialize on first frame
-        if (m_next_frame_time == WallClock{}){
+        if (m_next_frame_time == WallClock::min()){
             m_next_frame_time = frame->timestamp;
         }
 

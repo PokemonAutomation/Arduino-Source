@@ -75,13 +75,13 @@ private:
     const bool m_has_video;
     size_t m_target_fps;
     std::chrono::microseconds m_frame_interval;
+    WallClock m_next_frame_time;
 
     //  We use shared_ptr here so it's fast to snapshot when we need to copy
     //  everything asynchronously.
     std::deque<std::shared_ptr<AudioBlock>> m_audio;
     std::deque<std::shared_ptr<const VideoFrame>> m_frames;
     std::deque<CompressedVideoFrame> m_compressed_frames;
-    WallClock m_next_frame_time;
 
     Thread m_worker;
     std::atomic<bool> m_stopping{false};
