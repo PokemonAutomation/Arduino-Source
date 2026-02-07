@@ -23,6 +23,7 @@
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Recording/StreamHistoryOption.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "StreamHistoryTracker_SaveFrames.h"
 
 #include <iostream>
@@ -195,9 +196,7 @@ private:
 StreamHistoryTracker::~StreamHistoryTracker() {
     m_stopping = true;
     m_cv.notify_all();
-    if (m_worker.joinable()) {
-        m_worker.join();
-    }
+    m_worker.reset();
 }
 
 StreamHistoryTracker::StreamHistoryTracker(
@@ -218,7 +217,9 @@ StreamHistoryTracker::StreamHistoryTracker(
     , m_frame_interval(1000000 / m_target_fps)
     , m_next_frame_time(WallClock::min())
 {
-    m_worker = Thread([this]{ worker_loop(); });
+    m_worker = GlobalThreadPools::unlimited_normal().blocking_dispatch(
+        [this]{ worker_loop(); }
+    );
 }
 
 void StreamHistoryTracker::set_window(std::chrono::seconds window){

@@ -40,6 +40,7 @@ namespace PokemonAutomation{
 
 PABotBase::PABotBase(
     Logger& logger,
+    ThreadPool& thread_pool,
     std::unique_ptr<StreamConnection> connection,
     std::chrono::milliseconds retransmit_delay
 )
@@ -54,7 +55,7 @@ PABotBase::PABotBase(
 {
     //  We must initialize this last because it will trigger the lifetime
     //  sanitizer if it beats it to construction.
-    m_retransmit_thread = Thread([this]{
+    m_retransmit_thread = thread_pool.blocking_dispatch([this]{
         run_with_catch(
             "PABotBase::retransmit_thread()",
             [this]{
@@ -120,7 +121,7 @@ void PABotBase::stop(std::string error_message){
         std::lock_guard<Mutex> lg(m_sleep_lock);
     }
     m_cv.notify_all();
-    m_retransmit_thread.join();
+    m_retransmit_thread.reset();
 
     {
         ReadSpinLock lg(m_state_lock, "PABotBase::stop()");

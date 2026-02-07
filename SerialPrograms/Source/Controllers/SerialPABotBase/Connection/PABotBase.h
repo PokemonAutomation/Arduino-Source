@@ -31,7 +31,8 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 #include "Controllers/SerialPABotBase/Connection/PABotBaseConnection.h"
 #include "BotBase.h"
@@ -47,6 +48,7 @@ class PABotBase final : public BotBaseController, public PABotBaseConnection{
 public:
     PABotBase(
         Logger& logger,
+        ThreadPool& thread_pool,
         std::unique_ptr<StreamConnection> connection,
         std::chrono::milliseconds retransmit_delay = std::chrono::milliseconds(100)
     );
@@ -195,7 +197,7 @@ private:
     std::atomic<State> m_state;
     std::atomic<bool> m_error;
     std::string m_error_message;
-    Thread m_retransmit_thread;
+    std::unique_ptr<AsyncTask> m_retransmit_thread;
 
     LifetimeSanitizer m_sanitizer;
 };

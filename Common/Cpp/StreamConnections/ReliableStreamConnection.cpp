@@ -23,6 +23,7 @@ namespace PokemonAutomation{
 ReliableStreamConnection::ReliableStreamConnection(
     CancellableScope* parent,
     Logger& logger, bool log_everything,
+    ThreadPool& thread_pool,
     StreamConnection& unreliable_connection,
     WallDuration retransmit_timeout
 )
@@ -43,7 +44,7 @@ ReliableStreamConnection::ReliableStreamConnection(
     pabb2_PacketParser_init(&m_parser);
     pabb2_StreamCoalescer_init(&m_stream_coalescer);
 
-    m_retransmit_thread = Thread([this]{ retransmit_thread(); });
+    m_retransmit_thread = thread_pool.blocking_dispatch([this]{ retransmit_thread(); });
 
     m_unreliable_connection.add_listener(*this);
     if (parent){
@@ -55,7 +56,7 @@ ReliableStreamConnection::~ReliableStreamConnection(){
     cancel(nullptr);
     detach();
     m_unreliable_connection.remove_listener(*this);
-    m_retransmit_thread.join();
+    m_retransmit_thread.reset();
 }
 
 bool ReliableStreamConnection::cancel(std::exception_ptr exception) noexcept{

@@ -8,6 +8,7 @@
 #include "Common/Cpp/Concurrency/SpinPause.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "Controllers/JoystickTools.h"
 #include "SysbotBase_ProController.h"
 
@@ -36,11 +37,13 @@ ProController_SysbotBase::ProController_SysbotBase(
         return;
     }
 
-    m_dispatch_thread = Thread([this]{ thread_body(); });
+    m_dispatch_thread = GlobalThreadPools::unlimited_realtime().blocking_dispatch(
+        [this]{ thread_body(); }
+    );
 }
 ProController_SysbotBase::~ProController_SysbotBase(){
     stop();
-    m_dispatch_thread.join();
+    m_dispatch_thread.reset();
 }
 void ProController_SysbotBase::stop(){
     if (m_stopping.exchange(true)){

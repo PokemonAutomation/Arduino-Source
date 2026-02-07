@@ -12,7 +12,8 @@
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "Common/PABotBase2/PABotBase2_PacketSender.h"
 #include "Common/PABotBase2/PABotBase2_PacketParser.h"
 #include "Common/PABotBase2/PABotBase2_StreamCoalescer.h"
@@ -31,6 +32,7 @@ public:
     ReliableStreamConnection(
         CancellableScope* parent,
         Logger& logger, bool log_everything,
+        ThreadPool& thread_pool,
         StreamConnection& unreliable_connection,
         WallDuration retransmit_timeout = Milliseconds(100)
     );
@@ -110,7 +112,7 @@ private:
 
     mutable Mutex m_lock;
     ConditionVariable m_cv;
-    Thread m_retransmit_thread;
+    std::unique_ptr<AsyncTask> m_retransmit_thread;
 };
 
 

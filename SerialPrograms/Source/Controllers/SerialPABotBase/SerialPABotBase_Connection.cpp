@@ -13,6 +13,7 @@
 #include "Common/Cpp/SerialConnection/SerialConnection.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Errors.h"
 #include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Acks.h"
@@ -72,8 +73,20 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
     std::string error;
     try{
         set_status_line0("Connecting...", COLOR_DARKGREEN);
-        std::unique_ptr<SerialConnection> connection(new SerialConnection(info.systemLocation().toStdString(), PABB_BAUD_RATE));
-        m_botbase.reset(new PABotBase(m_logger, std::move(connection)));
+        std::unique_ptr<SerialConnection> connection(
+            new SerialConnection(
+                GlobalThreadPools::unlimited_normal(),
+                info.systemLocation().toStdString(),
+                PABB_BAUD_RATE
+            )
+        );
+        m_botbase.reset(
+            new PABotBase(
+                m_logger,
+                GlobalThreadPools::unlimited_normal(),
+                std::move(connection)
+            )
+        );
         add_message_printers();
     }catch (const ConnectionException& e){
         error = e.message();
@@ -87,7 +100,7 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
         return;
     }
 
-    m_status_thread = Thread([=, this]{
+    m_status_thread = GlobalThreadPools::unlimited_normal().blocking_dispatch([=, this]{
         run_with_catch(
             "SerialPABotBase_Connection::thread_body()",
             [=, this]{ thread_body(set_to_null_controller); }
@@ -105,7 +118,7 @@ SerialPABotBase_Connection::~SerialPABotBase_Connection(){
         std::lock_guard<Mutex> lg(m_lock);
         m_cv.notify_all();
     }
-    m_status_thread.join();
+    m_status_thread.reset();
     m_botbase.reset();
 }
 

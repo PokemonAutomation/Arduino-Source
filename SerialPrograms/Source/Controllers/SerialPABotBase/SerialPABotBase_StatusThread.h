@@ -12,6 +12,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "SerialPABotBase_Connection.h"
 
 //#include <iostream>
@@ -42,7 +43,11 @@ public:
         , m_callback(callback)
         , m_stopping(false)
         , m_error(false)
-        , m_status_thread([this]{ status_thread(); })
+        , m_status_thread(
+            GlobalThreadPools::unlimited_normal().blocking_dispatch(
+                [this]{ status_thread(); }
+            )
+        )
     {}
     ~ControllerStatusThread(){
         if (m_stopping.exchange(true)){
@@ -57,7 +62,7 @@ public:
             }
             m_cv.notify_all();
         }
-        m_status_thread.join();
+        m_status_thread.reset();
     }
 
 private:
@@ -65,41 +70,43 @@ private:
         constexpr std::chrono::milliseconds PERIOD(1000);
         std::atomic<WallClock> last_ack(current_time());
 
-        Thread watchdog([&, this]{
-            WallClock next_ping = current_time();
-            while (true){
-                if (m_stopping.load(std::memory_order_relaxed) ||
-                    m_error.load(std::memory_order_acquire) ||
-                    !m_connection.is_ready()
-                ){
-                    break;
-                }
+        std::unique_ptr<AsyncTask> watchdog = GlobalThreadPools::unlimited_normal().blocking_dispatch(
+            [&, this]{
+                WallClock next_ping = current_time();
+                while (true){
+                    if (m_stopping.load(std::memory_order_relaxed) ||
+                        m_error.load(std::memory_order_acquire) ||
+                        !m_connection.is_ready()
+                    ){
+                        break;
+                    }
 
-                auto last = current_time() - last_ack.load(std::memory_order_relaxed);
-                std::chrono::duration<double> seconds = last;
-                if (last > 2 * PERIOD){
-                    std::string text = "Last Ack: " + tostr_fixed(seconds.count(), 3) + " seconds ago";
-                    m_connection.set_status_line1(text, COLOR_RED);
-    //                m_logger.log("Connection issue detected. Turning on all logging...");
-    //                settings.log_everything.store(true, std::memory_order_release);
-                }
+                    auto last = current_time() - last_ack.load(std::memory_order_relaxed);
+                    std::chrono::duration<double> seconds = last;
+                    if (last > 2 * PERIOD){
+                        std::string text = "Last Ack: " + tostr_fixed(seconds.count(), 3) + " seconds ago";
+                        m_connection.set_status_line1(text, COLOR_RED);
+        //                m_logger.log("Connection issue detected. Turning on all logging...");
+        //                settings.log_everything.store(true, std::memory_order_release);
+                    }
 
-                std::unique_lock<Mutex> lg(m_sleep_lock);
-                if (m_stopping.load(std::memory_order_relaxed) ||
-                    m_error.load(std::memory_order_acquire) ||
-                    !m_connection.is_ready()
-                ){
-                    break;
-                }
+                    std::unique_lock<Mutex> lg(m_sleep_lock);
+                    if (m_stopping.load(std::memory_order_relaxed) ||
+                        m_error.load(std::memory_order_acquire) ||
+                        !m_connection.is_ready()
+                    ){
+                        break;
+                    }
 
-                WallClock now = current_time();
-                next_ping += PERIOD;
-                if (now + PERIOD < next_ping){
-                    next_ping = now + PERIOD;
+                    WallClock now = current_time();
+                    next_ping += PERIOD;
+                    if (now + PERIOD < next_ping){
+                        next_ping = now + PERIOD;
+                    }
+                    m_cv.wait_until(lg, next_ping);
                 }
-                m_cv.wait_until(lg, next_ping);
             }
-        });
+        );
 
 
         WallClock next_ping = current_time();
@@ -144,9 +151,9 @@ private:
 
         {
             std::unique_lock<Mutex> lg(m_sleep_lock);
-            m_cv.notify_all();
         }
-        watchdog.join();
+        m_cv.notify_all();
+        watchdog.reset();
     }
 
 private:
@@ -157,7 +164,7 @@ private:
     std::atomic<bool> m_error;
     Mutex m_sleep_lock;
     ConditionVariable m_cv;
-    Thread m_status_thread;
+    std::unique_ptr<AsyncTask> m_status_thread;
 };
 
 

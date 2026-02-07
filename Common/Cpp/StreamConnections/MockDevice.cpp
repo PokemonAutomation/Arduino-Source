@@ -5,6 +5,7 @@
  */
 
 #include "Common/PABotBase2/PABotBase2_ConnectionDebug.h"
+
 #include "MockDevice.h"
 
 //  REMOVE
@@ -23,7 +24,7 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-MockDevice::MockDevice()
+MockDevice::MockDevice(ThreadPool& thread_pool)
     : m_stopping(false)
 {
     pabb2_ReliableStreamConnection_init(
@@ -33,8 +34,8 @@ MockDevice::MockDevice()
         fp_device_read_serial
     );
 
-    m_device_thread = Thread([this]{ device_thread(); });
-    m_host_thread = Thread([this]{ host_recv_thread(); });
+    m_device_thread = thread_pool.blocking_dispatch([this]{ device_thread(); });
+    m_host_thread = thread_pool.blocking_dispatch([this]{ host_recv_thread(); });
 }
 MockDevice::~MockDevice(){
     m_stopping.store(true, std::memory_order_release);
@@ -46,8 +47,8 @@ MockDevice::~MockDevice(){
     }
     m_device_cv.notify_all();
     m_host_cv.notify_all();
-    m_device_thread.join();
-    m_host_thread.join();
+    m_device_thread.reset();
+    m_host_thread.reset();
 }
 void MockDevice::print() const{
     std::lock_guard<Mutex> lg(m_device_lock);
