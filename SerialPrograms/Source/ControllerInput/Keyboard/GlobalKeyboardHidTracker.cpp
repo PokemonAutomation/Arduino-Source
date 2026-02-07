@@ -9,6 +9,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "KeyboardInput_State.h"
 #include "KeyboardInput_KeyMappings.h"
 #include "GlobalKeyboardHidTracker.h"
@@ -36,17 +37,19 @@ KeyboardHidTracker::~KeyboardHidTracker(){
 KeyboardHidTracker::KeyboardHidTracker()
     : m_logger(global_logger_raw(), "Keyboard")
     , m_stopping(false)
-    , m_thread([this]{
-        run_with_catch(
-            "KeyboardHidTracker::thread_loop()",
-            [this]{ thread_loop(); }
-        );
-    })
+    , m_thread(
+        GlobalThreadPools::unlimited_realtime().blocking_dispatch([this]{
+            run_with_catch(
+                "KeyboardHidTracker::thread_loop()",
+                [this]{ thread_loop(); }
+            );
+        })
+    )
 {}
 
 
 void KeyboardHidTracker::stop(){
-    if (!m_thread.joinable()){
+    if (!m_thread){
         return;
     }
     m_stopping.store(true, std::memory_order_release);
@@ -54,7 +57,7 @@ void KeyboardHidTracker::stop(){
         std::lock_guard<Mutex> lg(m_sleep_lock);
     }
     m_cv.notify_all();
-    m_thread.join();
+    m_thread.reset();
 }
 
 

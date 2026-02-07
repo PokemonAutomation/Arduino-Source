@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 #include "Common/Cpp/Concurrency/Watchdog.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "GlobalServices.h"
 
 namespace PokemonAutomation{
@@ -22,7 +23,7 @@ ScheduledTaskRunner& global_scheduled_task_runner(){
 }
 #endif
 Watchdog& global_watchdog(){
-    static Watchdog watchdog;
+    static Watchdog watchdog(GlobalThreadPools::unlimited_normal());
     return watchdog;
 }
 

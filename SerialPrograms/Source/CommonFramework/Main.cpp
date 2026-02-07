@@ -7,6 +7,7 @@
 #include "Common/Cpp/Concurrency/Qt6.9ThreadBugWorkaround.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
+#include "Common/Cpp/Concurrency/Watchdog.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ImageResolution.h"
 #include "StaticRegistration.h"
@@ -15,6 +16,7 @@
 #include "VideoPipeline/Backends/MediaServicesQt6.h"
 #include "Globals.h"
 #include "GlobalSettingsPanel.h"
+#include "GlobalServices.h"
 #include "PersistentSettings.h"
 #include "Tests/CommandLineTests.h"
 #include "ErrorReports/ProgramDumper.h"
@@ -25,6 +27,7 @@
 #include "Integrations/DppIntegration/DppClient.h"
 #include "Logging/Logger.h"
 #include "Logging/OutputRedirector.h"
+#include "Logging/FileWindowLogger.h"
 //#include "Tools/StatsDatabase.h"
 //#include "Windows/DpiScaler.h"
 #include "Startup/SetupSettings.h"
@@ -163,7 +166,6 @@ int run_program(int argc, char *argv[]){
     int ret = application.exec();
 
     GlobalMediaServices::instance().stop();
-    GlobalThreadPools::qt_threadpool().stop();
 
     return ret;
 }
@@ -195,20 +197,26 @@ int main(int argc, char *argv[]){
     Integration::DppClient::Client::instance().disconnect();
 #endif
 
+    //  We must clear the OCR cache or it will crash on Linux when the library
+    //  unloads before the cache is destructed from static memory.
+    OCR::clear_cache();
+
     //  Stop the controllers.
     global_input_stop();
+
+    //  Stop misc. services.
+    SystemSleepController::instance().stop();
+    global_watchdog().stop();
+    static_cast<FileWindowLogger&>(global_logger_raw()).stop();
 
     //  Force stop the thread pools.
     PokemonAutomation::GlobalThreadPools::computation_realtime().stop();
     PokemonAutomation::GlobalThreadPools::computation_normal().stop();
     PokemonAutomation::GlobalThreadPools::unlimited_realtime().stop();
     PokemonAutomation::GlobalThreadPools::unlimited_normal().stop();
+    GlobalThreadPools::qt_worker_threadpool().stop();
 
     PokemonAutomation::global_dispatcher.stop();
-
-    //  We must clear the OCR cache or it will crash on Linux when the library
-    //  unloads before the cache is destructed from static memory.
-    OCR::clear_cache();
 
     cout << "Exiting main()..." << endl;
 

@@ -21,9 +21,9 @@
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Logging/Logger.h"
+//#include "CommonFramework/Logging/Logger.h"
 #include "Integrations/ProgramTrackerInterfaces.h"
 
 namespace PokemonAutomation{
@@ -132,7 +132,7 @@ private:
 
     std::atomic<WallClock> m_timestamp;
     std::atomic<ProgramState> m_state;
-    Thread m_thread;
+    std::unique_ptr<AsyncTask> m_program_thread;
 
 //    Mutex m_stats_lock;
     std::unique_ptr<StatsTracker> m_historical_stats;

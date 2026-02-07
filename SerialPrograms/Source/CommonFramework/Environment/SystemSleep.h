@@ -45,8 +45,8 @@ public:
 
 
 protected:
-    virtual ~SystemSleepController() = default;
     SystemSleepController();
+    virtual ~SystemSleepController() = default;
 
     //  Must be called under lock.
     void notify_listeners(SleepSuppress state);
@@ -54,6 +54,8 @@ protected:
 
 public:
     static SystemSleepController& instance();
+
+    virtual void stop() = 0;
 
     SleepSuppress current_state() const;
 

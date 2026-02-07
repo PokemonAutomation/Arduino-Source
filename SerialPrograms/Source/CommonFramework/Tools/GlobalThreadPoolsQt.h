@@ -19,7 +19,7 @@ namespace GlobalThreadPools{
 
 
 
-QWorkerThreadPool& qt_threadpool();
+QWorkerThreadPool& qt_worker_threadpool();
 
 
 

@@ -12,7 +12,7 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 
 namespace PokemonAutomation{
 
@@ -118,7 +118,7 @@ private:
     QList<QCameraDevice> m_cameras;
 
     // Background persistent worker thread that waits for camera refresh requests
-    Thread m_thread;
+    std::unique_ptr<AsyncTask> m_thread;
 };
 
 

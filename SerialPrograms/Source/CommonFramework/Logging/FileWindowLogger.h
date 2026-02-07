@@ -28,12 +28,13 @@ class FileWindowLoggerWindow;
 // adding the ability to manage multiple Qt windows that display log output.
 class FileWindowLogger : public Logger, private FileLogger::Listener{
 public:
-    ~FileWindowLogger();
-
     // Construct a FileWindowLogger that writes to the given file path.
     // The max_queue_size parameter controls how many log messages can be
     // queued before the log() call blocks.
     FileWindowLogger(const std::string& path, size_t max_queue_size);
+
+    ~FileWindowLogger();
+    void stop();
 
     // Add/remove Qt windows that will display log messages.
     void operator+=(FileWindowLoggerWindow& widget);

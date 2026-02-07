@@ -14,7 +14,8 @@
 #include "AbstractLogger.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
 #include "Common/Cpp/FileIO.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "LastLogTracker.h"
@@ -55,12 +56,13 @@ public:
     };
 
 public:
-    ~FileLogger();
-
     // Construct a FileLogger with the given configuration.
     // The log file is created if it doesn't exist, or appended to if it does.
     // A UTF-8 BOM is written to new files.
-    FileLogger(FileLoggerConfig config);
+    FileLogger(ComputationThreadPool& thread_pool, FileLoggerConfig config);
+
+    ~FileLogger();
+    void stop();
 
     // Add a listener to receive log messages. Thread-safe.
     void add_listener(Listener& listener);
@@ -101,7 +103,7 @@ private:
     std::deque<std::pair<std::string, Color>> m_queue;
 
     ListenerSet<Listener> m_listeners;
-    Thread m_thread;
+    std::unique_ptr<AsyncTask> m_thread;
 };
 
 

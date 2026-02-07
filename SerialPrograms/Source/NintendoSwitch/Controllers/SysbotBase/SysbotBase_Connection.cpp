@@ -9,6 +9,7 @@
 //#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "SysbotBase_Connection.h"
 
@@ -50,6 +51,7 @@ TcpSysbotBase_Connection::TcpSysbotBase_Connection(
     const std::string& url
 )
     : m_logger(logger)
+    , m_socket(GlobalThreadPools::unlimited_realtime())
     , m_supports_command_queue(false)
     , m_last_ping_send(WallClock::min())
     , m_last_ping_receive(WallClock::min())
@@ -93,7 +95,7 @@ TcpSysbotBase_Connection::~TcpSysbotBase_Connection(){
         std::lock_guard<Mutex> lg(m_lock);
         m_cv.notify_all();
     }
-    m_thread.join();
+    m_thread.reset();
 }
 
 
@@ -285,7 +287,7 @@ void TcpSysbotBase_Connection::set_mode(const std::string& sbb_version){
         return;
     }
 
-    m_thread = Thread([this]{ thread_loop(); });
+    m_thread = GlobalThreadPools::unlimited_realtime().blocking_dispatch([this]{ thread_loop(); });
     declare_ready();
 }
 

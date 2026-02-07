@@ -8,6 +8,7 @@
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ProgramSession.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"

@@ -14,7 +14,7 @@
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Sockets/ClientSocket.h"
 #include "Controllers/ControllerConnection.h"
 
@@ -76,7 +76,7 @@ private:
     SpinLock m_send_lock;
     Mutex m_lock;
     ConditionVariable m_cv;
-    Thread m_thread;
+    std::unique_ptr<AsyncTask> m_thread;
 
     ListenerSet<Listener> m_listeners;
 };

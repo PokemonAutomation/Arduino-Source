@@ -12,7 +12,7 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "ControllerInput/ControllerInput.h"
 //#include "KeyboardHidButtons.h"
 #include "KeyboardInput_State.h"
@@ -52,7 +52,7 @@ private:
 
     Mutex m_sleep_lock;
     ConditionVariable m_cv;
-    Thread m_thread;
+    std::unique_ptr<AsyncTask> m_thread;
 };
 
 

@@ -10,6 +10,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "MediaServicesQt6.h"
 
 namespace PokemonAutomation{
@@ -34,7 +35,7 @@ GlobalMediaServices::GlobalMediaServices()
     );
 
     // Start the persistent background worker thread
-    m_thread = Thread([this]{
+    m_thread = GlobalThreadPools::unlimited_normal().blocking_dispatch([this]{
         thread_body();
     });
 }
@@ -43,7 +44,7 @@ GlobalMediaServices::~GlobalMediaServices(){
 }
 
 void GlobalMediaServices::stop(){
-    if (!m_thread.joinable()){
+    if (!m_thread){
         return;
     }
 
@@ -55,8 +56,8 @@ void GlobalMediaServices::stop(){
         m_cv.notify_all();      // Wake worker from cv.wait() if sleeping
     }
 
-    // Wait for the woke worker thread to finish its current work and join
-    m_thread.join();
+    // Wait for the worker thread to finish its current work and join
+    m_thread.reset();
 }
 
 

@@ -6,32 +6,42 @@
 
 #include <Windows.h>
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "SystemSleep.h"
 
 namespace PokemonAutomation{
 
 
-class WindowsSleepController : public SystemSleepController{
+class WindowsSleepController final : public SystemSleepController{
 public:
-    virtual ~WindowsSleepController(){
-        {
-            std::lock_guard<Mutex> lg(m_lock);
-            m_stopping = true;
-            m_cv.notify_all();
-        }
-        m_thread.join();
-        if (m_state.load(std::memory_order_relaxed) != SleepSuppress::NONE){
-            global_logger_tagged().log("Destroying WindowsSleepController with active requests...", COLOR_RED);
-        }
-    }
     WindowsSleepController()
         : m_screen_on_requests(0)
         , m_no_sleep_requests(0)
         , m_stopping(false)
-        , m_thread([this]{ thread_loop(); })
+        , m_thread(GlobalThreadPools::unlimited_normal().blocking_dispatch(
+            [this]{ thread_loop(); })
+        )
     {}
+    virtual ~WindowsSleepController(){
+        stop();
+    }
+    virtual void stop() override{
+        if (!m_thread){
+            return;
+        }
+        {
+            std::lock_guard<Mutex> lg(m_lock);
+            m_stopping = true;
+        }
+        m_cv.notify_all();
+        m_thread.reset();
+        if (m_state.load(std::memory_order_relaxed) != SleepSuppress::NONE){
+            global_logger_tagged().log("Destroying WindowsSleepController with active requests...", COLOR_RED);
+        }
+    }
 
     virtual void push_screen_on() override{
         std::lock_guard<Mutex> lg(m_lock);
@@ -109,7 +119,7 @@ private:
 
     bool m_stopping;
     ConditionVariable m_cv;
-    Thread m_thread;
+    std::unique_ptr<AsyncTask> m_thread;
 };
 
 

@@ -7,6 +7,8 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "CommonFramework/ProgramSession.h"
 #include "CommonFramework/ProgramStats/StatsDatabase.h"
@@ -42,7 +44,7 @@ ProgramSession::~ProgramSession(){
 }
 
 void ProgramSession::join_program_thread(){
-    m_thread.join();
+    m_program_thread.reset();
 }
 
 
@@ -166,13 +168,22 @@ std::string ProgramSession::start_program(){
         m_logger.log("Starting program...");
         m_timestamp.store(current_time(), std::memory_order_relaxed);
         set_state(ProgramState::RUNNING);
+        m_program_thread = GlobalThreadPools::unlimited_realtime().blocking_dispatch(
+            [this]{
+                run_with_catch(
+                    "ProgramSession::start_program()",
+                    [this]{ run_program(); }
+                );
+            }
+        );
+#if 0
         m_thread = Thread([this]{
             run_with_catch(
                 "ProgramSession::start_program()",
                 [this]{ run_program(); }
             );
         });
-
+#endif
         return "";
     }
     case ProgramState::RUNNING:

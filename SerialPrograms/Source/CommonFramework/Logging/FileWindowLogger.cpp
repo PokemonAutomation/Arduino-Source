@@ -13,6 +13,7 @@
 #include "CommonFramework/Windows/WindowTracker.h"
 #include "CommonFramework/Windows/MainWindow.h"
 #include "CommonFramework/Options/ResolutionOption.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "FileWindowLogger.h"
 
 #include <iostream>
@@ -34,19 +35,25 @@ Logger& global_logger_raw(){
     static FileWindowLogger logger(get_log_filepath(), LOG_HISTORY_LINES);
     return logger;
 }
-
-
 FileWindowLogger::~FileWindowLogger(){
+    stop();
     m_file_logger.remove_listener(*this);
 }
+void FileWindowLogger::stop(){
+    m_file_logger.stop();
+}
+
 
 FileWindowLogger::FileWindowLogger(const std::string& path, size_t max_queue_size)
-    : m_file_logger(FileLoggerConfig{
-        .file_path = path,
-        .max_queue_size = max_queue_size,
-        .max_file_size_bytes = 50 * 1024 * 1024,  // 50MB
-        .last_log_max_lines = max_queue_size,
-    })
+    : m_file_logger(
+        GlobalThreadPools::unlimited_realtime(),
+        FileLoggerConfig{
+            .file_path = path,
+            .max_queue_size = max_queue_size,
+            .max_file_size_bytes = 50 * 1024 * 1024,  // 50MB
+            .last_log_max_lines = max_queue_size,
+        }
+    )
 {
     m_file_logger.add_listener(*this);
 }

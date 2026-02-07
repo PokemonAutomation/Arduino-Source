@@ -12,16 +12,7 @@
 namespace PokemonAutomation{
 
 
-FileLogger::~FileLogger(){
-    {
-        std::lock_guard<Mutex> lg(m_lock);
-        m_stopping = true;
-        m_cv.notify_all();
-    }
-    m_thread.join();
-}
-
-FileLogger::FileLogger(FileLoggerConfig config)
+FileLogger::FileLogger(ComputationThreadPool& thread_pool, FileLoggerConfig config)
     : m_config(std::move(config))
     , m_last_log_tracker(m_config.last_log_max_lines)
     , m_stopping(false)
@@ -39,10 +30,25 @@ FileLogger::FileLogger(FileLoggerConfig config)
         std::cout << "Write log to existing file " << file_path << std::endl;
     }
 
-    m_thread = Thread([this]{
+    m_thread = thread_pool.blocking_dispatch([this]{
         thread_loop();
     });
 }
+FileLogger::~FileLogger(){
+    stop();
+}
+void FileLogger::stop(){
+    if (!m_thread){
+        return;
+    }
+    {
+        std::lock_guard<Mutex> lg(m_lock);
+        m_stopping = true;
+    }
+    m_cv.notify_all();
+    m_thread.reset();
+}
+
 
 void FileLogger::add_listener(Listener& listener){
     m_listeners.add(listener);

@@ -38,7 +38,7 @@ ComputationThreadPool& unlimited_realtime(){
         [](){
             GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_POOL.PRIORITY.set_on_this_thread(global_logger_tagged());
         },
-        0, (size_t)-1
+        0
     );
     return runner;
 }
@@ -47,7 +47,7 @@ ComputationThreadPool& unlimited_normal(){
         [](){
             GlobalSettings::instance().PERFORMANCE->NORMAL_THREAD_POOL.PRIORITY.set_on_this_thread(global_logger_tagged());
         },
-        0, (size_t)-1
+        0
     );
     return runner;
 }

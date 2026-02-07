@@ -20,7 +20,8 @@
 #include <signal.h>
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
 #include "AbstractClientSocket.h"
 
 namespace PokemonAutomation{
@@ -29,8 +30,9 @@ namespace PokemonAutomation{
 
 class ClientSocket_POSIX final : public AbstractClientSocket{
 public:
-    ClientSocket_POSIX()
-        : m_socket(socket(AF_INET, SOCK_STREAM, 0)){
+    ClientSocket_POSIX(ComputationThreadPool& thread_pool)
+        : m_thread_pool(thread_pool)
+        , m_socket(socket(AF_INET, SOCK_STREAM, 0)){
         // Ignore SIGPIPE. Handle errors via errno instead
         signal(SIGPIPE, SIG_IGN);
 
@@ -41,7 +43,7 @@ public:
 
     virtual ~ClientSocket_POSIX(){
         close();
-        m_thread.join();
+        m_thread.reset();
         close_socket();
     }
 
@@ -60,8 +62,8 @@ public:
         }
         try{
             m_state.store(State::CONNECTING, std::memory_order_relaxed);
-            m_thread = Thread([addr = std::move(address), port, this] {
-                thread_loop(std::move(addr), port);
+            m_thread = m_thread_pool.blocking_dispatch([=, this]{
+                thread_loop(address, port);
             });
         }catch (...){
             m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
@@ -263,13 +265,14 @@ Connected:
 
 
 private:
+    ComputationThreadPool& m_thread_pool;
     const int m_socket;
 
     std::string m_error;
 
     mutable Mutex m_lock;
     ConditionVariable m_cv;
-    Thread m_thread;
+    std::unique_ptr<AsyncTask> m_thread;
 };
 
 

@@ -11,7 +11,8 @@
 #include <winsock.h>
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
 #include "AbstractClientSocket.h"
 
 #pragma comment(lib, "Ws2_32.lib")
@@ -22,8 +23,9 @@ namespace PokemonAutomation{
 
 class ClientSocket_WinSocket final : public AbstractClientSocket{
 public:
-    ClientSocket_WinSocket()
-        : m_socket(::socket(AF_INET, SOCK_STREAM, 0))
+    ClientSocket_WinSocket(ComputationThreadPool& thread_pool)
+        : m_thread_pool(thread_pool)
+        , m_socket(::socket(AF_INET, SOCK_STREAM, 0))
     {
         u_long non_blocking = 1;
         if (ioctlsocket(m_socket, FIONBIO, &non_blocking)){
@@ -35,7 +37,7 @@ public:
 
     virtual ~ClientSocket_WinSocket(){
         close();
-        m_thread.join();
+        m_thread.reset();
         close_socket();
     }
     virtual void close() noexcept override{
@@ -53,7 +55,7 @@ public:
         }
         try{
             m_state.store(State::CONNECTING, std::memory_order_relaxed);
-            m_thread = Thread([&, this]{
+            m_thread = m_thread_pool.blocking_dispatch([=, this]{
                 thread_loop(address, port);
             });
         }catch (...){
@@ -232,13 +234,14 @@ Connected:
 
 
 private:
+    ComputationThreadPool& m_thread_pool;
     const SOCKET m_socket;
 
     std::string m_error;
 
     mutable Mutex m_lock;
     ConditionVariable m_cv;
-    Thread m_thread;
+    std::unique_ptr<AsyncTask> m_thread;
 };
 
 

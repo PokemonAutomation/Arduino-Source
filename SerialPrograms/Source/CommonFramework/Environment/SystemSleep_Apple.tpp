@@ -13,9 +13,12 @@ namespace PokemonAutomation{
 
 
 
-class AppleSleepController : public SystemSleepController{
+class AppleSleepController final : public SystemSleepController{
 public:
     virtual ~AppleSleepController(){
+        stop();
+    }
+    virtual void stop() override{
         std::lock_guard<Mutex> lg(m_lock);
         update_state(SleepSuppress::NONE);
     }

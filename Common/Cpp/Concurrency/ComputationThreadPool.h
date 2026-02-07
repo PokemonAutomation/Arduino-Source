@@ -31,7 +31,7 @@ public:
     ComputationThreadPool(
         std::function<void()>&& new_thread_callback,
         size_t starting_threads,
-        size_t max_threads
+        size_t max_threads = (size_t)-1
     );
     ~ComputationThreadPool();
 

@@ -7,6 +7,7 @@
 #include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Watchdog.h"
 
 //using std::cout;
@@ -16,17 +17,23 @@ namespace PokemonAutomation{
 
 
 
+Watchdog::Watchdog(ComputationThreadPool& thread_pool)
+    : m_thread(thread_pool.blocking_dispatch([this]{ thread_body(); }))
+{}
 Watchdog::~Watchdog(){
+    stop();
+}
+void Watchdog::stop(){
+    if (!m_thread){
+        return;
+    }
     {
         std::lock_guard<Mutex> lg(m_sleep_lock);
         m_stopped = true;
-        m_cv.notify_all();
     }
-    m_thread.join();
+    m_cv.notify_all();
+    m_thread.reset();
 }
-Watchdog::Watchdog()
-    : m_thread([this]{ thread_body(); })
-{}
 
 
 void Watchdog::add(WatchdogCallback& callback, std::chrono::milliseconds period){
