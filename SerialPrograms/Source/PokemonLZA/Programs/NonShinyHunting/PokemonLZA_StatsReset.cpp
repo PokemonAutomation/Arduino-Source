@@ -141,7 +141,7 @@ StatsReset::~StatsReset(){
 }
 
 void StatsReset::on_config_value_changed(void* object){
-    ConfigOptionState state = POKEMON == GiftPokemon::MELMETAL
+    ConfigOptionState state = POKEMON == GiftPokemon::MELTAN
                                   ? ConfigOptionState::ENABLED
                                   : ConfigOptionState::HIDDEN;
     RIGHT_SCROLLS.set_visibility(state);
