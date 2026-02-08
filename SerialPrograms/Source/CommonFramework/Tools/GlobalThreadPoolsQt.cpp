@@ -17,6 +17,12 @@ QtWorkerThreadPool& qt_worker_threadpool(){
 }
 
 
+QtEventThreadPool& qt_event_threadpool(){
+    static QtEventThreadPool pool;
+    return pool;
+}
+
+
 
 }
 }

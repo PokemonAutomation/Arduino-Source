@@ -18,8 +18,12 @@ namespace PokemonAutomation{
 namespace GlobalThreadPools{
 
 
-
+//  Temporary and only used for audio template loading.
+//  Hopefully we can remove this in the near future.
 QtWorkerThreadPool& qt_worker_threadpool();
+
+
+QtEventThreadPool& qt_event_threadpool();
 
 
 

@@ -124,4 +124,64 @@ void QtWorkerThreadPool::run_and_wait(std::function<void()> lambda){
 
 
 
+
+
+
+
+
+
+QtEventThreadPool::~QtEventThreadPool(){
+    stop();
+}
+void QtEventThreadPool::stop(){
+    m_threads.clear();
+    m_available_threads.clear();
+}
+
+
+
+
+
+
+QObject* QtEventThreadPool::add_object(std::function<std::unique_ptr<QObject>()> factory){
+    QtEventThread& thread = get_thread();
+    QObject* ret = thread.add_object(std::move(factory));
+    try{
+        m_objects[ret] = &thread;
+    }catch (...){
+        thread.remove_object();
+        std::lock_guard<Mutex> lg(m_lock);
+        m_available_threads.emplace_back(&thread);
+        throw;
+    }
+    return ret;
+}
+void QtEventThreadPool::remove_object(QObject* object) noexcept{
+    std::lock_guard<Mutex> lg(m_lock);
+    auto iter = m_objects.find(object);
+    if (iter == m_objects.end()){
+        return;
+    }
+    iter->second->remove_object();
+    m_available_threads.emplace_back(iter->second);
+    m_objects.erase(iter);
+}
+
+QtEventThread& QtEventThreadPool::get_thread(){
+    std::lock_guard<Mutex> lg(m_lock);
+    if (m_available_threads.empty()){
+        m_available_threads.reserve(m_threads.size() + 1);
+        auto& new_thread = m_threads.emplace_back();
+        m_available_threads.emplace_back(&new_thread);
+    }
+    QtEventThread* ret = m_available_threads.back();
+    m_available_threads.pop_back();
+    return *ret;
+}
+
+
+
+
+
+
 }

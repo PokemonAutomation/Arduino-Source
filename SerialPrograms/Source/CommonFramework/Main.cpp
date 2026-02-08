@@ -106,9 +106,17 @@ int run_program(int argc, char *argv[]){
     QDir().mkpath(QString::fromStdString(SETTINGS_PATH()));
     QDir().mkpath(QString::fromStdString(SCREENSHOTS_PATH()));
 
+
+
     //  Preload all the cameras now so we don't hang the UI later on.
-    ScopeExit cameras([]{ GlobalMediaServices::instance().stop(); });
+    ScopeExit cameras([]{
+        GlobalMediaServices::instance().stop();
+    });
     get_all_cameras();
+
+    //  Force all the Qt thread pools to be constructed now on the main thread.
+    GlobalThreadPools::qt_worker_threadpool();
+    GlobalThreadPools::qt_event_threadpool();
 
     //  Several novice developers struggled to build and run the program due to missing Resources folder.
     //  Add this check to pop a message box when Resources folder is missing.
@@ -226,14 +234,19 @@ int main(int argc, char *argv[]){
     global_watchdog().stop();
     static_cast<FileWindowLogger&>(global_logger_raw()).stop();
 
+    //  When we actually migrate to Qt 6.9+, we may need to move the exit(0)
+    //  call here since joining *any* threads may hang.
+
     //  Force stop the thread pools.
+    //  This is where all the threads in the program are joined.
     PokemonAutomation::GlobalThreadPools::computation_realtime().stop();
     PokemonAutomation::GlobalThreadPools::computation_normal().stop();
     PokemonAutomation::GlobalThreadPools::unlimited_realtime().stop();
     PokemonAutomation::GlobalThreadPools::unlimited_normal().stop();
-    GlobalThreadPools::qt_worker_threadpool().stop();
-
     PokemonAutomation::global_dispatcher.stop();
+
+    GlobalThreadPools::qt_worker_threadpool().stop();
+    GlobalThreadPools::qt_event_threadpool().stop();
 
     cout << "Exiting main()..." << endl;
 
