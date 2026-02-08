@@ -62,7 +62,7 @@ public:
         }
         try{
             m_state.store(State::CONNECTING, std::memory_order_relaxed);
-            m_thread = m_thread_pool.blocking_dispatch([=, this]{
+            m_thread = m_thread_pool.dispatch_now_blocking([=, this]{
                 thread_loop(address, port);
             });
         }catch (...){
