@@ -23,11 +23,13 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/CancellableScope.h
     ../Common/Cpp/Color.cpp
     ../Common/Cpp/Color.h
-    ../Common/Cpp/Concurrency/AsyncTask.cpp
     ../Common/Cpp/Concurrency/AsyncTask.h
+    ../Common/Cpp/Concurrency/Backends/AsyncTask_Default.h
     ../Common/Cpp/Concurrency/Backends/Thread_Qt.tpp
     ../Common/Cpp/Concurrency/Backends/Thread_StdThread.tpp
     ../Common/Cpp/Concurrency/Backends/Thread_StdThreadDetach.tpp
+    ../Common/Cpp/Concurrency/Backends/ThreadPool_Default.cpp
+    ../Common/Cpp/Concurrency/Backends/ThreadPool_Default.h
     ../Common/Cpp/Concurrency/ConditionVariable.h
     ../Common/Cpp/Concurrency/FireForgetDispatcher.cpp
     ../Common/Cpp/Concurrency/FireForgetDispatcher.h
@@ -45,8 +47,6 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Concurrency/Thread.h
     ../Common/Cpp/Concurrency/ThreadPool.cpp
     ../Common/Cpp/Concurrency/ThreadPool.h
-    ../Common/Cpp/Concurrency/ThreadPoolCore.cpp
-    ../Common/Cpp/Concurrency/ThreadPoolCore.h
     ../Common/Cpp/Concurrency/Watchdog.cpp
     ../Common/Cpp/Concurrency/Watchdog.h
     ../Common/Cpp/Containers/AlignedMalloc.cpp

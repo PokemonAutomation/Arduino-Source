@@ -1,24 +1,25 @@
-/*  Async Task
+/*  Async Task (Default)
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_AsyncTaskCore_H
-#define PokemonAutomation_AsyncTaskCore_H
+#ifndef PokemonAutomation_AsyncTask_Default_H
+#define PokemonAutomation_AsyncTask_Default_H
 
 #include <functional>
 #include <atomic>
 #include <exception>
-#include "SpinPause.h"
-#include "Mutex.h"
-#include "ConditionVariable.h"
+#include "Common/Cpp/Concurrency/SpinPause.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 
 namespace PokemonAutomation{
 
 
 
-class AsyncTaskCore{
+class AsyncTask_Cpp : public AsyncTaskCore{
 public:
     enum class State{
         NOT_STARTED,
@@ -31,10 +32,10 @@ public:
 public:
     //  If the task has already started, this will wait for it to finish.
     //  This will not rethrow exceptions.
-    ~AsyncTaskCore(){
+    virtual ~AsyncTask_Cpp(){
         State state = m_state.load(std::memory_order_acquire);
         if (state == State::NOT_STARTED || state == State::SAFE_TO_DESTRUCT){
-    //        cout << "Already Done: " << (int)state << endl;
+//            cout << "Already Done: " << (int)state << endl;
             return;
         }
 
@@ -49,18 +50,18 @@ public:
             pause();
         }
     }
-    AsyncTaskCore(std::function<void()> task)
+    AsyncTask_Cpp(std::function<void()> task)
         : m_task(std::move(task))
         , m_state(State::NOT_STARTED)
     {}
 
-    bool is_finished() const noexcept{
+    virtual bool is_finished() const noexcept override{
         State state = m_state.load(std::memory_order_acquire);
         return state == State::FINISHED || state == State::SAFE_TO_DESTRUCT;
     }
 
     //  Wait for the task to finish. Will rethrow any exceptions.
-    void wait_and_rethrow_exceptions(){
+    virtual void wait_and_rethrow_exceptions() override{
         if (!is_finished()){
             std::unique_lock<Mutex> lg(m_lock);
             m_cv.wait(lg, [this]{ return is_finished(); });
@@ -74,10 +75,10 @@ public:
 public:
     //  These should only be called inside a parallel framework.
     //  These are not thread-safe with each other.
-    void report_started(){
+    virtual void report_started() override{
         m_state.store(State::RUNNING, std::memory_order_release);
     }
-    void report_cancelled() noexcept{
+    virtual void report_cancelled() noexcept override{
         {
             m_state.store(State::FINISHED, std::memory_order_release);
             {
@@ -87,7 +88,7 @@ public:
         }
         m_state.store(State::SAFE_TO_DESTRUCT, std::memory_order_release);
     }
-    void run() noexcept{
+    virtual void run() noexcept override{
         {
             try{
                 m_task();

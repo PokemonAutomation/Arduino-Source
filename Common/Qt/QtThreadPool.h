@@ -15,14 +15,14 @@
 namespace PokemonAutomation{
 
 
-class QWorkerThread;
+class QtWorkerThread;
 
 
 
-class QWorkerThreadPool{
+class QtWorkerThreadPool{
 public:
-    QWorkerThreadPool();
-    ~QWorkerThreadPool();
+    QtWorkerThreadPool();
+    ~QtWorkerThreadPool();
     void stop();
 
     void dispatch(std::function<void()> lambda);
@@ -30,10 +30,10 @@ public:
 
 
 private:
-    friend class QWorkerThread;
+    friend class QtWorkerThread;
 
-    std::vector<std::unique_ptr<QWorkerThread>> m_threads;
-    std::vector<QWorkerThread*> m_available_threads;
+    std::vector<std::unique_ptr<QtWorkerThread>> m_threads;
+    std::vector<QtWorkerThread*> m_available_threads;
     bool m_stopping = false;
 
     Mutex m_lock;

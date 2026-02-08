@@ -11,8 +11,8 @@ namespace GlobalThreadPools{
 
 
 
-QWorkerThreadPool& qt_worker_threadpool(){
-    static QWorkerThreadPool pool;
+QtWorkerThreadPool& qt_worker_threadpool(){
+    static QtWorkerThreadPool pool;
     return pool;
 }
 

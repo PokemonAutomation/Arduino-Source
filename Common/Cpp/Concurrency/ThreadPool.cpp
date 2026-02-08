@@ -4,9 +4,8 @@
  *
  */
 
-#include "Common/Cpp/Containers/Pimpl.tpp"
 #include "AsyncTask.h"
-#include "ThreadPoolCore.h"
+#include "Backends/ThreadPool_Default.h"
 #include "ThreadPool.h"
 
 //#include <iostream>
@@ -25,13 +24,13 @@ ThreadPool::ThreadPool(
     size_t max_threads
 )
     : m_core(
-        CONSTRUCT_TOKEN,
-        std::move(new_thread_callback),
-        starting_threads,
-        max_threads
+        std::make_unique<ThreadPool_Default>(
+            std::move(new_thread_callback),
+            starting_threads,
+            max_threads
+        )
     )
 {}
-ThreadPool::~ThreadPool() = default;
 size_t ThreadPool::current_threads() const{
     return m_core->current_threads();
 }

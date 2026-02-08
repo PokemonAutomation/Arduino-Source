@@ -1,15 +1,6 @@
-/*  Thread Pool
+/*  Thread Pool (Default)
  *
  *  From: https://github.com/PokemonAutomation/
- *
- *      This is a thread pool for compute-heavy tasks.
- *
- *  This thread pool has a limited number of threads and should only be used for
- *  compute-heavy tasks that do not block or yield. A blocked thread will still
- *  count towards the thread limit.
- *
- *  Because the # of threads is capped, it is safe to spam this thread pool with
- *  lots of smaller tasks.
  *
  */
 
@@ -18,26 +9,27 @@
 
 #include <functional>
 #include <deque>
-#include "Common/Cpp/CpuUtilization/CpuUtilization.h"
 #include "Common/Cpp/Stopwatch.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/Thread.h"
-#include "AsyncTask.h"
+#include "Common/Cpp/CpuUtilization/CpuUtilization.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 
 namespace PokemonAutomation{
 
 
 
 
-class ThreadPoolCore final{
+class ThreadPool_Default final : public ThreadPoolCore{
 public:
-    ThreadPoolCore(
+    ThreadPool_Default(
         std::function<void()>&& new_thread_callback,
         size_t starting_threads,
         size_t max_threads
     );
-    ~ThreadPoolCore();
+    ~ThreadPool_Default();
 
     size_t current_threads() const{
         std::lock_guard<Mutex> lg(m_lock);

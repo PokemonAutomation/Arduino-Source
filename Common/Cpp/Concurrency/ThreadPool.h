@@ -18,22 +18,48 @@
 
 #include <functional>
 #include "Common/Cpp/Time.h"
-#include "Common/Cpp/Containers/Pimpl.h"
 
 namespace PokemonAutomation{
 
 class AsyncTask;
-class ThreadPoolCore;
+
+class ThreadPoolCore{
+public:
+    virtual void stop() = 0;
+    virtual void ensure_threads(size_t threads) = 0;
+
+public:
+    virtual size_t current_threads() const = 0;
+    virtual size_t max_threads() const = 0;
+    virtual WallDuration cpu_time() const = 0;
+
+public:
+    //  Dispatch the function. If there are no threads available, it waits until
+    //  there are.
+    [[nodiscard]] virtual AsyncTask blocking_dispatch(std::function<void()>&& func) = 0;
+
+    //  Dispatch the function. Returns null if no threads are available.
+    //  "func" will be moved-from only on success.
+    [[nodiscard]] virtual AsyncTask try_dispatch(std::function<void()>& func) = 0;
+
+    //  Run function for all the indices [start, end).
+    //  Lower indices are not allowed to block on higher indices.
+    virtual void run_in_parallel(
+        const std::function<void(size_t index)>& func,
+        size_t start, size_t end,
+        size_t block_size = 0
+    ) = 0;
+};
 
 
-class ThreadPool final{
+
+class ThreadPool{
 public:
     ThreadPool(
         std::function<void()>&& new_thread_callback,
         size_t starting_threads,
         size_t max_threads = (size_t)-1
     );
-    ~ThreadPool();
 
     size_t current_threads() const;
     size_t max_threads() const;
@@ -68,7 +94,7 @@ public:
 
 
 private:
-    Pimpl<ThreadPoolCore> m_core;
+    std::unique_ptr<ThreadPoolCore> m_core;
 };
 
 

@@ -1,4 +1,4 @@
-/*  Thread Pool
+/*  Thread Pool (Default)
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -6,9 +6,9 @@
 
 #include <thread>
 #include "Common/Cpp/PanicDump.h"
-#include "ReverseLockGuard.h"
-#include "AsyncTaskCore.h"
-#include "ThreadPoolCore.h"
+#include "Common/Cpp/Concurrency/ReverseLockGuard.h"
+#include "AsyncTask_Default.h"
+#include "ThreadPool_Default.h"
 
 //#include <iostream>
 //using std::cout;
@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 
 
 
-ThreadPoolCore::ThreadPoolCore(
+ThreadPool_Default::ThreadPool_Default(
     std::function<void()>&& new_thread_callback,
     size_t starting_threads,
     size_t max_threads
@@ -33,7 +33,7 @@ ThreadPoolCore::ThreadPoolCore(
     }
 }
 
-void ThreadPoolCore::stop() {
+void ThreadPool_Default::stop() {
     {
         std::lock_guard<Mutex> lg(m_lock);
         if (m_stopping) return;
@@ -59,14 +59,14 @@ void ThreadPoolCore::stop() {
 
 }
 
-ThreadPoolCore::~ThreadPoolCore(){
+ThreadPool_Default::~ThreadPool_Default(){
     stop();
 }
 
 
 
 
-WallDuration ThreadPoolCore::cpu_time() const{
+WallDuration ThreadPool_Default::cpu_time() const{
     //  TODO: Don't lock the entire queue.
     WallDuration ret = WallDuration::zero();
     std::lock_guard<Mutex> lg(m_lock);
@@ -78,7 +78,7 @@ WallDuration ThreadPoolCore::cpu_time() const{
 }
 
 
-void ThreadPoolCore::ensure_threads(size_t threads){
+void ThreadPool_Default::ensure_threads(size_t threads){
     std::lock_guard<Mutex> lg(m_lock);
     while (m_threads.size() < threads){
         spawn_thread();
@@ -93,8 +93,8 @@ void ThreadPoolCore::wait_for_everything(){
 }
 #endif
 
-AsyncTask ThreadPoolCore::blocking_dispatch(std::function<void()>&& func){
-    AsyncTask task(std::move(func));
+AsyncTask ThreadPool_Default::blocking_dispatch(std::function<void()>&& func){
+    AsyncTask task(std::make_unique<AsyncTask_Cpp>(std::move(func)));
 
     {
         std::unique_lock<Mutex> lg(m_lock);
@@ -124,7 +124,7 @@ AsyncTask ThreadPoolCore::blocking_dispatch(std::function<void()>&& func){
 
     return task;
 }
-AsyncTask ThreadPoolCore::try_dispatch(std::function<void()>& func){
+AsyncTask ThreadPool_Default::try_dispatch(std::function<void()>& func){
     AsyncTask task;
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -133,7 +133,7 @@ AsyncTask ThreadPoolCore::try_dispatch(std::function<void()>& func){
             return AsyncTask();
         }
 
-        task = AsyncTask(std::move(func));
+        task = AsyncTask(std::make_unique<AsyncTask_Cpp>(std::move(func)));
 
         //  Enqueue task.
         m_queue.emplace_back(task.core())->report_started();
@@ -147,7 +147,7 @@ AsyncTask ThreadPoolCore::try_dispatch(std::function<void()>& func){
 }
 
 
-void ThreadPoolCore::run_in_parallel(
+void ThreadPool_Default::run_in_parallel(
     const std::function<void(size_t index)>& func,
     size_t start, size_t end,
     size_t block_size
@@ -169,14 +169,16 @@ void ThreadPoolCore::run_in_parallel(
     //  Prepare all the tasks.
     std::vector<AsyncTask> tasks;
     for (size_t c = 0; c < blocks; c++){
-        tasks.emplace_back([=, &func]{
-            size_t s = start + c * block_size;
-            size_t e = std::min(s + block_size, end);
-//            cout << "Running: [" << s << "," << e << ")" << endl;
-            for (; s < e; s++){
-                func(s);
-            }
-        });
+        tasks.emplace_back(
+            std::make_unique<AsyncTask_Cpp>([=, &func]{
+                size_t s = start + c * block_size;
+                size_t e = std::min(s + block_size, end);
+//                cout << "Running: [" << s << "," << e << ")" << endl;
+                for (; s < e; s++){
+                    func(s);
+                }
+            })
+        );
     }
 
     {
@@ -206,7 +208,7 @@ void ThreadPoolCore::run_in_parallel(
 
 
 
-void ThreadPoolCore::spawn_thread(){
+void ThreadPool_Default::spawn_thread(){
     //  Must call under lock.
     ThreadData& handle = m_threads.emplace_back();
     try{
@@ -221,12 +223,12 @@ void ThreadPoolCore::spawn_thread(){
         throw;
     }
 }
-void ThreadPoolCore::spawn_threads(){
+void ThreadPool_Default::spawn_threads(){
     while (m_threads.size() < std::min(m_queue.size() + m_busy_count, m_max_threads)){
         spawn_thread();
     }
 }
-void ThreadPoolCore::thread_loop(ThreadData& data){
+void ThreadPool_Default::thread_loop(ThreadData& data){
     data.handle = current_thread_handle();
 
     if (m_new_thread_callback){

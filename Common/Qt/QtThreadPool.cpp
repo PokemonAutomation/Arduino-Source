@@ -14,20 +14,20 @@ namespace PokemonAutomation{
 
 
 
-class QWorkerThread : private QThread{
+class QtWorkerThread : private QThread{
 public:
-    QWorkerThread(QWorkerThreadPool& parent)
+    QtWorkerThread(QtWorkerThreadPool& parent)
         : m_parent(parent)
     {
         start();
     }
-    ~QWorkerThread(){
-//        cout << "~QWorkerThread() - start" << endl;
+    ~QtWorkerThread(){
+//        cout << "~QtWorkerThread() - start" << endl;
         m_cv.notify_all();
         quit();
-        QWorkerThread::wait();
+        QtWorkerThread::wait();
         QThread::wait();
-//        cout << "~QWorkerThread() - end" << endl;
+//        cout << "~QtWorkerThread() - end" << endl;
     }
 
     void run_unprotected(std::function<void()> lambda){
@@ -65,7 +65,7 @@ private:
 //        cout << "Thread ending..." << endl;
     }
 
-    QWorkerThreadPool& m_parent;
+    QtWorkerThreadPool& m_parent;
     std::function<void()> m_lambda;
     ConditionVariable m_cv;
 };
@@ -73,12 +73,12 @@ private:
 
 
 
-QWorkerThreadPool::QWorkerThreadPool() = default;
-QWorkerThreadPool::~QWorkerThreadPool(){
+QtWorkerThreadPool::QtWorkerThreadPool() = default;
+QtWorkerThreadPool::~QtWorkerThreadPool(){
     stop();
 }
 
-void QWorkerThreadPool::stop(){
+void QtWorkerThreadPool::stop(){
     {
         std::lock_guard<Mutex> lg(m_lock);
         m_stopping = true;
@@ -88,32 +88,32 @@ void QWorkerThreadPool::stop(){
 }
 
 
-void QWorkerThreadPool::dispatch(std::function<void()> lambda){
+void QtWorkerThreadPool::dispatch(std::function<void()> lambda){
     if (lambda == nullptr){
         return;
     }
-    QWorkerThread* thread;
+    QtWorkerThread* thread;
     {
         std::unique_lock<Mutex> lg(m_lock);
         if (m_available_threads.empty()){
             m_available_threads.reserve(m_threads.size() + 1);
-            auto& new_thread = m_threads.emplace_back(std::make_unique<QWorkerThread>(*this));
+            auto& new_thread = m_threads.emplace_back(std::make_unique<QtWorkerThread>(*this));
             m_available_threads.emplace_back(new_thread.get());
         }
         thread = m_available_threads.back();
         thread->run_unprotected(std::move(lambda));
     }
 }
-void QWorkerThreadPool::run_and_wait(std::function<void()> lambda){
+void QtWorkerThreadPool::run_and_wait(std::function<void()> lambda){
     if (lambda == nullptr){
         return;
     }
-    QWorkerThread* thread;
+    QtWorkerThread* thread;
     {
         std::unique_lock<Mutex> lg(m_lock);
         if (m_available_threads.empty()){
             m_available_threads.reserve(m_threads.size() + 1);
-            auto& new_thread = m_threads.emplace_back(std::make_unique<QWorkerThread>(*this));
+            auto& new_thread = m_threads.emplace_back(std::make_unique<QtWorkerThread>(*this));
             m_available_threads.emplace_back(new_thread.get());
         }
         thread = m_available_threads.back();
