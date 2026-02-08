@@ -32,7 +32,7 @@ ScreenWatchDisplayWidget::ScreenWatchDisplayWidget(ScreenWatchWidget& parent, Sc
     , m_holder(parent)
     , m_option(option)
     , m_stop(false)
-    , m_updater(GlobalThreadPools::unlimited_normal().blocking_dispatch(
+    , m_updater(GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
         [this]{ thread_loop(); }
     ))
 {}

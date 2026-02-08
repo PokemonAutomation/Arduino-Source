@@ -22,49 +22,42 @@ namespace PokemonAutomation{
 
 
 
-class ThreadPool_Default final : public ThreadPoolCore{
+class ThreadPool_Default final : public ThreadPool{
 public:
     ThreadPool_Default(
         std::function<void()>&& new_thread_callback,
         size_t starting_threads,
-        size_t max_threads
+        size_t max_threads = (size_t)-1
     );
     ~ThreadPool_Default();
 
-    size_t current_threads() const{
-        std::lock_guard<Mutex> lg(m_lock);
-        return m_threads.size();
-    }
-    size_t max_threads() const{
-        return m_max_threads;
-    }
-    WallDuration cpu_time() const;
+    virtual void stop() override;
+    virtual void ensure_threads(size_t threads) override;
 
-    void ensure_threads(size_t threads);
-
-    void stop();
 //    void wait_for_everything();
 
 
 public:
-    //  As of this writing, tasks dispatched earlier are not allowed to block
-    //  on tasks that are dispatched later as it may cause a deadlock.
+    virtual size_t current_threads() const override{
+        std::lock_guard<Mutex> lg(m_lock);
+        return m_threads.size();
+    }
+    virtual size_t max_threads() const override{
+        return m_max_threads;
+    }
+    virtual WallDuration cpu_time() const override;
 
-    //  Dispatch the function. If there are no threads available, it waits until
-    //  there are.
-    [[nodiscard]] AsyncTask blocking_dispatch(std::function<void()>&& func);
 
-    //  Dispatch the function. Returns null if no threads are available.
-    //  "func" will be moved-from only on success.
-    [[nodiscard]] AsyncTask try_dispatch(std::function<void()>& func);
+public:
+    [[nodiscard]] virtual AsyncTask dispatch(std::function<void()>&& func) override;
+    [[nodiscard]] virtual AsyncTask dispatch_now_blocking(std::function<void()>&& func) override;
+    [[nodiscard]] virtual AsyncTask try_dispatch_now(std::function<void()>& func) override;
 
-    //  Run function for all the indices [start, end).
-    //  Lower indices are not allowed to block on higher indices.
-    void run_in_parallel(
+    virtual void run_in_parallel(
         const std::function<void(size_t index)>& func,
         size_t start, size_t end,
         size_t block_size = 0
-    );
+    ) override;
 
 
 private:
@@ -80,8 +73,6 @@ private:
 
 
 private:
-    struct Data;
-
     std::function<void()> m_new_thread_callback;
     size_t m_max_threads;
     std::deque<AsyncTaskCore*> m_queue;

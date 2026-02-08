@@ -27,7 +27,7 @@ public:
 public:
     //  These should only be called inside a parallel framework.
     //  These are not thread-safe with each other.
-    virtual void report_started() = 0;
+    virtual void report_started() noexcept = 0;
     virtual void report_cancelled() noexcept = 0;
     virtual void run() noexcept = 0;
 };

@@ -37,7 +37,7 @@ ProController_SysbotBase::ProController_SysbotBase(
         return;
     }
 
-    m_dispatch_thread = GlobalThreadPools::unlimited_realtime().blocking_dispatch(
+    m_dispatch_thread = GlobalThreadPools::unlimited_realtime().dispatch_now_blocking(
         [this]{ thread_body(); }
     );
 }

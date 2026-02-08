@@ -44,7 +44,9 @@ ReliableStreamConnection::ReliableStreamConnection(
     pabb2_PacketParser_init(&m_parser);
     pabb2_StreamCoalescer_init(&m_stream_coalescer);
 
-    m_retransmit_thread = thread_pool.blocking_dispatch([this]{ retransmit_thread(); });
+    m_retransmit_thread = thread_pool.dispatch_now_blocking(
+        [this]{ retransmit_thread(); }
+    );
 
     m_unreliable_connection.add_listener(*this);
     if (parent){

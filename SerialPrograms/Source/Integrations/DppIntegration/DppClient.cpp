@@ -54,7 +54,7 @@ void Client::connect(){
             m_bot = std::make_unique<cluster>(token, intents);
             m_handler = std::make_unique<commandhandler>(m_bot.get(), false);
             m_bot->cache_policy = { cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_aggressive };
-            m_start_thread = GlobalThreadPools::unlimited_normal().blocking_dispatch(
+            m_start_thread = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
                 [&, this]{ run(token); }
             );
         }catch (std::exception& e){

@@ -55,7 +55,7 @@ PABotBase::PABotBase(
 {
     //  We must initialize this last because it will trigger the lifetime
     //  sanitizer if it beats it to construction.
-    m_retransmit_thread = thread_pool.blocking_dispatch([this]{
+    m_retransmit_thread = thread_pool.dispatch_now_blocking([this]{
         run_with_catch(
             "PABotBase::retransmit_thread()",
             [this]{

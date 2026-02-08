@@ -55,7 +55,7 @@ AsyncCommandSession<ControllerType>::AsyncCommandSession(
     attach(scope);
 
     //  Now start the thread. Destructor is guaranteed to run if this succeeds.
-    m_thread = GlobalThreadPools::unlimited_realtime().blocking_dispatch(
+    m_thread = GlobalThreadPools::unlimited_realtime().dispatch_now_blocking(
         [this]{ thread_loop(); }
     );
 }

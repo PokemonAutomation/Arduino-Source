@@ -75,7 +75,7 @@ public:
 public:
     //  These should only be called inside a parallel framework.
     //  These are not thread-safe with each other.
-    virtual void report_started() override{
+    virtual void report_started() noexcept override{
         m_state.store(State::RUNNING, std::memory_order_release);
     }
     virtual void report_cancelled() noexcept override{

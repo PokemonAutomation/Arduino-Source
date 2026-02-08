@@ -100,7 +100,7 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
         return;
     }
 
-    m_status_thread = GlobalThreadPools::unlimited_normal().blocking_dispatch([=, this]{
+    m_status_thread = GlobalThreadPools::unlimited_normal().dispatch_now_blocking([=, this]{
         run_with_catch(
             "SerialPABotBase_Connection::thread_body()",
             [=, this]{ thread_body(set_to_null_controller); }

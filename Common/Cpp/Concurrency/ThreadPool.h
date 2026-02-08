@@ -23,7 +23,8 @@ namespace PokemonAutomation{
 
 class AsyncTask;
 
-class ThreadPoolCore{
+
+class ThreadPool{
 public:
     virtual void stop() = 0;
     virtual void ensure_threads(size_t threads) = 0;
@@ -34,13 +35,22 @@ public:
     virtual WallDuration cpu_time() const = 0;
 
 public:
-    //  Dispatch the function. If there are no threads available, it waits until
-    //  there are.
-    [[nodiscard]] virtual AsyncTask blocking_dispatch(std::function<void()>&& func) = 0;
+    //  As of this writing, tasks dispatched earlier are not allowed to block
+    //  on tasks that are dispatched later as it may cause a deadlock.
 
-    //  Dispatch the function. Returns null if no threads are available.
-    //  "func" will be moved-from only on success.
-    [[nodiscard]] virtual AsyncTask try_dispatch(std::function<void()>& func) = 0;
+    //  Dispatch the function and return immediately.
+    //  The function is not guaranteed to begin running immediately.
+    [[nodiscard]] virtual AsyncTask dispatch(std::function<void()>&& func) = 0;
+
+    //  Dispatch the function and begin running now.
+    //  If there are no threads available, it waits until there are.
+    //  This function will not return until the function has begin running.
+    [[nodiscard]] virtual AsyncTask dispatch_now_blocking(std::function<void()>&& func) = 0;
+
+    //  Try to dispatch the function and begin running now.
+    //  Returns null if no threads are available. "func" will be moved-from only on success.
+    //  This function returns immediately.
+    [[nodiscard]] virtual AsyncTask try_dispatch_now(std::function<void()>& func) = 0;
 
     //  Run function for all the indices [start, end).
     //  Lower indices are not allowed to block on higher indices.
@@ -50,56 +60,6 @@ public:
         size_t block_size = 0
     ) = 0;
 };
-
-
-
-class ThreadPool{
-public:
-    ThreadPool(
-        std::function<void()>&& new_thread_callback,
-        size_t starting_threads,
-        size_t max_threads = (size_t)-1
-    );
-
-    size_t current_threads() const;
-    size_t max_threads() const;
-    WallDuration cpu_time() const;
-
-    void ensure_threads(size_t threads);
-
-    void stop();
-
-//    void wait_for_everything();
-
-
-public:
-    //  As of this writing, tasks dispatched earlier are not allowed to block
-    //  on tasks that are dispatched later as it may cause a deadlock.
-
-    //  Dispatch the function. If there are no threads available, it waits until
-    //  there are.
-    [[nodiscard]] AsyncTask blocking_dispatch(std::function<void()>&& func);
-
-    //  Dispatch the function. Returns null if no threads are available.
-    //  "func" will be moved-from only on success.
-    [[nodiscard]] AsyncTask try_dispatch(std::function<void()>& func);
-
-    //  Run function for all the indices [start, end).
-    //  Lower indices are not allowed to block on higher indices.
-    void run_in_parallel(
-        const std::function<void(size_t index)>& func,
-        size_t start, size_t end,
-        size_t block_size = 0
-    );
-
-
-private:
-    std::unique_ptr<ThreadPoolCore> m_core;
-};
-
-
-
-
 
 
 

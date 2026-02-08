@@ -30,7 +30,7 @@ FileLogger::FileLogger(ThreadPool& thread_pool, FileLoggerConfig config)
         std::cout << "Write log to existing file " << file_path << std::endl;
     }
 
-    m_thread = thread_pool.blocking_dispatch([this]{
+    m_thread = thread_pool.dispatch_now_blocking([this]{
         thread_loop();
     });
 }

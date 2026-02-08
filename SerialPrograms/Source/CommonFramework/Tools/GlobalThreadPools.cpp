@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Concurrency/Backends/ThreadPool_Default.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
@@ -15,7 +16,7 @@ namespace GlobalThreadPools{
 
 
 ThreadPool& computation_realtime(){
-    static ThreadPool runner(
+    static ThreadPool_Default runner(
         [](){
             GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_POOL.PRIORITY.set_on_this_thread(global_logger_tagged());
         },
@@ -24,7 +25,7 @@ ThreadPool& computation_realtime(){
     return runner;
 }
 ThreadPool& computation_normal(){
-    static ThreadPool runner(
+    static ThreadPool_Default runner(
         [](){
             GlobalSettings::instance().PERFORMANCE->NORMAL_THREAD_POOL.PRIORITY.set_on_this_thread(global_logger_tagged());
         },
@@ -34,7 +35,7 @@ ThreadPool& computation_normal(){
 }
 
 ThreadPool& unlimited_realtime(){
-    static ThreadPool runner(
+    static ThreadPool_Default runner(
         [](){
             GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread(global_logger_tagged());
         },
@@ -43,7 +44,7 @@ ThreadPool& unlimited_realtime(){
     return runner;
 }
 ThreadPool& unlimited_pivot(){
-    static ThreadPool runner(
+    static ThreadPool_Default runner(
         [](){
             GlobalSettings::instance().PERFORMANCE->INFERENCE_PIVOT_PRIORITY.set_on_this_thread(global_logger_tagged());
         },
@@ -52,7 +53,7 @@ ThreadPool& unlimited_pivot(){
     return runner;
 }
 ThreadPool& unlimited_normal(){
-    static ThreadPool runner(
+    static ThreadPool_Default runner(
         [](){
             GlobalSettings::instance().PERFORMANCE->NORMAL_THREAD_POOL.PRIORITY.set_on_this_thread(global_logger_tagged());
         },

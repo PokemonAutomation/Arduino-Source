@@ -44,7 +44,7 @@ public:
         , m_stopping(false)
         , m_error(false)
         , m_status_thread(
-            GlobalThreadPools::unlimited_normal().blocking_dispatch(
+            GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
                 [this]{ status_thread(); }
             )
         )
@@ -70,7 +70,7 @@ private:
         constexpr std::chrono::milliseconds PERIOD(1000);
         std::atomic<WallClock> last_ack(current_time());
 
-        AsyncTask watchdog = GlobalThreadPools::unlimited_normal().blocking_dispatch(
+        AsyncTask watchdog = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
             [&, this]{
                 WallClock next_ping = current_time();
                 while (true){

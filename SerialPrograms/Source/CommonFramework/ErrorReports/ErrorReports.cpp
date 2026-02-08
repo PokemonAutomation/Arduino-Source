@@ -385,7 +385,7 @@ AsyncTask send_all_unsent_reports(Logger& logger, bool allow_prompt){
 
     global_logger_tagged().log("Attempting to send " + std::to_string(reports.size()) + " error reports.", COLOR_PURPLE);
 
-    return GlobalThreadPools::unlimited_normal().blocking_dispatch(
+    return GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
         [reports = std::move(reports)]{
             send_reports(global_logger_tagged(), reports);
         }

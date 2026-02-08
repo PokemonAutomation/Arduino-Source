@@ -38,7 +38,7 @@ void DiscordSocial::run(){
             log(message, "Internal", severity);
         }, m_log_level);
 
-        m_thread = GlobalThreadPools::unlimited_normal().blocking_dispatch(
+        m_thread = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
             [this]{ thread_loop(); }
         );
     }catch (...){

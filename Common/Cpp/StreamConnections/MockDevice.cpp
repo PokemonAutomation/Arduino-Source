@@ -34,8 +34,8 @@ MockDevice::MockDevice(ThreadPool& thread_pool)
         fp_device_read_serial
     );
 
-    m_device_thread = thread_pool.blocking_dispatch([this]{ device_thread(); });
-    m_host_thread = thread_pool.blocking_dispatch([this]{ host_recv_thread(); });
+    m_device_thread = thread_pool.dispatch_now_blocking([this]{ device_thread(); });
+    m_host_thread = thread_pool.dispatch_now_blocking([this]{ host_recv_thread(); });
 }
 MockDevice::~MockDevice(){
     m_stopping.store(true, std::memory_order_release);

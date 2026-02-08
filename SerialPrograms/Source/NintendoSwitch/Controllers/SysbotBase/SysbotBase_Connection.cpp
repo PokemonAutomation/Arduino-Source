@@ -287,7 +287,7 @@ void TcpSysbotBase_Connection::set_mode(const std::string& sbb_version){
         return;
     }
 
-    m_thread = GlobalThreadPools::unlimited_realtime().blocking_dispatch(
+    m_thread = GlobalThreadPools::unlimited_realtime().dispatch_now_blocking(
         [this]{ thread_loop(); }
     );
     declare_ready();

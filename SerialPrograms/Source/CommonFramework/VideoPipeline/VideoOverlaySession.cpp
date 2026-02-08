@@ -34,7 +34,7 @@ VideoOverlaySession::~VideoOverlaySession(){
 VideoOverlaySession::VideoOverlaySession(Logger& logger, VideoOverlayOption& option)
     : m_logger(logger)
     , m_option(option)
-    , m_stats_updater(GlobalThreadPools::unlimited_normal().blocking_dispatch(
+    , m_stats_updater(GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
         [this]{ stats_thread(); }
     ))
 {}

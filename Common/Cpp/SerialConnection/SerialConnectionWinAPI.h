@@ -113,7 +113,7 @@ public:
 
         //  Start receiver thread.
         try{
-            m_listener = thread_pool.blocking_dispatch([this]{
+            m_listener = thread_pool.dispatch_now_blocking([this]{
                 run_with_catch(
                     "SerialConnection::SerialConnection()",
                     [this]{ recv_loop(); }

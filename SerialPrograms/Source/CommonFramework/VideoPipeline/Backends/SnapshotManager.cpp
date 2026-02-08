@@ -107,7 +107,7 @@ bool SnapshotManager::try_dispatch_conversion(uint64_t seqnum, QVideoFrame frame
             convert(seqnum, std::move(frame), timestamp);
         };
 
-        *task = GlobalThreadPools::computation_realtime().try_dispatch(lambda);
+        *task = GlobalThreadPools::computation_realtime().try_dispatch_now(lambda);
 
         //  Dispatch was successful. We're done.
         if (*task){

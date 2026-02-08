@@ -45,7 +45,6 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Concurrency/SpinPause.h
     ../Common/Cpp/Concurrency/Thread.cpp
     ../Common/Cpp/Concurrency/Thread.h
-    ../Common/Cpp/Concurrency/ThreadPool.cpp
     ../Common/Cpp/Concurrency/ThreadPool.h
     ../Common/Cpp/Concurrency/Watchdog.cpp
     ../Common/Cpp/Concurrency/Watchdog.h

@@ -217,7 +217,7 @@ StreamHistoryTracker::StreamHistoryTracker(
     , m_frame_interval(1000000 / m_target_fps)
     , m_next_frame_time(WallClock::min())
 {
-    m_worker = GlobalThreadPools::unlimited_normal().blocking_dispatch(
+    m_worker = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
         [this]{ worker_loop(); }
     );
 }

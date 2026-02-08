@@ -38,7 +38,7 @@ KeyboardHidTracker::KeyboardHidTracker()
     : m_logger(global_logger_raw(), "Keyboard")
     , m_stopping(false)
     , m_thread(
-        GlobalThreadPools::unlimited_realtime().blocking_dispatch([this]{
+        GlobalThreadPools::unlimited_realtime().dispatch_now_blocking([this]{
             run_with_catch(
                 "KeyboardHidTracker::thread_loop()",
                 [this]{ thread_loop(); }

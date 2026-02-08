@@ -18,7 +18,9 @@ namespace PokemonAutomation{
 
 
 Watchdog::Watchdog(ThreadPool& thread_pool)
-    : m_thread(thread_pool.blocking_dispatch([this]{ thread_body(); }))
+    : m_thread(thread_pool.dispatch_now_blocking(
+        [this]{ thread_body(); })
+    )
 {}
 Watchdog::~Watchdog(){
     stop();

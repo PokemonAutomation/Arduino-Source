@@ -90,7 +90,7 @@ int run_until_with_time_limit(
     );
 
     bool timed_out = false;
-    AsyncTask timer = GlobalThreadPools::unlimited_realtime().blocking_dispatch([&]{
+    AsyncTask timer = GlobalThreadPools::unlimited_realtime().dispatch_now_blocking([&]{
         subscope.wait_until(deadline);
         timed_out = true;
         subscope.cancel(nullptr);

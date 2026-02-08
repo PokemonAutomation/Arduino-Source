@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 
 ScheduledTaskRunner::ScheduledTaskRunner(ThreadPool& thread_pool)
     : m_stopped(false)
-    , m_runner(thread_pool.blocking_dispatch([this]{ thread_loop(); }))
+    , m_runner(thread_pool.dispatch_now_blocking([this]{ thread_loop(); }))
 {
 //    cout << "ScheduledTaskRunner: (Constructor): " << this << endl;
 }

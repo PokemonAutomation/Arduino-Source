@@ -32,8 +32,10 @@ ThreadPool_Default::ThreadPool_Default(
         spawn_thread();
     }
 }
-
-void ThreadPool_Default::stop() {
+ThreadPool_Default::~ThreadPool_Default(){
+    stop();
+}
+void ThreadPool_Default::stop(){
     {
         std::lock_guard<Mutex> lg(m_lock);
         if (m_stopping) return;
@@ -56,25 +58,6 @@ void ThreadPool_Default::stop() {
 
     // DO NOT CLEAR AGAIN IN DESTRUCTOR
     m_queue.clear();
-
-}
-
-ThreadPool_Default::~ThreadPool_Default(){
-    stop();
-}
-
-
-
-
-WallDuration ThreadPool_Default::cpu_time() const{
-    //  TODO: Don't lock the entire queue.
-    WallDuration ret = WallDuration::zero();
-    std::lock_guard<Mutex> lg(m_lock);
-    for (const ThreadData& thread : m_threads){
-//        ret += thread_cpu_time(thread.handle);
-        ret += thread.runtime.total();
-    }
-    return ret;
 }
 
 
@@ -93,9 +76,39 @@ void ThreadPoolCore::wait_for_everything(){
 }
 #endif
 
-AsyncTask ThreadPool_Default::blocking_dispatch(std::function<void()>&& func){
-    AsyncTask task(std::make_unique<AsyncTask_Cpp>(std::move(func)));
 
+
+
+WallDuration ThreadPool_Default::cpu_time() const{
+    //  TODO: Don't lock the entire queue.
+    WallDuration ret = WallDuration::zero();
+    std::lock_guard<Mutex> lg(m_lock);
+    for (const ThreadData& thread : m_threads){
+//        ret += thread_cpu_time(thread.handle);
+        ret += thread.runtime.total();
+    }
+    return ret;
+}
+
+AsyncTask ThreadPool_Default::dispatch(std::function<void()>&& func){
+    AsyncTask task;
+    {
+        std::unique_lock<Mutex> lg(m_lock);
+        AsyncTaskCore*& ptr = m_queue.emplace_back();
+        try{
+            task = AsyncTask(std::make_unique<AsyncTask_Cpp>(std::move(func)));
+            ptr = task.core();
+            ptr->report_started();
+        }catch (...){
+            m_queue.pop_back();
+            throw;
+        }
+    }
+    m_thread_cv.notify_one();
+    return task;
+}
+AsyncTask ThreadPool_Default::dispatch_now_blocking(std::function<void()>&& func){
+    AsyncTask task;
     {
         std::unique_lock<Mutex> lg(m_lock);
 
@@ -104,27 +117,21 @@ AsyncTask ThreadPool_Default::blocking_dispatch(std::function<void()>&& func){
         });
 
         //  Enqueue task.
-        m_queue.emplace_back(task.core())->report_started();
-        spawn_threads();
-
-#if 0
-        //  Use this thread to process the queue until our task is
-        while (!m_queue.empty() && !task->is_finished()){
-            AsyncTask* current = m_queue.front();
-            m_queue.pop_front();
-
-            ReverseLockGuard<Mutex> lg0(m_lock);
-            current->run();
+        AsyncTaskCore*& ptr = m_queue.emplace_back();
+        try{
+            spawn_threads();
+            task = AsyncTask(std::make_unique<AsyncTask_Cpp>(std::move(func)));
+            ptr = task.core();
+            ptr->report_started();
+        }catch (...){
+            m_queue.pop_back();
+            throw;
         }
-#endif
     }
-
-//    cout << "notify... " << endl;
     m_thread_cv.notify_one();
-
     return task;
 }
-AsyncTask ThreadPool_Default::try_dispatch(std::function<void()>& func){
+AsyncTask ThreadPool_Default::try_dispatch_now(std::function<void()>& func){
     AsyncTask task;
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -133,16 +140,19 @@ AsyncTask ThreadPool_Default::try_dispatch(std::function<void()>& func){
             return AsyncTask();
         }
 
-        task = AsyncTask(std::make_unique<AsyncTask_Cpp>(std::move(func)));
-
         //  Enqueue task.
-        m_queue.emplace_back(task.core())->report_started();
-
-        spawn_threads();
+        AsyncTaskCore*& ptr = m_queue.emplace_back();
+        try{
+            spawn_threads();
+            task = AsyncTask(std::make_unique<AsyncTask_Cpp>(std::move(func)));
+            ptr = task.core();
+            ptr->report_started();
+        }catch (...){
+            m_queue.pop_back();
+            throw;
+        }
     }
-
     m_thread_cv.notify_one();
-
     return task;
 }
 

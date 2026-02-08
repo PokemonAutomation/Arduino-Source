@@ -21,7 +21,7 @@ public:
         : m_screen_on_requests(0)
         , m_no_sleep_requests(0)
         , m_stopping(false)
-        , m_thread(GlobalThreadPools::unlimited_normal().blocking_dispatch(
+        , m_thread(GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
             [this]{ thread_loop(); })
         )
     {}

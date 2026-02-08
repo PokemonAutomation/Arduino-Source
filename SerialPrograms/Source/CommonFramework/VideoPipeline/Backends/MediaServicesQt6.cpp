@@ -35,7 +35,7 @@ GlobalMediaServices::GlobalMediaServices()
     );
 
     // Start the persistent background worker thread
-    m_thread = GlobalThreadPools::unlimited_normal().blocking_dispatch([this]{
+    m_thread = GlobalThreadPools::unlimited_normal().dispatch_now_blocking([this]{
         thread_body();
     });
 }
