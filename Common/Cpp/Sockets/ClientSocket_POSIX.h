@@ -43,7 +43,7 @@ public:
 
     virtual ~ClientSocket_POSIX(){
         close();
-        m_thread.reset();
+        m_thread.wait_and_ignore_exceptions();
         close_socket();
     }
 
