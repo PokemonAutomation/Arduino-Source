@@ -272,7 +272,7 @@ private:
 
     mutable Mutex m_lock;
     ConditionVariable m_cv;
-    std::unique_ptr<AsyncTask> m_thread;
+    AsyncTask m_thread;
 };
 
 
