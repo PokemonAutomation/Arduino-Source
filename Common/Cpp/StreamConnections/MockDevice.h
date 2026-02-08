@@ -11,7 +11,8 @@
 #include "Common/Cpp/StreamConnections/StreamConnection.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "Common/PABotBase2/PABotbase2_ReliableStreamConnection.h"
 
 namespace PokemonAutomation{
@@ -21,7 +22,7 @@ namespace PokemonAutomation{
 
 class MockDevice : public StreamConnection{
 public:
-    MockDevice();
+    MockDevice(ThreadPool& thread_pool);
     ~MockDevice();
 
     void print() const;
@@ -74,11 +75,11 @@ private:
 
     mutable Mutex m_device_lock;
     ConditionVariable m_device_cv;
-    Thread m_device_thread;
+    AsyncTask m_device_thread;
 
     mutable Mutex m_host_lock;
     ConditionVariable m_host_cv;
-    Thread m_host_thread;
+    AsyncTask m_host_thread;
 };
 
 

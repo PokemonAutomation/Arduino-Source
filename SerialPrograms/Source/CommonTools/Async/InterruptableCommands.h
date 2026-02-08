@@ -10,13 +10,13 @@
 #include <functional>
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/CancellableScope.h"
 
 
 namespace PokemonAutomation{
 
 class Logger;
-class AsyncTask;
 class ProgramEnvironment;
 
 
@@ -77,7 +77,7 @@ private:
 
     Mutex m_lock;
     ConditionVariable m_cv;
-    std::unique_ptr<AsyncTask> m_thread;
+    AsyncTask m_thread;
 
     LifetimeSanitizer m_sanitizer;
 };

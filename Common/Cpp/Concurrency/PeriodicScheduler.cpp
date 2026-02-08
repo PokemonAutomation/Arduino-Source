@@ -196,9 +196,9 @@ void PeriodicRunner::thread_loop(){
         idle_since_last_check += end - start;
     }
 }
-void PeriodicRunner::stop_thread(){
+void PeriodicRunner::stop_thread() noexcept{
     PeriodicRunner::cancel(nullptr);
-    m_runner.reset();
+    m_runner.wait_and_ignore_exceptions();
 }
 
 double PeriodicRunner::current_utilization() const{

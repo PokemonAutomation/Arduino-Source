@@ -5,6 +5,7 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "Integrations/ProgramTracker.h"
 #include "DiscordSocial.h"
 
@@ -18,9 +19,9 @@ DiscordSocial& DiscordSocial::instance(){
     return instance;
 }
 
-void DiscordSocial::stop(){
+void DiscordSocial::stop() noexcept{
     m_running.store(false, std::memory_order_release);
-    m_thread.join();
+    m_thread.wait_and_ignore_exceptions();
     if (m_client) m_client.reset();
 }
 void DiscordSocial::run(){
@@ -37,7 +38,9 @@ void DiscordSocial::run(){
             log(message, "Internal", severity);
         }, m_log_level);
 
-        m_thread = Thread([this]{ thread_loop(); });
+        m_thread = GlobalThreadPools::unlimited_normal().blocking_dispatch(
+            [this]{ thread_loop(); }
+        );
     }catch (...){
         m_client.reset();
         log("Failed to start DiscordSocialSDK.", "run()", LoggingSeverity::Error);

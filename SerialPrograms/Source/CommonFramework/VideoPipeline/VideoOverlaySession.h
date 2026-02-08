@@ -155,8 +155,7 @@ private:
     std::vector<OverlayStatSnapshot> m_stat_lines;
     Mutex m_stats_lock;
     ConditionVariable m_stats_cv;
-    std::unique_ptr<AsyncTask> m_stats_updater;
-//    Thread m_stats_updater;
+    AsyncTask m_stats_updater;
 };
 
 

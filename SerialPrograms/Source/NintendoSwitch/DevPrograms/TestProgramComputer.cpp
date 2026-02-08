@@ -119,6 +119,7 @@
 #include "Common/Cpp/Containers/CircularBuffer.h"
 #include "Common/Cpp/Sockets/ClientSocket.h"
 #include "Common/Cpp/Containers/SparseArray.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -301,11 +302,12 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 #if 1
     {
-        MockDevice device;
+        MockDevice device(GlobalThreadPools::unlimited_normal());
 
         ReliableStreamConnection connection(
             &scope,
             logger, true,
+            GlobalThreadPools::unlimited_realtime(),
             device,
             1s
         );

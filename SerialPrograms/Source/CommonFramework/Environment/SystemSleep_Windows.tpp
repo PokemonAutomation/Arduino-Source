@@ -28,7 +28,7 @@ public:
     virtual ~WindowsSleepController(){
         stop();
     }
-    virtual void stop() override{
+    virtual void stop() noexcept override{
         if (!m_thread){
             return;
         }
@@ -37,9 +37,14 @@ public:
             m_stopping = true;
         }
         m_cv.notify_all();
-        m_thread.reset();
+        m_thread.wait_and_ignore_exceptions();
         if (m_state.load(std::memory_order_relaxed) != SleepSuppress::NONE){
-            global_logger_tagged().log("Destroying WindowsSleepController with active requests...", COLOR_RED);
+            try{
+                global_logger_tagged().log(
+                    "Destroying WindowsSleepController with active requests...",
+                    COLOR_RED
+                );
+            }catch (...){}
         }
     }
 
@@ -119,7 +124,7 @@ private:
 
     bool m_stopping;
     ConditionVariable m_cv;
-    std::unique_ptr<AsyncTask> m_thread;
+    AsyncTask m_thread;
 };
 
 

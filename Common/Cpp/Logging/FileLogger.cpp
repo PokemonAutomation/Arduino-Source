@@ -37,7 +37,7 @@ FileLogger::FileLogger(ThreadPool& thread_pool, FileLoggerConfig config)
 FileLogger::~FileLogger(){
     stop();
 }
-void FileLogger::stop(){
+void FileLogger::stop() noexcept{
     if (!m_thread){
         return;
     }
@@ -46,7 +46,7 @@ void FileLogger::stop(){
         m_stopping = true;
     }
     m_cv.notify_all();
-    m_thread.reset();
+    m_thread.wait_and_ignore_exceptions();
 }
 
 

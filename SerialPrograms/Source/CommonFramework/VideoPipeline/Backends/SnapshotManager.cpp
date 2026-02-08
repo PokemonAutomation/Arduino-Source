@@ -90,7 +90,7 @@ void SnapshotManager::convert(uint64_t seqnum, QVideoFrame frame, WallClock time
 bool SnapshotManager::try_dispatch_conversion(uint64_t seqnum, QVideoFrame frame, WallClock timestamp) noexcept{
     //  Must call under the lock.
 
-    std::unique_ptr<AsyncTask>* task;
+    AsyncTask* task;
     try{
         task = &m_pending_conversions[seqnum];
 
@@ -150,7 +150,7 @@ SnapshotManager::ObjectsToGC SnapshotManager::cleanup(){
     //  Cleanup finished tasks.
     while (!m_pending_conversions.empty()){
         auto iter = m_pending_conversions.begin();
-        if (iter->second->is_finished()){
+        if (iter->second.is_finished()){
             ret.tasks_to_free.emplace_back(std::move(iter->second));
             m_pending_conversions.erase(iter);
         }else{

@@ -11,9 +11,15 @@
 #define PokemonAutomation_StreamHistoryTracker_SaveFrames_H
 
 #include <deque>
+#include <QImage>
+#include <QVideoFrame>
+#include "Common/Cpp/Time.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 
 
 namespace PokemonAutomation{
@@ -83,7 +89,7 @@ private:
     std::deque<std::shared_ptr<const VideoFrame>> m_frames;
     std::deque<CompressedVideoFrame> m_compressed_frames;
 
-    Thread m_worker;
+    AsyncTask m_worker;
     std::atomic<bool> m_stopping{false};
     
     // Queue for the worker thread

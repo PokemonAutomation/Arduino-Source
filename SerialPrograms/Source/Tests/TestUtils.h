@@ -57,7 +57,7 @@ class DummyBotBase : public BotBaseController{
 public:
     DummyBotBase(Logger& logger) : m_logger(logger) {}
 
-    virtual void stop(std::string error_message) override{}
+    virtual void stop(std::string error_message) noexcept override{}
     
     virtual Logger& logger() override { return m_logger; }
 

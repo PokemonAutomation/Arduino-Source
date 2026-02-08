@@ -6,7 +6,7 @@
 #include <atomic>
 #include <discord_social_sdk/discordpp.h>
 #include "Common/Cpp/Logging/AbstractLogger.h"
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 
 namespace PokemonAutomation{
 namespace Integration{
@@ -22,7 +22,7 @@ public:
 
     static DiscordSocial& instance();
     void run();
-    void stop();
+    void stop() noexcept;
 
 private:
     Logger& logger();
@@ -32,7 +32,7 @@ private:
     void thread_loop();
 
 private:
-    Thread m_thread;
+    AsyncTask m_thread;
     std::shared_ptr<discordpp::Client> m_client = nullptr;
     std::atomic<bool> m_running;
     const uint64_t m_app_id = 1406867596585865326;

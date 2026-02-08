@@ -55,7 +55,7 @@ class ControllerInputSource{
 public:
     //  This called before program shutdown. Child classes should shutdown any
     //  threads they own to avoid static-deinit shenanigans.
-    virtual void stop() = 0;
+    virtual void stop() noexcept = 0;
 
     //  User has switched away from the current console.
     //  Release all buttons and reset back to neutral state.

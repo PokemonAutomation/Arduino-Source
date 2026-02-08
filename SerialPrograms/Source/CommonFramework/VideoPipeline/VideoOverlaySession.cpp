@@ -29,7 +29,7 @@ VideoOverlaySession::~VideoOverlaySession(){
         m_stopping = true;
     }
     m_stats_cv.notify_all();
-//    m_stats_updater.join();
+    m_stats_updater.wait_and_ignore_exceptions();
 }
 VideoOverlaySession::VideoOverlaySession(Logger& logger, VideoOverlayOption& option)
     : m_logger(logger)
@@ -37,7 +37,6 @@ VideoOverlaySession::VideoOverlaySession(Logger& logger, VideoOverlayOption& opt
     , m_stats_updater(GlobalThreadPools::unlimited_normal().blocking_dispatch(
         [this]{ stats_thread(); }
     ))
-//    , m_stats_updater([this]{ stats_thread(); })
 {}
 
 

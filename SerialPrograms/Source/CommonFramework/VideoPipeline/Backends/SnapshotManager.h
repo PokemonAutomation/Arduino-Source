@@ -37,7 +37,7 @@ private:
     void push_new_screenshot(uint64_t seqnum, VideoSnapshot snapshot);
 
     struct ObjectsToGC{
-        std::vector<std::unique_ptr<AsyncTask>> tasks_to_free;
+        std::vector<AsyncTask> tasks_to_free;
         std::vector<VideoSnapshot> snapshots_to_free;
 
         void destroy_now();
@@ -52,7 +52,7 @@ private:
     ConditionVariable m_cv;
 
     size_t m_active_conversions;
-    std::map<uint64_t, std::unique_ptr<AsyncTask>> m_pending_conversions;
+    std::map<uint64_t, AsyncTask> m_pending_conversions;
     bool m_queued_convert = false;
 
     uint64_t m_converting_seqnum;

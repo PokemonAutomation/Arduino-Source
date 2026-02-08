@@ -13,6 +13,7 @@
 #include <QMouseEvent>
 #include <QApplication>
 #include <QGuiApplication>
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "ScreenWatchWidget.h"
 
 //#include <iostream>
@@ -31,7 +32,9 @@ ScreenWatchDisplayWidget::ScreenWatchDisplayWidget(ScreenWatchWidget& parent, Sc
     , m_holder(parent)
     , m_option(option)
     , m_stop(false)
-    , m_updater([this]{ thread_loop(); })
+    , m_updater(GlobalThreadPools::unlimited_normal().blocking_dispatch(
+        [this]{ thread_loop(); }
+    ))
 {}
 ScreenWatchDisplayWidget::~ScreenWatchDisplayWidget(){
     {
@@ -39,7 +42,7 @@ ScreenWatchDisplayWidget::~ScreenWatchDisplayWidget(){
         m_stop = true;
         m_cv.notify_all();
     }
-    m_updater.join();
+    m_updater.wait_and_ignore_exceptions();
 }
 void ScreenWatchDisplayWidget::paintEvent(QPaintEvent* event){
 //    cout << "ScreenWatchDisplayWidget::paintEvent: " << m_holder.width() << " x " << m_holder.height() << endl;

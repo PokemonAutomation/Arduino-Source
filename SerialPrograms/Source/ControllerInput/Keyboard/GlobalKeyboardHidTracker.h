@@ -28,7 +28,7 @@ public:
     ~KeyboardHidTracker();
     KeyboardHidTracker();
 
-    virtual void stop() override;
+    virtual void stop() noexcept override;
 
     virtual void clear_state() override;
 
@@ -52,7 +52,7 @@ private:
 
     Mutex m_sleep_lock;
     ConditionVariable m_cv;
-    std::unique_ptr<AsyncTask> m_thread;
+    AsyncTask m_thread;
 };
 
 

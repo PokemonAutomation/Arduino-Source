@@ -10,7 +10,7 @@
 #include <QWidget>
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Qt/WidgetStackFixedAspectRatio.h"
 #include "Common/Qt/Options/ConfigWidget.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -38,7 +38,7 @@ private:
     ConditionVariable m_cv;
     bool m_stop;
     VideoSnapshot m_last_frame;
-    Thread m_updater;
+    AsyncTask m_updater;
 };
 
 class ScreenWatchWidget : public WidgetStackFixedAspectRatio, public ConfigWidget{

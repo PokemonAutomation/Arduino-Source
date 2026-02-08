@@ -23,7 +23,7 @@ Watchdog::Watchdog(ThreadPool& thread_pool)
 Watchdog::~Watchdog(){
     stop();
 }
-void Watchdog::stop(){
+void Watchdog::stop() noexcept{
     if (!m_thread){
         return;
     }
@@ -32,7 +32,7 @@ void Watchdog::stop(){
         m_stopped = true;
     }
     m_cv.notify_all();
-    m_thread.reset();
+    m_thread.wait_and_ignore_exceptions();
 }
 
 

@@ -88,7 +88,7 @@ protected:
 private:
     void thread_loop();
 protected:
-    void stop_thread();
+    void stop_thread() noexcept;
 
 private:
     ThreadPool& m_thread_pool;
@@ -102,7 +102,7 @@ private:
 
     PeriodicScheduler m_scheduler;
 
-    std::unique_ptr<AsyncTask> m_runner;
+    AsyncTask m_runner;
 };
 
 

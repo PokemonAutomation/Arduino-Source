@@ -18,7 +18,7 @@ public:
     virtual ~AppleSleepController(){
         stop();
     }
-    virtual void stop() override{
+    virtual void stop() noexcept override{
         std::lock_guard<Mutex> lg(m_lock);
         update_state(SleepSuppress::NONE);
     }

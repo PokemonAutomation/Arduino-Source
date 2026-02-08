@@ -159,7 +159,7 @@ int run_program(int argc, char *argv[]){
     set_working_directory();
 
     //  Run this asynchronously to we don't block startup.
-    std::unique_ptr<AsyncTask> task = send_all_unsent_reports(logger, true);
+    AsyncTask task = send_all_unsent_reports(logger, true);
 
 
 

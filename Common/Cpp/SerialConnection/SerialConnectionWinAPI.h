@@ -16,7 +16,8 @@
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Strings/Unicode.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "Common/Cpp/StreamConnections/StreamConnection.h"
 
 namespace PokemonAutomation{
@@ -28,10 +29,19 @@ void serial_debug_log(const std::string& msg);
 class SerialConnection : public StreamConnection{
 public:
     //  UTF-8
-    SerialConnection(const std::string& name, uint32_t baud_rate)
-        : SerialConnection(name, utf8_to_wstr(name), baud_rate)
+    SerialConnection(
+        ThreadPool& thread_pool,
+        const std::string& name,
+        uint32_t baud_rate
+    )
+        : SerialConnection(thread_pool, name, utf8_to_wstr(name), baud_rate)
     {}
-    SerialConnection(const std::string& name, const std::wstring& wname, uint32_t baud_rate)
+    SerialConnection(
+        ThreadPool& thread_pool,
+        const std::string& name,
+        const std::wstring& wname,
+        uint32_t baud_rate
+    )
         : m_exit(false)
         , m_consecutive_errors(0)
     {
@@ -103,7 +113,7 @@ public:
 
         //  Start receiver thread.
         try{
-            m_listener = Thread([this]{
+            m_listener = thread_pool.blocking_dispatch([this]{
                 run_with_catch(
                     "SerialConnection::SerialConnection()",
                     [this]{ recv_loop(); }
@@ -120,10 +130,10 @@ public:
         }
     }
 
-    virtual void stop() final{
+    virtual void stop() noexcept final{
         m_exit.store(true, std::memory_order_release);
         CloseHandle(m_handle);
-        m_listener.join();
+        m_listener.wait_and_ignore_exceptions();
     }
 
 private:
@@ -237,7 +247,7 @@ private:
     std::atomic<size_t> m_consecutive_errors;
     SpinLock m_send_lock;
     SpinLock m_error_lock;
-    Thread m_listener;
+    AsyncTask m_listener;
 };
 
 

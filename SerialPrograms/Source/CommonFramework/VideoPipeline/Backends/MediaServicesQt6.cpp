@@ -43,7 +43,7 @@ GlobalMediaServices::~GlobalMediaServices(){
     stop();
 }
 
-void GlobalMediaServices::stop(){
+void GlobalMediaServices::stop() noexcept{
     if (!m_thread){
         return;
     }
@@ -57,7 +57,7 @@ void GlobalMediaServices::stop(){
     }
 
     // Wait for the worker thread to finish its current work and join
-    m_thread.reset();
+    m_thread.wait_and_ignore_exceptions();
 }
 
 

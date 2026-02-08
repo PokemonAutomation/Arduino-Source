@@ -69,7 +69,7 @@ AsyncCommandSession<ControllerType>::~AsyncCommandSession(){
     AsyncCommandSession::cancel(nullptr);
 
     //  Join the thread.
-    m_thread.reset();
+    m_thread.wait_and_ignore_exceptions();
 }
 
 template <typename ControllerType>
@@ -198,7 +198,7 @@ void AsyncCommandSession<ControllerType>::wait(){
 template <typename ControllerType>
 void AsyncCommandSession<ControllerType>::stop_session_and_rethrow(){
     cancel(nullptr);
-    m_thread->wait_and_rethrow_exceptions();
+    m_thread.wait_and_rethrow_exceptions();
     throw_if_cancelled_with_exception();
 }
 

@@ -90,7 +90,7 @@ int run_until_with_time_limit(
     );
 
     bool timed_out = false;
-    std::unique_ptr<AsyncTask> timer = GlobalThreadPools::unlimited_realtime().blocking_dispatch([&]{
+    AsyncTask timer = GlobalThreadPools::unlimited_realtime().blocking_dispatch([&]{
         subscope.wait_until(deadline);
         timed_out = true;
         subscope.cancel(nullptr);
@@ -103,7 +103,7 @@ int run_until_with_time_limit(
 //        subscope.wait_for_all_requests();
     }catch (OperationCancelledException&){}
 
-    timer->wait_and_rethrow_exceptions();
+    timer.wait_and_rethrow_exceptions();
     subscope.throw_if_cancelled_with_exception();
     scope.throw_if_cancelled();
 

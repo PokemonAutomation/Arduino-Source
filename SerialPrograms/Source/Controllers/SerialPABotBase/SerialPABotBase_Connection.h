@@ -11,7 +11,7 @@
 //#include <set>
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Controllers/SerialPABotBase/Connection/BotBase.h"
 #include "Controllers/SerialPABotBase/Connection/PABotBase.h"
 #include "Controllers/SerialPABotBase/Connection/MessageLogger.h"
@@ -70,7 +70,7 @@ private:
     uint8_t m_program_id = 0;
     std::string m_program_name;
 
-    Thread m_status_thread;
+    AsyncTask m_status_thread;
     std::unique_ptr<PABotBase> m_botbase;
     mutable Mutex m_lock;
     Mutex m_sleep_lock;

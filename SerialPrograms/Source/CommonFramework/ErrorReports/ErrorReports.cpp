@@ -343,23 +343,23 @@ void send_reports(Logger& logger, const std::vector<std::string>& reports){
         }
     }
 }
-std::unique_ptr<AsyncTask> send_all_unsent_reports(Logger& logger, bool allow_prompt){
+AsyncTask send_all_unsent_reports(Logger& logger, bool allow_prompt){
 #ifdef PA_OFFICIAL
     ErrorReportSendMode mode = GlobalSettings::instance().ERROR_REPORTS->SEND_MODE;
     if (mode == ErrorReportSendMode::NEVER_SEND_ANYTHING){
-        return nullptr;
+        return AsyncTask();
     }
 
     std::vector<std::string> reports = SendableErrorReport::get_pending_reports();
     global_logger_tagged().log("Found " + std::to_string(reports.size()) + " unsent error reports.", COLOR_PURPLE);
 
     if (reports.empty()){
-        return nullptr;
+        return AsyncTask();
     }
 
     if (mode == ErrorReportSendMode::PROMPT_WHEN_CONVENIENT){
         if (!allow_prompt){
-            return nullptr;
+            return AsyncTask();
         }
         QMessageBox box;
         QMessageBox::StandardButton button = box.information(
@@ -379,7 +379,7 @@ std::unique_ptr<AsyncTask> send_all_unsent_reports(Logger& logger, bool allow_pr
             QMessageBox::StandardButton::Yes
         );
         if (button != QMessageBox::StandardButton::Yes){
-            return nullptr;
+            return AsyncTask();
         }
     }
 
@@ -391,7 +391,7 @@ std::unique_ptr<AsyncTask> send_all_unsent_reports(Logger& logger, bool allow_pr
         }
     );
 #else
-    return nullptr;
+    return AsyncTask();
 #endif
 }
 

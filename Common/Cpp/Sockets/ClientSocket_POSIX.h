@@ -43,7 +43,7 @@ public:
 
     virtual ~ClientSocket_POSIX(){
         close();
-        m_thread.reset();
+        m_thread.wait_and_ignore_exceptions();
         close_socket();
     }
 
@@ -272,7 +272,7 @@ private:
 
     mutable Mutex m_lock;
     ConditionVariable m_cv;
-    std::unique_ptr<AsyncTask> m_thread;
+    AsyncTask m_thread;
 };
 
 
