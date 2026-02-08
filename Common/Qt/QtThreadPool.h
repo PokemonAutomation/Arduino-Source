@@ -106,7 +106,7 @@ private:
 
     Mutex m_lock;
 
-    bool m_stopping = false;
+//    bool m_stopping = false;
     std::deque<QtEventThread> m_threads;
     std::vector<QtEventThread*> m_available_threads;
 };
