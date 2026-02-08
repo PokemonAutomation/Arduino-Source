@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -20,6 +21,7 @@
 #include "PokemonLZA_StatsReset.h"
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
+#include "PokemonLZA/Programs/PokemonLZA_FastTravelNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_MenuNavigation.h"
 
 namespace PokemonAutomation{
@@ -162,13 +164,19 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         context.wait_for_all_requests();
 
         if (POKEMON == GiftPokemon::FLOETTE || POKEMON == GiftPokemon::MAGEARNA){
-            // fly to Quasartico, replace with OCR in the future
-            overworld_to_main_menu(env.console, context);
-            open_map(env.console, context, false, false);
-            pbf_move_right_joystick(context, {0, +1}, 500ms, 500ms);
-            pbf_move_right_joystick(context, {0, +1}, 500ms, 500ms);
-            pbf_move_left_joystick(context, {-0.609, 0}, 100ms, 500ms);
-            fly_from_map(env.console, context);
+            // fly to Quasartico Inc.
+            FastTravelState travel_status = open_map_and_fly_to(env.console, context, LANGUAGE, Location::QUASARTICO_INC);
+            if (travel_status != FastTravelState::SUCCESS){
+                stats.errors++;
+                env.update_stats();
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Failed to travel to Quasartico Inc.",
+                    env.console
+                    );
+            }
+            context.wait_for(100ms);
+            env.log("Detected overworld. Fast traveled to Quasartico Inc.");
 
             // move to the door
             pbf_move_left_joystick(context, {0, +1}, 8s, 500ms);
@@ -184,14 +192,18 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
         if (POKEMON == GiftPokemon::MELTAN || POKEMON == GiftPokemon::MELMETAL){
             // fly to Lysandre Café, replace with OCR in the future
-            overworld_to_main_menu(env.console, context);
-            open_map(env.console, context, false, false);
-            pbf_press_button(context, BUTTON_Y, 50ms, 500ms);
-            pbf_press_dpad(context, DPAD_RIGHT, 50ms, 500ms);
-            pbf_press_dpad(context, DPAD_RIGHT, 50ms, 500ms);
-            pbf_press_dpad(context, DPAD_RIGHT, 50ms, 500ms);
-            pbf_press_dpad(context, DPAD_UP, 50ms, 500ms);
-            pbf_mash_button(context, BUTTON_A, 5s);
+            FastTravelState travel_status = open_map_and_fly_to(env.console, context, LANGUAGE, Location::LYSANDRE_CAFE);
+            if (travel_status != FastTravelState::SUCCESS){
+                stats.errors++;
+                env.update_stats();
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Failed to travel to Lysandre Café",
+                    env.console
+                    );
+            }
+            context.wait_for(100ms);
+            env.log("Detected overworld. Fast traveled to Lysandre Café");
 
             // move to the staircase
             pbf_move_left_joystick(context, {-1, -0.05}, 200ms, 500ms);
