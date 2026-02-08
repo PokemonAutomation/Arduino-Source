@@ -106,7 +106,7 @@ protected:
     //  Everything here must be called under the lock.
 
     virtual std::string check_validity() const{ return ""; }
-    void join_program_thread();
+    void join_program_thread() noexcept;
 
 private:
     //  Everything here must be called under the lock.
@@ -132,7 +132,7 @@ private:
 
     std::atomic<WallClock> m_timestamp;
     std::atomic<ProgramState> m_state;
-    std::unique_ptr<AsyncTask> m_program_thread;
+    AsyncTask m_program_thread;
 
 //    Mutex m_stats_lock;
     std::unique_ptr<StatsTracker> m_historical_stats;

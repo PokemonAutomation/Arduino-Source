@@ -62,7 +62,7 @@ public:
     // Shut down the service. Wake up and join the persistent worker thread. After this
     // function is called, you are not supposed to query camera info any more from this
     // class.
-    void stop();
+    void stop() noexcept;
 
 private:
     GlobalMediaServices();
@@ -118,7 +118,7 @@ private:
     QList<QCameraDevice> m_cameras;
 
     // Background persistent worker thread that waits for camera refresh requests
-    std::unique_ptr<AsyncTask> m_thread;
+    AsyncTask m_thread;
 };
 
 

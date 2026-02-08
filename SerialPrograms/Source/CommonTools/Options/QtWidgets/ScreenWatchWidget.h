@@ -38,7 +38,7 @@ private:
     ConditionVariable m_cv;
     bool m_stop;
     VideoSnapshot m_last_frame;
-    std::unique_ptr<AsyncTask> m_updater;
+    AsyncTask m_updater;
 };
 
 class ScreenWatchWidget : public WidgetStackFixedAspectRatio, public ConfigWidget{

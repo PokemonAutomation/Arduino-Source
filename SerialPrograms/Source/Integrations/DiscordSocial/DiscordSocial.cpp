@@ -19,9 +19,9 @@ DiscordSocial& DiscordSocial::instance(){
     return instance;
 }
 
-void DiscordSocial::stop(){
+void DiscordSocial::stop() noexcept{
     m_running.store(false, std::memory_order_release);
-    m_thread.reset();
+    m_thread.wait_and_ignore_exceptions();
     if (m_client) m_client.reset();
 }
 void DiscordSocial::run(){

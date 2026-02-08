@@ -67,7 +67,7 @@ void Client::disconnect(){
     std::lock_guard<std::mutex> lg(m_client_lock);
 //    cout << "Client::disconnect()" << endl;
 
-    m_start_thread.reset();
+    m_start_thread.wait_and_ignore_exceptions();
 
     if (m_bot == nullptr || !m_is_connected.load(std::memory_order_relaxed)){
         return;

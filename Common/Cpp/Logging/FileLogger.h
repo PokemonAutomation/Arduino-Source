@@ -62,7 +62,7 @@ public:
     FileLogger(ThreadPool& thread_pool, FileLoggerConfig config);
 
     ~FileLogger();
-    void stop();
+    void stop() noexcept;
 
     // Add a listener to receive log messages. Thread-safe.
     void add_listener(Listener& listener);
@@ -103,7 +103,7 @@ private:
     std::deque<std::pair<std::string, Color>> m_queue;
 
     ListenerSet<Listener> m_listeners;
-    std::unique_ptr<AsyncTask> m_thread;
+    AsyncTask m_thread;
 };
 
 

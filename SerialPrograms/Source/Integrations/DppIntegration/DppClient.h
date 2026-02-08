@@ -49,7 +49,7 @@ private:
     std::unique_ptr<dpp::commandhandler> m_handler = nullptr;
     std::atomic<bool> m_is_connected;
     std::mutex m_client_lock;
-    std::unique_ptr<AsyncTask> m_start_thread;
+    AsyncTask m_start_thread;
 };
 
 

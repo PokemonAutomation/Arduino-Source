@@ -75,11 +75,11 @@ private:
 
     mutable Mutex m_device_lock;
     ConditionVariable m_device_cv;
-    std::unique_ptr<AsyncTask> m_device_thread;
+    AsyncTask m_device_thread;
 
     mutable Mutex m_host_lock;
     ConditionVariable m_host_cv;
-    std::unique_ptr<AsyncTask> m_host_thread;
+    AsyncTask m_host_thread;
 };
 
 

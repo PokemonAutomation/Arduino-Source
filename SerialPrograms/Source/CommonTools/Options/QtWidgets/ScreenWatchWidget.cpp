@@ -42,7 +42,7 @@ ScreenWatchDisplayWidget::~ScreenWatchDisplayWidget(){
         m_stop = true;
         m_cv.notify_all();
     }
-    m_updater.reset();
+    m_updater.wait_and_ignore_exceptions();
 }
 void ScreenWatchDisplayWidget::paintEvent(QPaintEvent* event){
 //    cout << "ScreenWatchDisplayWidget::paintEvent: " << m_holder.width() << " x " << m_holder.height() << endl;

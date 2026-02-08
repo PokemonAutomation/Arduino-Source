@@ -89,7 +89,7 @@ private:
     std::deque<std::shared_ptr<const VideoFrame>> m_frames;
     std::deque<CompressedVideoFrame> m_compressed_frames;
 
-    std::unique_ptr<AsyncTask> m_worker;
+    AsyncTask m_worker;
     std::atomic<bool> m_stopping{false};
     
     // Queue for the worker thread

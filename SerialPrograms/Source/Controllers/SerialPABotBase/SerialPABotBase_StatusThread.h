@@ -62,7 +62,7 @@ public:
             }
             m_cv.notify_all();
         }
-        m_status_thread.reset();
+        m_status_thread.wait_and_ignore_exceptions();
     }
 
 private:
@@ -70,7 +70,7 @@ private:
         constexpr std::chrono::milliseconds PERIOD(1000);
         std::atomic<WallClock> last_ack(current_time());
 
-        std::unique_ptr<AsyncTask> watchdog = GlobalThreadPools::unlimited_normal().blocking_dispatch(
+        AsyncTask watchdog = GlobalThreadPools::unlimited_normal().blocking_dispatch(
             [&, this]{
                 WallClock next_ping = current_time();
                 while (true){
@@ -153,7 +153,7 @@ private:
             std::unique_lock<Mutex> lg(m_sleep_lock);
         }
         m_cv.notify_all();
-        watchdog.reset();
+        watchdog.wait_and_ignore_exceptions();
     }
 
 private:
@@ -164,7 +164,7 @@ private:
     std::atomic<bool> m_error;
     Mutex m_sleep_lock;
     ConditionVariable m_cv;
-    std::unique_ptr<AsyncTask> m_status_thread;
+    AsyncTask m_status_thread;
 };
 
 

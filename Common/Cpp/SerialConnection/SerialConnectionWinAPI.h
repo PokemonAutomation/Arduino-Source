@@ -130,10 +130,10 @@ public:
         }
     }
 
-    virtual void stop() final{
+    virtual void stop() noexcept final{
         m_exit.store(true, std::memory_order_release);
         CloseHandle(m_handle);
-        m_listener.reset();
+        m_listener.wait_and_ignore_exceptions();
     }
 
 private:
@@ -247,7 +247,7 @@ private:
     std::atomic<size_t> m_consecutive_errors;
     SpinLock m_send_lock;
     SpinLock m_error_lock;
-    std::unique_ptr<AsyncTask> m_listener;
+    AsyncTask m_listener;
 };
 
 

@@ -70,7 +70,7 @@ private:
     uint8_t m_program_id = 0;
     std::string m_program_name;
 
-    std::unique_ptr<AsyncTask> m_status_thread;
+    AsyncTask m_status_thread;
     std::unique_ptr<PABotBase> m_botbase;
     mutable Mutex m_lock;
     Mutex m_sleep_lock;

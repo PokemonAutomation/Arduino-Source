@@ -47,8 +47,8 @@ MockDevice::~MockDevice(){
     }
     m_device_cv.notify_all();
     m_host_cv.notify_all();
-    m_device_thread.reset();
-    m_host_thread.reset();
+    m_device_thread.wait_and_ignore_exceptions();
+    m_host_thread.wait_and_ignore_exceptions();
 }
 void MockDevice::print() const{
     std::lock_guard<Mutex> lg(m_device_lock);

@@ -56,7 +56,7 @@ ReliableStreamConnection::~ReliableStreamConnection(){
     cancel(nullptr);
     detach();
     m_unreliable_connection.remove_listener(*this);
-    m_retransmit_thread.reset();
+    m_retransmit_thread.wait_and_ignore_exceptions();
 }
 
 bool ReliableStreamConnection::cancel(std::exception_ptr exception) noexcept{

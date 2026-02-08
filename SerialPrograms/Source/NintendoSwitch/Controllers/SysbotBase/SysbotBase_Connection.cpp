@@ -95,7 +95,7 @@ TcpSysbotBase_Connection::~TcpSysbotBase_Connection(){
         std::lock_guard<Mutex> lg(m_lock);
         m_cv.notify_all();
     }
-    m_thread.reset();
+    m_thread.wait_and_ignore_exceptions();
 }
 
 
@@ -287,7 +287,9 @@ void TcpSysbotBase_Connection::set_mode(const std::string& sbb_version){
         return;
     }
 
-    m_thread = GlobalThreadPools::unlimited_realtime().blocking_dispatch([this]{ thread_loop(); });
+    m_thread = GlobalThreadPools::unlimited_realtime().blocking_dispatch(
+        [this]{ thread_loop(); }
+    );
     declare_ready();
 }
 

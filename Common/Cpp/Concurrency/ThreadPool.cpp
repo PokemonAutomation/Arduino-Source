@@ -47,10 +47,10 @@ void ThreadPool::ensure_threads(size_t threads){
 //void ParallelTaskRunner::wait_for_everything(){
 //    m_core->wait_for_everything();
 //}
-std::unique_ptr<AsyncTask> ThreadPool::blocking_dispatch(std::function<void()>&& func){
+AsyncTask ThreadPool::blocking_dispatch(std::function<void()>&& func){
     return m_core->blocking_dispatch(std::move(func));
 }
-std::unique_ptr<AsyncTask> ThreadPool::try_dispatch(std::function<void()>& func){
+AsyncTask ThreadPool::try_dispatch(std::function<void()>& func){
     return m_core->try_dispatch(func);
 }
 void ThreadPool::run_in_parallel(

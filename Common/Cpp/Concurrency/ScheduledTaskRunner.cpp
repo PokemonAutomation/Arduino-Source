@@ -25,7 +25,7 @@ ScheduledTaskRunner::ScheduledTaskRunner(ThreadPool& thread_pool)
 ScheduledTaskRunner::~ScheduledTaskRunner(){
     stop();
 }
-void ScheduledTaskRunner::stop(){
+void ScheduledTaskRunner::stop() noexcept{
     if (!m_runner){
         return;
     }
@@ -36,7 +36,7 @@ void ScheduledTaskRunner::stop(){
         m_stopped = true;
     }
     m_cv.notify_all();
-    m_runner.reset();
+    m_runner.wait_and_ignore_exceptions();
 //    cout << "ScheduledTaskRunner: (Destructor - end):   " << this << endl;
 }
 

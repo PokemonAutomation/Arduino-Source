@@ -118,7 +118,7 @@ SerialPABotBase_Connection::~SerialPABotBase_Connection(){
         std::lock_guard<Mutex> lg(m_lock);
         m_cv.notify_all();
     }
-    m_status_thread.reset();
+    m_status_thread.wait_and_ignore_exceptions();
     m_botbase.reset();
 }
 

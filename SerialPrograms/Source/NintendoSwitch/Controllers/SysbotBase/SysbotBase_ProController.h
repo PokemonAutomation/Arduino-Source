@@ -249,7 +249,7 @@ private:
     WallClock m_next_state_change;
 
     ConditionVariable m_cv;
-    std::unique_ptr<AsyncTask> m_dispatch_thread;
+    AsyncTask m_dispatch_thread;
 };
 
 

@@ -52,11 +52,11 @@ public:
 
     //  Dispatch the function. If there are no threads available, it waits until
     //  there are.
-    [[nodiscard]] std::unique_ptr<AsyncTask> blocking_dispatch(std::function<void()>&& func);
+    [[nodiscard]] AsyncTask blocking_dispatch(std::function<void()>&& func);
 
     //  Dispatch the function. Returns null if no threads are available.
     //  "func" will be moved-from only on success.
-    [[nodiscard]] std::unique_ptr<AsyncTask> try_dispatch(std::function<void()>& func);
+    [[nodiscard]] AsyncTask try_dispatch(std::function<void()>& func);
 
     //  Run function for all the indices [start, end).
     //  Lower indices are not allowed to block on higher indices.

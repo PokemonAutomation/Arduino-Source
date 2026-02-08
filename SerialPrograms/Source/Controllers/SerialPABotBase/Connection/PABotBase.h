@@ -55,7 +55,7 @@ public:
     virtual ~PABotBase();
 
     void connect();
-    virtual void stop(std::string error_message = "") override;
+    virtual void stop(std::string error_message = "") noexcept override;
 
     std::chrono::time_point<std::chrono::system_clock> last_ack() const{
         return m_last_ack.load(std::memory_order_acquire);
@@ -197,7 +197,7 @@ private:
     std::atomic<State> m_state;
     std::atomic<bool> m_error;
     std::string m_error_message;
-    std::unique_ptr<AsyncTask> m_retransmit_thread;
+    AsyncTask m_retransmit_thread;
 
     LifetimeSanitizer m_sanitizer;
 };

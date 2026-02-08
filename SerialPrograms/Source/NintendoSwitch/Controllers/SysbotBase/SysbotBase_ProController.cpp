@@ -43,7 +43,7 @@ ProController_SysbotBase::ProController_SysbotBase(
 }
 ProController_SysbotBase::~ProController_SysbotBase(){
     stop();
-    m_dispatch_thread.reset();
+    m_dispatch_thread.wait_and_ignore_exceptions();
 }
 void ProController_SysbotBase::stop(){
     if (m_stopping.exchange(true)){

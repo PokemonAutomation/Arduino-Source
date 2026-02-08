@@ -19,6 +19,7 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
 
 namespace PokemonAutomation{
@@ -35,7 +36,7 @@ public:
     Watchdog(ThreadPool& thread_pool);
     ~Watchdog();
 
-    void stop();
+    void stop() noexcept;
 
     //  Add a callback which will be called at the specified period.
     //  If callback already exists, the period will be overwritten and the next
@@ -95,7 +96,7 @@ private:
     Mutex m_sleep_lock;
 
     ConditionVariable m_cv;
-    std::unique_ptr<AsyncTask> m_thread;
+    AsyncTask m_thread;
 };
 
 

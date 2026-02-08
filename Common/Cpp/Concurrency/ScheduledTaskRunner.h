@@ -12,6 +12,8 @@
 #include <map>
 #include "Common/Cpp/Time.h"
 //#include "Common/Cpp/CancellableScope.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
 
@@ -22,7 +24,7 @@ class ScheduledTaskRunner{
 public:
     ScheduledTaskRunner(ThreadPool& thread_pool);
     ~ScheduledTaskRunner();
-    void stop();
+    void stop() noexcept;
 
     //  Returns the # of events in the schedule.
     size_t size() const;
@@ -46,7 +48,7 @@ private:
 
     std::multimap<WallClock, std::function<void()>> m_schedule;
 
-    std::unique_ptr<AsyncTask> m_runner;
+    AsyncTask m_runner;
 };
 
 

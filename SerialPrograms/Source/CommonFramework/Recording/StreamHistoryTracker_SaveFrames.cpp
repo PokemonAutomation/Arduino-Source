@@ -193,10 +193,10 @@ private:
 };
 #endif
 
-StreamHistoryTracker::~StreamHistoryTracker() {
+StreamHistoryTracker::~StreamHistoryTracker(){
     m_stopping = true;
     m_cv.notify_all();
-    m_worker.reset();
+    m_worker.wait_and_ignore_exceptions();
 }
 
 StreamHistoryTracker::StreamHistoryTracker(

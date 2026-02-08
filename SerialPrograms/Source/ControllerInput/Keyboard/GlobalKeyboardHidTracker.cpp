@@ -48,7 +48,7 @@ KeyboardHidTracker::KeyboardHidTracker()
 {}
 
 
-void KeyboardHidTracker::stop(){
+void KeyboardHidTracker::stop() noexcept{
     if (!m_thread){
         return;
     }
@@ -57,7 +57,7 @@ void KeyboardHidTracker::stop(){
         std::lock_guard<Mutex> lg(m_sleep_lock);
     }
     m_cv.notify_all();
-    m_thread.reset();
+    m_thread.wait_and_ignore_exceptions();
 }
 
 

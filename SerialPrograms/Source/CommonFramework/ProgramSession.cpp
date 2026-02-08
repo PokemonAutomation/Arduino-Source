@@ -43,8 +43,8 @@ ProgramSession::~ProgramSession(){
 //    join_program_thread();
 }
 
-void ProgramSession::join_program_thread(){
-    m_program_thread.reset();
+void ProgramSession::join_program_thread() noexcept{
+    m_program_thread.wait_and_ignore_exceptions();
 }
 
 

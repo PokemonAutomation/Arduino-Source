@@ -35,9 +35,10 @@ struct LifetimeSanitizerFields{
 
     LifetimeSanitizerFields()
         : filter({
-//        "MultiSwitchProgramSession",
-//        "MultiSwitchProgramWidget2",
-//        "VideoSource",
+//            "MultiSwitchProgramSession",
+//            "MultiSwitchProgramWidget2",
+//            "VideoSource",
+//            "AsyncTask",
         })
     {}
 };

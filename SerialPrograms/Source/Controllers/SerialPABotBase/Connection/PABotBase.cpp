@@ -102,7 +102,7 @@ void PABotBase::connect(){
         SerialPABotBase::DeviceRequest_seqnum_reset(), nullptr
     ).convert<PABB_MSG_ACK_REQUEST>(logger(), response);
 }
-void PABotBase::stop(std::string error_message){
+void PABotBase::stop(std::string error_message) noexcept{
     auto scope_check = m_sanitizer.check_scope();
 
     //  Make sure only one thread can get in here.
@@ -121,7 +121,7 @@ void PABotBase::stop(std::string error_message){
         std::lock_guard<Mutex> lg(m_sleep_lock);
     }
     m_cv.notify_all();
-    m_retransmit_thread.reset();
+    m_retransmit_thread.wait_and_ignore_exceptions();
 
     {
         ReadSpinLock lg(m_state_lock, "PABotBase::stop()");

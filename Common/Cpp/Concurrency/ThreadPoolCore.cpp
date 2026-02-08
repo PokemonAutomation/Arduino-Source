@@ -7,6 +7,7 @@
 #include <thread>
 #include "Common/Cpp/PanicDump.h"
 #include "ReverseLockGuard.h"
+#include "AsyncTaskCore.h"
 #include "ThreadPoolCore.h"
 
 //#include <iostream>
@@ -92,8 +93,8 @@ void ThreadPoolCore::wait_for_everything(){
 }
 #endif
 
-std::unique_ptr<AsyncTask> ThreadPoolCore::blocking_dispatch(std::function<void()>&& func){
-    std::unique_ptr<AsyncTask> task(new AsyncTask(std::move(func)));
+AsyncTask ThreadPoolCore::blocking_dispatch(std::function<void()>&& func){
+    AsyncTask task(std::move(func));
 
     {
         std::unique_lock<Mutex> lg(m_lock);
@@ -103,7 +104,7 @@ std::unique_ptr<AsyncTask> ThreadPoolCore::blocking_dispatch(std::function<void(
         });
 
         //  Enqueue task.
-        m_queue.emplace_back(task.get())->report_started();
+        m_queue.emplace_back(task.core())->report_started();
         spawn_threads();
 
 #if 0
@@ -123,19 +124,19 @@ std::unique_ptr<AsyncTask> ThreadPoolCore::blocking_dispatch(std::function<void(
 
     return task;
 }
-std::unique_ptr<AsyncTask> ThreadPoolCore::try_dispatch(std::function<void()>& func){
-    std::unique_ptr<AsyncTask> task;
+AsyncTask ThreadPoolCore::try_dispatch(std::function<void()>& func){
+    AsyncTask task;
     {
         std::lock_guard<Mutex> lg(m_lock);
 
         if (m_queue.size() + m_busy_count >= m_max_threads){
-            return nullptr;
+            return AsyncTask();
         }
 
-        task.reset(new AsyncTask(std::move(func)));
+        task = AsyncTask(std::move(func));
 
         //  Enqueue task.
-        m_queue.emplace_back(task.get())->report_started();
+        m_queue.emplace_back(task.core())->report_started();
 
         spawn_threads();
     }
@@ -166,30 +167,30 @@ void ThreadPoolCore::run_in_parallel(
     size_t blocks = (total + block_size - 1) / block_size;
 
     //  Prepare all the tasks.
-    std::vector<std::unique_ptr<AsyncTask>> tasks(blocks);
+    std::vector<AsyncTask> tasks;
     for (size_t c = 0; c < blocks; c++){
-        tasks[c].reset(new AsyncTask([=, &func]{
+        tasks.emplace_back([=, &func]{
             size_t s = start + c * block_size;
             size_t e = std::min(s + block_size, end);
 //            cout << "Running: [" << s << "," << e << ")" << endl;
             for (; s < e; s++){
                 func(s);
             }
-        }));
+        });
     }
 
     {
         //  Enqueue all the tasks.
         std::unique_lock<Mutex> lg(m_lock);
-        for (std::unique_ptr<AsyncTask>& task : tasks){
-            m_queue.emplace_back(task.get())->report_started();
+        for (AsyncTask& task : tasks){
+            m_queue.emplace_back(task.core())->report_started();
             m_thread_cv.notify_one();
         }
         spawn_threads();
 
         //  Use this thread to process the queue until our tasks are done.
-        while (!m_queue.empty() && !tasks.back()->is_finished()){
-            AsyncTask* task = m_queue.front();
+        while (!m_queue.empty() && !tasks.back().is_finished()){
+            AsyncTaskCore* task = m_queue.front();
             m_queue.pop_front();
 
             ReverseLockGuard<Mutex> lg0(m_lock);
@@ -198,8 +199,8 @@ void ThreadPoolCore::run_in_parallel(
     }
 
     //  Wait for everything to finish.
-    for (std::unique_ptr<AsyncTask>& task : tasks){
-        task->wait_and_rethrow_exceptions();
+    for (AsyncTask& task : tasks){
+        task.wait_and_rethrow_exceptions();
     }
 }
 
@@ -250,7 +251,7 @@ void ThreadPoolCore::thread_loop(ThreadData& data){
             continue;
         }
 
-        AsyncTask* task = m_queue.front();
+        AsyncTaskCore* task = m_queue.front();
         m_queue.pop_front();
 
         ReverseLockGuard<Mutex> lg0(m_lock);
