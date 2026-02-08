@@ -9,6 +9,9 @@
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "Pokemon/Pokemon_Strings.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "PokemonLZA_TurboMacro.h"
 
 //#include <iostream>
@@ -19,18 +22,39 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLZA{
 
+using namespace Pokemon;
 
 LZA_TurboMacro_Descriptor::LZA_TurboMacro_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "NintendoSwitch:TurboMacro",
-        "Nintendo Switch", "Turbo Macro",
+        "PokemonLZA:TurboMacro", STRING_POKEMON + " LZA",
+        "Turbo Macro",
         "Programs/NintendoSwitch/TurboMacro.html",
-        "Create macros",
+        "Create macros. Stops with specific trigger (e.g. shiny sound).",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
+
+class LZA_TurboMacro_Descriptor::Stats : public StatsTracker{
+public:
+    Stats()
+        : loops(m_stats["Loops"])
+        , shinies(m_stats["Shiny Sounds"])
+        , errors(m_stats["Errors"])
+    {
+        m_display_order.emplace_back("Loops");
+        m_display_order.emplace_back("Shiny Sounds");
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+    }
+
+    std::atomic<uint64_t>& loops;
+    std::atomic<uint64_t>& shinies;
+    std::atomic<uint64_t>& errors;
+};
+std::unique_ptr<StatsTracker> LZA_TurboMacro_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 LZA_TurboMacro::LZA_TurboMacro()
     : LOOP(
@@ -82,16 +106,23 @@ void LZA_TurboMacro::program(SingleSwitchProgramEnvironment& env, CancellableSco
     if (GO_HOME_WHEN_DONE){
         go_home(env.console, context);
     }
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 
 void LZA_TurboMacro::run_table(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+    LZA_TurboMacro_Descriptor::Stats& stats =
+        env.current_stats<LZA_TurboMacro_Descriptor::Stats>();
     for (uint32_t c = 0; c < LOOP; c++){
         TABLE.run(scope, env.console.controller());
+        stats.loops++;
+        env.update_stats();
     }
 }
 
 void LZA_TurboMacro::run_table_stop_when_shiny_sound(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+    LZA_TurboMacro_Descriptor::Stats& stats =
+        env.current_stats<LZA_TurboMacro_Descriptor::Stats>();
     ShinySoundDetectedActionOption shiny_detected_option("Shiny Detected", "", "1000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY);
     ShinySoundHandler shiny_sound_handler(shiny_detected_option);
     PokemonLA::ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool {
@@ -113,6 +144,8 @@ void LZA_TurboMacro::run_table_stop_when_shiny_sound(SingleSwitchProgramEnvironm
     );
 
     if (ret == 0){
+        stats.shinies++;
+        env.update_stats();
         return;
     }
 }

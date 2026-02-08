@@ -20,6 +20,9 @@ namespace PokemonLZA{
 class LZA_TurboMacro_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     LZA_TurboMacro_Descriptor();
+
+    class Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
