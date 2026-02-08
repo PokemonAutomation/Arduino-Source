@@ -1752,6 +1752,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/PokemonLZA_StallBuyer.h
     Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.cpp
     Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.h
+    Source/PokemonLZA/Programs/PokemonLZA_TurboMacro.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_TurboMacro.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_BeldumHunter.cpp
