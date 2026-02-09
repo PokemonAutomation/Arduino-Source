@@ -6,8 +6,8 @@
 
 #include <sstream>
 #include "Common/Cpp/Containers/AlignedVector.tpp"
+#include "Common/Qt/GlobalThreadPoolsQt.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Tools/GlobalThreadPoolsQt.h"
 #include "Kernels/Kernels_Alignment.h"
 #include "Kernels/AbsFFT/Kernels_AbsFFT.h"
 #include "AudioConstants.h"

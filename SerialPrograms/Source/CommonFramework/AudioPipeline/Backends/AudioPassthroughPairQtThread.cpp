@@ -4,10 +4,7 @@
  *
  */
 
-//#include "Common/Cpp/Concurrency/SpinPause.h"
-//#include "CommonFramework/GlobalSettingsPanel.h"
-//#include "CommonFramework/Options/Environment/PerformanceOptions.h"
-#include "CommonFramework/Tools/GlobalThreadPoolsQt.h"
+#include "Common/Qt/GlobalThreadPoolsQt.h"
 #include "AudioPassthroughPairQt.h"
 #include "AudioPassthroughPairQtThread.h"
 

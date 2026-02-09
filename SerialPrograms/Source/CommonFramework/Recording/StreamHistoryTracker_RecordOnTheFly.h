@@ -12,7 +12,6 @@
 #include <QCoreApplication>
 #include <QFileInfo>
 #include <QUrl>
-//#include <QThread>
 #include <QAudioBufferInput>
 #include <QVideoFrameInput>
 #include <QMediaFormat>

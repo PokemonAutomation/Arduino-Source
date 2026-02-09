@@ -217,6 +217,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/CodeValidator.h
     ../Common/Qt/CollapsibleGroupBox.cpp
     ../Common/Qt/CollapsibleGroupBox.h
+    ../Common/Qt/GlobalThreadPoolsQt.cpp
+    ../Common/Qt/GlobalThreadPoolsQt.h
     ../Common/Qt/NoWheelComboBox.h
     ../Common/Qt/QtThreadPool.cpp
     ../Common/Qt/QtThreadPool.h
@@ -484,8 +486,6 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Tools/FileDownloader.h
     Source/CommonFramework/Tools/GlobalThreadPools.cpp
     Source/CommonFramework/Tools/GlobalThreadPools.h
-    Source/CommonFramework/Tools/GlobalThreadPoolsQt.cpp
-    Source/CommonFramework/Tools/GlobalThreadPoolsQt.h
     Source/CommonFramework/Tools/ProgramEnvironment.cpp
     Source/CommonFramework/Tools/ProgramEnvironment.h
     Source/CommonFramework/Tools/StatAccumulator.cpp

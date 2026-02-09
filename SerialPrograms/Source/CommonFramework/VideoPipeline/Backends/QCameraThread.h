@@ -9,7 +9,7 @@
 
 #include <QCamera>
 #include "Common/Cpp/Logging/AbstractLogger.h"
-#include "CommonFramework/Tools/GlobalThreadPoolsQt.h"
+#include "Common/Qt/GlobalThreadPoolsQt.h"
 
 //#include <iostream>
 //using std::cout;
