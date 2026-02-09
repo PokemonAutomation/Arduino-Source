@@ -14,6 +14,10 @@
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -61,7 +65,7 @@ public:
         m_pending_factory = std::move(factory);
         emit add_object_internal();
         std::unique_lock<Mutex> lg(m_lock);
-        m_cv.wait(lg, [this]{ return m_pending_factory == nullptr; });
+        m_cv.wait(lg, [this]{ return m_object != nullptr; });
         return m_object.get();
     }
     void remove_object(){
@@ -72,10 +76,19 @@ public:
 
 public slots:
     void add_object_internal(){
-        m_object = m_pending_factory();
+        {
+            std::lock_guard<Mutex> lg(m_lock);
+            m_object = m_pending_factory();
+            m_pending_factory = nullptr;
+        }
+        m_cv.notify_all();
     }
     void remove_object_internal(){
-        m_object.reset();
+        {
+            std::lock_guard<Mutex> lg(m_lock);
+            m_object.reset();
+        }
+        m_cv.notify_all();
     }
 
 private:
