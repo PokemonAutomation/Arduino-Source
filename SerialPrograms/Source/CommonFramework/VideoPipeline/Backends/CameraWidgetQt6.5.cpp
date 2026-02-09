@@ -9,7 +9,6 @@
 
 #include <chrono>
 #include <iostream>
-//#include <QThread>
 #include <QCamera>
 #include <QPainter>
 #include <QMediaDevices>

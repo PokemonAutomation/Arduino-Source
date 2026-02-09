@@ -10,7 +10,6 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioPassthroughPairQtThread_H
 #define PokemonAutomation_AudioPipeline_AudioPassthroughPairQtThread_H
 
-#include <QThread>
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "CommonFramework/AudioPipeline/AudioPassthroughPair.h"
 
