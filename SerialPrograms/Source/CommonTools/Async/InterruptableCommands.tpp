@@ -5,6 +5,8 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "InterruptableCommands.h"
 
 //#include <iostream>
@@ -42,7 +44,7 @@ AsyncCommandSession<ControllerType>::CommandSet::CommandSet(
 
 template <typename ControllerType>
 AsyncCommandSession<ControllerType>::AsyncCommandSession(
-    CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
+    CancellableScope& scope, Logger& logger,
     ControllerType& controller
 )
     : m_logger(logger)
@@ -53,7 +55,9 @@ AsyncCommandSession<ControllerType>::AsyncCommandSession(
     attach(scope);
 
     //  Now start the thread. Destructor is guaranteed to run if this succeeds.
-    m_thread = dispatcher.dispatch([this]{ thread_loop(); });
+    m_thread = GlobalThreadPools::unlimited_realtime().dispatch_now_blocking(
+        [this]{ thread_loop(); }
+    );
 }
 template <typename ControllerType>
 AsyncCommandSession<ControllerType>::~AsyncCommandSession(){
@@ -65,13 +69,13 @@ AsyncCommandSession<ControllerType>::~AsyncCommandSession(){
     AsyncCommandSession::cancel(nullptr);
 
     //  Join the thread.
-    m_thread.reset();
+    m_thread.wait_and_ignore_exceptions();
 }
 
 template <typename ControllerType>
 bool AsyncCommandSession<ControllerType>::command_is_running(){
     auto scope_check = m_sanitizer.check_scope();
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     return m_current != nullptr;
 }
 
@@ -79,7 +83,7 @@ template <typename ControllerType>
 void AsyncCommandSession<ControllerType>::stop_command(){
     auto scope_check = m_sanitizer.check_scope();
 
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
     if (cancelled()){
         return;
     }
@@ -104,7 +108,7 @@ void AsyncCommandSession<ControllerType>::dispatch(std::function<void(Controller
         m_controller, std::move(lambda)
     ));
 
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
     if (cancelled()){
         return;
     }
@@ -131,7 +135,7 @@ bool AsyncCommandSession<ControllerType>::cancel(std::exception_ptr exception) n
     if (Cancellable::cancel(exception)){
         return true;
     }
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     if (m_current != nullptr){
         m_current->context.cancel(std::move(exception));
     }
@@ -143,7 +147,7 @@ void AsyncCommandSession<ControllerType>::thread_loop(){
     while (true){
         CommandSet* current;
         {
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
             m_cv.wait(lg, [this]{
                 return cancelled() || m_current != nullptr;
             });
@@ -162,7 +166,7 @@ void AsyncCommandSession<ControllerType>::thread_loop(){
         //  it will deadlock.
         std::unique_ptr<CommandSet> done;
         {
-            std::lock_guard<std::mutex> lg(m_lock);
+            std::lock_guard<Mutex> lg(m_lock);
             done = std::move(m_current);
             m_cv.notify_all();
         }
@@ -176,7 +180,7 @@ void AsyncCommandSession<ControllerType>::thread_loop(){
 #if 0
 template <typename ControllerType>
 void AsyncCommandSession::stop_commands(){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     if (m_current){
         m_current->context.cancel_now();
     }
@@ -184,7 +188,7 @@ void AsyncCommandSession::stop_commands(){
 #endif
 template <typename ControllerType>
 void AsyncCommandSession<ControllerType>::wait(){
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
 //    cout << "wait() - start" << endl;
     m_cv.wait(lg, [this]{
         return m_current == nullptr;
@@ -194,7 +198,7 @@ void AsyncCommandSession<ControllerType>::wait(){
 template <typename ControllerType>
 void AsyncCommandSession<ControllerType>::stop_session_and_rethrow(){
     cancel(nullptr);
-    m_thread->wait_and_rethrow_exceptions();
+    m_thread.wait_and_rethrow_exceptions();
     throw_if_cancelled_with_exception();
 }
 

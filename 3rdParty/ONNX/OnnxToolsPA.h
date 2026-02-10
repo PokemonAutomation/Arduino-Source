@@ -11,7 +11,7 @@
 
 #include <string>
 #include <onnxruntime_c_api.h>
-#include "Common/Cpp/Unicode.h"
+#include "Common/Cpp/Strings/Unicode.h"
 
 namespace PokemonAutomation{
 

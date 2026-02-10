@@ -4,8 +4,9 @@
 
 #include <dpp/dpp.h>
 #include <Integrations/DppIntegration/DppUtility.h>
-#include "CommonFramework/Notifications/MessageAttachment.h"
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
+#include "CommonFramework/Notifications/MessageAttachment.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "Integrations/DiscordSettingsOption.h"
 
 namespace PokemonAutomation{
@@ -16,7 +17,16 @@ namespace DppCommandHandler{
 
 class Handler : DppUtility::Utility{
 public:
-    Handler() {}
+    Handler()
+        : m_queue(GlobalThreadPools::unlimited_normal())
+    {}
+    ~Handler(){
+        m_queue.stop();
+    }
+
+    virtual void stop(){
+        m_queue.stop();
+    }
 
 private:
     struct SlashCommand{
@@ -24,11 +34,10 @@ private:
         std::function<void(const dpp::slashcommand_t&)> func;
     };
 
-    AsyncDispatcher m_dispatcher = AsyncDispatcher(nullptr, 1);
-    ScheduledTaskRunner m_queue = ScheduledTaskRunner(m_dispatcher);
     std::mutex m_count_lock;
     static dpp::user owner;
     static Color color;
+    ScheduledTaskRunner m_queue;
 
 protected:
     void initialize(dpp::cluster& bot, dpp::commandhandler& handler);

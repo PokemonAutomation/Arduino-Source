@@ -20,7 +20,6 @@ struct StringMatchResult;
 class DictionaryMatcher;
 
 
-
 struct TextColorRange{
     uint32_t mins;
     uint32_t maxs;

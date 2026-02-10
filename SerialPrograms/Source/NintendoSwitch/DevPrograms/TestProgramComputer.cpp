@@ -24,7 +24,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.h"
 #include "Common/Cpp/CpuId/CpuId.h"
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
@@ -72,7 +71,7 @@
 #include "CommonFramework/ImageTypes/ImageHSV32.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
-#include "Common/Cpp/StringTools.h"
+#include "Common/Cpp/Strings/StringTools.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 #include "Common/Cpp/Options/EnumDropdownDatabase.h"
@@ -120,6 +119,7 @@
 #include "Common/Cpp/Containers/CircularBuffer.h"
 #include "Common/Cpp/Sockets/ClientSocket.h"
 #include "Common/Cpp/Containers/SparseArray.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -141,6 +141,9 @@
 //#include "Common/SerialPABotBase/LightweightWallClock_StdChrono.h"
 #include "Common/Cpp/Options/MacAddressOption.h"
 #include "CommonTools/Images/ImageFilter.h"
+#include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
+#include "Common/PABotBase2/PABotbase2_ReliableStreamConnection.h"
+#include "Common/Cpp/StreamConnections/MockDevice.h"
 
 
 //#include <opencv2/core.hpp>
@@ -293,8 +296,51 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     using namespace std::chrono_literals;
 
+    [[maybe_unused]] Logger& logger = env.logger();
 
 
+
+#if 1
+    {
+        MockDevice device(GlobalThreadPools::unlimited_normal());
+
+        ReliableStreamConnection connection(
+            &scope,
+            logger, true,
+            GlobalThreadPools::unlimited_realtime(),
+            device,
+            1s
+        );
+
+        connection.reset();
+
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_VERSION);
+        connection.wait_for_pending();
+
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE);
+        connection.wait_for_pending();
+
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS);
+        connection.wait_for_pending();
+
+
+        connection.send("asdf", 4);
+        connection.send("qwer", 4);
+        connection.send("zxcv", 4);
+        cout << "sent = " << connection.send("0123456789abcdef", 16) << endl;
+//        connection.send("0123456789abcdef", 16);
+//        connection.send("0123456789abcdef", 16);
+//        connection.send("0123456789abcdef", 16);
+
+        connection.print();
+
+        connection.wait_for_pending();
+
+        device.print();
+
+        scope.wait_for(60s);
+    }
+#endif
 
 
 

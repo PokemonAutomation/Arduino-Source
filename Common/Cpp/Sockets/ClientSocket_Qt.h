@@ -8,11 +8,12 @@
 #define PokemonAutomation_ClientSocket_Qt_H
 
 #include <iostream>
-#include <mutex>
-#include <condition_variable>
-#include <QThread>
 #include <QTcpSocket>
 //#include "Common/Cpp/Concurrency/SpinPause.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "Common/Qt/QtThreadPool.h"
+#include "Common/Qt/GlobalThreadPoolsQt.h"
 #include "AbstractClientSocket.h"
 
 //using std::cout;
@@ -20,30 +21,38 @@
 
 namespace PokemonAutomation{
 
+class ThreadPool;
 
 
-class ClientSocket_Qt final : public QThread, public AbstractClientSocket{
+
+class ClientSocket_Qt final : public QObject, public AbstractClientSocket{
     Q_OBJECT
 
     struct SendData{
         const void* data;
         size_t total_bytes;
         size_t bytes_sent;
-        std::mutex lock;
+        Mutex lock;
         std::condition_variable cv;
     };
 
 
 public:
-    ClientSocket_Qt()
-        : m_socket(nullptr)
+    ClientSocket_Qt(ThreadPool&)
+        : m_socket(
+            static_cast<QTcpSocket*>(
+                GlobalThreadPools::qt_event_threadpool().add_object(
+                    [this]{ return make_socket(); }
+                )
+            )
+        )
     {
 //        cout << "ClientSocket_Qt()" << endl;
-        start();
+//        start();
 
 //        cout << "ClientSocket_Qt() - waiting" << endl;
-        std::unique_lock<std::mutex> lg(m_lock);
-        m_cv.wait(lg, [this]{ return m_socket != nullptr; });
+//        std::unique_lock<Mutex> lg(m_lock);
+//        m_cv.wait(lg, [this]{ return m_socket != nullptr; });
     }
 
     virtual ~ClientSocket_Qt(){
@@ -51,10 +60,11 @@ public:
         close();
     }
     virtual void close() noexcept override{
+        GlobalThreadPools::qt_event_threadpool().remove_object(m_socket);
 //        cout << "close()" << endl;
         m_state.store(State::DESTRUCTING, std::memory_order_release);
-        quit();
-        wait();
+//        quit();
+//        wait();
     }
 
     virtual void connect(const std::string& address, uint16_t port) override{
@@ -75,7 +85,7 @@ public:
 
         emit send(&send_data);
 
-        std::unique_lock<std::mutex> lg(send_data.lock);
+        std::unique_lock<Mutex> lg(send_data.lock);
         send_data.cv.wait(lg, [&]{
             return send_data.data == nullptr || m_socket == nullptr;
         });
@@ -91,36 +101,36 @@ signals:
     void internal_send(std::string packet);
 
 private:
-    virtual void run() override{
-        QTcpSocket socket;
+    std::unique_ptr<QTcpSocket> make_socket(){
+        auto socket = std::make_unique<QTcpSocket>();
 
-        QThread::connect(
-            &socket, &QTcpSocket::connected,
-            &socket, [this]{
+        QObject::connect(
+            socket.get(), &QTcpSocket::connected,
+            socket.get(), [this]{
 //                cout << "connected()" << endl;
                 m_state.store(State::CONNECTED, std::memory_order_release);
                 m_listeners.run_method(&Listener::on_connect_finished, "");
             }
         );
-        QThread::connect(
-            &socket, &QTcpSocket::disconnected,
-            &socket, [this]{
+        QObject::connect(
+            socket.get(), &QTcpSocket::disconnected,
+            socket.get(), [this]{
                 std::cout << "QTcpSocket::disconnected()" << std::endl;
                 m_state.store(State::DESTRUCTING, std::memory_order_release);
-                quit();
+//                quit();
             }
         );
-        QThread::connect(
-            &socket, &QTcpSocket::errorOccurred,
-            &socket, [this](QAbstractSocket::SocketError error){
+        QObject::connect(
+            socket.get(), &QTcpSocket::errorOccurred,
+            socket.get(), [this](QAbstractSocket::SocketError error){
                 std::cout << "QTcpSocket::errorOccurred(): error = " << (int)error <<  std::endl;
                 m_state.store(State::DESTRUCTING, std::memory_order_release);
-                quit();
+//                quit();
             }
         );
-        QThread::connect(
-            &socket, &QTcpSocket::readyRead,
-            &socket, [this]{
+        QObject::connect(
+            socket.get(), &QTcpSocket::readyRead,
+            socket.get(), [this]{
 //                cout << "readyRead()" << endl;
                 constexpr size_t BUFFER_SIZE = 4096;
                 char buffer[BUFFER_SIZE];
@@ -131,16 +141,16 @@ private:
                 }
             }
         );
-        QThread::connect(
+        QObject::connect(
             this, &ClientSocket_Qt::internal_connect,
-            &socket, [this](const std::string& address, uint16_t port){
+            socket.get(), [this](const std::string& address, uint16_t port){
                 m_state.store(State::CONNECTING, std::memory_order_release);
                 m_socket->connectToHost(QHostAddress(QString::fromStdString(address)), port);
             }
         );
-        QThread::connect(
+        QObject::connect(
             this, &ClientSocket_Qt::internal_send,
-            &socket, [this](std::string packet){
+            socket.get(), [this](std::string packet){
 //                cout << "internal_send() - enter: " << packet.data() << endl;
 
                 size_t bytes = packet.size();
@@ -160,62 +170,13 @@ private:
 //                cout << "internal_send() - exit " << endl;
             }
         );
-#if 0
-        QThread::connect(
-            this, &ClientSocket_Qt::send,
-            &socket, [this](void* params){
-//                cout << "internal_send() - enter " << endl;
 
-                SendData& data = *(SendData*)params;
-                size_t sent = 0;
-
-                size_t bytes = data.total_bytes;
-
-                const char* ptr = (const char*)data.data;
-                while (bytes > 0 && m_socket->state() == QAbstractSocket::ConnectedState){
-                    qint64 current_sent = m_socket->write((const char*)ptr, bytes);
-                    if (current_sent <= 0){
-                        break;
-                    }
-                    sent += current_sent;
-                    ptr += current_sent;
-                    bytes -= current_sent;
-                }
-
-                m_socket->flush();
-
-                std::lock_guard<std::mutex> lg(data.lock);
-                data.data = nullptr;
-                data.bytes_sent = sent;
-                data.cv.notify_all();
-
-//                cout << "internal_send() - exit " << endl;
-            }
-        );
-#endif
-
-
-        {
-            std::lock_guard<std::mutex> lg(m_lock);
-            if (this->state() == State::DESTRUCTING){
-                return;
-            }
-            m_socket = &socket;
-        }
-        m_cv.notify_all();
-
-        exec();
-
-        {
-            std::lock_guard<std::mutex> lg(m_lock);
-            m_socket = nullptr;
-        }
-        m_cv.notify_all();
+        return socket;
     }
 
 private:
-    std::mutex m_lock;
-    std::condition_variable m_cv;
+    Mutex m_lock;
+    ConditionVariable m_cv;
     QTcpSocket* m_socket;
 };
 

@@ -9,6 +9,7 @@
 //#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "SysbotBase_Connection.h"
 
@@ -50,6 +51,7 @@ TcpSysbotBase_Connection::TcpSysbotBase_Connection(
     const std::string& url
 )
     : m_logger(logger)
+    , m_socket(GlobalThreadPools::unlimited_realtime())
     , m_supports_command_queue(false)
     , m_last_ping_send(WallClock::min())
     , m_last_ping_receive(WallClock::min())
@@ -90,10 +92,10 @@ TcpSysbotBase_Connection::~TcpSysbotBase_Connection(){
     m_socket.remove_listener(*this);
     m_socket.close();
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_cv.notify_all();
     }
-    m_thread.join();
+    m_thread.wait_and_ignore_exceptions();
 }
 
 
@@ -114,7 +116,7 @@ std::string pretty_print(uint64_t x){
 
 
 void TcpSysbotBase_Connection::thread_loop(){
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
     m_last_ping_send = current_time();
     while (true){
         ClientSocket::State state = m_socket.state();
@@ -208,7 +210,7 @@ void TcpSysbotBase_Connection::process_message(const std::string& message, WallC
         }
         set_status_line0("sys-botbase: Version " + str, COLOR_BLUE);
 
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_last_ping_receive = timestamp;
 
         if (m_last_ping_send != WallClock::min()){
@@ -241,7 +243,7 @@ void TcpSysbotBase_Connection::process_message(const std::string& message, WallC
         }
         size_t ping_seqnum = atoll(ptr);
 
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_last_ping_receive = timestamp;
         auto iter = m_active_pings.find(ping_seqnum);
         if (iter == m_active_pings.end()){
@@ -285,7 +287,9 @@ void TcpSysbotBase_Connection::set_mode(const std::string& sbb_version){
         return;
     }
 
-    m_thread = Thread([this]{ thread_loop(); });
+    m_thread = GlobalThreadPools::unlimited_realtime().dispatch_now_blocking(
+        [this]{ thread_loop(); }
+    );
     declare_ready();
 }
 

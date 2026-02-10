@@ -4,10 +4,10 @@
  *
  */
 
-#include <mutex>
-#include <condition_variable>
 #include <QThread>
 #include <QApplication>
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Redispatch.h"
 
 //#include <iostream>
@@ -38,20 +38,20 @@ void run_on_object_thread_and_wait(QObject* object, std::function<void()> lambda
 //    static int c = 0;
 //    c++;
 
-    std::mutex lock;
-    std::condition_variable cv;
+    Mutex lock;
+    ConditionVariable cv;
     bool done = false;
 //    cout << c << ": " << "Invoking..." << endl;
     QMetaObject::invokeMethod(object, [&]{
 //        cout << c << ": " << "Running Lambda..." << endl;
         lambda();
 //        cout << c << ": " << "Running Lambda... Done" << endl;
-        std::lock_guard<std::mutex> lg(lock);
+        std::lock_guard<Mutex> lg(lock);
         done = true;
         cv.notify_all();
     });
 //    cout << c << ": " << "Invoking... Done" << endl;
-    std::unique_lock<std::mutex> lg(lock);
+    std::unique_lock<Mutex> lg(lock);
 //    cout << c << ": " << "Waiting..." << endl;
     cv.wait(lg, [&]{ return done; });
 }

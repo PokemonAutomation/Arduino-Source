@@ -7,11 +7,7 @@
 #ifndef PokemonAutomation_AsyncTask_H
 #define PokemonAutomation_AsyncTask_H
 
-#include <functional>
-#include <atomic>
-#include <exception>
-#include <mutex>
-#include <condition_variable>
+#include <memory>
 
 #define PA_SANITIZE_AsyncTask
 
@@ -22,35 +18,59 @@
 namespace PokemonAutomation{
 
 
+class AsyncTaskCore{
+public:
+    virtual ~AsyncTaskCore() = default;
+    virtual bool is_finished() const noexcept = 0;
+    virtual void wait_and_rethrow_exceptions() = 0;
+
+public:
+    //  These should only be called inside a parallel framework.
+    //  These are not thread-safe with each other.
+    virtual void report_started() noexcept = 0;
+    virtual void report_cancelled() noexcept = 0;
+    virtual void run() noexcept = 0;
+};
+
+
+
 class AsyncTask{
 public:
-    enum class State{
-        NOT_STARTED,
-        RUNNING,
-        FINISHED,
-        SAFE_TO_DESTRUCT,
-    };
+    AsyncTask(const AsyncTask&) = delete;
+    void operator=(const AsyncTask&) = delete;
+    AsyncTask(AsyncTask&&) = default;
+    AsyncTask& operator=(AsyncTask&&) = default;
 
-
-public:
     //  If the task has already started, this will wait for it to finish.
     //  This will not rethrow exceptions.
-    ~AsyncTask();
+    ~AsyncTask() = default;
 
 
 public:
-    template <class... Args>
-    AsyncTask(Args&&... args)
-        : m_task(std::forward<Args>(args)...)
-        , m_state(State::NOT_STARTED)
+    AsyncTask()
+        : m_sanitizer("AsyncTask")
+    {}
+    AsyncTask(std::unique_ptr<AsyncTaskCore> task)
+        : m_task(std::move(task))
+        , m_sanitizer("AsyncTask")
     {}
 
+    operator bool() const{
+        return (bool)m_task;
+    }
+    AsyncTaskCore* core(){
+        return m_task.get();
+    }
     bool is_finished() const noexcept{
 #ifdef PA_SANITIZE_AsyncTask
         auto scope = m_sanitizer.check_scope();
 #endif
-        State state = m_state.load(std::memory_order_acquire);
-        return state == State::FINISHED || state == State::SAFE_TO_DESTRUCT;
+        return m_task->is_finished();
+    }
+
+    //  Wait for the task to finish. Will ignore any exceptions.
+    void wait_and_ignore_exceptions() noexcept{
+        m_task.reset();
     }
 
     //  Wait for the task to finish. Will rethrow any exceptions.
@@ -58,13 +78,7 @@ public:
 #ifdef PA_SANITIZE_AsyncTask
         auto scope = m_sanitizer.check_scope();
 #endif
-        if (!is_finished()){
-            std::unique_lock<std::mutex> lg(m_lock);
-            m_cv.wait(lg, [this]{ return is_finished(); });
-        }
-        if (m_exception){
-            std::rethrow_exception(m_exception);
-        }
+        m_task->wait_and_rethrow_exceptions();
     }
 
 
@@ -75,18 +89,20 @@ public:
 #ifdef PA_SANITIZE_AsyncTask
         auto scope = m_sanitizer.check_scope();
 #endif
-        m_state.store(State::RUNNING, std::memory_order_release);
+        m_task->report_started();
     }
-    void report_cancelled() noexcept;
-    void run() noexcept;
+    void report_cancelled() noexcept{
+        m_sanitizer.check_usage();
+        m_task->report_cancelled();
+    }
+    void run() noexcept{
+        m_sanitizer.check_usage();
+        m_task->run();
+    }
 
 
 private:
-    std::function<void()> m_task;
-    std::atomic<State> m_state;
-    std::exception_ptr m_exception;
-    mutable std::mutex m_lock;
-    std::condition_variable m_cv;
+    std::unique_ptr<AsyncTaskCore> m_task;
 
 #ifdef PA_SANITIZE_AsyncTask
     LifetimeSanitizer m_sanitizer;

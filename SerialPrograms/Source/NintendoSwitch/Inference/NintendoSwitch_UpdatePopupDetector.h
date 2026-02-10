@@ -33,6 +33,7 @@ private:
     ImageFloatBox m_left;
     ImageFloatBox m_bottom_solid;
     ImageFloatBox m_bottom_buttons;
+    ImageFloatBox m_option_divider;
 };
 class UpdatePopupDetector_Switch2 : public StaticScreenDetector{
 public:
@@ -49,6 +50,7 @@ private:
     ImageFloatBox m_left;
     ImageFloatBox m_bottom_solid;
     ImageFloatBox m_bottom_buttons;
+    ImageFloatBox m_option_divider;
 };
 
 

@@ -7,10 +7,11 @@
 #ifndef PokemonAutomation_CommonTools_InterruptableCommands_H
 #define PokemonAutomation_CommonTools_InterruptableCommands_H
 
-#include <mutex>
-#include <condition_variable>
+#include <functional>
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/CancellableScope.h"
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 
 
 namespace PokemonAutomation{
@@ -25,7 +26,7 @@ class AsyncCommandSession final : private Cancellable{
 
 public:
     AsyncCommandSession(
-        CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
+        CancellableScope& scope, Logger& logger,
         ControllerType& controller
     );
     virtual ~AsyncCommandSession();
@@ -74,9 +75,9 @@ private:
     ControllerType& m_controller;
     std::unique_ptr<CommandSet> m_current;
 
-    std::mutex m_lock;
-    std::condition_variable m_cv;
-    std::unique_ptr<AsyncTask> m_thread;
+    Mutex m_lock;
+    ConditionVariable m_cv;
+    AsyncTask m_thread;
 
     LifetimeSanitizer m_sanitizer;
 };

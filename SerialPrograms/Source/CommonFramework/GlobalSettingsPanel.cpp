@@ -139,6 +139,12 @@ GlobalSettings::GlobalSettings()
 #endif
     )
     , THEME(CONSTRUCT_TOKEN)
+    , USE_PADDLE_OCR(
+        "<b>Enable PaddleOCR:</b><br>"
+        "Use PaddleOCR instead of Tesseract for OCR.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )
     , WINDOW_SIZE(
         CONSTRUCT_TOKEN,
         "Window Size/Position:",
@@ -241,6 +247,7 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(STATS_FILE);
     PA_ADD_OPTION(TEMP_FOLDER);
     PA_ADD_OPTION(THEME);
+    PA_ADD_OPTION(USE_PADDLE_OCR);
     PA_ADD_OPTION(WINDOW_SIZE);
     PA_ADD_OPTION(LOG_WINDOW_SIZE);
     PA_ADD_OPTION(LOG_WINDOW_STARTUP);
@@ -300,6 +307,7 @@ void GlobalSettings::load_json(const JsonValue& json){
     const bool developer_mode = PreloadSettings::instance().DEVELOPER_MODE;
     BatchOption::load_json(json);
 
+    USE_PADDLE_OCR.set_visibility(developer_mode ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
     SAVE_DEBUG_VIDEOS_ON_SWITCH.set_visibility(developer_mode ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
 
     //  Remake this to update the color.

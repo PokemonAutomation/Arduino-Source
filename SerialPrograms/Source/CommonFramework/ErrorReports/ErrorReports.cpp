@@ -10,15 +10,15 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/GlobalServices.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Environment/Environment.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "ProgramDumper.h"
 #include "ErrorReports.h"
 
@@ -343,23 +343,23 @@ void send_reports(Logger& logger, const std::vector<std::string>& reports){
         }
     }
 }
-std::unique_ptr<AsyncTask> send_all_unsent_reports(Logger& logger, bool allow_prompt){
+AsyncTask send_all_unsent_reports(Logger& logger, bool allow_prompt){
 #ifdef PA_OFFICIAL
     ErrorReportSendMode mode = GlobalSettings::instance().ERROR_REPORTS->SEND_MODE;
     if (mode == ErrorReportSendMode::NEVER_SEND_ANYTHING){
-        return nullptr;
+        return AsyncTask();
     }
 
     std::vector<std::string> reports = SendableErrorReport::get_pending_reports();
     global_logger_tagged().log("Found " + std::to_string(reports.size()) + " unsent error reports.", COLOR_PURPLE);
 
     if (reports.empty()){
-        return nullptr;
+        return AsyncTask();
     }
 
     if (mode == ErrorReportSendMode::PROMPT_WHEN_CONVENIENT){
         if (!allow_prompt){
-            return nullptr;
+            return AsyncTask();
         }
         QMessageBox box;
         QMessageBox::StandardButton button = box.information(
@@ -379,17 +379,19 @@ std::unique_ptr<AsyncTask> send_all_unsent_reports(Logger& logger, bool allow_pr
             QMessageBox::StandardButton::Yes
         );
         if (button != QMessageBox::StandardButton::Yes){
-            return nullptr;
+            return AsyncTask();
         }
     }
 
     global_logger_tagged().log("Attempting to send " + std::to_string(reports.size()) + " error reports.", COLOR_PURPLE);
 
-    return global_async_dispatcher().dispatch([reports = std::move(reports)]{
-        send_reports(global_logger_tagged(), reports);
-    });
+    return GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+        [reports = std::move(reports)]{
+            send_reports(global_logger_tagged(), reports);
+        }
+    );
 #else
-    return nullptr;
+    return AsyncTask();
 #endif
 }
 

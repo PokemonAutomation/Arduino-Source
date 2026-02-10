@@ -21,7 +21,6 @@
  ************************************************************************************/
 
 #pragma once
-#include <dpp/integration.h>
 #include <dpp/export.h>
 #include <dpp/snowflake.h>
 #include <dpp/managed.h>
@@ -31,8 +30,6 @@
 #include <dpp/permissions.h>
 #include <dpp/json_fwd.h>
 #include <dpp/json_interface.h>
-#include <map>
-#include <optional>
 
 namespace dpp {
 
@@ -213,31 +210,6 @@ public:
 };
 
 /**
- * @brief Status indicating whether event webhooks are enabled or disabled for an application.
- */
-enum application_event_webhook_status: uint8_t {
-	/**
-	 * @brief Webhook events are disabled by developer
-	 */
-	ews_disabled = 1,
-	/**
-	 * @brief Webhook events are enabled by developer
-	 */
-	ews_enabled = 2,
-	/**
-	 * @brief Webhook events are disabled by Discord, usually due to inactivity
-	 */
-	ews_disabled_by_discord = 3,
-};
-
-/**
- * @brief Configuration object for an app installation
- */
-struct DPP_EXPORT integration_configuration {
-		application_install_params oauth2_install_params;
-};
-
-/**
  * @brief The application class represents details of a bot application
  */
 class DPP_EXPORT application : public managed, public json_interface<application> {
@@ -354,11 +326,6 @@ public:
 	uint64_t approximate_guild_count;
 
 	/**
-	 * @brief Optional: Approximate count of users that have installed the app
-	 */
-	uint64_t approximate_user_install_count;
-
-	/**
 	 * @brief Optional: Array of redirect URIs for the app.
 	 */
 	std::vector<std::string> redirect_uris;
@@ -376,21 +343,6 @@ public:
 	std::string role_connections_verification_url;
 
 	/**
-	 * @brief Event webhooks URL for the app to receive webhook events
-	 */
-	std::string event_webhooks_url;
-
-	/**
-	 * @brief List of Webhook event types the app subscribes to.
-	 */
-	std::vector<std::string> event_webhooks_types;
-
-	/**
-	 * If webhook events are enabled for the app.
-	 */
-	application_event_webhook_status event_webhooks_status;
-
-	/**
 	 * @brief Up to 5 tags describing the content and functionality of the application.
 	 */
 	std::vector<std::string> tags;
@@ -399,11 +351,6 @@ public:
 	 * @brief Settings for the application's default in-app authorization link, if enabled.
 	 */
 	application_install_params install_params;
-
-	/**
-	 * @brief Default scopes and permissions for each supported installation context
-	 */
-	std::map<application_integration_types, integration_configuration> integration_types_config;
 
 	/**
 	 * @brief The application's default custom authorization link, if enabled.
@@ -520,4 +467,4 @@ public:
  */
 typedef std::unordered_map<snowflake, application> application_map;
 
-}
+} // namespace dpp

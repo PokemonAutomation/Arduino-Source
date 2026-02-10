@@ -9,8 +9,8 @@
 
 #include <string>
 #include <atomic>
-#include <mutex>
-#include <condition_variable>
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
@@ -59,21 +59,21 @@ class RaidWaiter : public CancellableScope{
 public:
     void signal_joiner_is_ready(){
         {
-            std::lock_guard<std::mutex> lg(m_lock);
+            std::lock_guard<Mutex> lg(m_lock);
             m_joiners_ready++;
         }
         m_cv.notify_all();
     }
     void signal_raid_code_is_ready(std::string raid_code){
         {
-            std::lock_guard<std::mutex> lg(m_lock);
+            std::lock_guard<Mutex> lg(m_lock);
             m_raid_code = std::move(raid_code);
         }
         m_cv.notify_all();
     }
 
     std::string wait_for_raid_code(){
-        std::unique_lock<std::mutex> lg(m_lock);
+        std::unique_lock<Mutex> lg(m_lock);
         m_cv.wait(
             lg,
             [&]{
@@ -84,7 +84,7 @@ public:
         return m_raid_code;
     }
     void wait_for_joiners(size_t joiners){
-        std::unique_lock<std::mutex> lg(m_lock);
+        std::unique_lock<Mutex> lg(m_lock);
         m_cv.wait(
             lg,
             [&]{
@@ -96,7 +96,7 @@ public:
     virtual bool cancel(std::exception_ptr exception = nullptr) noexcept override{
         bool ret = CancellableScope::cancel(exception);
         {
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
         }
         m_cv.notify_all();
         return ret;
@@ -105,8 +105,8 @@ public:
 private:
     size_t m_joiners_ready = 0;
     std::string m_raid_code;
-    std::mutex m_lock;
-    std::condition_variable m_cv;
+    Mutex m_lock;
+    ConditionVariable m_cv;
 };
 
 void join_raid(

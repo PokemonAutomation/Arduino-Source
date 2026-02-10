@@ -8,9 +8,9 @@
 #define PokemonAutomation_PokemonLZA_DialogDetector_H
 
 #include <optional>
-#include <atomic>
+//#include <atomic>
 #include "Common/Cpp/Color.h"
-#include "Common/Cpp/AbstractLogger.h"
+//#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"

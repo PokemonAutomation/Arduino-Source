@@ -18,8 +18,8 @@
  *       Prefer to call them from the main thread where Thread is created.
  */
 
-#ifndef PokemonAutomation_Thread_H
-#define PokemonAutomation_Thread_H
+#ifndef PokemonAutomation_Concurrency_Thread_H
+#define PokemonAutomation_Concurrency_Thread_H
 
 #include <functional>
 #include "Common/Cpp/Containers/Pimpl.h"

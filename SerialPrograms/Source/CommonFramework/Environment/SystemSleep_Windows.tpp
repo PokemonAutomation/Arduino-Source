@@ -4,53 +4,67 @@
  *
  */
 
-#include <mutex>
-#include <condition_variable>
 #include <Windows.h>
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "SystemSleep.h"
 
 namespace PokemonAutomation{
 
 
-class WindowsSleepController : public SystemSleepController{
+class WindowsSleepController final : public SystemSleepController{
 public:
-    virtual ~WindowsSleepController(){
-        {
-            std::lock_guard<std::mutex> lg(m_lock);
-            m_stopping = true;
-            m_cv.notify_all();
-        }
-        m_thread.join();
-        if (m_state.load(std::memory_order_relaxed) != SleepSuppress::NONE){
-            global_logger_tagged().log("Destroying WindowsSleepController with active requests...", COLOR_RED);
-        }
-    }
     WindowsSleepController()
         : m_screen_on_requests(0)
         , m_no_sleep_requests(0)
         , m_stopping(false)
-        , m_thread([this]{ thread_loop(); })
+        , m_thread(GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+            [this]{ thread_loop(); })
+        )
     {}
+    virtual ~WindowsSleepController(){
+        stop();
+    }
+    virtual void stop() noexcept override{
+        if (!m_thread){
+            return;
+        }
+        {
+            std::lock_guard<Mutex> lg(m_lock);
+            m_stopping = true;
+        }
+        m_cv.notify_all();
+        m_thread.wait_and_ignore_exceptions();
+        if (m_state.load(std::memory_order_relaxed) != SleepSuppress::NONE){
+            try{
+                global_logger_tagged().log(
+                    "Destroying WindowsSleepController with active requests...",
+                    COLOR_RED
+                );
+            }catch (...){}
+        }
+    }
 
     virtual void push_screen_on() override{
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_screen_on_requests++;
         m_cv.notify_all();
     }
     virtual void pop_screen_on() override{
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_screen_on_requests--;
         m_cv.notify_all();
     }
     virtual void push_no_sleep() override{
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_no_sleep_requests++;
         m_cv.notify_all();
     }
     virtual void pop_no_sleep() override{
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_no_sleep_requests--;
         m_cv.notify_all();
     }
@@ -60,7 +74,7 @@ private:
         //  SetThreadExecutionState(ES_CONTINUOUS) only lasts as long as the
         //  thread is alive. So we use our own thread.
         while (true){
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
             if (m_stopping){
                 return;
             }
@@ -109,8 +123,8 @@ private:
     size_t m_no_sleep_requests = 0;
 
     bool m_stopping;
-    std::condition_variable m_cv;
-    Thread m_thread;
+    ConditionVariable m_cv;
+    AsyncTask m_thread;
 };
 
 

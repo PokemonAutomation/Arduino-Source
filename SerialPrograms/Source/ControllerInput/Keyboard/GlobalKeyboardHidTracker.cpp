@@ -7,7 +7,9 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "KeyboardInput_State.h"
 #include "KeyboardInput_KeyMappings.h"
 #include "GlobalKeyboardHidTracker.h"
@@ -35,25 +37,27 @@ KeyboardHidTracker::~KeyboardHidTracker(){
 KeyboardHidTracker::KeyboardHidTracker()
     : m_logger(global_logger_raw(), "Keyboard")
     , m_stopping(false)
-    , m_thread([this]{
-        run_with_catch(
-            "KeyboardHidTracker::thread_loop()",
-            [this]{ thread_loop(); }
-        );
-    })
+    , m_thread(
+        GlobalThreadPools::unlimited_realtime().dispatch_now_blocking([this]{
+            run_with_catch(
+                "KeyboardHidTracker::thread_loop()",
+                [this]{ thread_loop(); }
+            );
+        })
+    )
 {}
 
 
-void KeyboardHidTracker::stop(){
-    if (!m_thread.joinable()){
+void KeyboardHidTracker::stop() noexcept{
+    if (!m_thread){
         return;
     }
     m_stopping.store(true, std::memory_order_release);
     {
-        std::lock_guard<std::mutex> lg(m_sleep_lock);
+        std::lock_guard<Mutex> lg(m_sleep_lock);
     }
     m_cv.notify_all();
-    m_thread.join();
+    m_thread.wait_and_ignore_exceptions();
 }
 
 
@@ -63,7 +67,7 @@ void KeyboardHidTracker::clear_state(){
         m_state_tracker.clear();
     }
 
-    std::lock_guard<std::mutex> lg(m_sleep_lock);
+    std::lock_guard<Mutex> lg(m_sleep_lock);
     m_cv.notify_all();
 }
 
@@ -74,7 +78,7 @@ void KeyboardHidTracker::on_key_press(const QKeyEvent& key){
         m_state_tracker.press(key.nativeVirtualKey());
     }
 
-    std::lock_guard<std::mutex> lg(m_sleep_lock);
+    std::lock_guard<Mutex> lg(m_sleep_lock);
     m_cv.notify_all();
 }
 void KeyboardHidTracker::on_key_release(const QKeyEvent& key){
@@ -84,7 +88,7 @@ void KeyboardHidTracker::on_key_release(const QKeyEvent& key){
         m_state_tracker.release(key.nativeVirtualKey());
     }
 
-    std::lock_guard<std::mutex> lg(m_sleep_lock);
+    std::lock_guard<Mutex> lg(m_sleep_lock);
     m_cv.notify_all();
 }
 
@@ -194,7 +198,7 @@ void KeyboardHidTracker::thread_loop(){
 
 
         //  Wait for next event.
-        std::unique_lock<std::mutex> lg(m_sleep_lock);
+        std::unique_lock<Mutex> lg(m_sleep_lock);
         if (m_stopping.load(std::memory_order_acquire)){
             return;
         }

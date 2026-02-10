@@ -6,8 +6,9 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/CancellableScope.h"
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "InferenceSession.h"
 #include "InferenceRoutines.h"
 
@@ -89,7 +90,7 @@ int run_until_with_time_limit(
     );
 
     bool timed_out = false;
-    std::unique_ptr<AsyncTask> timer = env.realtime_dispatcher().dispatch([&]{
+    AsyncTask timer = GlobalThreadPools::unlimited_realtime().dispatch_now_blocking([&]{
         subscope.wait_until(deadline);
         timed_out = true;
         subscope.cancel(nullptr);
@@ -102,7 +103,7 @@ int run_until_with_time_limit(
 //        subscope.wait_for_all_requests();
     }catch (OperationCancelledException&){}
 
-    timer->wait_and_rethrow_exceptions();
+    timer.wait_and_rethrow_exceptions();
     subscope.throw_if_cancelled_with_exception();
     scope.throw_if_cancelled();
 

@@ -34,6 +34,15 @@ void Pimpl<Type>::operator=(const Pimpl& x){
     m_ptr = copy;
     delete ptr;
 }
+template <typename Type>
+void Pimpl<Type>::operator=(Pimpl&& x) noexcept{
+    if (this == &x){
+        return;
+    }
+    delete m_ptr;
+    m_ptr = x.m_ptr;
+    x.m_ptr = nullptr;
+}
 
 template <typename Type>
 template <class... Args>

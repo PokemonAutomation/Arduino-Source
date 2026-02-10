@@ -470,16 +470,27 @@ void BoxDetector::move_cursor(
 
 
 SomethingInBoxCellDetector::SomethingInBoxCellDetector(Color color, VideoOverlay* overlay)
-: m_right_stick_up_down_detector(color, ButtonType::RightStickUpDown, {0.933, 0.381, 0.027, 0.051}, overlay) {}
+: m_right_stick_up_down_detector(color, ButtonType::RightStickUpDown, {0.933, 0.381, 0.027, 0.051}, overlay)
+, m_left_white_space_box{0.453, 0.100, 0.009, 0.059}, m_right_white_space_box{0.947, 0.107, 0.010, 0.052} {}
 
 void SomethingInBoxCellDetector::make_overlays(VideoOverlaySet& items) const{
     m_right_stick_up_down_detector.make_overlays(items);
+    items.add(COLOR_BLACK, m_left_white_space_box);
+    items.add(COLOR_BLACK, m_right_white_space_box);
 }
 
 bool SomethingInBoxCellDetector::detect(const ImageViewRGB32& screen){
-    bool detected = m_right_stick_up_down_detector.detect(screen);
-    // cout << "SomethingInBoxCellDetector detected? " << detected << endl;
-    return detected;
+    const double min_white_color_sum = 500.0;
+    const double max_white_color_stddev_sum = 15.0;
+    bool detected = is_white(extract_box_reference(screen, m_left_white_space_box), min_white_color_sum, max_white_color_stddev_sum);
+    if (!detected){
+        return false;
+    }
+    detected = is_white(extract_box_reference(screen, m_right_white_space_box), min_white_color_sum, max_white_color_stddev_sum);
+    if (!detected){
+        return false;
+    }
+    return m_right_stick_up_down_detector.detect(screen);
 }
 
 

@@ -112,7 +112,6 @@ void find_and_center_on_sky(
 
     AsyncCommandSession<ProController> session(
         context, stream.logger(),
-        env.realtime_dispatcher(),
         context.controller()
     );
     OverworldState state = OverworldState::None;

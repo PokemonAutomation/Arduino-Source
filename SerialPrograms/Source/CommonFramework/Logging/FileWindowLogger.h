@@ -2,82 +2,67 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
+ *  Qt-dependent layer that adds GUI window support on top of the Qt-free FileLogger.
+ *  The actual file I/O is handled by Common/Cpp/Logging/FileLogger.
  */
 
 #ifndef PokemonAutomation_Logging_FileWindowLogger_H
 #define PokemonAutomation_Logging_FileWindowLogger_H
 
-#include <deque>
 #include <set>
-#include <mutex>
-#include <condition_variable>
-#include <QFile>
 #include <QTextEdit>
 #include <QMainWindow>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Logging/FileLogger.h"
 #include "Common/Cpp/Options/ConfigOption.h"
-//#include "Common/Cpp/LifetimeSanitizer.h"
-#include "Common/Cpp/Concurrency/Thread.h"
 
 namespace PokemonAutomation{
 
 class FileWindowLoggerWindow;
 
 
-class LastLogTracker{
+// A logger that writes to a file (via FileLogger) and can also display
+// log messages in Qt GUI windows (FileWindowLoggerWindow).
+//
+// This class acts as a thin Qt wrapper around the Qt-free FileLogger,
+// adding the ability to manage multiple Qt windows that display log output.
+class FileWindowLogger : public Logger, private FileLogger::Listener{
 public:
-    LastLogTracker(size_t max_lines = 10000)
-        : m_max_lines(max_lines)
-    {}
-    void operator+=(std::string line);
-    std::vector<std::string> snapshot() const;
+    // Construct a FileWindowLogger that writes to the given file path.
+    // The max_queue_size parameter controls how many log messages can be
+    // queued before the log() call blocks.
+    FileWindowLogger(const std::string& path, size_t max_queue_size);
 
-private:
-    size_t m_max_lines;
-    std::deque<std::string> m_lines;
-};
-
-
-class FileWindowLogger : public Logger{
-public:
     ~FileWindowLogger();
-    FileWindowLogger(const std::string& path);
+    void stop();
 
+    // Add/remove Qt windows that will display log messages.
     void operator+=(FileWindowLoggerWindow& widget);
     void operator-=(FileWindowLoggerWindow& widget);
 
+    // Logger interface implementation - forwards to FileLogger.
     virtual void log(const std::string& msg, Color color = Color()) override;
     virtual void log(std::string&& msg, Color color = Color()) override;
     virtual std::vector<std::string> get_last() const override;
 
 private:
-    static std::string normalize_newlines(const std::string& msg);
-    static std::string to_file_str(const std::string& msg);
+    // FileLogger::Listener implementation - called when a message is logged.
+    // Formats the message for Qt display and sends to all registered windows.
+    virtual void on_log(const std::string& msg, Color color) override;
+
+    // Convert a log message to HTML for display in QTextEdit.
     static QString to_window_str(const std::string& msg, Color color);
 
-    void internal_log(const std::string& msg, Color color);
-    void thread_loop();
-
-    // when SerialPrograms.log is above a certain size, rename it to SerialPrograms-[timestamp].log
-    // then create a new, empty SerialPrograms.log
-    // this is only called from thread_loop(). So, we don't need to worry about synchronization because the thread loop is the only thread here.
-    void rotate_log_file();
-
 private:
-    QFile m_file;
-    size_t m_max_queue_size;
-    mutable std::mutex m_lock;
-    std::condition_variable m_cv;
-    LastLogTracker m_last_log_tracker;
-    bool m_stopping;
-    std::deque<std::pair<std::string, Color>> m_queue;
-    std::set<FileWindowLoggerWindow*> m_windows;
-    Thread m_thread;
+    FileLogger m_file_logger;
 
-//    LifetimeSanitizer m_sanitizer;
+    Mutex m_window_lock;
+    std::set<FileWindowLoggerWindow*> m_windows;
 };
 
 
+// A Qt window that displays log output from a FileWindowLogger.
+// Uses Qt signals/slots for thread-safe updates from the logger's background thread.
 class FileWindowLoggerWindow : public QMainWindow, public ConfigOption::Listener{
     Q_OBJECT
 
@@ -85,7 +70,10 @@ public:
     FileWindowLoggerWindow(FileWindowLogger& logger, QWidget* parent = nullptr);
     virtual ~FileWindowLoggerWindow();
 
+    // Called by FileWindowLogger to display a log message.
+    // Thread-safe: emits a signal that is handled on the UI thread.
     void log(QString msg);
+
     virtual void resizeEvent(QResizeEvent* event) override;
     virtual void moveEvent(QMoveEvent* event) override;
 
@@ -94,6 +82,7 @@ signals:
 
 private:
     virtual void on_config_value_changed(void* object) override;
+
     FileWindowLogger& m_logger;
     QMenuBar* m_menubar;
     QTextEdit* m_text;

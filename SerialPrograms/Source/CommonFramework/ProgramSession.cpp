@@ -7,6 +7,8 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "CommonFramework/ProgramSession.h"
 #include "CommonFramework/ProgramStats/StatsDatabase.h"
@@ -41,8 +43,8 @@ ProgramSession::~ProgramSession(){
 //    join_program_thread();
 }
 
-void ProgramSession::join_program_thread(){
-    m_thread.join();
+void ProgramSession::join_program_thread() noexcept{
+    m_program_thread.wait_and_ignore_exceptions();
 }
 
 
@@ -51,14 +53,14 @@ const std::string& ProgramSession::identifier() const{
     return m_descriptor.identifier();
 }
 std::string ProgramSession::current_stats() const{
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     if (m_current_stats){
         return m_current_stats->to_str(StatsTracker::DISPLAY_ON_SCREEN);
     }
     return "";
 }
 std::string ProgramSession::historical_stats() const{
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     if (m_historical_stats){
         return m_historical_stats->to_str(StatsTracker::DISPLAY_ON_SCREEN);
     }
@@ -70,11 +72,11 @@ WallClock ProgramSession::timestamp() const{
 
 
 void ProgramSession::report_stats_changed(){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     push_stats();
 }
 void ProgramSession::report_error(const std::string& message){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     push_error(message);
 }
 
@@ -144,7 +146,7 @@ void ProgramSession::update_historical_stats_with_current(){
 
 std::string ProgramSession::start_program(){
     m_logger.log("Received Program Start Request");
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
 
     ProgramState state = this->current_state();
     switch (state){
@@ -166,13 +168,22 @@ std::string ProgramSession::start_program(){
         m_logger.log("Starting program...");
         m_timestamp.store(current_time(), std::memory_order_relaxed);
         set_state(ProgramState::RUNNING);
+        m_program_thread = GlobalThreadPools::unlimited_realtime().dispatch_now_blocking(
+            [this]{
+                run_with_catch(
+                    "ProgramSession::start_program()",
+                    [this]{ run_program(); }
+                );
+            }
+        );
+#if 0
         m_thread = Thread([this]{
             run_with_catch(
                 "ProgramSession::start_program()",
                 [this]{ run_program(); }
             );
         });
-
+#endif
         return "";
     }
     case ProgramState::RUNNING:
@@ -193,7 +204,7 @@ std::string ProgramSession::start_program(){
 std::string ProgramSession::stop_program(){
     m_logger.log("Received Stop Request");
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
 
         ProgramState state = this->current_state();
         switch (state){
@@ -226,14 +237,14 @@ std::string ProgramSession::stop_program(){
 
 void ProgramSession::run_program(){
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_current_stats = m_descriptor.make_stats();
         load_historical_stats();
         push_stats();
     }
     internal_run_program();
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         push_stats();
         update_historical_stats_with_current();
         set_state(ProgramState::STOPPED);

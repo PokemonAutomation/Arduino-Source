@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "VideoOverlaySession.h"
 
 //#include <iostream>
@@ -24,16 +25,18 @@ void VideoOverlaySession::remove_listener(ContentListener& listener){
 
 VideoOverlaySession::~VideoOverlaySession(){
     {
-        std::lock_guard<std::mutex> lg(m_stats_lock);
+        std::lock_guard<Mutex> lg(m_stats_lock);
         m_stopping = true;
     }
     m_stats_cv.notify_all();
-    m_stats_updater.join();
+    m_stats_updater.wait_and_ignore_exceptions();
 }
 VideoOverlaySession::VideoOverlaySession(Logger& logger, VideoOverlayOption& option)
     : m_logger(logger)
     , m_option(option)
-    , m_stats_updater([this]{ stats_thread(); })
+    , m_stats_updater(GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+        [this]{ stats_thread(); }
+    ))
 {}
 
 
@@ -69,7 +72,7 @@ void VideoOverlaySession::set(const VideoOverlayOption& option){
 
 
 void VideoOverlaySession::stats_thread(){
-    std::unique_lock<std::mutex> lg(m_stats_lock);
+    std::unique_lock<Mutex> lg(m_stats_lock);
     while (!m_stopping){
         {
             std::vector<OverlayStatSnapshot> lines;

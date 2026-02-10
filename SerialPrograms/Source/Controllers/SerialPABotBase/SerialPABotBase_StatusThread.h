@@ -10,6 +10,9 @@
 #define PokemonAutomation_SerialPABotBase_StatusThread_H
 
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "SerialPABotBase_Connection.h"
 
 //#include <iostream>
@@ -40,7 +43,11 @@ public:
         , m_callback(callback)
         , m_stopping(false)
         , m_error(false)
-        , m_status_thread([this]{ status_thread(); })
+        , m_status_thread(
+            GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+                [this]{ status_thread(); }
+            )
+        )
     {}
     ~ControllerStatusThread(){
         if (m_stopping.exchange(true)){
@@ -48,14 +55,14 @@ public:
         }
         m_scope.cancel(nullptr);
         {
-            std::unique_lock<std::mutex> lg(m_sleep_lock);
+            std::unique_lock<Mutex> lg(m_sleep_lock);
             BotBaseController* botbase = m_connection.botbase();
             if (botbase){
                 botbase->on_cancellable_cancel();
             }
             m_cv.notify_all();
         }
-        m_status_thread.join();
+        m_status_thread.wait_and_ignore_exceptions();
     }
 
 private:
@@ -63,41 +70,43 @@ private:
         constexpr std::chrono::milliseconds PERIOD(1000);
         std::atomic<WallClock> last_ack(current_time());
 
-        Thread watchdog([&, this]{
-            WallClock next_ping = current_time();
-            while (true){
-                if (m_stopping.load(std::memory_order_relaxed) ||
-                    m_error.load(std::memory_order_acquire) ||
-                    !m_connection.is_ready()
-                ){
-                    break;
-                }
+        AsyncTask watchdog = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+            [&, this]{
+                WallClock next_ping = current_time();
+                while (true){
+                    if (m_stopping.load(std::memory_order_relaxed) ||
+                        m_error.load(std::memory_order_acquire) ||
+                        !m_connection.is_ready()
+                    ){
+                        break;
+                    }
 
-                auto last = current_time() - last_ack.load(std::memory_order_relaxed);
-                std::chrono::duration<double> seconds = last;
-                if (last > 2 * PERIOD){
-                    std::string text = "Last Ack: " + tostr_fixed(seconds.count(), 3) + " seconds ago";
-                    m_connection.set_status_line1(text, COLOR_RED);
-    //                m_logger.log("Connection issue detected. Turning on all logging...");
-    //                settings.log_everything.store(true, std::memory_order_release);
-                }
+                    auto last = current_time() - last_ack.load(std::memory_order_relaxed);
+                    std::chrono::duration<double> seconds = last;
+                    if (last > 2 * PERIOD){
+                        std::string text = "Last Ack: " + tostr_fixed(seconds.count(), 3) + " seconds ago";
+                        m_connection.set_status_line1(text, COLOR_RED);
+        //                m_logger.log("Connection issue detected. Turning on all logging...");
+        //                settings.log_everything.store(true, std::memory_order_release);
+                    }
 
-                std::unique_lock<std::mutex> lg(m_sleep_lock);
-                if (m_stopping.load(std::memory_order_relaxed) ||
-                    m_error.load(std::memory_order_acquire) ||
-                    !m_connection.is_ready()
-                ){
-                    break;
-                }
+                    std::unique_lock<Mutex> lg(m_sleep_lock);
+                    if (m_stopping.load(std::memory_order_relaxed) ||
+                        m_error.load(std::memory_order_acquire) ||
+                        !m_connection.is_ready()
+                    ){
+                        break;
+                    }
 
-                WallClock now = current_time();
-                next_ping += PERIOD;
-                if (now + PERIOD < next_ping){
-                    next_ping = now + PERIOD;
+                    WallClock now = current_time();
+                    next_ping += PERIOD;
+                    if (now + PERIOD < next_ping){
+                        next_ping = now + PERIOD;
+                    }
+                    m_cv.wait_until(lg, next_ping);
                 }
-                m_cv.wait_until(lg, next_ping);
             }
-        });
+        );
 
 
         WallClock next_ping = current_time();
@@ -127,7 +136,7 @@ private:
                 m_callback.stop_with_error(std::move(error));
             }
 
-            std::unique_lock<std::mutex> lg(m_sleep_lock);
+            std::unique_lock<Mutex> lg(m_sleep_lock);
             if (m_stopping.load(std::memory_order_relaxed) || !m_connection.is_ready()){
                 break;
             }
@@ -141,10 +150,10 @@ private:
         }
 
         {
-            std::unique_lock<std::mutex> lg(m_sleep_lock);
-            m_cv.notify_all();
+            std::unique_lock<Mutex> lg(m_sleep_lock);
         }
-        watchdog.join();
+        m_cv.notify_all();
+        watchdog.wait_and_ignore_exceptions();
     }
 
 private:
@@ -153,9 +162,9 @@ private:
     CancellableHolder<CancellableScope> m_scope;
     std::atomic<bool> m_stopping;
     std::atomic<bool> m_error;
-    std::mutex m_sleep_lock;
-    std::condition_variable m_cv;
-    Thread m_status_thread;
+    Mutex m_sleep_lock;
+    ConditionVariable m_cv;
+    AsyncTask m_status_thread;
 };
 
 

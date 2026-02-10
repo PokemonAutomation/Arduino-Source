@@ -525,6 +525,12 @@ AutoStory::AutoStory()
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
+    , ENSURE_MINIMAP_UNLOCKED(
+        "<b>Pre-check: Ensure the minimap is unlocked:</b><br>"
+        "This is to ensure the minimap is unlocked. We use it to detect our direction.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(30))
     , NOTIFICATIONS({
@@ -764,6 +770,7 @@ AutoStory::AutoStory()
     PA_ADD_OPTION(CHANGE_SETTINGS);
     PA_ADD_OPTION(ENSURE_TIME_UNSYNCED);
     PA_ADD_OPTION(ENSURE_CORRECT_MOVES);
+    PA_ADD_OPTION(ENSURE_MINIMAP_UNLOCKED);
     
     PA_ADD_OPTION(NOTIFICATIONS);
 
@@ -1314,6 +1321,11 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     if (ENSURE_CORRECT_MOVES && STORY_SECTION == StorySection::MAIN_STORY){
         env.console.log("Ensure lead Gardevoir has the correct moves.");
         confirm_lead_pokemon_moves(env, context, LANGUAGE);
+    }
+
+    if (ENSURE_MINIMAP_UNLOCKED && STORY_SECTION == StorySection::MAIN_STORY){
+        env.console.log("Ensure the minimap is unlocked.");
+        confirm_minimap_unlocked(env, context);
     }
 
     run_autostory(env, context);

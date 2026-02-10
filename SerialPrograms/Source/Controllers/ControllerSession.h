@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_Controllers_ControllerSession_H
 #define PokemonAutomation_Controllers_ControllerSession_H
 
-#include <mutex>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/ListenerSet.h"
 //#include "Common/Cpp/Exceptions.h"
 #include "Controller.h"
@@ -146,7 +146,7 @@ private:
     Logger& m_logger;
     ControllerOption& m_option;
 
-    std::mutex m_reset_lock;
+    Mutex m_reset_lock;
     mutable SpinLock m_state_lock;
 
     bool m_options_locked;

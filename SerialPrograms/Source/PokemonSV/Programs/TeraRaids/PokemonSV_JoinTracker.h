@@ -11,12 +11,12 @@
 #include <array>
 #include <set>
 #include <map>
-#include <mutex>
-#include "CommonFramework/Language.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/StaticTableOption.h"
+#include "CommonFramework/Language.h"
 #include "CommonFramework/Options/LabelCellOption.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
 
@@ -141,7 +141,7 @@ private:
     RaidPlayerBanList& m_ban_settings;
     uint8_t m_host_players;
 
-    mutable std::mutex m_lock;
+    mutable Mutex m_lock;
     std::array<std::map<Language, std::string>, 4> m_last_known_names;
     std::vector<TeraLobbyNameMatchResult> m_last_known_bans;
 };

@@ -9,6 +9,7 @@
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
@@ -217,7 +218,10 @@ bool BoxDexNumberDetector::detect(const ImageViewRGB32& screen){
         // for some languages. We have to use `min_digit_area` to filter out the dot when doing OCR.
         // The min digit area computation is that any dot with size smaller than image_crop.height()/5 is filtered out when OCR.
         const size_t min_digit_area = dex_image_crop.height()*dex_image_crop.height() / 25;
-        return OCR::read_number_waterfill_multifilter(m_logger, dex_image_crop,
+        return OCR::read_number_waterfill_multifilter(
+            m_logger,
+            GlobalThreadPools::computation_normal(),
+            dex_image_crop,
             {
                 {0x0, 0xff808080},
                 {0x0, 0xff909090},

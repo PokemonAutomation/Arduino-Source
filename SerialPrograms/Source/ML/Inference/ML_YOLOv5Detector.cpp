@@ -6,18 +6,17 @@
 
 #include <filesystem>
 #include <iostream>
-#include <fstream>
 #include <QMessageBox>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Filesystem.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Globals.h"
-#include "Common/Cpp/StringTools.h"
-#include "Common/Cpp/PrettyPrint.h"
 #include "ML_YOLOv5Detector.h"
 
 //#include <iostream>
@@ -34,7 +33,7 @@ namespace {
     std::string to_resource_filepath(const std::string& path){
         std::string resource_path = RESOURCE_PATH() + path;
         std::cout << "Got resource path " << resource_path << std::endl;
-        if (std::filesystem::exists(resource_path)){
+        if (Filesystem::exists(resource_path)){
             return resource_path;
         }
         return path;

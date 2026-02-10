@@ -8,7 +8,7 @@
 #include <mutex>
 #include <condition_variable>
 #include "Common/Compiler.h"
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "PokemonSwSh_MaxLair_StateTracker.h"
 
 namespace PokemonAutomation{
@@ -31,7 +31,7 @@ GlobalStateTracker::~GlobalStateTracker(){
     detach();
 }
 std::pair<uint64_t, std::string> GlobalStateTracker::dump(){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     std::string str;
     for (size_t c = 0; c < m_count; c++){
         str += "Switch " + std::to_string(c) + ": (group " + std::to_string(m_groups[c]) + ")\n";
@@ -49,12 +49,12 @@ bool GlobalStateTracker::cancel(std::exception_ptr exception) noexcept{
     if (Cancellable::cancel(std::move(exception))){
         return true;
     }
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     m_cv.notify_all();
     return false;
 }
 void GlobalStateTracker::push_update(size_t index){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     m_state_epoch++;
     m_master_consoles[index] = m_consoles[index];
     m_master_consoles[index].timestamp = current_time();
@@ -62,7 +62,7 @@ void GlobalStateTracker::push_update(size_t index){
 }
 
 GlobalState GlobalStateTracker::infer_actual_state(size_t index){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     return infer_actual_state_unprotected(index);
 }
 
@@ -100,7 +100,7 @@ void GlobalStateTracker::group_clear_status(uint8_t group){
     }
 }
 void GlobalStateTracker::mark_as_dead(size_t index){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     m_state_epoch++;
     m_groups[index] = 4;
 }
@@ -108,7 +108,7 @@ void GlobalStateTracker::mark_as_dead(size_t index){
 GlobalState GlobalStateTracker::synchronize(
     Logger& logger, size_t index, std::chrono::milliseconds window
 ){
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
     m_state_epoch++;
 
     time_point timestamp = current_time();

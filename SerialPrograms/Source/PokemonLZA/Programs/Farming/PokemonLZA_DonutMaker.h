@@ -36,12 +36,23 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    bool match_powers(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::vector<uint16_t>& match_counts);
-    bool should_stop(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::vector<uint16_t>& match_counts);
+    bool match_powers(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context,
+        std::vector<uint16_t>& kept_counts
+    );
+    bool should_stop(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context,
+        const std::vector<uint16_t>& kept_counts,
+        uint16_t total_kept
+    );
     void animation_to_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void add_berries_and_make_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void open_berry_menu_from_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    bool donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::vector<uint16_t>& match_counts);
+    void move_to_ansha(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void save_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    bool donut_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::vector<uint16_t>& kept_counts);
 
 private:
 

@@ -11,13 +11,14 @@
 
 #include <chrono>
 #include <map>
-#include <mutex>
-#include <condition_variable>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/EventRateTracker.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "AsyncDispatcher.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 
 namespace PokemonAutomation{
 
@@ -73,7 +74,7 @@ public:
     double current_utilization() const;
 
 protected:
-    PeriodicRunner(AsyncDispatcher& dispatcher);
+    PeriodicRunner(ThreadPool& thread_pool);
     bool add_event(void* event, std::chrono::milliseconds period, WallClock start = current_time());
     void remove_event(void* event);
 
@@ -87,21 +88,21 @@ protected:
 private:
     void thread_loop();
 protected:
-    void stop_thread();
+    void stop_thread() noexcept;
 
 private:
-    AsyncDispatcher& m_dispatcher;
+    ThreadPool& m_thread_pool;
 
     std::atomic<size_t> m_pending_waits;
-    std::mutex m_lock;
-    std::condition_variable m_cv;
+    Mutex m_lock;
+    ConditionVariable m_cv;
 
     mutable SpinLock m_stats_lock;
     UtilizationTracker m_utilization;
 
     PeriodicScheduler m_scheduler;
 
-    std::unique_ptr<AsyncTask> m_runner;
+    AsyncTask m_runner;
 };
 
 

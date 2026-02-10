@@ -75,6 +75,54 @@ ShinySoundDetectedActionOption::ShinySoundDetectedActionOption(
     PA_ADD_STATIC(NOTES);
 }
 
+bool ShinySoundDetectedActionOption::on_shiny_sighted(
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
+    size_t current_count
+){
+    ShinySoundDetectedAction action = ACTION;
+
+    if (action == ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY && current_count > 1){
+        return false;
+    }
+
+    if (action == ShinySoundDetectedAction::NO_NOTIFICATIONS && current_count > 1) {
+        return false;
+    }
+
+    if (TAKE_VIDEO){
+        context.wait_for(SCREENSHOT_DELAY);
+        pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
+    }
+
+    if (action != ShinySoundDetectedAction::NO_NOTIFICATIONS) {
+        send_shiny_sighted_notification(env, stream);
+    }
+
+    return action == ShinySoundDetectedAction::STOP_PROGRAM;
+}
+
+
+void ShinySoundDetectedActionOption::send_shiny_sighted_notification(
+    ProgramEnvironment& env, VideoStream& stream
+){
+    {
+        std::ostringstream ss;
+        ss << "Sighted Shiny!";
+        stream.log(ss.str(), COLOR_BLUE);
+    }
+
+    std::vector<std::pair<std::string, std::string>> embeds;
+
+    send_program_notification(
+        env, NOTIFICATIONS,
+        Pokemon::COLOR_STAR_SHINY,
+        "Sighted Shiny",
+        embeds, "",
+        stream.video().snapshot(), true
+    );
+}
+
+
 bool ShinySoundDetectedActionOption::on_shiny_sound(
     ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     size_t current_count,

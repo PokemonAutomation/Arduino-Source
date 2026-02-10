@@ -13,26 +13,29 @@ namespace PokemonAutomation{
 
 
 
-class AppleSleepController : public SystemSleepController{
+class AppleSleepController final : public SystemSleepController{
 public:
     virtual ~AppleSleepController(){
-        std::lock_guard<std::mutex> lg(m_lock);
+        stop();
+    }
+    virtual void stop() noexcept override{
+        std::lock_guard<Mutex> lg(m_lock);
         update_state(SleepSuppress::NONE);
     }
     virtual void push_screen_on() override{
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         update_state(SleepSuppress::SCREEN_ON);
     }
     virtual void pop_screen_on() override{
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         update_state(SleepSuppress::NONE);
     }
     virtual void push_no_sleep() override{
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         update_state(SleepSuppress::NO_SLEEP);
     }
     virtual void pop_no_sleep() override{
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         update_state(SleepSuppress::NONE);
     }
 

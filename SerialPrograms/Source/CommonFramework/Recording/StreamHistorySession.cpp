@@ -4,7 +4,6 @@
  *
  */
 
-#include <QThread>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Concurrency/SpinLock.h"
@@ -13,9 +12,9 @@
 #include "CommonFramework/Recording/StreamHistoryOption.h"
 
 #if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
-//#include "StreamHistoryTracker_SaveFrames.h"
+#include "StreamHistoryTracker_SaveFrames.h"
 //#include "StreamHistoryTracker_RecordOnTheFly.h"
-#include "StreamHistoryTracker_ParallelStreams.h"
+//#include "StreamHistoryTracker_ParallelStreams.h"
 #else
 #include "StreamHistoryTracker_Null.h"
 #endif
@@ -66,35 +65,6 @@ void StreamHistorySession::start(AudioChannelFormat format, bool has_video){
 }
 
 
-#if 0
-class HistorySaverThread : public QThread{
-public:
-    HistorySaverThread(StreamHistoryTracker& tracker, const std::string& filename)
-        : m_tracker(tracker)
-        , m_filename(filename)
-    {}
-    ~HistorySaverThread(){
-        quit();
-        wait();
-    }
-    bool save(){
-        start();
-        quit();
-        wait();
-        return m_success;
-    }
-    virtual void run() override{
-//        m_success = m_tracker.save(m_logger, m_filename);
-        m_success = m_tracker.save(m_filename);
-        exec();
-    }
-
-private:
-    StreamHistoryTracker& m_tracker;
-    const std::string& m_filename;
-    bool m_success = false;
-};
-#endif
 
 bool StreamHistorySession::save(const std::string& filename) const{
     //  This will be coming in from random threads. It will block until the save

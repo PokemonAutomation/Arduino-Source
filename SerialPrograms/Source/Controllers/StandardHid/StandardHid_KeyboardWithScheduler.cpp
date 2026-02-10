@@ -17,7 +17,7 @@ void KeyboardControllerWithScheduler::issue_key(
     KeyboardKey key
 ){
     SuperscalarScheduler::Schedule schedule;
-    std::lock_guard<std::mutex> lg0(m_issue_lock);
+    std::lock_guard<Mutex> lg0(m_issue_lock);
     {
         if (cancellable){
             cancellable->throw_if_cancelled();
@@ -44,7 +44,7 @@ void KeyboardControllerWithScheduler::issue_keys(
     const std::vector<KeyboardKey>& keys
 ){
     SuperscalarScheduler::Schedule schedule;
-    std::lock_guard<std::mutex> lg0(m_issue_lock);
+    std::lock_guard<Mutex> lg0(m_issue_lock);
     {
         if (cancellable){
             cancellable->throw_if_cancelled();

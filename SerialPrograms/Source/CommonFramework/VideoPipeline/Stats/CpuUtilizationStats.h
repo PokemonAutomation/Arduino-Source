@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_CpuUtilizationStats_H
 #define PokemonAutomation_CpuUtilizationStats_H
 
-#include <mutex>
 #include "Common/Cpp/EventRateTracker.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/CpuUtilization/CpuUtilization.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayTypes.h"
 
@@ -26,7 +26,7 @@ public:
     virtual OverlayStatSnapshot get_current() override;
 
 private:
-    std::mutex m_lock;
+    Mutex m_lock;
     SystemCpuTime m_last_clock;
     UtilizationTracker m_tracker;
 

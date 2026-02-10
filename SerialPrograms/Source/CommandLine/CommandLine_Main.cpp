@@ -9,7 +9,7 @@
 #include <iostream>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Logging/OutputRedirector.h"
+// #include "CommonFramework/Logging/OutputRedirector.h"
 #include "Integrations/PybindSwitchController.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 
@@ -17,9 +17,9 @@ using namespace PokemonAutomation;
 using namespace PokemonAutomation::NintendoSwitch;
 
 int main(int argc, char* argv[]){
-    // Set up output redirection for logging
-    OutputRedirector redirect_stdout(std::cout, "stdout", Color());
-    OutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
+//     // Set up output redirection for logging
+//     OutputRedirector redirect_stdout(std::cout, "stdout", Color());
+//     OutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
 
     // Get the global command-line logger (suitable for command-line tools)
     Logger& logger = global_logger_command_line();
@@ -31,7 +31,7 @@ int main(int argc, char* argv[]){
     // Check if port name argument is provided
     if (argc < 2) {
         logger.log("Usage: " + std::string(argv[0]) + " <port_name>", COLOR_RED);
-        logger.log("Example: " + std::string(argv[0]) + " /dev/cu.usbserial-0001");
+        logger.log("Example: " + std::string(argv[0]) + " cu.usbserial-0001");
         return 1;
     }
 

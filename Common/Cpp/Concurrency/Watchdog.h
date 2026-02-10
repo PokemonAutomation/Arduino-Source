@@ -15,11 +15,12 @@
 #define PokemonAutomation_Watchdog_H
 
 #include <map>
-#include <mutex>
-#include <condition_variable>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 
 namespace PokemonAutomation{
 
@@ -32,8 +33,10 @@ struct WatchdogCallback{
 
 class Watchdog{
 public:
+    Watchdog(ThreadPool& thread_pool);
     ~Watchdog();
-    Watchdog();
+
+    void stop() noexcept;
 
     //  Add a callback which will be called at the specified period.
     //  If callback already exists, the period will be overwritten and the next
@@ -67,7 +70,7 @@ private:
         WatchdogCallback& callback;
         std::chrono::milliseconds period;
         Schedule::iterator iter;
-        std::mutex lock;
+        Mutex lock;
 
         Entry(
             WatchdogCallback& p_callback,
@@ -90,10 +93,10 @@ private:
 
     //  Nothing should ever acquire both locks at once.
     SpinLock m_state_lock;
-    std::mutex m_sleep_lock;
+    Mutex m_sleep_lock;
 
-    std::condition_variable m_cv;
-    Thread m_thread;
+    ConditionVariable m_cv;
+    AsyncTask m_thread;
 };
 
 

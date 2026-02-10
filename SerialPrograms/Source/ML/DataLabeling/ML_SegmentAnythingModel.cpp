@@ -15,6 +15,7 @@
 #include <opencv2/imgproc.hpp>
 #include "3rdParty/ONNX/OnnxToolsPA.h"
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Filesystem.h"
 #include "CommonFramework/Globals.h"
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"
 #include "ML_SegmentAnythingModelConstants.h"
@@ -186,7 +187,7 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
         return;
     }
     
-    if (!std::filesystem::exists(embedding_model_path)){
+    if (!Filesystem::exists(embedding_model_path)){
         std::cerr << "Error: no such embedding model path " << embedding_model_path << "." << std::endl;
         QMessageBox box;
         box.critical(nullptr, "Embedding Model Does Not Exist",
@@ -195,7 +196,7 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
     }
     // since the embedding model has too many weights, onnx created a .data file to contain weights.
     auto embedding_model_data_path = embedding_model_path + ".data";
-    if (!std::filesystem::exists(embedding_model_data_path)){
+    if (!Filesystem::exists(embedding_model_data_path)){
         std::cerr << "Error: no such embedding model data path " << embedding_model_data_path << "." << std::endl;
         QMessageBox box;
         box.critical(nullptr, "Embedding Model Data File Does Not Exist",
@@ -218,7 +219,7 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
         const auto& image_path = all_image_paths[i];
         std::cout << (i+1) << "/" << all_image_paths.size() << ": ";
         const std::string embedding_path = image_path + ".embedding";
-        if (std::filesystem::exists(embedding_path)){
+        if (Filesystem::exists(embedding_path)){
             std::cout << "skip already computed embedding " << embedding_path << "." << std::endl;
             continue;
         }

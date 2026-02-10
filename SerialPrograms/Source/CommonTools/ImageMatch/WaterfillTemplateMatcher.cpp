@@ -70,9 +70,10 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
 
     if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
         const auto exact_image = extract_box_reference(reference, *largest_object);
+        const double stddev_sum = image_stats(exact_image).stddev.sum();
         cout << "Build waterfil template matcher from " << full_path << ", W x H: " << exact_image.width()
              << " x " << exact_image.height() <<  ", area ratio: " << m_area_ratio << ", Object area: "
-             << largest_object->area << endl;
+             << largest_object->area << ", stddev sum: " << stddev_sum << endl;
         dump_debug_image(global_logger_command_line(), "CommonFramework/WaterfillTemplateMatcher",
             "template_cropped", exact_image);
     }

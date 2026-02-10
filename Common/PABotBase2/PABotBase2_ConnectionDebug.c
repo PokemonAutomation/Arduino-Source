@@ -49,7 +49,7 @@ void pabb2_PacketHeader_print(const pabb2_PacketHeader* packet, bool ascii){
         sizeof(uint32_t)
     );
     uint32_t actual_crc32 = 0xffffffff;
-    uint8_t magic_number = PABB2_CONNECTION_PACKET_MAGIC_NUMBER;
+    uint8_t magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     pabb_crc32_buffer(&actual_crc32, &magic_number, 1);
     pabb_crc32_buffer(&actual_crc32, (const uint8_t*)packet + 1, packet_bytes - sizeof(uint32_t) - 1);
     printf("    CRC32:  0x%u / 0x%u", actual_crc32, expected_crc32);
@@ -59,7 +59,7 @@ void pabb2_PacketHeader_print(const pabb2_PacketHeader* packet, bool ascii){
     printf("\n");
 
     switch (packet->opcode){
-    case PABB2_CONNECTION_PACKET_OPCODE_STREAM_DATA:{
+    case PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA:{
         const size_t OVERHEAD = sizeof(pabb2_PacketHeaderData) + sizeof(uint32_t);
         const pabb2_PacketHeaderData* stream_packet = (const pabb2_PacketHeaderData*)packet;
         if (packet_bytes < OVERHEAD){

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_BlueberryQuestDetector_H
 #define PokemonAutomation_PokemonSV_BlueberryQuestDetector_H
 
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"

@@ -25,7 +25,7 @@ FireForgetDispatcher::FireForgetDispatcher()
 
 void FireForgetDispatcher::stop() {
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         // like with the other thread option, make sure we're not double stopping
         if (m_stopping) return;
         m_stopping = true;
@@ -39,7 +39,7 @@ FireForgetDispatcher::~FireForgetDispatcher(){
 }
 
 void FireForgetDispatcher::dispatch(std::function<void()>&& func){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     m_queue.emplace_back(std::move(func));
     m_cv.notify_one();
 
@@ -60,7 +60,7 @@ void FireForgetDispatcher::thread_loop(){
     while (true){
         std::function<void()> task;
         {
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
             if (m_stopping){
                 return;
             }

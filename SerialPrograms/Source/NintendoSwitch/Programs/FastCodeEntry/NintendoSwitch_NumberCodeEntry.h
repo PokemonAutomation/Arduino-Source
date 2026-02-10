@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_NumberCodeEntry_H
 #define PokemonAutomation_NintendoSwitch_NumberCodeEntry_H
 
+#include <optional>
 #include <string>
 #include "Controllers/StandardHid/StandardHid_Keyboard.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
@@ -21,19 +22,18 @@ namespace FastCodeEntry{
 //  controller type.
 void numberpad_enter_code(
     ConsoleHandle& console, AbstractControllerContext& context,
-    const std::string& code,
-    bool include_plus
+    bool assume_console_type_is_ready,
+    const std::string& code, bool include_plus
 );
 
 void numberpad_enter_code(
     ConsoleHandle& console, StandardHid::KeyboardContext& context,
-    const std::string& code,
-    bool include_plus
+    const std::string& code, bool include_plus
 );
 void numberpad_enter_code(
     ConsoleHandle& console, ProControllerContext& context,
-    const std::string& code,
-    bool include_plus
+    bool assume_console_type_is_ready,
+    const std::string& code, bool include_plus
 );
 
 

@@ -12,8 +12,8 @@
 namespace PokemonAutomation{
 
 
-std::u32string to_utf32(const std::string& str);
-std::string to_utf8(const std::u32string& str);
+//std::u32string to_utf32(const std::string& str);
+//std::string to_utf8(const std::u32string& str);
 
 std::string to_lower(const std::string& str);
 void to_lower(std::u32string& str);

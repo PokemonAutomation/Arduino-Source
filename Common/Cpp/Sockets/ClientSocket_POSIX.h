@@ -2,7 +2,7 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *      This file is completely untested!
+ *      This file is mostly untested!
  *
  */
 
@@ -10,14 +10,18 @@
 #define PokemonAutomation_ClientSocket_POSIX_H
 
 #include <iostream>
-#include <mutex>
-#include <condition_variable>
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include "Common/Cpp/Concurrency/Thread.h"
+#include <cerrno>
+#include <cstring>
+#include <signal.h>
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "AbstractClientSocket.h"
 
 namespace PokemonAutomation{
@@ -26,35 +30,39 @@ namespace PokemonAutomation{
 
 class ClientSocket_POSIX final : public AbstractClientSocket{
 public:
-    ClientSocket_POSIX()
-        : m_socket(socket(AF_INET, SOCK_STREAM, 0))
-    {
-        fcntl(m_socket, F_SETFL, O_NONBLOCK);
+    ClientSocket_POSIX(ThreadPool& thread_pool)
+        : m_thread_pool(thread_pool)
+        , m_socket(socket(AF_INET, SOCK_STREAM, 0)){
+        // Ignore SIGPIPE. Handle errors via errno instead
+        signal(SIGPIPE, SIG_IGN);
+
+        if (m_socket != -1){
+            fcntl(m_socket, F_SETFL, O_NONBLOCK);
+        }
     }
 
     virtual ~ClientSocket_POSIX(){
         close();
-        m_thread.join();
-        if (m_socket != -1){
-            ::close(m_socket);
-        }
+        m_thread.wait_and_ignore_exceptions();
+        close_socket();
     }
+
     virtual void close() noexcept override{
         {
-            std::lock_guard<std::mutex> lg1(m_lock);
+            std::lock_guard<Mutex> lg1(m_lock);
             m_state.store(State::DESTRUCTING, std::memory_order_relaxed);
             m_cv.notify_all();
         }
     }
 
     virtual void connect(const std::string& address, uint16_t port) override{
-        std::lock_guard<std::mutex> lg1(m_lock);
+        std::lock_guard<Mutex> lg1(m_lock);
         if (m_state.load(std::memory_order_relaxed) != State::NOT_RUNNING){
             return;
         }
         try{
             m_state.store(State::CONNECTING, std::memory_order_relaxed);
-            m_thread = Thread([&, this]{
+            m_thread = m_thread_pool.dispatch_now_blocking([=, this]{
                 thread_loop(address, port);
             });
         }catch (...){
@@ -73,20 +81,20 @@ public:
         const char* ptr = (const char*)data;
         size_t sent = 0;
 
-        while (bytes > 0){
+        while (bytes > 0 && state() == State::CONNECTED){
             size_t current = std::min<size_t>(bytes, BLOCK_SIZE);
-            ssize_t current_sent = ::send(m_socket, ptr, (int)current, MSG_DONTWAIT);
+            ssize_t current_sent = ::send(m_socket, ptr, (int)current, MSG_DONTWAIT | MSG_NOSIGNAL);
             if (current_sent != -1){
-                sent += current;
+                sent += current_sent;
                 if ((size_t)current_sent < current){
                     return sent;
                 }
-                ptr += current;
-                bytes -= current;
+                ptr += current_sent;
+                bytes -= current_sent;
                 continue;
             }
 
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
             if (state() == State::DESTRUCTING){
                 break;
             }
@@ -95,10 +103,17 @@ public:
 //            cout << "error = " << error << endl;
             switch (error){
             case EAGAIN:
-//            case EWOULDBLOCK:
+#if EAGAIN != EWOULDBLOCK
+            case EWOULDBLOCK:
+#endif
                 break;
+            case EPIPE:
+            case ECONNRESET:
+            case ENOTCONN:
+                m_error = "Connection closed: " + std::string(strerror(error));
+                return sent;
             default:
-                m_error = "POSIX Error Code: " + std::to_string(error);
+                m_error = "Send error (errno " + std::to_string(error) + "): " + std::string(strerror(error));
                 return sent;
             }
 
@@ -109,9 +124,21 @@ public:
 
 
 private:
-    void thread_loop(const std::string& address, uint16_t port){
+    void close_socket(){
+        if (m_socket == -1){
+            return;
+        }
+        int ret = ::close(m_socket);
+        if (ret != 0){
+            try{
+                std::cout << "Failed close(): errno = " << errno << " (" << strerror(errno) << ")" << std::endl;
+            }catch (...){}
+        }
+    }
+
+    void thread_loop(std::string address, uint16_t port){
         try{
-            thread_loop_internal(address, port);
+            thread_loop_internal(std::move(address), port);
         }catch (...){
             try{
                 std::cout << "ClientSocket_POSIX(): An exception was thrown from the receive thread." << std::endl;
@@ -119,13 +146,14 @@ private:
         }
     }
 
-    void thread_loop_internal(const std::string& address, uint16_t port){
+    void thread_loop_internal(std::string address, uint16_t port){
         m_listeners.run_method(&Listener::on_thread_start);
 
         {
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
 
             sockaddr_in server;
+            std::memset(&server, 0, sizeof(server));
             server.sin_family = AF_INET;
             server.sin_port = htons(port);
             server.sin_addr.s_addr = inet_addr(address.c_str());
@@ -154,13 +182,19 @@ private:
                 case ETIMEDOUT:
                     m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
                     m_error = "Connection timed out.";
-                    m_lock.unlock();
+                    lg.unlock();
+                    m_listeners.run_method(&Listener::on_connect_finished, m_error);
+                    return;
+                case ECONNREFUSED:
+                    m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
+                    m_error = "Connection refused.";
+                    lg.unlock();
                     m_listeners.run_method(&Listener::on_connect_finished, m_error);
                     return;
                 default:
                     m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
-                    m_error = "WSA Error Code: " + std::to_string(error);
-                    m_lock.unlock();
+                    m_error = "Connect error (errno " + std::to_string(error) + "): " + std::string(strerror(error));
+                    lg.unlock();
                     m_listeners.run_method(&Listener::on_connect_finished, m_error);
                     return;
                 }
@@ -183,13 +217,14 @@ Connected:
             ssize_t bytes;
             int error = 0;
             {
-                std::unique_lock<std::mutex> lg(m_lock);
+                std::unique_lock<Mutex> lg(m_lock);
                 State state = m_state.load(std::memory_order_relaxed);
                 if (state == State::DESTRUCTING){
                     return;
                 }
                 bytes = ::recv(m_socket, buffer, BUFFER_SIZE, 0);
-                if (bytes < 0){
+//                cout << "error = " << error << endl;
+                if (bytes == -1){
                     error = errno;
                 }
             }
@@ -199,20 +234,26 @@ Connected:
                 continue;
             }
 
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
             if (state() == State::DESTRUCTING){
                 return;
             }
 
-            if (bytes < 0){
-//                cout << "error = " << error << endl;
+//            cout << "error = " << error << endl;
+            if (bytes == -1){
                 switch (error){
                 case EAGAIN:
-//                case EWOULDBLOCK:
+#if EAGAIN != EWOULDBLOCK
+                case EWOULDBLOCK:
+#endif
                     break;
+                case ECONNRESET:
+                case ENOTCONN:
+                case EPIPE:
+                    m_error = "Receive error (errno " + std::to_string(error) + "): " + std::string(strerror(error));
+                    return;
                 default:
-                    std::unique_lock<std::mutex> lg(m_lock);
-                    m_error = "POSIX Error Code: " + std::to_string(error);
+                    m_error = "Receive error (errno " + std::to_string(error) + "): " + std::string(strerror(error));
                     return;
                 }
             }
@@ -224,13 +265,14 @@ Connected:
 
 
 private:
+    ThreadPool& m_thread_pool;
     const int m_socket;
 
     std::string m_error;
 
-    mutable std::mutex m_lock;
-    std::condition_variable m_cv;
-    Thread m_thread;
+    mutable Mutex m_lock;
+    ConditionVariable m_cv;
+    AsyncTask m_thread;
 };
 
 

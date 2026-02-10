@@ -5,9 +5,9 @@
  */
 
 #include <optional>
-#include <mutex>
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "Common/Cpp/StringTools.h"
+#include "Common/Cpp/Strings/StringTools.h"
 #include "BoxDraw.h"
 
 // #include <iostream>
@@ -71,7 +71,7 @@ public:
     }
     virtual void on_config_value_changed(void* object) override{
         {
-            std::lock_guard<std::mutex> lg(m_lock);
+            std::lock_guard<Mutex> lg(m_lock);
             m_overlay_set.clear();
             m_overlay_set.add(COLOR_RED, {m_parent.X, m_parent.Y, m_parent.WIDTH, m_parent.HEIGHT});
         }
@@ -135,7 +135,7 @@ private:
     BoxDraw& m_parent;
     VideoOverlay& m_overlay;
     VideoOverlaySet m_overlay_set;
-    std::mutex m_lock;
+    Mutex m_lock;
 
     std::optional<std::pair<double, double>> m_mouse_start;
 };

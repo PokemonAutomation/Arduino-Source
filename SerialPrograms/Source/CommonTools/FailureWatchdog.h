@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_CommonTools_FailureWatchdog_H
 #define PokemonAutomation_CommonTools_FailureWatchdog_H
 
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Language.h"

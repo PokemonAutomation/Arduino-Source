@@ -7,12 +7,10 @@
 #ifndef PokemonAutomation_ProgramEnvironment_H
 #define PokemonAutomation_ProgramEnvironment_H
 
-#include "Common/Cpp/Containers/Pimpl.h"
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 
 namespace PokemonAutomation{
 
-class AsyncDispatcher;
 class StatsTracker;
 class ProgramSession;
 struct ProgramInfo;
@@ -23,7 +21,6 @@ struct ProgramEnvironmentData;
 
 class ProgramEnvironment{
 public:
-    ~ProgramEnvironment();
     ProgramEnvironment(
         const ProgramInfo& program_info,
         ProgramSession& session,
@@ -40,17 +37,6 @@ public:
     void log(const std::string& msg, Color color = Color()){ m_logger.log(msg, color); }
 
 public:
-    //  Thread Pools
-
-    //  A high-priority dispatcher for program and logic threads that cannot
-    //  tolerate being delayed.
-    AsyncDispatcher& realtime_dispatcher();
-
-    //  A high-priority dispatcher for inference where starvation may cause the
-    //  program to encounter issues.
-    AsyncDispatcher& realtime_inference_dispatcher();
-
-public:
     //  Stats Management
 
     void update_stats();
@@ -64,13 +50,12 @@ public:
 
 
 private:
+    const ProgramInfo& m_program_info;
     ProgramSession& m_session;
     Logger& m_logger;
 
     StatsTracker* m_current_stats;
     const StatsTracker* m_historical_stats;
-
-    Pimpl<ProgramEnvironmentData> m_data;
 };
 
 

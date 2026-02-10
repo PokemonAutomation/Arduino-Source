@@ -20,8 +20,14 @@
  *
  ************************************************************************************/
 #pragma once
+#include <dpp/export.h>
+#include <dpp/snowflake.h>
+#include <dpp/misc-enum.h>
+#include <dpp/managed.h>
+#include <dpp/utility.h>
+#include <dpp/role.h>
+#include <dpp/user.h>
 #include <dpp/channel.h>
-#include <dpp/thread.h>
 #include <dpp/guild.h>
 #include <dpp/invite.h>
 #include <dpp/emoji.h>
@@ -39,14 +45,13 @@
 #include <dpp/entitlement.h>
 #include <functional>
 #include <variant>
-#include <dpp/voice_channel_effect.h>
 #include <exception>
 #include <algorithm>
 #include <string>
 
-#ifndef DPP_NO_CORO
+#ifdef DPP_CORO
 #include <dpp/coro.h>
-#endif /* DPP_NO_CORO */
+#endif /* DPP_CORO */
 
 namespace dpp {
 
@@ -59,20 +64,6 @@ class discord_voice_client;
  * @brief A function used as a callback for any REST based command
  */
 using command_completion_event_t = std::function<void(const confirmation_callback_t&)>;
-
-/**
- * @brief Route interaction event
- *
- * @param creator Creating cluster
- * @param shard_id Shard ID or 0
- * @param d JSON data for the event
- * @param raw Raw JSON string
- * @param from_webhook True if the interaction comes from a webhook
- * @return JSON interaction response, only valid when from_webhook is true
- */
-namespace events {
-	std::string DPP_EXPORT internal_handle_interaction(cluster* creator, uint16_t shard_id, json &d, const std::string &raw, bool from_webhook);
-}
 
 /** @brief Base event parameter struct.
  * Each event you receive from the library will have its parameter derived from this class.
@@ -93,13 +84,9 @@ public:
 
 	/**
 	 * @brief Shard the event came from.
+	 * Note that for some events, notably voice events, this may be nullptr.
 	 */
-	uint32_t shard = 0;
-
-	/**
-	 * @brief Cluster owning the event dispatch
-	 */
-	 dpp::cluster* owner = nullptr;
+	discord_client* from = nullptr;
 
 	/**
 	 * @brief Whether the event was cancelled using cancel_event().
@@ -128,24 +115,18 @@ public:
 	/**
 	 * @brief Construct a new event_dispatch_t object
 	 *
-	 * @param shard_id The shard the event originated on.
+	 * @param client The shard the event originated on. May be a nullptr, e.g. for voice events
 	 * @param raw Raw event data as JSON or ETF
 	 */
-	event_dispatch_t(dpp::cluster* creator, uint32_t shard_id, const std::string& raw);
-
-	/**
-	 * @brief Returns the shard object for the events shard id
-	 * @return discord client object
-	 */
-	discord_client* from() const;
+	event_dispatch_t(discord_client* client, const std::string& raw);
 
 	/**
 	 * @brief Construct a new event_dispatch_t object
 	 *
-	 * @param shard_id The shard the event originated on.
+	 * @param client The shard the event originated on. May be a nullptr, e.g. for voice events
 	 * @param raw Raw event data as JSON or ETF
 	 */
-	event_dispatch_t(dpp::cluster* creator, uint32_t shard_id, std::string&& raw);
+	event_dispatch_t(discord_client* client, std::string&& raw);
 
 	/**
 	 * @brief Copy another event_dispatch_t object
@@ -211,19 +192,6 @@ struct DPP_EXPORT log_t : public event_dispatch_t {
 	 * @brief Log Message
 	 */
 	std::string message = {};
-};
-
-/**
- * @brief Closure of socket (removal from socket engine)
- */
-struct DPP_EXPORT socket_close_t : public event_dispatch_t {
-        using event_dispatch_t::event_dispatch_t;
-        using event_dispatch_t::operator=;
-
-	/**
-	 * @brief Socket file descriptor
-	 */
-	socket fd{INVALID_SOCKET};
 };
 
 namespace utility {
@@ -474,19 +442,6 @@ struct DPP_EXPORT stage_instance_delete_t : public event_dispatch_t {
 };
 
 /**
- * @brief Voice channel effect send
- */
-struct DPP_EXPORT voice_channel_effect_send_t : public event_dispatch_t {
-	using event_dispatch_t::event_dispatch_t;
-	using event_dispatch_t::operator=;
-
-	/**
-	 * @brief Voice channel effect
-	 */
-	voice_channel_effect effect = {};
-};
-
-/**
  * @brief Voice state update
  */
 struct DPP_EXPORT voice_state_update_t : public event_dispatch_t {
@@ -505,27 +460,6 @@ struct DPP_EXPORT voice_state_update_t : public event_dispatch_t {
 struct DPP_EXPORT interaction_create_t : public event_dispatch_t {
 	using event_dispatch_t::event_dispatch_t;
 	using event_dispatch_t::operator=;
-
-	/**
-	 * @brief Returns a generic http success confirmation
-	 * @return success
-	 */
-	confirmation_callback_t success() const;
-
-	/**
-	 * @brief True if from a HTTP interaction webhook, false if from websocket
-	 */
-	bool from_webhook{false};
-
-	/**
-	 * @brief If this interaction is created from a webhook server,
-	 * it fills this value with a JSON string which is sent as the HTTP response.
-	 * This is thread local so that it is preserved when the event is copied, we
-	 * guarantee that the request/response is in the same thread so this will always
-	 * be valid.
-	 * @param response response to set
-	 */
-	void set_queued_response(const std::string& response) const;
 
 	/**
 	 * @brief Acknowledge interaction without displaying a message to the user,
@@ -575,22 +509,6 @@ struct DPP_EXPORT interaction_create_t : public event_dispatch_t {
 	 * On success the callback will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
 	 */
 	void reply(const std::string& mt, command_completion_event_t callback = utility::log_error()) const;
-
-	/**
-	 * @brief Create a follow-up message for this interaction.
-	 * @param m Message object to send. Not all fields are supported by Discord.
-	 * @param callback User function to execute when the api call completes.
-	 * On success the callback will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
-	 */
-	void follow_up(const message& m, command_completion_event_t callback = utility::log_error()) const;
-	
-	/**
-	 * @brief Create a follow-up message for this interaction.
-	 * @param mt The string value to send, for simple text only messages
-	 * @param callback User function to execute when the api call completes.
-	 * On success the callback will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
-	 */
-	void follow_up(const std::string& mt, command_completion_event_t callback = utility::log_error()) const;
 
 	/**
 	 * @brief Reply to interaction with a dialog box
@@ -653,13 +571,7 @@ struct DPP_EXPORT interaction_create_t : public event_dispatch_t {
 	 */
 	void delete_original_response(command_completion_event_t callback = utility::log_error()) const;
 
-	/**
-	 * @brief Get queued response when responding to a HTTP request
-	 * @return response JSON
-	 */
-	std::string get_queued_response() const;
-
-#ifndef DPP_NO_CORO
+#ifdef DPP_CORO
 	/**
 	 * @brief Acknowledge interaction without displaying a message to the user,
 	 * for use with button and select menu components.
@@ -675,7 +587,7 @@ struct DPP_EXPORT interaction_create_t : public event_dispatch_t {
 	 * @param m Message object to send. Not all fields are supported by Discord.
 	 * On success the result will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
 	 */
-	dpp::async<dpp::confirmation_callback_t> co_reply(interaction_response_type t, message m) const;
+	dpp::async<dpp::confirmation_callback_t> co_reply(interaction_response_type t, const message& m) const;
 
 	/**
 	 * @brief Send a reply for this interaction
@@ -684,7 +596,7 @@ struct DPP_EXPORT interaction_create_t : public event_dispatch_t {
 	 * @param mt The string value to send, for simple text only messages
 	 * On success the result will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
 	 */
-	dpp::async<dpp::confirmation_callback_t> co_reply(interaction_response_type t, std::string mt) const;
+	dpp::async<dpp::confirmation_callback_t> co_reply(interaction_response_type t, const std::string& mt) const;
 
 	/**
 	 * @brief Send a reply for this interaction.
@@ -693,7 +605,7 @@ struct DPP_EXPORT interaction_create_t : public event_dispatch_t {
 	 * @param m Message object to send. Not all fields are supported by Discord.
 	 * On success the result will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
 	 */
-	dpp::async<dpp::confirmation_callback_t> co_reply(message m) const;
+	dpp::async<dpp::confirmation_callback_t> co_reply(const message& m) const;
 
 	/**
 	 * @brief Send a reply for this interaction.
@@ -702,23 +614,7 @@ struct DPP_EXPORT interaction_create_t : public event_dispatch_t {
 	 * @param mt The string value to send, for simple text only messages
 	 * On success the result will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
 	 */
-	dpp::async<dpp::confirmation_callback_t> co_reply(std::string mt) const;
-
-	/**
-	 * @brief Create a follow-up message for this interaction.
-	 *
-	 * @param m Message object to send. Not all fields are supported by Discord.
-	 * On success the result will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
-	 */
-	dpp::async<dpp::confirmation_callback_t> co_follow_up(message m) const;
-
-	/**
-	 * @brief Create a follow-up message for this interaction.
-	 *
-	 * @param mt The string value to send, for simple text only messages
-	 * On success the result will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
-	 */
-	dpp::async<dpp::confirmation_callback_t> co_follow_up(std::string mt) const;
+	dpp::async<dpp::confirmation_callback_t> co_reply(const std::string& mt) const;
 
 	/**
 	 * @brief Reply to interaction with a dialog box
@@ -726,7 +622,7 @@ struct DPP_EXPORT interaction_create_t : public event_dispatch_t {
 	 * @param mr Dialog box response to send
 	 * On success the result will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
 	 */
-	dpp::async<dpp::confirmation_callback_t> co_dialog(interaction_modal_response mr) const;
+	dpp::async<dpp::confirmation_callback_t> co_dialog(const interaction_modal_response& mr) const;
 
 	/**
 	 * @brief Edit the response for this interaction
@@ -734,7 +630,7 @@ struct DPP_EXPORT interaction_create_t : public event_dispatch_t {
 	 * @param m Message object to send. Not all fields are supported by Discord.
 	 * On success the result will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
 	 */
-	dpp::async<dpp::confirmation_callback_t> co_edit_response(message m) const;
+	dpp::async<dpp::confirmation_callback_t> co_edit_response(const message& m) const;
 
 	/**
 	 * @brief Edit the response for this interaction
@@ -742,7 +638,7 @@ struct DPP_EXPORT interaction_create_t : public event_dispatch_t {
 	 * @param mt The string value to send, for simple text only messages
 	 * On success the result will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
 	 */
-	dpp::async<dpp::confirmation_callback_t> co_edit_response(std::string mt) const;
+	dpp::async<dpp::confirmation_callback_t> co_edit_response(const std::string& mt) const;
 
 	/**
 	 * @brief Set the bot to 'thinking' state where you have up to 15 minutes to respond
@@ -765,15 +661,7 @@ struct DPP_EXPORT interaction_create_t : public event_dispatch_t {
 	 * @param m Message object to send. Not all fields are supported by Discord.
 	 * On success the result will contain a dpp::message object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
 	 */
-	dpp::async<dpp::confirmation_callback_t> co_edit_original_response(message m) const;
-
-	/**
-	 * @brief Edit original response message for this interaction
-	 *
-	 * @param mt The string value to send, for simple text only messages
-	 * On success the result will contain a dpp::message object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
-	 */
-	dpp::async<dpp::confirmation_callback_t> co_edit_original_response(std::string mt) const;
+	dpp::async<dpp::confirmation_callback_t> co_edit_original_response(const message& m) const;
 
 	/**
 	 * @brief Delete original response message for this interaction. This cannot be used on an ephemeral interaction response.
@@ -781,7 +669,7 @@ struct DPP_EXPORT interaction_create_t : public event_dispatch_t {
 	 * On success the result will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
 	 */
 	dpp::async<dpp::confirmation_callback_t> co_delete_original_response() const;
-#endif /* DPP_NO_CORO */
+#endif /* DPP_CORO */
 
 	/**
 	 * @brief command interaction
@@ -1004,7 +892,7 @@ struct DPP_EXPORT guild_stickers_update_t : public event_dispatch_t {
 	/**
 	 * @brief Updating guild
 	 */
-	guild updating_guild;
+	guild* updating_guild = nullptr;
 
 	/**
 	 * @brief stickers being updated
@@ -1040,7 +928,7 @@ struct DPP_EXPORT channel_delete_t : public event_dispatch_t {
 	/**
 	 * @brief guild channel is being deleted from
 	 */
-	guild deleting_guild;
+	guild* deleting_guild = nullptr;
 
 	/**
 	 * @brief channel being deleted
@@ -1058,12 +946,12 @@ struct DPP_EXPORT channel_update_t : public event_dispatch_t {
 	/**
 	 * @brief guild channel is being updated on
 	 */
-	guild updating_guild;
+	guild* updating_guild = nullptr;
 
 	/**
 	 * @brief channel being updated
 	 */
-	channel updated;
+	channel* updated = nullptr;
 };
 
 /**
@@ -1082,16 +970,6 @@ struct DPP_EXPORT ready_t : public event_dispatch_t {
 	 * @brief shard id
 	 */
 	uint32_t shard_id = {};
-
-	/**
-	 * @brief Array of guild IDs the bot is in, at the time of this event.
-	 */
-	std::vector<snowflake> guilds{};
-
-	/**
-	 * @brief The number of guilds the bot is in, at the time of this event.
-	 */
-	uint32_t guild_count{0};
 };
 
 /**
@@ -1129,7 +1007,7 @@ struct DPP_EXPORT guild_member_remove_t : public event_dispatch_t {
 	/**
 	 * @brief guild user is being removed from
 	 */
-	guild removing_guild;
+	guild* removing_guild = nullptr;
 
 	/**
 	 * @brief Guild ID removed from
@@ -1170,12 +1048,12 @@ struct DPP_EXPORT guild_role_create_t : public event_dispatch_t {
 	/**
 	 * @brief guild role is being created on
 	 */
-	guild creating_guild;
+	guild* creating_guild = nullptr;
 
 	/**
 	 * @brief role being created
 	 */
-	role created;
+	role* created = nullptr;
 };
 
 /**
@@ -1188,18 +1066,18 @@ struct DPP_EXPORT typing_start_t : public event_dispatch_t {
 	/**
 	 * @brief guild user is typing on
 	 */
-	guild typing_guild;
+	guild* typing_guild = nullptr;
 
 	/**
 	 * @brief channel user is typing on
 	 */
-	channel typing_channel;
+	channel* typing_channel = nullptr;
 
 	/**
 	 * @brief user who is typing.
 	 * Can be nullptr if user is not cached
 	 */
-	user typing_user;
+	user* typing_user = nullptr;
 
 	/**
 	 * @brief User id of user typing.
@@ -1242,7 +1120,7 @@ struct DPP_EXPORT message_reaction_add_t : public event_dispatch_t {
 	/**
 	 * @brief Guild reaction occurred on
 	 */
-	guild reacting_guild;
+	guild* reacting_guild = nullptr;
 
 	/**
 	 * @brief User who reacted
@@ -1263,7 +1141,7 @@ struct DPP_EXPORT message_reaction_add_t : public event_dispatch_t {
 	 * @brief channel the reaction happened on (Optional)
 	 * @note only filled when the channel is cached
 	 */
-	channel reacting_channel;
+	channel* reacting_channel = nullptr;
 
 	/**
 	 * @brief emoji of reaction
@@ -1291,12 +1169,12 @@ struct DPP_EXPORT guild_members_chunk_t : public event_dispatch_t {
 	/**
 	 * @brief guild the members chunk is for
 	 */
-	guild adding;
+	guild* adding = nullptr;
 
 	/**
 	 * @brief list of members in the chunk
 	 */
-	guild_member_map members;
+	guild_member_map* members = nullptr;
 };
 
 /**
@@ -1309,7 +1187,7 @@ struct DPP_EXPORT message_reaction_remove_t : public event_dispatch_t {
 	/**
 	 * @brief Guild reaction occurred on
 	 */
-	guild reacting_guild;
+	guild* reacting_guild = nullptr;
 
 	/**
 	 * @brief User who reacted
@@ -1325,7 +1203,7 @@ struct DPP_EXPORT message_reaction_remove_t : public event_dispatch_t {
 	 * @brief channel the reaction happened on (optional)
 	 * @note only filled when the channel is cached
 	 */
-	channel reacting_channel;
+	channel* reacting_channel = nullptr;
 
 	/**
 	 * @brief emoji of reaction
@@ -1348,7 +1226,7 @@ struct DPP_EXPORT guild_create_t : public event_dispatch_t {
 	/**
 	 * @brief guild that was created
 	 */
-	guild created;
+	guild* created = nullptr;
 
 	/**
 	 * @brief List of presences of all users on the guild.
@@ -1389,12 +1267,12 @@ struct DPP_EXPORT channel_create_t : public event_dispatch_t {
 	/**
 	 * @brief guild channel was created on
 	 */
-	guild creating_guild;
+	guild* creating_guild = nullptr;
 
 	/**
 	 * @brief channel that was created
 	 */
-	channel created;
+	channel* created = nullptr;
 };
 
 /**
@@ -1407,7 +1285,7 @@ struct DPP_EXPORT message_reaction_remove_emoji_t : public event_dispatch_t {
 	/**
 	 * @brief Guild reaction occurred on
 	 */
-	guild reacting_guild;
+	guild* reacting_guild = nullptr;
 
 	/**
 	 * @brief Channel ID the reactions was removed in
@@ -1418,7 +1296,7 @@ struct DPP_EXPORT message_reaction_remove_emoji_t : public event_dispatch_t {
 	 * @brief channel the reaction happened on (optional)
 	 * @note only filled when the channel is cached
 	 */
-	channel reacting_channel;
+	channel* reacting_channel = nullptr;
 
 	/**
 	 * @brief emoji of reaction
@@ -1441,17 +1319,17 @@ struct DPP_EXPORT message_delete_bulk_t : public event_dispatch_t {
 	/**
 	 * @brief guild messages are being deleted upon
 	 */
-	guild deleting_guild;
+	guild* deleting_guild = nullptr;
 
 	/**
 	 * @brief user who is deleting the messages
 	 */
-	user deleting_user;
+	user* deleting_user = nullptr;
 
 	/**
 	 * @brief channel messages are being deleted from
 	 */
-	channel deleting_channel;
+	channel* deleting_channel = nullptr;
 
 	/**
 	 * @brief list of message ids of deleted messages
@@ -1469,12 +1347,12 @@ struct DPP_EXPORT guild_role_update_t : public event_dispatch_t {
 	/**
 	 * @brief guild where roles are being updated
 	 */
-	guild updating_guild;
+	guild* updating_guild = nullptr;
 
 	/**
 	 * @brief the role being updated
 	 */
-	role updated;
+	role* updated = nullptr;
 };
 
 /**
@@ -1487,12 +1365,12 @@ struct DPP_EXPORT guild_role_delete_t : public event_dispatch_t {
 	/**
 	 * @brief guild where role is being deleted
 	 */
-	guild deleting_guild;
+	guild* deleting_guild = nullptr;
 
 	/**
 	 * @brief role being deleted
 	 */
-	role deleted;
+	role* deleted = nullptr;
 
 	/**
 	 * @brief ID of the deleted role
@@ -1510,12 +1388,12 @@ struct DPP_EXPORT channel_pins_update_t : public event_dispatch_t {
 	/**
 	 * @brief guild where message is being pinned
 	 */
-	guild pin_guild;
+	guild* pin_guild = nullptr;
 
 	/**
 	 * @brief channel where message is being pinned
 	 */
-	channel pin_channel;
+	channel* pin_channel = nullptr;
 
 	/**
 	 * @brief timestamp of pin
@@ -1533,7 +1411,7 @@ struct DPP_EXPORT message_reaction_remove_all_t : public event_dispatch_t {
 	/**
 	 * @brief Guild reaction occurred on
 	 */
-	guild reacting_guild;
+	guild* reacting_guild = nullptr;
 
 	/**
 	 * @brief Channel ID the reactions was removed in
@@ -1544,7 +1422,7 @@ struct DPP_EXPORT message_reaction_remove_all_t : public event_dispatch_t {
 	 * @brief channel the reaction happened on (optional)
 	 * @note only filled when the channel is cached
 	 */
-	channel reacting_channel;
+	channel* reacting_channel = nullptr;
 
 	/**
 	 * @brief message id of the message reacted upon
@@ -1591,7 +1469,7 @@ struct DPP_EXPORT guild_emojis_update_t : public event_dispatch_t {
 	/**
 	 * @brief guild where emojis are being updated
 	 */
-	guild updating_guild;
+	guild* updating_guild = nullptr;
 };
 
 /**
@@ -1618,12 +1496,12 @@ struct DPP_EXPORT webhooks_update_t : public event_dispatch_t {
 	/**
 	 * @brief guild where webhooks are being updated
 	 */
-	guild webhook_guild;
+	guild* webhook_guild = nullptr;
 
 	/**
 	 * @brief channel where webhooks are being updated
 	 */
-	channel webhook_channel;
+	channel* webhook_channel = nullptr;
 };
 
 /**
@@ -1636,7 +1514,7 @@ struct DPP_EXPORT guild_member_add_t : public event_dispatch_t {
 	/**
 	 * @brief guild which gained new member
 	 */
-	guild adding_guild;
+	guild* adding_guild = nullptr;
 
 	/**
 	 * @brief member which was added
@@ -1667,7 +1545,7 @@ struct DPP_EXPORT guild_update_t : public event_dispatch_t {
 	/**
 	 * @brief guild being updated
 	 */
-	guild updated;
+	guild* updated = nullptr;
 };
 
 /**
@@ -1680,7 +1558,7 @@ struct DPP_EXPORT guild_integrations_update_t : public event_dispatch_t {
 	/**
 	 * @brief guild where integrations are being updated
 	 */
-	guild updating_guild;
+	guild* updating_guild = nullptr;
 };
 
 /**
@@ -1693,7 +1571,7 @@ struct DPP_EXPORT guild_member_update_t : public event_dispatch_t {
 	/**
 	 * @brief guild where member is being updated
 	 */
-	guild updating_guild;
+	guild* updating_guild = nullptr;
 
 	/**
 	 * @brief member being updated
@@ -1796,108 +1674,6 @@ struct DPP_EXPORT message_create_t : public event_dispatch_t {
 	 * @note confirmation_callback_t::value contains a message object on success. On failure, value is undefined and confirmation_callback_t::is_error() is true.
 	 */
 	void reply(message&& msg, bool mention_replied_user = false, command_completion_event_t callback = utility::log_error()) const;
-
-#ifndef DPP_NO_CORO
-	/**
-	 * @brief Send a text to the same channel as the channel_id in received event.
-	 * 
-	 * @param m Text to send
-	 * On success the result will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
-	 */
-	dpp::async<dpp::confirmation_callback_t> co_send(std::string m) const;
-
-	/**
-	 * @brief Send a message to the same channel as the channel_id in received event.
-	 * 
-	 * @param msg Message to send
-	 * On success the result will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
-	 */
-	dpp::async<dpp::confirmation_callback_t> co_send(message msg) const;
-
-	/**
-	 * @brief Reply to the message received in the event.
-	 *
-	 * @param m Text to send as a reply.
-	 * @param mention_replied_user mentions (pings) the author of message replied to, if true
-	 * On success the result will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
-	 */
-	dpp::async<dpp::confirmation_callback_t> co_reply(std::string m, bool mention_replied_user = false) const;
-
-	/**
-	 * @brief Reply to the message received in the event.
-	 *
-	 * @param msg Message to send as a reply.
-	 * @param mention_replied_user mentions (pings) the author of message replied to, if true
-	 * On success the result will contain a dpp::confirmation object in confirmation_callback_t::value. On failure, the value is undefined and confirmation_callback_t::is_error() method will return true. You can obtain full error details with confirmation_callback_t::get_error().
-	 */
-	dpp::async<dpp::confirmation_callback_t> co_reply(message msg, bool mention_replied_user = false) const;
-#endif /* DPP_NO_CORO */
-};
-
-/**
- * @brief Message poll vote add
- */
-struct DPP_EXPORT message_poll_vote_add_t : public event_dispatch_t {
-	using event_dispatch_t::event_dispatch_t;
-	using event_dispatch_t::operator=;
-
-	/**
-	 * @brief ID of the user who added the vote
-	 */
-	snowflake user_id;
-
-	/**
-	 * @brief ID of the channel containing the vote
-	 */
-	snowflake channel_id;
-
-	/**
-	 * @brief ID of the message containing the vote
-	 */
-	snowflake message_id;
-
-	/**
-	 * @brief ID of the guild containing the vote or 0 for DMs
-	 */
-	snowflake guild_id;
-
-	/**
-	 * @brief ID of the answer in the message poll object
-	 */
-	uint32_t answer_id;
-};
-
-/**
- * @brief Message poll vote remove
- */
-struct DPP_EXPORT message_poll_vote_remove_t : public event_dispatch_t {
-	using event_dispatch_t::event_dispatch_t;
-	using event_dispatch_t::operator=;
-
-	/**
-	 * @brief ID of the user who added the vote
-	 */
-	snowflake user_id;
-
-	/**
-	 * @brief ID of the channel containing the vote
-	 */
-	snowflake channel_id;
-
-	/**
-	 * @brief ID of the message containing the vote
-	 */
-	snowflake message_id;
-
-	/**
-	 * @brief ID of the guild containing the vote or 0 for DMs
-	 */
-	snowflake guild_id;
-
-	/**
-	 * @brief ID of the answer in the message poll object
-	 */
-	uint32_t answer_id;
 };
 
 /**
@@ -1923,7 +1699,7 @@ struct DPP_EXPORT guild_ban_add_t : public event_dispatch_t {
 	/**
 	 * @brief guild where ban was added
 	 */
-	guild banning_guild;
+	guild* banning_guild = nullptr;
 
 	/**
 	 * @brief user being banned
@@ -1941,7 +1717,7 @@ struct DPP_EXPORT guild_ban_remove_t : public event_dispatch_t {
 	/**
 	 * @brief guild where ban is being removed
 	 */
-	guild unbanning_guild;
+	guild* unbanning_guild = nullptr;
 
 	/**
 	 * @brief user being unbanned
@@ -1998,7 +1774,7 @@ struct DPP_EXPORT thread_create_t : public event_dispatch_t {
 	/**
 	 * @brief guild where thread was created
 	 */
-	guild creating_guild;
+	guild* creating_guild = nullptr;
 
 	/**
 	 * @brief thread created
@@ -2016,7 +1792,7 @@ struct DPP_EXPORT thread_update_t : public event_dispatch_t {
 	/**
 	 * @brief guild where thread was updated
 	 */
-	guild updating_guild;
+	guild* updating_guild = nullptr;
 
 	/**
 	 * @brief thread updated
@@ -2034,7 +1810,7 @@ struct DPP_EXPORT thread_delete_t : public event_dispatch_t {
 	/**
 	 * @brief guild where thread was deleted
 	 */
-	guild deleting_guild;
+	guild* deleting_guild = nullptr;
 
 	/**
 	 * @brief thread deleted
@@ -2052,7 +1828,7 @@ struct DPP_EXPORT thread_list_sync_t : public event_dispatch_t {
 	/**
 	 * @brief guild where thread list was synchronised
 	 */
-	guild updating_guild;
+	guild* updating_guild = nullptr;
 
 	/**
 	 * @brief list of threads (channels) synchronised
@@ -2127,16 +1903,34 @@ struct DPP_EXPORT voice_buffer_send_t : public event_dispatch_t {
 	/**
 	 * @brief encoded size of sent buffer
 	 */
-	uint64_t buffer_size = 0;
-
-	/**
-	 * @brief number of packet waiting to be sent in the queue
-	 */
-	size_t packets_left = 0;
+	int buffer_size = 0;
 };
 
 /**
- * @brief voice ready
+ * @brief voice user talking
+ */
+struct DPP_EXPORT voice_user_talking_t : public event_dispatch_t {
+	using event_dispatch_t::event_dispatch_t;
+	using event_dispatch_t::operator=;
+
+	/**
+	 * @brief voice client where user is talking
+	 */
+	class discord_voice_client* voice_client = nullptr;
+
+	/**
+	 * @brief talking user id
+	 */
+	snowflake user_id = {};
+
+	/**
+	 * @brief flags for talking user
+	 */
+	uint8_t talking_flags = 0;
+};
+
+/**
+ * @brief voice user talking
  */
 struct DPP_EXPORT voice_ready_t : public event_dispatch_t {
 	using event_dispatch_t::event_dispatch_t;
@@ -2165,28 +1959,28 @@ struct DPP_EXPORT voice_receive_t : public event_dispatch_t {
 	/**
 	 * @brief Construct a new voice receive t object
 	 *
-	 * @param creator The creating cluster
-	 * @param shard_id Shard the voice channel exists on
+	 * @param client The shard the event originated on.
+	 * WILL ALWAYS be NULL.
 	 * @param raw Raw event text as UDP packet.
 	 * @param vc owning voice client pointer
 	 * @param _user_id user id who is speaking, 0 for a mix of all user audio
 	 * @param pcm user audio to set
 	 * @param length length of user audio in bytes
 	 */
-	voice_receive_t(dpp::cluster* creator, uint32_t shard_id, const std::string& raw, class discord_voice_client* vc, snowflake _user_id, const uint8_t* pcm, size_t length);
+	voice_receive_t(discord_client* client, const std::string& raw, class discord_voice_client* vc, snowflake _user_id, const uint8_t* pcm, size_t length);
 
 	/**
 	 * @brief Construct a new voice receive t object
 	 *
-	 * @param creator The creating cluster
-	 * @param shard_id Shard the voice channel exists on
+	 * @param client The shard the event originated on.
+	 * WILL ALWAYS be NULL.
 	 * @param raw Raw event text as UDP packet.
 	 * @param vc owning voice client pointer
 	 * @param _user_id user id who is speaking, 0 for a mix of all user audio
 	 * @param pcm user audio to set
 	 * @param length length of user audio in bytes
 	 */
-	voice_receive_t(dpp::cluster* creator, uint32_t shard_id, std::string&& raw, class discord_voice_client* vc, snowflake _user_id, const uint8_t* pcm, size_t length);
+	voice_receive_t(discord_client* client, std::string&& raw, class discord_voice_client* vc, snowflake _user_id, const uint8_t* pcm, size_t length);
 
 	/**
 	 * @brief Voice client
@@ -2208,7 +2002,7 @@ struct DPP_EXPORT voice_receive_t : public event_dispatch_t {
 	/**
 	 * @brief Audio data, encoded as 48kHz stereo PCM or Opus,
 	 */
-	std::vector<uint8_t> audio_data = {};
+	std::basic_string<uint8_t> audio_data = {};
 
 	/**
 	 * @brief User ID of speaker (zero if unknown)
@@ -2269,44 +2063,6 @@ struct DPP_EXPORT voice_client_disconnect_t : public event_dispatch_t {
 };
 
 /**
- * @brief Discord voice platform types
- */
-enum client_platform_t : uint8_t {
-	/**
-	 * @brief Web, Desktop
-	 */
-	client_platform_desktop = 0,
-	/**
-	 * @brief Mobile device
-	 */
-	client_platform_mobile = 1,
-};
-
-/**
- * @brief voice client platform type notification event
- */
-struct DPP_EXPORT voice_client_platform_t : public event_dispatch_t {
-	using event_dispatch_t::event_dispatch_t;
-	using event_dispatch_t::operator=;
-
-	/**
-	 * @brief voice client where user is
-	 */
-	discord_voice_client* voice_client = nullptr;
-
-	/**
-	 * @brief user id of user who left vc
-	 */
-	snowflake user_id = {};
-
-	/**
-	 * @brief Client platform for the voice user
-	 * Either desktop, or mobile
-	 */
-	client_platform_t platform = client_platform_desktop;
-};
-
-/**
  * @brief Delete stage instance
  */
 struct DPP_EXPORT entitlement_create_t : public event_dispatch_t {
@@ -2345,5 +2101,5 @@ struct DPP_EXPORT entitlement_delete_t : public event_dispatch_t {
 	entitlement deleted = {};
 };
 
-}
+} // namespace dpp
 

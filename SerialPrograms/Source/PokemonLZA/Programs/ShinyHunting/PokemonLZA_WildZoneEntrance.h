@@ -13,12 +13,12 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 #include "PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h"
-#include "PokemonLZA/Programs/PokemonLZA_Locations.h"
+#include "PokemonLZA/Resources/PokemonLZA_Locations.h"
 
 namespace PokemonAutomation::NintendoSwitch::PokemonLZA {
 
 
-class WildZoneOption : public EnumDropdownOption<WildZone>{
+class WildZoneOption : public EnumDropdownOption<Location>{
 public:
     WildZoneOption();
 };

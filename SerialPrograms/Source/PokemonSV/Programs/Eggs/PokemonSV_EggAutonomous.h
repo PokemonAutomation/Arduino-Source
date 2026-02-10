@@ -72,7 +72,8 @@ private:
 private:
     // Will need this to preserve raid den
     // TouchDateIntervalOption TOUCH_DATE_INTERVAL;
-
+    
+    DeferredStopButtonOption STOP_AFTER_CURRENT;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     OCR::LanguageOCROption LANGUAGE;

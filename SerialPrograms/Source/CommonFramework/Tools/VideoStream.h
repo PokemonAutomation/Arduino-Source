@@ -18,13 +18,12 @@
 #define PokemonAutomation_VideoPipeline_VideoStream_H
 
 #include <string>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Containers/Pimpl.h"
 
 namespace PokemonAutomation{
 
 class CancellableScope;
-class AsyncDispatcher;
 class Logger;
 class AudioFeed;
 class VideoFeed;
@@ -73,7 +72,7 @@ public:
 
 
 public:
-    void initialize_inference_threads(CancellableScope& scope, AsyncDispatcher& dispatcher);
+    void initialize_inference_threads(CancellableScope& scope);
 
 
 private:

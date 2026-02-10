@@ -21,15 +21,14 @@
  ************************************************************************************/
 #pragma once
 #include <dpp/export.h>
-#include <cstddef>
-#include <cstdint>
+#include <stddef.h>
 
 namespace dpp {
 
 /**
  * @brief Supported image types for profile pictures and CDN endpoints
  */
-enum image_type : uint8_t {
+enum image_type {
 	/**
 	 * @brief image/png
 	 */
@@ -48,6 +47,7 @@ enum image_type : uint8_t {
 	/**
 	 * @brief Webp.
 	 */
+	/// WebP
 	i_webp,
 };
 
@@ -86,4 +86,4 @@ enum loglevel {
 	ll_critical
 };
 
-}
+} // namespace dpp

@@ -4,8 +4,9 @@
  *
  */
 
-#include <mutex>
-#include <condition_variable>
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "Common/Cpp/Logging/TaggedLogger.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "Controllers/ControllerConnection.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h"
@@ -24,7 +25,7 @@ namespace NintendoSwitch{
 class PybindSwitchProControllerInternal final : public ControllerConnection::StatusListener{
 public:
     PybindSwitchProControllerInternal(const std::string& name)
-        : m_logger(global_logger_raw(), "[Pybind]")
+        : m_logger(global_logger_raw(), "Pybind")
         , m_descriptor(name)
         , m_connection(m_descriptor.open_connection(m_logger, false))
     {
@@ -35,7 +36,7 @@ public:
     }
 
     bool wait_for_ready(uint64_t timeout_millis){
-        std::unique_lock<std::mutex> lg(m_lock);
+        std::unique_lock<Mutex> lg(m_lock);
         m_cv.wait_for(lg, Milliseconds(timeout_millis), [this]{
             return m_connected;
         });
@@ -62,7 +63,7 @@ public:
         }
 
         {
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
             m_connected = true;
         }
         m_cv.notify_all();
@@ -80,9 +81,9 @@ public:
     std::unique_ptr<AbstractController> m_controller;
     std::atomic<ProController*> m_procon;
 
-    std::mutex m_lock;
     bool m_connected = false;
-    std::condition_variable m_cv;
+    Mutex m_lock;
+    ConditionVariable m_cv;
 };
 
 

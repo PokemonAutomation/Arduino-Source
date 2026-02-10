@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_EarlyShutdown_H
 #define PokemonAutomation_EarlyShutdown_H
 
-#include "AbstractLogger.h"
+#include "Logging/AbstractLogger.h"
 
 namespace PokemonAutomation{
 

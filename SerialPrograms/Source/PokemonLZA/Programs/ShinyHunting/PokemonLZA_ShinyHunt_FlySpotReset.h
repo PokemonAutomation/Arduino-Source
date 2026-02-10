@@ -29,9 +29,11 @@ public:
 };
 
 
-class ShinyHunt_FlySpotReset : public SingleSwitchProgramInstance{
+class ShinyHunt_FlySpotReset : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
     ShinyHunt_FlySpotReset();
+
+    virtual ~ShinyHunt_FlySpotReset();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
@@ -45,6 +47,8 @@ public:
     };
 
 private:
+    void on_config_value_changed(void* object) override;
+
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
     ShinySoundDetectedActionOption SHINY_DETECTED;
     EnumDropdownOption<Route> ROUTE;

@@ -43,7 +43,7 @@ void run_professor_swap(
     bool swap = should_swap_with_professor(stream.logger(), inferred, player_index);
     if (swap){
         stream.log("Choosing to swap.", COLOR_PURPLE);
-        std::lock_guard<std::mutex> lg(runtime.m_delay_lock);
+        std::lock_guard<Mutex> lg(runtime.m_delay_lock);
         pbf_press_button(context, BUTTON_A, 200ms, 800ms);
         context.wait_for_all_requests();
     }else{

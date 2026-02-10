@@ -84,7 +84,7 @@ std::array<std::string, 10> ItemPrinterPrizeReader::read_prizes(
     //  OCR 20 things in parallel.
     OCR::StringMatchResult results[20];
 
-    GlobalThreadPools::normal_inference().run_in_parallel(
+    GlobalThreadPools::computation_normal().run_in_parallel(
         [&](size_t index){
             if (index < 10){
                 results[index] = ItemPrinterPrizeOCR::instance().read_substring(
@@ -149,7 +149,7 @@ std::array<int16_t, 10> ItemPrinterPrizeReader::read_quantity(
 
     std::array<int16_t, 10> results;
 
-    GlobalThreadPools::normal_inference().run_in_parallel(
+    GlobalThreadPools::computation_normal().run_in_parallel(
         [&](size_t index){
             results[index] = read_number(logger, screen, boxes[index], (int8_t)index);
         },

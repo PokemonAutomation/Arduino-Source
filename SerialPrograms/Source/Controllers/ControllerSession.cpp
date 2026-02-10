@@ -206,7 +206,7 @@ void ControllerSession::make_controller(
 bool ControllerSession::set_device(const std::shared_ptr<const ControllerDescriptor>& device){
 //    cout << "ControllerSession::set_device() = " << device->display_name() << endl;
     {
-        std::lock_guard<std::mutex> lg0(m_reset_lock);
+        std::lock_guard<Mutex> lg0(m_reset_lock);
 
         //  Destroy the current connection+controller.
         std::unique_ptr<AbstractController> controller;
@@ -245,7 +245,7 @@ bool ControllerSession::set_controller(ControllerType controller_type){
 //    cout << "ControllerSession::set_controller()" << endl;
     std::shared_ptr<const ControllerDescriptor> device;
     {
-        std::lock_guard<std::mutex> lg0(m_reset_lock);
+        std::lock_guard<Mutex> lg0(m_reset_lock);
 
         //  Destroy the current connection+controller.
         std::unique_ptr<AbstractController> controller;
@@ -284,7 +284,7 @@ std::string ControllerSession::reset(bool clear_settings){
 //    cout << "ControllerSession::reset()" << endl;
 
     {
-        std::lock_guard<std::mutex> lg0(m_reset_lock);
+        std::lock_guard<Mutex> lg0(m_reset_lock);
 
 //        std::optional<ControllerType> change_controller;
 

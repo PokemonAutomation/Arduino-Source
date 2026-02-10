@@ -8,10 +8,11 @@
 #define PokemonAutomation_ClientSocket_WinSocket_H
 
 #include <iostream>
-#include <mutex>
-#include <condition_variable>
 #include <winsock.h>
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "AbstractClientSocket.h"
 
 #pragma comment(lib, "Ws2_32.lib")
@@ -22,8 +23,9 @@ namespace PokemonAutomation{
 
 class ClientSocket_WinSocket final : public AbstractClientSocket{
 public:
-    ClientSocket_WinSocket()
-        : m_socket(::socket(AF_INET, SOCK_STREAM, 0))
+    ClientSocket_WinSocket(ThreadPool& thread_pool)
+        : m_thread_pool(thread_pool)
+        , m_socket(::socket(AF_INET, SOCK_STREAM, 0))
     {
         u_long non_blocking = 1;
         if (ioctlsocket(m_socket, FIONBIO, &non_blocking)){
@@ -35,25 +37,25 @@ public:
 
     virtual ~ClientSocket_WinSocket(){
         close();
-        m_thread.join();
+        m_thread.wait_and_ignore_exceptions();
         close_socket();
     }
     virtual void close() noexcept override{
         {
-            std::lock_guard<std::mutex> lg1(m_lock);
+            std::lock_guard<Mutex> lg1(m_lock);
             m_state.store(State::DESTRUCTING, std::memory_order_relaxed);
             m_cv.notify_all();
         }
     }
 
     virtual void connect(const std::string& address, uint16_t port) override{
-        std::lock_guard<std::mutex> lg1(m_lock);
+        std::lock_guard<Mutex> lg1(m_lock);
         if (m_state.load(std::memory_order_relaxed) != State::NOT_RUNNING){
             return;
         }
         try{
             m_state.store(State::CONNECTING, std::memory_order_relaxed);
-            m_thread = Thread([&, this]{
+            m_thread = m_thread_pool.blocking_dispatch([=, this]{
                 thread_loop(address, port);
             });
         }catch (...){
@@ -88,7 +90,7 @@ public:
             int error = WSAGetLastError();
 //            cout << "error = " << error << endl;
 
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
             if (state() == State::DESTRUCTING){
                 break;
             }
@@ -135,7 +137,7 @@ private:
         m_listeners.run_method(&Listener::on_thread_start);
 
         {
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
 
             sockaddr_in server;
             server.sin_family = AF_INET;
@@ -209,7 +211,7 @@ Connected:
                 continue;
             }
 
-            std::unique_lock<std::mutex> lg(m_lock);
+            std::unique_lock<Mutex> lg(m_lock);
             if (state() == State::DESTRUCTING){
                 return;
             }
@@ -232,13 +234,14 @@ Connected:
 
 
 private:
+    ThreadPool& m_thread_pool;
     const SOCKET m_socket;
 
     std::string m_error;
 
-    mutable std::mutex m_lock;
-    std::condition_variable m_cv;
-    Thread m_thread;
+    mutable Mutex m_lock;
+    ConditionVariable m_cv;
+    AsyncTask m_thread;
 };
 
 

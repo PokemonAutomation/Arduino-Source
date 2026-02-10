@@ -6,9 +6,9 @@
 
 #include <cmath>
 #include <QFile>
+#include "Common/Cpp/Strings/Unicode.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonTools/OCR/OCR_StringNormalization.h"
 #include "CommonTools/OCR/OCR_TextMatcher.h"
@@ -95,7 +95,7 @@ bool check_ban_for_name(
     matches.emplace_back(TeraLobbyNameMatchResult{
         entry, banlist_source,
         ocr_name,
-        to_utf8(normalized_ocr_name),
+        utf32_to_str(normalized_ocr_name),
         log10p, distance == 0,
         entry.notes
     });
@@ -366,7 +366,7 @@ void TeraLobbyNameWatcher::get_last_known_state(
     std::array<std::map<Language, std::string>, 4>& names,
     std::vector<TeraLobbyNameMatchResult>& bans
 ){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     names = m_last_known_names;
     bans = m_last_known_bans;
 }
@@ -426,7 +426,7 @@ bool TeraLobbyNameWatcher::process_frame(const ImageViewRGB32& frame, WallClock 
     }
 
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
 //        m_last_known_players.store(players, std::memory_order_relaxed);
         m_last_known_names = std::move(names);
         m_last_known_bans = std::move(match_list);

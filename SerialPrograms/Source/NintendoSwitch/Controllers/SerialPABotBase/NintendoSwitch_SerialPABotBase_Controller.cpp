@@ -45,7 +45,7 @@ SerialPABotBase_Controller::SerialPABotBase_Controller(
 
 
 void SerialPABotBase_Controller::cancel_all_commands(){
-    std::lock_guard<std::mutex> lg(m_state_lock);
+    std::lock_guard<Mutex> lg(m_state_lock);
     if (!is_ready()){
         throw InvalidConnectionStateException(error_string());
     }
@@ -53,7 +53,7 @@ void SerialPABotBase_Controller::cancel_all_commands(){
     m_scheduler.clear_on_next();
 }
 void SerialPABotBase_Controller::replace_on_next_command(){
-    std::lock_guard<std::mutex> lg(m_state_lock);
+    std::lock_guard<Mutex> lg(m_state_lock);
     if (!is_ready()){
         throw InvalidConnectionStateException(error_string());
     }
@@ -64,9 +64,9 @@ void SerialPABotBase_Controller::replace_on_next_command(){
 
 void SerialPABotBase_Controller::wait_for_all(Cancellable* cancellable){
     SuperscalarScheduler::Schedule schedule;
-    std::lock_guard<std::mutex> lg0(m_issue_lock);
+    std::lock_guard<Mutex> lg0(m_issue_lock);
     {
-        std::lock_guard<std::mutex> lg1(m_state_lock);
+        std::lock_guard<Mutex> lg1(m_state_lock);
 
         ThrottleScope scope(m_logging_throttler);
         if (scope){

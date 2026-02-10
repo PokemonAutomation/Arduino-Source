@@ -5,8 +5,8 @@
  */
 
 #include <string.h>
-#include <mutex>
 #include "Common/Cpp/Containers/Pimpl.tpp"
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "MacAddressOption.h"
 
@@ -55,7 +55,7 @@ void parse_MAC_address(size_t length, uint8_t* address, const std::string& str){
 
 
 struct MacAddressCell::Data{
-    mutable std::mutex m_lock;
+    mutable Mutex m_lock;
     std::vector<uint8_t> m_current;
 
     Data(size_t bytes, const uint8_t* current)
@@ -82,7 +82,7 @@ void MacAddressCell::operator=(const MacAddressCell& x){
         );
     }
     {
-        std::scoped_lock<std::mutex, std::mutex> lg(m_data->m_lock, x.m_data->m_lock);
+        std::scoped_lock<Mutex, Mutex> lg(m_data->m_lock, x.m_data->m_lock);
         memcpy(m_data->m_current.data(), x.m_data->m_current.data(), bytes());
     }
     report_value_changed(this);
@@ -101,16 +101,16 @@ size_t MacAddressCell::bytes() const{
     return m_data->m_current.size();
 }
 std::string MacAddressCell::to_string() const{
-    std::lock_guard<std::mutex> lg(m_data->m_lock);
+    std::lock_guard<Mutex> lg(m_data->m_lock);
     return write_MAC_address(m_data->m_current.size(), m_data->m_current.data());
 }
 void MacAddressCell::current_value(uint8_t* address) const{
-    std::lock_guard<std::mutex> lg(m_data->m_lock);
+    std::lock_guard<Mutex> lg(m_data->m_lock);
     memcpy(address, m_data->m_current.data(), m_data->m_current.size());
 }
 void MacAddressCell::set(const uint8_t* address){
     {
-        std::lock_guard<std::mutex> lg(m_data->m_lock);
+        std::lock_guard<Mutex> lg(m_data->m_lock);
         if (memcmp(m_data->m_current.data(), address, m_data->m_current.size()) == 0){
             return;
         }
@@ -126,7 +126,7 @@ void MacAddressCell::set(const std::string& address){
 
 
 bool MacAddressCell::operator==(const uint8_t* address) const{
-    std::lock_guard<std::mutex> lg(m_data->m_lock);
+    std::lock_guard<Mutex> lg(m_data->m_lock);
     return memcmp(m_data->m_current.data(), address, m_data->m_current.size()) == 0;
 }
 

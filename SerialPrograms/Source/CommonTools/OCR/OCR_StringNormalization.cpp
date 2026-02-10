@@ -7,6 +7,7 @@
 #include <map>
 #include <QString>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Strings/Unicode.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/StringToolsQt.h"
@@ -50,16 +51,16 @@ std::map<char32_t, std::u32string> make_substitution_map32(){
     for (auto& item : obj){
         const std::string& target = item.first;
         std::string& sources = item.second.to_string_throw(path);
-        for (char32_t ch : to_utf32(sources)){
+        for (char32_t ch : utf8_to_utf32(sources)){
             auto iter = map.find(ch);
             if (iter != map.end()){
                 throw FileException(
                     nullptr, PA_CURRENT_FUNCTION,
-                    to_utf8(to_utf32("Duplicate character reduction: ") + ch),
+                    utf32_to_str(utf8_to_utf32("Duplicate character reduction: ") + ch),
                     std::move(path)
                 );
             }
-            map[ch] = to_utf32(target);
+            map[ch] = utf8_to_utf32(target);
         }
     }
     return map;

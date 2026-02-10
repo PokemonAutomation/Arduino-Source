@@ -104,20 +104,20 @@ private:
 
 
 
-PeriodicRunner::PeriodicRunner(AsyncDispatcher& dispatcher)
-    : m_dispatcher(dispatcher)
+PeriodicRunner::PeriodicRunner(ThreadPool& thread_pool)
+    : m_thread_pool(thread_pool)
     , m_pending_waits(0)
 {}
 bool PeriodicRunner::add_event(void* event, std::chrono::milliseconds period, WallClock start){
     throw_if_cancelled();
 
     m_pending_waits++;
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     m_pending_waits--;
 
     //  Thread not started yet. Do this first for strong exception safety.
     if (!m_runner){
-        m_runner = m_dispatcher.dispatch([this]{ thread_loop(); });
+        m_runner = m_thread_pool.dispatch_now_blocking([this]{ thread_loop(); });
     }
 
     bool ret = m_scheduler.add_event(event, period, start);
@@ -126,7 +126,7 @@ bool PeriodicRunner::add_event(void* event, std::chrono::milliseconds period, Wa
 }
 void PeriodicRunner::remove_event(void* event){
     m_pending_waits++;
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     m_pending_waits--;
     m_scheduler.remove_event(event);
     m_cv.notify_all();
@@ -140,13 +140,13 @@ bool PeriodicRunner::cancel(std::exception_ptr exception) noexcept{
     if (Cancellable::cancel(std::move(exception))){
         return true;
     }
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
     m_cv.notify_all();
     return false;
 }
 void PeriodicRunner::thread_loop(){
     bool is_back_to_back = false;
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
     WallClock last_check_timestamp = current_time();
     WallDuration idle_since_last_check = WallDuration(0);
     while (true){
@@ -196,9 +196,9 @@ void PeriodicRunner::thread_loop(){
         idle_since_last_check += end - start;
     }
 }
-void PeriodicRunner::stop_thread(){
+void PeriodicRunner::stop_thread() noexcept{
     PeriodicRunner::cancel(nullptr);
-    m_runner.reset();
+    m_runner.wait_and_ignore_exceptions();
 }
 
 double PeriodicRunner::current_utilization() const{

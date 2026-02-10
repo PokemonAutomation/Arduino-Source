@@ -551,6 +551,22 @@ void confirm_lead_pokemon_moves(SingleSwitchProgramEnvironment& env, ProControll
 
 }
 
+void confirm_minimap_unlocked(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    DirectionDetector direction;
+    try{
+        direction.change_direction(env.program_info(), env.console, context, 3.02);
+        pbf_press_button(context, BUTTON_L, 200ms, 200ms);
+    }catch(OperationFailedException&){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "confirm_minimap_unlocked(): Unable to confirm that the minimap is unlocked. Likely because the direction cannot be detected. "
+            "If you manually confirm that the minimap is unlocked, you can disable this precheck in the program setting \"Pre-check: Ensure the minimap is unlocked\".",
+            env.console
+        );
+    }
+
+}
+
 void change_settings_prior_to_autostory_segment_mode(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t current_segment_num, Language language){
     // get index of `Options` in the Main Menu, which depends on where you are in Autostory
     int8_t options_index;  
@@ -759,9 +775,10 @@ void change_settings(SingleSwitchProgramEnvironment& env, ProControllerContext& 
         config_option(context, 1); // Helping Functions: Off
     }
 
-    pbf_mash_button(context, BUTTON_A, 1000ms);
+    pbf_mash_button(context, BUTTON_A, 500ms);
+    env.console.log("Confirm that we want to save the settings.");
     clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5, {CallbackEnum::PROMPT_DIALOG});
-    
+    env.console.log("Settings saved.");
 }
 
 void do_action_and_monitor_for_battles(
@@ -813,8 +830,10 @@ void do_action_and_monitor_for_battles_early(
         {no_minimap}
     );
     if (ret == 0){  // if see no minimap. stop and see if we detect a battle. if so, throw Battl exception
+        stream.log("do_action_and_monitor_for_battles_early: Detected no mini-map. Possibly caught in a battle.");
         do_action_and_monitor_for_battles(info, stream, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            // wait 30 seconds to see if we detect a battle. If so, this throws an UnexpectedBattleException.
             pbf_wait(context, Seconds(30));
         });
 
@@ -1879,7 +1898,7 @@ void confirm_titan_battle(SingleSwitchProgramEnvironment& env, ProControllerCont
         // cout << "hp_bar_stats.average.sum(): " << hp_bar_stats.average.sum() << endl;    
         // expected color is green: {R 25-32, G 255, B 32-76}  {30, 255, 55}. total = 30+255+55 = 340
         // 30/340, 255/340, 55/340
-        is_green_hp_bar = is_solid(hp_bar_stats, {0.088235, 0.75, 0.161765}, 0.15, 30);
+        is_green_hp_bar = is_solid(hp_bar_stats, {0.088235, 0.75, 0.161765}, 0.25, 30);
         if (is_green_hp_bar){
             break;
         }

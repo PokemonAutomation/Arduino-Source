@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 
 
 SnapshotManager::~SnapshotManager(){
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
     m_cv.wait(lg, [this]{ return m_active_conversions == 0; });
 }
 SnapshotManager::SnapshotManager(Logger& logger, QVideoFrameCache& cache)
@@ -57,7 +57,7 @@ void SnapshotManager::convert(uint64_t seqnum, QVideoFrame frame, WallClock time
 
     ObjectsToGC objects_to_gc;
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
 //        cout << "SnapshotManager::convert() - post convert: " << seqnum << endl;
 
         if (m_converted_seqnum < seqnum){
@@ -77,7 +77,7 @@ void SnapshotManager::convert(uint64_t seqnum, QVideoFrame frame, WallClock time
     objects_to_gc.destroy_now();
 
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_active_conversions--;
 
         //  Warning: The moment we release the lock with (m_active_conversions == 0),
@@ -90,7 +90,7 @@ void SnapshotManager::convert(uint64_t seqnum, QVideoFrame frame, WallClock time
 bool SnapshotManager::try_dispatch_conversion(uint64_t seqnum, QVideoFrame frame, WallClock timestamp) noexcept{
     //  Must call under the lock.
 
-    std::unique_ptr<AsyncTask>* task;
+    AsyncTask* task;
     try{
         task = &m_pending_conversions[seqnum];
 
@@ -107,7 +107,7 @@ bool SnapshotManager::try_dispatch_conversion(uint64_t seqnum, QVideoFrame frame
             convert(seqnum, std::move(frame), timestamp);
         };
 
-        *task = GlobalThreadPools::realtime_inference().try_dispatch(lambda);
+        *task = GlobalThreadPools::computation_realtime().try_dispatch_now(lambda);
 
         //  Dispatch was successful. We're done.
         if (*task){
@@ -150,7 +150,7 @@ SnapshotManager::ObjectsToGC SnapshotManager::cleanup(){
     //  Cleanup finished tasks.
     while (!m_pending_conversions.empty()){
         auto iter = m_pending_conversions.begin();
-        if (iter->second->is_finished()){
+        if (iter->second.is_finished()){
             ret.tasks_to_free.emplace_back(std::move(iter->second));
             m_pending_conversions.erase(iter);
         }else{
@@ -176,12 +176,12 @@ SnapshotManager::ObjectsToGC SnapshotManager::cleanup(){
 VideoSnapshot SnapshotManager::snapshot_latest_blocking(){
     ObjectsToGC objects_to_gc;
     {
-        std::unique_lock<std::mutex> lg(m_lock);
+        std::unique_lock<Mutex> lg(m_lock);
         objects_to_gc = cleanup();
     }
     objects_to_gc.destroy_now();
 
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<Mutex> lg(m_lock);
 
 //    cout << "snapshot_latest_blocking()" << endl;
 
@@ -214,7 +214,7 @@ VideoSnapshot SnapshotManager::snapshot_latest_blocking(){
     try{
         uint32_t microseconds;
         {
-            ReverseLockGuard<std::mutex> lg0(m_lock);
+            ReverseLockGuard<Mutex> lg0(m_lock);
             WallClock time0 = current_time();
             snapshot = VideoSnapshot(frame_to_image(frame), timestamp);
             WallClock time1 = current_time();
@@ -238,7 +238,7 @@ VideoSnapshot SnapshotManager::snapshot_latest_blocking(){
 VideoSnapshot SnapshotManager::snapshot_recent_nonblocking(WallClock min_time){
 //    WallClock now = current_time();
 
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
 
     //  Already up-to-date. Return it.
     uint64_t seqnum = m_cache.seqnum();

@@ -10,7 +10,7 @@
 #include <QComboBox>
 #include <QPushButton>
 #include <QFileDialog>
-#include <filesystem>
+#include "Common/Cpp/Filesystem.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 
@@ -83,7 +83,7 @@ ImageAnnotationSourceSelectorWidget::ImageAnnotationSourceSelectorWidget(ImageAn
             const std::string& image_path = m_session.option().m_image_path;
             std::string starting_dir = ".";
             if (image_path.size() > 0){
-                starting_dir = std::filesystem::path(image_path).parent_path().string();
+                starting_dir = Filesystem::Path(image_path).parent_path().string();
             }
             const std::string path = QFileDialog::getOpenFileName(
                 nullptr, "Open image file", QString::fromStdString(starting_dir), "*.png *.jpg *.jpeg"
@@ -156,7 +156,7 @@ void ImageAnnotationSourceSelectorWidget::post_startup(VideoSource* source){
     const std::string& image_path = m_session.option().m_image_path;
     m_source_file_path_label->setText(QString::fromStdString(image_path));
 
-    const auto path = std::filesystem::path(image_path);
+    const auto path = Filesystem::Path(image_path);
     const auto filename = path.filename();
     const std::string folder_path = path.parent_path().string();
     const bool recursive_search = false;
@@ -165,7 +165,7 @@ void ImageAnnotationSourceSelectorWidget::post_startup(VideoSource* source){
     const size_t num_images = m_image_paths_in_folder.size();
     m_cur_image_file_idx_in_folder = SIZE_MAX;
     for (size_t i = 0; i < num_images; i++){
-        if (std::filesystem::path(m_image_paths_in_folder[i]).filename() == filename){
+        if (Filesystem::Path(m_image_paths_in_folder[i]).filename() == filename){
             m_cur_image_file_idx_in_folder = i;
         }
     }

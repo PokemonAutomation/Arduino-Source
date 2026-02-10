@@ -85,7 +85,7 @@ void SuperControlSession<ControllerType>::run_session(){
 
     m_active_command.reset(
         new AsyncCommandSession<ControllerType>(
-            m_context, m_env.logger(), m_env.realtime_dispatcher(),
+            m_context, m_env.logger(),
             m_context.controller()
         )
     );

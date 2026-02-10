@@ -33,7 +33,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    EnumDropdownOption<WildZoneCafe> CAFE;
+    EnumDropdownOption<Location> CAFE;
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
 
     SimpleIntegerOption<uint64_t> NUM_VISITS;

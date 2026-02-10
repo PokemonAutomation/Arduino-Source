@@ -35,7 +35,7 @@ void DonutBerriesSelectionDetector::make_overlays(VideoOverlaySet& items) const{
 bool DonutBerriesSelectionDetector::detect(const ImageViewRGB32& screen){
     // Match the pink bar:
     ImageViewRGB32 symbol = extract_box_reference(screen, m_symbol_box);
-    return is_solid(symbol, { 0.4375, 0.268, 0.295 }, 0.05, 10);
+    return is_solid(symbol, { 0.4375, 0.268, 0.295 }, 0.05, 15);
 }
 
 

@@ -17,25 +17,26 @@ file(GLOB LIBRARY_SOURCES
     ../Common/ControllerStates/NintendoSwitch_OemController_State.c
     ../Common/ControllerStates/NintendoSwitch_OemController_State.h
     ../Common/ControllerStates/NintendoSwitch_WiredController_State.h
-    ../Common/Cpp/AbstractLogger.h
     ../Common/Cpp/BitmapConversion.cpp
     ../Common/Cpp/BitmapConversion.h
     ../Common/Cpp/CancellableScope.cpp
     ../Common/Cpp/CancellableScope.h
     ../Common/Cpp/Color.cpp
     ../Common/Cpp/Color.h
-    ../Common/Cpp/Concurrency/AsyncDispatcher.cpp
-    ../Common/Cpp/Concurrency/AsyncDispatcher.h
-    ../Common/Cpp/Concurrency/AsyncTask.cpp
     ../Common/Cpp/Concurrency/AsyncTask.h
-    ../Common/Cpp/Concurrency/ComputationThreadPool.cpp
-    ../Common/Cpp/Concurrency/ComputationThreadPool.h
-    ../Common/Cpp/Concurrency/ComputationThreadPoolCore.cpp
-    ../Common/Cpp/Concurrency/ComputationThreadPoolCore.h
+    ../Common/Cpp/Concurrency/Backends/AsyncTask_Default.h
+    ../Common/Cpp/Concurrency/Backends/Thread_Qt.tpp
+    ../Common/Cpp/Concurrency/Backends/Thread_StdThread.tpp
+    ../Common/Cpp/Concurrency/Backends/Thread_StdThreadDetach.tpp
+    ../Common/Cpp/Concurrency/Backends/ThreadPool_Default.cpp
+    ../Common/Cpp/Concurrency/Backends/ThreadPool_Default.h
+    ../Common/Cpp/Concurrency/ConditionVariable.h
     ../Common/Cpp/Concurrency/FireForgetDispatcher.cpp
     ../Common/Cpp/Concurrency/FireForgetDispatcher.h
+    ../Common/Cpp/Concurrency/Mutex.h
     ../Common/Cpp/Concurrency/PeriodicScheduler.cpp
     ../Common/Cpp/Concurrency/PeriodicScheduler.h
+    ../Common/Cpp/Concurrency/Qt6.9ThreadBugWorkaround.h
     ../Common/Cpp/Concurrency/ReverseLockGuard.h
     ../Common/Cpp/Concurrency/ScheduledTaskRunner.cpp
     ../Common/Cpp/Concurrency/ScheduledTaskRunner.h
@@ -44,6 +45,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Concurrency/SpinPause.h
     ../Common/Cpp/Concurrency/Thread.cpp
     ../Common/Cpp/Concurrency/Thread.h
+    ../Common/Cpp/Concurrency/ThreadPool.h
     ../Common/Cpp/Concurrency/Watchdog.cpp
     ../Common/Cpp/Concurrency/Watchdog.h
     ../Common/Cpp/Containers/AlignedMalloc.cpp
@@ -79,6 +81,10 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Exceptions.h
     ../Common/Cpp/ExpressionEvaluator.cpp
     ../Common/Cpp/ExpressionEvaluator.h
+    ../Common/Cpp/Filesystem.cpp
+    ../Common/Cpp/Filesystem.h
+    ../Common/Cpp/FileIO.cpp
+    ../Common/Cpp/FileIO.h
     ../Common/Cpp/ImageResolution.cpp
     ../Common/Cpp/ImageResolution.h
     ../Common/Cpp/Json/JsonArray.cpp
@@ -92,6 +98,15 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/LifetimeSanitizer.cpp
     ../Common/Cpp/LifetimeSanitizer.h
     ../Common/Cpp/ListenerSet.h
+    ../Common/Cpp/Logging/AbstractLogger.h
+    ../Common/Cpp/Logging/FileLogger.cpp
+    ../Common/Cpp/Logging/FileLogger.h
+    ../Common/Cpp/Logging/LastLogTracker.cpp
+    ../Common/Cpp/Logging/LastLogTracker.h
+    ../Common/Cpp/Logging/OutputRedirector.cpp
+    ../Common/Cpp/Logging/OutputRedirector.h
+    ../Common/Cpp/Logging/TaggedLogger.cpp
+    ../Common/Cpp/Logging/TaggedLogger.h
     ../Common/Cpp/MemoryUtilization/MemoryUtilization.cpp
     ../Common/Cpp/MemoryUtilization/MemoryUtilization.h
     ../Common/Cpp/MemoryUtilization/MemoryUtilization_Linux.tpp
@@ -166,6 +181,10 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/SerialConnection/SerialConnection.h
     ../Common/Cpp/SerialConnection/SerialConnectionPOSIX.h
     ../Common/Cpp/SerialConnection/SerialConnectionWinAPI.h
+    ../Common/Cpp/StreamConnections/MockDevice.cpp
+    ../Common/Cpp/StreamConnections/MockDevice.h
+    ../Common/Cpp/StreamConnections/PABotBase2_MessageDumper.cpp
+    ../Common/Cpp/StreamConnections/PABotBase2_MessageDumper.h
     ../Common/Cpp/StreamConnections/ReliableStreamConnection.cpp
     ../Common/Cpp/StreamConnections/ReliableStreamConnection.h
     ../Common/Cpp/StreamConnections/StreamConnection.h
@@ -179,13 +198,13 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Stopwatch.h
     ../Common/Cpp/StreamConverters.cpp
     ../Common/Cpp/StreamConverters.h
-    ../Common/Cpp/StringTools.cpp
-    ../Common/Cpp/StringTools.h
+    ../Common/Cpp/Strings/StringTools.cpp
+    ../Common/Cpp/Strings/StringTools.h
+    ../Common/Cpp/Strings/Unicode.cpp
+    ../Common/Cpp/Strings/Unicode.h
     ../Common/Cpp/Time.cpp
     ../Common/Cpp/Time.h
     ../Common/Cpp/UiWrapper.h
-    ../Common/Cpp/Unicode.cpp
-    ../Common/Cpp/Unicode.h
     ../Common/Cpp/ValueDebouncer.h
     ../Common/CRC32/pabb_CRC32.c
     ../Common/CRC32/pabb_CRC32.h
@@ -198,7 +217,11 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/CodeValidator.h
     ../Common/Qt/CollapsibleGroupBox.cpp
     ../Common/Qt/CollapsibleGroupBox.h
+    ../Common/Qt/GlobalThreadPoolsQt.cpp
+    ../Common/Qt/GlobalThreadPoolsQt.h
     ../Common/Qt/NoWheelComboBox.h
+    ../Common/Qt/QtThreadPool.cpp
+    ../Common/Qt/QtThreadPool.h
     ../Common/Qt/Options/BatchWidget.cpp
     ../Common/Qt/Options/BatchWidget.h
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp
@@ -378,7 +401,6 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Logging/FileWindowLogger.h
     Source/CommonFramework/Logging/Logger.cpp
     Source/CommonFramework/Logging/Logger.h
-    Source/CommonFramework/Logging/OutputRedirector.cpp
     Source/CommonFramework/Logging/OutputRedirector.h
     Source/CommonFramework/Logging/QueuedLogger.cpp
     Source/CommonFramework/Logging/QueuedLogger.h
@@ -448,6 +470,7 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Recording/StreamHistoryTracker_Null.h
     Source/CommonFramework/Recording/StreamHistoryTracker_ParallelStreams.h
     Source/CommonFramework/Recording/StreamHistoryTracker_RecordOnTheFly.h
+    Source/CommonFramework/Recording/StreamHistoryTracker_SaveFrames.cpp
     Source/CommonFramework/Recording/StreamHistoryTracker_SaveFrames.h
     Source/CommonFramework/Recording/StreamRecorder.cpp
     Source/CommonFramework/Recording/StreamRecorder.h
@@ -602,6 +625,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonTools/OCR/OCR_LargeDictionaryMatcher.h
     Source/CommonTools/OCR/OCR_NumberReader.cpp
     Source/CommonTools/OCR/OCR_NumberReader.h
+    Source/CommonTools/OCR/OCR_RawPaddleOCR.cpp
+    Source/CommonTools/OCR/OCR_RawPaddleOCR.h
     Source/CommonTools/OCR/OCR_RawOCR.cpp
     Source/CommonTools/OCR/OCR_RawOCR.h
     Source/CommonTools/OCR/OCR_Routines.cpp
@@ -943,6 +968,8 @@ file(GLOB LIBRARY_SOURCES
     Source/ML/DataLabeling/ML_SegmentAnythingModel.cpp
     Source/ML/DataLabeling/ML_SegmentAnythingModel.h
     Source/ML/DataLabeling/ML_SegmentAnythingModelConstants.h
+    Source/ML/Inference/ML_PaddleOCRPipeline.cpp
+    Source/ML/Inference/ML_PaddleOCRPipeline.h
     Source/ML/Inference/ML_YOLOv5Detector.cpp
     Source/ML/Inference/ML_YOLOv5Detector.h
     Source/ML/Inference/ML_YOLONavigation.cpp
@@ -1703,6 +1730,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_WeatherFinder.h
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h
+    Source/PokemonLZA/Programs/PokemonLZA_FastTravelNavigation.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_FastTravelNavigation.h
     Source/PokemonLZA/Programs/PokemonLZA_HyperspaceNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_HyperspaceNavigation.h
     Source/PokemonLZA/Programs/PokemonLZA_BoxSorter.cpp
@@ -1713,7 +1742,6 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/PokemonLZA_DonutBerrySession.h
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.cpp
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.h
-    Source/PokemonLZA/Programs/PokemonLZA_Locations.h
     Source/PokemonLZA/Programs/PokemonLZA_MegaShardFarmer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_MegaShardFarmer.h
     Source/PokemonLZA/Programs/PokemonLZA_MenuNavigation.cpp
@@ -1724,6 +1752,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/PokemonLZA_StallBuyer.h
     Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.cpp
     Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.h
+    Source/PokemonLZA/Programs/PokemonLZA_TurboMacro.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_TurboMacro.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_BeldumHunter.cpp
@@ -1764,6 +1794,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Resources/PokemonLZA_DonutBerries.h
     Source/PokemonLZA/Resources/PokemonLZA_HyperspaceRewardNames.cpp
     Source/PokemonLZA/Resources/PokemonLZA_HyperspaceRewardNames.h
+    Source/PokemonLZA/Resources/PokemonLZA_Locations.cpp
+    Source/PokemonLZA/Resources/PokemonLZA_Locations.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.cpp

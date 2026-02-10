@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PABotBase2_ConnectionSender_H
-#define PokemonAutomation_PABotBase2_ConnectionSender_H
+#ifndef PokemonAutomation_PABotBase2_PacketSender_H
+#define PokemonAutomation_PABotBase2_PacketSender_H
 
 #include "PABotBase2_StreamInterface.h"
 #include "PABotBase2_Connection.h"
@@ -34,6 +34,8 @@ extern "C" {
 
 
 typedef struct{
+    uint8_t max_packet_size;    //  0 = 256 bytes
+
     uint8_t slot_head;
     uint8_t slot_tail;
 
@@ -68,11 +70,16 @@ typedef struct{
 void pabb2_PacketSender_init(
     pabb2_PacketSender* self,
     void* unreliable_sender_context,
-    pabb2_fp_StreamSend unreliable_sender_send
+    pabb2_fp_StreamSend unreliable_sender_send,
+    uint8_t max_packet_size
 );
+void pabb2_PacketSender_reset(pabb2_PacketSender* self);
 
-inline uint8_t pabb2_PacketSender_size(pabb2_PacketSender* self){
+static inline uint8_t pabb2_PacketSender_slots_used(pabb2_PacketSender* self){
     return self->slot_tail - self->slot_head;
+}
+static inline size_t pabb2_PacketSender_buffer_used(pabb2_PacketSender* self){
+    return self->buffer_tail - self->buffer_head;
 }
 
 //  Remove the packet corresponding to the specified seqnum from the queue.
@@ -139,10 +146,10 @@ bool pabb2_PacketSender_iterate_retransmits(pabb2_PacketSender* self);
 //
 void pabb2_PacketSender_send_info(pabb2_PacketSender* self, uint8_t seqnum, uint8_t opcode);
 
-void pabb2_PacketSender_send_ack(pabb2_PacketSender* self, uint8_t seqnum);
-void pabb2_PacketSender_send_ack_u8(pabb2_PacketSender* self, uint8_t seqnum, uint8_t data);
-void pabb2_PacketSender_send_ack_u16(pabb2_PacketSender* self, uint8_t seqnum, uint16_t data);
-void pabb2_PacketSender_send_ack_u32(pabb2_PacketSender* self, uint8_t seqnum, uint32_t data);
+void pabb2_PacketSender_send_ack(pabb2_PacketSender* self, uint8_t seqnum, uint8_t opcode);
+void pabb2_PacketSender_send_ack_u8(pabb2_PacketSender* self, uint8_t seqnum, uint8_t opcode, uint8_t data);
+void pabb2_PacketSender_send_ack_u16(pabb2_PacketSender* self, uint8_t seqnum, uint8_t opcode, uint16_t data);
+void pabb2_PacketSender_send_ack_u32(pabb2_PacketSender* self, uint8_t seqnum, uint8_t opcode, uint32_t data);
 
 
 

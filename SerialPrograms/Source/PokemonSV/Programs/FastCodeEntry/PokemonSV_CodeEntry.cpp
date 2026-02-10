@@ -139,6 +139,7 @@ const char* normalize_code(std::string& normalized_code, const std::string& code
 
 void enter_code(
     ConsoleHandle& console, AbstractControllerContext& context,
+    bool assume_console_type_is_ready,
     KeyboardLayout keyboard_layout,
     const std::string& normalized_code, bool force_keyboard_mode,
     bool include_plus,
@@ -155,7 +156,9 @@ void enter_code(
 
     if (force_keyboard_mode){
         FastCodeEntry::keyboard_enter_code(
-            console, context, keyboard_layout,
+            console, context,
+            assume_console_type_is_ready,
+            keyboard_layout,
             normalized_code, include_plus
         );
         return;
@@ -164,22 +167,33 @@ void enter_code(
     switch (normalized_code.size()){
     case 4:
 //        enter_digits_str(context, 4, normalized_code.c_str());
-        FastCodeEntry::numberpad_enter_code(console, context, normalized_code, include_plus);
+        FastCodeEntry::numberpad_enter_code(
+            console, context,
+            assume_console_type_is_ready,
+            normalized_code, include_plus
+        );
         break;
     case 6:
         FastCodeEntry::keyboard_enter_code(
-            console, context, keyboard_layout,
+            console, context,
+            assume_console_type_is_ready,
+            keyboard_layout,
             normalized_code, include_plus
         );
         break;
     case 8:
 //        enter_digits_str(context, 8, normalized_code.c_str());
-        FastCodeEntry::numberpad_enter_code(console, context, normalized_code, include_plus);
+        FastCodeEntry::numberpad_enter_code(
+            console, context,
+            assume_console_type_is_ready,
+            normalized_code, include_plus
+        );
         break;
     }
 }
 const char* enter_code(
     MultiSwitchProgramEnvironment& env, CancellableScope& scope,
+    bool assume_console_type_is_ready,
     const FastCodeEntrySettings& settings,
     const std::string& code, bool force_keyboard_mode,
     bool connect_controller_press
@@ -194,6 +208,7 @@ const char* enter_code(
         AbstractControllerContext context(scope, console.controller());
         enter_code(
             console, context,
+            assume_console_type_is_ready,
             settings.keyboard_layout[console.index()],
             normalized_code, force_keyboard_mode,
             !settings.skip_plus,

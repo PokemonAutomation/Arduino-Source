@@ -8,6 +8,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_ProController_SysbotBase3_H
 #define PokemonAutomation_NintendoSwitch_ProController_SysbotBase3_H
 
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 //#include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
@@ -231,7 +232,7 @@ private:
     uint64_t m_next_seqnum;
     uint64_t m_next_expected_seqnum_ack;
 
-    std::condition_variable m_cv;
+    ConditionVariable m_cv;
 };
 
 

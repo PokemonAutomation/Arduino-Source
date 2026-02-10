@@ -34,20 +34,11 @@ set(CMAKE_AUTOUIC ON)
 add_custom_target(build-time-make-directory ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory Assembly/)
 
-# Determine if this is an internal repo and normalize REPO_ROOT_DIR
-# CMAKE_CURRENT_SOURCE_DIR: the full path to this CmakeLists.txt
-# Find if "Arduino-Source-Internal" is in the path and store the find result to internal_repo_position
-string(FIND "${CMAKE_CURRENT_SOURCE_DIR}" "Arduino-Source-Internal" internal_repo_position)
-if(internal_repo_position EQUAL -1)  # no "Arduino-Source-Internal" in the path
-    # We are building the public repo, CMakeLists.txt is one level deep in the root repo dir
-    set(REPO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../")
-else()
-    # We are building the internal repo, CMakeLists.txt is three levels deep in the root repo dir
-    set(REPO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../")
-endif()
+# Internal repo or not, we're always building from the SerialPrograms folder
+set(REPO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../")
 
 # Determine environment
-if(DEFINED ENV{GITHUB_ACTIONS})
+if(DEFINED ENV{GITHUB_ACTIONS} OR DEFINED IS_AZURE_BUILD)
     message(STATUS "Detected CI environment, skipping qt deployment")
     set(QT_DEPLOY_FILES FALSE)
 else()
@@ -169,12 +160,29 @@ target_link_libraries(
 
 # Add source code exclusive to the internal repo and add C++ macro of official release
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../Internal/SerialPrograms/Internal0.cpp")
+    message(STATUS "Building internal SerialPrograms")
     target_compile_definitions(SerialProgramsLib PRIVATE PA_OFFICIAL)
     target_compile_definitions(SerialPrograms PRIVATE PA_OFFICIAL)
     target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.cpp)
     target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h)
     target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/Internal0.cpp)
     target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/Internal1.cpp)
+endif()
+
+if (IS_AZURE_BUILD)
+    target_compile_definitions(SerialProgramsLib PRIVATE
+        PA_VERSION_MAJOR=${VERSION_MAJOR}
+        PA_VERSION_MINOR=${VERSION_MINOR}
+        PA_VERSION_PATCH=${VERSION_PATCH}
+        PA_IS_BETA=${IS_BETA}
+    )
+
+    target_compile_definitions(SerialPrograms PRIVATE
+        PA_VERSION_MAJOR=${VERSION_MAJOR}
+        PA_VERSION_MINOR=${VERSION_MINOR}
+        PA_VERSION_PATCH=${VERSION_PATCH}
+        PA_IS_BETA=${IS_BETA}
+    )
 endif()
 
 # Function to apply common properties to both library and executable targets
@@ -267,7 +275,12 @@ if (WIN32)
 
     add_library(dpp_lib IMPORTED UNKNOWN)
     set_target_properties(dpp_lib PROPERTIES
-        IMPORTED_LOCATION   ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/dpp.lib
+        IMPORTED_LOCATION_RELEASE           ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/dpp.lib
+        IMPORTED_LOCATION_DEBUG             ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/dppd.lib
+        MAP_IMPORTED_CONFIG_DEBUG           DEBUG
+        MAP_IMPORTED_CONFIG_RELEASE         RELEASE
+        MAP_IMPORTED_CONFIG_RELWITHDEBINFO  RELEASE
+        MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
     )
 
     add_library(discord_lib IMPORTED UNKNOWN)
@@ -330,25 +343,26 @@ if (WIN32)
 else() # macOS and Linux
     find_package(PkgConfig REQUIRED)  # required to execute `pkg_search_module()` below
     if (APPLE)
-        # ==== Get ONNX Runtime paths ====
-        # First, try to see if there is an ONNX Runtime library built from source.
-        # Assume the onnxruntime repo, https://github.com/microsoft/onnxruntime is placed in the same folder as
-        # this Arduino-Source repo:
-        set(ONNXRUNTIME_ROOTDIR "${REPO_ROOT_DIR}../onnxruntime/")
-        set(ONNXRUNTIME_HEADER_DIR "${ONNXRUNTIME_ROOTDIR}include/onnxruntime/core/session/")
-        if(EXISTS "${ONNXRUNTIME_HEADER_DIR}")
-            # we have ONNX Runtime built from source
-            message("Use ONNX Runtime built from source at ${ONNXRUNTIME_ROOTDIR}")
-            target_include_directories(SerialProgramsLib PRIVATE ${ONNXRUNTIME_HEADER_DIR})
-            target_link_libraries(SerialProgramsLib PRIVATE ${ONNXRUNTIME_ROOTDIR}/build/MacOS/Release/libonnxruntime.dylib)
+        # prepare onnxruntime if needed
+        set(ONNXRUNTIME_VERSION "1.23.2")
+        set(ONNXRUNTIME_WORK_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries")
+        if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
+            set(ONNXRUNTIME_ARCH "arm64")
         else()
-            message("Built-from-source ONNX Runtime folder ${ONNXRUNTIME_ROOTDIR} does not exist.")
-            message("Use ONNX Runtime installed by Homebrew.")
-            pkg_search_module(ONNXRUNTIME REQUIRED libonnxruntime onnxruntime)
-            target_include_directories(SerialProgramsLib PRIVATE ${ONNXRUNTIME_INCLUDE_DIRS})
-            target_link_directories(SerialProgramsLib PUBLIC ${ONNXRUNTIME_LIBRARY_DIRS})
-            target_link_libraries(SerialProgramsLib PUBLIC ${ONNXRUNTIME_LINK_LIBRARIES})
+            set(ONNXRUNTIME_ARCH "x86_64")
         endif()
+        set(ONNXRUNTIME_LIB_DIR "${ONNXRUNTIME_WORK_DIR}/onnxruntime-osx-${ONNXRUNTIME_ARCH}-${ONNXRUNTIME_VERSION}")
+        set(ONNXRUNTIME_LIB_TAR "${ONNXRUNTIME_LIB_DIR}.tgz")
+        set(ONNXRUNTIME_DYLIB   "${ONNXRUNTIME_LIB_DIR}/lib/libonnxruntime.dylib")
+        if (NOT EXISTS "${ONNXRUNTIME_LIB_DIR}")
+            message(STATUS "ONNXRUNTIME not found, extracting from tgz...")
+            execute_process(
+                COMMAND ${CMAKE_COMMAND} -E tar xf "${ONNXRUNTIME_LIB_TAR}"
+                WORKING_DIRECTORY "${ONNXRUNTIME_WORK_DIR}"
+            )
+        endif()
+        target_include_directories(SerialProgramsLib SYSTEM PRIVATE "${ONNXRUNTIME_LIB_DIR}/include")
+        target_link_libraries(SerialProgramsLib PRIVATE "${ONNXRUNTIME_DYLIB}")
     else() # Linux
         # ONNX RUNTIME LINUX CONFIG
         # NOTE: users can specify their own ONNX_ROOT_PATH (this is the base folder for ONNX) on the command line when evoking cmake.
@@ -450,12 +464,15 @@ else() # macOS and Linux
 
     pkg_search_module(DPP dpp=10.0.28)
     if (DPP_FOUND) # enable dpp integration
+        message(STATUS "Compiling with DPP integration enabled")
         target_compile_definitions(SerialProgramsLib PUBLIC PA_DPP)
         ## to build against headers within this repo and properly set flags ##
         ## don't enable the following line ##
         # target_include_directories(SerialProgramsLib PRIVATE ${DPP_INCLUDE_DIRS})
         target_link_directories(SerialProgramsLib PUBLIC ${DPP_LIBRARY_DIRS})
         target_link_libraries(SerialProgramsLib PUBLIC ${DPP_LIBRARIES})
+    else()
+        message(NOTICE "Compiling with DPP integration disabled")
     endif()
 
     if (APPLE)
@@ -489,7 +506,7 @@ else() # macOS and Linux
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
     endif()
 
-    IF(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
+    if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
         # Arm CPU
         #   Run-time ISA dispatching
         target_compile_definitions(SerialProgramsLib PRIVATE PA_AutoDispatch_arm64_20_M1)
@@ -606,8 +623,10 @@ if (WIN32)
             )
             add_custom_target(run_windeployqt DEPENDS $<TARGET_FILE:SerialPrograms>)
         else()
-            message(WARNING "windeployqt not found, skipping Qt deployment.")
+            add_custom_target(run_windeployqt COMMENT "Skipping windeployqt (not found)")
         endif()
+    else()
+        add_custom_target(run_windeployqt COMMENT "Skipping windeployqt (CI environment)")
     endif()
 
     # Copy Discord SDK DLL
@@ -643,7 +662,7 @@ if (WIN32)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "$<IF:$<CONFIG:Debug>,${DPP_DEBUG_DLL},${DPP_RELEASE_DLL}>"
             "${WIN_DEPLOY_DIR}/dpp.dll"
-)
+    )
 
     # Extract OpenCV debug DLL if missing
     if (NOT EXISTS "${OPENCV_DEBUG_DLL}")

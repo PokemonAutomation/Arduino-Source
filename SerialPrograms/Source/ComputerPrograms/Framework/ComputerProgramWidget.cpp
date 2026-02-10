@@ -93,7 +93,7 @@ ComputerProgramWidget::ComputerProgramWidget(
     connect(
         m_actions_bar, &RunnablePanelActionBar::defaults_clicked,
         this, [&]{
-            std::lock_guard<std::mutex> lg(m_session.program_lock());
+            std::lock_guard<Mutex> lg(m_session.program_lock());
             option.restore_defaults();
             m_options->update_all(false);
         }

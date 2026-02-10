@@ -76,7 +76,7 @@ ConsoleSettings::ConsoleSettings()
         false
     )
     , START_GAME_MASH(
-        "<b>1. Start Game Mash:</b><br>Mash A for this long to start the game.",
+        "<b>Start Game Mash:</b><br>Mash A for this long to start the game.",
         LockMode::LOCK_WHILE_RUNNING,
         "2000 ms"
     )
@@ -123,10 +123,26 @@ ConsoleSettings::ConsoleSettings()
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
-    , SWITCH1_DIGIT_ENTRY0(false)
-    , SWITCH1_KEYBOARD_ENTRY0(false)
-    , SWITCH2_DIGIT_ENTRY0(true)
-    , SWITCH2_KEYBOARD_ENTRY0(true)
+    , CODEBOARD_ENTRY_SWITCH1_WIRED(
+        "Fast Code Entry Timings (Switch 1 Wired Controller)",
+        false,
+        ControllerPerformanceClass::SerialPABotBase_Wired
+    )
+    , CODEBOARD_ENTRY_SWITCH1_WIRELESS(
+        "Fast Code Entry Timings (Switch 1 Wireless Controller)",
+        false,
+        ControllerPerformanceClass::SerialPABotBase_Wireless
+    )
+    , CODEBOARD_ENTRY_SWITCH2_WIRED(
+        "Fast Code Entry Timings (Switch 2 Wired Controller)",
+        true,
+        ControllerPerformanceClass::SerialPABotBase_Wired
+    )
+    , CODEBOARD_ENTRY_SWITCH2_WIRELESS(
+        "Fast Code Entry Timings (Switch 2 Wireless Controller)",
+        true,
+        ControllerPerformanceClass::SerialPABotBase_Wireless
+    )
     , KEYBOARD_SECTION("<font size=4><b>Keyboard to Controller Mappings:</b></font>")
 {
     PA_ADD_OPTION(CONTROLLER_SETTINGS);
@@ -141,10 +157,10 @@ ConsoleSettings::ConsoleSettings()
     PA_ADD_OPTION(ENABLE_SBB3_LOGGING);
     PA_ADD_OPTION(TIMING_OPTIONS);
     if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(SWITCH1_DIGIT_ENTRY0);
-        PA_ADD_OPTION(SWITCH1_KEYBOARD_ENTRY0);
-        PA_ADD_OPTION(SWITCH2_DIGIT_ENTRY0);
-        PA_ADD_OPTION(SWITCH2_KEYBOARD_ENTRY0);
+        PA_ADD_OPTION(CODEBOARD_ENTRY_SWITCH1_WIRED);
+        PA_ADD_OPTION(CODEBOARD_ENTRY_SWITCH1_WIRELESS);
+        PA_ADD_OPTION(CODEBOARD_ENTRY_SWITCH2_WIRED);
+        PA_ADD_OPTION(CODEBOARD_ENTRY_SWITCH2_WIRELESS);
         PA_ADD_OPTION(KEYBOARD_CONTROLLER_TIMINGS);
     }
     PA_ADD_STATIC(KEYBOARD_SECTION);

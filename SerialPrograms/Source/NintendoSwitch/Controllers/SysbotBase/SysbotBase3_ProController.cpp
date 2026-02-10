@@ -42,7 +42,7 @@ ProController_SysbotBase3::~ProController_SysbotBase3(){
 }
 
 void ProController_SysbotBase3::cancel_all_commands(){
-    std::lock_guard<std::mutex> lg(m_state_lock);
+    std::lock_guard<Mutex> lg(m_state_lock);
     if (m_stopping){
         throw InvalidConnectionStateException("");
     }
@@ -60,7 +60,7 @@ void ProController_SysbotBase3::cancel_all_commands(){
     m_logger.log("cancel_all_commands(): Command Queue Size = " + std::to_string(queued), COLOR_DARKGREEN);
 }
 void ProController_SysbotBase3::replace_on_next_command(){
-    std::lock_guard<std::mutex> lg(m_state_lock);
+    std::lock_guard<Mutex> lg(m_state_lock);
     if (m_stopping){
         throw InvalidConnectionStateException("");
     }
@@ -83,9 +83,9 @@ void ProController_SysbotBase3::replace_on_next_command(){
 }
 void ProController_SysbotBase3::wait_for_all(Cancellable* cancellable){
     SuperscalarScheduler::Schedule schedule;
-    std::lock_guard<std::mutex> lg0(m_issue_lock);
+    std::lock_guard<Mutex> lg0(m_issue_lock);
     {
-        std::lock_guard<std::mutex> lg1(m_state_lock);
+        std::lock_guard<Mutex> lg1(m_state_lock);
 
     //    cout << "wait_for_all() - start" << endl;
 
@@ -96,7 +96,7 @@ void ProController_SysbotBase3::wait_for_all(Cancellable* cancellable){
     }
     execute_schedule(cancellable, schedule);
 
-    std::unique_lock<std::mutex> lg1(m_state_lock);
+    std::unique_lock<Mutex> lg1(m_state_lock);
     while (true){
         if (m_stopping){
             throw InvalidConnectionStateException("");
@@ -139,7 +139,7 @@ void ProController_SysbotBase3::on_message(const std::string& message){
         break;
     }
 
-    std::lock_guard<std::mutex> lg(m_state_lock);
+    std::lock_guard<Mutex> lg(m_state_lock);
 
 //    cout << "parsed = " << parsed << endl;
 //    cout << "m_next_seqnum = " << m_next_seqnum << endl;
@@ -256,7 +256,7 @@ void ProController_SysbotBase3::execute_state(
     }
 
     //  Wait until there is space.
-    std::unique_lock<std::mutex> lg(m_state_lock);
+    std::unique_lock<Mutex> lg(m_state_lock);
     m_cv.wait(lg, [this, cancellable]{
         if (cancellable && cancellable->cancelled()){
             return true;

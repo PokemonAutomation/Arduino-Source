@@ -9,8 +9,8 @@
 
 #include <deque>
 #include <functional>
-#include <mutex>
-#include <condition_variable>
+#include "Mutex.h"
+#include "ConditionVariable.h"
 #include "Thread.h"
 
 namespace PokemonAutomation{
@@ -35,8 +35,8 @@ private:
     std::deque<std::function<void()>> m_queue;
     Thread m_thread;
     bool m_stopping;
-    std::mutex m_lock;
-    std::condition_variable m_cv;
+    Mutex m_lock;
+    ConditionVariable m_cv;
 };
 
 

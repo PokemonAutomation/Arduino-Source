@@ -57,7 +57,7 @@ private:
     uint64_t m_program_id;
     MultiSwitchSystemSession& m_session;
 
-    std::mutex m_lock;
+    Mutex m_lock;
     bool m_shutting_down = false;
 
     QComboBox* m_console_count_box;

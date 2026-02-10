@@ -33,6 +33,8 @@ public:
         const ImageFloatBox& box
     );
 
+    const ImageFloatBox& last_detected() const { return m_last_detected; }
+
     virtual void make_overlays(VideoOverlaySet& items) const override;
 
     //  This is not const so that detectors can save/cache state.

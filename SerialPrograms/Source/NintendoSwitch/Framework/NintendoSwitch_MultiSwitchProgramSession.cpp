@@ -65,7 +65,7 @@ MultiSwitchProgramSession::~MultiSwitchProgramSession(){
 
 void MultiSwitchProgramSession::restore_defaults(){
     auto ScopeCheck = m_sanitizer.check_scope();
-    std::lock_guard<std::mutex> lg(program_lock());
+    std::lock_guard<Mutex> lg(program_lock());
     if (current_state() != ProgramState::STOPPED){
         logger().log("Cannot change settings while program is running.", COLOR_RED);
         return;
@@ -83,7 +83,7 @@ std::string MultiSwitchProgramSession::check_validity() const{
 void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     auto ScopeCheck = m_sanitizer.check_scope();
     {
-        std::lock_guard<std::mutex> lg(program_lock());
+        std::lock_guard<Mutex> lg(program_lock());
         std::string error = check_validity();
         if (!error.empty()){
             throw UserSetupError(logger(), std::move(error));
@@ -107,7 +107,7 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
     }
 
     {
-        std::lock_guard<std::mutex> lg(program_lock());
+        std::lock_guard<Mutex> lg(program_lock());
         if (current_state() != ProgramState::RUNNING){
             return;
         }
@@ -126,18 +126,18 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
                 env.consoles[c].controller().cancel_all_commands();
             }catch (...){}
         }
-        std::lock_guard<std::mutex> lg(program_lock());
+        std::lock_guard<Mutex> lg(program_lock());
         m_scope.store(nullptr, std::memory_order_release);
         throw;
     }
 
-    std::lock_guard<std::mutex> lg(program_lock());
+    std::lock_guard<Mutex> lg(program_lock());
     m_scope.store(nullptr, std::memory_order_release);
 }
 void MultiSwitchProgramSession::internal_stop_program(){
     auto ScopeCheck = m_sanitizer.check_scope();
     {
-        std::lock_guard<std::mutex> lg(program_lock());
+        std::lock_guard<Mutex> lg(program_lock());
         CancellableScope* scope = m_scope.load(std::memory_order_acquire);
         if (scope != nullptr){
             scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
@@ -151,7 +151,6 @@ void MultiSwitchProgramSession::internal_stop_program(){
 }
 void MultiSwitchProgramSession::internal_run_program(){
     auto ScopeCheck = m_sanitizer.check_scope();
-    GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread(logger());
     m_option.options().reset_state();
 
     SleepSuppressScope sleep_scope(GlobalSettings::instance().SLEEP_SUPPRESS->PROGRAM_RUNNING);

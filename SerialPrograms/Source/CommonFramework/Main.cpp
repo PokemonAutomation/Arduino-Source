@@ -4,15 +4,19 @@
 #include <QFileInfo>
 //#include <QTextStream>
 #include <QMessageBox>
+#include "Common/Cpp/Concurrency/Qt6.9ThreadBugWorkaround.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
+#include "Common/Cpp/Concurrency/Watchdog.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ImageResolution.h"
+#include "Common/Qt/GlobalThreadPoolsQt.h"
 #include "StaticRegistration.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "VideoPipeline/Backends/MediaServicesQt6.h"
 #include "Globals.h"
 #include "GlobalSettingsPanel.h"
+#include "GlobalServices.h"
 #include "PersistentSettings.h"
 #include "Tests/CommandLineTests.h"
 #include "ErrorReports/ProgramDumper.h"
@@ -23,6 +27,7 @@
 #include "Integrations/DppIntegration/DppClient.h"
 #include "Logging/Logger.h"
 #include "Logging/OutputRedirector.h"
+#include "Logging/FileWindowLogger.h"
 //#include "Tools/StatsDatabase.h"
 //#include "Windows/DpiScaler.h"
 #include "Startup/SetupSettings.h"
@@ -30,6 +35,7 @@
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "CommonTools/OCR/OCR_RawOCR.h"
 #include "ControllerInput/ControllerInput.h"
+#include "Integrations/DiscordWebhook.h"
 #include "Windows/MainWindow.h"
 
 #include <iostream>
@@ -52,11 +58,29 @@ void set_working_directory(){
 }
 
 
+class ScopeExit{
+    ScopeExit(const ScopeExit&) = delete;
+    void operator=(const ScopeExit&) = delete;
+
+public:
+    template <typename Lambda>
+    ScopeExit(Lambda&& lambda)
+        : m_lambda(std::move(lambda))
+    {}
+    ~ScopeExit(){
+        m_lambda();
+    }
+
+private:
+    std::function<void()> m_lambda;
+};
+
+
 int run_program(int argc, char *argv[]){
     QApplication application(argc, argv);
 
-    OutputRedirector redirect_stdout(std::cout, "stdout", Color());
-    OutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
+    GlobalOutputRedirector redirect_stdout(std::cout, "stdout", Color());
+    GlobalOutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
 
     Logger& logger = global_logger_tagged();
 
@@ -82,8 +106,17 @@ int run_program(int argc, char *argv[]){
     QDir().mkpath(QString::fromStdString(SETTINGS_PATH()));
     QDir().mkpath(QString::fromStdString(SCREENSHOTS_PATH()));
 
+
+
     //  Preload all the cameras now so we don't hang the UI later on.
+    ScopeExit cameras([]{
+        GlobalMediaServices::instance().stop();
+    });
     get_all_cameras();
+
+    //  Force all the Qt thread pools to be constructed now on the main thread.
+    GlobalThreadPools::qt_worker_threadpool();
+    GlobalThreadPools::qt_event_threadpool();
 
     //  Several novice developers struggled to build and run the program due to missing Resources folder.
     //  Add this check to pop a message box when Resources folder is missing.
@@ -134,7 +167,7 @@ int run_program(int argc, char *argv[]){
     set_working_directory();
 
     //  Run this asynchronously to we don't block startup.
-    std::unique_ptr<AsyncTask> task = send_all_unsent_reports(logger, true);
+    AsyncTask task = send_all_unsent_reports(logger, true);
 
 
 
@@ -158,11 +191,7 @@ int run_program(int argc, char *argv[]){
     w.raise(); // bring the window to front on macOS
     set_permissions(w);
 
-    int ret = application.exec();
-
-    GlobalMediaServices::instance().stop();
-
-    return ret;
+    return application.exec();
 }
 
 
@@ -189,21 +218,49 @@ int main(int argc, char *argv[]){
 #endif
 
 #ifdef PA_DPP
-    Integration::DppClient::Client::instance().disconnect();
+    Integration::DppClient::Client::instance().stop();
 #endif
-
-    //  Stop the controllers.
-    global_input_stop();
-
-    //  Force stop the thread pool
-    PokemonAutomation::GlobalThreadPools::realtime_inference().stop();
-    PokemonAutomation::GlobalThreadPools::normal_inference().stop();
-
-    PokemonAutomation::global_dispatcher.stop();
 
     //  We must clear the OCR cache or it will crash on Linux when the library
     //  unloads before the cache is destructed from static memory.
     OCR::clear_cache();
+
+    //  Stop the controllers.
+    global_input_stop();
+
+    //  Stop misc. services.
+    Integration::DiscordWebhook::DiscordWebhookSender::instance().stop();
+    SystemSleepController::instance().stop();
+    global_watchdog().stop();
+    static_cast<FileWindowLogger&>(global_logger_raw()).stop();
+
+    //  When we actually migrate to Qt 6.9+, we may need to move the exit(0)
+    //  call here since joining *any* threads may hang.
+
+    //  Force stop the thread pools.
+    //  This is where all the threads in the program are joined.
+    PokemonAutomation::GlobalThreadPools::computation_realtime().stop();
+    PokemonAutomation::GlobalThreadPools::computation_normal().stop();
+    PokemonAutomation::GlobalThreadPools::unlimited_realtime().stop();
+    PokemonAutomation::GlobalThreadPools::unlimited_normal().stop();
+    PokemonAutomation::global_dispatcher.stop();
+
+    GlobalThreadPools::qt_worker_threadpool().stop();
+    GlobalThreadPools::qt_event_threadpool().stop();
+
+    cout << "Exiting main()..." << endl;
+
+
+//
+//  Workaround Qt 6.9 thread-adoption bug on Windows.
+//      https://github.com/PokemonAutomation/Arduino-Source/issues/570
+//      https://bugreports.qt.io/browse/QTBUG-131892
+//
+//  Program will hang after main() without this!
+//
+#ifdef PA_ENABLE_QT_ADOPTION_WORKAROUND
+    exit(ret);
+#endif
 
     return ret;
 }

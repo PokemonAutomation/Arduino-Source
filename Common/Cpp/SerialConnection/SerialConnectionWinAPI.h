@@ -13,10 +13,11 @@
 #include "Common/Compiler.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Unicode.h"
 #include "Common/Cpp/PanicDump.h"
+#include "Common/Cpp/Strings/Unicode.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "Common/Cpp/StreamConnections/StreamConnection.h"
 
 namespace PokemonAutomation{
@@ -28,10 +29,19 @@ void serial_debug_log(const std::string& msg);
 class SerialConnection : public StreamConnection{
 public:
     //  UTF-8
-    SerialConnection(const std::string& name, uint32_t baud_rate)
-        : SerialConnection(name, utf8_to_wstr(name), baud_rate)
+    SerialConnection(
+        ThreadPool& thread_pool,
+        const std::string& name,
+        uint32_t baud_rate
+    )
+        : SerialConnection(thread_pool, name, utf8_to_wstr(name), baud_rate)
     {}
-    SerialConnection(const std::string& name, const std::wstring& wname, uint32_t baud_rate)
+    SerialConnection(
+        ThreadPool& thread_pool,
+        const std::string& name,
+        const std::wstring& wname,
+        uint32_t baud_rate
+    )
         : m_exit(false)
         , m_consecutive_errors(0)
     {
@@ -103,7 +113,7 @@ public:
 
         //  Start receiver thread.
         try{
-            m_listener = Thread([this]{
+            m_listener = thread_pool.dispatch_now_blocking([this]{
                 run_with_catch(
                     "SerialConnection::SerialConnection()",
                     [this]{ recv_loop(); }
@@ -120,10 +130,10 @@ public:
         }
     }
 
-    virtual void stop() final{
+    virtual void stop() noexcept final{
         m_exit.store(true, std::memory_order_release);
         CloseHandle(m_handle);
-        m_listener.join();
+        m_listener.wait_and_ignore_exceptions();
     }
 
 private:
@@ -143,7 +153,12 @@ private:
             clear_error = "ClearCommError error flag = " + std::to_string(comm_error);
         }
 
-        serial_debug_log(clear_error);
+        if (consecutive_errors <= 10){
+            serial_debug_log(message);
+        }
+        if (consecutive_errors == 10){
+            serial_debug_log("Further error messages will be suppressed.");
+        }
         if (consecutive_errors >= 100 && allow_throw){
             throw ConnectionException(nullptr, "Serial Connection failed.");
         }
@@ -182,7 +197,7 @@ private:
     }
 
     void recv_loop(){
-//        std::lock_guard<std::mutex> lg(m_send_lock);
+//        std::lock_guard<Mutex> lg(m_send_lock);
         char buffer[32];
         auto last_recv = current_time();
         while (!m_exit.load(std::memory_order_acquire)){
@@ -232,7 +247,7 @@ private:
     std::atomic<size_t> m_consecutive_errors;
     SpinLock m_send_lock;
     SpinLock m_error_lock;
-    Thread m_listener;
+    AsyncTask m_listener;
 };
 
 

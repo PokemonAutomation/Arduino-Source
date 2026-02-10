@@ -93,7 +93,7 @@ void ItemPrinterRngRow::on_config_value_changed(void* object){
 
     bool keep_going;
     do{
-        std::unique_lock<std::mutex> lg(m_update_lock, std::try_to_lock_t());
+        std::unique_lock<Mutex> lg(m_update_lock, std::try_to_lock_t());
         if (!lg.owns_lock()){
             return;
         }

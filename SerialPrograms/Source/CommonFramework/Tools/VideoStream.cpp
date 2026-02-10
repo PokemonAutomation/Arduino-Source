@@ -40,9 +40,9 @@ bool VideoStream::save_stream_history(const std::string& filename){
 }
 
 
-void VideoStream::initialize_inference_threads(CancellableScope& scope, AsyncDispatcher& dispatcher){
-    m_video_pivot.reset(scope, m_video, dispatcher);
-    m_audio_pivot.reset(scope, m_audio, dispatcher);
+void VideoStream::initialize_inference_threads(CancellableScope& scope){
+    m_video_pivot.reset(scope, m_video);
+    m_audio_pivot.reset(scope, m_audio);
     m_overlay.add_stat(*m_video_pivot);
     m_overlay.add_stat(*m_audio_pivot);
 }

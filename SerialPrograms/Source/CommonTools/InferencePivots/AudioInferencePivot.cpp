@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "AudioInferencePivot.h"
 
@@ -40,8 +41,8 @@ struct AudioInferencePivot::PeriodicCallback{
 };
 
 
-AudioInferencePivot::AudioInferencePivot(CancellableScope& scope, AudioFeed& feed, AsyncDispatcher& dispatcher)
-    : PeriodicRunner(dispatcher)
+AudioInferencePivot::AudioInferencePivot(CancellableScope& scope, AudioFeed& feed)
+    : PeriodicRunner(GlobalThreadPools::unlimited_pivot())
     , m_feed(feed)
 {
     attach(scope);

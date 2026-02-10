@@ -8,8 +8,8 @@
 #ifndef PokemonAutomation_NintendoSwitch_ProController_SysbotBase_H
 #define PokemonAutomation_NintendoSwitch_ProController_SysbotBase_H
 
-#include <condition_variable>
 #include "Common/Cpp/Containers/CircularBuffer.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
@@ -248,8 +248,8 @@ private:
     //  WallClock::min() means the state has suddently changed.
     WallClock m_next_state_change;
 
-    std::condition_variable m_cv;
-    Thread m_dispatch_thread;
+    ConditionVariable m_cv;
+    AsyncTask m_dispatch_thread;
 };
 
 

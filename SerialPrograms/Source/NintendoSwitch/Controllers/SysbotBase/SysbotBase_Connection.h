@@ -8,13 +8,13 @@
 #define PokemonAutomation_Controllers_SysbotBase_Connection_H
 
 #include <deque>
-#include <mutex>
-#include <condition_variable>
 #include <QUrl>
 #include <QHostAddress>
 #include <QTcpSocket>
 #include "Common/Cpp/Time.h"
-#include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Sockets/ClientSocket.h"
 #include "Controllers/ControllerConnection.h"
 
@@ -74,9 +74,9 @@ private:
     std::deque<char> m_receive_buffer;
 
     SpinLock m_send_lock;
-    std::mutex m_lock;
-    std::condition_variable m_cv;
-    Thread m_thread;
+    Mutex m_lock;
+    ConditionVariable m_cv;
+    AsyncTask m_thread;
 
     ListenerSet<Listener> m_listeners;
 };

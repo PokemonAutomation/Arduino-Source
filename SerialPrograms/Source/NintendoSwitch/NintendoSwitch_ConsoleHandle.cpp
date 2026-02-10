@@ -42,13 +42,13 @@ ConsoleHandle::ConsoleHandle(
     , m_controller(controller)
     , m_realtime_inference_utilization(
         new ThreadPoolUtilizationStat(
-            GlobalThreadPools::realtime_inference(),
+            GlobalThreadPools::computation_realtime(),
             "Real-Time Pool"
         )
     )
     , m_normal_inference_utilization(
         new ThreadPoolUtilizationStat(
-            GlobalThreadPools::normal_inference(),
+            GlobalThreadPools::computation_normal(),
             "Normal Pool"
         )
     )

@@ -10,6 +10,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "MediaServicesQt6.h"
 
 namespace PokemonAutomation{
@@ -27,14 +28,14 @@ GlobalMediaServices::GlobalMediaServices()
         this, [this]{
             // LOCK ACQUISITION: protect m_refresh_cameras and notify worker thread
             // waiting on the conditional variable m_cv.
-            std::lock_guard<std::mutex> lg(m_sleep_lock);
+            std::lock_guard<Mutex> lg(m_sleep_lock);
             m_refresh_cameras = true;  // Set work flag
             m_cv.notify_all();         // Wake worker thread from cv.wait()
         }
     );
 
     // Start the persistent background worker thread
-    m_thread = Thread([this]{
+    m_thread = GlobalThreadPools::unlimited_normal().dispatch_now_blocking([this]{
         thread_body();
     });
 }
@@ -42,21 +43,21 @@ GlobalMediaServices::~GlobalMediaServices(){
     stop();
 }
 
-void GlobalMediaServices::stop(){
-    if (!m_thread.joinable()){
+void GlobalMediaServices::stop() noexcept{
+    if (!m_thread){
         return;
     }
 
     {
         // LOCK ACQUISITION: acquire m_sleep_lock to set m_stopping and notify
         // worker thread waiting on the conditional variable m_cv.
-        std::lock_guard<std::mutex> lg(m_sleep_lock);
+        std::lock_guard<Mutex> lg(m_sleep_lock);
         m_stopping = true;      // Tell worker to exit loop
         m_cv.notify_all();      // Wake worker from cv.wait() if sleeping
     }
 
-    // Wait for the woke worker thread to finish its current work and join
-    m_thread.join();
+    // Wait for the worker thread to finish its current work and join
+    m_thread.wait_and_ignore_exceptions();
 }
 
 
@@ -64,7 +65,7 @@ void GlobalMediaServices::thread_body(){
     // LOCK ACQUISITION: Worker thread holds m_sleep_lock for entire loop
     // to protect reads of m_stopping and m_refresh_cameras.
     // unique_lock is used (not lock_guard) because cv.wait() needs to unlock/relock
-    std::unique_lock<std::mutex> lg(m_sleep_lock);
+    std::unique_lock<Mutex> lg(m_sleep_lock);
 
     while (!m_stopping){
 //            global_logger_tagged().log("GlobalMediaServices::thread_body() iteration", COLOR_CYAN);
@@ -139,7 +140,7 @@ QList<QCameraDevice> GlobalMediaServices::get_all_cameras_blocking(){
         //   thread's work and load the camera info in a blocking way. After this
         //   function returns, the persistent thread sees m_refresh_cameras is now
         //   true and will avoid doing the same camera update.
-        std::unique_lock<std::mutex> lg(m_sleep_lock);
+        std::unique_lock<Mutex> lg(m_sleep_lock);
         if (!m_stopping && m_refresh_cameras){
             refresh_cameras();
         }

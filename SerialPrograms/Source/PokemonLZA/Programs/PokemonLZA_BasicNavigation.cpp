@@ -116,15 +116,11 @@ bool open_map(
     MapIconDetector pokecenter_icon(COLOR_RED, MapIconType::PokemonCenter, icon_region, &console.overlay());
     MapIconDetector flyable_building_icon(COLOR_BLACK, MapIconType::BuildingFlyable, icon_region, &console.overlay());
     MapIconDetector flayble_cafe_icon(COLOR_ORANGE, MapIconType::CafeFlyable, icon_region, &console.overlay());
-    MapIconDetector flyable_hyperspace_battle_zone_icon(COLOR_ORANGE, MapIconType::HyperspaceBattleZone, icon_region, &console.overlay());
-    MapIconDetector flyable_hyperspace_wild_zone_icon(COLOR_ORANGE, MapIconType::HyperspaceWildZone, icon_region, &console.overlay());
 
     MapWatcher map_detector(COLOR_RED, &console.overlay());
     map_detector.attach_map_icon_detector(pokecenter_icon);
     map_detector.attach_map_icon_detector(flyable_building_icon);
     map_detector.attach_map_icon_detector(flayble_cafe_icon);
-    map_detector.attach_map_icon_detector(flyable_hyperspace_battle_zone_icon);
-    map_detector.attach_map_icon_detector(flyable_hyperspace_wild_zone_icon);
 
     do{
         map_detector.reset_state();
@@ -272,76 +268,81 @@ FastTravelState open_map_and_fly_in_place(ConsoleHandle& console, ProControllerC
 }
 
 
-void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProControllerContext& context, WildZone zone){
+void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProControllerContext& context, Location zone){
     pbf_wait(context, 300ms);
     switch(zone){
-    case WildZone::WILD_ZONE_1:
+    case Location::WILD_ZONE_1:
         pbf_move_left_joystick(context, {-1, -0.173}, 120ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_2:
+    case Location::WILD_ZONE_2:
         pbf_move_left_joystick(context, {-0.062, +1}, 100ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_3:
+    case Location::WILD_ZONE_3:
         pbf_move_left_joystick(context, {0, +1}, 100ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_4:
+    case Location::WILD_ZONE_4:
         pbf_move_left_joystick(context, {+1, 0}, 100ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_5:
+    case Location::WILD_ZONE_5:
         pbf_move_left_joystick(context, {+0.331, +1}, 100ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_6:
+    case Location::WILD_ZONE_6:
         pbf_move_left_joystick(context, {-0.375, +1}, 100ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_7:
+    case Location::WILD_ZONE_7:
         pbf_move_left_joystick(context, {-1, +0.219}, 100ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_8:
+    case Location::WILD_ZONE_8:
         pbf_move_left_joystick(context, {-1, -0.252}, 100ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_9:
+    case Location::WILD_ZONE_9:
         pbf_move_left_joystick(context, {-0.453, +1}, 100ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_10:
+    case Location::WILD_ZONE_10:
         pbf_move_left_joystick(context, {+1, +0.297}, 100ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_11:
+    case Location::WILD_ZONE_11:
         pbf_move_left_joystick(context, {-1, +0.688}, 100ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_12:
+    case Location::WILD_ZONE_12:
         pbf_move_left_joystick(context, {-0.844, +1}, 150ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_13:
+    case Location::WILD_ZONE_13:
         pbf_move_left_joystick(context, {-1, -0.252}, 100ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_14:
+    case Location::WILD_ZONE_14:
         pbf_move_left_joystick(context, {-0.141, -1}, 100ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_15:
+    case Location::WILD_ZONE_15:
         pbf_move_left_joystick(context, {-1, +1}, 100ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_16:
+    case Location::WILD_ZONE_16:
         pbf_move_left_joystick(context, {+0.724, +1}, 100ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_17:
+    case Location::WILD_ZONE_17:
         pbf_move_left_joystick(context, {+0.646, +1}, 100ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_18:
+    case Location::WILD_ZONE_18:
         pbf_move_left_joystick(context, {-0.844, -1}, 100ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_19:
+    case Location::WILD_ZONE_19:
         pbf_move_left_joystick(context, {-0.375, -1}, 100ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_20_NO_DISTORTION:
+    case Location::WILD_ZONE_20_NO_DISTORTION:
         pbf_move_left_joystick(context, {-1, +0.297}, 140ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_20_WITH_DISTORTION:
+    case Location::WILD_ZONE_20_WITH_DISTORTION:
         // During the distortion happening on top of Lumiose Tower as part
         // of the Mega Dimension DLC story, the wild zone 20 fast travel
         // symbol on the map is moved to the entrance gate. So we only
         // need a tiny left joystick push.
         pbf_move_left_joystick(context, {-0.219, +0.219}, 100ms, 0ms);
         break;
+    default:
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "move_map_cursor_from_entrance_to_zone(): Unsupported zone location."
+        );
     }
     pbf_wait(context, 300ms);
 }

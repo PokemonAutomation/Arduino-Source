@@ -9,11 +9,9 @@
 #ifndef PokemonAutomation_StreamHistoryTracker_RecordOnTheFly_H
 #define PokemonAutomation_StreamHistoryTracker_RecordOnTheFly_H
 
-#include <mutex>
 #include <QCoreApplication>
 #include <QFileInfo>
 #include <QUrl>
-//#include <QThread>
 #include <QAudioBufferInput>
 #include <QVideoFrameInput>
 #include <QMediaFormat>
@@ -21,9 +19,10 @@
 #include <QMediaCaptureSession>
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 
 #include <iostream>
@@ -88,8 +87,8 @@ private:
 //    const size_t m_audio_samples_per_second;
 //    const double m_microseconds_per_sample;
 
-//    mutable std::mutex m_lock;
-//    std::condition_variable m_cv;
+//    mutable Mutex m_lock;
+//    ConditionVariable m_cv;
 
     RollingStream m_stream;
 

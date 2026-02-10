@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=SerialPrograms
+Exec=SerialPrograms %U
+TryExec=SerialPrograms
+Icon=SerialPrograms
+Type=Application
+Terminal=false
+Categories=Utility;
+StartupWMClass=SerialPrograms
+X-AppImage-Integrate=false

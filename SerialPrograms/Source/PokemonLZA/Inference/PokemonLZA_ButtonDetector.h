@@ -77,7 +77,18 @@ public:
          : DetectorToFinder("ButtonWatcher", hold_duration, color, button_type, box, overlay)
     {}
 };
-
+class ButtonGoneWatcher : public DetectorToFinder<ButtonDetector>{
+public:
+    ButtonGoneWatcher(
+        Color color,
+        ButtonType button_type,
+        const ImageFloatBox& box,
+        VideoOverlay* overlay = nullptr,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
+    )
+         : DetectorToFinder("ButtonGoneWatcher", FinderType::GONE, hold_duration, color, button_type, box, overlay)
+    {}
+};
 
 
 

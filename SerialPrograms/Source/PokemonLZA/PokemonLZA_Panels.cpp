@@ -15,6 +15,7 @@
 #include "Programs/PokemonLZA_ClothingBuyer.h"
 #include "Programs/PokemonLZA_StallBuyer.h"
 #include "Programs/PokemonLZA_PostKillCatcher.h"
+#include "Programs/PokemonLZA_TurboMacro.h"
 
 //  Trading
 #include "Programs/Trading/PokemonLZA_SelfBoxTrade.h"
@@ -79,6 +80,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<HyperspaceRewardReset_Descriptor, HyperspaceRewardReset>());
     ret.emplace_back(make_single_switch_program<DonutMaker_Descriptor, DonutMaker>());
     if (IS_BETA_VERSION){
+        ret.emplace_back(make_single_switch_program<LZA_TurboMacro_Descriptor, LZA_TurboMacro>());
     }
 
     ret.emplace_back("---- Farming ----");
@@ -100,9 +102,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHunt_FlySpotReset_Descriptor, ShinyHunt_FlySpotReset>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_SewerHunter_Descriptor, ShinyHunt_SewerHunter>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_HelioptileHunter_Descriptor, ShinyHunt_HelioptileHunter>());
+    ret.emplace_back(make_single_switch_program<ShinyHunt_HyperspaceLegendary_Descriptor, ShinyHunt_HyperspaceLegendary>());
     if (IS_BETA_VERSION){
         ret.emplace_back(make_single_switch_program<ShinyHunt_ShuttleRun_Descriptor, ShinyHunt_ShuttleRun>());
-        ret.emplace_back(make_single_switch_program<ShinyHunt_HyperspaceLegendary_Descriptor, ShinyHunt_HyperspaceLegendary>());
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<ShinyHunt_HyperspaceHunter_Descriptor, ShinyHunt_HyperspaceHunter>());

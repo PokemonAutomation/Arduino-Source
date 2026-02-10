@@ -4,12 +4,14 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "NintendoSwitch_CodeEntrySettingsOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
+using namespace std::chrono_literals;
 
 
 KeyboardLayoutOption::KeyboardLayoutOption()
@@ -45,90 +47,86 @@ CodeEntrySkipPlusOption::CodeEntrySkipPlusOption()
 
 
 
-
-
-DigitEntryTimingsOption::DigitEntryTimingsOption(bool switch2)
+CodeboardTimingsOption::CodeboardTimingsOption(
+    std::string label,
+    bool switch2,
+    ControllerPerformanceClass performance_class
+)
     : GroupOption(
-        switch2
-            ? "Switch 2 Digit Entry Timings"
-            : "Switch 1 Digit Entry Timings",
+        std::move(label),
         LockMode::UNLOCK_WHILE_RUNNING,
         GroupOption::EnableMode::ALWAYS_ENABLED, true
     )
+    , unit(get_unit_timing(performance_class))
     , REORDERING(
         "<b>Digit Reordering:</b><br>Allow digits to be entered out of order.",
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
-    , TIME_UNIT(
-        "<b>Time Unit:</b><br>Timesteps should increment in multiples of this unit.<br>"
-        "<font color=\"red\">Controller timing variation will be added to this number.</font>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        switch2
-            ? PreloadSettings::instance().DEVELOPER_MODE ? "48 ms" : "64 ms"
-            : PreloadSettings::instance().DEVELOPER_MODE ? "24 ms" : "40 ms"
-    )
     , HOLD(
-        "<b>Hold:</b><br>Duration to hold each button press down.<br>"
-        "<font color=\"red\">Controller timing variation will be added to this number.</font>",
+        "<b>Hold:</b><br>Duration to hold each button press down.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        "48 ms"
+        PreloadSettings::instance().DEVELOPER_MODE && performance_class == ControllerPerformanceClass::SerialPABotBase_Wired
+            ? "40 ms"
+            : std::to_string(unit.count() * 2) + " ms"
     )
     , COOLDOWN(
-        "<b>Cooldown:</b><br>Do not reuse a button until this long after it is reused.<br>"
-        "<font color=\"red\">Controller timing variation will be added to this number.</font>",
+        "<b>Cooldown:</b><br>Do not reuse a button until this long after it is reused.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        "24 ms"
+        std::to_string(unit.count() * 1) + " ms"
+    )
+    , PRESS_DELAY(
+        "<b>Press Delay:</b><br>Wait this long after entering a character.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        switch2
+            ? std::to_string(unit.count() * 2) + " ms"
+            : std::to_string(unit.count() * 1) + " ms"
+    )
+    , MOVE_DELAY(
+        "<b>Move Delay:</b><br>Wait this long after moving the cursor.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        switch2
+            ? std::to_string(unit.count() * 2) + " ms"
+            : std::to_string(unit.count() * 1) + " ms"
+    )
+    , SCROLL_DELAY(
+        "<b>Scroll Delay:</b><br>Wait this long after scrolling.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        switch2
+            ? std::to_string(unit.count() * 2) + " ms"
+            : std::to_string(unit.count() * 1) + " ms"
+    )
+    , WRAP_DELAY(
+        "<b>Wrap Delay:</b><br>Wait this long after a wrapping scroll.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        std::to_string(unit.count() * 2) + " ms"
     )
 {
     PA_ADD_OPTION(REORDERING);
-    PA_ADD_OPTION(TIME_UNIT);
     PA_ADD_OPTION(HOLD);
     PA_ADD_OPTION(COOLDOWN);
+    PA_ADD_OPTION(PRESS_DELAY);
+    PA_ADD_OPTION(MOVE_DELAY);
+    PA_ADD_OPTION(SCROLL_DELAY);
+    PA_ADD_OPTION(WRAP_DELAY);
 }
 
-
-
-KeyboardEntryTimingsOption::KeyboardEntryTimingsOption(bool switch2)
-    : GroupOption(
-        switch2
-            ? "Switch 2 Keyboard Entry Timings"
-            : "Switch 1 Keyboard Entry Timings",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        GroupOption::EnableMode::ALWAYS_ENABLED, true
-    )
-    , REORDERING(
-        "<b>Character Reordering:</b><br>Allow characters to be entered out of order.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        true
-    )
-    , TIME_UNIT(
-        "<b>Time Unit:</b><br>Timesteps should increment in multiples of this unit.<br>"
-        "<font color=\"red\">Controller timing variation will be added to this number.</font>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        switch2
-            ? PreloadSettings::instance().DEVELOPER_MODE ? "48 ms" : "64 ms"
-            : PreloadSettings::instance().DEVELOPER_MODE ? "24 ms" : "40 ms"
-    )
-    , HOLD(
-        "<b>Hold:</b><br>Duration to hold each button press down.<br>"
-        "<font color=\"red\">Controller timing variation will be added to this number.</font>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        "48 ms"
-    )
-    , COOLDOWN(
-        "<b>Cooldown:</b><br>Do not reuse a button until this long after it is reused.<br>"
-        "<font color=\"red\">Controller timing variation will be added to this number.</font>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        "24 ms"
-    )
-{
-    PA_ADD_OPTION(REORDERING);
-    PA_ADD_OPTION(TIME_UNIT);
-    PA_ADD_OPTION(HOLD);
-    PA_ADD_OPTION(COOLDOWN);
+Milliseconds CodeboardTimingsOption::get_unit_timing(ControllerPerformanceClass performance_class){
+    switch (performance_class){
+    case ControllerPerformanceClass::SerialPABotBase_Wired:
+        return PreloadSettings::instance().DEVELOPER_MODE ? 24ms : 40ms;
+    case ControllerPerformanceClass::SerialPABotBase_Wireless:
+        return PreloadSettings::instance().DEVELOPER_MODE ? 34ms : 40ms;
+    case ControllerPerformanceClass::SysbotBase:
+        return 100ms;
+    default:
+        throw InternalProgramError(
+            nullptr,
+            PA_CURRENT_FUNCTION,
+            "Invalid performance class: " + std::to_string((int)performance_class)
+        );
+    }
 }
-
 
 
 KeyboardControllerTimingsOption::KeyboardControllerTimingsOption()

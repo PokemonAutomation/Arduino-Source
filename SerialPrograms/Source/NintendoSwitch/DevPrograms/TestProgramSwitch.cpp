@@ -12,7 +12,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "Common/Cpp/Concurrency/PeriodicScheduler.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -170,6 +169,11 @@
 #include "Common/PABotBase2/PABotBase2_PacketParser.h"
 #include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
 #include "Common/PABotBase2/PABotbase2_ReliableStreamConnection.h"
+#include "Common/Cpp/StreamConnections/MockDevice.h"
+#include "ML/Inference/ML_PaddleOCRPipeline.h"
+#include "CommonTools/OCR/OCR_RawPaddleOCR.h"
+
+
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -243,6 +247,7 @@ TestProgram::TestProgram()
         false
     )
     , IMAGE_PATH(false, "Path to image for testing", LockMode::UNLOCK_WHILE_RUNNING, "default.png", "default.png")
+    , FLOAT("Float option:", LockMode::UNLOCK_WHILE_RUNNING, 0) 
     , STATIC_TEXT("Test text...")
     , BOX("Box", LockMode::UNLOCK_WHILE_RUNNING, 0, 0, 1, 1)
     , BUTTONS("Buttons", ProController_Button_Database(), LockMode::UNLOCK_WHILE_RUNNING, BUTTON_NONE)
@@ -267,6 +272,7 @@ TestProgram::TestProgram()
     PA_ADD_OPTION(LANGUAGE);
 //    PA_ADD_OPTION(CONSOLE_MODEL);
     PA_ADD_OPTION(IMAGE_PATH);
+    PA_ADD_OPTION(FLOAT);
     PA_ADD_OPTION(STATIC_TEXT);
     PA_ADD_OPTION(BOX);
     PA_ADD_OPTION(BUTTONS);
@@ -363,18 +369,18 @@ struct DataPacket : pabb2_PacketHeaderData{
             size = MAX_SIZE;
         }
 
-        this->magic_number = PABB2_CONNECTION_PACKET_MAGIC_NUMBER;
+        this->magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
         this->seqnum = seqnum;
         this->packet_bytes = (uint8_t)(size + OVERHEAD);
-        this->opcode = PABB2_CONNECTION_PACKET_OPCODE_STREAM_DATA;
+        this->opcode = PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA;
         this->stream_offset = stream_offset;
         memcpy(data, str, size);
     }
 };
 
 
+#if 0
 pabb2_StreamCoalescer* coalescer;
-
 
 
 class MockConnection : public StreamConnection{
@@ -405,15 +411,15 @@ public:
             pabb2_PacketHeader header;
             uint8_t crc[sizeof(uint32_t)];
         } response;
-        response.header.magic_number = PABB2_CONNECTION_PACKET_MAGIC_NUMBER;
+        response.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
         response.header.seqnum = packet->seqnum;
         response.header.packet_bytes = sizeof(response);
-        response.header.opcode = PABB2_CONNECTION_PACKET_OPCODE_ACK;
+        response.header.opcode = PABB2_CONNECTION_OPCODE_RET;
         pabb_crc32_write_to_message(&response, sizeof(response));
 
         std::lock_guard<std::mutex> lg(m_lock);
 
-        if (packet->opcode == PABB2_CONNECTION_PACKET_OPCODE_STREAM_DATA){
+        if (packet->opcode == PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA){
             uint8_t stream_size = packet->packet_bytes - sizeof(pabb2_PacketHeaderData) - sizeof(uint32_t);
             for (uint8_t c = 0; c < stream_size; c++){
                 char expected = '0' + m_offset % 10;
@@ -479,17 +485,7 @@ private:
     bool m_stopping = false;
     Thread m_thread;
 };
-
-
-
-
-//void on_packet(void* context, const pabb2_PacketHeader* packet){
-//
-//}
-
-
-
-
+#endif
 
 
 
@@ -518,6 +514,46 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     // JoyconContext context(scope, console.controller<JoyconController>());
     VideoOverlaySet overlays(overlay);
 
+
+
+    PokemonLA::EventDialogDetector detector(logger, overlay, true);
+
+    auto snapshot = feed.snapshot();
+    detector.process_frame(snapshot, current_time());
+
+
+#if 0
+    UpdateMenuWatcher update_menu(console, COLOR_PURPLE);
+    CheckOnlineWatcher check_online(COLOR_CYAN);
+    update_menu.make_overlays(overlays);
+    check_online.make_overlays(overlays);
+#endif
+
+
+
+#if 0
+    {
+        MockDevice device;
+
+        ReliableStreamConnection connection(
+            logger,
+            device,
+            1s
+        );
+
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_VERSION);
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE);
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS);
+        connection.send_request(PABB2_CONNECTION_OPCODE_ASK_RESET);
+
+
+        context.wait_for(60s);
+    }
+#endif
+
+
+
+
 #if 0
     CloseGameWatcher close_game(console);
     close_game.make_overlays(overlays);
@@ -527,7 +563,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 1
+#if 0
     MockConnection unreliable_connection;
     {
         ReliableStreamConnection connection(logger, unreliable_connection, 100s);
@@ -749,7 +785,19 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
+#if 0
 
+    // ImageRGB32 image1(IMAGE_PATH);
+    auto image1 = feed.snapshot();
+    ImageViewRGB32 cropped = extract_box_reference(image1, ImageFloatBox{BOX.x(), BOX.y(), BOX.width(), BOX.height()});
+
+    // auto snapshot = feed.snapshot();
+    std::string text = OCR::paddle_ocr_read(LANGUAGE, cropped);
+    cout << text << endl;
+
+    
+
+#endif
 
 #if 0
     std::string move_results = "Move Effectiveness:";

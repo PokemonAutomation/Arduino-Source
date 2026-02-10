@@ -5,7 +5,7 @@
  */
 
 //#include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "ThreadUtilizationStats.h"
 
 //#include <iostream>
@@ -22,7 +22,7 @@ ThreadUtilizationStat::ThreadUtilizationStat(ThreadHandle handle, std::string la
 {}
 
 OverlayStatSnapshot ThreadUtilizationStat::get_current(){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
 
     WallClock now = current_time();
     WallDuration clock = thread_cpu_time(m_handle);
@@ -41,7 +41,7 @@ OverlayStatSnapshot ThreadUtilizationStat::get_current(){
 
 
 
-ThreadPoolUtilizationStat::ThreadPoolUtilizationStat(const ComputationThreadPool& thread_pool, std::string label)
+ThreadPoolUtilizationStat::ThreadPoolUtilizationStat(const ThreadPool& thread_pool, std::string label)
     : m_thread_pool(thread_pool)
     , m_label(std::move(label))
     , m_last_clock(thread_pool.cpu_time())
@@ -49,7 +49,7 @@ ThreadPoolUtilizationStat::ThreadPoolUtilizationStat(const ComputationThreadPool
 {}
 
 OverlayStatSnapshot ThreadPoolUtilizationStat::get_current(){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<Mutex> lg(m_lock);
 
     WallClock now = current_time();
     WallDuration clock = m_thread_pool.cpu_time();

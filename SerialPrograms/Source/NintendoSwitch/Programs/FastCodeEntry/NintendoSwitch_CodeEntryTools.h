@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <vector>
 #include "Common/Cpp/Time.h"
+#include "NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 
@@ -70,12 +71,24 @@ inline bool is_wrap(CodeEntryAction action){
 
 
 struct CodeEntryDelays{
+    bool reordering;
     Milliseconds hold;
     Milliseconds cool;
     Milliseconds press_delay;
     Milliseconds move_delay;
     Milliseconds scroll_delay;
     Milliseconds wrap_delay;
+
+    CodeEntryDelays() = default;
+    CodeEntryDelays(const CodeboardTimingsOption& option)
+        : reordering(option.REORDERING)
+        , hold(option.HOLD)
+        , cool(option.COOLDOWN)
+        , press_delay(option.PRESS_DELAY)
+        , move_delay(option.MOVE_DELAY)
+        , scroll_delay(option.SCROLL_DELAY)
+        , wrap_delay(option.WRAP_DELAY)
+    {}
 };
 
 
@@ -88,7 +101,8 @@ struct CodeEntryActionWithDelay{
 
 
 //  Given a path, optimize it and fully populate the delays.
-void codeboard_populate_delays(
+//  Return the cost of the path.
+Milliseconds codeboard_populate_delays(
     bool switch2,
     std::vector<CodeEntryActionWithDelay>& path_with_delays,
     const std::vector<CodeEntryAction>& path,

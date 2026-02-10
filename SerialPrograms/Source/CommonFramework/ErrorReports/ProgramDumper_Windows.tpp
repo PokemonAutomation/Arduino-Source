@@ -9,8 +9,8 @@
 #include <Windows.h>
 #include <winioctl.h>
 #include <Dbghelp.h>
-#include "Common/Cpp/Unicode.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Strings/Unicode.h"
 #include "ErrorReports.h"
 #include "ProgramDumper.h"
 
@@ -112,7 +112,7 @@ long WINAPI crash_handler(EXCEPTION_POINTERS* e){
 
     SendableErrorReport report;
 
-//    _wmkdir(utf8_to_wstr(ERROR_PATH_UNSENT).c_str());
+//    _wmkdir(str_to_wstr(ERROR_PATH_UNSENT).c_str());
     program_dump(nullptr, report.directory() + ERROR_DUMP_NAME, e);
     report.save_report_json(nullptr);
 

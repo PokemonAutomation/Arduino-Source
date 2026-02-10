@@ -40,6 +40,7 @@ namespace PokemonAutomation{
 
 PABotBase::PABotBase(
     Logger& logger,
+    ThreadPool& thread_pool,
     std::unique_ptr<StreamConnection> connection,
     std::chrono::milliseconds retransmit_delay
 )
@@ -54,7 +55,7 @@ PABotBase::PABotBase(
 {
     //  We must initialize this last because it will trigger the lifetime
     //  sanitizer if it beats it to construction.
-    m_retransmit_thread = Thread([this]{
+    m_retransmit_thread = thread_pool.dispatch_now_blocking([this]{
         run_with_catch(
             "PABotBase::retransmit_thread()",
             [this]{
@@ -101,7 +102,7 @@ void PABotBase::connect(){
         SerialPABotBase::DeviceRequest_seqnum_reset(), nullptr
     ).convert<PABB_MSG_ACK_REQUEST>(logger(), response);
 }
-void PABotBase::stop(std::string error_message){
+void PABotBase::stop(std::string error_message) noexcept{
     auto scope_check = m_sanitizer.check_scope();
 
     //  Make sure only one thread can get in here.
@@ -117,10 +118,10 @@ void PABotBase::stop(std::string error_message){
 
     //  Wake everyone up.
     {
-        std::lock_guard<std::mutex> lg(m_sleep_lock);
+        std::lock_guard<Mutex> lg(m_sleep_lock);
     }
     m_cv.notify_all();
-    m_retransmit_thread.join();
+    m_retransmit_thread.wait_and_ignore_exceptions();
 
     {
         ReadSpinLock lg(m_state_lock, "PABotBase::stop()");
@@ -151,7 +152,7 @@ void PABotBase::stop(std::string error_message){
 }
 void PABotBase::on_cancellable_cancel(){
     {
-        std::unique_lock<std::mutex> lg(m_sleep_lock);
+        std::unique_lock<Mutex> lg(m_sleep_lock);
     }
     m_cv.notify_all();
 }
@@ -163,7 +164,7 @@ void PABotBase::set_queue_limit(size_t queue_limit){
 void PABotBase::wait_for_all_requests(Cancellable* cancelled){
     auto scope_check = m_sanitizer.check_scope();
 
-    std::unique_lock<std::mutex> lg(m_sleep_lock);
+    std::unique_lock<Mutex> lg(m_sleep_lock);
     m_logger.log("Waiting for all requests to finish...", COLOR_DARKGREEN);
     while (true){
         if (cancelled){
@@ -228,7 +229,7 @@ void PABotBase::clear_all_active_commands(uint64_t seqnum){
     auto scope_check = m_sanitizer.check_scope();
     {
         //  Remove all commands at or before the specified seqnum.
-        std::lock_guard<std::mutex> lg0(m_sleep_lock);
+        std::lock_guard<Mutex> lg0(m_sleep_lock);
         WriteSpinLock lg1(m_state_lock, "PABotBase::next_command_interrupt()");
         m_logger.log(
             "Clearing all active commands... (Commands: " + std::to_string(m_pending_commands.size()) + ")",
@@ -376,7 +377,7 @@ void PABotBase::process_ack_request(BotBaseMessage message){
     switch (state){
     case AckState::NOT_ACKED:
         {
-            std::lock_guard<std::mutex> lg(m_sleep_lock);
+            std::lock_guard<Mutex> lg(m_sleep_lock);
         }
         m_cv.notify_all();
         return;
@@ -448,7 +449,7 @@ void PABotBase::process_command_finished(BotBaseMessage message){
 //    m_send_queue.emplace_back((uint8_t)PABB_MSG_ACK, std::string((char*)&ack, sizeof(ack)));
 
     {
-        std::lock_guard<std::mutex> lg0(m_sleep_lock);
+        std::lock_guard<Mutex> lg0(m_sleep_lock);
         WriteSpinLock lg1(m_state_lock, "PABotBase::process_command_finished()");
 
 #ifdef INTENTIONALLY_DROP_MESSAGES
@@ -538,7 +539,7 @@ void PABotBase::on_recv_message(BotBaseMessage message){
         }
         m_error.store(true, std::memory_order_release);
         {
-            std::lock_guard<std::mutex> lg0(m_sleep_lock);
+            std::lock_guard<Mutex> lg0(m_sleep_lock);
         }
         m_cv.notify_all();
     }
@@ -556,7 +557,7 @@ void PABotBase::on_recv_message(BotBaseMessage message){
             }
             m_error.store(true, std::memory_order_release);
             {
-                std::lock_guard<std::mutex> lg0(m_sleep_lock);
+                std::lock_guard<Mutex> lg0(m_sleep_lock);
             }
             m_cv.notify_all();
         }
@@ -570,7 +571,7 @@ void PABotBase::on_recv_message(BotBaseMessage message){
         }
         m_error.store(true, std::memory_order_release);
         {
-            std::lock_guard<std::mutex> lg0(m_sleep_lock);
+            std::lock_guard<Mutex> lg0(m_sleep_lock);
         }
         m_cv.notify_all();
         return;
@@ -591,7 +592,7 @@ void PABotBase::retransmit_thread(){
         auto now = current_time();
 
         if (now - last_sent < m_retransmit_delay){
-            std::unique_lock<std::mutex> lg(m_sleep_lock);
+            std::unique_lock<Mutex> lg(m_sleep_lock);
             if (m_state.load(std::memory_order_acquire) != State::RUNNING){
                 break;
             }
@@ -856,7 +857,7 @@ uint64_t PABotBase::issue_request(
         if (seqnum != 0){
             return seqnum;
         }
-        std::unique_lock<std::mutex> lg(m_sleep_lock);
+        std::unique_lock<Mutex> lg(m_sleep_lock);
         if (cancelled){
             cancelled->throw_if_cancelled();
         }
@@ -901,7 +902,7 @@ uint64_t PABotBase::issue_command(
         if (seqnum != 0){
             return seqnum;
         }
-        std::unique_lock<std::mutex> lg(m_sleep_lock);
+        std::unique_lock<Mutex> lg(m_sleep_lock);
         if (cancelled){
             cancelled->throw_if_cancelled();
         }
@@ -958,7 +959,7 @@ BotBaseMessage PABotBase::issue_request_and_wait(
 BotBaseMessage PABotBase::wait_for_request(uint64_t seqnum, Cancellable* cancelled){
     auto scope_check = m_sanitizer.check_scope();
 
-    std::unique_lock<std::mutex> lg(m_sleep_lock);
+    std::unique_lock<Mutex> lg(m_sleep_lock);
     while (true){
         if (cancelled){
             cancelled->throw_if_cancelled();
@@ -995,7 +996,7 @@ BotBaseMessage PABotBase::wait_for_request(uint64_t seqnum, Cancellable* cancell
 }
 
 
-void PABotBase::cv_wait(Cancellable* cancellable, std::unique_lock<std::mutex>& lg){
+void PABotBase::cv_wait(Cancellable* cancellable, std::unique_lock<Mutex>& lg){
     if (cancellable == nullptr){
         m_cv.wait(lg);
         return;

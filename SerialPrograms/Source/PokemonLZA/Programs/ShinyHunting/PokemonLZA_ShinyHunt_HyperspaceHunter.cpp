@@ -89,6 +89,22 @@ ShinyHunt_HyperspaceHunter::ShinyHunt_HyperspaceHunter()
         LockMode::UNLOCK_WHILE_RUNNING,
         120, 0, 9999 // default, min, max
     )
+    // , PER_SPAWN_TABLE(
+    //     "Custom Per Spawn Reset Command Table:",
+    //     {
+    //         ControllerClass::NintendoSwitch_ProController,
+    //         ControllerClass::NintendoSwitch_LeftJoycon,
+    //         ControllerClass::NintendoSwitch_RightJoycon,
+    //     }
+    // )
+    // , PER_CHECK_TABLE(
+    //     "Per Shiny Check Command Table:",
+    //     {
+    //         ControllerClass::NintendoSwitch_ProController,
+    //         ControllerClass::NintendoSwitch_LeftJoycon,
+    //         ControllerClass::NintendoSwitch_RightJoycon,
+    //     }
+    // )
     , FORWARD_RUN_TIME(
         "<b>Forward Run Time (Shuttle Run):</b><br>Duration to run forward in milliseconds.",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -337,6 +353,7 @@ void ShinyHunt_HyperspaceHunter::program(SingleSwitchProgramEnvironment& env, Pr
         }
     }
     assert_16_9_720p_min(env.logger(), env.console);
+    HyperspaceCalorieDetector::warm_ocr();
 
     // Mash button B to let Switch register the controller
     pbf_mash_button(context, BUTTON_B, 500ms);

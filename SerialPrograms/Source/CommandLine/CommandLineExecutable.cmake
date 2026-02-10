@@ -12,6 +12,9 @@ add_executable(SerialProgramsCommandLine ${COMMANDLINE_SOURCES})
 # Link to SerialProgramsLib (contains all the core functionality)
 target_link_libraries(SerialProgramsCommandLine PRIVATE SerialProgramsLib)
 
+# Ensure SerialProgramsCommandLine rebuilds when SerialProgramsLib is updated
+add_dependencies(SerialProgramsCommandLine SerialProgramsLib)
+
 # Apply common target properties (includes, compile flags, etc.)
 # This function is defined in the parent CMakeLists.txt
 apply_common_target_properties(SerialProgramsCommandLine)

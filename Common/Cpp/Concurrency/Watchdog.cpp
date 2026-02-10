@@ -7,6 +7,7 @@
 #include <iostream>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Watchdog.h"
 
 //using std::cout;
@@ -16,17 +17,25 @@ namespace PokemonAutomation{
 
 
 
-Watchdog::~Watchdog(){
-    {
-        std::lock_guard<std::mutex> lg(m_sleep_lock);
-        m_stopped = true;
-        m_cv.notify_all();
-    }
-    m_thread.join();
-}
-Watchdog::Watchdog()
-    : m_thread([this]{ thread_body(); })
+Watchdog::Watchdog(ThreadPool& thread_pool)
+    : m_thread(thread_pool.dispatch_now_blocking(
+        [this]{ thread_body(); })
+    )
 {}
+Watchdog::~Watchdog(){
+    stop();
+}
+void Watchdog::stop() noexcept{
+    if (!m_thread){
+        return;
+    }
+    {
+        std::lock_guard<Mutex> lg(m_sleep_lock);
+        m_stopped = true;
+    }
+    m_cv.notify_all();
+    m_thread.wait_and_ignore_exceptions();
+}
 
 
 void Watchdog::add(WatchdogCallback& callback, std::chrono::milliseconds period){
@@ -58,7 +67,7 @@ void Watchdog::add(WatchdogCallback& callback, std::chrono::milliseconds period)
     }
 
     if (signal){
-        std::lock_guard<std::mutex> wlg(m_sleep_lock);
+        std::lock_guard<Mutex> wlg(m_sleep_lock);
         m_cv.notify_all();
     }
 }
@@ -77,7 +86,7 @@ bool Watchdog::try_remove(WatchdogCallback& callback){
         return true;
     }
 
-    std::mutex& entry_lock = iter_c->second.lock;
+    Mutex& entry_lock = iter_c->second.lock;
     if (!entry_lock.try_lock()){
         return false;
     }
@@ -133,7 +142,7 @@ void Watchdog::delay(WatchdogCallback& callback, WallClock next_call){
     }
 
     if (signal){
-        std::lock_guard<std::mutex> wlg(m_sleep_lock);
+        std::lock_guard<Mutex> wlg(m_sleep_lock);
         m_cv.notify_all();
     }
 }
@@ -149,7 +158,7 @@ void Watchdog::thread_body(){
     WallClock wake_time = WallClock::min();
     while (true){
         {
-            std::unique_lock<std::mutex> wlg(m_sleep_lock);
+            std::unique_lock<Mutex> wlg(m_sleep_lock);
             if (m_stopped){
                 break;
             }
@@ -167,7 +176,7 @@ void Watchdog::thread_body(){
 
         WallClock now = current_time();
 
-        std::unique_lock<std::mutex> elg;
+        std::unique_lock<Mutex> elg;
         Entry* entry;
         CallbackMap::iterator iter_c;
         {
@@ -192,7 +201,7 @@ void Watchdog::thread_body(){
             }else{
                 //  Ready to run.
                 entry = &iter_c->second;
-                elg = std::unique_lock<std::mutex>(entry->lock);
+                elg = std::unique_lock<Mutex>(entry->lock);
             }
         }
 //        cout << "Running..." << endl;

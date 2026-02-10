@@ -12,15 +12,19 @@
 #include <map>
 #include "Common/Cpp/Time.h"
 //#include "Common/Cpp/CancellableScope.h"
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 
 namespace PokemonAutomation{
 
 
 class ScheduledTaskRunner{
 public:
+    ScheduledTaskRunner(ThreadPool& thread_pool);
     ~ScheduledTaskRunner();
-    ScheduledTaskRunner(AsyncDispatcher& dispatcher);
+    void stop() noexcept;
 
     //  Returns the # of events in the schedule.
     size_t size() const;
@@ -38,13 +42,13 @@ private:
     void thread_loop();
 
 private:
-    mutable std::mutex m_lock;
-    std::condition_variable m_cv;
+    mutable Mutex m_lock;
+    ConditionVariable m_cv;
     bool m_stopped;
 
     std::multimap<WallClock, std::function<void()>> m_schedule;
 
-    std::unique_ptr<AsyncTask> m_runner;
+    AsyncTask m_runner;
 };
 
 

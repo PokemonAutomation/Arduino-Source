@@ -34,7 +34,7 @@ ComputerProgramSession::~ComputerProgramSession(){
 
 
 void ComputerProgramSession::restore_defaults(){
-    std::lock_guard<std::mutex> lg(program_lock());
+    std::lock_guard<Mutex> lg(program_lock());
     if (current_state() != ProgramState::STOPPED){
         logger().log("Cannot change settings while program is running.", COLOR_RED);
         return;
@@ -52,7 +52,7 @@ std::string ComputerProgramSession::check_validity() const{
 
 void ComputerProgramSession::run_program_instance(ProgramEnvironment& env, CancellableScope& scope){
     {
-        std::lock_guard<std::mutex> lg(program_lock());
+        std::lock_guard<Mutex> lg(program_lock());
         std::string error = check_validity();
         if (!error.empty()){
             throw UserSetupError(logger(), std::move(error));

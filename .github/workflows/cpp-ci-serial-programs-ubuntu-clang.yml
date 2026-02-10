@@ -1,0 +1,10 @@
+name: C++ CI Serial Programs Ubuntu clang
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build:
+    uses: ./.github/workflows/cpp-ci-serial-programs-base.yml
+    with:
+      os: ubuntu-24.04
+      compiler: clang
+      run-clang-query: true

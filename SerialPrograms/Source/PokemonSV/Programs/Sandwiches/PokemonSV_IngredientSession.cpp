@@ -87,7 +87,7 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
     // Uses thread pool to speed up inference (11 tasks: 10 OCR + 1 sprite match)
     ImageMatch::ImageMatchResult image_result;
     SandwichIngredientReader reader(m_type);
-    GlobalThreadPools::normal_inference().run_in_parallel(
+    GlobalThreadPools::computation_normal().run_in_parallel(
         [&](size_t index){
             if (index < SandwichIngredientReader::INGREDIENT_PAGE_LINES){
                 // Task 0-9: OCR text detection on each of the 10 visible lines

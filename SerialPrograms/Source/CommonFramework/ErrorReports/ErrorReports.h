@@ -8,7 +8,7 @@
 #define PokemonAutomation_ErrorReports_H
 
 #include <memory>
-#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
@@ -153,7 +153,7 @@ void send_reports(Logger& logger, const std::vector<std::string>& reports);
 // - PROMPT_WHEN_CONVENIENT: Shows dialog asking user for permission (if allow_prompt is true)
 // - NEVER_SEND_ANYTHING: Does nothing
 // Returns: AsyncTask handle for background sending operation, or nullptr if not sending
-std::unique_ptr<AsyncTask> send_all_unsent_reports(Logger& logger, bool allow_prompt);
+AsyncTask send_all_unsent_reports(Logger& logger, bool allow_prompt);
 
 
 // Create and save a complete error report. This is the main entry point for error reporting.

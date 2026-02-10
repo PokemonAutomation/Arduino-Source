@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
 #include "PokemonLZA_DonutBerriesOption.h"
@@ -171,7 +172,10 @@ std::string FlavorPowerTableEntry::get_single_flavor_power_string(int power_inde
         level = level_3;
         break;
     default:
-        return "INVALID";
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION, 
+            "Invalid power index: " + std::to_string(power_index)
+        );
     }
 
     switch (power){
@@ -476,8 +480,10 @@ std::string FlavorPowerTableEntry::get_single_flavor_power_string(int power_inde
         selected_power += "sp-def-power-";
         break;
     default:
-        selected_power += "INVALID-";
-        break;
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION, 
+            "Invalid flavor power: " + std::to_string(static_cast<int>(power))
+        );
     }
 
     switch (level) {
@@ -500,8 +506,10 @@ std::string FlavorPowerTableEntry::get_single_flavor_power_string(int power_inde
         selected_power += "23";
         break;
     default:
-        selected_power += "INVALID";
-        break;
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION, 
+            "Invalid power level: " + std::to_string(static_cast<int>(level))
+        );
     }
     return selected_power;
 }
@@ -574,7 +582,7 @@ std::vector<std::unique_ptr<EditableTableRow>> DonutBerriesTable::make_defaults(
 
 FlavorPowerTableRow::FlavorPowerTableRow(EditableTableOption& parent_table)
     : EditableTableRow(parent_table)
-    , limit(LockMode::LOCK_WHILE_RUNNING, 1, 999, 1, 1)
+    , limit(LockMode::LOCK_WHILE_RUNNING, 1, 0, 999)
     , power_1(flavor_power_enum_database(), LockMode::LOCK_WHILE_RUNNING, Flavor_Powers::alpha)
     , level_1(power_level_enum_database(), LockMode::LOCK_WHILE_RUNNING, Power_Level::three)
     , power_2(flavor_power_enum_database(), LockMode::LOCK_WHILE_RUNNING, Flavor_Powers::any)
@@ -611,7 +619,8 @@ FlavorPowerTable::FlavorPowerTable()
         "Add all desired donuts to this table. "
         "The program will check the powers of a made donut and compare the powers to each row in the table."
         "<br>A keep limit can be set for each donut. Make sure you have enough berries to make this many donuts!"
-        "<br>Note that a donut with a power level of 3 will be included in the limit for donuts of \"Lv. 2 or 3\""
+        "<br>A single donut can match and count towards the limit of multiple entries in the table."
+        "<br>The order in which you list Flavor Powers 1, 2, and 3 does not matter."
         "<br>Note: \"All Types\" means the All Types Power in-game. \"*\" means match any type for the specified power",
         LockMode::LOCK_WHILE_RUNNING,
         make_defaults()

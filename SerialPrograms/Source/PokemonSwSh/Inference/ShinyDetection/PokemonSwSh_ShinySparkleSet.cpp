@@ -129,7 +129,7 @@ void ShinySparkleSetSwSh::read_from_image(size_t screen_area, const ImageViewRGB
 
     SpinLock lock;
     double best_alpha = 0;
-    GlobalThreadPools::realtime_inference().run_in_parallel(
+    GlobalThreadPools::computation_realtime().run_in_parallel(
         [&](size_t index){
             auto session = make_WaterfillSession();
             session->set_source(matrices[index]);

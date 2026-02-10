@@ -8,8 +8,8 @@
 #define PokemonAutomation_Logging_QueuedLogger_H
 
 #include <deque>
-#include <mutex>
-#include <condition_variable>
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Logger.h"
 
 namespace PokemonAutomation{
@@ -37,8 +37,8 @@ public:
     void signal();
 
 private:
-    std::mutex m_lock;
-    std::condition_variable m_cv;
+    Mutex m_lock;
+    ConditionV m_cv;
     std::deque<std::unique_ptr<Entry>> m_queue;
 };
 #endif

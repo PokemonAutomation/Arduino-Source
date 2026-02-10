@@ -106,6 +106,25 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
     PA_ADD_OPTION(MIN_CALORIE_REMAINING);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
+
+    ROUTE.add_listener(*this);
+}
+
+ShinyHunt_FlySpotReset::~ShinyHunt_FlySpotReset(){
+    ROUTE.remove_listener(*this);
+}
+
+
+void ShinyHunt_FlySpotReset::on_config_value_changed(void* object){
+    if (object == &ROUTE){
+        if (ROUTE == Route::HYPERSPACE_WILD_ZONE){
+            NUM_RESETS.set_visibility(ConfigOptionState::ENABLED);
+            MIN_CALORIE_REMAINING.set_visibility(ConfigOptionState::ENABLED);
+        } else{
+            NUM_RESETS.set_visibility(ConfigOptionState::HIDDEN);
+            MIN_CALORIE_REMAINING.set_visibility(ConfigOptionState::HIDDEN);
+        }
+    }
 }
 
 namespace {
@@ -216,18 +235,20 @@ bool route_hyperspace_wild_zone(
     SimpleIntegerOption<uint16_t>& MIN_CALORIE_REMAINING,
     uint8_t& ready_to_stop_counter
 ){
-    open_map(env.console, context, false, false);
+    {
+        const bool zoom_map_to_max = false;
+        const bool require_map_icons = false;
+        open_map(env.console, context, zoom_map_to_max, require_map_icons);
+    }
     
     // Fly from map to reset spawns
     std::shared_ptr<const ImageRGB32> overworld_screen;
     FastTravelState travel_status = fly_from_map(env.console, context, &overworld_screen);
     if (travel_status != FastTravelState::SUCCESS){
-        stats.errors++;
-        env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "route_hyperspace_wild_zone(): Cannot fast travel after moving map cursor.",
-            env.console
+        throw UserSetupError(
+            env.logger(),
+            "Cannot fast travel in Hyperspace Wild Zone due to aggressive " + STRING_POKEMON + " at portal. "
+            "Pick a Hyperspace that does not have " + STRING_POKEMON + " at portal when running Fly Spot Reset."
         );
     }
 

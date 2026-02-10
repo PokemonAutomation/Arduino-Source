@@ -4,9 +4,9 @@
  *
  */
 
-#include <mutex>
-#include <condition_variable>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 //#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
@@ -81,11 +81,11 @@ public:
     }
 
     virtual void on_config_value_changed(void* object) override{
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<Mutex> lg(m_lock);
         m_cv.notify_all();
     }
 //    virtual void focus_in() override{
-//        std::lock_guard<std::mutex> lg(m_lock);
+//        std::lock_guard<Mutex> lg(m_lock);
 //        m_cv.notify_all();
 //    }
 
@@ -95,7 +95,7 @@ public:
     ){
 //        const QClipboard* clipboard = QApplication::clipboard();
 
-        std::unique_lock<std::mutex> lg(m_lock);
+        std::unique_lock<Mutex> lg(m_lock);
         while (true){
             std::string code = m_code_box;
 //            if (code.empty()){
@@ -104,6 +104,7 @@ public:
             if (!code.empty()){
                 const char* error = enter_code(
                     env, scope,
+                    false,
                     settings,
                     code, false,
                     false
@@ -119,8 +120,8 @@ public:
 
 private:
     TextEditOption& m_code_box;
-    std::mutex m_lock;
-    std::condition_variable m_cv;
+    Mutex m_lock;
+    ConditionVariable m_cv;
 };
 
 
@@ -128,6 +129,7 @@ void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope
     if (MODE == Mode::NORMAL || MODE == Mode::MYSTERY_GIFT){
         const char* error = enter_code(
             env, scope,
+            MODE == Mode::NORMAL,
             SETTINGS,
             CODE,
             MODE == Mode::MYSTERY_GIFT ? true : false,
