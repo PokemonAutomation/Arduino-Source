@@ -10,7 +10,6 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioPassthroughPairQtThread_H
 #define PokemonAutomation_AudioPipeline_AudioPassthroughPairQtThread_H
 
-#include <QThread>
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "CommonFramework/AudioPipeline/AudioPassthroughPair.h"
 
@@ -20,7 +19,7 @@ class Logger;
 class AudioPassthroughPairQt;
 
 
-class AudioPassthroughPairQtThread : private QThread, public AudioPassthroughPair{
+class AudioPassthroughPairQtThread : public AudioPassthroughPair{
 public:
     virtual void add_listener(AudioFloatStreamListener& listener) override;
     virtual void remove_listener(AudioFloatStreamListener& listener) override;
@@ -51,11 +50,8 @@ public:
     virtual void set_sink_volume(double volume) override;
 
 private:
-    virtual void run() override;
-
-private:
     Logger& m_logger;
-    std::atomic<AudioPassthroughPairQt*> m_body;
+    AudioPassthroughPairQt* m_body;
     LifetimeSanitizer m_sanitizer;
 };
 
