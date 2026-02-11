@@ -25,7 +25,13 @@ class QtWorkerThread;
 class QtEventThread;
 
 
-
+//
+//  A simple work-running thread pool.
+//  This is functionally the same as Common/Cpp/Concurrency/ThreadPool.h,
+//  except that these are Qt threads and it is safe to run signal/slots off them.
+//
+//  This is deprecated and will be removed in the future.
+//
 class QtWorkerThreadPool{
 public:
     QtWorkerThreadPool();
@@ -46,6 +52,8 @@ private:
     Mutex m_lock;
     ConditionVariable m_cv;
 };
+
+
 
 
 
@@ -78,12 +86,22 @@ private:
 
 
 
+
+//
+//  This thread pool serves no purpose than to move objects into dedicated
+//  threads so their event loop processing does not conflict with anything
+//  else. Stuff like Qt video and audio will do this.
+//
 class QtEventThreadPool : public QObject{
 public:
     ~QtEventThreadPool();
     void stop();
 
+    //  Construct an object on a dedicated thread.
+    //  You pass it a factory. It returns a pointer to the object.
     QObject* add_object(std::function<std::unique_ptr<QObject>()> factory);
+
+    //  Remove and destruct the object.
     void remove_object(QObject* object) noexcept;
 
 
