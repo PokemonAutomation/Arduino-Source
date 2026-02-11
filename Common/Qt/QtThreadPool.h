@@ -53,47 +53,24 @@ class QtEventThread : public QThread{
     Q_OBJECT
 
 public:
-    QtEventThread(){
-        start();
-    }
-    ~QtEventThread(){
-        quit();
-        wait();
-    }
+    QtEventThread();
+    ~QtEventThread();
 
-    QObject* add_object(std::function<std::unique_ptr<QObject>()> factory){
-        m_pending_factory = std::move(factory);
-        emit add_object_internal();
-        std::unique_lock<Mutex> lg(m_lock);
-        m_cv.wait(lg, [this]{ return m_object != nullptr; });
-        return m_object.get();
-    }
-    void remove_object(){
-        emit remove_object_internal();
-        std::unique_lock<Mutex> lg(m_lock);
-        m_cv.wait(lg, [this]{ return m_object == nullptr; });
-    }
+    QObject* add_object(std::function<std::unique_ptr<QObject>()> factory);
+    void remove_object();
 
-public slots:
-    void add_object_internal(){
-        {
-            std::lock_guard<Mutex> lg(m_lock);
-            m_object = m_pending_factory();
-            m_pending_factory = nullptr;
-        }
-        m_cv.notify_all();
-    }
-    void remove_object_internal(){
-        {
-            std::lock_guard<Mutex> lg(m_lock);
-            m_object.reset();
-        }
-        m_cv.notify_all();
-    }
+public:
+    virtual void run() override;
+
+private:
+    void add_object_internal();
+    void remove_object_internal();
 
 private:
     Mutex m_lock;
     ConditionVariable m_cv;
+
+    std::atomic<QObject*> m_dummy;
 
     std::function<std::unique_ptr<QObject>()> m_pending_factory;
     std::unique_ptr<QObject> m_object;
@@ -119,7 +96,6 @@ private:
 
     Mutex m_lock;
 
-//    bool m_stopping = false;
     std::deque<QtEventThread> m_threads;
     std::vector<QtEventThread*> m_available_threads;
 };

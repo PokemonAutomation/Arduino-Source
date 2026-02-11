@@ -4,7 +4,13 @@
  *
  */
 
+#include "Common/Cpp/Concurrency/SpinPause.h"
 #include "QtThreadPool.h"
+
+//  REMOVE: Don't pull CommonFramework here.
+#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Options/Environment/PerformanceOptions.h"
+#include "CommonFramework/Logging/Logger.h"
 
 //#include <iostream>
 //using std::cout;
@@ -129,6 +135,69 @@ void QtWorkerThreadPool::run_and_wait(std::function<void()> lambda){
 
 
 
+QtEventThread::QtEventThread(){
+    start();
+
+    //  Wait for the thread to fully start up and construct the body.
+    while (m_dummy.load(std::memory_order_acquire) == nullptr){
+        pause();
+    }
+}
+QtEventThread::~QtEventThread(){
+    m_dummy.store(nullptr, std::memory_order_relaxed);
+    quit();
+    wait();
+}
+QObject* QtEventThread::add_object(std::function<std::unique_ptr<QObject>()> factory){
+    m_pending_factory = std::move(factory);
+    QMetaObject::invokeMethod(m_dummy.load(std::memory_order_relaxed), [this]{
+        add_object_internal();
+    });
+    std::unique_lock<Mutex> lg(m_lock);
+    m_cv.wait(lg, [this]{ return m_object != nullptr; });
+    return m_object.get();
+}
+void QtEventThread::remove_object(){
+    QMetaObject::invokeMethod(m_dummy.load(std::memory_order_relaxed), [this]{
+        remove_object_internal();
+    });
+    std::unique_lock<Mutex> lg(m_lock);
+    m_cv.wait(lg, [this]{ return m_object == nullptr; });
+}
+void QtEventThread::run(){
+    GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread(global_logger_tagged());
+
+    QObject dummy;
+    m_dummy.store(&dummy, std::memory_order_release);
+    exec();
+
+    //  Wait until we are in the destructor before destroying the body.
+    while (m_dummy.load(std::memory_order_acquire) != nullptr){
+        pause();
+    }
+}
+void QtEventThread::add_object_internal(){
+    {
+        std::lock_guard<Mutex> lg(m_lock);
+//        cout << "constructing on: " << std::this_thread::get_id() << endl;
+        m_object = m_pending_factory();
+        m_pending_factory = nullptr;
+    }
+    m_cv.notify_all();
+}
+void QtEventThread::remove_object_internal(){
+    {
+        std::lock_guard<Mutex> lg(m_lock);
+//        cout << "destructing on: " << std::this_thread::get_id() << endl;
+        m_object.reset();
+    }
+    m_cv.notify_all();
+}
+
+
+
+
+
 
 QtEventThreadPool::~QtEventThreadPool(){
     stop();
@@ -137,8 +206,6 @@ void QtEventThreadPool::stop(){
     m_threads.clear();
     m_available_threads.clear();
 }
-
-
 
 
 
@@ -157,14 +224,20 @@ QObject* QtEventThreadPool::add_object(std::function<std::unique_ptr<QObject>()>
     return ret;
 }
 void QtEventThreadPool::remove_object(QObject* object) noexcept{
-    std::lock_guard<Mutex> lg(m_lock);
-    auto iter = m_objects.find(object);
-    if (iter == m_objects.end()){
-        return;
+    std::map<QObject*, QtEventThread*>::iterator iter;
+    {
+        std::lock_guard<Mutex> lg(m_lock);
+        iter = m_objects.find(object);
+        if (iter == m_objects.end()){
+            return;
+        }
     }
     iter->second->remove_object();
-    m_available_threads.emplace_back(iter->second);
-    m_objects.erase(iter);
+    {
+        std::lock_guard<Mutex> lg(m_lock);
+        m_available_threads.emplace_back(iter->second);
+        m_objects.erase(iter);
+    }
 }
 
 QtEventThread& QtEventThreadPool::get_thread(){
@@ -175,6 +248,7 @@ QtEventThread& QtEventThreadPool::get_thread(){
         m_available_threads.emplace_back(&new_thread);
     }
     QtEventThread* ret = m_available_threads.back();
+//    cout << "QtEventThreadPool: " << m_threads.size() << ", using = " << ret << endl;
     m_available_threads.pop_back();
     return *ret;
 }
