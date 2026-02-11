@@ -102,6 +102,13 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
         LockMode::UNLOCK_WHILE_RUNNING,
         600, 0, 9999 // default, min, max
     )
+    , LATIAS_VISUAL_SHINY_THRESHOLD(
+        "<b>Latias Visual Shiny Threshold Value:</b><br>Applies only to the Latias Game Reset program. This value is used to evaluate whether a shiny or regular Latias is detected."
+        "<br>NOTE: Increase this threshold to decrease the sensitivity of the detector (decreasing the false negative rate and true positive rate)."
+        "<br>NOTE: The default value of 18 typically works fine. However, some setups/capture cards may result in occasional false positives. If this issue occurs, try increasing the value in increments of 5.",
+        LockMode::LOCK_WHILE_RUNNING,
+        18, 0, 100 // default, min, max
+    )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -114,6 +121,7 @@ ShinyHunt_HyperspaceLegendary::ShinyHunt_HyperspaceLegendary()
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(LEGENDARY);
     PA_ADD_OPTION(MIN_CALORIE_TO_CATCH);
+    PA_ADD_OPTION(LATIAS_VISUAL_SHINY_THRESHOLD);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -125,7 +133,8 @@ namespace {
 // Additionally, respawning is accomplished by resetting the game, so there is no need to track calories.
 bool hunt_latias_alt(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats)
+    ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats,
+    SimpleIntegerOption<uint16_t>& LATIAS_VISUAL_SHINY_THRESHOLD)
 {
     stats.spawns++;
     pbf_press_button(context, BUTTON_Y, 160ms, 2000ms);
@@ -155,20 +164,20 @@ bool hunt_latias_alt(SingleSwitchProgramEnvironment& env,
         cropped_hsv_image_view, false,
         0xff0d3d51, 0xff37ffd2
     );
-    double nonshiny_result = image_average(filtered_image_nonshiny).r;
-    double shiny_result = image_average(filtered_image_shiny).r;
+    double nonshiny_result = 100 * image_average(filtered_image_nonshiny).r;
+    double shiny_result = 100 * image_average(filtered_image_shiny).r;
     
     /*filtered_image_nonshiny.save("filtered_nonshiny.png");
     filtered_image_shiny.save("filtered_shiny.png");
     cropped_image.save("cropped.png");
     env.console.log("Saved images for Latias reset", COLOR_MAGENTA);*/
-    env.console.log(std::format("Score for non-shiny Latias: {}", nonshiny_result), COLOR_MAGENTA);
-    env.console.log(std::format("Score for shiny Latias: {}", shiny_result), COLOR_MAGENTA);
+    env.console.log(std::format("Score for non-shiny Latias: {} (considered non-shiny if over 18)", nonshiny_result), COLOR_MAGENTA);
+    env.console.log(std::format("Score for shiny Latias: {0} (considered shiny if over {1})", shiny_result, 0+LATIAS_VISUAL_SHINY_THRESHOLD), COLOR_MAGENTA);
 
     env.update_stats();
 
     // For now, return true (triggering program stop) if a shiny is detected or a non-shiny is not detected
-    if (nonshiny_result < 0.18 || shiny_result > 0.18) {
+    if (nonshiny_result < 18 || shiny_result > LATIAS_VISUAL_SHINY_THRESHOLD) {
         env.console.log("Shiny Latias identified or regular Latias not identified. Stopping program.", COLOR_MAGENTA);
         return true;
     }
@@ -706,7 +715,7 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
 
     while (true){
         if (LEGENDARY == Legendary::LATIAS_ALT){
-            if (hunt_latias_alt(env, context, stats)){
+            if (hunt_latias_alt(env, context, stats, LATIAS_VISUAL_SHINY_THRESHOLD)){
                 // shiny found
                 SHINY_DETECTED.on_shiny_sighted(
                     env, env.console, context,

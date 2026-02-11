@@ -48,6 +48,7 @@ private:
     ShinySoundDetectedActionOption SHINY_DETECTED;
     EnumDropdownOption<Legendary> LEGENDARY;
     SimpleIntegerOption<uint16_t> MIN_CALORIE_TO_CATCH;
+    SimpleIntegerOption<uint16_t> LATIAS_VISUAL_SHINY_THRESHOLD;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;
