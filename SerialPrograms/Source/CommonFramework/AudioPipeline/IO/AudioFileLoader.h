@@ -12,7 +12,6 @@
 #include <QObject>
 #include <QAudioFormat>
 #include <QFile>
-#include <QThread>
 
 class QAudioBuffer;
 class QAudioDecoder;
@@ -94,7 +93,7 @@ private:
     QAudioFormat m_audioFormat;
 
     AudioDecoderWorker* m_audioDecoderWorker = nullptr;
-    QThread m_audioDecoderThread;
+//    QThread m_audioDecoderThread;
 
     WavFile* m_wavFile = nullptr;
 
