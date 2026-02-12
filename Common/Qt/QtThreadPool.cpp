@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Concurrency/Qt6.9ThreadBugWorkaround.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
 #include "QtThreadPool.h"
 
@@ -203,6 +204,12 @@ QtEventThreadPool::~QtEventThreadPool(){
     stop();
 }
 void QtEventThreadPool::stop(){
+#ifdef PA_ENABLE_QT_ADOPTION_WORKAROUND
+    //  Leak all the threads because they can't be joined without hanging.
+    for (std::unique_ptr<QtEventThread>& thread : m_threads){
+        thread.release();
+    }
+#endif
     m_threads.clear();
     m_available_threads.clear();
 }
@@ -244,8 +251,10 @@ QtEventThread& QtEventThreadPool::get_thread(){
     std::lock_guard<Mutex> lg(m_lock);
     if (m_available_threads.empty()){
         m_available_threads.reserve(m_threads.size() + 1);
-        auto& new_thread = m_threads.emplace_back();
-        m_available_threads.emplace_back(&new_thread);
+        QtEventThread* new_thread = m_threads.emplace_back(
+            std::make_unique<QtEventThread>()
+        ).get();
+        m_available_threads.emplace_back(new_thread);
     }
     QtEventThread* ret = m_available_threads.back();
 //    cout << "QtEventThreadPool: " << m_threads.size() << ", using = " << ret << endl;

@@ -36,6 +36,12 @@ public:
     template <class... Args>
     void reset(Args&&... args);
 
+    Type* release(){
+        Type* ret = m_ptr;
+        m_ptr = nullptr;
+        return ret;
+    }
+
 
 public:
     operator bool() const{ return m_ptr != nullptr; }
