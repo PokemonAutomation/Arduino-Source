@@ -114,7 +114,7 @@ private:
 
     Mutex m_lock;
 
-    std::deque<QtEventThread> m_threads;
+    std::vector<std::unique_ptr<QtEventThread>> m_threads;
     std::vector<QtEventThread*> m_available_threads;
 };
 

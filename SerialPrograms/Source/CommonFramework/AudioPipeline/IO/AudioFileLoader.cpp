@@ -24,7 +24,11 @@
 
 namespace PokemonAutomation{
 
-AudioFileLoader::AudioFileLoader(QObject* parent, const std::string& filename, const QAudioFormat& audioFormat):
+AudioFileLoader::AudioFileLoader(
+    QObject* parent,
+    const std::string& filename,
+    const QAudioFormat& audioFormat
+):
     QObject(parent), m_filename(filename), m_audioFormat(audioFormat) {}
 
 AudioFileLoader::~AudioFileLoader(){

@@ -43,7 +43,11 @@ class AudioFileLoader: public QObject{
     Q_OBJECT
 
 public:
-    AudioFileLoader(QObject* parent, const std::string& filename, const QAudioFormat& audioFormat);
+    AudioFileLoader(
+        QObject* parent,
+        const std::string& filename,
+        const QAudioFormat& audioFormat
+    );
     virtual ~AudioFileLoader();
 
     // Start loading and decoding audio samples.
@@ -126,7 +130,12 @@ class AudioDecoderWorker: public QObject{
 Q_OBJECT
 
 public:
-    AudioDecoderWorker(QObject* parent, const std::string& filename, const QAudioFormat& audioFormat, std::vector<char>& decodedBuffer);
+    AudioDecoderWorker(
+        QObject* parent,
+        const std::string& filename,
+        const QAudioFormat& audioFormat,
+        std::vector<char>& decodedBuffer
+    );
     virtual ~AudioDecoderWorker();
 
     void start();

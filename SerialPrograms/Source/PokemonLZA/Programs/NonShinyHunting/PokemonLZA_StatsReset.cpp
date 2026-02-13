@@ -179,13 +179,17 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             env.log("Detected overworld. Fast traveled to Quasartico Inc.");
 
             // move to the door
-            pbf_move_left_joystick(context, {0, +1}, 8s, 500ms);
+            for (int i = 0; i < 4; ++i) {
+                pbf_press_button(context, BUTTON_Y, 100ms, 1s);
+            }
+            run_towards_gate_with_A_button(env.console, context, 0, +1, Seconds(2));
             if (POKEMON == GiftPokemon::FLOETTE){
                 pbf_mash_button(context, BUTTON_A, 30s);
             }
             if (POKEMON == GiftPokemon::MAGEARNA){
-                pbf_mash_button(context, BUTTON_A, 4s);
-                pbf_move_left_joystick(context, {+0.1, +1}, 2s, 500ms);
+                pbf_mash_button(context, BUTTON_A, Seconds(2));
+                wait_until_overworld(env.console, context, Seconds(10));
+                run_towards_gate_with_A_button(env.console, context, +0.15, +1, Seconds(3));
                 pbf_mash_button(context, BUTTON_A, 30s);
             }
         }
@@ -316,7 +320,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     if (POKEMON == GiftPokemon::FLOETTE || POKEMON == GiftPokemon::MELMETAL){
                         pbf_mash_button(context, BUTTON_A, 60s);
                     }else if (POKEMON == GiftPokemon::MAGEARNA){
-                        pbf_mash_button(context, BUTTON_A, 50s);
+                        pbf_mash_button(context, BUTTON_A, 60s);
                     }else{
                         pbf_mash_button(context, BUTTON_A, 30s);
                     }

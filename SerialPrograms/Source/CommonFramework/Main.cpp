@@ -234,9 +234,6 @@ int main(int argc, char *argv[]){
     global_watchdog().stop();
     static_cast<FileWindowLogger&>(global_logger_raw()).stop();
 
-    //  When we actually migrate to Qt 6.9+, we may need to move the exit(0)
-    //  call here since joining *any* threads may hang.
-
     //  Force stop the thread pools.
     //  This is where all the threads in the program are joined.
     PokemonAutomation::GlobalThreadPools::computation_realtime().stop();
@@ -250,16 +247,16 @@ int main(int argc, char *argv[]){
 
     cout << "Exiting main()..." << endl;
 
-
 //
 //  Workaround Qt 6.9 thread-adoption bug on Windows.
 //      https://github.com/PokemonAutomation/Arduino-Source/issues/570
 //      https://bugreports.qt.io/browse/QTBUG-131892
 //
-//  Program will hang after main() without this!
+//  Joining threads on Qt 6.9+ Windows will hang!
 //
 #ifdef PA_ENABLE_QT_ADOPTION_WORKAROUND
-    exit(ret);
+    cout << "Qt6.9 bug workaround: std::quick_exit() to avoid thread join hangs." << endl;
+    std::quick_exit(ret);
 #endif
 
     return ret;
