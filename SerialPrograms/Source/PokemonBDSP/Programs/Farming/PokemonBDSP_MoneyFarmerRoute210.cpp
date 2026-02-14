@@ -19,6 +19,10 @@
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_EndBattleDetector.h"
 #include "PokemonBDSP_MoneyFarmerRoute210.h"
 
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include <vector>
+#include <limits>
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
@@ -245,6 +249,56 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
     );
 }
 
+void MoneyFarmerRoute210::move_to_trainer(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::vector<ImagePixelBox>& bubbles
+){
+
+    const ImagePixelBox* closest = nullptr;
+    double best_dist_sq = std::numeric_limits<double>::max();
+    
+    // Calculate the distance between the character and the closest box
+    for (const auto& box : bubbles) {
+        double dx = box.min_x - 540.0;
+        double dy = box.min_y - 163.0;
+        double dist_sq = dx*dx + dy*dy;
+        
+        if (dist_sq < best_dist_sq) {
+            best_dist_sq = dist_sq;
+            closest = &box;
+        }
+    }
+    
+    if (!closest) return;
+    
+    if (closest->min_x < 350) {
+        // The trainer who wants to battle is to the far-left, behind the other trainer
+        pbf_press_dpad(context, DPAD_UP, 300ms, 0ms);
+        pbf_press_dpad(context, DPAD_LEFT, 500ms, 0ms);
+        pbf_mash_button(context, BUTTON_A, 1000ms);
+        pbf_press_dpad(context, DPAD_DOWN, 300ms, 0ms);
+        pbf_mash_button(context, BUTTON_A, 1000ms);
+    } else if (closest->min_x < 450) {
+        // The trainer who wants to battle is on the character's left
+        if (closest->min_y < 110) {
+            // The trainer who wants to battle is one step above us
+            pbf_press_dpad(context, DPAD_UP, 300ms, 0ms);
+            pbf_press_dpad(context, DPAD_LEFT, 300ms, 0ms);
+        } else {
+            // The trainer who wants to battle is on our left, right next to us
+            pbf_press_dpad(context, DPAD_LEFT, 300ms, 0ms);
+        }
+    } else if (closest->min_x < 560) {
+        // The trainer who wants to battle is right above us
+        pbf_press_dpad(context, DPAD_UP, 300ms, 0ms);
+    } else {
+        // The trainer who wants to battle is above us, one step to our right
+        pbf_press_dpad(context, DPAD_RIGHT, 300ms, 0ms);
+        pbf_press_dpad(context, DPAD_UP, 300ms, 0ms);
+    }
+    
+    pbf_mash_button(context, BUTTON_A, 1000ms);
+    
+}
+
 void MoneyFarmerRoute210::heal_at_center_and_return(
     Logger& logger, ProControllerContext& context,
     uint8_t pp0[4], uint8_t pp1[4]
@@ -410,10 +464,14 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
             stats.m_react++;
         }
         for (const ImagePixelBox& box : bubbles){
-            env.log("Reaction at: " + std::to_string(box.min_x), COLOR_BLUE);
+            env.log("Reaction at X: " + std::to_string(box.min_x) + "Y: " + std::to_string(box.min_y), COLOR_BLUE);
+        }
+        if (!bubbles.empty()) {
+            move_to_trainer(env, context, bubbles);
         }
 
         if (this->battle(env, context, pp0, pp1)){
+            env.update_stats();
             return;
         }
         if (!has_pp(pp0, pp1)){

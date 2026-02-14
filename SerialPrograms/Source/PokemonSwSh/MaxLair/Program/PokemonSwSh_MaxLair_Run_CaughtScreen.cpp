@@ -217,7 +217,7 @@ StateMachineAction run_caught_screen(
         if (is_host){
             runtime.path_stats.clear();
         }
-        if (shinies.empty() || shinies[0] == 3){
+        if (shinies.empty()){
             console.log("Quitting back to entrance.", COLOR_PURPLE);
             tracker.leave_summary();
             synchronize_caught_screen(console_index, console, context, state_tracker);
@@ -226,8 +226,10 @@ StateMachineAction run_caught_screen(
             pbf_press_button(context, BUTTON_A, 80ms, 920ms);
             return mash_A_to_entrance(runtime, console, context, entrance);
         }else{
-            console.log("Taking non-shiny boss and returning to entrance...", COLOR_BLUE);
-            tracker.scroll_to(shinies[0]);
+            
+            size_t take_index = shinies.back();
+            console.log("Taking shiny at slot " + std::to_string(take_index) + " and returning to entrance...", COLOR_BLUE);
+            tracker.scroll_to(take_index);
             tracker.enter_summary();    //  Enter summary to verify you're on the right mon.
             tracker.leave_summary();
             synchronize_caught_screen(console_index, console, context, state_tracker);
