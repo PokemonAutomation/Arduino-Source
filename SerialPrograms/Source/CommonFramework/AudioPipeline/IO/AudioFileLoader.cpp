@@ -94,7 +94,7 @@ bool AudioFileLoader::start(){
         connect(m_timer, &QTimer::timeout, this, &AudioFileLoader::sendDecodedBufferOnTimer);
     });
 
-    m_audioDecoderWorker->start();
+    emit m_audioDecoderWorker->start();
 
     return m_audioDecoderWorker->startSucceeded();
 }
@@ -288,7 +288,7 @@ AudioDecoderWorker::AudioDecoderWorker(
     QObject(parent), m_filename(filename), m_audioFormat(audioFormat), m_decodedBuffer(decodedBuffer){}
 
 
-void AudioDecoderWorker::start(){
+void AudioDecoderWorker::internal_start(){
     m_audioDecoder = new QAudioDecoder(this);
 
 #if 0
@@ -353,7 +353,7 @@ AudioDecoderWorker::~AudioDecoderWorker(){
     stop();
 }
 
-void AudioDecoderWorker::stop(){
+void AudioDecoderWorker::internal_stop(){
     if (m_audioDecoder){
         m_audioDecoder->stop();
     }
