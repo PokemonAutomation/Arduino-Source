@@ -21,9 +21,6 @@
 #include "PokemonSwSh/Programs/Hosting/PokemonSwSh_DenTools.h"
 #include "PokemonSwSh/Programs/Hosting/PokemonSwSh_DenRoller.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
-#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h"
-#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.h"
-#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateBackwardN.h"
 #include "PokemonSwSh/Options/PokemonSwSh_Catchability.h"
 
 namespace PokemonAutomation{
