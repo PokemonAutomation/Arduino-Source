@@ -25,11 +25,13 @@ ReliableStreamConnection::ReliableStreamConnection(
     Logger& logger, bool log_everything,
     ThreadPool& thread_pool,
     StreamConnection& unreliable_connection,
-    WallDuration retransmit_timeout
+    WallDuration retransmit_timeout,
+    Mutex* print_lock
 )
     : m_logger(logger)
     , m_unreliable_connection(unreliable_connection)
     , m_retransmit_timeout(retransmit_timeout)
+    , m_print_lock(print_lock)
     , m_log_everything(log_everything)
 //    , m_version_verified(false)
     , m_remote_slot_capacity(1)
@@ -228,7 +230,10 @@ void ReliableStreamConnection::retransmit_thread(){
 //
 
 void ReliableStreamConnection::on_recv(const void* data, size_t bytes){
-    cout << "ReliableStreamConnection::on_recv(): " << bytes << endl;
+    if (m_print_lock){
+        std::lock_guard<Mutex> lg(*m_print_lock);
+        cout << "ReliableStreamConnection::on_recv(): " << bytes << endl;
+    }
     pabb2_PacketParser_push_bytes(
         &m_parser,
         this, &ReliableStreamConnection::on_packet,

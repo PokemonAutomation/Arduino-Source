@@ -52,6 +52,7 @@ MockDevice::~MockDevice(){
 }
 void MockDevice::print() const{
     std::lock_guard<Mutex> lg(m_device_lock);
+    std::lock_guard<Mutex> lg1(m_print_lock);
     pabb2_StreamCoalescer_print(&m_connection.stream_coalescer, true);
 }
 
@@ -65,6 +66,7 @@ size_t MockDevice::device_send_serial(const void* data, size_t bytes, bool is_re
         }
 
         if ((rand() % 100) / 100. < PABB2_DROP_DEVICE_TO_HOST){
+            std::lock_guard<Mutex> lg1(m_print_lock);
             cout << "**Intentionally Dropping Packet: device -> host**" << endl;
             return 0;
         }
@@ -77,6 +79,7 @@ size_t MockDevice::device_send_serial(const void* data, size_t bytes, bool is_re
         );
 
         if ((rand() % 100) / 100. < PABB2_DROP_DEVICE_TO_HOST){
+            std::lock_guard<Mutex> lg1(m_print_lock);
             cout << "**Intentionally Corrupting Packet: device -> host**" << endl;
             m_device_to_host_line[rand() % m_device_to_host_line.size()] = 0;
         }
@@ -104,6 +107,7 @@ size_t MockDevice::send(const void* data, size_t bytes){
 //        cout << "MockDevice::send(const void* data, size_t bytes)" << endl;
 
         if ((rand() % 100) / 100. < PABB2_DROP_HOST_TO_DEVICE){
+            std::lock_guard<Mutex> lg1(m_print_lock);
             cout << "**Intentionally Dropping Packet: host -> device**" << endl;
             return 0;
         }
@@ -119,6 +123,7 @@ size_t MockDevice::send(const void* data, size_t bytes){
         );
 
         if ((rand() % 100) / 100. < PABB2_DROP_HOST_TO_DEVICE){
+            std::lock_guard<Mutex> lg1(m_print_lock);
             cout << "**Intentionally Corrupting Packet: host -> device**" << endl;
             m_host_to_device_line[rand() % m_host_to_device_line.size()] = 0;
         }
@@ -130,6 +135,53 @@ size_t MockDevice::send(const void* data, size_t bytes){
     m_device_cv.notify_all();
     return bytes;
 }
+
+void MockDevice::push_expected_stream_data(const void* data, size_t bytes){
+    std::lock_guard<Mutex> lg(m_device_lock);
+
+    m_expected_host_to_device_stream.insert(
+        m_expected_host_to_device_stream.end(),
+        (const uint8_t*)data,
+        (const uint8_t*)data + bytes
+    );
+
+    bytes = m_expected_host_to_device_stream.size();
+
+    std::vector<uint8_t> actual(bytes);
+    size_t read = pabb2_ReliableStreamConnection_read_stream(
+        &m_connection,
+        actual.data(), bytes
+    );
+
+    {
+        std::lock_guard<Mutex> lg1(m_print_lock);
+        cout << "read = " << read << endl;
+    }
+
+
+    std::vector<uint8_t> expected(
+        m_expected_host_to_device_stream.begin(),
+        m_expected_host_to_device_stream.begin() + read
+    );
+
+    m_expected_host_to_device_stream.erase(
+        m_expected_host_to_device_stream.begin(),
+        m_expected_host_to_device_stream.begin() + read
+    );
+
+    if (memcmp(actual.data(), expected.data(), read) == 0){
+        return;
+    }
+
+    std::lock_guard<Mutex> lg1(m_print_lock);
+    cout << "MISMATCH: Expected: "
+         << std::string((const char*)expected.data(), read)
+         << ", Actual: "
+         << std::string((const char*)actual.data(), read)
+         << endl;
+}
+
+
 
 
 void MockDevice::device_thread(){

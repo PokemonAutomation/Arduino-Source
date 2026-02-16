@@ -368,7 +368,11 @@ bool set_fast_travel_menu_filter_routine(
     int target_filter_index = static_cast<int>(filter);
     WallClock deadline = current_time() + 30s;
     do {
-        int selected_filter_index = get_current_selector_index(console, FAST_TRAVEL_FILTER_ARROW_BOX(), FAST_TRAVEL_FILTER_SPACING);
+        int selected_filter_index = get_current_selector_index(
+            console,
+            FAST_TRAVEL_FILTER_ARROW_BOX(),
+            FAST_TRAVEL_FILTER_SPACING
+        );
         if (selected_filter_index == -1){
             return false;
         }
