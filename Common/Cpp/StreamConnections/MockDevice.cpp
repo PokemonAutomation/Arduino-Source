@@ -4,8 +4,8 @@
  *
  */
 
+#include <string.h>
 #include "Common/PABotBase2/PABotBase2_ConnectionDebug.h"
-
 #include "MockDevice.h"
 
 //  REMOVE
