@@ -34,7 +34,8 @@ public:
         Logger& logger, bool log_everything,
         ThreadPool& thread_pool,
         StreamConnection& unreliable_connection,
-        WallDuration retransmit_timeout = Milliseconds(100)
+        WallDuration retransmit_timeout = Milliseconds(100),
+        Mutex* print_lock = nullptr
     );
     ~ReliableStreamConnection();
 
@@ -98,6 +99,7 @@ private:
     Logger& m_logger;
     StreamConnection& m_unreliable_connection;
     const WallDuration m_retransmit_timeout;
+    Mutex* m_print_lock;
 
     pabb2_PacketSender m_reliable_sender;
     pabb2_PacketParser m_parser;
@@ -113,6 +115,7 @@ private:
     mutable Mutex m_lock;
     ConditionVariable m_cv;
     AsyncTask m_retransmit_thread;
+
 };
 
 

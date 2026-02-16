@@ -309,7 +309,8 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
             logger, true,
             GlobalThreadPools::unlimited_realtime(),
             device,
-            1s
+            1s,
+            &device.print_lock()
         );
 
         connection.reset();
@@ -324,19 +325,21 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
         connection.wait_for_pending();
 
 
-        connection.send("asdf", 4);
-        connection.send("qwer", 4);
-        connection.send("zxcv", 4);
+        connection.send("asdf", 4); device.push_expected_stream_data("asdf", 4);
+        connection.send("qwer", 4); device.push_expected_stream_data("qwer", 4);
+        connection.send("zxcv", 4); device.push_expected_stream_data("zxcv", 4);
+        connection.wait_for_pending();
+
         cout << "sent = " << connection.send("0123456789abcdef", 16) << endl;
 //        connection.send("0123456789abcdef", 16);
 //        connection.send("0123456789abcdef", 16);
 //        connection.send("0123456789abcdef", 16);
 
         connection.print();
+        device.print();
 
         connection.wait_for_pending();
 
-        device.print();
 
         scope.wait_for(60s);
     }

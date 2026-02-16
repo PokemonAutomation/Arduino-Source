@@ -27,6 +27,10 @@ public:
 
     void print() const;
 
+    Mutex& print_lock() const{
+        return m_print_lock;
+    }
+
 
 private:
     //  Call from device.
@@ -54,6 +58,8 @@ public:
 
     virtual size_t send(const void* data, size_t bytes) override;
 
+    void push_expected_stream_data(const void* data, size_t bytes);
+
 
 private:
     void device_thread();
@@ -71,6 +77,8 @@ private:
     size_t m_host_to_device_capacity = 1024;
     std::deque<uint8_t> m_host_to_device_line;
 
+    std::deque<uint8_t> m_expected_host_to_device_stream;
+
     std::atomic<bool> m_stopping;
 
     mutable Mutex m_device_lock;
@@ -80,6 +88,8 @@ private:
     mutable Mutex m_host_lock;
     ConditionVariable m_host_cv;
     AsyncTask m_host_thread;
+
+    mutable Mutex m_print_lock;
 };
 
 
