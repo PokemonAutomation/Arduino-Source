@@ -4,13 +4,13 @@
  *
  */
 
+#include <iostream>
 #include <QCoreApplication>
 #include <QThread>
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Concurrency/Qt6.9ThreadBugWorkaround.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 
-//#include <iostream>
 //using std::cout;
 //using std::endl;
 
@@ -110,6 +110,7 @@ void Thread::join(){
     m_data->quit();
 
     //  But instead of waiting and joining (which will hang), we leak it intentionally.
+    std::cout << "Intentionally leaking QThread to work around Qt6.9 thread adoption bug..." << std::endl;
     m_data.release();
 #endif
 

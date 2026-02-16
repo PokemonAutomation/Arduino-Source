@@ -144,7 +144,7 @@ bool pabb2_StreamCoalescer_push_stream(pabb2_StreamCoalescer* self, const pabb2_
         uint8_t diff = seqnum - slot_head;
 //        printf("seqnum = %d, slot_head = %d\n", seqnum, slot_head);
         if (diff >= PABB2_StreamCoalescer_SLOTS){
-//            printf("Device: In the past.\n");
+//            printf("Device: In the past or too far ahead.\n");
             //  Negative means we're in the past and we can just ack.
             return diff & 0x80;
         }
@@ -185,7 +185,7 @@ bool pabb2_StreamCoalescer_push_stream(pabb2_StreamCoalescer* self, const pabb2_
 size_t pabb2_StreamCoalescer_read(pabb2_StreamCoalescer* self, void* data, size_t max_bytes){
     if (self->stream_reset){
         self->stream_reset = false;
-        return (size_t)-1;
+        return 0;
     }
 
     size_t read = 0;
