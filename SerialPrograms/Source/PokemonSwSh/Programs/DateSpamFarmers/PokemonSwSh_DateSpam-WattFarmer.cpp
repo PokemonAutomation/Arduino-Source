@@ -11,17 +11,13 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h"
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.h"
-#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateBackwardN.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
-#include "PokemonSwSh_DateSpam-WattFarmer.h"
-#include "PokemonSwSh/Programs/Hosting/PokemonSwSh_DenTools.h"
-#include "PokemonSwSh/Programs/Hosting/PokemonSwSh_DenRoller.h"
-#include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh/Options/PokemonSwSh_Catchability.h"
+#include "PokemonSwSh/Programs/Hosting/PokemonSwSh_DenTools.h"
+#include "PokemonSwSh_DateSpam-WattFarmer.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -99,7 +95,7 @@ void WattFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     uint8_t year = MAX_YEAR;
     uint16_t save_count = 0;
     
-    if (!HAVE_NSO) {
+    if (!HAVE_NSO){
         // First subdivide the number of skips into batches of 60 because the roll_den function only goes up to 60
         
         for (uint32_t c = 0; c < SKIPS; c++){
@@ -135,7 +131,7 @@ void WattFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         ssf_mash_AZs(context, GameSettings::instance().COLLECT_WATTS_OFFLINE_DELAY0);
         ssf_mash1_button(context, BUTTON_B, 960ms);
         
-    } else {
+    }else{
         for (uint32_t c = 0; c < SKIPS; c++){
             env.log("Fetch Attempts: " + tostr_u_commas(c));
 
