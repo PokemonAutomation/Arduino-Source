@@ -11,6 +11,8 @@
 #include "Common/Cpp/Options/StaticTableOption.h"
 #include "CommonFramework/Options/LabelCellOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
+#include "Common/Cpp/Options/ConfigOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -24,19 +26,26 @@ enum class BossAction{
 };
 
 
-class BossActionRow : public StaticTableRow{
+class BossActionRow : public StaticTableRow,
+                        public OptionListener<EnumDropdownOption<BossAction>>{
 public:
     BossActionRow(std::string slug, const std::string& name_slug, const std::string& sprite_slug);
+                            
+    virtual void value_changed(void* object, const EnumDropdownOption<BossAction>& option, BossAction value) override;
 
     LabelCellOption pokemon;
-    EnumDropdownCell<BossAction> action;
+    EnumDropdownOption<BossAction> action;
     PokemonBallSelectCell ball;
+    BooleanCheckBoxOption save_on_the_go;
 };
 
 class BossActionTable : public StaticTableOption{
 public:
     BossActionTable();
-    virtual std::vector<std::string> make_header() const;
+    virtual std::vector<std::string> make_header() const override;
+    
+private:
+    std::vector<BossActionRow*> m_rows;
 };
 
 

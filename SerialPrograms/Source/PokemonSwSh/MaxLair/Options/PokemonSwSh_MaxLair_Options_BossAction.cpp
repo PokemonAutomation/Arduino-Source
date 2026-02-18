@@ -15,6 +15,10 @@
 #include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
 #include "PokemonSwSh_MaxLair_Options_BossAction.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/ConfigOption.h"
+#include <vector>
+#include <memory>
 
 //#include <iostream>
 //using std::cout;
@@ -49,11 +53,40 @@ BossActionRow::BossActionRow(std::string slug, const std::string& name_slug, con
         BossAction::CATCH_AND_STOP_IF_SHINY
     )
     , ball(LockMode::UNLOCK_WHILE_RUNNING, "poke-ball")
+    , save_on_the_go(LockMode::UNLOCK_WHILE_RUNNING, "Save when seen?", false)
 {
     PA_ADD_STATIC(pokemon);
     add_option(action, "Action");
     add_option(ball, "Ball");
+    add_option(save_on_the_go, "Save when seen?");
+    
+    save_on_the_go.set_visibility(
+        action.enum_value() == BossAction::CATCH_AND_STOP_IF_SHINY ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED
+    );
+    
+    action.add_listener(*this);
 }
+
+void BossActionRow::value_changed(void* object, const EnumDropdownOption<BossAction>& option, BossAction value) {
+    if (&option == &action) {
+        save_on_the_go.set_visibility(
+            value == BossAction::CATCH_AND_STOP_IF_SHINY ?
+            ConfigOptionState::ENABLED : ConfigOptionState::DISABLED
+        );
+        
+        if (value != BossAction::CATCH_AND_STOP_IF_SHINY) {
+            save_on_the_go = false;
+        }
+    }
+}
+
+class BossActionTable : public StaticTableOption {
+    public:
+        BossActionTable();
+        virtual std::vector<std::string> make_header() const override;
+    private:
+    std::vector<BossActionRow*> m_rows;
+};
 
 
 BossActionTable::BossActionTable()
@@ -64,15 +97,36 @@ BossActionTable::BossActionTable()
         const MaxLairSlugs& slugs = get_maxlair_slugs(item.second);
         const std::string& sprite_slug = *slugs.sprite_slugs.begin();
         const std::string& name_slug = slugs.name_slug;
-        add_row(std::make_unique<BossActionRow>(item.second, name_slug, sprite_slug));
+        
+        auto row = std::make_unique<BossActionRow>(item.second, name_slug, sprite_slug);
+        m_rows.push_back(row.get());
+        add_row(std::move(row));
     }
     finish_construction();
+    
+    // Check function for only being able to select max 3 bosses to be saved on the go
+    for (auto* row : m_rows) {
+        auto& checkbox = row->save_on_the_go;
+        checkbox.add_listener([this, &checkbox](const BooleanCheckBoxOption&, bool value) {
+            if (value) {
+                size_t count = 0;
+                for (auto* r : m_rows) {
+                    if (r->save_on_the_go) count++;
+                }
+                if (count > 3) {
+                    // Make all other checkboxes equal to false
+                    const_cast<BooleanCheckBoxOption&>(checkbox).set_value(false);
+                }
+            }
+        });
+    }
 }
 std::vector<std::string> BossActionTable::make_header() const{
     std::vector<std::string> ret{
         STRING_POKEMON,
         "Action",
-        STRING_POKEBALL
+        STRING_POKEBALL,
+        "Save Path?"
     };
     return ret;
 }

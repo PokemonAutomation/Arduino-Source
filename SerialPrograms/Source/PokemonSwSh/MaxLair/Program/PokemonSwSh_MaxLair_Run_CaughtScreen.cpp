@@ -217,33 +217,31 @@ StateMachineAction run_caught_screen(
         if (is_host){
             runtime.path_stats.clear();
         }
-        if (shinies.empty()){
-            console.log("Quitting back to entrance.", COLOR_PURPLE);
-            tracker.leave_summary();
-            synchronize_caught_screen(console_index, console, context, state_tracker);
-            pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
-            pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
-            pbf_press_button(context, BUTTON_A, 80ms, 920ms);
-            return mash_A_to_entrance(runtime, console, context, entrance);
-        }else{
-            
-            size_t take_index = shinies.back();
-            console.log("Taking shiny at slot " + std::to_string(take_index) + " and returning to entrance...", COLOR_BLUE);
-            tracker.scroll_to(take_index);
-            tracker.enter_summary();    //  Enter summary to verify you're on the right mon.
-            tracker.leave_summary();
-            synchronize_caught_screen(console_index, console, context, state_tracker);
-            StateMachineAction state = mash_A_to_entrance(runtime, console, context, entrance);
-            if (state == StateMachineAction::RESET_RECOVER){
-                throw_and_log<FatalProgramException>(
-                    console.logger(),
-                    ErrorReport::NO_ERROR_REPORT,
-                    "Unable to take " + Pokemon::STRING_POKEMON + ". Did you forget to disable nicknames?",
-                    console
-               );
+            if (shinies.empty() || shinies[0] == 3){
+                console.log("Quitting back to entrance.", COLOR_PURPLE);
+                tracker.leave_summary();
+                synchronize_caught_screen(console_index, console, context, state_tracker);
+                pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
+                pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
+                pbf_press_button(context, BUTTON_A, 80ms, 920ms);
+                return mash_A_to_entrance(runtime, console, context, entrance);
+            }else{
+                console.log("Taking non-shiny boss and returning to entrance...", COLOR_BLUE);
+                tracker.scroll_to(shinies[0]);
+                tracker.enter_summary();    //  Enter summary to verify you're on the right mon.
+                tracker.leave_summary();
+                synchronize_caught_screen(console_index, console, context, state_tracker);
+                StateMachineAction state = mash_A_to_entrance(runtime, console, context, entrance);
+                if (state == StateMachineAction::RESET_RECOVER){
+                    throw_and_log<FatalProgramException>(
+                        console.logger(),
+                        ErrorReport::NO_ERROR_REPORT,
+                        "Unable to take " + Pokemon::STRING_POKEMON + ". Did you forget to disable nicknames?",
+                        console
+                   );
+                }
+                return state;
             }
-            return state;
-        }
 
     case CaughtScreenAction::RESET:
         console.log("Resetting game...", COLOR_BLUE);
