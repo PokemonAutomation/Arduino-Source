@@ -70,7 +70,7 @@ DenRoller::DenRoller()
         "Automatically stop when this " + STRING_POKEMON + " is rolled. Video output is required."
     )
     , VIEW_TIME0(
-        "<b>View Time:</b><br>Wait this long before restting. This wait is skipped if the desired " +
+        "<b>View Time:</b><br>Wait this long before resetting. This wait is skipped if the desired " +
         STRING_POKEMON + " is set since the program will be watching it for you.",
         LockMode::LOCK_WHILE_RUNNING,
         "5 s"

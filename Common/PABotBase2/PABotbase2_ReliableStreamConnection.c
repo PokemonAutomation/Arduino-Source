@@ -5,6 +5,7 @@
  */
 
 #include <stdio.h>  //  REMOVE
+#include "PABotBase2_ConnectionDebug.h"
 #include "PABotbase2_ReliableStreamConnection.h"
 
 
@@ -124,6 +125,7 @@ void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* s
             );
         }else{
             printf("Device: Failed to push.\n");
+            pabb2_StreamCoalescer_print(&self->stream_coalescer, true);
         }
         fflush(stdout);
         return;

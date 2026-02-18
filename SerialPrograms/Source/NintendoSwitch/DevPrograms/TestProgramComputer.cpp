@@ -281,7 +281,45 @@ struct RequestManagerConfig{
 
 
 
+std::string random_string(size_t max_length){
+    size_t length = rand() % max_length;
 
+    static const char TABLE[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+    std::string ret;
+    for (size_t c = 0; c < length; c++){
+        ret += TABLE[rand() % 62 + 48];
+    }
+    return ret;
+}
+
+void stress_test(Logger& logger, CancellableScope& scope){
+    using namespace std::chrono_literals;
+
+    MockDevice device(GlobalThreadPools::unlimited_normal());
+
+    ReliableStreamConnection connection(
+        &scope,
+        logger, true,
+        GlobalThreadPools::unlimited_realtime(),
+        device,
+        100ms,
+        &device.print_lock()
+    );
+
+    //  Connect
+    connection.reset();
+    connection.send_request(PABB2_CONNECTION_OPCODE_ASK_VERSION);
+    connection.wait_for_pending();
+    connection.send_request(PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE);
+    connection.wait_for_pending();
+    connection.send_request(PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS);
+    connection.wait_for_pending();
+
+
+
+
+}
 
 
 
@@ -309,7 +347,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
             logger, true,
             GlobalThreadPools::unlimited_realtime(),
             device,
-            1s,
+            100ms,
             &device.print_lock()
         );
 
@@ -330,16 +368,35 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
         connection.send("zxcv", 4); device.push_expected_stream_data("zxcv", 4);
         connection.wait_for_pending();
 
-        cout << "sent = " << connection.send("0123456789abcdef", 16) << endl;
+        {
+            std::lock_guard<Mutex> lg(device.print_lock());
+            cout << "sent = " << connection.send("0123456789abcdef", 16) << endl;
+        }
+        device.push_expected_stream_data("0123456789abcdef", 16);
 //        connection.send("0123456789abcdef", 16);
 //        connection.send("0123456789abcdef", 16);
 //        connection.send("0123456789abcdef", 16);
+
+        while (connection.pending() != 0 || device.verify_stream_data()){
+        }
+
+        connection.wait_for_pending();
+
+        {
+            std::lock_guard<Mutex> lg(device.print_lock());
+            cout << "============> Done" << endl;
+        }
+        device.verify_stream_data();
 
         connection.print();
         device.print();
 
-        connection.wait_for_pending();
-
+        {
+            std::lock_guard<Mutex> lg(device.print_lock());
+            cout << "============> Finishing up" << endl;
+        }
+        scope.wait_for(5s);
+        device.verify_stream_data();
 
         scope.wait_for(60s);
     }
