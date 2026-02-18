@@ -74,6 +74,10 @@ bool ReliableStreamConnection::cancel(std::exception_ptr exception) noexcept{
     m_cv.notify_all();
     return false;
 }
+size_t ReliableStreamConnection::pending() const{
+    std::unique_lock<Mutex> lg(m_lock);
+    return pabb2_PacketSender_slots_used(&m_reliable_sender);
+}
 void ReliableStreamConnection::wait_for_pending(){
     std::unique_lock<Mutex> lg(m_lock);
     m_cv.wait(lg, [this]{

@@ -75,10 +75,10 @@ void pabb2_PacketSender_init(
 );
 void pabb2_PacketSender_reset(pabb2_PacketSender* self);
 
-static inline uint8_t pabb2_PacketSender_slots_used(pabb2_PacketSender* self){
+static inline uint8_t pabb2_PacketSender_slots_used(const pabb2_PacketSender* self){
     return self->slot_tail - self->slot_head;
 }
-static inline size_t pabb2_PacketSender_buffer_used(pabb2_PacketSender* self){
+static inline size_t pabb2_PacketSender_buffer_used(const pabb2_PacketSender* self){
     return self->buffer_tail - self->buffer_head;
 }
 

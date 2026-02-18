@@ -49,11 +49,11 @@ private:
         camera->setCameraFormat(m_format);
         connect(
             camera.get(), &QCamera::errorOccurred,
-            this, [&](){
-                if (camera->error() == QCamera::NoError){
+            this, [this](){
+                if (m_camera->error() == QCamera::NoError){
                     return;
                 }
-                m_logger.log("QCamera error: " + camera->errorString().toStdString(), COLOR_RED);
+                m_logger.log("QCamera error: " + m_camera->errorString().toStdString(), COLOR_RED);
             }
         );
 
