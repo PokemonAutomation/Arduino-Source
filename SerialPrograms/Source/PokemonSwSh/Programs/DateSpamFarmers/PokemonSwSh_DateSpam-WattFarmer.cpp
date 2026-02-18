@@ -99,7 +99,7 @@ void WattFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         // First subdivide the number of skips into batches of 60 because the roll_den function only goes up to 60
         
         for (uint32_t c = 0; c < SKIPS; c++){
-            enter_den(context, 0ms, c >= 0, false);
+            enter_den(context, 0ms, true, false);
             enter_lobby(context, 0ms, false, Catchability::ALWAYS_CATCHABLE);
 
             //  Skip forward.
