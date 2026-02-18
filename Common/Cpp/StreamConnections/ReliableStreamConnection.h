@@ -43,6 +43,7 @@ public:
         cancel(nullptr);
     }
     virtual bool cancel(std::exception_ptr exception) noexcept override;
+    size_t pending() const;
     void wait_for_pending();
 
     void reset();

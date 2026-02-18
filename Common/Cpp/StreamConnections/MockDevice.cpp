@@ -13,7 +13,7 @@
 using std::cout;
 using std::endl;
 
-#if 0
+#if 1
 #define PABB2_DROP_HOST_TO_DEVICE   0.2
 #define PABB2_DROP_DEVICE_TO_HOST   0.2
 #else
@@ -137,15 +137,20 @@ size_t MockDevice::send(const void* data, size_t bytes){
 }
 
 void MockDevice::push_expected_stream_data(const void* data, size_t bytes){
+    {
+        std::lock_guard<Mutex> lg(m_device_lock);
+
+        m_expected_host_to_device_stream.insert(
+            m_expected_host_to_device_stream.end(),
+            (const uint8_t*)data,
+            (const uint8_t*)data + bytes
+        );
+    }
+    verify_stream_data();
+}
+size_t MockDevice::verify_stream_data(){
     std::lock_guard<Mutex> lg(m_device_lock);
-
-    m_expected_host_to_device_stream.insert(
-        m_expected_host_to_device_stream.end(),
-        (const uint8_t*)data,
-        (const uint8_t*)data + bytes
-    );
-
-    bytes = m_expected_host_to_device_stream.size();
+    size_t bytes = m_expected_host_to_device_stream.size();
 
     std::vector<uint8_t> actual(bytes);
     size_t read = pabb2_ReliableStreamConnection_read_stream(
@@ -169,16 +174,23 @@ void MockDevice::push_expected_stream_data(const void* data, size_t bytes){
         m_expected_host_to_device_stream.begin() + read
     );
 
-    if (memcmp(actual.data(), expected.data(), read) == 0){
-        return;
-    }
+    bool matched = memcmp(actual.data(), expected.data(), read) == 0;
 
     std::lock_guard<Mutex> lg1(m_print_lock);
-    cout << "MISMATCH: Expected: "
-         << std::string((const char*)expected.data(), read)
-         << ", Actual: "
-         << std::string((const char*)actual.data(), read)
-         << endl;
+    if (matched){
+        cout << "Matched: Bytes = " << read
+             << ", Remaining = " << m_expected_host_to_device_stream.size()
+             << ", Matched = "
+             << std::string((const char*)actual.data(), read)
+             << endl;
+    }else{
+        cout << "MISMATCH: Expected = "
+             << std::string((const char*)expected.data(), read)
+             << ", Actual = "
+             << std::string((const char*)actual.data(), read)
+             << endl;
+    }
+    return m_expected_host_to_device_stream.size();
 }
 
 

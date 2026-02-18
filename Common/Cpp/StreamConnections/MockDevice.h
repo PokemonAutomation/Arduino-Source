@@ -59,6 +59,7 @@ public:
     virtual size_t send(const void* data, size_t bytes) override;
 
     void push_expected_stream_data(const void* data, size_t bytes);
+    size_t verify_stream_data();
 
 
 private:
