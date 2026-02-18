@@ -39,6 +39,8 @@ private:
 
     SimpleIntegerOption<uint32_t> SKIPS;
     SimpleIntegerOption<uint16_t> SAVE_ITERATIONS0;
+    
+    BooleanCheckBoxOption HAVE_NSO;
 
     EventNotificationsOption NOTIFICATIONS;
 };
