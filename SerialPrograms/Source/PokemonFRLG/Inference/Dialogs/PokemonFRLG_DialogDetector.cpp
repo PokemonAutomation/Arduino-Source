@@ -27,8 +27,8 @@ namespace PokemonFRLG{
 
 WhiteDialogDetector::WhiteDialogDetector(Color color)
     : m_right_box(0.812, 0.726, 0.013, 0.169)
-    , m_top_box(0.178, 0.716, 0.632, 0.017)
-    , m_bottom_box(0.178, 0.888, 0.632, 0.011)
+    , m_top_box(0.175, 0.715, 0.649, 0.005)
+    , m_bottom_box(0.177, 0.896, 0.645, 0.008)
 {}
 void WhiteDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_right_box);
@@ -48,15 +48,11 @@ bool WhiteDialogDetector::detect(const ImageViewRGB32& screen){
     return false;
 }
 
-// Detect the red advancement arrow by filtering for DARK red.
-// There is red/pink color text for female npcs in non-japan versions
-// might be an issue if using it for things other than shiny-hunt resetting
-// all gifts are black/blue dialogs?
 AdvanceWhiteDialogDetector::AdvanceWhiteDialogDetector(Color color)
     : m_dialog_box(0.170, 0.726, 0.655, 0.172)
     , m_right_box(0.812, 0.726, 0.013, 0.169)
-    , m_top_box(0.178, 0.716, 0.632, 0.017)
-    , m_bottom_box(0.178, 0.888, 0.632, 0.011)
+    , m_top_box(0.175, 0.715, 0.649, 0.005)
+    , m_bottom_box(0.177, 0.896, 0.645, 0.008)
 {}
 void AdvanceWhiteDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_dialog_box);
@@ -92,6 +88,33 @@ bool AdvanceWhiteDialogDetector::detect(const ImageViewRGB32& screen){
         && (stats.average.r > stats.average.g + 200)
         )
     {
+        return true;
+    }
+    return false;
+}
+
+SelectionDialogDetector::SelectionDialogDetector(Color color)
+    : m_right_box(0.812, 0.726, 0.013, 0.169)
+    , m_top_box(0.175, 0.715, 0.649, 0.005)
+    , m_bottom_box(0.177, 0.896, 0.645, 0.008)
+    , m_selection_box(0.783, 0.457, 0.017, 0.177)
+{}
+void SelectionDialogDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(COLOR_RED, m_right_box);
+    items.add(COLOR_RED, m_top_box);
+    items.add(COLOR_RED, m_bottom_box);
+    items.add(COLOR_RED, m_selection_box);
+}
+bool SelectionDialogDetector::detect(const ImageViewRGB32& screen){
+    ImageViewRGB32 right_image = extract_box_reference(screen, m_right_box);
+    ImageViewRGB32 top_image = extract_box_reference(screen, m_top_box);
+    ImageViewRGB32 bottom_image = extract_box_reference(screen, m_bottom_box);
+    ImageViewRGB32 selection_image = extract_box_reference(screen, m_selection_box);
+    if (is_solid(right_image, { 0.25, 0.38, 0.369 })
+        && is_solid(top_image, { 0.25, 0.38, 0.369 })
+        && is_solid(bottom_image, { 0.25, 0.38, 0.369 })
+        && is_solid(selection_image, { 0.25, 0.38, 0.369 })
+        ){
         return true;
     }
     return false;

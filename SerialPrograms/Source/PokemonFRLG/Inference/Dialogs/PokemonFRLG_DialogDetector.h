@@ -29,6 +29,7 @@ namespace PokemonFRLG{
 
 // Common dialog box for npcs, etc.
 // This one detects the final line spoken, so no red arrow
+// This also detects all the other white dialogs, so use sparingly
 class WhiteDialogDetector : public StaticScreenDetector{
 public:
     WhiteDialogDetector(Color color);
@@ -49,6 +50,10 @@ public:
 };
 
 // Same as WhiteDialogDetector, but filter for the red arrow
+// Detect the red advancement arrow by filtering for DARK red.
+// There is red/pink color text for female npcs in non-japan versions
+// might be an issue if using it for things other than shiny-hunt resetting
+// all gifts are black/blue dialogs?
 class AdvanceWhiteDialogDetector : public StaticScreenDetector{
 public:
     AdvanceWhiteDialogDetector(Color color);
@@ -66,6 +71,27 @@ class AdvanceWhiteDialogWatcher : public DetectorToFinder<AdvanceWhiteDialogDete
 public:
     AdvanceWhiteDialogWatcher(Color color)
         : DetectorToFinder("AdvanceWhiteDialogWatcher", std::chrono::milliseconds(250), color)
+    {}
+};
+
+// Same as WhiteDialogDetector, but also looks for the white of the Yes/No box
+class SelectionDialogDetector : public StaticScreenDetector{
+public:
+    SelectionDialogDetector(Color color);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+private:
+    ImageFloatBox m_right_box;
+    ImageFloatBox m_top_box;
+    ImageFloatBox m_bottom_box;
+    ImageFloatBox m_selection_box;
+};
+class SelectionDialogWatcher : public DetectorToFinder<SelectionDialogDetector>{
+public:
+    SelectionDialogWatcher(Color color)
+        : DetectorToFinder("SelectionDialogWatcher", std::chrono::milliseconds(250), color)
     {}
 };
 
