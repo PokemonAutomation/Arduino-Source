@@ -33,6 +33,11 @@ GameSettings::GameSettings()
         LockMode::LOCK_WHILE_RUNNING,
         "3000 ms"
     )
+    , ENTER_GAME_MASH0(
+        "<b>Enter Game Mash:</b><br>Mash B for this long after loading a save to bypass the \"Previously On Your Quest...\" screens.",
+        LockMode::LOCK_WHILE_RUNNING,
+        "3000 ms"
+    )
     , m_shiny_audio_settings("<font size=4><b>Shiny Audio Settings:</b></font>")
     , SHINY_SOUND_THRESHOLD(
         "<b>Shiny Sound Threshold:</b><br>Maximum error coefficient to trigger a shiny detection.",

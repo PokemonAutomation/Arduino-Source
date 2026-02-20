@@ -25,6 +25,7 @@ public:
     SectionDividerOption m_soft_reset_timings;
     MillisecondsOption START_BUTTON_MASH0;
     MillisecondsOption ENTER_GAME_WAIT0;
+    MillisecondsOption ENTER_GAME_MASH0;
 
     SectionDividerOption m_shiny_audio_settings;
     FloatingPointOption SHINY_SOUND_THRESHOLD;

@@ -230,6 +230,7 @@ void StarterReset::open_summary(SingleSwitchProgramEnvironment& env, ProControll
             env.console
         );
     }
+    pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
 
 }
@@ -241,101 +242,27 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     StarterReset_Descriptor::Stats& stats = env.current_stats<StarterReset_Descriptor::Stats>();
 
     /*
-    * Settings: Text Speed fast.
+    * Settings: Text Speed fast. Default borders.
     * Setup: Stand in front of the starter you want. Save the game.
     */
 
-    obtain_starter(env, context);
-    open_summary(env, context);
-
-    VideoSnapshot screen = env.console.video().snapshot();
-
     bool shiny_starter = false;
-    ShinySymbolDetector shiny_checker(COLOR_YELLOW);
-    shiny_starter = shiny_checker.read(env.console.logger(), screen);
 
-    if (shiny_starter) {
-        env.log("Shiny starter detected!");
-        stats.shinystarter++;
-        send_program_status_notification(env, NOTIFICATION_SHINY_STARTER, "Shiny starter found!", screen, true);
-    }
-    else {
-        env.log("Starter is not shiny.");
-        env.log("Soft resetting.");
-        send_program_status_notification(
-            env, NOTIFICATION_STATUS_UPDATE,
-            "Soft resetting."
-        );
-        //soft_reset(env.program_info(), env.console, context);
-        stats.resets++;
-    }
-
-    
-    /*
-    bool shiny_starter = false;
     while (!shiny_starter) {
-        env.log("Selecting starter.");
-        pbf_press_button(context, BUTTON_A, 320ms, 1440ms);
-        context.wait_for_all_requests();
-
-        env.log("Starting battle.");
-
-        //Now mash B until the battle menu appears
-        BattleMenuWatcher battle_menu(COLOR_RED);
-        int ret = run_until<ProControllerContext>(
-            env.console, context,
-            [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 8000ms);
-            },
-            {battle_menu}
-        );
-        context.wait_for_all_requests();
-        if (ret != 0){
-            env.console.log("Failed to detect battle menu.", COLOR_RED);
-        }
-        else {
-            env.log("Battle menu detected.");
-        }
-
-        //Open the summary and check the color of the number
-        pbf_press_dpad(context, DPAD_DOWN, 320ms, 640ms);
-        pbf_press_button(context, BUTTON_A, 320ms, 640ms);
-
-        BlackScreenOverWatcher detector(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
-        int ret2 = wait_until(
-            env.console, context,
-            std::chrono::milliseconds(3000),
-            {{detector}}
-        );
-        if (ret2 == 0){
-            env.log("Entered party menu.");
-        }else{
-            env.log("Timed out waiting to enter party menu.", COLOR_RED);
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "StarterReset: Timed out waiting to enter party menu.",
-                env.console
-            );
-        }
-
-        pbf_press_button(context, BUTTON_A, 160ms, 1440ms);
-        pbf_press_dpad(context, DPAD_DOWN, 320ms, 640ms);
-        pbf_press_button(context, BUTTON_A, 320ms, 640ms);
-
-        pbf_wait(context, 1000ms);
-        context.wait_for_all_requests();
+        obtain_starter(env, context);
+        open_summary(env, context);
 
         VideoSnapshot screen = env.console.video().snapshot();
 
-        ShinyNumberDetector shiny_checker(COLOR_YELLOW);
+        ShinySymbolDetector shiny_checker(COLOR_YELLOW);
         shiny_starter = shiny_checker.read(env.console.logger(), screen);
 
         if (shiny_starter) {
             env.log("Shiny starter detected!");
             stats.shinystarter++;
             send_program_status_notification(env, NOTIFICATION_SHINY_STARTER, "Shiny starter found!", screen, true);
-        }
-        else {
+            break;
+        } else {
             env.log("Starter is not shiny.");
             env.log("Soft resetting.");
             send_program_status_notification(
@@ -344,9 +271,9 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             );
             soft_reset(env.program_info(), env.console, context);
             stats.resets++;
+            context.wait_for_all_requests();
         }
     }
-    */
 
     if (GO_HOME_WHEN_DONE) {
         pbf_press_button(context, BUTTON_HOME, 200ms, 1000ms);
