@@ -260,7 +260,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         if (shiny_starter) {
             env.log("Shiny starter detected!");
             stats.shinystarter++;
-            send_program_status_notification(env, NOTIFICATION_SHINY_STARTER, "Shiny starter found!", screen, true);
+            send_program_notification(env, NOTIFICATION_SHINY_STARTER, COLOR_YELLOW, "Shiny starter found!", {}, "", screen, true);
             break;
         } else {
             env.log("Starter is not shiny.");
