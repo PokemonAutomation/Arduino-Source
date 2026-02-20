@@ -10,7 +10,7 @@
 
 #include "PokemonFRLG_Settings.h"
 
-//#include "Programs/ShinyHunting/PokemonFRLG_StarterReset.h"
+#include "Programs/ShinyHunting/PokemonFRLG_StarterReset.h"
 #include "Programs/TestPrograms/PokemonFRLG_SoundListener.h"
 
 namespace PokemonAutomation{
@@ -20,7 +20,7 @@ namespace PokemonFRLG{
 
 
 PanelListFactory::PanelListFactory()
-    : PanelListDescriptor(Pokemon::STRING_POKEMON + " Fire Red and Leaf Green")
+    : PanelListDescriptor(Pokemon::STRING_POKEMON + " FireRed and LeafGreen")
 {}
 
 std::vector<PanelEntry> PanelListFactory::make_panels() const{
@@ -32,7 +32,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     //ret.emplace_back("---- General ----");
 
     ret.emplace_back("---- Shiny Hunting  ----");
-    //ret.emplace_back(make_single_switch_program<ShinyHunt-Starter_Descriptor, ShinyHunt-Starter>());
+    ret.emplace_back(make_single_switch_program<StarterReset_Descriptor, StarterReset>());
     
 
     if (PreloadSettings::instance().DEVELOPER_MODE){

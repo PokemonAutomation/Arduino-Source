@@ -63,7 +63,7 @@ GameSettings_Descriptor::GameSettings_Descriptor()
         "PokemonFRLG:GlobalSettings",
         STRING_POKEMON + " FRLG", "Game Settings",
         "Programs/PokemonFRLG/FRLGSettings.html",
-        "Global " + STRING_POKEMON + " Fire Red and Leaf Green Settings"
+        "Global " + STRING_POKEMON + " FireRed and LeafGreen Settings"
     )
 {}
 

@@ -1397,12 +1397,18 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.h
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.cpp
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.h
+    Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.cpp
+    Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h
     Source/PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.cpp
     Source/PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h
+    Source/PokemonFRLG/PokemonFRLG_Navigation.cpp
+    Source/PokemonFRLG/PokemonFRLG_Navigation.h
     Source/PokemonFRLG/PokemonFRLG_Panels.cpp
     Source/PokemonFRLG/PokemonFRLG_Panels.h
     Source/PokemonFRLG/PokemonFRLG_Settings.cpp
     Source/PokemonFRLG/PokemonFRLG_Settings.h
+    Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_StarterReset.cpp
+    Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_StarterReset.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.cpp
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.h
     Source/PokemonHome/Inference/PokemonHome_BallReader.cpp
