@@ -8,6 +8,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh_MaxLair_Run_Entrance.h"
 
 namespace PokemonAutomation{
@@ -15,12 +16,60 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{
 
+std::vector<std::string> read_saved_name(
+    Logger& logger,
+    Language language,
+    const ImageViewRGB32& screen,
+    const ImageFloatBox& box
+) {
+    auto cropped = extract_box_reference(screen, box);
+    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
+                                                        logger, language, cropped, OCR::BLACK_OR_WHITE_TEXT_FILTERS(),
+                                            0.01, 0.50, 2.0
+                                                                                 );
+    if (result.results.empty()) {
+        return "";
+    }
+    
+    return result.results.begin()->second.token;
+    
+}
+
+// Read the three currently saved paths (if any) from the entrance screen.
+// Returns a vector of three slugs (empty strings for empty slots).
+std::vector<std::string> read_saved_paths(
+    VideoStream& stream,
+    Language language
+) {
+    auto snapshot = stream.video().snapshot();
+    if (!snapshot) return { "", "", "" };
+
+    const double width = snapshot->width();
+    const double height = snapshot->height();
+
+    // To be adjusted
+    const ImageFloatBox name_region(0.30, 0.75, 0.40, 0.05);
+
+    std::vector<std::string> slugs;
+    for (int i = 0; i < 3; ++i) {
+        ImageFloatBox box(
+            name_region.x + i * (name_region.width / 3.0),
+            name_region.y,
+            name_region.width / 3.0,
+            name_region.height
+        );
+        std::string slug = read_saved_name(stream.logger(), language, *snapshot, box);
+        slugs.push_back(slug);
+    }
+    return slugs;
+}
 
 void run_entrance(
     AdventureRuntime& runtime,
     ProgramEnvironment& env, size_t console_index,
     VideoStream& stream, ProControllerContext& context,
-    bool save_path,
+    const std::string& boss_slug,
+    const EndBattleDecider& decider,
     GlobalStateTracker& state_tracker
 ){
     GlobalState& state = state_tracker[console_index];
@@ -33,6 +82,31 @@ void run_entrance(
         runtime.session_stats.add_run(0);
         if (console_index == runtime.host_index){
             runtime.path_stats.clear();
+        }
+    }
+    
+    // Read the three currently saved paths (if any)
+    Language language = runtime.console_settings[console_index].language;
+    std::vector<std::string> saved = read_saved_paths(stream, language);
+    
+    // Determine whether we should save this boss
+    bool should_save = false;
+    if (!boss_slug.empty()) {
+        // Check if already saved
+        bool already_saved = false;
+        for (const auto& s : saved) {
+            if (s == boss_slug) {
+                already_saved = true;
+                break;
+            }
+        }
+        // Count non‑empty slots
+        size_t occupied = 0;
+        for (const auto& s : saved) {
+            if (!s.empty()) ++occupied;
+        }
+        if (!already_saved && occupied < 3) {
+            should_save = decider.save_path(boss_slug);
         }
     }
 

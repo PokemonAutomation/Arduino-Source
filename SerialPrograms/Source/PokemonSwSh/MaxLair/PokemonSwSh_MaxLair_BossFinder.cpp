@@ -151,6 +151,9 @@ public:
         }
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid enum.");
     }
+    virtual bool save_path(const std::string& boss_slug) const override {
+        return false;
+    }
 
 
 private:

@@ -182,16 +182,19 @@ StateMachineAction run_state_iteration(
             global_state, decider,
             entrance
         );
-    case 7:
+    case 7: {
         console.log("Current State: Entrance");
+        std::string boss_slug = global_state.infer_actual_state(console_index).boss;
         run_entrance(
-            runtime,
-            env, console_index,
-            console, context,
-            save_path,
-            global_state
-        );
+                     runtime,
+                     env, console_index,
+                     console, context,
+                     boss_slug,
+                     decider,
+                     global_state
+                     );
         return StateMachineAction::DONE_WITH_ADVENTURE;
+    }
     case 8:
         console.log("Current State: Frozen Screen", COLOR_RED);
 //        pbf_mash_button(context, BUTTON_B, 1000ms);

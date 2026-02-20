@@ -166,6 +166,9 @@ public:
         }
         return actions.no_shinies;
     }
+    virtual bool save_path(const std::string& boss_slug) const override {
+        return false;
+    }
 
 private:
     const MaxLairStandard_ConsoleOptions& console(size_t index) const{
