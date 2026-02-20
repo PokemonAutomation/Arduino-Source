@@ -34,6 +34,7 @@ public:
 
 private:
     void obtain_starter(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void open_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 

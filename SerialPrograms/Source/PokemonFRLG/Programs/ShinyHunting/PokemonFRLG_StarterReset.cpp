@@ -16,6 +16,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
+#include "PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_StarterReset.h"
 
@@ -158,19 +159,10 @@ void StarterReset::obtain_starter(SingleSwitchProgramEnvironment& env, ProContro
     context.wait_for_all_requests();
 }
 
-
-void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    //StartProgramChecks::check_performance_class_wired_or_wireless(context);
-
+//After declining to nickname, clear rival pickup and open your starter's summary
+void StarterReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     StarterReset_Descriptor::Stats& stats = env.current_stats<StarterReset_Descriptor::Stats>();
 
-    /*
-    * Settings: Text Speed fast.
-    * Setup: Stand in front of the starter you want. Save the game.
-    */
-
-    obtain_starter(env, context);
-    
     //From no to nickname to overworld
     StartMenuWatcher start_menu(COLOR_RED);
 
@@ -192,12 +184,92 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Unable to open Start menu.",
+            "open_summary(): Unable to open Start menu.",
             env.console
         );
     }
 
     //No Pokedex yet, so 1 A press to open party menu
+    pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+
+    BlackScreenOverWatcher blk1(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    int ret1 = wait_until(
+        env.console, context,
+        5s,
+        {blk1}
+    );
+    if (ret1 == 0){
+        env.log("Entered party menu.");
+    }else{
+        env.log("Timed out waiting to enter game.", COLOR_RED);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "open_summary(): Unable to enter Party menu.",
+            env.console
+        );
+    }
+    context.wait_for_all_requests();
+
+    //Two presses to open summary
+    pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+    pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+
+    BlackScreenOverWatcher blk2(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    int ret2 = wait_until(
+        env.console, context,
+        5s,
+        {blk2}
+    );
+    if (ret2 == 0){
+        env.log("Entered summary.");
+    }else{
+        env.log("Timed out waiting to enter game.", COLOR_RED);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "open_summary(): Unable to enter summary.",
+            env.console
+        );
+    }
+    context.wait_for_all_requests();
+
+}
+
+
+void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    //StartProgramChecks::check_performance_class_wired_or_wireless(context);
+
+    StarterReset_Descriptor::Stats& stats = env.current_stats<StarterReset_Descriptor::Stats>();
+
+    /*
+    * Settings: Text Speed fast.
+    * Setup: Stand in front of the starter you want. Save the game.
+    */
+
+    obtain_starter(env, context);
+    open_summary(env, context);
+
+    VideoSnapshot screen = env.console.video().snapshot();
+
+    bool shiny_starter = false;
+    ShinySymbolDetector shiny_checker(COLOR_YELLOW);
+    shiny_starter = shiny_checker.read(env.console.logger(), screen);
+
+    if (shiny_starter) {
+        env.log("Shiny starter detected!");
+        stats.shinystarter++;
+        send_program_status_notification(env, NOTIFICATION_SHINY_STARTER, "Shiny starter found!", screen, true);
+    }
+    else {
+        env.log("Starter is not shiny.");
+        env.log("Soft resetting.");
+        send_program_status_notification(
+            env, NOTIFICATION_STATUS_UPDATE,
+            "Soft resetting."
+        );
+        //soft_reset(env.program_info(), env.console, context);
+        stats.resets++;
+    }
+
     
     /*
     bool shiny_starter = false;

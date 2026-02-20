@@ -1403,6 +1403,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h
     Source/PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.cpp
     Source/PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h
+    Source/PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.cpp
+    Source/PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h
     Source/PokemonFRLG/PokemonFRLG_Navigation.cpp
     Source/PokemonFRLG/PokemonFRLG_Navigation.h
     Source/PokemonFRLG/PokemonFRLG_Panels.cpp
