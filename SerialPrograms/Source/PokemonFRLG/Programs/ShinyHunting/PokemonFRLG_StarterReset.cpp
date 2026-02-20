@@ -15,6 +15,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_StarterReset.h"
 
@@ -88,7 +89,7 @@ void StarterReset::obtain_starter(SingleSwitchProgramEnvironment& env, ProContro
     pbf_press_button(context, BUTTON_A, 320ms, 640ms);
 
     bool seen_selection_arrow = false;
-    bool seen_nickname_arrow = false;
+    //bool seen_nickname_arrow = false;
     while (true){
         context.wait_for_all_requests();
 
@@ -128,13 +129,14 @@ void StarterReset::obtain_starter(SingleSwitchProgramEnvironment& env, ProContro
             } else {
                 env.log("Second selection box detected. NO to nickname.");
                 pbf_press_button(context, BUTTON_B, 320ms, 640ms);
-                seen_nickname_arrow = true;
+                //seen_nickname_arrow = true;
 
                 //Press B some to try and skip the rival's pickup
                 pbf_press_button(context, BUTTON_B, 320ms, 640ms);
                 pbf_press_button(context, BUTTON_B, 320ms, 640ms);
                 pbf_press_button(context, BUTTON_B, 320ms, 640ms);
-                break;
+                context.wait_for_all_requests();
+                return;
             }
             continue;
         //case 2:
@@ -160,7 +162,7 @@ void StarterReset::obtain_starter(SingleSwitchProgramEnvironment& env, ProContro
 void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //StartProgramChecks::check_performance_class_wired_or_wireless(context);
 
-    //StarterReset_Descriptor::Stats& stats = env.current_stats<StarterReset_Descriptor::Stats>();
+    StarterReset_Descriptor::Stats& stats = env.current_stats<StarterReset_Descriptor::Stats>();
 
     /*
     * Settings: Text Speed fast.
@@ -168,10 +170,35 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     */
 
     obtain_starter(env, context);
-
+    
     //From no to nickname to overworld
-    //open_menu
+    StartMenuWatcher start_menu(COLOR_RED);
 
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [](ProControllerContext& context) {
+            for (int i = 0; i < 5; i++) {
+                pbf_press_button(context, BUTTON_B, 320ms, 640ms);
+                pbf_wait(context, 500ms);
+                context.wait_for_all_requests();
+                pbf_press_button(context, BUTTON_PLUS, 320ms, 640ms);
+            }
+        },
+        { start_menu }
+    );
+    context.wait_for_all_requests();
+    if (ret < 0){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Unable to open Start menu.",
+            env.console
+        );
+    }
+
+    //No Pokedex yet, so 1 A press to open party menu
+    
     /*
     bool shiny_starter = false;
     while (!shiny_starter) {
