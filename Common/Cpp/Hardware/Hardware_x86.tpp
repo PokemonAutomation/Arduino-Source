@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/CpuId/CpuId_x86.h"
-#include "Environment.h"
+#include "Hardware.h"
 
 namespace PokemonAutomation{
 

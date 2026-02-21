@@ -85,6 +85,12 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Filesystem.h
     ../Common/Cpp/FileIO.cpp
     ../Common/Cpp/FileIO.h
+    ../Common/Cpp/Hardware/Hardware.cpp
+    ../Common/Cpp/Hardware/Hardware.h
+    ../Common/Cpp/Hardware/Hardware_arm64_Linux.tpp
+    ../Common/Cpp/Hardware/Hardware_x86.tpp
+    ../Common/Cpp/Hardware/Hardware_x86_Linux.tpp
+    ../Common/Cpp/Hardware/Hardware_x86_Windows.tpp
     ../Common/Cpp/ImageResolution.cpp
     ../Common/Cpp/ImageResolution.h
     ../Common/Cpp/Json/JsonArray.cpp
@@ -345,10 +351,6 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Environment/Environment_Linux.tpp
     Source/CommonFramework/Environment/Environment_Windows.h
     Source/CommonFramework/Environment/Environment_Windows.tpp
-    Source/CommonFramework/Environment/Environment_arm64_Linux.tpp
-    Source/CommonFramework/Environment/Environment_x86.tpp
-    Source/CommonFramework/Environment/Environment_x86_Linux.tpp
-    Source/CommonFramework/Environment/Environment_x86_Windows.tpp
     Source/CommonFramework/Environment/HardwareValidation.cpp
     Source/CommonFramework/Environment/HardwareValidation.h
     Source/CommonFramework/Environment/HardwareValidation_arm64.tpp

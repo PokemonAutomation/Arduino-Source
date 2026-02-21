@@ -343,26 +343,25 @@ if (WIN32)
 else() # macOS and Linux
     find_package(PkgConfig REQUIRED)  # required to execute `pkg_search_module()` below
     if (APPLE)
-        # prepare onnxruntime if needed
-        set(ONNXRUNTIME_VERSION "1.23.2")
-        set(ONNXRUNTIME_WORK_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries")
-        if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
-            set(ONNXRUNTIME_ARCH "arm64")
+        # ==== Get ONNX Runtime paths ====
+        # First, try to see if there is an ONNX Runtime library built from source.
+        # Assume the onnxruntime repo, https://github.com/microsoft/onnxruntime is placed in the same folder as
+        # this Arduino-Source repo:
+        set(ONNXRUNTIME_ROOTDIR "${REPO_ROOT_DIR}../onnxruntime/")
+        set(ONNXRUNTIME_HEADER_DIR "${ONNXRUNTIME_ROOTDIR}include/onnxruntime/core/session/")
+        if(EXISTS "${ONNXRUNTIME_HEADER_DIR}")
+            # we have ONNX Runtime built from source
+            message("Use ONNX Runtime built from source at ${ONNXRUNTIME_ROOTDIR}")
+            target_include_directories(SerialProgramsLib PRIVATE ${ONNXRUNTIME_HEADER_DIR})
+            target_link_libraries(SerialProgramsLib PRIVATE ${ONNXRUNTIME_ROOTDIR}/build/MacOS/Release/libonnxruntime.dylib)
         else()
-            set(ONNXRUNTIME_ARCH "x86_64")
+            message("Built-from-source ONNX Runtime folder ${ONNXRUNTIME_ROOTDIR} does not exist.")
+            message("Use ONNX Runtime installed by Homebrew.")
+            pkg_search_module(ONNXRUNTIME REQUIRED libonnxruntime onnxruntime)
+            target_include_directories(SerialProgramsLib PRIVATE ${ONNXRUNTIME_INCLUDE_DIRS})
+            target_link_directories(SerialProgramsLib PUBLIC ${ONNXRUNTIME_LIBRARY_DIRS})
+            target_link_libraries(SerialProgramsLib PUBLIC ${ONNXRUNTIME_LINK_LIBRARIES})
         endif()
-        set(ONNXRUNTIME_LIB_DIR "${ONNXRUNTIME_WORK_DIR}/onnxruntime-osx-${ONNXRUNTIME_ARCH}-${ONNXRUNTIME_VERSION}")
-        set(ONNXRUNTIME_LIB_TAR "${ONNXRUNTIME_LIB_DIR}.tgz")
-        set(ONNXRUNTIME_DYLIB   "${ONNXRUNTIME_LIB_DIR}/lib/libonnxruntime.dylib")
-        if (NOT EXISTS "${ONNXRUNTIME_LIB_DIR}")
-            message(STATUS "ONNXRUNTIME not found, extracting from tgz...")
-            execute_process(
-                COMMAND ${CMAKE_COMMAND} -E tar xf "${ONNXRUNTIME_LIB_TAR}"
-                WORKING_DIRECTORY "${ONNXRUNTIME_WORK_DIR}"
-            )
-        endif()
-        target_include_directories(SerialProgramsLib SYSTEM PRIVATE "${ONNXRUNTIME_LIB_DIR}/include")
-        target_link_libraries(SerialProgramsLib PRIVATE "${ONNXRUNTIME_DYLIB}")
     else() # Linux
         # ONNX RUNTIME LINUX CONFIG
         # NOTE: users can specify their own ONNX_ROOT_PATH (this is the base folder for ONNX) on the command line when evoking cmake.
@@ -506,7 +505,7 @@ else() # macOS and Linux
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
     endif()
 
-    if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
+    IF(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
         # Arm CPU
         #   Run-time ISA dispatching
         target_compile_definitions(SerialProgramsLib PRIVATE PA_AutoDispatch_arm64_20_M1)
