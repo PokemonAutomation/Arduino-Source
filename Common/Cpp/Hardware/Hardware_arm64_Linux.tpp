@@ -9,8 +9,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <sys/sysctl.h>
-
-#include "Environment.h"
+#include "Hardware.h"
 
 namespace PokemonAutomation{
 
