@@ -152,7 +152,12 @@ public:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid enum.");
     }
     virtual bool save_path(const std::string& boss_slug) const override {
-        return false;
+        try {
+            const BossActionRow& row = get_filter(boss_slug);
+            return row.save_on_the_go;
+        } catch (...) {
+            return false;
+        }
     }
 
 

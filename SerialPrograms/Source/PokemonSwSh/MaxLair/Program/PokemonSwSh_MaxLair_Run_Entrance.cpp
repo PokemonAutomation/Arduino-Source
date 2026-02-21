@@ -8,6 +8,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh_MaxLair_Run_Entrance.h"
 
@@ -16,27 +17,27 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{
 
-std::vector<std::string> read_saved_name(
+using namespace Pokemon;
+
+namespace {
+std::string read_saved_name(
     Logger& logger,
     Language language,
-    const ImageViewRGB32& screen,
+    const ImageViewRGB32& image,
     const ImageFloatBox& box
-) {
-    auto cropped = extract_box_reference(screen, box);
+                            ) {
+    auto cropped = extract_box_reference(image, box);
     OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
-                                                        logger, language, cropped, OCR::BLACK_OR_WHITE_TEXT_FILTERS(),
-                                            0.01, 0.50, 2.0
-                                                                                 );
+            logger, language, cropped, OCR::BLACK_OR_WHITE_TEXT_FILTERS(),
+0.01, 0.50, 2.0
+                                                    );
     if (result.results.empty()) {
         return "";
     }
     
     return result.results.begin()->second.token;
-    
 }
 
-// Read the three currently saved paths (if any) from the entrance screen.
-// Returns a vector of three slugs (empty strings for empty slots).
 std::vector<std::string> read_saved_paths(
     VideoStream& stream,
     Language language
@@ -44,6 +45,9 @@ std::vector<std::string> read_saved_paths(
     auto snapshot = stream.video().snapshot();
     if (!snapshot) return { "", "", "" };
 
+    const ImageRGB32* img_ptr = snapshot.get();
+    const ImageViewRGB32& screen = *img_ptr;
+    
     const double width = snapshot->width();
     const double height = snapshot->height();
 
@@ -51,18 +55,24 @@ std::vector<std::string> read_saved_paths(
     const ImageFloatBox name_region(0.30, 0.75, 0.40, 0.05);
 
     std::vector<std::string> slugs;
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; i++) {
         ImageFloatBox box(
             name_region.x + i * (name_region.width / 3.0),
             name_region.y,
             name_region.width / 3.0,
             name_region.height
         );
-        std::string slug = read_saved_name(stream.logger(), language, *snapshot, box);
+        std::string slug = read_saved_name(stream.logger(), language, screen, box);
         slugs.push_back(slug);
     }
     return slugs;
 }
+}
+
+
+// Read the three currently saved paths (if any) from the entrance screen.
+// Returns a vector of three slugs (empty strings for empty slots).
+
 
 void run_entrance(
     AdventureRuntime& runtime,
@@ -115,15 +125,16 @@ void run_entrance(
 
     pbf_wait(context, 2000ms);
     while (true){
-        if (save_path){
+        if (should_save){
             pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
         }else{
             pbf_press_button(context, BUTTON_B, 160ms, 1000ms);
         }
         context.wait_for_all_requests();
 
-        VideoSnapshot screen = stream.video().snapshot();
-        ImageStats stats = image_stats(extract_box_reference(screen, box));
+        VideoSnapshot screen_snap = stream.video().snapshot();
+        const ImageRGB32* img_ptr = screen_snap.get();
+        ImageStats stats = image_stats(extract_box_reference(*img_ptr, box));
         if (!is_grey(stats, 400, 1000)){
             break;
         }

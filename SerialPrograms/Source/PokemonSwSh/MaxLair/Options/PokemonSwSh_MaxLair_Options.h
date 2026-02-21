@@ -59,6 +59,7 @@ public:
         const PathStats& path_stats,
         bool any_shiny, bool boss_is_shiny
     ) const = 0;
+    virtual bool save_path(const std::string& boss_slug) const = 0;
 };
 
 

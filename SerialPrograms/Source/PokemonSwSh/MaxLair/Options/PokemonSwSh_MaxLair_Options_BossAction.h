@@ -11,6 +11,7 @@
 #include "Common/Cpp/Options/StaticTableOption.h"
 #include "CommonFramework/Options/LabelCellOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -31,6 +32,7 @@ public:
     LabelCellOption pokemon;
     EnumDropdownCell<BossAction> action;
     PokemonBallSelectCell ball;
+    BooleanCheckBoxCell save_on_the_go;
 };
 
 class BossActionTable : public StaticTableOption{
