@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <thread>
 #include <sys/sysctl.h>
 #include "Hardware.h"
 
