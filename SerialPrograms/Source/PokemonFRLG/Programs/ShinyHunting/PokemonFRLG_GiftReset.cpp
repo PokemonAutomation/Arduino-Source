@@ -1,4 +1,4 @@
-/*  Starter Reset
+/*  Gift Reset
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -18,66 +18,77 @@
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
-#include "PokemonFRLG_StarterReset.h"
+#include "PokemonFRLG_GiftReset.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
 
-StarterReset_Descriptor::StarterReset_Descriptor()
+GiftReset_Descriptor::GiftReset_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonFRLG:StarterReset",
-        Pokemon::STRING_POKEMON + " FRLG", "Starter Reset",
-        "Programs/PokemonFRLG/StarterReset.html",
-        "Soft reset for a shiny starter.",
+        "PokemonFRLG:GiftReset",
+        Pokemon::STRING_POKEMON + " FRLG", "Gift Reset",
+        "Programs/PokemonFRLG/GiftReset.html",
+        "Soft reset for a shiny gift Pokemon.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 
-struct StarterReset_Descriptor::Stats : public StatsTracker{
+struct GiftReset_Descriptor::Stats : public StatsTracker{
     Stats()
         : resets(m_stats["Resets"])
-        , shinystarter(m_stats["Shiny Starter"])
+        , shinies(m_stats["Shinies"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Resets");
-        m_display_order.emplace_back("Shiny Starter");
+        m_display_order.emplace_back("Shinies");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& resets;
-    std::atomic<uint64_t>& shinystarter;
+    std::atomic<uint64_t>& shinies;
     std::atomic<uint64_t>& errors;
 };
-std::unique_ptr<StatsTracker> StarterReset_Descriptor::make_stats() const{
+std::unique_ptr<StatsTracker> GiftReset_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-StarterReset::StarterReset()
-    : GO_HOME_WHEN_DONE(true)
-    , NOTIFICATION_SHINY_STARTER(
-        "Shiny Starter",
+GiftReset::GiftReset()
+    : TARGET(
+        "<b>Starter:</b><br>",
+        {
+            {Target::starters, "starters", "Bulbasaur / Squirtle / Charmander"},
+            {Target::hitmon, "hitmon", "Hitmonlee / Hitmonchan"},
+            {Target::mudkip, "mudkip", "Mudkip"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        Target::starters
+    )
+    , GO_HOME_WHEN_DONE(true)
+    , NOTIFICATION_SHINY(
+        "Shiny",
         true, true, ImageAttachmentMode::JPG,
         {"Notifs", "Showcase"}
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
-        &NOTIFICATION_SHINY_STARTER,
+        &NOTIFICATION_SHINY,
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
     })
 {
+    PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 //Pick up starter, say no to nickname
-void StarterReset::obtain_starter(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    StarterReset_Descriptor::Stats& stats = env.current_stats<StarterReset_Descriptor::Stats>();
+void GiftReset::obtain_starter(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    GiftReset_Descriptor::Stats& stats = env.current_stats<GiftReset_Descriptor::Stats>();
 
     /*
-    Ah, STARTER is your choice... red adv arrow
+    Ah, starter is your choice... red adv arrow
     So you're claiming... YES/NO box
     rly quite energetic... no arrow
     player received the starter from... no arrow, jingle must complete
@@ -86,7 +97,7 @@ void StarterReset::obtain_starter(SingleSwitchProgramEnvironment& env, ProContro
     rival received the ... no arrow DONE
     */
 
-    env.log("Obtaining starter.");
+    env.log("Obtaining Pokemon.");
     pbf_press_button(context, BUTTON_A, 320ms, 640ms);
 
     bool seen_selection_arrow = false;
@@ -121,10 +132,12 @@ void StarterReset::obtain_starter(SingleSwitchProgramEnvironment& env, ProContro
                 seen_selection_arrow = true;
                 pbf_press_button(context, BUTTON_A, 320ms, 640ms);
 
-                //Skip past energetic and jingle
-                pbf_press_button(context, BUTTON_B, 320ms, 640ms);
-                pbf_wait(context, 500ms);
-                context.wait_for_all_requests();
+                if (TARGET == Target::starters) {
+                    //Skip past energetic and jingle
+                    pbf_press_button(context, BUTTON_B, 320ms, 640ms);
+                    pbf_wait(context, 500ms);
+                    context.wait_for_all_requests();
+                }
                 pbf_press_button(context, BUTTON_B, 320ms, 640ms);
 
             } else {
@@ -132,10 +145,12 @@ void StarterReset::obtain_starter(SingleSwitchProgramEnvironment& env, ProContro
                 pbf_press_button(context, BUTTON_B, 320ms, 640ms);
                 //seen_nickname_arrow = true;
 
-                //Press B some to try and skip the rival's pickup
-                pbf_press_button(context, BUTTON_B, 320ms, 640ms);
-                pbf_press_button(context, BUTTON_B, 320ms, 640ms);
-                pbf_press_button(context, BUTTON_B, 320ms, 640ms);
+                if (TARGET == Target::starters) {
+                    //Press B some to try and skip the rival's pickup
+                    pbf_press_button(context, BUTTON_B, 320ms, 640ms);
+                    pbf_press_button(context, BUTTON_B, 320ms, 640ms);
+                    pbf_press_button(context, BUTTON_B, 320ms, 640ms);
+                }
                 context.wait_for_all_requests();
                 return;
             }
@@ -160,8 +175,8 @@ void StarterReset::obtain_starter(SingleSwitchProgramEnvironment& env, ProContro
 }
 
 //After declining to nickname, clear rival pickup and open your starter's summary
-void StarterReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    StarterReset_Descriptor::Stats& stats = env.current_stats<StarterReset_Descriptor::Stats>();
+void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    GiftReset_Descriptor::Stats& stats = env.current_stats<GiftReset_Descriptor::Stats>();
 
     //From no to nickname to overworld
     StartMenuWatcher start_menu(COLOR_RED);
@@ -171,7 +186,7 @@ void StarterReset::open_summary(SingleSwitchProgramEnvironment& env, ProControll
         [](ProControllerContext& context) {
             for (int i = 0; i < 5; i++) {
                 pbf_press_button(context, BUTTON_B, 320ms, 640ms);
-                pbf_wait(context, 500ms);
+                pbf_wait(context, 100ms);
                 context.wait_for_all_requests();
                 pbf_press_button(context, BUTTON_PLUS, 320ms, 640ms);
             }
@@ -189,7 +204,16 @@ void StarterReset::open_summary(SingleSwitchProgramEnvironment& env, ProControll
         );
     }
 
-    //No Pokedex yet, so 1 A press to open party menu
+    if (TARGET != Target::starters) {
+        //Pokedex, Pokemon, Bag, Trainer, Save, Option, Exit
+        env.log("Navigating to party menu.");
+        pbf_wait(context, 200ms);
+        context.wait_for_all_requests();
+        pbf_press_dpad(context, DPAD_DOWN, 320ms, 320ms);
+        context.wait_for_all_requests();
+    } //For starters, no Pokedex yet, do Pokemon is on top and we skip this
+
+    //Open party menu
     pbf_press_button(context, BUTTON_A, 320ms, 640ms);
 
     BlackScreenOverWatcher blk1(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
@@ -210,9 +234,15 @@ void StarterReset::open_summary(SingleSwitchProgramEnvironment& env, ProControll
     }
     context.wait_for_all_requests();
 
+    //Press up twice to get to the last slot
+    if (TARGET != Target::starters) {
+        pbf_press_dpad(context, DPAD_UP, 320ms, 320ms);
+        pbf_press_dpad(context, DPAD_UP, 320ms, 320ms);
+    }
+
     //Two presses to open summary
-    pbf_press_button(context, BUTTON_A, 320ms, 640ms);
-    pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+    pbf_press_button(context, BUTTON_A, 320ms, 320ms);
+    pbf_press_button(context, BUTTON_A, 320ms, 320ms);
 
     BlackScreenOverWatcher blk2(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     int ret2 = wait_until(
@@ -236,14 +266,16 @@ void StarterReset::open_summary(SingleSwitchProgramEnvironment& env, ProControll
 }
 
 
-void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //StartProgramChecks::check_performance_class_wired_or_wireless(context);
 
-    StarterReset_Descriptor::Stats& stats = env.current_stats<StarterReset_Descriptor::Stats>();
+    GiftReset_Descriptor::Stats& stats = env.current_stats<GiftReset_Descriptor::Stats>();
 
     /*
     * Settings: Text Speed fast. Default borders.
     * Setup: Stand in front of the starter you want. Save the game.
+    * For non-starters: move menu cursor back to the top (POKEDEX)!
+    * for starters, pokemon menu will be on top as it is added after picking
     */
 
     bool shiny_starter = false;
@@ -258,12 +290,12 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         shiny_starter = shiny_checker.read(env.console.logger(), screen);
 
         if (shiny_starter) {
-            env.log("Shiny starter detected!");
-            stats.shinystarter++;
-            send_program_notification(env, NOTIFICATION_SHINY_STARTER, COLOR_YELLOW, "Shiny starter found!", {}, "", screen, true);
+            env.log("Shiny found!");
+            stats.shinies++;
+            send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", screen, true);
             break;
         } else {
-            env.log("Starter is not shiny.");
+            env.log("Pokemon is not shiny.");
             env.log("Soft resetting.");
             send_program_status_notification(
                 env, NOTIFICATION_STATUS_UPDATE,

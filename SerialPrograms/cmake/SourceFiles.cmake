@@ -1413,8 +1413,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/PokemonFRLG_Panels.h
     Source/PokemonFRLG/PokemonFRLG_Settings.cpp
     Source/PokemonFRLG/PokemonFRLG_Settings.h
-    Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_StarterReset.cpp
-    Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_StarterReset.h
+    Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_GiftReset.cpp
+    Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_GiftReset.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.cpp
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.h
     Source/PokemonHome/Inference/PokemonHome_BallReader.cpp
