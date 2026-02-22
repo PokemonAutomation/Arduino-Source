@@ -34,7 +34,7 @@ bool reset_game_to_gamemenu(
         console,
         context,
         0, 0,
-        ConsoleSettings::instance().START_GAME_MASH0
+        ConsoleSettings::instance().START_GAME_MASH
     );
 
     // Now the game has opened:

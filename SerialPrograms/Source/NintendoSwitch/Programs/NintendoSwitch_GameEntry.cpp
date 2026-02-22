@@ -678,7 +678,7 @@ void from_home_close_and_reopen_game(
     ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu
 ){
-    Milliseconds start_game_mash = ConsoleSettings::instance().START_GAME_MASH0;
+    Milliseconds start_game_mash = ConsoleSettings::instance().START_GAME_MASH;
 
 #if 1
     bool video_available = (bool)console.video().snapshot();

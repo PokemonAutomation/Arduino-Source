@@ -68,7 +68,7 @@ void reset_game_from_home(
     if (!ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET && !tolerate_update_menu){
         fast_reset_game(
             context,
-            ConsoleSettings::instance().START_GAME_MASH0,
+            ConsoleSettings::instance().START_GAME_MASH,
             GameSettings::instance().START_GAME_WAIT0,
             GameSettings::instance().ENTER_GAME_MASH0,
             GameSettings::instance().ENTER_GAME_WAIT0
@@ -147,7 +147,7 @@ void start_game_from_home(
     }
 
     bool START_GAME_REQUIRES_INTERNET = ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET;
-    Milliseconds START_GAME_MASH = ConsoleSettings::instance().START_GAME_MASH0;
+    Milliseconds START_GAME_MASH = ConsoleSettings::instance().START_GAME_MASH;
 
     if (!START_GAME_REQUIRES_INTERNET && user_slot == 0){
         //  Mash your way into the game.
