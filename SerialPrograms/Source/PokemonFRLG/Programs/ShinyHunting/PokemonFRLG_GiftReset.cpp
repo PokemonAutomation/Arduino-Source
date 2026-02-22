@@ -56,11 +56,12 @@ std::unique_ptr<StatsTracker> GiftReset_Descriptor::make_stats() const{
 
 GiftReset::GiftReset()
     : TARGET(
-        "<b>Starter:</b><br>",
+        "<b>Target:</b><br>",
         {
             {Target::starters, "starters", "Bulbasaur / Squirtle / Charmander"},
-            {Target::hitmon, "hitmon", "Hitmonlee / Hitmonchan"},
-            {Target::mudkip, "mudkip", "Mudkip"},
+            {Target::hitmon, "hitmon", "Magikarp, Hitmonlee / Hitmonchan"},
+            {Target::eevee, "eevee", "Eevee"},
+            {Target::lapras, "lapras", "Lapras"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         Target::starters
@@ -84,7 +85,7 @@ GiftReset::GiftReset()
 }
 
 //Pick up starter, say no to nickname
-void GiftReset::obtain_starter(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void GiftReset::obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     GiftReset_Descriptor::Stats& stats = env.current_stats<GiftReset_Descriptor::Stats>();
 
     /*
@@ -128,9 +129,17 @@ void GiftReset::obtain_starter(SingleSwitchProgramEnvironment& env, ProControlle
         case 1:
             env.log("Detected Selection Dialog. Pressing A.");
             if (!seen_selection_arrow) {
-                env.log("First selection box detected. YES to starter.");
-                seen_selection_arrow = true;
-                pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+
+                if (TARGET == Target::starters || TARGET == Target::hitmon) {
+                    env.log("First selection box detected. YES to starter.");
+                    seen_selection_arrow = true;
+                    pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+                } else {
+                    env.log("Selection box detected. NO to nickname.");
+                    pbf_press_button(context, BUTTON_B, 320ms, 640ms);
+                    context.wait_for_all_requests();
+                    return;
+                }
 
                 if (TARGET == Target::starters) {
                     //Skip past energetic and jingle
@@ -174,6 +183,21 @@ void GiftReset::obtain_starter(SingleSwitchProgramEnvironment& env, ProControlle
     context.wait_for_all_requests();
 }
 
+//Different as lapras has multiple no-red-arrow dialog boxes
+void GiftReset::obtain_lapras(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    env.log("Obtaining Lapras.");
+    pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+
+    //At least 9 lines of dialog/No to nickname
+    //This takes care of the entire conversion+nickname+exit dialog
+    for (int i = 0; i < 10; i++) {
+        pbf_press_button(context, BUTTON_B, 320ms, 640ms);
+        pbf_wait(context, 100ms);
+        context.wait_for_all_requests();
+    }
+    context.wait_for_all_requests();
+}
+
 //After declining to nickname, clear rival pickup and open your starter's summary
 void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     GiftReset_Descriptor::Stats& stats = env.current_stats<GiftReset_Descriptor::Stats>();
@@ -184,7 +208,7 @@ void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerC
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context) {
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 10; i++) {
                 pbf_press_button(context, BUTTON_B, 320ms, 640ms);
                 pbf_wait(context, 100ms);
                 context.wait_for_all_requests();
@@ -199,7 +223,7 @@ void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerC
         env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "open_summary(): Unable to open Start menu.",
+            "open_summary(): Unable to open Start menu after 10 attempts.",
             env.console
         );
     }
@@ -273,15 +297,20 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     /*
     * Settings: Text Speed fast. Default borders.
-    * Setup: Stand in front of the starter you want. Save the game.
+    * Setup: 5 pokemon in your party. None for starter. Stand in front of the pokemon. Save the game.
     * For non-starters: move menu cursor back to the top (POKEDEX)!
     * for starters, pokemon menu will be on top as it is added after picking
+    * For magikarp: you need money to buy it
     */
 
     bool shiny_starter = false;
 
     while (!shiny_starter) {
-        obtain_starter(env, context);
+        if (TARGET != Target::lapras) {
+            obtain_pokemon(env, context);
+        } else {
+            obtain_lapras(env, context);
+        }
         open_summary(env, context);
 
         VideoSnapshot screen = env.console.video().snapshot();
@@ -303,6 +332,7 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             );
             soft_reset(env.program_info(), env.console, context);
             stats.resets++;
+            env.update_stats();
             context.wait_for_all_requests();
         }
     }

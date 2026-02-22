@@ -33,13 +33,15 @@ public:
     ) override{}
 
 private:
-    void obtain_starter(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void obtain_lapras(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void open_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
     enum class Target{
         starters,
         hitmon,
-        mudkip,
+        eevee,
+        lapras,
     };
     EnumDropdownOption<Target> TARGET;
 
