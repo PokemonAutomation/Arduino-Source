@@ -1,0 +1,509 @@
+# azure-pipelines.yml
+# CI pipeline for SerialPrograms
+
+trigger: none
+pr: none
+
+resources:
+  repositories:
+    - repository: Arduino-Source-Internal
+      type: github
+      name: PokemonAutomation/Arduino-Source-Internal
+      endpoint: PokemonAutomation
+      ref: refs/heads/master
+
+    - repository: Arduino-Source
+      type: github
+      name: Koi-3088/Arduino-Source
+      endpoint: Koi-3088
+      ref: refs/heads/azure
+
+variables:
+  - group: apple-signing
+  - group: github
+  - group: discord-symbols
+  - group: telemetry
+  - group: alarm_clock
+
+parameters:
+  - name: buildType
+    displayName: Build Type
+    type: string
+    default: Commit
+    values: [Commit, Release, Beta, PrivateBeta]
+
+  - name: targetOS
+    displayName: Target OS
+    type: string
+    default: All
+    values: [All, Windows, Linux, MacOS]
+
+  - name: versionMajor
+    displayName: Version Major
+    type: number
+    default: 0
+
+  - name: versionMinor
+    displayName: Version Minor
+    type: number
+    default: 0
+
+  - name: versionPatch
+    displayName: Version Patch
+    type: number
+    default: 0
+
+stages:
+
+###########################################
+#             WAKE-UP SIGNAL              #
+###########################################
+#- template: templates/wake-signal.yml
+#  parameters:
+#    stageName: Wake_Up_Signal
+#    displayName: 'Send Wake-Up Signal'
+#    dependsOn: []
+#    poolName: AlarmClock
+#    condition: always()
+
+###########################################
+#         WINDOWS BUILD JOB               #
+###########################################
+
+- stage: Windows_Build_x64
+  displayName: Windows Build x64
+  #dependsOn: Wake_Up_Signal
+  dependsOn: []
+  condition: and(succeeded(), or(eq('${{ parameters.targetOS }}', 'Windows'), eq('${{ parameters.targetOS }}', 'All')))
+
+  jobs:
+  - job: Windows
+    timeoutInMinutes: 30
+    cancelTimeoutInMinutes: 1
+    displayName: Windows
+
+    strategy:
+      matrix:
+        MSVC:
+          poolName: 'WindowsPool'
+          imageName: 'windows-2025'
+          architecture: 'x64'
+          compiler: 'MSVC'
+          qt_version: '6.8.3'
+          qt_version_major: '6'
+          qt_modules: 'qtserialport qtmultimedia'
+          cmake_preset: 'RelWithDebInfo'
+          cmake_version_params: '-DVERSION_MAJOR=${{ parameters.versionMajor }} -DVERSION_MINOR=${{ parameters.versionMinor }} -DVERSION_PATCH=${{ parameters.versionPatch }} -DIS_BETA=${{ lower(eq(parameters.buildType, ''PrivateBeta'')) }}'
+          cmake_additional_param: '-DCMAKE_PREFIX_PATH=C:/Qt/$(qt_version)/msvc2022_64/lib/cmake -DIS_AZURE_BUILD=TRUE'
+
+    pool:
+      name: $(poolName)
+
+    steps:
+      - template: templates/checkout.yml
+
+      - task: BatchScript@1
+        inputs:
+          filename: 'C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/Tools/VsDevCmd.bat'
+          arguments: '-arch=x64'
+          modifyEnvironment: true
+        displayName: 'Initialize VS Environment'
+        condition: succeeded()
+
+      - script: |
+          cd /d "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/SerialPrograms"
+          cmake --preset=$(cmake_preset) $(cmake_additional_param) $(cmake_version_params)
+        displayName: 'Configure CMake'
+        condition: succeeded()
+
+      - script: |
+          cd /d "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/SerialPrograms"
+          cmake --build --preset=$(cmake_preset)
+        displayName: 'Build'
+        condition: succeeded()
+
+      - powershell: |
+          Write-Host "=== Running windeployqt ==="
+          $BUILD_DIR = "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
+          $APP_EXE   = "$BUILD_DIR/SerialPrograms.exe"
+          $BUILD_CACHE = "$BUILD_DIR/cache-build"
+          $SYMBOLS_CACHE = "$BUILD_DIR/cache-symbols"
+          New-Item -ItemType Directory -Force -Path $BUILD_CACHE | Out-Null
+          & "C:/Qt/$(qt_version)/msvc2022_64/bin/windeployqt.exe" --dir "$BUILD_CACHE" --release "$APP_EXE"
+          New-Item -ItemType Directory -Force -Path $SYMBOLS_CACHE | Out-Null
+          Write-Host "=== windeployqt complete ==="
+        displayName: 'Deploy app'
+        condition: succeeded()
+
+      - powershell: |
+          echo "=== Copying resources==="
+          robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/Packages/Resources      $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/Resources /s
+          robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/Packages/Firmware       $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/Firmware /s
+          robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)   $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/ *.dll
+          robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)   $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/ SerialPrograms.exe
+          robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)   $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-symbols/ SerialPrograms.pdb
+          Write-Host "Robocopy exited with exit code:" $LASTEXITCODE
+          if ($LASTEXITCODE -eq 1) { exit 0 } else { exit 1 }
+        displayName: 'Copy resources'
+        condition: succeeded()
+
+      - powershell: |
+          $root = "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
+          $name = "SerialPrograms-Windows-$(compiler)-$(architecture)"
+
+          $cacheArtifactsDir = Join-Path $root "cache-artifacts"
+          $artifactSubdir = Join-Path $cacheArtifactsDir $name
+          New-Item -ItemType Directory -Force -Path $artifactSubdir | Out-Null
+
+          $temp = Join-Path $root "temp-archive"
+          New-Item -ItemType Directory -Force -Path $temp | Out-Null
+          Copy-Item "$root/cache-build/*" $temp -Recurse -Force
+
+          Compress-Archive -Path $temp/* -DestinationPath "$artifactSubdir/$name.zip"
+          Remove-Item $temp -Recurse -Force
+        displayName: 'Archive Windows build artifact'
+        condition: succeeded()
+
+      - task: Cache@2
+        displayName: 'Cache the build artifact'
+        inputs:
+          key: 'windows-build | "$(Build.BuildId)"'
+          path: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-artifacts'
+        condition: succeeded()
+
+      - task: Cache@2
+        displayName: 'Cache debug symbols'
+        inputs:
+          key: 'windows-symbols | "$(Build.BuildId)"'
+          path: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-symbols'
+        condition: succeeded()
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish SerialPrograms'
+        condition: succeeded()
+        inputs:
+          PathtoPublish: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-artifacts/SerialPrograms-Windows-$(compiler)-$(architecture)/SerialPrograms-Windows-$(compiler)-$(architecture).zip'
+          ArtifactName: 'SerialPrograms-Windows-$(compiler)-$(architecture)'
+
+###########################################
+#         LINUX BUILD JOB                 #
+###########################################
+
+- stage: Linux_Build_x64
+  displayName: Linux Build x64
+  #dependsOn: Wake_Up_Signal
+  dependsOn: []
+  condition: and(succeeded(), or(eq('${{ parameters.targetOS }}', 'Linux'), eq('${{ parameters.targetOS }}', 'All')))
+
+  jobs:
+  - job: Ubuntu
+    timeoutInMinutes: 30
+    cancelTimeoutInMinutes: 1
+    displayName: Ubuntu
+
+    strategy:
+      matrix:
+        GCC:
+          poolName: 'LinuxPool'
+          imageName: 'ubuntu-24.04'
+          architecture: 'x64'
+          compiler: 'GCC'
+          qt_version: '6.10.0'
+          qt_version_major: '6'
+          qt_modules: 'qtserialport qtmultimedia'
+          cmake_preset: 'RelWithDebInfo'
+          linux_path: '/opt/Qt/$(qt_version)/gcc_64/lib/cmake:/opt/Qt/$(qt_version)/gcc_64/bin:/opt/Qt/$(qt_version)/gcc_64/plugins:$PATH'
+          cmake_version_params: '-DVERSION_MAJOR=${{ parameters.versionMajor }} -DVERSION_MINOR=${{ parameters.versionMinor }} -DVERSION_PATCH=${{ parameters.versionPatch }} -DIS_BETA=${{ lower(eq(parameters.buildType, ''PrivateBeta'')) }}'
+          cmake_additional_param: '-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DIS_AZURE_BUILD=TRUE'
+
+    pool:
+      name: $(poolName)
+
+    steps:
+      - template: templates/checkout.yml
+
+      - script: |
+          export PATH=$(linux_path)
+          cd "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/SerialPrograms"
+          cmake --preset=$(cmake_preset) $(cmake_additional_param) $(cmake_version_params)
+        displayName: 'Configure CMake'
+        condition: succeeded()
+
+      - script: |
+          export PATH=$(linux_path)
+          cd "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/SerialPrograms"
+          cmake --build --preset=$(cmake_preset)
+        displayName: 'Build'
+        condition: succeeded()
+
+      - script: |
+          set -e
+          export PATH=$(linux_path)
+          BUILD_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
+
+          echo "=== Extracting debug symbols ==="
+          cd "$BUILD_DIR"
+          objcopy --only-keep-debug SerialPrograms SerialPrograms.debug
+          objcopy --strip-debug SerialPrograms
+          objcopy --add-gnu-debuglink=SerialPrograms.debug SerialPrograms
+          mkdir -p "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-symbols"
+          mv SerialPrograms.debug "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-symbols/SerialPrograms.debug"
+          echo "=== Debug symbols extracted to SerialPrograms.debug ==="
+        displayName: 'Extract Debug Symbols'
+        condition: succeeded()
+
+      - script: |
+          set -e
+          export LINUXDEPLOY_DISABLE_APPSTREAM=1
+          export PATH=$(linux_path)
+          BUILD_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
+          SRC_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public"
+          APPDIR="$BUILD_DIR/AppDir"
+          BUILD_CACHE_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build"
+
+          echo "=== Clean AppDir ==="
+          rm -rf "$APPDIR"
+          mkdir -p "$APPDIR"
+          mkdir -p "$APPDIR/usr/bin"
+          mkdir -p "$APPDIR/usr/lib"
+          mkdir -p "$APPDIR/usr/share/applications"
+          mkdir -p "$APPDIR/usr/share/icons/hicolor/256x256/apps"
+
+          echo "=== Moving resources ==="
+          mkdir -p "$APPDIR/usr/plugins/iconengines"
+          cp -a "/opt/Qt/$(qt_version)/gcc_64/plugins/iconengines/" "$APPDIR/usr/plugins/iconengines/"
+
+          mkdir -p "$APPDIR/usr/bin/Resources"
+          cp -a "$SRC_DIR/Packages/Resources/" "$APPDIR/usr/bin/"
+
+          mkdir -p "$BUILD_CACHE_DIR"
+          cp -a "$SRC_DIR/Packages/Firmware/" "$BUILD_CACHE_DIR/"
+
+          cp "$SRC_DIR/IconResource/SerialPrograms.desktop" "$APPDIR/usr/share/applications/"
+          cp "$SRC_DIR/IconResource/SerialPrograms.png" "$APPDIR/usr/share/icons/hicolor/256x256/apps/"
+          cp "$BUILD_DIR/SerialPrograms" "$APPDIR/usr/bin"
+
+          echo "=== Extracting Discord Social SDK ==="
+          DISCORD_ZIP="$SRC_DIR/3rdPartyBinaries/discord_social_sdk_linux.zip"
+          DISCORD_DIR="$SRC_DIR/3rdPartyBinaries/discord_social_sdk_linux"
+          rm -rf "$DISCORD_DIR"
+          mkdir -p "$DISCORD_DIR"
+          unzip -q "$DISCORD_ZIP" -d "$SRC_DIR/3rdPartyBinaries"
+          DISCORD_SO="$DISCORD_DIR/lib/release/libdiscord_partner_sdk.so"
+
+          echo "=== Downloading linuxdeploy & Qt plugin ==="
+          cd "$BUILD_DIR"
+          wget -nv https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          wget -nv https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+          wget -nv https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x linuxdeploy-*.AppImage
+          chmod +x appimagetool-x86_64.AppImage
+
+          echo "=== Running linuxdeploy to package AppImage ==="
+          ./linuxdeploy-x86_64.AppImage \
+              --appdir "AppDir" \
+              -d "$APPDIR/usr/share/applications/SerialPrograms.desktop" \
+              -i "$APPDIR/usr/share/icons/hicolor/256x256/apps/SerialPrograms.png" \
+              -e "$APPDIR/usr/bin/SerialPrograms" \
+              -l "$DISCORD_SO" \
+              -p qt \
+              -v 3
+
+          ./appimagetool-x86_64.AppImage AppDir
+          rm linuxdeploy-*.AppImage
+          rm appimagetool-x86_64.AppImage
+
+          echo "=== Archive Linux AppImage ==="
+          chmod +x "SerialPrograms-x86_64.AppImage"
+          tar -zcvf $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).tar.gz SerialPrograms-x86_64.AppImage
+          echo "=== AppImage build complete ==="
+        displayName: 'Deploy AppImage'
+        condition: succeeded()
+
+      - task: Cache@2
+        displayName: 'Cache build'
+        inputs:
+          key: 'ubuntu-build | "$(Build.BuildId)"'
+          path: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build'
+        condition: succeeded()
+
+      - task: Cache@2
+        displayName: 'Cache debug symbols'
+        inputs:
+          key: 'ubuntu-symbols | "$(Build.BuildId)"'
+          path: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-symbols'
+        condition: succeeded()
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish SerialPrograms'
+        condition: succeeded()
+        inputs:
+          PathtoPublish: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).tar.gz'
+          ArtifactName: 'SerialPrograms-Linux-$(compiler)-$(architecture)'
+
+###########################################
+#           MACOS BUILD STAGES            #
+###########################################
+
+- template: templates/macos-build.yml
+  parameters:
+    stageName: MacOS_Build_ARM64
+    displayName: 'MacOS Build ARM64'
+    targetOS: ${{ parameters.targetOS }}
+    poolName: ApplePool
+    imageName: macos-26
+    architecture: arm64
+    compiler: Clang
+    qt_version: '6.9.3'
+    qt_version_major: '6'
+    qt_modules: 'qtserialport qtmultimedia'
+    cmake_preset: RelWithDebInfo
+    macos_path: '/opt/Qt/6.9.3/macos/lib/cmake:/opt/Qt/6.9.3/macos/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew:$PATH'
+    cmake_version_params: '-DVERSION_MAJOR=${{ parameters.versionMajor }} -DVERSION_MINOR=${{ parameters.versionMinor }} -DVERSION_PATCH=${{ parameters.versionPatch }} -DIS_BETA=${{ lower(eq(parameters.buildType, ''PrivateBeta'')) }}'
+    cmake_additional_param: '-DPACKAGE_BUILD=true -DUNIX_LINK_TESSERACT:BOOL=true -DIS_AZURE_BUILD=TRUE'
+    condition: or(eq('${{ parameters.targetOS }}', 'MacOS'), eq('${{ parameters.targetOS }}', 'All'))
+
+- template: templates/macos-build.yml
+  parameters:
+    stageName: MacOS_Build_x64
+    displayName: 'MacOS Build x64'
+    targetOS: ${{ parameters.targetOS }}
+    poolName: ApplePool
+    imageName: macos-15
+    architecture: x64
+    compiler: Clang
+    qt_version: '6.9.3'
+    qt_version_major: '6'
+    qt_modules: 'qtserialport qtmultimedia'
+    cmake_preset: RelWithDebInfo
+    macos_path: '/usr/local/Qt/6.9.3/macos/lib/cmake:/usr/local/Qt/6.9.3/macos/bin:/usr/local/bin:/usr/local/sbin:/usr/local:$PATH'
+    cmake_version_params: '-DVERSION_MAJOR=${{ parameters.versionMajor }} -DVERSION_MINOR=${{ parameters.versionMinor }} -DVERSION_PATCH=${{ parameters.versionPatch }} -DIS_BETA=${{ lower(eq(parameters.buildType, ''PrivateBeta'')) }}'
+    cmake_additional_param: '-DPACKAGE_BUILD=true -DUNIX_LINK_TESSERACT:BOOL=true -DIS_AZURE_BUILD=TRUE'
+    condition: or(eq('${{ parameters.targetOS }}', 'MacOS'), eq('${{ parameters.targetOS }}', 'All'))
+
+###########################################
+#        MACOS NOTARIZATION STAGES        #
+###########################################
+
+- template: templates/macos-notarize.yml
+  parameters:
+    stageName: MacOS_Notarize_ARM64
+    displayName: 'MacOS Codesign ARM64'
+    dependsOnStage: MacOS_Build_ARM64
+    buildType: ${{ parameters.buildType }}
+    poolName: ApplePool
+    imageName: macos-26
+    architecture: arm64
+    compiler: Clang
+    cmake_preset: RelWithDebInfo
+    macos_path: '/opt/Qt/6.9.3/macos/lib/cmake:/opt/Qt/6.9.3/macos/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew:$PATH'
+    openssl_pkcs_args: '-legacy'
+    condition: and(succeeded('MacOS_Build_ARM64'), or(eq('${{ parameters.targetOS }}', 'MacOS'), eq('${{ parameters.targetOS }}', 'All')))
+
+- template: templates/macos-notarize.yml
+  parameters:
+    stageName: MacOS_Notarize_x64
+    displayName: 'MacOS Codesign x64'
+    dependsOnStage: MacOS_Build_x64
+    buildType: ${{ parameters.buildType }}
+    poolName: ApplePool
+    imageName: macos-15
+    architecture: x64
+    compiler: Clang
+    cmake_preset: RelWithDebInfo
+    macos_path: '/usr/local/Qt/6.9.3/macos/lib/cmake:/usr/local/Qt/6.9.3/macos/bin:/usr/local/bin:/usr/local/sbin:/usr/local:$PATH'
+    openssl_pkcs_args: '-legacy'
+    condition: and(succeeded('MacOS_Build_x64'), or(eq('${{ parameters.targetOS }}', 'MacOS'), eq('${{ parameters.targetOS }}', 'All')))
+
+##########################################
+#          UPLOAD DEBUG SYMBOLS          #
+##########################################
+
+- template: templates/upload-symbols.yml
+  parameters:
+    stageName: Upload_Debug_Symbols
+    displayName: 'Upload Debug Symbols'
+    dependsOn:
+      - Windows_Build_x64
+      - Linux_Build_x64
+      - MacOS_Notarize_ARM64
+      - MacOS_Notarize_x64
+    platforms:
+      - Windows
+      - Linux
+      - MacOS_ARM64
+      - MacOS_x64
+    poolName: WindowsPool
+    buildType: ${{ parameters.buildType }}
+    versionMajor: ${{ parameters.versionMajor }}
+    versionMinor: ${{ parameters.versionMinor }}
+    versionPatch: ${{ parameters.versionPatch }}
+    condition: succeeded()
+
+###########################################
+#                 SLEEP                   #
+###########################################
+#- template: templates/sleep-signal.yml
+#  parameters:
+#    stageName: Sleep_Signal
+#    displayName: 'Send Sleep Signal'
+#    dependsOn:
+#      - Upload_Debug_Symbols
+#    poolName: AlarmClock
+#    condition: always()
+
+##########################################
+#         UPDATE TELEMETRY JSON          #
+##########################################
+
+- template: templates/update-github-telemetry.yml
+  parameters:
+    stageName: Update_GitHub_Telemetry_JSON
+    displayName: 'Update GitHub Telemetry JSON'
+    dependsOn:
+      - Upload_Debug_Symbols
+    buildType: ${{ parameters.buildType }}
+    versionMajor: ${{ parameters.versionMajor }}
+    versionMinor: ${{ parameters.versionMinor }}
+    versionPatch: ${{ parameters.versionPatch }}
+    telemetryRepo: Koi-3088/ServerConfigs-PA-SHA
+    condition: and(succeeded(), eq('${{ parameters.targetOS }}', 'All'), ne('${{ parameters.buildType }}', 'Commit'))
+
+##########################################
+#        PUBLISH GITHUB RELEASE          #
+##########################################
+
+- template: templates/github-release.yml
+  parameters:
+    stageName: Publish_GitHub_Release
+    displayName: 'Publish GitHub Release'
+    dependsOn:
+      - Update_GitHub_Telemetry_JSON
+    platforms:
+      - Windows
+      - Linux
+      - MacOS_ARM64
+      - MacOS_x64
+    buildType: ${{ parameters.buildType }}
+    versionMajor: ${{ parameters.versionMajor }}
+    versionMinor: ${{ parameters.versionMinor }}
+    versionPatch: ${{ parameters.versionPatch }}
+    targetRepo: 'Koi-3088/ComputerControl'
+    condition: and(succeeded(), eq('${{ parameters.targetOS }}', 'All'), or(eq('${{ parameters.buildType }}', 'Release'), eq('${{ parameters.buildType }}', 'Beta')))
+
+##########################################
+#      UPDATE LATEST VERSION JSON        #
+##########################################
+
+- template: templates/update-github-version.yml
+  parameters:
+    stageName: Update_GitHub_Latest_Version_JSON
+    displayName: 'Update GitHub Latest Version JSON'
+    dependsOn:
+      - Publish_GitHub_Release
+    buildType: ${{ parameters.buildType }}
+    versionMajor: ${{ parameters.versionMajor }}
+    versionMinor: ${{ parameters.versionMinor }}
+    versionPatch: ${{ parameters.versionPatch }}
+    versionRepo: Koi-3088/ComputerControl
+    condition: and(succeeded(), eq('${{ parameters.targetOS }}', 'All'), ne('${{ parameters.buildType }}', 'Commit'))
