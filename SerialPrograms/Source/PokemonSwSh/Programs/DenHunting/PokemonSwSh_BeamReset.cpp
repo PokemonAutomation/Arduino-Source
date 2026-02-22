@@ -11,6 +11,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh_BeamReset.h"
 
 namespace PokemonAutomation{
@@ -79,7 +80,7 @@ void BeamReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         }
         pbf_wait(context, DELAY_BEFORE_RESET0);
 
-        reset_game_from_home(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+        reset_game_from_home_old(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
     }
 }
 

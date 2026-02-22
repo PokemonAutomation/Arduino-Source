@@ -46,39 +46,22 @@ void resume_game_front_of_den_nowatts(ProControllerContext& context, bool tolera
 
 void fast_reset_game(
     ProControllerContext& context,
-    Milliseconds start_game_mash, Milliseconds start_game_wait,
-    Milliseconds enter_game_mash, Milliseconds enter_game_wait
+    Milliseconds start_game_wait,
+    Milliseconds enter_game_mash,
+    Milliseconds enter_game_wait
 ){
     //  Fastest setting. No internet needed and no update menu.
     ssf_mash1_button(context, BUTTON_X, 400ms);
 
     //  Use mashing to ensure that the X press succeeds. If it fails, the SR
     //  will fail and can kill a den for the autohosts.
-    ssf_mash2_button(context, BUTTON_X, BUTTON_A, 3s + start_game_mash);
+    ssf_mash2_button(context, BUTTON_X, BUTTON_A, 3000ms + ConsoleSettings::instance().BLIND_START_GAME_MASH.get());
     ssf_mash1_button(context, BUTTON_X, start_game_wait);
 
     ssf_mash_AZs(context, enter_game_mash);
     pbf_wait(context, enter_game_wait);
 }
 
-void reset_game_from_home(
-    ConsoleHandle& console, ProControllerContext& context,
-    bool tolerate_update_menu
-){
-    if (!ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET && !tolerate_update_menu){
-        fast_reset_game(
-            context,
-            ConsoleSettings::instance().START_GAME_MASH,
-            GameSettings::instance().START_GAME_WAIT0,
-            GameSettings::instance().ENTER_GAME_MASH0,
-            GameSettings::instance().ENTER_GAME_WAIT0
-        );
-        return;
-    }
-
-    close_game_from_home(console, context);
-    start_game_from_home(context, tolerate_update_menu, 0, 0, false);
-}
 void settings_to_enter_game(ProControllerContext& context, bool fast){
     if (fast){
         //  100 ticks for the first press isn't enough to finish the animation.
@@ -147,7 +130,7 @@ void start_game_from_home(
     }
 
     bool START_GAME_REQUIRES_INTERNET = ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET;
-    Milliseconds START_GAME_MASH = ConsoleSettings::instance().START_GAME_MASH;
+    Milliseconds START_GAME_MASH = ConsoleSettings::instance().BLIND_START_GAME_MASH;
 
     if (!START_GAME_REQUIRES_INTERNET && user_slot == 0){
         //  Mash your way into the game.

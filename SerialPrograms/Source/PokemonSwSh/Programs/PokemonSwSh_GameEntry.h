@@ -39,14 +39,6 @@ void start_game_from_home_with_inference(
     bool backup_save = false,
     Milliseconds post_wait_time = Milliseconds(1000)
 );
-
-void reset_game_from_home_with_inference(
-    ConsoleHandle& console, ProControllerContext& context,
-    bool tolerate_update_menu,
-    bool backup_save = false,
-    Milliseconds post_wait_time = Milliseconds(1000)
-);
-
 void start_game_from_home(
     ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu,
@@ -54,6 +46,17 @@ void start_game_from_home(
     uint8_t user_slot = 0,
     bool backup_save = false,
     Milliseconds post_wait_time = Milliseconds(1000)
+);
+
+void reset_game_from_home_with_inference(
+    ConsoleHandle& console, ProControllerContext& context,
+    bool tolerate_update_menu,
+    bool backup_save = false,
+    Milliseconds post_wait_time = Milliseconds(1000)
+);
+void reset_game_from_home_old(
+    ConsoleHandle& console, ProControllerContext& device,
+    bool tolerate_update_menu
 );
 
 

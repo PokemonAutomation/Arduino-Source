@@ -41,14 +41,9 @@ void start_game_from_home(
 );
 void fast_reset_game(
     ProControllerContext& device,
-    Milliseconds start_game_mash,
     Milliseconds start_game_wait,
     Milliseconds enter_game_mash,
     Milliseconds enter_game_wait
-);
-void reset_game_from_home(
-    ConsoleHandle& console, ProControllerContext& device,
-    bool tolerate_update_menu
 );
 
 
