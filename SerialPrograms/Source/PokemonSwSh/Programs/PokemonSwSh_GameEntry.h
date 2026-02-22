@@ -54,10 +54,6 @@ void reset_game_from_home_with_inference(
     bool backup_save = false,
     Milliseconds post_wait_time = Milliseconds(1000)
 );
-void reset_game_from_home_old(
-    ConsoleHandle& console, ProControllerContext& device,
-    bool tolerate_update_menu
-);
 
 
 

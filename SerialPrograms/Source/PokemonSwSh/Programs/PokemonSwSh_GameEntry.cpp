@@ -171,23 +171,6 @@ void reset_game_from_home_with_inference(
     //  Wait for game to load.
     enter_loading_game(console, context, backup_save, post_wait_time);
 }
-void reset_game_from_home_old(
-    ConsoleHandle& console, ProControllerContext& context,
-    bool tolerate_update_menu
-){
-    if (!ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET && !tolerate_update_menu){
-        fast_reset_game(
-            context,
-            GameSettings::instance().START_GAME_WAIT0,
-            GameSettings::instance().ENTER_GAME_MASH0,
-            GameSettings::instance().ENTER_GAME_WAIT0
-        );
-        return;
-    }
-
-    close_game_from_home(console, context);
-    start_game_from_home(context, tolerate_update_menu, 0, 0, false);
-}
 
 
 
