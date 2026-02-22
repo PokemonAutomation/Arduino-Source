@@ -10,7 +10,7 @@
 
 #include "PokemonFRLG_Settings.h"
 
-#include "Programs/ShinyHunting/PokemonFRLG_StarterReset.h"
+#include "Programs/ShinyHunting/PokemonFRLG_GiftReset.h"
 #include "Programs/TestPrograms/PokemonFRLG_SoundListener.h"
 
 namespace PokemonAutomation{
@@ -32,7 +32,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     //ret.emplace_back("---- General ----");
 
     ret.emplace_back("---- Shiny Hunting  ----");
-    ret.emplace_back(make_single_switch_program<StarterReset_Descriptor, StarterReset>());
+    ret.emplace_back(make_single_switch_program<GiftReset_Descriptor, GiftReset>());
     
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
