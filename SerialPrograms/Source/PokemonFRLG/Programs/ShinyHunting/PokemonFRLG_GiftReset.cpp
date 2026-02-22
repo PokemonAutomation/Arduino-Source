@@ -62,6 +62,7 @@ GiftReset::GiftReset()
             {Target::hitmon, "hitmon", "Magikarp, Hitmonlee / Hitmonchan"},
             {Target::eevee, "eevee", "Eevee"},
             {Target::lapras, "lapras", "Lapras"},
+            {Target::fossils, "fossils", "Omanyte / Kabuto / Aerodactyl "},
         },
         LockMode::LOCK_WHILE_RUNNING,
         Target::starters
@@ -188,9 +189,14 @@ void GiftReset::obtain_lapras(SingleSwitchProgramEnvironment& env, ProController
     env.log("Obtaining Lapras.");
     pbf_press_button(context, BUTTON_A, 320ms, 640ms);
 
-    //At least 9 lines of dialog/No to nickname
+    //At least 9 lines of dialog/No to nickname for Lapras
+    //At least 4 lines of dialog for fossils
     //This takes care of the entire conversion+nickname+exit dialog
-    for (int i = 0; i < 10; i++) {
+    int limit = 10;
+    if (TARGET == Target::fossils) {
+        limit = 5;
+    }
+    for (int i = 0; i < limit; i++) {
         pbf_press_button(context, BUTTON_B, 320ms, 640ms);
         pbf_wait(context, 100ms);
         context.wait_for_all_requests();
@@ -301,12 +307,13 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     * For non-starters: move menu cursor back to the top (POKEDEX)!
     * for starters, pokemon menu will be on top as it is added after picking
     * For magikarp: you need money to buy it
+    * fossils: need to corner the scientist
     */
 
     bool shiny_starter = false;
 
     while (!shiny_starter) {
-        if (TARGET != Target::lapras) {
+        if (TARGET != Target::lapras && TARGET != Target::fossils) {
             obtain_pokemon(env, context);
         } else {
             obtain_lapras(env, context);

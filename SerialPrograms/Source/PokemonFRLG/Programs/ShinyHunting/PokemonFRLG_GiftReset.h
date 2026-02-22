@@ -42,6 +42,7 @@ private:
         hitmon,
         eevee,
         lapras,
+        fossils,
     };
     EnumDropdownOption<Target> TARGET;
 
