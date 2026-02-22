@@ -1401,6 +1401,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.h
     Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.cpp
     Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h
+    Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.cpp
+    Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.cpp
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h
     Source/PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.cpp
@@ -1415,6 +1417,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/PokemonFRLG_Settings.h
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_GiftReset.cpp
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_GiftReset.h
+    Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_PrizeCornerReset.cpp
+    Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_PrizeCornerReset.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.cpp
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.h
     Source/PokemonHome/Inference/PokemonHome_BallReader.cpp
