@@ -118,7 +118,7 @@ void start_game_from_home_with_inference(
         tolerate_update_menu,
         game_slot,
         user_slot,
-        ConsoleSettings::instance().START_GAME_MASH
+        ConsoleSettings::instance().START_GAME_MASH0
     );
 
     //  Wait for game to load.
@@ -168,7 +168,7 @@ void start_game_from_home(
         return;
     }
 
-    fast_reset_game(context, ConsoleSettings::instance().START_GAME_MASH, 0ms, 0ms, 0ms);
+    fast_reset_game(context, ConsoleSettings::instance().START_GAME_MASH0, 0ms, 0ms, 0ms);
     context.wait_for_all_requests();
 
     //  Wait for game to load.

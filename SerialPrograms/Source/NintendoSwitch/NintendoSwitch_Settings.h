@@ -43,7 +43,7 @@ public:
     ControllerSettingsTable CONTROLLER_SETTINGS;
 
     BooleanCheckBoxOption TRUST_USER_CONSOLE_SELECTION;
-    MillisecondsOption START_GAME_MASH;
+    MillisecondsOption START_GAME_MASH0;
     MillisecondsOption SETTINGS_TO_HOME_DELAY0;
     BooleanCheckBoxOption START_GAME_REQUIRES_INTERNET;
     MillisecondsOption START_GAME_INTERNET_CHECK_DELAY0;

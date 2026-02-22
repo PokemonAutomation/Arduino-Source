@@ -75,10 +75,10 @@ ConsoleSettings::ConsoleSettings()
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
-    , START_GAME_MASH(
+    , START_GAME_MASH0(
         "<b>Start Game Mash:</b><br>Mash A for this long to start the game.",
         LockMode::LOCK_WHILE_RUNNING,
-        "2000 ms"
+        "500 ms"
     )
     , SETTINGS_TO_HOME_DELAY0(
         "<b>Settings to Home Delay:</b><br>Delay from pressing home anywhere in the settings to return to the home menu.",
@@ -147,7 +147,7 @@ ConsoleSettings::ConsoleSettings()
 {
     PA_ADD_OPTION(CONTROLLER_SETTINGS);
     PA_ADD_OPTION(TRUST_USER_CONSOLE_SELECTION);
-    PA_ADD_OPTION(START_GAME_MASH);
+    PA_ADD_OPTION(START_GAME_MASH0);
     PA_ADD_OPTION(SETTINGS_TO_HOME_DELAY0);
     PA_ADD_OPTION(START_GAME_REQUIRES_INTERNET);
     PA_ADD_OPTION(START_GAME_INTERNET_CHECK_DELAY0);
