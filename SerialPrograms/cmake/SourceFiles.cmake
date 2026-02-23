@@ -1419,6 +1419,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_GiftReset.h
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_LegendaryReset.cpp
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_LegendaryReset.h
+    Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_LegendaryRunAway.cpp
+    Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_LegendaryRunAway.h
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_PrizeCornerReset.cpp
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_PrizeCornerReset.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.cpp
