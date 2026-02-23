@@ -85,6 +85,12 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Filesystem.h
     ../Common/Cpp/FileIO.cpp
     ../Common/Cpp/FileIO.h
+    ../Common/Cpp/Hardware/Hardware.cpp
+    ../Common/Cpp/Hardware/Hardware.h
+    ../Common/Cpp/Hardware/Hardware_arm64_Linux.tpp
+    ../Common/Cpp/Hardware/Hardware_x86.tpp
+    ../Common/Cpp/Hardware/Hardware_x86_Linux.tpp
+    ../Common/Cpp/Hardware/Hardware_x86_Windows.tpp
     ../Common/Cpp/ImageResolution.cpp
     ../Common/Cpp/ImageResolution.h
     ../Common/Cpp/Json/JsonArray.cpp
@@ -345,10 +351,6 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Environment/Environment_Linux.tpp
     Source/CommonFramework/Environment/Environment_Windows.h
     Source/CommonFramework/Environment/Environment_Windows.tpp
-    Source/CommonFramework/Environment/Environment_arm64_Linux.tpp
-    Source/CommonFramework/Environment/Environment_x86.tpp
-    Source/CommonFramework/Environment/Environment_x86_Linux.tpp
-    Source/CommonFramework/Environment/Environment_x86_Windows.tpp
     Source/CommonFramework/Environment/HardwareValidation.cpp
     Source/CommonFramework/Environment/HardwareValidation.h
     Source/CommonFramework/Environment/HardwareValidation_arm64.tpp
@@ -1397,6 +1399,24 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.h
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.cpp
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.h
+    Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.cpp
+    Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h
+    Source/PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.cpp
+    Source/PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h
+    Source/PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.cpp
+    Source/PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h
+    Source/PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.cpp
+    Source/PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h
+    Source/PokemonFRLG/PokemonFRLG_Navigation.cpp
+    Source/PokemonFRLG/PokemonFRLG_Navigation.h
+    Source/PokemonFRLG/PokemonFRLG_Panels.cpp
+    Source/PokemonFRLG/PokemonFRLG_Panels.h
+    Source/PokemonFRLG/PokemonFRLG_Settings.cpp
+    Source/PokemonFRLG/PokemonFRLG_Settings.h
+    Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_GiftReset.cpp
+    Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_GiftReset.h
+    Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.cpp
+    Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.h
     Source/PokemonHome/Inference/PokemonHome_BallReader.cpp
     Source/PokemonHome/Inference/PokemonHome_BallReader.h
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.cpp
@@ -2467,8 +2487,6 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattFarmer.h
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattTraderFarmer.cpp
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattTraderFarmer.h
-    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_BeamReset.cpp
-    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_BeamReset.h
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperEU.cpp
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperEU.h
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperJPN-7.8k.cpp
@@ -2601,16 +2619,6 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHunt-Regi.h
     Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntTools.cpp
     Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntTools.h
-    Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-IoATrade.cpp
-    Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-IoATrade.h
-    Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-Regi.cpp
-    Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-Regi.h
-    Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-Regigigas2.cpp
-    Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-Regigigas2.h
-    Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-StrongSpawn.cpp
-    Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-StrongSpawn.h
-    Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.cpp
-    Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.h
     Source/PokemonSwSh/Programs/TestPrograms/PokemonSwSh_ShinyEncounterTester.cpp
     Source/PokemonSwSh/Programs/TestPrograms/PokemonSwSh_ShinyEncounterTester.h
     Source/PokemonSwSh/Resources/PokemonSwSh_DailyHighlightDatabase.cpp

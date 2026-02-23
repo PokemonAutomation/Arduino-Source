@@ -39,14 +39,12 @@ void start_game_from_home(
     ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
-    uint8_t user_slot,
-    Milliseconds start_game_mash
+    uint8_t user_slot
 );
 void start_game_from_home(
     ConsoleHandle& console, JoyconContext& context,
     uint8_t game_slot,
-    uint8_t user_slot,
-    Milliseconds start_game_mash
+    uint8_t user_slot
 );
 
 //  From the home menu:

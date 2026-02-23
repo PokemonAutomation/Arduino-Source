@@ -4,11 +4,10 @@
  *
  */
 
-#include <thread>
 #include <QMessageBox>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/CpuId/CpuId.h"
-#include "Environment.h"
+#include "Common/Cpp/Hardware/Hardware.h"
 #include "HardwareValidation.h"
 
 namespace PokemonAutomation{

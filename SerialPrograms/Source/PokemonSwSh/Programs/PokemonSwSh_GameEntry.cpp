@@ -117,29 +117,12 @@ void start_game_from_home_with_inference(
         context,
         tolerate_update_menu,
         game_slot,
-        user_slot,
-        ConsoleSettings::instance().START_GAME_MASH
+        user_slot
     );
 
     //  Wait for game to load.
     enter_loading_game(console, context, backup_save, post_wait_time);
 }
-
-
-void reset_game_from_home_with_inference(
-    ConsoleHandle& console, ProControllerContext& context,
-    bool tolerate_update_menu,
-    bool backup_save,
-    Milliseconds post_wait_time
-){
-    from_home_close_and_reopen_game(console, context, tolerate_update_menu);
-    context.wait_for_all_requests();
-
-    //  Wait for game to load.
-    enter_loading_game(console, context, backup_save, post_wait_time);
-}
-
-
 void start_game_from_home(
     ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu,
@@ -168,12 +151,27 @@ void start_game_from_home(
         return;
     }
 
-    fast_reset_game(context, ConsoleSettings::instance().START_GAME_MASH, 0ms, 0ms, 0ms);
+    fast_reset_game(context, 0ms, 0ms, 0ms);
     context.wait_for_all_requests();
 
     //  Wait for game to load.
     enter_loading_game(console, context, backup_save, post_wait_time);
 }
+
+
+void reset_game_from_home_with_inference(
+    ConsoleHandle& console, ProControllerContext& context,
+    bool tolerate_update_menu,
+    bool backup_save,
+    Milliseconds post_wait_time
+){
+    from_home_close_and_reopen_game(console, context, tolerate_update_menu);
+    context.wait_for_all_requests();
+
+    //  Wait for game to load.
+    enter_loading_game(console, context, backup_save, post_wait_time);
+}
+
 
 
 }

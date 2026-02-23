@@ -30,7 +30,6 @@
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-PokeJobsFarmer.h"
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattTraderFarmer.h"
 
-#include "Programs/DenHunting/PokemonSwSh_BeamReset.h"
 #include "Programs/DenHunting/PokemonSwSh_PurpleBeamFinder.h"
 #include "Programs/DenHunting/PokemonSwSh_EventBeamFinder.h"
 #include "Programs/DenHunting/PokemonSwSh_DaySkipperJPN.h"
@@ -57,11 +56,6 @@
 #include "Programs/EggPrograms/PokemonSwSh_GodEggItemDupe.h"
 
 #include "Programs/ShinyHuntUnattended/PokemonSwSh_MultiGameFossil.h"
-#include "Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-Regi.h"
-#include "Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.h"
-#include "Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-StrongSpawn.h"
-#include "Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-Regigigas2.h"
-#include "Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-IoATrade.h"
 #include "Programs/ShinyHuntUnattended/PokemonSwSh_CurryHunter.h"
 
 #include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Regi.h"
@@ -193,14 +187,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 #if 0
     ret.emplace_back("---- Deprecated Programs ----");
     ret.emplace_back(make_single_switch_program<BallThrower_Descriptor, BallThrower>());
-    ret.emplace_back(make_single_switch_program<BeamReset_Descriptor, BeamReset>());
     ret.emplace_back(make_single_switch_program<EggCombined2_Descriptor, EggCombined2>());
     ret.emplace_back(make_single_switch_program<EggSuperCombined2_Descriptor, EggSuperCombined2>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedRegi_Descriptor, ShinyHuntUnattendedRegi>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedSwordsOfJustice_Descriptor, ShinyHuntUnattendedSwordsOfJustice>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedStrongSpawn_Descriptor, ShinyHuntUnattendedStrongSpawn>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedRegigigas2_Descriptor, ShinyHuntUnattendedRegigigas2>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedIoATrade_Descriptor, ShinyHuntUnattendedIoATrade>());
 #endif
 
     if (PreloadSettings::instance().DEVELOPER_MODE){

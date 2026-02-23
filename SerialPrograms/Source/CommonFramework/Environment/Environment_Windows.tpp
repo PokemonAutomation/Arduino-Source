@@ -6,12 +6,9 @@
 
 #ifdef _WIN32
 
-#include <map>
-#include <iostream>
-#include <thread>
 #include <Windows.h>
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Environment.h"
 #include "Environment_Windows.h"
 

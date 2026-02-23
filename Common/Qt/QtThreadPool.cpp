@@ -8,11 +8,6 @@
 #include "Common/Cpp/Concurrency/SpinPause.h"
 #include "QtThreadPool.h"
 
-//  REMOVE: Don't pull CommonFramework here.
-#include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Options/Environment/PerformanceOptions.h"
-#include "CommonFramework/Logging/Logger.h"
-
 //#include <iostream>
 //using std::cout;
 //using std::endl;
@@ -91,6 +86,12 @@ void QtWorkerThreadPool::stop(){
         m_stopping = true;
     }
     m_cv.notify_all();
+#ifdef PA_ENABLE_QT_ADOPTION_WORKAROUND
+    //  Leak all the threads because they can't be joined without hanging.
+    for (std::unique_ptr<QtWorkerThread>& thread : m_threads){
+        thread.release();
+    }
+#endif
     m_threads.clear();
 }
 
@@ -166,7 +167,7 @@ void QtEventThread::remove_object(){
     m_cv.wait(lg, [this]{ return m_object == nullptr; });
 }
 void QtEventThread::run(){
-    GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread(global_logger_tagged());
+    setPriority(QThread::TimeCriticalPriority);
 
     QObject dummy;
     m_dummy.store(&dummy, std::memory_order_release);
