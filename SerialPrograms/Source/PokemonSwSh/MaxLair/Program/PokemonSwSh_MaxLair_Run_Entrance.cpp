@@ -19,56 +19,6 @@ namespace MaxLairInternal{
 
 using namespace Pokemon;
 
-namespace {
-std::string read_saved_name(
-    Logger& logger,
-    Language language,
-    const ImageViewRGB32& image,
-    const ImageFloatBox& box
-                            ) {
-    auto cropped = extract_box_reference(image, box);
-    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
-            logger, language, cropped, OCR::BLACK_OR_WHITE_TEXT_FILTERS(),
-0.01, 0.50, 2.0
-                                                    );
-    if (result.results.empty()) {
-        return "";
-    }
-    
-    return result.results.begin()->second.token;
-}
-
-std::vector<std::string> read_saved_paths(
-    VideoStream& stream,
-    Language language
-) {
-    auto snapshot = stream.video().snapshot();
-    if (!snapshot) return { "", "", "" };
-
-    const ImageRGB32* img_ptr = snapshot.get();
-    const ImageViewRGB32& screen = *img_ptr;
-    
-    const double width = snapshot->width();
-    const double height = snapshot->height();
-
-    // To be adjusted
-    const ImageFloatBox name_region(0.30, 0.75, 0.40, 0.05);
-
-    std::vector<std::string> slugs;
-    for (int i = 0; i < 3; i++) {
-        ImageFloatBox box(
-            name_region.x + i * (name_region.width / 3.0),
-            name_region.y,
-            name_region.width / 3.0,
-            name_region.height
-        );
-        std::string slug = read_saved_name(stream.logger(), language, screen, box);
-        slugs.push_back(slug);
-    }
-    return slugs;
-}
-}
-
 
 // Read the three currently saved paths (if any) from the entrance screen.
 // Returns a vector of three slugs (empty strings for empty slots).
@@ -79,6 +29,7 @@ void run_entrance(
     ProgramEnvironment& env, size_t console_index,
     VideoStream& stream, ProControllerContext& context,
     const std::string& boss_slug,
+    bool followed_path,
     const EndBattleDecider& decider,
     GlobalStateTracker& state_tracker
 ){
@@ -95,49 +46,53 @@ void run_entrance(
         }
     }
     
-    // Read the three currently saved paths (if any)
-    Language language = runtime.console_settings[console_index].language;
-    std::vector<std::string> saved = read_saved_paths(stream, language);
+    // Get the boss slug
+    std::string boss_slug;
+    if (runtime.host_index < state_tracker.size()) {
+        boss_slug = state_tracker.infer_actual_state(runtime.host_index).boss;
+    }
     
     // Determine whether we should save this boss
     bool should_save = false;
     if (!boss_slug.empty()) {
-        // Check if already saved
-        bool already_saved = false;
-        for (const auto& s : saved) {
-            if (s == boss_slug) {
-                already_saved = true;
-                break;
-            }
-        }
-        // Count non‑empty slots
-        size_t occupied = 0;
-        for (const auto& s : saved) {
-            if (!s.empty()) ++occupied;
-        }
-        if (!already_saved && occupied < 3) {
-            should_save = decider.save_path(boss_slug);
-        }
+        should_save = runtime.actions.save_path(boss_slug);
+        stream.log("Boss: " + boss_slug + ", should save: " + (should_save ? "Yes" : "No"), COLOR_BLUE);
     }
+    
+    // Overlay box to detect when a dialogue box is present (grey area at bottom)
 
-
-    OverlayBoxScope box(stream.overlay(), {0.782, 0.850, 0.030, 0.050});
-
-    pbf_wait(context, 2000ms);
-    while (true){
-        if (should_save){
-            pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
-        }else{
-            pbf_press_button(context, BUTTON_B, 160ms, 1000ms);
+    OverlayBoxScope dialog_box(stream.overlay(), {0.782, 0.850, 0.030, 0.050});
+    
+    // First step, check if there is a path to be saved
+    pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
+    context.wait_for_all_requests();
+    
+    // Then, if there is something to be saved, check if the next dialogue box allows us to directly save or not
+    
+    if (followed_path) {
+        stream.log("Handling followed-path dialogue.", COLOR_BLUE);
+        // Keep the path or not
+        if (followed_path)
+        pbf_press_button(context, BUTTON_A, 160ms, 0ms);
+    } else {
+        pbf_press_button(context, BUTTON_B, 160ms, 0ms);
+    }
+    context.wait_for_all_requests();
+    
+    // Press A to finish dialogue
+    
+    while (true) {
+        context.wait_for(400ms);
+        VideoSnapshot screen = stream.video().snapshot();
+        if (!screen) continue;
+        ImageStats stats = image_stats(extract_box_reference(*screen, dialog_box));
+        
+        if (!is_grey(stats, 400, 1000)) {
+            break; // Dialogue box gone
         }
+        pbf_press_button(context, BUTTON_A, 160ms, 0ms);
         context.wait_for_all_requests();
-
-        VideoSnapshot screen_snap = stream.video().snapshot();
-        const ImageRGB32* img_ptr = screen_snap.get();
-        ImageStats stats = image_stats(extract_box_reference(*img_ptr, box));
-        if (!is_grey(stats, 400, 1000)){
-            break;
-        }
+        
     }
 }
 
