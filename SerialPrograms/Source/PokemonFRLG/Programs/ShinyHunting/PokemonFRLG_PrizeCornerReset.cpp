@@ -70,7 +70,7 @@ PrizeCornerReset::PrizeCornerReset()
     )
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_SHINY(
-        "Shiny",
+        "Shiny found",
         true, true, ImageAttachmentMode::JPG,
         {"Notifs", "Showcase"}
     )

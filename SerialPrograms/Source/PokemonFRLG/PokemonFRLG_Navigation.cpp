@@ -174,7 +174,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
     console.log("No shiny detected.");
 
     if (send_out_lead) {
-        //Send out lead, no shiny detection needed.
+        //Send out lead, no shiny detection needed. (Or wanted.)
         BattleMenuWatcher battle_menu(COLOR_RED);
         console.log("Sending out lead Pokemon.");
         pbf_press_button(context, BUTTON_A, 320ms, 320ms);
