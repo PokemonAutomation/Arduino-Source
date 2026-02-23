@@ -149,7 +149,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
         [&](ProControllerContext& context) {
             int ret = wait_until(
                 console, context,
-                std::chrono::seconds(30),
+                std::chrono::seconds(30), //More than enough time for shiny sound
                 {{legendary_appeared}}
             );
             if (ret == 0) {
@@ -163,6 +163,32 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
             }
             pbf_wait(context, 1000ms);
             context.wait_for_all_requests();
+
+            /* 
+            //Send out shiny lead to test detection
+            BattleMenuWatcher battle_menu(COLOR_RED);
+            console.log("Sending out lead Pokemon.");
+            pbf_press_button(context, BUTTON_A, 320ms, 320ms);
+
+            int ret2 = wait_until(
+                console, context,
+                std::chrono::seconds(15),
+                { {battle_menu} }
+            );
+            if (ret2 == 0) {
+                console.log("Battle menu detecteed!");
+            }
+            else {
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "handle_encounter(): Did not detect battle menu.",
+                    console
+                );
+            }
+            pbf_wait(context, 100000ms); //extreme audio delay on my cheap test device
+            context.wait_for_all_requests();
+            */
+
         },
         {{shiny_detector}}
     );

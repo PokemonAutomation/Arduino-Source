@@ -111,10 +111,10 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
         }
 
         //handle_encounter will wait for "POKEMON appeared!"
-        bool legendary_shiny = handle_encounter(env.console, context, true);
+        bool legendary_shiny = handle_encounter(env.console, context, false);
         if (legendary_shiny) {
             stats.shinies++;
-
+            env.update_stats();
             send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", env.console.video().snapshot(), true);
             break;
         }
