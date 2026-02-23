@@ -56,7 +56,12 @@ public:
 
 
 public:
+    //  Debugging
+
     void print() const;
+    Mutex* print_lock() const{
+        return m_print_lock;
+    }
 
 
 
