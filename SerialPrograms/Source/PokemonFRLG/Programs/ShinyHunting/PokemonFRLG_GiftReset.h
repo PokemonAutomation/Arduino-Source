@@ -1,11 +1,11 @@
-/*  Starter Reset
+/*  Gift Reset
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_PokemonFRLG_StarterReset_H
-#define PokemonAutomation_PokemonFRLG_StarterReset_H
+#ifndef PokemonAutomation_PokemonFRLG_GiftReset_H
+#define PokemonAutomation_PokemonFRLG_GiftReset_H
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -15,16 +15,16 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
 
-class StarterReset_Descriptor : public SingleSwitchProgramDescriptor{
+class GiftReset_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-    StarterReset_Descriptor();
+    GiftReset_Descriptor();
     struct Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class StarterReset : public SingleSwitchProgramInstance{
+class GiftReset : public SingleSwitchProgramInstance{
 public:
-    StarterReset();
+    GiftReset();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
 
     virtual void start_program_border_check(
@@ -33,12 +33,22 @@ public:
     ) override{}
 
 private:
-    void obtain_starter(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void obtain_lapras(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void open_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+    enum class Target{
+        starters,
+        hitmon,
+        eevee,
+        lapras,
+        fossils,
+    };
+    EnumDropdownOption<Target> TARGET;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    EventNotificationOption NOTIFICATION_SHINY_STARTER;
+    EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 };
