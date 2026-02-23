@@ -361,8 +361,7 @@ void start_game_from_home_blind(
     Logger& logger, ProControllerContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
-    uint8_t user_slot,
-    Milliseconds start_game_mash
+    uint8_t user_slot
 ){
     if (game_slot != 0){
         ssf_press_button(context, BUTTON_HOME, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0, 160ms);
@@ -385,6 +384,8 @@ void start_game_from_home_blind(
         pbf_press_dpad(context, DPAD_UP, 80ms, 0ms);    //  Skip the update window.
         move_to_user(context, user_slot);
     }
+
+    Milliseconds start_game_mash = ConsoleSettings::instance().BLIND_START_GAME_MASH;
 
 //    cout << "START_GAME_REQUIRES_INTERNET = " << ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET << endl;
     if (!ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET && user_slot == 0){
@@ -417,8 +418,7 @@ void start_game_from_home_blind(
 void start_game_from_home_with_inference(
     ConsoleHandle& console, ProControllerContext& context,
     uint8_t game_slot,
-    uint8_t user_slot,
-    Milliseconds start_game_wait
+    uint8_t user_slot
 ){
     context.wait_for_all_requests();
     {
@@ -485,7 +485,7 @@ void start_game_from_home_with_inference(
         case 1:
             console.log("Detected user-select screen.");
             move_to_user(context, user_slot);
-            pbf_press_button(context, BUTTON_A, 80ms, start_game_wait);
+            pbf_press_button(context, BUTTON_A, 160ms, 320ms);
             break;
         case 2:
             console.log("Detected update menu.", COLOR_BLUE);
@@ -518,8 +518,7 @@ void start_game_from_home_with_inference(
 void start_game_from_home_with_inference(
     ConsoleHandle& console, JoyconContext& context,
     uint8_t game_slot,
-    uint8_t user_slot,
-    Milliseconds start_game_wait
+    uint8_t user_slot
 ){
     context.wait_for_all_requests();
 
@@ -595,7 +594,7 @@ void start_game_from_home_with_inference(
         case 1:
             console.log("Detected user-select screen.");
             move_to_user(context, user_slot);
-            pbf_press_button(context, BUTTON_A, 80ms, start_game_wait);
+            pbf_press_button(context, BUTTON_A, 160ms, 320ms);
             break;
         case 2:
             console.log("Detected update menu.", COLOR_BLUE);
@@ -633,38 +632,33 @@ void start_game_from_home(
     ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
-    uint8_t user_slot,
-    Milliseconds start_game_mash
+    uint8_t user_slot
 ){
     context.wait_for_all_requests();
     if (console.video().snapshot()){
         console.log("start_game_from_home(): Video capture available. Using inference...");
         start_game_from_home_with_inference(
             console, context,
-            game_slot, user_slot,
-            start_game_mash
+            game_slot, user_slot
         );
     }else{
         console.log("start_game_from_home(): Video capture not available.", COLOR_RED);
         start_game_from_home_blind(
             console, context,
             tolerate_update_menu,
-            game_slot, user_slot,
-            start_game_mash
+            game_slot, user_slot
         );
     }
 }
 void start_game_from_home(
     ConsoleHandle& console, JoyconContext& context,
     uint8_t game_slot,
-    uint8_t user_slot,
-    Milliseconds start_game_wait
+    uint8_t user_slot
 ){
     //  Inference is required.
     start_game_from_home_with_inference(
         console, context,
-        game_slot, user_slot,
-        start_game_wait
+        game_slot, user_slot
     );
 }
 
@@ -678,8 +672,6 @@ void from_home_close_and_reopen_game(
     ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu
 ){
-    Milliseconds start_game_mash = ConsoleSettings::instance().START_GAME_MASH;
-
 #if 1
     bool video_available = (bool)console.video().snapshot();
     if (video_available ||
@@ -691,8 +683,7 @@ void from_home_close_and_reopen_game(
             console,
             context,
             tolerate_update_menu,
-            0, 0,
-            start_game_mash
+            0, 0
         );
         return;
     }
@@ -700,6 +691,8 @@ void from_home_close_and_reopen_game(
 
     //  Fastest setting. No internet needed and no update menu.
     ssf_mash1_button(context, BUTTON_X, 400ms);
+
+    Milliseconds start_game_mash = ConsoleSettings::instance().BLIND_START_GAME_MASH;
 
     //  Use mashing to ensure that the X press succeeds. If it fails, the SR
     //  will fail and can kill a den for the autohosts.

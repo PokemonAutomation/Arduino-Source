@@ -465,9 +465,9 @@ void hunt_terrakion(
 
         // Roll and roll back on Terrakion's roof to respawn
         detect_interactable(env.console, context);
-        pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
         pbf_move_left_joystick(context, {0, -1}, 80ms, 160ms);
-        pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+        pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
 
         context.wait_for_all_requests();
 
@@ -495,20 +495,21 @@ void hunt_terrakion(
     env.log("Move to check Terrakion.");
     env.add_overlay_log("To Check Terrakion");
 
-    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
-    context.wait_for_all_requests();
+    ssf_press_left_joystick(context, {-0.15, +0.5}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
     stats.spawns++;
     env.update_stats();
 
-    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
-    pbf_move_left_joystick(context, {-1, 1}, 80ms, 160ms);
-    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
-    pbf_move_left_joystick(context, {0, 1}, 80ms, 500ms);
-    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
-    pbf_move_left_joystick(context, {1, 1}, 80ms, 160ms);
-    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
-    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
-    pbf_press_button(context, BUTTON_Y, 100ms, 900ms);
+    ssf_press_left_joystick(context, {0, +0.5}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+
+    ssf_press_left_joystick(context, {+0.45, +0.5}, 0ms, 500ms, 0ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
+    pbf_press_button(context, BUTTON_Y, 100ms, 1000ms);
 
     context.wait_for_all_requests();
 }

@@ -91,13 +91,13 @@ void WattFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         pbf_press_button(context, BUTTON_B, 40ms, 40ms);
         ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 160ms);
     }
-    
+
     uint8_t year = MAX_YEAR;
     uint16_t save_count = 0;
-    
+
     if (!HAVE_NSO){
         // First subdivide the number of skips into batches of 60 because the roll_den function only goes up to 60
-        
+
         for (uint32_t c = 0; c < SKIPS; c++){
             enter_den(context, 0ms, true, false);
             enter_lobby(context, 0ms, false, Catchability::ALWAYS_CATCHABLE);
@@ -114,7 +114,7 @@ void WattFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             //  Exit Raid
             ssf_press_button(context, BUTTON_B, 960ms, 400ms);
             ssf_press_button(context, BUTTON_A, GameSettings::instance().REENTER_DEN_DELAY0, 400ms);
-            
+
             // Save after X skips
             if (SAVE_ITERATIONS0 != 0){
                 save_count++;
@@ -130,7 +130,7 @@ void WattFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         // Take the last Watts from the Den
         ssf_mash_AZs(context, GameSettings::instance().COLLECT_WATTS_OFFLINE_DELAY0);
         ssf_mash1_button(context, BUTTON_B, 960ms);
-        
+
     }else{
         for (uint32_t c = 0; c < SKIPS; c++){
             env.log("Fetch Attempts: " + tostr_u_commas(c));
