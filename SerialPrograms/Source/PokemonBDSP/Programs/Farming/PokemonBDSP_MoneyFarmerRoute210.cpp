@@ -291,19 +291,19 @@ void MoneyFarmerRoute210::check_pickup_items(
             }
             
             // Select mon, go to held items, go to put into bag (or back if the mon has no item), then exit with B
-            pbf_press_button(context, BUTTON_A, 80ms, 200ms);
+            pbf_press_button(context, BUTTON_A, 160ms, 200ms);
             
-            pbf_press_dpad(context, DPAD_UP, 80ms, 50ms);
-            pbf_press_dpad(context, DPAD_UP, 80ms, 50ms);
-            pbf_press_button(context, BUTTON_A, 80ms, 200ms);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 50ms);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 50ms);
+            pbf_press_button(context, BUTTON_A, 160ms, 200ms);
             
-            pbf_press_dpad(context, DPAD_UP, 80ms, 50ms);
-            pbf_press_dpad(context, DPAD_UP, 80ms, 50ms);
-            pbf_press_dpad(context, DPAD_UP, 80ms, 50ms);
-            pbf_press_button(context, BUTTON_A, 80ms, 200ms);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 50ms);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 50ms);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 50ms);
+            pbf_press_button(context, BUTTON_A, 160ms, 200ms);
             pbf_wait(context, 1000ms);
             
-            pbf_press_button(context, BUTTON_B, 80ms, 100ms);
+            pbf_press_button(context, BUTTON_B, 160ms, 100ms);
             
             current_slot = slot;
             pbf_wait(context, 150ms);
