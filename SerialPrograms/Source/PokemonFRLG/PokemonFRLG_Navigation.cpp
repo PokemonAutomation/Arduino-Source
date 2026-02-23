@@ -136,34 +136,29 @@ void open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     context.wait_for_all_requests();
 }
 
-/*
-bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool send_out_lead) {
+bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, bool send_out_lead) {
     float shiny_coefficient = 1.0;
-    ShinySoundDetector shiny_detector(stream.logger(), [&](float error_coefficient) -> bool{
+    ShinySoundDetector shiny_detector(console.logger(), [&](float error_coefficient) -> bool{
         shiny_coefficient = error_coefficient;
         return true;
     });
     AdvanceBattleDialogWatcher legendary_appeared(COLOR_YELLOW);
 
-    stream.log("Starting battle.");
-    pbf_mash_button(context, BUTTON_A, 4320ms);
-    context.wait_for_all_requests();
-
     int res = run_until<ProControllerContext>(
-        stream, context,
+        console, context,
         [&](ProControllerContext& context) {
             int ret = wait_until(
-                stream, context,
+                console, context,
                 std::chrono::seconds(30),
                 {{legendary_appeared}}
             );
             if (ret == 0) {
-                stream.log("Advance arrow detected.");
+                console.log("Battle Advance arrow detected.");
             } else {
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
-                    "handle_encounter(): Did not detect battle start.",
-                    stream
+                    "handle_encounter(): Did not detect battle advance arrow.",
+                    console
                 );
             }
             pbf_wait(context, 1000ms);
@@ -173,30 +168,30 @@ bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool s
     );
     shiny_detector.throw_if_no_sound();
     if (res == 0){
-        stream.log("Shiny detected!");
+        console.log("Shiny detected!");
         return true;
     }
-    stream.log("Shiny not found.");
+    console.log("No shiny detected.");
 
     if (send_out_lead) {
         //Send out lead, no shiny detection needed.
         BattleMenuWatcher battle_menu(COLOR_RED);
-        stream.log("Sending out lead Pokemon.");
+        console.log("Sending out lead Pokemon.");
         pbf_press_button(context, BUTTON_A, 320ms, 320ms);
 
         int ret = wait_until(
-            stream, context,
+            console, context,
             std::chrono::seconds(15),
             { {battle_menu} }
         );
         if (ret == 0) {
-            stream.log("Battle menu detecteed!");
+            console.log("Battle menu detecteed!");
         }
         else {
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "handle_encounter(): Did not detect battle menu.",
-                stream
+                console
             );
         }
         pbf_wait(context, 1000ms);
@@ -205,7 +200,6 @@ bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool s
 
     return false;
 }
-*/
 
 }
 }

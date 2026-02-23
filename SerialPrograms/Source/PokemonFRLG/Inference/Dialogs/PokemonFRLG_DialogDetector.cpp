@@ -129,7 +129,6 @@ void BattleDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_dialog_right_box);
 }
 bool BattleDialogDetector::detect(const ImageViewRGB32& screen){
-    //Background dialog is teal
     ImageViewRGB32 dialog_top_image = extract_box_reference(screen, m_dialog_top_box);
     ImageViewRGB32 dialog_right_image = extract_box_reference(screen, m_dialog_right_box);
 

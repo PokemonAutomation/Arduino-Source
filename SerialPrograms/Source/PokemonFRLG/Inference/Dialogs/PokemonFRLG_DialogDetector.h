@@ -96,8 +96,6 @@ public:
 };
 
 // Battle dialog boxes are teal, similar to r/s/e
-// We look in multiple places for this solid color
-// doing so checks that the battle menu is not up
 class BattleDialogDetector : public StaticScreenDetector{
 public:
     BattleDialogDetector(Color color);
