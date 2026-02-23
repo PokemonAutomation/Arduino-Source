@@ -316,6 +316,9 @@ void stress_test(Logger& logger, CancellableScope& scope){
     connection.send_request(PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS);
     connection.wait_for_pending();
 
+    uint64_t bytes_sent = 0;
+    WallClock last_print = current_time();
+
     while (true){
         scope.throw_if_cancelled();
 
@@ -323,9 +326,18 @@ void stress_test(Logger& logger, CancellableScope& scope){
         const char* ptr = data.data();
         size_t left = data.size();
         while (left > 0){
+//            scope.wait_for(Milliseconds(rand() % 100));
             size_t sent = connection.send(ptr, left);
+            if (sent == 0){
+                device.verify_stream_data();
+            }
             ptr += sent;
             left -= sent;
+        }
+        bytes_sent += data.size();
+        if (current_time() - last_print > Seconds(1)){
+            cout << "Bytes Sent = " << bytes_sent << endl;
+            last_print = current_time();
         }
         device.push_expected_stream_data(data.data(), data.size());
     }

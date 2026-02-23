@@ -286,29 +286,42 @@ bool pabb2_PacketSender_iterate_retransmits(pabb2_PacketSender* self){
         size_t offset = ~self->offsets[head & PABB2_ConnectionSender_SLOTS_MASK];
         pabb2_PacketHeader* packet = (pabb2_PacketHeader*)(self->buffer + offset);
 
-        //  Retransmit if it hasn't been acked already and is old enough.
-        if (packet->opcode != PABB2_CONNECTION_OPCODE_INVALID &&
-            seqnum - packet->magic_number >= PABB2_ConnectionSender_RETRANSMIT_COUNTER
-        ){
-            packet->magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
-            uint8_t packet_bytes = packet->packet_bytes;
-
+        //  Already acked.
+        if (packet->opcode == PABB2_CONNECTION_OPCODE_INVALID){
 #if 0
-            printf("Retransmitting: %u\n", packet->seqnum);
+            printf("Already Acked\n");
             fflush(stdout);
 #endif
-
-            self->unreliable_sender_send(
-                self->unreliable_sender_context,
-                packet,
-                packet_bytes == 0 ? (size_t)256 : (size_t)packet_bytes,
-                true
-            );
-            packet->magic_number = seqnum;
-            return true;
+            head++;
+            continue;
         }
 
-        head++;
+        //  Not old enough.
+        if ((uint8_t)(seqnum - packet->magic_number) < PABB2_ConnectionSender_RETRANSMIT_COUNTER){
+#if 0
+            printf("Not old enough.\n");
+            fflush(stdout);
+#endif
+            head++;
+            continue;
+        }
+
+        packet->magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
+        uint8_t packet_bytes = packet->packet_bytes;
+
+#if 0
+        printf("Retransmitting: %u\n", packet->seqnum);
+        fflush(stdout);
+#endif
+
+        self->unreliable_sender_send(
+            self->unreliable_sender_context,
+            packet,
+            packet_bytes == 0 ? (size_t)256 : (size_t)packet_bytes,
+            true
+        );
+        packet->magic_number = seqnum;
+        return true;
     }
 
     //  Increment counter only if we did nothing.
