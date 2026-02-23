@@ -79,6 +79,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
     * Setup: Stand in front of target. Save the game.
     * Lead can be shiny, reset is before lead is even sent out.
     * This is the same as RSE resets.
+    * For deoxys solve the puzzle first.
     */
 
     while (true) {
@@ -90,7 +91,9 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){
+                //Long mash + wait for cases like Deoxys
                 pbf_mash_button(context, BUTTON_B, 10000ms);
+                pbf_wait(context, 10000ms);
                 context.wait_for_all_requests();
             },
             {battle_entered}

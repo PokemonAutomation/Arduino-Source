@@ -227,6 +227,47 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
     return false;
 }
 
+void flee_battle(ConsoleHandle& console, ProControllerContext& context) {
+    console.log("Navigate to Run.");
+    pbf_press_dpad(context, DPAD_RIGHT, 160ms, 160ms);
+    pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
+    pbf_press_button(context, BUTTON_A, 160ms, 320ms);
+
+    AdvanceBattleDialogWatcher ran_away(COLOR_YELLOW);
+    int ret2 = wait_until(
+        console, context,
+        std::chrono::seconds(5),
+        {{ran_away}}
+    );
+    if (ret2 == 0) {
+        console.log("Running away...");
+    } else {
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "flee_battle(): Unable to navigate to flee button.",
+            console
+        );
+    }
+
+    pbf_press_button(context, BUTTON_A, 320ms, 320ms);
+    BlackScreenOverWatcher battle_over(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    int ret3 = wait_until(
+        console, context,
+        std::chrono::seconds(5),
+        {{battle_over}}
+    );
+    if (ret3 == 0) {
+        console.log("Successfully fled the battle.");
+    } else {
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "flee_battle(): Unable to flee from battle.",
+            console
+        );
+    }
+}
+
+
 }
 }
 }

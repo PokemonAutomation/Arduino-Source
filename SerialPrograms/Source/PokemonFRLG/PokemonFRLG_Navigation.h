@@ -31,6 +31,8 @@ void open_slot_six(ConsoleHandle& console, ProControllerContext& context);
 // For soft resets, send_out_lead as false and then soft_reset() to save time.
 bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, bool send_out_lead);
 
+// Run from battle. Cursor must start on the FIGHT button. Assumes fleeing will always work. (Smoke Ball)
+void flee_battle(ConsoleHandle& console, ProControllerContext& context);
 
 }
 }
