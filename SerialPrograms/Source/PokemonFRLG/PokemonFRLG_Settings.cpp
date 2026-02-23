@@ -42,12 +42,12 @@ GameSettings::GameSettings()
     , SHINY_SOUND_THRESHOLD(
         "<b>Shiny Sound Threshold:</b><br>Maximum error coefficient to trigger a shiny detection.",
         LockMode::LOCK_WHILE_RUNNING,
-        0.97, 0, 1.0
+        0.80, 0, 1.0 //0.87
     )
     , SHINY_SOUND_LOW_FREQUENCY(
         "<b>Shiny Sound Low Frequency (Hz):</b><br>High pass filter frequency for shiny sound.",
         LockMode::LOCK_WHILE_RUNNING,
-        5000, 0, 48000
+        1000, 0, 48000 //2000
     )
 {
     PA_ADD_STATIC(m_soft_reset_timings);
