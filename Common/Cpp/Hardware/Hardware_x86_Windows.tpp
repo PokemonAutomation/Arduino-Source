@@ -17,7 +17,7 @@
 #include <thread>
 #include <nmmintrin.h>
 #include "Common/Cpp/Exceptions.h"
-#include "Environment.h"
+#include "Hardware.h"
 
 namespace PokemonAutomation{
 

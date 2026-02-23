@@ -288,7 +288,7 @@ std::string random_string(size_t max_length){
 
     std::string ret;
     for (size_t c = 0; c < length; c++){
-        ret += TABLE[rand() % 62 + 48];
+        ret += TABLE[rand() % 62];
     }
     return ret;
 }
@@ -316,9 +316,19 @@ void stress_test(Logger& logger, CancellableScope& scope){
     connection.send_request(PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS);
     connection.wait_for_pending();
 
+    while (true){
+        scope.throw_if_cancelled();
 
-
-
+        std::string data = random_string(20);
+        const char* ptr = data.data();
+        size_t left = data.size();
+        while (left > 0){
+            size_t sent = connection.send(ptr, left);
+            ptr += sent;
+            left -= sent;
+        }
+        device.push_expected_stream_data(data.data(), data.size());
+    }
 }
 
 
@@ -336,9 +346,9 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     [[maybe_unused]] Logger& logger = env.logger();
 
+    stress_test(logger, scope);
 
-
-#if 1
+#if 0
     {
         MockDevice device(GlobalThreadPools::unlimited_normal());
 

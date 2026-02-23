@@ -15,14 +15,12 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "Environment.h"
+#include "Hardware.h"
 
 #ifndef cpuid_H
 #define cpuid_H
 #include <cpuid.h>
 #endif
-
-#include "Environment.h"
 
 namespace PokemonAutomation{
 

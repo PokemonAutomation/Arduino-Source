@@ -75,8 +75,8 @@ ConsoleSettings::ConsoleSettings()
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
-    , START_GAME_MASH(
-        "<b>Start Game Mash:</b><br>Mash A for this long to start the game.",
+    , BLIND_START_GAME_MASH(
+        "<b>Blind Start Game Mash:</b><br>Mash A for this long to start the game when video inference is unavailable.",
         LockMode::LOCK_WHILE_RUNNING,
         "2000 ms"
     )
@@ -147,7 +147,7 @@ ConsoleSettings::ConsoleSettings()
 {
     PA_ADD_OPTION(CONTROLLER_SETTINGS);
     PA_ADD_OPTION(TRUST_USER_CONSOLE_SELECTION);
-    PA_ADD_OPTION(START_GAME_MASH);
+    PA_ADD_OPTION(BLIND_START_GAME_MASH);
     PA_ADD_OPTION(SETTINGS_TO_HOME_DELAY0);
     PA_ADD_OPTION(START_GAME_REQUIRES_INTERNET);
     PA_ADD_OPTION(START_GAME_INTERNET_CHECK_DELAY0);
