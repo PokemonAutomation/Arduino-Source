@@ -7,3 +7,4 @@ jobs:
     with:
       os: macos-15-intel
       compiler: default
+      run-tests: true
