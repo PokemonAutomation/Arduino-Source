@@ -22,9 +22,9 @@ using namespace Pokemon;
 namespace {
     // Boxes for the corresponding pokemon names in case the list is full and the player battled a boss that isn't in the list
     const ImageFloatBox NAME_BOXES[3] = {
-        {0.30, 0.40, 0.40, 0.05},
-        {0.30, 0.50, 0.40, 0.05},
-        {0.30, 0.60, 0.40, 0.05}
+        {0.685000, 0.531000, 0.130000, 0.061000},
+        {0.685000, 0.586000, 0.130000, 0.061000},
+        {0.685000, 0.645000, 0.130000, 0.053000}
     };
 
     // Read the three saved paths names if the user has already saved 3 paths
@@ -114,7 +114,7 @@ void run_entrance(
     
     // Overlay box to detect when a dialogue box is present (grey area at bottom)
     
-    OverlayBoxScope dialog_box(stream.overlay(), {0.782, 0.850, 0.030, 0.050});
+    OverlayBoxScope dialog_box(stream.overlay(), {0.78, 0.85, 0.03, 0.05});
     
     // First step, press A after the initial greeting
     pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
@@ -165,7 +165,7 @@ void run_entrance(
             VideoSnapshot screen = stream.video().snapshot();
             if (!screen) continue;
             
-            // Detect whether we are in the list to replace the Boss' paths or not
+            // Detect whether we are in the list to replace the Boss' paths or not, but before we do this we need to move the cursor up so that there is no overlay
             
             std::vector<std::string> names = read_saved_paths(stream, language, screen);
             int non_empty = 0;
@@ -176,11 +176,26 @@ void run_entrance(
             
             if (in_list) {
                 stream.log("Detected replacement list.", COLOR_BLUE);
+                
+                // Move the cursor up
+                pbf_press_dpad(context, DPAD_UP, 160ms, 80ms);
+                context.wait_for_all_requests();
+                
+                context.wait_for(200ms);
+                
+                VideoSnapshot clean_screen = stream.video().snapshot();
+                if (!clean_screen) continue;
+                
+                names = read_saved_paths(stream, language, clean_screen);
+                
                 int slot = find_unprotected_slot(names, runtime.actions, stream.logger());
                 if (slot == -1) {
                     stream.log("Unable to save new boss, cancelling", COLOR_ORANGE);
                     pbf_press_button(context, BUTTON_B, 160ms, 0ms);
                 } else {
+                    // Bring cursor back to the top position
+                    pbf_press_dpad(context, DPAD_DOWN, 160ms, 80ms);
+                    // Then move down to target slot
                     for (int i = 0; i < slot; ++i) {
                         pbf_press_dpad(context, DPAD_DOWN, 160ms, 0ms);
                     };

@@ -53,7 +53,7 @@ BossActionRow::BossActionRow(std::string slug, const std::string& name_slug, con
         BossAction::CATCH_AND_STOP_IF_SHINY
     )
     , ball(LockMode::UNLOCK_WHILE_RUNNING, "poke-ball")
-    , save_on_the_go(LockMode::LOCK_WHILE_RUNNING, false)
+    , save_on_the_go(LockMode::UNLOCK_WHILE_RUNNING, false)
 {
     PA_ADD_STATIC(pokemon);
     add_option(action, "Action");
