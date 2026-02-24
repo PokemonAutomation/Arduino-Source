@@ -72,28 +72,28 @@ void run_entrance(
     if (followed_path) {
         stream.log("Handling followed-path dialogue.", COLOR_BLUE);
         // Keep the path or not
-        if (followed_path)
-        pbf_press_button(context, BUTTON_A, 160ms, 0ms);
-    } else {
-        pbf_press_button(context, BUTTON_B, 160ms, 0ms);
-    }
-    context.wait_for_all_requests();
+        if (followed_path) {
+            pbf_press_button(context, BUTTON_A, 160ms, 0ms);
+        } else {
+            pbf_press_button(context, BUTTON_B, 160ms, 0ms);
+        }
+        context.wait_for_all_requests();
     
     // Press A to finish dialogue
     
-    while (true) {
-        context.wait_for(400ms);
-        VideoSnapshot screen = stream.video().snapshot();
-        if (!screen) continue;
-        ImageStats stats = image_stats(extract_box_reference(*screen, dialog_box));
-        
-        if (!is_grey(stats, 400, 1000)) {
-            break; // Dialogue box gone
+        while (true) {
+            context.wait_for(400ms);
+            VideoSnapshot screen = stream.video().snapshot();
+            if (!screen) continue;
+            ImageStats stats = image_stats(extract_box_reference(*screen, dialog_box));
+            
+            if (!is_grey(stats, 400, 1000)) {
+                break; // Dialogue box gone
+            }
+            pbf_press_button(context, BUTTON_A, 160ms, 0ms);
+            context.wait_for_all_requests();
+            
         }
-        pbf_press_button(context, BUTTON_A, 160ms, 0ms);
-        context.wait_for_all_requests();
-        
-    }
 }
 
 
