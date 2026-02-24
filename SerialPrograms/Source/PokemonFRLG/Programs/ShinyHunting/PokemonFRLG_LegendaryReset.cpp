@@ -54,7 +54,12 @@ std::unique_ptr<StatsTracker> LegendaryReset_Descriptor::make_stats() const{
 }
 
 LegendaryReset::LegendaryReset()
-    : GO_HOME_WHEN_DONE(true)
+    : WALK_UP(
+        "<b>Walk Up (Ho-Oh only):</b><br>Walk up to trigger encounter.",
+        LockMode::LOCK_WHILE_RUNNING,
+        false
+    )
+    , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_SHINY(
         "Shiny found",
         true, true, ImageAttachmentMode::JPG,
@@ -67,6 +72,7 @@ LegendaryReset::LegendaryReset()
         &NOTIFICATION_PROGRAM_FINISH,
     })
 {
+    PA_ADD_OPTION(WALK_UP);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -83,6 +89,11 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
     */
 
     while (true) {
+        if (WALK_UP) {
+            //Step forward to start the encounter.
+            pbf_press_dpad(context, DPAD_UP, 320ms, 400ms);
+        }
+
         //Talk to target
         pbf_press_button(context, BUTTON_A, 320ms, 320ms);
 

@@ -35,6 +35,8 @@ public:
     ) override{}
 
 private:
+    BooleanCheckBoxOption WALK_UP;
+
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     EventNotificationOption NOTIFICATION_SHINY;
