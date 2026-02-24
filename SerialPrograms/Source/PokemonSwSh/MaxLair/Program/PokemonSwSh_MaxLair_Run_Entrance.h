@@ -22,9 +22,7 @@ void run_entrance(
     AdventureRuntime& runtime,
     ProgramEnvironment& env, size_t console_index,
     VideoStream& stream, ProControllerContext& context,
-    const std::string& boss_slug,
     bool followed_path,
-    const EndBattleDecider& decider,
     GlobalStateTracker& state_tracker
 );
 

@@ -215,7 +215,7 @@ public:
             return CaughtScreenAction::TAKE_NON_BOSS_SHINY_AND_CONTINUE;
         }
     }
-    virtual bool save_path(const std::string& boss_slug) const override {
+    virtual bool should_keep_followed_path() const override {
         return true;
     }
 

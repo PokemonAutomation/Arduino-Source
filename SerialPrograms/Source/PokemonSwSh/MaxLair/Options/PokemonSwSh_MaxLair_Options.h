@@ -59,7 +59,15 @@ public:
         const PathStats& path_stats,
         bool any_shiny, bool boss_is_shiny
     ) const = 0;
-    virtual bool save_path(const std::string& boss_slug) const = 0;
+    
+    // For BossFinder: whether to save a new path for the given boss.
+    virtual bool should_save_path(const std::string& boss_slug) const { return false; }
+
+    // For BossFinder: whether a boss is protected (should be kept in the list).
+    virtual bool is_protected_path(const std::string& boss_slug) const { return false; }
+
+    // For Standard/StrongBoss: whether to keep a followed path when prompted.
+    virtual bool should_keep_followed_path() const { return false; }
 };
 
 

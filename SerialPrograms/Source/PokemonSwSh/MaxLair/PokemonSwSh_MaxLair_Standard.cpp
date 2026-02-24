@@ -166,8 +166,8 @@ public:
         }
         return actions.no_shinies;
     }
-    virtual bool save_path(const std::string& boss_slug) const override {
-        return false;
+    virtual bool should_keep_followed_path() const override {
+        return true;
     }
 
 private:

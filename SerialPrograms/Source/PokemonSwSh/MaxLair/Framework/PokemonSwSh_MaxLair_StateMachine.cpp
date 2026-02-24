@@ -189,8 +189,7 @@ StateMachineAction run_state_iteration(
                      runtime,
                      env, console_index,
                      console, context,
-                     boss_slug,
-                     decider,
+                     save_path,
                      global_state
                      );
         return StateMachineAction::DONE_WITH_ADVENTURE;
