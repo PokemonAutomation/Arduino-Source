@@ -200,9 +200,6 @@ function(apply_common_target_properties target_name)
     target_link_directories(${target_name} PRIVATE ../3rdPartyBinaries/)
 endfunction()
 
-# fixes for miniz-cpp library
-target_compile_definitions(SerialProgramsLib PRIVATE "MZ_UINT64=std::uint64_t")
-
 
 # Apply common properties to both targets
 apply_common_target_properties(SerialProgramsLib)

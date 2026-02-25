@@ -23,6 +23,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cstring>
 #include <cstdint>
 #include <iostream>
 #include <fstream>
@@ -509,14 +510,14 @@ const char *mz_error(int err);
 
 // ------------------- Types and macros
 
-typedef unsigned char mz_uint8;
-typedef signed short mz_int16;
-typedef unsigned short mz_uint16;
-typedef unsigned int mz_uint32;
-typedef unsigned int mz_uint;
-typedef long long mz_int64;
-typedef unsigned long long mz_uint64;
-typedef int mz_bool;
+using mz_uint8 = uint8_t;
+using mz_int16 = int16_t;
+using mz_uint16 = uint16_t;
+using mz_uint32 = uint32_t;
+using mz_uint = uint32_t;
+using mz_int64 = int64_t;
+using mz_uint64 = uint64_t;
+using mz_bool = bool;
 
 #define MZ_FALSE (0)
 #define MZ_TRUE (1)
