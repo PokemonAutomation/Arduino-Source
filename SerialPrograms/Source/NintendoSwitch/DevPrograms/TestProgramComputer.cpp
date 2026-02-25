@@ -148,6 +148,7 @@
 
 
 //#include <opencv2/core.hpp>
+#include "3rdParty/miniz-cpp/zip_file.hpp"
 #include <onnxruntime_cxx_api.h>
 #include <random>
 
@@ -344,6 +345,21 @@ void stress_test(Logger& logger, CancellableScope& scope){
     }
 }
 
+void unzip_all(const std::string& zip_path, const std::string& output_dir) {
+    cout << "try to unzip the file." << endl;
+    miniz_cpp::zip_file archive(zip_path);
+    
+    // Optional: Ensure the output directory exists
+    if (!std::filesystem::exists(output_dir)) {
+        std::filesystem::create_directories(output_dir);
+    }
+
+    // Extract all files to the specified path
+    archive.extractall(output_dir);
+
+    cout << "done unzipping the file." << endl;
+
+}
 
 
 
@@ -362,7 +378,15 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    cout << random_u32(100, 115) << endl;
 
 
+
+#if 1
+    unzip_all(SETTINGS_PATH() + "testB/test2.zip", SETTINGS_PATH() + "testB/");
+
+#endif
+
+#if 0
     stress_test(logger, scope);
+#endif
 
 
 
