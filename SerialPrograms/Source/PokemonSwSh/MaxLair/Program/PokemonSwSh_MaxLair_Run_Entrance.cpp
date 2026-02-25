@@ -165,6 +165,10 @@ void run_entrance(
             VideoSnapshot screen = stream.video().snapshot();
             if (!screen) continue;
             
+            // Detect whether we have a dialog box or not
+            
+            
+            
             // Detect whether we are in the list to replace the Boss' paths or not, but before we do this we need to move the cursor up so that there is no overlay
             
             std::vector<std::string> names = read_saved_paths(stream, language, screen);
