@@ -487,6 +487,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Tools/ErrorDumper.h
     Source/CommonFramework/Tools/FileDownloader.cpp
     Source/CommonFramework/Tools/FileDownloader.h
+    Source/CommonFramework/Tools/FileUnzip.cpp
+    Source/CommonFramework/Tools/FileUnzip.h
     Source/CommonFramework/Tools/GlobalThreadPools.cpp
     Source/CommonFramework/Tools/GlobalThreadPools.h
     Source/CommonFramework/Tools/ProgramEnvironment.cpp

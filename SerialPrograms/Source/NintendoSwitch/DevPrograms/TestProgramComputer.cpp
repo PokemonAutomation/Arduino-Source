@@ -120,6 +120,7 @@
 #include "Common/Cpp/Sockets/ClientSocket.h"
 #include "Common/Cpp/Containers/SparseArray.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "CommonFramework/Tools/FileUnzip.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -148,7 +149,6 @@
 
 
 //#include <opencv2/core.hpp>
-#include "3rdParty/miniz-cpp/zip_file.hpp"
 #include <onnxruntime_cxx_api.h>
 #include <random>
 
@@ -345,22 +345,6 @@ void stress_test(Logger& logger, CancellableScope& scope){
     }
 }
 
-void unzip_all(const std::string& zip_path, const std::string& output_dir) {
-    cout << "try to unzip the file." << endl;
-    miniz_cpp::zip_file archive(zip_path);
-    
-    // Optional: Ensure the output directory exists
-    if (!std::filesystem::exists(output_dir)) {
-        std::filesystem::create_directories(output_dir);
-    }
-
-    // Extract all files to the specified path
-    archive.extractall(output_dir);
-
-    cout << "done unzipping the file." << endl;
-
-}
-
 
 
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
@@ -380,7 +364,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
 #if 1
-    unzip_all(SETTINGS_PATH() + "testB/test2.zip", SETTINGS_PATH() + "testB/");
+    unzip_file(SETTINGS_PATH() + "test2.zip", SETTINGS_PATH() + "testB/");
 
 #endif
 
