@@ -200,7 +200,6 @@ function(apply_common_target_properties target_name)
     target_link_directories(${target_name} PRIVATE ../3rdPartyBinaries/)
 endfunction()
 
-
 # Apply common properties to both targets
 apply_common_target_properties(SerialProgramsLib)
 apply_common_target_properties(SerialPrograms)
