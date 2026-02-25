@@ -274,8 +274,8 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
 }
 
 void MoneyFarmerRoute210::move_to_trainer(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::vector<ImagePixelBox>& bubbles
-){
-
+                                          ){
+    
     const ImagePixelBox* closest = nullptr;
     double best_dist_sq = std::numeric_limits<double>::max();
     
@@ -295,32 +295,37 @@ void MoneyFarmerRoute210::move_to_trainer(SingleSwitchProgramEnvironment& env, P
     
     if (closest->min_x < 350) {
         // The trainer who wants to battle is to the far-left, behind the other trainer
-        pbf_press_dpad(context, DPAD_UP, 300ms, 0ms);
+        pbf_press_dpad(context, DPAD_UP, 400ms, 0ms);
         pbf_press_dpad(context, DPAD_LEFT, 500ms, 0ms);
         pbf_mash_button(context, BUTTON_A, 1000ms);
-        pbf_press_dpad(context, DPAD_DOWN, 300ms, 0ms);
+        context.wait_for_all_requests();
+        pbf_press_dpad(context, DPAD_DOWN, 400ms, 0ms);
         pbf_mash_button(context, BUTTON_A, 1000ms);
+        context.wait_for_all_requests();
     } else if (closest->min_x < 450) {
         // The trainer who wants to battle is on the character's left
         if (closest->min_y < 110) {
             // The trainer who wants to battle is one step above us
-            pbf_press_dpad(context, DPAD_UP, 300ms, 0ms);
-            pbf_press_dpad(context, DPAD_LEFT, 300ms, 0ms);
+            pbf_press_dpad(context, DPAD_UP, 400ms, 0ms);
+            pbf_press_dpad(context, DPAD_LEFT, 400ms, 0ms);
+            context.wait_for_all_requests();
         } else {
             // The trainer who wants to battle is on our left, right next to us
-            pbf_press_dpad(context, DPAD_LEFT, 300ms, 0ms);
+            pbf_press_dpad(context, DPAD_LEFT, 400ms, 0ms);
         }
     } else if (closest->min_x < 560) {
         // The trainer who wants to battle is right above us
-        pbf_press_dpad(context, DPAD_UP, 300ms, 0ms);
+        pbf_press_dpad(context, DPAD_UP, 400ms, 0ms);
     } else {
         // The trainer who wants to battle is above us, one step to our right
-        pbf_press_dpad(context, DPAD_RIGHT, 300ms, 0ms);
-        pbf_press_dpad(context, DPAD_UP, 300ms, 0ms);
+        pbf_press_dpad(context, DPAD_RIGHT, 400ms, 0ms);
+        pbf_press_dpad(context, DPAD_UP, 400ms, 0ms);
+        context.wait_for_all_requests();
     }
     
     pbf_mash_button(context, BUTTON_A, 1000ms);
-    
+    context.wait_for_all_requests();
+}
     
 void MoneyFarmerRoute210::check_pickup_items(
     ProControllerContext& context, const bool pickup_slots[6]
