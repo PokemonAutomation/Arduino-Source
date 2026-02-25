@@ -201,10 +201,11 @@ function(apply_common_target_properties target_name)
 endfunction()
 
 # fixes for miniz-cpp library
-target_compile_definitions(SerialProgramsLib PRIVATE MZ_UINT64=std::uint64_t)
-# if(NOT MSVC)
-#     target_compile_options(SerialProgramsLib PRIVATE -include cstring)
-# endif()
+target_compile_definitions(SerialProgramsLib PRIVATE MZ_UINT64=unsigned\ long\ long)
+if(NOT MSVC)
+    target_compile_options(SerialProgramsLib PRIVATE -include cstring)
+endif()
+
 
 # Apply common properties to both targets
 apply_common_target_properties(SerialProgramsLib)
