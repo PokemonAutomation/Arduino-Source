@@ -11,6 +11,9 @@
 #include "PokemonFRLG_Settings.h"
 
 #include "Programs/ShinyHunting/PokemonFRLG_GiftReset.h"
+#include "Programs/ShinyHunting/PokemonFRLG_LegendaryReset.h"
+#include "Programs/ShinyHunting/PokemonFRLG_LegendaryRunAway.h"
+#include "Programs/ShinyHunting/PokemonFRLG_PrizeCornerReset.h"
 #include "Programs/TestPrograms/PokemonFRLG_SoundListener.h"
 
 namespace PokemonAutomation{
@@ -33,6 +36,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- Shiny Hunting  ----");
     ret.emplace_back(make_single_switch_program<GiftReset_Descriptor, GiftReset>());
+    ret.emplace_back(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
+    ret.emplace_back(make_single_switch_program<LegendaryRunAway_Descriptor, LegendaryRunAway>());
+    ret.emplace_back(make_single_switch_program<PrizeCornerReset_Descriptor, PrizeCornerReset>());
     
 
     if (PreloadSettings::instance().DEVELOPER_MODE){

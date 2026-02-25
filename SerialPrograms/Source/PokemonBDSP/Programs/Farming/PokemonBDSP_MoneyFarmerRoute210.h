@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonBDSP_MoneyFarmerRoute210_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -39,6 +40,11 @@ public:
 private:
     // Run the battle loop. Return true if the program should stop.
     bool battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]);
+    // Check for items generated through the Pickup ability
+    void check_pickup_items(
+        ProControllerContext& context,
+        const bool pickup_slots_selected[6]
+                       );
     // From the bottom row of the Ace Trainer pair, heal Pokemon and return.
     // Return true if VS Seeker needs charging.
     void move_to_trainer(
@@ -89,6 +95,15 @@ private:
     SimpleIntegerOption<uint8_t> MON1_MOVE2_PP;
     SimpleIntegerOption<uint8_t> MON1_MOVE3_PP;
     SimpleIntegerOption<uint8_t> MON1_MOVE4_PP;
+    
+    BooleanCheckBoxOption PICKUP_SLOT1;
+    BooleanCheckBoxOption PICKUP_SLOT2;
+    BooleanCheckBoxOption PICKUP_SLOT3;
+    BooleanCheckBoxOption PICKUP_SLOT4;
+    BooleanCheckBoxOption PICKUP_SLOT5;
+    BooleanCheckBoxOption PICKUP_SLOT6;
+    
+    SimpleIntegerOption<uint8_t> CHECK_PICKUP_FREQ;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

@@ -92,6 +92,20 @@ MoneyFarmerRoute210::MoneyFarmerRoute210()
     , MON1_MOVE2_PP("<b>2nd " + STRING_POKEMON + " Move 2 PP:</b><br>Set to zero to not use this move.", LockMode::LOCK_WHILE_RUNNING, 5, 0, 64)
     , MON1_MOVE3_PP("<b>2nd " + STRING_POKEMON + " Move 3 PP:</b><br>Set to zero to not use this move.", LockMode::LOCK_WHILE_RUNNING, 5, 0, 64)
     , MON1_MOVE4_PP("<b>2nd " + STRING_POKEMON + " Move 4 PP:</b><br>Set to zero to not use this move.", LockMode::LOCK_WHILE_RUNNING, 5, 0, 64)
+    , PICKUP_SLOT1(
+        "<b>" + STRING_POKEMON + " in slot 1 has the Pickup ability</b>", LockMode::LOCK_WHILE_RUNNING, false)
+    , PICKUP_SLOT2(
+        "<b>" + STRING_POKEMON + " in slot 2 has the Pickup ability</b>", LockMode::LOCK_WHILE_RUNNING, false)
+    , PICKUP_SLOT3(
+        "<b>" + STRING_POKEMON + " in slot 3 has the Pickup ability</b>", LockMode::LOCK_WHILE_RUNNING, false)
+    , PICKUP_SLOT4(
+        "<b>" + STRING_POKEMON + " in slot 4 has the Pickup ability</b>", LockMode::LOCK_WHILE_RUNNING, false)
+    , PICKUP_SLOT5(
+        "<b>" + STRING_POKEMON + " in slot 5 has the Pickup ability</b>", LockMode::LOCK_WHILE_RUNNING, false)
+    , PICKUP_SLOT6(
+        "<b>" + STRING_POKEMON + " in slot 6 has the Pickup ability</b>", LockMode::LOCK_WHILE_RUNNING, false)
+    , CHECK_PICKUP_FREQ (
+        "<b>Check " + STRING_POKEMON + " with the Pickup ability every this many battles</b>", LockMode::LOCK_WHILE_RUNNING, 10, 1, 100)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
@@ -110,6 +124,13 @@ MoneyFarmerRoute210::MoneyFarmerRoute210()
     PA_ADD_OPTION(MON1_MOVE2_PP);
     PA_ADD_OPTION(MON1_MOVE3_PP);
     PA_ADD_OPTION(MON1_MOVE4_PP);
+    PA_ADD_OPTION(PICKUP_SLOT1);
+    PA_ADD_OPTION(PICKUP_SLOT2);
+    PA_ADD_OPTION(PICKUP_SLOT3);
+    PA_ADD_OPTION(PICKUP_SLOT4);
+    PA_ADD_OPTION(PICKUP_SLOT5);
+    PA_ADD_OPTION(PICKUP_SLOT6);
+    PA_ADD_OPTION(CHECK_PICKUP_FREQ);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -149,6 +170,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
 
     //  State Machine
     //  We need lots of loops in case the party pokemon need to learn lots of moves.
+    
     while (true){
         context.wait_for_all_requests();
 
@@ -166,8 +188,10 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
                 {learn_move},
             }
         );
+        
+        
         switch (ret){
-        case 0:        
+        case 0:
             env.log("Battle menu detected!", COLOR_BLUE);
             battle_menu_seen = true;
 
@@ -297,6 +321,51 @@ void MoneyFarmerRoute210::move_to_trainer(SingleSwitchProgramEnvironment& env, P
     
     pbf_mash_button(context, BUTTON_A, 1000ms);
     
+    
+void MoneyFarmerRoute210::check_pickup_items(
+    ProControllerContext& context, const bool pickup_slots[6]
+){
+
+    // Open menu
+    pbf_press_button(context, BUTTON_X, 80ms, 1000ms);
+    
+    // Open Pokemon menu
+    pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
+    
+    // Loop over each pokemon that has Pickup according to the settings
+    int current_slot = 0;
+    
+    for (int slot = 0; slot < 6; slot++) {
+        if (pickup_slots[slot]) {
+            int presses = slot - current_slot;
+            for (int i = 0; i < presses; i++) {
+                pbf_wait(context, 50ms);
+                pbf_press_dpad(context, DPAD_DOWN, 80ms, 50ms);
+            }
+            
+            // Select mon, go to held items, go to put into bag (or back if the mon has no item), then exit with B
+            pbf_press_button(context, BUTTON_A, 160ms, 200ms);
+            
+            pbf_press_dpad(context, DPAD_UP, 160ms, 50ms);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 50ms);
+            pbf_press_button(context, BUTTON_A, 160ms, 200ms);
+            
+            pbf_press_dpad(context, DPAD_UP, 160ms, 50ms);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 50ms);
+            pbf_press_dpad(context, DPAD_UP, 160ms, 50ms);
+            pbf_press_button(context, BUTTON_A, 160ms, 200ms);
+            pbf_wait(context, 1000ms);
+            
+            pbf_press_button(context, BUTTON_B, 160ms, 100ms);
+            
+            current_slot = slot;
+            pbf_wait(context, 150ms);
+        }
+    };
+    
+    // Exit the screen
+    pbf_mash_button(context, BUTTON_B, 2000ms);
+
 }
 
 void MoneyFarmerRoute210::heal_at_center_and_return(
@@ -408,6 +477,21 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
         MON1_MOVE3_PP,
         MON1_MOVE4_PP,
     };
+    
+    // Transform the slots selected as having mons with the Pickup ability into an array
+    bool pickup_slots_selected[6] = {
+        PICKUP_SLOT1,
+        PICKUP_SLOT2,
+        PICKUP_SLOT3,
+        PICKUP_SLOT4,
+        PICKUP_SLOT5,
+        PICKUP_SLOT6,
+    };
+    
+    bool has_pickup_mons = PICKUP_SLOT1 || PICKUP_SLOT2 || PICKUP_SLOT3 || PICKUP_SLOT4 || PICKUP_SLOT5 || PICKUP_SLOT6;
+    
+    uint32_t pickup_counter = 0;
+    uint32_t total_pickup_checks = 0;
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_B, 40ms, 40ms);
@@ -427,6 +511,11 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
         env.update_stats();
 
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+        
+        if (has_pickup_mons && pickup_counter % CHECK_PICKUP_FREQ.current_value() == 0 && pickup_counter != total_pickup_checks) {
+            check_pickup_items(context, pickup_slots_selected);
+            total_pickup_checks = pickup_counter;
+        }
 
         if (need_to_charge){
             pbf_move_left_joystick(context, {+1, 0}, 1120ms, 0ms);
@@ -474,6 +563,8 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
             env.update_stats();
             return;
         }
+        pickup_counter++;
+        
         if (!has_pp(pp0, pp1)){
             need_to_charge = heal_after_battle_and_return(env, env.console, context, pp0, pp1);
             continue;
