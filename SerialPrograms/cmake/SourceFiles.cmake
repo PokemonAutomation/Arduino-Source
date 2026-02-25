@@ -8,7 +8,6 @@ set(EXECUTABLE_SOURCES "Source/CommonFramework/Main.cpp" ${DARK_STYLE_RES})
 # Note: Command-line executable sources are defined in Source/CommandLine/CommandLineExecutable.cmake
 
 file(GLOB LIBRARY_SOURCES
-    ../3rdParty/miniz-cpp/zip_file.hpp
     ../3rdParty/ONNX/OnnxToolsPA.h
     ../3rdParty/QtWavFile/WavFile.cpp
     ../3rdParty/QtWavFile/WavFile.h
