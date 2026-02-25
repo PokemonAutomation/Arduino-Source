@@ -203,7 +203,7 @@ endfunction()
 # fixes for miniz-cpp library
 target_compile_definitions(SerialProgramsLib PRIVATE MZ_UINT64=unsigned\ long\ long)
 if(NOT MSVC)
-    target_compile_options(SerialProgramsLib PRIVATE -include cstring)
+    target_compile_options(SerialProgramsLib PRIVATE -include \"<cstring>\")
 endif()
 
 
