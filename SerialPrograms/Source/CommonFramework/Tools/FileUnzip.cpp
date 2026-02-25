@@ -4,6 +4,7 @@
  *
  */
 
+#include <cstring>
 #include "miniz-cpp/zip_file.hpp"
 #include "FileUnzip.h"
 #include <filesystem>
