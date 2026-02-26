@@ -35,7 +35,7 @@ EncounterFilterWidget::EncounterFilterWidget(QWidget& parent, EncounterFilterOpt
         layout->addLayout(hbox);
         hbox->addWidget(new QLabel("<b>Stop on:</b>"));
 
-        m_shininess = new NoWheelComboBox(this);
+        m_shininess = new NoWheelCompactComboBox(this);
         hbox->addWidget(m_shininess);
         for (const std::string& item : ShinyFilter_NAMES){
             m_shininess->addItem(QString::fromStdString(item));

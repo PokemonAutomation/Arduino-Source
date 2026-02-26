@@ -78,7 +78,7 @@ MainWindow::MainWindow(QWidget* parent)
     QVBoxLayout* program_layout = new QVBoxLayout(program_box);
     program_layout->setAlignment(Qt::AlignTop);
 
-//    NoWheelComboBox* program_dropdown = new NoWheelComboBox(this);
+//    NoWheelCompactComboBox* program_dropdown = new NoWheelCompactComboBox(this);
 //    program_layout->addWidget(program_dropdown);
 
     m_program_list = new ProgramTabs(*this, *this);

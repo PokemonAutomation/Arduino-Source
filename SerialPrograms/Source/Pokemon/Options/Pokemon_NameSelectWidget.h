@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 namespace Pokemon{
 
 // A widget to select a pokemon
-class NameSelectWidget : public NoWheelComboBox{
+class NameSelectWidget : public NoWheelCompactComboBox{
 public:
     // icons: pokemon slug -> icon. This map can be larger than the list of pokemon displayed on the widget.
     // slugs: a list of pokemon slugs to choose from on the widget.
