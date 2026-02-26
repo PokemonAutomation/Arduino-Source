@@ -7,8 +7,8 @@
 #include <string.h>
 #include "PABotBase2_StreamCoalescer.h"
 
-//#include <stdio.h>  //  REMOVE
-//#include "PABotBase2_ConnectionDebug.h" //  REMOVE
+//#include <stdio.h>
+//#include "PABotBase2_ConnectionDebug.h"
 
 void pabb2_StreamCoalescer_init(pabb2_StreamCoalescer* self){
 //    printf("pabb2_StreamCoalescer_init(%p)\n", self);

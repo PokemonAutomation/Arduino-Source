@@ -4,7 +4,7 @@
  *
  */
 
-#include <stdio.h>  //  REMOVE
+//#include <stdio.h>
 #include "PABotBase2_ConnectionDebug.h"
 #include "PABotbase2_ReliableStreamConnection.h"
 
@@ -44,7 +44,7 @@ void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* s
     case PABB2_PacketParser_RESULT_VALID:
         break;
     case PABB2_PacketParser_RESULT_INVALID:
-        printf("PABB2_PacketParser_RESULT_INVALID\n");
+//        printf("PABB2_PacketParser_RESULT_INVALID\n");
         pabb2_PacketSender_send_info(
             &self->reliable_sender,
             packet->seqnum,
@@ -52,7 +52,7 @@ void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* s
         );
         return;
     case PABB2_PacketParser_RESULT_CHECKSUM_FAIL:
-        printf("PABB2_PacketParser_RESULT_CHECKSUM_FAIL\n");
+//        printf("PABB2_PacketParser_RESULT_CHECKSUM_FAIL\n");
         pabb2_PacketSender_send_info(
             &self->reliable_sender,
             packet->seqnum,
@@ -60,9 +60,11 @@ void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* s
         );
         return;
     default:
-        printf("Internal Error: Unrecognized packet state.\n");
+//        printf("Internal Error: Unrecognized packet state.\n");
         return;
     }
+
+//    printf("Device Received: %d\n", packet->opcode);
 
     //  Now handle the different opcodes.
     switch (packet->opcode){
@@ -124,10 +126,10 @@ void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* s
                 pabb2_StreamCoalescer_bytes_available(&self->stream_coalescer)
             );
         }else{
-            printf("Device: Failed to push.\n");
+//            printf("Device: Failed to push.\n");
             pabb2_StreamCoalescer_print(&self->stream_coalescer, true);
         }
-        fflush(stdout);
+//        fflush(stdout);
         return;
     default:
         pabb2_PacketSender_send_info(

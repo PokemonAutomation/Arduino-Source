@@ -7,6 +7,8 @@
 #include "Common/CRC32/pabb_CRC32.h"
 #include "PABotBase2_PacketParser.h"
 
+//#include <stdio.h>
+
 
 const pabb2_PacketHeader* pabb2_PacketParser_pull_bytes(
     pabb2_PacketParser* self,
@@ -27,6 +29,7 @@ const pabb2_PacketHeader* pabb2_PacketParser_pull_bytes(
 
         //  Header is still incomplete.
         if (self->index < MIN_PACKET_SIZE){
+//            printf("Incomplete Header: %d\n", self->index);
             return NULL;
         }
 
@@ -43,7 +46,6 @@ const pabb2_PacketHeader* pabb2_PacketParser_pull_bytes(
 
             //  Magic byte never found.
             if (c == MIN_PACKET_SIZE){
-                self->index = 0;
                 break;
             }
 
@@ -51,12 +53,12 @@ const pabb2_PacketHeader* pabb2_PacketParser_pull_bytes(
             if (buffer[c] == PABB2_CONNECTION_MAGIC_NUMBER){
                 //  Shift the buffer up so that the magic byte is at the start.
                 memmove(self->buffer, self->buffer + c, MIN_PACKET_SIZE - c);
-                goto EndLoop;
+                break;
             }
         }
-    }
 
-EndLoop:;
+        self->index -= c;
+    }
 
     //  At this point, we have a complete and valid header.
 
@@ -87,6 +89,7 @@ EndLoop:;
 
     //  Packet is incomplete.
     if (self->index < packet_bytes){
+//        printf("Incomplete Packet: %d\n", packet_bytes);
         return NULL;
     }
 

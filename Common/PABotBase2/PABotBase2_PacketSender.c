@@ -299,7 +299,7 @@ bool pabb2_PacketSender_iterate_retransmits(pabb2_PacketSender* self){
         //  Not old enough.
         if ((uint8_t)(seqnum - packet->magic_number) < PABB2_ConnectionSender_RETRANSMIT_COUNTER){
 #if 0
-            printf("Not old enough.\n");
+            printf("Not old enough: seqnum = %d, packet = %d\n", seqnum, packet->magic_number);
             fflush(stdout);
 #endif
             head++;
