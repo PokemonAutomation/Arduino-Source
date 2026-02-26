@@ -1,6 +1,7 @@
 SerialPrograms/bin/
 
 .vscode
+.qtcreator
 
 discord_social_sdk_win/
 discord_partner_sdk.dll
@@ -73,3 +74,4 @@ CLAUDE.md
 build_*/
 .cache/*
 Packages/*
+
