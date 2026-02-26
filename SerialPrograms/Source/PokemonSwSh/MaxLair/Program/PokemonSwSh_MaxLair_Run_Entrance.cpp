@@ -102,76 +102,117 @@ void run_entrance(
     // Determine whether we should save this boss (BossFinder)
     bool should_save_new = false;
     if (!boss_slug.empty()) {
-        should_save_new = runtime.actions.should_save_path(boss_slug);
+        should_save_new = runtime.actions.save_path(boss_slug);
         stream.log("Boss: " + boss_slug + ", should save: " + (should_save_new ? "Yes" : "No"), COLOR_BLUE);
     }
     
-    // Decide what to do with a followed path in Standard or StrongBoss
-    bool keep_followed = followed_path ? runtime.actions.should_keep_followed_path() : false;
-    if (followed_path) {
-        stream.log("Followed path: " + std::string(keep_followed ? "keep" : "discard"), COLOR_BLUE);
-    }
-    
     // Overlay box to detect when a dialogue box is present (grey area at bottom)
-    
     OverlayBoxScope dialog_box(stream.overlay(), {0.78, 0.85, 0.03, 0.05});
+    OverlayBoxScope yes_no_box(stream.overlay(), {0.75, 0.72, 0.06, 0.05});
     
     // First step, press A after the initial greeting
     pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
     context.wait_for_all_requests();
+    context.wait_for(400ms);
     
-    // Then, if there is something to be saved, check if the next dialogue box allows us to directly save or not (in case we want to save the path)
+    // Check after the first A press what happens
+    VideoSnapshot screen = stream.video().snapshot();
+    if (!screen) return;
+    // Check if there is a dialog box
+    ImageStats stats = image_stats(extract_box_reference(screen, dialog_box));
+    bool dialog_present = is_grey(stats, 400, 1000);
     
-    if (followed_path) {
-        stream.log("Handling followed-path dialogue.", COLOR_BLUE);
-        // Keep the path or not
-        if (keep_followed) {
-            pbf_press_button(context, BUTTON_A, 160ms, 0ms);
-        } else {
-            pbf_press_button(context, BUTTON_B, 160ms, 0ms);
-        }
-        context.wait_for_all_requests();
-        
-        // Press A to finish dialogue
-        
-        while (true) {
-            context.wait_for(400ms);
-            VideoSnapshot screen = stream.video().snapshot();
-            if (!screen) continue;
-            ImageStats stats = image_stats(extract_box_reference(screen, dialog_box));
-            
-            if (!is_grey(stats, 400, 1000)) {
-                break; // Dialogue box gone
+    if (!dialog_present) {
+        stream.log("Path is already in the list");
+        return; // Dialogue box gone
+    } else {
+        // Dialog present, is there a Yes/No box?
+        ImageStats yes_no_stats = image_stats(extract_box_reference(screen, yes_no_box));
+        bool yes_no_box_present = is_white(yes_no_stats, 400, 10);
+        if (yes_no_box_present) {
+            stream.log("Detected Yes/No box");
+            // There is a Yes/No box, which means that we encountered a new boss and we are asked to save it or not
+            if (save_path) {
+                // The path was previously chosen so we need to keep it, or it is a new path and it was chosen from the list in BossFinder
+                pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
+                stream.log("Path saved");
+            } else {
+                stream.log("Path discarded");
+                pbf_press_button(context, BUTTON_B, 160ms, 1000ms);
             }
-            pbf_press_button(context, BUTTON_A, 160ms, 0ms);
             context.wait_for_all_requests();
             
+            /// TODO: HANDLE DIALOG AFTER CHOICES HAVE BEEN MADE
+            return;
+            
+        };
+        
+        // There is only a dialog box but no choice yet, first press A again to see if it makes a Yes/No box appear
+        stream.log("No Yes/No box detected, only dialog");
+        pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
+        context.wait_for_all_requests();
+        context.wait_for(400ms);
+        
+        VideoSnapshot screen_two = stream.video().snapshot();
+        if (!screen_two) return;
+        
+        yes_no_stats = image_stats(extract_box_reference(screen_two, yes_no_box));
+        
+        yes_no_box_present = is_white(yes_no_stats, 400, 10);
+        
+        if (yes_no_box_present) {
+            stream.log("Detected Yes/No box");
+            // There is now a Yes/No choice box, which means that we followed a path and we are asked if we want to keep it
+            if (save_path) {
+                // The path was previously chosen so we need to keep it, or it is a new path and it was chosen from the list in BossFinder
+                stream.log("Path saved");
+                pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
+            } else {
+                stream.log("Path discarded");
+                pbf_press_button(context, BUTTON_B, 160ms, 1000ms);
+            }
+            context.wait_for_all_requests();
+            
+            /// TODO: HANDLE DIALOG AFTER CHOICES HAVE BEEN MADE
+            return;
+        };
+        
+        // Press A again to check if we lost to the boss?
+        stream.log("Checking if we lost to the previous boss?");
+        pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
+        context.wait_for_all_requests();
+        
+        VideoSnapshot screen_three = stream.video().snapshot();
+        if (!screen_three) return;
+        
+        stats = image_stats(extract_box_reference(screen_three, dialog_box));
+        bool dialog_present = is_grey(stats, 400, 1000);
+        
+        if (!dialog_present) {
+            // We lost to the boss, exiting this part of the loop;
+            stream.log("We lost against the boss, entrance state cleared");
+            return;
         }
-    }
-    
-    // Check if we have a new path to save
-    
-    if (!boss_slug.empty() && should_save_new) {
-        stream.log("Checking for new-path saving dialogue", COLOR_BLUE);
+        
+        // Our list of paths is full, so we need to check if we need to save the path
+        
+        pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
+        pbf_press_dpad(context, DPAD_UP, 160ms, 80ms);
+        
+        context.wait_for_all_requests();
         
         Language language = runtime.console_settings[console_index].language;
         
         size_t attempts = 0;
-        const size_t MAX_ATTEMPTS = 20;
+        const size_t MAX_ATTEMPTS = 10;
         bool done = false;
         while (!done && attempts < MAX_ATTEMPTS) {
             attempts++;
             context.wait_for(400ms);
-            VideoSnapshot screen = stream.video().snapshot();
-            if (!screen) continue;
+            VideoSnapshot screen_four = stream.video().snapshot();
+            if (!screen_four) continue;
             
-            // Detect whether we have a dialog box or not
-            
-            
-            
-            // Detect whether we are in the list to replace the Boss' paths or not, but before we do this we need to move the cursor up so that there is no overlay
-            
-            std::vector<std::string> names = read_saved_paths(stream, language, screen);
+            std::vector<std::string> names = read_saved_paths(stream, language, screen_four);
             int non_empty = 0;
             for (const auto& n : names) {
                 if (!n.empty()) ++non_empty;
@@ -180,11 +221,6 @@ void run_entrance(
             
             if (in_list) {
                 stream.log("Detected replacement list.", COLOR_BLUE);
-                
-                // Move the cursor up
-                pbf_press_dpad(context, DPAD_UP, 160ms, 80ms);
-                context.wait_for_all_requests();
-                
                 context.wait_for(200ms);
                 
                 VideoSnapshot clean_screen = stream.video().snapshot();
@@ -206,35 +242,17 @@ void run_entrance(
                     context.wait_for_all_requests();
                     pbf_press_button(context, BUTTON_A, 160ms, 0ms);
                 }
-                
-            } else {
-                // The player didn't yet save 3 paths so we are free to save a path or not
-                stream.log("Detected Yes/No prompt or simple message.", COLOR_BLUE);
-                if (should_save_new) {
-                    pbf_press_button(context, BUTTON_A, 160ms, 0ms);
-                } else {
-                    pbf_press_button(context, BUTTON_B, 160ms, 0ms);
-                }
-            }
-            context.wait_for_all_requests();
-            
-            VideoSnapshot new_screen = stream.video().snapshot();
-            if (!new_screen) continue;
-            ImageStats stats = image_stats(extract_box_reference(new_screen, dialog_box));
-            if (!is_grey(stats, 400, 1000)) {
-                stream.log("New-path dialogue ended.", COLOR_BLUE);
+                context.wait_for_all_requests();
                 done = true;
             }
-        }
-        if (attempts >= MAX_ATTEMPTS) {
-            stream.log("New-path save dialogue timed out.", COLOR_RED);
+            if (attempts >= MAX_ATTEMPTS) {
+                stream.log("New-path save dialogue timed out.", COLOR_RED);
+            }
         }
     }
-}
 
-
-
-}
+    
+    
 }
 }
 }

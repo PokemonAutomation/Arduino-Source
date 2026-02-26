@@ -166,7 +166,7 @@ public:
         }
         return actions.no_shinies;
     }
-    virtual bool should_keep_followed_path() const override {
+    virtual bool save_path() const override {
         return true;
     }
 
