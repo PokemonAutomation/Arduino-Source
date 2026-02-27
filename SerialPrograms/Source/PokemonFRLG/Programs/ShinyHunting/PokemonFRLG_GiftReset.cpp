@@ -69,7 +69,7 @@ GiftReset::GiftReset()
     )
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_SHINY(
-        "Shiny",
+        "Shiny found",
         true, true, ImageAttachmentMode::JPG,
         {"Notifs", "Showcase"}
     )
@@ -255,7 +255,7 @@ void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerC
     if (ret1 == 0){
         env.log("Entered party menu.");
     }else{
-        env.log("Timed out waiting to enter game.", COLOR_RED);
+        env.log("Unable to enter party menu.", COLOR_RED);
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "open_summary(): Unable to enter Party menu.",
@@ -283,7 +283,7 @@ void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerC
     if (ret2 == 0){
         env.log("Entered summary.");
     }else{
-        env.log("Timed out waiting to enter game.", COLOR_RED);
+        env.log("Unable to enter summary.", COLOR_RED);
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "open_summary(): Unable to enter summary.",

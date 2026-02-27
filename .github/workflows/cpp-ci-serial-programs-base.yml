@@ -120,6 +120,12 @@ jobs:
             exit 1
         }
 
+    - name: Run tests (Mac)
+      if: startsWith(inputs.os, 'mac') && inputs.run-tests
+      run: |
+        cd Arduino-Source/SerialPrograms/bin
+        ./SerialPrograms.app/Contents/MacOS/SerialPrograms --command-line-test-mode --command-line-test-folder ../../../CommandLineTests
+
     - name: Run clang query
       if: inputs.run-clang-query
       run : |

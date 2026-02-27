@@ -5,6 +5,7 @@
  */
 
 #include <string.h>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/PABotBase2/PABotBase2_ConnectionDebug.h"
 #include "MockDevice.h"
 
@@ -13,9 +14,9 @@
 using std::cout;
 using std::endl;
 
-#if 0
-#define PABB2_DROP_HOST_TO_DEVICE   0.2
-#define PABB2_DROP_DEVICE_TO_HOST   0.2
+#if 1
+#define PABB2_DROP_HOST_TO_DEVICE   0.01
+#define PABB2_DROP_DEVICE_TO_HOST   0.01
 #else
 #define PABB2_DROP_HOST_TO_DEVICE   0
 #define PABB2_DROP_DEVICE_TO_HOST   0
@@ -97,6 +98,9 @@ size_t MockDevice::device_read_serial(void* data, size_t max_bytes){
     auto iter1 = iter0 + bytes;
     std::copy(iter0, iter1, (uint8_t*)data);
     m_host_to_device_line.erase(iter0, iter1);
+
+//    cout << "device_read_serial(): attempt = " << max_bytes << ", actual = " << bytes << endl;
+
     return bytes;
 }
 
@@ -158,10 +162,17 @@ size_t MockDevice::verify_stream_data(){
         actual.data(), bytes
     );
 
+    if (read == 0){
+        return bytes;
+    }
+
+
+#if 0
     {
         std::lock_guard<Mutex> lg1(m_print_lock);
         cout << "read = " << read << endl;
     }
+#endif
 
 
     std::vector<uint8_t> expected(
@@ -178,17 +189,20 @@ size_t MockDevice::verify_stream_data(){
 
     std::lock_guard<Mutex> lg1(m_print_lock);
     if (matched){
+#if 0
         cout << "Matched: Bytes = " << read
              << ", Remaining = " << m_expected_host_to_device_stream.size()
              << ", Matched = "
              << std::string((const char*)actual.data(), read)
              << endl;
+#endif
     }else{
         cout << "MISMATCH: Expected = "
              << std::string((const char*)expected.data(), read)
              << ", Actual = "
              << std::string((const char*)actual.data(), read)
              << endl;
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatch");
     }
     return m_expected_host_to_device_stream.size();
 }
@@ -200,7 +214,7 @@ void MockDevice::device_thread(){
     std::unique_lock<Mutex> lg(m_device_lock);
     while (!m_stopping.load(std::memory_order_relaxed)){
         pabb2_ReliableStreamConnection_run_events(&m_connection);
-        m_device_cv.wait(lg);
+        m_device_cv.wait_for(lg, Milliseconds(10));
     }
 }
 void MockDevice::host_recv_thread(){

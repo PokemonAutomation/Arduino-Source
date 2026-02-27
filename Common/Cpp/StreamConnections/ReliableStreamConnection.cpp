@@ -11,10 +11,9 @@
 #include "Common/Cpp/StreamConnections/PABotBase2_MessageDumper.h"
 #include "ReliableStreamConnection.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -234,10 +233,12 @@ void ReliableStreamConnection::retransmit_thread(){
 //
 
 void ReliableStreamConnection::on_recv(const void* data, size_t bytes){
+#if 0
     if (m_print_lock){
         std::lock_guard<Mutex> lg(*m_print_lock);
         cout << "ReliableStreamConnection::on_recv(): " << bytes << endl;
     }
+#endif
     pabb2_PacketParser_push_bytes(
         &m_parser,
         this, &ReliableStreamConnection::on_packet,
