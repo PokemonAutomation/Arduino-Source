@@ -15,7 +15,7 @@
 namespace PokemonAutomation{
 
 
-class StringSelectCellWidget : public NoWheelComboBox, public ConfigWidget{
+class StringSelectCellWidget : public NoWheelCompactComboBox, public ConfigWidget{
 public:
     using ParentOption = StringSelectCell;
 

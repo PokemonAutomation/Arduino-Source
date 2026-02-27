@@ -35,14 +35,27 @@ PanelListWidget::PanelListWidget(
     , m_panel_holder(holder)
 {
 //    QFontMetrics fm(this->font());
+    // this->setStyleSheet(
+    //     "QListWidget::item {"
+    //     "    margin: 0px;"
+    //     "    padding: 0px;"     // Removes internal padding
+    //     "    border: none;"
+    //     "    height: 20px;"     // FORCE a specific height (adjust this number)
+    //     "}"
+    // );
+
+    int vertical_padding = 4; 
+    int row_height = this->fontMetrics().height() + vertical_padding;
     for (PanelEntry& item : list){
         const std::string& display_name = item.display_name;
         PanelDescriptor* descriptor = item.descriptor.get();
 
+        addItem(QString::fromStdString(display_name));
+        QListWidgetItem* list_item = this->item(this->count() - 1);
+        list_item->setData(Qt::SizeHintRole, QSize(0, row_height));
+
         //  Label/divider
         if (descriptor == nullptr){
-            addItem(QString::fromStdString(display_name));
-            QListWidgetItem* list_item = this->item(this->count() - 1);
             QFont font = list_item->font();
             font.setBold(true);
             list_item->setFont(font);
@@ -55,9 +68,7 @@ PanelListWidget::PanelListWidget(
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate program name: " + display_name);
         }
 
-        addItem(QString::fromStdString(display_name));
 //        addItem(QString::fromStdString("DM Elvis for FREE SHINIES!!!"));
-        QListWidgetItem* list_item = this->item(this->count() - 1);
         Color color = descriptor->color();
         if (color){
             QColor qcolor = QColor((uint32_t)color);

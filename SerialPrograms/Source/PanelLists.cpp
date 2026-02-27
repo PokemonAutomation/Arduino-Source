@@ -41,7 +41,7 @@ ProgramSelect::ProgramSelect(QWidget& parent, PanelHolder& holder)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignTop);
-    m_dropdown = new NoWheelComboBox(this);
+    m_dropdown = new NoWheelCompactComboBox(this);
     m_dropdown->setMaxVisibleItems(20);
     layout->addWidget(m_dropdown);
 

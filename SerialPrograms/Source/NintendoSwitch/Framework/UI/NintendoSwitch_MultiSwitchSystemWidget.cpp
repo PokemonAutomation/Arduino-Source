@@ -49,7 +49,7 @@ MultiSwitchSystemWidget::MultiSwitchSystemWidget(
     row->setContentsMargins(0, 0, 0, 0);
     row->addStretch(2);
     row->addWidget(new QLabel("<b>Switch Count:</b>", this), 0);
-    m_console_count_box = new NoWheelComboBox(this);
+    m_console_count_box = new NoWheelCompactComboBox(this);
     row->addWidget(m_console_count_box, 1);
     row->addStretch(2);
 

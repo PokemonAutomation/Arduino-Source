@@ -50,13 +50,13 @@ inline bool filter_serial_port(const QSerialPortInfo& port){
 
 
 
-class SerialPABotBase_SelectorWidget : public NoWheelComboBox{
+class SerialPABotBase_SelectorWidget : public NoWheelCompactComboBox{
 public:
     SerialPABotBase_SelectorWidget(
         ControllerSelectorWidget& parent,
         const ControllerDescriptor* current
     )
-        : NoWheelComboBox(&parent)
+        : NoWheelCompactComboBox(&parent)
         , m_parent(parent)
     {
 //        cout << "SerialPABotBase(): " << current << endl;

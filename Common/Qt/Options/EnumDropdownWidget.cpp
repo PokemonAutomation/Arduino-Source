@@ -22,7 +22,7 @@ EnumDropdownCellWidget::~EnumDropdownCellWidget(){
     m_value.remove_listener(*this);
 }
 EnumDropdownCellWidget::EnumDropdownCellWidget(QWidget& parent, IntegerEnumDropdownCell& value)
-    : NoWheelComboBox(&parent)
+    : NoWheelCompactComboBox(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
 {
