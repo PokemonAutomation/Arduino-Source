@@ -45,7 +45,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     layout1->addLayout(m_dropdowns, CONSOLE_SETTINGS_STRETCH_L1_BODY);
     layout1->addSpacing(5);
 
-    interface_dropdown = new NoWheelComboBox(this);
+    interface_dropdown = new NoWheelCompactComboBox(this);
     m_dropdowns->addWidget(interface_dropdown);
 
     interface_dropdown->addItem(QString::fromStdString(CONTROLLER_INTERFACE_STRINGS.get_string(ControllerInterface::SerialPABotBase)));
@@ -65,7 +65,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
 
 
     m_dropdowns->addSpacing(5);
-    m_controllers_dropdown = new NoWheelComboBox(this);
+    m_controllers_dropdown = new NoWheelCompactComboBox(this);
     m_controllers_dropdown->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     m_dropdowns->addWidget(m_controllers_dropdown);
     refresh_controllers(session.controller_type(), session.available_controllers());

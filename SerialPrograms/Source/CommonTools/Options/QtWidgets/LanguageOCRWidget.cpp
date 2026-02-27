@@ -34,7 +34,7 @@ LanguageOCRCellWidget::LanguageOCRCellWidget(QWidget& parent, LanguageOCRCell& v
 {
     QVBoxLayout* vbox = new QVBoxLayout(this);
     vbox->setContentsMargins(0, 0, 0, 0);
-    m_box = new NoWheelComboBox(&parent);
+    m_box = new NoWheelCompactComboBox(&parent);
 
     for (const auto& item : m_value.m_case_list){
 //        m_enum_to_index[item.first] = (int)m_index_to_enum.size();

@@ -39,12 +39,12 @@ VideoSourceSelectorWidget::VideoSourceSelectorWidget(Logger& logger, VideoSessio
     layout0->addLayout(layout1, CONSOLE_SETTINGS_STRETCH_L0_RIGHT);
     layout1->setContentsMargins(0, 0, 0, 0);
 
-    m_sources_box = new NoWheelComboBox(this);
+    m_sources_box = new NoWheelCompactComboBox(this);
     m_sources_box->setMaxVisibleItems(20);
     layout1->addWidget(m_sources_box, CONSOLE_SETTINGS_STRETCH_L1_BODY);
     layout1->addSpacing(5);
 
-    m_resolution_box = new NoWheelComboBox(this);
+    m_resolution_box = new NoWheelCompactComboBox(this);
     m_resolution_box->setMaxVisibleItems(20);
     layout1->addWidget(m_resolution_box, CONSOLE_SETTINGS_STRETCH_L1_RIGHT);
     layout1->addSpacing(5);

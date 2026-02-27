@@ -1,4 +1,4 @@
-/*  ComboBox without mouse wheel scrolling.
+/*  ComboBox without mouse wheel scrolling. Also, the height has been set to be more compact.
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -8,15 +8,39 @@
 #define PokemonAutomation_NoWheelComboBox_H
 
 #include <QComboBox>
+#include <QAbstractItemView>
+#include <QStyledItemDelegate>
 
 //#define PA_ENABLE_SIZE_CACHING
 
 namespace PokemonAutomation{
 
 
-class NoWheelComboBox : public QComboBox{
+class HeightDelegate : public QStyledItemDelegate {
 public:
-    using QComboBox::QComboBox;
+    using QStyledItemDelegate::QStyledItemDelegate;
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+        QSize s = QStyledItemDelegate::sizeHint(option, index);
+        int vertical_padding = 2;
+        s.setHeight(option.fontMetrics.height() + vertical_padding);
+        return s;
+    }
+};
+
+
+class NoWheelCompactComboBox : public QComboBox{
+public:
+    explicit NoWheelCompactComboBox(QWidget* parent = nullptr) : QComboBox(parent) {
+        // Set the height for every line in the dropdown
+        this->view()->setItemDelegate(new HeightDelegate(this));
+
+        // this->setStyleSheet("QAbstractItemView::item { height: 100px; }");
+        
+        // Optional: Force a standard list view to ensure the stylesheet 
+        // is respected on all platforms (like Windows/macOS)
+        // #include <QListView>
+        // this->setView(new QListView()); 
+    }
 
     void update_size_cache(){
 #ifdef PA_ENABLE_SIZE_CACHING
