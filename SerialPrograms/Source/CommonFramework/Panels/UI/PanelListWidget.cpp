@@ -44,7 +44,7 @@ PanelListWidget::PanelListWidget(
     //     "}"
     // );
 
-    int vertical_padding = 4; 
+    int vertical_padding = 2;
     int row_height = this->fontMetrics().height() + vertical_padding;
     for (PanelEntry& item : list){
         const std::string& display_name = item.display_name;

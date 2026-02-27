@@ -21,7 +21,7 @@ public:
     using QStyledItemDelegate::QStyledItemDelegate;
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override {
         QSize s = QStyledItemDelegate::sizeHint(option, index);
-        int vertical_padding = 8; 
+        int vertical_padding = 2;
         s.setHeight(option.fontMetrics.height() + vertical_padding);
         return s;
     }
