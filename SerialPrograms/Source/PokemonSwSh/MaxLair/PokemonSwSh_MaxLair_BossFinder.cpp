@@ -151,7 +151,7 @@ public:
         }
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid enum.");
     }
-    virtual bool save_path(const std::string& boss_slug) const override {
+    virtual bool is_in_save_list(const std::string& boss_slug) const override {
             return get_filter(boss_slug).save_on_the_go;
     }
 

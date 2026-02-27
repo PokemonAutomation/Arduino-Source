@@ -215,7 +215,7 @@ public:
             return CaughtScreenAction::TAKE_NON_BOSS_SHINY_AND_CONTINUE;
         }
     }
-    virtual bool save_path() const override {
+    virtual bool should_save_path() const override {
         return true;
     }
 
