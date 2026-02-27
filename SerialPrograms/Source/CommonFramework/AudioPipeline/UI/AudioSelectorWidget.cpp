@@ -53,11 +53,11 @@ AudioSelectorWidget::AudioSelectorWidget(QWidget& parent, AudioSession& session)
         layout1->addLayout(input_layout, CONSOLE_SETTINGS_STRETCH_L1_BODY);
         layout1->addSpacing(5);
 
-        m_audio_input_box = new NoWheelComboBox(this);
+        m_audio_input_box = new NoWheelCompactComboBox(this);
         m_audio_input_box->setMaxVisibleItems(20);
         input_layout->addWidget(m_audio_input_box);
 
-        m_audio_format_box = new NoWheelComboBox(this);
+        m_audio_format_box = new NoWheelCompactComboBox(this);
         layout1->addWidget(m_audio_format_box, CONSOLE_SETTINGS_STRETCH_L1_RIGHT);
         layout1->addSpacing(5);
 
@@ -80,7 +80,7 @@ AudioSelectorWidget::AudioSelectorWidget(QWidget& parent, AudioSession& session)
         layout1->addLayout(output_layout, CONSOLE_SETTINGS_STRETCH_L1_BODY);
         layout1->addSpacing(5);
 
-        m_audio_output_box = new NoWheelComboBox(this);
+        m_audio_output_box = new NoWheelCompactComboBox(this);
         m_audio_output_box->setMaxVisibleItems(20);
         if (GlobalSettings::instance().AUDIO_PIPELINE->SHOW_RECORD_FREQUENCIES){
             output_layout->addWidget(m_audio_output_box, 7);
@@ -98,7 +98,7 @@ AudioSelectorWidget::AudioSelectorWidget(QWidget& parent, AudioSession& session)
         layout1->addWidget(m_volume_slider, 2);
         layout1->addSpacing(5);
 
-        m_audio_vis_box = new NoWheelComboBox(this);
+        m_audio_vis_box = new NoWheelCompactComboBox(this);
         m_audio_vis_box->addItem("No Display");
         m_audio_vis_box->addItem("Spectrum");
         m_audio_vis_box->addItem("Spectrogram");

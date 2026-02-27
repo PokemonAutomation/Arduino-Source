@@ -15,7 +15,7 @@
 namespace PokemonAutomation{
 
 
-class EnumDropdownCellWidget : public NoWheelComboBox, public ConfigWidget{
+class EnumDropdownCellWidget : public NoWheelCompactComboBox, public ConfigWidget{
 public:
     using ParentOption = IntegerEnumDropdownCell;
 
