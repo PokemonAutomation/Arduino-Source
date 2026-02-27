@@ -21,7 +21,7 @@ Unlike with Qt 5.12, there is no offline installer for it. So you have two optio
 
 If you are ok with creating an account with Qt and using their online installer, then use this method.
 
-1. Download the online installer from here: https://www.qt.io/download-qt-Images/
+1. Download the online installer from here: [https://www.qt.io/download-qt-Images/](https://www.qt.io/development/download-qt-installer-oss)
 3. Select the following options: 
     - Qt 6.10.0
         - MSVC 2022 64-bit
@@ -78,5 +78,6 @@ TODO
 
 
 [<img src="https://canary.discordapp.com/api/guilds/695809740428673034/widget.png?style=banner2">](https://discord.gg/cQ4gWxN)
+
 
 

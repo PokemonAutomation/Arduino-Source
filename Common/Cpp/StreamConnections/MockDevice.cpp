@@ -15,8 +15,8 @@ using std::cout;
 using std::endl;
 
 #if 1
-#define PABB2_DROP_HOST_TO_DEVICE   0.2
-#define PABB2_DROP_DEVICE_TO_HOST   0.2
+#define PABB2_DROP_HOST_TO_DEVICE   0.01
+#define PABB2_DROP_DEVICE_TO_HOST   0.01
 #else
 #define PABB2_DROP_HOST_TO_DEVICE   0
 #define PABB2_DROP_DEVICE_TO_HOST   0
@@ -98,6 +98,9 @@ size_t MockDevice::device_read_serial(void* data, size_t max_bytes){
     auto iter1 = iter0 + bytes;
     std::copy(iter0, iter1, (uint8_t*)data);
     m_host_to_device_line.erase(iter0, iter1);
+
+//    cout << "device_read_serial(): attempt = " << max_bytes << ", actual = " << bytes << endl;
+
     return bytes;
 }
 

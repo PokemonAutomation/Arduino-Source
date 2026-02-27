@@ -300,7 +300,7 @@ void stress_test(Logger& logger, CancellableScope& scope){
 
     ReliableStreamConnection connection(
         &scope,
-        logger, true,
+        logger, false,
         GlobalThreadPools::unlimited_realtime(),
         device,
         100ms,
@@ -326,6 +326,10 @@ void stress_test(Logger& logger, CancellableScope& scope){
         const char* ptr = data.data();
         size_t left = data.size();
         while (left > 0){
+            if (current_time() - last_print > Seconds(1)){
+                cout << "Bytes Sent = " << bytes_sent + data.size() - left << endl;
+                last_print = current_time();
+            }
 //            scope.wait_for(Milliseconds(rand() % 100));
             size_t sent = connection.send(ptr, left);
             if (sent == 0){
@@ -335,10 +339,6 @@ void stress_test(Logger& logger, CancellableScope& scope){
             left -= sent;
         }
         bytes_sent += data.size();
-        if (current_time() - last_print > Seconds(1)){
-            cout << "Bytes Sent = " << bytes_sent << endl;
-            last_print = current_time();
-        }
         device.push_expected_stream_data(data.data(), data.size());
     }
 }
