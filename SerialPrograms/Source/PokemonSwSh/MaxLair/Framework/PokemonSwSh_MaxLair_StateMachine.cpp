@@ -186,12 +186,12 @@ StateMachineAction run_state_iteration(
         console.log("Current State: Entrance");
         std::string boss_slug = global_state.infer_actual_state(console_index).boss;
         run_entrance(
-                     runtime,
-                     env, console_index,
-                     console, context,
-                     save_path,
-                     global_state
-                     );
+            runtime,
+            env, console_index,
+            console, context,
+            save_path,
+            global_state
+         );
         return StateMachineAction::DONE_WITH_ADVENTURE;
     }
     case 8:

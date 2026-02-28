@@ -215,9 +215,6 @@ public:
             return CaughtScreenAction::TAKE_NON_BOSS_SHINY_AND_CONTINUE;
         }
     }
-    virtual bool should_keep_followed_path() const override {
-        return true;
-    }
 
 private:
     const MaxLairStrongBoss_ConsoleOptions& console(size_t index) const{

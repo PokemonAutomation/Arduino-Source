@@ -4,10 +4,14 @@
  *
  */
 
+#include <vector>
+#include <memory>
 //#include "Common/Compiler.h"
 //#include "Common/Cpp/Json/JsonValue.h"
 //#include "Common/Cpp/Json/JsonArray.h"
 //#include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/ConfigOption.h"
 //#include "CommonFramework/Globals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
@@ -15,10 +19,7 @@
 #include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
 #include "PokemonSwSh_MaxLair_Options_BossAction.h"
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/ConfigOption.h"
-#include <vector>
-#include <memory>
+
 
 //#include <iostream>
 //using std::cout;

@@ -166,9 +166,6 @@ public:
         }
         return actions.no_shinies;
     }
-    virtual bool should_keep_followed_path() const override {
-        return true;
-    }
 
 private:
     const MaxLairStandard_ConsoleOptions& console(size_t index) const{

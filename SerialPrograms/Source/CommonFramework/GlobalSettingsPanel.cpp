@@ -82,7 +82,7 @@ void PreloadSettings::load(const JsonValue& json){
         QByteArrayView dataView(dev_token->data(), dev_token->size());
         hash.addData(dataView);
 #endif
-        DEVELOPER_MODE = true; //TOKENS.find(hash.result().toHex().toStdString()) != TOKENS.end();
+        DEVELOPER_MODE = TOKENS.find(hash.result().toHex().toStdString()) != TOKENS.end();
     }
 
     const JsonObject* debug_obj = obj->get_object("DEBUG");
