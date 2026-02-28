@@ -140,7 +140,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
             "Soft resetting."
         );
 
-        soft_reset(env.program_info(), env.console, context);
+        soft_reset(env.console, context);
         stats.resets++;
         env.update_stats();
         context.wait_for_all_requests();

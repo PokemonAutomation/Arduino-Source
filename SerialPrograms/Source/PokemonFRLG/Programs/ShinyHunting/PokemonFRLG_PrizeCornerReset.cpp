@@ -165,7 +165,7 @@ void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControlle
                 env, NOTIFICATION_STATUS_UPDATE,
                 "Soft resetting."
             );
-            soft_reset(env.program_info(), env.console, context);
+            soft_reset(env.console, context);
             stats.resets++;
             context.wait_for_all_requests();
         }

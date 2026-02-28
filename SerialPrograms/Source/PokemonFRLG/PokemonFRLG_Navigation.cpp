@@ -13,6 +13,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "PokemonSwSh/MaxLair/Ai/PokemonSwSh_MaxLair_AI.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
@@ -24,37 +25,78 @@ namespace NintendoSwitch{
 namespace PokemonFRLG{
 
 
-void soft_reset(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+void soft_reset(ConsoleHandle& console, ProControllerContext& context){
     // A + B + Select + Start
     pbf_press_button(context, BUTTON_B | BUTTON_A | BUTTON_MINUS | BUTTON_PLUS, 360ms, 1440ms);
 
-    pbf_mash_button(context, BUTTON_PLUS, GameSettings::instance().START_BUTTON_MASH1);
+    pbf_mash_button(context, BUTTON_MINUS, GameSettings::instance().SELECT_BUTTON_MASH0);
     context.wait_for_all_requests();
 
+    //Random wait before pressing start/A
+    console.log("Randomly waiting...");
+    Milliseconds rng_wait = std::chrono::milliseconds(PokemonSwSh::MaxLairInternal::random(0, 10000));
+    pbf_wait(context, rng_wait);
+    context.wait_for_all_requests();
+
+    //Mash A until white screen to game load menu
+    WhiteScreenOverWatcher whitescreen(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+
+    int ls = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context) {
+            pbf_mash_button(context, BUTTON_A, 1000ms);
+            pbf_wait(context, 5000ms);
+            context.wait_for_all_requests();
+        },
+        { whitescreen }
+    );
+    context.wait_for_all_requests();
+    if (ls == 0){
+        console.log("Entered load menu.");
+    }else{
+        console.log("Unable to enter load menu.", COLOR_RED);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "soft_reset(): Unable to enter load menu.",
+            console
+        );
+    }
+    //Let the animation finish
+    pbf_wait(context, 500ms);
+    context.wait_for_all_requests();
+
+    //Load game
     pbf_press_button(context, BUTTON_A, 160ms, 320ms);
 
     //Wait for game to load in
     BlackScreenOverWatcher detector(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     int ret = wait_until(
-        stream, context,
+        console, context,
         GameSettings::instance().ENTER_GAME_WAIT0,
         {detector}
     );
     if (ret == 0){
-        stream.log("Entered game!");
+        console.log("Entered game!");
     }else{
-        stream.log("Timed out waiting to enter game.", COLOR_RED);
+        console.log("Timed out waiting to enter game.", COLOR_RED);
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "soft_reset(): Timed out waiting to enter game.",
-            stream
+            console
         );
     }
 
     //Mash past "previously on..."
     pbf_mash_button(context, BUTTON_B, GameSettings::instance().ENTER_GAME_MASH0);
-
     context.wait_for_all_requests();
+
+    //Random wait no.2
+    console.log("Randomly waiting...");
+    Milliseconds rng_wait2 = std::chrono::milliseconds(PokemonSwSh::MaxLairInternal::random(0, 10000));
+    pbf_wait(context, rng_wait2);
+    context.wait_for_all_requests();
+
+    console.log("Soft reset completed.");
 }
 
 void open_slot_six(ConsoleHandle& console, ProControllerContext& context){
