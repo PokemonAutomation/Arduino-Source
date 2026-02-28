@@ -28,7 +28,7 @@ void soft_reset(const ProgramInfo& info, VideoStream& stream, ProControllerConte
     // A + B + Select + Start
     pbf_press_button(context, BUTTON_B | BUTTON_A | BUTTON_MINUS | BUTTON_PLUS, 360ms, 1440ms);
 
-    pbf_mash_button(context, BUTTON_PLUS, GameSettings::instance().START_BUTTON_MASH0);
+    pbf_mash_button(context, BUTTON_PLUS, GameSettings::instance().START_BUTTON_MASH1);
     context.wait_for_all_requests();
 
     pbf_press_button(context, BUTTON_A, 160ms, 320ms);
