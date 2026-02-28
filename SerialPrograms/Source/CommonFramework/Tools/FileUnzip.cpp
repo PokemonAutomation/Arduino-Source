@@ -9,6 +9,7 @@
 // #define _LARGEFILE64_SOURCE 1
 
 #include "miniz-cpp/zip_file.hpp"
+#include "Common/Cpp/Exceptions.h"
 #include "FileUnzip.h"
 #include <filesystem>
 #include <fstream>
@@ -18,6 +19,8 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
+
+    namespace fs = std::filesystem;
 
     struct ProgressData {
         std::ofstream* outFile;
@@ -68,32 +71,67 @@ namespace PokemonAutomation{
     //     std::cout << "\nExtraction complete!" << std::endl;
     // }
 
+
+    // ensure that entry_name is inside target_dir.
+    // to prevent path traversal attacks.
+    bool is_safe(const std::string& target_dir, const std::string& entry_name) {
+        fs::path base = fs::absolute(target_dir);
+        // Join paths and resolve all '../'. Unlike canonical, this works even if the file doesn't exist yet.
+        fs::path final_path = fs::weakly_canonical(base / entry_name);
+        
+        // Check if the final path is still within the base directory
+        // this compares base and final_path, trying to find the first mismatch
+        // if the final_path is a descendent directory of base, 
+        // then the position of the first mismatch should be the end of base.
+        auto [root, relative] = std::mismatch(base.begin(), base.end(), final_path.begin());
+        return root == base.end();
+    }
+
     void unzip_all(const char* zip_path, const char* target_dir) {
         mz_zip_archive zip_archive;
         memset(&zip_archive, 0, sizeof(zip_archive));
 
+        // Opens the ZIP file at zip_path
+        // zip_archive holds the state and metadata of the ZIP archive.
         if (!mz_zip_reader_init_file(&zip_archive, zip_path, 0)) return;
 
         // Get total number of files in the archive
         int num_files = (int)mz_zip_reader_get_num_files(&zip_archive);
 
         for (int i = 0; i < num_files; i++) {
-            mz_zip_archive_file_stat file_stat;
+            mz_zip_archive_file_stat file_stat; // holds info on the specific file
+
+            // fills file_stat with the data for the current index
             if (!mz_zip_reader_file_stat(&zip_archive, i, &file_stat)) continue;
 
-            // Skip directories - you can't "write" a directory as a file
+            // Checks if the current entry is a folder. Miniz treats folders as entries; 
+            // this code skips them to avoid trying to "write" a folder as if it were a file.
             if (mz_zip_reader_is_file_a_directory(&zip_archive, i)) {
-                // Optional: Create local directory here using mkdir
                 continue;
             }
 
             // Construct your output path (e.g., target_dir + file_stat.m_filename)
             std::string out_path = std::string(target_dir) + "/" + file_stat.m_filename;
+            fs::path const parent_dir{fs::path(out_path).parent_path()};
+
+            // ensure that entry_name is inside target_dir. to prevent path traversal attacks.
+            if (!is_safe(target_dir, file_stat.m_filename)){
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "unzip_all: Attempted to unzip a file that was trying to leave its base directory. This is a security risk.");
+            }
+
+            // Create the entire directory, including intermediate directories for this file
+            std::error_code ec{};
+            fs::create_directories(parent_dir, ec);
+            if (ec) {
+                std::cerr << "Error creating " << parent_dir << ": " << ec.message() << std::endl;
+                ec.clear(); 
+            }
             
-            std::ofstream outFile(out_path, std::ios::binary);
+            std::ofstream outFile(out_path, std::ios::binary); // std::ios::binary is to prevent line-ending conversions.
             ProgressData progress = { &outFile, (uint64_t)file_stat.m_uncomp_size, 0 };
 
             // Extract using the callback
+            // decompresses the file in chunks and repeatedly calls write_callback to save those chunks to the disk via the outFile
             mz_zip_reader_extract_to_callback(&zip_archive, i, write_callback, &progress, 0);
             std::cout << "\nFinished: " << file_stat.m_filename << std::endl;
         }
