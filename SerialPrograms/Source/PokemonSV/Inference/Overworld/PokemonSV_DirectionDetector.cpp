@@ -190,10 +190,10 @@ void DirectionDetector::change_direction(
 
         // try to find the shortest path around the circle
         double diff = target - current;
-        if(diff > PI) {
+        if(diff > PI){
             diff -= (2 * PI);
         }
-        if(diff <= -PI) {
+        if(diff <= -PI){
             diff += (2 * PI);
         }
         double abs_diff = std::abs(diff);

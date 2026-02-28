@@ -305,7 +305,7 @@ class TealDialogMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
     TealDialogMatcher() : WaterfillTemplateMatcher(
         "PokemonLZA/DialogBox/DialogBoxTitleGreenLine-Template.png", Color(180,200,70), Color(200, 220, 115), 50
-    ) {
+    ){
         m_aspect_ratio_lower = 0.9;
         m_aspect_ratio_upper = 1.1;
         m_area_ratio_lower = 0.8;

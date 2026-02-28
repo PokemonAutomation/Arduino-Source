@@ -106,7 +106,7 @@ ShinyHuntMew::ShinyHuntMew()
     PA_ADD_OPTION(FACE_UP_TIME);
 }
 
-void ShinyHuntMew::enter_mew(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void ShinyHuntMew::enter_mew(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     int ret = run_until<ProControllerContext>(
         env.console, context,
@@ -156,7 +156,7 @@ void ShinyHuntMew::enter_mew(SingleSwitchProgramEnvironment& env, ProControllerC
     context.wait_for_all_requests();
 }
 
-void ShinyHuntMew::exit_mew(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void ShinyHuntMew::exit_mew(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ssf_press_button(context, BUTTON_B, 0ms, 400ms);
     pbf_press_dpad(context, DPAD_DOWN, 400ms, 160ms);
 
@@ -202,11 +202,11 @@ void ShinyHuntMew::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     * https://old.reddit.com/r/ShinyPokemon/comments/1c773oi/gen3_discuss_is_this_the_fastest_way_to_encounter/
     */
 
-    while (true) {
+    while (true){
         enter_mew(env, context);
 
         bool legendary_shiny = handle_encounter(env.console, context, true);
-        if (legendary_shiny) {
+        if (legendary_shiny){
             stats.shinies++;
             env.update_stats();
             send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", env.console.video().snapshot(), true);

@@ -15,12 +15,12 @@ namespace PokemonSwSh {
 
 
 
-DailyHighlightDatabase::DailyHighlightDatabase(const char* resource_path) {
+DailyHighlightDatabase::DailyHighlightDatabase(const char* resource_path){
     std::string filepath = RESOURCE_PATH() + resource_path;
     JsonValue json = load_json_file(filepath);
     JsonObject& root = json.to_object_throw(filepath);
 
-    for (auto& item : root) {
+    for (auto& item : root){
         const std::string& slug = item.first;
         JsonObject& obj = item.second.to_object_throw(filepath);
 
@@ -36,7 +36,7 @@ DailyHighlightDatabase::DailyHighlightDatabase(const char* resource_path) {
 
 std::pair<uint16_t, uint16_t> DailyHighlightDatabase::get_range_for_slug(const std::string& slug) const {
     auto iter = m_slug_to_range.find(slug);
-    if (iter == m_slug_to_range.end()) {
+    if (iter == m_slug_to_range.end()){
         throw InternalProgramError(
             nullptr,
             PA_CURRENT_FUNCTION,

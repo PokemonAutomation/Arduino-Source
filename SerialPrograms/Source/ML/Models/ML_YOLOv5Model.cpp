@@ -206,9 +206,9 @@ void YOLOv5Session::run(const cv::Mat& input_image, std::vector<YOLOv5Session::D
     // For retaining original values (0-255), use 1.0.
     image_resized.convertTo(image_float, CV_32F, 1.0 / 255.0); 
 
-    for (int c = 0, i = 0; c < 3; c++) {
-        for (int row = 0; row < image_float.rows; row++) {
-            for (int col = 0; col < image_float.cols; col++) {
+    for (int c = 0, i = 0; c < 3; c++){
+        for (int row = 0; row < image_float.rows; row++){
+            for (int col = 0; col < image_float.cols; col++){
                 float pixel_value = image_float.at<cv::Vec3f>(row, col)[c];
                 m_model_input[i++] = pixel_value;
             }

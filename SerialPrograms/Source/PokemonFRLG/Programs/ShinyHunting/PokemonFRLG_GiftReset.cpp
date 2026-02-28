@@ -129,9 +129,9 @@ void GiftReset::obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControlle
             continue;
         case 1:
             env.log("Detected Selection Dialog. Pressing A.");
-            if (!seen_selection_arrow) {
+            if (!seen_selection_arrow){
 
-                if (TARGET == Target::starters || TARGET == Target::hitmon) {
+                if (TARGET == Target::starters || TARGET == Target::hitmon){
                     env.log("First selection box detected. YES to starter.");
                     seen_selection_arrow = true;
                     pbf_press_button(context, BUTTON_A, 320ms, 640ms);
@@ -142,7 +142,7 @@ void GiftReset::obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControlle
                     return;
                 }
 
-                if (TARGET == Target::starters) {
+                if (TARGET == Target::starters){
                     //Skip past energetic and jingle
                     pbf_press_button(context, BUTTON_B, 320ms, 640ms);
                     pbf_wait(context, 500ms);
@@ -155,7 +155,7 @@ void GiftReset::obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControlle
                 pbf_press_button(context, BUTTON_B, 320ms, 640ms);
                 //seen_nickname_arrow = true;
 
-                if (TARGET == Target::starters) {
+                if (TARGET == Target::starters){
                     //Press B some to try and skip the rival's pickup
                     pbf_press_button(context, BUTTON_B, 320ms, 640ms);
                     pbf_press_button(context, BUTTON_B, 320ms, 640ms);
@@ -166,7 +166,7 @@ void GiftReset::obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControlle
             }
             continue;
         //case 2:
-        //    if (seen_selection_arrow) {
+        //    if (seen_selection_arrow){
         //        env.log("White dialog box detected. Pressing B.");
         //        pbf_press_button(context, BUTTON_B, 320ms, 640ms);
         //    }
@@ -193,10 +193,10 @@ void GiftReset::obtain_lapras(SingleSwitchProgramEnvironment& env, ProController
     //At least 4 lines of dialog for fossils
     //This takes care of the entire conversion+nickname+exit dialog
     int limit = 10;
-    if (TARGET == Target::fossils) {
+    if (TARGET == Target::fossils){
         limit = 5;
     }
-    for (int i = 0; i < limit; i++) {
+    for (int i = 0; i < limit; i++){
         pbf_press_button(context, BUTTON_B, 320ms, 640ms);
         pbf_wait(context, 100ms);
         context.wait_for_all_requests();
@@ -213,8 +213,8 @@ void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerC
 
     int ret = run_until<ProControllerContext>(
         env.console, context,
-        [](ProControllerContext& context) {
-            for (int i = 0; i < 10; i++) {
+        [](ProControllerContext& context){
+            for (int i = 0; i < 10; i++){
                 pbf_press_button(context, BUTTON_B, 320ms, 640ms);
                 pbf_wait(context, 100ms);
                 context.wait_for_all_requests();
@@ -236,7 +236,7 @@ void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerC
         );
     }
 
-    if (TARGET != Target::starters) {
+    if (TARGET != Target::starters){
         //Pokedex, Pokemon, Bag, Trainer, Save, Option, Exit
         env.log("Navigating to party menu.");
         pbf_wait(context, 200ms);
@@ -267,7 +267,7 @@ void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerC
     context.wait_for_all_requests();
 
     //Press up twice to get to the last slot
-    if (TARGET != Target::starters) {
+    if (TARGET != Target::starters){
         pbf_press_dpad(context, DPAD_UP, 320ms, 320ms);
         pbf_press_dpad(context, DPAD_UP, 320ms, 320ms);
     }
@@ -314,8 +314,8 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     bool shiny_starter = false;
 
-    while (!shiny_starter) {
-        if (TARGET != Target::lapras && TARGET != Target::fossils) {
+    while (!shiny_starter){
+        if (TARGET != Target::lapras && TARGET != Target::fossils){
             obtain_pokemon(env, context);
         }else{
             obtain_lapras(env, context);
@@ -327,7 +327,7 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         ShinySymbolDetector shiny_checker(COLOR_YELLOW);
         shiny_starter = shiny_checker.read(env.console.logger(), screen);
 
-        if (shiny_starter) {
+        if (shiny_starter){
             env.log("Shiny found!");
             stats.shinies++;
             send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", screen, true);
@@ -346,7 +346,7 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         }
     }
 
-    if (GO_HOME_WHEN_DONE) {
+    if (GO_HOME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 200ms, 1000ms);
     }
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

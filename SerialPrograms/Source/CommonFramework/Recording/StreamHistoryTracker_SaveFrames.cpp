@@ -35,16 +35,16 @@ namespace PokemonAutomation{
 
 
 
-void simulate_cpu_load(int milliseconds) {
+void simulate_cpu_load(int milliseconds){
     auto start = std::chrono::steady_clock::now();
-    while (std::chrono::steady_clock::now() - start < std::chrono::milliseconds(milliseconds)) {
+    while (std::chrono::steady_clock::now() - start < std::chrono::milliseconds(milliseconds)){
         // Waste cycles with dummy math to prevent compiler optimization
         double d = 1.0;
         d = std::sqrt(d * 1.1);
     }
 }
 
-QImage decompress_video_frame(const std::vector<uchar> &compressed_buffer) {
+QImage decompress_video_frame(const std::vector<uchar> &compressed_buffer){
     if (compressed_buffer.empty()) return {};
 
     // 1. Decompress JPEG buffer into a QImage
@@ -58,7 +58,7 @@ QImage decompress_video_frame(const std::vector<uchar> &compressed_buffer) {
     return img.convertToFormat(QImage::Format_BGR888);
 }
 
-std::vector<uchar> compress_video_frame(const QVideoFrame& const_frame) {
+std::vector<uchar> compress_video_frame(const QVideoFrame& const_frame){
     // simulate_cpu_load(100);  // for testing, to see what happens when the CPU is overwhelmed, and needs to drop frames.
 
 
@@ -66,7 +66,7 @@ std::vector<uchar> compress_video_frame(const QVideoFrame& const_frame) {
     QVideoFrame frame = const_frame;
 
     // 1. Map the frame to CPU memory
-    if (!frame.map(QVideoFrame::ReadOnly)) {
+    if (!frame.map(QVideoFrame::ReadOnly)){
         return {};
     }
 
@@ -235,7 +235,7 @@ void StreamHistoryTracker::on_frame(std::shared_ptr<const VideoFrame> frame){
         std::lock_guard<Mutex> lock(m_queue_lock);
 
         // Drop oldest if we are falling behind
-        if (m_pending_frames.size() >= MAX_PENDING_FRAMES) {
+        if (m_pending_frames.size() >= MAX_PENDING_FRAMES){
             m_pending_frames.pop_front(); 
             m_logger.log("Worker thread lagging: Frame dropped.", COLOR_RED);
         }
@@ -312,7 +312,7 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
     cv::VideoWriter writer(filename, cv::VideoWriter::fourcc('m', 'p', '4', 'v'), 
                            m_target_fps, cv::Size(width, height), true);
 
-    if (!writer.isOpened()) {
+    if (!writer.isOpened()){
         throw std::runtime_error("Could not open video file for writing.");
     }
 
@@ -323,8 +323,8 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
     WallClock start_time = frames[0].timestamp;
 
     // 2. Loop through frames
-    for (CompressedVideoFrame frame : frames) {
-        if (frame_index % 100 == 0) {
+    for (CompressedVideoFrame frame : frames){
+        if (frame_index % 100 == 0){
             m_logger.log("Saving frame " + std::to_string(frame_index) + " / " + std::to_string(frames.size()));
         }
 
@@ -336,7 +336,7 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
         double interval = std::chrono::duration_cast<std::chrono::milliseconds>(m_frame_interval).count();
         size_t target_frame_index = (size_t)std::round(elapsed/interval);
         // fill the gap with duplicate frames until we reach the target index
-        while (frames_inserted < target_frame_index) {
+        while (frames_inserted < target_frame_index){
             // Decompress last known good frame and write again
             QImage img = decompress_video_frame(last_good_buffer);
             cv::Mat mat(height, width, CV_8UC3, (void*)img.bits(), img.bytesPerLine());
@@ -361,7 +361,7 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
 
 
 void StreamHistoryTracker::worker_loop(){
-    while (!m_stopping) {
+    while (!m_stopping){
         std::shared_ptr<const VideoFrame> frame;
 
         // 1. Wait for a frame to process

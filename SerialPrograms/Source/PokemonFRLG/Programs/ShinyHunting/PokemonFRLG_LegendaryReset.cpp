@@ -88,8 +88,8 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
     * For deoxys solve the puzzle first.
     */
 
-    while (true) {
-        if (WALK_UP) {
+    while (true){
+        if (WALK_UP){
             //Step forward to start the encounter.
             pbf_press_dpad(context, DPAD_UP, 320ms, 400ms);
         }
@@ -126,7 +126,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
         //handle_encounter will wait for "POKEMON appeared!"
         bool legendary_shiny = handle_encounter(env.console, context, false);
-        if (legendary_shiny) {
+        if (legendary_shiny){
             stats.shinies++;
             env.update_stats();
             send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", env.console.video().snapshot(), true);
@@ -146,7 +146,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
         context.wait_for_all_requests();
     }
 
-    if (GO_HOME_WHEN_DONE) {
+    if (GO_HOME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 200ms, 1000ms);
     }
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

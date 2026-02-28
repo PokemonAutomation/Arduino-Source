@@ -110,7 +110,7 @@ LegendaryRunAway::LegendaryRunAway()
     PA_ADD_OPTION(LUGIA_LEFT_RIGHT);
 }
 
-void LegendaryRunAway::reset_hooh(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void LegendaryRunAway::reset_hooh(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     //Turn around, 10 steps down
     ssf_press_button(context, BUTTON_B, 0ms, HOOH_UP_DOWN);
@@ -174,7 +174,7 @@ void LegendaryRunAway::reset_hooh(SingleSwitchProgramEnvironment& env, ProContro
     context.wait_for_all_requests();
 }
 
-void LegendaryRunAway::reset_lugia(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void LegendaryRunAway::reset_lugia(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     //Turn around, 5 steps down
     ssf_press_button(context, BUTTON_B, 0ms, LUGIA_UP_DOWN);
@@ -251,8 +251,8 @@ void LegendaryRunAway::program(SingleSwitchProgramEnvironment& env, ProControlle
     * This is the same as RSE resets.
     */
 
-    while (true) {
-        if (TARGET == Target::hooh) {
+    while (true){
+        if (TARGET == Target::hooh){
             //Step forward to start the encounter.
             pbf_press_dpad(context, DPAD_UP, 160ms, 400ms);
         }else{
@@ -261,7 +261,7 @@ void LegendaryRunAway::program(SingleSwitchProgramEnvironment& env, ProControlle
         }
         
         bool legendary_shiny = handle_encounter(env.console, context, true);
-        if (legendary_shiny) {
+        if (legendary_shiny){
             stats.shinies++;
             env.update_stats();
             send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", env.console.video().snapshot(), true);
@@ -275,7 +275,7 @@ void LegendaryRunAway::program(SingleSwitchProgramEnvironment& env, ProControlle
         context.wait_for_all_requests();
         
         //Exit and re-enter the room
-        switch (TARGET) {
+        switch (TARGET){
         case Target::hooh:
             reset_hooh(env, context);
             break;
@@ -294,7 +294,7 @@ void LegendaryRunAway::program(SingleSwitchProgramEnvironment& env, ProControlle
         env.update_stats();
     }
 
-    if (GO_HOME_WHEN_DONE) {
+    if (GO_HOME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 200ms, 1000ms);
     }
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

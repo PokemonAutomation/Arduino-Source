@@ -33,7 +33,7 @@ inline bool filter_serial_port(const QSerialPortInfo& port){
 
 #if defined(__APPLE__)
     // exlude tty
-    if (port.portName().startsWith("tty.")) {
+    if (port.portName().startsWith("tty.")){
         return false;
     }
     // exclude system builtin serial ports

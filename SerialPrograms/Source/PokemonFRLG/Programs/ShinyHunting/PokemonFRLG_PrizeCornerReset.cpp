@@ -97,8 +97,8 @@ void PrizeCornerReset::obtain_prize(SingleSwitchProgramEnvironment& env, ProCont
     //Only 1 line to press through in english, not sure about other languages?
     int ret = run_until<ProControllerContext>(
         env.console, context,
-        [](ProControllerContext& context) {
-            for (int i = 0; i < 5; i++) {
+        [](ProControllerContext& context){
+            for (int i = 0; i < 5; i++){
                 pbf_press_button(context, BUTTON_B, 320ms, 320ms);
                 pbf_wait(context, 600ms); //Don't go too fast, have to let the box pop up
                 context.wait_for_all_requests();
@@ -144,7 +144,7 @@ void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControlle
 
     bool shiny_found = false;
 
-    while (!shiny_found) {
+    while (!shiny_found){
         obtain_prize(env, context);
         open_slot_six(env.console, context);
 
@@ -153,7 +153,7 @@ void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControlle
         ShinySymbolDetector shiny_checker(COLOR_YELLOW);
         shiny_found = shiny_checker.read(env.console.logger(), screen);
 
-        if (shiny_found) {
+        if (shiny_found){
             env.log("Shiny found!");
             stats.shinies++;
             send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", screen, true);
@@ -171,7 +171,7 @@ void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControlle
         }
     }
 
-    if (GO_HOME_WHEN_DONE) {
+    if (GO_HOME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 200ms, 1000ms);
     }
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

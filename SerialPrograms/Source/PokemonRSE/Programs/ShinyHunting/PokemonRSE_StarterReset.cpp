@@ -103,11 +103,11 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     */
 
     bool shiny_starter = false;
-    while (!shiny_starter) {
+    while (!shiny_starter){
         env.log("Opening bag and selecting starter.");
         pbf_press_button(context, BUTTON_A, 320ms, 1440ms);
 
-        switch (TARGET) {
+        switch (TARGET){
         case Target::treecko:
             pbf_press_dpad(context, DPAD_LEFT, 320ms, 800ms);
             break;
@@ -182,7 +182,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         ShinyNumberDetector shiny_checker(COLOR_YELLOW);
         shiny_starter = shiny_checker.read(env.console.logger(), screen);
 
-        if (shiny_starter) {
+        if (shiny_starter){
             env.log("Shiny starter detected!");
             stats.shinystarter++;
             send_program_status_notification(env, NOTIFICATION_SHINY_STARTER, "Shiny starter found!", screen, true);

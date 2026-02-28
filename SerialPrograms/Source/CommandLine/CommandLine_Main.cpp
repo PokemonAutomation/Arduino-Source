@@ -29,7 +29,7 @@ int main(int argc, char* argv[]){
     logger.log("Pokemon Automation - Command Line Tool");
 
     // Check if port name argument is provided
-    if (argc < 2) {
+    if (argc < 2){
         logger.log("Usage: " + std::string(argv[0]) + " <port_name>", COLOR_RED);
         logger.log("Example: " + std::string(argv[0]) + " cu.usbserial-0001");
         return 1;
@@ -48,7 +48,7 @@ int main(int argc, char* argv[]){
         controller.wait_for_ready(5000);
 
         // Check if controller is ready
-        if (controller.is_ready()) {
+        if (controller.is_ready()){
             logger.log("Controller is ready!", COLOR_GREEN);
             logger.log("Status: " + controller.current_status());
 
@@ -70,7 +70,7 @@ int main(int argc, char* argv[]){
             logger.log("Status: " + controller.current_status());
         }
 
-    } catch (const std::exception& e) {
+    } catch (const std::exception& e){
         logger.log("Error during controller test: " + std::string(e.what()), COLOR_RED);
     }
 

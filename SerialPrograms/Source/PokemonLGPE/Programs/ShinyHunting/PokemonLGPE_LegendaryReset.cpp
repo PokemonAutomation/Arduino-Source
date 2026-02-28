@@ -96,7 +96,7 @@ bool LegendaryReset::run_encounter(SingleSwitchProgramEnvironment& env, JoyconCo
     BattleArrowWatcher battle_started(COLOR_RED, {0.546, 0.863, 0.045, 0.068});
 
     env.log("Starting battle.");
-    switch (TARGET) {
+    switch (TARGET){
     case Target::mewtwo:
         pbf_mash_button(context, BUTTON_A, 3000ms);
         context.wait_for_all_requests();
@@ -116,13 +116,13 @@ bool LegendaryReset::run_encounter(SingleSwitchProgramEnvironment& env, JoyconCo
 
     int res = run_until<JoyconContext>(
         env.console, context,
-        [&](JoyconContext& context) {
+        [&](JoyconContext& context){
             int ret = wait_until(
                 env.console, context,
                 std::chrono::seconds(90),
                 {{battle_started}}
             );
-            if (ret == 0) {
+            if (ret == 0){
                 env.log("HP boxes detected.");
             }else{
                 stats.errors++;
@@ -169,7 +169,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
 
     size_t consecutive_failures = 0;
 
-    while (true) {
+    while (true){
         env.update_stats();
 
         if (consecutive_failures >= 3){
@@ -182,7 +182,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
 
         try{
             bool encounter_battle = run_encounter(env, context);
-            if (encounter_battle) {
+            if (encounter_battle){
                 stats.shinies++;
                 env.update_stats();
                 send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", env.console.video().snapshot(), true);
@@ -209,7 +209,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
     BattleArrowWatcher catching_started(COLOR_RED, {0.004251, 0.638941, 0.062699, 0.115312});
     int res = run_until<JoyconContext>(
         env.console, context,
-        [&](JoyconContext& context) {
+        [&](JoyconContext& context){
             while(true){
                 if (current_time() - start > std::chrono::minutes(5)){
                     stats.errors++;
@@ -268,7 +268,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
         break;
     }
 
-    if (GO_HOME_WHEN_DONE) {
+    if (GO_HOME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 200ms, 1000ms);
     }
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

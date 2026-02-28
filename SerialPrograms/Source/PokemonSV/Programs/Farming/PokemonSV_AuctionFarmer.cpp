@@ -221,12 +221,12 @@ std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(
     ImageFloatBox top_offer_box(0.05, 0.02, 0.90, 0.49);
     ImageFloatBox bottom_offer_box(0.05, 0.49, 0.90, 0.49);
     std::vector<ImageFloatBox> offer_boxes = {top_offer_box};
-    if (LANGUAGE == Language::Spanish || LANGUAGE == Language::ChineseTraditional) {
+    if (LANGUAGE == Language::Spanish || LANGUAGE == Language::ChineseTraditional){
         offer_boxes.emplace_back(bottom_offer_box);
     }
 
     for (ImagePixelBox dialog_box : dialog_boxes){
-        for (ImageFloatBox offer_box : offer_boxes) {
+        for (ImageFloatBox offer_box : offer_boxes){
             //        std::cout << "dialog_box: ["
             //                << dialog_box.min_x << "," << dialog_box.min_y << "] - ["
             //                << dialog_box.max_x << "," << dialog_box.max_y << "]" << std::endl;
@@ -264,9 +264,9 @@ std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(
             );
 
             result.clear_beyond_log10p(LOG10P_THRESHOLD);
-            if (best_item.empty() && !result.results.empty()) {
+            if (best_item.empty() && !result.results.empty()){
                 auto iter = result.results.begin();
-                if (iter->first < LOG10P_THRESHOLD) {
+                if (iter->first < LOG10P_THRESHOLD){
                     best_item = iter->second.token;
 
                     AuctionOffer offer{ best_item };
@@ -432,7 +432,7 @@ uint64_t read_next_bid(VideoStream& stream, ProControllerContext& context, Langu
         ImageViewRGB32 raw_bid_image = extract_box_reference(screen, box);
         ImagePixelBox bid_bounding_box = ImageMatch::enclosing_rectangle_with_pixel_filter(
             raw_bid_image,
-            [](Color pixel) {
+            [](Color pixel){
                 return (uint32_t)pixel.red() + pixel.green() + pixel.blue() < 250;
             });
 

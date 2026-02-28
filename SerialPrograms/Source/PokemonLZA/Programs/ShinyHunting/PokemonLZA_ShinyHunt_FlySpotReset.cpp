@@ -178,10 +178,10 @@ void route_wild_zone_19(
     ProControllerContext& context,
     ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
     bool to_zoom_to_max){
-    if (run_a_straight_path_in_overworld(env.console, context, -1, 0.375, 6500ms) == 0) {
+    if (run_a_straight_path_in_overworld(env.console, context, -1, 0.375, 6500ms) == 0){
         open_map(env.console, context, to_zoom_to_max, true);
         pbf_move_left_joystick(context, {-0.375, -1}, 100ms, 100ms);
-        if (fly_from_map(env.console, context) == FastTravelState::NOT_AT_FLY_SPOT) {
+        if (fly_from_map(env.console, context) == FastTravelState::NOT_AT_FLY_SPOT){
             pbf_move_left_joystick(context, {-0.375, 0.75}, 100ms, 100ms);
             fly_from_map(env.console, context);
         }
@@ -220,7 +220,7 @@ void route_alpha_pidgey(
     }
     open_map(env.console, context, to_zoom_to_max, true);
     pbf_move_left_joystick(context, {0, -1}, 200ms, 100ms);
-    if (fly_from_map(env.console, context) == FastTravelState::NOT_AT_FLY_SPOT) {
+    if (fly_from_map(env.console, context) == FastTravelState::NOT_AT_FLY_SPOT){
         pbf_move_left_joystick(context, {+1, 0}, 100ms, 100ms);
         fly_from_map(env.console, context);
     }
@@ -317,7 +317,7 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
     });
 
     route_func route;
-    switch (ROUTE) {
+    switch (ROUTE){
     case Route::NO_MOVEMENT:
         route = route_default;
         break;

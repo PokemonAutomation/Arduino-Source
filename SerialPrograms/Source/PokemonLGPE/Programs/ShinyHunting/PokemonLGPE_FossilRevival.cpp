@@ -186,9 +186,9 @@ void FossilRevival::program(SingleSwitchProgramEnvironment& env, CancellableScop
     */
 
     bool shiny_found = false;
-    while (!shiny_found) {
+    while (!shiny_found){
         //Run revives
-        for (uint16_t i = 0; i < NUM_REVIVALS; i++) {
+        for (uint16_t i = 0; i < NUM_REVIVALS; i++){
             env.log("Running trade.");
             run_revives(env, context);
 
@@ -237,12 +237,12 @@ void FossilRevival::program(SingleSwitchProgramEnvironment& env, CancellableScop
 
         //Now check for shinies. Check everything that was traded.
         env.log("Checking received Pokemon.");
-        for (uint16_t i = 0; i < NUM_REVIVALS; i++) {
+        for (uint16_t i = 0; i < NUM_REVIVALS; i++){
             VideoSnapshot screen = env.console.video().snapshot();
             ShinySymbolDetector shiny_checker(COLOR_YELLOW);
             bool check = shiny_checker.read(env.console.logger(), screen);
 
-            if (check) {
+            if (check){
                 env.log("Shiny detected!");
                 stats.shinies++;
                 env.update_stats();
@@ -280,7 +280,7 @@ void FossilRevival::program(SingleSwitchProgramEnvironment& env, CancellableScop
             context.wait_for_all_requests();
         }
         
-        if (!shiny_found) {
+        if (!shiny_found){
             env.log("Out of Pokemon to check and no shiny found. Resetting game.");
             send_program_status_notification(
                 env, NOTIFICATION_STATUS_UPDATE,
@@ -293,7 +293,7 @@ void FossilRevival::program(SingleSwitchProgramEnvironment& env, CancellableScop
         }
     }
 
-    if (GO_HOME_WHEN_DONE) {
+    if (GO_HOME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 200ms, 1000ms);
     }
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

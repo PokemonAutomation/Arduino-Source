@@ -73,7 +73,7 @@ bool AppleSleepController::disable_sleep(CFStringRef prevention_type){
 bool AppleSleepController::enable_sleep(){
     if (m_session_id != kIOPMNullAssertionID){
         auto ret = IOPMAssertionRelease(m_session_id);
-        if (ret != kIOReturnSuccess) {
+        if (ret != kIOReturnSuccess){
             global_logger_tagged().log("Unable to enable sleep. Error code " + std::to_string(ret), COLOR_RED);
             return false;
         }
@@ -94,21 +94,21 @@ void AppleSleepController::update_state(SleepSuppress state){
     // kIOPMAssertionTypeNoDisplaySleep prevents display sleep - Deprecated in 10.7
     // kIOPMAssertionTypeNoIdleSleep prevents idle sleep - Deprecated in 10.7
 
-    switch (state) {
+    switch (state){
     case SleepSuppress::NONE:
-        if (enable_sleep()) {
+        if (enable_sleep()){
             global_logger_tagged().log("Enabled display sleep and OS sleep.", COLOR_BLUE);
         }
         break;
     case SleepSuppress::NO_SLEEP:
         global_logger_tagged().log("Disabling OS sleep...", COLOR_BLUE);
-        if (disable_sleep(kIOPMAssertPreventUserIdleSystemSleep)) {
+        if (disable_sleep(kIOPMAssertPreventUserIdleSystemSleep)){
             global_logger_tagged().log("Disabled OS sleep.", COLOR_BLUE);
         }
         break;
     case SleepSuppress::SCREEN_ON:
         global_logger_tagged().log("Disabling display sleep and OS sleep...", COLOR_BLUE);
-        if (disable_sleep(kIOPMAssertPreventUserIdleDisplaySleep)) {
+        if (disable_sleep(kIOPMAssertPreventUserIdleDisplaySleep)){
             global_logger_tagged().log("Disabled display sleep and OS sleep.", COLOR_BLUE);
         }
         break;

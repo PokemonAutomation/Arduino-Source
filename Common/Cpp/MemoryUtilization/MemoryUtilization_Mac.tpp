@@ -42,13 +42,13 @@ void analyze_vm_regions(){
     std::cout << "Analyzing virtual memory regions for current process..." << std::endl;
 
     // Loop through all virtual memory regions
-    while (true) {
+    while (true){
         kr = mach_vm_region(task, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&info, &info_count, &object_name);
 
-        if (kr == KERN_INVALID_ADDRESS) {
+        if (kr == KERN_INVALID_ADDRESS){
             // Reached the end of the address space
             break;
-        } else if (kr != KERN_SUCCESS) {
+        } else if (kr != KERN_SUCCESS){
             std::cerr << "mach_vm_region failed with error: " << kr << std::endl;
             break;
         }
@@ -61,13 +61,13 @@ void analyze_vm_regions(){
                   << ", size " << size << " bytes"
                   << ", protection: ";
 
-        if (info.protection & VM_PROT_READ) {
+        if (info.protection & VM_PROT_READ){
             std::cout << "R";
         }
-        if (info.protection & VM_PROT_WRITE) {
+        if (info.protection & VM_PROT_WRITE){
             std::cout << "W";
         }
-        if (info.protection & VM_PROT_EXECUTE) {
+        if (info.protection & VM_PROT_EXECUTE){
             std::cout << "X";
         }
         std::cout << std::endl;
@@ -85,10 +85,10 @@ void analyze_vm_regions(){
 MemoryUsage process_memory_usage(){
     MemoryUsage usage;
     static int64_t physical_memory = 0;
-    if (physical_memory == 0) {
+    if (physical_memory == 0){
         int mib[] = {CTL_HW, HW_MEMSIZE};
         size_t length = sizeof(physical_memory);
-        if (sysctl(mib, 2, &physical_memory, &length, NULL, 0) != 0) {
+        if (sysctl(mib, 2, &physical_memory, &length, NULL, 0) != 0){
             std::cerr << "Error calling sysctl()." << std::endl;
         }
     }
@@ -110,9 +110,9 @@ MemoryUsage process_memory_usage(){
         mach_port_t object_name;
         unsigned int pages_swapped_out = 0;
 
-        for (mach_vm_address_t address = 0;; address += size) {
+        for (mach_vm_address_t address = 0;; address += size){
             auto kr = mach_vm_region(mach_task_self(), &address, &size, VM_REGION_EXTENDED_INFO, (vm_region_info_t)&info, &count, &object_name);
-            if (kr != KERN_SUCCESS) {
+            if (kr != KERN_SUCCESS){
                 if (kr == KERN_INVALID_ADDRESS) { // end of the address space
                     break;
                 }
@@ -129,7 +129,7 @@ MemoryUsage process_memory_usage(){
     {
         vm_statistics64_data_t vm_stats;
         mach_msg_type_number_t count = HOST_VM_INFO64_COUNT;
-        if (KERN_SUCCESS == host_statistics64(mach_host_self(), HOST_VM_INFO64, (host_info_t)&vm_stats, &count)) {
+        if (KERN_SUCCESS == host_statistics64(mach_host_self(), HOST_VM_INFO64, (host_info_t)&vm_stats, &count)){
             auto used = vm_stats.active_count + vm_stats.inactive_count +
               vm_stats.speculative_count + vm_stats.wire_count + vm_stats.compressor_page_count
               - vm_stats.purgeable_count - vm_stats.external_page_count;
@@ -142,7 +142,7 @@ MemoryUsage process_memory_usage(){
     {
         vm_statistics_data_t vm_stats;
         mach_msg_type_number_t count = HOST_VM_INFO_COUNT;
-        if (KERN_SUCCESS == host_statistics(mach_host_self(), HOST_VM_INFO, (host_info_t)&vm_stats, &count)) {
+        if (KERN_SUCCESS == host_statistics(mach_host_self(), HOST_VM_INFO, (host_info_t)&vm_stats, &count)){
             usage.total_used_system_memory = (size_t)(vm_stats.active_count + vm_stats.wire_count) * (size_t)vm_page_size;
         }else{
             std::cerr << "Failed to get host statistics." << std::endl;

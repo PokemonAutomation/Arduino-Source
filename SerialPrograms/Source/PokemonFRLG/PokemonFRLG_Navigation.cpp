@@ -63,8 +63,8 @@ void open_slot_six(ConsoleHandle& console, ProControllerContext& context){
 
     int ret = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
-            for (int i = 0; i < 10; i++) {
+        [](ProControllerContext& context){
+            for (int i = 0; i < 10; i++){
                 pbf_press_button(context, BUTTON_B, 320ms, 640ms);
                 pbf_wait(context, 100ms);
                 context.wait_for_all_requests();
@@ -138,7 +138,7 @@ void open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     context.wait_for_all_requests();
 }
 
-bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, bool send_out_lead) {
+bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, bool send_out_lead){
     float shiny_coefficient = 1.0;
     ShinySoundDetector shiny_detector(console.logger(), [&](float error_coefficient) -> bool{
         shiny_coefficient = error_coefficient;
@@ -148,13 +148,13 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
 
     int res = run_until<ProControllerContext>(
         console, context,
-        [&](ProControllerContext& context) {
+        [&](ProControllerContext& context){
             int ret = wait_until(
                 console, context,
                 std::chrono::seconds(30), //More than enough time for shiny sound
                 {{legendary_appeared}}
             );
-            if (ret == 0) {
+            if (ret == 0){
                 console.log("Battle Advance arrow detected.");
             }else{
                 OperationFailedException::fire(
@@ -177,7 +177,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
                 std::chrono::seconds(15),
                 { {battle_menu} }
             );
-            if (ret2 == 0) {
+            if (ret2 == 0){
                 console.log("Battle menu detecteed!");
             }
             else {
@@ -201,7 +201,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
     }
     console.log("No shiny detected.");
 
-    if (send_out_lead) {
+    if (send_out_lead){
         //Send out lead, no shiny detection needed. (Or wanted.)
         BattleMenuWatcher battle_menu(COLOR_RED);
         console.log("Sending out lead Pokemon.");
@@ -212,7 +212,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
             std::chrono::seconds(15),
             { {battle_menu} }
         );
-        if (ret == 0) {
+        if (ret == 0){
             console.log("Battle menu detecteed!");
         }
         else {
@@ -229,7 +229,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
     return false;
 }
 
-void flee_battle(ConsoleHandle& console, ProControllerContext& context) {
+void flee_battle(ConsoleHandle& console, ProControllerContext& context){
     console.log("Navigate to Run.");
     pbf_press_dpad(context, DPAD_RIGHT, 160ms, 160ms);
     pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
@@ -241,7 +241,7 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context) {
         std::chrono::seconds(5),
         {{ran_away}}
     );
-    if (ret2 == 0) {
+    if (ret2 == 0){
         console.log("Running away...");
     }else{
         OperationFailedException::fire(
@@ -258,7 +258,7 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context) {
         std::chrono::seconds(5),
         {{battle_over}}
     );
-    if (ret3 == 0) {
+    if (ret3 == 0){
         console.log("Successfully fled the battle.");
     }else{
         OperationFailedException::fire(

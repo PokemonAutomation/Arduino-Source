@@ -29,12 +29,12 @@ namespace ML{
 // Computes the cryptographic hash of a file.
 std::string create_file_hash(const std::string& filepath){
     QFile file(QString::fromStdString(filepath));
-    if (!file.open(QIODevice::ReadOnly)) {
+    if (!file.open(QIODevice::ReadOnly)){
         return "";
     }
 
     QCryptographicHash hash(QCryptographicHash::Sha256);
-    if (hash.addData(&file)) {
+    if (hash.addData(&file)){
         return hash.result().toHex(0).toStdString();
     }else{
         return "";
@@ -71,18 +71,18 @@ if (use_gpu){
         so.AppendExecutionProvider_CUDA(cuda_options);
         std::cout << "Using CUDA execution provider for GPU acceleration" << std::endl;
         cuda_available = true;
-    } catch (const Ort::Exception& e) {
+    } catch (const Ort::Exception& e){
         std::cout << "CUDA execution provider not available: " << e.what() << std::endl;
     }
 
     // Fallback to DirectML for all GPU vendors (NVIDIA, AMD, Intel)
     // DirectML is built into Windows 10 1903+ and requires no additional runtime installation
     // See: https://onnxruntime.ai/docs/execution-providers/DirectML-ExecutionProvider.html
-    if (!cuda_available) {
+    if (!cuda_available){
         try {
             so.AppendExecutionProvider("DML");
             std::cout << "Using DirectML execution provider for GPU acceleration" << std::endl;
-        } catch (const Ort::Exception& e) {
+        } catch (const Ort::Exception& e){
             std::cout << "DirectML execution provider not available, falling back to CPU: " << e.what() << std::endl;
         }
     }
@@ -171,30 +171,30 @@ void print_model_input_output_info(const Ort::Session& session){
     const auto input_names = session.GetInputNames();
     const auto output_names = session.GetOutputNames();
 
-    for (size_t i = 0; i < input_names.size(); ++i) {
+    for (size_t i = 0; i < input_names.size(); ++i){
         Ort::TypeInfo type_info = session.GetInputTypeInfo(i);
         auto tensor_info = type_info.GetTensorTypeAndShapeInfo();
         std::vector<int64_t> input_dims = tensor_info.GetShape();
 
         std::cout << "Input " << i << ": " << input_names[i] << " Type " << tensor_info.GetElementType() <<  " Shape: [";
-        for (size_t j = 0; j < input_dims.size(); ++j) {
+        for (size_t j = 0; j < input_dims.size(); ++j){
             std::cout << input_dims[j];
-            if (j < input_dims.size() - 1) {
+            if (j < input_dims.size() - 1){
                 std::cout << ", ";
             }
         }
         std::cout << "]" << std::endl;
     }
 
-    for (size_t i = 0; i < output_names.size(); ++i) {
+    for (size_t i = 0; i < output_names.size(); ++i){
         Ort::TypeInfo type_info = session.GetOutputTypeInfo(i);
         auto tensor_info = type_info.GetTensorTypeAndShapeInfo();
         std::vector<int64_t> output_dims = tensor_info.GetShape();
 
         std::cout << "Output " << i << ": " << input_names[i] << " Type " << tensor_info.GetElementType() <<  " Shape: [";
-        for (size_t j = 0; j < output_dims.size(); ++j) {
+        for (size_t j = 0; j < output_dims.size(); ++j){
             std::cout << output_dims[j];
-            if (j < output_dims.size() - 1) {
+            if (j < output_dims.size() - 1){
                 std::cout << ", ";
             }
         }

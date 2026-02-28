@@ -50,7 +50,7 @@ void soft_reset(const ProgramInfo& info, VideoStream& stream, ProControllerConte
     context.wait_for_all_requests();
 }
 
-void flee_battle(VideoStream& stream, ProControllerContext& context) {
+void flee_battle(VideoStream& stream, ProControllerContext& context){
     stream.log("Navigate to Run.");
     pbf_press_dpad(context, DPAD_RIGHT, 160ms, 160ms);
     pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
@@ -62,7 +62,7 @@ void flee_battle(VideoStream& stream, ProControllerContext& context) {
         std::chrono::seconds(5),
         {{ran_away}}
     );
-    if (ret2 == 0) {
+    if (ret2 == 0){
         stream.log("Running away...");
     }else{
         OperationFailedException::fire(
@@ -79,7 +79,7 @@ void flee_battle(VideoStream& stream, ProControllerContext& context) {
         std::chrono::seconds(5),
         {{battle_over}}
     );
-    if (ret3 == 0) {
+    if (ret3 == 0){
         stream.log("Ran from battle.");
     }else{
         OperationFailedException::fire(
@@ -90,7 +90,7 @@ void flee_battle(VideoStream& stream, ProControllerContext& context) {
     }
 }
 
-bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool send_out_lead) {
+bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool send_out_lead){
     float shiny_coefficient = 1.0;
     ShinySoundDetector shiny_detector(stream.logger(), [&](float error_coefficient) -> bool{
         shiny_coefficient = error_coefficient;
@@ -104,13 +104,13 @@ bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool s
 
     int res = run_until<ProControllerContext>(
         stream, context,
-        [&](ProControllerContext& context) {
+        [&](ProControllerContext& context){
             int ret = wait_until(
                 stream, context,
                 std::chrono::seconds(30),
                 {{legendary_appeared}}
             );
-            if (ret == 0) {
+            if (ret == 0){
                 stream.log("Advance arrow detected.");
             }else{
                 OperationFailedException::fire(
@@ -131,7 +131,7 @@ bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool s
     }
     stream.log("Shiny not found.");
 
-    if (send_out_lead) {
+    if (send_out_lead){
         //Send out lead, no shiny detection needed.
         BattleMenuWatcher battle_menu(COLOR_RED);
         stream.log("Sending out lead Pokemon.");
@@ -142,7 +142,7 @@ bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool s
             std::chrono::seconds(15),
             { {battle_menu} }
         );
-        if (ret == 0) {
+        if (ret == 0){
             stream.log("Battle menu detecteed!");
         }
         else {

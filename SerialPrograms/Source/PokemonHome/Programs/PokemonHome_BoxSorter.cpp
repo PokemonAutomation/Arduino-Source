@@ -424,7 +424,7 @@ void read_summary_screen(
     VideoSnapshot screen = env.console.video().snapshot();
 
     const int dex_number = OCR::read_number_waterfill(env.console, extract_box_reference(screen, national_dex_number_box), 0xff808080, 0xffffffff);
-    if (dex_number <= 0 || dex_number > static_cast<int>(NATIONAL_DEX_SLUGS().size())) {
+    if (dex_number <= 0 || dex_number > static_cast<int>(NATIONAL_DEX_SLUGS().size())){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "BoxSorter Check Summary: Unable to read a correct dex number, found: " + std::to_string(dex_number),
@@ -457,7 +457,7 @@ void read_summary_screen(
     cur_pokemon_info.gender = gender;
 
     const int ot_id = OCR::read_number_waterfill(env.console, extract_box_reference(screen, ot_id_box), 0xff808080, 0xffffffff);
-    if (ot_id < 0 || ot_id > 999'999) {
+    if (ot_id < 0 || ot_id > 999'999){
         dump_image(env.console, ProgramInfo(), "ReadSummary_OT", screen);
     }
     cur_pokemon_info.ot_id = ot_id;

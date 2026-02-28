@@ -78,13 +78,13 @@ std::vector<bool> Xoroshiro128Plus::generate_last_bit_sequence(size_t max_advanc
 }
 
 
-std::pair<bool, uint64_t> Xoroshiro128Plus::advances_to_state(Xoroshiro128PlusState other_state, uint64_t max_advances) {
+std::pair<bool, uint64_t> Xoroshiro128Plus::advances_to_state(Xoroshiro128PlusState other_state, uint64_t max_advances){
     Xoroshiro128Plus temp_rng(get_state());
     uint64_t advances = 0;
 
-    while (advances <= max_advances) {
+    while (advances <= max_advances){
         Xoroshiro128PlusState temp_state = temp_rng.get_state();
-        if (temp_state.s0 == other_state.s0 && temp_state.s1 == other_state.s1) {
+        if (temp_state.s0 == other_state.s0 && temp_state.s1 == other_state.s1){
             return { true, advances };
         }
         temp_rng.next();

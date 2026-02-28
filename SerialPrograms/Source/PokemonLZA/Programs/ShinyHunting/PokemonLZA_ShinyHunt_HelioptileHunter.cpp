@@ -82,7 +82,7 @@ ShinyHunt_HelioptileHunter::ShinyHunt_HelioptileHunter()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-bool proper_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+bool proper_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     
     open_map(env.console, context, true, true);
 
@@ -100,14 +100,14 @@ bool proper_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     return (sunnyDetector.detect(screen) || clearDetector.detect(screen));
 }
 
-void bench_loop(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t quantity) {
-    for(size_t i = 0; i < quantity; i++) {
+void bench_loop(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t quantity){
+    for(size_t i = 0; i < quantity; i++){
         sit_on_bench(env.console, context);
         pbf_move_left_joystick(context, {0, -1}, 500ms, 200ms);
     }
 }
 
-void find_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool is_night_time) {
+void find_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool is_night_time){
     context.wait_for_all_requests();
     env.log("Starting weather loop");
     bench_loop(env, context, (is_night_time) ? 1 : 2);
@@ -121,7 +121,7 @@ void find_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& con
     context.wait_for_all_requests();
 }
 
-void reach_bench(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void reach_bench(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //Go to poke center
     pbf_move_left_joystick(context, {-0.141, +1}, 100ms, 200ms);
     pbf_press_button(context, BUTTON_A, 500ms, 500ms);
@@ -151,7 +151,7 @@ void reach_gate(
     env.console.overlay().add_log("Detect Entrance");
 }
 
-void reach_wild_zone(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void reach_wild_zone(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     pbf_move_left_joystick(context, {+0.094, -1}, 200ms, 200ms);
     pbf_press_button(context, BUTTON_A, 500ms, 500ms);
     pbf_press_button(context, BUTTON_A, 500ms, 500ms);
@@ -190,15 +190,15 @@ void ShinyHunt_HelioptileHunter::program(SingleSwitchProgramEnvironment& env, Pr
     // This routine do not care for day/night change as is supposed to stop before time change.
     while(true){
         
-        if (END_AFTER_CYCLE.current_value() > 0 && END_AFTER_CYCLE.current_value() == stats.cycles.load()) {
+        if (END_AFTER_CYCLE.current_value() > 0 && END_AFTER_CYCLE.current_value() == stats.cycles.load()){
             go_home(env.console, context);
             send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
             break;
         }
 
         int hunt_loops = 0;
-        while (hunt_loops < 65) {
-            if (!proper_weather(env,context) || (hunt_loops == 0)) {
+        while (hunt_loops < 65){
+            if (!proper_weather(env,context) || (hunt_loops == 0)){
                 env.log("Not correct weather");
                 reach_bench(env, context);
                 find_weather(env, context, false);

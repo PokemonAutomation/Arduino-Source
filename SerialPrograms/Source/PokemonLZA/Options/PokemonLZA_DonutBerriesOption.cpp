@@ -486,7 +486,7 @@ std::string FlavorPowerTableEntry::get_single_flavor_power_string(int power_inde
         );
     }
 
-    switch (level) {
+    switch (level){
     case Power_Level::any:
         selected_power += "any";
         break;

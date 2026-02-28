@@ -99,13 +99,13 @@ bool BeldumHunter::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             env.console, context,
-            [&](ProControllerContext& context) {
+            [&](ProControllerContext& context){
                 pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 800ms);
                 pbf_wait(context, 5000ms);
             },
             { {entered} }
             );
-        if (ret == 0) {
+        if (ret == 0){
             env.log("Entered the lab.");
         }else{
             env.log("Failed to enter the lab.");
@@ -120,7 +120,7 @@ bool BeldumHunter::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
 
         int res = run_until<ProControllerContext>(
             env.console, context,
-            [&](ProControllerContext& context) {
+            [&](ProControllerContext& context){
 
                 env.log("Go straight toward the elevator.");
                 pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 3680ms);
@@ -144,9 +144,9 @@ bool BeldumHunter::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
             );
         shiny_detector.throw_if_no_sound();
 
-        if (res == 0) {
+        if (res == 0){
             env.log("Shiny detected!");
-            if (TAKE_VIDEO) {
+            if (TAKE_VIDEO){
                 pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
             }
 
@@ -182,7 +182,7 @@ void BeldumHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
             bool shiny_found = run_iteration(env, context);
-            if (shiny_found) {
+            if (shiny_found){
                 stats.shinies++;
                 env.update_stats();
 

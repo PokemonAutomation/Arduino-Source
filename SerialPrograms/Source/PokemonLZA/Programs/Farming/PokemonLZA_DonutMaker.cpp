@@ -256,7 +256,7 @@ bool DonutMaker::match_powers(
     return false;
 }
 
-void DonutMaker::animation_to_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void DonutMaker::animation_to_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
 #if 0
@@ -321,7 +321,7 @@ void DonutMaker::animation_to_donut(SingleSwitchProgramEnvironment& env, ProCont
 #endif
 }
 
-void DonutMaker::add_berries_and_make_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void DonutMaker::add_berries_and_make_donut(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //DonutMaker_Descriptor::Stats& stats = env.current_stats<DonutMaker_Descriptor::Stats>();
 
     env.log("Checking berry count.");
@@ -622,7 +622,7 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     {
         const std::vector<std::unique_ptr<DonutBerriesTableRow>> berries_table = BERRIES.copy_snapshot();
         const size_t num_berries = berries_table.size();
-        if (num_berries < 3 || num_berries > 8) {
+        if (num_berries < 3 || num_berries > 8){
             throw UserSetupError(env.console, "Must have at least 3 berries and no more than 8 berries.");
         }
     }
