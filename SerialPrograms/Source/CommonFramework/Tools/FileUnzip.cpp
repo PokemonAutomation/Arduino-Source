@@ -98,6 +98,18 @@ namespace PokemonAutomation{
         // Get total number of files in the archive
         int num_files = (int)mz_zip_reader_get_num_files(&zip_archive);
 
+        // calculate total uncompressed size
+        uint64_t total_uncompressed_size = 0;
+        for (int i = 0; i < num_files; i++) {
+            mz_zip_archive_file_stat file_stat; // holds info on the specific file
+
+            // fills file_stat with the data for the current index
+            if (!mz_zip_reader_file_stat(&zip_archive, i, &file_stat)) continue;
+
+            total_uncompressed_size += file_stat.m_uncomp_size;
+        }
+
+        uint64_t total_processed_bytes = 0;
         for (int i = 0; i < num_files; i++) {
             mz_zip_archive_file_stat file_stat; // holds info on the specific file
 
@@ -128,12 +140,13 @@ namespace PokemonAutomation{
             }
             
             std::ofstream outFile(out_path, std::ios::binary); // std::ios::binary is to prevent line-ending conversions.
-            ProgressData progress = { &outFile, (uint64_t)file_stat.m_uncomp_size, 0 };
+            ProgressData progress = { &outFile, total_uncompressed_size, total_processed_bytes };
 
             // Extract using the callback
             // decompresses the file in chunks and repeatedly calls write_callback to save those chunks to the disk via the outFile
             mz_zip_reader_extract_to_callback(&zip_archive, i, write_callback, &progress, 0);
             std::cout << "\nFinished: " << file_stat.m_filename << std::endl;
+            total_processed_bytes += file_stat.m_uncomp_size;
         }
 
         mz_zip_reader_end(&zip_archive);
