@@ -184,7 +184,6 @@ StateMachineAction run_state_iteration(
         );
     case 7:
         console.log("Current State: Entrance");
-        std::string boss_slug = global_state.infer_actual_state(console_index).boss;
         run_entrance(
             runtime,
             env, console_index,
