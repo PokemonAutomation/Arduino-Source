@@ -85,20 +85,23 @@ void open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     }
 
     console.log("Navigating to party menu.");
-    pbf_wait(context, 200ms);
-    context.wait_for_all_requests();
-    pbf_press_dpad(context, DPAD_DOWN, 320ms, 320ms);
-    context.wait_for_all_requests();
-
-    pbf_press_button(context, BUTTON_A, 320ms, 640ms);
-
     BlackScreenOverWatcher blk1(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
-    int ret1 = wait_until(
+
+    int pm = run_until<ProControllerContext>(
         console, context,
-        5s,
-        {blk1}
+        [](ProControllerContext& context) {
+            pbf_wait(context, 200ms);
+            context.wait_for_all_requests();
+            pbf_press_dpad(context, DPAD_DOWN, 320ms, 320ms);
+            context.wait_for_all_requests();
+
+            pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+            pbf_wait(context, 5000ms);
+            context.wait_for_all_requests();
+        },
+        { blk1 }
     );
-    if (ret1 == 0){
+    if (pm == 0){
         console.log("Entered party menu.");
     }else{
         console.log("Unable to enter Party menu.", COLOR_RED);
@@ -115,16 +118,18 @@ void open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     pbf_press_dpad(context, DPAD_UP, 320ms, 320ms);
 
     //Two presses to open summary
-    pbf_press_button(context, BUTTON_A, 320ms, 640ms);
-    pbf_press_button(context, BUTTON_A, 320ms, 640ms);
-
     BlackScreenOverWatcher blk2(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
-    int ret2 = wait_until(
+    int sm = run_until<ProControllerContext>(
         console, context,
-        5s,
-        {blk2}
+        [](ProControllerContext& context) {
+            pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+            pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+            pbf_wait(context, 5000ms);
+            context.wait_for_all_requests();
+        },
+        { blk2 }
     );
-    if (ret2 == 0){
+    if (sm == 0){
         console.log("Entered summary.");
     }else{
         console.log("Unable to enter summary.", COLOR_RED);

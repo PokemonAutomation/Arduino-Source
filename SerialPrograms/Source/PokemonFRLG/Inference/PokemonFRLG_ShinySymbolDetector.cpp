@@ -22,7 +22,7 @@ namespace NintendoSwitch{
 namespace PokemonFRLG{
 
 ShinySymbolDetector::ShinySymbolDetector(Color color)
-    : m_box_symbol(0.430, 0.208, 0.048, 0.078)
+    : m_box_symbol(0.436, 0.211, 0.033, 0.060)
 {}
 void ShinySymbolDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box_symbol);
