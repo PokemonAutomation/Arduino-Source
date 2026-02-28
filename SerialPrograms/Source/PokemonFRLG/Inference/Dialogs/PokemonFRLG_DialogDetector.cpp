@@ -26,9 +26,9 @@ namespace NintendoSwitch{
 namespace PokemonFRLG{
 
 WhiteDialogDetector::WhiteDialogDetector(Color color)
-    : m_right_box(0.812, 0.726, 0.013, 0.169)
-    , m_top_box(0.175, 0.715, 0.649, 0.005)
-    , m_bottom_box(0.177, 0.896, 0.645, 0.008)
+    : m_right_box(0.844, 0.725, 0.005, 0.197)
+    , m_top_box(0.151, 0.719, 0.698, 0.006)
+    , m_bottom_box(0.152, 0.913, 0.692, 0.009)
 {}
 void WhiteDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_right_box);
@@ -49,10 +49,10 @@ bool WhiteDialogDetector::detect(const ImageViewRGB32& screen){
 }
 
 AdvanceWhiteDialogDetector::AdvanceWhiteDialogDetector(Color color)
-    : m_dialog_box(0.170, 0.726, 0.655, 0.172)
-    , m_right_box(0.812, 0.726, 0.013, 0.169)
-    , m_top_box(0.175, 0.715, 0.649, 0.005)
-    , m_bottom_box(0.177, 0.896, 0.645, 0.008)
+    : m_dialog_box(0.145, 0.727, 0.707, 0.193)
+    , m_right_box(0.844, 0.725, 0.005, 0.197)
+    , m_top_box(0.151, 0.719, 0.698, 0.006)
+    , m_bottom_box(0.152, 0.913, 0.692, 0.009)
 {}
 void AdvanceWhiteDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_dialog_box);
@@ -94,10 +94,10 @@ bool AdvanceWhiteDialogDetector::detect(const ImageViewRGB32& screen){
 }
 
 SelectionDialogDetector::SelectionDialogDetector(Color color)
-    : m_right_box(0.812, 0.726, 0.013, 0.169)
-    , m_top_box(0.175, 0.715, 0.649, 0.005)
-    , m_bottom_box(0.177, 0.896, 0.645, 0.008)
-    , m_selection_box(0.783, 0.457, 0.017, 0.177)
+    : m_right_box(0.844, 0.725, 0.005, 0.197)
+    , m_top_box(00.151, 0.719, 0.698, 0.006)
+    , m_bottom_box(0.152, 0.913, 0.692, 0.009)
+    , m_selection_box(0.813, 0.436, 0.013, 0.195)
 {}
 void SelectionDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_right_box);
@@ -121,8 +121,8 @@ bool SelectionDialogDetector::detect(const ImageViewRGB32& screen){
 }
 
 BattleDialogDetector::BattleDialogDetector(Color color)
-    : m_dialog_top_box(0.152, 0.721, 0.694, 0.008)
-    , m_dialog_right_box(0.842, 0.730, 0.004, 0.171)
+    : m_dialog_top_box(0.124, 0.727, 0.752, 0.009)
+    , m_dialog_right_box(0.871, 0.736, 0.005, 0.179)
 {}
 void BattleDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_dialog_top_box);
@@ -142,10 +142,10 @@ bool BattleDialogDetector::detect(const ImageViewRGB32& screen){
 
 
 BattleMenuDetector::BattleMenuDetector(Color color)
-    : m_menu_top_box(0.522, 0.716, 0.331, 0.011)
-    , m_menu_right_box(0.845, 0.727, 0.008, 0.175)
-    , m_dialog_top_box(0.153, 0.720, 0.343, 0.014) //top of the white dialog box
-    , m_dialog_right_box(0.486, 0.722, 0.009, 0.177) //right side, closest to the menu
+    : m_menu_top_box(0.523, 0.720, 0.357, 0.008) //top of the white dialog box
+    , m_menu_right_box(0.875, 0.729, 0.005, 0.193)
+    , m_dialog_top_box(0.123, 0.726, 0.373, 0.013)
+    , m_dialog_right_box(0.492, 0.739, 0.005, 0.172) //right side, closest to the menu
 {}
 void BattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_menu_top_box);
@@ -174,9 +174,9 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
 
 
 AdvanceBattleDialogDetector::AdvanceBattleDialogDetector(Color color)
-    : m_dialog_box(0.152, 0.721, 0.694, 0.177)
-    , m_dialog_top_box(0.152, 0.721, 0.694, 0.008)
-    , m_dialog_right_box(0.842, 0.730, 0.004, 0.171)
+    : m_dialog_box(0.123, 0.725, 0.753, 0.197)
+    , m_dialog_top_box(0.124, 0.727, 0.752, 0.009)
+    , m_dialog_right_box(0.871, 0.736, 0.005, 0.179)
 {}
 void AdvanceBattleDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_dialog_box);
