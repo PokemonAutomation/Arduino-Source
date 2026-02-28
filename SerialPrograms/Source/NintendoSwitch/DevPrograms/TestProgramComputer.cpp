@@ -375,7 +375,9 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
 #if 1
-    unzip_file(SETTINGS_PATH() + "test2.zip", SETTINGS_PATH() + "testB/");
+    std::string zip_path = SETTINGS_PATH() + "test2.zip";
+    std::string target_dir = SETTINGS_PATH() + "testB/";
+    unzip_file(zip_path.c_str(), target_dir.c_str());
 
 #endif
 

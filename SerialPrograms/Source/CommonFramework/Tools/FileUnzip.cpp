@@ -72,22 +72,40 @@ namespace PokemonAutomation{
     // }
 
 
-    // ensure that entry_name is inside target_dir.
-    // to prevent path traversal attacks.
+    // ensure that entry_name is inside target_dir, to prevent path traversal attacks.
     bool is_safe(const std::string& target_dir, const std::string& entry_name) {
-        fs::path base = fs::absolute(target_dir);
-        // Join paths and resolve all '../'. Unlike canonical, this works even if the file doesn't exist yet.
-        fs::path final_path = fs::weakly_canonical(base / entry_name);
-        
-        // Check if the final path is still within the base directory
-        // this compares base and final_path, trying to find the first mismatch
-        // if the final_path is a descendent directory of base, 
-        // then the position of the first mismatch should be the end of base.
-        auto [root, relative] = std::mismatch(base.begin(), base.end(), final_path.begin());
-        return root == base.end();
+        try {
+            // 1. Get absolute, normalized paths
+            // handles symlinks. and resolves .. and . components. throws error if path doesn't exist
+            fs::path base = fs::canonical(target_dir);
+            // confirms that base is a directory, and not a file
+            if (!fs::is_directory(base)) return false;
+            
+            // resolves .. and . components and returns an absolute path without requiring the final path to exist.
+            fs::path target = fs::weakly_canonical(base / entry_name);
+
+            // cout << base << endl;
+            // cout << target << endl;
+
+            // 2. Use lexically_relative to find the path from base to target
+            fs::path rel = target.lexically_relative(base);
+
+            // 3. Validation:
+            // - If rel is empty, they are likely different roots
+            // - If rel starts with "..", it escaped the base
+            // - If rel is ".", it IS the base directory (usually safe)
+            if (rel.empty() || *rel.begin() == "..") {
+                return false;
+            }
+
+            return true;
+        } catch (...) {
+            cout << "target_dir path doesn't exist." << endl;
+            return false;
+        }
     }
 
-    void unzip_all(const char* zip_path, const char* target_dir) {
+    void unzip_file(const char* zip_path, const char* target_dir) {
         mz_zip_archive zip_archive;
         memset(&zip_archive, 0, sizeof(zip_archive));
 
@@ -126,17 +144,17 @@ namespace PokemonAutomation{
             std::string out_path = std::string(target_dir) + "/" + file_stat.m_filename;
             fs::path const parent_dir{fs::path(out_path).parent_path()};
 
-            // ensure that entry_name is inside target_dir. to prevent path traversal attacks.
-            if (!is_safe(target_dir, file_stat.m_filename)){
-                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "unzip_all: Attempted to unzip a file that was trying to leave its base directory. This is a security risk.");
-            }
-
             // Create the entire directory, including intermediate directories for this file
             std::error_code ec{};
             fs::create_directories(parent_dir, ec);
             if (ec) {
                 std::cerr << "Error creating " << parent_dir << ": " << ec.message() << std::endl;
                 ec.clear(); 
+            }
+
+            // ensure that entry_name is inside target_dir. to prevent path traversal attacks.
+            if (!is_safe(target_dir, file_stat.m_filename)){
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "unzip_all: Attempted to unzip a file that was trying to leave its base directory. This is a security risk.");
             }
             
             std::ofstream outFile(out_path, std::ios::binary); // std::ios::binary is to prevent line-ending conversions.
@@ -152,32 +170,32 @@ namespace PokemonAutomation{
         mz_zip_reader_end(&zip_archive);
     }
 
-    void unzip_file(const std::string& zip_path, const std::string& output_dir) {
-        cout << "try to unzip the file." << endl;
-        miniz_cpp::zip_file archive(zip_path);
+    // void unzip_file(const std::string& zip_path, const std::string& output_dir) {
+    //     cout << "try to unzip the file." << endl;
+    //     miniz_cpp::zip_file archive(zip_path);
 
-        // create folder structure before extracting.
-        // since miniz-cpp does not automatically create subdirectories if they exist within the zip archive
-        std::vector<miniz_cpp::zip_info> const info_list = archive.infolist();
-        auto const current_directory = std::filesystem::current_path();
-        std::error_code ec{};
-        for(miniz_cpp::zip_info const & info: info_list ){
-            std::filesystem::path const p{(std::filesystem::path(output_dir) / info.filename).parent_path()};
-            // Create the entire directory tree for this file
-            std::filesystem::create_directories(p, ec);
+    //     // create folder structure before extracting.
+    //     // since miniz-cpp does not automatically create subdirectories if they exist within the zip archive
+    //     std::vector<miniz_cpp::zip_info> const info_list = archive.infolist();
+    //     auto const current_directory = std::filesystem::current_path();
+    //     std::error_code ec{};
+    //     for(miniz_cpp::zip_info const & info: info_list ){
+    //         std::filesystem::path const p{(std::filesystem::path(output_dir) / info.filename).parent_path()};
+    //         // Create the entire directory tree for this file
+    //         std::filesystem::create_directories(p, ec);
             
-            if (ec) {
-                std::cerr << "Error creating " << p << ": " << ec.message() << std::endl;
-                ec.clear(); 
-            }
-        }
+    //         if (ec) {
+    //             std::cerr << "Error creating " << p << ": " << ec.message() << std::endl;
+    //             ec.clear(); 
+    //         }
+    //     }
 
-        // Extract all files to the specified path
-        archive.extractall(output_dir);
+    //     // Extract all files to the specified path
+    //     archive.extractall(output_dir);
 
-        cout << "done unzipping the file." << endl;
+    //     cout << "done unzipping the file." << endl;
 
-    }
+    // }
 
 
 }
