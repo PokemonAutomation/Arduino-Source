@@ -37,7 +37,7 @@ public:
     virtual bool detect(const ImageViewRGB32& screen) override;
 
     const std::vector<DetectionBox>& detected_boxes() const { return m_output_boxes; }
-    std::vector<DetectionBox>& detected_boxes() { return m_output_boxes; }
+    std::vector<DetectionBox>& detected_boxes(){ return m_output_boxes; }
 
     const std::unique_ptr<YOLOv5Session>& session() const { return m_yolo_session; }
 

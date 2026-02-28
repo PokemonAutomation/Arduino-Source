@@ -36,7 +36,7 @@ std::string create_file_hash(const std::string& filepath){
     QCryptographicHash hash(QCryptographicHash::Sha256);
     if (hash.addData(&file)) {
         return hash.result().toHex(0).toStdString();
-    } else {
+    }else{
         return "";
     }
 }

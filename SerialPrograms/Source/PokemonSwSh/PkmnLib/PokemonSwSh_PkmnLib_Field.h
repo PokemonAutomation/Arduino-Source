@@ -57,11 +57,11 @@ public:
     bool is_hail() const{ return m_current_weather == Weather::HAIL; }
 
     // set the weather
-    void set_rain() { m_current_weather = Weather::RAIN; }
-    void set_sun() { m_current_weather = Weather::SUN; }
-    void set_sandstorm() { m_current_weather = Weather::SANDSTORM; }
-    void set_hail() { m_current_weather = Weather::HAIL; }
-    void set_clear() { m_current_weather = Weather::CLEAR; }
+    void set_rain(){ m_current_weather = Weather::RAIN; }
+    void set_sun(){ m_current_weather = Weather::SUN; }
+    void set_sandstorm(){ m_current_weather = Weather::SANDSTORM; }
+    void set_hail(){ m_current_weather = Weather::HAIL; }
+    void set_clear(){ m_current_weather = Weather::CLEAR; }
 
     // terrain-related queries
     Terrain terrain() const{ return m_current_terrain; }
@@ -72,11 +72,11 @@ public:
     bool is_none_terrain() const{ return m_current_terrain == Terrain::NONE; }
 
     // set the terrain
-    void set_electric() { m_current_terrain = Terrain::ELECTRIC; }
-    void set_grassy() { m_current_terrain = Terrain::GRASSY; }
-    void set_misty() { m_current_terrain = Terrain::MISTY; }
-    void set_psychic() { m_current_terrain = Terrain::PSYCHIC; }
-    void set_none_terrain() { m_current_terrain = Terrain::NONE; }
+    void set_electric(){ m_current_terrain = Terrain::ELECTRIC; }
+    void set_grassy(){ m_current_terrain = Terrain::GRASSY; }
+    void set_misty(){ m_current_terrain = Terrain::MISTY; }
+    void set_psychic(){ m_current_terrain = Terrain::PSYCHIC; }
+    void set_none_terrain(){ m_current_terrain = Terrain::NONE; }
 
     // reset field
     void reset(){

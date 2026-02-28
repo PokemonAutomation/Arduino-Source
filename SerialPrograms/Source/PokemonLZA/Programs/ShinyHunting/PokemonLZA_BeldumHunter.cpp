@@ -107,7 +107,7 @@ bool BeldumHunter::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
             );
         if (ret == 0) {
             env.log("Entered the lab.");
-        } else {
+        }else{
             env.log("Failed to enter the lab.");
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,

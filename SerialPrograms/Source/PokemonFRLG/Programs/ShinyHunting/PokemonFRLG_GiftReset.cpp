@@ -135,7 +135,7 @@ void GiftReset::obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControlle
                     env.log("First selection box detected. YES to starter.");
                     seen_selection_arrow = true;
                     pbf_press_button(context, BUTTON_A, 320ms, 640ms);
-                } else {
+                }else{
                     env.log("Selection box detected. NO to nickname.");
                     pbf_press_button(context, BUTTON_B, 320ms, 640ms);
                     context.wait_for_all_requests();
@@ -150,7 +150,7 @@ void GiftReset::obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControlle
                 }
                 pbf_press_button(context, BUTTON_B, 320ms, 640ms);
 
-            } else {
+            }else{
                 env.log("Second selection box detected. NO to nickname.");
                 pbf_press_button(context, BUTTON_B, 320ms, 640ms);
                 //seen_nickname_arrow = true;
@@ -317,7 +317,7 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     while (!shiny_starter) {
         if (TARGET != Target::lapras && TARGET != Target::fossils) {
             obtain_pokemon(env, context);
-        } else {
+        }else{
             obtain_lapras(env, context);
         }
         open_summary(env, context);
@@ -332,7 +332,7 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             stats.shinies++;
             send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", screen, true);
             break;
-        } else {
+        }else{
             env.log("Pokemon is not shiny.");
             env.log("Soft resetting.");
             send_program_status_notification(

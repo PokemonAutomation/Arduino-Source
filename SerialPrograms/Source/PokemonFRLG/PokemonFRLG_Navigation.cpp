@@ -156,7 +156,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
             );
             if (ret == 0) {
                 console.log("Battle Advance arrow detected.");
-            } else {
+            }else{
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "handle_encounter(): Did not detect battle advance arrow.",
@@ -243,7 +243,7 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context) {
     );
     if (ret2 == 0) {
         console.log("Running away...");
-    } else {
+    }else{
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "flee_battle(): Unable to navigate to flee button.",
@@ -260,7 +260,7 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context) {
     );
     if (ret3 == 0) {
         console.log("Successfully fled the battle.");
-    } else {
+    }else{
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "flee_battle(): Unable to flee from battle.",

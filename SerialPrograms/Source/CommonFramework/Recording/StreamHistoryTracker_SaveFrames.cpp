@@ -360,7 +360,7 @@ bool StreamHistoryTracker::save(const std::string& filename) const{
 }
 
 
-void StreamHistoryTracker::worker_loop() {
+void StreamHistoryTracker::worker_loop(){
     while (!m_stopping) {
         std::shared_ptr<const VideoFrame> frame;
 

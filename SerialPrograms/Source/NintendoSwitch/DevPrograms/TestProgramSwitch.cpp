@@ -312,7 +312,7 @@ public:
         m_area_ratio_upper = 1.1;
     }
 
-    static const ImageMatch::WaterfillTemplateMatcher& instance() {
+    static const ImageMatch::WaterfillTemplateMatcher& instance(){
         static DialogTitleGreenLineMatcher matcher;
         return matcher;
     }

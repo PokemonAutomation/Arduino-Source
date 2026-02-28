@@ -124,7 +124,7 @@ void ImageAnnotationDisplayWidget::key_release(QKeyEvent* event){
         if (m_shift_pressed){
             // Shift+Z: go back 10 images
             m_selector_widget->go_to_image_by_index_offset(-10);
-        } else {
+        }else{
             // Z: go to previous image
             m_selector_widget->go_to_image_by_index_offset(-1);
         }
@@ -132,7 +132,7 @@ void ImageAnnotationDisplayWidget::key_release(QKeyEvent* event){
         if (m_shift_pressed){
             // Shift+X: go forward 10 images
             m_selector_widget->go_to_image_by_index_offset(10);
-        } else {
+        }else{
             // X: go to next image
             m_selector_widget->go_to_image_by_index_offset(1);
         }

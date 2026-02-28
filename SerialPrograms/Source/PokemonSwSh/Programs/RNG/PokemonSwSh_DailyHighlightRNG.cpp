@@ -33,7 +33,7 @@ namespace PokemonSwSh{
 using namespace Pokemon;
 
 
-const DailyHighlightDatabase& DAILY_HIGHLIGHT_DATABASE() {
+const DailyHighlightDatabase& DAILY_HIGHLIGHT_DATABASE(){
     static DailyHighlightDatabase database("PokemonSwSh/DailyHighlights.json");
     return database;
 }
@@ -502,7 +502,7 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, ProControll
             env.console.overlay().add_log("Initial RNG state:", COLOR_WHITE);
             rng = Xoroshiro128Plus(find_rng_state(env.console, context, SAVE_SCREENSHOTS, LOG_VALUES));
             stats.reads++;
-        } else {
+        }else{
             env.log("Refinding rng state.");
             env.console.overlay().add_log("New RNG state:", COLOR_WHITE);
             rng = Xoroshiro128Plus(refind_rng_state(env.console, context, rng.get_state(), 0, MAX_UNKNOWN_ADVANCES, SAVE_SCREENSHOTS, LOG_VALUES));

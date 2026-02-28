@@ -124,7 +124,7 @@ bool LegendaryReset::run_encounter(SingleSwitchProgramEnvironment& env, JoyconCo
             );
             if (ret == 0) {
                 env.log("HP boxes detected.");
-            } else {
+            }else{
                 stats.errors++;
                 env.update_stats();
                 OperationFailedException::fire(

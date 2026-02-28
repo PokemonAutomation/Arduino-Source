@@ -239,7 +239,7 @@ CameraAngle quest_photo_navi(
 
             if (console.state().console_type() == ConsoleType::Switch1) {
                 jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8000ms, 11200ms, 2400ms);
-            } else { //Switch 2
+            }else{ //Switch 2
                 jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8000ms, 10400ms, 2400ms);
             }
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
@@ -262,7 +262,7 @@ CameraAngle quest_photo_navi(
 
             if (console.state().console_type() == ConsoleType::Switch1) {
                 jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1600ms, 4600ms, 1600ms);
-            } else { //Switch 2
+            }else{ //Switch 2
                 jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1600ms, 400ms, 1600ms);
             }
 
@@ -528,7 +528,7 @@ void quest_catch_navi(
 
             if (console.state().console_type() == ConsoleType::Switch1) {
                 pbf_move_left_joystick(context, {0, +1}, 1600ms, 160ms);
-            } else {
+            }else{
                 pbf_move_left_joystick(context, {0, +1}, 1360ms, 160ms);
             }
 
@@ -539,7 +539,7 @@ void quest_catch_navi(
 
             if (console.state().console_type() == ConsoleType::Switch1) {
                 pbf_move_left_joystick(context, {0, +1}, 800ms, 160ms);
-            } else {
+            }else{
                 pbf_move_left_joystick(context, {0, +1}, 960ms, 160ms);
             }
             pbf_wait(context, 3200ms);
@@ -574,7 +574,7 @@ void quest_catch_navi(
 
             if (console.state().console_type() == ConsoleType::Switch1) {
                 jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1600ms, 4600ms, 1600ms);
-            } else { //Switch 2
+            }else{ //Switch 2
                 jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1600ms, 4000ms, 1600ms);
             }
 
@@ -595,7 +595,7 @@ void quest_catch_navi(
 
             if (console.state().console_type() == ConsoleType::Switch1) {
                 jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8000ms, 14400ms, 2400ms);
-            } else {
+            }else{
                 jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8000ms, 12800ms, 2400ms);
             }
 

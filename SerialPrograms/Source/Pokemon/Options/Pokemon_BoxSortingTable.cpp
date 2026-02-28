@@ -54,7 +54,7 @@ BoxSortingTable::BoxSortingTable(std::string label)
 {}
 
 BoxSortingTable::BoxSortingTable(std::string label, const std::vector<SortingRuleType>& allowed_rules)
-    : BoxSortingTableDatabaseHelper([&allowed_rules]() {
+    : BoxSortingTableDatabaseHelper([&allowed_rules](){
         // Build custom database from allowed rules
         const EnumDropdownDatabase<SortingRuleType>& full_db = SortingRuleType_Database();
         auto custom_db = std::make_shared<EnumDropdownDatabase<SortingRuleType>>();

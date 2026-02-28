@@ -193,7 +193,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                     if (save_successful) {
                         env.console.overlay().add_log("Game Saved Successfully", COLOR_BLUE);
                         rounds_since_last_save = 0;
-                    } else {
+                    }else{
                         env.console.overlay().add_log("Game Save Failed. Will attempt to save after the next reset.", COLOR_RED);
                     }
                 }

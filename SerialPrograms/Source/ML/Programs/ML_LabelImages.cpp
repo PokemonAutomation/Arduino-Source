@@ -606,7 +606,7 @@ void LabelImages::select_prev_annotation(){
         m_selected_obj_idx = m_annotations.size() - 1;
     } else if (m_selected_obj_idx == 0){
         m_selected_obj_idx = m_annotations.size() - 1;
-    } else {
+    }else{
         m_selected_obj_idx--;
     }
 
@@ -624,7 +624,7 @@ void LabelImages::select_next_annotation(){
         m_selected_obj_idx = 0;
     } else if (m_selected_obj_idx + 1 == m_annotations.size()){
         m_selected_obj_idx = 0;
-    } else {
+    }else{
         m_selected_obj_idx++;
     }
 
@@ -647,7 +647,7 @@ void LabelImages::on_config_value_changed(void* object){
             FORM_LABEL.set_visibility(ConfigOptionState::HIDDEN);
             CUSTOM_SET_LABEL.set_visibility(ConfigOptionState::ENABLED);
             MANUAL_LABEL.set_visibility(ConfigOptionState::HIDDEN);
-        } else { // value == 2
+        }else{ // value == 2
             FORM_LABEL.set_visibility(ConfigOptionState::HIDDEN);
             CUSTOM_SET_LABEL.set_visibility(ConfigOptionState::HIDDEN);
             MANUAL_LABEL.set_visibility(ConfigOptionState::ENABLED);

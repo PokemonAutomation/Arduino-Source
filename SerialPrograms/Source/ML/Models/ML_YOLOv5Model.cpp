@@ -159,7 +159,7 @@ YOLOv5Session::YOLOv5Session(const std::string& model_path, bool use_gpu)
                 global_logger_tagged().log("YOLOv5: Extracted " + std::to_string(m_label_names.size()) +
                                             " labels from model metadata", COLOR_GREEN);
             }
-        } else {
+        }else{
             throw std::runtime_error("YOLOv5 model does not have 'names' metadata to extract labels from");
         }
     } catch (const std::exception& e){

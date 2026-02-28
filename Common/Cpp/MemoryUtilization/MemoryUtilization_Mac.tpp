@@ -24,7 +24,7 @@ namespace PokemonAutomation{
 /**
  * @brief Retrieves and analyzes the virtual memory regions of the current process.
  */
-void analyze_vm_regions() {
+void analyze_vm_regions(){
     kern_return_t kr;
     mach_port_t task = mach_task_self();
 
@@ -99,7 +99,7 @@ MemoryUsage process_memory_usage(){
         if(KERN_SUCCESS == task_info(mach_task_self(), TASK_VM_INFO, (task_info_t) &tvi, &count))
         {
             usage.process_physical_memory = tvi.resident_size; // resident_size = internal + external + reusable
-        } else {
+        }else{
             std::cerr << "Failed to get task info." << std::endl;
         }
     }
@@ -134,7 +134,7 @@ MemoryUsage process_memory_usage(){
               vm_stats.speculative_count + vm_stats.wire_count + vm_stats.compressor_page_count
               - vm_stats.purgeable_count - vm_stats.external_page_count;
             usage.total_used_system_memory = (size_t)used * (size_t)vm_page_size;
-        } else {
+        }else{
             std::cerr << "Failed to get host statistics64." << std::endl;
         }
     }
@@ -144,7 +144,7 @@ MemoryUsage process_memory_usage(){
         mach_msg_type_number_t count = HOST_VM_INFO_COUNT;
         if (KERN_SUCCESS == host_statistics(mach_host_self(), HOST_VM_INFO, (host_info_t)&vm_stats, &count)) {
             usage.total_used_system_memory = (size_t)(vm_stats.active_count + vm_stats.wire_count) * (size_t)vm_page_size;
-        } else {
+        }else{
             std::cerr << "Failed to get host statistics." << std::endl;
         }
     }

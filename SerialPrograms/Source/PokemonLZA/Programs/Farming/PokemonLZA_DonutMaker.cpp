@@ -248,7 +248,7 @@ bool DonutMaker::match_powers(
             env.update_stats();
             send_program_status_notification(env, NOTIFICATION_DONUT_FOUND, "Match found! Keeping donut.", screen, true);
             return true;
-        } else {
+        }else{
             env.log("Matched donut exceeds all keep limits.");
         }
     }

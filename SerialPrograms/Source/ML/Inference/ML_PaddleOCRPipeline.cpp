@@ -124,7 +124,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image) {
         // static int i = 0;
         // cv::imwrite("output" + std::to_string(i) + ".png", cropped_image);
         // i++;
-    } else {
+    }else{
         return ""; // Return empty string if no text is detected in the region
     }
     

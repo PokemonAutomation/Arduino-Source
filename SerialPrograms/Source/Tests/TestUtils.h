@@ -90,7 +90,7 @@ public:
 // the video inference code that relies on a VideoFeed.
 class DummyVideoFeed: public VideoFeed{
 public:
-    DummyVideoFeed() {}
+    DummyVideoFeed(){}
 
     virtual void add_frame_listener(VideoFrameListener& listener) override{}
     virtual void remove_frame_listener(VideoFrameListener& listener) override{}
@@ -109,7 +109,7 @@ public:
 // the video inference code that relies on a VideoOverlay.
 class DummyVideoOverlay: public VideoOverlay{
 public:
-    DummyVideoOverlay() {}
+    DummyVideoOverlay(){}
 
     virtual void add_box(const OverlayBox& box) override{}
     virtual void remove_box(const OverlayBox& box) override{}
@@ -131,7 +131,7 @@ public:
 // the audio inference code that relies on an AudioFeed.
 class DummyAudioFeed: public AudioFeed{
 public:
-    DummyAudioFeed() {}
+    DummyAudioFeed(){}
     virtual void reset() override {}
 
     virtual std::vector<AudioSpectrum> spectrums_since(uint64_t starting_seqnum) override { return std::vector<AudioSpectrum>(); }

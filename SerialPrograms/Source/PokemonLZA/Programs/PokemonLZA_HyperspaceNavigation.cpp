@@ -80,7 +80,7 @@ void detect_interactable(
             "detect_interactable_pad(): Cannot detect interactable after 5 seconds",
             console
         );
-    } else {
+    }else{
         console.log("Detected warp pad.");
     }
 }

@@ -238,7 +238,7 @@ int test_pokemonLZA_BoxCellInfoDetector(const ImageViewRGB32& image, const std::
         expected_something_in_cell = true;
         expected_shiny = true;
         expected_alpha = true;
-    } else {
+    }else{
         cerr << "Error: second-to-last word must be 'Empty', 'Shiny', 'Alpha', or 'ShinyAlpha', got '" << status_word << "'." << endl;
         return 1;
     }
@@ -262,7 +262,7 @@ int test_pokemonLZA_BoxCellInfoDetector(const ImageViewRGB32& image, const std::
             return 1;
         }
         expected_dex_number = static_cast<uint16_t>(dex_num_int);
-    } else {
+    }else{
         cerr << "Error: last word must be 'None', 'L<number>', or 'H<number>', got '" << dex_info_word << "'." << endl;
         return 1;
     }
@@ -692,7 +692,7 @@ int test_pokemonLZA_FlavorPowerScreenDetector(const std::string& filepath){
             if (power_slug.empty()){
                 output_file << "empty" << endl;
                 cout << "  Slot " << i << ": empty" << endl;
-            } else {
+            }else{
                 output_file << power_slug << endl;
                 cout << "  Slot " << i << ": " << power_slug << endl;
             }
@@ -734,7 +734,7 @@ int test_pokemonLZA_FlavorPowerScreenDetector(const std::string& filepath){
                 cerr << "Error: Slot " << i << " - expected empty but icon detector detected level: " << detected_power_level << endl;
                 return 1;
             }
-        } else {
+        }else{
             TEST_RESULT_COMPONENT_EQUAL(detected_power_slug, expected_power, "power slug for slot " + std::to_string(i));
 
             // Verify that power level from icon matches the slug
@@ -818,7 +818,7 @@ int test_pokemonLZA_DonutBerriesReader(const std::string& filepath){
             if (results.results.empty()){
                 cerr << "Warning: No berry detected via OCR at slot " << i << endl;
                 output_file << "unknown-berry" << endl;
-            } else {
+            }else{
                 std::string best_match_ocr = results.results.begin()->second.token;
                 output_file << best_match_ocr << endl;
                 cout << "  Slot " << i << ": " << best_match_ocr << endl;

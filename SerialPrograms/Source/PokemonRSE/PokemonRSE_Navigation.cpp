@@ -64,7 +64,7 @@ void flee_battle(VideoStream& stream, ProControllerContext& context) {
     );
     if (ret2 == 0) {
         stream.log("Running away...");
-    } else {
+    }else{
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "handle_encounter(): Unable to navigate to flee button.",
@@ -81,7 +81,7 @@ void flee_battle(VideoStream& stream, ProControllerContext& context) {
     );
     if (ret3 == 0) {
         stream.log("Ran from battle.");
-    } else {
+    }else{
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "handle_encounter(): Unable to flee from battle.",
@@ -112,7 +112,7 @@ bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool s
             );
             if (ret == 0) {
                 stream.log("Advance arrow detected.");
-            } else {
+            }else{
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "handle_encounter(): Did not detect battle start.",

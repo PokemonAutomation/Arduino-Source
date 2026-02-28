@@ -65,7 +65,7 @@ int main(int argc, char* argv[]){
             controller.wait_for_all_requests();
 
             logger.log("A button mashing completed!", COLOR_GREEN);
-        } else {
+        }else{
             logger.log("Controller is not ready!", COLOR_RED);
             logger.log("Status: " + controller.current_status());
         }

@@ -185,7 +185,7 @@ void route_wild_zone_19(
             pbf_move_left_joystick(context, {-0.375, 0.75}, 100ms, 100ms);
             fly_from_map(env.console, context);
         }
-    } else {
+    }else{
         open_map(env.console, context, to_zoom_to_max, true);
         pbf_move_left_joystick(context, {-0.5, 0}, 100ms, 100ms);
         fly_from_map(env.console, context);

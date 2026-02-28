@@ -142,7 +142,7 @@ public:
         QMetaObject::invokeMethod(this, &AudioDecoderWorker::internal_start);
     }
 
-    bool startSucceeded() { return m_startSucceeded; }
+    bool startSucceeded(){ return m_startSucceeded; }
 
     void stop(){
         QMetaObject::invokeMethod(this, &AudioDecoderWorker::internal_stop);

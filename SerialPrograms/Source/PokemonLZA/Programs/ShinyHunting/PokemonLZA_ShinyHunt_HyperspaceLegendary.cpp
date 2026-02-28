@@ -351,7 +351,7 @@ void hunt_latias_check(
             "hunt_latias(): Cannot detect ladder after 5 seconds",
             env.console
         );
-    } else {
+    }else{
         env.console.log("Detected ladder.");
     }
 

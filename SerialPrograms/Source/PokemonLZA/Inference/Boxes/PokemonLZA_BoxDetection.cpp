@@ -444,7 +444,7 @@ void BoxDetector::move_cursor(
             if (left_dist < right_dist){
                 pbf_press_dpad(context, DPAD_LEFT, 160ms, 240ms);
                 // cout << "move left" << endl;
-            } else {
+            }else{
                 pbf_press_dpad(context, DPAD_RIGHT, 160ms, 240ms);
                 // cout << "move right" << endl;
             }
@@ -460,7 +460,7 @@ void BoxDetector::move_cursor(
             if (up_dist < down_dist){
                 pbf_press_dpad(context, DPAD_UP, 160ms, 240ms);
                 // cout << "move up" << endl;
-            } else {
+            }else{
                 pbf_press_dpad(context, DPAD_DOWN, 160ms, 240ms);
                 // cout << "move down" << endl;
             }

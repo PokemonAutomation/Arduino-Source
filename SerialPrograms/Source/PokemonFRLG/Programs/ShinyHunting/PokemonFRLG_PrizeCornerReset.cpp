@@ -158,7 +158,7 @@ void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControlle
             stats.shinies++;
             send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", screen, true);
             break;
-        } else {
+        }else{
             env.log("Prize is not shiny.");
             env.log("Soft resetting.");
             send_program_status_notification(

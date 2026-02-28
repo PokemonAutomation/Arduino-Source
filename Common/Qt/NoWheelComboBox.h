@@ -16,7 +16,7 @@
 namespace PokemonAutomation{
 
 
-class HeightDelegate : public QStyledItemDelegate {
+class HeightDelegate : public QStyledItemDelegate{
 public:
     using QStyledItemDelegate::QStyledItemDelegate;
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override {

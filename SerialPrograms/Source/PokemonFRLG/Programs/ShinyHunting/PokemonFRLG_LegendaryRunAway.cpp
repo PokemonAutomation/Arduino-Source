@@ -255,7 +255,7 @@ void LegendaryRunAway::program(SingleSwitchProgramEnvironment& env, ProControlle
         if (TARGET == Target::hooh) {
             //Step forward to start the encounter.
             pbf_press_dpad(context, DPAD_UP, 160ms, 400ms);
-        } else {
+        }else{
             //Press A to start the encounter.
             pbf_press_button(context, BUTTON_A, 320ms, 320ms);
         }
