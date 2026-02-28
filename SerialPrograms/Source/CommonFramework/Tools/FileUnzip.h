@@ -11,7 +11,7 @@
 
 namespace PokemonAutomation{
 
-void unzip_file(const std::string& zip_path, const std::string& output_dir);
+void unzip_file(const char* zip_path, const char* target_dir);
 
 }
 #endif
