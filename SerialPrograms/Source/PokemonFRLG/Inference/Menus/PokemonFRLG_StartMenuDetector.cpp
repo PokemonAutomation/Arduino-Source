@@ -22,9 +22,9 @@ namespace NintendoSwitch{
 namespace PokemonFRLG{
 
 StartMenuDetector::StartMenuDetector(Color color)
-    : m_right_box(0.864, 0.750, 0.006, 0.173)
-    , m_top_box(0.128, 0.744, 0.743, 0.006)
-    , m_bottom_box(0.128, 0.917, 0.736, 0.006)
+    : m_right_box(0.898, 0.751, 0.003, 0.195)
+    , m_top_box(0.097, 0.746, 0.804, 0.005)
+    , m_bottom_box(0.095, 0.941, 0.803, 0.006)
 {}
 void StartMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_right_box);

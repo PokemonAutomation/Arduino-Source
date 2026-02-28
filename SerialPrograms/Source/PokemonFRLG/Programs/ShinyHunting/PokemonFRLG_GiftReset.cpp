@@ -219,6 +219,8 @@ void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerC
                 pbf_wait(context, 100ms);
                 context.wait_for_all_requests();
                 pbf_press_button(context, BUTTON_PLUS, 320ms, 640ms);
+                pbf_wait(context, 100ms);
+                context.wait_for_all_requests();
             }
         },
         { start_menu }
