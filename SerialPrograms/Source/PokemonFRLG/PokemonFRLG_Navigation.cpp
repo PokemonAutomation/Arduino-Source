@@ -7,13 +7,13 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonTools/Random.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
-#include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
@@ -34,7 +34,7 @@ void soft_reset(ConsoleHandle& console, ProControllerContext& context){
 
     //Random wait before pressing start/A
     console.log("Randomly waiting...");
-    Milliseconds rng_wait = std::chrono::milliseconds(PokemonSwSh::MaxLairInternal::random(0, 5000));
+    Milliseconds rng_wait = std::chrono::milliseconds(random_u32(0, 5000));
     pbf_wait(context, rng_wait);
     context.wait_for_all_requests();
 
@@ -92,7 +92,7 @@ void soft_reset(ConsoleHandle& console, ProControllerContext& context){
 
     //Random wait no.2
     console.log("Randomly waiting...");
-    Milliseconds rng_wait2 = std::chrono::milliseconds(PokemonSwSh::MaxLairInternal::random(0, 5000));
+    Milliseconds rng_wait2 = std::chrono::milliseconds(random_u32(0, 5000));
     pbf_wait(context, rng_wait2);
     context.wait_for_all_requests();
 

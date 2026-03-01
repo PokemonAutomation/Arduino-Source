@@ -658,6 +658,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonTools/Options/StringSelectOption.h
     Source/CommonTools/Options/StringSelectTableOption.h
     Source/CommonTools/Options/TrainOCRModeOption.h
+    Source/CommonTools/Random.cpp
+    Source/CommonTools/Random.h
     Source/CommonTools/Resources/SpriteDatabase.cpp
     Source/CommonTools/Resources/SpriteDatabase.h
     Source/CommonTools/StartupChecks/StartProgramChecks.cpp

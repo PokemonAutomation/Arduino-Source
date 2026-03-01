@@ -144,6 +144,7 @@
 #include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
 #include "Common/PABotBase2/PABotbase2_ReliableStreamConnection.h"
 #include "Common/Cpp/StreamConnections/MockDevice.h"
+#include "CommonTools/Random.h"
 
 
 //#include <opencv2/core.hpp>
@@ -358,7 +359,12 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     [[maybe_unused]] Logger& logger = env.logger();
 
+//    cout << random_u32(100, 115) << endl;
+
+
     stress_test(logger, scope);
+
+
 
 #if 0
     {
