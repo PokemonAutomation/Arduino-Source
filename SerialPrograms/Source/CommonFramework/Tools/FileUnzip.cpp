@@ -5,10 +5,17 @@
  */
 
 
+#ifndef _LARGEFILE64_SOURCE
+#define _LARGEFILE64_SOURCE 1
+#endif
+#ifndef _FILE_OFFSET_BITS
+#define _FILE_OFFSET_BITS 64
+#endif
 
-// #define _LARGEFILE64_SOURCE 1
+// #include "miniz-cpp/zip_file.hpp"
 
-#include "miniz-cpp/zip_file.hpp"
+#include "miniz-3.1.1/miniz.h"
+// #include "3rdParty/miniz-3.1.1/miniz.h"
 #include "Common/Cpp/Exceptions.h"
 #include "FileUnzip.h"
 #include <filesystem>
@@ -106,12 +113,21 @@ namespace PokemonAutomation{
     }
 
     void unzip_file(const char* zip_path, const char* target_dir) {
+        fs::path p{zip_path};
+        if (!fs::exists(p)) {
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "unzip_all: Attempted to unzip a file that doesn't exist.");
+        } 
+
         mz_zip_archive zip_archive;
         memset(&zip_archive, 0, sizeof(zip_archive));
 
         // Opens the ZIP file at zip_path
         // zip_archive holds the state and metadata of the ZIP archive.
-        if (!mz_zip_reader_init_file(&zip_archive, zip_path, 0)) return;
+        if (!mz_zip_reader_init_file(&zip_archive, zip_path, 0)){
+            cout << "failed to run mz_zip_reader_init_file" << endl;
+            cout << "mz_zip_error: " << mz_zip_get_last_error(&zip_archive) << endl;
+            return;
+        } 
 
         // Get total number of files in the archive
         int num_files = (int)mz_zip_reader_get_num_files(&zip_archive);
@@ -124,6 +140,7 @@ namespace PokemonAutomation{
             // fills file_stat with the data for the current index
             if (!mz_zip_reader_file_stat(&zip_archive, i, &file_stat)) continue;
 
+            cout << std::to_string(file_stat.m_uncomp_size) << endl;
             total_uncompressed_size += file_stat.m_uncomp_size;
         }
 
