@@ -30,9 +30,10 @@ namespace PokemonAutomation{
     namespace fs = std::filesystem;
 
     struct ProgressData {
-        std::ofstream* outFile;
-        uint64_t totalBytes;
-        uint64_t processedBytes;
+        std::ofstream* out_file;
+        uint64_t total_bytes;
+        uint64_t processed_bytes;
+        int last_percentage;
     };
 
     // Callback triggered for every chunk of decompressed data
@@ -42,42 +43,27 @@ namespace PokemonAutomation{
 
         // 1. Check if we actually need to seek
         // tellp() returns the current 'put' position.  get the current position of the write pointer in an output stream.
-        if (static_cast<mz_uint64>(data->outFile->tellp()) != file_ofs) {
-            data->outFile->seekp(file_ofs);
+        if (static_cast<mz_uint64>(data->out_file->tellp()) != file_ofs) {
+            data->out_file->seekp(file_ofs);
         }
             
         // Write chunk to disk
-        data->outFile->write(static_cast<const char*>(pBuf), n);
+        data->out_file->write(static_cast<const char*>(pBuf), n);
         
         // Update and display progress
-        data->processedBytes += n;
-        double percent = (double)data->processedBytes / data->totalBytes * 100.0;
-        std::cout << "\rProgress: " << percent << "% (" 
-                << data->processedBytes << "/" << data->totalBytes << " bytes)" << std::flush;
+        data->processed_bytes += n;
+        double percent = (double)data->processed_bytes / data->total_bytes * 100.0;
+        int current_percent = static_cast<int>(percent);
+
+        // Only print if the integer value has changed
+        if (current_percent > data->last_percentage) {
+            data->last_percentage = current_percent;
+            std::cout << "\rProgress: " << current_percent << "% (" 
+                    << data->processed_bytes << "/" << data->total_bytes << " bytes)" << endl;
+        }
                 
         return n;
     }
-
-    // void unzip_with_progress(const char* zip_path, const char* file_in_zip, const char* out_path) {
-    //     mz_zip_archive zip_archive;
-    //     memset(&zip_archive, 0, sizeof(zip_archive));
-
-    //     if (!mz_zip_reader_init_file(&zip_archive, zip_path, 0)) return;
-
-    //     int file_index = mz_zip_reader_locate_file(&zip_archive, file_in_zip, nullptr, 0);
-    //     mz_zip_archive_file_stat stat;
-    //     mz_zip_reader_file_stat(&zip_archive, file_index, &stat);
-
-    //     std::ofstream outFile(out_path, std::ios::binary);
-    //     ProgressData progress = { &outFile, (size_t)stat.m_uncomp_size, 0 };
-
-    //     // Extract using the callback for byte-level tracking
-    //     mz_zip_reader_extract_to_callback(&zip_archive, file_index, write_callback, &progress, 0);
-
-    //     mz_zip_reader_end(&zip_archive);
-    //     std::cout << "\nExtraction complete!" << std::endl;
-    // }
-
 
     // ensure that entry_name is inside target_dir, to prevent path traversal attacks.
     bool is_safe(const std::string& target_dir, const std::string& entry_name) {
@@ -174,11 +160,11 @@ namespace PokemonAutomation{
                 throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "unzip_all: Attempted to unzip a file that was trying to leave its base directory. This is a security risk.");
             }
             
-            std::ofstream outFile(out_path, std::ios::binary); // std::ios::binary is to prevent line-ending conversions.
-            ProgressData progress = { &outFile, total_uncompressed_size, total_processed_bytes };
+            std::ofstream out_file(out_path, std::ios::binary); // std::ios::binary is to prevent line-ending conversions.
+            ProgressData progress = { &out_file, total_uncompressed_size, total_processed_bytes, -1 };
 
             // Extract using the callback
-            // decompresses the file in chunks and repeatedly calls write_callback to save those chunks to the disk via the outFile
+            // decompresses the file in chunks and repeatedly calls write_callback to save those chunks to the disk via the out_file
             mz_zip_reader_extract_to_callback(&zip_archive, i, write_callback, &progress, 0);
             std::cout << "\nFinished: " << file_stat.m_filename << std::endl;
             total_processed_bytes += file_stat.m_uncomp_size;
