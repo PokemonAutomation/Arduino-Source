@@ -120,6 +120,7 @@
 #include "Common/Cpp/Sockets/ClientSocket.h"
 #include "Common/Cpp/Containers/SparseArray.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "CommonFramework/Tools/FileUnzip.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -362,7 +363,17 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    cout << random_u32(100, 115) << endl;
 
 
+
+#if 1
+    std::string zip_path = SETTINGS_PATH() + "test2.zip";
+    std::string target_dir = SETTINGS_PATH() + "testB/";
+    unzip_file(zip_path.c_str(), target_dir.c_str());
+
+#endif
+
+#if 0
     stress_test(logger, scope);
+#endif
 
 
 
