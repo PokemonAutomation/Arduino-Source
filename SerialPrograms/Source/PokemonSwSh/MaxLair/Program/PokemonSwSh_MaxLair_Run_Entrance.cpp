@@ -31,19 +31,23 @@ const ImageFloatBox NAME_BOXES[3] = {
 
 // Read the three saved paths names if the user has already saved 3 paths
 std::vector<std::string> read_saved_paths(
-                                          VideoStream& stream,
-                                          Language language,
-                                          const ImageViewRGB32& screen
-                                          ) {
-    
+    VideoStream& stream,
+    Language language,
+    const ImageViewRGB32& screen
+) {
     std::vector<std::string> slugs;
     
     for (int i = 0; i < 3; ++i) {
-        auto cropped = extract_box_reference(screen, NAME_BOXES[i]);
+        auto cropped = extract_box_reference(
+            screen,
+            NAME_BOXES[i]
+        );
         OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
-                                                                                     stream.logger(), language, cropped, OCR::BLACK_OR_WHITE_TEXT_FILTERS(),
-                                                                                     0.01, 0.50, 2.0
-                                                                                     );
+                stream.logger(),
+                language, cropped,
+                OCR::BLACK_OR_WHITE_TEXT_FILTERS(),
+                0.01, 0.50, 2.0
+            );
         if (result.results.empty()) {
             slugs.emplace_back();
         } else {
@@ -55,10 +59,10 @@ std::vector<std::string> read_saved_paths(
 
 // Read the three currently saved paths (if any) from the entrance screen and return the index of the first slot that is NOT protected, returns -1 otherwise
 int find_unprotected_slot(
-                          const std::vector<std::string>& current_slugs,
-                          const EndBattleDecider& actions,
-                          Logger& logger
-                          ) {
+    const std::vector<std::string>& current_slugs,
+    const EndBattleDecider& actions,
+    Logger& logger
+) {
     for (int i = 0; i < 3; ++i) {
         if (current_slugs[i].empty()) {
             // Empty slot, override and add error
@@ -76,12 +80,12 @@ int find_unprotected_slot(
 }
 
 void run_entrance(
-                  AdventureRuntime& runtime,
-                  ProgramEnvironment& env, size_t console_index,
-                  VideoStream& stream, ProControllerContext& context,
-                  bool followed_path,
-                  GlobalStateTracker& state_tracker
-                  ){
+    AdventureRuntime& runtime,
+    ProgramEnvironment& env, size_t console_index,
+    VideoStream& stream, ProControllerContext& context,
+    bool followed_path,
+    GlobalStateTracker& state_tracker
+){
     GlobalState& state = state_tracker[console_index];
     
     if (!state.adventure_started){
