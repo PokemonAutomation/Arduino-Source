@@ -246,15 +246,19 @@ void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerC
     } //For starters, no Pokedex yet, do Pokemon is on top and we skip this
 
     //Open party menu
-    pbf_press_button(context, BUTTON_A, 320ms, 640ms);
-
     BlackScreenOverWatcher blk1(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
-    int ret1 = wait_until(
+
+    int pm = run_until<ProControllerContext>(
         env.console, context,
-        5s,
-        {blk1}
+        [](ProControllerContext& context) {
+            pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+            pbf_wait(context, 5000ms);
+            context.wait_for_all_requests();
+        },
+        { blk1 }
     );
-    if (ret1 == 0){
+    context.wait_for_all_requests();
+    if (pm == 0){
         env.log("Entered party menu.");
     }else{
         env.log("Unable to enter party menu.", COLOR_RED);
@@ -264,7 +268,6 @@ void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerC
             env.console
         );
     }
-    context.wait_for_all_requests();
 
     //Press up twice to get to the last slot
     if (TARGET != Target::starters){
@@ -273,16 +276,18 @@ void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerC
     }
 
     //Two presses to open summary
-    pbf_press_button(context, BUTTON_A, 320ms, 320ms);
-    pbf_press_button(context, BUTTON_A, 320ms, 320ms);
-
     BlackScreenOverWatcher blk2(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
-    int ret2 = wait_until(
+    int sm = run_until<ProControllerContext>(
         env.console, context,
-        5s,
-        {blk2}
+        [](ProControllerContext& context) {
+            pbf_press_button(context, BUTTON_A, 320ms, 320ms);
+            pbf_press_button(context, BUTTON_A, 320ms, 320ms);
+            pbf_wait(context, 5000ms);
+            context.wait_for_all_requests();
+        },
+        { blk2 }
     );
-    if (ret2 == 0){
+    if (sm == 0){
         env.log("Entered summary.");
     }else{
         env.log("Unable to enter summary.", COLOR_RED);
@@ -339,7 +344,7 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                 env, NOTIFICATION_STATUS_UPDATE,
                 "Soft resetting."
             );
-            soft_reset(env.program_info(), env.console, context);
+            soft_reset(env.console, context);
             stats.resets++;
             env.update_stats();
             context.wait_for_all_requests();
