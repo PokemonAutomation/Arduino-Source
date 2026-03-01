@@ -191,7 +191,7 @@ void StatsReset::enter_portal(SingleSwitchProgramEnvironment& env, ProController
         {
             overworld,
         }
-        );
+    );
 
     if (ret == 0){
         env.log("Detected overworld");
@@ -211,7 +211,7 @@ void StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
         {
             battle_menu,
         }
-        );
+    );
 
     if (ret == 0){
         env.log("Detected battle menu");
@@ -242,7 +242,7 @@ void StatsReset::run_catch(SingleSwitchProgramEnvironment& env, ProControllerCon
         BUTTON_ZL | BUTTON_ZR,
         500ms, 500ms + (hold + cool) * scrolls,
         0ms
-        );
+    );
 
     while (scrolls != 0){
         pbf_press_dpad(context, direction, hold, cool);
@@ -273,7 +273,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to travel to Quasartico Inc.",
                     env.console
-                    );
+                );
             }
             context.wait_for(100ms);
             env.log("Detected overworld. Fast traveled to Quasartico Inc.");
@@ -296,7 +296,12 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
         if (POKEMON == GiftPokemon::MELTAN || POKEMON == GiftPokemon::MELMETAL){
             // fly to Lysandre Café, replace with OCR in the future
-            FastTravelState travel_status = open_map_and_fly_to(env.console, context, LANGUAGE, Location::LYSANDRE_CAFE);
+            FastTravelState travel_status = open_map_and_fly_to(
+                env.console,
+                context,
+                LANGUAGE,
+                Location::LYSANDRE_CAFE
+            );
             if (travel_status != FastTravelState::SUCCESS){
                 stats.errors++;
                 env.update_stats();
@@ -304,7 +309,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to travel to Lysandre Café",
                     env.console
-                    );
+                );
             }
             context.wait_for(100ms);
             env.log("Detected overworld. Fast traveled to Lysandre Café");
@@ -348,7 +353,12 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
         if (POKEMON == GiftPokemon::GENESECT){
             // fly to wild zone 13
-            FastTravelState travel_status = open_map_and_fly_to(env.console, context, LANGUAGE, Location::WILD_ZONE_13);
+            FastTravelState travel_status = open_map_and_fly_to(
+                env.console,
+                context,
+                LANGUAGE,
+                Location::WILD_ZONE_13
+            );
             if (travel_status != FastTravelState::SUCCESS){
                 stats.errors++;
                 env.update_stats();
@@ -356,7 +366,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to travel to Wild Zone 13",
                     env.console
-                    );
+                );
             }
             context.wait_for(100ms);
             env.log("Detected overworld. Fast traveled to Wild Zone 13");
@@ -407,7 +417,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     overworld,
                     battle_menu
                 }
-                );
+            );
             switch (result){
             case 0:
                 env.log(STRING_POKEMON + " dialog finished.", COLOR_PURPLE);
