@@ -198,6 +198,7 @@ struct MaxLairDatabase{
     std::map<std::string, MaxLairMon> m_bosses;
 
     std::map<size_t, std::string> m_bosses_by_dex;
+    std::map<size_t, std::string> m_rentals_by_dex;
 
     static MaxLairDatabase& instance(){
         static MaxLairDatabase data;
@@ -218,6 +219,15 @@ struct MaxLairDatabase{
             }
             m_bosses_by_dex[iter->second] = item.first;
         }
+        
+        for (const auto& item : m_rentals){
+            const MaxLairSlugs& slugs = get_maxlair_slugs(item.first);
+            auto iter = national_dex.find(slugs.name_slug);
+            if (iter == national_dex.end()){
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Rental slug not found in national dex: " + slugs.name_slug);
+            }
+            m_rentals_by_dex[iter->second] = item.first;
+        }
 
 #if 0
         for (const auto& item : m_bosses_by_dex){
@@ -236,6 +246,10 @@ struct MaxLairDatabase{
 const std::map<size_t, std::string>& all_bosses_by_dex(){
     const MaxLairDatabase& database = MaxLairDatabase::instance();
     return database.m_bosses_by_dex;
+}
+const std::map<size_t, std::string>& all_rentals_by_dex(){
+    const MaxLairDatabase& database = MaxLairDatabase::instance();
+    return database.m_rentals_by_dex;
 }
 bool is_boss(const std::string& slug){
     const MaxLairDatabase& database = MaxLairDatabase::instance();
