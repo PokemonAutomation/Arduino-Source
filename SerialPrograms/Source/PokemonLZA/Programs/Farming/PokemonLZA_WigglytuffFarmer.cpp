@@ -225,7 +225,7 @@ void WigglytuffFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
 
     for (uint32_t rounds_since_last_save = 0;; rounds_since_last_save++){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-        if (NUM_ROUNDS != 0 && stats.rounds >= NUM_ROUNDS) {
+        if (NUM_ROUNDS != 0 && stats.rounds >= NUM_ROUNDS){
             break;
         }
 

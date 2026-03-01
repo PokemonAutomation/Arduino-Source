@@ -54,14 +54,14 @@ BoxSortingTable::BoxSortingTable(std::string label)
 {}
 
 BoxSortingTable::BoxSortingTable(std::string label, const std::vector<SortingRuleType>& allowed_rules)
-    : BoxSortingTableDatabaseHelper([&allowed_rules]() {
+    : BoxSortingTableDatabaseHelper([&allowed_rules](){
         // Build custom database from allowed rules
         const EnumDropdownDatabase<SortingRuleType>& full_db = SortingRuleType_Database();
         auto custom_db = std::make_shared<EnumDropdownDatabase<SortingRuleType>>();
 
-        for (SortingRuleType rule : allowed_rules) {
+        for (SortingRuleType rule : allowed_rules){
             const EnumEntry* entry = full_db.find(rule);
-            if (entry != nullptr) {
+            if (entry != nullptr){
                 custom_db->add(rule, entry->slug, entry->display, entry->enabled);
             }
         }
@@ -105,7 +105,7 @@ std::vector<std::unique_ptr<EditableTableRow>> BoxSortingTable::make_defaults(){
 }
 
 const EnumDropdownDatabase<SortingRuleType>& BoxSortingTable::database() const{
-    if (m_database) {
+    if (m_database){
         return *m_database;
     }
     return SortingRuleType_Database();

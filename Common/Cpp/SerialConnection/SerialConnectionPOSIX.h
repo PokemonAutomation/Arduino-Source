@@ -211,13 +211,13 @@ private:
                 // Successfully wrote some bytes
                 ptr += sent;
                 remaining -= sent;
-            } else {
+            }else{
                 // sent <= 0: either EAGAIN/EWOULDBLOCK or error
                 int error = errno;
                 if (error == EAGAIN || error == EWOULDBLOCK){
                     // Device not ready, sleep briefly and retry
                     usleep(1000);  // 1ms
-                } else {
+                }else{
                     // Real error occurred
                     process_error(
                         "Failed to write: " + std::to_string(bytes - remaining) +

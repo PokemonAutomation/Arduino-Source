@@ -74,7 +74,7 @@ void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
     // Throw user setup errors early in program
     // - Ensure language is set
     const Language language = MATERIAL_FARMER_OPTIONS.LANGUAGE;
-    if (language == Language::None) {
+    if (language == Language::None){
         throw UserSetupError(env.console.logger(), "Must set game language option to read ingredient lists.");
     }
 

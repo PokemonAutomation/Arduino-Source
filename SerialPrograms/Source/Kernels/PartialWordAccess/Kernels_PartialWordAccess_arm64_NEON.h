@@ -24,7 +24,7 @@ class PartialWordAccess_arm64_NEON{
 public:
     // create a mask with first `bytes` low bytes are all 1s
     // If `bytes` is 3, then the returned vector is from low bytes to high bytes: [0xFF, 0xFF, 0xFF, 0, 0, 0, ..., 0]
-    PA_FORCE_INLINE static uint8x16_t create_front_mask(size_t bytes) {
+    PA_FORCE_INLINE static uint8x16_t create_front_mask(size_t bytes){
         PA_ALIGN_STRUCT(16) uint8_t bytes_values[16] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
         const uint8x16_t seq_u8x16 = vld1q_u8(bytes_values);
         return vcgtq_u8(vdupq_n_u8((uint8_t)bytes), seq_u8x16);

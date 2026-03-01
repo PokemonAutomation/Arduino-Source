@@ -87,7 +87,7 @@ ShinyHunt_SewerHunter::ShinyHunt_SewerHunter()
 
 namespace {
 
-void fly_back_to_sewers_entrance(ConsoleHandle& console, ProControllerContext& context) {
+void fly_back_to_sewers_entrance(ConsoleHandle& console, ProControllerContext& context){
     pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms); // open map
     context.wait_for_all_requests();
     pbf_wait(context, 500ms);
@@ -180,7 +180,7 @@ void ShinyHunt_SewerHunter::program(SingleSwitchProgramEnvironment& env, ProCont
         );
     });
     std::function<void(SingleSwitchProgramEnvironment&, ProControllerContext&)> route;
-    switch (ROUTE) {
+    switch (ROUTE){
     case Route::KLEFKI:
         route = route_klefki;
         break;

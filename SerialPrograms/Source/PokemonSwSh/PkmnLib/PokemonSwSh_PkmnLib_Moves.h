@@ -49,8 +49,8 @@ public:
     double       correction_factor  () const{ return m_correction_factor; }
 
     // the only setter so far is updating the move type
-    void set_type(Type update_type) { m_current_type = update_type; }
-    void reset_move_type() { m_current_type = m_type; }
+    void set_type(Type update_type){ m_current_type = update_type; }
+    void reset_move_type(){ m_current_type = m_type; }
 
     bool operator<(const Move& move);
 

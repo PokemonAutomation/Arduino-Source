@@ -103,7 +103,7 @@ void DailyItemFarmer::start_local_trade(SingleSwitchProgramEnvironment& env, Joy
     pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
 
     //Enter link code
-    switch(LINK_CODE) {
+    switch(LINK_CODE){
     case LinkCode::Pikachu:
         break;
     case LinkCode::Eevee:
@@ -196,7 +196,7 @@ void DailyItemFarmer::program(SingleSwitchProgramEnvironment& env, CancellableSc
     context.wait_for_all_requests();
 
     env.log("Starting pickup loop.");
-    for (uint32_t count = 0; count < ATTEMPTS; count++) {
+    for (uint32_t count = 0; count < ATTEMPTS; count++){
         env.log("Pick up item.");
 
         pbf_mash_button(context, BUTTON_A, 4000ms);
@@ -254,7 +254,7 @@ void DailyItemFarmer::program(SingleSwitchProgramEnvironment& env, CancellableSc
         resume_game_from_home(env.console, context);
     }
 
-    if (GO_HOME_WHEN_DONE) {
+    if (GO_HOME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 200ms, 1000ms);
     }
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

@@ -178,7 +178,7 @@ LabelImages_Widget::LabelImages_Widget(
         m_program.m_annotations_hidden = !m_program.m_annotations_hidden;
         if (m_program.m_annotations_hidden){
             m_hide_annotation_button->setText("Show Annotation");
-        } else {
+        }else{
             m_hide_annotation_button->setText("Hide Annotation");
         }
         m_program.update_rendered_objects();

@@ -105,7 +105,7 @@ GimmighoulChestFarmer::GimmighoulChestFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void GimmighoulChestFarmer::navigate_to_gimmi(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void GimmighoulChestFarmer::navigate_to_gimmi(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //Cursor is already in position
     fly_to_overworld_from_map(env.program_info(), env.console, context);
     pbf_move_left_joystick(context, {-1, +1}, 1264ms, 0ms);
@@ -177,7 +177,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
             std::chrono::seconds(5),
             {battleStarting, battle_detected}
         );
-        if (retOverworld != 0) {
+        if (retOverworld != 0){
             //Wait for the battle to load then check for battle menu, if there isn't a battle menu then no chest
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
             int ret = wait_until(

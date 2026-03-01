@@ -39,7 +39,7 @@ public:
         m_area_ratio_upper = 1.1;
     }
 
-    static const ImageMatch::WaterfillTemplateMatcher& instance() {
+    static const ImageMatch::WaterfillTemplateMatcher& instance(){
         static DialogTitleGreenLineMatcher matcher;
         return matcher;
     }
@@ -59,7 +59,7 @@ public:
         m_area_ratio_upper = 1.1;
     }
 
-    static const ImageMatch::WaterfillTemplateMatcher& instance() {
+    static const ImageMatch::WaterfillTemplateMatcher& instance(){
         static DialogBlackArrowMatcher matcher;
         return matcher;
     }
@@ -79,7 +79,7 @@ public:
         m_area_ratio_upper = 1.1;
     }
 
-    static const ImageMatch::WaterfillTemplateMatcher& instance() {
+    static const ImageMatch::WaterfillTemplateMatcher& instance(){
         static DialogWhiteArrowMatcher matcher;
         return matcher;
     }
@@ -99,7 +99,7 @@ public:
         m_area_ratio_upper = 1.1;
     }
 
-    static const ImageMatch::WaterfillTemplateMatcher& instance() {
+    static const ImageMatch::WaterfillTemplateMatcher& instance(){
         static DialogTealArrowMatcher matcher;
         return matcher;
     }
@@ -119,7 +119,7 @@ public:
         m_area_ratio_upper = 1.1;
     }
 
-    static const ImageMatch::WaterfillTemplateMatcher& instance() {
+    static const ImageMatch::WaterfillTemplateMatcher& instance(){
         static DialogBlueArrowMatcher matcher;
         return matcher;
     }

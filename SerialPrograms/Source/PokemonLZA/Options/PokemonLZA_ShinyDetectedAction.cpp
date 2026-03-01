@@ -85,7 +85,7 @@ bool ShinySoundDetectedActionOption::on_shiny_sighted(
         return false;
     }
 
-    if (action == ShinySoundDetectedAction::NO_NOTIFICATIONS && current_count > 1) {
+    if (action == ShinySoundDetectedAction::NO_NOTIFICATIONS && current_count > 1){
         return false;
     }
 
@@ -94,7 +94,7 @@ bool ShinySoundDetectedActionOption::on_shiny_sighted(
         pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
     }
 
-    if (action != ShinySoundDetectedAction::NO_NOTIFICATIONS) {
+    if (action != ShinySoundDetectedAction::NO_NOTIFICATIONS){
         send_shiny_sighted_notification(env, stream);
     }
 
@@ -134,7 +134,7 @@ bool ShinySoundDetectedActionOption::on_shiny_sound(
         return false;
     }
 
-    if (action == ShinySoundDetectedAction::NO_NOTIFICATIONS && current_count > 1) {
+    if (action == ShinySoundDetectedAction::NO_NOTIFICATIONS && current_count > 1){
         return false;
     }
 
@@ -143,7 +143,7 @@ bool ShinySoundDetectedActionOption::on_shiny_sound(
         pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
     }
 
-    if (action != ShinySoundDetectedAction::NO_NOTIFICATIONS) {
+    if (action != ShinySoundDetectedAction::NO_NOTIFICATIONS){
         send_shiny_sound_notification(env, stream, error_coefficient);
     }
 

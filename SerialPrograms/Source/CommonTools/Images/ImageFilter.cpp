@@ -224,7 +224,7 @@ ImageRGB32 to_blackwhite_hsv32_range(
     const ImageViewHSV32& image,
     bool in_range_black,
     uint32_t mins, uint32_t maxs
-) {
+){
     ImageRGB32 ret(image.width(), image.height());
     Kernels::to_blackwhite_rgb32_range(
         image.data(), image.bytes_per_row(), image.width(), image.height(),

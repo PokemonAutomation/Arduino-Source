@@ -211,7 +211,7 @@ void HyperspaceRewardReset::program(SingleSwitchProgramEnvironment& env, ProCont
         talk_to_trainer(env, context);
         item_found = check_reward(env, context);
 
-        if (item_found) {
+        if (item_found){
             break;
         }
 

@@ -179,7 +179,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             env.log("Detected overworld. Fast traveled to Quasartico Inc.");
 
             // move to the door
-            for (int i = 0; i < 4; ++i) {
+            for (int i = 0; i < 4; ++i){
                 pbf_press_button(context, BUTTON_Y, 100ms, 1s);
             }
             run_towards_gate_with_A_button(env.console, context, 0, +1, Seconds(2));

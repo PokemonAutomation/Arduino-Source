@@ -333,9 +333,9 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
 
-    if (LOCATION == EggAutoLocation::ZeroGate) {
+    if (LOCATION == EggAutoLocation::ZeroGate){
         picnic_at_zero_gate(env.program_info(), env.console, context);
-    } else {
+    }else{
         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
         picnic_from_overworld(env.program_info(), env.console, context);
     }
@@ -364,9 +364,9 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
     leave_picnic(env.program_info(), env.console, context);
 
     // Reset position to flying spot:
-    if (LOCATION == EggAutoLocation::ZeroGate) {
+    if (LOCATION == EggAutoLocation::ZeroGate){
         reset_position_to_flying_spot(env, context);
-    } else {
+    }else{
         //Lighthouse: We haven't moved much so just fly.
         open_map_from_overworld(env.program_info(), env.console, context);
         fly_to_overworld_from_map(env.program_info(), env.console, context);
@@ -468,10 +468,10 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
             stats.m_hatched++;
             env.update_stats();
         };
-        if (LOCATION == EggAutoLocation::ZeroGate) {
+        if (LOCATION == EggAutoLocation::ZeroGate){
             hatch_eggs_at_zero_gate(env.program_info(), env.console, context, (uint8_t)num_eggs_in_party, hatched_callback);
             reset_position_to_flying_spot(env, context);
-        } else {
+        }else{
             hatch_eggs_at_area_three_lighthouse(env.program_info(), env.console, context, (uint8_t)num_eggs_in_party, hatched_callback);
             reset_position_to_flying_spot(env, context);
             //Clear spawns - over time floette/vivillon drift over past the fence (usually aroudn the 3rd batch)
@@ -687,9 +687,9 @@ bool EggAutonomous::move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, Pr
 void EggAutonomous::reset_position_to_flying_spot(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     // Use map to fly back to the flying spot
     open_map_from_overworld(env.program_info(), env.console, context);
-    if (LOCATION == EggAutoLocation::ZeroGate) {
+    if (LOCATION == EggAutoLocation::ZeroGate){
         pbf_move_left_joystick(context, {0, -0.252}, 160ms, 400ms);
-    } else { //lighthouse
+    }else{ //lighthouse
         pbf_move_left_joystick(context, {+0.016, +1}, 150ms, 50ms);
         pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
     }

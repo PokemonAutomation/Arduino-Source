@@ -231,7 +231,7 @@ bool BoxDexNumberDetector::detect(const ImageViewRGB32& screen){
         );
 #endif
     }();
-    if (dex_number <= 0 || dex_number > static_cast<int>(max_dex_number)) {
+    if (dex_number <= 0 || dex_number > static_cast<int>(max_dex_number)){
         m_dex_number = 0;
         m_dex_number_when_error = dex_number;
         return false;

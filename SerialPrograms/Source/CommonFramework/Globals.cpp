@@ -161,7 +161,7 @@ std::string get_runtime_base_path(){
         // the folder where we store persistent data.
         QString appSupportPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
         QDir dir(appSupportPath);
-        if (!dir.exists()) {
+        if (!dir.exists()){
             dir.mkpath(".");
         }
         return appSupportPath.toStdString() + "/";
@@ -244,7 +244,7 @@ namespace {
 }
 
 void set_program_path(const char* argv0){
-    if (argv0 != nullptr) {
+    if (argv0 != nullptr){
         std::filesystem::path program_path(argv0);
         g_program_absolute_path = std::filesystem::absolute(program_path).string();
         g_program_filename = program_path.filename().string();

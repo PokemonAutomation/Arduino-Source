@@ -36,7 +36,7 @@ struct PokemonFormDatabase{
 
 bool is_form_shiny(const std::string& form_slug){
     const std::string& suffix = "-shiny";
-    if (form_slug.length() < suffix.length()) {
+    if (form_slug.length() < suffix.length()){
            return false;
        }
     return form_slug.compare(form_slug.length() - suffix.length(), suffix.length(), suffix) == 0;
@@ -55,12 +55,12 @@ PokemonFormDatabase::PokemonFormDatabase(){
 
     const std::string no_shiny_pokemon_path = RESOURCE_PATH() + "Pokemon/SpecialPokemonWithNoShinyForm.txt";
     std::ifstream fin(no_shiny_pokemon_path);
-    if (!fin.is_open()) {
+    if (!fin.is_open()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "canot open resource file: " + no_shiny_pokemon_path);
     }
     std::string line;
     std::set<std::string> no_shiny_forms;
-    while (std::getline(fin, line)) {
+    while (std::getline(fin, line)){
         fin >> std::ws;
         no_shiny_forms.emplace(std::move(line));
     }

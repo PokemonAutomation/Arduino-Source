@@ -179,7 +179,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
     run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
-            for (uint32_t rounds_since_last_save = 0;; rounds_since_last_save++) {
+            for (uint32_t rounds_since_last_save = 0;; rounds_since_last_save++){
                 send_program_status_notification(env, NOTIFICATION_STATUS);
                 sit_on_bench(env.console, context);
                 shiny_sound_handler.process_pending(context);
@@ -187,13 +187,13 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                 env.update_stats();
 
                 uint32_t periodic_save = PERIODIC_SAVE;
-                if (periodic_save != 0 && rounds_since_last_save >= periodic_save) {
+                if (periodic_save != 0 && rounds_since_last_save >= periodic_save){
                     bool save_successful = save_game_to_menu(env.console, context);
                     pbf_mash_button(context, BUTTON_B, 2000ms);
-                    if (save_successful) {
+                    if (save_successful){
                         env.console.overlay().add_log("Game Saved Successfully", COLOR_BLUE);
                         rounds_since_last_save = 0;
-                    } else {
+                    }else{
                         env.console.overlay().add_log("Game Save Failed. Will attempt to save after the next reset.", COLOR_RED);
                     }
                 }

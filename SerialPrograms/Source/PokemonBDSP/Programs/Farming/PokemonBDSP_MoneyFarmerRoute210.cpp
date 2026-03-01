@@ -282,10 +282,10 @@ void MoneyFarmerRoute210::check_pickup_items(
     // Loop over each pokemon that has Pickup according to the settings
     int current_slot = 0;
     
-    for (int slot = 0; slot < 6; slot++) {
-        if (pickup_slots[slot]) {
+    for (int slot = 0; slot < 6; slot++){
+        if (pickup_slots[slot]){
             int presses = slot - current_slot;
-            for (int i = 0; i < presses; i++) {
+            for (int i = 0; i < presses; i++){
                 pbf_wait(context, 50ms);
                 pbf_press_dpad(context, DPAD_DOWN, 80ms, 50ms);
             }
@@ -458,7 +458,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
 
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         
-        if (has_pickup_mons && pickup_counter % CHECK_PICKUP_FREQ.current_value() == 0 && pickup_counter != total_pickup_checks) {
+        if (has_pickup_mons && pickup_counter % CHECK_PICKUP_FREQ.current_value() == 0 && pickup_counter != total_pickup_checks){
             check_pickup_items(context, pickup_slots_selected);
             total_pickup_checks = pickup_counter;
         }

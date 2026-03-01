@@ -30,8 +30,14 @@ WallDuration thread_cpu_time(const ThreadHandle& handle){
     pthread_threadid_np(handle.handle, &tid);
     struct proc_threadinfo pth;
     if (PROC_PIDTHREADINFO_SIZE ==
-        proc_pidinfo(getpid(), PROC_PIDTHREADID64INFO, tid, &pth,
-                    PROC_PIDTHREADINFO_SIZE)) {
+        proc_pidinfo(
+            getpid(),
+            PROC_PIDTHREADID64INFO,
+            tid,
+            &pth,
+            PROC_PIDTHREADINFO_SIZE
+        )
+    ){
         nanos = pth.pth_user_time + pth.pth_system_time; // user time + system time in ns
     }
     else{
