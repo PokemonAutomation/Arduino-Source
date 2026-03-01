@@ -34,7 +34,7 @@ StatsReset_Descriptor::StatsReset_Descriptor()
         "PokemonLZA:StatsReset",
         STRING_POKEMON + " LZA", "Stats Reset",
         "Programs/PokemonLZA/StatsReset.html",
-        "Repeatedly receive gift " + STRING_POKEMON + " until you get the stats you want.",
+        "Repeatedly catch/receive " + STRING_POKEMON + " until you get the stats you want.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
@@ -75,6 +75,7 @@ StatsReset::StatsReset()
         "<b>Gift " + STRING_POKEMON + ":</b>",
         {
             {GiftPokemon::FLOETTE,  "floette",  "Floette" },
+            {GiftPokemon::GENESECT, "genesect", "Genesect" },
             {GiftPokemon::MAGEARNA, "magearna", "Magearna"},
             {GiftPokemon::MELTAN,   "meltan",   "Meltan"  },
             {GiftPokemon::MELMETAL, "melmetal", "Melmetal"},
@@ -105,6 +106,12 @@ StatsReset::StatsReset()
         LockMode::UNLOCK_WHILE_RUNNING,
         "6000 ms"
     )
+    , DOWN_SCROLLS(
+        "<b>Donut Down-Scrolls:</b><br>"
+        "Scroll this many donuts down. Input a negative number to scroll up instead.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0, -50, 50
+    )
     , HP("<b>HP:</b>")
     , ATTACK("<b>Attack:</b>", IvJudgeFilter::NoGood)
     , DEFENSE("<b>Defense:</b>")
@@ -125,6 +132,7 @@ StatsReset::StatsReset()
     PA_ADD_OPTION(SCROLL_HOLD);
     PA_ADD_OPTION(SCROLL_RELEASE);
     PA_ADD_OPTION(POST_THROW_WAIT);
+    PA_ADD_OPTION(DOWN_SCROLLS);
     PA_ADD_OPTION(HP);
     PA_ADD_OPTION(ATTACK);
     PA_ADD_OPTION(DEFENSE);
@@ -143,13 +151,105 @@ StatsReset::~StatsReset(){
 }
 
 void StatsReset::on_config_value_changed(void* object){
-    ConfigOptionState state = POKEMON == GiftPokemon::MELTAN
-                                  ? ConfigOptionState::ENABLED
-                                  : ConfigOptionState::HIDDEN;
-    RIGHT_SCROLLS.set_visibility(state);
-    SCROLL_HOLD.set_visibility(state);
-    SCROLL_RELEASE.set_visibility(state);
-    POST_THROW_WAIT.set_visibility(state);
+    ConfigOptionState state_ball  = (POKEMON == GiftPokemon::GENESECT || POKEMON == GiftPokemon::MELTAN)
+                                    ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN;
+    ConfigOptionState state_donut = (POKEMON == GiftPokemon::GENESECT || POKEMON == GiftPokemon::MELMETAL)
+                                    ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN;
+    RIGHT_SCROLLS.set_visibility(state_ball);
+    SCROLL_HOLD.set_visibility(state_ball);
+    SCROLL_RELEASE.set_visibility(state_ball);
+    POST_THROW_WAIT.set_visibility(state_ball);
+    DOWN_SCROLLS.set_visibility(state_donut);
+}
+
+void StatsReset::enter_portal(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    pbf_press_button(context, BUTTON_A, 50ms, 1s);
+    int8_t scrolls = DOWN_SCROLLS;
+    DpadPosition direction;
+    if (scrolls >= 0){
+        direction = DPAD_DOWN;
+    }else{
+        direction = DPAD_UP;
+        scrolls = -scrolls;
+    }
+    while (scrolls != 0){
+        pbf_press_dpad(context, direction, 50ms, 500ms);
+        scrolls--;
+    }
+    pbf_mash_button(context, BUTTON_A, 5s);
+    pbf_press_button(context, BUTTON_PLUS, 5s, 500ms);
+
+    OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
+
+    context.wait_for_all_requests();
+
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_B, 30s);
+        },
+        {
+            overworld,
+        }
+        );
+
+    if (ret == 0){
+        env.log("Detected overworld");
+        context.wait_for_all_requests();
+    }
+}
+
+void StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool attempt_move){
+    RunFromBattleWatcher battle_menu(COLOR_GREEN, &env.console.overlay(), 10ms);
+
+    context.wait_for_all_requests();
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_B, 120s);
+        },
+        {
+            battle_menu,
+        }
+        );
+
+    if (ret == 0){
+        env.log("Detected battle menu");
+        if (attempt_move){
+            pbf_press_button(context, BUTTON_Y, 50ms, 500ms);
+            ssf_press_button(context, BUTTON_ZL, 0ms, 4s, 200ms);
+            pbf_mash_button(context, BUTTON_A, 4s);
+        }
+        context.wait_for_all_requests();
+    }
+}
+
+void StatsReset::run_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    int8_t scrolls = RIGHT_SCROLLS;
+    DpadPosition direction;
+    if (scrolls >= 0){
+        direction = DPAD_RIGHT;
+    }else{
+        direction = DPAD_LEFT;
+        scrolls = -scrolls;
+    }
+
+    Milliseconds hold = SCROLL_HOLD;
+    Milliseconds cool = SCROLL_RELEASE;
+
+    ssf_press_button(
+        context,
+        BUTTON_ZL | BUTTON_ZR,
+        500ms, 500ms + (hold + cool) * scrolls,
+        0ms
+        );
+
+    while (scrolls != 0){
+        pbf_press_dpad(context, direction, hold, cool);
+        scrolls--;
+    }
+
+    pbf_wait(context, POST_THROW_WAIT);
 }
 
 void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -220,79 +320,15 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             pbf_move_left_joystick(context, {0, +1}, 8s, 500ms);
             if (POKEMON == GiftPokemon::MELTAN){
                 // start battle, knock out in one move
-                RunFromBattleWatcher battle_menu(COLOR_GREEN, &env.console.overlay(), 10ms);
-
-                context.wait_for_all_requests();
-                int ret = run_until<ProControllerContext>(
-                    env.console, context,
-                    [](ProControllerContext& context){
-                        pbf_mash_button(context, BUTTON_B, 120s);
-                    },
-                    {
-                        battle_menu,
-                    }
-                    );
-
-                if (ret == 0){
-                    env.log("Detected battle menu");
-                    pbf_press_button(context, BUTTON_Y, 50ms, 500ms);
-                    ssf_press_button(context, BUTTON_ZL, 0ms, 4s, 200ms);
-                    pbf_mash_button(context, BUTTON_A, 4s);
-                    context.wait_for_all_requests();
-                }
+                run_battle(env, context, true);
 
                 // expected knock out, throw ball
-                int8_t scrolls = RIGHT_SCROLLS;
-                DpadPosition direction;
-                if (scrolls >= 0){
-                    direction = DPAD_RIGHT;
-                }else{
-                    direction = DPAD_LEFT;
-                    scrolls = -scrolls;
-                }
+                run_catch(env, context);
 
-                Milliseconds hold = SCROLL_HOLD;
-                Milliseconds cool = SCROLL_RELEASE;
-
-                ssf_press_button(
-                    context,
-                    BUTTON_ZL | BUTTON_ZR,
-                    500ms, 500ms + (hold + cool) * scrolls,
-                    0ms
-                    );
-
-                while (scrolls != 0){
-                    pbf_press_dpad(context, direction, hold, cool);
-                    scrolls--;
-                }
-
-                pbf_wait(context, POST_THROW_WAIT);
                 pbf_mash_button(context, BUTTON_A, 10s);
             }
             if (POKEMON == GiftPokemon::MELMETAL){
-                // enter portal
-                pbf_press_button(context, BUTTON_A, 50ms, 1s);
-                pbf_press_dpad(context, DPAD_UP, 50ms, 500ms);
-                pbf_mash_button(context, BUTTON_A, 5s);
-                pbf_press_button(context, BUTTON_PLUS, 5s, 500ms);
-
-                OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
-
-                context.wait_for_all_requests();
-                int ret = run_until<ProControllerContext>(
-                    env.console, context,
-                    [](ProControllerContext& context){
-                        pbf_mash_button(context, BUTTON_B, 30s);
-                    },
-                    {
-                        overworld,
-                    }
-                    );
-
-                if (ret == 0){
-                    env.log("Detected overworld");
-                    context.wait_for_all_requests();
-                }
+                enter_portal(env, context);
 
                 pbf_press_button(context, BUTTON_L, 50ms, 500ms);
                 ssf_press_button(context, BUTTON_B, 0ms, 1000ms, 0ms);
@@ -310,10 +346,51 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             }
         }
 
+        if (POKEMON == GiftPokemon::GENESECT){
+            // fly to wild zone 13
+            FastTravelState travel_status = open_map_and_fly_to(env.console, context, LANGUAGE, Location::WILD_ZONE_13);
+            if (travel_status != FastTravelState::SUCCESS){
+                stats.errors++;
+                env.update_stats();
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Failed to travel to Wild Zone 13",
+                    env.console
+                    );
+            }
+            context.wait_for(100ms);
+            env.log("Detected overworld. Fast traveled to Wild Zone 13");
+
+            // move to the portal
+            run_towards_gate_with_A_button(env.console, context, 0, +1, Seconds(5));
+            pbf_mash_button(context, BUTTON_A, 4s);
+
+            ssf_press_button(context, BUTTON_B, 0ms, 1000ms, 0ms);
+            pbf_move_left_joystick(context, {0.6, +1}, 2500ms, 500ms);
+
+            enter_portal(env, context);
+            pbf_wait(context, 5s);
+
+            // initiate battle
+            pbf_press_button(context, BUTTON_L, 50ms, 500ms);
+            ssf_press_button(context, BUTTON_B, 0ms, 1000ms, 0ms);
+            pbf_move_left_joystick(context, {0, +1}, 15s, 1s);
+            pbf_move_left_joystick(context, {-1, 0}, 200ms, 500ms);
+            pbf_press_button(context, BUTTON_L, 50ms, 500ms);
+            ssf_press_button(context, BUTTON_B, 0ms, 1000ms, 0ms);
+            pbf_move_left_joystick(context, {0.2, +1}, 15s, 1s);
+
+            run_battle(env, context);
+
+            run_catch(env, context);
+            pbf_mash_button(context, BUTTON_A, 5s);
+        }
+
         context.wait_for_all_requests();
         {
             BlackScreenOverWatcher detector;
             OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
+            RunFromBattleWatcher battle_menu(COLOR_GREEN, &env.console.overlay(), 10ms);
             int result = run_until<ProControllerContext>(
                 env.console, context,
                 [this](ProControllerContext& context){
@@ -328,6 +405,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 {
                     detector,
                     overworld,
+                    battle_menu
                 }
                 );
             switch (result){
@@ -336,6 +414,12 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 break;
             case 1:
                 env.log("Early overworld, catch failed", COLOR_PURPLE);
+                stats.catch_fail++;
+                go_home(env.console, context);
+                reset_game_from_home(env, env.console, context, true);
+                continue;
+            case 2:
+                env.log("Still in battle, catch failed", COLOR_PURPLE);
                 stats.catch_fail++;
                 go_home(env.console, context);
                 reset_game_from_home(env, env.console, context, true);
