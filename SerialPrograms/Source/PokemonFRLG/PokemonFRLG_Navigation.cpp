@@ -34,7 +34,7 @@ void soft_reset(ConsoleHandle& console, ProControllerContext& context){
 
     //Random wait before pressing start/A
     console.log("Randomly waiting...");
-    Milliseconds rng_wait = std::chrono::milliseconds(PokemonSwSh::MaxLairInternal::random(0, 10000));
+    Milliseconds rng_wait = std::chrono::milliseconds(PokemonSwSh::MaxLairInternal::random(0, 5000));
     pbf_wait(context, rng_wait);
     context.wait_for_all_requests();
 
@@ -92,7 +92,7 @@ void soft_reset(ConsoleHandle& console, ProControllerContext& context){
 
     //Random wait no.2
     console.log("Randomly waiting...");
-    Milliseconds rng_wait2 = std::chrono::milliseconds(PokemonSwSh::MaxLairInternal::random(0, 10000));
+    Milliseconds rng_wait2 = std::chrono::milliseconds(PokemonSwSh::MaxLairInternal::random(0, 5000));
     pbf_wait(context, rng_wait2);
     context.wait_for_all_requests();
 
