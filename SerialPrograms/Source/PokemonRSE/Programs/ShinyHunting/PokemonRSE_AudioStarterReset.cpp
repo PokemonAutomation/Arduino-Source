@@ -103,7 +103,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
     */
 
     bool shiny_starter = false;
-    while (!shiny_starter) {
+    while (!shiny_starter){
         float shiny_coefficient = 1.0;
         ShinySoundDetector pooch_detector(env.console, [&](float error_coefficient) -> bool{
             shiny_coefficient = error_coefficient;
@@ -113,7 +113,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
         env.log("Opening bag and selecting starter.");
         pbf_press_button(context, BUTTON_A, 320ms, 1440ms);
 
-        switch (TARGET) {
+        switch (TARGET){
         case Target::treecko:
             pbf_press_dpad(context, DPAD_LEFT, 320ms, 800ms);
             break;
@@ -139,13 +139,13 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
 
         int res = run_until<ProControllerContext>(
             env.console, context,
-            [&](ProControllerContext& context) {
+            [&](ProControllerContext& context){
                 int ret = wait_until(
                     env.console, context,
                     std::chrono::seconds(20),
                     {{pooch_appeared}}
                 );
-                if (ret == 0) {
+                if (ret == 0){
                     env.log("Advance arrow detected.");
                 }
                 pbf_wait(context, 1000ms);
@@ -174,7 +174,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
         BattleMenuWatcher battle_menu(COLOR_RED);
         int res2 = run_until<ProControllerContext>(
             env.console, context,
-            [&](ProControllerContext& context) {
+            [&](ProControllerContext& context){
                 env.log("Sending out selected starter.");
                 pbf_press_button(context, BUTTON_A, 320ms, 320ms);
 
@@ -183,7 +183,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
                     std::chrono::seconds(20),
                     {{battle_menu}}
                 );
-                if (ret == 0) {
+                if (ret == 0){
                     env.log("Battle menu detecteed!");
                 }
                 pbf_wait(context, 1000ms);

@@ -83,7 +83,7 @@ ShinyHuntDeoxys::ShinyHuntDeoxys()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     env.log("Step 1: Press A from below.");
     pbf_press_button(context, BUTTON_A, 160ms, 320ms);
 
@@ -211,9 +211,9 @@ void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, ProController
 
     bool first_run = true;
 
-    while (true) {
-        if (first_run) {
-            switch (STARTPOS) {
+    while (true){
+        if (first_run){
+            switch (STARTPOS){
             case StartPos::rock_solved:
                 env.log("StartPos: Already in position.");
                 break;
@@ -240,7 +240,7 @@ void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, ProController
 
         //Start battle
         bool legendary_shiny = handle_encounter(env.console, context, true);
-        if (legendary_shiny) {
+        if (legendary_shiny){
             stats.shinies++;
             env.update_stats();
             send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", env.console.video().snapshot(), true);

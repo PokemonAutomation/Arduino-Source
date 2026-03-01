@@ -1,5 +1,5 @@
 # Set the minimum cmake version required
-cmake_minimum_required(VERSION 3.18.0)
+cmake_minimum_required(VERSION 3.24.0)
 
 # Tell CMake to re-run configuration when these files change (get around Qt issues with stale CMake files)
 set(_cmake_files_to_watch

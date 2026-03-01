@@ -76,7 +76,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     BBQSoloFarmer_Descriptor::Stats& stats = env.current_stats<BBQSoloFarmer_Descriptor::Stats>();
 
     //Make sure console type is set
-    if (env.console.state().console_type() == ConsoleType::Unknown) {
+    if (env.console.state().console_type() == ConsoleType::Unknown){
         throw UserSetupError(env.console, "Console Type (Switch 1 or 2) must be specified.");
     }
     

@@ -44,7 +44,7 @@ void ThreadPool_Default::stop(){
 //        m_dispatch_cv.notify_all();
     }
     for (ThreadData& thread : m_threads){
-        if (thread.thread.joinable()) {
+        if (thread.thread.joinable()){
             thread.thread.join();
         }
     }

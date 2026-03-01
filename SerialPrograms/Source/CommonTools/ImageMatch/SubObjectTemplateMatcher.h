@@ -47,7 +47,7 @@ namespace ImageMatch{
 // 2. At runtime, use it to check candidates:
 //    FlagMatcher matcher(true);  // Looking for left bar
 //    ImagePixelBox object_box;
-//    if (matcher.matches(object_box, image, candidate_waterfill_object)) {
+//    if (matcher.matches(object_box, image, candidate_waterfill_object)){
 //        // Found a flag! object_box contains the full flag bounding box
 //    }
 class SubObjectTemplateMatcher{

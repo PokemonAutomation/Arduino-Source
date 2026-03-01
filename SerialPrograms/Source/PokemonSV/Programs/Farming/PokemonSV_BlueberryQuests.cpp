@@ -293,13 +293,13 @@ std::vector<BBQuests> process_quest_list(
             else{
                 bool quest_in_table = false;
                 for(const std::unique_ptr<BBQuestTableRow>& row : exclusions_table){
-                    if(n == row->quest) {
+                    if(n == row->quest){
                         stream.log("Quest found in inclusions/exclusions table.");
                         quest_in_table = true;
 
                         WhiteButtonWatcher rp2(COLOR_BLUE, WhiteButton::ButtonB, {0.484, 0.117, 0.022, 0.037});
                         int result2;
-                        switch (row->action) {
+                        switch (row->action){
                         case BBQAction::run:
                             stream.log("Run selected. Adding quest to list.");
                             quests_to_do.push_back(n);
@@ -323,7 +323,7 @@ std::vector<BBQuests> process_quest_list(
                             context.wait_for_all_requests();
                             
                             //Move cursor down to quest
-                            for (int i = 0; i < questpos; i++) {
+                            for (int i = 0; i < questpos; i++){
                                 pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
                                 pbf_wait(context, 800ms);
                                 context.wait_for_all_requests();
@@ -661,9 +661,9 @@ void quest_tera_self_defeat(
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
             //Drop on top of Kleavor (plenty of Scyther in the area as well)
-            if (console.state().console_type() == ConsoleType::Switch1) {
+            if (console.state().console_type() == ConsoleType::Switch1){
                 jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8000ms, 13200ms, 2400ms);
-            } else { //All switch 2s
+            }else{ //All switch 2s
                 jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 8000ms, 12800ms, 2400ms);
             }
 
@@ -762,7 +762,7 @@ void quest_sneak_up(
             pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
 
             //Turn slightly for switch 1
-            if (console.state().console_type() == ConsoleType::Switch1) {
+            if (console.state().console_type() == ConsoleType::Switch1){
                 pbf_move_left_joystick(context, {-1, +1}, 160ms, 400ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 400ms);
             }
@@ -878,11 +878,11 @@ void quest_wild_tera(
             //Skarmory is likely to attack but sometimes there is a different pokemon
             pbf_press_button(context, BUTTON_PLUS, 160ms, 840ms);
 
-            if (console.state().console_type() == ConsoleType::Switch1) {
+            if (console.state().console_type() == ConsoleType::Switch1){
                 pbf_move_left_joystick(context, {-0.609, +1}, 160ms, 840ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 400ms);
                 pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
-            } else { //Switch 2
+            }else{ //Switch 2
                 pbf_move_left_joystick(context, {-0.844, +1}, 160ms, 840ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 400ms);
             }

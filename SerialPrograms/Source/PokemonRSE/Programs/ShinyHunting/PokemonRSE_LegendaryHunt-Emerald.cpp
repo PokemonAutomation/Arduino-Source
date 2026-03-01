@@ -79,7 +79,7 @@ LegendaryHuntEmerald::LegendaryHuntEmerald()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void LegendaryHuntEmerald::reset_regi(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void LegendaryHuntEmerald::reset_regi(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //turn around, walk down 4/until black screen over
     BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
@@ -136,7 +136,7 @@ void LegendaryHuntEmerald::reset_regi(SingleSwitchProgramEnvironment& env, ProCo
     context.wait_for_all_requests();
 }
 
-void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //Turn left. Take 10 steps.
     ssf_press_button(context, BUTTON_B, 0ms, 1440ms);
     pbf_press_dpad(context, DPAD_LEFT, 1440ms, 160ms);
@@ -223,7 +223,7 @@ void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, Pr
     context.wait_for_all_requests();
 }
 
-void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //Turn down. Take 1 step.
     ssf_press_button(context, BUTTON_B, 0ms, 160ms);
     pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
@@ -316,7 +316,7 @@ void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, Pro
     context.wait_for_all_requests();
 }
 
-void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     //Turn around, 10 steps down
     ssf_press_button(context, BUTTON_B, 0ms, 1440ms);
@@ -383,7 +383,7 @@ void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, ProCo
     context.wait_for_all_requests();
 }
 
-void LegendaryHuntEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void LegendaryHuntEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     //Turn around, 5 steps down
     ssf_press_button(context, BUTTON_B, 0ms, 720ms);
@@ -463,8 +463,8 @@ void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, ProContr
     * Stand in front of Regis/Ho-Oh/Lugia. Save the game.
     */
 
-    while (true) {
-        switch (TARGET) {
+    while (true){
+        switch (TARGET){
         case Target::hooh:
         case Target::kyogre:
         case Target::groudon:
@@ -482,7 +482,7 @@ void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, ProContr
         //handle_encounter presses A already for everything else
         
         bool legendary_shiny = handle_encounter(env.console, context, true);
-        if (legendary_shiny) {
+        if (legendary_shiny){
             stats.shinies++;
             env.update_stats();
             send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", env.console.video().snapshot(), true);
@@ -496,7 +496,7 @@ void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, ProContr
         context.wait_for_all_requests();
         
         //Exit and re-enter the room
-        switch (TARGET) {
+        switch (TARGET){
         case Target::regis:
             reset_regi(env, context);
             break;

@@ -296,7 +296,7 @@ void JacintheInfiniteFarmer::program(SingleSwitchProgramEnvironment& env, ProCon
 
     while (true){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-        if (NUM_ROUNDS != 0 && stats.rounds >= NUM_ROUNDS) {
+        if (NUM_ROUNDS != 0 && stats.rounds >= NUM_ROUNDS){
             break;
         }
         if (talk_to_jacinthe(env, context)){

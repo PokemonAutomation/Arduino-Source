@@ -177,7 +177,7 @@ bool hunt_latias_alt(SingleSwitchProgramEnvironment& env,
     env.update_stats();
 
     // For now, return true (triggering program stop) if a shiny is detected or a non-shiny is not detected
-    if (nonshiny_result < 18 || shiny_result > LATIAS_VISUAL_SHINY_THRESHOLD) {
+    if (nonshiny_result < 18 || shiny_result > LATIAS_VISUAL_SHINY_THRESHOLD){
         env.console.log("Shiny Latias identified or regular Latias not identified. Stopping program.", COLOR_MAGENTA);
         return true;
     }
@@ -351,7 +351,7 @@ void hunt_latias_check(
             "hunt_latias(): Cannot detect ladder after 5 seconds",
             env.console
         );
-    } else {
+    }else{
         env.console.log("Detected ladder.");
     }
 
@@ -730,7 +730,7 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
             }
             const int ret = run_until<ProControllerContext>(
                 env.console, context,
-                [&](ProControllerContext& context) {
+                [&](ProControllerContext& context){
                     if (LEGENDARY == Legendary::LATIAS){
                         hunt_latias_check(env, context, stats);
                     }else if (LEGENDARY == Legendary::LATIOS){
@@ -759,7 +759,7 @@ void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env,
                 env, env.console, context,
                 shiny_count,
                 shiny_coefficient
-            )) {
+            )){
                 break;
             }
         }

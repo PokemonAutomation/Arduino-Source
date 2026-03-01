@@ -45,10 +45,10 @@ PageIngredients BerrySession::read_screen(std::shared_ptr<const ImageRGB32> scre
     PageIngredients ret;
     
     int slot = 0;
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++){
         DonutBerriesSelectionWatcher arrow(i);
         //cout << "menu index: " << i << endl;
-        if (arrow.detect(*screen)) {
+        if (arrow.detect(*screen)){
             //cout << "detected in slot: " << i << endl;
             slot = i;
             break;
@@ -156,7 +156,7 @@ bool BerrySession::run_move_iteration(
     size_t found_location = SIZE_MAX;
     for (size_t c = 0; c < DonutBerriesReader::BERRY_PAGE_LINES; c++){
         for (const std::string& item : page.item[c]){
-            if (berry == item) {
+            if (berry == item){
                 found_location = c;
                 break;
             }

@@ -42,7 +42,7 @@ public:
 
 public:
     Logger& logger(){ return m_logger; }
-    virtual VideoFeed& video() { return m_video_session; }
+    virtual VideoFeed& video(){ return m_video_session; }
     VideoOverlay& overlay(){ return m_overlay; }
 
     void set_image_source(const std::string& path);

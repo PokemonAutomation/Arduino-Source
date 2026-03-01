@@ -54,7 +54,7 @@ StringMatchResult multifiltered_OCR(
             const std::pair<ImageRGB32, size_t>& filtered = filtered_images[index];
 
             std::string text;
-            if (use_paddle_ocr) {
+            if (use_paddle_ocr){
                 text = paddle_ocr_read(language, filtered.first);
             }else{
                 text = ocr_read(language, filtered.first, psm);

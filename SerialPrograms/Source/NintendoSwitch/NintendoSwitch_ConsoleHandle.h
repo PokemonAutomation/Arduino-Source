@@ -49,7 +49,7 @@ public:
     operator Logger&(){ return logger(); }
     operator VideoFeed&(){ return video(); }
     operator VideoOverlay&(){ return overlay(); }
-    operator AudioFeed&() { return audio(); }
+    operator AudioFeed&(){ return audio(); }
     operator const StreamHistorySession&() const{ return history(); }
 
     ConsoleState& state(){ return m_console_state; }

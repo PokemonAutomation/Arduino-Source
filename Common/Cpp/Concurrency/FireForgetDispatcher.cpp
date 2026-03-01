@@ -23,7 +23,7 @@ FireForgetDispatcher::FireForgetDispatcher()
     : m_stopping(false)
 {}
 
-void FireForgetDispatcher::stop() {
+void FireForgetDispatcher::stop(){
     {
         std::lock_guard<Mutex> lg(m_lock);
         // like with the other thread option, make sure we're not double stopping

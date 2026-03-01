@@ -74,7 +74,7 @@ Xoroshiro128PlusState refind_rng_state(
     size_t max_advances,
     bool save_screenshots,
     bool log_image_values
-) {
+){
     return refind_rng_state_and_animations(stream, context, last_known_state, min_advances, max_advances, save_screenshots, log_image_values).first;
 }
 
@@ -180,10 +180,10 @@ void do_rng_advances(
     pbf_wait(context, 1000ms);
 }
 
-Xoroshiro128PlusState predict_state_after_menu_close(Xoroshiro128PlusState current_state, uint8_t num_npcs) {
+Xoroshiro128PlusState predict_state_after_menu_close(Xoroshiro128PlusState current_state, uint8_t num_npcs){
     Xoroshiro128Plus rng(current_state);
 
-    for (size_t i = 0; i < num_npcs; i++) {
+    for (size_t i = 0; i < num_npcs; i++){
         rng.nextInt(91);
     }
     rng.next();

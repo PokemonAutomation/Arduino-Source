@@ -63,7 +63,7 @@ PaddleOCRPipeline::PaddleOCRPipeline(Language language, std::string rec_path, st
     
 }
 
-void PaddleOCRPipeline::run(const std::string& img_path) {
+void PaddleOCRPipeline::run(const std::string& img_path){
     #if 0
     cv::Mat img = cv::imread(img_path);
     if (img.empty()) return;
@@ -72,7 +72,7 @@ void PaddleOCRPipeline::run(const std::string& img_path) {
     // In practice, use DBPostProcess to get boxes from detection output
     std::vector<cv::Rect> boxes = {{10, 10, 100, 30}}; // Mock detected box
 
-    for (auto& box : boxes) {
+    for (auto& box : boxes){
         cv::Mat cropped = img(box);
         std::string text = recognize(cropped);
         std::cout << "Detected Text: " << text << std::endl;
@@ -82,7 +82,7 @@ void PaddleOCRPipeline::run(const std::string& img_path) {
 
 
 
-void PaddleOCRPipeline::load_dictionary(const std::string& path) {
+void PaddleOCRPipeline::load_dictionary(const std::string& path){
     std::ifstream fs(path);
     std::string line;
     // m_dictionary.push_back("blank"); // CTC blank index
@@ -91,7 +91,7 @@ void PaddleOCRPipeline::load_dictionary(const std::string& path) {
     }
 }
 
-std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image) {
+std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
 
     // 1. Convert Image to OpenCV image (cv::mat)
     cv::Mat cv_image_rgb = imageviewrgb32_to_cv_mat_rgb(image);
@@ -109,7 +109,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image) {
     cv::findNonZero(binary_inv, nonZeroCoords);
 
     cv::Mat cropped_image;
-    if (!nonZeroCoords.empty()) {
+    if (!nonZeroCoords.empty()){
         // Get the minimal bounding rectangle for the text
         cv::Rect boundingBox = cv::boundingRect(nonZeroCoords);
         
@@ -124,7 +124,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image) {
         // static int i = 0;
         // cv::imwrite("output" + std::to_string(i) + ".png", cropped_image);
         // i++;
-    } else {
+    }else{
         return ""; // Return empty string if no text is detected in the region
     }
     
@@ -201,22 +201,22 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image) {
 }
 
 
-std::vector<float> preprocess_NCHW(cv::Mat& img) {
+std::vector<float> preprocess_NCHW(cv::Mat& img){
     std::vector<float> dst(img.rows * img.cols * 3);
-    for (int c = 0; c < 3; ++c) {
-        for (int i = 0; i < img.rows * img.cols; ++i) {
+    for (int c = 0; c < 3; ++c){
+        for (int i = 0; i < img.rows * img.cols; ++i){
             dst[c * img.rows * img.cols + i] = ((float*)img.data)[i * 3 + c];
         }
     }
     return dst;
 }
 
-std::string decode_CTC(float* data, const std::vector<int64_t>& shape, const std::vector<std::string>& dict) {
+std::string decode_CTC(float* data, const std::vector<int64_t>& shape, const std::vector<std::string>& dict){
     std::string text = "";
     size_t seq_len = static_cast<size_t>(shape[1]);
     int64_t num_cls = shape[2];
     size_t last_index = 0; 
-    for (size_t i = 0; i < seq_len; ++i) {
+    for (size_t i = 0; i < seq_len; ++i){
         float* row = data + i * num_cls;
         // 1. Get the character index with highest probability (Argmax)
         size_t argmax = std::distance(row, std::max_element(row, row + num_cls));
@@ -224,10 +224,10 @@ std::string decode_CTC(float* data, const std::vector<int64_t>& shape, const std
         // 2. CTC Decoding Rules:
         // Rule A: Index 0 is the CTC Blank. Skip it.
         // Rule B: Skip consecutive duplicate characters (e.g., "aa" -> "a").
-        if (argmax > 0 && argmax != last_index) {
+        if (argmax > 0 && argmax != last_index){
             // Index 1 from the model maps to the 1st line of your .txt file (Vector index 0)
             size_t dict_idx = argmax - 1; 
-            if (dict_idx < dict.size()) {
+            if (dict_idx < dict.size()){
                 text += dict[dict_idx];
             }
         }
@@ -238,15 +238,15 @@ std::string decode_CTC(float* data, const std::vector<int64_t>& shape, const std
 
 
 template <typename _Tp>
-_Tp safe_convert(size_t value) {
-    if (value > static_cast<size_t>(std::numeric_limits<_Tp>::max())) {
+_Tp safe_convert(size_t value){
+    if (value > static_cast<size_t>(std::numeric_limits<_Tp>::max())){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "safe_convert: Value too large for template type _Tp.");
     }
     return static_cast<_Tp>(value);
 }
 
 // Convert ImageViewRGB32 (ARGB) to CV Mat (RGB). Create a new copy of the image.
-cv::Mat imageviewrgb32_to_cv_mat_rgb(const ImageViewRGB32& image) {
+cv::Mat imageviewrgb32_to_cv_mat_rgb(const ImageViewRGB32& image){
     // 1. Wrap the existing 4-channel data without copying memory
     cv::Mat bgra_wrap = image.to_opencv_Mat();
 
