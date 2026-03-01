@@ -1,0 +1,18 @@
+# templates/checkout.yml
+# Template for checking out the Arduino-Source repositories
+
+steps:
+  - checkout: Arduino-Source-Internal
+    path: Arduino-Source-Internal
+    fetchDepth: 1
+    persistCredentials: true
+    sparseCheckoutPatterns: |
+      /*
+      !Repository/Public/*
+      !Repository/Deployment-SerialPrograms-Qt6.10.0-MSVC2022/
+      !Repository/Deployment-SerialPrograms-Qt6.8.3-MSVC2022/
+    workspaceRepo: true
+
+  - checkout: Arduino-Source
+    path: Arduino-Source-Internal/Repository/Public
+    persistCredentials: true

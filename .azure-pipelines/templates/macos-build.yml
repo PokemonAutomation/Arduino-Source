@@ -1,0 +1,178 @@
+# templates/macos-build.yml
+# Template for building SerialPrograms on MacOS
+
+parameters:
+  stageName: ''
+  displayName: ''
+  targetOS: ''
+  poolName: ''
+  imageName: ''
+  architecture: ''
+  compiler: ''
+  qt_version: ''
+  qt_version_major: ''
+  qt_modules: ''
+  cmake_preset: ''
+  macos_path: ''
+  cmake_version_params: ''
+  cmake_additional_param: ''
+  condition: ''
+
+stages:
+- stage: ${{ parameters.stageName }}
+  displayName: ${{ parameters.displayName }}
+  dependsOn: []
+  condition: ${{ parameters.condition }}
+
+  jobs:
+  - job: MacOS
+    timeoutInMinutes: 60
+    cancelTimeoutInMinutes: 1
+    displayName: MacOS ${{ parameters.architecture }}
+
+    pool:
+      name: ${{ parameters.poolName }}
+      demands:
+        - Agent.OSArchitecture -equals ${{ lower(parameters.architecture) }}
+
+    variables:
+      architecture: ${{ parameters.architecture }}
+      compiler: ${{ parameters.compiler }}
+      qt_version: ${{ parameters.qt_version }}
+      cmake_preset: ${{ parameters.cmake_preset }}
+      macos_path: ${{ parameters.macos_path }}
+      cmake_version_params: ${{ parameters.cmake_version_params }}
+      cmake_additional_param: ${{ parameters.cmake_additional_param }}
+
+    steps:
+      - template: checkout.yml
+
+      #- script: |
+      #    set -e
+      #    PERSISTENT_ONNX="/Users/Shared/onnxruntime"
+      #    WORK_ONNX="$(Pipeline.Workspace)/onnxruntime"
+      #
+      #    if [ -d "$PERSISTENT_ONNX" ]; then
+      #      echo "=== Found ONNX Runtime at $PERSISTENT_ONNX ==="
+      #      if [ ! -L "$WORK_ONNX" ]; then
+      #        ln -sf "$PERSISTENT_ONNX" "$WORK_ONNX"
+      #        echo "=== Created symlink to ONNX Runtime ==="
+      #      fi
+      #    else
+      #      echo "=== ERROR: ONNX Runtime not found at $PERSISTENT_ONNX ==="
+      #      exit 1
+      #    fi
+      #  displayName: 'Link ONNX Runtime'
+      #  condition: succeeded()
+
+      - script: |
+          export PATH=$(macos_path)
+          cd "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/SerialPrograms"
+          cmake $(cmake_additional_param) $(cmake_version_params) --preset=$(cmake_preset) --fresh
+        displayName: 'Configure CMake'
+        condition: succeeded()
+
+      - script: |
+          export PATH=$(macos_path)
+          cd "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/SerialPrograms"
+          cmake --build --preset=$(cmake_preset)
+        displayName: 'Build'
+        condition: succeeded()
+
+      - script: |
+          set -e
+          export PATH=$(macos_path)
+          BUILD_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
+
+          echo "=== Generating dSYM bundle ==="
+          mkdir -p "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-symbols"
+          cd "$BUILD_DIR"
+          dsymutil SerialPrograms.app/Contents/MacOS/SerialPrograms -o cache-symbols/SerialPrograms.dSYM
+
+          echo "=== dSYM bundle created ==="
+        displayName: 'Generate Debug Symbols'
+        condition: succeeded()
+
+      - script: |
+          set -e
+          export PATH=$(macos_path)
+          APP_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/SerialPrograms.app"
+          MACOS_DIR="$APP_DIR/Contents/MacOS"
+          FW_DIR="$APP_DIR/Contents/Frameworks"
+          BREW_PREFIX=$(brew --prefix)
+
+          mkdir -p "$FW_DIR"
+          if [ "$(architecture)" = "x64" ]; then
+              QT_BIN="/usr/local/Qt/$(qt_version)/macos/bin"
+          else
+              QT_BIN="/opt/Qt/$(qt_version)/macos/bin"
+          fi
+
+          echo "=== Copying additional deps ==="
+          cp $BREW_PREFIX/opt/gcc/lib/gcc/current/libgcc_s.1.1.dylib $APP_DIR/Contents/Frameworks
+          cp $BREW_PREFIX/opt/protobuf/lib/libutf8_validity.dylib $APP_DIR/Contents/Frameworks
+          cp $BREW_PREFIX/opt/little-cms2/lib/liblcms2.2.dylib $APP_DIR/Contents/Frameworks
+          cp $BREW_PREFIX/opt/webp/lib/libsharpyuv.0.dylib $APP_DIR/Contents/Frameworks
+          cp $BREW_PREFIX/opt/jpeg-xl/lib/libjxl_cms.0.11.dylib $APP_DIR/Contents/Frameworks
+          cp $BREW_PREFIX/opt/vtk/lib/libvtkCommonComputationalGeometry-*.dylib $APP_DIR/Contents/Frameworks
+          cp $BREW_PREFIX/opt/vtk/lib/libvtkFiltersVerdict-*.dylib $APP_DIR/Contents/Frameworks
+          cp $BREW_PREFIX/opt/vtk/lib/libvtkfmt-*.dylib $APP_DIR/Contents/Frameworks
+          cp $BREW_PREFIX/opt/vtk/lib/libvtkFiltersGeometry-*.dylib $APP_DIR/Contents/Frameworks
+          cp $BREW_PREFIX/opt/vtk/lib/libvtkFiltersCore-*.dylib $APP_DIR/Contents/Frameworks
+          cp $BREW_PREFIX/opt/vtk/lib/libvtkCommonCore-*.dylib $APP_DIR/Contents/Frameworks
+          cp $BREW_PREFIX/opt/vtk/lib/libvtkCommonSystem-*.dylib $APP_DIR/Contents/Frameworks
+
+          echo "=== Running macdeployqt6 ==="
+          install_name_tool -add_rpath $BREW_PREFIX/lib $MACOS_DIR/SerialPrograms
+          otool -l $MACOS_DIR/SerialPrograms | grep -A2 LC_RPATH
+          "$QT_BIN/macdeployqt6" $APP_DIR -no-strip -verbose=3
+
+          echo "=== Fixing install IDs in copied libs ==="
+          for dylib in "$FW_DIR"/*.dylib; do
+              [ -f "$dylib" ] || continue
+              base=$(basename "$dylib")
+              install_name_tool -id "@executable_path/../Frameworks/$base" "$dylib"
+          done
+
+          echo "=== Rewriting internal dylib references ==="
+          for dylib in "$FW_DIR"/*.dylib; do
+              [ -f "$dylib" ] || continue
+              for linked in $(otool -L "$dylib" | awk 'NR>1 {print $1}' | grep "$BREW_PREFIX" || true); do
+                  base=$(basename "$linked")
+                  if [ -f "$FW_DIR/$base" ]; then
+                      install_name_tool -change "$linked" "@executable_path/../Frameworks/$base" "$dylib"
+                  fi
+              done
+          done
+
+          echo "=== Rewriting main executable references ==="
+          for linked in $(otool -L "$MACOS_DIR/SerialPrograms" | awk 'NR>1 {print $1}' | grep "$BREW_PREFIX" || true); do
+              base=$(basename "$linked")
+              if [ -f "$FW_DIR/$base" ]; then
+                  install_name_tool -change "$linked" "@executable_path/../Frameworks/$base" "$MACOS_DIR/SerialPrograms"
+              fi
+          done
+
+          echo "=== Creating tarballs for build and symbols ==="
+          mkdir -p "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build"
+          cd "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
+          tar -czf "cache-build/macos-build-${{ parameters.architecture }}.tar.gz" SerialPrograms.app
+          tar -czf "cache-symbols/macos-symbols-${{ parameters.architecture }}.tar.gz" cache-symbols/SerialPrograms.dSYM
+
+          echo "Deployment complete for $(architecture)"
+        displayName: 'Deploy app'
+        condition: succeeded()
+
+      - task: Cache@2
+        displayName: 'Cache the build artifact'
+        inputs:
+          key: 'macos-build-${{ parameters.architecture }} | "$(Build.BuildId)"'
+          path: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build'
+        condition: succeeded()
+
+      - task: Cache@2
+        displayName: 'Cache debug symbols'
+        inputs:
+          key: 'macos-symbols-${{ parameters.architecture }} | "$(Build.BuildId)"'
+          path: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-symbols'
+        condition: succeeded()

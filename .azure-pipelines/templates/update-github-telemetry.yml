@@ -1,0 +1,222 @@
+# templates/update-github-telemetry.yml
+# Template for updating GitHub Telemetry JSON file with new telemetry information
+
+parameters:
+  stageName: ''
+  displayName: ''
+  dependsOn: []
+  buildType: ''
+  versionMajor: 0
+  versionMinor: 0
+  versionPatch: 0
+  telemetryRepo: ''
+  condition: ''
+
+stages:
+- stage: ${{ parameters.stageName }}
+  displayName: ${{ parameters.displayName }}
+  dependsOn: ${{ parameters.dependsOn }}
+  condition: ${{ parameters.condition }}
+
+  jobs:
+  - job: UpdateTelemetryJSON
+    displayName: 'Update Telemetry JSON'
+    timeoutInMinutes: 10
+    cancelTimeoutInMinutes: 1
+
+    pool:
+      vmImage: windows-latest
+
+    steps:
+      - checkout: none
+
+      - task: DownloadSecureFile@1
+        name: ObfuscateScript
+        displayName: 'Download Obfuscation Script'
+        inputs:
+          secureFile: 'Obfuscate-Telemetry.ps1'
+
+      - task: PowerShell@2
+        displayName: 'Add v${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }} to Telemetry JSON'
+        condition: succeeded()
+        inputs:
+          targetType: 'inline'
+          script: |
+            $ErrorActionPreference = "Stop"
+
+            function Compare-Versions {
+                param(
+                    [string]$Version1,
+                    [string]$Version2
+                )
+
+                $v1Parts = $Version1.TrimStart('v').Split('.')
+                $v2Parts = $Version2.TrimStart('v').Split('.')
+
+                if ([int]$v1Parts[0] -gt [int]$v2Parts[0]) { return 1 }
+                if ([int]$v1Parts[0] -lt [int]$v2Parts[0]) { return -1 }
+
+                if ([int]$v1Parts[1] -gt [int]$v2Parts[1]) { return 1 }
+                if ([int]$v1Parts[1] -lt [int]$v2Parts[1]) { return -1 }
+
+                if ([int]$v1Parts[2] -gt [int]$v2Parts[2]) { return 1 }
+                if ([int]$v1Parts[2] -lt [int]$v2Parts[2]) { return -1 }
+
+                return 0
+            }
+
+            $token = "$(GITHUB_PAT)"
+            $repo = "${{ parameters.telemetryRepo }}"
+            $filePath = "Developer/Telemetry.json"
+            $branch = "main"
+            $getUrl = "https://api.github.com/repos/" + $repo + "/contents/" + $filePath + "?ref=" + $branch
+            $versionKey = $env:TELEMETRY_VERSION
+            Write-Host "Constructed URL: $getUrl"
+
+            Write-Host "================================================"
+            Write-Host "Adding $versionKey to Telemetry JSON"
+            Write-Host "Repository: $repo"
+            Write-Host "File: $filePath"
+            Write-Host "================================================"
+            Write-Host ""
+
+            Write-Host "Generating obfuscated metadata..."
+            $scriptPath = "$(obfuscateScript.secureFilePath)"
+            $obfuscatedMetadata = & $scriptPath
+            Write-Host "✓ Generated metadata (length: $($obfuscatedMetadata.Length) chars)"
+            Write-Host ""
+
+            $headers = @{
+                Authorization = "token $token"
+                Accept = "application/vnd.github.v3+json"
+            }
+
+            try {
+                Write-Host "Fetching current Telemetry JSON..."
+                $fileInfo = Invoke-RestMethod -Uri $getUrl -Headers $headers -Method Get
+
+                $currentContent = [System.Text.Encoding]::UTF8.GetString(
+                    [System.Convert]::FromBase64String($fileInfo.content)
+                )
+                $json = $currentContent | ConvertFrom-Json
+
+                if ($json.PSObject.Properties.Name -contains $versionKey) {
+                    Write-Host ""
+                    Write-Host "================================================"
+                    Write-Host "⚠️ Version $versionKey already exists in Telemetry JSON"
+                    Write-Host "Skipping update to prevent duplicates."
+                    Write-Host "================================================"
+                    exit 0
+                }
+
+                $highestVersion = $null
+                foreach ($property in $json.PSObject.Properties) {
+                    $key = $property.Name
+                    if ($key -eq "Default") { continue }
+                    if ($key -match '^v\d+\.\d+\.\d+$') {
+                        if ($null -eq $highestVersion -or (Compare-Versions $key $highestVersion) -gt 0) {
+                            $highestVersion = $key
+                        }
+                    }
+                }
+
+                if ($null -ne $highestVersion) {
+                    Write-Host "Current highest version: $highestVersion"
+                    $comparison = Compare-Versions $versionKey $highestVersion
+
+                    if ($comparison -le 0) {
+                        Write-Host ""
+                        Write-Host "================================================"
+                        Write-Host "⚠️ Version $versionKey is not higher than existing version $highestVersion"
+                        Write-Host "Skipping update. Only higher versions are added."
+                        Write-Host "================================================"
+                        exit 0
+                    }
+
+                    Write-Host "✓ Version $versionKey is higher than $highestVersion - proceeding with update"
+                } else {
+                    Write-Host "No existing versions found - proceeding with update"
+                }
+                Write-Host ""
+
+                $lines = $currentContent -split "`r?`n"
+                $updatedLines = @()
+                $insertionDone = $false
+                $inDefaultSection = $false
+                $bracketDepth = 0
+
+                for ($i = 0; $i -lt $lines.Count; $i++) {
+                    $line = $lines[$i]
+                    $updatedLines += $line
+
+                    if ($line -match '^\s*"Default"\s*:\s*\{') {
+                        $inDefaultSection = $true
+                        $bracketDepth = 1
+                    }
+                    elseif ($inDefaultSection) {
+                        $openBrackets = ([regex]::Matches($line, '\{')).Count
+                        $closeBrackets = ([regex]::Matches($line, '\}')).Count
+                        $bracketDepth += $openBrackets - $closeBrackets
+
+                        if ($bracketDepth -eq 0 -and $line -match '^\s*\}') {
+                            $inDefaultSection = $false
+                            $hasComma = $line -match '\},'
+
+                            if (-not $hasComma) {
+                                $updatedLines[$updatedLines.Count - 1] = $line -replace '\}', '},'
+                            }
+
+                            $baseIndent = "    "
+                            $updatedLines += "$baseIndent`"$versionKey`": {"
+                            $updatedLines += "$baseIndent    `"Metadata`": `"$obfuscatedMetadata`","
+                            $updatedLines += "$baseIndent    `"ReportRate`": 1.0"
+                            $updatedLines += "$baseIndent},"
+
+                            $insertionDone = $true
+                            Write-Host "✓ Inserted $versionKey with generated Metadata and ReportRate: 1.0"
+                        }
+                    }
+                }
+
+                if (-not $insertionDone) {
+                    Write-Host "❌ Failed to find Default section for insertion"
+                    exit 1
+                }
+
+                $newContent = ($updatedLines -join "`n")
+                $contentBytes = [System.Text.Encoding]::UTF8.GetBytes($newContent)
+                $contentBase64 = [System.Convert]::ToBase64String($contentBytes)
+                $commitMessage = "Add $versionKey to Telemetry JSON via Azure Pipeline"
+
+                $updateBody = @{
+                    message = $commitMessage
+                    content = $contentBase64
+                    sha = $fileInfo.sha
+                    branch = $branch
+                } | ConvertTo-Json -Depth 10
+
+                Write-Host "Pushing changes to GitHub..."
+                $putUrl = "https://api.github.com/repos/$repo/contents/$filePath"
+                $response = Invoke-RestMethod -Uri $putUrl -Headers $headers -Method Put -Body $updateBody -ContentType "application/json"
+
+                Write-Host ""
+                Write-Host "================================================"
+                Write-Host "✅ Successfully added $versionKey to Telemetry JSON"
+                Write-Host "================================================"
+
+            } catch {
+                Write-Host ""
+                Write-Host "================================================"
+                Write-Host "❌ Failed to update Telemetry JSON"
+                Write-Host "Error: $($_.Exception.Message)"
+                if ($_.ErrorDetails.Message) {
+                    Write-Host "Details: $($_.ErrorDetails.Message)"
+                }
+                Write-Host "================================================"
+                exit 1
+            }
+        env:
+          GITHUB_PAT: $(GITHUB_PAT)
+          TELEMETRY_KEY_1: $(TELEMETRY_KEY_1)
+          TELEMETRY_KEY_2: $(TELEMETRY_KEY_2)
+          TELEMETRY_VERSION: "v${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
