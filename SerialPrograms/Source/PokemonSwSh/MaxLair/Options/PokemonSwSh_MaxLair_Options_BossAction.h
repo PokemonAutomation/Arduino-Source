@@ -11,6 +11,10 @@
 #include "Common/Cpp/Options/StaticTableOption.h"
 #include "CommonFramework/Options/LabelCellOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/ConfigOption.h"
+#include <vector>
+#include <memory>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -23,20 +27,36 @@ enum class BossAction{
     CATCH_AND_STOP_IF_SHINY,
 };
 
+const EnumDropdownDatabase<BossAction>& BossAction_Database();
 
-class BossActionRow : public StaticTableRow{
+class BossActionRow : public StaticTableRow,
+private ConfigOption::Listener
+{
 public:
     BossActionRow(std::string slug, const std::string& name_slug, const std::string& sprite_slug);
+    virtual void on_config_value_changed(void* object) override;
 
+    
     LabelCellOption pokemon;
     EnumDropdownCell<BossAction> action;
     PokemonBallSelectCell ball;
+    BooleanCheckBoxCell save_on_the_go;
 };
 
-class BossActionTable : public StaticTableOption{
+class BossActionTable : public StaticTableOption,
+private ConfigOption::Listener
+{
 public:
     BossActionTable();
-    virtual std::vector<std::string> make_header() const;
+    ~BossActionTable();
+    
+    virtual void on_config_value_changed(void* object) override;
+    virtual std::vector<std::string> make_header() const override;
+    
+private:
+    std::vector<BossActionRow*> m_rows;
+    bool m_reverting;
+    void update_checkbox_states();
 };
 
 
