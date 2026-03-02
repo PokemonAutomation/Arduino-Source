@@ -82,10 +82,10 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Exceptions.h
     ../Common/Cpp/ExpressionEvaluator.cpp
     ../Common/Cpp/ExpressionEvaluator.h
-    ../Common/Cpp/FileIO.cpp
-    ../Common/Cpp/FileIO.h
     ../Common/Cpp/Filesystem.cpp
     ../Common/Cpp/Filesystem.h
+    ../Common/Cpp/FileIO.cpp
+    ../Common/Cpp/FileIO.h
     ../Common/Cpp/Hardware/Hardware.cpp
     ../Common/Cpp/Hardware/Hardware.h
     ../Common/Cpp/Hardware/Hardware_arm64_Linux.tpp
@@ -1408,6 +1408,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.cpp
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h
+    Source/PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.cpp
+    Source/PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.h
     Source/PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.cpp
     Source/PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h
     Source/PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.cpp
