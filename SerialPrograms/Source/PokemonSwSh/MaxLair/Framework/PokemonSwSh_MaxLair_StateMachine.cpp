@@ -160,7 +160,8 @@ StateMachineAction run_state_iteration(
             global_state,
             runtime.console_settings[console_index],
             battle_menu.dmaxed(),
-            battle_menu.cheer()
+            battle_menu.cheer(),
+            runtime.actions
         );
     case 5:
         console.log("Current State: Catch Select");

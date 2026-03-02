@@ -55,7 +55,7 @@ struct MaxLairMon{
 };
 
 const std::map<size_t, std::string>& all_bosses_by_dex();
-const std::map<size_t, std::string>& all_rentals_by_dex();
+const std::multimap<size_t, std::string>& all_rentals_by_dex();
 bool is_boss(const std::string& slug);
 
 const MaxLairMon& get_maxlair_mon(const std::string& slug);

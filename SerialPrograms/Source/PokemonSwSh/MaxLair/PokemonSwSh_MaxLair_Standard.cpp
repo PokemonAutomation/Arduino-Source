@@ -166,6 +166,9 @@ public:
         }
         return actions.no_shinies;
     }
+    virtual bool stop_for_non_boss(const std::string& slug) const override {
+        return false;
+    }
 
 private:
     const MaxLairStandard_ConsoleOptions& console(size_t index) const{
