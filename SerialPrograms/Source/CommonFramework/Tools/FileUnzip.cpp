@@ -12,10 +12,9 @@
 #define _FILE_OFFSET_BITS 64
 #endif
 
-// #include "miniz-cpp/zip_file.hpp"
 
 #include "miniz-3.1.1/miniz.h"
-// #include "3rdParty/miniz-3.1.1/miniz.h"
+#include "Common/Cpp/Filesystem.h"
 #include "Common/Cpp/Exceptions.h"
 #include "FileUnzip.h"
 #include <filesystem>
@@ -70,12 +69,12 @@ namespace PokemonAutomation{
         try {
             // 1. Get absolute, normalized paths
             // handles symlinks. and resolves .. and . components. throws error if path doesn't exist
-            fs::path base = fs::canonical(target_dir);
+            Filesystem::Path base = fs::canonical(Filesystem::Path(target_dir));
             // confirms that base is a directory, and not a file
             if (!fs::is_directory(base)) return false;
             
             // resolves .. and . components and returns an absolute path without requiring the final path to exist.
-            fs::path target = fs::weakly_canonical(base / entry_name);
+            fs::path target = fs::weakly_canonical(Filesystem::Path(base / entry_name));
 
             // cout << base << endl;
             // cout << target << endl;
@@ -99,7 +98,7 @@ namespace PokemonAutomation{
     }
 
     void unzip_file(const char* zip_path, const char* target_dir) {
-        fs::path p{zip_path};
+        Filesystem::Path p{zip_path};
         if (!fs::exists(p)) {
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "unzip_all: Attempted to unzip a file that doesn't exist.");
         } 
@@ -145,7 +144,7 @@ namespace PokemonAutomation{
 
             // Construct your output path (e.g., target_dir + file_stat.m_filename)
             std::string out_path = std::string(target_dir) + "/" + file_stat.m_filename;
-            fs::path const parent_dir{fs::path(out_path).parent_path()};
+            Filesystem::Path const parent_dir{Filesystem::Path(out_path).parent_path()};
 
             // Create the entire directory, including intermediate directories for this file
             std::error_code ec{};
