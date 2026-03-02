@@ -17,6 +17,7 @@
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.h"
 #include "PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_Navigation.h"
 
@@ -40,6 +41,7 @@ void soft_reset(ConsoleHandle& console, ProControllerContext& context){
 
     //Mash A until white screen to game load menu
     WhiteScreenOverWatcher whitescreen(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    LoadMenuWatcher load_menu(COLOR_BLUE);
 
     int ls = run_until<ProControllerContext>(
         console, context,
@@ -48,11 +50,13 @@ void soft_reset(ConsoleHandle& console, ProControllerContext& context){
             pbf_wait(context, 5000ms);
             context.wait_for_all_requests();
         },
-        { whitescreen }
+        { whitescreen, load_menu }
     );
     context.wait_for_all_requests();
-    if (ls == 0){
-        console.log("Entered load menu.");
+    if (ls == 0) {
+        console.log("Entered load menu. (WhiteScreenOver)");
+    }else if (ls == 1) {
+        console.log("Entered load menu. (LoadMenu)");
     }else{
         console.log("Unable to enter load menu.", COLOR_RED);
         OperationFailedException::fire(
