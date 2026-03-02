@@ -13,8 +13,6 @@ file(GLOB LIBRARY_SOURCES
     ../3rdParty/QtWavFile/WavFile.h
     ../3rdParty/TesseractPA/TesseractPA.cpp
     ../3rdParty/TesseractPA/TesseractPA.h
-    ../Common/CRC32/pabb_CRC32.c
-    ../Common/CRC32/pabb_CRC32.h
     ../Common/Compiler.h
     ../Common/ControllerStates/HID_Keyboard_State.h
     ../Common/ControllerStates/NintendoSwitch_OemController_State.c
@@ -28,11 +26,11 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Color.h
     ../Common/Cpp/Concurrency/AsyncTask.h
     ../Common/Cpp/Concurrency/Backends/AsyncTask_Default.h
-    ../Common/Cpp/Concurrency/Backends/ThreadPool_Default.cpp
-    ../Common/Cpp/Concurrency/Backends/ThreadPool_Default.h
     ../Common/Cpp/Concurrency/Backends/Thread_Qt.tpp
     ../Common/Cpp/Concurrency/Backends/Thread_StdThread.tpp
     ../Common/Cpp/Concurrency/Backends/Thread_StdThreadDetach.tpp
+    ../Common/Cpp/Concurrency/Backends/ThreadPool_Default.cpp
+    ../Common/Cpp/Concurrency/Backends/ThreadPool_Default.h
     ../Common/Cpp/Concurrency/ConditionVariable.h
     ../Common/Cpp/Concurrency/FireForgetDispatcher.cpp
     ../Common/Cpp/Concurrency/FireForgetDispatcher.h
@@ -161,9 +159,9 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Options/PathOption.h
     ../Common/Cpp/Options/RandomCodeOption.cpp
     ../Common/Cpp/Options/RandomCodeOption.h
+    ../Common/Cpp/Options/SimpleIntegerOptionBase.h
     ../Common/Cpp/Options/SimpleIntegerOption.cpp
     ../Common/Cpp/Options/SimpleIntegerOption.h
-    ../Common/Cpp/Options/SimpleIntegerOptionBase.h
     ../Common/Cpp/Options/StaticTableOption.cpp
     ../Common/Cpp/Options/StaticTableOption.h
     ../Common/Cpp/Options/StaticTextOption.cpp
@@ -190,13 +188,6 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/SerialConnection/SerialConnection.h
     ../Common/Cpp/SerialConnection/SerialConnectionPOSIX.h
     ../Common/Cpp/SerialConnection/SerialConnectionWinAPI.h
-    ../Common/Cpp/Sockets/AbstractClientSocket.h
-    ../Common/Cpp/Sockets/ClientSocket.cpp
-    ../Common/Cpp/Sockets/ClientSocket.h
-    ../Common/Cpp/Sockets/ClientSocket_POSIX.h
-    ../Common/Cpp/Sockets/ClientSocket_Qt.h
-    ../Common/Cpp/Sockets/ClientSocket_WinSocket.h
-    ../Common/Cpp/Stopwatch.h
     ../Common/Cpp/StreamConnections/MockDevice.cpp
     ../Common/Cpp/StreamConnections/MockDevice.h
     ../Common/Cpp/StreamConnections/PABotBase2_MessageDumper.cpp
@@ -205,6 +196,13 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/StreamConnections/ReliableStreamConnection.h
     ../Common/Cpp/StreamConnections/StreamConnection.h
     ../Common/Cpp/StreamConnections/StreamInterface.h
+    ../Common/Cpp/Sockets/AbstractClientSocket.h
+    ../Common/Cpp/Sockets/ClientSocket.cpp
+    ../Common/Cpp/Sockets/ClientSocket.h
+    ../Common/Cpp/Sockets/ClientSocket_POSIX.h
+    ../Common/Cpp/Sockets/ClientSocket_Qt.h
+    ../Common/Cpp/Sockets/ClientSocket_WinSocket.h
+    ../Common/Cpp/Stopwatch.h
     ../Common/Cpp/StreamConverters.cpp
     ../Common/Cpp/StreamConverters.h
     ../Common/Cpp/Strings/StringTools.cpp
@@ -215,17 +213,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Time.h
     ../Common/Cpp/UiWrapper.h
     ../Common/Cpp/ValueDebouncer.h
-    ../Common/PABotBase2/PABotBase2_Connection.h
-    ../Common/PABotBase2/PABotBase2_ConnectionDebug.c
-    ../Common/PABotBase2/PABotBase2_ConnectionDebug.h
-    ../Common/PABotBase2/PABotBase2_PacketParser.c
-    ../Common/PABotBase2/PABotBase2_PacketParser.h
-    ../Common/PABotBase2/PABotBase2_PacketSender.c
-    ../Common/PABotBase2/PABotBase2_PacketSender.h
-    ../Common/PABotBase2/PABotBase2_StreamCoalescer.c
-    ../Common/PABotBase2/PABotBase2_StreamCoalescer.h
-    ../Common/PABotBase2/PABotbase2_ReliableStreamConnection.c
-    ../Common/PABotBase2/PABotbase2_ReliableStreamConnection.h
+    ../Common/CRC32/pabb_CRC32.c
+    ../Common/CRC32/pabb_CRC32.h
     ../Common/Qt/AutoHeightTable.cpp
     ../Common/Qt/AutoHeightTable.h
     ../Common/Qt/AutoWidthLineEdit.cpp
@@ -238,6 +227,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/GlobalThreadPoolsQt.cpp
     ../Common/Qt/GlobalThreadPoolsQt.h
     ../Common/Qt/NoWheelComboBox.h
+    ../Common/Qt/QtThreadPool.cpp
+    ../Common/Qt/QtThreadPool.h
     ../Common/Qt/Options/BatchWidget.cpp
     ../Common/Qt/Options/BatchWidget.h
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp
@@ -286,8 +277,6 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/Options/TimeDurationWidget.h
     ../Common/Qt/Options/TimeExpressionWidget.cpp
     ../Common/Qt/Options/TimeExpressionWidget.h
-    ../Common/Qt/QtThreadPool.cpp
-    ../Common/Qt/QtThreadPool.h
     ../Common/Qt/Redispatch.cpp
     ../Common/Qt/Redispatch.h
     ../Common/Qt/ShutdownWithEvents.h
@@ -298,6 +287,17 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/TimeQt.h
     ../Common/Qt/WidgetStackFixedAspectRatio.cpp
     ../Common/Qt/WidgetStackFixedAspectRatio.h
+    ../Common/PABotBase2/PABotBase2_Connection.h
+    ../Common/PABotBase2/PABotBase2_ConnectionDebug.c
+    ../Common/PABotBase2/PABotBase2_ConnectionDebug.h
+    ../Common/PABotBase2/PABotBase2_PacketParser.c
+    ../Common/PABotBase2/PABotBase2_PacketParser.h
+    ../Common/PABotBase2/PABotBase2_PacketSender.c
+    ../Common/PABotBase2/PABotBase2_PacketSender.h
+    ../Common/PABotBase2/PABotbase2_ReliableStreamConnection.c
+    ../Common/PABotBase2/PABotbase2_ReliableStreamConnection.h
+    ../Common/PABotBase2/PABotBase2_StreamCoalescer.c
+    ../Common/PABotBase2/PABotBase2_StreamCoalescer.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_HID_Keyboard.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS1_OemControllers.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS_WiredController.h
@@ -409,10 +409,10 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Logging/QueuedLogger.h
     Source/CommonFramework/Notifications/EventNotificationOption.cpp
     Source/CommonFramework/Notifications/EventNotificationOption.h
-    Source/CommonFramework/Notifications/EventNotificationWidget.cpp
-    Source/CommonFramework/Notifications/EventNotificationWidget.h
     Source/CommonFramework/Notifications/EventNotificationsTable.cpp
     Source/CommonFramework/Notifications/EventNotificationsTable.h
+    Source/CommonFramework/Notifications/EventNotificationWidget.cpp
+    Source/CommonFramework/Notifications/EventNotificationWidget.h
     Source/CommonFramework/Notifications/MessageAttachment.cpp
     Source/CommonFramework/Notifications/MessageAttachment.h
     Source/CommonFramework/Notifications/ProgramInfo.h
@@ -628,10 +628,10 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonTools/OCR/OCR_LargeDictionaryMatcher.h
     Source/CommonTools/OCR/OCR_NumberReader.cpp
     Source/CommonTools/OCR/OCR_NumberReader.h
-    Source/CommonTools/OCR/OCR_RawOCR.cpp
-    Source/CommonTools/OCR/OCR_RawOCR.h
     Source/CommonTools/OCR/OCR_RawPaddleOCR.cpp
     Source/CommonTools/OCR/OCR_RawPaddleOCR.h
+    Source/CommonTools/OCR/OCR_RawOCR.cpp
+    Source/CommonTools/OCR/OCR_RawOCR.h
     Source/CommonTools/OCR/OCR_Routines.cpp
     Source/CommonTools/OCR/OCR_Routines.h
     Source/CommonTools/OCR/OCR_SmallDictionaryMatcher.cpp
@@ -748,8 +748,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Misc.h
     Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_StaticRequests.h
     Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_HID_Keyboard.h
-    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_NS1_OemControllers.h
     Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_NS_WiredController.h
+    Source/Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_NS1_OemControllers.h
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp
@@ -975,10 +975,10 @@ file(GLOB LIBRARY_SOURCES
     Source/ML/DataLabeling/ML_SegmentAnythingModelConstants.h
     Source/ML/Inference/ML_PaddleOCRPipeline.cpp
     Source/ML/Inference/ML_PaddleOCRPipeline.h
-    Source/ML/Inference/ML_YOLONavigation.cpp
-    Source/ML/Inference/ML_YOLONavigation.h
     Source/ML/Inference/ML_YOLOv5Detector.cpp
     Source/ML/Inference/ML_YOLOv5Detector.h
+    Source/ML/Inference/ML_YOLONavigation.cpp
+    Source/ML/Inference/ML_YOLONavigation.h
     Source/ML/ML_Panels.cpp
     Source/ML/ML_Panels.h
     Source/ML/Models/ML_ONNXRuntimeHelpers.cpp
@@ -1408,10 +1408,10 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.cpp
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h
-    Source/PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.cpp
-    Source/PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h
     Source/PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.cpp
     Source/PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h
+    Source/PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.cpp
+    Source/PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h
     Source/PokemonFRLG/PokemonFRLG_Navigation.cpp
     Source/PokemonFRLG/PokemonFRLG_Navigation.h
     Source/PokemonFRLG/PokemonFRLG_Panels.cpp
@@ -1711,10 +1711,10 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/PokemonLZA_DayNightChangeDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.h
-    Source/PokemonLZA/Inference/PokemonLZA_HyperspaceCalorieDetector.cpp
-    Source/PokemonLZA/Inference/PokemonLZA_HyperspaceCalorieDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_HyperspaceRewardNameReader.cpp
     Source/PokemonLZA/Inference/PokemonLZA_HyperspaceRewardNameReader.h
+    Source/PokemonLZA/Inference/PokemonLZA_HyperspaceCalorieDetector.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_HyperspaceCalorieDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.cpp
@@ -1761,18 +1761,18 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_WeatherFinder.h
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h
+    Source/PokemonLZA/Programs/PokemonLZA_FastTravelNavigation.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_FastTravelNavigation.h
+    Source/PokemonLZA/Programs/PokemonLZA_HyperspaceNavigation.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_HyperspaceNavigation.h
     Source/PokemonLZA/Programs/PokemonLZA_BoxSorter.cpp
     Source/PokemonLZA/Programs/PokemonLZA_BoxSorter.h
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.h
     Source/PokemonLZA/Programs/PokemonLZA_DonutBerrySession.cpp
     Source/PokemonLZA/Programs/PokemonLZA_DonutBerrySession.h
-    Source/PokemonLZA/Programs/PokemonLZA_FastTravelNavigation.cpp
-    Source/PokemonLZA/Programs/PokemonLZA_FastTravelNavigation.h
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.cpp
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.h
-    Source/PokemonLZA/Programs/PokemonLZA_HyperspaceNavigation.cpp
-    Source/PokemonLZA/Programs/PokemonLZA_HyperspaceNavigation.h
     Source/PokemonLZA/Programs/PokemonLZA_MegaShardFarmer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_MegaShardFarmer.h
     Source/PokemonLZA/Programs/PokemonLZA_MenuNavigation.cpp
@@ -1795,12 +1795,12 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.h
-    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.cpp
-    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HyperspaceHunter.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HyperspaceHunter.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HyperspaceLegendary.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HyperspaceLegendary.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShuttleRun.cpp
