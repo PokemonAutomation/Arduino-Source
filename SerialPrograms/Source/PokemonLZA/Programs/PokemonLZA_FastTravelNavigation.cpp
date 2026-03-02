@@ -35,7 +35,7 @@ int get_current_selector_index(
     const ImageFloatBox& box,
     double spacing
 ){
-    const ImageViewRGB32& screen = console.video().snapshot();
+    VideoSnapshot screen = console.video().snapshot();
     SelectionArrowWatcher arrow(
         COLOR_GREEN,
         &console.overlay(),
