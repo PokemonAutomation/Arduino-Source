@@ -7,6 +7,7 @@
 
 #include "CommonFramework/Logging/Logger.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
+#include "PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h"
 #include "PokemonFRLG_Tests.h"
 #include "TestUtils.h"
 #include "CommonFramework/Language.h"
@@ -29,6 +30,15 @@ int test_pokemonFRLG_AdvanceWhiteDialogDetector(const ImageViewRGB32& image, boo
     auto overlay = DummyVideoOverlay();
     AdvanceWhiteDialogDetector detector(COLOR_RED);
     bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
+int test_pokemonFRLG_ShinySymbolDetector(const ImageViewRGB32& image, bool target){
+    auto& logger = global_logger_command_line();
+    auto overlay = DummyVideoOverlay();
+    ShinySymbolDetector detector(COLOR_RED);
+    bool result = detector.read(logger, image);
     TEST_RESULT_EQUAL(result, target);
     return 0;
 }
