@@ -146,7 +146,7 @@ void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControlle
 
     while (!shiny_found){
         obtain_prize(env, context);
-        open_slot_six(env.console, context);
+        stats.errors += open_slot_six(env.console, context);
 
         VideoSnapshot screen = env.console.video().snapshot();
 
@@ -156,7 +156,15 @@ void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControlle
         if (shiny_found){
             env.log("Shiny found!");
             stats.shinies++;
-            send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", screen, true);
+            send_program_notification(
+                env,
+                NOTIFICATION_SHINY,
+                COLOR_YELLOW,
+                "Shiny found!",
+                {}, "",
+                screen,
+                true
+            );
             break;
         }else{
             env.log("Prize is not shiny.");
@@ -165,7 +173,7 @@ void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControlle
                 env, NOTIFICATION_STATUS_UPDATE,
                 "Soft resetting."
             );
-            soft_reset(env.console, context);
+            stats.errors += soft_reset(env.console, context);
             stats.resets++;
             context.wait_for_all_requests();
         }

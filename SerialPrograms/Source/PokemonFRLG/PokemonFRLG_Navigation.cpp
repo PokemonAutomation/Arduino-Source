@@ -11,7 +11,6 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
@@ -26,7 +25,7 @@ namespace NintendoSwitch{
 namespace PokemonFRLG{
 
 
-void soft_reset(ConsoleHandle& console, ProControllerContext& context){
+bool try_soft_reset(ConsoleHandle& console, ProControllerContext& context){
     // A + B + Select + Start
     pbf_press_button(context, BUTTON_B | BUTTON_A | BUTTON_MINUS | BUTTON_PLUS, 360ms, 1440ms);
 
@@ -58,12 +57,8 @@ void soft_reset(ConsoleHandle& console, ProControllerContext& context){
     }else if (ls == 1) {
         console.log("Entered load menu. (LoadMenu)");
     }else{
-        console.log("Unable to enter load menu.", COLOR_RED);
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "soft_reset(): Unable to enter load menu.",
-            console
-        );
+        console.log("soft_reset(): Unable to enter load menu.", COLOR_RED);
+        return false;
     }
     //Let the animation finish
     pbf_wait(context, 500ms);
@@ -82,12 +77,8 @@ void soft_reset(ConsoleHandle& console, ProControllerContext& context){
     if (ret == 0){
         console.log("Entered game!");
     }else{
-        console.log("Timed out waiting to enter game.", COLOR_RED);
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "soft_reset(): Timed out waiting to enter game.",
-            console
-        );
+        console.log("soft_reset(): Timed out waiting to enter game.", COLOR_RED);
+        return false;
     }
 
     //Mash past "previously on..."
@@ -100,10 +91,25 @@ void soft_reset(ConsoleHandle& console, ProControllerContext& context){
     pbf_wait(context, rng_wait2);
     context.wait_for_all_requests();
 
-    console.log("Soft reset completed.");
+    return true;
 }
 
-void open_slot_six(ConsoleHandle& console, ProControllerContext& context){
+uint64_t soft_reset(ConsoleHandle& console, ProControllerContext& context){
+    uint64_t errors = 0;
+    for (; errors < 5; errors++){
+        if (try_soft_reset(console, context)){
+            console.log("Soft reset completed.");
+            return errors;
+        }
+    }
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "soft_reset(): Failed to reset after 5 attempts.",
+        console
+    );
+}
+
+bool try_open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     //Attempt to exit any dialog and open the start menu
     StartMenuWatcher start_menu(COLOR_RED);
 
@@ -123,11 +129,8 @@ void open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     );
     context.wait_for_all_requests();
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "open_slot_six(): Unable to open Start menu.",
-            console
-        );
+        console.log("open_slot_six(): Unable to open Start menu.", COLOR_RED);
+        return false;
     }
 
     console.log("Navigating to party menu.");
@@ -150,12 +153,8 @@ void open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     if (pm == 0){
         console.log("Entered party menu.");
     }else{
-        console.log("Unable to enter Party menu.", COLOR_RED);
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "open_slot_six(): Unable to enter Party menu.",
-            console
-        );
+        console.log("open_slot_six(): Unable to enter Party menu.", COLOR_RED);
+        return false;
     }
     context.wait_for_all_requests();
 
@@ -178,15 +177,29 @@ void open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     if (sm == 0){
         console.log("Entered summary.");
     }else{
-        console.log("Unable to enter summary.", COLOR_RED);
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "open_slot_six(): Unable to enter summary.",
-            console
-        );
+        console.log("open_slot_six(): Unable to enter summary.", COLOR_RED);
+        return false;
     }
     pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
+    return true;
+}
+
+uint64_t open_slot_six(ConsoleHandle& console, ProControllerContext& context){
+    uint64_t errors = 0;
+    for (; errors < 5; errors++){
+        if (try_open_slot_six(console, context)){
+            return errors;
+        }else{
+            console.log("Mashing B to return to overworld and retry...");
+            pbf_mash_button(context, BUTTON_B, 10000ms);
+        }
+    }
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "open_slot_six(): Failed to open party summary after 5 attempts.",
+        console
+    );
 }
 
 bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, bool send_out_lead){

@@ -205,9 +205,7 @@ void GiftReset::obtain_lapras(SingleSwitchProgramEnvironment& env, ProController
 }
 
 //After declining to nickname, clear rival pickup and open your starter's summary
-void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    GiftReset_Descriptor::Stats& stats = env.current_stats<GiftReset_Descriptor::Stats>();
-
+bool GiftReset::try_open_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //From no to nickname to overworld
     StartMenuWatcher start_menu(COLOR_RED);
 
@@ -227,13 +225,9 @@ void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerC
     );
     context.wait_for_all_requests();
     if (ret < 0){
-        stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "open_summary(): Unable to open Start menu after 10 attempts.",
-            env.console
-        );
+        env.log("open_summary(): Unable to open Start menu after 10 attempts.", COLOR_RED);
+        return false;
     }
 
     if (TARGET != Target::starters){
@@ -261,12 +255,8 @@ void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerC
     if (pm == 0){
         env.log("Entered party menu.");
     }else{
-        env.log("Unable to enter party menu.", COLOR_RED);
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "open_summary(): Unable to enter Party menu.",
-            env.console
-        );
+        env.log("open_summary(): Unable to enter party menu.", COLOR_RED);
+        return false;
     }
 
     //Press up twice to get to the last slot
@@ -290,16 +280,28 @@ void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerC
     if (sm == 0){
         env.log("Entered summary.");
     }else{
-        env.log("Unable to enter summary.", COLOR_RED);
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "open_summary(): Unable to enter summary.",
-            env.console
-        );
+        env.log("open_summary(): Unable to enter summary.", COLOR_RED);
+        return false;
     }
     pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
-
+    return true;
+}
+uint64_t GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    uint64_t errors = 0;
+    for (; errors < 5; errors++){
+        if (try_open_summary(env, context)){
+            return errors;
+        }else{
+            env.log("Mashing B to return to overworld and retry...");
+            pbf_mash_button(context, BUTTON_B, 10000ms);
+        }
+    }
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "open_summary(): Failed to open party summary after 5 attempts.",
+        env.console
+    );
 }
 
 
@@ -325,7 +327,7 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         }else{
             obtain_lapras(env, context);
         }
-        open_summary(env, context);
+        stats.errors += open_summary(env, context);
 
         VideoSnapshot screen = env.console.video().snapshot();
 
@@ -335,7 +337,15 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         if (shiny_starter){
             env.log("Shiny found!");
             stats.shinies++;
-            send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", screen, true);
+            send_program_notification(
+                env,
+                NOTIFICATION_SHINY,
+                COLOR_YELLOW,
+                "Shiny found!",
+                {}, "",
+                screen,
+                true
+            );
             break;
         }else{
             env.log("Pokemon is not shiny.");
@@ -344,7 +354,7 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                 env, NOTIFICATION_STATUS_UPDATE,
                 "Soft resetting."
             );
-            soft_reset(env.console, context);
+            stats.errors += soft_reset(env.console, context);
             stats.resets++;
             env.update_stats();
             context.wait_for_all_requests();

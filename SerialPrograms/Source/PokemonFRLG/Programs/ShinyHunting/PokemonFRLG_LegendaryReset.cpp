@@ -129,7 +129,15 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
         if (legendary_shiny){
             stats.shinies++;
             env.update_stats();
-            send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", env.console.video().snapshot(), true);
+            send_program_notification(
+                env,
+                NOTIFICATION_SHINY,
+                COLOR_YELLOW,
+                "Shiny found!",
+                {}, "",
+                env.console.video().snapshot(),
+                true
+            );
             break;
         }
 
@@ -140,7 +148,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
             "Soft resetting."
         );
 
-        soft_reset(env.console, context);
+        stats.errors += soft_reset(env.console, context);
         stats.resets++;
         env.update_stats();
         context.wait_for_all_requests();
