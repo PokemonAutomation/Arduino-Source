@@ -100,31 +100,33 @@ void GiftReset::obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControlle
     */
 
     env.log("Obtaining Pokemon.");
-    AdvanceWhiteDialogWatcher adv_white_start(COLOR_RED);
-
-    int rets = run_until<ProControllerContext>(
-        env.console, context,
-        [](ProControllerContext& context){
-            for (int i = 0; i < 10; i++){
-                pbf_press_button(context, BUTTON_A, 320ms, 640ms);
-                pbf_wait(context, 2000ms);
-                context.wait_for_all_requests();
-            }
-        },
-        { adv_white_start }
-    );
-    context.wait_for_all_requests();
-    if (rets < 0){
-        env.update_stats();
-        env.log("obtain_pokemon(): Unable to start starter dialog after 10 attempts.", COLOR_RED);
+    if (TARGET == Target::starters) {
+        AdvanceWhiteDialogWatcher adv_white_start(COLOR_RED);
+        int rets = run_until<ProControllerContext>(
+            env.console, context,
+            [](ProControllerContext& context) {
+                for (int i = 0; i < 10; i++) {
+                    pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+                    pbf_wait(context, 2000ms);
+                    context.wait_for_all_requests();
+                }
+            },
+            { adv_white_start }
+            );
+        context.wait_for_all_requests();
+        if (rets < 0) {
+            env.update_stats();
+            env.log("obtain_pokemon(): Unable to start starter dialog after 10 attempts.", COLOR_RED);
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "obtain_pokemon(): Unable to start starter dialog after 10 attempts.",
                 env.console
             );
+        }
+        env.log("Initial A press completed.");
+    } else {
+        pbf_press_button(context, BUTTON_A, 320ms, 640ms);
     }
-    env.log("Initial A press completed.");
-
     bool seen_selection_arrow = false;
     //bool seen_nickname_arrow = false;
     while (true){
