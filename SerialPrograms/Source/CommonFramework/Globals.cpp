@@ -24,7 +24,7 @@ namespace PokemonAutomation{
 //
 
 #ifndef PA_IS_BETA
-#define PA_IS_BETA true
+#define PA_IS_BETA false
 #endif
 
 #ifndef PA_VERSION_MAJOR
