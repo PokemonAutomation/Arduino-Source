@@ -291,13 +291,17 @@ uint64_t GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControl
     uint64_t errors = 0;
     for (; errors < 5; errors++){
         if (try_open_summary(env, context)){
-            break;
+            return errors;
         }else{
             env.log("Mashing B to return to overworld and retry...");
             pbf_mash_button(context, BUTTON_B, 10000ms);
         }
     }
-    return errors;
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "open_summary(): Failed to open party summary after 5 attempts.",
+        env.console
+    );
 }
 
 

@@ -189,10 +189,17 @@ uint64_t open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     uint64_t errors = 0;
     for (; errors < 5; errors++){
         if (try_open_slot_six(console, context)){
-            break;
+            return errors;
+        }else{
+            console.log("Mashing B to return to overworld and retry...");
+            pbf_mash_button(context, BUTTON_B, 10000ms);
         }
     }
-    return errors;
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "open_slot_six(): Failed to open party summary after 5 attempts.",
+        console
+    );
 }
 
 bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, bool send_out_lead){
