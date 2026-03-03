@@ -66,7 +66,7 @@ bool AdvanceWhiteDialogDetector::detect(const ImageViewRGB32& screen){
     //Filter out background
     ImageRGB32 filtered_region = filter_rgb32_range(
         extract_box_reference(screen, m_dialog_box),
-        combine_rgb(185, 0, 1), combine_rgb(255, 32, 33), Color(0), replace_color_within_range
+        combine_rgb(164, 0, 0), combine_rgb(255, 114, 87), Color(0), replace_color_within_range
     );
     ImageStats stats = image_stats(filtered_region);
 
@@ -189,7 +189,7 @@ bool AdvanceBattleDialogDetector::detect(const ImageViewRGB32& screen){
     //Filter out background
     ImageRGB32 filtered_region = filter_rgb32_range(
         extract_box_reference(screen, m_dialog_box),
-        combine_rgb(185, 0, 1), combine_rgb(255, 32, 33), Color(0), replace_color_within_range
+        combine_rgb(164, 0, 0), combine_rgb(255, 114, 87), Color(0), replace_color_within_range
     );
     ImageStats stats = image_stats(filtered_region);
 
