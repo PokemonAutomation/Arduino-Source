@@ -10,6 +10,8 @@
 #include "CommonTools/Random.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
@@ -331,6 +333,18 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
             console
         );
     }
+}
+
+void home_black_border_check(ConsoleHandle& console, ProControllerContext& context){
+    console.log("Going to home to check for black border.");
+    go_home(console, context);
+    ensure_at_home(console, context);
+    context.wait_for_all_requests();
+    StartProgramChecks::check_border(console);
+    console.log("Returning to game.");
+    resume_game_from_home(console, context);
+    context.wait_for_all_requests();
+    console.log("Entered game.");
 }
 
 

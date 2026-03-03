@@ -243,6 +243,8 @@ void LegendaryRunAway::reset_lugia(SingleSwitchProgramEnvironment& env, ProContr
 void LegendaryRunAway::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     LegendaryRunAway_Descriptor::Stats& stats = env.current_stats<LegendaryRunAway_Descriptor::Stats>();
 
+    home_black_border_check(env.console, context);
+
     /*
     * Settings: Text Speed fast. Default borders. Battle animations off. Audio required.
     * Smoke Ball or fast pokemon required.

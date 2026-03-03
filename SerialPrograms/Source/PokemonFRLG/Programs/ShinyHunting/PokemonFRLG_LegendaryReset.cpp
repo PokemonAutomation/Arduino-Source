@@ -80,6 +80,8 @@ LegendaryReset::LegendaryReset()
 void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     LegendaryReset_Descriptor::Stats& stats = env.current_stats<LegendaryReset_Descriptor::Stats>();
 
+    home_black_border_check(env.console, context);
+
     /*
     * Settings: Text Speed fast. Default borders. Audio required.
     * Setup: Stand in front of target. Save the game.

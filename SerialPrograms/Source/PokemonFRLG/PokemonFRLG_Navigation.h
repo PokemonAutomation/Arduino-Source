@@ -36,6 +36,9 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
 // Run from battle. Cursor must start on the FIGHT button. Assumes fleeing will always work. (Smoke Ball)
 void flee_battle(ConsoleHandle& console, ProControllerContext& context);
 
+// Go to home to check that scaling is 100%. Then resume game.
+void home_black_border_check(ConsoleHandle& console, ProControllerContext& context);
+
 }
 }
 }

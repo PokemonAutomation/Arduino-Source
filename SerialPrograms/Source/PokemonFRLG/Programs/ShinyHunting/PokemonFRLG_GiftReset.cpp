@@ -335,6 +335,8 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     GiftReset_Descriptor::Stats& stats = env.current_stats<GiftReset_Descriptor::Stats>();
 
+    home_black_border_check(env.console, context);
+
     /*
     * Settings: Text Speed fast. Default borders.
     * Setup: 5 pokemon in your party. None for starter. Stand in front of the pokemon. Save the game.

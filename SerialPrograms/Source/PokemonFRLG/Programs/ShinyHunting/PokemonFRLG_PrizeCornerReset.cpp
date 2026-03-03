@@ -136,6 +136,8 @@ void PrizeCornerReset::obtain_prize(SingleSwitchProgramEnvironment& env, ProCont
 void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     PrizeCornerReset_Descriptor::Stats& stats = env.current_stats<PrizeCornerReset_Descriptor::Stats>();
 
+    home_black_border_check(env.console, context);
+
     /*
     * Settings: Text Speed fast. Default borders.
     * Setup: Have a party of 5. Stand in front of the prize redemption. Save game. Move cursor back to top.
