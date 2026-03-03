@@ -35,10 +35,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     //ret.emplace_back("---- General ----");
 
     ret.emplace_back("---- Shiny Hunting  ----");
-    if (IS_BETA_VERSION){
-        ret.emplace_back(make_single_switch_program<GiftReset_Descriptor, GiftReset>());
-        ret.emplace_back(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
-    }
+    ret.emplace_back(make_single_switch_program<GiftReset_Descriptor, GiftReset>());
+    ret.emplace_back(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<LegendaryRunAway_Descriptor, LegendaryRunAway>());
         ret.emplace_back(make_single_switch_program<PrizeCornerReset_Descriptor, PrizeCornerReset>());
