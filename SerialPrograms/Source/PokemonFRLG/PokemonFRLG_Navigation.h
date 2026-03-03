@@ -26,7 +26,7 @@ namespace PokemonFRLG{
 uint64_t soft_reset(ConsoleHandle& console, ProControllerContext &context);
 
 // From the overworld, open the summary of the Pokemon in slot 6. This assumes the menu cursor is in the top slot (POKEDEX)
-void open_slot_six(ConsoleHandle& console, ProControllerContext& context);
+uint64_t open_slot_six(ConsoleHandle& console, ProControllerContext& context);
 
 // After press A/walking up to enter a battle, run this handle the battle start and to check if opponent is shiny.
 // Set send_out_lead to true and then use flee_battle() after if for run away resets

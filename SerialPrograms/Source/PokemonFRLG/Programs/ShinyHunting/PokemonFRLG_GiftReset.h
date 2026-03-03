@@ -35,7 +35,8 @@ public:
 private:
     void obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void obtain_lapras(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    void open_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    bool try_open_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    uint64_t open_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
     enum class Target{
         starters,

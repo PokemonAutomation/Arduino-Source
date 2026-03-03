@@ -146,7 +146,7 @@ void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControlle
 
     while (!shiny_found){
         obtain_prize(env, context);
-        open_slot_six(env.console, context);
+        stats.errors += open_slot_six(env.console, context);
 
         VideoSnapshot screen = env.console.video().snapshot();
 

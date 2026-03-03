@@ -109,7 +109,7 @@ uint64_t soft_reset(ConsoleHandle& console, ProControllerContext& context){
     );
 }
 
-void open_slot_six(ConsoleHandle& console, ProControllerContext& context){
+bool try_open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     //Attempt to exit any dialog and open the start menu
     StartMenuWatcher start_menu(COLOR_RED);
 
@@ -129,11 +129,8 @@ void open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     );
     context.wait_for_all_requests();
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "open_slot_six(): Unable to open Start menu.",
-            console
-        );
+        console.log("open_slot_six(): Unable to open Start menu.", COLOR_RED);
+        return false;
     }
 
     console.log("Navigating to party menu.");
@@ -156,12 +153,8 @@ void open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     if (pm == 0){
         console.log("Entered party menu.");
     }else{
-        console.log("Unable to enter Party menu.", COLOR_RED);
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "open_slot_six(): Unable to enter Party menu.",
-            console
-        );
+        console.log("open_slot_six(): Unable to enter Party menu.", COLOR_RED);
+        return false;
     }
     context.wait_for_all_requests();
 
@@ -184,15 +177,22 @@ void open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     if (sm == 0){
         console.log("Entered summary.");
     }else{
-        console.log("Unable to enter summary.", COLOR_RED);
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "open_slot_six(): Unable to enter summary.",
-            console
-        );
+        console.log("open_slot_six(): Unable to enter summary.", COLOR_RED);
+        return false;
     }
     pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
+    return true;
+}
+
+uint64_t open_slot_six(ConsoleHandle& console, ProControllerContext& context){
+    uint64_t errors = 0;
+    for (; errors < 5; errors++){
+        if (try_open_slot_six(console, context)){
+            break;
+        }
+    }
+    return errors;
 }
 
 bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, bool send_out_lead){
