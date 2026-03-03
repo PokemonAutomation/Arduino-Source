@@ -2660,6 +2660,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Tests/Kernels_Tests.h
     Source/Tests/NintendoSwitch_Tests.cpp
     Source/Tests/NintendoSwitch_Tests.h
+    Source/Tests/PokemonFRLG_Tests.cpp
+    Source/Tests/PokemonFRLG_Tests.h
     Source/Tests/PokemonHome_Tests.cpp
     Source/Tests/PokemonHome_Tests.h
     Source/Tests/PokemonLA_Tests.cpp

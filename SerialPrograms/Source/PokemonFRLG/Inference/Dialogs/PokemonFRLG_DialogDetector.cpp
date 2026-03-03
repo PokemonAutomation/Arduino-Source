@@ -39,9 +39,9 @@ bool WhiteDialogDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 right_image = extract_box_reference(screen, m_right_box);
     ImageViewRGB32 top_image = extract_box_reference(screen, m_top_box);
     ImageViewRGB32 bottom_image = extract_box_reference(screen, m_bottom_box);
-    if (is_solid(right_image, { 0.25, 0.38, 0.369 })
-        && is_solid(top_image, { 0.25, 0.38, 0.369 })
-        && is_solid(bottom_image, { 0.25, 0.38, 0.369 })
+    if (is_solid(right_image, { 0.333333, 0.333333, 0.333333 })
+        && is_solid(top_image, { 0.333333, 0.333333, 0.333333 })
+        && is_solid(bottom_image, { 0.333333, 0.333333, 0.333333 })
         ){
         return true;
     }
@@ -81,11 +81,11 @@ bool AdvanceWhiteDialogDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 top_image = extract_box_reference(screen, m_top_box);
     ImageViewRGB32 bottom_image = extract_box_reference(screen, m_bottom_box);
 
-    if (is_solid(right_image, { 0.25, 0.38, 0.369 })
-        && is_solid(top_image, { 0.25, 0.38, 0.369 })
-        && is_solid(bottom_image, { 0.25, 0.38, 0.369 })
-        && (stats.average.r > stats.average.b + 200)
-        && (stats.average.r > stats.average.g + 200)
+    if (is_solid(right_image, { 0.333333, 0.333333, 0.333333 })
+        && is_solid(top_image, { 0.333333, 0.333333, 0.333333 })
+        && is_solid(bottom_image, { 0.333333, 0.333333, 0.333333 })
+        && (stats.average.r > stats.average.b + 180)
+        && (stats.average.r > stats.average.g + 180)
         )
     {
         return true;
@@ -110,10 +110,10 @@ bool SelectionDialogDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 top_image = extract_box_reference(screen, m_top_box);
     ImageViewRGB32 bottom_image = extract_box_reference(screen, m_bottom_box);
     ImageViewRGB32 selection_image = extract_box_reference(screen, m_selection_box);
-    if (is_solid(right_image, { 0.25, 0.38, 0.369 })
-        && is_solid(top_image, { 0.25, 0.38, 0.369 })
-        && is_solid(bottom_image, { 0.25, 0.38, 0.369 })
-        && is_solid(selection_image, { 0.25, 0.38, 0.369 })
+    if (is_solid(right_image, { 0.333333, 0.333333, 0.333333 })
+        && is_solid(top_image, { 0.333333, 0.333333, 0.333333 })
+        && is_solid(bottom_image, { 0.333333, 0.333333, 0.333333 })
+        && is_solid(selection_image, { 0.333333, 0.333333, 0.333333 })
         ){
         return true;
     }
@@ -205,8 +205,8 @@ bool AdvanceBattleDialogDetector::detect(const ImageViewRGB32& screen){
 
     if (is_solid(dialog_top_image, { 0.176, 0.357, 0.467 })
         && is_solid(dialog_right_image, { 0.176, 0.357, 0.467 })
-        && (stats.average.r > stats.average.b + 200)
-        && (stats.average.r > stats.average.g + 200)
+        && (stats.average.r > stats.average.b + 180)
+        && (stats.average.r > stats.average.g + 180)
         )
     {
         return true;
