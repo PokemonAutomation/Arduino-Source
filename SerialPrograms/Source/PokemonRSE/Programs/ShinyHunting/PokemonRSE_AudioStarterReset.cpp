@@ -197,7 +197,15 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
             env.log("Shiny starter detected!");
             stats.shinystarter++;
             env.update_stats();
-            send_program_notification(env, NOTIFICATION_SHINY_STARTER, COLOR_YELLOW, "Shiny starter found!", {}, "", env.console.video().snapshot(), true);
+            send_program_notification(
+                env,
+                NOTIFICATION_SHINY_STARTER,
+                COLOR_YELLOW,
+                "Shiny starter found!",
+                {}, "",
+                env.console.video().snapshot(),
+                true
+            );
             shiny_starter = true;
         }
         else {

@@ -335,7 +335,15 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         if (shiny_starter){
             env.log("Shiny found!");
             stats.shinies++;
-            send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", screen, true);
+            send_program_notification(
+                env,
+                NOTIFICATION_SHINY,
+                COLOR_YELLOW,
+                "Shiny found!",
+                {}, "",
+                screen,
+                true
+            );
             break;
         }else{
             env.log("Pokemon is not shiny.");
@@ -344,7 +352,7 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                 env, NOTIFICATION_STATUS_UPDATE,
                 "Soft resetting."
             );
-            soft_reset(env.console, context);
+            stats.errors += soft_reset(env.console, context);
             stats.resets++;
             env.update_stats();
             context.wait_for_all_requests();

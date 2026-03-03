@@ -11,7 +11,6 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
@@ -26,81 +25,93 @@ namespace NintendoSwitch{
 namespace PokemonFRLG{
 
 
-void soft_reset(ConsoleHandle& console, ProControllerContext& context){
-    // A + B + Select + Start
-    pbf_press_button(context, BUTTON_B | BUTTON_A | BUTTON_MINUS | BUTTON_PLUS, 360ms, 1440ms);
+uint64_t soft_reset(ConsoleHandle& console, ProControllerContext& context){
+    uint64_t errors = 0;
+    while (true){
+        // A + B + Select + Start
+        pbf_press_button(context, BUTTON_B | BUTTON_A | BUTTON_MINUS | BUTTON_PLUS, 360ms, 1440ms);
 
-    pbf_mash_button(context, BUTTON_MINUS, GameSettings::instance().SELECT_BUTTON_MASH0);
-    context.wait_for_all_requests();
+        pbf_mash_button(context, BUTTON_MINUS, GameSettings::instance().SELECT_BUTTON_MASH0);
+        context.wait_for_all_requests();
 
-    //Random wait before pressing start/A
-    console.log("Randomly waiting...");
-    Milliseconds rng_wait = std::chrono::milliseconds(random_u32(0, 5000));
-    pbf_wait(context, rng_wait);
-    context.wait_for_all_requests();
+        //Random wait before pressing start/A
+        console.log("Randomly waiting...");
+        Milliseconds rng_wait = std::chrono::milliseconds(random_u32(0, 5000));
+        pbf_wait(context, rng_wait);
+        context.wait_for_all_requests();
 
-    //Mash A until white screen to game load menu
-    WhiteScreenOverWatcher whitescreen(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
-    LoadMenuWatcher load_menu(COLOR_BLUE);
+        //Mash A until white screen to game load menu
+        WhiteScreenOverWatcher whitescreen(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+        LoadMenuWatcher load_menu(COLOR_BLUE);
 
-    int ls = run_until<ProControllerContext>(
-        console, context,
-        [](ProControllerContext& context) {
-            pbf_mash_button(context, BUTTON_A, 1000ms);
-            pbf_wait(context, 5000ms);
-            context.wait_for_all_requests();
-        },
-        { whitescreen, load_menu }
-    );
-    context.wait_for_all_requests();
-    if (ls == 0) {
-        console.log("Entered load menu. (WhiteScreenOver)");
-    }else if (ls == 1) {
-        console.log("Entered load menu. (LoadMenu)");
-    }else{
-        console.log("Unable to enter load menu.", COLOR_RED);
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "soft_reset(): Unable to enter load menu.",
-            console
+        int ls = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context) {
+                pbf_mash_button(context, BUTTON_A, 1000ms);
+                pbf_wait(context, 5000ms);
+                context.wait_for_all_requests();
+            },
+            { whitescreen, load_menu }
         );
-    }
-    //Let the animation finish
-    pbf_wait(context, 500ms);
-    context.wait_for_all_requests();
+        context.wait_for_all_requests();
+        if (ls == 0) {
+            console.log("Entered load menu. (WhiteScreenOver)");
+        }else if (ls == 1) {
+            console.log("Entered load menu. (LoadMenu)");
+        }else{
+            console.log("Unable to enter load menu.", COLOR_RED);
+            errors++;
+            if (errors >= 5){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "soft_reset(): Failed to reset after 5 attempts.",
+                    console
+                );
+            }
+            continue;
+        }
+        //Let the animation finish
+        pbf_wait(context, 500ms);
+        context.wait_for_all_requests();
 
-    //Load game
-    pbf_press_button(context, BUTTON_A, 160ms, 320ms);
+        //Load game
+        pbf_press_button(context, BUTTON_A, 160ms, 320ms);
 
-    //Wait for game to load in
-    BlackScreenOverWatcher detector(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
-    int ret = wait_until(
-        console, context,
-        GameSettings::instance().ENTER_GAME_WAIT0,
-        {detector}
-    );
-    if (ret == 0){
-        console.log("Entered game!");
-    }else{
-        console.log("Timed out waiting to enter game.", COLOR_RED);
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "soft_reset(): Timed out waiting to enter game.",
-            console
+        //Wait for game to load in
+        BlackScreenOverWatcher detector(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+        int ret = wait_until(
+            console, context,
+            GameSettings::instance().ENTER_GAME_WAIT0,
+            {detector}
         );
+        if (ret == 0){
+            console.log("Entered game!");
+        }else{
+            console.log("Timed out waiting to enter game.", COLOR_RED);
+            errors++;
+            if (errors >= 5){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "soft_reset(): Failed to reset after 5 attempts.",
+                    console
+                );
+            }
+            continue;
+        }
+
+        //Mash past "previously on..."
+        pbf_mash_button(context, BUTTON_B, GameSettings::instance().ENTER_GAME_MASH0);
+        context.wait_for_all_requests();
+
+        //Random wait no.2
+        console.log("Randomly waiting...");
+        Milliseconds rng_wait2 = std::chrono::milliseconds(random_u32(0, 5000));
+        pbf_wait(context, rng_wait2);
+        context.wait_for_all_requests();
     }
-
-    //Mash past "previously on..."
-    pbf_mash_button(context, BUTTON_B, GameSettings::instance().ENTER_GAME_MASH0);
-    context.wait_for_all_requests();
-
-    //Random wait no.2
-    console.log("Randomly waiting...");
-    Milliseconds rng_wait2 = std::chrono::milliseconds(random_u32(0, 5000));
-    pbf_wait(context, rng_wait2);
-    context.wait_for_all_requests();
 
     console.log("Soft reset completed.");
+    return errors;
 }
 
 void open_slot_six(ConsoleHandle& console, ProControllerContext& context){
