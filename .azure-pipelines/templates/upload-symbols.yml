@@ -1,0 +1,359 @@
+# templates/upload-symbols.yml
+# Template for uploading debug symbols to Discord
+
+parameters:
+  stageName: ''
+  displayName: ''
+  dependsOn: []
+  platforms: []
+  buildType: ''
+  versionMajor: 0
+  versionMinor: 0
+  versionPatch: 0
+  condition: ''
+
+stages:
+  - stage: ${{ parameters.stageName }}
+    displayName: ${{ parameters.displayName }}
+    dependsOn: ${{ parameters.dependsOn }}
+    condition: ${{ parameters.condition }}
+
+    jobs:
+      - job: UploadSymbols
+        displayName: 'Upload Debug Symbols'
+        pool:
+          name: ${{ parameters.poolName }}
+
+        variables:
+          - name: VERSION
+            value: '${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}'
+          - name: BUILD_DATE
+            value: $[format('{0:yyyy}{0:MM}{0:dd}', pipeline.startTime)]
+          - name: SHORT_SHA
+            value: $[substring(variables['Build.SourceVersion'], 0, 8)]
+          - name: BUILD_TYPE
+            value: '${{ parameters.buildType }}'
+          - name: WINDOWS_UPLOADED
+            value: 'false'
+          - name: LINUX_UPLOADED
+            value: 'false'
+          - name: MACOS_ARM64_UPLOADED
+            value: 'false'
+          - name: MACOS_X64_UPLOADED
+            value: 'false'
+
+        steps:
+          - checkout: none
+
+          - task: Cache@2
+            displayName: 'Restore Windows symbols'
+            inputs:
+              key: 'windows-symbols | "$(Build.BuildId)"'
+              path: $(Pipeline.Workspace)/symbols-windows
+              cacheHitVar: WINDOWS_CACHE_RESTORED
+            condition: and(succeeded(), contains('${{ join(',', parameters.platforms) }}', 'Windows'))
+
+          - task: Cache@2
+            displayName: 'Restore Linux symbols'
+            inputs:
+              key: 'ubuntu-symbols | "$(Build.BuildId)"'
+              path: $(Pipeline.Workspace)/symbols-linux
+              cacheHitVar: LINUX_CACHE_RESTORED
+            condition: and(succeeded(), contains('${{ join(',', parameters.platforms) }}', 'Linux'))
+
+          - task: Cache@2
+            displayName: 'Restore MacOS ARM64 symbols'
+            inputs:
+              key: 'macos-symbols-arm64 | "$(Build.BuildId)"'
+              path: $(Pipeline.Workspace)/symbols-macos-arm64
+              cacheHitVar: MACOS_ARM64_CACHE_RESTORED
+            condition: and(succeeded(), contains('${{ join(',', parameters.platforms) }}', 'MacOS_ARM64'))
+
+          - task: Cache@2
+            displayName: 'Restore MacOS x64 symbols'
+            inputs:
+              key: 'macos-symbols-x64 | "$(Build.BuildId)"'
+              path: $(Pipeline.Workspace)/symbols-macos-x64
+              cacheHitVar: MACOS_X64_CACHE_RESTORED
+            condition: and(succeeded(), contains('${{ join(',', parameters.platforms) }}', 'MacOS_x64'))
+
+          # Mount NAS share
+          - powershell: |
+              $ErrorActionPreference = 'Stop'
+              
+              $nasName = "$(NAS_NAME)"
+              $shareName = "SerialPrograms Symbols"
+              $nasPath = "\\$nasName\$shareName"
+              $username = "$(NAS_USERNAME)"
+              $password = "$(NAS_PASSWORD)"
+              
+              Write-Host "Mapping network drive to NAS..."
+              $netUseCmd = "net use Z: `"$nasPath`" /user:`"$username`" `"$password`" /persistent:no"
+              Invoke-Expression $netUseCmd
+              
+              if ($LASTEXITCODE -ne 0) {
+                throw "Failed to map network drive"
+              }
+              
+              Write-Host "✓ NAS mounted successfully at Z:"
+            displayName: 'Mount NAS Share'
+            condition: succeeded()
+            env:
+              NAS_USERNAME: $(NAS_USERNAME)
+              NAS_PASSWORD: $(NAS_PASSWORD)
+              NAS_NAME: $(NAS_NAME)
+
+          # Upload Windows symbols
+          - powershell: |
+              $ErrorActionPreference = 'Stop'
+              
+              $version = "$(VERSION)"
+              $symbolsDir = "$(Pipeline.Workspace)\symbols-windows"
+              $buildDate = "$(BUILD_DATE)"
+              $shortSha = "$(SHORT_SHA)"
+              $buildType = "$(BUILD_TYPE)"
+              
+              if (-not (Test-Path $symbolsDir)) {
+                Write-Host "Windows symbols not found"
+                exit 1
+              }
+
+              Write-Host "=== Packaging Windows symbols ==="
+              $archiveName = "SerialPrograms-Windows-$version-$buildDate-$shortSha.zip"
+              $archivePath = Join-Path $symbolsDir $archiveName
+
+              Push-Location $symbolsDir
+              $pdbFiles = Get-ChildItem -Filter "*.pdb"
+              
+              if ($pdbFiles.Count -eq 0) {
+                Write-Host "No Windows symbols found to upload"
+                Pop-Location
+                exit 1
+              }
+              
+              Compress-Archive -Path *.pdb -DestinationPath $archiveName -CompressionLevel Optimal -Force
+              Pop-Location
+              
+              if (-not (Test-Path $archivePath)) {
+                Write-Host "Failed to create archive"
+                exit 1
+              }
+              
+              Copy-Item $archivePath "Z:\Windows\$buildType" -Force
+              Write-Host "##vso[task.setvariable variable=WINDOWS_UPLOADED]true"
+              
+              Write-Host "✓ Windows symbols uploaded to NAS"
+            displayName: 'Upload Windows Symbols'
+            condition: and(succeeded(), eq(variables.WINDOWS_CACHE_RESTORED, 'true'))
+
+          # Upload Linux symbols
+          - powershell: |
+              $ErrorActionPreference = 'Stop'
+              
+              $version = "$(VERSION)"
+              $symbolsDir = "$(Pipeline.Workspace)\symbols-linux"
+              $buildDate = "$(BUILD_DATE)"
+              $shortSha = "$(SHORT_SHA)"
+              $buildType = "$(BUILD_TYPE)"
+              
+              if (-not (Test-Path $symbolsDir)) {
+                Write-Host "Linux symbols not found"
+                exit 1
+              }
+              
+              Write-Host "=== Packaging Linux symbols ==="
+              $archiveName = "SerialPrograms-Linux-$version-$buildDate-$shortSha.tar.gz"
+              $archivePath = Join-Path $symbolsDir $archiveName
+              
+              Push-Location $symbolsDir
+              $debugFiles = Get-ChildItem -Filter "*.debug" -ErrorAction SilentlyContinue
+              $execFile = Get-Item "SerialPrograms" -ErrorAction SilentlyContinue
+              
+              if ($debugFiles.Count -eq 0 -and -not $execFile) {
+                Write-Host "No Linux symbols found to upload"
+                Pop-Location
+                exit 1
+              }
+              
+              Write-Host "Creating tar.gz archive with Windows tar..."
+              $filesToArchive = @()
+              if ($debugFiles) { $filesToArchive += "*.debug" }
+              if ($execFile) { $filesToArchive += "SerialPrograms" }
+              
+              tar -czf $archiveName $filesToArchive
+              Pop-Location
+              
+              if (-not (Test-Path $archivePath)) {
+                Write-Host "Failed to create archive"
+                exit 1
+              }
+              
+              Copy-Item $archivePath "Z:\Linux\$buildType" -Force
+              Write-Host "##vso[task.setvariable variable=LINUX_UPLOADED]true"
+              Write-Host "✓ Linux symbols uploaded to NAS"
+            displayName: 'Upload Linux Symbols'
+            condition: and(succeeded(), eq(variables.LINUX_CACHE_RESTORED, 'true'))
+
+          # Upload MacOS ARM64 symbols
+          - powershell: |
+              $ErrorActionPreference = 'Stop'
+              
+              $version = "$(VERSION)"
+              $symbolsDir = "$(Pipeline.Workspace)\symbols-macos-arm64"
+              $buildDate = "$(BUILD_DATE)"
+              $shortSha = "$(SHORT_SHA)"
+              $buildType = "$(BUILD_TYPE)"
+              
+              if (-not (Test-Path $symbolsDir)) {
+                Write-Host "MacOS ARM64 symbols not found"
+                exit 1
+              }
+              
+              Write-Host "=== Packaging MacOS ARM64 symbols ==="
+              $archiveName = "SerialPrograms-MacOS-ARM64-Symbols-$version-$buildDate-$shortSha.tar.gz"
+              $archivePath = Join-Path $symbolsDir $archiveName
+
+              Push-Location $symbolsDir
+              $dsymFiles = Get-ChildItem -Filter "*.dSYM" -ErrorAction SilentlyContinue
+              $execFile = Get-Item "SerialPrograms" -ErrorAction SilentlyContinue
+              
+              if ($dsymFiles.Count -eq 0 -and -not $execFile) {
+                Write-Host "No MacOS ARM64 symbols found to upload"
+                Pop-Location
+                exit 1
+              }
+              
+              Write-Host "Creating tar.gz archive with Windows tar..."
+              $filesToArchive = @()
+              if ($dsymFiles) { $filesToArchive += "*.dSYM" }
+              if ($execFile) { $filesToArchive += "SerialPrograms" }
+              
+              tar -czf $archiveName $filesToArchive
+              Pop-Location
+              
+              if (-not (Test-Path $archivePath)) {
+                Write-Host "Failed to create archive"
+                exit 1
+              }
+              
+              Copy-Item $archivePath "Z:\MacOS_ARM64\$buildType" -Force
+              Write-Host "##vso[task.setvariable variable=MACOS_ARM64_UPLOADED]true"
+              Write-Host "✓ MacOS ARM64 symbols uploaded to NAS"
+            displayName: 'Upload MacOS ARM64 Symbols'
+            condition: and(succeeded(), eq(variables.MACOS_ARM64_CACHE_RESTORED, 'true'))
+
+          # Upload MacOS x64 symbols
+          - powershell: |
+              $ErrorActionPreference = 'Stop'
+              
+              $version = "$(VERSION)"
+              $symbolsDir = "$(Pipeline.Workspace)\symbols-macos-x64"
+              $buildDate = "$(BUILD_DATE)"
+              $shortSha = "$(SHORT_SHA)"
+              $buildType = "$(BUILD_TYPE)"
+              
+              if (-not (Test-Path $symbolsDir)) {
+                Write-Host "MacOS x64 symbols not found"
+                exit 1
+              }
+              
+              Write-Host "=== Packaging MacOS x64 symbols ==="
+              $archiveName = "SerialPrograms-MacOS-x64-Symbols-$version-$buildDate-$shortSha.tar.gz"
+              $archivePath = Join-Path $symbolsDir $archiveName
+              
+              Push-Location $symbolsDir
+              $dsymFiles = Get-ChildItem -Filter "*.dSYM" -ErrorAction SilentlyContinue
+              $execFile = Get-Item "SerialPrograms" -ErrorAction SilentlyContinue
+              
+              if ($dsymFiles.Count -eq 0 -and -not $execFile) {
+                Write-Host "No MacOS x64 symbols found to upload"
+                Pop-Location
+                exit 1
+              }
+
+              Write-Host "Creating tar.gz archive with Windows tar..."
+              $filesToArchive = @()
+              if ($dsymFiles) { $filesToArchive += "*.dSYM" }
+              if ($execFile) { $filesToArchive += "SerialPrograms" }
+              
+              tar -czf $archiveName $filesToArchive
+              Pop-Location
+              
+              if (-not (Test-Path $archivePath)) {
+                Write-Host "Failed to create archive"
+                exit 1
+              }
+              
+              Copy-Item $archivePath "Z:\MacOS_x64\$buildType" -Force
+              Write-Host "##vso[task.setvariable variable=MACOS_X64_UPLOADED]true"
+              Write-Host "✓ MacOS x64 symbols uploaded to NAS"
+            displayName: 'Upload MacOS x64 Symbols'
+            condition: and(succeeded(), eq(variables.MACOS_X64_CACHE_RESTORED, 'true'))
+
+          # Send Discord notification
+          - powershell: |
+              $ErrorActionPreference = 'Stop'
+              [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+              $PSDefaultParameterValues['*:Encoding'] = 'utf8'
+
+              $version = "$(VERSION)"
+              $webhook = "$(DISCORD_SYMBOLS_WEBHOOK)"
+              $nasUrl = "$(NAS_DOMAIN_URL)"
+              $buildId = "$(Build.BuildId)"
+              $buildType = "$(BUILD_TYPE)"
+              $commit = "$(SHORT_SHA)"
+              $buildDate = "$(BUILD_DATE)"
+              $platforms = ""
+
+              if ("$(WINDOWS_UPLOADED)" -eq "true") { $platforms += "✅ Windows (x64, MSVC)`n" }
+              if ("$(LINUX_UPLOADED)" -eq "true") { $platforms += "✅ Linux (x64, GCC)`n" }
+              if ("$(MACOS_ARM64_UPLOADED)" -eq "true") { $platforms += "✅ MacOS (ARM64, Clang)`n" }
+              if ("$(MACOS_X64_UPLOADED)" -eq "true") { $platforms += "✅ MacOS (x64, Clang)`n" }
+
+              $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+              if ([string]::IsNullOrEmpty($platforms)) {
+                Write-Host "No symbols were uploaded"
+                $errorPayload = @{
+                  embeds = @(
+                    @{
+                      title = "No Debug Symbols Uploaded"
+                      description = "No debug symbols were available to upload for this build."
+                      color = 15158332
+                      footer = @{ text = "Azure DevOps Pipeline" }
+                      timestamp = $timestamp
+                    }
+                  )
+                } | ConvertTo-Json -Depth 10
+                
+                Invoke-RestMethod -Uri $webhook -Method Post -Body $errorPayload -ContentType "application/json"
+                exit 1
+              }
+
+              $payload = [PSCustomObject]@{
+                embeds = @(
+                  [PSCustomObject]@{
+                    title = "Debug Symbols Uploaded Successfully"
+                    url = $nasUrl
+                    description = "**Version:** $version`n**Build ID:** $buildId`n**Build Type:** $buildType`n**Short commit SHA:** $commit`n**Date:** $buildDate`n`n**Platforms:**`n$platforms`n`n**[📦 Open NAS Symbols]($nasUrl)**"
+                    color = 3066993
+                    footer = [PSCustomObject]@{ text = "Azure DevOps Pipeline" }
+                    timestamp = $timestamp
+                  }
+                )
+              }
+
+              $json = $payload | ConvertTo-Json -Depth 10 -Compress
+              $utf8Bytes = [System.Text.Encoding]::UTF8.GetBytes($json)
+              Invoke-RestMethod -Uri $webhook -Method Post -Body $utf8Bytes -ContentType "application/json; charset=utf-8"
+              Write-Host "✓ Discord notification sent"
+            displayName: 'Send Discord Notification'
+            condition: always()
+            env:
+              DISCORD_SYMBOLS_WEBHOOK: $(DISCORD_SYMBOLS_WEBHOOK)
+              NAS_DOMAIN_URL: $(NAS_DOMAIN_URL)
+
+          - powershell: |
+              net use Z: /delete /yes 2>$null
+              Write-Host "NAS drive unmounted"
+            displayName: 'Unmount NAS Share'
+            condition: always()

@@ -1,0 +1,191 @@
+# templates/macos-notarize.yml
+# Template for codesigning and notarizing SerialPrograms on MacOS
+
+parameters:
+  stageName: ''
+  displayName: ''
+  dependsOnStage: ''
+  buildType: ''
+  poolName: ''
+  imageName: ''
+  architecture: ''
+  compiler: ''
+  cmake_preset: ''
+  macos_path: ''
+  openssl_pkcs_args: ''
+  condition: ''
+
+stages:
+- stage: ${{ parameters.stageName }}
+  displayName: ${{ parameters.displayName }}
+  dependsOn: ${{ parameters.dependsOnStage }}
+  condition: ${{ parameters.condition }}
+
+  jobs:
+  - job: Codesign
+    displayName: Codesign ${{ parameters.architecture }}
+    timeoutInMinutes: 120
+    cancelTimeoutInMinutes: 1
+
+    pool:
+      name: ${{ parameters.poolName }}
+      demands:
+        - Agent.OSArchitecture -equals ${{ lower(parameters.architecture) }}
+
+    variables:
+      architecture: ${{ parameters.architecture }}
+      compiler: ${{ parameters.compiler }}
+      cmake_preset: ${{ parameters.cmake_preset }}
+
+    steps:
+      - template: checkout.yml
+
+      - task: Cache@2
+        displayName: 'Restore the cached build artifact'
+        inputs:
+          key: 'macos-build-${{ parameters.architecture }} | "$(Build.BuildId)"'
+          path: $(Pipeline.Workspace)
+          restoreKeys: |
+            macos-build-${{ parameters.architecture }} | "$(Build.BuildId)"
+        condition: succeeded()
+
+      - task: InstallAppleCertificate@2
+        displayName: 'Install Apple certificate'
+        inputs:
+          certSecureFile: 'CodesignCertMac.p12'
+          certPwd: $(CERT_PW)
+          keychain: custom
+          keychainPassword: $(KEYCHAIN_PW)
+          customKeychainPath: '$(HOME)/Library/Keychains/azure-signing.keychain-db'
+          deleteCert: true
+          deleteCustomKeychain: true
+          opensslPkcsArgs: ${{ parameters.openssl_pkcs_args }}
+        condition: succeeded()
+
+      - script: |
+          set -e
+          KEYCHAIN="$HOME/Library/Keychains/azure-signing.keychain-db"
+
+          echo "=== Activating keychain ==="
+          security list-keychains -d user -s "$KEYCHAIN" "$HOME/Library/Keychains/login.keychain-db"
+          security unlock-keychain -p "$(KEYCHAIN_PW)" "$KEYCHAIN"
+
+          echo "=== Allowing codesign to access private key ==="
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$(KEYCHAIN_PW)" "$KEYCHAIN"
+
+          echo "=== Verifying identities ==="
+          security find-identity -p codesigning -v
+        env:
+          KEYCHAIN_PW: $(KEYCHAIN_PW)
+        displayName: 'Authorize signing key'
+        condition: succeeded()
+
+      - script: |
+          set -euo pipefail
+          export PATH=${{ parameters.macos_path }}
+          APP_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/SerialPrograms.app"
+          ZIP_PATH="$(Pipeline.Workspace)/SerialPrograms-MacOS-$(compiler)-$(architecture).zip"
+          ENTITLEMENTS_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/SerialPrograms/cmake/MacOSXEntitlements.plist"
+
+          echo "=== Extracting tarball ==="
+          tar -xzf "$(Pipeline.Workspace)/macos-build-${{ parameters.architecture }}.tar.gz"
+
+          echo "=== Signing app ==="
+          codesign --deep --force --options runtime --timestamp --entitlements "$ENTITLEMENTS_DIR" --sign "$SIGN_IDENTITY" "$APP_DIR"
+
+          echo "=== Verifying code signature ==="
+          codesign --verify --deep --strict --verbose=2 "$APP_DIR"
+
+          echo "Creating ZIP for notarization..."
+          ditto -c -k --keepParent "$APP_DIR" "$ZIP_PATH"
+        env:
+          SIGN_IDENTITY: $(SIGNING_IDENTITY)
+        displayName: 'Codesign, verify, create ZIP'
+        condition: succeeded()
+
+      - script: |
+          set -euo pipefail
+          ZIP_PATH="$(Pipeline.Workspace)/SerialPrograms-MacOS-$(compiler)-$(architecture).zip"
+
+          SUBMIT_JSON=$(xcrun notarytool submit "$ZIP_PATH" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_APP_PW" \
+            --team-id "$APPLE_TEAM_ID" \
+            --output-format json)
+
+          REQUEST_ID=$(echo "$SUBMIT_JSON" | jq -r '.id')
+          [ -n "$REQUEST_ID" ] && [ "$REQUEST_ID" != "null" ]
+
+          echo "##vso[task.setvariable variable=NOTARY_REQUEST_ID]$REQUEST_ID"
+        env:
+          APPLE_ID: $(APPLE_ID)
+          APPLE_APP_PW: $(APPLE_APP_PW)
+          APPLE_TEAM_ID: $(APPLE_TEAM_ID)
+        displayName: 'Submit for notarization'
+        condition: succeeded()
+
+      - script: |
+          set -euo pipefail
+          MAX_WAIT=14400
+          INTERVAL=30
+          ELAPSED=0
+
+          while true; do
+            STATUS=$(xcrun notarytool info "$(NOTARY_REQUEST_ID)" \
+              --apple-id "$APPLE_ID" \
+              --password "$APPLE_APP_PW" \
+              --team-id "$APPLE_TEAM_ID" \
+              --output-format json | jq -r '.status')
+
+            case "$STATUS" in
+              Accepted) break ;;
+              Invalid)
+                xcrun notarytool log "$(NOTARY_REQUEST_ID)" \
+                  --apple-id "$APPLE_ID" \
+                  --password "$APPLE_APP_PW" \
+                  --team-id "$APPLE_TEAM_ID"
+                exit 1 ;;
+            esac
+
+            sleep "$INTERVAL"
+            ELAPSED=$((ELAPSED + INTERVAL))
+            [ "$ELAPSED" -lt "$MAX_WAIT" ]
+          done
+        env:
+          APPLE_ID: $(APPLE_ID)
+          APPLE_APP_PW: $(APPLE_APP_PW)
+          APPLE_TEAM_ID: $(APPLE_TEAM_ID)
+        displayName: 'Wait for notarization'
+        condition: succeeded()
+
+      - script: |
+          set -euo pipefail
+          APP_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/SerialPrograms.app"
+          xcrun stapler staple "$APP_DIR"
+          spctl --assess --type execute --verbose=4 "$APP_DIR"
+        displayName: 'Staple and verify'
+        condition: succeeded()
+
+      - script: |
+          echo "=== Creating a tarball ==="
+          tar -czf "SerialPrograms-MacOS-$(compiler)-$(architecture).tar.gz" -C "$(Pipeline.Workspace)/Arduino-Source-Internal" "SerialPrograms.app"
+          echo "=== Creating cache directory and moving tarball ==="
+          CACHE_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/cache-notarized"
+          mkdir -p "$CACHE_DIR"
+          mv "$(Pipeline.Workspace)/Arduino-Source-Internal/SerialPrograms-MacOS-$(compiler)-$(architecture).tar.gz" "$CACHE_DIR/"
+        displayName: 'Create a tarball'
+        condition: succeeded()
+
+      - task: Cache@2
+        displayName: 'Cache the notarized artifact'
+        inputs:
+          key: 'macos-notarized-${{ parameters.architecture }} | "$(Build.BuildId)"'
+          path: '$(Pipeline.Workspace)/Arduino-Source-Internal/cache-notarized'
+        condition: succeeded()
+
+      - task: PublishPipelineArtifact@1
+        displayName: 'Publish notarized app'
+        inputs:
+          targetPath: '$(Pipeline.Workspace)/Arduino-Source-Internal/cache-notarized/SerialPrograms-MacOS-$(compiler)-$(architecture).tar.gz'
+          artifact: 'SerialPrograms-MacOS-$(compiler)-$(architecture)'
+        condition: succeeded()
