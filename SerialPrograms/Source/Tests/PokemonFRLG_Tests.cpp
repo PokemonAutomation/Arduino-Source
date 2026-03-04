@@ -43,4 +43,12 @@ int test_pokemonFRLG_ShinySymbolDetector(const ImageViewRGB32& image, bool targe
     return 0;
 }
 
+int test_pokemonFRLG_SelectionDialogDetector(const ImageViewRGB32& image, bool target){
+    auto overlay = DummyVideoOverlay();
+    SelectionDialogDetector detector(COLOR_RED);
+    bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
 }
