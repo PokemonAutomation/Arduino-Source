@@ -132,8 +132,8 @@ bool BattleDialogDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 dialog_top_image = extract_box_reference(screen, m_dialog_top_box);
     ImageViewRGB32 dialog_right_image = extract_box_reference(screen, m_dialog_right_box);
 
-    if (is_solid(dialog_top_image, { 0.176, 0.357, 0.467 })
-        && is_solid(dialog_right_image, { 0.176, 0.357, 0.467 })
+    if (is_solid(dialog_top_image, { 0.176, 0.357, 0.467 }, 0.25, 20)
+        && is_solid(dialog_right_image, { 0.176, 0.357, 0.467 }, 0.25, 20)
         ){
         return true;
     }
@@ -162,10 +162,10 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 dialog_top_image = extract_box_reference(screen, m_dialog_top_box);
     ImageViewRGB32 dialog_right_image = extract_box_reference(screen, m_dialog_right_box);
 
-    if (is_solid(menu_top_image, { 0.335, 0.332, 0.335 }) //253, 251, 254 white
-        && is_solid(menu_right_image, { 0.335, 0.332, 0.335 })
-        && is_solid(dialog_top_image, { 0.176, 0.357, 0.467 }) //40, 81, 106 teal
-        && is_solid(dialog_right_image, { 0.176, 0.357, 0.467 })
+    if (is_white(menu_top_image)
+        && is_white(menu_right_image)
+        && is_solid(dialog_top_image, { 0.176, 0.357, 0.467 }, 0.25, 20) //40, 81, 106 teal
+        && is_solid(dialog_right_image, { 0.176, 0.357, 0.467 }, 0.25, 20)
         ){
         return true;
     }
@@ -203,8 +203,8 @@ bool AdvanceBattleDialogDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 dialog_top_image = extract_box_reference(screen, m_dialog_top_box);
     ImageViewRGB32 dialog_right_image = extract_box_reference(screen, m_dialog_right_box);
 
-    if (is_solid(dialog_top_image, { 0.176, 0.357, 0.467 })
-        && is_solid(dialog_right_image, { 0.176, 0.357, 0.467 })
+    if (is_solid(dialog_top_image, { 0.176, 0.357, 0.467 }, 0.25, 20)
+        && is_solid(dialog_right_image, { 0.176, 0.357, 0.467 }, 0.25, 20)
         && (stats.average.r > stats.average.b + 180)
         && (stats.average.r > stats.average.g + 180)
         )
