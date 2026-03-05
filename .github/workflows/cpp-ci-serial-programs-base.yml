@@ -135,8 +135,12 @@ jobs:
         git diff --name-only origin/main...HEAD > changed_files.txt
 
         echo "Generating clang-scan-deps experimental-full > deps.json."
+        
+        # filter compile_commands.json, to remove .rc files, since clang-scan-deps doesn't recognize this format
+        jq '[.[] | select(.file | endswith(".rc") | not)]' compile_commands.json > compile_commands_filtered.json
+
         # get dependency graph
-        clang-scan-deps -compilation-database compile_commands.json -format experimental-full > deps.json
+        clang-scan-deps -compilation-database compile_commands_filtered.json -format experimental-full > deps.json
 
         # normalize slashes
         # sed 's|\\\\|/|g' deps.json > normalized_deps.json
