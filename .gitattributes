@@ -1,1 +1,4 @@
 * -text
+
+# Explicitly ensure shell scripts use LF for CI compatibility
+*.sh text eol=lf
