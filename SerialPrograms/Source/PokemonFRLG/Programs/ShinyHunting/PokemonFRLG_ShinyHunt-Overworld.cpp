@@ -105,13 +105,13 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, ProControl
     */
 
     while (true){
-		bool encounter_found = find_encounter(env, context);
+        bool encounter_found = find_encounter(env, context);
 
         if (!encounter_found){
             stats.errors += 1;
             env.update_stats();
             break;
-		}
+        }
 
         //handle_encounter will wait for "POKEMON appeared!"
         bool encounter_shiny = handle_encounter(env.console, context, true);
@@ -133,7 +133,7 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, ProControl
             break;
         }
 
-		flee_battle(env.console, context);
+        flee_battle(env.console, context);
         context.wait_for_all_requests();
 
         stats.encounters++;
