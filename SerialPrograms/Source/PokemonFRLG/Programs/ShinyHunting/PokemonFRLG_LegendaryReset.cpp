@@ -29,7 +29,7 @@ LegendaryReset_Descriptor::LegendaryReset_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Legendary Reset",
         "Programs/PokemonFRLG/LegendaryReset.html",
         "Shiny hunt legendary Pokemon using soft resets.",
-        ProgramControllerClass::StandardController_RequiresPrecision,
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
@@ -59,6 +59,7 @@ LegendaryReset::LegendaryReset()
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
+    , TAKE_VIDEO("<b>Take Video:</b><br>Record a video when the shiny is found.", LockMode::UNLOCK_WHILE_RUNNING, true)
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_SHINY(
         "Shiny found",
@@ -72,13 +73,17 @@ LegendaryReset::LegendaryReset()
         &NOTIFICATION_PROGRAM_FINISH,
     })
 {
+    PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(WALK_UP);
+    PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     LegendaryReset_Descriptor::Stats& stats = env.current_stats<LegendaryReset_Descriptor::Stats>();
+
+    home_black_border_check(env.console, context);
 
     /*
     * Settings: Text Speed fast. Default borders. Audio required.
@@ -138,6 +143,9 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
                 env.console.video().snapshot(),
                 true
             );
+            if (TAKE_VIDEO){
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
+            }
             break;
         }
 

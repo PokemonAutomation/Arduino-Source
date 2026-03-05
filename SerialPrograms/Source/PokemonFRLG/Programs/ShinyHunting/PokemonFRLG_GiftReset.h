@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonFRLG_GiftReset_H
 #define PokemonAutomation_PokemonFRLG_GiftReset_H
 
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
@@ -46,6 +47,8 @@ private:
         fossils,
     };
     EnumDropdownOption<Target> TARGET;
+
+    BooleanCheckBoxOption TAKE_VIDEO;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 

@@ -30,7 +30,7 @@ GiftReset_Descriptor::GiftReset_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Gift Reset",
         "Programs/PokemonFRLG/GiftReset.html",
         "Soft reset for a shiny gift Pokemon.",
-        ProgramControllerClass::StandardController_RequiresPrecision,
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
@@ -67,6 +67,7 @@ GiftReset::GiftReset()
         LockMode::LOCK_WHILE_RUNNING,
         Target::starters
     )
+    , TAKE_VIDEO("<b>Take Video:</b><br>Record a video when the shiny is found.", LockMode::UNLOCK_WHILE_RUNNING, true)
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_SHINY(
         "Shiny found",
@@ -81,6 +82,7 @@ GiftReset::GiftReset()
     })
 {
     PA_ADD_OPTION(TARGET);
+    PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -100,8 +102,33 @@ void GiftReset::obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControlle
     */
 
     env.log("Obtaining Pokemon.");
-    pbf_press_button(context, BUTTON_A, 320ms, 640ms);
-
+    if (TARGET == Target::starters) {
+        AdvanceWhiteDialogWatcher adv_white_start(COLOR_RED);
+        int rets = run_until<ProControllerContext>(
+            env.console, context,
+            [](ProControllerContext& context) {
+                for (int i = 0; i < 10; i++) {
+                    pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+                    pbf_wait(context, 2000ms);
+                    context.wait_for_all_requests();
+                }
+            },
+            { adv_white_start }
+            );
+        context.wait_for_all_requests();
+        if (rets < 0) {
+            env.update_stats();
+            env.log("obtain_pokemon(): Unable to start starter dialog after 10 attempts.", COLOR_RED);
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "obtain_pokemon(): Unable to start starter dialog after 10 attempts.",
+                env.console
+            );
+        }
+        env.log("Initial A press completed.");
+    } else {
+        pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+    }
     bool seen_selection_arrow = false;
     //bool seen_nickname_arrow = false;
     while (true){
@@ -310,6 +337,8 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     GiftReset_Descriptor::Stats& stats = env.current_stats<GiftReset_Descriptor::Stats>();
 
+    home_black_border_check(env.console, context);
+
     /*
     * Settings: Text Speed fast. Default borders.
     * Setup: 5 pokemon in your party. None for starter. Stand in front of the pokemon. Save the game.
@@ -346,6 +375,9 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                 screen,
                 true
             );
+            if (TAKE_VIDEO){
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
+            }
             break;
         }else{
             env.log("Pokemon is not shiny.");

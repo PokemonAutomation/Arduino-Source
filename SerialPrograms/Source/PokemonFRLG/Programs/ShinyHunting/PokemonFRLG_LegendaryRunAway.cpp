@@ -30,7 +30,7 @@ LegendaryRunAway_Descriptor::LegendaryRunAway_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Legendary Run Away",
         "Programs/PokemonFRLG/LegendaryRunAway.html",
         "Shiny hunt legendary Pokemon using the run away method.",
-        ProgramControllerClass::StandardController_RequiresPrecision,
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
@@ -64,6 +64,7 @@ LegendaryRunAway::LegendaryRunAway()
         LockMode::LOCK_WHILE_RUNNING,
         Target::hooh
     )
+    , TAKE_VIDEO("<b>Take Video:</b><br>Record a video when the shiny is found.", LockMode::UNLOCK_WHILE_RUNNING, true)
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_SHINY(
         "Shiny found",
@@ -100,7 +101,9 @@ LegendaryRunAway::LegendaryRunAway()
         "550 ms"
     )
 {
+    PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(TARGET);
+    PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
     PA_ADD_STATIC(m_advanced_options);
@@ -243,6 +246,8 @@ void LegendaryRunAway::reset_lugia(SingleSwitchProgramEnvironment& env, ProContr
 void LegendaryRunAway::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     LegendaryRunAway_Descriptor::Stats& stats = env.current_stats<LegendaryRunAway_Descriptor::Stats>();
 
+    home_black_border_check(env.console, context);
+
     /*
     * Settings: Text Speed fast. Default borders. Battle animations off. Audio required.
     * Smoke Ball or fast pokemon required.
@@ -264,7 +269,17 @@ void LegendaryRunAway::program(SingleSwitchProgramEnvironment& env, ProControlle
         if (legendary_shiny){
             stats.shinies++;
             env.update_stats();
-            send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", env.console.video().snapshot(), true);
+            send_program_notification(env,
+                NOTIFICATION_SHINY,
+                COLOR_YELLOW,
+                "Shiny found!",
+                {}, "",
+                env.console.video().snapshot(),
+                true
+            );
+            if (TAKE_VIDEO){
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
+            }
             break;
         }
         env.log("No shiny found.");

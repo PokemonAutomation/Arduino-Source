@@ -31,7 +31,7 @@ PrizeCornerReset_Descriptor::PrizeCornerReset_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Prize Corner Reset",
         "Programs/PokemonFRLG/PrizeCornerReset.html",
         "Redeem and soft reset for a shiny Game Corner prize.",
-        ProgramControllerClass::StandardController_RequiresPrecision,
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
@@ -68,6 +68,7 @@ PrizeCornerReset::PrizeCornerReset()
         LockMode::LOCK_WHILE_RUNNING,
         0
     )
+    , TAKE_VIDEO("<b>Take Video:</b><br>Record a video when the shiny is found.", LockMode::UNLOCK_WHILE_RUNNING, true)
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_SHINY(
         "Shiny found",
@@ -82,6 +83,7 @@ PrizeCornerReset::PrizeCornerReset()
     })
 {
     PA_ADD_OPTION(SLOT);
+    PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -136,6 +138,8 @@ void PrizeCornerReset::obtain_prize(SingleSwitchProgramEnvironment& env, ProCont
 void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     PrizeCornerReset_Descriptor::Stats& stats = env.current_stats<PrizeCornerReset_Descriptor::Stats>();
 
+    home_black_border_check(env.console, context);
+
     /*
     * Settings: Text Speed fast. Default borders.
     * Setup: Have a party of 5. Stand in front of the prize redemption. Save game. Move cursor back to top.
@@ -165,6 +169,9 @@ void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControlle
                 screen,
                 true
             );
+            if (TAKE_VIDEO){
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
+            }
             break;
         }else{
             env.log("Prize is not shiny.");

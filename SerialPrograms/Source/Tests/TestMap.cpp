@@ -9,6 +9,7 @@
 #include "CommonFramework_Tests.h"
 #include "Kernels_Tests.h"
 #include "NintendoSwitch_Tests.h"
+#include "PokemonFRLG_Tests.h"
 #include "PokemonHome_Tests.h"
 #include "PokemonLA_Tests.h"
 #include "PokemonLZA_Tests.h"
@@ -308,6 +309,9 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonLZA_HyperspaceCalorieDetector", std::bind(image_int_detector_helper, test_pokemonLZA_HyperspaceCalorieDetector, _1)},
     {"PokemonLZA_FlavorPowerScreenDetector", test_pokemonLZA_FlavorPowerScreenDetector},
     {"PokemonLZA_DonutBerriesReader", test_pokemonLZA_DonutBerriesReader},
+    {"PokemonFRLG_AdvanceWhiteDialogDetector", std::bind(image_bool_detector_helper, test_pokemonFRLG_AdvanceWhiteDialogDetector, _1)},
+    {"PokemonFRLG_ShinySymbolDetector", std::bind(image_bool_detector_helper, test_pokemonFRLG_ShinySymbolDetector, _1)},
+    {"PokemonFRLG_SelectionDialogDetector", std::bind(image_bool_detector_helper, test_pokemonFRLG_SelectionDialogDetector, _1)},
 };
 
 TestFunction find_test_function(const std::string& test_space, const std::string& test_name){

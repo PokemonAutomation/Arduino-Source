@@ -39,9 +39,9 @@ bool WhiteDialogDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 right_image = extract_box_reference(screen, m_right_box);
     ImageViewRGB32 top_image = extract_box_reference(screen, m_top_box);
     ImageViewRGB32 bottom_image = extract_box_reference(screen, m_bottom_box);
-    if (is_solid(right_image, { 0.25, 0.38, 0.369 })
-        && is_solid(top_image, { 0.25, 0.38, 0.369 })
-        && is_solid(bottom_image, { 0.25, 0.38, 0.369 })
+    if (is_white(right_image)
+        && is_white(top_image)
+        && is_white(bottom_image)
         ){
         return true;
     }
@@ -66,7 +66,7 @@ bool AdvanceWhiteDialogDetector::detect(const ImageViewRGB32& screen){
     //Filter out background
     ImageRGB32 filtered_region = filter_rgb32_range(
         extract_box_reference(screen, m_dialog_box),
-        combine_rgb(185, 0, 1), combine_rgb(255, 32, 33), Color(0), replace_color_within_range
+        combine_rgb(164, 0, 0), combine_rgb(255, 114, 87), Color(0), replace_color_within_range
     );
     ImageStats stats = image_stats(filtered_region);
 
@@ -81,11 +81,11 @@ bool AdvanceWhiteDialogDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 top_image = extract_box_reference(screen, m_top_box);
     ImageViewRGB32 bottom_image = extract_box_reference(screen, m_bottom_box);
 
-    if (is_solid(right_image, { 0.25, 0.38, 0.369 })
-        && is_solid(top_image, { 0.25, 0.38, 0.369 })
-        && is_solid(bottom_image, { 0.25, 0.38, 0.369 })
-        && (stats.average.r > stats.average.b + 200)
-        && (stats.average.r > stats.average.g + 200)
+    if (is_white(right_image)
+        && is_white(top_image)
+        && is_white(bottom_image)
+        && (stats.average.r > stats.average.b + 180)
+        && (stats.average.r > stats.average.g + 180)
         )
     {
         return true;
@@ -110,10 +110,10 @@ bool SelectionDialogDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 top_image = extract_box_reference(screen, m_top_box);
     ImageViewRGB32 bottom_image = extract_box_reference(screen, m_bottom_box);
     ImageViewRGB32 selection_image = extract_box_reference(screen, m_selection_box);
-    if (is_solid(right_image, { 0.25, 0.38, 0.369 })
-        && is_solid(top_image, { 0.25, 0.38, 0.369 })
-        && is_solid(bottom_image, { 0.25, 0.38, 0.369 })
-        && is_solid(selection_image, { 0.25, 0.38, 0.369 })
+    if (is_white(right_image)
+        && is_white(top_image)
+        && is_white(bottom_image)
+        && is_white(selection_image)
         ){
         return true;
     }
@@ -189,7 +189,7 @@ bool AdvanceBattleDialogDetector::detect(const ImageViewRGB32& screen){
     //Filter out background
     ImageRGB32 filtered_region = filter_rgb32_range(
         extract_box_reference(screen, m_dialog_box),
-        combine_rgb(185, 0, 1), combine_rgb(255, 32, 33), Color(0), replace_color_within_range
+        combine_rgb(164, 0, 0), combine_rgb(255, 114, 87), Color(0), replace_color_within_range
     );
     ImageStats stats = image_stats(filtered_region);
 
@@ -205,8 +205,8 @@ bool AdvanceBattleDialogDetector::detect(const ImageViewRGB32& screen){
 
     if (is_solid(dialog_top_image, { 0.176, 0.357, 0.467 })
         && is_solid(dialog_right_image, { 0.176, 0.357, 0.467 })
-        && (stats.average.r > stats.average.b + 200)
-        && (stats.average.r > stats.average.g + 200)
+        && (stats.average.r > stats.average.b + 180)
+        && (stats.average.r > stats.average.g + 180)
         )
     {
         return true;
