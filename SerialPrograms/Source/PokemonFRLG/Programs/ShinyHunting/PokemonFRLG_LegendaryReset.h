@@ -12,6 +12,8 @@
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -35,7 +37,10 @@ public:
     ) override{}
 
 private:
+    PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
+
     BooleanCheckBoxOption WALK_UP;
+    BooleanCheckBoxOption TAKE_VIDEO;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 

@@ -30,7 +30,7 @@ GiftReset_Descriptor::GiftReset_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Gift Reset",
         "Programs/PokemonFRLG/GiftReset.html",
         "Soft reset for a shiny gift Pokemon.",
-        ProgramControllerClass::StandardController_RequiresPrecision,
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
@@ -67,6 +67,7 @@ GiftReset::GiftReset()
         LockMode::LOCK_WHILE_RUNNING,
         Target::starters
     )
+    , TAKE_VIDEO("<b>Take Video:</b><br>Record a video when the shiny is found.", LockMode::UNLOCK_WHILE_RUNNING, true)
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_SHINY(
         "Shiny found",
@@ -81,6 +82,7 @@ GiftReset::GiftReset()
     })
 {
     PA_ADD_OPTION(TARGET);
+    PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -373,6 +375,9 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                 screen,
                 true
             );
+            if (TAKE_VIDEO){
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
+            }
             break;
         }else{
             env.log("Pokemon is not shiny.");
