@@ -1,10 +1,20 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 TMP_DIR="$REPO_ROOT/.ci_tmp"
 mkdir -p "$TMP_DIR"
+
+# Define the cleanup function
+cleanup() {
+    echo "Cleaning up temporary files..."
+    rm -rf "$TMP_DIR"
+}
+
+# Register the trap: run cleanup on EXIT, plus common signals like INT (Ctrl+C) or TERM
+trap cleanup EXIT INT TERM
+
 
 cd "$REPO_ROOT"
 
@@ -28,7 +38,7 @@ echo "Generating clang-scan-deps experimental-full > deps.json."
 jq '[.[] | select(.file | endswith(".rc") | not)]' "$DB_PATH" > "$TMP_DIR/compile_commands_filtered.json"
 
 # get dependency graph
-clang-scan-deps -compilation-database compile_commands_filtered.json -format experimental-full > "$TMP_DIR/deps.json"
+clang-scan-deps -compilation-database "$TMP_DIR/compile_commands_filtered.json" -format experimental-full > "$TMP_DIR/deps.json"
 
 # normalize slashes
 # sed 's|\\\\|/|g' deps.json > normalized_deps.json
@@ -115,8 +125,9 @@ EOF
 
 echo "Running clang-query."
 
-files=$(jq -r '.[].file' SerialPrograms/bin/compile_commands.json)
-echo "$files" | xargs --max-args=150 clang-query -p SerialPrograms/bin/ -f "$TMP_DIR/query.txt" >> output.txt
+files=$(jq -r '.[].file' "$DB_PATH")
+DB_DIR=$(dirname "$DB_PATH")
+echo "$files" | xargs --max-args=150 clang-query -p "$DB_DIR" -f "$TMP_DIR/query.txt" >> output.txt
 cat output.txt
 if grep --silent "Match #" output.txt; then
   echo "::error Forbidden std::filesystem::path construction detected!"
