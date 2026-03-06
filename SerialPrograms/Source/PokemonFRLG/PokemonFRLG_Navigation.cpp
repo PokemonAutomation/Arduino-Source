@@ -317,12 +317,15 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
         );
     }
 
-    pbf_press_button(context, BUTTON_A, 320ms, 320ms);
     BlackScreenOverWatcher battle_over(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
-    int ret3 = wait_until(
+    int ret3 = run_until<ProControllerContext>(
         console, context,
-        std::chrono::seconds(5),
-        {{battle_over}}
+        [](ProControllerContext& context) {
+            pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+            pbf_wait(context, 5000ms);
+            context.wait_for_all_requests();
+        },
+        { battle_over }
     );
     if (ret3 == 0){
         console.log("Successfully fled the battle.");
