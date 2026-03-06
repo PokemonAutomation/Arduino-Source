@@ -535,6 +535,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     std::string test = "hello";
     std::filesystem::path p{test};
 
+    std::string out_path = "hello" + "/" + file_stat.m_filename;
+    std::filesystem::path const parent_dir{std::filesystem::path(out_path).parent_path()};
+
 
 #if 0
     UpdateMenuWatcher update_menu(console, COLOR_PURPLE);
