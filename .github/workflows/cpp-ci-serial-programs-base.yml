@@ -87,6 +87,12 @@ jobs:
         cd bin
         cmake .. -DQT_MAJOR:STRING=6 ${{env.CMAKE_ADDITIONAL_FLAGS}}
         # cmake --build . --config RelWithDebInfo --parallel 10
+    - name: Generate Qt Autogen Files
+      if: inputs.run-clang-query
+      run: |
+        cd Arduino-Source/SerialPrograms/bin
+        # This triggers only the moc/uic/rcc generation targets
+        cmake --build . --target SerialProgramsCommandLine_autogen SerialPrograms_autogen SerialProgramsLib_autogen --parallel 10
 
     - name: Prepare upload build
       if: inputs.upload-build
