@@ -153,20 +153,28 @@ DB_DIR=$(dirname "$DB_PATH")
 
 
 LIST_FILE="$TMP_DIR/file_list.txt"
-
 jq -r '.[].file' "$DB_PATH" | tr -d '\r' | sed 's|\\|/|g' > "$LIST_FILE"
 
-# 2. Run clang-query using the list file
-# We use -a to read arguments from the file
-xargs -d '\n' -a "$LIST_FILE" --max-args=150 \
-    clang-query -p "$DB_DIR" \
-    --extra-arg="-Wno-unused-command-line-argument" \
-    --extra-arg="-Wno-unused-function" \
-    -f "$TMP_DIR/query.txt" >> "$TMP_DIR/output.txt"
+LIST_FILE="$TMP_DIR/files_to_query.txt"
+
+> "$TMP_DIR/output.txt"
+
+# Run clang-query using the list file
+# check if LIST_FILE has any data to analyze
+if [ ! -s "$LIST_FILE" ]; then
+    echo "No files found to analyze. Skipping Clang-Query."
+else
+    xargs -d '\n' -a "$LIST_FILE" --max-args=150 \
+		clang-query -p "$DB_DIR" \
+		--extra-arg="-Wno-unused-command-line-argument" \
+		--extra-arg="-Wno-unused-function" \
+		-f "$TMP_DIR/query.txt" >> "$TMP_DIR/output.txt"
+fi
 
 
-cat output.txt
-if grep --silent "Match #" output.txt; then
+
+cat "$TMP_DIR/output.txt"
+if grep --silent "Match #" "$TMP_DIR/output.txt"; then
   echo "::error Forbidden std::filesystem::path construction detected!"
   exit 1
 fi
