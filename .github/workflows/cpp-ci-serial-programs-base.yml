@@ -128,5 +128,6 @@ jobs:
 
     - name: Run clang query
       if: inputs.run-clang-query
+      working-directory: ./Arduino-Source
       run : bash ./.github/scripts/clang-query.sh
         
