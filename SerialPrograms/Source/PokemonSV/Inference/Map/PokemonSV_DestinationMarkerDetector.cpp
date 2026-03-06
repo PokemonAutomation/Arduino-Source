@@ -23,7 +23,7 @@ class DestinationMarkerMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
     
     DestinationMarkerMatcher() : WaterfillTemplateMatcher(
-        "PokemonSV/Map/DestinationMarkerIcon-Template.png", Color(180,80,0), Color(255, 130, 50), 50
+        "PokemonSV/Map/DestinationMarkerIcon-Template.png", Color(180,80,0), Color(255, 130, 70), 50
     ){
         m_aspect_ratio_lower = 0.8;
         m_aspect_ratio_upper = 1.2;
@@ -42,7 +42,7 @@ class DestinationMarkerYellowMatcher : public ImageMatch::WaterfillTemplateMatch
 public:
     
     DestinationMarkerYellowMatcher() : WaterfillTemplateMatcher(
-        "PokemonSV/Map/DestinationMarkerIcon-Yellow.png", Color(180,80,0), Color(255, 200, 50), 50
+        "PokemonSV/Map/DestinationMarkerIcon-Yellow.png", Color(180,80,0), Color(255, 200, 70), 50
     ){
         m_aspect_ratio_lower = 0.8;
         m_aspect_ratio_upper = 1.2;
@@ -82,7 +82,7 @@ bool DestinationMarkerDetector::detect(const ImageViewRGB32& screen){
 
 std::vector<ImageFloatBox> DestinationMarkerDetector::detect_all(const ImageViewRGB32& screen) const{
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
-        {combine_rgb(180, 80, 0), combine_rgb(255, 130, 50)},
+        {combine_rgb(180, 80, 0), combine_rgb(255, 130, 70)},
 
     };
 
@@ -119,7 +119,7 @@ std::vector<ImageFloatBox> DestinationMarkerDetector::detect_all(const ImageView
 
 std::vector<ImageFloatBox> DestinationMarkerDetector::detect_all_yellow(const ImageViewRGB32& screen) const{
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
-        {combine_rgb(180, 100, 0), combine_rgb(255, 190, 50)},  // to detect the marker within the minimap, when the radar beam is covering the marker
+        {combine_rgb(180, 100, 0), combine_rgb(255, 190, 70)},  // to detect the marker within the minimap, when the radar beam is covering the marker
     };
 
 
