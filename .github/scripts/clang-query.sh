@@ -31,11 +31,21 @@ fi
 
 echo "Generating clang-scan-deps experimental-full > deps.json."
 
+# in ubuntu, the command is clang-scan-deps-18. in Windows, it is clang-scan-deps
+SCAN_DEPS=$(command -v clang-scan-deps-18 || command -v clang-scan-deps)
+
+# Safety check: Exit if the tool isn't found
+if [ -z "$SCAN_DEPS" ]; then
+  echo "Error: clang-scan-deps (or version -18) not found in PATH."
+  exit 1
+fi
+
+
 # filter compile_commands.json, to remove .rc files, since clang-scan-deps doesn't recognize this format
 jq '[.[] | select(.file | endswith(".rc") | not)]' "$DB_PATH" > "$TMP_DIR/compile_commands_filtered.json"
 
 # get dependency graph
-clang-scan-deps -compilation-database "$TMP_DIR/compile_commands_filtered.json" -format experimental-full > "$TMP_DIR/deps.json"
+"$SCAN_DEPS" -compilation-database "$TMP_DIR/compile_commands_filtered.json" -format experimental-full > "$TMP_DIR/deps.json"
 
 # normalize slashes
 # sed 's|\\\\|/|g' deps.json > normalized_deps.json
