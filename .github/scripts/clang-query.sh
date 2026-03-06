@@ -101,7 +101,6 @@ jq -r "$JQ_SCRIPT" \
 echo "Generating changed_files.txt from git diff."
 
 # git diff with relative paths
-git fetch origin main --depth=1
 git diff --name-only origin/main...HEAD > "$TMP_DIR/changed_files.txt"
 
 echo "Generating files_to_query.txt, based on changed_files.txt and deps.json."

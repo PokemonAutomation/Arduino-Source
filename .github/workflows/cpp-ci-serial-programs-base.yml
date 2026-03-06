@@ -51,6 +51,8 @@ jobs:
       with:
         path: 'Arduino-Source'
         submodules: 'recursive'
+        fetch-depth: 0
+        filter: blob:none
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
