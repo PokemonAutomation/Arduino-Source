@@ -10,7 +10,6 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -267,7 +266,7 @@ bool GiftReset::try_open_summary(SingleSwitchProgramEnvironment& env, ProControl
     } //For starters, no Pokedex yet, do Pokemon is on top and we skip this
 
     //Open party menu
-    BlackScreenOverWatcher blk1(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher blk1(COLOR_RED);
 
     int pm = run_until<ProControllerContext>(
         env.console, context,
@@ -293,7 +292,7 @@ bool GiftReset::try_open_summary(SingleSwitchProgramEnvironment& env, ProControl
     }
 
     //Two presses to open summary
-    BlackScreenOverWatcher blk2(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher blk2(COLOR_RED);
     int sm = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context) {
