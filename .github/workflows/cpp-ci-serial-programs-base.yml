@@ -86,7 +86,7 @@ jobs:
         mkdir bin
         cd bin
         cmake .. -DQT_MAJOR:STRING=6 ${{env.CMAKE_ADDITIONAL_FLAGS}}
-        cmake --build . --config RelWithDebInfo --parallel 10
+        # cmake --build . --config RelWithDebInfo --parallel 10
 
     - name: Prepare upload build
       if: inputs.upload-build
