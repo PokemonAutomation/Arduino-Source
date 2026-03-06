@@ -533,7 +533,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
     std::string test = "hello";
-    std::filesystem::path(test);
+    std::filesystem::path p{test};
 
 
 #if 0
