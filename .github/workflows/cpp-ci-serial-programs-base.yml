@@ -85,7 +85,7 @@ jobs:
         cd Arduino-Source/SerialPrograms
         mkdir bin
         cd bin
-        cmake .. -DQT_MAJOR:STRING=6 ${{env.CMAKE_ADDITIONAL_FLAGS}}
+        cmake .. -DQT_MAJOR:STRING=6 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ${{env.CMAKE_ADDITIONAL_FLAGS}}
         # cmake --build . --config RelWithDebInfo --parallel 10
     - name: Generate Qt Autogen Files
       if: inputs.run-clang-query
