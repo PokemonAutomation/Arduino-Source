@@ -532,7 +532,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     detector.process_frame(snapshot, current_time());
 #endif
 
-    std::filesystem::path("hello");
+    std::string test = "hello";
+    std::filesystem::path(test);
 
 
 #if 0
