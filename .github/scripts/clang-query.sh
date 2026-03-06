@@ -29,9 +29,6 @@ else
 fi
 
 
-# git diff with relative paths
-git diff --name-only origin/main...HEAD > "$TMP_DIR/changed_files.txt"
-
 echo "Generating clang-scan-deps experimental-full > deps.json."
 
 # filter compile_commands.json, to remove .rc files, since clang-scan-deps doesn't recognize this format
@@ -91,9 +88,14 @@ jq -r "$JQ_SCRIPT" \
 	--arg INPUT "$INPUT" \
 	"$TMP_DIR/deps.json"
 
-echo "Generating files_to_query.txt."
-# for each line in changed_files.txt, search deps.json to find all their dependants
-# 
+echo "Generating changed_files.txt from git diff."
+
+# git diff with relative paths
+git diff --name-only origin/main...HEAD > "$TMP_DIR/changed_files.txt"
+
+echo "Generating files_to_query.txt, based on changed_files.txt and deps.json."
+
+# for each line in changed_files_unix.txt, search deps.json to find all their dependants
 jq -r --rawfile mod "$TMP_DIR/changed_files.txt" \
 	--arg TU "$TU_KEY" \
 	--arg CMD "$CMD_KEY" \
@@ -112,7 +114,7 @@ jq -r --rawfile mod "$TMP_DIR/changed_files.txt" \
 	# 4. Get the source file path
 	.[$INPUT] 
   ] | unique[]
-' "$TMP_DIR/deps.json" > "$TMP_DIR/files_to_query.txt"
+' "$TMP_DIR/deps.json" | tr -d '\r' > "$TMP_DIR/files_to_query.txt"
 
 
 
@@ -151,11 +153,13 @@ DB_DIR=$(dirname "$DB_PATH")
 # 	--extra-arg="-Wno-unused-function" \
 # 	-f "$TMP_DIR/query.txt" >> "$TMP_DIR/output.txt"
 
-
-LIST_FILE="$TMP_DIR/file_list.txt"
-jq -r '.[].file' "$DB_PATH" | tr -d '\r' | sed 's|\\|/|g' > "$LIST_FILE"
-
-LIST_FILE="$TMP_DIR/files_to_query.txt"
+ONLY_CHECK_CHANGED_FILES=true
+if [ "$ONLY_CHECK_CHANGED_FILES" = "true" ]; then
+    LIST_FILE="$TMP_DIR/files_to_query.txt"
+else # check all files
+	LIST_FILE="$TMP_DIR/file_list.txt"
+    jq -r '.[].file' "$DB_PATH" | tr -d '\r' | sed 's|\\|/|g' > "$LIST_FILE"
+fi
 
 > "$TMP_DIR/output.txt"
 
