@@ -13,7 +13,7 @@ cleanup() {
 }
 
 # Register the trap: run cleanup on EXIT, plus common signals like INT (Ctrl+C) or TERM
-trap cleanup EXIT INT TERM
+# trap cleanup EXIT INT TERM
 
 
 cd "$REPO_ROOT"
@@ -114,6 +114,8 @@ jq -r --rawfile mod "$TMP_DIR/changed_files.txt" \
   ] | unique[]
 ' "$TMP_DIR/deps.json" > "$TMP_DIR/files_to_query.txt"
 
+
+
 cat << 'EOF' > "$TMP_DIR/query.txt"
 set output dump
 match invocation(
@@ -125,9 +127,44 @@ EOF
 
 echo "Running clang-query."
 
-files=$(jq -r '.[].file' "$DB_PATH")
+# files=$(jq -r '.[].file' "$DB_PATH")
 DB_DIR=$(dirname "$DB_PATH")
-echo "$files" | xargs --max-args=150 clang-query -p "$DB_DIR" -f "$TMP_DIR/query.txt" >> output.txt
+#echo "$files" | xargs --max-args=150 clang-query -p "$DB_DIR" -f "$TMP_DIR/query.txt" >> output.txt
+
+# jq -r '.[].file' "$DB_PATH" | sed 's/\\/\//g' | tr -d '\r'  | xargs -d '\n' --max-args=150 clang-query -p "$DB_DIR" -f "$TMP_DIR/query.txt" -- -Wno-unused-command-line-argument >> "$TMP_DIR/output.txt"
+
+# this works
+# jq -r '.[].file' "$DB_PATH" | sed 's/\\/\//g' | tr -d '\r'  | xargs -d '\n' --max-args=150 clang-query -p "$DB_DIR" -f "$TMP_DIR/query.txt" >> "$TMP_DIR/output.txt"
+# jq -r '.[].file' "$DB_PATH" | tr -d '\r'  | xargs -d '\n' --max-args=150 clang-query -p "$DB_DIR" -f "$TMP_DIR/query.txt" >> "$TMP_DIR/output.txt"
+
+# also works
+# jq -r '.[].file' "$DB_PATH" | tr -d '\r' | xargs -d '\n' --max-args=150 \
+# clang-query -p "$DB_DIR" \
+# --extra-arg="-Wno-unused-command-line-argument" \
+# -f "$TMP_DIR/query.txt" >> "$TMP_DIR/output.txt"
+
+# also works
+# jq -r '.[].file' "$DB_PATH" | tr -d '\r' | sed 's|\\|/|g' | \
+# 	xargs -d '\n' --max-args=150 \
+# 	clang-query -p "$DB_DIR" \
+# 	--extra-arg="-Wno-unused-command-line-argument" \
+# 	--extra-arg="-Wno-unused-function" \
+# 	-f "$TMP_DIR/query.txt" >> "$TMP_DIR/output.txt"
+
+
+LIST_FILE="$TMP_DIR/file_list.txt"
+
+jq -r '.[].file' "$DB_PATH" | tr -d '\r' | sed 's|\\|/|g' > "$LIST_FILE"
+
+# 2. Run clang-query using the list file
+# We use -a to read arguments from the file
+xargs -d '\n' -a "$LIST_FILE" --max-args=150 \
+    clang-query -p "$DB_DIR" \
+    --extra-arg="-Wno-unused-command-line-argument" \
+    --extra-arg="-Wno-unused-function" \
+    -f "$TMP_DIR/query.txt" >> "$TMP_DIR/output.txt"
+
+
 cat output.txt
 if grep --silent "Match #" output.txt; then
   echo "::error Forbidden std::filesystem::path construction detected!"
