@@ -23,19 +23,28 @@ namespace NintendoSwitch{
 namespace PokemonFRLG{
 
 
-class BlackScreenOverWatcher : public PokemonAutomation::BlackScreenOverWatcher{
+class WhiteScreenOverWatcher : public PokemonAutomation::WhiteScreenOverWatcher{
 public:
-    BlackScreenOverWatcher(Color color = COLOR_RED)
-        : PokemonAutomation::BlackScreenOverWatcher(
+    WhiteScreenOverWatcher(Color color = COLOR_RED)
+        : PokemonAutomation::WhiteScreenOverWatcher(
             color,
             GameSettings::instance().GAME_BOX.inner_to_outer({0.231692, 0.0616538, 0.551385, 0.9045})
         )
     {}
 };
-class WhiteScreenOverWatcher : public PokemonAutomation::WhiteScreenOverWatcher{
+class BlackScreenWatcher : public PokemonAutomation::BlackScreenWatcher{
 public:
-    WhiteScreenOverWatcher(Color color = COLOR_RED)
-        : PokemonAutomation::WhiteScreenOverWatcher(
+    BlackScreenWatcher(Color color = COLOR_RED)
+        : PokemonAutomation::BlackScreenWatcher(
+            color,
+            GameSettings::instance().GAME_BOX.inner_to_outer({0.231692, 0.0616538, 0.551385, 0.9045})
+        )
+    {}
+};
+class BlackScreenOverWatcher : public PokemonAutomation::BlackScreenOverWatcher{
+public:
+    BlackScreenOverWatcher(Color color = COLOR_RED)
+        : PokemonAutomation::BlackScreenOverWatcher(
             color,
             GameSettings::instance().GAME_BOX.inner_to_outer({0.231692, 0.0616538, 0.551385, 0.9045})
         )

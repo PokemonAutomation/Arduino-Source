@@ -4,19 +4,15 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "CommonTools/StartupChecks/StartProgramChecks.h"
-#include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
-#include "PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_ShinyHunt-Overworld.h"
 
@@ -50,7 +46,7 @@ struct ShinyHuntOverworld_Descriptor::Stats : public StatsTracker{
     std::atomic<uint64_t>& shinies;
     std::atomic<uint64_t>& errors;
 };
-std::unique_ptr<StatsTracker> ShinyHuntOverworld_Descriptor::make_stats() const {
+std::unique_ptr<StatsTracker> ShinyHuntOverworld_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
@@ -149,16 +145,15 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, ProControl
 
 bool ShinyHuntOverworld::find_encounter(SingleSwitchProgramEnvironment& env, ProControllerContext& context) const
 {
-    BlackScreenWatcher battle_entered(COLOR_RED, { 0.282, 0.064, 0.448, 0.871 });
+    BlackScreenWatcher battle_entered(COLOR_RED);
 
     Milliseconds normal_duration = MOVE_DURATION0;
     Milliseconds biased_duration = MOVE_DURATION0.get() + 200ms;
     Milliseconds mash_duration = normal_duration - 64ms;
 
     int ret = 1;
-    while (ret != 0)
-    {
-        switch (TRIGGER_METHOD) {
+    while (ret != 0){
+        switch (TRIGGER_METHOD){
         case TriggerMethod::HORIZONTAL_NO_BIAS:
             ret = run_until<ProControllerContext>(
                 env.console, context,
