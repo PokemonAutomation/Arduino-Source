@@ -36,7 +36,7 @@ namespace PokemonAutomation{
 #endif
 
 #ifndef PA_VERSION_PATCH
-#define PA_VERSION_PATCH 2
+#define PA_VERSION_PATCH 4
 #endif
 
 const bool IS_BETA_VERSION = PA_IS_BETA;
@@ -86,7 +86,7 @@ const std::string DISCORD_LINK_URL_PROGRAM = "https://discord.gg/BSjDp27";
 //  URL to use in the Discord notifications/embeds.
 const std::string DISCORD_LINK_URL_EMBED = "https://discord.gg/xMJcveK";
 
-// URL to use in the DiscordSocialSDK integration.
+//  URL to use in the DiscordSocialSDK integration.
 const std::string DISCORD_LINK_URL_SDK = "https://discord.gg/gn9YEyjjAV";
 
 

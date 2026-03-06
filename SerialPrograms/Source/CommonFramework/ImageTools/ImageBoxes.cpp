@@ -234,14 +234,25 @@ ImageFloatBox translate_to_parent(
     );
 }
 ImageFloatBox translate_to_parent(
-    const ImageFloatBox& inference_box,
-    const ImageFloatBox& box
+    const ImageFloatBox& outer_relative_to_master,
+    const ImageFloatBox& inner_relative_to_outer
 ){
     return ImageFloatBox(
-        inference_box.x + box.x * inference_box.width,
-        inference_box.y + box.y * inference_box.height,
-        box.width * inference_box.width,
-        box.height * inference_box.height
+        outer_relative_to_master.x + inner_relative_to_outer.x * outer_relative_to_master.width,
+        outer_relative_to_master.y + inner_relative_to_outer.y * outer_relative_to_master.height,
+        inner_relative_to_outer.width * outer_relative_to_master.width,
+        inner_relative_to_outer.height * outer_relative_to_master.height
+    );
+}
+ImageFloatBox translate_to_child(
+    const ImageFloatBox& outer_relative_to_master,
+    const ImageFloatBox& inner_relative_to_master
+){
+    return ImageFloatBox(
+        (inner_relative_to_master.x - outer_relative_to_master.x) / outer_relative_to_master.width,
+        (inner_relative_to_master.y - outer_relative_to_master.y) / outer_relative_to_master.height,
+        inner_relative_to_master.width / outer_relative_to_master.width,
+        inner_relative_to_master.height / outer_relative_to_master.height
     );
 }
 

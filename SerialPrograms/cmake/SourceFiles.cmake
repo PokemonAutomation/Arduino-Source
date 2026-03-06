@@ -420,6 +420,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Notifications/ProgramNotifications.h
     Source/CommonFramework/Notifications/SenderNotificationTable.cpp
     Source/CommonFramework/Notifications/SenderNotificationTable.h
+    Source/CommonFramework/Options/BoxOption.cpp
+    Source/CommonFramework/Options/BoxOption.h
     Source/CommonFramework/Options/CheckForUpdatesOption.h
     Source/CommonFramework/Options/Environment/PerformanceOptions.h
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h
