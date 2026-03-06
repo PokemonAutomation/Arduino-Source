@@ -87,13 +87,24 @@ jobs:
         cd bin
         cmake .. -DQT_MAJOR:STRING=6 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ${{env.CMAKE_ADDITIONAL_FLAGS}}
         # cmake --build . --config RelWithDebInfo --parallel 10
-    - name: Generate Qt Autogen Files
+    - name: Fake missing Qt generated files
       if: inputs.run-clang-query
       run: |
-        cd Arduino-Source/SerialPrograms/bin
-        # This triggers only the moc/uic/rcc generation targets
-        cmake --build . --target SerialProgramsCommandLine_autogen SerialPrograms_autogen SerialProgramsLib_autogen --parallel 10
-
+        # Create the bin directory if it doesn't exist
+        mkdir -p Arduino-Source/SerialPrograms/bin
+        
+        # Fake the RCC (resource) files
+        touch Arduino-Source/SerialPrograms/bin/qrc_darkstyle.cpp
+        
+        # Fake the MOC/Autogen files for all components
+        mkdir -p Arduino-Source/SerialPrograms/bin/SerialProgramsLib_autogen
+        touch Arduino-Source/SerialPrograms/bin/SerialProgramsLib_autogen/mocs_compilation.cpp
+        
+        mkdir -p Arduino-Source/SerialPrograms/bin/SerialPrograms_autogen
+        touch Arduino-Source/SerialPrograms/bin/SerialPrograms_autogen/mocs_compilation.cpp
+        
+        mkdir -p Arduino-Source/SerialPrograms/bin/SerialProgramsCommandLine_autogen
+        touch Arduino-Source/SerialPrograms/bin/SerialProgramsCommandLine_autogen/mocs_compilation.cpp
     - name: Prepare upload build
       if: inputs.upload-build
       shell: bash
