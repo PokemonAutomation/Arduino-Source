@@ -38,10 +38,10 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Shiny Hunting  ----");
     ret.emplace_back(make_single_switch_program<GiftReset_Descriptor, GiftReset>());
     ret.emplace_back(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
+    ret.emplace_back(make_single_switch_program<ShinyHuntOverworld_Descriptor, ShinyHuntOverworld>());
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<LegendaryRunAway_Descriptor, LegendaryRunAway>());
         ret.emplace_back(make_single_switch_program<PrizeCornerReset_Descriptor, PrizeCornerReset>());
-        ret.emplace_back(make_single_switch_program<ShinyHuntOverworld_Descriptor, ShinyHuntOverworld>());
     }
     
 
