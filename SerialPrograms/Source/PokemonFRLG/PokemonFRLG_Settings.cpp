@@ -22,6 +22,13 @@ GameSettings& GameSettings::instance(){
 }
 GameSettings::GameSettings()
     : BatchOption(LockMode::LOCK_WHILE_RUNNING)
+    , GAME_BOX(
+        "Game Box: The part of the screen containing the actual video feed.",
+        LockMode::LOCK_WHILE_RUNNING,
+        GroupOption::EnableMode::ALWAYS_ENABLED,
+        true,
+        {0.09375, 0.00462963, 0.8125, 0.962963}
+    )
     , m_soft_reset_timings("<font size=4><b>Soft Reset Timings:</b></font>")
     , SELECT_BUTTON_MASH0(
         "<b>Start Button Mash:</b><br>Mash select for this long after a soft reset to get to Press Start.",
@@ -50,6 +57,7 @@ GameSettings::GameSettings()
         1000, 0, 48000 //2000
     )
 {
+    PA_ADD_STATIC(GAME_BOX);
     PA_ADD_STATIC(m_soft_reset_timings);
     PA_ADD_OPTION(SELECT_BUTTON_MASH0);
     PA_ADD_OPTION(ENTER_GAME_WAIT0);

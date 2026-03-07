@@ -253,14 +253,8 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(LOG_WINDOW_STARTUP);
 
     PA_ADD_OPTION(KEYBOARD_CONTROLS_LAYOUT);
+    PA_ADD_OPTION(STREAM_HISTORY);
 
-#if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
-    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(STREAM_HISTORY);
-    }
-#else
-    STREAM_HISTORY->set_enabled(false);
-#endif
 #ifdef PA_ENABLE_SLEEP_SUPPRESS
     PA_ADD_OPTION(SLEEP_SUPPRESS);
 #endif

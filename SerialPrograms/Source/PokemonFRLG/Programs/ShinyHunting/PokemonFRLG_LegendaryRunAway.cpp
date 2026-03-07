@@ -114,7 +114,7 @@ LegendaryRunAway::LegendaryRunAway()
 }
 
 void LegendaryRunAway::reset_hooh(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher exit_area(COLOR_RED);
     //Turn around, 10 steps down
     ssf_press_button(context, BUTTON_B, 0ms, HOOH_UP_DOWN);
     pbf_press_dpad(context, DPAD_DOWN, HOOH_UP_DOWN, 160ms);
@@ -141,7 +141,7 @@ void LegendaryRunAway::reset_hooh(SingleSwitchProgramEnvironment& env, ProContro
         env.log("Left area.");
     }
 
-    BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher enter_area(COLOR_RED);
     //turn left, take one step. now turn back right and take a step. wait for black screen over.
     int ret2 = run_until<ProControllerContext>(
         env.console, context,
@@ -178,7 +178,7 @@ void LegendaryRunAway::reset_hooh(SingleSwitchProgramEnvironment& env, ProContro
 }
 
 void LegendaryRunAway::reset_lugia(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher exit_area(COLOR_RED);
     //Turn around, 5 steps down
     ssf_press_button(context, BUTTON_B, 0ms, LUGIA_UP_DOWN);
     pbf_press_dpad(context, DPAD_DOWN, LUGIA_UP_DOWN, 160ms);
@@ -206,7 +206,7 @@ void LegendaryRunAway::reset_lugia(SingleSwitchProgramEnvironment& env, ProContr
         env.log("Left area.");
     }
 
-    BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher enter_area(COLOR_RED);
     //turn up, take one step. then turn back down and take a step. wait for black screen over.
     int ret2 = run_until<ProControllerContext>(
         env.console, context,

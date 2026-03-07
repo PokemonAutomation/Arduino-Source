@@ -67,6 +67,11 @@ private:
         std::atomic<uint64_t>& m_resets;
     };
 
+    virtual void start_program_border_check(
+        VideoStream& stream, size_t console_index,
+        FeedbackType feedback_type
+    ) override{}
+
 private:
     ButtonCell BUTTON0;
     ButtonOption BUTTON1;

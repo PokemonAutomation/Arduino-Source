@@ -161,21 +161,17 @@ CommandRow::CommandRow(
         this, [this](bool){ emit screenshot_requested(); }
     );
 
-#if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
-    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
-        m_video_button = new QPushButton("Video Capture", this);
-        layout1->addWidget(m_video_button, 2);
-        if (GlobalSettings::instance().STREAM_HISTORY->enabled()){
-            connect(
-                m_video_button, &QPushButton::clicked,
-                this, [this](bool){ emit video_requested(); }
-            );
-        }else{
-            m_video_button->setEnabled(false);
-            m_video_button->setToolTip("Please turn on Stream History to enable video capture.");
-        }
+    m_video_button = new QPushButton("Video Capture", this);
+    layout1->addWidget(m_video_button, 2);
+    if (GlobalSettings::instance().STREAM_HISTORY->enabled()){
+        connect(
+            m_video_button, &QPushButton::clicked,
+            this, [this](bool){ emit video_requested(); }
+        );
+    }else{
+        m_video_button->setEnabled(false);
+        m_video_button->setToolTip("Please turn on Stream History to enable video capture.");
     }
-#endif
 
     m_session.add_listener(*this);
     m_controller.add_listener(*this);

@@ -23,6 +23,8 @@ int test_pokemonFRLG_ShinySymbolDetector(const ImageViewRGB32& image, bool targe
 
 int test_pokemonFRLG_SelectionDialogDetector(const ImageViewRGB32& image, bool target);
 
+int test_pokemonFRLG_AdvanceBattleDialogDetector(const ImageViewRGB32& image, bool target);
+
 }
 
 #endif
