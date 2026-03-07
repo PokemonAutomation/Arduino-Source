@@ -163,6 +163,13 @@ DB_DIR=$(dirname "$DB_PATH")
 # 	--extra-arg="-Wno-unused-function" \
 # 	-f "$TMP_DIR/query.txt" >> "$TMP_DIR/output.txt"
 
+CLANG_QUERY=$(command -v clang-query-18 || command -v clang-query)
+
+if [ -z "$CLANG_QUERY" ]; then
+    echo "Error: clang-query (or version -18) not found!"
+    exit 1
+fi
+
 ONLY_CHECK_CHANGED_FILES=true
 if [ "$ONLY_CHECK_CHANGED_FILES" = "true" ]; then
     LIST_FILE="$TMP_DIR/files_to_query.txt"
@@ -179,7 +186,7 @@ if [ ! -s "$LIST_FILE" ]; then
     echo "No files found to analyze. Skipping Clang-Query."
 else
     xargs -d '\n' -a "$LIST_FILE" --max-args=150 \
-		clang-query -p "$DB_DIR" \
+		"$CLANG_QUERY" -p "$DB_DIR" \
 		--extra-arg="-Wno-unused-command-line-argument" \
 		--extra-arg="-Wno-unused-function" \
 		-f "$TMP_DIR/query.txt" >> "$TMP_DIR/output.txt"
