@@ -51,6 +51,8 @@ jobs:
       with:
         path: 'Arduino-Source'
         submodules: 'recursive'
+        fetch-depth: 0
+        filter: blob:none
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
@@ -64,7 +66,7 @@ jobs:
         cd Arduino-Source
         sudo apt update
         sudo apt upgrade
-        sudo apt install clang-tools libopencv-dev
+        sudo apt install clang-tools-18 libopencv-dev
 
         sudo apt install ./3rdPartyBinaries/libdpp-10.0.28-linux-x64.deb
 
@@ -87,6 +89,25 @@ jobs:
         cd bin
         cmake .. -DQT_MAJOR:STRING=6 ${{env.CMAKE_ADDITIONAL_FLAGS}}
         cmake --build . --config RelWithDebInfo --parallel 10
+
+    # - name: Fake missing Qt generated files (for testing clang-query without building the whole project)
+    #   if: inputs.run-clang-query
+    #   run: |
+    #     # Create the bin directory if it doesn't exist
+    #     mkdir -p Arduino-Source/SerialPrograms/bin
+        
+    #     # Fake the RCC (resource) files
+    #     touch Arduino-Source/SerialPrograms/bin/qrc_darkstyle.cpp
+        
+    #     # Fake the MOC/Autogen files for all components
+    #     mkdir -p Arduino-Source/SerialPrograms/bin/SerialProgramsLib_autogen
+    #     touch Arduino-Source/SerialPrograms/bin/SerialProgramsLib_autogen/mocs_compilation.cpp
+        
+    #     mkdir -p Arduino-Source/SerialPrograms/bin/SerialPrograms_autogen
+    #     touch Arduino-Source/SerialPrograms/bin/SerialPrograms_autogen/mocs_compilation.cpp
+        
+    #     mkdir -p Arduino-Source/SerialPrograms/bin/SerialProgramsCommandLine_autogen
+    #     touch Arduino-Source/SerialPrograms/bin/SerialProgramsCommandLine_autogen/mocs_compilation.cpp
 
     - name: Prepare upload build
       if: inputs.upload-build

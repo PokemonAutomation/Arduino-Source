@@ -75,3 +75,5 @@ build_*/
 .cache/*
 Packages/*
 
+.ci_tmp
+
