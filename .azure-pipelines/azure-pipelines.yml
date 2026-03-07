@@ -10,13 +10,11 @@ resources:
       type: github
       name: PokemonAutomation/Arduino-Source-Internal
       endpoint: PokemonAutomation
-      ref: refs/heads/master
 
     - repository: Arduino-Source
       type: github
       name: PokemonAutomation/Arduino-Source
       endpoint: PokemonAutomation
-      ref: refs/heads/main
 
 variables:
   - group: apple-signing
