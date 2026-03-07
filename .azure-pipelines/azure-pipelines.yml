@@ -407,6 +407,9 @@ stages:
     macos_path: '/opt/Qt/6.10.2/macos/lib/cmake:/opt/Qt/6.10.2/macos/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew:$PATH'
     cmake_version_params: '-DVERSION_MAJOR=${{ parameters.versionMajor }} -DVERSION_MINOR=${{ parameters.versionMinor }} -DVERSION_PATCH=${{ parameters.versionPatch }} -DIS_BETA=${{ lower(eq(parameters.buildType, ''PrivateBeta'')) }}'
     cmake_additional_param: '-DPACKAGE_BUILD=true -DUNIX_LINK_TESSERACT:BOOL=true -DIS_AZURE_BUILD=TRUE'
+    versionMajor: ${{ parameters.versionMajor }}
+    versionMinor: ${{ parameters.versionMinor }}
+    versionPatch: ${{ parameters.versionPatch }}
     condition: or(eq('${{ parameters.targetOS }}', 'MacOS'), eq('${{ parameters.targetOS }}', 'All'))
 
 - template: templates/macos-build.yml
@@ -425,6 +428,9 @@ stages:
     macos_path: '/usr/local/Qt/6.10.2/macos/lib/cmake:/usr/local/Qt/6.10.2/macos/bin:/usr/local/bin:/usr/local/sbin:/usr/local:$PATH'
     cmake_version_params: '-DVERSION_MAJOR=${{ parameters.versionMajor }} -DVERSION_MINOR=${{ parameters.versionMinor }} -DVERSION_PATCH=${{ parameters.versionPatch }} -DIS_BETA=${{ lower(eq(parameters.buildType, ''PrivateBeta'')) }}'
     cmake_additional_param: '-DPACKAGE_BUILD=true -DUNIX_LINK_TESSERACT:BOOL=true -DIS_AZURE_BUILD=TRUE'
+    versionMajor: ${{ parameters.versionMajor }}
+    versionMinor: ${{ parameters.versionMinor }}
+    versionPatch: ${{ parameters.versionPatch }}
     condition: or(eq('${{ parameters.targetOS }}', 'MacOS'), eq('${{ parameters.targetOS }}', 'All'))
 
 ###########################################
@@ -444,6 +450,9 @@ stages:
     cmake_preset: RelWithDebInfo
     macos_path: '/opt/Qt/6.10.2/macos/lib/cmake:/opt/Qt/6.10.2/macos/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew:$PATH'
     openssl_pkcs_args: '-legacy'
+    versionMajor: ${{ parameters.versionMajor }}
+    versionMinor: ${{ parameters.versionMinor }}
+    versionPatch: ${{ parameters.versionPatch }}
     condition: and(succeeded('MacOS_Build_ARM64'), or(eq('${{ parameters.targetOS }}', 'MacOS'), eq('${{ parameters.targetOS }}', 'All')))
 
 - template: templates/macos-notarize.yml
@@ -459,6 +468,9 @@ stages:
     cmake_preset: RelWithDebInfo
     macos_path: '/usr/local/Qt/6.10.2/macos/lib/cmake:/usr/local/Qt/6.10.2/macos/bin:/usr/local/bin:/usr/local/sbin:/usr/local:$PATH'
     openssl_pkcs_args: '-legacy'
+    versionMajor: ${{ parameters.versionMajor }}
+    versionMinor: ${{ parameters.versionMinor }}
+    versionPatch: ${{ parameters.versionPatch }}
     condition: and(succeeded('MacOS_Build_x64'), or(eq('${{ parameters.targetOS }}', 'MacOS'), eq('${{ parameters.targetOS }}', 'All')))
 
 ##########################################

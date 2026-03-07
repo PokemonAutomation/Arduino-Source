@@ -16,6 +16,9 @@ parameters:
   macos_path: ''
   cmake_version_params: ''
   cmake_additional_param: ''
+  versionMajor: 0
+  versionMinor: 0
+  versionPatch: 0
   condition: ''
 
 stages:
