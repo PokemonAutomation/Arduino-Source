@@ -167,12 +167,22 @@ stages:
         condition: succeeded()
 
       - script: |
-          echo "=== Creating a tarball ==="
-          tar -czf "SerialPrograms-MacOS-$(compiler)-$(architecture).tar.gz" -C "$(Pipeline.Workspace)/Arduino-Source-Internal" "SerialPrograms.app"
+          set -e
+          VERSION="${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
+          FOLDER_NAME="SerialPrograms-$VERSION-MacOS-${{ parameters.architecture }}"
+    
+          echo "=== Creating tarball with enclosing folder ==="
+          cd "$(Pipeline.Workspace)"
+          mkdir -p "$FOLDER_NAME"
+          cp -R "Arduino-Source-Internal/SerialPrograms.app" "$FOLDER_NAME/"
+          tar -czf "SerialPrograms-MacOS-$(compiler)-$(architecture).tar.gz" "$FOLDER_NAME"
+
           echo "=== Creating cache directory and moving tarball ==="
-          CACHE_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/cache-notarized"
+          CACHE_DIR="Arduino-Source-Internal/cache-notarized"
           mkdir -p "$CACHE_DIR"
-          mv "$(Pipeline.Workspace)/Arduino-Source-Internal/SerialPrograms-MacOS-$(compiler)-$(architecture).tar.gz" "$CACHE_DIR/"
+          mv "SerialPrograms-MacOS-$(compiler)-$(architecture).tar.gz" "$CACHE_DIR/"
+
+          echo "=== Tarball created with enclosing folder: $FOLDER_NAME ==="
         displayName: 'Create a tarball'
         condition: succeeded()
 
