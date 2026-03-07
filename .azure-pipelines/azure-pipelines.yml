@@ -453,6 +453,28 @@ stages:
 #    condition: always()
 
 ##########################################
+#          ARTIFACT VALIDATION           #
+##########################################
+
+- stage: Manual_Validation
+  displayName: 'Manual Validation'
+  dependsOn:
+    - Upload_Debug_Symbols
+  condition: and(succeeded(), eq('${{ parameters.targetOS }}', 'All'), ne('${{ parameters.buildType }}', 'Commit'))
+  jobs:
+    - job: ManualValidation
+      displayName: 'Manual Validation'
+      pool: server
+      timeoutInMinutes: 1440
+      steps:
+        - task: ManualValidation@0
+          timeoutInMinutes: 1440
+          inputs:
+            notifyUsers: '$(Build.RequestedForEmail)'
+            instructions: 'Please validate the build artifacts for each platform. Approve to proceed or reject to fail the pipeline.'
+            onTimeout: 'reject'
+
+##########################################
 #         UPDATE TELEMETRY JSON          #
 ##########################################
 
@@ -461,7 +483,7 @@ stages:
     stageName: Update_GitHub_Telemetry_JSON
     displayName: 'Update GitHub Telemetry JSON'
     dependsOn:
-      - Upload_Debug_Symbols
+      - Manual_Validation
     buildType: ${{ parameters.buildType }}
     versionMajor: ${{ parameters.versionMajor }}
     versionMinor: ${{ parameters.versionMinor }}
@@ -506,4 +528,9 @@ stages:
     versionMinor: ${{ parameters.versionMinor }}
     versionPatch: ${{ parameters.versionPatch }}
     versionRepo: PokemonAutomation/ComputerControl
-    condition: and(succeeded(), eq('${{ parameters.targetOS }}', 'All'), ne('${{ parameters.buildType }}', 'Commit'))
+    condition: |
+      and(
+        in(dependencies.Publish_GitHub_Release.result, 'Succeeded', 'Skipped'),
+        eq('${{ parameters.targetOS }}', 'All'),
+        ne('${{ parameters.buildType }}', 'Commit')
+      )
