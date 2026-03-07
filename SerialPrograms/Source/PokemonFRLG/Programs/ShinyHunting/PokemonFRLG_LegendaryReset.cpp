@@ -10,12 +10,9 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "CommonTools/StartupChecks/StartProgramChecks.h"
-#include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
-#include "PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_LegendaryReset.h"
 
@@ -103,7 +100,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
         pbf_press_button(context, BUTTON_A, 320ms, 320ms);
 
         //Mash B until black screen detected but not over (entered battle)
-        BlackScreenWatcher battle_entered(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+        BlackScreenWatcher battle_entered(COLOR_RED);
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){

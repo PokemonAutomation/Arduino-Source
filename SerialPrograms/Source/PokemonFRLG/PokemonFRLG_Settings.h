@@ -10,6 +10,7 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
+#include "CommonFramework/Options/BoxOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 
 namespace PokemonAutomation{
@@ -21,6 +22,8 @@ class GameSettings : public BatchOption{
     GameSettings();
 public:
     static GameSettings& instance();
+
+    BoxOption GAME_BOX;
 
     SectionDividerOption m_soft_reset_timings;
     MillisecondsOption SELECT_BUTTON_MASH0;

@@ -9,7 +9,6 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Random.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -41,7 +40,7 @@ bool try_soft_reset(ConsoleHandle& console, ProControllerContext& context){
     context.wait_for_all_requests();
 
     //Mash A until white screen to game load menu
-    WhiteScreenOverWatcher whitescreen(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    WhiteScreenOverWatcher whitescreen(COLOR_RED);
     LoadMenuWatcher load_menu(COLOR_BLUE);
 
     int ls = run_until<ProControllerContext>(
@@ -70,7 +69,7 @@ bool try_soft_reset(ConsoleHandle& console, ProControllerContext& context){
     pbf_press_button(context, BUTTON_A, 160ms, 320ms);
 
     //Wait for game to load in
-    BlackScreenOverWatcher detector(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher detector(COLOR_RED);
     int ret = wait_until(
         console, context,
         GameSettings::instance().ENTER_GAME_WAIT0,
@@ -136,7 +135,7 @@ bool try_open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     }
 
     console.log("Navigating to party menu.");
-    BlackScreenOverWatcher blk1(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher blk1(COLOR_RED);
 
     int pm = run_until<ProControllerContext>(
         console, context,
@@ -165,7 +164,7 @@ bool try_open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     pbf_press_dpad(context, DPAD_UP, 320ms, 320ms);
 
     //Two presses to open summary
-    BlackScreenOverWatcher blk2(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher blk2(COLOR_RED);
     int sm = run_until<ProControllerContext>(
         console, context,
         [](ProControllerContext& context) {
@@ -317,7 +316,7 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
         );
     }
 
-    BlackScreenOverWatcher battle_over(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher battle_over(COLOR_RED);
     int ret3 = run_until<ProControllerContext>(
         console, context,
         [](ProControllerContext& context) {
