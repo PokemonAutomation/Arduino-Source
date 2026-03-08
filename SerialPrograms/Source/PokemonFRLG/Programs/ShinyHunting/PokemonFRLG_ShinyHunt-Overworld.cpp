@@ -22,9 +22,9 @@ namespace PokemonFRLG{
 
 ShinyHuntOverworld_Descriptor::ShinyHuntOverworld_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonFRLG:OverworldReset",
+        "PokemonFRLG:ShinyHuntOverworld",
         Pokemon::STRING_POKEMON + " FRLG", "Shiny Hunt - Overworld",
-        "Programs/PokemonFRLG/OverworldReset.html",
+        "Programs/PokemonFRLG/ShinyHunt-Overworld.html",
         "Shiny hunt Overworld Pokemon.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
