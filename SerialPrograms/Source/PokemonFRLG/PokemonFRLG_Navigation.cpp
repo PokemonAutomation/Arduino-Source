@@ -339,8 +339,7 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
 
 void home_black_border_check(ConsoleHandle& console, ProControllerContext& context){
     console.log("Going to home to check for black border.");
-    go_home(console, context);
-    ensure_at_home(console, context);
+    pbf_press_button(context, BUTTON_HOME, 120ms, 880ms);
     context.wait_for_all_requests();
     StartProgramChecks::check_border(console);
     console.log("Returning to game.");
