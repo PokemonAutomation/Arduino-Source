@@ -182,7 +182,7 @@ stages:
           tar -czf "SerialPrograms-MacOS-$(compiler)-$(architecture).tar.gz" -C "$(Pipeline.Workspace)/Arduino-Source-Internal" "$FOLDER_NAME"
 
           echo "=== Creating cache directory and moving tarball ==="
-          CACHE_DIR="Arduino-Source-Internal/cache-notarized"
+          CACHE_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/cache-notarized"
           mkdir -p "$CACHE_DIR"
           mv "$(Pipeline.Workspace)/Arduino-Source-Internal/SerialPrograms-MacOS-$(compiler)-$(architecture).tar.gz" "$CACHE_DIR/"
 
