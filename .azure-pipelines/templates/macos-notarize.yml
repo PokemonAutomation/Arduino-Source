@@ -13,6 +13,9 @@ parameters:
   cmake_preset: ''
   macos_path: ''
   openssl_pkcs_args: ''
+  versionMajor: 0
+  versionMinor: 0
+  versionPatch: 0
   condition: ''
 
 stages:
@@ -83,7 +86,9 @@ stages:
       - script: |
           set -euo pipefail
           export PATH=${{ parameters.macos_path }}
-          APP_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/SerialPrograms.app"
+          VERSION="${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
+          FOLDER_NAME="SerialPrograms-$VERSION-MacOS-${{ parameters.architecture }}"
+          APP_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/$FOLDER_NAME/SerialPrograms.app"
           ZIP_PATH="$(Pipeline.Workspace)/SerialPrograms-MacOS-$(compiler)-$(architecture).zip"
           ENTITLEMENTS_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/SerialPrograms/cmake/MacOSXEntitlements.plist"
 
@@ -160,19 +165,28 @@ stages:
 
       - script: |
           set -euo pipefail
-          APP_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/SerialPrograms.app"
+          VERSION="${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
+          FOLDER_NAME="SerialPrograms-$VERSION-MacOS-${{ parameters.architecture }}"
+          APP_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/$FOLDER_NAME/SerialPrograms.app"
           xcrun stapler staple "$APP_DIR"
           spctl --assess --type execute --verbose=4 "$APP_DIR"
         displayName: 'Staple and verify'
         condition: succeeded()
 
       - script: |
-          echo "=== Creating a tarball ==="
-          tar -czf "SerialPrograms-MacOS-$(compiler)-$(architecture).tar.gz" -C "$(Pipeline.Workspace)/Arduino-Source-Internal" "SerialPrograms.app"
+          set -e
+          VERSION="${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
+          FOLDER_NAME="SerialPrograms-$VERSION-MacOS-${{ parameters.architecture }}"
+    
+          echo "=== Creating tarball with enclosing folder ==="
+          tar -czf "SerialPrograms-MacOS-$(compiler)-$(architecture).tar.gz" -C "$(Pipeline.Workspace)/Arduino-Source-Internal" "$FOLDER_NAME"
+
           echo "=== Creating cache directory and moving tarball ==="
           CACHE_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/cache-notarized"
           mkdir -p "$CACHE_DIR"
           mv "$(Pipeline.Workspace)/Arduino-Source-Internal/SerialPrograms-MacOS-$(compiler)-$(architecture).tar.gz" "$CACHE_DIR/"
+
+          echo "=== Tarball created with enclosing folder: $FOLDER_NAME ==="
         displayName: 'Create a tarball'
         condition: succeeded()
 

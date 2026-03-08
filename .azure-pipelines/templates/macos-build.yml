@@ -16,6 +16,9 @@ parameters:
   macos_path: ''
   cmake_version_params: ''
   cmake_additional_param: ''
+  versionMajor: 0
+  versionMinor: 0
+  versionPatch: 0
   condition: ''
 
 stages:
@@ -156,10 +159,16 @@ stages:
           echo "=== Creating tarballs for build and symbols ==="
           mkdir -p "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build"
           cd "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
-          tar -czf "cache-build/macos-build-${{ parameters.architecture }}.tar.gz" SerialPrograms.app
+
+          VERSION="${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
+          FOLDER_NAME="SerialPrograms-$VERSION-MacOS-${{ parameters.architecture }}"
+          mkdir -p "$FOLDER_NAME"
+          cp -R SerialPrograms.app "$FOLDER_NAME/"
+
+          tar -czf "cache-build/macos-build-${{ parameters.architecture }}.tar.gz" "$FOLDER_NAME"
           tar -czf "cache-symbols/macos-symbols-${{ parameters.architecture }}.tar.gz" cache-symbols/SerialPrograms.dSYM
 
-          echo "Deployment complete for $(architecture)"
+          echo "Deployment complete for $(architecture) with enclosing folder: $FOLDER_NAME"
         displayName: 'Deploy app'
         condition: succeeded()
 

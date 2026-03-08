@@ -87,7 +87,7 @@ stages:
           imageName: 'windows-2025'
           architecture: 'x64'
           compiler: 'MSVC'
-          qt_version: '6.8.3'
+          qt_version: '6.10.2'
           qt_version_major: '6'
           qt_modules: 'qtserialport qtmultimedia'
           cmake_preset: 'RelWithDebInfo'
@@ -124,11 +124,17 @@ stages:
           Write-Host "=== Running windeployqt ==="
           $BUILD_DIR = "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
           $APP_EXE   = "$BUILD_DIR/SerialPrograms.exe"
-          $BUILD_CACHE = "$BUILD_DIR/cache-build"
+          $BUILD_CACHE = "$BUILD_DIR/cache-build/Binaries64"
           $SYMBOLS_CACHE = "$BUILD_DIR/cache-symbols"
           New-Item -ItemType Directory -Force -Path $BUILD_CACHE | Out-Null
           & "C:/Qt/$(qt_version)/msvc2022_64/bin/windeployqt.exe" --dir "$BUILD_CACHE" --release "$APP_EXE"
           New-Item -ItemType Directory -Force -Path $SYMBOLS_CACHE | Out-Null
+
+          Write-Host "=== Excluding unnecessary files from deployment ==="
+          Remove-Item -Path "$BUILD_CACHE/opencv_world4120d.dll" -ErrorAction SilentlyContinue
+          Remove-Item -Path "$BUILD_CACHE/translations" -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -Path "$BUILD_CACHE/generic" -Recurse -Force -ErrorAction SilentlyContinue
+
           Write-Host "=== windeployqt complete ==="
         displayName: 'Deploy app'
         condition: succeeded()
@@ -137,8 +143,8 @@ stages:
           echo "=== Copying resources==="
           robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/Packages/Resources      $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/Resources /s
           robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/Packages/Firmware       $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/Firmware /s
-          robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)   $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/ *.dll
-          robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)   $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/ SerialPrograms.exe
+          robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)   $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/Binaries64 *.dll
+          robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)   $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/Binaries64 SerialPrograms.exe
           robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)   $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-symbols/ SerialPrograms.pdb
           Write-Host "Robocopy exited with exit code:" $LASTEXITCODE
           if ($LASTEXITCODE -eq 1) { exit 0 } else { exit 1 }
@@ -146,7 +152,41 @@ stages:
         condition: succeeded()
 
       - powershell: |
+          $BUILD_DIR = "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
+          $BUILD_CACHE = "$BUILD_DIR/cache-build"
+
+          $cmdContent = @'
+          cd %~dp0
+
+          if not exist Binaries64\ (
+              echo.
+              echo Please unzip the folder before you can use it.
+              echo.
+              pause
+              exit
+          )
+
+          if not exist Binaries64\SerialPrograms.exe (
+              echo.
+              echo Binaries\SerialPrograms.exe not found. Did your anti-virus delete it?
+              echo.
+              pause
+              exit
+          )
+
+          start "" Binaries64\SerialPrograms.exe
+
+          '@
+
+          Set-Content -Path "$BUILD_CACHE/SerialPrograms-Windows.cmd" -Value $cmdContent -Encoding UTF8
+          Write-Host "=== Created SerialPrograms-Windows.cmd launcher ==="
+        displayName: 'Create launcher script'
+        condition: succeeded()
+
+      - powershell: |
           $root = "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
+          $version = "${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
+          $folderName = "SerialPrograms-$version-Windows-x64"
           $name = "SerialPrograms-Windows-$(compiler)-$(architecture)"
 
           $cacheArtifactsDir = Join-Path $root "cache-artifacts"
@@ -154,11 +194,14 @@ stages:
           New-Item -ItemType Directory -Force -Path $artifactSubdir | Out-Null
 
           $temp = Join-Path $root "temp-archive"
-          New-Item -ItemType Directory -Force -Path $temp | Out-Null
-          Copy-Item "$root/cache-build/*" $temp -Recurse -Force
+          $tempFolder = Join-Path $temp $folderName
+          New-Item -ItemType Directory -Force -Path $tempFolder | Out-Null
+          Copy-Item "$root/cache-build/*" $tempFolder -Recurse -Force
 
-          Compress-Archive -Path $temp/* -DestinationPath "$artifactSubdir/$name.zip"
+          Compress-Archive -Path $tempFolder -DestinationPath "$artifactSubdir/$name.zip"
           Remove-Item $temp -Recurse -Force
+
+          Write-Host "=== Created archive with enclosing folder: $folderName ==="
         displayName: 'Archive Windows build artifact'
         condition: succeeded()
 
@@ -206,7 +249,7 @@ stages:
           imageName: 'ubuntu-24.04'
           architecture: 'x64'
           compiler: 'GCC'
-          qt_version: '6.10.0'
+          qt_version: '6.10.2'
           qt_version_major: '6'
           qt_modules: 'qtserialport qtmultimedia'
           cmake_preset: 'RelWithDebInfo'
@@ -312,9 +355,14 @@ stages:
           rm appimagetool-x86_64.AppImage
 
           echo "=== Archive Linux AppImage ==="
+          VERSION="${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
+          FOLDER_NAME="SerialPrograms-$VERSION-Ubuntu-x64"
+          mkdir -p "$FOLDER_NAME"
           chmod +x "SerialPrograms-x86_64.AppImage"
-          tar -zcvf $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).tar.gz SerialPrograms-x86_64.AppImage
-          echo "=== AppImage build complete ==="
+          mv "SerialPrograms-x86_64.AppImage" "$FOLDER_NAME/"
+          tar -zcvf $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).tar.gz "$FOLDER_NAME"
+          
+          echo "=== AppImage build complete with enclosing folder: $FOLDER_NAME ==="
         displayName: 'Deploy AppImage'
         condition: succeeded()
 
@@ -352,13 +400,16 @@ stages:
     imageName: macos-26
     architecture: arm64
     compiler: Clang
-    qt_version: '6.9.3'
+    qt_version: '6.10.2'
     qt_version_major: '6'
     qt_modules: 'qtserialport qtmultimedia'
     cmake_preset: RelWithDebInfo
-    macos_path: '/opt/Qt/6.9.3/macos/lib/cmake:/opt/Qt/6.9.3/macos/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew:$PATH'
+    macos_path: '/opt/Qt/6.10.2/macos/lib/cmake:/opt/Qt/6.10.2/macos/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew:$PATH'
     cmake_version_params: '-DVERSION_MAJOR=${{ parameters.versionMajor }} -DVERSION_MINOR=${{ parameters.versionMinor }} -DVERSION_PATCH=${{ parameters.versionPatch }} -DIS_BETA=${{ lower(eq(parameters.buildType, ''PrivateBeta'')) }}'
     cmake_additional_param: '-DPACKAGE_BUILD=true -DUNIX_LINK_TESSERACT:BOOL=true -DIS_AZURE_BUILD=TRUE'
+    versionMajor: ${{ parameters.versionMajor }}
+    versionMinor: ${{ parameters.versionMinor }}
+    versionPatch: ${{ parameters.versionPatch }}
     condition: or(eq('${{ parameters.targetOS }}', 'MacOS'), eq('${{ parameters.targetOS }}', 'All'))
 
 - template: templates/macos-build.yml
@@ -370,13 +421,16 @@ stages:
     imageName: macos-15
     architecture: x64
     compiler: Clang
-    qt_version: '6.9.3'
+    qt_version: '6.10.2'
     qt_version_major: '6'
     qt_modules: 'qtserialport qtmultimedia'
     cmake_preset: RelWithDebInfo
-    macos_path: '/usr/local/Qt/6.9.3/macos/lib/cmake:/usr/local/Qt/6.9.3/macos/bin:/usr/local/bin:/usr/local/sbin:/usr/local:$PATH'
+    macos_path: '/usr/local/Qt/6.10.2/macos/lib/cmake:/usr/local/Qt/6.10.2/macos/bin:/usr/local/bin:/usr/local/sbin:/usr/local:$PATH'
     cmake_version_params: '-DVERSION_MAJOR=${{ parameters.versionMajor }} -DVERSION_MINOR=${{ parameters.versionMinor }} -DVERSION_PATCH=${{ parameters.versionPatch }} -DIS_BETA=${{ lower(eq(parameters.buildType, ''PrivateBeta'')) }}'
     cmake_additional_param: '-DPACKAGE_BUILD=true -DUNIX_LINK_TESSERACT:BOOL=true -DIS_AZURE_BUILD=TRUE'
+    versionMajor: ${{ parameters.versionMajor }}
+    versionMinor: ${{ parameters.versionMinor }}
+    versionPatch: ${{ parameters.versionPatch }}
     condition: or(eq('${{ parameters.targetOS }}', 'MacOS'), eq('${{ parameters.targetOS }}', 'All'))
 
 ###########################################
@@ -394,8 +448,11 @@ stages:
     architecture: arm64
     compiler: Clang
     cmake_preset: RelWithDebInfo
-    macos_path: '/opt/Qt/6.9.3/macos/lib/cmake:/opt/Qt/6.9.3/macos/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew:$PATH'
+    macos_path: '/opt/Qt/6.10.2/macos/lib/cmake:/opt/Qt/6.10.2/macos/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew:$PATH'
     openssl_pkcs_args: '-legacy'
+    versionMajor: ${{ parameters.versionMajor }}
+    versionMinor: ${{ parameters.versionMinor }}
+    versionPatch: ${{ parameters.versionPatch }}
     condition: and(succeeded('MacOS_Build_ARM64'), or(eq('${{ parameters.targetOS }}', 'MacOS'), eq('${{ parameters.targetOS }}', 'All')))
 
 - template: templates/macos-notarize.yml
@@ -409,8 +466,11 @@ stages:
     architecture: x64
     compiler: Clang
     cmake_preset: RelWithDebInfo
-    macos_path: '/usr/local/Qt/6.9.3/macos/lib/cmake:/usr/local/Qt/6.9.3/macos/bin:/usr/local/bin:/usr/local/sbin:/usr/local:$PATH'
+    macos_path: '/usr/local/Qt/6.10.2/macos/lib/cmake:/usr/local/Qt/6.10.2/macos/bin:/usr/local/bin:/usr/local/sbin:/usr/local:$PATH'
     openssl_pkcs_args: '-legacy'
+    versionMajor: ${{ parameters.versionMajor }}
+    versionMinor: ${{ parameters.versionMinor }}
+    versionPatch: ${{ parameters.versionPatch }}
     condition: and(succeeded('MacOS_Build_x64'), or(eq('${{ parameters.targetOS }}', 'MacOS'), eq('${{ parameters.targetOS }}', 'All')))
 
 ##########################################

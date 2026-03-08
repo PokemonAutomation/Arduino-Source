@@ -9,7 +9,7 @@ steps:
     sparseCheckoutPatterns: |
       /*
       !Repository/Public/*
-      !Repository/Deployment-SerialPrograms-Qt6.10.0-MSVC2022/
+      !Repository/Deployment-SerialPrograms-Qt6.10.2-MSVC2022/
       !Repository/Deployment-SerialPrograms-Qt6.8.3-MSVC2022/
     workspaceRepo: true
 
