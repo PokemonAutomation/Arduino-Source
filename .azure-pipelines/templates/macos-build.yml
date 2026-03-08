@@ -165,6 +165,12 @@ stages:
           mkdir -p "$FOLDER_NAME"
           cp -R SerialPrograms.app "$FOLDER_NAME/"
 
+          echo "=== Moving Firmware to outside of the .app bundle ==="
+          mv "$FOLDER_NAME/SerialPrograms.app/Contents/Firmware" "$FOLDER_NAME/"
+
+          echo "=== Removing Scripts folder from .app bundle ==="
+          rm -rf "$FOLDER_NAME/SerialPrograms.app/Contents/Scripts"
+
           tar -czf "cache-build/macos-build-${{ parameters.architecture }}.tar.gz" "$FOLDER_NAME"
           tar -czf "cache-symbols/macos-symbols-${{ parameters.architecture }}.tar.gz" cache-symbols/SerialPrograms.dSYM
 

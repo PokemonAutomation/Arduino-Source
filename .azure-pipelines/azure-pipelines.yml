@@ -350,6 +350,10 @@ stages:
               -p qt \
               -v 3
 
+          echo "=== Removing unnecessary Qt files ==="
+          rm -rf "$APPDIR/usr/translations"
+
+          echo "=== Packaging AppImage ==="
           ./appimagetool-x86_64.AppImage AppDir
           rm linuxdeploy-*.AppImage
           rm appimagetool-x86_64.AppImage
