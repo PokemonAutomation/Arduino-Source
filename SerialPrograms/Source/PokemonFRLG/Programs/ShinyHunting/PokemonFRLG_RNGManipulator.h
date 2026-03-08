@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonFRLG_StarterRNG_H
-#define PokemonAutomation_PokemonFRLG_StarterRNG_H
+#ifndef PokemonAutomation_PokemonFRLG_RNGManipulator_H
+#define PokemonAutomation_PokemonFRLG_RNGManipulator_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
@@ -17,16 +17,16 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
 
-class StarterRNG_Descriptor : public SingleSwitchProgramDescriptor{
+class RNGManipulator_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-    StarterRNG_Descriptor();
+    RNGManipulator_Descriptor();
     struct Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class StarterRNG : public SingleSwitchProgramInstance{
+class RNGManipulator : public SingleSwitchProgramInstance{
 public:
-    StarterRNG();
+    RNGManipulator();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
     virtual void start_program_border_check(
         VideoStream& stream,
@@ -40,6 +40,7 @@ private:
     };
     enum class Target{
         starters,
+        magikarp,
         hitmon,
         eevee,
         lapras,
