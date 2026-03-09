@@ -60,13 +60,15 @@ RNGManipulator::RNGManipulator()
         {
             {Target::starters, "starters", "Bulbasaur / Squirtle / Charmander"},
             {Target::magikarp, "magikarp", "Magikarp"},
-            {Target::hitmon, "hitmon", "Hitmonlee / Hitmonchan"},
-            {Target::eevee, "eevee", "Eevee"},
-            {Target::lapras, "lapras", "Lapras"},
-            {Target::fossils, "fossils", "Omanyte / Kabuto / Aerodactyl"},
+            // {Target::hitmon, "hitmon", "Hitmonlee / Hitmonchan"},
+            // {Target::eevee, "eevee", "Eevee"},
+            // {Target::lapras, "lapras", "Lapras"},
+            // {Target::fossils, "fossils", "Omanyte / Kabuto / Aerodactyl"},
             {Target::sweetscent, "sweetscent", "Sweet Scent for wild encounters"},
-            {Target::wildwalk, "wildwalk", "Hit seed and advance when walking in grass"},
-            {Target::fishing, "fishing", "Hit seed and advance when fishing"}
+            {Target::grasswalk, "grasswalk", "Walk to trigger wild encounters (inaccurate)."},
+            // {Target::fishing, "fishing", "Fishing"},
+            // {Target::static, "static", "Static overworld encounters (including Legendaries)"},
+            // {Target::roaming, "roaming", "Roaming Legendaries"}
         },
         LockMode::LOCK_WHILE_RUNNING,
         Target::starters
@@ -100,7 +102,16 @@ RNGManipulator::RNGManipulator()
         LockMode::UNLOCK_WHILE_RUNNING,
         1000, 900 // default, min
     )
-    , TAKE_PICTURES("<b>Take Pictures of Stats:</b><br>Take pictures of the first two pages of the summary screen.<br>Only applies to gifts.", LockMode::UNLOCK_WHILE_RUNNING, true)
+    , TAKE_PICTURES(
+        "<b>Take Pictures of Stats:</b><br>Take pictures of the first two pages of the summary screen.<br>Only applies to gifts. Useful for calibrating your seed and advances.", 
+        LockMode::UNLOCK_WHILE_RUNNING, 
+        false // default
+    )
+    , TAKE_VIDEO(
+        "<b>Take Video:</b><br>Record a video when the shiny is found.", 
+        LockMode::UNLOCK_WHILE_RUNNING, 
+        true // default
+    )
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_SHINY(
         "Shiny found",
@@ -121,70 +132,12 @@ RNGManipulator::RNGManipulator()
     PA_ADD_OPTION(LOAD_ADVANCES);
     PA_ADD_OPTION(DOUBLE_ADVANCES);
     PA_ADD_OPTION(TAKE_PICTURES);
+    PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 namespace{
-
-// reset_to_starter(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EnumDropdownOption<ResetType>& RESET_TYPE, SimpleIntegerOption<uint64_t>& SEED_DELAY, SimpleIntegerOption<uint64_t>& LOAD_ADVANCES, SimpleIntegerOption<uint64_t>& DOUBLE_ADVANCES, BooleanCheckBoxOption& TAKE_PICTURES){
-//     double FRAMERATE = 59.7275; // valid for GBA, but not sure for Switch
-//     uint64_t LOAD_DELAY = uint64_t((LOAD_ADVANCES)/ FRAMERATE * 1000);
-//     uint64_t DOUBLE_DELAY = uint64_t((DOUBLE_ADVANCES)/ FRAMERATE * 500);
-//     env.log("Load screen delay: " + std::to_string(LOAD_DELAY));
-//     env.log("In-game delay: " + std::to_string(DOUBLE_DELAY));
-//     if (RESET_TYPE ==  ResetType::hard){
-//         // close the game
-//         pbf_press_button(context, BUTTON_HOME, 200ms, 1300ms);
-//         pbf_press_button(context, BUTTON_Y, 200ms, 1300ms);
-//         pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
-//         // press A to select game
-//         pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
-//         // press A to select profile and immediately go back to the home screen
-//         pbf_press_button(context, BUTTON_A, 100ms, 100ms);
-//         pbf_press_button(context, BUTTON_HOME, 200ms, 2800ms);
-//         pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(SEED_DELAY - 200));
-//     }else{
-//         // perform soft reset and 
-//         pbf_press_button(context, BUTTON_B | BUTTON_A | BUTTON_X | BUTTON_Y, 200ms, std::chrono::milliseconds(SEED_DELAY - 200));
-//     }
-//     // Advance to the load game screen and wait
-//     pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(LOAD_DELAY - 200));
-//     // Load the game (sets the Initial Seed)
-//     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-//     // Skip through the recap
-//     pbf_press_button(context, BUTTON_B, 200ms, 2300ms);
-//     // Advance through starter dialogue and wait on "really quite energetic!"
-//     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-//     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-//     pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(DOUBLE_DELAY - 7200));
-//     // Finish dialogue (hits the target advance)
-//     pbf_press_button(context, BUTTON_A, 200ms, 5800ms);
-//     // Decline nickname
-//     pbf_press_button(context, BUTTON_B, 200ms, 2300ms);
-//     // Advance through rival choiec
-//     pbf_press_button(context, BUTTON_B, 200ms, 4800ms);
-//     // Navigate to summary
-//     pbf_press_button(context, BUTTON_PLUS, 200ms, 800ms);
-//     pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
-//     pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
-//     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-//     if (TAKE_PICTURES){
-//         // Capture both summary screens
-//         pbf_wait(context, 1000ms);
-//         pbf_press_button(context, BUTTON_CAPTURE, 200ms, 1900ms);
-//         pbf_move_left_joystick(context, {+1, 0}, 200ms, 1300ms);
-//         pbf_press_button(context, BUTTON_CAPTURE, 200ms, 1800ms);
-//     }else{
-//         // view both summary screens
-//         pbf_wait(context, 2000ms);
-//         pbf_move_left_joystick(context, {+1, 0}, 200ms, 1300ms);
-//         pbf_wait(context, 2500ms);
-//     }
-
-//     context.wait_for_all_requests();
-//     env.log("Encounter reached.");
-// }
 
 void hard_reset(ProControllerContext& context){
     // close the game
@@ -250,7 +203,7 @@ void go_to_starter_summary(ProControllerContext& context){
 }
 
 void go_to_summary(ProControllerContext& context){
-    // Navigate to summary (last party slot)
+    // navigate to summary (last party slot)
     pbf_press_button(context, BUTTON_PLUS, 200ms, 800ms);
     pbf_move_left_joystick(context, {0, -1}, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
@@ -262,16 +215,15 @@ void go_to_summary(ProControllerContext& context){
 }
 
 bool use_sweet_scent(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& DOUBLE_DELAY){
-    // Navigate to last party slot
+    // navigate to last party slot
     pbf_press_button(context, BUTTON_PLUS, 200ms, 800ms);
     pbf_move_left_joystick(context, {0, -1}, 200ms, 1800ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
     pbf_move_left_joystick(context, {0, +1}, 200ms, 1300ms);
     pbf_move_left_joystick(context, {0, +1}, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 800ms);
-    // hover over Sweet Scent (2nd option, maybe HMs change this)
+    // hover over Sweet Scent (2nd option, but maybe HMs could change this)
     pbf_move_left_joystick(context, {0, -1}, 200ms, std::chrono::milliseconds(DOUBLE_DELAY - 8400));
-    // 8000ms
     pbf_press_button(context, BUTTON_A, 200ms, 800ms);
     context.wait_for_all_requests();
     BlackScreenWatcher battle_entered(COLOR_RED);
@@ -383,46 +335,18 @@ void RNGManipulator::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
             ShinySymbolDetector shiny_checker(COLOR_YELLOW);
             shiny_found = shiny_checker.read(env.console.logger(), screen);
-        }else if (TARGET == Target::hitmon){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Hitmonchan/Hitmonlee hunt not implemented",
-                env.console
-            );
-        }else if (TARGET == Target::eevee){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Eevee hunt not implemented",
-                env.console
-            );
-        }else if (TARGET == Target::lapras){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Lapras hunt not implemented",
-                env.console
-            );
-        }else if (TARGET == Target::fossils){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Fossil hunt not implemented",
-                env.console
-            );
         }else if (TARGET == Target::sweetscent){
             shiny_found = use_sweet_scent(env, context, DOUBLE_DELAY);
             context.wait_for_all_requests();
-        }else if (TARGET == Target::wildwalk){
+            env.log("Wild encounter started.");
+        }else if (TARGET == Target::grasswalk){
             shiny_found = grass_walk_after_delay(env, context, DOUBLE_DELAY);
             context.wait_for_all_requests();
-        }else if (TARGET == Target::fishing){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Fishing hunt not implemented",
-                env.console
-            );
+            env.log("Wild encounter started.");
         }else{
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Invalid RNG option",
+                "Option not yet implemented.",
                 env.console
             );
         }
@@ -440,6 +364,9 @@ void RNGManipulator::program(SingleSwitchProgramEnvironment& env, ProControllerC
                 screen,
                 true
             );
+            if (TAKE_VIDEO){
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
+            }
             break;
         }else if (stats.resets >= NUM_RESETS){
             send_program_status_notification(

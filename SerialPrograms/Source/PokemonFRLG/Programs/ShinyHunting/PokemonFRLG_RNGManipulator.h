@@ -41,13 +41,15 @@ private:
     enum class Target{
         starters,
         magikarp,
-        hitmon,
-        eevee,
-        lapras,
-        fossils,
+        // hitmon,
+        // eevee,
+        // lapras,
+        // fossils,
         sweetscent,
-        wildwalk,
-        fishing,
+        grasswalk,
+        // fishing,
+        // static,
+        // roaming
     };
 
     EnumDropdownOption<Target> TARGET;
@@ -62,8 +64,8 @@ private:
 
     BooleanCheckBoxOption TAKE_PICTURES;
 
+    BooleanCheckBoxOption TAKE_VIDEO;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
-
     EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
