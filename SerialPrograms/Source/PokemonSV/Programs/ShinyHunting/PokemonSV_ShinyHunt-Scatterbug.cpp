@@ -418,7 +418,7 @@ void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& 
 
     auto move_forward_with_lets_go = [&](int num_iterations){
         context.wait_for_all_requests();
-        for(int i = 0; i < num_iterations; i++){
+        for (int i = 0; i < num_iterations; i++){
             use_lets_go_to_clear_in_front(console, context, *m_encounter_tracker, throw_ball_if_bubble, [&](ProControllerContext& context){
                 // Do the following movement while the Let's Go pokemon clearing wild pokemon.
                 // Slowly Moving forward

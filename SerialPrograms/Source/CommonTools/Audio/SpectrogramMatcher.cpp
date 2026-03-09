@@ -28,10 +28,10 @@ std::vector<float> buildSpikeKernel(size_t numFrequencies, size_t halfSampleRate
     // 199.21875 * numFrequencies / halfSampleRate
     size_t numKernelIntervals = int(199.21875 * numFrequencies / halfSampleRate + 0.5);
     size_t slopeLen = numKernelIntervals / 2;
-    for(size_t i = 0; i <= slopeLen; i++){
+    for (size_t i = 0; i <= slopeLen; i++){
         kernel.push_back(-4.0f + 8.f * i / (float)slopeLen);
     }
-    for(size_t i = ((numKernelIntervals+1) % 2); i <= slopeLen; i++){
+    for (size_t i = ((numKernelIntervals+1) % 2); i <= slopeLen; i++){
         kernel.push_back(-4.0f + 8.f * (slopeLen-i)/(float)slopeLen);
     }
     return kernel;
@@ -135,7 +135,7 @@ SpectrogramMatcher::SpectrogramMatcher(
         // num windows of each subdivided template
         const size_t num_subWindows = numTemplateWindows / templateSubdivision;
         m_numSpectrumsNeeded = num_subWindows;
-        for(size_t i = 0; i < templateSubdivision; i++){
+        for (size_t i = 0; i < templateSubdivision; i++){
             const size_t windowStart = i * num_subWindows;
             const size_t windowEnd = (i+1) * num_subWindows;
             m_templateRange.emplace_back(windowStart, windowEnd);
@@ -183,7 +183,7 @@ std::vector<float> SpectrogramMatcher::buildTemplateNorm() const{
     for (size_t sub_index = 0; sub_index < m_templateRange.size(); sub_index++){
         float sumSqr = 0.0f;
         for (size_t i = m_templateRange[sub_index].first; i < m_templateRange[sub_index].second; i++){
-            for(size_t j = m_freqStart; j < m_freqEnd; j++){
+            for (size_t j = m_freqStart; j < m_freqEnd; j++){
                 const float v = m_template.getWindow(i)[j];
                 sumSqr += v * v;
             }
@@ -215,7 +215,7 @@ bool SpectrogramMatcher::update_to_new_spectrum(AudioSpectrum spectrum){
     case Mode::AVERAGE_5:
     {
         AlignedVector<float> avgedSpectrum(m_template.bufferSize());
-        for(size_t j = 0; j < m_template.numFrequencies(); j++){
+        for (size_t j = 0; j < m_template.numFrequencies(); j++){
             const float * rawFreqMag = spectrum.magnitudes->data() + m_originalFreqStart + j*5;
             const float newMag = (rawFreqMag[0] + rawFreqMag[1] + rawFreqMag[2] + rawFreqMag[3] + rawFreqMag[4]) / 5.0f;
             avgedSpectrum[j] = newMag;
@@ -267,12 +267,12 @@ std::pair<float, float> SpectrogramMatcher::match_sub_template(size_t sub_index)
 
     const size_t template_start = m_templateRange[sub_index].first;
     const size_t template_end = m_templateRange[sub_index].second;
-    for(size_t i = template_start; i < template_end; i++, iter++, iter2++){
+    for (size_t i = template_start; i < template_end; i++, iter++, iter2++){
         // match in order from latest window to oldest
         const float* templateData = m_template.getWindow(template_end-1-i);
         const float* streamData = iter->magnitudes->data();
         streamSumSqr += *iter2;
-        for(size_t j = m_freqStart; j < m_freqEnd; j++){
+        for (size_t j = m_freqStart; j < m_freqEnd; j++){
             sumMulti += templateData[j] * streamData[j];
         }
     }
@@ -281,11 +281,11 @@ std::pair<float, float> SpectrogramMatcher::match_sub_template(size_t sub_index)
 
     iter = m_spectrums.begin();
     float sum = 0.0f;
-    for(size_t i = template_start; i < template_end; i++, iter++){
+    for (size_t i = template_start; i < template_end; i++, iter++){
         // match in order from latest window to oldest
         const float* templateData = m_template.getWindow(template_end-1-i);
         const float* streamData = iter->magnitudes->data();
-        for(size_t j = m_freqStart; j < m_freqEnd; j++){
+        for (size_t j = m_freqStart; j < m_freqEnd; j++){
             float d = templateData[j] - scale * streamData[j];
             sum += d * d;
         }
@@ -347,7 +347,7 @@ float SpectrogramMatcher::match(const std::vector<AudioSpectrum>& new_spectrums)
     for (const auto& s : m_spectrums){
         if (s.stamp != lastStamp - 1){
             std::cout << "Error: SpectrogramMatcher (" + m_name + ") spectrum timestamps are not continuous:" << std::endl;
-            for(const auto& sp : m_spectrums){
+            for (const auto& sp : m_spectrums){
                 std::cout << sp.stamp << ", ";
             }
             std::cout << std::endl;

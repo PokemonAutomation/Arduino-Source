@@ -393,7 +393,7 @@ std::string get_joystick_direction(const JoystickPosition& position){
             direction = "\u2191";
         }
 
-    }else { // x < STICK_CENTER
+    }else{ // x < STICK_CENTER
         if (position.y < 0){
             // left-down
             direction = "\u2199";

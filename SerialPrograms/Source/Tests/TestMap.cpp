@@ -204,7 +204,7 @@ int sound_bool_detector_helper(SoundBoolDetectorFunction test_func, const std::s
     size_t sample_rate = 48000;
     AudioTemplate audio_stream = loadAudioTemplate(test_path, sample_rate);
     std::vector<AudioSpectrum> spectrums;
-    for(size_t i = 0; i < audio_stream.numWindows(); i++){
+    for (size_t i = 0; i < audio_stream.numWindows(); i++){
         // AudioSpectrum(size_t s, size_t rate, std::shared_ptr<const AlignedVector<float>> m);
         AlignedVector<float> freq_mag(audio_stream.numFrequencies());
         memcpy(freq_mag.data(), audio_stream.getWindow(i), sizeof(float) * audio_stream.numFrequencies());

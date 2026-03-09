@@ -18,10 +18,11 @@ namespace PokemonSV{
 
 
 PicnicDetector::PicnicDetector(Color color)
-: m_color(color)
-, m_button_b(color, WhiteButton::ButtonB, {0.024, 0.702, 0.024, 0.045})
-, m_button_minus(color, WhiteButton::ButtonMinus, {0.024, 0.866, 0.024, 0.045})
-, m_button_y(color, WhiteButton::ButtonY, {0.024, 0.917, 0.024, 0.045}) {}
+    : m_color(color)
+    , m_button_b(color, WhiteButton::ButtonB, {0.024, 0.702, 0.024, 0.045})
+    , m_button_minus(color, WhiteButton::ButtonMinus, {0.024, 0.866, 0.024, 0.045})
+    , m_button_y(color, WhiteButton::ButtonY, {0.024, 0.917, 0.024, 0.045})
+{}
 
 void PicnicDetector::make_overlays(VideoOverlaySet& items) const{
     m_button_b.make_overlays(items);

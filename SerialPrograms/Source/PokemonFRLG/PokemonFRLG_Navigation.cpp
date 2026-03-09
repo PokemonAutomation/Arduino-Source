@@ -45,7 +45,7 @@ bool try_soft_reset(ConsoleHandle& console, ProControllerContext& context){
 
     int ls = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_A, 1000ms);
             pbf_wait(context, 5000ms);
             context.wait_for_all_requests();
@@ -53,9 +53,9 @@ bool try_soft_reset(ConsoleHandle& console, ProControllerContext& context){
         { whitescreen, load_menu }
     );
     context.wait_for_all_requests();
-    if (ls == 0) {
+    if (ls == 0){
         console.log("Entered load menu. (WhiteScreenOver)");
-    }else if (ls == 1) {
+    }else if (ls == 1){
         console.log("Entered load menu. (LoadMenu)");
     }else{
         console.log("soft_reset(): Unable to enter load menu.", COLOR_RED);
@@ -139,7 +139,7 @@ bool try_open_slot_six(ConsoleHandle& console, ProControllerContext& context){
 
     int pm = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_wait(context, 200ms);
             context.wait_for_all_requests();
             pbf_press_dpad(context, DPAD_DOWN, 320ms, 320ms);
@@ -167,7 +167,7 @@ bool try_open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     BlackScreenOverWatcher blk2(COLOR_RED);
     int sm = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_press_button(context, BUTTON_A, 320ms, 640ms);
             pbf_press_button(context, BUTTON_A, 320ms, 640ms);
             pbf_wait(context, 5000ms);
@@ -244,8 +244,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
             );
             if (ret2 == 0){
                 console.log("Battle menu detecteed!");
-            }
-            else {
+            }else{
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "handle_encounter(): Did not detect battle menu.",
@@ -279,8 +278,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
         );
         if (ret == 0){
             console.log("Battle menu detecteed!");
-        }
-        else {
+        }else{
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "handle_encounter(): Did not detect battle menu.",
@@ -319,7 +317,7 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
     BlackScreenOverWatcher battle_over(COLOR_RED);
     int ret3 = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_press_button(context, BUTTON_A, 320ms, 640ms);
             pbf_wait(context, 5000ms);
             context.wait_for_all_requests();

@@ -105,7 +105,7 @@ void route_alpha_pidgeot(SingleSwitchProgramEnvironment& env, ProControllerConte
         wait_until_overworld(env.console, context, 50s);
         open_map(env.console, context, false, true);
         pbf_move_left_joystick(context, {+0.157, +0.156}, 100ms, 200ms);
-        if (fly_from_map(env.console, context) == FastTravelState::NOT_AT_FLY_SPOT) {
+        if (fly_from_map(env.console, context) == FastTravelState::NOT_AT_FLY_SPOT){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "fly_from_map(): Unable to fast travel",
@@ -129,7 +129,7 @@ void route_wild_zone_3_tower(SingleSwitchProgramEnvironment& env, ProControllerC
     bool been_at_downstairs = false;
     bool been_at_upstairs_after_downstairs = false;
 
-    for(int i = 0; i < 6; i++){
+    for (int i = 0; i < 6; i++){
         // if there is no day/night change and no button drop, this loop should only have three iterations
         const double direction = get_facing_direction(env.console, context);
         const bool face_east = get_angle_between_facing_directions(direction, 90.0) < 10.0;
@@ -185,7 +185,7 @@ void ShinyHunt_ShuttleRun::program(SingleSwitchProgramEnvironment& env, ProContr
         );
     });
     std::function<void(SingleSwitchProgramEnvironment&, ProControllerContext&)> route;
-    switch (ROUTE) {
+    switch (ROUTE){
     case Route::ALPHA_PIDGEOT:
         route = route_alpha_pidgeot;
         break;

@@ -55,7 +55,7 @@ int main(int argc, char* argv[]){
             // Mash A button for 3 seconds
             logger.log("Mashing A button for 3 seconds...");
 
-            for(int i = 0; i < 30; i++){
+            for (int i = 0; i < 30; i++){
                 // Push A button: delay=0ms, hold=50ms, release=50ms, button=BUTTON_A
                 controller.push_button(0, 50, 50, static_cast<uint32_t>(BUTTON_A));
             }

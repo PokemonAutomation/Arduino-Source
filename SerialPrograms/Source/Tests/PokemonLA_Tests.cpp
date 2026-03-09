@@ -137,7 +137,7 @@ int test_pokemonLA_MMOQuestionMarkDetector(const ImageViewRGB32& image, const st
     int target_num_MMOs_on_region_map = -1;
     int target_region_index = -1;
 
-    for(size_t keyword_index = 0; keyword_index < keywords.size(); keyword_index++){
+    for (size_t keyword_index = 0; keyword_index < keywords.size(); keyword_index++){
         const std::string& word = keywords[keyword_index];
         if (hisui_kw_found == false && word == "Hisui"){
             hisui_kw_found = true;
@@ -165,7 +165,7 @@ int test_pokemonLA_MMOQuestionMarkDetector(const ImageViewRGB32& image, const st
         }else if (region_kw_found){
             // Found "Region" keyword, read a number as how many MMOs on the region map, and a region name.
             if (target_region_index < 0){
-                for(size_t index = 0; index < 5; index++){
+                for (size_t index = 0; index < 5; index++){
                     if (word == WILD_REGION_SHORT_NAMES[index]){
                         target_region_index = (int)index;
                         break;
@@ -199,7 +199,7 @@ int test_pokemonLA_MMOQuestionMarkDetector(const ImageViewRGB32& image, const st
     if (hisui_kw_found){
         const auto region_has_MMO = detector.detect_MMO_on_hisui_map(image);
 
-        for(size_t i = 0; i < 5; i++){
+        for (size_t i = 0; i < 5; i++){
             const bool result = region_has_MMO[i];
             const bool target = target_hisui_region_has_MMO[i];
             if (result != target){
@@ -277,7 +277,7 @@ int test_pokemon_details(const PokemonDetails& details, const PokemonDetails& ta
 
     const std::string& pokemon_slug = *target.name_candidates.begin();
     bool found_name = false;
-    for(const auto& slg : details.name_candidates){
+    for (const auto& slg : details.name_candidates){
         if (slg == pokemon_slug){
             found_name = true;
             break;
@@ -285,7 +285,7 @@ int test_pokemon_details(const PokemonDetails& details, const PokemonDetails& ta
     }
     if (found_name == false){
         cerr << "Error: " << __func__ << " name result is ";
-        for(const auto& slg : details.name_candidates){
+        for (const auto& slg : details.name_candidates){
             cerr << slg << ", ";
         }
         cerr << "but should be " << pokemon_slug << "." << endl;
@@ -384,7 +384,7 @@ int test_pokemonLA_BattleSpriteWatcher(const ImageViewRGB32& image, const std::v
     auto overlay = DummyVideoOverlay();
 
     std::vector<bool> target;
-    for(auto it = keywords.rbegin(); it != keywords.rend(); it++){
+    for (auto it = keywords.rbegin(); it != keywords.rend(); it++){
         const auto& word = *it;
         if (word == "0"){
             target.push_back(false);
@@ -402,7 +402,7 @@ int test_pokemonLA_BattleSpriteWatcher(const ImageViewRGB32& image, const std::v
 
     auto result = watcher.sprites_appeared();
 
-    for(size_t i = 0; i < MAX_WILD_POKEMON_IN_MULTI_BATTLE; i++){
+    for (size_t i = 0; i < MAX_WILD_POKEMON_IN_MULTI_BATTLE; i++){
         if (result[i] != target[i]){
             cerr << "Error: in test_pokemonLA_BattleSpriteWatcher sprite " << i << " has " << result[i] << ", but should be " << target[i] << endl;
             return 1;
@@ -430,7 +430,7 @@ int test_pokemonLA_BattleSpriteArrowDetector(const ImageViewRGB32& image, int ta
     auto overlay = DummyVideoOverlay();
 
     const size_t target_index = target;
-    for(size_t sprite_index = 0; sprite_index < MAX_WILD_POKEMON_IN_MULTI_BATTLE; sprite_index++){
+    for (size_t sprite_index = 0; sprite_index < MAX_WILD_POKEMON_IN_MULTI_BATTLE; sprite_index++){
         BattleSpriteArrowDetector detector(logger, overlay, sprite_index, std::chrono::milliseconds(0), true);
         bool result = detector.process_frame(image, current_time());
         if (sprite_index != target_index && result){
@@ -527,7 +527,7 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
 
     const std::vector<std::string> filename_words = parse_words(base_name);
     MapRegion region = MapRegion::NONE;
-    for(const std::string& word : filename_words){
+    for (const std::string& word : filename_words){
         if (word == "Fieldlands"){
             region = MapRegion::FIELDLANDS;
             break;
@@ -571,7 +571,7 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
     }
 
     cout << "Target sprites: " << target_sprites.size() << " total" << endl;
-    for(const auto& slug : target_sprites){
+    for (const auto& slug : target_sprites){
         cout << "- " << slug << endl;
     }
 
@@ -589,7 +589,7 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
     });
 
     cout << "Detect MMO question marks:" << endl;
-    for(const auto& box : quest_results){
+    for (const auto& box : quest_results){
         cout << "- " << box.center_x() << ", " << box.center_y() << " " << box.width() << " x " << box.height() << endl;
     }
 
@@ -679,7 +679,7 @@ int test_pokemonLA_FlagTracker_performance(const ImageViewRGB32& image, int num_
     FlagTracker tracker(logger, overlay);
 
     auto time_start = current_time();
-    for(int i = 0; i < num_iterations; i++){
+    for (int i = 0; i < num_iterations; i++){
         tracker.process_frame(image, current_time());
     }
     auto time_end = current_time();

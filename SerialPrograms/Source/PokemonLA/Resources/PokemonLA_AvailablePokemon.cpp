@@ -32,7 +32,7 @@ const std::vector<std::string>& MMO_FIRST_WAVE_SPRITE_SLUGS(){
 
 std::array<std::vector<std::string>, 5> load_MMO_first_wave_region_sprite_slugs(){
     std::array<std::vector<std::string>, 5> slugs;
-    for(int i = 0; i < 5; i++){
+    for (int i = 0; i < 5; i++){
         std::string filename = "PokemonLA/MMOFirstWaveSpriteList-" + std::to_string(i) + ".json";
         slugs[i] = Pokemon::load_pokemon_slug_json_list(filename.c_str());
     }

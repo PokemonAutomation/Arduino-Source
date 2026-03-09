@@ -72,7 +72,8 @@ std::string SANDWICH_HAND_TYPE_NAMES(SandwichHandType type){
 }
 
 SandwichHandLocator::SandwichHandLocator(HandType hand_type, const ImageFloatBox& box, Color color)
-: m_type(hand_type), m_box(box), m_color(color) {}
+    : m_type(hand_type), m_box(box), m_color(color)
+{}
 
 void SandwichHandLocator::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
@@ -127,7 +128,11 @@ SandwichHandWatcher::SandwichHandWatcher(
     HandType hand_type,
     const ImageFloatBox& box,
     Color color
-): VisualInferenceCallback("SandwichHandWatcher"), m_locator(hand_type, box, color), m_location(-1.0, -1.0) {}
+)
+    : VisualInferenceCallback("SandwichHandWatcher")
+    , m_locator(hand_type, box, color)
+    , m_location(-1.0, -1.0)
+{}
 
 void SandwichHandWatcher::make_overlays(VideoOverlaySet& items) const{
     m_locator.make_overlays(items);

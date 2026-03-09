@@ -104,7 +104,8 @@ struct ImageSolidCheck{
         : box(x, y, width, height)
         , expected_color_ratio(r, g, b)
         , max_euclidean_distance(max_distance)
-        , max_stddev_sum(max_stddev_sum) {}
+        , max_stddev_sum(max_stddev_sum)
+    {}
     
     // Check if the area on the image is a solid color.
     bool check(const ImageViewRGB32& image) const;

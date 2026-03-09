@@ -61,7 +61,7 @@ int test_kernels_ImageScaleBrightness(const ImageViewRGB32& image){
     
     int num_iterations = 500;
     auto time_start = current_time();
-    for(int i = 0; i < num_iterations; i++){
+    for (int i = 0; i < num_iterations; i++){
         scale_brightness(new_image.width(), new_image.height(), new_image.data(), new_image.bytes_per_row(), 1.2f, 1.3f, 0.5f);
         // break;
     }
@@ -125,7 +125,7 @@ int test_kernels_BinaryMatrix(const ImageViewRGB32& image){
     // We try to wait for three seconds:
     const size_t num_iters = size_t(3000 / ms);
     time_start = current_time();
-    for(size_t i = 0; i < num_iters; i++){
+    for (size_t i = 0; i < num_iters; i++){
         compress_rgb32_to_binary_range(
             image.data(), image.bytes_per_row(), *binary_matrix, mins, maxs
         );
@@ -226,7 +226,7 @@ int test_kernels_FilterRGB32Range(const ImageViewRGB32& image){
     // We try to wait for three seconds:
     const size_t num_iters = size_t(3000 / ms);
     time_start = current_time();
-    for(size_t i = 0; i < num_iters; i++){
+    for (size_t i = 0; i < num_iters; i++){
         Kernels::filter_rgb32_range(
             image.data(), image.bytes_per_row(), image.width(), image.height(),
             image_out.data(), image_out.bytes_per_row(),
@@ -337,7 +337,7 @@ int test_kernels_FilterRGB32Euclidean(const ImageViewRGB32& image){
     // We try to wait for three seconds:
     const size_t num_iters = size_t(3000 / ms);
     time_start = current_time();
-    for(size_t i = 0; i < num_iters; i++){
+    for (size_t i = 0; i < num_iters; i++){
         pixels_in_range = Kernels::filter_rgb32_euclidean(
             image.data(), image.bytes_per_row(), image.width(), image.height(),
             image_out.data(), image_out.bytes_per_row(),
@@ -444,7 +444,7 @@ int test_kernels_ToBlackWhiteRGB32Range(const ImageViewRGB32& image){
     // We try to wait for three seconds:
     const size_t num_iters = size_t(3000 / ms);
     time_start = current_time();
-    for(size_t i = 0; i < num_iters; i++){
+    for (size_t i = 0; i < num_iters; i++){
         Kernels::to_blackwhite_rgb32_range(
             image.data(), image.bytes_per_row(), image.width(), image.height(),
             image_out.data(), image_out.bytes_per_row(),
@@ -528,7 +528,7 @@ int test_kernels_FilterByMask(const ImageViewRGB32& image){
     // We try to wait for three seconds:
     const size_t num_iters = size_t(3000 / ms);
     time_start = current_time();
-    for(size_t i = 0; i < num_iters; i++){
+    for (size_t i = 0; i < num_iters; i++){
         filter_by_mask(*binary_matrix, new_image.data(), new_image.bytes_per_row(), uint32_t(replacement_color), replace_zero_bits);
     }
     time_end = current_time();
@@ -595,7 +595,7 @@ int test_kernels_CompressRGB32ToBinaryEuclidean(const ImageViewRGB32& image){
     // We try to wait for three seconds:
     const size_t num_iters = size_t(3000 / ms);
     time_start = current_time();
-    for(size_t i = 0; i < num_iters; i++){
+    for (size_t i = 0; i < num_iters; i++){
         Kernels::compress_rgb32_to_binary_euclidean(
             image.data(), image.bytes_per_row(), matrix,
             uint32_t(middle_color), max_dist
@@ -660,7 +660,7 @@ int test_kernels_Waterfill(const ImageViewRGB32& image){
     auto ms = ns / 1000000.;
     cout << "One waterfill time: " << ms << " ms" << endl;
 
-    for(size_t i = 0; i < objects.size(); ++i){
+    for (size_t i = 0; i < objects.size(); ++i){
         TEST_RESULT_COMPONENT_EQUAL(objects[i].area, gt_objects[i].area, "object " + std::to_string(i) + " area");
         TEST_RESULT_COMPONENT_EQUAL(objects[i].min_x, gt_objects[i].min_x, "object " + std::to_string(i) + " min_x");
         TEST_RESULT_COMPONENT_EQUAL(objects[i].min_y, gt_objects[i].min_y, "object " + std::to_string(i) + " min_y");
@@ -671,7 +671,7 @@ int test_kernels_Waterfill(const ImageViewRGB32& image){
     // We try to wait for three seconds:
     const size_t num_iters = size_t(3000 / ms);
     time_start = current_time();
-    for(size_t i = 0; i < num_iters; i++){
+    for (size_t i = 0; i < num_iters; i++){
         matrix = source_matrix.copy();
         objects = Kernels::Waterfill::find_objects_inplace(matrix, min_area);
     }
@@ -695,12 +695,12 @@ template<class Tile> int test_binary_matrix_tile_t(){
     Tile tile;
     // BinaryTile_64x8_arm64_NEON tile;
     // BinaryTile_64xH_Default<8, BinaryMatrixType::arm64x8_x64_NEON> tile;
-    for(size_t height = 0; height < tile.HEIGHT; ++height){
-        for(size_t width = 0; width < tile.WIDTH; ++width){
+    for (size_t height = 0; height < tile.HEIGHT; ++height){
+        for (size_t width = 0; width < tile.WIDTH; ++width){
             tile.set_zero();
             tile.set_ones(width, height);
-            for(size_t y = 0; y < tile.HEIGHT; ++y){
-                for(size_t x = 0; x < tile.WIDTH; ++x){
+            for (size_t y = 0; y < tile.HEIGHT; ++y){
+                for (size_t x = 0; x < tile.WIDTH; ++x){
                     bool gt = y < height && x < width;
                     if (gt != tile.get_bit(x, y)){
                         cout << "Tile::set_ones(width = " << width << ", height = " << height << "), tile (x = " << 
@@ -714,7 +714,7 @@ template<class Tile> int test_binary_matrix_tile_t(){
 
     sum = 0;
     time_start = current_time();
-    for(size_t i = 0; i < num_iters; ++i){
+    for (size_t i = 0; i < num_iters; ++i){
         tile.set_ones(32, 4);
         sum += tile.row(0) + tile.row(1) + tile.row(2) + tile.row(3);
     }
@@ -724,12 +724,12 @@ template<class Tile> int test_binary_matrix_tile_t(){
     cout << "Execution enforcer: " << sum << endl;
     cout << "Running " << num_iters << " iters, Tile::set_ones() time: " << ms / num_iters << " ms" << endl;
 
-    for(size_t height = 0; height < tile.HEIGHT; ++height){
-        for(size_t width = 0; width < tile.WIDTH; ++width){
+    for (size_t height = 0; height < tile.HEIGHT; ++height){
+        for (size_t width = 0; width < tile.WIDTH; ++width){
             tile.set_ones();
             tile.clear_padding(width, height);
-            for(size_t y = 0; y < tile.HEIGHT; ++y){
-                for(size_t x = 0; x < tile.WIDTH; ++x){
+            for (size_t y = 0; y < tile.HEIGHT; ++y){
+                for (size_t x = 0; x < tile.WIDTH; ++x){
                     bool gt = y < height && x < width;
                     if (gt != tile.get_bit(x, y)){
                         cout << "Tile::clear_padding(width = " << width << ", height = " << height << "), tile (x = " << 
@@ -742,7 +742,7 @@ template<class Tile> int test_binary_matrix_tile_t(){
     }
     sum = 0;
     time_start = current_time();
-    for(size_t i = 0; i < num_iters; ++i){
+    for (size_t i = 0; i < num_iters; ++i){
         tile.clear_padding(32, 4);
         sum += tile.row(0) + tile.row(1) + tile.row(2) + tile.row(3);
     }
@@ -754,8 +754,8 @@ template<class Tile> int test_binary_matrix_tile_t(){
 
     tile.set_ones(35, 3);
     tile.invert();
-    for(size_t y = 0; y < tile.HEIGHT; ++y){
-        for(size_t x = 0; x < tile.WIDTH; ++x){
+    for (size_t y = 0; y < tile.HEIGHT; ++y){
+        for (size_t x = 0; x < tile.WIDTH; ++x){
             bool gt = !(x < 35 && y < 3);
             if (gt != tile.get_bit(x, y)){
                 cout << "Tile::invert(), tile (x = " << 
@@ -769,8 +769,8 @@ template<class Tile> int test_binary_matrix_tile_t(){
     tile.set_ones(35, 3);
     tile2.set_ones(13, 6);
     tile.andnot(tile2);
-    for(size_t y = 0; y < tile.HEIGHT; ++y){
-        for(size_t x = 0; x < tile.WIDTH; ++x){
+    for (size_t y = 0; y < tile.HEIGHT; ++y){
+        for (size_t x = 0; x < tile.WIDTH; ++x){
             bool gt = !(x < 13 && y < 6) && (x < 35 && y < 3);
             if (gt != tile.get_bit(x, y)){
                 cout << "Tile::andnot(), tile (x = " << 
@@ -783,7 +783,7 @@ template<class Tile> int test_binary_matrix_tile_t(){
     tile.set_ones(35, 3);
     {
         uint64_t top_row = tile.top();
-        for(size_t x = 0; x < tile.WIDTH; ++x){
+        for (size_t x = 0; x < tile.WIDTH; ++x){
             uint64_t bit = ((top_row >> x) & 1);
             uint64_t gt = uint64_t(x < 35);
             if (bit != gt){
@@ -798,7 +798,7 @@ template<class Tile> int test_binary_matrix_tile_t(){
         uint64_t& top_row = tile.top();
         top_row = 0xFFFFFFFFFFFFFFFF;
         uint64_t top = tile.top();
-        for(size_t x = 0; x < tile.WIDTH; ++x){
+        for (size_t x = 0; x < tile.WIDTH; ++x){
             uint64_t bit = ((top >> x) & 1);
             if (bit != 1){
                 cout << "& Tile::top(), tile (x = " << 
@@ -812,7 +812,7 @@ template<class Tile> int test_binary_matrix_tile_t(){
         uint64_t& bottom_row = tile.bottom();
         bottom_row = 0xFFFFFFFFFFFFFFFF;
         uint64_t bottom = tile.bottom();
-        for(size_t x = 0; x < tile.WIDTH; ++x){
+        for (size_t x = 0; x < tile.WIDTH; ++x){
             uint64_t bit = ((bottom >> x) & 1);
             if (bit != 1){
                 cout << "& Tile::bottom(), tile (x = " << 
@@ -822,8 +822,8 @@ template<class Tile> int test_binary_matrix_tile_t(){
         }
     }
     tile.set_zero();
-    for(size_t y = 0; y < tile.HEIGHT; ++y){
-        for(size_t x = 0; x < tile.WIDTH; ++x){
+    for (size_t y = 0; y < tile.HEIGHT; ++y){
+        for (size_t x = 0; x < tile.WIDTH; ++x){
             tile.set_bit(x, y);
             if (1 != tile.get_bit(x, y)){
                 cout << "Tile::set_bit(), tile (x = " << 
@@ -848,11 +848,11 @@ template<class Tile> int test_binary_matrix_tile_t(){
     std::srand(0);
     auto src_tile = tile;
     auto dst_tile = tile;
-    for(size_t num_tests = 0; num_tests < 30; ++num_tests){
+    for (size_t num_tests = 0; num_tests < 30; ++num_tests){
         src_tile.set_zero();
         dst_tile.set_zero();
-        for(size_t y = 0; y < tile.HEIGHT; ++y){
-            for(size_t x = 0; x < tile.WIDTH; ++x){
+        for (size_t y = 0; y < tile.HEIGHT; ++y){
+            for (size_t x = 0; x < tile.WIDTH; ++x){
                 src_tile.set_bit(x, y, std::rand() % 2);
                 dst_tile.set_bit(x, y, std::rand() % 2);
             }
@@ -862,8 +862,8 @@ template<class Tile> int test_binary_matrix_tile_t(){
             std::function<bool(size_t, size_t, size_t, size_t)> gt_test,
             std::function<bool(size_t, size_t, size_t, size_t)> get_src_bit_test){
             // check against GT
-            for(size_t y = 0; y < tile.HEIGHT; ++y){
-                for(size_t x = 0; x < tile.WIDTH; ++x){
+            for (size_t y = 0; y < tile.HEIGHT; ++y){
+                for (size_t x = 0; x < tile.WIDTH; ++x){
                     bool gt = false;
                     if (gt_test(shift_x, shift_y, x, y)){
                         gt = dst_tile.get_bit(x, y) || get_src_bit_test(shift_x, shift_y, x, y);
@@ -885,8 +885,8 @@ template<class Tile> int test_binary_matrix_tile_t(){
             return 0;
         };
 
-        for(size_t shift_y = 0; shift_y < tile.HEIGHT; ++shift_y){
-            for(size_t shift_x = 0; shift_x < tile.WIDTH; ++shift_x){
+        for (size_t shift_y = 0; shift_y < tile.HEIGHT; ++shift_y){
+            for (size_t shift_x = 0; shift_x < tile.WIDTH; ++shift_x){
                 tile = dst_tile;
                 src_tile.copy_to_shift_pp(tile, shift_x, shift_y);
                 auto gt_test_pp = [&](size_t shift_x, size_t shift_y, size_t x, size_t y) -> bool{
@@ -948,20 +948,20 @@ int test_binary_matrix_tile(){
         return 1;
     }
 
-    for(size_t num_bytes = 0; num_bytes <= 16; ++num_bytes){
+    for (size_t num_bytes = 0; num_bytes <= 16; ++num_bytes){
         PartialWordAccess_arm64_NEON partial(num_bytes);
 
         uint8_t buffer[48];
-        for(int i = 0; i < 48; i++){
+        for (int i = 0; i < 48; i++){
             buffer[i] = 99;
         }
-        for(uint8_t i = 0; i < 16; i++){
+        for (uint8_t i = 0; i < 16; i++){
             buffer[i+16] = i;
         }
 
         // uint8x16_t x = partial.load(buffer+16);
         uint8x16_t x = partial.load_int_no_read_past_end(buffer+16);
-        for(size_t i = 0; i < num_bytes; ++i){
+        for (size_t i = 0; i < num_bytes; ++i){
             if (x[i] != buffer[i+16]){
                 cout << "Error: PartialWordAccess_arm64_NEON(" << num_bytes << ")::load_int_no_read_past_end(), i = " << i << " is " << int(x[i])
                     << ", but should be " << int(buffer[i+16]) << endl;
@@ -969,18 +969,18 @@ int test_binary_matrix_tile(){
             }
         }
         x = partial.load_int_no_read_before_ptr(buffer+16);
-        for(size_t i = 0; i < num_bytes; ++i){
+        for (size_t i = 0; i < num_bytes; ++i){
             if (x[i] != buffer[i+16]){
                 cout << "Error: PartialWordAccess_arm64_NEON(" << num_bytes << ")::load_int_no_read_before_ptr(), i = " << i << " is " << int(x[i])
                     << ", but should be " << int(buffer[i+16]) << endl;
                 return 1;
             }
         }
-        for(int i = 0; i < 48; i++){
+        for (int i = 0; i < 48; i++){
             buffer[i] = 99;
         }
         partial.store_int_no_past_end(buffer+16, x);
-        for(size_t i = 0; i < num_bytes; ++i){
+        for (size_t i = 0; i < num_bytes; ++i){
             if (x[i] != buffer[i+16]){
                 cout << "Error: PartialWordAccess_arm64_NEON(" << num_bytes << ")::store_int_no_past_end(), i = " << i << " is " << int(buffer[i+16])
                     << ", but should be " << int(x[i+16]) << endl;

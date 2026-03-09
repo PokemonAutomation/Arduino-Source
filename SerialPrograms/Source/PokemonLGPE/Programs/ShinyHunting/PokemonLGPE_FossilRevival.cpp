@@ -133,8 +133,7 @@ void FossilRevival::run_revives(SingleSwitchProgramEnvironment& env, JoyconConte
             "Failed to revive fossil.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Fossil revived.");
     }
 
@@ -157,8 +156,7 @@ void FossilRevival::run_revives(SingleSwitchProgramEnvironment& env, JoyconConte
             "Did not detect summary over.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Summary closed/Pokemon tucked away in box/team.");
     }
 
@@ -269,8 +267,7 @@ void FossilRevival::program(SingleSwitchProgramEnvironment& env, CancellableScop
                 context.wait_for_all_requests();
                 pbf_wait(context, 5000ms);
                 context.wait_for_all_requests();
-            }
-            else {
+            }else{
                 env.log("Not shiny.");
             }
 

@@ -92,8 +92,7 @@ void log_qtkey(Logger& logger, const QtKeyMap::QtKey& qtkey){
     const KeyboardInputMappings& azerty_hid_map = KEYID_TO_HID_AZERTY();
     if (auto iter = azerty_hid_map.find(qtkey); iter != azerty_hid_map.end()){
         ss << " mapped to AZERTY HID key " << KEYBOARDKEY_TO_STRING().at(iter->second);
-    }
-    else {
+    }else{
         ss << " has no AZERTY HID mapping";
     }
 

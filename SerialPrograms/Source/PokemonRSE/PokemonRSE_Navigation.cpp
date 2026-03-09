@@ -144,8 +144,7 @@ bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool s
         );
         if (ret == 0){
             stream.log("Battle menu detecteed!");
-        }
-        else {
+        }else{
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "handle_encounter(): Did not detect battle menu.",

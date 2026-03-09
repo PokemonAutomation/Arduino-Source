@@ -296,7 +296,7 @@ void DonutMaker::animation_to_donut(SingleSwitchProgramEnvironment& env, ProCont
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            for(int i = 0; i < 20; i++){
+            for (int i = 0; i < 20; i++){
                 pbf_press_button(context, BUTTON_A, 100ms, 400ms);
             }
         },
