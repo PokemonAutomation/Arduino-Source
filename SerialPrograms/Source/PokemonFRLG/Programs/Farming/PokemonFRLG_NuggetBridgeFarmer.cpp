@@ -234,6 +234,9 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
         stats.nuggets++;
         env.update_stats();
 
+        if (STOP_AFTER_CURRENT.should_stop()) {
+            break;
+        }
     }
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

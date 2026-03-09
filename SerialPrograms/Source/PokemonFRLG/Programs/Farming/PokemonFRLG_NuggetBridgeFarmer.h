@@ -20,38 +20,38 @@ namespace PokemonFRLG{
 
 class NuggetBridgeFarmer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-    NuggetBridgeFarmer_Descriptor();
-    struct Stats;
+	NuggetBridgeFarmer_Descriptor();
+	struct Stats;
 	virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 class NuggetBridgeFarmer : public SingleSwitchProgramInstance {
 public:
-    NuggetBridgeFarmer();
-    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
-    virtual void start_program_border_check(
-        VideoStream& stream,
-        FeedbackType feedback_type
-    ) override {
-    }
+	NuggetBridgeFarmer();
+	virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
+	virtual void start_program_border_check(
+		VideoStream& stream,
+		FeedbackType feedback_type
+	) override {
+	}
 
 private:
 
-    DeferredStopButtonOption STOP_AFTER_CURRENT;
-    SimpleIntegerOption<uint32_t> NUM_NUGGETS;
-    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+	DeferredStopButtonOption STOP_AFTER_CURRENT;
+	SimpleIntegerOption<uint32_t> NUM_NUGGETS;
+	GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    //SimpleIntegerOption<uint32_t> PERIODIC_SAVE;
+	//SimpleIntegerOption<uint32_t> PERIODIC_SAVE;
 
-    EventNotificationOption NOTIFICATION_STATUS_UPDATE;
-    EventNotificationsOption NOTIFICATIONS;
+	EventNotificationOption NOTIFICATION_STATUS_UPDATE;
+	EventNotificationsOption NOTIFICATIONS;
 
 };
 
 }
 }
 }
-     
+	 
 
 
 
