@@ -135,12 +135,12 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
         env.console.log("Navigating to Team Rocket member...");
 
         ssf_press_button(context, BUTTON_B, 0ms, 12000ms);
-        ssf_press_dpad(context, DPAD_LEFT, 0ms, 590ms);
-        ssf_press_dpad(context, DPAD_UP, 0ms, 510ms);
-        ssf_press_dpad(context, DPAD_LEFT, 0ms, 1550ms);
-        ssf_press_dpad(context, DPAD_UP, 0ms, 1175ms);
-        ssf_press_dpad(context, DPAD_RIGHT, 0ms, 1950ms);
-        ssf_press_dpad(context, DPAD_UP, 0ms, 5300ms);
+        pbf_press_dpad(context, DPAD_LEFT, 590ms, 0ms);
+        pbf_press_dpad(context, DPAD_UP, 510ms, 0ms);
+        pbf_press_dpad(context, DPAD_LEFT, 1550ms, 0ms);
+        pbf_press_dpad(context, DPAD_UP, 1175ms, 0ms);
+        pbf_press_dpad(context, DPAD_RIGHT, 1950ms, 0ms);
+        pbf_press_dpad(context, DPAD_UP, 5300ms, 0ms);
 
         context.wait_for_all_requests();
 
