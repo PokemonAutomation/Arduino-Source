@@ -86,7 +86,8 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
     NuggetBridgeFarmer_Descriptor::Stats& stats = env.current_stats<NuggetBridgeFarmer_Descriptor::Stats>();
     DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
 
-    for (uint32_t nuggets_since_last_save = 0;; nuggets_since_last_save++) {
+    //for (uint32_t nuggets_since_last_save = 0;; nuggets_since_last_save++) {
+    while (true) {
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         if (NUM_NUGGETS != 0 && stats.nuggets >= NUM_NUGGETS) {
             break;
