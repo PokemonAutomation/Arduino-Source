@@ -12,6 +12,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
+#include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_NuggetBridgeFarmer.h"
 
 namespace PokemonAutomation{
@@ -83,6 +84,8 @@ NuggetBridgeFarmer::NuggetBridgeFarmer()
 
 void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
 
+    home_black_border_check(env.console, context);
+
     NuggetBridgeFarmer_Descriptor::Stats& stats = env.current_stats<NuggetBridgeFarmer_Descriptor::Stats>();
     DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
 
@@ -94,8 +97,7 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
         }
 
         env.console.log("Exiting Pokemon Center...");
-        while (true)
-        {
+        while (true){
             BlackScreenWatcher pokemon_ceter_exit(COLOR_RED);
 
             int ret = run_until<ProControllerContext>(
@@ -110,9 +112,24 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
                 break;
             }
         }
-        // Wait for the screen to load after exiting. 
-        // TODO: Is there something we can watch for instead of just waiting a fixed time?
-        pbf_wait(context, 2300ms);
+
+        env.console.log("Detecting overworld...");
+        while (true) {
+            BlackScreenOverWatcher overworld_entered(COLOR_RED);
+
+            int ret = wait_until(
+                env.console, context,
+                std::chrono::milliseconds(2000),
+                {overworld_entered}
+            );
+
+            if (ret == 0) {
+                break;
+            }
+        }
+
+        // There is a small delay from seeing the overworld to being able to a actually move.
+        pbf_wait(context, 1000ms);
         context.wait_for_all_requests();
 
         env.console.log("Navigating to Team Rocket member...");
@@ -128,8 +145,7 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
         context.wait_for_all_requests();
 
         env.console.log("Starting battle...");
-        while (true)
-        {
+        while (true){
             BattleMenuWatcher battle_menu(COLOR_RED);
 
             int ret = run_until<ProControllerContext>(
@@ -146,8 +162,7 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
         }
 
         env.console.log("Loosing battle...");
-        while (true)
-        {
+        while (true){
             BlackScreenWatcher battle_lost(COLOR_RED);
 
             int ret = run_until<ProControllerContext>(
@@ -164,8 +179,7 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
         }
 
         env.console.log("Talking to nurse joy...");
-        while (true)
-        {
+        while (true){
             WhiteDialogWatcher nurse_joy_dialog(COLOR_RED);
             int ret = run_until<ProControllerContext>(
                 env.console, context,
@@ -181,8 +195,7 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
         }
 
         // Spam B till nurse joy stops talking
-        while (true)
-        {
+        while (true){
             WhiteDialogWatcher nurse_joy_dialog(COLOR_RED);
             int ret = run_until<ProControllerContext>(
                 env.console, context,
