@@ -49,10 +49,10 @@ std::unique_ptr<StatsTracker> NuggetBridgeFarmer_Descriptor::make_stats() const{
 }
 
 NuggetBridgeFarmer::NuggetBridgeFarmer()
-    : STOP_AFTER_CURRENT("Battle")
+    : STOP_AFTER_CURRENT("Nugget")
     , NUM_NUGGETS(
         "<b>Number of Nuggets:</b><br>"
-        "Zero will run until 'Stop after Current Battle' is pressed or the program is manually stopped.",
+        "Zero will run until 'Stop after Current Nugget' is pressed or the program is manually stopped.",
         LockMode::UNLOCK_WHILE_RUNNING, 
         120, // About 2 hours of farming. 
         0
