@@ -256,8 +256,36 @@ void go_to_summary(ProControllerContext& context){
     pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
     pbf_move_left_joystick(context, {0, +1}, 200ms, 1300ms);
     pbf_move_left_joystick(context, {0, +1}, 200ms, 1300ms);
+    // open summary
     pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
     pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
+}
+
+bool use_sweet_scent(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& DOUBLE_DELAY){
+    // Navigate to last party slot
+    pbf_press_button(context, BUTTON_PLUS, 200ms, 800ms);
+    pbf_move_left_joystick(context, {0, -1}, 200ms, 1800ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
+    pbf_move_left_joystick(context, {0, +1}, 200ms, 1300ms);
+    pbf_move_left_joystick(context, {0, +1}, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+    // hover over Sweet Scent (2nd option, maybe HMs change this)
+    pbf_move_left_joystick(context, {0, -1}, 200ms, std::chrono::milliseconds(DOUBLE_DELAY - 8400));
+    // 8000ms
+    pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+    context.wait_for_all_requests();
+    BlackScreenWatcher battle_entered(COLOR_RED);
+    run_until<ProControllerContext>(
+        env.console, context,
+        [](ProControllerContext& context) {
+            while (true){
+                pbf_wait(context, 100ms);
+            }
+        },
+        { battle_entered }
+    );
+    bool encounter_shiny = handle_encounter(env.console, context, false);
+    return encounter_shiny;
 }
 
 void take_summary_pictures(ProControllerContext& context){
@@ -302,7 +330,6 @@ void RNGManipulator::program(SingleSwitchProgramEnvironment& env, ProControllerC
     RNGManipulator_Descriptor::Stats& stats = env.current_stats<RNGManipulator_Descriptor::Stats>();
 
     bool shiny_found = false;
-    uint64_t num_resets = 0;
 
     double FRAMERATE = 59.7275; // valid for GBA, but not sure for Switch
     uint64_t LOAD_DELAY;
@@ -381,11 +408,8 @@ void RNGManipulator::program(SingleSwitchProgramEnvironment& env, ProControllerC
                 env.console
             );
         }else if (TARGET == Target::sweetscent){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Sweet Scent hunt not implemented",
-                env.console
-            );
+            shiny_found = use_sweet_scent(env, context, DOUBLE_DELAY);
+            context.wait_for_all_requests();
         }else if (TARGET == Target::wildwalk){
             shiny_found = grass_walk_after_delay(env, context, DOUBLE_DELAY);
             context.wait_for_all_requests();
@@ -403,8 +427,7 @@ void RNGManipulator::program(SingleSwitchProgramEnvironment& env, ProControllerC
             );
         }
 
-        num_resets++;
-
+        stats.resets++;
         if (shiny_found){
             env.log("Shiny found!");
             stats.shinies++;
@@ -418,7 +441,7 @@ void RNGManipulator::program(SingleSwitchProgramEnvironment& env, ProControllerC
                 true
             );
             break;
-        }else if (num_resets >= NUM_RESETS){
+        }else if (stats.resets >= NUM_RESETS){
             send_program_status_notification(
                 env, NOTIFICATION_STATUS_UPDATE,
                 "Maximum resets reached."
@@ -431,7 +454,6 @@ void RNGManipulator::program(SingleSwitchProgramEnvironment& env, ProControllerC
                 env, NOTIFICATION_STATUS_UPDATE,
                 "Resetting."
             );
-            stats.resets++;
             env.update_stats();
             context.wait_for_all_requests();
         }
