@@ -65,13 +65,37 @@ stages:
 #    condition: always()
 
 ###########################################
+#        SET VERSION BUILD NUMBER         #
+###########################################
+
+- stage: Set_Build_Number
+  displayName: 'Set Build Number'
+  dependsOn: []
+  condition: succeeded()
+
+  jobs:
+    - job: SetVersion
+      displayName: 'Set Build Number to Version'
+      timeoutInMinutes: 10
+      pool: server
+
+      steps:
+        - script: |
+            VERSION="$v{{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
+            echo "Setting build number to $VERSION"
+            echo "##vso[build.updatebuildnumber]$VERSION"
+          displayName: 'Set Build Number to Version'
+
+
+###########################################
 #         WINDOWS BUILD JOB               #
 ###########################################
 
 - stage: Windows_Build_x64
   displayName: Windows Build x64
-  #dependsOn: Wake_Up_Signal
-  dependsOn: []
+  dependsOn:
+    #- Wake_Up_Signal
+    - Set_Build_Number
   condition: and(succeeded(), or(eq('${{ parameters.targetOS }}', 'Windows'), eq('${{ parameters.targetOS }}', 'All')))
 
   jobs:
@@ -232,8 +256,9 @@ stages:
 
 - stage: Linux_Build_x64
   displayName: Linux Build x64
-  #dependsOn: Wake_Up_Signal
-  dependsOn: []
+  dependsOn:
+    #- Wake_Up_Signal
+    - Set_Build_Number
   condition: and(succeeded(), or(eq('${{ parameters.targetOS }}', 'Linux'), eq('${{ parameters.targetOS }}', 'All')))
 
   jobs:
@@ -399,6 +424,7 @@ stages:
   parameters:
     stageName: MacOS_Build_ARM64
     displayName: 'MacOS Build ARM64'
+    dependsOnStage: Set_Build_Number
     targetOS: ${{ parameters.targetOS }}
     poolName: ApplePool
     imageName: macos-26
@@ -420,6 +446,7 @@ stages:
   parameters:
     stageName: MacOS_Build_x64
     displayName: 'MacOS Build x64'
+    dependsOnStage: Set_Build_Number
     targetOS: ${{ parameters.targetOS }}
     poolName: ApplePool
     imageName: macos-15

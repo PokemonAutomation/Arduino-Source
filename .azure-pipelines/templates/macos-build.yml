@@ -4,6 +4,7 @@
 parameters:
   stageName: ''
   displayName: ''
+  dependsOnStage: ''
   targetOS: ''
   poolName: ''
   imageName: ''
@@ -24,7 +25,7 @@ parameters:
 stages:
 - stage: ${{ parameters.stageName }}
   displayName: ${{ parameters.displayName }}
-  dependsOn: []
+  dependsOn: ${{ parameters.dependsOnStage }}
   condition: ${{ parameters.condition }}
 
   jobs:
