@@ -77,11 +77,12 @@ stages:
     - job: SetVersion
       displayName: 'Set Build Number to Version'
       timeoutInMinutes: 10
-      pool: server
+      pool:
+        vmImage: ubuntu-latest
 
       steps:
         - script: |
-            VERSION="$v{{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
+            VERSION="v${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
             echo "Setting build number to $VERSION"
             echo "##vso[build.updatebuildnumber]$VERSION"
           displayName: 'Set Build Number to Version'
