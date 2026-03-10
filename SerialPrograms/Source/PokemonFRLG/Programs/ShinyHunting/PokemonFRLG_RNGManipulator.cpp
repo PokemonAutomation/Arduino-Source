@@ -4,7 +4,7 @@
  *
  */
 
- #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -146,9 +146,7 @@ void hard_reset(ProControllerContext& context){
     pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
     // press A to select game
     pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
-    // press A to select profile and immediately go back to the home screen
-    // pbf_press_button(context, BUTTON_A, 100ms, 100ms);
-    // pbf_press_button(context, BUTTON_HOME, 200ms, 2800ms);
+    // press A to select profile and launch the game
     pbf_press_button(context, BUTTON_A, 200ms, 0ms);
 }
 
