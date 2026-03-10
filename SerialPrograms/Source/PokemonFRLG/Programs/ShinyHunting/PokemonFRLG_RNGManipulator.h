@@ -42,7 +42,7 @@ private:
         starters,
         magikarp,
         // hitmon,
-        // eevee,
+        eevee,
         // lapras,
         // fossils,
         sweetscent,

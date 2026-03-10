@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+ #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -61,7 +61,7 @@ RNGManipulator::RNGManipulator()
             {Target::starters, "starters", "Bulbasaur / Squirtle / Charmander"},
             {Target::magikarp, "magikarp", "Magikarp"},
             // {Target::hitmon, "hitmon", "Hitmonlee / Hitmonchan"},
-            // {Target::eevee, "eevee", "Eevee"},
+            {Target::eevee, "eevee", "Eevee"},
             // {Target::lapras, "lapras", "Lapras"},
             // {Target::fossils, "fossils", "Omanyte / Kabuto / Aerodactyl"},
             {Target::sweetscent, "sweetscent", "Sweet Scent for wild encounters"},
@@ -147,13 +147,46 @@ void hard_reset(ProControllerContext& context){
     // press A to select game
     pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
     // press A to select profile and immediately go back to the home screen
-    pbf_press_button(context, BUTTON_A, 100ms, 100ms);
-    pbf_press_button(context, BUTTON_HOME, 200ms, 2800ms);
+    // pbf_press_button(context, BUTTON_A, 100ms, 100ms);
+    // pbf_press_button(context, BUTTON_HOME, 200ms, 2800ms);
     pbf_press_button(context, BUTTON_A, 200ms, 0ms);
 }
 
 void soft_reset(ProControllerContext& context){
     pbf_press_button(context, BUTTON_B | BUTTON_A | BUTTON_X | BUTTON_Y, 200ms, 0ms);
+}
+
+uint64_t wait_for_copyright_text(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    // wait for copyright text to appear
+    BlackScreenWatcher black_screen(COLOR_RED);
+    context.wait_for_all_requests();
+    int black_ret = wait_until(
+        env.console, context, 2000ms,
+        {black_screen}
+    );
+    if (black_ret != 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Black screen not detected after starting game.",
+            env.console
+        );
+    }
+    BlackScreenOverWatcher copyright_detected(COLOR_RED);
+    context.wait_for_all_requests();
+    WallClock start_time = current_time();
+    int ret = wait_until(
+        env.console, context, 2000ms,
+        {copyright_detected}
+    );
+    if (ret != 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Black screen detected for more than 2 seconds.",
+            env.console
+        );
+    }
+    auto elapsed = current_time() - start_time;
+    return std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
 }
 
 void set_seed_after_delay(ProControllerContext& context, SimpleIntegerOption<uint64_t>& SEED_DELAY){
@@ -194,6 +227,16 @@ void collect_magikarp_after_delay(ProControllerContext& context, uint64_t& DOUBL
     pbf_press_button(context, BUTTON_B, 200ms, 1300ms);
 }
 
+
+void collect_eevee_after_delay(ProControllerContext& context, uint64_t& DOUBLE_DELAY){
+    // No dialogue to advance through -- just wait
+    pbf_wait(context, std::chrono::milliseconds(DOUBLE_DELAY - 4000));
+    // Interact with the pokeball
+    pbf_press_button(context, BUTTON_A, 200ms, 3800ms);
+    // Decline nickname
+    pbf_press_button(context, BUTTON_B, 200ms, 1300ms);
+}
+
 void go_to_starter_summary(ProControllerContext& context){
     // Navigate to summary (1st party slot)
     pbf_press_button(context, BUTTON_PLUS, 200ms, 800ms);
@@ -227,15 +270,17 @@ bool use_sweet_scent(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     pbf_press_button(context, BUTTON_A, 200ms, 800ms);
     context.wait_for_all_requests();
     BlackScreenWatcher battle_entered(COLOR_RED);
-    run_until<ProControllerContext>(
-        env.console, context,
-        [](ProControllerContext& context) {
-            while (true){
-                pbf_wait(context, 100ms);
-            }
-        },
-        { battle_entered }
+    int ret = wait_until(
+        env.console, context, 10000ms,
+        {battle_entered}
     );
+    if (ret != 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Sweet Scent failed to initiate encounter.",
+            env.console
+        );
+    }
     bool encounter_shiny = handle_encounter(env.console, context, false);
     return encounter_shiny;
 }
@@ -292,8 +337,8 @@ void RNGManipulator::program(SingleSwitchProgramEnvironment& env, ProControllerC
     while (!shiny_found){
         LOAD_DELAY = uint64_t((LOAD_ADVANCES)/ FRAMERATE * 1000);
         DOUBLE_DELAY = uint64_t((DOUBLE_ADVANCES)/ FRAMERATE * 500);
-        env.log("Load screen delay: " + std::to_string(LOAD_DELAY));
-        env.log("In-game delay: " + std::to_string(DOUBLE_DELAY));
+        env.log("Load screen delay: " + std::to_string(LOAD_DELAY) + "ms");
+        env.log("In-game delay: " + std::to_string(DOUBLE_DELAY) + "ms");
         if (RESET_TYPE == ResetType::hard){
             hard_reset(context);
         }else if (RESET_TYPE == ResetType::soft){
@@ -305,6 +350,9 @@ void RNGManipulator::program(SingleSwitchProgramEnvironment& env, ProControllerC
                 env.console
             );
         }
+
+        uint64_t STARTUP_DELAY = wait_for_copyright_text(env, context);
+        env.log("Sstartup delay: " + std::to_string(STARTUP_DELAY) + "ms");
 
         set_seed_after_delay(context, SEED_DELAY);
         load_game_after_delay(context, LOAD_DELAY);
@@ -330,6 +378,19 @@ void RNGManipulator::program(SingleSwitchProgramEnvironment& env, ProControllerC
             }
             context.wait_for_all_requests();
             env.log("Magikarp collected.");
+
+            screen = env.console.video().snapshot();
+
+            ShinySymbolDetector shiny_checker(COLOR_YELLOW);
+            shiny_found = shiny_checker.read(env.console.logger(), screen);
+        }else if (TARGET == Target::eevee) {
+            collect_eevee_after_delay(context, DOUBLE_DELAY);
+            go_to_summary(context);
+            if (TAKE_PICTURES){
+                take_summary_pictures(context);
+            }
+            context.wait_for_all_requests();
+            env.log("Eevee collected.");
 
             screen = env.console.video().snapshot();
 
