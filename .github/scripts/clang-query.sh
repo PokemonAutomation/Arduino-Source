@@ -140,6 +140,23 @@ echo "Generating changed_files.txt from git diff."
 # git diff with relative paths
 git diff --name-only origin/main...HEAD > "$TMP_DIR/changed_files.txt"
 
+# if [ "$GITHUB_ACTIONS" == "true" ]; then
+#     if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
+#         # Compare PR branch to target branch (main)
+#         BASE="origin/$GITHUB_BASE_REF"
+#     else
+#         # Compare current push to previous state
+#         BASE="${{ github.event.before }}"
+#     fi
+#     HEAD="$GITHUB_SHA"
+# else
+#     # LOCAL: Compare local main to the last known state on server
+#     # (Assuming you are on main and want to see what you just pushed/changed)
+#     git fetch origin main
+#     BASE="origin/main"
+#     HEAD="HEAD"
+# fi
+
 echo "Generating files_to_query.txt, based on changed_files.txt and deps.json."
 
 # for each line in changed_files_unix.txt, search deps.json to find all their dependants
