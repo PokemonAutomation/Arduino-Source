@@ -1414,6 +1414,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.h
     Source/PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.cpp
     Source/PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h
+    Source/PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.cpp
+    Source/PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.h
     Source/PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.cpp
     Source/PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h
     Source/PokemonFRLG/PokemonFRLG_Navigation.cpp
@@ -1424,6 +1426,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/PokemonFRLG_Settings.h
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_NuggetBridgeFarmer.cpp
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_NuggetBridgeFarmer.h
+    Source/PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.cpp
+    Source/PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_GiftReset.cpp
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_GiftReset.h
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_LegendaryReset.cpp

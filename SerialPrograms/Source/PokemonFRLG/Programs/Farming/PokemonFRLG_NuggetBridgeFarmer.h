@@ -41,7 +41,7 @@ private:
     SimpleIntegerOption<uint32_t> NUM_NUGGETS;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    //SimpleIntegerOption<uint32_t> PERIODIC_SAVE;
+    SimpleIntegerOption<uint32_t> PERIODIC_SAVE;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
