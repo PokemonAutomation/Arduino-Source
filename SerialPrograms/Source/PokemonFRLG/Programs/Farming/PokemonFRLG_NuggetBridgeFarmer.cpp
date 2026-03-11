@@ -57,7 +57,7 @@ NuggetBridgeFarmer::NuggetBridgeFarmer()
         "<b>Number of Nuggets:</b><br>"
         "Zero will run until 'Stop after Current Nugget' is pressed or the program is manually stopped.",
         LockMode::UNLOCK_WHILE_RUNNING, 
-        120, // About 2 hours of farming. 
+        100, // About 2 hours of farming. 
         0
     )
     , GO_HOME_WHEN_DONE(false)
@@ -65,7 +65,7 @@ NuggetBridgeFarmer::NuggetBridgeFarmer()
         "<b>Periodically Save:</b><br>"
         "Save the game every this many nuggets. This reduces the loss to game crashes. Set to zero to disable.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        10,
+        50,
         0
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
