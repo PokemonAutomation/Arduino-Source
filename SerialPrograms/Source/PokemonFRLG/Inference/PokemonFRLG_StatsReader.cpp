@@ -5,7 +5,6 @@
  */
 
 #include "PokemonFRLG_StatsReader.h"
-#include "PokemonFRLG_DigitReader.h"
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -19,6 +18,7 @@
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Inference/Pokemon_NatureReader.h"
 #include "PokemonFRLG/PokemonFRLG_Settings.h"
+#include "PokemonFRLG_DigitReader.h"
 #include <opencv2/imgproc.hpp>
 
 namespace PokemonAutomation {
@@ -147,32 +147,35 @@ void StatsReader::read_page1(Logger &logger, Language language,
   }
 
   ImageViewRGB32 level_box = extract_box_reference(game_screen, m_box_level);
-  
-  // As per user request, upscale the level box without additional blur/morphological filters.
-  ImageRGB32 level_upscaled = level_box.scale_to(level_box.width() * 4, level_box.height() * 4);
+
+  // As per user request, upscale the level box without additional
+  // blur/morphological filters.
+  ImageRGB32 level_upscaled =
+      level_box.scale_to(level_box.width() * 4, level_box.height() * 4);
   level_upscaled.save("DebugDumps/ocr_level_upscaled.png");
-  
-  // The level has a colored (lilac) background. The text is white, with a gray/black shadow.
-  // To bridge the gaps and make a solid black character on a white background:
-  // We want to turn BOTH the bright white text AND the dark shadow into BLACK pixels,
-  // and turn the mid-tone lilac background into WHITE.
-  // We can do this by keeping pixels that are very bright (text) or very dark (shadow).
-  
+
+  // The level has a colored (lilac) background. The text is white, with a
+  // gray/black shadow. To bridge the gaps and make a solid black character on a
+  // white background: We want to turn BOTH the bright white text AND the dark
+  // shadow into BLACK pixels, and turn the mid-tone lilac background into
+  // WHITE. We can do this by keeping pixels that are very bright (text) or very
+  // dark (shadow).
+
   ImageRGB32 level_ready(level_upscaled.width(), level_upscaled.height());
   for (size_t r = 0; r < level_upscaled.height(); r++) {
-      for (size_t c = 0; c < level_upscaled.width(); c++) {
-          Color pixel(level_upscaled.pixel(c, r));
-          // If it's very bright (white text) OR very dark (shadow), it becomes black text.
-          // Otherwise (lilac background), it becomes white background.
-          if ((pixel.red() > 200 && pixel.green() > 200 && pixel.blue() > 200) || 
-              (pixel.red() < 100 && pixel.green() < 100 && pixel.blue() < 100)) {
-              level_ready.pixel(c, r) = (uint32_t)0xff000000; // Black
-          } else {
-              level_ready.pixel(c, r) = (uint32_t)0xffffffff; // White
-          }
+    for (size_t c = 0; c < level_upscaled.width(); c++) {
+      Color pixel(level_upscaled.pixel(c, r));
+      // If it's very bright (white text) OR very dark (shadow), it becomes
+      // black text. Otherwise (lilac background), it becomes white background.
+      if ((pixel.red() > 200 && pixel.green() > 200 && pixel.blue() > 200) ||
+          (pixel.red() < 100 && pixel.green() < 100 && pixel.blue() < 100)) {
+        level_ready.pixel(c, r) = (uint32_t)0xff000000; // Black
+      } else {
+        level_ready.pixel(c, r) = (uint32_t)0xffffffff; // White
       }
+    }
   }
-  
+
   level_ready.save("DebugDumps/ocr_level_ready.png");
 
   if (!GlobalSettings::instance().USE_PADDLE_OCR) {
@@ -194,12 +197,19 @@ void StatsReader::read_page1(Logger &logger, Language language,
       }
     }
     preprocessed.save("DebugDumps/ocr_level_preprocessed.png");
+    // Trim left 10% to exclude the "L" glyph blob (always at x≈0).
+    // The actual level digits start at ~13%+ of the box width.
+    size_t lv_skip = preprocessed.width() * 10 / 100;
+    ImagePixelBox digits_bbox(lv_skip, 0, preprocessed.width(),
+                              preprocessed.height());
+    ImageViewRGB32 level_digit_view =
+        extract_box_reference(preprocessed, digits_bbox);
+    level_digit_view.save("DebugDumps/ocr_level_digits_trimmed.png");
+    // Use threshold 230 (not 175): lilac-background blob crops inherently
+    // give higher RMSD than yellow stat-box crops due to background colour.
     stats.level = read_digits_waterfill_template(
-        logger, preprocessed, 175.0,
-        "PokemonFRLG/LevelDigits/", "levelDigit",
-        0x7F  // tighter threshold: prevents blurred lilac (B~208→~156) from
-              // being captured as foreground (190 threshold would capture it)
-    );
+        logger, level_digit_view, 230.0, "PokemonFRLG/LevelDigits/",
+        "levelDigit", 0x7F);
   } else {
     // Pass the binarized image to PaddleOCR
     stats.level = OCR::read_number(logger, level_ready, language);
