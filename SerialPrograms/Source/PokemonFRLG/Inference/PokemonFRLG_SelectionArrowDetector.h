@@ -14,16 +14,21 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
 
-enum class SelectionArrowPosition{
-    START_MENU_POKEDEX,
-    START_MENU_POKEMON,
-    START_MENU_BAG,
-    START_MENU_TRAINER,
-    START_MENU_SAVE,
-    START_MENU_OPTION,
-    START_MENU_EXIT,
-    CHOICE_MENU_YES,
-    CHOICE_MENU_NO
+const int START_MENU_OPTION_COUNT = 7;
+// The order of these enums should be the same as the order of options in the game menu, from top to bottom, for ease of use with loops.
+enum class SelectionArrowPositionStartMenu{
+    POKEDEX,
+    POKEMON,
+    BAG,
+    TRAINER,
+    SAVE,
+    OPTION,
+    EXIT
+};
+
+enum class SelectionArrowPositionConfirmationMenu {
+    YES,
+    NO
 };
 
 class SelectionArrowDetector : public StaticScreenDetector{
@@ -37,10 +42,18 @@ public:
     SelectionArrowDetector(
         Color color,
         VideoOverlay* overlay,
-        SelectionArrowPosition position
+        SelectionArrowPositionStartMenu position
     );
 
-    static ImageFloatBox arrow_box_for_position(SelectionArrowPosition position);
+    SelectionArrowDetector(
+        Color color,
+        VideoOverlay* overlay,
+        SelectionArrowPositionConfirmationMenu position
+    );
+
+    static ImageFloatBox arrow_box_for_position(SelectionArrowPositionStartMenu position);
+    
+    static ImageFloatBox arrow_box_for_position(SelectionArrowPositionConfirmationMenu position);
 
     const ImageFloatBox& last_detected() const { return m_last_detected; }
 
@@ -72,7 +85,16 @@ public:
     SelectionArrowWatcher(
         Color color,
         VideoOverlay* overlay,
-        SelectionArrowPosition position,
+        SelectionArrowPositionStartMenu position,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
+    )
+        : DetectorToFinder("SelectionArrowWatcher", hold_duration, color, overlay, arrow_box_for_position(position))
+    {
+    }
+    SelectionArrowWatcher(
+        Color color,
+        VideoOverlay* overlay,
+        SelectionArrowPositionConfirmationMenu position,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
     )
         : DetectorToFinder("SelectionArrowWatcher", hold_duration, color, overlay, arrow_box_for_position(position))

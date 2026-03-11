@@ -13,25 +13,33 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
 
-ImageFloatBox SelectionArrowDetector::arrow_box_for_position(SelectionArrowPosition position){
+ImageFloatBox SelectionArrowDetector::arrow_box_for_position(SelectionArrowPositionStartMenu position){
     switch (position){
-    case SelectionArrowPosition::START_MENU_POKEDEX:
+    case SelectionArrowPositionStartMenu::POKEDEX:
         return ImageFloatBox(0.685, 0.055, 0.03, 0.075);
-    case SelectionArrowPosition::START_MENU_POKEMON:
+    case SelectionArrowPositionStartMenu::POKEMON:
         return ImageFloatBox(0.685, 0.145, 0.03, 0.075);
-    case SelectionArrowPosition::START_MENU_BAG:
+    case SelectionArrowPositionStartMenu::BAG:
         return ImageFloatBox(0.685, 0.235, 0.03, 0.075);
-    case SelectionArrowPosition::START_MENU_TRAINER:
+    case SelectionArrowPositionStartMenu::TRAINER:
         return ImageFloatBox(0.685, 0.330, 0.03, 0.075);
-    case SelectionArrowPosition::START_MENU_SAVE:
+    case SelectionArrowPositionStartMenu::SAVE:
         return ImageFloatBox(0.685, 0.415, 0.03, 0.075);
-    case SelectionArrowPosition::START_MENU_OPTION:
+    case SelectionArrowPositionStartMenu::OPTION:
         return ImageFloatBox(0.685, 0.510, 0.03, 0.075);
-    case SelectionArrowPosition::START_MENU_EXIT:
+    case SelectionArrowPositionStartMenu::EXIT:
         return ImageFloatBox(0.685, 0.6, 0.03, 0.075);
-    case SelectionArrowPosition::CHOICE_MENU_YES:
+    default:
+        break;
+    }
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid FRLG Selection Arrow Position");
+}
+
+ImageFloatBox SelectionArrowDetector::arrow_box_for_position(SelectionArrowPositionConfirmationMenu position) {
+    switch (position) {
+    case SelectionArrowPositionConfirmationMenu::YES:
         return ImageFloatBox(0.660, 0.450, 0.03, 0.075);
-    case SelectionArrowPosition::CHOICE_MENU_NO:
+    case SelectionArrowPositionConfirmationMenu::NO:
         return ImageFloatBox(0.660, 0.535, 0.03, 0.075);
     default:
         break;
@@ -71,12 +79,22 @@ SelectionArrowDetector::SelectionArrowDetector(
 SelectionArrowDetector::SelectionArrowDetector(
     Color color, 
     VideoOverlay* overlay, 
-    SelectionArrowPosition position
+    SelectionArrowPositionStartMenu position
 )
     : m_color(color)
     , m_overlay(overlay)
     , m_arrow_box(arrow_box_for_position(position))
 {}
+SelectionArrowDetector::SelectionArrowDetector(
+    Color color,
+    VideoOverlay* overlay,
+    SelectionArrowPositionConfirmationMenu position
+)
+    : m_color(color)
+    , m_overlay(overlay)
+    , m_arrow_box(arrow_box_for_position(position))
+{
+}
 void SelectionArrowDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_arrow_box);
 }
