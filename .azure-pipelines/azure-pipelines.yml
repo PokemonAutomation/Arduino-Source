@@ -441,8 +441,8 @@ stages:
 
           ARTIFACT_PATH_UBUNTU="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).$EXT"
           echo "##vso[task.setvariable variable=ARTIFACT_PATH_UBUNTU]$ARTIFACT_PATH_UBUNTU"
-         displayName: 'Set artifact path'
-         condition: succeeded()
+        displayName: 'Set artifact path'
+        condition: succeeded()
 
       - task: PublishBuildArtifacts@1
         displayName: 'Publish SerialPrograms'
