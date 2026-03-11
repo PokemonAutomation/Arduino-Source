@@ -40,6 +40,24 @@ int read_digits_waterfill_template(
                                    // use 0x7F=127 for lilac level box
 );
 
+// Read a string of decimal digits from `stat_region` by splitting the region into
+// a fixed number of equal-width segments, instead of using waterfill.
+// Useful when digits are tightly packed or overlapping and waterfill merges them.
+//
+// num_splits       The number of equal-width segments to split the region into.
+// template_subdir  Resource subdirectory containing 0-9.png templates.
+// dump_prefix      Prefix used when saving debug crop PNGs to DebugDumps/.
+//
+// Returns the parsed integer, or -1 on failure.
+int read_digits_fixed_width_template(
+    Logger& logger,
+    const ImageViewRGB32& stat_region,
+    int num_splits = 2,
+    double rmsd_threshold = 175.0,
+    const std::string& template_subdir = "PokemonFRLG/LevelDigits/",
+    const std::string& dump_prefix = "digit_split"
+);
+
 } // namespace PokemonFRLG
 } // namespace NintendoSwitch
 } // namespace PokemonAutomation

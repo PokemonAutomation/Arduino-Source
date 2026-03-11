@@ -53,13 +53,13 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const {
                                                 PrizeCornerReset>());
   }
 
-  if (PreloadSettings::instance().DEVELOPER_MODE) {
+
     ret.emplace_back("---- Developer Tools ----");
     ret.emplace_back(
         make_single_switch_program<SoundListener_Descriptor, SoundListener>());
     ret.emplace_back(
         make_single_switch_program<ReadStats_Descriptor, ReadStats>());
-  }
+  
 
   return ret;
 }

@@ -148,8 +148,6 @@ void StatsReader::read_page1(Logger &logger, Language language,
 
   ImageViewRGB32 level_box = extract_box_reference(game_screen, m_box_level);
 
-  // As per user request, upscale the level box without additional
-  // blur/morphological filters.
   ImageRGB32 level_upscaled =
       level_box.scale_to(level_box.width() * 4, level_box.height() * 4);
   level_upscaled.save("DebugDumps/ocr_level_upscaled.png");
@@ -197,9 +195,9 @@ void StatsReader::read_page1(Logger &logger, Language language,
       }
     }
     preprocessed.save("DebugDumps/ocr_level_preprocessed.png");
-    // Trim left 10% to exclude the "L" glyph blob (always at x≈0).
+    // Trim left 7% to exclude the "L" glyph blob (always at x≈0).
     // The actual level digits start at ~13%+ of the box width.
-    size_t lv_skip = preprocessed.width() * 10 / 100;
+    size_t lv_skip = preprocessed.width() * 7 / 100;
     ImagePixelBox digits_bbox(lv_skip, 0, preprocessed.width(),
                               preprocessed.height());
     ImageViewRGB32 level_digit_view =
