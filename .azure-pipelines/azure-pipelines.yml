@@ -85,7 +85,7 @@ stages:
             VERSION="v${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
             echo "Setting build number to $VERSION"
             echo "##vso[build.updatebuildnumber]$VERSION"
-            echo "##vso[build.addbuildtag]BuildType:${{ parameters.buildType }}"
+            echo "##vso[build.addbuildtag]${{ parameters.buildType }}"
           displayName: 'Set Build Number to Version'
 
 
@@ -214,6 +214,7 @@ stages:
           $version = "${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
           $folderName = "SerialPrograms-$version-Windows-x64"
           $name = "SerialPrograms-Windows-$(compiler)-$(architecture)"
+          $buildType = "${{ parameters.buildType }}"
 
           $cacheArtifactsDir = Join-Path $root "cache-artifacts"
           $artifactSubdir = Join-Path $cacheArtifactsDir $name
@@ -224,12 +225,22 @@ stages:
           New-Item -ItemType Directory -Force -Path $tempFolder | Out-Null
           Copy-Item "$root/cache-build/*" $tempFolder -Recurse -Force
 
-          Compress-Archive -Path $tempFolder -DestinationPath "$artifactSubdir/$name.zip"
+          if ($buildType -eq "PrivateBeta") {
+              Write-Host "=== Encrypting build artifact with password ==="
+              $zipPath = "$artifactSubdir/$name.zip"
+              & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 -p"$(ARTIFACT_PASSWORD)" -mem=AES256 $zipPath "$tempFolder/*"
+          } else {
+              $zipPath = "$artifactSubdir/$name.zip"
+              & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 $zipPath "$tempFolder/*"
+          }
+
           Remove-Item $temp -Recurse -Force
 
           Write-Host "=== Created archive with enclosing folder: $folderName ==="
         displayName: 'Archive Windows build artifact'
         condition: succeeded()
+        env:
+          ARTIFACT_PASSWORD: $(ARTIFACT_PASSWORD)
 
       - task: Cache@2
         displayName: 'Cache the build artifact'
@@ -391,11 +402,20 @@ stages:
           mkdir -p "$FOLDER_NAME"
           chmod +x "SerialPrograms-x86_64.AppImage"
           mv "SerialPrograms-x86_64.AppImage" "$FOLDER_NAME/"
-          tar -zcvf $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).tar.gz "$FOLDER_NAME"
+
+          BUILD_TYPE="${{ parameters.buildType }}"
+            if [ "$BUILD_TYPE" = "PrivateBeta" ]; then
+                echo "=== Encrypting build artifact with password ==="
+                7z a -tzip -mx=9 -p"$ARTIFACT_PASSWORD" -mem=AES256 "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).zip" "$FOLDER_NAME"
+            else
+                tar -I "gzip -9" -cvf $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).tar.gz "$FOLDER_NAME"
+            fi
           
           echo "=== AppImage build complete with enclosing folder: $FOLDER_NAME ==="
         displayName: 'Deploy AppImage'
         condition: succeeded()
+        env:
+          ARTIFACT_PASSWORD: $(ARTIFACT_PASSWORD)
 
       - task: Cache@2
         displayName: 'Cache build'
@@ -411,11 +431,24 @@ stages:
           path: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-symbols'
         condition: succeeded()
 
+      - script: |
+          BUILD_TYPE="${{ parameters.buildType }}"
+          if [ "$BUILD_TYPE" = "PrivateBeta" ]; then
+              EXT="zip"
+          else
+              EXT="tar.gz"
+          fi
+
+          ARTIFACT_PATH_UBUNTU="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).$EXT"
+          echo "##vso[task.setvariable variable=ARTIFACT_PATH_UBUNTU]$ARTIFACT_PATH_UBUNTU"
+         displayName: 'Set artifact path'
+         condition: succeeded()
+
       - task: PublishBuildArtifacts@1
         displayName: 'Publish SerialPrograms'
         condition: succeeded()
         inputs:
-          PathtoPublish: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).tar.gz'
+          PathtoPublish: '$(ARTIFACT_PATH_UBUNTU)'
           ArtifactName: 'SerialPrograms-Linux-$(compiler)-$(architecture)'
 
 ###########################################
