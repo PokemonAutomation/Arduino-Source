@@ -201,6 +201,12 @@ int main(int argc, char *argv[]){
     set_program_path(argv[0]);
 #endif
 
+#if defined(__linux__)
+    // Qt multimedia, default to gstreamer to prevent flickering
+    if (qEnvironmentVariableIsEmpty("QT_MEDIA_BACKEND"))
+        qputenv("QT_MEDIA_BACKEND", "gstreamer");
+#endif
+
     //  So far, this is only needed on Mac where static initialization is fucked up.
     PokemonAutomation::register_all_statics();
 
