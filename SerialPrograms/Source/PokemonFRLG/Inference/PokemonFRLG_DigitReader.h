@@ -11,8 +11,7 @@
  */
 
 #ifndef PokemonAutomation_PokemonFRLG_DigitReader_H
-#define PokemonAutomation_PokemonFRLG_DigitReader_H
-
+#include <cstdint>
 #include <string>
 
 namespace PokemonAutomation {
