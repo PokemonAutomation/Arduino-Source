@@ -75,6 +75,9 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     layout1->addSpacing(5);
 
     m_status_text->setText(QString::fromStdString(session.status_text()));
+    m_status_text->setTextFormat(Qt::RichText);
+    m_status_text->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    m_status_text->setOpenExternalLinks(true);
 
     m_reset_button = new QPushButton("Reset Ctrl.", this);
 #if 1
