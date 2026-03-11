@@ -18,6 +18,89 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG {
 
+bool move_cursor_to_position(ConsoleHandle& console, ProControllerContext& context, SelectionArrowPositionStartMenu destination){
+    SelectionArrowWatcher pokedex_arrow = SelectionArrowWatcher(
+        COLOR_RED,
+        &console.overlay(),
+        SelectionArrowPositionStartMenu::POKEDEX
+    );
+
+    SelectionArrowWatcher pokemon_arrow = SelectionArrowWatcher(
+        COLOR_RED,
+        &console.overlay(),
+        SelectionArrowPositionStartMenu::POKEMON
+    );
+
+    SelectionArrowWatcher bag_arrow = SelectionArrowWatcher(
+        COLOR_RED,
+        &console.overlay(),
+        SelectionArrowPositionStartMenu::BAG
+    );
+
+    SelectionArrowWatcher trainer_arrow = SelectionArrowWatcher(
+        COLOR_RED,
+        &console.overlay(),
+        SelectionArrowPositionStartMenu::TRAINER
+    );
+
+    SelectionArrowWatcher save_arrow = SelectionArrowWatcher(
+        COLOR_RED,
+        &console.overlay(),
+        SelectionArrowPositionStartMenu::SAVE
+    );
+
+    SelectionArrowWatcher option_arrow = SelectionArrowWatcher(
+        COLOR_RED,
+        &console.overlay(),
+        SelectionArrowPositionStartMenu::OPTION
+    );
+
+    SelectionArrowWatcher exit_arrow = SelectionArrowWatcher(
+        COLOR_RED,
+        &console.overlay(),
+        SelectionArrowPositionStartMenu::EXIT
+    );
+
+    // The order of these watchers needs to match the order of the SelectionArrowPositionStartMenu enum for the math below to work.
+    int ret = wait_until(
+        console, context,
+        std::chrono::seconds(2),
+        {
+            pokedex_arrow,
+            pokemon_arrow,
+            bag_arrow,
+            trainer_arrow,
+            save_arrow,
+            option_arrow,
+            exit_arrow
+        }
+    );
+
+    if (ret < 0) {
+        console.log("Unable to detect selection arrow. Not moving cursor.", COLOR_RED);
+        return false;
+    }
+
+    int destination_index = static_cast<int>(destination);
+    int forward = (destination_index - ret + START_MENU_OPTION_COUNT) % START_MENU_OPTION_COUNT;
+    int backward = (ret - destination_index + START_MENU_OPTION_COUNT) % START_MENU_OPTION_COUNT;
+    if (forward <= backward) {
+        for (int i = 0; i < forward; i++) {
+            pbf_press_dpad(context, DPAD_DOWN, 320ms, 400ms);
+        }
+        context.wait_for_all_requests();
+    }
+    else {
+        for (int i = 0; i < backward; i++)
+        {
+            pbf_press_dpad(context, DPAD_UP, 320ms, 400ms);
+        }
+        context.wait_for_all_requests();
+    }
+
+    return true;
+}
+
 void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& context){
 
     bool seen_start_menu = false;
@@ -65,106 +148,10 @@ void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& contex
             }
         }
 
-        SelectionArrowWatcher pokedex_arrow = SelectionArrowWatcher(
-            COLOR_RED,
-            &console.overlay(),
-            SelectionArrowPosition::START_MENU_POKEDEX
-        );
-
-        SelectionArrowWatcher pokemon_arrow = SelectionArrowWatcher(
-            COLOR_RED,
-            &console.overlay(),
-            SelectionArrowPosition::START_MENU_POKEMON
-        );
-
-        SelectionArrowWatcher bag_arrow = SelectionArrowWatcher(
-            COLOR_RED,
-            &console.overlay(),
-            SelectionArrowPosition::START_MENU_BAG
-        );
-
-        SelectionArrowWatcher trainer_arrow = SelectionArrowWatcher(
-            COLOR_RED,
-            &console.overlay(),
-            SelectionArrowPosition::START_MENU_TRAINER
-        );
-
-        SelectionArrowWatcher save_arrow = SelectionArrowWatcher(
-            COLOR_RED,
-            &console.overlay(),
-            SelectionArrowPosition::START_MENU_SAVE
-        );
-
-        SelectionArrowWatcher option_arrow = SelectionArrowWatcher(
-            COLOR_RED,
-            &console.overlay(),
-            SelectionArrowPosition::START_MENU_OPTION
-        );
-
-        SelectionArrowWatcher exit_arrow = SelectionArrowWatcher(
-            COLOR_RED,
-            &console.overlay(),
-            SelectionArrowPosition::START_MENU_EXIT
-        );
-
-        int ret3 = wait_until(
-            console, context,
-            std::chrono::seconds(2),
-            {
-                pokedex_arrow,
-                pokemon_arrow,
-                bag_arrow,
-                trainer_arrow,
-                save_arrow,
-                option_arrow,
-                exit_arrow
-            }
-        );
-
-        switch (ret3){
-        case 0:
-            console.log("Detected Pokedex Arrow. Naviating to 'SAVE'.");
-            pbf_press_dpad(context, DPAD_UP, 320ms, 400ms);
-            pbf_press_dpad(context, DPAD_UP, 320ms, 400ms);
-            pbf_press_dpad(context, DPAD_UP, 320ms, 400ms);
-            context.wait_for_all_requests();
-            break;
-        case 1:
-            console.log("Detected Pokemon Arrow. Naviating to 'SAVE'.");
-            pbf_press_dpad(context, DPAD_DOWN, 320ms, 400ms);
-            pbf_press_dpad(context, DPAD_DOWN, 320ms, 400ms);
-            pbf_press_dpad(context, DPAD_DOWN, 320ms, 400ms);
-            context.wait_for_all_requests();
-            break;
-        case 2:
-            console.log("Detected Bag Arrow. Naviating to 'SAVE'.");
-            pbf_press_dpad(context, DPAD_DOWN, 320ms, 400ms);
-            pbf_press_dpad(context, DPAD_DOWN, 320ms, 400ms);
-            context.wait_for_all_requests();
-            break;
-        case 3:
-            console.log("Detected Trainer Arrow. Naviating to 'SAVE'.");
-            pbf_press_dpad(context, DPAD_DOWN, 320ms, 400ms);
-            context.wait_for_all_requests();
-            break;
-        case 4:
-            console.log("Detected Save Arrow.");
-            break;
-        case 5:
-            console.log("Detected Option Arrow. Naviating to 'SAVE'.");
-            pbf_press_dpad(context, DPAD_UP, 320ms, 400ms);
-            context.wait_for_all_requests();
-            break;
-        case 6:
-            console.log("Detected Exit Arrow. Naviating to 'SAVE'.");
-            pbf_press_dpad(context, DPAD_UP, 320ms, 400ms);
-            pbf_press_dpad(context, DPAD_UP, 320ms, 400ms);
-            context.wait_for_all_requests();
-            break;
-        default:
+        if (!move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::SAVE)) {
             continue;
         }
-
+        
         pbf_press_button(context, BUTTON_A, 320ms, 400ms);
 
         bool save_confirmed = false;
@@ -181,12 +168,12 @@ void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& contex
             SelectionArrowWatcher save_confirm_arrow = SelectionArrowWatcher(
                 COLOR_RED,
                 &console.overlay(),
-                SelectionArrowPosition::CHOICE_MENU_YES
+                SelectionArrowPositionConfirmationMenu::YES
             );
 
             int ret4 = wait_until(
                 console, context,
-                std::chrono::seconds(10),
+                std::chrono::seconds(1),
                 {
                     save_confirm_arrow
                 }
@@ -205,10 +192,10 @@ void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& contex
             context.wait_for_all_requests();
         }
 
-        context.wait_for_all_requests();
+    context.wait_for_all_requests();
 
-        return;
-    }
+    return;
+}
 
 }
 

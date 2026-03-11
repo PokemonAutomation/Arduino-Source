@@ -22,6 +22,13 @@ using ProControllerContext = ControllerContext<ProController>;
 
 namespace PokemonFRLG {
 
+// Starting from the start menu, move the selection arrow to the specified position.
+// Return true if successful, false otherwise (e.g. if selection arrow is not detected).
+bool move_cursor_to_position(
+    ConsoleHandle& console, ProControllerContext& context, 
+    SelectionArrowPositionStartMenu destination
+);
+
 //  Starting from either the overworld or the main menu, save the game.
 //  This function returns in the overworld.
 void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& context);
