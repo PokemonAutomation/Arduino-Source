@@ -177,18 +177,27 @@ stages:
           set -e
           VERSION="${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
           FOLDER_NAME="SerialPrograms-$VERSION-MacOS-${{ parameters.architecture }}"
-    
-          echo "=== Creating tarball with enclosing folder ==="
-          tar -czf "SerialPrograms-MacOS-$(compiler)-$(architecture).tar.gz" -C "$(Pipeline.Workspace)/Arduino-Source-Internal" "$FOLDER_NAME"
+          BUILD_TYPE="${{ parameters.buildType }}"
+
+          cd "$(Pipeline.Workspace)/Arduino-Source-Internal"
+          if [ "$BUILD_TYPE" = "PrivateBeta" ]; then
+              echo "=== Creating password-protected archive for PrivateBeta ==="
+              7z a -tzip -mx=9 -p"$ARTIFACT_PASSWORD" -mem=AES256 "SerialPrograms-MacOS-$(compiler)-$(architecture).zip" "$FOLDER_NAME"
+          else
+              echo "=== Creating tarball with enclosing folder ==="
+              tar -I "gzip -9" -czf "SerialPrograms-MacOS-$(compiler)-$(architecture).tar.gz" "$FOLDER_NAME"
+          fi
 
           echo "=== Creating cache directory and moving tarball ==="
           CACHE_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/cache-notarized"
           mkdir -p "$CACHE_DIR"
-          mv "$(Pipeline.Workspace)/Arduino-Source-Internal/SerialPrograms-MacOS-$(compiler)-$(architecture).tar.gz" "$CACHE_DIR/"
+          mv "$(Pipeline.Workspace)/Arduino-Source-Internal/SerialPrograms-MacOS-$(compiler)-$(architecture).$EXT" "$CACHE_DIR/"
 
           echo "=== Tarball created with enclosing folder: $FOLDER_NAME ==="
         displayName: 'Create a tarball'
         condition: succeeded()
+        env:
+          ARTIFACT_PASSWORD: $(ARTIFACT_PASSWORD)
 
       - task: Cache@2
         displayName: 'Cache the notarized artifact'
@@ -197,9 +206,17 @@ stages:
           path: '$(Pipeline.Workspace)/Arduino-Source-Internal/cache-notarized'
         condition: succeeded()
 
+      - script: |
+          BUILD_TYPE="${{ parameters.buildType }}"
+          EXT=$([ "$BUILD_TYPE" = "PrivateBeta" ] && echo "zip" || echo "tar.gz")
+          ARTIFACT_PATH_MACOS="$(Pipeline.Workspace)/Arduino-Source-Internal/cache-notarized/SerialPrograms-MacOS-$(compiler)-$(architecture).$EXT"
+          echo "##vso[task.setvariable variable=ARTIFACT_PATH_MACOS]$ARTIFACT_PATH_MACOS"
+        displayName: 'Set artifact path'
+        condition: succeeded()
+
       - task: PublishPipelineArtifact@1
         displayName: 'Publish notarized app'
         inputs:
-          targetPath: '$(Pipeline.Workspace)/Arduino-Source-Internal/cache-notarized/SerialPrograms-MacOS-$(compiler)-$(architecture).tar.gz'
+          targetPath: '$(ARTIFACT_PATH_MACOS)'
           artifact: 'SerialPrograms-MacOS-$(compiler)-$(architecture)'
         condition: succeeded()
