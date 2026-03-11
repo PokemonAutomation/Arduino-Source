@@ -170,12 +170,15 @@ int read_digits_waterfill_template(Logger &logger,
 
     for (int i = 0; i < expected_digits; ++i) {
       size_t min_x = obj.min_x + i * split_w;
-      size_t max_x = (i == expected_digits - 1) ? obj.max_x
-                                                : obj.min_x + (i + 1) * split_w;
+      size_t max_x = (i == expected_digits - 1) ? obj.max_x : obj.min_x + (i + 1) * split_w;
 
       // Crop original (unblurred) region to the split bounding box.
       ImagePixelBox bbox(min_x, obj.min_y, max_x, obj.max_y);
       ImageViewRGB32 crop = extract_box_reference(stat_region, bbox);
+
+      if (dump_prefix == "levelDigit") {
+          crop.save("DebugDumps/" + dump_prefix + "_x" + std::to_string(min_x) + "_split_raw.png");
+      }
 
       // Compute RMSD against each digit template; pick the minimum.
       // If no templates are loaded (extraction mode), skip matching entirely.
