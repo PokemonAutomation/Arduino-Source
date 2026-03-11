@@ -124,8 +124,7 @@ void ShinyHuntMew::enter_mew(SingleSwitchProgramEnvironment& env, ProControllerC
             "Failed to enter area.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Entered area.");
     }
 
@@ -183,8 +182,7 @@ void ShinyHuntMew::exit_mew(SingleSwitchProgramEnvironment& env, ProControllerCo
             "Failed to exit area.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Exited area.");
     }
 }

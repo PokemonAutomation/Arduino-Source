@@ -203,7 +203,7 @@ void LabelImages::save_annotation_to_file() const{
     json["IMAGE_HEIGHT"] = source_image_height;
 
     JsonArray anno_json_arr;
-    for(const auto& anno_obj: m_annotations){
+    for (const auto& anno_obj: m_annotations){
         anno_json_arr.push_back(anno_obj.to_json());
     }
     json["ANNOTATION"] = std::move(anno_json_arr);
@@ -275,7 +275,7 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
         return;
     }
 
-    for(size_t i = 0; i < json_array->size(); i++){
+    for (size_t i = 0; i < json_array->size(); i++){
         try{
             ObjectAnnotation anno_obj = ObjectAnnotation::from_json((*json_array)[i]);
             m_annotations.emplace_back(std::move(anno_obj));
@@ -354,19 +354,19 @@ bool LabelImages::run_sam_to_create_annotation(
     //     [p0_x, p0_y, p1_x, p1_y], where p0 is the top-left corner and p1 is the lower right corner.
     const size_t num_points = inclusion_points.size() + exclusion_points.size();
     std::vector<int> input_points(2*num_points), input_point_labels(num_points);
-    for(size_t i = 0; i < inclusion_points.size(); i++){
+    for (size_t i = 0; i < inclusion_points.size(); i++){
         input_points[2*i] = static_cast<int>(inclusion_points[i].first);
         input_points[2*i+1] = static_cast<int>(inclusion_points[i].second);
         input_point_labels[i] = 1;
     }
-    for(size_t i = 0; i < exclusion_points.size(); i++){
+    for (size_t i = 0; i < exclusion_points.size(); i++){
         input_points[2*inclusion_points.size() + 2*i] = static_cast<int>(exclusion_points[i].first);
         input_points[2*inclusion_points.size() + 2*i+1] = static_cast<int>(exclusion_points[i].second);
         input_point_labels[inclusion_points.size() + i] = 0;
     }
 
     // fall back to CPU if fails with GPU.
-    for(size_t i = 0; i < 2; i++){
+    for (size_t i = 0; i < 2; i++){
         try{
             // if (m_use_gpu_for_sam_anno){ throw Ort::Exception("Testing.", ORT_FAIL); }  // to simulate GPU/CPU failure
             m_sam_session->run(
@@ -427,7 +427,7 @@ bool LabelImages::run_sam_to_create_annotation(
 
     mask_box = ImagePixelBox(min_mask_x, min_mask_y, max_mask_x+1, max_mask_y+1);
     mask.resize(mask_width * mask_height);
-    for(size_t row = 0; row < mask_height; row++){
+    for (size_t row = 0; row < mask_height; row++){
         auto it = m_output_boolean_mask.begin() + (min_mask_y + row) * source_width + min_mask_x;
         auto it2 = mask.begin() + row * mask_width;
         std::copy(it, it + mask_width, it2);
@@ -472,7 +472,7 @@ void LabelImages::remove_closest_point(std::vector<std::pair<size_t, size_t>>& p
 
     size_t min_dist = SIZE_MAX;
     size_t target_point = 0;
-    for(size_t i = 0; i < points.size(); i++){
+    for (size_t i = 0; i < points.size(); i++){
         const auto& ip = points[i];
         size_t d_x = ip.first > tp.first ? ip.first - tp.first : tp.first - ip.first;
         size_t d_y = ip.second > tp.second ? ip.second - tp.second : tp.second - ip.second;
@@ -555,7 +555,7 @@ void LabelImages::change_annotation_selection_by_mouse(double x, double y){
 
     size_t closest_distance = SIZE_MAX;
     std::vector<size_t> zero_distance_annotations;
-    for(size_t i = 0; i < m_annotations.size(); i++){
+    for (size_t i = 0; i < m_annotations.size(); i++){
         const size_t dx = m_annotations[i].mask_box.distance_to_point_x(p.first);
         const size_t dy = m_annotations[i].mask_box.distance_to_point_y(p.second);
         const size_t d2 = dx*dx + dy*dy;
@@ -574,7 +574,7 @@ void LabelImages::change_annotation_selection_by_mouse(double x, double y){
     if (zero_distance_annotations.size() > 1){
         // this point is inside multiple boxes, we then use the closest to the box center to determine
         closest_distance = SIZE_MAX;
-        for(size_t i : zero_distance_annotations){
+        for (size_t i : zero_distance_annotations){
             const size_t dx = m_annotations[i].mask_box.center_distance_to_point_x(p.first);
             const size_t dy = m_annotations[i].mask_box.center_distance_to_point_y(p.second);
             const size_t d2 = dx*dx + dy*dy;
@@ -700,7 +700,7 @@ void LabelImages::load_custom_label_set(const std::string& json_path){
     try{
         JsonValue value = load_json_file(json_path);
         const JsonArray& json_array = value.to_array_throw();
-        for(size_t i = 0; i < json_array.size(); i++){
+        for (size_t i = 0; i < json_array.size(); i++){
             const std::string& label_slug = json_array[i].to_string_throw();
             new_database.add_entry(StringSelectEntry(label_slug, label_slug));
         }

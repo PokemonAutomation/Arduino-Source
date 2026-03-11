@@ -100,7 +100,7 @@ BoxEggPartyColumnWatcher::BoxEggPartyColumnWatcher(Color color)
     : VisualInferenceCallback("BoxEggPartyColumnWatcher"),
     m_egg_watchers(5), m_empty_watchers(5)
 {
-    for(uint8_t i = 0; i < 5; i++){
+    for (uint8_t i = 0; i < 5; i++){
         m_egg_watchers.emplace_back(
             BoxCursorLocation::PARTY,
             (uint8_t)(i + 1), (uint8_t)0,
@@ -117,7 +117,7 @@ BoxEggPartyColumnWatcher::BoxEggPartyColumnWatcher(Color color)
 }
 
 void BoxEggPartyColumnWatcher::make_overlays(VideoOverlaySet& items) const{
-    for(int i = 0; i < 5; i++){
+    for (int i = 0; i < 5; i++){
         m_egg_watchers[i].make_overlays(items);
         m_empty_watchers[i].make_overlays(items);
     }
@@ -125,7 +125,7 @@ void BoxEggPartyColumnWatcher::make_overlays(VideoOverlaySet& items) const{
 
 bool BoxEggPartyColumnWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     bool all_certain = true;
-    for(int i = 0; i < 5; i++){
+    for (int i = 0; i < 5; i++){
         // Return true if an egg is detected
         const bool egg_certain =  m_egg_watchers[i].process_frame(frame, timestamp);
         // Return true if it is sure that the slot is empty or not
@@ -140,7 +140,7 @@ bool BoxEggPartyColumnWatcher::process_frame(const ImageViewRGB32& frame, WallCl
 
 uint8_t BoxEggPartyColumnWatcher::num_eggs_found() const{
     uint8_t num_eggs = 0;
-    for(int i = 0; i < 5; i++){
+    for (int i = 0; i < 5; i++){
         if (m_egg_watchers[i].consistent_result()){
             num_eggs++;
         }
@@ -150,7 +150,7 @@ uint8_t BoxEggPartyColumnWatcher::num_eggs_found() const{
 
 uint8_t BoxEggPartyColumnWatcher::num_non_egg_pokemon_found() const{
     uint8_t num_pokemon = 0;
-    for(int i = 0; i < 5; i++){
+    for (int i = 0; i < 5; i++){
         if (m_empty_watchers[i].consistent_result() == false && m_egg_watchers[i].consistent_result() == false){
             num_pokemon++;
         }

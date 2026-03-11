@@ -79,7 +79,7 @@ PA_FORCE_INLINE void scale_brightness_arm64_NEON_four_pixels_per_channel_scale(
         vst1q_u32(&image[c], vec_u32x4);
     }
 
-    for(size_t c = width_aligned; c < width; c++){
+    for (size_t c = width_aligned; c < width; c++){
         uint32_t pixel = image[c];
         float r = (float)((pixel >> 16) & 0x000000ff);
         float g = (float)((pixel >> 8) & 0x000000ff);

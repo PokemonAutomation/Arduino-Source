@@ -189,7 +189,7 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, ProCont
     const std::vector<std::string>& dex_slugs = NATIONAL_DEX_SLUGS();
     // Build a map of slug -> national dex ID for fast lookup
     std::map<std::string, size_t> dex_slug_order;
-    for(size_t i = 0; i < dex_slugs.size(); ++i){
+    for (size_t i = 0; i < dex_slugs.size(); ++i){
         dex_slug_order.emplace(dex_slugs[i], i);
     }
 

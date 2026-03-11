@@ -164,9 +164,9 @@ BoxDetector::BoxDetector(Color color, VideoOverlay* overlay)
     : m_color(color)
     , m_plus_button(color, ButtonType::ButtonPlus, {0.581, 0.940, 0.310, 0.046}, overlay)
 {
-    for(size_t row = 0; row < 6; row++){
+    for (size_t row = 0; row < 6; row++){
         double y = (row == 0 ? 0.122 : 0.333 + (0.797 - 0.331)/ 4.0 * (row-1));
-        for(size_t col = 0; col < 6; col++){
+        for (size_t col = 0; col < 6; col++){
             double x = 0.058 + col * (0.386 - 0.059)/5.0;
             m_arrow_boxes.emplace_back(x, y, 0.018, 0.026);
             // m_lifted_arrow_boxes.emplace_back(x+0.011, y-0.010, 0.023, 0.032);
@@ -177,7 +177,7 @@ BoxDetector::BoxDetector(Color color, VideoOverlay* overlay)
 
 void BoxDetector::make_overlays(VideoOverlaySet& items) const{
     m_plus_button.make_overlays(items);
-    for(const ImageFloatBox& box : m_arrow_boxes){
+    for (const ImageFloatBox& box : m_arrow_boxes){
         items.add(m_color, box);
     }
 }

@@ -94,7 +94,7 @@ double get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area
 
     // The angle of each marker end relative to the marker center
     double end_angles[3] = {0.0, 0.0, 0.0};
-    for(int i = 0; i < 3; i++){
+    for (int i = 0; i < 3; i++){
         ptrdiff_t x = (ptrdiff_t)marker_ends[i].center_of_gravity_x() - (ptrdiff_t)local_marker_center_x;
         ptrdiff_t y = (ptrdiff_t)marker_ends[i].center_of_gravity_y() - (ptrdiff_t)local_marker_center_y;
         double angle = std::atan2(y, x) * 57.29577951308232;
@@ -108,7 +108,7 @@ double get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area
     double end_angle_distances[3] = {0.0, 0.0, 0.0};
     // Find out which two ends form the smallest angular distance between them
     int min_angle_distance_index = 0;
-    for(int i = 0; i < 3; i++){
+    for (int i = 0; i < 3; i++){
         end_angle_distances[i] = std::fabs(end_angles[i] - end_angles[(i+1)%3]);
         if (end_angle_distances[i] > 180){
             end_angle_distances[i] = 360 - end_angle_distances[i];

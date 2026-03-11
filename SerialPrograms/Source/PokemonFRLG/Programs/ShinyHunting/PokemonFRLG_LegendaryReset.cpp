@@ -121,8 +121,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
                 "Failed to enter battle.",
                 env.console
             );
-        }
-        else {
+        }else{
             env.log("Battle started.");
         }
 

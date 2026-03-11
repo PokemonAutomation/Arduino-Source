@@ -186,7 +186,7 @@ void ThreeSegmentDudunsparceFinder::program(SingleSwitchProgramEnvironment& env,
     pbf_press_button(context, BUTTON_L, 80ms, 800ms);
 
     try{
-        for(uint8_t i = 0; i < 6; i++){
+        for (uint8_t i = 0; i < 6; i++){
             check_one_column(env, context, i);
         }
     } catch(OperationFailedException&){

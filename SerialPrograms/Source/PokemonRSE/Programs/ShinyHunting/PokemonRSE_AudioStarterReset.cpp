@@ -159,8 +159,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
             stats.poochyena++;
             env.update_stats();
             send_program_notification(env, NOTIFICATION_SHINY_POOCH, COLOR_YELLOW, "Shiny Poochyena found", {}, "", env.console.video().snapshot(), true);
-        }
-        else {
+        }else{
             env.log("Poochyena is not shiny.");
         }
         context.wait_for_all_requests();
@@ -207,8 +206,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
                 true
             );
             shiny_starter = true;
-        }
-        else {
+        }else{
             env.log("Starter is not shiny.");
             env.log("Soft resetting.");
             send_program_status_notification(

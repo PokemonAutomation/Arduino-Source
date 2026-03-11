@@ -22,9 +22,9 @@ namespace PokemonFRLG{
 
 ShinyHuntOverworld_Descriptor::ShinyHuntOverworld_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonFRLG:OverworldReset",
+        "PokemonFRLG:ShinyHuntOverworld",
         Pokemon::STRING_POKEMON + " FRLG", "Shiny Hunt - Overworld",
-        "Programs/PokemonFRLG/OverworldReset.html",
+        "Programs/PokemonFRLG/ShinyHunt-Overworld.html",
         "Shiny hunt Overworld Pokemon.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
@@ -157,7 +157,7 @@ bool ShinyHuntOverworld::find_encounter(SingleSwitchProgramEnvironment& env, Pro
         case TriggerMethod::HORIZONTAL_NO_BIAS:
             ret = run_until<ProControllerContext>(
                 env.console, context,
-                [normal_duration, mash_duration](ProControllerContext& context) {
+                [normal_duration, mash_duration](ProControllerContext& context){
                     ssf_press_left_joystick(context, { -1, 0 }, 0ms, normal_duration);
                     ssf_mash1_button(context, BUTTON_B, mash_duration);
                     ssf_press_left_joystick(context, { +1, 0 }, 0ms, normal_duration);
@@ -169,7 +169,7 @@ bool ShinyHuntOverworld::find_encounter(SingleSwitchProgramEnvironment& env, Pro
         case TriggerMethod::HORIZONTAL_BIAS_LEFT:
             ret = run_until<ProControllerContext>(
                 env.console, context,
-                [normal_duration, mash_duration, biased_duration](ProControllerContext& context) {
+                [normal_duration, mash_duration, biased_duration](ProControllerContext& context){
                     ssf_press_left_joystick(context, { -1, 0 }, 0ms, biased_duration);
                     ssf_mash1_button(context, BUTTON_B, mash_duration);
                     ssf_press_left_joystick(context, { +1, 0 }, 0ms, normal_duration);
@@ -181,7 +181,7 @@ bool ShinyHuntOverworld::find_encounter(SingleSwitchProgramEnvironment& env, Pro
         case TriggerMethod::HORIZONTAL_BIAS_RIGHT:
             ret = run_until<ProControllerContext>(
                 env.console, context,
-                [normal_duration, mash_duration, biased_duration](ProControllerContext& context) {
+                [normal_duration, mash_duration, biased_duration](ProControllerContext& context){
                     ssf_press_left_joystick(context, { +1, 0 }, 0ms, biased_duration);
                     ssf_mash1_button(context, BUTTON_B, mash_duration);
                     ssf_press_left_joystick(context, { -1, 0 }, 0ms, normal_duration);
@@ -193,7 +193,7 @@ bool ShinyHuntOverworld::find_encounter(SingleSwitchProgramEnvironment& env, Pro
         case TriggerMethod::VERTICAL_NO_BIAS:
             ret = run_until<ProControllerContext>(
                 env.console, context,
-                [normal_duration, mash_duration](ProControllerContext& context) {
+                [normal_duration, mash_duration](ProControllerContext& context){
                     ssf_press_left_joystick(context, { 0, +1 }, 0ms, normal_duration);
                     ssf_mash1_button(context, BUTTON_B, mash_duration);
                     ssf_press_left_joystick(context, { 0, -1 }, 0ms, normal_duration);
@@ -205,7 +205,7 @@ bool ShinyHuntOverworld::find_encounter(SingleSwitchProgramEnvironment& env, Pro
         case TriggerMethod::VERTICAL_BIAS_UP:
             ret = run_until<ProControllerContext>(
                 env.console, context,
-                [normal_duration, mash_duration, biased_duration](ProControllerContext& context) {
+                [normal_duration, mash_duration, biased_duration](ProControllerContext& context){
                     ssf_press_left_joystick(context, { 0, +1 }, 0ms, biased_duration);
                     ssf_mash1_button(context, BUTTON_B, mash_duration);
                     ssf_press_left_joystick(context, { 0, -1 }, 0ms, normal_duration);
@@ -217,7 +217,7 @@ bool ShinyHuntOverworld::find_encounter(SingleSwitchProgramEnvironment& env, Pro
         case TriggerMethod::VERTICAL_BIAS_DOWN:
             ret = run_until<ProControllerContext>(
                 env.console, context,
-                [normal_duration, mash_duration, biased_duration](ProControllerContext& context) {
+                [normal_duration, mash_duration, biased_duration](ProControllerContext& context){
                     ssf_press_left_joystick(context, { 0, -1 }, 0ms, biased_duration);
                     ssf_mash1_button(context, BUTTON_B, mash_duration);
                     ssf_press_left_joystick(context, { 0, +1 }, 0ms, normal_duration);

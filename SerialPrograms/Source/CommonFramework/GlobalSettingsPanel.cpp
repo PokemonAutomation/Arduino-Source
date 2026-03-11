@@ -356,14 +356,14 @@ void GlobalSettings::load_json(const JsonValue& json){
             std::cout << "Enter command line test mode:" << std::endl;
             if (COMMAND_LINE_TEST_LIST.size() > 0){
                 std::cout << "Run following tests: " << std::endl;
-                for(const auto& name : COMMAND_LINE_TEST_LIST){
+                for (const auto& name : COMMAND_LINE_TEST_LIST){
                     std::cout << "- " << name << std::endl;
                 }
             }
             if (COMMAND_LINE_IGNORE_LIST.size() > 0){
                 std::cout << "Ignore following " << COMMAND_LINE_IGNORE_LIST.size() << " paths: " << std::endl;
                 const size_t MAX_LINES = 5;
-                for(size_t i = 0; i < COMMAND_LINE_IGNORE_LIST.size() && i < MAX_LINES; i++){
+                for (size_t i = 0; i < COMMAND_LINE_IGNORE_LIST.size() && i < MAX_LINES; i++){
                     std::cout << "- " << COMMAND_LINE_IGNORE_LIST[i] << std::endl;
                 }
                 if (COMMAND_LINE_IGNORE_LIST.size() > MAX_LINES){
@@ -385,7 +385,7 @@ JsonValue GlobalSettings::to_json() const{
 
     {
         JsonArray test_list;
-        for(const auto& name : COMMAND_LINE_TEST_LIST){
+        for (const auto& name : COMMAND_LINE_TEST_LIST){
             test_list.push_back(name);
         }
         command_line_test_obj["TEST_LIST"] = std::move(test_list);
@@ -393,7 +393,7 @@ JsonValue GlobalSettings::to_json() const{
 
     {
         JsonArray ignore_list;
-        for(const auto& name : COMMAND_LINE_IGNORE_LIST){
+        for (const auto& name : COMMAND_LINE_IGNORE_LIST){
             ignore_list.push_back(name);
         }
         command_line_test_obj["IGNORE_LIST"] = std::move(ignore_list);

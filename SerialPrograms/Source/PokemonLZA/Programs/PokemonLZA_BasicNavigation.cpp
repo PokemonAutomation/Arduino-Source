@@ -138,7 +138,7 @@ bool open_map(
             if (zoom_to_max){
                 map_detector.reset_state();
                 // move right joystick to zoom out the map
-                for(int i = 0; i < 3; i++){
+                for (int i = 0; i < 3; i++){
                     pbf_move_right_joystick(context, {0, -1}, 100ms, 300ms);
                 }
                 context.wait_for_all_requests();
@@ -184,7 +184,7 @@ FastTravelState fly_from_map(
         int ret = run_until<ProControllerContext>(
             console, context,
             [&](ProControllerContext& context){
-                for(int i = 0; i < 4; i++){
+                for (int i = 0; i < 4; i++){
                     pbf_mash_button(context, BUTTON_A, 1000ms);
                 }
             },

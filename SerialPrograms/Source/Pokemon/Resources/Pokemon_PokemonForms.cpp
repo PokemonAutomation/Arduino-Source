@@ -65,7 +65,7 @@ PokemonFormDatabase::PokemonFormDatabase(){
         no_shiny_forms.emplace(std::move(line));
     }
 
-    for(const auto& species_slug: NATIONAL_DEX_SLUGS()){
+    for (const auto& species_slug: NATIONAL_DEX_SLUGS()){
         const std::string& species_display_name = get_pokemon_name(species_slug).display_name();
         const JsonArray* form_array = form_displays.get_array(species_slug);
         if (form_array == nullptr){

@@ -43,7 +43,7 @@ public:
         return (float*)((char*)m_spectrogram.data() + windowIndex * m_bytes_per_spectrum);
     }
 
-//    void scale(float s) { for(auto& v: m_spectrogram) v *= s; }
+//    void scale(float s){ for (auto& v: m_spectrogram) v *= s; }
 
 private:
     size_t m_numWindows = 0;

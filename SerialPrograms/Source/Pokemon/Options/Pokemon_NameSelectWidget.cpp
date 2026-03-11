@@ -57,7 +57,7 @@ NameSelectWidget::NameSelectWidget(
         }
     }
     if (extra_names && extra_name_list){
-        for(const std::string& slug : *extra_name_list){
+        for (const std::string& slug : *extra_name_list){
             const auto it = extra_names->find(slug);
             if (it == extra_names->end()){
                 throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Extra slug not found: " + slug);

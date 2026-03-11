@@ -430,7 +430,7 @@ std::vector<std::string> OutbreakFinder::run_iteration(
         // Check if we found any Massive Outbreak pokemon (including MMO symbol targets)
         {
             std::vector<std::string> desired_outbreaks_found;
-            for(const auto& found : found_hisui_map_events){
+            for (const auto& found : found_hisui_map_events){
                 if (desired_outbreaks.find(found) != desired_outbreaks.end()){
                     desired_outbreaks_found.push_back(found);
                 }
@@ -439,7 +439,7 @@ std::vector<std::string> OutbreakFinder::run_iteration(
                 stats.matches += desired_outbreaks_found.size();
                 std::ostringstream os;
                 os << "Found following desired outbreak" << (desired_outbreaks_found.size() > 1 ? "s: " : ": ");
-                for(const auto& outbreak: desired_outbreaks_found){
+                for (const auto& outbreak: desired_outbreaks_found){
                     os << outbreak << ", ";
                     env.console.overlay().add_log("Found " + outbreak, COLOR_GREEN);
                 }
@@ -563,8 +563,8 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, ProControllerC
     // MMO_targets: MMO map event slug (e.g. "fieldlands-mmo") -> how many desired MMO pokemon can spawn on this map
     std::map<std::string, int> MMO_targets;
     // Check if each MMO map event may spawn desired MMO pokemon:
-    for(size_t i = 0; i < 5; i++){
-        for(const std::string& sprite_slug: MMO_FIRST_WAVE_REGION_SPRITE_SLUGS()[i]){
+    for (size_t i = 0; i < 5; i++){
+        for (const std::string& sprite_slug: MMO_FIRST_WAVE_REGION_SPRITE_SLUGS()[i]){
             if (desired_MMO_pokemon.find(sprite_slug) != desired_MMO_pokemon.end()
                 || desired_star_MMO_pokemon.find(sprite_slug) != desired_star_MMO_pokemon.end()
             ){
@@ -575,14 +575,14 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
     std::ostringstream os;
     os << "User requires MMO pokemon. Need to visit (\"map MMO name\", \"how many desired MMO pokemon on the map\"): ";
-    for(const auto& p : MMO_targets){
+    for (const auto& p : MMO_targets){
         os << "(" << p.first << ", " << p.second << ") ";
     }
     env.log(os.str());
 
     // Add MMO map event targets (e.g. "fieldlands-mmo") derived from user selected MMO pokemon to 
     // `desired_hisui_map_events`.
-    for(const auto& p : MMO_targets){
+    for (const auto& p : MMO_targets){
         desired_hisui_map_events.insert(p.first);
     }
 

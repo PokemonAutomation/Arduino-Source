@@ -48,7 +48,7 @@ std::vector<ImagePixelBox> merge_overlapping_boxes(std::vector<ImagePixelBox>& b
     DisjointSet disjoint_set(boxes.size());
 
     for (size_t i = 0; i < boxes.size(); i++){
-        for(size_t j = i + 1; j < boxes.size(); j++){
+        for (size_t j = i + 1; j < boxes.size(); j++){
             // box_j and the ones behind it won't overlap with cur_box.
             if (boxes[j].min_x >= boxes[i].max_x){
                 // break;
@@ -61,7 +61,7 @@ std::vector<ImagePixelBox> merge_overlapping_boxes(std::vector<ImagePixelBox>& b
     }
 
     std::map<size_t, ImagePixelBox> merged_boxes;
-    for(size_t i = 0; i < boxes.size(); i++){
+    for (size_t i = 0; i < boxes.size(); i++){
         size_t rep_box = disjoint_set.find(i);
         auto it = merged_boxes.find(rep_box);
         if (it == merged_boxes.end()){
@@ -75,7 +75,7 @@ std::vector<ImagePixelBox> merge_overlapping_boxes(std::vector<ImagePixelBox>& b
     }
 
     std::vector<ImagePixelBox> output_boxes;
-    for(const auto& p : merged_boxes){
+    for (const auto& p : merged_boxes){
         output_boxes.push_back(p.second);
     }
 
@@ -144,7 +144,11 @@ struct TreeColor{
 
     ColorPair leave;
 
-    TreeColor(ColorPair fruit_core, ColorPair fruit_full, ColorPair leave) : fruit_core(fruit_core), fruit_full(fruit_full), leave(leave) {}
+    TreeColor(ColorPair fruit_core, ColorPair fruit_full, ColorPair leave)
+        : fruit_core(fruit_core)
+        , fruit_full(fruit_full)
+        , leave(leave)
+    {}
 };
 
 enum class BerryTreeType{
@@ -271,7 +275,7 @@ bool BerryTreeDetector::process_frame(const ImageViewRGB32& frame, WallClock tim
 
     std::vector<ImagePixelBox> berry_boxes;
 
-    for(const auto& candidate_box: berry_candidate_areas){
+    for (const auto& candidate_box: berry_candidate_areas){
         std::cout << "candidate box " << to_str(candidate_box) << std::endl;
         // std::cout << std::endl;
 
@@ -317,7 +321,7 @@ bool BerryTreeDetector::process_frame(const ImageViewRGB32& frame, WallClock tim
     }
 
     // Check leaf color around berries
-    for(const auto& berry_box : berry_boxes){
+    for (const auto& berry_box : berry_boxes){
         draw_box(debug_image, berry_box, uint32_t(COLOR_GREEN), 1);
 
         ImagePixelBox enlarged_box;
@@ -341,8 +345,8 @@ bool BerryTreeDetector::process_frame(const ImageViewRGB32& frame, WallClock tim
             }
         );
 
-        // for(int x = 0; x < enlarged_box.width(); x++){
-        //     for(int y = 0; y < enlarged_box.height(); y++){
+        // for (int x = 0; x < enlarged_box.width(); x++){
+        //     for (int y = 0; y < enlarged_box.height(); y++){
         //         if (leaf_matrix.get(x, y)){
         //             debug_image.setPixelColor(enlarged_box.min_x + x, enlarged_box.min_y + y, QColor(255, 0, 0));
         //         }
@@ -368,8 +372,8 @@ bool BerryTreeDetector::process_frame(const ImageViewRGB32& frame, WallClock tim
 
     
 
-    // for(int x = 0; x < debug_image.width(); x++){
-    //     for(int y = 0; y < debug_image.height(); y++){
+    // for (int x = 0; x < debug_image.width(); x++){
+    //     for (int y = 0; y < debug_image.height(); y++){
     //         if (matrices[0].get(x, y)){
     //             debug_image.setPixelColor(x, y, QColor(255, 0, 0));
     //         }

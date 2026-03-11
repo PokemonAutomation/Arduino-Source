@@ -66,7 +66,7 @@ std::set<std::string> enter_region_and_read_MMO(
     double map_cursor_move_y = 0;
     const Milliseconds map_cursor_move_duration = 400ms;
 
-    for(size_t i = 0; i < 5; i++){
+    for (size_t i = 0; i < 5; i++){
         if (mmo_name == MMO_NAMES()[i]){
             switch (i){
             case 0:
@@ -156,7 +156,7 @@ std::set<std::string> enter_region_and_read_MMO(
 
     const auto quest_results = question_mark_detector.detect_MMOs_on_region_map(question_mark_image);
     env.log("Detected MMO question marks:");
-    for(const auto& box : quest_results){
+    for (const auto& box : quest_results){
         std::ostringstream os;
         os << "- " << box.center_x() << ", " << box.center_y() << " " << box.width() << " x " << box.height();
         env.log(os.str());

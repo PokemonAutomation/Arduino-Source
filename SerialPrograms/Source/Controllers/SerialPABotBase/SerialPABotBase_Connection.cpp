@@ -11,6 +11,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/SerialConnection/SerialConnection.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
@@ -213,7 +214,9 @@ void SerialPABotBase_Connection::throw_incompatible_protocol(){
     throw SerialProtocolException(
         m_logger, PA_CURRENT_FUNCTION,
         "Incompatible protocol. Device: " + std::to_string(m_protocol) + "<br>"
-        "Please flash the .hex/.bin that came with this version of the program."
+        "Please flash your microcontroller (e.g. ESP32, Pico W, Arduino) <br>"
+        "with the .bin/.uf2/.hex that came with this version of the program.<br>" + 
+        make_text_url(ONLINE_DOC_URL_BASE + "SetupGuide/Reflash.html", "See documentation for more details.")
     );
 }
 ControllerType SerialPABotBase_Connection::process_device(bool set_to_null_controller){

@@ -60,7 +60,7 @@ public:
     // - model_path: path to the onnx model file. Can be a relative path to `RESOURCE_PATH()`.
     // If model loading fails, InternalProgramError exception is thrown
     YOLOv5Watcher(VideoOverlay& overlay, const std::string& model_path);
-    virtual ~YOLOv5Watcher() {}
+    virtual ~YOLOv5Watcher(){}
 
     virtual void make_overlays(VideoOverlaySet& items) const override {}
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;

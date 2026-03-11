@@ -31,13 +31,13 @@ LabelImages_OverlayManager::LabelImages_OverlayManager(LabelImages& program)
     m_inclusion_point_icon_template = ImageRGB32(21, 21);
     m_inclusion_point_icon_template.fill(0);
     const size_t strip_size = 5, strip_start = (21 - 5) / 2;
-    for(size_t y = 0; y < strip_size; y++){
-        for(size_t x = 0; x < m_inclusion_point_icon_template.width(); x++){
+    for (size_t y = 0; y < strip_size; y++){
+        for (size_t x = 0; x < m_inclusion_point_icon_template.width(); x++){
             m_inclusion_point_icon_template.pixel(x, y+strip_start) = uint32_t(enum_to_color(m_program.CURRENT_DRAWN_BOX));
         }
     }
-    for(size_t y = 0; y < m_inclusion_point_icon_template.height(); y++){
-        for(size_t x = 0; x < strip_size; x++){
+    for (size_t y = 0; y < m_inclusion_point_icon_template.height(); y++){
+        for (size_t x = 0; x < strip_size; x++){
             m_inclusion_point_icon_template.pixel(x+strip_start, y) = uint32_t(enum_to_color(m_program.CURRENT_DRAWN_BOX));
         }
     }
@@ -47,8 +47,8 @@ LabelImages_OverlayManager::LabelImages_OverlayManager(LabelImages& program)
     const size_t center = m_exclusion_point_icon_template.height() / 2;
     const size_t d2_min_th = (center-2)*(center-2);
     const size_t d2_max_th = (center+2)*(center+2);
-    for(size_t y = 0; y < m_exclusion_point_icon_template.height(); y++){
-        for(size_t x = 0; x < m_exclusion_point_icon_template.width(); x++){
+    for (size_t y = 0; y < m_exclusion_point_icon_template.height(); y++){
+        for (size_t x = 0; x < m_exclusion_point_icon_template.width(); x++){
             const size_t dx = size_t_diff(center, x);
             const size_t dy = size_t_diff(center, y);
             const size_t d2 = dx*dx + dy*dy;
@@ -146,15 +146,15 @@ void LabelImages_OverlayManager::update_rendered_annotations(){
                 return pixelbox_to_floatbox(image_width, image_height, box);
             };
             // the inclusion and exclusion points are only rendered for the current selected object:
-            for(const auto& p : obj.inclusion_points){
+            for (const auto& p : obj.inclusion_points){
                 m_overlay_set.add(m_inclusion_point_icon.copy(), create_box(p));
             }
-            for(const auto& p : obj.exclusion_points){
+            for (const auto& p : obj.exclusion_points){
                 m_overlay_set.add(m_exclusion_point_icon.copy(), create_box(p));
             }
         }
     };
-    for(size_t i_obj = 0; i_obj < annotations.size(); i_obj++){
+    for (size_t i_obj = 0; i_obj < annotations.size(); i_obj++){
         if (i_obj == m_selected){
             // skip current selected annotation because we want to render it last so that
             // it will not be occluded by other annotations

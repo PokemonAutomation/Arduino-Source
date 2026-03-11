@@ -40,7 +40,7 @@ public:
     // - If hand not detected, return (-1, -1).
     std::pair<double, double> detect(const ImageViewRGB32& screen) const;
 
-    void change_box(const ImageFloatBox& new_box) { m_box = new_box; }
+    void change_box(const ImageFloatBox& new_box){ m_box = new_box; }
 
     // return the coordinates of the sandwich hand.
     // search within the confines of the box area_to_search.
@@ -65,7 +65,7 @@ public:
 
     const std::pair<double, double>& location() const { return m_location; }
 
-    void change_box(const ImageFloatBox& new_box) { m_locator.change_box(new_box); }
+    void change_box(const ImageFloatBox& new_box){ m_locator.change_box(new_box); }
 
     // - searches the whole screen for the sandwich hand,
     // - then updates its location
