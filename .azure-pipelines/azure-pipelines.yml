@@ -85,6 +85,7 @@ stages:
             VERSION="v${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
             echo "Setting build number to $VERSION"
             echo "##vso[build.updatebuildnumber]$VERSION"
+            echo "##vso[build.addbuildtag]BuildType:${{ parameters.buildType }}"
           displayName: 'Set Build Number to Version'
 
 
