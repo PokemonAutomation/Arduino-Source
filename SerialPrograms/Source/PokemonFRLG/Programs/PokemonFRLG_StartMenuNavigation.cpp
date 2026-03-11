@@ -53,7 +53,7 @@ void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& contex
             int ret2 = run_until<ProControllerContext>(
                 console, context,
                 [](ProControllerContext& context) {
-                    pbf_press_button(context, BUTTON_PLUS, 320ms, 200ms);
+                    pbf_press_button(context, BUTTON_PLUS, 320ms, 320ms);
                     pbf_wait(context, 100ms);
                     context.wait_for_all_requests();
                 },
