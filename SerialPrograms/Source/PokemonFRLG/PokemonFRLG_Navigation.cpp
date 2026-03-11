@@ -339,6 +339,7 @@ void home_black_border_check(ConsoleHandle& console, ProControllerContext& conte
     if (GameSettings::instance().DEVICE == GameSettings::Device::switch_1_2) {
         console.log("Switch 1 or 2 selected in Settings.");
         console.log("Going to home to check for black border.");
+        pbf_press_button(context, BUTTON_ZL, 120ms, 880ms); //  Connect the controller.
         pbf_press_button(context, BUTTON_HOME, 120ms, 880ms);
         context.wait_for_all_requests();
         StartProgramChecks::check_border(console);
