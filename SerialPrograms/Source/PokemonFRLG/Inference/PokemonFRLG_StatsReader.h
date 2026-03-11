@@ -1,4 +1,4 @@
-/*  Stats Reader
+﻿/*  Stats Reader
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -13,6 +13,7 @@
 
 #include <stdint.h>
 #include <string>
+#include <optional>
 
 namespace PokemonAutomation {
 class Logger;
@@ -22,42 +23,42 @@ namespace NintendoSwitch {
 namespace PokemonFRLG {
 
 struct PokemonFRLG_Stats {
-  std::string nature;
-  int level = -1;
-  std::string name;
-  int hp = -1;
-  int attack = -1;
-  int defense = -1;
-  int sp_attack = -1;
-  int sp_defense = -1;
-  int speed = -1;
+    std::string nature;
+    std::optional<unsigned> level;
+    std::string name;
+    std::optional<unsigned> hp;
+    std::optional<unsigned> attack;
+    std::optional<unsigned> defense;
+    std::optional<unsigned> sp_attack;
+    std::optional<unsigned> sp_defense;
+    std::optional<unsigned> speed;
 };
 
 class StatsReader {
 public:
-  StatsReader(Color color = COLOR_RED);
+    StatsReader(Color color = COLOR_RED);
 
-  void make_overlays(VideoOverlaySet &items) const;
+    void make_overlays(VideoOverlaySet &items) const;
 
-  // Reads from page 1 (Nature, Level, Name)
-  void read_page1(Logger &logger, Language language,
-                  const ImageViewRGB32 &frame, PokemonFRLG_Stats &stats);
+    // Reads from page 1 (Nature, Level, Name)
+    void read_page1(Logger &logger, Language language,
+                                    const ImageViewRGB32 &frame, PokemonFRLG_Stats &stats);
 
-  // Reads from page 2 (Stats: HP, Atk, Def, SpA, SpD, Spe)
-  void read_page2(Logger &logger, const ImageViewRGB32 &frame,
-                  PokemonFRLG_Stats &stats);
+    // Reads from page 2 (Stats: HP, Atk, Def, SpA, SpD, Spe)
+    void read_page2(Logger &logger, const ImageViewRGB32 &frame,
+                                    PokemonFRLG_Stats &stats);
 
 private:
-  Color m_color;
-  ImageFloatBox m_box_nature;
-  ImageFloatBox m_box_level;
-  ImageFloatBox m_box_name;
-  ImageFloatBox m_box_hp;
-  ImageFloatBox m_box_attack;
-  ImageFloatBox m_box_defense;
-  ImageFloatBox m_box_sp_attack;
-  ImageFloatBox m_box_sp_defense;
-  ImageFloatBox m_box_speed;
+    Color m_color;
+    ImageFloatBox m_box_nature;
+    ImageFloatBox m_box_level;
+    ImageFloatBox m_box_name;
+    ImageFloatBox m_box_hp;
+    ImageFloatBox m_box_attack;
+    ImageFloatBox m_box_defense;
+    ImageFloatBox m_box_sp_attack;
+    ImageFloatBox m_box_sp_defense;
+    ImageFloatBox m_box_speed;
 
 };
 
@@ -65,3 +66,4 @@ private:
 } // namespace NintendoSwitch
 } // namespace PokemonAutomation
 #endif
+

@@ -1,4 +1,4 @@
-/*  Read Stats
+﻿/*  Read Stats
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -19,24 +19,25 @@ namespace PokemonFRLG {
 
 class ReadStats_Descriptor : public SingleSwitchProgramDescriptor {
 public:
-  ReadStats_Descriptor();
+    ReadStats_Descriptor();
 };
 
 class ReadStats : public SingleSwitchProgramInstance {
 public:
-  ReadStats();
-  virtual void program(SingleSwitchProgramEnvironment &env,
+    ReadStats();
+    virtual void program(SingleSwitchProgramEnvironment &env,
                        ProControllerContext &context) override;
 
-  virtual void start_program_border_check(VideoStream &stream,
-                                          FeedbackType feedback_type) override {
-  }
+    virtual void start_program_border_check(VideoStream &stream,
+                                            FeedbackType feedback_type) override {
+    }
 
 private:
-  OCR::LanguageOCROption LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
 };
 
 } // namespace PokemonFRLG
 } // namespace NintendoSwitch
 } // namespace PokemonAutomation
 #endif
+
