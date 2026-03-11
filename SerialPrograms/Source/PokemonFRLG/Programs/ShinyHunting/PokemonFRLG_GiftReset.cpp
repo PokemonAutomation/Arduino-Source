@@ -78,6 +78,7 @@ GiftReset::GiftReset()
         &NOTIFICATION_SHINY,
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
     })
 {
     PA_ADD_OPTION(TARGET);
@@ -126,6 +127,7 @@ void GiftReset::obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControlle
         }
         env.log("Initial A press completed.");
     }else{
+        //Need to double check what the first dialog box is for the other gifts
         pbf_press_button(context, BUTTON_A, 320ms, 640ms);
     }
     bool seen_selection_arrow = false;
@@ -253,6 +255,10 @@ bool GiftReset::try_open_summary(SingleSwitchProgramEnvironment& env, ProControl
     if (ret < 0){
         env.update_stats();
         env.log("open_summary(): Unable to open Start menu after 10 attempts.", COLOR_RED);
+        send_program_recoverable_error_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            "open_summary(): Unable to open Start menu after 10 attempts."
+        );
         return false;
     }
 
@@ -282,6 +288,10 @@ bool GiftReset::try_open_summary(SingleSwitchProgramEnvironment& env, ProControl
         env.log("Entered party menu.");
     }else{
         env.log("open_summary(): Unable to enter party menu.", COLOR_RED);
+        send_program_recoverable_error_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            "open_summary(): Unable to enter party menu."
+        );
         return false;
     }
 
@@ -307,6 +317,10 @@ bool GiftReset::try_open_summary(SingleSwitchProgramEnvironment& env, ProControl
         env.log("Entered summary.");
     }else{
         env.log("open_summary(): Unable to enter summary.", COLOR_RED);
+        send_program_recoverable_error_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            "open_summary(): Unable to enter summary."
+        );
         return false;
     }
     pbf_wait(context, 1000ms);

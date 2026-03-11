@@ -335,15 +335,21 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
     }
 }
 
-void home_black_border_check(ConsoleHandle& console, ProControllerContext& context){
-    console.log("Going to home to check for black border.");
-    pbf_press_button(context, BUTTON_HOME, 120ms, 880ms);
-    context.wait_for_all_requests();
-    StartProgramChecks::check_border(console);
-    console.log("Returning to game.");
-    resume_game_from_home(console, context);
-    context.wait_for_all_requests();
-    console.log("Entered game.");
+void home_black_border_check(ConsoleHandle& console, ProControllerContext& context) {
+    if (GameSettings::instance().DEVICE == GameSettings::Device::switch_1_2) {
+        console.log("Switch 1 or 2 selected in Settings.");
+        console.log("Going to home to check for black border.");
+        pbf_press_button(context, BUTTON_HOME, 120ms, 880ms);
+        context.wait_for_all_requests();
+        StartProgramChecks::check_border(console);
+        console.log("Returning to game.");
+        resume_game_from_home(console, context);
+        context.wait_for_all_requests();
+        console.log("Entered game.");
+    }else{
+        console.log("Non-Switch device selected in Settings.");
+        console.log("Skipping black border check.", COLOR_BLUE);
+    }
 }
 
 
