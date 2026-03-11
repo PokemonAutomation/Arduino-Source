@@ -135,7 +135,10 @@ std::string get_resource_path(){
     if (QDir(system_path).exists()) {
         return system_path.toStdString();
     }
-#endif // Fallback to ~/.local/share/SerialPrograms/Resources
+    // Prevents a prompt telling the user to install Resources to /usr/Resources
+    // if the binary is located at /usr/bin/SerialPrograms
+    return (get_application_base_dir_path() + "/Resources/").toStdString();
+#else
     //  Find the resource directory.
     QString path = get_application_base_dir_path();
     for (size_t c = 0; c < 5; c++){
@@ -147,6 +150,7 @@ std::string get_resource_path(){
         path += "/..";
     }
     return (QCoreApplication::applicationDirPath() + "/../Resources/").toStdString();
+#endif
 }
 std::string get_training_path(){
     //  Find the training data directory.
