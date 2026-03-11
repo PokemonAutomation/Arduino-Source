@@ -49,7 +49,7 @@ void SAMEmbedderSession::run(cv::Mat& input_image, std::vector<float>& model_out
     auto output_tensor = create_tensor<float>(memory_info, model_output, output_shape);
 
     for (int row = 0, p_loc=0; row < SAM_EMBEDDER_INPUT_IMAGE_HEIGHT; row++){
-        for(int col = 0; col < SAM_EMBEDDER_INPUT_IMAGE_WIDTH; col++){
+        for (int col = 0; col < SAM_EMBEDDER_INPUT_IMAGE_WIDTH; col++){
             cv::Vec3b p = input_image.at<cv::Vec3b>(row, col);
             model_input[p_loc++] = p[0];
             model_input[p_loc++] = p[1];
@@ -123,7 +123,7 @@ void SAMSession::run(
     // assign input coordinates and boxes:
     const float scale_x = SAM_EMBEDDER_INPUT_IMAGE_WIDTH / float(original_image_width);
     const float scale_y = SAM_EMBEDDER_INPUT_IMAGE_HEIGHT / float(original_image_height);
-    for(size_t i = 0; i < input_point_labels.size(); i++){
+    for (size_t i = 0; i < input_point_labels.size(); i++){
         input_point_coords_buffer[2*i] = input_points[2*i] * scale_x;
         input_point_coords_buffer[2*i+1] = input_points[2*i+1] * scale_y;
 
@@ -158,11 +158,11 @@ void SAMSession::run(
     output_tensors[2] = create_tensor<float>(memory_info, output_low_res_mask_buffer, output_low_res_mask_shape);
 
     std::array<const char*, SAM_N_INPUT_TENSORS> input_names_c;
-    for(int i = 0; i < SAM_N_INPUT_TENSORS; i++){
+    for (int i = 0; i < SAM_N_INPUT_TENSORS; i++){
         input_names_c[i] = input_names[i].data();
     }
     std::array<const char*, SAM_N_OUTPUT_TENSORS> output_names_c;
-    for(int i = 0; i < SAM_N_OUTPUT_TENSORS; i++){
+    for (int i = 0; i < SAM_N_OUTPUT_TENSORS; i++){
         output_names_c[i] = output_names[i].data();
     }
 
@@ -174,7 +174,7 @@ void SAMSession::run(
     std::cout << "SAM inference time: " << milliseconds << " ms" << std::endl;
 
     output_boolean_mask.resize(original_image_height * original_image_width, false);
-    for(size_t i = 0; i < output_mask_buffer.size(); i++){
+    for (size_t i = 0; i < output_mask_buffer.size(); i++){
         output_boolean_mask[i] = output_mask_buffer[i] > SAM_OUTPUT_MASK_THRESHOLD;
     }
 }
@@ -251,7 +251,7 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
         output_image_embedding.clear();
 
         // fall back to CPU if fails with GPU.
-        for(size_t j = 0; j < 2; j++){
+        for (size_t j = 0; j < 2; j++){
             try{
                 // If fails with GPU, fall back to CPU.
                 // throw Ort::Exception("Testing.", ORT_FAIL);  // to simulate GPU/CPU failure

@@ -189,7 +189,13 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
     uint16_t priority_advances = 0;
     std::vector<CramomaticTarget> possible_targets;
 
-    std::sort(selected_balls.begin(), selected_balls.end(), [](CramomaticSelection sel1, CramomaticSelection sel2) { return sel1.priority > sel2.priority; });
+    std::sort(
+        selected_balls.begin(),
+        selected_balls.end(),
+        [](CramomaticSelection sel1, CramomaticSelection sel2){
+            return sel1.priority > sel2.priority;
+        }
+    );
     // priority_advances only starts counting up after the first good result is found
     while (priority_advances <= MAX_PRIORITY_ADVANCES){
         // calculate the result for the current temp_rng state
@@ -245,8 +251,11 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
 
                     uint16_t priority = selection.priority;
                     selected_balls.erase(
-                        std::remove_if(selected_balls.begin(), selected_balls.end()
-                            , [priority](CramomaticSelection sel) { return sel.priority <= priority; })
+                        std::remove_if(
+                            selected_balls.begin(),
+                            selected_balls.end(),
+                            [priority](CramomaticSelection sel){ return sel.priority <= priority; }
+                        )
                         , selected_balls.end());
                     break;
                 }

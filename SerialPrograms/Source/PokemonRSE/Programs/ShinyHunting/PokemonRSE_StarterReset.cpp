@@ -142,8 +142,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         context.wait_for_all_requests();
         if (ret != 0){
             env.console.log("Failed to detect battle menu.", COLOR_RED);
-        }
-        else {
+        }else{
             env.log("Battle menu detected.");
         }
 
@@ -186,8 +185,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             env.log("Shiny starter detected!");
             stats.shinystarter++;
             send_program_status_notification(env, NOTIFICATION_SHINY_STARTER, "Shiny starter found!", screen, true);
-        }
-        else {
+        }else{
             env.log("Starter is not shiny.");
             env.log("Soft resetting.");
             send_program_status_notification(

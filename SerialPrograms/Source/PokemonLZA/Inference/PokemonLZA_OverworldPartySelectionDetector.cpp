@@ -25,7 +25,7 @@ namespace {
 
 std::array<ImageFloatBox, 6> get_boxes(){
     std::array<ImageFloatBox, 6> boxes;
-    for(size_t i = 0; i < 6; i++){
+    for (size_t i = 0; i < 6; i++){
         boxes[i] = {0.048 + 0.0398*i, 0.926, 0.017, 0.058};
     }
     return boxes;
@@ -75,7 +75,7 @@ OverworldPartySelectionDetector::OverworldPartySelectionDetector(Color color, Vi
 {}
 
 void OverworldPartySelectionDetector::make_overlays(VideoOverlaySet& items) const{
-    for(size_t i = 0; i < 6; i++){
+    for (size_t i = 0; i < 6; i++){
         m_dpad_ups[i].make_overlays(items);
         m_dpad_downs[i].make_overlays(items);
     }
@@ -83,7 +83,7 @@ void OverworldPartySelectionDetector::make_overlays(VideoOverlaySet& items) cons
 
 bool OverworldPartySelectionDetector::detect(const ImageViewRGB32& screen){
     m_detected_up_idx = INVALID_PARTY_IDX, m_detected_down_idx = INVALID_PARTY_IDX;
-    for(uint8_t i = 0; i < 6; i++){
+    for (uint8_t i = 0; i < 6; i++){
         if (i == PreloadSettings::debug().BOX_SYSTEM_CELL_COL){
             PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING = true;
         }

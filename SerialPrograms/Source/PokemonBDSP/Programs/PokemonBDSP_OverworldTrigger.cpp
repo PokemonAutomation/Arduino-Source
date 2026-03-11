@@ -139,7 +139,7 @@ bool OverworldTrigger::find_encounter(VideoStream& stream, ProControllerContext&
         const Milliseconds change_pokemon_delay = 160ms;
         if (location >= 1 && location <= 3){
             const size_t move_down_times = location;
-            for(size_t i = 0; i < move_down_times; ++i){
+            for (size_t i = 0; i < move_down_times; ++i){
                 pbf_press_dpad(context, DPAD_DOWN, 160ms, change_pokemon_delay);
             }
         }else if (location >= 1){ // for location 4 and 5

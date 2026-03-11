@@ -26,7 +26,7 @@ namespace PokemonLZA{
 
 
 DonutBerriesSelectionDetector::DonutBerriesSelectionDetector(size_t menu_index)
-    : m_symbol_box({0.001, menu_index*0.087 + 0.245, 0.006, 0.070}) {}
+    : m_symbol_box({0.001, menu_index*0.087 + 0.245, 0.006, 0.070}){}
 
 void DonutBerriesSelectionDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_symbol_box);

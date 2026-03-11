@@ -26,14 +26,14 @@ MMOSpriteStarSymbolDetector::MMOSpriteStarSymbolDetector(const ImageViewRGB32& f
     , m_symbol_colors(star_boxes.size(), FloatPixel())
     , m_frame_width(frame.width()), m_frame_height(frame.height())
 {
-    for(size_t i = 0; i < m_boxes.size(); i++){
+    for (size_t i = 0; i < m_boxes.size(); i++){
         ImageViewRGB32 ref = extract_box_reference(frame, m_boxes[i]);
         m_initial_images.push_back(std::move(ref));
     }
 }
 
 void MMOSpriteStarSymbolDetector::make_overlays(VideoOverlaySet& items) const{
-    for(const auto& box : m_boxes){
+    for (const auto& box : m_boxes){
         items.add(COLOR_RED, pixelbox_to_floatbox(m_frame_width, m_frame_height, box));
     }
 }
@@ -46,7 +46,7 @@ bool MMOSpriteStarSymbolDetector::process_frame(const ImageViewRGB32& frame, Wal
     }
 
     // Collect image color stats:
-    for(size_t i = 0; i < m_boxes.size(); i++){
+    for (size_t i = 0; i < m_boxes.size(); i++){
         ImageViewRGB32 ref = extract_box_reference(frame, m_boxes[i]);
         double rmsd = ImageMatch::pixel_RMSD(m_initial_images[i], ref);
         m_rmsd[i] += rmsd;
@@ -65,7 +65,7 @@ bool MMOSpriteStarSymbolDetector::process_frame(const ImageViewRGB32& frame, Wal
     // Caller of this detector can query `m_is_star` to know the detection result.
     // Details of the detection can be queried via `m_rmsd` and `m_symbol_colors`
     // 
-    for(size_t i = 0; i < m_boxes.size(); i++){
+    for (size_t i = 0; i < m_boxes.size(); i++){
         // Compute average values:
         m_rmsd[i] = m_rmsd[i] / (double)m_num_frames;
         m_symbol_colors[i] = m_symbol_colors[i] / (double)m_num_frames;
@@ -81,7 +81,7 @@ bool MMOSpriteStarSymbolDetector::process_frame(const ImageViewRGB32& frame, Wal
     }
 
     // ImageRGB32 output = frame.copy();
-    // for(size_t i = 0; i < m_boxes.size(); i++){
+    // for (size_t i = 0; i < m_boxes.size(); i++){
     //     draw_box(output, m_boxes[i], combine_rgb(255, 0,0));
     //     draw_box(output, ImagePixelBox(m_boxes[i].center_x()-1, m_boxes[i].center_y()-1, m_boxes[i].center_x()+1, m_boxes[i].center_y()+1), 
     //         combine_rgb(0, 255,0));

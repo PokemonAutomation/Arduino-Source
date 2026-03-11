@@ -196,7 +196,10 @@ void StatsReader::read_page1(Logger &logger, Language language,
     preprocessed.save("DebugDumps/ocr_level_preprocessed.png");
     stats.level = read_digits_waterfill_template(
         logger, preprocessed, 175.0,
-        "PokemonFRLG/LevelDigits/", "levelDigit");
+        "PokemonFRLG/LevelDigits/", "levelDigit",
+        0x7F  // tighter threshold: prevents blurred lilac (B~208→~156) from
+              // being captured as foreground (190 threshold would capture it)
+    );
   } else {
     // Pass the binarized image to PaddleOCR
     stats.level = OCR::read_number(logger, level_ready, language);

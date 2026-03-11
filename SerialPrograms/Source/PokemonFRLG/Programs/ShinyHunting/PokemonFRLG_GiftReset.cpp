@@ -101,12 +101,12 @@ void GiftReset::obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControlle
     */
 
     env.log("Obtaining Pokemon.");
-    if (TARGET == Target::starters) {
+    if (TARGET == Target::starters){
         AdvanceWhiteDialogWatcher adv_white_start(COLOR_RED);
         int rets = run_until<ProControllerContext>(
             env.console, context,
-            [](ProControllerContext& context) {
-                for (int i = 0; i < 10; i++) {
+            [](ProControllerContext& context){
+                for (int i = 0; i < 10; i++){
                     pbf_press_button(context, BUTTON_A, 320ms, 640ms);
                     pbf_wait(context, 2000ms);
                     context.wait_for_all_requests();
@@ -115,7 +115,7 @@ void GiftReset::obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControlle
             { adv_white_start }
             );
         context.wait_for_all_requests();
-        if (rets < 0) {
+        if (rets < 0){
             env.update_stats();
             env.log("obtain_pokemon(): Unable to start starter dialog after 10 attempts.", COLOR_RED);
             OperationFailedException::fire(
@@ -125,7 +125,7 @@ void GiftReset::obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControlle
             );
         }
         env.log("Initial A press completed.");
-    } else {
+    }else{
         pbf_press_button(context, BUTTON_A, 320ms, 640ms);
     }
     bool seen_selection_arrow = false;
@@ -270,7 +270,7 @@ bool GiftReset::try_open_summary(SingleSwitchProgramEnvironment& env, ProControl
 
     int pm = run_until<ProControllerContext>(
         env.console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_press_button(context, BUTTON_A, 320ms, 640ms);
             pbf_wait(context, 5000ms);
             context.wait_for_all_requests();
@@ -295,7 +295,7 @@ bool GiftReset::try_open_summary(SingleSwitchProgramEnvironment& env, ProControl
     BlackScreenOverWatcher blk2(COLOR_RED);
     int sm = run_until<ProControllerContext>(
         env.console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_press_button(context, BUTTON_A, 320ms, 320ms);
             pbf_press_button(context, BUTTON_A, 320ms, 320ms);
             pbf_wait(context, 5000ms);

@@ -59,7 +59,7 @@ public:
 
     // Under debug mode, will throw FatalProgramException when more than one box cell
     // detects a cursor. This is used for debugging.
-    void set_debug_mode(bool debug_mode) { m_debug_mode = debug_mode; }
+    void set_debug_mode(bool debug_mode){ m_debug_mode = debug_mode; }
 
 private:
     // 6 regions, one for each party pokemon, to detect dpad buttons

@@ -35,7 +35,9 @@ int read_digits_waterfill_template(
     const ImageViewRGB32& stat_region,
     double rmsd_threshold = 175.0,
     const std::string& template_subdir = "PokemonFRLG/Digits/",
-    const std::string& dump_prefix = "digit"
+    const std::string& dump_prefix = "digit",
+    uint8_t binarize_high = 0xBE   // 0xBE=190 for yellow stat boxes;
+                                   // use 0x7F=127 for lilac level box
 );
 
 } // namespace PokemonFRLG

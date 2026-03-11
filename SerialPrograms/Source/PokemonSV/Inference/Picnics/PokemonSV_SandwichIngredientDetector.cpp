@@ -64,7 +64,12 @@ public:
 
 
 SandwichIngredientArrowDetector::SandwichIngredientArrowDetector(size_t menu_index, Color color)
-    : m_arrow(color, GradientArrowType::RIGHT, {0.013, menu_index*0.074 + 0.167, 0.056, 0.084}) {}
+    : m_arrow(
+        color,
+        GradientArrowType::RIGHT,
+        {0.013, menu_index*0.074 + 0.167, 0.056, 0.084}
+    )
+{}
 
 void SandwichIngredientArrowDetector::make_overlays(VideoOverlaySet& items) const{
     m_arrow.make_overlays(items);
@@ -86,14 +91,14 @@ DeterminedSandwichIngredientDetector::DeterminedSandwichIngredientDetector(
 }
 
 void DeterminedSandwichIngredientDetector::make_overlays(VideoOverlaySet& items) const{
-    for(int i = 0; i < 4; i++){
+    for (int i = 0; i < 4; i++){
         items.add(m_color, m_edges[i]);
     }
 }
 
 bool DeterminedSandwichIngredientDetector::detect(const ImageViewRGB32& screen){
     int yellow_count = 0;
-    for(int i = 0; i < 4; i++){
+    for (int i = 0; i < 4; i++){
         FloatPixel avg = image_stats(extract_box_reference(screen, m_edges[i])).average;
         if (avg.r > avg.b * 1.25 && avg.g > avg.b * 1.15){
             yellow_count++;
@@ -104,7 +109,9 @@ bool DeterminedSandwichIngredientDetector::detect(const ImageViewRGB32& screen){
 
 
 SandwichCondimentsPageDetector::SandwichCondimentsPageDetector(Color color)
-    : m_color(color), m_box(0.046, 0.100, 0.021, 0.052) {}
+    : m_color(color)
+    , m_box(0.046, 0.100, 0.021, 0.052)
+{}
 
 void SandwichCondimentsPageDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
@@ -125,14 +132,16 @@ bool SandwichCondimentsPageDetector::detect(const ImageViewRGB32& screen){
         filters,
         {min_size, SIZE_MAX},
         70,
-        [&](Kernels::Waterfill::WaterfillObject& object) -> bool { return true; }
+        [&](Kernels::Waterfill::WaterfillObject& object) -> bool{ return true; }
     );
 }
 
 
 
 SandwichPicksPageDetector::SandwichPicksPageDetector(Color color)
-    : m_color(color), m_box(0.046, 0.100, 0.021, 0.052) {}
+    : m_color(color)
+    , m_box(0.046, 0.100, 0.021, 0.052)
+{}
 
 void SandwichPicksPageDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);

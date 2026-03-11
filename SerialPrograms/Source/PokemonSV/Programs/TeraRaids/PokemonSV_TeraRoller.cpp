@@ -224,7 +224,7 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 throw ProgramFinishedException();
             }
 
-            if (CHECK_ONLY_FIRST) { // Check only the first Pokédex page
+            if (CHECK_ONLY_FIRST){ // Check only the first Pokédex page
                 break;
             }else if (i < 4){ // Check the remaining four Pokédex pages
                 pbf_press_dpad(context, DPAD_RIGHT, 80ms, 160ms);

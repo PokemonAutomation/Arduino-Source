@@ -109,8 +109,7 @@ FriendshipFarmer::FriendshipFarmer()
 void FriendshipFarmer::on_config_value_changed(void* object){
     if (FARMING_OPTION == FarmingOption::Cafe){
         NUM_PARTY_MEMBERS.set_visibility(ConfigOptionState::ENABLED);
-    }
-    else {
+    }else{
         NUM_PARTY_MEMBERS.set_visibility(ConfigOptionState::HIDDEN);
     }
 }
@@ -517,8 +516,7 @@ void FriendshipFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
             //Max = 255 points = 8.5 drinks
             if (FRIENDSHIP_AMOUNT.get() == FriendshipAmount::Evolve){
                 drinks_needed = 6;
-            }
-            else {
+            }else{
                 drinks_needed = 9;
             }
 

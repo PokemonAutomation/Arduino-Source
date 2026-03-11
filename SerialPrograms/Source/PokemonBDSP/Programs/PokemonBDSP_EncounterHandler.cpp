@@ -207,7 +207,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     if (encounter_results.size() > 0){
         os << "Pokemon: (";
         bool first_slug = true;
-        for(const auto& name: encounter_results[0].slug_candidates){
+        for (const auto& name: encounter_results[0].slug_candidates){
             if (first_slug == false){
                 os << ",";
             }
@@ -219,7 +219,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     if (encounter_results.size() > 1){
         os << "(";
         bool first_slug = true;
-        for(const auto& name: encounter_results[1].slug_candidates){
+        for (const auto& name: encounter_results[1].slug_candidates){
             if (first_slug == false){
                 os << ",";
             }

@@ -136,8 +136,7 @@ void LegendaryRunAway::reset_hooh(SingleSwitchProgramEnvironment& env, ProContro
             "Failed to exit area.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Left area.");
     }
 
@@ -162,8 +161,7 @@ void LegendaryRunAway::reset_hooh(SingleSwitchProgramEnvironment& env, ProContro
             "Failed to enter area.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Entered area.");
     }
 
@@ -201,8 +199,7 @@ void LegendaryRunAway::reset_lugia(SingleSwitchProgramEnvironment& env, ProContr
             "Failed to exit area.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Left area.");
     }
 
@@ -228,8 +225,7 @@ void LegendaryRunAway::reset_lugia(SingleSwitchProgramEnvironment& env, ProContr
             "Failed to enter area.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Entered area.");
     }
 

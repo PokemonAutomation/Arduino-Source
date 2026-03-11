@@ -221,7 +221,7 @@ void DailyHighlightRNG::buy_highlight(SingleSwitchProgramEnvironment& env, ProCo
     int ret = run_until<ProControllerContext>(
         env.console,
         context, 
-        [](ProControllerContext& context) { 
+        [](ProControllerContext& context){ 
             pbf_mash_button(context, BUTTON_A, 20000ms);
         },
         { {arrow_detector} }
@@ -452,8 +452,7 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, ProControll
 
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
-    }
-    else {
+    }else{
         pbf_press_button(context, BUTTON_B, 80ms, 80ms);
     }
 

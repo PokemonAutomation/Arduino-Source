@@ -169,7 +169,7 @@ void export_image_annotations_to_yolo_dataset(
     std::map<std::string, size_t> label_counts; // label name -> how many such label in the dataseet
     std::map<std::string, size_t> label_indices; // label name -> label ID
     cout << "Load dataset labels: " << endl;
-    for(size_t i = 0; i < label_names.size(); i++){
+    for (size_t i = 0; i < label_names.size(); i++){
         cout << "- " << label_names[i] << endl;
         label_indices[label_names[i]] = i;
         label_counts[label_names[i]] = 0;
@@ -198,7 +198,7 @@ void export_image_annotations_to_yolo_dataset(
 
     std::set<std::string> missing_labels;
     bool copy_error = false;
-    for(size_t i = 0; i < image_paths.size(); i++){
+    for (size_t i = 0; i < image_paths.size(); i++){
         const auto& image_path = image_paths[i];
         const Filesystem::Path image_file(image_path);
 
@@ -247,7 +247,7 @@ void export_image_annotations_to_yolo_dataset(
             const int64_t image_width = json_obj->get_integer_throw("IMAGE_WIDTH");
             const int64_t image_height = json_obj->get_integer_throw("IMAGE_HEIGHT");
             const JsonArray& json_array = json_obj->get_array_throw("ANNOTATION");
-            for(size_t j = 0; j < json_array.size(); j++){
+            for (size_t j = 0; j < json_array.size(); j++){
                 const ObjectAnnotation anno_obj = ObjectAnnotation::from_json((json_array)[j]);
                 const std::string& label = anno_obj.label;
 
@@ -289,7 +289,7 @@ void export_image_annotations_to_yolo_dataset(
 
         const auto target_label_file = target_label_folder / image_file.filename().replace_extension(".txt");
         std::ofstream fout(target_label_file.string());
-        for(const auto& file_line : label_file_lines){
+        for (const auto& file_line : label_file_lines){
             fout << file_line << "\n";
         }
     }
@@ -301,12 +301,12 @@ void export_image_annotations_to_yolo_dataset(
     }
 
     cout << "Found labels -> count: " << endl;
-    for(const auto& p : label_counts){
+    for (const auto& p : label_counts){
         cout << "- " << p.first << ": " << p.second << endl;
     }
     if (missing_labels.size() > 0){
         cout << "Labels not exported: " << endl;
-        for(const auto& label : missing_labels){
+        for (const auto& label : missing_labels){
             cout << "- " << label << endl;
         }
     }

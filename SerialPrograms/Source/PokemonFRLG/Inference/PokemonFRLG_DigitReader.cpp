@@ -78,7 +78,8 @@ int read_digits_waterfill_template(
     const ImageViewRGB32& stat_region,
     double rmsd_threshold,
     const std::string& template_subdir,
-    const std::string& dump_prefix
+    const std::string& dump_prefix,
+    uint8_t binarize_high
 ) {
     using namespace Kernels::Waterfill;
 
@@ -104,15 +105,17 @@ int read_digits_waterfill_template(
 
     // ------------------------------------------------------------------
     // Step 2: Binarise the blurred image.
-    //   Dark pixels (text + shadow, all channels <= 190) become 1.
-    //   Light pixels (yellow/white background) become 0.
+    //   Pixels where ALL channels <= binarize_high become 1 (foreground).
+    //   Default 0xBE (190) works for yellow stat boxes.
+    //   Use 0x7F (127) for the lilac level box to prevent the blurred
+    //   lilac background (B≈208, drops to ~156 near shadows) from being
+    //   captured and merging digit blobs.
     // ------------------------------------------------------------------
-    // Select dark pixels (text + shadow): all channels <= 190.
-    // 0xff000000 = alpha 255, R=G=B=0 (black)
-    // 0xffbebebe = alpha 255, R=G=B=190
+    uint32_t bh = binarize_high;
+    uint32_t binarize_color = 0xff000000u | (bh << 16) | (bh << 8) | bh;
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
         blurred_img,
-        0xff000000u, 0xffbebebeu
+        0xff000000u, binarize_color
     );
 
     // ------------------------------------------------------------------

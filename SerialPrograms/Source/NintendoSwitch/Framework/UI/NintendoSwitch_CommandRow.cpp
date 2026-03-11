@@ -150,11 +150,11 @@ CommandRow::CommandRow(
 
     connect(
         m_load_profile_button, &QPushButton::clicked,
-        this, [this](bool) { emit load_profile(); }
+        this, [this](bool){ emit load_profile(); }
     );
     connect(
         m_save_profile_button, &QPushButton::clicked,
-        this, [this](bool) { emit save_profile(); }
+        this, [this](bool){ emit save_profile(); }
     );
     connect(
         m_screenshot_button, &QPushButton::clicked,
