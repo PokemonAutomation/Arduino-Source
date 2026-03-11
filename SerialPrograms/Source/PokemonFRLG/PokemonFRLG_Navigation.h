@@ -21,8 +21,7 @@ namespace PokemonFRLG{
 
 // Press A+B+Select+Start at the same time to soft reset, then re-enters the game.
 // There are two random waits, one before pressing start and another after loading in the game.
-// This is to prevent repeatedly getting the same pokemon, due to FRLG's RNG
-// For now this assumes no dry battery.
+// This is to prevent repeatedly getting the same pokemon, due to FRLG's RNG.
 uint64_t soft_reset(ConsoleHandle& console, ProControllerContext &context);
 
 // From the overworld, open the summary of the Pokemon in slot 6. This assumes the menu cursor is in the top slot (POKEDEX)
