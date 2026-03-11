@@ -19,52 +19,51 @@
 #include "Programs/TestPrograms/PokemonFRLG_SoundListener.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadStats.h"
 
-namespace PokemonAutomation {
-    namespace NintendoSwitch {
-        namespace PokemonFRLG {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonFRLG{
 
 
 
-            PanelListFactory::PanelListFactory()
-                : PanelListDescriptor(Pokemon::STRING_POKEMON + " FireRed and LeafGreen")
-            {
-            }
+PanelListFactory::PanelListFactory()
+    : PanelListDescriptor(Pokemon::STRING_POKEMON + " FireRed and LeafGreen")
+{}
 
-            std::vector<PanelEntry> PanelListFactory::make_panels() const {
-                std::vector<PanelEntry> ret;
+std::vector<PanelEntry> PanelListFactory::make_panels() const{
+    std::vector<PanelEntry> ret;
+    
+    ret.emplace_back("---- Settings ----");
+    ret.emplace_back(make_settings<GameSettings_Descriptor, GameSettingsPanel>());
 
-                ret.emplace_back("---- Settings ----");
-                ret.emplace_back(make_settings<GameSettings_Descriptor, GameSettingsPanel>());
-
-                ret.emplace_back("---- Farming ----");
-                if (PreloadSettings::instance().DEVELOPER_MODE) {
-                    ret.emplace_back(make_single_switch_program<NuggetBridgeFarmer_Descriptor, NuggetBridgeFarmer>());
-                }
-
-                //ret.emplace_back("---- General ----");
-
-                ret.emplace_back("---- Shiny Hunting  ----");
-                ret.emplace_back(make_single_switch_program<GiftReset_Descriptor, GiftReset>());
-                ret.emplace_back(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
-                ret.emplace_back(make_single_switch_program<ShinyHuntOverworld_Descriptor, ShinyHuntOverworld>());
-                if (PreloadSettings::instance().DEVELOPER_MODE) {
-                    ret.emplace_back(make_single_switch_program<LegendaryRunAway_Descriptor, LegendaryRunAway>());
-                    ret.emplace_back(make_single_switch_program<PrizeCornerReset_Descriptor, PrizeCornerReset>());
-                }
-
-
-                if (PreloadSettings::instance().DEVELOPER_MODE) {
-                    ret.emplace_back("---- Developer Tools ----");
-                    ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
-                    ret.emplace_back(make_single_switch_program<ReadStats_Descriptor, ReadStats>());
-                }
-
-                return ret;
-            }
-
-
-
-
-        }
+    ret.emplace_back("---- Farming ----");
+    if (PreloadSettings::instance().DEVELOPER_MODE) {
+        ret.emplace_back(make_single_switch_program<NuggetBridgeFarmer_Descriptor, NuggetBridgeFarmer>());
     }
+
+    //ret.emplace_back("---- General ----");
+
+    ret.emplace_back("---- Shiny Hunting  ----");
+    ret.emplace_back(make_single_switch_program<GiftReset_Descriptor, GiftReset>());
+    ret.emplace_back(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
+    ret.emplace_back(make_single_switch_program<ShinyHuntOverworld_Descriptor, ShinyHuntOverworld>());
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back(make_single_switch_program<LegendaryRunAway_Descriptor, LegendaryRunAway>());
+        ret.emplace_back(make_single_switch_program<PrizeCornerReset_Descriptor, PrizeCornerReset>());
+    }
+    
+
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back("---- Developer Tools ----");
+        ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
+        ret.emplace_back(make_single_switch_program<ReadStats_Descriptor, ReadStats>());
+    }
+
+    return ret;
+}
+
+
+
+
+}
+}
 }
