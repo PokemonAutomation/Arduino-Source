@@ -118,7 +118,7 @@ GlobalSettings::GlobalSettings()
         false,
         "<b>Stats File:</b><br>Use the stats file here. Multiple instances of the program can use the same file.",
         LockMode::LOCK_WHILE_RUNNING,
-#if defined(__APPLE__)
+#if defined(__APPLE__) || defined(__linux__)
         QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/UserSettings/PA-Stats.txt",
         QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/UserSettings/PA-Stats.txt"
 #else
@@ -133,6 +133,10 @@ GlobalSettings::GlobalSettings()
 #if defined(__APPLE__)
         QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/TempFiles/",
         QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/TempFiles/"
+#elif defined(__linux__)
+        // /tmp/
+        QStandardPaths::writableLocation(QStandardPaths::TempLocation).toStdString(),
+        QStandardPaths::writableLocation(QStandardPaths::TempLocation).toStdString()
 #else
         "TempFiles/",
         "TempFiles/"

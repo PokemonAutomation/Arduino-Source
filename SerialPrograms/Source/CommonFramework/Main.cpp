@@ -39,6 +39,7 @@
 #include "Windows/MainWindow.h"
 
 #include <iostream>
+#include <QStandardPaths>
 using std::cout;
 using std::endl;
 
@@ -48,6 +49,12 @@ using namespace PokemonAutomation;
 Q_DECLARE_METATYPE(std::string)
 
 void set_working_directory(){
+#if defined(__linux__)
+    // ~/.local/share/SerialPrograms
+    QString base_folder_path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    std::cout << base_folder_path.toStdString() << std::endl;
+    QDir::setCurrent(base_folder_path);
+#else
     QString application_dir_path = qApp->applicationDirPath();
     if (application_dir_path.endsWith(".app/Contents/MacOS")){
         // a macOS bundle. Change working directory to the folder that hosts the .app folder.
@@ -55,6 +62,7 @@ void set_working_directory(){
         QString base_folder_path = QFileInfo(app_bundle_path).dir().absolutePath();
         QDir::setCurrent(base_folder_path);
     }
+#endif
 }
 
 

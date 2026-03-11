@@ -114,6 +114,10 @@ const size_t LOG_HISTORY_LINES = 10000;
 namespace{
 
 QString get_application_base_dir_path(){
+#if defined(__linux__)
+    // ~/.local/share/SerialPrograms
+    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+#else
     QString application_dir_path = qApp->applicationDirPath();
     if (application_dir_path.endsWith(".app/Contents/MacOS")){
         // a macOS bundle. Change working directory to the folder that hosts the .app folder.
@@ -122,8 +126,16 @@ QString get_application_base_dir_path(){
         return base_folder_path;
     }
     return application_dir_path;
+#endif
 }
 std::string get_resource_path(){
+#if defined(__linux__)
+    // Look for Resources installed as part of a package
+    QString system_path = "/usr/share/SerialPrograms/Resources/";
+    if (QDir(system_path).exists()) {
+        return system_path.toStdString();
+    }
+#endif // Fallback to ~/.local/share/SerialPrograms/Resources
     //  Find the resource directory.
     QString path = get_application_base_dir_path();
     for (size_t c = 0; c < 5; c++){
@@ -151,6 +163,10 @@ std::string get_training_path(){
 }
 
 std::string get_runtime_base_path(){
+#if defined(__linux__)
+    // ~/.local/share/SerialPrograms/
+    return (get_application_base_dir_path() + "/").toStdString();
+#else
     //  On MacOS, find the writable application support directory
     if (QSysInfo::productType() == "macos" || QSysInfo::productType() == "osx"){
         // QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) returns
@@ -167,6 +183,7 @@ std::string get_runtime_base_path(){
         return appSupportPath.toStdString() + "/";
     }
     return "./";
+#endif
 }
 
 std::string get_setting_path(){
