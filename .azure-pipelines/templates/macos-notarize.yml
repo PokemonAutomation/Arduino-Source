@@ -191,7 +191,7 @@ stages:
           echo "=== Creating cache directory and moving tarball ==="
           CACHE_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/cache-notarized"
           mkdir -p "$CACHE_DIR"
-          mv "$(Pipeline.Workspace)/Arduino-Source-Internal/SerialPrograms-MacOS-$(compiler)-$(architecture).tar.gz" "$CACHE_DIR/"
+          mv "$(Pipeline.Workspace)/Arduino-Source-Internal/SerialPrograms-MacOS-$(compiler)-$(architecture).$EXT" "$CACHE_DIR/"
 
           echo "=== Tarball created with enclosing folder: $FOLDER_NAME ==="
         displayName: 'Create a tarball'

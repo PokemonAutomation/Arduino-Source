@@ -228,7 +228,7 @@ stages:
           if ($buildType -eq "PrivateBeta") {
               Write-Host "=== Encrypting build artifact with password ==="
               $zipPath = "$artifactSubdir/$name.zip"
-              & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 -p"$(ARTIFACT_PASSWORD)" -mem=AES256 $zipPath "$tempFolder/*"
+              & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 -p"$env:ARTIFACT_PASSWORD" -mem=AES256 $zipPath "$tempFolder/*"
           } else {
               $zipPath = "$artifactSubdir/$name.zip"
               & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 $zipPath "$tempFolder/*"
