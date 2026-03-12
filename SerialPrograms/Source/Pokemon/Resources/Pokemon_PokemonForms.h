@@ -27,7 +27,10 @@ public:
 
 private:
     PokemonForm(std::string slug, std::string display_name, std::string species)
-    : m_slug(std::move(slug)), m_display_name(std::move(display_name)), m_species(std::move(species)) {}
+        : m_slug(std::move(slug))
+        , m_display_name(std::move(display_name))
+        , m_species(std::move(species))
+    {}
     friend struct PokemonFormDatabase;
 
     std::string m_slug;

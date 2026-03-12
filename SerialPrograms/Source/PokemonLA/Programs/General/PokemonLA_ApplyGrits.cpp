@@ -65,7 +65,7 @@ void ApplyGrits::ApplyGritsOnOnePokemon(SingleSwitchProgramEnvironment& env, Pro
     // Start the function when the game is in the item menu, with cursor hovering over Grit Dust
     // Grit Gravel, Grit Pebble and Grit Rock must be on the right side of Grit Dust, in the correct order.
 
-    for(size_t grit_index = 0; grit_index < 4; grit_index++){
+    for (size_t grit_index = 0; grit_index < 4; grit_index++){
         
         if (grit_index > 0){
             // Move to the next Grit item
@@ -78,7 +78,7 @@ void ApplyGrits::ApplyGritsOnOnePokemon(SingleSwitchProgramEnvironment& env, Pro
         pbf_press_button(context, BUTTON_A, 160ms, 400ms);
 
         // Move down the pokemon list
-        for(size_t i = 0; i < pokemon_index; i++){
+        for (size_t i = 0; i < pokemon_index; i++){
             pbf_press_dpad(context, DPAD_DOWN, 160ms, 640ms);
         }
 
@@ -86,12 +86,12 @@ void ApplyGrits::ApplyGritsOnOnePokemon(SingleSwitchProgramEnvironment& env, Pro
         pbf_press_button(context, BUTTON_A, 160ms, 640ms);
 
         // For each of the size pokemon attributes: HP, Attack, Defense, Sp. Atk, Sp. Def, Speed
-        for(size_t attr_index = 0; attr_index < 6; attr_index++){
+        for (size_t attr_index = 0; attr_index < 6; attr_index++){
             if (attr_index > 0){
                 // Move to the next attribute
                 pbf_press_dpad(context, DPAD_DOWN, 160ms, 400ms);
             }
-            for(size_t i = 0; i < grit_level_increase[grit_index]; i++){
+            for (size_t i = 0; i < grit_level_increase[grit_index]; i++){
                 // One press to apply the Grit item
                 pbf_press_button(context, BUTTON_A, 160ms, 800ms);
                 // Second press to clear the message box, whether it is applied successfully or not.
@@ -117,7 +117,7 @@ void ApplyGrits::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
 
     size_t num_pokemon = NUM_POKEMON.current_value();
-    for(size_t i = 0; i < num_pokemon; i++){
+    for (size_t i = 0; i < num_pokemon; i++){
         ApplyGritsOnOnePokemon(env, context, i);
     }
 

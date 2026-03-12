@@ -145,7 +145,7 @@ void AutoFossil::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         if (STOP_AFTER_CURRENT.should_stop()){
             break;
         }
-        for(size_t i = 0; i < num_fossils_to_revive; i++){
+        for (size_t i = 0; i < num_fossils_to_revive; i++){
             revive_one_fossil(env, context);
             std::ostringstream os;
             os << "Got Fossil " << i + 1 << "/" << num_fossils_to_revive;
@@ -156,7 +156,7 @@ void AutoFossil::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
         overworld_to_box_system(env.console, context);
         bool found_match = false;
-        for(uint8_t i = 0; i < num_boxes; i++){
+        for (uint8_t i = 0; i < num_boxes; i++){
             size_t num_fossils_in_box = (i == num_boxes - 1 ? num_fossils_to_revive - i*30 : 30);
             found_match = check_fossils_in_one_box(env, context, i*30, num_fossils_in_box);
             if (found_match && !CONTINUE_AFTER_FIND){
@@ -229,7 +229,7 @@ void AutoFossil::revive_one_fossil(SingleSwitchProgramEnvironment& env, ProContr
         case 1:
             env.log("Detected selection arrow.");
             // This is when the Reg asks you which fossil to revive
-            for(size_t i = 0; i < WHICH_FOSSIL.current_value(); i++){
+            for (size_t i = 0; i < WHICH_FOSSIL.current_value(); i++){
                 pbf_press_dpad(context, DPAD_DOWN, 40ms, 40ms);
             }
             pbf_press_button(context, BUTTON_A, 80ms, 40ms);
@@ -275,7 +275,7 @@ bool AutoFossil::check_fossils_in_one_box(
     bool found_match = false;
     BoxDetector box_detector(COLOR_RED, &env.console.overlay());
     BoxPageInfoWatcher info_watcher(&env.console.overlay());
-    for(size_t i = 0; i < num_fossils_in_box; i++){
+    for (size_t i = 0; i < num_fossils_in_box; i++){
         env.console.overlay().add_log("To cell: (" + std::to_string(box_row) + ", " + std::to_string(box_col) + ")");
         box_detector.move_cursor(env.program_info(), env.console, context, box_row, box_col);
 

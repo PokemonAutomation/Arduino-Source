@@ -10,7 +10,6 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -30,7 +29,7 @@ GiftReset_Descriptor::GiftReset_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Gift Reset",
         "Programs/PokemonFRLG/GiftReset.html",
         "Soft reset for a shiny gift Pokemon.",
-        ProgramControllerClass::StandardController_RequiresPrecision,
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
@@ -67,6 +66,7 @@ GiftReset::GiftReset()
         LockMode::LOCK_WHILE_RUNNING,
         Target::starters
     )
+    , TAKE_VIDEO("<b>Take Video:</b><br>Record a video when the shiny is found.", LockMode::UNLOCK_WHILE_RUNNING, true)
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_SHINY(
         "Shiny found",
@@ -78,9 +78,11 @@ GiftReset::GiftReset()
         &NOTIFICATION_SHINY,
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
     })
 {
     PA_ADD_OPTION(TARGET);
+    PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -100,8 +102,34 @@ void GiftReset::obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControlle
     */
 
     env.log("Obtaining Pokemon.");
-    pbf_press_button(context, BUTTON_A, 320ms, 640ms);
-
+    if (TARGET == Target::starters){
+        AdvanceWhiteDialogWatcher adv_white_start(COLOR_RED);
+        int rets = run_until<ProControllerContext>(
+            env.console, context,
+            [](ProControllerContext& context){
+                for (int i = 0; i < 10; i++){
+                    pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+                    pbf_wait(context, 2000ms);
+                    context.wait_for_all_requests();
+                }
+            },
+            { adv_white_start }
+            );
+        context.wait_for_all_requests();
+        if (rets < 0){
+            env.update_stats();
+            env.log("obtain_pokemon(): Unable to start starter dialog after 10 attempts.", COLOR_RED);
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "obtain_pokemon(): Unable to start starter dialog after 10 attempts.",
+                env.console
+            );
+        }
+        env.log("Initial A press completed.");
+    }else{
+        //Need to double check what the first dialog box is for the other gifts
+        pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+    }
     bool seen_selection_arrow = false;
     //bool seen_nickname_arrow = false;
     while (true){
@@ -205,9 +233,7 @@ void GiftReset::obtain_lapras(SingleSwitchProgramEnvironment& env, ProController
 }
 
 //After declining to nickname, clear rival pickup and open your starter's summary
-void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    GiftReset_Descriptor::Stats& stats = env.current_stats<GiftReset_Descriptor::Stats>();
-
+bool GiftReset::try_open_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //From no to nickname to overworld
     StartMenuWatcher start_menu(COLOR_RED);
 
@@ -227,13 +253,13 @@ void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerC
     );
     context.wait_for_all_requests();
     if (ret < 0){
-        stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "open_summary(): Unable to open Start menu after 10 attempts.",
-            env.console
+        env.log("open_summary(): Unable to open Start menu after 10 attempts.", COLOR_RED);
+        send_program_recoverable_error_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            "open_summary(): Unable to open Start menu after 10 attempts."
         );
+        return false;
     }
 
     if (TARGET != Target::starters){
@@ -246,11 +272,11 @@ void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerC
     } //For starters, no Pokedex yet, do Pokemon is on top and we skip this
 
     //Open party menu
-    BlackScreenOverWatcher blk1(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher blk1(COLOR_RED);
 
     int pm = run_until<ProControllerContext>(
         env.console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_press_button(context, BUTTON_A, 320ms, 640ms);
             pbf_wait(context, 5000ms);
             context.wait_for_all_requests();
@@ -261,12 +287,12 @@ void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerC
     if (pm == 0){
         env.log("Entered party menu.");
     }else{
-        env.log("Unable to enter party menu.", COLOR_RED);
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "open_summary(): Unable to enter Party menu.",
-            env.console
+        env.log("open_summary(): Unable to enter party menu.", COLOR_RED);
+        send_program_recoverable_error_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            "open_summary(): Unable to enter party menu."
         );
+        return false;
     }
 
     //Press up twice to get to the last slot
@@ -276,10 +302,10 @@ void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerC
     }
 
     //Two presses to open summary
-    BlackScreenOverWatcher blk2(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher blk2(COLOR_RED);
     int sm = run_until<ProControllerContext>(
         env.console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_press_button(context, BUTTON_A, 320ms, 320ms);
             pbf_press_button(context, BUTTON_A, 320ms, 320ms);
             pbf_wait(context, 5000ms);
@@ -290,16 +316,32 @@ void GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerC
     if (sm == 0){
         env.log("Entered summary.");
     }else{
-        env.log("Unable to enter summary.", COLOR_RED);
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "open_summary(): Unable to enter summary.",
-            env.console
+        env.log("open_summary(): Unable to enter summary.", COLOR_RED);
+        send_program_recoverable_error_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            "open_summary(): Unable to enter summary."
         );
+        return false;
     }
     pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
-
+    return true;
+}
+uint64_t GiftReset::open_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    uint64_t errors = 0;
+    for (; errors < 5; errors++){
+        if (try_open_summary(env, context)){
+            return errors;
+        }else{
+            env.log("Mashing B to return to overworld and retry...");
+            pbf_mash_button(context, BUTTON_B, 10000ms);
+        }
+    }
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "open_summary(): Failed to open party summary after 5 attempts.",
+        env.console
+    );
 }
 
 
@@ -307,6 +349,8 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     //StartProgramChecks::check_performance_class_wired_or_wireless(context);
 
     GiftReset_Descriptor::Stats& stats = env.current_stats<GiftReset_Descriptor::Stats>();
+
+    home_black_border_check(env.console, context);
 
     /*
     * Settings: Text Speed fast. Default borders.
@@ -325,7 +369,7 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         }else{
             obtain_lapras(env, context);
         }
-        open_summary(env, context);
+        stats.errors += open_summary(env, context);
 
         VideoSnapshot screen = env.console.video().snapshot();
 
@@ -335,7 +379,18 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         if (shiny_starter){
             env.log("Shiny found!");
             stats.shinies++;
-            send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", screen, true);
+            send_program_notification(
+                env,
+                NOTIFICATION_SHINY,
+                COLOR_YELLOW,
+                "Shiny found!",
+                {}, "",
+                screen,
+                true
+            );
+            if (TAKE_VIDEO){
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
+            }
             break;
         }else{
             env.log("Pokemon is not shiny.");
@@ -344,7 +399,7 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                 env, NOTIFICATION_STATUS_UPDATE,
                 "Soft resetting."
             );
-            soft_reset(env.console, context);
+            stats.errors += soft_reset(env.console, context);
             stats.resets++;
             env.update_stats();
             context.wait_for_all_requests();

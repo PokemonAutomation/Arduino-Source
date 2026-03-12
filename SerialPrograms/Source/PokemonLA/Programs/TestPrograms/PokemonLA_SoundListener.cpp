@@ -149,7 +149,7 @@ void search_alpha_roar_from_audio_dump(){
 
     std::ofstream fout("file_check_output.txt");
 
-    for(size_t fileIdx = 0; fileIdx < file_list.size(); fileIdx++){
+    for (size_t fileIdx = 0; fileIdx < file_list.size(); fileIdx++){
         matcher.clear();
 
 
@@ -172,7 +172,7 @@ void search_alpha_roar_from_audio_dump(){
         float minScore = FLT_MAX;
         std::vector<AudioSpectrum> new_spectrums;
         size_t numStreamWindows = std::max(matcher.numMatchedWindows(), audio.numWindows());
-        for(size_t audioIdx = 0; audioIdx < numStreamWindows; audioIdx++){
+        for (size_t audioIdx = 0; audioIdx < numStreamWindows; audioIdx++){
             new_spectrums.clear();
             AlignedVector<float> freqVector(audio.numFrequencies());
             if (audioIdx < audio.numWindows()){
@@ -201,7 +201,7 @@ void search_alpha_roar_from_audio_dump(){
     auto it = closest_files.begin();
     std::cout << "--------------" << std::endl;
     fout.open("file_check_output_sorted.txt");
-    for(int i = 0; it != closest_files.end(); i++, it++){
+    for (int i = 0; it != closest_files.end(); i++, it++){
         if (i < 40)
             std::cout << it->first << ", " << it->second << std::endl;
         fout << it->first << ", " << it->second << std::endl;

@@ -32,7 +32,7 @@ public:
     // 0-bits are set to color `replacement` (another filter constructor parameter).
     // Otherwise, pixels corresponding to 1-bits are set to the color.
     PA_FORCE_INLINE void filter64(uint64_t bits, uint32_t* pixels) const{
-        for(int i = 0; i < 64; i+=16){
+        for (int i = 0; i < 64; i+=16){
             filter16((bits >> i) & 0xFFFF, pixels + i);
         }
     }
@@ -41,7 +41,7 @@ public:
     // only setting `count` (count <= 64) pixels.
     PA_FORCE_INLINE void filter64(uint64_t bits, uint32_t* pixels, size_t count) const{
         const size_t count_round_4 = (count / 4) * 4;
-        for(size_t i = 0; i < count_round_4; i+=4){
+        for (size_t i = 0; i < count_round_4; i+=4){
             filter4((bits >> i) & 0xF, pixels + i);
         }
         
@@ -161,7 +161,7 @@ public:
     // Convert a row of 64 pixels to bit map fit into uint64_t
     PA_FORCE_INLINE uint64_t convert64(const uint32_t* pixels) const{
         uint64_t bits = 0;
-        for(size_t c = 0; c < 64; c += 16){
+        for (size_t c = 0; c < 64; c += 16){
             bits |= convert16(pixels + c) << c;
         }
         return bits;
@@ -172,13 +172,13 @@ public:
         uint64_t bits = 0;
         size_t c = 0;
 
-        for(size_t i = 0; i < count / 16; i++){
+        for (size_t i = 0; i < count / 16; i++){
             bits |= convert16(pixels + c) << c;
             c += 16;
         }
 
         count %= 16;
-        for(size_t i = 0; i < count / 4; i++, c+=4){
+        for (size_t i = 0; i < count / 4; i++, c+=4){
             const uint8x16_t pixel = vld1q_u8((const uint8_t*)(pixels + c));
             bits |= convert4(pixel) << c;
         }
@@ -260,7 +260,7 @@ public:
 
     PA_FORCE_INLINE uint64_t convert64(const uint32_t* pixels) const{
         uint64_t bits = 0;
-        for(size_t c = 0; c < 64; c += 4){
+        for (size_t c = 0; c < 64; c += 4){
             bits |= convert4(pixels + c) << c;
         }
         return bits;
@@ -269,7 +269,7 @@ public:
         uint64_t bits = 0;
         size_t c = 0;
 
-        for(size_t i = 0; i < count / 4; i++, c+=4){
+        for (size_t i = 0; i < count / 4; i++, c+=4){
             bits |= convert4(pixels + c) << c;
         }
         count %= 4;

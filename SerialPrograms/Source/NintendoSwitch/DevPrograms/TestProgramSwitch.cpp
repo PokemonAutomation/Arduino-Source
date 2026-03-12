@@ -172,6 +172,7 @@
 #include "Common/Cpp/StreamConnections/MockDevice.h"
 #include "ML/Inference/ML_PaddleOCRPipeline.h"
 #include "CommonTools/OCR/OCR_RawPaddleOCR.h"
+#include "CommonTools/Images/ImageTools.h"
 
 
 
@@ -493,6 +494,8 @@ private:
 
 
 
+
+
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -514,13 +517,20 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     // JoyconContext context(scope, console.controller<JoyconController>());
     VideoOverlaySet overlays(overlay);
 
+    auto snapshot = feed.snapshot();
+
+    ImageFloatBox box = find_contents_float_box(snapshot);
+    cout << box.x << ", " << box.y << ", " << box.width << ", " << box.height << endl;
+
+    overlays.add(COLOR_RED, box);
 
 
+#if 0
     PokemonLA::EventDialogDetector detector(logger, overlay, true);
 
     auto snapshot = feed.snapshot();
     detector.process_frame(snapshot, current_time());
-
+#endif
 
 #if 0
     UpdateMenuWatcher update_menu(console, COLOR_PURPLE);

@@ -1,0 +1,387 @@
+# templates/github-release.yml
+# Template for publishing releases to GitHub
+
+parameters:
+  stageName: ''
+  displayName: ''
+  dependsOn: []
+  platforms: []
+  buildType: ''
+  targetRepo: ''
+  versionMajor: 0
+  versionMinor: 0
+  versionPatch: 0
+  condition: ''
+
+stages:
+  - stage: ${{ parameters.stageName }}
+    displayName: ${{ parameters.displayName }}
+    dependsOn: ${{ parameters.dependsOn }}
+    condition: ${{ parameters.condition }}
+
+    jobs:
+      - job: CreateRelease
+        displayName: 'Create GitHub Release'
+        pool:
+          vmImage: ubuntu-latest
+
+        variables:
+          - name: VERSION_TAG
+            value: 'v${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}'
+          - name: VERSION_NUMBER
+            value: '${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}'
+          - name: IS_PRERELEASE
+            value: ${{ eq(parameters.buildType, 'Beta') }}
+          - name: BUILD_DATE
+            value: $[format('{0:yyyy}{0:MM}{0:dd}', pipeline.startTime)]
+
+        steps:
+          - checkout: none
+
+          - task: Cache@2
+            displayName: 'Restore Windows Artifacts'
+            inputs:
+              key: 'windows-build | "$(Build.BuildId)"'
+              path: '$(Pipeline.Workspace)/artifacts-windows'
+              cacheHitVar: WINDOWS_CACHE_RESTORED
+            condition: and(succeeded(), contains('${{ join(',', parameters.platforms) }}', 'Windows'))
+
+          - task: Cache@2
+            displayName: 'Restore Linux Artifacts'
+            inputs:
+              key: 'ubuntu-build | "$(Build.BuildId)"'
+              path: '$(Pipeline.Workspace)/artifacts-linux'
+              cacheHitVar: LINUX_CACHE_RESTORED
+            condition: and(succeeded(), contains('${{ join(',', parameters.platforms) }}', 'Linux'))
+
+          - task: Cache@2
+            displayName: 'Restore MacOS ARM64 Artifacts'
+            inputs:
+              key: 'macos-notarized-arm64 | "$(Build.BuildId)"'
+              path: '$(Pipeline.Workspace)/artifacts-macos-arm64'
+              cacheHitVar: MACOS_ARM64_CACHE_RESTORED
+            condition: and(succeeded(), contains('${{ join(',', parameters.platforms) }}', 'MacOS_ARM64'))
+
+          - task: Cache@2
+            displayName: 'Restore MacOS x64 Artifacts'
+            inputs:
+              key: 'macos-notarized-x64 | "$(Build.BuildId)"'
+              path: '$(Pipeline.Workspace)/artifacts-macos-x64'
+              cacheHitVar: MACOS_X64_CACHE_RESTORED
+            condition: and(succeeded(), contains('${{ join(',', parameters.platforms) }}', 'MacOS_x64'))
+
+          - script: |
+              type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+              curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+              sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+              echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+              sudo apt update
+              sudo apt install gh -y
+              gh --version
+            displayName: 'Install GitHub CLI'
+            condition: succeeded()
+
+          - script: |
+              echo "$(GITHUB_TOKEN)" | gh auth login --with-token
+              gh auth status
+            displayName: 'Authenticate with GitHub'
+            condition: succeeded()
+            env:
+              GITHUB_TOKEN: $(GITHUB_PAT)
+
+          - script: |
+              REPO="${{ parameters.targetRepo }}"
+              echo "Fetching ChangeLog.md from $REPO..."
+
+              gh api repos/$REPO/contents/ChangeLog.md --jq '.content' | base64 -d > changelog-raw.md
+              if [ ! -s changelog-raw.md ]; then
+                echo "✗ Failed to fetch ChangeLog.md or file is empty"
+                exit 1
+              fi
+
+              echo "✓ ChangeLog.md fetched successfully"
+              cat changelog-raw.md
+            displayName: 'Fetch ChangeLog.md'
+            condition: succeeded()
+            env:
+              GITHUB_TOKEN: $(GITHUB_PAT)
+
+          - script: |
+              REPO="${{ parameters.targetRepo }}"
+              echo "Fetching latest commit SHA from $REPO..."
+
+              DEFAULT_BRANCH=$(gh api repos/$REPO --jq '.default_branch')
+              if [ -z "$DEFAULT_BRANCH" ]; then
+                echo "✗ Failed to fetch default branch"
+                exit 1
+              fi
+
+              echo "✓ Default branch: $DEFAULT_BRANCH"
+              COMMIT_SHA=$(gh api repos/$REPO/commits/$DEFAULT_BRANCH --jq '.sha // empty')
+              if [ -z "$COMMIT_SHA" ] || [ ${#COMMIT_SHA} -ne 40 ]; then
+                echo "✗ Failed to fetch commit SHA or invalid SHA received"
+                exit 1
+              fi
+
+              echo "✓ Latest commit SHA: $COMMIT_SHA"
+              echo "##vso[task.setvariable variable=COMMIT_SHA]$COMMIT_SHA"
+            displayName: 'Fetch Latest Commit SHA'
+            condition: succeeded()
+            env:
+              GITHUB_TOKEN: $(GITHUB_PAT)
+
+          - script: |
+              VERSION_TAG="$(VERSION_TAG)"
+              BUILD_TYPE="${{ parameters.buildType }}"
+
+              if [ "$BUILD_TYPE" = "Beta" ]; then
+                VERSION_TAG="${VERSION_TAG}-beta"
+              fi
+
+              echo "Creating release notes from ChangeLog.md..."
+              cp changelog-raw.md release-notes.md
+
+              echo "Release notes created:"
+              cat release-notes.md
+
+              echo "##vso[task.setvariable variable=RELEASE_VERSION]$VERSION_TAG"
+            displayName: 'Prepare Release Notes'
+            condition: succeeded()
+
+          - script: |
+              ARTIFACTS_DIR="$(Pipeline.Workspace)"
+              echo "=== Debugging Cache Contents ==="
+              
+              if [ "$(WINDOWS_CACHE_RESTORED)" = "true" ]; then
+                echo "Windows artifacts directory structure:"
+                ls -lR "$ARTIFACTS_DIR/artifacts-windows/" || echo "Directory not found"
+              fi
+              
+              if [ "$(LINUX_CACHE_RESTORED)" = "true" ]; then
+                echo "Linux artifacts directory structure:"
+                ls -lR "$ARTIFACTS_DIR/artifacts-linux/" || echo "Directory not found"
+              fi
+              
+              if [ "$(MACOS_ARM64_CACHE_RESTORED)" = "true" ]; then
+                echo "MacOS ARM64 artifacts directory structure:"
+                ls -lR "$ARTIFACTS_DIR/artifacts-macos-arm64/" || echo "Directory not found"
+              fi
+              
+              if [ "$(MACOS_X64_CACHE_RESTORED)" = "true" ]; then
+                echo "MacOS X64 artifacts directory structure:"
+                ls -lR "$ARTIFACTS_DIR/artifacts-macos-x64/" || echo "Directory not found"
+              fi
+              
+              echo "=== End Debug ==="
+            displayName: 'Debug: List Cache Contents'
+            condition: succeeded()
+
+          - script: |
+              ARTIFACTS_DIR="$(Pipeline.Workspace)"
+              echo "Validating artifacts..."
+
+              if [ "$(WINDOWS_CACHE_RESTORED)" = "true" ]; then
+                WIN_ARTIFACT=$(find "$ARTIFACTS_DIR/artifacts-windows/" -name "*.zip" -type f | head -n 1)
+                if [ ! -f "$WIN_ARTIFACT" ]; then
+                  echo "✗ Error: Windows artifact not found"
+                  exit 1
+                fi
+                echo "✓ Found Windows artifact: $WIN_ARTIFACT"
+                echo "##vso[task.setvariable variable=WIN_ARTIFACT]$WIN_ARTIFACT"
+              else
+                echo "Skipping Windows artifact validation"
+              fi
+
+              if [ "$(LINUX_CACHE_RESTORED)" = "true" ]; then
+                LINUX_ARTIFACT=$(find "$ARTIFACTS_DIR/artifacts-linux/" -name "*.tar.gz" -type f | head -n 1)
+                if [ ! -f "$LINUX_ARTIFACT" ]; then
+                  echo "✗ Error: Linux artifact not found"
+                  exit 1
+                fi
+                echo "✓ Found Linux artifact: $LINUX_ARTIFACT"
+                echo "##vso[task.setvariable variable=LINUX_ARTIFACT]$LINUX_ARTIFACT"
+              else
+                echo "Skipping Linux artifact validation"
+              fi
+
+              if [ "$(MACOS_ARM64_CACHE_RESTORED)" = "true" ]; then
+                MACOS_ARM64_ARTIFACT=$(find "$ARTIFACTS_DIR/artifacts-macos-arm64/" -name "*.tar.gz" -type f | head -n 1)
+                if [ ! -f "$MACOS_ARM64_ARTIFACT" ]; then
+                  echo "✗ Error: MacOS ARM64 artifact not found"
+                  exit 1
+                fi
+                echo "✓ Found MacOS ARM64 artifact: $MACOS_ARM64_ARTIFACT"
+                echo "##vso[task.setvariable variable=MACOS_ARM64_ARTIFACT]$MACOS_ARM64_ARTIFACT"
+              else
+                echo "Skipping MacOS ARM64 artifact validation"
+              fi
+
+              if [ "$(MACOS_X64_CACHE_RESTORED)" = "true" ]; then
+                MACOS_X64_ARTIFACT=$(find "$ARTIFACTS_DIR/artifacts-macos-x64/" -name "*.tar.gz" -type f | head -n 1)
+                if [ ! -f "$MACOS_X64_ARTIFACT" ]; then
+                  echo "✗ Error: MacOS X64 artifact not found"
+                  exit 1
+                fi
+                echo "✓ Found MacOS X64 artifact: $MACOS_X64_ARTIFACT"
+                echo "##vso[task.setvariable variable=MACOS_X64_ARTIFACT]$MACOS_X64_ARTIFACT"
+              else
+                echo "Skipping MacOS X64 artifact validation"
+              fi
+
+              echo "✓ All required artifacts validated successfully"
+            displayName: 'Validate Artifacts'
+            condition: succeeded()
+
+          - script: |
+              ARTIFACTS_DIR="$(Pipeline.Workspace)"
+              VERSION="$(VERSION_NUMBER)"
+              BUILD_DATE="$(BUILD_DATE)"
+
+              echo "Renaming artifacts to standardized format..."
+              if [ "$(WINDOWS_CACHE_RESTORED)" = "true" ] && [ -n "$(WIN_ARTIFACT)" ]; then
+                OLD_PATH="$(WIN_ARTIFACT)"
+                NEW_NAME="PA-SerialPrograms-Windows-x64-${VERSION}-${BUILD_DATE}.zip"
+                NEW_PATH="$ARTIFACTS_DIR/$NEW_NAME"
+
+                echo "Renaming: $(basename "$OLD_PATH") -> $NEW_NAME"
+                mv "$OLD_PATH" "$NEW_PATH"
+                echo "##vso[task.setvariable variable=WIN_ARTIFACT]$NEW_PATH"
+              fi
+
+              if [ "$(LINUX_CACHE_RESTORED)" = "true" ] && [ -n "$(LINUX_ARTIFACT)" ]; then
+                OLD_PATH="$(LINUX_ARTIFACT)"
+                NEW_NAME="PA-SerialPrograms-Ubuntu-x64-${VERSION}-${BUILD_DATE}.tar.gz"
+                NEW_PATH="$ARTIFACTS_DIR/$NEW_NAME"
+
+                echo "Renaming: $(basename "$OLD_PATH") -> $NEW_NAME"
+                mv "$OLD_PATH" "$NEW_PATH"
+                echo "##vso[task.setvariable variable=LINUX_ARTIFACT]$NEW_PATH"
+              fi
+
+              if [ "$(MACOS_ARM64_CACHE_RESTORED)" = "true" ] && [ -n "$(MACOS_ARM64_ARTIFACT)" ]; then
+                OLD_PATH="$(MACOS_ARM64_ARTIFACT)"
+                NEW_NAME="PA-SerialPrograms-MacOS-ARM64-${VERSION}-${BUILD_DATE}.tar.gz"
+                NEW_PATH="$ARTIFACTS_DIR/$NEW_NAME"
+
+                echo "Renaming: $(basename "$OLD_PATH") -> $NEW_NAME"
+                mv "$OLD_PATH" "$NEW_PATH"
+                echo "##vso[task.setvariable variable=MACOS_ARM64_ARTIFACT]$NEW_PATH"
+              fi
+
+              if [ "$(MACOS_X64_CACHE_RESTORED)" = "true" ] && [ -n "$(MACOS_X64_ARTIFACT)" ]; then
+                OLD_PATH="$(MACOS_X64_ARTIFACT)"
+                NEW_NAME="PA-SerialPrograms-MacOS-x64-${VERSION}-${BUILD_DATE}.tar.gz"
+                NEW_PATH="$ARTIFACTS_DIR/$NEW_NAME"
+
+                echo "Renaming: $(basename "$OLD_PATH") -> $NEW_NAME"
+                mv "$OLD_PATH" "$NEW_PATH"
+                echo "##vso[task.setvariable variable=MACOS_X64_ARTIFACT]$NEW_PATH"
+              fi
+
+              echo "✓ All artifacts renamed successfully"
+            displayName: 'Rename Artifacts'
+            condition: succeeded()
+
+          - script: |
+              RELEASE_VERSION="$(RELEASE_VERSION)"
+              REPO="${{ parameters.targetRepo }}"
+              COMMIT_SHA="$(COMMIT_SHA)"
+
+              echo "Creating git tag $RELEASE_VERSION at commit $COMMIT_SHA..."
+              if gh api repos/$REPO/git/refs/tags/$RELEASE_VERSION 2>/dev/null; then
+                echo "Tag $RELEASE_VERSION already exists. Deleting..."
+                gh api -X DELETE repos/$REPO/git/refs/tags/$RELEASE_VERSION
+              fi
+
+              gh api repos/$REPO/git/refs \
+                -f ref="refs/tags/$RELEASE_VERSION" \
+                -f sha="$COMMIT_SHA"
+
+              if [ $? -eq 0 ]; then
+                echo "✓ Tag created successfully"
+              else
+                echo "✗ Failed to create tag"
+                exit 1
+              fi
+            displayName: 'Create Git Tag'
+            condition: succeeded()
+            env:
+              GITHUB_TOKEN: $(GITHUB_PAT)
+
+          - script: |
+              RELEASE_VERSION="$(RELEASE_VERSION)"
+              REPO="${{ parameters.targetRepo }}"
+              IS_PRERELEASE="$(IS_PRERELEASE)" 
+              COMMIT_SHA="$(COMMIT_SHA)"
+
+              echo "Creating GitHub release $RELEASE_VERSION in $REPO..."
+              if gh release view "$RELEASE_VERSION" --repo "$REPO" >/dev/null 2>&1; then
+                echo "Release $RELEASE_VERSION already exists. Deleting..."
+                gh release delete "$RELEASE_VERSION" --repo "$REPO" --yes
+              fi
+
+              if [ "$IS_PRERELEASE" = "True" ]; then
+                gh release create "$RELEASE_VERSION" \
+                  --repo "$REPO" \
+                  --title "Version $RELEASE_VERSION" \
+                  --notes-file release-notes.md \
+                  --prerelease \
+                  --target "$COMMIT_SHA"
+              else
+                gh release create "$RELEASE_VERSION" \
+                  --repo "$REPO" \
+                  --title "SerialPrograms $RELEASE_VERSION" \
+                  --notes-file release-notes.md \
+                  --target "$COMMIT_SHA"
+              fi
+
+              if [ $? -eq 0 ]; then
+                echo "✓ Release created successfully"
+              else
+                echo "✗ Failed to create release"
+                exit 1
+              fi
+            displayName: 'Create GitHub Release'
+            condition: succeeded()
+            env:
+              GITHUB_TOKEN: $(GITHUB_PAT)
+
+          - script: |
+              RELEASE_VERSION="$(RELEASE_VERSION)"
+              REPO="${{ parameters.targetRepo }}"
+              echo "Uploading artifacts to release $RELEASE_VERSION..."
+
+              if [ "$(WINDOWS_CACHE_RESTORED)" = "true" ] && [ -n "$(WIN_ARTIFACT)" ]; then
+                echo "Uploading Windows artifact: $(WIN_ARTIFACT)"
+                gh release upload "$RELEASE_VERSION" "$(WIN_ARTIFACT)" --repo "$REPO" --clobber
+              else
+                echo "Skipping Windows artifact upload"
+              fi
+
+              if [ "$(LINUX_CACHE_RESTORED)" = "true" ] && [ -n "$(LINUX_ARTIFACT)" ]; then
+                echo "Uploading Linux artifact: $(LINUX_ARTIFACT)"
+                gh release upload "$RELEASE_VERSION" "$(LINUX_ARTIFACT)" --repo "$REPO" --clobber
+              else
+                echo "Skipping Linux artifact upload"
+              fi
+
+              if [ "$(MACOS_ARM64_CACHE_RESTORED)" = "true" ] && [ -n "$(MACOS_ARM64_ARTIFACT)" ]; then
+                echo "Uploading MacOS ARM64 artifact: $(MACOS_ARM64_ARTIFACT)"
+                gh release upload "$RELEASE_VERSION" "$(MACOS_ARM64_ARTIFACT)" --repo "$REPO" --clobber
+              else
+                echo "Skipping MacOS ARM64 artifact upload"
+              fi
+
+              if [ "$(MACOS_X64_CACHE_RESTORED)" = "true" ] && [ -n "$(MACOS_X64_ARTIFACT)" ]; then
+                echo "Uploading MacOS X64 artifact: $(MACOS_X64_ARTIFACT)"
+                gh release upload "$RELEASE_VERSION" "$(MACOS_X64_ARTIFACT)" --repo "$REPO" --clobber
+              else
+                echo "Skipping MacOS X64 artifact upload"
+              fi
+
+              echo "✓ All required artifacts uploaded successfully"
+              echo "Release URL: https://github.com/$REPO/releases/tag/$RELEASE_VERSION"
+            displayName: 'Upload Artifacts to Release'
+            condition: succeeded()
+            env:
+              GITHUB_TOKEN: $(GITHUB_PAT)

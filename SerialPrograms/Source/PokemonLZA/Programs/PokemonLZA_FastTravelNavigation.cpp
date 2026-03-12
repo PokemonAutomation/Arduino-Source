@@ -42,7 +42,7 @@ int get_current_selector_index(
         SelectionArrowType::RIGHT,
         box
     );
-    if (arrow.detect(screen)) {
+    if (arrow.detect(screen)){
         ImageFloatBox detected = arrow.last_detected();
         double arrow_height = detected.height;
         double stride = arrow_height + spacing;
@@ -228,7 +228,7 @@ bool navigate_to_lumiose_sewers_location(
     // Use this box to detect cafe woof icon to differentiate between lumiose-sewers-1 and lumiose-sewers-2
     const ImageFloatBox& cafe_woof_box = {0.537000, 0.783000, 0.043000, 0.077000};
     // Zoom in for detection
-    for(int i = 0; i < 5; i++){
+    for (int i = 0; i < 5; i++){
         pbf_move_right_joystick(context, {0, +1}, 100ms, 300ms); // Zoom in
     }
     // Set filter to facilities to reduce number of locations on the list
@@ -277,7 +277,7 @@ bool navigate_to_lumiose_sewers_location(
                 context.wait_for_all_requests();
                 if (cafe_woof_icon.detect(console.video().snapshot())){
                     console.log("Lumiose Sewers 1 detected");
-                    for(int i = 0; i < 5; i++){
+                    for (int i = 0; i < 5; i++){
                         pbf_move_right_joystick(context, {0, -1}, 100ms, 300ms); // Zoom out
                     }
                     context.wait_for_all_requests();
@@ -291,7 +291,7 @@ bool navigate_to_lumiose_sewers_location(
                 context.wait_for_all_requests();
                 if (!cafe_woof_icon.detect(console.video().snapshot())){
                     console.log("Lumiose Sewers 2 detected");
-                    for(int i = 0; i < 5; i++){
+                    for (int i = 0; i < 5; i++){
                         pbf_move_right_joystick(context, {0, -1}, 100ms, 300ms); // Zoom out
                     }
                     context.wait_for_all_requests();

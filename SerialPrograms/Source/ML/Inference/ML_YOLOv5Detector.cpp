@@ -67,7 +67,7 @@ bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
     m_output_boxes.clear();
 
     // fall back to CPU if fails with GPU.
-    for(size_t i = 0; i < 2; i++){
+    for (size_t i = 0; i < 2; i++){
         try{
             // if (m_use_gpu){ throw Ort::Exception("Testing.", ORT_FAIL); }  // to simulate GPU/CPU failure
             // If fails with GPU, fall back to CPU.
@@ -119,7 +119,7 @@ bool YOLOv5Watcher::process_frame(const ImageViewRGB32& frame, WallClock timesta
     m_detector.detect(frame);
 
     m_overlay_set.clear();
-    for(const auto& box : m_detector.detected_boxes()){
+    for (const auto& box : m_detector.detected_boxes()){
         std::string text = m_detector.session()->label_name(box.label_idx) + ": " + tostr_fixed(box.score, 2);
         m_overlay_set.add(COLOR_RED, box.box, text);
     }

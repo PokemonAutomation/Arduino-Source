@@ -14,6 +14,8 @@
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -45,6 +47,9 @@ private:
 
     void reset_hooh(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void reset_lugia(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+    PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
+    BooleanCheckBoxOption TAKE_VIDEO;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 

@@ -16,8 +16,9 @@ namespace PokemonLZA{
 
 
 DayNightChangeWatcher::DayNightChangeWatcher(Color color)
-: VisualInferenceCallback("DayNighChangeWatcher")
-, m_black_screen(color) {}
+    : VisualInferenceCallback("DayNighChangeWatcher")
+    , m_black_screen(color)
+{}
 
 void DayNightChangeWatcher::make_overlays(VideoOverlaySet& items) const{
     m_black_screen.make_overlays(items);

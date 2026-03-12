@@ -45,7 +45,7 @@ public:
 
     // Set whether the game is currently holding a pokemon to move around in box view.
     // The box cursor detection functionality inside BoxDetector needs to know this info.
-    void holding_pokemon(bool holding_pokemon) { m_holding_pokemon = holding_pokemon; }
+    void holding_pokemon(bool holding_pokemon){ m_holding_pokemon = holding_pokemon; }
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
@@ -64,7 +64,7 @@ public:
 
     // Under debug mode, will throw FatalProgramException when more than one box cell
     // detects a cursor. This is used for debugging.
-    void set_debug_mode(bool debug_mode) { m_debug_mode = debug_mode; }
+    void set_debug_mode(bool debug_mode){ m_debug_mode = debug_mode; }
 
 private:
     // called for each box cell to check if the selection arrow is above that cell

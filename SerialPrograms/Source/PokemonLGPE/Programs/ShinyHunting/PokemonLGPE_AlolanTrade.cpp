@@ -101,8 +101,7 @@ void AlolanTrade::run_trade(SingleSwitchProgramEnvironment& env, JoyconContext& 
             "Failed to start trade.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Trade started.");
     }
 
@@ -123,8 +122,7 @@ void AlolanTrade::run_trade(SingleSwitchProgramEnvironment& env, JoyconContext& 
             "Did not detect end of trade.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Trade completed.");
     }
 
@@ -262,8 +260,7 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
                 context.wait_for_all_requests();
                 pbf_wait(context, 5000ms);
                 context.wait_for_all_requests();
-            }
-            else {
+            }else{
                 env.log("Not shiny.");
             }
 

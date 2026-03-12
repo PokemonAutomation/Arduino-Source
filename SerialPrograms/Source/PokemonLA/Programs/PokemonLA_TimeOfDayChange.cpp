@@ -107,7 +107,7 @@ void change_time_of_day_at_tent(
         num_movements = 2;
         dpad_dir = DPAD_UP;
     }
-    for(int i = 0; i < num_movements; i++){
+    for (int i = 0; i < num_movements; i++){
         pbf_press_dpad(context, dpad_dir, 240ms, 560ms);
     }
 

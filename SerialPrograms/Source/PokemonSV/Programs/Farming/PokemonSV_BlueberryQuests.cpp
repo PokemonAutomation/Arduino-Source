@@ -145,7 +145,7 @@ int read_BP(const ProgramInfo& info, VideoStream& stream, ProControllerContext& 
     int result = run_until<ProControllerContext>(
         stream, context,
         [&](ProControllerContext& context){
-            for (int i = 0; i < 6; i++) { //try 6 times
+            for (int i = 0; i < 6; i++){ //try 6 times
                 pbf_press_dpad(context, DPAD_RIGHT, 400ms, 160ms);
                 pbf_wait(context, 1600ms);
                 context.wait_for_all_requests();
@@ -184,7 +184,7 @@ std::vector<BBQuests> read_quests(
     int result = run_until<ProControllerContext>(
         stream, context,
         [&](ProControllerContext& context){
-            for (int i = 0; i < 6; i++) { //try 6 times
+            for (int i = 0; i < 6; i++){ //try 6 times
                 pbf_press_dpad(context, DPAD_RIGHT, 400ms, 160ms);
                 pbf_wait(context, 1600ms);
                 context.wait_for_all_requests();
@@ -292,7 +292,7 @@ std::vector<BBQuests> process_quest_list(
             }
             else{
                 bool quest_in_table = false;
-                for(const std::unique_ptr<BBQuestTableRow>& row : exclusions_table){
+                for (const std::unique_ptr<BBQuestTableRow>& row : exclusions_table){
                     if(n == row->quest){
                         stream.log("Quest found in inclusions/exclusions table.");
                         quest_in_table = true;
@@ -569,7 +569,7 @@ void quest_make_tm(const ProgramInfo& info, VideoStream& stream, ProControllerCo
         int make_tm = run_until<ProControllerContext>(
             stream, context,
             [&](ProControllerContext& context){
-                for (int i = 0; i < 229; i++) { //229 is max number of TMs
+                for (int i = 0; i < 229; i++){ //229 is max number of TMs
                     //click on tm
                     pbf_press_button(context, BUTTON_A, 160ms, 400ms);
                     pbf_wait(context, 800ms);
@@ -630,7 +630,7 @@ void quest_travel_500(const ProgramInfo& info, VideoStream& stream, ProControlle
 
     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 160ms, 840ms);
 
-    for(int j = 0; j < 60; j++){ //One min just to be safe.
+    for (int j = 0; j < 60; j++){ //One min just to be safe.
         pbf_controller_state(
             context, BUTTON_LCLICK, DPAD_NONE,
             {0, +1}, {+1, 0}, 1000ms

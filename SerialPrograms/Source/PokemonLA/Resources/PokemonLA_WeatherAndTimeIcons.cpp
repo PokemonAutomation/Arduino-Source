@@ -19,7 +19,7 @@ std::array<ImageRGB32, NUM_WEATHER> BUILD_WEATHER_ICONS(){
     const std::string image_folder_path = RESOURCE_PATH() + "PokemonLA/Weather/";
 
     std::array<ImageRGB32, NUM_WEATHER> ret;
-    for(size_t i = 0; i < NUM_WEATHER; i++){
+    for (size_t i = 0; i < NUM_WEATHER; i++){
         const auto& weather_name = WEATHER_NAMES[i];
         const std::string image_path = image_folder_path + weather_name + ".png";
         // std::cout << image_path << std::endl;
@@ -41,7 +41,7 @@ std::array<ImageRGB32, NUM_TIMES_OF_DAY> BUILD_TIME_OF_DAY_ICONS(){
     const std::string image_folder_path = RESOURCE_PATH() + "PokemonLA/Time/";
 
     std::array<ImageRGB32, NUM_TIMES_OF_DAY> ret;
-    for(size_t i = 0; i < NUM_TIMES_OF_DAY; i++){
+    for (size_t i = 0; i < NUM_TIMES_OF_DAY; i++){
         // +1 here to skip TimeOfDay::NONE
         const auto& time_name = TIME_OF_DAY_NAMES[i+1];
         const std::string image_path = image_folder_path + time_name + ".png";

@@ -10,8 +10,6 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
@@ -31,7 +29,7 @@ PrizeCornerReset_Descriptor::PrizeCornerReset_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Prize Corner Reset",
         "Programs/PokemonFRLG/PrizeCornerReset.html",
         "Redeem and soft reset for a shiny Game Corner prize.",
-        ProgramControllerClass::StandardController_RequiresPrecision,
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
@@ -68,6 +66,7 @@ PrizeCornerReset::PrizeCornerReset()
         LockMode::LOCK_WHILE_RUNNING,
         0
     )
+    , TAKE_VIDEO("<b>Take Video:</b><br>Record a video when the shiny is found.", LockMode::UNLOCK_WHILE_RUNNING, true)
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_SHINY(
         "Shiny found",
@@ -82,6 +81,7 @@ PrizeCornerReset::PrizeCornerReset()
     })
 {
     PA_ADD_OPTION(SLOT);
+    PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -89,32 +89,39 @@ PrizeCornerReset::PrizeCornerReset()
 void PrizeCornerReset::obtain_prize(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     PrizeCornerReset_Descriptor::Stats& stats = env.current_stats<PrizeCornerReset_Descriptor::Stats>();
 
-    env.log("Talking to booth.");
-    pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+    for (int attempts = 0;; attempts++){
+        PrizeSelectWatcher prize_dialog(COLOR_RED);
 
-    PrizeSelectWatcher prize_dialog(COLOR_RED);
+        //Only 1 line to press through in english, not sure about other languages?
+        int ret = run_until<ProControllerContext>(
+            env.console, context,
+            [&](ProControllerContext& context){
+                env.log("Talking to booth.");
+                pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+                pbf_press_button(context, BUTTON_B, 320ms, 1680ms);
+                pbf_press_button(context, BUTTON_B, 320ms, 1680ms);
+                pbf_press_button(context, BUTTON_B, 320ms, 1680ms);
+            },
+            { prize_dialog }
+        );
+        context.wait_for_all_requests();
+        if (ret == 0){
+            break;
+        }
 
-    //Only 1 line to press through in english, not sure about other languages?
-    int ret = run_until<ProControllerContext>(
-        env.console, context,
-        [](ProControllerContext& context){
-            for (int i = 0; i < 5; i++){
-                pbf_press_button(context, BUTTON_B, 320ms, 320ms);
-                pbf_wait(context, 600ms); //Don't go too fast, have to let the box pop up
-                context.wait_for_all_requests();
-            }
-        },
-        { prize_dialog }
-    );
-    context.wait_for_all_requests();
-    if (ret < 0){
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "obtain_prize(): Unable to find prize menu.",
-            env.console
-        );
+        if (attempts >= 5){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "obtain_prize(): Unable to open prize menu after 5 attempts.",
+                env.console
+            );
+        }
+
+        env.log("Unable to find prize menu... Retrying...", COLOR_RED);
+
+        pbf_mash_button(context, BUTTON_B, 5000ms);
     }
 
     //Select prize slot
@@ -136,6 +143,8 @@ void PrizeCornerReset::obtain_prize(SingleSwitchProgramEnvironment& env, ProCont
 void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     PrizeCornerReset_Descriptor::Stats& stats = env.current_stats<PrizeCornerReset_Descriptor::Stats>();
 
+    home_black_border_check(env.console, context);
+
     /*
     * Settings: Text Speed fast. Default borders.
     * Setup: Have a party of 5. Stand in front of the prize redemption. Save game. Move cursor back to top.
@@ -146,7 +155,7 @@ void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControlle
 
     while (!shiny_found){
         obtain_prize(env, context);
-        open_slot_six(env.console, context);
+        stats.errors += open_slot_six(env.console, context);
 
         VideoSnapshot screen = env.console.video().snapshot();
 
@@ -156,7 +165,18 @@ void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControlle
         if (shiny_found){
             env.log("Shiny found!");
             stats.shinies++;
-            send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", screen, true);
+            send_program_notification(
+                env,
+                NOTIFICATION_SHINY,
+                COLOR_YELLOW,
+                "Shiny found!",
+                {}, "",
+                screen,
+                true
+            );
+            if (TAKE_VIDEO){
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
+            }
             break;
         }else{
             env.log("Prize is not shiny.");
@@ -165,7 +185,7 @@ void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControlle
                 env, NOTIFICATION_STATUS_UPDATE,
                 "Soft resetting."
             );
-            soft_reset(env.console, context);
+            stats.errors += soft_reset(env.console, context);
             stats.resets++;
             context.wait_for_all_requests();
         }

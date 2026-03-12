@@ -181,7 +181,7 @@ void leave_picnic(const ProgramInfo& info, VideoStream& stream, ProControllerCon
     stream.overlay().add_log("Leaving picnic", COLOR_WHITE);
 
     pbf_press_button(context, BUTTON_Y, 240ms, 800ms);
-    for(int i = 0; i < 5; i++){
+    for (int i = 0; i < 5; i++){
         PromptDialogWatcher prompt(COLOR_RED, {0.595, 0.517, 0.273, 0.131});
         context.wait_for_all_requests();
         int ret = wait_until(
@@ -271,7 +271,7 @@ void print_flypoint_location(const ProgramInfo& info, VideoStream& stream, ProCo
         return;
     }
 
-    for(const auto& box: found_locations){
+    for (const auto& box: found_locations){
         std::ostringstream os;
         os << "Found " + fly_point_string + " at box: {" << box.x << ", " << box.y << "}"; // << ", width=" << box.width << ", height=" << box.height;
         stream.log(os.str());
@@ -368,7 +368,7 @@ void move_cursor_to_position_offset_from_flypoint(const ProgramInfo& info, Video
         double closest_icon_y = 0.0;
         double closest_dist2 = DBL_MAX;  // distance^2 in pixels
 
-        for(const auto& box: found_locations){
+        for (const auto& box: found_locations){
             const double found_x = box.x;
             const double found_y = box.y;
             const double x_diff = (found_x - expected_x) * 1920;
@@ -452,7 +452,7 @@ bool detect_closest_flypoint_and_move_map_cursor_there(
         }
         
         // Find the detected PokeCenter icon closest to the screen center (where player character is on the map).
-        for(const auto& box: found_locations){
+        for (const auto& box: found_locations){
             const double loc_x = (box.x + box.width/2) * screen_width;
             const double loc_y = (box.y + box.height/2) * screen_height;
             const double x_diff = loc_x - center_x, y_diff = loc_y - center_y;

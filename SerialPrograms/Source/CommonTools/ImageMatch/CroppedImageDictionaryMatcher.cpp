@@ -115,7 +115,7 @@ ImageMatchResult CroppedImageDictionaryMatcher::match(
     if (PreloadSettings::debug().IMAGE_DICTIONARY_MATCHING){
         std::cout << "CroppedImageDictionaryMatcher: results: " << std::endl;
         size_t count = 0;
-        for(const auto& result : results.results){
+        for (const auto& result : results.results){
             std::cout << "alpha=" << result.first << ", " << result.second << std::endl;
             const auto& image_template = m_database.find(result.second)->second.image_template();
             dump_debug_image(global_logger_command_line(), "CommonFramework/CroppedImageDictionaryMatcher", "match_result_" + std::to_string(count) + "_" + result.second, image_template);

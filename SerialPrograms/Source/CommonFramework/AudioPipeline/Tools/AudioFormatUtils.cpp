@@ -91,7 +91,7 @@ float audio_sample_sum(const QAudioFormat& format, const char* data, size_t len)
     convert_samples_to_float(format, data, len, buffer.data());
 
     float sum = 0.0f;
-    for(float v: buffer){
+    for (float v: buffer){
         sum += v;
     }
     return sum;

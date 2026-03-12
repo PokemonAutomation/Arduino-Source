@@ -108,7 +108,7 @@ bool detect_MMO_question_mark(const PokemonAutomation::ImageViewRGB32& frame, co
         },
         {scale(min_bg_size), scale(max_bg_size)},
         90,
-        [](WaterfillObject&) { return true; }
+        [](WaterfillObject&){ return true; }
     );
 
 //    cout << "detected = " << detected << endl;
@@ -121,7 +121,7 @@ bool detect_MMO_question_mark(const PokemonAutomation::ImageViewRGB32& frame, co
             image, MMOQuestionMarkCurveMatcher::instance(),
             {{combine_rgb(180, 180, 180), combine_rgb(255, 255, 255)}},
             {scale(min_curve_size), scale(max_curve_size)}, 100,
-            [](WaterfillObject&) { return true; }
+            [](WaterfillObject&){ return true; }
         );
     }
 
@@ -137,21 +137,21 @@ MMOQuestionMarkDetector::MMOQuestionMarkDetector(Logger& logger)
 
 
 void MMOQuestionMarkDetector::make_overlays(VideoOverlaySet& items) const{
-    for(size_t i = 0; i < hisui_map_boxes.size(); i++){
+    for (size_t i = 0; i < hisui_map_boxes.size(); i++){
         items.add(COLOR_RED, hisui_map_boxes[i]);
     }
 }
 
 std::array<bool, 5> MMOQuestionMarkDetector::detect_MMO_on_hisui_map(const ImageViewRGB32& frame){
     std::array<bool, 5> detected{false};
-    for(size_t i = 0; i < hisui_map_boxes.size(); i++){
+    for (size_t i = 0; i < hisui_map_boxes.size(); i++){
         detected[i] = detect_MMO_question_mark(frame, hisui_map_boxes[i]);
     }
     
     if (std::find(detected.begin(), detected.end(), true) != detected.end()){
         std::ostringstream os;
         os << "Detected MMO question mark on region ";
-        for(size_t i = 0; i < detected.size(); i++){
+        for (size_t i = 0; i < detected.size(); i++){
             if (detected[i]){
                 os << WILD_REGION_SHORT_NAMES[i] << ", ";
             }
@@ -204,7 +204,7 @@ std::vector<ImagePixelBox> MMOQuestionMarkDetector::detect_MMOs_on_region_map(co
 
 
 void add_hisui_MMO_detection_to_overlay(const std::array<bool, 5>& detection_result, VideoOverlaySet& items){
-    for(size_t i = 0; i < hisui_map_boxes.size(); i++){
+    for (size_t i = 0; i < hisui_map_boxes.size(); i++){
         if (detection_result[i]){
             items.add(COLOR_CYAN, hisui_map_boxes[i]);
         }

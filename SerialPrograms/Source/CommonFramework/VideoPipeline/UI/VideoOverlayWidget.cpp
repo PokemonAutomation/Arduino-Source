@@ -264,7 +264,7 @@ void VideoOverlayWidget::render_images(QPainter& painter){
     const double width = static_cast<double>(this->width());
     const double height = static_cast<double>(this->height());
 
-    for(const auto& image_overlay: *m_images){
+    for (const auto& image_overlay: *m_images){
         QImage q_image = image_overlay.image.to_QImage_ref();
         // source rect is the entire portion of the q_image, in pixel units
         QRectF source_rect(0.0, 0.0, static_cast<double>(q_image.width()), static_cast<double>(q_image.height()));
