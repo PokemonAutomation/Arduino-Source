@@ -79,7 +79,7 @@ Weather detect_weather_on_map(Logger& logger, const ImageViewRGB32& screen){
     const auto match_result = WEATHER_ICON_MATCHER().match(icon_image, 100);
     std::ostringstream os;
     os << "Weather icon match result: ";
-    for(auto result : match_result.results){
+    for (auto result : match_result.results){
         os << result.second << "(" << result.first << ") ";
     }
     logger.log(os.str(), COLOR_BLUE);
@@ -116,7 +116,7 @@ TimeOfDay detect_time_of_day_on_map(Logger& logger, const ImageViewRGB32& screen
 
     std::ostringstream os;
     os << "Time of day icon match result: ";
-    for(auto result : match_result.results){
+    for (auto result : match_result.results){
         os << result.second << "(" << result.first << ") ";
     }
     logger.log(os.str(), COLOR_BLUE);

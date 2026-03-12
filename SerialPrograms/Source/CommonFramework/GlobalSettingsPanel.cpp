@@ -253,14 +253,8 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(LOG_WINDOW_STARTUP);
 
     PA_ADD_OPTION(KEYBOARD_CONTROLS_LAYOUT);
+    PA_ADD_OPTION(STREAM_HISTORY);
 
-#if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
-    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(STREAM_HISTORY);
-    }
-#else
-    STREAM_HISTORY->set_enabled(false);
-#endif
 #ifdef PA_ENABLE_SLEEP_SUPPRESS
     PA_ADD_OPTION(SLEEP_SUPPRESS);
 #endif
@@ -358,14 +352,14 @@ void GlobalSettings::load_json(const JsonValue& json){
             std::cout << "Enter command line test mode:" << std::endl;
             if (COMMAND_LINE_TEST_LIST.size() > 0){
                 std::cout << "Run following tests: " << std::endl;
-                for(const auto& name : COMMAND_LINE_TEST_LIST){
+                for (const auto& name : COMMAND_LINE_TEST_LIST){
                     std::cout << "- " << name << std::endl;
                 }
             }
             if (COMMAND_LINE_IGNORE_LIST.size() > 0){
                 std::cout << "Ignore following " << COMMAND_LINE_IGNORE_LIST.size() << " paths: " << std::endl;
                 const size_t MAX_LINES = 5;
-                for(size_t i = 0; i < COMMAND_LINE_IGNORE_LIST.size() && i < MAX_LINES; i++){
+                for (size_t i = 0; i < COMMAND_LINE_IGNORE_LIST.size() && i < MAX_LINES; i++){
                     std::cout << "- " << COMMAND_LINE_IGNORE_LIST[i] << std::endl;
                 }
                 if (COMMAND_LINE_IGNORE_LIST.size() > MAX_LINES){
@@ -387,7 +381,7 @@ JsonValue GlobalSettings::to_json() const{
 
     {
         JsonArray test_list;
-        for(const auto& name : COMMAND_LINE_TEST_LIST){
+        for (const auto& name : COMMAND_LINE_TEST_LIST){
             test_list.push_back(name);
         }
         command_line_test_obj["TEST_LIST"] = std::move(test_list);
@@ -395,7 +389,7 @@ JsonValue GlobalSettings::to_json() const{
 
     {
         JsonArray ignore_list;
-        for(const auto& name : COMMAND_LINE_IGNORE_LIST){
+        for (const auto& name : COMMAND_LINE_IGNORE_LIST){
             ignore_list.push_back(name);
         }
         command_line_test_obj["IGNORE_LIST"] = std::move(ignore_list);

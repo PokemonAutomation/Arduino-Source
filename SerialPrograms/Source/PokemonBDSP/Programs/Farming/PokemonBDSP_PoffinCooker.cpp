@@ -152,10 +152,10 @@ void PoffinCooker::program(SingleSwitchProgramEnvironment& env, ProControllerCon
 
             // Get the stats of the screen's image
             ImageStats IMGstats = image_stats(extract_box_reference(screen, box));
-            if (IMGstats.average.g > 170 && IMGstats.average.r < 125) { // Looking for the green arrow
+            if (IMGstats.average.g > 170 && IMGstats.average.r < 125){ // Looking for the green arrow
                 turn = true;
             }
-            if (IMGstats.average.b > 170 && IMGstats.average.r < 125) { // Looking for the blue arrow
+            if (IMGstats.average.b > 170 && IMGstats.average.r < 125){ // Looking for the blue arrow
                 turn = false;
             }
             if (turn){
@@ -172,10 +172,10 @@ void PoffinCooker::program(SingleSwitchProgramEnvironment& env, ProControllerCon
 
             // Get the stats of the screen's image
             ImageStats IMGstats = image_stats(extract_box_reference(screen, box));
-            if (IMGstats.average.g > 170 && IMGstats.average.r < 125) { // Looking for the green arrow
+            if (IMGstats.average.g > 170 && IMGstats.average.r < 125){ // Looking for the green arrow
                 turn = true;
             }
-            if (IMGstats.average.b > 170 && IMGstats.average.r < 125) { // Looking for the blue arrow
+            if (IMGstats.average.b > 170 && IMGstats.average.r < 125){ // Looking for the blue arrow
                 turn = false;
             }
             if (turn){

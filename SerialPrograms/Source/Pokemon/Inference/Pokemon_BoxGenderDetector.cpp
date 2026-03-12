@@ -24,7 +24,10 @@ namespace PokemonAutomation{
 namespace Pokemon{
 
 BoxGenderDetector::BoxGenderDetector(const ImageFloatBox& box, double area_ratio_threshold, Color color)
-: m_box(box), m_area_ratio_threshold(area_ratio_threshold), m_color(color) {}
+    : m_box(box)
+    , m_area_ratio_threshold(area_ratio_threshold)
+    , m_color(color)
+{}
 
 void BoxGenderDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);

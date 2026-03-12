@@ -78,7 +78,7 @@ FeatureType feature_distance(const FeatureVector& a, const FeatureVector& b){
         throw std::runtime_error("feature size mismatch");
     }
     FeatureType sum = 0.0f;
-    for(size_t i = 0; i < a.size(); i++){
+    for (size_t i = 0; i < a.size(); i++){
         FeatureType d = a[i] - b[i];
         sum += d*d;
     }
@@ -89,7 +89,7 @@ FeatureType feature_distance(const FeatureVector& a, const FeatureVector& b){
 std::string feature_to_str(const FeatureVector& a){
     std::ostringstream os;
     os << "[";
-    for(size_t i = 0; i < a.size(); i++){
+    for (size_t i = 0; i < a.size(); i++){
         if (i != 0){
             os << ", ";
         }
@@ -121,13 +121,13 @@ void run_Sobel_gradient_filter(const ImageViewRGB32& image, std::function<void(s
     const size_t x_end = width - ksz + 1;
     const size_t y_end = height - ksz + 1;
 
-    for(size_t y = 0; y < y_end; y++){
-        for(size_t x = 0; x < x_end; x++){
+    for (size_t y = 0; y < y_end; y++){
+        for (size_t x = 0; x < x_end; x++){
             int sum_x[3] = {0, 0, 0};
             int sum_y[3] = {0, 0, 0};
             bool has_alpha_pixel = false;
-            for(size_t sy = 0; sy < 3; sy++){
-                for(size_t sx = 0; sx < 3; sx++){
+            for (size_t sy = 0; sy < 3; sy++){
+                for (size_t sx = 0; sx < 3; sx++){
                     uint32_t p = image.pixel(x + sx, y + sy);
                     int alpha = p >> 24;
                     if (alpha < 128){
@@ -136,7 +136,7 @@ void run_Sobel_gradient_filter(const ImageViewRGB32& image, std::function<void(s
                         has_alpha_pixel = true;
                         break;
                     }
-                    for(int ch = 0; ch < 3; ch++){ // rgb channel
+                    for (int ch = 0; ch < 3; ch++){ // rgb channel
                         int shift = ch * 8;
                         int c = (uint32_t(0xff) & p >> shift);
 
@@ -170,11 +170,11 @@ ImageRGB32 smooth_image(const ImageViewRGB32& image){
 
     size_t image_width = image.width();
     size_t image_height = image.height();
-    for(size_t y = 0; y < image_height; y++){
-        for(size_t x = 0; x < image_width; x++){
+    for (size_t y = 0; y < image_height; y++){
+        for (size_t x = 0; x < image_width; x++){
             float sum[3] = {0,0,0};
             float weights = 0.0;
-            for(size_t i = 0; i < 5; i++){
+            for (size_t i = 0; i < 5; i++){
                 if (x + i < 2 || x + i >= image_width + 2){
                     continue;
                 }
@@ -187,7 +187,7 @@ ImageRGB32 smooth_image(const ImageViewRGB32& image){
 
                 weights += filter[i];
 
-                for(int ch = 0; ch < 3; ch++){
+                for (int ch = 0; ch < 3; ch++){
                     int shift = 16 - ch * 8;
                     int c = (uint32_t(0xff) & p >> shift);
                     sum[ch] += filter[i] * c;
@@ -198,7 +198,7 @@ ImageRGB32 smooth_image(const ImageViewRGB32& image){
             }
 
             char c[3];
-            for(int ch = 0; ch < 3; ch++){
+            for (int ch = 0; ch < 3; ch++){
                 sum[ch] /= weights;
                 int v = std::min(std::max(int(sum[ch] + 0.5f), 0), 255);
                 c[ch] = (char)v;
@@ -210,11 +210,11 @@ ImageRGB32 smooth_image(const ImageViewRGB32& image){
     ImageRGB32 result2(image.width(), image.height());
     result2.fill(0);
 
-    for(size_t y = 0; y < image_height; y++){
-        for(size_t x = 0; x < image_width; x++){
+    for (size_t y = 0; y < image_height; y++){
+        for (size_t x = 0; x < image_width; x++){
             float sum[3] = {0,0,0};
             float weights = 0.0;
-            for(size_t i = 0; i < 5; i++){
+            for (size_t i = 0; i < 5; i++){
                 if (y + i < 2 || y + i - 2 >= image_height){
                     continue;
                 }
@@ -227,7 +227,7 @@ ImageRGB32 smooth_image(const ImageViewRGB32& image){
 
                 weights += filter[i];
 
-                for(int ch = 0; ch < 3; ch++){
+                for (int ch = 0; ch < 3; ch++){
                     int shift = 16 - ch * 8;
                     int c = (uint32_t(0xff) & (p >> shift));
                     sum[ch] += filter[i] * c;
@@ -238,7 +238,7 @@ ImageRGB32 smooth_image(const ImageViewRGB32& image){
             }
 
             char c[3];
-            for(int ch = 0; ch < 3; ch++){
+            for (int ch = 0; ch < 3; ch++){
                 sum[ch] /= weights;
                 int v = std::min(std::max(int(sum[ch] + 0.5f), 0), 255);
                 c[ch] = (char)v;
@@ -309,7 +309,7 @@ FeatureVector compute_gradient_histogram(const ImageViewRGB32& image){
     });
 
     FeatureVector result(num_angle_divisions);
-    for(size_t i = 0; i < num_angle_divisions; i++){
+    for (size_t i = 0; i < num_angle_divisions; i++){
         result[i] = bin[i] / (FeatureType)num_grad;
     }
 
@@ -342,8 +342,8 @@ FeatureVector compute_feature(const ImageViewRGB32& input_image){
     const int num_divisions = 2;
     const double portion = 1.0 / (double)num_divisions;
     FeatureVector result;
-    for(int i = 0; i < num_divisions; i++){
-        for(int j = 0; j < num_divisions; j++){
+    for (int i = 0; i < num_divisions; i++){
+        for (int j = 0; j < num_divisions; j++){
             if (i == 1 && j == 0){
                 continue; // skip the berry / bonus wave overlapping area
             }
@@ -437,7 +437,7 @@ std::multimap<double, std::string> match_pokemon_map_sprite_feature(const ImageV
 
     std::multimap<double, std::string> result;
 
-    for(const auto& slug : region_available_sprites[region_index]){
+    for (const auto& slug : region_available_sprites[region_index]){
         auto it = sprite_map.find(slug);
         if (it == sprite_map.end()){
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Inconsistent sprite slug definitions in resource: " + slug);
@@ -565,13 +565,13 @@ double compute_MMO_sprite_gradient_distance(const ImageViewRGB32& gradient_templ
 
 #ifdef USE_IMAGE_LEVEL_TRANSLATION
     score = FLT_MAX;
-    for(int oy = -max_offset; oy <= max_offset; oy++){ // offset_y
-        for(int ox = -max_offset; ox <= max_offset; ox++){ // offset_x
+    for (int oy = -max_offset; oy <= max_offset; oy++){ // offset_y
+        for (int ox = -max_offset; ox <= max_offset; ox++){ // offset_x
 
             float match_score = 0.0;
             int num_gradients = 0;
-            for(size_t y = 0; y < gradient.height(); y++){
-                for(size_t x = 0; x < gradient.width(); x++){
+            for (size_t y = 0; y < gradient.height(); y++){
+                for (size_t x = 0; x < gradient.width(); x++){
                     uint32_t g = gradient.pixel(x, y);
                     if (is_transparent(g)){
                         continue;
@@ -612,8 +612,8 @@ double compute_MMO_sprite_gradient_distance(const ImageViewRGB32& gradient_templ
 #ifdef USE_PIXEL_LEVEL_TRANSLATION
     score = 0;
     int num_gradients = 0;
-    for(size_t y = 0; y < gradient.height(); y++){
-        for(size_t x = 0; x < gradient.width(); x++){
+    for (size_t y = 0; y < gradient.height(); y++){
+        for (size_t x = 0; x < gradient.width(); x++){
             uint32_t g = gradient.pixel(x, y);
             uint32_t gx = uint32_t(0xff) & (g >> 16);
             uint32_t gy = uint32_t(0xff) & (g >> 8);
@@ -623,8 +623,8 @@ double compute_MMO_sprite_gradient_distance(const ImageViewRGB32& gradient_templ
             }
 
             float min_pixel_score = FLT_MAX;
-            for(int oy = -max_offset; oy <= max_offset; oy++){ // offset_y
-                for(int ox = -max_offset; ox <= max_offset; ox++){ // offset_x
+            for (int oy = -max_offset; oy <= max_offset; oy++){ // offset_y
+                for (int ox = -max_offset; ox <= max_offset; ox++){ // offset_x
                     int my = (int)(y + oy); // moved y
                     int mx = (int)(x + ox); // moved x
                     if (mx < 0 || mx >= tempt_width || my < 0 || my >= tempt_height){
@@ -672,21 +672,21 @@ double compute_MMO_sprite_gradient_distance(const ImageViewRGB32& gradient_templ
     score = 0;
     int num_gradients = 0;
 
-    for(int y = 0; y < (int)gradient.height(); y++){
-        for(int x = 0; x < (int)gradient.width(); x++){
+    for (int y = 0; y < (int)gradient.height(); y++){
+        for (int x = 0; x < (int)gradient.width(); x++){
             uint32_t g = gradient.pixel(x, y);
             if (is_transparent(g)){
                 continue;
             }
 
             double min_block_score = FLT_MAX;
-            for(int oy = -max_offset; oy <= max_offset; oy++){ // offset_y
-                for(int ox = -max_offset; ox <= max_offset; ox++){ // offset_x
+            for (int oy = -max_offset; oy <= max_offset; oy++){ // offset_y
+                for (int ox = -max_offset; ox <= max_offset; ox++){ // offset_x
 
                     double block_score = 0.0;
                     int block_size = 0;
-                    for(int by = y - block_radius; by <= y + block_radius; by++){
-                        for(int bx = x - block_radius; bx <= x + block_radius; bx++){
+                    for (int by = y - block_radius; by <= y + block_radius; by++){
+                        for (int bx = x - block_radius; bx <= x + block_radius; bx++){
                             if (bx < 0 || bx >= (int)gradient.width() || by < 0 || by >= (int)gradient.height()){
                                 continue;
                             }
@@ -821,7 +821,7 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
     {
         std::ostringstream os;
         os << "  Candidates: ";
-        for(size_t i = 0; i < result.candidates.size(); i++){
+        for (size_t i = 0; i < result.candidates.size(); i++){
             if (i > 0){
                 os << ", ";
             }
@@ -840,11 +840,11 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
         const ImagePixelBox expanded_box = box.expand_as(2);
         const ImageHSV32 sprite_hsv = compute_MMO_sprite_color_hsv(extract_box_reference(screen, expanded_box));
         
-        for(const auto& slug: result.candidates){
+        for (const auto& slug: result.candidates){
             const ImageHSV32& candidate_template = sprite_map.find(slug)->second.hsv_image;
             double score = FLT_MAX;
-            for(size_t ox = 0; ox <= 4; ox++){
-                for(size_t oy = 0; oy <= 4; oy++){
+            for (size_t ox = 0; ox <= 4; ox++){
+                for (size_t oy = 0; oy <= 4; oy++){
                     ImagePixelBox shifted_box(ox, oy, box.width(), box.height());
                     double match_score = compute_MMO_sprite_hsv_distance(
                         candidate_template,
@@ -861,7 +861,7 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
     // Build a map from sprite to their color score and output scores for debugging
     std::map<std::string, double> color_match_sprite_scores;
     int result_count = 0;
-    for(const auto& p : result.color_match_results){
+    for (const auto& p : result.color_match_results){
         const auto& slug = p.second;
         color_match_sprite_scores.emplace(slug, p.first);
         if (result_count < 5){
@@ -920,7 +920,7 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
     // std::string sprite_filename = os.str();
     // gradient_image.save(sprite_filename);
 
-    for(const auto& p : result.color_match_results){
+    for (const auto& p : result.color_match_results){
         const auto& slug = p.second;
         ImageViewRGB32 template_gradient = sprite_map.find(slug)->second.gradient_image;
         double score = compute_MMO_sprite_gradient_distance(template_gradient, gradient_image);
@@ -928,7 +928,7 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
     }
 
     result_count = 0;
-    for(const auto& p : result.gradient_match_results){
+    for (const auto& p : result.gradient_match_results){
         if (result_count == 5){
             size_t num_rest_results = result.gradient_match_results.size() - 5;
             std::ostringstream os;

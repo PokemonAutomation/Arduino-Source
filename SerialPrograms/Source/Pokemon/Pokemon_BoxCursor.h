@@ -23,7 +23,11 @@ extern const size_t BOX_COLS;
 struct BoxCursor{
     // Convert a global index to a BoxCursor position
     BoxCursor(size_t index);
-    BoxCursor(size_t box, size_t row, size_t column) : box(box), row(row), column(column) {}
+    BoxCursor(size_t box, size_t row, size_t column)
+        : box(box)
+        , row(row)
+        , column(column)
+    {}
     BoxCursor(){}
 
     size_t box = 0;

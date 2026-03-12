@@ -100,8 +100,7 @@ void LegendaryHuntEmerald::reset_regi(SingleSwitchProgramEnvironment& env, ProCo
             "Failed to exit area.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Left area.");
     }
     pbf_wait(context, 400ms);
@@ -124,8 +123,7 @@ void LegendaryHuntEmerald::reset_regi(SingleSwitchProgramEnvironment& env, ProCo
             "Failed to enter area.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Entered area.");
     }
 
@@ -177,8 +175,7 @@ void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, Pr
             "Failed to exit area.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Left area.");
     }
 
@@ -201,8 +198,7 @@ void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, Pr
             "Failed to enter area.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Entered area.");
     }
     ssf_press_button(context, BUTTON_B, 0ms, 640ms);
@@ -267,8 +263,7 @@ void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, Pro
             "Failed to exit area.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Left area.");
     }
 
@@ -290,8 +285,7 @@ void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, Pro
             "Failed to enter area.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Entered area.");
     }
 
@@ -340,8 +334,7 @@ void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, ProCo
             "Failed to exit area.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Left area.");
     }
 
@@ -367,8 +360,7 @@ void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, ProCo
             "Failed to enter area.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Entered area.");
     }
 
@@ -407,8 +399,7 @@ void LegendaryHuntEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, ProC
             "Failed to exit area.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Left area.");
     }
 
@@ -434,8 +425,7 @@ void LegendaryHuntEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, ProC
             "Failed to enter area.",
             env.console
         );
-    }
-    else {
+    }else{
         env.log("Entered area.");
     }
 

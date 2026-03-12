@@ -21,7 +21,7 @@ std::vector<std::string> make_DONUT_BERRIES_SLUGS(){
     std::string path = RESOURCE_PATH() + "PokemonLZA/Donuts/donut_berry_list.json";
     JsonValue json = load_json_file(path);
     JsonArray& berry_array = json.to_array_throw(path);
-    for(const auto& obj : berry_array){
+    for (const auto& obj : berry_array){
         ret.push_back(obj.to_string_throw());
     }
     return ret;

@@ -97,7 +97,7 @@ WeatherFinder::WeatherFinder()
 }
 
 // //Test Method
-// void WeatherFinder::validate_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+// void WeatherFinder::validate_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 //     VideoSnapshot screen = env.console.video().snapshot();
     
 //     WeatherIconDetector clearDetector(
@@ -144,8 +144,8 @@ WeatherFinder::WeatherFinder()
 //     env.log("Rainbow is " + std::to_string(rainbowResult));
 // }
 
-WeatherIconType get_weather_type(size_t option) {
-    switch (option) {
+WeatherIconType get_weather_type(size_t option){
+    switch (option){
         case 0:
             return WeatherIconType::Clear;
         case 1:
@@ -163,8 +163,8 @@ WeatherIconType get_weather_type(size_t option) {
     }
 }
 
-std::string get_weather_name(size_t option) {
-    switch (option) {
+std::string get_weather_name(size_t option){
+    switch (option){
         case 0:
             return "Clear";
         case 1:
@@ -182,20 +182,20 @@ std::string get_weather_name(size_t option) {
     }
 }
 
-void bench_it(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void bench_it(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     sit_on_bench(env.console, context);
     pbf_move_left_joystick(context, {0, -1}, 500ms, 500ms);
     context.wait_for_all_requests();
 }
 
-void WeatherFinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void WeatherFinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     WeatherFinder_Descriptor::Stats& stats = env.current_stats<WeatherFinder_Descriptor::Stats>();
     assert_16_9_720p_min(env.logger(), env.console);
     
     bool isDay = !START_POSITION.current_value();
 
     //Reset to day time
-    if (!isDay) {
+    if (!isDay){
         env.log("Resetting to Day");
         bench_it(env, context);
         isDay = true;
@@ -209,7 +209,7 @@ void WeatherFinder::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             &env.console.overlay()
         );
 
-    while (true) {
+    while (true){
         env.log("Looking for " + weatherName + " " + std::string(isDay ? "day" : "night"));
         
         open_map(env.console, context, false, true);
@@ -218,16 +218,15 @@ void WeatherFinder::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         bool result = detector.detect(screen);
         context.wait_for_all_requests();
         
-        if (result == 1) {
+        if (result == 1){
             env.log("Desired weather found.");
             GO_HOME_WHEN_DONE.run_end_of_program(context);
             send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
             break;
-        }
-        else {
+        }else{
             env.log("Desired weather not found. Continuing");
             pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
-            for (uint8_t c = 0; c < 2; c++) {
+            for (uint8_t c = 0; c < 2; c++){
                 bench_it(env, context);
                 isDay = !isDay;
                 env.log("Current time of day: " + std::string(isDay ? "DAY" : "NIGHT"));

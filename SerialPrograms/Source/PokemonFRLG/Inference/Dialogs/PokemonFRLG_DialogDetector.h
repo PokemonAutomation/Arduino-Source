@@ -8,18 +8,50 @@
 #define PokemonAutomation_PokemonFRLG_DialogDetector_H
 
 #include <chrono>
-#include <atomic>
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
+#include "PokemonFRLG/PokemonFRLG_Settings.h"
 
 namespace PokemonAutomation{
     class CancellableScope;
     class VideoFeed;
 namespace NintendoSwitch{
 namespace PokemonFRLG{
+
+
+class WhiteScreenOverWatcher : public PokemonAutomation::WhiteScreenOverWatcher{
+public:
+    WhiteScreenOverWatcher(Color color = COLOR_RED)
+        : PokemonAutomation::WhiteScreenOverWatcher(
+            color,
+            GameSettings::instance().GAME_BOX.inner_to_outer({0.231692, 0.0616538, 0.551385, 0.9045})
+        )
+    {}
+};
+class BlackScreenWatcher : public PokemonAutomation::BlackScreenWatcher{
+public:
+    BlackScreenWatcher(Color color = COLOR_RED)
+        : PokemonAutomation::BlackScreenWatcher(
+            color,
+            GameSettings::instance().GAME_BOX.inner_to_outer({0.231692, 0.0616538, 0.551385, 0.9045})
+        )
+    {}
+};
+class BlackScreenOverWatcher : public PokemonAutomation::BlackScreenOverWatcher{
+public:
+    BlackScreenOverWatcher(Color color = COLOR_RED)
+        : PokemonAutomation::BlackScreenOverWatcher(
+            color,
+            GameSettings::instance().GAME_BOX.inner_to_outer({0.231692, 0.0616538, 0.551385, 0.9045})
+        )
+    {}
+};
+
+
 
 // When given a choice popup, there is no advance arrow.
 // FRLG doesn't have an advance arrow on the final line of dialog when speaking to an npc!

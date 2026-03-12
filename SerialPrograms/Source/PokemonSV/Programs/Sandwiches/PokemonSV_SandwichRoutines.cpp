@@ -152,14 +152,14 @@ bool select_sandwich_recipe(
         {
             std::ostringstream os;
             os << "Recipe IDs detected: ";
-            for(int i = 0; i < 6; i++){
+            for (int i = 0; i < 6; i++){
                 os << recipe_IDs[i] << ", ";
             }
             stream.log(os.str());
         }
 
         size_t min_ID = 300;
-        for(int i = 0; i < 6; i++){
+        for (int i = 0; i < 6; i++){
             if (recipe_IDs[i] > 0 && recipe_IDs[i] < min_ID){
                 min_ID = recipe_IDs[i];
             }
@@ -174,7 +174,7 @@ bool select_sandwich_recipe(
             // target is in this page!
             
             int target_cell = -1;
-            for(int i = 0; i < 6; i++){
+            for (int i = 0; i < 6; i++){
                 if (recipe_IDs[i] == target_sandwich_ID){
                     target_cell = i;
                     break;
@@ -592,7 +592,7 @@ void finish_sandwich_eating(
     int ret = run_until<ProControllerContext>(
         stream, context,
         [](ProControllerContext& context){
-            for(int i = 0; i < 20; i++){
+            for (int i = 0; i < 20; i++){
                 pbf_press_button(context, BUTTON_A, 160ms, 3840ms);
             }
         },
@@ -623,7 +623,7 @@ void repeat_press_until(
     Milliseconds default_audio_period = Milliseconds(20)
 ){
     button_press();
-    for(size_t i_try = 0; i_try < max_presses; i_try++){
+    for (size_t i_try = 0; i_try < max_presses; i_try++){
         context.wait_for_all_requests();
         const int ret = wait_until(stream, context, detection_timeout, callbacks);
         if (ret >= 0){
@@ -809,12 +809,12 @@ void make_two_herbs_sandwich(
     };
 
     // Press DPAD_UP multiple times to move to the first herb row
-    for(size_t i = 0; i < first_herb_index_last+1; i++){
+    for (size_t i = 0; i < first_herb_index_last+1; i++){
         move_one_up_to_row(9 - i);
     }
     press_a_to_determine_herb(0); // Press A to determine one herb
     // Press DPAD_UP against to move to the second herb row
-    for(size_t i = first_herb_index_last+1; i < sweet_herb_index_last+1; i++){
+    for (size_t i = first_herb_index_last+1; i < sweet_herb_index_last+1; i++){
         move_one_up_to_row(9 - i);
     }
     press_a_to_determine_herb(1); // Press A to determine the second herb
@@ -888,7 +888,7 @@ void make_sandwich_option(ProgramEnvironment& env, VideoStream& stream, ProContr
 
         for (const std::unique_ptr<SandwichIngredientsTableRow>& row : table){
             const std::string& table_item = row->item.slug();
-            if (!(table_item == "baguette")) { //ignore baguette
+            if (!(table_item == "baguette")){ //ignore baguette
                 if (std::find(ALL_SANDWICH_FILLINGS_SLUGS().begin(), ALL_SANDWICH_FILLINGS_SLUGS().end(), table_item) != ALL_SANDWICH_FILLINGS_SLUGS().end()){
                     fillings[table_item]++;
                     num_fillings++;

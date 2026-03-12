@@ -1,0 +1,224 @@
+# templates/update-github-version.yml
+# Template for updating GitHub LatestVersion JSON file with new version information
+
+parameters:
+  stageName: ''
+  displayName: ''
+  dependsOn: []
+  buildType: ''
+  versionMajor: 0
+  versionMinor: 0
+  versionPatch: 0
+  versionRepo: ''
+  condition: ''
+
+stages:
+- stage: ${{ parameters.stageName }}
+  displayName: ${{ parameters.displayName }}
+  dependsOn: ${{ parameters.dependsOn }}
+  condition: ${{ parameters.condition }}
+
+  jobs:
+  - job: UpdateVersionJSON
+    displayName: 'Update LatestVersion JSON'
+    timeoutInMinutes: 10
+    cancelTimeoutInMinutes: 1
+
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:
+      - checkout: none
+
+      - script: |
+          echo "$(GITHUB_TOKEN)" | gh auth login --with-token
+          gh auth status
+        displayName: 'Authenticate with GitHub'
+        condition: succeeded()
+        env:
+          GITHUB_TOKEN: $(GITHUB_PAT)
+
+      - script: |
+          REPO="${{ parameters.versionRepo }}"
+          echo "Fetching ChangeLog.md from $REPO..."
+
+          gh api repos/$REPO/contents/ChangeLog.md --jq '.content' | base64 -d > changelog.md
+          if [ ! -s changelog.md ]; then
+            echo "✗ Failed to fetch ChangeLog.md or file is empty"
+            exit 1
+          fi
+
+          echo "✓ ChangeLog.md fetched successfully"
+          CHANGELOG_CONTENT=$(cat changelog.md | base64 -w 0)
+          echo "##vso[task.setvariable variable=CHANGELOG_B64]$CHANGELOG_CONTENT"
+        displayName: 'Fetch ChangeLog.md'
+        condition: succeeded()
+        env:
+          GITHUB_TOKEN: $(GITHUB_PAT)
+
+      - task: PowerShell@2
+        name: UpdateVersionJSON
+        displayName: 'Update ${{ parameters.buildType }} Version in GitHub'
+        inputs:
+          targetType: 'inline'
+          pwsh: true
+          script: |
+            $ErrorActionPreference = "Stop"
+
+            $changeLogB64 = "$(CHANGELOG_B64)"
+            $changeLog = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($changeLogB64))
+            Write-Host "✓ ChangeLog decoded successfully"
+            function Compare-Versions {
+                param(
+                    [int]$Major1, [int]$Minor1, [int]$Patch1,
+                    [int]$Major2, [int]$Minor2, [int]$Patch2
+                )
+
+                if ($Major1 -gt $Major2) { return 1 }
+                if ($Major1 -lt $Major2) { return -1 }
+
+                if ($Minor1 -gt $Minor2) { return 1 }
+                if ($Minor1 -lt $Minor2) { return -1 }
+
+                if ($Patch1 -gt $Patch2) { return 1 }
+                if ($Patch1 -lt $Patch2) { return -1 }
+
+                return 0
+            }
+
+            $token = "$(GITHUB_PAT)"
+            $repo = "${{ parameters.versionRepo }}"
+            $filePath = "LatestVersion.json"
+            $changeLogPath = "ChangeLog.md"
+            $branch = "master"
+            $buildType = "${{ parameters.buildType }}"
+            $getUrl = "https://api.github.com/repos/${repo}/contents/${filePath}?ref=${branch}"
+            $versionMajor = ${{ parameters.versionMajor }}
+            $versionMinor = ${{ parameters.versionMinor }}
+            $versionPatch = ${{ parameters.versionPatch }}
+
+            $headers = @{
+                Authorization = "token $token"
+                Accept = "application/vnd.github.v3+json"
+            }
+
+            try {
+                Write-Host "Fetching current JSON file..."
+                $fileInfo = Invoke-RestMethod -Uri $getUrl -Headers $headers -Method Get -Verbose
+                $currentContent = [System.Text.Encoding]::UTF8.GetString(
+                    [System.Convert]::FromBase64String($fileInfo.content)
+                )
+
+                $json = $currentContent | ConvertFrom-Json
+                if ($json.PSObject.Properties.Name -contains $buildType) {
+                    $currentMajor = $json.$buildType.VersionMajor
+                    $currentMinor = $json.$buildType.VersionMinor
+                    $currentPatch = $json.$buildType.VersionPatch
+                    Write-Host "Current $buildType version: v$currentMajor.$currentMinor.$currentPatch"
+
+                    $comparison = Compare-Versions `
+                        -Major1 $versionMajor -Minor1 $versionMinor -Patch1 $versionPatch `
+                        -Major2 $currentMajor -Minor2 $currentMinor -Patch2 $currentPatch
+
+                        if ($comparison -lt 0) {
+                            Write-Host ""
+                            Write-Host "================================================"
+                            Write-Host "⚠️ New version v$versionMajor.$versionMinor.$versionPatch is LOWER than current v$currentMajor.$currentMinor.$currentPatch"
+                            Write-Host "Aborting update. Only higher versions are pushed."
+                            Write-Host "================================================"
+                            exit 1
+                        }
+                        elseif ($comparison -eq 0) {
+                            Write-Host ""
+                            Write-Host "================================================"
+                            Write-Host "⚠️ Version v$versionMajor.$versionMinor.$versionPatch already exists"
+                            Write-Host "Skipping update to prevent duplicate."
+                            Write-Host "================================================"
+                            Write-Host ""
+                            exit 0
+                        }
+                        else {
+                            Write-Host "✓ New version v$versionMajor.$versionMinor.$versionPatch is HIGHER - proceeding with update"
+                        }
+                } else {
+                    Write-Host "No existing $buildType section found - proceeding with update"
+                }
+                Write-Host ""
+
+                $lines = $currentContent -split "`r?`n"
+                $inTargetSection = $false
+                $updatedLines = @()
+
+                foreach ($line in $lines) {
+                    if ($line -match "`"$buildType`"\s*:\s*\{") {
+                        $inTargetSection = $true
+                    }
+
+                    if ($inTargetSection) {
+                        if ($line -match '^\s*"VersionMajor"\s*:\s*\d+') {
+                            $indent = $line -replace '"VersionMajor".*', ''
+                            $line = $indent + '"VersionMajor": ' + $versionMajor + ','
+                        }
+                        elseif ($line -match '^\s*"VersionMinor"\s*:\s*\d+') {
+                            $indent = $line -replace '"VersionMinor".*', ''
+                            $line = $indent + '"VersionMinor": ' + $versionMinor + ','
+                        }
+                        elseif ($line -match '^\s*"VersionPatch"\s*:\s*\d+') {
+                            $indent = $line -replace '"VersionPatch".*', ''
+                            $line = $indent + '"VersionPatch": ' + $versionPatch + ','
+                        }
+                        elseif (($changeLog.Trim() -ne "") -and ($line -match '^\s*"Changes"\s*:')) {
+                            $indent = $line -replace '"Changes".*', ''
+                            $escaped = $changeLog.Trim() `
+                            -replace '\\', '\\' `
+                            -replace '"', '\"' `
+                            -replace "`n", '\n' `
+                            -replace "`r", '\r' `
+                            -replace "`t", '\t'
+                            $line = $indent + '"Changes": "' + $escaped + '"'
+                        }
+
+                        if ($line -match '^\s*\}') {
+                            $inTargetSection = $false
+                        }
+                    }
+
+                    $updatedLines += $line
+                }
+
+                $newContent = ($updatedLines -join "`n")
+                $contentBytes = [System.Text.Encoding]::UTF8.GetBytes($newContent)
+                $contentBase64 = [System.Convert]::ToBase64String($contentBytes)
+                $commitMessage = "Update $buildType to v$versionMajor.$versionMinor.$versionPatch via Azure Pipeline"
+
+                $updateBody = @{
+                    message = $commitMessage
+                    content = $contentBase64
+                    sha = $fileInfo.sha
+                    branch = $branch
+                } | ConvertTo-Json -Depth 10
+
+                Write-Host "Pushing changes to GitHub..."
+                $putUrl = "https://api.github.com/repos/$repo/contents/$filePath"
+                $response = Invoke-RestMethod -Uri $putUrl -Headers $headers -Method Put -Body $updateBody -ContentType "application/json"
+
+                Write-Host ""
+                Write-Host "================================================"
+                Write-Host "✅ Successfully updated $buildType section"
+                Write-Host "================================================"
+            } catch {
+                Write-Host ""
+                Write-Host "================================================"
+                Write-Host "❌ Failed to update JSON file"
+                Write-Host "Error: $($_.Exception.Message)"
+                Write-Host "Status Code: $($_.Exception.Response.StatusCode.value__)"
+                Write-Host "Request URL: $getUrl"
+                if ($_.ErrorDetails.Message) {
+                    Write-Host "Details: $($_.ErrorDetails.Message)"
+                }
+                Write-Host "================================================"
+                exit 1
+            }
+        condition: succeeded()
+        env:
+          GITHUB_TOKEN: $(GITHUB_PAT)

@@ -138,7 +138,7 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
         // This indicates a serious detection failure
         if (common.empty()){
             std::set<std::string> sprite_result;
-            for(const auto& p : image_result.results){
+            for (const auto& p : image_result.results){
                 sprite_result.insert(p.second);
             }
             OperationFailedException::fire(
@@ -153,7 +153,7 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
         // Error: Multiple ingredients match both OCR and sprite (ambiguous)
         if (common.size() > 1){
             std::set<std::string> sprite_result;
-            for(const auto& p : image_result.results){
+            for (const auto& p : image_result.results){
                 sprite_result.insert(p.second);
             }
             OperationFailedException::fire(

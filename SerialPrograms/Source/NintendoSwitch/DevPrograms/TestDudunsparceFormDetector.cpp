@@ -102,7 +102,7 @@ bool DudunsparceFormDetector::process_frame(const ImageViewRGB32& frame, WallClo
     auto outputTensor = Ort::Value::CreateTensor<float>(memoryInfo, modelOutput.data(), modelOutput.size(), outputShape.data(), outputShape.size());
 
     for (int row = 0, p_loc=0; row < 25; row++){
-        for(int col = 0; col < 25; col++){
+        for (int col = 0; col < 25; col++){
             float p = float_mat.at<float>(row, col);
             modelInput[p_loc++] = p;
         }

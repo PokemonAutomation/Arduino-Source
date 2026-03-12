@@ -114,8 +114,7 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, CancellableScope& s
                 "Failed to receive gift Pokemon.",
                 env.console
             );
-        }
-        else {
+        }else{
             env.log("Received gift Pokemon.");
         }
         send_program_status_notification(
@@ -174,8 +173,7 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, CancellableScope& s
             env.update_stats();
             send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", screen, true);
             shiny_found = true;
-        }
-        else {
+        }else{
             env.log("Not shiny. Resetting game.");
             send_program_status_notification(
                 env, NOTIFICATION_STATUS_UPDATE,

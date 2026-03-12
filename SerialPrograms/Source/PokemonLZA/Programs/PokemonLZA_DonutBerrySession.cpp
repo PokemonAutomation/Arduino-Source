@@ -110,7 +110,7 @@ PageIngredients BerrySession::read_screen(std::shared_ptr<const ImageRGB32> scre
 
         if (common.empty()){
             std::set<std::string> sprite_result;
-            for(const auto& p : image_result.results){
+            for (const auto& p : image_result.results){
                 sprite_result.insert(p.second);
             }
             OperationFailedException::fire(
@@ -123,7 +123,7 @@ PageIngredients BerrySession::read_screen(std::shared_ptr<const ImageRGB32> scre
         }
         if (common.size() > 1){
             std::set<std::string> sprite_result;
-            for(const auto& p : image_result.results){
+            for (const auto& p : image_result.results){
                 sprite_result.insert(p.second);
             }
             OperationFailedException::fire(
@@ -244,7 +244,7 @@ void BerrySession::add_berries(
     bool all_hyper_berries = true;
     bool all_normal_berries = true;
     std::string log_msg = "Berries to add: ";
-    for(const auto& p : berries){
+    for (const auto& p : berries){
         log_msg += p.first + ": " + std::to_string(p.second) + ", ";
         if (BERRY_ORDER.find(p.first) == BERRY_ORDER.end()){
             throw InternalProgramError(&stream.logger(), 
@@ -319,7 +319,7 @@ void BerrySession::add_berries(
         stream.log("Adding " + name.display_name() + " x " + std::to_string(back.second), COLOR_BLUE);
 
         DonutBerriesReader reader;
-        for(size_t i = 0; i < back.second; i++){
+        for (size_t i = 0; i < back.second; i++){
             pbf_press_button(context, BUTTON_A, 160ms, 400ms);
             context.wait_for_all_requests();
             stream.overlay().add_log("Add " + name.display_name());

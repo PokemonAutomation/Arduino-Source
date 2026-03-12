@@ -88,6 +88,7 @@
 #include "Integrations/DiscordWebhook.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_JoinTracker.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
+#include "PokemonSV/Inference/Map/PokemonSV_DestinationMarkerDetector.h"
 #include "CommonFramework/Environment/Environment.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/TimeQt.h"
@@ -120,6 +121,7 @@
 #include "Common/Cpp/Sockets/ClientSocket.h"
 #include "Common/Cpp/Containers/SparseArray.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "CommonFramework/Tools/FileUnzip.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -173,10 +175,12 @@ TestProgramComputer_Descriptor::TestProgramComputer_Descriptor()
 {}
 TestProgramComputer::TestProgramComputer()
     : STATIC_TEXT("test text")
+    , IMAGE_PATH(false, "Path to image for testing", LockMode::UNLOCK_WHILE_RUNNING, "default.png", "default.png")
     , SCREEN_WATCHER("Capture Box", 0, 0, 1, 1)
     , MAC_ADDRESS(LockMode::UNLOCK_WHILE_RUNNING, 6, nullptr)
 {
     PA_ADD_OPTION(STATIC_TEXT);
+    PA_ADD_OPTION(IMAGE_PATH);
 //    PA_ADD_OPTION(SCREEN_WATCHER);
     PA_ADD_OPTION(MAC_ADDRESS);
 }
@@ -362,7 +366,24 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    cout << random_u32(100, 115) << endl;
 
 
+#if 0
+    ImageRGB32 image(IMAGE_PATH);
+    DestinationMarkerDetector detector(COLOR_CYAN, {0.717, 0.165, 0.03, 0.061}, false);
+    cout << detector.detect(image) << endl;
+#endif
+
+
+
+#if 0
+    std::string zip_path = SETTINGS_PATH() + "test2.zip";
+    std::string target_dir = SETTINGS_PATH() + "testB/";
+    unzip_file(zip_path.c_str(), target_dir.c_str());
+
+#endif
+
+#if 0
     stress_test(logger, scope);
+#endif
 
 
 
