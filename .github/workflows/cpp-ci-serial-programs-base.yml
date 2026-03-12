@@ -147,7 +147,7 @@ jobs:
         EOF
 
         files=$(jq -r '.[].file' SerialPrograms/bin/compile_commands.json)
-        echo "$files" | xargs --max-args=50 clang-query -p SerialPrograms/bin/ -f query.txt >> output.txt
+        echo "$files" | xargs --max-procs=0 --max-args=50 clang-query -p SerialPrograms/bin/ -f query.txt >> output.txt
         cat output.txt
         if grep "Match #" output.txt; then
           echo "::error Forbidden code detected. It can be"
