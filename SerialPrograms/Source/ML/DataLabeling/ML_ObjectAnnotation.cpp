@@ -16,7 +16,10 @@ namespace PokemonAutomation{
 namespace ML{
 
 
-ObjectAnnotation::ObjectAnnotation(): user_box(0,0,0,0), mask_box(0,0,0,0) {}
+ObjectAnnotation::ObjectAnnotation()
+    : user_box(0,0,0,0)
+    , mask_box(0,0,0,0)
+{}
 
 // if failed to pass, will throw JsonParseException
 ObjectAnnotation ObjectAnnotation::from_json(const JsonValue& json){
@@ -53,7 +56,7 @@ ObjectAnnotation ObjectAnnotation::from_json(const JsonValue& json){
     const JsonArray* inc_pt_array = json_obj.get_array("InclusionPoints");
     if (inc_pt_array){
         const size_t num_points = inc_pt_array->size() / 2;
-        for(size_t i = 0; i < num_points; i++){
+        for (size_t i = 0; i < num_points; i++){
             size_t x = (*inc_pt_array)[2*i].to_integer_throw();
             size_t y = (*inc_pt_array)[2*i+1].to_integer_throw();
             anno_obj.inclusion_points.emplace_back(x, y);
@@ -62,7 +65,7 @@ ObjectAnnotation ObjectAnnotation::from_json(const JsonValue& json){
     const JsonArray* exc_pt_array = json_obj.get_array("ExclusionPoints");
     if (exc_pt_array){
         const size_t num_points = exc_pt_array->size() / 2;
-        for(size_t i = 0; i < num_points; i++){
+        for (size_t i = 0; i < num_points; i++){
             size_t x = (*exc_pt_array)[2*i].to_integer_throw();
             size_t y = (*exc_pt_array)[2*i+1].to_integer_throw();
             anno_obj.exclusion_points.emplace_back(x, y);
@@ -94,7 +97,7 @@ JsonValue ObjectAnnotation::to_json() const{
 
     if (inclusion_points.size() > 0){
         JsonArray inc_pt_arr;
-        for(const auto& p : inclusion_points){
+        for (const auto& p : inclusion_points){
             inc_pt_arr.push_back(int64_t(p.first));
             inc_pt_arr.push_back(int64_t(p.second));
         }
@@ -102,7 +105,7 @@ JsonValue ObjectAnnotation::to_json() const{
     }
     if (exclusion_points.size() > 0){
         JsonArray exc_pt_arr;
-        for(const auto& p : exclusion_points){
+        for (const auto& p : exclusion_points){
             exc_pt_arr.push_back(int64_t(p.first));
             exc_pt_arr.push_back(int64_t(p.second));
         }

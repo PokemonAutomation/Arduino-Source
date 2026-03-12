@@ -64,7 +64,7 @@ void TurboA::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     // Mash until time limit is reached
     const uint64_t num_iters = total_ms / 1000;
     const uint64_t remaining_ms = total_ms % 1000;
-    for(uint64_t i = 0; i < num_iters; i++){
+    for (uint64_t i = 0; i < num_iters; i++){
         ssf_mash1_button(context, BUTTON_A, 1000ms);
     }
     if (remaining_ms > 0){

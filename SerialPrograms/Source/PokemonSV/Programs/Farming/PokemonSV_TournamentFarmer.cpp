@@ -355,7 +355,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
     int ret_black = run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
-            for(size_t c = 0; c < 30; c++) { //Sylveon build has 16 PP at max, and Chi-Yu build has 24.
+            for (size_t c = 0; c < 30; c++){ //Sylveon build has 16 PP at max, and Chi-Yu build has 24.
                 if (current_time() - start > std::chrono::minutes(5)){
                     env.log("Timed out during battle after 5 minutes.", COLOR_RED);
                     stats.errors++;

@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonFRLG_GiftReset_H
 #define PokemonAutomation_PokemonFRLG_GiftReset_H
 
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
@@ -35,7 +36,8 @@ public:
 private:
     void obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void obtain_lapras(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    void open_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    bool try_open_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    uint64_t open_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
     enum class Target{
         starters,
@@ -45,6 +47,8 @@ private:
         fossils,
     };
     EnumDropdownOption<Target> TARGET;
+
+    BooleanCheckBoxOption TAKE_VIDEO;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 

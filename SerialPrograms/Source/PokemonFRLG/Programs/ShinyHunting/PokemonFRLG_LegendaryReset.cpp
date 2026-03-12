@@ -10,12 +10,9 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "CommonTools/StartupChecks/StartProgramChecks.h"
-#include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
-#include "PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_LegendaryReset.h"
 
@@ -29,7 +26,7 @@ LegendaryReset_Descriptor::LegendaryReset_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Legendary Reset",
         "Programs/PokemonFRLG/LegendaryReset.html",
         "Shiny hunt legendary Pokemon using soft resets.",
-        ProgramControllerClass::StandardController_RequiresPrecision,
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
@@ -59,6 +56,7 @@ LegendaryReset::LegendaryReset()
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
+    , TAKE_VIDEO("<b>Take Video:</b><br>Record a video when the shiny is found.", LockMode::UNLOCK_WHILE_RUNNING, true)
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_SHINY(
         "Shiny found",
@@ -72,13 +70,17 @@ LegendaryReset::LegendaryReset()
         &NOTIFICATION_PROGRAM_FINISH,
     })
 {
+    PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(WALK_UP);
+    PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     LegendaryReset_Descriptor::Stats& stats = env.current_stats<LegendaryReset_Descriptor::Stats>();
+
+    home_black_border_check(env.console, context);
 
     /*
     * Settings: Text Speed fast. Default borders. Audio required.
@@ -98,7 +100,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
         pbf_press_button(context, BUTTON_A, 320ms, 320ms);
 
         //Mash B until black screen detected but not over (entered battle)
-        BlackScreenWatcher battle_entered(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+        BlackScreenWatcher battle_entered(COLOR_RED);
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){
@@ -119,8 +121,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
                 "Failed to enter battle.",
                 env.console
             );
-        }
-        else {
+        }else{
             env.log("Battle started.");
         }
 
@@ -129,7 +130,18 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
         if (legendary_shiny){
             stats.shinies++;
             env.update_stats();
-            send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", env.console.video().snapshot(), true);
+            send_program_notification(
+                env,
+                NOTIFICATION_SHINY,
+                COLOR_YELLOW,
+                "Shiny found!",
+                {}, "",
+                env.console.video().snapshot(),
+                true
+            );
+            if (TAKE_VIDEO){
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
+            }
             break;
         }
 
@@ -140,7 +152,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
             "Soft resetting."
         );
 
-        soft_reset(env.console, context);
+        stats.errors += soft_reset(env.console, context);
         stats.resets++;
         env.update_stats();
         context.wait_for_all_requests();

@@ -95,7 +95,7 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     size_t num_eggs_collected = 0;
 
     try{
-        for(uint16_t i = 0; i < EGG_SANDWICH.MAX_NUM_SANDWICHES; i++){
+        for (uint16_t i = 0; i < EGG_SANDWICH.MAX_NUM_SANDWICHES; i++){
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
             picnic_at_zero_gate(env.program_info(), env.console, context);

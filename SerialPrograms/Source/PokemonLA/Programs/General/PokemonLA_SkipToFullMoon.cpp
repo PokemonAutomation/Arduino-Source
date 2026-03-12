@@ -109,7 +109,7 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, ProControllerC
             env.console, context,
             [](ProControllerContext& local_context){
                 // pbf_mash_button(local_context, BUTTON_B, 7000ms);
-                for(size_t i = 0; i < 15; i++){
+                for (size_t i = 0; i < 15; i++){
                      pbf_press_button(local_context, BUTTON_B, 160ms, 640ms);
                 }
             },

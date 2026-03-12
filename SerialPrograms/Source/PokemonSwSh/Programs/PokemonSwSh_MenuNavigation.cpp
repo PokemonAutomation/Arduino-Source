@@ -49,7 +49,7 @@ void navigate_to_menu_app(
 
     const DpadPosition dir = (cur_col < target_col ? DPAD_RIGHT : DPAD_LEFT);
     const int steps = std::abs(cur_col - target_col);
-    for(int i = 0; i < steps; i++){
+    for (int i = 0; i < steps; i++){
         box_scroll(context, dir);
     }
 

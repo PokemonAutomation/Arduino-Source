@@ -97,7 +97,7 @@ void handle_egg_hatching(
         stream, context,
         [](ProControllerContext& context){
             ssf_press_right_joystick(context, {-1, 0}, 0ms, 760ms);
-            for(int i = 0; i < 60; i++){
+            for (int i = 0; i < 60; i++){
                 pbf_mash_button(context, BUTTON_A, 1000ms);
             }
         },
@@ -227,7 +227,7 @@ void order_compote_du_fils(
         int ret = run_until<ProControllerContext>(
             stream, context,
             [](ProControllerContext& context){
-                for(int i = 0; i < 60; i++){
+                for (int i = 0; i < 60; i++){
                     pbf_press_button(context, BUTTON_A, 200ms, 800ms);
                 }
             },
@@ -633,7 +633,7 @@ void hatch_eggs_at_zero_gate(
     std::function<void(uint8_t)> egg_hatched_callback)
 {
     bool got_off_ramp = false;
-    for(uint8_t egg_idx = 0; egg_idx < num_eggs_in_party; egg_idx++){
+    for (uint8_t egg_idx = 0; egg_idx < num_eggs_in_party; egg_idx++){
         stream.log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party) + ".");
         stream.overlay().add_log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party), COLOR_BLUE);
 
@@ -688,7 +688,7 @@ void hatch_eggs_at_area_three_lighthouse(
     std::function<void(uint8_t)> egg_hatched_callback)
 {
     bool got_off_ramp = false;
-    for(uint8_t egg_idx = 0; egg_idx < num_eggs_in_party; egg_idx++){
+    for (uint8_t egg_idx = 0; egg_idx < num_eggs_in_party; egg_idx++){
         stream.log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party) + ".");
         stream.overlay().add_log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party), COLOR_BLUE);
 
@@ -758,7 +758,7 @@ void hatch_eggs_anywhere(
         context.wait_for_all_requests();
     }
 
-    for(uint8_t egg_idx = 0; egg_idx < num_eggs_in_party; egg_idx++){
+    for (uint8_t egg_idx = 0; egg_idx < num_eggs_in_party; egg_idx++){
         stream.log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party) + ".");
         stream.overlay().add_log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party), COLOR_BLUE);
 

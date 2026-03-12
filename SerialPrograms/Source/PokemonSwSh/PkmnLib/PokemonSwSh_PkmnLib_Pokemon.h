@@ -110,13 +110,13 @@ public:
     uint16_t            speed() const{ return m_calc_speed; }
 
     bool is_dynamax() const{ return m_is_dynamax; }
-    void set_is_dynamax(bool is_dynamax) { m_is_dynamax = is_dynamax; }
+    void set_is_dynamax(bool is_dynamax){ m_is_dynamax = is_dynamax; }
 
     bool is_stab(Type move_type) const{ return move_type == m_type1 || move_type == m_type2; }
     bool has_type(Type theType) const{ return theType == m_type1 || theType == m_type2; }
 
     bool is_legendary() const{ return m_is_legendary; }
-    void set_is_legendary(bool is_legendary) { m_is_legendary = is_legendary; }
+    void set_is_legendary(bool is_legendary){ m_is_legendary = is_legendary; }
 
     size_t num_moves() const;
     const Move& move(size_t index) const;
@@ -146,7 +146,7 @@ public:
     void set_hp_ratio(double hp_ratio);
 //    void take_damage(uint16_t damage);
 //    void heal(uint16_t points);
-//    void set_level(uint8_t level) { m_level = level; }
+//    void set_level(uint8_t level){ m_level = level; }
 
     VolatileStatusEffects volatile_status_effect() const{ return volatile_status; }
     NonVolatileStatusEffects non_volatile_status_effect() const{ return non_volatile_status; }

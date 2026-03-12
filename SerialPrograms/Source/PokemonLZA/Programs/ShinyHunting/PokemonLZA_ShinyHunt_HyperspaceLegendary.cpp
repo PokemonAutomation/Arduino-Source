@@ -180,8 +180,7 @@ bool hunt_latias_alt(SingleSwitchProgramEnvironment& env,
     if (nonshiny_result < 18 || shiny_result > LATIAS_VISUAL_SHINY_THRESHOLD){
         env.console.log("Shiny Latias identified or regular Latias not identified. Stopping program.", COLOR_MAGENTA);
         return true;
-    }
-    else {
+    }else{
         env.console.log("Non-shiny Latias identified. Resetting the game.", COLOR_MAGENTA);
         return false;
     }

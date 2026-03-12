@@ -210,7 +210,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         // hatch_eggs_full_routine(env, context, -1);
 
         // enter_box_system_from_overworld(env.program_info(), env.console, context);
-        // for(int i = 0; i < 5; i++){
+        // for (int i = 0; i < 5; i++){
         //     process_one_baby(env, context, i, 5);
         // }
 
@@ -484,7 +484,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         // Check each hatched baby whether they will be kept.
         // If yes, move them to the keep box.
         // Otherwise, release them or move them into box in case we will reset game later.
-        for(uint8_t i = 0; i < num_eggs_in_party; i++){
+        for (uint8_t i = 0; i < num_eggs_in_party; i++){
             process_one_baby(env, context, i, (uint8_t)num_eggs_in_party);
         }
 

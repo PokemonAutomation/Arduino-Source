@@ -57,7 +57,7 @@ std::vector<DetectedBox> MapDetector::detected_map_icons() const{
     std::vector<DetectedBox> ret;
     for (MapIconDetector* detector : m_map_icon_detectors){
         const auto& detected_boxes = detector->last_detected();
-        for(const auto& box: detected_boxes){
+        for (const auto& box: detected_boxes){
             ret.emplace_back(box.name, box.box);
         }
     }
@@ -69,7 +69,7 @@ void MapDetector::reset_state(){
     m_b_button.reset_state();
     m_x_button.reset_state();
     m_y_button.reset_state();
-    for(MapIconDetector* detector : m_map_icon_detectors){
+    for (MapIconDetector* detector : m_map_icon_detectors){
         detector->reset_state();
     }
 }

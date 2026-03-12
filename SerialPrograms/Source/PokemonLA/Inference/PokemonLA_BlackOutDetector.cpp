@@ -76,7 +76,7 @@ bool BlackOutDetector::process_frame(const ImageViewRGB32& frame, WallClock time
 
 
     // // Check each patch of background color of the dropped item screen
-    // for(const auto& check: dropped_item_bg_checks){
+    // for (const auto& check: dropped_item_bg_checks){
     //     if (check.check(frame) == false){
     //         // cout << "Check failed " << check.debug_string(frame) << endl;
     //         return false;

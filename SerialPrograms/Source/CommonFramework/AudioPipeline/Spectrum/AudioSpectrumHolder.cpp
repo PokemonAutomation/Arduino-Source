@@ -84,7 +84,7 @@ AudioSpectrumHolder::AudioSpectrumHolder()
 //    }
 
 //    cout << "Freq vis block boundaries: ";
-//    for(const auto v : m_freq_visualization_block_boundaries){
+//    for (const auto v : m_freq_visualization_block_boundaries){
 //        cout << v << " ";
 //    }
 //    cout << endl;
@@ -193,7 +193,7 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
         m_last_spectrum.timestamp = timestamp;
         for (size_t i = 0; i < m_freq_visualization_block_boundaries.size() - 1; i++){
             float mag = 0.0f;
-            for(size_t j = m_freq_visualization_block_boundaries[i]; j < m_freq_visualization_block_boundaries[i+1]; j++){
+            for (size_t j = m_freq_visualization_block_boundaries[i]; j < m_freq_visualization_block_boundaries[i+1]; j++){
                 mag += output[j];
             }
 
@@ -227,7 +227,7 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
 //        std::cout << "Computed FFT! "  << magSum << std::endl;
 
         if (m_saveFreqToDisk){
-            for(size_t i = 0; i < m_num_freqs; i++){
+            for (size_t i = 0; i < m_num_freqs; i++){
                 m_freqStream << output[i] << " ";
             }
             m_freqStream << std::endl;

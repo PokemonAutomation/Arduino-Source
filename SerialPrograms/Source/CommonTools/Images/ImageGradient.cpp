@@ -26,8 +26,8 @@ size_t count_horizontal_translucent_border_pixels(const ImageViewRGB32& image, c
     }
 
     size_t num_rows = image.height() - 1;
-    for(size_t row_index = 0; row_index < num_rows; row_index++){
-        for(size_t x = 0; x < image.width(); x++){
+    for (size_t row_index = 0; row_index < num_rows; row_index++){
+        for (size_t x = 0; x < image.width(); x++){
             uint32_t p_above = image.pixel(x, row_index);
             uint32_t p_below = image.pixel(x, row_index+1);
 
@@ -59,9 +59,9 @@ size_t count_horizontal_translucent_border_pixels(const ImageViewRGB32& image, c
     int16_t thres_c[3] = {threshold.red(), threshold.green(), threshold.blue()};
 
     size_t num_border_pixels = 0;
-    for(size_t x = 0; x < image.width(); x++){
+    for (size_t x = 0; x < image.width(); x++){
         bool has_non_border_channel = false;
-        for(int c = 0; c < 3; c++){
+        for (int c = 0; c < 3; c++){
             if (is_zero[3*x+c] == false && gradients[3*x+c] < thres_c[c]){
                 has_non_border_channel = true;
                 break;
@@ -72,12 +72,12 @@ size_t count_horizontal_translucent_border_pixels(const ImageViewRGB32& image, c
     }
     
     // int16_t min_color[3] = {255, 255, 255}; 
-    // for(size_t i = 0; i < image.width(); i++){
+    // for (size_t i = 0; i < image.width(); i++){
     //     if (is_zero[3*i] == false || is_zero[3*i+1] == false || is_zero[3*i+2] == false){
     //         cout << i << ": (" << gradients[3*i] << (is_zero[3*i] ? "*" : "");
     //         cout << ", " << gradients[3*i+1] << (is_zero[3*i+1] ? "*" : "");
     //         cout << ", " << gradients[3*i+2] << (is_zero[3*i+2] ? "*" : "") << ")\n";
-    //         for(int j = 0; j < 3; j++){
+    //         for (int j = 0; j < 3; j++){
     //             if (is_zero[3*i+j] == false){
     //                 min_color[j] = std::min(min_color[j], gradients[3*i + j]);
     //             }
@@ -101,11 +101,11 @@ size_t count_vertical_translucent_border_pixels(const ImageViewRGB32& image, con
 
     size_t num_cols = image.width() - 1;
     // Go through each row in the image
-    for(size_t y = 0; y < image.height(); y++){
+    for (size_t y = 0; y < image.height(); y++){
         // Record the border gradient of this row:
         bool is_zero[3] = {false};
         int16_t gradients[3] = {0};
-        for(size_t col_index = 0; col_index < num_cols; col_index++){
+        for (size_t col_index = 0; col_index < num_cols; col_index++){
             uint32_t p_left = image.pixel(col_index, y);
             uint32_t p_right = image.pixel(col_index+1, y);
 
@@ -134,7 +134,7 @@ size_t count_vertical_translucent_border_pixels(const ImageViewRGB32& image, con
         }
 
         bool has_non_border_channel = false;
-        for(int c = 0; c < 3; c++){
+        for (int c = 0; c < 3; c++){
             if (is_zero[c] == false && gradients[c] < thres_c[c]){
                 has_non_border_channel = true;
                 break;

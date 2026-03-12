@@ -12,6 +12,7 @@
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -38,6 +39,8 @@ private:
     void obtain_prize(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
     IntegerEnumDropdownOption SLOT;
+
+    BooleanCheckBoxOption TAKE_VIDEO;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 

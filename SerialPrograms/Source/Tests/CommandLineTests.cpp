@@ -48,24 +48,24 @@ void print_equals(){
         int _ret = 0; \
         try{ \
             _ret = test_func(file_path); \
-        } catch (const std::exception& e) { \
+        }catch(const std::exception& e){ \
             cout << "Test: " << (file_path) << " threw exception: " << e.what() << endl; \
             _ret = 1; \
-        } catch (const Exception& e) {\
+        }catch(const Exception& e){\
            cout << "Test: " << (file_path) << " threw " << e.name() << ": <<<" << e.message() << ">>>" << endl; \
            _ret = 1; \
         } \
-        if (_ret > 0) {\
+        if (_ret > 0){\
             print_equals(); \
             cout << "Test: " << (file_path) << " failed." << endl; \
             return _ret; \
         }else if (_ret == 0){ \
             num_passed++; \
         } \
-    } while (0)
+    }while (0)
 
 bool skip_ignored_path(const QString& file_path, const std::vector<QString>& ignore_list){
-    for(const auto& path_prefix : ignore_list){
+    for (const auto& path_prefix : ignore_list){
         if (file_path.startsWith(path_prefix)){
             cout << "* Skip ignored path " << file_path.toStdString() << endl;
             return true;
@@ -155,7 +155,7 @@ int run_test_space(const QFileInfo& space_info, size_t& num_passed, const std::v
     // Look for sub-sub-folders as test object names, e.g.
     // ./CommandLineTests/PokemonLA/BattleMenuDetector/
     const QFileInfoList obj_list = sub_dir.entryInfoList();
-    for(const QFileInfo& obj_info : obj_list){
+    for (const QFileInfo& obj_info : obj_list){
         RETURN_IF_NOT_ZERO(run_test_obj(test_space, obj_info, num_passed, ignore_list));
     }
 
@@ -188,7 +188,7 @@ int run_command_line_tests(){
     // The ignore list will be used to skip path.
     // The ignore list functions as path prefixes when determining which path to skip.
     std::vector<QString> ignore_list;
-    for(const std::string& ignore_path : GlobalSettings::instance().COMMAND_LINE_IGNORE_LIST){
+    for (const std::string& ignore_path : GlobalSettings::instance().COMMAND_LINE_IGNORE_LIST){
         QString path_cleaned = QDir::cleanPath(QString::fromStdString(root_folder_name + "/" + ignore_path));
         // Remove the trailing '/' or '\\' to make sure it can match the input path
         // without the trailing '/' or '\\'.
@@ -205,12 +205,12 @@ int run_command_line_tests(){
         // ./CommandLineTests/PokemonSwSh/
         test_root_dir.setFilter(QDir::Filter::Dirs);
         const QFileInfoList sub_dir_list = test_root_dir.entryInfoList();
-        for(const QFileInfo& sub_dir_info : sub_dir_list){
+        for (const QFileInfo& sub_dir_info : sub_dir_list){
             RETURN_IF_NOT_ZERO(run_test_space(sub_dir_info, num_passed, ignore_list));
         }
     }else{
         // Only run on selected tests
-        for(const std::string& test_path : selected_test_list){
+        for (const std::string& test_path : selected_test_list){
             const std::string full_path = root_folder_name + "/" + test_path;
             const QString full_path_cleaned = QDir::cleanPath(QString::fromStdString(full_path));
 

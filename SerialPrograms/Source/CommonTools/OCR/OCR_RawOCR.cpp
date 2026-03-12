@@ -145,7 +145,7 @@ public:
 #ifdef __APPLE__
 #ifdef UNIX_LINK_TESSERACT
     ~TesseractPool(){
-        for(auto& api : m_instances){
+        for (auto& api : m_instances){
             api.release();
         }
     }

@@ -92,7 +92,7 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
 
     // We try at most 4 focus change attempts
     int max_focus_change_attempt = 4;
-    for(int focus_index = 0; focus_index <= max_focus_change_attempt; focus_index++){
+    for (int focus_index = 0; focus_index <= max_focus_change_attempt; focus_index++){
         WildPokemonFocusDetector focus_detector(env.console.logger(), env.console);
         int ret = wait_until(
             env.console, context, std::chrono::seconds(3),
@@ -129,7 +129,7 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
         bool found_nearby_pokemon = false;
         { // Filter out names that are not target pokemon
             std::set<std::string> filtered_names;
-            for(const auto& name : details.name_candidates){
+            for (const auto& name : details.name_candidates){
                 if (target_pokemon.find(name) != target_pokemon.end()){
                     filtered_names.insert(name);
                 }
@@ -246,7 +246,7 @@ AutoMultiSpawn::AutoMultiSpawn()
 std::vector<int> parse_multispawn_path(SingleSwitchProgramEnvironment& env, const std::string& path, int max_num_despawn){
     std::vector<int> path_despawns;
     std::string raw_path = path + "|";
-    for(size_t pos = 0, next_pos = 0; (next_pos = raw_path.find('|', pos)) != std::string::npos; pos = next_pos + 1){
+    for (size_t pos = 0, next_pos = 0; (next_pos = raw_path.find('|', pos)) != std::string::npos; pos = next_pos + 1){
         if (pos == next_pos){ // In the case it's just one "|"
             continue;
         }
@@ -287,14 +287,14 @@ void AutoMultiSpawn::program(SingleSwitchProgramEnvironment& env, ProControllerC
     std::vector<int> path_despawns = parse_multispawn_path(env, PATH, max_num_despawn);
     std::vector<TimeOfDay> path_times;
     // We + 1 here because we need one more time change to read the desired target pokemon at the end (usually a shiny alpha)
-    for(size_t i = 0; i < path_despawns.size() + 1; i++){
+    for (size_t i = 0; i < path_despawns.size() + 1; i++){
         // TODO: if murkrow path is added, need to output 'N'
         path_times.push_back(i % 2 == 0 ? TimeOfDay::MORNING : TimeOfDay::MIDDAY);
     }
     
     {
         std::ostringstream os;
-        for(size_t i = 0; i < path_despawns.size(); i++){
+        for (size_t i = 0; i < path_despawns.size(); i++){
             if (i >0){
                 os << '|';
             }
@@ -306,7 +306,7 @@ void AutoMultiSpawn::program(SingleSwitchProgramEnvironment& env, ProControllerC
     fast_travel_from_overworld(env, env.console, context, TravelLocations::instance().Mirelands_Mirelands);
     change_time_of_day_at_tent(env.console, context, path_times[0], Camp::MIRELANDS_MIRELANDS);
 
-    for(size_t iStep = 0; iStep < path_despawns.size(); iStep++){
+    for (size_t iStep = 0; iStep < path_despawns.size(); iStep++){
         // - Teleport to a camp
         // - From camp, go to the spawn point
         // - Battle the pokemon there to remove them
@@ -315,7 +315,7 @@ void AutoMultiSpawn::program(SingleSwitchProgramEnvironment& env, ProControllerC
         advance_one_path_step(env, context, max_num_despawn, path_despawns[iStep], path_times[iStep], path_times[iStep+1]);
 
         std::ostringstream os;
-        for(size_t jStep = 0; jStep < path_despawns.size(); jStep++){
+        for (size_t jStep = 0; jStep < path_despawns.size(); jStep++){
             os << 'A' << path_despawns[jStep] << '(' << timeOfDayOneLetter(path_times[jStep]) << ")|";
             if (iStep == jStep){
                 os << '*';
@@ -361,7 +361,7 @@ void AutoMultiSpawn::advance_one_path_step(
     size_t already_removed_pokemon = 0;
     size_t remained_to_remove = num_to_despawn;
     size_t pokemon_left = num_spawned_pokemon;
-    for(int i = 0; i < 3; i++){
+    for (int i = 0; i < 3; i++){
         // Go to spawn point to start a battle, remove some pokemon, then return to camp.
         size_t num_pokemon_removed = try_one_battle_to_remove_pokemon(env, context, pokemon_left, remained_to_remove);
         already_removed_pokemon += num_pokemon_removed;
@@ -411,7 +411,7 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
     // Try to go to spawn point and focus on one pokemon
     PokemonDetails focused_pokemon;
     const size_t num_tries = 5;
-    for(size_t i = 0; i < num_tries; i++){
+    for (size_t i = 0; i < num_tries; i++){
         // From camp go to the spawn point, try focusing on one pokemon.
         // Return the pokemon details if found the target pokemon. Otherwise if cannot find one, return empty details.
         focused_pokemon = go_to_spawn_point_and_try_focusing_pokemon(env, context, num_left);
@@ -479,7 +479,7 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
         }
 
         if (battle_starting){
-            for(bool appeared: battle_sprite_watcher.sprites_appeared()){
+            for (bool appeared: battle_sprite_watcher.sprites_appeared()){
                 num_initial_sprites += appeared;
             }
 
@@ -512,7 +512,7 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
         const auto sprite_detection_frame = env.console.video().snapshot().frame;
         const auto sprites_remain = battle_sprite_watcher.detect_sprites(*sprite_detection_frame);
         size_t num_sprites_remain = 0;
-        for(bool remain : sprites_remain){
+        for (bool remain : sprites_remain){
             num_sprites_remain += remain;
         }
         num_removed_pokemon = num_initial_sprites - num_sprites_remain;
@@ -579,14 +579,14 @@ PokemonDetails AutoMultiSpawn::go_to_spawn_point_and_try_focusing_pokemon(
     pbf_mash_button(context, BUTTON_B, 12000ms); // 1450
 
     // Descend down from the air:
-    for(int i = 0; i < 2 ; i++){
+    for (int i = 0; i < 2 ; i++){
         change_mount(env.console, context, MountState::BRAVIARY_OFF);
         context.wait_for(std::chrono::milliseconds(300));
         change_mount(env.console, context, MountState::BRAVIARY_ON);
     }
 
     // pbf_press_button(context, BUTTON_PLUS, 160ms, 1200ms); // jump down from Braviary
-    // for(int i = 0; i < 2; i++){
+    // for (int i = 0; i < 2; i++){
     //     pbf_press_button(context, BUTTON_PLUS, 160ms, 400ms); // Call back Braviary to stop falling
     //     pbf_press_button(context, BUTTON_PLUS, 160ms, 1200ms); // fall down again
     // }
@@ -602,7 +602,7 @@ PokemonDetails AutoMultiSpawn::go_to_spawn_point_and_try_focusing_pokemon(
 
     // Try three focus sessions:
     const int max_focus_try = 5;
-    for(int i = 0; i < max_focus_try; i++){
+    for (int i = 0; i < max_focus_try; i++){
         // ret.first: whether we can focus on some pokemon
         // ret.second: the details of the target pokemon being focused, or empty if no target pokemon found.
         MultiSpawn spawn = SPAWN;

@@ -101,7 +101,7 @@ bool proper_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& c
 }
 
 void bench_loop(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t quantity){
-    for(size_t i = 0; i < quantity; i++){
+    for (size_t i = 0; i < quantity; i++){
         sit_on_bench(env.console, context);
         pbf_move_left_joystick(context, {0, -1}, 500ms, 200ms);
     }
@@ -112,7 +112,7 @@ void find_weather(SingleSwitchProgramEnvironment& env, ProControllerContext& con
     env.log("Starting weather loop");
     bench_loop(env, context, (is_night_time) ? 1 : 2);
 
-    while (!proper_weather(env, context)) {   
+    while (!proper_weather(env, context)){
         env.log("Weather not found"); 
         pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
         bench_loop(env, context, 2);

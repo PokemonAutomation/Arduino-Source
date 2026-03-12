@@ -104,7 +104,7 @@ bool HyperspaceCalorieLimitWatcher::process_frame(const ImageViewRGB32& frame, W
         uint16_t last_calorie = m_last_calorie_images.front().first;
         if (calorie > last_calorie){
             // calorie shouldn't go up!
-            for(const auto& p : m_last_calorie_images){
+            for (const auto& p : m_last_calorie_images){
                 p.second.save(DEBUG_PATH() + "/HyperspaceCalorieLimitWatcher/PossibleWrongCalorie_" + std::to_string(p.first) + ".png");
             }
         }
