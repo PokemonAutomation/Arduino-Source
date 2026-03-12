@@ -140,6 +140,7 @@ void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& contex
         }
         
         pbf_press_button(context, BUTTON_A, 320ms, 400ms);
+        context.wait_for_all_requests();
 
         SelectionArrowWatcher save_arrow = SelectionArrowWatcher(
             COLOR_RED,
