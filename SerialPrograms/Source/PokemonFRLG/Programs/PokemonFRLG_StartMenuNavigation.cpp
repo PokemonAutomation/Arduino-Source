@@ -134,53 +134,65 @@ void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& contex
 
         if (!move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::SAVE)) {
             console.log("Unable to detect selection arrow. Attempting to open start menu again.");
+            pbf_mash_button(context, BUTTON_B, 320ms);
+            context.wait_for_all_requests();
             continue;
         }
         
         pbf_press_button(context, BUTTON_A, 320ms, 400ms);
 
-        bool save_confirmed = false;
-        // There can be one or two confirmation dialogs depending on whether the game was saved prior to this.
-        while (true){
-            if (current_time() - start > std::chrono::seconds(120)) {
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
-                    "save_game_to_overworld(): Unable to save game after 2 minutes.",
-                    console
-                );
+        SelectionArrowWatcher save_arrow = SelectionArrowWatcher(
+            COLOR_RED,
+            &console.overlay(),
+            SelectionArrowPositionConfirmationMenu::YES
+        );
+
+        int ret4 = wait_until(
+            console, context,
+            std::chrono::seconds(1),
+            {
+                save_arrow
             }
+        );
 
-            SelectionArrowWatcher save_confirm_arrow = SelectionArrowWatcher(
-                COLOR_RED,
-                &console.overlay(),
-                SelectionArrowPositionConfirmationMenu::YES
-            );
-
-            int ret4 = wait_until(
-                console, context,
-                std::chrono::seconds(1),
-                {
-                    save_confirm_arrow
-                }
-            );
-
-            if (ret4 == 0) {
-                console.log("Detected Save Confirmation Arrow. Saving game.");
-                pbf_press_button(context, BUTTON_A, 320ms, 200ms);
-                save_confirmed = true;
-            }
-
-            if (ret4 != 0 && save_confirmed) {
-                break;
-            }
-
+        if (ret4 != 0) {
+            console.log("Unable to detect Save Arrow. Attempting to open start menu again.");
+            pbf_mash_button(context, BUTTON_B, 320ms);
             context.wait_for_all_requests();
+            continue;
         }
 
-    context.wait_for_all_requests();
+        console.log("Detected Save Arrow. Saving game.");
+        pbf_press_button(context, BUTTON_A, 320ms, 200ms);
 
-    return;
-}
+        SelectionArrowWatcher save_confirm_arrow = SelectionArrowWatcher(
+            COLOR_RED,
+            &console.overlay(),
+            SelectionArrowPositionConfirmationMenu::YES
+        );
+
+        int ret5 = wait_until(
+            console, context,
+            std::chrono::seconds(1),
+            {
+                save_confirm_arrow
+            }
+        );
+
+        if (ret5 != 0) {
+            console.log("Unable to detect Save Confirmation Arrow. Attempting to open start menu again.");
+            pbf_mash_button(context, BUTTON_B, 320ms);
+            context.wait_for_all_requests();
+            continue;
+        }
+
+        console.log("Detected Save Confirmation Arrow. Saving game.");
+        pbf_press_button(context, BUTTON_A, 320ms, 200ms);
+
+        context.wait_for_all_requests();
+
+        return;
+    }
 
 }
 
