@@ -7,6 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_SelectionArrowDetector.h"
 
 namespace PokemonAutomation{
@@ -16,19 +17,19 @@ namespace PokemonFRLG{
 ImageFloatBox SelectionArrowDetector::arrow_box_for_position(SelectionArrowPositionStartMenu position){
     switch (position){
     case SelectionArrowPositionStartMenu::POKEDEX:
-        return ImageFloatBox(0.685, 0.055, 0.03, 0.075);
+        return ImageFloatBox(0.727692, 0.0523077, 0.0369231, 0.0778846);
     case SelectionArrowPositionStartMenu::POKEMON:
-        return ImageFloatBox(0.685, 0.145, 0.03, 0.075);
+        return ImageFloatBox(0.727692, 0.1457692, 0.0369231, 0.0778846);
     case SelectionArrowPositionStartMenu::BAG:
-        return ImageFloatBox(0.685, 0.235, 0.03, 0.075);
+        return ImageFloatBox(0.727692, 0.2392307, 0.0369231, 0.0778846);
     case SelectionArrowPositionStartMenu::TRAINER:
-        return ImageFloatBox(0.685, 0.330, 0.03, 0.075);
+        return ImageFloatBox(0.727692, 0.3378846, 0.0369231, 0.0778846);
     case SelectionArrowPositionStartMenu::SAVE:
-        return ImageFloatBox(0.685, 0.415, 0.03, 0.075);
+        return ImageFloatBox(0.727692, 0.4261538, 0.0369231, 0.0778846);
     case SelectionArrowPositionStartMenu::OPTION:
-        return ImageFloatBox(0.685, 0.510, 0.03, 0.075);
+        return ImageFloatBox(0.727692, 0.5248076, 0.0369231, 0.0778846);
     case SelectionArrowPositionStartMenu::EXIT:
-        return ImageFloatBox(0.685, 0.6, 0.03, 0.075);
+        return ImageFloatBox(0.727692, 0.6182692, 0.0369231, 0.0778846);
     default:
         break;
     }
@@ -38,9 +39,9 @@ ImageFloatBox SelectionArrowDetector::arrow_box_for_position(SelectionArrowPosit
 ImageFloatBox SelectionArrowDetector::arrow_box_for_position(SelectionArrowPositionConfirmationMenu position) {
     switch (position) {
     case SelectionArrowPositionConfirmationMenu::YES:
-        return ImageFloatBox(0.660, 0.450, 0.03, 0.075);
+        return ImageFloatBox(0.69692, 0.4625, 0.037, 0.07788);
     case SelectionArrowPositionConfirmationMenu::NO:
-        return ImageFloatBox(0.660, 0.535, 0.03, 0.075);
+        return ImageFloatBox(0.69692, 0.55, 0.037, 0.07788);
     default:
         break;
     }
@@ -96,10 +97,14 @@ SelectionArrowDetector::SelectionArrowDetector(
 {
 }
 void SelectionArrowDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(m_color, m_arrow_box);
+    const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
+    items.add(m_color, GAME_BOX.inner_to_outer(m_arrow_box));
 }
 bool SelectionArrowDetector::detect(const ImageViewRGB32& screen){
-    double screen_rel_size = (screen.height() / 1080.0);
+    const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
+    ImageViewRGB32 game_screen = extract_box_reference(screen, GAME_BOX);
+
+    double screen_rel_size = (game_screen.height() / 1080.0);
     double screen_rel_size_2 = screen_rel_size * screen_rel_size;
 
     double min_area_1080p = 700;
@@ -111,21 +116,21 @@ bool SelectionArrowDetector::detect(const ImageViewRGB32& screen){
     };
 
     bool found = match_template_by_waterfill(
-        screen.size(),
-        extract_box_reference(screen, m_arrow_box),
+        game_screen.size(),
+        extract_box_reference(game_screen, m_arrow_box),
         SelectionArrowMatcher::matcher(),
         FILTERS,
         {min_area, SIZE_MAX},
         rmsd_threshold,
         [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
-            m_last_detected = translate_to_parent(screen, m_arrow_box, object);
+            m_last_detected = translate_to_parent(game_screen, m_arrow_box, object);
             return true;
         }
     );
 
     if (m_overlay){
         if (found){
-            m_last_detected_box.emplace(*m_overlay, m_last_detected, COLOR_GREEN);
+            m_last_detected_box.emplace(*m_overlay, GAME_BOX.inner_to_outer(m_last_detected), COLOR_GREEN);
         }else{
             m_last_detected_box.reset();
         }
