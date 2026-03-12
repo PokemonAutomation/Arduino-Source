@@ -324,6 +324,25 @@ bool GiftReset::try_open_summary(SingleSwitchProgramEnvironment& env, ProControl
         );
         return false;
     }
+
+    //Double check that we are on summary
+    SummaryWatcher sum1(COLOR_RED);
+    int sm1 = wait_until(
+        env.console, context,
+        std::chrono::seconds(5),
+        {{ sum1 }}
+    );
+    if (sm1 == 0){
+        env.log("Summary page dots detected.");
+    }else{
+        env.log("open_summary(): Unable to detect summary screen.", COLOR_RED);
+        send_program_recoverable_error_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            "open_summary(): Unable to detect summary screen."
+        );
+        return false;
+    }
+
     pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
     return true;

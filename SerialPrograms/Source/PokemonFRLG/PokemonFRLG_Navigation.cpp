@@ -18,6 +18,7 @@
 #include "PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h"
 #include "PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_Navigation.h"
 
@@ -181,6 +182,21 @@ bool try_open_slot_six(ConsoleHandle& console, ProControllerContext& context){
         console.log("open_slot_six(): Unable to enter summary.", COLOR_RED);
         return false;
     }
+
+    //Double check that we are on summary
+    SummaryWatcher sum1(COLOR_RED);
+    int sm1 = wait_until(
+        console, context,
+        std::chrono::seconds(5),
+        {{ sum1 }}
+    );
+    if (sm1 == 0){
+        console.log("Summary page dots detected.");
+    }else{
+        console.log("open_slot_six(): Unable to detect summary screen.", COLOR_RED);
+        return false;
+    }
+
     pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
     return true;
