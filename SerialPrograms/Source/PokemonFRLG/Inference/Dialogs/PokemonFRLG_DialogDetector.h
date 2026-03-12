@@ -138,6 +138,9 @@ public:
 private:
     ImageFloatBox m_dialog_top_box;
     ImageFloatBox m_dialog_right_box;
+
+    ImageFloatBox m_dialog_top_jpn_box;
+    ImageFloatBox m_dialog_right_jpn_box;
 };
 class BattleDialogWatcher : public DetectorToFinder<BattleDialogDetector>{
 public:
@@ -161,6 +164,11 @@ private:
     ImageFloatBox m_menu_right_box;
     ImageFloatBox m_dialog_top_box;
     ImageFloatBox m_dialog_right_box;
+
+    ImageFloatBox m_menu_top_jpn_box;
+    ImageFloatBox m_menu_right_jpn_box;
+    ImageFloatBox m_dialog_top_jpn_box;
+    ImageFloatBox m_dialog_right_jpn_box;
 };
 class BattleMenuWatcher : public DetectorToFinder<BattleMenuDetector>{
 public:
@@ -184,6 +192,10 @@ private:
     ImageFloatBox m_dialog_box;
     ImageFloatBox m_dialog_top_box;
     ImageFloatBox m_dialog_right_box;
+
+    ImageFloatBox m_dialog_jpn_box;
+    ImageFloatBox m_dialog_top_jpn_box;
+    ImageFloatBox m_dialog_right_jpn_box;
 };
 class AdvanceBattleDialogWatcher : public DetectorToFinder<AdvanceBattleDialogDetector>{
 public:
