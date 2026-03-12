@@ -182,10 +182,8 @@ void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& contex
         );
 
         if (ret5 != 0) {
-            console.log("Unable to detect Save Confirmation Arrow. Attempting to open start menu again.");
-            pbf_mash_button(context, BUTTON_B, 320ms);
-            context.wait_for_all_requests();
-            continue;
+            console.log("Unable to detect Save Confirmation Arrow. Assuming this was the first save.");
+            return;
         }
 
         console.log("Detected Save Confirmation Arrow. Saving game.");
