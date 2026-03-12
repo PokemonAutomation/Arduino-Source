@@ -64,6 +64,7 @@ RNGManipulator::RNGManipulator()
             {Target::eevee, "eevee", "Eevee"},
             // {Target::lapras, "lapras", "Lapras"},
             // {Target::fossils, "fossils", "Omanyte / Kabuto / Aerodactyl"},
+            {Target::snorlax, "snorlax", "Snorlax"},
             {Target::sweetscent, "sweetscent", "Sweet Scent for wild encounters"},
             {Target::grasswalk, "grasswalk", "Walk to trigger wild encounters (inaccurate)."},
             // {Target::fishing, "fishing", "Fishing"},
@@ -98,7 +99,7 @@ RNGManipulator::RNGManipulator()
         1000, 200 // default, min
     )
     , DOUBLE_ADVANCES(
-        "<b>In-Game Advances:</b><br>The number of frames to advance before finalizing the gift.<br>These pass at double the rate compared to other consoles, where every 2nd frame is skipped.",
+        "<b>In-Game Advances:</b><br>The number of frames to advance before triggering the gift/encounter.<br>These pass at double the rate compared to other consoles, where every 2nd frame is skipped.",
         LockMode::UNLOCK_WHILE_RUNNING,
         1000, 900 // default, min
     )
@@ -159,7 +160,7 @@ uint64_t wait_for_copyright_text(SingleSwitchProgramEnvironment& env, ProControl
     BlackScreenWatcher black_screen(COLOR_RED);
     context.wait_for_all_requests();
     int black_ret = wait_until(
-        env.console, context, 2000ms,
+        env.console, context, 5000ms,
         {black_screen}
     );
     if (black_ret != 0){
@@ -173,13 +174,13 @@ uint64_t wait_for_copyright_text(SingleSwitchProgramEnvironment& env, ProControl
     context.wait_for_all_requests();
     WallClock start_time = current_time();
     int ret = wait_until(
-        env.console, context, 2000ms,
+        env.console, context, 5000ms,
         {copyright_detected}
     );
     if (ret != 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Black screen detected for more than 2 seconds.",
+            "Black screen detected for more than 5 seconds.",
             env.console
         );
     }
@@ -199,6 +200,24 @@ void load_game_after_delay(ProControllerContext& context, uint64_t& LOAD_DELAY){
     // skip recap
     pbf_press_button(context, BUTTON_B, 200ms, 2300ms);
     // need to later subtract 4000ms from delay to hit desired number of advances
+}
+
+bool watch_for_shiny_encounter(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    BlackScreenWatcher battle_entered(COLOR_RED);
+    context.wait_for_all_requests();
+    int ret = wait_until(
+        env.console, context, 10000ms,
+        {battle_entered}
+    );
+    if (ret != 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to initiate encounter.",
+            env.console
+        );
+    }
+    bool encounter_shiny = handle_encounter(env.console, context, false);
+    return encounter_shiny;
 }
 
 void collect_starter_after_delay(ProControllerContext& context, uint64_t& DOUBLE_DELAY){
@@ -225,7 +244,6 @@ void collect_magikarp_after_delay(ProControllerContext& context, uint64_t& DOUBL
     pbf_press_button(context, BUTTON_B, 200ms, 1300ms);
 }
 
-
 void collect_eevee_after_delay(ProControllerContext& context, uint64_t& DOUBLE_DELAY){
     // No dialogue to advance through -- just wait
     pbf_wait(context, std::chrono::milliseconds(DOUBLE_DELAY - 4000));
@@ -233,6 +251,15 @@ void collect_eevee_after_delay(ProControllerContext& context, uint64_t& DOUBLE_D
     pbf_press_button(context, BUTTON_A, 200ms, 3800ms);
     // Decline nickname
     pbf_press_button(context, BUTTON_B, 200ms, 1300ms);
+}
+
+void encounter_snorlax_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& DOUBLE_DELAY){
+    // Interact with Snorlax, YES to PokeFlute, wait on "woke up!"
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 9800ms); // PokeFlute tune
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(DOUBLE_DELAY - 15700)); // 4000ms + 1500ms + 10000ms + 200ms
+    pbf_press_button(context, BUTTON_A, 200ms, 200ms); 
+
 }
 
 void go_to_starter_summary(ProControllerContext& context){
@@ -255,7 +282,7 @@ void go_to_summary(ProControllerContext& context){
     pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
 }
 
-bool use_sweet_scent(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& DOUBLE_DELAY){
+void use_sweet_scent(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& DOUBLE_DELAY){
     // navigate to last party slot
     pbf_press_button(context, BUTTON_PLUS, 200ms, 800ms);
     pbf_move_left_joystick(context, {0, -1}, 200ms, 1800ms);
@@ -266,21 +293,6 @@ bool use_sweet_scent(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     // hover over Sweet Scent (2nd option, but maybe HMs could change this)
     pbf_move_left_joystick(context, {0, -1}, 200ms, std::chrono::milliseconds(DOUBLE_DELAY - 8400));
     pbf_press_button(context, BUTTON_A, 200ms, 800ms);
-    context.wait_for_all_requests();
-    BlackScreenWatcher battle_entered(COLOR_RED);
-    int ret = wait_until(
-        env.console, context, 10000ms,
-        {battle_entered}
-    );
-    if (ret != 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "Sweet Scent failed to initiate encounter.",
-            env.console
-        );
-    }
-    bool encounter_shiny = handle_encounter(env.console, context, false);
-    return encounter_shiny;
 }
 
 void take_summary_pictures(ProControllerContext& context){
@@ -394,8 +406,14 @@ void RNGManipulator::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
             ShinySymbolDetector shiny_checker(COLOR_YELLOW);
             shiny_found = shiny_checker.read(env.console.logger(), screen);
+        }else if (TARGET == Target::snorlax){
+            encounter_snorlax_after_delay(env, context, DOUBLE_DELAY);
+            shiny_found = watch_for_shiny_encounter(env, context);
+            context.wait_for_all_requests();
+            env.log("Wild encounter started.");
         }else if (TARGET == Target::sweetscent){
-            shiny_found = use_sweet_scent(env, context, DOUBLE_DELAY);
+            use_sweet_scent(env, context, DOUBLE_DELAY);
+            shiny_found = watch_for_shiny_encounter(env, context);
             context.wait_for_all_requests();
             env.log("Wild encounter started.");
         }else if (TARGET == Target::grasswalk){

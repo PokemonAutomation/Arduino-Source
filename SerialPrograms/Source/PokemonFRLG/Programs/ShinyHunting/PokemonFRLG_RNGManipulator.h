@@ -45,6 +45,7 @@ private:
         eevee,
         // lapras,
         // fossils,
+        snorlax,
         sweetscent,
         grasswalk,
         // fishing,
