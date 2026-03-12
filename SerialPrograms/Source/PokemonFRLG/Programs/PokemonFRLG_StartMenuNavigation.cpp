@@ -164,6 +164,7 @@ void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& contex
 
         console.log("Detected Save Arrow. Saving game.");
         pbf_press_button(context, BUTTON_A, 320ms, 200ms);
+        context.wait_for_all_requests();
 
         SelectionArrowWatcher save_confirm_arrow = SelectionArrowWatcher(
             COLOR_RED,
@@ -188,7 +189,6 @@ void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& contex
 
         console.log("Detected Save Confirmation Arrow. Saving game.");
         pbf_press_button(context, BUTTON_A, 320ms, 200ms);
-
         context.wait_for_all_requests();
 
         return;
