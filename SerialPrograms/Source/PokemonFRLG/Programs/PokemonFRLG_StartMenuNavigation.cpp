@@ -103,8 +103,6 @@ bool move_cursor_to_position(ConsoleHandle& console, ProControllerContext& conte
 
 void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& context){
 
-    bool seen_start_menu = false;
-
     WallClock start = current_time();
     while (true){
         context.wait_for_all_requests();
@@ -127,28 +125,15 @@ void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& contex
             }
         );
 
-        if (ret == 0) {
-            seen_start_menu = true;
-        }
-
-        while (!seen_start_menu)
-        {
-            int ret2 = run_until<ProControllerContext>(
-                console, context,
-                [](ProControllerContext& context) {
-                    pbf_press_button(context, BUTTON_PLUS, 320ms, 320ms);
-                    pbf_wait(context, 100ms);
-                    context.wait_for_all_requests();
-                },
-                { start_menu }
-            );
-
-            if (ret2 == 0) {
-                seen_start_menu = true;
-            }
+        if (ret != 0) {
+            console.log("Start menu not detected. Attempting to open start menu.");
+            pbf_press_button(context, BUTTON_X, 320ms, 320ms);
+            context.wait_for_all_requests();
+            continue;
         }
 
         if (!move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::SAVE)) {
+            console.log("Unable to detect selection arrow. Attempting to open start menu again.");
             continue;
         }
         
