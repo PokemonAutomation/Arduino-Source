@@ -203,10 +203,7 @@ void print_model_input_output_info(const Ort::Session& session){
 }
 
 Ort::Env create_ORT_env(){
-    if (Ort::Global<void>::api_ == nullptr){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Onnx API returned a null pointer.");  
-    }
-
+    // Bit redundant now, but still might be useful to add logging or other init?
     return Ort::Env();
 }
 
