@@ -86,6 +86,28 @@ if (use_gpu){
             std::cout << "DirectML execution provider not available, falling back to CPU: " << e.what() << std::endl;
         }
     }
+#elif defined(__linux__)
+    // Try CUDA first for NVIDIA GPUs (best performance)
+    // See: https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html
+    try {
+        OrtCUDAProviderOptions cuda_options{};
+        cuda_options.device_id = 0;
+        so.AppendExecutionProvider_CUDA(cuda_options);
+        std::cout << "Using CUDA execution provider for GPU acceleration" << std::endl;
+    } catch (const Ort::Exception& e) {
+        std::cout << "CUDA execution provider not available, trying ROCm: " << e.what() << std::endl;
+
+        // Try ROCm next for AMD GPUs
+        // See: https://onnxruntime.ai/docs/execution-providers/ROCm-ExecutionProvider.html
+        try {
+            OrtROCMProviderOptions rocm_options{};
+            rocm_options.device_id = 0;
+            so.AppendExecutionProvider_ROCM(rocm_options);
+            std::cout << "Using ROCm execution provider for GPU acceleration" << std::endl;
+        } catch (const Ort::Exception& e) {
+            std::cout << "ROCm execution provider not available, falling back to CPU: " << e.what() << std::endl;
+        }
+    }
 #endif
 }
 
