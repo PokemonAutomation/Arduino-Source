@@ -10,13 +10,14 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
+#include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 #include "PokemonFRLG_GiftReset.h"
 
 namespace PokemonAutomation{
@@ -263,14 +264,33 @@ bool GiftReset::try_open_summary(SingleSwitchProgramEnvironment& env, ProControl
         return false;
     }
 
-    if (TARGET != Target::starters){
+    if (TARGET == Target::starters){
+        //  We navigate to pokedex since we don't have it yet so it becomes Pokemon.
+        if (!move_cursor_to_position(env.console, context, SelectionArrowPositionStartMenu::POKEDEX)){
+            std::string str = "open_summary(): Unable to move menu cursor to: " + Pokemon::STRING_POKEMON;
+            env.log(str, COLOR_RED);
+            send_program_recoverable_error_notification(
+                env, NOTIFICATION_ERROR_RECOVERABLE,
+                str
+            );
+            return false;
+        }
+    }else{
         //Pokedex, Pokemon, Bag, Trainer, Save, Option, Exit
         env.log("Navigating to party menu.");
         pbf_wait(context, 200ms);
         context.wait_for_all_requests();
-        pbf_press_dpad(context, DPAD_DOWN, 320ms, 320ms);
-        context.wait_for_all_requests();
-    } //For starters, no Pokedex yet, do Pokemon is on top and we skip this
+
+        if (!move_cursor_to_position(env.console, context, SelectionArrowPositionStartMenu::POKEMON)){
+            std::string str = "open_summary(): Unable to move menu cursor to: " + Pokemon::STRING_POKEMON;
+            env.log(str, COLOR_RED);
+            send_program_recoverable_error_notification(
+                env, NOTIFICATION_ERROR_RECOVERABLE,
+                str
+            );
+            return false;
+        }
+    }
 
     //Open party menu
     BlackScreenOverWatcher blk1(COLOR_RED);
