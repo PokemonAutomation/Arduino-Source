@@ -85,11 +85,6 @@ PickupFarmer::PickupFarmer()
         LockMode::LOCK_WHILE_RUNNING,
         20, 5, 50 // default, min, max
     )
-    , USE_PAYDAY(
-        "<b>Use Pay Day</b><br>Check this if Pay Day is the first move on your lead " + Pokemon::STRING_POKEMON + ".", 
-        LockMode::LOCK_WHILE_RUNNING, 
-        true // default
-    )
     , STOP_ON_MOVE_LEARN(
         "<b>Quit when a new move is learned</b><br>Stop this program when a new move is learned. If unchecked, new moves will not be learned.",
         LockMode::LOCK_WHILE_RUNNING, 
@@ -122,7 +117,6 @@ PickupFarmer::PickupFarmer()
     PA_ADD_OPTION(MAX_ENCOUNTERS);
     PA_ADD_OPTION(BATTLES_PER_ITEM_CHECK);
     PA_ADD_OPTION(MOVE_PP);
-    PA_ADD_OPTION(USE_PAYDAY);
     PA_ADD_OPTION(STOP_ON_MOVE_LEARN);
     PA_ADD_OPTION(IGNORE_SHINIES);
     PA_ADD_OPTION(TAKE_VIDEO);
@@ -393,7 +387,7 @@ void use_first_battle_move(SingleSwitchProgramEnvironment& env, ProControllerCon
     context.wait_for_all_requests();
 }
 
-bool exit_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, BooleanCheckBoxOption& USE_PAYDAY, BooleanCheckBoxOption& STOP_ON_MOVE_LEARN){
+bool exit_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, BooleanCheckBoxOption& STOP_ON_MOVE_LEARN){
     BlackScreenWatcher battle_exited(COLOR_RED);    
     context.wait_for_all_requests();
     env.log("Exiting battle.");
@@ -536,7 +530,7 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     bool shiny_found = false;
     bool failed_encounter = false;
 
-    bool spin_leftright = false; // true;
+    bool spin_leftright = true;
     uint16_t moves_used = 0;
     uint16_t encounters_since_item_check = 0;
 
@@ -610,7 +604,7 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
 
         use_first_battle_move(env, context);
         moves_used++;
-        bool move_learned = exit_battle(env, context, USE_PAYDAY, STOP_ON_MOVE_LEARN);
+        bool move_learned = exit_battle(env, context, STOP_ON_MOVE_LEARN);
 
         if (move_learned && STOP_ON_MOVE_LEARN){
             send_program_status_notification(

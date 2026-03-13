@@ -45,7 +45,6 @@ private:
     SimpleIntegerOption<uint64_t> BATTLES_PER_ITEM_CHECK;
     SimpleIntegerOption<uint64_t> MOVE_PP;
 
-    BooleanCheckBoxOption USE_PAYDAY;
     BooleanCheckBoxOption STOP_ON_MOVE_LEARN;
     BooleanCheckBoxOption IGNORE_SHINIES;
 
