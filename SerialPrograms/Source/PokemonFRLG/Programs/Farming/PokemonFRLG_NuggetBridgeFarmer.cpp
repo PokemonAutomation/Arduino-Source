@@ -11,9 +11,10 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
-#include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
+#include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_NuggetBridgeFarmer.h"
+#include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -55,17 +56,17 @@ NuggetBridgeFarmer::NuggetBridgeFarmer()
         "<b>Number of Nuggets:</b><br>"
         "Zero will run until 'Stop after Current Nugget' is pressed or the program is manually stopped.",
         LockMode::UNLOCK_WHILE_RUNNING, 
-        120, // About 2 hours of farming. 
+        100, // About 2 hours of farming. 
         0
     )
     , GO_HOME_WHEN_DONE(false)
-    /*, PERIODIC_SAVE(
+    , PERIODIC_SAVE(
         "<b>Periodically Save:</b><br>"
         "Save the game every this many nuggets. This reduces the loss to game crashes. Set to zero to disable.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        10,
+        50,
         0
-    )*/
+    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
@@ -77,23 +78,29 @@ NuggetBridgeFarmer::NuggetBridgeFarmer()
 
     PA_ADD_OPTION(NUM_NUGGETS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
-    //PA_ADD_OPTION(PERIODIC_SAVE);
+    PA_ADD_OPTION(PERIODIC_SAVE);
 
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 
     home_black_border_check(env.console, context);
 
     NuggetBridgeFarmer_Descriptor::Stats& stats = env.current_stats<NuggetBridgeFarmer_Descriptor::Stats>();
     DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
 
-    //for (uint32_t nuggets_since_last_save = 0;; nuggets_since_last_save++) {
-    while (true) {
+    for (uint32_t nuggets_since_last_save = 0;; nuggets_since_last_save++){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-        if (NUM_NUGGETS != 0 && stats.nuggets >= NUM_NUGGETS) {
+        if (NUM_NUGGETS != 0 && stats.nuggets >= NUM_NUGGETS){
             break;
+        }
+
+        if (PERIODIC_SAVE != 0 && nuggets_since_last_save >= PERIODIC_SAVE){
+            env.console.log("Saving game...");
+
+            save_game_to_overworld(env.console, context);
+            nuggets_since_last_save = 0;
         }
 
         env.console.log("Exiting Pokemon Center...");
@@ -102,19 +109,19 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
 
             int ret = run_until<ProControllerContext>(
                 env.console, context,
-                [](ProControllerContext& context) {
+                [](ProControllerContext& context){
                     pbf_press_dpad(context, DPAD_DOWN, 2000ms, 0ms);
                 },
                 { pokemon_ceter_exit }
             );
 
-            if (ret == 0) {
+            if (ret == 0){
                 break;
             }
         }
 
         env.console.log("Detecting overworld...");
-        while (true) {
+        while (true){
             BlackScreenOverWatcher overworld_entered(COLOR_RED);
 
             int ret = wait_until(
@@ -123,7 +130,7 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
                 {overworld_entered}
             );
 
-            if (ret == 0) {
+            if (ret == 0){
                 break;
             }
         }
@@ -150,13 +157,13 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
 
             int ret = run_until<ProControllerContext>(
                 env.console, context,
-                [](ProControllerContext& context) {
+                [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_B, 2000ms);
                 },
                 { battle_menu }
             );
 
-            if (ret == 0) {
+            if (ret == 0){
                 break;
             }
         }
@@ -167,13 +174,13 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
 
             int ret = run_until<ProControllerContext>(
                 env.console, context,
-                [](ProControllerContext& context) {
+                [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 2000ms);
                 },
                 { battle_lost }
             );
 
-            if (ret == 0) {
+            if (ret == 0){
                 break;
             }
         }
@@ -183,13 +190,13 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
             WhiteDialogWatcher nurse_joy_dialog(COLOR_RED);
             int ret = run_until<ProControllerContext>(
                 env.console, context,
-                [](ProControllerContext& context) {
+                [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_B, 2000ms);
                 },
                 { nurse_joy_dialog }
             );
 
-            if (ret == 0) {
+            if (ret == 0){
                 break;
             }
         }
@@ -199,56 +206,21 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
             WhiteDialogWatcher nurse_joy_dialog(COLOR_RED);
             int ret = run_until<ProControllerContext>(
                 env.console, context,
-                [](ProControllerContext& context) {
+                [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_B, 2000ms);
                 },
                 { nurse_joy_dialog }
             );
 
-            if (ret != 0) {
+            if (ret != 0){
                 break;
             }
         }
 
-        //TODO: Implement periodic saving. The Save Menu keeps the last cursor position. Need to implement arrow dectection on the correct option
-        /*if (PERIODIC_SAVE != 0 && nuggets_since_last_save >= PERIODIC_SAVE) {
-            StartMenuWatcher start_menu = StartMenuWatcher(COLOR_RED);
-
-            env.console.log("Saving game...");
-
-            while (true)
-            {
-                int ret = run_until<ProControllerContext>(
-                    env.console, context,
-                    [](ProControllerContext& context) {
-                        pbf_press_button(context, BUTTON_PLUS, 320ms, 640ms);
-                        pbf_wait(context, 100ms);
-                        context.wait_for_all_requests();
-                    },
-                    { start_menu }
-                );
-
-                if (ret == 0) {
-                    break;
-                }
-            }
-
-            pbf_press_dpad(context, DPAD_DOWN, 320ms, 320ms);
-            pbf_press_dpad(context, DPAD_DOWN, 320ms, 320ms);
-            pbf_press_dpad(context, DPAD_DOWN, 320ms, 320ms);
-            pbf_press_dpad(context, DPAD_DOWN, 320ms, 320ms);
-
-            pbf_press_button(context, BUTTON_A, 320ms, 320ms);
-            pbf_press_button(context, BUTTON_A, 320ms, 320ms);
-
-            pbf_mash_button(context, BUTTON_B, 2000ms);
-            nuggets_since_last_save = 0;
-        }*/
-
         stats.nuggets++;
         env.update_stats();
 
-        if (STOP_AFTER_CURRENT.should_stop()) {
+        if (STOP_AFTER_CURRENT.should_stop()){
             break;
         }
     }
