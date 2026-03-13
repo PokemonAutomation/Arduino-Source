@@ -22,6 +22,7 @@ variables:
   - group: discord-symbols
   - group: telemetry
   - group: alarm_clock
+  - group: artifacts
 
 parameters:
   - name: buildType
@@ -228,7 +229,7 @@ stages:
           if ($buildType -eq "PrivateBeta") {
               Write-Host "=== Encrypting build artifact with password ==="
               $zipPath = "$artifactSubdir/$name.zip"
-              & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 -p"$env:ARTIFACT_PASSWORD" -mem=AES256 $zipPath "$tempFolder/*"
+              & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 "-p$env:ARTIFACT_PASSWORD" -mem=AES256 $zipPath "$tempFolder/*"
           } else {
               $zipPath = "$artifactSubdir/$name.zip"
               & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 $zipPath "$tempFolder/*"
@@ -406,7 +407,7 @@ stages:
           BUILD_TYPE="${{ parameters.buildType }}"
             if [ "$BUILD_TYPE" = "PrivateBeta" ]; then
                 echo "=== Encrypting build artifact with password ==="
-                7z a -tzip -mx=9 -p"$ARTIFACT_PASSWORD" -mem=AES256 "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).zip" "$FOLDER_NAME"
+                7z a -tzip -mx=9 "-p$ARTIFACT_PASSWORD" -mem=AES256 "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).zip" "$FOLDER_NAME"
             else
                 tar -I "gzip -9" -cvf $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).tar.gz "$FOLDER_NAME"
             fi

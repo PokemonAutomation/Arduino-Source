@@ -183,7 +183,7 @@ stages:
           cd "$(Pipeline.Workspace)/Arduino-Source-Internal"
           if [ "$BUILD_TYPE" = "PrivateBeta" ]; then
               echo "=== Creating password-protected archive for PrivateBeta ==="
-              7z a -tzip -mx=9 -p"$ARTIFACT_PASSWORD" -mem=AES256 "SerialPrograms-MacOS-$(compiler)-$(architecture).$EXT" "$FOLDER_NAME"
+              7z a -tzip -mx=9 "-p$ARTIFACT_PASSWORD" -mem=AES256 "SerialPrograms-MacOS-$(compiler)-$(architecture).$EXT" "$FOLDER_NAME"
           else
               echo "=== Creating tarball with enclosing folder ==="
               tar -I "gzip -9" -czf "SerialPrograms-MacOS-$(compiler)-$(architecture).$EXT" "$FOLDER_NAME"
