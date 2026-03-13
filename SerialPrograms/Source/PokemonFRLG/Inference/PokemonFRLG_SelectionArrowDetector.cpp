@@ -36,8 +36,8 @@ ImageFloatBox SelectionArrowDetector::arrow_box_for_position(SelectionArrowPosit
     throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid FRLG Selection Arrow Position");
 }
 
-ImageFloatBox SelectionArrowDetector::arrow_box_for_position(SelectionArrowPositionConfirmationMenu position) {
-    switch (position) {
+ImageFloatBox SelectionArrowDetector::arrow_box_for_position(SelectionArrowPositionConfirmationMenu position){
+    switch (position){
     case SelectionArrowPositionConfirmationMenu::YES:
         return ImageFloatBox(0.69692, 0.4625, 0.037, 0.07788);
     case SelectionArrowPositionConfirmationMenu::NO:

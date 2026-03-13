@@ -7,6 +7,8 @@
 #ifndef PokemonAutomation_PokemonFRLG_StartMenuNavigation_H
 #define PokemonAutomation_PokemonFRLG_StartMenuNavigation_H
 
+#include "PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.h"
+
 namespace PokemonAutomation{
 
 class ImageRGB32;

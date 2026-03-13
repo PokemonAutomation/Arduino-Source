@@ -335,8 +335,8 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
     }
 }
 
-void home_black_border_check(ConsoleHandle& console, ProControllerContext& context) {
-    if (GameSettings::instance().DEVICE == GameSettings::Device::switch_1_2) {
+void home_black_border_check(ConsoleHandle& console, ProControllerContext& context){
+    if (GameSettings::instance().DEVICE == GameSettings::Device::switch_1_2){
         console.log("Switch 1 or 2 selected in Settings.");
         console.log("Going to home to check for black border.");
         pbf_press_button(context, BUTTON_ZL, 120ms, 880ms); //  Connect the controller.

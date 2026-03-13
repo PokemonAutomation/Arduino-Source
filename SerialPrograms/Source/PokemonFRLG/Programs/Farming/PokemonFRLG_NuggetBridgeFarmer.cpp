@@ -11,11 +11,9 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
-#include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_NuggetBridgeFarmer.h"
-#include "PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.h"
-#include <PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h>
+#include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -84,20 +82,20 @@ NuggetBridgeFarmer::NuggetBridgeFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 
     home_black_border_check(env.console, context);
 
     NuggetBridgeFarmer_Descriptor::Stats& stats = env.current_stats<NuggetBridgeFarmer_Descriptor::Stats>();
     DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
 
-    for (uint32_t nuggets_since_last_save = 0;; nuggets_since_last_save++) {
+    for (uint32_t nuggets_since_last_save = 0;; nuggets_since_last_save++){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-        if (NUM_NUGGETS != 0 && stats.nuggets >= NUM_NUGGETS) {
+        if (NUM_NUGGETS != 0 && stats.nuggets >= NUM_NUGGETS){
             break;
         }
 
-        if (PERIODIC_SAVE != 0 && nuggets_since_last_save >= PERIODIC_SAVE) {
+        if (PERIODIC_SAVE != 0 && nuggets_since_last_save >= PERIODIC_SAVE){
             env.console.log("Saving game...");
 
             save_game_to_overworld(env.console, context);
@@ -110,19 +108,19 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
 
             int ret = run_until<ProControllerContext>(
                 env.console, context,
-                [](ProControllerContext& context) {
+                [](ProControllerContext& context){
                     pbf_press_dpad(context, DPAD_DOWN, 2000ms, 0ms);
                 },
                 { pokemon_ceter_exit }
             );
 
-            if (ret == 0) {
+            if (ret == 0){
                 break;
             }
         }
 
         env.console.log("Detecting overworld...");
-        while (true) {
+        while (true){
             BlackScreenOverWatcher overworld_entered(COLOR_RED);
 
             int ret = wait_until(
@@ -131,7 +129,7 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
                 {overworld_entered}
             );
 
-            if (ret == 0) {
+            if (ret == 0){
                 break;
             }
         }
@@ -158,13 +156,13 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
 
             int ret = run_until<ProControllerContext>(
                 env.console, context,
-                [](ProControllerContext& context) {
+                [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_B, 2000ms);
                 },
                 { battle_menu }
             );
 
-            if (ret == 0) {
+            if (ret == 0){
                 break;
             }
         }
@@ -175,13 +173,13 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
 
             int ret = run_until<ProControllerContext>(
                 env.console, context,
-                [](ProControllerContext& context) {
+                [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 2000ms);
                 },
                 { battle_lost }
             );
 
-            if (ret == 0) {
+            if (ret == 0){
                 break;
             }
         }
@@ -191,13 +189,13 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
             WhiteDialogWatcher nurse_joy_dialog(COLOR_RED);
             int ret = run_until<ProControllerContext>(
                 env.console, context,
-                [](ProControllerContext& context) {
+                [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_B, 2000ms);
                 },
                 { nurse_joy_dialog }
             );
 
-            if (ret == 0) {
+            if (ret == 0){
                 break;
             }
         }
@@ -207,13 +205,13 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
             WhiteDialogWatcher nurse_joy_dialog(COLOR_RED);
             int ret = run_until<ProControllerContext>(
                 env.console, context,
-                [](ProControllerContext& context) {
+                [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_B, 2000ms);
                 },
                 { nurse_joy_dialog }
             );
 
-            if (ret != 0) {
+            if (ret != 0){
                 break;
             }
         }
@@ -221,7 +219,7 @@ void NuggetBridgeFarmer::program(SingleSwitchProgramEnvironment& env, ProControl
         stats.nuggets++;
         env.update_stats();
 
-        if (STOP_AFTER_CURRENT.should_stop()) {
+        if (STOP_AFTER_CURRENT.should_stop()){
             break;
         }
     }

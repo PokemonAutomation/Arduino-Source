@@ -76,7 +76,7 @@ bool move_cursor_to_position(ConsoleHandle& console, ProControllerContext& conte
         }
     );
 
-    if (ret < 0) {
+    if (ret < 0){
         console.log("Unable to detect selection arrow. Not moving cursor.", COLOR_RED);
         return false;
     }
@@ -84,8 +84,8 @@ bool move_cursor_to_position(ConsoleHandle& console, ProControllerContext& conte
     int destination_index = static_cast<int>(destination);
     int forward = (destination_index - ret + START_MENU_OPTION_COUNT) % START_MENU_OPTION_COUNT;
     int backward = (ret - destination_index + START_MENU_OPTION_COUNT) % START_MENU_OPTION_COUNT;
-    if (forward <= backward) {
-        for (int i = 0; i < forward; i++) {
+    if (forward <= backward){
+        for (int i = 0; i < forward; i++){
             pbf_press_dpad(context, DPAD_DOWN, 320ms, 400ms);
         }
         context.wait_for_all_requests();
@@ -107,7 +107,7 @@ void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& contex
     while (true){
         context.wait_for_all_requests();
 
-        if (current_time() - start > std::chrono::seconds(120)) {
+        if (current_time() - start > std::chrono::seconds(120)){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "save_game_to_overworld(): Unable to save game after 2 minutes.",
@@ -125,14 +125,14 @@ void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& contex
             }
         );
 
-        if (ret != 0) {
+        if (ret != 0){
             console.log("Start menu not detected. Attempting to open start menu.");
             pbf_press_button(context, BUTTON_X, 320ms, 320ms);
             context.wait_for_all_requests();
             continue;
         }
 
-        if (!move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::SAVE)) {
+        if (!move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::SAVE)){
             console.log("Unable to detect selection arrow. Attempting to open start menu again.");
             pbf_mash_button(context, BUTTON_B, 320ms);
             context.wait_for_all_requests();
@@ -156,7 +156,7 @@ void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& contex
             }
         );
 
-        if (ret4 != 0) {
+        if (ret4 != 0){
             console.log("Unable to detect Save Arrow. Attempting to open start menu again.");
             pbf_mash_button(context, BUTTON_B, 320ms);
             context.wait_for_all_requests();
@@ -181,7 +181,7 @@ void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& contex
             }
         );
 
-        if (ret5 != 0) {
+        if (ret5 != 0){
             console.log("Unable to detect Save Confirmation Arrow. Assuming this was the first save.");
             return;
         }

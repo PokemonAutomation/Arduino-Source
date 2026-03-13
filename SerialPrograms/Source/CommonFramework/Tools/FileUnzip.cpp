@@ -37,12 +37,12 @@ namespace PokemonAutomation{
 
     // Callback triggered for every chunk of decompressed data
     // pOpaque is an opaque pointer that actually represents ProgressData
-    size_t write_callback(void* pOpaque, mz_uint64 file_ofs, const void* pBuf, size_t n) {
+    size_t write_callback(void* pOpaque, mz_uint64 file_ofs, const void* pBuf, size_t n){
         ProgressData* data = static_cast<ProgressData*>(pOpaque);
 
         // 1. Check if we actually need to seek
         // tellp() returns the current 'put' position.  get the current position of the write pointer in an output stream.
-        if (static_cast<mz_uint64>(data->out_file->tellp()) != file_ofs) {
+        if (static_cast<mz_uint64>(data->out_file->tellp()) != file_ofs){
             data->out_file->seekp(file_ofs);
         }
             
@@ -55,7 +55,7 @@ namespace PokemonAutomation{
         int current_percent = static_cast<int>(percent);
 
         // Only print if the integer value has changed
-        if (current_percent > data->last_percentage) {
+        if (current_percent > data->last_percentage){
             data->last_percentage = current_percent;
             std::cout << "\rProgress: " << current_percent << "% (" 
                     << data->processed_bytes << "/" << data->total_bytes << " bytes)" << endl;
@@ -65,7 +65,7 @@ namespace PokemonAutomation{
     }
 
     // ensure that entry_name is inside target_dir, to prevent path traversal attacks.
-    bool is_safe(const std::string& target_dir, const std::string& entry_name) {
+    bool is_safe(const std::string& target_dir, const std::string& entry_name){
         try {
             // 1. Get absolute, normalized paths
             // handles symlinks. and resolves .. and . components. throws error if path doesn't exist
@@ -86,20 +86,20 @@ namespace PokemonAutomation{
             // - If rel is empty, they are likely different roots
             // - If rel starts with "..", it escaped the base
             // - If rel is ".", it IS the base directory (usually safe)
-            if (rel.empty() || *rel.begin() == "..") {
+            if (rel.empty() || *rel.begin() == ".."){
                 return false;
             }
 
             return true;
-        } catch (...) {
+        } catch (...){
             cout << "target_dir path doesn't exist." << endl;
             return false;
         }
     }
 
-    void unzip_file(const char* zip_path, const char* target_dir) {
+    void unzip_file(const char* zip_path, const char* target_dir){
         Filesystem::Path p{zip_path};
-        if (!fs::exists(p)) {
+        if (!fs::exists(p)){
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "unzip_all: Attempted to unzip a file that doesn't exist.");
         } 
 
@@ -119,7 +119,7 @@ namespace PokemonAutomation{
 
         // calculate total uncompressed size
         uint64_t total_uncompressed_size = 0;
-        for (int i = 0; i < num_files; i++) {
+        for (int i = 0; i < num_files; i++){
             mz_zip_archive_file_stat file_stat; // holds info on the specific file
 
             // fills file_stat with the data for the current index
@@ -130,7 +130,7 @@ namespace PokemonAutomation{
         }
 
         uint64_t total_processed_bytes = 0;
-        for (int i = 0; i < num_files; i++) {
+        for (int i = 0; i < num_files; i++){
             mz_zip_archive_file_stat file_stat; // holds info on the specific file
 
             // fills file_stat with the data for the current index
@@ -138,7 +138,7 @@ namespace PokemonAutomation{
 
             // Checks if the current entry is a folder. Miniz treats folders as entries; 
             // this code skips them to avoid trying to "write" a folder as if it were a file.
-            if (mz_zip_reader_is_file_a_directory(&zip_archive, i)) {
+            if (mz_zip_reader_is_file_a_directory(&zip_archive, i)){
                 continue;
             }
 
@@ -149,7 +149,7 @@ namespace PokemonAutomation{
             // Create the entire directory, including intermediate directories for this file
             std::error_code ec{};
             fs::create_directories(parent_dir, ec);
-            if (ec) {
+            if (ec){
                 std::cerr << "Error creating " << parent_dir << ": " << ec.message() << std::endl;
                 ec.clear(); 
             }
@@ -172,7 +172,7 @@ namespace PokemonAutomation{
         mz_zip_reader_end(&zip_archive);
     }
 
-    // void unzip_file(const std::string& zip_path, const std::string& output_dir) {
+    // void unzip_file(const std::string& zip_path, const std::string& output_dir){
     //     cout << "try to unzip the file." << endl;
     //     miniz_cpp::zip_file archive(zip_path);
 
@@ -186,7 +186,7 @@ namespace PokemonAutomation{
     //         // Create the entire directory tree for this file
     //         std::filesystem::create_directories(p, ec);
             
-    //         if (ec) {
+    //         if (ec){
     //             std::cerr << "Error creating " << p << ": " << ec.message() << std::endl;
     //             ec.clear(); 
     //         }
