@@ -389,26 +389,34 @@ void use_first_battle_move(SingleSwitchProgramEnvironment& env, ProControllerCon
 
 bool exit_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, BooleanCheckBoxOption& STOP_ON_MOVE_LEARN){
     BlackScreenWatcher battle_exited(COLOR_RED);    
+    BattleLearnDialogWatcher move_learn_select(COLOR_RED);
     context.wait_for_all_requests();
     env.log("Exiting battle.");
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context) {
-           pbf_mash_button(context, BUTTON_B, 15000ms);
+           pbf_mash_button(context, BUTTON_B, 30000ms);
         },
-        { battle_exited }
+        { battle_exited, move_learn_select }
     );
-    if (ret == 0) {
+    if (ret == 0){
         pbf_wait(context, 500ms);
         context.wait_for_all_requests();
         env.log("Battle exited.");
         return false;
+    }else if (ret == 1){
+        env.log("Move learn detected.");
+        if (STOP_ON_MOVE_LEARN) {
+            return true;
+        }
+    }else{
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to exit battle within 30 seconds.",
+            env.console
+        );
     }
 
-    env.log("Move learn detected.");
-    if (STOP_ON_MOVE_LEARN) {
-        return true;
-    }
     // there are two dialog selection boxes in a row
     // we need to decline the first one and accept the second one
     // the first one will occur after an Advance Battle Dialog
@@ -422,17 +430,20 @@ bool exit_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& cont
                 pbf_press_button(context, BUTTON_B, 200ms, 800ms);
             }
         },
-        { advance_dialog }
+        { battle_exited, advance_dialog }
     );
-    if (ret < 0) {
+    if (ret < 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to detect dialog advance arrow within 20 seconds.",
             env.console
         );
+    }else if (ret == 0){
+        pbf_wait(context, 500ms);
+        context.wait_for_all_requests();
+        env.log("Battle exited.");
     }
 
-    BattleLearnDialogWatcher move_learn_select(COLOR_RED);
     context.wait_for_all_requests();    
     deadline = current_time() + 10s;
     ret = run_until<ProControllerContext>(
@@ -442,14 +453,18 @@ bool exit_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& cont
                 pbf_press_button(context, BUTTON_B, 200ms, 1800ms);
             }
         },
-        { move_learn_select }
+        { battle_exited, move_learn_select }
     );
-    if (ret < 0) {
+    if (ret < 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to detect learn move selection box within 10 seconds.",
             env.console
         );
+    }else if (ret == 0){
+        pbf_wait(context, 500ms);
+        context.wait_for_all_requests();
+        env.log("Battle exited.");
     }
     env.log("Detected YES/NO box for learning a move.");
 
@@ -466,7 +481,7 @@ bool exit_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& cont
         },
         { battle_exited }
     );
-    if (ret < 0) {
+    if (ret < 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to exit battle within 20 seconds.",
