@@ -14,13 +14,15 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "Pokemon/Pokemon_Strings.h"
+#include "PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h"
-#include "PokemonFRLG/PokemonFRLG_Settings.h"
+#include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 #include "PokemonFRLG_Navigation.h"
 
 namespace PokemonAutomation{
@@ -136,19 +138,18 @@ bool try_open_slot_six(ConsoleHandle& console, ProControllerContext& context){
         return false;
     }
 
+    if (!move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::POKEMON)){
+        console.log("open_slot_six(): Unable to move menu cursor to: " + Pokemon::STRING_POKEMON, COLOR_RED);
+        return false;
+    }
+
     console.log("Navigating to party menu.");
     BlackScreenOverWatcher blk1(COLOR_RED);
 
     int pm = run_until<ProControllerContext>(
         console, context,
         [](ProControllerContext& context){
-            pbf_wait(context, 200ms);
-            context.wait_for_all_requests();
-            pbf_press_dpad(context, DPAD_DOWN, 320ms, 320ms);
-            context.wait_for_all_requests();
-
-            pbf_press_button(context, BUTTON_A, 320ms, 640ms);
-            pbf_wait(context, 5000ms);
+            pbf_press_button(context, BUTTON_A, 320ms, 5640ms);
             context.wait_for_all_requests();
         },
         { blk1 }
