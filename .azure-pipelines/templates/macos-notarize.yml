@@ -178,14 +178,15 @@ stages:
           VERSION="${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
           FOLDER_NAME="SerialPrograms-$VERSION-MacOS-${{ parameters.architecture }}"
           BUILD_TYPE="${{ parameters.buildType }}"
+          EXT=$([ "$BUILD_TYPE" = "PrivateBeta" ] && echo "zip" || echo "tar.gz")
 
           cd "$(Pipeline.Workspace)/Arduino-Source-Internal"
           if [ "$BUILD_TYPE" = "PrivateBeta" ]; then
               echo "=== Creating password-protected archive for PrivateBeta ==="
-              7z a -tzip -mx=9 -p"$ARTIFACT_PASSWORD" -mem=AES256 "SerialPrograms-MacOS-$(compiler)-$(architecture).zip" "$FOLDER_NAME"
+              7z a -tzip -mx=9 "-p$ARTIFACT_PASSWORD" -mem=AES256 "SerialPrograms-MacOS-$(compiler)-$(architecture).$EXT" "$FOLDER_NAME"
           else
               echo "=== Creating tarball with enclosing folder ==="
-              tar -I "gzip -9" -czf "SerialPrograms-MacOS-$(compiler)-$(architecture).tar.gz" "$FOLDER_NAME"
+              tar -I "gzip -9" -czf "SerialPrograms-MacOS-$(compiler)-$(architecture).$EXT" "$FOLDER_NAME"
           fi
 
           echo "=== Creating cache directory and moving tarball ==="
