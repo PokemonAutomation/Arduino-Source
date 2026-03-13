@@ -93,7 +93,7 @@ StreamHistoryOption::StreamHistoryOption()
             {VideoFPS::FPS_01,   "fps-01",    "1 FPS"},
         },
         LockMode::UNLOCK_WHILE_RUNNING,
-        VideoFPS::FPS_15
+        VideoFPS::FPS_10
     )
     , JPEG_QUALITY(
         "<b>JPEG Quality:</b><br>"
@@ -141,3 +141,4 @@ void StreamHistoryOption::on_config_value_changed(void* object){
 
 
 }
+
