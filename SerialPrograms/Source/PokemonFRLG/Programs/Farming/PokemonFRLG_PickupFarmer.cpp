@@ -16,7 +16,10 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
+#include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
+#include "PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.h"
+#include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_PickupFarmer.h"
 
@@ -172,7 +175,15 @@ void close_start_menu(SingleSwitchProgramEnvironment& env, ProControllerContext&
 void open_party_menu_from_overworld(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     PartyMenuWatcher party_open(COLOR_RED);
     open_start_menu(env, context);
-    int ret = run_until<ProControllerContext>(
+    int ret = move_cursor_to_position(env.console, context, SelectionArrowPositionStartMenu::POKEMON);
+    if (ret < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to navigate to POKEMON on the Start menu.",
+            env.console
+        ); 
+    }
+    ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context) {
             for (int i = 0; i<2; i++){
@@ -189,16 +200,6 @@ void open_party_menu_from_overworld(SingleSwitchProgramEnvironment& env, ProCont
             env.console
         ); 
     }
-}
-
-void prepare_start_menu(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    env.log("Selecting 'Pokemon' on the Start Menu.");
-    open_start_menu(env, context);
-    // Should use arrow detection for this when it is available
-    // set the menu to "Pokemon" and exit
-    pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
-    pbf_press_button(context, BUTTON_B, 200ms, 300ms);
-    close_start_menu(env, context);
 }
 
 void use_teleport(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -533,8 +534,6 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     bool spin_leftright = true;
     uint16_t moves_used = 0;
     uint16_t encounters_since_item_check = 0;
-
-    prepare_start_menu(env, context);
     
     while (!shiny_found){
         if (stats.encounters == 0 || failed_encounter || moves_used >= MOVE_PP){

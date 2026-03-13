@@ -128,29 +128,6 @@ public:
 };
 
 
-// Similar to BattleMenuDetector, but looks for the white of the Yes/No box when learning a new move
-class BattleLearnDialogDetector : public StaticScreenDetector{
-public:
-    BattleLearnDialogDetector(Color color);
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) override;
-
-private:
-    ImageFloatBox m_menu_top_box;
-    ImageFloatBox m_menu_right_box;
-    ImageFloatBox m_dialog_top_box;
-    ImageFloatBox m_dialog_right_box;
-};
-class BattleLearnDialogWatcher : public DetectorToFinder<BattleLearnDialogDetector>{
-public:
-    BattleLearnDialogWatcher(Color color)
-        : DetectorToFinder("BattleLearnDialogDetector", std::chrono::milliseconds(250), color)
-    {}
-};
-
-
-
 // The Party menu has a white box on the bottom
 // The background around the edges is dark teal/navy
 class PartyMenuDetector : public StaticScreenDetector{
@@ -190,6 +167,9 @@ public:
         : DetectorToFinder("PartySelectionWatcher", std::chrono::milliseconds(250), color)
     {}
 };
+
+
+
 
 }
 }
