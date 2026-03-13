@@ -189,8 +189,8 @@ StoragePokemonMenuArrowFinder::StoragePokemonMenuArrowFinder(VideoOverlay& overl
 RotomPhoneMenuArrowFinder::RotomPhoneMenuArrowFinder(VideoOverlay& overlay)
     : m_overlay_set(overlay)
 {
-    for(size_t i_row = 0; i_row < 2; i_row++){
-        for(size_t j_col = 0; j_col < 5; j_col++){
+    for (size_t i_row = 0; i_row < 2; i_row++){
+        for (size_t j_col = 0; j_col < 5; j_col++){
             ImageFloatBox box(0.047 + j_col*0.183, 0.175 + 0.333*i_row, 0.059, 0.104);
             m_overlay_set.add(COLOR_YELLOW, box);
         }

@@ -34,7 +34,7 @@ bool ImageViewRGB32::save(const std::string& path) const{
     QDir dir = fileInfo.dir();
 
     if (!dir.exists()){
-        if (!dir.mkpath(".")) { // Create the path (the "." refers to the dir path itself)
+        if (!dir.mkpath(".")){ // Create the path (the "." refers to the dir path itself)
             global_logger_tagged().log("Failed to create directory for saving image:" + dir.absolutePath().toStdString());
             return false;
         }

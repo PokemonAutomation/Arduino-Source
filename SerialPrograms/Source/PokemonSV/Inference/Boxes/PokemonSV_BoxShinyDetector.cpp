@@ -19,7 +19,8 @@ namespace PokemonSV{
 
 
 BoxShinyDetector::BoxShinyDetector(Color color, const ImageFloatBox& box)
-: m_color(color), m_box(box) {}
+    : m_color(color), m_box(box)
+{}
 
 void BoxShinyDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);

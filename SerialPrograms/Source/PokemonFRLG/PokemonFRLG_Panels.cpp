@@ -10,6 +10,7 @@
 
 #include "PokemonFRLG_Settings.h"
 
+#include "Programs/Farming/PokemonFRLG_NuggetBridgeFarmer.h"
 #include "Programs/ShinyHunting/PokemonFRLG_GiftReset.h"
 #include "Programs/ShinyHunting/PokemonFRLG_RNGManipulator.h"
 #include "Programs/ShinyHunting/PokemonFRLG_LegendaryReset.h"
@@ -34,16 +35,21 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Settings ----");
     ret.emplace_back(make_settings<GameSettings_Descriptor, GameSettingsPanel>());
 
+    ret.emplace_back("---- Farming ----");
+    ret.emplace_back(make_single_switch_program<NuggetBridgeFarmer_Descriptor, NuggetBridgeFarmer>());
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+    }
+
     //ret.emplace_back("---- General ----");
 
     ret.emplace_back("---- Shiny Hunting  ----");
     ret.emplace_back(make_single_switch_program<GiftReset_Descriptor, GiftReset>());
     ret.emplace_back(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
     ret.emplace_back(make_single_switch_program<ShinyHuntOverworld_Descriptor, ShinyHuntOverworld>());
+    ret.emplace_back(make_single_switch_program<PrizeCornerReset_Descriptor, PrizeCornerReset>());
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<RNGManipulator_Descriptor, RNGManipulator>());
         ret.emplace_back(make_single_switch_program<LegendaryRunAway_Descriptor, LegendaryRunAway>());
-        ret.emplace_back(make_single_switch_program<PrizeCornerReset_Descriptor, PrizeCornerReset>());
     }
     
 

@@ -42,7 +42,7 @@ BlackDialogBoxDetector::BlackDialogBoxDetector(
 
 
 void BlackDialogBoxDetector::make_overlays(VideoOverlaySet& items) const{
-    for(const auto& box : BLACK_BOXES){
+    for (const auto& box : BLACK_BOXES){
         items.add(COLOR_RED, box);
     }
 }

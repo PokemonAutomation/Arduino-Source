@@ -10,14 +10,13 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h"
+#include "PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_PrizeCornerReset.h"
 
@@ -91,32 +90,39 @@ PrizeCornerReset::PrizeCornerReset()
 void PrizeCornerReset::obtain_prize(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     PrizeCornerReset_Descriptor::Stats& stats = env.current_stats<PrizeCornerReset_Descriptor::Stats>();
 
-    env.log("Talking to booth.");
-    pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+    for (int attempts = 0;; attempts++){
+        PrizeSelectWatcher prize_dialog(COLOR_RED);
 
-    PrizeSelectWatcher prize_dialog(COLOR_RED);
+        //Only 1 line to press through in english, not sure about other languages?
+        int ret = run_until<ProControllerContext>(
+            env.console, context,
+            [&](ProControllerContext& context){
+                env.log("Talking to booth.");
+                pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+                pbf_press_button(context, BUTTON_B, 320ms, 1680ms);
+                pbf_press_button(context, BUTTON_B, 320ms, 1680ms);
+                pbf_press_button(context, BUTTON_B, 320ms, 1680ms);
+            },
+            { prize_dialog }
+        );
+        context.wait_for_all_requests();
+        if (ret == 0){
+            break;
+        }
 
-    //Only 1 line to press through in english, not sure about other languages?
-    int ret = run_until<ProControllerContext>(
-        env.console, context,
-        [](ProControllerContext& context){
-            for (int i = 0; i < 5; i++){
-                pbf_press_button(context, BUTTON_B, 320ms, 320ms);
-                pbf_wait(context, 600ms); //Don't go too fast, have to let the box pop up
-                context.wait_for_all_requests();
-            }
-        },
-        { prize_dialog }
-    );
-    context.wait_for_all_requests();
-    if (ret < 0){
         stats.errors++;
         env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "obtain_prize(): Unable to find prize menu.",
-            env.console
-        );
+        if (attempts >= 5){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "obtain_prize(): Unable to open prize menu after 5 attempts.",
+                env.console
+            );
+        }
+
+        env.log("Unable to find prize menu... Retrying...", COLOR_RED);
+
+        pbf_mash_button(context, BUTTON_B, 5000ms);
     }
 
     //Select prize slot

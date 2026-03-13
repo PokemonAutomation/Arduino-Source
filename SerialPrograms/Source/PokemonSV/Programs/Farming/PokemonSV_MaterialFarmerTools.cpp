@@ -565,7 +565,7 @@ void run_lets_go_iteration(
     const int total_iterations = num_forward_moves_per_lets_go_iteration;
 
     context.wait_for_all_requests();
-    for(int i = 0; i < total_iterations; i++){
+    for (int i = 0; i < total_iterations; i++){
         use_lets_go_to_clear_in_front(stream, context, encounter_tracker, throw_ball_if_bubble, [&](ProControllerContext& context){
             // Do the following movement while the Let's Go pokemon clearing wild pokemon.
             stream.log("Move-forward iteration number: " + std::to_string(i + 1) + "/" + std::to_string(total_iterations), COLOR_PURPLE);

@@ -160,7 +160,7 @@ int test_pokemonSV_SandwichRecipeDetector(const ImageViewRGB32& image, const std
     }
 
     int target_IDs[6] = {0, 0, 0, 0, 0, 0};
-    for(int i = 0; i < 6; i++){
+    for (int i = 0; i < 6; i++){
         const auto& word = words[words.size() + i - 7];
         if (parse_int(word, target_IDs[i]) == false || target_IDs[i] > 151){
             cerr << "Error: word " << words[words.size() + i - 7] << " is wrong. Must be an integer < 151. " << endl;
@@ -173,7 +173,7 @@ int test_pokemonSV_SandwichRecipeDetector(const ImageViewRGB32& image, const std
     size_t detected_IDs[6] = {0, 0, 0, 0, 0, 0};
     detector.detect_recipes(image, detected_IDs);
 
-    for(int i = 0; i < 6; i++){
+    for (int i = 0; i < 6; i++){
         if (target_IDs[i] < 0){
             continue;
         }
@@ -218,7 +218,7 @@ int test_pokemonSV_SandwichHandDetector(const ImageViewRGB32& image, const std::
     }
 
     float box_values[4] = {0.0f};
-    for(int i = 0; i < 4; i++){
+    for (int i = 0; i < 4; i++){
         if (parse_float(words[words.size() - 4 + i], box_values[i]) == false){
             cerr << "Error: word " << words[words.size() - 4 + i] << " should be a float, range [0.0, 1.0]" << endl;
             return 1;
@@ -297,7 +297,7 @@ int test_pokemonSV_BoxEggDetector(const ImageViewRGB32& image, bool target){
 
 int test_pokemonSV_BoxPartyEggDetector(const ImageViewRGB32& image, int target){
     uint8_t num_eggs = 0;
-    for(uint8_t i = 0; i < 5; i++){
+    for (uint8_t i = 0; i < 5; i++){
         BoxEggDetector detector(BoxCursorLocation::PARTY, i+1, 0);
         if (detector.detect(image)){
             num_eggs++;
@@ -376,7 +376,7 @@ int test_pokemonSV_SandwichIngredientsDetector(const ImageViewRGB32& image, cons
     bool picks_result = picks_detector.detect(image);
     TEST_RESULT_COMPONENT_EQUAL(picks_result, is_picks, "picks Page");
 
-    for(int i = 0; i < 10; i++){
+    for (int i = 0; i < 10; i++){
         auto type = (i < 6 ? SandwichIngredientType::FILLING : SandwichIngredientType::CONDIMENT);
         size_t index = (i < 6 ? i : i - 6);
         DeterminedSandwichIngredientDetector determined_detector(type, index);
@@ -497,7 +497,7 @@ int test_pokemonSV_FastTravelDetector(const ImageViewRGB32& image, bool target){
 int test_pokemonSV_MapPokeCenterIconDetector(const ImageViewRGB32& image, int target){
     MapPokeCenterIconDetector detector(COLOR_RED, MAP_READABLE_AREA);
     const auto result = detector.detect_all(image);
-    for(const auto& box : result){
+    for (const auto& box : result){
         std::cout << "Box: x=" << box.x << ", y=" << box.y << ", width=" << box.width << ", height=" << box.height << std::endl;
     }
     TEST_RESULT_EQUAL(int(result.size()), target);
@@ -551,7 +551,7 @@ int test_pokemonSV_SandwichPlateDetector(const ImageViewRGB32& image, const std:
     detectors.emplace_back(logger, COLOR_RED, language, SandwichPlateDetector::Side::RIGHT);
     
     std::string sides[3] = {"left", "middle", "right"};
-    for(int i = 0; i < 3; i++){
+    for (int i = 0; i < 3; i++){
         bool is_yellow = detectors[i].is_label_yellow(image);
 
         std::string target = words[words.size()-3 + i];

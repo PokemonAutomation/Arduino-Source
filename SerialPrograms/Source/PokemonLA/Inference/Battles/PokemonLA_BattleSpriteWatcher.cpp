@@ -30,14 +30,14 @@ BattleSpriteWatcher::BattleSpriteWatcher(Logger& logger, VideoOverlay& overlay)
     , m_logger(logger)
     , m_battle_start_detector(logger, overlay)
 {
-    for(size_t i = 0; i < MAX_WILD_POKEMON_IN_MULTI_BATTLE; i++){
+    for (size_t i = 0; i < MAX_WILD_POKEMON_IN_MULTI_BATTLE; i++){
         m_sprite_boxes.emplace_back(0.957 - 0.035*i, 0.044, 0.021, 0.035);
     }
     m_sprite_appeared.resize(m_sprite_boxes.size(), false);
 }
 
 void BattleSpriteWatcher::make_overlays(VideoOverlaySet& items) const{
-    for(const auto& box : m_sprite_boxes){
+    for (const auto& box : m_sprite_boxes){
         items.add(COLOR_RED, box);
     }
 }
@@ -66,7 +66,7 @@ std::vector<bool> BattleSpriteWatcher::detect_sprites(const ImageViewRGB32& fram
 
 bool BattleSpriteWatcher::set_detected_sprites(const ImageViewRGB32& frame, std::vector<bool>& sprites) const{
     bool ret = false;
-    for(size_t i = 0; i < m_sprite_boxes.size(); i++){
+    for (size_t i = 0; i < m_sprite_boxes.size(); i++){
         const auto& box = m_sprite_boxes[i];
         const auto stats = image_stats(extract_box_reference(frame, box));
         // cout << stats.average.to_string() << " " << stats.stddev.to_string() << endl;

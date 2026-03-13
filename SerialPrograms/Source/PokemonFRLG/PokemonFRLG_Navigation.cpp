@@ -14,11 +14,15 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "Pokemon/Pokemon_Strings.h"
+#include "PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
+#include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.h"
-#include "PokemonFRLG/PokemonFRLG_Settings.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h"
+#include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 #include "PokemonFRLG_Navigation.h"
 
 namespace PokemonAutomation{
@@ -45,7 +49,7 @@ bool try_soft_reset(ConsoleHandle& console, ProControllerContext& context){
 
     int ls = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_A, 1000ms);
             pbf_wait(context, 5000ms);
             context.wait_for_all_requests();
@@ -53,9 +57,9 @@ bool try_soft_reset(ConsoleHandle& console, ProControllerContext& context){
         { whitescreen, load_menu }
     );
     context.wait_for_all_requests();
-    if (ls == 0) {
+    if (ls == 0){
         console.log("Entered load menu. (WhiteScreenOver)");
-    }else if (ls == 1) {
+    }else if (ls == 1){
         console.log("Entered load menu. (LoadMenu)");
     }else{
         console.log("soft_reset(): Unable to enter load menu.", COLOR_RED);
@@ -111,7 +115,7 @@ uint64_t soft_reset(ConsoleHandle& console, ProControllerContext& context){
 }
 
 bool try_open_slot_six(ConsoleHandle& console, ProControllerContext& context){
-    //Attempt to exit any dialog and open the start menu
+    //  Attempt to exit any dialog and open the start menu
     StartMenuWatcher start_menu(COLOR_RED);
 
     int ret = run_until<ProControllerContext>(
@@ -134,19 +138,18 @@ bool try_open_slot_six(ConsoleHandle& console, ProControllerContext& context){
         return false;
     }
 
+    if (!move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::POKEMON)){
+        console.log("open_slot_six(): Unable to move menu cursor to: " + Pokemon::STRING_POKEMON, COLOR_RED);
+        return false;
+    }
+
     console.log("Navigating to party menu.");
     BlackScreenOverWatcher blk1(COLOR_RED);
 
     int pm = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
-            pbf_wait(context, 200ms);
-            context.wait_for_all_requests();
-            pbf_press_dpad(context, DPAD_DOWN, 320ms, 320ms);
-            context.wait_for_all_requests();
-
-            pbf_press_button(context, BUTTON_A, 320ms, 640ms);
-            pbf_wait(context, 5000ms);
+        [](ProControllerContext& context){
+            pbf_press_button(context, BUTTON_A, 320ms, 5640ms);
             context.wait_for_all_requests();
         },
         { blk1 }
@@ -167,7 +170,7 @@ bool try_open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     BlackScreenOverWatcher blk2(COLOR_RED);
     int sm = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_press_button(context, BUTTON_A, 320ms, 640ms);
             pbf_press_button(context, BUTTON_A, 320ms, 640ms);
             pbf_wait(context, 5000ms);
@@ -181,6 +184,21 @@ bool try_open_slot_six(ConsoleHandle& console, ProControllerContext& context){
         console.log("open_slot_six(): Unable to enter summary.", COLOR_RED);
         return false;
     }
+
+    //Double check that we are on summary
+    SummaryWatcher sum1(COLOR_RED);
+    int sm1 = wait_until(
+        console, context,
+        std::chrono::seconds(5),
+        {{ sum1 }}
+    );
+    if (sm1 == 0){
+        console.log("Summary page dots detected.");
+    }else{
+        console.log("open_slot_six(): Unable to detect summary screen.", COLOR_RED);
+        return false;
+    }
+
     pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
     return true;
@@ -244,8 +262,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
             );
             if (ret2 == 0){
                 console.log("Battle menu detecteed!");
-            }
-            else {
+            }else{
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "handle_encounter(): Did not detect battle menu.",
@@ -279,8 +296,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
         );
         if (ret == 0){
             console.log("Battle menu detecteed!");
-        }
-        else {
+        }else{
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "handle_encounter(): Did not detect battle menu.",
@@ -319,7 +335,7 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
     BlackScreenOverWatcher battle_over(COLOR_RED);
     int ret3 = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             pbf_press_button(context, BUTTON_A, 320ms, 640ms);
             pbf_wait(context, 5000ms);
             context.wait_for_all_requests();
@@ -338,15 +354,21 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
 }
 
 void home_black_border_check(ConsoleHandle& console, ProControllerContext& context){
-    console.log("Going to home to check for black border.");
-    go_home(console, context);
-    ensure_at_home(console, context);
-    context.wait_for_all_requests();
-    StartProgramChecks::check_border(console);
-    console.log("Returning to game.");
-    resume_game_from_home(console, context);
-    context.wait_for_all_requests();
-    console.log("Entered game.");
+    if (GameSettings::instance().DEVICE == GameSettings::Device::switch_1_2){
+        console.log("Switch 1 or 2 selected in Settings.");
+        console.log("Going to home to check for black border.");
+        pbf_press_button(context, BUTTON_ZL, 120ms, 880ms); //  Connect the controller.
+        pbf_press_button(context, BUTTON_HOME, 120ms, 880ms);
+        context.wait_for_all_requests();
+        StartProgramChecks::check_border(console);
+        console.log("Returning to game.");
+        resume_game_from_home(console, context);
+        context.wait_for_all_requests();
+        console.log("Entered game.");
+    }else{
+        console.log("Non-Switch device selected in Settings.");
+        console.log("Skipping black border check.", COLOR_BLUE);
+    }
 }
 
 

@@ -204,7 +204,7 @@ int sound_bool_detector_helper(SoundBoolDetectorFunction test_func, const std::s
     size_t sample_rate = 48000;
     AudioTemplate audio_stream = loadAudioTemplate(test_path, sample_rate);
     std::vector<AudioSpectrum> spectrums;
-    for(size_t i = 0; i < audio_stream.numWindows(); i++){
+    for (size_t i = 0; i < audio_stream.numWindows(); i++){
         // AudioSpectrum(size_t s, size_t rate, std::shared_ptr<const AlignedVector<float>> m);
         AlignedVector<float> freq_mag(audio_stream.numFrequencies());
         memcpy(freq_mag.data(), audio_stream.getWindow(i), sizeof(float) * audio_stream.numFrequencies());
@@ -313,6 +313,7 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonFRLG_ShinySymbolDetector", std::bind(image_bool_detector_helper, test_pokemonFRLG_ShinySymbolDetector, _1)},
     {"PokemonFRLG_SelectionDialogDetector", std::bind(image_bool_detector_helper, test_pokemonFRLG_SelectionDialogDetector, _1)},
     {"PokemonFRLG_AdvanceBattleDialogDetector", std::bind(image_bool_detector_helper, test_pokemonFRLG_AdvanceBattleDialogDetector, _1)},
+    {"PokemonFRLG_BattleMenuDetector", std::bind(image_bool_detector_helper, test_pokemonFRLG_BattleMenuDetector, _1)},
 };
 
 TestFunction find_test_function(const std::string& test_space, const std::string& test_name){

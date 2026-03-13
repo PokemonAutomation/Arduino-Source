@@ -26,8 +26,8 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 SandwichRecipeNumberDetector::SandwichRecipeNumberDetector(Logger& logger, Color color): m_logger(logger), m_color(color){
-    for(int y = 0; y < 3; y++){
-        for(int x = 0; x < 2; x++){
+    for (int y = 0; y < 3; y++){
+        for (int x = 0; x < 2; x++){
             // m_arrow_boxes[y*2+x] = ImageFloatBox(x * 0.26 + 0.103, y * 0.275 + 0.074, 0.068, 0.085);
             m_id_boxes[y*2+x] = ImageFloatBox(x * 0.26 + 0.015, y * 0.277 + 0.240, 0.042, 0.048);
         }
@@ -35,14 +35,14 @@ SandwichRecipeNumberDetector::SandwichRecipeNumberDetector(Logger& logger, Color
 }
 
 void SandwichRecipeNumberDetector::make_overlays(VideoOverlaySet& items) const{
-    for(int i = 0; i < 6; i++){
+    for (int i = 0; i < 6; i++){
         // items.add(m_color, m_arrow_boxes[i]);
         items.add(m_color, m_id_boxes[i]);
     }   
 }
 
 void SandwichRecipeNumberDetector::detect_recipes(const ImageViewRGB32& screen, size_t recipe_IDs[6]) const{
-    for(int i = 0; i < 6; i++){
+    for (int i = 0; i < 6; i++){
         auto cropped_image = extract_box_reference(screen, m_id_boxes[i]);
 
         const bool invert_blackwhite = true;
@@ -104,8 +104,8 @@ void SandwichRecipeNumberDetector::detect_recipes(const ImageViewRGB32& screen, 
 
 SandwichRecipeSelectionWatcher::SandwichRecipeSelectionWatcher(Color color)
 : VisualInferenceCallback("SandwichRecipeSelectionWatcher"), m_arrow_watchers(6){
-    for(int y = 0; y < 3; y++){
-        for(int x = 0; x < 2; x++){
+    for (int y = 0; y < 3; y++){
+        for (int x = 0; x < 2; x++){
             ImageFloatBox box(x * 0.26 + 0.103, y * 0.275 + 0.074, 0.068, 0.085);
             m_arrow_watchers.emplace_back(color, GradientArrowType::DOWN, box);
         }
@@ -113,14 +113,14 @@ SandwichRecipeSelectionWatcher::SandwichRecipeSelectionWatcher(Color color)
 }
 
 void SandwichRecipeSelectionWatcher::make_overlays(VideoOverlaySet& items) const{
-    for(int i = 0; i < 6; i++){
+    for (int i = 0; i < 6; i++){
         m_arrow_watchers[i].make_overlays(items);
     }
 }
 
 bool SandwichRecipeSelectionWatcher::process_frame(const VideoSnapshot& frame){
     int num_arrows_found = 0;
-    for(int i = 0; i < 6; i++){
+    for (int i = 0; i < 6; i++){
         const bool found_arrow = m_arrow_watchers[i].process_frame(frame);
         if (found_arrow){
             m_selected_recipe = i;
@@ -132,7 +132,7 @@ bool SandwichRecipeSelectionWatcher::process_frame(const VideoSnapshot& frame){
 
 bool SandwichRecipeSelectionWatcher::detect(const ImageViewRGB32& frame){
     int num_arrows_found = 0;
-    for(int i = 0; i < 6; i++){
+    for (int i = 0; i < 6; i++){
         const bool found_arrow = m_arrow_watchers[i].detect(frame);
         if (found_arrow){
             m_selected_recipe = i;

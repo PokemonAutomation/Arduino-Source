@@ -233,7 +233,7 @@ void YOLOv5Session::run(const cv::Mat& input_image, std::vector<YOLOv5Session::D
     std::vector<float> scores;
     std::vector<size_t> labels;
 
-    for(int i = 0; i < YOLO5_NUM_CANDIDATES; i++){
+    for (int i = 0; i < YOLO5_NUM_CANDIDATES; i++){
         float cx = m_model_output[cand_size*i];
         float cy = m_model_output[cand_size*i+1];
         float w = m_model_output[cand_size*i+2];
@@ -242,7 +242,7 @@ void YOLOv5Session::run(const cv::Mat& input_image, std::vector<YOLOv5Session::D
 
         float max_score = 0.0;
         size_t pred_label = 0;  // predicted label
-        for(size_t j_label = 0; j_label < m_label_names.size(); j_label++){
+        for (size_t j_label = 0; j_label < m_label_names.size(); j_label++){
             float score = m_model_output[cand_size*i+5+j_label];
             if (score > max_score){
                 max_score = score;
@@ -280,7 +280,7 @@ void YOLOv5Session::run(const cv::Mat& input_image, std::vector<YOLOv5Session::D
 
 
 size_t YOLOv5Session::label_index(const std::string& label_name) const{
-    for(size_t i = 0; i < m_label_names.size(); i++){
+    for (size_t i = 0; i < m_label_names.size(); i++){
         if (label_name == m_label_names[i]){
             return i;
         }
@@ -289,7 +289,7 @@ size_t YOLOv5Session::label_index(const std::string& label_name) const{
 }
 
 const YOLOv5Session::DetectionBox* find_detection(const std::vector<YOLOv5Session::DetectionBox>& detection, size_t label_idx){
-    for(const auto& box : detection){
+    for (const auto& box : detection){
         if (box.label_idx == label_idx){
             return &box;
         }

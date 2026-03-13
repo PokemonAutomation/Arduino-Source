@@ -22,6 +22,7 @@ variables:
   - group: discord-symbols
   - group: telemetry
   - group: alarm_clock
+  - group: artifacts
 
 parameters:
   - name: buildType
@@ -65,13 +66,39 @@ stages:
 #    condition: always()
 
 ###########################################
+#        SET VERSION BUILD NUMBER         #
+###########################################
+
+- stage: Set_Build_Number
+  displayName: 'Set Build Number'
+  dependsOn: []
+  condition: succeeded()
+
+  jobs:
+    - job: SetVersion
+      displayName: 'Set Build Number to Version'
+      timeoutInMinutes: 10
+      pool:
+        vmImage: ubuntu-latest
+
+      steps:
+        - script: |
+            VERSION="v${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
+            echo "Setting build number to $VERSION"
+            echo "##vso[build.updatebuildnumber]$VERSION"
+            echo "##vso[build.addbuildtag]${{ parameters.buildType }}"
+          displayName: 'Set Build Number to Version'
+
+
+###########################################
 #         WINDOWS BUILD JOB               #
 ###########################################
 
 - stage: Windows_Build_x64
   displayName: Windows Build x64
-  #dependsOn: Wake_Up_Signal
-  dependsOn: []
+  dependsOn:
+    #- Wake_Up_Signal
+    - Set_Build_Number
   condition: and(succeeded(), or(eq('${{ parameters.targetOS }}', 'Windows'), eq('${{ parameters.targetOS }}', 'All')))
 
   jobs:
@@ -188,6 +215,7 @@ stages:
           $version = "${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
           $folderName = "SerialPrograms-$version-Windows-x64"
           $name = "SerialPrograms-Windows-$(compiler)-$(architecture)"
+          $buildType = "${{ parameters.buildType }}"
 
           $cacheArtifactsDir = Join-Path $root "cache-artifacts"
           $artifactSubdir = Join-Path $cacheArtifactsDir $name
@@ -198,12 +226,22 @@ stages:
           New-Item -ItemType Directory -Force -Path $tempFolder | Out-Null
           Copy-Item "$root/cache-build/*" $tempFolder -Recurse -Force
 
-          Compress-Archive -Path $tempFolder -DestinationPath "$artifactSubdir/$name.zip"
+          if ($buildType -eq "PrivateBeta") {
+              Write-Host "=== Encrypting build artifact with password ==="
+              $zipPath = "$artifactSubdir/$name.zip"
+              & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 "-p$env:ARTIFACT_PASSWORD" -mem=AES256 $zipPath "$tempFolder/*"
+          } else {
+              $zipPath = "$artifactSubdir/$name.zip"
+              & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 $zipPath "$tempFolder/*"
+          }
+
           Remove-Item $temp -Recurse -Force
 
           Write-Host "=== Created archive with enclosing folder: $folderName ==="
         displayName: 'Archive Windows build artifact'
         condition: succeeded()
+        env:
+          ARTIFACT_PASSWORD: $(ARTIFACT_PASSWORD)
 
       - task: Cache@2
         displayName: 'Cache the build artifact'
@@ -232,8 +270,9 @@ stages:
 
 - stage: Linux_Build_x64
   displayName: Linux Build x64
-  #dependsOn: Wake_Up_Signal
-  dependsOn: []
+  dependsOn:
+    #- Wake_Up_Signal
+    - Set_Build_Number
   condition: and(succeeded(), or(eq('${{ parameters.targetOS }}', 'Linux'), eq('${{ parameters.targetOS }}', 'All')))
 
   jobs:
@@ -350,6 +389,10 @@ stages:
               -p qt \
               -v 3
 
+          echo "=== Removing unnecessary Qt files ==="
+          rm -rf "$APPDIR/usr/translations"
+
+          echo "=== Packaging AppImage ==="
           ./appimagetool-x86_64.AppImage AppDir
           rm linuxdeploy-*.AppImage
           rm appimagetool-x86_64.AppImage
@@ -360,11 +403,20 @@ stages:
           mkdir -p "$FOLDER_NAME"
           chmod +x "SerialPrograms-x86_64.AppImage"
           mv "SerialPrograms-x86_64.AppImage" "$FOLDER_NAME/"
-          tar -zcvf $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).tar.gz "$FOLDER_NAME"
+
+          BUILD_TYPE="${{ parameters.buildType }}"
+            if [ "$BUILD_TYPE" = "PrivateBeta" ]; then
+                echo "=== Encrypting build artifact with password ==="
+                7z a -tzip -mx=9 "-p$ARTIFACT_PASSWORD" -mem=AES256 "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).zip" "$FOLDER_NAME"
+            else
+                tar -I "gzip -9" -cvf $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).tar.gz "$FOLDER_NAME"
+            fi
           
           echo "=== AppImage build complete with enclosing folder: $FOLDER_NAME ==="
         displayName: 'Deploy AppImage'
         condition: succeeded()
+        env:
+          ARTIFACT_PASSWORD: $(ARTIFACT_PASSWORD)
 
       - task: Cache@2
         displayName: 'Cache build'
@@ -380,11 +432,24 @@ stages:
           path: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-symbols'
         condition: succeeded()
 
+      - script: |
+          BUILD_TYPE="${{ parameters.buildType }}"
+          if [ "$BUILD_TYPE" = "PrivateBeta" ]; then
+              EXT="zip"
+          else
+              EXT="tar.gz"
+          fi
+
+          ARTIFACT_PATH_UBUNTU="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).$EXT"
+          echo "##vso[task.setvariable variable=ARTIFACT_PATH_UBUNTU]$ARTIFACT_PATH_UBUNTU"
+        displayName: 'Set artifact path'
+        condition: succeeded()
+
       - task: PublishBuildArtifacts@1
         displayName: 'Publish SerialPrograms'
         condition: succeeded()
         inputs:
-          PathtoPublish: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).tar.gz'
+          PathtoPublish: '$(ARTIFACT_PATH_UBUNTU)'
           ArtifactName: 'SerialPrograms-Linux-$(compiler)-$(architecture)'
 
 ###########################################
@@ -395,6 +460,7 @@ stages:
   parameters:
     stageName: MacOS_Build_ARM64
     displayName: 'MacOS Build ARM64'
+    dependsOnStage: Set_Build_Number
     targetOS: ${{ parameters.targetOS }}
     poolName: ApplePool
     imageName: macos-26
@@ -416,6 +482,7 @@ stages:
   parameters:
     stageName: MacOS_Build_x64
     displayName: 'MacOS Build x64'
+    dependsOnStage: Set_Build_Number
     targetOS: ${{ parameters.targetOS }}
     poolName: ApplePool
     imageName: macos-15
@@ -559,6 +626,7 @@ stages:
     displayName: 'Publish GitHub Release'
     dependsOn:
       - Update_GitHub_Telemetry_JSON
+      - Manual_Validation
     platforms:
       - Windows
       - Linux
@@ -581,6 +649,7 @@ stages:
     displayName: 'Update GitHub Latest Version JSON'
     dependsOn:
       - Publish_GitHub_Release
+      - Manual_Validation
     buildType: ${{ parameters.buildType }}
     versionMajor: ${{ parameters.versionMajor }}
     versionMinor: ${{ parameters.versionMinor }}
@@ -588,6 +657,7 @@ stages:
     versionRepo: PokemonAutomation/ComputerControl
     condition: |
       and(
+        in(dependencies.Manual_Validation.result, 'Succeeded'),
         in(dependencies.Publish_GitHub_Release.result, 'Succeeded', 'Skipped'),
         eq('${{ parameters.targetOS }}', 'All'),
         ne('${{ parameters.buildType }}', 'Commit')

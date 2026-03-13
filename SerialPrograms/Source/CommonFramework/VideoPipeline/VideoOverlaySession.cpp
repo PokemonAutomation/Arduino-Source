@@ -292,7 +292,7 @@ void VideoOverlaySession::add_log(std::string message, Color color){
 
         //  We create a newly allocated Box vector to avoid listener accessing
         //  `m_log_texts` asynchronously.
-        for(const auto& item : m_log_texts){
+        for (const auto& item : m_log_texts){
             ptr->emplace_back(item);
         }
     }
@@ -306,7 +306,7 @@ void VideoOverlaySession::clear_log(){
 
         //  We create a newly allocated log text vector to avoid listener accessing
         //  `m_log_texts` asynchronously.
-        for(const auto& item : m_log_texts){
+        for (const auto& item : m_log_texts){
             ptr->emplace_back(item);
         }
     }

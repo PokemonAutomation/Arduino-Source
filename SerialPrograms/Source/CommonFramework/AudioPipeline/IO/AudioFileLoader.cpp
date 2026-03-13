@@ -250,7 +250,7 @@ std::pair<const char*, size_t> AudioFileLoader::convertRawWavSamples(){
     if(m_audioFormat.channelCount() == 1){
         // Input wav file has stereo or more channels, but output format is mono,
         // average L and R channel samples per frame:
-        for(size_t i = 0; i < framesRead; i++){
+        for (size_t i = 0; i < framesRead; i++){
             m_floatBuffer[i] = (m_floatBuffer[2*i] + m_floatBuffer[2*i+1]) / 2.0f;
         }
         return {reinterpret_cast<const char*>(m_floatBuffer.data()), framesRead * sizeof(float)};
@@ -260,9 +260,9 @@ std::pair<const char*, size_t> AudioFileLoader::convertRawWavSamples(){
         // Input wav is mono but output format is stereo,
         // Duplicate samples for each channel:
         m_floatBuffer.resize(samplesRead * m_audioFormat.channelCount());
-        for(size_t i = samplesRead; i-- > 0;){
+        for (size_t i = samplesRead; i-- > 0;){
             const float v = m_floatBuffer[i];
-            for(int j = m_audioFormat.channelCount()-1; j >= 0; j--){
+            for (int j = m_audioFormat.channelCount()-1; j >= 0; j--){
                 m_floatBuffer[m_audioFormat.channelCount()*i+j] = v;
             }
         }

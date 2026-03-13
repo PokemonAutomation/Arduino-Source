@@ -248,7 +248,7 @@ uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env
     Rustling current_rustling = rustling;
     uint16_t attempts = 0;
 
-    while ((current_rustling == Rustling::Slow || current_rustling == Rustling::No) && no_rustling < 3) { 
+    while ((current_rustling == Rustling::Slow || current_rustling == Rustling::No) && no_rustling < 3){
         /* Slow or No rustling, not in Battle! */
         pbf_mash_button(context, BUTTON_ZL, 1920ms);
         pbf_mash_button(context, BUTTON_B, 80ms);
