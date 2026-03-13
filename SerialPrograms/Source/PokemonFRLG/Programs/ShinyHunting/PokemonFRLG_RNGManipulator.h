@@ -47,7 +47,6 @@ private:
         // fossils,
         snorlax,
         sweetscent,
-        grasswalk,
         // fishing,
         // static,
         // roaming
