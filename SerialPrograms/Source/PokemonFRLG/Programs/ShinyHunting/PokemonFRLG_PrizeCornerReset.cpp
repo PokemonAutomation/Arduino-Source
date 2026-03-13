@@ -16,6 +16,7 @@
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h"
+#include "PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_PrizeCornerReset.h"
 

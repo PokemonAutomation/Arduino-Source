@@ -1408,6 +1408,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.h
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.cpp
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.h
+    Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.cpp
+    Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h
     Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.cpp
     Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h
     Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.cpp

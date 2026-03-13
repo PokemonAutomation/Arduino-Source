@@ -15,6 +15,7 @@
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
+#include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.h"
@@ -112,7 +113,7 @@ uint64_t soft_reset(ConsoleHandle& console, ProControllerContext& context){
 }
 
 bool try_open_slot_six(ConsoleHandle& console, ProControllerContext& context){
-    //Attempt to exit any dialog and open the start menu
+    //  Attempt to exit any dialog and open the start menu
     StartMenuWatcher start_menu(COLOR_RED);
 
     int ret = run_until<ProControllerContext>(
