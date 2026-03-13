@@ -135,6 +135,11 @@ std::string get_resource_path(){
     if (QDir(system_path).exists()) {
         return system_path.toStdString();
     }
+    // Check for Resources in the current working directory
+    QString cwd_path = "./Resources/";
+    if (QDir(cwd_path).exists()) {
+        return cwd_path.toStdString();
+    }
     // Prevents a prompt telling the user to install Resources to /usr/Resources
     // if the binary is located at /usr/bin/SerialPrograms
     return (get_application_base_dir_path() + "/Resources/").toStdString();
