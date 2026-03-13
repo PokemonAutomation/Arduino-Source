@@ -626,6 +626,7 @@ stages:
     displayName: 'Publish GitHub Release'
     dependsOn:
       - Update_GitHub_Telemetry_JSON
+      - Manual_Validation
     platforms:
       - Windows
       - Linux
@@ -648,6 +649,7 @@ stages:
     displayName: 'Update GitHub Latest Version JSON'
     dependsOn:
       - Publish_GitHub_Release
+      - Manual_Validation
     buildType: ${{ parameters.buildType }}
     versionMajor: ${{ parameters.versionMajor }}
     versionMinor: ${{ parameters.versionMinor }}
@@ -655,6 +657,7 @@ stages:
     versionRepo: PokemonAutomation/ComputerControl
     condition: |
       and(
+        in(dependencies.Manual_Validation.result, 'Succeeded'),
         in(dependencies.Publish_GitHub_Release.result, 'Succeeded', 'Skipped'),
         eq('${{ parameters.targetOS }}', 'All'),
         ne('${{ parameters.buildType }}', 'Commit')
