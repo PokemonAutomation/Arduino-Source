@@ -13,7 +13,7 @@ StreamHistoryOption::StreamHistoryOption()
     : GroupOption(
         "Stream History",
         LockMode::LOCK_WHILE_RUNNING,
-        GroupOption::EnableMode::DEFAULT_DISABLED,
+        IS_BETA_VERSION ? GroupOption::EnableMode::DEFAULT_ENABLED : GroupOption::EnableMode::DEFAULT_DISABLED,
         true
     )
     , DESCRIPTION(
@@ -141,4 +141,5 @@ void StreamHistoryOption::on_config_value_changed(void* object){
 
 
 }
+
 
