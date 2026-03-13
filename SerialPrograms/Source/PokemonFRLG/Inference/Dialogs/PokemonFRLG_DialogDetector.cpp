@@ -230,6 +230,92 @@ bool AdvanceBattleDialogDetector::detect(const ImageViewRGB32& screen){
     return false;
 }
 
+BattleLearnDialogDetector::BattleLearnDialogDetector(Color color)
+    : m_menu_top_box(0.805, 0.445, 0.149, 0.006)
+    , m_menu_right_box(0.962, 0.445, 0.006, 0.200) // right side, Yes/No selection
+    , m_dialog_top_box(0.036, 0.763, 0.459, 0.014)
+    , m_dialog_right_box(0.941, 0.763, 0.006, 0.179) //right side, closest to the menu
+{}
+void BattleLearnDialogDetector::make_overlays(VideoOverlaySet& items) const{
+    const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_menu_top_box));
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_menu_right_box));
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_top_box));
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_right_box));
+}
+bool BattleLearnDialogDetector::detect(const ImageViewRGB32& screen){
+    ImageViewRGB32 game_screen = extract_box_reference(screen, GameSettings::instance().GAME_BOX);
+
+    //Menu is white
+    ImageViewRGB32 menu_top_image = extract_box_reference(game_screen, m_menu_top_box);
+    ImageViewRGB32 menu_right_image = extract_box_reference(game_screen, m_menu_right_box);
+
+    //Background dialog is teal
+    ImageViewRGB32 dialog_top_image = extract_box_reference(game_screen, m_dialog_top_box);
+    ImageViewRGB32 dialog_right_image = extract_box_reference(game_screen, m_dialog_right_box);
+
+    if (is_white(menu_top_image)
+        && is_white(menu_right_image)
+        && is_solid(dialog_top_image, { 0.176, 0.357, 0.467 }, 0.25, 20) //40, 81, 106 teal
+        && is_solid(dialog_right_image, { 0.176, 0.357, 0.467 }, 0.25, 20)
+    ){
+        return true;
+    }
+    return false;
+}
+
+PartyMenuDetector::PartyMenuDetector(Color color)
+    : m_dialog_top_box(0.028, 0.840, 0.705, 0.010)
+    , m_page_background_box(0.028, 0.500, 0.010, 0.250)
+{}
+void PartyMenuDetector::make_overlays(VideoOverlaySet& items) const{
+    const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_top_box));
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_page_background_box));
+}
+bool PartyMenuDetector::detect(const ImageViewRGB32& screen){
+    ImageViewRGB32 game_screen = extract_box_reference(screen, GameSettings::instance().GAME_BOX);
+
+    //Dialog is white
+    ImageViewRGB32 dialog_top_image = extract_box_reference(game_screen, m_dialog_top_box);
+
+    //Menu background is teal
+    ImageViewRGB32 menu_background_image = extract_box_reference(game_screen, m_page_background_box);
+
+    if (is_white(dialog_top_image)
+        && is_solid(menu_background_image, { 0.020, 0.424, 0.412 }, 0.25, 20) //5, 108, 105 teal
+    ){
+        return true;
+    }
+    return false;
+}
+
+PartySelectionDetector::PartySelectionDetector(Color color)
+    : m_dialog_right_box(0.955, 0.648, 0.010, 0.303)
+    , m_page_background_box(0.028, 0.500, 0.010, 0.250)
+{}
+void PartySelectionDetector::make_overlays(VideoOverlaySet& items) const{
+    const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_dialog_right_box));
+    items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_page_background_box));
+}
+bool PartySelectionDetector::detect(const ImageViewRGB32& screen){
+    ImageViewRGB32 game_screen = extract_box_reference(screen, GameSettings::instance().GAME_BOX);
+
+    //Dialog is white
+    ImageViewRGB32 dialog_right_image = extract_box_reference(game_screen, m_dialog_right_box);
+
+    //Menu background is teal
+    ImageViewRGB32 menu_background_image = extract_box_reference(game_screen, m_page_background_box);
+
+    if (is_white(dialog_right_image)
+        && is_solid(menu_background_image, { 0.020, 0.424, 0.412 }, 0.25, 20) //5, 108, 105 teal
+    ){
+        return true;
+    }
+    return false;
+}
+
 
 }
 }
