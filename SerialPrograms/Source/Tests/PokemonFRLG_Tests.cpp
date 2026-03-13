@@ -59,4 +59,12 @@ int test_pokemonFRLG_AdvanceBattleDialogDetector(const ImageViewRGB32& image, bo
     return 0;
 }
 
+int test_pokemonFRLG_BattleMenuDetector(const ImageViewRGB32& image, bool target){
+    auto overlay = DummyVideoOverlay();
+    BattleMenuDetector detector(COLOR_RED);
+    bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
 }
