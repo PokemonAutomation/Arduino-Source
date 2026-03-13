@@ -379,74 +379,87 @@ else() # macOS and Linux
         # extract it, and then link it up
 
         # Set the ONNXRUNTIME version and arch, allows for quick updates
-        set(ONNXRUNTIME_VERSION "1.23.0")
-        set(ONNXRUNTIME_ARCH "x64")
-        set(ONNXRUNTIME_DIR_NAME "onnxruntime-linux-${ONNXRUNTIME_ARCH}-${ONNXRUNTIME_VERSION}")
-        set(ONNXRUNTIME_TGZ_NAME "${ONNXRUNTIME_DIR_NAME}.tgz")
-        # build up the URL based on the version and name
-        set(ONNXRUNTIME_URL "https://github.com/microsoft/onnxruntime/releases/download/v${ONNXRUNTIME_VERSION}/${ONNXRUNTIME_TGZ_NAME}")
+        pkg_check_modules(ONNXRUNTIME QUIET libonnxruntime)
 
-        # Cache variable is editable by users *and* is properly stored
-        set(ONNX_ROOT_PATH "" CACHE PATH "Path to the root of a pre-installed ONNX Runtime (e.g., /path/to/onnxruntime-linux-x64-1.23.0)")
+        if(ONNXRUNTIME_FOUND)
+            message(STATUS "Found system installed ONNX Runtime")
 
-        # Download the onnxruntime if it doesn't exist or if the path is bad
-        if(NOT ONNX_ROOT_PATH OR NOT EXISTS "${ONNX_ROOT_PATH}/include/onnxruntime_cxx_api.h")
-            set(EXTRACTED_ONNX_PATH "${CMAKE_BINARY_DIR}/${ONNXRUNTIME_DIR_NAME}")
+            message(STATUS "Found ONNX Include Dirs: ${ONNXRUNTIME_INCLUDE_DIRS}")
+            message(STATUS "Found ONNX Library: ${ONNXRUNTIME_LIBRARIES}")
 
-            if(NOT IS_DIRECTORY ${EXTRACTED_ONNX_PATH})
-                message(STATUS "ONNX_ROOT_PATH not found. Downloading ONNX Runtime v${ONNXRUNTIME_VERSION}...")
-                
-                # logic for downloading...
-                set(DOWNLOAD_LOCATION "${CMAKE_BINARY_DIR}/${ONNXRUNTIME_TGZ_NAME}")
-                file(DOWNLOAD
-                    ${ONNXRUNTIME_URL}
-                    ${DOWNLOAD_LOCATION}
-                    SHOW_PROGRESS
-                    STATUS download_status
-                )
-                list(GET download_status 0 error_code)
-                if(NOT error_code EQUAL 0)
-                    list(GET download_status 1 error_message)
-                    message(FATAL_ERROR "Failed to download ONNX Runtime: ${error_message}")
+            target_include_directories(SerialProgramsLib PUBLIC ${ONNXRUNTIME_INCLUDE_DIRS})
+            target_link_libraries(SerialProgramsLib PUBLIC ${ONNXRUNTIME_LIBRARIES})
+
+        else()
+            set(ONNXRUNTIME_VERSION "1.23.0")
+            set(ONNXRUNTIME_ARCH "x64")
+            set(ONNXRUNTIME_DIR_NAME "onnxruntime-linux-${ONNXRUNTIME_ARCH}-${ONNXRUNTIME_VERSION}")
+            set(ONNXRUNTIME_TGZ_NAME "${ONNXRUNTIME_DIR_NAME}.tgz")
+            # build up the URL based on the version and name
+            set(ONNXRUNTIME_URL "https://github.com/microsoft/onnxruntime/releases/download/v${ONNXRUNTIME_VERSION}/${ONNXRUNTIME_TGZ_NAME}")
+
+            # Cache variable is editable by users *and* is properly stored
+            set(ONNX_ROOT_PATH "" CACHE PATH "Path to the root of a pre-installed ONNX Runtime (e.g., /path/to/onnxruntime-linux-x64-1.23.0)")
+
+            # Download the onnxruntime if it doesn't exist or if the path is bad
+            if(NOT ONNX_ROOT_PATH OR NOT EXISTS "${ONNX_ROOT_PATH}/include/onnxruntime_cxx_api.h")
+                set(EXTRACTED_ONNX_PATH "${CMAKE_BINARY_DIR}/${ONNXRUNTIME_DIR_NAME}")
+
+                if(NOT IS_DIRECTORY ${EXTRACTED_ONNX_PATH})
+                    message(STATUS "ONNX_ROOT_PATH not found. Downloading ONNX Runtime v${ONNXRUNTIME_VERSION}...")
+
+                    # logic for downloading...
+                    set(DOWNLOAD_LOCATION "${CMAKE_BINARY_DIR}/${ONNXRUNTIME_TGZ_NAME}")
+                    file(DOWNLOAD
+                        ${ONNXRUNTIME_URL}
+                        ${DOWNLOAD_LOCATION}
+                        SHOW_PROGRESS
+                        STATUS download_status
+                    )
+                    list(GET download_status 0 error_code)
+                    if(NOT error_code EQUAL 0)
+                        list(GET download_status 1 error_message)
+                        message(FATAL_ERROR "Failed to download ONNX Runtime: ${error_message}")
+                    endif()
+
+                    # logic for extracting the tarball to our working directory
+                    message(STATUS "Extracting ONNX Runtime...")
+                    execute_process(
+                        COMMAND ${CMAKE_COMMAND} -E tar xzf "${DOWNLOAD_LOCATION}"
+                        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                    )
                 endif()
 
-                # logic for extracting the tarball to our working directory
-                message(STATUS "Extracting ONNX Runtime...")
-                execute_process(
-                    COMMAND ${CMAKE_COMMAND} -E tar xzf "${DOWNLOAD_LOCATION}"
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-                )
+                # Update the ONNX_ROOT_PATH to point to our downloaded version, force ensures we update it
+                set(ONNX_ROOT_PATH "${EXTRACTED_ONNX_PATH}" CACHE PATH "Path to the downloaded ONNX Runtime" FORCE)
+                message(STATUS "Using downloaded ONNX Runtime at: ${ONNX_ROOT_PATH}")
+            else()
+                message(STATUS "Using user-provided ONNX Runtime at: ${ONNX_ROOT_PATH}")
             endif()
 
-            # Update the ONNX_ROOT_PATH to point to our downloaded version, force ensures we update it
-            set(ONNX_ROOT_PATH "${EXTRACTED_ONNX_PATH}" CACHE PATH "Path to the downloaded ONNX Runtime" FORCE)
-            message(STATUS "Using downloaded ONNX Runtime at: ${ONNX_ROOT_PATH}")
-        else()
-            message(STATUS "Using user-provided ONNX Runtime at: ${ONNX_ROOT_PATH}")
-        endif()
+            # configure and find headers from the onnxruntime
+            find_path(ONNX_INCLUDE_DIRS
+                NAMES onnxruntime_cxx_api.h
+                HINTS "${ONNX_ROOT_PATH}/include"
+                REQUIRED
+            )
 
-        # configure and find headers from the onnxruntime
-        find_path(ONNX_INCLUDE_DIRS
-            NAMES onnxruntime_cxx_api.h
-            HINTS "${ONNX_ROOT_PATH}/include"
-            REQUIRED
-        )
+            find_library(ONNX_RUNTIME_LIB
+                NAMES onnxruntime
+                HINTS "${ONNX_ROOT_PATH}/lib"
+                REQUIRED
+            )
 
-        find_library(ONNX_RUNTIME_LIB
-            NAMES onnxruntime
-            HINTS "${ONNX_ROOT_PATH}/lib"
-            REQUIRED
-        )
-
-        if(ONNX_INCLUDE_DIRS AND ONNX_RUNTIME_LIB)
-            # only link if it was found, otherwise we error out
-            message(STATUS "Found ONNX Include Dirs: ${ONNX_INCLUDE_DIRS}")
-            message(STATUS "Found ONNX Library: ${ONNX_RUNTIME_LIB}")
-            target_include_directories(SerialProgramsLib PUBLIC "${ONNX_INCLUDE_DIRS}")
-            target_link_libraries(SerialProgramsLib PUBLIC "${ONNX_RUNTIME_LIB}")
-        else()
-            message(FATAL_ERROR "Could not find ONNX Runtime headers or library.")
-        endif()
+            if(ONNX_INCLUDE_DIRS AND ONNX_RUNTIME_LIB)
+                # only link if it was found, otherwise we error out
+                message(STATUS "Found ONNX Include Dirs: ${ONNX_INCLUDE_DIRS}")
+                message(STATUS "Found ONNX Library: ${ONNX_RUNTIME_LIB}")
+                target_include_directories(SerialProgramsLib PUBLIC "${ONNX_INCLUDE_DIRS}")
+                target_link_libraries(SerialProgramsLib PUBLIC "${ONNX_RUNTIME_LIB}")
+            else()
+                message(FATAL_ERROR "Could not find ONNX Runtime headers or library.")
+            endif()
+        endif ()
     endif() # end Linux
 
     # Find OpenCV
