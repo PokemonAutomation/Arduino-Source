@@ -344,7 +344,7 @@ void RNGManipulator::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
     double FRAMERATE = 60.0;        // FPS. tested on Switch 1
 
-    int64_t SEED_OFFSET = -2015;    // milliseconds. tested on Switch 1 against ten-lines seeds
+    int64_t SEED_OFFSET = -2020;    // milliseconds. tested on Switch 1 against ten-lines seeds
     int64_t ADVANCES_OFFSET = 162;  // frames. test on Switch 1
 
     uint64_t LOAD_DELAY;
