@@ -726,3 +726,4 @@ endif()
 
 # Add command-line executable (GUI-free) from subdirectory
 include(Source/CommandLine/CommandLineExecutable.cmake)
+include(cmake/CPack.cmake)
