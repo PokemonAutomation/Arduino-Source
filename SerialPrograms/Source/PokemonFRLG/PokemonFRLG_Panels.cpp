@@ -17,6 +17,7 @@
 #include "Programs/ShinyHunting/PokemonFRLG_PrizeCornerReset.h"
 #include "Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Overworld.h"
 #include "Programs/TestPrograms/PokemonFRLG_SoundListener.h"
+#include "Programs/TestPrograms/PokemonFRLG_ReadStats.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -54,6 +55,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
+        ret.emplace_back(make_single_switch_program<ReadStats_Descriptor, ReadStats>());
     }
 
     return ret;
