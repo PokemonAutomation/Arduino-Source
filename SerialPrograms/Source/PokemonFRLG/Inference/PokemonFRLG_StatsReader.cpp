@@ -31,7 +31,7 @@ static int debug_counter = 0;
 // Full OCR preprocessing pipeline for GBA pixel fonts.
 //
 // GBA fonts are seven-segment-like with 1-pixel gaps between segments.
-// Pipeline: blur at native → smooth upscale → BW → smooth BW → re-BW → pad
+// Pipeline: blur at native -> smooth upscale -> BW -> smooth BW -> re-BW -> pad
 //
 // The native blur connects gaps. Post-BW padding provides margins.
 static ImageRGB32 preprocess_for_ocr(
@@ -52,8 +52,8 @@ static ImageRGB32 preprocess_for_ocr(
 
     cv::Mat src = image.to_opencv_Mat();
 
-    // Step 1: Gaussian blur at NATIVE resolution with 5×5 kernel.
-    // The 5×5 kernel reaches 2 pixels away (vs 1px for 3×3), bridging
+    // Step 1: Gaussian blur at NATIVE resolution with 5x5 kernel.
+    // The 5x5 kernel reaches 2 pixels away (vs 1px for 3x3), bridging
     // wider gaps in the seven-segment font. Two passes for heavy smoothing.
     cv::Mat blurred_native;
     src.copyTo(blurred_native);
@@ -73,7 +73,7 @@ static ImageRGB32 preprocess_for_ocr(
         blurred_native_img.save(prefix + "_1_blurred_native.png");
     }
 
-    // Step 2: Smooth upscale 4× with bilinear interpolation.
+    // Step 2: Smooth upscale 4x with bilinear interpolation.
     int scale_factor = 4;
     int new_w = static_cast<int>(image.width()) * scale_factor;
     int new_h = static_cast<int>(image.height()) * scale_factor;
@@ -97,7 +97,7 @@ static ImageRGB32 preprocess_for_ocr(
         bw.save(prefix + "_3_bw.png");
     }
 
-    // Step 4: Post-BW smoothing → re-threshold.
+    // Step 4: Post-BW smoothing -> re-threshold.
     // The BW image has angular seven-segment shapes. GaussianBlur on the
     // binary image creates gray anti-aliased edges. Re-thresholding at 128
     // rounds the corners into natural smooth digit shapes that Tesseract
@@ -109,7 +109,7 @@ static ImageRGB32 preprocess_for_ocr(
     // Re-threshold: convert smoothed back to ImageRGB32 and BW threshold.
     // After blur on BW: text areas are dark gray (~0-64), bg areas are
     // light gray (~192-255), edge zones are mid-gray (~64-192).
-    // Threshold at [0..128] captures text + expanded edges → BLACK.
+    // Threshold at [0..128] captures text + expanded edges -> BLACK.
     ImageRGB32 smoothed_img(smoothed.cols, smoothed.rows);
     smoothed.copyTo(smoothed_img.to_opencv_Mat());
     ImageRGB32 smooth_bw = to_blackwhite_rgb32_range(
@@ -211,8 +211,8 @@ void StatsReader::read_page1(
 
     if (!GlobalSettings::instance().USE_PADDLE_OCR) {
         // The level uses white text with dark shadow on a lilac background.
-        // The digit reader's binarizer captures dark pixels (≤190 on all channels)
-        // but NOT the white text (all channels 255 → excluded). This leaves the
+        // The digit reader's binarizer captures dark pixels (<=190 on all channels)
+        // but NOT the white text (all channels 255 -> excluded). This leaves the
         // shadow outline fragmented into many small disconnected blobs.
         // Preprocess: convert bright-white text pixels to black so the binarizer
         // merges text + shadow into one solid connected blob per digit.
@@ -222,7 +222,7 @@ void StatsReader::read_page1(
         if (save_debug_images) {
             preprocessed.save("DebugDumps/ocr_level_preprocessed.png");
         }
-        // Trim left 7% to exclude the "L" glyph blob (always at x≈0).
+        // Trim left 7% to exclude the "L" glyph blob (always at x~0).
         // The actual level digits start at ~13%+ of the box width.
         size_t lv_skip = preprocessed.width() * 7 / 100;
         ImagePixelBox digits_bbox(
@@ -245,16 +245,16 @@ void StatsReader::read_page1(
     }
 
     // Read Nature (black text on white/beige).
-    // Pipeline: BW → invert → morph close → invert → upscale → smooth → pad.
+    // Pipeline: BW -> invert -> morph close -> invert -> upscale -> smooth -> pad.
     // Morph close on the inverted image (text=white) bridges gaps in text
-    // regions by growing white→eroding back. Works per-channel on CV_8UC4.
+    // regions by growing white->eroding back. Works per-channel on CV_8UC4.
     const static Pokemon::NatureReader reader("Pokemon/NatureCheckerOCR.json");
     ImageViewRGB32 nature_raw = extract_box_reference(game_screen, m_box_nature);
     if (save_debug_images) {
         nature_raw.save("DebugDumps/ocr_nature_0_raw.png");
     }
 
-    // Step 1: BW at native resolution. Dark text [0..150] → black.
+    // Step 1: BW at native resolution. Dark text [0..150] -> black.
     ImageRGB32 nature_bw = to_blackwhite_rgb32_range(
             nature_raw, true,
             combine_rgb(0, 0, 0), combine_rgb(150, 150, 150));
@@ -262,10 +262,10 @@ void StatsReader::read_page1(
         nature_bw.save("DebugDumps/ocr_nature_1_bw.png");
     }
 
-    // Step 2: Invert → MORPH_CLOSE → Invert to bridge gaps.
+    // Step 2: Invert -> MORPH_CLOSE -> Invert to bridge gaps.
     // On the inverted image, text is bright (255) and bg is dark (0).
     // MORPH_CLOSE (dilate then erode) fills small dark holes within
-    // the bright text regions — exactly the 1px gaps we need to bridge.
+    // the bright text regions - exactly the 1px gaps we need to bridge.
     // A 3x3 kernel bridges 1px gaps. Two iterations bridges 2px gaps.
     {
         cv::Mat bw_mat = nature_bw.to_opencv_Mat();
@@ -396,7 +396,7 @@ void StatsReader::read_page2(
         }
 
         // PaddleOCR path (original): preprocess then per-digit waterfill OCR.
-        // Dark text [0..190] → black. Threshold at 190 captures the
+        // Dark text [0..190] -> black. Threshold at 190 captures the
         // blurred gap pixels between segments, making bridges thicker.
         // Not higher than 190 to avoid capturing yellow bg edge noise.
         ImageRGB32 ocr_ready = preprocess_for_ocr(
@@ -404,7 +404,7 @@ void StatsReader::read_page2(
             combine_rgb(0, 0, 0), combine_rgb(190, 190, 190)
         );
 
-        // Waterfill isolates each digit → per-char SINGLE_CHAR OCR.
+        // Waterfill isolates each digit -> per-char SINGLE_CHAR OCR.
         return OCR::read_number_waterfill(
             logger, ocr_ready, 0xff000000,
             0xff808080

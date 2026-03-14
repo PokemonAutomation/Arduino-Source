@@ -90,12 +90,14 @@ struct DigitTemplates {
 // ---------------------------------------------------------------------------
 // Main function
 // ---------------------------------------------------------------------------
-int read_digits_waterfill_template(Logger& logger,
-                                   const ImageViewRGB32& stat_region,
-                                   double rmsd_threshold,
-                                   DigitTemplateType template_type,
-                                   const std::string& dump_prefix,
-                                   uint8_t binarize_high) {
+int read_digits_waterfill_template(
+    Logger& logger,
+    const ImageViewRGB32& stat_region,
+    double rmsd_threshold,
+    DigitTemplateType template_type,
+    const std::string& dump_prefix,
+    uint8_t binarize_high
+) {
     using namespace Kernels::Waterfill;
 
     if (!stat_region) {
@@ -123,7 +125,7 @@ int read_digits_waterfill_template(Logger& logger,
     //   Pixels where ALL channels <= binarize_high become 1 (foreground).
     //   Default 0xBE (190) works for yellow stat boxes.
     //   Use 0x7F (127) for the lilac level box to prevent the blurred
-    //   lilac background (B≈208, drops to ~156 near shadows) from being
+    //   lilac background (B~208, drops to ~156 near shadows) from being
     //   captured and merging digit blobs.
     // ------------------------------------------------------------------
     uint32_t bh = binarize_high;
@@ -195,7 +197,7 @@ int read_digits_waterfill_template(Logger& logger,
             ImageViewRGB32 crop = extract_box_reference(stat_region, bbox);
 
             if (dump_prefix == "levelDigit") {
-                    crop.save("DebugDumps/" + dump_prefix + "_x" + std::to_string(min_x) + "_split_raw.png");
+                crop.save("DebugDumps/" + dump_prefix + "_x" + std::to_string(min_x) + "_split_raw.png");
             }
 
             // Compute RMSD against each digit template; pick the minimum.
@@ -218,16 +220,20 @@ int read_digits_waterfill_template(Logger& logger,
                 // Always save the raw crop for user inspection / template extraction.
                 crop.save("DebugDumps/" + dump_prefix + "_x" + std::to_string(min_x) +
                                     "_raw.png");
-                logger.log("DigitReader: blob at x=" + std::to_string(min_x) +
-                       " skipped (best RMSD=" + std::to_string(best_rmsd) +
-                       ", threshold=" + std::to_string(rmsd_threshold) + ").",
-                   COLOR_ORANGE);
+                logger.log(
+                    "DigitReader: blob at x=" + std::to_string(min_x) +
+                    " skipped (best RMSD=" + std::to_string(best_rmsd) +
+                    ", threshold=" + std::to_string(rmsd_threshold) + ").",
+                    COLOR_ORANGE
+                );
                 continue;
             }
 
-            logger.log("DigitReader: blob at x=" + std::to_string(min_x) +
-                 " -> digit " + std::to_string(best_digit) +
-                 " (RMSD=" + std::to_string(best_rmsd) + ")");
+            logger.log(
+                "DigitReader: blob at x=" + std::to_string(min_x) +
+                " -> digit " + std::to_string(best_digit) +
+                " (RMSD=" + std::to_string(best_rmsd) + ")"
+            );
             // Save crop with prefix so level and stat crops are distinguishable.
             crop.save("DebugDumps/" + dump_prefix + "_x" + std::to_string(min_x) +
                                 "_match" + std::to_string(best_digit) + ".png");
@@ -240,8 +246,10 @@ int read_digits_waterfill_template(Logger& logger,
     }
 
     int number = std::atoi(result_str.c_str());
-    logger.log("DigitReader: \"" + result_str + "\" -> " +
-             std::to_string(number));
+    logger.log(
+        "DigitReader: \"" + result_str + "\" -> " +
+        std::to_string(number)
+    );
     return number;
 }
 
