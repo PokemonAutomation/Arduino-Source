@@ -15,6 +15,9 @@
 #include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
 #include "PokemonBDSP/Options/PokemonBDSP_LearnMove.h"
 
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include <vector>
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
@@ -44,6 +47,11 @@ private:
                        );
     // From the bottom row of the Ace Trainer pair, heal Pokemon and return.
     // Return true if VS Seeker needs charging.
+    void move_to_trainer(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context,
+        const std::vector<ImagePixelBox>& bubbles
+    );
     bool heal_after_battle_and_return(
         SingleSwitchProgramEnvironment& env,
         VideoStream& stream, ProControllerContext& context,
