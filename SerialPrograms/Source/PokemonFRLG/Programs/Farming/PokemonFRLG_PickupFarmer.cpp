@@ -14,11 +14,8 @@
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
-#include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
-#include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
-#include "PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
 #include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_PickupFarmer.h"
@@ -129,240 +126,6 @@ PickupFarmer::PickupFarmer()
 
 namespace{
 
-void open_start_menu(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    uint16_t errors = 0;
-
-    while(true){
-        if (errors > 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Failed to open Start menu 5 times in a row.",
-                env.console
-            );
-        }
-
-        StartMenuWatcher start_menu(COLOR_RED);
-
-        context.wait_for_all_requests();
-        int ret = run_until<ProControllerContext>(
-            env.console, context,
-            [](ProControllerContext& context) {
-                pbf_press_button(context, BUTTON_PLUS, 200ms, 1800ms);
-            },
-            { start_menu }
-        );
-
-        if (ret < 0){
-            env.log("Failed to open Start menu.");
-            errors++;
-            context.wait_for_all_requests();
-            pbf_mash_button(context, BUTTON_B, 1000ms);
-            continue;
-        }
-        
-        env.log("Start menu opened.");
-        return;
-    }
-}
-
-void close_start_menu(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    pbf_mash_button(context, BUTTON_B, 1000ms);
-    // TODO: add overworld detection
-    env.log("Start menu closed.");
-}
-
-void open_party_menu_from_overworld(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    uint16_t errors = 0;
-    bool start_menu_is_open = false;
-    while (true){
-        if (errors > 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Failed to open party menu 5 times in a row.",
-                env.console
-            );
-        }
-
-        context.wait_for_all_requests();
-        if (!start_menu_is_open){
-            open_start_menu(env, context); // This is unavoidable since we cannot detect the overworld.
-            start_menu_is_open = true;
-        }
-
-        StartMenuWatcher start_menu(COLOR_RED);
-        PartyMenuWatcher party_menu(COLOR_RED);
-
-        int ret = wait_until(
-            env.console, context, 10000ms,
-            { start_menu, party_menu }
-        );
-
-        switch (ret){
-        case 0:
-            ret = move_cursor_to_position(env.console, context, SelectionArrowPositionStartMenu::POKEMON);
-            if (ret < 0){
-                env.log("Failed to navigate to POKEMON on the start menu.");
-                errors++;
-                context.wait_for_all_requests();
-                pbf_mash_button(context, BUTTON_B, 2000ms);
-                start_menu_is_open = false;
-            } else {
-                env.log("Navigated to POKEMON on the start menu");
-                context.wait_for_all_requests();
-                pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-            }
-            continue;
-        case 1:
-            env.log("Party menu opened.");
-            return;
-        default:
-            env.log("Failed to open party menu.");
-            errors++;
-            pbf_mash_button(context, BUTTON_B, 2000ms);
-            start_menu_is_open = false;
-            continue;
-        }
-    }
-}
-
-void use_teleport(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    uint16_t errors = 0;
-    
-    while (true){
-        if (errors > 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Failed to use Teleport 5 times in a row.",
-                env.console
-            );
-        }
-
-        open_party_menu_from_overworld(env, context);
-        // navigate to last party slot
-        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
-        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
-
-        PartySelectionWatcher teleporter_selected(COLOR_RED);
-
-        context.wait_for_all_requests();
-        int ret = run_until<ProControllerContext>(
-            env.console, context,
-            [](ProControllerContext& context) {
-                pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
-            },
-            { teleporter_selected }
-        );
-
-        if (ret < 0){
-            env.log("Failed to select Teleport user.");
-            errors++;
-            pbf_mash_button(context, BUTTON_B, 3000ms);
-            continue;
-        }
-        
-        // select Teleport (2nd option, but maybe HMs could change this)
-        pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
-        pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
-        pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
-
-        BlackScreenWatcher teleport_transition(COLOR_RED);
-
-        context.wait_for_all_requests();
-        ret = wait_until(
-            env.console, context, 20000ms,
-            {teleport_transition}
-        );
-
-        if (ret < 0){
-            env.log("Failed to use Teleport");
-            errors++;
-            pbf_mash_button(context, BUTTON_B, 4000ms);
-            continue;
-        }
-
-        pbf_wait(context, 3000ms);
-        context.wait_for_all_requests();
-        env.log("Used Teleport.");
-        return;
-    }
-}
-
-void enter_leave_pokecenter(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool leave){
-    uint16_t errors = 0;
-
-    while (true){
-        if (errors > 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                leave ? "Failed to exit PokeCenter." : "Failed to enter PokeCenter.",
-                env.console
-            );
-        }
-
-        BlackScreenWatcher pokecenter_transition(COLOR_RED);
-
-        int ret = run_until<ProControllerContext>(
-            env.console, context,
-            [leave](ProControllerContext& context) {
-                pbf_move_left_joystick(context, {0, (leave ? -1.0 : +1.0)}, 10000ms, 0ms);
-            },
-            { pokecenter_transition }
-        );
-
-        if (ret < 0){
-            env.log(leave ? "Failed to exit PokeCenter." : "Failed to enter PokeCenter.");
-            errors++;
-            pbf_mash_button(context, BUTTON_B, 1000ms);
-            continue;
-        }
-
-        pbf_wait(context, 2500ms);
-        context.wait_for_all_requests();
-        env.log(leave ? "Exited PokeCenter." : "Entered PokeCenter");
-        return;
-    }
-}
-
-void heal_at_pokecenter(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    uint16_t errors = 0;
-
-    while (true){
-        if (errors > 5) {
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Failed to initiate PokeCenter dialog.",
-                env.console
-            );
-        }
-
-        AdvanceWhiteDialogWatcher dialog(COLOR_RED);
-
-        context.wait_for_all_requests();
-        int ret = run_until<ProControllerContext>(
-            env.console, context,
-            [](ProControllerContext& context) {
-                // walk up to counter and initiate dialog
-                ssf_press_left_joystick(context, {0, +1}, 0ms, 10000ms);
-                ssf_mash1_button(context, BUTTON_A, 10000ms);
-            },
-            { dialog }
-        );
-
-        if (ret < 0){
-            env.log("Failed to detect PokeCenter dialog within 10 seconds");
-            errors++;
-            pbf_mash_button(context, BUTTON_B, 2000ms);
-            continue;
-        }
-
-        env.log("Detected PokeCenter dialog.");
-        pbf_mash_button(context, BUTTON_A, 8000ms);
-        pbf_mash_button(context, BUTTON_B, 5000ms);
-        context.wait_for_all_requests();
-        return;
-    }
-}
-
 void walk_to_route1(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     env.log("Walking to Route 1.");
     // left a couple of steps
@@ -461,99 +224,9 @@ void use_first_battle_move(SingleSwitchProgramEnvironment& env, ProControllerCon
     }
 }
 
-bool exit_wild_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, BooleanCheckBoxOption& STOP_ON_MOVE_LEARN){
-    
-    BlackScreenWatcher battle_exited(COLOR_RED);    
-    
-    context.wait_for_all_requests();
-    int ret = run_until<ProControllerContext>(
-        env.console, context,
-        [](ProControllerContext& context) {
-           pbf_mash_button(context, BUTTON_B, 20000ms);
-        },
-        { battle_exited }
-    );
-
-    if (ret == 0) {
-        pbf_wait(context, 500ms);
-        context.wait_for_all_requests();
-        env.log("Battle exited.");
-        return false;
-    }
-
-    env.log("Loop detected.");
-
-    // there are two dialog selection boxes in a row
-    // we need to decline the first one and accept the second one
-    // the first one will occur after an Advance Battle Dialog
-    uint16_t errors = 0;
-    uint16_t loops = 0;
-    bool rejected_first_box = false;
-    while (true){
-        if (errors > 5 || loops > 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Failed to exit battle.",
-                env.console
-            );
-        }
-
-        AdvanceBattleDialogWatcher advance_dialog(COLOR_RED);
-        BattleLearnDialogWatcher move_learn_select(COLOR_RED);
-
-        context.wait_for_all_requests();
-        WallClock deadline = current_time() + 30s;
-        ret = run_until<ProControllerContext>(
-            env.console, context,
-            [deadline, rejected_first_box](ProControllerContext& context) {
-                pbf_wait(context, 1000ms); // give the watchers a chance to detect something
-                while (current_time() < deadline){
-                    pbf_press_button(context, rejected_first_box ? BUTTON_A : BUTTON_B, 200ms, 1800ms);
-                }
-            },
-            { battle_exited, advance_dialog, move_learn_select }
-        );
-
-        switch (ret){
-        case 0:
-            pbf_wait(context, 500ms);
-            context.wait_for_all_requests();
-            env.log("Battle exited.");
-            return rejected_first_box;
-        case 1:
-            env.log("Battle Advance arrow detected.");
-            pbf_press_button(context, BUTTON_B, 200ms, 800ms);
-            rejected_first_box = false;
-            continue;
-        case 2:
-            if (STOP_ON_MOVE_LEARN) {
-                env.log("Move learn detected.");
-                return true;
-            }else if (rejected_first_box) {
-                loops++;
-                env.log("Declined to learn new move.");
-                pbf_press_button(context, BUTTON_A, 200ms, 200ms);
-                pbf_mash_button(context, BUTTON_B, 2000ms);
-            }else{
-                pbf_press_button(context, BUTTON_B, 200ms, 0ms);
-                rejected_first_box = true;
-            }
-            continue;
-        default:
-            env.log("Failed to detect expected battle dialogs.");
-            errors++;
-            // attempt to exit any screen that might be open (party, bag, etc)
-            pbf_mash_button(context, BUTTON_B, 500ms);
-            context.wait_for_all_requests();
-            rejected_first_box = false;
-            continue;
-        }
-    }
-}
-
 void take_pickup_items(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     env.log("Collecting items from party.");
-    open_party_menu_from_overworld(env, context);
+    open_party_menu_from_overworld(env.console, context);
     pbf_move_left_joystick(context, {+1, 0}, 200ms, 300ms); // move to slot 2
 
     PartySelectionWatcher selection_open(COLOR_RED);
@@ -586,7 +259,7 @@ void take_pickup_items(SingleSwitchProgramEnvironment& env, ProControllerContext
     // close the start menu
     pbf_press_button(context, BUTTON_B, 200ms, 300ms);
     pbf_press_button(context, BUTTON_B, 200ms, 800ms);
-    close_start_menu(env, context);
+    close_start_menu(env.console, context);
 }
 
 } // namespace
@@ -609,10 +282,10 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     while (!shiny_found){
         try{
             if (stats.encounters == 0 || failed_encounter || moves_used >= MOVE_PP){
-                use_teleport(env, context);
-                enter_leave_pokecenter(env, context, false);
-                heal_at_pokecenter(env, context);
-                enter_leave_pokecenter(env, context, true);
+                use_teleport(env.console, context);
+                enter_pokecenter(env.console, context);
+                heal_at_pokecenter(env.console, context);
+                leave_pokecenter(env.console, context);
                 stats.healing_trips++;
                 if (GAME_LOCATION == GameLocation::route1){
                     walk_to_route1(env, context);
@@ -674,7 +347,7 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
 
             use_first_battle_move(env, context);
             moves_used++;
-            bool move_learned = exit_wild_battle(env, context, STOP_ON_MOVE_LEARN);
+            bool move_learned = exit_wild_battle(env.console, context, !!STOP_ON_MOVE_LEARN);
 
             if (move_learned && STOP_ON_MOVE_LEARN){
                 send_program_status_notification(
