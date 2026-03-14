@@ -37,7 +37,7 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context);
 
 // Exit a wild battle after winning. Checks if a Pokemon is learning a new move.
 // Set stop_on_move_learn to true to cause this to exit early when a move is being learned without declining it
-// Cancels evolutions
+// Assumes that the Pokemon will not evolve
 bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, bool stop_on_move_learn);
 
 // Uses Teleport to return to a PokeCenter. 
