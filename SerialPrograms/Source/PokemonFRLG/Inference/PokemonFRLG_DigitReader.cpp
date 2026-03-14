@@ -4,32 +4,30 @@
  *
  */
 
-#include "PokemonFRLG_DigitReader.h"
+#include <array>
+#include <map>
+#include <memory>
+#include <string>
+#include <opencv2/imgproc.hpp>
 #include "Common/Cpp/Color.h" // needed for COLOR_RED, COLOR_ORANGE
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include <array>
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
+#include "PokemonFRLG_DigitReader.h"
 
-#include <opencv2/imgproc.hpp>
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonFRLG {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonFRLG{
 
 // ---------------------------------------------------------------------------
 // Template store: loads 10 digit matchers from a resource sub-directory.
@@ -39,48 +37,50 @@ namespace PokemonFRLG {
 // - LevelBox (lilac level box): PokemonFRLG/LevelDigits/
 // ---------------------------------------------------------------------------
 
-static std::string get_template_path(DigitTemplateType type) {
-    switch (type) {
-        case DigitTemplateType::StatBox:
-            return "PokemonFRLG/Digits/";
-        case DigitTemplateType::LevelBox:
-            return "PokemonFRLG/LevelDigits/";
-        default:
-            return "PokemonFRLG/Digits/";
+static std::string get_template_path(DigitTemplateType type){
+    switch (type){
+    case DigitTemplateType::StatBox:
+        return "PokemonFRLG/Digits/";
+    case DigitTemplateType::LevelBox:
+        return "PokemonFRLG/LevelDigits/";
+    default:
+        return "PokemonFRLG/Digits/";
     }
 }
 
-struct DigitTemplates {
+struct DigitTemplates{
     // matchers[d] is the matcher for digit d (0-9), or nullptr if missing.
     std::array<std::unique_ptr<ImageMatch::ExactImageMatcher>, 10> matchers;
     bool any_loaded = false;
 
-    explicit DigitTemplates(DigitTemplateType template_type) {
+    explicit DigitTemplates(DigitTemplateType template_type){
         std::string resource_subdir = get_template_path(template_type);
-        for (int d = 0; d < 10; ++d) {
+        for (int d = 0; d < 10; ++d){
             std::string path =
-                    RESOURCE_PATH() + resource_subdir + std::to_string(d) + ".png";
-            try {
+                RESOURCE_PATH() + resource_subdir + std::to_string(d) + ".png";
+            try{
                 ImageRGB32 img(path);
-                if (img.width() > 0) {
+                if (img.width() > 0){
                     matchers[d] =
                             std::make_unique<ImageMatch::ExactImageMatcher>(std::move(img));
                     any_loaded = true;
                 }
-            } catch (...) {
+            }catch (...){
                 // Template image missing - slot stays nullptr.
             }
         }
-        if (!any_loaded) {
-            throw FileException(nullptr, PA_CURRENT_FUNCTION, 
-                "Failed to load any digit templates", resource_subdir);
+        if (!any_loaded){
+            throw FileException(
+                nullptr, PA_CURRENT_FUNCTION,
+                "Failed to load any digit templates", resource_subdir
+            );
         }
     }
 
-    static const DigitTemplates& get(DigitTemplateType template_type) {
+    static const DigitTemplates& get(DigitTemplateType template_type){
         static std::map<DigitTemplateType, DigitTemplates> cache;
         auto it = cache.find(template_type);
-        if (it == cache.end()) {
+        if (it == cache.end()){
             it = cache.emplace(template_type, DigitTemplates(template_type)).first;
         }
         return it->second;
@@ -97,10 +97,10 @@ int read_digits_waterfill_template(
     DigitTemplateType template_type,
     const std::string& dump_prefix,
     uint8_t binarize_high
-) {
+){
     using namespace Kernels::Waterfill;
 
-    if (!stat_region) {
+    if (!stat_region){
         logger.log("DigitReader: empty stat region.", COLOR_RED);
         return -1;
     }
@@ -131,7 +131,7 @@ int read_digits_waterfill_template(
     uint32_t bh = binarize_high;
     uint32_t binarize_color = 0xff000000u | (bh << 16) | (bh << 8) | bh;
     PackedBinaryMatrix matrix =
-            compress_rgb32_to_binary_range(blurred_img, 0xff000000u, binarize_color);
+        compress_rgb32_to_binary_range(blurred_img, 0xff000000u, binarize_color);
 
     // ------------------------------------------------------------------
     // Step 3: Waterfill - find connected dark blobs (individual digits).
@@ -144,20 +144,22 @@ int read_digits_waterfill_template(
         std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
         auto iter = session->make_iterator(min_area);
         WaterfillObject obj;
-        while (blobs.size() < 8 && iter->find_next(obj, false)) {
+        while (blobs.size() < 8 && iter->find_next(obj, false)){
             // Require at least 3px wide AND 3px tall to discard noise fragments.
-            if (obj.max_x - obj.min_x < 3 || obj.max_y - obj.min_y < 3)
+            if (obj.max_x - obj.min_x < 3 || obj.max_y - obj.min_y < 3){
                 continue;
+            }
             // Use min_x as key so the map is automatically sorted left-to-right.
             // If two blobs share an identical min_x, bump the key slightly.
             size_t key = obj.min_x;
-            while (blobs.count(key))
+            while (blobs.count(key)){
                 ++key;
+            }
             blobs.emplace(key, std::move(obj));
         }
     }
 
-    if (blobs.empty()) {
+    if (blobs.empty()){
         logger.log("DigitReader: waterfill found no digit blobs.", COLOR_RED);
         return -1;
     }
@@ -170,7 +172,7 @@ int read_digits_waterfill_template(
     const DigitTemplates& templates = DigitTemplates::get(template_type);
     std::string result_str;
 
-    for (const auto &kv : blobs) {
+    for (const auto &kv : blobs){
         const WaterfillObject &obj = kv.second;
 
         size_t width = obj.max_x - obj.min_x;
@@ -180,15 +182,15 @@ int read_digits_waterfill_template(
         // GBA font digits are typically narrower than they are tall (aspect ~0.6).
         // If the blob's width is wider than expected for a single digit, it's a
         // merged blob.
-        if (width > height * 1.5) {
+        if (width > height * 1.5){
             expected_digits = 3; // e.g. "100"
-        } else if (width > height * 0.8) {
+        }else if (width > height * 0.8){
             expected_digits = 2; // e.g. "23"
         }
 
         size_t split_w = width / expected_digits;
 
-        for (int i = 0; i < expected_digits; ++i) {
+        for (int i = 0; i < expected_digits; ++i){
             size_t min_x = obj.min_x + i * split_w;
             size_t max_x = (i == expected_digits - 1) ? obj.max_x : obj.min_x + (i + 1) * split_w;
 
@@ -196,7 +198,7 @@ int read_digits_waterfill_template(
             ImagePixelBox bbox(min_x, obj.min_y, max_x, obj.max_y);
             ImageViewRGB32 crop = extract_box_reference(stat_region, bbox);
 
-            if (dump_prefix == "levelDigit") {
+            if (dump_prefix == "levelDigit"){
                 crop.save("DebugDumps/" + dump_prefix + "_x" + std::to_string(min_x) + "_split_raw.png");
             }
 
@@ -204,22 +206,23 @@ int read_digits_waterfill_template(
             // If no templates are loaded (extraction mode), skip matching entirely.
             double best_rmsd = 9999.0;
             int best_digit = -1;
-            if (templates.any_loaded) {
-                for (int d = 0; d < 10; ++d) {
+            if (templates.any_loaded){
+                for (int d = 0; d < 10; ++d){
                     if (!templates.matchers[d])
                         continue;
                     double r = templates.matchers[d]->rmsd(crop);
-                    if (r < best_rmsd) {
+                    if (r < best_rmsd){
                         best_rmsd = r;
                         best_digit = d;
                     }
                 }
             }
 
-            if (best_rmsd > rmsd_threshold) {
+            if (best_rmsd > rmsd_threshold){
                 // Always save the raw crop for user inspection / template extraction.
-                crop.save("DebugDumps/" + dump_prefix + "_x" + std::to_string(min_x) +
-                                    "_raw.png");
+                crop.save(
+                    "DebugDumps/" + dump_prefix + "_x" + std::to_string(min_x) + "_raw.png"
+                );
                 logger.log(
                     "DigitReader: blob at x=" + std::to_string(min_x) +
                     " skipped (best RMSD=" + std::to_string(best_rmsd) +
@@ -235,13 +238,15 @@ int read_digits_waterfill_template(
                 " (RMSD=" + std::to_string(best_rmsd) + ")"
             );
             // Save crop with prefix so level and stat crops are distinguishable.
-            crop.save("DebugDumps/" + dump_prefix + "_x" + std::to_string(min_x) +
-                                "_match" + std::to_string(best_digit) + ".png");
+            crop.save(
+                "DebugDumps/" + dump_prefix + "_x" + std::to_string(min_x) +
+                "_match" + std::to_string(best_digit) + ".png"
+            );
             result_str += static_cast<char>('0' + best_digit);
         }
     }
 
-    if (result_str.empty()) {
+    if (result_str.empty()){
         return -1;
     }
 

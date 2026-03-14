@@ -14,14 +14,15 @@
 #include <cstdint>
 #include <string>
 
-namespace PokemonAutomation {
+namespace PokemonAutomation{
+
 class Logger;
 class ImageViewRGB32;
 
-namespace NintendoSwitch {
-namespace PokemonFRLG {
+namespace NintendoSwitch{
+namespace PokemonFRLG{
 
-enum class DigitTemplateType {
+enum class DigitTemplateType{
     StatBox,      // Yellow stat boxes (default): PokemonFRLG/Digits/
     LevelBox,     // Lilac level box: PokemonFRLG/LevelDigits/
 };

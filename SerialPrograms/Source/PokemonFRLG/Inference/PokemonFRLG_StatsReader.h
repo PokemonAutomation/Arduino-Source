@@ -7,22 +7,23 @@
 #ifndef PokemonAutomation_PokemonFRLG_StatsReader_H
 #define PokemonAutomation_PokemonFRLG_StatsReader_H
 
+#include <optional>
+#include <string>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Language.h"
 
-#include <stdint.h>
-#include <string>
-#include <optional>
 
-namespace PokemonAutomation {
+namespace PokemonAutomation{
+
 class Logger;
 class ImageViewRGB32;
 class VideoOverlaySet;
-namespace NintendoSwitch {
-namespace PokemonFRLG {
 
-struct PokemonFRLG_Stats {
+namespace NintendoSwitch{
+namespace PokemonFRLG{
+
+struct PokemonFRLG_Stats{
     std::string nature;
     std::optional<unsigned> level;
     std::string name;

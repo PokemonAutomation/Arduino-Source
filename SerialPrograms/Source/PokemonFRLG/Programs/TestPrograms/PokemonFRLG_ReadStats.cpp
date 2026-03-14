@@ -4,43 +4,54 @@
  *
  */
 
-#include "PokemonFRLG_ReadStats.h"
+#include <chrono>
+#include <string>
+#include <optional>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_StatsReader.h"
-#include <chrono>
-#include <string>
-#include <optional>
+#include "PokemonFRLG_ReadStats.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonFRLG{
 
 using namespace std::chrono_literals;
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonFRLG {
+
 
 ReadStats_Descriptor::ReadStats_Descriptor()
-        : SingleSwitchProgramDescriptor(
-                    "PokemonFRLG:ReadStats", Pokemon::STRING_POKEMON + " FRLG",
-                    "Read Summary Stats", "",
-                    "Read stats, level, name, and nature from the summary screen. Start "
-                    "on page 1 of summary.",
-                    ProgramControllerClass::StandardController_NoRestrictions,
-                    FeedbackType::REQUIRED, AllowCommandsWhenRunning::DISABLE_COMMANDS) {}
+    : SingleSwitchProgramDescriptor(
+        "PokemonFRLG:ReadStats",
+        Pokemon::STRING_POKEMON + " FRLG",
+        "Read Summary Stats", "",
+        "Read stats, level, name, and nature from the summary screen. Start "
+        "on page 1 of summary.",
+        ProgramControllerClass::StandardController_NoRestrictions,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
+){}
 
 ReadStats::ReadStats()
-        : LANGUAGE("<b>Game Language:</b>",
-               Pokemon::PokemonNameReader::instance().languages(),
-               LockMode::LOCK_WHILE_RUNNING, true) {
+    : LANGUAGE(
+        "<b>Game Language:</b>",
+        Pokemon::PokemonNameReader::instance().languages(),
+        LockMode::LOCK_WHILE_RUNNING, true
+    )
+{
     PA_ADD_OPTION(LANGUAGE);
 }
 
-void ReadStats::program(SingleSwitchProgramEnvironment &env,
-                                                ProControllerContext &context) {
-    env.log("Starting Read Stats program... Please ensure you are on Page 1 "
-                    "(POKEMON INFO).");
+void ReadStats::program(
+    SingleSwitchProgramEnvironment &env,
+    ProControllerContext &context
+){
+    env.log(
+        "Starting Read Stats program... Please ensure you are on Page 1 (POKEMON INFO)."
+    );
 
     StatsReader reader;
     VideoOverlaySet overlays(env.console.overlay());
