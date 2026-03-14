@@ -10,13 +10,14 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/StartupChecks/StartProgramChecks.h"
-#include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
+#include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 #include "PokemonFRLG_GiftReset.h"
 
 namespace PokemonAutomation{
@@ -117,6 +118,7 @@ void GiftReset::obtain_pokemon(SingleSwitchProgramEnvironment& env, ProControlle
             );
         context.wait_for_all_requests();
         if (rets < 0){
+            stats.errors++;
             env.update_stats();
             env.log("obtain_pokemon(): Unable to start starter dialog after 10 attempts.", COLOR_RED);
             OperationFailedException::fire(
@@ -262,14 +264,33 @@ bool GiftReset::try_open_summary(SingleSwitchProgramEnvironment& env, ProControl
         return false;
     }
 
-    if (TARGET != Target::starters){
+    if (TARGET == Target::starters){
+        //  We navigate to pokedex since we don't have it yet so it becomes Pokemon.
+        if (!move_cursor_to_position(env.console, context, SelectionArrowPositionStartMenu::POKEDEX)){
+            std::string str = "open_summary(): Unable to move menu cursor to: " + Pokemon::STRING_POKEMON;
+            env.log(str, COLOR_RED);
+            send_program_recoverable_error_notification(
+                env, NOTIFICATION_ERROR_RECOVERABLE,
+                str
+            );
+            return false;
+        }
+    }else{
         //Pokedex, Pokemon, Bag, Trainer, Save, Option, Exit
         env.log("Navigating to party menu.");
         pbf_wait(context, 200ms);
         context.wait_for_all_requests();
-        pbf_press_dpad(context, DPAD_DOWN, 320ms, 320ms);
-        context.wait_for_all_requests();
-    } //For starters, no Pokedex yet, do Pokemon is on top and we skip this
+
+        if (!move_cursor_to_position(env.console, context, SelectionArrowPositionStartMenu::POKEMON)){
+            std::string str = "open_summary(): Unable to move menu cursor to: " + Pokemon::STRING_POKEMON;
+            env.log(str, COLOR_RED);
+            send_program_recoverable_error_notification(
+                env, NOTIFICATION_ERROR_RECOVERABLE,
+                str
+            );
+            return false;
+        }
+    }
 
     //Open party menu
     BlackScreenOverWatcher blk1(COLOR_RED);
@@ -323,6 +344,25 @@ bool GiftReset::try_open_summary(SingleSwitchProgramEnvironment& env, ProControl
         );
         return false;
     }
+
+    //Double check that we are on summary
+    SummaryWatcher sum1(COLOR_RED);
+    int sm1 = wait_until(
+        env.console, context,
+        std::chrono::seconds(5),
+        {{ sum1 }}
+    );
+    if (sm1 == 0){
+        env.log("Summary page dots detected.");
+    }else{
+        env.log("open_summary(): Unable to detect summary screen.", COLOR_RED);
+        send_program_recoverable_error_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            "open_summary(): Unable to detect summary screen."
+        );
+        return false;
+    }
+
     pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
     return true;
@@ -360,6 +400,33 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     * For magikarp: you need money to buy it
     * fossils: need to corner the scientist
     */
+
+    switch (TARGET){
+    case Target::starters:
+        env.log("Targeting starters.");
+        break;
+    case Target::hitmon:
+        env.log("Targeting Magikarp, Hitmonlee, and Hitmonchan.");
+        break;
+    case Target::eevee:
+        env.log("Targeting Eevee.");
+        break;
+    case Target::lapras:
+        env.log("Targeting Lapras.");
+        break;
+    case Target::fossils:
+        env.log("Targeting fossils.");
+        break;
+    default:
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "GiftReset: Invalid target selection.",
+            env.console
+        );
+        break;
+    }
 
     bool shiny_starter = false;
 
