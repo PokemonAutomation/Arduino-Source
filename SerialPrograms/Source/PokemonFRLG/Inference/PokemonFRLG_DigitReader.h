@@ -1,4 +1,4 @@
-﻿/*  FRLG Digit Reader
+/*  FRLG Digit Reader
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -33,18 +33,18 @@ enum class DigitTemplateType {
 //
 // Returns the parsed integer, or -1 on failure.
 int read_digits_waterfill_template(
-        Logger& logger,
-        const ImageViewRGB32& stat_region,
-        double rmsd_threshold = 175.0,
-        DigitTemplateType template_type = DigitTemplateType::StatBox,
-        const std::string& dump_prefix = "digit",
-        uint8_t binarize_high = 0xBE   // 0xBE=190 for yellow stat boxes;
-                                   // use 0x7F=127 for lilac level box
+    Logger& logger,
+    const ImageViewRGB32& stat_region,
+    double rmsd_threshold = 175.0,
+    DigitTemplateType template_type = DigitTemplateType::StatBox,
+    const std::string& dump_prefix = "digit",
+    uint8_t binarize_high = 0xBE   // 0xBE=190 for yellow stat boxes;
+    // use 0x7F=127 for lilac level box
 );
 
 // Read a string of decimal digits from `stat_region` by splitting the region into
 // a fixed number of equal-width segments, instead of using waterfill.
-// Useful when digits are tightly packed or overlapping and waterfill merges them.
+// Useful when digits are tightly packed.
 //
 // num_splits       The number of equal-width segments to split the region into.
 // template_type    Which template set to use (StatBox or LevelBox).
@@ -52,12 +52,12 @@ int read_digits_waterfill_template(
 //
 // Returns the parsed integer, or -1 on failure.
 int read_digits_fixed_width_template(
-        Logger& logger,
-        const ImageViewRGB32& stat_region,
-        int num_splits = 2,
-        double rmsd_threshold = 175.0,
-        DigitTemplateType template_type = DigitTemplateType::LevelBox,
-        const std::string& dump_prefix = "digit_split"
+    Logger& logger,
+    const ImageViewRGB32& stat_region,
+    int num_splits = 2,
+    double rmsd_threshold = 175.0,
+    DigitTemplateType template_type = DigitTemplateType::LevelBox,
+    const std::string& dump_prefix = "digit_split"
 );
 
 } // namespace PokemonFRLG

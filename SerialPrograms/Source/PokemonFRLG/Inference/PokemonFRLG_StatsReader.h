@@ -41,12 +41,16 @@ public:
     void make_overlays(VideoOverlaySet &items) const;
 
     // Reads from page 1 (Nature, Level, Name)
-    void read_page1(Logger &logger, Language language,
-                                    const ImageViewRGB32 &frame, PokemonFRLG_Stats &stats);
+    void read_page1(
+        Logger &logger, Language language,
+        const ImageViewRGB32 &frame, PokemonFRLG_Stats &stats
+    );
 
     // Reads from page 2 (Stats: HP, Atk, Def, SpA, SpD, Spe)
-    void read_page2(Logger &logger, const ImageViewRGB32 &frame,
-                                    PokemonFRLG_Stats &stats);
+    void read_page2(
+        Logger &logger, const ImageViewRGB32 &frame,
+        PokemonFRLG_Stats &stats
+    );
 
 private:
     Color m_color;
