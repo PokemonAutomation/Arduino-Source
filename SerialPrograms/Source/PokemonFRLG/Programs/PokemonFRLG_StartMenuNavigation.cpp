@@ -18,6 +18,48 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG {
 
+void open_start_menu(ConsoleHandle& console, ProControllerContext& context){
+    uint16_t errors = 0;
+
+    while(true){
+        if (errors > 5){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to open Start menu 5 times in a row.",
+                console
+            );
+        }
+
+        StartMenuWatcher start_menu(COLOR_RED);
+
+        context.wait_for_all_requests();
+        int ret = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context) {
+                pbf_press_button(context, BUTTON_PLUS, 200ms, 1800ms);
+            },
+            { start_menu }
+        );
+
+        if (ret < 0){
+            console.log("Failed to open Start menu.");
+            errors++;
+            context.wait_for_all_requests();
+            pbf_mash_button(context, BUTTON_B, 1000ms);
+            continue;
+        }
+        
+        console.log("Start menu opened.");
+        return;
+    }
+}
+
+void close_start_menu(ConsoleHandle& console, ProControllerContext& context){
+    pbf_mash_button(context, BUTTON_B, 1000ms);
+    // TODO: add overworld detection
+    console.log("Start menu closed.");
+}
+
 bool move_cursor_to_position(ConsoleHandle& console, ProControllerContext& context, SelectionArrowPositionStartMenu destination){
     SelectionArrowWatcher pokedex_arrow = SelectionArrowWatcher(
         COLOR_RED,
