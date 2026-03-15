@@ -11,6 +11,12 @@ install(
     DESTINATION share/SerialPrograms/Resources
 )
 
+# Firmware
+install(
+    DIRECTORY ${CMAKE_BINARY_DIR}/Firmware/
+    DESTINATION share/SerialPrograms/Firmware
+)
+
 # App icon
 install(
     FILES ${CMAKE_SOURCE_DIR}/../IconResource/SerialPrograms.png

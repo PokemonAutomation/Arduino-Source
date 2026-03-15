@@ -43,6 +43,8 @@ package() {
     install -d "$pkgdir/usr/share/SerialPrograms"
     cp -r "$srcdir/Arduino-Source/SerialPrograms/build/Resources/." \
         "$pkgdir/usr/share/SerialPrograms/Resources/"
+    cp -r "$srcdir/Arduino-Source/SerialPrograms/build/Firmware/." \
+        "$pkgdir/usr/share/SerialPrograms/Firmware/"
 
     install -d "$pkgdir/usr/share/icons/hicolor/256x256/apps"
     install -Dm644 $srcdir/Arduino-Source/IconResource/SerialPrograms.png \
