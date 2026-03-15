@@ -326,6 +326,17 @@ void MoneyFarmerRoute210::move_to_trainer(SingleSwitchProgramEnvironment& env, P
     pbf_mash_button(context, BUTTON_A, 1000ms);
     context.wait_for_all_requests();
 }
+
+void MoneyFarmerRoute210::recover_from_failed_battle_start(ProControllerContext& context){
+    env.log("Recovering from failed battle start – moving to safe position.");
+    
+    pbf_move_left_joystick(context, {0, +1}, 2000ms, 0ms);
+    pbf_move_left_joystick(context, {+1, 0}, 2000ms, 0ms);
+    pbf_move_left_joystick(context, {0, -1}, 4000ms, 0ms);
+    // Wait a bit to ensure we're settled.
+    pbf_wait(context, 500ms);
+    context.wait_for_all_requests();
+}
     
 void MoneyFarmerRoute210::check_pickup_items(
     ProControllerContext& context, const bool pickup_slots[6]
@@ -511,6 +522,8 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
         }
         pbf_move_left_joystick(context, {+1, 0}, 1120ms, 0ms);
     }
+    
+    uint8_t consecutive_failures = 0;
 
     while (true){
         env.update_stats();
@@ -564,9 +577,16 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
             move_to_trainer(env, context, bubbles);
         }
 
-        if (this->battle(env, context, pp0, pp1)){
-            env.update_stats();
-            return;
+        // Attempt the battle
+        bool battle_success = battle(env, context, pp0, pp1);
+        if (!battle_success) {
+            consecutive_failures++;
+            if (consecutive_failers >= 3) {
+                heal_after_battle_and_return(env, env.console, context, pp0, pp1);
+            }
+            env.log("Battle did not start. Recovering and retrying.");
+            recover_from_failed_battle_start(context);
+            continue;
         }
         pickup_counter++;
         

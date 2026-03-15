@@ -52,6 +52,9 @@ private:
         ProControllerContext& context,
         const std::vector<ImagePixelBox>& bubbles
     );
+    void recover_from_failed_battle_start(
+        ProControllerContext& context
+    );
     bool heal_after_battle_and_return(
         SingleSwitchProgramEnvironment& env,
         VideoStream& stream, ProControllerContext& context,
