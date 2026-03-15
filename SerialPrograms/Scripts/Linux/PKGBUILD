@@ -1,5 +1,5 @@
 pkgname=pokemon-automation
-pkgver=0.62.5
+pkgver=1
 pkgrel=1
 pkgdesc="Pokemon Automation Serial Programs"
 arch=('x86_64')
