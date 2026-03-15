@@ -12,6 +12,7 @@
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -22,6 +23,7 @@
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
 #include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 #include "PokemonFRLG_Navigation.h"
 
@@ -350,6 +352,296 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
             "flee_battle(): Unable to flee from battle.",
             console
         );
+    }
+}
+
+bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, bool stop_on_move_learn){
+    
+    BlackScreenWatcher battle_exited(COLOR_RED);    
+    
+    context.wait_for_all_requests();
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context) {
+           pbf_mash_button(context, BUTTON_B, 20000ms);
+        },
+        { battle_exited }
+    );
+
+    if (ret == 0) {
+        pbf_wait(context, 500ms);
+        context.wait_for_all_requests();
+        console.log("Battle exited.");
+        return false;
+    }
+
+    console.log("Loop detected.");
+
+    // there are two dialog selection boxes in a row
+    // we need to decline the first one and accept the second one
+    // the first one will occur after an Advance Battle Dialog
+    uint16_t errors = 0;
+    uint16_t loops = 0;
+    bool rejected_first_box = false;
+    while (true){
+        if (errors > 5 || loops > 5){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to exit battle.",
+                console
+            );
+        }
+
+        AdvanceBattleDialogWatcher advance_dialog(COLOR_RED);
+        BattleLearnDialogWatcher move_learn_select(COLOR_RED);
+
+        context.wait_for_all_requests();
+        WallClock deadline = current_time() + 30s;
+        ret = run_until<ProControllerContext>(
+            console, context,
+            [deadline, rejected_first_box](ProControllerContext& context) {
+                pbf_wait(context, 1000ms); // give the watchers a chance to detect something
+                while (current_time() < deadline){
+                    pbf_press_button(context, rejected_first_box ? BUTTON_A : BUTTON_B, 200ms, 1800ms);
+                }
+            },
+            { battle_exited, advance_dialog, move_learn_select }
+        );
+
+        switch (ret){
+        case 0:
+            pbf_wait(context, 500ms);
+            context.wait_for_all_requests();
+            console.log("Battle exited.");
+            return rejected_first_box;
+        case 1:
+            console.log("Battle Advance arrow detected.");
+            pbf_press_button(context, BUTTON_B, 200ms, 800ms);
+            rejected_first_box = false;
+            continue;
+        case 2:
+            if (stop_on_move_learn) {
+                console.log("Move learn detected.");
+                return true;
+            }else if (rejected_first_box) {
+                loops++;
+                console.log("Declined to learn new move.");
+                pbf_press_button(context, BUTTON_A, 200ms, 200ms);
+                pbf_mash_button(context, BUTTON_B, 2000ms);
+            }else{
+                pbf_press_button(context, BUTTON_B, 200ms, 0ms);
+                rejected_first_box = true;
+            }
+            continue;
+        default:
+            console.log("Failed to detect expected battle dialogs.");
+            errors++;
+            // attempt to exit any screen that might be open (party, bag, etc)
+            pbf_mash_button(context, BUTTON_B, 500ms);
+            context.wait_for_all_requests();
+            rejected_first_box = false;
+            continue;
+        }
+    }
+}
+
+void use_teleport(ConsoleHandle& console, ProControllerContext& context){
+    uint16_t errors = 0;
+    
+    while (true){
+        if (errors > 5){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to use Teleport 5 times in a row.",
+                console
+            );
+        }
+
+        open_party_menu_from_overworld(console, context);
+        // navigate to last party slot
+        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+
+        PartySelectionWatcher teleporter_selected(COLOR_RED);
+
+        context.wait_for_all_requests();
+        int ret = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context) {
+                pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+            },
+            { teleporter_selected }
+        );
+
+        if (ret < 0){
+            console.log("Failed to select Teleport user.");
+            errors++;
+            pbf_mash_button(context, BUTTON_B, 3000ms);
+            continue;
+        }
+        
+        // select Teleport (2nd option, but maybe HMs could change this)
+        pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
+        pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+        pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
+
+        BlackScreenWatcher teleport_transition(COLOR_RED);
+
+        context.wait_for_all_requests();
+        ret = wait_until(
+            console, context, 20000ms,
+            {teleport_transition}
+        );
+
+        if (ret < 0){
+            console.log("Failed to use Teleport");
+            errors++;
+            pbf_mash_button(context, BUTTON_B, 4000ms);
+            continue;
+        }
+
+        pbf_wait(context, 3000ms);
+        context.wait_for_all_requests();
+        console.log("Used Teleport.");
+        return;
+    }
+}
+
+void enter_leave_pokecenter(ConsoleHandle& console, ProControllerContext& context, bool leave){
+    uint16_t errors = 0;
+
+    while (true){
+        if (errors > 5){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                leave ? "Failed to exit PokeCenter." : "Failed to enter PokeCenter.",
+                console
+            );
+        }
+
+        BlackScreenWatcher pokecenter_transition(COLOR_RED);
+
+        int ret = run_until<ProControllerContext>(
+            console, context,
+            [leave](ProControllerContext& context) {
+                pbf_move_left_joystick(context, {0, (leave ? -1.0 : +1.0)}, 10000ms, 0ms);
+            },
+            { pokecenter_transition }
+        );
+
+        if (ret < 0){
+            console.log(leave ? "Failed to exit PokeCenter." : "Failed to enter PokeCenter.");
+            errors++;
+            pbf_mash_button(context, BUTTON_B, 1000ms);
+            continue;
+        }
+
+        pbf_wait(context, 2500ms);
+        context.wait_for_all_requests();
+        console.log(leave ? "Exited PokeCenter." : "Entered PokeCenter");
+        return;
+    }
+}
+
+void enter_pokecenter(ConsoleHandle& console, ProControllerContext& context){
+    enter_leave_pokecenter(console, context, false);
+}
+
+void leave_pokecenter(ConsoleHandle& console, ProControllerContext& context){
+    enter_leave_pokecenter(console, context, true);
+}
+
+void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context){
+    uint16_t errors = 0;
+
+    while (true){
+        if (errors > 5) {
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to initiate PokeCenter dialog.",
+                console
+            );
+        }
+
+        AdvanceWhiteDialogWatcher dialog(COLOR_RED);
+
+        context.wait_for_all_requests();
+        int ret = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context) {
+                // walk up to counter and initiate dialog
+                ssf_press_left_joystick(context, {0, +1}, 0ms, 10000ms);
+                ssf_mash1_button(context, BUTTON_A, 10000ms);
+            },
+            { dialog }
+        );
+
+        if (ret < 0){
+            console.log("Failed to detect PokeCenter dialog within 10 seconds");
+            errors++;
+            pbf_mash_button(context, BUTTON_B, 2000ms);
+            continue;
+        }
+
+        console.log("Detected PokeCenter dialog.");
+        pbf_mash_button(context, BUTTON_A, 8000ms);
+        pbf_mash_button(context, BUTTON_B, 5000ms);
+        context.wait_for_all_requests();
+        return;
+    }
+}
+
+void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context){
+    uint16_t errors = 0;
+    bool start_menu_is_open = false;
+    while (true){
+        if (errors > 5){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to open party menu 5 times in a row.",
+                console
+            );
+        }
+
+        context.wait_for_all_requests();
+        if (!start_menu_is_open){
+            open_start_menu(console, context); // This is unavoidable since we cannot detect the overworld.
+            start_menu_is_open = true;
+        }
+
+        StartMenuWatcher start_menu(COLOR_RED);
+        PartyMenuWatcher party_menu(COLOR_RED);
+
+        int ret = wait_until(
+            console, context, 10000ms,
+            { start_menu, party_menu }
+        );
+
+        switch (ret){
+        case 0:
+            ret = move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::POKEMON);
+            if (ret < 0){
+                console.log("Failed to navigate to POKEMON on the start menu.");
+                errors++;
+                context.wait_for_all_requests();
+                pbf_mash_button(context, BUTTON_B, 2000ms);
+                start_menu_is_open = false;
+            } else {
+                console.log("Navigated to POKEMON on the start menu");
+                context.wait_for_all_requests();
+                pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+            }
+            continue;
+        case 1:
+            console.log("Party menu opened.");
+            return;
+        default:
+            console.log("Failed to open party menu.");
+            errors++;
+            pbf_mash_button(context, BUTTON_B, 2000ms);
+            start_menu_is_open = false;
+            continue;
+        }
     }
 }
 

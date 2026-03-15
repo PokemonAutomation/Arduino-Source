@@ -24,6 +24,12 @@ using ProControllerContext = ControllerContext<ProController>;
 
 namespace PokemonFRLG {
 
+// Open the start menu from the overworld
+void open_start_menu(ConsoleHandle& console, ProControllerContext& context);
+
+// Close the start menu to return to the overworld
+void close_start_menu(ConsoleHandle& console, ProControllerContext& context);
+
 // Starting from the start menu, move the selection arrow to the specified position.
 // Return true if successful, false otherwise (e.g. if selection arrow is not detected).
 bool move_cursor_to_position(
