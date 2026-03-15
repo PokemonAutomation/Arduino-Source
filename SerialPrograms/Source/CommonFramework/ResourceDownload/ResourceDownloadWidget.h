@@ -22,6 +22,15 @@ public:
 };
 
 
+class DeleteButtonWidget : public ConfigWidget{
+public:
+    using ParentOption = ResourceDeleteButton;
+
+public:
+    DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& value);
+};
+
+
 
 }
 #endif

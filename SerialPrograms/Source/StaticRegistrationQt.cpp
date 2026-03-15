@@ -104,6 +104,7 @@ void register_all_statics(){
 
     // Resource Download
     RegisterConfigWidget<DownloadButtonWidget>();
+    RegisterConfigWidget<DeleteButtonWidget>();
 
     //  Integrations
     RegisterConfigWidget<Integration::DiscordIntegrationSettingsWidget>();
