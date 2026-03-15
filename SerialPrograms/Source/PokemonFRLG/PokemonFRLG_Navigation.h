@@ -35,6 +35,28 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
 // Run from battle. Cursor must start on the FIGHT button. Assumes fleeing will always work. (Smoke Ball)
 void flee_battle(ConsoleHandle& console, ProControllerContext& context);
 
+// Exit a wild battle after winning. Checks if a Pokemon is learning a new move.
+// Set stop_on_move_learn to true to cause this to exit early when a move is being learned without declining it
+// Assumes that the Pokemon will not evolve
+bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, bool stop_on_move_learn);
+
+// Uses Teleport to return to a PokeCenter. 
+// Assumes that Teleport is usable and the last party member has it learned
+void use_teleport(ConsoleHandle& console, ProControllerContext& context);
+
+// Enter a pokecenter. Assumes the player is standing in front of its door
+void enter_pokecenter(ConsoleHandle& console, ProControllerContext& context);
+
+// Leave a pokecenter. Assumes the player is standing directly north of the exit
+void leave_pokecenter(ConsoleHandle& console, ProControllerContext& context);
+
+// Approach the counter and heal at a PokeCenter. Assumed the player is directly south of the nurse
+// Combine with enter_pokecenter, leave_pokecenter, and use_teleport for automating healing your party
+void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context);
+
+// Starting from the start menu, a sub-screen of the start menu, or the overworld, navigate to the party screen
+void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context);
+
 // Go to home to check that scaling is 100%. Then resume game.
 void home_black_border_check(ConsoleHandle& console, ProControllerContext& context);
 

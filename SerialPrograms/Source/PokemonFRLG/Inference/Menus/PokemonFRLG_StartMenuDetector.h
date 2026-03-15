@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonFRLG_StartMenuDetector_H
 
 #include <chrono>
-#include <atomic>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
