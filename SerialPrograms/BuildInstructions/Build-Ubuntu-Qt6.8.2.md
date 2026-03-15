@@ -1,15 +1,16 @@
-# How to Build (Qt 6.8.2) - Ubuntu 24.04
+# How to Build (Qt 6.8.2) - Linux
 
-Note that our Ubuntu setup does not work. The video display flickers to the point of being unusable.
+Note that our Linux setup might not work. The video display can flicker to the point of being unusable.
 
 ## Build Tools:
 
-Install the following packages:
+Install the following build requirements, these steps will use ubuntu packages but the steps will be the same on your distro:
 
 ```
-sudo apt install cmake
-sudo apt install libglx-dev libgl1-mesa-dev
-sudo apt install libopencv-dev
+git cmake ninja-build gcc g++ qt6-base-dev qt6-multimedia-dev qt6-serialport-dev libopencv-dev libonnx-dev libasound2-dev
+dpkg                    # To build .deb packages for Debian based distros
+rpm                     # To build .rpm packages for RHEL based distros
+pacman-package-manager  # To build .pkg packages for Arch based distros
 ```
 
 
@@ -30,20 +31,30 @@ sudo apt install libopencv-dev
 ![](Images/Windows-Install-Qt6.7.3-Custom.png)
 ![](Images/Windows-Install-Qt6.8.2-Components.png)
 
+### Alternatively:
+1. ```curl -L https://download.qt.io/official_releases/online_installers/qt-online-installer-linux-x64-online.run -o qt.run```
+2. ```chmod +x qt.run```
+3. ```./qt.run install qt6.8.2-full-dev```
+4. ```export CMAKE_PREFIX_PATH=/opt/Qt/6.8.2/gcc_64:$CMAKE_PREFIX_PATH```
+
 ## Setup:
 
+### Package:
 1. Clone this repo.
-2. Clone the [Packages Repo](https://github.com/PokemonAutomation/Packages).
-3. In the `Packages` repo, copy the `SerialPrograms/Resources` folder into the root of the `Arduino-Source` repo.
+2. Open a terminal in the folder ```Arduino-Source/SerialPrograms/Scripts/Linux```
+3. Run the script ```./packages.sh (PACKAGE TYPE)```
+   - PACKAGE TYPE:
+     - DEB - .deb package
+     - RPM - .rpm package
+     - PKG - .pkg package
+     - TGZ - Generic package
+4. Find the package at ```/Arduino-Source/SerialPrograms/build```
+5. Install the package ```apt install ./pokemon-automation--x86_64.deb```
 
-![](Images/Directory.png)
-
-4. Open Qt Creator.
-5. Click on `File` -> `Open File or Project`.
-6. Navigate to `SerialPrograms` and select `CMakeLists.txt`.
-7. Enable parallel build: Build & Run -> Build Steps -> Build -> Details -> CMake arguments: `-j16` (the # of cores you have)
-8. At the bottom left corner, click on the little monitor and select `Release with Debug Information`.
-9. Still in the bottom left corner, click the upper green arrow to compile and launch the program.
+### Source:
+1. Clone this repo.
+2. Open a terminal in ```Arduino-Source/SerialPrograms```
+3. Compile the source code ```cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-O2 -march=native -Wno-odr" -DCMAKE_CXX_FLAGS="-O2 -march=native -Wno-odr" && ninja -C build```
 
 <hr>
 
