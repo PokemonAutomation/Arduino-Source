@@ -17,7 +17,7 @@
 #include "Common/Cpp/Options/StringOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "CommonFramework/Panels/PanelTools.h"
-#include "CommonFramework/ResourceDownloadTable.h"
+#include "CommonFramework/ResourceDownload/ResourceDownloadTable.h"
 
 //#include <iostream>
 //using std::cout;
