@@ -9,8 +9,8 @@
 
 namespace PokemonAutomation{
 
-DownloadButton::DownloadButton(ResourceDownloadRow& p_row)
-    : ConfigOptionImpl<DownloadButton>(LockMode::UNLOCK_WHILE_RUNNING)
+ResourceDownloadButton::ResourceDownloadButton(ResourceDownloadRow& p_row)
+    : ConfigOptionImpl<ResourceDownloadButton>(LockMode::UNLOCK_WHILE_RUNNING)
     , option(p_row)
 {}    
 
@@ -27,7 +27,7 @@ ResourceDownloadRow::ResourceDownloadRow(
 {
     PA_ADD_STATIC(m_resource_name);
     PA_ADD_STATIC(m_file_size_label);
-    // PA_ADD_STATIC(m_download_button);
+    PA_ADD_STATIC(m_download_button);
 }
 
 ResourceDownloadTable::ResourceDownloadTable()
@@ -40,7 +40,8 @@ ResourceDownloadTable::ResourceDownloadTable()
 std::vector<std::string> ResourceDownloadTable::make_header() const{
     std::vector<std::string> ret{
         "Resource",
-        "Size"
+        "Size",
+        "",
     };
     return ret;
 }

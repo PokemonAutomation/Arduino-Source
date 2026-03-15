@@ -14,9 +14,9 @@ namespace PokemonAutomation{
 
 
 class ResourceDownloadRow;
-class DownloadButton : public ConfigOptionImpl<DownloadButton>{
+class ResourceDownloadButton : public ConfigOptionImpl<ResourceDownloadButton>{
 public:
-    DownloadButton(ResourceDownloadRow& p_row);
+    ResourceDownloadButton(ResourceDownloadRow& p_row);
 
     ResourceDownloadRow& option;
 };
@@ -33,7 +33,7 @@ public:
     LabelCellOption m_resource_name;
     size_t m_file_size;
     LabelCellOption m_file_size_label;
-    DownloadButton m_download_button;
+    ResourceDownloadButton m_download_button;
 
 
 };
