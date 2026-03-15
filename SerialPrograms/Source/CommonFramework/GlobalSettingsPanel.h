@@ -17,6 +17,7 @@
 #include "Common/Cpp/Options/StringOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "CommonFramework/Panels/PanelTools.h"
+#include "CommonFramework/ResourceDownloadTable.h"
 
 //#include <iostream>
 //using std::cout;
@@ -124,6 +125,7 @@ public:
 
     Pimpl<ThemeSelectorOption> THEME;
     BooleanCheckBoxOption USE_PADDLE_OCR;
+    ResourceDownloadTable RESOURCE_DOWNLOAD_TABLE;
     Pimpl<ResolutionOption> WINDOW_SIZE;
     Pimpl<ResolutionOption> LOG_WINDOW_SIZE;
     BooleanCheckBoxOption LOG_WINDOW_STARTUP;
