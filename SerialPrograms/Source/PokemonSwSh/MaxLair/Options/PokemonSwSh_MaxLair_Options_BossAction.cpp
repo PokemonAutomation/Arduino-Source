@@ -85,9 +85,7 @@ BossActionTable::BossActionTable()
         const std::string& sprite_slug = *slugs.sprite_slugs.begin();
         const std::string& name_slug = slugs.name_slug;
         
-        auto row = std::make_unique<BossActionRow>(item.second, name_slug, sprite_slug);
-        m_rows.push_back(row.get());
-        add_row(std::move(row));
+        add_row(std::make_unique<BossActionRow>(item.second, name_slug, sprite_slug));
     }
     finish_construction();
     
@@ -99,56 +97,12 @@ BossActionTable::BossActionTable()
     update_checkbox_states();
 }
 
-BossActionTable::~BossActionTable(){
-    for (auto* row : m_rows) {
-        row->save_on_the_go.remove_listener(*this);
-        row->action.remove_listener(*this);
-    }
-}
-
-void BossActionTable::update_checkbox_states() {
-    size_t checked = 0;
-    for (auto* row : m_rows) {
-        if (row->save_on_the_go) checked++;
-    }
-    for (auto* row : m_rows) {
-        bool action_ok = (row->action == BossAction::CATCH_AND_STOP_IF_SHINY);
-        bool disable_by_max = (checked >= 3 && !row->save_on_the_go);
-        ConfigOptionState state = (action_ok && !disable_by_max) ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED;
-        row->save_on_the_go.set_visibility(state);
-    }
-}
-
-void BossActionTable::on_config_value_changed(void* object) {
-    if (m_reverting) return;
-    
-    // Counting how many checkboxes are currently checked
-    size_t checked = 0;
-    for (auto* row : m_rows) {
-        if (row->save_on_the_go) checked++;
-    }
-    
-    // If we exceed the 3 boxes ticked, we revert the change for the last box ticked
-    if (checked > 3) {
-        for (auto* row : m_rows) {
-            if (object == &row->save_on_the_go && row->save_on_the_go) {
-                m_reverting = true;
-                row->save_on_the_go = false;
-                m_reverting = false;
-                
-                return;
-            }
-        }
-    }
-    update_checkbox_states();
-}
-
 std::vector<std::string> BossActionTable::make_header() const{
     std::vector<std::string> ret{
         STRING_POKEMON,
         "Action",
         STRING_POKEBALL,
-        "Save Path (Max 3)"
+        "Save Path"
     };
     return ret;
 }

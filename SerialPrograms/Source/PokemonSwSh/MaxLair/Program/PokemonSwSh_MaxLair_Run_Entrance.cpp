@@ -138,7 +138,7 @@ void run_entrance(
         }
         
         context.wait_for_all_requests();
-        context.wait_for(2000ms);
+        context.wait_for(1000ms);
         VideoSnapshot screen = stream.video().snapshot();
         if (!screen) continue;
         
@@ -149,66 +149,20 @@ void run_entrance(
         ImageStats paths_box_stats = image_stats(extract_box_reference(screen, paths_box));
         
         bool dialog_box_present = is_grey(dialog_box_stats, 400, 1000);
-        
         bool yes_no_box_present = is_white(yes_no_box_stats, 400, 10);
-        
         bool paths_box_present = is_white(paths_box_stats, 400, 10);
         
         if (paths_box_present && yes_no_box_present) {
             
             if (save_path) {
-                // Bring the cursor to the bottom position to correctly identify boss names
-                pbf_press_dpad(context, DPAD_UP, 160ms, 80ms);
+                // List of bosses is full, stop the program
+                stream.log("Cannot save path – saved list is full. Stopping program.", COLOR_RED);
+                OperationFailedException::fire(
+                    ErrorReport::NO_ERROR_REPORT,
+                    "Paths list is full. Program stopped.",
+                    stream
+                );
                 
-                context.wait_for_all_requests();
-                
-                VideoSnapshot clean_screen = stream.video().snapshot();
-                
-                if (!clean_screen) continue;
-                
-                size_t attempts = 0;
-                const size_t MAX_ATTEMPTS = 10;
-                bool done = false;
-                while (!done && attempts < MAX_ATTEMPTS) {
-                    attempts++;
-                    
-                    std::vector<std::string> names = read_saved_paths(stream, language, clean_screen);
-                    int non_empty = 0;
-                    for (const auto& n : names) {
-                        if (!n.empty()) ++non_empty;
-                    }
-                    bool in_list = (non_empty >= 2); // If there are at least 2 readable names, then we can read the list
-                    
-                    if (in_list) {
-                        context.wait_for(1000ms);
-                        
-                        int slot = find_unprotected_slot(names, runtime.actions, stream.logger());
-                        if (slot == -1) {
-                            stream.log("Unable to save new boss or all bosses from list already saved, cancelling", COLOR_ORANGE);
-                            runtime.session_stats.add_error();
-                            pbf_press_button(context, BUTTON_B, 160ms, 1000ms);
-                        } else {
-                            // Bring cursor back to the top position
-                            pbf_press_dpad(context, DPAD_DOWN, 160ms, 500ms);
-                            context.wait_for(1000ms);
-                            // Then move down to target slot
-                            for (int i = 0; i < slot; ++i) {
-                                pbf_press_dpad(context, DPAD_DOWN, 160ms, 500ms);
-                            };
-                            context.wait_for_all_requests();
-                            stream.log("Erasing old path and saving new path");
-                            pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
-                            
-                            send_program_notification(env, runtime.notification_status, COLOR_BLUE, "Path Saved", {{"Boss: ", boss_slug}}, "");
-                            
-                        }
-                        context.wait_for_all_requests();
-                        done = true;
-                    }
-                    if (attempts >= MAX_ATTEMPTS) {
-                        stream.log("New-path save dialogue timed out.", COLOR_RED);
-                    };
-                }
             } else {
                 stream.log("Not saving path");
                 pbf_press_button(context, BUTTON_B, 160ms, 1000ms);
@@ -217,9 +171,14 @@ void run_entrance(
         } else if (!paths_box_present && yes_no_box_present) {
             
             if (save_path) {
-                stream.log("Saving new path or keeping old path");
-                pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
-                send_program_notification(env, runtime.notification_status, COLOR_BLUE, "Path Saved", {{"Boss: ", boss_slug}}, "");
+                if (followed_path) {
+                    stream.log("Keeping old path.");
+                    pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
+                } else {
+                    stream.log("Saving new path");
+                    pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
+                    send_program_notification(env, runtime.notification_status, COLOR_BLUE, "Path Saved", {{"Boss: ", boss_slug}}, "");
+                }
             } else {
                 stream.log("Not saving new path");
                 pbf_press_button(context, BUTTON_B, 160ms, 1000ms);
