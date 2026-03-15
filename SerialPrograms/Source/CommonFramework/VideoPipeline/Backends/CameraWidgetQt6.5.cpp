@@ -190,9 +190,6 @@ void CameraVideoSource::set_video_output(QGraphicsVideoItem& item){
         &m_camera->camera(), [&](const QVideoFrame& frame){
             //  This runs on the QCamera's thread. So it is off the critical path.
 
-            if (frame.size().isEmpty() || frame.bytesPerLine(0) == 0)
-                return; // Ignore empty frames
-
             WallClock now = current_time();
             if (!m_last_frame.push_frame(frame, now)){
                 return;
