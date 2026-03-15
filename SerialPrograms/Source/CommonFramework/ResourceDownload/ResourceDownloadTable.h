@@ -21,6 +21,13 @@ public:
     ResourceDownloadRow& option;
 };
 
+class ResourceDeleteButton : public ConfigOptionImpl<ResourceDeleteButton>{
+public:
+    ResourceDeleteButton(ResourceDownloadRow& p_row);
+
+    ResourceDownloadRow& option;
+};
+
 class ResourceDownloadRow : public StaticTableRow{
 
 public:
@@ -34,6 +41,7 @@ public:
     size_t m_file_size;
     LabelCellOption m_file_size_label;
     ResourceDownloadButton m_download_button;
+    ResourceDeleteButton m_delete_button;
 
 
 };

@@ -39,6 +39,28 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
     );
 }
 
+template class RegisterConfigWidget<DeleteButtonWidget>;
+
+
+DeleteButtonWidget::DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& value)
+    : ConfigWidget(value)
+{
+    QPushButton* button = new QPushButton(&parent);
+    m_widget = button;
+
+    QFont font;
+    font.setBold(true);
+    button->setFont(font);
+    button->setText("Delete");
+
+    button->connect(
+        button, &QPushButton::clicked,
+        button, [&](bool){
+            cout << "Clicked Delete Button" << endl;
+        }
+    );
+}
+
 
 
 }
