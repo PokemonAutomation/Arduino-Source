@@ -1,0 +1,63 @@
+pkgname=pokemon-automation
+pkgver=0.62.5
+pkgrel=1
+pkgdesc="Pokemon Automation Serial Programs"
+arch=('x86_64')
+url="https://github.com/PokemonAutomation/Arduino-Source"
+license=('MIT')
+options=('!debug')
+
+depends=('qt6-base' 'qt6-multimedia' 'qt6-serialport' 'qt6-imageformats' \
+        'qt6-multimedia-gstreamer' 'gstreamer' 'opencv' 'mesa' \
+        'libglvnd' 'hdf5' 'vtk' 'tesseract' 'onnxruntime')
+
+makedepends=('cmake' 'ninja')
+
+source=("Arduino-Source.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+    CCACHE_ARGS=()
+    if command -v ccache >/dev/null 2>&1; then
+        echo "[INFO] Using ccache for compilation"
+        CCACHE_ARGS=(-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache)
+    fi
+
+    mkdir -p "$srcdir/Arduino-Source/SerialPrograms/build"
+    cd "$srcdir/Arduino-Source/SerialPrograms/build"
+
+    cmake .. \
+        -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_C_FLAGS="-O2 -g0 -fno-record-gcc-switches -fno-ident -Wno-odr" \
+        -DCMAKE_CXX_FLAGS="-O2 -g0 -fno-record-gcc-switches -fno-ident -Wno-odr" \
+        "${CCACHE_ARGS[@]}"
+
+    ninja -j$(( $(nproc) - 1))
+}
+
+package() {
+    install -Dm755 $srcdir/Arduino-Source/SerialPrograms/build/SerialPrograms \
+        "$pkgdir/usr/bin/SerialPrograms"
+
+    install -d "$pkgdir/usr/share/SerialPrograms"
+    cp -r "$srcdir/Arduino-Source/SerialPrograms/build/Resources/." \
+        "$pkgdir/usr/share/SerialPrograms/Resources/"
+
+    install -d "$pkgdir/usr/share/icons/hicolor/256x256/apps"
+    install -Dm644 $srcdir/Arduino-Source/IconResource/SerialPrograms.png \
+        "$pkgdir/usr/share/icons/hicolor/256x256/apps/SerialPrograms.png"
+
+    install -d "$pkgdir/usr/share/applications"
+    cat > "$pkgdir/usr/share/applications/SerialPrograms.desktop" <<EOF
+[Desktop Entry]
+Name=Pokemon Automation
+Exec=/usr/bin/SerialPrograms
+Icon=SerialPrograms
+Type=Application
+Categories=Utility;
+EOF
+
+    install -Dm644 $srcdir/Arduino-Source/LICENSE -t \
+        "${pkgdir}/usr/share/licenses/SerialPrograms/"
+}
