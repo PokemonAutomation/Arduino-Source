@@ -39,11 +39,9 @@ set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${PACKAGE_VERSION}-${CMAKE_SY
 # Debian
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "PokemonAutomation")
 set(CPACK_DEBIAN_PACKAGE_DEPENDS
-    "libqt6core6, libqt6gui6, libqt6widgets6, libqt6multimedia6, libqt6serialport6, qt6-imageformats-plugins, \
+    "libqt6core6, libqt6gui6, libqt6widgets6, libqt6multimedia6, libqt6serialport6, qt6-image-formats-plugins, \
      gstreamer1.0-plugins-base, gstreamer1.0-plugins-good, gstreamer1.0-plugins-bad, gstreamer1.0-plugins-ugly, \
-     libopencv-core4.6, libopencv-imgproc4.6, libglx0, libgl1, libhdf5-103, libvtk7.1, tesseract-ocr, \
-     onnxruntime-tools"
-)
+     libopencv-core, libopencv-imgproc, libglx0, libgl1, libhdf5, libvtk, tesseract-ocr, libonnx"
 
 # RPM
 set(CPACK_RPM_PACKAGE_LICENSE "MIT")
