@@ -14,9 +14,9 @@
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
-#include "Common/PABotBase2/PABotBase2_PacketSender.h"
-#include "Common/PABotBase2/PABotBase2_PacketParser.h"
-#include "Common/PABotBase2/PABotBase2_StreamCoalescer.h"
+#include "Common/PABotBase2/ConnectionLayer/PABotBase2_PacketSender.h"
+#include "Common/PABotBase2/ConnectionLayer/PABotBase2_PacketParser.h"
+#include "Common/PABotBase2/ConnectionLayer/PABotBase2_StreamCoalescer.h"
 #include "StreamConnection.h"
 
 namespace PokemonAutomation{

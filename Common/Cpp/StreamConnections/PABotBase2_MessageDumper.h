@@ -8,7 +8,7 @@
 #define PokemonAutomation_PABotBase2_MessageDumper_H
 
 #include <string>
-#include "Common/PABotBase2/PABotBase2_Connection.h"
+#include "Common/PABotBase2/ConnectionLayer/PABotBase2_Connection.h"
 
 namespace PokemonAutomation{
 
