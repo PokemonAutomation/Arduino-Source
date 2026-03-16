@@ -186,7 +186,7 @@ stages:
               7z a -tzip -mx=9 "-p$ARTIFACT_PASSWORD" -mem=AES256 "SerialPrograms-MacOS-$(compiler)-$(architecture).$EXT" "$FOLDER_NAME"
           else
               echo "=== Creating tarball with enclosing folder ==="
-              tar -I "gzip -9" -czf "SerialPrograms-MacOS-$(compiler)-$(architecture).$EXT" "$FOLDER_NAME"
+              tar -cf - "$FOLDER_NAME" | gzip -9 > "SerialPrograms-MacOS-$(compiler)-$(architecture).$EXT"
           fi
 
           echo "=== Creating cache directory and moving tarball ==="
