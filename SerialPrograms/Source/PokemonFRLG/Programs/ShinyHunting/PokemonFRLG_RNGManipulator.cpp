@@ -103,20 +103,20 @@ RNGManipulator::RNGManipulator()
         LockMode::UNLOCK_WHILE_RUNNING,
         1000, 200 // default, min
     )
-    , DOUBLE_ADVANCES(
+    , INGAME_ADVANCES(
         "<b>In-Game Advances:</b><br>The number of frames to advance before triggering the gift/encounter.<br>These pass at double the rate compared to other consoles, where every 2nd frame is skipped.",
         LockMode::UNLOCK_WHILE_RUNNING,
         1000, 700 // default, min
     )
-    , TEACHY_ADVANCES(
-        "<b>Teachy TV Advances:</b><br>The number of frames to advance using the Teachy TV.<br>These pass at 313x the base framerate.<br>For best accuracy, this value should be divisble by 313",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        0, 0 // default, min
-    )
     , ADVANCES_CALIBRATION(
-        "<b>Advances Calibration:</b><br>Modifies the frame advances passed in the load screen.<br>",
+        "<b>Advances Calibration:</b><br>Modifies the frame advances passed after loading the game.<br>",
         LockMode::UNLOCK_WHILE_RUNNING,
         0 // default
+    )
+    , USE_TEACHY_TV(
+        "<b>Use Teachy TV:</b><br>Opens the Teachy TV to quickly advance in-game frames at 313x speed.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false // default
     )
     , TAKE_PICTURES(
         "<b>Take Pictures of Stats:</b><br>Take pictures of the first two pages of the summary screen.<br>Only applies to gifts. Useful for calibrating your seed and advances.", 
@@ -147,9 +147,9 @@ RNGManipulator::RNGManipulator()
     PA_ADD_OPTION(SEED_DELAY);
     PA_ADD_OPTION(SEED_CALIBRATION);
     PA_ADD_OPTION(LOAD_ADVANCES);
-    PA_ADD_OPTION(DOUBLE_ADVANCES);
-    PA_ADD_OPTION(TEACHY_ADVANCES);
+    PA_ADD_OPTION(INGAME_ADVANCES);
     PA_ADD_OPTION(ADVANCES_CALIBRATION);
+    PA_ADD_OPTION(USE_TEACHY_TV);
     PA_ADD_OPTION(TAKE_PICTURES);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -390,18 +390,17 @@ void RNGManipulator::program(SingleSwitchProgramEnvironment& env, ProControllerC
     VideoSnapshot screen;
 
     while (!shiny_found){
-        bool use_teachy_tv = TEACHY_ADVANCES > 0;
-        if (use_teachy_tv && DOUBLE_ADVANCES < 2000) {
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "When using the Teachy TV, the in-game advances must at least 2000 frames to allow for menu navigation time.",
-                env.console
-            );
+        uint64_t MODIFIED_INGAME_ADVANCES = INGAME_ADVANCES + FIXED_ADVANCES_OFFSET + ADVANCES_CALIBRATION;
+        uint64_t TEACHY_ADVANCES = 0;
+
+        bool should_use_teachy_tv = USE_TEACHY_TV && MODIFIED_INGAME_ADVANCES > 5000;
+        if (should_use_teachy_tv) {
+            TEACHY_ADVANCES = uint64_t((int)std::floor((MODIFIED_INGAME_ADVANCES - 5000) / 313) * 313);
         }
 
-        LOAD_DELAY = uint64_t((LOAD_ADVANCES + ADVANCES_CALIBRATION + FIXED_ADVANCES_OFFSET)/ FRAMERATE * 1000);
+        LOAD_DELAY = uint64_t((LOAD_ADVANCES)/ FRAMERATE * 1000);
         TEACHY_DELAY = uint64_t(TEACHY_ADVANCES / FRAMERATE * 1000 / 313);
-        DOUBLE_DELAY = uint64_t(DOUBLE_ADVANCES / FRAMERATE * 500) - (use_teachy_tv ? 13700 : 0);
+        DOUBLE_DELAY = uint64_t((MODIFIED_INGAME_ADVANCES - TEACHY_ADVANCES) / FRAMERATE * 500) - (should_use_teachy_tv ? 13700 : 0);
         env.log("Load screen delay: " + std::to_string(LOAD_DELAY) + "ms");
         env.log("In-game delay: " + std::to_string(DOUBLE_DELAY) + "ms");
         env.log("Teachy TV delay: " + std::to_string(TEACHY_DELAY) + "ms");
@@ -425,7 +424,7 @@ void RNGManipulator::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
         set_seed_after_delay(context, SEED_DELAY, SEED_CALIBRATION, FIXED_SEED_OFFSET);
         load_game_after_delay(context, LOAD_DELAY);
-        if (use_teachy_tv){
+        if (should_use_teachy_tv){
             wait_with_teachy_tv(context, TEACHY_DELAY);
         }
 

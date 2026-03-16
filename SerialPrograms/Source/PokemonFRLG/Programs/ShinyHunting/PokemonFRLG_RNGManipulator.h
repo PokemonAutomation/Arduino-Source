@@ -62,9 +62,10 @@ private:
     SimpleIntegerOption<int64_t> SEED_CALIBRATION;
 
     SimpleIntegerOption<uint64_t> LOAD_ADVANCES;
-    SimpleIntegerOption<uint64_t> DOUBLE_ADVANCES;
-    SimpleIntegerOption<uint64_t> TEACHY_ADVANCES;
+    SimpleIntegerOption<uint64_t> INGAME_ADVANCES;
     SimpleIntegerOption<int64_t> ADVANCES_CALIBRATION;
+
+    BooleanCheckBoxOption USE_TEACHY_TV;
 
     BooleanCheckBoxOption TAKE_PICTURES;
 
