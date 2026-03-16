@@ -89,9 +89,14 @@ RNGManipulator::RNGManipulator()
         ResetType::hard
     )
     , SEED_DELAY(
-        "<b>Title Screen Delay Time (ms):</b><br>The delay between starting the game and advancing past the title screen.",
+        "<b>Seed Delay Time (ms):</b><br>The delay between starting the game and advancing past the title screen. Set this to match your target seed.",
         LockMode::UNLOCK_WHILE_RUNNING,
         32000, 30000 // default, min
+    )
+    , SEED_CALIBRATION(
+         "<b>Seed Calibration (ms):</b><br>Modifies the seed delay time.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0  // default
     )
     , LOAD_ADVANCES(
         "<b>Load Screen Advances:</b><br>The number of frames to advance before loading the game.<br>These pass at the \"normal\" rate compared to other consoles.",
@@ -102,6 +107,16 @@ RNGManipulator::RNGManipulator()
         "<b>In-Game Advances:</b><br>The number of frames to advance before triggering the gift/encounter.<br>These pass at double the rate compared to other consoles, where every 2nd frame is skipped.",
         LockMode::UNLOCK_WHILE_RUNNING,
         1000, 700 // default, min
+    )
+    , TEACHY_ADVANCES(
+        "<b>Teachy TV Advances:</b><br>The number of frames to advance using the Teachy TV.<br>These pass at 313x the base framerate.<br>For best accuracy, this value should be divisble by 313",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0, 0 // default, min
+    )
+    , ADVANCES_CALIBRATION(
+        "<b>Advances Calibration:</b><br>Modifies the frame advances passed in the load screen.<br>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0 // default
     )
     , TAKE_PICTURES(
         "<b>Take Pictures of Stats:</b><br>Take pictures of the first two pages of the summary screen.<br>Only applies to gifts. Useful for calibrating your seed and advances.", 
@@ -130,8 +145,11 @@ RNGManipulator::RNGManipulator()
     PA_ADD_OPTION(NUM_RESETS);
     PA_ADD_OPTION(RESET_TYPE);
     PA_ADD_OPTION(SEED_DELAY);
+    PA_ADD_OPTION(SEED_CALIBRATION);
     PA_ADD_OPTION(LOAD_ADVANCES);
     PA_ADD_OPTION(DOUBLE_ADVANCES);
+    PA_ADD_OPTION(TEACHY_ADVANCES);
+    PA_ADD_OPTION(ADVANCES_CALIBRATION);
     PA_ADD_OPTION(TAKE_PICTURES);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -190,9 +208,9 @@ uint64_t wait_for_copyright_text(SingleSwitchProgramEnvironment& env, ProControl
     return std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
 }
 
-void set_seed_after_delay(ProControllerContext& context, SimpleIntegerOption<uint64_t>& SEED_DELAY, int64_t& SEED_OFFSET){
+void set_seed_after_delay(ProControllerContext& context, SimpleIntegerOption<uint64_t>& SEED_DELAY,  SimpleIntegerOption<int64_t>& SEED_CALIBRATION, int64_t& FIXED_SEED_OFFSET){
     // wait on title screen for the specified delay
-    pbf_wait(context, std::chrono::milliseconds(SEED_DELAY + SEED_OFFSET));
+    pbf_wait(context, std::chrono::milliseconds(SEED_DELAY + SEED_CALIBRATION + FIXED_SEED_OFFSET));
     // hold A for a few seconds through the transition to the load screen
     pbf_press_button(context, BUTTON_A, 3000ms, 0ms);
 }
@@ -203,6 +221,24 @@ void load_game_after_delay(ProControllerContext& context, uint64_t& LOAD_DELAY){
     // skip recap
     pbf_press_button(context, BUTTON_B, 33ms, 2467ms);
     // need to later subtract 4000ms from delay to hit desired number of advances
+}
+
+void wait_with_teachy_tv(ProControllerContext& context, uint64_t& TEACHY_DELAY){
+    // open start menu -> bag -> key items -> Teachy TV -> use
+    pbf_press_button(context, BUTTON_PLUS, 200ms, 300ms);
+    pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
+    pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
+    pbf_move_left_joystick(context, {+1, 0}, 200ms, 2300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(TEACHY_DELAY));
+    // close teachy tv -> close bag -> reset start menu cursor position - > close start menu
+    pbf_press_button(context, BUTTON_B, 200ms, 2300ms);
+    pbf_press_button(context, BUTTON_B, 200ms, 2300ms);
+    pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+    pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+    pbf_press_button(context, BUTTON_B, 200ms, 300ms);
+    // total non-teachy delay duration: 13700ms
 }
 
 bool watch_for_shiny_encounter(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -344,19 +380,34 @@ void RNGManipulator::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
     double FRAMERATE = 60.0;        // FPS. tested on Switch 1
 
-    int64_t SEED_OFFSET = -2020;    // milliseconds. tested on Switch 1 against ten-lines seeds
-    int64_t ADVANCES_OFFSET = 162;  // frames. test on Switch 1
+    int64_t FIXED_SEED_OFFSET = -2020;    // milliseconds. tested on Switch 1 against ten-lines seeds
+    int64_t FIXED_ADVANCES_OFFSET = 162;  // frames. test on Switch 1
 
     uint64_t LOAD_DELAY;
     uint64_t DOUBLE_DELAY;
+    uint64_t TEACHY_DELAY;
 
     VideoSnapshot screen;
 
     while (!shiny_found){
-        LOAD_DELAY = uint64_t((LOAD_ADVANCES)/ FRAMERATE * 1000);
-        DOUBLE_DELAY = uint64_t((DOUBLE_ADVANCES + ADVANCES_OFFSET)/ FRAMERATE * 500);
+        bool use_teachy_tv = TEACHY_ADVANCES > 0;
+        if (use_teachy_tv && DOUBLE_ADVANCES < 2000) {
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "When using the Teachy TV, the in-game advances must at least 2000 frames to allow for menu navigation time.",
+                env.console
+            );
+        }
+
+        LOAD_DELAY = uint64_t((LOAD_ADVANCES + ADVANCES_CALIBRATION + FIXED_ADVANCES_OFFSET)/ FRAMERATE * 1000);
+        TEACHY_DELAY = uint64_t(TEACHY_ADVANCES / FRAMERATE * 1000 / 313);
+        DOUBLE_DELAY = uint64_t(DOUBLE_ADVANCES / FRAMERATE * 500) - (use_teachy_tv ? 13700 : 0);
         env.log("Load screen delay: " + std::to_string(LOAD_DELAY) + "ms");
         env.log("In-game delay: " + std::to_string(DOUBLE_DELAY) + "ms");
+        env.log("Teachy TV delay: " + std::to_string(TEACHY_DELAY) + "ms");
+        env.log("Total time: " + std::to_string(SEED_DELAY + SEED_CALIBRATION + FIXED_SEED_OFFSET + LOAD_DELAY + DOUBLE_DELAY + TEACHY_DELAY) + "ms");
+
+
         if (RESET_TYPE == ResetType::hard){
             hard_reset(context);
         }else if (RESET_TYPE == ResetType::soft){
@@ -372,8 +423,11 @@ void RNGManipulator::program(SingleSwitchProgramEnvironment& env, ProControllerC
         uint64_t STARTUP_DELAY = wait_for_copyright_text(env, context);
         env.log("Startup delay: " + std::to_string(STARTUP_DELAY) + "ms");
 
-        set_seed_after_delay(context, SEED_DELAY, SEED_OFFSET);
+        set_seed_after_delay(context, SEED_DELAY, SEED_CALIBRATION, FIXED_SEED_OFFSET);
         load_game_after_delay(context, LOAD_DELAY);
+        if (use_teachy_tv){
+            wait_with_teachy_tv(context, TEACHY_DELAY);
+        }
 
         if (TARGET == Target::starters){
             collect_starter_after_delay(env, context, DOUBLE_DELAY);
