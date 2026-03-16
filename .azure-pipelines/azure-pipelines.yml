@@ -409,7 +409,7 @@ stages:
                 echo "=== Encrypting build artifact with password ==="
                 7z a -tzip -mx=9 "-p$ARTIFACT_PASSWORD" -mem=AES256 "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).zip" "$FOLDER_NAME"
             else
-                tar -I "gzip -9" -cvf $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).tar.gz "$FOLDER_NAME"
+                7z a -tzip -mx=9 "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).zip" "$FOLDER_NAME"
             fi
           
           echo "=== AppImage build complete with enclosing folder: $FOLDER_NAME ==="
@@ -432,24 +432,11 @@ stages:
           path: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-symbols'
         condition: succeeded()
 
-      - script: |
-          BUILD_TYPE="${{ parameters.buildType }}"
-          if [ "$BUILD_TYPE" = "PrivateBeta" ]; then
-              EXT="zip"
-          else
-              EXT="tar.gz"
-          fi
-
-          ARTIFACT_PATH_UBUNTU="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).$EXT"
-          echo "##vso[task.setvariable variable=ARTIFACT_PATH_UBUNTU]$ARTIFACT_PATH_UBUNTU"
-        displayName: 'Set artifact path'
-        condition: succeeded()
-
       - task: PublishBuildArtifacts@1
         displayName: 'Publish SerialPrograms'
         condition: succeeded()
         inputs:
-          PathtoPublish: '$(ARTIFACT_PATH_UBUNTU)'
+          PathtoPublish: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).zip'
           ArtifactName: 'SerialPrograms-Linux-$(compiler)-$(architecture)'
 
 ###########################################
