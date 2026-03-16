@@ -4,7 +4,9 @@
  *
  */
 
-
+#include "CommonFramework/Globals.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "ResourceDownloadTable.h"
 
 namespace PokemonAutomation{
@@ -40,7 +42,7 @@ ResourceDownloadRow::ResourceDownloadRow(
 ResourceDownloadTable::ResourceDownloadTable()
     : StaticTableOption("<b>Resource Downloading:</b><br>Download resources not included in the initial download of the program.", LockMode::LOCK_WHILE_RUNNING, false)
 {
-    add_row(std::make_unique<ResourceDownloadRow>("PaddleOCR", 1000000));
+    add_rows_from_resource_list_json();
 
     finish_construction();
 }
@@ -52,6 +54,28 @@ std::vector<std::string> ResourceDownloadTable::make_header() const{
         "",
     };
     return ret;
+}
+
+
+void ResourceDownloadTable::add_rows_from_resource_list_json(){
+    JsonValue json = load_json_file(RESOURCE_PATH() + "ResourceList.json");
+
+    try{
+        const JsonObject& obj = json.to_object_throw();
+        const JsonArray& resource_list = obj.get_array_throw("resourceList");
+        for (const JsonValue& resource_val : resource_list){
+            const JsonObject& resource_obj = resource_val.to_object_throw();
+
+            std::string resource_name = resource_obj.get_string_throw("resourceName");
+            int64_t decompressed_bytes = resource_obj.get_integer_throw("DecompressedBytes");
+
+            add_row(std::make_unique<ResourceDownloadRow>(std::move(resource_name), decompressed_bytes));
+        }
+
+    }catch (ParseException& e){
+        throw ParseException(e.message() + "\nJSON parsing error. Given JSON file doesn't match the expected format.");
+    }
+
 }
 
 

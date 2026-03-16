@@ -53,6 +53,9 @@ public:
 
     virtual std::vector<std::string> make_header() const override;
 
+    void add_rows_from_resource_list_json();
+
+
 };
 
 
