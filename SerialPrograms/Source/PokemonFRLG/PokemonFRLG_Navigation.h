@@ -19,6 +19,23 @@ namespace NintendoSwitch{
     using ProControllerContext = ControllerContext<ProController>;
 namespace PokemonFRLG{
 
+enum class KantoFlyLocation{
+    pallettown,
+    viridiancity,
+    pewtercity,
+    route4,
+    ceruleancity,
+    vermilioncity,
+    route10,
+    lavendertown,
+    celadoncity,
+    saffroncity,
+    fuschiacity,
+    cinnabarisland,
+    indigoplateau,
+};
+
+
 // Press A+B+Select+Start at the same time to soft reset, then re-enters the game.
 // There are two random waits, one before pressing start and another after loading in the game.
 // This is to prevent repeatedly getting the same pokemon, due to FRLG's RNG.
@@ -40,9 +57,18 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context);
 // Assumes that the Pokemon will not evolve
 bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, bool stop_on_move_learn);
 
+// Starting from the start menu, a sub-screen of the start menu, or the overworld, navigate to the party screen
+void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context);
+
 // Uses Teleport to return to a PokeCenter. 
 // Assumes that Teleport is usable and the last party member has it learned
 void use_teleport(ConsoleHandle& console, ProControllerContext& context);
+
+// Navigates to the fly map. Assumes that a fly user is the last member of your party
+void open_fly_map_from_overworld(ConsoleHandle& console, ProControllerContext& context);
+
+// Starting from the Kanto Fly map, fly to a specified location.
+void fly_from_kanto_map(ConsoleHandle& console, ProControllerContext& context, KantoFlyLocation destination);
 
 // Enter a pokecenter. Assumes the player is standing in front of its door
 void enter_pokecenter(ConsoleHandle& console, ProControllerContext& context);
@@ -53,9 +79,6 @@ void leave_pokecenter(ConsoleHandle& console, ProControllerContext& context);
 // Approach the counter and heal at a PokeCenter. Assumed the player is directly south of the nurse
 // Combine with enter_pokecenter, leave_pokecenter, and use_teleport for automating healing your party
 void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context);
-
-// Starting from the start menu, a sub-screen of the start menu, or the overworld, navigate to the party screen
-void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context);
 
 // Go to home to check that scaling is 100%. Then resume game.
 void home_black_border_check(ConsoleHandle& console, ProControllerContext& context);

@@ -24,6 +24,7 @@
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
+#include "PokemonFRLG/Inference/Map/PokemonFRLG_MapDetector.h"
 #include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 #include "PokemonFRLG_Navigation.h"
 
@@ -445,6 +446,60 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
     }
 }
 
+void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context){
+    uint16_t errors = 0;
+    bool start_menu_is_open = false;
+    while (true){
+        if (errors > 5){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to open party menu 5 times in a row.",
+                console
+            );
+        }
+
+        context.wait_for_all_requests();
+        if (!start_menu_is_open){
+            open_start_menu(console, context); // This is unavoidable since we cannot detect the overworld.
+            start_menu_is_open = true;
+        }
+
+        StartMenuWatcher start_menu(COLOR_RED);
+        PartyMenuWatcher party_menu(COLOR_RED);
+
+        int ret = wait_until(
+            console, context, 10000ms,
+            { start_menu, party_menu }
+        );
+
+        switch (ret){
+        case 0:
+            ret = move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::POKEMON);
+            if (ret < 0){
+                console.log("Failed to navigate to POKEMON on the start menu.");
+                errors++;
+                context.wait_for_all_requests();
+                pbf_mash_button(context, BUTTON_B, 2000ms);
+                start_menu_is_open = false;
+            } else {
+                console.log("Navigated to POKEMON on the start menu");
+                context.wait_for_all_requests();
+                pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+            }
+            continue;
+        case 1:
+            console.log("Party menu opened.");
+            return;
+        default:
+            console.log("Failed to open party menu.");
+            errors++;
+            pbf_mash_button(context, BUTTON_B, 2000ms);
+            start_menu_is_open = false;
+            continue;
+        }
+    }
+}
+
 void use_teleport(ConsoleHandle& console, ProControllerContext& context){
     uint16_t errors = 0;
     
@@ -505,6 +560,167 @@ void use_teleport(ConsoleHandle& console, ProControllerContext& context){
         console.log("Used Teleport.");
         return;
     }
+}
+
+void open_fly_map_from_overworld(ConsoleHandle& console, ProControllerContext& context){
+    uint16_t errors = 0;
+    while (true){
+        if (errors > 5){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to open Fly map 5 times in a row.",
+                console
+            );
+        }
+
+        open_party_menu_from_overworld(console, context);
+        // navigate to last party slot
+        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+
+        PartySelectionWatcher fly_user_selected(COLOR_RED);
+
+        context.wait_for_all_requests();
+        int ret = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context) {
+                pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+            },
+            { fly_user_selected }
+        );
+
+        if (ret < 0){
+            console.log("Failed to select Fly user.");
+            errors++;
+            pbf_mash_button(context, BUTTON_B, 3000ms);
+            continue;
+        }
+        
+        // select Fly (2nd option, but maybe other HMs could change this)
+        KantoMapWatcher map_opened(COLOR_RED);
+        context.wait_for_all_requests();
+        pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
+        pbf_press_button(context, BUTTON_A, 200ms, 0ms);
+        ret = wait_until(
+            console, context, 20000ms,
+            {map_opened}
+        );
+
+        if (ret < 0){
+            console.log("Failed to detect Kanto map");
+            errors++;
+            pbf_mash_button(context, BUTTON_B, 4000ms);
+            continue;
+        }
+
+        pbf_wait(context, 1000ms);
+        context.wait_for_all_requests();
+        console.log("Kanto map detected.");
+        return;
+    }
+}
+
+void fly_from_kanto_map(ConsoleHandle& console, ProControllerContext& context, KantoFlyLocation destination){
+    uint64_t errors = 0;
+    
+    while (true){
+        if (errors > 5){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to inititate Fly five times in a row.",
+                console
+            ); 
+        }
+
+        pbf_move_left_joystick(context, {-1, +1}, 4000ms, 500ms);
+        context.wait_for_all_requests();
+
+        switch (destination){
+        case KantoFlyLocation::pallettown:
+            pbf_move_left_joystick(context, {0, -1}, 850ms, 100ms);
+            pbf_move_left_joystick(context, {+1, 0}, 317ms, 100ms);
+            break;
+        case KantoFlyLocation::viridiancity:
+            pbf_move_left_joystick(context, {0, -1}, 633ms, 100ms);
+            pbf_move_left_joystick(context, {+1, 0}, 317ms, 100ms);
+            break;
+        case KantoFlyLocation::pewtercity:
+            pbf_move_left_joystick(context, {0, -1}, 317ms, 100ms);
+            pbf_move_left_joystick(context, {+1, 0}, 317ms, 100ms);
+            break;
+        case KantoFlyLocation::route4:
+            pbf_move_left_joystick(context, {0, -1}, 233ms, 100ms);
+            pbf_move_left_joystick(context, {+1, 0}, 633ms, 100ms);
+            break;
+        case KantoFlyLocation::ceruleancity:
+            pbf_move_left_joystick(context, {0, -1}, 233ms, 100ms);
+            pbf_move_left_joystick(context, {+1, 0}, 1150ms, 100ms);
+            break;
+        case KantoFlyLocation::vermilioncity:
+            pbf_move_left_joystick(context, {0, -1}, 700ms, 100ms);
+            pbf_move_left_joystick(context, {+1, 0}, 1150ms, 100ms);
+            break;
+        case KantoFlyLocation::route10:
+            pbf_move_left_joystick(context, {0, -1}, 233ms, 100ms);
+            pbf_move_left_joystick(context, {+1, 0}, 1500ms, 100ms);
+            break;
+        case KantoFlyLocation::lavendertown:
+            pbf_move_left_joystick(context, {0, -1}, 467ms, 100ms);
+            pbf_move_left_joystick(context, {+1, 0}, 1500ms, 100ms);
+            break;
+        case KantoFlyLocation::celadoncity:
+            pbf_move_left_joystick(context, {0, -1}, 467ms, 100ms);
+            pbf_move_left_joystick(context, {+1, 0}, 900ms, 100ms);
+            break;
+        case KantoFlyLocation::saffroncity:
+            pbf_move_left_joystick(context, {0, -1}, 467ms, 100ms);
+            pbf_move_left_joystick(context, {+1, 0}, 1150ms, 100ms);
+            break;
+        case KantoFlyLocation::fuschiacity:
+            pbf_move_left_joystick(context, {0, -1}, 967ms, 100ms);
+            pbf_move_left_joystick(context, {+1, 0}, 967ms, 100ms);
+            break;
+        case KantoFlyLocation::cinnabarisland:
+            pbf_move_left_joystick(context, {0, -1}, 1100ms, 100ms);
+            pbf_move_left_joystick(context, {+1, 0}, 317ms, 100ms);
+            break;
+        case KantoFlyLocation::indigoplateau:
+            pbf_move_left_joystick(context, {0, -1}, 200ms, 100ms);
+            pbf_move_left_joystick(context, {+1, 0}, 150ms, 100ms);
+            break;
+        default:
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unimplemented Kanto fly target.",
+                console
+            );
+        }
+
+        BlackScreenWatcher fly_initiated(COLOR_RED);
+        context.wait_for_all_requests();
+        int ret = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context) {
+                // walk up to counter and initiate dialog
+                pbf_mash_button(context, BUTTON_A, 5000ms);
+            },
+            { fly_initiated }
+        );
+        
+        pbf_wait(context, 8000ms);
+        context.wait_for_all_requests();
+
+        if (ret == 0) {
+            console.log("Fly initiated.");
+            return;
+        }else{
+            errors++;
+            console.log("Failed to detect black screen within 5 seconds of attempting to fly.");
+            continue;
+        }
+
+    }
+    
 }
 
 void enter_leave_pokecenter(ConsoleHandle& console, ProControllerContext& context, bool leave){
@@ -588,60 +804,6 @@ void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context){
         pbf_mash_button(context, BUTTON_B, 5000ms);
         context.wait_for_all_requests();
         return;
-    }
-}
-
-void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context){
-    uint16_t errors = 0;
-    bool start_menu_is_open = false;
-    while (true){
-        if (errors > 5){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Failed to open party menu 5 times in a row.",
-                console
-            );
-        }
-
-        context.wait_for_all_requests();
-        if (!start_menu_is_open){
-            open_start_menu(console, context); // This is unavoidable since we cannot detect the overworld.
-            start_menu_is_open = true;
-        }
-
-        StartMenuWatcher start_menu(COLOR_RED);
-        PartyMenuWatcher party_menu(COLOR_RED);
-
-        int ret = wait_until(
-            console, context, 10000ms,
-            { start_menu, party_menu }
-        );
-
-        switch (ret){
-        case 0:
-            ret = move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::POKEMON);
-            if (ret < 0){
-                console.log("Failed to navigate to POKEMON on the start menu.");
-                errors++;
-                context.wait_for_all_requests();
-                pbf_mash_button(context, BUTTON_B, 2000ms);
-                start_menu_is_open = false;
-            } else {
-                console.log("Navigated to POKEMON on the start menu");
-                context.wait_for_all_requests();
-                pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-            }
-            continue;
-        case 1:
-            console.log("Party menu opened.");
-            return;
-        default:
-            console.log("Failed to open party menu.");
-            errors++;
-            pbf_mash_button(context, BUTTON_B, 2000ms);
-            start_menu_is_open = false;
-            continue;
-        }
     }
 }
 
