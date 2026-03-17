@@ -157,24 +157,34 @@ stages:
           & "C:/Qt/$(qt_version)/msvc2022_64/bin/windeployqt.exe" --dir "$BUILD_CACHE" --release "$APP_EXE"
           New-Item -ItemType Directory -Force -Path $SYMBOLS_CACHE | Out-Null
 
-          Write-Host "=== Excluding unnecessary files from deployment ==="
-          Remove-Item -Path "$BUILD_CACHE/opencv_world4120d.dll" -ErrorAction SilentlyContinue
-          Remove-Item -Path "$BUILD_CACHE/translations" -Recurse -Force -ErrorAction SilentlyContinue
-          Remove-Item -Path "$BUILD_CACHE/generic" -Recurse -Force -ErrorAction SilentlyContinue
-
           Write-Host "=== windeployqt complete ==="
         displayName: 'Deploy app'
         condition: succeeded()
 
       - powershell: |
           echo "=== Copying resources==="
-          robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/Packages/Resources      $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/Resources /s
-          robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/Packages/Firmware       $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/Firmware /s
-          robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)   $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/Binaries64 *.dll
-          robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)   $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/Binaries64 SerialPrograms.exe
-          robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)   $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-symbols/ SerialPrograms.pdb
-          Write-Host "Robocopy exited with exit code:" $LASTEXITCODE
-          if ($LASTEXITCODE -eq 1) { exit 0 } else { exit 1 }
+          $PACKAGES_DIR = "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/Packages" 
+          $BUILD_DIR = "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
+          $BINARIES_DIR = "$BUILD_DIR/cache-build/Binaries64"
+
+          function Invoke-Robocopy {
+              robocopy @args
+              if ($LASTEXITCODE -ge 8) {
+                  Write-Host "Robocopy failed with exit code:" $LASTEXITCODE
+                  exit 1
+              }
+          }
+
+          Invoke-Robocopy $PACKAGES_DIR/Resources $BUILD_DIR/cache-build/Resources /s
+          Invoke-Robocopy $PACKAGES_DIR/Firmware  $BUILD_DIR/cache-build/Firmware /s
+          Invoke-Robocopy $BUILD_DIR              $BINARIES_DIR *.dll
+          Invoke-Robocopy $BUILD_DIR              $BINARIES_DIR SerialPrograms.exe
+          Invoke-Robocopy $BUILD_DIR              $BUILD_DIR/cache-symbols/ SerialPrograms.pdb
+
+          Write-Host "=== Excluding unnecessary files from deployment ==="
+          Remove-Item -Path "$BINARIES_DIR/opencv_world4120d.dll" -ErrorAction SilentlyContinue
+          Remove-Item -Path "$BINARIES_DIR/translations"          -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -Path "$BINARIES_DIR/generic"               -Recurse -Force -ErrorAction SilentlyContinue
         displayName: 'Copy resources'
         condition: succeeded()
 
