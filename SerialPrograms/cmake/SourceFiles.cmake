@@ -289,17 +289,20 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/TimeQt.h
     ../Common/Qt/WidgetStackFixedAspectRatio.cpp
     ../Common/Qt/WidgetStackFixedAspectRatio.h
-    ../Common/PABotBase2/PABotBase2_Connection.h
-    ../Common/PABotBase2/PABotBase2_ConnectionDebug.c
-    ../Common/PABotBase2/PABotBase2_ConnectionDebug.h
-    ../Common/PABotBase2/PABotBase2_PacketParser.c
-    ../Common/PABotBase2/PABotBase2_PacketParser.h
-    ../Common/PABotBase2/PABotBase2_PacketSender.c
-    ../Common/PABotBase2/PABotBase2_PacketSender.h
-    ../Common/PABotBase2/PABotbase2_ReliableStreamConnection.c
-    ../Common/PABotBase2/PABotbase2_ReliableStreamConnection.h
-    ../Common/PABotBase2/PABotBase2_StreamCoalescer.c
-    ../Common/PABotBase2/PABotBase2_StreamCoalescer.h
+    ../Common/PABotBase2/ConnectionLayer/PABotBase2_Connection.h
+    ../Common/PABotBase2/ConnectionLayer/PABotBase2_ConnectionDebug.c
+    ../Common/PABotBase2/ConnectionLayer/PABotBase2_ConnectionDebug.h
+    ../Common/PABotBase2/ConnectionLayer/PABotBase2_PacketParser.c
+    ../Common/PABotBase2/ConnectionLayer/PABotBase2_PacketParser.h
+    ../Common/PABotBase2/ConnectionLayer/PABotBase2_PacketSender.c
+    ../Common/PABotBase2/ConnectionLayer/PABotBase2_PacketSender.h
+    ../Common/PABotBase2/ConnectionLayer/PABotbase2_ReliableStreamConnection.c
+    ../Common/PABotBase2/ConnectionLayer/PABotbase2_ReliableStreamConnection.h
+    ../Common/PABotBase2/ConnectionLayer/PABotBase2_StreamCoalescer.c
+    ../Common/PABotBase2/ConnectionLayer/PABotBase2_StreamCoalescer.h
+    ../Common/PABotBase2/DataLayer/PABotBase2_Controller_HID_Keyboard.h
+    ../Common/PABotBase2/DataLayer/PABotBase2_Controller_NS_WiredController.h
+    ../Common/PABotBase2/DataLayer/PABotBase2_Controller_NS1_OemController.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_HID_Keyboard.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS1_OemControllers.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS_WiredController.h

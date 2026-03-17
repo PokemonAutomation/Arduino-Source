@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PABotBase2_StreamCoalescer_H
-#define PokemonAutomation_PABotBase2_StreamCoalescer_H
+#ifndef PokemonAutomation_PABotBase2_ConnectionLayer_StreamCoalescer_H
+#define PokemonAutomation_PABotBase2_ConnectionLayer_StreamCoalescer_H
 
 #include "PABotBase2_Connection.h"
 

@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PABotBase2_ConnectionProtocol_H
-#define PokemonAutomation_PABotBase2_ConnectionProtocol_H
+#ifndef PokemonAutomation_PABotBase2_ConnectionLayer_ConnectionProtocol_H
+#define PokemonAutomation_PABotBase2_ConnectionLayer_ConnectionProtocol_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -25,7 +25,7 @@ extern "C" {
 
 
 #define PABB2_CONNECTION_MAGIC_NUMBER                   0x81
-#define PABB2_CONNECTION_PROTOCOL_VERSION               2023011700
+#define PABB2_CONNECTION_PROTOCOL_VERSION               2025011700
 
 
 //
