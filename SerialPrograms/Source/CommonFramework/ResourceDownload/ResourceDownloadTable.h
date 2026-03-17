@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Options/LabelCellOption.h"
 #include "Common/Cpp/Options/StaticTableOption.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 
 namespace PokemonAutomation{
 
@@ -49,7 +50,7 @@ public:
 private:
     std::string resource_version_to_string(ResourceVersion version);
 
-private:
+public:
     LabelCellOption m_resource_name;
 
     size_t m_file_size;
@@ -81,6 +82,7 @@ struct DownloadedResource{
 
 class ResourceDownloadTable : public StaticTableOption{
 public:
+    ~ResourceDownloadTable();
     ResourceDownloadTable();
 
     virtual std::vector<std::string> make_header() const override;
@@ -90,12 +92,16 @@ private:
     std::vector<std::unique_ptr<ResourceDownloadRow>> get_resource_download_rows();
     void add_resource_download_rows();
 
+    void check_all_resource_versions();
+
 
 private:
     std::vector<DownloadedResource> m_resources;
 
     // we need to keep a handle on each Row, so that we can edit m_is_downloaded_label later on.
     std::vector<std::unique_ptr<ResourceDownloadRow>> m_resource_rows;
+
+    AsyncTask m_worker;
 
 };
 
