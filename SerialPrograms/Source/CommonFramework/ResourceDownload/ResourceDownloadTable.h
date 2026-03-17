@@ -28,21 +28,39 @@ public:
     ResourceDownloadRow& option;
 };
 
+enum class ResourceVersion{
+    CURRENT,
+    OUTDATED,
+    NOT_APPLICABLE,
+    BLANK,
+};
+
 class ResourceDownloadRow : public StaticTableRow{
 
 public:
     // ~ResourceDownloadRow();
     ResourceDownloadRow(
         std::string&& resource_name,
+        size_t file_size,
         bool is_downloaded,
-        size_t file_size
+        ResourceVersion version
     );
 
+private:
+    std::string resource_version_to_string(ResourceVersion version);
+
+private:
     LabelCellOption m_resource_name;
-    bool m_is_downloaded;
-    LabelCellOption m_is_downloaded_label;
+
     size_t m_file_size;
     LabelCellOption m_file_size_label;
+
+    bool m_is_downloaded;
+    LabelCellOption m_is_downloaded_label;
+
+    ResourceVersion m_version;
+    LabelCellOption m_version_label;
+
     ResourceDownloadButton m_download_button;
     ResourceDeleteButton m_delete_button;
 
@@ -67,6 +85,7 @@ public:
 
     virtual std::vector<std::string> make_header() const override;
 
+private:
     std::vector<DownloadedResource> deserialize_resource_list_json();
     std::vector<std::unique_ptr<ResourceDownloadRow>> get_resource_download_rows();
     void add_resource_download_rows();
