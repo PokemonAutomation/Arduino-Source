@@ -5,12 +5,18 @@
  */
 
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Filesystem.h"
 #include "ResourceDownloadTable.h"
 
 #include <filesystem>
+#include <thread>
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -66,6 +72,10 @@ std::string ResourceDownloadRow::resource_version_to_string(ResourceVersion vers
     }
 }
 
+ResourceDownloadTable::~ResourceDownloadTable(){
+    m_worker.wait_and_ignore_exceptions();
+}
+
 ResourceDownloadTable::ResourceDownloadTable()
     : StaticTableOption("<b>Resource Downloading:</b><br>Download resources not included in the initial download of the program.", LockMode::LOCK_WHILE_RUNNING, false)
     , m_resources(deserialize_resource_list_json())
@@ -74,6 +84,13 @@ ResourceDownloadTable::ResourceDownloadTable()
     add_resource_download_rows();
 
     finish_construction();
+
+    m_worker = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+        [this]{ 
+            // cout << "hello1" << endl;
+            check_all_resource_versions(); 
+        }
+    );
 }
 std::vector<std::string> ResourceDownloadTable::make_header() const{
     std::vector<std::string> ret{
@@ -137,7 +154,7 @@ std::vector<std::unique_ptr<ResourceDownloadRow>> ResourceDownloadTable::get_res
         std::string resource_name = resource.resource_name;
         ResourceVersion version = ResourceVersion::BLANK;
 
-        Filesystem::Path filepath{RUNTIME_BASE_PATH() + "DownloadedResources/" + resource_name};
+        Filesystem::Path filepath{DOWNLOADED_RESOURCE_PATH() + resource_name};
         bool is_downloaded = std::filesystem::is_directory(filepath);
 
         resource_rows.emplace_back(std::make_unique<ResourceDownloadRow>(std::move(resource_name), resource.size_decompressed_bytes, is_downloaded, version));
@@ -153,6 +170,16 @@ void ResourceDownloadTable::add_resource_download_rows(){
     }
 }
 
+void ResourceDownloadTable::check_all_resource_versions(){
+
+    // test code
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+
+    for (auto& row_ptr : m_resource_rows){
+        row_ptr->m_version_label.set_text("Hi");
+    }
+
+}
 
 
 
