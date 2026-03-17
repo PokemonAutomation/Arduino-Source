@@ -38,8 +38,13 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    // Run the battle loop. Return true if the program should stop.
-    bool battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]);
+    enum class BattleOutcome {
+        FINISHED,
+        FAILED_START,
+        MOVE_LEARN
+    };
+    // Run the battle loop. Returns the outcome of the battle attempt.
+    BattleOutcome battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]);
     // Check for items generated through the Pickup ability
     void check_pickup_items(
         ProControllerContext& context,
@@ -53,12 +58,13 @@ private:
         const std::vector<ImagePixelBox>& bubbles
     );
     void recover_from_failed_battle_start(
+        SingleSwitchProgramEnvironment& env, 
         ProControllerContext& context
     );
     bool heal_after_battle_and_return(
         SingleSwitchProgramEnvironment& env,
         VideoStream& stream, ProControllerContext& context,
-        uint8_t pp0[4], uint8_t pp1[4]
+        uint8_t pp0[4], uint8_t pp1[4], bool has_pickup_mons
     );
     // Starting in front of the Celestic Town Pokecenter, heal and return
     // to the Ace Trainer pair.

@@ -137,7 +137,7 @@ MoneyFarmerRoute210::MoneyFarmerRoute210()
 
 
 
-bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]){
+MoneyFarmerRoute210::BattleOutcome MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]){
     MoneyFarmerRoute210_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute210_Descriptor::Stats>();
 
     env.log("Starting battle!");
@@ -161,7 +161,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
             stats.m_errors++;
             env.log("Failed to detect start of battle after 20 seconds.", COLOR_RED);
             pbf_mash_button(context, BUTTON_B, 1000ms);
-            return false;
+            return BattleOutcome::FAILED_START;
         }
     }
     pbf_wait(context, 5000ms);
@@ -247,7 +247,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
         case 1:
             env.log("Battle finished!", COLOR_BLUE);
             pbf_mash_button(context, BUTTON_B, 2000ms);
-            return false;
+            return BattleOutcome::FINISHED;
         case 2:
             env.log("Detected move learn!", COLOR_BLUE);
             if (ON_LEARN_MOVE == OnLearnMove::DONT_LEARN){
@@ -255,7 +255,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
                 break;
             }
-            return true;
+            return BattleOutcome::MOVE_LEARN;
         default:
             stats.m_errors++;
             OperationFailedException::fire(
@@ -293,10 +293,12 @@ void MoneyFarmerRoute210::move_to_trainer(SingleSwitchProgramEnvironment& env, P
     
     if (!closest) return;
     
+    pbf_press_dpad(context, DPAD_RIGHT, 200ms, 0ms);
+    
     if (closest->min_x < 350) {
         // The trainer who wants to battle is to the far-left, behind the other trainer
-        pbf_press_dpad(context, DPAD_UP, 400ms, 0ms);
-        pbf_press_dpad(context, DPAD_LEFT, 500ms, 0ms);
+        //pbf_press_dpad(context, DPAD_UP, 400ms, 0ms);
+        //pbf_press_dpad(context, DPAD_LEFT, 500ms, 0ms);
         pbf_mash_button(context, BUTTON_A, 1000ms);
         context.wait_for_all_requests();
         pbf_press_dpad(context, DPAD_DOWN, 400ms, 0ms);
@@ -311,7 +313,7 @@ void MoneyFarmerRoute210::move_to_trainer(SingleSwitchProgramEnvironment& env, P
             context.wait_for_all_requests();
         } else {
             // The trainer who wants to battle is on our left, right next to us
-            pbf_press_dpad(context, DPAD_LEFT, 400ms, 0ms);
+            //pbf_press_dpad(context, DPAD_LEFT, 400ms, 0ms);
         }
     } else if (closest->min_x < 560) {
         // The trainer who wants to battle is right above us
@@ -323,18 +325,20 @@ void MoneyFarmerRoute210::move_to_trainer(SingleSwitchProgramEnvironment& env, P
         context.wait_for_all_requests();
     }
     
-    pbf_mash_button(context, BUTTON_A, 1000ms);
+    //pbf_mash_button(context, BUTTON_A, 1000ms);
     context.wait_for_all_requests();
 }
 
-void MoneyFarmerRoute210::recover_from_failed_battle_start(ProControllerContext& context){
+void MoneyFarmerRoute210::recover_from_failed_battle_start(
+   SingleSwitchProgramEnvironment& env,
+   ProControllerContext& context
+){
     env.log("Recovering from failed battle start – moving to safe position.");
     
-    pbf_move_left_joystick(context, {0, +1}, 2000ms, 0ms);
-    pbf_move_left_joystick(context, {+1, 0}, 2000ms, 0ms);
-    pbf_move_left_joystick(context, {0, -1}, 4000ms, 0ms);
-    // Wait a bit to ensure we're settled.
-    pbf_wait(context, 500ms);
+    pbf_press_dpad(context, DPAD_LEFT, 600ms, 0ms);
+    pbf_press_dpad(context, DPAD_UP, 1000ms, 0ms);
+    pbf_press_dpad(context, DPAD_LEFT, 1000ms, 0ms);
+    pbf_press_dpad(context, DPAD_DOWN, 5000ms, 0ms);
     context.wait_for_all_requests();
 }
     
@@ -441,9 +445,17 @@ void MoneyFarmerRoute210::fly_to_center_heal_and_return(
 bool MoneyFarmerRoute210::heal_after_battle_and_return(
     SingleSwitchProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context,
-    uint8_t pp0[4], uint8_t pp1[4])
+    uint8_t pp0[4], uint8_t pp1[4], bool has_pickup_mons)
 {
     if (HEALING_METHOD == HealMethod::CelesticTown){
+        if (has_pickup_mons){
+            // Move the menu cursor back to the Pokemon icon
+            pbf_press_button(context, BUTTON_X, 40ms, 600ms);
+            pbf_press_dpad(context, DPAD_UP, 80ms, 600ms);
+            pbf_press_dpad(context, DPAD_RIGHT, 80ms, 600ms);
+            pbf_wait(context, 400ms);
+            pbf_mash_button(context, BUTTON_B, 1000ms);
+        }
         // Go to Celestic Town Pokecenter to heal the party.
         fly_to_center_heal_and_return(stream.logger(), context, pp0, pp1);
         return false;
@@ -578,20 +590,23 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
         }
 
         // Attempt the battle
-        bool battle_success = battle(env, context, pp0, pp1);
-        if (!battle_success) {
+        BattleOutcome outcome = battle(env, context, pp0, pp1);
+        if (outcome == BattleOutcome::FAILED_START) {
             consecutive_failures++;
-            if (consecutive_failers >= 3) {
-                heal_after_battle_and_return(env, env.console, context, pp0, pp1);
+            if (consecutive_failures > 3) {
+                stats.m_errors++;
+                env.log("Battle did not 4 times in a row. Flying back.");
+                heal_after_battle_and_return(env, env.console, context, pp0, pp1, has_pickup_mons);
+                consecutive_failures = 0;
             }
             env.log("Battle did not start. Recovering and retrying.");
-            recover_from_failed_battle_start(context);
+            recover_from_failed_battle_start(env, context);
             continue;
         }
         pickup_counter++;
         
         if (!has_pp(pp0, pp1)){
-            need_to_charge = heal_after_battle_and_return(env, env.console, context, pp0, pp1);
+            need_to_charge = heal_after_battle_and_return(env, env.console, context, pp0, pp1, has_pickup_mons);
             continue;
         }
     }
