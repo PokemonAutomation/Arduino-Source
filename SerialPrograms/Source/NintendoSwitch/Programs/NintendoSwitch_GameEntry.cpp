@@ -274,7 +274,8 @@ void resume_game_from_home(
 
         //  In case we failed to enter the game.
         HomeMenuWatcher home_detector(console);
-        if (home_detector.detect(console.video().snapshot())){
+        auto snapshot = console.video().snapshot();
+        if (home_detector.detect(snapshot)){
             console.log("Failed to re-enter game. Trying again...", COLOR_RED);
             pbf_press_button(context, BUTTON_HOME, 80ms, 80ms);
             continue;
