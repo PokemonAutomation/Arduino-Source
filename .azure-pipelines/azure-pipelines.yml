@@ -170,7 +170,7 @@ stages:
           function Invoke-Robocopy {
               robocopy @args
               if ($LASTEXITCODE -ge 8) {
-                  throw "Robocopy failed with exit code:" $LASTEXITCODE
+                  throw "Robocopy failed with exit code: $LASTEXITCODE"
               }
           }
 
