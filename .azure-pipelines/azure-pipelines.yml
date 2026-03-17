@@ -228,7 +228,7 @@ stages:
           $name = "SerialPrograms-Windows-$(compiler)-$(architecture)"
           $buildType = "${{ parameters.buildType }}"
 
-          $artifactSubdir = Join-Path $root "cache-artifacts" $name
+          $artifactSubdir = Join-Path $root "cache-artifacts/$name"
           $zipPath = Join-Path $artifactSubdir "$name.zip"
           New-Item -ItemType Directory -Force -Path $artifactSubdir | Out-Null
 
