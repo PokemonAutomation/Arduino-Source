@@ -7,7 +7,10 @@
 #include "CommonFramework/Globals.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/Filesystem.h"
 #include "ResourceDownloadTable.h"
+
+#include <filesystem>
 
 namespace PokemonAutomation{
 
@@ -110,8 +113,11 @@ std::vector<DownloadedResource> ResourceDownloadTable::deserialize_resource_list
 std::vector<std::unique_ptr<ResourceDownloadRow>> ResourceDownloadTable::get_resource_download_rows(){
     std::vector<std::unique_ptr<ResourceDownloadRow>> resource_rows;
     for (const DownloadedResource& resource : m_resources){
-        bool is_downloaded = false;
         std::string resource_name = resource.resource_name;
+        
+        Filesystem::Path filepath{RUNTIME_BASE_PATH() + "DownloadedResources/" + resource_name};
+        bool is_downloaded = std::filesystem::is_directory(filepath);
+
         resource_rows.emplace_back(std::make_unique<ResourceDownloadRow>(std::move(resource_name), is_downloaded, resource.size_decompressed_bytes));
     }
 
