@@ -170,21 +170,22 @@ stages:
           function Invoke-Robocopy {
               robocopy @args
               if ($LASTEXITCODE -ge 8) {
-                  Write-Host "Robocopy failed with exit code:" $LASTEXITCODE
-                  exit 1
+                  throw "Robocopy failed with exit code:" $LASTEXITCODE
               }
           }
 
           Invoke-Robocopy $PACKAGES_DIR/Resources $BUILD_DIR/cache-build/Resources /s
-          Invoke-Robocopy $PACKAGES_DIR/Firmware  $BUILD_DIR/cache-build/Firmware /s
-          Invoke-Robocopy $BUILD_DIR              $BINARIES_DIR *.dll
-          Invoke-Robocopy $BUILD_DIR              $BINARIES_DIR SerialPrograms.exe
-          Invoke-Robocopy $BUILD_DIR              $BUILD_DIR/cache-symbols/ SerialPrograms.pdb
+          Invoke-Robocopy $PACKAGES_DIR/Firmware  $BUILD_DIR/cache-build/Firmware  /s
+          Invoke-Robocopy $BUILD_DIR              $BINARIES_DIR                    *.dll
+          Invoke-Robocopy $BUILD_DIR              $BINARIES_DIR                    SerialPrograms.exe
+          Invoke-Robocopy $BUILD_DIR              $BUILD_DIR/cache-symbols/        SerialPrograms.pdb
 
           Write-Host "=== Excluding unnecessary files from deployment ==="
           Remove-Item -Path "$BINARIES_DIR/opencv_world4120d.dll" -ErrorAction SilentlyContinue
           Remove-Item -Path "$BINARIES_DIR/translations"          -Recurse -Force -ErrorAction SilentlyContinue
           Remove-Item -Path "$BINARIES_DIR/generic"               -Recurse -Force -ErrorAction SilentlyContinue
+
+          exit 0
         displayName: 'Copy resources'
         condition: succeeded()
 
