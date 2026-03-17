@@ -49,6 +49,11 @@ uint64_t open_slot_six(ConsoleHandle& console, ProControllerContext& context);
 // For soft resets, send_out_lead as false and then soft_reset() to save time.
 bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, bool send_out_lead);
 
+// Mash A to keep using the first move until a Pokemon faints (either the player's or the opponent)
+// Flees the battle if out of PP.
+// returns 0 if the opponent fainted, 1 if the player Pokemon fainted, and 2 if the battle was fled.
+int spam_first_move(ConsoleHandle& console, ProControllerContext& context, uint64_t& remaining_pp);
+
 // Run from battle. Cursor must start on the FIGHT button. Assumes fleeing will always work. (Smoke Ball)
 void flee_battle(ConsoleHandle& console, ProControllerContext& context);
 

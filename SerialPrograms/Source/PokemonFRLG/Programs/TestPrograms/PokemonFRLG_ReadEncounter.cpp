@@ -40,8 +40,21 @@ ReadEncounter::ReadEncounter()
         Pokemon::PokemonNameReader::instance().languages(),
         LockMode::LOCK_WHILE_RUNNING, true
     )
+    , SUBSET(
+        "<b>Possible Encounters:</b>",
+        {
+            {Subset::route1, "route1", "Route 1 (Pidgey / Rattata)"},
+            {Subset::route22, "route22", "Route 22 (Rattata / Spearow / Mankey"},
+            {Subset::viridianforest, "viridianforest", "Viridian Forest (Caterpie / Metapod / Weedle / Kakuna / Pikachu)"},
+            {Subset::rocktunnel, "rocktunnel", "Rock Tunnel (Geodude / Machop / Mankey / Onix / Zubat)"},
+            {Subset::pokemontower, "pokemontower", "Pokemon Tower (Gastly, Haunter, Cubone)"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        Subset::route1
+    )
 {
     PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(SUBSET);
 }
 
 void ReadEncounter::program(
@@ -52,7 +65,28 @@ void ReadEncounter::program(
         "Starting Read Encounter program..."
     );
 
-    std::set<std::string> subset = std::set<std::string>{"pidgey","rattata"};
+    std::set<std::string> subset;
+    switch (SUBSET){
+    case Subset::route1:
+        subset = std::set<std::string>{"pidgey","rattata"};
+        break;
+    case Subset::route22:
+        subset = std::set<std::string>{"rattata", "spearow", "mankey"};
+        break;
+    case Subset::viridianforest:
+        subset = std::set<std::string>{"caterpie", "metapod", "weedle", "kakuna", "pikachu"};
+        break;
+    case Subset::rocktunnel:
+        subset = std::set<std::string>{"geodude", "zubat", "mankey", "machop", "onix"};
+        break;
+    case Subset::pokemontower:
+        subset = std::set<std::string>{"gastly", "haunter", "cubone"};
+        break;
+    default:
+        subset = std::set<std::string>{};
+    }
+    std::set<std::string>{"pidgey","rattata"};
+
 
     WildEncounterReader reader(COLOR_RED);
     VideoOverlaySet overlays(env.console.overlay());
@@ -66,8 +100,6 @@ void ReadEncounter::program(
     reader.read_encounter(env.logger(), LANGUAGE, screen, subset, encounter);
 
     env.log("Name: " + encounter.name);
-    env.log("Level: " +
-            (encounter.level.has_value() ? std::to_string(*encounter.level) : "???"));
 
     env.log("Finished reading encounter.", COLOR_BLUE);
     pbf_wait(context, 10s);

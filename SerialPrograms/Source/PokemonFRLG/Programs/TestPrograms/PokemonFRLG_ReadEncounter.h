@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonFRLG_ReadEncounter_H
 #define PokemonAutomation_PokemonFRLG_ReadEncounter_H
 
+#include <set>
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
@@ -34,7 +35,17 @@ public:
     ) override{}
 
 private:
+    enum class Subset{
+        route1,
+        route22,
+        viridianforest,
+        rocktunnel,
+        pokemontower
+    };
+
     OCR::LanguageOCROption LANGUAGE;
+    EnumDropdownOption<Subset> SUBSET;
+
 };
 
 } // namespace PokemonFRLG

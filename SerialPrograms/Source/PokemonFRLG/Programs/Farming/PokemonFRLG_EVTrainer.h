@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonFRLG_EVTrainer_H
-#define PokemonAutomation_PokemonFRLG_EVTrainer_H
+#ifndef PokemonAutomation_PokemonFRLG_EvTrainer_H
+#define PokemonAutomation_PokemonFRLG_EvTrainer_H
 
 #include <optional>
 #include <string>
@@ -20,16 +20,16 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
 
-class EVTrainer_Descriptor : public SingleSwitchProgramDescriptor{
+class EvTrainer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-    EVTrainer_Descriptor();
+    EvTrainer_Descriptor();
     struct Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class EVTrainer : public SingleSwitchProgramInstance{
+class EvTrainer : public SingleSwitchProgramInstance{
 public:
-    EVTrainer();
+    EvTrainer();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
     virtual void start_program_border_check(
         VideoStream& stream,
@@ -37,16 +37,27 @@ public:
     ) override{}
 
 private:
-    enum class EV{
-        hp,
-        atk,
-        def,
-        spatk,
-        spdef,
-        speed
+    enum class EvTrainingLocation{
+        viridianforest,
+        route22,
+        rocktunnel,
+        pokemontower,
+        surfspot,
+        route1
+    };
+    
+    struct EffortValues{
+        uint64_t hp = 0;
+        uint64_t attack = 0;
+        uint64_t defense = 0;
+        uint64_t spatk = 0;
+        uint64_t spdef = 0;
+        uint64_t speed = 0;
     };
 
-    uint16_t get_ev_yield(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EV ev);
+    std::string get_encounter_species(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EvTrainingLocation& location);
+
+    EffortValues get_ev_yield(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::string& species);
 
     // OCR::LanguageOCROption LANGUAGE;
 

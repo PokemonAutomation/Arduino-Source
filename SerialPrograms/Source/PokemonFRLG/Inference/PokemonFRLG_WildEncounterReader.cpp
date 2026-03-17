@@ -46,8 +46,6 @@ void WildEncounterReader::read_encounter(
             extract_box_reference(frame, GameSettings::instance().GAME_BOX);
 
     // Read Name (black text on off-white background).
-    // Use multifiltered OCR across multiple black bands. This tolerates
-    // brightness shifts (down to ~0xc0) while still preferring cleaner bands.
     const std::vector<OCR::TextColorRange> name_text_color_ranges{
         {combine_rgb(0, 0, 0), combine_rgb(64, 64, 64)},
         {combine_rgb(0, 0, 0), combine_rgb(96, 96, 96)},

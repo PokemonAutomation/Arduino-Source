@@ -20,9 +20,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
 
-// Detect the default (first) Pokemon Summary page
-// This has nature and OT, but no stats
-// This will work with all languages, as the page indicators are in the same positions
+// Detect the map screen for Kanto
 class KantoMapDetector : public StaticScreenDetector{
 public:
     KantoMapDetector(Color color);

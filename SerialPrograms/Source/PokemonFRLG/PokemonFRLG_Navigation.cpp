@@ -25,6 +25,7 @@
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
 #include "PokemonFRLG/Inference/Map/PokemonFRLG_MapDetector.h"
+#include "PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.h"
 #include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 #include "PokemonFRLG_Navigation.h"
 
@@ -311,6 +312,68 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
     }
 
     return false;
+}
+
+int spam_first_move(ConsoleHandle& console, ProControllerContext& context, uint64_t& remaining_pp){
+    uint16_t errors = 0;
+    uint16_t times_moved = 0;
+    while (true){
+        if (errors > 5) {
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "spam_first_move(): Failed to use move 5 times.",
+                console
+            );  
+        } else if (times_moved > 50){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "spam_first_move(): More than 50 move uses detected.",
+                console
+            );  
+        }
+
+        BattleMenuWatcher battle_menu(COLOR_RED);
+        BattleFaintWatcher pokemon_fainted(COLOR_RED);
+        BattleOpponentFaintWatcher opponent_fainted(COLOR_RED);
+        BlackScreenWatcher battle_ended(COLOR_RED);
+
+        int ret = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context){
+                pbf_wait(context, 10000ms);
+                context.wait_for_all_requests();
+            },
+            { battle_menu, pokemon_fainted, opponent_fainted, battle_ended }
+        );
+
+        switch (ret){
+        case 0:
+            if (remaining_pp == 0){
+                flee_battle(console, context);
+                return 2;
+            }
+            console.log("Using first move.");
+            pbf_mash_button(context, BUTTON_A, 2000ms);
+            context.wait_for_all_requests();
+            times_moved++;
+            remaining_pp--;
+            continue;
+        case 1:
+            console.log("Player Pokemon fainted.");
+            return 1;
+        case 2:
+            console.log("Opponent fainted.");
+            return 0;
+        case 3: 
+            console.log("Battle ended");
+            return 2;
+        default:
+            console.log("Failed to detect move use.");
+            pbf_mash_button(context, BUTTON_B, 2000ms); // get back to the top-level battle menu
+            context.wait_for_all_requests();
+            continue;
+        }
+    }
 }
 
 void flee_battle(ConsoleHandle& console, ProControllerContext& context){
@@ -635,6 +698,7 @@ void fly_from_kanto_map(ConsoleHandle& console, ProControllerContext& context, K
         pbf_move_left_joystick(context, {-1, +1}, 4000ms, 500ms);
         context.wait_for_all_requests();
 
+        // blindly move the cursor to the specified fly spot
         switch (destination){
         case KantoFlyLocation::pallettown:
             pbf_move_left_joystick(context, {0, -1}, 850ms, 100ms);

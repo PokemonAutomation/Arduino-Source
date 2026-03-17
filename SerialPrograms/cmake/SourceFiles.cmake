@@ -1437,6 +1437,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/PokemonFRLG_DigitReader.h
     Source/PokemonFRLG/Inference/PokemonFRLG_StatsReader.cpp
     Source/PokemonFRLG/Inference/PokemonFRLG_StatsReader.h
+    Source/PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.cpp
+    Source/PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.h
     Source/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.cpp
     Source/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h
     Source/PokemonFRLG/PokemonFRLG_Navigation.cpp
@@ -1449,8 +1451,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_NuggetBridgeFarmer.h
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_PickupFarmer.cpp
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_PickupFarmer.h
-    Source/PokemonFRLG/Programs/Farming/PokemonFRLG_EVTrainer.cpp
-    Source/PokemonFRLG/Programs/Farming/PokemonFRLG_EVTrainer.h
+    Source/PokemonFRLG/Programs/Farming/PokemonFRLG_EvTrainer.cpp
+    Source/PokemonFRLG/Programs/Farming/PokemonFRLG_EvTrainer.h
     Source/PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.cpp
     Source/PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_GiftReset.cpp
