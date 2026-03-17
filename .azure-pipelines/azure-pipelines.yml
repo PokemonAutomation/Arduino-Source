@@ -224,30 +224,34 @@ stages:
       - powershell: |
           $root = "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
           $version = "${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
-          $folderName = "SerialPrograms-$version-Windows-x64"
+          $folderName = "SerialPrograms-$version-Windows-$(architecture)"
           $name = "SerialPrograms-Windows-$(compiler)-$(architecture)"
           $buildType = "${{ parameters.buildType }}"
 
-          $cacheArtifactsDir = Join-Path $root "cache-artifacts"
-          $artifactSubdir = Join-Path $cacheArtifactsDir $name
+          $artifactSubdir = Join-Path $root "cache-artifacts" $name
+          $zipPath = Join-Path $artifactSubdir "$name.zip"
           New-Item -ItemType Directory -Force -Path $artifactSubdir | Out-Null
 
-          $temp = Join-Path $root "temp-archive"
-          $tempFolder = Join-Path $temp $folderName
+          $tempFolder = Join-Path $root $folderName
           New-Item -ItemType Directory -Force -Path $tempFolder | Out-Null
           Copy-Item "$root/cache-build/*" $tempFolder -Recurse -Force
 
-          if ($buildType -eq "PrivateBeta") {
-              Write-Host "=== Encrypting build artifact with password ==="
-              $zipPath = "$artifactSubdir/$name.zip"
-              & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 "-p$env:ARTIFACT_PASSWORD" -mem=AES256 $zipPath "$tempFolder/*"
-          } else {
-              $zipPath = "$artifactSubdir/$name.zip"
-              & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 $zipPath "$tempFolder/*"
+          Push-Location $root
+          try {
+              if ($buildType -eq "PrivateBeta") {
+                  Write-Host "=== Encrypting build artifact with password ==="
+                  & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 "-p$env:ARTIFACT_PASSWORD" -mem=AES256 $zipPath $folderName
+              } else {
+                  & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 $zipPath $folderName
+              }
+              if ($LASTEXITCODE -ne 0) {
+                  throw "7-Zip failed with exit code: $LASTEXITCODE"
+              }
+          } finally {
+              Pop-Location
           }
 
-          Remove-Item $temp -Recurse -Force
-
+          Remove-Item $tempFolder -Recurse -Force
           Write-Host "=== Created archive with enclosing folder: $folderName ==="
         displayName: 'Archive Windows build artifact'
         condition: succeeded()
