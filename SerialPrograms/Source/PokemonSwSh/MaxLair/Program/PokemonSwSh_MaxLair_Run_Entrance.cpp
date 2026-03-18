@@ -20,6 +20,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{
 
+
 void run_entrance(
     AdventureRuntime& runtime,
     ProgramEnvironment& env, size_t console_index,
@@ -28,7 +29,7 @@ void run_entrance(
     GlobalStateTracker& state_tracker
 ){
     GlobalState& state = state_tracker[console_index];
-    
+
     if (!state.adventure_started){
         stream.log("Failed to start raid.", COLOR_RED);
         runtime.session_stats.add_error();
@@ -39,6 +40,8 @@ void run_entrance(
             runtime.path_stats.clear();
         }
     }
+    
+    
     context.wait_for(1000ms);
     
     // Get the boss slug

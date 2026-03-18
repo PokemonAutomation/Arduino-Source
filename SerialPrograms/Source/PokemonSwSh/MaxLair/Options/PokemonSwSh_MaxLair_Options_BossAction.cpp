@@ -20,7 +20,6 @@
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
 #include "PokemonSwSh_MaxLair_Options_BossAction.h"
 
-
 //#include <iostream>
 //using std::cout;
 //using std::endl;
