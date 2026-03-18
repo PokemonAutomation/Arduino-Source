@@ -768,6 +768,11 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase2_Connection.cpp
+    Source/Controllers/SerialPABotBase/SerialPABotBase2_Connection.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase2_Descriptor.cpp
+    Source/Controllers/SerialPABotBase/SerialPABotBase2_Descriptor.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase2_SelectorWidget.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_StatusThread.h
     Source/Controllers/StandardHid/StandardHid_Keyboard.cpp
     Source/Controllers/StandardHid/StandardHid_Keyboard.h
