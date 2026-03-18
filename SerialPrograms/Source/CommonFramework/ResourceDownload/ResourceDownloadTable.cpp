@@ -6,6 +6,8 @@
 
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "CommonFramework/Options/LabelCellOption.h"
+#include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Filesystem.h"
@@ -30,7 +32,38 @@ ResourceDeleteButton::ResourceDeleteButton(ResourceDownloadRow& p_row)
     , option(p_row)
 {}
 
+struct ResourceDownloadRow::Data{
+    Data(
+        std::string&& resource_name,
+        size_t file_size,
+        bool is_downloaded,
+        ResourceVersion version
+    )
+        : m_resource_name(LockMode::LOCK_WHILE_RUNNING, resource_name)
+        , m_file_size(file_size)
+        , m_file_size_label(LockMode::LOCK_WHILE_RUNNING, std::to_string(file_size))
+        , m_is_downloaded(is_downloaded)
+        , m_is_downloaded_label(LockMode::LOCK_WHILE_RUNNING, is_downloaded ? "Yes" : "--")
+        , m_version(version)
+        , m_version_label(LockMode::LOCK_WHILE_RUNNING, resource_version_to_string(version))
+    {}
 
+    LabelCellOption m_resource_name;
+
+    size_t m_file_size;
+    LabelCellOption m_file_size_label;
+
+    bool m_is_downloaded;
+    LabelCellOption m_is_downloaded_label;
+
+    ResourceVersion m_version;
+    LabelCellOption m_version_label;
+
+
+};
+
+
+ResourceDownloadRow::~ResourceDownloadRow(){}
 ResourceDownloadRow::ResourceDownloadRow(
     std::string&& resource_name,
     size_t file_size,
@@ -38,20 +71,14 @@ ResourceDownloadRow::ResourceDownloadRow(
     ResourceVersion version
 )
     : StaticTableRow(resource_name)
-    , m_resource_name(LockMode::LOCK_WHILE_RUNNING, resource_name)
-    , m_file_size(file_size)
-    , m_file_size_label(LockMode::LOCK_WHILE_RUNNING, std::to_string(file_size))
-    , m_is_downloaded(is_downloaded)
-    , m_is_downloaded_label(LockMode::LOCK_WHILE_RUNNING, is_downloaded ? "Yes" : "--")
-    , m_version(version)
-    , m_version_label(LockMode::LOCK_WHILE_RUNNING, resource_version_to_string(version))
+    , m_data(CONSTRUCT_TOKEN, std::move(resource_name), file_size, is_downloaded, version)
     , m_download_button(*this)
     , m_delete_button(*this)
 {
-    PA_ADD_STATIC(m_resource_name);
-    PA_ADD_STATIC(m_file_size_label);
-    PA_ADD_STATIC(m_is_downloaded_label);
-    PA_ADD_STATIC(m_version_label);
+    PA_ADD_STATIC(m_data->m_resource_name);
+    PA_ADD_STATIC(m_data->m_file_size_label);
+    PA_ADD_STATIC(m_data->m_is_downloaded_label);
+    PA_ADD_STATIC(m_data->m_version_label);
 
     PA_ADD_STATIC(m_download_button);
     PA_ADD_STATIC(m_delete_button);
@@ -179,7 +206,7 @@ void ResourceDownloadTable::check_all_resource_versions(){
     std::this_thread::sleep_for(std::chrono::seconds(5));
 
     for (auto& row_ptr : m_resource_rows){
-        row_ptr->m_version_label.set_text("Hi");
+        row_ptr->m_data->m_version_label.set_text("Hi");
     }
 
 }
