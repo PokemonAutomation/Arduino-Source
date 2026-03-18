@@ -157,24 +157,35 @@ stages:
           & "C:/Qt/$(qt_version)/msvc2022_64/bin/windeployqt.exe" --dir "$BUILD_CACHE" --release "$APP_EXE"
           New-Item -ItemType Directory -Force -Path $SYMBOLS_CACHE | Out-Null
 
-          Write-Host "=== Excluding unnecessary files from deployment ==="
-          Remove-Item -Path "$BUILD_CACHE/opencv_world4120d.dll" -ErrorAction SilentlyContinue
-          Remove-Item -Path "$BUILD_CACHE/translations" -Recurse -Force -ErrorAction SilentlyContinue
-          Remove-Item -Path "$BUILD_CACHE/generic" -Recurse -Force -ErrorAction SilentlyContinue
-
           Write-Host "=== windeployqt complete ==="
         displayName: 'Deploy app'
         condition: succeeded()
 
       - powershell: |
           echo "=== Copying resources==="
-          robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/Packages/Resources      $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/Resources /s
-          robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/Packages/Firmware       $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/Firmware /s
-          robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)   $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/Binaries64 *.dll
-          robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)   $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/Binaries64 SerialPrograms.exe
-          robocopy $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)   $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-symbols/ SerialPrograms.pdb
-          Write-Host "Robocopy exited with exit code:" $LASTEXITCODE
-          if ($LASTEXITCODE -eq 1) { exit 0 } else { exit 1 }
+          $PACKAGES_DIR = "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/Packages" 
+          $BUILD_DIR = "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
+          $BINARIES_DIR = "$BUILD_DIR/cache-build/Binaries64"
+
+          function Invoke-Robocopy {
+              robocopy @args
+              if ($LASTEXITCODE -ge 8) {
+                  throw "Robocopy failed with exit code: $LASTEXITCODE"
+              }
+          }
+
+          Invoke-Robocopy $PACKAGES_DIR/Resources $BUILD_DIR/cache-build/Resources /s
+          Invoke-Robocopy $PACKAGES_DIR/Firmware  $BUILD_DIR/cache-build/Firmware  /s
+          Invoke-Robocopy $BUILD_DIR              $BINARIES_DIR                    *.dll
+          Invoke-Robocopy $BUILD_DIR              $BINARIES_DIR                    SerialPrograms.exe
+          Invoke-Robocopy $BUILD_DIR              $BUILD_DIR/cache-symbols/        SerialPrograms.pdb
+
+          Write-Host "=== Excluding unnecessary files from deployment ==="
+          Remove-Item -Path "$BINARIES_DIR/opencv_world4120d.dll" -ErrorAction SilentlyContinue
+          Remove-Item -Path "$BINARIES_DIR/translations"          -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -Path "$BINARIES_DIR/generic"               -Recurse -Force -ErrorAction SilentlyContinue
+
+          exit 0
         displayName: 'Copy resources'
         condition: succeeded()
 
@@ -213,30 +224,34 @@ stages:
       - powershell: |
           $root = "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
           $version = "${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
-          $folderName = "SerialPrograms-$version-Windows-x64"
+          $folderName = "SerialPrograms-$version-Windows-$(architecture)"
           $name = "SerialPrograms-Windows-$(compiler)-$(architecture)"
           $buildType = "${{ parameters.buildType }}"
 
-          $cacheArtifactsDir = Join-Path $root "cache-artifacts"
-          $artifactSubdir = Join-Path $cacheArtifactsDir $name
+          $artifactSubdir = Join-Path $root "cache-artifacts/$name"
+          $zipPath = Join-Path $artifactSubdir "$name.zip"
           New-Item -ItemType Directory -Force -Path $artifactSubdir | Out-Null
 
-          $temp = Join-Path $root "temp-archive"
-          $tempFolder = Join-Path $temp $folderName
+          $tempFolder = Join-Path $root $folderName
           New-Item -ItemType Directory -Force -Path $tempFolder | Out-Null
           Copy-Item "$root/cache-build/*" $tempFolder -Recurse -Force
 
-          if ($buildType -eq "PrivateBeta") {
-              Write-Host "=== Encrypting build artifact with password ==="
-              $zipPath = "$artifactSubdir/$name.zip"
-              & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 "-p$env:ARTIFACT_PASSWORD" -mem=AES256 $zipPath "$tempFolder/*"
-          } else {
-              $zipPath = "$artifactSubdir/$name.zip"
-              & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 $zipPath "$tempFolder/*"
+          Push-Location $root
+          try {
+              if ($buildType -eq "PrivateBeta") {
+                  Write-Host "=== Encrypting build artifact with password ==="
+                  & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 "-p$env:ARTIFACT_PASSWORD" -mem=AES256 $zipPath $folderName
+              } else {
+                  & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 $zipPath $folderName
+              }
+              if ($LASTEXITCODE -ne 0) {
+                  throw "7-Zip failed with exit code: $LASTEXITCODE"
+              }
+          } finally {
+              Pop-Location
           }
 
-          Remove-Item $temp -Recurse -Force
-
+          Remove-Item $tempFolder -Recurse -Force
           Write-Host "=== Created archive with enclosing folder: $folderName ==="
         displayName: 'Archive Windows build artifact'
         condition: succeeded()
@@ -409,7 +424,7 @@ stages:
                 echo "=== Encrypting build artifact with password ==="
                 7z a -tzip -mx=9 "-p$ARTIFACT_PASSWORD" -mem=AES256 "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).zip" "$FOLDER_NAME"
             else
-                tar -I "gzip -9" -cvf $(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).tar.gz "$FOLDER_NAME"
+                7z a -tzip -mx=9 "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).zip" "$FOLDER_NAME"
             fi
           
           echo "=== AppImage build complete with enclosing folder: $FOLDER_NAME ==="
@@ -432,24 +447,11 @@ stages:
           path: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-symbols'
         condition: succeeded()
 
-      - script: |
-          BUILD_TYPE="${{ parameters.buildType }}"
-          if [ "$BUILD_TYPE" = "PrivateBeta" ]; then
-              EXT="zip"
-          else
-              EXT="tar.gz"
-          fi
-
-          ARTIFACT_PATH_UBUNTU="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).$EXT"
-          echo "##vso[task.setvariable variable=ARTIFACT_PATH_UBUNTU]$ARTIFACT_PATH_UBUNTU"
-        displayName: 'Set artifact path'
-        condition: succeeded()
-
       - task: PublishBuildArtifacts@1
         displayName: 'Publish SerialPrograms'
         condition: succeeded()
         inputs:
-          PathtoPublish: '$(ARTIFACT_PATH_UBUNTU)'
+          PathtoPublish: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).zip'
           ArtifactName: 'SerialPrograms-Linux-$(compiler)-$(architecture)'
 
 ###########################################
