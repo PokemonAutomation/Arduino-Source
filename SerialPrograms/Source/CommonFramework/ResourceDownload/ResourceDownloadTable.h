@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_ResourceDownloadTable_H
 #define PokemonAutomation_ResourceDownloadTable_H
 
-#include "CommonFramework/Options/LabelCellOption.h"
-#include "Common/Cpp/Options/StaticTableOption.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Containers/Pimpl.h"
+#include "Common/Cpp/Options/StaticTableOption.h"
 
 namespace PokemonAutomation{
 
@@ -39,7 +39,7 @@ enum class ResourceVersion{
 class ResourceDownloadRow : public StaticTableRow{
 
 public:
-    // ~ResourceDownloadRow();
+    ~ResourceDownloadRow();
     ResourceDownloadRow(
         std::string&& resource_name,
         size_t file_size,
@@ -48,23 +48,14 @@ public:
     );
 
 private:
-    std::string resource_version_to_string(ResourceVersion version);
+    static std::string resource_version_to_string(ResourceVersion version);
 
 public:
-    LabelCellOption m_resource_name;
-
-    size_t m_file_size;
-    LabelCellOption m_file_size_label;
-
-    bool m_is_downloaded;
-    LabelCellOption m_is_downloaded_label;
-
-    ResourceVersion m_version;
-    LabelCellOption m_version_label;
+    struct Data;
+    Pimpl<Data> m_data;
 
     ResourceDownloadButton m_download_button;
     ResourceDeleteButton m_delete_button;
-
 
 };
 
