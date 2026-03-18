@@ -9,6 +9,7 @@
 #include "CommonTools/Images/SolidColorTest.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh_MaxLair_Run_Entrance.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -119,8 +120,6 @@ void run_entrance(
         save_path = followed_path;
     }
     
-    Language language = runtime.console_settings[console_index].language;
-    
     // Overlay box to detect when a dialogue box, a Yes/No option to save a path or erasing a path if our list is full is present
     OverlayBoxScope dialog_box(stream.overlay(), {0.78, 0.85, 0.03, 0.05});
     OverlayBoxScope yes_no_box(stream.overlay(), {0.68, 0.75, 0.135, 0.02});
@@ -175,9 +174,10 @@ void run_entrance(
                     stream.log("Keeping old path.");
                     pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
                 } else {
+                    std::string display_name = get_pokemon_name(boss_slug).display_name();
                     stream.log("Saving new path");
                     pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
-                    send_program_notification(env, runtime.notification_status, COLOR_BLUE, "Path Saved", {{"Boss: ", boss_slug}}, "");
+                    send_program_notification(env, runtime.notification_status, COLOR_BLUE, "Path Saved", {{"Boss: ", display_name}}, "");
                 }
             } else {
                 stream.log("Not saving new path");

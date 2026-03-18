@@ -72,12 +72,15 @@ void BossActionRow::on_config_value_changed(void* object) {
     if (action != BossAction::CATCH_AND_STOP_IF_SHINY) {
         save_on_the_go = false;
     }
+    
+    save_on_the_go.set_visibility(
+            action == BossAction::CATCH_AND_STOP_IF_SHINY ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED
+    );
 }
 
 
 BossActionTable::BossActionTable()
     : StaticTableOption("<b>Boss Actions:</b>", LockMode::UNLOCK_WHILE_RUNNING)
-    , m_reverting(false)
 {
     for (const auto& item : all_bosses_by_dex()){
 //        cout << item.second << endl;
@@ -88,13 +91,6 @@ BossActionTable::BossActionTable()
         add_row(std::make_unique<BossActionRow>(item.second, name_slug, sprite_slug));
     }
     finish_construction();
-    
-    for (auto* row : m_rows) {
-        row->save_on_the_go.add_listener(*this);
-        row->action.add_listener(*this);
-    }
-    
-    update_checkbox_states();
 }
 
 std::vector<std::string> BossActionTable::make_header() const{

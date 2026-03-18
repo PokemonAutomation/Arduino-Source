@@ -43,20 +43,11 @@ public:
     BooleanCheckBoxCell save_on_the_go;
 };
 
-class BossActionTable : public StaticTableOption,
-private ConfigOption::Listener
+class BossActionTable : public StaticTableOption
 {
 public:
     BossActionTable();
-    ~BossActionTable();
-    
-    virtual void on_config_value_changed(void* object) override;
     virtual std::vector<std::string> make_header() const override;
-    
-private:
-    std::vector<BossActionRow*> m_rows;
-    bool m_reverting;
-    void update_checkbox_states();
 };
 
 
