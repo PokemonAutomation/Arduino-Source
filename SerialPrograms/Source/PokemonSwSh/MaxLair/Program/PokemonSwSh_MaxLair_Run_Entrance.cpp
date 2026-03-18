@@ -20,66 +20,6 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{
 
-using namespace Pokemon;
-
-namespace {
-// Boxes for the corresponding pokemon names in case the list is full and the player battled a boss that isn't in the list
-const ImageFloatBox NAME_BOXES[3] = {
-    {0.685000, 0.531000, 0.130000, 0.061000},
-    {0.685000, 0.586000, 0.130000, 0.061000},
-    {0.685000, 0.645000, 0.130000, 0.053000}
-};
-
-// Read the three saved paths names if the user has already saved 3 paths
-std::vector<std::string> read_saved_paths(
-    VideoStream& stream,
-    Language language,
-    const ImageViewRGB32& screen
-) {
-    std::vector<std::string> slugs;
-    
-    for (int i = 0; i < 3; ++i) {
-        auto cropped = extract_box_reference(
-            screen,
-            NAME_BOXES[i]
-        );
-        OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
-                stream.logger(),
-                language, cropped,
-                OCR::BLACK_OR_WHITE_TEXT_FILTERS(),
-                0.01, 0.50, 2.0
-            );
-        if (result.results.empty()) {
-            slugs.emplace_back();
-        } else {
-            slugs.push_back(result.results.begin()->second.token);
-        }
-    }
-    return slugs;
-}
-
-// Read the three currently saved paths (if any) from the entrance screen and return the index of the first slot that is NOT protected, returns -1 otherwise
-int find_unprotected_slot(
-    const std::vector<std::string>& current_slugs,
-    const EndBattleDecider& actions,
-    Logger& logger
-) {
-    for (int i = 0; i < 3; ++i) {
-        if (current_slugs[i].empty()) {
-            // Empty slot, override and add error
-            logger.log("Failed to read slot " + std::to_string(i) + ", replacing it.", COLOR_RED);
-            return i;
-        }
-        if (!actions.is_in_save_list(current_slugs[i])) {
-            logger.log("Slot " + std::to_string(i) + " contains unprotected boss, will replace it.", COLOR_BLUE);
-            return i;
-        }
-    }
-    logger.log("All slots already saved and protected", COLOR_RED);
-    return -1;
-}
-}
-
 void run_entrance(
     AdventureRuntime& runtime,
     ProgramEnvironment& env, size_t console_index,
@@ -137,6 +77,7 @@ void run_entrance(
         }
         
         context.wait_for_all_requests();
+
         context.wait_for(1000ms);
         VideoSnapshot screen = stream.video().snapshot();
         if (!screen) continue;
@@ -189,10 +130,10 @@ void run_entrance(
         
         pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
     }
-    
-    
-    
 }
+
+
+
 }
 }
 }

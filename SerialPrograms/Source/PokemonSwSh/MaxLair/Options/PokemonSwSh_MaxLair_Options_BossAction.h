@@ -29,22 +29,18 @@ enum class BossAction{
 
 const EnumDropdownDatabase<BossAction>& BossAction_Database();
 
-class BossActionRow : public StaticTableRow,
-private ConfigOption::Listener
-{
+class BossActionRow : public StaticTableRow, private ConfigOption::Listener{
 public:
     BossActionRow(std::string slug, const std::string& name_slug, const std::string& sprite_slug);
     virtual void on_config_value_changed(void* object) override;
 
-    
     LabelCellOption pokemon;
     EnumDropdownCell<BossAction> action;
     PokemonBallSelectCell ball;
     BooleanCheckBoxCell save_on_the_go;
 };
 
-class BossActionTable : public StaticTableOption
-{
+class BossActionTable : public StaticTableOption{
 public:
     BossActionTable();
     virtual std::vector<std::string> make_header() const override;

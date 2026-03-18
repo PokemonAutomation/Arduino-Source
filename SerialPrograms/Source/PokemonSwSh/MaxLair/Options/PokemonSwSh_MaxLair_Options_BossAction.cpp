@@ -72,7 +72,6 @@ void BossActionRow::on_config_value_changed(void* object) {
     if (action != BossAction::CATCH_AND_STOP_IF_SHINY) {
         save_on_the_go = false;
     }
-    
     save_on_the_go.set_visibility(
             action == BossAction::CATCH_AND_STOP_IF_SHINY ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED
     );
@@ -87,12 +86,10 @@ BossActionTable::BossActionTable()
         const MaxLairSlugs& slugs = get_maxlair_slugs(item.second);
         const std::string& sprite_slug = *slugs.sprite_slugs.begin();
         const std::string& name_slug = slugs.name_slug;
-        
         add_row(std::make_unique<BossActionRow>(item.second, name_slug, sprite_slug));
     }
     finish_construction();
 }
-
 std::vector<std::string> BossActionTable::make_header() const{
     std::vector<std::string> ret{
         STRING_POKEMON,
