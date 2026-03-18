@@ -94,6 +94,8 @@ ShinyHuntOverworld::ShinyHuntOverworld()
 void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ShinyHuntOverworld_Descriptor::Stats& stats = env.current_stats<ShinyHuntOverworld_Descriptor::Stats>();
 
+    home_black_border_check(env.console, context);
+
     /*
     * Settings: Text Speed fast. Audio required.
     * Setup: Stand in grass.

@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PABotBase2_PacketParser_H
-#define PokemonAutomation_PABotBase2_PacketParser_H
+#ifndef PokemonAutomation_PABotBase2_ConnectionLayer_PacketParser_H
+#define PokemonAutomation_PABotBase2_ConnectionLayer_PacketParser_H
 
 #include "PABotBase2_StreamInterface.h"
 #include "PABotBase2_Connection.h"

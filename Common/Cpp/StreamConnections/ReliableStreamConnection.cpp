@@ -7,7 +7,7 @@
 #include "Common/CRC32/pabb_CRC32.h"
 //#include "Common/Cpp/PrettyPrint.h"
 //#include "Common/Cpp/Exceptions.h"
-#include "Common/PABotBase2/PABotBase2_ConnectionDebug.h"
+#include "Common/PABotBase2/ConnectionLayer/PABotBase2_ConnectionDebug.h"
 #include "Common/Cpp/StreamConnections/PABotBase2_MessageDumper.h"
 #include "ReliableStreamConnection.h"
 

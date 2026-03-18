@@ -168,7 +168,7 @@ UpdatePopupDetector_Switch2::UpdatePopupDetector_Switch2(Color color)
     , m_left(0.08, 0.25, 0.10, 0.38)
     , m_bottom_solid(0.10, 0.86, 0.80, 0.04)
     , m_bottom_buttons(0.70, 0.92, 0.28, 0.05)
-    , m_option_divider(0.49, 0.60, 0.02, 0.01)
+    , m_option_divider_check_for_internet(0.49, 0.675, 0.02, 0.01)
 {}
 
 void UpdatePopupDetector_Switch2::make_overlays(VideoOverlaySet& items) const{
@@ -178,16 +178,17 @@ void UpdatePopupDetector_Switch2::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_left);
     items.add(m_color, m_bottom_solid);
     items.add(m_color, m_bottom_buttons);
-    items.add(m_color, m_option_divider);
+    items.add(m_color, m_option_divider_check_for_internet);
 }
 bool UpdatePopupDetector_Switch2::detect(const ImageViewRGB32& screen){
-    ImageStats option_divider = image_stats(extract_box_reference(screen, m_option_divider));
+    ImageStats option_divider = image_stats(extract_box_reference(screen, m_option_divider_check_for_internet));
+//    cout << "option_divider = " << option_divider.average << option_divider.stddev << endl;
     if (option_divider.stddev.sum() < 10){
         return false;
     }
 
     ImageStats stats_box_top = image_stats(extract_box_reference(screen, m_box_top));
-//    cout << stats_box_top.average << stats_box_top.stddev << endl;
+//    cout << "stats_box_top = " << stats_box_top.average << stats_box_top.stddev << endl;
     bool white;
     if (stats_box_top.average.sum() < 300){
         white = false;

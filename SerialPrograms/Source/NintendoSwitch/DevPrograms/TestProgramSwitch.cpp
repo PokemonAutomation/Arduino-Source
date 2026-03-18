@@ -159,16 +159,16 @@
 #include "Common/Cpp/Options/CheckboxDropdownOption.h"
 #include "Common/Cpp/Options/CheckboxDropdownOption.tpp"
 //#include "Integrations/PybindSwitchController.h"
-#include "Common/PABotBase2/PABotBase2_ConnectionDebug.h"
-#include "Common/PABotBase2/PABotBase2_PacketSender.h"
-#include "Common/PABotBase2/PABotBase2_StreamCoalescer.h"
+#include "Common/PABotBase2/ConnectionLayer/PABotBase2_ConnectionDebug.h"
+#include "Common/PABotBase2/ConnectionLayer/PABotBase2_PacketSender.h"
+#include "Common/PABotBase2/ConnectionLayer/PABotBase2_StreamCoalescer.h"
 #include "Common/Cpp/StreamConnections/StreamInterface.h"
 #include "Common/Cpp/StreamConnections/StreamConnection.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/CRC32/pabb_CRC32.h"
-#include "Common/PABotBase2/PABotBase2_PacketParser.h"
+#include "Common/PABotBase2/ConnectionLayer/PABotBase2_PacketParser.h"
 #include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
-#include "Common/PABotBase2/PABotbase2_ReliableStreamConnection.h"
+#include "Common/PABotBase2/ConnectionLayer/PABotbase2_ReliableStreamConnection.h"
 #include "Common/Cpp/StreamConnections/MockDevice.h"
 #include "ML/Inference/ML_PaddleOCRPipeline.h"
 #include "CommonTools/OCR/OCR_RawPaddleOCR.h"
@@ -519,11 +519,19 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     auto snapshot = feed.snapshot();
 
+    UpdatePopupDetector detector(console);
+
+    cout << detector.detect(snapshot) << endl;
+
+
+#if 0
+    auto snapshot = feed.snapshot();
+
     ImageFloatBox box = find_contents_float_box(snapshot);
     cout << box.x << ", " << box.y << ", " << box.width << ", " << box.height << endl;
 
     overlays.add(COLOR_RED, box);
-
+#endif
 
 #if 0
     PokemonLA::EventDialogDetector detector(logger, overlay, true);

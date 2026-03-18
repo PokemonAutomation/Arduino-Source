@@ -144,7 +144,7 @@
 #include "Common/Cpp/Options/MacAddressOption.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
-#include "Common/PABotBase2/PABotbase2_ReliableStreamConnection.h"
+#include "Common/PABotBase2/ConnectionLayer/PABotbase2_ReliableStreamConnection.h"
 #include "Common/Cpp/StreamConnections/MockDevice.h"
 #include "CommonTools/Random.h"
 
@@ -271,8 +271,6 @@ std::atomic<size_t> CheckedObject<Type>::m_instances(0);
 
 
 
-
-
 #if 0
 struct RequestManagerConfig{
     using ClockType = LightweightWallClock_StdChrono;
@@ -283,6 +281,14 @@ struct RequestManagerConfig{
     static constexpr size_t QUEUE_SIZE = 64;
 };
 #endif
+
+
+
+
+
+
+
+
 
 
 
@@ -381,7 +387,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 #endif
 
-#if 0
+#if 1
     stress_test(logger, scope);
 #endif
 
