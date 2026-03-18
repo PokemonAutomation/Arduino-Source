@@ -84,13 +84,6 @@ ResourceDownloadTable::ResourceDownloadTable()
     add_resource_download_rows();
 
     finish_construction();
-
-    m_worker = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
-        [this]{ 
-            // cout << "hello1" << endl;
-            check_all_resource_versions(); 
-        }
-    );
 }
 std::vector<std::string> ResourceDownloadTable::make_header() const{
     std::vector<std::string> ret{
@@ -102,6 +95,16 @@ std::vector<std::string> ResourceDownloadTable::make_header() const{
         "",
     };
     return ret;
+}
+
+UiWrapper ResourceDownloadTable::make_UiComponent(void* params) {
+    m_worker = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+        [this]{ 
+            check_all_resource_versions(); 
+        }
+    );
+
+    return ConfigOptionImpl<StaticTableOption>::make_UiComponent(params);
 }
 
 ResourceType get_resource_type_from_string(std::string type){
