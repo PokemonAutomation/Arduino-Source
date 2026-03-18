@@ -86,6 +86,7 @@ public:
     ResourceDownloadTable();
 
     virtual std::vector<std::string> make_header() const override;
+    virtual UiWrapper make_UiComponent(void* params) override;
 
 private:
     std::vector<DownloadedResource> deserialize_resource_list_json();
