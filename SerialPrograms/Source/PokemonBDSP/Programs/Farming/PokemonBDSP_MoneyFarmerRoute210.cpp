@@ -47,16 +47,19 @@ struct MoneyFarmerRoute210_Descriptor::Stats : public StatsTracker{
         , m_errors(m_stats["Errors"])
         , m_noreact(m_stats["No React"])
         , m_react(m_stats["React"])
+        , m_pickup(m_stats["Pickup"])
     {
         m_display_order.emplace_back("Searches");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("No React");
         m_display_order.emplace_back("React");
+        m_display_order.emplace_back("Pickup", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& m_searches;
     std::atomic<uint64_t>& m_errors;
     std::atomic<uint64_t>& m_noreact;
     std::atomic<uint64_t>& m_react;
+    std::atomic<uint64_t>& m_pickup;
 };
 std::unique_ptr<StatsTracker> MoneyFarmerRoute210_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -137,7 +140,9 @@ MoneyFarmerRoute210::MoneyFarmerRoute210()
 
 
 
-MoneyFarmerRoute210::BattleOutcome MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]){
+MoneyFarmerRoute210::BattleOutcome MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+    uint8_t pp0[4], uint8_t pp1[4],
+    const std::vector<ImagePixelBox>& bubbles){
     MoneyFarmerRoute210_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute210_Descriptor::Stats>();
 
     env.log("Starting battle!");
@@ -146,7 +151,8 @@ MoneyFarmerRoute210::BattleOutcome MoneyFarmerRoute210::battle(SingleSwitchProgr
         StartBattleDetector detector(env.console);
         int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](ProControllerContext& context){
+            [this, &env, &bubbles](ProControllerContext& context){
+                move_to_trainer(env, context, bubbles);
                 pbf_press_button(context, BUTTON_ZL, 80ms, 80ms);
                 for (size_t c = 0; c < 17; c++){
                     pbf_press_dpad(context, DPAD_UP, 40ms, 80ms);
@@ -293,12 +299,10 @@ void MoneyFarmerRoute210::move_to_trainer(SingleSwitchProgramEnvironment& env, P
     
     if (!closest) return;
     
-    pbf_press_dpad(context, DPAD_RIGHT, 200ms, 0ms);
-    
     if (closest->min_x < 350) {
         // The trainer who wants to battle is to the far-left, behind the other trainer
-        //pbf_press_dpad(context, DPAD_UP, 400ms, 0ms);
-        //pbf_press_dpad(context, DPAD_LEFT, 500ms, 0ms);
+        pbf_press_dpad(context, DPAD_UP, 400ms, 0ms);
+        pbf_press_dpad(context, DPAD_LEFT, 500ms, 0ms);
         pbf_mash_button(context, BUTTON_A, 1000ms);
         context.wait_for_all_requests();
         pbf_press_dpad(context, DPAD_DOWN, 400ms, 0ms);
@@ -313,7 +317,7 @@ void MoneyFarmerRoute210::move_to_trainer(SingleSwitchProgramEnvironment& env, P
             context.wait_for_all_requests();
         } else {
             // The trainer who wants to battle is on our left, right next to us
-            //pbf_press_dpad(context, DPAD_LEFT, 400ms, 0ms);
+            pbf_press_dpad(context, DPAD_LEFT, 400ms, 0ms);
         }
     } else if (closest->min_x < 560) {
         // The trainer who wants to battle is right above us
@@ -325,7 +329,7 @@ void MoneyFarmerRoute210::move_to_trainer(SingleSwitchProgramEnvironment& env, P
         context.wait_for_all_requests();
     }
     
-    //pbf_mash_button(context, BUTTON_A, 1000ms);
+    pbf_mash_button(context, BUTTON_A, 1000ms);
     context.wait_for_all_requests();
 }
 
@@ -346,10 +350,15 @@ void MoneyFarmerRoute210::check_pickup_items(
     ProControllerContext& context, const bool pickup_slots[6]
 ){
 
-    // Open menu
+    // Open the menu and the map no matter where the cursor is and leaving the menu again to make sure of its position
     pbf_press_button(context, BUTTON_X, 80ms, 1000ms);
+    pbf_press_button(context, BUTTON_PLUS, 80ms, 1920ms);
+    pbf_mash_button(context, BUTTON_B, 2000ms);
     
-    // Open Pokemon menu
+    // Open the menu and move to the Pokemon menu
+    pbf_press_button(context, BUTTON_X, 40ms, 600ms);
+    pbf_press_dpad(context, DPAD_UP, 80ms, 600ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 80ms, 600ms);
     pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
     
     // Loop over each pokemon that has Pickup according to the settings
@@ -448,6 +457,8 @@ bool MoneyFarmerRoute210::heal_after_battle_and_return(
     uint8_t pp0[4], uint8_t pp1[4], bool has_pickup_mons)
 {
     if (HEALING_METHOD == HealMethod::CelesticTown){
+        // Go to Celestic Town Pokecenter to heal the party.
+        fly_to_center_heal_and_return(stream.logger(), context, pp0, pp1);
         if (has_pickup_mons){
             // Move the menu cursor back to the Pokemon icon
             pbf_press_button(context, BUTTON_X, 40ms, 600ms);
@@ -456,8 +467,6 @@ bool MoneyFarmerRoute210::heal_after_battle_and_return(
             pbf_wait(context, 400ms);
             pbf_mash_button(context, BUTTON_B, 1000ms);
         }
-        // Go to Celestic Town Pokecenter to heal the party.
-        fly_to_center_heal_and_return(stream.logger(), context, pp0, pp1);
         return false;
     }else{
         // Use Global Room to heal the party.
@@ -516,10 +525,11 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
         PICKUP_SLOT6,
     };
     
+    
+    
     bool has_pickup_mons = PICKUP_SLOT1 || PICKUP_SLOT2 || PICKUP_SLOT3 || PICKUP_SLOT4 || PICKUP_SLOT5 || PICKUP_SLOT6;
     
     uint32_t pickup_counter = 0;
-    uint32_t total_pickup_checks = 0;
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_B, 40ms, 40ms);
@@ -541,11 +551,6 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
         env.update_stats();
 
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-        
-        if (has_pickup_mons && pickup_counter % CHECK_PICKUP_FREQ.current_value() == 0 && pickup_counter != total_pickup_checks){
-            check_pickup_items(context, pickup_slots_selected);
-            total_pickup_checks = pickup_counter;
-        }
 
         if (need_to_charge){
             pbf_move_left_joystick(context, {+1, 0}, 1120ms, 0ms);
@@ -585,12 +590,9 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
         for (const ImagePixelBox& box : bubbles){
             env.log("Reaction at X: " + std::to_string(box.min_x) + "Y: " + std::to_string(box.min_y), COLOR_BLUE);
         }
-        if (!bubbles.empty()) {
-            move_to_trainer(env, context, bubbles);
-        }
 
         // Attempt the battle
-        BattleOutcome outcome = battle(env, context, pp0, pp1);
+        BattleOutcome outcome = battle(env, context, pp0, pp1, bubbles);
         if (outcome == BattleOutcome::FAILED_START) {
             consecutive_failures++;
             if (consecutive_failures > 3) {
@@ -603,7 +605,12 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
             recover_from_failed_battle_start(env, context);
             continue;
         }
+        
         pickup_counter++;
+        if (has_pickup_mons && pickup_counter % CHECK_PICKUP_FREQ.current_value() == 0) {
+            check_pickup_items(context, pickup_slots_selected);
+            stats.m_pickup++;
+        }
         
         if (!has_pp(pp0, pp1)){
             need_to_charge = heal_after_battle_and_return(env, env.console, context, pp0, pp1, has_pickup_mons);

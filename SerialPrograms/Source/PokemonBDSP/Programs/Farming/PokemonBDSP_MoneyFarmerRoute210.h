@@ -44,12 +44,14 @@ private:
         MOVE_LEARN
     };
     // Run the battle loop. Returns the outcome of the battle attempt.
-    BattleOutcome battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]);
+    BattleOutcome battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t pp0[4], uint8_t pp1[4],
+        const std::vector<ImagePixelBox>& bubbles
+    );
     // Check for items generated through the Pickup ability
     void check_pickup_items(
         ProControllerContext& context,
         const bool pickup_slots_selected[6]
-                       );
+    );
     // From the bottom row of the Ace Trainer pair, heal Pokemon and return.
     // Return true if VS Seeker needs charging.
     void move_to_trainer(
@@ -68,7 +70,11 @@ private:
     );
     // Starting in front of the Celestic Town Pokecenter, heal and return
     // to the Ace Trainer pair.
-    void heal_at_center_and_return(Logger& logger, ProControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]);
+    void heal_at_center_and_return(
+        Logger& logger,
+        ProControllerContext& context,
+        uint8_t pp0[4], uint8_t pp1[4]
+    );
     // Fly from the Ace Trainer pair to Hearthome Pokecenter, heal and return.
     void fly_to_center_heal_and_return(
         Logger& logger, ProControllerContext& context,
