@@ -67,7 +67,7 @@ RNGManipulator::RNGManipulator()
             // {Target::fossils, "fossils", "Omanyte / Kabuto / Aerodactyl"},
             {Target::snorlax, "snorlax", "Snorlax"},
             {Target::sweetscent, "sweetscent", "Sweet Scent for wild encounters"},
-            // {Target::fishing, "fishing", "Fishing"},
+            {Target::fishing, "fishing", "Fishing"},
             // {Target::static, "static", "Static overworld encounters (including Legendaries)"},
             // {Target::roaming, "roaming", "Roaming Legendaries"}
         },
@@ -250,11 +250,12 @@ bool watch_for_shiny_encounter(SingleSwitchProgramEnvironment& env, ProControlle
         {battle_entered}
     );
     if (ret != 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "Failed to initiate encounter.",
-            env.console
-        );
+        // OperationFailedException::fire(
+        //     ErrorReport::SEND_ERROR_REPORT,
+        //     "Failed to initiate encounter.",
+        //     env.console
+        // );
+        return false;
     }
     bool encounter_shiny = handle_encounter(env.console, context, false);
     return encounter_shiny;
@@ -353,6 +354,12 @@ void use_sweet_scent(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     pbf_press_button(context, BUTTON_A, 200ms, 800ms);
     context.wait_for_all_requests();
     env.log("Sweet Scent used.");
+}
+
+void use_registered_fishing_rod(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& DOUBLE_DELAY){
+    pbf_press_button(context, BUTTON_MINUS, 200ms, std::chrono::milliseconds(DOUBLE_DELAY - 4200));
+    pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+    context.wait_for_all_requests();
 }
 
 void take_summary_pictures(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -464,6 +471,10 @@ void RNGManipulator::program(SingleSwitchProgramEnvironment& env, ProControllerC
             context.wait_for_all_requests();
         }else if (TARGET == Target::sweetscent){
             use_sweet_scent(env, context, DOUBLE_DELAY);
+            shiny_found = watch_for_shiny_encounter(env, context);
+            context.wait_for_all_requests();
+        }else if (TARGET == Target::fishing){
+            use_registered_fishing_rod(env, context, DOUBLE_DELAY);
             shiny_found = watch_for_shiny_encounter(env, context);
             context.wait_for_all_requests();
         }else{

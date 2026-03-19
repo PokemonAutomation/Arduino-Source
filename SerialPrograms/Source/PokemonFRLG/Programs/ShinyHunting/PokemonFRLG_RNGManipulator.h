@@ -47,7 +47,7 @@ private:
         // fossils,
         snorlax,
         sweetscent,
-        // fishing,
+        fishing,
         // static,
         // roaming
     };
