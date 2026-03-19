@@ -341,7 +341,7 @@ int spam_first_move(ConsoleHandle& console, ProControllerContext& context, uint6
         int ret = run_until<ProControllerContext>(
             console, context,
             [](ProControllerContext& context){
-                pbf_wait(context, 10000ms);
+                pbf_wait(context, 20000ms);
                 context.wait_for_all_requests();
             },
             { battle_menu, pokemon_fainted, opponent_fainted, battle_ended }
@@ -890,7 +890,7 @@ void home_black_border_check(ConsoleHandle& console, ProControllerContext& conte
         console.log("Entered game.");
     }else{
         console.log("Non-Switch device selected in Settings.");
-        console.log("Skipping black border and aspect ratio checks.", COLOR_BLUE);
+        console.log("Skipping black border check.", COLOR_BLUE);
     }
 }
 

@@ -284,7 +284,7 @@ void use_dig(SingleSwitchProgramEnvironment& env, ProControllerContext& context)
         if (errors > 5){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Failed to use Teleport 5 times in a row.",
+                "Failed to use Dig 5 times in a row.",
                 env.console
             );
         }
@@ -460,33 +460,33 @@ void EvTrainer::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     bool spin_leftright = true;
     uint64_t pp_left = MOVE_PP;
     
-    EvTrainingLocation current_location;
+    EvTrainingLocation current_location = EvTrainingLocation::viridianforest;
     bool finished_stat = false;
 
     while (!shiny_found){
         try{
-            if (stats.hp_evs < HP_EVS){
-                current_location = EvTrainingLocation::viridianforest;
-            }else if (stats.atk_evs < ATK_EVS){
-                current_location = EvTrainingLocation::route22;
-            }else if (stats.def_evs < ATK_EVS){
-                current_location = EvTrainingLocation::rocktunnel;
-            }else if (stats.spa_evs < SPATK_EVS){
-                current_location = EvTrainingLocation::pokemontower;
-            }else if (stats.spd_evs < SPDEF_EVS){
-                current_location = EvTrainingLocation::surfspot;
-            }else if (stats.spe_evs < SPEED_EVS){
-                current_location = EvTrainingLocation::route1;
-            }else{
-                break;
-            }
-
             if (stats.encounters == 0 || failed_encounter || finished_stat || pp_left == 0){
                 // use dig to get out of Pokemon Tower or Rock Tunnel
                 if (current_location == EvTrainingLocation::pokemontower  || current_location == EvTrainingLocation::rocktunnel){
                     use_dig(env, context);
                 }
                 bool should_heal = stats.encounters == 0 || pp_left < (MOVE_PP / 2); 
+
+                if (stats.hp_evs < HP_EVS){
+                    current_location = EvTrainingLocation::viridianforest;
+                }else if (stats.atk_evs < ATK_EVS){
+                    current_location = EvTrainingLocation::route22;
+                }else if (stats.def_evs < DEF_EVS){
+                    current_location = EvTrainingLocation::rocktunnel;
+                }else if (stats.spa_evs < SPATK_EVS){
+                    current_location = EvTrainingLocation::pokemontower;
+                }else if (stats.spd_evs < SPDEF_EVS){
+                    current_location = EvTrainingLocation::surfspot;
+                }else if (stats.spe_evs < SPEED_EVS){
+                    current_location = EvTrainingLocation::route1;
+                }else{
+                    break;
+                }
 
                 switch (current_location){
                 case EvTrainingLocation::viridianforest:
@@ -604,8 +604,12 @@ void EvTrainer::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
             std::string encounter_species = get_encounter_species(env, context, current_location);
             EffortValues ev_yield = get_ev_yield(env, context, encounter_species);
-            if ((ev_yield.hp > HP_EVS - stats.hp_evs) 
-                ||(ev_yield.hp > HP_EVS - stats.hp_evs)
+            if (   (ev_yield.hp + stats.hp_evs > HP_EVS) 
+                || (ev_yield.attack + stats.atk_evs> ATK_EVS)
+                || (ev_yield.defense + stats.def_evs > DEF_EVS)
+                || (ev_yield.spatk + stats.spa_evs > SPATK_EVS)
+                || (ev_yield.spdef + stats.spd_evs > SPDEF_EVS)
+                || (ev_yield.speed + stats.spe_evs> SPEED_EVS)
             ){
                 flee_battle(env.console, context);
             }else{
