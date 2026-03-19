@@ -519,11 +519,19 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     auto snapshot = feed.snapshot();
 
+    UpdatePopupDetector detector(console);
+
+    cout << detector.detect(snapshot) << endl;
+
+
+#if 0
+    auto snapshot = feed.snapshot();
+
     ImageFloatBox box = find_contents_float_box(snapshot);
     cout << box.x << ", " << box.y << ", " << box.width << ", " << box.height << endl;
 
     overlays.add(COLOR_RED, box);
-
+#endif
 
 #if 0
     PokemonLA::EventDialogDetector detector(logger, overlay, true);
