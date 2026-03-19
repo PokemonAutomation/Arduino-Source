@@ -364,7 +364,6 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Environment/SystemSleep.cpp
     Source/CommonFramework/Environment/SystemSleep.h
     Source/CommonFramework/Environment/SystemSleep_Apple.tpp
-    Source/CommonFramework/Environment/SystemSleep_Linux.tpp
     Source/CommonFramework/Environment/SystemSleep_Windows.tpp
     Source/CommonFramework/ErrorReports/ErrorReports.cpp
     Source/CommonFramework/ErrorReports/ErrorReports.h
