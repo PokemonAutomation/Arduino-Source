@@ -13,27 +13,28 @@
 
 namespace PokemonAutomation{
 
-
+class JsonValue;
 class ResourceDownloadRow;
 class ResourceDownloadButton : public ConfigOptionImpl<ResourceDownloadButton>{
 public:
     ResourceDownloadButton(ResourceDownloadRow& p_row);
 
-    ResourceDownloadRow& option;
+    ResourceDownloadRow& row;
 };
 
 class ResourceDeleteButton : public ConfigOptionImpl<ResourceDeleteButton>{
 public:
     ResourceDeleteButton(ResourceDownloadRow& p_row);
 
-    ResourceDownloadRow& option;
+    ResourceDownloadRow& row;
 };
 
-enum class ResourceVersion{
+enum class ResourceVersionStatus{
     CURRENT,
-    OUTDATED,
-    NOT_APPLICABLE,
-    BLANK,
+    OUTDATED, // still used, but newer version available
+    RETIRED, // no longer used
+    NOT_APPLICABLE, // resource not downloaded locally, so can't get its version
+    BLANK, // not yet fetched version info from remote
 };
 
 class ResourceDownloadRow : public StaticTableRow{
@@ -44,11 +45,11 @@ public:
         std::string&& resource_name,
         size_t file_size,
         bool is_downloaded,
-        ResourceVersion version
+        size_t version_num
     );
 
 private:
-    static std::string resource_version_to_string(ResourceVersion version);
+    static std::string resource_version_to_string(ResourceVersionStatus version);
 
 public:
     struct Data;
@@ -65,6 +66,7 @@ enum class ResourceType{
 };
 struct DownloadedResource{
     std::string resource_name;
+    size_t version_num;
     ResourceType resource_type;
     size_t size_compressed_bytes;
     size_t size_decompressed_bytes;
@@ -79,8 +81,8 @@ public:
     virtual std::vector<std::string> make_header() const override;
     virtual UiWrapper make_UiComponent(void* params) override;
 
-private:
-    std::vector<DownloadedResource> deserialize_resource_list_json();
+private:  
+    std::vector<DownloadedResource> deserialize_resource_list_json(const JsonValue& json);
     std::vector<std::unique_ptr<ResourceDownloadRow>> get_resource_download_rows();
     void add_resource_download_rows();
 
