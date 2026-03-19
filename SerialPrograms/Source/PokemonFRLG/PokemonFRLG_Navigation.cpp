@@ -315,7 +315,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
     return false;
 }
 
-int spam_first_move(ConsoleHandle& console, ProControllerContext& context, uint64_t& remaining_pp){
+int spam_first_move(ConsoleHandle& console, ProControllerContext& context){
     uint16_t errors = 0;
     uint16_t times_moved = 0;
     while (true){
@@ -337,6 +337,8 @@ int spam_first_move(ConsoleHandle& console, ProControllerContext& context, uint6
         BattleFaintWatcher pokemon_fainted(COLOR_RED);
         BattleOpponentFaintWatcher opponent_fainted(COLOR_RED);
         BlackScreenWatcher battle_ended(COLOR_RED);
+        BattleOutOfPpWatcher out_of_pp(COLOR_RED);
+        AdvanceBattleDialogWatcher out_of_pp_dialog(COLOR_RED);
 
         int ret = run_until<ProControllerContext>(
             console, context,
@@ -347,17 +349,30 @@ int spam_first_move(ConsoleHandle& console, ProControllerContext& context, uint6
             { battle_menu, pokemon_fainted, opponent_fainted, battle_ended }
         );
 
+        int ret2;
         switch (ret){
         case 0:
-            if (remaining_pp == 0){
-                flee_battle(console, context);
-                return 2;
-            }
             console.log("Using first move.");
-            pbf_mash_button(context, BUTTON_A, 2000ms);
             context.wait_for_all_requests();
-            times_moved++;
-            remaining_pp--;
+            ret2 = run_until<ProControllerContext>(
+                console, context,
+                [](ProControllerContext& context){
+                    pbf_press_button(context, BUTTON_A, 200ms, 300ms); // leave enough time for PP color to be detected
+                    pbf_press_button(context, BUTTON_A, 200ms, 300ms);
+                    pbf_mash_button(context, BUTTON_A, 500ms);
+                    context.wait_for_all_requests();
+                },
+                { out_of_pp, out_of_pp_dialog }
+            );
+            if (ret2 < 0){
+                times_moved++;
+            } else {
+                console.log("Out of PP, fleeing battle.");
+                pbf_mash_button(context, BUTTON_B, 2000ms);
+                flee_battle(console, context);
+                context.wait_for_all_requests();
+                return 3;
+            }
             continue;
         case 1:
             console.log("Player Pokemon fainted.");
@@ -366,7 +381,9 @@ int spam_first_move(ConsoleHandle& console, ProControllerContext& context, uint6
             console.log("Opponent fainted.");
             return 0;
         case 3: 
-            console.log("Battle ended");
+            console.log("Battle ended"); // the opponent probably fled
+            pbf_wait(context, 2000ms);
+            context.wait_for_all_requests();
             return 2;
         default:
             console.log("Failed to detect move use.");

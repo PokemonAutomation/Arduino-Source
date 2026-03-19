@@ -51,8 +51,9 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
 
 // Mash A to keep using the first move until a Pokemon faints (either the player's or the opponent)
 // Flees the battle if out of PP.
-// returns 0 if the opponent fainted, 1 if the player Pokemon fainted, and 2 if the battle was fled.
-int spam_first_move(ConsoleHandle& console, ProControllerContext& context, uint64_t& remaining_pp);
+// returns 0 if the opponent fainted, 1 if the player Pokemon fainted, 2 if the battle was fled (by either Pokemon), 
+// and 3 if the battle was fled and the player Pokemon is out of PP.
+int spam_first_move(ConsoleHandle& console, ProControllerContext& context);
 
 // Run from battle. Cursor must start on the FIGHT button. Assumes fleeing will always work. (Smoke Ball)
 void flee_battle(ConsoleHandle& console, ProControllerContext& context);

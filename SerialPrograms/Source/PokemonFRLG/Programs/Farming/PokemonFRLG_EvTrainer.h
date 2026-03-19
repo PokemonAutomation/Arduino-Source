@@ -68,8 +68,6 @@ private:
     SimpleIntegerOption<uint64_t> SPDEF_EVS;
     SimpleIntegerOption<uint64_t> SPEED_EVS;
 
-    SimpleIntegerOption<uint64_t> MOVE_PP;
-
     BooleanCheckBoxOption STOP_ON_MOVE_LEARN;
     BooleanCheckBoxOption IGNORE_SHINIES;
 

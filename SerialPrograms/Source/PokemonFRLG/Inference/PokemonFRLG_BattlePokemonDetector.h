@@ -29,9 +29,9 @@ public:
     virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
-    // ImageFloatBox m_left_box;
+    ImageFloatBox m_left_box;
     ImageFloatBox m_right_box;
-    // ImageFloatBox m_top_box;
+    ImageFloatBox m_top_box;
     ImageFloatBox m_bottom_box;
 };
 
@@ -39,7 +39,7 @@ private:
 class BattleFaintWatcher : public DetectorToFinder<BattlePokemonDetector>{
 public:
     BattleFaintWatcher(Color color)
-        : DetectorToFinder("BattleFaintWatcher", FinderType::GONE, std::chrono::milliseconds(250), color)
+        : DetectorToFinder("BattleFaintWatcher", FinderType::GONE, std::chrono::milliseconds(2000), color)
     {}
 };
 
@@ -54,7 +54,7 @@ public:
 private:
     ImageFloatBox m_left_box;
     ImageFloatBox m_right_box;
-    // ImageFloatBox m_top_box;
+    ImageFloatBox m_top_box;
     ImageFloatBox m_bottom_box;
 };
 
@@ -62,7 +62,7 @@ private:
 class BattleOpponentFaintWatcher : public DetectorToFinder<BattleOpponentDetector>{
 public:
     BattleOpponentFaintWatcher(Color color)
-        : DetectorToFinder("BattleOPponentFaintWatcher", FinderType::GONE, std::chrono::milliseconds(250), color)
+        : DetectorToFinder("BattleOPponentFaintWatcher", FinderType::GONE, std::chrono::milliseconds(1000), color)
     {}
 };
 
