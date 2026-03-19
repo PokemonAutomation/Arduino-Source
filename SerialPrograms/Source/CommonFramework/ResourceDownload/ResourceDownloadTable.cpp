@@ -18,6 +18,7 @@
 
 #include <filesystem>
 #include <thread>
+// #include <unordered_set>
 
 #include <iostream>
 using std::cout;
@@ -40,7 +41,8 @@ struct ResourceDownloadRow::Data{
         std::string&& resource_name,
         size_t file_size,
         bool is_downloaded,
-        size_t version_num
+        std::optional<uint16_t> version_num,
+        ResourceVersionStatus version_status
     )
         : m_resource_name(LockMode::LOCK_WHILE_RUNNING, resource_name)
         , m_file_size(file_size)
@@ -48,8 +50,8 @@ struct ResourceDownloadRow::Data{
         , m_is_downloaded(is_downloaded)
         , m_is_downloaded_label(LockMode::LOCK_WHILE_RUNNING, is_downloaded ? "Yes" : "--")
         , m_version_num(version_num)
-        , m_version_status(ResourceVersionStatus::BLANK)
-        , m_version_status_label(LockMode::LOCK_WHILE_RUNNING, resource_version_to_string(m_version_status))
+        , m_version_status(version_status)
+        , m_version_status_label(LockMode::LOCK_WHILE_RUNNING, resource_version_to_string(version_status))
     {}
 
     LabelCellOption m_resource_name;
@@ -60,7 +62,7 @@ struct ResourceDownloadRow::Data{
     bool m_is_downloaded;
     LabelCellOption m_is_downloaded_label;
 
-    size_t m_version_num;
+    std::optional<uint16_t> m_version_num;
     ResourceVersionStatus m_version_status;
     LabelCellOption m_version_status_label;
 
@@ -73,10 +75,11 @@ ResourceDownloadRow::ResourceDownloadRow(
     std::string&& resource_name,
     size_t file_size,
     bool is_downloaded,
-    size_t version_num
+    std::optional<uint16_t> version_num,
+    ResourceVersionStatus version_status
 )
     : StaticTableRow(resource_name)
-    , m_data(CONSTRUCT_TOKEN, std::move(resource_name), file_size, is_downloaded, version_num)
+    , m_data(CONSTRUCT_TOKEN, std::move(resource_name), file_size, is_downloaded, version_num, version_status)
     , m_download_button(*this)
     , m_delete_button(*this)
 {
@@ -99,9 +102,63 @@ std::string ResourceDownloadRow::resource_version_to_string(ResourceVersionStatu
         return "--";
     case ResourceVersionStatus::BLANK:
         return "";
+    case ResourceVersionStatus::FUTURE_VERSION:
+        return "Unsupported future version.<br>Please update the Computer Control program.";
     default:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "resource_version_to_string: Unknown enum.");  
     }
+}
+
+ResourceType get_resource_type_from_string(std::string type){
+    if (type == "ZippedFolder"){
+        return ResourceType::ZIP_FILE;
+    }else{
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "get_resource_type_from_string: Unknown string.");
+    }
+    
+}
+
+std::vector<DownloadedResource> deserialize_resource_list_json(const JsonValue& json){
+    std::vector<DownloadedResource> resources;    
+
+    try{
+        const JsonObject& obj = json.to_object_throw();
+        const JsonArray& resource_list = obj.get_array_throw("resourceList");
+        for (const JsonValue& resource_val : resource_list){
+            const JsonObject& resource_obj = resource_val.to_object_throw();
+
+            std::string resource_name = resource_obj.get_string_throw("resourceName");
+            std::optional<uint16_t> version_num = (uint16_t)resource_obj.get_integer_throw("version");
+            ResourceType resource_type = get_resource_type_from_string(resource_obj.get_string_throw("Type"));
+            size_t compressed_bytes = (size_t)resource_obj.get_integer_throw("CompressedBytes");
+            size_t decompressed_bytes = (size_t)resource_obj.get_integer_throw("DecompressedBytes");
+            std::string url = resource_obj.get_string_throw("URL");
+
+            DownloadedResource resource = {
+                resource_name,
+                version_num,
+                resource_type,
+                compressed_bytes,
+                decompressed_bytes,
+                url
+            };
+
+            resources.emplace_back(std::move(resource));
+
+        }
+
+    }catch (ParseException& e){
+        throw ParseException(e.message() + "\nJSON parsing error. Given JSON file doesn't match the expected format.");
+    }
+
+    return resources;
+}
+
+
+std::vector<DownloadedResource> local_resource_download_list(){
+	static std::vector<DownloadedResource> local_resources = deserialize_resource_list_json(load_json_file(RESOURCE_PATH() + "ResourceDownloadList.json"));
+
+	return local_resources;
 }
 
 ResourceDownloadTable::~ResourceDownloadTable(){
@@ -110,7 +167,6 @@ ResourceDownloadTable::~ResourceDownloadTable(){
 
 ResourceDownloadTable::ResourceDownloadTable()
     : StaticTableOption("<b>Resource Downloading:</b><br>Download resources not included in the initial download of the program.", LockMode::LOCK_WHILE_RUNNING, false)
-    , m_resources(deserialize_resource_list_json(load_json_file(RESOURCE_PATH() + "ResourceDownloadList.json")))
     , m_resource_rows(get_resource_download_rows())
 {
     add_resource_download_rows();
@@ -139,62 +195,50 @@ UiWrapper ResourceDownloadTable::make_UiComponent(void* params) {
     return ConfigOptionImpl<StaticTableOption>::make_UiComponent(params);
 }
 
-ResourceType get_resource_type_from_string(std::string type){
-    if (type == "ZippedFolder"){
-        return ResourceType::ZIP_FILE;
-    }else{
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "get_resource_type_from_string: Unknown string.");
-    }
-    
+
+uint16_t get_resource_version_num(Filesystem::Path folder_path){
+    std::string file_name = folder_path.string() + "/version.json";
+    const JsonValue& json = load_json_file(file_name);
+
+    const JsonObject& obj = json.to_object_throw();
+    uint16_t version_num = (uint16_t)obj.get_integer_throw("version");
+
+    return version_num;
 }
 
-std::vector<DownloadedResource> ResourceDownloadTable::deserialize_resource_list_json(const JsonValue& json){
-    std::vector<DownloadedResource> resources;    
-
-    try{
-        const JsonObject& obj = json.to_object_throw();
-        const JsonArray& resource_list = obj.get_array_throw("resourceList");
-        for (const JsonValue& resource_val : resource_list){
-            const JsonObject& resource_obj = resource_val.to_object_throw();
-
-            std::string resource_name = resource_obj.get_string_throw("resourceName");
-            size_t version_num = resource_obj.get_integer_throw("version");
-            ResourceType resource_type = get_resource_type_from_string(resource_obj.get_string_throw("Type"));
-            size_t compressed_bytes = (size_t)resource_obj.get_integer_throw("CompressedBytes");
-            size_t decompressed_bytes = (size_t)resource_obj.get_integer_throw("DecompressedBytes");
-            std::string url = resource_obj.get_string_throw("URL");
-
-            DownloadedResource resource = {
-                resource_name,
-                version_num,
-                resource_type,
-                compressed_bytes,
-                decompressed_bytes,
-                url
-            };
-
-            resources.emplace_back(std::move(resource));
-
-        }
-
-    }catch (ParseException& e){
-        throw ParseException(e.message() + "\nJSON parsing error. Given JSON file doesn't match the expected format.");
+ResourceVersionStatus get_version_status(uint16_t expected_version_num, std::optional<uint16_t> current_version_num){
+    if (!current_version_num.has_value()){
+        return ResourceVersionStatus::NOT_APPLICABLE;
     }
 
-    return resources;
+    if (current_version_num < expected_version_num){
+        return ResourceVersionStatus::OUTDATED;
+    }else if (current_version_num == expected_version_num){
+        return ResourceVersionStatus::CURRENT;
+    }else{ // current > expected
+        return ResourceVersionStatus::FUTURE_VERSION;
+    }
 }
 
 std::vector<std::unique_ptr<ResourceDownloadRow>> ResourceDownloadTable::get_resource_download_rows(){
     std::vector<std::unique_ptr<ResourceDownloadRow>> resource_rows;
-    for (const DownloadedResource& resource : m_resources){
+    for (const DownloadedResource& resource : local_resource_download_list()){
         std::string resource_name = resource.resource_name;
-        size_t version_num = resource.version_num;
+        uint16_t expected_version_num = resource.version_num.value();
+        std::optional<uint16_t> current_version_num;  // default nullopt
+        ResourceVersionStatus version_status = ResourceVersionStatus::BLANK;
 
-        Filesystem::Path filepath{DOWNLOADED_RESOURCE_PATH() + resource_name + "-v" + std::to_string(version_num)};
+        Filesystem::Path filepath{DOWNLOADED_RESOURCE_PATH() + resource_name};
         bool is_downloaded = std::filesystem::is_directory(filepath);
-        cout << DOWNLOADED_RESOURCE_PATH() + resource_name + "-v" + std::to_string(version_num) << endl;
+        if (is_downloaded){
+            current_version_num = get_resource_version_num(filepath);
+        }
 
-        resource_rows.emplace_back(std::make_unique<ResourceDownloadRow>(std::move(resource_name), resource.size_decompressed_bytes, is_downloaded, version_num));
+        version_status = get_version_status(expected_version_num, current_version_num);
+        
+        // cout << DOWNLOADED_RESOURCE_PATH() + resource_name + "-v" + std::to_string(version_num) << endl;
+
+        resource_rows.emplace_back(std::make_unique<ResourceDownloadRow>(std::move(resource_name), resource.size_decompressed_bytes, is_downloaded, current_version_num, version_status));
     }
 
     return resource_rows;
@@ -207,7 +251,7 @@ void ResourceDownloadTable::add_resource_download_rows(){
     }
 }
 
-const JsonObject& fetch_resource_download_list_json_from_remote(){
+JsonValue fetch_resource_download_list_json_from_remote(){
     Logger& logger = global_logger_tagged();
     JsonValue json;
     try{
@@ -218,23 +262,27 @@ const JsonObject& fetch_resource_download_list_json_from_remote(){
     }catch (OperationFailedException&){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "fetch_resource_download_list_json_from_remote: Failed to download JSON.");  
     }
-    const JsonObject* obj = json.to_object();
-    if (obj == nullptr){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "fetch_resource_download_list_json_from_remote: Invalid JSON.");  
-    }
     
-    return *obj;
+    return json;
 }
 
-const JsonObject& remote_resource_download_list_json(){
-    static const JsonObject& json = fetch_resource_download_list_json_from_remote();
+const JsonValue& remote_resource_download_list_json(){
+    static const JsonValue json = fetch_resource_download_list_json_from_remote();
 
     return json;
 }
 
+std::vector<DownloadedResource> remote_resource_download_list(){
+	static std::vector<DownloadedResource> remote_resources = deserialize_resource_list_json(remote_resource_download_list_json());
+
+	return remote_resources;
+}
+
+
 void ResourceDownloadTable::check_all_resource_versions(){
-    const JsonObject& json_obj = remote_resource_download_list_json();
-    json_obj.get_string_throw("hi");
+    std::vector<DownloadedResource> remote_resources = remote_resource_download_list();
+
+
 
     // const JsonArray& resource_list = json_obj.get_array_throw("resourceList");
 
