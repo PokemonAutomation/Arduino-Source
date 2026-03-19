@@ -7,13 +7,14 @@
 #include <QKeyEvent>
 #include <QHBoxLayout>
 #include "Common/Qt/NoWheelComboBox.h"
-//#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Panels/ConsoleSettingsStretch.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "ControllerSelectorWidget.h"
 //#include "NintendoSwitch/NintendoSwitch_Settings.h"
 
 #include "SerialPABotBase/SerialPABotBase_SelectorWidget.h"
+#include "SerialPABotBase/SerialPABotBase2_SelectorWidget.h"
 #include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h"
 
 //#include <iostream>
@@ -49,6 +50,9 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     m_dropdowns->addWidget(interface_dropdown);
 
     interface_dropdown->addItem(QString::fromStdString(CONTROLLER_INTERFACE_STRINGS.get_string(ControllerInterface::SerialPABotBase)));
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        interface_dropdown->addItem(QString::fromStdString(CONTROLLER_INTERFACE_STRINGS.get_string(ControllerInterface::SerialPABotBase2)));
+    }
     interface_dropdown->addItem(QString::fromStdString(CONTROLLER_INTERFACE_STRINGS.get_string(ControllerInterface::TcpSysbotBase)));
 //    interface_dropdown->addItem(QString::fromStdString(CONTROLLER_INTERFACE_STRINGS.get_string(ControllerInterface::UsbSysbotBase)));
 
@@ -158,6 +162,11 @@ void ControllerSelectorWidget::refresh_selection(ControllerInterface interface_t
     switch (interface_type){
     case ControllerInterface::SerialPABotBase:
         m_selector = new SerialPABotBase::SerialPABotBase_SelectorWidget(*this, m_session.descriptor().get());
+        m_dropdowns->insertWidget(1, m_selector, 1);
+        break;
+
+    case ControllerInterface::SerialPABotBase2:
+        m_selector = new SerialPABotBase::SerialPABotBase2_SelectorWidget(*this, m_session.descriptor().get());
         m_dropdowns->insertWidget(1, m_selector, 1);
         break;
 

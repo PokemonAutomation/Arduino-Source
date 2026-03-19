@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PABotBase2_ConnectionDebug_H
-#define PokemonAutomation_PABotBase2_ConnectionDebug_H
+#ifndef PokemonAutomation_PABotBase2_ConnectionLayer_ConnectionDebug_H
+#define PokemonAutomation_PABotBase2_ConnectionLayer_ConnectionDebug_H
 
 #include "PABotBase2_Connection.h"
 #include "PABotBase2_PacketSender.h"

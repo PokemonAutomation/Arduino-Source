@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PABotBase2_StreamInterface_H
-#define PokemonAutomation_PABotBase2_StreamInterface_H
+#ifndef PokemonAutomation_PABotBase2_ConnectionLayer_StreamInterface_H
+#define PokemonAutomation_PABotBase2_ConnectionLayer_StreamInterface_H
 
 #include <stdbool.h>
 #include <stddef.h>
