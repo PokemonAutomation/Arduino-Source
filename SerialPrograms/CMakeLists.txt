@@ -460,6 +460,11 @@ else() # macOS and Linux
                 message(FATAL_ERROR "Could not find ONNX Runtime headers or library.")
             endif()
         endif ()
+
+        # Systemd DBus Library
+        find_package(sdbus-c++ REQUIRED)
+        target_link_libraries(SerialProgramsLib PRIVATE sdbus-c++)
+        target_link_libraries(SerialPrograms PRIVATE sdbus-c++)
     endif() # end Linux
 
     # Find OpenCV
