@@ -10,6 +10,7 @@
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Options/StaticTableOption.h"
+#include <optional>
 
 namespace PokemonAutomation{
 
@@ -35,6 +36,7 @@ enum class ResourceVersionStatus{
     RETIRED, // no longer used
     NOT_APPLICABLE, // resource not downloaded locally, so can't get its version
     BLANK, // not yet fetched version info from remote
+    FUTURE_VERSION, // current version number is greater than the expected version number
 };
 
 class ResourceDownloadRow : public StaticTableRow{
@@ -45,7 +47,8 @@ public:
         std::string&& resource_name,
         size_t file_size,
         bool is_downloaded,
-        size_t version_num
+        std::optional<uint16_t> version_num,
+        ResourceVersionStatus version_status
     );
 
 private:
@@ -66,7 +69,7 @@ enum class ResourceType{
 };
 struct DownloadedResource{
     std::string resource_name;
-    size_t version_num;
+    std::optional<uint16_t> version_num;
     ResourceType resource_type;
     size_t size_compressed_bytes;
     size_t size_decompressed_bytes;
@@ -82,7 +85,6 @@ public:
     virtual UiWrapper make_UiComponent(void* params) override;
 
 private:  
-    std::vector<DownloadedResource> deserialize_resource_list_json(const JsonValue& json);
     std::vector<std::unique_ptr<ResourceDownloadRow>> get_resource_download_rows();
     void add_resource_download_rows();
 
@@ -90,8 +92,6 @@ private:
 
 
 private:
-    std::vector<DownloadedResource> m_resources;
-
     // we need to keep a handle on each Row, so that we can edit m_is_downloaded_label later on.
     std::vector<std::unique_ptr<ResourceDownloadRow>> m_resource_rows;
 
