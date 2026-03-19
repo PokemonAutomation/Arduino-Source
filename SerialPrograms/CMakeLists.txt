@@ -395,7 +395,7 @@ else() # macOS and Linux
 
             if(NOT IS_DIRECTORY ${EXTRACTED_ONNX_PATH})
                 message(STATUS "ONNX_ROOT_PATH not found. Downloading ONNX Runtime v${ONNXRUNTIME_VERSION}...")
-                
+
                 # logic for downloading...
                 set(DOWNLOAD_LOCATION "${CMAKE_BINARY_DIR}/${ONNXRUNTIME_TGZ_NAME}")
                 file(DOWNLOAD
@@ -447,6 +447,11 @@ else() # macOS and Linux
         else()
             message(FATAL_ERROR "Could not find ONNX Runtime headers or library.")
         endif()
+
+        # Systemd DBus Library
+        find_package(sdbus-c++ REQUIRED)
+        target_link_libraries(SerialProgramsLib PRIVATE sdbus-c++)
+        target_link_libraries(SerialPrograms PRIVATE sdbus-c++)
     endif() # end Linux
 
     # Find OpenCV
