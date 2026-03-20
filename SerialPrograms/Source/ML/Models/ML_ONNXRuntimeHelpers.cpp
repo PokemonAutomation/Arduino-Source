@@ -75,10 +75,25 @@ if (use_gpu){
         std::cout << "CUDA execution provider not available: " << e.what() << std::endl;
     }
 
+    if (!cuda_available) {
+        bool rocm_available = false;
+        // Try ROCm next for AMD GPUs
+        // See: https://onnxruntime.ai/docs/execution-providers/ROCm-ExecutionProvider.html
+        try {
+            OrtROCMProviderOptions rocm_options{};
+            rocm_options.device_id = 0;
+            so.AppendExecutionProvider_ROCM(rocm_options);
+            std::cout << "Using ROCm execution provider for GPU acceleration" << std::endl;
+            rocm_available = true;
+        } catch (const Ort::Exception& e) {
+            std::cout << "ROCm execution provider not available, falling back to CPU: " << e.what() << std::endl;
+        }
+    }
+
     // Fallback to DirectML for all GPU vendors (NVIDIA, AMD, Intel)
     // DirectML is built into Windows 10 1903+ and requires no additional runtime installation
     // See: https://onnxruntime.ai/docs/execution-providers/DirectML-ExecutionProvider.html
-    if (!cuda_available){
+    if (!cuda_available and !rocm_available){
         try {
             so.AppendExecutionProvider("DML");
             std::cout << "Using DirectML execution provider for GPU acceleration" << std::endl;
