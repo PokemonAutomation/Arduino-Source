@@ -15,6 +15,9 @@
 //using std::endl;
 
 #ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wtype-limits"
+#endif
+#ifdef __clang__
 #pragma GCC diagnostic ignored "-Wtautological-constant-out-of-range-compare"
 #endif
 
