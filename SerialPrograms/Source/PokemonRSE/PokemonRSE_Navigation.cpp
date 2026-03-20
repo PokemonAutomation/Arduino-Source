@@ -100,17 +100,20 @@ uint64_t soft_reset(ConsoleHandle& console, ProControllerContext& context){
 }
 
 void flee_battle(VideoStream& stream, ProControllerContext& context){
-    stream.log("Navigate to Run.");
-    pbf_press_dpad(context, DPAD_RIGHT, 160ms, 160ms);
-    pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
-    pbf_press_button(context, BUTTON_A, 160ms, 320ms);
-
     AdvanceBattleDialogWatcher ran_away(COLOR_YELLOW);
-    int ret2 = wait_until(
+    int ret2 = run_until<ProControllerContext>(
         stream, context,
-        std::chrono::seconds(5),
-        {{ran_away}}
+        [&](ProControllerContext& context){
+            stream.log("Navigate to Run.");
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 160ms);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
+            pbf_press_button(context, BUTTON_A, 160ms, 320ms);
+            pbf_wait(context, 5000ms);
+            context.wait_for_all_requests();
+        },
+        { ran_away }
     );
+    context.wait_for_all_requests();
     if (ret2 == 0){
         stream.log("Running away...");
     }else{
@@ -121,15 +124,19 @@ void flee_battle(VideoStream& stream, ProControllerContext& context){
         );
     }
 
-    pbf_press_button(context, BUTTON_A, 320ms, 320ms);
     BlackScreenOverWatcher battle_over(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
-    int ret3 = wait_until(
+    int ret3 = run_until<ProControllerContext>(
         stream, context,
-        std::chrono::seconds(5),
-        {{battle_over}}
+        [&](ProControllerContext& context){
+            pbf_press_button(context, BUTTON_A, 320ms, 320ms);
+            pbf_wait(context, 5000ms);
+            context.wait_for_all_requests();
+        },
+        { battle_over }
     );
+    context.wait_for_all_requests();
     if (ret3 == 0){
-        stream.log("Ran from battle.");
+        stream.log("Successfully ran from battle.");
     }else{
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
