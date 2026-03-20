@@ -36,7 +36,7 @@ GameSettings::GameSettings()
         "Refer to the documentation for specific setups.",
         {
             {Device::switch_1_2,            "switch_1_2",           "Nintendo Switch 1 and 2"},
-            {Device::rg35xx,                "rg35xx",               "RG35XX"},
+            //{Device::rg35xx,                "rg35xx",               "RG35XX"},
             //{Device::custom,                "custom",               "Custom"},
         },
         LockMode::LOCK_WHILE_RUNNING,
