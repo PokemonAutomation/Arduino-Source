@@ -59,7 +59,7 @@ private:
 
     EffortValues get_ev_yield(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::string& species);
 
-    // OCR::LanguageOCROption LANGUAGE;
+    OCR::LanguageOCROption LANGUAGE;
 
     SimpleIntegerOption<uint64_t> HP_EVS;
     SimpleIntegerOption<uint64_t> ATK_EVS;
@@ -68,6 +68,7 @@ private:
     SimpleIntegerOption<uint64_t> SPDEF_EVS;
     SimpleIntegerOption<uint64_t> SPEED_EVS;
 
+    BooleanCheckBoxOption PREVENT_EVOLUTION;
     BooleanCheckBoxOption STOP_ON_MOVE_LEARN;
     BooleanCheckBoxOption IGNORE_SHINIES;
 

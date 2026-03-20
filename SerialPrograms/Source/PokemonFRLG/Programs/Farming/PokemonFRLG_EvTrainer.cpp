@@ -83,23 +83,23 @@ std::unique_ptr<StatsTracker> EvTrainer_Descriptor::make_stats() const{
 }
 
 EvTrainer::EvTrainer()
-    // : LANGUAGE(
-    //     "<b>Game Language:</b>",
-    //     {
-    //         Language::English,
-    //         Language::Japanese,
-    //         Language::Spanish,
-    //         Language::French,
-    //         Language::German,
-    //         Language::Italian,
-    //         Language::Korean,
-    //         Language::ChineseSimplified,
-    //         Language::ChineseTraditional,
-    //     },
-    //     LockMode::LOCK_WHILE_RUNNING,
-    //     true
-    // )
-    : HP_EVS(
+    : LANGUAGE(
+        "<b>Game Language:</b>",
+        {
+            Language::English,
+            Language::Japanese,
+            Language::Spanish,
+            Language::French,
+            Language::German,
+            Language::Italian,
+            Language::Korean,
+            Language::ChineseSimplified,
+            Language::ChineseTraditional,
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
+    , HP_EVS(
         "<b>HP EVs:</b>",
         LockMode::LOCK_WHILE_RUNNING,
         0, 0, 255 // default, min, max
@@ -128,6 +128,11 @@ EvTrainer::EvTrainer()
         "<b>Speed EVs:</b>",
         LockMode::LOCK_WHILE_RUNNING,
         0, 0, 255 // default, min, max
+    )
+    , PREVENT_EVOLUTION(
+        "<b>Prevent " + Pokemon::STRING_POKEMON + " from evolving</b>",
+        LockMode::LOCK_WHILE_RUNNING, 
+        false // default
     )
     , STOP_ON_MOVE_LEARN(
         "<b>Quit when a new move is learned</b><br>Stop this program when a new move is learned. If unchecked, new moves will not be learned.",
@@ -164,6 +169,7 @@ EvTrainer::EvTrainer()
     PA_ADD_OPTION(SPATK_EVS);
     PA_ADD_OPTION(SPDEF_EVS);
     PA_ADD_OPTION(SPEED_EVS);
+    PA_ADD_OPTION(PREVENT_EVOLUTION);
     PA_ADD_OPTION(STOP_ON_MOVE_LEARN);
     PA_ADD_OPTION(IGNORE_SHINIES);
     PA_ADD_OPTION(TAKE_VIDEO);
@@ -179,7 +185,10 @@ void visit_pokecenter(SingleSwitchProgramEnvironment& env, ProControllerContext&
     leave_pokecenter(env.console, context);  
 }
 
-void walk_to_viridianforest(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void travel_to_viridianforest(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    open_fly_map_from_overworld(env.console, context);
+    fly_from_kanto_map(env.console, context, KantoFlyLocation::pewtercity);
+    visit_pokecenter(env, context);
     env.log("Walking to Viridian Forest.");
     // down to the trees
     pbf_move_left_joystick(context, {0, -1}, 2350ms, 200ms);
@@ -194,7 +203,10 @@ void walk_to_viridianforest(SingleSwitchProgramEnvironment& env, ProControllerCo
     context.wait_for_all_requests();
 }
 
-void walk_to_route22(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void travel_to_route22(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    open_fly_map_from_overworld(env.console, context);
+    fly_from_kanto_map(env.console, context, KantoFlyLocation::viridiancity);
+    visit_pokecenter(env, context);
     context.wait_for_all_requests();
     env.log("Walking to Route 22.");
     // left a few steps
@@ -212,7 +224,10 @@ void walk_to_route22(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     context.wait_for_all_requests();
 }
 
-void walk_to_rock_tunnel(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void travel_to_rock_tunnel(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    open_fly_map_from_overworld(env.console, context);
+    fly_from_kanto_map(env.console, context, KantoFlyLocation::route10);
+    visit_pokecenter(env, context);
     env.log("Walking to Rock Tunnel.");
     // down to the fence
     pbf_move_left_joystick(context, {0, -1}, 2367ms, 200ms);
@@ -229,7 +244,10 @@ void walk_to_rock_tunnel(SingleSwitchProgramEnvironment& env, ProControllerConte
     context.wait_for_all_requests();
 }
 
-void walk_to_pokemontower(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void travel_to_pokemontower(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    open_fly_map_from_overworld(env.console, context);
+    fly_from_kanto_map(env.console, context, KantoFlyLocation::lavendertown);
+    visit_pokecenter(env, context);
     env.log("Walking to Pokemon Tower.");
     // PokeCenter to tower
     pbf_move_left_joystick(context, {0, -1}, 400ms, 200ms);
@@ -248,7 +266,10 @@ void walk_to_pokemontower(SingleSwitchProgramEnvironment& env, ProControllerCont
     context.wait_for_all_requests();
 }
 
-void walk_to_surf_spot(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void travel_to_surf_spot(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    open_fly_map_from_overworld(env.console, context);
+    fly_from_kanto_map(env.console, context, KantoFlyLocation::vermilioncity);
+    visit_pokecenter(env, context);
     env.log("Walking to the shore and Surfing.");
     // walk directly left to the shore
     pbf_move_left_joystick(context, {-1, 0}, 5000ms, 200ms);
@@ -259,7 +280,10 @@ void walk_to_surf_spot(SingleSwitchProgramEnvironment& env, ProControllerContext
     context.wait_for_all_requests();
 }
 
-void walk_to_route1(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void travel_to_route1(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    open_fly_map_from_overworld(env.console, context);
+    fly_from_kanto_map(env.console, context, KantoFlyLocation::viridiancity);
+    visit_pokecenter(env, context);
     context.wait_for_all_requests();
     env.log("Walking to Route 1.");
     // left a couple of steps
@@ -399,7 +423,7 @@ std::string EvTrainer::get_encounter_species(SingleSwitchProgramEnvironment& env
     env.log("Reading name...");
     VideoSnapshot screen = env.console.video().snapshot();
     PokemonFRLG_WildEncounter encounter;
-    reader.read_encounter(env.logger(), Language::English, screen, subset, encounter);
+    reader.read_encounter(env.logger(), LANGUAGE, screen, subset, encounter);
     env.log("Name: " + encounter.name);
 
     return encounter.name;
@@ -462,7 +486,6 @@ void EvTrainer::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                 if (current_location == EvTrainingLocation::pokemontower  || current_location == EvTrainingLocation::rocktunnel){
                     use_dig(env, context);
                 }
-                bool should_heal = stats.encounters == 0 || failed_encounter || out_of_pp; 
 
                 if (stats.hp_evs < HP_EVS){
                     current_location = EvTrainingLocation::viridianforest;
@@ -480,76 +503,27 @@ void EvTrainer::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                     break;
                 }
 
+                spin_leftright = true;
+
                 switch (current_location){
                 case EvTrainingLocation::viridianforest:
-                    open_fly_map_from_overworld(env.console, context);
-                    fly_from_kanto_map(env.console, context, KantoFlyLocation::pewtercity);
-                    if (should_heal){
-                        visit_pokecenter(env, context);
-                        stats.healing_trips++;
-                        out_of_pp = false;
-                    }
-                    walk_to_viridianforest(env, context);
-                    spin_leftright = true;
+                    travel_to_viridianforest(env, context);
                     break;
                 case EvTrainingLocation::route22:
-                    open_fly_map_from_overworld(env.console, context);
-                    fly_from_kanto_map(env.console, context, KantoFlyLocation::viridiancity);
-                    if (should_heal){
-                        visit_pokecenter(env, context);
-                        stats.healing_trips++;
-                        out_of_pp = false;
-                    }
-                    walk_to_route22(env, context);
-                    spin_leftright = true;
+                    travel_to_route22(env, context);
                     break;
                 case EvTrainingLocation::rocktunnel:
-                    open_fly_map_from_overworld(env.console, context);
-                    fly_from_kanto_map(env.console, context, KantoFlyLocation::route10);
-                    if (should_heal){
-                        visit_pokecenter(env, context);
-                        stats.healing_trips++;
-                        out_of_pp = false;
-                    }
-                    walk_to_rock_tunnel(env, context);
-                    spin_leftright = true;
+                    travel_to_rock_tunnel(env, context);
                     break;
                 case EvTrainingLocation::pokemontower:
-                    open_fly_map_from_overworld(env.console, context);
-                    fly_from_kanto_map(env.console, context, KantoFlyLocation::lavendertown);
-                    if (should_heal){
-                        visit_pokecenter(env, context);
-                        stats.healing_trips++;
-                        out_of_pp = false;
-                    }
-                    walk_to_pokemontower(env, context);
-                    spin_leftright = true;
+                    travel_to_pokemontower(env, context);
                     break;
                 case EvTrainingLocation::surfspot:
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
-                        "Not yet implemented.",
-                        env.console
-                    );
-                    fly_from_kanto_map(env.console, context, KantoFlyLocation::vermilioncity);
-                    if (should_heal){
-                        visit_pokecenter(env, context);
-                        stats.healing_trips++;
-                        out_of_pp = false;
-                    }
-                    walk_to_surf_spot(env, context);
+                    travel_to_surf_spot(env, context);
                     spin_leftright = false;
                     break;
                 case EvTrainingLocation::route1:
-                    open_fly_map_from_overworld(env.console, context);
-                    fly_from_kanto_map(env.console, context, KantoFlyLocation::viridiancity);
-                    if (should_heal){
-                        visit_pokecenter(env, context);
-                        stats.healing_trips++;
-                        out_of_pp = false;
-                    }
-                    walk_to_route1(env, context);
-                    spin_leftright = true;
+                    travel_to_route1(env, context);
                     break;
                 default:
                     OperationFailedException::fire(
@@ -558,7 +532,9 @@ void EvTrainer::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                         env.console
                     );
                 }
-
+                
+                stats.healing_trips++;
+                out_of_pp = false;
                 failed_encounter = false;
                 finished_stat = false;
             }
@@ -659,7 +635,7 @@ void EvTrainer::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                         finished_stat = false;
                     }
 
-                    bool move_learned = exit_wild_battle(env.console, context, !!STOP_ON_MOVE_LEARN);
+                    bool move_learned = exit_wild_battle(env.console, context, !!STOP_ON_MOVE_LEARN, !!PREVENT_EVOLUTION);
 
                     if (move_learned && STOP_ON_MOVE_LEARN){
                         send_program_status_notification(

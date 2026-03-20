@@ -437,34 +437,15 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
     }
 }
 
-bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, bool stop_on_move_learn){
-    
-    BlackScreenWatcher battle_exited(COLOR_RED);    
-    
-    context.wait_for_all_requests();
-    int ret = run_until<ProControllerContext>(
-        console, context,
-        [](ProControllerContext& context) {
-           pbf_mash_button(context, BUTTON_B, 20000ms);
-        },
-        { battle_exited }
-    );
-
-    if (ret == 0) {
-        pbf_wait(context, 500ms);
-        context.wait_for_all_requests();
-        console.log("Battle exited.");
-        return false;
-    }
-
-    console.log("Loop detected.");
-
-    // there are two dialog selection boxes in a row
-    // we need to decline the first one and accept the second one
-    // the first one will occur after an Advance Battle Dialog
+bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, bool stop_on_move_learn, bool prevent_evolution){
+    // For move learning, there are two dialog selection boxes in a row
+    // we need to decline the first one and accept the second one, so mashing B won't work
+    // The first one will occur after an Advance Battle Dialog
     uint16_t errors = 0;
     uint16_t loops = 0;
+    bool first_attempt = true;
     bool rejected_first_box = false;
+    bool move_learned = false;
     while (true){
         if (errors > 5 || loops > 5){
             OperationFailedException::fire(
@@ -474,28 +455,61 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
             );
         }
 
+        BlackScreenWatcher battle_exited(COLOR_RED);    
         AdvanceBattleDialogWatcher advance_dialog(COLOR_RED);
         BattleLearnDialogWatcher move_learn_select(COLOR_RED);
 
         context.wait_for_all_requests();
         WallClock deadline = current_time() + 30s;
-        ret = run_until<ProControllerContext>(
-            console, context,
-            [deadline, rejected_first_box](ProControllerContext& context) {
-                pbf_wait(context, 1000ms); // give the watchers a chance to detect something
-                while (current_time() < deadline){
-                    pbf_press_button(context, rejected_first_box ? BUTTON_A : BUTTON_B, 200ms, 1800ms);
-                }
-            },
-            { battle_exited, advance_dialog, move_learn_select }
-        );
+        int ret;
+        if (first_attempt){
+            ret = run_until<ProControllerContext>(
+                console, context,
+                [](ProControllerContext& context) {
+                    pbf_mash_button(context, BUTTON_B, 20000ms);
+                },
+                { battle_exited }
+            );
+        }else{
+            ret = run_until<ProControllerContext>(
+                console, context,
+                [deadline, rejected_first_box](ProControllerContext& context) {
+                    pbf_wait(context, 1000ms); // give the watchers a chance to detect something
+                    while (current_time() < deadline){
+                        pbf_press_button(context, rejected_first_box ? BUTTON_A : BUTTON_B, 200ms, 1800ms);
+                    }
+                },
+                { battle_exited, advance_dialog, move_learn_select }
+            );
+        }
+
+        BattleDialogWatcher evolution_started(COLOR_RED);
+        int ret2;
 
         switch (ret){
         case 0:
-            pbf_wait(context, 500ms);
-            context.wait_for_all_requests();
             console.log("Battle exited.");
-            return rejected_first_box;
+
+            // check for the evolution screen
+            context.wait_for_all_requests(); 
+            ret2 = run_until<ProControllerContext>(
+                console, context,
+                [](ProControllerContext& context) {
+                    pbf_wait(context, 2000ms);
+                },
+                { evolution_started }
+            );
+
+            if (ret2 == 1){
+                if (!prevent_evolution){
+                    // make sure B isn't pressed too soon, which would cancel the evolution
+                    pbf_wait(context, 20000ms);
+                }
+                rejected_first_box = false;
+                continue; // press B as in other cases, and handle any move learning loops that might come up
+            }
+
+            return move_learned;
         case 1:
             console.log("Battle Advance arrow detected.");
             pbf_press_button(context, BUTTON_B, 200ms, 800ms);
@@ -513,9 +527,15 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
             }else{
                 pbf_press_button(context, BUTTON_B, 200ms, 0ms);
                 rejected_first_box = true;
+                move_learned = true;
             }
             continue;
         default:
+            if (first_attempt){
+                console.log("Loop detected.");
+                first_attempt = false;
+                continue;
+            }
             console.log("Failed to detect expected battle dialogs.");
             errors++;
             // attempt to exit any screen that might be open (party, bag, etc)
@@ -581,7 +601,7 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
     }
 }
 
-void use_teleport(ConsoleHandle& console, ProControllerContext& context){
+void use_teleport_from_overworld(ConsoleHandle& console, ProControllerContext& context){
     uint16_t errors = 0;
     
     while (true){
@@ -887,6 +907,37 @@ void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context){
         context.wait_for_all_requests();
         return;
     }
+}
+
+int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftright, Seconds timeout){
+    BlackScreenWatcher battle_entered(COLOR_RED);
+
+    context.wait_for_all_requests();
+    console.log("Starting grass spin.");
+    WallClock deadline = current_time() + timeout;
+
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [leftright, deadline](ProControllerContext& context) {
+            while (current_time() < deadline){
+                if (leftright){
+                    pbf_move_left_joystick(context, {+1, 0}, 33ms, 150ms);
+                    pbf_move_left_joystick(context, {-1, 0}, 33ms, 150ms);
+                }else{
+                    pbf_move_left_joystick(context, {0, +1}, 33ms, 150ms);
+                    pbf_move_left_joystick(context, {0, -1}, 33ms, 150ms);
+                }
+            }
+        },
+        { battle_entered }
+    );
+    
+    if (ret < 0){
+        return -1;
+    }
+
+    bool encounter_shiny = handle_encounter(console, context, true);
+    return encounter_shiny ? 1 : 0;
 }
 
 void home_black_border_check(ConsoleHandle& console, ProControllerContext& context){

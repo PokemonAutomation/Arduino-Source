@@ -59,32 +59,38 @@ int spam_first_move(ConsoleHandle& console, ProControllerContext& context);
 void flee_battle(ConsoleHandle& console, ProControllerContext& context);
 
 // Exit a wild battle after winning. Checks if a Pokemon is learning a new move.
-// Set stop_on_move_learn to true to cause this to exit early when a move is being learned without declining it
-// Assumes that the Pokemon will not evolve
-bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, bool stop_on_move_learn);
+// If stop_on_move_learn is true, this exits early when a move is being learned without declining it.
+// Otherwise, this returns to the overworld
+bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, bool stop_on_move_learn, bool prevent_evolution);
 
 // Starting from the start menu, a sub-screen of the start menu, or the overworld, navigate to the party screen
 void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context);
 
 // Uses Teleport to return to a PokeCenter. 
 // Assumes that Teleport is usable and the last party member has it learned
-void use_teleport(ConsoleHandle& console, ProControllerContext& context);
+void use_teleport_from_overworld(ConsoleHandle& console, ProControllerContext& context);
 
-// Navigates to the fly map. Assumes that a fly user is the last member of your party
+// Navigates to the fly map. Assumes that Fly is usable and the last member of your party has it learned
 void open_fly_map_from_overworld(ConsoleHandle& console, ProControllerContext& context);
 
 // Starting from the Kanto Fly map, fly to a specified location.
 void fly_from_kanto_map(ConsoleHandle& console, ProControllerContext& context, KantoFlyLocation destination);
 
-// Enter a pokecenter. Assumes the player is standing in front of its door
+// Enter a PokeCenter. Assumes the player is standing in front of its door
 void enter_pokecenter(ConsoleHandle& console, ProControllerContext& context);
 
-// Leave a pokecenter. Assumes the player is standing directly north of the exit
+// Leave a PokeCenter. Assumes the player is standing directly north of the exit
 void leave_pokecenter(ConsoleHandle& console, ProControllerContext& context);
 
 // Approach the counter and heal at a PokeCenter. Assumed the player is directly south of the nurse
-// Combine with enter_pokecenter, leave_pokecenter, and use_teleport for automating healing your party
+// Combine with enter_pokecenter, leave_pokecenter, and use_teleport_from_overworld for automating healing your party
 void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context);
+
+// Trigger encounters in grass without moving by tapping the left thumbstick back and forth
+// Can be used to alternate left/right and up/down. It is important that the player is not facing
+// the same direction as the first thumbstick press.
+// returns -1 if no encounter is triggered, 0 if a non-shiny is encounter, and 1 if a shiny is encountered
+int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftright, Seconds timeout = 60s);
 
 // Go to home to check that scaling is 100%. Then resume game.
 void home_black_border_check(ConsoleHandle& console, ProControllerContext& context);
