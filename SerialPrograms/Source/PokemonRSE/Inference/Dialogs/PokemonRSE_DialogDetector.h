@@ -22,6 +22,7 @@ namespace NintendoSwitch{
 namespace PokemonRSE{
 
 // Battle dialog boxes are teal
+// This is unused right now so isn't tested well
 /*
 class BattleDialogDetector : public StaticScreenDetector{
 public:

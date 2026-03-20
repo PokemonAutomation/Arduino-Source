@@ -69,7 +69,7 @@ GameSettings::GameSettings()
     , SHINY_SOUND_LOW_FREQUENCY(
         "<b>Shiny Sound Low Frequency (Hz):</b><br>High pass filter frequency for shiny sound.",
         LockMode::LOCK_WHILE_RUNNING,
-        1000, 0, 48000
+        3000, 0, 48000
     )
 {
     PA_ADD_STATIC(m_game_device_settings);
