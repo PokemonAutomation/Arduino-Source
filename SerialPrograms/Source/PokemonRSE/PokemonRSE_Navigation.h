@@ -31,7 +31,7 @@ void flee_battle(VideoStream& stream, ProControllerContext& context);
 // After press A/walking up to enter a battle, run this handle the battle start and to check if opponent is shiny.
 // Set send_out_lead to true and then use flee_battle() after if game is Emerald.
 // For R/S, send_out_lead as false and then soft_reset() to save time.
-bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool send_out_lead);
+bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, bool send_out_lead);
 
 // Go to home to check that scaling is 100%. Then resume game.
 // Skips checks if not Switch.
