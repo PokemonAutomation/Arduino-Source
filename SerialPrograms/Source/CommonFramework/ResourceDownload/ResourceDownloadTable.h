@@ -8,60 +8,9 @@
 #define PokemonAutomation_ResourceDownloadTable_H
 
 #include "Common/Cpp/Concurrency/AsyncTask.h"
-#include "Common/Cpp/Containers/Pimpl.h"
-#include "Common/Cpp/Options/StaticTableOption.h"
-#include <optional>
+#include "ResourceDownloadRow.h"
 
 namespace PokemonAutomation{
-
-class JsonValue;
-class ResourceDownloadRow;
-class ResourceDownloadButton : public ConfigOptionImpl<ResourceDownloadButton>{
-public:
-    ResourceDownloadButton(ResourceDownloadRow& p_row);
-
-    ResourceDownloadRow& row;
-};
-
-class ResourceDeleteButton : public ConfigOptionImpl<ResourceDeleteButton>{
-public:
-    ResourceDeleteButton(ResourceDownloadRow& p_row);
-
-    ResourceDownloadRow& row;
-};
-
-enum class ResourceVersionStatus{
-    CURRENT,
-    OUTDATED, // still used, but newer version available
-    RETIRED, // no longer used
-    NOT_APPLICABLE, // resource not downloaded locally, so can't get its version
-    BLANK, // not yet fetched version info from remote
-    FUTURE_VERSION, // current version number is greater than the expected version number
-};
-
-class ResourceDownloadRow : public StaticTableRow{
-
-public:
-    ~ResourceDownloadRow();
-    ResourceDownloadRow(
-        std::string&& resource_name,
-        size_t file_size,
-        bool is_downloaded,
-        std::optional<uint16_t> version_num,
-        ResourceVersionStatus version_status
-    );
-
-private:
-    static std::string resource_version_to_string(ResourceVersionStatus version);
-
-public:
-    struct Data;
-    Pimpl<Data> m_data;
-
-    ResourceDownloadButton m_download_button;
-    ResourceDeleteButton m_delete_button;
-
-};
 
 
 enum class ResourceType{
@@ -82,13 +31,10 @@ public:
     ResourceDownloadTable();
 
     virtual std::vector<std::string> make_header() const override;
-    virtual UiWrapper make_UiComponent(void* params) override;
+    // virtual UiWrapper make_UiComponent(void* params) override;
 
 private:  
-    std::vector<std::unique_ptr<ResourceDownloadRow>> get_resource_download_rows();
     void add_resource_download_rows();
-
-    void check_all_resource_versions();
 
 
 private:
