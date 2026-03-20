@@ -7,7 +7,7 @@ Note that our Linux setup might not work. The video display can flicker to the p
 Install the following build requirements, these steps will use ubuntu packages but the steps will be the same on your distro:
 
 ```
-git cmake ninja-build gcc g++ qt6-base-dev qt6-multimedia-dev qt6-serialport-dev libopencv-dev libonnx-dev libasound2-dev
+git cmake ninja-build gcc g++ qt6-base-dev qt6-multimedia-dev qt6-serialport-dev libopencv-dev libonnx-dev libasound2-dev libsystemd-dev
 dpkg                    # To build .deb packages for Debian based distros
 rpm                     # To build .rpm packages for RHEL based distros
 pacman-package-manager  # To build .pkg packages for Arch based distros
