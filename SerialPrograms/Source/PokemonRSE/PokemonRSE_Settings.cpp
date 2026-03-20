@@ -53,7 +53,7 @@ GameSettings::GameSettings()
     , SELECT_BUTTON_MASH0(
         "<b>Select Button Mash:</b><br>Mash select for this long after a soft reset to get to Press Start.",
         LockMode::LOCK_WHILE_RUNNING,
-        "5000 ms"
+        "3200 ms"
     )
     , ENTER_GAME_WAIT0(
         "<b>Enter Game Wait:</b><br>Wait this long for the game to load.",
