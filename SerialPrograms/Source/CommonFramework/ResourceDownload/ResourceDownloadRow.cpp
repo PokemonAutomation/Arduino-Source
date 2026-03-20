@@ -11,18 +11,38 @@
 #include "CommonFramework/Options/LabelCellOption.h"
 #include "ResourceDownloadRow.h"
 
+#include <thread>
 
-// #include <iostream>
-// using std::cout;
-// using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
+
+ResourceDownloadButton::~ResourceDownloadButton(){
+    m_worker.wait_and_ignore_exceptions();
+}
 
 
 ResourceDownloadButton::ResourceDownloadButton(ResourceDownloadRow& p_row)
     : ConfigOptionImpl<ResourceDownloadButton>(LockMode::UNLOCK_WHILE_RUNNING)
     , row(p_row)
+    , m_enabled(true)
 {}
+
+
+void ResourceDownloadButton::run_download(){
+    m_worker = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+        [this]{ 
+            std::this_thread::sleep_for(std::chrono::seconds(7));
+            cout << "Clicked Download Button" << endl;
+
+            m_enabled = true;
+            emit download_finished();
+        }
+    );
+
+}
 
 ResourceDeleteButton::ResourceDeleteButton(ResourceDownloadRow& p_row)
     : ConfigOptionImpl<ResourceDeleteButton>(LockMode::UNLOCK_WHILE_RUNNING)
