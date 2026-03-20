@@ -245,7 +245,6 @@ Ort::Env create_ORT_env(){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Onnx API returned a null pointer.");
     }
 #endif
-    // Bit redundant now, but still might be useful to add logging or other init?
     return Ort::Env();
 }
 
