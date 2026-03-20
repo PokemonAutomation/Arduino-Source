@@ -449,24 +449,14 @@ else() # macOS and Linux
         endif()
 
         # Systemd DBus Library
-        find_package(sdbus-c++ 2.2.1 QUIET)
-
-        if(TARGET sdbus-c++ AND sdbus-c++_VERSION VERSION_GREATER_EQUAL 2.2.1)
-            # Use System-installed library
-            message(STATUS "Using system-installed sdbus-c++ v${sdbus-c++_VERSION}")
-            target_link_libraries(SerialProgramsLib PRIVATE sdbus-c++)
-            target_link_libraries(SerialPrograms PRIVATE sdbus-c++)
-        else()
-            # Use bundled library
-            message(STATUS "sdbus-c++ >= 2.2.1 not found, using bundled library")
-            target_include_directories(SerialProgramsLib PRIVATE
-                ${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/include
-            )
-            target_link_libraries(SerialProgramsLib PRIVATE
-                ${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/lib/libsdbus-c++.a
-                systemd
-            )
-        endif()
+        message(STATUS "Using bundled sdbus-c++ library.")
+        target_include_directories(SerialProgramsLib PRIVATE
+            ${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/include
+        )
+        target_link_libraries(SerialProgramsLib PRIVATE
+            ${REPO_ROOT_DIR}/3rdParty/sdbus-cpp/lib/libsdbus-c++.a
+            systemd #sdbus-c++ relies on libsystemd, almost all distros should have this
+        )
     endif() # end Linux
 
     # Find OpenCV

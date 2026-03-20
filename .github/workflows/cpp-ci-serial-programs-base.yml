@@ -64,7 +64,7 @@ jobs:
         cd Arduino-Source
         sudo apt update
         sudo apt upgrade
-        sudo apt install clang-tools libopencv-dev libsdbus-c++-dev libsystemd-dev
+        sudo apt install clang-tools libopencv-dev libsystemd-dev
 
         sudo apt install ./3rdPartyBinaries/libdpp-10.0.28-linux-x64.deb
 
