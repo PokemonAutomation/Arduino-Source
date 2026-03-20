@@ -203,6 +203,8 @@ int main(int argc, char *argv[]){
 
 #if defined(__linux__)
     // Qt multimedia, default to gstreamer to prevent flickering
+    // Easier than the alternative which is compiling qt6multimedia with QT_DEFAULT_MEDIA_BACKEND
+    // See: https://doc.qt.io/qt-6.5/qtmultimedia-index.html
     if (qEnvironmentVariableIsEmpty("QT_MEDIA_BACKEND"))
         qputenv("QT_MEDIA_BACKEND", "gstreamer");
 #endif
