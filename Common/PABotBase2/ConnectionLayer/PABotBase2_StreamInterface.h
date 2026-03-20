@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PABotBase2_ConnectionLayer_StreamInterface_H
 #define PokemonAutomation_PABotBase2_ConnectionLayer_StreamInterface_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 namespace PokemonAutomation{
