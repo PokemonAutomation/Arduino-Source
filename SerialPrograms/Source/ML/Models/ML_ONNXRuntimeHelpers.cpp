@@ -75,8 +75,8 @@ if (use_gpu){
         std::cout << "CUDA execution provider not available: " << e.what() << std::endl;
     }
 
+    bool rocm_available = false;
     if (!cuda_available) {
-        bool rocm_available = false;
         // Try ROCm next for AMD GPUs
         // See: https://onnxruntime.ai/docs/execution-providers/ROCm-ExecutionProvider.html
         try {
