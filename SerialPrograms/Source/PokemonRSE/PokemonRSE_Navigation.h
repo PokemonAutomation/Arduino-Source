@@ -34,6 +34,7 @@ void flee_battle(VideoStream& stream, ProControllerContext& context);
 bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool send_out_lead);
 
 // Go to home to check that scaling is 100%. Then resume game.
+// Skips checks if not Switch.
 void home_black_border_check(ConsoleHandle& console, ProControllerContext& context);
 
 
