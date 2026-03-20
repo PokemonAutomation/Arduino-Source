@@ -19,25 +19,25 @@
 #define PABB_PACK
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace PokemonAutomation{
+namespace PABotBase2{
 
 
-#define PABB2_CONNECTION_MAGIC_NUMBER                   0x81
-#define PABB2_CONNECTION_PROTOCOL_VERSION               2025011700
+#define PABB2_CONNECTION_BAUD_RATE                  115200
+#define PABB2_CONNECTION_MAGIC_NUMBER               0x81
+#define PABB2_CONNECTION_PROTOCOL_VERSION           2025011700
 
 
 //
 //  Special
 //
 
-typedef struct{
+struct PABB_PACK PacketHeader{
     uint8_t magic_number;
     uint8_t seqnum;
     uint8_t packet_bytes;
     uint8_t opcode;
-} PABB_PACK pabb2_PacketHeader;
+};
 
 #define PABB2_CONNECTION_OPCODE_INVALID             0x00
 
@@ -45,27 +45,27 @@ typedef struct{
 #define PABB2_CONNECTION_OPCODE_RET_RESET           0x81
 
 
-typedef struct{
+struct PABB_PACK PacketHeader_Ack_u8{
     uint8_t magic_number;
     uint8_t seqnum;
     uint8_t packet_bytes;
     uint8_t opcode;
     uint8_t data;
-} PABB_PACK pabb2_PacketHeader_Ack_u8;
-typedef struct{
+};
+struct PABB_PACK PacketHeader_Ack_u16{
     uint8_t magic_number;
     uint8_t seqnum;
     uint8_t packet_bytes;
     uint8_t opcode;
     uint16_t data;
-} PABB_PACK pabb2_PacketHeader_Ack_u16;
-typedef struct{
+};
+struct PABB_PACK PacketHeader_Ack_u32{
     uint8_t magic_number;
     uint8_t seqnum;
     uint8_t packet_bytes;
     uint8_t opcode;
     uint32_t data;
-} PABB_PACK pabb2_PacketHeader_Ack_u32;
+};
 
 
 
@@ -88,13 +88,13 @@ typedef struct{
 #define PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA     0x30
 #define PABB2_CONNECTION_OPCODE_RET_STREAM_DATA     0xb0
 #define PABB2_CONNECTION_OPCODE_ASK_STREAM_REQUEST  0x31
-typedef struct{
+struct PABB_PACK PacketHeaderData{
     uint8_t magic_number;
     uint8_t seqnum;
     uint8_t packet_bytes;
     uint8_t opcode;
     uint16_t stream_offset;
-} PABB_PACK pabb2_PacketHeaderData;
+};
 
 
 
@@ -121,10 +121,8 @@ typedef struct{
 
 
 
-
-#ifdef __cplusplus
 }
-#endif
+}
 
 #if _WIN32
 #pragma pack(pop)

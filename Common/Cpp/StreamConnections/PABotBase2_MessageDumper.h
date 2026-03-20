@@ -11,10 +11,12 @@
 #include "Common/PABotBase2/ConnectionLayer/PABotBase2_Connection.h"
 
 namespace PokemonAutomation{
+namespace PABotBase2{
 
 
-std::string tostr(const pabb2_PacketHeader* header);
+std::string tostr(const PacketHeader* header);
 
 
+}
 }
 #endif

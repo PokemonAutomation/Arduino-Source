@@ -14,7 +14,7 @@
 using std::cout;
 using std::endl;
 
-#if 1
+#if 0
 #define PABB2_DROP_HOST_TO_DEVICE   0.01
 #define PABB2_DROP_DEVICE_TO_HOST   0.01
 #else
@@ -24,17 +24,15 @@ using std::endl;
 
 namespace PokemonAutomation{
 
+//  REMOVE
+extern std::mutex print_lock;
+
+
 
 MockDevice::MockDevice(ThreadPool& thread_pool)
-    : m_stopping(false)
+    : m_connection(*this)
+    , m_stopping(false)
 {
-    pabb2_ReliableStreamConnection_init(
-        &m_connection,
-        this,
-        fp_device_send_serial,
-        fp_device_read_serial
-    );
-
     m_device_thread = thread_pool.dispatch_now_blocking([this]{ device_thread(); });
     m_host_thread = thread_pool.dispatch_now_blocking([this]{ host_recv_thread(); });
 }
@@ -54,7 +52,7 @@ MockDevice::~MockDevice(){
 void MockDevice::print() const{
     std::lock_guard<Mutex> lg(m_device_lock);
     std::lock_guard<Mutex> lg1(m_print_lock);
-    pabb2_StreamCoalescer_print(&m_connection.stream_coalescer, true);
+    m_connection.stream_coalescer().print(true);
 }
 
 
@@ -99,7 +97,15 @@ size_t MockDevice::device_read_serial(void* data, size_t max_bytes){
     std::copy(iter0, iter1, (uint8_t*)data);
     m_host_to_device_line.erase(iter0, iter1);
 
-//    cout << "device_read_serial(): attempt = " << max_bytes << ", actual = " << bytes << endl;
+    //  REMOVE
+//    {
+//        std::lock_guard<Mutex> lg1(PokemonAutomation::print_lock);
+//        cout << "device_read_serial(): attempt = " << max_bytes << ", actual = " << bytes << endl;
+//    }
+
+//    if (bytes > 0){
+//        PacketHeader_check((const PABotBase2::PacketHeader*)data, true);
+//    }
 
     return bytes;
 }
@@ -110,6 +116,14 @@ size_t MockDevice::send(const void* data, size_t bytes){
         WriteSpinLock lg(m_host_to_device_lock);
 //        cout << "MockDevice::send(const void* data, size_t bytes)" << endl;
 
+#if 0
+        if (((const PABotBase2::PacketHeader*)data)->magic_number != 0x81){
+            cout << "corrupted packet!" << endl;
+            PABotBase2::PacketHeader_print((const PABotBase2::PacketHeader*)data, true);
+        }
+        PABotBase2::PacketHeader_check((const PABotBase2::PacketHeader*)data, true);
+#endif
+
         if ((rand() % 100) / 100. < PABB2_DROP_HOST_TO_DEVICE){
             std::lock_guard<Mutex> lg1(m_print_lock);
             cout << "**Intentionally Dropping Packet: host -> device**" << endl;
@@ -119,7 +133,10 @@ size_t MockDevice::send(const void* data, size_t bytes){
         if (m_host_to_device_line.size() >= m_host_to_device_capacity){
             return 0;
         }
-        bytes = std::min(bytes, m_host_to_device_capacity - m_host_to_device_line.size());
+
+//        bytes = std::min(bytes, m_host_to_device_capacity - m_host_to_device_line.size());
+//        cout << "MockDevice::send(): " << bytes << endl;
+
         m_host_to_device_line.insert(
             m_host_to_device_line.end(),
             (const uint8_t*)data,
@@ -157,10 +174,7 @@ size_t MockDevice::verify_stream_data(){
     size_t bytes = m_expected_host_to_device_stream.size();
 
     std::vector<uint8_t> actual(bytes);
-    size_t read = pabb2_ReliableStreamConnection_read_stream(
-        &m_connection,
-        actual.data(), bytes
-    );
+    size_t read = m_connection.read_stream(actual.data(), bytes);
 
     if (read == 0){
         return bytes;
@@ -213,7 +227,7 @@ size_t MockDevice::verify_stream_data(){
 void MockDevice::device_thread(){
     std::unique_lock<Mutex> lg(m_device_lock);
     while (!m_stopping.load(std::memory_order_relaxed)){
-        pabb2_ReliableStreamConnection_run_events(&m_connection);
+        m_connection.run_events();
         m_device_cv.wait_for(lg, Milliseconds(10));
     }
 }

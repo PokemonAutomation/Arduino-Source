@@ -7,30 +7,25 @@
 #ifndef PokemonAutomation_PABotBase2_ConnectionLayer_StreamInterface_H
 #define PokemonAutomation_PABotBase2_ConnectionLayer_StreamInterface_H
 
-#include <stdbool.h>
-#include <stddef.h>
+#include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace PokemonAutomation{
+namespace PABotBase2{
 
 
-typedef size_t (*pabb2_fp_StreamSend)(
-    void* context,
-    const void* data, size_t bytes,
-    bool is_retransmit
-);
-typedef size_t (*pabb2_fp_StreamRecv)(
-    void* context,
-    void* data, size_t max_bytes
-);
+struct StreamConnection{
+    virtual size_t send(const void* data, size_t bytes, bool is_retransmit) = 0;
+    virtual size_t recv(void* data, size_t max_bytes) = 0;
+
+    //  Wait for something to be ready to receive. Timeout in milliseconds.
+    virtual void wait_for_recv_available(uint16_t milliseconds){
+        (void)milliseconds;
+    }
+};
 
 
 
 
-
-
-#ifdef __cplusplus
 }
-#endif
+}
 #endif

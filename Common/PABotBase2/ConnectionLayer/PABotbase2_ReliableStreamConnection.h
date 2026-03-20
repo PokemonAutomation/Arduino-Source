@@ -12,50 +12,44 @@
 #include "PABotBase2_PacketParser.h"
 #include "PABotBase2_StreamCoalescer.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace PokemonAutomation{
+namespace PABotBase2{
 
 
 
-typedef struct{
-    void* unreliable_connection;
-    pabb2_fp_StreamSend unreliable_send;
-    pabb2_fp_StreamRecv unreliable_recv;
+class ReliableStreamConnectionFW{
+public:
+    ReliableStreamConnectionFW(StreamConnection& unreliable_connection);
 
-    pabb2_PacketSender reliable_sender;
-    pabb2_PacketParser parser;
-    pabb2_StreamCoalescer stream_coalescer;
-} pabb2_ReliableStreamConnection;
+    size_t send_stream(const void* data, size_t bytes){
+        return m_reliable_sender.send_stream(data, bytes);
+    }
+    size_t read_stream(void* data, size_t bytes){
+        return m_stream_coalescer.read(data, bytes);
+    }
+
+    void run_events();
+
+
+public:
+    //  For debugging
+    const StreamCoalescer& stream_coalescer() const{
+        return m_stream_coalescer;
+    }
+
+
+private:
+    PacketSender m_reliable_sender;
+    PacketParser m_parser;
+    StreamCoalescer m_stream_coalescer;
+};
 
 
 
-void pabb2_ReliableStreamConnection_init(
-    pabb2_ReliableStreamConnection* self,
-    void* unreliable_connection,
-    pabb2_fp_StreamSend unreliable_send,
-    pabb2_fp_StreamRecv unreliable_recv
-);
 
-inline size_t pabb2_ReliableStreamConnection_send_stream(
-    pabb2_ReliableStreamConnection* self,
-    const void* data, size_t bytes
-){
-    return pabb2_PacketSender_send_stream(&self->reliable_sender, data, bytes);
+
+
+
 }
-inline size_t pabb2_ReliableStreamConnection_read_stream(
-    pabb2_ReliableStreamConnection* self,
-    void* data, size_t bytes
-){
-    return pabb2_StreamCoalescer_read(&self->stream_coalescer, data, bytes);
 }
-
-void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* self);
-
-
-
-
-#ifdef __cplusplus
-}
-#endif
 #endif

@@ -18,20 +18,18 @@
 #define PABB_PACK
 #endif
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace PokemonAutomation{
+namespace PABotBase2{
 
 
 
 #define PABB_MSG_REQ_NS1_OEM_CONTROLLER_READ_SPI        0x91
 #define PABB_MSG_REQ_NS1_OEM_CONTROLLER_WRITE_SPI       0x92
-typedef struct{
+struct PABB_PACK pabb2_Message_NS1_OemController_Spi{
     uint32_t controller_type;
     uint32_t address;
     uint8_t bytes;
-} PABB_PACK pabb2_Message_NS1_OemController_Spi;
+};
 
 
 #define PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_PLAYER_LIGHTS      0x93
@@ -41,23 +39,22 @@ typedef struct{
 
 
 #define PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_BUTTONS            0x97
-typedef struct{
+struct PABB_PACK pabb2_Message_Command_NS1_OemController_Buttons{
     uint16_t milliseconds;
     pabb_NintendoSwitch_OemController_State0x30_Buttons buttons;
-} PABB_PACK pabb2_Message_Command_NS1_OemController_Buttons;
+};
 
 
 #define PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_FULL_STATE         0x98
-typedef struct{
+struct PABB_PACK pabb2_Message_Command_NS1_OemController_FullState{
     uint16_t milliseconds;
     pabb_NintendoSwitch_OemController_State0x30 state;
-} PABB_PACK pabb2_Message_Command_NS1_OemController_FullState;
+};
 
 
 
-#ifdef __cplusplus
 }
-#endif
+}
 
 
 

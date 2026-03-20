@@ -311,7 +311,7 @@ void stress_test(Logger& logger, CancellableScope& scope){
 
     ReliableStreamConnection connection(
         &scope,
-        logger, false,
+        logger, true,
         GlobalThreadPools::unlimited_realtime(),
         device,
         100ms,
@@ -330,31 +330,39 @@ void stress_test(Logger& logger, CancellableScope& scope){
     uint64_t bytes_sent = 0;
     WallClock last_print = current_time();
 
-    while (true){
-        scope.throw_if_cancelled();
+    try{
+        while (true){
+            scope.throw_if_cancelled();
 
-        std::string data = random_string(20);
-        const char* ptr = data.data();
-        size_t left = data.size();
-        while (left > 0){
-            if (current_time() - last_print > Seconds(1)){
-                cout << "Bytes Sent = " << bytes_sent + data.size() - left << endl;
-                last_print = current_time();
+            std::string data = random_string(20);
+            const char* ptr = data.data();
+            size_t left = data.size();
+            while (left > 0){
+                if (current_time() - last_print > Seconds(1)){
+                    cout << "Bytes Sent = " << bytes_sent + data.size() - left << endl;
+                    last_print = current_time();
+                }
+    //            scope.wait_for(Milliseconds(rand() % 100));
+                size_t sent = connection.send(ptr, left);
+                if (sent == 0){
+                    device.verify_stream_data();
+                }
+                ptr += sent;
+                left -= sent;
             }
-//            scope.wait_for(Milliseconds(rand() % 100));
-            size_t sent = connection.send(ptr, left);
-            if (sent == 0){
-                device.verify_stream_data();
-            }
-            ptr += sent;
-            left -= sent;
+            bytes_sent += data.size();
+            device.push_expected_stream_data(data.data(), data.size());
         }
-        bytes_sent += data.size();
-        device.push_expected_stream_data(data.data(), data.size());
+    }catch (Exception&){
+        connection.print();
+        device.print();
+        throw;
     }
+
 }
 
 
+std::mutex print_lock;
 
 
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){

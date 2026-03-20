@@ -8,9 +8,10 @@
 #include "PABotBase2_MessageDumper.h"
 
 namespace PokemonAutomation{
+namespace PABotBase2{
 
 
-std::string tostr(const pabb2_PacketHeader* header){
+std::string tostr(const PacketHeader* header){
     std::string str;
     switch (header->opcode){
     case PABB2_CONNECTION_OPCODE_INVALID:
@@ -34,7 +35,7 @@ std::string tostr(const pabb2_PacketHeader* header){
     case PABB2_CONNECTION_OPCODE_RET_VERSION:
         str += "PABB2_CONNECTION_OPCODE_RET_VERSION: seqnum = ";
         str += std::to_string(header->seqnum);
-        str += ", version = " + std::to_string(((const pabb2_PacketHeader_Ack_u32*)header)->data);
+        str += ", version = " + std::to_string(((const PacketHeader_Ack_u32*)header)->data);
         return str;
 
     case PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE:
@@ -44,7 +45,7 @@ std::string tostr(const pabb2_PacketHeader* header){
     case PABB2_CONNECTION_OPCODE_RET_PACKET_SIZE:
         str += "PABB2_CONNECTION_OPCODE_RET_PACKET_SIZE: seqnum = ";
         str += std::to_string(header->seqnum);
-        str += ", bytes = " + std::to_string(((const pabb2_PacketHeader_Ack_u16*)header)->data);
+        str += ", bytes = " + std::to_string(((const PacketHeader_Ack_u16*)header)->data);
         return str;
 
     case PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS:
@@ -54,7 +55,7 @@ std::string tostr(const pabb2_PacketHeader* header){
     case PABB2_CONNECTION_OPCODE_RET_BUFFER_SLOTS:
         str += "PABB2_CONNECTION_OPCODE_RET_BUFFER_SLOTS: seqnum = ";
         str += std::to_string(header->seqnum);
-        str += ", slots = " + std::to_string(((const pabb2_PacketHeader_Ack_u8*)header)->data);
+        str += ", slots = " + std::to_string(((const PacketHeader_Ack_u8*)header)->data);
         return str;
 
     case PABB2_CONNECTION_OPCODE_ASK_BUFFER_BYTES:
@@ -64,14 +65,14 @@ std::string tostr(const pabb2_PacketHeader* header){
     case PABB2_CONNECTION_OPCODE_RET_BUFFER_BYTES:
         str += "PABB2_CONNECTION_OPCODE_RET_BUFFER_BYTES: seqnum = ";
         str += std::to_string(header->seqnum);
-        str += ", bytes = " + std::to_string(((const pabb2_PacketHeader_Ack_u16*)header)->data);
+        str += ", bytes = " + std::to_string(((const PacketHeader_Ack_u16*)header)->data);
         return str;
 
     case PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA:
         str += "PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA: seqnum = ";
         str += std::to_string(header->seqnum);
-        str += ", offset = " + std::to_string(((const pabb2_PacketHeaderData*)header)->stream_offset);
-        str += ", bytes = " + std::to_string(header->packet_bytes - sizeof(pabb2_PacketHeaderData) - sizeof(uint32_t));
+        str += ", offset = " + std::to_string(((const PacketHeaderData*)header)->stream_offset);
+        str += ", bytes = " + std::to_string(header->packet_bytes - sizeof(PacketHeaderData) - sizeof(uint32_t));
         return str;
     case PABB2_CONNECTION_OPCODE_RET_STREAM_DATA:
         str += "PABB2_CONNECTION_OPCODE_RET_STREAM_REQUEST: seqnum = ";
@@ -80,7 +81,7 @@ std::string tostr(const pabb2_PacketHeader* header){
     case PABB2_CONNECTION_OPCODE_ASK_STREAM_REQUEST:
         str += "PABB2_CONNECTION_OPCODE_RET_STREAM: seqnum = ";
         str += std::to_string(header->seqnum);
-        str += ", offset = " + std::to_string(((const pabb2_PacketHeaderData*)header)->stream_offset);
+        str += ", offset = " + std::to_string(((const PacketHeaderData*)header)->stream_offset);
         return str;
 
 #if 0
@@ -91,17 +92,17 @@ std::string tostr(const pabb2_PacketHeader* header){
     case PABB2_CONNECTION_OPCODE_RET_u8:
         str += "PABB2_CONNECTION_OPCODE_RET_u8: seqnum = ";
         str += std::to_string(header->seqnum);
-        str += ", data = " + std::to_string(((const pabb2_PacketHeader_Ack_u8*)header)->data);
+        str += ", data = " + std::to_string(((const PacketHeader_Ack_u8*)header)->data);
         return str;
     case PABB2_CONNECTION_OPCODE_RET_u16:
         str += "PABB2_CONNECTION_OPCODE_RET_u16: seqnum = ";
         str += std::to_string(header->seqnum);
-        str += ", data = " + std::to_string(((const pabb2_PacketHeader_Ack_u16*)header)->data);
+        str += ", data = " + std::to_string(((const PacketHeader_Ack_u16*)header)->data);
         return str;
     case PABB2_CONNECTION_OPCODE_RET_u32:
         str += "PABB2_CONNECTION_OPCODE_RET_u32: seqnum = ";
         str += std::to_string(header->seqnum);
-        str += ", data = " + std::to_string(((const pabb2_PacketHeader_Ack_u32*)header)->data);
+        str += ", data = " + std::to_string(((const PacketHeader_Ack_u32*)header)->data);
         return str;
 #endif
 
@@ -126,4 +127,5 @@ std::string tostr(const pabb2_PacketHeader* header){
 }
 
 
+}
 }

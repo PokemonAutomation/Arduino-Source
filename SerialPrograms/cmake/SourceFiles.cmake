@@ -290,15 +290,15 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/WidgetStackFixedAspectRatio.cpp
     ../Common/Qt/WidgetStackFixedAspectRatio.h
     ../Common/PABotBase2/ConnectionLayer/PABotBase2_Connection.h
-    ../Common/PABotBase2/ConnectionLayer/PABotBase2_ConnectionDebug.c
+    ../Common/PABotBase2/ConnectionLayer/PABotBase2_ConnectionDebug.cpp
     ../Common/PABotBase2/ConnectionLayer/PABotBase2_ConnectionDebug.h
-    ../Common/PABotBase2/ConnectionLayer/PABotBase2_PacketParser.c
+    ../Common/PABotBase2/ConnectionLayer/PABotBase2_PacketParser.cpp
     ../Common/PABotBase2/ConnectionLayer/PABotBase2_PacketParser.h
-    ../Common/PABotBase2/ConnectionLayer/PABotBase2_PacketSender.c
+    ../Common/PABotBase2/ConnectionLayer/PABotBase2_PacketSender.cpp
     ../Common/PABotBase2/ConnectionLayer/PABotBase2_PacketSender.h
-    ../Common/PABotBase2/ConnectionLayer/PABotbase2_ReliableStreamConnection.c
-    ../Common/PABotBase2/ConnectionLayer/PABotbase2_ReliableStreamConnection.h
-    ../Common/PABotBase2/ConnectionLayer/PABotBase2_StreamCoalescer.c
+    ../Common/PABotBase2/ConnectionLayer/PABotBase2_ReliableStreamConnection.cpp
+    ../Common/PABotBase2/ConnectionLayer/PABotBase2_ReliableStreamConnection.h
+    ../Common/PABotBase2/ConnectionLayer/PABotBase2_StreamCoalescer.cpp
     ../Common/PABotBase2/ConnectionLayer/PABotBase2_StreamCoalescer.h
     ../Common/PABotBase2/DataLayer/PABotBase2_Controller_HID_Keyboard.h
     ../Common/PABotBase2/DataLayer/PABotBase2_Controller_NS_WiredController.h

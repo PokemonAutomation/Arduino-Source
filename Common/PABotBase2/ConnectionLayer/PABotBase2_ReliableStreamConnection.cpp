@@ -8,34 +8,23 @@
 #include "PABotBase2_ConnectionDebug.h"
 #include "PABotbase2_ReliableStreamConnection.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
-void pabb2_ReliableStreamConnection_init(
-    pabb2_ReliableStreamConnection* self,
-    void* unreliable_connection,
-    pabb2_fp_StreamSend unreliable_send,
-    pabb2_fp_StreamRecv unreliable_recv
-){
-    self->unreliable_connection = unreliable_connection;
-    self->unreliable_send = unreliable_send;
-    self->unreliable_recv = unreliable_recv;
+namespace PokemonAutomation{
+namespace PABotBase2{
 
-    pabb2_PacketSender_init(
-        &self->reliable_sender,
-        unreliable_connection,
-        unreliable_send,
-        PABB2_MAX_INCOMING_PACKET_SIZE
-    );
-    pabb2_PacketParser_init(&self->parser);
-    pabb2_StreamCoalescer_init(&self->stream_coalescer);
-}
 
-void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* self){
-    const pabb2_PacketHeader* packet = pabb2_PacketParser_pull_bytes(
-        &self->parser,
-        self->unreliable_connection, self->unreliable_recv
-    );
+ReliableStreamConnectionFW::ReliableStreamConnectionFW(StreamConnection& unreliable_connection)
+    : m_reliable_sender(unreliable_connection, (uint8_t)(PABB2_MAX_INCOMING_PACKET_SIZE % 256))
+    , m_parser(unreliable_connection)
+{}
+
+void ReliableStreamConnectionFW::run_events(){
+    const PacketHeader* packet = m_parser.pull_bytes();
     if (packet == NULL){
-        pabb2_PacketSender_iterate_retransmits(&self->reliable_sender);
+        m_reliable_sender.iterate_retransmits();
         return;
     }
 
@@ -45,19 +34,19 @@ void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* s
         break;
     case PABB2_PacketParser_RESULT_INVALID:
 //        printf("PABB2_PacketParser_RESULT_INVALID\n");
-        pabb2_PacketSender_send_info(
-            &self->reliable_sender,
+        m_reliable_sender.send_packet_empty(
             packet->seqnum,
             PABB2_CONNECTION_OPCODE_INVALID_LENGTH
         );
         return;
     case PABB2_PacketParser_RESULT_CHECKSUM_FAIL:
 //        printf("PABB2_PacketParser_RESULT_CHECKSUM_FAIL\n");
-        pabb2_PacketSender_send_info(
-            &self->reliable_sender,
+        m_reliable_sender.send_packet_empty(
             packet->seqnum,
             PABB2_CONNECTION_OPCODE_INVALID_CHECKSUM_FAIL
         );
+//        cout << "CRC error:";
+//        PacketHeader_print(packet, true);
         return;
     default:
 //        printf("Internal Error: Unrecognized packet state.\n");
@@ -69,47 +58,42 @@ void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* s
     //  Now handle the different opcodes.
     switch (packet->opcode){
     case PABB2_CONNECTION_OPCODE_ASK_RESET:
-        pabb2_PacketSender_send_ack(
-            &self->reliable_sender,
+        m_reliable_sender.send_packet_empty(
             packet->seqnum,
             PABB2_CONNECTION_OPCODE_RET_RESET
         );
-        pabb2_PacketSender_reset(&self->reliable_sender);
-        pabb2_PacketParser_reset(&self->parser);
-        pabb2_StreamCoalescer_reset(&self->stream_coalescer);
-        pabb2_StreamCoalescer_push_packet(&self->stream_coalescer, 0);
+        m_reliable_sender.reset();
+        m_parser.reset();
+        m_stream_coalescer.reset();
+        m_stream_coalescer.push_packet(0);
         return;
     case PABB2_CONNECTION_OPCODE_ASK_VERSION:
-        pabb2_StreamCoalescer_push_packet(&self->stream_coalescer, packet->seqnum);
-        pabb2_PacketSender_send_ack_u32(
-            &self->reliable_sender,
+        m_stream_coalescer.push_packet(packet->seqnum);
+        m_reliable_sender.send_packet_u32(
             packet->seqnum,
             PABB2_CONNECTION_OPCODE_RET_VERSION,
             PABB2_CONNECTION_PROTOCOL_VERSION
         );
         return;
     case PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE:
-        pabb2_StreamCoalescer_push_packet(&self->stream_coalescer, packet->seqnum);
-        pabb2_PacketSender_send_ack_u16(
-            &self->reliable_sender,
+        m_stream_coalescer.push_packet(packet->seqnum);
+        m_reliable_sender.send_packet_u16(
             packet->seqnum,
             PABB2_CONNECTION_OPCODE_RET_PACKET_SIZE,
             PABB2_MAX_INCOMING_PACKET_SIZE
         );
         return;
     case PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS:
-        pabb2_StreamCoalescer_push_packet(&self->stream_coalescer, packet->seqnum);
-        pabb2_PacketSender_send_ack_u8(
-            &self->reliable_sender,
+        m_stream_coalescer.push_packet(packet->seqnum);
+        m_reliable_sender.send_packet_u8(
             packet->seqnum,
             PABB2_CONNECTION_OPCODE_RET_BUFFER_SLOTS,
             PABB2_StreamCoalescer_SLOTS
         );
         return;
     case PABB2_CONNECTION_OPCODE_ASK_BUFFER_BYTES:
-        pabb2_StreamCoalescer_push_packet(&self->stream_coalescer, packet->seqnum);
-        pabb2_PacketSender_send_ack_u16(
-            &self->reliable_sender,
+        m_stream_coalescer.push_packet(packet->seqnum);
+        m_reliable_sender.send_packet_u16(
             packet->seqnum,
             PABB2_CONNECTION_OPCODE_RET_BUFFER_BYTES,
             PABB2_StreamCoalescer_BUFFER_SIZE
@@ -117,26 +101,29 @@ void pabb2_ReliableStreamConnection_run_events(pabb2_ReliableStreamConnection* s
         return;
     case PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA:
 //        printf("Device: PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA\n");
-        if (pabb2_StreamCoalescer_push_stream(&self->stream_coalescer, (const pabb2_PacketHeaderData*)packet)){
+        if (m_stream_coalescer.push_stream((const PacketHeaderData*)packet)){
 //            printf("Device: Succeeded push.\n");
-            pabb2_PacketSender_send_ack_u16(
-                &self->reliable_sender,
+            m_reliable_sender.send_packet_u16(
                 packet->seqnum,
                 PABB2_CONNECTION_OPCODE_RET_STREAM_DATA,
-                pabb2_StreamCoalescer_bytes_available(&self->stream_coalescer)
+                m_stream_coalescer.bytes_available()
             );
         }else{
 //            printf("Device: Failed to push.\n");
-            pabb2_StreamCoalescer_print(&self->stream_coalescer, true);
+//            m_stream_coalescer.print(true);
         }
 //        fflush(stdout);
         return;
     default:
-        pabb2_PacketSender_send_info(
-            &self->reliable_sender,
+        m_reliable_sender.send_packet_empty(
             packet->seqnum,
             PABB2_CONNECTION_OPCODE_UNKNOWN_OPCODE
         );
     }
 }
 
+
+
+
+}
+}

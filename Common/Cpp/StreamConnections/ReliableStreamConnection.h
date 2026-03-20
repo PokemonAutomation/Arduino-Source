@@ -25,15 +25,22 @@ namespace PokemonAutomation{
 
 class ReliableStreamConnection final
     : public CancellableScope
-    , public StreamConnection
+    , public PokemonAutomation::StreamConnection
+    , public PABotBase2::StreamConnection
     , private StreamListener
 {
+    using PacketHeader = PABotBase2::PacketHeader;
+    using PacketHeader_Ack_u8 = PABotBase2::PacketHeader_Ack_u8;
+    using PacketHeader_Ack_u16 = PABotBase2::PacketHeader_Ack_u16;
+    using PacketHeader_Ack_u32 = PABotBase2::PacketHeader_Ack_u32;
+    using PacketHeaderData = PABotBase2::PacketHeaderData;
+
 public:
     ReliableStreamConnection(
         CancellableScope* parent,
         Logger& logger, bool log_everything,
         ThreadPool& thread_pool,
-        StreamConnection& unreliable_connection,
+        PokemonAutomation::StreamConnection& unreliable_connection,
         WallDuration retransmit_timeout = Milliseconds(100),
         Mutex* print_lock = nullptr
     );
@@ -71,11 +78,7 @@ private:
     void send_ack(uint8_t seqnum, uint8_t opcode);
     void send_ack_u16(uint8_t seqnum, uint8_t opcode, uint16_t data);
 
-    static size_t send_raw(
-        void* context,
-        const void* data, size_t bytes,
-        bool is_retransmit
-    );
+    virtual size_t send(const void* data, size_t bytes, bool is_retransmit) override;
     void retransmit_thread();
 
 
@@ -83,33 +86,36 @@ private:
     //  Receive
 
     virtual void on_recv(const void* data, size_t bytes) override;
-    static void on_packet(void* context, const pabb2_PacketHeader* packet){
+    static void on_packet(void* context, const PacketHeader* packet){
         ReliableStreamConnection& self = *(ReliableStreamConnection*)context;
         self.on_packet(packet);
     }
-    void on_packet(const pabb2_PacketHeader* packet);
+    virtual size_t recv(void* data, size_t max_bytes) override{
+        return 0;
+    }
+    void on_packet(const PacketHeader* packet);
 
-    void process_RET_RESET(const pabb2_PacketHeader* packet);
-    void process_RET_VERSION(const pabb2_PacketHeader* packet);
-    void process_RET_PACKET_SIZE(const pabb2_PacketHeader* packet);
-    void process_RET_BUFFER_SLOTS(const pabb2_PacketHeader* packet);
-    void process_RET_BUFFER_BYTES(const pabb2_PacketHeader* packet);
+    void process_RET_RESET(const PacketHeader* packet);
+    void process_RET_VERSION(const PacketHeader* packet);
+    void process_RET_PACKET_SIZE(const PacketHeader* packet);
+    void process_RET_BUFFER_SLOTS(const PacketHeader* packet);
+    void process_RET_BUFFER_BYTES(const PacketHeader* packet);
 
-    void process_ASK_STREAM_DATA(const pabb2_PacketHeader* packet);
-    void process_RET_STREAM_DATA(const pabb2_PacketHeader* packet);
+    void process_ASK_STREAM_DATA(const PacketHeader* packet);
+    void process_RET_STREAM_DATA(const PacketHeader* packet);
 
 
 private:
 //public:
 
     Logger& m_logger;
-    StreamConnection& m_unreliable_connection;
+    PokemonAutomation::StreamConnection& m_unreliable_connection;
     const WallDuration m_retransmit_timeout;
     Mutex* m_print_lock;
 
-    pabb2_PacketSender m_reliable_sender;
-    pabb2_PacketParser m_parser;
-    pabb2_StreamCoalescer m_stream_coalescer;
+    PABotBase2::PacketSender m_reliable_sender;
+    PABotBase2::PacketParser m_parser;
+    PABotBase2::StreamCoalescer m_stream_coalescer;
 
     bool m_log_everything;
 //    std::atomic<bool> m_version_verified;

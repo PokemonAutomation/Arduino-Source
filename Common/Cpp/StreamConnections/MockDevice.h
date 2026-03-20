@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 
 
 
-class MockDevice : public StreamConnection{
+class MockDevice : public StreamConnection, public PABotBase2::StreamConnection{
 public:
     MockDevice(ThreadPool& thread_pool);
     ~MockDevice();
@@ -35,18 +35,11 @@ public:
 private:
     //  Call from device.
 
-    static size_t fp_device_send_serial(
-        void* context,
-        const void* data, size_t bytes,
-        bool is_retransmit
-    ){
-        return ((MockDevice*)context)->device_send_serial(data, bytes, is_retransmit);
+    virtual size_t send(const void* data, size_t bytes, bool is_retransmit) override{
+        return device_send_serial(data, bytes, is_retransmit);
     }
-    static size_t fp_device_read_serial(
-        void* context,
-        void* data, size_t max_bytes
-    ){
-        return ((MockDevice*)context)->device_read_serial(data, max_bytes);
+    virtual size_t recv(void* data, size_t max_bytes) override{
+        return device_read_serial(data, max_bytes);
     }
 
     size_t device_send_serial(const void* data, size_t bytes, bool is_retransmit);
@@ -68,7 +61,7 @@ private:
 
 
 private:
-    pabb2_ReliableStreamConnection m_connection;
+    PABotBase2::ReliableStreamConnectionFW m_connection;
 
     SpinLock m_device_to_host_lock;
     size_t m_device_to_host_capacity = 1024;

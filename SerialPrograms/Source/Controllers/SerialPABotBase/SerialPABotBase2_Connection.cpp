@@ -7,6 +7,7 @@
 #include <QSerialPortInfo>
 #include <QMessageBox>
 #include "Common/Cpp/PanicDump.h"
+#include "Common/PABotBase2/ConnectionLayer/PABotBase2_Connection.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "SerialPABotBase2_Connection.h"
@@ -87,7 +88,7 @@ void SerialPABotBase2_Connection::connect_thread_body(bool set_to_null_controlle
     m_unreliable_connection = std::make_unique<SerialConnection>(
         GlobalThreadPools::unlimited_realtime(),
         info.systemLocation().toStdString(),
-        115200  //  Temporary. Will increase to 460800 in the future.
+        PABB2_CONNECTION_BAUD_RATE
     );
 
     {
