@@ -225,6 +225,11 @@ void print_model_input_output_info(const Ort::Session& session){
 }
 
 Ort::Env create_ORT_env(){
+#if ORT_API_VERSION < 24 // Removed in ONNX Runtime 1.24.0
+    if (Ort::Global<void>::api_ == nullptr){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Onnx API returned a null pointer.");
+    }
+#endif
     // Bit redundant now, but still might be useful to add logging or other init?
     return Ort::Env();
 }
