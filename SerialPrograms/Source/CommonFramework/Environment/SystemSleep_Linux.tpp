@@ -15,6 +15,44 @@
 namespace PokemonAutomation{
 
 
+// Strong typing overload
+template <typename Connection>
+auto make_login1_proxy(Connection& connection, int)
+    -> decltype(sdbus::createProxy(
+        connection,
+        sdbus::BusName{"org.freedesktop.login1"},
+        sdbus::ObjectPath{"/org/freedesktop/login1"}
+    ))
+{
+    return sdbus::createProxy(
+        connection,
+        sdbus::BusName{"org.freedesktop.login1"},
+        sdbus::ObjectPath{"/org/freedesktop/login1"}
+    );
+}
+
+// Fallback overload
+template <typename Connection>
+auto make_login1_proxy(Connection& connection, long)
+    -> decltype(sdbus::createProxy(
+        connection,
+        "org.freedesktop.login1",
+        "/org/freedesktop/login1"
+    ))
+{
+    return sdbus::createProxy(
+        connection,
+        "org.freedesktop.login1",
+        "/org/freedesktop/login1"
+    );
+}
+
+template <typename Connection>
+auto make_login1_proxy(Connection& connection)
+{
+    return make_login1_proxy(connection, 0);
+}
+
 class LinuxSleepController final : public SystemSleepController{
 public:
     LinuxSleepController()
@@ -74,11 +112,7 @@ private:
     void thread_loop()
     {
         auto connection = sdbus::createSystemBusConnection();
-        auto proxy = sdbus::createProxy(
-            *connection,
-            sdbus::BusName{"org.freedesktop.login1"},
-            sdbus::ObjectPath{"/org/freedesktop/login1"}
-        );
+        auto proxy = make_login1_proxy(*connection);
 
         while (true)
         {
