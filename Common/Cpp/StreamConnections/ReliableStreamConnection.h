@@ -51,11 +51,24 @@ public:
         cancel(nullptr);
     }
     virtual bool cancel(std::exception_ptr exception) noexcept override;
-    size_t pending() const;
-    void wait_for_pending();
 
     void reset();
 
+    bool remote_protocol_is_compatible() const{
+        return m_remote_protocol_compatible;
+    }
+    uint32_t remote_protocol() const{
+        return m_remote_protocol;
+    }
+    const std::string& error_string() const{
+        return m_error;
+    }
+
+    size_t pending() const;
+    void wait_for_pending();
+
+
+public:
     //  Send stream data.
     virtual size_t send(const void* data, size_t bytes) override;
 
@@ -115,6 +128,10 @@ private:
     PABotBase2::StreamCoalescer m_stream_coalescer;
 
     bool m_log_everything;
+
+    bool m_remote_protocol_compatible;
+    uint32_t m_remote_protocol;
+
 //    std::atomic<bool> m_version_verified;
     uint8_t m_remote_slot_capacity;
     uint16_t m_remote_buffer_capacity;

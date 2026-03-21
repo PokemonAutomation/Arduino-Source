@@ -296,8 +296,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/PABotBase2/ConnectionLayer/PABotBase2_PacketParser.h
     ../Common/PABotBase2/ConnectionLayer/PABotBase2_PacketSender.cpp
     ../Common/PABotBase2/ConnectionLayer/PABotBase2_PacketSender.h
-    ../Common/PABotBase2/ConnectionLayer/PABotBase2_ReliableStreamConnection.cpp
-    ../Common/PABotBase2/ConnectionLayer/PABotBase2_ReliableStreamConnection.h
+    ../Common/PABotBase2/ConnectionLayer/PABotBase2_ReliableStreamConnectionFW.cpp
+    ../Common/PABotBase2/ConnectionLayer/PABotBase2_ReliableStreamConnectionFW.h
     ../Common/PABotBase2/ConnectionLayer/PABotBase2_StreamCoalescer.cpp
     ../Common/PABotBase2/ConnectionLayer/PABotBase2_StreamCoalescer.h
     ../Common/PABotBase2/DataLayer/PABotBase2_Controller_HID_Keyboard.h
@@ -736,6 +736,14 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/JoystickTools.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h
+    Source/Controllers/PABotBase2/PABotBase2_DeviceHandle.cpp
+    Source/Controllers/PABotBase2/PABotBase2_DeviceHandle.h
+    Source/Controllers/PABotBase2/SerialPABotBase2_Connection.cpp
+    Source/Controllers/PABotBase2/SerialPABotBase2_Connection.h
+    Source/Controllers/PABotBase2/SerialPABotBase2_Descriptor.cpp
+    Source/Controllers/PABotBase2/SerialPABotBase2_Descriptor.h
+    Source/Controllers/PABotBase2/SerialPABotBase2_SelectorWidget.h
+    Source/Controllers/PABotBase2/SerialPABotBase_StatusThread.h
     Source/Controllers/Schedulers/ControllerWithScheduler.h
     Source/Controllers/Schedulers/SuperscalarScheduler.cpp
     Source/Controllers/Schedulers/SuperscalarScheduler.h
@@ -768,12 +776,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase2_Connection.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase2_Connection.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase2_Descriptor.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase2_Descriptor.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase2_SelectorWidget.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_StatusThread.h
     Source/Controllers/StandardHid/StandardHid_Keyboard.cpp
     Source/Controllers/StandardHid/StandardHid_Keyboard.h
     Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.cpp

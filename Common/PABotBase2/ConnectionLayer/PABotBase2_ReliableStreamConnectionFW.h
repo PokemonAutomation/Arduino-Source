@@ -1,4 +1,4 @@
-/*  PABotBase2 Reliable Stream Connection
+/*  PABotBase2 Reliable Stream Connection (firmware-side)
  *
  *  From: https://github.com/PokemonAutomation/
  *

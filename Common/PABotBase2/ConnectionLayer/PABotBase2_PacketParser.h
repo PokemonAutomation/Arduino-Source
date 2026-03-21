@@ -18,7 +18,7 @@
 //  Min Size: sizeof(largest header) + sizeof(uint32_t) + 1
 //  Max Size: 256
 #ifndef PABB2_MAX_INCOMING_PACKET_SIZE
-#define PABB2_MAX_INCOMING_PACKET_SIZE      ((uint16_t)128)
+#define PABB2_MAX_INCOMING_PACKET_SIZE      ((uint16_t)256)
 #endif
 
 #endif

@@ -12,8 +12,8 @@
 #include "Controllers/ControllerDescriptor.h"
 #include "Controllers/ControllerSelectorWidget.h"
 #include "Controllers/NullController.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h"
 #include "SerialPABotBase2_Descriptor.h"
-#include "SerialPABotBase_SelectorWidget.h"
 
 //#include <iostream>
 //using std::cout;

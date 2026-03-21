@@ -35,6 +35,8 @@ ReliableStreamConnection::ReliableStreamConnection(
     , m_parser(*this)
     , m_log_everything(log_everything)
 //    , m_version_verified(false)
+    , m_remote_protocol_compatible(false)
+    , m_remote_protocol(0)
     , m_remote_slot_capacity(1)
     , m_remote_buffer_capacity(PABB2_PacketSender_BUFFER_SIZE)
 {
@@ -346,26 +348,33 @@ void ReliableStreamConnection::process_RET_VERSION(const PacketHeader* packet){
             m_logger.log("[ReliableStreamConnection]: " + m_error, COLOR_RED);
             break;
         }
+        m_reliable_sender.remove(packet->seqnum);
 
         const PacketHeader_Ack_u32* message = (const PacketHeader_Ack_u32*)packet;
-        uint32_t major_version = message->data / 100;
-        uint32_t minor_version = message->data % 100;
-        if (major_version != PABB2_CONNECTION_PROTOCOL_VERSION / 100 ||
-            minor_version < PABB2_CONNECTION_PROTOCOL_VERSION % 100
-        ){
-            m_error = "Incompatible protocol. Remote: " + std::to_string(message->data);
+        uint32_t protocol = message->data;
+        m_remote_protocol = protocol;
+        std::string str = "Remote Protocol: " + std::to_string(protocol);
+        uint32_t major_version = protocol / 100;
+        uint32_t minor_version = protocol % 100;
+        m_remote_protocol_compatible =
+            major_version == PABB2_CONNECTION_PROTOCOL_VERSION / 100 &&
+            minor_version >= PABB2_CONNECTION_PROTOCOL_VERSION % 100;
+        if (!m_remote_protocol_compatible){
+            m_error = str + " (incompatible)";
             m_logger.log("[ReliableStreamConnection]: " + m_error, COLOR_RED);
             break;
         }
 
-        m_logger.log("[ReliableStreamConnection]: Protocol is compatible.", COLOR_BLUE);
+        m_logger.log(
+            "[ReliableStreamConnection]: " + str + " (compatible)",
+            COLOR_BLUE
+        );
         m_reliable_sender.remove(packet->seqnum);
 
     }while (false);
     m_cv.notify_all();
 }
 void ReliableStreamConnection::process_RET_PACKET_SIZE(const PacketHeader* packet){
-//    m_logger.log(tostr(packet), COLOR_DARKGREEN);
     if (packet->packet_bytes < sizeof(PacketHeader_Ack_u16) + sizeof(uint32_t)){
         m_logger.log(
             "[ReliableStreamConnection]: Packet size response is too small: " + std::to_string(packet->packet_bytes),
@@ -386,7 +395,6 @@ void ReliableStreamConnection::process_RET_PACKET_SIZE(const PacketHeader* packe
     m_cv.notify_all();
 }
 void ReliableStreamConnection::process_RET_BUFFER_SLOTS(const PacketHeader* packet){
-//    m_logger.log(tostr(packet), COLOR_DARKGREEN);
     if (packet->packet_bytes < sizeof(PacketHeader_Ack_u8) + sizeof(uint32_t)){
         m_logger.log(
             "[ReliableStreamConnection]: Buffer slot response is too small: " + std::to_string(packet->packet_bytes),
