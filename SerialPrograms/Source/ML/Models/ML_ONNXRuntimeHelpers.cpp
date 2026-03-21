@@ -75,15 +75,52 @@ if (use_gpu){
         std::cout << "CUDA execution provider not available: " << e.what() << std::endl;
     }
 
+    bool rocm_available = false;
+    if (!cuda_available) {
+        // Try ROCm next for AMD GPUs
+        // See: https://onnxruntime.ai/docs/execution-providers/ROCm-ExecutionProvider.html
+        try {
+            OrtROCMProviderOptions rocm_options{};
+            rocm_options.device_id = 0;
+            so.AppendExecutionProvider_ROCM(rocm_options);
+            std::cout << "Using ROCm execution provider for GPU acceleration" << std::endl;
+            rocm_available = true;
+        } catch (const Ort::Exception& e) {
+            std::cout << "ROCm execution provider not available, falling back to CPU: " << e.what() << std::endl;
+        }
+    }
+
     // Fallback to DirectML for all GPU vendors (NVIDIA, AMD, Intel)
     // DirectML is built into Windows 10 1903+ and requires no additional runtime installation
     // See: https://onnxruntime.ai/docs/execution-providers/DirectML-ExecutionProvider.html
-    if (!cuda_available){
+    if (!cuda_available and !rocm_available){
         try {
             so.AppendExecutionProvider("DML");
             std::cout << "Using DirectML execution provider for GPU acceleration" << std::endl;
         } catch (const Ort::Exception& e){
             std::cout << "DirectML execution provider not available, falling back to CPU: " << e.what() << std::endl;
+        }
+    }
+#elif defined(__linux__)
+    // Try CUDA first for NVIDIA GPUs (best performance)
+    // See: https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html
+    try {
+        OrtCUDAProviderOptions cuda_options{};
+        cuda_options.device_id = 0;
+        so.AppendExecutionProvider_CUDA(cuda_options);
+        std::cout << "Using CUDA execution provider for GPU acceleration" << std::endl;
+    } catch (const Ort::Exception& e) {
+        std::cout << "CUDA execution provider not available, trying ROCm: " << e.what() << std::endl;
+
+        // Try ROCm next for AMD GPUs
+        // See: https://onnxruntime.ai/docs/execution-providers/ROCm-ExecutionProvider.html
+        try {
+            OrtROCMProviderOptions rocm_options{};
+            rocm_options.device_id = 0;
+            so.AppendExecutionProvider_ROCM(rocm_options);
+            std::cout << "Using ROCm execution provider for GPU acceleration" << std::endl;
+        } catch (const Ort::Exception& e) {
+            std::cout << "ROCm execution provider not available, falling back to CPU: " << e.what() << std::endl;
         }
     }
 #endif
@@ -203,10 +240,11 @@ void print_model_input_output_info(const Ort::Session& session){
 }
 
 Ort::Env create_ORT_env(){
+#if ORT_API_VERSION < 24 // Removed in ONNX Runtime 1.24.0
     if (Ort::Global<void>::api_ == nullptr){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Onnx API returned a null pointer.");  
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Onnx API returned a null pointer.");
     }
-
+#endif
     return Ort::Env();
 }
 
