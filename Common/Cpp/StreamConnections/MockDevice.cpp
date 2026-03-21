@@ -174,7 +174,7 @@ size_t MockDevice::verify_stream_data(){
     size_t bytes = m_expected_host_to_device_stream.size();
 
     std::vector<uint8_t> actual(bytes);
-    size_t read = m_connection.read_stream(actual.data(), bytes);
+    size_t read = m_connection.recv(actual.data(), bytes);
 
     if (read == 0){
         return bytes;

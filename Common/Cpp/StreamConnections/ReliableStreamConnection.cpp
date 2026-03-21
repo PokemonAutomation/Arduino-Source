@@ -312,15 +312,15 @@ void ReliableStreamConnection::on_packet(const PacketHeader* packet){
     case PABB2_CONNECTION_OPCODE_RET_BUFFER_SLOTS:
         process_RET_BUFFER_SLOTS(packet);
         return;
-#if 0
-    case PABB2_CONNECTION_OPCODE_RET:
-    case PABB2_CONNECTION_OPCODE_RET_u8:
-    case PABB2_CONNECTION_OPCODE_RET_u16:
-    case PABB2_CONNECTION_OPCODE_RET_u32:
+    case PABB2_CONNECTION_OPCODE_INFO:
+    case PABB2_CONNECTION_OPCODE_INFO_u8:
+    case PABB2_CONNECTION_OPCODE_INFO_u16:
+    case PABB2_CONNECTION_OPCODE_INFO_u32:
 //        cout << "Received ack" << endl;
-        pabb2_PacketSender_remove(&m_reliable_sender, packet->seqnum);
+        if (!m_log_everything){
+            m_logger.log("Receive: " + tostr(packet), COLOR_DARKGREEN);
+        }
         return;
-#endif
     default:
         m_logger.log(
             "[ReliableStreamConnection]: UNKNOWN OPCODE: Device send an unknown opcode: " + std::to_string(packet->opcode),
