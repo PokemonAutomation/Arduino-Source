@@ -26,6 +26,7 @@ public:
         : m_logger(logger)
         , m_connection(connection)
     {}
+    virtual ~DeviceHandle() = default;
 
     void connect();
 
