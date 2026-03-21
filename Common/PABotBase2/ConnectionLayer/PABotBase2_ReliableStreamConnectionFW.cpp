@@ -72,6 +72,7 @@ bool ReliableStreamConnectionFW::run_events(){
         m_parser.reset();
         m_stream_coalescer.reset();
         m_stream_coalescer.push_packet(0);
+        m_reset_flag = true;
         return true;
     case PABB2_CONNECTION_OPCODE_ASK_VERSION:
         m_stream_coalescer.push_packet(packet->seqnum);

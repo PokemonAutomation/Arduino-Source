@@ -30,7 +30,13 @@ public:
     virtual size_t recv(void* data, size_t bytes) override{
         return m_stream_coalescer.read(data, bytes);
     }
-
+    
+    virtual bool reset_flag_set() const{
+        return m_reset_flag;
+    }
+    virtual void clear_reset_flag(){
+        m_reset_flag = false;
+    }
     virtual bool run_events() override;
 
 
@@ -51,6 +57,8 @@ private:
     PacketSender m_reliable_sender;
     PacketParser m_parser;
     StreamCoalescer m_stream_coalescer;
+
+    bool m_reset_flag = false;
 };
 
 

@@ -144,7 +144,7 @@
 #include "Common/Cpp/Options/MacAddressOption.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
-#include "Common/PABotBase2/ConnectionLayer/PABotbase2_ReliableStreamConnectionFW.h"
+#include "Common/PABotBase2/ConnectionLayer/PABotBase2_ReliableStreamConnectionFW.h"
 #include "Common/Cpp/StreamConnections/MockDevice.h"
 #include "CommonTools/Random.h"
 
@@ -343,7 +343,7 @@ void stress_test(Logger& logger, CancellableScope& scope){
                     last_print = current_time();
                 }
     //            scope.wait_for(Milliseconds(rand() % 100));
-                size_t sent = connection.send(ptr, left);
+                size_t sent = connection.send_stream(ptr, left);
                 if (sent == 0){
                     device.verify_stream_data();
                 }
