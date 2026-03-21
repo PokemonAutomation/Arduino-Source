@@ -5,7 +5,6 @@
  */
 
 
-
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Options/LabelCellOption.h"
@@ -20,7 +19,8 @@ using std::endl;
 namespace PokemonAutomation{
 
 ResourceDownloadButton::~ResourceDownloadButton(){
-    m_worker.wait_and_ignore_exceptions();
+    m_worker1.wait_and_ignore_exceptions();
+    m_worker2.wait_and_ignore_exceptions();
 }
 
 
@@ -31,11 +31,28 @@ ResourceDownloadButton::ResourceDownloadButton(ResourceDownloadRow& p_row)
 {}
 
 
-void ResourceDownloadButton::run_download(){
-    m_worker = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+void ResourceDownloadButton::fetch_json(){
+    m_worker1 = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
         [this]{ 
+            m_enabled = false;
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+            cout << "Fetched json" << endl;
+
+            m_enabled = true;
+            emit json_fetch_finished();
+        }
+    );
+
+}
+
+
+void ResourceDownloadButton::run_download(){
+    m_worker2 = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+        [this]{ 
+            m_enabled = false;
             std::this_thread::sleep_for(std::chrono::seconds(7));
-            cout << "Clicked Download Button" << endl;
+            cout << "Done Download" << endl;
+            // show_update_box("Download", "Download", "Do you want to download?");
 
             m_enabled = true;
             emit download_finished();

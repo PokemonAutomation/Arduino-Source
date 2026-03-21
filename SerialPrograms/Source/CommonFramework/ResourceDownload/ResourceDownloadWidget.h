@@ -25,6 +25,14 @@ public:
 
 private:
     ResourceDownloadButton& m_value;
+    QPushButton* m_button;
+
+    void update_enabled_status();
+    void show_download_confirm_box(
+        const std::string& title,
+        const std::string& header,
+        const std::string& message_body
+    );
     
 };
 
@@ -36,6 +44,7 @@ public:
 public:
     DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& value);
 };
+
 
 
 

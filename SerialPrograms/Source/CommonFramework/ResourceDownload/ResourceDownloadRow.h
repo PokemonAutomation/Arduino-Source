@@ -26,9 +26,11 @@ public:
     ResourceDownloadButton(ResourceDownloadRow& p_row);
 
 signals:
+    void json_fetch_finished();
     void download_finished();
 
 public:
+    void fetch_json();
     void run_download();
     inline bool get_enabled(){ return m_enabled; }
     inline void set_enabled(bool enabled){ 
@@ -40,7 +42,8 @@ public:
 
 private:
     bool m_enabled;  // button should be blocked during an active task. m_enabled is false when blocked
-    AsyncTask m_worker;
+    AsyncTask m_worker1;
+    AsyncTask m_worker2;
 
 
 };
