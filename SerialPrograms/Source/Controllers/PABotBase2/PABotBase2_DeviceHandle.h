@@ -11,6 +11,7 @@
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/StreamConnections/StreamConnection.h"
 #include "Common/PABotBase2/DataLayer/PABotBase2_MessageProtocol.h"
 
@@ -20,13 +21,19 @@ namespace PABotBase2{
 
 
 
-class DeviceHandle : private StreamListener{
+class DeviceHandle final
+    : public CancellableScope
+    , private StreamListener
+{
 public:
-    DeviceHandle(Logger& logger, StreamConnection& connection)
-        : m_logger(logger)
-        , m_connection(connection)
-    {}
-    virtual ~DeviceHandle() = default;
+    DeviceHandle(
+        CancellableScope* parent,
+        Logger& logger,
+        PokemonAutomation::StreamConnection& connection
+    );
+    virtual ~DeviceHandle();
+
+    virtual bool cancel(std::exception_ptr exception) noexcept override;
 
     void connect();
 
@@ -43,7 +50,7 @@ private:
 
 private:
     Logger& m_logger;
-    StreamConnection& m_connection;
+    PokemonAutomation::StreamConnection& m_connection;
 
     uint32_t m_device_protocol = 0;
     uint32_t m_device_id = 0;
@@ -51,7 +58,6 @@ private:
     uint8_t m_command_queue_size = 4;
 
     uint8_t m_seqnum = 0;
-    bool m_stopping = false;
 
     struct LiveRequest{
         Mutex lock;

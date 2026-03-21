@@ -83,6 +83,56 @@ void ReliableStreamConnection::wait_for_pending(){
 
 
 //
+//  StreamSender/StreamListener
+//
+
+size_t ReliableStreamConnection::send(const void* data, size_t bytes){
+    std::lock_guard<Mutex> lg(m_lock);
+    throw_if_cancelled();
+    if (m_reliable_sender.slots_used() >= m_remote_slot_capacity){
+        return 0;
+    }
+    return m_reliable_sender.send_stream(data, bytes);
+}
+void ReliableStreamConnection::on_recv(const void* data, size_t bytes){
+#if 0
+    if (m_print_lock){
+        std::lock_guard<Mutex> lg(*m_print_lock);
+        cout << "ReliableStreamConnection::on_recv(): " << bytes << endl;
+    }
+#endif
+    m_parser.push_bytes(*this, (const uint8_t*)data, bytes);
+}
+
+
+
+//
+//  PABotBase2::StreamConnection
+//
+
+size_t ReliableStreamConnection::send(const void* data, size_t bytes, bool is_retransmit){
+    const PacketHeader* header = (const PacketHeader*)data;
+    if (is_retransmit){
+        m_logger.log(
+            "[ReliableStreamConnection]: Re-send: " + tostr(header),
+            COLOR_ORANGE
+        );
+    }else if (m_log_everything || (
+        header->opcode != PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA &&
+        header->opcode != PABB2_CONNECTION_OPCODE_RET_STREAM_DATA
+    )){
+        m_logger.log(
+            "[ReliableStreamConnection]: Sending: " + tostr(header),
+            COLOR_DARKGREEN
+        );
+//        PABotBase2::PacketHeader_print(header, true);   //  REMOVE
+    }
+    return m_unreliable_connection.send(data, bytes);
+}
+
+
+
+//
 //  Send Path
 //
 
@@ -97,14 +147,6 @@ void ReliableStreamConnection::reset(){
     }
     m_cv.notify_all();
     wait_for_pending();
-}
-size_t ReliableStreamConnection::send(const void* data, size_t bytes){
-    std::lock_guard<Mutex> lg(m_lock);
-    throw_if_cancelled();
-    if (m_reliable_sender.slots_used() >= m_remote_slot_capacity){
-        return 0;
-    }
-    return m_reliable_sender.send_stream(data, bytes);
 }
 
 bool ReliableStreamConnection::try_send_request(uint8_t opcode){
@@ -166,26 +208,6 @@ void ReliableStreamConnection::send_ack_u16(uint8_t seqnum, uint8_t opcode, uint
     m_unreliable_connection.send(&packet, sizeof(packet));
 }
 
-size_t ReliableStreamConnection::send(const void* data, size_t bytes, bool is_retransmit){
-    const PacketHeader* header = (const PacketHeader*)data;
-    if (is_retransmit){
-        m_logger.log(
-            "[ReliableStreamConnection]: Re-send: " + tostr(header),
-            COLOR_ORANGE
-        );
-    }else if (m_log_everything || (
-        header->opcode != PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA &&
-        header->opcode != PABB2_CONNECTION_OPCODE_RET_STREAM_DATA
-    )){
-        m_logger.log(
-            "[ReliableStreamConnection]: Sending: " + tostr(header),
-            COLOR_DARKGREEN
-        );
-//        PABotBase2::PacketHeader_print(header, true);   //  REMOVE
-    }
-    return m_unreliable_connection.send(data, bytes);
-}
-
 void ReliableStreamConnection::retransmit_thread(){
     WallClock next_retransmit = current_time() + m_retransmit_timeout;
     while (true){
@@ -224,20 +246,8 @@ void ReliableStreamConnection::retransmit_thread(){
 
 
 //
-//  Receive Path
+//  PABotBase2::PacketRunner
 //
-
-void ReliableStreamConnection::on_recv(const void* data, size_t bytes){
-#if 0
-    if (m_print_lock){
-        std::lock_guard<Mutex> lg(*m_print_lock);
-        cout << "ReliableStreamConnection::on_recv(): " << bytes << endl;
-    }
-#endif
-    m_parser.push_bytes(*this, (const uint8_t*)data, bytes);
-}
-
-
 
 void ReliableStreamConnection::on_packet(const PacketHeader* packet){
     uint8_t status = packet->magic_number;
@@ -329,9 +339,6 @@ void ReliableStreamConnection::on_packet(const PacketHeader* packet){
         return;
     }
 }
-
-
-
 void ReliableStreamConnection::process_RET_RESET(const PacketHeader* packet){
     {
         std::lock_guard<Mutex> lg(m_lock);

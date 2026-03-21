@@ -31,10 +31,10 @@ public:
         return m_stream_coalescer.read(data, bytes);
     }
     
-    virtual bool reset_flag_set() const{
+    virtual bool reset_flag_set() const override{
         return m_reset_flag;
     }
-    virtual void clear_reset_flag(){
+    virtual void clear_reset_flag() override{
         m_reset_flag = false;
     }
     virtual bool run_events() override;

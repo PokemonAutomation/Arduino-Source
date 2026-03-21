@@ -17,6 +17,36 @@ namespace PABotBase2{
 
 
 
+DeviceHandle::DeviceHandle(
+    CancellableScope* parent,
+    Logger& logger,
+    PokemonAutomation::StreamConnection& connection
+)
+    : m_logger(logger)
+    , m_connection(connection)
+{
+    if (parent){
+        attach(*parent);
+    }
+}
+DeviceHandle::~DeviceHandle(){
+    detach();
+    cancel(nullptr);
+}
+
+bool DeviceHandle::cancel(std::exception_ptr exception) noexcept{
+    bool already_cancelled = CancellableScope::cancel(std::move(exception));
+    if (already_cancelled){
+        return true;
+    }
+    {
+        std::lock_guard<Mutex> lg(m_lock);
+    }
+    m_cv.notify_all();
+    return false;
+}
+
+
 void DeviceHandle::connect(){
     m_device_protocol = query_u32(PABB2_MESSAGE_OPCODE_PROTOCOL_VERSION);
     m_device_firmware_version = query_u32(PABB2_MESSAGE_OPCODE_FIRMWARE_VERSION);
@@ -38,14 +68,12 @@ void DeviceHandle::send_data(const void* data, size_t bytes){
 
     const char* ptr = (const char*)data;
     while (bytes > 0){
-        if (m_stopping){
-            throw OperationCancelledException();
-        }
+        throw_if_cancelled();
         size_t sent;
         try{
             sent = m_connection.send(ptr, bytes);
         }catch (...){
-            m_stopping = true;
+            cancel(nullptr);
             throw;
         }
         ptr += sent;
@@ -55,9 +83,7 @@ void DeviceHandle::send_data(const void* data, size_t bytes){
 void DeviceHandle::send_request(pabb2_MessageHeader_Request& request){
     std::unique_lock<Mutex> lg(m_lock);
     while (true){
-        if (m_stopping){
-            throw OperationCancelledException();
-        }
+        throw_if_cancelled();
 
         request.id = m_seqnum;
 
@@ -75,9 +101,7 @@ void DeviceHandle::send_request(pabb2_MessageHeader_Request& request){
 std::string DeviceHandle::wait_for_response(uint8_t id){
     std::unique_lock<Mutex> lg(m_lock);
     while (true){
-        if (m_stopping){
-            throw OperationCancelledException();
-        }
+        throw_if_cancelled();
 
         auto iter = m_pending_requests.find(id);
         if (iter == m_pending_requests.end()){

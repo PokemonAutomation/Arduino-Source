@@ -45,6 +45,7 @@ private:
     SerialLogger m_logger;
     std::string m_device_name;
 
+//    Mutex m_lock;
     AsyncTask m_connect_thread;
     std::unique_ptr<SerialConnection> m_unreliable_connection;
     std::unique_ptr<ReliableStreamConnection> m_stream_connection;

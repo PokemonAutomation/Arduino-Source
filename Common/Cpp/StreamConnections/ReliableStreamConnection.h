@@ -69,11 +69,14 @@ public:
 
 
 public:
-    //  Send stream data.
-    virtual size_t send(const void* data, size_t bytes) override;
+    //  Send in-band
 
     bool try_send_request(uint8_t opcode);
     void send_request(uint8_t opcode);
+
+    size_t send_stream(const void* data, size_t bytes){
+        return send(data, bytes);
+    }
 
 
 public:
@@ -92,17 +95,28 @@ private:
     void send_ack(uint8_t seqnum, uint8_t opcode);
     void send_ack_u16(uint8_t seqnum, uint8_t opcode, uint16_t data);
 
-    virtual size_t send(const void* data, size_t bytes, bool is_retransmit) override;
     void retransmit_thread();
 
 
 private:
-    //  Receive
+    //  Virtuals: StreamSender/StreamListener
 
+    virtual size_t send(const void* data, size_t bytes) override;
     virtual void on_recv(const void* data, size_t bytes) override;
+
+
+private:
+    //  Virtuals: PABotBase2::StreamConnection
+
+    virtual size_t send(const void* data, size_t bytes, bool is_retransmit) override;
     virtual size_t recv(void* data, size_t max_bytes) override{
         return 0;
     }
+
+
+private:
+    //  Virtuals: PABotBase2::PacketRunner
+
     virtual void on_packet(const PacketHeader* packet) override;
 
     void process_RET_RESET(const PacketHeader* packet);

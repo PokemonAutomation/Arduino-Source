@@ -40,8 +40,6 @@ SerialPABotBase2_Connection::SerialPABotBase2_Connection(
 SerialPABotBase2_Connection::~SerialPABotBase2_Connection(){
     cancel(nullptr);
     m_ready.store(false, std::memory_order_release);
-
-
     m_connect_thread.wait_and_ignore_exceptions();
 }
 
@@ -149,7 +147,13 @@ bool SerialPABotBase2_Connection::open_device_connection(){
         m_logger.log(text);
         set_status_line0(text, COLOR_DARKGREEN);
     }
-    m_device = std::make_unique<PABotBase2::DeviceHandle>(m_logger, *m_stream_connection);
+    {
+//        std::lock_guard<Mutex> lg(m_lock);
+        m_device = std::make_unique<PABotBase2::DeviceHandle>(
+            this,
+            m_logger, *m_stream_connection
+        );
+    }
     m_device->connect();
 
 
