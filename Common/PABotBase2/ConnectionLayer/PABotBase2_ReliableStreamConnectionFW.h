@@ -30,7 +30,7 @@ public:
     virtual size_t recv(void* data, size_t bytes) override{
         return m_stream_coalescer.read(data, bytes);
     }
-    
+
     virtual bool reset_flag_set() const override{
         return m_reset_flag;
     }
