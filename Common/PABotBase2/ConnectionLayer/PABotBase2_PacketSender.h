@@ -113,10 +113,10 @@ public:
     //  Out-of-band messages that bypass the queue and go out as-is.
     //  These may be dropped.
     //
-    void send_packet_empty(uint8_t seqnum, uint8_t opcode);
-    void send_packet_u8(uint8_t seqnum, uint8_t opcode, uint8_t data);
-    void send_packet_u16(uint8_t seqnum, uint8_t opcode, uint16_t data);
-    void send_packet_u32(uint8_t seqnum, uint8_t opcode, uint32_t data);
+    void send_oob_packet_empty(uint8_t seqnum, uint8_t opcode);
+    void send_oob_packet_u8(uint8_t seqnum, uint8_t opcode, uint8_t data);
+    void send_oob_packet_u16(uint8_t seqnum, uint8_t opcode, uint16_t data);
+    void send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, uint32_t data);
 
 
 private:

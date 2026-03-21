@@ -98,21 +98,14 @@ struct PABB_PACK PacketHeaderData{
 
 
 
-
-//
-//  Acks
-//
-
-//#define PABB2_CONNECTION_OPCODE_RET                     0x90
-//#define PABB2_CONNECTION_OPCODE_RET_u8                  0x91
-//#define PABB2_CONNECTION_OPCODE_RET_u16                 0x92
-//#define PABB2_CONNECTION_OPCODE_RET_u32                 0x93
-
-
-
 //
 //  Out-of-band Info (no acks needed)
 //
+
+#define PABB2_CONNECTION_OPCODE_INFO                    0x40
+#define PABB2_CONNECTION_OPCODE_INFO_u8                 0x41
+#define PABB2_CONNECTION_OPCODE_INFO_u16                0x42
+#define PABB2_CONNECTION_OPCODE_INFO_u32                0x43
 
 #define PABB2_CONNECTION_OPCODE_INVALID_LENGTH          0x60
 #define PABB2_CONNECTION_OPCODE_INVALID_CHECKSUM_FAIL   0x61

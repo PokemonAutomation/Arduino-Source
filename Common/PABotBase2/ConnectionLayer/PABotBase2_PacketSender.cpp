@@ -339,7 +339,7 @@ bool PacketSender::iterate_retransmits(){
 
 
 
-void PacketSender::send_packet_empty(uint8_t seqnum, uint8_t opcode){
+void PacketSender::send_oob_packet_empty(uint8_t seqnum, uint8_t opcode){
     struct{
         PacketHeader header;
         uint8_t crc32[sizeof(uint32_t)];
@@ -351,7 +351,7 @@ void PacketSender::send_packet_empty(uint8_t seqnum, uint8_t opcode){
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     m_unreliable_connection.send(&packet, sizeof(packet), false);
 }
-void PacketSender::send_packet_u8(uint8_t seqnum, uint8_t opcode, uint8_t data){
+void PacketSender::send_oob_packet_u8(uint8_t seqnum, uint8_t opcode, uint8_t data){
     struct{
         PacketHeader_Ack_u8 header;
         uint8_t crc32[sizeof(uint32_t)];
@@ -364,7 +364,7 @@ void PacketSender::send_packet_u8(uint8_t seqnum, uint8_t opcode, uint8_t data){
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     m_unreliable_connection.send(&packet, sizeof(packet), false);
 }
-void PacketSender::send_packet_u16(uint8_t seqnum, uint8_t opcode, uint16_t data){
+void PacketSender::send_oob_packet_u16(uint8_t seqnum, uint8_t opcode, uint16_t data){
     struct{
         PacketHeader_Ack_u16 header;
         uint8_t crc32[sizeof(uint32_t)];
@@ -377,7 +377,7 @@ void PacketSender::send_packet_u16(uint8_t seqnum, uint8_t opcode, uint16_t data
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     m_unreliable_connection.send(&packet, sizeof(packet), false);
 }
-void PacketSender::send_packet_u32(uint8_t seqnum, uint8_t opcode, uint32_t data){
+void PacketSender::send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, uint32_t data){
     struct{
         PacketHeader_Ack_u32 header;
         uint8_t crc32[sizeof(uint32_t)];

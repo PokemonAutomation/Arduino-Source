@@ -17,18 +17,27 @@ namespace PABotBase2{
 
 
 
-class ReliableStreamConnectionFW{
+class ReliableStreamConnectionFW final : public StreamConnection{
 public:
     ReliableStreamConnectionFW(StreamConnection& unreliable_connection);
 
-    size_t send_stream(const void* data, size_t bytes){
+
+public:
+    virtual size_t send(const void* data, size_t bytes, bool is_retransmit = false) override{
+        (void)is_retransmit;
         return m_reliable_sender.send_stream(data, bytes);
     }
-    size_t read_stream(void* data, size_t bytes){
+    virtual size_t recv(void* data, size_t bytes) override{
         return m_stream_coalescer.read(data, bytes);
     }
 
-    void run_events();
+    virtual bool run_events() override;
+
+
+public:
+    void send_oob_info_u32(uint32_t data){
+        m_reliable_sender.send_oob_packet_u32(0, PABB2_CONNECTION_OPCODE_INFO_u32, data);
+    }
 
 
 public:

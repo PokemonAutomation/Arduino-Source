@@ -144,7 +144,7 @@
 #include "Common/Cpp/Options/MacAddressOption.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
-#include "Common/PABotBase2/ConnectionLayer/PABotbase2_ReliableStreamConnection.h"
+#include "Common/PABotBase2/ConnectionLayer/PABotbase2_ReliableStreamConnectionFW.h"
 #include "Common/Cpp/StreamConnections/MockDevice.h"
 #include "CommonTools/Random.h"
 
