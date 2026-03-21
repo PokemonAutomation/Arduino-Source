@@ -101,7 +101,7 @@ bool SerialPABotBase2_Connection::open_serial_connection(){
         set_status_line0(text, COLOR_DARKGREEN);
     }
     m_stream_connection = std::make_unique<ReliableStreamConnection>(
-        this,
+        static_cast<CancellableScope*>(this),
         m_logger, GlobalSettings::instance().LOG_EVERYTHING,
         GlobalThreadPools::unlimited_realtime(),
         *m_unreliable_connection,
@@ -150,7 +150,7 @@ bool SerialPABotBase2_Connection::open_device_connection(){
     {
 //        std::lock_guard<Mutex> lg(m_lock);
         m_device = std::make_unique<PABotBase2::DeviceHandle>(
-            this,
+            static_cast<CancellableScope*>(this),
             m_logger, *m_stream_connection
         );
     }

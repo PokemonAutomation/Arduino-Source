@@ -20,7 +20,10 @@ namespace SerialPABotBase{
 
 
 
-class SerialPABotBase2_Connection final : public ControllerConnection, public CancellableScope{
+class SerialPABotBase2_Connection final
+    : public ControllerConnection
+    , private CancellableScope
+{
 public:
     SerialPABotBase2_Connection(
         Logger& logger,
