@@ -303,6 +303,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/PABotBase2/DataLayer/PABotBase2_Controller_HID_Keyboard.h
     ../Common/PABotBase2/DataLayer/PABotBase2_Controller_NS_WiredController.h
     ../Common/PABotBase2/DataLayer/PABotBase2_Controller_NS1_OemController.h
+    ../Common/PABotBase2/DataLayer/PABotBase2_MessageProtocol.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_HID_Keyboard.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS1_OemControllers.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS_WiredController.h

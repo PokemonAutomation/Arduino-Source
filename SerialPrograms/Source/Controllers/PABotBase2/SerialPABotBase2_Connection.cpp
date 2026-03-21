@@ -149,7 +149,7 @@ bool SerialPABotBase2_Connection::open_device_connection(){
         m_logger.log(text);
         set_status_line0(text, COLOR_DARKGREEN);
     }
-    m_device = std::make_unique<PABotBase2::DeviceHandle>(*m_stream_connection);
+    m_device = std::make_unique<PABotBase2::DeviceHandle>(m_logger, *m_stream_connection);
     m_device->connect();
 
 

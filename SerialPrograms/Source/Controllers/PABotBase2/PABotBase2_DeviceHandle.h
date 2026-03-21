@@ -7,7 +7,12 @@
 #ifndef PokemonAutomation_Controllers_PABotBase2_DeviceHandle_H
 #define PokemonAutomation_Controllers_PABotBase2_DeviceHandle_H
 
+#include <map>
+#include "Common/Cpp/Logging/AbstractLogger.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/StreamConnections/StreamConnection.h"
+#include "Common/PABotBase2/DataLayer/PABotBase2_MessageProtocol.h"
 
 namespace PokemonAutomation{
 namespace PABotBase2{
@@ -15,23 +20,47 @@ namespace PABotBase2{
 
 
 
-class DeviceHandle{
+class DeviceHandle : private StreamListener{
 public:
-    DeviceHandle(StreamConnection& connection)
-        : m_connection(connection)
-        , m_device_protocol(0)
-        , m_command_queue_size(4)
+    DeviceHandle(Logger& logger, StreamConnection& connection)
+        : m_logger(logger)
+        , m_connection(connection)
     {}
 
     void connect();
 
 
 private:
+    virtual void on_recv(const void* data, size_t bytes) override;
+
+    void send_data(const void* data, size_t bytes);
+    void send_request(pabb2_MessageHeader_Request& request);
+    std::string wait_for_response(uint8_t id);
+
+    uint32_t query_u32(uint8_t opcode);
+
+
+private:
+    Logger& m_logger;
     StreamConnection& m_connection;
 
-    uint32_t m_device_protocol;
-    uint8_t m_command_queue_size;
+    uint32_t m_device_protocol = 0;
+    uint32_t m_device_id = 0;
+    uint32_t m_device_firmware_version = 0;
+    uint8_t m_command_queue_size = 4;
 
+    uint8_t m_seqnum = 0;
+    bool m_stopping = false;
+
+    struct LiveRequest{
+        Mutex lock;
+        ConditionVariable cv;
+        std::string response;
+    };
+
+    Mutex m_lock;
+    ConditionVariable m_cv;
+    std::map<uint8_t, LiveRequest> m_pending_requests;
 };
 
 
