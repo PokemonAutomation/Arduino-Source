@@ -7,13 +7,12 @@
 #ifndef PokemonAutomation_PABotBase2_ConnectionLayer_PacketParser_H
 #define PokemonAutomation_PABotBase2_ConnectionLayer_PacketParser_H
 
-#include "PABotBase2_StreamInterface.h"
+#include "../PABotBase2_StreamInterface.h"
 #include "PABotBase2_Connection.h"
 
-namespace PokemonAutomation{
-namespace PABotBase2{
-
-
+#ifdef PABB2_SIZING_OVERRIDE
+#include "PABotBase2_Config.h"
+#else
 
 //  Maximum size of incoming packet + overhead.
 //  Min Size: sizeof(largest header) + sizeof(uint32_t) + 1
@@ -22,6 +21,12 @@ namespace PABotBase2{
 #define PABB2_MAX_INCOMING_PACKET_SIZE      ((uint16_t)128)
 #endif
 
+#endif
+
+namespace PokemonAutomation{
+namespace PABotBase2{
+
+
 
 
 #define PABB2_PacketParser_RESULT_VALID             0
@@ -29,7 +34,9 @@ namespace PABotBase2{
 #define PABB2_PacketParser_RESULT_CHECKSUM_FAIL     2
 
 
-typedef void (*pabb2_fp_PacketRunner)(void* context, const PacketHeader* data);
+struct PacketRunner{
+    virtual void on_packet(const PacketHeader* data) = 0;
+};
 
 
 struct PacketParser{
@@ -62,7 +69,7 @@ public:
     //  "packet_runner" multiple times.
     //
     void push_bytes(
-        void* context, pabb2_fp_PacketRunner packet_runner,
+        PacketRunner& packet_runner,
         const uint8_t* data, size_t bytes
     );
 

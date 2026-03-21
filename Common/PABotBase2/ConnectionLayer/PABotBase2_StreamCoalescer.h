@@ -9,18 +9,24 @@
 
 #include "PABotBase2_Connection.h"
 
+#ifdef PABB2_SIZING_OVERRIDE
+#include "PABotBase2_Config.h"
+#else
+
+//  Must be power-of-two. (max 64)
+#ifndef PABB2_StreamCoalescer_SLOTS
+#define PABB2_StreamCoalescer_SLOTS         64
+#endif
+
+//  Must be power-of-two, fits into uint16_t. (max 32768)
+#ifndef PABB2_StreamCoalescer_BUFFER_SIZE
+#define PABB2_StreamCoalescer_BUFFER_SIZE   16384
+#endif
+
+#endif
+
 namespace PokemonAutomation{
 namespace PABotBase2{
-
-
-#ifndef PABB2_StreamCoalescer_SLOTS
-#define PABB2_StreamCoalescer_SLOTS         128     //  Must be power-of-two, fits into uint8_t. (max 128)
-#endif
-
-#ifndef PABB2_StreamCoalescer_BUFFER_SIZE
-#define PABB2_StreamCoalescer_BUFFER_SIZE   32768   //  Must be power-of-two, fits into uint16_t. (max 32768)
-#endif
-
 
 
 

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PABotBase2_ConnectionLayer_ReliableStreamConnection_H
 #define PokemonAutomation_PABotBase2_ConnectionLayer_ReliableStreamConnection_H
 
-#include "PABotBase2_StreamInterface.h"
+#include "../PABotBase2_StreamInterface.h"
 #include "PABotBase2_PacketSender.h"
 #include "PABotBase2_PacketParser.h"
 #include "PABotBase2_StreamCoalescer.h"

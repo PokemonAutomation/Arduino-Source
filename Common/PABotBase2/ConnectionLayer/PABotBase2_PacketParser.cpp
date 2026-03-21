@@ -121,7 +121,7 @@ const PacketHeader* PacketParser::pull_bytes(){
 }
 
 void PacketParser::push_bytes(
-    void* context, pabb2_fp_PacketRunner packet_runner,
+    PacketRunner& packet_runner,
     const uint8_t* data, size_t bytes
 ){
 //    cout << "pabb2_PacketParser_push_bytes(): " << bytes << endl;
@@ -196,7 +196,7 @@ void PacketParser::push_bytes(
                 : PABB2_PacketParser_RESULT_CHECKSUM_FAIL;
         }
 
-        packet_runner(context, header);
+        packet_runner.on_packet(header);
         index = 0;
     }
 

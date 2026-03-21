@@ -14,7 +14,7 @@
 using std::cout;
 using std::endl;
 
-#if 0
+#if 1
 #define PABB2_DROP_HOST_TO_DEVICE   0.01
 #define PABB2_DROP_DEVICE_TO_HOST   0.01
 #else

@@ -232,10 +232,7 @@ void ReliableStreamConnection::on_recv(const void* data, size_t bytes){
         cout << "ReliableStreamConnection::on_recv(): " << bytes << endl;
     }
 #endif
-    m_parser.push_bytes(
-        this, &ReliableStreamConnection::on_packet,
-        (const uint8_t*)data, bytes
-    );
+    m_parser.push_bytes(*this, (const uint8_t*)data, bytes);
 }
 
 

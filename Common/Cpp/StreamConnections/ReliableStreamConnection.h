@@ -27,6 +27,7 @@ class ReliableStreamConnection final
     : public CancellableScope
     , public PokemonAutomation::StreamConnection
     , public PABotBase2::StreamConnection
+    , private PABotBase2::PacketRunner
     , private StreamListener
 {
     using PacketHeader = PABotBase2::PacketHeader;
@@ -86,14 +87,10 @@ private:
     //  Receive
 
     virtual void on_recv(const void* data, size_t bytes) override;
-    static void on_packet(void* context, const PacketHeader* packet){
-        ReliableStreamConnection& self = *(ReliableStreamConnection*)context;
-        self.on_packet(packet);
-    }
     virtual size_t recv(void* data, size_t max_bytes) override{
         return 0;
     }
-    void on_packet(const PacketHeader* packet);
+    virtual void on_packet(const PacketHeader* packet) override;
 
     void process_RET_RESET(const PacketHeader* packet);
     void process_RET_VERSION(const PacketHeader* packet);

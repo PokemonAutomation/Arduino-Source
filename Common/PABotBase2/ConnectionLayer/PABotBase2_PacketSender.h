@@ -7,24 +7,31 @@
 #ifndef PokemonAutomation_PABotBase2_ConnectionLayer_PacketSender_H
 #define PokemonAutomation_PABotBase2_ConnectionLayer_PacketSender_H
 
-#include "PABotBase2_StreamInterface.h"
+#include "../PABotBase2_StreamInterface.h"
 #include "PABotBase2_Connection.h"
 
-namespace PokemonAutomation{
-namespace PABotBase2{
+#ifdef PABB2_SIZING_OVERRIDE
+#include "PABotBase2_Config.h"
+#else
 
-
+//  Must be power-of-two. (max 64)
 #ifndef PABB2_PacketSender_SLOTS
-#define PABB2_PacketSender_SLOTS        128     //  Must be power-of-two, fits into uint8_t. (max 128)
+#define PABB2_PacketSender_SLOTS                64
 #endif
 
+//  Must fit into size_t.
 #ifndef PABB2_PacketSender_BUFFER_SIZE
-#define PABB2_PacketSender_BUFFER_SIZE  32768   //  Must fit into size_t.
+#define PABB2_PacketSender_BUFFER_SIZE          16384
 #endif
 
 #ifndef PABB2_PacketSender_RETRANSMIT_COUNTER
 #define PABB2_PacketSender_RETRANSMIT_COUNTER   2
 #endif
+
+#endif
+
+namespace PokemonAutomation{
+namespace PABotBase2{
 
 
 
