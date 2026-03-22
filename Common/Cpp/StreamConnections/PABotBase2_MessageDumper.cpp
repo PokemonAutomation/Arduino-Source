@@ -148,6 +148,7 @@ std::string tostr(const pabb2_MessageHeader* header){
         str += "PABB2_MESSAGE_OPCODE_RET_DATA: id = ";
         str += std::to_string(header->id);
         str += ", bytes = " + std::to_string(header->message_bytes - sizeof(pabb2_MessageHeader));
+        return str;
 
     case PABB2_MESSAGE_OPCODE_PROTOCOL_VERSION:
         str += "PABB2_MESSAGE_OPCODE_PROTOCOL_VERSION: id = ";

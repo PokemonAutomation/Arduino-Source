@@ -45,6 +45,9 @@ bool DeviceHandle::cancel(std::exception_ptr exception) noexcept{
     }
     {
         std::lock_guard<Mutex> lg(m_lock);
+        for (auto& item : m_pending_requests){
+            item.second.cv.notify_all();
+        }
     }
     m_cv.notify_all();
     return false;
