@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonTools/Random.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -241,7 +242,7 @@ void wait_with_teachy_tv(ProControllerContext& context, uint64_t& TEACHY_DELAY){
     // total non-teachy delay duration: 13700ms
 }
 
-bool watch_for_shiny_encounter(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+int watch_for_shiny_encounter(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     BlackScreenWatcher battle_entered(COLOR_RED);
     context.wait_for_all_requests();
     env.log("Wild encounter started.");
@@ -255,10 +256,10 @@ bool watch_for_shiny_encounter(SingleSwitchProgramEnvironment& env, ProControlle
         //     "Failed to initiate encounter.",
         //     env.console
         // );
-        return false;
+        return -1;
     }
     bool encounter_shiny = handle_encounter(env.console, context, false);
-    return encounter_shiny;
+    return encounter_shiny ? 1 : 0;
 }
 
 void collect_starter_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& DOUBLE_DELAY){
@@ -357,7 +358,9 @@ void use_sweet_scent(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 }
 
 void use_registered_fishing_rod(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& DOUBLE_DELAY){
-    pbf_press_button(context, BUTTON_MINUS, 200ms, std::chrono::milliseconds(DOUBLE_DELAY - 4200));
+    uint32_t rng_wait = 50 * random_u32(0, 20); // helps avoid always hitting "Not even a nibble" (?)
+    pbf_wait(context, std::chrono::milliseconds(rng_wait));
+    pbf_press_button(context, BUTTON_MINUS, 200ms, std::chrono::milliseconds(DOUBLE_DELAY - rng_wait - 4200));
     pbf_press_button(context, BUTTON_A, 200ms, 800ms);
     context.wait_for_all_requests();
 }
@@ -467,15 +470,20 @@ void RNGManipulator::program(SingleSwitchProgramEnvironment& env, ProControllerC
             shiny_found = shiny_checker.read(env.console.logger(), screen);
         }else if (TARGET == Target::snorlax){
             encounter_snorlax_after_delay(env, context, DOUBLE_DELAY);
-            shiny_found = watch_for_shiny_encounter(env, context);
+            shiny_found = watch_for_shiny_encounter(env, context) == 1;
             context.wait_for_all_requests();
         }else if (TARGET == Target::sweetscent){
             use_sweet_scent(env, context, DOUBLE_DELAY);
-            shiny_found = watch_for_shiny_encounter(env, context);
+            shiny_found = watch_for_shiny_encounter(env, context) == 1;
             context.wait_for_all_requests();
         }else if (TARGET == Target::fishing){
             use_registered_fishing_rod(env, context, DOUBLE_DELAY);
-            shiny_found = watch_for_shiny_encounter(env, context);
+            int ret = watch_for_shiny_encounter(env, context);
+            if (ret < 0 ){
+                continue;
+                // keep going if "Not even a nibble..."
+            }
+            shiny_found = ret == 1;
             context.wait_for_all_requests();
         }else{
             OperationFailedException::fire(
