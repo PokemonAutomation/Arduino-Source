@@ -37,7 +37,6 @@ class StreamCoalescer{
 public:
     StreamCoalescer(){
         reset();
-        this->m_stream_reset = false;
     }
     void reset();
 
@@ -81,8 +80,6 @@ public:
 //    uint8_t m_seqnum;
     uint16_t m_stream_head;
     uint16_t m_stream_tail;
-
-    bool m_stream_reset;
 
     //  0       =   Not received yet.
     //  0-254   =   Received stream packet. # is the size.

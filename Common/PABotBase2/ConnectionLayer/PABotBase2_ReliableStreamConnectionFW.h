@@ -12,6 +12,10 @@
 #include "PABotBase2_PacketParser.h"
 #include "PABotBase2_StreamCoalescer.h"
 
+#ifndef PABB2_ReliableConnectionFW_POLL_MS
+#define PABB2_ReliableConnectionFW_POLL_MS      50
+#endif
+
 namespace PokemonAutomation{
 namespace PABotBase2{
 
@@ -21,6 +25,9 @@ class ReliableStreamConnectionFW final : public ReliableStreamConnectionPolling{
 public:
     ReliableStreamConnectionFW(UnreliableStreamConnectionPolling& unreliable_connection);
 
+    bool has_unacked_sends() const{
+        return m_reliable_sender.slots_used() != 0;
+    }
 
 public:
     virtual void reliable_send(const void* data, size_t bytes) override{
@@ -42,6 +49,7 @@ public:
         m_reset_flag = false;
     }
     virtual bool run_events() override;
+    virtual void wait_for_event(uint16_t milliseconds) override;
 
 
 public:

@@ -30,15 +30,16 @@ public:
     virtual void reliable_send(const void* data, size_t bytes) = 0;
     virtual size_t reliable_recv(void* data, size_t max_bytes) = 0;
 
-    virtual bool run_events(){
-        return false;
-    }
     virtual bool reset_flag_set() const{ return false; }
     virtual void clear_reset_flag(){}
 
-    //  Wait for something to be ready to receive. Timeout in milliseconds.
-    virtual void wait_for_recv_available(uint16_t milliseconds){
+    //  Wait for the next time to run an event. Timeout in milliseconds.
+    virtual void wait_for_event(uint16_t milliseconds){
         (void)milliseconds;
+    }
+
+    virtual bool run_events(){
+        return false;
     }
 };
 

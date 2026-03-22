@@ -56,9 +56,16 @@ bool DeviceHandle::cancel(std::exception_ptr exception) noexcept{
 
 void DeviceHandle::connect(){
     m_device_protocol = query_u32(PABB2_MESSAGE_OPCODE_PROTOCOL_VERSION);
+    m_logger.log("[MLC]: Remote Protocol: " + std::to_string(m_device_protocol), COLOR_BLUE);
+
     m_device_firmware_version = query_u32(PABB2_MESSAGE_OPCODE_FIRMWARE_VERSION);
+    m_logger.log("[MLC]: Firmware Version: " + std::to_string(m_device_firmware_version), COLOR_BLUE);
+
     m_device_id = query_u32(PABB2_MESSAGE_OPCODE_DEVICE_IDENTIFIER);
+    m_logger.log("[MLC]: Device ID: " + std::to_string(m_device_id), COLOR_BLUE);
+
     m_command_queue_size = (uint8_t)query_u32(PABB2_MESSAGE_OPCODE_CQ_CAPACITY);
+    m_logger.log("[MLC]: Command Queue Size: " + std::to_string(m_command_queue_size), COLOR_BLUE);
 
 }
 

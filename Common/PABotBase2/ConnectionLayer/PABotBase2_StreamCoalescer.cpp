@@ -31,7 +31,6 @@ void StreamCoalescer::reset(){
     m_slot_tail = 0;
     m_stream_head = 0;
     m_stream_tail = 0;
-    m_stream_reset = true;
     memset(m_lengths, 0, sizeof(m_lengths));
 
 }
@@ -214,11 +213,6 @@ bool StreamCoalescer::push_stream(const PacketHeaderData* packet){
 }
 
 size_t StreamCoalescer::read(void* data, size_t max_bytes){
-    if (m_stream_reset){
-        m_stream_reset = false;
-        return 0;
-    }
-
     size_t read = 0;
 
     while (max_bytes > 0){

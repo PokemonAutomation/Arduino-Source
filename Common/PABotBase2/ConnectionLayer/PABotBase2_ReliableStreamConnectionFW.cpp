@@ -28,6 +28,15 @@ ReliableStreamConnectionFW::ReliableStreamConnectionFW(UnreliableStreamConnectio
     , m_reliable_sender(unreliable_connection, (uint8_t)(PABB2_MAX_INCOMING_PACKET_SIZE % 256))
 {}
 
+
+void ReliableStreamConnectionFW::wait_for_event(uint16_t milliseconds){
+    //  If we have unacked sends, we cap the wait time since those may need to
+    //  be retransmitted.
+    if (m_reliable_sender.slots_used() != 0 && milliseconds > PABB2_ReliableConnectionFW_POLL_MS){
+        milliseconds = PABB2_ReliableConnectionFW_POLL_MS;
+    }
+    return m_unreliable_connection.wait_for_recv_available(milliseconds);
+}
 bool ReliableStreamConnectionFW::run_events(){
     const PacketHeader* packet = m_parser.pull_bytes(m_unreliable_connection);
     if (packet == NULL){

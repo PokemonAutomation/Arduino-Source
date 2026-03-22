@@ -487,7 +487,9 @@ void ReliableStreamConnection::process_ASK_STREAM_DATA(const PacketHeader* packe
         );
 
         char buffer[4096];
+//        m_stream_coalescer.print(false);
         size_t bytes = m_stream_coalescer.read(buffer, sizeof(buffer));
+//        cout << "bytes = " << bytes << endl;
         if (bytes != 0){
             on_reliable_recv(buffer, bytes);
         }
