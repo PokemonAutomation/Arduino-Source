@@ -89,7 +89,7 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
         bool log_everything = GlobalSettings::instance().LOG_EVERYTHING;
 
         if (log_everything){
-            m_logger.log("[DeviceHandle]: Receive: " + tostr(header), COLOR_PURPLE);
+            m_logger.log("[MLC]: Receive: " + tostr(header), COLOR_PURPLE);
         }
 
         //  Now we can process the message.
@@ -97,7 +97,7 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
         case PABB2_MESSAGE_OPCODE_INVALID:
         case PABB2_MESSAGE_OPCODE_REQUEST_DROPPED:
             if (!log_everything){
-                m_logger.log("[DeviceHandle]: Receive: " + tostr(header), COLOR_PURPLE);
+                m_logger.log("[MLC]: Receive: " + tostr(header), COLOR_PURPLE);
             }
             continue;
         case PABB2_MESSAGE_OPCODE_RET:
@@ -107,7 +107,7 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
             std::lock_guard<Mutex> lg(m_lock);
             auto iter = m_pending_requests.find(header->id);
             if (iter == m_pending_requests.end()){
-                m_logger.log("[DeviceHandle]: Received response for unknown ID: " + std::to_string(header->id));
+                m_logger.log("[MLC]: Received response for unknown ID: " + std::to_string(header->id));
                 continue;
             }
             iter->second.response = std::move(message);
@@ -143,7 +143,7 @@ void DeviceHandle::send_request(pabb2_MessageHeader& request){
     }
 
     if (GlobalSettings::instance().LOG_EVERYTHING){
-        m_logger.log("[DeviceHandle]: Sending: " + tostr(&request), COLOR_DARKGREEN);
+        m_logger.log("[MLC]: Sending: " + tostr(&request), COLOR_DARKGREEN);
     }
 
     m_connection.reliable_send(&request, request.message_bytes);

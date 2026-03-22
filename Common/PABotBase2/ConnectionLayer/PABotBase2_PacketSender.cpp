@@ -162,10 +162,7 @@ PacketHeader* PacketSender::reserve_packet(
 void PacketSender::commit_packet(PacketHeader* packet){
     pabb_crc32_write_to_message(packet, packet->packet_bytes);
 
-    m_connection.unreliable_send(
-        packet, packet->packet_bytes,
-        false
-    );
+    m_connection.unreliable_send(packet, packet->packet_bytes);
 
     //  In order to save memory, we repurpose the magic number as a timer to
     //  track when it should be retransmitted. However, it will be set back to
@@ -262,10 +259,7 @@ size_t PacketSender::send_stream(const void* data, size_t bytes){
 //        cout << "Send: " << (int)packet->seqnum << ", Offset: " << packet->stream_offset << endl;
 
         //  Send
-        m_connection.unreliable_send(
-            packet, packet_bytes,
-            false
-        );
+        m_connection.unreliable_send(packet, packet_bytes);
 
         //  Set the retransmit timer.
         packet->magic_number = m_retransmit_seqnum;
@@ -313,8 +307,10 @@ bool PacketSender::iterate_retransmits(){
             continue;
         }
 
+        packet->opcode |= PABB2_CONNECTION_RETRANSMIT_FLAG;
         packet->magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
         uint8_t packet_bytes = packet->packet_bytes;
+        pabb_crc32_write_to_message(packet, packet_bytes);
 
 #if 0
         printf("Retransmitting: %u\n", packet->seqnum);
@@ -323,8 +319,7 @@ bool PacketSender::iterate_retransmits(){
 
         m_connection.unreliable_send(
             packet,
-            packet_bytes == 0 ? (size_t)256 : (size_t)packet_bytes,
-            true
+            packet_bytes == 0 ? (size_t)256 : (size_t)packet_bytes
         );
         packet->magic_number = seqnum;
         return true;
@@ -349,7 +344,7 @@ void PacketSender::send_oob_packet_empty(uint8_t seqnum, uint8_t opcode){
     packet.header.packet_bytes = sizeof(packet);
     packet.header.opcode = opcode;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
-    m_connection.unreliable_send(&packet, sizeof(packet), false);
+    m_connection.unreliable_send(&packet, sizeof(packet));
 }
 void PacketSender::send_oob_packet_u8(uint8_t seqnum, uint8_t opcode, uint8_t data){
     struct{
@@ -362,7 +357,7 @@ void PacketSender::send_oob_packet_u8(uint8_t seqnum, uint8_t opcode, uint8_t da
     packet.header.opcode = opcode;
     packet.header.data = data;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
-    m_connection.unreliable_send(&packet, sizeof(packet), false);
+    m_connection.unreliable_send(&packet, sizeof(packet));
 }
 void PacketSender::send_oob_packet_u16(uint8_t seqnum, uint8_t opcode, uint16_t data){
     struct{
@@ -375,7 +370,7 @@ void PacketSender::send_oob_packet_u16(uint8_t seqnum, uint8_t opcode, uint16_t 
     packet.header.opcode = opcode;
     packet.header.data = data;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
-    m_connection.unreliable_send(&packet, sizeof(packet), false);
+    m_connection.unreliable_send(&packet, sizeof(packet));
 }
 void PacketSender::send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, uint32_t data){
     struct{
@@ -388,7 +383,7 @@ void PacketSender::send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, uint32_t 
     packet.header.opcode = opcode;
     packet.header.data = data;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
-    m_connection.unreliable_send(&packet, sizeof(packet), false);
+    m_connection.unreliable_send(&packet, sizeof(packet));
 }
 
 

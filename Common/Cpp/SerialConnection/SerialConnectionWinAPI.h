@@ -165,7 +165,7 @@ private:
     }
 
 
-    virtual size_t unreliable_send(const void* data, size_t bytes, bool = false) override{
+    virtual size_t unreliable_send(const void* data, size_t bytes) override{
         WriteSpinLock lg(m_send_lock, "SerialConnection::send()");
 #if 0
         for (size_t c = 0; c < bytes; c++){

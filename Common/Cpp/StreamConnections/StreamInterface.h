@@ -11,7 +11,7 @@ namespace PokemonAutomation{
 
 
 struct UnreliableStreamSender{
-    virtual size_t unreliable_send(const void* data, size_t bytes, bool is_retransmit) = 0;
+    virtual size_t unreliable_send(const void* data, size_t bytes) = 0;
 };
 
 

@@ -15,7 +15,10 @@ std::string tostr(const PacketHeader* header){
     //  TODO: Make sure packets are large enough before reading them.
 
     std::string str;
-    switch (header->opcode){
+    if (header->opcode & PABB2_CONNECTION_RETRANSMIT_FLAG){
+        str += "(Retransmit) ";
+    }
+    switch (header->opcode & PABB2_CONNECTION_OPCODE_MASK){
     case PABB2_CONNECTION_OPCODE_INVALID:
         str += "PABB2_CONNECTION_OPCODE_INVALID: seqnum = ";
         str += std::to_string(header->seqnum);
@@ -126,7 +129,7 @@ std::string tostr(const pabb2_MessageHeader* header){
     //  TODO: Make sure packets are large enough before reading them.
 
     std::string str;
-    switch (header->opcode){
+    switch (header->opcode & PABB2_CONNECTION_OPCODE_MASK){
     case PABB2_MESSAGE_OPCODE_INVALID:
         str += "PABB2_MESSAGE_OPCODE_INVALID: opcode = ";
         str += std::to_string(header->id);

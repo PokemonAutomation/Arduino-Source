@@ -62,7 +62,8 @@ bool ReliableStreamConnectionFW::run_events(){
 //    printf("Device Received: %d\n", packet->opcode);
 
     //  Now handle the different opcodes.
-    switch (packet->opcode){
+    uint8_t opcode = packet->opcode & PABB2_CONNECTION_OPCODE_MASK;
+    switch (opcode){
     case PABB2_CONNECTION_OPCODE_ASK_RESET:
         m_reliable_sender.send_oob_packet_empty(
             packet->seqnum,
