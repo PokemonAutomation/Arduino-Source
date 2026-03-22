@@ -116,6 +116,7 @@ void ReliableStreamConnection::on_recv(const void* data, size_t bytes){
 //
 
 size_t ReliableStreamConnection::unreliable_send(const void* data, size_t bytes, bool is_retransmit){
+//    cout << "ReliableStreamConnection::unreliable_send() - start" << endl;
     const PacketHeader* header = (const PacketHeader*)data;
     if (is_retransmit){
         m_logger.log(
@@ -132,6 +133,7 @@ size_t ReliableStreamConnection::unreliable_send(const void* data, size_t bytes,
         );
 //        PABotBase2::PacketHeader_print(header, true);   //  REMOVE
     }
+//    cout << "ReliableStreamConnection::unreliable_send() - before send" << endl;
     return m_unreliable_connection.unreliable_send(data, bytes, is_retransmit);
 }
 
@@ -184,6 +186,7 @@ void ReliableStreamConnection::print() const{
 
 
 void ReliableStreamConnection::send_ack(uint8_t seqnum, uint8_t opcode){
+    //  Must call inside lock.
     struct{
         PacketHeader header;
         uint8_t crc[sizeof(uint32_t)];
@@ -193,11 +196,10 @@ void ReliableStreamConnection::send_ack(uint8_t seqnum, uint8_t opcode){
     packet.header.packet_bytes = sizeof(packet);
     packet.header.opcode = opcode;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
-
-    std::lock_guard<Mutex> lg(m_lock);
     unreliable_send(&packet, sizeof(packet), false);
 }
 void ReliableStreamConnection::send_ack_u16(uint8_t seqnum, uint8_t opcode, uint16_t data){
+    //  Must call inside lock.
     struct{
         PacketHeader_Ack_u16 header;
         uint8_t crc[sizeof(uint32_t)];
@@ -208,8 +210,6 @@ void ReliableStreamConnection::send_ack_u16(uint8_t seqnum, uint8_t opcode, uint
     packet.header.opcode = opcode;
     packet.header.data = data;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
-
-    std::lock_guard<Mutex> lg(m_lock);
     unreliable_send(&packet, sizeof(packet), false);
 }
 
@@ -472,16 +472,23 @@ void ReliableStreamConnection::process_ASK_STREAM_DATA(const PacketHeader* packe
     {
         std::lock_guard<Mutex> lg(m_lock);
         if (!m_stream_coalescer.push_stream((const PacketHeaderData*)packet)){
-            cout << "push_stream() failed" << endl;
+//            cout << "push_stream() failed" << endl;
             return;
         }
+        cout << "Calling: send_ack_u16()" << endl;
         send_ack_u16(
             packet->seqnum,
             PABB2_CONNECTION_OPCODE_RET_STREAM_DATA,
-            m_stream_coalescer.bytes_available()
+            m_stream_coalescer.free_bytes()
         );
+
+        char buffer[4096];
+        size_t bytes = m_stream_coalescer.read(buffer, sizeof(buffer));
+        if (bytes != 0){
+            on_reliable_recv(buffer, bytes);
+        }
     }
-    m_cv.notify_all();
+//    m_cv.notify_all();
 }
 void ReliableStreamConnection::process_RET_STREAM_DATA(const PacketHeader* packet){
     {

@@ -99,15 +99,8 @@ private:
 
 
 private:
-    //  Virtuals: StreamSender/StreamListener
-
     virtual void reliable_send(const void* data, size_t bytes) override;
     virtual void on_recv(const void* data, size_t bytes) override;
-
-
-private:
-    //  Virtuals: PABotBase2::StreamConnection
-
     virtual size_t unreliable_send(const void* data, size_t bytes, bool is_retransmit) override;
 
 
@@ -133,8 +126,6 @@ private:
     const WallDuration m_retransmit_timeout;
     Mutex* m_print_lock;
 
-
-
     PABotBase2::PacketSender m_reliable_sender;
     PABotBase2::PacketParser m_parser;
     PABotBase2::StreamCoalescer m_stream_coalescer;
@@ -152,8 +143,8 @@ private:
 
     mutable Mutex m_lock;
     ConditionVariable m_cv;
-    AsyncTask m_retransmit_thread;
 
+    AsyncTask m_retransmit_thread;
 };
 
 

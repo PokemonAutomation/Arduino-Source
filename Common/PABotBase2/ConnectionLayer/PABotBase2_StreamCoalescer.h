@@ -45,7 +45,7 @@ public:
 
 
 public:
-    uint16_t bytes_available() const;
+    uint16_t free_bytes() const;
 
     void push_packet(uint8_t seqnum);
 

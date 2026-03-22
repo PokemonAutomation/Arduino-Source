@@ -113,7 +113,7 @@ bool ReliableStreamConnectionFW::run_events(){
             m_reliable_sender.send_oob_packet_u16(
                 packet->seqnum,
                 PABB2_CONNECTION_OPCODE_RET_STREAM_DATA,
-                m_stream_coalescer.bytes_available()
+                m_stream_coalescer.free_bytes()
             );
         }else{
 //            printf("Device: Failed to push.\n");

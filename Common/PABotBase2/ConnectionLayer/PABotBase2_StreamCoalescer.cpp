@@ -103,7 +103,7 @@ void StreamCoalescer::pop_leading_finished(){
 }
 
 
-uint16_t StreamCoalescer::bytes_available() const{
+uint16_t StreamCoalescer::free_bytes() const{
     if (m_slot_head == m_slot_tail){
         return PABB2_StreamCoalescer_BUFFER_SIZE;
     }

@@ -27,6 +27,7 @@ DeviceHandle::DeviceHandle(
     : m_logger(logger)
     , m_connection(connection)
 {
+    connection.add_listener(*this);
     if (parent){
         attach(*parent);
     }
@@ -34,6 +35,7 @@ DeviceHandle::DeviceHandle(
 DeviceHandle::~DeviceHandle(){
     detach();
     cancel(nullptr);
+    m_connection.remove_listener(*this);
 }
 
 bool DeviceHandle::cancel(std::exception_ptr exception) noexcept{
@@ -58,6 +60,7 @@ void DeviceHandle::connect(){
 }
 
 void DeviceHandle::on_recv(const void* data, size_t bytes){
+    cout << "DeviceHandle::on_recv()" << endl;
     m_buffer.insert(m_buffer.end(), (const char*)data, (const char*)data + bytes);
 
     while (true){
@@ -132,6 +135,7 @@ void DeviceHandle::send_request(pabb2_MessageHeader& request){
         }
 
         m_pending_requests[request.id];
+        m_seqnum++;
         break;
     }
 
@@ -156,7 +160,7 @@ std::string DeviceHandle::wait_for_response(uint8_t id){
         }
 
         if (iter->second.response.empty()){
-            m_cv.wait(lg);
+            iter->second.cv.wait(lg);
             continue;
         }
 
