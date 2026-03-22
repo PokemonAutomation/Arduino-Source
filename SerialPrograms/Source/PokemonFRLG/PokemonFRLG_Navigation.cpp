@@ -488,8 +488,6 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
 
         switch (ret){
         case 0:
-            console.log("Battle exited.");
-
             // check for the evolution screen
             context.wait_for_all_requests(); 
             ret2 = run_until<ProControllerContext>(
@@ -500,7 +498,8 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
                 { evolution_started }
             );
 
-            if (ret2 == 1){
+            if (ret2 == 0){
+                console.log("Evolution detected.");
                 if (!prevent_evolution){
                     // make sure B isn't pressed too soon, which would cancel the evolution
                     pbf_wait(context, 20000ms);
@@ -508,7 +507,7 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
                 rejected_first_box = false;
                 continue; // press B as in other cases, and handle any move learning loops that might come up
             }
-
+            console.log("Battle exited.");
             return move_learned;
         case 1:
             console.log("Battle Advance arrow detected.");
