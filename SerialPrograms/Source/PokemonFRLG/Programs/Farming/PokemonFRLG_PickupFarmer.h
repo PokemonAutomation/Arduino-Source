@@ -39,12 +39,19 @@ private:
         route22
     };
 
+    enum class TravelMethod{
+        fly,
+        teleport
+    };
+
+
     EnumDropdownOption<GameLocation> GAME_LOCATION;
+    EnumDropdownOption<TravelMethod> TRAVEL_METHOD;
 
     SimpleIntegerOption<uint64_t> MAX_ENCOUNTERS;
     SimpleIntegerOption<uint64_t> BATTLES_PER_ITEM_CHECK;
-    SimpleIntegerOption<uint64_t> MOVE_PP;
 
+    BooleanCheckBoxOption PREVENT_EVOLUTION;
     BooleanCheckBoxOption STOP_ON_MOVE_LEARN;
     BooleanCheckBoxOption IGNORE_SHINIES;
 
