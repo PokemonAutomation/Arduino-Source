@@ -34,9 +34,13 @@ public:
         , AUTO_RESET_SECONDS(
             "<b>Video Auto-Reset:</b><br>"
             "Attempt to reset the video if this many seconds has elapsed since the last video frame (in order to fix issues with RDP disconnection, etc).<br>"
-            "This option is not supported by all video frameworks.",
+            "This option is not supported by all video frameworks. Set to a value of 0 to disable Auto-Reset.",
             LockMode::UNLOCK_WHILE_RUNNING,
+#if defined(__linux__)
+            0 // Default to disabled on linux, auto-resets briefly output black frames
+#else
             5
+#endif
         )
     {
         PA_ADD_OPTION(VIDEO_BACKEND);

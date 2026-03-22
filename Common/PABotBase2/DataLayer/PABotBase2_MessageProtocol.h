@@ -18,10 +18,9 @@
 #define PABB_PACK
 #endif
 
+namespace PokemonAutomation{
+namespace PABotBase2{
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 
 
@@ -31,37 +30,32 @@ extern "C" {
 #define PABB2_MESSAGE_OPCODE_INVALID            0x00
 
 
-typedef struct{
+struct PABB_PACK pabb2_MessageHeader{
     uint16_t message_bytes;
     uint8_t opcode;
     uint8_t id;
-} PABB_PACK pabb2_MessageHeader_Request;
+};
 
 
 #define PABB2_MESSAGE_OPCODE_RET                0x10
 #define PABB2_MESSAGE_OPCODE_REQUEST_DROPPED    0x1f
-typedef struct{
-    uint16_t message_bytes;
-    uint8_t opcode;
-    uint8_t id;
-} PABB_PACK pabb2_Message_Response;
 
 
 #define PABB2_MESSAGE_OPCODE_RET_U32            0x11
-typedef struct{
+struct PABB_PACK pabb2_Message_Response_u32{
     uint16_t message_bytes;
     uint8_t opcode;
     uint8_t id;
     uint32_t data;
-} PABB_PACK pabb2_Message_Response_u32;
+};
 
 
 #define PABB2_MESSAGE_OPCODE_RET_DATA           0x12
-typedef struct{
+struct PABB_PACK pabb2_Message_Response_Data{
     uint16_t message_bytes;
     uint8_t opcode;
     uint8_t id;
-} PABB_PACK pabb2_Message_Response_Data;
+};
 
 
 #define PABB2_MESSAGE_OPCODE_PROTOCOL_VERSION       0x20
@@ -82,10 +76,8 @@ typedef struct{
 
 
 
-#ifdef __cplusplus
 }
-#endif
-
+}
 
 
 #if _WIN32

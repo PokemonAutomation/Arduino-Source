@@ -14,10 +14,10 @@
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
+#include "Common/Cpp/StreamConnections/PushingStreamConnections.h"
 #include "Common/PABotBase2/ConnectionLayer/PABotBase2_PacketSender.h"
 #include "Common/PABotBase2/ConnectionLayer/PABotBase2_PacketParser.h"
 #include "Common/PABotBase2/ConnectionLayer/PABotBase2_StreamCoalescer.h"
-#include "StreamConnection.h"
 
 namespace PokemonAutomation{
 
@@ -25,15 +25,23 @@ namespace PokemonAutomation{
 
 class ReliableStreamConnection final
     : public CancellableScope
-    , public StreamConnection
+    , public ReliableStreamConnectionPushing
+    , private UnreliableStreamSender
+    , private PABotBase2::PacketRunner
     , private StreamListener
 {
+    using PacketHeader = PABotBase2::PacketHeader;
+    using PacketHeader_Ack_u8 = PABotBase2::PacketHeader_Ack_u8;
+    using PacketHeader_Ack_u16 = PABotBase2::PacketHeader_Ack_u16;
+    using PacketHeader_Ack_u32 = PABotBase2::PacketHeader_Ack_u32;
+    using PacketHeaderData = PABotBase2::PacketHeaderData;
+
 public:
     ReliableStreamConnection(
         CancellableScope* parent,
         Logger& logger, bool log_everything,
         ThreadPool& thread_pool,
-        StreamConnection& unreliable_connection,
+        UnreliableStreamConnectionPushing& unreliable_connection,
         WallDuration retransmit_timeout = Milliseconds(100),
         Mutex* print_lock = nullptr
     );
@@ -43,16 +51,32 @@ public:
         cancel(nullptr);
     }
     virtual bool cancel(std::exception_ptr exception) noexcept override;
-    size_t pending() const;
-    void wait_for_pending();
 
     void reset();
 
-    //  Send stream data.
-    virtual size_t send(const void* data, size_t bytes) override;
+    bool remote_protocol_is_compatible() const{
+        return m_remote_protocol_compatible;
+    }
+    uint32_t remote_protocol() const{
+        return m_remote_protocol;
+    }
+    const std::string& error_string() const{
+        return m_error;
+    }
+
+    size_t pending() const;
+    void wait_for_pending();
+
+
+public:
+    //  Send in-band
 
     bool try_send_request(uint8_t opcode);
     void send_request(uint8_t opcode);
+
+    void send_stream(const void* data, size_t bytes){
+        reliable_send(data, bytes);
+    }
 
 
 public:
@@ -71,47 +95,46 @@ private:
     void send_ack(uint8_t seqnum, uint8_t opcode);
     void send_ack_u16(uint8_t seqnum, uint8_t opcode, uint16_t data);
 
-    static size_t send_raw(
-        void* context,
-        const void* data, size_t bytes,
-        bool is_retransmit
-    );
     void retransmit_thread();
 
 
 private:
-    //  Receive
-
+    virtual void reliable_send(const void* data, size_t bytes) override;
     virtual void on_recv(const void* data, size_t bytes) override;
-    static void on_packet(void* context, const pabb2_PacketHeader* packet){
-        ReliableStreamConnection& self = *(ReliableStreamConnection*)context;
-        self.on_packet(packet);
-    }
-    void on_packet(const pabb2_PacketHeader* packet);
-
-    void process_RET_RESET(const pabb2_PacketHeader* packet);
-    void process_RET_VERSION(const pabb2_PacketHeader* packet);
-    void process_RET_PACKET_SIZE(const pabb2_PacketHeader* packet);
-    void process_RET_BUFFER_SLOTS(const pabb2_PacketHeader* packet);
-    void process_RET_BUFFER_BYTES(const pabb2_PacketHeader* packet);
-
-    void process_ASK_STREAM_DATA(const pabb2_PacketHeader* packet);
-    void process_RET_STREAM_DATA(const pabb2_PacketHeader* packet);
+    virtual size_t unreliable_send(const void* data, size_t bytes, bool is_retransmit) override;
 
 
 private:
-//public:
+    //  Virtuals: PABotBase2::PacketRunner
 
+    virtual void on_packet(const PacketHeader* packet) override;
+
+    void process_UNKNOWN_OPCODE(const PacketHeader* packet);
+    void process_RET_RESET(const PacketHeader* packet);
+    void process_RET_VERSION(const PacketHeader* packet);
+    void process_RET_PACKET_SIZE(const PacketHeader* packet);
+    void process_RET_BUFFER_SLOTS(const PacketHeader* packet);
+    void process_RET_BUFFER_BYTES(const PacketHeader* packet);
+
+    void process_ASK_STREAM_DATA(const PacketHeader* packet);
+    void process_RET_STREAM_DATA(const PacketHeader* packet);
+
+
+private:
     Logger& m_logger;
-    StreamConnection& m_unreliable_connection;
+    UnreliableStreamConnectionPushing& m_unreliable_connection;
     const WallDuration m_retransmit_timeout;
     Mutex* m_print_lock;
 
-    pabb2_PacketSender m_reliable_sender;
-    pabb2_PacketParser m_parser;
-    pabb2_StreamCoalescer m_stream_coalescer;
+    PABotBase2::PacketSender m_reliable_sender;
+    PABotBase2::PacketParser m_parser;
+    PABotBase2::StreamCoalescer m_stream_coalescer;
 
     bool m_log_everything;
+
+    bool m_remote_protocol_compatible;
+    uint32_t m_remote_protocol;
+
 //    std::atomic<bool> m_version_verified;
     uint8_t m_remote_slot_capacity;
     uint16_t m_remote_buffer_capacity;
@@ -120,8 +143,8 @@ private:
 
     mutable Mutex m_lock;
     ConditionVariable m_cv;
-    AsyncTask m_retransmit_thread;
 
+    AsyncTask m_retransmit_thread;
 };
 
 

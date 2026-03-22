@@ -13,12 +13,17 @@
 #include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
 #include "Controllers/SerialPABotBase/Connection/MessageLogger.h"
 #include "Controllers/ControllerConnection.h"
+#include "PABotBase2_DeviceHandle.h"
 
 namespace PokemonAutomation{
 namespace SerialPABotBase{
 
 
-class SerialPABotBase2_Connection final : public ControllerConnection, public CancellableScope{
+
+class SerialPABotBase2_Connection final
+    : public ControllerConnection
+    , private CancellableScope
+{
 public:
     SerialPABotBase2_Connection(
         Logger& logger,
@@ -28,7 +33,14 @@ public:
     ~SerialPABotBase2_Connection();
 
 
+public:
+    ControllerType refresh_controller_type();
+
+
 private:
+    bool open_serial_port();
+    bool open_serial_connection();
+    bool open_device_connection();
     void connect_thread_body(bool set_to_null_controller);
 
 
@@ -36,11 +48,13 @@ private:
     SerialLogger m_logger;
     std::string m_device_name;
 
+//    Mutex m_lock;
     AsyncTask m_connect_thread;
     std::unique_ptr<SerialConnection> m_unreliable_connection;
     std::unique_ptr<ReliableStreamConnection> m_stream_connection;
-
+    std::unique_ptr<PABotBase2::DeviceHandle> m_device;
 };
+
 
 
 

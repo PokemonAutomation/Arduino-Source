@@ -29,7 +29,7 @@ LegendaryHuntEmerald_Descriptor::LegendaryHuntEmerald_Descriptor()
         Pokemon::STRING_POKEMON + " RSE", "Legendary Hunt (Emerald)",
         "Programs/PokemonRSE/LegendaryHuntEmerald.html",
         "Use the Run Away method to shiny hunt legendaries in Emerald.",
-        ProgramControllerClass::StandardController_RequiresPrecision,
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
@@ -39,12 +39,15 @@ struct LegendaryHuntEmerald_Descriptor::Stats : public StatsTracker{
     Stats()
         : resets(m_stats["Resets"])
         , shinies(m_stats["Shinies"])
+        , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Resets");
         m_display_order.emplace_back("Shinies");
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& shinies;
+    std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> LegendaryHuntEmerald_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -63,6 +66,8 @@ LegendaryHuntEmerald::LegendaryHuntEmerald()
         LockMode::LOCK_WHILE_RUNNING,
         Target::regis
     )
+    , TAKE_VIDEO("<b>Take Video:</b><br>Record a video when the shiny starter is found.", LockMode::UNLOCK_WHILE_RUNNING, true)
+    , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_SHINY(
         "Shiny Found",
         true, true, ImageAttachmentMode::JPG,
@@ -75,11 +80,16 @@ LegendaryHuntEmerald::LegendaryHuntEmerald()
         &NOTIFICATION_PROGRAM_FINISH,
         })
 {
+    PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(TARGET);
+    PA_ADD_OPTION(TAKE_VIDEO);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 void LegendaryHuntEmerald::reset_regi(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    LegendaryHuntEmerald_Descriptor::Stats& stats = env.current_stats<LegendaryHuntEmerald_Descriptor::Stats>();
+
     //turn around, walk down 4/until black screen over
     BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
@@ -95,6 +105,8 @@ void LegendaryHuntEmerald::reset_regi(SingleSwitchProgramEnvironment& env, ProCo
     context.wait_for_all_requests();
     if (ret != 0){
         env.log("Failed to exit area.", COLOR_RED);
+        stats.errors++;
+        env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to exit area.",
@@ -118,6 +130,8 @@ void LegendaryHuntEmerald::reset_regi(SingleSwitchProgramEnvironment& env, ProCo
     context.wait_for_all_requests();
     if (ret2 != 0){
         env.log("Failed to enter area.", COLOR_RED);
+        stats.errors++;
+        env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to enter area.",
@@ -135,6 +149,8 @@ void LegendaryHuntEmerald::reset_regi(SingleSwitchProgramEnvironment& env, ProCo
 }
 
 void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    LegendaryHuntEmerald_Descriptor::Stats& stats = env.current_stats<LegendaryHuntEmerald_Descriptor::Stats>();
+
     //Turn left. Take 10 steps.
     ssf_press_button(context, BUTTON_B, 0ms, 1440ms);
     pbf_press_dpad(context, DPAD_LEFT, 1440ms, 160ms);
@@ -170,6 +186,8 @@ void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, Pr
     context.wait_for_all_requests();
     if (ret != 0){
         env.log("Failed to exit area.", COLOR_RED);
+        stats.errors++;
+        env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to exit area.",
@@ -192,6 +210,8 @@ void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, Pr
     );
     context.wait_for_all_requests();
     if (ret2 != 0){
+        stats.errors++;
+        env.update_stats();
         env.log("Failed to enter area.", COLOR_RED);
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -220,6 +240,8 @@ void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, Pr
 }
 
 void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    LegendaryHuntEmerald_Descriptor::Stats& stats = env.current_stats<LegendaryHuntEmerald_Descriptor::Stats>();
+
     //Turn down. Take 1 step.
     ssf_press_button(context, BUTTON_B, 0ms, 160ms);
     pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
@@ -258,6 +280,8 @@ void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, Pro
     context.wait_for_all_requests();
     if (ret != 0){
         env.log("Failed to exit area.", COLOR_RED);
+        stats.errors++;
+        env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to exit area.",
@@ -280,6 +304,8 @@ void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, Pro
     context.wait_for_all_requests();
     if (ret2 != 0){
         env.log("Failed to enter area.", COLOR_RED);
+        stats.errors++;
+        env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to enter area.",
@@ -311,6 +337,8 @@ void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, Pro
 }
 
 void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    LegendaryHuntEmerald_Descriptor::Stats& stats = env.current_stats<LegendaryHuntEmerald_Descriptor::Stats>();
+
     BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     //Turn around, 10 steps down
     ssf_press_button(context, BUTTON_B, 0ms, 1440ms);
@@ -329,6 +357,8 @@ void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, ProCo
     context.wait_for_all_requests();
     if (ret != 0){
         env.log("Failed to exit area.", COLOR_RED);
+        stats.errors++;
+        env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to exit area.",
@@ -355,6 +385,8 @@ void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, ProCo
     context.wait_for_all_requests();
     if (ret2 != 0){
         env.log("Failed to enter area.", COLOR_RED);
+        stats.errors++;
+        env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to enter area.",
@@ -376,6 +408,8 @@ void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, ProCo
 }
 
 void LegendaryHuntEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    LegendaryHuntEmerald_Descriptor::Stats& stats = env.current_stats<LegendaryHuntEmerald_Descriptor::Stats>();
+
     BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     //Turn around, 5 steps down
     ssf_press_button(context, BUTTON_B, 0ms, 720ms);
@@ -394,6 +428,8 @@ void LegendaryHuntEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, ProC
     context.wait_for_all_requests();
     if (ret != 0){
         env.log("Failed to exit area.", COLOR_RED);
+        stats.errors++;
+        env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to exit area.",
@@ -420,6 +456,8 @@ void LegendaryHuntEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, ProC
     context.wait_for_all_requests();
     if (ret2 != 0){
         env.log("Failed to enter area.", COLOR_RED);
+        stats.errors++;
+        env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to enter area.",
@@ -440,9 +478,9 @@ void LegendaryHuntEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, ProC
 }
 
 void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    StartProgramChecks::check_performance_class_wired_or_wireless(context);
-
     LegendaryHuntEmerald_Descriptor::Stats& stats = env.current_stats<LegendaryHuntEmerald_Descriptor::Stats>();
+
+    home_black_border_check(env.console, context);
 
     /*
     * Text speed fast, battle animations off
@@ -454,28 +492,68 @@ void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, ProContr
     */
 
     while (true){
-        switch (TARGET){
-        case Target::hooh:
-        case Target::kyogre:
-        case Target::groudon:
-            //Step forward to start the encounter.
-            pbf_press_dpad(context, DPAD_UP, 160ms, 400ms);
-            break;
-        //case Target::groudon: //Step up is easier.
-        //    pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms);
-        //    break;
-        //case Target::kyogre:
-        //    pbf_press_dpad(context, DPAD_LEFT, 160ms, 400ms);
-        //    break;
-        default:;
+        BlackScreenWatcher legendary_battle_start(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+        int ret3 = run_until<ProControllerContext>(
+            env.console, context,
+            [&](ProControllerContext& context){
+                for (int i = 0; i < 5; i++){
+                    switch (TARGET){
+                    case Target::hooh:
+                    case Target::kyogre:
+                    case Target::groudon:
+                        //Step forward to start the encounter.
+                        pbf_press_dpad(context, DPAD_UP, 160ms, 400ms);
+                        break;
+                    //case Target::groudon: //Step up is easier.
+                    //    pbf_press_dpad(context, DPAD_RIGHT, 160ms, 400ms);
+                    //    break;
+                    //case Target::kyogre:
+                    //    pbf_press_dpad(context, DPAD_LEFT, 160ms, 400ms);
+                    //    break;
+                    case Target::lugia:
+                    case Target::regis:
+                        pbf_mash_button(context, BUTTON_A, 5000ms);
+                        context.wait_for_all_requests();
+                    default:;
+                    }
+                    pbf_wait(context, 2000ms);
+                    context.wait_for_all_requests();
+                }
+            },
+            {legendary_battle_start}
+        );
+        context.wait_for_all_requests();
+        if (ret3 != 0){
+            env.log("Failed to start battle after 5 attempts.", COLOR_RED);
+            stats.errors++;
+            env.update_stats();
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to start battle after 5 attempts.",
+                env.console
+            );
+        }else{
+            env.log("Legendary battle started.");
         }
-        //handle_encounter presses A already for everything else
+        context.wait_for_all_requests();
         
         bool legendary_shiny = handle_encounter(env.console, context, true);
         if (legendary_shiny){
             stats.shinies++;
             env.update_stats();
-            send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", env.console.video().snapshot(), true);
+
+            if (TAKE_VIDEO){
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
+            }
+
+            send_program_notification(env,
+                NOTIFICATION_SHINY,
+                COLOR_YELLOW,
+                "Shiny found!",
+                {}, "",
+                env.console.video().snapshot(),
+                true
+            );
             break;
         }
         env.log("No shiny found.");
@@ -514,7 +592,9 @@ void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, ProContr
         stats.resets++;
         env.update_stats();
     }
-
+    if (GO_HOME_WHEN_DONE){
+        pbf_press_button(context, BUTTON_HOME, 200ms, 1000ms);
+    }
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 

@@ -7,7 +7,10 @@
 #include <QSerialPortInfo>
 #include <QMessageBox>
 #include "Common/Cpp/PanicDump.h"
+#include "Common/PABotBase2/ConnectionLayer/PABotBase2_Connection.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "SerialPABotBase2_Connection.h"
 
@@ -37,15 +40,13 @@ SerialPABotBase2_Connection::SerialPABotBase2_Connection(
 SerialPABotBase2_Connection::~SerialPABotBase2_Connection(){
     cancel(nullptr);
     m_ready.store(false, std::memory_order_release);
-
-
     m_connect_thread.wait_and_ignore_exceptions();
 }
 
 
 
 
-void SerialPABotBase2_Connection::connect_thread_body(bool set_to_null_controller){
+bool SerialPABotBase2_Connection::open_serial_port(){
     {
         std::string text = "Opening serial port...";
         m_logger.log(text);
@@ -53,7 +54,7 @@ void SerialPABotBase2_Connection::connect_thread_body(bool set_to_null_controlle
     }
 
     if (cancelled()){
-        return;
+        return false;
     }
     QSerialPortInfo info(QString::fromStdString(m_device_name));
 
@@ -62,7 +63,7 @@ void SerialPABotBase2_Connection::connect_thread_body(bool set_to_null_controlle
         std::string text = "Serial port " + m_device_name + " is invalid.";
         m_logger.log(text, COLOR_RED);
         set_status_line0(text, COLOR_RED);
-        return;
+        return false;
     }
 
     //  Prolific is banned
@@ -78,25 +79,29 @@ void SerialPABotBase2_Connection::connect_thread_body(bool set_to_null_controlle
         std::string text = "Cannot connect to Prolific controller.";
         m_logger.log(text, COLOR_RED);
         set_status_line0(text, COLOR_RED);
-        return;
+        return false;
     }
 
     if (cancelled()){
-        return;
+        return false;
     }
+
     m_unreliable_connection = std::make_unique<SerialConnection>(
         GlobalThreadPools::unlimited_realtime(),
         info.systemLocation().toStdString(),
-        115200  //  Temporary. Will increase to 460800 in the future.
+        PABB2_CONNECTION_BAUD_RATE
     );
 
+    return true;
+}
+bool SerialPABotBase2_Connection::open_serial_connection(){
     {
         std::string text = "Opening up reliable channel...";
         m_logger.log(text);
         set_status_line0(text, COLOR_DARKGREEN);
     }
     m_stream_connection = std::make_unique<ReliableStreamConnection>(
-        this,
+        static_cast<CancellableScope*>(this),
         m_logger, GlobalSettings::instance().LOG_EVERYTHING,
         GlobalThreadPools::unlimited_realtime(),
         *m_unreliable_connection,
@@ -104,11 +109,75 @@ void SerialPABotBase2_Connection::connect_thread_body(bool set_to_null_controlle
         nullptr
     );
 
-    m_logger.log("Resetting device connection state...");
+    {
+        std::string text = "Connecting...";
+        m_logger.log(text);
+        set_status_line0(text, COLOR_DARKGREEN);
+    }
     m_stream_connection->reset();
+
+    m_stream_connection->send_request(PABB2_CONNECTION_OPCODE_ASK_VERSION);
+    m_stream_connection->wait_for_pending();
+    if (!m_stream_connection->remote_protocol_is_compatible()){
+        std::string str =
+            "Incompatible RSC protocol. Device: " + std::to_string(m_stream_connection->remote_protocol()) + "<br>"
+            "Please flash your microcontroller (e.g. ESP32, Pico W, Arduino) <br>"
+            "with the .bin/.uf2/.hex that came with this version of the program.<br>" +
+            make_text_url(ONLINE_DOC_URL_BASE + "SetupGuide/Reflash.html", "See documentation for more details.");
+        set_status_line0(str, COLOR_RED);
+        return false;
+    }
+    std::string error = m_stream_connection->error_string();
+    if (!error.empty()){
+        set_status_line0(error, COLOR_RED);
+        return false;
+    }
+
+    m_stream_connection->send_request(PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE);
+    m_stream_connection->wait_for_pending();
+
+    m_stream_connection->send_request(PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS);
+    m_stream_connection->wait_for_pending();
+
+    return true;
+}
+bool SerialPABotBase2_Connection::open_device_connection(){
+    {
+        std::string text = "Querying device...";
+        m_logger.log(text);
+        set_status_line0(text, COLOR_DARKGREEN);
+    }
+    {
+//        std::lock_guard<Mutex> lg(m_lock);
+        m_device = std::make_unique<PABotBase2::DeviceHandle>(
+            static_cast<CancellableScope*>(this),
+            m_logger, *m_stream_connection
+        );
+    }
+    m_device->connect();
+
+
+//    //  Current Controller
+//    ControllerType current_controller = refresh_controller_type();
 
     //  TODO
 
+    return true;
+}
+void SerialPABotBase2_Connection::connect_thread_body(bool set_to_null_controller){
+    try{
+        if (!open_serial_port()){
+            return;
+        }
+        if (!open_serial_connection()){
+            return;
+        }
+        if (!open_device_connection()){
+            return;
+        }
+    }catch (Exception& e){
+        set_status_line0(e.message(), COLOR_RED);
+    }
 }
 
 
