@@ -18,7 +18,7 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
-#include "Common/Cpp/StreamConnections/StreamConnection.h"
+#include "Common/Cpp/StreamConnections/PushingStreamConnections.h"
 
 namespace PokemonAutomation{
 
@@ -26,7 +26,7 @@ void serial_debug_log(const std::string& msg);
 
 
 
-class SerialConnection : public StreamConnection{
+class SerialConnection : public UnreliableStreamConnectionPushing{
 public:
     //  UTF-8
     SerialConnection(
@@ -165,7 +165,7 @@ private:
     }
 
 
-    virtual size_t send(const void* data, size_t bytes){
+    virtual size_t unreliable_send(const void* data, size_t bytes, bool = false) override{
         WriteSpinLock lg(m_send_lock, "SerialConnection::send()");
 #if 0
         for (size_t c = 0; c < bytes; c++){
@@ -219,7 +219,7 @@ private:
 #endif
             if (read != 0){
                 m_consecutive_errors.store(0, std::memory_order_release);
-                on_recv(buffer, read);
+                on_unreliable_recv(buffer, read);
                 last_recv = current_time();
                 continue;
             }

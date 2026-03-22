@@ -30,7 +30,7 @@ namespace PABotBase2{
 #define PABB2_MESSAGE_OPCODE_INVALID            0x00
 
 
-struct PABB_PACK pabb2_MessageHeader_Request{
+struct PABB_PACK pabb2_MessageHeader{
     uint16_t message_bytes;
     uint8_t opcode;
     uint8_t id;
@@ -39,11 +39,6 @@ struct PABB_PACK pabb2_MessageHeader_Request{
 
 #define PABB2_MESSAGE_OPCODE_RET                0x10
 #define PABB2_MESSAGE_OPCODE_REQUEST_DROPPED    0x1f
-struct PABB_PACK pabb2_Message_Response{
-    uint16_t message_bytes;
-    uint8_t opcode;
-    uint8_t id;
-};
 
 
 #define PABB2_MESSAGE_OPCODE_RET_U32            0x11

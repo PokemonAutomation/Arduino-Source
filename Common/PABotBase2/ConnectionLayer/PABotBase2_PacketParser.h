@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PABotBase2_ConnectionLayer_PacketParser_H
 #define PokemonAutomation_PABotBase2_ConnectionLayer_PacketParser_H
 
-#include "../PABotBase2_StreamInterface.h"
+#include "Common/Cpp/StreamConnections/PollingStreamConnections.h"
 #include "PABotBase2_Connection.h"
 
 #ifdef PABB2_SIZING_OVERRIDE
@@ -41,9 +41,8 @@ struct PacketRunner{
 
 struct PacketParser{
 public:
-    PacketParser(StreamConnection& unreliable_connection)
-        : m_unreliable_connection(unreliable_connection)
-        , m_index(0)
+    PacketParser()
+        : m_index(0)
     {}
     void reset(){
         m_index = 0;
@@ -61,7 +60,7 @@ public:
     //  This will never read more than is necessary unless there
     //  is an error.
     //
-    const PacketHeader* pull_bytes();
+    const PacketHeader* pull_bytes(UnreliableStreamConnectionPolling& connection);
 
     //
     //  Parse packets by consuming data from an existing buffer.
@@ -75,8 +74,6 @@ public:
 
 
 private:
-    StreamConnection& m_unreliable_connection;
-
     uint8_t m_index;
     uint8_t m_buffer[PABB2_MAX_INCOMING_PACKET_SIZE];
 };

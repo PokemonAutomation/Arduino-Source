@@ -23,13 +23,13 @@ namespace PokemonAutomation{
 namespace PABotBase2{
 
 
-ReliableStreamConnectionFW::ReliableStreamConnectionFW(StreamConnection& unreliable_connection)
-    : m_reliable_sender(unreliable_connection, (uint8_t)(PABB2_MAX_INCOMING_PACKET_SIZE % 256))
-    , m_parser(unreliable_connection)
+ReliableStreamConnectionFW::ReliableStreamConnectionFW(UnreliableStreamConnectionPolling& unreliable_connection)
+    : m_unreliable_connection(unreliable_connection)
+    , m_reliable_sender(unreliable_connection, (uint8_t)(PABB2_MAX_INCOMING_PACKET_SIZE % 256))
 {}
 
 bool ReliableStreamConnectionFW::run_events(){
-    const PacketHeader* packet = m_parser.pull_bytes();
+    const PacketHeader* packet = m_parser.pull_bytes(m_unreliable_connection);
     if (packet == NULL){
         return m_reliable_sender.iterate_retransmits();
     }
@@ -121,10 +121,14 @@ bool ReliableStreamConnectionFW::run_events(){
         }
 //        fflush(stdout);
         return true;
+    case PABB2_CONNECTION_OPCODE_RET_STREAM_DATA:
+        m_reliable_sender.remove(packet->seqnum);
+        return true;
     default:
-        m_reliable_sender.send_oob_packet_empty(
+        m_reliable_sender.send_oob_packet_u8(
             packet->seqnum,
-            PABB2_CONNECTION_OPCODE_UNKNOWN_OPCODE
+            PABB2_CONNECTION_OPCODE_UNKNOWN_OPCODE,
+            packet->opcode
         );
     }
 

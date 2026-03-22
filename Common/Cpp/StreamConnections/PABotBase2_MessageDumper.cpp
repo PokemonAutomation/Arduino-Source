@@ -12,6 +12,8 @@ namespace PABotBase2{
 
 
 std::string tostr(const PacketHeader* header){
+    //  TODO: Make sure packets are large enough before reading them.
+
     std::string str;
     switch (header->opcode){
     case PABB2_CONNECTION_OPCODE_INVALID:
@@ -84,27 +86,25 @@ std::string tostr(const PacketHeader* header){
         str += ", offset = " + std::to_string(((const PacketHeaderData*)header)->stream_offset);
         return str;
 
-#if 0
-    case PABB2_CONNECTION_OPCODE_RET:
-        str += "PABB2_CONNECTION_OPCODE_RET: seqnum = ";
+    case PABB2_CONNECTION_OPCODE_INFO:
+        str += "PABB2_CONNECTION_OPCODE_INFO: seqnum = ";
         str += std::to_string(header->seqnum);
         return str;
-    case PABB2_CONNECTION_OPCODE_RET_u8:
-        str += "PABB2_CONNECTION_OPCODE_RET_u8: seqnum = ";
+    case PABB2_CONNECTION_OPCODE_INFO_U8:
+        str += "PABB2_CONNECTION_OPCODE_INFO_U8: seqnum = ";
         str += std::to_string(header->seqnum);
         str += ", data = " + std::to_string(((const PacketHeader_Ack_u8*)header)->data);
         return str;
-    case PABB2_CONNECTION_OPCODE_RET_u16:
-        str += "PABB2_CONNECTION_OPCODE_RET_u16: seqnum = ";
+    case PABB2_CONNECTION_OPCODE_INFO_U16:
+        str += "PABB2_CONNECTION_OPCODE_INFO_U16: seqnum = ";
         str += std::to_string(header->seqnum);
         str += ", data = " + std::to_string(((const PacketHeader_Ack_u16*)header)->data);
         return str;
-    case PABB2_CONNECTION_OPCODE_RET_u32:
-        str += "PABB2_CONNECTION_OPCODE_RET_u32: seqnum = ";
+    case PABB2_CONNECTION_OPCODE_INFO_U32:
+        str += "PABB2_CONNECTION_OPCODE_INFO_U32: seqnum = ";
         str += std::to_string(header->seqnum);
         str += ", data = " + std::to_string(((const PacketHeader_Ack_u32*)header)->data);
         return str;
-#endif
 
     case PABB2_CONNECTION_OPCODE_INVALID_LENGTH:
         str += "PABB2_CONNECTION_OPCODE_INVALID_LENGTH: seqnum = ";
@@ -114,17 +114,103 @@ std::string tostr(const PacketHeader* header){
         str += "PABB2_CONNECTION_OPCODE_INVALID_CHECKSUM_FAIL: seqnum = ";
         str += std::to_string(header->seqnum);
         return str;
-    case PABB2_CONNECTION_OPCODE_INVALID_OPCODE:
-        str += "PABB2_CONNECTION_OPCODE_INVALID_OPCODE: seqnum = ";
-        str += std::to_string(header->seqnum);
-        return str;
     case PABB2_CONNECTION_OPCODE_UNKNOWN_OPCODE:
         str += "PABB2_CONNECTION_OPCODE_UNKNOWN_OPCODE: seqnum = ";
         str += std::to_string(header->seqnum);
         return str;
     }
-    return "Unknown opcode: 0x" + tostr_hex(header->opcode);
+    return "Unknown Packet Opcode: 0x" + tostr_hex(header->opcode);
 }
+
+std::string tostr(const pabb2_MessageHeader* header){
+    //  TODO: Make sure packets are large enough before reading them.
+
+    std::string str;
+    switch (header->opcode){
+    case PABB2_MESSAGE_OPCODE_INVALID:
+        str += "PABB2_MESSAGE_OPCODE_INVALID: opcode = ";
+        str += std::to_string(header->id);
+        return str;
+    case PABB2_MESSAGE_OPCODE_RET:
+        str += "PABB2_MESSAGE_OPCODE_RET: id = ";
+        str += std::to_string(header->id);
+        return str;
+    case PABB2_MESSAGE_OPCODE_REQUEST_DROPPED:
+        str += "PABB2_MESSAGE_OPCODE_REQUEST_DROPPED: id = ";
+        str += std::to_string(header->id);
+        return str;
+    case PABB2_MESSAGE_OPCODE_RET_U32:
+        str += "PABB2_MESSAGE_OPCODE_RET_U32: id = ";
+        str += std::to_string(header->id);
+        str += ", data = " + std::to_string(((const pabb2_Message_Response_u32*)header)->data);
+        return str;
+    case PABB2_MESSAGE_OPCODE_RET_DATA:
+        str += "PABB2_MESSAGE_OPCODE_RET_DATA: id = ";
+        str += std::to_string(header->id);
+        str += ", bytes = " + std::to_string(header->message_bytes - sizeof(pabb2_MessageHeader));
+
+    case PABB2_MESSAGE_OPCODE_PROTOCOL_VERSION:
+        str += "PABB2_MESSAGE_OPCODE_PROTOCOL_VERSION: id = ";
+        str += std::to_string(header->id);
+        return str;
+    case PABB2_MESSAGE_OPCODE_FIRMWARE_VERSION:
+        str += "PABB2_MESSAGE_OPCODE_FIRMWARE_VERSION: id = ";
+        str += std::to_string(header->id);
+        return str;
+    case PABB2_MESSAGE_OPCODE_DEVICE_IDENTIFIER:
+        str += "PABB2_MESSAGE_OPCODE_DEVICE_IDENTIFIER: id = ";
+        str += std::to_string(header->id);
+        return str;
+    case PABB2_MESSAGE_OPCODE_CONTROLLER_LIST:
+        str += "PABB2_MESSAGE_OPCODE_CONTROLLER_LIST: id = ";
+        str += std::to_string(header->id);
+        return str;
+    case PABB2_MESSAGE_OPCODE_CQ_CAPACITY:
+        str += "PABB2_MESSAGE_OPCODE_CQ_CAPACITY: id = ";
+        str += std::to_string(header->id);
+        return str;
+
+    case PABB_MESSAGE_OPCODE_READ_CONTROLLER_MODE:
+        str += "PABB_MESSAGE_OPCODE_READ_CONTROLLER_MODE: id = ";
+        str += std::to_string(header->id);
+        return str;
+    case PABB_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE:
+        str += "PABB_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE: id = ";
+        str += std::to_string(header->id);
+        return str;
+    case PABB_MESSAGE_OPCODE_RESET_TO_CONTROLLER:
+        str += "PABB_MESSAGE_OPCODE_RESET_TO_CONTROLLER: id = ";
+        str += std::to_string(header->id);
+        return str;
+    case PABB_MESSAGE_OPCODE_CONTROLLER_MAC_ADDRESS:
+        str += "PABB_MESSAGE_OPCODE_CONTROLLER_MAC_ADDRESS: id = ";
+        str += std::to_string(header->id);
+        return str;
+    case PABB_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS:
+        str += "PABB_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS: id = ";
+        str += std::to_string(header->id);
+        return str;
+
+    case PABB2_MESSAGE_OPCODE_CQ_CANCEL:
+        str += "PABB2_MESSAGE_OPCODE_CQ_CANCEL: id = ";
+        str += std::to_string(header->id);
+        return str;
+    case PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT:
+        str += "PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT: id = ";
+        str += std::to_string(header->id);
+        return str;
+    case PABB2_MESSAGE_OPCODE_CQ_COMMAND_FINISHED:
+        str += "PABB2_MESSAGE_OPCODE_CQ_COMMAND_FINISHED: id = ";
+        str += std::to_string(header->id);
+        return str;
+    }
+
+
+    return "Unknown Message Opcode: 0x" + tostr_hex(header->opcode);
+}
+
+
+
 
 
 }

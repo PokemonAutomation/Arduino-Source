@@ -19,10 +19,10 @@ namespace PokemonAutomation{
 namespace PABotBase2{
 
 PacketSender::PacketSender(
-    StreamConnection& unreliable_connection,
+    UnreliableStreamSender& connection,
     uint8_t max_packet_size
 )
-    : m_unreliable_connection(unreliable_connection)
+    : m_connection(connection)
     , m_max_packet_size(max_packet_size)
 {
     reset();
@@ -162,7 +162,7 @@ PacketHeader* PacketSender::reserve_packet(
 void PacketSender::commit_packet(PacketHeader* packet){
     pabb_crc32_write_to_message(packet, packet->packet_bytes);
 
-    m_unreliable_connection.send(
+    m_connection.unreliable_send(
         packet, packet->packet_bytes,
         false
     );
@@ -262,7 +262,7 @@ size_t PacketSender::send_stream(const void* data, size_t bytes){
 //        cout << "Send: " << (int)packet->seqnum << ", Offset: " << packet->stream_offset << endl;
 
         //  Send
-        m_unreliable_connection.send(
+        m_connection.unreliable_send(
             packet, packet_bytes,
             false
         );
@@ -321,7 +321,7 @@ bool PacketSender::iterate_retransmits(){
         fflush(stdout);
 #endif
 
-        m_unreliable_connection.send(
+        m_connection.unreliable_send(
             packet,
             packet_bytes == 0 ? (size_t)256 : (size_t)packet_bytes,
             true
@@ -349,7 +349,7 @@ void PacketSender::send_oob_packet_empty(uint8_t seqnum, uint8_t opcode){
     packet.header.packet_bytes = sizeof(packet);
     packet.header.opcode = opcode;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
-    m_unreliable_connection.send(&packet, sizeof(packet), false);
+    m_connection.unreliable_send(&packet, sizeof(packet), false);
 }
 void PacketSender::send_oob_packet_u8(uint8_t seqnum, uint8_t opcode, uint8_t data){
     struct{
@@ -362,7 +362,7 @@ void PacketSender::send_oob_packet_u8(uint8_t seqnum, uint8_t opcode, uint8_t da
     packet.header.opcode = opcode;
     packet.header.data = data;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
-    m_unreliable_connection.send(&packet, sizeof(packet), false);
+    m_connection.unreliable_send(&packet, sizeof(packet), false);
 }
 void PacketSender::send_oob_packet_u16(uint8_t seqnum, uint8_t opcode, uint16_t data){
     struct{
@@ -375,7 +375,7 @@ void PacketSender::send_oob_packet_u16(uint8_t seqnum, uint8_t opcode, uint16_t 
     packet.header.opcode = opcode;
     packet.header.data = data;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
-    m_unreliable_connection.send(&packet, sizeof(packet), false);
+    m_connection.unreliable_send(&packet, sizeof(packet), false);
 }
 void PacketSender::send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, uint32_t data){
     struct{
@@ -388,7 +388,7 @@ void PacketSender::send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, uint32_t 
     packet.header.opcode = opcode;
     packet.header.data = data;
     pabb_crc32_write_to_message(&packet, sizeof(packet));
-    m_unreliable_connection.send(&packet, sizeof(packet), false);
+    m_connection.unreliable_send(&packet, sizeof(packet), false);
 }
 
 

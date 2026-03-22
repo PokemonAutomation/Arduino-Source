@@ -5,6 +5,8 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/StreamConnections/PABotBase2_MessageDumper.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "PABotBase2_DeviceHandle.h"
 
 //  REMOVE
@@ -20,7 +22,7 @@ namespace PABotBase2{
 DeviceHandle::DeviceHandle(
     CancellableScope* parent,
     Logger& logger,
-    PokemonAutomation::StreamConnection& connection
+    ReliableStreamConnectionPushing& connection
 )
     : m_logger(logger)
     , m_connection(connection)
@@ -56,31 +58,66 @@ void DeviceHandle::connect(){
 }
 
 void DeviceHandle::on_recv(const void* data, size_t bytes){
+    m_buffer.insert(m_buffer.end(), (const char*)data, (const char*)data + bytes);
 
-
-
-
-}
-
-
-void DeviceHandle::send_data(const void* data, size_t bytes){
-    //  Must be called under the lock.
-
-    const char* ptr = (const char*)data;
-    while (bytes > 0){
-        throw_if_cancelled();
-        size_t sent;
-        try{
-            sent = m_connection.send(ptr, bytes);
-        }catch (...){
-            cancel(nullptr);
-            throw;
+    while (true){
+        //  Header is incomplete.
+        if (m_buffer.size() < sizeof(pabb2_MessageHeader)){
+            return;
         }
-        ptr += sent;
-        bytes -= sent;
+
+        //  Message is incomplete.
+        uint16_t message_size;
+        std::copy(m_buffer.begin(), m_buffer.begin() + 2, (char*)&message_size);
+        if (m_buffer.size() < message_size){
+            return;
+        }
+
+        auto iter_s = m_buffer.begin();
+        auto iter_e = iter_s + message_size;
+        std::string message(iter_s, iter_e);
+        m_buffer.erase(iter_s, iter_e);
+
+        const pabb2_MessageHeader* header = (const pabb2_MessageHeader*)message.c_str();
+
+        bool log_everything = GlobalSettings::instance().LOG_EVERYTHING;
+
+        if (log_everything){
+            m_logger.log("[DeviceHandle]: Receive: " + tostr(header), COLOR_PURPLE);
+        }
+
+        //  Now we can process the message.
+        switch (header->opcode){
+        case PABB2_MESSAGE_OPCODE_INVALID:
+        case PABB2_MESSAGE_OPCODE_REQUEST_DROPPED:
+            if (!log_everything){
+                m_logger.log("[DeviceHandle]: Receive: " + tostr(header), COLOR_PURPLE);
+            }
+            continue;
+        case PABB2_MESSAGE_OPCODE_RET:
+        case PABB2_MESSAGE_OPCODE_RET_U32:
+        case PABB2_MESSAGE_OPCODE_RET_DATA:
+        {
+            std::lock_guard<Mutex> lg(m_lock);
+            auto iter = m_pending_requests.find(header->id);
+            if (iter == m_pending_requests.end()){
+                m_logger.log("[DeviceHandle]: Received response for unknown ID: " + std::to_string(header->id));
+                continue;
+            }
+            iter->second.response = std::move(message);
+            iter->second.cv.notify_all();
+            continue;
+        }
+        }
+
+        //  TODO: Process device-specific messages.
     }
+
+
 }
-void DeviceHandle::send_request(pabb2_MessageHeader_Request& request){
+
+
+void DeviceHandle::send_request(pabb2_MessageHeader& request){
     std::unique_lock<Mutex> lg(m_lock);
     while (true){
         throw_if_cancelled();
@@ -97,6 +134,12 @@ void DeviceHandle::send_request(pabb2_MessageHeader_Request& request){
         m_pending_requests[request.id];
         break;
     }
+
+    if (GlobalSettings::instance().LOG_EVERYTHING){
+        m_logger.log("[DeviceHandle]: Sending: " + tostr(&request), COLOR_DARKGREEN);
+    }
+
+    m_connection.reliable_send(&request, request.message_bytes);
 }
 std::string DeviceHandle::wait_for_response(uint8_t id){
     std::unique_lock<Mutex> lg(m_lock);
@@ -125,8 +168,8 @@ std::string DeviceHandle::wait_for_response(uint8_t id){
 
 
 uint32_t DeviceHandle::query_u32(uint8_t opcode){
-    pabb2_MessageHeader_Request request;
-    request.message_bytes = sizeof(pabb2_MessageHeader_Request);
+    pabb2_MessageHeader request;
+    request.message_bytes = sizeof(pabb2_MessageHeader);
     request.opcode = opcode;
 
     send_request(request);

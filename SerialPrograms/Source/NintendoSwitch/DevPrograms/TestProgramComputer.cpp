@@ -313,7 +313,7 @@ void stress_test(Logger& logger, CancellableScope& scope){
         &scope,
         logger, true,
         GlobalThreadPools::unlimited_realtime(),
-        device,
+        device.host_side_connection(),
         100ms,
         &device.print_lock()
     );
@@ -343,13 +343,15 @@ void stress_test(Logger& logger, CancellableScope& scope){
                     last_print = current_time();
                 }
     //            scope.wait_for(Milliseconds(rand() % 100));
-                size_t sent = connection.send_stream(ptr, left);
-                if (sent == 0){
-                    device.verify_stream_data();
-                }
+                connection.send_stream(ptr, left);
+                size_t sent = left;
+//                if (sent == 0){
+//                    device.verify_stream_data();
+//                }
                 ptr += sent;
                 left -= sent;
             }
+            device.verify_stream_data();
             bytes_sent += data.size();
             device.push_expected_stream_data(data.data(), data.size());
         }

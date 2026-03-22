@@ -22,7 +22,7 @@ namespace PokemonAutomation{
 namespace PABotBase2{
 
 
-const PacketHeader* PacketParser::pull_bytes(){
+const PacketHeader* PacketParser::pull_bytes(UnreliableStreamConnectionPolling& connection){
     const uint8_t MIN_PACKET_SIZE = sizeof(PacketHeader) + sizeof(uint32_t);
 
     while (true){
@@ -34,7 +34,7 @@ const PacketHeader* PacketParser::pull_bytes(){
         }
 
         //  Read enough to finish the header.
-        m_index += (uint8_t)m_unreliable_connection.recv(
+        m_index += (uint8_t)connection.unreliable_recv(
             m_buffer + index,
             MIN_PACKET_SIZE - index
         );
@@ -92,7 +92,7 @@ const PacketHeader* PacketParser::pull_bytes(){
     //  Read enough to finish the packet.
     if (m_index < packet_bytes){
         uint8_t index = m_index;
-        m_index += (uint8_t)m_unreliable_connection.recv(
+        m_index += (uint8_t)connection.unreliable_recv(
             m_buffer + index,
             packet_bytes - index
         );

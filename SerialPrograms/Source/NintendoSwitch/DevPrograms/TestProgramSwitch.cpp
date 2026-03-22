@@ -163,7 +163,6 @@
 #include "Common/PABotBase2/ConnectionLayer/PABotBase2_PacketSender.h"
 #include "Common/PABotBase2/ConnectionLayer/PABotBase2_StreamCoalescer.h"
 #include "Common/Cpp/StreamConnections/StreamInterface.h"
-#include "Common/Cpp/StreamConnections/StreamConnection.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/CRC32/pabb_CRC32.h"
 #include "Common/PABotBase2/ConnectionLayer/PABotBase2_PacketParser.h"

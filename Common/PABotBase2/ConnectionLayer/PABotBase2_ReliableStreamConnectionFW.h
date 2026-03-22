@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PABotBase2_ConnectionLayer_ReliableStreamConnection_H
 #define PokemonAutomation_PABotBase2_ConnectionLayer_ReliableStreamConnection_H
 
-#include "../PABotBase2_StreamInterface.h"
+#include "Common/Cpp/StreamConnections/PollingStreamConnections.h"
 #include "PABotBase2_PacketSender.h"
 #include "PABotBase2_PacketParser.h"
 #include "PABotBase2_StreamCoalescer.h"
@@ -17,17 +17,21 @@ namespace PABotBase2{
 
 
 
-class ReliableStreamConnectionFW final : public StreamConnection{
+class ReliableStreamConnectionFW final : public ReliableStreamConnectionPolling{
 public:
-    ReliableStreamConnectionFW(StreamConnection& unreliable_connection);
+    ReliableStreamConnectionFW(UnreliableStreamConnectionPolling& unreliable_connection);
 
 
 public:
-    virtual size_t send(const void* data, size_t bytes, bool is_retransmit = false) override{
-        (void)is_retransmit;
-        return m_reliable_sender.send_stream(data, bytes);
+    virtual void reliable_send(const void* data, size_t bytes) override{
+        const char* ptr = (const char*)data;
+        while (bytes > 0){
+            size_t sent = m_reliable_sender.send_stream(ptr, bytes);
+            ptr += sent;
+            bytes -= sent;
+        }
     }
-    virtual size_t recv(void* data, size_t bytes) override{
+    virtual size_t reliable_recv(void* data, size_t bytes) override{
         return m_stream_coalescer.read(data, bytes);
     }
 
@@ -42,7 +46,7 @@ public:
 
 public:
     void send_oob_info_u32(uint32_t data){
-        m_reliable_sender.send_oob_packet_u32(0, PABB2_CONNECTION_OPCODE_INFO_u32, data);
+        m_reliable_sender.send_oob_packet_u32(0, PABB2_CONNECTION_OPCODE_INFO_U32, data);
     }
 
 
@@ -54,6 +58,7 @@ public:
 
 
 private:
+    UnreliableStreamConnectionPolling& m_unreliable_connection;
     PacketSender m_reliable_sender;
     PacketParser m_parser;
     StreamCoalescer m_stream_coalescer;

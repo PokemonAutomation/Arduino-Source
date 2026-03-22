@@ -14,10 +14,10 @@
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
+#include "Common/Cpp/StreamConnections/PushingStreamConnections.h"
 #include "Common/PABotBase2/ConnectionLayer/PABotBase2_PacketSender.h"
 #include "Common/PABotBase2/ConnectionLayer/PABotBase2_PacketParser.h"
 #include "Common/PABotBase2/ConnectionLayer/PABotBase2_StreamCoalescer.h"
-#include "StreamConnection.h"
 
 namespace PokemonAutomation{
 
@@ -25,8 +25,8 @@ namespace PokemonAutomation{
 
 class ReliableStreamConnection final
     : public CancellableScope
-    , public PokemonAutomation::StreamConnection
-    , public PABotBase2::StreamConnection
+    , public ReliableStreamConnectionPushing
+    , private UnreliableStreamSender
     , private PABotBase2::PacketRunner
     , private StreamListener
 {
@@ -41,7 +41,7 @@ public:
         CancellableScope* parent,
         Logger& logger, bool log_everything,
         ThreadPool& thread_pool,
-        PokemonAutomation::StreamConnection& unreliable_connection,
+        UnreliableStreamConnectionPushing& unreliable_connection,
         WallDuration retransmit_timeout = Milliseconds(100),
         Mutex* print_lock = nullptr
     );
@@ -74,8 +74,8 @@ public:
     bool try_send_request(uint8_t opcode);
     void send_request(uint8_t opcode);
 
-    size_t send_stream(const void* data, size_t bytes){
-        return send(data, bytes);
+    void send_stream(const void* data, size_t bytes){
+        reliable_send(data, bytes);
     }
 
 
@@ -101,17 +101,14 @@ private:
 private:
     //  Virtuals: StreamSender/StreamListener
 
-    virtual size_t send(const void* data, size_t bytes) override;
+    virtual void reliable_send(const void* data, size_t bytes) override;
     virtual void on_recv(const void* data, size_t bytes) override;
 
 
 private:
     //  Virtuals: PABotBase2::StreamConnection
 
-    virtual size_t send(const void* data, size_t bytes, bool is_retransmit) override;
-    virtual size_t recv(void* data, size_t max_bytes) override{
-        return 0;
-    }
+    virtual size_t unreliable_send(const void* data, size_t bytes, bool is_retransmit) override;
 
 
 private:
@@ -119,6 +116,7 @@ private:
 
     virtual void on_packet(const PacketHeader* packet) override;
 
+    void process_UNKNOWN_OPCODE(const PacketHeader* packet);
     void process_RET_RESET(const PacketHeader* packet);
     void process_RET_VERSION(const PacketHeader* packet);
     void process_RET_PACKET_SIZE(const PacketHeader* packet);
@@ -130,12 +128,12 @@ private:
 
 
 private:
-//public:
-
     Logger& m_logger;
-    PokemonAutomation::StreamConnection& m_unreliable_connection;
+    UnreliableStreamConnectionPushing& m_unreliable_connection;
     const WallDuration m_retransmit_timeout;
     Mutex* m_print_lock;
+
+
 
     PABotBase2::PacketSender m_reliable_sender;
     PABotBase2::PacketParser m_parser;

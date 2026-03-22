@@ -30,7 +30,9 @@ extern std::mutex print_lock;
 
 
 MockDevice::MockDevice(ThreadPool& thread_pool)
-    : m_connection(*this)
+    : m_device_side_connection(*this)
+    , m_host_side_connection(*this)
+    , m_connection(m_device_side_connection)
     , m_stopping(false)
 {
     m_device_thread = thread_pool.dispatch_now_blocking([this]{ device_thread(); });
@@ -56,46 +58,48 @@ void MockDevice::print() const{
 }
 
 
-size_t MockDevice::device_send_serial(const void* data, size_t bytes, bool is_retransmit){
+size_t MockDevice::DeviceSideConnection::unreliable_send(const void* data, size_t bytes, bool is_retransmit){
+    MockDevice& parent = m_parent;
     {
-        WriteSpinLock lg(m_device_to_host_lock);
+        WriteSpinLock lg(parent.m_device_to_host_lock);
 //        cout << "MockDevice::device_send_serial()" << endl;
-        if (m_device_to_host_line.size() >= m_device_to_host_capacity){
+        if (parent.m_device_to_host_line.size() >= parent.m_device_to_host_capacity){
             return 0;
         }
 
         if ((rand() % 100) / 100. < PABB2_DROP_DEVICE_TO_HOST){
-            std::lock_guard<Mutex> lg1(m_print_lock);
+            std::lock_guard<Mutex> lg1(parent.m_print_lock);
             cout << "**Intentionally Dropping Packet: device -> host**" << endl;
             return 0;
         }
 
-        bytes = std::min(bytes, m_device_to_host_capacity - m_device_to_host_line.size());
-        m_device_to_host_line.insert(
-            m_device_to_host_line.end(),
+        bytes = std::min(bytes, parent.m_device_to_host_capacity - parent.m_device_to_host_line.size());
+        parent.m_device_to_host_line.insert(
+            parent.m_device_to_host_line.end(),
             (const uint8_t*)data,
             (const uint8_t*)data + bytes
         );
 
         if ((rand() % 100) / 100. < PABB2_DROP_DEVICE_TO_HOST){
-            std::lock_guard<Mutex> lg1(m_print_lock);
+            std::lock_guard<Mutex> lg1(parent.m_print_lock);
             cout << "**Intentionally Corrupting Packet: device -> host**" << endl;
-            m_device_to_host_line[rand() % m_device_to_host_line.size()] = 0;
+            parent.m_device_to_host_line[rand() % parent.m_device_to_host_line.size()] = 0;
         }
     }
     {
-        std::lock_guard<Mutex> lg(m_host_lock);
+        std::lock_guard<Mutex> lg(parent.m_host_lock);
     }
-    m_host_cv.notify_all();
+    parent.m_host_cv.notify_all();
     return bytes;
 }
-size_t MockDevice::device_read_serial(void* data, size_t max_bytes){
-    WriteSpinLock lg(m_host_to_device_lock);
-    size_t bytes = std::min(max_bytes, m_host_to_device_line.size());
-    auto iter0 = m_host_to_device_line.begin();
+size_t MockDevice::DeviceSideConnection::unreliable_recv(void* data, size_t max_bytes){
+    MockDevice& parent = m_parent;
+    WriteSpinLock lg(parent.m_host_to_device_lock);
+    size_t bytes = std::min(max_bytes, parent.m_host_to_device_line.size());
+    auto iter0 = parent.m_host_to_device_line.begin();
     auto iter1 = iter0 + bytes;
     std::copy(iter0, iter1, (uint8_t*)data);
-    m_host_to_device_line.erase(iter0, iter1);
+    parent.m_host_to_device_line.erase(iter0, iter1);
 
     //  REMOVE
 //    {
@@ -111,9 +115,10 @@ size_t MockDevice::device_read_serial(void* data, size_t max_bytes){
 }
 
 
-size_t MockDevice::send(const void* data, size_t bytes){
+size_t MockDevice::HostSideConnection::unreliable_send(const void* data, size_t bytes, bool is_retransmit){
+    MockDevice& parent = m_parent;
     {
-        WriteSpinLock lg(m_host_to_device_lock);
+        WriteSpinLock lg(parent.m_host_to_device_lock);
 //        cout << "MockDevice::send(const void* data, size_t bytes)" << endl;
 
 #if 0
@@ -125,35 +130,35 @@ size_t MockDevice::send(const void* data, size_t bytes){
 #endif
 
         if ((rand() % 100) / 100. < PABB2_DROP_HOST_TO_DEVICE){
-            std::lock_guard<Mutex> lg1(m_print_lock);
+            std::lock_guard<Mutex> lg1(parent.m_print_lock);
             cout << "**Intentionally Dropping Packet: host -> device**" << endl;
             return 0;
         }
 
-        if (m_host_to_device_line.size() >= m_host_to_device_capacity){
+        if (parent.m_host_to_device_line.size() >= parent.m_host_to_device_capacity){
             return 0;
         }
 
 //        bytes = std::min(bytes, m_host_to_device_capacity - m_host_to_device_line.size());
 //        cout << "MockDevice::send(): " << bytes << endl;
 
-        m_host_to_device_line.insert(
-            m_host_to_device_line.end(),
+        parent.m_host_to_device_line.insert(
+            parent.m_host_to_device_line.end(),
             (const uint8_t*)data,
             (const uint8_t*)data + bytes
         );
 
         if ((rand() % 100) / 100. < PABB2_DROP_HOST_TO_DEVICE){
-            std::lock_guard<Mutex> lg1(m_print_lock);
+            std::lock_guard<Mutex> lg1(parent.m_print_lock);
             cout << "**Intentionally Corrupting Packet: host -> device**" << endl;
-            m_host_to_device_line[rand() % m_host_to_device_line.size()] = 0;
+            parent.m_host_to_device_line[rand() % parent.m_host_to_device_line.size()] = 0;
         }
     }
     {
-        std::lock_guard<Mutex> lg(m_device_lock);
+        std::lock_guard<Mutex> lg(parent.m_device_lock);
 //        cout << "MockDevice::send(const void* data, size_t bytes) - notifying" << endl;
     }
-    m_device_cv.notify_all();
+    parent.m_device_cv.notify_all();
     return bytes;
 }
 
@@ -174,7 +179,7 @@ size_t MockDevice::verify_stream_data(){
     size_t bytes = m_expected_host_to_device_stream.size();
 
     std::vector<uint8_t> actual(bytes);
-    size_t read = m_connection.recv(actual.data(), bytes);
+    size_t read = m_connection.reliable_recv(actual.data(), bytes);
 
     if (read == 0){
         return bytes;
@@ -248,7 +253,7 @@ void MockDevice::host_recv_thread(){
             }
         }
 //        cout << "Passing data to host: " << data.size() << endl;
-        on_recv(data.data(), data.size());
+        m_host_side_connection.on_unreliable_recv(data.data(), data.size());
     }
 }
 

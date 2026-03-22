@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PABotBase2_ConnectionLayer_PacketSender_H
 #define PokemonAutomation_PABotBase2_ConnectionLayer_PacketSender_H
 
-#include "../PABotBase2_StreamInterface.h"
+#include "Common/Cpp/StreamConnections/PollingStreamConnections.h"
 #include "PABotBase2_Connection.h"
 
 #ifdef PABB2_SIZING_OVERRIDE
@@ -41,7 +41,7 @@ class PacketSender{
 
 public:
     PacketSender(
-        StreamConnection& unreliable_connection,
+        UnreliableStreamSender& connection,
         uint8_t max_packet_size
     );
     void reset();
@@ -120,7 +120,7 @@ public:
 
 
 private:
-    StreamConnection& m_unreliable_connection;
+    UnreliableStreamSender& m_connection;
 
     uint8_t m_max_packet_size;  //  0 = 256 bytes
 

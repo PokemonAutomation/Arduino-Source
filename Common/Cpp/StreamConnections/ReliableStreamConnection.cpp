@@ -11,9 +11,10 @@
 #include "Common/Cpp/StreamConnections/PABotBase2_MessageDumper.h"
 #include "ReliableStreamConnection.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+//  REMOVE
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -23,7 +24,7 @@ ReliableStreamConnection::ReliableStreamConnection(
     CancellableScope* parent,
     Logger& logger, bool log_everything,
     ThreadPool& thread_pool,
-    PokemonAutomation::StreamConnection& unreliable_connection,
+    UnreliableStreamConnectionPushing& unreliable_connection,
     WallDuration retransmit_timeout,
     Mutex* print_lock
 )
@@ -32,7 +33,6 @@ ReliableStreamConnection::ReliableStreamConnection(
     , m_retransmit_timeout(retransmit_timeout)
     , m_print_lock(print_lock)
     , m_reliable_sender(*this, 20)
-    , m_parser(*this)
     , m_log_everything(log_everything)
 //    , m_version_verified(false)
     , m_remote_protocol_compatible(false)
@@ -86,13 +86,18 @@ void ReliableStreamConnection::wait_for_pending(){
 //  StreamSender/StreamListener
 //
 
-size_t ReliableStreamConnection::send(const void* data, size_t bytes){
-    std::lock_guard<Mutex> lg(m_lock);
-    throw_if_cancelled();
-    if (m_reliable_sender.slots_used() >= m_remote_slot_capacity){
-        return 0;
+void ReliableStreamConnection::reliable_send(const void* data, size_t bytes){
+    const char* ptr = (const char*)data;
+    std::unique_lock<Mutex> lg(m_lock);
+    while (bytes > 0){
+        throw_if_cancelled();
+        if (m_reliable_sender.slots_used() >= m_remote_slot_capacity){
+            m_cv.wait(lg);
+        }
+        size_t sent = m_reliable_sender.send_stream(ptr, bytes);
+        ptr += sent;
+        bytes -= sent;
     }
-    return m_reliable_sender.send_stream(data, bytes);
 }
 void ReliableStreamConnection::on_recv(const void* data, size_t bytes){
 #if 0
@@ -110,7 +115,7 @@ void ReliableStreamConnection::on_recv(const void* data, size_t bytes){
 //  PABotBase2::StreamConnection
 //
 
-size_t ReliableStreamConnection::send(const void* data, size_t bytes, bool is_retransmit){
+size_t ReliableStreamConnection::unreliable_send(const void* data, size_t bytes, bool is_retransmit){
     const PacketHeader* header = (const PacketHeader*)data;
     if (is_retransmit){
         m_logger.log(
@@ -127,7 +132,7 @@ size_t ReliableStreamConnection::send(const void* data, size_t bytes, bool is_re
         );
 //        PABotBase2::PacketHeader_print(header, true);   //  REMOVE
     }
-    return m_unreliable_connection.send(data, bytes);
+    return m_unreliable_connection.unreliable_send(data, bytes, is_retransmit);
 }
 
 
@@ -190,7 +195,7 @@ void ReliableStreamConnection::send_ack(uint8_t seqnum, uint8_t opcode){
     pabb_crc32_write_to_message(&packet, sizeof(packet));
 
     std::lock_guard<Mutex> lg(m_lock);
-    m_unreliable_connection.send(&packet, sizeof(packet));
+    unreliable_send(&packet, sizeof(packet), false);
 }
 void ReliableStreamConnection::send_ack_u16(uint8_t seqnum, uint8_t opcode, uint16_t data){
     struct{
@@ -205,7 +210,7 @@ void ReliableStreamConnection::send_ack_u16(uint8_t seqnum, uint8_t opcode, uint
     pabb_crc32_write_to_message(&packet, sizeof(packet));
 
     std::lock_guard<Mutex> lg(m_lock);
-    m_unreliable_connection.send(&packet, sizeof(packet));
+    unreliable_send(&packet, sizeof(packet), false);
 }
 
 void ReliableStreamConnection::retransmit_thread(){
@@ -281,7 +286,7 @@ void ReliableStreamConnection::on_packet(const PacketHeader* packet){
     }
 
     if (m_log_everything){
-        m_logger.log("Receive: " + tostr(packet), COLOR_DARKGREEN);
+        m_logger.log("[ReliableStreamConnection]: Receive: " + tostr(packet), COLOR_PURPLE);
     }
 
 
@@ -298,11 +303,8 @@ void ReliableStreamConnection::on_packet(const PacketHeader* packet){
             COLOR_RED
         );
         return;
-    case PABB2_CONNECTION_OPCODE_INVALID_OPCODE:
-        m_logger.log(
-            "[ReliableStreamConnection]: PABB2_CONNECTION_OPCODE_INVALID_OPCODE: Device reported an invalid opcode.",
-            COLOR_RED
-        );
+    case PABB2_CONNECTION_OPCODE_UNKNOWN_OPCODE:
+        process_UNKNOWN_OPCODE(packet);
         return;
     case PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA:
         process_ASK_STREAM_DATA(packet);
@@ -323,12 +325,12 @@ void ReliableStreamConnection::on_packet(const PacketHeader* packet){
         process_RET_BUFFER_SLOTS(packet);
         return;
     case PABB2_CONNECTION_OPCODE_INFO:
-    case PABB2_CONNECTION_OPCODE_INFO_u8:
-    case PABB2_CONNECTION_OPCODE_INFO_u16:
-    case PABB2_CONNECTION_OPCODE_INFO_u32:
+    case PABB2_CONNECTION_OPCODE_INFO_U8:
+    case PABB2_CONNECTION_OPCODE_INFO_U16:
+    case PABB2_CONNECTION_OPCODE_INFO_U32:
 //        cout << "Received ack" << endl;
         if (!m_log_everything){
-            m_logger.log("Receive: " + tostr(packet), COLOR_DARKGREEN);
+            m_logger.log("[ReliableStreamConnection]: Receive: " + tostr(packet), COLOR_PURPLE);
         }
         return;
     default:
@@ -338,6 +340,21 @@ void ReliableStreamConnection::on_packet(const PacketHeader* packet){
         );
         return;
     }
+}
+void ReliableStreamConnection::process_UNKNOWN_OPCODE(const PacketHeader* packet){
+    std::lock_guard<Mutex> lg(m_lock);
+    if (packet->packet_bytes < sizeof(PacketHeader_Ack_u8) + sizeof(uint32_t)){
+        m_error = "Unknown opcode packet is too small: " + std::to_string(packet->packet_bytes);
+        m_logger.log("[ReliableStreamConnection]: " + m_error, COLOR_RED);
+        return;
+    }
+
+    const PacketHeader_Ack_u8* message = (const PacketHeader_Ack_u8*)packet;
+    m_logger.log(
+        "[ReliableStreamConnection]: PABB2_CONNECTION_OPCODE_INVALID_OPCODE: Device reported an invalid opcode: " +
+        std::to_string(message->data),
+        COLOR_RED
+    );
 }
 void ReliableStreamConnection::process_RET_RESET(const PacketHeader* packet){
     {
@@ -444,6 +461,7 @@ void ReliableStreamConnection::process_RET_BUFFER_BYTES(const PacketHeader* pack
 
 
 void ReliableStreamConnection::process_ASK_STREAM_DATA(const PacketHeader* packet){
+    cout << "process_ASK_STREAM_DATA()" << endl;
     if (packet->packet_bytes < sizeof(PacketHeaderData) + sizeof(uint32_t)){
         m_logger.log(
             "[ReliableStreamConnection]: Received stream packet that is too small: " + std::to_string(packet->packet_bytes),
@@ -454,14 +472,15 @@ void ReliableStreamConnection::process_ASK_STREAM_DATA(const PacketHeader* packe
     {
         std::lock_guard<Mutex> lg(m_lock);
         if (!m_stream_coalescer.push_stream((const PacketHeaderData*)packet)){
+            cout << "push_stream() failed" << endl;
             return;
         }
+        send_ack_u16(
+            packet->seqnum,
+            PABB2_CONNECTION_OPCODE_RET_STREAM_DATA,
+            m_stream_coalescer.bytes_available()
+        );
     }
-    send_ack_u16(
-        packet->seqnum,
-        PABB2_CONNECTION_OPCODE_RET_STREAM_DATA,
-        m_stream_coalescer.bytes_available()
-    );
     m_cv.notify_all();
 }
 void ReliableStreamConnection::process_RET_STREAM_DATA(const PacketHeader* packet){
