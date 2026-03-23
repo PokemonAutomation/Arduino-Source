@@ -386,40 +386,6 @@ void use_dig(SingleSwitchProgramEnvironment& env, ProControllerContext& context)
     }
 }
 
-int grass_spin(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool leftright){
-    // "walk" without moving by tapping the joystick to change directions
-    // alternate between left/right and up/down to ensure there is always a direction change
-
-    BlackScreenWatcher battle_entered(COLOR_RED);
-
-    context.wait_for_all_requests();
-    env.log("Starting grass spin.");
-    WallClock deadline = current_time() + 60s;
-
-    int ret = run_until<ProControllerContext>(
-        env.console, context,
-        [leftright, deadline](ProControllerContext& context) {
-            while (current_time() < deadline){
-                if (leftright){
-                    pbf_move_left_joystick(context, {+1, 0}, 33ms, 150ms);
-                    pbf_move_left_joystick(context, {-1, 0}, 33ms, 150ms);
-                }else{
-                    pbf_move_left_joystick(context, {0, +1}, 33ms, 150ms);
-                    pbf_move_left_joystick(context, {0, -1}, 33ms, 150ms);
-                }
-            }
-        },
-        { battle_entered }
-    );
-    
-    if (ret < 0){
-        return -1;
-    }
-
-    bool encounter_shiny = handle_encounter(env.console, context, true);
-    return encounter_shiny ? 1 : 0;
-}
-
 } // namespace
 
 std::string EvTrainer::get_encounter_species(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EvTrainingLocation& location){
@@ -574,7 +540,7 @@ void EvTrainer::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                
 
             uint16_t errors = 0;
-            int ret = grass_spin(env, context, spin_leftright);
+            int ret = grass_spin(env.console, context, spin_leftright);
             shiny_found = (ret == 1);
             if (ret < 0){
                 failed_encounter = true;
