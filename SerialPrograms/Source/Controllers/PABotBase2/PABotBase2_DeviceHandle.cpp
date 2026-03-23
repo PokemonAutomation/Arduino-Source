@@ -4,6 +4,7 @@
  *
  */
 
+#include <string.h>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/StreamConnections/PABotBase2_MessageDumper.h"
