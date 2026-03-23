@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 namespace PABotBase2{
 
 
-void pabb2_print_bytes(const void* data, size_t bytes, bool ascii){
+void print_bytes(const void* data, size_t bytes, bool ascii){
     const char* ptr = (const char*)data;
 
     if (ascii){
@@ -73,7 +73,7 @@ void PacketHeader_print(const PacketHeader* packet, bool ascii){
         }
         std::cout << "    offset: " << stream_packet->stream_offset << std::endl;
         std::cout << "    data:   ";
-        pabb2_print_bytes(stream_packet + 1, packet_bytes - OVERHEAD, ascii);
+        print_bytes(stream_packet + 1, packet_bytes - OVERHEAD, ascii);
         std::cout << std::endl;
         break;
     }
@@ -152,11 +152,11 @@ void StreamCoalescer::print(bool ascii) const{
         offset_e &= BUFFER_MASK;
 
         if (offset_s < offset_e){
-            pabb2_print_bytes(m_buffer + offset_s, size, ascii);
+            print_bytes(m_buffer + offset_s, size, ascii);
         }else{
         uint8_t block = (uint8_t)(PABB2_StreamCoalescer_BUFFER_SIZE - offset_s);
-            pabb2_print_bytes(m_buffer + offset_s, block, ascii);
-            pabb2_print_bytes(m_buffer, size - block, ascii);
+            print_bytes(m_buffer + offset_s, block, ascii);
+            print_bytes(m_buffer, size - block, ascii);
         }
         std::cout << std::endl;
     }

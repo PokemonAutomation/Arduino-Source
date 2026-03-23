@@ -154,12 +154,13 @@ bool SerialPABotBase2_Connection::open_device_connection(){
             m_logger, *m_stream_connection
         );
     }
+
     m_device->connect();
     m_controller_list = m_device->controller_list();
 
     set_status_line0(
         m_device->device_name() + " (" + std::to_string(m_device->device_firmware_version()) + ")",
-        COLOR_BLUE
+        theme_friendly_darkblue()
     );
 
 
@@ -181,6 +182,7 @@ void SerialPABotBase2_Connection::connect_thread_body(bool set_to_null_controlle
         if (!open_device_connection()){
             return;
         }
+        declare_ready();
     }catch (Exception& e){
         set_status_line0(e.message(), COLOR_RED);
     }

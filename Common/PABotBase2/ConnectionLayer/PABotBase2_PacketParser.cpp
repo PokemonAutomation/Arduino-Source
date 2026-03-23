@@ -10,6 +10,7 @@
 //#include <iostream>
 //using std::cout;
 //using std::endl;
+//#include "PABotBase2_ConnectionDebug.h"
 
 #ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wtype-limits"
@@ -133,11 +134,16 @@ void PacketParser::push_bytes(
 ){
 //    cout << "pabb2_PacketParser_push_bytes(): " << bytes << endl;
 
+//    cout << "push_bytes(): ";
+//    PABotBase2::print_bytes(data, bytes, false);
+//    cout << endl;
+
     const uint8_t MIN_PACKET_SIZE = sizeof(PacketHeader) + sizeof(uint32_t);
 
     uint8_t index = m_index;
 
     while (bytes > 0){
+//        cout << "index = " << (int)index << ", bytes left = " << bytes << endl;
 //        cout << "bytes left: " << bytes << endl;
         if (index == 0 && data[0] != PABB2_CONNECTION_MAGIC_NUMBER){
 //            cout << "Skipping invalid start of packet." << endl;
@@ -152,6 +158,7 @@ void PacketParser::push_bytes(
             if (bytes < bytes_needed_to_finish_header){
 //                cout << "Not enough data to complete header: " << (int)index << endl;
                 memcpy(m_buffer + index, data, bytes);
+                index += (uint8_t)bytes;
                 break;
             }
             memcpy(m_buffer + index, data, bytes_needed_to_finish_header);

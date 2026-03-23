@@ -11,6 +11,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "Controllers/ControllerTypeStrings.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "PABotBase2_DeviceHandle.h"
 
@@ -31,6 +32,7 @@ DeviceHandle::DeviceHandle(
 )
     : m_logger(logger)
     , m_connection(connection)
+    , m_command_queue(logger, *this, connection)
 {
     connection.add_listener(*this);
     if (parent){
@@ -50,9 +52,6 @@ bool DeviceHandle::cancel(std::exception_ptr exception) noexcept{
     }
     {
         std::lock_guard<Mutex> lg(m_lock);
-        for (auto& item : m_pending_requests){
-            item.second.cv.notify_all();
-        }
     }
     m_cv.notify_all();
     return false;
@@ -104,7 +103,7 @@ void DeviceHandle::query_protocol(){
     }
     m_logger.log(
         "[MLC]: Remote Protocol: " + std::to_string(m_device_protocol) + " (compatible)",
-        COLOR_RED
+        COLOR_BLUE
     );
 }
 void DeviceHandle::query_controller_list(){
@@ -137,13 +136,14 @@ void DeviceHandle::query_controller_list(){
     m_logger.Logger::log("Checking Controller List... (" + str + ")");
 }
 void DeviceHandle::query_command_queue(){
-    m_command_queue_size = (uint8_t)query_u32(PABB2_MESSAGE_OPCODE_CQ_CAPACITY);
-    m_logger.log("[MLC]: Command Queue Size: " + std::to_string(m_command_queue_size), COLOR_BLUE);
+    uint8_t command_queue_size = (uint8_t)query_u32(PABB2_MESSAGE_OPCODE_CQ_CAPACITY);
+    m_logger.log("[MLC]: Command Queue Size: " + std::to_string(command_queue_size), COLOR_BLUE);
 
     //  For now we don't need to use that much queue size.
-    m_command_queue_size = std::min<uint8_t>(m_command_queue_size, 32);
+    command_queue_size = std::min<uint8_t>(command_queue_size, 32);
 
-    m_logger.Logger::log("Setting queue size to: " + std::to_string(m_command_queue_size));
+    m_logger.Logger::log("Setting queue size to: " + std::to_string(command_queue_size));
+    m_command_queue.set_command_queue_size(command_queue_size);
 }
 void DeviceHandle::connect(){
     query_protocol();
@@ -159,12 +159,26 @@ void DeviceHandle::connect(){
 }
 
 
-void DeviceHandle::send_request(pabb2_MessageHeader& request){
+ControllerType DeviceHandle::refresh_controller_type(){
+    m_logger.log("Reading Controller Mode...");
+    uint32_t type_id = query_u32(PABB_MESSAGE_OPCODE_READ_CONTROLLER_MODE);
+
+    ControllerType current_controller = SerialPABotBase::id_to_controller_type(type_id);
+    m_logger.log(
+        "Reading Controller Mode... Mode = " +
+        CONTROLLER_TYPE_STRINGS.get_string(current_controller)
+    );
+//    m_current_controller.store(current_controller, std::memory_order_release);
+    return current_controller;
+}
+
+
+uint8_t DeviceHandle::send_request(MessageHeader& request){
     std::unique_lock<Mutex> lg(m_lock);
     while (true){
         throw_if_cancelled();
 
-        request.id = m_seqnum;
+        request.id = m_request_seqnum;
 
         //  Wait until the slot is available.
         auto iter = m_pending_requests.find(request.id);
@@ -174,7 +188,7 @@ void DeviceHandle::send_request(pabb2_MessageHeader& request){
         }
 
         m_pending_requests[request.id];
-        m_seqnum++;
+        m_request_seqnum++;
         break;
     }
 
@@ -183,60 +197,63 @@ void DeviceHandle::send_request(pabb2_MessageHeader& request){
     }
 
     m_connection.reliable_send(&request, request.message_bytes);
+
+    return request.id;
 }
-std::string DeviceHandle::wait_for_response(uint8_t id){
+std::string DeviceHandle::wait_for_request_response(uint8_t id){
     std::unique_lock<Mutex> lg(m_lock);
     while (true){
         throw_if_cancelled();
 
+        //  Request doesn't exist.
         auto iter = m_pending_requests.find(id);
         if (iter == m_pending_requests.end()){
             throw InternalProgramError(
                 &m_logger,
                 PA_CURRENT_FUNCTION,
-                "Attempted to wait for an ID that doesn't exist."
+                "Attempted to wait for a request ID that doesn't exist."
             );
         }
 
-        if (iter->second.response.empty()){
-            iter->second.cv.wait(lg);
+        if (iter->second.empty()){
+            m_cv.wait(lg);
             continue;
         }
 
-        std::string str = std::move(iter->second.response);
+        std::string str = std::move(iter->second);
         m_pending_requests.erase(iter);
         return str;
     }
 }
 
 uint32_t DeviceHandle::query_u32(uint8_t opcode){
-    pabb2_MessageHeader request;
-    request.message_bytes = sizeof(pabb2_MessageHeader);
+    MessageHeader request;
+    request.message_bytes = sizeof(MessageHeader);
     request.opcode = opcode;
 
     send_request(request);
 
-    std::string response = wait_for_response(request.id);
-    if (response.size() != sizeof(pabb2_Message_Response_u32)){
+    std::string response = wait_for_request_response(request.id);
+    if (response.size() != sizeof(Message_u32)){
         throw InternalProgramError(
             &m_logger,
             PA_CURRENT_FUNCTION,
-            "Expected response length of: " + std::to_string(sizeof(pabb2_Message_Response_u32))
+            "Expected response length of: " + std::to_string(sizeof(Message_u32))
         );
     }
 
-    const pabb2_Message_Response_u32* msg = (const pabb2_Message_Response_u32*)response.c_str();
+    const Message_u32* msg = (const Message_u32*)response.c_str();
     return msg->data;
 }
 std::string DeviceHandle::query_data(uint8_t opcode){
-    pabb2_MessageHeader request;
-    request.message_bytes = sizeof(pabb2_MessageHeader);
+    MessageHeader request;
+    request.message_bytes = sizeof(MessageHeader);
     request.opcode = opcode;
 
     send_request(request);
 
-    std::string response = wait_for_response(request.id);
-    if (response.size() < sizeof(pabb2_Message_Response_Data)){
+    std::string response = wait_for_request_response(request.id);
+    if (response.size() < sizeof(MessageHeader)){
         throw InternalProgramError(
             &m_logger,
             PA_CURRENT_FUNCTION,
@@ -244,8 +261,8 @@ std::string DeviceHandle::query_data(uint8_t opcode){
         );
     }
 
-    const pabb2_Message_Response_Data* msg = (const pabb2_Message_Response_Data*)response.c_str();
-    return std::string((const char*)(msg + 1), msg->message_bytes - sizeof(pabb2_Message_Response_Data));
+    const MessageHeader* msg = (const MessageHeader*)response.c_str();
+    return std::string((const char*)(msg + 1), msg->message_bytes - sizeof(MessageHeader));
 }
 
 
@@ -253,12 +270,12 @@ std::string DeviceHandle::query_data(uint8_t opcode){
 
 
 void DeviceHandle::on_recv(const void* data, size_t bytes){
-    cout << "DeviceHandle::on_recv()" << endl;
+//    cout << "DeviceHandle::on_recv()" << endl;
     m_buffer.insert(m_buffer.end(), (const char*)data, (const char*)data + bytes);
 
     while (true){
         //  Header is incomplete.
-        if (m_buffer.size() < sizeof(pabb2_MessageHeader)){
+        if (m_buffer.size() < sizeof(MessageHeader)){
             return;
         }
 
@@ -274,7 +291,7 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
         std::string message(iter_s, iter_e);
         m_buffer.erase(iter_s, iter_e);
 
-        const pabb2_MessageHeader* header = (const pabb2_MessageHeader*)message.c_str();
+        const MessageHeader* header = (const MessageHeader*)message.c_str();
 
         bool log_everything = GlobalSettings::instance().LOG_EVERYTHING;
 
@@ -292,16 +309,21 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
             continue;
         case PABB2_MESSAGE_OPCODE_RET:
         case PABB2_MESSAGE_OPCODE_RET_U32:
-        case PABB2_MESSAGE_OPCODE_RET_DATA:
-        {
-            std::lock_guard<Mutex> lg(m_lock);
-            auto iter = m_pending_requests.find(header->id);
-            if (iter == m_pending_requests.end()){
-                m_logger.log("[MLC]: Received response for unknown ID: " + std::to_string(header->id));
-                continue;
+        case PABB2_MESSAGE_OPCODE_RET_DATA:{
+            {
+                std::lock_guard<Mutex> lg(m_lock);
+                auto iter = m_pending_requests.find(header->id);
+                if (iter == m_pending_requests.end()){
+                    m_logger.log("[MLC]: Received request response for unknown ID: " + std::to_string(header->id));
+                    continue;
+                }
+                iter->second = std::move(message);
             }
-            iter->second.response = std::move(message);
-            iter->second.cv.notify_all();
+            m_cv.notify_all();
+            continue;
+        }
+        case PABB2_MESSAGE_OPCODE_CQ_COMMAND_FINISHED:{
+            m_command_queue.report_command_finished(*header);
             continue;
         }
         }

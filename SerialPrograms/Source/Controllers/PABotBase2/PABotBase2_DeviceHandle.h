@@ -16,6 +16,7 @@
 #include "Common/Cpp/StreamConnections/PushingStreamConnections.h"
 #include "Common/PABotBase2/DataLayer/PABotBase2_MessageProtocol.h"
 #include "Controllers/ControllerTypes.h"
+#include "PABotBase2_CommandQueueManager.h"
 
 namespace PokemonAutomation{
 namespace PABotBase2{
@@ -51,11 +52,19 @@ public:
         return m_controller_list;
     }
 
+    CommandQueueManager& command_queue(){
+        return m_command_queue;
+    }
+
+
+public:
+    ControllerType refresh_controller_type();
+
+    uint8_t send_request(MessageHeader& request);
+    std::string wait_for_request_response(uint8_t id);
+
 
 private:
-    void send_request(pabb2_MessageHeader& request);
-    std::string wait_for_response(uint8_t id);
-
     uint32_t query_u32(uint8_t opcode);
     std::string query_data(uint8_t opcode);
 
@@ -66,30 +75,30 @@ private:
 
     virtual void on_recv(const void* data, size_t bytes) override;
 
+
 private:
     Logger& m_logger;
     ReliableStreamConnectionPushing& m_connection;
+    CommandQueueManager m_command_queue;
 
     uint32_t m_device_protocol = 0;
     uint32_t m_device_id = 0;
     std::string m_device_name;
     uint32_t m_device_firmware_version = 0;
     std::vector<ControllerType> m_controller_list;
-    uint8_t m_command_queue_size = 4;
 
-    uint8_t m_seqnum = 0;
+//    std::atomic<ControllerType> m_controller_type;
 
-    struct LiveRequest{
-        ConditionVariable cv;
-        std::string response;
-    };
+    uint8_t m_request_seqnum = 0;
 
     Mutex m_lock;
     ConditionVariable m_cv;
-    std::map<uint8_t, LiveRequest> m_pending_requests;
+    std::map<uint8_t, std::string> m_pending_requests;
 
     std::deque<char> m_buffer;
 };
+
+
 
 
 

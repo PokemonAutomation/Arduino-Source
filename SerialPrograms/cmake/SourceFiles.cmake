@@ -738,6 +738,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/JoystickTools.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h
+    Source/Controllers/PABotBase2/PABotBase2_CommandQueueManager.cpp
+    Source/Controllers/PABotBase2/PABotBase2_CommandQueueManager.h
     Source/Controllers/PABotBase2/PABotBase2_DeviceHandle.cpp
     Source/Controllers/PABotBase2/PABotBase2_DeviceHandle.h
     Source/Controllers/PABotBase2/SerialPABotBase2_Connection.cpp

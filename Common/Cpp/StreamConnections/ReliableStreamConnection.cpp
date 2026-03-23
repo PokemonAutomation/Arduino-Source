@@ -11,10 +11,9 @@
 #include "Common/Cpp/StreamConnections/PABotBase2_MessageDumper.h"
 #include "ReliableStreamConnection.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -265,18 +264,27 @@ void ReliableStreamConnection::on_packet(const PacketHeader* packet){
 //        cout << "on_packet(): seqnum = [" << (int)packet->seqnum << "], opcode = " << (int)packet->opcode << endl;
 //    }
 
+//    cout << "on_packet(): ";
+//    PABotBase2::print_bytes(packet, packet->packet_bytes, false);
+//    cout << endl;
+
+    //
+    //  Process the packet status.
+    //
+
     switch (status){
     case PABB2_PacketParser_RESULT_VALID:
         break;
     case PABB2_PacketParser_RESULT_INVALID:
         m_logger.log(
-            "[RSC]: INVALID MESSAGE: Received invalid message from device.",
+            "[RSC]: INVALID PACKET: Received invalid packet from device.",
             COLOR_RED
         );
         return;
     case PABB2_PacketParser_RESULT_CHECKSUM_FAIL:
         m_logger.log(
-            "[RSC]: CHECKSUM MISMATCH: Received bad data from device.",
+            "[RSC]: CHECKSUM MISMATCH: Received bad data from device: bytes = " + std::to_string(packet->packet_bytes),
+//            "[RSC]: CHECKSUM MISMATCH: Received bad data from device: bytes = " + tostr(packet),
             COLOR_RED
         );
         return;
@@ -288,10 +296,15 @@ void ReliableStreamConnection::on_packet(const PacketHeader* packet){
         return;
     }
 
+
+
+    //
+    //  Process the packet itself.
+    //
+
     if (m_log_everything){
         m_logger.log("[RSC]: Receive: " + tostr(packet), COLOR_PURPLE);
     }
-
 
     uint8_t opcode = packet->opcode & PABB2_CONNECTION_OPCODE_MASK;
     switch (opcode){

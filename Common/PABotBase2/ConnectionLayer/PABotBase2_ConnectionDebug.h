@@ -12,7 +12,7 @@
 namespace PokemonAutomation{
 namespace PABotBase2{
 
-
+void print_bytes(const void* data, size_t bytes, bool ascii);
 void PacketHeader_print(const PacketHeader* packet, bool ascii);
 bool PacketHeader_check(const PacketHeader* packet, bool ascii);
 

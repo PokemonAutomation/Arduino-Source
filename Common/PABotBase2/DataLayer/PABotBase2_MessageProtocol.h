@@ -23,40 +23,31 @@ namespace PABotBase2{
 
 
 
-
 #define PABB2_MESSAGE_PROTOCOL_VERSION      2026031600
 
 
-#define PABB2_MESSAGE_OPCODE_INVALID            0x00
-
-
-struct PABB_PACK pabb2_MessageHeader{
+struct PABB_PACK MessageHeader{
     uint16_t message_bytes;
     uint8_t opcode;
     uint8_t id;
 };
-
-
-#define PABB2_MESSAGE_OPCODE_RET                0x10
-#define PABB2_MESSAGE_OPCODE_REQUEST_DROPPED    0x1f
-
-
-#define PABB2_MESSAGE_OPCODE_RET_U32            0x11
-struct PABB_PACK pabb2_Message_Response_u32{
+struct PABB_PACK Message_u32{
     uint16_t message_bytes;
     uint8_t opcode;
     uint8_t id;
     uint32_t data;
 };
 
+#define PABB2_MESSAGE_OPCODE_INVALID                0x00
+#define PABB2_MESSAGE_OPCODE_LOG_STRING             0x01
+#define PABB2_MESSAGE_OPCODE_LOG_LABEL_H32          0x02
+#define PABB2_MESSAGE_OPCODE_LOG_LABEL_U32          0x03
+#define PABB2_MESSAGE_OPCODE_LOG_LABEL_I32          0x04
 
-#define PABB2_MESSAGE_OPCODE_RET_DATA           0x12
-struct PABB_PACK pabb2_Message_Response_Data{
-    uint16_t message_bytes;
-    uint8_t opcode;
-    uint8_t id;
-};
-
+#define PABB2_MESSAGE_OPCODE_REQUEST_DROPPED        0x10
+#define PABB2_MESSAGE_OPCODE_RET                    0x11
+#define PABB2_MESSAGE_OPCODE_RET_U32                0x12
+#define PABB2_MESSAGE_OPCODE_RET_DATA               0x13
 
 #define PABB2_MESSAGE_OPCODE_PROTOCOL_VERSION       0x20
 #define PABB2_MESSAGE_OPCODE_FIRMWARE_VERSION       0x21
@@ -71,9 +62,10 @@ struct PABB_PACK pabb2_Message_Response_Data{
 #define PABB_MESSAGE_OPCODE_CONTROLLER_MAC_ADDRESS  0x33
 #define PABB_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS      0x34
 
-#define PABB2_MESSAGE_OPCODE_CQ_CANCEL              0x40
-#define PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT     0x41
-#define PABB2_MESSAGE_OPCODE_CQ_COMMAND_FINISHED    0x42
+#define PABB2_MESSAGE_OPCODE_CQ_COMMAND_DROPPED     0x40
+#define PABB2_MESSAGE_OPCODE_CQ_CANCEL              0x41
+#define PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT     0x42
+#define PABB2_MESSAGE_OPCODE_CQ_COMMAND_FINISHED    0x43
 
 
 

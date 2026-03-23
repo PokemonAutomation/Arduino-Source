@@ -34,7 +34,9 @@ public:
 
 
 public:
-    ControllerType refresh_controller_type();
+    ControllerType refresh_controller_type(){
+        return m_device->refresh_controller_type();
+    }
 
 
 private:
