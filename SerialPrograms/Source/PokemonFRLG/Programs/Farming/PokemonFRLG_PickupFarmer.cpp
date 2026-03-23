@@ -38,14 +38,14 @@ PickupFarmer_Descriptor::PickupFarmer_Descriptor()
 
 struct PickupFarmer_Descriptor::Stats : public StatsTracker{
     Stats()
-        : encounters(m_stats["Encounters"])
+        : encounters(m_stats["Encounters Won"])
         , item_checks(m_stats["Item Checks"])
         , healing_trips(m_stats["Healing Trips"])
         , times_fainted(m_stats["Times Fainted"])
         , shinies(m_stats["Shinies"])
         , errors(m_stats["Errors"])
     {
-        m_display_order.emplace_back("Encounters");
+        m_display_order.emplace_back("Encounters Won");
         m_display_order.emplace_back("Item Checks");
         m_display_order.emplace_back("Healing Trips");
         m_display_order.emplace_back("Times Fainted", HIDDEN_IF_ZERO);
@@ -83,7 +83,7 @@ PickupFarmer::PickupFarmer()
         TravelMethod::fly
     )
     , MAX_ENCOUNTERS(
-        "<b>Max Encounters:</b><br>Set to 0 to continue indefinitely.",
+        "<b>Max Encounters to Defeat:</b><br>Set to 0 to continue indefinitely.",
         LockMode::UNLOCK_WHILE_RUNNING,
         0, 0 // default, min
     )
@@ -263,6 +263,7 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
                 
                 out_of_pp = false;
                 failed_encounter = false;
+                spin_leftright = true;
             }
 
             uint16_t errors = 0;
@@ -285,7 +286,6 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             }else{
                 spin_leftright = !spin_leftright;
                 encounters_since_item_check++;
-                stats.encounters++;
             }
 
             if (shiny_found && !IGNORE_SHINIES){
@@ -320,6 +320,7 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             } else if (ret2 == 3){
                 out_of_pp = true;
             } else if (ret2 == 0){ // opponent fainted
+                stats.encounters++;
                 bool move_learned = exit_wild_battle(env.console, context, !!STOP_ON_MOVE_LEARN, !!PREVENT_EVOLUTION);
                 if (move_learned && STOP_ON_MOVE_LEARN){
                     send_program_status_notification(
