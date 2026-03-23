@@ -23,8 +23,16 @@ void ComputerHandle::send_message_u32(uint8_t id, uint32_t data){
     response.id = id;
     response.data = data;
     data_connection.reliable_send(&response, response.message_bytes);
-    
+
 //    data_connection.send_oob_info_u32(response.message_bytes);
+}
+void ComputerHandle::send_message_data(uint8_t id, uint16_t bytes, const void* data){
+    pabb2_Message_Response_Data response;
+    response.message_bytes = sizeof(pabb2_Message_Response_Data) + bytes;
+    response.opcode = PABB2_MESSAGE_OPCODE_RET_DATA;
+    response.id = id;
+    data_connection.reliable_send(&response, sizeof(pabb2_Message_Response_Data));
+    data_connection.reliable_send(data, bytes);
 }
 void ComputerHandle::process_completed_message(){
     const pabb2_MessageHeader* header = (const pabb2_MessageHeader*)m_buffer;
@@ -38,6 +46,12 @@ void ComputerHandle::process_completed_message(){
         return;
     case PABB2_MESSAGE_OPCODE_DEVICE_IDENTIFIER:
         send_message_u32(header->id, PABB2_DEVICE_ID);
+        return;
+    case PABB2_MESSAGE_OPCODE_DEVICE_NAME:
+        send_message_data(header->id, sizeof(PABB2_DEVICE_NAME) - 1, PABB2_DEVICE_NAME);
+        return;
+    case PABB2_MESSAGE_OPCODE_CONTROLLER_LIST:
+        send_message_data(header->id, sizeof(PABB_CONTROLLER_LIST), PABB_CONTROLLER_LIST);
         return;
     case PABB2_MESSAGE_OPCODE_CQ_CAPACITY:
         send_message_u32(header->id, PABB2_CommandQueue_SLOTS);

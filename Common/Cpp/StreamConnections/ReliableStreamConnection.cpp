@@ -393,10 +393,7 @@ void ReliableStreamConnection::process_RET_VERSION(const PacketHeader* packet){
             break;
         }
 
-        m_logger.log(
-            "[RSC]: " + str + " (compatible)",
-            COLOR_BLUE
-        );
+        m_logger.log("[RSC]: " + str + " (compatible)", COLOR_BLUE);
         m_reliable_sender.remove(packet->seqnum);
 
     }while (false);

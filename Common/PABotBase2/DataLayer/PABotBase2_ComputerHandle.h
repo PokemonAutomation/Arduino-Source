@@ -29,6 +29,7 @@ public:
 
 private:
     void send_message_u32(uint8_t id, uint32_t data);
+    void send_message_data(uint8_t id, uint16_t bytes, const void* data);
     void process_completed_message();
 
 private:

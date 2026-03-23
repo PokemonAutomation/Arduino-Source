@@ -15,6 +15,7 @@
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/StreamConnections/PushingStreamConnections.h"
 #include "Common/PABotBase2/DataLayer/PABotBase2_MessageProtocol.h"
+#include "Controllers/ControllerTypes.h"
 
 namespace PokemonAutomation{
 namespace PABotBase2{
@@ -39,14 +40,31 @@ public:
     void connect();
 
 
-private:
-    virtual void on_recv(const void* data, size_t bytes) override;
+public:
+    uint32_t device_firmware_version() const{
+        return m_device_firmware_version;
+    }
+    const std::string& device_name() const{
+        return m_device_name;
+    }
+    const std::vector<ControllerType>& controller_list() const{
+        return m_controller_list;
+    }
 
+
+private:
     void send_request(pabb2_MessageHeader& request);
     std::string wait_for_response(uint8_t id);
 
     uint32_t query_u32(uint8_t opcode);
+    std::string query_data(uint8_t opcode);
 
+    void throw_incompatible_protocol();
+    void query_protocol();
+    void query_controller_list();
+    void query_command_queue();
+
+    virtual void on_recv(const void* data, size_t bytes) override;
 
 private:
     Logger& m_logger;
@@ -54,7 +72,9 @@ private:
 
     uint32_t m_device_protocol = 0;
     uint32_t m_device_id = 0;
+    std::string m_device_name;
     uint32_t m_device_firmware_version = 0;
+    std::vector<ControllerType> m_controller_list;
     uint8_t m_command_queue_size = 4;
 
     uint8_t m_seqnum = 0;
@@ -70,6 +90,8 @@ private:
 
     std::deque<char> m_buffer;
 };
+
+
 
 
 

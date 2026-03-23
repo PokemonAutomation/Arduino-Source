@@ -155,6 +155,12 @@ bool SerialPABotBase2_Connection::open_device_connection(){
         );
     }
     m_device->connect();
+    m_controller_list = m_device->controller_list();
+
+    set_status_line0(
+        m_device->device_name() + " (" + std::to_string(m_device->device_firmware_version()) + ")",
+        COLOR_BLUE
+    );
 
 
 //    //  Current Controller
