@@ -444,15 +444,22 @@ else() # macOS and Linux
                 REQUIRED
             )
 
-        if(ONNX_INCLUDE_DIRS AND ONNX_RUNTIME_LIB)
-            # only link if it was found, otherwise we error out
-            message(STATUS "Found ONNX Include Dirs: ${ONNX_INCLUDE_DIRS}")
-            message(STATUS "Found ONNX Library: ${ONNX_RUNTIME_LIB}")
-            target_include_directories(SerialProgramsLib PUBLIC "${ONNX_INCLUDE_DIRS}")
-            target_link_libraries(SerialProgramsLib PUBLIC "${ONNX_RUNTIME_LIB}")
-        else()
-            message(FATAL_ERROR "Could not find ONNX Runtime headers or library.")
-        endif()
+            find_library(ONNX_RUNTIME_LIB
+                NAMES onnxruntime
+                HINTS "${ONNX_ROOT_PATH}/lib"
+                REQUIRED
+            )
+
+            if(ONNX_INCLUDE_DIRS AND ONNX_RUNTIME_LIB)
+                # only link if it was found, otherwise we error out
+                message(STATUS "Found ONNX Include Dirs: ${ONNX_INCLUDE_DIRS}")
+                message(STATUS "Found ONNX Library: ${ONNX_RUNTIME_LIB}")
+                target_include_directories(SerialProgramsLib PUBLIC "${ONNX_INCLUDE_DIRS}")
+                target_link_libraries(SerialProgramsLib PUBLIC "${ONNX_RUNTIME_LIB}")
+            else()
+                message(FATAL_ERROR "Could not find ONNX Runtime headers or library.")
+            endif()
+        endif ()
 
         # Systemd DBus Library
         message(STATUS "Using bundled sdbus-c++ library.")
