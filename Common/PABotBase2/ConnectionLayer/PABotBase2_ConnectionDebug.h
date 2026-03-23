@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PABotBase2_ConnectionLayer_ConnectionDebug_H
 #define PokemonAutomation_PABotBase2_ConnectionLayer_ConnectionDebug_H
 
+#include <cstddef>
 #include "PABotBase2_Connection.h"
 
 namespace PokemonAutomation{
