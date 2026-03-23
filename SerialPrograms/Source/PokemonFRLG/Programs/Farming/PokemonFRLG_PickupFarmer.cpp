@@ -126,6 +126,7 @@ PickupFarmer::PickupFarmer()
     })
 {
     PA_ADD_OPTION(GAME_LOCATION);
+    PA_ADD_OPTION(TRAVEL_METHOD);
     PA_ADD_OPTION(MAX_ENCOUNTERS);
     PA_ADD_OPTION(BATTLES_PER_ITEM_CHECK);
     PA_ADD_OPTION(STOP_ON_MOVE_LEARN);
@@ -248,8 +249,10 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
                 switch (GAME_LOCATION){
                 case GameLocation::route1:
                     walk_to_route1(env, context);
+                    break;
                 case GameLocation::route22:
                     walk_to_route22(env, context);
+                    break;
                 default:
                     OperationFailedException::fire(
                         ErrorReport::SEND_ERROR_REPORT,
