@@ -19,53 +19,57 @@
 #define PABB_PACK
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace PokemonAutomation{
+namespace PABotBase2{
 
 
-#define PABB2_CONNECTION_MAGIC_NUMBER                   0x81
-#define PABB2_CONNECTION_PROTOCOL_VERSION               2025011700
+#define PABB2_CONNECTION_BAUD_RATE                  115200
+#define PABB2_CONNECTION_MAGIC_NUMBER               0x81
+#define PABB2_CONNECTION_PROTOCOL_VERSION           2025011700
+
+
+#define PABB2_CONNECTION_RETRANSMIT_FLAG            0x80
+#define PABB2_CONNECTION_OPCODE_MASK                0x7f
 
 
 //
 //  Special
 //
 
-typedef struct{
+struct PABB_PACK PacketHeader{
     uint8_t magic_number;
     uint8_t seqnum;
     uint8_t packet_bytes;
     uint8_t opcode;
-} PABB_PACK pabb2_PacketHeader;
+};
 
 #define PABB2_CONNECTION_OPCODE_INVALID             0x00
 
 #define PABB2_CONNECTION_OPCODE_ASK_RESET           0x01
-#define PABB2_CONNECTION_OPCODE_RET_RESET           0x81
+#define PABB2_CONNECTION_OPCODE_RET_RESET           0x41
 
 
-typedef struct{
+struct PABB_PACK PacketHeader_Ack_u8{
     uint8_t magic_number;
     uint8_t seqnum;
     uint8_t packet_bytes;
     uint8_t opcode;
     uint8_t data;
-} PABB_PACK pabb2_PacketHeader_Ack_u8;
-typedef struct{
+};
+struct PABB_PACK PacketHeader_Ack_u16{
     uint8_t magic_number;
     uint8_t seqnum;
     uint8_t packet_bytes;
     uint8_t opcode;
     uint16_t data;
-} PABB_PACK pabb2_PacketHeader_Ack_u16;
-typedef struct{
+};
+struct PABB_PACK PacketHeader_Ack_u32{
     uint8_t magic_number;
     uint8_t seqnum;
     uint8_t packet_bytes;
     uint8_t opcode;
     uint32_t data;
-} PABB_PACK pabb2_PacketHeader_Ack_u32;
+};
 
 
 
@@ -73,40 +77,28 @@ typedef struct{
 //  Requests (acks required)
 //
 
-#define PABB2_CONNECTION_OPCODE_ASK_VERSION         0x20
-#define PABB2_CONNECTION_OPCODE_RET_VERSION         0xa0
+#define PABB2_CONNECTION_OPCODE_ASK_VERSION         0x02
+#define PABB2_CONNECTION_OPCODE_RET_VERSION         0x42
 
-#define PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE     0x21
-#define PABB2_CONNECTION_OPCODE_RET_PACKET_SIZE     0xa1
+#define PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE     0x03
+#define PABB2_CONNECTION_OPCODE_RET_PACKET_SIZE     0x43
 
-#define PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS    0x22
-#define PABB2_CONNECTION_OPCODE_RET_BUFFER_SLOTS    0xa2
+#define PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS    0x04
+#define PABB2_CONNECTION_OPCODE_RET_BUFFER_SLOTS    0x44
 
-#define PABB2_CONNECTION_OPCODE_ASK_BUFFER_BYTES    0x23
-#define PABB2_CONNECTION_OPCODE_RET_BUFFER_BYTES    0xa3
+#define PABB2_CONNECTION_OPCODE_ASK_BUFFER_BYTES    0x05
+#define PABB2_CONNECTION_OPCODE_RET_BUFFER_BYTES    0x45
 
-#define PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA     0x30
-#define PABB2_CONNECTION_OPCODE_RET_STREAM_DATA     0xb0
-#define PABB2_CONNECTION_OPCODE_ASK_STREAM_REQUEST  0x31
-typedef struct{
+#define PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA     0x10
+#define PABB2_CONNECTION_OPCODE_RET_STREAM_DATA     0x50
+#define PABB2_CONNECTION_OPCODE_ASK_STREAM_REQUEST  0x11
+struct PABB_PACK PacketHeaderData{
     uint8_t magic_number;
     uint8_t seqnum;
     uint8_t packet_bytes;
     uint8_t opcode;
     uint16_t stream_offset;
-} PABB_PACK pabb2_PacketHeaderData;
-
-
-
-
-//
-//  Acks
-//
-
-//#define PABB2_CONNECTION_OPCODE_RET                     0x90
-//#define PABB2_CONNECTION_OPCODE_RET_u8                  0x91
-//#define PABB2_CONNECTION_OPCODE_RET_u16                 0x92
-//#define PABB2_CONNECTION_OPCODE_RET_u32                 0x93
+};
 
 
 
@@ -114,17 +106,19 @@ typedef struct{
 //  Out-of-band Info (no acks needed)
 //
 
-#define PABB2_CONNECTION_OPCODE_INVALID_LENGTH          0x60
-#define PABB2_CONNECTION_OPCODE_INVALID_CHECKSUM_FAIL   0x61
-#define PABB2_CONNECTION_OPCODE_INVALID_OPCODE          0x62
-#define PABB2_CONNECTION_OPCODE_UNKNOWN_OPCODE          0x63
+#define PABB2_CONNECTION_OPCODE_INFO                    0x20
+#define PABB2_CONNECTION_OPCODE_INFO_U8                 0x21
+#define PABB2_CONNECTION_OPCODE_INFO_U16                0x22
+#define PABB2_CONNECTION_OPCODE_INFO_U32                0x23
+
+#define PABB2_CONNECTION_OPCODE_INVALID_LENGTH          0x30
+#define PABB2_CONNECTION_OPCODE_INVALID_CHECKSUM_FAIL   0x31
+#define PABB2_CONNECTION_OPCODE_UNKNOWN_OPCODE          0x32
 
 
 
-
-#ifdef __cplusplus
 }
-#endif
+}
 
 #if _WIN32
 #pragma pack(pop)

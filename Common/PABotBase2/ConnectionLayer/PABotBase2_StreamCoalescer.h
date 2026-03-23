@@ -9,72 +9,97 @@
 
 #include "PABotBase2_Connection.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifdef PABB2_SIZING_OVERRIDE
+#include "PABotBase2_Config.h"
+#else
 
-
+//  Must be power-of-two. (max 64)
 #ifndef PABB2_StreamCoalescer_SLOTS
-#define PABB2_StreamCoalescer_SLOTS         4   //  Must be power-of-two, fits into uint8_t. (max 128)
+#define PABB2_StreamCoalescer_SLOTS         64
 #endif
 
+//  Must be power-of-two, fits into uint16_t. (max 32768)
 #ifndef PABB2_StreamCoalescer_BUFFER_SIZE
-#define PABB2_StreamCoalescer_BUFFER_SIZE   64  //  Must be power-of-two, fits into uint16_t. (max 32768)
+#define PABB2_StreamCoalescer_BUFFER_SIZE   16384
 #endif
 
+#endif
+
+namespace PokemonAutomation{
+namespace PABotBase2{
 
 
-#define PABB2_StreamCoalescer_SLOTS_MASK        (uint8_t)((PABB2_StreamCoalescer_SLOTS) - 1)
-#define PABB2_StreamCoalescer_BUFFER_MASK       (size_t)((PABB2_StreamCoalescer_BUFFER_SIZE) - 1)
+
+class StreamCoalescer{
+    static const uint8_t SLOTS_MASK = (PABB2_StreamCoalescer_SLOTS) - 1;
+    static const uint16_t BUFFER_MASK = (PABB2_StreamCoalescer_BUFFER_SIZE) - 1;
+
+public:
+    StreamCoalescer(){
+        reset();
+    }
+    void reset();
+
+    void print(bool ascii) const;
 
 
-typedef struct{
-    uint8_t slot_head;
-    uint8_t slot_tail;
+public:
+    uint16_t free_bytes() const;
 
-//    uint8_t seqnum;
-    uint16_t stream_head;
-    uint16_t stream_tail;
+    void push_packet(uint8_t seqnum);
 
-    bool stream_reset;
+    //  Returns true if the packet has been received and can be acked.
+    bool push_stream(const PacketHeaderData* packet);
+
+    //
+    //  Read data from the stream.
+    //
+    //  Returns the # of bytes actually read.
+    //  Returns (size_t)-1 if the stream has been reset.
+    //  Returning less than "max_bytes" indicates the stream is out of usable data.
+    //
+    size_t read(void* data, size_t max_bytes);
+
+
+private:
+    void write_buffer(
+        const void* data,
+        uint16_t stream_offset, uint8_t bytes
+    );
+    void read_buffer(
+        void* data,
+        uint16_t stream_offset, uint8_t bytes
+    );
+    void pop_leading_finished();
+
+
+public:
+    uint8_t m_slot_head;
+    uint8_t m_slot_tail;
+
+//    uint8_t m_seqnum;
+    uint16_t m_stream_head;
+    uint16_t m_stream_tail;
 
     //  0       =   Not received yet.
     //  0-254   =   Received stream packet. # is the size.
     //  255     =   Received non-stream packet.
-    uint8_t lengths[PABB2_StreamCoalescer_SLOTS];
+    uint8_t m_lengths[PABB2_StreamCoalescer_SLOTS];
 
-    uint16_t offsets[PABB2_StreamCoalescer_SLOTS];
+    uint16_t m_offsets[PABB2_StreamCoalescer_SLOTS];
 
-    uint8_t buffer[PABB2_StreamCoalescer_BUFFER_SIZE];
-} pabb2_StreamCoalescer;
+    uint8_t m_buffer[PABB2_StreamCoalescer_BUFFER_SIZE];
+};
 
 
-void pabb2_StreamCoalescer_init(pabb2_StreamCoalescer* self);
-static inline void pabb2_StreamCoalescer_reset(pabb2_StreamCoalescer* self){
-    pabb2_StreamCoalescer_init(self);
-    self->stream_reset = true;
+
+
+
+
+
+
+
+
 }
-
-uint16_t pabb2_StreamCoalescer_bytes_available(pabb2_StreamCoalescer* self);
-
-void pabb2_StreamCoalescer_push_packet(pabb2_StreamCoalescer* self, uint8_t seqnum);
-
-//  Returns true if the packet has been received and can be acked.
-bool pabb2_StreamCoalescer_push_stream(pabb2_StreamCoalescer* self, const pabb2_PacketHeaderData* packet);
-
-//
-//  Read data from the stream.
-//
-//  Returns the # of bytes actually read.
-//  Returns (size_t)-1 if the stream has been reset.
-//  Returning less than "max_bytes" indicates the stream is out of usable data.
-//
-size_t pabb2_StreamCoalescer_read(pabb2_StreamCoalescer* self, void* data, size_t max_bytes);
-
-
-
-
-#ifdef __cplusplus
 }
-#endif
 #endif

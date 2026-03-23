@@ -7,22 +7,18 @@
 #ifndef PokemonAutomation_PABotBase2_ConnectionLayer_ConnectionDebug_H
 #define PokemonAutomation_PABotBase2_ConnectionLayer_ConnectionDebug_H
 
+#include <cstddef>
 #include "PABotBase2_Connection.h"
-#include "PABotBase2_PacketSender.h"
-#include "PABotBase2_StreamCoalescer.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace PokemonAutomation{
+namespace PABotBase2{
 
-
-void pabb2_PacketHeader_print(const pabb2_PacketHeader* packet, bool ascii);
-void pabb2_PacketSender_print(const pabb2_PacketSender* self, bool ascii);
-void pabb2_StreamCoalescer_print(const pabb2_StreamCoalescer* self, bool ascii);
+void print_bytes(const void* data, size_t bytes, bool ascii);
+void PacketHeader_print(const PacketHeader* packet, bool ascii);
+bool PacketHeader_check(const PacketHeader* packet, bool ascii);
 
 
 
-#ifdef __cplusplus
 }
-#endif
+}
 #endif

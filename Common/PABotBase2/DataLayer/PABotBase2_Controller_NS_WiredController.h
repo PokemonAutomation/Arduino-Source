@@ -18,24 +18,22 @@
 #define PABB_PACK
 #endif
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace PokemonAutomation{
+namespace PABotBase2{
 
 
 
 #define PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE     0x90
-typedef struct{
+struct PABB_PACK pabb2_Message_Command_NS_WiredController_State{
     uint16_t milliseconds;
     pabb_NintendoSwitch_WiredController_State report;
-} PABB_PACK pabb2_Message_Command_NS_WiredController_State;
+};
 
 
 
-#ifdef __cplusplus
+
 }
-#endif
+}
 
 
 

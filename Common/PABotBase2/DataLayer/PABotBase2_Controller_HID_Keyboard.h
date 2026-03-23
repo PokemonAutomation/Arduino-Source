@@ -18,24 +18,22 @@
 #define PABB_PACK
 #endif
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace PokemonAutomation{
+namespace PABotBase2{
 
 
 
 #define PABB2_MESSAGE_CMD_HID_KEYBOARD_STATE            0x82
-typedef struct{
+struct PABB_PACK pabb2_Message_Command_HID_Keyboard_State{
     uint16_t milliseconds;
     pabb_HID_Keyboard_State report;
-} PABB_PACK pabb2_Message_Command_HID_Keyboard_State;
+};
 
 
 
-#ifdef __cplusplus
+
 }
-#endif
+}
 
 
 
