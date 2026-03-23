@@ -285,7 +285,6 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
                 continue;
             }else{
                 spin_leftright = !spin_leftright;
-                encounters_since_item_check++;
             }
 
             if (shiny_found && !IGNORE_SHINIES){
@@ -321,6 +320,7 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
                 out_of_pp = true;
             } else if (ret2 == 0){ // opponent fainted
                 stats.encounters++;
+                encounters_since_item_check++;
                 bool move_learned = exit_wild_battle(env.console, context, !!STOP_ON_MOVE_LEARN, !!PREVENT_EVOLUTION);
                 if (move_learned && STOP_ON_MOVE_LEARN){
                     send_program_status_notification(
