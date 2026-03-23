@@ -16,6 +16,8 @@
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
 #include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
@@ -267,17 +269,46 @@ void travel_to_pokemontower(SingleSwitchProgramEnvironment& env, ProControllerCo
 }
 
 void travel_to_surf_spot(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    open_fly_map_from_overworld(env.console, context);
-    fly_from_kanto_map(env.console, context, KantoFlyLocation::vermilioncity);
-    visit_pokecenter(env, context);
-    env.log("Walking to the shore and Surfing.");
-    // walk directly left to the shore
-    pbf_move_left_joystick(context, {-1, 0}, 5000ms, 200ms);
-    // mash A to start surfing
-    pbf_mash_button(context, BUTTON_A, 5000ms);
-    // move away from the shore a little bit
-    pbf_move_left_joystick(context, {-1, 0}, 500ms, 200ms);
-    context.wait_for_all_requests();
+    int errors = 0;
+    while (true){
+        if (errors > 3){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to surf 3 times in a row.",
+                env.console
+            );
+        }
+
+        open_fly_map_from_overworld(env.console, context);
+        fly_from_kanto_map(env.console, context, KantoFlyLocation::vermilioncity);
+        visit_pokecenter(env, context);
+        env.log("Walking to the shore and Surfing.");
+
+        WhiteDialogWatcher surf_dialog(COLOR_RED);
+
+        context.wait_for_all_requests();
+        int ret = run_until<ProControllerContext>(
+            env.console, context,
+            [](ProControllerContext& context) {
+                // walk up to counter and initiate dialog
+                ssf_press_left_joystick(context, {-1, 0}, 0ms, 10000ms);
+                ssf_mash1_button(context, BUTTON_A, 10000ms);
+            },
+            { surf_dialog }
+        );
+        if (ret < 0){
+            env.log("Failed to detect surf dialog");
+            errors++;
+            pbf_mash_button(context, BUTTON_B, 1000ms);
+            context.wait_for_all_requests();
+            continue;
+        }
+        pbf_mash_button(context, BUTTON_A, 2000ms);
+        // move away from the shore a little bit
+        pbf_move_left_joystick(context, {-1, 0}, 3000ms, 200ms);
+        context.wait_for_all_requests();
+        return;
+    }
 }
 
 void travel_to_route1(SingleSwitchProgramEnvironment& env, ProControllerContext& context){

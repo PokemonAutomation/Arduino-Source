@@ -450,7 +450,7 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
         if (errors > 5 || loops > 5){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Failed to exit battle.",
+                "exit_wild_battle(): Failed to exit battle.",
                 console
             );
         }
@@ -521,8 +521,7 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
             }else if (rejected_first_box) {
                 loops++;
                 console.log("Declined to learn new move.");
-                pbf_press_button(context, BUTTON_A, 200ms, 200ms);
-                pbf_mash_button(context, BUTTON_B, 2000ms);
+                pbf_press_button(context, BUTTON_A, 200ms, 0ms);
             }else{
                 pbf_press_button(context, BUTTON_B, 200ms, 0ms);
                 rejected_first_box = true;
@@ -553,7 +552,7 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
         if (errors > 5){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Failed to open party menu 5 times in a row.",
+                "open_party_menu_from_overworld(): Failed to open party menu 5 times in a row.",
                 console
             );
         }
@@ -607,7 +606,7 @@ void use_teleport_from_overworld(ConsoleHandle& console, ProControllerContext& c
         if (errors > 5){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Failed to use Teleport 5 times in a row.",
+                "use_teleport_from_overworld(): Failed to use Teleport 5 times in a row.",
                 console
             );
         }
@@ -668,7 +667,7 @@ void open_fly_map_from_overworld(ConsoleHandle& console, ProControllerContext& c
         if (errors > 5){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Failed to open Fly map 5 times in a row.",
+                "open_fly_map_from_overworld(): Failed to open Fly map 5 times in a row.",
                 console
             );
         }
@@ -727,7 +726,7 @@ void fly_from_kanto_map(ConsoleHandle& console, ProControllerContext& context, K
         if (errors > 5){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Failed to inititate Fly five times in a row.",
+                "fly_from_kanto_map(): Failed to inititate Fly five times in a row.",
                 console
             ); 
         }
@@ -792,7 +791,7 @@ void fly_from_kanto_map(ConsoleHandle& console, ProControllerContext& context, K
         default:
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Unimplemented Kanto fly target.",
+                "fly_from_kanto_map(): Unimplemented Kanto fly target.",
                 console
             );
         }
@@ -831,7 +830,7 @@ void enter_leave_pokecenter(ConsoleHandle& console, ProControllerContext& contex
         if (errors > 5){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                leave ? "Failed to exit PokeCenter." : "Failed to enter PokeCenter.",
+                leave ? "leave_pokecenter(): Failed to exit PokeCenter." : "enter_pokecenter(): Failed to enter PokeCenter.",
                 console
             );
         }
@@ -875,7 +874,7 @@ void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context){
         if (errors > 5) {
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Failed to initiate PokeCenter dialog.",
+                "heal_at_pokecenter(): Failed to initiate PokeCenter dialog.",
                 console
             );
         }
@@ -909,7 +908,8 @@ void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context){
 }
 
 int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftright, Seconds timeout){
-    BlackScreenWatcher battle_entered(COLOR_RED);
+    BlackScreenWatcher battle_triggered(COLOR_RED);
+    BattleDialogWatcher battle_entered(COLOR_RED);
 
     context.wait_for_all_requests();
     console.log("Starting grass spin.");
@@ -928,7 +928,7 @@ int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftr
                 }
             }
         },
-        { battle_entered }
+        { battle_triggered, battle_entered }
     );
     
     if (ret < 0){
