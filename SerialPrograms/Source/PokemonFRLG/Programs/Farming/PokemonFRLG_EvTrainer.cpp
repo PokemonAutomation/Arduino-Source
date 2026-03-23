@@ -501,6 +501,8 @@ void EvTrainer::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     EvTrainer_Descriptor::Stats& stats = env.current_stats<EvTrainer_Descriptor::Stats>();
 
+    home_black_border_check(env.console, context);
+
     bool shiny_found = false;
     bool failed_encounter = false;
 
