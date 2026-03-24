@@ -487,6 +487,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Recording/StreamHistoryTracker_SaveFrames.h
     Source/CommonFramework/Recording/StreamRecorder.cpp
     Source/CommonFramework/Recording/StreamRecorder.h
+    Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.cpp
+    Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.h
     Source/CommonFramework/ResourceDownload/ResourceDownloadRow.cpp
     Source/CommonFramework/ResourceDownload/ResourceDownloadRow.h
     Source/CommonFramework/ResourceDownload/ResourceDownloadTable.cpp

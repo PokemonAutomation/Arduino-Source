@@ -13,17 +13,6 @@
 namespace PokemonAutomation{
 
 
-enum class ResourceType{
-    ZIP_FILE,
-};
-struct DownloadedResource{
-    std::string resource_name;
-    std::optional<uint16_t> version_num;
-    ResourceType resource_type;
-    size_t size_compressed_bytes;
-    size_t size_decompressed_bytes;
-    std::string url;
-};
 
 class ResourceDownloadTable : public StaticTableOption{
 public:
@@ -44,9 +33,6 @@ private:
     AsyncTask m_worker;
 
 };
-
-
-
 
 
 

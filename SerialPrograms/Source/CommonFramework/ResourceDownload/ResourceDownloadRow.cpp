@@ -8,6 +8,7 @@
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Options/LabelCellOption.h"
+// #include "ResourceDownloadTable.h"
 #include "ResourceDownloadRow.h"
 
 #include <thread>
@@ -17,54 +18,6 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
-
-ResourceDownloadButton::~ResourceDownloadButton(){
-    m_worker1.wait_and_ignore_exceptions();
-    m_worker2.wait_and_ignore_exceptions();
-}
-
-
-ResourceDownloadButton::ResourceDownloadButton(ResourceDownloadRow& p_row)
-    : ConfigOptionImpl<ResourceDownloadButton>(LockMode::UNLOCK_WHILE_RUNNING)
-    , row(p_row)
-    , m_enabled(true)
-{}
-
-
-void ResourceDownloadButton::fetch_json(){
-    m_worker1 = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
-        [this]{ 
-            m_enabled = false;
-            std::this_thread::sleep_for(std::chrono::seconds(3));
-            cout << "Fetched json" << endl;
-
-            m_enabled = true;
-            emit json_fetch_finished();
-        }
-    );
-
-}
-
-
-void ResourceDownloadButton::run_download(){
-    m_worker2 = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
-        [this]{ 
-            m_enabled = false;
-            std::this_thread::sleep_for(std::chrono::seconds(7));
-            cout << "Done Download" << endl;
-            // show_update_box("Download", "Download", "Do you want to download?");
-
-            m_enabled = true;
-            emit download_finished();
-        }
-    );
-
-}
-
-ResourceDeleteButton::ResourceDeleteButton(ResourceDownloadRow& p_row)
-    : ConfigOptionImpl<ResourceDeleteButton>(LockMode::UNLOCK_WHILE_RUNNING)
-    , row(p_row)
-{}
 
 std::string resource_version_to_string(ResourceVersionStatus version){
     switch(version){
@@ -115,6 +68,85 @@ struct ResourceDownloadRow::Data{
 
 
 };
+
+
+ResourceDownloadButton::~ResourceDownloadButton(){
+    m_worker1.wait_and_ignore_exceptions();
+    m_worker2.wait_and_ignore_exceptions();
+}
+
+
+ResourceDownloadButton::ResourceDownloadButton(ResourceDownloadRow& p_row)
+    : ConfigOptionImpl<ResourceDownloadButton>(LockMode::UNLOCK_WHILE_RUNNING)
+    , row(p_row)
+    , m_enabled(true)
+{}
+
+
+void ResourceDownloadButton::fetch_remote_metadata(){
+    m_worker1 = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+        [this]{ 
+            m_enabled = false;
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+            cout << "Fetched json" << endl;
+            
+
+
+            m_enabled = true;
+            emit metadata_fetch_finished();
+        }
+    );
+
+}
+
+void ResourceDownloadButton::initialize_remote_metadata(){
+    DownloadedResourceMetadata corresponding_remote_metadata;
+    RemoteMetadataStatus status = RemoteMetadataStatus::NOT_AVAILABLE;
+    std::vector<DownloadedResourceMetadata> all_remote_metadata = remote_resource_download_list();
+    
+    std::string resource_name = row.m_data->m_resource_name.text();
+
+    for (DownloadedResourceMetadata remote_metadata : all_remote_metadata){
+        if (remote_metadata.resource_name == resource_name){
+            corresponding_remote_metadata = remote_metadata;
+            status = RemoteMetadataStatus::AVAILABLE;
+            break;
+        }
+    }
+
+    RemoteMetadata remote_metadata = {status, corresponding_remote_metadata};
+
+    m_remote_metadata = std::make_unique<RemoteMetadata>(remote_metadata);
+}
+
+ResourceDownloadButton::RemoteMetadata& ResourceDownloadButton::get_remote_metadata(){
+    // Only runs once per instance
+    std::call_once(init_flag, &ResourceDownloadButton::initialize_remote_metadata, this);
+    return *m_remote_metadata;
+}
+
+
+
+void ResourceDownloadButton::run_download(){
+    m_worker2 = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+        [this]{ 
+            m_enabled = false;
+            std::this_thread::sleep_for(std::chrono::seconds(7));
+            cout << "Done Download" << endl;
+            // show_update_box("Download", "Download", "Do you want to download?");
+
+            m_enabled = true;
+            emit download_finished();
+        }
+    );
+
+}
+
+ResourceDeleteButton::ResourceDeleteButton(ResourceDownloadRow& p_row)
+    : ConfigOptionImpl<ResourceDeleteButton>(LockMode::UNLOCK_WHILE_RUNNING)
+    , row(p_row)
+{}
+
 
 
 ResourceDownloadRow::~ResourceDownloadRow(){}

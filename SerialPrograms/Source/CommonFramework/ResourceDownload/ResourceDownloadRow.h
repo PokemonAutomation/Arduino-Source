@@ -12,7 +12,7 @@
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "Common/Cpp/Options/StaticTableOption.h"
-#include <optional>
+#include "ResourceDownloadHelpers.h"
 
 
 namespace PokemonAutomation{
@@ -26,11 +26,24 @@ public:
     ResourceDownloadButton(ResourceDownloadRow& p_row);
 
 signals:
-    void json_fetch_finished();
+    void metadata_fetch_finished();
     void download_finished();
 
 public:
-    void fetch_json();
+    enum class RemoteMetadataStatus{
+        UNINITIALIZED,
+        NOT_AVAILABLE,
+        AVAILABLE,
+    };
+    struct RemoteMetadata {
+        RemoteMetadataStatus status = RemoteMetadataStatus::UNINITIALIZED;
+        DownloadedResourceMetadata metadata;
+    };
+
+    // get the DownloadedResourceMetadata from the remote JSON, that corresponds to this button/row
+    void initialize_remote_metadata();
+    RemoteMetadata& get_remote_metadata();
+    void fetch_remote_metadata();
     void run_download();
     inline bool get_enabled(){ return m_enabled; }
     inline void set_enabled(bool enabled){ 
@@ -39,12 +52,16 @@ public:
 
 public:
     ResourceDownloadRow& row;
+    std::once_flag init_flag;
+    std::unique_ptr<RemoteMetadata> m_remote_metadata;
 
 private:
     bool m_enabled;  // button should be blocked during an active task. m_enabled is false when blocked
     AsyncTask m_worker1;
     AsyncTask m_worker2;
 
+    
+    
 
 };
 
@@ -55,14 +72,7 @@ public:
     ResourceDownloadRow& row;
 };
 
-enum class ResourceVersionStatus{
-    CURRENT,
-    OUTDATED, // still used, but newer version available
-    FUTURE_VERSION, // current version number is greater than the expected version number
-    NOT_APPLICABLE, // resource not downloaded locally, so can't get its version
-    // RETIRED, // no longer used
-    // BLANK, // not yet fetched version info from remote
-};
+
 
 class ResourceDownloadRow : public StaticTableRow{
 
