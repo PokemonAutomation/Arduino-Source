@@ -14,7 +14,7 @@
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
-#include "Common/PABotBase2/ConnectionLayer/PABotBase2_ReliableStreamConnectionFW.h"
+#include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2FW_ReliableStreamConnection.h"
 
 namespace PokemonAutomation{
 

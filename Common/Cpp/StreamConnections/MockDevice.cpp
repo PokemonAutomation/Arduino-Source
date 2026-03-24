@@ -6,7 +6,7 @@
 
 #include <string.h>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/PABotBase2/ConnectionLayer/PABotBase2_ConnectionDebug.h"
+#include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2_ConnectionDebug.h"
 #include "MockDevice.h"
 
 //  REMOVE
