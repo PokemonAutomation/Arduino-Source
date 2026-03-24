@@ -37,6 +37,8 @@
 #include "ControllerInput/ControllerInput.h"
 #include "Integrations/DiscordWebhook.h"
 #include "Windows/MainWindow.h"
+#include "Server/HTTP.h"
+#include "Server/WebSocket.h"
 
 #include <iostream>
 using std::cout;
@@ -190,6 +192,12 @@ int run_program(int argc, char *argv[]){
     w.show();
     w.raise(); // bring the window to front on macOS
     set_permissions(w);
+
+    Server::HTTPServer& httpServer = Server::HTTPServer::instance();
+    httpServer.start(8080);
+
+    Server::WSServer& wsServer = Server::WSServer::instance();
+    wsServer.start(8081);
 
     return application.exec();
 }
