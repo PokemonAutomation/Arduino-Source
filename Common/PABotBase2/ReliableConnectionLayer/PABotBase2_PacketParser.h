@@ -4,11 +4,11 @@
  *
  */
 
-#ifndef PokemonAutomation_PABotBase2_ConnectionLayer_PacketParser_H
-#define PokemonAutomation_PABotBase2_ConnectionLayer_PacketParser_H
+#ifndef PokemonAutomation_PABotBase2_ReliableConnectionLayer_PacketParser_H
+#define PokemonAutomation_PABotBase2_ReliableConnectionLayer_PacketParser_H
 
 #include "Common/Cpp/StreamConnections/PollingStreamConnections.h"
-#include "PABotBase2_Connection.h"
+#include "PABotBase2_PacketProtocol.h"
 
 #ifdef PABB2_SIZING_OVERRIDE
 #include "PABotBase2_Config.h"

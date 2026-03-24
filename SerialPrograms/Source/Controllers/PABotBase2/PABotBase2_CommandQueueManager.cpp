@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/StreamConnections/PABotBase2_MessageDumper.h"
+#include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "PABotBase2_CommandQueueManager.h"
 

@@ -7,7 +7,7 @@
 #include <string.h>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/StreamConnections/PABotBase2_MessageDumper.h"
+#include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/GlobalSettingsPanel.h"

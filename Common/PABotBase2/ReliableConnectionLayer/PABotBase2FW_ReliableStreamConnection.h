@@ -1,11 +1,11 @@
-/*  PABotBase2 Reliable Stream Connection (firmware-side)
+/*  PABotBase2 Reliable Stream Connection (FW)
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_PABotBase2_ConnectionLayer_ReliableStreamConnection_H
-#define PokemonAutomation_PABotBase2_ConnectionLayer_ReliableStreamConnection_H
+#ifndef PokemonAutomation_PABotBase2FW_ReliableStreamConnection_H
+#define PokemonAutomation_PABotBase2FW_ReliableStreamConnection_H
 
 #include "Common/Cpp/StreamConnections/PollingStreamConnections.h"
 #include "PABotBase2_PacketSender.h"

@@ -192,12 +192,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/SerialConnection/SerialConnectionWinAPI.h
     ../Common/Cpp/StreamConnections/MockDevice.cpp
     ../Common/Cpp/StreamConnections/MockDevice.h
-    ../Common/Cpp/StreamConnections/PABotBase2_MessageDumper.cpp
-    ../Common/Cpp/StreamConnections/PABotBase2_MessageDumper.h
     ../Common/Cpp/StreamConnections/PollingStreamConnections.h
     ../Common/Cpp/StreamConnections/PushingStreamConnections.h
-    ../Common/Cpp/StreamConnections/ReliableStreamConnection.cpp
-    ../Common/Cpp/StreamConnections/ReliableStreamConnection.h
     ../Common/Cpp/StreamConnections/StreamInterface.h
     ../Common/Cpp/Sockets/AbstractClientSocket.h
     ../Common/Cpp/Sockets/ClientSocket.cpp
@@ -290,21 +286,25 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/TimeQt.h
     ../Common/Qt/WidgetStackFixedAspectRatio.cpp
     ../Common/Qt/WidgetStackFixedAspectRatio.h
-    ../Common/PABotBase2/ConnectionLayer/PABotBase2_Connection.h
-    ../Common/PABotBase2/ConnectionLayer/PABotBase2_ConnectionDebug.cpp
-    ../Common/PABotBase2/ConnectionLayer/PABotBase2_ConnectionDebug.h
-    ../Common/PABotBase2/ConnectionLayer/PABotBase2_PacketParser.cpp
-    ../Common/PABotBase2/ConnectionLayer/PABotBase2_PacketParser.h
-    ../Common/PABotBase2/ConnectionLayer/PABotBase2_PacketSender.cpp
-    ../Common/PABotBase2/ConnectionLayer/PABotBase2_PacketSender.h
-    ../Common/PABotBase2/ConnectionLayer/PABotBase2_ReliableStreamConnectionFW.cpp
-    ../Common/PABotBase2/ConnectionLayer/PABotBase2_ReliableStreamConnectionFW.h
-    ../Common/PABotBase2/ConnectionLayer/PABotBase2_StreamCoalescer.cpp
-    ../Common/PABotBase2/ConnectionLayer/PABotBase2_StreamCoalescer.h
-    ../Common/PABotBase2/DataLayer/PABotBase2_Controller_HID_Keyboard.h
-    ../Common/PABotBase2/DataLayer/PABotBase2_Controller_NS_WiredController.h
-    ../Common/PABotBase2/DataLayer/PABotBase2_Controller_NS1_OemController.h
-    ../Common/PABotBase2/DataLayer/PABotBase2_MessageProtocol.h
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_ConnectionDebug.cpp
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_ConnectionDebug.h
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketParser.cpp
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketParser.h
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketProtocol.h
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketSender.cpp
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketSender.h
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_StreamCoalescer.cpp
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_StreamCoalescer.h
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2CC_ReliableStreamConnection.cpp
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2CC_ReliableStreamConnection.h
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2FW_ReliableStreamConnection.cpp
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2FW_ReliableStreamConnection.h
+    ../Common/PABotBase2/Controllers/PABotBase2_Controller_HID_Keyboard.h
+    ../Common/PABotBase2/Controllers/PABotBase2_Controller_NS_WiredController.h
+    ../Common/PABotBase2/Controllers/PABotBase2_Controller_NS1_OemController.h
+    ../Common/PABotBase2/PABotBase2CC_MessageDumper.cpp
+    ../Common/PABotBase2/PABotBase2CC_MessageDumper.h
+    ../Common/PABotBase2/PABotBase2_MessageProtocol.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_HID_Keyboard.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS1_OemControllers.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS_WiredController.h

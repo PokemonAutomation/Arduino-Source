@@ -14,7 +14,7 @@
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/StreamConnections/PushingStreamConnections.h"
-#include "Common/PABotBase2/DataLayer/PABotBase2_MessageProtocol.h"
+#include "Common/PABotBase2/PABotBase2_MessageProtocol.h"
 #include "Controllers/ControllerTypes.h"
 #include "PABotBase2_CommandQueueManager.h"
 

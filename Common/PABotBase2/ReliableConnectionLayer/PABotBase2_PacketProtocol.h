@@ -1,11 +1,11 @@
-/*  PABotBase2 Connection Protocol
+/*  PABotBase2 Packet Protocol
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_PABotBase2_ConnectionLayer_ConnectionProtocol_H
-#define PokemonAutomation_PABotBase2_ConnectionLayer_ConnectionProtocol_H
+#ifndef PokemonAutomation_PABotBase2_ReliableConnectionLayer_PacketProtocol_H
+#define PokemonAutomation_PABotBase2_ReliableConnectionLayer_PacketProtocol_H
 
 #include <stdbool.h>
 #include <stdint.h>

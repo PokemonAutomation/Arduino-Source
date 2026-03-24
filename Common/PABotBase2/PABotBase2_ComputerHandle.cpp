@@ -16,7 +16,14 @@ namespace PABotBase2{
 
 
 
-void ComputerHandle::send_message_u32(uint8_t id, uint32_t data){
+void ComputerHandle::send_message_invalid_message(uint8_t id){
+    MessageHeader message;
+    message.message_bytes = sizeof(MessageHeader);
+    message.opcode = PABB2_MESSAGE_OPCODE_INVALID;
+    message.id = id;
+    data_connection.reliable_send(&message, message.message_bytes);
+}
+void ComputerHandle::send_message_u32(uint8_t id, const uint32_t& data){
     Message_u32 response;
     response.message_bytes = sizeof(Message_u32);
     response.opcode = PABB2_MESSAGE_OPCODE_RET_U32;
@@ -72,10 +79,13 @@ void ComputerHandle::process_completed_message(){
     case PABB2_MESSAGE_OPCODE_CQ_CAPACITY:
         send_message_u32(header->id, PABB2_CommandQueue_SLOTS);
         return;
-
     }
 
+    if (m_listener && m_listener->execute_message(header)){
+        return;
+    }
 
+    send_message_invalid_message(header->id);
 }
 
 

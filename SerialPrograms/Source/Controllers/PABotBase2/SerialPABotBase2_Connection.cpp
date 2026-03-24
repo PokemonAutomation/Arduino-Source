@@ -7,7 +7,7 @@
 #include <QSerialPortInfo>
 #include <QMessageBox>
 #include "Common/Cpp/PanicDump.h"
-#include "Common/PABotBase2/ConnectionLayer/PABotBase2_Connection.h"
+#include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketProtocol.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
@@ -44,6 +44,12 @@ SerialPABotBase2_Connection::~SerialPABotBase2_Connection(){
 }
 
 
+
+ControllerType SerialPABotBase2_Connection::refresh_controller_type(){
+    ControllerType ret = m_device->refresh_controller_type();
+    m_current_controller.store(ret, std::memory_order_release);
+    return ret;
+}
 
 
 bool SerialPABotBase2_Connection::open_serial_port(){
@@ -100,7 +106,7 @@ bool SerialPABotBase2_Connection::open_serial_connection(){
         m_logger.log(text);
         set_status_line0(text, COLOR_DARKGREEN);
     }
-    m_stream_connection = std::make_unique<ReliableStreamConnection>(
+    m_stream_connection = std::make_unique<PABotBase2::ReliableStreamConnection>(
         static_cast<CancellableScope*>(this),
         m_logger, GlobalSettings::instance().LOG_EVERYTHING,
         GlobalThreadPools::unlimited_realtime(),
@@ -141,7 +147,7 @@ bool SerialPABotBase2_Connection::open_serial_connection(){
 
     return true;
 }
-bool SerialPABotBase2_Connection::open_device_connection(){
+bool SerialPABotBase2_Connection::open_device_connection(bool set_to_null_controller){
     {
         std::string text = "Querying device...";
         m_logger.log(text);
@@ -164,10 +170,23 @@ bool SerialPABotBase2_Connection::open_device_connection(){
     );
 
 
-//    //  Current Controller
-//    ControllerType current_controller = refresh_controller_type();
+    //  Current Controller
+    ControllerType current_controller = refresh_controller_type();
 
-    //  TODO
+    if (set_to_null_controller && current_controller != ControllerType::None){
+        PABotBase2::MessageHeader request;
+        request.message_bytes = sizeof(request);
+        request.opcode = PABB_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE;
+        m_device->send_request(request);
+
+#if 0
+        m_botbase->issue_request_and_wait(
+            DeviceRequest_change_controller_mode(PABB_CID_NONE),
+            nullptr
+        );
+#endif
+        refresh_controller_type();
+    }
 
     return true;
 }
@@ -179,7 +198,7 @@ void SerialPABotBase2_Connection::connect_thread_body(bool set_to_null_controlle
         if (!open_serial_connection()){
             return;
         }
-        if (!open_device_connection()){
+        if (!open_device_connection(set_to_null_controller)){
             return;
         }
         declare_ready();

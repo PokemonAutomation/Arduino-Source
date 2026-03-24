@@ -16,18 +16,41 @@ namespace PokemonAutomation{
 namespace PABotBase2{
 
 
+
 class ComputerHandle{
 public:
-    ComputerHandle(ReliableStreamConnectionPolling& connection)
+    struct Listener{
+        virtual bool execute_message(const MessageHeader* header) = 0;
+    };
+
+
+public:
+    ComputerHandle(
+        ReliableStreamConnectionPolling& connection,
+        Listener* listener = nullptr
+    )
         : m_connection(connection)
+        , m_listener(listener)
         , m_index(0)
     {}
+    void set_listener(Listener* listener){
+        m_listener = listener;
+    }
 
     //  Returns true if there may be more work to do.
     bool run_events();
     void wait_for_event(uint16_t milliseconds){
         m_connection.wait_for_event(milliseconds);
     }
+
+
+public:
+    void send_message_invalid_message(uint8_t id);
+    void send_message_u32(uint8_t id, const uint32_t& data);
+    void send_message_data(
+        uint8_t opcode, uint8_t id,
+        uint16_t bytes, const void* data
+    );
 
 
 public:
@@ -46,11 +69,6 @@ public:
 
 
 private:
-    void send_message_u32(uint8_t id, uint32_t data);
-    void send_message_data(
-        uint8_t opcode, uint8_t id,
-        uint16_t bytes, const void* data
-    );
     void send_message_u32_data(
         uint8_t opcode, uint8_t id,
         const uint32_t& u32,
@@ -61,6 +79,7 @@ private:
 
 private:
     ReliableStreamConnectionPolling& m_connection;
+    Listener* m_listener = nullptr;
 
     uint8_t m_index;
     char m_buffer[PABB2_MAX_INCOMING_MESSAGE_SIZE];

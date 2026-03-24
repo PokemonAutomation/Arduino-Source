@@ -6,7 +6,7 @@
 
 //#include <stdio.h>
 #include "PABotBase2_ConnectionDebug.h"
-#include "PABotBase2_ReliableStreamConnectionFW.h"
+#include "PABotBase2FW_ReliableStreamConnection.h"
 
 //#include <iostream>
 //using std::cout;

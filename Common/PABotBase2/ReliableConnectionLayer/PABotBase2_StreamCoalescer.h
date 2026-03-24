@@ -4,10 +4,10 @@
  *
  */
 
-#ifndef PokemonAutomation_PABotBase2_ConnectionLayer_StreamCoalescer_H
-#define PokemonAutomation_PABotBase2_ConnectionLayer_StreamCoalescer_H
+#ifndef PokemonAutomation_PABotBase2_ReliableConnectionLayer_StreamCoalescer_H
+#define PokemonAutomation_PABotBase2_ReliableConnectionLayer_StreamCoalescer_H
 
-#include "PABotBase2_Connection.h"
+#include "PABotBase2_PacketProtocol.h"
 
 #ifdef PABB2_SIZING_OVERRIDE
 #include "PABotBase2_Config.h"
