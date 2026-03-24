@@ -10,13 +10,42 @@
 #include <memory>
 #include <deque>
 #include <mutex>
+#include <QBuffer>
+#include <QImage>
+#include <QVideoFrame>
 #include "Common/Cpp/EventRateTracker.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Watchdog.h"
 #include "VideoSourceDescriptor.h"
 #include "VideoSource.h"
+#include "Backends/VideoFrameQt.h"
 
 namespace PokemonAutomation{
+
+inline QByteArray frame_to_jpeg(const VideoFrame& vf)
+{
+    QVideoFrame qvf = vf.frame;
+
+    // Map frame for reading
+    if (!qvf.map(QVideoFrame::ReadOnly)){
+        return {};
+    }
+
+    // Convert to QImage
+    QImage img = qvf.toImage();
+    qvf.unmap();
+
+    if (img.isNull()){
+        return {};
+    }
+
+    // Encode to JPEG
+    QByteArray byteArray;
+    QBuffer buffer(&byteArray);
+    buffer.open(QIODevice::WriteOnly);
+    img.save(&buffer, "JPEG");
+    return byteArray;
+}
 
 
 class VideoSession

@@ -11,6 +11,7 @@
 #include "Backends/VideoFrameQt.h"
 #include "VideoSources/VideoSource_Null.h"
 #include "VideoSession.h"
+#include "CommonFramework/Server/WebSocket.h"
 
 //#include <iostream>
 //using std::cout;
@@ -338,6 +339,8 @@ void VideoSession::on_frame(std::shared_ptr<const VideoFrame> frame){
         m_fps_tracker_source.push_event(frame->timestamp);
     }
     global_watchdog().delay(*this);
+    QByteArray frameData = frame_to_jpeg(*frame);
+    Server::WSServer::instance().send_binary(frameData);
 }
 void VideoSession::on_rendered_frame(WallClock timestamp){
     WriteSpinLock lg(m_fps_lock);
