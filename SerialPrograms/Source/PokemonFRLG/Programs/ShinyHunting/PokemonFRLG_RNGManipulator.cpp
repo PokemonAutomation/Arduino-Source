@@ -167,11 +167,15 @@ void hard_reset(ProControllerContext& context){
     // press A to select game
     pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
     // press A to select profile and launch the game
-    pbf_press_button(context, BUTTON_A, 200ms, 0ms);
+    pbf_press_button(context, BUTTON_A, 50ms, 1000ms);
+    // return to HOME menu and wait a moment
+    pbf_press_button(context, BUTTON_HOME, 125ms, 2000ms);
+    // open game
+    pbf_press_button(context, BUTTON_A, 125ms, 0ms);
 }
 
 void soft_reset(ProControllerContext& context){
-    pbf_press_button(context, BUTTON_B | BUTTON_A | BUTTON_X | BUTTON_Y, 200ms, 0ms);
+    pbf_press_button(context, BUTTON_B | BUTTON_A | BUTTON_X | BUTTON_Y, 125ms, 0ms);
 }
 
 uint64_t wait_for_copyright_text(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
