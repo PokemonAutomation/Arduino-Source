@@ -9,11 +9,12 @@
 
 #include <QWidget>
 #include "Common/Qt/Options/ConfigWidget.h"
-#include "ResourceDownloadTable.h"
+// #include "ResourceDownloadTable.h"
+#include "ResourceDownloadRow.h"
 
 namespace PokemonAutomation{
 
-class ResourceDownloadButton;
+// class ResourceDownloadButton;
 
 class DownloadButtonWidget : public QWidget, public ConfigWidget{
 public:

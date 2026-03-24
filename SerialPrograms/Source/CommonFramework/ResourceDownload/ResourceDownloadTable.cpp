@@ -5,12 +5,12 @@
  */
 
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Logging/Logger.h"
+// #include "CommonFramework/Logging/Logger.h"
 // #include "CommonFramework/Tools/GlobalThreadPools.h"
-#include "CommonFramework/Tools/FileDownloader.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "Common/Cpp/Json/JsonArray.h"
-#include "Common/Cpp/Json/JsonObject.h"
+// #include "CommonFramework/Tools/FileDownloader.h"
+// #include "CommonFramework/Exceptions/OperationFailedException.h"
+// #include "Common/Cpp/Json/JsonArray.h"
+// #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Filesystem.h"
 #include "ResourceDownloadRow.h"
 #include "ResourceDownloadTable.h"
@@ -85,7 +85,7 @@ std::vector<std::string> ResourceDownloadTable::make_header() const{
 // }
 
 void ResourceDownloadTable::add_resource_download_rows(){
-    for (auto& row_ptr : m_resource_rows){
+    for (std::unique_ptr<ResourceDownloadRow>& row_ptr : m_resource_rows){
         add_row(row_ptr.get());
     }
 }

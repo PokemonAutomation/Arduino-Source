@@ -8,11 +8,12 @@
 #define PokemonAutomation_ResourceDownloadTable_H
 
 #include "Common/Cpp/Concurrency/AsyncTask.h"
-#include "ResourceDownloadRow.h"
+#include "Common/Cpp/Options/StaticTableOption.h"
+// #include "ResourceDownloadRow.h"
 
 namespace PokemonAutomation{
 
-
+class ResourceDownloadRow;
 
 class ResourceDownloadTable : public StaticTableOption{
 public:
