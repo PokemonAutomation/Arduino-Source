@@ -54,14 +54,14 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
         this, [this](){
             m_value.set_enabled(false);
             update_enabled_status();
-            m_value.fetch_json();
+            m_value.fetch_remote_metadata();
         }
     );
 
     // when json has been fetched, open the update box. 
     // When click Ok in update box, start the download. If click cancel, re-enable the download button
     connect(
-        &m_value, &ResourceDownloadButton::json_fetch_finished,
+        &m_value, &ResourceDownloadButton::metadata_fetch_finished,
         this, [this](){
             show_download_confirm_box("Download", "Download", "body");
         }
