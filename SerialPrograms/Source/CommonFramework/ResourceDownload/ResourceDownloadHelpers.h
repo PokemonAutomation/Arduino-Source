@@ -40,8 +40,8 @@ enum class ResourceVersionStatus{
     // BLANK, // not yet fetched version info from remote
 };
 
-std::vector<DownloadedResourceMetadata> local_resource_download_list();
-std::vector<DownloadedResourceMetadata> remote_resource_download_list();
+const std::vector<DownloadedResourceMetadata>& local_resource_download_list();
+const std::vector<DownloadedResourceMetadata>& remote_resource_download_list();
 uint16_t get_resource_version_num(Filesystem::Path folder_path);
 ResourceVersionStatus get_version_status(uint16_t expected_version_num, std::optional<uint16_t> current_version_num);
 

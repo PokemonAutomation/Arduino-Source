@@ -31,11 +31,12 @@ private:
     void update_enabled_status();
     void show_download_confirm_box(
         const std::string& title,
-        const std::string& header,
         const std::string& message_body
     );
     
 };
+
+void show_error_box(std::string function_name);
 
 
 class DeleteButtonWidget : public ConfigWidget{

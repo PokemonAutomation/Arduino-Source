@@ -63,15 +63,15 @@ std::vector<DownloadedResourceMetadata> deserialize_resource_list_json(const Jso
 
         }
 
-    }catch (ParseException& e){
-        throw ParseException(e.message() + "\nJSON parsing error. Given JSON file doesn't match the expected format.");
+    }catch (ParseException&){
+        throw ParseException("JSON parsing error. Given JSON file doesn't match the expected format.");
     }
 
     return resources;
 }
 
 
-std::vector<DownloadedResourceMetadata> local_resource_download_list(){
+const std::vector<DownloadedResourceMetadata>& local_resource_download_list(){
 	static std::vector<DownloadedResourceMetadata> local_resources = deserialize_resource_list_json(load_json_file(RESOURCE_PATH() + "ResourceDownloadList.json"));
 
 	return local_resources;
@@ -99,7 +99,7 @@ const JsonValue& remote_resource_download_list_json(){
     return json;
 }
 
-std::vector<DownloadedResourceMetadata> remote_resource_download_list(){
+const std::vector<DownloadedResourceMetadata>& remote_resource_download_list(){
 	static std::vector<DownloadedResourceMetadata> remote_resources = deserialize_resource_list_json(remote_resource_download_list_json());
 
 	return remote_resources;
