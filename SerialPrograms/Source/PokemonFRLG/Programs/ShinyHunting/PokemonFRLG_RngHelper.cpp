@@ -253,7 +253,7 @@ void collect_starter_after_delay(SingleSwitchProgramEnvironment& env, ProControl
     if (INGAME_DELAY < 7500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Starters: the in-game delay cannot be less than 7500ms (450 frames). Check your in-game advances calibration.",
+            "Starters: the in-game delay cannot be less than 7500ms (900 frames). Check your in-game advances calibration.",
             env.console
         );
     }
@@ -275,7 +275,7 @@ void collect_magikarp_after_delay(SingleSwitchProgramEnvironment& env, ProContro
     if (INGAME_DELAY < 7500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Magikarp: the in-game delay cannot be less than 7500ms (450 frames). Check your in-game advances calibration.",
+            "Magikarp: the in-game delay cannot be less than 7500ms (900 frames). Check your in-game advances calibration.",
             env.console
         );
     }
@@ -295,7 +295,7 @@ void collect_hitmon_after_delay(SingleSwitchProgramEnvironment& env, ProControll
     if (INGAME_DELAY < 4500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Hitmonchan/Hitmonlee: the in-game delay cannot be less than 4500ms (270 frames). Check your in-game advances calibration.",
+            "Hitmonchan/Hitmonlee: the in-game delay cannot be less than 4500ms (540 frames). Check your in-game advances calibration.",
             env.console
         );
     }
@@ -313,7 +313,7 @@ void collect_eevee_after_delay(SingleSwitchProgramEnvironment& env, ProControlle
     if (INGAME_DELAY < 4000){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Eevee: the in-game delay cannot be less than 4000ms (240 frames). Check your in-game advances calibration.",
+            "Eevee: the in-game delay cannot be less than 4000ms (480 frames). Check your in-game advances calibration.",
             env.console
         );
     }
@@ -331,7 +331,7 @@ void collect_lapras_after_delay(SingleSwitchProgramEnvironment& env, ProControll
     if (INGAME_DELAY < 7500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Lapras: the in-game delay cannot be less than 7500ms (450 frames). Check your in-game advances calibration.",
+            "Lapras: the in-game delay cannot be less than 7500ms (900 frames). Check your in-game advances calibration.",
             env.console
         );
     }
@@ -351,7 +351,7 @@ void collect_fossil_after_delay(SingleSwitchProgramEnvironment& env, ProControll
     if (INGAME_DELAY < 6000){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Fossils: the in-game delay cannot be less than 6000ms (360 frames). Check your in-game advances calibration.",
+            "Fossils: the in-game delay cannot be less than 6000ms (720 frames). Check your in-game advances calibration.",
             env.console
         );
     }
@@ -370,7 +370,7 @@ void collect_gamecorner_after_delay(SingleSwitchProgramEnvironment& env, ProCont
     if (INGAME_DELAY < 8500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Game Corner: the in-game delay cannot be less than 8500ms (510 frames). Check your in-game advances calibration.",
+            "Game Corner: the in-game delay cannot be less than 8500ms (1020 frames). Check your in-game advances calibration.",
             env.console
         );
     }
@@ -398,7 +398,7 @@ void encounter_static_after_delay(SingleSwitchProgramEnvironment& env, ProContro
     if (INGAME_DELAY < 4000){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Static: the in-game delay cannot be less than 4000ms (240 frames). Check your in-game advances calibration.",
+            "Static: the in-game delay cannot be less than 4000ms (480 frames). Check your in-game advances calibration.",
             env.console
         );
     }
@@ -414,7 +414,7 @@ void encounter_snorlax_after_delay(SingleSwitchProgramEnvironment& env, ProContr
     if (INGAME_DELAY < 16000){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Snorlax: the in-game delay cannot be less than 16000ms (960 frames). Check your in-game advances calibration.",
+            "Snorlax: the in-game delay cannot be less than 16000ms (1920 frames). Check your in-game advances calibration.",
             env.console
         );
     }
@@ -445,7 +445,7 @@ void use_sweet_scent(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     if (INGAME_DELAY < 8500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Sweet Scent: the in-game delay cannot be less than 8500ms (510 frames). Check your in-game advances calibration.",
+            "Sweet Scent: the in-game delay cannot be less than 8500ms (1020 frames). Check your in-game advances calibration.",
             env.console
         );
     }
@@ -467,7 +467,7 @@ void use_registered_fishing_rod(SingleSwitchProgramEnvironment& env, ProControll
     if (INGAME_DELAY < 5500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Fishing: the in-game delay cannot be less than 5500ms (330 frames). Check your in-game advances calibration.",
+            "Fishing: the in-game delay cannot be less than 5500ms (660 frames). Check your in-game advances calibration.",
             env.console
         );
     }
