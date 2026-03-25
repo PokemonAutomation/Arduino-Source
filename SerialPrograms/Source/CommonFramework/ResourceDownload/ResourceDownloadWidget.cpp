@@ -54,7 +54,7 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
         this, [this](){
             m_value.set_enabled(false);
             update_enabled_status();
-            m_value.fetch_remote_metadata();
+            m_value.ensure_remote_metadata_loaded();
         }
     );
 
@@ -62,8 +62,8 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
     // When click Ok in update box, start the download. If click cancel, re-enable the download button
     connect(
         &m_value, &ResourceDownloadButton::metadata_fetch_finished,
-        this, [this](){
-            show_download_confirm_box("Download", "Download", "body");
+        this, [this](std::string predownload_warning){
+            show_download_confirm_box("Download", predownload_warning);
         }
     );
 
@@ -71,6 +71,17 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
     connect(
         &m_value, &ResourceDownloadButton::download_finished,
         this, &DownloadButtonWidget::update_enabled_status
+    );
+
+    // if the thread catches an exception, show an error box
+    // since exceptions can't bubble up as usual
+    connect(
+        &m_value, &ResourceDownloadButton::exception_caught,
+        this, [this](std::string function_name){
+            m_value.set_enabled(true);
+            update_enabled_status();
+            show_error_box(function_name);
+        }
     );
 }
 
@@ -88,7 +99,6 @@ void DownloadButtonWidget::update_enabled_status(){
 
 void DownloadButtonWidget::show_download_confirm_box(
     const std::string& title,
-    const std::string& header,
     const std::string& message_body
 ){
     QMessageBox box;
@@ -99,7 +109,7 @@ void DownloadButtonWidget::show_download_confirm_box(
 //    cout << "skip = " << skip << endl;
 
     box.setTextFormat(Qt::RichText);
-    std::string text = header + "<br>";
+    std::string text = message_body;
     // text += make_text_url(link_url, link_text);
     // text += get_changes(node);
 
@@ -124,6 +134,14 @@ void DownloadButtonWidget::show_download_confirm_box(
         update_enabled_status();
         return;
     }
+}
+
+void show_error_box(std::string function_name){
+    std::cerr << "Error: Exception thrown in thread. From " + function_name + ". Report this as a bug." << std::endl;
+    QMessageBox box;
+    box.warning(nullptr, "Error:",
+        QString::fromStdString("Error: Exception thrown in thread. From " + function_name + ". Report this as a bug."));
+
 }
 
 

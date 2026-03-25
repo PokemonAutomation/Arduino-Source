@@ -26,7 +26,8 @@ public:
     ResourceDownloadButton(ResourceDownloadRow& p_row);
 
 signals:
-    void metadata_fetch_finished();
+    void metadata_fetch_finished(std::string popup_message);
+    void exception_caught(std::string function_name);
     void download_finished();
 
 public:
@@ -42,8 +43,11 @@ public:
 
     // get the DownloadedResourceMetadata from the remote JSON, that corresponds to this button/row
     void initialize_remote_metadata();
-    RemoteMetadata& get_remote_metadata();
-    void fetch_remote_metadata();
+    RemoteMetadata& fetch_remote_metadata();
+    DownloadedResourceMetadata get_local_metadata();
+    void ensure_remote_metadata_loaded();
+    std::string predownload_warning_summary(RemoteMetadata& remote_metadata);
+
     void run_download();
     inline bool get_enabled(){ return m_enabled; }
     inline void set_enabled(bool enabled){ 
@@ -57,6 +61,7 @@ public:
 
 private:
     bool m_enabled;  // button should be blocked during an active task. m_enabled is false when blocked
+    DownloadedResourceMetadata m_local_metadata;
     AsyncTask m_worker1;
     AsyncTask m_worker2;
 
