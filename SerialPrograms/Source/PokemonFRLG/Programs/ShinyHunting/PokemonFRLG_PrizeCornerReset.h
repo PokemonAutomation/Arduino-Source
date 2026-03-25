@@ -40,6 +40,8 @@ private:
 
     IntegerEnumDropdownOption SLOT;
 
+    SimpleIntegerOption<uint32_t> NUM_REDEEM;
+
     BooleanCheckBoxOption TAKE_VIDEO;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

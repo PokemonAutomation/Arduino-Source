@@ -67,6 +67,14 @@ PrizeCornerReset::PrizeCornerReset()
         LockMode::LOCK_WHILE_RUNNING,
         0
     )
+    , NUM_REDEEM(
+        "<b>Number of redemptions:</b><br>How many times to redeem a prize per reset. "
+        "Make sure your party has enough room, and that you have enough coins for multiple redemptions."
+        "<br> ex. When buying 3 Dratini (2,800 * 3 = 8,400 coins) in FireRed, have a party of 3, with 3 open slots. "
+        "This cannot be done in LeafGreen, as Dratini costs more, so the max there would be 2 Dratini (4,600 * 2 = 9,200 coins) and your party size would be 4, with 2 open slots.",
+        LockMode::LOCK_WHILE_RUNNING,
+        1, 1, 5
+    )
     , TAKE_VIDEO("<b>Take Video:</b><br>Record a video when the shiny is found.", LockMode::UNLOCK_WHILE_RUNNING, true)
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_SHINY(
@@ -82,6 +90,7 @@ PrizeCornerReset::PrizeCornerReset()
     })
 {
     PA_ADD_OPTION(SLOT);
+    PA_ADD_OPTION(NUM_REDEEM);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -155,34 +164,51 @@ void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControlle
     bool shiny_found = false;
 
     while (!shiny_found){
-        obtain_prize(env, context);
+        for (uint16_t i = 0; i < NUM_REDEEM; i++){
+            env.log("Obtaining prize.");
+            obtain_prize(env, context);
+        }
         stats.errors += open_slot_six(env.console, context);
         env.update_stats();
 
-        VideoSnapshot screen = env.console.video().snapshot();
+        env.log("Checking prizes.");
+        for (uint16_t i = 0; i < NUM_REDEEM; i++){
+            VideoSnapshot screen = env.console.video().snapshot();
 
-        ShinySymbolDetector shiny_checker(COLOR_YELLOW);
-        shiny_found = shiny_checker.read(env.console.logger(), screen);
+            ShinySymbolDetector shiny_checker(COLOR_YELLOW);
+            bool check = shiny_checker.read(env.console.logger(), screen);
 
-        if (shiny_found){
-            env.log("Shiny found!");
-            stats.shinies++;
-            env.update_stats();
-            send_program_notification(
-                env,
-                NOTIFICATION_SHINY,
-                COLOR_YELLOW,
-                "Shiny found!",
-                {}, "",
-                screen,
-                true
-            );
-            if (TAKE_VIDEO){
-                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
+            if (check){
+                env.log("Shiny found!");
+                stats.shinies++;
+                env.update_stats();
+                send_program_notification(
+                    env,
+                    NOTIFICATION_SHINY,
+                    COLOR_YELLOW,
+                    "Shiny found!",
+                    {}, "",
+                    screen,
+                    true
+                );
+                if (TAKE_VIDEO){
+                    pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
+                }
+                shiny_found = true;
+            }else{
+                env.log("Prize is not shiny.");
             }
-            break;
-        }else{
-            env.log("Prize is not shiny.");
+
+            if(i < NUM_REDEEM - 1) {
+                //Check the next pokemon
+                pbf_press_dpad(context, DPAD_UP, 320ms, 320ms);
+                pbf_wait(context, 1000ms);
+                context.wait_for_all_requests();
+            }
+        }
+
+        if (!shiny_found){
+            env.log("Out of Pokemon to check.");
             env.log("Soft resetting.");
             send_program_status_notification(
                 env, NOTIFICATION_STATUS_UPDATE,
