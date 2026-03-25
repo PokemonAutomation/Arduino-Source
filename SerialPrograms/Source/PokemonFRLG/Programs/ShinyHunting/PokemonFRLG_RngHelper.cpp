@@ -1,0 +1,720 @@
+/*  RNG Helper
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#include <cmath>
+#include "CommonTools/Random.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
+#include "Pokemon/Pokemon_Strings.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.h"
+#include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
+#include "PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h"
+#include "PokemonFRLG/PokemonFRLG_Navigation.h"
+#include "PokemonFRLG_RngHelper.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonFRLG{
+
+RngHelper_Descriptor::RngHelper_Descriptor()
+    : SingleSwitchProgramDescriptor(
+        "PokemonFRLG:RngHelper",
+        Pokemon::STRING_POKEMON + " FRLG", "RNG Helper",
+        "Programs/PokemonFRLG/RngHelper.html",
+        "Soft reset with specific timings for hitting a target Seed and Frame for RNG manipulation.",
+        ProgramControllerClass::StandardController_NoRestrictions,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
+    )
+{}
+
+struct RngHelper_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : resets(m_stats["Resets"])
+        , shinies(m_stats["Shinies"])
+        , errors(m_stats["Errors"])
+    {
+        m_display_order.emplace_back("Resets");
+        m_display_order.emplace_back("Shinies");
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+    }
+    std::atomic<uint64_t>& resets;
+    std::atomic<uint64_t>& shinies;
+    std::atomic<uint64_t>& errors;
+};
+std::unique_ptr<StatsTracker> RngHelper_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
+
+RngHelper::RngHelper()
+    : TARGET(
+        "<b>Target:</b><br>",
+        {
+            {Target::starters, "starters", "Bulbasaur / Squirtle / Charmander"},
+            {Target::magikarp, "magikarp", "Magikarp"},
+            {Target::hitmon, "hitmon", "Hitmonlee / Hitmonchan"},
+            {Target::eevee, "eevee", "Eevee"},
+            {Target::lapras, "lapras", "Lapras"},
+            {Target::fossils, "fossils", "Omanyte / Kabuto / Aerodactyl"},
+            {Target::gamecornerabra, "gamecornerabra", "Game Corner Abra"},
+            {Target::gamecornerclefairy, "gamecornerclefairy", "Game Corner Clefairy"},
+            {Target::gamecornerdratini, "gamecornerdratini", "Game Corner Dratini"},
+            {Target::gamecornerbug, "gamecornerbug", "Game Corner Bug (Scyther / Pinsir)"},
+            {Target::gamecornerporygon, "gamecornerporygon", "Game Corner Porygon"},
+            // {Target::togepi, "togepi", "Togepi"},
+            {Target::staticencounter, "staticencounter", "Static overworld encounters"},
+            {Target::snorlax, "snorlax", "Snorlax"},
+            // {Target::legendarybirds, "legendarybirds", "Articuno / Zapdos / Moltres"},
+            // {Target::mewtwo, "mewtwo", "Mewtwo"},
+            // {Target::hooh, "hooh", "Ho-oh"},
+            // {Target::hypno, "berryforesthypno", "Berry Forest Hypno"},
+            {Target::sweetscent, "sweetscent", "Sweet Scent"},
+            {Target::fishing, "fishing", "Fishing"},
+            // {Target::roaming, "roaming", "Roaming Legendaries"}
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        Target::starters
+    )    
+    , NUM_RESETS(
+        "<b>Max Resets:</b><br>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        1, 0 // default, min
+    )
+    , SEED_DELAY(
+        "<b>Seed Delay Time (ms):</b><br>The delay between starting the game and advancing past the title screen. Set this to match your target seed.",
+        LockMode::LOCK_WHILE_RUNNING,
+        35000, 28000 // default, min
+    )
+    , SEED_CALIBRATION(
+         "<b>Seed Calibration (ms):</b><br>Modifies the seed delay time.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0  // default
+    )
+    , LOAD_ADVANCES(
+        "<b>Load Screen Advances (frames):</b><br>The number of frames to advance before loading the game.<br>These pass at the \"normal\" rate compared to other consoles.",
+        LockMode::LOCK_WHILE_RUNNING,
+        1000, 200 // default, min
+    )
+    , LOAD_CALIBRATION(
+        "<b>Load Screen Advances Calibration (frames):</b><br>A \"fine adjustment\" that modifies the frame advances passed on the load screen.<br>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0 // default
+    )
+    , INGAME_ADVANCES(
+        "<b>In-Game Advances (frames):</b><br>The number of frames to advance before triggering the gift/encounter.<br>These pass at double the rate compared to other consoles, where every 2nd frame is skipped.<br><i>Warning: this needs to be long enough to accomodate all in-game button presses prior to the gift/encounter</i>",
+        LockMode::LOCK_WHILE_RUNNING,
+        12345, 700 // default, min
+    )
+    , INGAME_CALIBRATION(
+        "<b>In-Game Advances Calibration (frames):</b><br>A \"coarse adjustment\" that modifies the frame advances passed after loading the game.<br>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0 // default
+    )
+    , USE_COPYRIGHT_TEXT(
+        "<b>Detect Copyright Text:</b><br>Start the seed timer only after detecting the copyright text. Can be helpful for improving seed consistency.",
+        LockMode::LOCK_WHILE_RUNNING,
+        true // default
+    )
+    , USE_TEACHY_TV(
+        "<b>Use Teachy TV:</b><br>Opens the Teachy TV to quickly advance in-game frames at 313x speed.<br><i>Warning: can result in larger misses.</i>",
+        LockMode::LOCK_WHILE_RUNNING,
+        false // default
+    )
+    , TAKE_VIDEO(
+        "<b>Take Video:</b><br>Record a video when the shiny is found.", 
+        LockMode::LOCK_WHILE_RUNNING, 
+        true // default
+    )
+    , GO_HOME_WHEN_DONE(true)
+    , NOTIFICATION_SHINY(
+        "Shiny found",
+        true, true, ImageAttachmentMode::JPG,
+        {"Notifs", "Showcase"}
+    )
+    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATIONS({
+        &NOTIFICATION_SHINY,
+        &NOTIFICATION_STATUS_UPDATE,
+        &NOTIFICATION_PROGRAM_FINISH,
+    })
+{
+    PA_ADD_OPTION(TARGET);
+    PA_ADD_OPTION(NUM_RESETS);
+    PA_ADD_OPTION(SEED_DELAY);
+    PA_ADD_OPTION(SEED_CALIBRATION);
+    PA_ADD_OPTION(LOAD_ADVANCES);
+    PA_ADD_OPTION(LOAD_CALIBRATION);
+    PA_ADD_OPTION(INGAME_ADVANCES);
+    PA_ADD_OPTION(INGAME_CALIBRATION);
+    PA_ADD_OPTION(USE_COPYRIGHT_TEXT);
+    PA_ADD_OPTION(USE_TEACHY_TV);
+    PA_ADD_OPTION(TAKE_VIDEO);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(NOTIFICATIONS);
+}
+
+namespace{
+
+void hard_reset(ProControllerContext& context){
+    // close the game
+    pbf_press_button(context, BUTTON_HOME, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_Y, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
+    // press A to select game
+    pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
+    // press A to select profile and launch the game
+    pbf_press_button(context, BUTTON_A, 50ms, 150ms);
+    // return to HOME menu and wait a moment
+    pbf_press_button(context, BUTTON_HOME, 125ms, 2000ms);
+    // open game
+    pbf_press_button(context, BUTTON_A, 125ms, 0ms);
+}
+
+
+uint64_t wait_for_copyright_text(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    // wait for copyright text to appear
+    BlackScreenWatcher black_screen(COLOR_RED, ImageFloatBox {0.25, 0.25, 0.55, 0.55});
+    context.wait_for_all_requests();
+    WallClock start_time = current_time(); // immediately (more or less) after the button press to enter the game
+    int black_ret = wait_until(
+        env.console, context, 10000ms,
+        {black_screen},
+        1ms
+    );
+    if (black_ret < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Black screen not detected within 10 seconds of starting game.",
+            env.console
+        );
+    }
+    BlackScreenOverWatcher copyright_detected(COLOR_RED, ImageFloatBox {0.25, 0.25, 0.55, 0.55});
+    int ret = wait_until(
+        env.console, context, 10000ms,
+        {copyright_detected },
+        1ms
+    );
+    if (ret < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Black screen detected for more than 10 seconds after starting game.",
+            env.console
+        );
+    }
+    auto elapsed = current_time() - start_time; // when the copyright text appears
+    return std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+}
+
+void set_seed_after_delay(ProControllerContext& context, SimpleIntegerOption<uint64_t>& SEED_DELAY,  SimpleIntegerOption<int64_t>& SEED_CALIBRATION, int64_t& FIXED_SEED_OFFSET){
+    // wait on title screen for the specified delay
+    pbf_wait(context, std::chrono::milliseconds(SEED_DELAY + SEED_CALIBRATION + FIXED_SEED_OFFSET));
+    // hold A for a few seconds through the transition to the load screen
+    pbf_press_button(context, BUTTON_A, 3000ms, 0ms);
+}
+
+void load_game_after_delay(ProControllerContext& context, uint64_t& LOAD_DELAY){
+    pbf_wait(context, std::chrono::milliseconds(LOAD_DELAY - 3000));
+    pbf_press_button(context, BUTTON_A, 33ms, 1467ms);
+    // skip recap
+    pbf_press_button(context, BUTTON_B, 33ms, 2467ms);
+    // need to later subtract 4000ms from delay to hit desired number of advances
+}
+
+void wait_with_teachy_tv(ProControllerContext& context, uint64_t& TEACHY_DELAY){
+    // open start menu -> bag -> key items -> Teachy TV -> use
+    pbf_press_button(context, BUTTON_PLUS, 200ms, 300ms);
+    pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
+    pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
+    pbf_move_left_joystick(context, {+1, 0}, 200ms, 2300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(TEACHY_DELAY));
+    // close teachy tv -> close bag -> reset start menu cursor position - > close start menu
+    pbf_press_button(context, BUTTON_B, 200ms, 2300ms);
+    pbf_press_button(context, BUTTON_B, 200ms, 2300ms);
+    pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+    pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+    pbf_press_button(context, BUTTON_B, 200ms, 300ms);
+    // total non-teachy delay duration: 13700ms
+}
+
+void collect_starter_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+    if (INGAME_DELAY < 7500){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Starters: the in-game delay cannot be less than 7500ms (450 frames). Check your in-game advances calibration.",
+            env.console
+        );
+    }
+    // Advance through starter dialogue and wait on "really quite energetic!"
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(INGAME_DELAY - 7200)); // 4000ms + 3000ms + 200ms
+    // Finish dialogue (hits the target advance)
+    pbf_press_button(context, BUTTON_A, 200ms, 5800ms);
+    // Decline nickname
+    pbf_mash_button(context, BUTTON_B, 2500ms);
+    // Advance through rival choice
+    pbf_mash_button(context, BUTTON_B, 5000ms);
+    context.wait_for_all_requests();
+    env.log("Starter collected.");
+}
+
+void collect_magikarp_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+    if (INGAME_DELAY < 7500){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Magikarp: the in-game delay cannot be less than 7500ms (450 frames). Check your in-game advances calibration.",
+            env.console
+        );
+    }
+    // Advance through starter dialogue and wait on YES/NO
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(INGAME_DELAY - 7200)); // 4000ms + 3000ms + 200ms
+    // Finish dialogue (hits the target advance)
+    pbf_press_button(context, BUTTON_A, 200ms, 3800ms);
+    // Decline nickname
+    pbf_mash_button(context, BUTTON_B, 2000ms);
+    context.wait_for_all_requests();
+    env.log("Magikarp collected.");
+}
+
+void collect_hitmon_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+    if (INGAME_DELAY < 4500){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Hitmonchan/Hitmonlee: the in-game delay cannot be less than 4500ms (270 frames). Check your in-game advances calibration.",
+            env.console
+        );
+    }
+    // One dialog before accepting
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(INGAME_DELAY - 4200)); // 4000ms + 200ms
+    // Confirm selection
+    pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+    // Decline nickname
+    pbf_mash_button(context, BUTTON_B, 2000ms);
+    context.wait_for_all_requests();
+    env.log("Hitmonchan/Hitmonlee collected.");
+}
+
+void collect_eevee_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+    if (INGAME_DELAY < 4000){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Eevee: the in-game delay cannot be less than 4000ms (240 frames). Check your in-game advances calibration.",
+            env.console
+        );
+    }
+    // No dialogue to advance through -- just wait
+    pbf_wait(context, std::chrono::milliseconds(INGAME_DELAY - 4000));
+    // Interact with the pokeball
+    pbf_press_button(context, BUTTON_A, 200ms, 3800ms);
+    // Decline nickname
+    pbf_mash_button(context, BUTTON_B, 2000ms);
+    context.wait_for_all_requests();
+    env.log("Eevee collected.");
+}
+
+void collect_lapras_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+    if (INGAME_DELAY < 7500){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Lapras: the in-game delay cannot be less than 7500ms (450 frames). Check your in-game advances calibration.",
+            env.console
+        );
+    }
+    // 3 dialog presses
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(INGAME_DELAY - 7200)); // 4000ms + 3000ms + 200ms
+    // Accept Lapras on target frame
+    pbf_press_button(context, BUTTON_A, 200ms, 3800ms);
+    // Decline nickname and exit dialog
+    pbf_mash_button(context, BUTTON_B, 7500ms);
+    context.wait_for_all_requests();
+    env.log("Lapras collected.");
+}
+
+void collect_fossil_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+    if (INGAME_DELAY < 6000){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Fossils: the in-game delay cannot be less than 6000ms (360 frames). Check your in-game advances calibration.",
+            env.console
+        );
+    }
+    // 2 dialog presses
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(INGAME_DELAY - 5700)); // 4000ms + 1500ms + 200ms
+    // Advance dialog on target frame
+    pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
+    // Decline nickname
+    pbf_mash_button(context, BUTTON_B, 2000ms);
+    context.wait_for_all_requests();
+    env.log("Fossil Pokemon collected.");
+}
+
+void collect_gamecorner_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY, int SLOT){
+    if (INGAME_DELAY < 8500){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Game Corner: the in-game delay cannot be less than 8500ms (510 frames). Check your in-game advances calibration.",
+            env.console
+        );
+    }
+    // 2 dialog presses
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    // navigate to desired option
+    for (int i=0; i<SLOT; i++){
+        pbf_move_left_joystick(context, {0,-1}, 100ms, 300ms);
+    }
+    for (int i=SLOT; i<5; i++){
+        pbf_wait(context, 400ms);
+    }
+    // select option and wait on confirmation
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(INGAME_DELAY - 8200)); // 4000ms + 3000ms + (400ms * 5) + 200ms
+    // confirm prize
+    pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
+    // decline nickname
+    pbf_mash_button(context, BUTTON_B, 2000ms);
+    context.wait_for_all_requests();
+    env.log("Game corner prize collected.");
+}
+
+void encounter_static_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+    if (INGAME_DELAY < 4000){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Static: the in-game delay cannot be less than 4000ms (240 frames). Check your in-game advances calibration.",
+            env.console
+        );
+    }
+    // No dialogue to advance through -- just wait
+    pbf_wait(context, std::chrono::milliseconds(INGAME_DELAY - 4000));
+    // Interact with the static encounter
+    pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+    context.wait_for_all_requests();
+    env.log("Static encounter started.");
+}
+
+void encounter_snorlax_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+    if (INGAME_DELAY < 16000){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Snorlax: the in-game delay cannot be less than 16000ms (960 frames). Check your in-game advances calibration.",
+            env.console
+        );
+    }
+    // Interact with Snorlax, YES to PokeFlute, wait on "woke up!"
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 9800ms); // PokeFlute tune
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(INGAME_DELAY - 15700)); // 4000ms + 1500ms + 10000ms + 200ms
+    pbf_press_button(context, BUTTON_A, 200ms, 200ms); 
+    context.wait_for_all_requests();
+    env.log("Snorlax encounter started.");
+}
+
+void open_party_menu_from_overworld(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    pbf_press_button(context, BUTTON_PLUS, 200ms, 800ms);
+    int ret = move_cursor_to_position(env.console, context, SelectionArrowPositionStartMenu::POKEMON);
+    if (ret < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to navigate to POKEMON on the Start menu.",
+            env.console
+        ); 
+    }
+    pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+    context.wait_for_all_requests();
+}
+
+void use_sweet_scent(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+    if (INGAME_DELAY < 8500){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Sweet Scent: the in-game delay cannot be less than 8500ms (510 frames). Check your in-game advances calibration.",
+            env.console
+        );
+    }
+    // navigate to last party slot
+    pbf_press_button(context, BUTTON_PLUS, 200ms, 300ms);
+    pbf_move_left_joystick(context, {0, -1}, 200ms, 800ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
+    pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+    pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 300ms);
+    // hover over Sweet Scent (2nd option, but maybe HMs could change this)
+    pbf_move_left_joystick(context, {0, -1}, 200ms, std::chrono::milliseconds(INGAME_DELAY - 8400));
+    pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+    context.wait_for_all_requests();
+    env.log("Sweet Scent used.");
+}
+
+void use_registered_fishing_rod(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+    if (INGAME_DELAY < 5500){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Fishing: the in-game delay cannot be less than 5500ms (330 frames). Check your in-game advances calibration.",
+            env.console
+        );
+    }
+    // n
+    uint32_t rng_wait = 50 * random_u32(0, 20); // helps avoid always hitting "Not even a nibble" (?)
+    pbf_wait(context, std::chrono::milliseconds(rng_wait));
+    pbf_press_button(context, BUTTON_MINUS, 200ms, std::chrono::milliseconds(INGAME_DELAY - rng_wait - 4200));
+    pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+    context.wait_for_all_requests();
+}
+
+void go_to_starter_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    // Navigate to summary (1st party slot)
+    open_party_menu_from_overworld(env, context);
+    pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
+}
+
+bool shiny_check_starter_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    go_to_starter_summary(env, context);
+    context.wait_for_all_requests();
+    VideoSnapshot screen = env.console.video().snapshot();
+    ShinySymbolDetector shiny_checker(COLOR_YELLOW);
+    return shiny_checker.read(env.console.logger(), screen);
+}
+
+void go_to_sixth_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    // navigate to summary (last party slot)
+    open_party_menu_from_overworld(env, context);
+    pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+    pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+    // open summary
+    pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
+}
+
+bool shiny_check_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    go_to_sixth_summary(env, context);
+    context.wait_for_all_requests();
+    VideoSnapshot screen = env.console.video().snapshot();
+    ShinySymbolDetector shiny_checker(COLOR_YELLOW);
+    return shiny_checker.read(env.console.logger(), screen);
+}
+
+int watch_for_shiny_encounter(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    BlackScreenWatcher battle_entered(COLOR_RED);
+    context.wait_for_all_requests();
+    env.log("Wild encounter started.");
+    int ret = wait_until(
+        env.console, context, 10000ms,
+        {battle_entered}
+    );
+    if (ret < 0){
+        // OperationFailedException::fire(
+        //     ErrorReport::SEND_ERROR_REPORT,
+        //     "Failed to initiate encounter.",
+        //     env.console
+        // );
+        return -1;
+    }
+    bool encounter_shiny = handle_encounter(env.console, context, false);
+    return encounter_shiny ? 1 : 0;
+}
+
+} // namespace
+
+
+void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    /*
+    * Settings: Text Speed fast
+    */
+
+    RngHelper_Descriptor::Stats& stats = env.current_stats<RngHelper_Descriptor::Stats>();
+
+    bool shiny_found = false;
+
+    double FRAMERATE = 59.999977;       // FPS. from Dhruv (don't know original source)
+    double FRAME_DURATION = 1000 / FRAMERATE;
+
+    int64_t FIXED_SEED_OFFSET = USE_COPYRIGHT_TEXT ? -1700 : -800;  // milliseconds. approximate, might be console-specific (?)
+    int64_t FIXED_ADVANCES_OFFSET = 0;                              // frames
+
+    uint64_t LOAD_DELAY;
+    uint64_t INGAME_DELAY;
+    uint64_t TEACHY_DELAY;
+
+    while (!shiny_found){
+        double MODIFIED_INGAME_ADVANCES = INGAME_ADVANCES + FIXED_ADVANCES_OFFSET + INGAME_CALIBRATION;
+        uint64_t TEACHY_ADVANCES = 0;
+
+        bool should_use_teachy_tv = USE_TEACHY_TV && MODIFIED_INGAME_ADVANCES > 5000;
+        if (should_use_teachy_tv) {
+            TEACHY_ADVANCES = uint64_t((int)std::floor((MODIFIED_INGAME_ADVANCES - 5000) / 313) * 313);
+        }
+
+        LOAD_DELAY = uint64_t((LOAD_ADVANCES + LOAD_CALIBRATION) * FRAME_DURATION);
+        TEACHY_DELAY = uint64_t(TEACHY_ADVANCES * FRAME_DURATION / 313);
+        INGAME_DELAY = uint64_t((MODIFIED_INGAME_ADVANCES - TEACHY_ADVANCES) * FRAME_DURATION / 2) - (should_use_teachy_tv ? 13700 : 0);
+        env.log("Load screen delay: " + std::to_string(LOAD_DELAY) + "ms");
+        env.log("In-game delay: " + std::to_string(INGAME_DELAY) + "ms");
+        env.log("Teachy TV delay: " + std::to_string(TEACHY_DELAY) + "ms");
+        env.log("Total time: " + std::to_string(SEED_DELAY + SEED_CALIBRATION + FIXED_SEED_OFFSET + LOAD_DELAY + INGAME_DELAY + TEACHY_DELAY) + "ms");
+
+        if (SEED_DELAY + SEED_CALIBRATION + FIXED_SEED_OFFSET < 28000){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "The title screen delay cannot be less than 28000ms. Check your seed calibration.",
+                env.console
+            );
+        }
+        if (LOAD_DELAY < 3000){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "The load screen delay cannot be less than 3000ms (180 frames). Check your load screen calibration.",
+                env.console
+            );
+        }
+
+        hard_reset(context);
+
+        if (USE_COPYRIGHT_TEXT) {
+            uint64_t STARTUP_DELAY = wait_for_copyright_text(env, context);
+            env.log("Startup delay: " + std::to_string(STARTUP_DELAY) + "ms");
+        }
+
+        set_seed_after_delay(context, SEED_DELAY, SEED_CALIBRATION, FIXED_SEED_OFFSET);
+        load_game_after_delay(context, LOAD_DELAY);
+        if (should_use_teachy_tv){
+            wait_with_teachy_tv(context, TEACHY_DELAY);
+        }
+
+        int ret;
+        switch (TARGET){
+        case Target::starters:
+            collect_starter_after_delay(env, context, INGAME_DELAY);
+            shiny_found = shiny_check_starter_summary(env, context);
+            break;
+        case Target::magikarp:
+            collect_magikarp_after_delay(env, context, INGAME_DELAY);
+            shiny_found = shiny_check_summary(env, context);
+            break;
+        case Target::hitmon:
+            collect_hitmon_after_delay(env, context, INGAME_DELAY);
+            shiny_found = shiny_check_summary(env, context);
+            break;
+        case Target::eevee:
+            collect_eevee_after_delay(env, context, INGAME_DELAY);
+            shiny_found = shiny_check_summary(env, context);
+            break;
+        case Target::lapras:
+            collect_lapras_after_delay(env, context, INGAME_DELAY);
+            shiny_found = shiny_check_summary(env, context);
+            break;
+        case Target::fossils:
+            collect_fossil_after_delay(env, context, INGAME_DELAY);
+            shiny_found = shiny_check_summary(env, context);
+            break;
+        case Target::gamecornerabra:
+            collect_gamecorner_after_delay(env, context, INGAME_DELAY, 0);
+            shiny_found = shiny_check_summary(env, context);
+            break;
+        case Target::gamecornerclefairy:
+            collect_gamecorner_after_delay(env, context, INGAME_DELAY, 1);
+            shiny_found = shiny_check_summary(env, context);
+            break;
+        case Target::gamecornerdratini:
+            collect_gamecorner_after_delay(env, context, INGAME_DELAY, 2);
+            shiny_found = shiny_check_summary(env, context);
+            break;
+        case Target::gamecornerbug:
+            collect_gamecorner_after_delay(env, context, INGAME_DELAY, 3);
+            shiny_found = shiny_check_summary(env, context);
+            break;
+        case Target::gamecornerporygon:
+            collect_gamecorner_after_delay(env, context, INGAME_DELAY, 4);
+            shiny_found = shiny_check_summary(env, context);
+            break;
+        case Target::snorlax:
+            encounter_snorlax_after_delay(env, context, INGAME_DELAY);
+            shiny_found = watch_for_shiny_encounter(env, context) == 1;
+            context.wait_for_all_requests();
+            break;
+        case Target::sweetscent:
+            use_sweet_scent(env, context, INGAME_DELAY);
+            shiny_found = watch_for_shiny_encounter(env, context) == 1;
+            context.wait_for_all_requests();
+            break;
+        case Target::fishing:
+            use_registered_fishing_rod(env, context, INGAME_DELAY);
+            ret = watch_for_shiny_encounter(env, context);
+            if (ret < 0 ){
+                continue;
+                // keep going if "Not even a nibble..."
+            }
+            shiny_found = ret == 1;
+            context.wait_for_all_requests();
+            break;
+        default:
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Option not yet implemented.",
+                env.console
+            );
+        }
+
+        stats.resets++;
+        if (shiny_found){
+            env.log("Shiny found!");
+            stats.shinies++;
+            send_program_notification(
+                env,
+                NOTIFICATION_SHINY,
+                COLOR_YELLOW,
+                "Shiny found!",
+                {}, "",
+                env.console.video().snapshot(),
+                true
+            );
+            if (TAKE_VIDEO){
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
+            }
+            break;
+        }else if (stats.resets >= NUM_RESETS){
+            send_program_status_notification(
+                env, NOTIFICATION_STATUS_UPDATE,
+                "Maximum resets reached."
+            );
+            break;
+        }else{
+            env.log("Pokemon is not shiny.");
+            env.log("Resetting.");
+            send_program_status_notification(
+                env, NOTIFICATION_STATUS_UPDATE,
+                "Resetting."
+            );
+            env.update_stats();
+            context.wait_for_all_requests();
+        }
+    }
+
+    if (GO_HOME_WHEN_DONE){
+        pbf_press_button(context, BUTTON_HOME, 200ms, 1000ms);
+    }
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+}
+
+}
+}
+}
+

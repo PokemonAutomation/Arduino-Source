@@ -1,13 +1,14 @@
-/*  Gift Reset
+/*  RNG Helper
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_PokemonFRLG_RNGManipulator_H
-#define PokemonAutomation_PokemonFRLG_RNGManipulator_H
+#ifndef PokemonAutomation_PokemonFRLG_RngHelper_H
+#define PokemonAutomation_PokemonFRLG_RngHelper_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -17,16 +18,16 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
 
-class RNGManipulator_Descriptor : public SingleSwitchProgramDescriptor{
+class RngHelper_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-    RNGManipulator_Descriptor();
+    RngHelper_Descriptor();
     struct Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class RNGManipulator : public SingleSwitchProgramInstance{
+class RngHelper : public SingleSwitchProgramInstance{
 public:
-    RNGManipulator();
+    RngHelper();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
     virtual void start_program_border_check(
         VideoStream& stream,
@@ -41,14 +42,24 @@ private:
     enum class Target{
         starters,
         magikarp,
-        // hitmon,
+        hitmon,
         eevee,
-        // lapras,
-        // fossils,
+        lapras,
+        fossils,
+        gamecornerabra,
+        gamecornerclefairy,
+        gamecornerdratini,
+        gamecornerbug,
+        gamecornerporygon,
+        // togepi,
+        staticencounter,
         snorlax,
+        // legendarybirds,
+        // mewtwo,
+        // hooh,
+        // hypno,
         sweetscent,
         fishing,
-        // static,
         // roaming
     };
 
@@ -56,18 +67,17 @@ private:
 
     SimpleIntegerOption<uint64_t> NUM_RESETS;
 
-    EnumDropdownOption<ResetType> RESET_TYPE;
-
     SimpleIntegerOption<uint64_t> SEED_DELAY;
     SimpleIntegerOption<int64_t> SEED_CALIBRATION;
 
     SimpleIntegerOption<uint64_t> LOAD_ADVANCES;
+    FloatingPointOption LOAD_CALIBRATION;
+
     SimpleIntegerOption<uint64_t> INGAME_ADVANCES;
-    SimpleIntegerOption<int64_t> ADVANCES_CALIBRATION;
+    FloatingPointOption INGAME_CALIBRATION;
 
+    BooleanCheckBoxOption USE_COPYRIGHT_TEXT;
     BooleanCheckBoxOption USE_TEACHY_TV;
-
-    BooleanCheckBoxOption TAKE_PICTURES;
 
     BooleanCheckBoxOption TAKE_VIDEO;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
