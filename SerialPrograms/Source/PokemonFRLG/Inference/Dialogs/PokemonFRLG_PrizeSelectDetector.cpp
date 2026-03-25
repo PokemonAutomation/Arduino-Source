@@ -19,9 +19,9 @@ namespace NintendoSwitch{
 namespace PokemonFRLG{
 
 PrizeSelectDetector::PrizeSelectDetector(Color color)
-    : m_right_box(0.884, 0.749115, 0.016, 0.1755)
-    , m_top_box(0.1, 0.737692, 0.798769, 0.00519231)
-    , m_bottom_box(0.102462, 0.925654, 0.793846, 0.00830769)
+    : m_right_box(0.923385, 0.748077, 0.00615385, 0.204577)
+    , m_top_box(0.0704615, 0.741846, 0.859077, 0.00623077)
+    , m_bottom_box(0.0716923, 0.943308, 0.851692, 0.00934615)
     , m_selection_box(0.705538, 0.528962, 0.212923, 0.0602308)
 {}
 void PrizeSelectDetector::make_overlays(VideoOverlaySet& items) const{
