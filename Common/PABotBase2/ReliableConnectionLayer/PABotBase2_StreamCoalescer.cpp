@@ -54,7 +54,7 @@ void StreamCoalescer::write_buffer(
         memcpy(m_buffer + stream_offset_s, data, bytes);
     }else{
         //  Wrap around
-        uint8_t block = (uint8_t)(PABB2_StreamCoalescer_BUFFER_SIZE - stream_offset_s);
+        uint8_t block = (uint8_t)(BUFFER_SIZE - stream_offset_s);
         memcpy(m_buffer + stream_offset_s, data, block);
         memcpy(m_buffer, (const uint8_t*)data + block, bytes - block);
     }
@@ -77,7 +77,7 @@ void StreamCoalescer::read_buffer(
         memcpy(data, m_buffer + stream_offset_s, bytes);
     }else{
         //  Wrap around
-        uint8_t block = (uint8_t)(PABB2_StreamCoalescer_BUFFER_SIZE - stream_offset_s);
+        uint8_t block = (uint8_t)(BUFFER_SIZE - stream_offset_s);
         memcpy(data, m_buffer + stream_offset_s, block);
         memcpy((uint8_t*)data + block, m_buffer, bytes - block);
     }
@@ -104,7 +104,7 @@ void StreamCoalescer::pop_leading_finished(){
 
 uint16_t StreamCoalescer::free_bytes() const{
     if (m_slot_head == m_slot_tail){
-        return PABB2_StreamCoalescer_BUFFER_SIZE;
+        return BUFFER_SIZE;
     }
     return (m_stream_tail - m_stream_head) & BUFFER_MASK;
 }
@@ -118,14 +118,14 @@ void StreamCoalescer::push_packet(uint8_t seqnum){
 //    printf("pabb2_StreamCoalescer_push_packet(%p): seqnum = %d, slot_head = %d\n", self, seqnum, slot_head);
 
     //  Either before (old retransmit) or too far in future.
-    if ((uint8_t)(seqnum - slot_head) >= PABB2_StreamCoalescer_SLOTS){
+    if ((uint8_t)(seqnum - slot_head) >= SLOTS){
 //        printf("Device: Packet is out of range.\n");
         return;
     }
 
     //  Extend the tail if needed.
     uint8_t slot_tail = m_slot_tail;
-    if ((uint8_t)(seqnum - slot_tail) < PABB2_StreamCoalescer_SLOTS){
+    if ((uint8_t)(seqnum - slot_tail) < SLOTS){
         slot_tail = seqnum + 1;
         m_slot_tail = slot_tail;
     }
@@ -154,8 +154,8 @@ bool StreamCoalescer::push_stream(const PacketHeaderData* packet){
     }
 
     //  Data is larger than the entire buffer.
-    if (stream_size > PABB2_StreamCoalescer_BUFFER_SIZE){
-//        printf("Device: stream_size > PABB2_StreamCoalescer_BUFFER_SIZE\n");
+    if (stream_size > BUFFER_SIZE){
+//        printf("Device: stream_size > BUFFER_SIZE\n");
         return false;
     }
 
@@ -171,7 +171,7 @@ bool StreamCoalescer::push_stream(const PacketHeaderData* packet){
     {
         uint8_t diff = seqnum - slot_head;
 //        printf("seqnum = %d, slot_head = %d\n", seqnum, slot_head);
-        if (diff >= PABB2_StreamCoalescer_SLOTS){
+        if (diff >= SLOTS){
 //            printf("seqnum = %d, slot_head = %d\n", seqnum, slot_head);
 //            printf("Device: In the past or too far ahead.\n");
             //  Negative means we're in the past and we can just ack.
@@ -185,19 +185,19 @@ bool StreamCoalescer::push_stream(const PacketHeaderData* packet){
 //    size_t stream_head = m_stream_head;
 
     //  Too far ahead that it's beyond our window.
-    if ((uint16_t)(stream_offset_e - m_stream_head) > PABB2_StreamCoalescer_BUFFER_SIZE){
+    if ((uint16_t)(stream_offset_e - m_stream_head) > BUFFER_SIZE){
 //        printf("Device: To far in future.\n");
         return false;
     }
 
     //  Extend the tail if needed.
     uint8_t slot_tail = m_slot_tail;
-    if ((uint8_t)(seqnum - slot_tail) < PABB2_StreamCoalescer_SLOTS){
+    if ((uint8_t)(seqnum - slot_tail) < SLOTS){
         slot_tail = seqnum + 1;
         m_slot_tail = slot_tail;
     }
     uint16_t stream_tail = m_stream_tail;
-    if ((uint16_t)(stream_offset_e - stream_tail) < PABB2_StreamCoalescer_BUFFER_SIZE){
+    if ((uint16_t)(stream_offset_e - stream_tail) < BUFFER_SIZE){
         stream_tail = stream_offset_e;
         m_stream_tail = stream_tail;
     }

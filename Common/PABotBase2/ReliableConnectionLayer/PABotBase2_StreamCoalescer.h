@@ -31,8 +31,12 @@ namespace PABotBase2{
 
 
 class StreamCoalescer{
-    static const uint8_t SLOTS_MASK = (PABB2_StreamCoalescer_SLOTS) - 1;
-    static const uint16_t BUFFER_MASK = (PABB2_StreamCoalescer_BUFFER_SIZE) - 1;
+    static constexpr uint8_t SLOTS = PABB2_StreamCoalescer_SLOTS;
+    static constexpr uint8_t SLOTS_MASK = SLOTS - 1;
+    static constexpr uint16_t BUFFER_SIZE = PABB2_StreamCoalescer_BUFFER_SIZE;
+    static constexpr uint16_t BUFFER_MASK = BUFFER_SIZE - 1;
+    static_assert((SLOTS & SLOTS_MASK) == 0, "Must be power-of-two.");
+    static_assert((BUFFER_SIZE & BUFFER_MASK) == 0, "Must be power-of-two.");
 
 public:
     StreamCoalescer(){
@@ -84,11 +88,11 @@ public:
     //  0       =   Not received yet.
     //  0-254   =   Received stream packet. # is the size.
     //  255     =   Received non-stream packet.
-    uint8_t m_lengths[PABB2_StreamCoalescer_SLOTS];
+    uint8_t m_lengths[SLOTS];
 
-    uint16_t m_offsets[PABB2_StreamCoalescer_SLOTS];
+    uint16_t m_offsets[SLOTS];
 
-    uint8_t m_buffer[PABB2_StreamCoalescer_BUFFER_SIZE];
+    uint8_t m_buffer[BUFFER_SIZE];
 };
 
 

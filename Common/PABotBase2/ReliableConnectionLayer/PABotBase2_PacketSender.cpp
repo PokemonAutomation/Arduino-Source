@@ -102,7 +102,7 @@ PacketHeader* PacketSender::reserve_packet(
 ){
     //  No slots available.
     uint8_t slots_used = m_slot_tail - m_slot_head;
-    if (slots_used == PABB2_PacketSender_SLOTS){
+    if (slots_used == SLOTS){
         return NULL;
     }
 
@@ -176,7 +176,7 @@ size_t PacketSender::send_stream(const void* data, size_t bytes){
     while (bytes > 0){
         //  No slots available.
         uint8_t slots_used = m_slot_tail - m_slot_head;
-        if (slots_used == PABB2_PacketSender_SLOTS){
+        if (slots_used == SLOTS){
             break;
         }
 
