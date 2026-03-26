@@ -117,8 +117,17 @@ public:
     //
     void send_oob_packet_empty(uint8_t seqnum, uint8_t opcode);
     void send_oob_packet_u8(uint8_t seqnum, uint8_t opcode, uint8_t data);
-    void send_oob_packet_u16(uint8_t seqnum, uint8_t opcode, uint16_t data);
-    void send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, uint32_t data);
+    void send_oob_packet_u16(uint8_t seqnum, uint8_t opcode, const uint16_t& data);
+    void send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, const uint32_t& data);
+    void send_oob_packet_data(
+        uint8_t seqnum, uint8_t opcode,
+        uint8_t bytes, const void* data
+    );
+    void send_oob_packet_u32_data(
+        uint8_t seqnum, uint8_t opcode,
+        const uint32_t& u32,
+        uint8_t bytes, const void* data
+    );
 
 
 private:

@@ -204,7 +204,7 @@ void ReliableStreamConnection::send_ack(uint8_t seqnum, uint8_t opcode){
 void ReliableStreamConnection::send_ack_u16(uint8_t seqnum, uint8_t opcode, uint16_t data){
     //  Must call inside lock.
     struct{
-        PacketHeader_Ack_u16 header;
+        PacketHeader_u16 header;
         uint8_t crc[sizeof(uint32_t)];
     } packet;
     packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
@@ -345,7 +345,13 @@ void ReliableStreamConnection::on_packet(const PacketHeader* packet){
     case PABB2_CONNECTION_OPCODE_INFO:
     case PABB2_CONNECTION_OPCODE_INFO_U8:
     case PABB2_CONNECTION_OPCODE_INFO_U16:
+    case PABB2_CONNECTION_OPCODE_INFO_H32:
     case PABB2_CONNECTION_OPCODE_INFO_U32:
+    case PABB2_CONNECTION_OPCODE_INFO_I32:
+    case PABB2_CONNECTION_OPCODE_INFO_STR:
+    case PABB2_CONNECTION_OPCODE_INFO_LABEL_H32:
+    case PABB2_CONNECTION_OPCODE_INFO_LABEL_U32:
+    case PABB2_CONNECTION_OPCODE_INFO_LABEL_I32:
 //        cout << "Received ack" << endl;
         if (!m_log_everything){
             m_logger.log("[RSC]: Receive: " + tostr(packet), COLOR_PURPLE);
@@ -361,13 +367,13 @@ void ReliableStreamConnection::on_packet(const PacketHeader* packet){
 }
 void ReliableStreamConnection::process_UNKNOWN_OPCODE(const PacketHeader* packet){
     std::lock_guard<Mutex> lg(m_lock);
-    if (packet->packet_bytes < sizeof(PacketHeader_Ack_u8) + sizeof(uint32_t)){
+    if (packet->packet_bytes < sizeof(PacketHeader_u8) + sizeof(uint32_t)){
         m_error = "Unknown opcode packet is too small: " + std::to_string(packet->packet_bytes);
         m_logger.log("[RSC]: " + m_error, COLOR_RED);
         return;
     }
 
-    const PacketHeader_Ack_u8* message = (const PacketHeader_Ack_u8*)packet;
+    const PacketHeader_u8* message = (const PacketHeader_u8*)packet;
     m_logger.log(
         "[RSC]: PABB2_CONNECTION_OPCODE_INVALID_OPCODE: Device reported an invalid opcode: " +
         std::to_string(message->data),
@@ -385,14 +391,14 @@ void ReliableStreamConnection::process_RET_VERSION(const PacketHeader* packet){
 //    m_logger.log(tostr(packet), COLOR_DARKGREEN);
     do{
         std::lock_guard<Mutex> lg(m_lock);
-        if (packet->packet_bytes < sizeof(PacketHeader_Ack_u32) + sizeof(uint32_t)){
+        if (packet->packet_bytes < sizeof(PacketHeader_u32) + sizeof(uint32_t)){
             m_error = "Version response is too small: " + std::to_string(packet->packet_bytes);
             m_logger.log("[RSC]: " + m_error, COLOR_RED);
             break;
         }
         m_reliable_sender.remove(packet->seqnum);
 
-        const PacketHeader_Ack_u32* message = (const PacketHeader_Ack_u32*)packet;
+        const PacketHeader_u32* message = (const PacketHeader_u32*)packet;
         uint32_t protocol = message->data;
         m_remote_protocol = protocol;
         std::string str = "Remote Protocol: " + std::to_string(protocol);
@@ -414,14 +420,14 @@ void ReliableStreamConnection::process_RET_VERSION(const PacketHeader* packet){
     m_cv.notify_all();
 }
 void ReliableStreamConnection::process_RET_PACKET_SIZE(const PacketHeader* packet){
-    if (packet->packet_bytes < sizeof(PacketHeader_Ack_u16) + sizeof(uint32_t)){
+    if (packet->packet_bytes < sizeof(PacketHeader_u16) + sizeof(uint32_t)){
         m_logger.log(
             "[RSC]: Packet size response is too small: " + std::to_string(packet->packet_bytes),
             COLOR_RED
         );
         return;
     }
-    const PacketHeader_Ack_u16* message = (const PacketHeader_Ack_u16*)packet;
+    const PacketHeader_u16* message = (const PacketHeader_u16*)packet;
     m_logger.log(
         "[RSC]: Setting Packet Size to: " + std::to_string(message->data),
         COLOR_BLUE
@@ -434,14 +440,14 @@ void ReliableStreamConnection::process_RET_PACKET_SIZE(const PacketHeader* packe
     m_cv.notify_all();
 }
 void ReliableStreamConnection::process_RET_BUFFER_SLOTS(const PacketHeader* packet){
-    if (packet->packet_bytes < sizeof(PacketHeader_Ack_u8) + sizeof(uint32_t)){
+    if (packet->packet_bytes < sizeof(PacketHeader_u8) + sizeof(uint32_t)){
         m_logger.log(
             "[RSC]: Buffer slot response is too small: " + std::to_string(packet->packet_bytes),
             COLOR_RED
         );
         return;
     }
-    const PacketHeader_Ack_u8* message = (const PacketHeader_Ack_u8*)packet;
+    const PacketHeader_u8* message = (const PacketHeader_u8*)packet;
     m_logger.log(
         "[RSC]: Setting Buffer Slots to: " + std::to_string(message->data),
         COLOR_BLUE
@@ -454,14 +460,14 @@ void ReliableStreamConnection::process_RET_BUFFER_SLOTS(const PacketHeader* pack
     m_cv.notify_all();
 }
 void ReliableStreamConnection::process_RET_BUFFER_BYTES(const PacketHeader* packet){
-    if (packet->packet_bytes < sizeof(PacketHeader_Ack_u16) + sizeof(uint32_t)){
+    if (packet->packet_bytes < sizeof(PacketHeader_u16) + sizeof(uint32_t)){
         m_logger.log(
             "[RSC]: Buffer slot response is too small: " + std::to_string(packet->packet_bytes),
             COLOR_RED
         );
         return;
     }
-    const PacketHeader_Ack_u16* message = (const PacketHeader_Ack_u16*)packet;
+    const PacketHeader_u16* message = (const PacketHeader_u16*)packet;
     m_logger.log(
         "[RSC]: Setting Buffer Slots to: " + std::to_string(message->data),
         COLOR_BLUE

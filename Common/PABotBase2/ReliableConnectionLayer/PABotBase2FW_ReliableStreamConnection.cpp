@@ -4,7 +4,8 @@
  *
  */
 
-//#include <stdio.h>
+#include <string.h>
+#include <algorithm>
 #include "PABotBase2_ConnectionDebug.h"
 #include "PABotBase2FW_ReliableStreamConnection.h"
 
@@ -26,7 +27,29 @@ namespace PABotBase2{
 ReliableStreamConnectionFW::ReliableStreamConnectionFW(UnreliableStreamConnectionPolling& unreliable_connection)
     : m_unreliable_connection(unreliable_connection)
     , m_reliable_sender(unreliable_connection, (uint8_t)(PABB2_MAX_INCOMING_PACKET_SIZE % 256))
+    , m_last_retransmit(pabb_current_time())
 {}
+
+
+
+void ReliableStreamConnectionFW::send_oob_info_str(const char* str){
+    const size_t MAX_LENGTH = 256 - sizeof(PacketHeader) - sizeof(uint32_t);
+    size_t len = strlen(str);
+    m_reliable_sender.send_oob_packet_data(
+        0, PABB2_CONNECTION_OPCODE_INFO_STR,
+        (uint8_t)std::min(len, MAX_LENGTH), str
+    );
+}
+void ReliableStreamConnectionFW::send_oob_info_label_i32(uint8_t opcode, const char* str, uint32_t data){
+    const size_t MAX_LENGTH = 256 - sizeof(PacketHeader_u32) - sizeof(uint32_t);
+    size_t len = strlen(str);
+    m_reliable_sender.send_oob_packet_u32_data(
+        0, opcode,
+        data,
+        (uint8_t)std::min(len, MAX_LENGTH), str
+    );
+}
+
 
 
 void ReliableStreamConnectionFW::wait_for_event(uint16_t milliseconds){
@@ -37,10 +60,20 @@ void ReliableStreamConnectionFW::wait_for_event(uint16_t milliseconds){
     }
     return m_unreliable_connection.wait_for_recv_available(milliseconds);
 }
+bool ReliableStreamConnectionFW::iterate_retransmits(){
+    WallClock now = pabb_current_time();
+    WallClock next_retransmit = m_last_retransmit + pabb_milliseconds(PABB2_ReliableConnectionFW_POLL_MS);
+    if (pabb_time_wrapsafe_cmplt(now, next_retransmit)){
+        return false;
+    }
+
+    m_last_retransmit = now;
+    return m_reliable_sender.iterate_retransmits();
+}
 bool ReliableStreamConnectionFW::run_events(){
     const PacketHeader* packet = m_parser.pull_bytes(m_unreliable_connection);
-    if (packet == NULL){
-        return m_reliable_sender.iterate_retransmits();
+    if (packet == nullptr){
+        return iterate_retransmits();
     }
 
     //  Check the packet status.
