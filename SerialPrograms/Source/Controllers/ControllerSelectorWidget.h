@@ -40,6 +40,7 @@ public:
     virtual void options_locked(bool locked) override;
 
 private:
+    void update_interface_dropdown(ControllerInterface interface_type);
     void refresh_selection(ControllerInterface interface_type);
     void refresh_controllers(
         ControllerType controller_type,

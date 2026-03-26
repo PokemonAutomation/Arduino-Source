@@ -49,12 +49,17 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     interface_dropdown = new NoWheelCompactComboBox(this);
     m_dropdowns->addWidget(interface_dropdown);
 
-    m_interface_list.emplace_back(ControllerInterface::SerialPABotBase);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        m_interface_list.emplace_back(ControllerInterface::SerialPABotBase2);
+
+    //  Add all the supported interfaces.
+    {
+        m_interface_list.emplace_back(ControllerInterface::SerialPABotBase);
+        if (PreloadSettings::instance().DEVELOPER_MODE){
+            m_interface_list.emplace_back(ControllerInterface::SerialPABotBase2);
+        }
+        m_interface_list.emplace_back(ControllerInterface::TcpSysbotBase);
+//        m_interface_list.emplace_back(ControllerInterface::UsbSysbotBase);
     }
-    m_interface_list.emplace_back(ControllerInterface::TcpSysbotBase);
-//    m_interface_list.emplace_back(ControllerInterface::UsbSysbotBase);
+
 
     for (ControllerInterface item : m_interface_list){
         interface_dropdown->addItem(QString::fromStdString(CONTROLLER_INTERFACE_STRINGS.get_string(item)));
@@ -67,7 +72,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
         current.reset(new SerialPABotBase::SerialPABotBase_Descriptor());
         session.set_device(std::move(current));
     }
-    interface_dropdown->setCurrentIndex((int)current->interface_type - 1);
+    update_interface_dropdown(current->interface_type);
     m_selector = current->make_selector_QtWidget(*this);
     m_dropdowns->addWidget(m_selector, 1);
 
@@ -149,10 +154,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
 
 
 
-
-void ControllerSelectorWidget::refresh_selection(ControllerInterface interface_type){
-//    cout << "refresh_selection(): "<< endl;
-
+void ControllerSelectorWidget::update_interface_dropdown(ControllerInterface interface_type){
     if (interface_type == ControllerInterface::None){
         interface_type = ControllerInterface::SerialPABotBase;
     }
@@ -162,6 +164,11 @@ void ControllerSelectorWidget::refresh_selection(ControllerInterface interface_t
             break;
         }
     }
+
+}
+void ControllerSelectorWidget::refresh_selection(ControllerInterface interface_type){
+//    cout << "refresh_selection(): "<< endl;
+    update_interface_dropdown(interface_type);
 
     delete m_selector;
     m_selector = nullptr;
