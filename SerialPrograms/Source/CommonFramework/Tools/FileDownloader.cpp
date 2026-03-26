@@ -14,6 +14,7 @@
 #include <QNetworkReply>
 #include <QObject>
 #include <QTimer>
+#include <QSaveFile>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "FileDownloader.h"
@@ -89,6 +90,61 @@ std::string download_file(Logger& logger, const std::string& url){
 
     return std::string(downloaded_data.data(), downloaded_data.size());
 }
+
+void download_file_to_disk(Logger& logger, const std::string& url, const std::string& file_path){
+//    cout << "download_file()" << endl;
+    QNetworkAccessManager network_access_manager;
+    QEventLoop loop;
+    
+    // 1. Initialize QSaveFile
+    QSaveFile file(QString::fromStdString(file_path));
+    if (!file.open(QIODevice::WriteOnly)) {
+        throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+            "Could not open save file: " + file_path);
+    }
+
+    QNetworkRequest request(QUrl(QString::fromStdString(url)));
+
+    request.setTransferTimeout(std::chrono::seconds(5));
+    
+    // 2. Start the GET request
+    QNetworkReply* reply = network_access_manager.get(request);
+
+    // 3. Stream chunks directly to the temporary file
+    QObject::connect(reply, &QNetworkReply::readyRead, [&file, reply]() {
+        file.write(reply->readAll());
+    });
+
+    // 4. Handle completion and errors
+    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    
+    // Start the loop. local wait mechanism that pauses execution of the function 
+    // while Qt handles the network request. 
+    // the loop stops once we see the signal QNetworkReply::finished.
+    loop.exec();
+
+    // // Final check for remaining data
+    // if (reply->bytesAvailable() > 0) {
+    //     file.write(reply->readAll());
+    // }
+
+    // 5. Finalize the transaction
+    if (reply->error() == QNetworkReply::NoError) {
+        // This moves the temporary file to the final destination 'file_path'
+        if (!file.commit()) {
+            throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+                "Failed to commit file to disk: " + file_path);
+        }
+    } else {
+        QString error_string = reply->errorString();
+        // QSaveFile automatically deletes the temp file if commit() isn't called
+        throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+            "Network Error: " + error_string.toStdString());
+    }
+
+    reply->deleteLater();
+}
+
 JsonValue download_json_file(Logger& logger, const std::string& url){
     std::string downloaded_data = download_file(logger, url);
     return parse_json(downloaded_data);

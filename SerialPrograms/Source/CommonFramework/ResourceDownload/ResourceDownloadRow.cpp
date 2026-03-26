@@ -5,13 +5,17 @@
  */
 
 #include <QMessageBox>
+#include "CommonFramework/Globals.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Tools/FileDownloader.h"
 #include "CommonFramework/Options/LabelCellOption.h"
 // #include "ResourceDownloadTable.h"
 #include "ResourceDownloadRow.h"
 
 #include <thread>
+// #include <fstream>
 
 #include <iostream>
 using std::cout;
@@ -80,7 +84,7 @@ ResourceDownloadButton::ResourceDownloadButton(ResourceDownloadRow& p_row)
     : ConfigOptionImpl<ResourceDownloadButton>(LockMode::UNLOCK_WHILE_RUNNING)
     , row(p_row)
     , m_enabled(true)
-    , m_local_metadata(get_local_metadata())
+    , m_local_metadata(initialize_local_metadata())
 {}
 
 
@@ -89,10 +93,11 @@ void ResourceDownloadButton::ensure_remote_metadata_loaded(){
         [this]{ 
             try {
                 m_enabled = false;
-                std::this_thread::sleep_for(std::chrono::seconds(1));
+                // std::this_thread::sleep_for(std::chrono::seconds(1));
                 std::string predownload_warning;
                 ResourceDownloadButton::RemoteMetadata& remote_handle = fetch_remote_metadata();
                 // cout << "Fetched remote metadata" << endl;
+                // throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "testing"); 
 
                 predownload_warning = predownload_warning_summary(remote_handle);
                 m_enabled = true;
@@ -191,7 +196,7 @@ ResourceDownloadButton::RemoteMetadata& ResourceDownloadButton::fetch_remote_met
     return *m_remote_metadata;
 }
 
-DownloadedResourceMetadata ResourceDownloadButton::get_local_metadata(){
+DownloadedResourceMetadata ResourceDownloadButton::initialize_local_metadata(){
     DownloadedResourceMetadata corresponding_local_metadata;
     std::vector<DownloadedResourceMetadata> all_local_metadata = local_resource_download_list();
     
@@ -207,7 +212,7 @@ DownloadedResourceMetadata ResourceDownloadButton::get_local_metadata(){
     }
 
     if (!found){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "get_local_metadata: Corresponding DownloadedResourceMetadata not found in the local JSON file.");  
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "initialize_local_metadata: Corresponding DownloadedResourceMetadata not found in the local JSON file.");  
     }
 
     return corresponding_local_metadata;
@@ -217,13 +222,32 @@ DownloadedResourceMetadata ResourceDownloadButton::get_local_metadata(){
 void ResourceDownloadButton::run_download(){
     m_worker2 = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
         [this]{ 
-            m_enabled = false;
-            std::this_thread::sleep_for(std::chrono::seconds(7));
-            cout << "Done Download" << endl;
-            // show_update_box("Download", "Download", "Do you want to download?");
+            try {
+                m_enabled = false;
+                // std::this_thread::sleep_for(std::chrono::seconds(7));
+                Logger& logger = global_logger_tagged();
+                std::string url = m_local_metadata.url;
+                std::string resource_name = m_local_metadata.resource_name;
+                FileDownloader::download_file_to_disk(
+                    logger, 
+                    url, 
+                    DOWNLOADED_RESOURCE_PATH() + resource_name + "/temp.zip"
+                );
 
-            m_enabled = true;
-            emit download_finished();
+                cout << "Done Download" << endl;
+
+                m_enabled = true;
+                emit download_finished();
+            }catch(...){
+                m_enabled = true;
+                // cout << "Exception thrown in thread" << endl;
+                emit exception_caught("ResourceDownloadButton::ensure_remote_metadata_loaded");
+                // std::cerr << "Error: Unknown error. Embedding session failed." << std::endl;
+                // QMessageBox box;
+                // box.warning(nullptr, "Error:",
+                //     QString::fromStdString("Error: Unknown error. Embedding session failed."));
+                return;
+            }
         }
     );
 
