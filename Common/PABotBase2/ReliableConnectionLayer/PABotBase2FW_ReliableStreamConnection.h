@@ -43,14 +43,7 @@ public:
     }
 
 public:
-    virtual void reliable_send(const void* data, size_t bytes) override{
-        const char* ptr = (const char*)data;
-        while (bytes > 0){
-            size_t sent = m_reliable_sender.send_stream(ptr, bytes);
-            ptr += sent;
-            bytes -= sent;
-        }
-    }
+    virtual void reliable_send(const void* data, size_t bytes) override;
     virtual size_t reliable_recv(void* data, size_t bytes) override{
         return m_stream_coalescer.read(data, bytes);
     }
@@ -61,11 +54,15 @@ public:
     virtual void clear_reset_flag() override{
         m_reset_flag = false;
     }
+
     virtual bool run_events() override;
     virtual void wait_for_event(uint16_t milliseconds) override;
 
 
 public:
+    //  Send out-of-band messages.
+    //  These are not part of the reliable protocol and may be dropped.
+
     void send_oob_info_u32(uint32_t data){
         m_reliable_sender.send_oob_packet_u32(0, PABB2_CONNECTION_OPCODE_INFO_U32, data);
     }
@@ -100,7 +97,12 @@ private:
     StreamCoalescer m_stream_coalescer;
 
     WallClock m_last_retransmit;
+
     bool m_reset_flag = false;
+
+    //  Don't allow any stream traffic until CC is ready.
+    //  The MLC layer will get stuck in a bad state if we end up between packets.
+    bool m_stream_ready = false;
 };
 
 

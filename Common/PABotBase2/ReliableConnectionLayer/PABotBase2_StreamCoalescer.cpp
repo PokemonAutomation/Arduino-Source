@@ -106,7 +106,7 @@ uint16_t StreamCoalescer::free_bytes() const{
     if (m_slot_head == m_slot_tail){
         return BUFFER_SIZE;
     }
-    return (m_stream_tail - m_stream_head) & BUFFER_MASK;
+    return (m_stream_head - m_stream_tail) & BUFFER_MASK;
 }
 
 void StreamCoalescer::push_packet(uint8_t seqnum){

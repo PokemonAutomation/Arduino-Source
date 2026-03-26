@@ -32,6 +32,19 @@ ReliableStreamConnectionFW::ReliableStreamConnectionFW(UnreliableStreamConnectio
 
 
 
+void ReliableStreamConnectionFW::reliable_send(const void* data, size_t bytes){
+    if (!m_stream_ready){
+        return;
+    }
+    const char* ptr = (const char*)data;
+    while (bytes > 0){
+        size_t sent = m_reliable_sender.send_stream(ptr, bytes);
+        ptr += sent;
+        bytes -= sent;
+    }
+}
+
+
 void ReliableStreamConnectionFW::send_oob_info_str(const char* str){
     const size_t MAX_LENGTH = 256 - sizeof(PacketHeader) - sizeof(uint32_t);
     size_t len = strlen(str);
@@ -116,6 +129,7 @@ bool ReliableStreamConnectionFW::run_events(){
         m_stream_coalescer.reset();
         m_stream_coalescer.push_packet(0);
         m_reset_flag = true;
+        m_stream_ready = false;
         return true;
     case PABB2_CONNECTION_OPCODE_ASK_VERSION:
         m_stream_coalescer.push_packet(packet->seqnum);
@@ -150,19 +164,16 @@ bool ReliableStreamConnectionFW::run_events(){
         );
         return true;
     case PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA:
-//        printf("Device: PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA\n");
-        if (m_stream_coalescer.push_stream((const PacketHeaderData*)packet)){
-//            printf("Device: Succeeded push.\n");
-            m_reliable_sender.send_oob_packet_u16(
-                packet->seqnum,
-                PABB2_CONNECTION_OPCODE_RET_STREAM_DATA,
-                m_stream_coalescer.free_bytes()
-            );
-        }else{
-//            printf("Device: Failed to push.\n");
-//            m_stream_coalescer.print(true);
+        m_stream_ready = true;
+        if (!m_stream_coalescer.push_stream((const PacketHeaderData*)packet)){
+            send_oob_info_str("Stream is full.");
+            return true;
         }
-//        fflush(stdout);
+        m_reliable_sender.send_oob_packet_u16(
+            packet->seqnum,
+            PABB2_CONNECTION_OPCODE_RET_STREAM_DATA,
+            m_stream_coalescer.free_bytes()
+        );
         return true;
     case PABB2_CONNECTION_OPCODE_RET_STREAM_DATA:
         m_reliable_sender.remove(packet->seqnum);

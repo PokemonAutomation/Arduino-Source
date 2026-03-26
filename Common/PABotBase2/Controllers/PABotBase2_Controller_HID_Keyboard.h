@@ -8,6 +8,7 @@
 #define PokemonAutomation_PABotBase2_Controller_HID_Keyboard_H
 
 #include "../../ControllerStates/StandardHid_Keyboard_State.h"
+#include "../PABotBase2_MessageProtocol.h"
 
 #if _WIN32
 #pragma pack(push, 1)
@@ -24,7 +25,7 @@ namespace PABotBase2{
 
 
 #define PABB2_MESSAGE_CMD_HID_KEYBOARD_STATE            0x82
-struct PABB_PACK pabb2_Message_Command_HID_Keyboard_State{
+struct PABB_PACK pabb2_Message_Command_HID_Keyboard_State : MessageHeader{
     uint16_t milliseconds;
     pabb_HID_Keyboard_State report;
 };

@@ -87,7 +87,7 @@ void DeviceHandle::query_protocol(){
     }
     {
         m_device_id = query_u32(PABB2_MESSAGE_OPCODE_DEVICE_IDENTIFIER);
-        m_logger.log("[MLC]: Device ID: " + tostr_hex(m_device_id), COLOR_BLUE);
+        m_logger.log("[MLC]: Device ID: 0x" + tostr_hex(m_device_id), COLOR_BLUE);
         auto iter = PROGRAMS->find(m_device_id);
         if (iter == PROGRAMS->end()){
             m_logger.Logger::log(
@@ -161,7 +161,7 @@ void DeviceHandle::connect(){
 
 ControllerType DeviceHandle::refresh_controller_type(){
     m_logger.log("Reading Controller Mode...");
-    uint32_t type_id = query_u32(PABB_MESSAGE_OPCODE_READ_CONTROLLER_MODE);
+    uint32_t type_id = query_u32(PABB2_MESSAGE_OPCODE_READ_CONTROLLER_MODE);
 
     ControllerType current_controller = SerialPABotBase::id_to_controller_type(type_id);
     m_logger.log(

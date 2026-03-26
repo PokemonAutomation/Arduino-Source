@@ -13,7 +13,7 @@
 #include "SerialPABotBase2_Descriptor.h"
 
 //#include "Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.h"
-//#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.h"
+#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.h"
 //#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_ProController.h"
 //#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Joycon.h"
 
@@ -86,7 +86,6 @@ std::unique_ptr<AbstractController> SerialPABotBase2_Descriptor::make_controller
             )
         );
 #endif
-#if 0
     case ControllerType::NintendoSwitch_WiredController:
     case ControllerType::NintendoSwitch2_WiredController:
         return std::unique_ptr<AbstractController>(
@@ -98,6 +97,7 @@ std::unique_ptr<AbstractController> SerialPABotBase2_Descriptor::make_controller
             )
         );
 
+#if 0
     case ControllerType::NintendoSwitch_WiredProController:
     case ControllerType::NintendoSwitch_WirelessProController:
         return std::unique_ptr<AbstractController>(

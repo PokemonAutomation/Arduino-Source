@@ -120,7 +120,6 @@ std::string tostr(const PacketHeader* header){
         return str;
     case PABB2_CONNECTION_OPCODE_INFO_STR:
         str += "PABB2_CONNECTION_OPCODE_INFO_STR: ";
-        str += std::to_string(header->seqnum);
         str += std::string(
             (const char*)(header + 1),
             header->packet_bytes - sizeof(PacketHeader) - sizeof(uint32_t)
@@ -271,24 +270,24 @@ std::string tostr(const MessageHeader* header){
         str += std::to_string(header->id);
         return str;
 
-    case PABB_MESSAGE_OPCODE_READ_CONTROLLER_MODE:
-        str += "PABB_MESSAGE_OPCODE_READ_CONTROLLER_MODE: id = ";
+    case PABB2_MESSAGE_OPCODE_READ_CONTROLLER_MODE:
+        str += "PABB2_MESSAGE_OPCODE_READ_CONTROLLER_MODE: id = ";
         str += std::to_string(header->id);
         return str;
-    case PABB_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE:
-        str += "PABB_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE: id = ";
+    case PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE:
+        str += "PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE: id = ";
         str += std::to_string(header->id);
         return str;
-    case PABB_MESSAGE_OPCODE_RESET_TO_CONTROLLER:
-        str += "PABB_MESSAGE_OPCODE_RESET_TO_CONTROLLER: id = ";
+    case PABB2_MESSAGE_OPCODE_RESET_TO_CONTROLLER:
+        str += "PABB2_MESSAGE_OPCODE_RESET_TO_CONTROLLER: id = ";
         str += std::to_string(header->id);
         return str;
-    case PABB_MESSAGE_OPCODE_CONTROLLER_MAC_ADDRESS:
-        str += "PABB_MESSAGE_OPCODE_CONTROLLER_MAC_ADDRESS: id = ";
+    case PABB2_MESSAGE_OPCODE_CONTROLLER_MAC_ADDRESS:
+        str += "PABB2_MESSAGE_OPCODE_CONTROLLER_MAC_ADDRESS: id = ";
         str += std::to_string(header->id);
         return str;
-    case PABB_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS:
-        str += "PABB_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS: id = ";
+    case PABB2_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS:
+        str += "PABB2_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS: id = ";
         str += std::to_string(header->id);
         return str;
 
