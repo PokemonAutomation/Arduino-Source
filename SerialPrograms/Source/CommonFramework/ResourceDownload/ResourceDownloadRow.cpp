@@ -4,7 +4,7 @@
  *
  */
 
-#include <QMessageBox>
+// #include <QMessageBox>
 #include "CommonFramework/Globals.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Exceptions.h"
@@ -226,12 +226,35 @@ void ResourceDownloadButton::run_download(){
                 m_enabled = false;
                 // std::this_thread::sleep_for(std::chrono::seconds(7));
                 Logger& logger = global_logger_tagged();
-                std::string url = m_local_metadata.url;
-                std::string resource_name = m_local_metadata.resource_name;
+                ResourceDownloadButton::RemoteMetadata& remote_handle = fetch_remote_metadata();
+                if (remote_handle.status != RemoteMetadataStatus::AVAILABLE){
+                    switch (remote_handle.status){
+                    case RemoteMetadataStatus::UNINITIALIZED:
+                        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "run_download: Remote metadata uninitialized.");
+                    case RemoteMetadataStatus::NOT_AVAILABLE:
+                        cout << "run_download: Download not available. Cancel download." << endl;
+                        m_enabled = true;
+                        emit download_finished();
+                        return;
+                    default:
+                        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "run_download: Unknown enum."); 
+                    }
+                }
+
+                // Download is available
+
+                DownloadedResourceMetadata metadata = remote_handle.metadata;
+                std::string url = metadata.url;
+                std::string resource_name = metadata.resource_name;
+                qint64 expected_size = metadata.size_compressed_bytes;
                 FileDownloader::download_file_to_disk(
                     logger, 
                     url, 
-                    DOWNLOADED_RESOURCE_PATH() + resource_name + "/temp.zip"
+                    DOWNLOADED_RESOURCE_PATH() + resource_name + "/temp.zip",
+                    expected_size,
+                    [this](int percentage_progress){
+                        download_progress(percentage_progress);
+                    }
                 );
 
                 cout << "Done Download" << endl;

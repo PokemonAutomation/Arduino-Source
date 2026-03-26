@@ -67,6 +67,17 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
         }
     );
 
+    connect(
+        &m_value, &ResourceDownloadButton::download_progress,
+        this, [this](int percentage_progress){
+            // Simple Console Progress Bar
+            std::cout << "\rProgress: [" << std::string(percentage_progress / 5, '#') 
+                        << std::string(20 - (percentage_progress / 5), ' ') << "] " 
+                        << percentage_progress << "%" << endl;
+
+        }
+    );
+
     // when the download is finished, update the UI to re-enable the button
     connect(
         &m_value, &ResourceDownloadButton::download_finished,
