@@ -91,7 +91,13 @@ std::string download_file(Logger& logger, const std::string& url){
     return std::string(downloaded_data.data(), downloaded_data.size());
 }
 
-void download_file_to_disk(Logger& logger, const std::string& url, const std::string& file_path){
+void download_file_to_disk(
+    Logger& logger, 
+    const std::string& url, 
+    const std::string& file_path,
+    qint64 expected_size,
+    std::function<void(int)> progress_callback
+){
 //    cout << "download_file()" << endl;
     QNetworkAccessManager network_access_manager;
     QEventLoop loop;
@@ -109,6 +115,18 @@ void download_file_to_disk(Logger& logger, const std::string& url, const std::st
     
     // 2. Start the GET request
     QNetworkReply* reply = network_access_manager.get(request);
+
+    // Progress Bar Logic
+    QObject::connect(reply, &QNetworkReply::downloadProgress, 
+        [expected_size, progress_callback](qint64 bytesReceived, qint64 bytesTotal) {
+            
+            // Use expected_size if the network doesn't provide one
+            qint64 total = (bytesTotal > 0) ? bytesTotal : expected_size;
+
+            int percentage_progress = static_cast<int>((bytesReceived * 100) / total);
+            progress_callback(percentage_progress);
+           
+    });
 
     // 3. Stream chunks directly to the temporary file
     QObject::connect(reply, &QNetworkReply::readyRead, [&file, reply]() {

@@ -27,6 +27,7 @@ public:
 
 signals:
     void metadata_fetch_finished(std::string popup_message);
+    void download_progress(int percentage);
     void exception_caught(std::string function_name);
     void download_finished();
 
