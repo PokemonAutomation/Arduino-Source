@@ -73,12 +73,11 @@ RngHelper::RngHelper()
             {Target::gamecornerbug, "gamecornerbug", "Game Corner Bug (Scyther / Pinsir)"},
             {Target::gamecornerporygon, "gamecornerporygon", "Game Corner Porygon"},
             // {Target::togepi, "togepi", "Togepi"},
-            {Target::staticencounter, "staticencounter", "Static overworld encounters"},
+            {Target::staticencounter, "staticencounter", "Static Overworld Encounters"},
             {Target::snorlax, "snorlax", "Snorlax"},
-            // {Target::legendarybirds, "legendarybirds", "Articuno / Zapdos / Moltres"},
-            // {Target::mewtwo, "mewtwo", "Mewtwo"},
-            // {Target::hooh, "hooh", "Ho-oh"},
-            // {Target::hypno, "berryforesthypno", "Berry Forest Hypno"},
+            {Target::mewtwo, "mewtwo", "Mewtwo"},
+            {Target::hooh, "hooh", "Ho-oh"},
+            {Target::hypno, "berryforesthypno", "Berry Forest Hypno"},
             {Target::sweetscent, "sweetscent", "Sweet Scent"},
             {Target::fishing, "fishing", "Fishing"},
             // {Target::roaming, "roaming", "Roaming Legendaries"}
@@ -223,7 +222,14 @@ void set_seed_after_delay(ProControllerContext& context, SimpleIntegerOption<uin
     pbf_press_button(context, BUTTON_A, 3000ms, 0ms);
 }
 
-void load_game_after_delay(ProControllerContext& context, uint64_t& LOAD_DELAY){
+void load_game_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& LOAD_DELAY){
+        if (LOAD_DELAY < 3200){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "The load screen delay cannot be less than 3200ms (192 frames). Check your load screen calibration.",
+            env.console
+        );
+    }
     pbf_wait(context, std::chrono::milliseconds(LOAD_DELAY - 3000));
     pbf_press_button(context, BUTTON_A, 33ms, 1467ms);
     // skip recap
@@ -398,7 +404,7 @@ void encounter_static_after_delay(SingleSwitchProgramEnvironment& env, ProContro
     if (INGAME_DELAY < 4000){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Static: the in-game delay cannot be less than 4000ms (480 frames). Check your in-game advances calibration.",
+            "Static Encounter: the in-game delay cannot be less than 4000ms (480 frames). Check your in-game advances calibration.",
             env.console
         );
     }
@@ -406,6 +412,7 @@ void encounter_static_after_delay(SingleSwitchProgramEnvironment& env, ProContro
     pbf_wait(context, std::chrono::milliseconds(INGAME_DELAY - 4000));
     // Interact with the static encounter
     pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+    pbf_mash_button(context, BUTTON_A, 1000ms); // finishes dialog for the legendary birds
     context.wait_for_all_requests();
     env.log("Static encounter started.");
 }
@@ -425,6 +432,60 @@ void encounter_snorlax_after_delay(SingleSwitchProgramEnvironment& env, ProContr
     pbf_press_button(context, BUTTON_A, 200ms, 200ms); 
     context.wait_for_all_requests();
     env.log("Snorlax encounter started.");
+}
+
+void encounter_mewtwo_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+    if (INGAME_DELAY < 4500){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Mewtwo: the in-game delay cannot be less than 4500ms (540 frames). Check your in-game advances calibration.",
+            env.console
+        );
+    }
+    // one dialogue before the encounter happens
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(INGAME_DELAY - 4200)); // 4000ms + 200ms
+    // Initiate encounter
+    pbf_press_button(context, BUTTON_A, 200ms, 200ms); 
+    context.wait_for_all_requests();
+    env.log("Hypno encounter started.");
+}
+
+void encounter_hooh_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+    if (INGAME_DELAY < 4000){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Ho-oh: the in-game delay cannot be less than 4000ms (480 frames). Check your in-game advances calibration.",
+            env.console
+        );
+    }
+    // No dialogue to advance through -- just wait
+    pbf_wait(context, std::chrono::milliseconds(INGAME_DELAY - 4000));
+    // Trigger the encounter (WALK UP)
+    pbf_move_left_joystick(context, {0, +1}, 200ms, 800ms);
+    context.wait_for_all_requests();
+    env.log("Ho-oh encounter started.");
+}
+
+void encounter_hypno_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+    if (INGAME_DELAY < 13000){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Hypno: the in-game delay cannot be less than 13000ms (1560 frames). Check your in-game advances calibration.",
+            env.console
+        );
+    }
+    // 5 dialog advances, with the 5th needing some extra time
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
+    // Wait after the 6th
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(INGAME_DELAY - 12700)); // 4000ms + 8500ms + 200ms
+    // Initiate encounter
+    pbf_press_button(context, BUTTON_A, 200ms, 200ms); 
+    context.wait_for_all_requests();
+    env.log("Hypno encounter started.");
 }
 
 void open_party_menu_from_overworld(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -542,6 +603,8 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     RngHelper_Descriptor::Stats& stats = env.current_stats<RngHelper_Descriptor::Stats>();
 
+    home_black_border_check(env.console, context);
+
     bool shiny_found = false;
 
     double FRAMERATE = 59.999977;       // FPS. from Dhruv (don't know original source)
@@ -556,6 +619,13 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     while (!shiny_found){
         double MODIFIED_INGAME_ADVANCES = INGAME_ADVANCES + FIXED_ADVANCES_OFFSET + INGAME_CALIBRATION;
+        if (MODIFIED_INGAME_ADVANCES < 0) {
+           OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "In-game advances cannot be negative. Check your in-game advances calibration.",
+                env.console
+            ); 
+        }
         uint64_t TEACHY_ADVANCES = 0;
 
         bool should_use_teachy_tv = USE_TEACHY_TV && MODIFIED_INGAME_ADVANCES > 5000;
@@ -578,13 +648,6 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                 env.console
             );
         }
-        if (LOAD_DELAY < 3000){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "The load screen delay cannot be less than 3000ms (180 frames). Check your load screen calibration.",
-                env.console
-            );
-        }
 
         hard_reset(context);
 
@@ -594,7 +657,7 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         }
 
         set_seed_after_delay(context, SEED_DELAY, SEED_CALIBRATION, FIXED_SEED_OFFSET);
-        load_game_after_delay(context, LOAD_DELAY);
+        load_game_after_delay(env, context, LOAD_DELAY);
         if (should_use_teachy_tv){
             wait_with_teachy_tv(context, TEACHY_DELAY);
         }
@@ -645,8 +708,27 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             collect_gamecorner_after_delay(env, context, INGAME_DELAY, 4);
             shiny_found = shiny_check_summary(env, context);
             break;
+        case Target::staticencounter:
+            encounter_static_after_delay(env, context, INGAME_DELAY);
+            shiny_found = shiny_check_summary(env, context);
+            break;
         case Target::snorlax:
             encounter_snorlax_after_delay(env, context, INGAME_DELAY);
+            shiny_found = watch_for_shiny_encounter(env, context) == 1;
+            context.wait_for_all_requests();
+            break;
+        case Target::mewtwo:
+            encounter_mewtwo_after_delay(env, context, INGAME_DELAY);
+            shiny_found = watch_for_shiny_encounter(env, context) == 1;
+            context.wait_for_all_requests();
+            break;
+        case Target::hooh:
+            encounter_hooh_after_delay(env, context, INGAME_DELAY);
+            shiny_found = watch_for_shiny_encounter(env, context) == 1;
+            context.wait_for_all_requests();
+            break;
+        case Target::hypno:
+            encounter_hypno_after_delay(env, context, INGAME_DELAY);
             shiny_found = watch_for_shiny_encounter(env, context) == 1;
             context.wait_for_all_requests();
             break;

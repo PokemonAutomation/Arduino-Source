@@ -54,10 +54,9 @@ private:
         // togepi,
         staticencounter,
         snorlax,
-        // legendarybirds,
-        // mewtwo,
-        // hooh,
-        // hypno,
+        mewtwo,
+        hooh,
+        hypno,
         sweetscent,
         fishing,
         // roaming
