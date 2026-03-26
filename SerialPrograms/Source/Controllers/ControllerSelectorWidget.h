@@ -67,6 +67,7 @@ private:
     QPushButton* m_reset_button = nullptr;
 
 //    bool m_shift_held = false;
+    std::vector<ControllerInterface> m_interface_list;
 
     std::vector<std::shared_ptr<const ControllerDescriptor>> m_device_list;
 };
