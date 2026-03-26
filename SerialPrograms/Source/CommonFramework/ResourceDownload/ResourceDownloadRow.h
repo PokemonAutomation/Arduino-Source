@@ -44,7 +44,7 @@ public:
     // get the DownloadedResourceMetadata from the remote JSON, that corresponds to this button/row
     void initialize_remote_metadata();
     RemoteMetadata& fetch_remote_metadata();
-    DownloadedResourceMetadata get_local_metadata();
+    DownloadedResourceMetadata initialize_local_metadata();
     void ensure_remote_metadata_loaded();
     std::string predownload_warning_summary(RemoteMetadata& remote_metadata);
 
