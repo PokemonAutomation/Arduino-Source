@@ -25,8 +25,9 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class PrizeCornerReset : public SingleSwitchProgramInstance{
+class PrizeCornerReset : public SingleSwitchProgramInstance, private ConfigOption::Listener{
 public:
+    ~PrizeCornerReset();
     PrizeCornerReset();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
 
@@ -39,8 +40,8 @@ private:
     void obtain_prize(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
     IntegerEnumDropdownOption SLOT;
-
     SimpleIntegerOption<uint32_t> NUM_REDEEM;
+    StaticTextOption WARNING;
 
     BooleanCheckBoxOption TAKE_VIDEO;
 
@@ -49,6 +50,10 @@ private:
     EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
+
+private:
+    virtual void on_config_value_changed(void* object) override;
+    std::string check_amount_redeemed(uint16_t slot_num, uint32_t redeem_num) const;
 };
 
 }

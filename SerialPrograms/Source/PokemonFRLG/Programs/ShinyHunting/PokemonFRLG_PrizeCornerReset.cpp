@@ -38,20 +38,28 @@ PrizeCornerReset_Descriptor::PrizeCornerReset_Descriptor()
 
 struct PrizeCornerReset_Descriptor::Stats : public StatsTracker{
     Stats()
-        : resets(m_stats["Resets"])
+        : prizes(m_stats["Prizes"])
+        , resets(m_stats["Resets"])
         , shinies(m_stats["Shinies"])
         , errors(m_stats["Errors"])
     {
+        m_display_order.emplace_back("Prizes");
         m_display_order.emplace_back("Resets");
         m_display_order.emplace_back("Shinies");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
+    std::atomic<uint64_t>& prizes;
     std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& shinies;
     std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> PrizeCornerReset_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
+}
+
+PrizeCornerReset::~PrizeCornerReset(){
+    SLOT.remove_listener(*this);
+    NUM_REDEEM.remove_listener(*this);
 }
 
 PrizeCornerReset::PrizeCornerReset()
@@ -75,6 +83,7 @@ PrizeCornerReset::PrizeCornerReset()
         LockMode::LOCK_WHILE_RUNNING,
         1, 1, 5
     )
+    , WARNING("")
     , TAKE_VIDEO("<b>Take Video:</b><br>Record a video when the shiny is found.", LockMode::UNLOCK_WHILE_RUNNING, true)
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_SHINY(
@@ -91,9 +100,39 @@ PrizeCornerReset::PrizeCornerReset()
 {
     PA_ADD_OPTION(SLOT);
     PA_ADD_OPTION(NUM_REDEEM);
+    PA_ADD_OPTION(WARNING);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
+
+    PrizeCornerReset::on_config_value_changed(this);
+    SLOT.add_listener(*this);
+    NUM_REDEEM.add_listener(*this);
+    WARNING.set_visibility(ConfigOptionState::HIDDEN);
+}
+
+void PrizeCornerReset::on_config_value_changed(void* object){
+    std::string error;
+     
+    error = check_amount_redeemed((uint16_t)SLOT.current_value(), NUM_REDEEM);
+
+    if (error.empty()){
+        WARNING.set_visibility(ConfigOptionState::HIDDEN);
+    }else{
+        WARNING.set_text("<font color=\"red\">" + error + "</font>");
+        WARNING.set_visibility(ConfigOptionState::ENABLED);
+    }
+}
+
+std::string PrizeCornerReset::check_amount_redeemed(uint16_t slot_num, uint32_t redeem_num) const{
+    if (slot_num == 4 && redeem_num != 1) { //Only 1 Porygon in both FR and LG
+        return "Error: Cannot redeem more than 1 Porygon per reset due to coin case limit.";
+    } else if (slot_num == 3 && redeem_num > 2) { //2 Dratini LG or 1 Scyther FR
+        return "Error: Maximum redemption of 2 Dratini per reset due to coin case limit.";
+    } else if (slot_num == 2 && redeem_num > 3) { //Max of 3 for both games
+        return "Error: Maximum redemption of 3 Dratini/Pinsir due to coin case limit.";
+    } //Abra/Clefairy will run out of party space first before coins.
+    return "";
 }
 
 void PrizeCornerReset::obtain_prize(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -143,15 +182,24 @@ void PrizeCornerReset::obtain_prize(SingleSwitchProgramEnvironment& env, ProCont
 
     //Select prize
     pbf_press_button(context, BUTTON_A, 320ms, 640ms);
-    pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+    pbf_press_button(context, BUTTON_A, 320ms, 640ms); //Yes to redeem
 
     //Exit dialog
     pbf_mash_button(context, BUTTON_B, 2000ms);
     context.wait_for_all_requests();
+
+    stats.prizes++;
+    env.update_stats();
 }
 
 void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     PrizeCornerReset_Descriptor::Stats& stats = env.current_stats<PrizeCornerReset_Descriptor::Stats>();
+
+    std::string amount_check;
+    amount_check = check_amount_redeemed((uint16_t)SLOT.current_value(), NUM_REDEEM);
+    if (amount_check != "") {
+        throw UserSetupError(env.console, "Invalid number of redemptions for the selected prize. Please check your selected options.");
+    }
 
     home_black_border_check(env.console, context);
 
