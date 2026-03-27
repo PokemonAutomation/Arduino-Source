@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 
 
 
-class ControllerConnection{
+class ControllerConnection : public CancellableScope{
 public:
     struct StatusListener{
 //        virtual void pre_connection_not_ready(ControllerConnection& connection){}
@@ -32,13 +32,16 @@ public:
     void remove_status_listener(StatusListener& listener);
 
 
-public:
+protected:
     ControllerConnection()
         : m_current_controller(ControllerType::None)
         , m_ready(false)
     {}
+public:
     virtual ~ControllerConnection() = default;
 
+
+public:
     ControllerType current_controller() const{
         return m_current_controller.load(std::memory_order_acquire);
     }

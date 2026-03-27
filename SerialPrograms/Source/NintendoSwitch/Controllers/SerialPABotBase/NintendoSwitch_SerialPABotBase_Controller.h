@@ -1,4 +1,4 @@
-/*  SerialPABotBase: Pro Controller
+/*  SerialPABotBase: Controller
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -27,23 +27,10 @@ public:
         return m_handle.protocol_version();
     }
 
-    void stop_with_error(std::string error_message) noexcept{
-        try{
-            WriteSpinLock lg(m_error_lock);
-            m_error_string = error_message;
-        }catch (...){}
-        m_serial->stop(std::move(error_message));
-    }
+    void stop_with_error(std::string error_message) noexcept;
 
-    bool is_ready() const{
-        return m_serial
-            && m_serial->state() == BotBaseController::State::RUNNING
-            && m_handle.is_ready();
-    }
-    std::string error_string() const{
-        ReadSpinLock lg(m_error_lock);
-        return m_error_string;
-    }
+    bool is_ready() const;
+    std::string error_string() const;
 
 
 public:
