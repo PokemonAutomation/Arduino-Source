@@ -24,8 +24,7 @@ class ResourceDownloadRow : public QObject, public StaticTableRow{
 public:
     ~ResourceDownloadRow();
     ResourceDownloadRow(
-        std::string&& resource_name,
-        size_t file_size,
+        DownloadedResourceMetadata local_metadata,
         bool is_downloaded,
         std::optional<uint16_t> version_num,
         ResourceVersionStatus version_status
@@ -39,12 +38,16 @@ public:
     // get the DownloadedResourceMetadata from the remote JSON, that corresponds to this button/row
     void initialize_remote_metadata();
     RemoteMetadata& fetch_remote_metadata();
-    DownloadedResourceMetadata initialize_local_metadata();
+    // DownloadedResourceMetadata initialize_local_metadata();
 
     void run_download(DownloadedResourceMetadata resource_metadata);
 
 public:
+    DownloadedResourceMetadata m_local_metadata;
+
+private:
     std::once_flag init_flag;
+    std::unique_ptr<RemoteMetadata> m_remote_metadata;
 
     struct Data;
     Pimpl<Data> m_data;
@@ -52,9 +55,7 @@ public:
     ResourceDownloadButton m_download_button;
     ResourceDeleteButton m_delete_button;
     ResourceProgressBar m_progress_bar;
-    DownloadedResourceMetadata m_local_metadata;
 
-    std::unique_ptr<RemoteMetadata> m_remote_metadata;
 
 
 
