@@ -6,6 +6,7 @@
 
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "ResourceDownloadRow.h"
 #include "ResourceDownloadOptions.h"
 
@@ -49,14 +50,15 @@ void ResourceDownloadButton::ensure_remote_metadata_loaded(){
                 m_enabled = true;
                 emit metadata_fetch_finished(predownload_warning);
 
+            }catch(OperationFailedException&){
+                m_enabled = true;
+                // cout << "failed" << endl;
+                emit download_failed();
+                return;
             }catch(...){
                 m_enabled = true;
                 // cout << "Exception thrown in thread" << endl;
                 emit exception_caught("ResourceDownloadButton::ensure_remote_metadata_loaded");
-                // std::cerr << "Error: Unknown error. Embedding session failed." << std::endl;
-                // QMessageBox box;
-                // box.warning(nullptr, "Error:",
-                //     QString::fromStdString("Error: Unknown error. Embedding session failed."));
                 return;
             }
         
@@ -138,14 +140,15 @@ void ResourceDownloadButton::start_download(){
 
                 m_enabled = true;
                 emit download_finished();
+            }catch(OperationFailedException&){
+                m_enabled = true;
+                // cout << "failed" << endl;
+                emit download_failed();
+                return;
             }catch(...){
                 m_enabled = true;
                 // cout << "Exception thrown in thread" << endl;
-                emit exception_caught("ResourceDownloadButton::ensure_remote_metadata_loaded");
-                // std::cerr << "Error: Unknown error. Embedding session failed." << std::endl;
-                // QMessageBox box;
-                // box.warning(nullptr, "Error:",
-                //     QString::fromStdString("Error: Unknown error. Embedding session failed."));
+                emit exception_caught("ResourceDownloadButton::start_download");
                 return;
             }
         }
