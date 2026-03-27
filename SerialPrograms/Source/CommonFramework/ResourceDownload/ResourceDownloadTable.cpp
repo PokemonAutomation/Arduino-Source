@@ -70,6 +70,7 @@ std::vector<std::string> ResourceDownloadTable::make_header() const{
         "Version",
         "",
         "",
+        "",
     };
     return ret;
 }

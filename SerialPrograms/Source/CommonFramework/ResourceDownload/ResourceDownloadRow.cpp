@@ -138,13 +138,7 @@ std::string ResourceDownloadButton::predownload_warning_summary(ResourceDownload
         size_t compressed_size = remote_metadata.size_compressed_bytes;
         size_t decompressed_size = remote_metadata.size_decompressed_bytes;
 
-        std::string disk_space_requirement = "";
-
-        if (decompressed_size > 100000){
-            disk_space_requirement = "This will require " + std::to_string(decompressed_size + compressed_size) + " bytes of free space";
-        }else{
-            disk_space_requirement = "This will require " + std::to_string(decompressed_size) + " bytes of free space";
-        }
+        std::string disk_space_requirement = "This will require " + std::to_string(decompressed_size + compressed_size) + " bytes of free space";
 
         if (local_version_num < remote_version_num){
             predownload_warning = "The resource you are downloading is a more updated version than the program expects. "
@@ -282,6 +276,12 @@ ResourceDeleteButton::ResourceDeleteButton(ResourceDownloadRow& p_row)
 {}
 
 
+ResourceProgressBar::ResourceProgressBar(ResourceDownloadRow& p_row)
+    : ConfigOptionImpl<ResourceProgressBar>(LockMode::UNLOCK_WHILE_RUNNING)
+    , row(p_row)
+{}
+
+
 
 ResourceDownloadRow::~ResourceDownloadRow(){}
 ResourceDownloadRow::ResourceDownloadRow(
@@ -295,6 +295,7 @@ ResourceDownloadRow::ResourceDownloadRow(
     , m_data(CONSTRUCT_TOKEN, std::move(resource_name), file_size, is_downloaded, version_num, version_status)
     , m_download_button(*this)
     , m_delete_button(*this)
+    , m_progress_bar(*this)
 {
     PA_ADD_STATIC(m_data->m_resource_name);
     PA_ADD_STATIC(m_data->m_file_size_label);
@@ -303,6 +304,7 @@ ResourceDownloadRow::ResourceDownloadRow(
 
     PA_ADD_STATIC(m_download_button);
     PA_ADD_STATIC(m_delete_button);
+    PA_ADD_STATIC(m_progress_bar);
 }
 
 
