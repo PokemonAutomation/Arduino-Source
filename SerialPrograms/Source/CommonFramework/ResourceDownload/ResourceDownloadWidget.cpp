@@ -67,7 +67,7 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
     );
 
     connect(
-        &m_value, &ResourceDownloadButton::download_progress,
+        &m_value.row, &ResourceDownloadRow::download_progress,
         this, [this](int percentage_progress){
             // Simple Console Progress Bar
             std::cout << "\rProgress: [" << std::string(percentage_progress / 5, '#') 
@@ -136,7 +136,7 @@ void DownloadButtonWidget::show_download_confirm_box(
     if (clicked == ok){
         cout << "Clicked Ok to Download" << endl;
 
-        m_value.run_download();
+        m_value.start_download();
         return;
     }
     if (clicked == cancel){

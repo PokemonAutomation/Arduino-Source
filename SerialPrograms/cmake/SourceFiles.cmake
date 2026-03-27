@@ -489,6 +489,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Recording/StreamRecorder.h
     Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.cpp
     Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.h
+    Source/CommonFramework/ResourceDownload/ResourceDownloadOptions.cpp
+    Source/CommonFramework/ResourceDownload/ResourceDownloadOptions.h
     Source/CommonFramework/ResourceDownload/ResourceDownloadRow.cpp
     Source/CommonFramework/ResourceDownload/ResourceDownloadRow.h
     Source/CommonFramework/ResourceDownload/ResourceDownloadTable.cpp
