@@ -155,6 +155,7 @@ RemoteMetadata& ResourceDownloadRow::fetch_remote_metadata(){
 
 void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metadata){
     Logger& logger = global_logger_tagged();
+    // std::this_thread::sleep_for(std::chrono::seconds(5));
     
     std::string url = resource_metadata.url;
     std::string resource_name = resource_metadata.resource_name;

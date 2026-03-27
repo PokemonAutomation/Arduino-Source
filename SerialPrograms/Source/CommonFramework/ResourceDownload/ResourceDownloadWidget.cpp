@@ -24,13 +24,18 @@ namespace PokemonAutomation{
 
 template class RegisterConfigWidget<DownloadButtonWidget>;
 DownloadButtonWidget::~DownloadButtonWidget(){
+    // cout << "Destructor for DownloadButtonWidget" << endl;
+    // m_value.disconnect(this);
 }
 DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButton& value)
-    : ConfigWidget(value)
+    : QWidget(&parent)
+    , ConfigWidget(value, *this)
     , m_value(value)
 {
     m_button = new QPushButton(&parent);
     m_widget = m_button;
+
+    // cout << "Constructor for DownloadButtonWidget" << endl;
 
     QFont font;
     font.setBold(true);
@@ -66,21 +71,13 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
         }
     );
 
-    connect(
-        &m_value.row, &ResourceDownloadRow::download_progress,
-        this, [this](int percentage_progress){
-            // Simple Console Progress Bar
-            std::cout << "\rProgress: [" << std::string(percentage_progress / 5, '#') 
-                        << std::string(20 - (percentage_progress / 5), ' ') << "] " 
-                        << percentage_progress << "%" << endl;
-
-        }
-    );
 
     // when the download is finished, update the UI to re-enable the button
     connect(
         &m_value, &ResourceDownloadButton::download_finished,
-        this, &DownloadButtonWidget::update_enabled_status
+        this, [this](){
+            update_enabled_status();
+        }
     );
 
     // if the thread catches an exception, show an error box
@@ -158,7 +155,8 @@ void show_error_box(std::string function_name){
 
 template class RegisterConfigWidget<DeleteButtonWidget>;
 DeleteButtonWidget::DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& value)
-    : ConfigWidget(value)
+    : QWidget(&parent)
+    , ConfigWidget(value, *this)
 {
     QPushButton* button = new QPushButton(&parent);
     m_widget = button;
@@ -178,15 +176,22 @@ DeleteButtonWidget::DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& va
 
 
 template class RegisterConfigWidget<ProgressBarWidget>;
+ProgressBarWidget::~ProgressBarWidget(){
+    // m_value.row.disconnect(this);
+    // cout << "Destructor for ProgressBarWidget" << endl;
+
+}
 ProgressBarWidget::ProgressBarWidget(QWidget& parent, ResourceProgressBar& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
+    , m_value(value)
 {
 
     // 1. Instantiate the widgets
     m_status_label = new QLabel("Ready", this);
     m_progress_bar = new QProgressBar(this);
 
+    // cout << "Constructor for ProgressBarWidget" << endl;
 
     // 2. Configure the progress bar
     m_progress_bar->setRange(0, 100);
@@ -199,6 +204,19 @@ ProgressBarWidget::ProgressBarWidget(QWidget& parent, ResourceProgressBar& value
     layout->addWidget(m_progress_bar);
 
     this->setLayout(layout);
+
+    connect(
+        &m_value.row, &ResourceDownloadRow::download_progress,
+        this, 
+        [this](int percentage_progress){
+            m_progress_bar->setValue(percentage_progress);
+            // Simple Console Progress Bar
+            // std::cout << "\rProgress: [" << std::string(percentage_progress / 5, '#') 
+            //             << std::string(20 - (percentage_progress / 5), ' ') << "] " 
+            //             << percentage_progress << "%" << endl;
+
+        }
+    );    
 }
 
 

@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 
 // class ResourceDownloadButton;
 
-class DownloadButtonWidget : public QObject, public ConfigWidget{
+class DownloadButtonWidget : public QWidget, public ConfigWidget{
     Q_OBJECT
 public:
     using ParentOption = ResourceDownloadButton;
@@ -42,7 +42,7 @@ private:
 void show_error_box(std::string function_name);
 
 
-class DeleteButtonWidget : public ConfigWidget{
+class DeleteButtonWidget :  public QWidget, public ConfigWidget{
 public:
     using ParentOption = ResourceDeleteButton;
 
@@ -55,9 +55,11 @@ public:
     using ParentOption = ResourceProgressBar;
 
 public:
+    ~ProgressBarWidget();
     ProgressBarWidget(QWidget& parent, ResourceProgressBar& value);
 
 private:
+    ResourceProgressBar& m_value;
     QLabel* m_status_label;
     QProgressBar* m_progress_bar;
 };
