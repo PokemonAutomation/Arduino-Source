@@ -22,8 +22,8 @@
 namespace PokemonAutomation{
 
 
-struct CancellableData{
-    CancellableData()
+struct Cancellable::Data{
+    Data()
         : cancelled(false)
     {}
     std::atomic<bool> cancelled;
@@ -60,7 +60,7 @@ bool Cancellable::cancelled() const noexcept{
 }
 bool Cancellable::cancel(std::exception_ptr exception) noexcept{
     auto scope_check = m_sanitizer.check_scope();
-    CancellableData& data(*m_impl);
+    Data& data(*m_impl);
     WriteSpinLock lg(data.lock);
     if (exception && !data.exception){
         data.exception = std::move(exception);
@@ -77,7 +77,7 @@ bool Cancellable::cancel(std::exception_ptr exception) noexcept{
 }
 void Cancellable::throw_if_cancelled() const{
     auto scope_check = m_sanitizer.check_scope();
-    const CancellableData& data(*m_impl);
+    const Data& data(*m_impl);
     if (!data.cancelled.load(std::memory_order_acquire)){
         return;
     }
@@ -90,7 +90,7 @@ void Cancellable::throw_if_cancelled() const{
 }
 bool Cancellable::throw_if_cancelled_with_exception() const{
     auto scope_check = m_sanitizer.check_scope();
-    const CancellableData& data(*m_impl);
+    const Data& data(*m_impl);
     if (!data.cancelled.load(std::memory_order_acquire)){
         return false;
     }
@@ -116,7 +116,7 @@ void Cancellable::detach() noexcept{
 
 
 
-struct CancellableScopeData{
+struct CancellableScope::Data{
     std::set<Cancellable*> children;
 
     Mutex lock;
@@ -135,7 +135,7 @@ bool CancellableScope::cancel(std::exception_ptr exception) noexcept{
     if (Cancellable::cancel(exception)){
         return true;
     }
-    CancellableScopeData& data(*m_impl);
+    Data& data(*m_impl);
     std::lock_guard lg(data.lock);
     for (Cancellable* child : data.children){
 //        cout << "Canceling: " << child << endl;
@@ -155,7 +155,7 @@ void CancellableScope::wait_for(std::chrono::milliseconds duration){
 void CancellableScope::wait_until(WallClock stop){
     auto scope_check = m_sanitizer.check_scope();
     throw_if_cancelled();
-    CancellableScopeData& data(*m_impl);
+    Data& data(*m_impl);
     {
         std::unique_lock<Mutex> lg(data.lock);
         data.cv.wait_until(
@@ -170,7 +170,7 @@ void CancellableScope::wait_until(WallClock stop){
 void CancellableScope::wait_until_cancel(){
     auto scope_check = m_sanitizer.check_scope();
     throw_if_cancelled();
-    CancellableScopeData& data(*m_impl);
+    Data& data(*m_impl);
     {
         std::unique_lock<Mutex> lg(data.lock);
         data.cv.wait(
@@ -185,7 +185,7 @@ void CancellableScope::wait_until_cancel(){
 void CancellableScope::operator+=(Cancellable& cancellable){
 //    cout << "Attaching: " << &cancellable << endl;
     auto scope_check = m_sanitizer.check_scope();
-    CancellableScopeData& data(*m_impl);
+    Data& data(*m_impl);
     std::lock_guard<Mutex> lg(data.lock);
     throw_if_cancelled();
     data.children.insert(&cancellable);
@@ -193,7 +193,7 @@ void CancellableScope::operator+=(Cancellable& cancellable){
 void CancellableScope::operator-=(Cancellable& cancellable){
 //    cout << "Detaching: " << &cancellable << endl;
     auto scope_check = m_sanitizer.check_scope();
-    CancellableScopeData& data(*m_impl);
+    Data& data(*m_impl);
     std::lock_guard<Mutex> lg(data.lock);
     data.children.erase(&cancellable);
 }

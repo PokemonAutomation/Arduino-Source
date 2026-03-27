@@ -11,6 +11,8 @@
 #include "SystemSleep_Windows.tpp"
 #elif __APPLE__
 #include "SystemSleep_Apple.tpp"
+#elif __linux__
+#include "SystemSleep_Linux.tpp"
 #else
 namespace PokemonAutomation{
     SystemSleepController& SystemSleepController::instance(){

@@ -17,7 +17,7 @@
 #include <memory>
 #include <deque>
 #include <map>
-#include "Common/Cpp/StreamConnections/StreamConnection.h"
+#include "Common/Cpp/StreamConnections/PushingStreamConnections.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 #include "BotBase.h"
 
@@ -32,7 +32,10 @@ class BotBaseMessageType;
 //  the child class to wrap and make them thread-safe.
 class PABotBaseConnection : public StreamListener{
 public:
-    PABotBaseConnection(Logger& logger, std::unique_ptr<StreamConnection> connection);
+    PABotBaseConnection(
+        Logger& logger,
+        std::unique_ptr<UnreliableStreamConnectionPushing> connection
+    );
     virtual ~PABotBaseConnection();
 
     void add_message_printer(const BotBaseMessageType& type);
@@ -59,7 +62,7 @@ private:
     void push_error_byte(ErrorBatchType type, char byte);
 
 private:
-    std::unique_ptr<StreamConnection> m_connection;
+    std::unique_ptr<UnreliableStreamConnectionPushing> m_connection;
     std::deque<char> m_recv_buffer;
 
     ErrorBatchType m_current_error_type;

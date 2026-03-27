@@ -10,6 +10,7 @@
 #include "CommonTools/Random.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
@@ -648,6 +649,10 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
 void home_black_border_check(ConsoleHandle& console, ProControllerContext& context){
     if (GameSettings::instance().DEVICE == GameSettings::Device::switch_1_2){
         console.log("Switch 1 or 2 selected in Settings.");
+
+        console.log("Checking for min 720p and 16:9.");
+        assert_16_9_720p_min(console, console);
+
         console.log("Going to home to check for black border.");
         pbf_press_button(context, BUTTON_ZL, 120ms, 880ms); //  Connect the controller.
         pbf_press_button(context, BUTTON_HOME, 120ms, 880ms);
@@ -659,7 +664,7 @@ void home_black_border_check(ConsoleHandle& console, ProControllerContext& conte
         console.log("Entered game.");
     }else{
         console.log("Non-Switch device selected in Settings.");
-        console.log("Skipping black border check.", COLOR_BLUE);
+        console.log("Skipping black border and aspect ratio checks.", COLOR_BLUE);
     }
 }
 

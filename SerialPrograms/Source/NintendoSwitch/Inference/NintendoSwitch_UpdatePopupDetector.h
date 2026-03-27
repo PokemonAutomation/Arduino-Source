@@ -50,7 +50,7 @@ private:
     ImageFloatBox m_left;
     ImageFloatBox m_bottom_solid;
     ImageFloatBox m_bottom_buttons;
-    ImageFloatBox m_option_divider;
+    ImageFloatBox m_option_divider_check_for_internet;
 };
 
 

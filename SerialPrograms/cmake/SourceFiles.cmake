@@ -192,11 +192,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/SerialConnection/SerialConnectionWinAPI.h
     ../Common/Cpp/StreamConnections/MockDevice.cpp
     ../Common/Cpp/StreamConnections/MockDevice.h
-    ../Common/Cpp/StreamConnections/PABotBase2_MessageDumper.cpp
-    ../Common/Cpp/StreamConnections/PABotBase2_MessageDumper.h
-    ../Common/Cpp/StreamConnections/ReliableStreamConnection.cpp
-    ../Common/Cpp/StreamConnections/ReliableStreamConnection.h
-    ../Common/Cpp/StreamConnections/StreamConnection.h
+    ../Common/Cpp/StreamConnections/PollingStreamConnections.h
+    ../Common/Cpp/StreamConnections/PushingStreamConnections.h
     ../Common/Cpp/StreamConnections/StreamInterface.h
     ../Common/Cpp/Sockets/AbstractClientSocket.h
     ../Common/Cpp/Sockets/ClientSocket.cpp
@@ -289,17 +286,25 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/TimeQt.h
     ../Common/Qt/WidgetStackFixedAspectRatio.cpp
     ../Common/Qt/WidgetStackFixedAspectRatio.h
-    ../Common/PABotBase2/PABotBase2_Connection.h
-    ../Common/PABotBase2/PABotBase2_ConnectionDebug.c
-    ../Common/PABotBase2/PABotBase2_ConnectionDebug.h
-    ../Common/PABotBase2/PABotBase2_PacketParser.c
-    ../Common/PABotBase2/PABotBase2_PacketParser.h
-    ../Common/PABotBase2/PABotBase2_PacketSender.c
-    ../Common/PABotBase2/PABotBase2_PacketSender.h
-    ../Common/PABotBase2/PABotbase2_ReliableStreamConnection.c
-    ../Common/PABotBase2/PABotbase2_ReliableStreamConnection.h
-    ../Common/PABotBase2/PABotBase2_StreamCoalescer.c
-    ../Common/PABotBase2/PABotBase2_StreamCoalescer.h
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_ConnectionDebug.cpp
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_ConnectionDebug.h
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketParser.cpp
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketParser.h
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketProtocol.h
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketSender.cpp
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketSender.h
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_StreamCoalescer.cpp
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2_StreamCoalescer.h
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2CC_ReliableStreamConnection.cpp
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2CC_ReliableStreamConnection.h
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2FW_ReliableStreamConnection.cpp
+    ../Common/PABotBase2/ReliableConnectionLayer/PABotBase2FW_ReliableStreamConnection.h
+    ../Common/PABotBase2/Controllers/PABotBase2_Controller_HID_Keyboard.h
+    ../Common/PABotBase2/Controllers/PABotBase2_Controller_NS_WiredController.h
+    ../Common/PABotBase2/Controllers/PABotBase2_Controller_NS1_OemController.h
+    ../Common/PABotBase2/PABotBase2CC_MessageDumper.cpp
+    ../Common/PABotBase2/PABotBase2CC_MessageDumper.h
+    ../Common/PABotBase2/PABotBase2_MessageProtocol.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_HID_Keyboard.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS1_OemControllers.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS_WiredController.h
@@ -361,6 +366,7 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Environment/SystemSleep.cpp
     Source/CommonFramework/Environment/SystemSleep.h
     Source/CommonFramework/Environment/SystemSleep_Apple.tpp
+    Source/CommonFramework/Environment/SystemSleep_Linux.tpp
     Source/CommonFramework/Environment/SystemSleep_Windows.tpp
     Source/CommonFramework/ErrorReports/ErrorReports.cpp
     Source/CommonFramework/ErrorReports/ErrorReports.h
@@ -733,6 +739,16 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/JoystickTools.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h
+    Source/Controllers/PABotBase2/PABotBase2_CommandQueueManager.cpp
+    Source/Controllers/PABotBase2/PABotBase2_CommandQueueManager.h
+    Source/Controllers/PABotBase2/PABotBase2_DeviceHandle.cpp
+    Source/Controllers/PABotBase2/PABotBase2_DeviceHandle.h
+    Source/Controllers/PABotBase2/SerialPABotBase2_Connection.cpp
+    Source/Controllers/PABotBase2/SerialPABotBase2_Connection.h
+    Source/Controllers/PABotBase2/SerialPABotBase2_Descriptor.cpp
+    Source/Controllers/PABotBase2/SerialPABotBase2_Descriptor.h
+    Source/Controllers/PABotBase2/SerialPABotBase2_SelectorWidget.h
+    Source/Controllers/PABotBase2/SerialPABotBase_StatusThread.h
     Source/Controllers/Schedulers/ControllerWithScheduler.h
     Source/Controllers/Schedulers/SuperscalarScheduler.cpp
     Source/Controllers/Schedulers/SuperscalarScheduler.h
@@ -765,7 +781,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_StatusThread.h
     Source/Controllers/StandardHid/StandardHid_Keyboard.cpp
     Source/Controllers/StandardHid/StandardHid_Keyboard.h
     Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.cpp
