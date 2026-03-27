@@ -46,7 +46,7 @@ std::string resource_version_to_string(ResourceVersionStatus version){
 
 struct ResourceDownloadRow::Data{
     Data(
-        std::string&& resource_name,
+        std::string& resource_name,
         size_t file_size,
         bool is_downloaded,
         std::optional<uint16_t> version_num,
@@ -80,18 +80,17 @@ struct ResourceDownloadRow::Data{
 
 ResourceDownloadRow::~ResourceDownloadRow(){}
 ResourceDownloadRow::ResourceDownloadRow(
-    std::string&& resource_name,
-    size_t file_size,
+    DownloadedResourceMetadata local_metadata,
     bool is_downloaded,
     std::optional<uint16_t> version_num,
     ResourceVersionStatus version_status
 )
-    : StaticTableRow(resource_name)
-    , m_data(CONSTRUCT_TOKEN, std::move(resource_name), file_size, is_downloaded, version_num, version_status)
+    : StaticTableRow(local_metadata.resource_name)
+    , m_local_metadata(local_metadata)
+    , m_data(CONSTRUCT_TOKEN, local_metadata.resource_name, local_metadata.size_decompressed_bytes, is_downloaded, version_num, version_status)
     , m_download_button(*this)
     , m_delete_button(*this)
     , m_progress_bar(*this)
-    , m_local_metadata(initialize_local_metadata())
 {
     PA_ADD_STATIC(m_data->m_resource_name);
     PA_ADD_STATIC(m_data->m_file_size_label);
@@ -110,8 +109,6 @@ void ResourceDownloadRow::initialize_remote_metadata(){
     RemoteMetadataStatus status = RemoteMetadataStatus::NOT_AVAILABLE;
     std::vector<DownloadedResourceMetadata> all_remote_metadata = remote_resource_download_list();
 
-    cout << "done remote_resource_download_list" << endl;
-    
     std::string resource_name = m_data->m_resource_name.text();
 
     for (DownloadedResourceMetadata remote_metadata : all_remote_metadata){
@@ -133,27 +130,27 @@ RemoteMetadata& ResourceDownloadRow::fetch_remote_metadata(){
     return *m_remote_metadata;
 }
 
-DownloadedResourceMetadata ResourceDownloadRow::initialize_local_metadata(){
-    DownloadedResourceMetadata corresponding_local_metadata;
-    std::vector<DownloadedResourceMetadata> all_local_metadata = local_resource_download_list();
+// DownloadedResourceMetadata ResourceDownloadRow::initialize_local_metadata(){
+//     DownloadedResourceMetadata corresponding_local_metadata;
+//     std::vector<DownloadedResourceMetadata> all_local_metadata = local_resource_download_list();
     
-    std::string resource_name = m_data->m_resource_name.text();
+//     std::string resource_name = m_data->m_resource_name.text();
 
-    bool found = false;
-    for (DownloadedResourceMetadata local_metadata : all_local_metadata){
-        if (local_metadata.resource_name == resource_name){
-            corresponding_local_metadata = local_metadata;
-            found = true;
-            break;
-        }
-    }
+//     bool found = false;
+//     for (DownloadedResourceMetadata local_metadata : all_local_metadata){
+//         if (local_metadata.resource_name == resource_name){
+//             corresponding_local_metadata = local_metadata;
+//             found = true;
+//             break;
+//         }
+//     }
 
-    if (!found){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "initialize_local_metadata: Corresponding DownloadedResourceMetadata not found in the local JSON file.");  
-    }
+//     if (!found){
+//         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "initialize_local_metadata: Corresponding DownloadedResourceMetadata not found in the local JSON file.");  
+//     }
 
-    return corresponding_local_metadata;
-}
+//     return corresponding_local_metadata;
+// }
 
 
 void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metadata){

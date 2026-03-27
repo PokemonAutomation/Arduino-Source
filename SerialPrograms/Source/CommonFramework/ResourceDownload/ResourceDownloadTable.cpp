@@ -41,7 +41,7 @@ std::vector<std::unique_ptr<ResourceDownloadRow>> get_resource_download_rows(){
 
         ResourceVersionStatus version_status = get_version_status(expected_version_num, current_version_num);
 
-        resource_rows.emplace_back(std::make_unique<ResourceDownloadRow>(std::move(resource_name), resource.size_decompressed_bytes, is_downloaded, current_version_num, version_status));
+        resource_rows.emplace_back(std::make_unique<ResourceDownloadRow>(resource, is_downloaded, current_version_num, version_status));
     }
 
     return resource_rows;
