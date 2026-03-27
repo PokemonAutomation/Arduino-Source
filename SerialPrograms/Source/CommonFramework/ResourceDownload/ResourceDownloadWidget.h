@@ -8,6 +8,8 @@
 #define PokemonAutomation_ResourceDownloadWidget_H
 
 #include <QObject>
+#include <QLabel>
+#include <QProgressBar>
 #include "Common/Qt/Options/ConfigWidget.h"
 // #include "ResourceDownloadTable.h"
 #include "ResourceDownloadRow.h"
@@ -46,6 +48,18 @@ public:
 
 public:
     DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& value);
+};
+
+class ProgressBarWidget : public QWidget, public ConfigWidget{
+public:
+    using ParentOption = ResourceProgressBar;
+
+public:
+    ProgressBarWidget(QWidget& parent, ResourceProgressBar& value);
+
+private:
+    QLabel* m_status_label;
+    QProgressBar* m_progress_bar;
 };
 
 

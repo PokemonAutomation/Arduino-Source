@@ -9,6 +9,7 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QPointer>
+#include <QHBoxLayout>
 #include "CommonFramework/Logging/Logger.h"
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -22,14 +23,13 @@ namespace PokemonAutomation{
 
 
 template class RegisterConfigWidget<DownloadButtonWidget>;
-
 DownloadButtonWidget::~DownloadButtonWidget(){
 }
 DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButton& value)
     : ConfigWidget(value)
     , m_value(value)
-    , m_button(new QPushButton(&parent))
 {
+    m_button = new QPushButton(&parent);
     m_widget = m_button;
 
     QFont font;
@@ -157,8 +157,6 @@ void show_error_box(std::string function_name){
 
 
 template class RegisterConfigWidget<DeleteButtonWidget>;
-
-
 DeleteButtonWidget::DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& value)
     : ConfigWidget(value)
 {
@@ -178,6 +176,30 @@ DeleteButtonWidget::DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& va
     );
 }
 
+
+template class RegisterConfigWidget<ProgressBarWidget>;
+ProgressBarWidget::ProgressBarWidget(QWidget& parent, ResourceProgressBar& value)
+    : QWidget(&parent)
+    , ConfigWidget(value, *this)
+{
+
+    // 1. Instantiate the widgets
+    m_status_label = new QLabel("Ready", this);
+    m_progress_bar = new QProgressBar(this);
+
+
+    // 2. Configure the progress bar
+    m_progress_bar->setRange(0, 100);
+    m_progress_bar->setValue(0);
+    m_progress_bar->setTextVisible(true); // Shows % inside the bar
+
+    // 3. Create a horizontal layout to hold them
+    QHBoxLayout *layout = new QHBoxLayout();
+    layout->addWidget(m_status_label);
+    layout->addWidget(m_progress_bar);
+
+    this->setLayout(layout);
+}
 
 
 }

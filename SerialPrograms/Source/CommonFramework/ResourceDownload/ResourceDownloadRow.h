@@ -46,6 +46,7 @@ public:
     void initialize_remote_metadata();
     RemoteMetadata& fetch_remote_metadata();
     DownloadedResourceMetadata initialize_local_metadata();
+
     void ensure_remote_metadata_loaded();
     std::string predownload_warning_summary(RemoteMetadata& remote_metadata);
 
@@ -78,6 +79,13 @@ public:
     ResourceDownloadRow& row;
 };
 
+class ResourceProgressBar : public ConfigOptionImpl<ResourceProgressBar>{
+public:
+    ResourceProgressBar(ResourceDownloadRow& p_row);
+
+    ResourceDownloadRow& row;
+};
+
 
 
 class ResourceDownloadRow : public StaticTableRow{
@@ -98,6 +106,7 @@ public:
 
     ResourceDownloadButton m_download_button;
     ResourceDeleteButton m_delete_button;
+    ResourceProgressBar m_progress_bar;
 
 };
 
