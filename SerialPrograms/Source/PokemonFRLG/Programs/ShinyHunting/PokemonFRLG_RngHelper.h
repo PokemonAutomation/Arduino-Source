@@ -59,6 +59,12 @@ private:
         hypno,
         sweetscent,
         fishing,
+        safarizonecenter,
+        safarizoneeast,
+        safarizonenorth,
+        safarizonewest,
+        safarizonesurf,
+        safarizonefish,
         // roaming
     };
 

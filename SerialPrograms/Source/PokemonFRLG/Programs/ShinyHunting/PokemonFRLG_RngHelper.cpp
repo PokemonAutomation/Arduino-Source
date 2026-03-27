@@ -80,6 +80,12 @@ RngHelper::RngHelper()
             {Target::hypno, "berryforesthypno", "Berry Forest Hypno"},
             {Target::sweetscent, "sweetscent", "Sweet Scent"},
             {Target::fishing, "fishing", "Fishing"},
+            {Target::safarizonecenter, "safarizonecenter", "Safari Zone Center (Sweet Scent)"},
+            {Target::safarizoneeast, "safarizoneeast", "Safari Zone East (Sweet Scent)"},
+            {Target::safarizonenorth, "safarizonenorth", "Safari Zone North (Sweet Scent)"},
+            {Target::safarizonewest, "safarizonewest", "Safari Zone West (Sweet Scent)"},
+            {Target::safarizonesurf, "safarizonesurf", "Safari Zone Surfing"},
+            {Target::safarizonefish, "safarizonefish", "Safari Zone Fishing"},
             // {Target::roaming, "roaming", "Roaming Legendaries"}
         },
         LockMode::LOCK_WHILE_RUNNING,
@@ -253,13 +259,14 @@ void wait_with_teachy_tv(ProControllerContext& context, uint64_t& TEACHY_DELAY){
     pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
     pbf_press_button(context, BUTTON_B, 200ms, 300ms);
     // total non-teachy delay duration: 13700ms
+    // if used in the Safari Zone: 14200ms
 }
 
 void collect_starter_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
     if (INGAME_DELAY < 7500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Starters: the in-game delay cannot be less than 7500ms (900 frames). Check your in-game advances calibration.",
+            "Starters: the in-game delay cannot be less than 7500ms (900 frames). Check your in-game advances and calibration.",
             env.console
         );
     }
@@ -281,7 +288,7 @@ void collect_magikarp_after_delay(SingleSwitchProgramEnvironment& env, ProContro
     if (INGAME_DELAY < 7500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Magikarp: the in-game delay cannot be less than 7500ms (900 frames). Check your in-game advances calibration.",
+            "Magikarp: the in-game delay cannot be less than 7500ms (900 frames). Check your in-game advances and calibration.",
             env.console
         );
     }
@@ -301,7 +308,7 @@ void collect_hitmon_after_delay(SingleSwitchProgramEnvironment& env, ProControll
     if (INGAME_DELAY < 4500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Hitmonchan/Hitmonlee: the in-game delay cannot be less than 4500ms (540 frames). Check your in-game advances calibration.",
+            "Hitmonchan/Hitmonlee: the in-game delay cannot be less than 4500ms (540 frames). Check your in-game advances and calibration.",
             env.console
         );
     }
@@ -319,7 +326,7 @@ void collect_eevee_after_delay(SingleSwitchProgramEnvironment& env, ProControlle
     if (INGAME_DELAY < 4000){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Eevee: the in-game delay cannot be less than 4000ms (480 frames). Check your in-game advances calibration.",
+            "Eevee: the in-game delay cannot be less than 4000ms (480 frames). Check your in-game advances and calibration.",
             env.console
         );
     }
@@ -337,7 +344,7 @@ void collect_lapras_after_delay(SingleSwitchProgramEnvironment& env, ProControll
     if (INGAME_DELAY < 7500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Lapras: the in-game delay cannot be less than 7500ms (900 frames). Check your in-game advances calibration.",
+            "Lapras: the in-game delay cannot be less than 7500ms (900 frames). Check your in-game advances and calibration.",
             env.console
         );
     }
@@ -357,7 +364,7 @@ void collect_fossil_after_delay(SingleSwitchProgramEnvironment& env, ProControll
     if (INGAME_DELAY < 6000){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Fossils: the in-game delay cannot be less than 6000ms (720 frames). Check your in-game advances calibration.",
+            "Fossils: the in-game delay cannot be less than 6000ms (720 frames). Check your in-game advances and calibration.",
             env.console
         );
     }
@@ -376,7 +383,7 @@ void collect_gamecorner_after_delay(SingleSwitchProgramEnvironment& env, ProCont
     if (INGAME_DELAY < 8500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Game Corner: the in-game delay cannot be less than 8500ms (1020 frames). Check your in-game advances calibration.",
+            "Game Corner: the in-game delay cannot be less than 8500ms (1020 frames). Check your in-game advances and calibration.",
             env.console
         );
     }
@@ -404,7 +411,7 @@ void encounter_static_after_delay(SingleSwitchProgramEnvironment& env, ProContro
     if (INGAME_DELAY < 4000){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Static Encounter: the in-game delay cannot be less than 4000ms (480 frames). Check your in-game advances calibration.",
+            "Static Encounter: the in-game delay cannot be less than 4000ms (480 frames). Check your in-game advances and calibration.",
             env.console
         );
     }
@@ -421,7 +428,7 @@ void encounter_snorlax_after_delay(SingleSwitchProgramEnvironment& env, ProContr
     if (INGAME_DELAY < 16000){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Snorlax: the in-game delay cannot be less than 16000ms (1920 frames). Check your in-game advances calibration.",
+            "Snorlax: the in-game delay cannot be less than 16000ms (1920 frames). Check your in-game advances and calibration.",
             env.console
         );
     }
@@ -438,7 +445,7 @@ void encounter_mewtwo_after_delay(SingleSwitchProgramEnvironment& env, ProContro
     if (INGAME_DELAY < 4500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Mewtwo: the in-game delay cannot be less than 4500ms (540 frames). Check your in-game advances calibration.",
+            "Mewtwo: the in-game delay cannot be less than 4500ms (540 frames). Check your in-game advances and calibration.",
             env.console
         );
     }
@@ -454,7 +461,7 @@ void encounter_hooh_after_delay(SingleSwitchProgramEnvironment& env, ProControll
     if (INGAME_DELAY < 4000){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Ho-oh: the in-game delay cannot be less than 4000ms (480 frames). Check your in-game advances calibration.",
+            "Ho-oh: the in-game delay cannot be less than 4000ms (480 frames). Check your in-game advances and calibration.",
             env.console
         );
     }
@@ -470,7 +477,7 @@ void encounter_hypno_after_delay(SingleSwitchProgramEnvironment& env, ProControl
     if (INGAME_DELAY < 13000){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Hypno: the in-game delay cannot be less than 13000ms (1560 frames). Check your in-game advances calibration.",
+            "Hypno: the in-game delay cannot be less than 13000ms (1560 frames). Check your in-game advances and calibration.",
             env.console
         );
     }
@@ -502,23 +509,32 @@ void open_party_menu_from_overworld(SingleSwitchProgramEnvironment& env, ProCont
     context.wait_for_all_requests();
 }
 
-void use_sweet_scent(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
-    if (INGAME_DELAY < 8500){
+void use_sweet_scent(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY, bool SAFARI_ZONE = false){
+    if (!SAFARI_ZONE && INGAME_DELAY < 8500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Sweet Scent: the in-game delay cannot be less than 8500ms (1020 frames). Check your in-game advances calibration.",
+            "Sweet Scent: the in-game delay cannot be less than 8500ms (1020 frames). Check your in-game advances and calibration.",
+            env.console
+        );
+    }else if (SAFARI_ZONE && INGAME_DELAY < 9500){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Sweet Scent: the in-game delay cannot be less than 9500ms (1140 frames). Check your in-game advances and calibration.",
             env.console
         );
     }
     // navigate to last party slot
     pbf_press_button(context, BUTTON_PLUS, 200ms, 300ms);
-    pbf_move_left_joystick(context, {0, -1}, 200ms, 800ms);
+    pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
+    if (SAFARI_ZONE) { // there is an extra menu option at the top of the start menu
+        pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms); 
+    }
     pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
     pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
     pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 300ms);
     // hover over Sweet Scent (2nd option, but maybe HMs could change this)
-    pbf_move_left_joystick(context, {0, -1}, 200ms, std::chrono::milliseconds(INGAME_DELAY - 8400));
+    pbf_move_left_joystick(context, {0, -1}, 200ms, std::chrono::milliseconds(INGAME_DELAY - (SAFARI_ZONE ? 7900 : 7400)));
     pbf_press_button(context, BUTTON_A, 200ms, 800ms);
     context.wait_for_all_requests();
     env.log("Sweet Scent used.");
@@ -528,7 +544,7 @@ void use_registered_fishing_rod(SingleSwitchProgramEnvironment& env, ProControll
     if (INGAME_DELAY < 5500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Fishing: the in-game delay cannot be less than 5500ms (660 frames). Check your in-game advances calibration.",
+            "Fishing: the in-game delay cannot be less than 5500ms (660 frames). Check your in-game advances and calibration.",
             env.console
         );
     }
@@ -593,6 +609,89 @@ int watch_for_shiny_encounter(SingleSwitchProgramEnvironment& env, ProController
     return encounter_shiny ? 1 : 0;
 }
 
+void enter_safarizone(ProControllerContext& context){
+    // walk up to initiate dialogue
+    pbf_move_left_joystick(context, {0, +1}, 600ms, 400ms);
+    // Advance through the dialogue (waiting a little longer when Safari Balls are recieved)
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 3300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    // finish dialogue and automatically enter the Safari Zone
+    pbf_press_button(context, BUTTON_A, 200ms, 4800ms);
+    // total duration: 18500ms
+}
+
+void walk_to_safarizonefish(ProControllerContext& context){
+    enter_safarizone(context); // 18500ms
+    // walk from the entrance to the pond in the central area
+    pbf_move_left_joystick(context, {0, +1}, 2200ms, 300ms);
+    pbf_move_left_joystick(context, {+1, 0}, 1600ms, 300ms);
+    pbf_move_left_joystick(context, {0, +1}, 600ms, 300ms);
+    // total duration: 23800ms
+}
+
+void walk_to_safarizonesurf(ProControllerContext& context){
+    walk_to_safarizonefish(context); // 23800ms
+    // start surfing
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 3300ms);
+    // total duration: 30300ms
+}
+
+void walk_to_safarizonecenter(ProControllerContext& context){
+    enter_safarizone(context); // 18500ms
+    // walk from the entrance to the nearest grass
+    pbf_move_left_joystick(context, {0, +1}, 460ms, 300ms);
+    pbf_move_left_joystick(context, {-1, 0}, 1110ms, 300ms);
+    // total duration: 20670ms
+}
+
+void walk_to_safarizoneeast(ProControllerContext& context){
+    enter_safarizone(context); // 18500ms
+    // walk from the entrance to the east area
+    pbf_move_left_joystick(context, {0, +1}, 160ms, 300ms);
+    pbf_move_left_joystick(context, {+1, 0}, 4400ms, 300ms);
+    pbf_move_left_joystick(context, {0, +1}, 3550ms, 300ms);
+    // walk to the nearest grass
+    pbf_move_left_joystick(context, {+1, 0}, 3600ms, 300ms);
+    pbf_move_left_joystick(context, {0, -1}, 700ms, 300ms);
+    pbf_move_left_joystick(context, {+1, 0}, 3450ms, 300ms);
+    // total duration: 36160ms
+}
+
+void walk_to_safarizonenorth(ProControllerContext& context){
+    walk_to_safarizonesurf(context); // 30300ms
+    // from the pond to the grass in the north area
+    pbf_move_left_joystick(context, {0, +1}, 2810ms, 300ms);
+    pbf_move_left_joystick(context, {-1, 0}, 1530ms, 300ms);
+    pbf_move_left_joystick(context, {0, +1}, 1870ms, 300ms);
+    // total duration: 37410ms
+}
+
+void walk_to_safarizonewest(ProControllerContext& context){
+    walk_to_safarizonesurf(context); // 30300ms
+    // surf past the hedge and exit the pond
+    pbf_move_left_joystick(context, {-1, 0}, 500ms, 300ms);
+    pbf_move_left_joystick(context, {0, -1}, 260ms, 500ms);
+    // walk to the west area
+    pbf_move_left_joystick(context, {-1, 0}, 5500ms, 300ms);
+    pbf_move_left_joystick(context, {0, +1}, 240ms, 300ms);
+    pbf_move_left_joystick(context, {-1, 0}, 1200ms, 500ms);
+    // walk to the grass
+    pbf_move_left_joystick(context, {-1, 0}, 2860ms, 300ms);
+    pbf_move_left_joystick(context, {0, +1}, 1390ms, 300ms);
+    pbf_move_left_joystick(context, {-1, 0}, 1510ms, 300ms);
+    pbf_move_left_joystick(context, {0, -1}, 770ms, 300ms);
+    pbf_move_left_joystick(context, {-1, 0}, 2400ms, 300ms);
+    pbf_move_left_joystick(context, {0, -1}, 600ms, 300ms);
+    // total duration: 51430ms
+}
+
 } // namespace
 
 
@@ -622,15 +721,25 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         if (MODIFIED_INGAME_ADVANCES < 0) {
            OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "In-game advances cannot be negative. Check your in-game advances calibration.",
+                "In-game advances cannot be negative. Check your in-game advances and calibration.",
                 env.console
             ); 
         }
         uint64_t TEACHY_ADVANCES = 0;
 
-        bool should_use_teachy_tv = USE_TEACHY_TV && MODIFIED_INGAME_ADVANCES > 5000;
+        bool SAFARI_ZONE = (TARGET == Target::safarizonecenter
+            || TARGET == Target::safarizoneeast
+            || TARGET == Target::safarizonenorth
+            || TARGET == Target::safarizonewest
+            || TARGET == Target::safarizonesurf
+            || TARGET == Target::safarizonefish 
+        );
+
+        uint64_t TEACHY_TV_BUFFER = SAFARI_ZONE ? 12000 : 5000; // Safari zone targets need extra time to walk to the right position
+
+        bool should_use_teachy_tv = USE_TEACHY_TV && MODIFIED_INGAME_ADVANCES > TEACHY_TV_BUFFER; // don't use Teacy TV for short in-game advance targets
         if (should_use_teachy_tv) {
-            TEACHY_ADVANCES = uint64_t((int)std::floor((MODIFIED_INGAME_ADVANCES - 5000) / 313) * 313);
+            TEACHY_ADVANCES = uint64_t((int)std::floor((MODIFIED_INGAME_ADVANCES - TEACHY_TV_BUFFER) / 313) * 313);
         }
 
         LOAD_DELAY = uint64_t((LOAD_ADVANCES + LOAD_CALIBRATION) * FRAME_DURATION);
@@ -663,6 +772,7 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         }
 
         int ret;
+        uint64_t MODIFIED_INGAME_DELAY;
         switch (TARGET){
         case Target::starters:
             collect_starter_after_delay(env, context, INGAME_DELAY);
@@ -739,6 +849,95 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             break;
         case Target::fishing:
             use_registered_fishing_rod(env, context, INGAME_DELAY);
+            ret = watch_for_shiny_encounter(env, context);
+            if (ret < 0 ){
+                continue;
+                // keep going if "Not even a nibble..."
+            }
+            shiny_found = ret == 1;
+            context.wait_for_all_requests();
+            break;
+        case Target::safarizonecenter:
+            if (INGAME_DELAY < 21000){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Safari Zone Center: in-game delay cannot be less than 21000ms (2520 frames). Check your in-game advances and calibration.",
+                    env.console
+                );
+            }
+            MODIFIED_INGAME_DELAY = INGAME_DELAY - 20670;
+            walk_to_safarizonecenter(context);
+            use_sweet_scent(env, context, MODIFIED_INGAME_DELAY, true);
+            shiny_found = watch_for_shiny_encounter(env, context) == 1;
+            context.wait_for_all_requests();
+            break;
+        case Target::safarizoneeast:
+            if (INGAME_DELAY < 36500){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Safari Zone East: in-game delay cannot be less than 36500ms (4380 frames). Check your in-game advances and calibration.",
+                    env.console
+                );
+            }
+            MODIFIED_INGAME_DELAY = INGAME_DELAY - 36160;
+            walk_to_safarizoneeast(context);
+            use_sweet_scent(env, context, MODIFIED_INGAME_DELAY, true);
+            shiny_found = watch_for_shiny_encounter(env, context) == 1;
+            context.wait_for_all_requests();
+            break;
+        case Target::safarizonenorth:
+            if (INGAME_DELAY < 38000){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Safari Zone North: in-game delay cannot be less than 38000ms (4560 frames). Check your in-game advances and calibration.",
+                    env.console
+                );
+            }
+            MODIFIED_INGAME_DELAY = INGAME_DELAY - 37410;
+            walk_to_safarizonenorth(context);
+            use_sweet_scent(env, context, MODIFIED_INGAME_DELAY, true);
+            shiny_found = watch_for_shiny_encounter(env, context) == 1;
+            context.wait_for_all_requests();
+            break;
+        case Target::safarizonewest:
+            if (INGAME_DELAY < 52000){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Safari Zone West: in-game delay cannot be less than 52000ms (6240 frames). Check your in-game advances and calibration.",
+                    env.console
+                );
+            }
+            MODIFIED_INGAME_DELAY = INGAME_DELAY - 51430;
+            walk_to_safarizonewest(context);
+            use_sweet_scent(env, context, MODIFIED_INGAME_DELAY, true);
+            shiny_found = watch_for_shiny_encounter(env, context) == 1;
+            context.wait_for_all_requests();
+            break;
+        case Target::safarizonesurf:
+            if (INGAME_DELAY < 31000){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Safari Zone Surfing: in-game delay cannot be less than 31000ms (3720 frames). Check your in-game advances and calibration.",
+                    env.console
+                );
+            }
+            MODIFIED_INGAME_DELAY = INGAME_DELAY - 30300;
+            walk_to_safarizonewest(context);
+            use_sweet_scent(env, context, MODIFIED_INGAME_DELAY, true);
+            shiny_found = watch_for_shiny_encounter(env, context) == 1;
+            context.wait_for_all_requests();
+            break;
+        case Target::safarizonefish:
+            if (INGAME_DELAY < 24500){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Safari Zone Fishing: in-game delay cannot be less than 24500ms (2940 frames). Check your in-game advances and calibration.",
+                    env.console
+                );
+            }
+            MODIFIED_INGAME_DELAY = INGAME_DELAY - 30300;
+            walk_to_safarizonewest(context);
+            use_registered_fishing_rod(env, context, MODIFIED_INGAME_DELAY);
             ret = watch_for_shiny_encounter(env, context);
             if (ret < 0 ){
                 continue;
