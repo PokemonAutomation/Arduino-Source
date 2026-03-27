@@ -26,8 +26,7 @@ template class RegisterConfigWidget<DownloadButtonWidget>;
 DownloadButtonWidget::~DownloadButtonWidget(){
 }
 DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButton& value)
-    : QWidget(&parent)
-    , ConfigWidget(value)
+    : ConfigWidget(value)
     , m_value(value)
     , m_button(new QPushButton(&parent))
 {
