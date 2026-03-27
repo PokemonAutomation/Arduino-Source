@@ -3,59 +3,55 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-#ifndef PokemonAutomation_ShinyHuntFishing_H
-#define PokemonAutomation_ShinyHuntFishing_H
+#ifndef PokemonAutomation_PokemonFRLG_ShinyHuntFishing_H
+#define PokemonAutomation_PokemonFRLG_ShinyHuntFishing_H
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
+
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
+namespace PokemonAutomation {
+namespace NintendoSwitch {
+namespace PokemonFRLG {
 
-#include "CommonFramework/ProgramStats/StatsTracking.h"
-
-namespace PokemonAutomation{
-namespace NintendoSwitch{
-namespace PokemonFRLG{
-
-
-class ShinyHuntFishing_Descriptor
- : public SingleSwitchProgramDescriptor{
+class ShinyHuntFishing_Descriptor : public SingleSwitchProgramDescriptor {
 public:
-    ShinyHuntFishing_Descriptor
-();
+    ShinyHuntFishing_Descriptor();
+
     struct Stats;
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
+    std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class ShinyHuntFishing : public SingleSwitchProgramInstance{
+class ShinyHuntFishing : public SingleSwitchProgramInstance {
 public:
     ShinyHuntFishing();
-    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
+    void program(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context
+        ) override;
 
-    // disable strict border detection
-    virtual void start_program_border_check(VideoStream&, FeedbackType) override{}
-
+    // Disable strict border detection
+    void start_program_border_check(
+        VideoStream&,
+        FeedbackType
+        ) override {}
 
 private:
-
-
     SimpleIntegerOption<int> BITE_WAIT_MS;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     EventNotificationOption NOTIFICATION_SHINY;
 
-    EventNotificationOption NOTIFICATION_STATUS_UPDATE;
-
     EventNotificationsOption NOTIFICATIONS;
-
 };
 
-
-}
-}
-}
+}  // namespace PokemonFRLG
+}  // namespace NintendoSwitch
+}  // namespace PokemonAutomation
 
 #endif
