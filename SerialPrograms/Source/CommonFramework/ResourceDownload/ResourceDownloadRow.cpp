@@ -4,7 +4,6 @@
  *
  */
 
-// #include <QMessageBox>
 #include "CommonFramework/Globals.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Exceptions.h"
@@ -14,7 +13,7 @@
 // #include "ResourceDownloadTable.h"
 #include "ResourceDownloadRow.h"
 
-#include <thread>
+// #include <thread>
 // #include <fstream>
 
 #include <iostream>
@@ -22,6 +21,11 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ResourceDownloadRow
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 std::string resource_version_to_string(ResourceVersionStatus version){
     switch(version){
@@ -74,102 +78,41 @@ struct ResourceDownloadRow::Data{
 };
 
 
-ResourceDownloadButton::~ResourceDownloadButton(){
-    m_worker1.wait_and_ignore_exceptions();
-    m_worker2.wait_and_ignore_exceptions();
-}
-
-
-ResourceDownloadButton::ResourceDownloadButton(ResourceDownloadRow& p_row)
-    : ConfigOptionImpl<ResourceDownloadButton>(LockMode::UNLOCK_WHILE_RUNNING)
-    , row(p_row)
-    , m_enabled(true)
+ResourceDownloadRow::~ResourceDownloadRow(){}
+ResourceDownloadRow::ResourceDownloadRow(
+    std::string&& resource_name,
+    size_t file_size,
+    bool is_downloaded,
+    std::optional<uint16_t> version_num,
+    ResourceVersionStatus version_status
+)
+    : StaticTableRow(resource_name)
+    , m_data(CONSTRUCT_TOKEN, std::move(resource_name), file_size, is_downloaded, version_num, version_status)
+    , m_download_button(*this)
+    , m_delete_button(*this)
+    , m_progress_bar(*this)
     , m_local_metadata(initialize_local_metadata())
-{}
+{
+    PA_ADD_STATIC(m_data->m_resource_name);
+    PA_ADD_STATIC(m_data->m_file_size_label);
+    PA_ADD_STATIC(m_data->m_is_downloaded_label);
+    PA_ADD_STATIC(m_data->m_version_status_label);
 
-
-void ResourceDownloadButton::ensure_remote_metadata_loaded(){
-    m_worker1 = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
-        [this]{ 
-            try {
-                m_enabled = false;
-                // std::this_thread::sleep_for(std::chrono::seconds(1));
-                std::string predownload_warning;
-                ResourceDownloadButton::RemoteMetadata& remote_handle = fetch_remote_metadata();
-                // cout << "Fetched remote metadata" << endl;
-                // throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "testing"); 
-
-                predownload_warning = predownload_warning_summary(remote_handle);
-                m_enabled = true;
-                emit metadata_fetch_finished(predownload_warning);
-
-            }catch(...){
-                m_enabled = true;
-                // cout << "Exception thrown in thread" << endl;
-                emit exception_caught("ResourceDownloadButton::ensure_remote_metadata_loaded");
-                // std::cerr << "Error: Unknown error. Embedding session failed." << std::endl;
-                // QMessageBox box;
-                // box.warning(nullptr, "Error:",
-                //     QString::fromStdString("Error: Unknown error. Embedding session failed."));
-                return;
-            }
-        
-        }
-    );
-
-}
-
-std::string ResourceDownloadButton::predownload_warning_summary(ResourceDownloadButton::RemoteMetadata& remote_handle){
-
-    std::string predownload_warning;
-
-    switch (remote_handle.status){
-    case RemoteMetadataStatus::UNINITIALIZED:
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "predownload_warning_summary: Remote metadata uninitialized.");
-    case RemoteMetadataStatus::NOT_AVAILABLE:
-        predownload_warning = "Resource no longer available for download. We recommend updating the Computer Control program.";
-        break;
-    case RemoteMetadataStatus::AVAILABLE:
-    {
-        uint16_t local_version_num = m_local_metadata.version_num.value();
-
-        DownloadedResourceMetadata remote_metadata = remote_handle.metadata;
-        uint16_t remote_version_num = remote_metadata.version_num.value();
-        size_t compressed_size = remote_metadata.size_compressed_bytes;
-        size_t decompressed_size = remote_metadata.size_decompressed_bytes;
-
-        std::string disk_space_requirement = "This will require " + std::to_string(decompressed_size + compressed_size) + " bytes of free space";
-
-        if (local_version_num < remote_version_num){
-            predownload_warning = "The resource you are downloading is a more updated version than the program expects. "
-            "This may or may not cause issues with the programs. "
-            "We recommend updating the Computer Control program.<br>" +
-            disk_space_requirement;
-        }else if (local_version_num == remote_version_num){
-            predownload_warning = "Update available.<br>" + disk_space_requirement;
-        }else if (local_version_num > remote_version_num){
-            predownload_warning = "The resource you are downloading is a less updated version than the program expects. "
-            "Please report this as a bug.<br>" +
-            disk_space_requirement;
-        }
-    }
-        break;
-    default:
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "predownload_warning_summary: Unknown enum."); 
-    }
-
-    return predownload_warning;
+    PA_ADD_STATIC(m_download_button);
+    PA_ADD_STATIC(m_delete_button);
+    PA_ADD_STATIC(m_progress_bar);
 }
 
 
-void ResourceDownloadButton::initialize_remote_metadata(){
+
+void ResourceDownloadRow::initialize_remote_metadata(){
     DownloadedResourceMetadata corresponding_remote_metadata;
     RemoteMetadataStatus status = RemoteMetadataStatus::NOT_AVAILABLE;
     std::vector<DownloadedResourceMetadata> all_remote_metadata = remote_resource_download_list();
 
     cout << "done remote_resource_download_list" << endl;
     
-    std::string resource_name = row.m_data->m_resource_name.text();
+    std::string resource_name = m_data->m_resource_name.text();
 
     for (DownloadedResourceMetadata remote_metadata : all_remote_metadata){
         if (remote_metadata.resource_name == resource_name){
@@ -184,17 +127,17 @@ void ResourceDownloadButton::initialize_remote_metadata(){
     m_remote_metadata = std::make_unique<RemoteMetadata>(remote_metadata);
 }
 
-ResourceDownloadButton::RemoteMetadata& ResourceDownloadButton::fetch_remote_metadata(){
+RemoteMetadata& ResourceDownloadRow::fetch_remote_metadata(){
     // Only runs once per instance
-    std::call_once(init_flag, &ResourceDownloadButton::initialize_remote_metadata, this);
+    std::call_once(init_flag, &ResourceDownloadRow::initialize_remote_metadata, this);
     return *m_remote_metadata;
 }
 
-DownloadedResourceMetadata ResourceDownloadButton::initialize_local_metadata(){
+DownloadedResourceMetadata ResourceDownloadRow::initialize_local_metadata(){
     DownloadedResourceMetadata corresponding_local_metadata;
     std::vector<DownloadedResourceMetadata> all_local_metadata = local_resource_download_list();
     
-    std::string resource_name = row.m_data->m_resource_name.text();
+    std::string resource_name = m_data->m_resource_name.text();
 
     bool found = false;
     for (DownloadedResourceMetadata local_metadata : all_local_metadata){
@@ -213,98 +156,21 @@ DownloadedResourceMetadata ResourceDownloadButton::initialize_local_metadata(){
 }
 
 
-void ResourceDownloadButton::run_download(){
-    m_worker2 = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
-        [this]{ 
-            try {
-                m_enabled = false;
-                // std::this_thread::sleep_for(std::chrono::seconds(7));
-                Logger& logger = global_logger_tagged();
-                ResourceDownloadButton::RemoteMetadata& remote_handle = fetch_remote_metadata();
-                if (remote_handle.status != RemoteMetadataStatus::AVAILABLE){
-                    switch (remote_handle.status){
-                    case RemoteMetadataStatus::UNINITIALIZED:
-                        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "run_download: Remote metadata uninitialized.");
-                    case RemoteMetadataStatus::NOT_AVAILABLE:
-                        cout << "run_download: Download not available. Cancel download." << endl;
-                        m_enabled = true;
-                        emit download_finished();
-                        return;
-                    default:
-                        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "run_download: Unknown enum."); 
-                    }
-                }
-
-                // Download is available
-
-                DownloadedResourceMetadata metadata = remote_handle.metadata;
-                std::string url = metadata.url;
-                std::string resource_name = metadata.resource_name;
-                qint64 expected_size = metadata.size_compressed_bytes;
-                FileDownloader::download_file_to_disk(
-                    logger, 
-                    url, 
-                    DOWNLOADED_RESOURCE_PATH() + resource_name + "/temp.zip",
-                    expected_size,
-                    [this](int percentage_progress){
-                        download_progress(percentage_progress);
-                    }
-                );
-
-                cout << "Done Download" << endl;
-
-                m_enabled = true;
-                emit download_finished();
-            }catch(...){
-                m_enabled = true;
-                // cout << "Exception thrown in thread" << endl;
-                emit exception_caught("ResourceDownloadButton::ensure_remote_metadata_loaded");
-                // std::cerr << "Error: Unknown error. Embedding session failed." << std::endl;
-                // QMessageBox box;
-                // box.warning(nullptr, "Error:",
-                //     QString::fromStdString("Error: Unknown error. Embedding session failed."));
-                return;
-            }
+void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metadata){
+    Logger& logger = global_logger_tagged();
+    
+    std::string url = resource_metadata.url;
+    std::string resource_name = resource_metadata.resource_name;
+    qint64 expected_size = resource_metadata.size_compressed_bytes;
+    FileDownloader::download_file_to_disk(
+        logger, 
+        url, 
+        DOWNLOADED_RESOURCE_PATH() + resource_name + "/temp.zip",
+        expected_size,
+        [this](int percentage_progress){
+            download_progress(percentage_progress);
         }
     );
-
-}
-
-ResourceDeleteButton::ResourceDeleteButton(ResourceDownloadRow& p_row)
-    : ConfigOptionImpl<ResourceDeleteButton>(LockMode::UNLOCK_WHILE_RUNNING)
-    , row(p_row)
-{}
-
-
-ResourceProgressBar::ResourceProgressBar(ResourceDownloadRow& p_row)
-    : ConfigOptionImpl<ResourceProgressBar>(LockMode::UNLOCK_WHILE_RUNNING)
-    , row(p_row)
-{}
-
-
-
-ResourceDownloadRow::~ResourceDownloadRow(){}
-ResourceDownloadRow::ResourceDownloadRow(
-    std::string&& resource_name,
-    size_t file_size,
-    bool is_downloaded,
-    std::optional<uint16_t> version_num,
-    ResourceVersionStatus version_status
-)
-    : StaticTableRow(resource_name)
-    , m_data(CONSTRUCT_TOKEN, std::move(resource_name), file_size, is_downloaded, version_num, version_status)
-    , m_download_button(*this)
-    , m_delete_button(*this)
-    , m_progress_bar(*this)
-{
-    PA_ADD_STATIC(m_data->m_resource_name);
-    PA_ADD_STATIC(m_data->m_file_size_label);
-    PA_ADD_STATIC(m_data->m_is_downloaded_label);
-    PA_ADD_STATIC(m_data->m_version_status_label);
-
-    PA_ADD_STATIC(m_download_button);
-    PA_ADD_STATIC(m_delete_button);
-    PA_ADD_STATIC(m_progress_bar);
 }
 
 

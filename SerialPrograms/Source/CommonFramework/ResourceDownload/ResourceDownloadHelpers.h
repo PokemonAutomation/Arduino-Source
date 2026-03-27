@@ -40,6 +40,17 @@ enum class ResourceVersionStatus{
     // BLANK, // not yet fetched version info from remote
 };
 
+enum class RemoteMetadataStatus{
+    UNINITIALIZED,
+    NOT_AVAILABLE,
+    AVAILABLE,
+};
+struct RemoteMetadata {
+    RemoteMetadataStatus status = RemoteMetadataStatus::UNINITIALIZED;
+    DownloadedResourceMetadata metadata;
+};
+
+
 const std::vector<DownloadedResourceMetadata>& local_resource_download_list();
 const std::vector<DownloadedResourceMetadata>& remote_resource_download_list();
 uint16_t get_resource_version_num(Filesystem::Path folder_path);
