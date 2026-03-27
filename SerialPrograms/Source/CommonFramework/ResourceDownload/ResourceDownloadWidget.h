@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_ResourceDownloadWidget_H
 #define PokemonAutomation_ResourceDownloadWidget_H
 
-#include <QWidget>
+#include <QObject>
 #include "Common/Qt/Options/ConfigWidget.h"
 // #include "ResourceDownloadTable.h"
 #include "ResourceDownloadRow.h"
@@ -16,7 +16,8 @@ namespace PokemonAutomation{
 
 // class ResourceDownloadButton;
 
-class DownloadButtonWidget : public QWidget, public ConfigWidget{
+class DownloadButtonWidget : public QObject, public ConfigWidget{
+    Q_OBJECT
 public:
     using ParentOption = ResourceDownloadButton;
 
