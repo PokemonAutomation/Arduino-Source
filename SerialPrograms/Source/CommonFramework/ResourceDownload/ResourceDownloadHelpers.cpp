@@ -80,15 +80,11 @@ const std::vector<DownloadedResourceMetadata>& local_resource_download_list(){
 
 JsonValue fetch_resource_download_list_json_from_remote(){
     Logger& logger = global_logger_tagged();
-    JsonValue json;
-    try{
-        json = FileDownloader::download_json_file(
+    JsonValue json = 
+        FileDownloader::download_json_file(
             logger,
             "https://raw.githubusercontent.com/jw098/Packages/refs/heads/download/Resources/ResourceDownloadList.json"
         );
-    }catch (OperationFailedException&){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "fetch_resource_download_list_json_from_remote: Failed to download JSON.");  
-    }
     
     return json;
 }

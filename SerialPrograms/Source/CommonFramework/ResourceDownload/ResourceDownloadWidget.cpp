@@ -21,6 +21,22 @@ using std::endl;
 
 namespace PokemonAutomation{
 
+void show_error_box(std::string function_name){
+    std::cerr << "Error: Exception thrown in thread. From " + function_name + ". Report this as a bug." << std::endl;
+    QMessageBox box;
+    box.warning(nullptr, "Error:",
+        QString::fromStdString("Error: Exception thrown in thread. From " + function_name + ". Report this as a bug."));
+
+}
+
+void show_download_failed_box(){
+    std::cerr << "Error: Download failed. Check your internet connection." << std::endl;
+    QMessageBox box;
+    box.warning(nullptr, "Error:",
+        QString::fromStdString("Error: Download failed. Check your internet connection."));
+
+}    
+
 
 template class RegisterConfigWidget<DownloadButtonWidget>;
 DownloadButtonWidget::~DownloadButtonWidget(){
@@ -90,6 +106,16 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
             show_error_box(function_name);
         }
     );
+
+    // if download fails
+    connect(
+        &m_value, &ResourceDownloadButton::download_failed,
+        this, [this](){
+            m_value.set_enabled(true);
+            update_enabled_status();
+            show_download_failed_box();
+        }
+    );
 }
 
 
@@ -143,13 +169,7 @@ void DownloadButtonWidget::show_download_confirm_box(
     }
 }
 
-void show_error_box(std::string function_name){
-    std::cerr << "Error: Exception thrown in thread. From " + function_name + ". Report this as a bug." << std::endl;
-    QMessageBox box;
-    box.warning(nullptr, "Error:",
-        QString::fromStdString("Error: Exception thrown in thread. From " + function_name + ". Report this as a bug."));
 
-}
 
 
 

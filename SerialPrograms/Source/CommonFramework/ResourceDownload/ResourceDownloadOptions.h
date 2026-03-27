@@ -28,6 +28,7 @@ public:
 signals:
     void metadata_fetch_finished(std::string popup_message);
     void exception_caught(std::string function_name);
+    void download_failed();
     void download_finished();
 
 public:
