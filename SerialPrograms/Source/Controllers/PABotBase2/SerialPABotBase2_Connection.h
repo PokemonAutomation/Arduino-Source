@@ -12,7 +12,6 @@
 #include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2CC_ReliableStreamConnection.h"
 #include "Controllers/PABotBase2/PABotBase2_Connection.h"
 #include "Controllers/SerialPABotBase/Connection/MessageLogger.h"
-#include "PABotBase2_DeviceHandle.h"
 
 namespace PokemonAutomation{
 namespace SerialPABotBase{
@@ -48,7 +47,6 @@ private:
     AsyncTask m_connect_thread;
     std::unique_ptr<SerialConnection> m_unreliable_connection;
     std::unique_ptr<PABotBase2::ReliableStreamConnection> m_stream_connection;
-    std::unique_ptr<PABotBase2::DeviceHandle> m_device;
 };
 
 

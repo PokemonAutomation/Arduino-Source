@@ -32,7 +32,7 @@ DeviceHandle::DeviceHandle(
 )
     : m_logger(logger)
     , m_connection(connection)
-    , m_command_queue(logger, *this, connection)
+    , m_command_queue(logger, *this, connection, m_message_handlers)
 {
     connection.add_listener(*this);
     if (parent){
@@ -192,7 +192,12 @@ uint8_t DeviceHandle::send_request(MessageHeader& request){
         break;
     }
 
-    if (GlobalSettings::instance().LOG_EVERYTHING){
+    auto iter = m_message_handlers.find(request.opcode);
+    if (iter != m_message_handlers.end()){
+        if (iter->second->should_print()){
+            m_logger.log("[MLC]: Sending: " + iter->second->tostr(&request), COLOR_DARKGREEN);
+        }
+    }else if (GlobalSettings::instance().LOG_EVERYTHING){
         m_logger.log("[MLC]: Sending: " + tostr(&request), COLOR_DARKGREEN);
     }
 
@@ -295,21 +300,18 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
 
         bool log_everything = GlobalSettings::instance().LOG_EVERYTHING;
 
-        if (log_everything){
-            m_logger.log("[MLC]: Receive: " + tostr(header), COLOR_PURPLE);
-        }
-
         //  Now we can process the message.
         switch (header->opcode){
         case PABB2_MESSAGE_OPCODE_INVALID:
         case PABB2_MESSAGE_OPCODE_REQUEST_DROPPED:
-            if (!log_everything){
-                m_logger.log("[MLC]: Receive: " + tostr(header), COLOR_PURPLE);
-            }
+            m_logger.log("[MLC]: Receive: " + tostr(header), COLOR_RED);
             continue;
         case PABB2_MESSAGE_OPCODE_RET:
         case PABB2_MESSAGE_OPCODE_RET_U32:
         case PABB2_MESSAGE_OPCODE_RET_DATA:{
+            if (log_everything){
+                m_logger.log("[MLC]: Receive: " + tostr(header), COLOR_PURPLE);
+            }
             {
                 std::lock_guard<Mutex> lg(m_lock);
                 auto iter = m_pending_requests.find(header->id);
@@ -322,13 +324,34 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
             m_cv.notify_all();
             continue;
         }
+        case PABB2_MESSAGE_OPCODE_LOG_STRING:
+        case PABB2_MESSAGE_OPCODE_LOG_LABEL_H32:
+        case PABB2_MESSAGE_OPCODE_LOG_LABEL_U32:
+        case PABB2_MESSAGE_OPCODE_LOG_LABEL_I32:
+            m_logger.log("[MLC]: Receive: " + tostr(header), COLOR_PURPLE);
+            continue;
         case PABB2_MESSAGE_OPCODE_CQ_COMMAND_FINISHED:{
+            if (log_everything){
+                m_logger.log("[MLC]: Receive: " + tostr(header), COLOR_PURPLE);
+            }
             m_command_queue.report_command_finished(*header);
             continue;
         }
         }
 
-        //  TODO: Process device-specific messages.
+        auto iter = m_message_handlers.find(header->opcode);
+        if (iter == m_message_handlers.end()){
+            m_logger.log("[MLC]: Receive: " + tostr(header), COLOR_RED);
+            return;
+        }
+
+        MessageHandler& handler = *iter->second;
+        handler.assert_is_valid(m_logger, header);
+        if (handler.should_print()){
+            m_logger.log("[MLC]: Receive: " + handler.tostr(header), COLOR_PURPLE);
+        }
+
+        handler.on_recv(m_logger, header);
     }
 
 

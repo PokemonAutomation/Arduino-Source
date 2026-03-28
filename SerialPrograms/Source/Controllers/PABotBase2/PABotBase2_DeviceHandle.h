@@ -9,6 +9,7 @@
 
 #include <deque>
 #include <map>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
@@ -17,17 +18,14 @@
 #include "Common/PABotBase2/PABotBase2_MessageProtocol.h"
 #include "Controllers/ControllerTypes.h"
 #include "PABotBase2_CommandQueueManager.h"
+#include "PABotBase2_MessageHandler.h"
 
 namespace PokemonAutomation{
 namespace PABotBase2{
 
 
 
-
-class DeviceHandle final
-    : public CancellableScope
-    , private StreamListener
-{
+class DeviceHandle final : public CancellableScope, private StreamListener{
 public:
     DeviceHandle(
         CancellableScope* parent,
@@ -35,6 +33,20 @@ public:
         ReliableStreamConnectionPushing& connection
     );
     virtual ~DeviceHandle();
+
+    template <typename MessageHandler, class... Args>
+    void add_message_handler(Args&&... args){
+        auto ret = m_message_handlers.emplace(
+            MessageHandler::OPCODE,
+            std::make_unique<MessageHandler>(std::forward<Args>(args)...)
+        );
+        if (!ret.second){
+            throw InternalProgramError(
+                &m_logger, PA_CURRENT_FUNCTION,
+                "Duplicate Message Opcode: " + std::to_string(MessageHandler::OPCODE)
+            );
+        }
+    }
 
     virtual bool cancel(std::exception_ptr exception) noexcept override;
 
@@ -62,6 +74,26 @@ public:
 
     uint8_t send_request(MessageHeader& request);
     std::string wait_for_request_response(uint8_t id);
+
+    template <typename ResponseType, uint8_t response_opcode>
+    void wait_for_request_response(ResponseType& response, uint8_t id){
+        std::string raw = wait_for_request_response(id);
+        const MessageHeader* header = (const MessageHeader*)raw.data();
+        if (header->opcode != response_opcode){
+            throw SerialProtocolException(
+                m_logger, PA_CURRENT_FUNCTION,
+                "Received Incorrect Response Type: Expected = " + std::to_string(response_opcode) + ", Actual = " + std::to_string(header->opcode)
+            );
+        }
+        if (header->message_bytes != sizeof(ResponseType)){
+            throw SerialProtocolException(
+                m_logger, PA_CURRENT_FUNCTION,
+                "Received Incorrect Response Size: Expected = " + std::to_string(sizeof(ResponseType)) + ", Actual = " + std::to_string(header->message_bytes)
+            );
+        }
+        memcpy(&response, header, sizeof(ResponseType));
+    }
+
 
 
 private:
@@ -96,6 +128,12 @@ private:
     std::map<uint8_t, std::string> m_pending_requests;
 
     std::deque<char> m_buffer;
+
+    struct MessageConverter{
+        bool always_print;
+        std::string (*tostr)(const MessageHeader*);
+    };
+    std::map<uint8_t, std::unique_ptr<MessageHandler>> m_message_handlers;
 };
 
 

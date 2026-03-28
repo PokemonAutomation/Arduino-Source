@@ -176,7 +176,7 @@ std::string tostr(const MessageHeader* header){
     //  TODO: Make sure packets are large enough before reading them.
 
     std::string str;
-    switch (header->opcode & PABB2_CONNECTION_OPCODE_MASK){
+    switch (header->opcode){
     case PABB2_MESSAGE_OPCODE_INVALID:
         str += "PABB2_MESSAGE_OPCODE_INVALID: id = ";
         str += std::to_string(header->id);
@@ -274,14 +274,20 @@ std::string tostr(const MessageHeader* header){
         str += "PABB2_MESSAGE_OPCODE_READ_CONTROLLER_MODE: id = ";
         str += std::to_string(header->id);
         return str;
-    case PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE:
+    case PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE:{
+        const Message_u32* message = (const Message_u32*)header;
         str += "PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE: id = ";
-        str += std::to_string(header->id);
+        str += std::to_string(message->id);
+        str += ", controller = " + std::to_string(message->data);
         return str;
-    case PABB2_MESSAGE_OPCODE_RESET_TO_CONTROLLER:
+    }
+    case PABB2_MESSAGE_OPCODE_RESET_TO_CONTROLLER:{
+        const Message_u32* message = (const Message_u32*)header;
         str += "PABB2_MESSAGE_OPCODE_RESET_TO_CONTROLLER: id = ";
-        str += std::to_string(header->id);
+        str += std::to_string(message->id);
+        str += ", controller = " + std::to_string(message->data);
         return str;
+    }
     case PABB2_MESSAGE_OPCODE_CONTROLLER_MAC_ADDRESS:
         str += "PABB2_MESSAGE_OPCODE_CONTROLLER_MAC_ADDRESS: id = ";
         str += std::to_string(header->id);
@@ -290,19 +296,25 @@ std::string tostr(const MessageHeader* header){
         str += "PABB2_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS: id = ";
         str += std::to_string(header->id);
         return str;
+    case PABB2_MESSAGE_OPCODE_REQUEST_STATUS:
+        str += "PABB2_MESSAGE_OPCODE_REQUEST_STATUS: id = ";
+        str += std::to_string(header->id);
+        return str;
 
     case PABB2_MESSAGE_OPCODE_CQ_CANCEL:
-        str += "PABB2_MESSAGE_OPCODE_CQ_CANCEL: id = ";
-        str += std::to_string(header->id);
+        str += "PABB2_MESSAGE_OPCODE_CQ_CANCEL";
         return str;
     case PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT:
-        str += "PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT: id = ";
-        str += std::to_string(header->id);
+        str += "PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT:";
         return str;
-    case PABB2_MESSAGE_OPCODE_CQ_COMMAND_FINISHED:
+    case PABB2_MESSAGE_OPCODE_CQ_COMMAND_FINISHED:{
+        const Message_u32* message = (const Message_u32*)header;
         str += "PABB2_MESSAGE_OPCODE_CQ_COMMAND_FINISHED: id = ";
-        str += std::to_string(header->id);
+        str += std::to_string(message->id);
+        str += ", timestamp = ";
+        str += std::to_string(message->data);
         return str;
+    }
     }
 
 

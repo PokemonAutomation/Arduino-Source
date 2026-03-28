@@ -41,6 +41,7 @@ SerialPABotBase2_Connection::~SerialPABotBase2_Connection(){
     cancel(nullptr);
     m_ready.store(false, std::memory_order_release);
     m_connect_thread.wait_and_ignore_exceptions();
+    m_device.reset();
 }
 
 
