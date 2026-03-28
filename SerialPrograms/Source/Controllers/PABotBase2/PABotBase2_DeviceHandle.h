@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Controllers_PABotBase2_DeviceHandle_H
 #define PokemonAutomation_Controllers_PABotBase2_DeviceHandle_H
 
+#include <string.h>
 #include <deque>
 #include <map>
 #include "Common/Cpp/Exceptions.h"
