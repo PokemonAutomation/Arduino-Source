@@ -51,10 +51,15 @@ std::unique_ptr<StatsTracker> LegendaryReset_Descriptor::make_stats() const{
 }
 
 LegendaryReset::LegendaryReset()
-    : WALK_UP(
-        "<b>Walk Up (Ho-Oh only):</b><br>Walk up to trigger encounter.",
+    : TARGET(
+        "<b>Target:</b><br>",
+        {
+            {Target::press_a, "press_a", "Press A: Articuno, Zapdos, Moltres, Mewtwo, Deoxys, Lugia, Electrode"},
+            {Target::walk_up, "walk_up", "Walk Up: Ho-Oh"},
+            {Target::snorlax, "snorlax", "Snorlax"},
+        },
         LockMode::LOCK_WHILE_RUNNING,
-        false
+        Target::press_a
     )
     , TAKE_VIDEO("<b>Take Video:</b><br>Record a video when the shiny is found.", LockMode::UNLOCK_WHILE_RUNNING, true)
     , GO_HOME_WHEN_DONE(true)
@@ -71,7 +76,7 @@ LegendaryReset::LegendaryReset()
     })
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
-    PA_ADD_OPTION(WALK_UP);
+    PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -91,13 +96,26 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
     */
 
     while (true){
-        if (WALK_UP){
+        switch (TARGET) {
+        case Target::press_a:
+            env.log("Target: Press A.");
+            //Talk to target
+            pbf_press_button(context, BUTTON_A, 320ms, 320ms);
+            break;
+        case Target::walk_up:
+            env.log("Target: Walk Up.");
             //Step forward to start the encounter.
             pbf_press_dpad(context, DPAD_UP, 320ms, 400ms);
+            break;
+        case Target::snorlax:
+            env.log("Target: Snorlax.");
+            //Use Pokeflute
+            pbf_mash_button(context, BUTTON_A, 3000ms);
+            //Wait a bit for the sound effect before B mash starts
+            pbf_wait(context, 3000ms);
+            context.wait_for_all_requests();
+            break;
         }
-
-        //Talk to target
-        pbf_press_button(context, BUTTON_A, 320ms, 320ms);
 
         //Mash B until black screen detected but not over (entered battle)
         BlackScreenWatcher battle_entered(COLOR_RED);
