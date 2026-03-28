@@ -15,6 +15,13 @@
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "AudioInfo.h"
 
+#ifdef _WIN32
+#include <Windows.h>
+#include <mmdeviceapi.h>
+#include <functiondiscoverykeys_devpkey.h>
+#include "CommonFramework/VideoPipeline/Backends/DirectShowCameraList.h"
+#endif
+
 //#include <iostream>
 //using std::cout;
 //using std::endl;
@@ -371,6 +378,220 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
     WallClock end = current_time();
     double seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.;
     global_logger_tagged().log("Done querying audio inputs... " + tostr_fixed(seconds, 3) + " seconds", COLOR_CYAN);
+
+    //  Log all Qt-enumerated devices for diagnosis.
+    global_logger_tagged().log(
+        "Qt audio inputs: " + std::to_string(list.size()) + " devices found.",
+        COLOR_CYAN
+    );
+    for (size_t i = 0; i < list.size(); i++){
+        global_logger_tagged().log(
+            "  Qt audio[" + std::to_string(i) + "]: "
+            "display=\"" + list[i].display_name() + "\", "
+            "id=\"" + list[i].device_name() + "\", "
+            "formats=" + std::to_string(list[i].supported_formats().size()),
+            COLOR_CYAN
+        );
+    }
+
+#ifdef _WIN32
+    //  Some capture cards (e.g. AVerMedia GC550) are not visible to Qt6's
+    //  audio enumeration.  Enumerate ALL Windows audio capture endpoints
+    //  via the Core Audio MMDevice API and DirectShow, then add any that
+    //  Qt missed.
+    {
+        std::vector<std::string> qt_names;
+        qt_names.reserve(list.size());
+        for (const AudioDeviceInfo& device : list){
+            qt_names.push_back(device.display_name());
+        }
+
+        //  Collect names of audio capture endpoints Qt doesn't know about.
+        std::vector<std::string> missing_names;
+
+        //  --- MMDevice / WASAPI enumeration ---
+        {
+            HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+            bool com_ok = SUCCEEDED(hr);
+
+            IMMDeviceEnumerator* enumerator = nullptr;
+            hr = CoCreateInstance(
+                __uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL,
+                __uuidof(IMMDeviceEnumerator), reinterpret_cast<void**>(&enumerator)
+            );
+            if (SUCCEEDED(hr) && enumerator){
+                IMMDeviceCollection* collection = nullptr;
+                //  eCapture + eRender would get everything, but we only need capture.
+                //  Also enumerate ALL states to see disabled/unplugged devices.
+                hr = enumerator->EnumAudioEndpoints(eCapture, DEVICE_STATEMASK_ALL, &collection);
+                if (SUCCEEDED(hr) && collection){
+                    UINT count = 0;
+                    collection->GetCount(&count);
+                    global_logger_tagged().log(
+                        "MMDevice audio capture endpoints: " + std::to_string(count) + " found.",
+                        COLOR_CYAN
+                    );
+                    for (UINT i = 0; i < count; i++){
+                        IMMDevice* device = nullptr;
+                        if (FAILED(collection->Item(i, &device)) || !device) continue;
+
+                        //  Get device state.
+                        DWORD state = 0;
+                        device->GetState(&state);
+                        std::string state_str;
+                        switch (state){
+                        case DEVICE_STATE_ACTIVE:       state_str = "ACTIVE"; break;
+                        case DEVICE_STATE_DISABLED:     state_str = "DISABLED"; break;
+                        case DEVICE_STATE_NOTPRESENT:   state_str = "NOT_PRESENT"; break;
+                        case DEVICE_STATE_UNPLUGGED:    state_str = "UNPLUGGED"; break;
+                        default:                        state_str = "UNKNOWN(" + std::to_string(state) + ")"; break;
+                        }
+
+                        IPropertyStore* props = nullptr;
+                        if (SUCCEEDED(device->OpenPropertyStore(STGM_READ, &props)) && props){
+                            PROPVARIANT var_name;
+                            PropVariantInit(&var_name);
+                            if (SUCCEEDED(props->GetValue(PKEY_Device_FriendlyName, &var_name))){
+                                if (var_name.vt == VT_LPWSTR && var_name.pwszVal){
+                                    int len = WideCharToMultiByte(CP_UTF8, 0, var_name.pwszVal, -1, nullptr, 0, nullptr, nullptr);
+                                    if (len > 0){
+                                        std::string name(len - 1, '\0');
+                                        WideCharToMultiByte(CP_UTF8, 0, var_name.pwszVal, -1, name.data(), len, nullptr, nullptr);
+
+                                        global_logger_tagged().log(
+                                            "  MMDevice[" + std::to_string(i) + "]: "
+                                            "\"" + name + "\" state=" + state_str,
+                                            COLOR_CYAN
+                                        );
+
+                                        //  Only add active devices.
+                                        if (state == DEVICE_STATE_ACTIVE){
+                                            //  Check if Qt already has this device.
+                                            bool found = false;
+                                            for (const std::string& qt_name : qt_names){
+                                                if (qt_name.find(name) != std::string::npos ||
+                                                    name.find(qt_name) != std::string::npos){
+                                                    found = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (!found){
+                                                missing_names.push_back(std::move(name));
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            PropVariantClear(&var_name);
+                            props->Release();
+                        }
+                        device->Release();
+                    }
+                    collection->Release();
+                }else{
+                    global_logger_tagged().log("MMDevice: EnumAudioEndpoints failed.", COLOR_RED);
+                }
+                enumerator->Release();
+            }else{
+                global_logger_tagged().log("MMDevice: CoCreateInstance for IMMDeviceEnumerator failed.", COLOR_RED);
+            }
+            if (com_ok) CoUninitialize();
+        }
+
+        //  --- DirectShow audio capture enumeration ---
+        {
+            std::vector<std::string> dshow_only = get_directshow_only_audio_devices(qt_names);
+            global_logger_tagged().log(
+                "DirectShow-only audio devices: " + std::to_string(dshow_only.size()) + " found.",
+                COLOR_CYAN
+            );
+            for (std::string& name : dshow_only){
+                global_logger_tagged().log(
+                    "  DirectShow audio: \"" + name + "\"",
+                    COLOR_CYAN
+                );
+                //  Avoid duplicates from MMDevice pass.
+                bool already_found = false;
+                for (const std::string& m : missing_names){
+                    if (m.find(name) != std::string::npos ||
+                        name.find(m) != std::string::npos){
+                        already_found = true;
+                        break;
+                    }
+                }
+                if (!already_found){
+                    missing_names.push_back(std::move(name));
+                }
+            }
+        }
+
+        //  Add all missing devices to the list.
+        global_logger_tagged().log(
+            "Audio devices missing from Qt: " + std::to_string(missing_names.size()),
+            missing_names.empty() ? COLOR_CYAN : COLOR_ORANGE
+        );
+        for (const std::string& name : missing_names){
+            global_logger_tagged().log(
+                "  Adding: \"" + name + "\"",
+                COLOR_ORANGE
+            );
+            list.emplace_back();
+            Data& data = *list.back().m_body;
+            data.device_name = "dshow_audio:" + name;
+            data.display_name = name + " (DirectShow)";
+            data.preferred_format_index = -1;
+        }
+
+        //  --- Video capture devices with embedded audio pins ---
+        //  HDMI capture cards (e.g. AVerMedia GC550) may not register
+        //  as standalone audio endpoints.  Their audio is only accessible
+        //  through the DirectShow video capture filter's audio pin.
+        {
+            std::vector<std::string> video_audio = get_video_devices_with_audio_pins();
+            global_logger_tagged().log(
+                "Video capture devices with audio pins: " + std::to_string(video_audio.size()) + " found.",
+                COLOR_CYAN
+            );
+            for (const std::string& name : video_audio){
+                global_logger_tagged().log(
+                    "  Video device with audio pin: \"" + name + "\"",
+                    COLOR_CYAN
+                );
+
+                //  Check if already present (as a Qt device or previously added).
+                bool already_present = false;
+                for (const std::string& qt_name : qt_names){
+                    if (qt_name.find(name) != std::string::npos ||
+                        name.find(qt_name) != std::string::npos){
+                        already_present = true;
+                        break;
+                    }
+                }
+                if (!already_present){
+                    for (const AudioDeviceInfo& existing : list){
+                        if (existing.display_name().find(name) != std::string::npos ||
+                            name.find(existing.display_name()) != std::string::npos){
+                            already_present = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!already_present){
+                    global_logger_tagged().log(
+                        "  Adding HDMI audio: \"" + name + "\"",
+                        COLOR_ORANGE
+                    );
+                    list.emplace_back();
+                    Data& data = *list.back().m_body;
+                    data.device_name = "dshow_audio:" + name;
+                    data.display_name = name + " (HDMI Audio)";
+                    data.preferred_format_index = -1;
+                }
+            }
+        }
+    }
+#endif
 
     bool show_all_devices = GlobalSettings::instance().AUDIO_PIPELINE->SHOW_ALL_DEVICES;
     if (show_all_devices){

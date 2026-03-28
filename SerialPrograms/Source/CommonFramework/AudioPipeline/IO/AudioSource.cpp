@@ -21,6 +21,9 @@ using NativeAudioSource = QAudioSource;
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioFileLoader.h"
 #include "AudioSource.h"
+#ifdef _WIN32
+#include "DirectShowAudioCapture.h"
+#endif
 
 //#include <iostream>
 //using std::cout;
@@ -140,6 +143,28 @@ AudioSource::AudioSource(Logger& logger, const std::string& file, AudioChannelFo
     m_input_file = std::make_unique<AudioInputFile>(logger, *m_reader, file, native_format);
 }
 AudioSource::AudioSource(Logger& logger, const AudioDeviceInfo& device, AudioChannelFormat format, float volume_multiplier){
+#ifdef _WIN32
+    //  DirectShow audio from a video capture device's audio pin.
+    const std::string& dev_name = device.device_name();
+    const std::string DSHOW_AUDIO_PREFIX = "dshow_audio:";
+    if (dev_name.size() > DSHOW_AUDIO_PREFIX.size() &&
+        dev_name.compare(0, DSHOW_AUDIO_PREFIX.size(), DSHOW_AUDIO_PREFIX) == 0)
+    {
+        std::string friendly_name = dev_name.substr(DSHOW_AUDIO_PREFIX.size());
+
+        //  DirectShow will deliver 16-bit PCM.
+        init(format, AudioSampleFormat::SINT16, volume_multiplier);
+
+        int sample_rate = static_cast<int>(m_sample_rate);
+        int channels = static_cast<int>(m_channels);
+
+        m_dshow_audio_capture = std::make_unique<DirectShowAudioCapture>(
+            logger, *m_reader, friendly_name, sample_rate, channels
+        );
+        return;
+    }
+#endif
+
     NativeAudioInfo native_info = device.native_info();
     QAudioFormat native_format = native_info.preferredFormat();
 
