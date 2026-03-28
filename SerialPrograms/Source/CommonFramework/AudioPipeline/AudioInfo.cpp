@@ -539,7 +539,12 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
             Data& data = *list.back().m_body;
             data.device_name = "dshow_audio:" + name;
             data.display_name = name + " (DirectShow)";
-            data.preferred_format_index = -1;
+            data.supported_formats = {
+                AudioChannelFormat::MONO_48000,
+                AudioChannelFormat::DUAL_44100,
+                AudioChannelFormat::DUAL_48000,
+            };
+            data.preferred_format_index = 2;  //  Default to stereo 48kHz.
         }
 
         //  --- Video capture devices with embedded audio pins ---
@@ -586,7 +591,12 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
                     Data& data = *list.back().m_body;
                     data.device_name = "dshow_audio:" + name;
                     data.display_name = name + " (HDMI Audio)";
-                    data.preferred_format_index = -1;
+                    data.supported_formats = {
+                        AudioChannelFormat::MONO_48000,
+                        AudioChannelFormat::DUAL_44100,
+                        AudioChannelFormat::DUAL_48000,
+                    };
+                    data.preferred_format_index = 2;  //  Default to stereo 48kHz.
                 }
             }
         }
