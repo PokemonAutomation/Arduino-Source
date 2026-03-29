@@ -4,11 +4,12 @@
  *
  */
 
-//#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 //#include "CommonFramework/VideoPipeline/VideoFeed.h"
 //#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -20,6 +21,7 @@
 #include "PokemonLGPE/Commands/PokemonLGPE_DateSpam.h"
 //#include "PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h"
 //#include "PokemonLGPE/Programs/PokemonLGPE_GameEntry.h"
+#include "PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonLGPE_DailyItemFarmer.h"
 
@@ -95,7 +97,35 @@ DailyItemFarmer::DailyItemFarmer()
 void DailyItemFarmer::start_local_trade(SingleSwitchProgramEnvironment& env, JoyconContext& context){
     env.log("Starting local trade.");
     //Open Menu -> Communication -> Nearby player -> Local Trade
-    pbf_press_button(context, BUTTON_X, 200ms, 800ms);
+    BattleArrowWatcher menu_open(COLOR_RED, {0.418, 0.621, 0.049, 0.075});
+    int res = run_until<JoyconContext>(
+        env.console, context,
+        [&](JoyconContext& context){
+            for (int i = 0; i < 10; i++){
+                pbf_press_button(context, BUTTON_X, 200ms, 800ms);
+                pbf_wait(context, 1000ms);
+                context.wait_for_all_requests();
+            }
+        },
+        {{menu_open}}
+    );
+    context.wait_for_all_requests();
+    switch (res){
+    case 0:
+        env.log("start_local_trade(): Menu detected.");
+        send_program_status_notification(
+            env, NOTIFICATION_STATUS_UPDATE,
+            "Menu detected."
+        );
+        break;
+    default:
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "start_local_trade(): Failed to detect menu.",
+            env.console
+        );
+        break;
+    }
     pbf_move_joystick(context, {+1, 0}, 100ms, 400ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
     pbf_press_button(context, BUTTON_A, 200ms, 2000ms); //  Black screen
