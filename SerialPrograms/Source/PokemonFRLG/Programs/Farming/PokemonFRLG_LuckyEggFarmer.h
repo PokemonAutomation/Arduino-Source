@@ -39,10 +39,10 @@ public:
 private:
 
     bool navigate_to_chansey(ConsoleHandle& console, ProControllerContext& context);
-	void swap_lead_pokemon(ConsoleHandle& console, ProControllerContext& context);
-	bool is_chansey(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-	bool find_encounter(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-	bool attempt_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int& balls_left);
+    void swap_lead_pokemon(ConsoleHandle& console, ProControllerContext& context);
+    bool is_chansey(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    bool find_encounter(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    bool attempt_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int& balls_left);
     bool check_for_lucky_egg(ConsoleHandle& console, ProControllerContext& context);
 
     OCR::LanguageOCROption LANGUAGE;
