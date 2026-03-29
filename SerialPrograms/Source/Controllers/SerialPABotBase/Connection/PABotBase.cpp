@@ -41,7 +41,7 @@ namespace PokemonAutomation{
 PABotBase::PABotBase(
     Logger& logger,
     ThreadPool& thread_pool,
-    std::unique_ptr<StreamConnection> connection,
+    std::unique_ptr<UnreliableStreamConnectionPushing> connection,
     std::chrono::milliseconds retransmit_delay
 )
     : PABotBaseConnection(logger, std::move(connection))

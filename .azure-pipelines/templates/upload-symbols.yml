@@ -7,6 +7,7 @@ parameters:
   dependsOn: []
   platforms: []
   buildType: ''
+  poolName: ''
   versionMajor: 0
   versionMinor: 0
   versionPatch: 0
@@ -175,7 +176,7 @@ stages:
                 exit 1
               }
               
-              Write-Host "Creating tar.gz archive with Windows tar..."
+              Write-Host "Creating tar.gz archive..."
               $filesToArchive = @()
               if ($debugFiles) { $filesToArchive += "*.debug" }
               if ($execFile) { $filesToArchive += "SerialPrograms" }
@@ -223,7 +224,7 @@ stages:
                 exit 1
               }
               
-              Write-Host "Creating tar.gz archive with Windows tar..."
+              Write-Host "Creating tar.gz archive..."
               $filesToArchive = @()
               if ($dsymFiles) { $filesToArchive += "*.dSYM" }
               if ($execFile) { $filesToArchive += "SerialPrograms" }
@@ -271,7 +272,7 @@ stages:
                 exit 1
               }
 
-              Write-Host "Creating tar.gz archive with Windows tar..."
+              Write-Host "Creating tar.gz archiv..."
               $filesToArchive = @()
               if ($dsymFiles) { $filesToArchive += "*.dSYM" }
               if ($execFile) { $filesToArchive += "SerialPrograms" }

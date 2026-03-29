@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_WiredControllerNS1_H
 #define PokemonAutomation_NintendoSwitch_SerialPABotBase_WiredControllerNS1_H
 
-#include "Controllers/SerialPABotBase/SerialPABotBase_StatusThread.h"
+#include "Controllers/ControllerStatusThread.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
@@ -21,7 +21,7 @@ namespace NintendoSwitch{
 class SerialPABotBase_WiredController final :
     public ProController,
     public SerialPABotBase_Controller,
-    private SerialPABotBase::ControllerStatusThreadCallback
+    private ControllerStatusThreadCallback
 {
 public:
     using ContextType = ProControllerContext;
@@ -235,7 +235,7 @@ private:
 
 
 private:
-    std::unique_ptr<SerialPABotBase::ControllerStatusThread> m_status_thread;
+    std::unique_ptr<ControllerStatusThread> m_status_thread;
 };
 
 

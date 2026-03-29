@@ -47,9 +47,19 @@ stages:
             echo "✗ Failed to fetch ChangeLog.md or file is empty"
             exit 1
           fi
-
           echo "✓ ChangeLog.md fetched successfully"
-          CHANGELOG_CONTENT=$(cat changelog.md | base64 -w 0)
+
+          echo "Converting Markdown to HTML..."
+          python3 -m pip install --quiet markdown
+          python3 -c "import markdown; content = open('changelog.md', encoding='utf-8').read(); html = markdown.markdown(content, extensions=['fenced_code', 'tables', 'nl2br']); open('changelog.html', 'w', encoding='utf-8').write(html)"
+
+          if [ ! -s changelog.html ]; then
+            echo "✗ Failed to convert ChangeLog.md to HTML"
+            exit 1
+          fi
+          echo "✓ ChangeLog.md converted to HTML"
+
+          CHANGELOG_CONTENT=$(base64 -w 0 changelog.html)
           echo "##vso[task.setvariable variable=CHANGELOG_B64]$CHANGELOG_CONTENT"
         displayName: 'Fetch ChangeLog.md'
         condition: succeeded()
@@ -173,7 +183,7 @@ stages:
                             -replace '\\', '\\' `
                             -replace '"', '\"' `
                             -replace "`n", '\n' `
-                            -replace "`r", '\r' `
+                            -replace "`r", '' `
                             -replace "`t", '\t'
                             $line = $indent + '"Changes": "' + $escaped + '"'
                         }
@@ -189,7 +199,7 @@ stages:
                 $newContent = ($updatedLines -join "`n")
                 $contentBytes = [System.Text.Encoding]::UTF8.GetBytes($newContent)
                 $contentBase64 = [System.Convert]::ToBase64String($contentBytes)
-                $commitMessage = "Update $buildType to v$versionMajor.$versionMinor.$versionPatch via Azure Pipeline"
+                $commitMessage = "Update $buildType to v$versionMajor.$versionMinor.$versionPatch via Azure Pipelines"
 
                 $updateBody = @{
                     message = $commitMessage
