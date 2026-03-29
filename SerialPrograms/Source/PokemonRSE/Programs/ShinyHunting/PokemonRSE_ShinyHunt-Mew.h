@@ -11,6 +11,8 @@
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
+#include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -34,6 +36,10 @@ public:
     ) override{}
 
 private:
+    PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
+    BooleanCheckBoxOption TAKE_VIDEO;
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+
     EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

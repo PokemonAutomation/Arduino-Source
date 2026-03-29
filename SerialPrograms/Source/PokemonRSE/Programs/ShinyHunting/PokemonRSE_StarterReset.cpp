@@ -39,12 +39,15 @@ struct StarterReset_Descriptor::Stats : public StatsTracker{
     Stats()
         : resets(m_stats["Resets"])
         , shinystarter(m_stats["Shiny Starter"])
+        , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Resets");
         m_display_order.emplace_back("Shiny Starter");
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& shinystarter;
+    std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> StarterReset_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -192,8 +195,10 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
                 env, NOTIFICATION_STATUS_UPDATE,
                 "Soft resetting."
             );
-            soft_reset(env.program_info(), env.console, context);
+            stats.errors += soft_reset(env.console, context);
             stats.resets++;
+            env.update_stats();
+            context.wait_for_all_requests();
         }
     }
 

@@ -29,7 +29,7 @@ ShinyHuntMew_Descriptor::ShinyHuntMew_Descriptor()
         Pokemon::STRING_POKEMON + " RSE", "Shiny Hunt - Mew",
         "Programs/PokemonRSE/ShinyHuntMew.html",
         "Use the Run Away method to shiny hunt Mew in Emerald.",
-        ProgramControllerClass::StandardController_RequiresPrecision,
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
@@ -39,19 +39,24 @@ struct ShinyHuntMew_Descriptor::Stats : public StatsTracker{
     Stats()
         : resets(m_stats["Resets"])
         , shinies(m_stats["Shinies"])
+        , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Resets");
         m_display_order.emplace_back("Shinies");
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& shinies;
+    std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> ShinyHuntMew_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
 ShinyHuntMew::ShinyHuntMew()
-    : NOTIFICATION_SHINY(
+    : TAKE_VIDEO("<b>Take Video:</b><br>Record a video when the shiny starter is found.", LockMode::UNLOCK_WHILE_RUNNING, true)
+    , GO_HOME_WHEN_DONE(true)
+    , NOTIFICATION_SHINY(
         "Shiny Found",
         true, true, ImageAttachmentMode::JPG,
         {"Notifs", "Showcase"}
@@ -96,6 +101,9 @@ ShinyHuntMew::ShinyHuntMew()
         "150 ms"
     )
 {
+    PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
+    PA_ADD_OPTION(TAKE_VIDEO);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(MEW_WAIT_TIME);
@@ -107,6 +115,8 @@ ShinyHuntMew::ShinyHuntMew()
 }
 
 void ShinyHuntMew::enter_mew(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    ShinyHuntMew_Descriptor::Stats& stats = env.current_stats<ShinyHuntMew_Descriptor::Stats>();
+
     BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     int ret = run_until<ProControllerContext>(
         env.console, context,
@@ -119,6 +129,8 @@ void ShinyHuntMew::enter_mew(SingleSwitchProgramEnvironment& env, ProControllerC
     context.wait_for_all_requests();
     if (ret != 0){
         env.log("Failed to enter area.", COLOR_RED);
+        stats.errors++;
+        env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to enter area.",
@@ -149,13 +161,42 @@ void ShinyHuntMew::enter_mew(SingleSwitchProgramEnvironment& env, ProControllerC
     ssf_press_button(context, BUTTON_B, 0ms, RIGHT_GRASS_2_TIME);
     pbf_press_dpad(context, DPAD_RIGHT, RIGHT_GRASS_2_TIME, 0ms);
 
-    //Turn up. Start battle.
+    //Turn up.
     pbf_press_dpad(context, DPAD_UP, FACE_UP_TIME, 0ms);
+    context.wait_for_all_requests();
 
+    //Start battle.
+    BlackScreenWatcher legendary_battle_start(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    int ret3 = run_until<ProControllerContext>(
+        env.console, context,
+        [&](ProControllerContext& context){
+            for (int i = 0; i < 5; i++){
+                pbf_mash_button(context, BUTTON_A, 3000ms);
+                pbf_wait(context, 10000ms);
+                context.wait_for_all_requests();
+            }
+        },
+        {legendary_battle_start}
+    );
+    context.wait_for_all_requests();
+    if (ret3 != 0){
+        env.log("Failed to start battle after 5 attempts.", COLOR_RED);
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to start battle after 5 attempts.",
+            env.console
+        );
+    }else{
+        env.log("Legendary battle started.");
+    }
     context.wait_for_all_requests();
 }
 
 void ShinyHuntMew::exit_mew(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    ShinyHuntMew_Descriptor::Stats& stats = env.current_stats<ShinyHuntMew_Descriptor::Stats>();
+
     ssf_press_button(context, BUTTON_B, 0ms, 400ms);
     pbf_press_dpad(context, DPAD_DOWN, 400ms, 160ms);
 
@@ -177,6 +218,8 @@ void ShinyHuntMew::exit_mew(SingleSwitchProgramEnvironment& env, ProControllerCo
     context.wait_for_all_requests();
     if (ret != 0){
         env.log("Failed to exit area.", COLOR_RED);
+        stats.errors++;
+        env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to exit area.",
@@ -188,9 +231,9 @@ void ShinyHuntMew::exit_mew(SingleSwitchProgramEnvironment& env, ProControllerCo
 }
 
 void ShinyHuntMew::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    StartProgramChecks::check_performance_class_wired_or_wireless(context);
-
     ShinyHuntMew_Descriptor::Stats& stats = env.current_stats<ShinyHuntMew_Descriptor::Stats>();
+
+    home_black_border_check(env.console, context);
 
     /*
     * Requires more precision to ensure a Mew encounter every time.
@@ -207,7 +250,19 @@ void ShinyHuntMew::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         if (legendary_shiny){
             stats.shinies++;
             env.update_stats();
-            send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", env.console.video().snapshot(), true);
+
+            if (TAKE_VIDEO){
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
+            }
+
+            send_program_notification(env,
+                NOTIFICATION_SHINY,
+                COLOR_YELLOW,
+                "Shiny found!",
+                {}, "",
+                env.console.video().snapshot(),
+                true
+            );
             break;
         }
         env.log("No shiny found.");
@@ -223,6 +278,9 @@ void ShinyHuntMew::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         env.update_stats();
     }
 
+    if (GO_HOME_WHEN_DONE){
+        pbf_press_button(context, BUTTON_HOME, 200ms, 1000ms);
+    }
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
