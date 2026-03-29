@@ -86,7 +86,7 @@ jobs:
         mkdir bin
         cd bin
         cmake .. -DQT_MAJOR:STRING=6 ${{env.CMAKE_ADDITIONAL_FLAGS}}
-        cmake --build . --config RelWithDebInfo --parallel 10
+        # cmake --build . --config RelWithDebInfo --parallel 10
 
     - name: Prepare upload build
       if: inputs.upload-build
@@ -131,19 +131,51 @@ jobs:
       run : |
         cd Arduino-Source
 
+        clang-query --version
         cat << 'EOF' > query.txt
-        set output dump
-        match invocation(
+        set output diag
+        match cxxConstructExpr(
           isExpansionInFileMatching("SerialPrograms/"),
           hasDeclaration(cxxConstructorDecl(ofClass(hasName("std::filesystem::path")))),
           hasArgument(0, hasType(asString("std::string")))
         )
+
+        # match cxxConstructExpr(
+        #   isExpansionInFileMatching("SerialPrograms/"),
+        #   hasDeclaration(cxxConstructorDecl(ofClass(hasName("ImageViewRGB32")))),
+        #   hasArgument(0, hasType(rValueReferenceType(pointee(hasType(hasName("VideoSnapshot")))))),
+        #   unless(hasAncestor(functionDecl(isInline())))
+        # )
+
+        match cxxConstructExpr(
+          isExpansionInFileMatching("SerialPrograms/"),
+          hasDeclaration(cxxConstructorDecl(ofClass(hasName("ImageViewRGB32")))),
+          hasArgument(0, hasType(rValueReferenceType(pointee(hasType(hasName("VideoSnapshot")))))),
+          unless(hasAncestor(functionDecl(isInline())))
+        )
         EOF
 
-        files=$(jq -r '.[].file' SerialPrograms/bin/compile_commands.json)
-        echo "$files" | xargs --max-args=150 clang-query -p SerialPrograms/bin/ -f query.txt >> output.txt
-        cat output.txt
-        if grep --silent "Match #" output.txt; then
-          echo "::error Forbidden std::filesystem::path construction detected!"
+        # files=$(jq -r '.[].file' SerialPrograms/bin/compile_commands.json)
+        # echo "$files" | xargs --max-args=150 clang-query -p SerialPrograms/bin/ -f query.txt >> clang-query_output.txt
+        clang-query -p SerialPrograms/bin/ /home/runner/work/Arduino-Source/Arduino-Source/Arduino-Source/3rdParty/QtWavFile/WavFile.cpp -f query.txt >> clang-query_output.txt
+
+        echo "Clang query output (begin)"
+        cat clang-query_output.txt
+        echo "Clang query output (end)"
+
+        if grep --silent "Match #" clang-query_output.txt; then
+          echo "::error Forbidden code detected! It can be one of the following:"
+          echo "::error - std::filesystem::path created from std::string. More information https://discord.com/channels/695809740428673034/1462210406616531259/1462567541825339635"
+          echo "::error - ImageViewRGB32 created from VideoSnapshot&& that is stored. It is a dangling pointer as nothing hold the data anymore"
+          echo "::error You can read more about the exact error with the artifact below."
           exit 1
         fi
+
+    - name: Upload Clang query output
+      uses: actions/upload-artifact@v7
+      if: inputs.run-clang-query && always()
+      with:
+        name: Clang query output (compiler=${{inputs.compiler}})
+        path: |
+          Arduino-Source/SerialPrograms/bin/compile_commands.json
+          Arduino-Source/clang-query_output.txt
