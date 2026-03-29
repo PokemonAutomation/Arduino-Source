@@ -36,6 +36,30 @@ ImageFloatBox SelectionArrowDetector::arrow_box_for_position(SelectionArrowPosit
     throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid FRLG Selection Arrow Position");
 }
 
+ImageFloatBox SelectionArrowDetector::arrow_box_for_position(SelectionArrowPositionSafariMenu position){
+    // Safari Zone menu has the same 7 slots as the overworld menu; RETIRE occupies slot 0,
+    // shifting POKEDEX..EXIT each down one relative to the overworld enum.
+    switch (position){
+    case SelectionArrowPositionSafariMenu::RETIRE:
+        return ImageFloatBox(0.727692, 0.0523077, 0.0369231, 0.0778846);
+    case SelectionArrowPositionSafariMenu::POKEDEX:
+        return ImageFloatBox(0.727692, 0.1457692, 0.0369231, 0.0778846);
+    case SelectionArrowPositionSafariMenu::POKEMON:
+        return ImageFloatBox(0.727692, 0.2392307, 0.0369231, 0.0778846);
+    case SelectionArrowPositionSafariMenu::BAG:
+        return ImageFloatBox(0.727692, 0.3378846, 0.0369231, 0.0778846);
+    case SelectionArrowPositionSafariMenu::TRAINER:
+        return ImageFloatBox(0.727692, 0.4261538, 0.0369231, 0.0778846);
+    case SelectionArrowPositionSafariMenu::OPTION:
+        return ImageFloatBox(0.727692, 0.5248076, 0.0369231, 0.0778846);
+    case SelectionArrowPositionSafariMenu::EXIT:
+        return ImageFloatBox(0.727692, 0.6182692, 0.0369231, 0.0778846);
+    default:
+        break;
+    }
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid FRLG Safari Selection Arrow Position");
+}
+
 ImageFloatBox SelectionArrowDetector::arrow_box_for_position(SelectionArrowPositionConfirmationMenu position){
     switch (position){
     case SelectionArrowPositionConfirmationMenu::YES:
@@ -90,6 +114,16 @@ SelectionArrowDetector::SelectionArrowDetector(
     Color color,
     VideoOverlay* overlay,
     SelectionArrowPositionConfirmationMenu position
+)
+    : m_color(color)
+    , m_overlay(overlay)
+    , m_arrow_box(arrow_box_for_position(position))
+{
+}
+SelectionArrowDetector::SelectionArrowDetector(
+    Color color,
+    VideoOverlay* overlay,
+    SelectionArrowPositionSafariMenu position
 )
     : m_color(color)
     , m_overlay(overlay)
