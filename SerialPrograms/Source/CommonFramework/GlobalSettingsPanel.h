@@ -156,6 +156,8 @@ public:
 
     StringOption DEVELOPER_TOKEN;
 
+    BooleanCheckBoxOption ENABLE_API;
+
     // The mode that does not run Qt GUI, but instead runs some tests for
     // debugging, unit testing and developing purposes.
     bool COMMAND_LINE_TEST_MODE = false;

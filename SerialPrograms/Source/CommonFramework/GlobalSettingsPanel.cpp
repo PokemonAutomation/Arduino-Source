@@ -241,6 +241,13 @@ GlobalSettings::GlobalSettings()
         LockMode::LOCK_WHILE_RUNNING,
         "", ""
     )
+    , ENABLE_API(
+        "<b>Enable API:</b><br>"
+        "Enable the HTTP API to control the program remotely."
+        "You must restart the program for it to take effect.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )
 {
     PA_ADD_OPTION(OPEN_BASE_FOLDER_BUTTON);
     PA_ADD_OPTION(CHECK_FOR_UPDATES);
@@ -285,6 +292,7 @@ GlobalSettings::GlobalSettings()
 #endif
 
     PA_ADD_OPTION(DEVELOPER_TOKEN);
+    PA_ADD_OPTION(ENABLE_API);
 
     GlobalSettings::on_config_value_changed(this);
     ENABLE_LIFETIME_SANITIZER0.add_listener(*this);
