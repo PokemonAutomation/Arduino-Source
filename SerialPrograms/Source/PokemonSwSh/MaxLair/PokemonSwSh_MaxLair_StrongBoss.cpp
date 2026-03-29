@@ -215,6 +215,9 @@ public:
             return CaughtScreenAction::TAKE_NON_BOSS_SHINY_AND_CONTINUE;
         }
     }
+    virtual bool stop_for_non_boss(const std::string& slug) const override {
+        return false;
+    }
 
 private:
     const MaxLairStrongBoss_ConsoleOptions& console(size_t index) const{
