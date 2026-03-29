@@ -4,10 +4,14 @@
  *
  */
 
+#include <vector>
+#include <memory>
 //#include "Common/Compiler.h"
 //#include "Common/Cpp/Json/JsonValue.h"
 //#include "Common/Cpp/Json/JsonArray.h"
 //#include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/ConfigOption.h"
 //#include "CommonFramework/Globals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
@@ -49,10 +53,27 @@ BossActionRow::BossActionRow(std::string slug, const std::string& name_slug, con
         BossAction::CATCH_AND_STOP_IF_SHINY
     )
     , ball(LockMode::UNLOCK_WHILE_RUNNING, "poke-ball")
+    , save_on_the_go(LockMode::UNLOCK_WHILE_RUNNING, false)
 {
     PA_ADD_STATIC(pokemon);
     add_option(action, "Action");
     add_option(ball, "Ball");
+    add_option(save_on_the_go, "Save Path");
+    
+    save_on_the_go.set_visibility(
+        action == BossAction::CATCH_AND_STOP_IF_SHINY ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED
+                                  );
+    
+    action.add_listener(*this);
+}
+
+void BossActionRow::on_config_value_changed(void* object) {
+    if (action != BossAction::CATCH_AND_STOP_IF_SHINY) {
+        save_on_the_go = false;
+    }
+    save_on_the_go.set_visibility(
+            action == BossAction::CATCH_AND_STOP_IF_SHINY ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED
+    );
 }
 
 
@@ -72,7 +93,8 @@ std::vector<std::string> BossActionTable::make_header() const{
     std::vector<std::string> ret{
         STRING_POKEMON,
         "Action",
-        STRING_POKEBALL
+        STRING_POKEBALL,
+        "Save Path"
     };
     return ret;
 }
