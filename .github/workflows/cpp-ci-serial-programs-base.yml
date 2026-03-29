@@ -149,7 +149,7 @@ jobs:
         match cxxConstructExpr(
           isExpansionInFileMatching("SerialPrograms/"),
           hasDeclaration(cxxConstructorDecl(ofClass(hasName("ImageViewRGB32")))),
-          hasArgument(0, hasType(asString("VideoSnapshot"))),
+          hasArgument(0, hasType(rValueReferenceType(pointee(hasType(hasName("VideoSnapshot")))))),
           unless(hasAncestor(functionDecl(isInline())))
         )
         EOF
