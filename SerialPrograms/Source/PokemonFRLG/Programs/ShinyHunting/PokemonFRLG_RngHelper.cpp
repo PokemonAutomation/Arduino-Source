@@ -228,7 +228,7 @@ void set_seed_after_delay(ProControllerContext& context, SimpleIntegerOption<uin
     pbf_press_button(context, BUTTON_A, 3000ms, 0ms);
 }
 
-void load_game_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& LOAD_DELAY){
+void load_game_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& LOAD_DELAY){
         if (LOAD_DELAY < 3200){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -243,7 +243,7 @@ void load_game_after_delay(SingleSwitchProgramEnvironment& env, ProControllerCon
     // need to later subtract 4000ms from delay to hit desired number of advances
 }
 
-void wait_with_teachy_tv(ProControllerContext& context, uint64_t& TEACHY_DELAY){
+void wait_with_teachy_tv(ProControllerContext& context, const uint64_t& TEACHY_DELAY){
     // open start menu -> bag -> key items -> Teachy TV -> use
     pbf_press_button(context, BUTTON_PLUS, 200ms, 300ms);
     pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
@@ -262,7 +262,7 @@ void wait_with_teachy_tv(ProControllerContext& context, uint64_t& TEACHY_DELAY){
     // if used in the Safari Zone: 14200ms
 }
 
-void collect_starter_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+void collect_starter_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& INGAME_DELAY){
     if (INGAME_DELAY < 7500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -284,7 +284,7 @@ void collect_starter_after_delay(SingleSwitchProgramEnvironment& env, ProControl
     env.log("Starter collected.");
 }
 
-void collect_magikarp_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+void collect_magikarp_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& INGAME_DELAY){
     if (INGAME_DELAY < 7500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -304,7 +304,7 @@ void collect_magikarp_after_delay(SingleSwitchProgramEnvironment& env, ProContro
     env.log("Magikarp collected.");
 }
 
-void collect_hitmon_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+void collect_hitmon_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& INGAME_DELAY){
     if (INGAME_DELAY < 4500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -322,7 +322,7 @@ void collect_hitmon_after_delay(SingleSwitchProgramEnvironment& env, ProControll
     env.log("Hitmonchan/Hitmonlee collected.");
 }
 
-void collect_eevee_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+void collect_eevee_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& INGAME_DELAY){
     if (INGAME_DELAY < 4000){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -340,7 +340,7 @@ void collect_eevee_after_delay(SingleSwitchProgramEnvironment& env, ProControlle
     env.log("Eevee collected.");
 }
 
-void collect_lapras_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+void collect_lapras_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& INGAME_DELAY){
     if (INGAME_DELAY < 7500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -360,7 +360,7 @@ void collect_lapras_after_delay(SingleSwitchProgramEnvironment& env, ProControll
     env.log("Lapras collected.");
 }
 
-void collect_fossil_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+void collect_fossil_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& INGAME_DELAY){
     if (INGAME_DELAY < 6000){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -379,7 +379,7 @@ void collect_fossil_after_delay(SingleSwitchProgramEnvironment& env, ProControll
     env.log("Fossil Pokemon collected.");
 }
 
-void collect_gamecorner_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY, int SLOT){
+void collect_gamecorner_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& INGAME_DELAY, int SLOT){
     if (INGAME_DELAY < 8500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -407,7 +407,7 @@ void collect_gamecorner_after_delay(SingleSwitchProgramEnvironment& env, ProCont
     env.log("Game corner prize collected.");
 }
 
-void encounter_static_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+void encounter_static_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& INGAME_DELAY){
     if (INGAME_DELAY < 4000){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -424,7 +424,7 @@ void encounter_static_after_delay(SingleSwitchProgramEnvironment& env, ProContro
     env.log("Static encounter started.");
 }
 
-void encounter_snorlax_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+void encounter_snorlax_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& INGAME_DELAY){
     if (INGAME_DELAY < 16000){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -441,7 +441,7 @@ void encounter_snorlax_after_delay(SingleSwitchProgramEnvironment& env, ProContr
     env.log("Snorlax encounter started.");
 }
 
-void encounter_mewtwo_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+void encounter_mewtwo_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& INGAME_DELAY){
     if (INGAME_DELAY < 4500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -457,7 +457,7 @@ void encounter_mewtwo_after_delay(SingleSwitchProgramEnvironment& env, ProContro
     env.log("Hypno encounter started.");
 }
 
-void encounter_hooh_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+void encounter_hooh_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& INGAME_DELAY){
     if (INGAME_DELAY < 4000){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -473,7 +473,7 @@ void encounter_hooh_after_delay(SingleSwitchProgramEnvironment& env, ProControll
     env.log("Ho-oh encounter started.");
 }
 
-void encounter_hypno_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+void encounter_hypno_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& INGAME_DELAY){
     if (INGAME_DELAY < 13000){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -509,7 +509,7 @@ void open_party_menu_from_overworld(SingleSwitchProgramEnvironment& env, ProCont
     context.wait_for_all_requests();
 }
 
-void use_sweet_scent(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY, bool SAFARI_ZONE = false){
+void use_sweet_scent(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& INGAME_DELAY, bool SAFARI_ZONE = false){
     if (!SAFARI_ZONE && INGAME_DELAY < 8500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -540,7 +540,7 @@ void use_sweet_scent(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     env.log("Sweet Scent used.");
 }
 
-void use_registered_fishing_rod(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint64_t& INGAME_DELAY){
+void use_registered_fishing_rod(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& INGAME_DELAY){
     if (INGAME_DELAY < 5500){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -712,10 +712,6 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     int64_t FIXED_SEED_OFFSET = USE_COPYRIGHT_TEXT ? -1700 : -800;  // milliseconds. approximate, might be console-specific (?)
     int64_t FIXED_ADVANCES_OFFSET = 0;                              // frames
 
-    uint64_t LOAD_DELAY;
-    uint64_t INGAME_DELAY;
-    uint64_t TEACHY_DELAY;
-
     while (!shiny_found){
         double MODIFIED_INGAME_ADVANCES = INGAME_ADVANCES + FIXED_ADVANCES_OFFSET + INGAME_CALIBRATION;
         if (MODIFIED_INGAME_ADVANCES < 0) {
@@ -727,7 +723,7 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         }
         uint64_t TEACHY_ADVANCES = 0;
 
-        bool SAFARI_ZONE = (TARGET == Target::safarizonecenter
+        const bool SAFARI_ZONE = (TARGET == Target::safarizonecenter
             || TARGET == Target::safarizoneeast
             || TARGET == Target::safarizonenorth
             || TARGET == Target::safarizonewest
@@ -742,9 +738,9 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             TEACHY_ADVANCES = uint64_t((int)std::floor((MODIFIED_INGAME_ADVANCES - TEACHY_TV_BUFFER) / 313) * 313);
         }
 
-        LOAD_DELAY = uint64_t((LOAD_ADVANCES + LOAD_CALIBRATION) * FRAME_DURATION);
-        TEACHY_DELAY = uint64_t(TEACHY_ADVANCES * FRAME_DURATION / 313);
-        INGAME_DELAY = uint64_t((MODIFIED_INGAME_ADVANCES - TEACHY_ADVANCES) * FRAME_DURATION / 2) - (should_use_teachy_tv ? 13700 : 0);
+        const uint64_t LOAD_DELAY = uint64_t((LOAD_ADVANCES + LOAD_CALIBRATION) * FRAME_DURATION);
+        const uint64_t TEACHY_DELAY = uint64_t(TEACHY_ADVANCES * FRAME_DURATION / 313);
+        const uint64_t INGAME_DELAY = uint64_t((MODIFIED_INGAME_ADVANCES - TEACHY_ADVANCES) * FRAME_DURATION / 2) - (should_use_teachy_tv ? 13700 : 0);
         env.log("Load screen delay: " + std::to_string(LOAD_DELAY) + "ms");
         env.log("In-game delay: " + std::to_string(INGAME_DELAY) + "ms");
         env.log("Teachy TV delay: " + std::to_string(TEACHY_DELAY) + "ms");
