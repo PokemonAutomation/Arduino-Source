@@ -37,7 +37,9 @@ namespace PABotBase2{
 
 
 class PacketSender{
-    static const uint8_t SLOTS_MASK = (PABB2_PacketSender_SLOTS) - 1;
+    static constexpr uint8_t SLOTS = PABB2_PacketSender_SLOTS;
+    static constexpr uint8_t SLOTS_MASK = SLOTS - 1;
+    static_assert((SLOTS & SLOTS_MASK) == 0, "Must be power-of-two.");
 
 public:
     PacketSender(
@@ -115,8 +117,17 @@ public:
     //
     void send_oob_packet_empty(uint8_t seqnum, uint8_t opcode);
     void send_oob_packet_u8(uint8_t seqnum, uint8_t opcode, uint8_t data);
-    void send_oob_packet_u16(uint8_t seqnum, uint8_t opcode, uint16_t data);
-    void send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, uint32_t data);
+    void send_oob_packet_u16(uint8_t seqnum, uint8_t opcode, const uint16_t& data);
+    void send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, const uint32_t& data);
+    void send_oob_packet_data(
+        uint8_t seqnum, uint8_t opcode,
+        uint8_t bytes, const void* data
+    );
+    void send_oob_packet_u32_data(
+        uint8_t seqnum, uint8_t opcode,
+        const uint32_t& u32,
+        uint8_t bytes, const void* data
+    );
 
 
 private:
@@ -144,7 +155,7 @@ private:
 
     //  These store the offsets within the buffer where the packet starts.
     //  The values stored here have their bits flipped so that zero means invalid.
-    size_t m_offsets[PABB2_PacketSender_SLOTS];
+    size_t m_offsets[SLOTS];
 
     uint8_t m_buffer[PABB2_PacketSender_BUFFER_SIZE];
 };

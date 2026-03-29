@@ -1,17 +1,14 @@
-/*  SerialPABotBase: Wired Controller (Switch 1)
+/*  PABotBase2: Wired Controller (Nintendo Switch)
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
+#include "Common/PABotBase2/Controllers/PABotBase2_Controller_NS_WiredController.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/JoystickTools.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
-#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_ControllerMode.h"
-#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_BaseProtocol_Misc.h"
-#include "Controllers/SerialPABotBase/Messages/SerialPABotBase_MessageWrappers_NS_WiredController.h"
-#include "NintendoSwitch_SerialPABotBase_WiredController.h"
+#include "NintendoSwitch_PABotBase2_WiredController.h"
 
 //#include <iostream>
 //using std::cout;
@@ -20,69 +17,90 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
+using namespace PABotBase2;
+
 using namespace std::chrono_literals;
 
 
 
+class PABotBase2_MessageHandler_WiredController : public PABotBase2::FixedLengthMesssageHandler<
+    PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE,
+    pabb2_Message_Command_NS_WiredController_State
+>{
+public:
+    virtual std::string tostr(const MessageHeader* header) const override{
+        const MessageType* message = (const MessageType*)header;
+        std::string str;
+        str += "PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE: id = ";
+        str += std::to_string(message->id);
+        str += ", ms = " + std::to_string(message->milliseconds);
+        return str;
+    }
 
-SerialPABotBase_WiredController::SerialPABotBase_WiredController(
+};
+
+
+
+PABotBase2_WiredController::PABotBase2_WiredController(
     Logger& logger,
-    SerialPABotBase::SerialPABotBase_Connection& connection,
+    PABotBase2::Connection& connection,
     ControllerType controller_type,
     ControllerResetMode reset_mode
 )
     : ProController(logger)
-    , SerialPABotBase_Controller(
-        logger,
-        controller_type,
-        connection
-    )
+    , PABotBase2_Controller(logger, connection)
 {
-    using namespace SerialPABotBase;
+    using namespace PABotBase2;
 
+//    cout << "PABotBase2_WiredController()" << endl;
 
-    //  Add controller-specific messages.
-    connection.add_message_printer<MessageType_WiredController_ControllerStateMs>();
-
+    connection.device().add_message_handler<PABotBase2_MessageHandler_WiredController>();
 
     switch (reset_mode){
     case PokemonAutomation::ControllerResetMode::DO_NOT_RESET:
         break;
     case PokemonAutomation::ControllerResetMode::SIMPLE_RESET:
-        connection.botbase()->issue_request_and_wait(
-            DeviceRequest_change_controller_mode(controller_type_to_id(controller_type)),
-            nullptr
-        );
+    case PokemonAutomation::ControllerResetMode::RESET_AND_CLEAR_STATE:{
+        PABotBase2::Message_u32 message;
+        message.message_bytes = sizeof(message);
+        message.opcode = reset_mode == PokemonAutomation::ControllerResetMode::SIMPLE_RESET
+            ?PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE
+            : PABB2_MESSAGE_OPCODE_RESET_TO_CONTROLLER;
+        message.data = SerialPABotBase::controller_type_to_id(controller_type);
+        uint8_t id = connection.device().send_request(message);
+//        cout << "wait... start" << endl;
+        connection.device().wait_for_request_response(id);
+//        cout << "wait... done" << endl;
         break;
-    case PokemonAutomation::ControllerResetMode::RESET_AND_CLEAR_STATE:
-        connection.botbase()->issue_request_and_wait(
-            DeviceRequest_reset_to_controller(controller_type_to_id(controller_type)),
-            nullptr
-        );
-        break;
+    }
     }
 
     //  Re-read the controller.
-    ControllerType current_controller = connection.refresh_controller_type();
+    ControllerType current_controller = connection.device().refresh_controller_type();
     if (current_controller != controller_type){
+//        cout << "Failed to set controller type." << endl;
         throw SerialProtocolException(logger, PA_CURRENT_FUNCTION, "Failed to set controller type.");
     }
 
+//    cout << "Starting status thread" << endl;
+
+#if 0   //  REMOVE
     m_status_thread.reset(new ControllerStatusThread(
         connection, *this
     ));
+#endif
 }
-SerialPABotBase_WiredController::~SerialPABotBase_WiredController(){
+PABotBase2_WiredController::~PABotBase2_WiredController(){
     stop();
 }
-void SerialPABotBase_WiredController::stop(){
+void PABotBase2_WiredController::stop(){
     m_status_thread.reset();
 }
 
 
 
 
-void SerialPABotBase_WiredController::execute_state(
+void PABotBase2_WiredController::execute_state(
     Cancellable* cancellable,
     const SuperscalarScheduler::ScheduleEntry& entry
 ){
@@ -170,37 +188,40 @@ void SerialPABotBase_WiredController::execute_state(
     }
     dpad_byte |= dpad;
 
+    PABotBase2::pabb2_Message_Command_NS_WiredController_State request;
+    request.message_bytes = sizeof(request);
+    request.opcode = PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE;
+    request.report.buttons0 = (uint8_t)buttons;
+    request.report.buttons1 = (uint8_t)(buttons >> 8);
+    request.report.dpad_byte = dpad_byte;
+    request.report.left_joystick_x = JoystickTools::linear_float_to_u8(controller_state.left_joystick.x);
+    request.report.left_joystick_y = JoystickTools::linear_float_to_u8(-controller_state.left_joystick.y);
+    request.report.right_joystick_x = JoystickTools::linear_float_to_u8(controller_state.right_joystick.x);
+    request.report.right_joystick_y = JoystickTools::linear_float_to_u8(-controller_state.right_joystick.y);
+
     //  Divide the controller state into smaller chunks that fit into the report
     //  duration.
     Milliseconds time_left = std::chrono::duration_cast<Milliseconds>(entry.duration);
 
     while (time_left > Milliseconds::zero()){
         Milliseconds current = std::min(time_left, 65535ms);
-        m_serial->issue_request(
-            DeviceRequest_WiredController_ControllerStateMs(
-                (uint16_t)current.count(),
-                buttons,
-                dpad_byte,
-                JoystickTools::linear_float_to_u8(controller_state.left_joystick.x),
-                JoystickTools::linear_float_to_u8(-controller_state.left_joystick.y),
-                JoystickTools::linear_float_to_u8(controller_state.right_joystick.x),
-                JoystickTools::linear_float_to_u8(-controller_state.right_joystick.y)
-            ),
-            cancellable
-        );
+        request.milliseconds = current.count();
+        m_connection.device().command_queue().send_command(request);
         time_left -= current;
     }
 }
 
 
 
-
-void SerialPABotBase_WiredController::update_status(Cancellable& cancellable){
-    pabb_MsgAckRequestI32 response;
-    m_serial->issue_request_and_wait(
-        SerialPABotBase::MessageControllerStatus(),
-        &cancellable
-    ).convert<PABB_MSG_ACK_REQUEST_I32>(m_logger, response);
+void PABotBase2_WiredController::update_status(Cancellable& cancellable){
+    PABotBase2::MessageHeader request;
+    request.message_bytes = sizeof(request);
+    request.opcode = PABB2_MESSAGE_OPCODE_REQUEST_STATUS;
+    uint8_t id = m_connection.device().send_request(request);
+    PABotBase2::Message_u32 response;
+    m_connection.device().wait_for_request_response<PABotBase2::Message_u32, PABB2_MESSAGE_OPCODE_RET_U32>(
+        response, id
+    );
 
     uint32_t status = response.data;
     bool status_connected = status & 1;
@@ -216,15 +237,11 @@ void SerialPABotBase_WiredController::update_status(Cancellable& cancellable){
         : html_color_text("No", COLOR_RED)
     );
 
-    m_handle.set_status_line1(str);
+    m_connection.set_status_line1(str);
 }
-void SerialPABotBase_WiredController::stop_with_error(std::string message){
-    SerialPABotBase_Controller::stop_with_error(std::move(message));
+void PABotBase2_WiredController::stop_with_error(std::string message){
+    PABotBase2_Controller::stop_with_error(std::move(message));
 }
-
-
-
-
 
 
 

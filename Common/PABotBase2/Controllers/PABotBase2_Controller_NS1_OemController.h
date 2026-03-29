@@ -8,6 +8,7 @@
 #define PokemonAutomation_PABotBase2_Controller_NS1_OemController_H
 
 #include "../../ControllerStates/NintendoSwitch_OemController_State.h"
+#include "../PABotBase2_MessageProtocol.h"
 
 #if _WIN32
 #pragma pack(push, 1)
@@ -25,7 +26,7 @@ namespace PABotBase2{
 
 #define PABB_MSG_REQ_NS1_OEM_CONTROLLER_READ_SPI        0x91
 #define PABB_MSG_REQ_NS1_OEM_CONTROLLER_WRITE_SPI       0x92
-struct PABB_PACK pabb2_Message_NS1_OemController_Spi{
+struct PABB_PACK pabb2_Message_NS1_OemController_Spi : MessageHeader{
     uint32_t controller_type;
     uint32_t address;
     uint8_t bytes;
@@ -39,14 +40,14 @@ struct PABB_PACK pabb2_Message_NS1_OemController_Spi{
 
 
 #define PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_BUTTONS            0x97
-struct PABB_PACK pabb2_Message_Command_NS1_OemController_Buttons{
+struct PABB_PACK pabb2_Message_Command_NS1_OemController_Buttons : MessageHeader{
     uint16_t milliseconds;
     pabb_NintendoSwitch_OemController_State0x30_Buttons buttons;
 };
 
 
 #define PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_FULL_STATE         0x98
-struct PABB_PACK pabb2_Message_Command_NS1_OemController_FullState{
+struct PABB_PACK pabb2_Message_Command_NS1_OemController_FullState : MessageHeader{
     uint16_t milliseconds;
     pabb_NintendoSwitch_OemController_State0x30 state;
 };

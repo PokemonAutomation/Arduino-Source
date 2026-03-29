@@ -735,6 +735,7 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/ControllerState.h
     Source/Controllers/ControllerStateTable.cpp
     Source/Controllers/ControllerStateTable.h
+    Source/Controllers/ControllerStatusThread.h
     Source/Controllers/ControllerTypeStrings.cpp
     Source/Controllers/ControllerTypeStrings.h
     Source/Controllers/ControllerTypes.h
@@ -745,8 +746,11 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/NullController.h
     Source/Controllers/PABotBase2/PABotBase2_CommandQueueManager.cpp
     Source/Controllers/PABotBase2/PABotBase2_CommandQueueManager.h
+    Source/Controllers/PABotBase2/PABotBase2_Connection.h
     Source/Controllers/PABotBase2/PABotBase2_DeviceHandle.cpp
     Source/Controllers/PABotBase2/PABotBase2_DeviceHandle.h
+    Source/Controllers/PABotBase2/PABotBase2_MessageHandler.cpp
+    Source/Controllers/PABotBase2/PABotBase2_MessageHandler.h
     Source/Controllers/PABotBase2/SerialPABotBase2_Connection.cpp
     Source/Controllers/PABotBase2/SerialPABotBase2_Connection.h
     Source/Controllers/PABotBase2/SerialPABotBase2_Descriptor.cpp
@@ -1058,6 +1062,10 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerTable.h
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController_from_Keyboard.cpp
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController_from_Keyboard.h
+    Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_Controller.cpp
+    Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_Controller.h
+    Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_WiredController.cpp
+    Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_WiredController.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.cpp
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Joycon.cpp

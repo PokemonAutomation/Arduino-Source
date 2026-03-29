@@ -5,6 +5,7 @@
  */
 
 #include <string.h>
+#include "Common/Compiler.h"
 #include "Common/CRC32/pabb_CRC32.h"
 #include "PABotBase2_PacketSender.h"
 
@@ -102,7 +103,7 @@ PacketHeader* PacketSender::reserve_packet(
 ){
     //  No slots available.
     uint8_t slots_used = m_slot_tail - m_slot_head;
-    if (slots_used == PABB2_PacketSender_SLOTS){
+    if (slots_used == SLOTS){
         return NULL;
     }
 
@@ -176,7 +177,7 @@ size_t PacketSender::send_stream(const void* data, size_t bytes){
     while (bytes > 0){
         //  No slots available.
         uint8_t slots_used = m_slot_tail - m_slot_head;
-        if (slots_used == PABB2_PacketSender_SLOTS){
+        if (slots_used == SLOTS){
             break;
         }
 
@@ -334,7 +335,7 @@ bool PacketSender::iterate_retransmits(){
 
 
 
-void PacketSender::send_oob_packet_empty(uint8_t seqnum, uint8_t opcode){
+PA_NO_INLINE void PacketSender::send_oob_packet_empty(uint8_t seqnum, uint8_t opcode){
     struct{
         PacketHeader header;
         uint8_t crc32[sizeof(uint32_t)];
@@ -346,9 +347,9 @@ void PacketSender::send_oob_packet_empty(uint8_t seqnum, uint8_t opcode){
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     m_connection.unreliable_send(&packet, sizeof(packet));
 }
-void PacketSender::send_oob_packet_u8(uint8_t seqnum, uint8_t opcode, uint8_t data){
+PA_NO_INLINE void PacketSender::send_oob_packet_u8(uint8_t seqnum, uint8_t opcode, uint8_t data){
     struct{
-        PacketHeader_Ack_u8 header;
+        PacketHeader_u8 header;
         uint8_t crc32[sizeof(uint32_t)];
     } packet;
     packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
@@ -359,33 +360,66 @@ void PacketSender::send_oob_packet_u8(uint8_t seqnum, uint8_t opcode, uint8_t da
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     m_connection.unreliable_send(&packet, sizeof(packet));
 }
-void PacketSender::send_oob_packet_u16(uint8_t seqnum, uint8_t opcode, uint16_t data){
+PA_NO_INLINE void PacketSender::send_oob_packet_u16(uint8_t seqnum, uint8_t opcode, const uint16_t& data){
     struct{
-        PacketHeader_Ack_u16 header;
+        PacketHeader_u16 header;
         uint8_t crc32[sizeof(uint32_t)];
     } packet;
     packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
     packet.header.opcode = opcode;
-    packet.header.data = data;
+    memcpy(&packet.header.data, &data, sizeof(uint16_t));
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     m_connection.unreliable_send(&packet, sizeof(packet));
 }
-void PacketSender::send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, uint32_t data){
+PA_NO_INLINE void PacketSender::send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, const uint32_t& data){
     struct{
-        PacketHeader_Ack_u32 header;
+        PacketHeader_u32 header;
         uint8_t crc32[sizeof(uint32_t)];
     } packet;
     packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
     packet.header.opcode = opcode;
-    packet.header.data = data;
+    memcpy(&packet.header.data, &data, sizeof(uint32_t));
     pabb_crc32_write_to_message(&packet, sizeof(packet));
     m_connection.unreliable_send(&packet, sizeof(packet));
 }
-
+PA_NO_INLINE void PacketSender::send_oob_packet_data(
+    uint8_t seqnum, uint8_t opcode,
+    uint8_t bytes, const void* data
+){
+    PacketHeader header;
+    header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
+    header.seqnum = seqnum;
+    header.packet_bytes = sizeof(PacketHeader) + sizeof(uint32_t) + bytes;
+    header.opcode = opcode;
+    uint32_t crc = 0xffffffff;
+    pabb_crc32_buffer(&crc, &header, sizeof(PacketHeader));
+    pabb_crc32_buffer(&crc, data, bytes);
+    m_connection.unreliable_send(&header, sizeof(header));
+    m_connection.unreliable_send(data, bytes);
+    m_connection.unreliable_send(&crc, sizeof(uint32_t));
+}
+PA_NO_INLINE void PacketSender::send_oob_packet_u32_data(
+    uint8_t seqnum, uint8_t opcode,
+    const uint32_t& u32,
+    uint8_t bytes, const void* data
+){
+    PacketHeader_u32 header;
+    header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
+    header.seqnum = seqnum;
+    header.packet_bytes = sizeof(PacketHeader_u32) + sizeof(uint32_t) + bytes;
+    header.opcode = opcode;
+    memcpy(&header.data, &u32, sizeof(uint32_t));
+    uint32_t crc = 0xffffffff;
+    pabb_crc32_buffer(&crc, &header, sizeof(PacketHeader_u32));
+    pabb_crc32_buffer(&crc, data, bytes);
+    m_connection.unreliable_send(&header, sizeof(header));
+    m_connection.unreliable_send(data, bytes);
+    m_connection.unreliable_send(&crc, sizeof(uint32_t));
+}
 
 
 

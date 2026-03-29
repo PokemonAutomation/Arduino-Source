@@ -42,7 +42,23 @@ SerialPABotBase_Controller::SerialPABotBase_Controller(
 }
 
 
+void SerialPABotBase_Controller::stop_with_error(std::string error_message) noexcept{
+    try{
+        WriteSpinLock lg(m_error_lock);
+        m_error_string = error_message;
+    }catch (...){}
+    m_serial->stop(std::move(error_message));
+}
 
+bool SerialPABotBase_Controller::is_ready() const{
+    return m_serial
+        && m_serial->state() == BotBaseController::State::RUNNING
+        && m_handle.is_ready();
+}
+std::string SerialPABotBase_Controller::error_string() const{
+    ReadSpinLock lg(m_error_lock);
+    return m_error_string;
+}
 
 void SerialPABotBase_Controller::cancel_all_commands(){
     std::lock_guard<Mutex> lg(m_state_lock);

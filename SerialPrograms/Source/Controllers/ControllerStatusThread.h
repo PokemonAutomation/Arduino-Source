@@ -1,4 +1,4 @@
-/*  SerialPABotBase: Status Thread Helper
+/*  Controllers: Status Thread Helper
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -6,21 +6,23 @@
  *
  */
 
-#ifndef PokemonAutomation_SerialPABotBase_StatusThread_H
-#define PokemonAutomation_SerialPABotBase_StatusThread_H
+#ifndef PokemonAutomation_Controllers_StatusThread_H
+#define PokemonAutomation_Controllers_StatusThread_H
 
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
-#include "SerialPABotBase_Connection.h"
+#include "Controllers/ControllerConnection.h"
 
 //#include <iostream>
 //using std::cout;
 //using std::endl;
 
 namespace PokemonAutomation{
-namespace SerialPABotBase{
 
 
 
@@ -36,7 +38,7 @@ struct ControllerStatusThreadCallback{
 class ControllerStatusThread{
 public:
     ControllerStatusThread(
-        SerialPABotBase_Connection& connection,
+        ControllerConnection& connection,
         ControllerStatusThreadCallback& callback
     )
         : m_connection(connection)
@@ -56,12 +58,9 @@ public:
         m_scope.cancel(nullptr);
         {
             std::unique_lock<Mutex> lg(m_sleep_lock);
-            BotBaseController* botbase = m_connection.botbase();
-            if (botbase){
-                botbase->on_cancellable_cancel();
-            }
-            m_cv.notify_all();
+            m_connection.cancel();
         }
+        m_cv.notify_all();
         m_status_thread.wait_and_ignore_exceptions();
     }
 
@@ -121,11 +120,7 @@ private:
                 last_ack.store(current_time(), std::memory_order_relaxed);
             }catch (OperationCancelledException&){
                 break;
-            }catch (InvalidConnectionStateException& e){
-                error = e.message();
-            }catch (SerialProtocolException& e){
-                error = e.message();
-            }catch (ConnectionException& e){
+            }catch (Exception& e){
                 error = e.message();
             }catch (...){
                 error = "Unknown error.";
@@ -157,7 +152,7 @@ private:
     }
 
 private:
-    SerialPABotBase::SerialPABotBase_Connection& m_connection;
+    ControllerConnection& m_connection;
     ControllerStatusThreadCallback& m_callback;
     CancellableHolder<CancellableScope> m_scope;
     std::atomic<bool> m_stopping;
@@ -172,6 +167,5 @@ private:
 
 
 
-}
 }
 #endif

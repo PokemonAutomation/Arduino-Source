@@ -1,16 +1,16 @@
-/*  SerialPABotBase: Wired Controller (Switch 1)
+/*  PABotBase2: Wired Controller (Nintendo Switch)
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_WiredControllerNS1_H
-#define PokemonAutomation_NintendoSwitch_SerialPABotBase_WiredControllerNS1_H
+#ifndef PokemonAutomation_NintendoSwitch_PABotBase2_WiredControllerNS_H
+#define PokemonAutomation_NintendoSwitch_PABotBase2_WiredControllerNS_H
 
 #include "Controllers/ControllerStatusThread.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
-#include "NintendoSwitch_SerialPABotBase_Controller.h"
+#include "NintendoSwitch_PABotBase2_Controller.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -18,9 +18,9 @@ namespace NintendoSwitch{
 
 
 
-class SerialPABotBase_WiredController final :
+class PABotBase2_WiredController final :
     public ProController,
-    public SerialPABotBase_Controller,
+    public PABotBase2_Controller,
     private ControllerStatusThreadCallback
 {
 public:
@@ -28,13 +28,13 @@ public:
 
 
 public:
-    SerialPABotBase_WiredController(
+    PABotBase2_WiredController(
         Logger& logger,
-        SerialPABotBase::SerialPABotBase_Connection& connection,
+        PABotBase2::Connection& connection,
         ControllerType controller_type,
         ControllerResetMode reset_mode
     );
-    ~SerialPABotBase_WiredController();
+    ~PABotBase2_WiredController();
     void stop();
 
     virtual Logger& logger() override{
@@ -44,7 +44,7 @@ public:
         return m_logging_throttler;
     }
     virtual bool is_ready() const override{
-        return SerialPABotBase_Controller::is_ready();
+        return PABotBase2_Controller::is_ready();
     }
 
 
@@ -68,14 +68,14 @@ public:
 
 public:
     virtual void cancel_all_commands() override{
-        SerialPABotBase_Controller::cancel_all_commands();
+        PABotBase2_Controller::cancel_all_commands();
     }
     virtual void replace_on_next_command() override{
-        SerialPABotBase_Controller::replace_on_next_command();
+        PABotBase2_Controller::replace_on_next_command();
     }
 
     virtual void wait_for_all(Cancellable* cancellable) override{
-        SerialPABotBase_Controller::wait_for_all(cancellable);
+        PABotBase2_Controller::wait_for_all(cancellable);
     }
 
 
@@ -222,12 +222,6 @@ private:
     virtual void update_status(Cancellable& cancellable) override;
     virtual void stop_with_error(std::string message) override;
 
-
-private:
-    template <typename Type>
-    PA_FORCE_INLINE Type milliseconds_to_ticks_8ms(Type milliseconds){
-        return milliseconds / 8 + (milliseconds % 8 + 7) / 8;
-    }
     virtual void execute_state(
         Cancellable* cancellable,
         const SuperscalarScheduler::ScheduleEntry& entry
@@ -237,7 +231,6 @@ private:
 private:
     std::unique_ptr<ControllerStatusThread> m_status_thread;
 };
-
 
 
 

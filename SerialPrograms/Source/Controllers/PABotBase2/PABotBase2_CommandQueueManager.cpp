@@ -97,7 +97,12 @@ uint8_t CommandQueueManager::send_command(MessageHeader& command){
         break;
     }
 
-    if (GlobalSettings::instance().LOG_EVERYTHING){
+    auto iter = m_message_handlers.find(command.opcode);
+    if (iter != m_message_handlers.end()){
+        if (iter->second->should_print()){
+            m_logger.log("[MLC]: Sending: " + iter->second->tostr(&command), COLOR_DARKGREEN);
+        }
+    }else if (GlobalSettings::instance().LOG_EVERYTHING){
         m_logger.log("[MLC]: Sending: " + tostr(&command), COLOR_DARKGREEN);
     }
 

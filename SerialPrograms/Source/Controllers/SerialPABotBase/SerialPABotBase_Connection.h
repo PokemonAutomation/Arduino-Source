@@ -23,7 +23,7 @@ namespace PokemonAutomation{
 namespace SerialPABotBase{
 
 
-class SerialPABotBase_Connection : public ControllerConnection{
+class SerialPABotBase_Connection final : public ControllerConnection{
 public:
     SerialPABotBase_Connection(
         Logger& logger,
@@ -49,6 +49,8 @@ public:
     BotBaseController* botbase();
 
     ControllerType refresh_controller_type();
+
+    virtual bool cancel(std::exception_ptr exception = nullptr) noexcept override;
 
 
 private:

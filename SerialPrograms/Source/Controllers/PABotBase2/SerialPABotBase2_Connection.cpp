@@ -41,6 +41,7 @@ SerialPABotBase2_Connection::~SerialPABotBase2_Connection(){
     cancel(nullptr);
     m_ready.store(false, std::memory_order_release);
     m_connect_thread.wait_and_ignore_exceptions();
+    m_device.reset();
 }
 
 
@@ -176,7 +177,7 @@ bool SerialPABotBase2_Connection::open_device_connection(bool set_to_null_contro
     if (set_to_null_controller && current_controller != ControllerType::None){
         PABotBase2::MessageHeader request;
         request.message_bytes = sizeof(request);
-        request.opcode = PABB_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE;
+        request.opcode = PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE;
         m_device->send_request(request);
 
 #if 0
