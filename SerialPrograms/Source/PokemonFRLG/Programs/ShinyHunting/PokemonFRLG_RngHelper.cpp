@@ -922,7 +922,7 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                 );
             }
             MODIFIED_INGAME_DELAY = INGAME_DELAY - 30300;
-            walk_to_safarizonewest(context);
+            walk_to_safarizonesurf(context);
             use_sweet_scent(env, context, MODIFIED_INGAME_DELAY, true);
             shiny_found = watch_for_shiny_encounter(env, context) == 1;
             context.wait_for_all_requests();
@@ -936,7 +936,7 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                 );
             }
             MODIFIED_INGAME_DELAY = INGAME_DELAY - 30300;
-            walk_to_safarizonewest(context);
+            walk_to_safarizonefish(context);
             use_registered_fishing_rod(env, context, MODIFIED_INGAME_DELAY);
             ret = watch_for_shiny_encounter(env, context);
             if (ret < 0 ){
