@@ -592,7 +592,7 @@ void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context){
     }
 }
 
-void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context){
+void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context){
     uint16_t errors = 0;
     bool start_menu_is_open = false;
     while (true){
@@ -620,7 +620,12 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
 
         switch (ret){
         case 0:
-            ret = move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::POKEMON);
+            if (menu_context == StartMenuContext::SAFARI_ZONE){
+                ret = move_cursor_to_position(console, context, SelectionArrowPositionSafariMenu::POKEMON);
+            } else {
+                ret = move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::POKEMON);
+            }
+
             if (ret < 0){
                 console.log("Failed to navigate to POKEMON on the start menu.");
                 errors++;
@@ -632,6 +637,7 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
                 context.wait_for_all_requests();
                 pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
             }
+
             continue;
         case 1:
             console.log("Party menu opened.");
