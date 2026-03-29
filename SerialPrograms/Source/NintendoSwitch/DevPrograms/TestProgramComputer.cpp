@@ -143,8 +143,8 @@
 //#include "Common/SerialPABotBase/LightweightWallClock_StdChrono.h"
 #include "Common/Cpp/Options/MacAddressOption.h"
 #include "CommonTools/Images/ImageFilter.h"
-#include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
-#include "Common/PABotBase2/ConnectionLayer/PABotbase2_ReliableStreamConnection.h"
+#include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2CC_ReliableStreamConnection.h"
+#include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2FW_ReliableStreamConnection.h"
 #include "Common/Cpp/StreamConnections/MockDevice.h"
 #include "CommonTools/Random.h"
 
@@ -309,11 +309,11 @@ void stress_test(Logger& logger, CancellableScope& scope){
 
     MockDevice device(GlobalThreadPools::unlimited_normal());
 
-    ReliableStreamConnection connection(
+    PABotBase2::ReliableStreamConnection connection(
         &scope,
-        logger, false,
+        logger, true,
         GlobalThreadPools::unlimited_realtime(),
-        device,
+        device.host_side_connection(),
         100ms,
         &device.print_lock()
     );
@@ -330,31 +330,41 @@ void stress_test(Logger& logger, CancellableScope& scope){
     uint64_t bytes_sent = 0;
     WallClock last_print = current_time();
 
-    while (true){
-        scope.throw_if_cancelled();
+    try{
+        while (true){
+            scope.throw_if_cancelled();
 
-        std::string data = random_string(20);
-        const char* ptr = data.data();
-        size_t left = data.size();
-        while (left > 0){
-            if (current_time() - last_print > Seconds(1)){
-                cout << "Bytes Sent = " << bytes_sent + data.size() - left << endl;
-                last_print = current_time();
+            std::string data = random_string(20);
+            const char* ptr = data.data();
+            size_t left = data.size();
+            while (left > 0){
+                if (current_time() - last_print > Seconds(1)){
+                    cout << "Bytes Sent = " << bytes_sent + data.size() - left << endl;
+                    last_print = current_time();
+                }
+    //            scope.wait_for(Milliseconds(rand() % 100));
+                connection.send_stream(ptr, left);
+                size_t sent = left;
+//                if (sent == 0){
+//                    device.verify_stream_data();
+//                }
+                ptr += sent;
+                left -= sent;
             }
-//            scope.wait_for(Milliseconds(rand() % 100));
-            size_t sent = connection.send(ptr, left);
-            if (sent == 0){
-                device.verify_stream_data();
-            }
-            ptr += sent;
-            left -= sent;
+            device.verify_stream_data();
+            bytes_sent += data.size();
+            device.push_expected_stream_data(data.data(), data.size());
         }
-        bytes_sent += data.size();
-        device.push_expected_stream_data(data.data(), data.size());
+    }catch (Exception&){
+        connection.print();
+        device.print();
+        throw;
     }
+
 }
 
 
+std::mutex print_lock;
 
 
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){

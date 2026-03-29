@@ -41,7 +41,6 @@ class CancellableScope;
 
 
 
-struct CancellableData;
 class Cancellable{
     Cancellable(const Cancellable&) = delete;
     void operator=(const Cancellable&) = delete;
@@ -107,14 +106,14 @@ protected:
 
 private:
     CancellableScope* m_scope = nullptr;
-    Pimpl<CancellableData> m_impl;
+    struct Data;
+    Pimpl<Data> m_impl;
 public:
     LifetimeSanitizer m_sanitizer;
 };
 
 
 
-struct CancellableScopeData;
 class CancellableScope : public Cancellable{
 public:
     virtual ~CancellableScope() override;
@@ -134,7 +133,8 @@ private:
     void operator-=(Cancellable& cancellable);
 
 private:
-    Pimpl<CancellableScopeData> m_impl;
+    struct Data;
+    Pimpl<Data> m_impl;
     LifetimeSanitizer m_sanitizer;
 };
 

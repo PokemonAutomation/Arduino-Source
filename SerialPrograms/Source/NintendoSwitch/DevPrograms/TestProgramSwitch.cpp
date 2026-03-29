@@ -159,16 +159,15 @@
 #include "Common/Cpp/Options/CheckboxDropdownOption.h"
 #include "Common/Cpp/Options/CheckboxDropdownOption.tpp"
 //#include "Integrations/PybindSwitchController.h"
-#include "Common/PABotBase2/ConnectionLayer/PABotBase2_ConnectionDebug.h"
-#include "Common/PABotBase2/ConnectionLayer/PABotBase2_PacketSender.h"
-#include "Common/PABotBase2/ConnectionLayer/PABotBase2_StreamCoalescer.h"
+#include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2_ConnectionDebug.h"
+#include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketSender.h"
+#include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2_StreamCoalescer.h"
 #include "Common/Cpp/StreamConnections/StreamInterface.h"
-#include "Common/Cpp/StreamConnections/StreamConnection.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/CRC32/pabb_CRC32.h"
-#include "Common/PABotBase2/ConnectionLayer/PABotBase2_PacketParser.h"
-#include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
-#include "Common/PABotBase2/ConnectionLayer/PABotbase2_ReliableStreamConnection.h"
+#include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketParser.h"
+#include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2FW_ReliableStreamConnection.h"
+#include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2CC_ReliableStreamConnection.h"
 #include "Common/Cpp/StreamConnections/MockDevice.h"
 #include "ML/Inference/ML_PaddleOCRPipeline.h"
 #include "CommonTools/OCR/OCR_RawPaddleOCR.h"
@@ -288,6 +287,7 @@ TestProgram::TestProgram()
 
 //using namespace Kernels;
 using namespace Kernels::Waterfill;
+using namespace PABotBase2;
 
 
 
@@ -327,9 +327,9 @@ public:
 class LogSender : public StreamSender{
 public:
     virtual size_t send(const void* data, size_t bytes) override{
-//        cout << PABotBase2::dump_packet((const pabb2_PacketHeader*)data) << endl;
+//        cout << PABotBase2::dump_packet((const PacketHeader*)data) << endl;
         cout << "Sending: ";
-        pabb2_PacketHeader_print((const pabb2_PacketHeader*)data, false);
+        PABotBase2::PacketHeader_print((const PacketHeader*)data, false);
         fflush(stdout);
         return bytes;
     }
@@ -348,20 +348,20 @@ std::string dump(const pabb2_PacketSender& sender){
     str += "Buffer Head: " + std::to_string(sender.buffer_head) + "\n";
     str += "Buffer Tail: " + std::to_string(sender.buffer_tail) + "\n";
     for (uint8_t seqnum = sender.slot_head; seqnum != sender.slot_tail; seqnum++){
-        size_t offset = ~sender.offsets[seqnum & PABB2_ConnectionSender_SLOTS_MASK];
+        size_t offset = ~sender.offsets[seqnum & PABB2_PacketSender_SLOTS_MASK];
         str += "Offset = " + std::to_string(offset) + "\n";
-        str += PABotBase2::dump_packet((const pabb2_PacketHeader*)(sender.buffer + offset));
+        str += PABotBase2::dump_packet((const PacketHeader*)(sender.buffer + offset));
         str += "\n";
     }
     return str;
 }
 #endif
 
-struct DataPacket : pabb2_PacketHeaderData{
+struct DataPacket : PacketHeaderData{
     char data[256];
 
     void set(uint8_t seqnum, uint16_t stream_offset, const char* str){
-        const size_t OVERHEAD = sizeof(pabb2_PacketHeaderData) + sizeof(uint32_t);
+        const size_t OVERHEAD = sizeof(PacketHeaderData) + sizeof(uint32_t);
         const size_t MAX_SIZE = 256 - OVERHEAD;
 
         size_t size = strlen(str);
@@ -399,17 +399,17 @@ public:
     }
 
     virtual size_t send(const void* data, size_t bytes) override{
-        const pabb2_PacketHeader* packet = (const pabb2_PacketHeader*)data;
+        const PacketHeader* packet = (const PacketHeader*)data;
 #if 0
         cout << "Sending: ";
-        pabb2_PacketHeader_print(packet, false);
+        PacketHeader_print(packet, false);
         fflush(stdout);
 #endif
 
         WallClock now = current_time();
 
         struct{
-            pabb2_PacketHeader header;
+            PacketHeader header;
             uint8_t crc[sizeof(uint32_t)];
         } response;
         response.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
@@ -421,10 +421,10 @@ public:
         std::lock_guard<std::mutex> lg(m_lock);
 
         if (packet->opcode == PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA){
-            uint8_t stream_size = packet->packet_bytes - sizeof(pabb2_PacketHeaderData) - sizeof(uint32_t);
+            uint8_t stream_size = packet->packet_bytes - sizeof(PacketHeaderData) - sizeof(uint32_t);
             for (uint8_t c = 0; c < stream_size; c++){
                 char expected = '0' + m_offset % 10;
-                char actual = ((const char*)packet)[sizeof(pabb2_PacketHeaderData) + c];
+                char actual = ((const char*)packet)[sizeof(PacketHeaderData) + c];
                 if (expected != actual){
                     cout << "Mismatch at: " << m_offset << ", expected = " << expected << ", actual = " << actual << endl;
 
@@ -464,7 +464,7 @@ private:
                 std::string& packet = iter->second;
 #if 0
                 cout << "Receiving: ";
-                pabb2_PacketHeader_print((const pabb2_PacketHeader*)packet.data(), false);
+                PacketHeader_print((const PacketHeader*)packet.data(), false);
                 fflush(stdout);
 #endif
                 on_recv(packet.data(), packet.size());
@@ -681,7 +681,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     pabb2_PacketSender queue;
     pabb2_PacketSender_init(&queue);
 
-    pabb2_PacketHeader* packet;
+    PacketHeader* packet;
 
     packet = pabb2_PacketSender_reserve_packet(&queue, 16);
     if (packet){

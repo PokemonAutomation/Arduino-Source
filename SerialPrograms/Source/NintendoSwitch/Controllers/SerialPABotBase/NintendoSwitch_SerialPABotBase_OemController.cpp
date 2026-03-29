@@ -103,7 +103,7 @@ SerialPABotBase_OemController::SerialPABotBase_OemController(
         throw SerialProtocolException(logger, PA_CURRENT_FUNCTION, "Failed to set controller type.");
     }
 
-    m_status_thread.reset(new SerialPABotBase::ControllerStatusThread(
+    m_status_thread.reset(new ControllerStatusThread(
         connection, *this
     ));
 

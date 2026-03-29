@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_StandardHid_Keyboard_SerialPABotBase_H
 #define PokemonAutomation_StandardHid_Keyboard_SerialPABotBase_H
 
+#include "Controllers/ControllerStatusThread.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Connection.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_StatusThread.h"
 #include "StandardHid_Keyboard.h"
 #include "StandardHid_KeyboardWithScheduler.h"
 
@@ -20,7 +20,7 @@ namespace StandardHid{
 class SerialPABotBase_Keyboard final :
     public Keyboard,
     public KeyboardControllerWithScheduler,
-    private SerialPABotBase::ControllerStatusThreadCallback
+    private ControllerStatusThreadCallback
 {
 public:
     using ContextType = KeyboardContext;
@@ -135,7 +135,7 @@ protected:
 
     std::map<uint64_t, KeyboardKey> m_last_state;
 
-    std::unique_ptr<SerialPABotBase::ControllerStatusThread> m_status_thread;
+    std::unique_ptr<ControllerStatusThread> m_status_thread;
 };
 
 
