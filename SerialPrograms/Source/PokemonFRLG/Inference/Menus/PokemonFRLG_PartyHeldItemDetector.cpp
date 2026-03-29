@@ -47,7 +47,7 @@ ImageFloatBox PartyHeldItemDetector::box_for_slot(PartyHeldItemSlot slot){
         return ImageFloatBox(0.432, 0.3, 0.025, 0.050);
     case PartyHeldItemSlot::SLOT_4:
         return ImageFloatBox(0.432, 0.45, 0.025, 0.050);
-    case PartyHeldItemSlot::SLOT_5 :
+    case PartyHeldItemSlot::SLOT_5:
         return ImageFloatBox(0.432, 0.6, 0.025, 0.050);
     case PartyHeldItemSlot::SLOT_6:
         return ImageFloatBox(0.432, 0.725, 0.025, 0.050);
