@@ -419,8 +419,7 @@ std::string EvTrainer::get_encounter_species(SingleSwitchProgramEnvironment& env
 
     env.log("Reading name...");
     VideoSnapshot screen = env.console.video().snapshot();
-    PokemonFRLG_WildEncounter encounter;
-    reader.read_encounter(env.logger(), LANGUAGE, screen, subset, encounter);
+    PokemonFRLG_WildEncounter encounter = reader.read_encounter(env.logger(), LANGUAGE, screen, subset);
     env.log("Name: " + encounter.name);
 
     return encounter.name;

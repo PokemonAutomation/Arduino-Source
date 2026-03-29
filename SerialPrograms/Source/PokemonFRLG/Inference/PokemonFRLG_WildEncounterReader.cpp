@@ -30,18 +30,18 @@ WildEncounterReader::WildEncounterReader(Color color)
     // , m_box_level(0.325, 0.120, 0.092, 0.063)
     {}
 
-void WildEncounterReader::make_overlays(VideoOverlaySet &items) const {
-    const BoxOption &GAME_BOX = GameSettings::instance().GAME_BOX;
+void WildEncounterReader::make_overlays(VideoOverlaySet& items) const {
+    const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_name));
     // items.add(m_color, GAME_BOX.inner_to_outer(m_box_level));
 }
 
-void WildEncounterReader::read_encounter(
-    Logger &logger, Language language,
-    const ImageViewRGB32 &frame, 
-    std::set<std::string> &subset, 
-    PokemonFRLG_WildEncounter& encounter
+PokemonFRLG_WildEncounter WildEncounterReader::read_encounter(
+    Logger& logger, Language language,
+    const ImageViewRGB32& frame, 
+    std::set<std::string>& subset
 ) {
+    PokemonFRLG_WildEncounter encounter; 
     ImageViewRGB32 game_screen =
             extract_box_reference(frame, GameSettings::instance().GAME_BOX);
 
@@ -58,6 +58,7 @@ void WildEncounterReader::read_encounter(
     if (!name_result.results.empty()) {
         encounter.name = name_result.results.begin()->second.token;
     }
+    return encounter;
 }
 
 } // namespace PokemonFRLG

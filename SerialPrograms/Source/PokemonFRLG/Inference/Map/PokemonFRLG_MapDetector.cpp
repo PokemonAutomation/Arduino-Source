@@ -50,7 +50,6 @@ bool KantoMapDetector::detect(const ImageViewRGB32& screen){
     return false;
 }
 
-// SeviiMapDetector
 
 
 }

@@ -33,15 +33,14 @@ class WildEncounterReader {
 public:
     WildEncounterReader(Color color = COLOR_RED);
 
-    void make_overlays(VideoOverlaySet &items) const;
+    void make_overlays(VideoOverlaySet& items) const;
 
     // Reads species from the top left of the battle screen
     // by matching to the provided subset of species 
-    void read_encounter(
-        Logger &logger, Language language,
-        const ImageViewRGB32 &frame, 
-        std::set<std::string> &subset, 
-        PokemonFRLG_WildEncounter &encounter
+    PokemonFRLG_WildEncounter read_encounter(
+        Logger& logger, Language language,
+        const ImageViewRGB32& frame, 
+        std::set<std::string>& subset
     );
 
 private:

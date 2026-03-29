@@ -58,8 +58,8 @@ ReadEncounter::ReadEncounter()
 }
 
 void ReadEncounter::program(
-    SingleSwitchProgramEnvironment &env,
-    ProControllerContext &context
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context
 ){
     env.log(
         "Starting Read Encounter program..."
@@ -85,19 +85,14 @@ void ReadEncounter::program(
     default:
         subset = std::set<std::string>{};
     }
-    std::set<std::string>{"pidgey","rattata"};
-
 
     WildEncounterReader reader(COLOR_RED);
     VideoOverlaySet overlays(env.console.overlay());
     reader.make_overlays(overlays);
 
-    PokemonFRLG_WildEncounter encounter;
-
-
     env.log("Reading name and level...");
     VideoSnapshot screen = env.console.video().snapshot();
-    reader.read_encounter(env.logger(), LANGUAGE, screen, subset, encounter);
+    PokemonFRLG_WildEncounter encounter = reader.read_encounter(env.logger(), LANGUAGE, screen, subset);
 
     env.log("Name: " + encounter.name);
 
