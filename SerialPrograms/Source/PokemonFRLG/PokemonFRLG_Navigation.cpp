@@ -484,6 +484,7 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
         }
 
         BattleDialogWatcher evolution_started(COLOR_RED);
+        StartMenuWatcher start_menu_open(COLOR_RED);
         int ret2;
 
         switch (ret){
@@ -538,6 +539,23 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
             errors++;
             // attempt to exit any screen that might be open (party, bag, etc)
             pbf_mash_button(context, BUTTON_B, 500ms);
+            // overworld detection: look for the start menu
+            context.wait_for_all_requests();
+            ret2 = run_until<ProControllerContext>(
+                console, context,
+                [](ProControllerContext& context) {
+                    pbf_press_button(context, BUTTON_PLUS, 200ms, 800ms);
+                    pbf_press_button(context, BUTTON_PLUS, 200ms, 800ms);
+                    pbf_press_button(context, BUTTON_PLUS, 200ms, 800ms);
+                },
+                { start_menu_open }
+            );
+            if (ret2 == 0){
+                pbf_mash_button(context, BUTTON_B, 500ms);
+                context.wait_for_all_requests();
+                console.log("Battle exited.");
+                return move_learned;
+            }
             context.wait_for_all_requests();
             rejected_first_box = false;
             continue;
