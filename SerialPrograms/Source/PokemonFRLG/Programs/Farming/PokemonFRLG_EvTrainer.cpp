@@ -389,6 +389,8 @@ void use_dig(SingleSwitchProgramEnvironment& env, ProControllerContext& context)
 } // namespace
 
 std::string EvTrainer::get_encounter_species(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EvTrainingLocation& location){
+    const double MAX_SPECIES_LOG10P = -1.2; // relaxed from the default of -1.4 to prevent failure to get OCR matches for some species
+    
     // make OCR more reliable by providing possible wild encounters for each location
     std::set<std::string> subset = {};
     switch (location){
@@ -419,7 +421,7 @@ std::string EvTrainer::get_encounter_species(SingleSwitchProgramEnvironment& env
 
     env.log("Reading name...");
     VideoSnapshot screen = env.console.video().snapshot();
-    PokemonFRLG_WildEncounter encounter = reader.read_encounter(env.logger(), LANGUAGE, screen, subset);
+    PokemonFRLG_WildEncounter encounter = reader.read_encounter(env.logger(), LANGUAGE, screen, subset, MAX_SPECIES_LOG10P);
     env.log("Name: " + encounter.name);
 
     return encounter.name;
@@ -448,10 +450,13 @@ EvTrainer::EffortValues EvTrainer::get_ev_yield(SingleSwitchProgramEnvironment& 
         {"cubone",      {0,0,1,0,0,0}},
     };
 
-    if (ev_map.find(species) == ev_map.end()){
+    if (species == ""){
+        env.log("get_ev_yield(): failed to detect species");
+        return {999, 999, 999, 999, 999, 999}; // this will always trigger running away
+    }else if (ev_map.find(species) == ev_map.end()){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Missing EV yield for " + species,
+            "get_ev_yield(): Missing EV yield for " + species,
             env.console
         );
     }

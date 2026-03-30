@@ -39,7 +39,8 @@ void WildEncounterReader::make_overlays(VideoOverlaySet& items) const {
 PokemonFRLG_WildEncounter WildEncounterReader::read_encounter(
     Logger& logger, Language language,
     const ImageViewRGB32& frame, 
-    std::set<std::string>& subset
+    std::set<std::string>& subset,
+    double max_log10p
 ) {
     PokemonFRLG_WildEncounter encounter; 
     ImageViewRGB32 game_screen =
@@ -54,7 +55,8 @@ PokemonFRLG_WildEncounter WildEncounterReader::read_encounter(
     // auto name_result = Pokemon::PokemonNameReader::instance().read_substring(    
     auto name_result = Pokemon::PokemonNameReader(subset).read_substring(
             logger, language, extract_box_reference(game_screen, m_box_name),
-            name_text_color_ranges);
+            name_text_color_ranges,
+            0.01, 0.50, max_log10p);
     if (!name_result.results.empty()) {
         encounter.name = name_result.results.begin()->second.token;
     }
