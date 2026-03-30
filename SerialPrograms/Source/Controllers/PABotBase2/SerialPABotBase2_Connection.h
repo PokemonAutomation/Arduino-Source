@@ -27,6 +27,8 @@ public:
     );
     ~SerialPABotBase2_Connection();
 
+    virtual bool cancel(std::exception_ptr exception = nullptr) noexcept override;
+
 
 public:
     ControllerType refresh_controller_type();

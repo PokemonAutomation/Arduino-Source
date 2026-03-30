@@ -8,7 +8,7 @@
 //#include "Common/Cpp/PrettyPrint.h"
 //#include "Common/Cpp/Exceptions.h"
 #include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
-#include "PABotBase2_ConnectionDebug.h"
+//#include "PABotBase2_ConnectionDebug.h"
 #include "PABotBase2CC_ReliableStreamConnection.h"
 
 //#include <iostream>
@@ -134,7 +134,7 @@ size_t ReliableStreamConnection::unreliable_send(const void* data, size_t bytes)
             "[RSC]: Sending: " + tostr(header),
             COLOR_DARKGREEN
         );
-//        PABotBase2::PacketHeader_print(header, true);   //  REMOVE
+//        PABotBase2::PacketHeader_print(header, true);
     }
 //    cout << "ReliableStreamConnection::unreliable_send() - before send" << endl;
     return m_unreliable_connection.unreliable_send(data, bytes);

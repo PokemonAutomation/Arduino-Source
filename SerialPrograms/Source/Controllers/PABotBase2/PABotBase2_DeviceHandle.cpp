@@ -15,10 +15,9 @@
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "PABotBase2_DeviceHandle.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace PABotBase2{
@@ -46,8 +45,7 @@ DeviceHandle::~DeviceHandle(){
 }
 
 bool DeviceHandle::cancel(std::exception_ptr exception) noexcept{
-    bool already_cancelled = CancellableScope::cancel(std::move(exception));
-    if (already_cancelled){
+    if (CancellableScope::cancel(std::move(exception))){
         return true;
     }
     {
