@@ -86,18 +86,12 @@ public:
 
     static ImageFloatBox party_slot_boxes(PartySlot position);
 
-    const ImageFloatBox& last_detected() const { return m_last_detected; }
-
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
     const Color m_color;
-    VideoOverlay* m_overlay;
     const ImageFloatBox m_party_box;
-
-    ImageFloatBox m_last_detected;
-    std::optional<OverlayBoxScope> m_last_detected_box;
 };
 class PartySlotWatcher : public DetectorToFinder<PartySlotDetector>{
 public:
