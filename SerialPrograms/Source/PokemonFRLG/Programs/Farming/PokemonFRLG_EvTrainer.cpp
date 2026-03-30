@@ -447,6 +447,7 @@ EvTrainer::EffortValues EvTrainer::get_ev_yield(SingleSwitchProgramEnvironment& 
         {"geodude",     {0,0,1,0,0,0}},
         {"gastly",      {0,0,0,1,0,0}},
         {"haunter",     {0,0,0,2,0,0}},
+        {"onix",        {0,0,1,0,0,0}},
         {"cubone",      {0,0,1,0,0,0}},
     };
 
