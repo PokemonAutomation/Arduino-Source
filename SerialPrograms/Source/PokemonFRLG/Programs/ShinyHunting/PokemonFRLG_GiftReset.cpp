@@ -13,6 +13,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h"
@@ -293,7 +294,7 @@ bool GiftReset::try_open_summary(SingleSwitchProgramEnvironment& env, ProControl
     }
 
     //Open party menu
-    BlackScreenOverWatcher blk1(COLOR_RED);
+    PartyMenuWatcher blk1(COLOR_RED);
 
     int pm = run_until<ProControllerContext>(
         env.console, context,
@@ -318,8 +319,29 @@ bool GiftReset::try_open_summary(SingleSwitchProgramEnvironment& env, ProControl
 
     //Press up twice to get to the last slot
     if (TARGET != Target::starters){
-        pbf_press_dpad(context, DPAD_UP, 320ms, 320ms);
-        pbf_press_dpad(context, DPAD_UP, 320ms, 320ms);
+        PartySlotWatcher last_slot(COLOR_RED, PartySlot::SIX);
+        int ps = run_until<ProControllerContext>(
+            env.console, context,
+            [](ProControllerContext& context){
+                for (int i = 0; i < 15; i++) { //Enough to cycle through 6pty+cxl twice
+                    pbf_wait(context, 320ms);
+                    context.wait_for_all_requests();
+                    pbf_press_dpad(context, DPAD_UP, 320ms, 320ms);
+                }
+            },
+            { last_slot }
+            );
+        context.wait_for_all_requests();
+        if (ps == 0){
+            env.log("Moved selection to slot six.");
+        } else{
+            env.log("open_summary(): Unable to move selection to slot six.", COLOR_RED);
+            send_program_recoverable_error_notification(
+                env, NOTIFICATION_ERROR_RECOVERABLE,
+                "open_summary(): Unable to move selection to slot six."
+            );
+            return false;
+        }
     }
 
     //Two presses to open summary
