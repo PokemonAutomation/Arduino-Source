@@ -15,12 +15,15 @@
 
 // #include <thread>
 // #include <fstream>
+#include <filesystem>
 
 #include <iostream>
 using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
+
+    namespace fs = std::filesystem;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ResourceDownloadRow
@@ -156,14 +159,21 @@ RemoteMetadata& ResourceDownloadRow::fetch_remote_metadata(){
 void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metadata){
     Logger& logger = global_logger_tagged();
     // std::this_thread::sleep_for(std::chrono::seconds(5));
-    
+
     std::string url = resource_metadata.url;
     std::string resource_name = resource_metadata.resource_name;
     qint64 expected_size = resource_metadata.size_compressed_bytes;
+
+    std::string resource_directory = DOWNLOADED_RESOURCE_PATH() + resource_name;
+
+    // delete directory and the old resource
+    fs::remove_all(resource_directory);
+
+    // download    
     FileDownloader::download_file_to_disk(
         logger, 
         url, 
-        DOWNLOADED_RESOURCE_PATH() + resource_name + "/temp.zip",
+        resource_directory + "/temp.zip",
         expected_size,
         [this](int percentage_progress){
             download_progress(percentage_progress);

@@ -15,6 +15,8 @@
 #include <QObject>
 #include <QTimer>
 #include <QSaveFile>
+#include <QFileInfo>
+#include <QDir>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "FileDownloader.h"
@@ -101,6 +103,12 @@ void download_file_to_disk(
 //    cout << "download_file()" << endl;
     QNetworkAccessManager network_access_manager;
     QEventLoop loop;
+
+    // ensure the directory exists
+    QString filePath = QString::fromStdString(file_path);
+    QFileInfo fileInfo(filePath);
+    QString dirPath = fileInfo.absolutePath();
+    QDir().mkpath(dirPath);
     
     // 1. Initialize QSaveFile
     QSaveFile file(QString::fromStdString(file_path));
@@ -110,7 +118,7 @@ void download_file_to_disk(
     }
 
     QNetworkRequest request(QUrl(QString::fromStdString(url)));
-
+    // request.setAttribute(QNetworkRequest::AutoRedirectionPolicyAttribute, true);  // enable auto-redirects
     request.setTransferTimeout(std::chrono::seconds(5));
     
     // 2. Start the GET request
@@ -123,10 +131,10 @@ void download_file_to_disk(
             // Use expected_size if the network doesn't provide one
             qint64 total = (bytesTotal > 0) ? bytesTotal : expected_size;
 
-            int percentage_progress = static_cast<int>((bytesReceived * 100) / total);
-            progress_callback(percentage_progress);
-           
-    });
+            int percentage_progress = (total > 0) ? static_cast<int>((bytesReceived * 100) / total) : 0;
+            progress_callback(std::min(percentage_progress, 100));
+        }
+    );
 
     // 3. Stream chunks directly to the temporary file
     QObject::connect(reply, &QNetworkReply::readyRead, [&file, reply]() {
@@ -142,9 +150,9 @@ void download_file_to_disk(
     loop.exec();
 
     // // Final check for remaining data
-    // if (reply->bytesAvailable() > 0) {
-    //     file.write(reply->readAll());
-    // }
+    if (reply->bytesAvailable() > 0) {
+        file.write(reply->readAll());
+    }
 
     // 5. Finalize the transaction
     if (reply->error() == QNetworkReply::NoError) {
