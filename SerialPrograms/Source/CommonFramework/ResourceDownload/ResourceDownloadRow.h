@@ -32,6 +32,7 @@ public:
 
 signals:
     void download_progress(int percentage);
+    void unzip_progress(int percentage);
 
 
 public:
