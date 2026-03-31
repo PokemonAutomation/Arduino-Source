@@ -9,6 +9,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/FileDownloader.h"
+#include "CommonFramework/Tools/FileUnzip.h"
 #include "CommonFramework/Options/LabelCellOption.h"
 // #include "ResourceDownloadTable.h"
 #include "ResourceDownloadRow.h"
@@ -169,16 +170,30 @@ void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metad
     // delete directory and the old resource
     fs::remove_all(resource_directory);
 
-    // download    
+    // download
+    std::string zip_path = resource_directory + "/temp.zip";
     FileDownloader::download_file_to_disk(
         logger, 
         url, 
-        resource_directory + "/temp.zip",
+        zip_path,
         expected_size,
         [this](int percentage_progress){
             download_progress(percentage_progress);
         }
     );
+
+    // unzip
+    unzip_file(
+        zip_path.c_str(), 
+        resource_directory.c_str(),
+        [this](int percentage_progress){
+            unzip_progress(percentage_progress);
+        }
+    );
+
+    // delete old zip file
+    fs::remove(zip_path);
+
 }
 
 

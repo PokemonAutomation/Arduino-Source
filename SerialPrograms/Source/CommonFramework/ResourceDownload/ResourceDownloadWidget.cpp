@@ -229,6 +229,7 @@ ProgressBarWidget::ProgressBarWidget(QWidget& parent, ResourceProgressBar& value
         &m_value.row, &ResourceDownloadRow::download_progress,
         this, 
         [this](int percentage_progress){
+            m_status_label->setText("Downloading:");
             m_progress_bar->setValue(percentage_progress);
             // Simple Console Progress Bar
             // std::cout << "\rProgress: [" << std::string(percentage_progress / 5, '#') 
@@ -237,6 +238,16 @@ ProgressBarWidget::ProgressBarWidget(QWidget& parent, ResourceProgressBar& value
 
         }
     );    
+
+
+    connect(
+        &m_value.row, &ResourceDownloadRow::unzip_progress,
+        this, 
+        [this](int percentage_progress){
+            m_status_label->setText("Unzipping:");
+            m_progress_bar->setValue(percentage_progress);
+        }
+    ); 
 }
 
 
