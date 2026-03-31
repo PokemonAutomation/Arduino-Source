@@ -427,7 +427,7 @@ MessageLogger::MessageLogger(){
         PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT,
         false,
         [](const MessageHeader* header){
-            std::string str = "PABB2_MESSAGE_OPCODE_CQ_COMMAND_FINISHED";
+            std::string str = "PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT";
             return str;
         }
     );

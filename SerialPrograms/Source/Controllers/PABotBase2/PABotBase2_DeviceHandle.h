@@ -36,6 +36,12 @@ public:
     );
     virtual ~DeviceHandle();
 
+    void add_message_logger(
+        uint8_t opcode,
+        bool always_print,
+        std::string(*tostr)(const MessageHeader*)
+    );
+
     template <typename MessageHandler, class... Args>
     void add_message_handler(Args&&... args){
         auto ret = m_message_handlers.emplace(

@@ -33,7 +33,19 @@ PABotBase2_WiredController::PABotBase2_WiredController(
 {
     using namespace PABotBase2;
 
-    //  No extra message handling needed.
+    //  Add controller-specific messages.
+    connection.device().add_message_logger(
+        PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE,
+        false,
+        [](const MessageHeader* header){
+            const auto* message = (const pabb2_Message_Command_NS_WiredController_State*)header;
+            std::string str;
+            str += "PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE: id = ";
+            str += std::to_string(message->id);
+            str += ", ms = " + std::to_string(message->milliseconds);
+            return str;
+        }
+    );
 
     switch (reset_mode){
     case PokemonAutomation::ControllerResetMode::DO_NOT_RESET:
