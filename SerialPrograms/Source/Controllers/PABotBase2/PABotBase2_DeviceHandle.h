@@ -17,6 +17,7 @@
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/StreamConnections/PushingStreamConnections.h"
 #include "Common/PABotBase2/PABotBase2_MessageProtocol.h"
+#include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
 #include "Controllers/ControllerTypes.h"
 #include "PABotBase2_CommandQueueManager.h"
 #include "PABotBase2_MessageHandler.h"
@@ -129,6 +130,8 @@ private:
     std::map<uint8_t, std::string> m_pending_requests;
 
     std::deque<char> m_buffer;
+
+    MessageLogger m_message_loggers;
 
     struct MessageConverter{
         bool always_print;

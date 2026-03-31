@@ -68,9 +68,7 @@ void CommandQueueManager::send_cancel(){
         message.message_bytes = sizeof(MessageHeader);
         message.opcode = PABB2_MESSAGE_OPCODE_CQ_CANCEL;
         message.id = 0;
-        if (GlobalSettings::instance().LOG_EVERYTHING){
-            m_logger.log("[MLC]: Sending: " + tostr(&message), COLOR_DARKGREEN);
-        }
+        m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &message);
         m_connection.reliable_send(&message, message.message_bytes);
     }
     m_cv.notify_all();
@@ -83,9 +81,7 @@ void CommandQueueManager::send_replace_on_next(){
         message.message_bytes = sizeof(MessageHeader);
         message.opcode = PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT;
         message.id = 0;
-        if (GlobalSettings::instance().LOG_EVERYTHING){
-            m_logger.log("[MLC]: Sending: " + tostr(&message), COLOR_DARKGREEN);
-        }
+        m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &message);
         m_connection.reliable_send(&message, message.message_bytes);
     }
     m_cv.notify_all();
@@ -117,15 +113,7 @@ uint8_t CommandQueueManager::send_command(MessageHeader& command){
             break;
         }
 
-        auto iter = m_message_handlers.find(command.opcode);
-        if (iter != m_message_handlers.end()){
-            if (iter->second->should_print()){
-                m_logger.log("[MLC]: Sending: " + iter->second->tostr(&command), COLOR_DARKGREEN);
-            }
-        }else if (GlobalSettings::instance().LOG_EVERYTHING){
-            m_logger.log("[MLC]: Sending: " + tostr(&command), COLOR_DARKGREEN);
-        }
-
+        m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &command);
         m_connection.reliable_send(&command, command.message_bytes);
     }
     m_cv.notify_all();
