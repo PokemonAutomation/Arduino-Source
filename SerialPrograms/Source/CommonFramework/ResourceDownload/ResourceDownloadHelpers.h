@@ -53,7 +53,7 @@ struct RemoteMetadata {
 
 const std::vector<DownloadedResourceMetadata>& local_resource_download_list();
 const std::vector<DownloadedResourceMetadata>& remote_resource_download_list();
-uint16_t get_resource_version_num(Filesystem::Path folder_path);
+std::optional<uint16_t> get_resource_version_num(Filesystem::Path folder_path);
 ResourceVersionStatus get_version_status(uint16_t expected_version_num, std::optional<uint16_t> current_version_num);
 
 }

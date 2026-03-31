@@ -101,14 +101,19 @@ const std::vector<DownloadedResourceMetadata>& remote_resource_download_list(){
 	return remote_resources;
 }
 
-uint16_t get_resource_version_num(Filesystem::Path folder_path){
-    std::string file_name = folder_path.string() + "/version.json";
-    const JsonValue& json = load_json_file(file_name);
+std::optional<uint16_t> get_resource_version_num(Filesystem::Path folder_path){
+    try{
+        std::string file_name = folder_path.string() + "/version.json";
+        const JsonValue& json = load_json_file(file_name);
 
-    const JsonObject& obj = json.to_object_throw();
-    uint16_t version_num = (uint16_t)obj.get_integer_throw("version");
+        const JsonObject& obj = json.to_object_throw();
+        uint16_t version_num = (uint16_t)obj.get_integer_throw("version");
+        return version_num;
+    }catch(...){
+        std::cerr << "Unable to determine the version number from version.json." << endl;
+        return std::nullopt;
+    }
 
-    return version_num;
 }
 
 ResourceVersionStatus get_version_status(uint16_t expected_version_num, std::optional<uint16_t> current_version_num){
