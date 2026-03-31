@@ -208,7 +208,7 @@ ProgressBarWidget::ProgressBarWidget(QWidget& parent, ResourceProgressBar& value
 {
 
     // 1. Instantiate the widgets
-    m_status_label = new QLabel("Ready", this);
+    m_status_label = new QLabel("", this);
     m_progress_bar = new QProgressBar(this);
 
     // cout << "Constructor for ProgressBarWidget" << endl;
@@ -217,6 +217,7 @@ ProgressBarWidget::ProgressBarWidget(QWidget& parent, ResourceProgressBar& value
     m_progress_bar->setRange(0, 100);
     m_progress_bar->setValue(0);
     m_progress_bar->setTextVisible(true); // Shows % inside the bar
+    m_progress_bar->hide();
 
     // 3. Create a horizontal layout to hold them
     QHBoxLayout *layout = new QHBoxLayout();
@@ -224,11 +225,15 @@ ProgressBarWidget::ProgressBarWidget(QWidget& parent, ResourceProgressBar& value
     layout->addWidget(m_progress_bar);
 
     this->setLayout(layout);
+    this->setMinimumWidth(170);
 
     connect(
         &m_value.row, &ResourceDownloadRow::download_progress,
         this, 
         [this](int percentage_progress){
+            if (m_progress_bar->isHidden()) {
+                m_progress_bar->show(); // Make it visible when progress starts
+            }
             m_status_label->setText("Downloading:");
             m_progress_bar->setValue(percentage_progress);
             // Simple Console Progress Bar
@@ -244,6 +249,9 @@ ProgressBarWidget::ProgressBarWidget(QWidget& parent, ResourceProgressBar& value
         &m_value.row, &ResourceDownloadRow::unzip_progress,
         this, 
         [this](int percentage_progress){
+            if (m_progress_bar->isHidden()) {
+                m_progress_bar->show(); // Make it visible when progress starts
+            }
             m_status_label->setText("Unzipping:");
             m_progress_bar->setValue(percentage_progress);
         }
