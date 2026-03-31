@@ -18,26 +18,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 using namespace PABotBase2;
-
 using namespace std::chrono_literals;
-
-
-
-class PABotBase2_MessageHandler_WiredController : public PABotBase2::FixedLengthMesssageHandler<
-    PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE,
-    pabb2_Message_Command_NS_WiredController_State
->{
-public:
-    virtual std::string tostr(const MessageHeader* header) const override{
-        const MessageType* message = (const MessageType*)header;
-        std::string str;
-        str += "PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE: id = ";
-        str += std::to_string(message->id);
-        str += ", ms = " + std::to_string(message->milliseconds);
-        return str;
-    }
-
-};
 
 
 
@@ -52,9 +33,19 @@ PABotBase2_WiredController::PABotBase2_WiredController(
 {
     using namespace PABotBase2;
 
-//    cout << "PABotBase2_WiredController()" << endl;
-
-    connection.device().add_message_handler<PABotBase2_MessageHandler_WiredController>();
+    //  Add controller-specific messages.
+    connection.device().add_message_logger(
+        PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE,
+        false,
+        [](const MessageHeader* header){
+            const auto* message = (const pabb2_Message_Command_NS_WiredController_State*)header;
+            std::string str;
+            str += "PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE: id = ";
+            str += std::to_string(message->id);
+            str += ", ms = " + std::to_string(message->milliseconds);
+            return str;
+        }
+    );
 
     switch (reset_mode){
     case PokemonAutomation::ControllerResetMode::DO_NOT_RESET:

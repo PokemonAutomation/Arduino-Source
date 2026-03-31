@@ -14,6 +14,10 @@
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "SerialPABotBase2_Connection.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace SerialPABotBase{
 
@@ -38,10 +42,16 @@ SerialPABotBase2_Connection::SerialPABotBase2_Connection(
     });
 };
 SerialPABotBase2_Connection::~SerialPABotBase2_Connection(){
-    cancel(nullptr);
+    SerialPABotBase2_Connection::cancel(nullptr);
+    m_device.reset();
+}
+bool SerialPABotBase2_Connection::cancel(std::exception_ptr exception) noexcept{
+    if (Connection::cancel(std::move(exception))){
+        return true;
+    }
     m_ready.store(false, std::memory_order_release);
     m_connect_thread.wait_and_ignore_exceptions();
-    m_device.reset();
+    return false;
 }
 
 

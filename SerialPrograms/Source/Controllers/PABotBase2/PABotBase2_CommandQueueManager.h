@@ -14,6 +14,7 @@
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/StreamConnections/PushingStreamConnections.h"
 #include "Common/PABotBase2/PABotBase2_MessageProtocol.h"
+#include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
 #include "PABotBase2_MessageHandler.h"
 
 namespace PokemonAutomation{
@@ -21,21 +22,27 @@ namespace PABotBase2{
 
 
 
-class CommandQueueManager{
+class CommandQueueManager final : public Cancellable{
 public:
     CommandQueueManager(
         Logger& logger,
-        Cancellable& scope,
+        CancellableScope& scope,
         ReliableStreamConnectionPushing& connection,
-        const std::map<uint8_t, std::unique_ptr<MessageHandler>>& message_handlers
+        MessageLogger& message_loggers
     )
         : m_logger(logger)
-        , m_scope(scope)
         , m_connection(connection)
-        , m_message_handlers(message_handlers)
-    {}
+        , m_message_loggers(message_loggers)
+    {
+        attach(scope);
+    }
+    ~CommandQueueManager(){
+        detach();
+    }
 
     void set_command_queue_size(uint8_t command_queue_size);
+
+    virtual bool cancel(std::exception_ptr exception) noexcept override;
 
 
 public:
@@ -51,9 +58,8 @@ public:
 
 private:
     Logger& m_logger;
-    Cancellable& m_scope;
     ReliableStreamConnectionPushing& m_connection;
-    const std::map<uint8_t, std::unique_ptr<MessageHandler>>& m_message_handlers;
+    MessageLogger& m_message_loggers;
 
     Mutex m_lock;
     ConditionVariable m_cv;
