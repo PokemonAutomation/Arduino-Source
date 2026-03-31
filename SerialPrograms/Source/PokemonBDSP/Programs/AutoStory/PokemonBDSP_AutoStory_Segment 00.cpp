@@ -1,4 +1,4 @@
-/*  BDSP AutoStory - Segment from beginning cinematic to after choosing the starter mons
+/*  BDSP AutoStory - Segment from beginning cinematic until after choosing the starter mons
  *
  *  From: https://github.com/PokemonAutomation/
  *

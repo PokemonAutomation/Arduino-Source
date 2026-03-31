@@ -1,4 +1,4 @@
-/*  BDSP AutoStory - Segment from right after choosing the starter mons to the first badge
+/*  BDSP AutoStory - Segment from right after choosing the starter mons until after acquiring the first badge
  *
  *  From: https://github.com/PokemonAutomation/
  *

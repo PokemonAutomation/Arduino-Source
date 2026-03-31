@@ -1,4 +1,4 @@
-/*  BDSP AutoStory - Segment from after acquiring seventh badge to after acquiring eighth badge
+/*  BDSP AutoStory - Segment from after acquiring the seventh badge until after acquiring the eighth badge
  *
  *  From: https://github.com/PokemonAutomation/
  *

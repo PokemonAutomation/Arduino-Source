@@ -1,4 +1,4 @@
-/*  BDSP AutoStory - Segment from after acquiring eighth badge to finish (including Beating the Elite 4)
+/*  BDSP AutoStory - Segment from after acquiring the eighth badge until the finish line (including Beating the Elite 4)
  *
  *  From: https://github.com/PokemonAutomation/
  *
