@@ -57,7 +57,7 @@ size_t write_callback(void* pOpaque, mz_uint64 file_ofs, const void* pBuf, size_
 
     // Only print if the integer value has changed
     if (current_percent > data->last_percentage){
-        data->progress_callback(data->last_percentage);
+        data->progress_callback(current_percent);
         // data->last_percentage = current_percent;
         // std::cout << "\rProgress: " << current_percent << "% (" 
         //         << data->processed_bytes << "/" << data->total_bytes << " bytes)" << endl;
