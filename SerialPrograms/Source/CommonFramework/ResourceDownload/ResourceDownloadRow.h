@@ -36,6 +36,9 @@ signals:
 
 
 public:
+    void set_version_status(ResourceVersionStatus version_status);
+    void set_is_downloaded(bool is_downloaded);
+
     // get the DownloadedResourceMetadata from the remote JSON, that corresponds to this button/row
     void initialize_remote_metadata();
     RemoteMetadata& fetch_remote_metadata();

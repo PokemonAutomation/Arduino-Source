@@ -48,6 +48,10 @@ std::string resource_version_to_string(ResourceVersionStatus version){
     }
 }
 
+std::string is_downloaded_string(bool is_downloaded){
+    return is_downloaded ? "Yes" : "--";
+}
+
 struct ResourceDownloadRow::Data{
     Data(
         std::string& resource_name,
@@ -60,7 +64,7 @@ struct ResourceDownloadRow::Data{
         , m_file_size(file_size)
         , m_file_size_label(LockMode::LOCK_WHILE_RUNNING, std::to_string(file_size))
         , m_is_downloaded(is_downloaded)
-        , m_is_downloaded_label(LockMode::LOCK_WHILE_RUNNING, is_downloaded ? "Yes" : "--")
+        , m_is_downloaded_label(LockMode::LOCK_WHILE_RUNNING, is_downloaded_string(is_downloaded))
         , m_version_num(version_num)
         , m_version_status(version_status)
         , m_version_status_label(LockMode::LOCK_WHILE_RUNNING, resource_version_to_string(version_status))
@@ -80,6 +84,17 @@ struct ResourceDownloadRow::Data{
 
 
 };
+
+void ResourceDownloadRow::set_version_status(ResourceVersionStatus version_status){
+    m_data->m_version_status = version_status;
+    m_data->m_version_status_label.set_text(resource_version_to_string(version_status));
+}
+
+
+void ResourceDownloadRow::set_is_downloaded(bool is_downloaded){
+    m_data->m_is_downloaded = is_downloaded;
+    m_data->m_is_downloaded_label.set_text(is_downloaded_string(is_downloaded));
+}
 
 
 ResourceDownloadRow::~ResourceDownloadRow(){}
@@ -193,6 +208,10 @@ void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metad
 
     // delete old zip file
     fs::remove(zip_path);
+
+    // update the table labels
+    set_is_downloaded(true);
+    set_version_status(ResourceVersionStatus::CURRENT);
 
 }
 
