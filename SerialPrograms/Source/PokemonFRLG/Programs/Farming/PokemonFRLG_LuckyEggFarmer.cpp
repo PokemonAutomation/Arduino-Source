@@ -299,6 +299,8 @@ bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProContr
 
         PokedexRegisteredWatcher pokedex_registered(COLOR_RED, &env.console.overlay());
 
+        WhiteDialogWatcher in_safari_zone_building(COLOR_RED);
+
         WallClock start = current_time();
         while (true)
         {
@@ -326,10 +328,10 @@ bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProContr
                     int ret2 = wait_until(
                         env.console, context,
                         std::chrono::milliseconds(2000),
-                        { nickname_question_arrow, advance_battle_dialog, pokedex_registered }
+                        { nickname_question_arrow, advance_battle_dialog, pokedex_registered, in_safari_zone_building }
                     );
 
-                    if (ret2 == 0) {
+                    if (ret2 == 0 || ret2 == 3) {
                         pbf_mash_button(context, BUTTON_B, 2000ms);
                         context.wait_for_all_requests();
                         break;
@@ -490,6 +492,11 @@ void LuckyEggFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
                 env.log("Lucky Egg not found. Continuing to farm...");
                 pbf_mash_button(context, BUTTON_B, 1500ms);
                 context.wait_for_all_requests();
+            }
+
+            if (balls_left <= 0) {
+                env.log("Out of Safari balls. Resetting...");
+                break;
             }
         }
 
