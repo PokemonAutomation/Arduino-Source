@@ -10,35 +10,15 @@
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "NintendoSwitch_PABotBase2_WiredController.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 using namespace PABotBase2;
-
 using namespace std::chrono_literals;
-
-
-
-class PABotBase2_MessageHandler_WiredController : public PABotBase2::FixedLengthMesssageHandler<
-    PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE,
-    pabb2_Message_Command_NS_WiredController_State
->{
-public:
-    virtual std::string tostr(const MessageHeader* header) const override{
-        const MessageType* message = (const MessageType*)header;
-        std::string str;
-        str += "PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE: id = ";
-        str += std::to_string(message->id);
-        str += ", ms = " + std::to_string(message->milliseconds);
-        return str;
-    }
-
-};
 
 
 
@@ -53,33 +33,35 @@ PABotBase2_WiredController::PABotBase2_WiredController(
 {
     using namespace PABotBase2;
 
-    cout << "PABotBase2_WiredController()" << endl;
-
-    connection.device().add_message_handler<PABotBase2_MessageHandler_WiredController>();
+    //  Add controller-specific messages.
+    connection.device().add_message_logger(
+        PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE,
+        false,
+        [](const MessageHeader* header){
+            const auto* message = (const pabb2_Message_Command_NS_WiredController_State*)header;
+            std::string str;
+            str += "PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE: id = ";
+            str += std::to_string(message->id);
+            str += ", ms = " + std::to_string(message->milliseconds);
+            return str;
+        }
+    );
 
     switch (reset_mode){
     case PokemonAutomation::ControllerResetMode::DO_NOT_RESET:
         break;
-    case PokemonAutomation::ControllerResetMode::SIMPLE_RESET:{
-        PABotBase2::Message_u32 message;
-        message.message_bytes = sizeof(message);
-        message.opcode = PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE;
-        message.data = SerialPABotBase::controller_type_to_id(controller_type);
-        uint8_t id = connection.device().send_request(message);
-        cout << "wait... start" << endl;
-        connection.device().wait_for_request_response(id);
-        cout << "wait... done" << endl;
-        break;
-    }
+    case PokemonAutomation::ControllerResetMode::SIMPLE_RESET:
     case PokemonAutomation::ControllerResetMode::RESET_AND_CLEAR_STATE:{
         PABotBase2::Message_u32 message;
         message.message_bytes = sizeof(message);
-        message.opcode = PABB2_MESSAGE_OPCODE_RESET_TO_CONTROLLER;
+        message.opcode = reset_mode == PokemonAutomation::ControllerResetMode::SIMPLE_RESET
+            ?PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE
+            : PABB2_MESSAGE_OPCODE_RESET_TO_CONTROLLER;
         message.data = SerialPABotBase::controller_type_to_id(controller_type);
         uint8_t id = connection.device().send_request(message);
-        cout << "wait... start" << endl;
+//        cout << "wait... start" << endl;
         connection.device().wait_for_request_response(id);
-        cout << "wait... done" << endl;
+//        cout << "wait... done" << endl;
         break;
     }
     }
@@ -87,11 +69,11 @@ PABotBase2_WiredController::PABotBase2_WiredController(
     //  Re-read the controller.
     ControllerType current_controller = connection.device().refresh_controller_type();
     if (current_controller != controller_type){
-        cout << "Failed to set controller type." << endl;
+//        cout << "Failed to set controller type." << endl;
         throw SerialProtocolException(logger, PA_CURRENT_FUNCTION, "Failed to set controller type.");
     }
 
-    cout << "Starting status thread" << endl;
+//    cout << "Starting status thread" << endl;
 
 #if 0   //  REMOVE
     m_status_thread.reset(new ControllerStatusThread(

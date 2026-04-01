@@ -5,10 +5,10 @@
  */
 
 #include "Common/CRC32/pabb_CRC32.h"
-//#include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 //#include "Common/Cpp/Exceptions.h"
 #include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
-#include "PABotBase2_ConnectionDebug.h"
+//#include "PABotBase2_ConnectionDebug.h"
 #include "PABotBase2CC_ReliableStreamConnection.h"
 
 //#include <iostream>
@@ -126,15 +126,15 @@ size_t ReliableStreamConnection::unreliable_send(const void* data, size_t bytes)
 
     if (retransmit){
         m_logger.log(
-            "[RSC]: Re-send: " + tostr(header),
+            "[RSC]: Re-send: (0x" + tostr_hex(header->opcode) + ") " + tostr(header),
             COLOR_ORANGE
         );
     }else if (m_log_everything || always_log){
         m_logger.log(
-            "[RSC]: Sending: " + tostr(header),
+            "[RSC]: Sending: (0x" + tostr_hex(header->opcode) + ") " + tostr(header),
             COLOR_DARKGREEN
         );
-//        PABotBase2::PacketHeader_print(header, true);   //  REMOVE
+//        PABotBase2::PacketHeader_print(header, true);
     }
 //    cout << "ReliableStreamConnection::unreliable_send() - before send" << endl;
     return m_unreliable_connection.unreliable_send(data, bytes);
@@ -304,7 +304,7 @@ void ReliableStreamConnection::on_packet(const PacketHeader* packet){
     //
 
     if (m_log_everything){
-        m_logger.log("[RSC]: Receive: " + tostr(packet), COLOR_PURPLE);
+        m_logger.log("[RSC]: Receive: (0x" + tostr_hex(packet->opcode) + ") " + tostr(packet), COLOR_PURPLE);
     }
 
     uint8_t opcode = packet->opcode & PABB2_CONNECTION_OPCODE_MASK;
@@ -354,7 +354,7 @@ void ReliableStreamConnection::on_packet(const PacketHeader* packet){
     case PABB2_CONNECTION_OPCODE_INFO_LABEL_I32:
 //        cout << "Received ack" << endl;
         if (!m_log_everything){
-            m_logger.log("[RSC]: Receive: " + tostr(packet), COLOR_PURPLE);
+            m_logger.log("[RSC]: Receive: (0x" + tostr_hex(packet->opcode) + ") " + tostr(packet), COLOR_PURPLE);
         }
         return;
     default:

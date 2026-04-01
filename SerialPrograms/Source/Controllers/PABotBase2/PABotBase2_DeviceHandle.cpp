@@ -15,10 +15,9 @@
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "PABotBase2_DeviceHandle.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace PABotBase2{
@@ -32,7 +31,7 @@ DeviceHandle::DeviceHandle(
 )
     : m_logger(logger)
     , m_connection(connection)
-    , m_command_queue(logger, *this, connection, m_message_handlers)
+    , m_command_queue(logger, *this, connection, m_message_loggers)
 {
     connection.add_listener(*this);
     if (parent){
@@ -45,9 +44,17 @@ DeviceHandle::~DeviceHandle(){
     m_connection.remove_listener(*this);
 }
 
+
+void DeviceHandle::add_message_logger(
+    uint8_t opcode,
+    bool always_print,
+    std::string(*tostr)(const MessageHeader*)
+){
+    m_message_loggers.add_message(opcode, always_print, tostr);
+}
+
 bool DeviceHandle::cancel(std::exception_ptr exception) noexcept{
-    bool already_cancelled = CancellableScope::cancel(std::move(exception));
-    if (already_cancelled){
+    if (CancellableScope::cancel(std::move(exception))){
         return true;
     }
     {
@@ -158,7 +165,6 @@ void DeviceHandle::connect(){
     query_command_queue();
 }
 
-
 ControllerType DeviceHandle::refresh_controller_type(){
     m_logger.log("Reading Controller Mode...");
     uint32_t type_id = query_u32(PABB2_MESSAGE_OPCODE_READ_CONTROLLER_MODE);
@@ -192,15 +198,7 @@ uint8_t DeviceHandle::send_request(MessageHeader& request){
         break;
     }
 
-    auto iter = m_message_handlers.find(request.opcode);
-    if (iter != m_message_handlers.end()){
-        if (iter->second->should_print()){
-            m_logger.log("[MLC]: Sending: " + iter->second->tostr(&request), COLOR_DARKGREEN);
-        }
-    }else if (GlobalSettings::instance().LOG_EVERYTHING){
-        m_logger.log("[MLC]: Sending: " + tostr(&request), COLOR_DARKGREEN);
-    }
-
+    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
     m_connection.reliable_send(&request, request.message_bytes);
 
     return request.id;
@@ -298,20 +296,16 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
 
         const MessageHeader* header = (const MessageHeader*)message.c_str();
 
-        bool log_everything = GlobalSettings::instance().LOG_EVERYTHING;
+        m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, header);
 
         //  Now we can process the message.
         switch (header->opcode){
         case PABB2_MESSAGE_OPCODE_INVALID:
         case PABB2_MESSAGE_OPCODE_REQUEST_DROPPED:
-            m_logger.log("[MLC]: Receive: " + tostr(header), COLOR_RED);
             continue;
         case PABB2_MESSAGE_OPCODE_RET:
         case PABB2_MESSAGE_OPCODE_RET_U32:
         case PABB2_MESSAGE_OPCODE_RET_DATA:{
-            if (log_everything){
-                m_logger.log("[MLC]: Receive: " + tostr(header), COLOR_PURPLE);
-            }
             {
                 std::lock_guard<Mutex> lg(m_lock);
                 auto iter = m_pending_requests.find(header->id);
@@ -328,12 +322,8 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
         case PABB2_MESSAGE_OPCODE_LOG_LABEL_H32:
         case PABB2_MESSAGE_OPCODE_LOG_LABEL_U32:
         case PABB2_MESSAGE_OPCODE_LOG_LABEL_I32:
-            m_logger.log("[MLC]: Receive: " + tostr(header), COLOR_PURPLE);
             continue;
         case PABB2_MESSAGE_OPCODE_CQ_COMMAND_FINISHED:{
-            if (log_everything){
-                m_logger.log("[MLC]: Receive: " + tostr(header), COLOR_PURPLE);
-            }
             m_command_queue.report_command_finished(*header);
             continue;
         }
@@ -341,16 +331,11 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
 
         auto iter = m_message_handlers.find(header->opcode);
         if (iter == m_message_handlers.end()){
-            m_logger.log("[MLC]: Receive: " + tostr(header), COLOR_RED);
             return;
         }
 
         MessageHandler& handler = *iter->second;
         handler.assert_is_valid(m_logger, header);
-        if (handler.should_print()){
-            m_logger.log("[MLC]: Receive: " + handler.tostr(header), COLOR_PURPLE);
-        }
-
         handler.on_recv(m_logger, header);
     }
 
