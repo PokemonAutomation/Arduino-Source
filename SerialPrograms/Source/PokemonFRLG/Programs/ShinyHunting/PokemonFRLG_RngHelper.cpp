@@ -18,8 +18,9 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.h"
-#include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h"
+#include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
+#include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_RngHelper.h"
 
@@ -72,7 +73,7 @@ RngHelper::RngHelper()
             {Target::gamecornerdratini, "gamecornerdratini", "Game Corner Dratini"},
             {Target::gamecornerbug, "gamecornerbug", "Game Corner Bug (Scyther / Pinsir)"},
             {Target::gamecornerporygon, "gamecornerporygon", "Game Corner Porygon"},
-            // {Target::togepi, "togepi", "Togepi"},
+            {Target::togepi, "togepi", "Togepi"},
             {Target::staticencounter, "staticencounter", "Static Overworld Encounters"},
             {Target::snorlax, "snorlax", "Snorlax"},
             {Target::mewtwo, "mewtwo", "Mewtwo"},
@@ -189,7 +190,7 @@ void hard_reset(ProControllerContext& context){
 
 uint64_t wait_for_copyright_text(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     // wait for copyright text to appear
-    BlackScreenWatcher black_screen(COLOR_RED, ImageFloatBox {0.25, 0.25, 0.55, 0.55});
+    BlackScreenWatcher black_screen(COLOR_RED);
     context.wait_for_all_requests();
     WallClock start_time = current_time(); // immediately (more or less) after the button press to enter the game
     int black_ret = wait_until(
@@ -204,7 +205,7 @@ uint64_t wait_for_copyright_text(SingleSwitchProgramEnvironment& env, ProControl
             env.console
         );
     }
-    BlackScreenOverWatcher copyright_detected(COLOR_RED, ImageFloatBox {0.25, 0.25, 0.55, 0.55});
+    BlackScreenOverWatcher copyright_detected(COLOR_RED);
     int ret = wait_until(
         env.console, context, 10000ms,
         {copyright_detected },
@@ -407,6 +408,29 @@ void collect_gamecorner_after_delay(SingleSwitchProgramEnvironment& env, ProCont
     env.log("Game corner prize collected.");
 }
 
+void collect_togepi_egg_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& INGAME_DELAY){
+    if (INGAME_DELAY < 12000) {
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Togepi: the in-game delay cannot be less than 12000ms (1440 frames). Check your in-game advances and calibration.",
+            env.console
+        );
+    }
+    // 6 dialog presses
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(INGAME_DELAY - 11700)); // 4000ms + 7500ms + 200ms
+    // accept egg
+    pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
+    // exit dialogue
+    pbf_mash_button(context, BUTTON_B, 2500ms);
+    context.wait_for_all_requests();    
+    env.log("Togepi egg collected.");
+}
+
 void encounter_static_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& INGAME_DELAY){
     if (INGAME_DELAY < 4000){
         OperationFailedException::fire(
@@ -589,6 +613,39 @@ bool shiny_check_summary(SingleSwitchProgramEnvironment& env, ProControllerConte
     return shiny_checker.read(env.console.logger(), screen);
 }
 
+void hatch_togepi_egg(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    // assumes the player is already on a bike and that the nearby trainer has been defeated
+    // cycle to the right
+    pbf_move_left_joystick(context, {+1, 0}, 1000ms, 200ms);
+    pbf_move_left_joystick(context, {-1, 0}, 100ms, 500ms);
+    WhiteDialogWatcher egg_dialog(COLOR_RED);
+    context.wait_for_all_requests();
+    WallClock deadline = current_time() + 600s;
+    env.log("Hatching Togepi egg...");
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [deadline](ProControllerContext& context) {
+            // cycle back and forth
+            while (current_time() < deadline){
+                pbf_move_left_joystick(context, {-1, 0}, 400ms, 0ms);
+                pbf_move_left_joystick(context, {+1, 0}, 400ms, 0ms); 
+            }
+        },
+        { egg_dialog }
+    );
+    if (ret < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Togepi: failed to hatch egg within 10 minutes. Check your in-game setup.",
+            env.console
+        );
+    }
+
+    // watch hatching animation and decline nickname
+    pbf_mash_button(context, BUTTON_B, 15000ms);
+    context.wait_for_all_requests();
+}
+
 int watch_for_shiny_encounter(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     BlackScreenWatcher battle_entered(COLOR_RED);
     context.wait_for_all_requests();
@@ -709,7 +766,7 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     double FRAMERATE = 59.999977;       // FPS. from Dhruv (don't know original source)
     double FRAME_DURATION = 1000 / FRAMERATE;
 
-    int64_t FIXED_SEED_OFFSET = USE_COPYRIGHT_TEXT ? -1700 : -800;  // milliseconds. approximate, might be console-specific (?)
+    int64_t FIXED_SEED_OFFSET = USE_COPYRIGHT_TEXT ? -2048 : -800;  // milliseconds. approximate, might be console-specific (?)
     int64_t FIXED_ADVANCES_OFFSET = 0;                              // frames
 
     while (!shiny_found){
@@ -812,6 +869,11 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             break;
         case Target::gamecornerporygon:
             collect_gamecorner_after_delay(env, context, INGAME_DELAY, 4);
+            shiny_found = shiny_check_summary(env, context);
+            break;
+        case Target::togepi:
+            collect_togepi_egg_after_delay(env, context, INGAME_DELAY);
+            hatch_togepi_egg(env, context);
             shiny_found = shiny_check_summary(env, context);
             break;
         case Target::staticencounter:

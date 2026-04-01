@@ -51,7 +51,7 @@ private:
         gamecornerdratini,
         gamecornerbug,
         gamecornerporygon,
-        // togepi,
+        togepi,
         staticencounter,
         snorlax,
         mewtwo,
