@@ -163,6 +163,17 @@ void ResourceDownloadButton::start_download(){
 ResourceDeleteButton::ResourceDeleteButton(ResourceDownloadRow& p_row)
     : ConfigOptionImpl<ResourceDeleteButton>(LockMode::UNLOCK_WHILE_RUNNING)
     , row(p_row)
+    , m_enabled(true)
+{}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ResourceCancelButton
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ResourceCancelButton::ResourceCancelButton(ResourceDownloadRow& p_row)
+    : ConfigOptionImpl<ResourceCancelButton>(LockMode::UNLOCK_WHILE_RUNNING)
+    , row(p_row)
+    , m_enabled(true)
 {}
 
 

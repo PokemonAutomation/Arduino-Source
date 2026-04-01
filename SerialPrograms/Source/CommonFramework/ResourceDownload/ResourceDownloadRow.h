@@ -58,6 +58,7 @@ private:
 
     ResourceDownloadButton m_download_button;
     ResourceDeleteButton m_delete_button;
+    ResourceCancelButton m_cancel_button;
     ResourceProgressBar m_progress_bar;
 
 

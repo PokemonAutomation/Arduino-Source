@@ -71,6 +71,7 @@ std::vector<std::string> ResourceDownloadTable::make_header() const{
         "",
         "",
         "",
+        "",
     };
     return ret;
 }

@@ -109,6 +109,7 @@ ResourceDownloadRow::ResourceDownloadRow(
     , m_data(CONSTRUCT_TOKEN, local_metadata.resource_name, local_metadata.size_decompressed_bytes, is_downloaded, version_num, version_status)
     , m_download_button(*this)
     , m_delete_button(*this)
+    , m_cancel_button(*this)
     , m_progress_bar(*this)
 {
     PA_ADD_STATIC(m_data->m_resource_name);
@@ -118,6 +119,7 @@ ResourceDownloadRow::ResourceDownloadRow(
 
     PA_ADD_STATIC(m_download_button);
     PA_ADD_STATIC(m_delete_button);
+    PA_ADD_STATIC(m_cancel_button);
     PA_ADD_STATIC(m_progress_bar);
 }
 

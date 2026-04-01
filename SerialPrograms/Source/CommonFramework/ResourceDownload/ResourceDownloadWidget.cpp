@@ -195,6 +195,27 @@ DeleteButtonWidget::DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& va
 }
 
 
+template class RegisterConfigWidget<CancelButtonWidget>;
+CancelButtonWidget::CancelButtonWidget(QWidget& parent, ResourceCancelButton& value)
+    : QWidget(&parent)
+    , ConfigWidget(value, *this)
+{
+    QPushButton* button = new QPushButton(&parent);
+    m_widget = button;
+
+    QFont font;
+    font.setBold(true);
+    button->setFont(font);
+    button->setText("Cancel");
+
+    button->connect(
+        button, &QPushButton::clicked,
+        button, [&](bool){
+            cout << "Clicked Cancel Button" << endl;
+        }
+    );
+}
+
 template class RegisterConfigWidget<ProgressBarWidget>;
 ProgressBarWidget::~ProgressBarWidget(){
     // m_value.row.disconnect(this);
