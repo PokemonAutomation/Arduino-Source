@@ -38,12 +38,14 @@ signals:
 public:
     void set_version_status(ResourceVersionStatus version_status);
     void set_is_downloaded(bool is_downloaded);
+    void set_cancel_action(bool cancel_action);
 
     // get the DownloadedResourceMetadata from the remote JSON, that corresponds to this button/row
     void initialize_remote_metadata();
     RemoteMetadata& fetch_remote_metadata();
     // DownloadedResourceMetadata initialize_local_metadata();
 
+    // throws OperationCancelledException if the user cancels the action
     void run_download(DownloadedResourceMetadata resource_metadata);
 
 public:

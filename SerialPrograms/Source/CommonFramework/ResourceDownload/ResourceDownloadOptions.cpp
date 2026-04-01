@@ -139,7 +139,15 @@ void ResourceDownloadButton::start_download(){
                 cout << "Done Download" << endl;
 
                 m_enabled = true;
+                row.set_cancel_action(false);
                 emit download_finished();
+            }catch(OperationCancelledException&){
+                m_enabled = true;
+
+                row.set_cancel_action(false);
+                
+                emit download_finished();
+                return;
             }catch(OperationFailedException&){
                 m_enabled = true;
                 // cout << "failed" << endl;

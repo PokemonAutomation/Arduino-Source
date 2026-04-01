@@ -68,6 +68,7 @@ struct ResourceDownloadRow::Data{
         , m_version_num(version_num)
         , m_version_status(version_status)
         , m_version_status_label(LockMode::LOCK_WHILE_RUNNING, resource_version_to_string(version_status))
+        , m_cancel_action(false)
     {}
 
     LabelCellOption m_resource_name;
@@ -82,6 +83,8 @@ struct ResourceDownloadRow::Data{
     ResourceVersionStatus m_version_status;
     LabelCellOption m_version_status_label;
 
+    std::atomic<bool> m_cancel_action;
+
 
 };
 
@@ -94,6 +97,10 @@ void ResourceDownloadRow::set_version_status(ResourceVersionStatus version_statu
 void ResourceDownloadRow::set_is_downloaded(bool is_downloaded){
     m_data->m_is_downloaded = is_downloaded;
     m_data->m_is_downloaded_label.set_text(is_downloaded_string(is_downloaded));
+}
+
+void ResourceDownloadRow::set_cancel_action(bool cancel_action){
+    m_data->m_cancel_action = cancel_action;
 }
 
 
@@ -183,37 +190,50 @@ void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metad
     qint64 expected_size = resource_metadata.size_compressed_bytes;
 
     std::string resource_directory = DOWNLOADED_RESOURCE_PATH() + resource_name;
+    try{
+        // delete directory and the old resource
+        fs::remove_all(resource_directory);
 
-    // delete directory and the old resource
-    fs::remove_all(resource_directory);
+        // download
+        std::string zip_path = resource_directory + "/temp.zip";
+        FileDownloader::download_file_to_disk(
+            logger, 
+            url, 
+            zip_path,
+            expected_size,
+            [this](int percentage_progress){
+                download_progress(percentage_progress);
+            },
+            [this](){
+                return m_data->m_cancel_action.load();
+            }
+        );
 
-    // download
-    std::string zip_path = resource_directory + "/temp.zip";
-    FileDownloader::download_file_to_disk(
-        logger, 
-        url, 
-        zip_path,
-        expected_size,
-        [this](int percentage_progress){
-            download_progress(percentage_progress);
-        }
-    );
+        // unzip
+        unzip_file(
+            zip_path.c_str(), 
+            resource_directory.c_str(),
+            [this](int percentage_progress){
+                unzip_progress(percentage_progress);
+            }
+        );
 
-    // unzip
-    unzip_file(
-        zip_path.c_str(), 
-        resource_directory.c_str(),
-        [this](int percentage_progress){
-            unzip_progress(percentage_progress);
-        }
-    );
+        // delete old zip file
+        fs::remove(zip_path);
 
-    // delete old zip file
-    fs::remove(zip_path);
+        // update the table labels
+        set_is_downloaded(true);
+        set_version_status(ResourceVersionStatus::CURRENT);
+    }catch(OperationCancelledException& e){
+        // delete directory and the resource
+        fs::remove_all(resource_directory);
 
-    // update the table labels
-    set_is_downloaded(true);
-    set_version_status(ResourceVersionStatus::CURRENT);
+        // update the table labels
+        set_is_downloaded(false);
+        set_version_status(ResourceVersionStatus::NOT_APPLICABLE);
+
+        throw e;
+    }
 
 }
 

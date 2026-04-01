@@ -48,6 +48,10 @@ public:
 
 public:
     DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& value);
+
+private:
+    ResourceDeleteButton& m_value;
+    QPushButton* m_button;    
 };
 
 class CancelButtonWidget :  public QWidget, public ConfigWidget{
@@ -56,6 +60,10 @@ public:
 
 public:
     CancelButtonWidget(QWidget& parent, ResourceCancelButton& value);
+
+private:
+    ResourceCancelButton& m_value;
+    QPushButton* m_button;    
 };
 
 class ProgressBarWidget : public QWidget, public ConfigWidget{
