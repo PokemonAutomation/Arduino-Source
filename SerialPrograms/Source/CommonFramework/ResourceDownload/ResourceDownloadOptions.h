@@ -61,6 +61,19 @@ public:
     ResourceDeleteButton(ResourceDownloadRow& p_row);
 
     ResourceDownloadRow& row;
+
+private:
+    bool m_enabled;
+};
+
+class ResourceCancelButton : public ConfigOptionImpl<ResourceCancelButton>{
+public:
+    ResourceCancelButton(ResourceDownloadRow& p_row);
+
+    ResourceDownloadRow& row;
+
+private:
+    bool m_enabled;    
 };
 
 class ResourceProgressBar : public ConfigOptionImpl<ResourceProgressBar>{

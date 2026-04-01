@@ -50,6 +50,14 @@ public:
     DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& value);
 };
 
+class CancelButtonWidget :  public QWidget, public ConfigWidget{
+public:
+    using ParentOption = ResourceCancelButton;
+
+public:
+    CancelButtonWidget(QWidget& parent, ResourceCancelButton& value);
+};
+
 class ProgressBarWidget : public QWidget, public ConfigWidget{
 public:
     using ParentOption = ResourceProgressBar;
