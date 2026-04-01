@@ -177,18 +177,19 @@ template class RegisterConfigWidget<DeleteButtonWidget>;
 DeleteButtonWidget::DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
+    , m_value(value)
 {
-    QPushButton* button = new QPushButton(&parent);
-    m_widget = button;
+    m_button = new QPushButton(&parent);
+    m_widget = m_button;
 
     QFont font;
     font.setBold(true);
-    button->setFont(font);
-    button->setText("Delete");
+    m_button->setFont(font);
+    m_button->setText("Delete");
 
-    button->connect(
-        button, &QPushButton::clicked,
-        button, [&](bool){
+    m_button->connect(
+        m_button, &QPushButton::clicked,
+        m_button, [&](bool){
             cout << "Clicked Delete Button" << endl;
         }
     );
@@ -199,18 +200,20 @@ template class RegisterConfigWidget<CancelButtonWidget>;
 CancelButtonWidget::CancelButtonWidget(QWidget& parent, ResourceCancelButton& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
+    , m_value(value)
 {
-    QPushButton* button = new QPushButton(&parent);
-    m_widget = button;
+    m_button = new QPushButton(&parent);
+    m_widget = m_button;
 
     QFont font;
     font.setBold(true);
-    button->setFont(font);
-    button->setText("Cancel");
+    m_button->setFont(font);
+    m_button->setText("Cancel");
 
-    button->connect(
-        button, &QPushButton::clicked,
-        button, [&](bool){
+    m_button->connect(
+        m_button, &QPushButton::clicked,
+        m_button, [&](bool){
+            m_value.row.set_cancel_action(true);
             cout << "Clicked Cancel Button" << endl;
         }
     );

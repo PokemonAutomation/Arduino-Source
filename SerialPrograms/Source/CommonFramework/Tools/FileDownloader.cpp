@@ -98,7 +98,8 @@ void download_file_to_disk(
     const std::string& url, 
     const std::string& file_path,
     qint64 expected_size,
-    std::function<void(int)> progress_callback
+    std::function<void(int)> progress_callback,
+    std::function<bool()> is_cancelled
 ){
 //    cout << "download_file()" << endl;
     QNetworkAccessManager network_access_manager;
@@ -124,9 +125,13 @@ void download_file_to_disk(
     // 2. Start the GET request
     QNetworkReply* reply = network_access_manager.get(request);
 
-    // Progress Bar Logic
+    // Progress Bar Logic. and check for Cancel
     QObject::connect(reply, &QNetworkReply::downloadProgress, 
-        [expected_size, progress_callback](qint64 bytesReceived, qint64 bytesTotal) {
+        [reply, expected_size, progress_callback, is_cancelled](qint64 bytesReceived, qint64 bytesTotal) {
+
+            if (is_cancelled()){
+                reply->abort();
+            }
             
             // Use expected_size if the network doesn't provide one
             qint64 total = (bytesTotal > 0) ? bytesTotal : expected_size;
@@ -162,10 +167,15 @@ void download_file_to_disk(
                 "Failed to commit file to disk: " + file_path);
         }
     } else {
-        QString error_string = reply->errorString();
-        // QSaveFile automatically deletes the temp file if commit() isn't called
-        throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
-            "Network Error: " + error_string.toStdString());
+        if (is_cancelled()){
+            logger.log("Download cancelled by user.");
+            throw OperationCancelledException();
+        }else{
+            QString error_string = reply->errorString();
+            // QSaveFile automatically deletes the temp file if commit() isn't called
+            throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+                "Network Error: " + error_string.toStdString());
+        }
     }
 
     reply->deleteLater();
