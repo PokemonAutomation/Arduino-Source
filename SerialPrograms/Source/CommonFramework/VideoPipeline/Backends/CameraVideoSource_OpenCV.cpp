@@ -62,8 +62,39 @@ void CameraVideoSource_OpenCV::capture_thread_body(
     Resolution desired_resolution
 ){
     cv::VideoCapture cap;
-    if (!cap.open(device_index, cv::CAP_DSHOW)){
-        m_logger.log("OpenCV: Failed to open DirectShow device " + std::to_string(device_index), COLOR_RED);
+
+    //  Retry opening the device with exponential backoff.
+    //  DirectShow devices (e.g. AVerMedia GC550) may fail to open if:
+    //    - The device is still being released from a previous session.
+    //    - Another DirectShow filter graph (audio capture) is initializing concurrently.
+    //    - The driver needs time to become ready after plug-in or wake.
+    constexpr int MAX_RETRIES = 8;
+    constexpr int INITIAL_DELAY_MS = 200;
+    bool opened = false;
+    for (int attempt = 0; attempt < MAX_RETRIES; attempt++){
+        if (m_stopping.load(std::memory_order_acquire)){
+            return;
+        }
+        if (cap.open(device_index, cv::CAP_DSHOW)){
+            opened = true;
+            break;
+        }
+        int delay = INITIAL_DELAY_MS * (1 << attempt);  //  200, 400, 800, 1600, ...
+        if (delay > 5000) delay = 5000;
+        m_logger.log(
+            "OpenCV: Failed to open DirectShow device " + std::to_string(device_index) +
+            " (attempt " + std::to_string(attempt + 1) + "/" + std::to_string(MAX_RETRIES) +
+            "), retrying in " + std::to_string(delay) + "ms...",
+            COLOR_ORANGE
+        );
+        std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+    }
+    if (!opened){
+        m_logger.log(
+            "OpenCV: Failed to open DirectShow device " + std::to_string(device_index) +
+            " after " + std::to_string(MAX_RETRIES) + " attempts.",
+            COLOR_RED
+        );
         return;
     }
 
@@ -97,15 +128,38 @@ void CameraVideoSource_OpenCV::capture_thread_body(
     }
 
     cv::Mat bgr_frame;
+    int consecutive_failures = 0;
     while (!m_stopping.load(std::memory_order_acquire)){
-        if (!cap.read(bgr_frame)){
-            //  Brief sleep on read failure to avoid busy-spin.
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        if (!cap.read(bgr_frame) || bgr_frame.empty()){
+            consecutive_failures++;
+            //  After many consecutive failures, try to re-open the device.
+            if (consecutive_failures >= 300){  // ~3 seconds of failures
+                m_logger.log(
+                    "OpenCV: " + std::to_string(consecutive_failures) +
+                    " consecutive read failures. Attempting to re-open device...",
+                    COLOR_ORANGE
+                );
+                cap.release();
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                if (m_stopping.load(std::memory_order_acquire)) break;
+                if (cap.open(device_index, cv::CAP_DSHOW)){
+                    if (desired_resolution){
+                        cap.set(cv::CAP_PROP_FRAME_WIDTH, static_cast<double>(desired_resolution.width));
+                        cap.set(cv::CAP_PROP_FRAME_HEIGHT, static_cast<double>(desired_resolution.height));
+                    }
+                    m_logger.log("OpenCV: Device re-opened successfully.", COLOR_GREEN);
+                }else{
+                    m_logger.log("OpenCV: Re-open failed. Will keep retrying...", COLOR_RED);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+                }
+                consecutive_failures = 0;
+            }else{
+                //  Brief sleep on read failure to avoid busy-spin.
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }
             continue;
         }
-        if (bgr_frame.empty()){
-            continue;
-        }
+        consecutive_failures = 0;
 
         WallClock now = current_time();
 
@@ -163,7 +217,9 @@ public:
         setAttribute(Qt::WA_NoSystemBackground);
 
         //  Start a refresh timer for display.
-        m_timer_id = startTimer(33);  // ~30 fps
+        //  Use Qt::PreciseTimer to avoid Windows default timer resolution
+        //  (15.625ms) rounding 33ms up to ~47ms (~21 FPS).
+        m_timer_id = startTimer(16, Qt::PreciseTimer);  // ~60 fps
     }
     ~VideoWidget_OpenCV(){
         killTimer(m_timer_id);
