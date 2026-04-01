@@ -74,7 +74,7 @@ PickupFarmer::PickupFarmer()
         GameLocation::route1
     )
     , TRAVEL_METHOD(
-        "<bTravel Method:</b><br>This move should be learned by the last " + Pokemon::STRING_POKEMON + " in your party.",
+        "<b>Travel Method:</b><br>This move should be learned by the last " + Pokemon::STRING_POKEMON + " in your party.",
         {
             {TravelMethod::fly,  "fly",  "Fly"},
             {TravelMethod::teleport, "teleport", "Teleport"}
