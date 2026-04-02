@@ -34,18 +34,23 @@ struct ProgressData {
     uint64_t processed_bytes;
     int last_percentage;
     std::function<void(int)> progress_callback;
+    std::function<bool()> is_cancelled;
 };
 
 // Callback triggered for every chunk of decompressed data
 // pOpaque is an opaque pointer that actually represents ProgressData
-size_t write_callback(void* pOpaque, mz_uint64 file_ofs, const void* pBuf, size_t n){
+size_t write_callback(void* pOpaque, [[maybe_unused]] mz_uint64 file_ofs, const void* pBuf, size_t n){
     ProgressData* data = static_cast<ProgressData*>(pOpaque);
 
-    // 1. Check if we actually need to seek
-    // tellp() returns the current 'put' position.  get the current position of the write pointer in an output stream.
-    if (static_cast<mz_uint64>(data->out_file->tellp()) != file_ofs){
-        data->out_file->seekp(file_ofs);
+    if (data->is_cancelled()){
+        return 0;  // this causes mz_zip_reader_extract_to_callback to return an error
     }
+
+    // Check if we actually need to seek
+    // tellp() returns the current 'put' position.  get the current position of the write pointer in an output stream.
+    // if (static_cast<mz_uint64>(data->out_file->tellp()) != file_ofs){
+    //     data->out_file->seekp(file_ofs);
+    // }
         
     // Write chunk to disk
     data->out_file->write(static_cast<const char*>(pBuf), n);
@@ -58,7 +63,8 @@ size_t write_callback(void* pOpaque, mz_uint64 file_ofs, const void* pBuf, size_
     // Only print if the integer value has changed
     if (current_percent > data->last_percentage){
         data->progress_callback(current_percent);
-        // data->last_percentage = current_percent;
+        data->last_percentage = current_percent;
+        
         // std::cout << "\rProgress: " << current_percent << "% (" 
         //         << data->processed_bytes << "/" << data->total_bytes << " bytes)" << endl;
     }
@@ -102,7 +108,8 @@ bool is_safe(const std::string& target_dir, const std::string& entry_name){
 void unzip_file(
     const char* zip_path, 
     const char* target_dir, 
-    std::function<void(int)> progress_callback
+    std::function<void(int)> progress_callback,
+    std::function<bool()> is_cancelled
 ){
     Filesystem::Path p{zip_path};
     if (!fs::exists(p)){
@@ -120,12 +127,20 @@ void unzip_file(
         return;
     } 
 
+    // This automatically calls mz_zip_reader_end when this function exits for any reason.
+    struct ZipCleanup {
+        mz_zip_archive* p;
+        ~ZipCleanup() { mz_zip_reader_end(p); }
+    } cleanup{&zip_archive};
+
     // Get total number of files in the archive
     int num_files = (int)mz_zip_reader_get_num_files(&zip_archive);
 
     // calculate total uncompressed size
     uint64_t total_uncompressed_size = 0;
     for (int i = 0; i < num_files; i++){
+        if (is_cancelled()) return;
+
         mz_zip_archive_file_stat file_stat; // holds info on the specific file
 
         // fills file_stat with the data for the current index
@@ -137,6 +152,8 @@ void unzip_file(
 
     uint64_t total_processed_bytes = 0;
     for (int i = 0; i < num_files; i++){
+        if (is_cancelled()) return;
+
         mz_zip_archive_file_stat file_stat; // holds info on the specific file
 
         // fills file_stat with the data for the current index
@@ -148,9 +165,14 @@ void unzip_file(
             continue;
         }
 
+        // ensure that entry_name is inside target_dir. to prevent path traversal attacks.
+        if (!is_safe(target_dir, file_stat.m_filename)){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "unzip_all: Attempted to unzip a file that was trying to leave its base directory. This is a security risk.");
+        }
+
         // Construct your output path (e.g., target_dir + file_stat.m_filename)
-        std::string out_path = std::string(target_dir) + "/" + file_stat.m_filename;
-        Filesystem::Path const parent_dir{Filesystem::Path(out_path).parent_path()};
+        Filesystem::Path out_path = Filesystem::Path(target_dir) / Filesystem::Path(file_stat.m_filename);
+        Filesystem::Path const parent_dir{out_path.parent_path()};
 
         // Create the entire directory, including intermediate directories for this file
         std::error_code ec{};
@@ -160,22 +182,27 @@ void unzip_file(
             ec.clear(); 
         }
 
-        // ensure that entry_name is inside target_dir. to prevent path traversal attacks.
-        if (!is_safe(target_dir, file_stat.m_filename)){
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "unzip_all: Attempted to unzip a file that was trying to leave its base directory. This is a security risk.");
-        }
         
-        std::ofstream out_file(out_path, std::ios::binary); // std::ios::binary is to prevent line-ending conversions.
-        ProgressData progress = { &out_file, total_uncompressed_size, total_processed_bytes, -1, progress_callback };
+        std::ofstream out_file(out_path.string(), std::ios::binary); // std::ios::binary is to prevent line-ending conversions.
+        ProgressData progress = { &out_file, total_uncompressed_size, total_processed_bytes, -1, progress_callback, is_cancelled };
 
         // Extract using the callback
         // decompresses the file in chunks and repeatedly calls write_callback to save those chunks to the disk via the out_file
-        mz_zip_reader_extract_to_callback(&zip_archive, i, write_callback, &progress, 0);
-        std::cout << "\nFinished: " << file_stat.m_filename << std::endl;
+        mz_bool status = mz_zip_reader_extract_to_callback(&zip_archive, i, write_callback, &progress, 0);
+
+        if (!status){
+            out_file.close();
+            if (is_cancelled()){
+                // close and delete the partially unzipped file
+                fs::remove(out_path, ec);
+                return;
+            }
+        }
+
+        // std::cout << "\nFinished: " << file_stat.m_filename << std::endl;
         total_processed_bytes += file_stat.m_uncomp_size;
     }
 
-    mz_zip_reader_end(&zip_archive);
 }
 
 // void unzip_file(const std::string& zip_path, const std::string& output_dir){
