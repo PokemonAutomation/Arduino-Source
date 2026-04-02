@@ -57,15 +57,15 @@ public:
     void start_download();
     // throws OperationCancelledException if the user cancels the action
     void run_download(DownloadedResourceMetadata resource_metadata);
-    
 
-public:
-    DownloadedResourceMetadata m_local_metadata;
+    void start_delete();
+    
 
 private:
     std::once_flag init_flag;
     std::unique_ptr<RemoteMetadata> m_remote_metadata;
 
+    DownloadedResourceMetadata m_local_metadata;
     struct Data;
     Pimpl<Data> m_data;
 
@@ -76,6 +76,7 @@ private:
 
     AsyncTask m_worker1;
     AsyncTask m_worker2;
+    AsyncTask m_worker3;
 
 
 

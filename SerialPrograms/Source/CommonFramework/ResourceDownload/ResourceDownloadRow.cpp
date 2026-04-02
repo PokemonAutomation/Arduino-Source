@@ -109,6 +109,7 @@ void ResourceDownloadRow::set_cancel_action(bool cancel_action){
 ResourceDownloadRow::~ResourceDownloadRow(){
     m_worker1.wait_and_ignore_exceptions();
     m_worker2.wait_and_ignore_exceptions();
+    m_worker3.wait_and_ignore_exceptions();
 }
 ResourceDownloadRow::ResourceDownloadRow(
     DownloadedResourceMetadata local_metadata,
@@ -369,6 +370,32 @@ void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metad
 
         throw e;
     }
+
+}
+
+
+void ResourceDownloadRow::start_delete(){
+    m_worker3 = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+    [this]{ 
+        try {
+            std::string resource_name = m_local_metadata.resource_name;
+
+            std::string resource_directory = DOWNLOADED_RESOURCE_PATH() + resource_name;
+            // delete directory and the old resource
+            fs::remove_all(resource_directory);
+
+            // update the table labels
+            set_is_downloaded(false);
+            set_version_status(ResourceVersionStatus::NOT_APPLICABLE);
+            
+            // emit delete_finished();
+        }catch(...){
+            // actions_done_reenable_buttons();
+            emit exception_caught("ResourceDownloadButton::start_delete");
+            return;
+        }
+    }
+    );
 
 }
 
