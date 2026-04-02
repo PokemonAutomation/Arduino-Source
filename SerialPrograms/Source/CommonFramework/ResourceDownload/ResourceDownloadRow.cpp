@@ -216,6 +216,10 @@ void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metad
             [this](int percentage_progress){
                 unzip_progress(percentage_progress);
             }
+            ,
+            [this](){
+                return m_data->m_cancel_action.load();
+            }
         );
 
         // delete old zip file
