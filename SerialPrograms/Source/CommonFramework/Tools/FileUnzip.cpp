@@ -146,7 +146,7 @@ void unzip_file(
         // fills file_stat with the data for the current index
         if (!mz_zip_reader_file_stat(&zip_archive, i, &file_stat)) continue;
 
-        cout << std::to_string(file_stat.m_uncomp_size) << endl;
+        // cout << std::to_string(file_stat.m_uncomp_size) << endl;
         total_uncompressed_size += file_stat.m_uncomp_size;
     }
 
