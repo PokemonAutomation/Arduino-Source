@@ -27,15 +27,17 @@ public:
     ~DownloadButtonWidget();
     DownloadButtonWidget(QWidget& parent, ResourceDownloadButton& value);
 
-private:
-    ResourceDownloadButton& m_value;
-    QPushButton* m_button;
 
+private:
     void update_enabled_status();
     void show_download_confirm_box(
         const std::string& title,
         const std::string& message_body
     );
+
+private:
+    ResourceDownloadButton& m_value;
+    QPushButton* m_button;
     
 };
 
@@ -48,6 +50,9 @@ public:
 
 public:
     DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& value);
+
+private:
+    void show_delete_confirm_box();
 
 private:
     ResourceDeleteButton& m_value;

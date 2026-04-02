@@ -46,6 +46,13 @@ class ResourceDeleteButton : public ConfigOptionImpl<ResourceDeleteButton>{
 public:
     ResourceDeleteButton(ResourceDownloadRow& p_row);
 
+public:
+    inline bool get_enabled(){ return m_enabled; }
+    inline void set_enabled(bool enabled){ 
+        m_enabled = enabled; 
+    }
+
+public:
     ResourceDownloadRow& row;
 
 private:
@@ -56,6 +63,13 @@ class ResourceCancelButton : public ConfigOptionImpl<ResourceCancelButton>{
 public:
     ResourceCancelButton(ResourceDownloadRow& p_row);
 
+public:
+    inline bool get_enabled(){ return m_enabled; }
+    inline void set_enabled(bool enabled){ 
+        m_enabled = enabled; 
+    }
+
+public:
     ResourceDownloadRow& row;
 
 private:

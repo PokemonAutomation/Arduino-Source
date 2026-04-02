@@ -185,14 +185,56 @@ DeleteButtonWidget::DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& va
     m_button->setFont(font);
     m_button->setText("Delete");
 
-    m_button->connect(
+    connect(
         m_button, &QPushButton::clicked,
         m_button, [&](bool){
+            show_delete_confirm_box();
             cout << "Clicked Delete Button" << endl;
         }
     );
+
+    // connect(
+    //     &m_value.row, &ResourceDownloadRow::delete_finished,
+    //     this, [this](){
+    //         // update_enabled_status();
+    //     }
+    // );
 }
 
+
+void DeleteButtonWidget::show_delete_confirm_box(){
+    QMessageBox box;
+    QPushButton* yes = box.addButton(QMessageBox::Yes);
+    QPushButton* cancel = box.addButton("Cancel", QMessageBox::NoRole);
+    box.setEscapeButton(cancel);
+//    cout << "ok = " << ok << endl;
+//    cout << "skip = " << skip << endl;
+
+    box.setTextFormat(Qt::RichText);
+    std::string title = "Delete";
+    std::string message_body = "Are you suer you want to delete this resource?";
+
+    box.setWindowTitle(QString::fromStdString(title));
+    box.setText(QString::fromStdString(message_body));
+
+//    box.open();
+
+    box.exec();
+
+    QAbstractButton* clicked = box.clickedButton();
+//    cout << "clicked = " << clicked << endl;
+    if (clicked == yes){
+        cout << "Clicked Yes to Delete" << endl;
+
+        m_value.row.start_delete();
+        return;
+    }
+    if (clicked == cancel){
+        // m_value.set_enabled(true);
+        // update_enabled_status();
+        return;
+    }
+}
 
 template class RegisterConfigWidget<CancelButtonWidget>;
 CancelButtonWidget::CancelButtonWidget(QWidget& parent, ResourceCancelButton& value)
@@ -208,7 +250,7 @@ CancelButtonWidget::CancelButtonWidget(QWidget& parent, ResourceCancelButton& va
     m_button->setFont(font);
     m_button->setText("Cancel");
 
-    m_button->connect(
+    connect(
         m_button, &QPushButton::clicked,
         m_button, [&](bool){
             m_value.row.set_cancel_action(true);
