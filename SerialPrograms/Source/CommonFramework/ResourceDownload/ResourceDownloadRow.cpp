@@ -6,7 +6,9 @@
 
 #include "CommonFramework/Globals.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
-#include "Common/Cpp/Exceptions.h"
+// #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/FileDownloader.h"
 #include "CommonFramework/Tools/FileUnzip.h"
@@ -104,7 +106,10 @@ void ResourceDownloadRow::set_cancel_action(bool cancel_action){
 }
 
 
-ResourceDownloadRow::~ResourceDownloadRow(){}
+ResourceDownloadRow::~ResourceDownloadRow(){
+    m_worker1.wait_and_ignore_exceptions();
+    m_worker2.wait_and_ignore_exceptions();
+}
 ResourceDownloadRow::ResourceDownloadRow(
     DownloadedResourceMetadata local_metadata,
     bool is_downloaded,
@@ -179,6 +184,132 @@ RemoteMetadata& ResourceDownloadRow::fetch_remote_metadata(){
 
 //     return corresponding_local_metadata;
 // }
+
+void ResourceDownloadRow::actions_done_reenable_buttons(){
+    m_download_button.set_enabled(true);
+    set_cancel_action(false);
+}
+
+void ResourceDownloadRow::ensure_remote_metadata_loaded(){
+    m_worker1 = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+    [this]{ 
+        try {
+            // std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::string predownload_warning;
+            RemoteMetadata& remote_handle = fetch_remote_metadata();
+            // cout << "Fetched remote metadata" << endl;
+            // throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "testing"); 
+
+            predownload_warning = predownload_warning_summary(remote_handle);
+
+            actions_done_reenable_buttons();
+            emit metadata_fetch_finished(predownload_warning);
+
+        }catch(OperationFailedException&){
+            // cout << "failed" << endl;
+            actions_done_reenable_buttons();
+            emit download_failed();
+            return;
+        }catch(...){
+            actions_done_reenable_buttons();
+            // cout << "Exception thrown in thread" << endl;
+            emit exception_caught("ResourceDownloadButton::ensure_remote_metadata_loaded");
+            return;
+        }
+    
+    }
+    );
+
+}
+
+std::string ResourceDownloadRow::predownload_warning_summary(RemoteMetadata& remote_handle){
+
+    std::string predownload_warning;
+
+    switch (remote_handle.status){
+    case RemoteMetadataStatus::UNINITIALIZED:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "predownload_warning_summary: Remote metadata uninitialized.");
+    case RemoteMetadataStatus::NOT_AVAILABLE:
+        predownload_warning = "Resource no longer available for download. We recommend updating the Computer Control program.";
+        break;
+    case RemoteMetadataStatus::AVAILABLE:
+    {
+        uint16_t local_version_num = m_local_metadata.version_num.value();
+
+        DownloadedResourceMetadata remote_metadata = remote_handle.metadata;
+        uint16_t remote_version_num = remote_metadata.version_num.value();
+        size_t compressed_size = remote_metadata.size_compressed_bytes;
+        size_t decompressed_size = remote_metadata.size_decompressed_bytes;
+
+        std::string disk_space_requirement = "This will require " + std::to_string(decompressed_size + compressed_size) + " bytes of free space";
+
+        if (local_version_num < remote_version_num){
+            predownload_warning = "The resource you are downloading is a more updated version than the program expects. "
+            "This may or may not cause issues with the programs. "
+            "We recommend updating the Computer Control program.<br>" +
+            disk_space_requirement;
+        }else if (local_version_num == remote_version_num){
+            predownload_warning = "Update available.<br>" + disk_space_requirement;
+        }else if (local_version_num > remote_version_num){
+            predownload_warning = "The resource you are downloading is a less updated version than the program expects. "
+            "Please report this as a bug.<br>" +
+            disk_space_requirement;
+        }
+    }
+        break;
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "predownload_warning_summary: Unknown enum."); 
+    }
+
+    return predownload_warning;
+}
+
+
+
+void ResourceDownloadRow::start_download(){
+    m_worker2 = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+    [this]{ 
+        try {
+            
+            // std::this_thread::sleep_for(std::chrono::seconds(7));
+            RemoteMetadata& remote_handle = fetch_remote_metadata();
+            if (remote_handle.status != RemoteMetadataStatus::AVAILABLE){
+                switch (remote_handle.status){
+                case RemoteMetadataStatus::UNINITIALIZED:
+                    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "start_download: Remote metadata uninitialized.");
+                case RemoteMetadataStatus::NOT_AVAILABLE:
+                    cout << "start_download: Download not available. Cancel download." << endl;
+                    throw OperationCancelledException();
+                default:
+                    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "start_download: Unknown enum."); 
+                }
+            }
+
+            // Download is available
+            DownloadedResourceMetadata metadata = remote_handle.metadata;
+            run_download(metadata);
+
+            cout << "Done Download" << endl;
+
+            actions_done_reenable_buttons();
+            emit download_finished();
+        }catch(OperationCancelledException&){
+            actions_done_reenable_buttons();                
+            emit download_finished();
+            return;
+        }catch(OperationFailedException&){
+            actions_done_reenable_buttons();
+            emit download_failed();
+            return;
+        }catch(...){
+            actions_done_reenable_buttons();
+            emit exception_caught("ResourceDownloadButton::start_download");
+            return;
+        }
+    }
+    );
+
+}
 
 
 void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metadata){

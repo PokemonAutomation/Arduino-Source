@@ -74,14 +74,14 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
         this, [this](){
             m_value.set_enabled(false);
             update_enabled_status();
-            m_value.ensure_remote_metadata_loaded();
+            m_value.row.ensure_remote_metadata_loaded();
         }
     );
 
     // when json has been fetched, open the update box. 
     // When click Ok in update box, start the download. If click cancel, re-enable the download button
     connect(
-        &m_value, &ResourceDownloadButton::metadata_fetch_finished,
+        &m_value.row, &ResourceDownloadRow::metadata_fetch_finished,
         this, [this](std::string predownload_warning){
             show_download_confirm_box("Download", predownload_warning);
         }
@@ -90,7 +90,7 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
 
     // when the download is finished, update the UI to re-enable the button
     connect(
-        &m_value, &ResourceDownloadButton::download_finished,
+        &m_value.row, &ResourceDownloadRow::download_finished,
         this, [this](){
             update_enabled_status();
         }
@@ -99,9 +99,8 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
     // if the thread catches an exception, show an error box
     // since exceptions can't bubble up as usual
     connect(
-        &m_value, &ResourceDownloadButton::exception_caught,
+        &m_value.row, &ResourceDownloadRow::exception_caught,
         this, [this](std::string function_name){
-            m_value.set_enabled(true);
             update_enabled_status();
             show_error_box(function_name);
         }
@@ -109,9 +108,8 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
 
     // if download fails
     connect(
-        &m_value, &ResourceDownloadButton::download_failed,
+        &m_value.row, &ResourceDownloadRow::download_failed,
         this, [this](){
-            m_value.set_enabled(true);
             update_enabled_status();
             show_download_failed_box();
         }
@@ -159,7 +157,7 @@ void DownloadButtonWidget::show_download_confirm_box(
     if (clicked == ok){
         cout << "Clicked Ok to Download" << endl;
 
-        m_value.start_download();
+        m_value.row.start_download();
         return;
     }
     if (clicked == cancel){
