@@ -16,6 +16,7 @@
 namespace PokemonAutomation{
 
 class RecursiveThrottler;
+enum class ControllerInputType;
 class ControllerInputState;
 class ControllerState;
 enum class ControllerType;
