@@ -118,6 +118,7 @@ ResourceDownloadRow::ResourceDownloadRow(
     ResourceVersionStatus version_status
 )
     : StaticTableRow(local_metadata.resource_name)
+    , m_button_state(ButtonState::READY)
     , m_local_metadata(local_metadata)
     , m_data(CONSTRUCT_TOKEN, local_metadata.resource_name, local_metadata.size_decompressed_bytes, is_downloaded, version_num, version_status)
     , m_download_button(*this)
@@ -186,10 +187,6 @@ RemoteMetadata& ResourceDownloadRow::fetch_remote_metadata(){
 //     return corresponding_local_metadata;
 // }
 
-void ResourceDownloadRow::actions_done_reenable_buttons(){
-    m_download_button.set_enabled(true);
-    set_cancel_action(false);
-}
 
 void ResourceDownloadRow::ensure_remote_metadata_loaded(){
     m_worker1 = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
@@ -203,16 +200,16 @@ void ResourceDownloadRow::ensure_remote_metadata_loaded(){
 
             predownload_warning = predownload_warning_summary(remote_handle);
 
-            actions_done_reenable_buttons();
+            // update_button_state(ButtonState::READY);
             emit metadata_fetch_finished(predownload_warning);
 
         }catch(OperationFailedException&){
             // cout << "failed" << endl;
-            actions_done_reenable_buttons();
+            update_button_state(ButtonState::READY);
             emit download_failed();
             return;
         }catch(...){
-            actions_done_reenable_buttons();
+            update_button_state(ButtonState::READY);
             // cout << "Exception thrown in thread" << endl;
             emit exception_caught("ResourceDownloadButton::ensure_remote_metadata_loaded");
             return;
@@ -292,18 +289,17 @@ void ResourceDownloadRow::start_download(){
 
             cout << "Done Download" << endl;
 
-            actions_done_reenable_buttons();
-            emit download_finished();
+            update_button_state(ButtonState::READY);
+
         }catch(OperationCancelledException&){
-            actions_done_reenable_buttons();                
-            emit download_finished();
+            update_button_state(ButtonState::READY);
             return;
         }catch(OperationFailedException&){
-            actions_done_reenable_buttons();
+            update_button_state(ButtonState::READY);
             emit download_failed();
             return;
         }catch(...){
-            actions_done_reenable_buttons();
+            update_button_state(ButtonState::READY);
             emit exception_caught("ResourceDownloadButton::start_download");
             return;
         }
@@ -392,15 +388,64 @@ void ResourceDownloadRow::start_delete(){
             set_is_downloaded(false);
             set_version_status(ResourceVersionStatus::NOT_APPLICABLE);
             
-            // emit delete_finished();
+            update_button_state(ButtonState::READY);
         }catch(...){
-            // actions_done_reenable_buttons();
+            update_button_state(ButtonState::READY);
             emit exception_caught("ResourceDownloadButton::start_delete");
             return;
         }
     }
     );
 
+}
+
+void ResourceDownloadRow::update_button_state(ButtonState state){
+    switch (state){
+    case ButtonState::DOWNLOAD:
+        // button state can only enter the DOWNLOAD state 
+        // if going from the READY state
+        if (m_button_state == ButtonState::READY){
+            m_download_button.set_enabled(false);
+            m_delete_button.set_enabled(false);
+            m_cancel_button.set_enabled(true);
+            set_cancel_action(false);
+            m_button_state = state;
+        }
+        break;
+    case ButtonState::DELETE:
+        // button state can only enter the DELETE state 
+        // if going from the READY state
+        if (m_button_state == ButtonState::READY){
+            m_download_button.set_enabled(false);
+            m_delete_button.set_enabled(false);
+            m_cancel_button.set_enabled(false);
+            set_cancel_action(false);
+            m_button_state = state;
+        }
+        break;
+    case ButtonState::CANCEL:
+        // button state can only enter the CANCEL state 
+        // if going from the DOWNLOAD state
+        if (m_button_state == ButtonState::DOWNLOAD){ 
+            m_download_button.set_enabled(false);
+            m_delete_button.set_enabled(false);
+            m_cancel_button.set_enabled(false);
+            set_cancel_action(true);
+            m_button_state = state;
+        }
+        break;
+    case ButtonState::READY:
+        m_download_button.set_enabled(true);
+        m_delete_button.set_enabled(true);
+        m_cancel_button.set_enabled(true);
+        set_cancel_action(false);
+        m_button_state = state;
+        break;
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "update_button_state: Unknown enum.");  
+    }
+
+    emit button_state_updated();
 }
 
 

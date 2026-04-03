@@ -18,7 +18,12 @@
 
 namespace PokemonAutomation{
 
-
+enum class ButtonState{
+    DOWNLOAD,
+    DELETE,
+    CANCEL,
+    READY,
+};
 class ResourceDownloadRow : public QObject, public StaticTableRow{
     Q_OBJECT
 public:
@@ -39,13 +44,13 @@ signals:
     void download_failed();
     void download_finished();
 
+    void button_state_updated();
+
 
 public:
     void set_version_status(ResourceVersionStatus version_status);
     void set_is_downloaded(bool is_downloaded);
     void set_cancel_action(bool cancel_action);
-
-    void actions_done_reenable_buttons();
 
     void ensure_remote_metadata_loaded();
     std::string predownload_warning_summary(RemoteMetadata& remote_metadata);
@@ -59,12 +64,15 @@ public:
     void run_download(DownloadedResourceMetadata resource_metadata);
 
     void start_delete();
+
+    void update_button_state(ButtonState state);
     
 
 private:
     std::once_flag init_flag;
     std::unique_ptr<RemoteMetadata> m_remote_metadata;
 
+    ButtonState m_button_state;
     DownloadedResourceMetadata m_local_metadata;
     struct Data;
     Pimpl<Data> m_data;
