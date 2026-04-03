@@ -73,6 +73,7 @@ size_t write_callback(void* pOpaque, [[maybe_unused]] mz_uint64 file_ofs, const 
 }
 
 // ensure that entry_name is inside target_dir, to prevent path traversal attacks.
+// assumes target_dir exists
 bool is_safe(const std::string& target_dir, const std::string& entry_name){
     try {
         // 1. Get absolute, normalized paths
@@ -113,8 +114,17 @@ void unzip_file(
 ){
     Filesystem::Path p{zip_path};
     if (!fs::exists(p)){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "unzip_all: Attempted to unzip a file that doesn't exist.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "unzip_file: Attempted to unzip a file that doesn't exist.");
     } 
+
+    {
+        Filesystem::Path dir{target_dir};
+        std::error_code ec{};
+        fs::create_directories(dir, ec);
+        if (ec){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "unzip_file: Error creating the target directory " + std::string(target_dir) + ": " + ec.message());
+        }
+    }
 
     mz_zip_archive zip_archive;
     memset(&zip_archive, 0, sizeof(zip_archive));
@@ -122,9 +132,8 @@ void unzip_file(
     // Opens the ZIP file at zip_path
     // zip_archive holds the state and metadata of the ZIP archive.
     if (!mz_zip_reader_init_file(&zip_archive, zip_path, 0)){
-        cout << "failed to run mz_zip_reader_init_file" << endl;
-        cout << "mz_zip_error: " << mz_zip_get_last_error(&zip_archive) << endl;
-        return;
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, 
+            "unzip_file: failed to run mz_zip_reader_init_file. mz_zip_error: " + mz_zip_get_last_error(&zip_archive));
     } 
 
     // This automatically calls mz_zip_reader_end when this function exits for any reason.
@@ -139,7 +148,7 @@ void unzip_file(
     // calculate total uncompressed size
     uint64_t total_uncompressed_size = 0;
     for (int i = 0; i < num_files; i++){
-        if (is_cancelled()) return;
+        if (is_cancelled()) throw OperationCancelledException();
 
         mz_zip_archive_file_stat file_stat; // holds info on the specific file
 
@@ -152,7 +161,7 @@ void unzip_file(
 
     uint64_t total_processed_bytes = 0;
     for (int i = 0; i < num_files; i++){
-        if (is_cancelled()) return;
+        if (is_cancelled()) throw OperationCancelledException();
 
         mz_zip_archive_file_stat file_stat; // holds info on the specific file
 
@@ -167,7 +176,7 @@ void unzip_file(
 
         // ensure that entry_name is inside target_dir. to prevent path traversal attacks.
         if (!is_safe(target_dir, file_stat.m_filename)){
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "unzip_all: Attempted to unzip a file that was trying to leave its base directory. This is a security risk.");
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "unzip_file: Attempted to unzip a file that was trying to leave its base directory. This is a security risk.");
         }
 
         // Construct your output path (e.g., target_dir + file_stat.m_filename)
@@ -195,7 +204,7 @@ void unzip_file(
             if (is_cancelled()){
                 // close and delete the partially unzipped file
                 fs::remove(out_path, ec);
-                return;
+                throw OperationCancelledException();
             }
         }
 
