@@ -29,7 +29,7 @@ public:
 
 
 private:
-    void update_enabled_status();
+    void update_UI_state();
     void show_download_confirm_box(
         const std::string& title,
         const std::string& message_body
@@ -52,6 +52,7 @@ public:
     DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& value);
 
 private:
+    void update_UI_state();
     void show_delete_confirm_box();
 
 private:
@@ -65,6 +66,9 @@ public:
 
 public:
     CancelButtonWidget(QWidget& parent, ResourceCancelButton& value);
+
+private:
+    void update_UI_state();
 
 private:
     ResourceCancelButton& m_value;

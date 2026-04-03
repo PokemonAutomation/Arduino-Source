@@ -61,20 +61,27 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
     // this status is stored within ResourceDownloadButton::m_enabled
     // when the button is clicked, m_enabled is set to false
     // when te download is done, m_enabled is set back to true
-    // the UI is updated to reflect the status of m_enabled, by using update_enabled_status
+    // the UI is updated to reflect the status of m_enabled, by using update_UI_state
 
 
     // update the UI based on m_enabled, when the button is constructed
-    update_enabled_status();
+    update_UI_state();
 
-    // when the button is clicked, m_enabled is set to false,
-    // fetch json
+    // when the button is clicked, runs row.update_button_state(), which updates the button state
+    // also, fetch json
     connect(
         m_button, &QPushButton::clicked,
         this, [this](){
-            m_value.set_enabled(false);
-            update_enabled_status();
+            m_value.row.update_button_state(ButtonState::DOWNLOAD);
             m_value.row.ensure_remote_metadata_loaded();
+        }
+    );
+
+    // when button_state_updated, update the UI state to match
+    connect(
+        &m_value.row, &ResourceDownloadRow::button_state_updated,
+        this, [this](){
+            update_UI_state();
         }
     );
 
@@ -87,21 +94,12 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
         }
     );
 
-
-    // when the download is finished, update the UI to re-enable the button
-    connect(
-        &m_value.row, &ResourceDownloadRow::download_finished,
-        this, [this](){
-            update_enabled_status();
-        }
-    );
-
     // if the thread catches an exception, show an error box
     // since exceptions can't bubble up as usual
+    // this connect handles all exception_caught() emitted by ResourceDownloadRow
     connect(
         &m_value.row, &ResourceDownloadRow::exception_caught,
         this, [this](std::string function_name){
-            update_enabled_status();
             show_error_box(function_name);
         }
     );
@@ -110,14 +108,13 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
     connect(
         &m_value.row, &ResourceDownloadRow::download_failed,
         this, [this](){
-            update_enabled_status();
             show_download_failed_box();
         }
     );
 }
 
 
-void DownloadButtonWidget::update_enabled_status(){
+void DownloadButtonWidget::update_UI_state(){
     if (m_value.get_enabled()){
         m_button->setEnabled(true);
         m_button->setText("Download");
@@ -161,8 +158,7 @@ void DownloadButtonWidget::show_download_confirm_box(
         return;
     }
     if (clicked == cancel){
-        m_value.set_enabled(true);
-        update_enabled_status();
+        m_value.row.update_button_state(ButtonState::READY);
         return;
     }
 }
@@ -185,20 +181,40 @@ DeleteButtonWidget::DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& va
     m_button->setFont(font);
     m_button->setText("Delete");
 
+
+    // update the UI based on m_enabled, when the button is constructed
+    update_UI_state();
+
+    // when the button is clicked, runs row.update_button_state(), which updates the button state
+    // also, show the delete confirm box
     connect(
         m_button, &QPushButton::clicked,
-        m_button, [&](bool){
+        this, [&](bool){
+            m_value.row.update_button_state(ButtonState::DELETE);
             show_delete_confirm_box();
             cout << "Clicked Delete Button" << endl;
         }
     );
 
-    // connect(
-    //     &m_value.row, &ResourceDownloadRow::delete_finished,
-    //     this, [this](){
-    //         // update_enabled_status();
-    //     }
-    // );
+    // when button_state_updated, update the UI state to match
+    connect(
+        &m_value.row, &ResourceDownloadRow::button_state_updated,
+        this, [this](){
+            update_UI_state();
+        }
+    );
+
+}
+
+
+void DeleteButtonWidget::update_UI_state(){
+    if (m_value.get_enabled()){
+        m_button->setEnabled(true);
+        m_button->setText("Delete");
+    }else{
+        m_button->setEnabled(false);
+        m_button->setText("Deleting...");
+    }
 }
 
 
@@ -212,7 +228,7 @@ void DeleteButtonWidget::show_delete_confirm_box(){
 
     box.setTextFormat(Qt::RichText);
     std::string title = "Delete";
-    std::string message_body = "Are you suer you want to delete this resource?";
+    std::string message_body = "Are you sure you want to delete this resource?";
 
     box.setWindowTitle(QString::fromStdString(title));
     box.setText(QString::fromStdString(message_body));
@@ -230,8 +246,7 @@ void DeleteButtonWidget::show_delete_confirm_box(){
         return;
     }
     if (clicked == cancel){
-        // m_value.set_enabled(true);
-        // update_enabled_status();
+        m_value.row.update_button_state(ButtonState::READY);
         return;
     }
 }
@@ -250,13 +265,37 @@ CancelButtonWidget::CancelButtonWidget(QWidget& parent, ResourceCancelButton& va
     m_button->setFont(font);
     m_button->setText("Cancel");
 
+    // update the UI based on m_enabled, when the button is constructed
+    update_UI_state();
+
+    // when the button is clicked, runs row.update_button_state(), which updates the button state
+    // also, set cancel state to true
     connect(
         m_button, &QPushButton::clicked,
-        m_button, [&](bool){
-            m_value.row.set_cancel_action(true);
+        this, [&](bool){
+            m_value.row.update_button_state(ButtonState::CANCEL);
             cout << "Clicked Cancel Button" << endl;
         }
     );
+
+    // when button_state_updated, update the UI state to match
+    connect(
+        &m_value.row, &ResourceDownloadRow::button_state_updated,
+        this, [this](){
+            update_UI_state();
+        }
+    );
+
+}
+
+void CancelButtonWidget::update_UI_state(){
+    if (m_value.get_enabled()){
+        m_button->setEnabled(true);
+        m_button->setText("Cancel");
+    }else{
+        m_button->setEnabled(false);
+        m_button->setText("Cancelling...");
+    }
 }
 
 template class RegisterConfigWidget<ProgressBarWidget>;
