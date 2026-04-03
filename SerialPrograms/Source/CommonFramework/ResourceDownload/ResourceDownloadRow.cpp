@@ -357,6 +357,10 @@ void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metad
         // delete old zip file
         fs::remove(zip_path);
 
+        if (m_data->m_cancel_action.load()){
+            throw OperationCancelledException();
+        }
+
         // update the table labels
         set_is_downloaded(true);
         set_version_status(ResourceVersionStatus::CURRENT);
