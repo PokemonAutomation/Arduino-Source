@@ -15,6 +15,9 @@
 #include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
 #include "PokemonBDSP/Options/PokemonBDSP_LearnMove.h"
 
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include <vector>
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
@@ -35,23 +38,43 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    // Run the battle loop. Return true if the program should stop.
-    bool battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]);
+    enum class BattleOutcome {
+        FINISHED,
+        FAILED_START,
+        MOVE_LEARN
+    };
+    // Run the battle loop. Returns the outcome of the battle attempt.
+    BattleOutcome battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t pp0[4], uint8_t pp1[4],
+        const std::vector<ImagePixelBox>& bubbles
+    );
     // Check for items generated through the Pickup ability
     void check_pickup_items(
         ProControllerContext& context,
         const bool pickup_slots_selected[6]
-                       );
+    );
     // From the bottom row of the Ace Trainer pair, heal Pokemon and return.
     // Return true if VS Seeker needs charging.
+    void move_to_trainer(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context,
+        const std::vector<ImagePixelBox>& bubbles
+    );
+    void recover_from_failed_battle_start(
+        SingleSwitchProgramEnvironment& env, 
+        ProControllerContext& context
+    );
     bool heal_after_battle_and_return(
         SingleSwitchProgramEnvironment& env,
         VideoStream& stream, ProControllerContext& context,
-        uint8_t pp0[4], uint8_t pp1[4]
+        uint8_t pp0[4], uint8_t pp1[4], bool has_pickup_mons
     );
     // Starting in front of the Celestic Town Pokecenter, heal and return
     // to the Ace Trainer pair.
-    void heal_at_center_and_return(Logger& logger, ProControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]);
+    void heal_at_center_and_return(
+        Logger& logger,
+        ProControllerContext& context,
+        uint8_t pp0[4], uint8_t pp1[4]
+    );
     // Fly from the Ace Trainer pair to Hearthome Pokecenter, heal and return.
     void fly_to_center_heal_and_return(
         Logger& logger, ProControllerContext& context,
