@@ -296,7 +296,7 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
 
         const MessageHeader* header = (const MessageHeader*)message.c_str();
 
-        m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, header);
+        m_message_loggers.log_recv(m_logger, GlobalSettings::instance().LOG_EVERYTHING, header);
 
         //  Now we can process the message.
         switch (header->opcode){

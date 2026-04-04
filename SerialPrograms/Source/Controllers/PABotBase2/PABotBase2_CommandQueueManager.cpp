@@ -50,13 +50,7 @@ void CommandQueueManager::wait_for_command_finish(uint8_t id){
             return;
         }
 
-        if (iter->second.empty()){
-            m_cv.wait(lg);
-            continue;
-        }
-
-        m_pending_commands.erase(iter);
-        return;
+        m_cv.wait(lg);
     }
 }
 
@@ -108,7 +102,10 @@ uint8_t CommandQueueManager::send_command(MessageHeader& command){
                 continue;
             }
 
-            m_pending_commands[command.id];
+            m_pending_commands.emplace(
+                command.id,
+                std::make_shared<CommandHandle>()
+            );
             m_command_seqnum++;
             break;
         }
@@ -127,7 +124,13 @@ void CommandQueueManager::report_command_finished(const MessageHeader& finished_
             m_logger.log("[MLC]: Received command finish for unknown ID: " + std::to_string(finished_message.id));
             return;
         }
-        iter->second = std::string((const char*)&finished_message, finished_message.message_bytes);
+        iter->second->finished = true;
+        memcpy(
+            &iter->second->device_timestamp,
+            &((const Message_u32&)finished_message).data,
+            sizeof(uint32_t)
+        );
+        m_pending_commands.erase(iter);
     }
     m_cv.notify_all();
 }

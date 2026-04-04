@@ -67,6 +67,7 @@ void SerialPABotBase_Controller::cancel_all_commands(){
     }
     m_serial->stop_all_commands();
     m_scheduler.clear_on_next();
+    m_logger.log("cancel_all_commands()", COLOR_DARKGREEN);
 }
 void SerialPABotBase_Controller::replace_on_next_command(){
     std::lock_guard<Mutex> lg(m_state_lock);
@@ -75,6 +76,7 @@ void SerialPABotBase_Controller::replace_on_next_command(){
     }
     m_serial->next_command_interrupt();
     m_scheduler.clear_on_next();
+    m_logger.log("replace_on_next_command()", COLOR_DARKGREEN);
 }
 
 
