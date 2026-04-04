@@ -58,6 +58,10 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
     font.setBold(true);
     m_button->setFont(font);
 
+    QFontMetrics metrics(m_button->font());
+    int minWidth = metrics.horizontalAdvance("Downloading...");
+    m_button->setMinimumWidth(minWidth);
+
     // Button should be disabled when in the middle of downloading
     // this status is stored within ResourceDownloadButton::m_enabled
     // when the button is clicked, m_enabled is set to false
@@ -121,7 +125,9 @@ void DownloadButtonWidget::update_UI_state(){
         m_button->setText("Download");
     }else{
         m_button->setEnabled(false);
-        m_button->setText("Downloading...");
+        if (m_value.row.get_button_state() == ButtonState::DOWNLOAD){
+            m_button->setText("Downloading...");
+        }
     }
 }
 
@@ -182,6 +188,10 @@ DeleteButtonWidget::DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& va
     m_button->setFont(font);
     m_button->setText("Delete");
 
+    QFontMetrics metrics(m_button->font());
+    int minWidth = metrics.horizontalAdvance("Deleting...");
+    m_button->setMinimumWidth(minWidth);
+
 
     // update the UI based on m_enabled, when the button is constructed
     update_UI_state();
@@ -214,7 +224,9 @@ void DeleteButtonWidget::update_UI_state(){
         m_button->setText("Delete");
     }else{
         m_button->setEnabled(false);
-        m_button->setText("Deleting...");
+        if (m_value.row.get_button_state() == ButtonState::DELETE){
+            m_button->setText("Deleting...");
+        }
     }
 }
 
@@ -266,6 +278,10 @@ CancelButtonWidget::CancelButtonWidget(QWidget& parent, ResourceCancelButton& va
     m_button->setFont(font);
     m_button->setText("Cancel");
 
+    QFontMetrics metrics(m_button->font());
+    int minWidth = metrics.horizontalAdvance("Cancelling...");
+    m_button->setMinimumWidth(minWidth);
+
     // update the UI based on m_enabled, when the button is constructed
     update_UI_state();
 
@@ -295,7 +311,9 @@ void CancelButtonWidget::update_UI_state(){
         m_button->setText("Cancel");
     }else{
         m_button->setEnabled(false);
-        m_button->setText("Cancelling...");
+        if (m_value.row.get_button_state() == ButtonState::CANCEL){
+            m_button->setText("Cancelling...");
+        }
     }
 }
 
