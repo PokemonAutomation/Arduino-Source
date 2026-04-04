@@ -84,6 +84,9 @@ public:
     ProgressBarWidget(QWidget& parent, ResourceProgressBar& value);
 
 private:
+    void update_UI_state();
+    
+private:
     ResourceProgressBar& m_value;
     QLabel* m_status_label;
     QProgressBar* m_progress_bar;

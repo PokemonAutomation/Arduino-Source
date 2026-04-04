@@ -11,6 +11,7 @@
 #include <QPointer>
 #include <QHBoxLayout>
 #include "CommonFramework/Logging/Logger.h"
+#include "Common/Cpp/Exceptions.h"
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "ResourceDownloadWidget.h"
@@ -337,7 +338,7 @@ ProgressBarWidget::ProgressBarWidget(QWidget& parent, ResourceProgressBar& value
             if (m_progress_bar->isHidden()) {
                 m_progress_bar->show(); // Make it visible when progress starts
             }
-            m_status_label->setText("Downloading:");
+            m_status_label->setText("Downloading");
             m_progress_bar->setValue(percentage_progress);
             // Simple Console Progress Bar
             // std::cout << "\rProgress: [" << std::string(percentage_progress / 5, '#') 
@@ -355,10 +356,49 @@ ProgressBarWidget::ProgressBarWidget(QWidget& parent, ResourceProgressBar& value
             if (m_progress_bar->isHidden()) {
                 m_progress_bar->show(); // Make it visible when progress starts
             }
-            m_status_label->setText("Unzipping:");
+            m_status_label->setText("Unzipping");
             m_progress_bar->setValue(percentage_progress);
         }
     ); 
+
+    // when button_state_updated, update the UI state to match
+    connect(
+        &m_value.row, &ResourceDownloadRow::button_state_updated,
+        this, [this](){
+            update_UI_state();
+        }
+    );
+    
+}
+
+
+void ProgressBarWidget::update_UI_state(){
+    ButtonState state = m_value.row.get_button_state();
+    switch (state){
+    case ButtonState::DOWNLOAD:
+        m_status_label->setText("Downloading");
+        if (m_progress_bar->isHidden()) {
+            m_progress_bar->show();
+        }
+        break;
+    case ButtonState::DELETE:
+        // m_status_label->setText("");
+        // m_progress_bar->hide();
+        m_progress_bar->setValue(0);
+        break;
+    case ButtonState::CANCEL:
+        // m_status_label->setText("");
+        // m_progress_bar->hide();
+        m_progress_bar->setValue(0);
+        break;
+    case ButtonState::READY:
+        m_status_label->setText("");
+        m_progress_bar->hide();
+        m_progress_bar->setValue(0);
+        break;
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "update_UI_state: Unknown enum.");  
+    }
 }
 
 

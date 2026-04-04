@@ -66,6 +66,8 @@ public:
     void start_delete();
 
     void update_button_state(ButtonState state);
+
+    inline ButtonState get_button_state(){ return m_button_state; }
     
 
 private:
