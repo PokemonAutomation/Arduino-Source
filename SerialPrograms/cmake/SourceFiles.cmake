@@ -1443,10 +1443,14 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.cpp
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.h
+    Source/PokemonFRLG/Inference/Menus/PokemonFRLG_PartyHeldItemDetector.cpp
+    Source/PokemonFRLG/Inference/Menus/PokemonFRLG_PartyHeldItemDetector.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.cpp
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h
     Source/PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.cpp
     Source/PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h
+    Source/PokemonFRLG/Inference/PokemonFRLG_BattleSelectionArrowDetector.cpp
+    Source/PokemonFRLG/Inference/PokemonFRLG_BattleSelectionArrowDetector.h
     Source/PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.cpp
     Source/PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.h
     Source/PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.cpp
@@ -1455,16 +1459,22 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/PokemonFRLG_DigitReader.h
     Source/PokemonFRLG/Inference/PokemonFRLG_StatsReader.cpp
     Source/PokemonFRLG/Inference/PokemonFRLG_StatsReader.h
+    Source/PokemonFRLG/Inference/PokemonFRLG_PokedexRegisteredDetector.cpp
+    Source/PokemonFRLG/Inference/PokemonFRLG_PokedexRegisteredDetector.h
     Source/PokemonFRLG/PokemonFRLG_Navigation.cpp
     Source/PokemonFRLG/PokemonFRLG_Navigation.h
     Source/PokemonFRLG/PokemonFRLG_Panels.cpp
     Source/PokemonFRLG/PokemonFRLG_Panels.h
     Source/PokemonFRLG/PokemonFRLG_Settings.cpp
     Source/PokemonFRLG/PokemonFRLG_Settings.h
+    Source/PokemonFRLG/Programs/Farming/PokemonFRLG_LuckyEggFarmer.cpp
+    Source/PokemonFRLG/Programs/Farming/PokemonFRLG_LuckyEggFarmer.h
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_NuggetBridgeFarmer.cpp
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_NuggetBridgeFarmer.h
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_PickupFarmer.cpp
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_PickupFarmer.h
+    Source/PokemonFRLG/Programs/PokemonFRLG_BattleMenuNavigation.cpp
+    Source/PokemonFRLG/Programs/PokemonFRLG_BattleMenuNavigation.h
     Source/PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.cpp
     Source/PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_GiftReset.cpp

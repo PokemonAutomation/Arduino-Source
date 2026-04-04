@@ -55,7 +55,11 @@ void leave_pokecenter(ConsoleHandle& console, ProControllerContext& context);
 void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context);
 
 // Starting from the start menu, a sub-screen of the start menu, or the overworld, navigate to the party screen
-void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context);
+enum class StartMenuContext {
+    STANDARD,
+    SAFARI_ZONE
+};
+void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context = StartMenuContext::STANDARD);
 
 // Go to home to check that scaling is 100%. Then resume game.
 void home_black_border_check(ConsoleHandle& console, ProControllerContext& context);
