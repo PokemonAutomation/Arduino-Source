@@ -50,6 +50,39 @@ ImageFloatBox get_pc_menu_option_box(PCMenuOption option, bool is_palette_town=f
     );
 }
 
+// Get the box location for the daily item type (paintable, recipe, none) in the shop menu based on the index (0-4)
+ImageFloatBox get_shop_daily_item_type_box(int item_index){
+    return ImageFloatBox(
+        SHOP_DAILY_ITEM_TYPE_BOX_1.x + item_index * SHOP_DAILY_ITEM_OFFSET.first,
+        SHOP_DAILY_ITEM_TYPE_BOX_1.y + item_index * SHOP_DAILY_ITEM_OFFSET.second,
+        SHOP_DAILY_ITEM_TYPE_BOX_1.width,
+        SHOP_DAILY_ITEM_TYPE_BOX_1.height
+    );
+}
+
+// Get the box location for the daily item coin icon in the shop menu based on the index (0-4)
+ImageFloatBox get_shop_daily_item_coin_icon_box(int item_index){
+    return ImageFloatBox(
+        SHOP_DAILY_ITEM_COIN_ICON_BOX_1.x + item_index * SHOP_DAILY_ITEM_OFFSET.first,
+        SHOP_DAILY_ITEM_COIN_ICON_BOX_1.y + item_index * SHOP_DAILY_ITEM_OFFSET.second,
+        SHOP_DAILY_ITEM_COIN_ICON_BOX_1.width,
+        SHOP_DAILY_ITEM_COIN_ICON_BOX_1.height
+    );
+}
+
+std::vector<ImageFloatBox> get_shop_daily_item_selection_boxes(){
+    std::vector<ImageFloatBox> boxes;
+    for (size_t i = 0; i < 5; i++){
+        boxes.emplace_back(
+            SHOP_DAILY_ITEM_SELECTOR_BOX_1.x + i * SHOP_DAILY_ITEM_OFFSET.first,
+            SHOP_DAILY_ITEM_SELECTOR_BOX_1.y + i * SHOP_DAILY_ITEM_OFFSET.second,
+            SHOP_DAILY_ITEM_SELECTOR_BOX_1.width,
+            SHOP_DAILY_ITEM_SELECTOR_BOX_1.height
+        );
+    }
+    return boxes;
+}
+
 // Interact when the A button prompt appears
 // Watches for the A button prompt and wait for it to clear
 bool interact_button_a_prompt(ConsoleHandle& console, ProControllerContext& context){
@@ -598,6 +631,68 @@ void continue_until_prompt(
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "continue_until_prompt() failed to detect prompt",
+            console
+        );
+    }
+}
+
+RecipeType item_is_recipe(ConsoleHandle& console, ProControllerContext& context, int item_index){
+    RecipeIconDetector recipe_icon_detector(
+        COLOR_YELLOW,
+        &console.overlay(),
+        get_shop_daily_item_type_box(item_index)
+    );
+    VideoSnapshot screen = console.video().snapshot();
+    if (recipe_icon_detector.detect(screen)){
+        console.log("Detected recipe icon for item " + std::to_string(item_index));
+        return recipe_icon_detector.recipe_type();
+    }
+    else{
+        console.log("No recipe icon detected for item " + std::to_string(item_index));
+        return RecipeType::NOT_RECIPE;
+    }
+}
+
+bool item_is_available(ConsoleHandle& console, ProControllerContext& context, int item_index){
+    CoinIconDetector coin_icon_detector(
+        COLOR_YELLOW,
+        &console.overlay(),
+        get_shop_daily_item_coin_icon_box(item_index)
+    );
+    VideoSnapshot screen = console.video().snapshot();
+    if (coin_icon_detector.detect(screen)){
+        console.log("Detected coin icon for item " + std::to_string(item_index) + ", item is available");
+        return true;
+    }
+    else{
+        console.log("No coin icon detected for item " + std::to_string(item_index) + ", item is not available");
+        return false;
+    }
+}
+
+void buy_item(ConsoleHandle& console, ProControllerContext& context, int item_index){
+    std::vector<ImageFloatBox> selection_boxes = get_shop_daily_item_selection_boxes();
+    SelectionArrowWatcher item_selector(
+        COLOR_YELLOW, &console.overlay(),
+        SelectionArrowType::DOWN,
+        selection_boxes[item_index]
+    );
+    generic_select_and_open(console, context, selection_boxes, item_index, SelectionArrowType::DOWN);
+
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [&](ProControllerContext& context){
+            for (int i = 0; i < 20; i++){
+                pbf_press_button(context, BUTTON_A, 160ms, 1500ms);
+            }
+        },
+        {item_selector}
+    );
+    if (ret != 0){
+        console.log("Failed to detect shop after purchase");
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "buy_item() failed to detect shop after purchase",
             console
         );
     }
