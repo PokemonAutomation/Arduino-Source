@@ -61,12 +61,16 @@ private:
     ReliableStreamConnectionPushing& m_connection;
     MessageLogger& m_message_loggers;
 
-    Mutex m_lock;
+    mutable Mutex m_lock;
     ConditionVariable m_cv;
     uint8_t m_command_queue_size = 4;
     uint8_t m_command_seqnum = 0;
 
-    std::map<uint8_t, std::string> m_pending_commands;
+    struct CommandHandle{
+        bool finished = false;
+        uint32_t device_timestamp = 0;
+    };
+    std::map<uint8_t, std::shared_ptr<CommandHandle>> m_pending_commands;
 };
 
 

@@ -119,6 +119,18 @@ std::string tostr(const PacketHeader* header){
         str += std::to_string(header->seqnum);
         str += ", data = " + std::to_string((int32_t)((const PacketHeader_u32*)header)->data);
         return str;
+    case PABB2_CONNECTION_OPCODE_INFO_BINARY:{
+        static const char HEX_DIGITS[] = "0123456789abcdef";
+        str += "PABB2_CONNECTION_OPCODE_INFO_BINARY:";
+        const uint8_t* ptr = (const uint8_t*)(header + 1);
+        size_t length = header->packet_bytes - sizeof(PacketHeader) - sizeof(uint32_t);
+        for (size_t c = 0; c < length; c++){
+            str += " ";
+            str += HEX_DIGITS[ptr[c] & 0xf];
+            str += HEX_DIGITS[ptr[c] >> 4];
+        }
+        return str;
+    }
     case PABB2_CONNECTION_OPCODE_INFO_STR:
         str += "PABB2_CONNECTION_OPCODE_INFO_STR: ";
         str += std::string(

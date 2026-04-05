@@ -348,6 +348,7 @@ void ReliableStreamConnection::on_packet(const PacketHeader* packet){
     case PABB2_CONNECTION_OPCODE_INFO_H32:
     case PABB2_CONNECTION_OPCODE_INFO_U32:
     case PABB2_CONNECTION_OPCODE_INFO_I32:
+    case PABB2_CONNECTION_OPCODE_INFO_BINARY:
     case PABB2_CONNECTION_OPCODE_INFO_STR:
     case PABB2_CONNECTION_OPCODE_INFO_LABEL_H32:
     case PABB2_CONNECTION_OPCODE_INFO_LABEL_U32:
@@ -359,7 +360,7 @@ void ReliableStreamConnection::on_packet(const PacketHeader* packet){
         return;
     default:
         m_logger.log(
-            "[RSC]: UNKNOWN OPCODE: Device send an unknown opcode: " + std::to_string(packet->opcode),
+            "[RSC]: UNKNOWN OPCODE: Device sent an unknown opcode: " + tostr_hex(packet->opcode),
             COLOR_RED
         );
         return;
