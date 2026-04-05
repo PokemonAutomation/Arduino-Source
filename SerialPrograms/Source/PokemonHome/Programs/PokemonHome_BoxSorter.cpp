@@ -49,6 +49,7 @@ language
 #include "PokemonHome/Inference/PokemonHome_ButtonDetector.h"
 #include "PokemonHome/Inference/PokemonHome_BoxGenderDetector.h"
 #include "PokemonHome/Inference/PokemonHome_BallReader.h"
+#include "PokemonHome/Inference/PokemonHome_TypeReader.h"
 #include "PokemonHome_BoxSorter.h"
 
 namespace PokemonAutomation{
@@ -401,6 +402,8 @@ void read_summary_screen(
     ImageFloatBox nature_box(0.157, 0.783, 0.212, 0.042); // Nature
     ImageFloatBox ability_box(0.158, 0.838, 0.213, 0.042); // Ability
     ImageFloatBox alpha_box(0.787, 0.095, 0.024, 0.046); // Alpha symbol
+    ImageFloatBox type_box(0.615, 0.240, 0.071, 0.057); // Type symbols
+
 
     video_overlay_set.add(COLOR_WHITE, national_dex_number_box);
     video_overlay_set.add(COLOR_BLUE, shiny_symbol_box);
@@ -461,7 +464,13 @@ void read_summary_screen(
         dump_image(env.console, ProgramInfo(), "ReadSummary_OT", screen);
     }
     cur_pokemon_info.ot_id = ot_id;
-    
+
+    TypeReader type_reader(type_box);
+    auto [type1, type2] = type_reader.read_types(screen);
+
+    cur_pokemon_info.type1 = type1;
+    cur_pokemon_info.type2 = type2;
+
     env.add_overlay_log(create_overlay_info(cur_pokemon_info));
     video_overlay_set.clear();
 

@@ -28,6 +28,7 @@
 #include "Pokemon/Pokemon_CollectedPokemonInfo.h"
 #include "PokemonHome/Inference/PokemonHome_BoxGenderDetector.h"
 #include "PokemonHome/Inference/PokemonHome_BallReader.h"
+#include "PokemonHome/Inference/PokemonHome_TypeReader.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h"
 #include "PokemonLZA/Resources/PokemonLZA_AvailablePokemon.h"
@@ -255,6 +256,7 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     BoxAlphaDetector alpha_detector(COLOR_RED, &env.console.overlay());
     SomethingInBoxCellDetector non_empty_detector(COLOR_BLUE, &env.console.overlay());
     BoxDexNumberDetector dex_number_detector(env.console);
+    PokemonHome::TypeReader type_reader(ImageFloatBox(0.467, 0.256, 0.110, 0.041));
 
     box_detector.make_overlays(video_overlay_set);
     shiny_detector.make_overlays(video_overlay_set);
@@ -319,6 +321,7 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                         name_slug = LUMIOSE_DEX_SLUGS()[dex_number-1];
                     }
                     
+                    auto [type1, type2] = type_reader.read_types(screen);
                     boxes_data.push_back(
                         CollectedPokemonInfo{
                             .preferences = &sort_preferences,
@@ -326,6 +329,8 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                             .name_slug = name_slug,
                             .shiny = shiny_detector.detect(screen),
                             .alpha = alpha_detector.detect(screen),
+                            .type1 = type1,
+                            .type2 = type2,
                         }
                         );
                     ss << "\u2705 " ;    //  checkbox

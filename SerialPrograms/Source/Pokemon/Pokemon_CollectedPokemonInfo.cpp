@@ -27,7 +27,9 @@ bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs
            lhs.alpha == rhs.alpha &&
            lhs.ball_slug == rhs.ball_slug &&
            lhs.gender == rhs.gender &&
-           lhs.ot_id == rhs.ot_id;
+           lhs.ot_id == rhs.ot_id &&
+           lhs.type1 == rhs.type1 &&
+           lhs.type2 == rhs.type2;
 }
 
 
@@ -73,6 +75,14 @@ bool operator<(const std::optional<CollectedPokemonInfo>& lhs, const std::option
                 return (lhs->gender < rhs->gender) != preference.reverse;
             }
             break;
+        case SortingRuleType::Type:
+            if (lhs->type1 != rhs->type1){
+                return (lhs->type1 < rhs->type1) != preference.reverse;
+            }
+            if (lhs->type2 != rhs->type2){
+                return (lhs->type2 < rhs->type2) != preference.reverse;
+            }
+            break;
         default:
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "unknown SortingRuleType");
         } // end switch
@@ -94,6 +104,8 @@ std::ostream& operator<<(std::ostream& os, const std::optional<CollectedPokemonI
         os << "ball:" << pokemon->ball_slug << " ";
         os << "gender:" << gender_to_string(pokemon->gender) << " ";
         os << "ot_id:" << pokemon->ot_id << " ";
+        os << "type1:" << POKEMON_TYPE_SLUGS().get_string(pokemon->type1) << " ";
+        os << "type2:" << POKEMON_TYPE_SLUGS().get_string(pokemon->type2) << " ";
         os << ")";
     }else{
         os << "(empty)";
@@ -144,6 +156,8 @@ void save_boxes_data_to_json(const std::vector<std::optional<CollectedPokemonInf
             pokemon["ball"] = current_pokemon->ball_slug;
             pokemon["gender"] = gender_to_string(current_pokemon->gender);
             pokemon["ot_id"] = current_pokemon->ot_id;
+            pokemon["type1"] = POKEMON_TYPE_SLUGS().get_string(current_pokemon->type1);
+            pokemon["type2"] = POKEMON_TYPE_SLUGS().get_string(current_pokemon->type2);
         }
         pokemon_data.push_back(std::move(pokemon));
     }
