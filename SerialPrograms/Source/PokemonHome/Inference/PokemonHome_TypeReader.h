@@ -9,7 +9,6 @@
 
 #include <utility>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Pokemon/Pokemon_Types.h"
 
 namespace PokemonAutomation{
@@ -28,7 +27,7 @@ public:
     std::pair<PokemonType, PokemonType> read_types(const ImageViewRGB32& screen) const;
 
 private:
-    OverlayBoxScope m_box;
+    ImageFloatBox m_box;
 };
 
 

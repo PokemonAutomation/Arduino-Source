@@ -187,8 +187,8 @@ static void find_type_candidates(
 
 
 
-TypeReader::TypeReader(VideoStream& stream, const ImageFloatBox& box)
-    : m_box(stream.overlay(), box)
+TypeReader::TypeReader(const ImageFloatBox& box)
+    : m_box(box)
 {}
 
 std::pair<PokemonType, PokemonType> TypeReader::read_types(const ImageViewRGB32& screen) const{
