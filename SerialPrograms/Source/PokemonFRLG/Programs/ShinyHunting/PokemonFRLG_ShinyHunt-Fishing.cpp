@@ -43,12 +43,6 @@ namespace NintendoSwitch {
 namespace PokemonFRLG {
 
 
-/*
-===============================================================================
-Descriptor
-Defines program metadata and statistics tracking.
-===============================================================================
-*/
 ShinyHuntFishing_Descriptor::ShinyHuntFishing_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonFRLG:ShinyHuntFishing",
@@ -80,12 +74,7 @@ struct ShinyHuntFishing_Descriptor::Stats : public StatsTracker {
 std::unique_ptr<StatsTracker>
 ShinyHuntFishing_Descriptor::make_stats() const {return std::make_unique<Stats>();}
 
-/*
-===============================================================================
-Constructor
-Defines user configurable options.
-===============================================================================
-*/
+
 ShinyHuntFishing::ShinyHuntFishing() : SingleSwitchProgramInstance()
 
     // Adaptive delay before pressing A after casting rod.
@@ -155,15 +144,6 @@ void ShinyHuntFishing::program(
     env.log("Performing initial autosave.");
     save_game_to_overworld(env.console, context);
 
-    /*Return to overworld after saving.*/
-    pbf_mash_button(context, BUTTON_B, 1000ms);
-
-    /*
-    ---------------------------------------------------------------------------
-    Detector initialization
-    These watchers monitor game state changes.
-    ---------------------------------------------------------------------------
-    */
     AdvanceWhiteDialogWatcher advance_dialog(COLOR_RED);
     WhiteDialogWatcher white_dialog(COLOR_RED);
     BlackScreenWatcher battle_entered(COLOR_RED);
