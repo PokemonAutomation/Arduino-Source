@@ -379,7 +379,7 @@ void CloudIslandReset::program(SingleSwitchProgramEnvironment& env, ProControlle
 
     DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
 
-    while (true){
+    while (NUM_RESETS != 0 && stats.resets < NUM_RESETS){
         delete_cloud_island_save(env, context);
         create_cloud_island_after_delete(env, context);
         stats.resets++;
@@ -388,7 +388,7 @@ void CloudIslandReset::program(SingleSwitchProgramEnvironment& env, ProControlle
         bool all_stamps_mew = add_todays_stamp(env, context);
 
         leave_cloud_island(env, context);
-        if (all_stamps_mew){
+        if (STOP_AFTER_CURRENT.should_stop() || all_stamps_mew){
             break;
         }
     }

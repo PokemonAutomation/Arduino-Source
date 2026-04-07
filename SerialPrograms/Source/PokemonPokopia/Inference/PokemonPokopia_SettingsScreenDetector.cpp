@@ -32,6 +32,7 @@ bool SettingsScreenDetector::detect(const ImageViewRGB32& screen){
 }
 
 
+
 }
 }
 }

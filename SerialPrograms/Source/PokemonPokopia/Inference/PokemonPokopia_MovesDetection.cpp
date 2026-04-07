@@ -38,11 +38,6 @@ bool OverworldDetector::detect(const ImageViewRGB32& screen){
 
 
 
-
-
-
-
-
 }
 }
 }

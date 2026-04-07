@@ -54,7 +54,6 @@ GameSettingsPanel::GameSettingsPanel(const GameSettings_Descriptor& descriptor)
 
 
 
-
 }
 }
 }

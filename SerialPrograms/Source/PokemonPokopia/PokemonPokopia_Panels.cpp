@@ -46,7 +46,6 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
 
 
-
 }
 }
 }

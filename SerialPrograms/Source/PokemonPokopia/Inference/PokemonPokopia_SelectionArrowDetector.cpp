@@ -105,11 +105,6 @@ bool SelectionArrowDetector::detect(const ImageViewRGB32& screen){
 
 
 
-
-
-
-
-
 }
 }
 }

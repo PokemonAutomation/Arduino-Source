@@ -708,6 +708,8 @@ void move_to_next_stamp(ConsoleHandle& console, ProControllerContext& context, S
     );
 }
 
+
+
 }
 }
 }

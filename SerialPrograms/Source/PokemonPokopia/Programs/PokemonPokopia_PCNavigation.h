@@ -169,6 +169,8 @@ void move_to_next_stamp(
     SelectionArrowWatcher& replace_stamp_selection_watcher
 );
 
+
+
 }
 }
 }

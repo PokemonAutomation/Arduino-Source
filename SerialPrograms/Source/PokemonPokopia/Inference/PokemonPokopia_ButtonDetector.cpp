@@ -147,23 +147,6 @@ bool ButtonDetector::detect(const ImageViewRGB32& screen){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 }
 }
