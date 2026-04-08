@@ -1,9 +1,9 @@
 # SerialPrograms API Documentation
 
-[<img src="https://canary.discordapp.com/api/guilds/695809740428673034/widget.png?style=banner2">](https://discord.gg/cQ4gWxN)
-
 > [!WARNING]
 > This API is still under development and not all features are fully implemented.
+
+[<img src="https://canary.discordapp.com/api/guilds/695809740428673034/widget.png?style=banner2">](https://discord.gg/cQ4gWxN)
 
 ## Configuration
 
