@@ -30,13 +30,13 @@ public:
     virtual QSize sizeHint() const override;
 
 private:
-    void add(std::unique_ptr<PanelListDescriptor> list);
+    void add(PanelListDescriptor* list);
     void change_list(int index);
 
 private:
     PanelHolder& m_holder;
 
-    std::vector<std::unique_ptr<PanelListDescriptor>> m_lists;
+    std::vector<PanelListDescriptor*> m_lists;
     std::map<std::string, int> m_tab_map;
 
     QComboBox* m_dropdown;

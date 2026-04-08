@@ -21,6 +21,9 @@ inline void init_server(){
         HTTPServer& httpServer = HTTPServer::instance();
         httpServer.start(8080);
 
+        // Register all HTTP routes
+        register_program_routes();
+
         // Start WebSocket Server
         WSServer& wsServer = WSServer::instance();
         wsServer.start(8081);

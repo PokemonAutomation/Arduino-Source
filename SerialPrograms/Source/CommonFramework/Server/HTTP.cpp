@@ -66,6 +66,7 @@ namespace PokemonAutomation
 
         void HTTPServer::addRoute(
             const QString& path,
+            QHttpServerRequest::Method method,
             std::function<void(const QHttpServerRequest&, QHttpServerResponder&)> handler
         )
         {
@@ -75,7 +76,7 @@ namespace PokemonAutomation
                 return;
             }
 
-            m_server->route(path, [handler](const QHttpServerRequest& req, QHttpServerResponder& res)
+            m_server->route(path, method, [handler](const QHttpServerRequest& req, QHttpServerResponder& res)
             {
                 handler(req, res);
             });

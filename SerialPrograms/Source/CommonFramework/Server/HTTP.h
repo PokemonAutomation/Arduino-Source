@@ -31,12 +31,14 @@ namespace PokemonAutomation
 
             void addRoute(
                 const QString& path,
+                QHttpServerRequest::Method method,
                 std::function<void(const QHttpServerRequest&, QHttpServerResponder&)> handler
             );
 
             template <typename... Args, typename Handler>
             void addRoute(
                 const QString& path,
+                QHttpServerRequest::Method method,
                 Handler&& handler
             )
             {
@@ -46,7 +48,7 @@ namespace PokemonAutomation
                     return;
                 }
 
-                m_server->route(path, std::forward<Handler>(handler));
+                m_server->route(path, method, std::forward<Handler>(handler));
             }
 
         private:

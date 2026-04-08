@@ -454,6 +454,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Panels/PanelInstance.cpp
     Source/CommonFramework/Panels/PanelInstance.h
     Source/CommonFramework/Panels/PanelList.cpp
+    Source/CommonFramework/Panels/ProgramRegistry.cpp
+    Source/CommonFramework/Panels/ProgramRegistry.h
     Source/CommonFramework/Panels/PanelList.h
     Source/CommonFramework/Panels/PanelTools.h
     Source/CommonFramework/Panels/ProgramDescriptor.cpp
@@ -490,6 +492,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Server/Sockets/VideoWS.h
     Source/CommonFramework/Server/HTTP.cpp
     Source/CommonFramework/Server/HTTP.h
+    Source/CommonFramework/Server/Routes/ProgramRoutes.cpp
+    Source/CommonFramework/Server/Routes/ProgramRoutes.h
     Source/CommonFramework/Server/WebSocket.cpp
     Source/CommonFramework/Server/Websocket.h
     Source/CommonFramework/Startup/NewVersionCheck.cpp
