@@ -116,7 +116,7 @@ stages:
           compiler: 'MSVC'
           qt_version: '6.10.2'
           qt_version_major: '6'
-          qt_modules: 'qtserialport qtmultimedia'
+          qt_modules: 'qtserialport qtmultimedia qthttpserver qtwebsockets'
           cmake_preset: 'RelWithDebInfo'
           cmake_version_params: '-DVERSION_MAJOR=${{ parameters.versionMajor }} -DVERSION_MINOR=${{ parameters.versionMinor }} -DVERSION_PATCH=${{ parameters.versionPatch }} -DIS_BETA=${{ lower(eq(parameters.buildType, ''PrivateBeta'')) }}'
           cmake_additional_param: '-DCMAKE_PREFIX_PATH=C:/Qt/$(qt_version)/msvc2022_64/lib/cmake -DIS_AZURE_BUILD=TRUE'
@@ -305,7 +305,7 @@ stages:
           compiler: 'GCC'
           qt_version: '6.10.2'
           qt_version_major: '6'
-          qt_modules: 'qtserialport qtmultimedia'
+          qt_modules: 'qtserialport qtmultimedia qthttpserver qtwebsockets'
           cmake_preset: 'RelWithDebInfo'
           linux_path: '/opt/Qt/$(qt_version)/gcc_64/lib/cmake:/opt/Qt/$(qt_version)/gcc_64/bin:/opt/Qt/$(qt_version)/gcc_64/plugins:$PATH'
           cmake_version_params: '-DVERSION_MAJOR=${{ parameters.versionMajor }} -DVERSION_MINOR=${{ parameters.versionMinor }} -DVERSION_PATCH=${{ parameters.versionPatch }} -DIS_BETA=${{ lower(eq(parameters.buildType, ''PrivateBeta'')) }}'
@@ -470,7 +470,7 @@ stages:
     compiler: Clang
     qt_version: '6.10.2'
     qt_version_major: '6'
-    qt_modules: 'qtserialport qtmultimedia'
+    qt_modules: 'qtserialport qtmultimedia qthttpserver qtwebsockets'
     cmake_preset: RelWithDebInfo
     macos_path: '/opt/Qt/6.10.2/macos/lib/cmake:/opt/Qt/6.10.2/macos/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew:$PATH'
     cmake_version_params: '-DVERSION_MAJOR=${{ parameters.versionMajor }} -DVERSION_MINOR=${{ parameters.versionMinor }} -DVERSION_PATCH=${{ parameters.versionPatch }} -DIS_BETA=${{ lower(eq(parameters.buildType, ''PrivateBeta'')) }}'
@@ -492,7 +492,7 @@ stages:
     compiler: Clang
     qt_version: '6.10.2'
     qt_version_major: '6'
-    qt_modules: 'qtserialport qtmultimedia'
+    qt_modules: 'qtserialport qtmultimedia qthttpserver qtwebsockets'
     cmake_preset: RelWithDebInfo
     macos_path: '/usr/local/Qt/6.10.2/macos/lib/cmake:/usr/local/Qt/6.10.2/macos/bin:/usr/local/bin:/usr/local/sbin:/usr/local:$PATH'
     cmake_version_params: '-DVERSION_MAJOR=${{ parameters.versionMajor }} -DVERSION_MINOR=${{ parameters.versionMinor }} -DVERSION_PATCH=${{ parameters.versionPatch }} -DIS_BETA=${{ lower(eq(parameters.buildType, ''PrivateBeta'')) }}'
