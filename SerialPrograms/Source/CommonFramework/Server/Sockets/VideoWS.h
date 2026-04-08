@@ -24,6 +24,7 @@ namespace PokemonAutomation
                 return instance;
             }
 
+            // Send frames to all connected clients
             virtual void on_frame(std::shared_ptr<const VideoFrame> frame) override
             {
                 if (WSServer::instance().hasClients())

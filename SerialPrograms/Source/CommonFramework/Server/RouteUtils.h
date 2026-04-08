@@ -16,13 +16,14 @@ namespace Server{
 
 inline QString to_slug(const std::string& name) {
     QString slug = QString::fromStdString(name);
-    // Normalize to NFD (Decomposition) to separate accents from base characters
+    // Normalise to NFD (Decomposition) to remove accents (é to e, etc...)
     slug = slug.normalized(QString::NormalizationForm_D);
-    // Remove Non-Spacing Mark characters (diacritics)
     slug.remove(QRegularExpression("\\p{M}"));
-    // Back to NFC for any further processing if needed, though not strictly required for slugification
+
+    // Back to NFC for any further processing if needed, though not strictly required
     slug = slug.normalized(QString::NormalizationForm_C);
-    
+
+    // Reformat non-alphanumeric characters so "Program (1.0.0)" -> "program-1-0-0"
     slug = slug.toLower();
     slug.replace(QRegularExpression("[^a-z0-9]"), "-");
     while (slug.contains("--")) {

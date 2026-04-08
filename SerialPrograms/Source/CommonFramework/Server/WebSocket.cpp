@@ -73,7 +73,6 @@ namespace PokemonAutomation
             emit serverStopped();
         }
 
-        // Called when a new client connects
         void WSServer::clientConnection()
         {
             QWebSocket* client = m_server->nextPendingConnection();
@@ -88,7 +87,6 @@ namespace PokemonAutomation
             emit clientConnected(client);
         }
 
-        // Called when a client disconnects
         void WSServer::clientDisconnection()
         {
             QWebSocket* client = qobject_cast<QWebSocket*>(sender());
@@ -102,7 +100,6 @@ namespace PokemonAutomation
             emit clientDisconnected(client);
         }
 
-        // Handle text messages from clients
         void WSServer::handleMessage(const QString& message)
         {
             QWebSocket* client = qobject_cast<QWebSocket*>(sender());
@@ -111,7 +108,6 @@ namespace PokemonAutomation
             emit messageReceived(client, message);
         }
 
-        // Handle binary messages from clients
         void WSServer::handleBinary(const QByteArray& data)
         {
             QWebSocket* client = qobject_cast<QWebSocket*>(sender());
@@ -120,7 +116,7 @@ namespace PokemonAutomation
             emit binaryReceived(client, data);
         }
 
-        // Send text message to a specific client
+        // Send text message to a specific client - Currently not much use for this, but still here just incase
         void WSServer::send_message(QWebSocket* client, const QString& message)
         {
             if (!client) return;
@@ -132,7 +128,7 @@ namespace PokemonAutomation
             }, Qt::QueuedConnection);
         }
 
-        // Send binary message to a specific client
+        // Send binary message to a specific client - Currently not much use for this, but still here just incase
         void WSServer::send_binary(QWebSocket* client, const QByteArray& data)
         {
             if (!client) return;
