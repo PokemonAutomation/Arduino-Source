@@ -242,7 +242,7 @@ GlobalSettings::GlobalSettings()
         "", ""
     )
     , ENABLE_API(
-        "<b>Enable API:</b><br>"
+        "<b>Enable API (experimental):</b><br>"
         "Enable the HTTP API to control the program remotely."
         "You must restart the program for it to take effect.",
         LockMode::UNLOCK_WHILE_RUNNING,
