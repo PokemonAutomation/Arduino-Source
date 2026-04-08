@@ -133,7 +133,7 @@ void unzip_file(
     // zip_archive holds the state and metadata of the ZIP archive.
     if (!mz_zip_reader_init_file(&zip_archive, zip_path, 0)){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, 
-            "unzip_file: failed to run mz_zip_reader_init_file. mz_zip_error: " + mz_zip_get_last_error(&zip_archive));
+            "unzip_file: failed to run mz_zip_reader_init_file. mz_zip_error: " + std::to_string(mz_zip_get_last_error(&zip_archive)));
     } 
 
     // This automatically calls mz_zip_reader_end when this function exits for any reason.

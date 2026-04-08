@@ -104,7 +104,7 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
     // this connect handles all exception_caught() emitted by ResourceDownloadRow
     connect(
         &m_value.row, &ResourceDownloadRow::exception_caught,
-        this, [this](std::string function_name){
+        this, [](std::string function_name){
             show_error_box(function_name);
         }
     );
@@ -112,7 +112,7 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
     // if download fails
     connect(
         &m_value.row, &ResourceDownloadRow::download_failed,
-        this, [this](){
+        this, [](){
             show_download_failed_box();
         }
     );
