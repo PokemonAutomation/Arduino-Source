@@ -28,6 +28,7 @@ public:
     bool enabled() const{ return m_enabled; }
 
     PanelListWidget* make_QWidget(QWidget& parent, PanelHolder& holder) const;
+    std::vector<PanelEntry> get_panels() const { return make_panels(); }
 
 protected:
     virtual std::vector<PanelEntry> make_panels() const = 0;
