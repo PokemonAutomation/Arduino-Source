@@ -87,6 +87,7 @@ MaxLairBossFinder::MaxLairBossFinder()
 
     PA_ADD_OPTION(CONSOLES);
     PA_ADD_OPTION(BOSS_LIST);
+    PA_ADD_OPTION(NON_BOSS_LIST);
     PA_ADD_OPTION(HOSTING);
 
     PA_ADD_OPTION(TOUCH_DATE_INTERVAL);
@@ -119,9 +120,10 @@ void MaxLairBossFinder::update_active_consoles(size_t switch_count){
 
 class EndBattleDecider_BossFinder : public EndBattleDecider{
 public:
-    EndBattleDecider_BossFinder(const Consoles& consoles, const BossActionTable& boss_list)
+    EndBattleDecider_BossFinder(const Consoles& consoles, const BossActionTable& boss_list, NonBossActionTable& non_boss_list)
         : m_consoles(consoles)
         , m_boss_list(boss_list)
+        , m_non_boss_list(non_boss_list)
     {}
     virtual const std::string& normal_ball(
         size_t console_index
@@ -151,6 +153,28 @@ public:
         }
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid enum.");
     }
+    virtual bool stop_for_non_boss(const std::string& slug) const override {
+        for (const StaticTableRow* row : m_non_boss_list.table()) {
+            const NonBossActionRow* nb_row = static_cast<const NonBossActionRow*>(row);
+            
+            const std::string& row_slug = nb_row->slug();
+            
+            // Exact match
+            if (slug == row_slug) {
+                return nb_row->action == NonBossAction::STOP_PROGRAM;
+            }
+            
+            // If it has a specific variant, match any OCR slug that starts with it and has a hyphen (a form)
+            if (row_slug.find('-') == std::string::npos) {
+                if (slug.size() > row_slug.size() &&
+                    slug.substr(0, row_slug.size()) == row_slug &&
+                    slug[row_slug.size()] == '-') {
+                    return nb_row->action == NonBossAction::STOP_PROGRAM;
+                }
+            }
+        }
+        return false;
+    }
 
 
 private:
@@ -171,6 +195,7 @@ private:
 
     const Consoles& m_consoles;
     const BossActionTable& m_boss_list;
+    const NonBossActionTable& m_non_boss_list;
 
 };
 
@@ -194,7 +219,7 @@ void MaxLairBossFinder::program(MultiSwitchProgramEnvironment& env, CancellableS
         }
     });
 
-    EndBattleDecider_BossFinder decider(CONSOLES, BOSS_LIST);
+    EndBattleDecider_BossFinder decider(CONSOLES, BOSS_LIST, NON_BOSS_LIST);
 
     loop_adventures(
         env, scope, CONSOLES,

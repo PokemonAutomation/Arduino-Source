@@ -2463,6 +2463,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Consoles.h
     Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Hosting.cpp
     Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Hosting.h
+    Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_NonBossAction.cpp
+    Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_NonBossAction.h
     Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_BossFinder.cpp
     Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_BossFinder.h
     Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_Standard.cpp
