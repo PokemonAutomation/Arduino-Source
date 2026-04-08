@@ -38,6 +38,7 @@ public:
 signals:
     void download_progress(int percentage);
     void unzip_progress(int percentage);
+    void hash_progress(int percentage);
 
     void metadata_fetch_finished(std::string popup_message);
     void exception_caught(std::string function_name);
