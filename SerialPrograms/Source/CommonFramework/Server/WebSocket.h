@@ -42,6 +42,10 @@ namespace PokemonAutomation
             void send_message(QWebSocket* client, const QString& message);
             void send_binary(QWebSocket* client, const QByteArray& data);
 
+            // Clients
+            int clientCount() const { return m_clients.size(); }
+            bool hasClients() const { return !m_clients.isEmpty(); }
+
         signals:
             void clientConnected(QWebSocket* client);
             void clientDisconnected(QWebSocket* client);

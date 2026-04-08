@@ -12,6 +12,7 @@
 #include "VideoSources/VideoSource_Null.h"
 #include "VideoSession.h"
 #include "CommonFramework/Server/WebSocket.h"
+#include "CommonFramework/Server/Sockets/VideoWS.h"
 
 //#include <iostream>
 //using std::cout;
@@ -43,6 +44,7 @@ void VideoSession::remove_frame_listener(VideoFrameListener& listener){
 
 
 bool VideoSession::try_shutdown(){
+    remove_frame_listener(Server::VideoWSServer::instance());
     if (m_video_source){
         m_video_source->remove_source_frame_listener(*this);
         m_video_source->remove_rendered_frame_listener(*this);
@@ -61,6 +63,7 @@ VideoSession::VideoSession(Logger& logger, VideoSourceOption& option)
     , m_option(option)
     , m_descriptor(std::make_unique<VideoSourceDescriptor_Null>())
 {
+    add_frame_listener(Server::VideoWSServer::instance());
     uint8_t watchdog_timeout = GlobalSettings::instance().VIDEO_PIPELINE->AUTO_RESET_SECONDS;
     if (watchdog_timeout != 0){
         global_watchdog().add(*this, std::chrono::seconds(watchdog_timeout));
@@ -339,8 +342,6 @@ void VideoSession::on_frame(std::shared_ptr<const VideoFrame> frame){
         m_fps_tracker_source.push_event(frame->timestamp);
     }
     global_watchdog().delay(*this);
-    QByteArray frameData = frame_to_jpeg(*frame);
-    Server::WSServer::instance().send_binary(frameData);
 }
 void VideoSession::on_rendered_frame(WallClock timestamp){
     WriteSpinLock lg(m_fps_lock);

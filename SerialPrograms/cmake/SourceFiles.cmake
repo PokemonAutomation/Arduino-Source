@@ -487,6 +487,7 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Recording/StreamHistoryTracker_SaveFrames.h
     Source/CommonFramework/Recording/StreamRecorder.cpp
     Source/CommonFramework/Recording/StreamRecorder.h
+    Source/CommonFramework/Server/Sockets/VideoWS.h
     Source/CommonFramework/Server/HTTP.cpp
     Source/CommonFramework/Server/HTTP.h
     Source/CommonFramework/Server/WebSocket.cpp
