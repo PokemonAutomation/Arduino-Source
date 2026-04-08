@@ -217,7 +217,7 @@ void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& contex
 
         int ret5 = wait_until(
             console, context,
-            std::chrono::seconds(1),
+            std::chrono::seconds(2),
             {
                 save_confirm_arrow
             }
