@@ -6,6 +6,7 @@
 
 #include "CommonFramework/Globals.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
+#include "Common/Cpp/PrettyPrint.h"
 // #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
@@ -13,6 +14,7 @@
 #include "CommonFramework/Tools/FileDownloader.h"
 #include "CommonFramework/Tools/FileUnzip.h"
 #include "CommonFramework/Tools/FileHash.h"
+#include "Common/Cpp/Filesystem.h"
 #include "CommonFramework/Options/LabelCellOption.h"
 // #include "ResourceDownloadTable.h"
 #include "ResourceDownloadRow.h"
@@ -65,7 +67,7 @@ struct ResourceDownloadRow::Data{
     )
         : m_resource_name(LockMode::LOCK_WHILE_RUNNING, resource_name)
         , m_file_size(file_size)
-        , m_file_size_label(LockMode::LOCK_WHILE_RUNNING, std::to_string(file_size))
+        , m_file_size_label(LockMode::LOCK_WHILE_RUNNING, tostr_bytes(file_size))
         , m_is_downloaded(is_downloaded)
         , m_is_downloaded_label(LockMode::LOCK_WHILE_RUNNING, is_downloaded_string(is_downloaded))
         , m_version_num(version_num)
@@ -351,6 +353,9 @@ void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metad
             throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
                 "Downloaded file failed verification. SHA 256 hash did not match the expected value.");
         }
+
+        // Filesystem::Path p{zip_path};
+        // cout << "File size: " << std::filesystem::file_size(p) << endl;
 
         // unzip
         unzip_file(
