@@ -158,6 +158,7 @@ The WebSocket server broadcasts real-time video frames from the capture card. Th
 
 ### Text Messages
 
+The logs shown in the Output Window are sent as text messages.
+
 > [!WARNING] 
 > Not yet implemented.
-> Logs will be sent as text messages.
