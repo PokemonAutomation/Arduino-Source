@@ -10,6 +10,7 @@
 #pragma once
 
 #include <QtHttpServer/QtHttpServer>
+#include <QtHttpServer/QHttpServerRouterRule>
 #include "CommonFramework/Logging/Logger.h"
 
 

@@ -4,6 +4,7 @@
  *
  */
 
+#include <QtHttpServer/QHttpServerRouterRule>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
