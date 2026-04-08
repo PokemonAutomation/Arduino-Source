@@ -242,7 +242,7 @@ std::string ResourceDownloadRow::predownload_warning_summary(RemoteMetadata& rem
         size_t compressed_size = remote_metadata.size_compressed_bytes;
         size_t decompressed_size = remote_metadata.size_decompressed_bytes;
 
-        std::string disk_space_requirement = "This will require " + std::to_string(decompressed_size + compressed_size) + " bytes of free space";
+        std::string disk_space_requirement = "This will require " + tostr_bytes(decompressed_size + compressed_size) + " of free space";
 
         if (local_version_num < remote_version_num){
             predownload_warning = "The resource you are downloading is a more updated version than the program expects. "
@@ -350,6 +350,7 @@ void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metad
             );
         std::string expected_hash = resource_metadata.sha_256;
         if (hash != expected_hash){
+            std::cerr << "current hash: " << hash << endl;
             throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
                 "Downloaded file failed verification. SHA 256 hash did not match the expected value.");
         }
@@ -389,6 +390,15 @@ void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metad
         set_version_status(ResourceVersionStatus::NOT_APPLICABLE);
 
         throw e;
+    }catch(...){
+        // delete directory and the resource
+        fs::remove_all(resource_directory);
+
+        // update the table labels
+        set_is_downloaded(false);
+        set_version_status(ResourceVersionStatus::NOT_APPLICABLE);
+
+        throw;
     }
 
 }
