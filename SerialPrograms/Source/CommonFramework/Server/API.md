@@ -24,10 +24,6 @@
 > [!TIP]
 > Sending a POST request to either the global settings or a program's settings will not update the setting if the relevant panel is currently open in the desktop application.
 
-### Connection
-
-- **URL:** `http://localhost:{HTTP Port}`
-
 ---
 
 ### Settings
@@ -145,10 +141,6 @@ Updates the configuration options for a specific program. Only the provided fiel
 ---
 
 ## WebSocket
-
-### Connection
-
-- **URL:** `ws://localhost:{WebSocket Port}`
 
 ---
 
