@@ -49,6 +49,7 @@ std::vector<DownloadedResourceMetadata> deserialize_resource_list_json(const Jso
             size_t compressed_bytes = (size_t)resource_obj.get_integer_throw("CompressedBytes");
             size_t decompressed_bytes = (size_t)resource_obj.get_integer_throw("DecompressedBytes");
             std::string url = resource_obj.get_string_throw("URL");
+            std::string sha_256 = resource_obj.get_string_throw("SHA_256");
 
             DownloadedResourceMetadata resource = {
                 resource_name,
@@ -56,7 +57,8 @@ std::vector<DownloadedResourceMetadata> deserialize_resource_list_json(const Jso
                 resource_type,
                 compressed_bytes,
                 decompressed_bytes,
-                url
+                url,
+                sha_256
             };
 
             resources.emplace_back(std::move(resource));
@@ -64,7 +66,9 @@ std::vector<DownloadedResourceMetadata> deserialize_resource_list_json(const Jso
         }
 
     }catch (ParseException&){
-        throw ParseException("JSON parsing error. Given JSON file doesn't match the expected format.");
+        std::cerr << "JSON parsing error. Given JSON file doesn't match the expected format." << endl;
+        // throw ParseException("JSON parsing error. Given JSON file doesn't match the expected format.");
+        return std::vector<DownloadedResourceMetadata>();
     }
 
     return resources;
@@ -72,6 +76,7 @@ std::vector<DownloadedResourceMetadata> deserialize_resource_list_json(const Jso
 
 
 const std::vector<DownloadedResourceMetadata>& local_resource_download_list(){
+    // cout << "local_resource_download_list" << endl;
 	static std::vector<DownloadedResourceMetadata> local_resources = deserialize_resource_list_json(load_json_file(RESOURCE_PATH() + "ResourceDownloadList.json"));
 
 	return local_resources;
@@ -96,6 +101,7 @@ const JsonValue& remote_resource_download_list_json(){
 }
 
 const std::vector<DownloadedResourceMetadata>& remote_resource_download_list(){
+    // cout << "remote_resource_download_list" << endl;
 	static std::vector<DownloadedResourceMetadata> remote_resources = deserialize_resource_list_json(remote_resource_download_list_json());
 
 	return remote_resources;

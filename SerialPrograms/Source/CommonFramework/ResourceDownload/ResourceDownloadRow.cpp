@@ -338,6 +338,7 @@ void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metad
             }
         );
 
+        // hash
         std::string hash = 
             hash_file(
                 zip_path,
@@ -345,7 +346,11 @@ void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metad
                     hash_progress(percentage_progress);
                 }
             );
-        cout << hash << endl;
+        std::string expected_hash = resource_metadata.sha_256;
+        if (hash != expected_hash){
+            throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+                "Downloaded file failed verification. SHA 256 hash did not match the expected value.");
+        }
 
         // unzip
         unzip_file(

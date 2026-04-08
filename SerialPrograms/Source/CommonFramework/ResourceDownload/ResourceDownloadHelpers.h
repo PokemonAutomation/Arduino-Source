@@ -29,6 +29,7 @@ struct DownloadedResourceMetadata{
     size_t size_compressed_bytes;
     size_t size_decompressed_bytes;
     std::string url;
+    std::string sha_256;
 };
 
 enum class ResourceVersionStatus{
