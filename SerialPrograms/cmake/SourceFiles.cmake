@@ -1437,6 +1437,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h
     Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.cpp
     Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.h
+    Source/PokemonFRLG/Inference/Map/PokemonFRLG_MapDetector.cpp
+    Source/PokemonFRLG/Inference/Map/PokemonFRLG_MapDetector.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.cpp
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.cpp
