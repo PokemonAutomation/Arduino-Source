@@ -37,8 +37,7 @@
 #include "ControllerInput/ControllerInput.h"
 #include "Integrations/DiscordWebhook.h"
 #include "Windows/MainWindow.h"
-#include "Server/HTTP.h"
-#include "Server/WebSocket.h"
+#include "Server/InitialiseServer.h"
 
 #include <iostream>
 using std::cout;
@@ -193,15 +192,8 @@ int run_program(int argc, char *argv[]){
     w.raise(); // bring the window to front on macOS
     set_permissions(w);
 
-    // Start HTTP API if enabled
-    if (GlobalSettings::instance().ENABLE_API)
-    {
-        Server::HTTPServer& httpServer = Server::HTTPServer::instance();
-        httpServer.start(8080);
-
-        Server::WSServer& wsServer = Server::WSServer::instance();
-        wsServer.start(8081);
-    }
+    // Start HTTP/WS Server if enabled
+    Server::init_server();
 
     return application.exec();
 }
