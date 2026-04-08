@@ -55,30 +55,31 @@ void CommandQueueManager::wait_for_command_finish(uint8_t id){
     }
 }
 
-void CommandQueueManager::send_cancel(){
+bool CommandQueueManager::send_cancel(WallDuration timeout){
+    MessageHeader message;
+    message.message_bytes = sizeof(MessageHeader);
+    message.opcode = PABB2_MESSAGE_OPCODE_CQ_CANCEL;
+    message.id = 0;
     {
         std::unique_lock<Mutex> lg(m_lock);
         m_pending_commands.clear();
-        MessageHeader message;
-        message.message_bytes = sizeof(MessageHeader);
-        message.opcode = PABB2_MESSAGE_OPCODE_CQ_CANCEL;
-        message.id = 0;
-        m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &message);
-        m_connection.reliable_send(&message, message.message_bytes);
     }
+    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &message);
+    size_t bytes_sent = m_connection.reliable_send(&message, message.message_bytes, timeout);
     m_cv.notify_all();
+    return bytes_sent == message.message_bytes;
 }
 void CommandQueueManager::send_replace_on_next(){
+    MessageHeader message;
+    message.message_bytes = sizeof(MessageHeader);
+    message.opcode = PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT;
+    message.id = 0;
     {
         std::unique_lock<Mutex> lg(m_lock);
         m_pending_commands.clear();
-        MessageHeader message;
-        message.message_bytes = sizeof(MessageHeader);
-        message.opcode = PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT;
-        message.id = 0;
-        m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &message);
-        m_connection.reliable_send(&message, message.message_bytes);
     }
+    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &message);
+    m_connection.reliable_send(&message, message.message_bytes);
     m_cv.notify_all();
 }
 
@@ -110,10 +111,9 @@ uint8_t CommandQueueManager::send_command(MessageHeader& command){
             m_command_seqnum++;
             break;
         }
-
-        m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &command);
-        m_connection.reliable_send(&command, command.message_bytes);
     }
+    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &command);
+    m_connection.reliable_send(&command, command.message_bytes);
     m_cv.notify_all();
     return command.id;
 }

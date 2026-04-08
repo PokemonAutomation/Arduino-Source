@@ -28,7 +28,7 @@ public:
         Logger& logger,
         CancellableScope& scope,
         ReliableStreamConnectionPushing& connection,
-        MessageLogger& message_loggers
+        const MessageLogger& message_loggers
     )
         : m_logger(logger)
         , m_connection(connection)
@@ -49,7 +49,7 @@ public:
     void wait_for_all();
     void wait_for_command_finish(uint8_t id);
 
-    void send_cancel();
+    bool send_cancel(WallDuration timeout = WallDuration::max());
     void send_replace_on_next();
 
     uint8_t send_command(MessageHeader& command);
@@ -59,7 +59,7 @@ public:
 private:
     Logger& m_logger;
     ReliableStreamConnectionPushing& m_connection;
-    MessageLogger& m_message_loggers;
+    const MessageLogger& m_message_loggers;
 
     mutable Mutex m_lock;
     ConditionVariable m_cv;

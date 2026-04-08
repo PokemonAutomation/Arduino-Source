@@ -41,7 +41,7 @@ ProController_SysbotBase3::~ProController_SysbotBase3(){
     m_connection.remove_listener(*this);
 }
 
-void ProController_SysbotBase3::cancel_all_commands(){
+bool ProController_SysbotBase3::cancel_all_commands(WallDuration timeout){
     std::lock_guard<Mutex> lg(m_state_lock);
     if (m_stopping){
         throw InvalidConnectionStateException("");
@@ -58,6 +58,7 @@ void ProController_SysbotBase3::cancel_all_commands(){
     m_scheduler.clear_on_next();
     m_cv.notify_all();
     m_logger.log("cancel_all_commands(): Command Queue Size = " + std::to_string(queued), COLOR_DARKGREEN);
+    return true;
 }
 void ProController_SysbotBase3::replace_on_next_command(){
     std::lock_guard<Mutex> lg(m_state_lock);

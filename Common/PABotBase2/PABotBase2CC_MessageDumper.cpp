@@ -456,7 +456,7 @@ MessageLogger::MessageLogger(){
     );
 }
 
-std::string MessageLogger::to_str(const MessageHeader* message){
+std::string MessageLogger::to_str(const MessageHeader* message) const{
     uint8_t opcode = message->opcode;
     auto iter = m_converters.find(opcode);
     if (iter == m_converters.end()){
@@ -469,7 +469,7 @@ void MessageLogger::log_send(
     bool always_log,
     const MessageHeader* message,
     Color color
-){
+) const{
     auto iter = m_converters.find(message->opcode);
     if (iter == m_converters.end()){
         logger.log(
@@ -490,7 +490,7 @@ void MessageLogger::log_recv(
     bool always_log,
     const MessageHeader* message,
     Color color
-){
+) const{
     auto iter = m_converters.find(message->opcode);
     if (iter == m_converters.end()){
         logger.log(

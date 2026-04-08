@@ -37,19 +37,19 @@ public:
         std::string(*tostr)(const MessageHeader*)
     );
 
-    std::string to_str(const MessageHeader* message);
+    std::string to_str(const MessageHeader* message) const;
     void log_send(
         Logger& logger,
         bool always_log,
         const MessageHeader* message,
         Color color = COLOR_DARKGREEN
-    );
+    ) const;
     void log_recv(
         Logger& logger,
         bool always_log,
         const MessageHeader* message,
         Color color = COLOR_PURPLE
-    );
+    ) const;
 
 
 private:
