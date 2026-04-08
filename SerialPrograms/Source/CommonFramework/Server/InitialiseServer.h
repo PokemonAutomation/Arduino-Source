@@ -10,6 +10,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Server/HTTP.h"
 #include "CommonFramework/Server/WebSocket.h"
+#include "CommonFramework/Options/Environment/APIOptions.h"
 #include "Routes/ProgramRoutes.h"
 #include "Routes/GlobalSettingsRoutes.h"
 
@@ -17,10 +18,10 @@ namespace PokemonAutomation{
 namespace Server{
 
 inline void init_server(){
-    if (GlobalSettings::instance().ENABLE_API){
+    if (GlobalSettings::instance().API->ENABLE_API){
         // Start HTTP Server
         HTTPServer& httpServer = HTTPServer::instance();
-        httpServer.start(8080);
+        httpServer.start(GlobalSettings::instance().API->HTTP_PORT);
 
         // Register all HTTP routes
         register_program_routes();
@@ -28,7 +29,7 @@ inline void init_server(){
 
         // Start WebSocket Server
         WSServer& wsServer = WSServer::instance();
-        wsServer.start(8081);
+        wsServer.start(GlobalSettings::instance().API->WS_PORT);
     }
 }
 

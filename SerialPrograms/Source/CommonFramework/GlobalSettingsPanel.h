@@ -37,6 +37,7 @@ class PerformanceOptions;
 class AudioPipelineOptions;
 class VideoPipelineOptions;
 class ErrorReportOption;
+class APIOptions;
 
 
 
@@ -156,7 +157,7 @@ public:
 
     StringOption DEVELOPER_TOKEN;
 
-    BooleanCheckBoxOption ENABLE_API;
+    Pimpl<APIOptions> API;
 
     // The mode that does not run Qt GUI, but instead runs some tests for
     // debugging, unit testing and developing purposes.

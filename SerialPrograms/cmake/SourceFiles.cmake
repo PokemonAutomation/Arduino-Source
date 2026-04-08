@@ -439,6 +439,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Options/Environment/SleepSuppressOption.h
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.h
+    Source/CommonFramework/Options/Environment/APIOptions.cpp
+    Source/CommonFramework/Options/Environment/APIOptions.h
     Source/CommonFramework/Options/LabelCellOption.cpp
     Source/CommonFramework/Options/LabelCellOption.h
     Source/CommonFramework/Options/QtWidget/LabelCellWidget.cpp

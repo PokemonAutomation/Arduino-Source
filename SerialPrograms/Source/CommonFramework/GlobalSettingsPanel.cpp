@@ -27,6 +27,7 @@
 #include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
 #include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "Integrations/DiscordSettingsOption.h"
+#include "CommonFramework/Options/Environment/APIOptions.h"
 //#include "CommonFramework/Environment/Environment.h"
 #include "GlobalSettingsPanel.h"
 
@@ -241,13 +242,7 @@ GlobalSettings::GlobalSettings()
         LockMode::LOCK_WHILE_RUNNING,
         "", ""
     )
-    , ENABLE_API(
-        "<b>Enable API (experimental):</b><br>"
-        "Enable the HTTP API to control the program remotely."
-        "You must restart the program for it to take effect.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
-    )
+    , API(CONSTRUCT_TOKEN)
 {
     PA_ADD_OPTION(OPEN_BASE_FOLDER_BUTTON);
     PA_ADD_OPTION(CHECK_FOR_UPDATES);
@@ -292,7 +287,7 @@ GlobalSettings::GlobalSettings()
 #endif
 
     PA_ADD_OPTION(DEVELOPER_TOKEN);
-    PA_ADD_OPTION(ENABLE_API);
+    PA_ADD_OPTION(API);
 
     GlobalSettings::on_config_value_changed(this);
     ENABLE_LIFETIME_SANITIZER0.add_listener(*this);
