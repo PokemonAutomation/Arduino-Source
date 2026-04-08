@@ -77,9 +77,9 @@ std::vector<DownloadedResourceMetadata> deserialize_resource_list_json(const Jso
 
 const std::vector<DownloadedResourceMetadata>& local_resource_download_list(){
     // cout << "local_resource_download_list" << endl;
-	static std::vector<DownloadedResourceMetadata> local_resources = deserialize_resource_list_json(load_json_file(RESOURCE_PATH() + "ResourceDownloadList.json"));
+    static std::vector<DownloadedResourceMetadata> local_resources = deserialize_resource_list_json(load_json_file(RESOURCE_PATH() + "ResourceDownloadList.json"));
 
-	return local_resources;
+    return local_resources;
 }
 
 
@@ -102,9 +102,9 @@ const JsonValue& remote_resource_download_list_json(){
 
 const std::vector<DownloadedResourceMetadata>& remote_resource_download_list(){
     // cout << "remote_resource_download_list" << endl;
-	static std::vector<DownloadedResourceMetadata> remote_resources = deserialize_resource_list_json(remote_resource_download_list_json());
+    static std::vector<DownloadedResourceMetadata> remote_resources = deserialize_resource_list_json(remote_resource_download_list_json());
 
-	return remote_resources;
+    return remote_resources;
 }
 
 std::optional<uint16_t> get_resource_version_num(Filesystem::Path folder_path){
