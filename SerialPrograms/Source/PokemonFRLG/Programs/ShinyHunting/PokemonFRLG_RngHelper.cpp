@@ -110,7 +110,7 @@ RngHelper::RngHelper()
     , LOAD_ADVANCES(
         "<b>Load Screen Advances (frames):</b><br>The number of frames to advance before loading the game.<br>These pass at the \"normal\" rate compared to other consoles.",
         LockMode::LOCK_WHILE_RUNNING,
-        1000, 200 // default, min
+        1000, 192 // default, min
     )
     , LOAD_CALIBRATION(
         "<b>Load Screen Advances Calibration (frames):</b><br>A \"fine adjustment\" that modifies the frame advances passed on the load screen.<br>",
@@ -120,7 +120,7 @@ RngHelper::RngHelper()
     , INGAME_ADVANCES(
         "<b>In-Game Advances (frames):</b><br>The number of frames to advance before triggering the gift/encounter.<br>These pass at double the rate compared to other consoles, where every 2nd frame is skipped.<br><i>Warning: this needs to be long enough to accomodate all in-game button presses prior to the gift/encounter</i>",
         LockMode::LOCK_WHILE_RUNNING,
-        12345, 700 // default, min
+        12345, 480 // default, min
     )
     , INGAME_CALIBRATION(
         "<b>In-Game Advances Calibration (frames):</b><br>A \"coarse adjustment\" that modifies the frame advances passed after loading the game.<br>",
@@ -432,15 +432,17 @@ void collect_togepi_egg_after_delay(SingleSwitchProgramEnvironment& env, ProCont
 }
 
 void encounter_static_after_delay(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& INGAME_DELAY){
-    if (INGAME_DELAY < 4000){
+    if (INGAME_DELAY < 5000){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Static Encounter: the in-game delay cannot be less than 4000ms (480 frames). Check your in-game advances and calibration.",
+            "Static Encounter: the in-game delay cannot be less than 5000ms (600 frames). Check your in-game advances and calibration.",
             env.console
         );
     }
-    // No dialogue to advance through -- just wait
-    pbf_wait(context, std::chrono::milliseconds(INGAME_DELAY - 4000));
+    // No dialogue to advance through -- just wait in the start menu (avoids extra RNG advances by boulders Mt Ember and Seafoam Islands)
+    pbf_press_button(context, BUTTON_PLUS, 200ms, 300ms);
+    pbf_wait(context, std::chrono::milliseconds(INGAME_DELAY - 5000)); // 4000ms + 1000ms
+    pbf_press_button(context, BUTTON_B, 200ms, 300ms);
     // Interact with the static encounter
     pbf_press_button(context, BUTTON_A, 200ms, 800ms);
     pbf_mash_button(context, BUTTON_A, 1000ms); // finishes dialog for the legendary birds
@@ -492,7 +494,7 @@ void encounter_hooh_after_delay(SingleSwitchProgramEnvironment& env, ProControll
     // No dialogue to advance through -- just wait
     pbf_wait(context, std::chrono::milliseconds(INGAME_DELAY - 4000));
     // Trigger the encounter (WALK UP)
-    pbf_move_left_joystick(context, {0, +1}, 200ms, 800ms);
+    pbf_move_left_joystick(context, {0, +1}, 800ms, 700ms);
     context.wait_for_all_requests();
     env.log("Ho-oh encounter started.");
 }
@@ -595,7 +597,7 @@ bool shiny_check_starter_summary(SingleSwitchProgramEnvironment& env, ProControl
     return shiny_checker.read(env.console.logger(), screen);
 }
 
-void go_to_sixth_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void go_to_last_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     // navigate to summary (last party slot)
     open_party_menu_from_overworld(env, context);
     pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
@@ -606,7 +608,7 @@ void go_to_sixth_summary(SingleSwitchProgramEnvironment& env, ProControllerConte
 }
 
 bool shiny_check_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    go_to_sixth_summary(env, context);
+    go_to_last_summary(env, context);
     context.wait_for_all_requests();
     VideoSnapshot screen = env.console.video().snapshot();
     ShinySymbolDetector shiny_checker(COLOR_YELLOW);
@@ -790,7 +792,7 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
         uint64_t TEACHY_TV_BUFFER = SAFARI_ZONE ? 12000 : 5000; // Safari zone targets need extra time to walk to the right position
 
-        bool should_use_teachy_tv = USE_TEACHY_TV && MODIFIED_INGAME_ADVANCES > TEACHY_TV_BUFFER; // don't use Teacy TV for short in-game advance targets
+        bool should_use_teachy_tv = USE_TEACHY_TV && MODIFIED_INGAME_ADVANCES > TEACHY_TV_BUFFER; // don't use Teachy TV for short in-game advance targets
         if (should_use_teachy_tv) {
             TEACHY_ADVANCES = uint64_t((int)std::floor((MODIFIED_INGAME_ADVANCES - TEACHY_TV_BUFFER) / 313) * 313);
         }
@@ -878,32 +880,27 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             break;
         case Target::staticencounter:
             encounter_static_after_delay(env, context, INGAME_DELAY);
-            shiny_found = shiny_check_summary(env, context);
+            shiny_found = watch_for_shiny_encounter(env, context) == 1;
             break;
         case Target::snorlax:
             encounter_snorlax_after_delay(env, context, INGAME_DELAY);
             shiny_found = watch_for_shiny_encounter(env, context) == 1;
-            context.wait_for_all_requests();
             break;
         case Target::mewtwo:
             encounter_mewtwo_after_delay(env, context, INGAME_DELAY);
             shiny_found = watch_for_shiny_encounter(env, context) == 1;
-            context.wait_for_all_requests();
             break;
         case Target::hooh:
             encounter_hooh_after_delay(env, context, INGAME_DELAY);
             shiny_found = watch_for_shiny_encounter(env, context) == 1;
-            context.wait_for_all_requests();
             break;
         case Target::hypno:
             encounter_hypno_after_delay(env, context, INGAME_DELAY);
             shiny_found = watch_for_shiny_encounter(env, context) == 1;
-            context.wait_for_all_requests();
             break;
         case Target::sweetscent:
             use_sweet_scent(env, context, INGAME_DELAY);
             shiny_found = watch_for_shiny_encounter(env, context) == 1;
-            context.wait_for_all_requests();
             break;
         case Target::fishing:
             use_registered_fishing_rod(env, context, INGAME_DELAY);
@@ -913,7 +910,6 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                 // keep going if "Not even a nibble..."
             }
             shiny_found = ret == 1;
-            context.wait_for_all_requests();
             break;
         case Target::safarizonecenter:
             if (INGAME_DELAY < 21000){
@@ -927,7 +923,6 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             walk_to_safarizonecenter(context);
             use_sweet_scent(env, context, MODIFIED_INGAME_DELAY, true);
             shiny_found = watch_for_shiny_encounter(env, context) == 1;
-            context.wait_for_all_requests();
             break;
         case Target::safarizoneeast:
             if (INGAME_DELAY < 36500){
@@ -941,7 +936,6 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             walk_to_safarizoneeast(context);
             use_sweet_scent(env, context, MODIFIED_INGAME_DELAY, true);
             shiny_found = watch_for_shiny_encounter(env, context) == 1;
-            context.wait_for_all_requests();
             break;
         case Target::safarizonenorth:
             if (INGAME_DELAY < 38000){
@@ -955,7 +949,6 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             walk_to_safarizonenorth(context);
             use_sweet_scent(env, context, MODIFIED_INGAME_DELAY, true);
             shiny_found = watch_for_shiny_encounter(env, context) == 1;
-            context.wait_for_all_requests();
             break;
         case Target::safarizonewest:
             if (INGAME_DELAY < 52000){
@@ -969,7 +962,6 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             walk_to_safarizonewest(context);
             use_sweet_scent(env, context, MODIFIED_INGAME_DELAY, true);
             shiny_found = watch_for_shiny_encounter(env, context) == 1;
-            context.wait_for_all_requests();
             break;
         case Target::safarizonesurf:
             if (INGAME_DELAY < 31000){
@@ -983,7 +975,6 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             walk_to_safarizonesurf(context);
             use_sweet_scent(env, context, MODIFIED_INGAME_DELAY, true);
             shiny_found = watch_for_shiny_encounter(env, context) == 1;
-            context.wait_for_all_requests();
             break;
         case Target::safarizonefish:
             if (INGAME_DELAY < 24500){
@@ -1002,7 +993,6 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                 // keep going if "Not even a nibble..."
             }
             shiny_found = ret == 1;
-            context.wait_for_all_requests();
             break;
         default:
             OperationFailedException::fire(
