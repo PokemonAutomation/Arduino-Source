@@ -34,6 +34,21 @@ namespace PokemonAutomation
                 std::function<void(const QHttpServerRequest&, QHttpServerResponder&)> handler
             );
 
+            template <typename... Args, typename Handler>
+            void addRoute(
+                const QString& path,
+                Handler&& handler
+            )
+            {
+                if (!m_server)
+                {
+                    m_logger.log("Failed to add route, HTTP Server not initialised", COLOR_RED);
+                    return;
+                }
+
+                m_server->route(path, std::forward<Handler>(handler));
+            }
+
         private:
             explicit HTTPServer();
             ~HTTPServer();
