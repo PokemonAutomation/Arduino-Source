@@ -43,7 +43,7 @@ namespace PokemonAutomation
             void send_binary(QWebSocket* client, const QByteArray& data);
 
             // Clients
-            int clientCount() const { return m_clients.size(); }
+            qsizetype clientCount() const { return m_clients.size(); }
             bool hasClients() const { return !m_clients.isEmpty(); }
 
         signals:
