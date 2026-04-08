@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Globals.h"
+#include "Common/Cpp/Exceptions.h"
 // #include "CommonFramework/Logging/Logger.h"
 // #include "CommonFramework/Tools/GlobalThreadPools.h"
 // #include "CommonFramework/Tools/FileDownloader.h"
@@ -28,7 +29,14 @@ namespace PokemonAutomation{
 
 std::vector<std::unique_ptr<ResourceDownloadRow>> get_resource_download_rows(){
     std::vector<std::unique_ptr<ResourceDownloadRow>> resource_rows;
-    for (const DownloadedResourceMetadata& resource : local_resource_download_list()){
+    std::vector<DownloadedResourceMetadata> resource_list; 
+    try{
+        resource_list = local_resource_download_list();
+    }catch(FileException&){
+        return {};
+    }
+    
+    for (const DownloadedResourceMetadata& resource : resource_list){
         std::string resource_name = resource.resource_name;
         uint16_t expected_version_num = resource.version_num.value();
         std::optional<uint16_t> current_version_num;  // default nullopt

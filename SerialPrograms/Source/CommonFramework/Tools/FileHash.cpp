@@ -37,18 +37,18 @@ std::string hash_file(const std::string& file_path, std::function<void(int)> has
     int last_percentage = -1;
     while (!file.atEnd()) {
         qint64 num_bytes_in_chunk = file.read(buffer.data(), buffer.size());
-        if (total_bytes_read == -1) {
+        if (num_bytes_in_chunk == -1) {
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "hash_file: Read error:" + file.errorString().toStdString());
         }
 
-        hash.addData(buffer.data(), num_bytes_in_chunk);
+        hash.addData(QByteArrayView(buffer.data(), num_bytes_in_chunk));
         total_bytes_read += num_bytes_in_chunk;
 
         double percent = (static_cast<double>(total_bytes_read) / file_size) * 100.0;
         int current_percent = static_cast<int>(percent);
         // Only trigger callback if the integer value has changed
         if (current_percent > last_percentage){
-            hash_progress(percent);
+            hash_progress(current_percent);
             last_percentage = current_percent;
         }
     }
