@@ -12,6 +12,7 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/FileDownloader.h"
 #include "CommonFramework/Tools/FileUnzip.h"
+#include "CommonFramework/Tools/FileHash.h"
 #include "CommonFramework/Options/LabelCellOption.h"
 // #include "ResourceDownloadTable.h"
 #include "ResourceDownloadRow.h"
@@ -336,6 +337,15 @@ void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metad
                 return m_data->m_cancel_action.load();
             }
         );
+
+        std::string hash = 
+            hash_file(
+                zip_path,
+                [this](int percentage_progress){
+                    hash_progress(percentage_progress);
+                }
+            );
+        cout << hash << endl;
 
         // unzip
         unzip_file(

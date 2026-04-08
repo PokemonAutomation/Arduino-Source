@@ -379,6 +379,18 @@ ProgressBarWidget::ProgressBarWidget(QWidget& parent, ResourceProgressBar& value
         }
     ); 
 
+    connect(
+        &m_value.row, &ResourceDownloadRow::hash_progress,
+        this, 
+        [this](int percentage_progress){
+            if (m_progress_bar->isHidden()) {
+                m_progress_bar->show(); // Make it visible when progress starts
+            }
+            m_status_label->setText("Verifying");
+            m_progress_bar->setValue(percentage_progress);
+        }
+    );
+
     // when button_state_updated, update the UI state to match
     connect(
         &m_value.row, &ResourceDownloadRow::button_state_updated,
