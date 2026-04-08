@@ -24,7 +24,7 @@ APIOptions::APIOptions()
         "<b>Enable API:</b><br>"
         "Enable the HTTP API and WebSockets to control the program remotely.<br>",
         LockMode::UNLOCK_WHILE_RUNNING,
-        false
+        true
     )
     , HTTP_PORT(
         "<b>HTTP Port:</b><br>"
