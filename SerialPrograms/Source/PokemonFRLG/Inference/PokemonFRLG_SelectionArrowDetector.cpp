@@ -112,7 +112,8 @@ bool SelectionArrowDetector::detect(const ImageViewRGB32& screen){
     size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
 
     const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
-        {0xff464646, 0xff787878}
+        {0xff464646, 0xff787878},
+        {0xff3f413a, 0xff7f827c}
     };
 
     bool found = match_template_by_waterfill(

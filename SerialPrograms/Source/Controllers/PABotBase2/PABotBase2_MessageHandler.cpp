@@ -5,16 +5,12 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "PABotBase2_MessageHandler.h"
 
 namespace PokemonAutomation{
 namespace PABotBase2{
 
 
-bool MessageHandler::should_print() const{
-    return GlobalSettings::instance().LOG_EVERYTHING;
-}
 void MessageHandler::assert_size_eq(Logger& logger, uint16_t bytes, const MessageHeader* header) const{
     if (header->message_bytes != bytes){
         throw SerialProtocolException(

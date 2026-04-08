@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "PABotBase2CC_MessageDumper.h"
 
@@ -118,6 +119,18 @@ std::string tostr(const PacketHeader* header){
         str += std::to_string(header->seqnum);
         str += ", data = " + std::to_string((int32_t)((const PacketHeader_u32*)header)->data);
         return str;
+    case PABB2_CONNECTION_OPCODE_INFO_BINARY:{
+        static const char HEX_DIGITS[] = "0123456789abcdef";
+        str += "PABB2_CONNECTION_OPCODE_INFO_BINARY:";
+        const uint8_t* ptr = (const uint8_t*)(header + 1);
+        size_t length = header->packet_bytes - sizeof(PacketHeader) - sizeof(uint32_t);
+        for (size_t c = 0; c < length; c++){
+            str += " ";
+            str += HEX_DIGITS[ptr[c] & 0xf];
+            str += HEX_DIGITS[ptr[c] >> 4];
+        }
+        return str;
+    }
     case PABB2_CONNECTION_OPCODE_INFO_STR:
         str += "PABB2_CONNECTION_OPCODE_INFO_STR: ";
         str += std::string(
@@ -172,154 +185,339 @@ std::string tostr(const PacketHeader* header){
     return "Unknown Packet Opcode: 0x" + tostr_hex(header->opcode);
 }
 
-std::string tostr(const MessageHeader* header){
-    //  TODO: Make sure packets are large enough before reading them.
-
-    std::string str;
-    switch (header->opcode){
-    case PABB2_MESSAGE_OPCODE_INVALID:
-        str += "PABB2_MESSAGE_OPCODE_INVALID: id = ";
-        str += std::to_string(header->id);
-        return str;
-    case PABB2_MESSAGE_OPCODE_LOG_STRING:
-        str += "PABB2_MESSAGE_OPCODE_LOG_STRING: id = ";
-        str += std::to_string(header->id);
-        str += ": " + std::string(
-            (const char*)(header + 1),
-            header->message_bytes - sizeof(MessageHeader)
-        );
-        return str;
-    case PABB2_MESSAGE_OPCODE_LOG_LABEL_H32:{
-        const Message_u32* message = (const Message_u32*)header;
-        str += "PABB2_MESSAGE_OPCODE_LOG_LABEL_U32: id = ";
-        str += std::to_string(message->id);
-        str += ": " + std::string(
-            (const char*)(message + 1),
-            message->message_bytes - sizeof(Message_u32)
-        );
-        str += ": ";
-        str += tostr_hex(message->data);
-        return str;
-    }
-    case PABB2_MESSAGE_OPCODE_LOG_LABEL_U32:{
-        const Message_u32* message = (const Message_u32*)header;
-        str += "PABB2_MESSAGE_OPCODE_LOG_LABEL_U32: id = ";
-        str += std::to_string(message->id);
-        str += ": " + std::string(
-            (const char*)(message + 1),
-            message->message_bytes - sizeof(Message_u32)
-        );
-        str += ": ";
-        str += std::to_string((uint32_t)message->data);
-        return str;
-    }
-    case PABB2_MESSAGE_OPCODE_LOG_LABEL_I32:{
-        const Message_u32* message = (const Message_u32*)header;
-        str += "PABB2_MESSAGE_OPCODE_LOG_LABEL_U32: id = ";
-        str += std::to_string(message->id);
-        str += ": " + std::string(
-            (const char*)(message + 1),
-            message->message_bytes - sizeof(Message_u32)
-        );
-        str += ": ";
-        str += std::to_string((int32_t)message->data);
-        return str;
-    }
-
-    case PABB2_MESSAGE_OPCODE_RET:
-        str += "PABB2_MESSAGE_OPCODE_RET: id = ";
-        str += std::to_string(header->id);
-        return str;
-    case PABB2_MESSAGE_OPCODE_REQUEST_DROPPED:
-        str += "PABB2_MESSAGE_OPCODE_REQUEST_DROPPED: id = ";
-        str += std::to_string(header->id);
-        return str;
-    case PABB2_MESSAGE_OPCODE_RET_U32:
-        str += "PABB2_MESSAGE_OPCODE_RET_U32: id = ";
-        str += std::to_string(header->id);
-        str += ", data = " + std::to_string(((const Message_u32*)header)->data);
-        return str;
-    case PABB2_MESSAGE_OPCODE_RET_DATA:
-        str += "PABB2_MESSAGE_OPCODE_RET_DATA: id = ";
-        str += std::to_string(header->id);
-        str += ", bytes = " + std::to_string(header->message_bytes - sizeof(MessageHeader));
-        return str;
-
-    case PABB2_MESSAGE_OPCODE_PROTOCOL_VERSION:
-        str += "PABB2_MESSAGE_OPCODE_PROTOCOL_VERSION: id = ";
-        str += std::to_string(header->id);
-        return str;
-    case PABB2_MESSAGE_OPCODE_FIRMWARE_VERSION:
-        str += "PABB2_MESSAGE_OPCODE_FIRMWARE_VERSION: id = ";
-        str += std::to_string(header->id);
-        return str;
-    case PABB2_MESSAGE_OPCODE_DEVICE_IDENTIFIER:
-        str += "PABB2_MESSAGE_OPCODE_DEVICE_IDENTIFIER: id = ";
-        str += std::to_string(header->id);
-        return str;
-    case PABB2_MESSAGE_OPCODE_DEVICE_NAME:
-        str += "PABB2_MESSAGE_OPCODE_DEVICE_NAME: id = ";
-        str += std::to_string(header->id);
-        return str;
-    case PABB2_MESSAGE_OPCODE_CONTROLLER_LIST:
-        str += "PABB2_MESSAGE_OPCODE_CONTROLLER_LIST: id = ";
-        str += std::to_string(header->id);
-        return str;
-    case PABB2_MESSAGE_OPCODE_CQ_CAPACITY:
-        str += "PABB2_MESSAGE_OPCODE_CQ_CAPACITY: id = ";
-        str += std::to_string(header->id);
-        return str;
-
-    case PABB2_MESSAGE_OPCODE_READ_CONTROLLER_MODE:
-        str += "PABB2_MESSAGE_OPCODE_READ_CONTROLLER_MODE: id = ";
-        str += std::to_string(header->id);
-        return str;
-    case PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE:{
-        const Message_u32* message = (const Message_u32*)header;
-        str += "PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE: id = ";
-        str += std::to_string(message->id);
-        str += ", controller = " + std::to_string(message->data);
-        return str;
-    }
-    case PABB2_MESSAGE_OPCODE_RESET_TO_CONTROLLER:{
-        const Message_u32* message = (const Message_u32*)header;
-        str += "PABB2_MESSAGE_OPCODE_RESET_TO_CONTROLLER: id = ";
-        str += std::to_string(message->id);
-        str += ", controller = " + std::to_string(message->data);
-        return str;
-    }
-    case PABB2_MESSAGE_OPCODE_CONTROLLER_MAC_ADDRESS:
-        str += "PABB2_MESSAGE_OPCODE_CONTROLLER_MAC_ADDRESS: id = ";
-        str += std::to_string(header->id);
-        return str;
-    case PABB2_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS:
-        str += "PABB2_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS: id = ";
-        str += std::to_string(header->id);
-        return str;
-    case PABB2_MESSAGE_OPCODE_REQUEST_STATUS:
-        str += "PABB2_MESSAGE_OPCODE_REQUEST_STATUS: id = ";
-        str += std::to_string(header->id);
-        return str;
-
-    case PABB2_MESSAGE_OPCODE_CQ_CANCEL:
-        str += "PABB2_MESSAGE_OPCODE_CQ_CANCEL";
-        return str;
-    case PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT:
-        str += "PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT:";
-        return str;
-    case PABB2_MESSAGE_OPCODE_CQ_COMMAND_FINISHED:{
-        const Message_u32* message = (const Message_u32*)header;
-        str += "PABB2_MESSAGE_OPCODE_CQ_COMMAND_FINISHED: id = ";
-        str += std::to_string(message->id);
-        str += ", timestamp = ";
-        str += std::to_string(message->data);
-        return str;
-    }
-    }
 
 
-    return "Unknown Message Opcode: 0x" + tostr_hex(header->opcode);
+void MessageLogger::add_message(
+    uint8_t opcode,
+    bool always_print,
+    std::string(*tostr)(const MessageHeader*)
+){
+    auto ret = m_converters.emplace(opcode, Converter{always_print, tostr});
+    if (ret.second){
+        return;
+    }
+    throw InternalProgramError(
+        nullptr,
+        PA_CURRENT_FUNCTION,
+        "Duplicate opcode: " + std::to_string(opcode)
+    );
 }
+
+MessageLogger::MessageLogger(){
+    add_message(
+        PABB2_MESSAGE_OPCODE_INVALID,
+        true,
+        [](const MessageHeader* header){
+            std::string str = "PABB2_MESSAGE_OPCODE_INVALID";
+            str += ": id = " + std::to_string(header->id);
+            return str;
+        }
+    );
+    add_message(
+        PABB2_MESSAGE_OPCODE_LOG_STRING,
+        true,
+        [](const MessageHeader* header){
+            const Message_u32* message = (const Message_u32*)header;
+            std::string str = "PABB2_MESSAGE_OPCODE_LOG_STRING";
+            str += ": " + std::string(
+                (const char*)(message + 1),
+                message->message_bytes - sizeof(Message_u32)
+            );
+            return str;
+        }
+    );
+    add_message(
+        PABB2_MESSAGE_OPCODE_LOG_LABEL_H32,
+        true,
+        [](const MessageHeader* header){
+            const Message_u32* message = (const Message_u32*)header;
+            std::string str = "PABB2_MESSAGE_OPCODE_LOG_LABEL_H32";
+            str += ": " + std::string(
+                (const char*)(message + 1),
+                message->message_bytes - sizeof(Message_u32)
+            );
+            str += ": " + tostr_hex(message->data);
+            return str;
+        }
+    );
+    add_message(
+        PABB2_MESSAGE_OPCODE_LOG_LABEL_U32,
+        true,
+        [](const MessageHeader* header){
+            const Message_u32* message = (const Message_u32*)header;
+            std::string str = "PABB2_MESSAGE_OPCODE_LOG_LABEL_U32";
+            str += ": " + std::string(
+                (const char*)(message + 1),
+                message->message_bytes - sizeof(Message_u32)
+            );
+            str += ": " + std::to_string(message->data);
+            return str;
+        }
+    );
+    add_message(
+        PABB2_MESSAGE_OPCODE_LOG_LABEL_I32,
+        true,
+        [](const MessageHeader* header){
+            const Message_u32* message = (const Message_u32*)header;
+            std::string str = "PABB2_MESSAGE_OPCODE_LOG_LABEL_I32";
+            str += ": " + std::string(
+                (const char*)(message + 1),
+                message->message_bytes - sizeof(Message_u32)
+            );
+            str += ": " + std::to_string((int32_t)message->data);
+            return str;
+        }
+    );
+
+
+    add_message(
+        PABB2_MESSAGE_OPCODE_RET,
+        false,
+        [](const MessageHeader* header){
+            std::string str = "PABB2_MESSAGE_OPCODE_RET";
+            str += ": id = " + std::to_string(header->id);
+            return str;
+        }
+    );
+    add_message(
+        PABB2_MESSAGE_OPCODE_REQUEST_DROPPED,
+        true,
+        [](const MessageHeader* header){
+            std::string str = "PABB2_MESSAGE_OPCODE_REQUEST_DROPPED";
+            str += ": id = " + std::to_string(header->id);
+            return str;
+        }
+    );
+    add_message(
+        PABB2_MESSAGE_OPCODE_RET_U32,
+        false,
+        [](const MessageHeader* header){
+            const Message_u32* message = (const Message_u32*)header;
+            std::string str = "PABB2_MESSAGE_OPCODE_RET_U32";
+            str += ": id = " + std::to_string(header->id);
+            str += ", data = " + std::to_string(message->data);
+            return str;
+        }
+    );
+    add_message(
+        PABB2_MESSAGE_OPCODE_RET_DATA,
+        false,
+        [](const MessageHeader* header){
+            std::string str = "PABB2_MESSAGE_OPCODE_RET_DATA";
+            str += ": id = " + std::to_string(header->id);
+            str += ", bytes = " + std::to_string(header->message_bytes - sizeof(MessageHeader));
+            return str;
+        }
+    );
+
+
+    add_message(
+        PABB2_MESSAGE_OPCODE_PROTOCOL_VERSION,
+        true,
+        [](const MessageHeader* header){
+            std::string str = "PABB2_MESSAGE_OPCODE_PROTOCOL_VERSION";
+            str += ": id = " + std::to_string(header->id);
+            return str;
+        }
+    );
+    add_message(
+        PABB2_MESSAGE_OPCODE_FIRMWARE_VERSION,
+        true,
+        [](const MessageHeader* header){
+            std::string str = "PABB2_MESSAGE_OPCODE_FIRMWARE_VERSION";
+            str += ": id = " + std::to_string(header->id);
+            return str;
+        }
+    );
+    add_message(
+        PABB2_MESSAGE_OPCODE_DEVICE_IDENTIFIER,
+        true,
+        [](const MessageHeader* header){
+            std::string str = "PABB2_MESSAGE_OPCODE_DEVICE_IDENTIFIER";
+            str += ": id = " + std::to_string(header->id);
+            return str;
+        }
+    );
+    add_message(
+        PABB2_MESSAGE_OPCODE_DEVICE_NAME,
+        true,
+        [](const MessageHeader* header){
+            std::string str = "PABB2_MESSAGE_OPCODE_DEVICE_NAME";
+            str += ": id = " + std::to_string(header->id);
+            return str;
+        }
+    );
+    add_message(
+        PABB2_MESSAGE_OPCODE_CONTROLLER_LIST,
+        true,
+        [](const MessageHeader* header){
+            std::string str = "PABB2_MESSAGE_OPCODE_CONTROLLER_LIST";
+            str += ": id = " + std::to_string(header->id);
+            return str;
+        }
+    );
+    add_message(
+        PABB2_MESSAGE_OPCODE_CQ_CAPACITY,
+        true,
+        [](const MessageHeader* header){
+            std::string str = "PABB2_MESSAGE_OPCODE_CQ_CAPACITY";
+            str += ": id = " + std::to_string(header->id);
+            return str;
+        }
+    );
+
+
+    add_message(
+        PABB2_MESSAGE_OPCODE_READ_CONTROLLER_MODE,
+        true,
+        [](const MessageHeader* header){
+            std::string str = "PABB2_MESSAGE_OPCODE_READ_CONTROLLER_MODE";
+            str += ": id = " + std::to_string(header->id);
+            return str;
+        }
+    );
+    add_message(
+        PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE,
+        true,
+        [](const MessageHeader* header){
+            const Message_u32* message = (const Message_u32*)header;
+            std::string str = "PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE";
+            str += ": id = " + std::to_string(header->id);
+            str += ", controller = " + std::to_string(message->data);
+            return str;
+        }
+    );
+    add_message(
+        PABB2_MESSAGE_OPCODE_RESET_TO_CONTROLLER,
+        true,
+        [](const MessageHeader* header){
+            const Message_u32* message = (const Message_u32*)header;
+            std::string str = "PABB2_MESSAGE_OPCODE_RESET_TO_CONTROLLER";
+            str += ": id = " + std::to_string(header->id);
+            str += ", controller = " + std::to_string(message->data);
+            return str;
+        }
+    );
+    add_message(
+        PABB2_MESSAGE_OPCODE_CONTROLLER_MAC_ADDRESS,
+        true,
+        [](const MessageHeader* header){
+            std::string str = "PABB2_MESSAGE_OPCODE_CONTROLLER_MAC_ADDRESS";
+            str += ": id = " + std::to_string(header->id);
+            return str;
+        }
+    );
+    add_message(
+        PABB2_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS,
+        false,
+        [](const MessageHeader* header){
+            std::string str = "PABB2_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS";
+            str += ": id = " + std::to_string(header->id);
+            return str;
+        }
+    );
+    add_message(
+        PABB2_MESSAGE_OPCODE_REQUEST_STATUS,
+        false,
+        [](const MessageHeader* header){
+            std::string str = "PABB2_MESSAGE_OPCODE_REQUEST_STATUS";
+            str += ": id = " + std::to_string(header->id);
+            return str;
+        }
+    );
+
+
+    add_message(
+        PABB2_MESSAGE_OPCODE_CQ_CANCEL,
+        false,
+        [](const MessageHeader* header){
+            std::string str = "PABB2_MESSAGE_OPCODE_CQ_CANCEL";
+            return str;
+        }
+    );
+    add_message(
+        PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT,
+        false,
+        [](const MessageHeader* header){
+            std::string str = "PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT";
+            return str;
+        }
+    );
+    add_message(
+        PABB2_MESSAGE_OPCODE_CQ_COMMAND_FINISHED,
+        false,
+        [](const MessageHeader* header){
+            const Message_u32* message = (const Message_u32*)header;
+            std::string str = "PABB2_MESSAGE_OPCODE_CQ_COMMAND_FINISHED";
+            str += ": id = " + std::to_string(header->id);
+            str += ", timestamp = " + std::to_string(message->data);
+            return str;
+        }
+    );
+}
+
+std::string MessageLogger::to_str(const MessageHeader* message) const{
+    uint8_t opcode = message->opcode;
+    auto iter = m_converters.find(opcode);
+    if (iter == m_converters.end()){
+        return "(0x" + tostr_hex(opcode) + "): Unknown Opcode";
+    }
+    return "(0x" + tostr_hex(opcode) + ") " + iter->second.converter(message);
+}
+void MessageLogger::log_send(
+    Logger& logger,
+    bool always_log,
+    const MessageHeader* message,
+    Color color
+) const{
+    auto iter = m_converters.find(message->opcode);
+    if (iter == m_converters.end()){
+        logger.log(
+            "[MLC]: Sending: (0x" + tostr_hex(message->opcode) + ") Unknown Opcode",
+            COLOR_RED
+        );
+        return;
+    }
+    if (always_log || iter->second.always_log){
+        logger.log(
+            "[MLC]: Sending: (0x" + tostr_hex(message->opcode) + ") " + iter->second.converter(message),
+            color
+        );
+    }
+}
+void MessageLogger::log_recv(
+    Logger& logger,
+    bool always_log,
+    const MessageHeader* message,
+    Color color
+) const{
+    auto iter = m_converters.find(message->opcode);
+    if (iter == m_converters.end()){
+        logger.log(
+            "[MLC]: Receive: (0x" + tostr_hex(message->opcode) + ") Unknown Opcode",
+            COLOR_RED
+        );
+    }
+    if (always_log || iter->second.always_log){
+        logger.log(
+            "[MLC]: Receive: (0x" + tostr_hex(message->opcode) + ") " + iter->second.converter(message),
+            color
+        );
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

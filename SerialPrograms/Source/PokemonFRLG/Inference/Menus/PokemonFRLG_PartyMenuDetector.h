@@ -21,6 +21,15 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
 
+enum class PartySlot{
+    ONE,
+    TWO,
+    THREE,
+    FOUR,
+    FIVE,
+    SIX
+    //CXL
+};
 
 // The Party menu has a white box on the bottom
 // The background around the edges is dark teal/navy
@@ -60,6 +69,40 @@ public:
     PartySelectionWatcher(Color color)
         : DetectorToFinder("PartySelectionWatcher", std::chrono::milliseconds(250), color)
     {}
+};
+
+
+class PartySlotDetector : public StaticScreenDetector{
+public:
+    PartySlotDetector(
+        Color color,
+        const ImageFloatBox& box
+    );
+
+    PartySlotDetector(
+        Color color,
+        PartySlot position
+    );
+
+    static ImageFloatBox party_slot_boxes(PartySlot position);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+private:
+    const Color m_color;
+    const ImageFloatBox m_party_box;
+};
+class PartySlotWatcher : public DetectorToFinder<PartySlotDetector>{
+public:
+    PartySlotWatcher(
+        Color color,
+        PartySlot position,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
+    )
+        : DetectorToFinder("PartySlotWatcher", hold_duration, color, party_slot_boxes(position))
+    {
+    }
 };
 
 
