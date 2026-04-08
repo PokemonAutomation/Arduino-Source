@@ -11,6 +11,7 @@
 #include "CommonFramework/Server/HTTP.h"
 #include "CommonFramework/Server/WebSocket.h"
 #include "Routes/ProgramRoutes.h"
+#include "Routes/GlobalSettingsRoutes.h"
 
 namespace PokemonAutomation{
 namespace Server{
@@ -23,6 +24,7 @@ inline void init_server(){
 
         // Register all HTTP routes
         register_program_routes();
+        register_settings_routes();
 
         // Start WebSocket Server
         WSServer& wsServer = WSServer::instance();

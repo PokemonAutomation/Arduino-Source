@@ -494,6 +494,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Server/HTTP.h
     Source/CommonFramework/Server/Routes/ProgramRoutes.cpp
     Source/CommonFramework/Server/Routes/ProgramRoutes.h
+    Source/CommonFramework/Server/Routes/GlobalSettingsRoutes.cpp
+    Source/CommonFramework/Server/Routes/GlobalSettingsRoutes.h
     Source/CommonFramework/Server/WebSocket.cpp
     Source/CommonFramework/Server/Websocket.h
     Source/CommonFramework/Startup/NewVersionCheck.cpp
