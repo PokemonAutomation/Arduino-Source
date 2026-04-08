@@ -31,10 +31,10 @@ void show_error_box(std::string function_name){
 }
 
 void show_download_failed_box(){
-    std::cerr << "Error: Download failed. Check your internet connection." << std::endl;
+    std::cerr << "Error: Download failed. Check your internet connection and check you have enough disk space." << std::endl;
     QMessageBox box;
     box.warning(nullptr, "Error:",
-        QString::fromStdString("Error: Download failed. Check your internet connection."));
+        QString::fromStdString("Error: Download failed. Check your internet connection and check you have enough disk space."));
 
 }    
 

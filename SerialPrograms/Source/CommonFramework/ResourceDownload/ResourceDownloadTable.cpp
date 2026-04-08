@@ -65,7 +65,7 @@ ResourceDownloadTable::ResourceDownloadTable()
 std::vector<std::string> ResourceDownloadTable::make_header() const{
     std::vector<std::string> ret{
         "Resource",
-        "Size (MB)",
+        "Size",
         "Downloaded",
         "Version",
         "",
