@@ -1457,6 +1457,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/PokemonFRLG_StatsReader.h
     Source/PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.cpp
     Source/PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.h
+    Source/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.cpp
+    Source/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h
     Source/PokemonFRLG/PokemonFRLG_Navigation.cpp
     Source/PokemonFRLG/PokemonFRLG_Navigation.h
     Source/PokemonFRLG/PokemonFRLG_Panels.cpp
@@ -1483,6 +1485,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadStats.cpp
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadStats.h
+    Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadEncounter.cpp
+    Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadEncounter.h
     Source/PokemonHome/Inference/PokemonHome_BallReader.cpp
     Source/PokemonHome/Inference/PokemonHome_BallReader.h
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.cpp
