@@ -14,7 +14,7 @@
 #include "Common/Cpp/Options/StaticTableOption.h"
 #include "ResourceDownloadHelpers.h"
 #include "ResourceDownloadOptions.h"
-
+#include <mutex>
 
 namespace PokemonAutomation{
 
