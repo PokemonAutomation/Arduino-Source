@@ -109,6 +109,20 @@ WallClock make_sandwich_material_farm(
     MaterialFarmerStats& stats
 );        
 
+// do the given action
+// if encounters battle, run away and try the given action again
+// will re-attempt up to 5 times.
+void do_action_and_run_from_battle(
+    const ProgramInfo& info, 
+    VideoStream& stream,
+    ProControllerContext& context,
+    std::function<
+        void(const ProgramInfo& info, 
+        VideoStream& stream,
+        ProControllerContext& context)
+    >&& action
+);
+
 void move_to_start_position_for_letsgo0(VideoStream& stream, ProControllerContext& context);
 
 void move_to_start_position_for_letsgo1(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
