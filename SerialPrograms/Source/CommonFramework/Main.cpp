@@ -27,6 +27,8 @@
 #include "Integrations/DppIntegration/DppClient.h"
 #include "Logging/Logger.h"
 #include "Logging/OutputRedirector.h"
+#include "Common/Cpp/Logging/FileLogger.h"
+#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Logging/FileWindowLogger.h"
 //#include "Tools/StatsDatabase.h"
 //#include "Windows/DpiScaler.h"
@@ -55,6 +57,22 @@ void set_working_directory(){
         QString base_folder_path = QFileInfo(app_bundle_path).dir().absolutePath();
         QDir::setCurrent(base_folder_path);
     }
+}
+
+namespace PokemonAutomation{
+
+// This function is required by Common/Cpp/Logging/GlobalLogger.h:global_logger_raw() to initialize
+// the global file logger.
+// This function is called the first time `global_logger_raw()` is called to initialize the static
+// local global file logger object.
+// Note: in order to make sure `USER_FILE_PATH()` and `QCoreApplication::applicationName()` work
+//    correctly you need to define `QApplication` before `make_global_config()` is called.
+FileLoggerConfig make_global_config(){
+    return FileLoggerConfig{
+        .file_path = USER_FILE_PATH() + QCoreApplication::applicationName().toStdString() + ".log",
+    };
+}
+
 }
 
 
@@ -240,7 +258,7 @@ int main(int argc, char *argv[]){
     Integration::DiscordWebhook::DiscordWebhookSender::instance().stop();
     SystemSleepController::instance().stop();
     global_watchdog().stop();
-    static_cast<FileWindowLogger&>(global_logger_raw()).stop();
+    dynamic_cast<FileLogger&>(global_logger_raw()).stop();
 
 //
 //  Workaround Qt 6.9 thread-adoption bug on Windows.
