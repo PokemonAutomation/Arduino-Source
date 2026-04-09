@@ -75,7 +75,7 @@ PABotBase2_WiredController::PABotBase2_WiredController(
 
 //    cout << "Starting status thread" << endl;
 
-#if 0   //  REMOVE
+#if 1
     m_status_thread.reset(new ControllerStatusThread(
         connection, *this
     ));
