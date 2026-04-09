@@ -323,7 +323,7 @@ void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metad
     std::string resource_directory = DOWNLOADED_RESOURCE_PATH() + resource_name;
     try{
         // delete directory and the old resource
-        fs::remove_all(resource_directory);
+        fs::remove_all(Filesystem::Path(resource_directory));
 
         // download
         std::string zip_path = resource_directory + "/temp.zip";
@@ -372,7 +372,7 @@ void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metad
         );
 
         // delete old zip file
-        fs::remove(zip_path);
+        fs::remove(Filesystem::Path(zip_path));
 
         if (m_data->m_cancel_action.load()){
             throw OperationCancelledException();
@@ -383,7 +383,7 @@ void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metad
         set_version_status(ResourceVersionStatus::CURRENT);
     }catch(OperationCancelledException& e){
         // delete directory and the resource
-        fs::remove_all(resource_directory);
+        fs::remove_all(Filesystem::Path(resource_directory));
 
         // update the table labels
         set_is_downloaded(false);
@@ -392,7 +392,7 @@ void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metad
         throw e;
     }catch(...){
         // delete directory and the resource
-        fs::remove_all(resource_directory);
+        fs::remove_all(Filesystem::Path(resource_directory));
 
         // update the table labels
         set_is_downloaded(false);
