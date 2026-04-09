@@ -412,7 +412,7 @@ void ResourceDownloadRow::start_delete(){
 
             std::string resource_directory = DOWNLOADED_RESOURCE_PATH() + resource_name;
             // delete directory and the old resource
-            fs::remove_all(resource_directory);
+            fs::remove_all(Filesystem::Path(resource_directory));
 
             // update the table labels
             set_is_downloaded(false);
