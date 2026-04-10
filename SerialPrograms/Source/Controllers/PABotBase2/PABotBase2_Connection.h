@@ -22,15 +22,15 @@ public:
         return *m_device;
     }
 
-#if 0
-    virtual bool cancel(std::exception_ptr exception = nullptr) noexcept override{
-        if (ControllerConnection::cancel(std::move(exception))){
-            return true;
+    virtual void try_set_controller_type(
+        ControllerType controller_type,
+        bool clear_settings
+    ) noexcept override{
+        if (!is_ready()){
+            return;
         }
-        m_device.reset();
-        return false;
+        m_device->try_set_controller_type(controller_type, clear_settings);
     }
-#endif
 
 protected:
     std::unique_ptr<PABotBase2::DeviceHandle> m_device;

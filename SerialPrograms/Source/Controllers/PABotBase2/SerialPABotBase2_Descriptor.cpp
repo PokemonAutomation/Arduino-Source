@@ -91,9 +91,7 @@ std::unique_ptr<AbstractController> SerialPABotBase2_Descriptor::make_controller
         return std::unique_ptr<AbstractController>(
             new PokemonAutomation::NintendoSwitch::PABotBase2_WiredController(
                 logger,
-                static_cast<PABotBase2::Connection&>(connection),
-                controller_type,
-                reset_mode
+                static_cast<PABotBase2::Connection&>(connection)
             )
         );
 

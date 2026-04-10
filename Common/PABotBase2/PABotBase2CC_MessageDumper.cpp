@@ -132,7 +132,7 @@ std::string tostr(const PacketHeader* header){
         return str;
     }
     case PABB2_CONNECTION_OPCODE_INFO_STR:
-        str += "PABB2_CONNECTION_OPCODE_INFO_STR: ";
+        str += "LOG_STR: ";
         str += std::string(
             (const char*)(header + 1),
             header->packet_bytes - sizeof(PacketHeader) - sizeof(uint32_t)
@@ -140,7 +140,7 @@ std::string tostr(const PacketHeader* header){
         return str;
     case PABB2_CONNECTION_OPCODE_INFO_LABEL_H32:{
         const PacketHeader_u32* packet = (const PacketHeader_u32*)header;
-        str += "PABB2_CONNECTION_OPCODE_INFO_LABEL_H32: ";
+        str += "LOG_H32: ";
         str += std::string(
             (const char*)(packet + 1),
             header->packet_bytes - sizeof(PacketHeader_u32) - sizeof(uint32_t)
@@ -150,7 +150,7 @@ std::string tostr(const PacketHeader* header){
     }
     case PABB2_CONNECTION_OPCODE_INFO_LABEL_U32:{
         const PacketHeader_u32* packet = (const PacketHeader_u32*)header;
-        str += "PABB2_CONNECTION_OPCODE_INFO_LABEL_U32: ";
+        str += "LOG_U32: ";
         str += std::string(
             (const char*)(packet + 1),
             header->packet_bytes - sizeof(PacketHeader_u32) - sizeof(uint32_t)
@@ -160,7 +160,7 @@ std::string tostr(const PacketHeader* header){
     }
     case PABB2_CONNECTION_OPCODE_INFO_LABEL_I32:{
         const PacketHeader_u32* packet = (const PacketHeader_u32*)header;
-        str += "PABB2_CONNECTION_OPCODE_INFO_LABEL_I32: ";
+        str += "LOG_I32: ";
         str += std::string(
             (const char*)(packet + 1),
             header->packet_bytes - sizeof(PacketHeader_u32) - sizeof(uint32_t)
@@ -383,7 +383,7 @@ MessageLogger::MessageLogger(){
             const Message_u32* message = (const Message_u32*)header;
             std::string str = "PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE";
             str += ": id = " + std::to_string(header->id);
-            str += ", controller = " + std::to_string(message->data);
+            str += ", controller = " + tostr_hex(message->data);
             return str;
         }
     );
@@ -394,7 +394,7 @@ MessageLogger::MessageLogger(){
             const Message_u32* message = (const Message_u32*)header;
             std::string str = "PABB2_MESSAGE_OPCODE_RESET_TO_CONTROLLER";
             str += ": id = " + std::to_string(header->id);
-            str += ", controller = " + std::to_string(message->data);
+            str += ", controller = " + tostr_hex(message->data);
             return str;
         }
     );
@@ -469,41 +469,45 @@ void MessageLogger::log_send(
     bool always_log,
     const MessageHeader* message,
     Color color
-) const{
-    auto iter = m_converters.find(message->opcode);
-    if (iter == m_converters.end()){
-        logger.log(
-            "[MLC]: Sending: (0x" + tostr_hex(message->opcode) + ") Unknown Opcode",
-            COLOR_RED
-        );
-        return;
-    }
-    if (always_log || iter->second.always_log){
-        logger.log(
-            "[MLC]: Sending: (0x" + tostr_hex(message->opcode) + ") " + iter->second.converter(message),
-            color
-        );
-    }
+) const noexcept{
+    try{
+        auto iter = m_converters.find(message->opcode);
+        if (iter == m_converters.end()){
+            logger.log(
+                "[MLC]: Sending: (0x" + tostr_hex(message->opcode) + ") Unknown Opcode",
+                COLOR_RED
+            );
+            return;
+        }
+        if (always_log || iter->second.always_log){
+            logger.log(
+                "[MLC]: Sending: (0x" + tostr_hex(message->opcode) + ") " + iter->second.converter(message),
+                color
+            );
+        }
+    }catch (...){}
 }
 void MessageLogger::log_recv(
     Logger& logger,
     bool always_log,
     const MessageHeader* message,
     Color color
-) const{
-    auto iter = m_converters.find(message->opcode);
-    if (iter == m_converters.end()){
-        logger.log(
-            "[MLC]: Receive: (0x" + tostr_hex(message->opcode) + ") Unknown Opcode",
-            COLOR_RED
-        );
-    }
-    if (always_log || iter->second.always_log){
-        logger.log(
-            "[MLC]: Receive: (0x" + tostr_hex(message->opcode) + ") " + iter->second.converter(message),
-            color
-        );
-    }
+) const noexcept{
+    try{
+        auto iter = m_converters.find(message->opcode);
+        if (iter == m_converters.end()){
+            logger.log(
+                "[MLC]: Receive: (0x" + tostr_hex(message->opcode) + ") Unknown Opcode",
+                COLOR_RED
+            );
+        }
+        if (always_log || iter->second.always_log){
+            logger.log(
+                "[MLC]: Receive: (0x" + tostr_hex(message->opcode) + ") " + iter->second.converter(message),
+                color
+            );
+        }
+    }catch (...){}
 }
 
 

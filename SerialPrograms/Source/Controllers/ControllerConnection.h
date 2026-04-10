@@ -40,6 +40,11 @@ protected:
 public:
     virtual ~ControllerConnection() = default;
 
+    virtual void try_set_controller_type(
+        ControllerType controller_type,
+        bool clear_settings
+    ) noexcept{}
+
 
 public:
     ControllerType current_controller() const{

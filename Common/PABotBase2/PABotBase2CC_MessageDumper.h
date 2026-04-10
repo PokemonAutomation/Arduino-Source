@@ -43,13 +43,13 @@ public:
         bool always_log,
         const MessageHeader* message,
         Color color = COLOR_DARKGREEN
-    ) const;
+    ) const noexcept;
     void log_recv(
         Logger& logger,
         bool always_log,
         const MessageHeader* message,
         Color color = COLOR_PURPLE
-    ) const;
+    ) const noexcept;
 
 
 private:

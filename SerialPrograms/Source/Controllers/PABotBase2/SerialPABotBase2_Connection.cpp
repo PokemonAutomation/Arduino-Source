@@ -12,6 +12,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "SerialPABotBase2_Connection.h"
 
 //#include <iostream>
@@ -185,9 +186,10 @@ bool SerialPABotBase2_Connection::open_device_connection(bool set_to_null_contro
     ControllerType current_controller = refresh_controller_type();
 
     if (set_to_null_controller && current_controller != ControllerType::None){
-        PABotBase2::MessageHeader request;
+        PABotBase2::Message_u32 request;
         request.message_bytes = sizeof(request);
         request.opcode = PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE;
+        request.data = SerialPABotBase::controller_type_to_id(ControllerType::None);
         m_device->send_request(request);
 
 #if 0

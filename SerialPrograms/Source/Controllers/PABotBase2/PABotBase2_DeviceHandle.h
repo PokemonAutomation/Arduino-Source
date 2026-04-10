@@ -59,6 +59,10 @@ public:
     virtual bool cancel(std::exception_ptr exception) noexcept override;
 
     void connect();
+    void try_set_controller_type(
+        ControllerType controller_type,
+        bool clear_settings
+    ) noexcept;
 
 
 public:
@@ -81,6 +85,7 @@ public:
     ControllerType refresh_controller_type();
 
     uint8_t send_request(MessageHeader& request);
+    std::optional<uint8_t> try_send_request(MessageHeader& request, WallDuration timeout) noexcept;
     std::string wait_for_request_response(uint8_t id);
 
     template <typename ResponseType, uint8_t response_opcode>

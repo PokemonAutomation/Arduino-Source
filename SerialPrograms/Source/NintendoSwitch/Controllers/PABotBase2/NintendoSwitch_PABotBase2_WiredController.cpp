@@ -10,9 +10,10 @@
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "NintendoSwitch_PABotBase2_WiredController.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+//  REMOVE
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -24,9 +25,7 @@ using namespace std::chrono_literals;
 
 PABotBase2_WiredController::PABotBase2_WiredController(
     Logger& logger,
-    PABotBase2::Connection& connection,
-    ControllerType controller_type,
-    ControllerResetMode reset_mode
+    PABotBase2::Connection& connection
 )
     : ProController(logger)
     , PABotBase2_Controller(logger, connection)
@@ -46,34 +45,6 @@ PABotBase2_WiredController::PABotBase2_WiredController(
             return str;
         }
     );
-
-    switch (reset_mode){
-    case PokemonAutomation::ControllerResetMode::DO_NOT_RESET:
-        break;
-    case PokemonAutomation::ControllerResetMode::SIMPLE_RESET:
-    case PokemonAutomation::ControllerResetMode::RESET_AND_CLEAR_STATE:{
-        PABotBase2::Message_u32 message;
-        message.message_bytes = sizeof(message);
-        message.opcode = reset_mode == PokemonAutomation::ControllerResetMode::SIMPLE_RESET
-            ?PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE
-            : PABB2_MESSAGE_OPCODE_RESET_TO_CONTROLLER;
-        message.data = SerialPABotBase::controller_type_to_id(controller_type);
-        uint8_t id = connection.device().send_request(message);
-//        cout << "wait... start" << endl;
-        connection.device().wait_for_request_response(id);
-//        cout << "wait... done" << endl;
-        break;
-    }
-    }
-
-    //  Re-read the controller.
-    ControllerType current_controller = connection.device().refresh_controller_type();
-    if (current_controller != controller_type){
-//        cout << "Failed to set controller type." << endl;
-        throw SerialProtocolException(logger, PA_CURRENT_FUNCTION, "Failed to set controller type.");
-    }
-
-//    cout << "Starting status thread" << endl;
 
 #if 1
     m_status_thread.reset(new ControllerStatusThread(
