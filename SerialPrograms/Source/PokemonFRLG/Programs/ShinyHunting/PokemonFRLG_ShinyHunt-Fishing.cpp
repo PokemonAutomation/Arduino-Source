@@ -204,12 +204,10 @@ void ShinyHuntFishing::program(
         If timeout occurs, run_until returns negative.
         */
         int ret =
-            run_until<ProControllerContext>(env.console, context, [&](ProControllerContext& context)
-                { pbf_wait(
-                        context,
-                        std::chrono::milliseconds(bite_wait_ms)
-                    );
-                },
+            wait_until(
+                env.console,
+                context,
+                std::chrono::milliseconds(bite_wait_ms),
                 {
                     advance_dialog,
                     white_dialog,
@@ -223,14 +221,15 @@ void ShinyHuntFishing::program(
         */
         if (ret == 0) {
             env.log("Advance dialog detected (red arrow).");
-            pbf_mash_button(context, BUTTON_A, 800ms);
+            pbf_mash_button(context, BUTTON_B, 800ms);
         } else if (ret == 1) {
             env.log("White dialog detected.");
-            pbf_mash_button(context, BUTTON_A, 800ms);
+            pbf_mash_button(context, BUTTON_B, 800ms);
         } else if (ret == 2) {
             env.log("Battle transition detected.");
         } else {
             env.log("No bite detected.");
+            continue;
         }
 
         /*
@@ -241,12 +240,10 @@ void ShinyHuntFishing::program(
         - FIGHT menu appearance
         */
         int battle_ret =
-            run_until<ProControllerContext>(
+            wait_until(
                 env.console,
                 context,
-                [](ProControllerContext& context){
-                    pbf_wait(context, 4000ms);
-                },
+                4000ms,
                 {
                     battle_entered,
                     battle_dialog,
@@ -281,13 +278,10 @@ void ShinyHuntFishing::program(
 
             /*Attempt to recover battle state.*/
             battle_ret =
-                run_until<ProControllerContext>(
+                wait_until(
                     env.console,
                     context,
-
-                    [](ProControllerContext& context){
-                        pbf_wait(context, 2000ms);
-                    },
+                    2000ms,
                     {
                         battle_entered,
                         battle_dialog,
@@ -309,7 +303,7 @@ void ShinyHuntFishing::program(
         Adjust timing upward to improve bite sync.
         -----------------------------------------------------------------------
         */
-        if (battle_ret != 0) {
+        if (battle_ret < 0) {
             failed_attempts++;
 
             /*
