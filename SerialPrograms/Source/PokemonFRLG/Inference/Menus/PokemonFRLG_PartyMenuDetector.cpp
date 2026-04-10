@@ -76,17 +76,17 @@ bool PartySelectionDetector::detect(const ImageViewRGB32& screen){
 ImageFloatBox PartySlotDetector::party_slot_boxes(PartySlot position){
     switch (position){
     case PartySlot::ONE:
-        return ImageFloatBox(0.130000, 0.163000, 0.200000, 0.009000);
+        return ImageFloatBox(0.035000, 0.376617, 0.003280, 0.070000);
     case PartySlot::TWO:
-        return ImageFloatBox(0.710000, 0.063000, 0.260000, 0.009000);
+        return ImageFloatBox(0.985000, 0.080000, 0.003280, 0.099663);
     case PartySlot::THREE:
-        return ImageFloatBox(0.710000, 0.213000, 0.260000, 0.009000);
+        return ImageFloatBox(0.985000, 0.230000, 0.003280, 0.099663);
     case PartySlot::FOUR:
-        return ImageFloatBox(0.710000, 0.363000, 0.260000, 0.009000);
+        return ImageFloatBox(0.985000, 0.380000, 0.003280, 0.099663);
     case PartySlot::FIVE:
-        return ImageFloatBox(0.710000, 0.513000, 0.260000, 0.009000);
+        return ImageFloatBox(0.985000, 0.530000, 0.003280, 0.099663);
     case PartySlot::SIX:
-        return ImageFloatBox(0.710000, 0.663000, 0.260000, 0.009000);
+        return ImageFloatBox(0.985000, 0.675000, 0.003280, 0.099663);
     default:
         break;
     }
