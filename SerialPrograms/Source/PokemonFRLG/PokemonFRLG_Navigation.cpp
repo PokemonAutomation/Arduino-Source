@@ -332,7 +332,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
     return false;
 }
 
-int spam_first_move(ConsoleHandle& console, ProControllerContext& context){
+BattleResult spam_first_move(ConsoleHandle& console, ProControllerContext& context){
     uint16_t errors = 0;
     uint16_t times_moved = 0;
     while (true){
@@ -388,20 +388,20 @@ int spam_first_move(ConsoleHandle& console, ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 2000ms);
                 flee_battle(console, context);
                 context.wait_for_all_requests();
-                return 3;
+                return BattleResult::outofpp;
             }
             continue;
         case 1:
             console.log("Player Pokemon fainted.");
-            return 1;
+            return BattleResult::playerfainted;
         case 2:
             console.log("Opponent fainted.");
-            return 0;
+            return BattleResult::opponentfainted;
         case 3: 
             console.log("Battle ended"); // the opponent probably fled
             pbf_wait(context, 2000ms);
             context.wait_for_all_requests();
-            return 2;
+            return BattleResult::unknown;
         default:
             console.log("Failed to detect move use.");
             pbf_mash_button(context, BUTTON_B, 2000ms); // get back to the top-level battle menu
