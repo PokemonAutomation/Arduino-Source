@@ -12,7 +12,7 @@
 #include "SerialPABotBase2_SelectorWidget.h"
 #include "SerialPABotBase2_Descriptor.h"
 
-//#include "Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.h"
+#include "Controllers/StandardHid/StandardHid_Keyboard_PABotBase2.h"
 //#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.h"
 //#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_ProController.h"
 //#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Joycon.h"
@@ -76,16 +76,13 @@ std::unique_ptr<AbstractController> SerialPABotBase2_Descriptor::make_controller
     ControllerResetMode reset_mode
 ) const{
     switch (controller_type){
-#if 0
     case ControllerType::HID_Keyboard:
         return std::unique_ptr<AbstractController>(
-            new PokemonAutomation::StandardHid::SerialPABotBase_Keyboard(
+            new PokemonAutomation::StandardHid::PABotBase2_Keyboard(
                 logger,
-                static_cast<SerialPABotBase_Connection&>(connection),
-                reset_mode
+                static_cast<PABotBase2::Connection&>(connection)
             )
         );
-#endif
     case ControllerType::NintendoSwitch_WiredController:
     case ControllerType::NintendoSwitch2_WiredController:
         return std::unique_ptr<AbstractController>(

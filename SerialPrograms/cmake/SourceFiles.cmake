@@ -789,6 +789,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/StandardHid/StandardHid_Keyboard.h
     Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.cpp
     Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.h
+    Source/Controllers/StandardHid/StandardHid_Keyboard_PABotBase2.cpp
+    Source/Controllers/StandardHid/StandardHid_Keyboard_PABotBase2.h
     Source/Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.cpp
     Source/Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.h
     Source/Integrations/DiscordIntegrationSettings.cpp

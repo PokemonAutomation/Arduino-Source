@@ -7,13 +7,11 @@
 #include "Common/PABotBase2/Controllers/PABotBase2_Controller_NS_WiredController.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/JoystickTools.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "NintendoSwitch_PABotBase2_WiredController.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -46,17 +44,47 @@ PABotBase2_WiredController::PABotBase2_WiredController(
         }
     );
 
-#if 1
     m_status_thread.reset(new ControllerStatusThread(
         connection, *this
     ));
-#endif
 }
 PABotBase2_WiredController::~PABotBase2_WiredController(){
     stop();
 }
 void PABotBase2_WiredController::stop(){
     m_status_thread.reset();
+}
+
+
+
+void PABotBase2_WiredController::update_status(Cancellable& cancellable){
+    PABotBase2::MessageHeader request;
+    request.message_bytes = sizeof(request);
+    request.opcode = PABB2_MESSAGE_OPCODE_REQUEST_STATUS;
+    uint8_t id = m_connection.device().send_request(request);
+    PABotBase2::Message_u32 response;
+    m_connection.device().wait_for_request_response<PABotBase2::Message_u32, PABB2_MESSAGE_OPCODE_RET_U32>(
+        response, id
+    );
+
+    uint32_t status = response.data;
+    bool status_connected = status & 1;
+    bool status_ready     = status & 2;
+
+    std::string str;
+    str += "Connected: " + (status_connected
+        ? html_color_text("Yes", theme_friendly_darkblue())
+        : html_color_text("No", COLOR_RED)
+    );
+    str += " - Ready: " + (status_ready
+        ? html_color_text("Yes", theme_friendly_darkblue())
+        : html_color_text("No", COLOR_RED)
+    );
+
+    m_connection.set_status_line1(str);
+}
+void PABotBase2_WiredController::stop_with_error(std::string message){
+    PABotBase2_Controller::stop_with_error(std::move(message));
 }
 
 
@@ -171,38 +199,6 @@ void PABotBase2_WiredController::execute_state(
         m_connection.device().command_queue().send_command(request);
         time_left -= current;
     }
-}
-
-
-
-void PABotBase2_WiredController::update_status(Cancellable& cancellable){
-    PABotBase2::MessageHeader request;
-    request.message_bytes = sizeof(request);
-    request.opcode = PABB2_MESSAGE_OPCODE_REQUEST_STATUS;
-    uint8_t id = m_connection.device().send_request(request);
-    PABotBase2::Message_u32 response;
-    m_connection.device().wait_for_request_response<PABotBase2::Message_u32, PABB2_MESSAGE_OPCODE_RET_U32>(
-        response, id
-    );
-
-    uint32_t status = response.data;
-    bool status_connected = status & 1;
-    bool status_ready     = status & 2;
-
-    std::string str;
-    str += "Connected: " + (status_connected
-        ? html_color_text("Yes", theme_friendly_darkblue())
-        : html_color_text("No", COLOR_RED)
-    );
-    str += " - Ready: " + (status_ready
-        ? html_color_text("Yes", theme_friendly_darkblue())
-        : html_color_text("No", COLOR_RED)
-    );
-
-    m_connection.set_status_line1(str);
-}
-void PABotBase2_WiredController::stop_with_error(std::string message){
-    PABotBase2_Controller::stop_with_error(std::move(message));
 }
 
 
