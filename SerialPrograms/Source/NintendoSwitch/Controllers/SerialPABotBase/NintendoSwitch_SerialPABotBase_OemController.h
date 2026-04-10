@@ -9,7 +9,7 @@
 
 #include <cmath>
 #include "Common/ControllerStates/NintendoSwitch_OemController_State.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_StatusThread.h"
+#include "Controllers/ControllerStatusThread.h"
 #include "Controllers/JoystickTools.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
 
@@ -24,7 +24,7 @@ namespace NintendoSwitch{
 
 class SerialPABotBase_OemController :
     public SerialPABotBase_Controller,
-    private SerialPABotBase::ControllerStatusThreadCallback,
+    private ControllerStatusThreadCallback,
     private BotBaseController::Listener
 {
 public:
@@ -141,7 +141,7 @@ protected:
 
 
 private:
-    std::unique_ptr<SerialPABotBase::ControllerStatusThread> m_status_thread;
+    std::unique_ptr<ControllerStatusThread> m_status_thread;
 
     std::string m_color_html;
 };

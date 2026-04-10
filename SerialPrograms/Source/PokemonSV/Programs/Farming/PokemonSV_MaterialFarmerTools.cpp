@@ -10,6 +10,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -26,6 +27,7 @@
 #include "PokemonSV/Programs/Battles/PokemonSV_Battles.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.h"
+#include "PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_MaterialFarmerTools.h"
 
 // #include <iostream>
@@ -463,6 +465,33 @@ void move_to_start_position_for_letsgo0(
 
 }
 
+void do_action_and_run_from_battle(
+    const ProgramInfo& info, 
+    VideoStream& stream,
+    ProControllerContext& context,
+    std::function<
+        void(const ProgramInfo& info, 
+        VideoStream& stream,
+        ProControllerContext& context)
+    >&& action
+){
+    size_t max_attempts = 5;
+    for (size_t i = 0; i < max_attempts; i++){
+        try {
+            do_action_and_monitor_for_battles_early(info, stream, context,
+                [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                    action(info, stream, context);
+                }
+            );
+            break;
+        }catch(UnexpectedBattleException&){
+            stream.log("Detected battle. Now running away.", COLOR_PURPLE);
+            run_from_battle(stream, context);
+        }
+    }
+
+}
+
 // from the North Province (Area 3) pokecenter, move to start position for Happiny dust farming
 void move_to_start_position_for_letsgo1(
     const ProgramInfo& info,
@@ -483,9 +512,21 @@ void move_to_start_position_for_letsgo1(
     // move toward clearing besides the pokecenter
     pbf_move_left_joystick(context, {0, +1}, 2400ms, 80ms);
 
-    // look right, towards the start position
+    // look right, towards the start position. handle unexpected battles
     DirectionDetector direction;
-    direction.change_direction(info, stream, context, 5.76);
+    do_action_and_run_from_battle(
+        info, stream, context,
+        [&](const ProgramInfo& info, VideoStream& stream,ProControllerContext& context){
+            try {
+                direction.change_direction(info, stream, context, 5.76);
+            }catch(OperationFailedException&){
+                context.wait_for(Seconds(5));
+            }
+        }
+    );
+
+    
+
     // pbf_move_right_joystick(context, {+1, 0}, 1040ms, 80ms);
     pbf_move_left_joystick(context, {0, +1}, 80ms, 80ms);
 
@@ -515,9 +556,18 @@ void move_to_start_position_for_letsgo1(
     pbf_press_button(context, BUTTON_B, 400ms, 80ms);
     pbf_press_button(context, BUTTON_B, 400ms, 80ms);
 
-    // look right
+    // look right. handle unexpected battles
     // pbf_move_right_joystick(context, {+1, 0}, 160ms, 80ms);
-    direction.change_direction(info, stream, context, 5.3);
+    do_action_and_run_from_battle(
+        info, stream, context,
+        [&](const ProgramInfo& info, VideoStream& stream,ProControllerContext& context){
+            try {
+                direction.change_direction(info, stream, context, 5.3);
+            }catch(OperationFailedException&){
+                context.wait_for(Seconds(5));
+            }
+        }
+    );
 
     // move forward slightly
     pbf_move_left_joystick(context, {0, +1}, 400ms, 80ms);
