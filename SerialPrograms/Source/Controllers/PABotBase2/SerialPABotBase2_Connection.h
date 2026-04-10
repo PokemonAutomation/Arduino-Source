@@ -7,23 +7,18 @@
 #ifndef PokemonAutomation_Controllers_SerialPABotBase2_Connection_H
 #define PokemonAutomation_Controllers_SerialPABotBase2_Connection_H
 
-#include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/SerialConnection/SerialConnection.h"
 #include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2CC_ReliableStreamConnection.h"
+#include "Controllers/PABotBase2/PABotBase2_Connection.h"
 #include "Controllers/SerialPABotBase/Connection/MessageLogger.h"
-#include "Controllers/ControllerConnection.h"
-#include "PABotBase2_DeviceHandle.h"
 
 namespace PokemonAutomation{
 namespace SerialPABotBase{
 
 
 
-class SerialPABotBase2_Connection final
-    : public ControllerConnection
-    , private CancellableScope
-{
+class SerialPABotBase2_Connection final : public PABotBase2::Connection{
 public:
     SerialPABotBase2_Connection(
         Logger& logger,
@@ -31,6 +26,8 @@ public:
         bool set_to_null_controller
     );
     ~SerialPABotBase2_Connection();
+
+    virtual bool cancel(std::exception_ptr exception = nullptr) noexcept override;
 
 
 public:
@@ -52,7 +49,6 @@ private:
     AsyncTask m_connect_thread;
     std::unique_ptr<SerialConnection> m_unreliable_connection;
     std::unique_ptr<PABotBase2::ReliableStreamConnection> m_stream_connection;
-    std::unique_ptr<PABotBase2::DeviceHandle> m_device;
 };
 
 

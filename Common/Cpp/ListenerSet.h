@@ -152,7 +152,7 @@ void ListenerSet<ListenerType>::remove(ListenerType& listener) noexcept{
     auto scope = m_sanitizer.check_scope();
 #endif
 
-    bool printed = false;
+//    bool printed = false;
 
     while (true){
         WriteSpinLock lg(m_lock, "ListenerSet::remove()");
@@ -168,12 +168,14 @@ void ListenerSet<ListenerType>::remove(ListenerType& listener) noexcept{
 #endif
 
         if (!node.lock.try_acquire_write()){
+#if 0
             if (!printed){
                 try{
                     std::cout << "ListenerSet::remove(): Retry inner." << std::endl;
                 }catch (...){}
                 printed = true;
             }
+#endif
             continue;
         }
 

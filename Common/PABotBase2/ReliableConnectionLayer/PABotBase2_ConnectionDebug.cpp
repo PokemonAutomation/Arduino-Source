@@ -99,11 +99,11 @@ bool PacketHeader_check(const PacketHeader* packet, bool ascii){
         return true;
     }
 
-    //  REMOVE
-    std::cout << "PacketHeader_check(): CRC mismatch" << std::endl;
-    PacketHeader_print(packet, ascii);
-//    system("pause");
-
+    if (false){
+        std::cout << "PacketHeader_check(): CRC mismatch" << std::endl;
+        PacketHeader_print(packet, ascii);
+//        system("pause");
+    }
     return false;
 }
 

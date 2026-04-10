@@ -118,7 +118,25 @@ private:
 class BattleLearnDialogWatcher : public DetectorToFinder<BattleLearnDialogDetector>{
 public:
     BattleLearnDialogWatcher(Color color)
-        : DetectorToFinder("BattleLearnDialogDetector", std::chrono::milliseconds(250), color)
+        : DetectorToFinder("BattleLearnDialogWatcher", std::chrono::milliseconds(250), color)
+    {}
+};
+
+class BattleOutOfPpDetector : public StaticScreenDetector{
+public:
+    BattleOutOfPpDetector(Color color);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+private:
+    ImageFloatBox m_box;
+    double m_area_ratio_threshold;
+};
+class BattleOutOfPpWatcher : public DetectorToFinder<BattleOutOfPpDetector>{
+public:
+    BattleOutOfPpWatcher(Color color)
+        : DetectorToFinder("BattleOutOfPpWatcher", std::chrono::milliseconds(250), color)
     {}
 };
 
