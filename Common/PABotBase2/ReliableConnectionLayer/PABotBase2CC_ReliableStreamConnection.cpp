@@ -86,18 +86,28 @@ void ReliableStreamConnection::wait_for_pending(){
 //  StreamSender/StreamListener
 //
 
-void ReliableStreamConnection::reliable_send(const void* data, size_t bytes){
+size_t ReliableStreamConnection::reliable_send(const void* data, size_t bytes, WallDuration timeout){
+    WallClock deadline = timeout == WallDuration::max()
+        ? WallClock::max()
+        : current_time() + timeout;
+
     const char* ptr = (const char*)data;
     std::unique_lock<Mutex> lg(m_lock);
-    while (bytes > 0){
+    size_t total_sent = 0;
+    while (bytes > 0 && current_time() < deadline){
         throw_if_cancelled();
         if (m_reliable_sender.slots_used() >= m_remote_slot_capacity){
-            m_cv.wait(lg);
+            m_cv.wait_until(lg, deadline);
         }
         size_t sent = m_reliable_sender.send_stream(ptr, bytes);
         ptr += sent;
         bytes -= sent;
+        total_sent += sent;
+        if (sent == 0){
+            m_cv.wait_until(lg, deadline);
+        }
     }
+    return total_sent;
 }
 void ReliableStreamConnection::on_recv(const void* data, size_t bytes){
 #if 0
@@ -348,6 +358,7 @@ void ReliableStreamConnection::on_packet(const PacketHeader* packet){
     case PABB2_CONNECTION_OPCODE_INFO_H32:
     case PABB2_CONNECTION_OPCODE_INFO_U32:
     case PABB2_CONNECTION_OPCODE_INFO_I32:
+    case PABB2_CONNECTION_OPCODE_INFO_BINARY:
     case PABB2_CONNECTION_OPCODE_INFO_STR:
     case PABB2_CONNECTION_OPCODE_INFO_LABEL_H32:
     case PABB2_CONNECTION_OPCODE_INFO_LABEL_U32:
@@ -359,7 +370,7 @@ void ReliableStreamConnection::on_packet(const PacketHeader* packet){
         return;
     default:
         m_logger.log(
-            "[RSC]: UNKNOWN OPCODE: Device send an unknown opcode: " + std::to_string(packet->opcode),
+            "[RSC]: UNKNOWN OPCODE: Device sent an unknown opcode: " + tostr_hex(packet->opcode),
             COLOR_RED
         );
         return;

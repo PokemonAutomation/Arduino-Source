@@ -742,6 +742,7 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/NullController.h
     Source/Controllers/PABotBase2/PABotBase2_CommandQueueManager.cpp
     Source/Controllers/PABotBase2/PABotBase2_CommandQueueManager.h
+    Source/Controllers/PABotBase2/PABotBase2_Connection.cpp
     Source/Controllers/PABotBase2/PABotBase2_Connection.h
     Source/Controllers/PABotBase2/PABotBase2_DeviceHandle.cpp
     Source/Controllers/PABotBase2/PABotBase2_DeviceHandle.h
@@ -789,6 +790,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/StandardHid/StandardHid_Keyboard.h
     Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.cpp
     Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.h
+    Source/Controllers/StandardHid/StandardHid_Keyboard_PABotBase2.cpp
+    Source/Controllers/StandardHid/StandardHid_Keyboard_PABotBase2.h
     Source/Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.cpp
     Source/Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.h
     Source/Integrations/DiscordIntegrationSettings.cpp
@@ -1060,6 +1063,10 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController_from_Keyboard.h
     Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_Controller.cpp
     Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_Controller.h
+    Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_Joycon.h
+    Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_OemController.cpp
+    Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_OemController.h
+    Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_ProController.h
     Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_WiredController.cpp
     Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_WiredController.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.cpp
@@ -1239,6 +1246,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.h
+    Source/Pokemon/Inference/Pokemon_TypeReader.cpp
+    Source/Pokemon/Inference/Pokemon_TypeReader.h
     Source/Pokemon/Options/Pokemon_BoxSortingTable.cpp
     Source/Pokemon/Options/Pokemon_BoxSortingTable.h
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h
@@ -1437,6 +1446,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h
     Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.cpp
     Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.h
+    Source/PokemonFRLG/Inference/Map/PokemonFRLG_MapDetector.cpp
+    Source/PokemonFRLG/Inference/Map/PokemonFRLG_MapDetector.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.cpp
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.cpp
@@ -1455,6 +1466,10 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/PokemonFRLG_DigitReader.h
     Source/PokemonFRLG/Inference/PokemonFRLG_StatsReader.cpp
     Source/PokemonFRLG/Inference/PokemonFRLG_StatsReader.h
+    Source/PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.cpp
+    Source/PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.h
+    Source/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.cpp
+    Source/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h
     Source/PokemonFRLG/PokemonFRLG_Navigation.cpp
     Source/PokemonFRLG/PokemonFRLG_Navigation.h
     Source/PokemonFRLG/PokemonFRLG_Panels.cpp
@@ -1475,12 +1490,16 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_LegendaryRunAway.h
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_PrizeCornerReset.cpp
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_PrizeCornerReset.h
+    Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Fishing.cpp
+    Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Fishing.h
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Overworld.cpp
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Overworld.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.cpp
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadStats.cpp
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadStats.h
+    Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadEncounter.cpp
+    Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadEncounter.h
     Source/PokemonHome/Inference/PokemonHome_BallReader.cpp
     Source/PokemonHome/Inference/PokemonHome_BallReader.h
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.cpp
@@ -2382,8 +2401,6 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h
     Source/PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h
-    Source/PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.cpp
-    Source/PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h
     Source/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h
     Source/PokemonSwSh/Inference/RNG/PokemonSwSh_OrbeetleAttackAnimationDetector.cpp

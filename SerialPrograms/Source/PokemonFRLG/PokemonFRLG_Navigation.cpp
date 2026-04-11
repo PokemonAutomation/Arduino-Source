@@ -296,7 +296,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
         },
         {{shiny_detector}}
     );
-    shiny_detector.throw_if_no_sound();
+    shiny_detector.throw_if_no_sound(std::chrono::milliseconds(1000));
     if (res == 0){
         console.log("Shiny detected!");
         return true;

@@ -16,6 +16,7 @@
 namespace PokemonAutomation{
 
 class RecursiveThrottler;
+enum class ControllerInputType;
 class ControllerInputState;
 class ControllerState;
 enum class ControllerType;
@@ -101,7 +102,11 @@ public:
     //  state and clears the command queue.
     //  This does not wait for the commands to finish cancelling. This is an
     //  asynchronous function that merely initiates the cancellation process.
-    virtual void cancel_all_commands() = 0;
+    //
+    //  If the cancel cannot be sent before the timeout, it will return false.
+    //  Thus this can be used to send a non-blocking cancel that will not
+    //  hang if the controller is stuck.
+    virtual bool cancel_all_commands(WallDuration timeout = WallDuration::max()) = 0;
 
     //  Same as "cancel_all_commands()", but instead of cancelling the stream,
     //  it lets it keep running. Then on the next command issued after this
@@ -289,7 +294,7 @@ public:
             return true;
         }
         try{
-            m_controller.cancel_all_commands();
+            m_controller.cancel_all_commands(std::chrono::milliseconds(100));
         }catch (...){}
         return false;
     }

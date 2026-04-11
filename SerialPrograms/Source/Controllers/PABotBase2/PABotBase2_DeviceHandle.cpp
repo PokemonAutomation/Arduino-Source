@@ -45,14 +45,6 @@ DeviceHandle::~DeviceHandle(){
 }
 
 
-void DeviceHandle::add_message_logger(
-    uint8_t opcode,
-    bool always_print,
-    std::string(*tostr)(const MessageHeader*)
-){
-    m_message_loggers.add_message(opcode, always_print, tostr);
-}
-
 bool DeviceHandle::cancel(std::exception_ptr exception) noexcept{
     if (CancellableScope::cancel(std::move(exception))){
         return true;
@@ -164,6 +156,20 @@ void DeviceHandle::connect(){
     query_controller_list();
     query_command_queue();
 }
+void DeviceHandle::try_set_controller_type(
+    ControllerType controller_type,
+    bool clear_settings
+) noexcept{
+    PABotBase2::Message_u32 message;
+    message.message_bytes = sizeof(message);
+    message.opcode = clear_settings
+        ? PABB2_MESSAGE_OPCODE_RESET_TO_CONTROLLER
+        : PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE;
+    try{
+        message.data = SerialPABotBase::controller_type_to_id(controller_type);
+        try_send_request(message, std::chrono::milliseconds(100));
+    }catch (...){}
+}
 
 ControllerType DeviceHandle::refresh_controller_type(){
     m_logger.log("Reading Controller Mode...");
@@ -177,7 +183,6 @@ ControllerType DeviceHandle::refresh_controller_type(){
 //    m_current_controller.store(current_controller, std::memory_order_release);
     return current_controller;
 }
-
 
 uint8_t DeviceHandle::send_request(MessageHeader& request){
     std::unique_lock<Mutex> lg(m_lock);
@@ -199,7 +204,49 @@ uint8_t DeviceHandle::send_request(MessageHeader& request){
     }
 
     m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
-    m_connection.reliable_send(&request, request.message_bytes);
+
+    try{
+        m_connection.reliable_send(&request, request.message_bytes);
+    }catch (...){
+        m_pending_requests.erase(request.id);
+        m_request_seqnum--;
+        throw;
+    }
+
+    return request.id;
+}
+std::optional<uint8_t> DeviceHandle::try_send_request(MessageHeader& request, WallDuration timeout) noexcept{
+    std::unique_lock<Mutex> lg(m_lock);
+    try{
+        while (true){
+            throw_if_cancelled();
+
+            request.id = m_request_seqnum;
+
+            //  Wait until the slot is available.
+            auto iter = m_pending_requests.find(request.id);
+            if (iter != m_pending_requests.end()){
+                m_cv.wait(lg);
+                continue;
+            }
+
+            m_pending_requests[request.id];
+            m_request_seqnum++;
+            break;
+        }
+    }catch (...){
+        return {};
+    }
+
+    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
+
+    try{
+        m_connection.reliable_send(&request, request.message_bytes, timeout);
+    }catch (...){
+        m_pending_requests.erase(request.id);
+        m_request_seqnum--;
+        return {};
+    }
 
     return request.id;
 }
@@ -296,7 +343,7 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
 
         const MessageHeader* header = (const MessageHeader*)message.c_str();
 
-        m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, header);
+        m_message_loggers.log_recv(m_logger, GlobalSettings::instance().LOG_EVERYTHING, header);
 
         //  Now we can process the message.
         switch (header->opcode){
