@@ -1246,6 +1246,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.h
+    Source/Pokemon/Inference/Pokemon_TypeReader.cpp
+    Source/Pokemon/Inference/Pokemon_TypeReader.h
     Source/Pokemon/Options/Pokemon_BoxSortingTable.cpp
     Source/Pokemon/Options/Pokemon_BoxSortingTable.h
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h
@@ -2397,8 +2399,6 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h
     Source/PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h
-    Source/PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.cpp
-    Source/PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h
     Source/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h
     Source/PokemonSwSh/Inference/RNG/PokemonSwSh_OrbeetleAttackAnimationDetector.cpp
