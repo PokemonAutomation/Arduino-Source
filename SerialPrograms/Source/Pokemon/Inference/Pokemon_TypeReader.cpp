@@ -32,7 +32,7 @@ public:
         switch (generation)
         {       
         case PokemonAutomation::Pokemon::PokemonTypeGeneration::GEN8:
-			sprite = ImageRGB32(RESOURCE_PATH() + "Pokemon/Types/Gen8/" + slug + ".png");
+            sprite = ImageRGB32(RESOURCE_PATH() + "Pokemon/Types/Gen8/" + slug + ".png");
             break;
         case PokemonAutomation::Pokemon::PokemonTypeGeneration::GEN9:
             sprite = ImageRGB32(RESOURCE_PATH() + "Pokemon/Types/Gen9/" + slug + ".png");
@@ -159,18 +159,18 @@ std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image, Po
 
     //    std::map<double, PokemonType> rank;
 
-	const std::map<PokemonType, TypeSprite>* type_sprite_map;
+    const std::map<PokemonType, TypeSprite>* type_sprite_map;
 
-	switch (generation) {
-	case PokemonAutomation::Pokemon::PokemonTypeGeneration::GEN8:
-		type_sprite_map = &Gen8TypeSpriteDatabase::instance().m_type_map;
-		break;
-	case PokemonAutomation::Pokemon::PokemonTypeGeneration::GEN9:
-		type_sprite_map = &Gen9TypeSpriteDatabase::instance().m_type_map;
-		break;
-	default:
-		throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid enum.");
-	}
+    switch (generation) {
+    case PokemonAutomation::Pokemon::PokemonTypeGeneration::GEN8:
+        type_sprite_map = &Gen8TypeSpriteDatabase::instance().m_type_map;
+        break;
+    case PokemonAutomation::Pokemon::PokemonTypeGeneration::GEN9:
+        type_sprite_map = &Gen9TypeSpriteDatabase::instance().m_type_map;
+        break;
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid enum.");
+    }
 
     double best_score = 0.45;
     PokemonType best_type = PokemonType::NONE;
@@ -232,7 +232,7 @@ void find_type_symbol_candidates(
     const ImageViewRGB32& image,
     PackedBinaryMatrix& matrix, 
     double max_area_ratio,
-	PokemonTypeGeneration generation
+    PokemonTypeGeneration generation
 ){
     size_t max_area = (size_t)(image.width() * image.height() * max_area_ratio);
     std::vector<WaterfillObject> objects = find_objects_inplace(
@@ -314,7 +314,7 @@ std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_type_symbols(
     const ImageViewPlanar32& original_screen,
     const ImageViewRGB32& image, 
     double max_area_ratio,
-	PokemonTypeGeneration generation
+    PokemonTypeGeneration generation
 ) {
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates;
 
@@ -387,7 +387,7 @@ std::pair<PokemonType, PokemonType> read_pokemon_types(
         original_screen,
         image,
         0.20,
-		generation
+        generation
     );
 
     //  Re-sort by screen position (left-to-right, top-to-bottom) so that primary/secondary
