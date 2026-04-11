@@ -422,6 +422,7 @@ void access_pc_from_overworld(ConsoleHandle& console, ProControllerContext& cont
                         break;
                     }
                 // Not sure how to handle this case, can't test it. Attempt to back out and try again for now
+                // Currently not being detected
                 case PCOpenStatus::ENVIRONMENT_CHANGE:
                     console.log("Environment change detected");
                     pbf_mash_button(context, BUTTON_B, 15s);
@@ -429,7 +430,7 @@ void access_pc_from_overworld(ConsoleHandle& console, ProControllerContext& cont
                 case PCOpenStatus::FAILURE:
                     console.log("Failed to open PC"); // Likely stuck talking to a wandering Pokemon
                     pbf_mash_button(context, BUTTON_B, 15s);
-                    break;
+                    continue;
                 default:
                     throw InternalProgramError(
                         nullptr, PA_CURRENT_FUNCTION,
@@ -443,7 +444,7 @@ void access_pc_from_overworld(ConsoleHandle& console, ProControllerContext& cont
     }
     OperationFailedException(
         ErrorReport::SEND_ERROR_REPORT,
-        "open_pc_from_overworld() failed to open PC",
+        "access_pc_from_overworld() failed to open PC",
         console
     );
 }

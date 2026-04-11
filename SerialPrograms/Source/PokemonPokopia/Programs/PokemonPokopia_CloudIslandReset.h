@@ -41,9 +41,6 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    // Starting from the overworld, face the PC and attempt to open the PC meanu
-    void open_pc_from_overworld(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-
     // Starting from the overworld, navigate through the PC menu to delete the existing cloud island save and return to overworld
     void delete_cloud_island_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 

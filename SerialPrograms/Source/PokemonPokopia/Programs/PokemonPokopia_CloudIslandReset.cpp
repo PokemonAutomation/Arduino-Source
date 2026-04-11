@@ -84,48 +84,6 @@ CloudIslandReset::CloudIslandReset()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void CloudIslandReset::open_pc_from_overworld(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    CloudIslandReset_Descriptor::Stats& stats = env.current_stats<CloudIslandReset_Descriptor::Stats>();
-    wait_for_overworld(env.console, context);
-
-    // Need to physically face PC for PC open prompt
-    ButtonWatcher button_a_watcher(
-        COLOR_RED, ButtonType::ButtonA, 
-        {0.250000, 0.000000, 0.500000, 1.000000}, // Button A can fall in a fairly large area
-        &env.console.overlay()
-    );
-    // Wandering Pokemon can trigger the same prompt, retry a few times
-    for (int i = 0; i < 5; i++){
-        int ret = run_until<ProControllerContext>(
-            env.console, context,
-            [&](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, +0.8}, 25ms, 2000ms);
-                pbf_move_left_joystick(context, {0, -0.8}, 25ms, 240ms); // return position
-                pbf_move_left_joystick(context, {+0.8, 0}, 25ms, 2000ms);
-                pbf_move_left_joystick(context, {-0.8, 0}, 25ms, 240ms); // return position
-                pbf_move_left_joystick(context, {-0.8, 0}, 25ms, 2000ms);
-                pbf_move_left_joystick(context, {+0.8, 0}, 25ms, 240ms); // return position
-            },
-            {button_a_watcher}
-        );
-        switch (ret){
-        case 0:
-            env.console.log("Detected A button prompt");
-
-            return;
-        default:
-            env.console.log("Failed to detect A button prompt, attempting to reposition and retry... (attempt " + std::to_string(i+1) + ")");
-        }
-    }
-    stats.errors++;
-    env.update_stats();
-    OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT,
-        "open_pc_from_overworld() failed to open PC",
-        env.console
-    );
-}
-
 void CloudIslandReset::delete_cloud_island_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     CloudIslandReset_Descriptor::Stats& stats = env.current_stats<CloudIslandReset_Descriptor::Stats>();
 
