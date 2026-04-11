@@ -87,8 +87,6 @@ enum class PCMenuOption{
     APPRAISE // Only present in Palette Town
 };
 
-// TODO: Automatically detect whether the player is in Palette Town
-
 // Wait until the overworld is fully loaded
 void wait_for_overworld(ConsoleHandle& console, ProControllerContext& context);
 
@@ -102,7 +100,7 @@ void access_pc_from_overworld(ConsoleHandle& console, ProControllerContext& cont
 void exit_pc(ConsoleHandle& console, ProControllerContext& context);
 
 // With the PC menu open and actionable, open the specified menu option
-void open_menu_option(ConsoleHandle& console, ProControllerContext& context, PCMenuOption option, bool is_palette_town=false);
+void open_menu_option(ConsoleHandle& console, ProControllerContext& context, PCMenuOption option);
 
 // A generic function to open and select an option for a vertical or horizontal list
 // Takes in a vector of ImageBoxes for the selection arrow locations for each item

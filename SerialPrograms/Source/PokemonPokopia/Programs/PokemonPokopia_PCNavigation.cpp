@@ -163,18 +163,31 @@ bool set_selector_on_target_row(ConsoleHandle& console, ProControllerContext& co
 }
 
 // Helper to move the selector within the current row until the target is hovered
-bool set_selector_on_target_within_row_routine(ConsoleHandle& console, ProControllerContext& context, SelectionArrowWatcher& target_selector){
+// Check for both possible locations for palette town and everywhere else
+bool set_selector_on_target_within_row_routine(ConsoleHandle& console, ProControllerContext& context, PCMenuOption target){
+    SelectionArrowWatcher target_selector(
+        COLOR_YELLOW, &console.overlay(),
+        SelectionArrowType::DOWN,
+        get_pc_menu_option_box(target)
+    );
+    SelectionArrowWatcher target_selector_pallete(
+        COLOR_YELLOW, &console.overlay(),
+        SelectionArrowType::DOWN,
+        get_pc_menu_option_box(target, true)
+    );
+
     WallClock deadline = current_time() + 30s;
     while (current_time() < deadline){
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context,
-            500ms,
+            1s,
             {
-                target_selector
+                target_selector,
+                target_selector_pallete
             }
         );
-        if (ret == 0){
+        if (ret == 0 || ret == 1){
             console.log("Selector on target");
             return true;
         }
@@ -185,10 +198,10 @@ bool set_selector_on_target_within_row_routine(ConsoleHandle& console, ProContro
 }
 
 // Move the selector within the current row until the target is hovered
-bool set_selector_on_target_within_row(ConsoleHandle& console, ProControllerContext& context, SelectionArrowWatcher& target_selector){
+bool set_selector_on_target_within_row(ConsoleHandle& console, ProControllerContext& context, PCMenuOption target){
     WallClock deadline = current_time() + 30s;
     while (current_time() < deadline){
-        if (set_selector_on_target_within_row_routine(console, context, target_selector)){
+        if (set_selector_on_target_within_row_routine(console, context, target)){
             // context.wait_for(1000ms); // Confirmation in case video lags
             // if (set_selector_on_target_within_row_routine(console, context, target_selector)){
                 console.log("Selector confirmed on target");
@@ -202,14 +215,14 @@ bool set_selector_on_target_within_row(ConsoleHandle& console, ProControllerCont
 
 // Move the selector to hover the menu option specified by the target_selector
 // Move vertically to the right row, then horizontally to the right option within the row
-bool set_menu_option(ConsoleHandle& console, ProControllerContext& context, PCMenuOption option, SelectionArrowWatcher& target_selector){
+bool set_menu_option(ConsoleHandle& console, ProControllerContext& context, PCMenuOption option){
     bool target_is_on_top_row = (option == PCMenuOption::CHALLENGES || option == PCMenuOption::SHOP);
 
     if (!set_selector_on_target_row(console, context, target_is_on_top_row)){
         console.log("Failed to navigate to the correct row");
         return false;
     }
-    if (set_selector_on_target_within_row(console, context, target_selector)){
+    if (set_selector_on_target_within_row(console, context, option)){
         console.log("Successfully navigated to the correct menu option");
         return true;
     }
@@ -461,14 +474,13 @@ void exit_pc(ConsoleHandle& console, ProControllerContext& context){
     console.log("Exited PC and returned to overworld");
 }
 
-void open_menu_option(ConsoleHandle& console, ProControllerContext& context, PCMenuOption option, bool is_palette_town){
-    SelectionArrowWatcher target_selector(
+void open_menu_option(ConsoleHandle& console, ProControllerContext& context, PCMenuOption option){
+    SelectionArrowDetector target_selector(
         COLOR_YELLOW, &console.overlay(),
         SelectionArrowType::DOWN,
-        get_pc_menu_option_box(option, is_palette_town)
+        {0.150000, 0.200000, 0.700000, 0.500000}
     );
-    
-    if (!set_menu_option(console, context, option, target_selector)){
+    if (!set_menu_option(console, context, option)){
         console.log("Failed to set menu option");
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -479,11 +491,28 @@ void open_menu_option(ConsoleHandle& console, ProControllerContext& context, PCM
     WallClock deadline = current_time() + 30s;
     while (current_time() < deadline){
         context.wait_for_all_requests();
+        VideoSnapshot screen = console.video().snapshot();
+        ImageFloatBox last_detected_box;
+        if (target_selector.detect(screen)){
+            last_detected_box = target_selector.last_detected();
+        }
+        else {
+            context.wait_for(500ms);
+            continue;
+        }
         pbf_press_button(context, BUTTON_A, 160ms, 240ms);
         context.wait_for(500ms);
-        VideoSnapshot screen = console.video().snapshot();
-        if (!target_selector.detect(screen)){
-            console.log("PC menu option opened");
+        screen = console.video().snapshot();
+        ImageFloatBox current_detected_box;
+        if (target_selector.detect(screen)){
+            current_detected_box = target_selector.last_detected();
+            if (std::abs(current_detected_box.x - last_detected_box.x) > 0.01 && std::abs(current_detected_box.y - last_detected_box.y) > 0.01){
+                console.log("PC Menu option opened");
+                return;
+            }
+        }
+        else {
+            console.log("PC Menu option opened"); // For subsequent menus without selectors
             return;
         }
     }

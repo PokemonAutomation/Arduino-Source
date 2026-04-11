@@ -63,12 +63,6 @@ std::unique_ptr<StatsTracker> CloudIslandReset_Descriptor::make_stats() const{
 
 CloudIslandReset::CloudIslandReset()
     : STOP_AFTER_CURRENT("Reset")
-    , IN_PALETTE_TOWN(
-        "<b>In Palette Town:</b><br>"
-        "Whether the program is being run from Palette Town. This affects the layout of the PC menu.",
-        LockMode::LOCK_WHILE_RUNNING,
-        false
-    )
     , NUM_RESETS(
         "<b>Number of Resets to Run:</b><br>"
         "Zero will run until 'Stop after Current Reset' is pressed or the program is manually stopped.",
@@ -85,7 +79,6 @@ CloudIslandReset::CloudIslandReset()
     })
 {
     PA_ADD_OPTION(STOP_AFTER_CURRENT);
-    PA_ADD_OPTION(IN_PALETTE_TOWN);
     PA_ADD_OPTION(NUM_RESETS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -139,7 +132,7 @@ void CloudIslandReset::delete_cloud_island_save(SingleSwitchProgramEnvironment& 
     access_pc_from_overworld(env.console, context);
     env.console.log("Opened PC menu");
 
-    open_menu_option(env.console, context, PCMenuOption::LINK_PLAY, IN_PALETTE_TOWN);
+    open_menu_option(env.console, context, PCMenuOption::LINK_PLAY);
     env.console.log("Opened Link Play menu");
 
     // Navigate top level Link Play menu and enter settings [invite, visit, play, settings])
@@ -209,7 +202,7 @@ void CloudIslandReset::create_cloud_island_after_delete(SingleSwitchProgramEnvir
     access_pc_from_overworld(env.console, context);
     env.console.log("Opened PC menu");
 
-    open_menu_option(env.console, context, PCMenuOption::LINK_PLAY, IN_PALETTE_TOWN);
+    open_menu_option(env.console, context, PCMenuOption::LINK_PLAY);
     env.console.log("Opened Link Play menu");
 
     // Navigate top level Link Play menu and enter play Cloud Island menu [invite, visit, play, settings])

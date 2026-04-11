@@ -63,7 +63,6 @@ private:
 
 private:
     DeferredStopButtonOption STOP_AFTER_CURRENT;
-    BooleanCheckBoxOption IN_PALETTE_TOWN;
     SimpleIntegerOption<uint32_t> NUM_RESETS;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
