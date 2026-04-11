@@ -45,14 +45,6 @@ DeviceHandle::~DeviceHandle(){
 }
 
 
-void DeviceHandle::add_message_logger(
-    uint8_t opcode,
-    bool always_print,
-    std::string(*tostr)(const MessageHeader*)
-){
-    m_message_loggers.add_message(opcode, always_print, tostr);
-}
-
 bool DeviceHandle::cancel(std::exception_ptr exception) noexcept{
     if (CancellableScope::cancel(std::move(exception))){
         return true;

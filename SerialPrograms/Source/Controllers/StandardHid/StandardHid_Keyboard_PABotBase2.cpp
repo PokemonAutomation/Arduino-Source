@@ -26,14 +26,13 @@ PABotBase2_Keyboard::PABotBase2_Keyboard(
     using namespace PABotBase2;
 
     //  Add controller-specific messages.
-    connection.device().add_message_logger(
+    connection.device().message_logger().add_message<pabb2_Message_Command_HID_Keyboard_State>(
+        "PABB2_MESSAGE_CMD_HID_KEYBOARD_STATE",
         PABB2_MESSAGE_CMD_HID_KEYBOARD_STATE,
         false,
-        [](const MessageHeader* header){
-            const auto* message = (const pabb2_Message_Command_HID_Keyboard_State*)header;
+        [](const pabb2_Message_Command_HID_Keyboard_State* message){
             std::string str;
-            str += "PABB2_MESSAGE_CMD_HID_KEYBOARD_STATE: id = ";
-            str += std::to_string(message->id);
+            str += "id = " + std::to_string(message->id);
             str += ", ms = " + std::to_string(message->milliseconds);
             return str;
         }

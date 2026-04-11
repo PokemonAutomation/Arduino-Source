@@ -36,11 +36,15 @@ public:
     );
     virtual ~DeviceHandle();
 
-    void add_message_logger(
-        uint8_t opcode,
-        bool always_print,
-        std::string(*tostr)(const MessageHeader*)
-    );
+    Logger& logger() const{
+        return m_logger;
+    }
+    MessageLogger& message_logger(){
+        return m_message_loggers;
+    }
+    ReliableStreamConnectionPushing& connection(){
+        return m_connection;
+    }
 
     template <typename MessageHandler, class... Args>
     void add_message_handler(Args&&... args){
@@ -95,13 +99,15 @@ public:
         if (header->opcode != response_opcode){
             throw SerialProtocolException(
                 m_logger, PA_CURRENT_FUNCTION,
-                "Received Incorrect Response Type: Expected = " + std::to_string(response_opcode) + ", Actual = " + std::to_string(header->opcode)
+                "Received Incorrect Response Type: Expected = " + std::to_string(response_opcode) +
+                ", Actual = " + std::to_string(header->opcode)
             );
         }
         if (header->message_bytes != sizeof(ResponseType)){
             throw SerialProtocolException(
                 m_logger, PA_CURRENT_FUNCTION,
-                "Received Incorrect Response Size: Expected = " + std::to_string(sizeof(ResponseType)) + ", Actual = " + std::to_string(header->message_bytes)
+                "Received Incorrect Response Size: Expected = " + std::to_string(sizeof(ResponseType)) +
+                ", Actual = " + std::to_string(header->message_bytes)
             );
         }
         memcpy(&response, header, sizeof(ResponseType));
@@ -145,7 +151,7 @@ private:
     MessageLogger m_message_loggers;
 
     struct MessageConverter{
-        bool always_print;
+        bool always_print = false;
         std::string (*tostr)(const MessageHeader*);
     };
     std::map<uint8_t, std::unique_ptr<MessageHandler>> m_message_handlers;

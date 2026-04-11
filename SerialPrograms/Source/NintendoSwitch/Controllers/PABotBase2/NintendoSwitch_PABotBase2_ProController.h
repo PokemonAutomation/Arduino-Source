@@ -1,16 +1,14 @@
-/*  PABotBase2: Wired Controller (Nintendo Switch)
+/*  PABotBase2: Pro Controller (Nintendo Switch 1)
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_PABotBase2_WiredController_H
-#define PokemonAutomation_NintendoSwitch_PABotBase2_WiredController_H
+#ifndef PokemonAutomation_NintendoSwitch_PABotBase2_ProController_H
+#define PokemonAutomation_NintendoSwitch_PABotBase2_ProController_H
 
-#include "Controllers/ControllerStatusThread.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
-#include "NintendoSwitch_PABotBase2_Controller.h"
+#include "NintendoSwitch_PABotBase2_OemController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -18,22 +16,25 @@ namespace NintendoSwitch{
 
 
 
-class PABotBase2_WiredController final :
+class PABotBase2_ProController final :
     public ProController,
-    public PABotBase2_Controller,
-    private ControllerStatusThreadCallback
+    public PABotBase2_OemController
 {
-public:
-    using ContextType = ProControllerContext;
+    static constexpr uint16_t JOYSTICK_MIN_THRESHOLD = 1874;
+    static constexpr uint16_t JOYSTICK_MAX_THRESHOLD = 320;
 
-
 public:
-    PABotBase2_WiredController(
+    PABotBase2_ProController(
         Logger& logger,
-        PABotBase2::Connection& connection
-    );
-    ~PABotBase2_WiredController();
-    void stop();
+        PABotBase2::Connection& connection,
+        ControllerType controller_type
+    )
+        : ProController(logger)
+        , PABotBase2_OemController(logger, connection, controller_type)
+    {}
+    ~PABotBase2_ProController(){
+        PABotBase2_OemController::stop();
+    }
 
     virtual Logger& logger() override{
         return m_logger;
@@ -48,16 +49,16 @@ public:
 
 public:
     virtual ControllerPerformanceClass performance_class() const override{
-        return ControllerPerformanceClass::SerialPABotBase_Wired;
+        return m_performance_class;
     }
     virtual Milliseconds ticksize() const override{
-        return Milliseconds(0);
+        return m_ticksize;
     }
     virtual Milliseconds cooldown() const override{
-        return Milliseconds(8);
+        return m_cooldown;
     }
     virtual Milliseconds timing_variation() const override{
-        return ConsoleSettings::instance().TIMING_OPTIONS.WIRED;
+        return m_timing_variation;
     }
     virtual bool atomic_multibutton() const override{
         return true;
@@ -66,7 +67,8 @@ public:
 
 public:
     virtual bool cancel_all_commands(WallDuration timeout) override{
-        return PABotBase2_Controller::cancel_all_commands(timeout);
+        PABotBase2_Controller::cancel_all_commands(timeout);
+        return true;
     }
     virtual void replace_on_next_command() override{
         PABotBase2_Controller::replace_on_next_command();
@@ -86,12 +88,12 @@ public:
     virtual void issue_nop(Cancellable* cancellable, Milliseconds duration) override{
         ControllerWithScheduler::issue_nop(cancellable, duration);
     }
+
     virtual void issue_buttons(
         Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         Button button
     ) override{
-        button &= VALID_PRO_CONTROLLER_BUTTONS;
         ControllerWithScheduler::issue_buttons(cancellable, delay, hold, cooldown, button);
     }
     virtual void issue_dpad(
@@ -189,7 +191,6 @@ public:
         Button button,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown
     ) override{
-        button &= VALID_PRO_CONTROLLER_BUTTONS;
         ControllerWithScheduler::issue_mash_button(cancellable, duration, button, delay, hold, cooldown);
     }
     virtual void issue_mash_button(
@@ -197,8 +198,6 @@ public:
         Milliseconds duration,
         Button button0, Button button1
     ) override{
-        button0 &= VALID_PRO_CONTROLLER_BUTTONS;
-        button1 &= VALID_PRO_CONTROLLER_BUTTONS;
         ControllerWithScheduler::issue_mash_button(cancellable, duration, button0, button1);
     }
     virtual void issue_mash_AZs(
@@ -217,17 +216,79 @@ public:
 
 
 private:
-    virtual void update_status(Cancellable& cancellable) override;
-    virtual void stop_with_error(std::string message) override;
-
     virtual void execute_state(
         Cancellable* cancellable,
         const SuperscalarScheduler::ScheduleEntry& entry
-    ) override;
+    ) override{
+        SwitchControllerState controller_state;
+        for (auto& item : entry.state){
+            static_cast<const SwitchCommand&>(*item).apply(controller_state);
+        }
 
+        //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
+        pabb_NintendoSwitch_OemController_State0x30_Buttons buttons{
+            .button3 = 0,
+            .button4 = 0,
+            .button5 = 0,
+            .left_joystick = {0x00, 0x08, 0x80},
+            .right_joystick = {0x00, 0x08, 0x80},
+            .vibrator = 0x00,
+        };
 
-private:
-    std::unique_ptr<ControllerStatusThread> m_status_thread;
+    //    Button all_buttons =
+        populate_report_buttons(buttons, controller_state);
+
+        {
+            SplitDpad dpad = convert_unified_to_split_dpad(controller_state.dpad);
+            buttons.button5 |= (dpad.down  ? 1 : 0) << 0;
+            buttons.button5 |= (dpad.up    ? 1 : 0) << 1;
+            buttons.button5 |= (dpad.right ? 1 : 0) << 2;
+            buttons.button5 |= (dpad.left  ? 1 : 0) << 3;
+        }
+
+        //  Left Stick
+        encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
+            buttons.left_joystick,
+            controller_state.left_joystick
+        );
+
+        //  Right Stick
+        encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
+            buttons.right_joystick,
+            controller_state.right_joystick
+        );
+
+        pabb_NintendoSwitch_OemController_State0x30_Gyro gyro{
+            0x0000,
+            0x0000,
+            0x0000,
+            0x0000,
+            0x0000,
+            0x0000,
+        };
+        bool gyro_active = populate_report_gyro(gyro, controller_state);
+
+    //    gyro_active = true;
+    //    gyro.rotation_y = 0x00ff;
+    //    gyro.rotation_z = 0x000f;
+
+        if (!gyro_active){
+            issue_report(cancellable, entry.duration, buttons);
+        }else{
+            issue_report(cancellable, entry.duration, buttons, gyro);
+        }
+
+    #if 0
+        m_logger.log(
+            "push_state(): (" + button_to_string(all_buttons) +
+            "), dpad(" + dpad_to_string(m_dpad.position) +
+            "), LJ(" + std::to_string(m_left_joystick.x) + "," + std::to_string(m_left_joystick.y) +
+            "), RJ(" + std::to_string(m_right_joystick.x) + "," + std::to_string(m_right_joystick.y) +
+            "), hold = " + std::to_string(std::chrono::duration_cast<Milliseconds>(duration).count()) + "ms",
+            COLOR_DARKGREEN
+        );
+    #endif
+    }
 };
 
 

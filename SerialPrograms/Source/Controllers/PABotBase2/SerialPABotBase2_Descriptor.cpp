@@ -13,9 +13,8 @@
 #include "SerialPABotBase2_Descriptor.h"
 
 #include "Controllers/StandardHid/StandardHid_Keyboard_PABotBase2.h"
-//#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.h"
-//#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_ProController.h"
-//#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Joycon.h"
+#include "NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_ProController.h"
+#include "NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_Joycon.h"
 #include "NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_WiredController.h"
 
 //#include <iostream>
@@ -92,40 +91,35 @@ std::unique_ptr<AbstractController> SerialPABotBase2_Descriptor::make_controller
             )
         );
 
-#if 0
     case ControllerType::NintendoSwitch_WiredProController:
     case ControllerType::NintendoSwitch_WirelessProController:
         return std::unique_ptr<AbstractController>(
-            new PokemonAutomation::NintendoSwitch::SerialPABotBase_ProController(
+            new PokemonAutomation::NintendoSwitch::PABotBase2_ProController(
                 logger,
-                static_cast<SerialPABotBase_Connection&>(connection),
-                controller_type,
-                reset_mode
+                static_cast<PABotBase2::Connection&>(connection),
+                controller_type
             )
         );
 
     case ControllerType::NintendoSwitch_WiredLeftJoycon:
     case ControllerType::NintendoSwitch_WirelessLeftJoycon:
         return std::unique_ptr<AbstractController>(
-            new PokemonAutomation::NintendoSwitch::SerialPABotBase_LeftJoycon(
+            new PokemonAutomation::NintendoSwitch::PABotBase2_LeftJoycon(
                 logger,
-                static_cast<SerialPABotBase_Connection&>(connection),
-                controller_type,
-                reset_mode
+                static_cast<PABotBase2::Connection&>(connection),
+                controller_type
             )
         );
 
     case ControllerType::NintendoSwitch_WiredRightJoycon:
     case ControllerType::NintendoSwitch_WirelessRightJoycon:
         return std::unique_ptr<AbstractController>(
-            new PokemonAutomation::NintendoSwitch::SerialPABotBase_RightJoycon(
+            new PokemonAutomation::NintendoSwitch::PABotBase2_RightJoycon(
                 logger,
-                static_cast<SerialPABotBase_Connection&>(connection),
-                controller_type,
-                reset_mode
+                static_cast<PABotBase2::Connection&>(connection),
+                controller_type
             )
         );
-#endif
 
     default:;
     }
