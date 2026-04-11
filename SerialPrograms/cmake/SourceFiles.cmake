@@ -2384,8 +2384,6 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h
     Source/PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h
-    Source/PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.cpp
-    Source/PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h
     Source/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h
     Source/PokemonSwSh/Inference/RNG/PokemonSwSh_OrbeetleAttackAnimationDetector.cpp
