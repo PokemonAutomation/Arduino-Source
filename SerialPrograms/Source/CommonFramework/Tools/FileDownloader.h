@@ -8,6 +8,8 @@
 #define PokemonAutomation_FileDownloader_H
 
 #include <string>
+#include <functional>
+#include <QtTypes>
 
 namespace PokemonAutomation{
     class Logger;
@@ -16,6 +18,16 @@ namespace FileDownloader{
 
 //  Throws OperationFailedException if failed to download.
 std::string download_file(Logger& logger, const std::string& url);
+
+//  Throws OperationFailedException if failed to download.
+void download_file_to_disk(
+    Logger& logger, 
+    const std::string& url, 
+    const std::string& file_path, 
+    qint64 expected_size,
+    std::function<void(int)> progress_callback,
+    std::function<bool()> is_cancelled
+);
 
 //  Throws OperationFailedException if failed to download.
 //  Returns empty value if invalid JSON.

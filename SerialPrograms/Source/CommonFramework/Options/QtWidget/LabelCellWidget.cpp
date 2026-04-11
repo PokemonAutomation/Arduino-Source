@@ -24,7 +24,7 @@ LabelCellWidget::~LabelCellWidget(){
 LabelCellWidget::LabelCellWidget(QWidget& parent, LabelCellOption& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
-//    , m_value(value)
+    , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -49,6 +49,17 @@ LabelCellWidget::LabelCellWidget(QWidget& parent, LabelCellOption& value)
     layout->addWidget(m_text, 1);
 //    text->setTextInteractionFlags(Qt::TextBrowserInteraction);
 //    m_text->setOpenExternalLinks(true);
+
+    m_value.add_listener(*this);
+}
+
+void LabelCellWidget::update_value(){
+    m_text->setText(QString::fromStdString(m_value.text()));
+}
+void LabelCellWidget::on_config_value_changed(void* object){
+    QMetaObject::invokeMethod(m_text, [this]{
+        update_value();
+    }, Qt::QueuedConnection);
 }
 
 

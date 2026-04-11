@@ -471,7 +471,7 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/PersistentSettings.cpp
     Source/CommonFramework/PersistentSettings.h
     Source/CommonFramework/ProgramSession.cpp
-    Source/CommonFramework/ProgramSession.h
+    Source/CommonFramework/ProgramSession.h    
     Source/CommonFramework/ProgramStats/StatsDatabase.cpp
     Source/CommonFramework/ProgramStats/StatsDatabase.h
     Source/CommonFramework/ProgramStats/StatsTracking.cpp
@@ -487,6 +487,16 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Recording/StreamHistoryTracker_SaveFrames.h
     Source/CommonFramework/Recording/StreamRecorder.cpp
     Source/CommonFramework/Recording/StreamRecorder.h
+    Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.cpp
+    Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.h
+    Source/CommonFramework/ResourceDownload/ResourceDownloadOptions.cpp
+    Source/CommonFramework/ResourceDownload/ResourceDownloadOptions.h
+    Source/CommonFramework/ResourceDownload/ResourceDownloadRow.cpp
+    Source/CommonFramework/ResourceDownload/ResourceDownloadRow.h
+    Source/CommonFramework/ResourceDownload/ResourceDownloadTable.cpp
+    Source/CommonFramework/ResourceDownload/ResourceDownloadTable.h
+    Source/CommonFramework/ResourceDownload/ResourceDownloadWidget.cpp
+    Source/CommonFramework/ResourceDownload/ResourceDownloadWidget.h
     Source/CommonFramework/Startup/NewVersionCheck.cpp
     Source/CommonFramework/Startup/NewVersionCheck.h
     Source/CommonFramework/Startup/SetupSettings.cpp
@@ -497,6 +507,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Tools/ErrorDumper.h
     Source/CommonFramework/Tools/FileDownloader.cpp
     Source/CommonFramework/Tools/FileDownloader.h
+    Source/CommonFramework/Tools/FileHash.cpp
+    Source/CommonFramework/Tools/FileHash.h
     Source/CommonFramework/Tools/FileUnzip.cpp
     Source/CommonFramework/Tools/FileUnzip.h
     Source/CommonFramework/Tools/GlobalThreadPools.cpp
