@@ -41,6 +41,7 @@ language
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Inference/Pokemon_TypeReader.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
@@ -49,7 +50,6 @@ language
 #include "PokemonHome/Inference/PokemonHome_ButtonDetector.h"
 #include "PokemonHome/Inference/PokemonHome_BoxGenderDetector.h"
 #include "PokemonHome/Inference/PokemonHome_BallReader.h"
-#include "PokemonHome/Inference/PokemonHome_TypeReader.h"
 #include "PokemonHome_BoxSorter.h"
 
 namespace PokemonAutomation{
@@ -465,11 +465,10 @@ void read_summary_screen(
     }
     cur_pokemon_info.ot_id = ot_id;
 
-    TypeReader type_reader(type_box);
-    auto [type1, type2] = type_reader.read_types(screen);
+    auto [primaryType, secondaryType] = read_pokemon_types(screen, type_box, PokemonTypeGeneration::GEN9);
 
-    cur_pokemon_info.type1 = type1;
-    cur_pokemon_info.type2 = type2;
+    cur_pokemon_info.primaryType = primaryType;
+    cur_pokemon_info.secondaryType = secondaryType;
 
     env.add_overlay_log(create_overlay_info(cur_pokemon_info));
     video_overlay_set.clear();
