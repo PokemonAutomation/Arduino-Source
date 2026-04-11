@@ -261,8 +261,7 @@ bool LuckyEggFarmer::is_chansey(SingleSwitchProgramEnvironment& env, ProControll
 
     env.log("Reading name...");
     VideoSnapshot screen = env.console.video().snapshot();
-    PokemonFRLG_WildEncounter encounter;
-    reader.read_encounter(env.logger(), LANGUAGE, screen, subset, encounter);
+    PokemonFRLG_WildEncounter encounter = reader.read_encounter(env.logger(), LANGUAGE, screen, subset);
     env.log("Name: " + encounter.name);
 
     if (encounter.name != "chansey") {
