@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Kernels_AbsFFT_Arch_Default_H
 #define PokemonAutomation_Kernels_AbsFFT_Arch_Default_H
 
+#include <cstddef>
 #include <cmath>
 #include "Common/Compiler.h"
 

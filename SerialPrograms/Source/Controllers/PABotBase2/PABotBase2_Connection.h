@@ -8,7 +8,6 @@
 #define PokemonAutomation_Controllers_PABotBase2_Connection_H
 
 #include <memory>
-#include "Common/Cpp/CancellableScope.h"
 #include "Controllers/ControllerConnection.h"
 #include "PABotBase2_DeviceHandle.h"
 
@@ -22,6 +21,13 @@ public:
         return *m_device;
     }
 
+    virtual void try_set_controller_type(
+        ControllerType controller_type,
+        bool clear_settings
+    ) noexcept override;
+
+private:
+    void run_preconnect_configure(ControllerType controller_type);
 
 protected:
     std::unique_ptr<PABotBase2::DeviceHandle> m_device;

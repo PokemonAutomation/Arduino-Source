@@ -15,10 +15,9 @@
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "PABotBase2_DeviceHandle.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace PABotBase2{
@@ -32,7 +31,7 @@ DeviceHandle::DeviceHandle(
 )
     : m_logger(logger)
     , m_connection(connection)
-    , m_command_queue(logger, *this, connection)
+    , m_command_queue(logger, *this, connection, m_message_loggers)
 {
     connection.add_listener(*this);
     if (parent){
@@ -45,9 +44,9 @@ DeviceHandle::~DeviceHandle(){
     m_connection.remove_listener(*this);
 }
 
+
 bool DeviceHandle::cancel(std::exception_ptr exception) noexcept{
-    bool already_cancelled = CancellableScope::cancel(std::move(exception));
-    if (already_cancelled){
+    if (CancellableScope::cancel(std::move(exception))){
         return true;
     }
     {
@@ -157,7 +156,20 @@ void DeviceHandle::connect(){
     query_controller_list();
     query_command_queue();
 }
-
+void DeviceHandle::try_set_controller_type(
+    ControllerType controller_type,
+    bool clear_settings
+) noexcept{
+    PABotBase2::Message_u32 message;
+    message.message_bytes = sizeof(message);
+    message.opcode = clear_settings
+        ? PABB2_MESSAGE_OPCODE_RESET_TO_CONTROLLER
+        : PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE;
+    try{
+        message.data = SerialPABotBase::controller_type_to_id(controller_type);
+        try_send_request(message, std::chrono::milliseconds(100));
+    }catch (...){}
+}
 
 ControllerType DeviceHandle::refresh_controller_type(){
     m_logger.log("Reading Controller Mode...");
@@ -171,7 +183,6 @@ ControllerType DeviceHandle::refresh_controller_type(){
 //    m_current_controller.store(current_controller, std::memory_order_release);
     return current_controller;
 }
-
 
 uint8_t DeviceHandle::send_request(MessageHeader& request){
     std::unique_lock<Mutex> lg(m_lock);
@@ -192,11 +203,50 @@ uint8_t DeviceHandle::send_request(MessageHeader& request){
         break;
     }
 
-    if (GlobalSettings::instance().LOG_EVERYTHING){
-        m_logger.log("[MLC]: Sending: " + tostr(&request), COLOR_DARKGREEN);
+    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
+
+    try{
+        m_connection.reliable_send(&request, request.message_bytes);
+    }catch (...){
+        m_pending_requests.erase(request.id);
+        m_request_seqnum--;
+        throw;
     }
 
-    m_connection.reliable_send(&request, request.message_bytes);
+    return request.id;
+}
+std::optional<uint8_t> DeviceHandle::try_send_request(MessageHeader& request, WallDuration timeout) noexcept{
+    std::unique_lock<Mutex> lg(m_lock);
+    try{
+        while (true){
+            throw_if_cancelled();
+
+            request.id = m_request_seqnum;
+
+            //  Wait until the slot is available.
+            auto iter = m_pending_requests.find(request.id);
+            if (iter != m_pending_requests.end()){
+                m_cv.wait(lg);
+                continue;
+            }
+
+            m_pending_requests[request.id];
+            m_request_seqnum++;
+            break;
+        }
+    }catch (...){
+        return {};
+    }
+
+    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
+
+    try{
+        m_connection.reliable_send(&request, request.message_bytes, timeout);
+    }catch (...){
+        m_pending_requests.erase(request.id);
+        m_request_seqnum--;
+        return {};
+    }
 
     return request.id;
 }
@@ -293,19 +343,12 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
 
         const MessageHeader* header = (const MessageHeader*)message.c_str();
 
-        bool log_everything = GlobalSettings::instance().LOG_EVERYTHING;
-
-        if (log_everything){
-            m_logger.log("[MLC]: Receive: " + tostr(header), COLOR_PURPLE);
-        }
+        m_message_loggers.log_recv(m_logger, GlobalSettings::instance().LOG_EVERYTHING, header);
 
         //  Now we can process the message.
         switch (header->opcode){
         case PABB2_MESSAGE_OPCODE_INVALID:
         case PABB2_MESSAGE_OPCODE_REQUEST_DROPPED:
-            if (!log_everything){
-                m_logger.log("[MLC]: Receive: " + tostr(header), COLOR_PURPLE);
-            }
             continue;
         case PABB2_MESSAGE_OPCODE_RET:
         case PABB2_MESSAGE_OPCODE_RET_U32:
@@ -322,13 +365,25 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
             m_cv.notify_all();
             continue;
         }
+        case PABB2_MESSAGE_OPCODE_LOG_STRING:
+        case PABB2_MESSAGE_OPCODE_LOG_LABEL_H32:
+        case PABB2_MESSAGE_OPCODE_LOG_LABEL_U32:
+        case PABB2_MESSAGE_OPCODE_LOG_LABEL_I32:
+            continue;
         case PABB2_MESSAGE_OPCODE_CQ_COMMAND_FINISHED:{
             m_command_queue.report_command_finished(*header);
             continue;
         }
         }
 
-        //  TODO: Process device-specific messages.
+        auto iter = m_message_handlers.find(header->opcode);
+        if (iter == m_message_handlers.end()){
+            return;
+        }
+
+        MessageHandler& handler = *iter->second;
+        handler.assert_is_valid(m_logger, header);
+        handler.on_recv(m_logger, header);
     }
 
 

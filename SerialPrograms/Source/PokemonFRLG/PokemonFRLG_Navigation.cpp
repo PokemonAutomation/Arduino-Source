@@ -147,7 +147,7 @@ bool try_open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     }
 
     console.log("Navigating to party menu.");
-    BlackScreenOverWatcher blk1(COLOR_RED);
+    PartyMenuWatcher blk1(COLOR_RED);
 
     int pm = run_until<ProControllerContext>(
         console, context,
@@ -166,8 +166,25 @@ bool try_open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     context.wait_for_all_requests();
 
     //Press up twice to get to the last slot
-    pbf_press_dpad(context, DPAD_UP, 320ms, 320ms);
-    pbf_press_dpad(context, DPAD_UP, 320ms, 320ms);
+    PartySlotWatcher last_slot(COLOR_RED, PartySlot::SIX);
+    int ps = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context){
+            for (int i = 0; i < 15; i++) { //Enough to cycle through 6pty+cxl twice
+                pbf_wait(context, 320ms);
+                context.wait_for_all_requests();
+                pbf_press_dpad(context, DPAD_UP, 320ms, 320ms);
+            }
+        },
+        { last_slot }
+        );
+    context.wait_for_all_requests();
+    if (ps == 0){
+        console.log("Moved selection to slot six.");
+    } else{
+        console.log("open_slot_six(): Unable to move selection to slot six.", COLOR_RED);
+        return false;
+    }
 
     //Two presses to open summary
     BlackScreenOverWatcher blk2(COLOR_RED);
@@ -279,7 +296,7 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
         },
         {{shiny_detector}}
     );
-    shiny_detector.throw_if_no_sound();
+    shiny_detector.throw_if_no_sound(std::chrono::milliseconds(1000));
     if (res == 0){
         console.log("Shiny detected!");
         return true;

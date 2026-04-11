@@ -67,8 +67,9 @@ public:
 
 
 public:
-    virtual void cancel_all_commands() override{
+    virtual bool cancel_all_commands(WallDuration timeout) override{
         SerialPABotBase_Controller::cancel_all_commands();
+        return true;
     }
     virtual void replace_on_next_command() override{
         SerialPABotBase_Controller::replace_on_next_command();
