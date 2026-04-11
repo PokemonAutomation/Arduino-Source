@@ -9,11 +9,13 @@
 
 #include <string>
 #include <functional>
+#include "Common/Cpp/CancellableScope.h"
+
 
 namespace PokemonAutomation{
 
 // uses SHA 256
-std::string hash_file(const std::string& file_path, std::function<void(int)> hash_progress);
+std::string hash_file(CancellableScope& scope, const std::string& file_path, std::function<void(int)> hash_progress);
 
 }
 #endif

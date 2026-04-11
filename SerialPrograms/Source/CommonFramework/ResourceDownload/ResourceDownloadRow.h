@@ -10,6 +10,7 @@
 #include <QObject>
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/CancellableScope.h"
 // #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "Common/Cpp/Options/StaticTableOption.h"
 #include "ResourceDownloadHelpers.h"
@@ -17,6 +18,18 @@
 #include <mutex>
 
 namespace PokemonAutomation{
+
+
+class DownloadThread : public CancellableScope {
+public:
+    ~DownloadThread();
+    DownloadThread(ResourceDownloadRow& row);
+
+
+private:
+    ResourceDownloadRow& m_row;
+    AsyncTask m_worker;
+};
 
 enum class ButtonState{
     DOWNLOAD,
@@ -51,7 +64,6 @@ signals:
 public:
     void set_version_status(ResourceVersionStatus version_status);
     void set_is_downloaded(bool is_downloaded);
-    void set_cancel_action(bool cancel_action);
 
     void ensure_remote_metadata_loaded();
     std::string predownload_warning_summary(RemoteMetadata& remote_metadata);

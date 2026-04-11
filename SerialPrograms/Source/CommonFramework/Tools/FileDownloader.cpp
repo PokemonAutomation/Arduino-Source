@@ -94,12 +94,12 @@ std::string download_file(Logger& logger, const std::string& url){
 }
 
 void download_file_to_disk(
+    CancellableScope& scope,
     Logger& logger, 
     const std::string& url, 
     const std::string& file_path,
     qint64 expected_size,
-    std::function<void(int)> progress_callback,
-    std::function<bool()> is_cancelled
+    std::function<void(int)> progress_callback
 ){
 //    cout << "download_file()" << endl;
     QNetworkAccessManager network_access_manager;
@@ -127,9 +127,9 @@ void download_file_to_disk(
 
     // Progress Bar Logic. and check for Cancel
     QObject::connect(reply, &QNetworkReply::downloadProgress, 
-        [reply, expected_size, progress_callback, is_cancelled](qint64 bytesReceived, qint64 bytesTotal) {
+        [reply, &scope, expected_size, progress_callback](qint64 bytesReceived, qint64 bytesTotal) {
 
-            if (is_cancelled()){
+            if (scope.cancelled()){
                 reply->abort();
             }
             
@@ -167,7 +167,7 @@ void download_file_to_disk(
                 "Failed to commit file to disk: " + file_path);
         }
     } else {
-        if (is_cancelled()){
+        if (scope.cancelled()){
             logger.log("Download cancelled by user.");
             throw OperationCancelledException();
         }else{

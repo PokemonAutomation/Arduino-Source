@@ -31,6 +31,19 @@ namespace PokemonAutomation{
 
     namespace fs = std::filesystem;
 
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DownloadThread
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+DownloadThread::~DownloadThread(){
+    m_worker.wait_and_ignore_exceptions();
+}
+DownloadThread::DownloadThread(ResourceDownloadRow& row) 
+    : CancellableScope()
+    , m_row(row)
+{}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ResourceDownloadRow
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,7 +86,6 @@ struct ResourceDownloadRow::Data{
         , m_version_num(version_num)
         , m_version_status(version_status)
         , m_version_status_label(LockMode::LOCK_WHILE_RUNNING, resource_version_to_string(version_status))
-        , m_cancel_action(false)
     {}
 
     LabelCellOption m_resource_name;
@@ -87,8 +99,6 @@ struct ResourceDownloadRow::Data{
     std::optional<uint16_t> m_version_num;
     ResourceVersionStatus m_version_status;
     LabelCellOption m_version_status_label;
-
-    std::atomic<bool> m_cancel_action;
 
 
 };
@@ -104,9 +114,6 @@ void ResourceDownloadRow::set_is_downloaded(bool is_downloaded){
     m_data->m_is_downloaded_label.set_text(is_downloaded_string(is_downloaded));
 }
 
-void ResourceDownloadRow::set_cancel_action(bool cancel_action){
-    m_data->m_cancel_action = cancel_action;
-}
 
 
 ResourceDownloadRow::~ResourceDownloadRow(){
@@ -322,27 +329,30 @@ void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metad
 
     std::string resource_directory = DOWNLOADED_RESOURCE_PATH() + resource_name;
     try{
+
+        DownloadThread scope(*this); // TODO: use the thread itself, not just CancellableScope
+
+        
         // delete directory and the old resource
         fs::remove_all(Filesystem::Path(resource_directory));
 
         // download
         std::string zip_path = resource_directory + "/temp.zip";
         FileDownloader::download_file_to_disk(
+            scope,
             logger, 
             url, 
             zip_path,
             expected_size,
             [this](int percentage_progress){
                 download_progress(percentage_progress);
-            },
-            [this](){
-                return m_data->m_cancel_action.load();
             }
         );
 
         // hash
         std::string hash = 
             hash_file(
+                scope,
                 zip_path,
                 [this](int percentage_progress){
                     hash_progress(percentage_progress);
@@ -360,23 +370,18 @@ void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metad
 
         // unzip
         unzip_file(
+            scope,
             zip_path.c_str(), 
             resource_directory.c_str(),
             [this](int percentage_progress){
                 unzip_progress(percentage_progress);
-            }
-            ,
-            [this](){
-                return m_data->m_cancel_action.load();
             }
         );
 
         // delete old zip file
         fs::remove(Filesystem::Path(zip_path));
 
-        if (m_data->m_cancel_action.load()){
-            throw OperationCancelledException();
-        }
+        scope.throw_if_cancelled();
 
         // update the table labels
         set_is_downloaded(true);
@@ -438,7 +443,6 @@ void ResourceDownloadRow::update_button_state(ButtonState state){
             m_download_button.set_enabled(false);
             m_delete_button.set_enabled(false);
             m_cancel_button.set_enabled(true);
-            set_cancel_action(false);
             m_button_state = state;
         }
         break;
@@ -449,7 +453,6 @@ void ResourceDownloadRow::update_button_state(ButtonState state){
             m_download_button.set_enabled(false);
             m_delete_button.set_enabled(false);
             m_cancel_button.set_enabled(false);
-            set_cancel_action(false);
             m_button_state = state;
         }
         break;
@@ -460,7 +463,8 @@ void ResourceDownloadRow::update_button_state(ButtonState state){
             m_download_button.set_enabled(false);
             m_delete_button.set_enabled(false);
             m_cancel_button.set_enabled(false);
-            set_cancel_action(true);
+            // set_cancel_action(true);
+            // TODO: set cancel to true
             m_button_state = state;
         }
         break;
@@ -468,7 +472,6 @@ void ResourceDownloadRow::update_button_state(ButtonState state){
         m_download_button.set_enabled(true);
         m_delete_button.set_enabled(true);
         m_cancel_button.set_enabled(true);
-        set_cancel_action(false);
         m_button_state = state;
         break;
     default:

@@ -34,7 +34,7 @@ struct ProgressData {
     uint64_t processed_bytes;
     int last_percentage;
     std::function<void(int)> progress_callback;
-    std::function<bool()> is_cancelled;
+    CancellableScope& scope;
 };
 
 // Callback triggered for every chunk of decompressed data
@@ -42,7 +42,7 @@ struct ProgressData {
 size_t write_callback(void* pOpaque, [[maybe_unused]] mz_uint64 file_ofs, const void* pBuf, size_t n){
     ProgressData* data = static_cast<ProgressData*>(pOpaque);
 
-    if (data->is_cancelled()){
+    if (data->scope.cancelled()){
         return 0;  // this causes mz_zip_reader_extract_to_callback to return an error
     }
 
@@ -107,10 +107,10 @@ bool is_safe(const std::string& target_dir, const std::string& entry_name){
 }
 
 void unzip_file(
+    CancellableScope& scope,
     const char* zip_path, 
     const char* target_dir, 
-    std::function<void(int)> progress_callback,
-    std::function<bool()> is_cancelled
+    std::function<void(int)> progress_callback
 ){
     Filesystem::Path p{zip_path};
     if (!fs::exists(p)){
@@ -148,7 +148,7 @@ void unzip_file(
     // calculate total uncompressed size
     uint64_t total_uncompressed_size = 0;
     for (int i = 0; i < num_files; i++){
-        if (is_cancelled()) throw OperationCancelledException();
+        scope.throw_if_cancelled();
 
         mz_zip_archive_file_stat file_stat; // holds info on the specific file
 
@@ -161,7 +161,7 @@ void unzip_file(
 
     uint64_t total_processed_bytes = 0;
     for (int i = 0; i < num_files; i++){
-        if (is_cancelled()) throw OperationCancelledException();
+        scope.throw_if_cancelled();
 
         mz_zip_archive_file_stat file_stat; // holds info on the specific file
 
@@ -193,7 +193,7 @@ void unzip_file(
 
         
         std::ofstream out_file(out_path.string(), std::ios::binary); // std::ios::binary is to prevent line-ending conversions.
-        ProgressData progress = { &out_file, total_uncompressed_size, total_processed_bytes, -1, progress_callback, is_cancelled };
+        ProgressData progress = { &out_file, total_uncompressed_size, total_processed_bytes, -1, progress_callback, scope };
 
         // Extract using the callback
         // decompresses the file in chunks and repeatedly calls write_callback to save those chunks to the disk via the out_file
@@ -201,7 +201,7 @@ void unzip_file(
 
         if (!status){
             out_file.close();
-            if (is_cancelled()){
+            if (scope.cancelled()){
                 // close and delete the partially unzipped file
                 fs::remove(out_path, ec);
                 throw OperationCancelledException();

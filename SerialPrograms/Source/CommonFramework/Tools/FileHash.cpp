@@ -12,7 +12,7 @@
 #include <QFile>
 #include <QCryptographicHash>
 #include <QDebug>
-
+#include "FileHash.h"
 
 
 #include <iostream>
@@ -23,7 +23,7 @@ namespace PokemonAutomation{
 
 
 
-std::string hash_file(const std::string& file_path, std::function<void(int)> hash_progress) {
+std::string hash_file(CancellableScope& scope, const std::string& file_path, std::function<void(int)> hash_progress) {
     QFile file(QString::fromStdString(file_path));
     if (!file.open(QIODevice::ReadOnly)) {
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "hash_file: Could not open file.");
@@ -36,6 +36,8 @@ std::string hash_file(const std::string& file_path, std::function<void(int)> has
     QByteArray buffer(1024 * 1024, 0); // Pre-allocate 1MB once
     int last_percentage = -1;
     while (!file.atEnd()) {
+        scope.throw_if_cancelled();
+        
         qint64 num_bytes_in_chunk = file.read(buffer.data(), buffer.size());
         if (num_bytes_in_chunk == -1) {
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "hash_file: Read error:" + file.errorString().toStdString());

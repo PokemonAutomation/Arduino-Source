@@ -9,18 +9,20 @@
 
 #include <string>
 #include <functional>
+#include "Common/Cpp/CancellableScope.h"
+
 
 namespace PokemonAutomation{
 
 // unzips the zip file located in zip_path, to target_dir
 // if target_dir doesn't already exist, it will create it.
-// throw OperationCancelledException if the is_cancelled callback returns true
+// throw OperationCancelledException if the CancellableScope is cancelled
 // throw InternalProgramError if unzipping fails.
 void unzip_file(
+    CancellableScope& scope,
     const char* zip_path, 
     const char* target_dir, 
-    std::function<void(int)> progress_callback,
-    std::function<bool()> is_cancelled
+    std::function<void(int)> progress_callback
 );
 
 }

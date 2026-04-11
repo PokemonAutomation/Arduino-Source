@@ -10,6 +10,8 @@
 #include <string>
 #include <functional>
 #include <QtTypes>
+#include "Common/Cpp/CancellableScope.h"
+
 
 namespace PokemonAutomation{
     class Logger;
@@ -21,12 +23,12 @@ std::string download_file(Logger& logger, const std::string& url);
 
 //  Throws OperationFailedException if failed to download.
 void download_file_to_disk(
+    CancellableScope& scope,
     Logger& logger, 
     const std::string& url, 
     const std::string& file_path, 
     qint64 expected_size,
-    std::function<void(int)> progress_callback,
-    std::function<bool()> is_cancelled
+    std::function<void(int)> progress_callback
 );
 
 //  Throws OperationFailedException if failed to download.
