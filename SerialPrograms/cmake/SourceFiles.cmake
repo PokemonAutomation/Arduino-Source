@@ -1472,10 +1472,10 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/PokemonFRLG_StatsReader.h
     Source/PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.cpp
     Source/PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.h
-    Source/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.cpp
-    Source/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h
     Source/PokemonFRLG/Inference/PokemonFRLG_PokedexRegisteredDetector.cpp
     Source/PokemonFRLG/Inference/PokemonFRLG_PokedexRegisteredDetector.h
+    Source/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.cpp
+    Source/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h
     Source/PokemonFRLG/PokemonFRLG_Navigation.cpp
     Source/PokemonFRLG/PokemonFRLG_Navigation.h
     Source/PokemonFRLG/PokemonFRLG_Panels.cpp
