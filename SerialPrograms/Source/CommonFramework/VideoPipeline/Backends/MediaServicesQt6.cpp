@@ -13,6 +13,10 @@
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "MediaServicesQt6.h"
 
+#ifdef _WIN32
+#include <objbase.h>
+#endif
+
 namespace PokemonAutomation{
 
 
@@ -62,6 +66,15 @@ void GlobalMediaServices::stop() noexcept{
 
 
 void GlobalMediaServices::thread_body(){
+    //  On Windows, QMediaDevices::videoInputs() internally uses Windows Media
+    //  Foundation (WMF) APIs which require COM to be initialized on the calling
+    //  thread. Without this, MFEnumDeviceSources() silently fails and returns
+    //  an empty device list, causing capture cards to not appear in the UI.
+#ifdef _WIN32
+    HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+    bool com_initialized = SUCCEEDED(hr);
+#endif
+
     // LOCK ACQUISITION: Worker thread holds m_sleep_lock for entire loop
     // to protect reads of m_stopping and m_refresh_cameras.
     // unique_lock is used (not lock_guard) because cv.wait() needs to unlock/relock
@@ -88,6 +101,12 @@ void GlobalMediaServices::thread_body(){
     }
     // Loop exits when m_stopping is true (set by stop() function)
     // Lock is released when lg goes out of scope
+
+#ifdef _WIN32
+    if (com_initialized){
+        CoUninitialize();
+    }
+#endif
 }
 
 

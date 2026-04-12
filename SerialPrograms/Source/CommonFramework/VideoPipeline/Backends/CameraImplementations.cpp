@@ -10,6 +10,10 @@
 #include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
 #include "CameraImplementations.h"
 
+#ifdef _WIN32
+#include "DirectShowCameraList.h"
+#endif
+
 //#include <iostream>
 //using std::cout;
 //using std::endl;
@@ -105,22 +109,32 @@ const CameraBackend& get_camera_backend(){
 
 std::vector<CameraInfo> get_all_cameras(){
     const CameraBackend& backend = get_camera_backend();
-//    global_logger_tagged().log("Start loading camera list...");
-//    WallClock start = current_time();
     std::vector<CameraInfo> ret = backend.get_all_cameras();
-//    WallClock end = current_time();
-//    double seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.;
-//    global_logger_tagged().log("Done loading camera list... " + tostr_fixed(seconds, 3) + " seconds");
+
+#ifdef _WIN32
+    //  Some capture cards (e.g. AVerMedia GC550) only have DirectShow drivers
+    //  and are invisible to Qt6's WMF-based QMediaDevices.  Enumerate DirectShow
+    //  devices and append any that Qt didn't find.
+    std::vector<std::string> qt_names;
+    qt_names.reserve(ret.size());
+    for (const CameraInfo& cam : ret){
+        qt_names.push_back(backend.get_camera_name(cam));
+    }
+    for (CameraInfo& dshow_cam : get_directshow_only_cameras(qt_names)){
+        ret.push_back(std::move(dshow_cam));
+    }
+#endif
+
     return ret;
 }
 std::string get_camera_name(const CameraInfo& info){
+#ifdef _WIN32
+    if (is_directshow_device(info)){
+        return get_directshow_display_name(info);
+    }
+#endif
     const CameraBackend& backend = get_camera_backend();
-//    global_logger_tagged().log("Start reading camera name...");
-//    WallClock start = current_time();
     std::string ret = backend.get_camera_name(info);
-//    WallClock end = current_time();
-//    double seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.;
-//    global_logger_tagged().log("Done reading camera name... " + tostr_fixed(seconds, 3) + " seconds");
     return ret;
 }
 
