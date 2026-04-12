@@ -597,18 +597,18 @@ void EvTrainer::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             ){
                 flee_battle(env.console, context);
             }else{
-                int ret2 = spam_first_move(env.console, context);
-                if (ret2 == 1) { // user fainted
+                BattleResult ret2 = spam_first_move(env.console, context);
+                if (ret2 == BattleResult::playerfainted) {
                     stats.times_fainted++;
                     out_of_pp = true; // triggers a healing trip
                     //TODO: handle exiting the battle in case the player can't escape
                     pbf_mash_button(context, BUTTON_B, 5000ms);
                     context.wait_for_all_requests();
-                } else if (ret2 == 2){ // battle fled (no EV gain)
+                } else if (ret2 == BattleResult::unknown){ // battle fled (no EV gain)
                     // continue;
-                } else if (ret2 == 3){
+                } else if (ret2 == BattleResult::outofpp){
                     out_of_pp = true;
-                } else if (ret2 == 0){ // opponent fainted
+                } else if (ret2 == BattleResult::opponentfainted){
                     stats.hp_evs  += ev_yield.hp;
                     stats.atk_evs += ev_yield.attack;
                     stats.def_evs += ev_yield.defense;
