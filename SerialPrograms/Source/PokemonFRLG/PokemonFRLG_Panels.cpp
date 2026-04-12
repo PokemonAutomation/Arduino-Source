@@ -40,8 +40,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- Farming ----");
     ret.emplace_back(make_single_switch_program<NuggetBridgeFarmer_Descriptor, NuggetBridgeFarmer>());
+    ret.emplace_back(make_single_switch_program<PickupFarmer_Descriptor, PickupFarmer>());
     if (PreloadSettings::instance().DEVELOPER_MODE){
-        ret.emplace_back(make_single_switch_program<PickupFarmer_Descriptor, PickupFarmer>());
     }
 
     //ret.emplace_back("---- General ----");
