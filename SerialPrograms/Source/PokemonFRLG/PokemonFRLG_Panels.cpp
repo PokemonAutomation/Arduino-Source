@@ -13,6 +13,7 @@
 #include "Programs/Farming/PokemonFRLG_NuggetBridgeFarmer.h"
 #include "Programs/Farming/PokemonFRLG_PickupFarmer.h"
 #include "Programs/ShinyHunting/PokemonFRLG_GiftReset.h"
+#include "Programs/ShinyHunting/PokemonFRLG_RngHelper.h"
 #include "Programs/ShinyHunting/PokemonFRLG_LegendaryReset.h"
 #include "Programs/ShinyHunting/PokemonFRLG_LegendaryRunAway.h"
 #include "Programs/ShinyHunting/PokemonFRLG_PrizeCornerReset.h"
@@ -54,6 +55,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<PrizeCornerReset_Descriptor, PrizeCornerReset>());
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<LegendaryRunAway_Descriptor, LegendaryRunAway>());
+        ret.emplace_back(make_single_switch_program<RngHelper_Descriptor, RngHelper>());
     }
     
 
