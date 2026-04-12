@@ -82,7 +82,10 @@ public:
 
     uint8_t send_request(MessageHeader& request);
     std::optional<uint8_t> try_send_request(MessageHeader& request, WallDuration timeout) noexcept;
-    std::string wait_for_request_response(uint8_t id);
+    std::string wait_for_request_response(
+        uint8_t id,
+        WallDuration timeout = WallDuration::max()
+    );
 
     template <typename ResponseType, uint8_t response_opcode>
     void wait_for_request_response(ResponseType& response, uint8_t id){

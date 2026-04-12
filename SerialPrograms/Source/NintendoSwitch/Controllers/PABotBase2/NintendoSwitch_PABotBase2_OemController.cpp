@@ -233,7 +233,7 @@ void PABotBase2_OemController::run_preconnect_configure(
         request.opcode = PABB2_MESSAGE_OPCODE_CONTROLLER_MAC_ADDRESS;
         request.data = SerialPABotBase::controller_type_to_id(controller_type);
         uint8_t id = connection.device().send_request(request);
-        std::string response = connection.device().wait_for_request_response(id);
+        std::string response = connection.device().wait_for_request_response(id, std::chrono::milliseconds(100));
         if (response.size() == sizeof(MessageHeader) + sizeof(controller_mac_address)){
             memcpy(
                 controller_mac_address,

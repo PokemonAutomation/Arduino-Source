@@ -370,7 +370,7 @@ void ReliableStreamConnection::on_packet(const PacketHeader* packet){
         return;
     default:
         m_logger.log(
-            "[RSC]: UNKNOWN OPCODE: Device sent an unknown opcode: " + tostr_hex(packet->opcode),
+            "[RSC]: UNKNOWN OPCODE: Device sent an unknown opcode: 0x" + tostr_hex(packet->opcode),
             COLOR_RED
         );
         return;
