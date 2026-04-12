@@ -207,7 +207,8 @@ void BattleOutOfPpDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, GAME_BOX.inner_to_outer(m_box));
 }
 bool BattleOutOfPpDetector::detect(const ImageViewRGB32& screen){
-    const auto region = extract_box_reference(screen, m_box);
+    ImageViewRGB32 game_screen = extract_box_reference(screen, GameSettings::instance().GAME_BOX);
+    const auto region = extract_box_reference(game_screen, m_box);
 
     // Retain only red pixels from region ( ~ RGB(225, 74, 27) )
     const bool replace_color_within_range = false;

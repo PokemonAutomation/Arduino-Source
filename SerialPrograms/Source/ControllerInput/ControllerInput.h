@@ -44,7 +44,7 @@ private:
 
 
 struct ControllerInputListener{
-    virtual void run_controller_input(ControllerInputState& state){}
+    virtual void run_controller_input(ControllerInputState& state) = 0;
 };
 
 

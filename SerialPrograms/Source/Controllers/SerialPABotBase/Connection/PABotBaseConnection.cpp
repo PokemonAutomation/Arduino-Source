@@ -60,7 +60,7 @@ void PABotBaseConnection::send_zeros(uint8_t bytes){
 
     char ch = 0;
     for (uint8_t c = 0; c < bytes; c++){
-        m_connection->unreliable_send(&ch, 1, false);
+        m_connection->unreliable_send(&ch, 1);
 //        Sleep(10);
     }
 }
@@ -95,7 +95,7 @@ void PABotBaseConnection::send_message(const BotBaseMessage& message, bool is_re
     buffer += std::string(sizeof(uint32_t), 0);
     pabb_crc32_write_to_message(&buffer[0], buffer.size());
 
-    m_connection->unreliable_send(&buffer[0], buffer.size(), is_retransmit);
+    m_connection->unreliable_send(&buffer[0], buffer.size());
 }
 
 

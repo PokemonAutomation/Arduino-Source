@@ -16,7 +16,7 @@ namespace PABotBase2{
 
 
 std::string tostr(const PacketHeader* header);
-std::string tostr(const pabb2_MessageHeader* header);
+std::string tostr(const MessageHeader* header);
 
 
 }

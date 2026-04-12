@@ -12,10 +12,10 @@
 #include "SerialPABotBase2_SelectorWidget.h"
 #include "SerialPABotBase2_Descriptor.h"
 
-//#include "Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.h"
-//#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.h"
-//#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_ProController.h"
-//#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Joycon.h"
+#include "Controllers/StandardHid/StandardHid_Keyboard_PABotBase2.h"
+#include "NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_ProController.h"
+#include "NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_Joycon.h"
+#include "NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_WiredController.h"
 
 //#include <iostream>
 //using std::cout;
@@ -74,67 +74,55 @@ std::unique_ptr<AbstractController> SerialPABotBase2_Descriptor::make_controller
     ControllerType controller_type,
     ControllerResetMode reset_mode
 ) const{
-#if 0
     switch (controller_type){
-#if 0
     case ControllerType::HID_Keyboard:
         return std::unique_ptr<AbstractController>(
-            new PokemonAutomation::StandardHid::SerialPABotBase_Keyboard(
+            new PokemonAutomation::StandardHid::PABotBase2_Keyboard(
                 logger,
-                static_cast<SerialPABotBase_Connection&>(connection),
-                reset_mode
+                static_cast<PABotBase2::Connection&>(connection)
             )
         );
-#endif
-#if 0
     case ControllerType::NintendoSwitch_WiredController:
     case ControllerType::NintendoSwitch2_WiredController:
         return std::unique_ptr<AbstractController>(
-            new PokemonAutomation::NintendoSwitch::SerialPABotBase_WiredController(
+            new PokemonAutomation::NintendoSwitch::PABotBase2_WiredController(
                 logger,
-                static_cast<SerialPABotBase_Connection&>(connection),
-                controller_type,
-                reset_mode
+                static_cast<PABotBase2::Connection&>(connection)
             )
         );
 
     case ControllerType::NintendoSwitch_WiredProController:
     case ControllerType::NintendoSwitch_WirelessProController:
         return std::unique_ptr<AbstractController>(
-            new PokemonAutomation::NintendoSwitch::SerialPABotBase_ProController(
+            new PokemonAutomation::NintendoSwitch::PABotBase2_ProController(
                 logger,
-                static_cast<SerialPABotBase_Connection&>(connection),
-                controller_type,
-                reset_mode
+                static_cast<PABotBase2::Connection&>(connection),
+                controller_type
             )
         );
 
     case ControllerType::NintendoSwitch_WiredLeftJoycon:
     case ControllerType::NintendoSwitch_WirelessLeftJoycon:
         return std::unique_ptr<AbstractController>(
-            new PokemonAutomation::NintendoSwitch::SerialPABotBase_LeftJoycon(
+            new PokemonAutomation::NintendoSwitch::PABotBase2_LeftJoycon(
                 logger,
-                static_cast<SerialPABotBase_Connection&>(connection),
-                controller_type,
-                reset_mode
+                static_cast<PABotBase2::Connection&>(connection),
+                controller_type
             )
         );
 
     case ControllerType::NintendoSwitch_WiredRightJoycon:
     case ControllerType::NintendoSwitch_WirelessRightJoycon:
         return std::unique_ptr<AbstractController>(
-            new PokemonAutomation::NintendoSwitch::SerialPABotBase_RightJoycon(
+            new PokemonAutomation::NintendoSwitch::PABotBase2_RightJoycon(
                 logger,
-                static_cast<SerialPABotBase_Connection&>(connection),
-                controller_type,
-                reset_mode
+                static_cast<PABotBase2::Connection&>(connection),
+                controller_type
             )
         );
-#endif
 
     default:;
     }
-#endif
 
     logger.log(
         std::string("Unsupported Controller Type: ") + CONTROLLER_TYPE_STRINGS.get_string(controller_type),

@@ -19,6 +19,13 @@ namespace NintendoSwitch{
     using ProControllerContext = ControllerContext<ProController>;
 namespace PokemonFRLG{
 
+enum class BattleResult{
+    opponentfainted,
+    playerfainted,
+    outofpp,
+    unknown
+};
+
 enum class KantoFlyLocation{
     pallettown,
     viridiancity,
@@ -51,16 +58,15 @@ bool handle_encounter(ConsoleHandle& console, ProControllerContext& context, boo
 
 // Mash A to keep using the first move until a Pokemon faints (either the player's or the opponent)
 // Flees the battle if out of PP.
-// returns 0 if the opponent fainted, 1 if the player Pokemon fainted, 2 if the battle was fled (by either Pokemon), 
-// and 3 if the battle was fled and the player Pokemon is out of PP.
-int spam_first_move(ConsoleHandle& console, ProControllerContext& context);
+// Returns a BattleResult indicating how the battle ended
+BattleResult spam_first_move(ConsoleHandle& console, ProControllerContext& context);
 
 // Run from battle. Cursor must start on the FIGHT button. Assumes fleeing will always work. (Smoke Ball)
 void flee_battle(ConsoleHandle& console, ProControllerContext& context);
 
 // Exit a wild battle after winning. Checks if a Pokemon is learning a new move.
-// If stop_on_move_learn is true, this exits early when a move is being learned without declining it.
-// Otherwise, this returns to the overworld
+// If stop_on_move_learn is true, this exits early when a move is being learned without declining it. Otherwise, this returns to the overworld. 
+// Returns true if a move was learned (even if it was rejected) and false otherwise.
 bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, bool stop_on_move_learn, bool prevent_evolution);
 
 // Starting from the start menu, a sub-screen of the start menu, or the overworld, navigate to the party screen

@@ -14,6 +14,9 @@ namespace PokemonAutomation{
 namespace SerialPABotBase{
 
 
+//
+//  PABotBase 1
+//
 
 const std::map<pabb_ProgramID, uint32_t>& SUPPORTED_DEVICES(){
     static const std::map<pabb_ProgramID, uint32_t> database{
@@ -44,6 +47,37 @@ const std::map<uint32_t, std::map<pabb_ProgramID, uint8_t>>& SUPPORTED_VERSIONS(
     static const std::map<uint32_t, std::map<pabb_ProgramID, uint8_t>> database = make_SUPPORTED_VERSIONS();
     return database;
 }
+
+
+
+//
+//  PABotBase 2
+//
+
+const std::map<pabb_ProgramID, uint32_t>& SUPPORTED_DEVICES2(){
+    static const std::map<pabb_ProgramID, uint32_t> database{
+        {PABB_PID_UNSPECIFIED,                  2026041100},
+        {PABB_PID_PABOTBASE_ESP32S3,            2026041100},
+    };
+    return database;
+}
+
+std::map<uint32_t, std::map<pabb_ProgramID, uint8_t>> make_SUPPORTED_VERSIONS2(){
+    std::map<uint32_t, std::map<pabb_ProgramID, uint8_t>> ret;
+    for (const auto& item : SUPPORTED_DEVICES2()){
+        ret[item.second / 100][item.first] = (uint8_t)(item.second % 100);
+    }
+    return ret;
+}
+const std::map<uint32_t, std::map<pabb_ProgramID, uint8_t>>& SUPPORTED_VERSIONS2(){
+    static const std::map<uint32_t, std::map<pabb_ProgramID, uint8_t>> database = make_SUPPORTED_VERSIONS2();
+    return database;
+}
+
+
+
+
+
 
 
 bool controller_is_valid(uint32_t id){

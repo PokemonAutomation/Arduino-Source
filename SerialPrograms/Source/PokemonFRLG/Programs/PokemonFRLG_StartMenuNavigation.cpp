@@ -35,7 +35,7 @@ void open_start_menu(ConsoleHandle& console, ProControllerContext& context){
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 pbf_press_button(context, BUTTON_PLUS, 200ms, 1800ms);
             },
             { start_menu }
@@ -217,7 +217,7 @@ void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& contex
 
         int ret5 = wait_until(
             console, context,
-            std::chrono::seconds(1),
+            std::chrono::seconds(2),
             {
                 save_confirm_arrow
             }

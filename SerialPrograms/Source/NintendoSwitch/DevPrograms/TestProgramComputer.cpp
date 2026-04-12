@@ -143,8 +143,8 @@
 //#include "Common/SerialPABotBase/LightweightWallClock_StdChrono.h"
 #include "Common/Cpp/Options/MacAddressOption.h"
 #include "CommonTools/Images/ImageFilter.h"
-#include "Common/Cpp/StreamConnections/ReliableStreamConnection.h"
-#include "Common/PABotBase2/ConnectionLayer/PABotBase2_ReliableStreamConnectionFW.h"
+#include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2CC_ReliableStreamConnection.h"
+#include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2FW_ReliableStreamConnection.h"
 #include "Common/Cpp/StreamConnections/MockDevice.h"
 #include "CommonTools/Random.h"
 
@@ -309,7 +309,7 @@ void stress_test(Logger& logger, CancellableScope& scope){
 
     MockDevice device(GlobalThreadPools::unlimited_normal());
 
-    ReliableStreamConnection connection(
+    PABotBase2::ReliableStreamConnection connection(
         &scope,
         logger, true,
         GlobalThreadPools::unlimited_realtime(),

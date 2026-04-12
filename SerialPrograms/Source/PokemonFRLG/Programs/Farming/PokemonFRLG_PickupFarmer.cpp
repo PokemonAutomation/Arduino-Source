@@ -175,16 +175,16 @@ void take_pickup_items(SingleSwitchProgramEnvironment& env, ProControllerContext
     PartySelectionWatcher selection_open(COLOR_RED);
     int ret;
     // take items from positions 2-5. This works even if they haven't picked up an item
-    for(int i = 2; i <= 5; i++) {
+    for(int i = 2; i <= 5; i++){
         context.wait_for_all_requests();
         ret = run_until<ProControllerContext>(
             env.console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
             },
             { selection_open }
         );
-        if (ret < 0) {
+        if (ret < 0){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to detect selection menu.",

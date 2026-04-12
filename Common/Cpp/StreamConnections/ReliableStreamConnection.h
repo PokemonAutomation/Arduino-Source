@@ -101,7 +101,7 @@ private:
 private:
     virtual void reliable_send(const void* data, size_t bytes) override;
     virtual void on_recv(const void* data, size_t bytes) override;
-    virtual size_t unreliable_send(const void* data, size_t bytes, bool is_retransmit) override;
+    virtual size_t unreliable_send(const void* data, size_t bytes) override;
 
 
 private:

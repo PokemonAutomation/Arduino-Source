@@ -7,12 +7,17 @@
 #include <QSerialPortInfo>
 #include <QMessageBox>
 #include "Common/Cpp/PanicDump.h"
-#include "Common/PABotBase2/ConnectionLayer/PABotBase2_Connection.h"
+#include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2_PacketProtocol.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "SerialPABotBase2_Connection.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace SerialPABotBase{
@@ -38,12 +43,25 @@ SerialPABotBase2_Connection::SerialPABotBase2_Connection(
     });
 };
 SerialPABotBase2_Connection::~SerialPABotBase2_Connection(){
-    cancel(nullptr);
+    SerialPABotBase2_Connection::cancel(nullptr);
+    m_device.reset();
+}
+bool SerialPABotBase2_Connection::cancel(std::exception_ptr exception) noexcept{
+    if (Connection::cancel(std::move(exception))){
+        return true;
+    }
     m_ready.store(false, std::memory_order_release);
     m_connect_thread.wait_and_ignore_exceptions();
+    return false;
 }
 
 
+
+ControllerType SerialPABotBase2_Connection::refresh_controller_type(){
+    ControllerType ret = m_device->refresh_controller_type();
+    m_current_controller.store(ret, std::memory_order_release);
+    return ret;
+}
 
 
 bool SerialPABotBase2_Connection::open_serial_port(){
@@ -100,7 +118,7 @@ bool SerialPABotBase2_Connection::open_serial_connection(){
         m_logger.log(text);
         set_status_line0(text, COLOR_DARKGREEN);
     }
-    m_stream_connection = std::make_unique<ReliableStreamConnection>(
+    m_stream_connection = std::make_unique<PABotBase2::ReliableStreamConnection>(
         static_cast<CancellableScope*>(this),
         m_logger, GlobalSettings::instance().LOG_EVERYTHING,
         GlobalThreadPools::unlimited_realtime(),
@@ -121,7 +139,7 @@ bool SerialPABotBase2_Connection::open_serial_connection(){
     if (!m_stream_connection->remote_protocol_is_compatible()){
         std::string str =
             "Incompatible RSC protocol. Device: " + std::to_string(m_stream_connection->remote_protocol()) + "<br>"
-            "Please flash your microcontroller (e.g. ESP32, Pico W, Arduino) <br>"
+            "Please flash your microcontroller (e.g. ESP32, Pico W...) <br>"
             "with the .bin/.uf2/.hex that came with this version of the program.<br>" +
             make_text_url(ONLINE_DOC_URL_BASE + "SetupGuide/Reflash.html", "See documentation for more details.");
         set_status_line0(str, COLOR_RED);
@@ -141,7 +159,7 @@ bool SerialPABotBase2_Connection::open_serial_connection(){
 
     return true;
 }
-bool SerialPABotBase2_Connection::open_device_connection(){
+bool SerialPABotBase2_Connection::open_device_connection(bool set_to_null_controller){
     {
         std::string text = "Querying device...";
         m_logger.log(text);
@@ -154,13 +172,34 @@ bool SerialPABotBase2_Connection::open_device_connection(){
             m_logger, *m_stream_connection
         );
     }
+
     m_device->connect();
+    m_controller_list = m_device->controller_list();
+
+    set_status_line0(
+        m_device->device_name() + " (" + std::to_string(m_device->device_firmware_version()) + ")",
+        theme_friendly_darkblue()
+    );
 
 
-//    //  Current Controller
-//    ControllerType current_controller = refresh_controller_type();
+    //  Current Controller
+    ControllerType current_controller = refresh_controller_type();
 
-    //  TODO
+    if (set_to_null_controller && current_controller != ControllerType::None){
+        PABotBase2::Message_u32 request;
+        request.message_bytes = sizeof(request);
+        request.opcode = PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE;
+        request.data = SerialPABotBase::controller_type_to_id(ControllerType::None);
+        m_device->send_request(request);
+
+#if 0
+        m_botbase->issue_request_and_wait(
+            DeviceRequest_change_controller_mode(PABB_CID_NONE),
+            nullptr
+        );
+#endif
+        refresh_controller_type();
+    }
 
     return true;
 }
@@ -172,9 +211,10 @@ void SerialPABotBase2_Connection::connect_thread_body(bool set_to_null_controlle
         if (!open_serial_connection()){
             return;
         }
-        if (!open_device_connection()){
+        if (!open_device_connection(set_to_null_controller)){
             return;
         }
+        declare_ready();
     }catch (Exception& e){
         set_status_line0(e.message(), COLOR_RED);
     }

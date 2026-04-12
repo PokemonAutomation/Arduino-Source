@@ -14,7 +14,7 @@
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
-#include "Common/PABotBase2/ConnectionLayer/PABotBase2_ReliableStreamConnectionFW.h"
+#include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2FW_ReliableStreamConnection.h"
 
 namespace PokemonAutomation{
 
@@ -57,7 +57,7 @@ private:
     class DeviceSideConnection : public UnreliableStreamConnectionPolling{
     public:
         DeviceSideConnection(MockDevice& parent) : m_parent(parent) {}
-        virtual size_t unreliable_send(const void* data, size_t bytes, bool is_retransmit) override;
+        virtual size_t unreliable_send(const void* data, size_t bytes) override;
         virtual size_t unreliable_recv(void* data, size_t max_bytes) override;
     private:
         MockDevice& m_parent;
@@ -66,7 +66,7 @@ private:
     class HostSideConnection : public UnreliableStreamConnectionPushing{
     public:
         HostSideConnection(MockDevice& parent) : m_parent(parent) {}
-        virtual size_t unreliable_send(const void* data, size_t bytes, bool is_retransmit) override;
+        virtual size_t unreliable_send(const void* data, size_t bytes) override;
         using UnreliableStreamConnectionPushing::on_unreliable_recv;
     private:
         MockDevice& m_parent;

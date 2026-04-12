@@ -198,7 +198,7 @@ private:
     // 2. There is an error. (returns less than bytes)
     // 3. The SerialConnection instance is getting destructed from a different thread.
     // If consecutive connection errors reache 100, throw ConnectionException.
-    virtual size_t unreliable_send(const void* data, size_t bytes, bool = false) override{
+    virtual size_t unreliable_send(const void* data, size_t bytes) override{
         WriteSpinLock lg(m_send_lock, "SerialConnection::send()");
 
         const char* ptr = (const char*)data;

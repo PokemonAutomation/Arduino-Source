@@ -39,7 +39,13 @@ public:
 private:
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
 
-    BooleanCheckBoxOption WALK_UP;
+    enum class Target{
+        press_a,
+        walk_up,
+        snorlax,
+    };
+    EnumDropdownOption<Target> TARGET;
+
     BooleanCheckBoxOption TAKE_VIDEO;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
