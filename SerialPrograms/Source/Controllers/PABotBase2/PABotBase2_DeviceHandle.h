@@ -35,7 +35,21 @@ public:
         ReliableStreamConnectionPushing& connection
     );
     virtual ~DeviceHandle();
+    void add_message_handler(
+        uint8_t opcode,
+        std::function<void(const MessageHeader*)> handler
+    );
 
+    virtual bool cancel(std::exception_ptr exception) noexcept override;
+
+    void connect();
+    void try_set_controller_type(
+        ControllerType controller_type,
+        bool clear_settings
+    ) noexcept;
+
+
+public:
     Logger& logger() const{
         return m_logger;
     }
@@ -45,28 +59,6 @@ public:
     ReliableStreamConnectionPushing& connection(){
         return m_connection;
     }
-
-    template <typename MessageHandler, class... Args>
-    void add_message_handler(Args&&... args){
-        auto ret = m_message_handlers.emplace(
-            MessageHandler::OPCODE,
-            std::make_unique<MessageHandler>(std::forward<Args>(args)...)
-        );
-        if (!ret.second){
-            throw InternalProgramError(
-                &m_logger, PA_CURRENT_FUNCTION,
-                "Duplicate Message Opcode: " + std::to_string(MessageHandler::OPCODE)
-            );
-        }
-    }
-
-    virtual bool cancel(std::exception_ptr exception) noexcept override;
-
-    void connect();
-    void try_set_controller_type(
-        ControllerType controller_type,
-        bool clear_settings
-    ) noexcept;
 
 
 public:
@@ -149,12 +141,7 @@ private:
     std::deque<char> m_buffer;
 
     MessageLogger m_message_loggers;
-
-    struct MessageConverter{
-        bool always_print = false;
-        std::string (*tostr)(const MessageHeader*);
-    };
-    std::map<uint8_t, std::unique_ptr<MessageHandler>> m_message_handlers;
+    std::map<uint8_t, std::function<void(const MessageHeader*)>> m_message_handlers;
 };
 
 

@@ -56,7 +56,7 @@ PABotBase2_OemController::PABotBase2_OemController(
 
 
     //  Add controller-specific messages.
-    connection.device().message_logger().add_message<pabb2_Message_NS1_OemController_Spi>(
+    connection.message_logger().add_message<pabb2_Message_NS1_OemController_Spi>(
         "PABB_MSG_REQ_NS1_OEM_CONTROLLER_READ_SPI",
         PABB_MSG_REQ_NS1_OEM_CONTROLLER_READ_SPI,
         true,
@@ -69,7 +69,7 @@ PABotBase2_OemController::PABotBase2_OemController(
             return str;
         }
     );
-    connection.device().message_logger().add_message<pabb2_Message_NS1_OemController_Spi>(
+    connection.message_logger().add_message_min_length<pabb2_Message_NS1_OemController_Spi>(
         "PABB_MSG_REQ_NS1_OEM_CONTROLLER_WRITE_SPI",
         PABB_MSG_REQ_NS1_OEM_CONTROLLER_WRITE_SPI,
         true,
@@ -82,7 +82,7 @@ PABotBase2_OemController::PABotBase2_OemController(
             return str;
         }
     );
-    connection.device().message_logger().add_message<MessageHeader>(
+    connection.message_logger().add_message<MessageHeader>(
         "PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_PLAYER_LIGHTS",
         PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_PLAYER_LIGHTS,
         true,
@@ -92,7 +92,7 @@ PABotBase2_OemController::PABotBase2_OemController(
             return str;
         }
     );
-    connection.device().message_logger().add_message<Message_u32>(
+    connection.message_logger().add_message<Message_u32>(
         "PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_PLAYER_LIGHTS",
         PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_PLAYER_LIGHTS,
         true,
@@ -103,7 +103,7 @@ PABotBase2_OemController::PABotBase2_OemController(
             return str;
         }
     );
-    connection.device().message_logger().add_message<MessageHeader>(
+    connection.message_logger().add_message<MessageHeader>(
         "PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_USB_DISALLOWED",
         PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_USB_DISALLOWED,
         true,
@@ -113,17 +113,33 @@ PABotBase2_OemController::PABotBase2_OemController(
             return str;
         }
     );
-    connection.device().message_logger().add_message<pabb2_Message_Feedback_NS1_OemController_Rumble>(
-        "CONTROLLER_RUMBLE",
+    connection.message_logger().add_message<pabb2_Message_Feedback_NS1_OemController_Rumble>(
+        "PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_RUMBLE",
         PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_RUMBLE,
-        true,
+#if 0
+        [](const pabb2_Message_Feedback_NS1_OemController_Rumble* message){
+            uint32_t left, right;
+            memcpy(&left, message->data.left, sizeof(uint32_t));
+            memcpy(&right, message->data.right, sizeof(uint32_t));
+            const uint32_t NEUTRAL = 0x40400100;
+            if (left != 0 && left != NEUTRAL){
+                return true;
+            }
+            if (right != 0 && right != NEUTRAL){
+                return true;
+            }
+            return false;
+        },
+#else
+        false,
+#endif
         [](const pabb2_Message_Feedback_NS1_OemController_Rumble* message){
             std::string str;
             str += tostr_hexbytes(&message->data, sizeof(pabb_NintendoSwitch_Rumble));
             return str;
         }
     );
-    connection.device().message_logger().add_message<pabb2_Message_Command_NS1_OemController_Buttons>(
+    connection.message_logger().add_message<pabb2_Message_Command_NS1_OemController_Buttons>(
         "PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_BUTTONS",
         PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_BUTTONS,
         false,
@@ -134,7 +150,7 @@ PABotBase2_OemController::PABotBase2_OemController(
             return str;
         }
     );
-    connection.device().message_logger().add_message<pabb2_Message_Command_NS1_OemController_FullState>(
+    connection.message_logger().add_message<pabb2_Message_Command_NS1_OemController_FullState>(
         "PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_FULL_STATE",
         PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_FULL_STATE,
         false,
@@ -143,6 +159,49 @@ PABotBase2_OemController::PABotBase2_OemController(
             str += "id = " + std::to_string(message->id);
             str += ", ms = " + std::to_string(message->milliseconds);
             return str;
+        }
+    );
+
+    connection.device().add_message_handler(
+        PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_RUMBLE,
+        [this](const MessageHeader* header){
+            if (header->message_bytes != sizeof(pabb2_Message_Feedback_NS1_OemController_Rumble)){
+                m_logger.log(
+                    "PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_RUMBLE: **(invalid size = " + std::to_string(header->message_bytes) + ")**",
+                    COLOR_RED
+                );
+                return;
+            }
+            const auto* message = (const pabb2_Message_Feedback_NS1_OemController_Rumble*)header;
+
+            //  We don't do anything here yet.
+            uint32_t left, right;
+            memcpy(&left, message->data.left, sizeof(uint32_t));
+            memcpy(&right, message->data.right, sizeof(uint32_t));
+
+            const uint32_t NEUTRAL = 0x40400100;
+            bool is_active = false;
+            if (left != 0 && left != NEUTRAL){
+                is_active = true;
+            }
+            if (right != 0 && right != NEUTRAL){
+                is_active = true;
+            }
+
+            if (is_active){
+                m_logger.log(
+                    "Rumble: Left = " + tostr_hexbytes(&left, sizeof(uint32_t)) +
+                    ", Right = " + tostr_hexbytes(&right, sizeof(uint32_t)),
+                    COLOR_DARKGREEN
+                );
+            }
+        }
+    );
+    connection.device().add_message_handler(
+        PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_USB_DISALLOWED,
+        [this](const MessageHeader* header){
+            WriteSpinLock lg(m_error_lock);
+            m_error_string = "Please enable \"Pro Controller Wired Communication\" in the Switch settings.";
         }
     );
 
@@ -231,8 +290,10 @@ void PABotBase2_OemController::run_preconnect_configure(
     request.address = 0x00006050;
     request.bytes = sizeof(PABB_NintendoSwitch_ControllerColors);
 
-    connection.device().connection().reliable_send(&request, sizeof(request), Milliseconds(100));
-    connection.device().connection().reliable_send(&colors, sizeof(colors), Milliseconds(100));
+    connection.message_logger().log_send(logger, true, &request);
+
+    connection.device().connection().reliable_send_blocking(&request, sizeof(request), Milliseconds(100));
+    connection.device().connection().reliable_send_blocking(&colors, sizeof(colors), Milliseconds(100));
 }
 
 
