@@ -32,11 +32,13 @@ void PacketSender::reset(){
     m_slot_head = 0;
     m_slot_tail = 0;
     m_retransmit_seqnum = 0;
+    m_stream_corrupted = false;
     m_stream_offset = 0;
     m_buffer_head = 0;
     m_buffer_tail = 0;
     memset(m_offsets, 0, sizeof(m_offsets));
 }
+
 
 bool PacketSender::remove(uint8_t seqnum){
 //    {
@@ -159,7 +161,6 @@ PacketHeader* PacketSender::reserve_packet(
 
     return ret;
 }
-
 void PacketSender::commit_packet(PacketHeader* packet){
     pabb_crc32_write_to_message(packet, packet->packet_bytes);
 
@@ -172,6 +173,14 @@ void PacketSender::commit_packet(PacketHeader* packet){
 }
 
 size_t PacketSender::send_stream(const void* data, size_t bytes){
+    if (m_stream_corrupted){
+        return 0;
+    }
+
+    //  256 will overflow to 0 which is explicitly supported.
+    size_t max_packet_size = (uint8_t)(m_max_packet_size - 1);
+    max_packet_size++;
+
     size_t sent = 0;
 
     while (bytes > 0){
@@ -217,9 +226,6 @@ size_t PacketSender::send_stream(const void* data, size_t bytes){
             break;
         }
 
-        //  256 will overflow to 0 which is explicitly supported.
-        size_t max_packet_size = (uint8_t)(m_max_packet_size - 1);
-        max_packet_size++;
         if (capacity > max_packet_size){
             capacity = max_packet_size;
         }

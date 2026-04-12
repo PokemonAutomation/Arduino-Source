@@ -477,14 +477,14 @@ void do_action_and_run_from_battle(
 ){
     size_t max_attempts = 5;
     for (size_t i = 0; i < max_attempts; i++){
-        try {
+        try{
             do_action_and_monitor_for_battles_early(info, stream, context,
                 [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                     action(info, stream, context);
                 }
             );
             break;
-        }catch(UnexpectedBattleException&){
+        }catch (UnexpectedBattleException&){
             stream.log("Detected battle. Now running away.", COLOR_PURPLE);
             run_from_battle(stream, context);
         }
@@ -517,9 +517,9 @@ void move_to_start_position_for_letsgo1(
     do_action_and_run_from_battle(
         info, stream, context,
         [&](const ProgramInfo& info, VideoStream& stream,ProControllerContext& context){
-            try {
+            try{
                 direction.change_direction(info, stream, context, 5.76);
-            }catch(OperationFailedException&){
+            }catch (OperationFailedException&){
                 context.wait_for(Seconds(5));
             }
         }
@@ -561,9 +561,9 @@ void move_to_start_position_for_letsgo1(
     do_action_and_run_from_battle(
         info, stream, context,
         [&](const ProgramInfo& info, VideoStream& stream,ProControllerContext& context){
-            try {
+            try{
                 direction.change_direction(info, stream, context, 5.3);
-            }catch(OperationFailedException&){
+            }catch (OperationFailedException&){
                 context.wait_for(Seconds(5));
             }
         }

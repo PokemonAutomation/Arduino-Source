@@ -7,7 +7,6 @@
 #include "Common/PABotBase2/Controllers/PABotBase2_Controller_NS_WiredController.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/JoystickTools.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "NintendoSwitch_PABotBase2_WiredController.h"
 
 //#include <iostream>
@@ -24,9 +23,7 @@ using namespace std::chrono_literals;
 
 PABotBase2_WiredController::PABotBase2_WiredController(
     Logger& logger,
-    PABotBase2::Connection& connection,
-    ControllerType controller_type,
-    ControllerResetMode reset_mode
+    PABotBase2::Connection& connection
 )
     : ProController(logger)
     , PABotBase2_Controller(logger, connection)
@@ -34,58 +31,59 @@ PABotBase2_WiredController::PABotBase2_WiredController(
     using namespace PABotBase2;
 
     //  Add controller-specific messages.
-    connection.device().add_message_logger(
+    connection.message_logger().add_message<pabb2_Message_Command_NS_WiredController_State>(
+        "PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE",
         PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE,
         false,
-        [](const MessageHeader* header){
-            const auto* message = (const pabb2_Message_Command_NS_WiredController_State*)header;
+        [](const pabb2_Message_Command_NS_WiredController_State* message){
             std::string str;
-            str += "PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE: id = ";
-            str += std::to_string(message->id);
+            str += "id = " + std::to_string(message->id);
             str += ", ms = " + std::to_string(message->milliseconds);
             return str;
         }
     );
 
-    switch (reset_mode){
-    case PokemonAutomation::ControllerResetMode::DO_NOT_RESET:
-        break;
-    case PokemonAutomation::ControllerResetMode::SIMPLE_RESET:
-    case PokemonAutomation::ControllerResetMode::RESET_AND_CLEAR_STATE:{
-        PABotBase2::Message_u32 message;
-        message.message_bytes = sizeof(message);
-        message.opcode = reset_mode == PokemonAutomation::ControllerResetMode::SIMPLE_RESET
-            ?PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE
-            : PABB2_MESSAGE_OPCODE_RESET_TO_CONTROLLER;
-        message.data = SerialPABotBase::controller_type_to_id(controller_type);
-        uint8_t id = connection.device().send_request(message);
-//        cout << "wait... start" << endl;
-        connection.device().wait_for_request_response(id);
-//        cout << "wait... done" << endl;
-        break;
-    }
-    }
-
-    //  Re-read the controller.
-    ControllerType current_controller = connection.device().refresh_controller_type();
-    if (current_controller != controller_type){
-//        cout << "Failed to set controller type." << endl;
-        throw SerialProtocolException(logger, PA_CURRENT_FUNCTION, "Failed to set controller type.");
-    }
-
-//    cout << "Starting status thread" << endl;
-
-#if 1
     m_status_thread.reset(new ControllerStatusThread(
         connection, *this
     ));
-#endif
 }
 PABotBase2_WiredController::~PABotBase2_WiredController(){
     stop();
 }
 void PABotBase2_WiredController::stop(){
     m_status_thread.reset();
+}
+
+
+
+void PABotBase2_WiredController::update_status(Cancellable& cancellable){
+    PABotBase2::MessageHeader request;
+    request.message_bytes = sizeof(request);
+    request.opcode = PABB2_MESSAGE_OPCODE_REQUEST_STATUS;
+    uint8_t id = m_connection.device().send_request(request);
+    PABotBase2::Message_u32 response;
+    m_connection.device().wait_for_request_response<PABotBase2::Message_u32, PABB2_MESSAGE_OPCODE_RET_U32>(
+        response, id
+    );
+
+    uint32_t status = response.data;
+    bool status_connected = status & 1;
+    bool status_ready     = status & 2;
+
+    std::string str;
+    str += "Connected: " + (status_connected
+        ? html_color_text("Yes", theme_friendly_darkblue())
+        : html_color_text("No", COLOR_RED)
+    );
+    str += " - Ready: " + (status_ready
+        ? html_color_text("Yes", theme_friendly_darkblue())
+        : html_color_text("No", COLOR_RED)
+    );
+
+    m_connection.set_status_line1(str);
+}
+void PABotBase2_WiredController::stop_with_error(std::string message){
+    PABotBase2_Controller::stop_with_error(std::move(message));
 }
 
 
@@ -200,38 +198,6 @@ void PABotBase2_WiredController::execute_state(
         m_connection.device().command_queue().send_command(request);
         time_left -= current;
     }
-}
-
-
-
-void PABotBase2_WiredController::update_status(Cancellable& cancellable){
-    PABotBase2::MessageHeader request;
-    request.message_bytes = sizeof(request);
-    request.opcode = PABB2_MESSAGE_OPCODE_REQUEST_STATUS;
-    uint8_t id = m_connection.device().send_request(request);
-    PABotBase2::Message_u32 response;
-    m_connection.device().wait_for_request_response<PABotBase2::Message_u32, PABB2_MESSAGE_OPCODE_RET_U32>(
-        response, id
-    );
-
-    uint32_t status = response.data;
-    bool status_connected = status & 1;
-    bool status_ready     = status & 2;
-
-    std::string str;
-    str += "Connected: " + (status_connected
-        ? html_color_text("Yes", theme_friendly_darkblue())
-        : html_color_text("No", COLOR_RED)
-    );
-    str += " - Ready: " + (status_ready
-        ? html_color_text("Yes", theme_friendly_darkblue())
-        : html_color_text("No", COLOR_RED)
-    );
-
-    m_connection.set_status_line1(str);
-}
-void PABotBase2_WiredController::stop_with_error(std::string message){
-    PABotBase2_Controller::stop_with_error(std::move(message));
 }
 
 

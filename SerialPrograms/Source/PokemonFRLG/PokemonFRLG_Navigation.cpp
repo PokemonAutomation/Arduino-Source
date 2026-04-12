@@ -172,7 +172,7 @@ bool try_open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     int ps = run_until<ProControllerContext>(
         console, context,
         [](ProControllerContext& context){
-            for (int i = 0; i < 15; i++) { //Enough to cycle through 6pty+cxl twice
+            for (int i = 0; i < 15; i++){ //Enough to cycle through 6pty+cxl twice
                 pbf_wait(context, 320ms);
                 context.wait_for_all_requests();
                 pbf_press_dpad(context, DPAD_UP, 320ms, 320ms);
@@ -533,10 +533,10 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
             rejected_first_box = false;
             continue;
         case 2:
-            if (stop_on_move_learn) {
+            if (stop_on_move_learn){
                 console.log("Move learn detected.");
                 return true;
-            }else if (rejected_first_box) {
+            }else if (rejected_first_box){
                 loops++;
                 console.log("Declined to learn new move.");
                 pbf_press_button(context, BUTTON_A, 200ms, 0ms);
@@ -656,7 +656,7 @@ void use_teleport_from_overworld(ConsoleHandle& console, ProControllerContext& c
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
             },
             { teleporter_selected }
@@ -874,7 +874,7 @@ void enter_leave_pokecenter(ConsoleHandle& console, ProControllerContext& contex
 
         int ret = run_until<ProControllerContext>(
             console, context,
-            [leave](ProControllerContext& context) {
+            [leave](ProControllerContext& context){
                 pbf_move_left_joystick(context, {0, (leave ? -1.0 : +1.0)}, 10000ms, 0ms);
             },
             { pokecenter_transition }
@@ -906,7 +906,7 @@ void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context){
     uint16_t errors = 0;
 
     while (true){
-        if (errors > 5) {
+        if (errors > 5){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "heal_at_pokecenter(): Failed to initiate PokeCenter dialog.",
@@ -919,7 +919,7 @@ void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context){
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 // walk up to counter and initiate dialog
                 ssf_press_left_joystick(context, {0, +1}, 0ms, 10000ms);
                 ssf_mash1_button(context, BUTTON_A, 10000ms);
@@ -952,7 +952,7 @@ int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftr
 
     int ret = run_until<ProControllerContext>(
         console, context,
-        [leftright, deadline](ProControllerContext& context) {
+        [leftright, deadline](ProControllerContext& context){
             while (current_time() < deadline){
                 if (leftright){
                     pbf_move_left_joystick(context, {+1, 0}, 33ms, 150ms);

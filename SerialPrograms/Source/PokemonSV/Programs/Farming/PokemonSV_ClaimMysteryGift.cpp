@@ -182,9 +182,9 @@ void ClaimMysteryGift::enter_mystery_gift_via_internet_window(SingleSwitchProgra
         pbf_press_dpad(context, DPAD_UP, 160ms, 840ms);
         pbf_press_button(context, BUTTON_A, 160ms, 4000ms);
         pbf_press_button(context, BUTTON_A, 160ms, 4000ms);
-        try {
+        try{
             clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {CallbackEnum::PROMPT_DIALOG});
-        }catch(OperationFailedException&){
+        }catch (OperationFailedException&){
             env.console.log("enter_mystery_gift_via_internet_window: Failed to detect the dialog that leads to the Mystery Gift code window. Reset game and re-try.", COLOR_YELLOW);
             reset_game(env.program_info(), env.console, context);
             continue;
@@ -304,9 +304,9 @@ void ClaimMysteryGift::enter_mystery_gift_code_window(SingleSwitchProgramEnviron
         pbf_press_dpad(context, DPAD_DOWN, 160ms, 840ms);
         pbf_press_button(context, BUTTON_A, 160ms, 4000ms);
         pbf_press_button(context, BUTTON_A, 160ms, 10000ms);
-        try {
+        try{
             clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {CallbackEnum::PROMPT_DIALOG});
-        }catch(OperationFailedException&){
+        }catch (OperationFailedException&){
             env.console.log("enter_mystery_gift_code_window: Failed to detect the dialog that leads to the Mystery Gift code window. Reset game and re-try.", COLOR_YELLOW);
             reset_game(env.program_info(), env.console, context);
             continue;

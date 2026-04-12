@@ -86,7 +86,7 @@ void ReliableStreamConnection::wait_for_pending(){
 //  StreamSender/StreamListener
 //
 
-size_t ReliableStreamConnection::reliable_send(const void* data, size_t bytes, WallDuration timeout){
+size_t ReliableStreamConnection::reliable_send_blocking(const void* data, size_t bytes, WallDuration timeout){
     WallClock deadline = timeout == WallDuration::max()
         ? WallClock::max()
         : current_time() + timeout;

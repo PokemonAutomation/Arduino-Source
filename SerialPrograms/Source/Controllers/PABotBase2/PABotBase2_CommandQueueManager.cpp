@@ -71,7 +71,7 @@ bool CommandQueueManager::send_cancel(WallDuration timeout){
     }
     m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &message);
     WallClock start = current_time();
-    size_t bytes_sent = m_connection.reliable_send(&message, message.message_bytes, timeout);
+    size_t bytes_sent = m_connection.reliable_send_blocking(&message, message.message_bytes, timeout);
     WallClock end = current_time();
     m_cv.notify_all();
 
@@ -107,7 +107,7 @@ void CommandQueueManager::send_replace_on_next(){
         m_pending_commands.clear();
     }
     m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &message);
-    m_connection.reliable_send(&message, message.message_bytes);
+    m_connection.reliable_send_blocking(&message, message.message_bytes);
     m_cv.notify_all();
 }
 
@@ -141,7 +141,7 @@ uint8_t CommandQueueManager::send_command(MessageHeader& command){
         }
     }
     m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &command);
-    m_connection.reliable_send(&command, command.message_bytes);
+    m_connection.reliable_send_blocking(&command, command.message_bytes);
     m_cv.notify_all();
     return command.id;
 }

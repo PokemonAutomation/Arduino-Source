@@ -35,7 +35,7 @@ void open_start_menu(ConsoleHandle& console, ProControllerContext& context){
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 pbf_press_button(context, BUTTON_PLUS, 200ms, 1800ms);
             },
             { start_menu }

@@ -16,6 +16,7 @@
 #include "Programs/ShinyHunting/PokemonFRLG_LegendaryReset.h"
 #include "Programs/ShinyHunting/PokemonFRLG_LegendaryRunAway.h"
 #include "Programs/ShinyHunting/PokemonFRLG_PrizeCornerReset.h"
+#include "Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Fishing.h"
 #include "Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Overworld.h"
 #include "Programs/TestPrograms/PokemonFRLG_SoundListener.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadStats.h"
@@ -39,8 +40,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- Farming ----");
     ret.emplace_back(make_single_switch_program<NuggetBridgeFarmer_Descriptor, NuggetBridgeFarmer>());
+    ret.emplace_back(make_single_switch_program<PickupFarmer_Descriptor, PickupFarmer>());
     if (PreloadSettings::instance().DEVELOPER_MODE){
-        ret.emplace_back(make_single_switch_program<PickupFarmer_Descriptor, PickupFarmer>());
     }
 
     //ret.emplace_back("---- General ----");
@@ -48,6 +49,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Shiny Hunting  ----");
     ret.emplace_back(make_single_switch_program<GiftReset_Descriptor, GiftReset>());
     ret.emplace_back(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
+    ret.emplace_back(make_single_switch_program<ShinyHuntFishing_Descriptor, ShinyHuntFishing>());
     ret.emplace_back(make_single_switch_program<ShinyHuntOverworld_Descriptor, ShinyHuntOverworld>());
     ret.emplace_back(make_single_switch_program<PrizeCornerReset_Descriptor, PrizeCornerReset>());
     if (PreloadSettings::instance().DEVELOPER_MODE){

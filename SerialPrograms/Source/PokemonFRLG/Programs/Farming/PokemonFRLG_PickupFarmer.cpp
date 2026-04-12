@@ -167,7 +167,7 @@ int grass_spin(SingleSwitchProgramEnvironment& env, ProControllerContext& contex
 
     int ret = run_until<ProControllerContext>(
         env.console, context,
-        [leftright, deadline](ProControllerContext& context) {
+        [leftright, deadline](ProControllerContext& context){
             while (current_time() < deadline){
                 if (leftright){
                     pbf_move_left_joystick(context, {+1, 0}, 33ms, 150ms);
@@ -192,7 +192,7 @@ int grass_spin(SingleSwitchProgramEnvironment& env, ProControllerContext& contex
 void use_first_battle_move(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     uint16_t errors = 0;
     while (true){    
-        if (errors > 5) {
+        if (errors > 5){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to detect battle menu.",
@@ -208,7 +208,7 @@ void use_first_battle_move(SingleSwitchProgramEnvironment& env, ProControllerCon
             { menu_open }
         );
 
-        if (ret < 0) {
+        if (ret < 0){
             env.log("Failed to detect battle menu within 5 seconds.");
             errors++;
             // attempt to return to the top-level battle menu
@@ -232,16 +232,16 @@ void take_pickup_items(SingleSwitchProgramEnvironment& env, ProControllerContext
     PartySelectionWatcher selection_open(COLOR_RED);
     int ret;
     // take items from positions 2-5. This works even if they haven't picked up an item
-    for(int i = 2; i <= 5; i++) {
+    for(int i = 2; i <= 5; i++){
         context.wait_for_all_requests();
         ret = run_until<ProControllerContext>(
             env.console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
             },
             { selection_open }
         );
-        if (ret < 0) {
+        if (ret < 0){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to detect selection menu.",
