@@ -284,7 +284,7 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     while (!shiny_found){
         try{
             if (stats.encounters == 0 || failed_encounter || moves_used >= MOVE_PP){
-                use_teleport(env.console, context);
+                use_teleport_from_overworld(env.console, context);
                 enter_pokecenter(env.console, context);
                 heal_at_pokecenter(env.console, context);
                 leave_pokecenter(env.console, context);
@@ -349,7 +349,7 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
 
             use_first_battle_move(env, context);
             moves_used++;
-            bool move_learned = exit_wild_battle(env.console, context, !!STOP_ON_MOVE_LEARN);
+            bool move_learned = exit_wild_battle(env.console, context, !!STOP_ON_MOVE_LEARN, false);
 
             if (move_learned && STOP_ON_MOVE_LEARN){
                 send_program_status_notification(
