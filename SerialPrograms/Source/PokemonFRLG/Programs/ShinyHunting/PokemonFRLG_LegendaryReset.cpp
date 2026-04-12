@@ -96,7 +96,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
     */
 
     while (true){
-        switch (TARGET) {
+        switch (TARGET){
         case Target::press_a:
             env.log("Target: Press A.");
             //Talk to target

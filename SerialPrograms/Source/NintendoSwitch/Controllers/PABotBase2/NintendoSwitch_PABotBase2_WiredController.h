@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_PABotBase2_WiredControllerNS_H
-#define PokemonAutomation_NintendoSwitch_PABotBase2_WiredControllerNS_H
+#ifndef PokemonAutomation_NintendoSwitch_PABotBase2_WiredController_H
+#define PokemonAutomation_NintendoSwitch_PABotBase2_WiredController_H
 
 #include "Controllers/ControllerStatusThread.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -30,9 +30,7 @@ public:
 public:
     PABotBase2_WiredController(
         Logger& logger,
-        PABotBase2::Connection& connection,
-        ControllerType controller_type,
-        ControllerResetMode reset_mode
+        PABotBase2::Connection& connection
     );
     ~PABotBase2_WiredController();
     void stop();

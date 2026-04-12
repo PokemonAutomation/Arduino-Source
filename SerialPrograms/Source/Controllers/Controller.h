@@ -294,7 +294,7 @@ public:
             return true;
         }
         try{
-            m_controller.cancel_all_commands();
+            m_controller.cancel_all_commands(std::chrono::milliseconds(100));
         }catch (...){}
         return false;
     }

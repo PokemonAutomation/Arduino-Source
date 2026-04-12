@@ -209,7 +209,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
                 );
                 if (ret == 0){
                     env.log("Advance arrow detected.");
-                } else {
+                }else{
                     env.log("Battle Advance arrow was not detected.");
                     stats.errors++;
                     env.update_stats();
@@ -262,7 +262,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
                 );
                 if (ret == 0){
                     env.log("Battle menu detecteed!");
-                } else {
+                }else{
                     env.log("Battle menu was not detected.");
                     stats.errors++;
                     env.update_stats();

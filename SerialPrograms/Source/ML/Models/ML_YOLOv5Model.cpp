@@ -142,7 +142,7 @@ YOLOv5Session::YOLOv5Session(const std::string& model_path, bool use_gpu)
 , m_model_input(3*YOLO5_INPUT_IMAGE_SIZE*YOLO5_INPUT_IMAGE_SIZE)
 {
     // Extract YOLO labels from model metadata
-    try {
+    try{
         Ort::ModelMetadata metadata = m_session.GetModelMetadata();
         Ort::AllocatorWithDefaultOptions allocator;
 
@@ -162,7 +162,7 @@ YOLOv5Session::YOLOv5Session(const std::string& model_path, bool use_gpu)
         }else{
             throw std::runtime_error("YOLOv5 model does not have 'names' metadata to extract labels from");
         }
-    } catch (const std::exception& e){
+    }catch (const std::exception& e){
         throw std::runtime_error("YOLOv5: Failed to extract labels from metadata: " + std::string(e.what()));
     }
 

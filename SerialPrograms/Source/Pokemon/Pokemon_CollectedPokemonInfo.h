@@ -14,6 +14,7 @@
 #include <ostream>
 #include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "Pokemon/Options/Pokemon_BoxSortingTable.h"
+#include "Pokemon_Types.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{
@@ -31,6 +32,8 @@ struct CollectedPokemonInfo{
     std::string ball_slug = "";
     StatsHuntGenderFilter gender = StatsHuntGenderFilter::Genderless;
     uint32_t ot_id = 0; // original trainer ID
+    PokemonType primaryType = PokemonType::NONE;
+    PokemonType secondaryType = PokemonType::NONE;
 };
 
 bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs);

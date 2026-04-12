@@ -175,16 +175,16 @@ void take_pickup_items(SingleSwitchProgramEnvironment& env, ProControllerContext
     PartySelectionWatcher selection_open(COLOR_RED);
     int ret;
     // take items from positions 2-5. This works even if they haven't picked up an item
-    for(int i = 2; i <= 5; i++) {
+    for(int i = 2; i <= 5; i++){
         context.wait_for_all_requests();
         ret = run_until<ProControllerContext>(
             env.console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
             },
             { selection_open }
         );
-        if (ret < 0) {
+        if (ret < 0){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to detect selection menu.",
@@ -307,18 +307,18 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             }
             shiny_found = false;
 
-            int ret2 = spam_first_move(env.console, context);
-            if (ret2 == 1) { // user fainted
+            BattleResult ret2 = spam_first_move(env.console, context);
+            if (ret2 == BattleResult::playerfainted) {
                 stats.times_fainted++;
                 out_of_pp = true; // triggers a healing trip
-                //TODO: handle exiting the battle in case the player can't escape
+                //TODO: handle exiting the battle in case the player can't escape (due to low speed stat)
                 pbf_mash_button(context, BUTTON_B, 5000ms);
                 context.wait_for_all_requests();
-            } else if (ret2 == 2){ // battle fled (no EV gain)
+            } else if (ret2 == BattleResult::unknown){ // battle fled (no EV gain)
                 // continue;
-            } else if (ret2 == 3){
+            } else if (ret2 == BattleResult::outofpp){
                 out_of_pp = true;
-            } else if (ret2 == 0){ // opponent fainted
+            } else if (ret2 == BattleResult::opponentfainted){
                 stats.encounters++;
                 encounters_since_item_check++;
                 bool move_learned = exit_wild_battle(env.console, context, !!STOP_ON_MOVE_LEARN, !!PREVENT_EVOLUTION);
