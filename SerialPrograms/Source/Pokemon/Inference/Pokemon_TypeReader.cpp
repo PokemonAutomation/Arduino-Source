@@ -51,7 +51,7 @@ public:
         std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 10);
 
         WaterfillObject object;
-        for (const WaterfillObject& item : objects) {
+        for (const WaterfillObject& item : objects){
             object.merge_assume_no_overlap(item);
         }
 
@@ -75,14 +75,14 @@ private:
 struct Gen8TypeSpriteDatabase {
     std::map<PokemonType, TypeSprite> m_type_map;
 
-    static Gen8TypeSpriteDatabase& instance() {
+    static Gen8TypeSpriteDatabase& instance(){
         static Gen8TypeSpriteDatabase data;
         return data;
     }
 
-    Gen8TypeSpriteDatabase() {
-        for (const auto& item : POKEMON_TYPE_SLUGS()) {
-            if (item.first == PokemonType::NONE) {
+    Gen8TypeSpriteDatabase(){
+        for (const auto& item : POKEMON_TYPE_SLUGS()){
+            if (item.first == PokemonType::NONE){
                 continue;
             }
             m_type_map.emplace(item.first, TypeSprite(item.second, PokemonTypeGeneration::GEN8));
@@ -93,14 +93,14 @@ struct Gen8TypeSpriteDatabase {
 struct Gen9TypeSpriteDatabase {
     std::map<PokemonType, TypeSprite> m_type_map;
 
-    static Gen9TypeSpriteDatabase& instance() {
+    static Gen9TypeSpriteDatabase& instance(){
         static Gen9TypeSpriteDatabase data;
         return data;
     }
 
-    Gen9TypeSpriteDatabase() {
-        for (const auto& item : POKEMON_TYPE_SLUGS()) {
-            if (item.first == PokemonType::NONE) {
+    Gen9TypeSpriteDatabase(){
+        for (const auto& item : POKEMON_TYPE_SLUGS()){
+            if (item.first == PokemonType::NONE){
                 continue;
             }
             m_type_map.emplace(item.first, TypeSprite(item.second, PokemonTypeGeneration::GEN9));
@@ -108,22 +108,22 @@ struct Gen9TypeSpriteDatabase {
     }
 };
 
-size_t distance_sqr(const ImagePixelBox& a, const ImagePixelBox& b) {
+size_t distance_sqr(const ImagePixelBox& a, const ImagePixelBox& b){
     bool overlap_x = a.min_x <= b.max_x && b.min_x <= a.max_x;
     bool overlap_y = a.min_y <= b.max_y && b.min_y <= a.max_y;
-    if (overlap_x && overlap_y) {
+    if (overlap_x && overlap_y){
         return 0;
     }
 
     size_t dist_x = 0;
-    if (!overlap_x) {
+    if (!overlap_x){
         dist_x = a.max_x < b.min_x
             ? b.min_x - a.max_x
             : a.min_x - b.max_x;
     }
 
     size_t dist_y = 0;
-    if (!overlap_y) {
+    if (!overlap_y){
         dist_y = a.max_y < b.min_y
             ? b.min_y - a.max_y
             : a.min_y - b.max_y;
@@ -132,20 +132,20 @@ size_t distance_sqr(const ImagePixelBox& a, const ImagePixelBox& b) {
     return dist_x * dist_x + dist_y * dist_y;
 }
 
-std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image, PokemonTypeGeneration generation) {
+std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image, PokemonTypeGeneration generation){
     size_t width = image.width();
     size_t height = image.height();
-    if (width * height < 100) {
+    if (width * height < 100){
         return { 1.0, PokemonType::NONE };
     }
-    if (width > 2 * height) {
+    if (width > 2 * height){
         return { 1.0, PokemonType::NONE };
     }
-    if (height > 2 * width) {
+    if (height > 2 * width){
         return { 1.0, PokemonType::NONE };
     }
     ImageStats stats = image_stats(image);
-    if (stats.stddev.sum() < 50) {
+    if (stats.stddev.sum() < 50){
         //        if (print){
         //            cout << "stats.stddev.sum() = " << stats.stddev.sum() << endl;
         //        }
@@ -161,7 +161,7 @@ std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image, Po
 
     const std::map<PokemonType, TypeSprite>* type_sprite_map;
 
-    switch (generation) {
+    switch (generation){
     case PokemonAutomation::Pokemon::PokemonTypeGeneration::GEN8:
         type_sprite_map = &Gen8TypeSpriteDatabase::instance().m_type_map;
         break;
@@ -174,7 +174,7 @@ std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image, Po
 
     double best_score = 0.45;
     PokemonType best_type = PokemonType::NONE;
-    for (const auto& item : *type_sprite_map) {
+    for (const auto& item : *type_sprite_map){
         //        if (threshold != 700 || id != 55){
         //            continue;
         //        }
@@ -182,14 +182,14 @@ std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image, Po
         double expected_aspect_ratio = item.second.aspect_ratio();
         double ratio = aspect_ratio / expected_aspect_ratio;
 #if 0
-        if (print) {
+        if (print){
             cout << item.second.slug()
                 << " : expected = " << expected_aspect_ratio
                 << ", actual = " << aspect_ratio
                 << ", ratio = " << ratio << endl;
         }
 #endif
-        if (std::abs(ratio - 1) > 0.2) {
+        if (std::abs(ratio - 1) > 0.2){
             continue;
         }
 
@@ -203,17 +203,17 @@ std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image, Po
 #if 0
         //  Handicap fairy due to white and pink being too similar in color and
         //  false positiving on the background.
-        if (item.first == PokemonType::FAIRY) {
+        if (item.first == PokemonType::FAIRY){
             rmsd_ratio *= 1.5;
         }
 
         //  Bonus for dark because or large contrast.
-        if (item.first == PokemonType::DARK) {
+        if (item.first == PokemonType::DARK){
             rmsd_ratio *= 0.8;
         }
 #endif
 
-        if (best_score > rmsd_alpha) {
+        if (best_score > rmsd_alpha){
             best_score = rmsd_alpha;
             best_type = item.first;
             //            cout << item.second.slug() << ": " << stats.stddev << endl;
@@ -315,7 +315,7 @@ std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_type_symbols(
     const ImageViewRGB32& image, 
     double max_area_ratio,
     PokemonTypeGeneration generation
-) {
+){
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates;
 
     {
@@ -335,7 +335,7 @@ std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_type_symbols(
                 {0xffe0e0e0, 0xffffffff},
             }
             );
-        for (PackedBinaryMatrix& matrix : matrices) {
+        for (PackedBinaryMatrix& matrix : matrices){
             find_type_symbol_candidates(candidates, original_screen, image, matrix, max_area_ratio, generation);
         }
     }
@@ -343,25 +343,25 @@ std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_type_symbols(
     //    cout << "-------------" << endl;
 
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> filtered;
-    for (const auto& candidate : candidates) {
+    for (const auto& candidate : candidates){
         //        cout << POKEMON_TYPE_SLUGS().get_string(candidate.second.first) << ": " << candidate.first << endl;
         //        hits.emplace_back(overlay, translate_to_parent(screen, box, candidate.second.second.box), COLOR_GREEN);
 
         bool is_dupe = false;
-        for (const auto& item : filtered) {
-            if (distance_sqr(candidate.second.second, item.second.second) == 0) {
+        for (const auto& item : filtered){
+            if (distance_sqr(candidate.second.second, item.second.second) == 0){
                 is_dupe = true;
                 break;
             }
         }
-        if (!is_dupe) {
+        if (!is_dupe){
             filtered.emplace(candidate);
         }
     }
 
 #if 0
     static int c = 0;
-    for (const auto& item : filtered) {
+    for (const auto& item : filtered){
         //        cout << get_type_slug(item.second.first) << ": " << item.first << " - [" << item.second.second.center_x() << "," << item.second.second.center_y() << "]" << endl;
         const ImagePixelBox& box = item.second.second;
         ImageViewRGB32 img = image.sub_image(
@@ -379,7 +379,7 @@ std::pair<PokemonType, PokemonType> read_pokemon_types(
     const ImageViewRGB32& original_screen,
     const ImageFloatBox& box,
     PokemonTypeGeneration generation
-) {
+){
 
     ImageViewRGB32 image = extract_box_reference(original_screen, box);
 
@@ -394,27 +394,27 @@ std::pair<PokemonType, PokemonType> read_pokemon_types(
     //  assignment is stable regardless of which type was detected with higher confidence.
     std::vector<std::pair<PokemonType, ImagePixelBox>> sorted;
     sorted.reserve(filtered.size());
-    for (const auto& item : filtered) {
+    for (const auto& item : filtered){
         sorted.emplace_back(item.second);
     }
-    std::sort(sorted.begin(), sorted.end(), [](const auto& a, const auto& b) {
+    std::sort(sorted.begin(), sorted.end(), [](const auto& a, const auto& b){
         size_t height = a.second.max_y - a.second.min_y;
         size_t diff_y = a.second.min_y > b.second.min_y
             ? a.second.min_y - b.second.min_y
             : b.second.min_y - a.second.min_y;
-        if (diff_y > height) {
+        if (diff_y > height){
             return a.second.min_y < b.second.min_y;
         }
         return a.second.min_x < b.second.min_x;
         });
 
     std::pair<PokemonType, PokemonType> result{ PokemonType::NONE, PokemonType::NONE };
-    for (const auto& item : sorted) {
+    for (const auto& item : sorted){
         PokemonType type = item.first;
-        if (result.first == PokemonType::NONE) {
+        if (result.first == PokemonType::NONE){
             result.first = type;
         }
-        else if (type != result.first) {
+        else if (type != result.first){
             result.second = type;
             break;
         }

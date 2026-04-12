@@ -170,7 +170,7 @@ bool try_open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     int ps = run_until<ProControllerContext>(
         console, context,
         [](ProControllerContext& context){
-            for (int i = 0; i < 15; i++) { //Enough to cycle through 6pty+cxl twice
+            for (int i = 0; i < 15; i++){ //Enough to cycle through 6pty+cxl twice
                 pbf_wait(context, 320ms);
                 context.wait_for_all_requests();
                 pbf_press_dpad(context, DPAD_UP, 320ms, 320ms);
@@ -380,13 +380,13 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
     context.wait_for_all_requests();
     int ret = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
            pbf_mash_button(context, BUTTON_B, 20000ms);
         },
         { battle_exited }
     );
 
-    if (ret == 0) {
+    if (ret == 0){
         pbf_wait(context, 500ms);
         context.wait_for_all_requests();
         console.log("Battle exited.");
@@ -417,7 +417,7 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
         WallClock deadline = current_time() + 30s;
         ret = run_until<ProControllerContext>(
             console, context,
-            [deadline, rejected_first_box](ProControllerContext& context) {
+            [deadline, rejected_first_box](ProControllerContext& context){
                 pbf_wait(context, 1000ms); // give the watchers a chance to detect something
                 while (current_time() < deadline){
                     pbf_press_button(context, rejected_first_box ? BUTTON_A : BUTTON_B, 200ms, 1800ms);
@@ -438,10 +438,10 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
             rejected_first_box = false;
             continue;
         case 2:
-            if (stop_on_move_learn) {
+            if (stop_on_move_learn){
                 console.log("Move learn detected.");
                 return true;
-            }else if (rejected_first_box) {
+            }else if (rejected_first_box){
                 loops++;
                 console.log("Declined to learn new move.");
                 pbf_press_button(context, BUTTON_A, 200ms, 200ms);
@@ -485,7 +485,7 @@ void use_teleport(ConsoleHandle& console, ProControllerContext& context){
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
             },
             { teleporter_selected }
@@ -541,7 +541,7 @@ void enter_leave_pokecenter(ConsoleHandle& console, ProControllerContext& contex
 
         int ret = run_until<ProControllerContext>(
             console, context,
-            [leave](ProControllerContext& context) {
+            [leave](ProControllerContext& context){
                 pbf_move_left_joystick(context, {0, (leave ? -1.0 : +1.0)}, 10000ms, 0ms);
             },
             { pokecenter_transition }
@@ -573,7 +573,7 @@ void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context){
     uint16_t errors = 0;
 
     while (true){
-        if (errors > 5) {
+        if (errors > 5){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to initiate PokeCenter dialog.",
@@ -586,7 +586,7 @@ void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context){
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 // walk up to counter and initiate dialog
                 ssf_press_left_joystick(context, {0, +1}, 0ms, 10000ms);
                 ssf_mash1_button(context, BUTTON_A, 10000ms);
@@ -644,7 +644,7 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
                 context.wait_for_all_requests();
                 pbf_mash_button(context, BUTTON_B, 2000ms);
                 start_menu_is_open = false;
-            } else {
+            }else{
                 console.log("Navigated to POKEMON on the start menu");
                 context.wait_for_all_requests();
                 pbf_press_button(context, BUTTON_A, 200ms, 1300ms);

@@ -39,7 +39,7 @@ int main(int argc, char* argv[]){
     logger.log("================================================================================");
     logger.log("Testing PybindSwitchProController...");
 
-    try {
+    try{
         // Create controller with port name from command-line argument
         const std::string port_name = argv[1];
         logger.log("Creating PybindSwitchProController with port: " + port_name);
@@ -70,7 +70,7 @@ int main(int argc, char* argv[]){
             logger.log("Status: " + controller.current_status());
         }
 
-    } catch (const std::exception& e){
+    }catch (const std::exception& e){
         logger.log("Error during controller test: " + std::string(e.what()), COLOR_RED);
     }
 

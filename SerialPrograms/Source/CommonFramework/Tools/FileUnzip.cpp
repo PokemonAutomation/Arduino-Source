@@ -66,7 +66,7 @@ namespace PokemonAutomation{
 
     // ensure that entry_name is inside target_dir, to prevent path traversal attacks.
     bool is_safe(const std::string& target_dir, const std::string& entry_name){
-        try {
+        try{
             // 1. Get absolute, normalized paths
             // handles symlinks. and resolves .. and . components. throws error if path doesn't exist
             Filesystem::Path base = fs::canonical(Filesystem::Path(target_dir));
@@ -91,7 +91,7 @@ namespace PokemonAutomation{
             }
 
             return true;
-        } catch (...){
+        }catch (...){
             cout << "target_dir path doesn't exist." << endl;
             return false;
         }
