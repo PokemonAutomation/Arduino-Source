@@ -262,9 +262,12 @@ std::optional<uint8_t> DeviceHandle::try_send_request(MessageHeader& request, Wa
 
     return request.id;
 }
-std::string DeviceHandle::wait_for_request_response(uint8_t id){
+std::string DeviceHandle::wait_for_request_response(uint8_t id, WallDuration timeout){
+    WallClock deadline = timeout == WallDuration::max()
+        ? WallClock::max()
+        : current_time() + timeout;
     std::unique_lock<Mutex> lg(m_lock);
-    while (true){
+    while (current_time() < deadline){
         throw_if_cancelled();
 
         //  Request doesn't exist.
@@ -278,7 +281,7 @@ std::string DeviceHandle::wait_for_request_response(uint8_t id){
         }
 
         if (iter->second.empty()){
-            m_cv.wait(lg);
+            m_cv.wait_until(lg, deadline);
             continue;
         }
 
@@ -286,6 +289,7 @@ std::string DeviceHandle::wait_for_request_response(uint8_t id){
         m_pending_requests.erase(iter);
         return str;
     }
+    return "";
 }
 
 uint32_t DeviceHandle::query_u32(uint8_t opcode){
