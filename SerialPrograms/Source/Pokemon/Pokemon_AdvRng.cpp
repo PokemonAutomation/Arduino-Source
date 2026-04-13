@@ -27,7 +27,7 @@ AdvRngState rngstate_from_internal_state(uint16_t seed, uint64_t advances, uint3
 AdvRngState rngstate_from_seed(uint16_t& seed, uint64_t advances, RngMethod method){
     uint32_t state = seed;
     state = increment_internal_rng_state(state);
-    for (int i=0; i<advances; i++){ 
+    for (uint64_t i=0; i<advances; i++){ 
         state = increment_internal_rng_state(state);
     }
 
@@ -167,7 +167,7 @@ void AdvRng::set_state_advances(uint64_t advances){
 }
 
 void AdvRng::search_advance_range(std::map<AdvRngState, AdvPokemonResult>& hits, AdvRngFilters& target, uint64_t min_advances, uint64_t max_advances, uint16_t tid_xor_sid, uint8_t gender_threshold){
-    for (int m=0; m<3; m++){
+    for (uint8_t m=0; m<3; m++){
         set_state_advances(min_advances);
 
         RngMethod method;
@@ -189,7 +189,7 @@ void AdvRng::search_advance_range(std::map<AdvRngState, AdvPokemonResult>& hits,
             continue;
         }
 
-        for (int a=min_advances; a<max_advances; a++){
+        for (uint64_t a=min_advances; a<max_advances; a++){
             AdvPokemonResult res = pokemon_from_state(state, method);
             bool match = check_for_match(res, target, tid_xor_sid, gender_threshold);
             if (match){
