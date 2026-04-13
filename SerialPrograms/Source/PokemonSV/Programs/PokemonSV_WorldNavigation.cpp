@@ -302,7 +302,7 @@ void place_marker_offset_from_flypoint(
             );
         }
 
-        try {
+        try{
             open_map_from_overworld(info, stream, context, false);
 
             // move cursor near landmark (pokecenter)
@@ -532,7 +532,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, VideoStream& stre
     const std::array<double, MAX_TRY_COUNT> adjustment_table =  {1, 1.4, 1, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 0.9, 0.8, 1.4}; // {1, 1.4, 1.5};
     
     while(true){
-        try {
+        try{
             pbf_press_button(context, BUTTON_ZR, 320ms, 800ms);
             // try different magnitudes of cursor push with each failure.
             double push_scale = 0.29 * adjustment_table[try_count];
@@ -580,7 +580,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, VideoStream& stre
     // Part 3: Tries to detect a pokecenter that is further away from the player, while at max warpable level
     try_count = 0;
     while(true){
-        try {
+        try{
             double push_scale = 0.29 * adjustment_table[try_count];
             // std::cout << "push_scale: " << std::to_string(push_scale) << std::endl;
             // Now try finding the closest pokecenter at the max warpable level
@@ -639,7 +639,7 @@ void jump_off_wall_until_map_open(const ProgramInfo& info, VideoStream& stream, 
 // Open map and teleport back to town pokecenter
 void reset_to_pokecenter(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     while (true){
-        try {
+        try{
             open_map_from_overworld(info, stream, context);
             fly_to_closest_pokecenter_on_map(info, stream, context);
             break;
@@ -735,7 +735,7 @@ bool attempt_fly_to_overlapping_flypoint(
     ProControllerContext& context
 ){
     while (true){
-        try {
+        try{
             open_map_from_overworld(info, stream, context, false);
             context.wait_for_all_requests();
             pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);

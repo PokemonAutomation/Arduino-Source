@@ -9,7 +9,6 @@
 #include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2_ConnectionDebug.h"
 #include "MockDevice.h"
 
-//  REMOVE
 #include <iostream>
 using std::cout;
 using std::endl;

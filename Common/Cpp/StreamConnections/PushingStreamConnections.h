@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_StreamConnections_PushingStreamConnections_H
 #define PokemonAutomation_StreamConnections_PushingStreamConnections_H
 
+#include "Common/Cpp/Time.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "StreamInterface.h"
 
@@ -40,7 +41,10 @@ protected:
 
 class ReliableStreamConnectionPushing : public StreamConnectionPushing{
 public:
-    virtual void reliable_send(const void* data, size_t bytes) = 0;
+    virtual size_t reliable_send_blocking(
+        const void* data, size_t bytes,
+        WallDuration timeout = WallDuration::max()
+    ) = 0;
 
 protected:
     void on_reliable_recv(const void* data, size_t bytes){

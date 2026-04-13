@@ -183,7 +183,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
     const char* input_names[] = {m_input_name.c_str()};
     const char* output_names[] = {m_output_name.c_str()};  
 
-    try {
+    try{
         // 7. Run the recognition session
         auto outputs = m_rec_session.Run(
             Ort::RunOptions{nullptr}, 
@@ -194,7 +194,7 @@ std::string PaddleOCRPipeline::recognize(const ImageViewRGB32& image){
             1              // output_count
         );
         return decode_CTC(outputs[0].GetTensorMutableData<float>(), outputs[0].GetTensorTypeAndShapeInfo().GetShape(), m_dictionary);
-    }catch(Ort::Exception& e){
+    }catch (Ort::Exception& e){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "PaddleOCRPipeline::recognize(): Failed." + std::string(e.what()));
     }
     

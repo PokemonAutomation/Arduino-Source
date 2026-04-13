@@ -323,7 +323,7 @@ bool GiftReset::try_open_summary(SingleSwitchProgramEnvironment& env, ProControl
         int ps = run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){
-                for (int i = 0; i < 15; i++) { //Enough to cycle through 6pty+cxl twice
+                for (int i = 0; i < 15; i++){ //Enough to cycle through 6pty+cxl twice
                     pbf_wait(context, 320ms);
                     context.wait_for_all_requests();
                     pbf_press_dpad(context, DPAD_UP, 320ms, 320ms);

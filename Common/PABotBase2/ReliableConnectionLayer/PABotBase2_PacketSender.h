@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PABotBase2_ReliableConnectionLayer_PacketSender_H
 #define PokemonAutomation_PABotBase2_ReliableConnectionLayer_PacketSender_H
 
-#include "Common/Cpp/StreamConnections/PollingStreamConnections.h"
+#include "Common/Cpp/StreamConnections/StreamInterface.h"
 #include "PABotBase2_PacketProtocol.h"
 
 #ifdef PABB2_SIZING_OVERRIDE
@@ -65,6 +65,10 @@ public:
 
 
 public:
+    void declare_stream_corrupted(){
+        m_stream_corrupted = true;
+    }
+
     //  Remove the packet corresponding to the specified seqnum from the queue.
     //  Returns true is successful, false if seqnum is not in the queue.
     bool remove(uint8_t seqnum);
@@ -141,6 +145,8 @@ private:
     //  A timer that increments each time "pabb2_PacketSender_iterate_retransmits()"
     //  is called and nothing is re-transmitted.
     uint8_t m_retransmit_seqnum;
+
+    bool m_stream_corrupted;
 
     //  If non-zero, it indicates we are in the middle of sending stream bytes.
     //  The current packet must be finished before sending anything else.

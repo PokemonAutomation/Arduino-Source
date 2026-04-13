@@ -20,7 +20,7 @@ namespace PokemonFRLG{
 
 PrizeSelectDetector::PrizeSelectDetector(Color color)
     : m_right_box(0.923385, 0.748077, 0.00615385, 0.204577)
-    , m_top_box(0.0704615, 0.741846, 0.859077, 0.00623077)
+    , m_top_box(0.0704615, 0.75, 0.859077, 0.00623077)
     , m_bottom_box(0.0716923, 0.943308, 0.851692, 0.00934615)
     , m_selection_box(0.705538, 0.528962, 0.212923, 0.0602308)
 {}
@@ -38,10 +38,10 @@ bool PrizeSelectDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 top_image = extract_box_reference(game_screen, m_top_box);
     ImageViewRGB32 bottom_image = extract_box_reference(game_screen, m_bottom_box);
     ImageViewRGB32 selection_image = extract_box_reference(game_screen, m_selection_box);
-    if (is_solid(right_image, { 0.25, 0.38, 0.369 })
-        && is_solid(top_image, { 0.25, 0.38, 0.369 })
-        && is_solid(bottom_image, { 0.25, 0.38, 0.369 })
-        && is_solid(selection_image, { 0.25, 0.38, 0.369 })
+    if (is_white(right_image)
+        && is_white(top_image)
+        && is_white(bottom_image)
+        && is_white(selection_image)
     ){
         return true;
     }

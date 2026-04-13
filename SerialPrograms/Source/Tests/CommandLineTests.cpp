@@ -48,10 +48,10 @@ void print_equals(){
         int _ret = 0; \
         try{ \
             _ret = test_func(file_path); \
-        }catch(const std::exception& e){ \
+        }catch (const std::exception& e){ \
             cout << "Test: " << (file_path) << " threw exception: " << e.what() << endl; \
             _ret = 1; \
-        }catch(const Exception& e){\
+        }catch (const Exception& e){\
            cout << "Test: " << (file_path) << " threw " << e.name() << ": <<<" << e.message() << ">>>" << endl; \
            _ret = 1; \
         } \

@@ -27,6 +27,8 @@ int test_pokemonFRLG_AdvanceBattleDialogDetector(const ImageViewRGB32& image, bo
 
 int test_pokemonFRLG_BattleMenuDetector(const ImageViewRGB32& image, bool target);
 
+int test_pokemonFRLG_PrizeSelectDetector(const ImageViewRGB32& image, bool target);
+
 }
 
 #endif

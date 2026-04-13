@@ -95,10 +95,10 @@ void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, C
 
     try{
         program(env, context);
-    } catch(FatalProgramException&){
+    }catch (FatalProgramException&){
         record_debug_video();
         throw;
-    } catch(OperationFailedException&){
+    }catch (OperationFailedException&){
         record_debug_video();
         throw;
     }

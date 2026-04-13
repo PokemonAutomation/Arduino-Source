@@ -13,6 +13,7 @@
 //#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
+#include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h"
 #include "PokemonFRLG_Tests.h"
 #include "TestUtils.h"
@@ -63,6 +64,14 @@ int test_pokemonFRLG_AdvanceBattleDialogDetector(const ImageViewRGB32& image, bo
 int test_pokemonFRLG_BattleMenuDetector(const ImageViewRGB32& image, bool target){
     auto overlay = DummyVideoOverlay();
     BattleMenuDetector detector(COLOR_RED);
+    bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
+int test_pokemonFRLG_PrizeSelectDetector(const ImageViewRGB32& image, bool target){
+    auto overlay = DummyVideoOverlay();
+    PrizeSelectDetector detector(COLOR_RED);
     bool result = detector.detect(image);
     TEST_RESULT_EQUAL(result, target);
     return 0;

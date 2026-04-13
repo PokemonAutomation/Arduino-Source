@@ -40,13 +40,13 @@ static ImageRGB32 preprocess_for_ocr(
     int blur_kernel_size, int blur_passes,
     bool in_range_black, uint32_t bw_min,
     uint32_t bw_max
-) {
+){
     const bool save_debug_images = GlobalSettings::instance().SAVE_DEBUG_IMAGES;
     int id = debug_counter++;
     std::string prefix = "DebugDumps/ocr_" + label + "_" + std::to_string(id);
 
     // Save raw input
-    if (save_debug_images) {
+    if (save_debug_images){
         image.save(prefix + "_0_raw.png");
     }
 
@@ -57,8 +57,8 @@ static ImageRGB32 preprocess_for_ocr(
     // wider gaps in the seven-segment font. Two passes for heavy smoothing.
     cv::Mat blurred_native;
     src.copyTo(blurred_native);
-    if (blur_kernel_size > 0 && blur_passes > 0) {
-        for (int i = 0; i < blur_passes; i++) {
+    if (blur_kernel_size > 0 && blur_passes > 0){
+        for (int i = 0; i < blur_passes; i++){
             cv::GaussianBlur(
                 blurred_native, blurred_native,
                 cv::Size(blur_kernel_size, blur_kernel_size), 1.5
@@ -69,7 +69,7 @@ static ImageRGB32 preprocess_for_ocr(
     // Save blurred at native res
     ImageRGB32 blurred_native_img(blurred_native.cols, blurred_native.rows);
     blurred_native.copyTo(blurred_native_img.to_opencv_Mat());
-    if (save_debug_images) {
+    if (save_debug_images){
         blurred_native_img.save(prefix + "_1_blurred_native.png");
     }
 
@@ -86,14 +86,14 @@ static ImageRGB32 preprocess_for_ocr(
     // Save upscaled
     ImageRGB32 resized_img(resized.cols, resized.rows);
     resized.copyTo(resized_img.to_opencv_Mat());
-    if (save_debug_images) {
+    if (save_debug_images){
         resized_img.save(prefix + "_2_upscaled.png");
     }
 
     // Step 3: BW threshold on the smooth upscaled image.
     ImageRGB32 bw =
             to_blackwhite_rgb32_range(resized_img, in_range_black, bw_min, bw_max);
-    if (save_debug_images) {
+    if (save_debug_images){
         bw.save(prefix + "_3_bw.png");
     }
 
@@ -114,13 +114,13 @@ static ImageRGB32 preprocess_for_ocr(
     smoothed.copyTo(smoothed_img.to_opencv_Mat());
     ImageRGB32 smooth_bw = to_blackwhite_rgb32_range(
             smoothed_img, true, combine_rgb(0, 0, 0), combine_rgb(128, 128, 128));
-    if (save_debug_images) {
+    if (save_debug_images){
         smooth_bw.save(prefix + "_4_smooth_bw.png");
     }
 
     // Step 5: Pad with white border (Tesseract needs margins).
     ImageRGB32 padded = pad_image(smooth_bw, smooth_bw.height() / 2, 0xffffffff);
-    if (save_debug_images) {
+    if (save_debug_images){
         padded.save(prefix + "_5_padded.png");
     }
 
@@ -136,7 +136,7 @@ StatsReader::StatsReader(Color color)
             m_box_defense(0.891000, 0.325612, 0.097607, 0.066639),
             m_box_sp_attack(0.891000, 0.406134, 0.097607, 0.066639),
             m_box_sp_defense(0.891000, 0.486657, 0.097607, 0.063862),
-            m_box_speed(0.891000, 0.567180, 0.097607, 0.066639) {}
+            m_box_speed(0.891000, 0.567180, 0.097607, 0.066639){}
 
 void StatsReader::make_overlays(VideoOverlaySet &items) const {
     const BoxOption &GAME_BOX = GameSettings::instance().GAME_BOX;
@@ -155,7 +155,7 @@ void StatsReader::read_page1(
     Logger &logger, Language language,
     const ImageViewRGB32 &frame,
     PokemonFRLG_Stats &stats
-) {
+){
     const bool save_debug_images = GlobalSettings::instance().SAVE_DEBUG_IMAGES;
     ImageViewRGB32 game_screen =
             extract_box_reference(frame, GameSettings::instance().GAME_BOX);
@@ -171,7 +171,7 @@ void StatsReader::read_page1(
     auto name_result = Pokemon::PokemonNameReader::instance().read_substring(
             logger, language, extract_box_reference(game_screen, m_box_name),
             name_text_color_ranges);
-    if (!name_result.results.empty()) {
+    if (!name_result.results.empty()){
         stats.name = name_result.results.begin()->second.token;
     }
 
@@ -179,7 +179,7 @@ void StatsReader::read_page1(
 
     ImageRGB32 level_upscaled =
             level_box.scale_to(level_box.width() * 4, level_box.height() * 4);
-    if (save_debug_images) {
+    if (save_debug_images){
         level_upscaled.save("DebugDumps/ocr_level_upscaled.png");
     }
 
@@ -191,25 +191,25 @@ void StatsReader::read_page1(
     // dark (shadow).
 
     ImageRGB32 level_ready(level_upscaled.width(), level_upscaled.height());
-    for (size_t r = 0; r < level_upscaled.height(); r++) {
-        for (size_t c = 0; c < level_upscaled.width(); c++) {
+    for (size_t r = 0; r < level_upscaled.height(); r++){
+        for (size_t c = 0; c < level_upscaled.width(); c++){
             Color pixel(level_upscaled.pixel(c, r));
             // If it's very bright (white text) OR very dark (shadow), it becomes
             // black text. Otherwise (lilac background), it becomes white background.
             if ((pixel.red() > 200 && pixel.green() > 200 && pixel.blue() > 200) ||
-                    (pixel.red() < 100 && pixel.green() < 100 && pixel.blue() < 100)) {
+                    (pixel.red() < 100 && pixel.green() < 100 && pixel.blue() < 100)){
                 level_ready.pixel(c, r) = (uint32_t)0xff000000; // Black
-            } else {
+            }else{
                 level_ready.pixel(c, r) = (uint32_t)0xffffffff; // White
             }
         }
     }
 
-    if (save_debug_images) {
+    if (save_debug_images){
         level_ready.save("DebugDumps/ocr_level_ready.png");
     }
 
-    if (!GlobalSettings::instance().USE_PADDLE_OCR) {
+    if (!GlobalSettings::instance().USE_PADDLE_OCR){
         // The level uses white text with dark shadow on a lilac background.
         // The digit reader's binarizer captures dark pixels (<=190 on all channels)
         // but NOT the white text (all channels 255 -> excluded). This leaves the
@@ -219,7 +219,7 @@ void StatsReader::read_page1(
         ImageRGB32 preprocessed = filter_rgb32_range(
             level_box, 0xffc8c8c8, 0xffffffff, Color(0xff000000), true
         );
-        if (save_debug_images) {
+        if (save_debug_images){
             preprocessed.save("DebugDumps/ocr_level_preprocessed.png");
         }
         // Trim left 7% to exclude the "L" glyph blob (always at x~0).
@@ -231,7 +231,7 @@ void StatsReader::read_page1(
         );
         ImageViewRGB32 level_digit_view =
                 extract_box_reference(preprocessed, digits_bbox);
-        if (save_debug_images) {
+        if (save_debug_images){
             level_digit_view.save("DebugDumps/ocr_level_digits_trimmed.png");
         }
         // Use threshold 230 (not 175): lilac-background blob crops inherently
@@ -239,7 +239,7 @@ void StatsReader::read_page1(
         stats.level = read_digits_waterfill_template(
                 logger, level_digit_view, 230.0, DigitTemplateType::LevelBox,
                 "levelDigit", 0x7F);
-    } else {
+    }else{
         // Pass the binarized image to PaddleOCR
         stats.level = OCR::read_number(logger, level_ready, language);
     }
@@ -250,7 +250,7 @@ void StatsReader::read_page1(
     // regions by growing white->eroding back. Works per-channel on CV_8UC4.
     const static Pokemon::NatureReader reader("Pokemon/NatureCheckerOCR.json");
     ImageViewRGB32 nature_raw = extract_box_reference(game_screen, m_box_nature);
-    if (save_debug_images) {
+    if (save_debug_images){
         nature_raw.save("DebugDumps/ocr_nature_0_raw.png");
     }
 
@@ -258,7 +258,7 @@ void StatsReader::read_page1(
     ImageRGB32 nature_bw = to_blackwhite_rgb32_range(
             nature_raw, true,
             combine_rgb(0, 0, 0), combine_rgb(150, 150, 150));
-    if (save_debug_images) {
+    if (save_debug_images){
         nature_bw.save("DebugDumps/ocr_nature_1_bw.png");
     }
 
@@ -285,7 +285,7 @@ void StatsReader::read_page1(
         result.copyTo(nature_filled.to_opencv_Mat());
         nature_bw = std::move(nature_filled);
     }
-    if (save_debug_images) {
+    if (save_debug_images){
         nature_bw.save("DebugDumps/ocr_nature_2_gapfilled.png");
     }
 
@@ -298,7 +298,7 @@ void StatsReader::read_page1(
             0, 0, cv::INTER_LINEAR);
     ImageRGB32 nature_up(upscaled.cols, upscaled.rows);
     upscaled.copyTo(nature_up.to_opencv_Mat());
-    if (save_debug_images) {
+    if (save_debug_images){
         nature_up.save("DebugDumps/ocr_nature_3_upscaled.png");
     }
 
@@ -310,14 +310,14 @@ void StatsReader::read_page1(
     ImageRGB32 nature_smooth = to_blackwhite_rgb32_range(
             smoothed_img, true,
             combine_rgb(0, 0, 0), combine_rgb(128, 128, 128));
-    if (save_debug_images) {
+    if (save_debug_images){
         nature_smooth.save("DebugDumps/ocr_nature_4_smooth.png");
     }
 
     // Step 5: Pad with white border.
     ImageRGB32 nature_padded = pad_image(
             nature_smooth, nature_smooth.height() / 2, 0xffffffff);
-    if (save_debug_images) {
+    if (save_debug_images){
         nature_padded.save("DebugDumps/ocr_nature_5_padded.png");
     }
 
@@ -327,12 +327,12 @@ void StatsReader::read_page1(
     OCR::StringMatchResult best_nature_result;
     bool have_best_nature_result = false;
 
-    auto consider_nature_result = [&](const OCR::StringMatchResult& result) {
-        if (result.results.empty()) {
+    auto consider_nature_result = [&](const OCR::StringMatchResult& result){
+        if (result.results.empty()){
             return;
         }
         if (!have_best_nature_result
-                || result.results.begin()->first < best_nature_result.results.begin()->first) {
+                || result.results.begin()->first < best_nature_result.results.begin()->first){
             best_nature_result = result;
             have_best_nature_result = true;
         }
@@ -344,7 +344,7 @@ void StatsReader::read_page1(
 
     ImageViewRGB32 nature_left = extract_box_reference(nature_padded, left_word_box);
     ImageViewRGB32 nature_right = extract_box_reference(nature_padded, right_word_box);
-    if (save_debug_images) {
+    if (save_debug_images){
         nature_left.save("DebugDumps/ocr_nature_6_left_word.png");
         nature_right.save("DebugDumps/ocr_nature_7_right_word.png");
     }
@@ -364,7 +364,7 @@ void StatsReader::read_page1(
         consider_nature_result(right_result);
 
         // Fallback: if both halves fail thresholding, try full-line once.
-        if (!have_best_nature_result) {
+        if (!have_best_nature_result){
         OCR::StringMatchResult full_result = reader.match_substring_from_image(
             nullptr, language, nature_padded,
             Pokemon::NatureReader::MAX_LOG10P,
@@ -373,7 +373,7 @@ void StatsReader::read_page1(
         consider_nature_result(full_result);
         }
 
-    if (have_best_nature_result) {
+    if (have_best_nature_result){
         best_nature_result.log(logger, Pokemon::NatureReader::MAX_LOG10P, "Nature Final");
         stats.nature = best_nature_result.results.begin()->second.token;
     }
@@ -382,14 +382,14 @@ void StatsReader::read_page1(
 void StatsReader::read_page2(
     Logger &logger, const ImageViewRGB32 &frame,
     PokemonFRLG_Stats &stats
-) {
+){
     ImageViewRGB32 game_screen =
             extract_box_reference(frame, GameSettings::instance().GAME_BOX);
 
-    auto read_stat = [&](const ImageFloatBox &box, const std::string &name) {
+    auto read_stat = [&](const ImageFloatBox &box, const std::string &name){
         ImageViewRGB32 stat_region = extract_box_reference(game_screen, box);
 
-        if (!GlobalSettings::instance().USE_PADDLE_OCR) {
+        if (!GlobalSettings::instance().USE_PADDLE_OCR){
             // Tesseract-free path: waterfill segmentation + template matching
             // against the PokemonFRLG/Digits/0-9.png templates.
             return read_digits_waterfill_template(logger, stat_region);
@@ -417,8 +417,8 @@ void StatsReader::read_page2(
         m_box_hp.width * 0.3, m_box_hp.height
     );
 
-    auto assign_stat = [](std::optional<unsigned>& field, int value) {
-        if (value != -1) {
+    auto assign_stat = [](std::optional<unsigned>& field, int value){
+        if (value != -1){
             field = static_cast<unsigned>(value);
         }
     };

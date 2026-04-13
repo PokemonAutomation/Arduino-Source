@@ -10,7 +10,7 @@
 namespace PokemonAutomation{
 namespace PABotBase2{
 
-
+#if 0
 void MessageHandler::assert_size_eq(Logger& logger, uint16_t bytes, const MessageHeader* header) const{
     if (header->message_bytes != bytes){
         throw SerialProtocolException(
@@ -27,7 +27,7 @@ void MessageHandler::assert_size_min(Logger& logger, uint16_t min_bytes, const M
         );
     }
 }
-
+#endif
 
 
 }
