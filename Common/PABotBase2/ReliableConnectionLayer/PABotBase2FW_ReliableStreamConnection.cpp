@@ -39,12 +39,27 @@ void ReliableStreamConnectionFW::reliable_send(const void* data, size_t bytes){
     const char* ptr = (const char*)data;
     while (bytes > 0){
         size_t sent = m_reliable_sender.send_stream(ptr, bytes);
+
+        if (sent == 0){
+            m_reliable_sender.declare_stream_corrupted();
+            m_reliable_sender.send_oob_packet_empty(0, PABB2_CONNECTION_OPCODE_INFO_STREAM_DEAD);
+            printf("Stream buffer is full.\n");
+            return;
+        }
+
         ptr += sent;
         bytes -= sent;
     }
 }
 
 
+void ReliableStreamConnectionFW::send_oob_info_binary(const void* data, uint8_t bytes){
+    const size_t MAX_LENGTH = 256 - sizeof(PacketHeader) - sizeof(uint32_t);
+    m_reliable_sender.send_oob_packet_data(
+        0, PABB2_CONNECTION_OPCODE_INFO_BINARY,
+        (uint8_t)std::min<uint8_t>(bytes, MAX_LENGTH), data
+    );
+}
 void ReliableStreamConnectionFW::send_oob_info_str(const char* str){
     const size_t MAX_LENGTH = 256 - sizeof(PacketHeader) - sizeof(uint32_t);
     size_t len = strlen(str);

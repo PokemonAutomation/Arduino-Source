@@ -23,7 +23,7 @@ namespace PABotBase2{
 
 
 
-#define PABB2_MESSAGE_PROTOCOL_VERSION      2026031600
+#define PABB2_MESSAGE_PROTOCOL_VERSION      2026041100
 
 
 struct PABB_PACK MessageHeader{
@@ -31,10 +31,7 @@ struct PABB_PACK MessageHeader{
     uint8_t opcode;
     uint8_t id;
 };
-struct PABB_PACK Message_u32{
-    uint16_t message_bytes;
-    uint8_t opcode;
-    uint8_t id;
+struct PABB_PACK Message_u32 : MessageHeader{
     uint32_t data;
 };
 
@@ -61,6 +58,8 @@ struct PABB_PACK Message_u32{
 #define PABB2_MESSAGE_OPCODE_RESET_TO_CONTROLLER    0x32
 #define PABB2_MESSAGE_OPCODE_CONTROLLER_MAC_ADDRESS 0x33
 #define PABB2_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS     0x34
+#define PABB2_MESSAGE_OPCODE_REQUEST_STATUS         0x35
+#define PABB2_MESSAGE_OPCODE_CONSOLE_DISCONNECT     0x36
 
 #define PABB2_MESSAGE_OPCODE_CQ_COMMAND_DROPPED     0x40
 #define PABB2_MESSAGE_OPCODE_CQ_CANCEL              0x41

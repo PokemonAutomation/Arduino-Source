@@ -39,7 +39,7 @@ public:
 
         if (current == nullptr || (
                 current->interface_type != ControllerInterface::None &&
-                current->interface_type != ControllerInterface::SerialPABotBase
+                current->interface_type != ControllerInterface::SerialPABotBase2
             )
         ){
             std::shared_ptr<const ControllerDescriptor> descriptor =

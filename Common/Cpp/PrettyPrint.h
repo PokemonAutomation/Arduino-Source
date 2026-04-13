@@ -33,6 +33,8 @@ std::string duration_to_string(std::chrono::milliseconds milliseconds);
 
 std::string tostr_hex(uint64_t x);
 
+std::string tostr_hexbytes(const void* data, size_t length);
+
 }
 #endif
 

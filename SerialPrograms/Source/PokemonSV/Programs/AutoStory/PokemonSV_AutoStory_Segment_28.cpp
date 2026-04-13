@@ -245,7 +245,7 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
                 pbf_wait(context, wait);
 
 
-                try {
+                try{
                     direction.change_direction(env.program_info(), env.console, context, 1.451616);
                     pbf_move_left_joystick(context, {0, +1}, 4000ms, 400ms);
                     pbf_press_button(context, BUTTON_R, 160ms, 160ms);

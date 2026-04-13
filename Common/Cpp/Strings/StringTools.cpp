@@ -39,12 +39,12 @@ std::string strip(const std::string& str){
 }
 
 size_t to_size_t(const std::string& str){
-    try {
+    try{
         int num = std::stoi(str);
         return static_cast<size_t>(num);
-    } catch (const std::invalid_argument&){
+    }catch (const std::invalid_argument&){
         return SIZE_MAX;
-    } catch (const std::out_of_range&){
+    }catch (const std::out_of_range&){
         return SIZE_MAX;
     }
 }

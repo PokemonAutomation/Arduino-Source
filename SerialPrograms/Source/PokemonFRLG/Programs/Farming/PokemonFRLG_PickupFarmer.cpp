@@ -38,21 +38,24 @@ PickupFarmer_Descriptor::PickupFarmer_Descriptor()
 
 struct PickupFarmer_Descriptor::Stats : public StatsTracker{
     Stats()
-        : encounters(m_stats["Encounters"])
+        : encounters(m_stats["Encounters Won"])
         , item_checks(m_stats["Item Checks"])
         , healing_trips(m_stats["Healing Trips"])
+        , times_fainted(m_stats["Times Fainted"])
         , shinies(m_stats["Shinies"])
         , errors(m_stats["Errors"])
     {
-        m_display_order.emplace_back("Encounters");
+        m_display_order.emplace_back("Encounters Won");
         m_display_order.emplace_back("Item Checks");
         m_display_order.emplace_back("Healing Trips");
+        m_display_order.emplace_back("Times Fainted", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Shinies", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& encounters;
     std::atomic<uint64_t>& item_checks;
     std::atomic<uint64_t>& healing_trips;
+    std::atomic<uint64_t>& times_fainted;
     std::atomic<uint64_t>& shinies;
     std::atomic<uint64_t>& errors;
 };
@@ -69,9 +72,18 @@ PickupFarmer::PickupFarmer()
         },
         LockMode::LOCK_WHILE_RUNNING,
         GameLocation::route1
-    )    
+    )
+    , TRAVEL_METHOD(
+        "<b>Travel Method:</b><br>This move should be learned by the last " + Pokemon::STRING_POKEMON + " in your party.",
+        {
+            {TravelMethod::fly,  "fly",  "Fly"},
+            {TravelMethod::teleport, "teleport", "Teleport"}
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        TravelMethod::fly
+    )
     , MAX_ENCOUNTERS(
-        "<b>Max Encounters:</b><br>Set to 0 to continue indefinitely.",
+        "<b>Max Encounters to Defeat:</b><br>Set to 0 to continue indefinitely.",
         LockMode::UNLOCK_WHILE_RUNNING,
         0, 0 // default, min
     )
@@ -80,10 +92,10 @@ PickupFarmer::PickupFarmer()
         LockMode::LOCK_WHILE_RUNNING,
         10, 1 // default, min
     )
-    , MOVE_PP(
-        "<b>PP of your lead " + Pokemon::STRING_POKEMON + "'s first move:</b><br>",
-        LockMode::LOCK_WHILE_RUNNING,
-        20, 5, 50 // default, min, max
+    , PREVENT_EVOLUTION(
+        "<b>Prevent " + Pokemon::STRING_POKEMON + " from evolving</b>",
+        LockMode::LOCK_WHILE_RUNNING, 
+        false // default
     )
     , STOP_ON_MOVE_LEARN(
         "<b>Quit when a new move is learned</b><br>Stop this program when a new move is learned. If unchecked, new moves will not be learned.",
@@ -114,9 +126,9 @@ PickupFarmer::PickupFarmer()
     })
 {
     PA_ADD_OPTION(GAME_LOCATION);
+    PA_ADD_OPTION(TRAVEL_METHOD);
     PA_ADD_OPTION(MAX_ENCOUNTERS);
     PA_ADD_OPTION(BATTLES_PER_ITEM_CHECK);
-    PA_ADD_OPTION(MOVE_PP);
     PA_ADD_OPTION(STOP_ON_MOVE_LEARN);
     PA_ADD_OPTION(IGNORE_SHINIES);
     PA_ADD_OPTION(TAKE_VIDEO);
@@ -155,75 +167,6 @@ void walk_to_route22(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     context.wait_for_all_requests();
 }
 
-int grass_spin(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool leftright){
-    // "walk" without moving by tapping the joystick to change directions
-    // alternate between left/right and up/down to ensure there is always a direction change
-
-    BlackScreenWatcher battle_entered(COLOR_RED);
-
-    context.wait_for_all_requests();
-    env.log("Starting grass spin.");
-    WallClock deadline = current_time() + 60s;
-
-    int ret = run_until<ProControllerContext>(
-        env.console, context,
-        [leftright, deadline](ProControllerContext& context) {
-            while (current_time() < deadline){
-                if (leftright){
-                    pbf_move_left_joystick(context, {+1, 0}, 33ms, 150ms);
-                    pbf_move_left_joystick(context, {-1, 0}, 33ms, 150ms);
-                }else{
-                    pbf_move_left_joystick(context, {0, +1}, 33ms, 150ms);
-                    pbf_move_left_joystick(context, {0, -1}, 33ms, 150ms);
-                }
-            }
-        },
-        { battle_entered }
-    );
-    
-    if (ret < 0){
-        return -1;
-    }
-
-    bool encounter_shiny = handle_encounter(env.console, context, true);
-    return encounter_shiny ? 1 : 0;
-}
-
-void use_first_battle_move(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    uint16_t errors = 0;
-    while (true){    
-        if (errors > 5) {
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Failed to detect battle menu.",
-                env.console
-            );
-        }
-
-        BattleMenuWatcher menu_open(COLOR_RED);
-        
-        context.wait_for_all_requests();
-        int ret = wait_until(
-            env.console, context, 5000ms,
-            { menu_open }
-        );
-
-        if (ret < 0) {
-            env.log("Failed to detect battle menu within 5 seconds.");
-            errors++;
-            // attempt to return to the top-level battle menu
-            pbf_mash_button(context, BUTTON_B, 2000ms);
-            continue;
-        }
-
-        // mash A to use the move in the first position
-        pbf_mash_button(context, BUTTON_A, 1000ms); 
-        context.wait_for_all_requests();
-        env.log("Used first move.");
-        return;
-    }
-}
-
 void take_pickup_items(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     env.log("Collecting items from party.");
     open_party_menu_from_overworld(env.console, context);
@@ -232,16 +175,16 @@ void take_pickup_items(SingleSwitchProgramEnvironment& env, ProControllerContext
     PartySelectionWatcher selection_open(COLOR_RED);
     int ret;
     // take items from positions 2-5. This works even if they haven't picked up an item
-    for(int i = 2; i <= 5; i++) {
+    for(int i = 2; i <= 5; i++){
         context.wait_for_all_requests();
         ret = run_until<ProControllerContext>(
             env.console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
             },
             { selection_open }
         );
-        if (ret < 0) {
+        if (ret < 0){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to detect selection menu.",
@@ -278,38 +221,57 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     bool failed_encounter = false;
 
     bool spin_leftright = true;
-    uint16_t moves_used = 0;
+    bool out_of_pp = false;
     uint16_t encounters_since_item_check = 0;
     
     while (!shiny_found){
         try{
-            if (stats.encounters == 0 || failed_encounter || moves_used >= MOVE_PP){
-                use_teleport(env.console, context);
+            if (stats.encounters == 0 || failed_encounter || out_of_pp){
+                switch (TRAVEL_METHOD){
+                case TravelMethod::fly:
+                    open_fly_map_from_overworld(env.console, context);
+                    fly_from_kanto_map(env.console, context, KantoFlyLocation::viridiancity);
+                    break;
+                case TravelMethod::teleport:
+                    use_teleport_from_overworld(env.console, context);
+                    break;
+                default:
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Option not yet implemented.",
+                    env.console
+                );
+                }
                 enter_pokecenter(env.console, context);
                 heal_at_pokecenter(env.console, context);
                 leave_pokecenter(env.console, context);
                 stats.healing_trips++;
-                if (GAME_LOCATION == GameLocation::route1){
+                switch (GAME_LOCATION){
+                case GameLocation::route1:
                     walk_to_route1(env, context);
-                }else if (GAME_LOCATION == GameLocation::route22){
+                    break;
+                case GameLocation::route22:
                     walk_to_route22(env, context);
-                }else{
+                    break;
+                default:
                     OperationFailedException::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "Option not yet implemented.",
                         env.console
                     );
                 }
-                moves_used = 0;
+                
+                out_of_pp = false;
                 failed_encounter = false;
+                spin_leftright = true;
             }
 
             uint16_t errors = 0;
-            int ret = grass_spin(env, context, spin_leftright);
+            int ret = grass_spin(env.console, context, spin_leftright);
             shiny_found = (ret == 1);
             if (ret < 0){
                 failed_encounter = true;
-                env.log("Failed to trigger encounter: teleporting back to PokeCenter");
+                env.log("Failed to trigger encounter: traveling back to PokeCenter");
                 errors++;
                 if (errors >= 5){
                     OperationFailedException::fire(
@@ -323,8 +285,6 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
                 continue;
             }else{
                 spin_leftright = !spin_leftright;
-                encounters_since_item_check++;
-                stats.encounters++;
             }
 
             if (shiny_found && !IGNORE_SHINIES){
@@ -347,16 +307,28 @@ void PickupFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             }
             shiny_found = false;
 
-            use_first_battle_move(env, context);
-            moves_used++;
-            bool move_learned = exit_wild_battle(env.console, context, !!STOP_ON_MOVE_LEARN);
-
-            if (move_learned && STOP_ON_MOVE_LEARN){
-                send_program_status_notification(
-                    env, NOTIFICATION_STATUS_UPDATE,
-                    "Stopping: move learned."
-                );
-                break;
+            BattleResult ret2 = spam_first_move(env.console, context);
+            if (ret2 == BattleResult::playerfainted) {
+                stats.times_fainted++;
+                out_of_pp = true; // triggers a healing trip
+                //TODO: handle exiting the battle in case the player can't escape (due to low speed stat)
+                pbf_mash_button(context, BUTTON_B, 5000ms);
+                context.wait_for_all_requests();
+            } else if (ret2 == BattleResult::unknown){ // battle fled (no EV gain)
+                // continue;
+            } else if (ret2 == BattleResult::outofpp){
+                out_of_pp = true;
+            } else if (ret2 == BattleResult::opponentfainted){
+                stats.encounters++;
+                encounters_since_item_check++;
+                bool move_learned = exit_wild_battle(env.console, context, !!STOP_ON_MOVE_LEARN, !!PREVENT_EVOLUTION);
+                if (move_learned && STOP_ON_MOVE_LEARN){
+                    send_program_status_notification(
+                        env, NOTIFICATION_STATUS_UPDATE,
+                        "Stopping: move learned."
+                    );
+                    break;
+                }
             }
 
             if (encounters_since_item_check >= BATTLES_PER_ITEM_CHECK){

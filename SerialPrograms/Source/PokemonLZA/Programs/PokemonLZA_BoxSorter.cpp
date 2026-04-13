@@ -22,6 +22,7 @@
 #include "CommonTools/VisualDetectors/FrozenImageDetector.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Inference/Pokemon_TypeReader.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon/Pokemon_BoxCursor.h"
@@ -319,6 +320,7 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                         name_slug = LUMIOSE_DEX_SLUGS()[dex_number-1];
                     }
                     
+                    auto [primaryType, secondaryType] = read_pokemon_types(screen, ImageFloatBox(0.467, 0.256, 0.110, 0.041), PokemonTypeGeneration::GEN9);
                     boxes_data.push_back(
                         CollectedPokemonInfo{
                             .preferences = &sort_preferences,
@@ -326,6 +328,8 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                             .name_slug = name_slug,
                             .shiny = shiny_detector.detect(screen),
                             .alpha = alpha_detector.detect(screen),
+                            .primaryType = primaryType,
+                            .secondaryType = secondaryType,
                         }
                         );
                     ss << "\u2705 " ;    //  checkbox

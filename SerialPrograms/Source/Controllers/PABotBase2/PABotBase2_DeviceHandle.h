@@ -7,27 +7,27 @@
 #ifndef PokemonAutomation_Controllers_PABotBase2_DeviceHandle_H
 #define PokemonAutomation_Controllers_PABotBase2_DeviceHandle_H
 
+#include <string.h>
 #include <deque>
 #include <map>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/StreamConnections/PushingStreamConnections.h"
 #include "Common/PABotBase2/PABotBase2_MessageProtocol.h"
+#include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
 #include "Controllers/ControllerTypes.h"
 #include "PABotBase2_CommandQueueManager.h"
+#include "PABotBase2_MessageHandler.h"
 
 namespace PokemonAutomation{
 namespace PABotBase2{
 
 
 
-
-class DeviceHandle final
-    : public CancellableScope
-    , private StreamListener
-{
+class DeviceHandle final : public CancellableScope, private StreamListener{
 public:
     DeviceHandle(
         CancellableScope* parent,
@@ -35,10 +35,30 @@ public:
         ReliableStreamConnectionPushing& connection
     );
     virtual ~DeviceHandle();
+    void add_message_handler(
+        uint8_t opcode,
+        std::function<void(const MessageHeader*)> handler
+    );
 
     virtual bool cancel(std::exception_ptr exception) noexcept override;
 
     void connect();
+    void try_set_controller_type(
+        ControllerType controller_type,
+        bool clear_settings
+    ) noexcept;
+
+
+public:
+    Logger& logger() const{
+        return m_logger;
+    }
+    MessageLogger& message_logger(){
+        return m_message_loggers;
+    }
+    ReliableStreamConnectionPushing& connection(){
+        return m_connection;
+    }
 
 
 public:
@@ -61,7 +81,33 @@ public:
     ControllerType refresh_controller_type();
 
     uint8_t send_request(MessageHeader& request);
-    std::string wait_for_request_response(uint8_t id);
+    std::optional<uint8_t> try_send_request(MessageHeader& request, WallDuration timeout) noexcept;
+    std::string wait_for_request_response(
+        uint8_t id,
+        WallDuration timeout = WallDuration::max()
+    );
+
+    template <typename ResponseType, uint8_t response_opcode>
+    void wait_for_request_response(ResponseType& response, uint8_t id){
+        std::string raw = wait_for_request_response(id);
+        const MessageHeader* header = (const MessageHeader*)raw.data();
+        if (header->opcode != response_opcode){
+            throw SerialProtocolException(
+                m_logger, PA_CURRENT_FUNCTION,
+                "Received Incorrect Response Type: Expected = " + std::to_string(response_opcode) +
+                ", Actual = " + std::to_string(header->opcode)
+            );
+        }
+        if (header->message_bytes != sizeof(ResponseType)){
+            throw SerialProtocolException(
+                m_logger, PA_CURRENT_FUNCTION,
+                "Received Incorrect Response Size: Expected = " + std::to_string(sizeof(ResponseType)) +
+                ", Actual = " + std::to_string(header->message_bytes)
+            );
+        }
+        memcpy(&response, header, sizeof(ResponseType));
+    }
+
 
 
 private:
@@ -96,6 +142,9 @@ private:
     std::map<uint8_t, std::string> m_pending_requests;
 
     std::deque<char> m_buffer;
+
+    MessageLogger m_message_loggers;
+    std::map<uint8_t, std::function<void(const MessageHeader*)>> m_message_handlers;
 };
 
 

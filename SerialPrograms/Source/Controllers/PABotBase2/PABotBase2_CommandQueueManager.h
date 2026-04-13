@@ -14,32 +14,42 @@
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/StreamConnections/PushingStreamConnections.h"
 #include "Common/PABotBase2/PABotBase2_MessageProtocol.h"
+#include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
+#include "PABotBase2_MessageHandler.h"
 
 namespace PokemonAutomation{
 namespace PABotBase2{
 
 
 
-class CommandQueueManager{
+class CommandQueueManager final : public Cancellable{
 public:
     CommandQueueManager(
         Logger& logger,
-        Cancellable& scope,
-        ReliableStreamConnectionPushing& connection
+        CancellableScope& scope,
+        ReliableStreamConnectionPushing& connection,
+        const MessageLogger& message_loggers
     )
         : m_logger(logger)
-        , m_scope(scope)
         , m_connection(connection)
-    {}
+        , m_message_loggers(message_loggers)
+    {
+        attach(scope);
+    }
+    ~CommandQueueManager(){
+        detach();
+    }
 
     void set_command_queue_size(uint8_t command_queue_size);
+
+    virtual bool cancel(std::exception_ptr exception) noexcept override;
 
 
 public:
     void wait_for_all();
     void wait_for_command_finish(uint8_t id);
 
-    void send_cancel();
+    bool send_cancel(WallDuration timeout = WallDuration::max());
     void send_replace_on_next();
 
     uint8_t send_command(MessageHeader& command);
@@ -48,15 +58,19 @@ public:
 
 private:
     Logger& m_logger;
-    Cancellable& m_scope;
     ReliableStreamConnectionPushing& m_connection;
+    const MessageLogger& m_message_loggers;
 
-    Mutex m_lock;
+    mutable Mutex m_lock;
     ConditionVariable m_cv;
     uint8_t m_command_queue_size = 4;
     uint8_t m_command_seqnum = 0;
 
-    std::map<uint8_t, std::string> m_pending_commands;
+    struct CommandHandle{
+        bool finished = false;
+        uint32_t device_timestamp = 0;
+    };
+    std::map<uint8_t, std::shared_ptr<CommandHandle>> m_pending_commands;
 };
 
 

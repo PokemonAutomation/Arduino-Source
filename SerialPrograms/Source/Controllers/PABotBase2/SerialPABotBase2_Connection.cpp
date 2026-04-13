@@ -12,7 +12,12 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "SerialPABotBase2_Connection.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace SerialPABotBase{
@@ -38,9 +43,16 @@ SerialPABotBase2_Connection::SerialPABotBase2_Connection(
     });
 };
 SerialPABotBase2_Connection::~SerialPABotBase2_Connection(){
-    cancel(nullptr);
+    SerialPABotBase2_Connection::cancel(nullptr);
+    m_device.reset();
+}
+bool SerialPABotBase2_Connection::cancel(std::exception_ptr exception) noexcept{
+    if (Connection::cancel(std::move(exception))){
+        return true;
+    }
     m_ready.store(false, std::memory_order_release);
     m_connect_thread.wait_and_ignore_exceptions();
+    return false;
 }
 
 
@@ -127,7 +139,7 @@ bool SerialPABotBase2_Connection::open_serial_connection(){
     if (!m_stream_connection->remote_protocol_is_compatible()){
         std::string str =
             "Incompatible RSC protocol. Device: " + std::to_string(m_stream_connection->remote_protocol()) + "<br>"
-            "Please flash your microcontroller (e.g. ESP32, Pico W, Arduino) <br>"
+            "Please flash your microcontroller (e.g. ESP32, Pico W...) <br>"
             "with the .bin/.uf2/.hex that came with this version of the program.<br>" +
             make_text_url(ONLINE_DOC_URL_BASE + "SetupGuide/Reflash.html", "See documentation for more details.");
         set_status_line0(str, COLOR_RED);
@@ -174,9 +186,10 @@ bool SerialPABotBase2_Connection::open_device_connection(bool set_to_null_contro
     ControllerType current_controller = refresh_controller_type();
 
     if (set_to_null_controller && current_controller != ControllerType::None){
-        PABotBase2::MessageHeader request;
+        PABotBase2::Message_u32 request;
         request.message_bytes = sizeof(request);
         request.opcode = PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE;
+        request.data = SerialPABotBase::controller_type_to_id(ControllerType::None);
         m_device->send_request(request);
 
 #if 0
