@@ -175,12 +175,12 @@ namespace{
 void hard_reset(ProControllerContext& context){
     // close the game
     pbf_press_button(context, BUTTON_HOME, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_Y, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_X, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
     // press A to select game
     pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
     // press A to select profile and launch the game
-    pbf_press_button(context, BUTTON_A, 50ms, 150ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 300ms);
     // return to HOME menu and wait a moment
     pbf_press_button(context, BUTTON_HOME, 125ms, 2000ms);
     // open game
