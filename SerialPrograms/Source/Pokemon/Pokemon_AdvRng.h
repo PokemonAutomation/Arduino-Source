@@ -86,7 +86,6 @@ enum class RngMethod{
 };
 
 struct AdvRngState{
-    AdvRngState(uint16_t seed, uint64_t advance, RngMethod method, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
     uint16_t seed;
     uint64_t advance;
     RngMethod method;
@@ -95,10 +94,14 @@ struct AdvRngState{
     uint32_t s2;
     uint32_t s3;
     uint32_t s4;
+
+    bool operator<(const AdvRngState& rhs) const noexcept
+    {
+        return this->advance < rhs.advance;
+    }
 };
 
 struct AdvPokemonResult{
-    AdvPokemonResult(uint32_t pid, uint16_t gender, Nature nature, Ability ability, IVs ivs);
     uint32_t pid;
     uint8_t gender;
     Nature nature;

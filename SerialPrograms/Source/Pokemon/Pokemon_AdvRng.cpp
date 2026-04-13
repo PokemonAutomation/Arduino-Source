@@ -21,7 +21,7 @@ AdvRngState rngstate_from_internal_state(uint16_t seed, uint64_t advances, uint3
     uint32_t s3 = increment_internal_rng_state(s2);
     uint32_t s4 = increment_internal_rng_state(s3);
 
-    return AdvRngState(seed, advances, method, s0, s1, s2, s3, s4);
+    return  {seed, advances, method, s0, s1, s2, s3, s4};
 }
 
 AdvRngState rngstate_from_seed(uint16_t& seed, uint64_t advances, RngMethod method){
@@ -86,10 +86,7 @@ AdvPokemonResult pokemon_from_state(AdvRngState& state, RngMethod method = RngMe
     IvGroup ivgroup1;
     IvGroup ivgroup2;
     switch(method){
-    case RngMethod::Method1:
-        ivgroup1 = iv_group_from_state(state.s2);
-        ivgroup2 = iv_group_from_state(state.s3);
-        break;
+
     case RngMethod::Method2:
         ivgroup1 = iv_group_from_state(state.s3);
         ivgroup2 = iv_group_from_state(state.s4);
@@ -98,7 +95,10 @@ AdvPokemonResult pokemon_from_state(AdvRngState& state, RngMethod method = RngMe
         ivgroup1 = iv_group_from_state(state.s2);
         ivgroup2 = iv_group_from_state(state.s4);
         break;
+    case RngMethod::Method1:
     default:
+        ivgroup1 = iv_group_from_state(state.s2);
+        ivgroup2 = iv_group_from_state(state.s3);
         break;
     }
 
@@ -110,7 +110,7 @@ AdvPokemonResult pokemon_from_state(AdvRngState& state, RngMethod method = RngMe
     ivs.spdef = ivgroup2.iv1;
     ivs.speed = ivgroup2.iv2;
 
-    return AdvPokemonResult(pid, gender, nature, ability, ivs);
+    return {pid, gender, nature, ability, ivs};
 }
 
 ShinyType shiny_type_from_pid(uint32_t pid, uint16_t tid_xor_sid){
@@ -172,16 +172,15 @@ void AdvRng::search_advance_range(std::map<AdvRngState, AdvPokemonResult>& hits,
 
         RngMethod method;
         switch (m){
-        case 0:
-           method = RngMethod::Method1;
-           break;
         case 1:
             method = RngMethod::Method2;
             break;
         case 2:
             method = RngMethod::Method4;
             break;
+        case 0:
         default:
+            method = RngMethod::Method1;
             break;
         }
 
