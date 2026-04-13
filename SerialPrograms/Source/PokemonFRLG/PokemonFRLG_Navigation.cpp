@@ -982,8 +982,7 @@ int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftr
                 if (leftright){
                     pbf_move_left_joystick(context, { +1, 0 }, 33ms, 150ms);
                     pbf_move_left_joystick(context, { -1, 0 }, 33ms, 150ms);
-                }
-                else{
+                }else{
                     pbf_move_left_joystick(context, { 0, +1 }, 33ms, 150ms);
                     pbf_move_left_joystick(context, { 0, -1 }, 33ms, 150ms);
                 }
@@ -991,7 +990,6 @@ int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftr
         },
         { battle_triggered, battle_entered }
     );
-
     if (ret < 0){
         return -1;
     }
