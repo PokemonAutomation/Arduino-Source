@@ -1,11 +1,11 @@
-/*  Advance RNG
+/*  Adv RNG
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_PokemonSwSh_AdvRng_H
-#define PokemonAutomation_PokemonSwSh_AdvRng_H
+#ifndef Pokemon_AdvRng_H
+#define Pokemon_AdvRng_H
 
 #include <stdint.h>
 #include <utility>
@@ -78,23 +78,23 @@ enum class ShinyType{
     Any
 };
 
-
-struct AdvRngState{
-    AdvRngState(uint16_t seed, uint64_t advance, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
-    uint16_t seed;
-    uint64_t advance;
-    uint32_t s0;
-    uint32_t s1;
-    uint32_t s2;
-    uint32_t s3;
-    uint32_t s4;
-};
-
 enum class RngMethod{
     Method1,
     Method2,
     Method4,
     Any
+};
+
+struct AdvRngState{
+    AdvRngState(uint16_t seed, uint64_t advance, RngMethod method, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
+    uint16_t seed;
+    uint64_t advance;
+    RngMethod method;
+    uint32_t s0;
+    uint32_t s1;
+    uint32_t s2;
+    uint32_t s3;
+    uint32_t s4;
 };
 
 struct AdvPokemonResult{
@@ -120,11 +120,11 @@ public:
     uint16_t seed;
     AdvRngState state;
 
+    AdvRng(uint16_t seed, AdvRngState state);
+    AdvRng(uint16_t seed, uint64_t min_advances, RngMethod method = RngMethod::Method1);
+
     std::map<AdvRngState, AdvPokemonResult> search(AdvRngFilters& target, std::vector<uint16_t>& seeds, uint64_t min_advances, uint64_t max_advances, uint16_t tid_xor_sid = 0, uint8_t gender_threshold = 126);
 private:
-    AdvRng(uint16_t seed, AdvRngState state);
-    AdvRng(uint16_t seed, uint64_t min_advances);
-
     void set_seed(uint16_t seed);
     void set_state_advances(uint64_t advances);
     void advance_state();

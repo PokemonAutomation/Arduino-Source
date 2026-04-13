@@ -1,4 +1,4 @@
-/*  Xoroshiro128+ and reverse
+/*  Adv RNG
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -14,23 +14,24 @@ uint32_t increment_internal_rng_state(uint32_t& state){
     return state * 0x41c64e6d + 0x6073;
 }
 
-AdvRngState rngstate_from_internal_state(uint16_t seed, uint64_t advances, uint32_t& state){
+AdvRngState rngstate_from_internal_state(uint16_t seed, uint64_t advances, uint32_t& state, RngMethod method){
     uint32_t s0 = state;
     uint32_t s1 = increment_internal_rng_state(s0);
     uint32_t s2 = increment_internal_rng_state(s1);
     uint32_t s3 = increment_internal_rng_state(s2);
     uint32_t s4 = increment_internal_rng_state(s3);
 
-    return AdvRngState(seed, advances, s0, s1, s2, s3, s4);
+    return AdvRngState(seed, advances, method, s0, s1, s2, s3, s4);
 }
 
-AdvRngState rngstate_from_seed(uint16_t& seed, uint64_t& advances){
+AdvRngState rngstate_from_seed(uint16_t& seed, uint64_t advances, RngMethod method){
     uint32_t state = seed;
-    for (int i=0; i<advances; i++){
+    state = increment_internal_rng_state(state);
+    for (int i=0; i<advances; i++){ 
         state = increment_internal_rng_state(state);
     }
 
-    return rngstate_from_internal_state(seed, advances, state);
+    return rngstate_from_internal_state(seed, advances, state, method);
 }
 
 void advance_rng_state(AdvRngState& state){
@@ -147,20 +148,25 @@ AdvRng::AdvRng(uint16_t seed, AdvRngState state)
     , state(state)
 {}
 
-AdvRng::AdvRng(uint16_t seed, uint64_t min_advances)
+AdvRng::AdvRng(uint16_t seed, uint64_t min_advances, RngMethod method)
     : seed(seed)
-    , state(rngstate_from_seed(seed, min_advances))
+    , state(rngstate_from_seed(seed, min_advances, method))
 {}
 
 void AdvRng::advance_state(){
     advance_rng_state(state);
 }
 
-void AdvRng::set_state_advances(uint64_t advances){
-    state = rngstate_from_seed(seed, advances);
+void AdvRng::set_seed(uint16_t newseed){
+    seed = newseed;
+    state = rngstate_from_seed(seed, 0, state.method);
 }
 
-void AdvRng::search_advance_range(std::map<AdvRngState, AdvPokemonResult>& hits, AdvRngFilters& target, uint64_t min_advances, uint64_t max_advances, uint16_t tid_xor_sid, uint8_t gender_threshold ){
+void AdvRng::set_state_advances(uint64_t advances){
+    state = rngstate_from_seed(seed, advances, state.method);
+}
+
+void AdvRng::search_advance_range(std::map<AdvRngState, AdvPokemonResult>& hits, AdvRngFilters& target, uint64_t min_advances, uint64_t max_advances, uint16_t tid_xor_sid, uint8_t gender_threshold){
     for (int m=0; m<3; m++){
         set_state_advances(min_advances);
 
@@ -196,6 +202,7 @@ void AdvRng::search_advance_range(std::map<AdvRngState, AdvPokemonResult>& hits,
 std::map<AdvRngState, AdvPokemonResult> AdvRng::search(AdvRngFilters& target, std::vector<uint16_t>& seeds, uint64_t min_advances, uint64_t max_advances, uint16_t tid_xor_sid, uint8_t gender_threshold){
     std::map<AdvRngState, AdvPokemonResult> hits;
     for (uint16_t seed : seeds){
+        set_seed(seed);
         search_advance_range(hits, target, min_advances, max_advances, tid_xor_sid, gender_threshold);
     }
     return hits;
