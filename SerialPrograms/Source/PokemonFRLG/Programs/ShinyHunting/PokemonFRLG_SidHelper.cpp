@@ -181,9 +181,11 @@ uint16_t read_tid(SingleSwitchProgramEnvironment& env, ProControllerContext& con
     env.log("Trainer Card detected.");
     env.log("Reading TID...");
     uint16_t tid = reader.read_tid(env.logger(), screen);
-    env.log("TID: " + tid);
+    env.log("TID: " + std::to_string(tid));
 
     context.wait_for_all_requests();
+
+    return tid;
 }
 
 std::vector<std::pair<std::string, std::string>> get_sid_messages(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint16_t tid, SimpleIntegerOption<uint32_t>& TARGET_FRAME, SimpleIntegerOption<uint8_t>& NUM_CANDIDATES){
@@ -220,12 +222,12 @@ void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     home_black_border_check(env.console, context);
 
-    SidHelper_Descriptor::Stats& stats = env.current_stats<SidHelper_Descriptor::Stats>();
+    // SidHelper_Descriptor::Stats& stats = env.current_stats<SidHelper_Descriptor::Stats>();
 
     double FRAMERATE = 59.999977; // FPS
     double FRAME_DURATION = 1000 / FRAMERATE; // ms
 
-    const uint64_t SID_DELAY = TARGET_FRAME * FRAME_DURATION;
+    const uint64_t SID_DELAY = uint64_t(TARGET_FRAME * FRAME_DURATION);
 
     set_sid_from_name_screen(env, context, SID_DELAY);
     finish_intro_animations(env, context);
