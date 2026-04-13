@@ -120,7 +120,7 @@ ShinyType shiny_type_from_pid(uint32_t pid, uint16_t tid_xor_sid){
 
     if (pid_xor == tid_xor_sid){
         return ShinyType::Square;
-    }else if (pid_xor ^ tid_xor_sid < 8){
+    }else if ((pid_xor ^ tid_xor_sid) < 8){
         return ShinyType::Star;
     }else{
         return ShinyType::Normal;
