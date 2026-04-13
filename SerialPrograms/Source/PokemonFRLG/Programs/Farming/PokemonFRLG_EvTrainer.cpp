@@ -142,17 +142,17 @@ EvTrainer::EvTrainer()
         false // default
     )
     , PREVENT_EVOLUTION(
-        "<b>Prevent " + Pokemon::STRING_POKEMON + " from evolving</b>",
+        "<b>Prevent " + Pokemon::STRING_POKEMON + " from evolving:</b>",
         LockMode::LOCK_WHILE_RUNNING, 
         false // default
     )
     , STOP_ON_MOVE_LEARN(
-        "<b>Quit when a new move is learned</b><br>Stop this program when a new move is learned. If unchecked, new moves will not be learned.",
+        "<b>Quit when a new move is learned:</b><br>Stop this program when a new move is learned. If unchecked, new moves will not be learned.",
         LockMode::LOCK_WHILE_RUNNING, 
         false // default
     )
     , IGNORE_SHINIES(
-        "<b>Ignore shinies</b><br>Do not stop the program when a wild shiny is encountered.",
+        "<b>Ignore shinies:</b><br>Do not stop the program when a wild shiny is encountered.",
         LockMode::LOCK_WHILE_RUNNING, 
         false // default
     )
