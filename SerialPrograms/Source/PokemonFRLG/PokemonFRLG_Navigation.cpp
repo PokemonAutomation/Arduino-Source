@@ -598,7 +598,7 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
     }
 }
 
-void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context) {
+void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context){
     uint16_t errors = 0;
     bool start_menu_is_open = false;
     while (true) {
@@ -624,23 +624,23 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
             { start_menu, party_menu }
         );
 
-        switch (ret) {
+        switch (ret){
         case 0:
-            if (menu_context == StartMenuContext::SAFARI_ZONE) {
+            if (menu_context == StartMenuContext::SAFARI_ZONE){
                 ret = move_cursor_to_position(console, context, SelectionArrowPositionSafariMenu::POKEMON);
             }
-            else {
+            else{
                 ret = move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::POKEMON);
-			}
+            }
 
-            if (ret < 0) {
+            if (ret < 0){
                 console.log("Failed to navigate to POKEMON on the start menu.");
                 errors++;
                 context.wait_for_all_requests();
                 pbf_mash_button(context, BUTTON_B, 2000ms);
                 start_menu_is_open = false;
             }
-            else {
+            else{
                 console.log("Navigated to POKEMON on the start menu");
                 context.wait_for_all_requests();
                 pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
@@ -967,7 +967,7 @@ void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context){
     }
 }
 
-int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftright, Seconds timeout) {
+int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftright, Seconds timeout){
     BlackScreenWatcher battle_triggered(COLOR_RED);
     BattleDialogWatcher battle_entered(COLOR_RED);
 
@@ -977,13 +977,13 @@ int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftr
 
     int ret = run_until<ProControllerContext>(
         console, context,
-        [leftright, deadline](ProControllerContext& context) {
-            while (current_time() < deadline) {
-                if (leftright) {
+        [leftright, deadline](ProControllerContext& context){
+            while (current_time() < deadline){
+                if (leftright){
                     pbf_move_left_joystick(context, { +1, 0 }, 33ms, 150ms);
                     pbf_move_left_joystick(context, { -1, 0 }, 33ms, 150ms);
                 }
-                else {
+                else{
                     pbf_move_left_joystick(context, { 0, +1 }, 33ms, 150ms);
                     pbf_move_left_joystick(context, { 0, -1 }, 33ms, 150ms);
                 }
@@ -992,7 +992,7 @@ int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftr
         { battle_triggered, battle_entered }
     );
 
-    if (ret < 0) {
+    if (ret < 0){
         return -1;
     }
 
