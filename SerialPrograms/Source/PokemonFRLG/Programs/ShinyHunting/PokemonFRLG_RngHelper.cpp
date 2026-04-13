@@ -34,7 +34,7 @@ RngHelper_Descriptor::RngHelper_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "RNG Helper",
         "Programs/PokemonFRLG/RngHelper.html",
         "Soft reset with specific timings for hitting a target Seed and Frame for RNG manipulation.",
-        ProgramControllerClass::StandardController_NoRestrictions,
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
