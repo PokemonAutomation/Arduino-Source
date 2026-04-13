@@ -1,4 +1,4 @@
-/*  Read Trainer Id
+/*  Read Trainer ID
  *
  *  From: https://github.com/PokemonAutomation/
  *
