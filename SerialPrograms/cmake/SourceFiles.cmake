@@ -1284,6 +1284,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Pokemon/Pokemon_Types.h
     Source/Pokemon/Pokemon_Xoroshiro128Plus.cpp
     Source/Pokemon/Pokemon_Xoroshiro128Plus.h
+    Source/Pokemon/Pokemon_AdvRng.cpp
+    Source/Pokemon/Pokemon_AdvRng.h
     Source/Pokemon/Resources/Pokemon_BerryNames.cpp
     Source/Pokemon/Resources/Pokemon_BerryNames.h
     Source/Pokemon/Resources/Pokemon_BerrySprites.cpp
