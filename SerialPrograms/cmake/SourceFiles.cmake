@@ -1500,6 +1500,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Fishing.h
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Overworld.cpp
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Overworld.h
+    Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_SidHelper.cpp
+    Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_SidHelper.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.cpp
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadStats.cpp
