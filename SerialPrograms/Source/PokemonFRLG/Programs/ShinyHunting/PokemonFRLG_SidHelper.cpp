@@ -29,7 +29,7 @@ SidHelper_Descriptor::SidHelper_Descriptor()
         "PokemonFRLG:SidHelper",
         Pokemon::STRING_POKEMON + " FRLG", "SID Helper",
         "Programs/PokemonFRLG/SidHelper.html",
-        "Hit a specific frame when starting a new game and determine the corresponding SID.",
+        "Hit a specific RNG advance when starting a new game and determine the corresponding SID.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
@@ -52,16 +52,16 @@ std::unique_ptr<StatsTracker> SidHelper_Descriptor::make_stats() const{
 }
 
 SidHelper::SidHelper()
-    : TARGET_FRAME(
-        "<b>Target Frame:</b><br>"
-        "The target frame for finalizing the SID. This is arbitrary unless you're attempting to hit a specific TID/SID combination<br>"
-        "This value should always be odd",
+    : TARGET_ADVANCES(
+        "<b>Target Advances:</b><br>"
+        "The target advances for finalizing the SID. This is arbitrary unless you're attempting to hit a specific TID/SID combination.<br>"
+        "This value should always be odd.",
         LockMode::LOCK_WHILE_RUNNING, 
         2301, 2000 // default, min
     )
     , NUM_CANDIDATES(
         "<b># Candidate SIDs:</b><br>"
-        "The number of SIDs to list near the target",
+        "The number of SIDs to list near the target.",
         LockMode::LOCK_WHILE_RUNNING, 
         5, 1, 11 // default, min, max
     )
@@ -73,7 +73,8 @@ SidHelper::SidHelper()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-    PA_ADD_OPTION(TARGET_FRAME);
+    PA_ADD_OPTION(TARGET_ADVANCES);
+    PA_ADD_OPTION(NUM_CANDIDATES);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -188,21 +189,23 @@ uint16_t read_tid(SingleSwitchProgramEnvironment& env, ProControllerContext& con
     return tid;
 }
 
-std::vector<std::pair<std::string, std::string>> get_sid_messages(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint16_t tid, SimpleIntegerOption<uint32_t>& TARGET_FRAME, SimpleIntegerOption<uint8_t>& NUM_CANDIDATES){
+std::vector<std::pair<std::string, std::string>> get_sid_messages(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint16_t tid, SimpleIntegerOption<uint32_t>& TARGET_ADVANCES, SimpleIntegerOption<uint8_t>& NUM_CANDIDATES){
     std::vector<std::pair<std::string, std::string>> messages;
 
-    int start = -1 * (NUM_CANDIDATES - 1) / 2;
+    int start = -1 * NUM_CANDIDATES / 2;
     int end = start + NUM_CANDIDATES;
 
-    Pokemon::AdvRng rng(tid, TARGET_FRAME + start);
+    Pokemon::AdvRng rng(tid, TARGET_ADVANCES + 2*start);
 
     for (int i=start; i<end; i++){
         std::pair<std::string, std::string> m;
         uint16_t sid = rng.state.s0 >> 16;
 
-        m.first = std::to_string(rng.state.advance);
+        m.first = "Advances " + std::to_string(rng.state.advance);
         m.second = std::to_string(sid);
         messages.push_back(m);
+
+        env.log(m.first + ": " + m.second);
 
         rng.advance_state();
         rng.advance_state(); // 2 by 2
@@ -214,9 +217,9 @@ std::vector<std::pair<std::string, std::string>> get_sid_messages(SingleSwitchPr
 } // namespace
 
 void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    if (TARGET_FRAME % 2 == 0){
+    if (TARGET_ADVANCES % 2 == 0){
         OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT, "SidHelper(): Target Frame needs to be odd", env.console
+            ErrorReport::SEND_ERROR_REPORT, "SidHelper(): the Target Advances setting needs to be odd", env.console
         ); 
     }
 
@@ -227,7 +230,7 @@ void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     double FRAMERATE = 59.999977; // FPS
     double FRAME_DURATION = 1000 / FRAMERATE; // ms
 
-    const uint64_t SID_DELAY = uint64_t(TARGET_FRAME * FRAME_DURATION);
+    const uint64_t SID_DELAY = uint64_t((TARGET_ADVANCES - 1) * FRAME_DURATION / 2); // advances pass 2 by 2, first one doesn't count (?)
 
     set_sid_from_name_screen(env, context, SID_DELAY);
     finish_intro_animations(env, context);
@@ -235,7 +238,7 @@ void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     uint16_t tid = read_tid(env, context);
 
-    std::vector<std::pair<std::string, std::string>> sid_messages = get_sid_messages(env, context, tid, TARGET_FRAME, NUM_CANDIDATES);
+    std::vector<std::pair<std::string, std::string>> sid_messages = get_sid_messages(env, context, tid, TARGET_ADVANCES, NUM_CANDIDATES);
 
     send_program_notification(env, NOTIFICATION_SIDS, COLOR_BLUE, "Possible SIDs:", sid_messages, "");
 

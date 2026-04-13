@@ -37,7 +37,7 @@ public:
 
 private:
 
-    SimpleIntegerOption<uint32_t> TARGET_FRAME;
+    SimpleIntegerOption<uint32_t> TARGET_ADVANCES;
     SimpleIntegerOption<uint8_t> NUM_CANDIDATES;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
