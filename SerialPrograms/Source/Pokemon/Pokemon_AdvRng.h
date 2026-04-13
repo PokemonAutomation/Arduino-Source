@@ -95,8 +95,7 @@ struct AdvRngState{
     uint32_t s3;
     uint32_t s4;
 
-    bool operator<(const AdvRngState& rhs) const noexcept
-    {
+    bool operator<(const AdvRngState& rhs) const noexcept{
         return this->advance < rhs.advance;
     }
 };
