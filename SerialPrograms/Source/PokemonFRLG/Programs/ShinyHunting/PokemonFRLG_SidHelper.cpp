@@ -192,13 +192,21 @@ std::vector<std::pair<std::string, std::string>> get_sid_messages(SingleSwitchPr
     int start = -1 * (NUM_CANDIDATES - 1) / 2;
     int end = start + NUM_CANDIDATES;
 
-    AdvRng rng = AdvRng(tid, start);
+    Pokemon::AdvRng rng(tid, TARGET_FRAME + start);
 
     for (int i=start; i<end; i++){
         std::pair<std::string, std::string> m;
+        uint16_t sid = rng.state.s0 >> 16;
 
-        m.first = std::to_string(i);
+        m.first = std::to_string(rng.state.advance);
+        m.second = std::to_string(sid);
+        messages.push_back(m);
+
+        rng.advance_state();
+        rng.advance_state(); // 2 by 2
     }
+
+    return messages;
 }
 
 } // namespace
@@ -227,8 +235,7 @@ void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     std::vector<std::pair<std::string, std::string>> sid_messages = get_sid_messages(env, context, tid, TARGET_FRAME, NUM_CANDIDATES);
 
-    send_program_notification(env, NOTIFICATION_SIDS, COLOR_BLUE, "Possible SIDs:", 
-    sid_messages, "");
+    send_program_notification(env, NOTIFICATION_SIDS, COLOR_BLUE, "Possible SIDs:", sid_messages, "");
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);
