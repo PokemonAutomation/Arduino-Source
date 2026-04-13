@@ -27,9 +27,9 @@ namespace PokemonFRLG{
 SidHelper_Descriptor::SidHelper_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonFRLG:SidHelper",
-        Pokemon::STRING_POKEMON + " FRLG", "Nugget Bridge Farmer",
+        Pokemon::STRING_POKEMON + " FRLG", "SID Helper",
         "Programs/PokemonFRLG/SidHelper.html",
-        "Farm the Nugget Bridge for money.",
+        "Hit a specific frame when starting a new game and determine the corresponding SID.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS

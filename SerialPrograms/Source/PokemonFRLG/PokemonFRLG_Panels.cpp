@@ -18,6 +18,7 @@
 #include "Programs/ShinyHunting/PokemonFRLG_PrizeCornerReset.h"
 #include "Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Fishing.h"
 #include "Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Overworld.h"
+#include "Programs/ShinyHunting/PokemonFRLG_SidHelper.h"
 #include "Programs/TestPrograms/PokemonFRLG_SoundListener.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadStats.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadTrainerId.h"
@@ -43,6 +44,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<NuggetBridgeFarmer_Descriptor, NuggetBridgeFarmer>());
     ret.emplace_back(make_single_switch_program<PickupFarmer_Descriptor, PickupFarmer>());
     if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back(make_single_switch_program<SidHelper_Descriptor, SidHelper>());
     }
 
     //ret.emplace_back("---- General ----");
