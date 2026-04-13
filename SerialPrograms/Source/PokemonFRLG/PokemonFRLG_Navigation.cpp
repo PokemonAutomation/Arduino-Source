@@ -639,8 +639,7 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
                 context.wait_for_all_requests();
                 pbf_mash_button(context, BUTTON_B, 2000ms);
                 start_menu_is_open = false;
-            }
-            else{
+            }else{
                 console.log("Navigated to POKEMON on the start menu");
                 context.wait_for_all_requests();
                 pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
@@ -980,16 +979,17 @@ int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftr
         [leftright, deadline](ProControllerContext& context){
             while (current_time() < deadline){
                 if (leftright){
-                    pbf_move_left_joystick(context, { +1, 0 }, 33ms, 150ms);
-                    pbf_move_left_joystick(context, { -1, 0 }, 33ms, 150ms);
+                    pbf_move_left_joystick(context, {+1, 0}, 33ms, 150ms);
+                    pbf_move_left_joystick(context, {-1, 0}, 33ms, 150ms);
                 }else{
-                    pbf_move_left_joystick(context, { 0, +1 }, 33ms, 150ms);
-                    pbf_move_left_joystick(context, { 0, -1 }, 33ms, 150ms);
+                    pbf_move_left_joystick(context, {0, +1}, 33ms, 150ms);
+                    pbf_move_left_joystick(context, {0, -1}, 33ms, 150ms);
                 }
             }
         },
         { battle_triggered, battle_entered }
     );
+
     if (ret < 0){
         return -1;
     }
