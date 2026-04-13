@@ -131,6 +131,16 @@ EvTrainer::EvTrainer()
         LockMode::LOCK_WHILE_RUNNING,
         0, 0, 255 // default, min, max
     )
+    , MACHO_BRACE(
+        "<b>Macho Brace:</b><br>Macho Brace doubles all earned EVs when held.",
+        LockMode::LOCK_WHILE_RUNNING, 
+        false // default
+    )
+    , POKERUS(
+        "<b>" + Pokemon::STRING_POKERUS + ":</b><br>" + Pokemon::STRING_POKERUS + " doubles all earned EVs (stacks with Macho Brace)",
+        LockMode::LOCK_WHILE_RUNNING, 
+        false // default
+    )
     , PREVENT_EVOLUTION(
         "<b>Prevent " + Pokemon::STRING_POKEMON + " from evolving</b>",
         LockMode::LOCK_WHILE_RUNNING, 
@@ -171,6 +181,8 @@ EvTrainer::EvTrainer()
     PA_ADD_OPTION(SPATK_EVS);
     PA_ADD_OPTION(SPDEF_EVS);
     PA_ADD_OPTION(SPEED_EVS);
+    PA_ADD_OPTION(MACHO_BRACE);
+    PA_ADD_OPTION(POKERUS);
     PA_ADD_OPTION(PREVENT_EVOLUTION);
     PA_ADD_OPTION(STOP_ON_MOVE_LEARN);
     PA_ADD_OPTION(IGNORE_SHINIES);
@@ -427,7 +439,7 @@ std::string EvTrainer::get_encounter_species(SingleSwitchProgramEnvironment& env
     return encounter.name;
 }
 
-EvTrainer::EffortValues EvTrainer::get_ev_yield(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::string& species){
+EvTrainer::EffortValues EvTrainer::get_ev_yield(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::string& species, uint8_t& ev_multiplier){
     std::set<std::string> subset;
     // It's probably a better idea to generate a more complete list of EVs to use as a resource
     // ... but this one is enough for the limited number of possible encounters in these few locations
@@ -462,7 +474,18 @@ EvTrainer::EffortValues EvTrainer::get_ev_yield(SingleSwitchProgramEnvironment& 
         );
     }
 
-    return ev_map.find(species)->second;
+    EvTrainer::EffortValues evs = ev_map.find(species)->second;
+    if (ev_multiplier > 1){
+        evs = {
+            evs.hp * ev_multiplier,
+            evs.attack * ev_multiplier,
+            evs.defense * ev_multiplier,
+            evs.spatk * ev_multiplier,
+            evs.spdef * ev_multiplier,
+            evs.speed * ev_multiplier
+        };
+    }
+    return evs;
 }
 
 void EvTrainer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -482,6 +505,8 @@ void EvTrainer::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     
     EvTrainingLocation current_location = EvTrainingLocation::viridianforest;
     bool finished_stat = false;
+
+    uint8_t EV_MULTIPLIER = (MACHO_BRACE ? 2 : 1) * (POKERUS ? 2 : 1);
 
     while (!shiny_found){
         try{
@@ -587,7 +612,7 @@ void EvTrainer::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             shiny_found = false;
 
             std::string encounter_species = get_encounter_species(env, context, current_location);
-            EffortValues ev_yield = get_ev_yield(env, context, encounter_species);
+            EffortValues ev_yield = get_ev_yield(env, context, encounter_species, EV_MULTIPLIER);
             if (   (ev_yield.hp + stats.hp_evs > HP_EVS) 
                 || (ev_yield.attack + stats.atk_evs> ATK_EVS)
                 || (ev_yield.defense + stats.def_evs > DEF_EVS)
@@ -618,22 +643,22 @@ void EvTrainer::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                     
                     switch (current_location){
                     case EvTrainingLocation::viridianforest:
-                        finished_stat = stats.hp_evs >= HP_EVS;
+                        finished_stat = stats.hp_evs + EV_MULTIPLIER - 1 >= HP_EVS; // avoid overshooting with Macho Brace / Pokerus
                         break;
                     case EvTrainingLocation::route22:
-                        finished_stat = stats.atk_evs >= ATK_EVS;
+                        finished_stat = stats.atk_evs + EV_MULTIPLIER - 1 >= ATK_EVS;
                         break;
                     case EvTrainingLocation::rocktunnel:
-                        finished_stat = stats.def_evs >= DEF_EVS;
+                        finished_stat = stats.def_evs + EV_MULTIPLIER - 1 >= DEF_EVS;
                         break;
                     case EvTrainingLocation::pokemontower:
-                        finished_stat = stats.spa_evs >= SPATK_EVS;
+                        finished_stat = stats.spa_evs + EV_MULTIPLIER - 1 >= SPATK_EVS;
                         break;
                     case EvTrainingLocation::surfspot:
-                        finished_stat = stats.spd_evs >= SPDEF_EVS;
+                        finished_stat = stats.spd_evs + EV_MULTIPLIER - 1 >= SPDEF_EVS;
                         break;
                     case EvTrainingLocation::route1:
-                        finished_stat = stats.spe_evs >= SPEED_EVS;
+                        finished_stat = stats.spe_evs + EV_MULTIPLIER - 1 >= SPEED_EVS;
                         break;
                     default:
                         finished_stat = false;

@@ -57,7 +57,7 @@ private:
 
     std::string get_encounter_species(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EvTrainingLocation& location);
 
-    EffortValues get_ev_yield(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::string& species);
+    EffortValues get_ev_yield(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::string& species, uint8_t& ev_multiplier);
 
     OCR::LanguageOCROption LANGUAGE;
 
@@ -67,6 +67,9 @@ private:
     SimpleIntegerOption<uint64_t> SPATK_EVS;
     SimpleIntegerOption<uint64_t> SPDEF_EVS;
     SimpleIntegerOption<uint64_t> SPEED_EVS;
+
+    BooleanCheckBoxOption MACHO_BRACE;
+    BooleanCheckBoxOption POKERUS;
 
     BooleanCheckBoxOption PREVENT_EVOLUTION;
     BooleanCheckBoxOption STOP_ON_MOVE_LEARN;
