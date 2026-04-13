@@ -123,11 +123,12 @@ public:
     AdvRng(uint16_t seed, AdvRngState state);
     AdvRng(uint16_t seed, uint64_t min_advances, RngMethod method = RngMethod::Method1);
 
-    std::map<AdvRngState, AdvPokemonResult> search(AdvRngFilters& target, std::vector<uint16_t>& seeds, uint64_t min_advances, uint64_t max_advances, uint16_t tid_xor_sid = 0, uint8_t gender_threshold = 126);
-private:
     void set_seed(uint16_t seed);
     void set_state_advances(uint64_t advances);
     void advance_state();
+
+    std::map<AdvRngState, AdvPokemonResult> search(AdvRngFilters& target, std::vector<uint16_t>& seeds, uint64_t min_advances, uint64_t max_advances, uint16_t tid_xor_sid = 0, uint8_t gender_threshold = 126);
+private:
     void search_advance_range(std::map<AdvRngState, AdvPokemonResult>& hits, AdvRngFilters& target, uint64_t min_advances, uint64_t max_advances, uint16_t tid_xor_sid, uint8_t gender_threshold);
 };
 
