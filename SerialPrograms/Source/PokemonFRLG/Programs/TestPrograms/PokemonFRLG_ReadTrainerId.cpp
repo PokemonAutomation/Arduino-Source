@@ -57,7 +57,7 @@ void ReadTrainerId::program(
         env.log("Trainer Card detected.");
         env.log("Reading TID...");
         uint16_t tid = reader.read_tid(env.logger(), screen);
-        env.log("TID: " + tid);
+        env.log("TID: " + std::to_string(tid));
     }else{
         env.log("Trainer Card not detected!");
     }
