@@ -123,6 +123,8 @@ IMoniker* find_video_device_by_name(const std::string& device_name){
 //  ISampleGrabberCB implementation that pushes audio data to AudioStreamToFloat.
 class AudioGrabberCallback : public ISampleGrabberCB{
 public:
+    virtual ~AudioGrabberCallback() = default;
+
     AudioGrabberCallback(AudioStreamToFloat& reader, Logger& logger)
         : m_reader(reader)
         , m_logger(logger)
