@@ -38,12 +38,147 @@ namespace PokemonAutomation{
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 DownloadThread::~DownloadThread(){
+    // cout << "~DownloadThread" << endl;
+    this->cancel();
     m_worker.wait_and_ignore_exceptions();
 }
 DownloadThread::DownloadThread(ResourceDownloadRow& row) 
     : CancellableScope()
     , m_row(row)
 {}
+
+void DownloadThread::start_download_thread(){
+    m_worker = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+    [this]{ 
+        
+        // runs when lambda is finished
+        // updates button state, and cleans up this thread
+        // use a signal/slot, since an object can't safely call reset() on itself.
+        auto guard = qScopeGuard([&] { emit m_row.download_done(); });
+
+        try {
+            // std::this_thread::sleep_for(std::chrono::seconds(7));
+            RemoteMetadata& remote_handle = m_row.fetch_remote_metadata();
+            if (remote_handle.status != RemoteMetadataStatus::AVAILABLE){
+                switch (remote_handle.status){
+                case RemoteMetadataStatus::UNINITIALIZED:
+                    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "start_download: Remote metadata uninitialized.");
+                case RemoteMetadataStatus::NOT_AVAILABLE:
+                    cout << "start_download: Download not available. Cancel download." << endl;
+                    throw OperationCancelledException();
+                default:
+                    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "start_download: Unknown enum."); 
+                }
+            }
+
+            // Download is available
+            DownloadedResourceMetadata metadata = remote_handle.metadata;
+            run_download(metadata);
+
+            cout << "Done Download" << endl;
+
+        }catch(OperationCancelledException&){
+            // user cancelled action
+
+        }catch(OperationFailedException&){
+            emit m_row.download_failed();
+        }catch(...){
+            emit m_row.exception_caught("ResourceDownloadButton::start_download");
+        }
+
+
+        // emit m_row.download_done(); 
+    }
+    );
+
+}
+
+void DownloadThread::run_download(DownloadedResourceMetadata resource_metadata){
+    Logger& logger = global_logger_tagged();
+    // std::this_thread::sleep_for(std::chrono::seconds(5));
+
+    std::string url = resource_metadata.url;
+    std::string resource_name = resource_metadata.resource_name;
+    qint64 expected_size = resource_metadata.size_compressed_bytes;
+
+    std::string resource_directory = DOWNLOADED_RESOURCE_PATH() + resource_name;
+    try{
+
+        // delete directory and the old resource
+        fs::remove_all(Filesystem::Path(resource_directory));
+
+        // download
+        std::string zip_path = resource_directory + "/temp.zip";
+        FileDownloader::download_file_to_disk(
+            *this,
+            logger, 
+            url, 
+            zip_path,
+            expected_size,
+            [this](int percentage_progress){
+                m_row.download_progress(percentage_progress);
+            }
+        );
+
+        // hash
+        std::string hash = 
+            hash_file(
+                *this,
+                zip_path,
+                [this](int percentage_progress){
+                    m_row.hash_progress(percentage_progress);
+                }
+            );
+        std::string expected_hash = resource_metadata.sha_256;
+        if (hash != expected_hash){
+            std::cerr << "current hash: " << hash << endl;
+            throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+                "Downloaded file failed verification. SHA 256 hash did not match the expected value.");
+        }
+
+        // Filesystem::Path p{zip_path};
+        // cout << "File size: " << std::filesystem::file_size(p) << endl;
+
+        // unzip
+        unzip_file(
+            *this,
+            zip_path.c_str(), 
+            resource_directory.c_str(),
+            [this](int percentage_progress){
+                m_row.unzip_progress(percentage_progress);
+            }
+        );
+
+        // delete old zip file
+        fs::remove(Filesystem::Path(zip_path));
+
+        throw_if_cancelled();
+
+        // update the table labels
+        m_row.set_is_downloaded(true);
+        m_row.set_version_status(ResourceVersionStatus::CURRENT);
+    }catch(OperationCancelledException& e){
+        // delete directory and the resource
+        fs::remove_all(Filesystem::Path(resource_directory));
+
+        // update the table labels
+        m_row.set_is_downloaded(false);
+        m_row.set_version_status(ResourceVersionStatus::NOT_APPLICABLE);
+
+        throw e;
+    }catch(...){
+        // delete directory and the resource
+        fs::remove_all(Filesystem::Path(resource_directory));
+
+        // update the table labels
+        m_row.set_is_downloaded(false);
+        m_row.set_version_status(ResourceVersionStatus::NOT_APPLICABLE);
+
+        throw;
+    }
+
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ResourceDownloadRow
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -117,8 +252,9 @@ void ResourceDownloadRow::set_is_downloaded(bool is_downloaded){
 
 
 ResourceDownloadRow::~ResourceDownloadRow(){
+    // cout << "~ResourceDownloadRow" << endl;
     m_worker1.wait_and_ignore_exceptions();
-    m_worker2.wait_and_ignore_exceptions();
+    // m_worker2.wait_and_ignore_exceptions();
     m_worker3.wait_and_ignore_exceptions();
 }
 ResourceDownloadRow::ResourceDownloadRow(
@@ -136,6 +272,15 @@ ResourceDownloadRow::ResourceDownloadRow(
     , m_cancel_button(*this)
     , m_progress_bar(*this)
 {
+
+    connect(
+        this, &ResourceDownloadRow::download_done,
+        this, [this](){
+            on_download_finished();
+        },
+        Qt::QueuedConnection
+    );
+
     PA_ADD_STATIC(m_data->m_resource_name);
     PA_ADD_STATIC(m_data->m_file_size_label);
     PA_ADD_STATIC(m_data->m_is_downloaded_label);
@@ -275,137 +420,11 @@ std::string ResourceDownloadRow::predownload_warning_summary(RemoteMetadata& rem
 
 
 void ResourceDownloadRow::start_download(){
-    m_worker2 = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
-    [this]{ 
-        try {
-            
-            // std::this_thread::sleep_for(std::chrono::seconds(7));
-            RemoteMetadata& remote_handle = fetch_remote_metadata();
-            if (remote_handle.status != RemoteMetadataStatus::AVAILABLE){
-                switch (remote_handle.status){
-                case RemoteMetadataStatus::UNINITIALIZED:
-                    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "start_download: Remote metadata uninitialized.");
-                case RemoteMetadataStatus::NOT_AVAILABLE:
-                    cout << "start_download: Download not available. Cancel download." << endl;
-                    throw OperationCancelledException();
-                default:
-                    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "start_download: Unknown enum."); 
-                }
-            }
 
-            // Download is available
-            DownloadedResourceMetadata metadata = remote_handle.metadata;
-            run_download(metadata);
-
-            cout << "Done Download" << endl;
-
-            update_button_state(ButtonState::READY);
-
-        }catch(OperationCancelledException&){
-            update_button_state(ButtonState::READY);
-            return;
-        }catch(OperationFailedException&){
-            update_button_state(ButtonState::READY);
-            emit download_failed();
-            return;
-        }catch(...){
-            update_button_state(ButtonState::READY);
-            emit exception_caught("ResourceDownloadButton::start_download");
-            return;
-        }
+    if (m_download_thread == nullptr){
+        m_download_thread = std::make_unique<DownloadThread>(*this);
+        m_download_thread->start_download_thread();
     }
-    );
-
-}
-
-
-void ResourceDownloadRow::run_download(DownloadedResourceMetadata resource_metadata){
-    Logger& logger = global_logger_tagged();
-    // std::this_thread::sleep_for(std::chrono::seconds(5));
-
-    std::string url = resource_metadata.url;
-    std::string resource_name = resource_metadata.resource_name;
-    qint64 expected_size = resource_metadata.size_compressed_bytes;
-
-    std::string resource_directory = DOWNLOADED_RESOURCE_PATH() + resource_name;
-    try{
-
-        DownloadThread scope(*this); // TODO: use the thread itself, not just CancellableScope
-
-        
-        // delete directory and the old resource
-        fs::remove_all(Filesystem::Path(resource_directory));
-
-        // download
-        std::string zip_path = resource_directory + "/temp.zip";
-        FileDownloader::download_file_to_disk(
-            scope,
-            logger, 
-            url, 
-            zip_path,
-            expected_size,
-            [this](int percentage_progress){
-                download_progress(percentage_progress);
-            }
-        );
-
-        // hash
-        std::string hash = 
-            hash_file(
-                scope,
-                zip_path,
-                [this](int percentage_progress){
-                    hash_progress(percentage_progress);
-                }
-            );
-        std::string expected_hash = resource_metadata.sha_256;
-        if (hash != expected_hash){
-            std::cerr << "current hash: " << hash << endl;
-            throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
-                "Downloaded file failed verification. SHA 256 hash did not match the expected value.");
-        }
-
-        // Filesystem::Path p{zip_path};
-        // cout << "File size: " << std::filesystem::file_size(p) << endl;
-
-        // unzip
-        unzip_file(
-            scope,
-            zip_path.c_str(), 
-            resource_directory.c_str(),
-            [this](int percentage_progress){
-                unzip_progress(percentage_progress);
-            }
-        );
-
-        // delete old zip file
-        fs::remove(Filesystem::Path(zip_path));
-
-        scope.throw_if_cancelled();
-
-        // update the table labels
-        set_is_downloaded(true);
-        set_version_status(ResourceVersionStatus::CURRENT);
-    }catch(OperationCancelledException& e){
-        // delete directory and the resource
-        fs::remove_all(Filesystem::Path(resource_directory));
-
-        // update the table labels
-        set_is_downloaded(false);
-        set_version_status(ResourceVersionStatus::NOT_APPLICABLE);
-
-        throw e;
-    }catch(...){
-        // delete directory and the resource
-        fs::remove_all(Filesystem::Path(resource_directory));
-
-        // update the table labels
-        set_is_downloaded(false);
-        set_version_status(ResourceVersionStatus::NOT_APPLICABLE);
-
-        throw;
-    }
-
 }
 
 
@@ -432,6 +451,16 @@ void ResourceDownloadRow::start_delete(){
     }
     );
 
+}
+
+void ResourceDownloadRow::on_download_finished(){
+    
+    update_button_state(ButtonState::READY);
+    if (m_download_thread){
+        
+        // cout << "reset m_download_thread" << endl;
+        m_download_thread.reset(); // destroy the DownloadThread
+    }
 }
 
 void ResourceDownloadRow::update_button_state(ButtonState state){
@@ -463,8 +492,9 @@ void ResourceDownloadRow::update_button_state(ButtonState state){
             m_download_button.set_enabled(false);
             m_delete_button.set_enabled(false);
             m_cancel_button.set_enabled(false);
-            // set_cancel_action(true);
-            // TODO: set cancel to true
+            if (m_download_thread){
+                m_download_thread->cancel();  // cancel the download thread
+            }
             m_button_state = state;
         }
         break;

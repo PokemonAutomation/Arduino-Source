@@ -25,6 +25,11 @@ public:
     ~DownloadThread();
     DownloadThread(ResourceDownloadRow& row);
 
+public:
+    void start_download_thread();
+
+    // throws OperationCancelledException if the user cancels the action
+    void run_download(DownloadedResourceMetadata resource_metadata);
 
 private:
     ResourceDownloadRow& m_row;
@@ -55,8 +60,9 @@ signals:
 
     void metadata_fetch_finished(std::string popup_message);
     void exception_caught(std::string function_name);
+    void download_done();
     void download_failed();
-    void download_finished();
+    void download_completed();
 
     void button_state_updated();
 
@@ -73,8 +79,8 @@ public:
     // DownloadedResourceMetadata initialize_local_metadata();
 
     void start_download();
-    // throws OperationCancelledException if the user cancels the action
-    void run_download(DownloadedResourceMetadata resource_metadata);
+    
+    void on_download_finished();
 
     void start_delete();
 
@@ -100,6 +106,8 @@ private:
     AsyncTask m_worker1;
     AsyncTask m_worker2;
     AsyncTask m_worker3;
+
+    std::unique_ptr<DownloadThread> m_download_thread;
 
 
 
