@@ -77,6 +77,9 @@ public:
     }
 
     void set_baud_rate(uint32_t baud_rate){
+#ifdef __APPLE__
+        speed_t baud = baud_rate;
+#else
         speed_t baud = B9600;
         switch (baud_rate){
         case 9600:   baud = B9600;   break;
@@ -100,6 +103,7 @@ public:
         default:
             throw ConnectionException(nullptr, "Unsupported Baud Rate: " + std::to_string(baud_rate));
         }
+#endif
 
         struct termios options;
         if (tcgetattr(m_fd, &options) == -1){
