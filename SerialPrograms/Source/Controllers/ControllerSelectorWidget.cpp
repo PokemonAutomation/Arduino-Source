@@ -7,6 +7,7 @@
 #include <QKeyEvent>
 #include <QHBoxLayout>
 #include "Common/Qt/NoWheelComboBox.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Panels/ConsoleSettingsStretch.h"
 #include "Controllers/ControllerTypeStrings.h"
@@ -53,7 +54,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     //  Add all the supported interfaces.
     {
         m_interface_list.emplace_back(ControllerInterface::SerialPABotBase);
-        if (PreloadSettings::instance().DEVELOPER_MODE){
+        if (IS_BETA_VERSION){
             m_interface_list.emplace_back(ControllerInterface::SerialPABotBase2);
         }
         m_interface_list.emplace_back(ControllerInterface::TcpSysbotBase);

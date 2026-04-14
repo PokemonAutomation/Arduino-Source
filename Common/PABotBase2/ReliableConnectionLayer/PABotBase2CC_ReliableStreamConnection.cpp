@@ -72,12 +72,19 @@ size_t ReliableStreamConnection::pending() const{
     std::unique_lock<Mutex> lg(m_lock);
     return m_reliable_sender.slots_used();
 }
-void ReliableStreamConnection::wait_for_pending(){
+bool ReliableStreamConnection::wait_for_pending(WallDuration timeout){
     std::unique_lock<Mutex> lg(m_lock);
-    m_cv.wait(lg, [this]{
-        return this->cancelled() || m_reliable_sender.slots_used() == 0;
-    });
+    if (timeout == WallDuration::max()){
+        m_cv.wait(lg, [this]{
+            return this->cancelled() || m_reliable_sender.slots_used() == 0;
+        });
+    }else{
+        m_cv.wait_for(lg, timeout, [this]{
+            return this->cancelled() || m_reliable_sender.slots_used() == 0;
+        });
+    }
     throw_if_cancelled();
+    return m_reliable_sender.slots_used() == 0;
 }
 
 
@@ -156,7 +163,7 @@ size_t ReliableStreamConnection::unreliable_send(const void* data, size_t bytes)
 //  Send Path
 //
 
-void ReliableStreamConnection::reset(){
+bool ReliableStreamConnection::reset(WallDuration timeout){
     {
         std::lock_guard<Mutex> lg(m_lock);
         m_reliable_sender.reset();
@@ -166,7 +173,7 @@ void ReliableStreamConnection::reset(){
         m_reliable_sender.send_packet(PABB2_CONNECTION_OPCODE_ASK_RESET, 0, nullptr);
     }
     m_cv.notify_all();
-    wait_for_pending();
+    return wait_for_pending(timeout);
 }
 
 bool ReliableStreamConnection::try_send_request(uint8_t opcode){

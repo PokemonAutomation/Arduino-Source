@@ -36,16 +36,6 @@ public:
     )
         : m_exit(false)
     {
-        speed_t baud = B9600;
-        switch (baud_rate){
-        case 9600:   baud = B9600;   break;
-        case 19200:  baud = B19200;  break;
-        case 38400:  baud = B38400;  break;
-        case 57600:  baud = B57600;  break;
-        case 115200: baud = B115200; break;
-        default:
-            throw ConnectionException(nullptr, "Unsupported Baud Rate: " + std::to_string(baud_rate));
-        }
 //        std::cout << "desired baud = " << baud << std::endl;
 
         m_fd = open(name.c_str(), O_RDWR | O_NOCTTY);
@@ -56,6 +46,59 @@ public:
                 str += " (permission denied)\nPlease run as sudo.";
             }
             throw ConnectionException(nullptr, std::move(str));
+        }
+
+        set_baud_rate(baud_rate);
+
+        //  Start receiver thread.
+        try{
+            m_listener = thread_pool.dispatch_now_blocking([this]{
+                run_with_catch(
+                    "SerialConnection::SerialConnection()",
+                    [this]{ recv_loop(); }
+                );
+            });
+        }catch (...){
+            close(m_fd);
+            throw;
+        }
+    }
+
+    virtual ~SerialConnection(){
+        if (!m_exit.load(std::memory_order_acquire)){
+            stop();
+        }
+    }
+
+    virtual void stop() noexcept final{
+        m_exit.store(true, std::memory_order_release);
+        close(m_fd);
+        m_listener.wait_and_ignore_exceptions();
+    }
+
+    void set_baud_rate(uint32_t baud_rate){
+        speed_t baud = B9600;
+        switch (baud_rate){
+        case 9600:   baud = B9600;   break;
+        case 19200:  baud = B19200;  break;
+        case 38400:  baud = B38400;  break;
+        case 57600:  baud = B57600;  break;
+        case 115200: baud = B115200; break;
+        case 230400: baud = B230400; break;
+        case 460800: baud = B460800; break;
+        case 500000: baud = B500000; break;
+        case 576000: baud = B576000; break;
+        case 921600: baud = B921600; break;
+        case 1000000: baud = B1000000; break;
+        case 1152000: baud = B1152000; break;
+        case 1500000: baud = B1500000; break;
+        case 2000000: baud = B2000000; break;
+        case 2500000: baud = B2500000; break;
+        case 3000000: baud = B3000000; break;
+        case 3500000: baud = B3500000; break;
+        case 4000000: baud = B4000000; break;
+        default:
+            throw ConnectionException(nullptr, "Unsupported Baud Rate: " + std::to_string(baud_rate));
         }
 
         struct termios options;
@@ -75,8 +118,6 @@ public:
             int error = errno;
             throw ConnectionException(nullptr, "cfsetospeed() failed. Error = " + std::to_string(error));
         }
-//        std::cout << "write baud = " << cfgetispeed(&options) << std::endl;
-//        std::cout << "write baud = " << cfgetospeed(&options) << std::endl;
 
 #if 0
         std::cout << "BRKINT  = " << (options.c_iflag & BRKINT) << std::endl;
@@ -109,7 +150,7 @@ public:
 
         // Don't send SIGINT on break
         options.c_iflag &= ~BRKINT;
-        // Don't strip 8th bit. Critical for binary data 
+        // Don't strip 8th bit. Critical for binary data
         options.c_iflag &= ~ISTRIP;
         // Don't map CR to NL
         options.c_iflag &= ~ICRNL;
@@ -161,31 +202,6 @@ public:
 //            std::cout << "actual baud = " << cfgetospeed(&options) << std::endl;
             throw ConnectionException(nullptr, "Unable to set output baud rate.");
         }
-
-        //  Start receiver thread.
-        try{
-            m_listener = thread_pool.dispatch_now_blocking([this]{
-                run_with_catch(
-                    "SerialConnection::SerialConnection()",
-                    [this]{ recv_loop(); }
-                );
-            });
-        }catch (...){
-            close(m_fd);
-            throw;
-        }
-    }
-
-    virtual ~SerialConnection(){
-        if (!m_exit.load(std::memory_order_acquire)){
-            stop();
-        }
-    }
-
-    virtual void stop() noexcept final{
-        m_exit.store(true, std::memory_order_release);
-        close(m_fd);
-        m_listener.wait_and_ignore_exceptions();
     }
 
 
