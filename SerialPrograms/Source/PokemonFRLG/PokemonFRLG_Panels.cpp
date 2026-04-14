@@ -56,7 +56,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHuntFishing_Descriptor, ShinyHuntFishing>());
     ret.emplace_back(make_single_switch_program<ShinyHuntOverworld_Descriptor, ShinyHuntOverworld>());
     ret.emplace_back(make_single_switch_program<PrizeCornerReset_Descriptor, PrizeCornerReset>());
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (IS_BETA_VERSION){
         ret.emplace_back(make_single_switch_program<LegendaryRunAway_Descriptor, LegendaryRunAway>());
         ret.emplace_back(make_single_switch_program<RngHelper_Descriptor, RngHelper>());
     }
