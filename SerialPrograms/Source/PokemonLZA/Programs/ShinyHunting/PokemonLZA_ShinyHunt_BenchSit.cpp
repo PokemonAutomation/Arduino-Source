@@ -8,7 +8,6 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/VideoStream.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
@@ -17,9 +16,9 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DayNightStateDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_WeatherDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA_ShinyHunt_BenchSit.h"
 
@@ -28,6 +27,8 @@ namespace NintendoSwitch{
 namespace PokemonLZA{
 
 using namespace Pokemon;
+
+
 
 
 
@@ -67,6 +68,8 @@ std::unique_ptr<StatsTracker> ShinyHunt_BenchSit_Descriptor::make_stats() const{
 
 
 
+
+
 ShinyHunt_BenchSit::ShinyHunt_BenchSit()
     : WALK_DIRECTION(
           "<b>Run Direction:</b><br>The direction of running after each day change to increase the spawn radius.",
@@ -94,33 +97,26 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
           )
     , DAY_NIGHT_FILTER(
           "<b>Run Only During Day/Night:</b>",
-          LockMode::UNLOCK_WHILE_RUNNING,
+          LockMode::LOCK_WHILE_RUNNING,
           GroupOption::EnableMode::DEFAULT_DISABLED
           )
-    , FILTER_ENABLED(
-          "Enable day/night filter",
-          LockMode::UNLOCK_WHILE_RUNNING,
-          false
-          )
+
     , FILTER_MODE(
           "Time filter",
           {
            {0, "day", "Day"},
            {1, "night", "Night"},
            },
-          LockMode::UNLOCK_WHILE_RUNNING,
+          LockMode::LOCK_WHILE_RUNNING,
           0
           )
+
     , WEATHER_FILTER(
           "<b>Run Only During Specific Weather:</b>",
-          LockMode::UNLOCK_WHILE_RUNNING,
+          LockMode::LOCK_WHILE_RUNNING,
           GroupOption::EnableMode::DEFAULT_DISABLED
           )
-    , WEATHER_FILTER_ENABLED(
-          "Enable weather filter",
-          LockMode::UNLOCK_WHILE_RUNNING,
-          false
-          )
+
     , WEATHER_FILTER_MODE(
           "Weather filter",
           {
@@ -131,9 +127,10 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
            {4, "foggy", "Foggy"},
            {5, "rainbow", "Rainbow"},
            },
-          LockMode::UNLOCK_WHILE_RUNNING,
+          LockMode::LOCK_WHILE_RUNNING,
           0
           )
+
     , SHINY_DETECTED(
           "Shiny Detected", "",
           "2000 ms",
@@ -155,10 +152,9 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
     PA_ADD_OPTION(WALK_FORWARD_DURATION);
     PA_ADD_OPTION(PERIODIC_SAVE);
     PA_ADD_OPTION(DAY_NIGHT_FILTER);
-    DAY_NIGHT_FILTER.add_option(FILTER_ENABLED, "FilterEnabled");
     DAY_NIGHT_FILTER.add_option(FILTER_MODE, "FilterMode");
+
     PA_ADD_OPTION(WEATHER_FILTER);
-    WEATHER_FILTER.add_option(WEATHER_FILTER_ENABLED, "WeatherFilterEnabled");
     WEATHER_FILTER.add_option(WEATHER_FILTER_MODE, "WeatherFilterMode");
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -182,6 +178,7 @@ void run_back_until_found_bench(
             pbf_move_left_joystick(context, {0, -1}, 800ms, 200ms);
             pbf_press_button(context, BUTTON_L, 160ms, 160ms);
 
+            //  Can't just hold it down since sometimes it doesn't register.
             for (int c = 0; c < 10; c++){
                 pbf_move_right_joystick(context, {-1, 0}, 800ms, 200ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 0ms);
@@ -204,14 +201,15 @@ void run_back_until_found_bench(
     }
 }
 
+bool ShinyHunt_BenchSit::should_run_based_on_day_night(
+    const ImageViewRGB32& frame
+    ){
 
-bool ShinyHunt_BenchSit::should_run_based_on_day_night(const ImageViewRGB32& frame){
-
-    if (!DAY_NIGHT_FILTER.enabled() || !FILTER_ENABLED){
+    if (!DAY_NIGHT_FILTER.enabled()){
         return true;
     }
 
-    DayNightStateDetector detector(COLOR_RED);
+    DayNightStateDetector detector(COLOR_RED, nullptr);
 
     if (!detector.detect(frame)){
         return true;
@@ -220,7 +218,7 @@ bool ShinyHunt_BenchSit::should_run_based_on_day_night(const ImageViewRGB32& fra
     DayNightState current_state =
         detector.get_state();
 
-    int filter_mode =
+    size_t filter_mode =
         FILTER_MODE.current_value();
 
     if (filter_mode == 0){
@@ -236,33 +234,41 @@ bool ShinyHunt_BenchSit::should_run_based_on_day_night(const ImageViewRGB32& fra
 
 bool ShinyHunt_BenchSit::should_run_based_on_weather(const ImageViewRGB32& frame){
 
-    if (!WEATHER_FILTER_ENABLED){
+    if (!WEATHER_FILTER.enabled()){
         return true;
     }
 
-    int weather_mode = WEATHER_FILTER_MODE.current_value();
+    size_t weather_mode =
+        WEATHER_FILTER_MODE.current_value();
 
     WeatherIconType weather_type;
 
     switch (weather_mode){
+
     case 0:
         weather_type = WeatherIconType::Clear;
         break;
+
     case 1:
         weather_type = WeatherIconType::Sunny;
         break;
+
     case 2:
         weather_type = WeatherIconType::Rain;
         break;
+
     case 3:
         weather_type = WeatherIconType::Cloudy;
         break;
+
     case 4:
         weather_type = WeatherIconType::Foggy;
         break;
+
     case 5:
         weather_type = WeatherIconType::Rainbow;
         break;
+
     default:
         return true;
     }
@@ -272,212 +278,132 @@ bool ShinyHunt_BenchSit::should_run_based_on_weather(const ImageViewRGB32& frame
     return detector.detect(frame);
 }
 
-
-void ShinyHunt_BenchSit::program(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context
-    ){
+void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
-    ShinyHunt_BenchSit_Descriptor::Stats& stats =
-        env.current_stats<ShinyHunt_BenchSit_Descriptor::Stats>();
+    ShinyHunt_BenchSit_Descriptor::Stats& stats = env.current_stats<ShinyHunt_BenchSit_Descriptor::Stats>();
 
     ShinySoundHandler shiny_sound_handler(SHINY_DETECTED);
 
-    PokemonLA::ShinySoundDetector shiny_detector(
-        env.console,
-        [&](float error_coefficient) -> bool{
-
-            stats.shinies++;
-            env.update_stats();
-
-            env.console.overlay().add_log(
-                "Shiny Sound Detected!",
-                COLOR_YELLOW
-                );
-
-            return shiny_sound_handler.on_shiny_sound(
-                env,
-                env.console,
-                stats.shinies,
-                error_coefficient
-                );
-        }
-        );
-
+    PokemonLA::ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+        //  Warning: This callback will be run from a different thread than this function.
+        stats.shinies++;
+        env.update_stats();
+        env.console.overlay().add_log("Shiny Sound Detected!", COLOR_YELLOW);
+        return shiny_sound_handler.on_shiny_sound(
+            env, env.console,
+            stats.shinies,
+            error_coefficient
+            );
+    });
 
     run_until<ProControllerContext>(
-        env.console,
-        context,
-
+        env.console, context,
         [&](ProControllerContext& context){
-
             for (uint32_t rounds_since_last_save = 0;; rounds_since_last_save++){
-
                 send_program_status_notification(env, NOTIFICATION_STATUS);
-
                 sit_on_bench(env.console, context);
-
                 shiny_sound_handler.process_pending(context);
-
                 stats.resets++;
                 env.update_stats();
 
-
                 uint32_t periodic_save = PERIODIC_SAVE;
-
-                if (periodic_save != 0 &&
-                    rounds_since_last_save >= periodic_save){
-
-                    bool save_successful =
-                        save_game_to_menu(env.console, context);
-
+                if (periodic_save != 0 && rounds_since_last_save >= periodic_save){
+                    bool save_successful = save_game_to_menu(env.console, context);
                     pbf_mash_button(context, BUTTON_B, 2000ms);
-
                     if (save_successful){
-
-                        env.console.overlay().add_log(
-                            "Game Saved Successfully",
-                            COLOR_BLUE
-                            );
-
+                        env.console.overlay().add_log("Game Saved Successfully", COLOR_BLUE);
                         rounds_since_last_save = 0;
-
                     }else{
-
-                        env.console.overlay().add_log(
-                            "Game Save Failed. Will retry later.",
-                            COLOR_RED
-                            );
+                        env.console.overlay().add_log("Game Save Failed. Will attempt to save after the next reset.", COLOR_RED);
                     }
                 }
 
-
-
                 Milliseconds duration = WALK_FORWARD_DURATION;
+                auto frame = env.console.video().snapshot();
+
+                if (!should_run_based_on_day_night(frame)){
+
+                    env.console.overlay().add_log(
+                        "Skipping move (wrong day/night)",
+                        COLOR_ORANGE
+                        );
+
+                    run_back_until_found_bench(env, context);
+
+                    shiny_sound_handler.process_pending(context);
+
+                    continue;
+                }
+
+
+                if (!should_run_based_on_weather(frame)){
+
+                    env.console.overlay().add_log(
+                        "Skipping move (wrong weather)",
+                        COLOR_ORANGE
+                        );
+
+                    run_back_until_found_bench(env, context);
+
+                    shiny_sound_handler.process_pending(context);
+
+                    continue;
+                }
 
                 if (duration > Milliseconds::zero()){
-
-                    auto frame =
-                        env.console.video().snapshot();
-
-
-                    if (!should_run_based_on_day_night(frame)){
-
-                        env.console.overlay().add_log(
-                            "Skipping move (wrong day/night)",
-                            COLOR_ORANGE
-                            );
-
-                        run_back_until_found_bench(env, context);
-
-                        shiny_sound_handler.process_pending(context);
-
-                        continue;
-                    }
-
-
-
-                    if (!should_run_based_on_weather(frame)){
-
-                        env.console.overlay().add_log(
-                            "Skipping move (wrong weather)",
-                            COLOR_ORANGE
-                            );
-
-                        run_back_until_found_bench(env, context);
-
-                        shiny_sound_handler.process_pending(context);
-
-                        continue;
-                    }
-
-
-
-                    if (WALK_DIRECTION.current_value() == 0){
-
+                    if (WALK_DIRECTION.current_value() == 0){ // forward
                         env.console.overlay().add_log("Move Forward");
-
-                        ssf_press_button(
-                            context,
-                            BUTTON_B,
-                            0ms,
-                            2*duration,
-                            0ms
-                            );
-
-                        pbf_move_left_joystick(
-                            context,
-                            {0, +1},
-                            duration,
-                            0ms
-                            );
-
-                        pbf_move_left_joystick(
-                            context,
-                            {0, -1},
-                            duration + 750ms,
-                            0ms
-                            );
-
+                        ssf_press_button(context, BUTTON_B, 0ms, 2*duration, 0ms);
+                        pbf_move_left_joystick(context, {0, +1}, duration, 0ms);
+                        // run back
+                        pbf_move_left_joystick(context, {0, -1}, duration + 750ms, 0ms);
                         run_back_until_found_bench(env, context);
-                    }
-                    else if (WALK_DIRECTION.current_value() == 1){
-
+                    }else if (WALK_DIRECTION.current_value() == 1){ // left
                         env.console.overlay().add_log("Move Left");
-
                         ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
-
-                        pbf_move_left_joystick(context, {-1, 0}, duration, 0ms);
-
+                        pbf_move_left_joystick(context, {-1, 0},  duration, 0ms);
                         pbf_press_button(context, BUTTON_L, 100ms, 400ms);
-
                         ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
-
                         pbf_move_left_joystick(context, {0, -1}, duration, 0ms);
-
-                        pbf_move_left_joystick(context, {-1, 0}, 100ms, 0ms);
-                    }
-                    else if (WALK_DIRECTION.current_value() == 2){
-
+                        pbf_move_left_joystick(context, {-1, 0},  100ms, 0ms);
+                    }else if (WALK_DIRECTION.current_value() == 2){ // right
                         env.console.overlay().add_log("Move Right");
-
                         ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
-
                         pbf_move_left_joystick(context, {+1, 0}, duration, 0ms);
-
                         pbf_press_button(context, BUTTON_L, 100ms, 400ms);
-
                         ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
-
                         pbf_move_left_joystick(context, {0, -1}, duration, 0ms);
-
                         pbf_move_left_joystick(context, {+1, 0}, 100ms, 0ms);
                     }
-
                 }else{
-
                     run_back_until_found_bench(env, context);
                 }
 
-
                 shiny_sound_handler.process_pending(context);
             }
-
         },
         {shiny_detector}
         );
 
-
+    //  Shiny sound detected and user requested stopping the program when
+    //  detected shiny sound.
     shiny_sound_handler.process_pending(context);
 
     go_home(env.console, context);
-
-    send_program_finished_notification(
-        env,
-        NOTIFICATION_PROGRAM_FINISH
-        );
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

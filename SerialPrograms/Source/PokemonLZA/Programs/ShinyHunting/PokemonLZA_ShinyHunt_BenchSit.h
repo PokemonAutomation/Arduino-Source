@@ -52,11 +52,9 @@ private:
     SimpleIntegerOption<uint32_t> PERIODIC_SAVE;
 
     GroupOption DAY_NIGHT_FILTER;
-    BooleanCheckBoxOption FILTER_ENABLED;
     IntegerEnumDropdownOption FILTER_MODE;
 
     GroupOption WEATHER_FILTER;
-    BooleanCheckBoxOption WEATHER_FILTER_ENABLED;
     IntegerEnumDropdownOption WEATHER_FILTER_MODE;
 
     ShinySoundDetectedActionOption SHINY_DETECTED;
