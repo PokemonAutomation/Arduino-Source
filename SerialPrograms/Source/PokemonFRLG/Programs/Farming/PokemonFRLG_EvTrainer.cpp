@@ -727,20 +727,20 @@ void EvTrainer::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             }
 
             // travel to the relevant Fly spot, heal at a PokeCenter, and walk to the grass
-            // if (stats.encounters == 0 || failed_last_encounter || finished_stat || should_heal){
-            //     // use dig to get out of Pokemon Tower or Rock Tunnel
-            //     if (current_location == EvTrainingLocation::pokemontower  || current_location == EvTrainingLocation::rocktunnel){
-            //         use_dig(env, context);
-            //     }
+            if (stats.encounters == 0 || failed_last_encounter || finished_stat || should_heal){
+                // use dig to get out of Pokemon Tower or Rock Tunnel
+                if (current_location == EvTrainingLocation::pokemontower  || current_location == EvTrainingLocation::rocktunnel){
+                    use_dig(env, context);
+                }
 
-            //     current_location = get_next_location(env, stats, HP_EVS, ATK_EVS, DEF_EVS, SPATK_EVS, SPDEF_EVS, SPEED_EVS);
-            //     spin_leftright = travel_to_location(env, context, current_location);
+                current_location = get_next_location(env, stats, HP_EVS, ATK_EVS, DEF_EVS, SPATK_EVS, SPDEF_EVS, SPEED_EVS);
+                spin_leftright = travel_to_location(env, context, current_location);
 
-            //     stats.healing_trips++;
-            //     should_heal = false;
-            //     failed_last_encounter = false;
-            //     finished_stat = false;
-            // }
+                stats.healing_trips++;
+                should_heal = false;
+                failed_last_encounter = false;
+                finished_stat = false;
+            }
 
                
             // trigger a wild encounter
