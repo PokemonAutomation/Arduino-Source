@@ -449,12 +449,12 @@ bool EvTrainer::check_if_finished(EvTrainer_Descriptor::Stats& stats, uint8_t EV
     , SimpleIntegerOption<uint64_t>& SPDEF_EVS
     , SimpleIntegerOption<uint64_t>& SPEED_EVS
 ){
-    return ( stats.hp_evs + EV_MULTIPLIER - 1 > HP_EVS
-        && stats.atk_evs + EV_MULTIPLIER - 1 > ATK_EVS
-        && stats.def_evs + EV_MULTIPLIER - 1 > DEF_EVS
-        && stats.spa_evs + EV_MULTIPLIER - 1 > SPATK_EVS
-        && stats.spd_evs + EV_MULTIPLIER - 1 > SPDEF_EVS
-        && stats.spe_evs + EV_MULTIPLIER - 1 > SPEED_EVS
+    return ( stats.hp_evs + EV_MULTIPLIER > HP_EVS
+        && stats.atk_evs + EV_MULTIPLIER > ATK_EVS
+        && stats.def_evs + EV_MULTIPLIER > DEF_EVS
+        && stats.spa_evs + EV_MULTIPLIER > SPATK_EVS
+        && stats.spd_evs + EV_MULTIPLIER > SPDEF_EVS
+        && stats.spe_evs + EV_MULTIPLIER > SPEED_EVS
     );
 }
 
@@ -666,22 +666,22 @@ EvTrainer::EvTrainerBattleResult EvTrainer::handle_wild_battle(SingleSwitchProgr
             
             switch (location){
             case EvTrainingLocation::viridianforest:
-                res.finished_stat = stats.hp_evs + EV_MULTIPLIER - 1 >= HP_EVS; // avoid overshooting with Macho Brace / Pokerus
+                res.finished_stat = stats.hp_evs + EV_MULTIPLIER > HP_EVS; // avoid overshooting with Macho Brace / Pokerus
                 break;
             case EvTrainingLocation::route22:
-                res.finished_stat = stats.atk_evs + EV_MULTIPLIER - 1 >= ATK_EVS;
+                res.finished_stat = stats.atk_evs + EV_MULTIPLIER > ATK_EVS;
                 break;
             case EvTrainingLocation::rocktunnel:
-                res.finished_stat = stats.def_evs + EV_MULTIPLIER - 1 >= DEF_EVS;
+                res.finished_stat = stats.def_evs + EV_MULTIPLIER > DEF_EVS;
                 break;
             case EvTrainingLocation::pokemontower:
-                res.finished_stat = stats.spa_evs + EV_MULTIPLIER - 1 >= SPATK_EVS;
+                res.finished_stat = stats.spa_evs + EV_MULTIPLIER > SPATK_EVS;
                 break;
             case EvTrainingLocation::surfspot:
-                res.finished_stat = stats.spd_evs + EV_MULTIPLIER - 1 >= SPDEF_EVS;
+                res.finished_stat = stats.spd_evs + EV_MULTIPLIER > SPDEF_EVS;
                 break;
             case EvTrainingLocation::route1:
-                res.finished_stat = stats.spe_evs + EV_MULTIPLIER - 1 >= SPEED_EVS;
+                res.finished_stat = stats.spe_evs + EV_MULTIPLIER > SPEED_EVS;
                 break;
             default:
                 res.finished_stat = false;
