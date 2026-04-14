@@ -55,9 +55,51 @@ private:
         uint64_t speed = 0;
     };
 
-    std::string get_encounter_species(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EvTrainingLocation& location);
+    struct EvTrainerEncounterResult{
+        bool failed_encounter;
+        bool shiny_found;
+    };
 
-    EffortValues get_ev_yield(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::string& species, uint8_t& ev_multiplier);
+    struct EvTrainerBattleResult{
+        bool should_heal;
+        bool finished_stat;
+        bool move_learned;
+    };
+
+    bool check_if_finished(EvTrainer_Descriptor::Stats& stats, uint8_t ev_multiplier
+    , SimpleIntegerOption<uint64_t>& HP_EVS
+    , SimpleIntegerOption<uint64_t>& ATK_EVS
+    , SimpleIntegerOption<uint64_t>& DEF_EVS
+    , SimpleIntegerOption<uint64_t>& SPATK_EVS
+    , SimpleIntegerOption<uint64_t>& SPDEF_EVS
+    , SimpleIntegerOption<uint64_t>& SPEED_EVS);
+
+    EvTrainingLocation get_next_location(SingleSwitchProgramEnvironment& env, EvTrainer_Descriptor::Stats& stats
+    , SimpleIntegerOption<uint64_t>& HP_EVS
+    , SimpleIntegerOption<uint64_t>& ATK_EVS
+    , SimpleIntegerOption<uint64_t>& DEF_EVS
+    , SimpleIntegerOption<uint64_t>& SPATK_EVS
+    , SimpleIntegerOption<uint64_t>& SPDEF_EVS
+    , SimpleIntegerOption<uint64_t>& SPEED_EVS);
+
+    // returns the appropriate spin_leftright value
+    bool travel_to_location(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EvTrainingLocation location);
+
+    std::string get_encounter_species(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EvTrainingLocation location);
+
+    EffortValues get_ev_yield(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::string& species, uint8_t ev_multiplier);
+
+    EvTrainerEncounterResult trigger_wild_encounter(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EvTrainer_Descriptor::Stats& stats, bool spin_leftright);
+
+    EvTrainerBattleResult handle_wild_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context
+        , EvTrainer_Descriptor::Stats& stats, bool STOP_ON_MOVE_LEARN, bool PREVENT_EVOLUTION
+        , uint8_t ev_multiplier, EvTrainingLocation location 
+        , SimpleIntegerOption<uint64_t>& HP_EVS
+        , SimpleIntegerOption<uint64_t>& ATK_EVS
+        , SimpleIntegerOption<uint64_t>& DEF_EVS
+        , SimpleIntegerOption<uint64_t>& SPATK_EVS
+        , SimpleIntegerOption<uint64_t>& SPDEF_EVS
+        , SimpleIntegerOption<uint64_t>& SPEED_EVS);
 
     OCR::LanguageOCROption LANGUAGE;
 

@@ -395,9 +395,128 @@ void use_dig(SingleSwitchProgramEnvironment& env, ProControllerContext& context)
     }
 }
 
+std::string get_ev_message(EvTrainer_Descriptor::Stats& stats){
+    std::string message = "EVs earned: ";
+    bool nonzero = false;
+    if (stats.hp_evs){
+        message += std::to_string(stats.hp_evs);
+        message += " HP, ";
+        nonzero = true;
+    }
+    if (stats.atk_evs){
+        message += std::to_string(stats.atk_evs);
+        message += " Attack, ";
+        nonzero = true;
+    }
+    if (stats.def_evs){
+        message += std::to_string(stats.def_evs);
+        message += " Defense, ";
+        nonzero = true;
+    }
+    if (stats.spa_evs){
+        message += std::to_string(stats.spa_evs);
+        message += " Sp. Attack, ";
+        nonzero = true;
+    }
+    if (stats.spd_evs){
+        message += std::to_string(stats.spd_evs);
+        message += " Sp. Defense, ";
+        nonzero = true;
+    }
+    if (stats.spe_evs){
+        message += std::to_string(stats.spe_evs);
+        message += " Speed, ";
+        nonzero = true;
+    }   
+
+    if (!nonzero){
+        message = "No EVs earned";
+    }else{
+        message.erase(message.size()-2);
+    }
+
+    return message;
+}
+
 } // namespace
 
-std::string EvTrainer::get_encounter_species(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EvTrainingLocation& location){
+
+bool EvTrainer::check_if_finished(EvTrainer_Descriptor::Stats& stats, uint8_t EV_MULTIPLIER
+    , SimpleIntegerOption<uint64_t>& HP_EVS
+    , SimpleIntegerOption<uint64_t>& ATK_EVS
+    , SimpleIntegerOption<uint64_t>& DEF_EVS
+    , SimpleIntegerOption<uint64_t>& SPATK_EVS
+    , SimpleIntegerOption<uint64_t>& SPDEF_EVS
+    , SimpleIntegerOption<uint64_t>& SPEED_EVS
+){
+    return ( stats.hp_evs + EV_MULTIPLIER - 1 > HP_EVS
+        && stats.atk_evs + EV_MULTIPLIER - 1 > ATK_EVS
+        && stats.def_evs + EV_MULTIPLIER - 1 > DEF_EVS
+        && stats.spa_evs + EV_MULTIPLIER - 1 > SPATK_EVS
+        && stats.spd_evs + EV_MULTIPLIER - 1 > SPDEF_EVS
+        && stats.spe_evs + EV_MULTIPLIER - 1 > SPEED_EVS
+    );
+}
+
+EvTrainer::EvTrainingLocation EvTrainer::get_next_location(SingleSwitchProgramEnvironment& env, EvTrainer_Descriptor::Stats& stats
+    , SimpleIntegerOption<uint64_t>& HP_EVS
+    , SimpleIntegerOption<uint64_t>& ATK_EVS
+    , SimpleIntegerOption<uint64_t>& DEF_EVS
+    , SimpleIntegerOption<uint64_t>& SPATK_EVS
+    , SimpleIntegerOption<uint64_t>& SPDEF_EVS
+    , SimpleIntegerOption<uint64_t>& SPEED_EVS
+){
+    if (stats.hp_evs < HP_EVS){
+        return EvTrainingLocation::viridianforest;
+    }else if (stats.atk_evs < ATK_EVS){
+        return EvTrainingLocation::route22;
+    }else if (stats.def_evs < DEF_EVS){
+        return EvTrainingLocation::rocktunnel;
+    }else if (stats.spa_evs < SPATK_EVS){
+        return EvTrainingLocation::pokemontower;
+    }else if (stats.spd_evs < SPDEF_EVS){
+        return EvTrainingLocation::surfspot;
+    }else if (stats.spe_evs < SPEED_EVS){
+        return EvTrainingLocation::route1;
+    }else{
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "EvTrainer(): program failed to exit after earning all EVs",
+            env.console
+        );
+    }
+}
+
+bool EvTrainer::travel_to_location(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EvTrainingLocation location){
+    switch (location){
+    case EvTrainingLocation::viridianforest:
+        travel_to_viridianforest(env, context);
+        return true;
+    case EvTrainingLocation::route22:
+        travel_to_route22(env, context);
+        return true;
+    case EvTrainingLocation::rocktunnel:
+        travel_to_rock_tunnel(env, context);
+        return true;
+    case EvTrainingLocation::pokemontower:
+        travel_to_pokemontower(env, context);
+        return true;
+    case EvTrainingLocation::surfspot:
+        travel_to_surf_spot(env, context);
+        return false;
+    case EvTrainingLocation::route1:
+        travel_to_route1(env, context);
+        return true;
+    default:
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "EvTrainer: Invalid EV Training location.",
+            env.console
+        );
+    }
+}
+
+std::string EvTrainer::get_encounter_species(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EvTrainingLocation location){
     const double MAX_SPECIES_LOG10P = -1.2; // relaxed from the default of -1.4 to prevent failure to get OCR matches for some species
     
     // make OCR more reliable by providing possible wild encounters for each location
@@ -436,7 +555,7 @@ std::string EvTrainer::get_encounter_species(SingleSwitchProgramEnvironment& env
     return encounter.name;
 }
 
-EvTrainer::EffortValues EvTrainer::get_ev_yield(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::string& species, uint8_t& ev_multiplier){
+EvTrainer::EffortValues EvTrainer::get_ev_yield(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::string& species, uint8_t EV_MULTIPLIER){
     std::set<std::string> subset;
     // It's probably a better idea to generate a more complete list of EVs to use as a resource
     // ... but this one is enough for the limited number of possible encounters in these few locations
@@ -472,17 +591,107 @@ EvTrainer::EffortValues EvTrainer::get_ev_yield(SingleSwitchProgramEnvironment& 
     }
 
     EvTrainer::EffortValues evs = ev_map.find(species)->second;
-    if (ev_multiplier > 1){
+    if (EV_MULTIPLIER > 1){
         evs = {
-            evs.hp * ev_multiplier,
-            evs.attack * ev_multiplier,
-            evs.defense * ev_multiplier,
-            evs.spatk * ev_multiplier,
-            evs.spdef * ev_multiplier,
-            evs.speed * ev_multiplier
+            evs.hp * EV_MULTIPLIER,
+            evs.attack * EV_MULTIPLIER,
+            evs.defense * EV_MULTIPLIER,
+            evs.spatk * EV_MULTIPLIER,
+            evs.spdef * EV_MULTIPLIER,
+            evs.speed * EV_MULTIPLIER
         };
     }
     return evs;
+}
+
+EvTrainer::EvTrainerEncounterResult EvTrainer::trigger_wild_encounter(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EvTrainer_Descriptor::Stats& stats, bool spin_leftright){
+    EvTrainerEncounterResult res = { false, false };
+
+    int ret = grass_spin(env.console, context, spin_leftright);
+    res.shiny_found = (ret == 1);
+    if (ret < 0){
+        res.failed_encounter = true;
+        env.log("Failed to trigger encounter: restarting travel");
+        // exit a menu in case there is one open
+        pbf_mash_button(context, BUTTON_B, 1000ms);
+    }else{
+        stats.encounters++;
+    }
+
+    return res;
+}
+
+
+EvTrainer::EvTrainerBattleResult EvTrainer::handle_wild_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context
+        , EvTrainer_Descriptor::Stats& stats, bool STOP_ON_MOVE_LEARN, bool PREVENT_EVOLUTION
+        , uint8_t EV_MULTIPLIER, EvTrainingLocation location 
+        , SimpleIntegerOption<uint64_t>& HP_EVS
+        , SimpleIntegerOption<uint64_t>& ATK_EVS
+        , SimpleIntegerOption<uint64_t>& DEF_EVS
+        , SimpleIntegerOption<uint64_t>& SPATK_EVS
+        , SimpleIntegerOption<uint64_t>& SPDEF_EVS
+        , SimpleIntegerOption<uint64_t>& SPEED_EVS
+){
+    EvTrainerBattleResult res = { false, false, false };
+    
+    std::string encounter_species = get_encounter_species(env, context, location);
+    EffortValues ev_yield = get_ev_yield(env, context, encounter_species, EV_MULTIPLIER);
+    if (   (ev_yield.hp + stats.hp_evs > HP_EVS) 
+        || (ev_yield.attack + stats.atk_evs> ATK_EVS)
+        || (ev_yield.defense + stats.def_evs > DEF_EVS)
+        || (ev_yield.spatk + stats.spa_evs > SPATK_EVS)
+        || (ev_yield.spdef + stats.spd_evs > SPDEF_EVS)
+        || (ev_yield.speed + stats.spe_evs> SPEED_EVS)
+    ){
+        flee_battle(env.console, context);
+    }else{
+        BattleResult ret = spam_first_move(env.console, context);
+        if (ret == BattleResult::playerfainted) {
+            stats.times_fainted++;
+            res.should_heal = true;
+            //TODO: handle exiting the battle in case the player can't escape (low speed, no Smoke Ball)
+            pbf_mash_button(context, BUTTON_B, 5000ms);
+            context.wait_for_all_requests();
+        } else if (ret == BattleResult::unknown){ // battle fled (no EV gain)
+            // continue;
+        } else if (ret == BattleResult::outofpp){
+            res.should_heal = true;
+        } else if (ret == BattleResult::opponentfainted){
+            stats.hp_evs  += ev_yield.hp;
+            stats.atk_evs += ev_yield.attack;
+            stats.def_evs += ev_yield.defense;
+            stats.spa_evs += ev_yield.spatk;
+            stats.spd_evs += ev_yield.spdef;
+            stats.spe_evs += ev_yield.speed;
+            
+            switch (location){
+            case EvTrainingLocation::viridianforest:
+                res.finished_stat = stats.hp_evs + EV_MULTIPLIER - 1 >= HP_EVS; // avoid overshooting with Macho Brace / Pokerus
+                break;
+            case EvTrainingLocation::route22:
+                res.finished_stat = stats.atk_evs + EV_MULTIPLIER - 1 >= ATK_EVS;
+                break;
+            case EvTrainingLocation::rocktunnel:
+                res.finished_stat = stats.def_evs + EV_MULTIPLIER - 1 >= DEF_EVS;
+                break;
+            case EvTrainingLocation::pokemontower:
+                res.finished_stat = stats.spa_evs + EV_MULTIPLIER - 1 >= SPATK_EVS;
+                break;
+            case EvTrainingLocation::surfspot:
+                res.finished_stat = stats.spd_evs + EV_MULTIPLIER - 1 >= SPDEF_EVS;
+                break;
+            case EvTrainingLocation::route1:
+                res.finished_stat = stats.spe_evs + EV_MULTIPLIER - 1 >= SPEED_EVS;
+                break;
+            default:
+                res.finished_stat = false;
+            }
+
+            res.move_learned = exit_wild_battle(env.console, context, !!STOP_ON_MOVE_LEARN, !!PREVENT_EVOLUTION);
+        }
+    }  
+
+    return res;
 }
 
 void EvTrainer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -494,101 +703,60 @@ void EvTrainer::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     home_black_border_check(env.console, context);
 
-    bool shiny_found = false;
-    bool failed_encounter = false;
-
-    bool spin_leftright = true;
-    bool out_of_pp = false;
-    
-    EvTrainingLocation current_location = EvTrainingLocation::viridianforest;
-    bool finished_stat = false;
-
     uint8_t EV_MULTIPLIER = (MACHO_BRACE ? 2 : 1) * (POKERUS ? 2 : 1);
 
-    while (!shiny_found){
+    bool failed_last_encounter = false;
+    uint8_t failed_encounters = 0;
+
+    bool spin_leftright = true;
+    bool should_heal = false;
+
+    EvTrainingLocation current_location = EvTrainingLocation::viridianforest;
+
+    bool finished_stat = false;
+    bool finished_all = check_if_finished(stats, EV_MULTIPLIER, HP_EVS, ATK_EVS, DEF_EVS, SPATK_EVS, SPDEF_EVS, SPEED_EVS);
+
+    while (!finished_all){
         try{
-            if (stats.encounters == 0 || failed_encounter || finished_stat || out_of_pp){
-                // use dig to get out of Pokemon Tower or Rock Tunnel
-                if (current_location == EvTrainingLocation::pokemontower  || current_location == EvTrainingLocation::rocktunnel){
-                    use_dig(env, context);
-                }
-
-                if (stats.hp_evs < HP_EVS){
-                    current_location = EvTrainingLocation::viridianforest;
-                }else if (stats.atk_evs < ATK_EVS){
-                    current_location = EvTrainingLocation::route22;
-                }else if (stats.def_evs < DEF_EVS){
-                    current_location = EvTrainingLocation::rocktunnel;
-                }else if (stats.spa_evs < SPATK_EVS){
-                    current_location = EvTrainingLocation::pokemontower;
-                }else if (stats.spd_evs < SPDEF_EVS){
-                    current_location = EvTrainingLocation::surfspot;
-                }else if (stats.spe_evs < SPEED_EVS){
-                    current_location = EvTrainingLocation::route1;
-                }else{
-                    break;
-                }
-
-                spin_leftright = true;
-
-                switch (current_location){
-                case EvTrainingLocation::viridianforest:
-                    travel_to_viridianforest(env, context);
-                    break;
-                case EvTrainingLocation::route22:
-                    travel_to_route22(env, context);
-                    break;
-                case EvTrainingLocation::rocktunnel:
-                    travel_to_rock_tunnel(env, context);
-                    break;
-                case EvTrainingLocation::pokemontower:
-                    travel_to_pokemontower(env, context);
-                    break;
-                case EvTrainingLocation::surfspot:
-                    travel_to_surf_spot(env, context);
-                    spin_leftright = false;
-                    break;
-                case EvTrainingLocation::route1:
-                    travel_to_route1(env, context);
-                    break;
-                default:
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
-                        "Invalid EV option.",
-                        env.console
-                    );
-                }
-                
-                stats.healing_trips++;
-                out_of_pp = false;
-                failed_encounter = false;
-                finished_stat = false;
+            if (failed_encounters >= 5){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Failed to trigger a wild encounter within 60 seconds 5 times in a row",
+                    env.console
+                );
             }
-               
 
-            uint16_t errors = 0;
-            int ret = grass_spin(env.console, context, spin_leftright);
-            shiny_found = (ret == 1);
-            if (ret < 0){
-                failed_encounter = true;
-                env.log("Failed to trigger encounter: restarting travel");
-                errors++;
-                if (errors >= 5){
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
-                        "Failed 5 times to trigger a wild encounter within 60 seconds",
-                        env.console
-                    );
-                }
-                // exit a menu in case there is one open
-                pbf_mash_button(context, BUTTON_B, 1000ms);
+            // travel to the relevant Fly spot, heal at a PokeCenter, and walk to the grass
+            // if (stats.encounters == 0 || failed_last_encounter || finished_stat || should_heal){
+            //     // use dig to get out of Pokemon Tower or Rock Tunnel
+            //     if (current_location == EvTrainingLocation::pokemontower  || current_location == EvTrainingLocation::rocktunnel){
+            //         use_dig(env, context);
+            //     }
+
+            //     current_location = get_next_location(env, stats, HP_EVS, ATK_EVS, DEF_EVS, SPATK_EVS, SPDEF_EVS, SPEED_EVS);
+            //     spin_leftright = travel_to_location(env, context, current_location);
+
+            //     stats.healing_trips++;
+            //     should_heal = false;
+            //     failed_last_encounter = false;
+            //     finished_stat = false;
+            // }
+
+               
+            // trigger a wild encounter
+            EvTrainerEncounterResult encounter_res = trigger_wild_encounter(env, context, stats, spin_leftright);
+            failed_last_encounter = encounter_res.failed_encounter;
+            if (failed_last_encounter){
+                failed_encounters++;
                 continue;
             }else{
                 spin_leftright = !spin_leftright;
-                stats.encounters++;
+                failed_encounters = 0;
             }
 
-            if (shiny_found && !IGNORE_SHINIES){
+
+            // handle shiny encounters
+            if (encounter_res.shiny_found){
                 env.log("Shiny found!");
                 stats.shinies++;
                 VideoSnapshot screen = env.console.video().snapshot();
@@ -604,75 +772,35 @@ void EvTrainer::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                 if (TAKE_VIDEO){
                     pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
                 }
+                if (!IGNORE_SHINIES){
+                    break;
+                }
+            }
+
+
+            // handle the battle and avoid overshooting the target EVs
+            EvTrainerBattleResult battle_res = handle_wild_battle(env, context, stats
+                , !!STOP_ON_MOVE_LEARN, !!PREVENT_EVOLUTION , EV_MULTIPLIER, current_location
+                , HP_EVS , ATK_EVS, DEF_EVS, SPATK_EVS, SPDEF_EVS, SPEED_EVS);
+
+            should_heal = battle_res.should_heal;
+            finished_stat = battle_res.finished_stat;
+            finished_all = check_if_finished(stats, EV_MULTIPLIER, HP_EVS, ATK_EVS, DEF_EVS, SPATK_EVS, SPDEF_EVS, SPEED_EVS);
+
+            if (battle_res.move_learned && STOP_ON_MOVE_LEARN){
+                VideoSnapshot screen = env.console.video().snapshot();
+                send_program_notification(
+                    env, 
+                    NOTIFICATION_STATUS_UPDATE,
+                    COLOR_BLUE,
+                    "Stopping: move learned.",
+                    {}, "",
+                    screen,
+                    true
+                );
                 break;
             }
-            shiny_found = false;
 
-            std::string encounter_species = get_encounter_species(env, context, current_location);
-            EffortValues ev_yield = get_ev_yield(env, context, encounter_species, EV_MULTIPLIER);
-            if (   (ev_yield.hp + stats.hp_evs > HP_EVS) 
-                || (ev_yield.attack + stats.atk_evs> ATK_EVS)
-                || (ev_yield.defense + stats.def_evs > DEF_EVS)
-                || (ev_yield.spatk + stats.spa_evs > SPATK_EVS)
-                || (ev_yield.spdef + stats.spd_evs > SPDEF_EVS)
-                || (ev_yield.speed + stats.spe_evs> SPEED_EVS)
-            ){
-                flee_battle(env.console, context);
-            }else{
-                BattleResult ret2 = spam_first_move(env.console, context);
-                if (ret2 == BattleResult::playerfainted) {
-                    stats.times_fainted++;
-                    out_of_pp = true; // triggers a healing trip
-                    //TODO: handle exiting the battle in case the player can't escape
-                    pbf_mash_button(context, BUTTON_B, 5000ms);
-                    context.wait_for_all_requests();
-                } else if (ret2 == BattleResult::unknown){ // battle fled (no EV gain)
-                    // continue;
-                } else if (ret2 == BattleResult::outofpp){
-                    out_of_pp = true;
-                } else if (ret2 == BattleResult::opponentfainted){
-                    stats.hp_evs  += ev_yield.hp;
-                    stats.atk_evs += ev_yield.attack;
-                    stats.def_evs += ev_yield.defense;
-                    stats.spa_evs += ev_yield.spatk;
-                    stats.spd_evs += ev_yield.spdef;
-                    stats.spe_evs += ev_yield.speed;
-                    
-                    switch (current_location){
-                    case EvTrainingLocation::viridianforest:
-                        finished_stat = stats.hp_evs + EV_MULTIPLIER - 1 >= HP_EVS; // avoid overshooting with Macho Brace / Pokerus
-                        break;
-                    case EvTrainingLocation::route22:
-                        finished_stat = stats.atk_evs + EV_MULTIPLIER - 1 >= ATK_EVS;
-                        break;
-                    case EvTrainingLocation::rocktunnel:
-                        finished_stat = stats.def_evs + EV_MULTIPLIER - 1 >= DEF_EVS;
-                        break;
-                    case EvTrainingLocation::pokemontower:
-                        finished_stat = stats.spa_evs + EV_MULTIPLIER - 1 >= SPATK_EVS;
-                        break;
-                    case EvTrainingLocation::surfspot:
-                        finished_stat = stats.spd_evs + EV_MULTIPLIER - 1 >= SPDEF_EVS;
-                        break;
-                    case EvTrainingLocation::route1:
-                        finished_stat = stats.spe_evs + EV_MULTIPLIER - 1 >= SPEED_EVS;
-                        break;
-                    default:
-                        finished_stat = false;
-                    }
-
-                    bool move_learned = exit_wild_battle(env.console, context, !!STOP_ON_MOVE_LEARN, !!PREVENT_EVOLUTION);
-
-                    if (move_learned && STOP_ON_MOVE_LEARN){
-                        send_program_status_notification(
-                            env, NOTIFICATION_STATUS_UPDATE,
-                            "Stopping: move learned."
-                        );
-                        break;
-                    }
-                }
-
-            }            
 
             send_program_status_notification(
                 env, NOTIFICATION_STATUS_UPDATE,
@@ -690,7 +818,8 @@ void EvTrainer::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     if (GO_HOME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 200ms, 1000ms);
     }
-    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH, get_ev_message(stats));
 }
 
 }
