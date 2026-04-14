@@ -412,6 +412,24 @@ BattleResult spam_first_move(ConsoleHandle& console, ProControllerContext& conte
 }
 
 void flee_battle(ConsoleHandle& console, ProControllerContext& context){
+    BattleMenuWatcher battle_menu(COLOR_RED);
+    context.wait_for_all_requests();
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context) {
+            pbf_wait(context, 1000ms);
+            pbf_mash_button(context, BUTTON_B, 9000ms);
+        },
+        { battle_menu }
+    );
+    if (ret < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "flee_battle(): Unable to detect battle menu.",
+            console
+        );
+    }
+
     console.log("Navigate to Run.");
     pbf_press_dpad(context, DPAD_RIGHT, 160ms, 160ms);
     pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
