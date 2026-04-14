@@ -108,7 +108,7 @@ bool SerialPABotBase2_Connection::open_serial_port(){
     m_unreliable_connection = std::make_unique<SerialConnection>(
         GlobalThreadPools::unlimited_realtime(),
         info.systemLocation().toStdString(),
-        PABB2_CONNECTION_BAUD_RATE
+        115200
     );
 
     return true;
