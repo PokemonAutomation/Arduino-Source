@@ -559,7 +559,6 @@ void RngHelper::set_seed_after_delay(ProControllerContext& context, int64_t& FIX
         button = BUTTON_A;
         break;
     }
-    BUTTON_A;
     pbf_press_button(context, button, 3000ms, 0ms);
 }
 
