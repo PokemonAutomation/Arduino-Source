@@ -36,7 +36,7 @@ namespace PokemonAutomation{
 #endif
 
 #ifndef PA_VERSION_PATCH
-#define PA_VERSION_PATCH 2
+#define PA_VERSION_PATCH 4
 #endif
 
 const bool IS_BETA_VERSION = PA_IS_BETA;
