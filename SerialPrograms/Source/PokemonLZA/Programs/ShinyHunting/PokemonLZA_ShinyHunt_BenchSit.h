@@ -43,7 +43,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    bool should_run_based_on_day_night(const ImageViewRGB32& frame);
+    bool should_run_based_on_day_night(const ImageViewRGB32& frame, VideoOverlay& overlay);
     bool should_run_based_on_weather(const ImageViewRGB32& frame);
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
 

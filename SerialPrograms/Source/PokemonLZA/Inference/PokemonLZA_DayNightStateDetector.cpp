@@ -6,11 +6,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLZA{
 
-DayNightStateDetector::DayNightStateDetector()
+DayNightStateDetector::DayNightStateDetector(VideoOverlay* overlay)
     :
-    m_box(0.40, 0.80, 0.45, 0.45),
+    m_box(0.10, 0.75, 0.32, 0.22),
     m_state(DayNightState::DAY)
-{}
+{
+    if (overlay){
+        m_overlay.emplace(
+            *overlay,
+            m_box,
+            COLOR_YELLOW
+        );
+    }
+}
 
 
 void DayNightStateDetector::make_overlays(VideoOverlaySet& items) const{
@@ -47,7 +55,9 @@ bool DayNightStateDetector::detect(const ImageViewRGB32& screen){
 
     return true;
 }
-
+DayNightState DayNightStateDetector::state() const{
+    return m_state;
+}
 }
 }
 }

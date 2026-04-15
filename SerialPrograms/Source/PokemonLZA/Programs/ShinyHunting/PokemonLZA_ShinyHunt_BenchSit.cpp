@@ -202,13 +202,14 @@ void run_back_until_found_bench(
 }
 
 bool ShinyHunt_BenchSit::should_run_based_on_day_night(
-    const ImageViewRGB32& frame
+    const ImageViewRGB32& frame,
+    VideoOverlay& overlay
     ){
     if (!DAY_NIGHT_FILTER.enabled()){
         return true;
     }
 
-    DayNightStateDetector detector;
+    DayNightStateDetector detector(&overlay);
 
     if (!detector.detect(frame)){
         return true;
@@ -312,7 +313,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
 
 
-                if (!should_run_based_on_day_night(frame)){
+                if (!should_run_based_on_day_night(frame, env.console.overlay())){
 
                     env.console.overlay().add_log(
                         "Skipping move (wrong day/night)",
