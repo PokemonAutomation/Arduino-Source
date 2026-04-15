@@ -158,7 +158,7 @@ int test_pokemonLA_MMOQuestionMarkDetector(const ImageViewRGB32& image, const st
                     return 1;
                 }
                 target_hisui_region_has_MMO[region] = true;
-            } catch(std::exception&){
+            }catch (std::exception&){
                 cerr << "Error: keyword must be a region number, ranging in [0, 4], but got " << word << endl;
                 return 1;
             }
@@ -183,7 +183,7 @@ int test_pokemonLA_MMOQuestionMarkDetector(const ImageViewRGB32& image, const st
                         return 1;
                     }
                     target_num_MMOs_on_region_map = num_MMOs;
-                } catch(std::exception&){}
+                }catch (std::exception&){}
             }
         }
     }

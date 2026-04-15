@@ -24,8 +24,8 @@ std::string tostr(const PacketHeader* header);
 
 struct MessagePrinter{
     const char* message_name;
-    size_t min_length;
-    size_t max_length;
+    uint16_t min_length;
+    uint16_t max_length;
     std::function<bool(const MessageHeader*)> should_log;
     std::function<std::string(const MessageHeader*)> to_str;
 
@@ -40,8 +40,8 @@ public:
     void add_message(
         const char* message_name,
         uint8_t opcode,
-        size_t min_length,
-        size_t max_length,
+        uint16_t min_length,
+        uint16_t max_length,
         std::function<bool(const MessageHeader*)> should_log,
         std::function<std::string(const MessageHeader*)> to_str
     );
@@ -62,6 +62,24 @@ public:
         );
     }
     template <typename MessageType>
+    void add_message(
+        const char* message_name,
+        uint8_t opcode,
+        bool(*should_print)(const MessageType*),
+        std::string(*tostr)(const MessageType*)
+    ){
+        add_message(
+            message_name, opcode,
+            sizeof(MessageType), sizeof(MessageType),
+            [=](const MessageHeader* header){
+                return should_print((const MessageType*)header);
+            },
+            [=](const MessageHeader* header){
+                return tostr((const MessageType*)header);
+            }
+        );
+    }
+    template <typename MessageType>
     void add_message_min_length(
         const char* message_name,
         uint8_t opcode,
@@ -72,6 +90,24 @@ public:
             message_name, opcode,
             sizeof(MessageType), (uint16_t)-1,
             [=](const MessageHeader*){ return always_print; },
+            [=](const MessageHeader* header){
+                return tostr((const MessageType*)header);
+            }
+        );
+    }
+    template <typename MessageType>
+    void add_message_min_length(
+        const char* message_name,
+        uint8_t opcode,
+        bool(*should_print)(const MessageType*),
+        std::string(*tostr)(const MessageType*)
+    ){
+        add_message(
+            message_name, opcode,
+            sizeof(MessageType), (uint16_t)-1,
+            [=](const MessageHeader* header){
+                return should_print((const MessageType*)header);
+            },
             [=](const MessageHeader* header){
                 return tostr((const MessageType*)header);
             }

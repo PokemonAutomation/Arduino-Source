@@ -31,7 +31,7 @@ PABotBase2_WiredController::PABotBase2_WiredController(
     using namespace PABotBase2;
 
     //  Add controller-specific messages.
-    connection.device().message_logger().add_message<pabb2_Message_Command_NS_WiredController_State>(
+    connection.message_logger().add_message<pabb2_Message_Command_NS_WiredController_State>(
         "PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE",
         PABB2_MESSAGE_CMD_NS_WIRED_CONTROLLER_STATE,
         false,

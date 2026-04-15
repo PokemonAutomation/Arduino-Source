@@ -20,6 +20,9 @@ public:
     PABotBase2::DeviceHandle& device(){
         return *m_device;
     }
+    MessageLogger& message_logger(){
+        return m_device->message_logger();
+    }
 
     virtual void try_set_controller_type(
         ControllerType controller_type,

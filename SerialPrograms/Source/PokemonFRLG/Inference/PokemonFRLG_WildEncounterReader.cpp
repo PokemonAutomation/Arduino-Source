@@ -41,7 +41,7 @@ PokemonFRLG_WildEncounter WildEncounterReader::read_encounter(
     const ImageViewRGB32& frame, 
     std::set<std::string>& subset,
     double max_log10p
-) {
+){
     PokemonFRLG_WildEncounter encounter; 
     ImageViewRGB32 game_screen =
             extract_box_reference(frame, GameSettings::instance().GAME_BOX);
@@ -57,7 +57,7 @@ PokemonFRLG_WildEncounter WildEncounterReader::read_encounter(
             logger, language, extract_box_reference(game_screen, m_box_name),
             name_text_color_ranges,
             0.01, 0.50, max_log10p);
-    if (!name_result.results.empty()) {
+    if (!name_result.results.empty()){
         encounter.name = name_result.results.begin()->second.token;
     }
     return encounter;

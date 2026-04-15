@@ -280,7 +280,7 @@ void export_image_annotations_to_yolo_dataset(
                 os << label_id << " " << center_x << " " << center_y << " " << width << " " << height;
                 label_file_lines.push_back(os.str());
             }
-        } catch(JsonParseException& ){
+        }catch (JsonParseException& ){
             QMessageBox box;
             box.warning(nullptr, "Wrong JSON content",
                 QString::fromStdString("Wong JSON content in annotation file " + anno_file.string() + "."));

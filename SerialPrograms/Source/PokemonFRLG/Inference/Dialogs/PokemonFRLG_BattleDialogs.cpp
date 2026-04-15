@@ -214,7 +214,7 @@ bool BattleOutOfPpDetector::detect(const ImageViewRGB32& screen){
     const bool replace_color_within_range = false;
     const ImageRGB32 red_region = filter_rgb32_range(
         region,
-        combine_rgb(150, 0, 0), combine_rgb(255, 150, 150), Color(0), replace_color_within_range
+        combine_rgb(180, 0, 0), combine_rgb(255, 120, 120), Color(0), replace_color_within_range
     );
     const size_t num_red_pixels = image_stats(red_region).count;
     const double threshold = region.width() * region.height() * m_area_ratio_threshold;

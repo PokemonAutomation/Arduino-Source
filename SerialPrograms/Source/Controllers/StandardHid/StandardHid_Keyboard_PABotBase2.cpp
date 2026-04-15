@@ -26,7 +26,7 @@ PABotBase2_Keyboard::PABotBase2_Keyboard(
     using namespace PABotBase2;
 
     //  Add controller-specific messages.
-    connection.device().message_logger().add_message<pabb2_Message_Command_HID_Keyboard_State>(
+    connection.message_logger().add_message<pabb2_Message_Command_HID_Keyboard_State>(
         "PABB2_MESSAGE_CMD_HID_KEYBOARD_STATE",
         PABB2_MESSAGE_CMD_HID_KEYBOARD_STATE,
         false,

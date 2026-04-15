@@ -111,7 +111,7 @@ Program Logic
 void ShinyHuntFishing::program(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context
-) {
+){
     auto& stats =
         env.current_stats<ShinyHuntFishing_Descriptor::Stats>();
 
@@ -169,7 +169,7 @@ void ShinyHuntFishing::program(
     Main Fishing Loop
     ===========================================================================
     */
-    while (true) {
+    while (true){
         /*
         Cast fishing rod.
         Rod must be registered to SELECT.
@@ -199,15 +199,15 @@ void ShinyHuntFishing::program(
         Advance dialog text as quickly as possible.
         Prevents missing encounter trigger window.
         */
-        if (ret == 0) {
+        if (ret == 0){
             env.log("Advance dialog detected (red arrow).");
             pbf_mash_button(context, BUTTON_B, 800ms);
-        } else if (ret == 1) {
+        } else if (ret == 1){
             env.log("White dialog detected.");
             pbf_mash_button(context, BUTTON_B, 800ms);
-        } else if (ret == 2) {
+        } else if (ret == 2){
             env.log("Battle transition detected.");
-        } else {
+        }else{
             env.log("No bite detected.");
             continue;
         }
@@ -242,7 +242,7 @@ void ShinyHuntFishing::program(
             std::chrono::seconds(8);
         bool dialog_seen = false;
         WallClock dialog_start;
-        if (ret == 0 || ret == 1) {
+        if (ret == 0 || ret == 1){
             dialog_seen = true;
             dialog_start = current_time();
         }
@@ -250,7 +250,7 @@ void ShinyHuntFishing::program(
             dialog_seen &&
             current_time() - dialog_start >
             DIALOG_FAILSAFE_TIMEOUT
-        ) {
+        ){
             env.log("Dialog persisted too long. "
                 "Triggering fail-safe."
             );
@@ -270,7 +270,7 @@ void ShinyHuntFishing::program(
                 );
 
             /*Count error only if fail-safe did not recover battle.*/
-            if (battle_ret < 0) {
+            if (battle_ret < 0){
                 env.log("Fail-safe recovery failed.");
                 stats.errors++;
                 env.update_stats();
@@ -283,16 +283,16 @@ void ShinyHuntFishing::program(
         Adjust timing upward to improve bite sync.
         -----------------------------------------------------------------------
         */
-        if (battle_ret < 0) {
+        if (battle_ret < 0){
             failed_attempts++;
 
             /*
             Increase delay gradually.
             Prevents over-adjusting due to random variance.
             */
-            if (failed_attempts >= 3) {
+            if (failed_attempts >= 3){
                 bite_wait_ms += adjustment_step;
-                if (bite_wait_ms > max_wait) {
+                if (bite_wait_ms > max_wait){
                     bite_wait_ms = max_wait;
                 }
                 BITE_WAIT_MS.set(bite_wait_ms);
@@ -314,7 +314,7 @@ void ShinyHuntFishing::program(
         Slightly reduce delay to improve efficiency.
         */
         bite_wait_ms -= adjustment_step;
-        if (bite_wait_ms < min_wait) {
+        if (bite_wait_ms < min_wait){
             bite_wait_ms = min_wait;
         }
         BITE_WAIT_MS.set(bite_wait_ms);
@@ -330,7 +330,7 @@ void ShinyHuntFishing::program(
         Shiny detected
         -----------------------------------------------------------------------
         */
-        if (shiny) {
+        if (shiny){
             stats.shinies++;
             env.update_stats();
             send_program_notification(
@@ -356,7 +356,7 @@ void ShinyHuntFishing::program(
     }
 
     /*Return to HOME menu after shiny found.*/
-    if (GO_HOME_WHEN_DONE) {
+    if (GO_HOME_WHEN_DONE){
         pbf_press_button(
             context,
             BUTTON_HOME,

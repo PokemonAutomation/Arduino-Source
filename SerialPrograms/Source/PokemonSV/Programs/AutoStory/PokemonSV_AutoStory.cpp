@@ -1034,13 +1034,13 @@ void AutoStory::test_checkpoints(
         if (checkpoint >= start_loop && checkpoint <= end_loop){
             for (int i = 0; i < loop; i++){
                 if (i > 0){
-                    try {
+                    try{
                         reset_game(env.program_info(), env.console, context);
                         enter_menu_from_overworld(env.program_info(), env.console, context, -1, MenuSide::NONE, has_minimap);
                         // we wait 5 seconds then save, so that the initial conditions are slightly different on each reset.
                         env.log("Wait 5 seconds.");
                         context.wait_for(Milliseconds(5 * 1000));
-                    }catch(...){
+                    }catch (...){
                         // try one more time
                         reset_game(env.program_info(), env.console, context);
                         enter_menu_from_overworld(env.program_info(), env.console, context, -1, MenuSide::NONE, has_minimap);

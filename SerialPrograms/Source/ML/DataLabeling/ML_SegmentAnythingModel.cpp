@@ -208,7 +208,7 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
     std::unique_ptr<SAMEmbedderSession> embedding_session;
     try{
         embedding_session = make_unique<SAMEmbedderSession>(embedding_model_path, use_gpu);
-    } catch(MLModelSessionCreationError& e){
+    }catch (MLModelSessionCreationError& e){
         QMessageBox box;
         box.warning(nullptr, "Unable To Create Model Session",
             QString::fromStdString(e.message() + ". Try using CPU?"));
@@ -257,7 +257,7 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
                 // throw Ort::Exception("Testing.", ORT_FAIL);  // to simulate GPU/CPU failure
                 embedding_session->run(resized_mat, output_image_embedding);
                 break;
-            }catch(Ort::Exception& e){
+            }catch (Ort::Exception& e){
                 if (use_gpu){
                     std::cerr << "Warning: Embedding session failed using the GPU. Will reattempt with the CPU.\n" << e.what() << std::endl;
                     use_gpu = false;
@@ -269,7 +269,7 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
                         QString::fromStdString("Error: Embedding session failed."));
                     return;
                 }
-            }catch(...){
+            }catch (...){
                 std::cerr << "Error: Unknown error. Embedding session failed." << std::endl;
                 QMessageBox box;
                 box.warning(nullptr, "Error:",

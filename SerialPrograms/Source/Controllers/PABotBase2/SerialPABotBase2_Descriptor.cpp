@@ -39,15 +39,10 @@ bool SerialPABotBase2_Descriptor::operator==(const ControllerDescriptor& x) cons
 
 
 std::string SerialPABotBase2_Descriptor::display_name() const{
-#if 0
-    QSerialPortInfo info(QString::fromStdString(m_name));
-    if (info.isNull()){
-        return m_name;
+    if (m_name.empty()){
+        return "(none)";
     }
-    return m_name + " - " + info.manufacturer().toStdString();
-#else
     return m_name;
-#endif
 }
 void SerialPABotBase2_Descriptor::load_json(const JsonValue& json){
     const std::string* name = json.to_string();
@@ -64,6 +59,9 @@ std::unique_ptr<ControllerConnection> SerialPABotBase2_Descriptor::open_connecti
     Logger& logger,
     bool set_to_null_controller
 ) const{
+    if (m_name.empty()){
+        return nullptr;
+    }
     return std::unique_ptr<ControllerConnection>(
         new SerialPABotBase2_Connection(logger, m_name, set_to_null_controller)
     );

@@ -45,6 +45,18 @@ DeviceHandle::~DeviceHandle(){
 }
 
 
+void DeviceHandle::add_message_handler(
+    uint8_t opcode,
+    std::function<void(const MessageHeader*)> handler
+){
+    auto ret = m_message_handlers.emplace(opcode, std::move(handler));
+    if (!ret.second){
+        throw InternalProgramError(
+            &m_logger, PA_CURRENT_FUNCTION,
+            "Duplicate Message Opcode: 0x" + tostr_hex(opcode)
+        );
+    }
+}
 bool DeviceHandle::cancel(std::exception_ptr exception) noexcept{
     if (CancellableScope::cancel(std::move(exception))){
         return true;
@@ -67,7 +79,7 @@ void DeviceHandle::throw_incompatible_protocol(){
     throw SerialProtocolException(
         m_logger, PA_CURRENT_FUNCTION,
         "Incompatible MLC protocol. Device: " + std::to_string(m_device_protocol) + "<br>"
-        "Please flash your microcontroller (e.g. ESP32, Pico W, Arduino) <br>"
+        "Please flash your microcontroller (e.g. ESP32, Pico W...) <br>"
         "with the .bin/.uf2/.hex that came with this version of the program.<br>" +
         make_text_url(ONLINE_DOC_URL_BASE + "SetupGuide/Reflash.html", "See documentation for more details.")
     );
@@ -206,7 +218,7 @@ uint8_t DeviceHandle::send_request(MessageHeader& request){
     m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
 
     try{
-        m_connection.reliable_send(&request, request.message_bytes);
+        m_connection.reliable_send_blocking(&request, request.message_bytes);
     }catch (...){
         m_pending_requests.erase(request.id);
         m_request_seqnum--;
@@ -241,7 +253,7 @@ std::optional<uint8_t> DeviceHandle::try_send_request(MessageHeader& request, Wa
     m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
 
     try{
-        m_connection.reliable_send(&request, request.message_bytes, timeout);
+        m_connection.reliable_send_blocking(&request, request.message_bytes, timeout);
     }catch (...){
         m_pending_requests.erase(request.id);
         m_request_seqnum--;
@@ -250,9 +262,12 @@ std::optional<uint8_t> DeviceHandle::try_send_request(MessageHeader& request, Wa
 
     return request.id;
 }
-std::string DeviceHandle::wait_for_request_response(uint8_t id){
+std::string DeviceHandle::wait_for_request_response(uint8_t id, WallDuration timeout){
+    WallClock deadline = timeout == WallDuration::max()
+        ? WallClock::max()
+        : current_time() + timeout;
     std::unique_lock<Mutex> lg(m_lock);
-    while (true){
+    while (current_time() < deadline){
         throw_if_cancelled();
 
         //  Request doesn't exist.
@@ -266,7 +281,7 @@ std::string DeviceHandle::wait_for_request_response(uint8_t id){
         }
 
         if (iter->second.empty()){
-            m_cv.wait(lg);
+            m_cv.wait_until(lg, deadline);
             continue;
         }
 
@@ -274,6 +289,7 @@ std::string DeviceHandle::wait_for_request_response(uint8_t id){
         m_pending_requests.erase(iter);
         return str;
     }
+    return "";
 }
 
 uint32_t DeviceHandle::query_u32(uint8_t opcode){
@@ -381,9 +397,11 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
             return;
         }
 
-        MessageHandler& handler = *iter->second;
-        handler.assert_is_valid(m_logger, header);
-        handler.on_recv(m_logger, header);
+//        MessageHandler& handler = *iter->second;
+//        handler.assert_is_valid(m_logger, header);
+//        handler.on_recv(m_logger, header);
+
+        iter->second(header);
     }
 
 

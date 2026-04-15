@@ -132,6 +132,8 @@ void PacketParser::push_bytes(
     PacketRunner& packet_runner,
     const uint8_t* data, size_t bytes
 ){
+//    cout << std::string((const char*)data, bytes) << endl;
+
 //    cout << "pabb2_PacketParser_push_bytes(): " << bytes << endl;
 
 //    cout << "push_bytes(): ";

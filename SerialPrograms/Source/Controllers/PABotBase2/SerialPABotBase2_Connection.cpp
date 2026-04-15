@@ -139,7 +139,7 @@ bool SerialPABotBase2_Connection::open_serial_connection(){
     if (!m_stream_connection->remote_protocol_is_compatible()){
         std::string str =
             "Incompatible RSC protocol. Device: " + std::to_string(m_stream_connection->remote_protocol()) + "<br>"
-            "Please flash your microcontroller (e.g. ESP32, Pico W, Arduino) <br>"
+            "Please flash your microcontroller (e.g. ESP32, Pico W...) <br>"
             "with the .bin/.uf2/.hex that came with this version of the program.<br>" +
             make_text_url(ONLINE_DOC_URL_BASE + "SetupGuide/Reflash.html", "See documentation for more details.");
         set_status_line0(str, COLOR_RED);
