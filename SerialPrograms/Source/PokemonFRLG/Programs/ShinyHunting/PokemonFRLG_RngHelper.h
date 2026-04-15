@@ -102,8 +102,9 @@ private:
     void reset_and_detect_copyright_text(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     bool check_for_shiny(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
-    EnumDropdownOption<Target> TARGET;
+    SimpleIntegerOption<uint8_t> PROFILE;
 
+    EnumDropdownOption<Target> TARGET;
     SimpleIntegerOption<uint64_t> NUM_RESETS;
 
     EnumDropdownOption<SeedButton> SEED_BUTTON;
