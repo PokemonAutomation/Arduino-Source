@@ -361,7 +361,7 @@ bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProContr
 }
 
 bool LuckyEggFarmer::check_for_lucky_egg(ConsoleHandle& console, ProControllerContext& context, bool returned_to_building) {
-	if (returned_to_building) {
+    if (returned_to_building) {
         open_party_menu_from_overworld(console, context, StartMenuContext::STANDARD);
     } 
     else {
@@ -476,7 +476,7 @@ void LuckyEggFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
             WhiteDialogDetector dialog(COLOR_RED);
             bool in_safari_zone_building = dialog.detect(env.console.video().snapshot());
             
-			if (balls_left <= 0) {
+            if (balls_left <= 0) {
                 in_safari_zone_building = true;
             }
 
