@@ -73,9 +73,6 @@ LuckyEggFarmer::LuckyEggFarmer()
             Language::French,
             Language::German,
             Language::Italian,
-            Language::Korean,
-            Language::ChineseSimplified,
-            Language::ChineseTraditional,
         },
         LockMode::LOCK_WHILE_RUNNING,
         true
