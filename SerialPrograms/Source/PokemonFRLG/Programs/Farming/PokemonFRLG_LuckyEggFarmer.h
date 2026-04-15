@@ -43,7 +43,7 @@ private:
     bool is_chansey(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     bool find_encounter(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     bool attempt_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int& balls_left);
-    bool check_for_lucky_egg(ConsoleHandle& console, ProControllerContext& context);
+    bool check_for_lucky_egg(ConsoleHandle& console, ProControllerContext& context, bool returned_to_building);
 
     OCR::LanguageOCROption LANGUAGE;
 

@@ -360,8 +360,14 @@ bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProContr
     }
 }
 
-bool LuckyEggFarmer::check_for_lucky_egg(ConsoleHandle& console, ProControllerContext& context) {
-    open_party_menu_from_overworld(console, context, StartMenuContext::SAFARI_ZONE);
+bool LuckyEggFarmer::check_for_lucky_egg(ConsoleHandle& console, ProControllerContext& context, bool returned_to_building) {
+    if (returned_to_building) {
+        open_party_menu_from_overworld(console, context, StartMenuContext::STANDARD);
+    } 
+    else {
+        open_party_menu_from_overworld(console, context, StartMenuContext::SAFARI_ZONE);
+    }
+
     PartyHeldItemDetector held_item_detector(COLOR_RED, &console.overlay(), ImageFloatBox(0.432, 0.3, 0.030, 0.485));
     if (held_item_detector.detect(console.video().snapshot())) {
         return true;
@@ -469,6 +475,10 @@ void LuckyEggFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
             WhiteDialogDetector dialog(COLOR_RED);
             bool in_safari_zone_building = dialog.detect(env.console.video().snapshot());
+            
+            if (balls_left <= 0) {
+                in_safari_zone_building = true;
+            }
 
             if (in_safari_zone_building && !caught) {
                 break;
@@ -480,7 +490,7 @@ void LuckyEggFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
             }
 
             if (caught) {
-                if (check_for_lucky_egg(env.console, context)) {
+                if (check_for_lucky_egg(env.console, context, in_safari_zone_building)) {
                     env.log("Lucky Egg found!");
                     stats.eggs++;
                     env.update_stats();
