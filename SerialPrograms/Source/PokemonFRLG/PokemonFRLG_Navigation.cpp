@@ -464,11 +464,11 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
     if (ret3 == 0){
         console.log("Successfully fled the battle.");
     }else{
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "flee_battle(): Unable to flee from battle.",
-            console
-        );
+        console.log("flee_battle(): failed to detect transition to overworld. Attempting to open start menu to verify successful flee..");
+        
+        open_start_menu(console, context);
+        close_start_menu(console, context);
+        context.wait_for_all_requests();
     }
 }
 
