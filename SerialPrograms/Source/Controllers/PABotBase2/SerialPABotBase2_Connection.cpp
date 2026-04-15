@@ -119,12 +119,15 @@ bool SerialPABotBase2_Connection::connect_to_device(){
         115200,
     };
     std::string str;
-    for (size_t c = 0; c < sizeof(BAUD_RATES) / sizeof(uint32_t); c++){
-        uint32_t baud_rate = BAUD_RATES[c];
-        m_logger.log("Trying baud " + tostr_u_commas(baud_rate) + "...");
-        m_unreliable_connection->set_baud_rate(baud_rate);
-        if (m_stream_connection->reset(std::chrono::milliseconds(100))){
-            return true;
+    WallClock start = current_time();
+    while (current_time() - start < std::chrono::seconds(5)){
+        for (size_t c = 0; c < sizeof(BAUD_RATES) / sizeof(uint32_t); c++){
+            uint32_t baud_rate = BAUD_RATES[c];
+            m_logger.log("Trying baud " + tostr_u_commas(baud_rate) + "...");
+            m_unreliable_connection->set_baud_rate(baud_rate);
+            if (m_stream_connection->reset(std::chrono::milliseconds(100))){
+                return true;
+            }
         }
     }
     str =

@@ -337,6 +337,11 @@ std::string DeviceHandle::query_data(uint8_t opcode){
 
 void DeviceHandle::on_recv(const void* data, size_t bytes){
 //    cout << "DeviceHandle::on_recv()" << endl;
+
+    if (m_stream_corrupted){
+        return;
+    }
+
     m_buffer.insert(m_buffer.end(), (const char*)data, (const char*)data + bytes);
 
     while (true){
@@ -348,6 +353,11 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
         //  Message is incomplete.
         uint16_t message_size;
         std::copy(m_buffer.begin(), m_buffer.begin() + 2, (char*)&message_size);
+        if (message_size < sizeof(MessageHeader)){
+            m_logger.log("[MLC]: Corrupted Stream: Message Length =" + std::to_string(message_size), COLOR_RED);
+            m_stream_corrupted = true;
+            return;
+        }
         if (m_buffer.size() < message_size){
             return;
         }

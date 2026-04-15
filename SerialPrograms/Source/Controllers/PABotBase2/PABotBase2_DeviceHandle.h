@@ -136,6 +136,7 @@ private:
 //    std::atomic<ControllerType> m_controller_type;
 
     uint8_t m_request_seqnum = 0;
+    bool m_stream_corrupted = false;
 
     Mutex m_lock;
     ConditionVariable m_cv;
