@@ -47,7 +47,7 @@ public:
     }
     virtual bool cancel(std::exception_ptr exception) noexcept override;
 
-    void reset();
+    bool reset(WallDuration timeout = WallDuration::max());
 
     bool remote_protocol_is_compatible() const{
         return m_remote_protocol_compatible;
@@ -60,7 +60,7 @@ public:
     }
 
     size_t pending() const;
-    void wait_for_pending();
+    bool wait_for_pending(WallDuration timeout = WallDuration::max());
 
 
 public:
