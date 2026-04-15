@@ -475,6 +475,10 @@ void LuckyEggFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
             WhiteDialogDetector dialog(COLOR_RED);
             bool in_safari_zone_building = dialog.detect(env.console.video().snapshot());
+            
+			if (balls_left <= 0) {
+                in_safari_zone_building = true;
+            }
 
             if (in_safari_zone_building && !caught) {
                 break;
