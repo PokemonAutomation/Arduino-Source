@@ -258,7 +258,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
             env, env.console,
             stats.shinies,
             error_coefficient
-            );
+        );
     });
 
     run_until<ProControllerContext>(
@@ -346,7 +346,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
             }
         },
         {shiny_detector}
-        );
+    );
 
     //  Shiny sound detected and user requested stopping the program when
     //  detected shiny sound.
