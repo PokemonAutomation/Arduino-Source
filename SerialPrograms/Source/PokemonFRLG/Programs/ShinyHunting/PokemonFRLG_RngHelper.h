@@ -75,9 +75,30 @@ private:
     void wait_with_teachy_tv(ProControllerContext& context, const uint64_t& TEACHY_DELAY);
 
 
-    void check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED_SEED_OFFSET, const uint64_t& CONTINUE_SCREEN_DELAY, const uint64_t& INGAME_DELAY, bool SAFARI_ZONE);
-    void perform_blind_sequence(ProControllerContext& context, int64_t FIXED_SEED_OFFSET, const uint64_t& CONTINUE_SCREEN_DELAY, const uint64_t& TEACHY_DELAY, const uint64_t& INGAME_DELAY, bool SAFARI_ZONE);
-    void reset_and_perform_blind_sequence(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int64_t FIXED_SEED_OFFSET, const uint64_t& CONTINUE_SCREEN_DELAY, const uint64_t& TEACHY_DELAY, const uint64_t& INGAME_DELAY, bool SAFARI_ZONE);
+    void check_timings(
+        SingleSwitchProgramEnvironment& env, 
+        int64_t FIXED_SEED_OFFSET, 
+        const uint64_t& CONTINUE_SCREEN_DELAY, 
+        const uint64_t& INGAME_DELAY, 
+        bool SAFARI_ZONE
+    );
+    void perform_blind_sequence(
+        ProControllerContext& context, 
+        int64_t FIXED_SEED_OFFSET, 
+        const uint64_t& CONTINUE_SCREEN_DELAY, 
+        const uint64_t& TEACHY_DELAY, 
+        const uint64_t& INGAME_DELAY, 
+        bool SAFARI_ZONE
+    );
+    void reset_and_perform_blind_sequence(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context, 
+        int64_t FIXED_SEED_OFFSET, 
+        const uint64_t& CONTINUE_SCREEN_DELAY, 
+        const uint64_t& TEACHY_DELAY, 
+        const uint64_t& INGAME_DELAY, 
+        bool SAFARI_ZONE
+    );
     void reset_and_detect_copyright_text(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     bool check_for_shiny(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
