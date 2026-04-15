@@ -101,6 +101,16 @@ RngHelper::RngHelper()
         LockMode::UNLOCK_WHILE_RUNNING,
         1, 0 // default, min
     )
+    , SEED_BUTTON(
+        "<b>Seed Button:</b><br>",
+        {
+            {SeedButton::A, "A", "A"},
+            {SeedButton::Start, "Start", "Start"},
+            {SeedButton::L, "L", "L (L=A)"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        SeedButton::A
+    )
     , SEED_DELAY(
         "<b>Seed Delay Time (ms):</b><br>The delay between starting the game and advancing past the title screen. Set this to match your target seed.",
         LockMode::LOCK_WHILE_RUNNING,
@@ -111,13 +121,14 @@ RngHelper::RngHelper()
         LockMode::UNLOCK_WHILE_RUNNING,
         0  // default
     )
-    , LOAD_ADVANCES(
-        "<b>Load Screen Advances (frames):</b><br>The number of frames to advance before loading the game.<br>These pass at the \"normal\" rate compared to other consoles.",
+    , CONTINUE_SCREEN_ADVANCES(
+        "<b>Continue Screen Advances (frames):</b><br>The number of frames to advance before loading the game.<br>These pass at the \"normal\" rate compared to other consoles.",
         LockMode::LOCK_WHILE_RUNNING,
         1000, 192 // default, min
     )
-    , LOAD_CALIBRATION(
-        "<b>Load Screen Advances Calibration (frames):</b><br>A \"fine adjustment\" that modifies the frame advances passed on the load screen.<br>",
+    , CONTINUE_SCREEN_CALIBRATION(
+        "<b>Continue Screen Advances Calibration (frames):</b><br>A \"fine adjustment\" that modifies the frame advances passed on the Continue Screen.<br>"
+        "Example: if your target advance was 10000 and you hit 10025, you can decrease your calibration value by 25.",
         LockMode::UNLOCK_WHILE_RUNNING,
         0 // default
     )
@@ -127,7 +138,8 @@ RngHelper::RngHelper()
         12345, 480 // default, min
     )
     , INGAME_CALIBRATION(
-        "<b>In-Game Advances Calibration (frames):</b><br>A \"coarse adjustment\" that modifies the frame advances passed after loading the game.<br>",
+        "<b>In-Game Advances Calibration (frames):</b><br>A \"coarse adjustment\" that modifies the frame advances passed after loading the game.<br>"
+        "Example: if your target advance was 10000 and you hit 8500, you can increase your calibration value by 1500.",
         LockMode::UNLOCK_WHILE_RUNNING,
         0 // default
     )
@@ -161,10 +173,11 @@ RngHelper::RngHelper()
 {
     PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(NUM_RESETS);
+    PA_ADD_OPTION(SEED_BUTTON);
     PA_ADD_OPTION(SEED_DELAY);
     PA_ADD_OPTION(SEED_CALIBRATION);
-    PA_ADD_OPTION(LOAD_ADVANCES);
-    PA_ADD_OPTION(LOAD_CALIBRATION);
+    PA_ADD_OPTION(CONTINUE_SCREEN_ADVANCES);
+    PA_ADD_OPTION(CONTINUE_SCREEN_CALIBRATION);
     PA_ADD_OPTION(INGAME_ADVANCES);
     PA_ADD_OPTION(INGAME_CALIBRATION);
     PA_ADD_OPTION(USE_COPYRIGHT_TEXT);
@@ -175,40 +188,6 @@ RngHelper::RngHelper()
 }
 
 namespace{
-
-void set_seed_after_delay(ProControllerContext& context, SimpleIntegerOption<uint64_t>& SEED_DELAY,  SimpleIntegerOption<int64_t>& SEED_CALIBRATION, int64_t& FIXED_SEED_OFFSET){
-    // wait on title screen for the specified delay
-    pbf_wait(context, std::chrono::milliseconds(SEED_DELAY + SEED_CALIBRATION + FIXED_SEED_OFFSET));
-    // hold A for a few seconds through the transition to the load screen
-    pbf_press_button(context, BUTTON_A, 3000ms, 0ms);
-}
-
-void load_game_after_delay(ProControllerContext& context, const uint64_t& LOAD_DELAY){
-    pbf_wait(context, std::chrono::milliseconds(LOAD_DELAY - 3000));
-    pbf_press_button(context, BUTTON_A, 33ms, 1467ms);
-    // skip recap
-    pbf_press_button(context, BUTTON_B, 33ms, 2467ms);
-    // need to later subtract 4000ms from delay to hit desired number of advances
-}
-
-void wait_with_teachy_tv(ProControllerContext& context, const uint64_t& TEACHY_DELAY){
-    // open start menu -> bag -> key items -> Teachy TV -> use
-    pbf_press_button(context, BUTTON_PLUS, 200ms, 300ms);
-    pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
-    pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
-    pbf_move_left_joystick(context, {+1, 0}, 200ms, 2300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(TEACHY_DELAY));
-    // close teachy tv -> close bag -> reset start menu cursor position - > close start menu
-    pbf_press_button(context, BUTTON_B, 200ms, 2300ms);
-    pbf_press_button(context, BUTTON_B, 200ms, 2300ms);
-    pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
-    pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
-    pbf_press_button(context, BUTTON_B, 200ms, 300ms);
-    // total non-teachy delay duration: 13700ms
-    // if used in the Safari Zone: 14200ms
-}
 
 void collect_starter_after_delay(ProControllerContext& context, const uint64_t& INGAME_DELAY){
     // Advance through starter dialogue and wait on "really quite energetic!"
@@ -560,11 +539,62 @@ void walk_to_safarizonewest(ProControllerContext& context){
 
 } // namespace
 
-void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED_SEED_OFFSET, const uint64_t& LOAD_DELAY, const uint64_t& INGAME_DELAY, bool SAFARI_ZONE){
-    if (LOAD_DELAY < 3200){
+
+void RngHelper::set_seed_after_delay(ProControllerContext& context, int64_t& FIXED_SEED_OFFSET){
+    // wait on title screen for the specified delay
+    pbf_wait(context, std::chrono::milliseconds(SEED_DELAY + SEED_CALIBRATION + FIXED_SEED_OFFSET));
+    // hold the specified button for a few seconds through the transition to the Continue Screen
+    Button button;
+    switch (SEED_BUTTON){
+    case SeedButton::A:
+        button = BUTTON_A;
+        break;
+    case SeedButton::Start:
+        button = BUTTON_PLUS;
+        break;
+    case SeedButton::L:
+        button = BUTTON_L;
+        break;
+    default:
+        button = BUTTON_A;
+        break;
+    }
+    BUTTON_A;
+    pbf_press_button(context, button, 3000ms, 0ms);
+}
+
+void RngHelper::load_game_after_delay(ProControllerContext& context, const uint64_t& CONTINUE_SCREEN_DELAY){
+    pbf_wait(context, std::chrono::milliseconds(CONTINUE_SCREEN_DELAY - 3000));
+    pbf_press_button(context, BUTTON_A, 33ms, 1467ms);
+    // skip recap
+    pbf_press_button(context, BUTTON_B, 33ms, 2467ms);
+    // need to later subtract 4000ms from delay to hit desired number of advances
+}
+
+void RngHelper::wait_with_teachy_tv(ProControllerContext& context, const uint64_t& TEACHY_DELAY){
+    // open start menu -> bag -> key items -> Teachy TV -> use
+    pbf_press_button(context, BUTTON_PLUS, 200ms, 300ms);
+    pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
+    pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
+    pbf_move_left_joystick(context, {+1, 0}, 200ms, 2300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(TEACHY_DELAY));
+    // close teachy tv -> close bag -> reset start menu cursor position - > close start menu
+    pbf_press_button(context, BUTTON_B, 200ms, 2300ms);
+    pbf_press_button(context, BUTTON_B, 200ms, 2300ms);
+    pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+    pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+    pbf_press_button(context, BUTTON_B, 200ms, 300ms);
+    // total non-teachy delay duration: 13700ms
+    // if used in the Safari Zone: 14200ms
+}
+
+void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED_SEED_OFFSET, const uint64_t& CONTINUE_SCREEN_DELAY, const uint64_t& INGAME_DELAY, bool SAFARI_ZONE){
+    if (CONTINUE_SCREEN_DELAY < 3200){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "The load screen delay cannot be less than 3200ms (192 frames). Check your load screen calibration.",
+            "The Continue Screen delay cannot be less than 3200ms (192 frames). Check your Continue Screen calibration.",
             env.console
         );
     }
@@ -785,10 +815,10 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
     }
 }
 
-void RngHelper::perform_blind_sequence(ProControllerContext& context, int64_t FIXED_SEED_OFFSET, const uint64_t& LOAD_DELAY, const uint64_t& TEACHY_DELAY, const uint64_t& INGAME_DELAY, bool SAFARI_ZONE){
+void RngHelper::perform_blind_sequence(ProControllerContext& context, int64_t FIXED_SEED_OFFSET, const uint64_t& CONTINUE_SCREEN_DELAY, const uint64_t& TEACHY_DELAY, const uint64_t& INGAME_DELAY, bool SAFARI_ZONE){
     pbf_press_button(context, BUTTON_A, 80ms, 0ms); // start the game from the Home screen
-    set_seed_after_delay(context, SEED_DELAY, SEED_CALIBRATION, FIXED_SEED_OFFSET);
-    load_game_after_delay(context, LOAD_DELAY);
+    set_seed_after_delay(context, FIXED_SEED_OFFSET);
+    load_game_after_delay(context, CONTINUE_SCREEN_DELAY);
     if (TEACHY_DELAY > 0){
         wait_with_teachy_tv(context, TEACHY_DELAY);
     }
@@ -884,7 +914,7 @@ void RngHelper::perform_blind_sequence(ProControllerContext& context, int64_t FI
     }
 }
 
-void RngHelper::reset_and_perform_blind_sequence(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int64_t FIXED_SEED_OFFSET, const uint64_t& LOAD_DELAY, const uint64_t& TEACHY_DELAY, const uint64_t& INGAME_DELAY, bool SAFARI_ZONE){
+void RngHelper::reset_and_perform_blind_sequence(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int64_t FIXED_SEED_OFFSET, const uint64_t& CONTINUE_SCREEN_DELAY, const uint64_t& TEACHY_DELAY, const uint64_t& INGAME_DELAY, bool SAFARI_ZONE){
     go_home(env.console, context);
     close_game_from_home(env.console, context);
     start_game_from_home(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW, uint8_t(0), uint8_t(0)); // TODO: add option for user slot if needed
@@ -907,9 +937,9 @@ void RngHelper::reset_and_perform_blind_sequence(SingleSwitchProgramEnvironment&
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             env.console, context,
-            [this, FIXED_SEED_OFFSET, LOAD_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE](ProControllerContext& context) {
+            [this, FIXED_SEED_OFFSET, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE](ProControllerContext& context) {
                 pbf_press_button(context, BUTTON_A, 80ms, 0ms);
-                perform_blind_sequence(context, FIXED_SEED_OFFSET, LOAD_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE);
+                perform_blind_sequence(context, FIXED_SEED_OFFSET, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE);
             },
             { update_detector }
         );
@@ -1075,21 +1105,21 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             TEACHY_ADVANCES = uint64_t((int)std::floor((MODIFIED_INGAME_ADVANCES - TEACHY_TV_BUFFER) / 313) * 313);
         }
 
-        const uint64_t LOAD_DELAY = uint64_t((LOAD_ADVANCES + LOAD_CALIBRATION) * FRAME_DURATION);
+        const uint64_t CONTINUE_SCREEN_DELAY = uint64_t((CONTINUE_SCREEN_ADVANCES + CONTINUE_SCREEN_CALIBRATION) * FRAME_DURATION);
         const uint64_t TEACHY_DELAY = uint64_t(TEACHY_ADVANCES * FRAME_DURATION / 313);
         const uint64_t INGAME_DELAY = uint64_t((MODIFIED_INGAME_ADVANCES - TEACHY_ADVANCES) * FRAME_DURATION / 2) - (should_use_teachy_tv ? 13700 : 0);
-        env.log("Load screen delay: " + std::to_string(LOAD_DELAY) + "ms");
+        env.log("Continue Screen delay: " + std::to_string(CONTINUE_SCREEN_DELAY) + "ms");
         env.log("In-game delay: " + std::to_string(INGAME_DELAY) + "ms");
         env.log("Teachy TV delay: " + std::to_string(TEACHY_DELAY) + "ms");
-        env.log("Total time: " + std::to_string(SEED_DELAY + SEED_CALIBRATION + FIXED_SEED_OFFSET + LOAD_DELAY + INGAME_DELAY + TEACHY_DELAY) + "ms");
+        env.log("Total time: " + std::to_string(SEED_DELAY + SEED_CALIBRATION + FIXED_SEED_OFFSET + CONTINUE_SCREEN_DELAY + INGAME_DELAY + TEACHY_DELAY) + "ms");
 
 
         // handle the blind part
         if (USE_COPYRIGHT_TEXT){
             reset_and_detect_copyright_text(env, context);
-            perform_blind_sequence(context, FIXED_SEED_OFFSET, LOAD_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE);
+            perform_blind_sequence(context, FIXED_SEED_OFFSET, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE);
         }else{
-            reset_and_perform_blind_sequence(env, context, FIXED_SEED_OFFSET, LOAD_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE);
+            reset_and_perform_blind_sequence(env, context, FIXED_SEED_OFFSET, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE);
         }
         stats.resets++;
 
