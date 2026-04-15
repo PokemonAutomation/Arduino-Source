@@ -1,5 +1,5 @@
 #include "PokemonLZA_DayNightStateDetector.h"
-
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 
 namespace PokemonAutomation{
@@ -8,15 +8,11 @@ namespace PokemonLZA{
 
 DayNightStateDetector::DayNightStateDetector(VideoOverlay* overlay)
     :
-    m_box(0.10, 0.75, 0.32, 0.22),
+    m_box(0.02, 0.50, 0.08, 0.10),
     m_state(DayNightState::DAY)
 {
     if (overlay){
-        m_overlay.emplace(
-            *overlay,
-            m_box,
-            COLOR_YELLOW
-        );
+        m_overlay.emplace(*overlay, m_box, COLOR_YELLOW);
     }
 }
 
@@ -42,17 +38,21 @@ bool DayNightStateDetector::detect(const ImageViewRGB32& screen){
 
     bool night_color =
         r < 120 &&
-        b > 70 &&
-        luminance < 140;
+        b > 50 &&
+        luminance < 100;
 
+    bool day_color =
+        r > 100 && r < 180 &&
+        g > 140 &&
+        b > 160 &&
+        luminance > 140;
 
-    if (night_color){
+    if (night_color) {
         m_state = DayNightState::NIGHT;
     }
-    else{
+    else if (day_color) {
         m_state = DayNightState::DAY;
     }
-
     return true;
 }
 DayNightState DayNightStateDetector::state() const{

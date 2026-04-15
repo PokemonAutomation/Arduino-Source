@@ -20,6 +20,8 @@
 #include "PokemonLZA/Inference/PokemonLZA_WeatherDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
+#include "PokemonLZA/Programs/PokemonLZA_FastTravelNavigation.h"
+#include "PokemonLZA/Resources/PokemonLZA_Locations.h"
 #include "PokemonLZA_ShinyHunt_BenchSit.h"
 
 namespace PokemonAutomation{
@@ -34,14 +36,14 @@ using namespace Pokemon;
 
 ShinyHunt_BenchSit_Descriptor::ShinyHunt_BenchSit_Descriptor()
     : SingleSwitchProgramDescriptor(
-          "PokemonLZA:ShinyHunt-BenchSit",
-          STRING_POKEMON + " LZA", "Bench Sit",
-          "Programs/PokemonLZA/ShinyHunt-BenchSit.html",
-          "Shiny hunt by repeatedly sitting on a bench to reset spawns.",
-          ProgramControllerClass::StandardController_NoRestrictions,
-          FeedbackType::REQUIRED,
-          AllowCommandsWhenRunning::DISABLE_COMMANDS
-          )
+        "PokemonLZA:ShinyHunt-BenchSit",
+        STRING_POKEMON + " LZA", "Bench Sit",
+        "Programs/PokemonLZA/ShinyHunt-BenchSit.html",
+        "Shiny hunt by repeatedly sitting on a bench to reset spawns.",
+        ProgramControllerClass::StandardController_NoRestrictions,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
+    )
 {}
 class ShinyHunt_BenchSit_Descriptor::Stats : public StatsTracker{
 public:
@@ -72,35 +74,34 @@ std::unique_ptr<StatsTracker> ShinyHunt_BenchSit_Descriptor::make_stats() const{
 
 ShinyHunt_BenchSit::ShinyHunt_BenchSit()
     : WALK_DIRECTION(
-          "<b>Run Direction:</b><br>The direction of running after each day change to increase the spawn radius.",
-          {
-           {0, "forward", "Forward"},
-           {1, "left", "Turn Left"},
-           {2, "right", "Turn Right"},
-           },
-          LockMode::UNLOCK_WHILE_RUNNING,
-          0
-          )
+        "<b>Run Direction:</b><br>The direction of running after each day change to increase the spawn radius.",
+        {
+            {0, "forward", "Forward"},
+            {1, "left", "Turn Left"},
+            {2, "right", "Turn Right"},
+        },
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0
+    )
     , WALK_FORWARD_DURATION(
-          "<b>Run Forward Duration</b><br>"
-          "Run forward and backward for this long after each day change to "
-          "increase the spawn radius. Set to zero to disable this.",
-          LockMode::UNLOCK_WHILE_RUNNING,
-          "2000 ms"
-          )
+        "<b>Run Forward Duration</b><br>"
+        "Run forward and backward for this long after each day change to "
+        "increase the spawn radius. Set to zero to disable this.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        "2000 ms"
+    )
     , PERIODIC_SAVE(
-          "<b>Periodically Save:</b><br>"
-          "Save the game every this many bench sits. This reduces the loss to game crashes. Set to zero to disable. Saving will be unsuccessful if you are under attack",
-          LockMode::UNLOCK_WHILE_RUNNING,
-          100,
-          0
-          )
+        "<b>Periodically Save:</b><br>"
+        "Save the game every this many bench sits. This reduces the loss to game crashes. Set to zero to disable. Saving will be unsuccessful if you are under attack",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        100,
+        0
+    )
     , DAY_NIGHT_FILTER(
           "Run Forward Only During Day/Night:",
           LockMode::LOCK_WHILE_RUNNING,
           GroupOption::EnableMode::DEFAULT_DISABLED
           )
-
     , FILTER_MODE(
           "Time filter",
           {
@@ -110,13 +111,11 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
           LockMode::LOCK_WHILE_RUNNING,
           0
           )
-
     , WEATHER_FILTER(
           "Run Forward Only During Specific Weather:",
           LockMode::LOCK_WHILE_RUNNING,
           GroupOption::EnableMode::DEFAULT_DISABLED
           )
-
     , WEATHER_FILTER_MODE(
           "Weather filter",
           {
@@ -130,20 +129,19 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
           LockMode::LOCK_WHILE_RUNNING,
           0
           )
-
     , SHINY_DETECTED(
-          "Shiny Detected", "",
-          "2000 ms",
-          ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY
-          )
+        "Shiny Detected", "",
+        "2000 ms",
+        ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY
+    )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
-          &NOTIFICATION_STATUS,
-          &SHINY_DETECTED.NOTIFICATIONS,
-          &NOTIFICATION_PROGRAM_FINISH,
-          &NOTIFICATION_ERROR_RECOVERABLE,
-          &NOTIFICATION_ERROR_FATAL,
-      })
+        &NOTIFICATION_STATUS,
+        &SHINY_DETECTED.NOTIFICATIONS,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
+        &NOTIFICATION_ERROR_FATAL,
+    })
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     if (PreloadSettings::instance().DEVELOPER_MODE){
@@ -153,7 +151,6 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
     PA_ADD_OPTION(PERIODIC_SAVE);
     PA_ADD_OPTION(DAY_NIGHT_FILTER);
     DAY_NIGHT_FILTER.add_option(FILTER_MODE, "FilterMode");
-
     PA_ADD_OPTION(WEATHER_FILTER);
     WEATHER_FILTER.add_option(WEATHER_FILTER_MODE, "WeatherFilterMode");
     PA_ADD_OPTION(SHINY_DETECTED);
@@ -163,13 +160,13 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
 
 void run_back_until_found_bench(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context
-    ){
+){
     ButtonWatcher buttonA(
         COLOR_RED,
         ButtonType::ButtonA,
         {0.486, 0.477, 0.115, 0.5},
         &env.console.overlay()
-        );
+    );
 
     int ret = run_until<ProControllerContext>(
         env.console, context,
@@ -186,7 +183,7 @@ void run_back_until_found_bench(
             }
         },
         {buttonA}
-        );
+    );
 
     switch (ret){
     case 0:
@@ -197,28 +194,24 @@ void run_back_until_found_bench(
             ErrorReport::SEND_ERROR_REPORT,
             "run_back_until_found_bench(): Unable to detect bench after multiple attempts.",
             env.console
-            );
+        );
     }
 }
-
 bool ShinyHunt_BenchSit::should_run_based_on_day_night(
-    const ImageViewRGB32& frame,
-    VideoOverlay& overlay
-    ){
+    const ImageViewRGB32& frame, VideoOverlay& overlay){
     if (!DAY_NIGHT_FILTER.enabled()){
         return true;
     }
-
-    DayNightStateDetector detector(&overlay);
-
-    if (!detector.detect(frame)){
+    
+    if (!m_day_night_detector){
+        m_day_night_detector = std::make_unique<DayNightStateDetector>(&overlay);
+    }
+    
+    if (!m_day_night_detector->detect(frame)){
         return true;
     }
-
-    DayNightState current_state = detector.state();
-
+    DayNightState current_state = m_day_night_detector->state();
     size_t filter_mode = FILTER_MODE.current_value();
-
     if (filter_mode == 0){
         return current_state == DayNightState::DAY;
     }
@@ -229,36 +222,26 @@ bool ShinyHunt_BenchSit::should_run_based_on_day_night(
     return true;
 }
 
-
 bool ShinyHunt_BenchSit::should_run_based_on_weather(
-    const ImageViewRGB32& frame
-    ){
+    const ImageViewRGB32& frame){
     if (!WEATHER_FILTER.enabled()){
         return true;
     }
-
     size_t weather_mode = WEATHER_FILTER_MODE.current_value();
-
     WeatherIconType weather_type;
-
     switch (weather_mode){
-
     case 0: weather_type = WeatherIconType::Clear; break;
     case 1: weather_type = WeatherIconType::Sunny; break;
     case 2: weather_type = WeatherIconType::Rain; break;
     case 3: weather_type = WeatherIconType::Cloudy; break;
     case 4: weather_type = WeatherIconType::Foggy; break;
     case 5: weather_type = WeatherIconType::Rainbow; break;
-
     default:
         return true;
     }
-
     WeatherIconDetector detector(weather_type);
-
     return detector.detect(frame);
 }
-
 void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
@@ -301,46 +284,35 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                 }
 
                 Milliseconds duration = WALK_FORWARD_DURATION;
+                open_map(env.console, context, true, true);
+                pbf_move_right_joystick(context, { 0, -1 }, 1000ms, 500ms);
+                pbf_move_left_joystick(context, { -1, 0 }, 1000ms, 500ms);
+                context.wait_for_all_requests();
 
-
-                open_map(env.console, context, false, true);
+                pbf_press_button(context, BUTTON_MINUS, 500ms, 500ms);
 
                 ImageViewRGB32 frame =
                     env.console.video().snapshot();
-
                 context.wait_for_all_requests();
-
                 pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
-
-
                 if (!should_run_based_on_day_night(frame, env.console.overlay())){
-
                     env.console.overlay().add_log(
                         "Skipping move (wrong day/night)",
                         COLOR_ORANGE
                         );
-
                     run_back_until_found_bench(env, context);
-
                     shiny_sound_handler.process_pending(context);
-
                     continue;
                 }
-
                 if (!should_run_based_on_weather(frame)){
-
                     env.console.overlay().add_log(
                         "Skipping move (wrong weather)",
                         COLOR_ORANGE
                         );
-
                     run_back_until_found_bench(env, context);
-
                     shiny_sound_handler.process_pending(context);
-
                     continue;
                 }
-
                 if (duration > Milliseconds::zero()){
                     if (WALK_DIRECTION.current_value() == 0){ // forward
                         env.console.overlay().add_log("Move Forward");

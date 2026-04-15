@@ -43,6 +43,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
+    std::unique_ptr<DayNightStateDetector> m_day_night_detector;
     bool should_run_based_on_day_night(const ImageViewRGB32& frame, VideoOverlay& overlay);
     bool should_run_based_on_weather(const ImageViewRGB32& frame);
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
