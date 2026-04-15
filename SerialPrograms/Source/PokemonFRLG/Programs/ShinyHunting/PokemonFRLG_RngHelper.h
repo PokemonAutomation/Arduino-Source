@@ -89,7 +89,7 @@ private:
     SimpleIntegerOption<uint64_t> SEED_DELAY;
     SimpleIntegerOption<int64_t> SEED_CALIBRATION;
 
-    SimpleIntegerOption<uint64_t> CONTINUE_SCREEN_ADVANCES;
+    SimpleIntegerOption<uint64_t> CONTINUE_SCREEN_FRAMES;
     FloatingPointOption CONTINUE_SCREEN_CALIBRATION;
 
     SimpleIntegerOption<uint64_t> INGAME_ADVANCES;

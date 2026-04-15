@@ -121,35 +121,35 @@ RngHelper::RngHelper()
         LockMode::UNLOCK_WHILE_RUNNING,
         0  // default
     )
-    , CONTINUE_SCREEN_ADVANCES(
-        "<b>Continue Screen Advances (frames):</b><br>The number of frames to advance before loading the game.<br>These pass at the \"normal\" rate compared to other consoles.",
+    , CONTINUE_SCREEN_FRAMES(
+        "<b>Continue Screen Frames:</b><br>The number of RNG advances before loading the game.<br>These pass at the \"normal\" rate compared to other consoles.",
         LockMode::LOCK_WHILE_RUNNING,
         1000, 192 // default, min
     )
     , CONTINUE_SCREEN_CALIBRATION(
-        "<b>Continue Screen Advances Calibration (frames):</b><br>A \"fine adjustment\" that modifies the frame advances passed on the Continue Screen.<br>"
+        "<b>Continue Screen Frames Calibration:</b><br>A \"fine adjustment\" that modifies the RNG advances passed on the Continue Screen.<br>"
         "Example: if your target advance was 10000 and you hit 10025, you can decrease your calibration value by 25.",
         LockMode::UNLOCK_WHILE_RUNNING,
         0 // default
     )
     , INGAME_ADVANCES(
-        "<b>In-Game Advances (frames):</b><br>The number of frames to advance before triggering the gift/encounter.<br>These pass at double the rate compared to other consoles, where every 2nd frame is skipped.<br><i>Warning: this needs to be long enough to accomodate all in-game button presses prior to the gift/encounter</i>",
+        "<b>In-Game Advances:</b><br>The number of in-game RNG advances before triggering the gift/encounter.<br>These pass at double the rate compared to other consoles, where every frame results in 2 advances.<br><i>Warning: this needs to be long enough to accomodate all in-game button presses prior to the gift/encounter</i>",
         LockMode::LOCK_WHILE_RUNNING,
         12345, 480 // default, min
     )
     , INGAME_CALIBRATION(
-        "<b>In-Game Advances Calibration (frames):</b><br>A \"coarse adjustment\" that modifies the frame advances passed after loading the game.<br>"
+        "<b>In-Game Advances Calibration:</b><br>A \"coarse adjustment\" that modifies the RNG advances passed after loading the game.<br>"
         "Example: if your target advance was 10000 and you hit 8500, you can increase your calibration value by 1500.",
         LockMode::UNLOCK_WHILE_RUNNING,
         0 // default
     )
     , USE_COPYRIGHT_TEXT(
-        "<b>Detect Copyright Text:</b><br>Start the seed timer only after detecting the copyright text. Can be helpful for improving seed consistency.",
+        "<b>Detect Copyright Text:</b><br>Start the seed timer only after detecting the copyright text. Can be helpful if your seeds are inconsistent.",
         LockMode::LOCK_WHILE_RUNNING,
         true // default
     )
     , USE_TEACHY_TV(
-        "<b>Use Teachy TV:</b><br>Opens the Teachy TV to quickly advance in-game frames at 313x speed.<br><i>Warning: can result in larger misses.</i>",
+        "<b>Use Teachy TV:</b><br>Opens the Teachy TV to quickly advance the RNG at 313x speed.<br><i>Warning: can result in larger misses.</i>",
         LockMode::LOCK_WHILE_RUNNING,
         false // default
     )
@@ -176,7 +176,7 @@ RngHelper::RngHelper()
     PA_ADD_OPTION(SEED_BUTTON);
     PA_ADD_OPTION(SEED_DELAY);
     PA_ADD_OPTION(SEED_CALIBRATION);
-    PA_ADD_OPTION(CONTINUE_SCREEN_ADVANCES);
+    PA_ADD_OPTION(CONTINUE_SCREEN_FRAMES);
     PA_ADD_OPTION(CONTINUE_SCREEN_CALIBRATION);
     PA_ADD_OPTION(INGAME_ADVANCES);
     PA_ADD_OPTION(INGAME_CALIBRATION);
@@ -587,14 +587,13 @@ void RngHelper::wait_with_teachy_tv(ProControllerContext& context, const uint64_
     pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
     pbf_press_button(context, BUTTON_B, 200ms, 300ms);
     // total non-teachy delay duration: 13700ms
-    // if used in the Safari Zone: 14200ms
 }
 
 void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED_SEED_OFFSET, const uint64_t& CONTINUE_SCREEN_DELAY, const uint64_t& INGAME_DELAY, bool SAFARI_ZONE){
     if (CONTINUE_SCREEN_DELAY < 3200){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "The Continue Screen delay cannot be less than 3200ms (192 frames). Check your Continue Screen calibration.",
+            "The Continue Screen delay cannot be less than 3200ms (192 advances). Check your Continue Screen calibration.",
             env.console
         );
     }
@@ -611,7 +610,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 7500){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Starters: the in-game delay cannot be less than 7500ms (900 frames). Check your in-game advances and calibration.",
+                "Starters: the in-game delay cannot be less than 7500ms (900 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -620,7 +619,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 7500){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Magikarp: the in-game delay cannot be less than 7500ms (900 frames). Check your in-game advances and calibration.",
+                "Magikarp: the in-game delay cannot be less than 7500ms (900 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -629,7 +628,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 4500){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Hitmonchan/Hitmonlee: the in-game delay cannot be less than 4500ms (540 frames). Check your in-game advances and calibration.",
+                "Hitmonchan/Hitmonlee: the in-game delay cannot be less than 4500ms (540 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -638,7 +637,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 4000){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Eevee: the in-game delay cannot be less than 4000ms (480 frames). Check your in-game advances and calibration.",
+                "Eevee: the in-game delay cannot be less than 4000ms (480 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -647,7 +646,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 7500){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Lapras: the in-game delay cannot be less than 7500ms (900 frames). Check your in-game advances and calibration.",
+                "Lapras: the in-game delay cannot be less than 7500ms (900 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -656,7 +655,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 6000){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Fossils: the in-game delay cannot be less than 6000ms (720 frames). Check your in-game advances and calibration.",
+                "Fossils: the in-game delay cannot be less than 6000ms (720 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -669,7 +668,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 8500){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Game Corner: the in-game delay cannot be less than 8500ms (1020 frames). Check your in-game advances and calibration.",
+                "Game Corner: the in-game delay cannot be less than 8500ms (1020 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -678,7 +677,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 12000) {
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Togepi: the in-game delay cannot be less than 12000ms (1440 frames). Check your in-game advances and calibration.",
+                "Togepi: the in-game delay cannot be less than 12000ms (1440 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -687,7 +686,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 5000){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Static Encounter: the in-game delay cannot be less than 5000ms (600 frames). Check your in-game advances and calibration.",
+                "Static Encounter: the in-game delay cannot be less than 5000ms (600 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -696,7 +695,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 16000){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Snorlax: the in-game delay cannot be less than 16000ms (1920 frames). Check your in-game advances and calibration.",
+                "Snorlax: the in-game delay cannot be less than 16000ms (1920 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -705,7 +704,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 4500){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Mewtwo: the in-game delay cannot be less than 4500ms (540 frames). Check your in-game advances and calibration.",
+                "Mewtwo: the in-game delay cannot be less than 4500ms (540 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -714,7 +713,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 4000){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Ho-oh: the in-game delay cannot be less than 4000ms (480 frames). Check your in-game advances and calibration.",
+                "Ho-oh: the in-game delay cannot be less than 4000ms (480 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -723,7 +722,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 13000){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Hypno: the in-game delay cannot be less than 13000ms (1560 frames). Check your in-game advances and calibration.",
+                "Hypno: the in-game delay cannot be less than 13000ms (1560 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -732,13 +731,13 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (!SAFARI_ZONE && INGAME_DELAY < 8500){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Sweet Scent: the in-game delay cannot be less than 8500ms (1020 frames). Check your in-game advances and calibration.",
+                "Sweet Scent: the in-game delay cannot be less than 8500ms (1020 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }else if (SAFARI_ZONE && INGAME_DELAY < 9500){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Sweet Scent: the in-game delay cannot be less than 9500ms (1140 frames). Check your in-game advances and calibration.",
+                "Sweet Scent: the in-game delay cannot be less than 9500ms (1140 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -747,7 +746,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 5500){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Fishing: the in-game delay cannot be less than 5500ms (1800 frames). Check your in-game advances and calibration.",
+                "Fishing: the in-game delay cannot be less than 5500ms (1800 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -756,7 +755,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 30500){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Safari Zone Center: in-game delay cannot be less than 30500ms (3660 frames). Check your in-game advances and calibration.",
+                "Safari Zone Center: in-game delay cannot be less than 30500ms (3660 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -765,7 +764,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 36500){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Safari Zone East: in-game delay cannot be less than 36500ms (4380 frames). Check your in-game advances and calibration.",
+                "Safari Zone East: in-game delay cannot be less than 36500ms (4380 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -774,7 +773,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 47500){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Safari Zone North: in-game delay cannot be less than 47500ms (5700 frames). Check your in-game advances and calibration.",
+                "Safari Zone North: in-game delay cannot be less than 47500ms (5700 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -783,7 +782,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 61500){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Safari Zone West: in-game delay cannot be less than 52000ms (7380 frames). Check your in-game advances and calibration.",
+                "Safari Zone West: in-game delay cannot be less than 52000ms (7380 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -792,7 +791,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 40500){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Safari Zone Surfing: in-game delay cannot be less than 40500ms (4860 frames). Check your in-game advances and calibration.",
+                "Safari Zone Surfing: in-game delay cannot be less than 40500ms (4860 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -801,7 +800,7 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
         if (INGAME_DELAY < 30000){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Safari Zone Fishing: in-game delay cannot be less than 30000ms (3600 frames). Check your in-game advances and calibration.",
+                "Safari Zone Fishing: in-game delay cannot be less than 30000ms (3600 advances). Check your in-game advances and calibration.",
                 env.console
             );
         }
@@ -917,7 +916,7 @@ void RngHelper::perform_blind_sequence(ProControllerContext& context, int64_t FI
 void RngHelper::reset_and_perform_blind_sequence(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int64_t FIXED_SEED_OFFSET, const uint64_t& CONTINUE_SCREEN_DELAY, const uint64_t& TEACHY_DELAY, const uint64_t& INGAME_DELAY, bool SAFARI_ZONE){
     go_home(env.console, context);
     close_game_from_home(env.console, context);
-    start_game_from_home(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW, uint8_t(0), uint8_t(0)); // TODO: add option for user slot if needed
+    start_game_from_home(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, uint8_t(0), uint8_t(0)); // TODO: add option for user slot if needed
     go_home(env.console, context); // happens as soon as a black screen is detected
 
     // attempt to resume the game and perform the blind sequence
@@ -932,13 +931,13 @@ void RngHelper::reset_and_perform_blind_sequence(SingleSwitchProgramEnvironment&
                 env.console
             );  
         }
-
+        env.log("Starting blind button presses...");
         UpdateMenuWatcher update_detector(env.console);
+        // any other fail conditions should be added here
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [this, FIXED_SEED_OFFSET, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE](ProControllerContext& context) {
-                pbf_press_button(context, BUTTON_A, 80ms, 0ms);
                 perform_blind_sequence(context, FIXED_SEED_OFFSET, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE);
             },
             { update_detector }
@@ -961,7 +960,7 @@ void RngHelper::reset_and_perform_blind_sequence(SingleSwitchProgramEnvironment&
 void RngHelper::reset_and_detect_copyright_text(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     go_home(env.console, context);
     close_game_from_home(env.console, context);
-    start_game_from_home(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW, uint8_t(0), uint8_t(0)); // TODO: add option for user slot if needed
+    start_game_from_home(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, uint8_t(0), uint8_t(0)); // TODO: add option for user slot if needed
     go_home(env.console, context); // happens as soon as a black screen is detected
 
     uint8_t attempts = 0;
@@ -1071,16 +1070,14 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     bool shiny_found = false;
 
-    double FRAMERATE = 59.999977;       // FPS. from Dhruv (don't know original source)
+    double FRAMERATE = 59.999977; // FPS
     double FRAME_DURATION = 1000 / FRAMERATE;
 
-    int64_t FIXED_SEED_OFFSET = USE_COPYRIGHT_TEXT ? -2048 : -800;  // milliseconds. approximate, might be console-specific (?)
-    int64_t FIXED_ADVANCES_OFFSET = 0;                              // frames
-
+    int64_t FIXED_SEED_OFFSET = USE_COPYRIGHT_TEXT ? -2140 : -845; // milliseconds. approximate
 
     while (!shiny_found){
         // prepare timings
-        double MODIFIED_INGAME_ADVANCES = INGAME_ADVANCES + FIXED_ADVANCES_OFFSET + INGAME_CALIBRATION;
+        double MODIFIED_INGAME_ADVANCES = INGAME_ADVANCES + INGAME_CALIBRATION;
         if (MODIFIED_INGAME_ADVANCES < 0) {
            OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
@@ -1105,7 +1102,7 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             TEACHY_ADVANCES = uint64_t((int)std::floor((MODIFIED_INGAME_ADVANCES - TEACHY_TV_BUFFER) / 313) * 313);
         }
 
-        const uint64_t CONTINUE_SCREEN_DELAY = uint64_t((CONTINUE_SCREEN_ADVANCES + CONTINUE_SCREEN_CALIBRATION) * FRAME_DURATION);
+        const uint64_t CONTINUE_SCREEN_DELAY = uint64_t((CONTINUE_SCREEN_FRAMES + CONTINUE_SCREEN_CALIBRATION) * FRAME_DURATION);
         const uint64_t TEACHY_DELAY = uint64_t(TEACHY_ADVANCES * FRAME_DURATION / 313);
         const uint64_t INGAME_DELAY = uint64_t((MODIFIED_INGAME_ADVANCES - TEACHY_ADVANCES) * FRAME_DURATION / 2) - (should_use_teachy_tv ? 13700 : 0);
         env.log("Continue Screen delay: " + std::to_string(CONTINUE_SCREEN_DELAY) + "ms");
@@ -1113,14 +1110,18 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         env.log("Teachy TV delay: " + std::to_string(TEACHY_DELAY) + "ms");
         env.log("Total time: " + std::to_string(SEED_DELAY + SEED_CALIBRATION + FIXED_SEED_OFFSET + CONTINUE_SCREEN_DELAY + INGAME_DELAY + TEACHY_DELAY) + "ms");
 
+        check_timings(env, FIXED_SEED_OFFSET, CONTINUE_SCREEN_DELAY, INGAME_DELAY, SAFARI_ZONE);
 
+        
         // handle the blind part
         if (USE_COPYRIGHT_TEXT){
             reset_and_detect_copyright_text(env, context);
+            env.log("Starting blind button presses...");
             perform_blind_sequence(context, FIXED_SEED_OFFSET, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE);
         }else{
             reset_and_perform_blind_sequence(env, context, FIXED_SEED_OFFSET, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE);
         }
+        env.log("Blind button presses complete.");
         stats.resets++;
 
         // detect shinies
