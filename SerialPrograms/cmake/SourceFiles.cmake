@@ -1921,6 +1921,24 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Resources/PokemonLZA_HyperspaceRewardNames.h
     Source/PokemonLZA/Resources/PokemonLZA_Locations.cpp
     Source/PokemonLZA/Resources/PokemonLZA_Locations.h
+    Source/PokemonPokopia/Inference/PokemonPokopia_ButtonDetector.cpp
+    Source/PokemonPokopia/Inference/PokemonPokopia_ButtonDetector.h
+    Source/PokemonPokopia/Inference/PokemonPokopia_MovesDetection.cpp
+    Source/PokemonPokopia/Inference/PokemonPokopia_MovesDetection.h
+    Source/PokemonPokopia/Inference/PokemonPokopia_PCDetection.cpp
+    Source/PokemonPokopia/Inference/PokemonPokopia_PCDetection.h
+    Source/PokemonPokopia/Inference/PokemonPokopia_SelectionArrowDetector.cpp
+    Source/PokemonPokopia/Inference/PokemonPokopia_SelectionArrowDetector.h
+    Source/PokemonPokopia/Inference/PokemonPokopia_SettingsScreenDetector.cpp
+    Source/PokemonPokopia/Inference/PokemonPokopia_SettingsScreenDetector.h
+    Source/PokemonPokopia/PokemonPokopia_Panels.cpp
+    Source/PokemonPokopia/PokemonPokopia_Panels.h
+    Source/PokemonPokopia/PokemonPokopia_Settings.cpp
+    Source/PokemonPokopia/PokemonPokopia_Settings.h
+    Source/PokemonPokopia/Programs/PokemonPokopia_CloudIslandReset.cpp
+    Source/PokemonPokopia/Programs/PokemonPokopia_CloudIslandReset.h
+    Source/PokemonPokopia/Programs/PokemonPokopia_PCNavigation.cpp
+    Source/PokemonPokopia/Programs/PokemonPokopia_PCNavigation.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.cpp
