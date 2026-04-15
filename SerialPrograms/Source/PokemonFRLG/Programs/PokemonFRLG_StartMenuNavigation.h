@@ -24,7 +24,7 @@ using ProControllerContext = ControllerContext<ProController>;
 
 namespace PokemonFRLG {
 
-// Open the start menu from the overworld
+// Open the start menu from the overworld. Throws OperationFailedException if it fails to open the menu after several attempts.
 void open_start_menu(ConsoleHandle& console, ProControllerContext& context);
 
 // Close the start menu to return to the overworld
