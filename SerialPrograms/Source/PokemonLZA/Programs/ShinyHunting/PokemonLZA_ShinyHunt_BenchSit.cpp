@@ -211,6 +211,11 @@ bool ShinyHunt_BenchSit::should_run_based_on_day_night(
         return true;
     }
     DayNightState current_state = m_day_night_detector->state();
+  if (current_state == DayNightState::NIGHT) {
+        overlay.add_log("Day/Night Detector: NIGHT", COLOR_CYAN);
+    } else {
+        overlay.add_log("Day/Night Detector: DAY", COLOR_YELLOW);
+    }
     size_t filter_mode = FILTER_MODE.current_value();
     if (filter_mode == 0){
         return current_state == DayNightState::DAY;

@@ -1,6 +1,7 @@
 #include "PokemonLZA_DayNightStateDetector.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
+#include <iostream>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -10,11 +11,7 @@ DayNightStateDetector::DayNightStateDetector(VideoOverlay* overlay)
     :
     m_box(0.02, 0.50, 0.08, 0.10),
     m_state(DayNightState::DAY)
-{
-    if (overlay){
-        m_overlay.emplace(*overlay, m_box, COLOR_YELLOW);
-    }
-}
+{}
 
 
 void DayNightStateDetector::make_overlays(VideoOverlaySet& items) const{
@@ -34,12 +31,13 @@ bool DayNightStateDetector::detect(const ImageViewRGB32& screen){
         0.299*r +
         0.587*g +
         0.114*b;
-
+   
+    std::cout << "RGB: (" << r << ", " << g << ", " << b << ") Luminance: " << luminance << std::endl;
 
     bool night_color =
-        r < 120 &&
-        b > 50 &&
-        luminance < 100;
+        r < 10 &&
+        b > 20 &&
+        luminance < 20;
 
     bool day_color =
         r > 100 && r < 180 &&

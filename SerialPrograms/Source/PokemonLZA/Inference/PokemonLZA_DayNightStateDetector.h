@@ -34,7 +34,6 @@ private:
 
     DayNightState m_state;
 
-    std::optional<OverlayBoxScope> m_overlay;
 };
 
 
