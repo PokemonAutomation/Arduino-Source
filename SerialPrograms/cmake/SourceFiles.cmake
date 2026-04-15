@@ -1474,6 +1474,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/PokemonFRLG_DigitReader.h
     Source/PokemonFRLG/Inference/PokemonFRLG_StatsReader.cpp
     Source/PokemonFRLG/Inference/PokemonFRLG_StatsReader.h
+    Source/PokemonFRLG/Inference/PokemonFRLG_BattleLevelUpReader.cpp
+    Source/PokemonFRLG/Inference/PokemonFRLG_BattleLevelUpReader.h
     Source/PokemonFRLG/Inference/PokemonFRLG_TrainerIdReader.cpp
     Source/PokemonFRLG/Inference/PokemonFRLG_TrainerIdReader.h
     Source/PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.cpp
@@ -1522,6 +1524,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadTrainerId.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadEncounter.cpp
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadEncounter.h
+    Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadBattleLevelUp.cpp
+    Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadBattleLevelUp.h
     Source/PokemonHome/Inference/PokemonHome_BallReader.cpp
     Source/PokemonHome/Inference/PokemonHome_BallReader.h
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.cpp
