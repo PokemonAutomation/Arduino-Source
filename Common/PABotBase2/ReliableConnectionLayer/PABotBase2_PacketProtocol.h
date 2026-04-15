@@ -23,8 +23,8 @@ namespace PokemonAutomation{
 namespace PABotBase2{
 
 
-#define PABB2_CONNECTION_BAUD_RATE                  115200
-//#define PABB2_CONNECTION_BAUD_RATE                  460800    //  Unstable on ESP32.
+//#define PABB2_CONNECTION_BAUD_RATE                  115200
+//#define PABB2_CONNECTION_BAUD_RATE                  921600
 #define PABB2_CONNECTION_MAGIC_NUMBER               0x81
 #define PABB2_CONNECTION_PROTOCOL_VERSION           2026041100
 

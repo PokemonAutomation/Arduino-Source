@@ -58,27 +58,7 @@ public:
             throw ConnectionException(nullptr, "Unable to open serial connection (" + name + "). Error = " + std::to_string(error));
         }
 
-        DCB serial_params{};
-        serial_params.DCBlength = sizeof(serial_params);
-
-        if (!GetCommState(m_handle, &serial_params)){
-            DWORD error = GetLastError();
-            CloseHandle(m_handle);
-            throw ConnectionException(nullptr, "GetCommState() failed. Error = " + std::to_string(error));
-        }
-//        cout << "BaudRate = " << (int)serial_params.BaudRate << endl;
-//        cout << "ByteSize = " << (int)serial_params.ByteSize << endl;
-//        cout << "StopBits = " << (int)serial_params.StopBits << "0 means 1 bit" << endl;
-//        cout << "Parity   = " << (int)serial_params.Parity << endl;
-        serial_params.BaudRate = baud_rate;
-        serial_params.ByteSize = 8;
-        serial_params.StopBits = 0;
-        serial_params.Parity = 0;
-        if (!SetCommState(m_handle, &serial_params)){
-            DWORD error = GetLastError();
-            CloseHandle(m_handle);
-            throw ConnectionException(nullptr, "SetCommState() failed. Error = " + std::to_string(error));
-        }
+        set_baud_rate(baud_rate);
 
 #if 1
         COMMTIMEOUTS timeouts{};
@@ -134,6 +114,30 @@ public:
         m_exit.store(true, std::memory_order_release);
         CloseHandle(m_handle);
         m_listener.wait_and_ignore_exceptions();
+    }
+
+    void set_baud_rate(uint32_t baud_rate){
+        DCB serial_params{};
+        serial_params.DCBlength = sizeof(serial_params);
+
+        if (!GetCommState(m_handle, &serial_params)){
+            DWORD error = GetLastError();
+            CloseHandle(m_handle);
+            throw ConnectionException(nullptr, "GetCommState() failed. Error = " + std::to_string(error));
+        }
+//        cout << "BaudRate = " << (int)serial_params.BaudRate << endl;
+//        cout << "ByteSize = " << (int)serial_params.ByteSize << endl;
+//        cout << "StopBits = " << (int)serial_params.StopBits << "0 means 1 bit" << endl;
+//        cout << "Parity   = " << (int)serial_params.Parity << endl;
+        serial_params.BaudRate = baud_rate;
+        serial_params.ByteSize = 8;
+        serial_params.StopBits = 0;
+        serial_params.Parity = 0;
+        if (!SetCommState(m_handle, &serial_params)){
+            DWORD error = GetLastError();
+            CloseHandle(m_handle);
+            throw ConnectionException(nullptr, "SetCommState() failed. Error = " + std::to_string(error));
+        }
     }
 
 private:
