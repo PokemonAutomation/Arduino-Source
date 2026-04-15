@@ -96,7 +96,7 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
           0
           )
     , DAY_NIGHT_FILTER(
-          "<b>Run Only During Day/Night:</b>",
+          "Run Forward Only During Day/Night:",
           LockMode::LOCK_WHILE_RUNNING,
           GroupOption::EnableMode::DEFAULT_DISABLED
           )
@@ -112,7 +112,7 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
           )
 
     , WEATHER_FILTER(
-          "<b>Run Only During Specific Weather:</b>",
+          "Run Forward Only During Specific Weather:",
           LockMode::LOCK_WHILE_RUNNING,
           GroupOption::EnableMode::DEFAULT_DISABLED
           )
@@ -204,22 +204,19 @@ void run_back_until_found_bench(
 bool ShinyHunt_BenchSit::should_run_based_on_day_night(
     const ImageViewRGB32& frame
     ){
-
     if (!DAY_NIGHT_FILTER.enabled()){
         return true;
     }
 
-    DayNightStateDetector detector(COLOR_RED, nullptr);
+    DayNightStateDetector detector;
 
     if (!detector.detect(frame)){
         return true;
     }
 
-    DayNightState current_state =
-        detector.get_state();
+    DayNightState current_state = detector.state();
 
-    size_t filter_mode =
-        FILTER_MODE.current_value();
+    size_t filter_mode = FILTER_MODE.current_value();
 
     if (filter_mode == 0){
         return current_state == DayNightState::DAY;
@@ -232,48 +229,31 @@ bool ShinyHunt_BenchSit::should_run_based_on_day_night(
 }
 
 
-bool ShinyHunt_BenchSit::should_run_based_on_weather(const ImageViewRGB32& frame){
-
+bool ShinyHunt_BenchSit::should_run_based_on_weather(
+    const ImageViewRGB32& frame
+    ){
     if (!WEATHER_FILTER.enabled()){
         return true;
     }
 
-    size_t weather_mode =
-        WEATHER_FILTER_MODE.current_value();
+    size_t weather_mode = WEATHER_FILTER_MODE.current_value();
 
     WeatherIconType weather_type;
 
     switch (weather_mode){
 
-    case 0:
-        weather_type = WeatherIconType::Clear;
-        break;
-
-    case 1:
-        weather_type = WeatherIconType::Sunny;
-        break;
-
-    case 2:
-        weather_type = WeatherIconType::Rain;
-        break;
-
-    case 3:
-        weather_type = WeatherIconType::Cloudy;
-        break;
-
-    case 4:
-        weather_type = WeatherIconType::Foggy;
-        break;
-
-    case 5:
-        weather_type = WeatherIconType::Rainbow;
-        break;
+    case 0: weather_type = WeatherIconType::Clear; break;
+    case 1: weather_type = WeatherIconType::Sunny; break;
+    case 2: weather_type = WeatherIconType::Rain; break;
+    case 3: weather_type = WeatherIconType::Cloudy; break;
+    case 4: weather_type = WeatherIconType::Foggy; break;
+    case 5: weather_type = WeatherIconType::Rainbow; break;
 
     default:
         return true;
     }
 
-    WeatherIconDetector detector(weather_type, nullptr);
+    WeatherIconDetector detector(weather_type);
 
     return detector.detect(frame);
 }
@@ -320,7 +300,17 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                 }
 
                 Milliseconds duration = WALK_FORWARD_DURATION;
-                auto frame = env.console.video().snapshot();
+
+
+                open_map(env.console, context, false, true);
+
+                ImageViewRGB32 frame =
+                    env.console.video().snapshot();
+
+                context.wait_for_all_requests();
+
+                pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
+
 
                 if (!should_run_based_on_day_night(frame)){
 
@@ -335,7 +325,6 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
 
                     continue;
                 }
-
 
                 if (!should_run_based_on_weather(frame)){
 

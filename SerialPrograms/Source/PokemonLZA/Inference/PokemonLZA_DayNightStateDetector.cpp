@@ -1,126 +1,52 @@
-#include "CommonFramework/ImageTools/ImageBoxes.h"
-
-#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
-
 #include "PokemonLZA_DayNightStateDetector.h"
+
+#include "CommonFramework/ImageTools/ImageStats.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLZA{
 
-
-namespace{
-
-// minimap crescent icon region (screen relative)
-const ImageFloatBox MOON_BOX(
-    0.075,
-    0.025,
-    0.040,
-    0.050
-    );
-
-
-// color range of moon icon
-const uint32_t MOON_COLOR_MIN = 0xffc0c0c0;
-const uint32_t MOON_COLOR_MAX = 0xffffffff;
-
-
-// ratio thresholds (resolution independent)
-const double MIN_MOON_RATIO = 0.03;
-const double MAX_MOON_RATIO = 0.40;
-
-
-}
-
-
-
-DayNightStateDetector::DayNightStateDetector(
-    Color color,
-    VideoOverlay* overlay
-    )
-    : StaticScreenDetector()
-    , m_state(DayNightState::UNKNOWN)
+DayNightStateDetector::DayNightStateDetector()
+    :
+    m_box(0.40, 0.80, 0.45, 0.45),
+    m_state(DayNightState::DAY)
 {}
 
 
-void DayNightStateDetector::make_overlays(
-    VideoOverlaySet& items
-    ) const{
-
-    items.add(COLOR_RED, MOON_BOX);
-
+void DayNightStateDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(COLOR_GREEN, m_box);
 }
 
+bool DayNightStateDetector::detect(const ImageViewRGB32& screen){
+
+    ImageStats stats =
+        image_stats(extract_box_reference(screen, m_box));
+
+    double r = stats.average.r;
+    double g = stats.average.g;
+    double b = stats.average.b;
+
+    double luminance =
+        0.299*r +
+        0.587*g +
+        0.114*b;
 
 
-bool DayNightStateDetector::detect(
-    const ImageViewRGB32& screen
-    ){
-
-    ImageViewRGB32 roi =
-        extract_box_reference(
-            screen,
-            MOON_BOX
-            );
+    bool night_color =
+        r < 120 &&
+        b > 70 &&
+        luminance < 140;
 
 
-    if (!roi){
-
-        m_state = DayNightState::UNKNOWN;
-
-        return false;
+    if (night_color){
+        m_state = DayNightState::NIGHT;
     }
-
-
-    PackedBinaryMatrix matrix =
-        compress_rgb32_to_binary_range(
-            roi,
-            MOON_COLOR_MIN,
-            MOON_COLOR_MAX
-            );
-
-
-    size_t matching_pixels = 0;
-
-    for (size_t y = 0; y < matrix.height(); y++){
-        for (size_t x = 0; x < matrix.width(); x++){
-
-            if (matrix.get(x,y)){
-                matching_pixels++;
-            }
-
-        }
+    else{
+        m_state = DayNightState::DAY;
     }
-
-
-    const double moon_ratio =
-        (double)matching_pixels /
-        (double)(matrix.width() * matrix.height());
-
-
-    const bool moon_detected =
-        moon_ratio >= MIN_MOON_RATIO &&
-        moon_ratio <= MAX_MOON_RATIO;
-
-
-    m_state =
-        moon_detected
-            ? DayNightState::NIGHT
-            : DayNightState::DAY;
-
 
     return true;
 }
-
-
-
-void DayNightStateDetector::reset_state(){
-
-    m_state = DayNightState::UNKNOWN;
-
-}
-
-
 
 }
 }
