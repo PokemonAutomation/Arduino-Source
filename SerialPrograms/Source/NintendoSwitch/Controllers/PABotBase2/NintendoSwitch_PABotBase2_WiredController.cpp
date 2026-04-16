@@ -195,7 +195,7 @@ void PABotBase2_WiredController::execute_state(
     while (time_left > Milliseconds::zero()){
         Milliseconds current = std::min(time_left, 65535ms);
         request.milliseconds = current.count();
-        m_connection.device().command_queue().send_command(request);
+        m_connection.device().command_queue().send_command(cancellable, request);
         time_left -= current;
     }
 }

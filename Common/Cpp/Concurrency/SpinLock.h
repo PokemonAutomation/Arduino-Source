@@ -102,10 +102,10 @@ public:
     }
 
 private:
-    void internal_acquire_read();
-    void internal_acquire_write();
-    void internal_acquire_read(const char* label);
-    void internal_acquire_write(const char* label);
+    void internal_acquire_read() noexcept;
+    void internal_acquire_write() noexcept;
+    void internal_acquire_read(const char* label) noexcept;
+    void internal_acquire_write(const char* label) noexcept;
 
 private:
     //  0           =   unlocked

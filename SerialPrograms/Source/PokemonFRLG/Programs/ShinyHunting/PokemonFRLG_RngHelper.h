@@ -35,10 +35,6 @@ public:
     ) override{}
 
 private:
-    enum class ResetType{
-        hard,
-        soft,
-    };
     enum class Target{
         starters,
         magikarp,
@@ -68,15 +64,55 @@ private:
         // roaming
     };
 
-    EnumDropdownOption<Target> TARGET;
+    enum class SeedButton{
+        A,
+        Start,
+        L
+    };
 
+    void set_seed_after_delay(ProControllerContext& context, int64_t& FIXED_SEED_OFFSET);
+    void load_game_after_delay(ProControllerContext& context, const uint64_t& LOAD_DELAY);
+    void wait_with_teachy_tv(ProControllerContext& context, const uint64_t& TEACHY_DELAY);
+
+
+    void check_timings(
+        SingleSwitchProgramEnvironment& env, 
+        int64_t FIXED_SEED_OFFSET, 
+        const uint64_t& CONTINUE_SCREEN_DELAY, 
+        const uint64_t& INGAME_DELAY, 
+        bool SAFARI_ZONE
+    );
+    void perform_blind_sequence(
+        ProControllerContext& context, 
+        int64_t FIXED_SEED_OFFSET, 
+        const uint64_t& CONTINUE_SCREEN_DELAY, 
+        const uint64_t& TEACHY_DELAY, 
+        const uint64_t& INGAME_DELAY, 
+        bool SAFARI_ZONE
+    );
+    void reset_and_perform_blind_sequence(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context, 
+        int64_t FIXED_SEED_OFFSET, 
+        const uint64_t& CONTINUE_SCREEN_DELAY, 
+        const uint64_t& TEACHY_DELAY, 
+        const uint64_t& INGAME_DELAY, 
+        bool SAFARI_ZONE
+    );
+    void reset_and_detect_copyright_text(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    bool check_for_shiny(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+    SimpleIntegerOption<uint8_t> PROFILE;
+
+    EnumDropdownOption<Target> TARGET;
     SimpleIntegerOption<uint64_t> NUM_RESETS;
 
+    EnumDropdownOption<SeedButton> SEED_BUTTON;
     SimpleIntegerOption<uint64_t> SEED_DELAY;
     SimpleIntegerOption<int64_t> SEED_CALIBRATION;
 
-    SimpleIntegerOption<uint64_t> LOAD_ADVANCES;
-    FloatingPointOption LOAD_CALIBRATION;
+    SimpleIntegerOption<uint64_t> CONTINUE_SCREEN_FRAMES;
+    FloatingPointOption CONTINUE_SCREEN_CALIBRATION;
 
     SimpleIntegerOption<uint64_t> INGAME_ADVANCES;
     FloatingPointOption INGAME_CALIBRATION;

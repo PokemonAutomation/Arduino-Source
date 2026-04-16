@@ -63,7 +63,7 @@ public:
 
 public:
     virtual bool cancel_all_commands(WallDuration timeout) override;
-    virtual void replace_on_next_command() override;
+    virtual void replace_on_next_command(Cancellable* cancellable) override;
 
     virtual void wait_for_all(Cancellable* cancellable) override;
 

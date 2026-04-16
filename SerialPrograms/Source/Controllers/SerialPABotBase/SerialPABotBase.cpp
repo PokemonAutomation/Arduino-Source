@@ -56,9 +56,11 @@ const std::map<uint32_t, std::map<pabb_ProgramID, uint8_t>>& SUPPORTED_VERSIONS(
 
 const std::map<pabb_ProgramID, uint32_t>& SUPPORTED_DEVICES2(){
     static const std::map<pabb_ProgramID, uint32_t> database{
-        {PABB_PID_UNSPECIFIED,                  2026041100},
-        {PABB_PID_PABOTBASE_ESP32,              2026041100},
-        {PABB_PID_PABOTBASE_ESP32S3,            2026041100},
+        {PABB_PID_UNSPECIFIED,              2026041100},
+        {PABB_PID_PABOTBASE_ESP32,          2026041100},
+        {PABB_PID_PABOTBASE_ESP32S3,        2026041100},
+        {PABB_PID_PABOTBASE_Pico1,          2026041100},
+        {PABB_PID_PABOTBASE_Pico2,          2026041100},
     };
     return database;
 }

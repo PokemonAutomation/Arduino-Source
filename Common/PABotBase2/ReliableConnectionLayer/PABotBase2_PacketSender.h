@@ -105,10 +105,9 @@ public:
 
     //
     //  Send the specified data on the data stream.
-    //  Returns the # of bytes actually sent.
-    //  Returning less than "bytes" indicates the queue is full.
+    //  Returns true if success.
     //
-    size_t send_stream(const void* data, size_t bytes);
+    bool send_stream_all_or_nothing(const void* data, size_t bytes) noexcept;
 
     //  Returns true if something was retransmitted.
     bool iterate_retransmits();

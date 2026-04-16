@@ -36,6 +36,8 @@ typedef uint8_t pabb_ProgramID;
 #define PABB_PID_PABOTBASE_Pico1W_UART                      0x21
 #define PABB_PID_PABOTBASE_Pico2W_USB                       0x22
 #define PABB_PID_PABOTBASE_Pico2W_UART                      0x23
+#define PABB_PID_PABOTBASE_Pico1                            0x24
+#define PABB_PID_PABOTBASE_Pico2                            0x25
 
 
 //

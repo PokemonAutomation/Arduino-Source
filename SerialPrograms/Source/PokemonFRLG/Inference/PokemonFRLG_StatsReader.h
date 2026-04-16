@@ -23,9 +23,17 @@ class VideoOverlaySet;
 namespace NintendoSwitch{
 namespace PokemonFRLG{
 
+
+enum class SummaryGender{
+    Male,
+    Female,
+    Genderless
+};
+
 struct PokemonFRLG_Stats{
     std::string nature;
     std::optional<unsigned> level;
+    std::optional<SummaryGender> gender;
     std::string name;
     std::optional<unsigned> hp;
     std::optional<unsigned> attack;
@@ -58,6 +66,7 @@ private:
     ImageFloatBox m_box_nature;
     ImageFloatBox m_box_level;
     ImageFloatBox m_box_name;
+    ImageFloatBox m_box_gender;
     ImageFloatBox m_box_hp;
     ImageFloatBox m_box_attack;
     ImageFloatBox m_box_defense;

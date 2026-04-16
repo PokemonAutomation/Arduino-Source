@@ -464,11 +464,11 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
     if (ret3 == 0){
         console.log("Successfully fled the battle.");
     }else{
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "flee_battle(): Unable to flee from battle.",
-            console
-        );
+        console.log("flee_battle(): failed to detect transition to overworld. Attempting to open start menu to verify successful flee..");
+        
+        open_start_menu(console, context);
+        close_start_menu(console, context);
+        context.wait_for_all_requests();
     }
 }
 
@@ -598,7 +598,7 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
     }
 }
 
-void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context){
+void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context){
     uint16_t errors = 0;
     bool start_menu_is_open = false;
     while (true){
@@ -626,7 +626,12 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
 
         switch (ret){
         case 0:
-            ret = move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::POKEMON);
+            if (menu_context == StartMenuContext::SAFARI_ZONE){
+                ret = move_cursor_to_position(console, context, SelectionArrowPositionSafariMenu::POKEMON);
+            } else {
+                ret = move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::POKEMON);
+            }
+
             if (ret < 0){
                 console.log("Failed to navigate to POKEMON on the start menu.");
                 errors++;
@@ -983,7 +988,7 @@ int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftr
         },
         { battle_triggered, battle_entered }
     );
-    
+
     if (ret < 0){
         return -1;
     }

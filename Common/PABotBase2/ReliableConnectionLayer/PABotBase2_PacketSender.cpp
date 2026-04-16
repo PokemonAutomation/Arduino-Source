@@ -172,16 +172,19 @@ void PacketSender::commit_packet(PacketHeader* packet){
     packet->magic_number = m_retransmit_seqnum;
 }
 
-size_t PacketSender::send_stream(const void* data, size_t bytes){
+bool PacketSender::send_stream_all_or_nothing(const void* data, size_t bytes) noexcept{
     if (m_stream_corrupted){
-        return 0;
+        return false;
     }
 
     //  256 will overflow to 0 which is explicitly supported.
     size_t max_packet_size = (uint8_t)(m_max_packet_size - 1);
     max_packet_size++;
 
-    size_t sent = 0;
+    uint8_t slot_tail = m_slot_tail;
+    size_t buffer_head = m_buffer_head;
+    size_t buffer_tail = m_buffer_tail;
+    uint16_t stream_offset = m_stream_offset;
 
     while (bytes > 0){
         //  No slots available.
@@ -192,8 +195,6 @@ size_t PacketSender::send_stream(const void* data, size_t bytes){
 
         const size_t OVERHEAD = sizeof(PacketHeaderData) + sizeof(uint32_t);
 
-        size_t buffer_head = m_buffer_head;
-        size_t buffer_tail = m_buffer_tail;
 
         size_t capacity;
         size_t offset;
@@ -204,8 +205,6 @@ size_t PacketSender::send_stream(const void* data, size_t bytes){
             capacity = PABB2_PacketSender_BUFFER_SIZE;
             offset = 0;
             buffer_tail = 0;
-            m_buffer_head = 0;
-            m_buffer_tail = 0;
         }else{
             offset = buffer_tail;
 
@@ -243,41 +242,62 @@ size_t PacketSender::send_stream(const void* data, size_t bytes){
         if (buffer_tail == PABB2_PacketSender_BUFFER_SIZE){
             buffer_tail = 0;
         }
-        m_buffer_tail = buffer_tail;
 //        printf("self->buffer_tail: %zu\n", self->buffer_tail);
 
-        m_offsets[m_slot_tail & SLOTS_MASK] = ~offset;
+        m_offsets[slot_tail & SLOTS_MASK] = ~offset;
 
         //  Build the packet header.
         PacketHeaderData* packet = (PacketHeaderData*)(m_buffer + offset);
         packet->magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
-        packet->seqnum = m_slot_tail++;
+        packet->seqnum = slot_tail++;
         packet->packet_bytes = (uint8_t)packet_bytes;  //  256 overflows to 0
         packet->opcode = PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA;
-        memcpy(&packet->stream_offset, &m_stream_offset, sizeof(uint16_t));   //  May be misaligned.
+        memcpy(&packet->stream_offset, &stream_offset, sizeof(uint16_t));   //  May be misaligned.
 
         //  Copy stream data.
         memcpy(packet + 1, data, current);
-        m_stream_offset += (uint16_t)current;
+        stream_offset += (uint16_t)current;
 
         //  Build CRC
         pabb_crc32_write_to_message(packet, packet_bytes);
 
-//        cout << "Send: " << (int)packet->seqnum << ", Offset: " << packet->stream_offset << endl;
-
-        //  Send
-        m_connection.unreliable_send(packet, packet_bytes);
-
-        //  Set the retransmit timer.
-        packet->magic_number = m_retransmit_seqnum;
-
-        sent += current;
         data = (const char*)data + current;
         bytes -= current;
     }
 
-    return sent;
+    if (bytes > 0){
+        //  Failed to send. Clear the offsets.
+        while (slot_tail != m_slot_tail){
+            m_offsets[--slot_tail & SLOTS_MASK] = 0;
+        }
+        return false;
+    }
+
+    //  Able to send. Commit the sends.
+    m_buffer_head = buffer_head;
+    m_buffer_tail = buffer_tail;
+    m_stream_offset = stream_offset;
+
+    while (m_slot_tail != slot_tail){
+        size_t offset = ~m_offsets[m_slot_tail++ & SLOTS_MASK];
+        PacketHeader* packet = (PacketHeader*)(m_buffer + offset);
+
+        //  Send
+//        cout << "Send: " << (int)packet->seqnum << ", Offset: " << packet->stream_offset << endl;
+        m_connection.unreliable_send(
+            packet,
+            packet->packet_bytes == 0 ? 256 : packet->packet_bytes
+        );
+
+        //  Set the retransmit timer.
+        packet->magic_number = m_retransmit_seqnum;
+    }
+
+//    m_slot_tail = slot_tail;
+
+    return true;
 }
+
 
 bool PacketSender::iterate_retransmits(){
     uint8_t head = m_slot_head;

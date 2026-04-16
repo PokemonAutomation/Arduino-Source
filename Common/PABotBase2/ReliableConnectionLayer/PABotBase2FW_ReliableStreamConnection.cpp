@@ -36,20 +36,13 @@ void ReliableStreamConnectionFW::reliable_send(const void* data, size_t bytes){
     if (!m_stream_ready){
         return;
     }
-    const char* ptr = (const char*)data;
-    while (bytes > 0){
-        size_t sent = m_reliable_sender.send_stream(ptr, bytes);
 
-        if (sent == 0){
-            m_reliable_sender.declare_stream_corrupted();
-            m_reliable_sender.send_oob_packet_empty(0, PABB2_CONNECTION_OPCODE_INFO_STREAM_DEAD);
-            printf("Stream buffer is full.\n");
-            return;
-        }
-
-        ptr += sent;
-        bytes -= sent;
+    if (m_reliable_sender.send_stream_all_or_nothing(data, bytes)){
+        return;
     }
+
+    m_reliable_sender.declare_stream_corrupted();
+    m_reliable_sender.send_oob_packet_empty(0, PABB2_CONNECTION_OPCODE_INFO_STREAM_DEAD);
 }
 
 
@@ -103,6 +96,8 @@ bool ReliableStreamConnectionFW::run_events(){
     if (packet == nullptr){
         return iterate_retransmits();
     }
+
+    m_packets_received++;
 
     //  Check the packet status.
     switch (packet->magic_number){
