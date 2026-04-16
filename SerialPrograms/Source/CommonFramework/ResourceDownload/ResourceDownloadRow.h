@@ -20,12 +20,13 @@
 namespace PokemonAutomation{
 
 
-class DownloadThread : public CancellableScope {
+class DownloadThread : public CancellableScope, public std::enable_shared_from_this<DownloadThread> {
 public:
     ~DownloadThread();
     DownloadThread(ResourceDownloadRow& row);
 
 public:
+    // static std::shared_ptr<DownloadThread> create(ResourceDownloadRow& row);
     void start_download_thread();
 
     // throws OperationCancelledException if the user cancels the action
@@ -60,7 +61,6 @@ signals:
 
     void metadata_fetch_finished(std::string popup_message);
     void exception_caught(std::string function_name);
-    void download_done();
     void download_failed();
     void download_completed();
 
@@ -107,7 +107,9 @@ private:
     AsyncTask m_worker2;
     AsyncTask m_worker3;
 
-    std::unique_ptr<DownloadThread> m_download_thread;
+    std::shared_ptr<DownloadThread> m_download_thread;
+
+    std::mutex m_thread_mutex;
 
 
 

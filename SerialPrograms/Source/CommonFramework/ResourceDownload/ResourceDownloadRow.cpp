@@ -48,13 +48,19 @@ DownloadThread::DownloadThread(ResourceDownloadRow& row)
 {}
 
 void DownloadThread::start_download_thread(){
+    auto self = shared_from_this();
     m_worker = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
-    [this]{ 
+    [this, self]{ 
         
         // runs when lambda is finished
-        // updates button state, and cleans up this thread
-        // use a signal/slot, since an object can't safely call reset() on itself.
-        auto guard = qScopeGuard([&] { emit m_row.download_done(); });
+        // updates button state, and releases DownloadRow's ownership over this thread
+        // the thread cleans itself up when self goes out of scope at the end of this lambda
+        struct ScopeGuard {
+            DownloadThread* thread_ptr;
+            ~ScopeGuard() {
+                thread_ptr->m_row.on_download_finished();
+            }
+        } guard{this};
 
         try {
             // std::this_thread::sleep_for(std::chrono::seconds(7));
@@ -86,8 +92,6 @@ void DownloadThread::start_download_thread(){
             emit m_row.exception_caught("ResourceDownloadButton::start_download");
         }
 
-
-        // emit m_row.download_done(); 
     }
     );
 
@@ -272,15 +276,6 @@ ResourceDownloadRow::ResourceDownloadRow(
     , m_cancel_button(*this)
     , m_progress_bar(*this)
 {
-
-    connect(
-        this, &ResourceDownloadRow::download_done,
-        this, [this](){
-            on_download_finished();
-        },
-        Qt::QueuedConnection
-    );
-
     PA_ADD_STATIC(m_data->m_resource_name);
     PA_ADD_STATIC(m_data->m_file_size_label);
     PA_ADD_STATIC(m_data->m_is_downloaded_label);
@@ -422,7 +417,7 @@ std::string ResourceDownloadRow::predownload_warning_summary(RemoteMetadata& rem
 void ResourceDownloadRow::start_download(){
 
     if (m_download_thread == nullptr){
-        m_download_thread = std::make_unique<DownloadThread>(*this);
+        m_download_thread = std::make_shared<DownloadThread>(*this);
         m_download_thread->start_download_thread();
     }
 }
@@ -456,10 +451,16 @@ void ResourceDownloadRow::start_delete(){
 void ResourceDownloadRow::on_download_finished(){
     
     update_button_state(ButtonState::READY);
-    if (m_download_thread){
-        
-        // cout << "reset m_download_thread" << endl;
-        m_download_thread.reset(); // destroy the DownloadThread
+    {
+        std::lock_guard<std::mutex> lock(m_thread_mutex);
+        if (m_download_thread){
+            // cout << "reset m_download_thread" << endl;
+
+            // This releases the Row's ownership. 
+            // The object will actually delete itself once the lambda 
+            // in start_download_thread() finishes (releasing 'self').
+            m_download_thread.reset();
+        }
     }
 }
 
