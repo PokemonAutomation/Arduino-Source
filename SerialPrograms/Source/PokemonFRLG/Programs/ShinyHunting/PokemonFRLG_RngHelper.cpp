@@ -20,6 +20,7 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_StartGameUserSelectDetector.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h"
@@ -102,7 +103,8 @@ RngHelper::RngHelper()
         1, 0 // default, min
     )
     , SEED_BUTTON(
-        "<b>Seed Button:</b><br>",
+        "<b>Seed Button:</b><br>"
+        "The button to be pressed on the title screen to set the seed.",
         {
             {SeedButton::A, "A", "A"},
             {SeedButton::Start, "Start", "Start"},
@@ -112,44 +114,57 @@ RngHelper::RngHelper()
         SeedButton::A
     )
     , SEED_DELAY(
-        "<b>Seed Delay Time (ms):</b><br>The delay between starting the game and advancing past the title screen. Set this to match your target seed.",
+        "<b>Seed Delay Time (ms):</b><br>"
+        "The delay between starting the game and advancing past the title screen. Set this to match your target seed.",
         LockMode::LOCK_WHILE_RUNNING,
         35000, 28000 // default, min
     )
     , SEED_CALIBRATION(
-         "<b>Seed Calibration (ms):</b><br>Modifies the seed delay time.",
+         "<b>Seed Calibration (ms):</b>"
+         "<br>Modifies the seed delay time. This should be changed in the opposite of the direction that you missed your seed.<br>"
+         "<i>Example: if you missed your target seed by +16ms (meaning the button press was too late), <b>decrease</b> your seed calibration by -16 (shortening the delay).</i>",
         LockMode::UNLOCK_WHILE_RUNNING,
         0  // default
     )
     , CONTINUE_SCREEN_FRAMES(
-        "<b>Continue Screen Frames:</b><br>The number of RNG advances before loading the game.<br>These pass at the \"normal\" rate compared to other consoles.",
+        "<b>Continue Screen Frames:</b>"
+        "<br>The number of RNG advances before loading the game.<br>"
+        "These pass at the \"normal\" rate compared to other consoles.",
         LockMode::LOCK_WHILE_RUNNING,
         1000, 192 // default, min
     )
     , CONTINUE_SCREEN_CALIBRATION(
-        "<b>Continue Screen Frames Calibration:</b><br>A \"fine adjustment\" that modifies the RNG advances passed on the Continue Screen.<br>"
-        "Example: if your target advance was 10000 and you hit 10025, you can decrease your calibration value by 25.",
+        "<b>Continue Screen Frames Calibration:</b>"
+        "<br>A \"fine adjustment\" that modifies the RNG advances passed on the Continue Screen.<br>"
+        "<i>Example: if your target advance was 10000 and you hit 10025, you can <b>decrease</b> your calibration value by 25.</i>",
         LockMode::UNLOCK_WHILE_RUNNING,
         0 // default
     )
     , INGAME_ADVANCES(
-        "<b>In-Game Advances:</b><br>The number of in-game RNG advances before triggering the gift/encounter.<br>These pass at double the rate compared to other consoles, where every frame results in 2 advances.<br><i>Warning: this needs to be long enough to accomodate all in-game button presses prior to the gift/encounter</i>",
+        "<b>In-Game Advances:</b>"
+        "<br>The number of in-game RNG advances before triggering the gift/encounter.<br>"
+        "These pass at double the rate compared to other consoles, where every frame results in 2 advances.<br>"
+        "<i>Warning: this needs to be long enough to accomodate all in-game button presses prior to the gift/encounter</i>",
         LockMode::LOCK_WHILE_RUNNING,
         12345, 480 // default, min
     )
     , INGAME_CALIBRATION(
-        "<b>In-Game Advances Calibration:</b><br>A \"coarse adjustment\" that modifies the RNG advances passed after loading the game.<br>"
-        "Example: if your target advance was 10000 and you hit 8500, you can increase your calibration value by 1500.",
+        "<b>In-Game Advances Calibration:</b>"
+        "<br>A \"coarse adjustment\" that modifies the RNG advances passed after loading the game.<br>"
+        "<i>Example: if your target advance was 10000 and you hit 8500, you can <b>increase</b> your calibration value by 1500.</i>",
         LockMode::UNLOCK_WHILE_RUNNING,
         0 // default
     )
     , USE_COPYRIGHT_TEXT(
-        "<b>Detect Copyright Text:</b><br>Start the seed timer only after detecting the copyright text. Can be helpful if your seeds are inconsistent.",
+        "<b>Detect Copyright Text:</b>"
+        "<br>Start the seed timer only after detecting the copyright text. Can be helpful if your seeds are inconsistent.",
         LockMode::LOCK_WHILE_RUNNING,
         true // default
     )
     , USE_TEACHY_TV(
-        "<b>Use Teachy TV:</b><br>Opens the Teachy TV to quickly advance the RNG at 313x speed.<br><i>Warning: can result in larger misses.</i>",
+        "<b>Use Teachy TV:</b>"
+        "<br>Opens the Teachy TV to quickly advance the RNG at 313x speed.<br>"
+        "<i>Warning: can result in larger misses.</i>",
         LockMode::LOCK_WHILE_RUNNING,
         false // default
     )
@@ -588,7 +603,13 @@ void RngHelper::wait_with_teachy_tv(ProControllerContext& context, const uint64_
     // total non-teachy delay duration: 13700ms
 }
 
-void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED_SEED_OFFSET, const uint64_t& CONTINUE_SCREEN_DELAY, const uint64_t& INGAME_DELAY, bool SAFARI_ZONE){
+void RngHelper::check_timings(
+    SingleSwitchProgramEnvironment& env, 
+    int64_t FIXED_SEED_OFFSET, 
+    const uint64_t& CONTINUE_SCREEN_DELAY, 
+    const uint64_t& INGAME_DELAY,
+    bool SAFARI_ZONE
+){
     if (CONTINUE_SCREEN_DELAY < 3200){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -813,7 +834,14 @@ void RngHelper::check_timings(SingleSwitchProgramEnvironment& env, int64_t FIXED
     }
 }
 
-void RngHelper::perform_blind_sequence(ProControllerContext& context, int64_t FIXED_SEED_OFFSET, const uint64_t& CONTINUE_SCREEN_DELAY, const uint64_t& TEACHY_DELAY, const uint64_t& INGAME_DELAY, bool SAFARI_ZONE){
+void RngHelper::perform_blind_sequence(
+    ProControllerContext& context, 
+    int64_t FIXED_SEED_OFFSET, 
+    const uint64_t& CONTINUE_SCREEN_DELAY, 
+    const uint64_t& TEACHY_DELAY, 
+    const uint64_t& INGAME_DELAY, 
+    bool SAFARI_ZONE
+){
     pbf_press_button(context, BUTTON_A, 80ms, 0ms); // start the game from the Home screen
     set_seed_after_delay(context, FIXED_SEED_OFFSET);
     load_game_after_delay(context, CONTINUE_SCREEN_DELAY);
@@ -912,26 +940,37 @@ void RngHelper::perform_blind_sequence(ProControllerContext& context, int64_t FI
     }
 }
 
-void RngHelper::reset_and_perform_blind_sequence(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int64_t FIXED_SEED_OFFSET, const uint64_t& CONTINUE_SCREEN_DELAY, const uint64_t& TEACHY_DELAY, const uint64_t& INGAME_DELAY, bool SAFARI_ZONE){
+void RngHelper::reset_and_perform_blind_sequence(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    int64_t FIXED_SEED_OFFSET, 
+    const uint64_t& CONTINUE_SCREEN_DELAY, 
+    const uint64_t& TEACHY_DELAY, 
+    const uint64_t& INGAME_DELAY, 
+    bool SAFARI_ZONE
+){
+    // close the game
     go_home(env.console, context);
     close_game_from_home(env.console, context);
+    // start the game and quickly go back home
     start_game_from_home(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, uint8_t(0), uint8_t(0)); // TODO: add option for user slot if needed
-    go_home(env.console, context); // happens as soon as a black screen is detected
+    pbf_wait(context, 200ms); // wait a moment to ensure the game doesn't fail to launch
+    go_home(env.console, context);
 
     // attempt to resume the game and perform the blind sequence
     // by this point, the license check should be over, so we don't need to worry about it when resuming the game
-    // profile selection is also already taken care of
     uint8_t attempts = 0;
     while(true){
         if (attempts >= 5){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "RngHelper(): Failed to resume the game 5 times in a row.",
+                "RngHelper(): Failed to reset the game 5 times in a row.",
                 env.console
             );  
         }
         env.log("Starting blind button presses...");
         UpdateMenuWatcher update_detector(env.console);
+        StartGameUserSelectWatcher user_selection_detector(env.console);
         // any other fail conditions should be added here
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
@@ -939,7 +978,7 @@ void RngHelper::reset_and_perform_blind_sequence(SingleSwitchProgramEnvironment&
             [this, FIXED_SEED_OFFSET, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE](ProControllerContext& context) {
                 perform_blind_sequence(context, FIXED_SEED_OFFSET, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE);
             },
-            { update_detector }
+            { update_detector, user_selection_detector }
         );
 
         switch (ret){
@@ -949,6 +988,12 @@ void RngHelper::reset_and_perform_blind_sequence(SingleSwitchProgramEnvironment&
             pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);
             pbf_press_button(context, BUTTON_A, 80ms, 4000ms);
             context.wait_for_all_requests();
+            continue;
+        case 1:
+            attempts++;
+            env.log("Detected the user selection screen. Reattempting to start the game");
+            pbf_press_button(context, BUTTON_A, 160ms, 1040ms);
+            go_home(env.console, context);
             continue;
         default:
             return;
@@ -960,7 +1005,8 @@ void RngHelper::reset_and_detect_copyright_text(SingleSwitchProgramEnvironment& 
     go_home(env.console, context);
     close_game_from_home(env.console, context);
     start_game_from_home(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, uint8_t(0), uint8_t(0)); // TODO: add option for user slot if needed
-    go_home(env.console, context); // happens as soon as a black screen is detected
+    pbf_wait(context, 200ms); // add an extra delay to try to ensure the game doesn't fail to launch
+    go_home(env.console, context);
 
     uint8_t attempts = 0;
     while(true){
@@ -973,6 +1019,7 @@ void RngHelper::reset_and_detect_copyright_text(SingleSwitchProgramEnvironment& 
         }
 
         UpdateMenuWatcher update_detector(env.console);
+        StartGameUserSelectWatcher user_selection_detector(env.console);
         BlackScreenWatcher blackscreen_detector(COLOR_RED);
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
@@ -980,7 +1027,7 @@ void RngHelper::reset_and_detect_copyright_text(SingleSwitchProgramEnvironment& 
             [](ProControllerContext& context) {
                 pbf_press_button(context, BUTTON_A, 80ms, 9920ms);
             },
-            { update_detector, blackscreen_detector },
+            { update_detector, user_selection_detector, blackscreen_detector },
             1ms
         );
 
@@ -994,7 +1041,13 @@ void RngHelper::reset_and_detect_copyright_text(SingleSwitchProgramEnvironment& 
             pbf_press_button(context, BUTTON_A, 80ms, 4000ms);
             context.wait_for_all_requests();
             continue;
-        case 1: 
+        case 1:
+            attempts++;
+            env.log("Detected the user selection screen. Reattempting to start the game");
+            pbf_press_button(context, BUTTON_A, 160ms, 1040ms);
+            go_home(env.console, context);
+            continue;
+        case 2: 
             context.wait_for_all_requests();
             ret2 = wait_until(
                 env.console, context, 10000ms,
