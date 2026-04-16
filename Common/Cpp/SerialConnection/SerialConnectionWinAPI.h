@@ -141,7 +141,7 @@ public:
     }
 
 private:
-    void process_error(const std::string& message, bool allow_throw){
+    void process_error(const std::string& message){
         WriteSpinLock lg(m_error_lock);
 
         size_t consecutive_errors = m_consecutive_errors.fetch_add(1);
@@ -157,19 +157,16 @@ private:
             clear_error = "ClearCommError error flag = " + std::to_string(comm_error);
         }
 
-        if (consecutive_errors <= 10){
+        if (consecutive_errors <= 100){
             serial_debug_log(message);
         }
-        if (consecutive_errors == 10){
+        if (consecutive_errors == 100){
             serial_debug_log("Further error messages will be suppressed.");
-        }
-        if (consecutive_errors >= 100 && allow_throw){
-            throw ConnectionException(nullptr, "Serial Connection failed.");
         }
     }
 
 
-    virtual size_t unreliable_send(const void* data, size_t bytes) override{
+    virtual size_t unreliable_send(const void* data, size_t bytes) noexcept override{
         WriteSpinLock lg(m_send_lock, "SerialConnection::send()");
 #if 0
         for (size_t c = 0; c < bytes; c++){
@@ -186,12 +183,13 @@ private:
         }
 
         DWORD error = GetLastError();
-        process_error(
-            "Failed to write: " + std::to_string(written) +
-            " / " + std::to_string(bytes) +
-            ", error = " + std::to_string(error),
-            true
-        );
+        try{
+            process_error(
+                "Failed to write: " + std::to_string(written) +
+                " / " + std::to_string(bytes) +
+                ", error = " + std::to_string(error)
+            );
+        }catch (...){}
 //        auto stop = current_time();
 //        cout << "WriteFile() : " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count() << endl;
 
@@ -210,7 +208,7 @@ private:
             DWORD read;
             if (ReadFile(m_handle, buffer, 32, &read, nullptr) == 0){
                 DWORD error = GetLastError();
-                process_error("ReadFile() failed. Error = " + std::to_string(error), false);
+                process_error("ReadFile() failed. Error = " + std::to_string(error));
             }
 //            auto stop = current_time();
 //            cout << "ReadFile() : " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count() << endl;
