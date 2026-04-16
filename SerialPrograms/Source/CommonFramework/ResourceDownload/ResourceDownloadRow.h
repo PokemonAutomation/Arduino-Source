@@ -20,13 +20,23 @@
 namespace PokemonAutomation{
 
 
+// must be initialized as shared_ptr, so that `shared_from_this` can work
+// so you're forced to use the factory method `create`
 class DownloadThread : public CancellableScope, public std::enable_shared_from_this<DownloadThread> {
-public:
-    ~DownloadThread();
-    DownloadThread(ResourceDownloadRow& row);
+
+private:
+    struct ConstructorKey { 
+        explicit ConstructorKey() = default; 
+    };
 
 public:
-    // static std::shared_ptr<DownloadThread> create(ResourceDownloadRow& row);
+    ~DownloadThread();
+    DownloadThread(ConstructorKey, ResourceDownloadRow& row);
+
+public:
+    // factor method to initialize DownloadThread, since it must be a shared_ptr
+    static std::shared_ptr<DownloadThread> create(ResourceDownloadRow& row);
+    
     void start_download_thread();
 
     // throws OperationCancelledException if the user cancels the action

@@ -42,19 +42,23 @@ DownloadThread::~DownloadThread(){
     this->cancel();
     m_worker.wait_and_ignore_exceptions();
 }
-DownloadThread::DownloadThread(ResourceDownloadRow& row) 
+DownloadThread::DownloadThread(ConstructorKey, ResourceDownloadRow& row) 
     : CancellableScope()
     , m_row(row)
 {}
 
+std::shared_ptr<DownloadThread> DownloadThread::create(ResourceDownloadRow& row){
+    return std::make_shared<DownloadThread>(ConstructorKey{}, row);
+}
+
 void DownloadThread::start_download_thread(){
     auto self = shared_from_this();
     m_worker = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
-    [this, self]{ 
+    [this, self]{
         
         // runs when lambda is finished
         // updates button state, and releases DownloadRow's ownership over this thread
-        // the thread cleans itself up when self goes out of scope at the end of this lambda
+        // the thread cleans itself up when `self` goes out of scope at the end of this lambda
         struct ScopeGuard {
             DownloadThread* thread_ptr;
             ~ScopeGuard() {
@@ -417,7 +421,7 @@ std::string ResourceDownloadRow::predownload_warning_summary(RemoteMetadata& rem
 void ResourceDownloadRow::start_download(){
 
     if (m_download_thread == nullptr){
-        m_download_thread = std::make_shared<DownloadThread>(*this);
+        m_download_thread = DownloadThread::create(*this);  //std::make_shared<DownloadThread>(*this);
         m_download_thread->start_download_thread();
     }
 }
