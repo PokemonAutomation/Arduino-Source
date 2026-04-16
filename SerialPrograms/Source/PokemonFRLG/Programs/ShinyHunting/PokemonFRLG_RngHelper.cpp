@@ -25,6 +25,7 @@
 #include "PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h"
 #include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_RngHelper.h"
@@ -64,8 +65,15 @@ std::unique_ptr<StatsTracker> RngHelper_Descriptor::make_stats() const{
 }
 
 RngHelper::RngHelper()
-    : TARGET(
-        "<b>Target:</b><br>",
+    : PROFILE(
+        "<b>User Profile Position:</b><br>"
+        "The position, from left to right, of the Switch profile with the FRLG save you'd like to use.<br>"
+        "If this is set to 0, Switch 1 defaults to the last-used profile, while Switch 2 defaults to the first profile (position 1)",
+        LockMode::LOCK_WHILE_RUNNING,
+        0, 0, 8 // default, min, max
+    )
+    , TARGET(
+        "<b>Target:</b>",
         {
             {Target::starters, "starters", "Bulbasaur / Squirtle / Charmander"},
             {Target::magikarp, "magikarp", "Magikarp"},
@@ -98,7 +106,8 @@ RngHelper::RngHelper()
         Target::starters
     )    
     , NUM_RESETS(
-        "<b>Max Resets:</b><br>",
+        "<b>Max Resets:</b><br>"
+        "This program requires manual calibration, so this should usually be set to 1 while calibrating.",
         LockMode::UNLOCK_WHILE_RUNNING,
         1, 0 // default, min
     )
@@ -186,6 +195,7 @@ RngHelper::RngHelper()
         &NOTIFICATION_PROGRAM_FINISH,
     })
 {
+    PA_ADD_OPTION(PROFILE);
     PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(NUM_RESETS);
     PA_ADD_OPTION(SEED_BUTTON);
@@ -385,9 +395,26 @@ void use_registered_fishing_rod(ProControllerContext& context, const uint64_t& I
 
 void go_to_starter_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     // Navigate to summary (1st party slot)
-    open_party_menu_from_overworld(env.console, context);
-    pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
+    open_start_menu(env.console, context); // Don't have a Pokedex yet, so arrow will already by over POKeMON
+    
+    SummaryWatcher summary_open(COLOR_RED);
+    context.wait_for_all_requests();
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [](ProControllerContext& context) {
+            pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
+            for (int i=0; i<3; i++){
+                pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
+            }
+        },
+        { summary_open }
+    );
+
+    if (ret < 0){
+        env.log("go_to_starter_summary(): failed to open the summary.");
+    }else{
+        env.log("Summary opened.");
+    }
 }
 
 bool shiny_check_starter_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -399,13 +426,30 @@ bool shiny_check_starter_summary(SingleSwitchProgramEnvironment& env, ProControl
 }
 
 void go_to_last_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    // navigate to summary (last party slot)
+    // navigate to the last occupied party slot
     open_party_menu_from_overworld(env.console, context);
     pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
     pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+
     // open summary
-    pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
+    SummaryWatcher summary_open(COLOR_RED);
+    context.wait_for_all_requests();
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [](ProControllerContext& context) {
+            pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
+            for (int i=0; i<3; i++){
+                pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
+            }
+        },
+        { summary_open }
+    );
+
+    if (ret < 0){
+        env.log("go_to_last_summary(): failed to open the summary.");
+    } else {
+        env.log("Summary opened.");
+    }
 }
 
 bool shiny_check_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -953,7 +997,7 @@ void RngHelper::reset_and_perform_blind_sequence(
     go_home(env.console, context);
     close_game_from_home(env.console, context);
     // start the game and quickly go back home
-    start_game_from_home(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, uint8_t(0), uint8_t(0)); // TODO: add option for user slot if needed
+    start_game_from_home(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, uint8_t(0), PROFILE); 
     pbf_wait(context, 200ms); // wait a moment to ensure the game doesn't fail to launch
     go_home(env.console, context);
 
@@ -1004,7 +1048,7 @@ void RngHelper::reset_and_perform_blind_sequence(
 void RngHelper::reset_and_detect_copyright_text(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     go_home(env.console, context);
     close_game_from_home(env.console, context);
-    start_game_from_home(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, uint8_t(0), uint8_t(0)); // TODO: add option for user slot if needed
+    start_game_from_home(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, uint8_t(0), PROFILE);
     pbf_wait(context, 200ms); // add an extra delay to try to ensure the game doesn't fail to launch
     go_home(env.console, context);
 
