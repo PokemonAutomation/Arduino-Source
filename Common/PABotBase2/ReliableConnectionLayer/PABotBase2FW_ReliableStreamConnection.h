@@ -38,6 +38,9 @@ class ReliableStreamConnectionFW final : public ReliableStreamConnectionPolling{
 public:
     ReliableStreamConnectionFW(UnreliableStreamConnectionPolling& unreliable_connection);
 
+    size_t packets_received() const{
+        return m_packets_received;
+    }
     bool has_unacked_sends() const{
         return m_reliable_sender.slots_used() != 0;
     }
@@ -96,6 +99,8 @@ private:
     PacketSender m_reliable_sender;
     PacketParser m_parser;
     StreamCoalescer m_stream_coalescer;
+
+    size_t m_packets_received = 0;
 
     WallClock m_last_retransmit;
 

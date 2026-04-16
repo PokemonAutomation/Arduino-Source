@@ -67,8 +67,7 @@ public:
 
 public:
     virtual bool cancel_all_commands(WallDuration timeout) override{
-        PABotBase2_Controller::cancel_all_commands(timeout);
-        return true;
+        return PABotBase2_Controller::cancel_all_commands(timeout);
     }
     virtual void replace_on_next_command() override{
         PABotBase2_Controller::replace_on_next_command();

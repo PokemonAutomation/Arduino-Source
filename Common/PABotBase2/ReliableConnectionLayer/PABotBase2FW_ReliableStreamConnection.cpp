@@ -104,6 +104,8 @@ bool ReliableStreamConnectionFW::run_events(){
         return iterate_retransmits();
     }
 
+    m_packets_received++;
+
     //  Check the packet status.
     switch (packet->magic_number){
     case PABB2_PacketParser_RESULT_VALID:
