@@ -11,6 +11,7 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/ImageManip.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
@@ -131,6 +132,7 @@ StatsReader::StatsReader(Color color)
         : m_color(color), m_box_nature(0.028976, 0.729610, 0.502487, 0.065251),
             m_box_level(0.052000, 0.120140, 0.099000, 0.069416),
             m_box_name(0.163158, 0.122917, 0.262811, 0.066639),
+            m_box_gender(0.430769, 0.114423, 0.034615, 0.081731),
             m_box_hp(0.815558, 0.131247, 0.173049, 0.065251),
             m_box_attack(0.891000, 0.245089, 0.097607, 0.063862),
             m_box_defense(0.891000, 0.325612, 0.097607, 0.066639),
@@ -174,6 +176,34 @@ void StatsReader::read_page1(
     if (!name_result.results.empty()){
         stats.name = name_result.results.begin()->second.token;
     }
+
+    // Detect gender by comparing red vs blue pixels
+    ImageViewRGB32 gender_box = extract_box_reference(game_screen, m_box_gender);
+
+    const bool replace_color_within_range = false;
+    const ImageRGB32 red_region = filter_rgb32_range(
+        gender_box,
+        combine_rgb(150, 0, 0), combine_rgb(255, 100, 100), Color(0), replace_color_within_range
+    );
+    const size_t num_red_pixels = image_stats(red_region).count;
+
+    const ImageRGB32 blue_region = filter_rgb32_range(
+        gender_box,
+        combine_rgb(0, 0, 180), combine_rgb(130, 130, 255), Color(0), replace_color_within_range
+    );
+    const size_t num_blue_pixels = image_stats(blue_region).count;
+
+    const double threshold = gender_box.width() * gender_box.height() * 0.1;
+
+    if (num_red_pixels > threshold){
+        stats.gender = SummaryGender::Female;
+    }else if (num_blue_pixels > threshold){
+        stats.gender = SummaryGender::Male;
+    } else {
+        stats.gender = SummaryGender::Genderless;
+    }
+
+
 
     ImageViewRGB32 level_box = extract_box_reference(game_screen, m_box_level);
 
