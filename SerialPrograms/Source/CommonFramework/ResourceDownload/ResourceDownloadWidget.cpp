@@ -49,14 +49,21 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
     , ConfigWidget(value, *this)
     , m_value(value)
 {
-    m_button = new QPushButton(&parent);
-    m_widget = m_button;
+
+    QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    m_button = new QPushButton("Download", this);
+    // m_widget = this;
+
+    layout->addWidget(m_button);
 
     // cout << "Constructor for DownloadButtonWidget" << endl;
 
     QFont font;
     font.setBold(true);
     m_button->setFont(font);
+    m_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     QFontMetrics metrics(m_button->font());
     int minWidth = metrics.horizontalAdvance("Downloading...");
@@ -180,13 +187,19 @@ DeleteButtonWidget::DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& va
     , ConfigWidget(value, *this)
     , m_value(value)
 {
-    m_button = new QPushButton(&parent);
-    m_widget = m_button;
+    QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    m_button = new QPushButton("Delete", this);
+    // m_widget = m_button;
+
+    layout->addWidget(m_button);
 
     QFont font;
     font.setBold(true);
     m_button->setFont(font);
     m_button->setText("Delete");
+    m_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     QFontMetrics metrics(m_button->font());
     int minWidth = metrics.horizontalAdvance("Deleting...");
@@ -270,13 +283,19 @@ CancelButtonWidget::CancelButtonWidget(QWidget& parent, ResourceCancelButton& va
     , ConfigWidget(value, *this)
     , m_value(value)
 {
-    m_button = new QPushButton(&parent);
-    m_widget = m_button;
+    QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    m_button = new QPushButton("Cancel", this);
+    // m_widget = m_button;
+
+    layout->addWidget(m_button);
 
     QFont font;
     font.setBold(true);
     m_button->setFont(font);
     m_button->setText("Cancel");
+    m_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     QFontMetrics metrics(m_button->font());
     int minWidth = metrics.horizontalAdvance("Cancelling...");
