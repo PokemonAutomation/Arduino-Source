@@ -218,7 +218,7 @@ private:
     // 2. There is an error. (returns less than bytes)
     // 3. The SerialConnection instance is getting destructed from a different thread.
     // If consecutive connection errors reache 100, throw ConnectionException.
-    virtual size_t unreliable_send(const void* data, size_t bytes) override{
+    virtual size_t unreliable_send(const void* data, size_t bytes) noexcept override{
         WriteSpinLock lg(m_send_lock, "SerialConnection::send()");
 
         const char* ptr = (const char*)data;
@@ -239,12 +239,13 @@ private:
                     usleep(1000);  // 1ms
                 }else{
                     // Real error occurred
-                    process_error(
-                        "Failed to write: " + std::to_string(bytes - remaining) +
-                        " / " + std::to_string(bytes) +
-                        ", error = " + std::to_string(error),
-                        true
-                    );
+                    try{
+                        process_error(
+                            "Failed to write: " + std::to_string(bytes - remaining) +
+                            " / " + std::to_string(bytes) +
+                            ", error = " + std::to_string(error)
+                        );
+                    }catch (...){}
                     return bytes - remaining;
                 }
             }
@@ -277,7 +278,7 @@ private:
             } else if (actual < 0){
                 // Read error occurred
                 int error = errno;
-                process_error("read serial POSIX() failed. Error = " + std::to_string(error), false);
+                process_error("read serial POSIX() failed. Error = " + std::to_string(error));
                 usleep(1000);
             }
             // actual == 0: timeout, no data received - just loop again to check m_exit
@@ -286,19 +287,16 @@ private:
     
 
 private:
-    void process_error(const std::string& message, bool allow_throw){
+    void process_error(const std::string& message){
         WriteSpinLock lg(m_error_lock);
 
         const size_t consecutive_errors = m_consecutive_errors.fetch_add(1);
 
-        if (consecutive_errors <= 10){
+        if (consecutive_errors <= 100){
             serial_debug_log(message);
         }
-        if (consecutive_errors == 10){
+        if (consecutive_errors == 100){
             serial_debug_log("Further error messages will be suppressed.");
-        }
-        if (consecutive_errors >= 100 && allow_throw){
-            throw ConnectionException(nullptr, "Serial Connection failed.");
         }
     }
 

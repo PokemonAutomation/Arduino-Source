@@ -87,23 +87,22 @@ void PABotBase2_Keyboard::stop_with_error(std::string error_message){
 }
 
 
-bool PABotBase2_Keyboard::cancel_all_commands(WallDuration timeout){
+void PABotBase2_Keyboard::cancel_all_commands(){
     std::lock_guard<Mutex> lg(m_state_lock);
     if (!is_ready()){
         throw InvalidConnectionStateException(error_string());
     }
     m_logger.log("cancel_all_commands()", COLOR_DARKGREEN);
-    bool ret = m_connection.device().command_queue().send_cancel(timeout);
+    m_connection.device().command_queue().send_cancel();
     m_scheduler.clear_on_next();
-    return ret;
 }
-void PABotBase2_Keyboard::replace_on_next_command(){
+void PABotBase2_Keyboard::replace_on_next_command(Cancellable* cancellable){
     std::lock_guard<Mutex> lg(m_state_lock);
     if (!is_ready()){
         throw InvalidConnectionStateException(error_string());
     }
     m_logger.log("replace_on_next_command()", COLOR_DARKGREEN);
-    m_connection.device().command_queue().send_replace_on_next();
+    m_connection.device().command_queue().send_replace_on_next(cancellable);
     m_scheduler.clear_on_next();
 }
 
@@ -126,7 +125,7 @@ void PABotBase2_Keyboard::wait_for_all(Cancellable* cancellable){
         m_scheduler.issue_wait_for_all(schedule);
     }
     execute_schedule(cancellable, schedule);
-    m_connection.device().command_queue().wait_for_all();
+    m_connection.device().command_queue().wait_for_all(cancellable);
 }
 
 
@@ -228,7 +227,7 @@ void PABotBase2_Keyboard::execute_state(
     while (time_left > Milliseconds::zero()){
         Milliseconds current = std::min(time_left, 65535ms);
         request.milliseconds = current.count();
-        m_connection.device().command_queue().send_command(request);
+        m_connection.device().command_queue().send_command(cancellable, request);
         time_left -= current;
     }
 }

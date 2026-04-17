@@ -102,11 +102,7 @@ public:
     //  state and clears the command queue.
     //  This does not wait for the commands to finish cancelling. This is an
     //  asynchronous function that merely initiates the cancellation process.
-    //
-    //  If the cancel cannot be sent before the timeout, it will return false.
-    //  Thus this can be used to send a non-blocking cancel that will not
-    //  hang if the controller is stuck.
-    virtual bool cancel_all_commands(WallDuration timeout = WallDuration::max()) = 0;
+    virtual void cancel_all_commands() = 0;
 
     //  Same as "cancel_all_commands()", but instead of cancelling the stream,
     //  it lets it keep running. Then on the next command issued after this
@@ -114,7 +110,7 @@ public:
     //  This lets you do stuff like suddenly change joystick movement in
     //  response to inference while simultaneously holding a button without
     //  ever releasing it during the transition.
-    virtual void replace_on_next_command() = 0;
+    virtual void replace_on_next_command(Cancellable* cancellable) = 0;
 
 
 public:
@@ -282,10 +278,10 @@ public:
     //
     //  This cancel is used when you need continuity from an ongoing
     //  sequence.
-    void cancel_lazy(){
+    void cancel_lazy(Cancellable* cancellable){
         auto scope = m_lifetime_sanitizer.check_scope();
         CancellableScope::cancel(nullptr);
-        m_controller.replace_on_next_command();
+        m_controller.replace_on_next_command(cancellable);
     }
 
     virtual bool cancel(std::exception_ptr exception) noexcept override{
@@ -294,7 +290,7 @@ public:
             return true;
         }
         try{
-            m_controller.cancel_all_commands(std::chrono::milliseconds(100));
+            m_controller.cancel_all_commands();
         }catch (...){}
         return false;
     }

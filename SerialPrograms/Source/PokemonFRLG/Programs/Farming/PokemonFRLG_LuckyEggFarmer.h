@@ -38,12 +38,27 @@ public:
 
 private:
 
+    // After exiting the safari zone building navigate to grass with Chansey.
+    // Currently only supports running. Should add Surf option...
     bool navigate_to_chansey(ConsoleHandle& console, ProControllerContext& context);
+    // Swap first and second pokemon. 
+    // First pokemon used to avoid encounters on the route to Chansey. Second pokemon used to improve encounter rates.
     void swap_lead_pokemon(ConsoleHandle& console, ProControllerContext& context);
+    // Reads wild encounter name and returns true if Chansey
     bool is_chansey(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    // Handles the encounter logic. Attempts to spin in place. Resets position to the top right corner of grass.
+    // Returns true if transition to battle detected.
     bool find_encounter(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    // Handles the catch logic. Should be updated to throw bait for better catch rates.
+    // Returns true if catch successful. Returns in the overworld.
     bool attempt_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int& balls_left);
+    // Opens the party menu from a given overworld location (safari zone, or the main safari zone building)
+    // Checks the last four party slots for held items. Returns true if item detected.
     bool check_for_lucky_egg(ConsoleHandle& console, ProControllerContext& context, bool returned_to_building);
+    // Handles the main loop once we are in the grass ready to search for a Chansey. 
+    // Returns true if a stop condition is met (lucky egg or shiny found).
+    // Returns false if we need to soft reset (out of safari balls, out of steps, caught a full party of Chansey).
+    bool run_safari_zone(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
     OCR::LanguageOCROption LANGUAGE;
 

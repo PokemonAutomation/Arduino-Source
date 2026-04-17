@@ -22,7 +22,7 @@ namespace PABotBase2{
 
 
 
-class CommandQueueManager final : public Cancellable{
+class CommandQueueManager final : public Cancellable, public Cancellable::CancelListener{
 public:
     CommandQueueManager(
         Logger& logger,
@@ -46,14 +46,22 @@ public:
 
 
 public:
-    void wait_for_all();
-    void wait_for_command_finish(uint8_t id);
+    void wait_for_all(Cancellable* cancellable);
+    void wait_for_command_finish(Cancellable* cancellable, uint8_t id);
 
-    bool send_cancel(WallDuration timeout = WallDuration::max());
-    void send_replace_on_next();
+    void send_cancel() noexcept;
+    void send_replace_on_next(Cancellable* cancellable);
 
-    uint8_t send_command(MessageHeader& command);
+    uint8_t send_command(Cancellable* cancellable, MessageHeader& command);
     void report_command_finished(const MessageHeader& finished_message);
+
+
+private:
+    bool try_push_pending_cancel() noexcept;
+
+    virtual void on_cancellable_cancel() override;
+    void cv_wait(Cancellable* cancellable, std::unique_lock<Mutex>& lg);
+    void throw_if_cancelled(Cancellable* cancellable);
 
 
 private:
@@ -66,6 +74,9 @@ private:
     uint8_t m_command_queue_size = 4;
     uint8_t m_command_seqnum = 0;
 
+    bool m_pending_cancel = false;
+
+    SpinLock m_pending_commands_lock;
     struct CommandHandle{
         bool finished = false;
         uint32_t device_timestamp = 0;
