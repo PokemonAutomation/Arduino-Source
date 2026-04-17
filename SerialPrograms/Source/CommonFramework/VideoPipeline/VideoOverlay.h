@@ -80,7 +80,7 @@ public:
 
 public:
     struct MouseListener{
-        virtual void on_mouse_press(double x, double y){}
+        virtual void on_mouse_press(double x, double y){};
         virtual void on_mouse_release(double x, double y){};
         virtual void on_mouse_move(double x, double y){};
     };
@@ -94,7 +94,7 @@ public:
     void issue_mouse_move(double x, double y);
 
     struct KeyEventListener{
-        virtual void on_key_press(QKeyEvent* event){}
+        virtual void on_key_press(QKeyEvent* event){};
         virtual void on_key_release(QKeyEvent* event){};
     };
     void add_keyevent_listener(KeyEventListener& listener);
