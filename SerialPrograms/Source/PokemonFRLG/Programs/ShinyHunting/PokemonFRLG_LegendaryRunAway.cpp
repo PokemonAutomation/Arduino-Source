@@ -145,7 +145,9 @@ void LegendaryRunAway::reset_hooh(SingleSwitchProgramEnvironment& env, ProContro
     int ret2 = run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_LEFT, HOOH_LEFT_RIGHT, 160ms);
+            ssf_press_button(context, BUTTON_B, 0ms, 500ms);
+            pbf_press_dpad(context, DPAD_LEFT, 500ms, 0ms);
+            context.wait_for_all_requests();
 
             ssf_press_button(context, BUTTON_B, 0ms, 500ms);
             pbf_press_dpad(context, DPAD_RIGHT, 500ms, 160ms);
