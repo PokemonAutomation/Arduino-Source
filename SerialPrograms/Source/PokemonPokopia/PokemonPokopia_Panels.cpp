@@ -12,6 +12,7 @@
 
 // General
 #include "Programs/PokemonPokopia_CloudIslandReset.h"
+#include "Programs/PokemonPokopia_PaletteReset.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -39,6 +40,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Untested/Beta/WIP ----");
         ret.emplace_back(make_single_switch_program<CloudIslandReset_Descriptor, CloudIslandReset>());
+        ret.emplace_back(make_single_switch_program<PaletteReset_Descriptor, PaletteReset>());
     }
 
     // if (PreloadSettings::instance().DEVELOPER_MODE){

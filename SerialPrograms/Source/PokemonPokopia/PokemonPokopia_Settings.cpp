@@ -25,9 +25,16 @@ GameSettings::GameSettings()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
+    ,GAME_TO_HOME_DELAY0(
+        "<b>Game to Home Delay:</b><br>Delay from pressing home to entering the the Switch home menu.",
+        LockMode::LOCK_WHILE_RUNNING,
+        "1000 ms"
+    )
+    
 {
     PA_ADD_STATIC(m_general);
     PA_ADD_STATIC(m_advanced_options);
+    PA_ADD_OPTION(GAME_TO_HOME_DELAY0);
 }
 
 
