@@ -133,6 +133,11 @@ void DeviceHandle::query_protocol(){
             if (iter == PROGRAMS->end()){
                 throw_incompatible_protocol();
             }
+        }else{
+            uint8_t minor_version = iter->second;
+            if (m_device_protocol % 100 < minor_version){
+                throw_incompatible_protocol();
+            }
         }
     }
     m_logger.log(
