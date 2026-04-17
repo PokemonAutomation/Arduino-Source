@@ -26,7 +26,7 @@ public:
 
     SectionDividerOption m_advanced_options;
 
-	MillisecondsOption GAME_TO_HOME_DELAY0;
+    MillisecondsOption GAME_TO_HOME_DELAY0;
 
 };
 
@@ -36,8 +36,8 @@ public:
 class GameSettings_Descriptor : public PanelDescriptor{
 public:
     GameSettings_Descriptor();
-	
-	
+    
+    
 };
 
 

@@ -66,8 +66,8 @@ void PaletteReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     assert_16_9_720p_min(env.logger(), env.console);
 
     //start in game facing a PC, with the A button visible,
-	for (uint32_t c = 0; c < SKIPS; c++){
-		env.log("Resets: " + tostr_u_commas(c));
+    for (uint32_t c = 0; c < SKIPS; c++){
+        env.log("Resets: " + tostr_u_commas(c));
 
         wait_for_overworld(env.console, context);
 
@@ -85,8 +85,8 @@ void PaletteReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         }
 
         exit_pc(env.console, context);
-	
-		//  Date skip
+    
+        //  Date skip
         pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
         home_to_date_time(env.console, context, true);
 
@@ -108,7 +108,7 @@ void PaletteReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
         home_to_date_time(env.console, context, true);
 
-		pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+        pbf_press_button(context, BUTTON_A, 160ms, 840ms);
         pbf_press_button(context, BUTTON_A, 48ms, 24ms);//month
         pbf_move_left_joystick(context, {0,+1}, 48ms, 24ms);
         pbf_press_button(context, BUTTON_A, 48ms, 24ms);//day
@@ -119,10 +119,10 @@ void PaletteReset::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         pbf_press_button(context, BUTTON_A, 160ms, 840ms);
 
         pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
-		//resume game
-		resume_game_from_home(env.console, context);
-		
-		pbf_wait(context, 2000ms);
+        //resume game
+        resume_game_from_home(env.console, context);
+        
+        pbf_wait(context, 2000ms);
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);
