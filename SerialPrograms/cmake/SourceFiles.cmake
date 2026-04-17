@@ -1490,6 +1490,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/PokemonFRLG_Panels.h
     Source/PokemonFRLG/PokemonFRLG_Settings.cpp
     Source/PokemonFRLG/PokemonFRLG_Settings.h
+    Source/PokemonFRLG/Programs/Farming/PokemonFRLG_ItemDuplication.cpp
+    Source/PokemonFRLG/Programs/Farming/PokemonFRLG_ItemDuplication.h
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_LuckyEggFarmer.cpp
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_LuckyEggFarmer.h
     Source/PokemonFRLG/Programs/Farming/PokemonFRLG_NuggetBridgeFarmer.cpp
