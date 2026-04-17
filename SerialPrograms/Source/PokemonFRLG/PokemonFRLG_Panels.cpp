@@ -9,7 +9,7 @@
 #include "PokemonFRLG_Panels.h"
 
 #include "PokemonFRLG_Settings.h"
-
+#include "Programs/Farming/PokemonFRLG_ItemDuplication.h"
 #include "Programs/Farming/PokemonFRLG_LuckyEggFarmer.h"
 #include "Programs/Farming/PokemonFRLG_NuggetBridgeFarmer.h"
 #include "Programs/Farming/PokemonFRLG_PickupFarmer.h"
@@ -26,7 +26,6 @@
 #include "Programs/TestPrograms/PokemonFRLG_ReadBattleLevelUp.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadTrainerId.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadEncounter.h"
-#include "Programs/Farming/PokemonFRLG_ItemDuplication.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
