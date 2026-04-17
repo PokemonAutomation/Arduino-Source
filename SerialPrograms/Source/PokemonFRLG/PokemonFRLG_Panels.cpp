@@ -9,7 +9,7 @@
 #include "PokemonFRLG_Panels.h"
 
 #include "PokemonFRLG_Settings.h"
-
+#include "Programs/Farming/PokemonFRLG_ItemDuplication.h"
 #include "Programs/Farming/PokemonFRLG_LuckyEggFarmer.h"
 #include "Programs/Farming/PokemonFRLG_NuggetBridgeFarmer.h"
 #include "Programs/Farming/PokemonFRLG_PickupFarmer.h"
@@ -61,6 +61,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Untested/Beta/WIP ----");
+        ret.emplace_back(make_single_switch_program<ItemDuplication_Descriptor, ItemDuplication>());
         ret.emplace_back(make_single_switch_program<LuckyEggFarmer_Descriptor, LuckyEggFarmer>());
         ret.emplace_back(make_single_switch_program<LegendaryRunAway_Descriptor, LegendaryRunAway>());
         ret.emplace_back(make_single_switch_program<RngHelper_Descriptor, RngHelper>());
