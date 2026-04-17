@@ -37,13 +37,13 @@ bool PABotBase2_Controller::cancel_all_commands(WallDuration timeout){
     m_scheduler.clear_on_next();
     return ret;
 }
-void PABotBase2_Controller::replace_on_next_command(){
+void PABotBase2_Controller::replace_on_next_command(Cancellable* cancellable){
     std::lock_guard<Mutex> lg(m_state_lock);
     if (!is_ready()){
         throw InvalidConnectionStateException(error_string());
     }
     m_logger.log("replace_on_next_command()", COLOR_DARKGREEN);
-    m_connection.device().command_queue().send_replace_on_next();
+    m_connection.device().command_queue().send_replace_on_next(cancellable);
     m_scheduler.clear_on_next();
 }
 
@@ -66,7 +66,7 @@ void PABotBase2_Controller::wait_for_all(Cancellable* cancellable){
         m_scheduler.issue_wait_for_all(schedule);
     }
     execute_schedule(cancellable, schedule);
-    m_connection.device().command_queue().wait_for_all();
+    m_connection.device().command_queue().wait_for_all(cancellable);
 }
 
 

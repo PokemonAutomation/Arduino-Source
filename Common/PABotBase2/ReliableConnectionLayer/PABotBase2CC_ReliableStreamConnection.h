@@ -97,7 +97,7 @@ private:
 //    virtual size_t reliable_send_available() const override;
     virtual size_t reliable_send_blocking(const void* data, size_t bytes, WallDuration timeout) override;
     virtual void on_recv(const void* data, size_t bytes) override;
-    virtual size_t unreliable_send(const void* data, size_t bytes) override;
+    virtual size_t unreliable_send(const void* data, size_t bytes) noexcept override;
 
 
 private:

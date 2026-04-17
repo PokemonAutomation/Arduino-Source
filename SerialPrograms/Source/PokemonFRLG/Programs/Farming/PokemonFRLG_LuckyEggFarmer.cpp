@@ -376,11 +376,92 @@ bool LuckyEggFarmer::check_for_lucky_egg(ConsoleHandle& console, ProControllerCo
     return false;
 }
 
+bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+    LuckyEggFarmer_Descriptor::Stats& stats = env.current_stats<LuckyEggFarmer_Descriptor::Stats>();
+
+    int chancy_count = 0;
+    int balls_left = 30;
+
+    while (chancy_count < 4) {
+        if (!find_encounter(env, context)) {
+            return false;
+        }
+
+        bool encounter_shiny = handle_encounter(env.console, context, true);
+        if (encounter_shiny) {
+            stats.shinies++;
+            env.update_stats();
+            send_program_notification(
+                env,
+                NOTIFICATION_SHINY,
+                COLOR_YELLOW,
+                "Shiny found!",
+                {}, "",
+                env.console.video().snapshot(),
+                true
+            );
+            if (TAKE_VIDEO) {
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
+            }
+            return true;
+        }
+
+        if (!is_chansey(env, context)) {
+            continue;
+        }
+
+        bool caught = attempt_catch(env, context, balls_left);
+
+        if (caught) {
+            stats.chanseys++;
+            env.update_stats();
+            chancy_count++;
+        }
+
+        pbf_wait(context, 500ms);
+        context.wait_for_all_requests();
+
+        WhiteDialogDetector dialog(COLOR_RED);
+        bool in_safari_zone_building = dialog.detect(env.console.video().snapshot());
+
+        if (balls_left <= 0) {
+            in_safari_zone_building = true;
+        }
+
+        if (in_safari_zone_building && !caught) {
+            return false;
+        }
+
+        if (in_safari_zone_building) {
+            pbf_mash_button(context, BUTTON_B, 500ms);
+            context.wait_for_all_requests();
+        }
+
+        if (caught) {
+            if (check_for_lucky_egg(env.console, context, in_safari_zone_building)) {
+                env.log("Lucky Egg found!");
+                stats.eggs++;
+                env.update_stats();
+                return true;
+            }
+            env.log("Lucky Egg not found. Continuing to farm...");
+            pbf_mash_button(context, BUTTON_B, 1500ms);
+            context.wait_for_all_requests();
+        }
+
+        if (balls_left <= 0) {
+            env.log("Out of Safari balls. Resetting...");
+            return false;
+        }
+    }
+
+    return false;
+}
+
 void LuckyEggFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 
     home_black_border_check(env.console, context);
 
-    LuckyEggFarmer_Descriptor::Stats& stats = env.current_stats<LuckyEggFarmer_Descriptor::Stats>();
     DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
 
     while (true){
@@ -431,80 +512,8 @@ void LuckyEggFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
         swap_lead_pokemon(env.console, context);
 
-        int chancy_count = 0;
-        int balls_left = 30;
-
-        while (chancy_count < 4) {
-            if (!find_encounter(env, context)) {
-                break;
-            }
-
-            bool encounter_shiny = handle_encounter(env.console, context, true);
-            if (encounter_shiny) {
-                stats.shinies++;
-                env.update_stats();
-                send_program_notification(
-                    env,
-                    NOTIFICATION_SHINY,
-                    COLOR_YELLOW,
-                    "Shiny found!",
-                    {}, "",
-                    env.console.video().snapshot(),
-                    true
-                );
-                if (TAKE_VIDEO) {
-                    pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
-                }
-                return;
-            }
-
-            if (!is_chansey(env, context)) {
-                continue;
-            }
-
-            bool caught = attempt_catch(env, context, balls_left);
-
-            if (caught){
-                stats.chanseys++;
-                env.update_stats();
-                chancy_count++;
-            }
-
-            pbf_wait(context, 500ms);
-            context.wait_for_all_requests();
-
-            WhiteDialogDetector dialog(COLOR_RED);
-            bool in_safari_zone_building = dialog.detect(env.console.video().snapshot());
-            
-            if (balls_left <= 0) {
-                in_safari_zone_building = true;
-            }
-
-            if (in_safari_zone_building && !caught) {
-                break;
-            }
-
-            if (in_safari_zone_building) {
-                pbf_mash_button(context, BUTTON_B, 500ms);
-                context.wait_for_all_requests();
-            }
-
-            if (caught) {
-                if (check_for_lucky_egg(env.console, context, in_safari_zone_building)) {
-                    env.log("Lucky Egg found!");
-                    stats.eggs++;
-                    env.update_stats();
-                    return;
-                }
-                env.log("Lucky Egg not found. Continuing to farm...");
-                pbf_mash_button(context, BUTTON_B, 1500ms);
-                context.wait_for_all_requests();
-            }
-
-            if (balls_left <= 0) {
-                env.log("Out of Safari balls. Resetting...");
-                break;
-            }
+        if (run_safari_zone(env, context)) {
+            break;
         }
 
         soft_reset(env.console, context);

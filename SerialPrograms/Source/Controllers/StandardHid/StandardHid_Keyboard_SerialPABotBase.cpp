@@ -83,7 +83,7 @@ bool SerialPABotBase_Keyboard::cancel_all_commands(WallDuration timeout){
     m_scheduler.clear_on_next();
     return true;
 }
-void SerialPABotBase_Keyboard::replace_on_next_command(){
+void SerialPABotBase_Keyboard::replace_on_next_command(Cancellable* cancellable){
     std::lock_guard<Mutex> lg(m_state_lock);
     if (!is_ready()){
         throw InvalidConnectionStateException(error_string());

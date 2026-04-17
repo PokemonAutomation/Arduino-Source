@@ -38,17 +38,17 @@ bool CommandQueueManager::cancel(std::exception_ptr exception) noexcept{
     return ret;
 }
 
-void CommandQueueManager::wait_for_all(){
+void CommandQueueManager::wait_for_all(Cancellable* cancellable){
     std::unique_lock<Mutex> lg(m_lock);
     while (!m_pending_commands.empty()){
-        throw_if_cancelled();
-        m_cv.wait(lg);
+        throw_if_cancelled(cancellable);
+        cv_wait(cancellable, lg);
     }
 }
-void CommandQueueManager::wait_for_command_finish(uint8_t id){
+void CommandQueueManager::wait_for_command_finish(Cancellable* cancellable, uint8_t id){
     std::unique_lock<Mutex> lg(m_lock);
     while (true){
-        throw_if_cancelled();
+        throw_if_cancelled(cancellable);
 
         //  Command doesn't exist.
         auto iter = m_pending_commands.find(id);
@@ -56,7 +56,7 @@ void CommandQueueManager::wait_for_command_finish(uint8_t id){
             return;
         }
 
-        m_cv.wait(lg);
+        cv_wait(cancellable, lg);
     }
 }
 
@@ -97,7 +97,7 @@ bool CommandQueueManager::send_cancel(WallDuration timeout){
         return false;
     }
 }
-void CommandQueueManager::send_replace_on_next(){
+void CommandQueueManager::send_replace_on_next(Cancellable* cancellable){
     MessageHeader message;
     message.message_bytes = sizeof(MessageHeader);
     message.opcode = PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT;
@@ -112,14 +112,14 @@ void CommandQueueManager::send_replace_on_next(){
 }
 
 
-uint8_t CommandQueueManager::send_command(MessageHeader& command){
+uint8_t CommandQueueManager::send_command(Cancellable* cancellable, MessageHeader& command){
     {
         std::unique_lock<Mutex> lg(m_lock);
         while (true){
-            throw_if_cancelled();
+            throw_if_cancelled(cancellable);
 
             if (m_pending_commands.size() >= m_command_queue_size){
-                m_cv.wait(lg);
+                cv_wait(cancellable, lg);
                 continue;
             }
 
@@ -164,6 +164,34 @@ void CommandQueueManager::report_command_finished(const MessageHeader& finished_
     m_cv.notify_all();
 }
 
+
+void CommandQueueManager::on_cancellable_cancel(){
+    {
+        std::unique_lock<Mutex> lg(m_lock);
+    }
+    m_cv.notify_all();
+}
+void CommandQueueManager::cv_wait(Cancellable* cancellable, std::unique_lock<Mutex>& lg){
+    if (cancellable == nullptr){
+        m_cv.wait(lg);
+        return;
+    }
+
+    cancellable->add_cancel_listener(*this);
+    m_cv.wait(lg);
+
+    //  Unlock to remove. Otherwise, it may deadlock with "on_cancellable_cancel()"
+    //  being called from a listener callback.
+    lg.unlock();
+    cancellable->remove_cancel_listener(*this);
+    lg.lock();
+}
+void CommandQueueManager::throw_if_cancelled(Cancellable* cancellable){
+    Cancellable::throw_if_cancelled();
+    if (cancellable){
+        cancellable->throw_if_cancelled();
+    }
+}
 
 
 
