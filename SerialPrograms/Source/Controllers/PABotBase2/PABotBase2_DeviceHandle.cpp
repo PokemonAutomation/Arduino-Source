@@ -39,6 +39,29 @@ DeviceHandle::DeviceHandle(
     }
 }
 DeviceHandle::~DeviceHandle(){
+    {
+        std::unique_lock<Mutex> lg(m_lock);
+        try{
+            m_logger.log(
+                "DeviceHandle::~DeviceHandle(): Waiting for " + std::to_string(m_pending_requests.size()) + " request(s) to finish."
+            );
+        }catch (...){}
+        bool ok = m_cv.wait_for(
+            lg, std::chrono::milliseconds(100),
+            [this]{
+                return m_pending_requests.empty();
+            }
+        );
+        if (!ok){
+            try{
+                m_logger.log(
+                    "DeviceHandle::~DeviceHandle(): Timed out waiting for " + std::to_string(m_pending_requests.size()) + " request(s) to finish.",
+                    COLOR_RED
+                );
+            }catch (...){}
+        }
+    }
+
     detach();
     cancel(nullptr);
     m_connection.remove_listener(*this);

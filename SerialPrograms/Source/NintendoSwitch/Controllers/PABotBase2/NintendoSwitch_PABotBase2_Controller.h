@@ -34,7 +34,7 @@ public:
 
 
 public:
-    bool cancel_all_commands(WallDuration timeout);
+    void cancel_all_commands();
     void replace_on_next_command(Cancellable* cancellable);
 
     void wait_for_all(Cancellable* cancellable);

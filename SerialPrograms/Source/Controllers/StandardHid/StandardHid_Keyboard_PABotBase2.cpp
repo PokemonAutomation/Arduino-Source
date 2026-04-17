@@ -87,15 +87,14 @@ void PABotBase2_Keyboard::stop_with_error(std::string error_message){
 }
 
 
-bool PABotBase2_Keyboard::cancel_all_commands(WallDuration timeout){
+void PABotBase2_Keyboard::cancel_all_commands(){
     std::lock_guard<Mutex> lg(m_state_lock);
     if (!is_ready()){
         throw InvalidConnectionStateException(error_string());
     }
     m_logger.log("cancel_all_commands()", COLOR_DARKGREEN);
-    bool ret = m_connection.device().command_queue().send_cancel(timeout);
+    m_connection.device().command_queue().send_cancel();
     m_scheduler.clear_on_next();
-    return ret;
 }
 void PABotBase2_Keyboard::replace_on_next_command(Cancellable* cancellable){
     std::lock_guard<Mutex> lg(m_state_lock);
