@@ -38,6 +38,9 @@ void show_download_failed_box(){
 
 }    
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DownloadButtonWidget
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template class RegisterConfigWidget<DownloadButtonWidget>;
 DownloadButtonWidget::~DownloadButtonWidget(){
@@ -123,6 +126,8 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
             show_download_failed_box();
         }
     );
+
+    value.row.add_listener(*this);
 }
 
 
@@ -178,8 +183,23 @@ void DownloadButtonWidget::show_download_confirm_box(
 }
 
 
+void DownloadButtonWidget::on_metadata_fetch_finished(std::string popup_message){
+
+}
+void DownloadButtonWidget::on_exception_caught(std::string function_name){
+    
+}
+void DownloadButtonWidget::on_download_failed(){
+    
+}
+void DownloadButtonWidget::on_button_state_updated(){
+    
+}
 
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DeleteButtonWidget
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template class RegisterConfigWidget<DeleteButtonWidget>;
 DeleteButtonWidget::DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& value)
@@ -228,6 +248,7 @@ DeleteButtonWidget::DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& va
         }
     );
 
+    value.row.add_listener(*this);
 }
 
 
@@ -277,6 +298,15 @@ void DeleteButtonWidget::show_delete_confirm_box(){
     }
 }
 
+
+void DeleteButtonWidget::on_button_state_updated(){
+    
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// CancelButtonWidget
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 template class RegisterConfigWidget<CancelButtonWidget>;
 CancelButtonWidget::CancelButtonWidget(QWidget& parent, ResourceCancelButton& value)
     : QWidget(&parent)
@@ -322,6 +352,8 @@ CancelButtonWidget::CancelButtonWidget(QWidget& parent, ResourceCancelButton& va
         }
     );
 
+    value.row.add_listener(*this);
+
 }
 
 void CancelButtonWidget::update_UI_state(){
@@ -335,6 +367,14 @@ void CancelButtonWidget::update_UI_state(){
         }
     }
 }
+
+void CancelButtonWidget::on_button_state_updated(){
+    
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ProgressBarWidget
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template class RegisterConfigWidget<ProgressBarWidget>;
 ProgressBarWidget::~ProgressBarWidget(){
@@ -417,7 +457,8 @@ ProgressBarWidget::ProgressBarWidget(QWidget& parent, ResourceProgressBar& value
             update_UI_state();
         }
     );
-    
+
+    value.row.add_listener(*this);
 }
 
 
@@ -450,5 +491,18 @@ void ProgressBarWidget::update_UI_state(){
     }
 }
 
+void ProgressBarWidget::on_download_progress(int percentage){
+
+}
+void ProgressBarWidget::on_unzip_progress(int percentage){
+
+}
+void ProgressBarWidget::on_hash_progress(int percentage){
+
+}
+
+void ProgressBarWidget::on_button_state_updated(){
+    
+}
 
 }

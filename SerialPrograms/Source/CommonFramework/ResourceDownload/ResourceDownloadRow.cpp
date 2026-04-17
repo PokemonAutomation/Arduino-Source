@@ -7,6 +7,7 @@
 #include "CommonFramework/Globals.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/ListenerSet.h"
 // #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
@@ -230,6 +231,8 @@ struct ResourceDownloadRow::Data{
         , m_version_status(version_status)
         , m_version_status_label(LockMode::LOCK_WHILE_RUNNING, resource_version_to_string(version_status))
     {}
+
+    ListenerSet<DownloadListener> listeners;
 
     LabelCellOption m_resource_name;
 
@@ -514,6 +517,50 @@ void ResourceDownloadRow::update_button_state(ButtonState state){
     }
 
     emit button_state_updated();
+}
+
+void ResourceDownloadRow::add_listener(DownloadListener& listener){
+    auto scope = m_lifetime_sanitizer.check_scope();
+    m_data->listeners.add(listener);
+}
+void ResourceDownloadRow::remove_listener(DownloadListener& listener){
+    auto scope = m_lifetime_sanitizer.check_scope();
+    m_data->listeners.remove(listener);
+}
+
+void ResourceDownloadRow::report_download_progress(int percentage){
+    auto scope = m_lifetime_sanitizer.check_scope();
+    m_data->listeners.run_method(&DownloadListener::on_download_progress, percentage);
+}
+void ResourceDownloadRow::report_unzip_progress(int percentage){
+    auto scope = m_lifetime_sanitizer.check_scope();
+    m_data->listeners.run_method(&DownloadListener::on_unzip_progress, percentage);
+}
+void ResourceDownloadRow::report_hash_progress(int percentage){
+    auto scope = m_lifetime_sanitizer.check_scope();
+    m_data->listeners.run_method(&DownloadListener::on_hash_progress, percentage);
+}
+
+void ResourceDownloadRow::report_metadata_fetch_finished(std::string popup_message){
+    auto scope = m_lifetime_sanitizer.check_scope();
+    m_data->listeners.run_method(&DownloadListener::on_metadata_fetch_finished, popup_message);
+}
+void ResourceDownloadRow::report_exception_caught(std::string function_name){
+    auto scope = m_lifetime_sanitizer.check_scope();
+    m_data->listeners.run_method(&DownloadListener::on_exception_caught, function_name);
+}
+void ResourceDownloadRow::report_download_failed(){
+    auto scope = m_lifetime_sanitizer.check_scope();
+    m_data->listeners.run_method(&DownloadListener::on_download_failed);
+}
+// void ResourceDownloadRow::report_download_completed(){
+//     auto scope = m_lifetime_sanitizer.check_scope();
+//     m_data->listeners.run_method(&DownloadListener::on_download_completed);
+// }
+
+void ResourceDownloadRow::report_button_state_updated(){
+    auto scope = m_lifetime_sanitizer.check_scope();
+    m_data->listeners.run_method(&DownloadListener::on_button_state_updated);
 }
 
 

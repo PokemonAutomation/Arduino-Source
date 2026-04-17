@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 
 // class ResourceDownloadButton;
 
-class DownloadButtonWidget : public QWidget, public ConfigWidget{
+class DownloadButtonWidget : public QWidget, public ConfigWidget, public ResourceDownloadRow::DownloadListener{
     Q_OBJECT
 public:
     using ParentOption = ResourceDownloadButton;
@@ -27,6 +27,10 @@ public:
     ~DownloadButtonWidget();
     DownloadButtonWidget(QWidget& parent, ResourceDownloadButton& value);
 
+    virtual void on_metadata_fetch_finished(std::string popup_message) override;
+    virtual void on_exception_caught(std::string function_name) override;
+    virtual void on_download_failed() override;
+    virtual void on_button_state_updated() override;
 
 private:
     void update_UI_state();
@@ -44,12 +48,14 @@ private:
 void show_error_box(std::string function_name);
 
 
-class DeleteButtonWidget :  public QWidget, public ConfigWidget{
+class DeleteButtonWidget :  public QWidget, public ConfigWidget, public ResourceDownloadRow::DownloadListener{
 public:
     using ParentOption = ResourceDeleteButton;
 
 public:
     DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& value);
+
+    virtual void on_button_state_updated() override;
 
 private:
     void update_UI_state();
@@ -60,12 +66,14 @@ private:
     QPushButton* m_button;    
 };
 
-class CancelButtonWidget :  public QWidget, public ConfigWidget{
+class CancelButtonWidget :  public QWidget, public ConfigWidget, public ResourceDownloadRow::DownloadListener{
 public:
     using ParentOption = ResourceCancelButton;
 
 public:
     CancelButtonWidget(QWidget& parent, ResourceCancelButton& value);
+
+    virtual void on_button_state_updated() override;
 
 private:
     void update_UI_state();
@@ -75,13 +83,19 @@ private:
     QPushButton* m_button;    
 };
 
-class ProgressBarWidget : public QWidget, public ConfigWidget{
+class ProgressBarWidget : public QWidget, public ConfigWidget, public ResourceDownloadRow::DownloadListener{
 public:
     using ParentOption = ResourceProgressBar;
 
 public:
     ~ProgressBarWidget();
     ProgressBarWidget(QWidget& parent, ResourceProgressBar& value);
+
+    virtual void on_download_progress(int percentage) override;
+    virtual void on_unzip_progress(int percentage) override;
+    virtual void on_hash_progress(int percentage) override;
+
+    virtual void on_button_state_updated() override;
 
 private:
     void update_UI_state();

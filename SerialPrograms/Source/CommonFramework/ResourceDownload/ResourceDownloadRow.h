@@ -11,6 +11,7 @@
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/CancellableScope.h"
+#include "Common/Cpp/LifetimeSanitizer.h"
 // #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "Common/Cpp/Options/StaticTableOption.h"
 #include "ResourceDownloadHelpers.h"
@@ -76,6 +77,34 @@ signals:
 
     void button_state_updated();
 
+public:
+    struct DownloadListener{
+        virtual void on_download_progress(int percentage){};
+        virtual void on_unzip_progress(int percentage){};
+        virtual void on_hash_progress(int percentage){};
+
+        virtual void on_metadata_fetch_finished(std::string popup_message){};
+        virtual void on_exception_caught(std::string function_name){};
+        virtual void on_download_failed(){};
+        // virtual void on_download_completed(){};
+
+        virtual void on_button_state_updated(){};
+    };
+
+    void add_listener(DownloadListener& listener);
+    void remove_listener(DownloadListener& listener);
+
+    void report_download_progress(int percentage);
+    void report_unzip_progress(int percentage);
+    void report_hash_progress(int percentage);
+
+    void report_metadata_fetch_finished(std::string popup_message);
+    void report_exception_caught(std::string function_name);
+    void report_download_failed();
+    // void report_download_completed();
+
+    void report_button_state_updated();
+
 
 public:
     void set_version_status(ResourceVersionStatus version_status);
@@ -120,6 +149,8 @@ private:
     std::shared_ptr<DownloadThread> m_download_thread;
 
     std::mutex m_thread_mutex;
+
+    LifetimeSanitizer m_lifetime_sanitizer;
 
 
 
