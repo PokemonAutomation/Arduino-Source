@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
