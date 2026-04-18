@@ -21,6 +21,7 @@
 #include "Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Fishing.h"
 #include "Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Overworld.h"
 #include "Programs/RngManipulation/PokemonFRLG_RngHelper.h"
+#include "Programs/RngManipulation/PokemonFRLG_StarterRng.h"
 #include "Programs/TestPrograms/PokemonFRLG_SoundListener.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadStats.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadBattleLevelUp.h"
@@ -67,6 +68,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back(make_single_switch_program<LuckyEggFarmer_Descriptor, LuckyEggFarmer>());
         ret.emplace_back(make_single_switch_program<LegendaryRunAway_Descriptor, LegendaryRunAway>());
         ret.emplace_back(make_single_switch_program<RngHelper_Descriptor, RngHelper>());
+        ret.emplace_back(make_single_switch_program<StarterRng_Descriptor, StarterRng>());
     }
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
