@@ -199,6 +199,11 @@ void run_back_until_found_bench(
 }
 bool ShinyHunt_BenchSit::should_run_based_on_day_night(
     const ImageViewRGB32& frame, VideoOverlay& overlay){
+
+    if ((Milliseconds)WALK_FORWARD_DURATION == Milliseconds::zero()){
+        return true;
+    }
+
     if (!DAY_NIGHT_FILTER.enabled()){
         return true;
     }
@@ -290,53 +295,55 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
 
                 Milliseconds duration = WALK_FORWARD_DURATION;
 
-                open_map(env.console, context, false, true);
+                bool dayNightOk = true;
+                bool weatherOk = true;
 
-                context.wait_for_all_requests();
-                pbf_wait(context, 800ms);
+                // Only open map if movement is enabled AND a filter is active
+                if (duration > Milliseconds::zero() &&
+                    (DAY_NIGHT_FILTER.enabled() || WEATHER_FILTER.enabled())){
 
+                    open_map(env.console, context, false, true);
 
-                // stabilize zoom
-                pbf_move_right_joystick(context, {0, 1}, 1500ms, 500ms);
+                    context.wait_for_all_requests();
+                    pbf_wait(context, 800ms);
 
-                context.wait_for_all_requests();
-                pbf_wait(context, 500ms);
+                    // zoom fully in
+                    pbf_move_right_joystick(context, {0, 1}, 1500ms, 500ms);
 
+                    context.wait_for_all_requests();
+                    pbf_wait(context, 500ms);
 
-                // show icons
-                pbf_press_button(context, BUTTON_MINUS, 500ms, 500ms);
+                    // hide icons
+                    pbf_press_button(context, BUTTON_MINUS, 500ms, 500ms);
 
-                context.wait_for_all_requests();
-                pbf_wait(context, 400ms);
+                    context.wait_for_all_requests();
+                    pbf_wait(context, 400ms);
 
+                    // double snapshot
+                    ImageViewRGB32 frame1 =
+                        env.console.video().snapshot();
 
-                // double snapshot
-                ImageViewRGB32 frame1 =
-                    env.console.video().snapshot();
+                    pbf_wait(context, 200ms);
 
-                pbf_wait(context, 200ms);
+                    ImageViewRGB32 frame2 =
+                        env.console.video().snapshot();
 
-                ImageViewRGB32 frame2 =
-                    env.console.video().snapshot();
+                    dayNightOk =
+                        should_run_based_on_day_night(frame1, env.console.overlay()) ||
+                        should_run_based_on_day_night(frame2, env.console.overlay());
 
+                    weatherOk =
+                        should_run_based_on_weather(frame1) ||
+                        should_run_based_on_weather(frame2);
 
-                // evaluate using both frames
-                bool dayNightOk =
-                    should_run_based_on_day_night(frame1, env.console.overlay()) ||
-                    should_run_based_on_day_night(frame2, env.console.overlay());
+                    // close map
+                    pbf_wait(context, 150ms);
 
-                bool weatherOk =
-                    should_run_based_on_weather(frame1) ||
-                    should_run_based_on_weather(frame2);
+                    pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
 
-
-                // close map
-                pbf_wait(context, 150ms);
-
-                pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
-
-                context.wait_for_all_requests();
-                pbf_wait(context, 400ms);
+                    context.wait_for_all_requests();
+                    pbf_wait(context, 400ms);
+                }
 
 
                 // filtering
