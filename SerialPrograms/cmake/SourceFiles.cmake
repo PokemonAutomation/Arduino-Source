@@ -1506,8 +1506,6 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_GiftReset.cpp
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_GiftReset.h
-    Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_RngHelper.cpp
-    Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_RngHelper.h
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_LegendaryReset.cpp
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_LegendaryReset.h
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_LegendaryRunAway.cpp
@@ -1518,6 +1516,14 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Fishing.h
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Overworld.cpp
     Source/PokemonFRLG/Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Overworld.h
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_BlindNavigation.cpp
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_BlindNavigation.h
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngNavigation.cpp
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngNavigation.h
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_HardReset.cpp
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_HardReset.h
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngHelper.cpp
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngHelper.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.cpp
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadStats.cpp
