@@ -418,7 +418,6 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context){
     AdvanceBattleDialogWatcher ran_away(COLOR_YELLOW);
     BlackScreenOverWatcher battle_over(COLOR_RED);
 
-
     while (true)
     {
         if (errors > 5){
