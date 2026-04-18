@@ -92,9 +92,9 @@ void DownloadThread::start_download_thread(){
             // user cancelled action
 
         }catch(OperationFailedException&){
-            emit m_row.download_failed();
+            m_row.report_download_failed();
         }catch(...){
-            emit m_row.exception_caught("ResourceDownloadButton::start_download");
+            m_row.report_exception_caught("ResourceDownloadButton::start_download");
         }
 
     }
@@ -125,7 +125,7 @@ void DownloadThread::run_download(DownloadedResourceMetadata resource_metadata){
             zip_path,
             expected_size,
             [this](int percentage_progress){
-                m_row.download_progress(percentage_progress);
+                m_row.report_download_progress(percentage_progress);
             }
         );
 
@@ -135,7 +135,7 @@ void DownloadThread::run_download(DownloadedResourceMetadata resource_metadata){
                 *this,
                 zip_path,
                 [this](int percentage_progress){
-                    m_row.hash_progress(percentage_progress);
+                    m_row.report_hash_progress(percentage_progress);
                 }
             );
         std::string expected_hash = resource_metadata.sha_256;
@@ -154,7 +154,7 @@ void DownloadThread::run_download(DownloadedResourceMetadata resource_metadata){
             zip_path.c_str(), 
             resource_directory.c_str(),
             [this](int percentage_progress){
-                m_row.unzip_progress(percentage_progress);
+                m_row.report_unzip_progress(percentage_progress);
             }
         );
 
@@ -358,17 +358,17 @@ void ResourceDownloadRow::ensure_remote_metadata_loaded(){
             predownload_warning = predownload_warning_summary(remote_handle);
 
             // update_button_state(ButtonState::READY);
-            emit metadata_fetch_finished(predownload_warning);
+            report_metadata_fetch_finished(predownload_warning);
 
         }catch(OperationFailedException&){
             // cout << "failed" << endl;
             update_button_state(ButtonState::READY);
-            emit download_failed();
+            report_download_failed();
             return;
         }catch(...){
             update_button_state(ButtonState::READY);
             // cout << "Exception thrown in thread" << endl;
-            emit exception_caught("ResourceDownloadButton::ensure_remote_metadata_loaded");
+            report_exception_caught("ResourceDownloadButton::ensure_remote_metadata_loaded");
             return;
         }
     
@@ -447,7 +447,7 @@ void ResourceDownloadRow::start_delete(){
             update_button_state(ButtonState::READY);
         }catch(...){
             update_button_state(ButtonState::READY);
-            emit exception_caught("ResourceDownloadButton::start_delete");
+            report_exception_caught("ResourceDownloadButton::start_delete");
             return;
         }
     }
@@ -516,7 +516,7 @@ void ResourceDownloadRow::update_button_state(ButtonState state){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "update_button_state: Unknown enum.");  
     }
 
-    emit button_state_updated();
+    report_button_state_updated();
 }
 
 void ResourceDownloadRow::add_listener(DownloadListener& listener){
@@ -541,11 +541,11 @@ void ResourceDownloadRow::report_hash_progress(int percentage){
     m_data->listeners.run_method(&DownloadListener::on_hash_progress, percentage);
 }
 
-void ResourceDownloadRow::report_metadata_fetch_finished(std::string popup_message){
+void ResourceDownloadRow::report_metadata_fetch_finished(const std::string& popup_message){
     auto scope = m_lifetime_sanitizer.check_scope();
     m_data->listeners.run_method(&DownloadListener::on_metadata_fetch_finished, popup_message);
 }
-void ResourceDownloadRow::report_exception_caught(std::string function_name){
+void ResourceDownloadRow::report_exception_caught(const std::string& function_name){
     auto scope = m_lifetime_sanitizer.check_scope();
     m_data->listeners.run_method(&DownloadListener::on_exception_caught, function_name);
 }
@@ -553,10 +553,6 @@ void ResourceDownloadRow::report_download_failed(){
     auto scope = m_lifetime_sanitizer.check_scope();
     m_data->listeners.run_method(&DownloadListener::on_download_failed);
 }
-// void ResourceDownloadRow::report_download_completed(){
-//     auto scope = m_lifetime_sanitizer.check_scope();
-//     m_data->listeners.run_method(&DownloadListener::on_download_completed);
-// }
 
 void ResourceDownloadRow::report_button_state_updated(){
     auto scope = m_lifetime_sanitizer.check_scope();

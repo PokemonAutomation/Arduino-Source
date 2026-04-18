@@ -46,11 +46,13 @@ template class RegisterConfigWidget<DownloadButtonWidget>;
 DownloadButtonWidget::~DownloadButtonWidget(){
     // cout << "Destructor for DownloadButtonWidget" << endl;
     // m_value.disconnect(this);
+    m_value.row.remove_listener(*this);
 }
 DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButton& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
+    , m_row(value.row)
 {
 
     QHBoxLayout* layout = new QHBoxLayout(this);
@@ -92,40 +94,6 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
         }
     );
 
-    // when button_state_updated, update the UI state to match
-    connect(
-        &m_value.row, &ResourceDownloadRow::button_state_updated,
-        this, [this](){
-            update_UI_state();
-        }
-    );
-
-    // when json has been fetched, open the update box. 
-    // When click Ok in update box, start the download. If click cancel, re-enable the download button
-    connect(
-        &m_value.row, &ResourceDownloadRow::metadata_fetch_finished,
-        this, [this](std::string predownload_warning){
-            show_download_confirm_box("Download", predownload_warning);
-        }
-    );
-
-    // if the thread catches an exception, show an error box
-    // since exceptions can't bubble up as usual
-    // this connect handles all exception_caught() emitted by ResourceDownloadRow
-    connect(
-        &m_value.row, &ResourceDownloadRow::exception_caught,
-        this, [](std::string function_name){
-            show_error_box(function_name);
-        }
-    );
-
-    // if download fails
-    connect(
-        &m_value.row, &ResourceDownloadRow::download_failed,
-        this, [](){
-            show_download_failed_box();
-        }
-    );
 
     value.row.add_listener(*this);
 }
@@ -182,18 +150,35 @@ void DownloadButtonWidget::show_download_confirm_box(
     }
 }
 
-
-void DownloadButtonWidget::on_metadata_fetch_finished(std::string popup_message){
+// when json has been fetched, open the update box. 
+// When click Ok in update box, start the download. If click cancel, re-enable the download button
+void DownloadButtonWidget::on_metadata_fetch_finished(const std::string& popup_message){
+    QMetaObject::invokeMethod(this, [this, popup_message]{
+        show_download_confirm_box("Download", popup_message);
+    }, Qt::QueuedConnection);
 
 }
-void DownloadButtonWidget::on_exception_caught(std::string function_name){
+
+// if the thread catches an exception, show an error box
+// since exceptions can't bubble up as usual
+// handles all exception_caught() reported by ResourceDownloadRow
+void DownloadButtonWidget::on_exception_caught(const std::string& function_name){
+    QMetaObject::invokeMethod(this, [function_name]{
+        show_error_box(function_name);
+    }, Qt::QueuedConnection);
     
 }
+
 void DownloadButtonWidget::on_download_failed(){
-    
+    QMetaObject::invokeMethod(this, [this]{
+        show_download_failed_box();
+    }, Qt::QueuedConnection);
 }
+
 void DownloadButtonWidget::on_button_state_updated(){
-    
+    QMetaObject::invokeMethod(this, [this]{
+        update_UI_state();
+    }, Qt::QueuedConnection);
 }
 
 
@@ -202,10 +187,14 @@ void DownloadButtonWidget::on_button_state_updated(){
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template class RegisterConfigWidget<DeleteButtonWidget>;
+DeleteButtonWidget::~DeleteButtonWidget(){
+    m_value.row.remove_listener(*this);
+}
 DeleteButtonWidget::DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
+    , m_row(value.row)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -237,14 +226,6 @@ DeleteButtonWidget::DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& va
             m_value.row.update_button_state(ButtonState::DELETE);
             show_delete_confirm_box();
             cout << "Clicked Delete Button" << endl;
-        }
-    );
-
-    // when button_state_updated, update the UI state to match
-    connect(
-        &m_value.row, &ResourceDownloadRow::button_state_updated,
-        this, [this](){
-            update_UI_state();
         }
     );
 
@@ -298,8 +279,11 @@ void DeleteButtonWidget::show_delete_confirm_box(){
     }
 }
 
-
+// when button_state_updated, update the UI state to match
 void DeleteButtonWidget::on_button_state_updated(){
+    QMetaObject::invokeMethod(this, [this]{
+        update_UI_state();
+    }, Qt::QueuedConnection);
     
 }
 
@@ -308,10 +292,14 @@ void DeleteButtonWidget::on_button_state_updated(){
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template class RegisterConfigWidget<CancelButtonWidget>;
+CancelButtonWidget::~CancelButtonWidget(){
+    m_value.row.remove_listener(*this);
+}
 CancelButtonWidget::CancelButtonWidget(QWidget& parent, ResourceCancelButton& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
+    , m_row(value.row)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -344,14 +332,6 @@ CancelButtonWidget::CancelButtonWidget(QWidget& parent, ResourceCancelButton& va
         }
     );
 
-    // when button_state_updated, update the UI state to match
-    connect(
-        &m_value.row, &ResourceDownloadRow::button_state_updated,
-        this, [this](){
-            update_UI_state();
-        }
-    );
-
     value.row.add_listener(*this);
 
 }
@@ -368,8 +348,11 @@ void CancelButtonWidget::update_UI_state(){
     }
 }
 
+// when button_state_updated, update the UI state to match
 void CancelButtonWidget::on_button_state_updated(){
-    
+    QMetaObject::invokeMethod(this, [this]{
+        update_UI_state();
+    }, Qt::QueuedConnection);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -380,12 +363,13 @@ template class RegisterConfigWidget<ProgressBarWidget>;
 ProgressBarWidget::~ProgressBarWidget(){
     // m_value.row.disconnect(this);
     // cout << "Destructor for ProgressBarWidget" << endl;
-
+    m_value.row.remove_listener(*this);
 }
 ProgressBarWidget::ProgressBarWidget(QWidget& parent, ResourceProgressBar& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
+    , m_row(value.row)
 {
 
     // 1. Instantiate the widgets
@@ -407,56 +391,6 @@ ProgressBarWidget::ProgressBarWidget(QWidget& parent, ResourceProgressBar& value
 
     this->setLayout(layout);
     this->setMinimumWidth(170);
-
-    connect(
-        &m_value.row, &ResourceDownloadRow::download_progress,
-        this, 
-        [this](int percentage_progress){
-            if (m_progress_bar->isHidden()) {
-                m_progress_bar->show(); // Make it visible when progress starts
-            }
-            m_status_label->setText("Downloading");
-            m_progress_bar->setValue(percentage_progress);
-            // Simple Console Progress Bar
-            // std::cout << "\rProgress: [" << std::string(percentage_progress / 5, '#') 
-            //             << std::string(20 - (percentage_progress / 5), ' ') << "] " 
-            //             << percentage_progress << "%" << endl;
-
-        }
-    );    
-
-
-    connect(
-        &m_value.row, &ResourceDownloadRow::unzip_progress,
-        this, 
-        [this](int percentage_progress){
-            if (m_progress_bar->isHidden()) {
-                m_progress_bar->show(); // Make it visible when progress starts
-            }
-            m_status_label->setText("Unzipping");
-            m_progress_bar->setValue(percentage_progress);
-        }
-    ); 
-
-    connect(
-        &m_value.row, &ResourceDownloadRow::hash_progress,
-        this, 
-        [this](int percentage_progress){
-            if (m_progress_bar->isHidden()) {
-                m_progress_bar->show(); // Make it visible when progress starts
-            }
-            m_status_label->setText("Verifying");
-            m_progress_bar->setValue(percentage_progress);
-        }
-    );
-
-    // when button_state_updated, update the UI state to match
-    connect(
-        &m_value.row, &ResourceDownloadRow::button_state_updated,
-        this, [this](){
-            update_UI_state();
-        }
-    );
 
     value.row.add_listener(*this);
 }
@@ -491,17 +425,35 @@ void ProgressBarWidget::update_UI_state(){
     }
 }
 
+void ProgressBarWidget::update_progress_bar(int percentage, const std::string& text){
+    if (m_progress_bar->isHidden()) {
+        m_progress_bar->show(); // Make it visible when progress starts
+    }
+    m_status_label->setText(QString::fromStdString(text));
+    m_progress_bar->setValue(percentage);
+}
+
 void ProgressBarWidget::on_download_progress(int percentage){
+    QMetaObject::invokeMethod(this, [this, percentage]{
+        update_progress_bar(percentage, "Downloading");
+    }, Qt::QueuedConnection);
 
 }
 void ProgressBarWidget::on_unzip_progress(int percentage){
-
+    QMetaObject::invokeMethod(this, [this, percentage]{
+        update_progress_bar(percentage, "Unzipping");
+    }, Qt::QueuedConnection);
 }
 void ProgressBarWidget::on_hash_progress(int percentage){
-
+    QMetaObject::invokeMethod(this, [this, percentage]{
+        update_progress_bar(percentage, "Verifying");
+    }, Qt::QueuedConnection);
 }
-
+// when button_state_updated, update the UI state to match
 void ProgressBarWidget::on_button_state_updated(){
+    QMetaObject::invokeMethod(this, [this]{
+        update_UI_state();
+    }, Qt::QueuedConnection);
     
 }
 

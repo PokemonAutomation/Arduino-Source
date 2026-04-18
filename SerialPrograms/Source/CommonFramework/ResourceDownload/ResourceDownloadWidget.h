@@ -27,8 +27,8 @@ public:
     ~DownloadButtonWidget();
     DownloadButtonWidget(QWidget& parent, ResourceDownloadButton& value);
 
-    virtual void on_metadata_fetch_finished(std::string popup_message) override;
-    virtual void on_exception_caught(std::string function_name) override;
+    virtual void on_metadata_fetch_finished(const std::string& popup_message) override;
+    virtual void on_exception_caught(const std::string& function_name) override;
     virtual void on_download_failed() override;
     virtual void on_button_state_updated() override;
 
@@ -41,6 +41,7 @@ private:
 
 private:
     ResourceDownloadButton& m_value;
+    ResourceDownloadRow& m_row;
     QPushButton* m_button;
     
 };
@@ -53,6 +54,7 @@ public:
     using ParentOption = ResourceDeleteButton;
 
 public:
+    ~DeleteButtonWidget();
     DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& value);
 
     virtual void on_button_state_updated() override;
@@ -63,6 +65,7 @@ private:
 
 private:
     ResourceDeleteButton& m_value;
+    ResourceDownloadRow& m_row;
     QPushButton* m_button;    
 };
 
@@ -71,6 +74,7 @@ public:
     using ParentOption = ResourceCancelButton;
 
 public:
+    ~CancelButtonWidget();
     CancelButtonWidget(QWidget& parent, ResourceCancelButton& value);
 
     virtual void on_button_state_updated() override;
@@ -80,6 +84,7 @@ private:
 
 private:
     ResourceCancelButton& m_value;
+    ResourceDownloadRow& m_row;
     QPushButton* m_button;    
 };
 
@@ -97,11 +102,13 @@ public:
 
     virtual void on_button_state_updated() override;
 
-private:
+private:    
     void update_UI_state();
+    void update_progress_bar(int percentage, const std::string& text);
     
 private:
     ResourceProgressBar& m_value;
+    ResourceDownloadRow& m_row;
     QLabel* m_status_label;
     QProgressBar* m_progress_bar;
 };

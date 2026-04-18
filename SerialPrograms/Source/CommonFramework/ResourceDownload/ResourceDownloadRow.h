@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_ResourceDownloadRow_H
 #define PokemonAutomation_ResourceDownloadRow_H
 
-#include <QObject>
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/CancellableScope.h"
@@ -54,8 +53,7 @@ enum class ButtonState{
     CANCEL,
     READY,
 };
-class ResourceDownloadRow : public QObject, public StaticTableRow{
-    Q_OBJECT
+class ResourceDownloadRow : public StaticTableRow{
 public:
     ~ResourceDownloadRow();
     ResourceDownloadRow(
@@ -65,28 +63,15 @@ public:
         ResourceVersionStatus version_status
     );
 
-signals:
-    void download_progress(int percentage);
-    void unzip_progress(int percentage);
-    void hash_progress(int percentage);
-
-    void metadata_fetch_finished(std::string popup_message);
-    void exception_caught(std::string function_name);
-    void download_failed();
-    void download_completed();
-
-    void button_state_updated();
-
 public:
     struct DownloadListener{
         virtual void on_download_progress(int percentage){};
         virtual void on_unzip_progress(int percentage){};
         virtual void on_hash_progress(int percentage){};
 
-        virtual void on_metadata_fetch_finished(std::string popup_message){};
-        virtual void on_exception_caught(std::string function_name){};
+        virtual void on_metadata_fetch_finished(const std::string& popup_message){};
+        virtual void on_exception_caught(const std::string& function_name){};
         virtual void on_download_failed(){};
-        // virtual void on_download_completed(){};
 
         virtual void on_button_state_updated(){};
     };
@@ -98,10 +83,9 @@ public:
     void report_unzip_progress(int percentage);
     void report_hash_progress(int percentage);
 
-    void report_metadata_fetch_finished(std::string popup_message);
-    void report_exception_caught(std::string function_name);
+    void report_metadata_fetch_finished(const std::string& popup_message);
+    void report_exception_caught(const std::string& function_name);
     void report_download_failed();
-    // void report_download_completed();
 
     void report_button_state_updated();
 
