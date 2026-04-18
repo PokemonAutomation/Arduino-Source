@@ -272,8 +272,7 @@ void ResourceDownloadRow::update_table_label(bool success){
 ResourceDownloadRow::~ResourceDownloadRow(){
     // cout << "~ResourceDownloadRow" << endl;
     m_worker1.wait_and_ignore_exceptions();
-    // m_worker2.wait_and_ignore_exceptions();
-    m_worker3.wait_and_ignore_exceptions();
+    m_worker2.wait_and_ignore_exceptions();
 }
 ResourceDownloadRow::ResourceDownloadRow(
     DownloadedResourceMetadata local_metadata,
@@ -440,7 +439,7 @@ void ResourceDownloadRow::start_download(){
 
 
 void ResourceDownloadRow::start_delete(){
-    m_worker3 = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
+    m_worker2 = GlobalThreadPools::unlimited_normal().dispatch_now_blocking(
     [this]{ 
         try {
             std::string resource_name = m_local_metadata.resource_name;

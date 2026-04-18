@@ -131,7 +131,6 @@ private:
 
     AsyncTask m_worker1;
     AsyncTask m_worker2;
-    AsyncTask m_worker3;
 
     std::shared_ptr<DownloadThread> m_download_thread;
 
