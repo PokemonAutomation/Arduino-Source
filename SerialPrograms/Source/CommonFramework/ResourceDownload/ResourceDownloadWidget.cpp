@@ -46,7 +46,7 @@ template class RegisterConfigWidget<DownloadButtonWidget>;
 DownloadButtonWidget::~DownloadButtonWidget(){
     // cout << "Destructor for DownloadButtonWidget" << endl;
     // m_value.disconnect(this);
-    m_value.row.remove_listener(*this);
+    m_row.remove_listener(*this);
 }
 DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButton& value)
     : QWidget(&parent)
@@ -89,13 +89,13 @@ DownloadButtonWidget::DownloadButtonWidget(QWidget& parent, ResourceDownloadButt
     connect(
         m_button, &QPushButton::clicked,
         this, [this](){
-            m_value.row.update_button_state(ButtonState::DOWNLOAD);
-            m_value.row.ensure_remote_metadata_loaded();
+            m_row.update_button_state(ButtonState::DOWNLOAD);
+            m_row.ensure_remote_metadata_loaded();
         }
     );
 
 
-    value.row.add_listener(*this);
+    m_row.add_listener(*this);
 }
 
 
@@ -105,7 +105,7 @@ void DownloadButtonWidget::update_UI_state(){
         m_button->setText("Download");
     }else{
         m_button->setEnabled(false);
-        if (m_value.row.get_button_state() == ButtonState::DOWNLOAD){
+        if (m_row.get_button_state() == ButtonState::DOWNLOAD){
             m_button->setText("Downloading...");
         }
     }
@@ -141,11 +141,11 @@ void DownloadButtonWidget::show_download_confirm_box(
     if (clicked == ok){
         cout << "Clicked Ok to Download" << endl;
 
-        m_value.row.start_download();
+        m_row.start_download();
         return;
     }
     if (clicked == cancel){
-        m_value.row.update_button_state(ButtonState::READY);
+        m_row.update_button_state(ButtonState::READY);
         return;
     }
 }
@@ -188,7 +188,7 @@ void DownloadButtonWidget::on_button_state_updated(){
 
 template class RegisterConfigWidget<DeleteButtonWidget>;
 DeleteButtonWidget::~DeleteButtonWidget(){
-    m_value.row.remove_listener(*this);
+    m_row.remove_listener(*this);
 }
 DeleteButtonWidget::DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& value)
     : QWidget(&parent)
@@ -223,13 +223,13 @@ DeleteButtonWidget::DeleteButtonWidget(QWidget& parent, ResourceDeleteButton& va
     connect(
         m_button, &QPushButton::clicked,
         this, [&](bool){
-            m_value.row.update_button_state(ButtonState::DELETE);
+            m_row.update_button_state(ButtonState::DELETE);
             show_delete_confirm_box();
             cout << "Clicked Delete Button" << endl;
         }
     );
 
-    value.row.add_listener(*this);
+    m_row.add_listener(*this);
 }
 
 
@@ -239,7 +239,7 @@ void DeleteButtonWidget::update_UI_state(){
         m_button->setText("Delete");
     }else{
         m_button->setEnabled(false);
-        if (m_value.row.get_button_state() == ButtonState::DELETE){
+        if (m_row.get_button_state() == ButtonState::DELETE){
             m_button->setText("Deleting...");
         }
     }
@@ -270,11 +270,11 @@ void DeleteButtonWidget::show_delete_confirm_box(){
     if (clicked == yes){
         cout << "Clicked Yes to Delete" << endl;
 
-        m_value.row.start_delete();
+        m_row.start_delete();
         return;
     }
     if (clicked == cancel){
-        m_value.row.update_button_state(ButtonState::READY);
+        m_row.update_button_state(ButtonState::READY);
         return;
     }
 }
@@ -293,7 +293,7 @@ void DeleteButtonWidget::on_button_state_updated(){
 
 template class RegisterConfigWidget<CancelButtonWidget>;
 CancelButtonWidget::~CancelButtonWidget(){
-    m_value.row.remove_listener(*this);
+    m_row.remove_listener(*this);
 }
 CancelButtonWidget::CancelButtonWidget(QWidget& parent, ResourceCancelButton& value)
     : QWidget(&parent)
@@ -327,12 +327,12 @@ CancelButtonWidget::CancelButtonWidget(QWidget& parent, ResourceCancelButton& va
     connect(
         m_button, &QPushButton::clicked,
         this, [&](bool){
-            m_value.row.update_button_state(ButtonState::CANCEL);
+            m_row.update_button_state(ButtonState::CANCEL);
             cout << "Clicked Cancel Button" << endl;
         }
     );
 
-    value.row.add_listener(*this);
+    m_row.add_listener(*this);
 
 }
 
@@ -342,7 +342,7 @@ void CancelButtonWidget::update_UI_state(){
         m_button->setText("Cancel");
     }else{
         m_button->setEnabled(false);
-        if (m_value.row.get_button_state() == ButtonState::CANCEL){
+        if (m_row.get_button_state() == ButtonState::CANCEL){
             m_button->setText("Cancelling...");
         }
     }
@@ -361,9 +361,8 @@ void CancelButtonWidget::on_button_state_updated(){
 
 template class RegisterConfigWidget<ProgressBarWidget>;
 ProgressBarWidget::~ProgressBarWidget(){
-    // m_value.row.disconnect(this);
     // cout << "Destructor for ProgressBarWidget" << endl;
-    m_value.row.remove_listener(*this);
+    m_row.remove_listener(*this);
 }
 ProgressBarWidget::ProgressBarWidget(QWidget& parent, ResourceProgressBar& value)
     : QWidget(&parent)
@@ -392,12 +391,12 @@ ProgressBarWidget::ProgressBarWidget(QWidget& parent, ResourceProgressBar& value
     this->setLayout(layout);
     this->setMinimumWidth(170);
 
-    value.row.add_listener(*this);
+    m_row.add_listener(*this);
 }
 
 
 void ProgressBarWidget::update_UI_state(){
-    ButtonState state = m_value.row.get_button_state();
+    ButtonState state = m_row.get_button_state();
     switch (state){
     case ButtonState::DOWNLOAD:
         m_status_label->setText("Downloading");
