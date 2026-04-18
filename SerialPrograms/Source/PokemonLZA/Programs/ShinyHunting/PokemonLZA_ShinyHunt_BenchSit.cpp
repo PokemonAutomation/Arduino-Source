@@ -289,59 +289,130 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                 }
 
                 Milliseconds duration = WALK_FORWARD_DURATION;
-                open_map(env.console, context, true, true);
-                pbf_move_right_joystick(context, { 0, -1 }, 1000ms, 500ms);
-                pbf_move_left_joystick(context, { -1, 0 }, 1000ms, 500ms);
-                context.wait_for_all_requests();
 
+                open_map(env.console, context, false, true);
+
+                context.wait_for_all_requests();
+                pbf_wait(context, 800ms);
+
+
+                // stabilize zoom
+                pbf_move_right_joystick(context, {0, 1}, 1500ms, 500ms);
+
+                context.wait_for_all_requests();
+                pbf_wait(context, 500ms);
+
+
+                // show icons
                 pbf_press_button(context, BUTTON_MINUS, 500ms, 500ms);
 
-                ImageViewRGB32 frame =
-                    env.console.video().snapshot();
                 context.wait_for_all_requests();
+                pbf_wait(context, 400ms);
+
+
+                // double snapshot
+                ImageViewRGB32 frame1 =
+                    env.console.video().snapshot();
+
+                pbf_wait(context, 200ms);
+
+                ImageViewRGB32 frame2 =
+                    env.console.video().snapshot();
+
+
+                // evaluate using both frames
+                bool dayNightOk =
+                    should_run_based_on_day_night(frame1, env.console.overlay()) ||
+                    should_run_based_on_day_night(frame2, env.console.overlay());
+
+                bool weatherOk =
+                    should_run_based_on_weather(frame1) ||
+                    should_run_based_on_weather(frame2);
+
+
+                // close map
+                pbf_wait(context, 150ms);
+
                 pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
-                if (!should_run_based_on_day_night(frame, env.console.overlay())){
+
+                context.wait_for_all_requests();
+                pbf_wait(context, 400ms);
+
+
+                // filtering
+                if (!dayNightOk){
+
                     env.console.overlay().add_log(
                         "Skipping move (wrong day/night)",
                         COLOR_ORANGE
                         );
+
                     run_back_until_found_bench(env, context);
                     shiny_sound_handler.process_pending(context);
                     continue;
                 }
-                if (!should_run_based_on_weather(frame)){
+
+                if (!weatherOk){
+
                     env.console.overlay().add_log(
                         "Skipping move (wrong weather)",
                         COLOR_ORANGE
                         );
+
                     run_back_until_found_bench(env, context);
                     shiny_sound_handler.process_pending(context);
                     continue;
                 }
+
+
+                // movement
                 if (duration > Milliseconds::zero()){
-                    if (WALK_DIRECTION.current_value() == 0){ // forward
+
+                    if (WALK_DIRECTION.current_value() == 0){
+
                         env.console.overlay().add_log("Move Forward");
+
                         ssf_press_button(context, BUTTON_B, 0ms, 2*duration, 0ms);
+
                         pbf_move_left_joystick(context, {0, +1}, duration, 0ms);
-                        // run back
-                        pbf_move_left_joystick(context, {0, -1}, duration + 750ms, 0ms);
+
+                        pbf_move_left_joystick(context, {0, -1}, duration + 1000ms, 0ms);
+
                         run_back_until_found_bench(env, context);
-                    }else if (WALK_DIRECTION.current_value() == 1){ // left
+                    }
+
+                    else if (WALK_DIRECTION.current_value() == 1){
+
                         env.console.overlay().add_log("Move Left");
+
                         ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
-                        pbf_move_left_joystick(context, {-1, 0},  duration, 0ms);
-                        pbf_press_button(context, BUTTON_L, 100ms, 400ms);
+
+                        pbf_move_left_joystick(context, {-1, 0}, duration, 0ms);
+
+                        pbf_press_button(context, BUTTON_L, 130ms, 450ms);
+
                         ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
-                        pbf_move_left_joystick(context, {0, -1}, duration, 0ms);
-                        pbf_move_left_joystick(context, {-1, 0},  100ms, 0ms);
-                    }else if (WALK_DIRECTION.current_value() == 2){ // right
+
+                        pbf_move_left_joystick(context, {0, -1}, duration + 150ms, 0ms);
+
+                        pbf_move_left_joystick(context, {-1, 0}, 150ms, 0ms);
+                    }
+
+                    else if (WALK_DIRECTION.current_value() == 2){
+
                         env.console.overlay().add_log("Move Right");
+
                         ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
+
                         pbf_move_left_joystick(context, {+1, 0}, duration, 0ms);
-                        pbf_press_button(context, BUTTON_L, 100ms, 400ms);
+
+                        pbf_press_button(context, BUTTON_L, 130ms, 450ms);
+
                         ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
-                        pbf_move_left_joystick(context, {0, -1}, duration, 0ms);
-                        pbf_move_left_joystick(context, {+1, 0}, 100ms, 0ms);
+
+                        pbf_move_left_joystick(context, {0, -1}, duration + 150ms, 0ms);
+
+                        pbf_move_left_joystick(context, {+1, 0}, 150ms, 0ms);
                     }
                 }else{
                     run_back_until_found_bench(env, context);
