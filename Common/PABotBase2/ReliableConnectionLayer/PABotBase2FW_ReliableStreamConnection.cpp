@@ -27,7 +27,7 @@ namespace PABotBase2{
 ReliableStreamConnectionFW::ReliableStreamConnectionFW(UnreliableStreamConnectionPolling& unreliable_connection)
     : m_unreliable_connection(unreliable_connection)
     , m_reliable_sender(unreliable_connection, (uint8_t)(PABB2_MAX_INCOMING_PACKET_SIZE % 256))
-    , m_last_retransmit(pabb_current_time())
+    , m_last_retransmit(current_time())
 {}
 
 
@@ -73,18 +73,23 @@ void ReliableStreamConnectionFW::send_oob_info_label_i32(uint8_t opcode, const c
 
 
 
-void ReliableStreamConnectionFW::wait_for_event(uint16_t milliseconds){
+void ReliableStreamConnectionFW::wait_for_event(WallDuration timeout){
     //  If we have unacked sends, we cap the wait time since those may need to
     //  be retransmitted.
-    if (m_reliable_sender.slots_used() != 0 && milliseconds > PABB2_ReliableConnectionFW_POLL_MS){
-        milliseconds = PABB2_ReliableConnectionFW_POLL_MS;
+
+    constexpr WallDuration POLL_RATE = milliseconds_to_duration(PABB2_ReliableConnectionFW_POLL_MS);
+
+    if (m_reliable_sender.slots_used() != 0 && timeout > POLL_RATE){
+        timeout = POLL_RATE;
     }
-    return m_unreliable_connection.wait_for_recv_available(milliseconds);
+    return m_unreliable_connection.wait_for_recv_available(timeout);
 }
 bool ReliableStreamConnectionFW::iterate_retransmits(){
-    WallClock now = pabb_current_time();
-    WallClock next_retransmit = m_last_retransmit + pabb_milliseconds(PABB2_ReliableConnectionFW_POLL_MS);
-    if (pabb_time_wrapsafe_cmplt(now, next_retransmit)){
+    constexpr WallDuration POLL_RATE = milliseconds_to_duration(PABB2_ReliableConnectionFW_POLL_MS);
+
+    WallClock now = current_time();
+    WallClock next_retransmit = m_last_retransmit + POLL_RATE;
+    if (wrapsafe_cmplt(now, next_retransmit)){
         return false;
     }
 
