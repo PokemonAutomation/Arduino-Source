@@ -170,7 +170,7 @@ void DownloadButtonWidget::on_exception_caught(const std::string& function_name)
 }
 
 void DownloadButtonWidget::on_download_failed(){
-    QMetaObject::invokeMethod(this, [this]{
+    QMetaObject::invokeMethod(this, []{
         show_download_failed_box();
     }, Qt::QueuedConnection);
 }
