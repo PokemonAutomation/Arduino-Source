@@ -42,6 +42,8 @@ public:
     // throws OperationCancelledException if the user cancels the action
     void run_download(DownloadedResourceMetadata resource_metadata);
 
+    
+
 private:
     ResourceDownloadRow& m_row;
     AsyncTask m_worker;
@@ -93,6 +95,7 @@ public:
 public:
     void set_version_status(ResourceVersionStatus version_status);
     void set_is_downloaded(bool is_downloaded);
+    void update_table_label(bool success);
 
     void ensure_remote_metadata_loaded();
     std::string predownload_warning_summary(RemoteMetadata& remote_metadata);

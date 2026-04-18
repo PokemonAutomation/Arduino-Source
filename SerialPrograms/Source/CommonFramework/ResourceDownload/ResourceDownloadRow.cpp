@@ -88,12 +88,20 @@ void DownloadThread::start_download_thread(){
 
             cout << "Done Download" << endl;
 
+            m_row.update_table_label(true);
+
         }catch(OperationCancelledException&){
             // user cancelled action
 
+            m_row.update_table_label(false);
+
         }catch(OperationFailedException&){
+            m_row.update_table_label(false);
+
             m_row.report_download_failed();
         }catch(...){
+            m_row.update_table_label(false);
+
             m_row.report_exception_caught("ResourceDownloadButton::start_download");
         }
 
@@ -163,25 +171,19 @@ void DownloadThread::run_download(DownloadedResourceMetadata resource_metadata){
 
         throw_if_cancelled();
 
-        // update the table labels
-        m_row.set_is_downloaded(true);
-        m_row.set_version_status(ResourceVersionStatus::CURRENT);
-    }catch(OperationCancelledException& e){
+    }catch(OperationCancelledException&){
         // delete directory and the resource
         fs::remove_all(Filesystem::Path(resource_directory));
 
-        // update the table labels
-        m_row.set_is_downloaded(false);
-        m_row.set_version_status(ResourceVersionStatus::NOT_APPLICABLE);
+        throw;
+    }catch(OperationFailedException&){
+        // delete directory and the resource
+        fs::remove_all(Filesystem::Path(resource_directory));
 
-        throw e;
+        throw;
     }catch(...){
         // delete directory and the resource
         fs::remove_all(Filesystem::Path(resource_directory));
-
-        // update the table labels
-        m_row.set_is_downloaded(false);
-        m_row.set_version_status(ResourceVersionStatus::NOT_APPLICABLE);
 
         throw;
     }
@@ -258,6 +260,11 @@ void ResourceDownloadRow::set_version_status(ResourceVersionStatus version_statu
 void ResourceDownloadRow::set_is_downloaded(bool is_downloaded){
     m_data->m_is_downloaded = is_downloaded;
     m_data->m_is_downloaded_label.set_text(is_downloaded_string(is_downloaded));
+}
+
+void ResourceDownloadRow::update_table_label(bool success){
+    set_is_downloaded(success);
+    set_version_status(success ? ResourceVersionStatus::CURRENT : ResourceVersionStatus::NOT_APPLICABLE);
 }
 
 
@@ -362,10 +369,12 @@ void ResourceDownloadRow::ensure_remote_metadata_loaded(){
 
         }catch(OperationFailedException&){
             // cout << "failed" << endl;
+            // update_table_label(false);
             update_button_state(ButtonState::READY);
             report_download_failed();
             return;
         }catch(...){
+            // update_table_label(false);
             update_button_state(ButtonState::READY);
             // cout << "Exception thrown in thread" << endl;
             report_exception_caught("ResourceDownloadButton::ensure_remote_metadata_loaded");
