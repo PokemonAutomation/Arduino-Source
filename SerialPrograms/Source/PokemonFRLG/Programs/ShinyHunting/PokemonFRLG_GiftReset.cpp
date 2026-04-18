@@ -334,7 +334,7 @@ bool GiftReset::try_open_summary(SingleSwitchProgramEnvironment& env, ProControl
         context.wait_for_all_requests();
         if (ps == 0){
             env.log("Moved selection to slot six.");
-        } else{
+        }else{
             env.log("open_summary(): Unable to move selection to slot six.", COLOR_RED);
             send_program_recoverable_error_notification(
                 env, NOTIFICATION_ERROR_RECOVERABLE,

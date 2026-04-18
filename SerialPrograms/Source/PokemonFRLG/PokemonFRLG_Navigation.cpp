@@ -183,7 +183,7 @@ bool try_open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     context.wait_for_all_requests();
     if (ps == 0){
         console.log("Moved selection to slot six.");
-    } else{
+    }else{
         console.log("open_slot_six(): Unable to move selection to slot six.", COLOR_RED);
         return false;
     }
