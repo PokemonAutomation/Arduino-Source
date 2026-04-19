@@ -20,6 +20,7 @@ template class RegisterConfigWidget<LabelCellWidget>;
 
 
 LabelCellWidget::~LabelCellWidget(){
+    m_value.remove_listener(*this);
 }
 LabelCellWidget::LabelCellWidget(QWidget& parent, LabelCellOption& value)
     : QWidget(&parent)
