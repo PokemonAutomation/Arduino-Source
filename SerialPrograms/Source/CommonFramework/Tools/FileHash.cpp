@@ -4,10 +4,6 @@
  *
  */
 
-
-
-
-
 #include "Common/Cpp/Exceptions.h"
 #include <QFile>
 #include <QCryptographicHash>
