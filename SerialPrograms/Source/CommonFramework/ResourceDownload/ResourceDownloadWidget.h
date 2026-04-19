@@ -96,15 +96,16 @@ public:
     ~ProgressBarWidget();
     ProgressBarWidget(QWidget& parent, ResourceProgressBar& value);
 
-    virtual void on_download_progress(int percentage) override;
-    virtual void on_unzip_progress(int percentage) override;
-    virtual void on_hash_progress(int percentage) override;
+    virtual void on_download_progress(uint64_t bytes_done, uint64_t total_bytes) override;
+    virtual void on_unzip_progress(uint64_t bytes_done, uint64_t total_bytes) override;
+    virtual void on_hash_progress(uint64_t bytes_done, uint64_t total_bytes) override;
 
     virtual void on_button_state_updated() override;
 
 private:    
     void update_UI_state();
     void update_progress_bar(int percentage, const std::string& text);
+    void update_progress_bar(uint64_t bytes_done, uint64_t total_bytes, const std::string& text);
     
 private:
     ResourceProgressBar& m_value;

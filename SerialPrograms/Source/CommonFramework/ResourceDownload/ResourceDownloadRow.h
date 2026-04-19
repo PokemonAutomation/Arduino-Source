@@ -67,9 +67,9 @@ public:
 
 public:
     struct DownloadListener{
-        virtual void on_download_progress(int percentage){};
-        virtual void on_unzip_progress(int percentage){};
-        virtual void on_hash_progress(int percentage){};
+        virtual void on_download_progress(uint64_t bytes_done, uint64_t total_bytes){};
+        virtual void on_unzip_progress(uint64_t bytes_done, uint64_t total_bytes){};
+        virtual void on_hash_progress(uint64_t bytes_done, uint64_t total_bytes){};
 
         virtual void on_metadata_fetch_finished(const std::string& popup_message){};
         virtual void on_exception_caught(const std::string& function_name){};
@@ -81,9 +81,9 @@ public:
     void add_listener(DownloadListener& listener);
     void remove_listener(DownloadListener& listener);
 
-    void report_download_progress(int percentage);
-    void report_unzip_progress(int percentage);
-    void report_hash_progress(int percentage);
+    void report_download_progress(uint64_t bytes_done, uint64_t total_bytes);
+    void report_unzip_progress(uint64_t bytes_done, uint64_t total_bytes);
+    void report_hash_progress(uint64_t bytes_done, uint64_t total_bytes);
 
     void report_metadata_fetch_finished(const std::string& popup_message);
     void report_exception_caught(const std::string& function_name);

@@ -22,7 +22,7 @@ void unzip_file(
     CancellableScope& scope,
     const char* zip_path, 
     const char* target_dir, 
-    std::function<void(int)> progress_callback
+    std::function<void(uint64_t bytes_done, uint64_t total_bytes)> progress_callback
 );
 
 }

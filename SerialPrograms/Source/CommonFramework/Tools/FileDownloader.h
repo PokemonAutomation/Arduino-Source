@@ -28,7 +28,7 @@ void download_file_to_disk(
     const std::string& url, 
     const std::string& file_path, 
     qint64 expected_size,
-    std::function<void(int)> progress_callback
+    std::function<void(uint64_t bytes_done, uint64_t total_bytes)> progress_callback
 );
 
 //  Throws OperationFailedException if failed to download.

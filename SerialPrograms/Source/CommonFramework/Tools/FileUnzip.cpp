@@ -33,7 +33,7 @@ struct ProgressData {
     uint64_t total_bytes;
     uint64_t processed_bytes;
     int last_percentage;
-    std::function<void(int)> progress_callback;
+    std::function<void(uint64_t bytes_done, uint64_t total_bytes)> progress_callback;
     CancellableScope& scope;
 };
 
@@ -57,17 +57,10 @@ size_t write_callback(void* pOpaque, [[maybe_unused]] mz_uint64 file_ofs, const 
     
     // Update and display progress
     data->processed_bytes += n;
-    double percent = (double)data->processed_bytes / data->total_bytes * 100.0;
-    int current_percent = static_cast<int>(percent);
 
-    // Only print if the integer value has changed
-    if (current_percent > data->last_percentage){
-        data->progress_callback(current_percent);
-        data->last_percentage = current_percent;
-        
-        // std::cout << "\rProgress: " << current_percent << "% (" 
-        //         << data->processed_bytes << "/" << data->total_bytes << " bytes)" << endl;
-    }
+    data->progress_callback(data->processed_bytes, data->total_bytes);
+
+
             
     return n;
 }
@@ -110,7 +103,7 @@ void unzip_file(
     CancellableScope& scope,
     const char* zip_path, 
     const char* target_dir, 
-    std::function<void(int)> progress_callback
+    std::function<void(uint64_t bytes_done, uint64_t total_bytes)> progress_callback
 ){
     Filesystem::Path p{zip_path};
     if (!fs::exists(p)){

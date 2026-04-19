@@ -432,20 +432,30 @@ void ProgressBarWidget::update_progress_bar(int percentage, const std::string& t
     m_progress_bar->setValue(percentage);
 }
 
-void ProgressBarWidget::on_download_progress(int percentage){
-    QMetaObject::invokeMethod(this, [this, percentage]{
-        update_progress_bar(percentage, "Downloading");
+void ProgressBarWidget::update_progress_bar(uint64_t bytes_done, uint64_t total_bytes, const std::string& text){
+    double percent = total_bytes > 0 ? (static_cast<double>(bytes_done) / total_bytes) * 100.0 : 0;
+    int current_percent = static_cast<int>(percent);
+    int last_percentage = m_progress_bar->value();
+    // Only update UI if integer value has changed
+    if (current_percent != last_percentage){
+        update_progress_bar(current_percent, text);
+    }
+}
+
+void ProgressBarWidget::on_download_progress(uint64_t bytes_done, uint64_t total_bytes){
+    QMetaObject::invokeMethod(this, [this, bytes_done, total_bytes]{
+        update_progress_bar(bytes_done, total_bytes, "Downloading");        
     }, Qt::QueuedConnection);
 
 }
-void ProgressBarWidget::on_unzip_progress(int percentage){
-    QMetaObject::invokeMethod(this, [this, percentage]{
-        update_progress_bar(percentage, "Unzipping");
+void ProgressBarWidget::on_unzip_progress(uint64_t bytes_done, uint64_t total_bytes){
+    QMetaObject::invokeMethod(this, [this, bytes_done, total_bytes]{
+        update_progress_bar(bytes_done, total_bytes, "Unzipping");
     }, Qt::QueuedConnection);
 }
-void ProgressBarWidget::on_hash_progress(int percentage){
-    QMetaObject::invokeMethod(this, [this, percentage]{
-        update_progress_bar(percentage, "Verifying");
+void ProgressBarWidget::on_hash_progress(uint64_t bytes_done, uint64_t total_bytes){
+    QMetaObject::invokeMethod(this, [this, bytes_done, total_bytes]{
+        update_progress_bar(bytes_done, total_bytes, "Verifying");
     }, Qt::QueuedConnection);
 }
 // when button_state_updated, update the UI state to match

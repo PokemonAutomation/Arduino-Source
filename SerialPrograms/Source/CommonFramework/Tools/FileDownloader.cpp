@@ -99,7 +99,7 @@ void download_file_to_disk(
     const std::string& url, 
     const std::string& file_path,
     qint64 expected_size,
-    std::function<void(int)> progress_callback
+    std::function<void(uint64_t bytes_done, uint64_t total_bytes)> progress_callback
 ){
 //    cout << "download_file()" << endl;
     QNetworkAccessManager network_access_manager;
@@ -136,8 +136,8 @@ void download_file_to_disk(
             // Use expected_size if the network doesn't provide one
             qint64 total = (bytesTotal > 0) ? bytesTotal : expected_size;
 
-            int percentage_progress = (total > 0) ? static_cast<int>((bytesReceived * 100) / total) : 0;
-            progress_callback(std::min(percentage_progress, 100));
+            // int percentage_progress = (total > 0) ? static_cast<int>((bytesReceived * 100) / total) : 0;
+            progress_callback(bytesReceived, total);
         }
     );
 

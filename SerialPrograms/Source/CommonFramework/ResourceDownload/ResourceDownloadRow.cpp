@@ -132,8 +132,8 @@ void DownloadThread::run_download(DownloadedResourceMetadata resource_metadata){
             url, 
             zip_path,
             expected_size,
-            [this](int percentage_progress){
-                m_row.report_download_progress(percentage_progress);
+            [this](uint64_t bytes_done, uint64_t total_bytes){
+                m_row.report_download_progress(bytes_done, total_bytes);
             }
         );
 
@@ -142,8 +142,8 @@ void DownloadThread::run_download(DownloadedResourceMetadata resource_metadata){
             hash_file(
                 *this,
                 zip_path,
-                [this](int percentage_progress){
-                    m_row.report_hash_progress(percentage_progress);
+                [this](uint64_t bytes_done, uint64_t total_bytes){
+                    m_row.report_hash_progress(bytes_done, total_bytes);
                 }
             );
         std::string expected_hash = resource_metadata.sha_256;
@@ -161,8 +161,8 @@ void DownloadThread::run_download(DownloadedResourceMetadata resource_metadata){
             *this,
             zip_path.c_str(), 
             resource_directory.c_str(),
-            [this](int percentage_progress){
-                m_row.report_unzip_progress(percentage_progress);
+            [this](uint64_t bytes_done, uint64_t total_bytes){
+                m_row.report_unzip_progress(bytes_done, total_bytes);
             }
         );
 
@@ -536,17 +536,17 @@ void ResourceDownloadRow::remove_listener(DownloadListener& listener){
     m_data->listeners.remove(listener);
 }
 
-void ResourceDownloadRow::report_download_progress(int percentage){
+void ResourceDownloadRow::report_download_progress(uint64_t bytes_done, uint64_t total_bytes){
     auto scope = m_lifetime_sanitizer.check_scope();
-    m_data->listeners.run_method(&DownloadListener::on_download_progress, percentage);
+    m_data->listeners.run_method(&DownloadListener::on_download_progress, bytes_done, total_bytes);
 }
-void ResourceDownloadRow::report_unzip_progress(int percentage){
+void ResourceDownloadRow::report_unzip_progress(uint64_t bytes_done, uint64_t total_bytes){
     auto scope = m_lifetime_sanitizer.check_scope();
-    m_data->listeners.run_method(&DownloadListener::on_unzip_progress, percentage);
+    m_data->listeners.run_method(&DownloadListener::on_unzip_progress, bytes_done, total_bytes);
 }
-void ResourceDownloadRow::report_hash_progress(int percentage){
+void ResourceDownloadRow::report_hash_progress(uint64_t bytes_done, uint64_t total_bytes){
     auto scope = m_lifetime_sanitizer.check_scope();
-    m_data->listeners.run_method(&DownloadListener::on_hash_progress, percentage);
+    m_data->listeners.run_method(&DownloadListener::on_hash_progress, bytes_done, total_bytes);
 }
 
 void ResourceDownloadRow::report_metadata_fetch_finished(const std::string& popup_message){
