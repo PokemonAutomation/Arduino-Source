@@ -379,7 +379,7 @@ void LabelImages_Widget::on_mouse_release(double x, double y){
         } else if (m_shift_pressed){
             // cout << "Shift pressed while at " << x << " " << y << endl;
             m_program.add_segmentation_exclusion_point(x, y);
-        } else{
+        }else{
             // normal mouse clicking
             // change currently selected annotation
             // also change the option values in the UI

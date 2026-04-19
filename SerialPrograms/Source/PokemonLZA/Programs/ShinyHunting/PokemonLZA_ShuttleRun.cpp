@@ -150,7 +150,7 @@ void route_wild_zone_3_tower(SingleSwitchProgramEnvironment& env, ProControllerC
         } else if (face_west || face_north){
             // if facing west or north, run forward
             pbf_move_left_joystick(context, {0, +1}, 500ms, 200ms);
-        } else{
+        }else{
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "route_wild_zone_3_tower: unexpected facing direction: " + PokemonAutomation::tostr_fixed(direction, 0) + " deg",

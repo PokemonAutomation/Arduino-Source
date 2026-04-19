@@ -27,6 +27,20 @@ enum class DigitTemplateType{
     LevelBox,     // Lilac level box: PokemonFRLG/LevelDigits/
 };
 
+// Full OCR preprocessing pipeline for GBA pixel fonts.
+//
+// GBA fonts are seven-segment-like with 1-pixel gaps between segments.
+// Pipeline: blur at native -> smooth upscale -> BW -> smooth BW -> re-BW -> pad
+//
+// The native blur connects gaps. Post-BW padding provides margins.
+ImageRGB32 preprocess_for_ocr(
+    const ImageViewRGB32 &image,
+    const std::string &label,
+    int blur_kernel_size, int blur_passes,
+    bool in_range_black, uint32_t bw_min,
+    uint32_t bw_max
+);
+
 // Read a string of decimal digits from `stat_region`.
 //
 // template_type    Which template set to use (StatBox or LevelBox).

@@ -101,8 +101,7 @@ void SAMSession::run(
     size_t num_points = input_points.size() / 2;
     if(input_box.size() > 0){
         num_points += 2; // add the bounding box two corners
-    }
-    else{
+    }else{
         num_points += 1; // add a padding point where there is no bounding box
     }
 
@@ -208,7 +207,7 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
     std::unique_ptr<SAMEmbedderSession> embedding_session;
     try{
         embedding_session = make_unique<SAMEmbedderSession>(embedding_model_path, use_gpu);
-    } catch(MLModelSessionCreationError& e){
+    }catch (MLModelSessionCreationError& e){
         QMessageBox box;
         box.warning(nullptr, "Unable To Create Model Session",
             QString::fromStdString(e.message() + ". Try using CPU?"));
@@ -237,7 +236,7 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
             cv::cvtColor(image_bgr, image, cv::COLOR_BGRA2RGB);
         } else if (image_bgr.channels() == 3){
             cv::cvtColor(image_bgr, image, cv::COLOR_BGR2RGB);
-        } else{
+        }else{
             std::cerr << "Error: wrong image channels. Only work with RGB or RGBA images." << std::endl;
             QMessageBox box;
             box.warning(nullptr, "Wrong Image Channels",
@@ -257,7 +256,7 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
                 // throw Ort::Exception("Testing.", ORT_FAIL);  // to simulate GPU/CPU failure
                 embedding_session->run(resized_mat, output_image_embedding);
                 break;
-            }catch(Ort::Exception& e){
+            }catch (Ort::Exception& e){
                 if (use_gpu){
                     std::cerr << "Warning: Embedding session failed using the GPU. Will reattempt with the CPU.\n" << e.what() << std::endl;
                     use_gpu = false;
@@ -269,7 +268,7 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
                         QString::fromStdString("Error: Embedding session failed."));
                     return;
                 }
-            }catch(...){
+            }catch (...){
                 std::cerr << "Error: Unknown error. Embedding session failed." << std::endl;
                 QMessageBox box;
                 box.warning(nullptr, "Error:",

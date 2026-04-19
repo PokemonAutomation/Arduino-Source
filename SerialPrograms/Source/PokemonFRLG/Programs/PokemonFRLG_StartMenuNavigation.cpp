@@ -35,7 +35,7 @@ void open_start_menu(ConsoleHandle& console, ProControllerContext& context){
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 pbf_press_button(context, BUTTON_PLUS, 200ms, 1800ms);
             },
             { start_menu }
@@ -60,62 +60,24 @@ void close_start_menu(ConsoleHandle& console, ProControllerContext& context){
     console.log("Start menu closed.");
 }
 
-bool move_cursor_to_position(ConsoleHandle& console, ProControllerContext& context, SelectionArrowPositionStartMenu destination){
-    SelectionArrowWatcher pokedex_arrow = SelectionArrowWatcher(
-        COLOR_RED,
-        &console.overlay(),
-        SelectionArrowPositionStartMenu::POKEDEX
-    );
+namespace {
 
-    SelectionArrowWatcher pokemon_arrow = SelectionArrowWatcher(
-        COLOR_RED,
-        &console.overlay(),
-        SelectionArrowPositionStartMenu::POKEMON
-    );
+const ImageFloatBox MENU_ARROW_BOX(0.727692, 0.0523077, 0.0369231, 0.6438461);
 
-    SelectionArrowWatcher bag_arrow = SelectionArrowWatcher(
-        COLOR_RED,
-        &console.overlay(),
-        SelectionArrowPositionStartMenu::BAG
-    );
+bool move_cursor_impl(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    const ImageFloatBox& search_box,
+    int option_count,
+    std::function<ImageFloatBox(int)> box_for_index,
+    int destination_index
+){
+    SelectionArrowWatcher arrow(COLOR_RED, &console.overlay(), search_box);
 
-    SelectionArrowWatcher trainer_arrow = SelectionArrowWatcher(
-        COLOR_RED,
-        &console.overlay(),
-        SelectionArrowPositionStartMenu::TRAINER
-    );
-
-    SelectionArrowWatcher save_arrow = SelectionArrowWatcher(
-        COLOR_RED,
-        &console.overlay(),
-        SelectionArrowPositionStartMenu::SAVE
-    );
-
-    SelectionArrowWatcher option_arrow = SelectionArrowWatcher(
-        COLOR_RED,
-        &console.overlay(),
-        SelectionArrowPositionStartMenu::OPTION
-    );
-
-    SelectionArrowWatcher exit_arrow = SelectionArrowWatcher(
-        COLOR_RED,
-        &console.overlay(),
-        SelectionArrowPositionStartMenu::EXIT
-    );
-
-    // The order of these watchers needs to match the order of the SelectionArrowPositionStartMenu enum for the math below to work.
     int ret = wait_until(
         console, context,
         std::chrono::seconds(2),
-        {
-            pokedex_arrow,
-            pokemon_arrow,
-            bag_arrow,
-            trainer_arrow,
-            save_arrow,
-            option_arrow,
-            exit_arrow
-        }
+        { arrow }
     );
 
     if (ret < 0){
@@ -123,24 +85,56 @@ bool move_cursor_to_position(ConsoleHandle& console, ProControllerContext& conte
         return false;
     }
 
-    int destination_index = static_cast<int>(destination);
-    int forward = (destination_index - ret + START_MENU_OPTION_COUNT) % START_MENU_OPTION_COUNT;
-    int backward = (ret - destination_index + START_MENU_OPTION_COUNT) % START_MENU_OPTION_COUNT;
+    double detected_center_y = arrow.last_detected().y + arrow.last_detected().height / 2;
+    int current_index = 0;
+    double closest_dist = std::numeric_limits<double>::max();
+    for (int i = 0; i < option_count; i++){
+        ImageFloatBox pos_box = box_for_index(i);
+        double pos_center_y = pos_box.y + pos_box.height / 2;
+        double dist = std::abs(detected_center_y - pos_center_y);
+        if (dist < closest_dist){
+            closest_dist = dist;
+            current_index = i;
+        }
+    }
+
+    int forward = (destination_index - current_index + option_count) % option_count;
+    int backward = (current_index - destination_index + option_count) % option_count;
     if (forward <= backward){
         for (int i = 0; i < forward; i++){
             pbf_press_dpad(context, DPAD_DOWN, 320ms, 400ms);
         }
-        context.wait_for_all_requests();
     }
-    else {
-        for (int i = 0; i < backward; i++)
-        {
+    else{
+        for (int i = 0; i < backward; i++){
             pbf_press_dpad(context, DPAD_UP, 320ms, 400ms);
         }
-        context.wait_for_all_requests();
     }
+    context.wait_for_all_requests();
 
     return true;
+}
+
+} // anonymous namespace
+
+bool move_cursor_to_position(ConsoleHandle& console, ProControllerContext& context, SelectionArrowPositionStartMenu destination){
+    return move_cursor_impl(
+        console, context,
+        MENU_ARROW_BOX,
+        START_MENU_OPTION_COUNT,
+        [](int i){ return SelectionArrowDetector::arrow_box_for_position(static_cast<SelectionArrowPositionStartMenu>(i)); },
+        static_cast<int>(destination)
+    );
+}
+
+bool move_cursor_to_position(ConsoleHandle& console, ProControllerContext& context, SelectionArrowPositionSafariMenu destination){
+    return move_cursor_impl(
+        console, context,
+        MENU_ARROW_BOX,
+        SAFARI_START_MENU_OPTION_COUNT,
+        [](int i){ return SelectionArrowDetector::arrow_box_for_position(static_cast<SelectionArrowPositionSafariMenu>(i)); },
+        static_cast<int>(destination)
+    );
 }
 
 void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& context){
@@ -217,7 +211,7 @@ void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& contex
 
         int ret5 = wait_until(
             console, context,
-            std::chrono::seconds(1),
+            std::chrono::seconds(2),
             {
                 save_confirm_arrow
             }

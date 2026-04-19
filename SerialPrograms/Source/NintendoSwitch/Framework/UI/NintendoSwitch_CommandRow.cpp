@@ -211,9 +211,7 @@ void CommandRow::set_focus(bool focused){
         if (controller != nullptr && allow_controller_input()){
             try{
                 controller->cancel_all_commands();
-            }catch (InvalidConnectionStateException&){
-            }catch (OperationCancelledException&){
-            }
+            }catch (...){}
         }
     }
     if (m_last_known_focus == focused){

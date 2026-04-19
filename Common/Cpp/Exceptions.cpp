@@ -128,7 +128,7 @@ MLModelSessionCreationError::MLModelSessionCreationError(Logger* logger, std::st
 {
     if (logger){
         logger->log(message());
-    } else{
+    }else{
         std::cerr << message() << std::endl;
     }
 }
