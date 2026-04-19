@@ -10,7 +10,6 @@
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/GroupOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -18,7 +17,6 @@
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 #include "PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h"
 #include "PokemonLZA/Inference/PokemonLZA_DayNightStateDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_WeatherDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -45,18 +43,15 @@ public:
 private:
     std::unique_ptr<DayNightStateDetector> m_day_night_detector;
     bool should_run_based_on_day_night(const ImageViewRGB32& frame, VideoOverlay& overlay);
-    bool should_run_based_on_weather(const ImageViewRGB32& frame);
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
 
     IntegerEnumDropdownOption WALK_DIRECTION;
     MillisecondsOption WALK_FORWARD_DURATION;
     SimpleIntegerOption<uint32_t> PERIODIC_SAVE;
+    SimpleIntegerOption<uint32_t> PERIODIC_TIME_CHECK;
 
     GroupOption DAY_NIGHT_FILTER;
-    IntegerEnumDropdownOption FILTER_MODE;
-
-    GroupOption WEATHER_FILTER;
-    IntegerEnumDropdownOption WEATHER_FILTER_MODE;
+    IntegerEnumDropdownOption DAY_FILTER_MODE;
 
     ShinySoundDetectedActionOption SHINY_DETECTED;
 
