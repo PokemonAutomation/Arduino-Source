@@ -60,7 +60,6 @@ DayNightState DayNightStateDetector::state() const{
     return m_state;
 }
 
-
 }
 }
 }

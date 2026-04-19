@@ -95,23 +95,24 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
         0
     )
     , PERIODIC_TIME_CHECK(
-        "<b>Periodically Check Time:</b><br>"
-        "Re-check day/night state every this many bench sits. "
-        "Set to 0 to check every cycle.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        10,
-        0
+          "<b>Periodically Check Time:</b><br>"
+          "How often the program re-checks the actual time of day from the map.<br>"
+          "0 = check every cycle.<br>"
+          "Higher values run faster but assume time alternates each bench sit.",
+          LockMode::UNLOCK_WHILE_RUNNING,
+          10,
+          0
     )
     , DAY_NIGHT_FILTER(
         "Run Forward Only During Day/Night:",
-        LockMode::LOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         GroupOption::EnableMode::DEFAULT_DISABLED
     )
     , DAY_FILTER_MODE(
         "Time filter",
         {
-        {0, "day", "Day"},
-        {1, "night", "Night"},
+            {0, "day", "Day"},
+            {1, "night", "Night"},
         },
         LockMode::UNLOCK_WHILE_RUNNING,
         0
@@ -136,9 +137,9 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
     }
     PA_ADD_OPTION(WALK_FORWARD_DURATION);
     PA_ADD_OPTION(PERIODIC_SAVE);
-    PA_ADD_OPTION(PERIODIC_TIME_CHECK);
     PA_ADD_OPTION(DAY_NIGHT_FILTER);
     DAY_NIGHT_FILTER.add_option(DAY_FILTER_MODE, "FilterMode");
+    DAY_NIGHT_FILTER.add_option(PERIODIC_TIME_CHECK,"PeriodicTimeCheck");
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -266,7 +267,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
 
                 Milliseconds duration = WALK_FORWARD_DURATION;
 
-                // Only open map if movement is enabled AND a filter is active
+                // Only open map when movement enabled AND day/night filter requires verification
                 bool need_time_check = true;
 
                 uint32_t periodic_time_check = PERIODIC_TIME_CHECK;
@@ -304,6 +305,12 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                         cached_time = m_day_night_detector->state();
                         cached_time_initialized = true;
                         rounds_since_time_check = 0;
+                        std::string time_string =
+                            cached_time == DayNightState::DAY
+                                ? "Cached Day"
+                                : "Cached Night";
+                        env.console.overlay().add_log(time_string, COLOR_GREEN);
+                        env.log(time_string);
                     }
 
                     // close map
