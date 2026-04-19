@@ -104,8 +104,7 @@ bool move_cursor_impl(
         for (int i = 0; i < forward; i++){
             pbf_press_dpad(context, DPAD_DOWN, 320ms, 400ms);
         }
-    }
-    else{
+    }else{
         for (int i = 0; i < backward; i++){
             pbf_press_dpad(context, DPAD_UP, 320ms, 400ms);
         }
