@@ -9,7 +9,6 @@
 
 #include <string>
 #include <functional>
-#include <QtTypes>
 #include "Common/Cpp/CancellableScope.h"
 
 
@@ -27,7 +26,7 @@ void download_file_to_disk(
     Logger& logger, 
     const std::string& url, 
     const std::string& file_path, 
-    qint64 expected_size,
+    uint64_t expected_size,
     std::function<void(uint64_t bytes_done, uint64_t total_bytes)> progress_callback
 );
 
