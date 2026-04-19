@@ -29,6 +29,14 @@ std::string Exception::to_str() const{
 }
 
 
+ParseException::ParseException(std::string message_string)
+    : m_message(std::move(message_string))
+{
+    std::string str = ParseException::name();
+    str += ": " + message();
+    std::cerr << str << std::endl;
+}
+
 
 
 FileException::FileException(Logger* logger, const char* location, std::string message_string, std::string file)

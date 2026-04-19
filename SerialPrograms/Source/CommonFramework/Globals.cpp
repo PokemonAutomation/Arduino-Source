@@ -220,6 +220,10 @@ const std::string& RESOURCE_PATH(){
     static std::string path = get_resource_path();
     return path;
 }
+const std::string& DOWNLOADED_RESOURCE_PATH(){
+    static std::string path = RUNTIME_BASE_PATH() + "DownloadedResources/";
+    return path;
+}
 const std::string& TRAINING_PATH(){
     static std::string path = get_training_path();
     return path;
