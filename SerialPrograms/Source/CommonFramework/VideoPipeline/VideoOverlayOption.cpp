@@ -40,7 +40,7 @@ void VideoOverlayOption::load_json(const JsonValue& json){
     }
     if (obj->read_boolean(tmp, JSON_IMAGES)){
         images.store(tmp, std::memory_order_relaxed);
-    } else{
+    }else{
         // by default the image overlay is on
         images.store(true, std::memory_order_relaxed);
     }
