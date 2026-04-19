@@ -25,8 +25,11 @@ public:
     ~LabelCellWidget();
     LabelCellWidget(QWidget& parent, LabelCellOption& value);
 
+    virtual void update_value() override;
+    virtual void on_config_value_changed(void* object) override;
+
 private:
-//    LabelCellOption& m_value;
+    LabelCellOption& m_value;
     QLabel* m_icon = nullptr;
     QLabel* m_text;
 };
