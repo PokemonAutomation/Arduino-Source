@@ -76,7 +76,7 @@ LuckyEggFarmer::LuckyEggFarmer()
         },
         LockMode::LOCK_WHILE_RUNNING,
         true
-        )
+    )
     , STOP_AFTER_CURRENT("Reset")
     , TAKE_VIDEO("<b>Take Video:</b><br>Record a video when the shiny is found.", LockMode::UNLOCK_WHILE_RUNNING, true)
     , GO_HOME_WHEN_DONE(false)
@@ -93,6 +93,7 @@ LuckyEggFarmer::LuckyEggFarmer()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(STOP_AFTER_CURRENT);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
