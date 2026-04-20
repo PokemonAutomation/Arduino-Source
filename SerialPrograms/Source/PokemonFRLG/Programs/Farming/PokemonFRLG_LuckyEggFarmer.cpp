@@ -226,6 +226,7 @@ bool LuckyEggFarmer::find_encounter(SingleSwitchProgramEnvironment& env, ProCont
     context.wait_for_all_requests();
 
     BlackScreenWatcher battle_entered(COLOR_RED);
+    AdvanceBattleDialogWatcher battle_dialog(COLOR_RED);
 
     // This could be removed if spin in place stops drifting.
     AdvanceWhiteDialogWatcher out_of_steps(COLOR_RED);
@@ -239,13 +240,13 @@ bool LuckyEggFarmer::find_encounter(SingleSwitchProgramEnvironment& env, ProCont
                 pbf_move_left_joystick(context, { -1, 0 }, 33ms, 150ms);
                 context.wait_for_all_requests();
             },
-            { battle_entered, out_of_steps }
+            { battle_entered, out_of_steps, battle_dialog }
         );
 
         pbf_wait(context, 100ms);
         context.wait_for_all_requests();
 
-        if (ret == 0) {
+        if (ret == 0 || ret == 2) {
             env.log("Battle entered.");
             return true;
         }
