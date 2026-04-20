@@ -38,13 +38,13 @@ public:
 ImageFloatBox BattleSelectionArrowDetector::box_for_option(BattleMenuOption option){
     switch (option){
     case BattleMenuOption::FIGHT:
-        return ImageFloatBox(0.533, 0.767, 0.024, 0.067);
+        return ImageFloatBox(0.525, 0.765, 0.040, 0.080);
     case BattleMenuOption::BAG:
-        return ImageFloatBox(0.768, 0.767, 0.024, 0.067);
+        return ImageFloatBox(0.760, 0.765, 0.040, 0.080);
     case BattleMenuOption::POKEMON:
-        return ImageFloatBox(0.533, 0.868, 0.024, 0.067);
+        return ImageFloatBox(0.525, 0.865, 0.040, 0.080);
     case BattleMenuOption::RUN:
-        return ImageFloatBox(0.768, 0.868, 0.024, 0.067);
+        return ImageFloatBox(0.760, 0.865, 0.040, 0.080);
     default:
         break;
     }
@@ -53,13 +53,13 @@ ImageFloatBox BattleSelectionArrowDetector::box_for_option(BattleMenuOption opti
 ImageFloatBox BattleSelectionArrowDetector::box_for_option(SafariBattleMenuOption option){
     switch (option){
     case SafariBattleMenuOption::BALL:
-        return ImageFloatBox(0.533, 0.767, 0.024, 0.067);
+        return ImageFloatBox(0.525, 0.765, 0.040, 0.080);
     case SafariBattleMenuOption::BAIT:
-        return ImageFloatBox(0.768, 0.767, 0.024, 0.067);
+        return ImageFloatBox(0.760, 0.765, 0.040, 0.080);
     case SafariBattleMenuOption::ROCK:
-        return ImageFloatBox(0.533, 0.868, 0.024, 0.067);
+        return ImageFloatBox(0.525, 0.865, 0.040, 0.080);
     case SafariBattleMenuOption::RUN:
-        return ImageFloatBox(0.768, 0.868, 0.024, 0.067);
+        return ImageFloatBox(0.760, 0.865, 0.040, 0.080);
     default:
         break;
     }
@@ -138,7 +138,8 @@ bool BattleSelectionArrowDetector::detect(const ImageViewRGB32& screen){
     size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
 
     const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
-        {0xff232828, 0xff646464}
+        {0xff000000, 0xff7f7f7f},
+        {0xff232828, 0xff646464},
     };
 
     bool found = match_template_by_waterfill(
