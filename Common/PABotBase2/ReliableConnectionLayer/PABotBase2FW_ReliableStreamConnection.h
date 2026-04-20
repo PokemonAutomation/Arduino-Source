@@ -20,13 +20,6 @@
 #include "PabbTime.h"
 #else
 #include "Common/Cpp/Time.h"
-inline PokemonAutomation::WallClock pabb_current_time(){
-    return PokemonAutomation::current_time();
-}
-inline PokemonAutomation::Milliseconds pabb_milliseconds(int64_t milliseconds){
-    return PokemonAutomation::Milliseconds(milliseconds);
-}
-#define pabb_time_wrapsafe_cmplt(x, y)  ((x) < (y))
 #endif
 
 namespace PokemonAutomation{
@@ -59,7 +52,7 @@ public:
     }
 
     virtual bool run_events() override;
-    virtual void wait_for_event(uint16_t milliseconds) override;
+    virtual void wait_for_event(WallDuration timeout) override;
 
 
 public:

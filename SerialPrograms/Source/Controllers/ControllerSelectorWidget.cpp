@@ -54,9 +54,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     //  Add all the supported interfaces.
     {
         m_interface_list.emplace_back(ControllerInterface::SerialPABotBase);
-        if (IS_BETA_VERSION){
-            m_interface_list.emplace_back(ControllerInterface::SerialPABotBase2);
-        }
+        m_interface_list.emplace_back(ControllerInterface::SerialPABotBase2);
         m_interface_list.emplace_back(ControllerInterface::TcpSysbotBase);
 //        m_interface_list.emplace_back(ControllerInterface::UsbSysbotBase);
     }
@@ -70,7 +68,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
 
     auto current = session.descriptor();
     if (current == nullptr || current->interface_type == ControllerInterface::None){
-        current.reset(new SerialPABotBase::SerialPABotBase_Descriptor());
+        current.reset(new SerialPABotBase::SerialPABotBase2_Descriptor());
         session.set_device(std::move(current));
     }
     update_interface_dropdown(current->interface_type);

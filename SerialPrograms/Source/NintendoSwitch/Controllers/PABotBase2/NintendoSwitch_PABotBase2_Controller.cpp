@@ -27,15 +27,14 @@ std::string PABotBase2_Controller::error_string() const{
 }
 
 
-bool PABotBase2_Controller::cancel_all_commands(WallDuration timeout){
+void PABotBase2_Controller::cancel_all_commands(){
     std::lock_guard<Mutex> lg(m_state_lock);
     if (!is_ready()){
         throw InvalidConnectionStateException(error_string());
     }
     m_logger.log("cancel_all_commands()", COLOR_DARKGREEN);
-    bool ret = m_connection.device().command_queue().send_cancel(timeout);
+    m_connection.device().command_queue().send_cancel();
     m_scheduler.clear_on_next();
-    return ret;
 }
 void PABotBase2_Controller::replace_on_next_command(Cancellable* cancellable){
     std::lock_guard<Mutex> lg(m_state_lock);

@@ -185,7 +185,7 @@ void LabelImages::init_sam_session(bool use_gpu){
     const std::string sam_model_path = RESOURCE_PATH() + "ML/sam_cpu.onnx";
     if (Filesystem::exists(sam_model_path)){
         m_sam_session = std::make_unique<SAMSession>(sam_model_path, use_gpu);
-    } else{
+    }else{
         std::cerr << "Error: no such SAM model path " << sam_model_path << "." << std::endl;
         QMessageBox box;
         box.critical(nullptr, "SAM Model Does Not Exist",
@@ -264,7 +264,7 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
     if (json_obj == nullptr){
         // legacy format, load as an array
         json_array = loaded_json.to_array();
-    } else{
+    }else{
         json_array = json_obj->get_array("ANNOTATION");
     }
     if (json_array == nullptr){
@@ -529,7 +529,7 @@ void LabelImages::delete_selected_annotation(){
 
     // if (m_selected_obj_idx >= m_annotations.size()){
     //     m_selected_obj_idx = m_annotations.size() - 1;
-    // } else{
+    // }else{
     //     // no change to the currently selected index
     // }
 

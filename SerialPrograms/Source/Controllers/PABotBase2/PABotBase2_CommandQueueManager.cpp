@@ -60,41 +60,15 @@ void CommandQueueManager::wait_for_command_finish(Cancellable* cancellable, uint
     }
 }
 
-bool CommandQueueManager::send_cancel(WallDuration timeout){
-    MessageHeader message;
-    message.message_bytes = sizeof(MessageHeader);
-    message.opcode = PABB2_MESSAGE_OPCODE_CQ_CANCEL;
-    message.id = 0;
+void CommandQueueManager::send_cancel() noexcept{
+    bool success;
     {
         std::unique_lock<Mutex> lg(m_lock);
-        m_pending_commands.clear();
+        m_pending_cancel = true;
+        success = try_push_pending_cancel();
     }
-    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &message);
-    WallClock start = current_time();
-    size_t bytes_sent = m_connection.reliable_send_blocking(&message, message.message_bytes, timeout);
-    WallClock end = current_time();
-    m_cv.notify_all();
-
-    if (timeout == WallDuration::max()){
-        return bytes_sent == message.message_bytes;
-    }
-
-    if (bytes_sent == message.message_bytes){
-        m_logger.log(
-            "CommandQueueManager(): Issuing non-blocking cancel... " +
-            std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()) +
-            " ms",
-            COLOR_BLUE
-        );
-        return true;
-    }else{
-        m_logger.log(
-            "CommandQueueManager(): Issuing non-blocking cancel... " +
-            std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count()) +
-            " ms (timed out)",
-            COLOR_RED
-        );
-        return false;
+    if (success){
+        m_cv.notify_all();
     }
 }
 void CommandQueueManager::send_replace_on_next(Cancellable* cancellable){
@@ -104,22 +78,34 @@ void CommandQueueManager::send_replace_on_next(Cancellable* cancellable){
     message.id = 0;
     {
         std::unique_lock<Mutex> lg(m_lock);
+        try_push_pending_cancel();
+        while (true){
+            throw_if_cancelled(cancellable);
+            if (m_connection.reliable_try_send_all_or_nothing(&message, message.message_bytes)){
+                break;
+            }
+            cv_wait(cancellable, lg);
+        }
         m_pending_commands.clear();
     }
     m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &message);
-    m_connection.reliable_send_blocking(&message, message.message_bytes);
     m_cv.notify_all();
 }
 
 
 uint8_t CommandQueueManager::send_command(Cancellable* cancellable, MessageHeader& command){
     {
+        bool need_to_wait = false;
         std::unique_lock<Mutex> lg(m_lock);
+        try_push_pending_cancel();
         while (true){
+            if (need_to_wait){
+                cv_wait(cancellable, lg);
+            }
+            need_to_wait = true;
             throw_if_cancelled(cancellable);
 
             if (m_pending_commands.size() >= m_command_queue_size){
-                cv_wait(cancellable, lg);
                 continue;
             }
 
@@ -128,20 +114,30 @@ uint8_t CommandQueueManager::send_command(Cancellable* cancellable, MessageHeade
             //  Wait until the slot is available.
             auto iter = m_pending_commands.find(command.id);
             if (iter != m_pending_commands.end()){
-                m_cv.wait(lg);
                 continue;
             }
 
-            m_pending_commands.emplace(
+            iter = m_pending_commands.emplace(
                 command.id,
                 std::make_shared<CommandHandle>()
-            );
-            m_command_seqnum++;
-            break;
+            ).first;
+
+            bool sent;
+            try{
+                sent = m_connection.reliable_try_send_all_or_nothing(&command, command.message_bytes);
+            }catch (...){
+                m_pending_commands.erase(iter);
+                throw;
+            }
+
+            if (sent){
+                m_command_seqnum++;
+                break;
+            }
+            m_pending_commands.erase(iter);
         }
     }
     m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &command);
-    m_connection.reliable_send_blocking(&command, command.message_bytes);
     m_cv.notify_all();
     return command.id;
 }
@@ -160,8 +156,31 @@ void CommandQueueManager::report_command_finished(const MessageHeader& finished_
             sizeof(uint32_t)
         );
         m_pending_commands.erase(iter);
+        try_push_pending_cancel();
     }
     m_cv.notify_all();
+}
+
+
+bool CommandQueueManager::try_push_pending_cancel() noexcept{
+    //  Must call under lock.
+    if (!m_pending_cancel){
+        return false;
+    }
+
+    MessageHeader message;
+    message.message_bytes = sizeof(MessageHeader);
+    message.opcode = PABB2_MESSAGE_OPCODE_CQ_CANCEL;
+    message.id = 0;
+    try{
+        if (m_connection.reliable_try_send_all_or_nothing(&message, message.message_bytes)){
+            m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &message);
+            m_pending_cancel = false;
+            m_pending_commands.clear();
+            return true;
+        }
+    }catch (...){}
+    return false;
 }
 
 

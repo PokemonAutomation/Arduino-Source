@@ -4,7 +4,7 @@
  *
  */
 
-#include "PokemonFRLG_BattleLevelUpReader.h"
+#include <opencv2/imgproc.hpp>
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -15,11 +15,13 @@
 #include "CommonTools/Images/ImageManip.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/OCR/OCR_Routines.h"
+#include "Pokemon/Pokemon_StatsCalculation.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Inference/Pokemon_NatureReader.h"
 #include "PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_DigitReader.h"
-#include <opencv2/imgproc.hpp>
+#include "PokemonFRLG_BattleLevelUpReader.h"
+
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -46,7 +48,7 @@ void BattleLevelUpReader::make_overlays(VideoOverlaySet &items) const {
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_speed));
 }
 
-PokemonFRLG_LevelUpStats BattleLevelUpReader::read_stats(Logger &logger, const ImageViewRGB32& frame){
+StatReads BattleLevelUpReader::read_stats(Logger &logger, const ImageViewRGB32& frame) const{
     ImageViewRGB32 game_screen =
             extract_box_reference(frame, GameSettings::instance().GAME_BOX);
     
@@ -75,18 +77,13 @@ PokemonFRLG_LevelUpStats BattleLevelUpReader::read_stats(Logger &logger, const I
         );
     };
 
-    PokemonFRLG_LevelUpStats stats;
-    auto assign_stat = [](std::optional<unsigned>& field, int value){
-        if (value != -1){
-            field = static_cast<unsigned>(value);
-        }
-    };
-    assign_stat(stats.hp, read_stat(m_box_hp, "hp"));
-    assign_stat(stats.attack, read_stat(m_box_attack, "attack"));
-    assign_stat(stats.defense, read_stat(m_box_defense, "defense"));
-    assign_stat(stats.sp_attack, read_stat(m_box_sp_attack, "spatk"));
-    assign_stat(stats.sp_defense, read_stat(m_box_sp_defense, "spdef"));
-    assign_stat(stats.speed, read_stat(m_box_speed, "speed"));
+    StatReads stats;
+    stats.hp = uint16_t(read_stat(m_box_hp, "hp"));
+    stats.attack = uint16_t(read_stat(m_box_attack, "attack"));
+    stats.defense = uint16_t(read_stat(m_box_defense, "defense"));
+    stats.spatk = uint16_t(read_stat(m_box_sp_attack, "spatk"));
+    stats.spdef = uint16_t(read_stat(m_box_sp_defense, "spdef"));
+    stats.speed = uint16_t(read_stat(m_box_speed, "speed"));
     return stats;
 }
 
