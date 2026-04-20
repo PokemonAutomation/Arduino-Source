@@ -25,40 +25,29 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-ResourceType get_resource_type_from_string(std::string type){
-    if (type == "ZippedFolder"){
-        return ResourceType::ZIP_FILE;
-    }else{
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "get_resource_type_from_string: Unknown string.");
-    }
-    
-}
-
 std::vector<DownloadedResourceMetadata> deserialize_resource_list_json(const JsonValue& json){
     std::vector<DownloadedResourceMetadata> resources;    
 
     try{
         const JsonObject& obj = json.to_object_throw();
-        const JsonArray& resource_list = obj.get_array_throw("resourceList");
+        const JsonArray& resource_list = obj.get_array_throw("ResourceList");
         for (const JsonValue& resource_val : resource_list){
             const JsonObject& resource_obj = resource_val.to_object_throw();
 
-            std::string resource_name = resource_obj.get_string_throw("resourceName");
-            std::optional<uint16_t> version_num = (uint16_t)resource_obj.get_integer_throw("version");
-            ResourceType resource_type = get_resource_type_from_string(resource_obj.get_string_throw("Type"));
+            std::string resource_name = resource_obj.get_string_throw("ResourceName");
+            std::optional<uint16_t> version_num = (uint16_t)resource_obj.get_integer_throw("Version");
             size_t compressed_bytes = (size_t)resource_obj.get_integer_throw("CompressedBytes");
             size_t decompressed_bytes = (size_t)resource_obj.get_integer_throw("DecompressedBytes");
             std::string url = resource_obj.get_string_throw("URL");
-            std::string sha_256 = resource_obj.get_string_throw("SHA_256");
+            std::string sha256 = resource_obj.get_string_throw("SHA256");
 
             DownloadedResourceMetadata resource = {
                 resource_name,
                 version_num,
-                resource_type,
                 compressed_bytes,
                 decompressed_bytes,
                 url,
-                sha_256
+                sha256
             };
 
             resources.emplace_back(std::move(resource));

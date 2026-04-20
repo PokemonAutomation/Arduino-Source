@@ -146,7 +146,7 @@ void DownloadThread::run_download(DownloadedResourceMetadata resource_metadata){
                     m_row.report_hash_progress(bytes_done, total_bytes);
                 }
             );
-        std::string expected_hash = resource_metadata.sha_256;
+        std::string expected_hash = resource_metadata.sha256;
         if (hash != expected_hash){
             std::cerr << "current hash: " << hash << endl;
             throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
@@ -203,8 +203,6 @@ std::string resource_version_to_string(ResourceVersionStatus version){
         return "Outdated";
     case ResourceVersionStatus::NOT_APPLICABLE:
         return "--";
-    // case ResourceVersionStatus::BLANK:
-    //     return "";
     case ResourceVersionStatus::FUTURE_VERSION:
         return "Unsupported future version.<br>Please update the Computer Control program.";
     default:
