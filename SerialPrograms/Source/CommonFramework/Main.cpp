@@ -77,7 +77,12 @@ private:
 
 
 int run_program(int argc, char *argv[]){
+#if defined(__APPLE__)
+    PokemonAutomation::set_startup_profile(argc, argv);
     QApplication application(argc, argv);
+#else
+    QApplication application(argc, argv);
+#endif
 
     GlobalOutputRedirector redirect_stdout(std::cout, "stdout", Color());
     GlobalOutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);

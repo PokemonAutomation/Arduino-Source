@@ -103,7 +103,7 @@ stages:
 
   jobs:
   - job: Windows
-    timeoutInMinutes: 30
+    timeoutInMinutes: 45
     cancelTimeoutInMinutes: 1
     displayName: Windows
 
@@ -143,7 +143,7 @@ stages:
 
       - script: |
           cd /d "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/SerialPrograms"
-          cmake --build --preset=$(cmake_preset)
+          cmake --build --preset=$(cmake_preset) -j 16
         displayName: 'Build'
         condition: succeeded()
 
@@ -228,42 +228,34 @@ stages:
           $name = "SerialPrograms-Windows-$(compiler)-$(architecture)"
           $buildType = "${{ parameters.buildType }}"
 
-          $artifactSubdir = Join-Path $root "cache-artifacts/$name"
-          $zipPath = Join-Path $artifactSubdir "$name.zip"
-          New-Item -ItemType Directory -Force -Path $artifactSubdir | Out-Null
+          Write-Host "=== Creating enclosing folder: $folderName ==="
+          $finalFolder = Join-Path $root $folderName
+          Rename-Item "$root/cache-build" $finalFolder
 
-          $tempFolder = Join-Path $root $folderName
-          New-Item -ItemType Directory -Force -Path $tempFolder | Out-Null
-          Copy-Item "$root/cache-build/*" $tempFolder -Recurse -Force
-
-          Push-Location $root
-          try {
-              if ($buildType -eq "PrivateBeta") {
-                  Write-Host "=== Encrypting build artifact with password ==="
-                  & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 "-p$env:ARTIFACT_PASSWORD" -mem=AES256 $zipPath $folderName
-              } else {
-                  & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 $zipPath $folderName
-              }
-              if ($LASTEXITCODE -ne 0) {
-                  throw "7-Zip failed with exit code: $LASTEXITCODE"
-              }
-          } finally {
-              Pop-Location
+          New-Item -ItemType Directory -Force -Path "$root/cache-build" | Out-Null
+          $zipPath = Join-Path $root "cache-build/$name.zip"
+          if ($buildType -eq "PrivateBeta") {
+              Write-Host "=== Creating password-protected archive ==="
+              & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 "-p$env:ARTIFACT_PASSWORD" -mem=AES256 $zipPath "$finalFolder"
+          } else {
+              Write-Host "=== Creating archive ==="
+              & "C:/Program Files/7-Zip/7z.exe" a -tzip -mx=9 $zipPath "$finalFolder"
           }
-
-          Remove-Item $tempFolder -Recurse -Force
-          Write-Host "=== Created archive with enclosing folder: $folderName ==="
+          if ($LASTEXITCODE -ne 0) {
+              throw "7-Zip failed with exit code: $LASTEXITCODE"
+          }
+          Write-Host "=== Archive created ==="
         displayName: 'Archive Windows build artifact'
-        condition: succeeded()
+        condition: and(succeeded(), ne('${{ parameters.buildType }}', 'Commit'))
         env:
           ARTIFACT_PASSWORD: $(ARTIFACT_PASSWORD)
 
       - task: Cache@2
-        displayName: 'Cache the build artifact'
+        displayName: 'Cache build artifact for GitHub release'
         inputs:
           key: 'windows-build | "$(Build.BuildId)"'
-          path: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-artifacts'
-        condition: succeeded()
+          path: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build'
+        condition: and(succeeded(), eq('${{ parameters.targetOS }}', 'All'), or(eq('${{ parameters.buildType }}', 'Release'), eq('${{ parameters.buildType }}', 'Beta')))
 
       - task: Cache@2
         displayName: 'Cache debug symbols'
@@ -272,12 +264,21 @@ stages:
           path: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-symbols'
         condition: succeeded()
 
-      - task: PublishBuildArtifacts@1
-        displayName: 'Publish SerialPrograms'
-        condition: succeeded()
+      - task: PublishPipelineArtifact@1
+        displayName: 'Publish Windows artifact (PrivateBeta)'
         inputs:
-          PathtoPublish: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-artifacts/SerialPrograms-Windows-$(compiler)-$(architecture)/SerialPrograms-Windows-$(compiler)-$(architecture).zip'
-          ArtifactName: 'SerialPrograms-Windows-$(compiler)-$(architecture)'
+          targetPath: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/SerialPrograms-Windows-$(compiler)-$(architecture).zip'
+          artifactName: 'SerialPrograms-Windows-$(compiler)-$(architecture)'
+          publishLocation: 'pipeline'
+        condition: and(succeeded(), eq('${{ parameters.buildType }}', 'PrivateBeta'))
+
+      - task: PublishPipelineArtifact@1
+        displayName: 'Publish Windows artifact'
+        inputs:
+          targetPath: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/SerialPrograms-${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}-Windows-$(architecture)'
+          artifactName: 'SerialPrograms-Windows-$(compiler)-$(architecture)'
+          publishLocation: 'pipeline'
+        condition: and(succeeded(), ne('${{ parameters.buildType }}', 'PrivateBeta'))
 
 ###########################################
 #         LINUX BUILD JOB                 #
@@ -292,7 +293,7 @@ stages:
 
   jobs:
   - job: Ubuntu
-    timeoutInMinutes: 30
+    timeoutInMinutes: 45
     cancelTimeoutInMinutes: 1
     displayName: Ubuntu
 
@@ -327,7 +328,7 @@ stages:
       - script: |
           export PATH=$(linux_path)
           cd "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/SerialPrograms"
-          cmake --build --preset=$(cmake_preset)
+          cmake --build --preset=$(cmake_preset) -j 16
         displayName: 'Build'
         condition: succeeded()
 
@@ -353,30 +354,27 @@ stages:
           export PATH=$(linux_path)
           BUILD_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
           SRC_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public"
-          APPDIR="$BUILD_DIR/AppDir"
+          APP_DIR="$BUILD_DIR/AppDir"
           BUILD_CACHE_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build"
 
           echo "=== Clean AppDir ==="
-          rm -rf "$APPDIR"
-          mkdir -p "$APPDIR"
-          mkdir -p "$APPDIR/usr/bin"
-          mkdir -p "$APPDIR/usr/lib"
-          mkdir -p "$APPDIR/usr/share/applications"
-          mkdir -p "$APPDIR/usr/share/icons/hicolor/256x256/apps"
+          rm -rf "$APP_DIR"
+          mkdir -p "$APP_DIR"
+          mkdir -p "$APP_DIR/usr/bin"
+          mkdir -p "$APP_DIR/usr/lib"
+          mkdir -p "$APP_DIR/usr/share/applications"
+          mkdir -p "$APP_DIR/usr/share/icons/hicolor/256x256/apps"
+          mkdir -p "$BUILD_CACHE_DIR"
 
           echo "=== Moving resources ==="
-          mkdir -p "$APPDIR/usr/plugins/iconengines"
-          cp -a "/opt/Qt/$(qt_version)/gcc_64/plugins/iconengines/" "$APPDIR/usr/plugins/iconengines/"
+          mkdir -p "$APP_DIR/usr/plugins/iconengines"
+          cp -a "/opt/Qt/$(qt_version)/gcc_64/plugins/iconengines/" "$APP_DIR/usr/plugins/iconengines/"
 
-          mkdir -p "$APPDIR/usr/bin/Resources"
-          cp -a "$SRC_DIR/Packages/Resources/" "$APPDIR/usr/bin/"
-
-          mkdir -p "$BUILD_CACHE_DIR"
-          cp -a "$SRC_DIR/Packages/Firmware/" "$BUILD_CACHE_DIR/"
-
-          cp "$SRC_DIR/IconResource/SerialPrograms.desktop" "$APPDIR/usr/share/applications/"
-          cp "$SRC_DIR/IconResource/SerialPrograms.png" "$APPDIR/usr/share/icons/hicolor/256x256/apps/"
-          cp "$BUILD_DIR/SerialPrograms" "$APPDIR/usr/bin"
+          mkdir -p "$APP_DIR/usr/share/metainfo"
+          cp "$SRC_DIR/IconResource/SerialPrograms.desktop" "$APP_DIR/usr/share/applications/"
+          cp "$SRC_DIR/IconResource/SerialPrograms.png" "$APP_DIR/usr/share/icons/hicolor/256x256/apps/"
+          cp "$SRC_DIR/IconResource/SerialPrograms.appdata.xml" "$APP_DIR/usr/share/metainfo/"
+          cp "$BUILD_DIR/SerialPrograms" "$APP_DIR/usr/bin"
 
           echo "=== Extracting Discord Social SDK ==="
           DISCORD_ZIP="$SRC_DIR/3rdPartyBinaries/discord_social_sdk_linux.zip"
@@ -386,26 +384,35 @@ stages:
           unzip -q "$DISCORD_ZIP" -d "$SRC_DIR/3rdPartyBinaries"
           DISCORD_SO="$DISCORD_DIR/lib/release/libdiscord_partner_sdk.so"
 
-          echo "=== Downloading linuxdeploy & Qt plugin ==="
+          echo "=== Downloading linuxdeploy, Qt plugin, gstreamer plugin ==="
           cd "$BUILD_DIR"
           wget -nv https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
           wget -nv https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
           wget -nv https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+          wget -nv https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-gstreamer/master/linuxdeploy-plugin-gstreamer.sh
           chmod +x linuxdeploy-*.AppImage
           chmod +x appimagetool-x86_64.AppImage
+          chmod +x linuxdeploy-plugin-gstreamer.sh
 
           echo "=== Running linuxdeploy to package AppImage ==="
+          export QMAKE="/opt/Qt/$(qt_version)/gcc_64/bin/qmake"
+          export EXTRA_QT_PLUGINS="multimedia"
           ./linuxdeploy-x86_64.AppImage \
-              --appdir "AppDir" \
-              -d "$APPDIR/usr/share/applications/SerialPrograms.desktop" \
-              -i "$APPDIR/usr/share/icons/hicolor/256x256/apps/SerialPrograms.png" \
-              -e "$APPDIR/usr/bin/SerialPrograms" \
+              --appdir "$APP_DIR" \
+              -d "$APP_DIR/usr/share/applications/SerialPrograms.desktop" \
+              -i "$APP_DIR/usr/share/icons/hicolor/256x256/apps/SerialPrograms.png" \
+              -e "$APP_DIR/usr/bin/SerialPrograms" \
               -l "$DISCORD_SO" \
               -p qt \
+              -p gstreamer \
               -v 3
 
           echo "=== Removing unnecessary Qt files ==="
-          rm -rf "$APPDIR/usr/translations"
+          rm -rf "$APP_DIR/usr/translations"
+
+          echo "=== Patching AppRun to force GStreamer backend ==="
+          sed -i '2i export PA_APPIMAGE_DIR=$(cd "$(dirname "$APPIMAGE")" && pwd)' "$APP_DIR/AppRun"
+          sed -i '2i export QT_MEDIA_BACKEND=gstreamer' "$APP_DIR/AppRun"
 
           echo "=== Packaging AppImage ==="
           ./appimagetool-x86_64.AppImage AppDir
@@ -415,30 +422,39 @@ stages:
           echo "=== Archive Linux AppImage ==="
           VERSION="${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
           FOLDER_NAME="SerialPrograms-$VERSION-Ubuntu-x64"
-          mkdir -p "$FOLDER_NAME"
-          chmod +x "SerialPrograms-x86_64.AppImage"
-          mv "SerialPrograms-x86_64.AppImage" "$FOLDER_NAME/"
-
           BUILD_TYPE="${{ parameters.buildType }}"
-            if [ "$BUILD_TYPE" = "PrivateBeta" ]; then
-                echo "=== Encrypting build artifact with password ==="
-                7z a -tzip -mx=9 "-p$ARTIFACT_PASSWORD" -mem=AES256 "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).zip" "$FOLDER_NAME"
-            else
-                7z a -tzip -mx=9 "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).zip" "$FOLDER_NAME"
-            fi
-          
-          echo "=== AppImage build complete with enclosing folder: $FOLDER_NAME ==="
+
+          mkdir -p "$FOLDER_NAME"
+          mv "SerialPrograms-x86_64.AppImage" "$FOLDER_NAME/SerialPrograms.AppImage"
+          chmod +x "$FOLDER_NAME/SerialPrograms.AppImage"
+          cp -a "$SRC_DIR/Packages/Firmware/" "$FOLDER_NAME/"
+          cp -a "$SRC_DIR/Packages/Resources/" "$FOLDER_NAME/"
+
+          if [ "$BUILD_TYPE" != "Commit" ]; then
+              ZIP_NAME="SerialPrograms-Ubuntu-$(compiler)-$(architecture).zip"
+              rm -rf "$BUILD_CACHE_DIR"/*
+              if [ "$BUILD_TYPE" = "PrivateBeta" ]; then
+                  echo "=== Creating password-protected archive ==="
+                  7z a -tzip -mx=9 "-p$ARTIFACT_PASSWORD" -mem=AES256 "$BUILD_CACHE_DIR/$ZIP_NAME" "$FOLDER_NAME"
+              else
+                  echo "=== Creating archive ==="
+                  7z a -tzip -mx=9 "$BUILD_CACHE_DIR/$ZIP_NAME" "$FOLDER_NAME"
+              fi
+              echo "=== Archive created ==="
+          else
+              echo "=== Skipping archive creation for Commit build ==="
+          fi
         displayName: 'Deploy AppImage'
         condition: succeeded()
         env:
           ARTIFACT_PASSWORD: $(ARTIFACT_PASSWORD)
 
       - task: Cache@2
-        displayName: 'Cache build'
+        displayName: 'Cache build artifact for GitHub release'
         inputs:
           key: 'ubuntu-build | "$(Build.BuildId)"'
           path: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build'
-        condition: succeeded()
+        condition: and(succeeded(), eq('${{ parameters.targetOS }}', 'All'), or(eq('${{ parameters.buildType }}', 'Release'), eq('${{ parameters.buildType }}', 'Beta')))
 
       - task: Cache@2
         displayName: 'Cache debug symbols'
@@ -447,12 +463,21 @@ stages:
           path: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-symbols'
         condition: succeeded()
 
-      - task: PublishBuildArtifacts@1
-        displayName: 'Publish SerialPrograms'
-        condition: succeeded()
+      - task: PublishPipelineArtifact@1
+        displayName: 'Publish Linux artifact (PrivateBeta)'
         inputs:
-          PathtoPublish: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).zip'
-          ArtifactName: 'SerialPrograms-Linux-$(compiler)-$(architecture)'
+          targetPath: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/SerialPrograms-Ubuntu-$(compiler)-$(architecture).zip'
+          artifactName: 'SerialPrograms-Linux-$(compiler)-$(architecture)'
+          publishLocation: 'pipeline'
+        condition: and(succeeded(), eq('${{ parameters.buildType }}', 'PrivateBeta'))
+
+      - task: PublishPipelineArtifact@1
+        displayName: 'Publish Linux artifact'
+        inputs:
+          targetPath: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/SerialPrograms-${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}-Ubuntu-x64'
+          artifactName: 'SerialPrograms-Linux-$(compiler)-$(architecture)'
+          publishLocation: 'pipeline'
+        condition: and(succeeded(), ne('${{ parameters.buildType }}', 'PrivateBeta'))
 
 ###########################################
 #           MACOS BUILD STAGES            #
@@ -463,6 +488,7 @@ stages:
     stageName: MacOS_Build_ARM64
     displayName: 'MacOS Build ARM64'
     dependsOnStage: Set_Build_Number
+    buildType: ${{ parameters.buildType }}
     targetOS: ${{ parameters.targetOS }}
     poolName: ApplePool
     imageName: macos-26
@@ -473,6 +499,7 @@ stages:
     qt_modules: 'qtserialport qtmultimedia'
     cmake_preset: RelWithDebInfo
     macos_path: '/opt/Qt/6.10.2/macos/lib/cmake:/opt/Qt/6.10.2/macos/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew:$PATH'
+    openssl_pkcs_args: '-legacy'
     cmake_version_params: '-DVERSION_MAJOR=${{ parameters.versionMajor }} -DVERSION_MINOR=${{ parameters.versionMinor }} -DVERSION_PATCH=${{ parameters.versionPatch }} -DIS_BETA=${{ lower(eq(parameters.buildType, ''PrivateBeta'')) }}'
     cmake_additional_param: '-DPACKAGE_BUILD=true -DUNIX_LINK_TESSERACT:BOOL=true -DIS_AZURE_BUILD=TRUE'
     versionMajor: ${{ parameters.versionMajor }}
@@ -485,6 +512,7 @@ stages:
     stageName: MacOS_Build_x64
     displayName: 'MacOS Build x64'
     dependsOnStage: Set_Build_Number
+    buildType: ${{ parameters.buildType }}
     targetOS: ${{ parameters.targetOS }}
     poolName: ApplePool
     imageName: macos-15
@@ -495,52 +523,13 @@ stages:
     qt_modules: 'qtserialport qtmultimedia'
     cmake_preset: RelWithDebInfo
     macos_path: '/usr/local/Qt/6.10.2/macos/lib/cmake:/usr/local/Qt/6.10.2/macos/bin:/usr/local/bin:/usr/local/sbin:/usr/local:$PATH'
+    openssl_pkcs_args: '-legacy'
     cmake_version_params: '-DVERSION_MAJOR=${{ parameters.versionMajor }} -DVERSION_MINOR=${{ parameters.versionMinor }} -DVERSION_PATCH=${{ parameters.versionPatch }} -DIS_BETA=${{ lower(eq(parameters.buildType, ''PrivateBeta'')) }}'
     cmake_additional_param: '-DPACKAGE_BUILD=true -DUNIX_LINK_TESSERACT:BOOL=true -DIS_AZURE_BUILD=TRUE'
     versionMajor: ${{ parameters.versionMajor }}
     versionMinor: ${{ parameters.versionMinor }}
     versionPatch: ${{ parameters.versionPatch }}
     condition: or(eq('${{ parameters.targetOS }}', 'MacOS'), eq('${{ parameters.targetOS }}', 'All'))
-
-###########################################
-#        MACOS NOTARIZATION STAGES        #
-###########################################
-
-- template: templates/macos-notarize.yml
-  parameters:
-    stageName: MacOS_Notarize_ARM64
-    displayName: 'MacOS Codesign ARM64'
-    dependsOnStage: MacOS_Build_ARM64
-    buildType: ${{ parameters.buildType }}
-    poolName: ApplePool
-    imageName: macos-26
-    architecture: arm64
-    compiler: Clang
-    cmake_preset: RelWithDebInfo
-    macos_path: '/opt/Qt/6.10.2/macos/lib/cmake:/opt/Qt/6.10.2/macos/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew:$PATH'
-    openssl_pkcs_args: '-legacy'
-    versionMajor: ${{ parameters.versionMajor }}
-    versionMinor: ${{ parameters.versionMinor }}
-    versionPatch: ${{ parameters.versionPatch }}
-    condition: and(succeeded('MacOS_Build_ARM64'), or(eq('${{ parameters.targetOS }}', 'MacOS'), eq('${{ parameters.targetOS }}', 'All')))
-
-- template: templates/macos-notarize.yml
-  parameters:
-    stageName: MacOS_Notarize_x64
-    displayName: 'MacOS Codesign x64'
-    dependsOnStage: MacOS_Build_x64
-    buildType: ${{ parameters.buildType }}
-    poolName: ApplePool
-    imageName: macos-15
-    architecture: x64
-    compiler: Clang
-    cmake_preset: RelWithDebInfo
-    macos_path: '/usr/local/Qt/6.10.2/macos/lib/cmake:/usr/local/Qt/6.10.2/macos/bin:/usr/local/bin:/usr/local/sbin:/usr/local:$PATH'
-    openssl_pkcs_args: '-legacy'
-    versionMajor: ${{ parameters.versionMajor }}
-    versionMinor: ${{ parameters.versionMinor }}
-    versionPatch: ${{ parameters.versionPatch }}
-    condition: and(succeeded('MacOS_Build_x64'), or(eq('${{ parameters.targetOS }}', 'MacOS'), eq('${{ parameters.targetOS }}', 'All')))
 
 ##########################################
 #          UPLOAD DEBUG SYMBOLS          #
@@ -553,8 +542,8 @@ stages:
     dependsOn:
       - Windows_Build_x64
       - Linux_Build_x64
-      - MacOS_Notarize_ARM64
-      - MacOS_Notarize_x64
+      - MacOS_Build_ARM64
+      - MacOS_Build_x64
     platforms:
       - Windows
       - Linux
@@ -638,7 +627,7 @@ stages:
     versionMajor: ${{ parameters.versionMajor }}
     versionMinor: ${{ parameters.versionMinor }}
     versionPatch: ${{ parameters.versionPatch }}
-    targetRepo: 'PokemonAutomation/ComputerControl'
+    targetRepo: PokemonAutomation/ComputerControl
     condition: and(succeeded(), eq('${{ parameters.targetOS }}', 'All'), or(eq('${{ parameters.buildType }}', 'Release'), eq('${{ parameters.buildType }}', 'Beta')))
 
 ##########################################
