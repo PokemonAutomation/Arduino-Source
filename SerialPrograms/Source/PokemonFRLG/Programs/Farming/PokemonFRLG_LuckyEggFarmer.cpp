@@ -42,18 +42,26 @@ LuckyEggFarmer_Descriptor::LuckyEggFarmer_Descriptor()
 struct LuckyEggFarmer_Descriptor::Stats : public StatsTracker {
     public:
     Stats()
-        : chanseys(m_stats["Chanseys Caught"])
+        : encounters(m_stats["Encounters"])
+        , chanseys_found(m_stats["Chanseys Found"])
+        , chanseys_caught(m_stats["Chanseys Caught"])
         , eggs(m_stats["Lucky Eggs Found"])
         , shinies(m_stats["Shinies"])
         , errors(m_stats["Errors"])
     {
+        m_display_order.emplace_back("Encounters");
+        m_display_order.emplace_back("Chanseys Found");
         m_display_order.emplace_back("Chanseys Caught");
-        m_display_order.emplace_back("Lucky Eggs Found");
-        m_display_order.emplace_back("Shinies");
+        m_display_order.emplace_back("Lucky Eggs");
+        m_display_order.emplace_back("Shinies", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+//        m_aliases["Chanseys Caught"] = "Caught";
+        m_aliases["Lucky Eggs Found"] = "Lucky Eggs";
     }
 
-    std::atomic<uint64_t>& chanseys;
+    std::atomic<uint64_t>& encounters;
+    std::atomic<uint64_t>& chanseys_found;
+    std::atomic<uint64_t>& chanseys_caught;
     std::atomic<uint64_t>& eggs;
     std::atomic<uint64_t>& shinies;
     std::atomic<uint64_t>& errors;
@@ -389,6 +397,7 @@ bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProCon
         }
 
         bool encounter_shiny = handle_encounter(env.console, context, true);
+        stats.encounters++;
         if (encounter_shiny) {
             stats.shinies++;
             env.update_stats();
@@ -405,16 +414,20 @@ bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProCon
                 pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
             }
             return true;
+        }else{
+            env.update_stats();
         }
 
         if (!is_chansey(env, context)) {
             continue;
         }
+        stats.chanseys_found++;
+        env.update_stats();
 
         bool caught = attempt_catch(env, context, balls_left);
 
         if (caught) {
-            stats.chanseys++;
+            stats.chanseys_caught++;
             env.update_stats();
             chancy_count++;
         }
