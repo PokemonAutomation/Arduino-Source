@@ -92,7 +92,7 @@ void ProController::run_controller_input(const ControllerInputState& state){
         timestamp = current_time();
         cancel_all_commands();
     }else{
-        replace_on_next_command();
+        replace_on_next_command(nullptr);
 
         timestamp = current_time();
         controller_state.execute(nullptr, false, *this, 2000ms);

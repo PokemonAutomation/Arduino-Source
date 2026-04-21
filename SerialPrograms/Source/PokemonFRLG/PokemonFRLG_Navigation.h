@@ -70,7 +70,11 @@ void flee_battle(ConsoleHandle& console, ProControllerContext& context);
 bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, bool stop_on_move_learn, bool prevent_evolution);
 
 // Starting from the start menu, a sub-screen of the start menu, or the overworld, navigate to the party screen
-void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context);
+enum class StartMenuContext {
+    STANDARD,
+    SAFARI_ZONE
+};
+void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context = StartMenuContext::STANDARD);
 
 // Uses Teleport to return to a PokeCenter. 
 // Assumes that Teleport is usable and the last party member has it learned

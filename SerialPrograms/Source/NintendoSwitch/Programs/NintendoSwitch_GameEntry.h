@@ -35,6 +35,9 @@ void resume_game_from_home(
     bool skip_home_press = false
 );
 
+void move_to_user(ProControllerContext& context, uint8_t user_slot);
+void move_to_user(JoyconContext& context, uint8_t user_slot);
+
 void start_game_from_home(
     ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu,

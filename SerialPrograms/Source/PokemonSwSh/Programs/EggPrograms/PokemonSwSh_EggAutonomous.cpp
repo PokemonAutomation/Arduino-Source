@@ -473,7 +473,7 @@ void EggAutonomous::call_flying_taxi(
         // Open menu
         env.log("Fly from overworld to reset position");
         ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
-    } else{
+    }else{
         env.log("Fly from menu to reset position");
     }
 

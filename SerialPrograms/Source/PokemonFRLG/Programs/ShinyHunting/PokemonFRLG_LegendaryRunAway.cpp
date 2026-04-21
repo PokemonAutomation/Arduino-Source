@@ -90,15 +90,15 @@ LegendaryRunAway::LegendaryRunAway()
         LockMode::LOCK_WHILE_RUNNING,
         "240 ms"
     )
-    , LUGIA_UP_DOWN(
+    , LUGIA_UP_DOWN0(
         "<b>Lugia up/down:</b><br>Time it takes to run up to Lugia or down away to reset.",
         LockMode::LOCK_WHILE_RUNNING,
-        "600 ms"
+        "620 ms"
     )
-    , LUGIA_LEFT_RIGHT(
+    , LUGIA_LEFT_RIGHT0(
         "<b>Lugia left time:</b><br>Time it takes walk three steps left after entering Lugia's room.",
         LockMode::LOCK_WHILE_RUNNING,
-        "550 ms"
+        "520 ms"
     )
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
@@ -109,21 +109,23 @@ LegendaryRunAway::LegendaryRunAway()
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(HOOH_UP_DOWN);
     PA_ADD_OPTION(HOOH_LEFT_RIGHT);
-    PA_ADD_OPTION(LUGIA_UP_DOWN);
-    PA_ADD_OPTION(LUGIA_LEFT_RIGHT);
+    PA_ADD_OPTION(LUGIA_UP_DOWN0);
+    PA_ADD_OPTION(LUGIA_LEFT_RIGHT0);
 }
 
 void LegendaryRunAway::reset_hooh(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     BlackScreenOverWatcher exit_area(COLOR_RED);
     //Turn around, 10 steps down
     ssf_press_button(context, BUTTON_B, 0ms, HOOH_UP_DOWN);
-    pbf_press_dpad(context, DPAD_DOWN, HOOH_UP_DOWN, 160ms);
+    pbf_press_dpad(context, DPAD_DOWN, HOOH_UP_DOWN, 0ms);
+    context.wait_for_all_requests();
 
     //Turn right, take 1 step. Wait for black screen over.
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_RIGHT, HOOH_LEFT_RIGHT, 160ms);
+            ssf_press_button(context, BUTTON_B, 0ms, 500ms);
+            pbf_press_dpad(context, DPAD_RIGHT, 500ms, 0ms);
             pbf_wait(context, 2400ms);
         },
         {exit_area}
@@ -133,11 +135,15 @@ void LegendaryRunAway::reset_hooh(SingleSwitchProgramEnvironment& env, ProContro
         env.log("Failed to exit area.", COLOR_RED);
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Failed to exit area.",
+            "reset_hooh(): Failed to exit area.",
             env.console
         );
     }else{
         env.log("Left area.");
+        send_program_status_notification(
+            env, NOTIFICATION_STATUS_UPDATE,
+            "reset_hooh(): Left area."
+        );
     }
 
     BlackScreenOverWatcher enter_area(COLOR_RED);
@@ -145,7 +151,12 @@ void LegendaryRunAway::reset_hooh(SingleSwitchProgramEnvironment& env, ProContro
     int ret2 = run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_LEFT, HOOH_LEFT_RIGHT, 160ms);
+            pbf_wait(context, 500ms);
+            context.wait_for_all_requests();
+
+            ssf_press_button(context, BUTTON_B, 0ms, 500ms);
+            pbf_press_dpad(context, DPAD_LEFT, 500ms, 0ms);
+            context.wait_for_all_requests();
 
             ssf_press_button(context, BUTTON_B, 0ms, 500ms);
             pbf_press_dpad(context, DPAD_RIGHT, 500ms, 160ms);
@@ -158,12 +169,19 @@ void LegendaryRunAway::reset_hooh(SingleSwitchProgramEnvironment& env, ProContro
         env.log("Failed to enter area.", COLOR_RED);
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Failed to enter area.",
+            "reset_hooh(): Failed to enter area.",
             env.console
         );
     }else{
         env.log("Entered area.");
+        send_program_status_notification(
+            env, NOTIFICATION_STATUS_UPDATE,
+            "reset_hooh(): Entered area."
+        );
     }
+    //Wait after loading in to zone
+    pbf_wait(context, 500ms);
+    context.wait_for_all_requests();
 
     //reverse above steps, but only take 9 steps up
     //doesn't really matter since we want to trigger the encounter anyway
@@ -178,8 +196,9 @@ void LegendaryRunAway::reset_hooh(SingleSwitchProgramEnvironment& env, ProContro
 void LegendaryRunAway::reset_lugia(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     BlackScreenOverWatcher exit_area(COLOR_RED);
     //Turn around, 5 steps down
-    ssf_press_button(context, BUTTON_B, 0ms, LUGIA_UP_DOWN);
-    pbf_press_dpad(context, DPAD_DOWN, LUGIA_UP_DOWN, 160ms);
+    ssf_press_button(context, BUTTON_B, 0ms, LUGIA_UP_DOWN0);
+    pbf_press_dpad(context, DPAD_DOWN, LUGIA_UP_DOWN0, 0ms);
+    context.wait_for_all_requests();
 
     //Turn right, 3 steps right. Wait for black screen over.
     int ret = run_until<ProControllerContext>(
@@ -196,11 +215,15 @@ void LegendaryRunAway::reset_lugia(SingleSwitchProgramEnvironment& env, ProContr
         env.log("Failed to exit area.", COLOR_RED);
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Failed to exit area.",
+            "reset_lugia(): Failed to exit area.",
             env.console
         );
     }else{
         env.log("Left area.");
+        send_program_status_notification(
+            env, NOTIFICATION_STATUS_UPDATE,
+            "reset_lugia(): Left area."
+        );
     }
 
     BlackScreenOverWatcher enter_area(COLOR_RED);
@@ -208,8 +231,11 @@ void LegendaryRunAway::reset_lugia(SingleSwitchProgramEnvironment& env, ProContr
     int ret2 = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
+            pbf_wait(context, 500ms);
+            context.wait_for_all_requests();
+
             ssf_press_button(context, BUTTON_B, 0ms, 500ms);
-            pbf_press_dpad(context, DPAD_UP, 500ms, 160ms);
+            pbf_press_dpad(context, DPAD_UP, 500ms, 0ms);
             context.wait_for_all_requests();
             ssf_press_button(context, BUTTON_B, 0ms, 500ms);
             pbf_press_dpad(context, DPAD_DOWN, 500ms, 160ms);
@@ -222,20 +248,27 @@ void LegendaryRunAway::reset_lugia(SingleSwitchProgramEnvironment& env, ProContr
         env.log("Failed to enter area.", COLOR_RED);
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Failed to enter area.",
+            "reset_lugia(): Failed to enter area.",
             env.console
         );
     }else{
         env.log("Entered area.");
+        send_program_status_notification(
+            env, NOTIFICATION_STATUS_UPDATE,
+            "reset_lugia(): Entered area."
+        );
     }
-
-    //reverse above steps
-    ssf_press_button(context, BUTTON_B, 0ms, LUGIA_LEFT_RIGHT);
-    pbf_press_dpad(context, DPAD_LEFT, LUGIA_LEFT_RIGHT, 160ms);
+    //Wait after loading in to zone
+    pbf_wait(context, 500ms);
     context.wait_for_all_requests();
 
-    ssf_press_button(context, BUTTON_B, 0ms, LUGIA_UP_DOWN);
-    pbf_press_dpad(context, DPAD_UP, LUGIA_UP_DOWN, 160ms);
+    //reverse above steps
+    ssf_press_button(context, BUTTON_B, 0ms, LUGIA_LEFT_RIGHT0);
+    pbf_press_dpad(context, DPAD_LEFT, LUGIA_LEFT_RIGHT0, 0ms);
+    context.wait_for_all_requests();
+
+    ssf_press_button(context, BUTTON_B, 0ms, LUGIA_UP_DOWN0);
+    pbf_press_dpad(context, DPAD_UP, LUGIA_UP_DOWN0, 160ms);
     context.wait_for_all_requests();
 }
 
@@ -260,6 +293,10 @@ void LegendaryRunAway::program(SingleSwitchProgramEnvironment& env, ProControlle
             //Press A to start the encounter.
             pbf_press_button(context, BUTTON_A, 320ms, 320ms);
         }
+        send_program_status_notification(
+            env, NOTIFICATION_STATUS_UPDATE,
+            "Starting encounter."
+        );
         
         bool legendary_shiny = handle_encounter(env.console, context, true);
         if (legendary_shiny){
@@ -279,6 +316,10 @@ void LegendaryRunAway::program(SingleSwitchProgramEnvironment& env, ProControlle
             break;
         }
         env.log("No shiny found.");
+        send_program_status_notification(
+            env, NOTIFICATION_STATUS_UPDATE,
+            "No shiny found."
+        );
         flee_battle(env.console, context);
         
         //Close out dialog box

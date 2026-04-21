@@ -57,7 +57,7 @@ void ProController_SysbotBase::stop(){
 
 
 
-bool ProController_SysbotBase::cancel_all_commands(WallDuration timeout){
+void ProController_SysbotBase::cancel_all_commands(){
 //    cout << "ProController_SysbotBase::cancel_all_commands()" << endl;
     std::lock_guard<Mutex> lg(m_state_lock);
     size_t queue_size = m_command_queue.size();
@@ -66,9 +66,8 @@ bool ProController_SysbotBase::cancel_all_commands(WallDuration timeout){
     m_cv.notify_all();
     m_scheduler.clear_on_next();
     m_logger.log("cancel_all_commands(): Command Queue Size = " + std::to_string(queue_size), COLOR_DARKGREEN);
-    return true;
 }
-void ProController_SysbotBase::replace_on_next_command(){
+void ProController_SysbotBase::replace_on_next_command(Cancellable* cancellable){
 //    cout << "ProController_SysbotBase::replace_on_next_command - Enter()" << endl;
     std::lock_guard<Mutex> lg(m_state_lock);
     m_cv.notify_all();

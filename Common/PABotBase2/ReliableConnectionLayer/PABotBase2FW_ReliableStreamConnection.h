@@ -20,13 +20,6 @@
 #include "PabbTime.h"
 #else
 #include "Common/Cpp/Time.h"
-inline PokemonAutomation::WallClock pabb_current_time(){
-    return PokemonAutomation::current_time();
-}
-inline PokemonAutomation::Milliseconds pabb_milliseconds(int64_t milliseconds){
-    return PokemonAutomation::Milliseconds(milliseconds);
-}
-#define pabb_time_wrapsafe_cmplt(x, y)  ((x) < (y))
 #endif
 
 namespace PokemonAutomation{
@@ -38,6 +31,9 @@ class ReliableStreamConnectionFW final : public ReliableStreamConnectionPolling{
 public:
     ReliableStreamConnectionFW(UnreliableStreamConnectionPolling& unreliable_connection);
 
+    size_t packets_received() const{
+        return m_packets_received;
+    }
     bool has_unacked_sends() const{
         return m_reliable_sender.slots_used() != 0;
     }
@@ -56,7 +52,7 @@ public:
     }
 
     virtual bool run_events() override;
-    virtual void wait_for_event(uint16_t milliseconds) override;
+    virtual void wait_for_event(WallDuration timeout) override;
 
 
 public:
@@ -96,6 +92,8 @@ private:
     PacketSender m_reliable_sender;
     PacketParser m_parser;
     StreamCoalescer m_stream_coalescer;
+
+    size_t m_packets_received = 0;
 
     WallClock m_last_retransmit;
 

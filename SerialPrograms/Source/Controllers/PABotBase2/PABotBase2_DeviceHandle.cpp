@@ -39,6 +39,29 @@ DeviceHandle::DeviceHandle(
     }
 }
 DeviceHandle::~DeviceHandle(){
+    {
+        std::unique_lock<Mutex> lg(m_lock);
+        try{
+            m_logger.log(
+                "DeviceHandle::~DeviceHandle(): Waiting for " + std::to_string(m_pending_requests.size()) + " request(s) to finish."
+            );
+        }catch (...){}
+        bool ok = m_cv.wait_for(
+            lg, std::chrono::milliseconds(100),
+            [this]{
+                return m_pending_requests.empty();
+            }
+        );
+        if (!ok){
+            try{
+                m_logger.log(
+                    "DeviceHandle::~DeviceHandle(): Timed out waiting for " + std::to_string(m_pending_requests.size()) + " request(s) to finish.",
+                    COLOR_RED
+                );
+            }catch (...){}
+        }
+    }
+
     detach();
     cancel(nullptr);
     m_connection.remove_listener(*this);
@@ -108,6 +131,11 @@ void DeviceHandle::query_protocol(){
             );
             iter = PROGRAMS->find(PABB_PID_UNSPECIFIED);
             if (iter == PROGRAMS->end()){
+                throw_incompatible_protocol();
+            }
+        }else{
+            uint8_t minor_version = iter->second;
+            if (m_device_protocol % 100 < minor_version){
                 throw_incompatible_protocol();
             }
         }
@@ -337,6 +365,11 @@ std::string DeviceHandle::query_data(uint8_t opcode){
 
 void DeviceHandle::on_recv(const void* data, size_t bytes){
 //    cout << "DeviceHandle::on_recv()" << endl;
+
+    if (m_stream_corrupted){
+        return;
+    }
+
     m_buffer.insert(m_buffer.end(), (const char*)data, (const char*)data + bytes);
 
     while (true){
@@ -348,6 +381,11 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
         //  Message is incomplete.
         uint16_t message_size;
         std::copy(m_buffer.begin(), m_buffer.begin() + 2, (char*)&message_size);
+        if (message_size < sizeof(MessageHeader)){
+            m_logger.log("[MLC]: Corrupted Stream: Message Length =" + std::to_string(message_size), COLOR_RED);
+            m_stream_corrupted = true;
+            return;
+        }
         if (m_buffer.size() < message_size){
             return;
         }

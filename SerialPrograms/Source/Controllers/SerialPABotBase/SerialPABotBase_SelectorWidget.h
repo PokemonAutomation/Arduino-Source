@@ -120,7 +120,7 @@ public:
 //        cout << "SerialPABotBase_SelectorWidget::refresh_devices()" << endl;
 
 
-        m_ports.emplace_back(new NullControllerDescriptor());
+        m_ports.emplace_back(new SerialPABotBase_Descriptor());
         for (QSerialPortInfo& port : QSerialPortInfo::availablePorts()){
             if (filter_serial_port(port)){
                 m_ports.emplace_back(

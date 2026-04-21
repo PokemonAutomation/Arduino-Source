@@ -163,6 +163,21 @@ PABotBase2_OemController::PABotBase2_OemController(
     );
 
     connection.device().add_message_handler(
+        PABB2_MESSAGE_OPCODE_CONSOLE_DISCONNECT,
+        [this](const MessageHeader* header){
+//            const auto* message = (const Message_u32*)header;
+            WriteSpinLock lg(m_error_lock);
+            m_error_string = "Disconnected by console.";
+        }
+    );
+    connection.device().add_message_handler(
+        PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_USB_DISALLOWED,
+        [this](const MessageHeader* header){
+            WriteSpinLock lg(m_error_lock);
+            m_error_string = "Please enable \"Pro Controller Wired Communication\" in the Switch settings.";
+        }
+    );
+    connection.device().add_message_handler(
         PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_RUMBLE,
         [this](const MessageHeader* header){
             if (header->message_bytes != sizeof(pabb2_Message_Feedback_NS1_OemController_Rumble)){
@@ -195,13 +210,6 @@ PABotBase2_OemController::PABotBase2_OemController(
                     COLOR_DARKGREEN
                 );
             }
-        }
-    );
-    connection.device().add_message_handler(
-        PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_USB_DISALLOWED,
-        [this](const MessageHeader* header){
-            WriteSpinLock lg(m_error_lock);
-            m_error_string = "Please enable \"Pro Controller Wired Communication\" in the Switch settings.";
         }
     );
 
@@ -389,7 +397,7 @@ void PABotBase2_OemController::issue_report(
     while (time_left > Milliseconds::zero()){
         Milliseconds current = std::min(time_left, 65535ms);
         request.milliseconds = current.count();
-        m_connection.device().command_queue().send_command(request);
+        m_connection.device().command_queue().send_command(cancellable, request);
         time_left -= current;
     }
 }
@@ -453,7 +461,7 @@ void PABotBase2_OemController::issue_report(
     while (time_left > Milliseconds::zero()){
         Milliseconds current = std::min(time_left, 65535ms);
         request.milliseconds = current.count();
-        m_connection.device().command_queue().send_command(request);
+        m_connection.device().command_queue().send_command(cancellable, request);
         time_left -= current;
     }
 }

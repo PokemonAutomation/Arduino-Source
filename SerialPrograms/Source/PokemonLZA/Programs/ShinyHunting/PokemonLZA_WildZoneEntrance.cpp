@@ -155,7 +155,7 @@ void ShinyHunt_WildZoneEntrance::on_config_value_changed(void* object){
         // no entering zone, disable related options
         WALK_TIME_IN_ZONE.set_visibility(ConfigOptionState::DISABLED);
         RUNNING.set_visibility(ConfigOptionState::DISABLED);
-    } else{
+    }else{
         // entering zone
         WALK_TIME_IN_ZONE.set_visibility(ConfigOptionState::ENABLED);
         RUNNING.set_visibility(ConfigOptionState::ENABLED);
@@ -472,7 +472,7 @@ void do_one_wild_zone_trip(
             if (running){
                 env.console.overlay().add_log("Running");
                 ssf_press_button(context, BUTTON_B, 0ms, walk_time_in_zone, 0ms);
-            } else{
+            }else{
                 env.console.overlay().add_log("Walking");
             }
             pbf_move_left_joystick(context, {0, +1}, walk_time_in_zone, 200ms);

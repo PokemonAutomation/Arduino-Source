@@ -183,7 +183,7 @@ bool try_open_slot_six(ConsoleHandle& console, ProControllerContext& context){
     context.wait_for_all_requests();
     if (ps == 0){
         console.log("Moved selection to slot six.");
-    } else{
+    }else{
         console.log("open_slot_six(): Unable to move selection to slot six.", COLOR_RED);
         return false;
     }
@@ -412,45 +412,83 @@ BattleResult spam_first_move(ConsoleHandle& console, ProControllerContext& conte
 }
 
 void flee_battle(ConsoleHandle& console, ProControllerContext& context){
-    console.log("Navigate to Run.");
-    pbf_press_dpad(context, DPAD_RIGHT, 160ms, 160ms);
-    pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
-    pbf_press_button(context, BUTTON_A, 160ms, 320ms);
+    uint16_t errors = 0;
 
+    BattleMenuWatcher battle_menu(COLOR_RED);
     AdvanceBattleDialogWatcher ran_away(COLOR_YELLOW);
-    int ret2 = wait_until(
-        console, context,
-        std::chrono::seconds(5),
-        {{ran_away}}
-    );
-    if (ret2 == 0){
-        console.log("Running away...");
-    }else{
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "flee_battle(): Unable to navigate to flee button.",
-            console
-        );
-    }
-
     BlackScreenOverWatcher battle_over(COLOR_RED);
-    int ret3 = run_until<ProControllerContext>(
-        console, context,
-        [](ProControllerContext& context){
-            pbf_press_button(context, BUTTON_A, 320ms, 640ms);
-            pbf_wait(context, 5000ms);
-            context.wait_for_all_requests();
-        },
-        { battle_over }
-    );
-    if (ret3 == 0){
-        console.log("Successfully fled the battle.");
-    }else{
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "flee_battle(): Unable to flee from battle.",
-            console
+
+    while (true)
+    {
+        if (errors > 5){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "flee_battle(): Failed to flee battle after 5 attempts.",
+                console
+            );
+        }
+
+        context.wait_for_all_requests();
+        int ret = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context) {
+                pbf_wait(context, 1000ms);
+                pbf_mash_button(context, BUTTON_B, 9000ms);
+            },
+            { battle_menu }
         );
+        if (ret < 0) {
+            errors++;
+            console.log("flee_battle(): Failed to detect battle menu. Attempt " + std::to_string(errors) + "/5", COLOR_RED);
+            continue;
+        }
+
+        console.log("Navigate to Run.");
+        pbf_press_dpad(context, DPAD_RIGHT, 160ms, 160ms);
+        pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
+        pbf_press_button(context, BUTTON_A, 160ms, 320ms);
+
+        int ret2 = wait_until(
+            console, context,
+            std::chrono::seconds(5),
+            { {ran_away} }
+        );
+
+        if (ret2 == 0) {
+            console.log("Running away...");
+        }
+        else {
+            // Even though we failed to detect the "ran away" dialog, we might have still successfully fled. 
+            // Attempt the next detections as a possible recovery.
+            console.log("flee_battle(): Failed to detect flee dialog.", COLOR_RED);
+        }
+
+        int ret3 = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context) {
+                pbf_press_button(context, BUTTON_A, 320ms, 640ms);
+                pbf_wait(context, 5000ms);
+                context.wait_for_all_requests();
+            },
+            { battle_over, battle_menu }
+        );
+        if (ret3 == 0) {
+            console.log("Successfully fled the battle.");
+            return;
+        }
+        else if (ret3 == 1){
+            errors++;
+            console.log("flee_battle(): Detected battle menu after attempting to flee. Attempt " + std::to_string(errors) + "/5", COLOR_RED);
+            continue;
+        }
+        else {
+            console.log("flee_battle(): failed to detect transition to overworld. Attempting to open start menu to verify successful flee..", COLOR_RED);
+            
+            open_start_menu(console, context);
+            close_start_menu(console, context);
+            context.wait_for_all_requests();
+            return;
+        }
     }
 }
 
@@ -580,7 +618,7 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
     }
 }
 
-void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context){
+void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context){
     uint16_t errors = 0;
     bool start_menu_is_open = false;
     while (true){
@@ -608,7 +646,12 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
 
         switch (ret){
         case 0:
-            ret = move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::POKEMON);
+            if (menu_context == StartMenuContext::SAFARI_ZONE){
+                ret = move_cursor_to_position(console, context, SelectionArrowPositionSafariMenu::POKEMON);
+            } else {
+                ret = move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::POKEMON);
+            }
+
             if (ret < 0){
                 console.log("Failed to navigate to POKEMON on the start menu.");
                 errors++;
@@ -965,7 +1008,7 @@ int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftr
         },
         { battle_triggered, battle_entered }
     );
-    
+
     if (ret < 0){
         return -1;
     }

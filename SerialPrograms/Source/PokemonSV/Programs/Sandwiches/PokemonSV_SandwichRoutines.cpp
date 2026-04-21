@@ -931,9 +931,8 @@ else if(SANDWICH_OPTIONS.BASE_RECIPE == BaseRecipe::non_shiny){
                 num_condiments++;
             }
         }
-    }
-    //Otherwise get the preset ingredients
-    else{
+    }else{
+        //  Otherwise get the preset ingredients
         stream.log("Preset sandwich selected.", COLOR_BLACK);
         stream.overlay().add_log("Preset sandwich selected.");
 
