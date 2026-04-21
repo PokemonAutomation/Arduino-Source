@@ -127,21 +127,31 @@ struct AdvRngFilters{
     AdvRngMethod method;
 };
 
-class AdvRng{
+// updates the AdvObservedPokemon with info from leveling up
+// assumes levels are earned sequentially
+// input EVs are the ones earned since the last level up, not the total
+void level_up_observed_pokemon(AdvObservedPokemon& pokemon, StatReads& newstats, EVs& evyield);
+
+// returns search filters that correspond with observed stats
+AdvRngFilters observation_to_filters(AdvObservedPokemon& observation, BaseStats& basestats, AdvRngMethod method = AdvRngMethod::Method1);
+
+class AdvRngSearcher{
 public:
     uint16_t seed;
     AdvRngState state;
 
-    AdvRng(uint16_t seed, AdvRngState state);
-    AdvRng(uint16_t seed, uint64_t min_advances, AdvRngMethod method = AdvRngMethod::Method1);
+    AdvRngSearcher(uint16_t seed, AdvRngState state);
+    AdvRngSearcher(uint16_t seed, uint64_t min_advances, AdvRngMethod method = AdvRngMethod::Method1);
 
     void set_seed(uint16_t seed);
     void set_state_advances(uint64_t advances);
     void advance_state();
 
+    AdvPokemonResult generate_pokemon();
+
     std::map<AdvRngState, AdvPokemonResult> search(
         AdvRngFilters& target,
-        std::vector<uint16_t>& seeds,
+        const std::vector<uint16_t>& seeds,
         uint64_t min_advances,
         uint64_t max_advances,
         uint16_t tid_xor_sid = 0,
@@ -158,9 +168,6 @@ private:
         uint8_t gender_threshold
     );
 };
-
-
-
 
 
 

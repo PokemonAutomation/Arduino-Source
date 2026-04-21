@@ -195,20 +195,20 @@ std::vector<std::pair<std::string, std::string>> get_sid_messages(SingleSwitchPr
     int start = -1 * NUM_CANDIDATES / 2;
     int end = start + NUM_CANDIDATES;
 
-    Pokemon::AdvRng rng(tid, TARGET_ADVANCES + 2*start);
+    Pokemon::AdvRngSearcher searcher(tid, TARGET_ADVANCES + 2*start);
 
     for (int i=start; i<end; i++){
         std::pair<std::string, std::string> m;
-        uint16_t sid = rng.state.s0 >> 16;
+        uint16_t sid = searcher.state.s0 >> 16;
 
-        m.first = "Advances " + std::to_string(rng.state.advance);
+        m.first = "Advances " + std::to_string(searcher.state.advance);
         m.second = std::to_string(sid);
         messages.push_back(m);
 
         env.log(m.first + ": " + m.second);
 
-        rng.advance_state();
-        rng.advance_state(); // 2 by 2
+        searcher.advance_state();
+        searcher.advance_state(); // 2 by 2
     }
 
     return messages;
