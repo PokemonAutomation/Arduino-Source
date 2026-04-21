@@ -45,7 +45,7 @@ struct LuckyEggFarmer_Descriptor::Stats : public StatsTracker {
         : encounters(m_stats["Encounters"])
         , chanseys_found(m_stats["Chanseys Found"])
         , chanseys_caught(m_stats["Chanseys Caught"])
-        , eggs(m_stats["Lucky Eggs Found"])
+        , eggs(m_stats["Lucky Eggs"])
         , shinies(m_stats["Shinies"])
         , errors(m_stats["Errors"])
     {
@@ -145,7 +145,7 @@ bool LuckyEggFarmer::navigate_to_chansey(ConsoleHandle& console, ProControllerCo
 
     ret = wait_until(
         console, context,
-        std::chrono::milliseconds(2000),
+        std::chrono::milliseconds(5000),
         { overworld_entered }
     );
 
@@ -191,7 +191,7 @@ bool LuckyEggFarmer::navigate_to_chansey(ConsoleHandle& console, ProControllerCo
 
     ret = wait_until(
         console, context,
-        std::chrono::milliseconds(2000),
+        std::chrono::milliseconds(5000),
         { overworld_entered }
     );
 
@@ -268,7 +268,17 @@ bool LuckyEggFarmer::find_encounter(SingleSwitchProgramEnvironment& env, ProCont
 }
 
 bool LuckyEggFarmer::is_chansey(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    std::set<std::string> subset = { "nidoran-f", "nidoran-m", "nidorino", "nidorina", "exeggcute", "rhyhorn", "venomoth", "chansey", "tauros" };
+    std::set<std::string> subset = {
+        "nidoran-f",
+        "nidoran-m",
+        "nidorino",
+        "nidorina",
+        "exeggcute",
+        "rhyhorn",
+        "venomoth",
+        "chansey",
+        "tauros",
+    };
 
     WildEncounterReader reader(COLOR_RED);
     VideoOverlaySet overlays(env.console.overlay());
@@ -279,23 +289,13 @@ bool LuckyEggFarmer::is_chansey(SingleSwitchProgramEnvironment& env, ProControll
     PokemonFRLG_WildEncounter encounter = reader.read_encounter(env.logger(), LANGUAGE, screen, subset);
     env.log("Name: " + encounter.name);
 
-    if (encounter.name != "chansey"){
-        env.log("Not a Chansey. Fleeing...");
-        flee_battle(env.console, context);
-        context.wait_for_all_requests();
-        return false;
-    }
-    else {
-        env.log("Chansey found!");
-        return true;
-    }
+    return encounter.name == "chansey";
 }
 
 bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int& balls_left){
     //TODO: Optimal bait/ball throwing
 
-    while (true)
-    {
+    while (true){
         BattleSelectionArrowWatcher nickname_question_arrow(
             COLOR_RED,
             &env.console.overlay(),
@@ -317,8 +317,7 @@ bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProContr
         WhiteDialogWatcher in_safari_zone_building(COLOR_RED);
 
         WallClock start = current_time();
-        while (true)
-        {
+        while (true){
             if (current_time() - start > std::chrono::seconds(20)){
                 env.log("No battle activity detected for 20 seconds. Assuming battle ended and in the overworld.");
 
@@ -338,8 +337,7 @@ bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProContr
             if (ret == 0 || ret == 3){
                 env.log("Caught a Chansey!");
 
-                while (true)
-                {
+                while (true){
                     int ret2 = wait_until(
                         env.console, context,
                         std::chrono::milliseconds(2000),
@@ -360,15 +358,13 @@ bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProContr
                 pbf_mash_button(context, BUTTON_B, 1500ms);
                 context.wait_for_all_requests();
                 return true;
-            }
-            else if (ret == 1){
+            }else if (ret == 1){
                 balls_left--;
                 env.log("Detected battle arrow. Balls left: " + std::to_string(balls_left));
                 pbf_press_button(context, BUTTON_A, 200ms, 200ms);
                 context.wait_for_all_requests();
                 break;
-            }
-            else if (ret == 2){
+            }else if (ret == 2){
                 env.log("Failed to catch Chansey.");
                 pbf_wait(context, 1000ms);
                 context.wait_for_all_requests();
@@ -397,10 +393,10 @@ bool LuckyEggFarmer::check_for_lucky_egg(ConsoleHandle& console, ProControllerCo
 bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     LuckyEggFarmer_Descriptor::Stats& stats = env.current_stats<LuckyEggFarmer_Descriptor::Stats>();
 
-    int chancy_count = 0;
+    int chansey_count = 0;
     int balls_left = 30;
 
-    while (chancy_count < 4){
+    while (chansey_count < 4){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         if (!find_encounter(env, context)){
             return false;
@@ -429,8 +425,13 @@ bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProCon
         }
 
         if (!is_chansey(env, context)){
+            env.log("Not a Chansey. Fleeing...");
+            flee_battle(env.console, context);
+            context.wait_for_all_requests();
             continue;
         }
+
+        env.log("Chansey found!");
         stats.chanseys_found++;
         env.update_stats();
 
@@ -439,7 +440,7 @@ bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProCon
         if (caught){
             stats.chanseys_caught++;
             env.update_stats();
-            chancy_count++;
+            chansey_count++;
         }
 
         pbf_wait(context, 500ms);
