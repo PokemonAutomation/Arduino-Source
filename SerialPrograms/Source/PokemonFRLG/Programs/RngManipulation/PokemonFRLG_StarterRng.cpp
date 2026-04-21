@@ -65,8 +65,8 @@ struct StarterRng_Descriptor::Stats : public StatsTracker{
     {
         m_display_order.emplace_back("Resets");
         m_display_order.emplace_back("Shinies");
-        m_display_order.emplace_back("Non-Shiny Hits, HIDDEN_IF_ZERO");
-        m_display_order.emplace_back("Wild Shinies, HIDDEN_IF_ZERO");
+        m_display_order.emplace_back("Non-Shiny Hits", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Wild Shinies", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& resets;
@@ -141,13 +141,13 @@ StarterRng::StarterRng()
     , ADVANCES(
         "<b>Advances:</b><br>The total number of RNG advances for your target.<br>This should be the combined amount of continue screen and in-game advances.",
         LockMode::LOCK_WHILE_RUNNING,
-        10000, 600 // default, min
+        10000, 600, 1000000000 // default, min
     )
-    , CONTINUE_SCREEN_FRAMES(
-        "<b>Continue Screen Frames:</b><br>The number of RNG advances to pass on the continue screen.<br>This should be less than the total number of advances above.",
-        LockMode::LOCK_WHILE_RUNNING,
-        1000, 192 // default, min
-    )
+    // , CONTINUE_SCREEN_FRAMES(
+    //     "<b>Continue Screen Frames:</b><br>The number of RNG advances to pass on the continue screen.<br>This should be less than the total number of advances above.",
+    //     LockMode::LOCK_WHILE_RUNNING,
+    //     1000, 192 // default, min
+    // )
     , USE_COPYRIGHT_TEXT(
         "<b>Detect Copyright Text:</b><br>Start the seed timer only after detecting the copyright text. Can be helpful if your seeds are inconsistent.",
         LockMode::LOCK_WHILE_RUNNING,
@@ -193,7 +193,7 @@ StarterRng::StarterRng()
     PA_ADD_OPTION(SEED_BUTTON);
     PA_ADD_OPTION(SEED_DELAY);
     PA_ADD_OPTION(ADVANCES);
-    PA_ADD_OPTION(CONTINUE_SCREEN_FRAMES);
+    // PA_ADD_OPTION(CONTINUE_SCREEN_FRAMES);
     PA_ADD_OPTION(USE_COPYRIGHT_TEXT);
     PA_ADD_OPTION(PROFILE);
     PA_ADD_OPTION(TAKE_VIDEO);
@@ -394,9 +394,10 @@ std::map<AdvRngState, AdvPokemonResult> StarterRng::get_starter_search_results(
     AdvObservedPokemon& pokemon
 ){
     std::map<AdvRngState, AdvPokemonResult> search_hits;
-    for (int i=0; i<2; i++){
-        uint64_t min_adv = ADVANCES - std::min(uint64_t(ADVANCES), advances_radius);    
-        uint64_t max_adv = ADVANCES + advances_radius;
+    for (int i=0; i<4; i++){
+        uint64_t adv_radius = advances_radius * (uint64_t(1) << i);
+        uint64_t min_adv = ADVANCES - std::min(uint64_t(ADVANCES), adv_radius);    
+        uint64_t max_adv = ADVANCES + adv_radius;
         search_hits = searcher.search(filters, SEED_VALUES, min_adv, max_adv, 0, 30);
         if (search_hits.size() > 0){
             env.log("Number of search hits: " + std::to_string(search_hits.size()));
@@ -419,7 +420,7 @@ double StarterRng::get_seed_calibration_frames(
     for (size_t i=0; i<HISTORY.results.size(); i++){
         uint16_t seed = HISTORY.results[i].seed;
         int16_t position = -1;
-        for (size_t j=0; j<SEED_VALUES.size(); i++){
+        for (size_t j=0; j<SEED_VALUES.size(); j++){
             if (seed == SEED_VALUES[j]){
                 position = int16_t(j);
                 break;
@@ -428,7 +429,7 @@ double StarterRng::get_seed_calibration_frames(
         if (position < 0){
             continue;
         }
-        double calibration = HISTORY.seed_calibrations[1];
+        double calibration = HISTORY.seed_calibrations[i];
         double offset = SEED_POSITION - position + calibration;
         sum += offset;
         len++;
@@ -442,13 +443,13 @@ double StarterRng::get_seed_calibration_frames(
     return average_offset;
 }
 
-double StarterRng::get_advances_calibration_frames(StarterRngCalibrationHistory& HISTORY, uint64_t ADVANCES){
+double StarterRng::get_advances_calibration_frames(StarterRngCalibrationHistory& CALIBRATION_HISTORY, uint64_t ADVANCES){
     double sum = 0;
     uint16_t len = 0;
-    for (size_t i=0; i<HISTORY.results.size(); i++){
-        uint64_t advance = HISTORY.results[i].advance;
-        double calibration = HISTORY.advance_calibrations[i];
-        double offset = ADVANCES - advance + calibration;
+    for (size_t i=0; i<CALIBRATION_HISTORY.results.size(); i++){
+        uint64_t advance = CALIBRATION_HISTORY.results[i].advance;
+        double calibration = CALIBRATION_HISTORY.advance_calibrations[i];
+        double offset = calibration + ADVANCES - advance;
         sum += offset;
         len++;
     }
@@ -461,61 +462,129 @@ double StarterRng::get_advances_calibration_frames(StarterRngCalibrationHistory&
     return average_offset;
 }
 
-bool StarterRng::update_calibration_history(
+bool StarterRng::update_history(
     SingleSwitchProgramEnvironment& env,
-    StarterRngCalibrationHistory& HISTORY, 
+    StarterRngAdvanceHistory& ADVANCE_HISTORY,
+    StarterRngCalibrationHistory& CALIBRATION_HISTORY, 
     const uint16_t& MAX_HISTORY_LENGTH,
     double& SEED_CALIBRATION_FRAMES,
     double& ADVANCES_CALIBRATION,
-    std::map<AdvRngState, AdvPokemonResult>& search_hits
+    int64_t& CONTINUE_SCREEN_ADJUSTMENT,
+    std::map<AdvRngState, AdvPokemonResult>& search_hits,
+    bool force_finish
 ){
+    const int MAX_ADVANCE_POSSIBILITIES = 20;
+    const uint32_t ADVANCE_RADIUS = 2;
+
     if (search_hits.size() == 0){
         env.log("No matches found.");
         return true;
     }
-    
-    std::vector<uint32_t> pids;
-    for(std::map<AdvRngState,AdvPokemonResult>::iterator it=search_hits.begin(); it!=search_hits.end(); ++it) {
-        pids.emplace_back(it->second.pid);
-    }
-    std::sort(pids.begin(), pids.end());
-    std::vector<uint32_t>::iterator iter;
-    iter = std::unique(pids.begin(), pids.begin() + pids.size());
-    pids.resize(std::distance(pids.begin(), iter));
 
-    size_t num_unique = pids.size(); // for the same method, equal PIDs will have equal stats
+    if (!force_finish && search_hits.size() > MAX_ADVANCE_POSSIBILITIES){
+        return false;
+    }
+
+    if (search_hits.size() == 1){
+        env.log("Updating calibrations...");
+        CALIBRATION_HISTORY.seed_calibrations.emplace_back(SEED_CALIBRATION_FRAMES);
+        CALIBRATION_HISTORY.advance_calibrations.emplace_back(ADVANCES_CALIBRATION);
+        CALIBRATION_HISTORY.continue_screen_adjustments.emplace_back(CONTINUE_SCREEN_ADJUSTMENT);
+        CALIBRATION_HISTORY.results.emplace_back(search_hits.begin()->first);
+        if (CALIBRATION_HISTORY.results.size() > MAX_HISTORY_LENGTH){
+            CALIBRATION_HISTORY.seed_calibrations.erase(CALIBRATION_HISTORY.seed_calibrations.begin());
+            CALIBRATION_HISTORY.advance_calibrations.erase(CALIBRATION_HISTORY.advance_calibrations.begin());
+            CALIBRATION_HISTORY.continue_screen_adjustments.erase(CALIBRATION_HISTORY.continue_screen_adjustments.begin());
+            CALIBRATION_HISTORY.results.erase(CALIBRATION_HISTORY.results.begin());
+        }
+        ADVANCE_HISTORY.results.clear();
+        ADVANCE_HISTORY.seed_calibrations.clear();
+        return true;
+    }
     
-    if (num_unique == 1){
-        AdvRngState hit = search_hits.begin()->first;
-        if (search_hits.size() > 1){
-            // for identical candidates, use the closest hit to the target advances
-            int64_t best_dist = hit.advance - ADVANCES;
-            best_dist = std::abs(best_dist);
-            for(std::map<AdvRngState,AdvPokemonResult>::iterator it=search_hits.begin(); it!=search_hits.end(); ++it) {
-                AdvRngState test_hit = it->first;
-                int64_t dist = test_hit.advance - ADVANCES;
-                dist = std::abs(dist);
-                if (dist < best_dist){
-                    hit = test_hit;
-                    best_dist = dist;
+    std::vector<uint64_t> advances;
+    std::vector<AdvRngState> hits;
+    for(std::map<AdvRngState,AdvPokemonResult>::iterator it=search_hits.begin(); it!=search_hits.end(); ++it) {
+        advances.emplace_back(it->first.advance);
+        hits.emplace_back(it->first);
+    }
+    
+    // get unique advances
+    std::sort(advances.begin(), advances.end());
+    std::vector<uint64_t>::iterator iter;
+    iter = std::unique(advances.begin(), advances.begin() + advances.size());
+    advances.resize(std::distance(advances.begin(), iter));
+
+    ADVANCE_HISTORY.seed_calibrations.emplace_back(SEED_CALIBRATION_FRAMES);
+    ADVANCE_HISTORY.results.emplace_back(hits);
+    
+    // check advance history for repeated values
+    std::vector<uint64_t> counts;
+    uint64_t best = 0;
+    uint64_t mode = 0;
+    bool tie = false;
+    for (uint64_t& adv : advances){
+        uint64_t count = 0;
+        for (auto& res : ADVANCE_HISTORY.results){
+            for (auto& state : res){
+                if (std::abs(int64_t(state.advance) - int64_t(adv)) <= ADVANCE_RADIUS){
+                    count++;
+                    break; // only count one possible hit from each attempt
                 }
             }
         }
-        env.log("Single search match found: " + std::to_string(hit.seed) + " / " + std::to_string(hit.advance));
-        env.log("Updating calibrations...");
-        HISTORY.seed_calibrations.emplace_back(SEED_CALIBRATION_FRAMES);
-        HISTORY.advance_calibrations.emplace_back(ADVANCES_CALIBRATION);
-        HISTORY.results.emplace_back(hit);
-        if (HISTORY.results.size() > MAX_HISTORY_LENGTH){
-            HISTORY.seed_calibrations.erase(HISTORY.seed_calibrations.begin());
-            HISTORY.advance_calibrations.erase(HISTORY.advance_calibrations.begin());
-            HISTORY.results.erase(HISTORY.results.begin());
+        if (count > best){
+            mode = adv;
+            best = count;
+            tie = false;
+        }else if (count == best){
+            tie = true;
         }
-        return true;
-    }else{
-        return false;
     }
+
+    if (tie){
+        env.log("More than 1 possible advances value hit.");
+        return true;
+    }
+
+
+    // add the closest possibility to the advances mode for each attempt to the calibration history
+    env.log("Inferred hits from previous " + std::to_string(ADVANCE_HISTORY.results.size()) + " attempts: ");
+    for (size_t i=0; i<ADVANCE_HISTORY.results.size(); i++){
+        auto& res = ADVANCE_HISTORY.results[i];
+        auto& seed_calibration = ADVANCE_HISTORY.seed_calibrations[i];
+        AdvRngState most_likely_hit;
+        int64_t lowest_dist = INTMAX_MAX;
+        for (auto& state : res){
+            int64_t state_dist = std::abs(int64_t(state.advance) - int64_t(mode));
+            if (state_dist < lowest_dist){
+                most_likely_hit = state;
+                lowest_dist = state_dist;
+            }
+        }
+        CALIBRATION_HISTORY.seed_calibrations.emplace_back(seed_calibration);
+        CALIBRATION_HISTORY.advance_calibrations.emplace_back(ADVANCES_CALIBRATION);
+        CALIBRATION_HISTORY.continue_screen_adjustments.emplace_back(CONTINUE_SCREEN_ADJUSTMENT);
+        CALIBRATION_HISTORY.results.emplace_back(most_likely_hit);
+        env.log("   " + std::to_string(most_likely_hit.seed) + " / " + std::to_string(most_likely_hit.advance));
+    }
+
+    env.log("Average advances hit: " + std::to_string(mode));
+
+
+    while (CALIBRATION_HISTORY.results.size() > MAX_HISTORY_LENGTH){
+        CALIBRATION_HISTORY.seed_calibrations.erase(CALIBRATION_HISTORY.seed_calibrations.begin());
+        CALIBRATION_HISTORY.advance_calibrations.erase(CALIBRATION_HISTORY.advance_calibrations.begin());
+        CALIBRATION_HISTORY.continue_screen_adjustments.erase(CALIBRATION_HISTORY.continue_screen_adjustments.begin());
+        CALIBRATION_HISTORY.results.erase(CALIBRATION_HISTORY.results.begin());
+    }
+
+    ADVANCE_HISTORY.results.clear();
+    ADVANCE_HISTORY.seed_calibrations.clear();
+
+    return true;
 }
+
 
 
 bool StarterRng::walk_to_rival_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -536,10 +605,14 @@ bool StarterRng::walk_to_rival_battle(SingleSwitchProgramEnvironment& env, ProCo
         num_steps_to_the_left = 2;
     }
 
+    // dodge rival
+    pbf_move_left_joystick(context, {0, -1}, 40ms, 460ms);
+    pbf_move_left_joystick(context, {0, -1}, 100ms, 400ms);
+
     // line up with the doorway
     pbf_move_left_joystick(context, {-1, 0}, 40ms, 460ms); // pivot left
     for (int i=0; i<num_steps_to_the_left; i++){
-        pbf_move_left_joystick(context, {-1, 0}, 60ms, 940ms);
+        pbf_move_left_joystick(context, {-1, 0}, 100ms, 400ms);
     }
     
     // walk down and trigger battle
@@ -734,7 +807,7 @@ bool StarterRng::walk_to_route1_from_home(SingleSwitchProgramEnvironment& env, P
     pbf_move_left_joystick(context, {+1, 0}, 1370ms, 300ms);
     pbf_move_left_joystick(context, {0, +1}, 1450ms, 300ms);
     pbf_move_left_joystick(context, {+1, 0}, 300ms,  300ms);
-    pbf_move_left_joystick(context, {+1, 0}, 1250ms, 300ms);
+    pbf_move_left_joystick(context, {0, +1}, 1250ms, 300ms);
 
     return false;
 }
@@ -749,8 +822,7 @@ int StarterRng::autolevel_on_route1(
     Pokemon::StatReads stats;
 
     env.log("Arrived at Route 1.");
-    bool leftright = false;
-    pbf_move_left_joystick(context, {-1, 0}, 100ms, 0ms);
+    bool leftright = true;
     context.wait_for_all_requests();
 
     while (true){
@@ -759,10 +831,10 @@ int StarterRng::autolevel_on_route1(
         int ret = grass_spin(env.console, context, leftright);
         if (ret < 0){
             env.log("autolevel_on_route1(): failed to trigger encounter.");
-            return false;
+            return -1;
         }
-        env.log("Encounter detected!");
-        if (ret == 1){
+
+        if (ret == 1){ // shiny
             return 1;
         }
 
@@ -778,6 +850,7 @@ int StarterRng::autolevel_on_route1(
 
         switch (ret2){
         case BattleResult::opponentfainted:
+            env.log("Opponent fainted.");
             evyield.speed++; // always rattata or pidgey
             leftright = !leftright;
 
@@ -786,7 +859,7 @@ int StarterRng::autolevel_on_route1(
                 env.console, context,
                 [](ProControllerContext& context) {
                     for (int i=0; i<5; i++){
-                        pbf_press_button(context, BUTTON_B, 200ms, 2800ms);
+                        pbf_press_button(context, BUTTON_B, 200ms, 1800ms);
                     }
                 },
                 { level_up, black_screen }
@@ -797,28 +870,27 @@ int StarterRng::autolevel_on_route1(
                 env.log("Level-up stats detected. Reading stats...");
                 screen = env.console.video().snapshot();      
                 stats = reader.read_stats(env.logger(), screen);
+                update_filters(pokemon, stats, evyield, BASE_STATS);
+                exit_wild_battle(env.console, context, false, true);
+                return 0;
             case -1:
                 exit_wild_battle(env.console, context, false, true);
             default:
                 pbf_wait(context, 1000ms);
                 context.wait_for_all_requests();
+                continue;
             }
-
-            update_filters(pokemon, stats, evyield, BASE_STATS);
-            return 0;
         case BattleResult::playerfainted:
             env.log("Pokemon fainted. Mashing B through dialogues...");
-            pbf_mash_button(context, BUTTON_B, 60s); // skip through a few transitions and lots of dialogue
+            pbf_mash_button(context, BUTTON_B, 30s); // skip through a few transitions and lots of dialogue
             failed = walk_to_route1_from_home(env, context);
             if (failed){
                 return -1;
             }
-            pbf_move_left_joystick(context, {-1, 0}, 100ms, 0ms);
             context.wait_for_all_requests();
+            leftright = true;
             continue;
         case BattleResult::outofpp:
-            // give up and reset if it's taking this long
-            return false;
         case BattleResult::unknown:
         default:
             return -1;
@@ -835,13 +907,19 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     home_black_border_check(env.console, context);
 
+    RNG_FILTERS.reset();
+    POSSIBLE_HITS.reset();
 
     const uint16_t TARGET_SEED = parse_seed(env, SEED);
     const std::vector<uint16_t> SEED_VALUES = parse_seed_list(env, SEED_LIST);
     const int16_t SEED_POSITION = seed_position_in_list(TARGET_SEED, SEED_VALUES);
 
     if (SEED_POSITION == -1){
-        // error
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "StarterRng(): Target Seed is missing from the list of nearby seeds.",
+            env.console
+        ); 
     }
 
     env.log("Target Seed Value: " + std::to_string(TARGET_SEED));
@@ -864,11 +942,15 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     const double FRAMERATE = 59.999977; // FPS
     const double FRAME_DURATION = 1000 / FRAMERATE;
 
-    uint64_t CONTINUE_SCREEN_FRAMES = 500;
+    uint8_t MAX_HISTORY_LENGTH = 10;
+    double SEED_BUMPS[] = {0, 1, -1, 2, -2};
+
+    uint64_t CONTINUE_SCREEN_FRAMES = 200;
 
     const uint64_t FIXED_SEED_OFFSET = USE_COPYRIGHT_TEXT ? -2140 : -845; // milliseconds. approximate;
     double SEED_CALIBRATION_FRAMES = 0;
     double ADVANCES_CALIBRATION = 0;
+    int64_t CONTINUE_SCREEN_ADJUSTMENT = 0;
 
     AdvRngSearcher searcher(TARGET_SEED, ADVANCES, AdvRngMethod::Method1);
     AdvPokemonResult target_result = searcher.generate_pokemon();
@@ -880,17 +962,21 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     env.log("SpD: " + std::to_string(target_result.ivs.spdef));
     env.log("Spe: " + std::to_string(target_result.ivs.speed));
 
-    StarterRngCalibrationHistory HISTORY; 
-    uint8_t MAX_HISTORY_LENGTH = 5;
-    uint64_t advances_radius = 2048;
+    StarterRngAdvanceHistory ADVANCE_HISTORY;
+    StarterRngCalibrationHistory CALIBRATION_HISTORY; 
+    uint64_t INITIAL_ADVANCES_RADIUS = 1024;
     uint64_t resets = 0;
     bool wildshiny_found = false;
 
     while (true){
-        if (have_hit_target(env, TARGET_SEED, HISTORY.results.back())){
-            env.log("Target Hit!");
-            stats.nonshiny++;
-            break;
+        if (CALIBRATION_HISTORY.results.size() > 0){
+            env.log("Checking for nonshiny target hit...");
+            if (have_hit_target(env, TARGET_SEED, CALIBRATION_HISTORY.results.back())){
+                env.log("Target Hit!");
+                stats.nonshiny++;
+                break;
+            }
+            env.log("Missed target.");
         }
 
         if (resets > MAX_RESETS){
@@ -902,35 +988,62 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             break;
         }
 
-        if (advances_radius > 4) {
-            advances_radius = advances_radius / 2;
-        }
+        send_program_status_notification(
+            env, NOTIFICATION_STATUS_UPDATE,
+            "Calibrating."
+        );
+        env.update_stats();
 
-        SEED_CALIBRATION_FRAMES = get_seed_calibration_frames(HISTORY, SEED_VALUES, SEED_POSITION);
-        ADVANCES_CALIBRATION = get_advances_calibration_frames(HISTORY, ADVANCES);
-        env.log("Seed calibration (frames): " + std::to_string(SEED_CALIBRATION_FRAMES));
-        env.log("Advance calibration (frames / 2): " + std::to_string(ADVANCES_CALIBRATION));
+        uint64_t advances_radius = INITIAL_ADVANCES_RADIUS;
+        for (size_t i=0; i<CALIBRATION_HISTORY.results.size(); i++){
+            advances_radius = advances_radius / 2;
+            if (advances_radius <= 4){
+                advances_radius = 4;
+                break;
+            }
+        }
+        env.log("Advances search radius: " + std::to_string(advances_radius));
+
+        SEED_CALIBRATION_FRAMES = get_seed_calibration_frames(CALIBRATION_HISTORY, SEED_VALUES, SEED_POSITION);
+        ADVANCES_CALIBRATION = get_advances_calibration_frames(CALIBRATION_HISTORY, ADVANCES);
 
         double CALIBRATED_ADVANCES = ADVANCES + ADVANCES_CALIBRATION;
         double INGAME_ADVANCES = CALIBRATED_ADVANCES - CONTINUE_SCREEN_FRAMES;
-        double continue_screen_tweak = 0;
 
-        if (HISTORY.results.size() > 0){
-            double prev_advance_miss = double(HISTORY.results.back().advance - ADVANCES);
+        if (CALIBRATION_HISTORY.results.size() > 0){
+            AdvRngState prev_hit = CALIBRATION_HISTORY.results.back();
+            int64_t prev_csf_calibration = CALIBRATION_HISTORY.continue_screen_adjustments.back();
+            int64_t prev_advance_miss = int64_t(prev_hit.advance) - int64_t(ADVANCES);
             if (prev_advance_miss != 0 && std::abs(prev_advance_miss) < 2){
+                env.log("Attempting to correct for off-by-one miss by modifying continue screen frames.");
                 if (prev_advance_miss > 0){
-                    continue_screen_tweak = -1;
+                    CONTINUE_SCREEN_ADJUSTMENT = prev_csf_calibration - 1;
                     INGAME_ADVANCES += 1;
                 }else{
-                    continue_screen_tweak = 1;
+                    CONTINUE_SCREEN_ADJUSTMENT = prev_csf_calibration + 1;
                     INGAME_ADVANCES -= 1;
                 }
+            }else{
+                // we're still not that close. Slightly vary the seed to more reliably hone in on advances
+                double seed_bump = SEED_BUMPS[ADVANCE_HISTORY.results.size() % 5];
+                SEED_CALIBRATION_FRAMES += seed_bump;
             }
-        };
+        }else{
+            double seed_bump = SEED_BUMPS[ADVANCE_HISTORY.results.size() % 5];
+            SEED_CALIBRATION_FRAMES += seed_bump;
+        }
+
+        env.log("Seed calibration (frames): " + std::to_string(SEED_CALIBRATION_FRAMES));
+        env.log("Advance calibration (frames / 2): " + std::to_string(ADVANCES_CALIBRATION));
+        env.log("Continue screen adjustment (frames): " + std::to_string(CONTINUE_SCREEN_ADJUSTMENT));
 
         uint64_t CALIBRATED_SEED_DELAY = uint64_t(std::round(SEED_DELAY + FIXED_SEED_OFFSET + FRAME_DURATION * SEED_CALIBRATION_FRAMES));
-        uint64_t CONTINUE_SCREEN_DELAY =  uint64_t(std::round(FRAME_DURATION * (CONTINUE_SCREEN_FRAMES + continue_screen_tweak)));
+        uint64_t CONTINUE_SCREEN_DELAY =  uint64_t(std::round(FRAME_DURATION * (CONTINUE_SCREEN_FRAMES + CONTINUE_SCREEN_ADJUSTMENT)));
         uint64_t INGAME_DELAY =  uint64_t(std::round(FRAME_DURATION * INGAME_ADVANCES / 2));
+
+        env.log("Title screen duration: " + std::to_string(CALIBRATED_SEED_DELAY) + "ms");
+        env.log("Continue screen duration: " + std::to_string(CONTINUE_SCREEN_DELAY) + "ms");
+        env.log("In-game duration: " + std::to_string(INGAME_DELAY) + "ms");
 
         env.log("Resetting Game...");
         if (USE_COPYRIGHT_TEXT){
@@ -971,7 +1084,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         RNG_FILTERS.set(filters);
 
         std::map<AdvRngState, AdvPokemonResult> search_hits = get_starter_search_results(env, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, pokemon);
-        bool finished = update_calibration_history(env, HISTORY, MAX_HISTORY_LENGTH, SEED_CALIBRATION_FRAMES, ADVANCES_CALIBRATION, search_hits);
+        bool finished = update_history(env, ADVANCE_HISTORY, CALIBRATION_HISTORY, MAX_HISTORY_LENGTH, SEED_CALIBRATION_FRAMES, ADVANCES_CALIBRATION, CONTINUE_SCREEN_ADJUSTMENT, search_hits);
         if (finished){
             env.log("RNG search finished.");
             continue;
@@ -991,7 +1104,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         }
         if (pokemon.level.size() > 1){
             search_hits = get_starter_search_results(env, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, pokemon);
-            finished = update_calibration_history(env, HISTORY, MAX_HISTORY_LENGTH, SEED_CALIBRATION_FRAMES, ADVANCES_CALIBRATION, search_hits);
+            finished = update_history(env, ADVANCE_HISTORY, CALIBRATION_HISTORY, MAX_HISTORY_LENGTH, SEED_CALIBRATION_FRAMES, ADVANCES_CALIBRATION, CONTINUE_SCREEN_ADJUSTMENT, search_hits);
             if (finished){
                 env.log("RNG search finished.");
                 continue;
@@ -1005,12 +1118,16 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         }
 
         auto num_levels = pokemon.level.size();
-        int MAX_LEVELS = 5;
+        uint16_t MAX_LEVELS = 3;
         while(true){
-            if (num_levels >= MAX_LEVELS){
-                env.log("RNG search not complete after 5 level-ups.");
+            if (num_levels > MAX_LEVELS){
+                env.log("RNG search not complete after 3 level-ups.");
+                update_history(env, ADVANCE_HISTORY, CALIBRATION_HISTORY, MAX_HISTORY_LENGTH, SEED_CALIBRATION_FRAMES, ADVANCES_CALIBRATION, CONTINUE_SCREEN_ADJUSTMENT, search_hits, true);
                 break;
             }
+
+            env.log("Level: " + std::to_string(4 + pokemon.level.size()));
+            env.log("Speed EVs: " + std::to_string(pokemon.evs.back().speed));
 
             int ret2 = autolevel_on_route1(env, context, pokemon, BASE_STATS);
             if (ret2 < 0){
@@ -1041,7 +1158,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             if (pokemon.level.size() > num_levels){
                 num_levels = pokemon.level.size();
                 search_hits = get_starter_search_results(env, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, pokemon);
-                finished = update_calibration_history(env, HISTORY, MAX_HISTORY_LENGTH, SEED_CALIBRATION_FRAMES, ADVANCES_CALIBRATION, search_hits);
+                finished = update_history(env, ADVANCE_HISTORY, CALIBRATION_HISTORY, MAX_HISTORY_LENGTH, SEED_CALIBRATION_FRAMES, ADVANCES_CALIBRATION, CONTINUE_SCREEN_ADJUSTMENT, search_hits);
                 if (finished){
                     env.log("RNG search finished.");
                     break;

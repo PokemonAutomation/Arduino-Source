@@ -46,10 +46,17 @@ private:
         charmander
     };
 
+    struct StarterRngAdvanceHistory{
+        std::vector<double> seed_calibrations;
+        std::vector<std::vector<AdvRngState>> results;
+    };
+
     struct StarterRngCalibrationHistory{
         std::vector<double> seed_calibrations;
         std::vector<double> advance_calibrations;
+        std::vector<int64_t> continue_screen_adjustments;
         std::vector<AdvRngState> results;
+
     };
 
     bool have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t TARGET_SEED, AdvRngState& hit);
@@ -67,18 +74,25 @@ private:
         AdvObservedPokemon& pokemon
     );
     double get_seed_calibration_frames(
-        StarterRngCalibrationHistory& HISTORY, 
+        StarterRngCalibrationHistory& CALIBRATION_HISTORY,
         const std::vector<uint16_t>& SEED_VALUES, 
         const int16_t& SEED_POSITION
     );
-    double get_advances_calibration_frames(StarterRngCalibrationHistory& HISTORY, uint64_t ADVANCES);
-    bool update_calibration_history(
+    double get_advances_calibration_frames(
+        StarterRngCalibrationHistory& CALIBRATION_HISTORY, 
+        uint64_t ADVANCES
+    );
+
+    bool update_history(
         SingleSwitchProgramEnvironment& env,
-        StarterRngCalibrationHistory& HISTORY, 
+        StarterRngAdvanceHistory& ADVANCE_HISTORY,
+        StarterRngCalibrationHistory& CALIBRATION_HISTORY, 
         const uint16_t& MAX_HISTORY_LENGTH,
         double& SEED_CALIBRATION_FRAMES,
         double& ADVANCES_CALIBRATION,
-        std::map<AdvRngState, AdvPokemonResult>& search_hits
+        int64_t& CONTINUE_SCREEN_ADJUSTMENT,
+        std::map<AdvRngState, AdvPokemonResult>& search_hits,
+        bool force_finish = false
     );
 
     bool walk_to_rival_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
@@ -114,7 +128,7 @@ private:
     SimpleIntegerOption<uint64_t> SEED_DELAY;
     
     SimpleIntegerOption<uint64_t>ADVANCES;
-    SimpleIntegerOption<uint64_t>CONTINUE_SCREEN_FRAMES;
+    // SimpleIntegerOption<uint64_t>CONTINUE_SCREEN_FRAMES;
 
     BooleanCheckBoxOption USE_COPYRIGHT_TEXT;
 
