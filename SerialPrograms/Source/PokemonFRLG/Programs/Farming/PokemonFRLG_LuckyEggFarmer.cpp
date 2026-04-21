@@ -457,6 +457,15 @@ bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProCon
                 env.log("Lucky Egg found!");
                 stats.eggs++;
                 env.update_stats();
+                send_program_notification(
+                    env,
+                    NOTIFICATION_PROGRAM_FINISH,
+                    COLOR_YELLOW,
+                    "Lucky Egg found!",
+                    {}, "",
+                    env.console.video().snapshot(),
+                    true
+                );
                 return true;
             }
             env.log("Lucky Egg not found. Continuing to farm...");
