@@ -86,7 +86,10 @@ LuckyEggFarmer::LuckyEggFarmer()
         true
     )
     , STOP_AFTER_CURRENT("Reset")
-    , TAKE_VIDEO("<b>Take Video:</b><br>Record a video when the shiny is found.", LockMode::UNLOCK_WHILE_RUNNING, true)
+    , TAKE_VIDEO(
+        "<b>Take Video:</b><br>Record a video when a lucky egg or shiny is found.",
+        LockMode::UNLOCK_WHILE_RUNNING, true
+    )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_LUCKY_EGG(
@@ -462,6 +465,9 @@ bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProCon
                 env.log("Lucky Egg found!");
                 stats.eggs++;
                 env.update_stats();
+                if (TAKE_VIDEO){
+                    pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
+                }
                 send_program_notification(
                     env,
                     NOTIFICATION_LUCKY_EGG,
