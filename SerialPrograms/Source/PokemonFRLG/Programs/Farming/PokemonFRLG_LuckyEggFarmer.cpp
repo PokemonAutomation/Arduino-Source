@@ -537,7 +537,8 @@ void LuckyEggFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
         swap_lead_pokemon(env.console, context);
 
         if (run_safari_zone(env, context)) {
-            break;
+            GO_HOME_WHEN_DONE.run_end_of_program(context);
+            return; // Already sent notification in run_safari_zone if shiny or lucky egg found.
         }
 
         soft_reset(env.console, context);
