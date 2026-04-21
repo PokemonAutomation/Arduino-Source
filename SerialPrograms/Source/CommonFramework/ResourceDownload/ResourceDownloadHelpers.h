@@ -22,8 +22,8 @@ namespace Filesystem{
 struct DownloadedResourceMetadata{
     std::string resource_name;
     std::optional<uint16_t> version_num;
-    size_t size_compressed_bytes;
-    size_t size_decompressed_bytes;
+    uint64_t size_compressed_bytes;
+    uint64_t size_decompressed_bytes;
     std::string url;
     std::string sha256;
 };

@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_ResourceDownloadOptions_H
 #define PokemonAutomation_ResourceDownloadOptions_H
 
-#include <QObject>
 // #include "Common/Cpp/Containers/Pimpl.h"
 // #include "Common/Cpp/Concurrency/AsyncTask.h"
 // #include "Common/Cpp/Options/StaticTableOption.h"
@@ -19,8 +18,7 @@ namespace PokemonAutomation{
 class ResourceDownloadRow;
 
 
-class ResourceDownloadButton : public QObject, public ConfigOptionImpl<ResourceDownloadButton>{
-    Q_OBJECT
+class ResourceDownloadButton : public ConfigOptionImpl<ResourceDownloadButton>{
 public:
     // ~ResourceDownloadButton();
     ResourceDownloadButton(ResourceDownloadRow& p_row);

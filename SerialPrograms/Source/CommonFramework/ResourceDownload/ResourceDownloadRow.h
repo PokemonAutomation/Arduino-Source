@@ -67,15 +67,15 @@ public:
 
 public:
     struct DownloadListener{
-        virtual void on_download_progress(uint64_t bytes_done, uint64_t total_bytes){};
-        virtual void on_unzip_progress(uint64_t bytes_done, uint64_t total_bytes){};
-        virtual void on_hash_progress(uint64_t bytes_done, uint64_t total_bytes){};
+        virtual void on_download_progress(uint64_t bytes_done, uint64_t total_bytes){}
+        virtual void on_unzip_progress(uint64_t bytes_done, uint64_t total_bytes){}
+        virtual void on_hash_progress(uint64_t bytes_done, uint64_t total_bytes){}
 
-        virtual void on_metadata_fetch_finished(const std::string& popup_message){};
-        virtual void on_exception_caught(const std::string& function_name){};
-        virtual void on_download_failed(){};
+        virtual void on_metadata_fetch_finished(const std::string& popup_message){}
+        virtual void on_exception_caught(const std::string& function_name){}
+        virtual void on_download_failed(){}
 
-        virtual void on_button_state_updated(){};
+        virtual void on_button_state_updated(){}
     };
 
     void add_listener(DownloadListener& listener);

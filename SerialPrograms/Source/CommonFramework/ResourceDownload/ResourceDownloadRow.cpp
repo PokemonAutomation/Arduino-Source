@@ -116,7 +116,7 @@ void DownloadThread::run_download(DownloadedResourceMetadata resource_metadata){
 
     std::string url = resource_metadata.url;
     std::string resource_name = resource_metadata.resource_name;
-    qint64 expected_size = resource_metadata.size_compressed_bytes;
+    uint64_t expected_size = resource_metadata.size_compressed_bytes;
 
     std::string resource_directory = DOWNLOADED_RESOURCE_PATH() + resource_name;
     try{
