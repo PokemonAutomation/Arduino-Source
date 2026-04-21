@@ -176,11 +176,13 @@ TestProgramComputer_Descriptor::TestProgramComputer_Descriptor()
 TestProgramComputer::TestProgramComputer()
     : STATIC_TEXT("test text")
     , IMAGE_PATH(false, "Path to image for testing", LockMode::UNLOCK_WHILE_RUNNING, "default.png", "default.png")
+    , INPUT_TEXT(false, "Input text:", LockMode::UNLOCK_WHILE_RUNNING, "", "")
     , SCREEN_WATCHER("Capture Box", 0, 0, 1, 1)
     , MAC_ADDRESS(LockMode::UNLOCK_WHILE_RUNNING, 6, nullptr)
 {
     PA_ADD_OPTION(STATIC_TEXT);
     PA_ADD_OPTION(IMAGE_PATH);
+    PA_ADD_OPTION(INPUT_TEXT);
 //    PA_ADD_OPTION(SCREEN_WATCHER);
     PA_ADD_OPTION(MAC_ADDRESS);
 }
@@ -381,6 +383,26 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 //    cout << random_u32(100, 115) << endl;
 
+#if 0
+    ImageRGB32 image(IMAGE_PATH);
+    ImageFloatBox num_sunflora_box = {0.27, 0.02, 0.04, 0.055};
+    // extract_box_reference(image, num_sunflora_box).save("crop.png");
+    int number = OCR::read_number_waterfill(logger, extract_box_reference(image, num_sunflora_box), 0xff000000, 0xff808080);
+
+    int expected_number = std::stoi(std::string(INPUT_TEXT));
+
+    std::string number_string = std::to_string(number);
+    std::string expected_number_string = std::to_string(expected_number);
+
+    // checks that expected_number is a prefix of number
+    // this is to handle the Asian languages that have extra characters after the number
+    if (number_string.compare(0, expected_number_string.size(), expected_number_string) == 0){
+        cout << "matches" << endl;
+    }else{
+        cout << "does not matche" << endl;
+    }
+#endif
+
 
 #if 0
     ImageRGB32 image(IMAGE_PATH);
@@ -397,7 +419,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 #endif
 
-#if 1
+#if 0
     stress_test(logger, scope);
 #endif
 
