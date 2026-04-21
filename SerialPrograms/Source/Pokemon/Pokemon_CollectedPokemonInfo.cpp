@@ -11,7 +11,6 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_BoxCursor.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
-#include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon_CollectedPokemonInfo.h"
 
 namespace PokemonAutomation{
@@ -27,7 +26,9 @@ bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs
            lhs.alpha == rhs.alpha &&
            lhs.ball_slug == rhs.ball_slug &&
            lhs.gender == rhs.gender &&
-           lhs.ot_id == rhs.ot_id;
+           lhs.ot_id == rhs.ot_id &&
+           lhs.primaryType == rhs.primaryType &&
+           lhs.secondaryType == rhs.secondaryType;
 }
 
 
@@ -73,6 +74,14 @@ bool operator<(const std::optional<CollectedPokemonInfo>& lhs, const std::option
                 return (lhs->gender < rhs->gender) != preference.reverse;
             }
             break;
+        case SortingRuleType::Type:
+            if (lhs->primaryType != rhs->primaryType){
+                return (lhs->primaryType < rhs->primaryType) != preference.reverse;
+            }
+            if (lhs->secondaryType != rhs->secondaryType){
+                return (lhs->secondaryType < rhs->secondaryType) != preference.reverse;
+            }
+            break;
         default:
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "unknown SortingRuleType");
         } // end switch
@@ -94,6 +103,8 @@ std::ostream& operator<<(std::ostream& os, const std::optional<CollectedPokemonI
         os << "ball:" << pokemon->ball_slug << " ";
         os << "gender:" << gender_to_string(pokemon->gender) << " ";
         os << "ot_id:" << pokemon->ot_id << " ";
+        os << "primaryType:" << POKEMON_TYPE_SLUGS().get_string(pokemon->primaryType) << " ";
+        os << "secondaryType:" << POKEMON_TYPE_SLUGS().get_string(pokemon->secondaryType) << " ";
         os << ")";
     }else{
         os << "(empty)";
@@ -144,6 +155,8 @@ void save_boxes_data_to_json(const std::vector<std::optional<CollectedPokemonInf
             pokemon["ball"] = current_pokemon->ball_slug;
             pokemon["gender"] = gender_to_string(current_pokemon->gender);
             pokemon["ot_id"] = current_pokemon->ot_id;
+            pokemon["primaryType"] = POKEMON_TYPE_SLUGS().get_string(current_pokemon->primaryType);
+            pokemon["secondaryType"] = POKEMON_TYPE_SLUGS().get_string(current_pokemon->secondaryType);
         }
         pokemon_data.push_back(std::move(pokemon));
     }

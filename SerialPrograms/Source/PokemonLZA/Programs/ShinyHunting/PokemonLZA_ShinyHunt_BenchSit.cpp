@@ -8,6 +8,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -15,6 +16,7 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_DayNightStateDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA_ShinyHunt_BenchSit.h"
@@ -92,6 +94,29 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
         100,
         0
     )
+    , DAY_NIGHT_FILTER(
+        "Run Forward Only During Day/Night:",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        GroupOption::EnableMode::DEFAULT_DISABLED
+    )
+    , DAY_FILTER_MODE(
+        "<b>Time filter:</b>",
+        {
+            {0, "day", "Day"},
+            {1, "night", "Night"},
+        },
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0
+    )
+    , PERIODIC_TIME_CHECK(
+          "<b>Periodically Check Time:</b><br>"
+          "How often the program re-checks the actual time of day from the map.<br>"
+          "0 = check every cycle.<br>"
+          "Higher values run faster but assume time alternates each bench sit.",
+          LockMode::UNLOCK_WHILE_RUNNING,
+          100,
+          0
+    )
     , SHINY_DETECTED(
         "Shiny Detected", "",
         "2000 ms",
@@ -112,6 +137,9 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
     }
     PA_ADD_OPTION(WALK_FORWARD_DURATION);
     PA_ADD_OPTION(PERIODIC_SAVE);
+    PA_ADD_OPTION(DAY_NIGHT_FILTER);
+    DAY_NIGHT_FILTER.add_option(DAY_FILTER_MODE, "FilterMode");
+    DAY_NIGHT_FILTER.add_option(PERIODIC_TIME_CHECK,"PeriodicTimeCheck");
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -156,13 +184,184 @@ void run_back_until_found_bench(
         );
     }
 }
+bool ShinyHunt_BenchSit::should_run_based_on_day_night(
+    const ImageViewRGB32& frame, VideoOverlay& overlay
+){
 
+    if ((Milliseconds)WALK_FORWARD_DURATION == Milliseconds::zero()){
+        return true;
+    }
+    if (!DAY_NIGHT_FILTER.enabled()){
+        return true;
+    }
+    if (!m_day_night_detector){
+        m_day_night_detector = std::make_unique<DayNightStateDetector>(&overlay);
+    }
+    if (!m_day_night_detector->detect(frame)){
+        return true;
+    }
+    DayNightState current_state = m_day_night_detector->state();
+    if (current_state == DayNightState::NIGHT) {
+        overlay.add_log("Day/Night Detector: NIGHT", COLOR_CYAN);
+    } else {
+        overlay.add_log("Day/Night Detector: DAY", COLOR_YELLOW);
+    }
+    size_t filter_mode = DAY_FILTER_MODE.current_value();
+    if (filter_mode == 0){
+        return current_state == DayNightState::DAY;
+    }
+    else if (filter_mode == 1){
+        return current_state == DayNightState::NIGHT;
+    }
+    return true;
+}
+void ShinyHunt_BenchSit::check_daynight(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context
+){
+    open_map(env.console, context, false, true);
+    context.wait_for_all_requests();
+    pbf_wait(context, 180ms);
+    // zoom fully in
+    pbf_move_right_joystick(context, {0, 1}, 900ms, 120ms);
+    context.wait_for_all_requests();
+    pbf_wait(context, 120ms);
+    // hide icons
+    pbf_press_button(context, BUTTON_MINUS, 80ms, 120ms);
+    context.wait_for_all_requests();
+    pbf_wait(context, 160ms);
+    // double snapshot
+    ImageViewRGB32 frame1 = env.console.video().snapshot();
+    pbf_wait(context, 120ms);
+    ImageViewRGB32 frame2 = env.console.video().snapshot();
+    should_run_based_on_day_night(frame1, env.console.overlay());
+    should_run_based_on_day_night(frame2, env.console.overlay());
+    if (m_day_night_detector){
+        m_cached_time = m_day_night_detector->state();
+        m_cached_time_initialized = true;
+        m_rounds_since_time_check = 0;
+        std::string time_string = m_cached_time == DayNightState::DAY
+            ? "Cached Day"
+            : "Cached Night";
+        env.console.overlay().add_log(time_string, COLOR_GREEN);
+        env.log(time_string);
+    }
+
+    // close map
+    pbf_wait(context, 120ms);
+    pbf_press_button(context, BUTTON_PLUS, 500ms, 120ms);
+    context.wait_for_all_requests();
+    pbf_wait(context, 150ms);
+}
+void ShinyHunt_BenchSit::run_rounds(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinySoundHandler& shiny_sound_handler
+){
+    ShinyHunt_BenchSit_Descriptor::Stats& stats = env.current_stats<ShinyHunt_BenchSit_Descriptor::Stats>();
+
+    for (uint32_t rounds_since_last_save = 0;; rounds_since_last_save++){
+        send_program_status_notification(env, NOTIFICATION_STATUS);
+        sit_on_bench(env.console, context);
+        shiny_sound_handler.process_pending(context);
+        stats.resets++;
+        env.update_stats();
+        if (m_cached_time_initialized){
+            m_cached_time = m_cached_time == DayNightState::DAY
+                ? DayNightState::NIGHT
+                : DayNightState::DAY;
+            m_rounds_since_time_check++;
+        }
+        uint32_t periodic_save = PERIODIC_SAVE;
+        if (periodic_save != 0 && rounds_since_last_save >= periodic_save){
+            bool save_successful = save_game_to_menu(env.console, context);
+            pbf_mash_button(context, BUTTON_B, 2000ms);
+            if (save_successful){
+                env.console.overlay().add_log("Game Saved Successfully", COLOR_BLUE);
+                rounds_since_last_save = 0;
+            }else{
+                env.console.overlay().add_log("Game Save Failed. Will attempt to save after the next reset.", COLOR_RED);
+            }
+        }
+
+        Milliseconds duration = WALK_FORWARD_DURATION;
+
+        // Only open map when movement enabled AND day/night filter requires verification
+        bool need_time_check = true;
+
+        uint32_t periodic_time_check = PERIODIC_TIME_CHECK;
+
+        if (periodic_time_check > 0 && m_cached_time_initialized){
+            need_time_check = m_rounds_since_time_check >= periodic_time_check;
+        }
+
+        if (duration > Milliseconds::zero() &&
+            DAY_NIGHT_FILTER.enabled() &&
+            (!m_cached_time_initialized || need_time_check)
+        ){
+            check_daynight(env, context);
+        }
+        // filtering
+        if (DAY_NIGHT_FILTER.enabled()){
+            size_t filter_mode = DAY_FILTER_MODE.current_value();
+            bool predicted_ok = filter_mode == 0
+                ? m_cached_time == DayNightState::DAY
+                : m_cached_time == DayNightState::NIGHT;
+
+            if (!predicted_ok){
+                env.console.overlay().add_log(
+                    "Skipping move (predicted wrong time of day)",
+                    COLOR_ORANGE
+                );
+                run_back_until_found_bench(env, context);
+                shiny_sound_handler.process_pending(context);
+                continue;
+            }
+        }
+
+        // movement
+        if (duration > Milliseconds::zero()){
+            if (WALK_DIRECTION.current_value() == 0){ // forward
+                env.console.overlay().add_log("Move Forward");
+                ssf_press_button(context, BUTTON_B, 0ms, 2*duration, 0ms);
+                pbf_move_left_joystick(context, {0, +1}, duration, 0ms);
+                // run back
+                pbf_move_left_joystick(context, {0, -1}, duration + 750ms, 0ms);
+                run_back_until_found_bench(env, context);
+            }else if (WALK_DIRECTION.current_value() == 1){ // left
+                env.console.overlay().add_log("Move Left");
+                ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
+                pbf_move_left_joystick(context, {-1, 0},  duration, 0ms);
+                pbf_press_button(context, BUTTON_L, 100ms, 400ms);
+                ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
+                pbf_move_left_joystick(context, {0, -1}, duration, 0ms);
+                pbf_move_left_joystick(context, {-1, 0},  100ms, 0ms);
+            }else if (WALK_DIRECTION.current_value() == 2){ // right
+                env.console.overlay().add_log("Move Right");
+                ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
+                pbf_move_left_joystick(context, {+1, 0}, duration, 0ms);
+                pbf_press_button(context, BUTTON_L, 100ms, 400ms);
+                ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
+                pbf_move_left_joystick(context, {0, -1}, duration, 0ms);
+                pbf_move_left_joystick(context, {+1, 0}, 100ms, 0ms);
+            }
+        }else{
+            run_back_until_found_bench(env, context);
+        }
+
+        shiny_sound_handler.process_pending(context);
+    }
+}
 void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     ShinyHunt_BenchSit_Descriptor::Stats& stats = env.current_stats<ShinyHunt_BenchSit_Descriptor::Stats>();
 
     ShinySoundHandler shiny_sound_handler(SHINY_DETECTED);
+
+    m_cached_time = DayNightState::DAY;
+    m_cached_time_initialized = false;
+    m_rounds_since_time_check = 0;
 
     PokemonLA::ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
         //  Warning: This callback will be run from a different thread than this function.
@@ -179,57 +378,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
     run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
-            for (uint32_t rounds_since_last_save = 0;; rounds_since_last_save++){
-                send_program_status_notification(env, NOTIFICATION_STATUS);
-                sit_on_bench(env.console, context);
-                shiny_sound_handler.process_pending(context);
-                stats.resets++;
-                env.update_stats();
-
-                uint32_t periodic_save = PERIODIC_SAVE;
-                if (periodic_save != 0 && rounds_since_last_save >= periodic_save){
-                    bool save_successful = save_game_to_menu(env.console, context);
-                    pbf_mash_button(context, BUTTON_B, 2000ms);
-                    if (save_successful){
-                        env.console.overlay().add_log("Game Saved Successfully", COLOR_BLUE);
-                        rounds_since_last_save = 0;
-                    }else{
-                        env.console.overlay().add_log("Game Save Failed. Will attempt to save after the next reset.", COLOR_RED);
-                    }
-                }
-
-                Milliseconds duration = WALK_FORWARD_DURATION;
-                if (duration > Milliseconds::zero()){
-                    if (WALK_DIRECTION.current_value() == 0){ // forward
-                        env.console.overlay().add_log("Move Forward");
-                        ssf_press_button(context, BUTTON_B, 0ms, 2*duration, 0ms);
-                        pbf_move_left_joystick(context, {0, +1}, duration, 0ms);
-                        // run back
-                        pbf_move_left_joystick(context, {0, -1}, duration + 750ms, 0ms);
-                        run_back_until_found_bench(env, context);
-                    }else if (WALK_DIRECTION.current_value() == 1){ // left
-                        env.console.overlay().add_log("Move Left");
-                        ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
-                        pbf_move_left_joystick(context, {-1, 0},  duration, 0ms);
-                        pbf_press_button(context, BUTTON_L, 100ms, 400ms);
-                        ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
-                        pbf_move_left_joystick(context, {0, -1}, duration, 0ms);
-                        pbf_move_left_joystick(context, {-1, 0},  100ms, 0ms);
-                    }else if (WALK_DIRECTION.current_value() == 2){ // right
-                        env.console.overlay().add_log("Move Right");
-                        ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
-                        pbf_move_left_joystick(context, {+1, 0}, duration, 0ms);
-                        pbf_press_button(context, BUTTON_L, 100ms, 400ms);
-                        ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
-                        pbf_move_left_joystick(context, {0, -1}, duration, 0ms);
-                        pbf_move_left_joystick(context, {+1, 0}, 100ms, 0ms);
-                    }
-                }else{
-                    run_back_until_found_bench(env, context);
-                }
-
-                shiny_sound_handler.process_pending(context);
-            }
+            run_rounds(env, context, shiny_sound_handler);
         },
         {shiny_detector}
     );

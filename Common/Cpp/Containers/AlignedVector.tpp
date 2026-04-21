@@ -56,7 +56,7 @@ AlignedVector<Object>::AlignedVector(const AlignedVector& x)
         size_t half = m_capacity / 2;
         if (half >= x.m_size){
             m_capacity = half;
-        } else{
+        }else{
             break;
         }
     }

@@ -529,7 +529,7 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, ProControll
 
         // Calibrate number of NPCs in the area and check whether the trader is in the slow state
         if ((CALIBRATION_INTERAVAL > 0 && assumed_successful_iterations % CALIBRATION_INTERAVAL == 0) || assumed_successful_iterations <= 0){
-            try {
+            try{
                 num_npcs = calibrate_num_npc_from_party(env, context, rng);
             }
             catch (OperationFailedException& exception){

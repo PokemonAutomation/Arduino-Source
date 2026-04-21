@@ -137,7 +137,7 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 break;
             }
         }
-    } catch(OperationFailedException&){
+    }catch (OperationFailedException&){
         stats.m_errors++;
         env.update_stats();
         throw;

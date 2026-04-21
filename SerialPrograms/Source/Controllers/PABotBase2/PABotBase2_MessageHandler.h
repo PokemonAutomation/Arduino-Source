@@ -15,13 +15,11 @@ namespace PokemonAutomation{
 namespace PABotBase2{
 
 
-
+#if 0
 class MessageHandler{
 public:
     virtual ~MessageHandler() = default;
-    virtual bool should_print() const;
     virtual void assert_is_valid(Logger& logger, const MessageHeader* header) const{}
-    virtual std::string tostr(const MessageHeader* header) const = 0;
     virtual void on_recv(Logger& logger, const MessageHeader* header){}
 
 protected:
@@ -40,6 +38,7 @@ public:
         assert_size_eq(logger, sizeof(MessageType), header);
     }
 };
+#endif
 
 
 }

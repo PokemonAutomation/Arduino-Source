@@ -49,7 +49,7 @@ public:
 public:
     SuperscalarScheduler(Logger& logger, WallDuration flush_threshold);
 
-    void clear_on_next(){
+    void clear_on_next() noexcept{
         m_pending_clear = true;
     }
 

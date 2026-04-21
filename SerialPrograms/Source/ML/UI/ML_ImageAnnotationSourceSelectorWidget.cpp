@@ -173,7 +173,7 @@ void ImageAnnotationSourceSelectorWidget::post_startup(VideoSource* source){
         std::cerr << "When searching the loaded image folder " << folder_path << ", cannot find the loaded image filename "
             << filename << "." << std::endl;
         m_folder_info_label->setText(QString::fromStdString("\?\?\?/" + std::to_string(num_images) + " in folder"));
-    } else{
+    }else{
         m_folder_info_label->setText(QString::fromStdString(
             std::to_string(m_cur_image_file_idx_in_folder+1) + "/" + std::to_string(num_images) + " in folder"));
     }
