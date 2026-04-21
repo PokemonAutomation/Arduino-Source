@@ -401,6 +401,7 @@ bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProCon
     int balls_left = 30;
 
     while (chancy_count < 4){
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         if (!find_encounter(env, context)){
             return false;
         }
@@ -500,12 +501,9 @@ void LuckyEggFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
     DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
 
     while (true){
-        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-        
         pbf_press_dpad(context, DPAD_UP, 200ms, 0ms);
 
-        while (true)
-        {
+        while (true){
             BlackScreenWatcher safari_zone_exit(COLOR_RED);
 
             int ret = run_until<ProControllerContext>(
