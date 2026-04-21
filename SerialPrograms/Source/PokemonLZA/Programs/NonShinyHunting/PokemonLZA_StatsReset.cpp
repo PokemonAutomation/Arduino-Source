@@ -247,7 +247,7 @@ void StatsReset::run_catch(SingleSwitchProgramEnvironment& env, ProControllerCon
         BUTTON_ZL | BUTTON_ZR,
         500ms, 500ms + (hold + cool) * scrolls,
         0ms
-        );
+    );
 
     while (scrolls != 0){
         pbf_press_dpad(context, direction, hold, cool);
@@ -314,7 +314,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to travel to Lysandre Café",
                     env.console
-                    );
+                );
             }
             context.wait_for(100ms);
             env.log("Detected overworld. Fast traveled to Lysandre Café");
@@ -371,7 +371,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to travel to Wild Zone 13",
                     env.console
-                    );
+                );
             }
             context.wait_for(100ms);
             env.log("Detected overworld. Fast traveled to Wild Zone 13");
