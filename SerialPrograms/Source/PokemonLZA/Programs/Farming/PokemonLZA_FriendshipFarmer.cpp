@@ -534,8 +534,7 @@ void FriendshipFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
         }
 
         env.log("Cafe Method Finished");
-    }
-    else{
+    }else{
         env.log("Bench Method Started");
         int hang_outs_needed;
 
@@ -544,13 +543,11 @@ void FriendshipFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
         // Max = 255 points = 26 hangouts
         if (FRIENDSHIP_AMOUNT.get() == FriendshipAmount::Evolve){
             hang_outs_needed = 16;
-        }
-        else{
+        }else{
             hang_outs_needed = 26;
         }
 
-        for (int i = 0; i < hang_outs_needed; ++i)
-        {
+        for (int i = 0; i < hang_outs_needed; ++i){
             hang_out_bench(env, context);
             exit_bench(env, context);
 

@@ -57,7 +57,7 @@ private:
     class DeviceSideConnection : public UnreliableStreamConnectionPolling{
     public:
         DeviceSideConnection(MockDevice& parent) : m_parent(parent) {}
-        virtual size_t unreliable_send(const void* data, size_t bytes) override;
+        virtual size_t unreliable_send(const void* data, size_t bytes) noexcept override;
         virtual size_t unreliable_recv(void* data, size_t max_bytes) override;
     private:
         MockDevice& m_parent;
@@ -66,7 +66,7 @@ private:
     class HostSideConnection : public UnreliableStreamConnectionPushing{
     public:
         HostSideConnection(MockDevice& parent) : m_parent(parent) {}
-        virtual size_t unreliable_send(const void* data, size_t bytes) override;
+        virtual size_t unreliable_send(const void* data, size_t bytes) noexcept override;
         using UnreliableStreamConnectionPushing::on_unreliable_recv;
     private:
         MockDevice& m_parent;

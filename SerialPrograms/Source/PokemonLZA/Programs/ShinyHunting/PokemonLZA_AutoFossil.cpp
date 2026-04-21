@@ -349,17 +349,17 @@ bool AutoFossil::check_fossils_in_one_box(
                     // from left to right
                     box_col = 0;
                     next_cell_right = true;
-                } else{
+                }else{
                     next_cell_right = false;
                 }
-            } else{
+            }else{
                 box_col++;
             }
-        } else{
+        }else{
             if (box_col == 0){
                 box_row++;
                 next_cell_right = true;
-            } else{
+            }else{
                 box_col--;
             }
         }

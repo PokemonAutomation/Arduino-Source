@@ -75,7 +75,7 @@ void SpinLock::spin_acquire(const char* label){
 
 
 
-void SpinLockMRSW::internal_acquire_read(){
+void SpinLockMRSW::internal_acquire_read() noexcept{
 //    cout << "SpinLockMRSW::internal_acquire_read()" << endl;
 
     while (true){
@@ -86,7 +86,7 @@ void SpinLockMRSW::internal_acquire_read(){
         pause();
     }
 }
-void SpinLockMRSW::internal_acquire_write(){
+void SpinLockMRSW::internal_acquire_write() noexcept{
 //    cout << "SpinLockMRSW::internal_acquire_write()" << endl;
 
     size_t state;
@@ -95,7 +95,7 @@ void SpinLockMRSW::internal_acquire_write(){
         state = m_readers.load(std::memory_order_acquire);
     }while (state != 0 || !m_readers.compare_exchange_weak(state, (size_t)-1));
 }
-void SpinLockMRSW::internal_acquire_read(const char* label){
+void SpinLockMRSW::internal_acquire_read(const char* label) noexcept{
 //    cout << "SpinLockMRSW::internal_acquire_read()" << endl;
 
 #ifdef PA_NO_RDTSC
@@ -109,13 +109,15 @@ void SpinLockMRSW::internal_acquire_read(const char* label){
         }
         pause();
         if (x86_rdtsc() - start > 10000000000){
-            cout << "Slow ReadSpinLock: " << label << endl;
+            try{
+                cout << "Slow ReadSpinLock: " << label << endl;
+            }catch (...){}
             start = x86_rdtsc();
         }
     }
 #endif
 }
-void SpinLockMRSW::internal_acquire_write(const char* label){
+void SpinLockMRSW::internal_acquire_write(const char* label) noexcept{
 //    cout << "SpinLockMRSW::internal_acquire_write()" << endl;
 
 #ifdef PA_NO_RDTSC
@@ -126,7 +128,9 @@ void SpinLockMRSW::internal_acquire_write(const char* label){
     do{
         pause();
         if (x86_rdtsc() - start > 10000000000){
-            cout << "Slow WriteSpinLock: " << label << endl;
+            try{
+                cout << "Slow WriteSpinLock: " << label << endl;
+            }catch (...){}
             start = x86_rdtsc();
         }
         state = m_readers.load(std::memory_order_acquire);

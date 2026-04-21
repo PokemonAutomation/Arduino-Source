@@ -12,18 +12,19 @@ This is the source code for all the main Arduino programs.
 
 # Dependencies:
 
-| **Dependency** | **License** |
-| --- | --- |
-| Qt5 and Qt6 | LGPLv3 |
-| [QDarkStyleSheet](https://github.com/ColinDuquesnoy/QDarkStyleSheet) | MIT |
-| [Qt Wav Reader](https://code.qt.io/cgit/qt/qtmultimedia.git/tree/examples/multimedia/spectrum/app/wavfile.cpp?h=5.15) | BSD |
-| [nlohmann json](https://github.com/nlohmann/json) | MIT |
-| [D++](https://github.com/brainboxdotcc/DPP) | Apache 2.0 |
-| [LUFA](https://github.com/abcminiuser/lufa) | MIT |
-| [Tesseract](https://github.com/tesseract-ocr/tesseract) | Apache 2.0 |
-| [Tesseract for Windows](https://github.com/peirick/Tesseract-OCR_for_Windows) | Apache 2.0 |
-| [OpenCV](https://github.com/opencv/opencv) | Apache 2.0 |
-| [ONNX](https://github.com/microsoft/onnxruntime) | MIT |
+| **Dependency** | **License**  |
+| --- |---|
+| Qt5 and Qt6 | LGPLv3       |
+| [QDarkStyleSheet](https://github.com/ColinDuquesnoy/QDarkStyleSheet) | MIT          |
+| [Qt Wav Reader](https://code.qt.io/cgit/qt/qtmultimedia.git/tree/examples/multimedia/spectrum/app/wavfile.cpp?h=5.15) | BSD          |
+| [nlohmann json](https://github.com/nlohmann/json) | MIT          |
+| [D++](https://github.com/brainboxdotcc/DPP) | Apache 2.0   |
+| [LUFA](https://github.com/abcminiuser/lufa) | MIT          |
+| [Tesseract](https://github.com/tesseract-ocr/tesseract) | Apache 2.0   |
+| [Tesseract for Windows](https://github.com/peirick/Tesseract-OCR_for_Windows) | Apache 2.0   |
+| [OpenCV](https://github.com/opencv/opencv) | Apache 2.0   |
+| [ONNX](https://github.com/microsoft/onnxruntime) | MIT          |
+| [sdbus-c++](https://github.com/Kistler-Group/sdbus-cpp) | LGPLv2.1     |
 
 Vanilla GPL is disallowed, though LGPL is allowed. This is for the following reasons:
 1. A tiny portion of the project is not open-sourced. (mostly related to telemetry and internal research experiments)

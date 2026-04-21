@@ -255,8 +255,11 @@ bool ControllerSession::set_controller(ControllerType controller_type){
             if (m_options_locked){
                 return false;
             }
-            if (m_connection && m_connection->current_controller() == controller_type){
-                return true;
+            if (m_connection){
+                if (m_connection->current_controller() == controller_type){
+                    return true;
+                }
+                m_connection->try_set_controller_type(controller_type, false);
             }
 
             //  Move these out to indicate that we should no longer access them.
@@ -305,6 +308,7 @@ std::string ControllerSession::reset(bool clear_settings){
             if (m_connection && m_connection->is_ready()){
                 m_desired_controller = m_connection->current_controller();
 //                cout << "Ready! - " << (int)m_desired_controller << endl;
+                m_connection->try_set_controller_type(m_desired_controller, clear_settings);
             }
 
             //  Move these out to indicate that we should no longer access them.

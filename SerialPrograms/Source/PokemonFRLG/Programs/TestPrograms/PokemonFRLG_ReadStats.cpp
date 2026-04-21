@@ -63,10 +63,18 @@ void ReadStats::program(
     VideoSnapshot screen1 = env.console.video().snapshot();
     reader.read_page1(env.logger(), LANGUAGE, screen1, stats);
 
+    std::string gender_strings[] = {"Male", "Female", "Genderless"};
+
     env.log("Name: " + stats.name);
     env.log("Level: " +
             (stats.level.has_value() ? std::to_string(*stats.level) : "???"));
     env.log("Nature: " + stats.nature);
+    env.log("Gender: " + std::string(
+        stats.gender.has_value() ? (
+            (stats.gender == SummaryGender::Male) ? "Male" : (
+                (stats.gender == SummaryGender::Female) ? "Female" : "Genderless"
+            )
+        ) : "???"));
 
     env.log("Navigating to Page 2 (POKEMON SKILLS)...");
     pbf_press_dpad(context, DPAD_RIGHT, 100ms, 100ms);

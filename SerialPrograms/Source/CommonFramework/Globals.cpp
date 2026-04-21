@@ -32,11 +32,11 @@ namespace PokemonAutomation{
 #endif
 
 #ifndef PA_VERSION_MINOR
-#define PA_VERSION_MINOR 62
+#define PA_VERSION_MINOR 63
 #endif
 
 #ifndef PA_VERSION_PATCH
-#define PA_VERSION_PATCH 9
+#define PA_VERSION_PATCH 8
 #endif
 
 const bool IS_BETA_VERSION = PA_IS_BETA;
@@ -218,6 +218,10 @@ const std::string& USER_FILE_PATH(){
 }
 const std::string& RESOURCE_PATH(){
     static std::string path = get_resource_path();
+    return path;
+}
+const std::string& DOWNLOADED_RESOURCE_PATH(){
+    static std::string path = RUNTIME_BASE_PATH() + "DownloadedResources/";
     return path;
 }
 const std::string& TRAINING_PATH(){

@@ -118,9 +118,56 @@ private:
 class BattleLearnDialogWatcher : public DetectorToFinder<BattleLearnDialogDetector>{
 public:
     BattleLearnDialogWatcher(Color color)
-        : DetectorToFinder("BattleLearnDialogDetector", std::chrono::milliseconds(250), color)
+        : DetectorToFinder("BattleLearnDialogWatcher", std::chrono::milliseconds(250), color)
     {}
 };
+
+class BattleOutOfPpDetector : public StaticScreenDetector{
+public:
+    BattleOutOfPpDetector(Color color);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+private:
+    ImageFloatBox m_box;
+    double m_area_ratio_threshold;
+};
+class BattleOutOfPpWatcher : public DetectorToFinder<BattleOutOfPpDetector>{
+public:
+    BattleOutOfPpWatcher(Color color)
+        : DetectorToFinder("BattleOutOfPpWatcher", std::chrono::milliseconds(250), color)
+    {}
+};
+
+enum class BattleLevelUpDialog{
+    plus,
+    stats,
+    either
+};
+
+class BattleLevelUpDetector : public StaticScreenDetector{
+public:
+    BattleLevelUpDetector(Color color, BattleLevelUpDialog dialog_type);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+private:
+    BattleLevelUpDialog dialog_type;
+    ImageFloatBox m_border_top_box;
+    ImageFloatBox m_border_right_box;
+    ImageFloatBox m_dialog_top_box;
+    ImageFloatBox m_dialog_right_box;
+    ImageFloatBox m_plus_box;
+};
+class BattleLevelUpWatcher : public DetectorToFinder<BattleLevelUpDetector>{
+public:
+    BattleLevelUpWatcher(Color color, BattleLevelUpDialog dialog_type)
+        : DetectorToFinder("BattleLevelUpWatcher", std::chrono::milliseconds(250), color, dialog_type)
+    {}
+};
+
 
 
 

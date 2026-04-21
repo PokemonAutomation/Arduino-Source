@@ -284,13 +284,13 @@ void ShinyHunt_HyperspaceHunter::use_shuttle_run(
                     ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
                     if (FORWARD_RUN_ROLL_TIME.get() == Milliseconds(0)){
                         pbf_move_left_joystick(context, {0, +1}, FORWARD_RUN_TIME, 0ms);
-                    } else{
+                    }else{
                         pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, {0, +1}, {0, 0}, FORWARD_RUN_ROLL_TIME);
                         pbf_controller_state(context, BUTTON_Y, DPAD_NONE, {0, +1}, {0, 0}, FORWARD_RUN_TIME.get() - FORWARD_RUN_ROLL_TIME.get());
                     }
                     if (BACKWARD_RUN_ROLL_TIME.get() == Milliseconds(0)){
                         pbf_move_left_joystick(context, {0, -1}, BACKWARD_RUN_TIME, 0ms);
-                    } else{
+                    }else{
                         pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, {0, -1}, {0, 0}, BACKWARD_RUN_ROLL_TIME);
                         pbf_controller_state(context, BUTTON_Y, DPAD_NONE, {0, -1}, {0, 0}, BACKWARD_RUN_TIME.get() - BACKWARD_RUN_ROLL_TIME.get());
                     }
@@ -317,7 +317,7 @@ void ShinyHunt_HyperspaceHunter::use_shuttle_run(
                     ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
                     if (FORWARD_RUN_ROLL_TIME.get() == Milliseconds(0)){
                         pbf_move_left_joystick(context, {0, +1}, FORWARD_RUN_TIME.get() + SHINY_CHECK_RUN_TIME.get(), 0ms);
-                    } else{
+                    }else{
                         pbf_controller_state(context, BUTTON_NONE, DPAD_NONE, {0, +1}, {0, 0}, FORWARD_RUN_ROLL_TIME);
                         const auto hold_time = FORWARD_RUN_TIME.get() + SHINY_CHECK_RUN_TIME.get() - FORWARD_RUN_ROLL_TIME.get();
                         pbf_controller_state(context, BUTTON_Y, DPAD_NONE, {0, +1}, {0, 0}, hold_time);

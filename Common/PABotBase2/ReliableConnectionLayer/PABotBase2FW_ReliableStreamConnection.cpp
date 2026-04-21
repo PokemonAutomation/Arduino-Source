@@ -27,7 +27,7 @@ namespace PABotBase2{
 ReliableStreamConnectionFW::ReliableStreamConnectionFW(UnreliableStreamConnectionPolling& unreliable_connection)
     : m_unreliable_connection(unreliable_connection)
     , m_reliable_sender(unreliable_connection, (uint8_t)(PABB2_MAX_INCOMING_PACKET_SIZE % 256))
-    , m_last_retransmit(pabb_current_time())
+    , m_last_retransmit(current_time())
 {}
 
 
@@ -36,15 +36,23 @@ void ReliableStreamConnectionFW::reliable_send(const void* data, size_t bytes){
     if (!m_stream_ready){
         return;
     }
-    const char* ptr = (const char*)data;
-    while (bytes > 0){
-        size_t sent = m_reliable_sender.send_stream(ptr, bytes);
-        ptr += sent;
-        bytes -= sent;
+
+    if (m_reliable_sender.send_stream_all_or_nothing(data, bytes)){
+        return;
     }
+
+    m_reliable_sender.declare_stream_corrupted();
+    m_reliable_sender.send_oob_packet_empty(0, PABB2_CONNECTION_OPCODE_INFO_STREAM_DEAD);
 }
 
 
+void ReliableStreamConnectionFW::send_oob_info_binary(const void* data, uint8_t bytes){
+    const size_t MAX_LENGTH = 256 - sizeof(PacketHeader) - sizeof(uint32_t);
+    m_reliable_sender.send_oob_packet_data(
+        0, PABB2_CONNECTION_OPCODE_INFO_BINARY,
+        (uint8_t)std::min<uint8_t>(bytes, MAX_LENGTH), data
+    );
+}
 void ReliableStreamConnectionFW::send_oob_info_str(const char* str){
     const size_t MAX_LENGTH = 256 - sizeof(PacketHeader) - sizeof(uint32_t);
     size_t len = strlen(str);
@@ -65,18 +73,23 @@ void ReliableStreamConnectionFW::send_oob_info_label_i32(uint8_t opcode, const c
 
 
 
-void ReliableStreamConnectionFW::wait_for_event(uint16_t milliseconds){
+void ReliableStreamConnectionFW::wait_for_event(WallDuration timeout){
     //  If we have unacked sends, we cap the wait time since those may need to
     //  be retransmitted.
-    if (m_reliable_sender.slots_used() != 0 && milliseconds > PABB2_ReliableConnectionFW_POLL_MS){
-        milliseconds = PABB2_ReliableConnectionFW_POLL_MS;
+
+    constexpr WallDuration POLL_RATE = milliseconds_to_duration(PABB2_ReliableConnectionFW_POLL_MS);
+
+    if (m_reliable_sender.slots_used() != 0 && timeout > POLL_RATE){
+        timeout = POLL_RATE;
     }
-    return m_unreliable_connection.wait_for_recv_available(milliseconds);
+    return m_unreliable_connection.wait_for_recv_available(timeout);
 }
 bool ReliableStreamConnectionFW::iterate_retransmits(){
-    WallClock now = pabb_current_time();
-    WallClock next_retransmit = m_last_retransmit + pabb_milliseconds(PABB2_ReliableConnectionFW_POLL_MS);
-    if (pabb_time_wrapsafe_cmplt(now, next_retransmit)){
+    constexpr WallDuration POLL_RATE = milliseconds_to_duration(PABB2_ReliableConnectionFW_POLL_MS);
+
+    WallClock now = current_time();
+    WallClock next_retransmit = m_last_retransmit + POLL_RATE;
+    if (wrapsafe_cmplt(now, next_retransmit)){
         return false;
     }
 
@@ -88,6 +101,8 @@ bool ReliableStreamConnectionFW::run_events(){
     if (packet == nullptr){
         return iterate_retransmits();
     }
+
+    m_packets_received++;
 
     //  Check the packet status.
     switch (packet->magic_number){

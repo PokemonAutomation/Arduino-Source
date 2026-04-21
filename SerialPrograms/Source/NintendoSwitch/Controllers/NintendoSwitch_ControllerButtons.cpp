@@ -149,7 +149,7 @@ const EnumStringMap<DpadPosition> DPAD_CODE_STRINGS{
 
 
 std::string dpad_to_string(DpadPosition dpad){
-    try {
+    try{
         return DPAD_STRINGS.get_string(dpad);
     }catch (ParseException&){
         return "unknown";

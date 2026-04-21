@@ -7,6 +7,7 @@
 #include <QKeyEvent>
 #include <QHBoxLayout>
 #include "Common/Qt/NoWheelComboBox.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Panels/ConsoleSettingsStretch.h"
 #include "Controllers/ControllerTypeStrings.h"
@@ -53,9 +54,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     //  Add all the supported interfaces.
     {
         m_interface_list.emplace_back(ControllerInterface::SerialPABotBase);
-        if (PreloadSettings::instance().DEVELOPER_MODE){
-            m_interface_list.emplace_back(ControllerInterface::SerialPABotBase2);
-        }
+        m_interface_list.emplace_back(ControllerInterface::SerialPABotBase2);
         m_interface_list.emplace_back(ControllerInterface::TcpSysbotBase);
 //        m_interface_list.emplace_back(ControllerInterface::UsbSysbotBase);
     }
@@ -69,7 +68,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
 
     auto current = session.descriptor();
     if (current == nullptr || current->interface_type == ControllerInterface::None){
-        current.reset(new SerialPABotBase::SerialPABotBase_Descriptor());
+        current.reset(new SerialPABotBase::SerialPABotBase2_Descriptor());
         session.set_device(std::move(current));
     }
     update_interface_dropdown(current->interface_type);

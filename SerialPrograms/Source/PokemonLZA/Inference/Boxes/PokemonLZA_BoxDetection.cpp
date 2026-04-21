@@ -437,7 +437,7 @@ void BoxDetector::move_cursor(
             if (current.col > col){
                 left_dist = current.col - col;
                 right_dist = col + 6 - current.col;
-            } else{
+            }else{
                 right_dist = col - current.col;
                 left_dist = current.col + 6 - col;
             }
@@ -448,12 +448,12 @@ void BoxDetector::move_cursor(
                 pbf_press_dpad(context, DPAD_RIGHT, 160ms, 240ms);
                 // cout << "move right" << endl;
             }
-        } else{ // move along y axis
+        }else{ // move along y axis
             uint8_t up_dist, down_dist;
             if (current.row > row){
                 up_dist = current.row - row;
                 down_dist = row + 6 - current.row;
-            } else{
+            }else{
                 down_dist = row - current.row;
                 up_dist = current.row + 6 - row;
             }
