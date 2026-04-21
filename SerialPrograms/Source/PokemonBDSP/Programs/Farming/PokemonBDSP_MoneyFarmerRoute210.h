@@ -17,6 +17,7 @@
 
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include <vector>
+#include <QSize>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -45,7 +46,7 @@ private:
     };
     // Run the battle loop. Returns the outcome of the battle attempt.
     BattleOutcome battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t pp0[4], uint8_t pp1[4],
-        const std::vector<ImagePixelBox>& bubbles
+        const std::vector<ImagePixelBox>& bubbles, const QSize& img_dims
     );
     // Check for items generated through the Pickup ability
     void check_pickup_items(
@@ -57,7 +58,8 @@ private:
     void move_to_trainer(
         SingleSwitchProgramEnvironment& env,
         ProControllerContext& context,
-        const std::vector<ImagePixelBox>& bubbles
+        const std::vector<ImagePixelBox>& bubbles,
+        const QSize& img_dims
     );
     void recover_from_failed_battle_start(
         SingleSwitchProgramEnvironment& env, 

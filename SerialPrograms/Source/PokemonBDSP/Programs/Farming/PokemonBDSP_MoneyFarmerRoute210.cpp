@@ -142,7 +142,7 @@ MoneyFarmerRoute210::MoneyFarmerRoute210()
 
 MoneyFarmerRoute210::BattleOutcome MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     uint8_t pp0[4], uint8_t pp1[4],
-    const std::vector<ImagePixelBox>& bubbles){
+    const std::vector<ImagePixelBox>& bubbles, const QSize& img_dims){
     MoneyFarmerRoute210_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute210_Descriptor::Stats>();
 
     env.log("Starting battle!");
@@ -151,8 +151,8 @@ MoneyFarmerRoute210::BattleOutcome MoneyFarmerRoute210::battle(SingleSwitchProgr
         StartBattleDetector detector(env.console);
         int ret = run_until<ProControllerContext>(
             env.console, context,
-            [this, &env, &bubbles](ProControllerContext& context){
-                move_to_trainer(env, context, bubbles);
+            [this, &env, &bubbles, &img_dims](ProControllerContext& context){
+                move_to_trainer(env, context, bubbles, img_dims);
                 pbf_press_button(context, BUTTON_ZL, 80ms, 80ms);
                 for (size_t c = 0; c < 17; c++){
                     pbf_press_dpad(context, DPAD_UP, 40ms, 80ms);
@@ -279,28 +279,41 @@ MoneyFarmerRoute210::BattleOutcome MoneyFarmerRoute210::battle(SingleSwitchProgr
     );
 }
 
-void MoneyFarmerRoute210::move_to_trainer(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::vector<ImagePixelBox>& bubbles
-                                          ){
-    
+void MoneyFarmerRoute210::move_to_trainer(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+                                          const std::vector<ImagePixelBox>& bubbles, const QSize& img_dims){
+
+    const double inv_w = 1.0 / img_dims.width();
+    const double inv_h = 1.0 / img_dims.height();
+    const double player_rel_x = 540.0 * inv_w;
+    const double player_rel_y = 163.0 * inv_h;
+
+    // Offsets from original pixel calibration: 350-540=-190, 450-540=-90, 560-540=+20, 110-163=-53
+    const double FAR_LEFT_DX = -190.0 * inv_w;
+    const double LEFT_DX     =  -90.0 * inv_w;
+    const double RIGHT_DX    =   20.0 * inv_w;
+    const double ABOVE_DY    =  -53.0 * inv_h;
+
     const ImagePixelBox* closest = nullptr;
     double best_dist_sq = std::numeric_limits<double>::max();
-    
-    // Calculate the distance between the character and the closest box
+
     for (const auto& box : bubbles) {
-        double dx = box.min_x - 540.0;
-        double dy = box.min_y - 163.0;
+        double dx = box.min_x * inv_w - player_rel_x;
+        double dy = box.min_y * inv_h - player_rel_y;
         double dist_sq = dx*dx + dy*dy;
-        
+
         if (dist_sq < best_dist_sq) {
             best_dist_sq = dist_sq;
             closest = &box;
         }
     }
-    
+
     if (!closest) return;
-    
-    if (closest->min_x < 350) {
-        // The trainer who wants to battle is to the far-left, behind the other trainer
+
+    const double dx = closest->min_x * inv_w - player_rel_x;
+    const double dy = closest->min_y * inv_h - player_rel_y;
+
+    if (dx < FAR_LEFT_DX) {
+        // Trainer is far-left, behind the other trainer
         pbf_press_dpad(context, DPAD_UP, 400ms, 0ms);
         pbf_press_dpad(context, DPAD_LEFT, 500ms, 0ms);
         pbf_mash_button(context, BUTTON_A, 1000ms);
@@ -308,27 +321,26 @@ void MoneyFarmerRoute210::move_to_trainer(SingleSwitchProgramEnvironment& env, P
         pbf_press_dpad(context, DPAD_DOWN, 400ms, 0ms);
         pbf_mash_button(context, BUTTON_A, 1000ms);
         context.wait_for_all_requests();
-    } else if (closest->min_x < 450) {
-        // The trainer who wants to battle is on the character's left
-        if (closest->min_y < 110) {
-            // The trainer who wants to battle is one step above us
+    } else if (dx < LEFT_DX) {
+        // Trainer is to the left
+        if (dy < ABOVE_DY) {
+            // Also one step above
             pbf_press_dpad(context, DPAD_UP, 400ms, 0ms);
             pbf_press_dpad(context, DPAD_LEFT, 400ms, 0ms);
             context.wait_for_all_requests();
         } else {
-            // The trainer who wants to battle is on our left, right next to us
             pbf_press_dpad(context, DPAD_LEFT, 400ms, 0ms);
         }
-    } else if (closest->min_x < 560) {
-        // The trainer who wants to battle is right above us
+    } else if (dx < RIGHT_DX) {
+        // Trainer is directly above
         pbf_press_dpad(context, DPAD_UP, 400ms, 0ms);
     } else {
-        // The trainer who wants to battle is above us, one step to our right
+        // Trainer is above and one step to the right
         pbf_press_dpad(context, DPAD_RIGHT, 400ms, 0ms);
         pbf_press_dpad(context, DPAD_UP, 400ms, 0ms);
         context.wait_for_all_requests();
     }
-    
+
     pbf_mash_button(context, BUTTON_A, 1000ms);
     context.wait_for_all_requests();
 }
@@ -566,6 +578,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
         context.wait_for_all_requests();
         stats.m_searches++;
 
+        QSize img_dims;
         std::vector<ImagePixelBox> bubbles;
         {
             VSSeekerReactionTracker tracker(env.console, {0.20, 0.20, 0.60, 0.60});
@@ -579,6 +592,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
             need_to_charge = true;
             pbf_mash_button(context, BUTTON_B, 2000ms);
 
+            img_dims = tracker.dimensions();
             bubbles = tracker.reactions();
             if (bubbles.empty()){
                 env.log("No reactions.", COLOR_ORANGE);
@@ -592,7 +606,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProContro
         }
 
         // Attempt the battle
-        BattleOutcome outcome = battle(env, context, pp0, pp1, bubbles);
+        BattleOutcome outcome = battle(env, context, pp0, pp1, bubbles, img_dims);
         if (outcome == BattleOutcome::FAILED_START) {
             consecutive_failures++;
             if (consecutive_failures > 3) {
