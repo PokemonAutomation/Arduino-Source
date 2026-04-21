@@ -88,15 +88,21 @@ LuckyEggFarmer::LuckyEggFarmer()
     , STOP_AFTER_CURRENT("Reset")
     , TAKE_VIDEO("<b>Take Video:</b><br>Record a video when the shiny is found.", LockMode::UNLOCK_WHILE_RUNNING, true)
     , GO_HOME_WHEN_DONE(false)
+    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATION_LUCKY_EGG(
+        "Lucky Egg Found",
+        true, true, ImageAttachmentMode::JPG,
+        { "Notifs", "Showcase" }
+    )
     , NOTIFICATION_SHINY(
         "Shiny found",
         true, true, ImageAttachmentMode::JPG,
         { "Notifs", "Showcase" }
     )
-    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
-        &NOTIFICATION_SHINY,
         &NOTIFICATION_STATUS_UPDATE,
+        &NOTIFICATION_LUCKY_EGG,
+        &NOTIFICATION_SHINY,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
     })
@@ -114,7 +120,7 @@ bool LuckyEggFarmer::navigate_to_chansey(ConsoleHandle& console, ProControllerCo
 
     int ret = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             ssf_press_button(context, BUTTON_B, 0ms, 4045ms);
             pbf_press_dpad(context, DPAD_UP, 100ms, 0ms);
             pbf_press_dpad(context, DPAD_RIGHT, 1966ms, 0ms);
@@ -152,7 +158,7 @@ bool LuckyEggFarmer::navigate_to_chansey(ConsoleHandle& console, ProControllerCo
 
     ret = run_until<ProControllerContext>(
         console, context,
-        [](ProControllerContext& context) {
+        [](ProControllerContext& context){
             ssf_press_button(context, BUTTON_B, 0ms, 143005ms);
             pbf_press_dpad(context, DPAD_RIGHT, 1600ms, 0ms);
             pbf_press_dpad(context, DPAD_DOWN, 100ms, 0ms);
@@ -219,7 +225,7 @@ void LuckyEggFarmer::swap_lead_pokemon(ConsoleHandle& console, ProControllerCont
     context.wait_for_all_requests();
 }
 
-bool LuckyEggFarmer::find_encounter(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+bool LuckyEggFarmer::find_encounter(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ssf_press_button(context, BUTTON_B, 0ms, 400ms);
     pbf_press_dpad(context, DPAD_RIGHT, 400ms, 0ms);
     pbf_wait(context, 100ms);
@@ -231,32 +237,31 @@ bool LuckyEggFarmer::find_encounter(SingleSwitchProgramEnvironment& env, ProCont
     // This could be removed if spin in place stops drifting.
     AdvanceWhiteDialogWatcher out_of_steps(COLOR_RED);
 
-    while (true) {
+    while (true){
         int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](ProControllerContext& context) {
+            [](ProControllerContext& context){
                 pbf_move_left_joystick(context, { +1, 0 }, 50ms, 150ms);
                 context.wait_for_all_requests();
                 pbf_move_left_joystick(context, { -1, 0 }, 33ms, 150ms);
                 context.wait_for_all_requests();
             },
-            { battle_entered, out_of_steps, battle_dialog }
+            { battle_entered, battle_dialog, out_of_steps }
         );
 
         pbf_wait(context, 100ms);
         context.wait_for_all_requests();
 
-        if (ret == 0 || ret == 2) {
+        switch (ret){
+        case 0:
+        case 1:
             env.log("Battle entered.");
             return true;
-        }
-        else if (ret == 1) {
+        case 2:
             env.log("Out of steps dialog detected. Resetting...");
             return false;
         }
     }
-
-    return false;
 }
 
 bool LuckyEggFarmer::is_chansey(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -271,7 +276,7 @@ bool LuckyEggFarmer::is_chansey(SingleSwitchProgramEnvironment& env, ProControll
     PokemonFRLG_WildEncounter encounter = reader.read_encounter(env.logger(), LANGUAGE, screen, subset);
     env.log("Name: " + encounter.name);
 
-    if (encounter.name != "chansey") {
+    if (encounter.name != "chansey"){
         env.log("Not a Chansey. Fleeing...");
         flee_battle(env.console, context);
         context.wait_for_all_requests();
@@ -283,7 +288,7 @@ bool LuckyEggFarmer::is_chansey(SingleSwitchProgramEnvironment& env, ProControll
     }
 }
 
-bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int& balls_left) {
+bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int& balls_left){
     //TODO: Optimal bait/ball throwing
 
     while (true)
@@ -311,7 +316,7 @@ bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProContr
         WallClock start = current_time();
         while (true)
         {
-            if (current_time() - start > std::chrono::seconds(20)) {
+            if (current_time() - start > std::chrono::seconds(20)){
                 env.log("No battle activity detected for 20 seconds. Assuming battle ended and in the overworld.");
 
                 //Check for safari zone building dialog?
@@ -327,7 +332,7 @@ bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProContr
 
             context.wait_for_all_requests();
 
-            if (ret == 0 || ret == 3) {
+            if (ret == 0 || ret == 3){
                 env.log("Caught a Chansey!");
 
                 while (true)
@@ -338,12 +343,12 @@ bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProContr
                         { nickname_question_arrow, advance_battle_dialog, pokedex_registered, in_safari_zone_building }
                     );
 
-                    if (ret2 == 0 || ret2 == 3) {
+                    if (ret2 == 0 || ret2 == 3){
                         pbf_mash_button(context, BUTTON_B, 2000ms);
                         context.wait_for_all_requests();
                         break;
                     }
-                    else if (ret2 == 1 || ret2 == 2) {
+                    else if (ret2 == 1 || ret2 == 2){
                         pbf_press_button(context, BUTTON_B, 200ms, 0ms);
                         context.wait_for_all_requests();
                     }
@@ -353,14 +358,14 @@ bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProContr
                 context.wait_for_all_requests();
                 return true;
             }
-            else if (ret == 1) {
+            else if (ret == 1){
                 balls_left--;
                 env.log("Detected battle arrow. Balls left: " + std::to_string(balls_left));
                 pbf_press_button(context, BUTTON_A, 200ms, 200ms);
                 context.wait_for_all_requests();
                 break;
             }
-            else if (ret == 2) {
+            else if (ret == 2){
                 env.log("Failed to catch Chansey.");
                 pbf_wait(context, 1000ms);
                 context.wait_for_all_requests();
@@ -370,8 +375,8 @@ bool LuckyEggFarmer::attempt_catch(SingleSwitchProgramEnvironment& env, ProContr
     }
 }
 
-bool LuckyEggFarmer::check_for_lucky_egg(ConsoleHandle& console, ProControllerContext& context, bool returned_to_building) {
-    if (returned_to_building) {
+bool LuckyEggFarmer::check_for_lucky_egg(ConsoleHandle& console, ProControllerContext& context, bool returned_to_building){
+    if (returned_to_building){
         open_party_menu_from_overworld(console, context, StartMenuContext::STANDARD);
     } 
     else {
@@ -379,27 +384,27 @@ bool LuckyEggFarmer::check_for_lucky_egg(ConsoleHandle& console, ProControllerCo
     }
 
     PartyHeldItemDetector held_item_detector(COLOR_RED, &console.overlay(), ImageFloatBox(0.432, 0.3, 0.030, 0.485));
-    if (held_item_detector.detect(console.video().snapshot())) {
+    if (held_item_detector.detect(console.video().snapshot())){
         return true;
     }
 
     return false;
 }
 
-bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     LuckyEggFarmer_Descriptor::Stats& stats = env.current_stats<LuckyEggFarmer_Descriptor::Stats>();
 
     int chancy_count = 0;
     int balls_left = 30;
 
-    while (chancy_count < 4) {
-        if (!find_encounter(env, context)) {
+    while (chancy_count < 4){
+        if (!find_encounter(env, context)){
             return false;
         }
 
         bool encounter_shiny = handle_encounter(env.console, context, true);
         stats.encounters++;
-        if (encounter_shiny) {
+        if (encounter_shiny){
             stats.shinies++;
             env.update_stats();
             send_program_notification(
@@ -411,7 +416,7 @@ bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProCon
                 env.console.video().snapshot(),
                 true
             );
-            if (TAKE_VIDEO) {
+            if (TAKE_VIDEO){
                 pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
             }
             return true;
@@ -419,7 +424,7 @@ bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProCon
             env.update_stats();
         }
 
-        if (!is_chansey(env, context)) {
+        if (!is_chansey(env, context)){
             continue;
         }
         stats.chanseys_found++;
@@ -427,7 +432,7 @@ bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProCon
 
         bool caught = attempt_catch(env, context, balls_left);
 
-        if (caught) {
+        if (caught){
             stats.chanseys_caught++;
             env.update_stats();
             chancy_count++;
@@ -439,28 +444,28 @@ bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProCon
         WhiteDialogDetector dialog(COLOR_RED);
         bool in_safari_zone_building = dialog.detect(env.console.video().snapshot());
 
-        if (balls_left <= 0) {
+        if (balls_left <= 0){
             in_safari_zone_building = true;
         }
 
-        if (in_safari_zone_building && !caught) {
+        if (in_safari_zone_building && !caught){
             return false;
         }
 
-        if (in_safari_zone_building) {
+        if (in_safari_zone_building){
             pbf_mash_button(context, BUTTON_B, 500ms);
             context.wait_for_all_requests();
         }
 
-        if (caught) {
-            if (check_for_lucky_egg(env.console, context, in_safari_zone_building)) {
+        if (caught){
+            if (check_for_lucky_egg(env.console, context, in_safari_zone_building)){
                 env.log("Lucky Egg found!");
                 stats.eggs++;
                 env.update_stats();
                 send_program_notification(
                     env,
-                    NOTIFICATION_PROGRAM_FINISH,
-                    COLOR_YELLOW,
+                    NOTIFICATION_LUCKY_EGG,
+                    Color(0xffffc0cb),
                     "Lucky Egg found!",
                     {}, "",
                     env.console.video().snapshot(),
@@ -473,7 +478,7 @@ bool LuckyEggFarmer::run_safari_zone(SingleSwitchProgramEnvironment& env, ProCon
             context.wait_for_all_requests();
         }
 
-        if (balls_left <= 0) {
+        if (balls_left <= 0){
             env.log("Out of Safari balls. Resetting...");
             return false;
         }
@@ -499,18 +504,18 @@ void LuckyEggFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
             int ret = run_until<ProControllerContext>(
                 env.console, context,
-                [](ProControllerContext& context) {
+                [](ProControllerContext& context){
                     pbf_press_button(context, BUTTON_A, 200ms, 200ms);
                 },
                 { safari_zone_exit }
             );
 
-            if (ret == 0) {
+            if (ret == 0){
                 break;
             }
         }
 
-        while (true) {
+        while (true){
             BlackScreenOverWatcher overworld_entered(COLOR_RED);
 
             int ret = wait_until(
@@ -519,7 +524,7 @@ void LuckyEggFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
                 { overworld_entered }
             );
 
-            if (ret == 0) {
+            if (ret == 0){
                 break;
             }
         }
@@ -536,7 +541,7 @@ void LuckyEggFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
         swap_lead_pokemon(env.console, context);
 
-        if (run_safari_zone(env, context)) {
+        if (run_safari_zone(env, context)){
             GO_HOME_WHEN_DONE.run_end_of_program(context);
             return; // Already sent notification in run_safari_zone if shiny or lucky egg found.
         }
