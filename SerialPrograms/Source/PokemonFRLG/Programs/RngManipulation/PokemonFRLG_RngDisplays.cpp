@@ -17,12 +17,12 @@ using namespace Pokemon;
 
 RngFilterDisplay::RngFilterDisplay()
     : GroupOption("Observed Stats", LockMode::READ_ONLY)
-    , hp(false, "<b>HP:</b>", LockMode::READ_ONLY, "-", "")
-    , atk(false, "<b>Attack:</b>", LockMode::READ_ONLY, "-", "")
-    , def(false, "<b>Defense:</b>", LockMode::READ_ONLY, "-", "")
-    , spatk(false, "<b>Special Attack:</b>", LockMode::READ_ONLY, "-", "")
-    , spdef(false, "<b>Special Defense:</b>", LockMode::READ_ONLY, "-", "")
-    , speed(false, "<b>Speed:</b>", LockMode::READ_ONLY, "-", "")
+    , hp(false, "<b>HP IV:</b>", LockMode::READ_ONLY, "-", "")
+    , atk(false, "<b>Attack IV:</b>", LockMode::READ_ONLY, "-", "")
+    , def(false, "<b>Defense IV:</b>", LockMode::READ_ONLY, "-", "")
+    , spatk(false, "<b>Special Attack IV:</b>", LockMode::READ_ONLY, "-", "")
+    , spdef(false, "<b>Special Defense IV:</b>", LockMode::READ_ONLY, "-", "")
+    , speed(false, "<b>Speed IV:</b>", LockMode::READ_ONLY, "-", "")
     , gender(false, "<b>Gender:</b>", LockMode::READ_ONLY, "-", "")
     , nature(false, "<b>Nature:</b>", LockMode::READ_ONLY, "-", "")
 {
@@ -122,13 +122,22 @@ void RngFilterDisplay::set(const AdvRngFilters& filter){
     nature.set(get_nature_string(filter.nature));
 }
 
+void RngFilterDisplay::reset(){
+    hp.set("-");
+    atk.set("-");
+    def.set("-");
+    spatk.set("-");
+    spdef.set("-");
+    speed.set("-");
+    gender.set("-");
+    nature.set("-");
+}
+
 PossibleHitsDisplay::PossibleHitsDisplay()
     : GroupOption("Possible Hits", LockMode::READ_ONLY)
-    , seeds(false, "<b>Seeds:</b>", LockMode::READ_ONLY, "-", "")
-    , advances(false, "<b>Advances:</b>", LockMode::READ_ONLY, "-", "")
+    , hits(false, "<b>Seeds/Advances:</b>", LockMode::READ_ONLY, "-", "")
 {
-    PA_ADD_STATIC(seeds);
-    PA_ADD_STATIC(advances);
+    PA_ADD_STATIC(hits);
 }
 
 std::vector<AdvRngState> PossibleHitsDisplay::get_rng_states_from_map(std::map<AdvRngState,AdvPokemonResult>& hits_map){
@@ -139,46 +148,36 @@ std::vector<AdvRngState> PossibleHitsDisplay::get_rng_states_from_map(std::map<A
     return rng_states;
 }
 
-std::string PossibleHitsDisplay::get_seeds_string(const std::vector<AdvRngState>& rng_states){
-    std::string seeds_string;
+std::string PossibleHitsDisplay::get_hits_string(const std::vector<AdvRngState>& rng_states){
+    std::string hits_string;
     for (size_t i=0; i<rng_states.size(); i++){
         if (i > 0){
-            seeds_string += ", ";
+            hits_string += ", ";
         }
-        uint16_t seed = rng_states[i].seed;
+        AdvRngState hit = rng_states[i];
+        uint16_t seed = hit.seed;
         std::ostringstream s;
         s << std::hex << seed;
-        seeds_string += s.str();
+        hits_string += s.str();
+        hits_string += "/";
+        hits_string += std::to_string(hit.advance);
     }
-    return seeds_string;
+    return hits_string;
 }
-std::string PossibleHitsDisplay::get_seeds_string(std::map<AdvRngState, AdvPokemonResult>& hits_map){
-    return get_seeds_string(get_rng_states_from_map(hits_map));
-}
-
-std::string PossibleHitsDisplay::get_advances_string(const std::vector<AdvRngState>& rng_states){
-    std::string advances_string;
-    for (size_t i=0; i<rng_states.size(); i++){
-        if (i > 0){
-            advances_string += ", ";
-        }
-        uint64_t adv = rng_states[i].advance;
-        advances_string += std::to_string(adv);
-    }
-    return advances_string;
-}
-std::string PossibleHitsDisplay::get_advances_string(std::map<AdvRngState, AdvPokemonResult>& hits_map){
-    return get_advances_string(get_rng_states_from_map(hits_map));
+std::string PossibleHitsDisplay::get_hits_string(std::map<AdvRngState, AdvPokemonResult>& hits_map){
+    return get_hits_string(get_rng_states_from_map(hits_map));
 }
 
 void PossibleHitsDisplay::set(const std::vector<AdvRngState>& rng_states){
-    seeds.set(get_seeds_string(rng_states));
-    advances.set(get_advances_string(rng_states));
+    hits.set(get_hits_string(rng_states));
 }
 void PossibleHitsDisplay::set(std::map<AdvRngState, AdvPokemonResult>& hits_map){
     std::vector<AdvRngState> rng_states = get_rng_states_from_map(hits_map);
-    seeds.set(get_seeds_string(rng_states));
-    advances.set(get_advances_string(rng_states));
+    set(rng_states);
+}
+
+void PossibleHitsDisplay::reset(){
+    hits.set("-");
 }
 
 }

@@ -160,34 +160,34 @@ bool check_for_match(AdvPokemonResult res, AdvRngFilters target, uint16_t tid_xo
 
 
 
-AdvRng::AdvRng(uint16_t seed, AdvRngState state)
+AdvRngSearcher::AdvRngSearcher(uint16_t seed, AdvRngState state)
     : seed(seed)
     , state(state)
 {}
 
-AdvRng::AdvRng(uint16_t seed, uint64_t min_advances, AdvRngMethod method)
+AdvRngSearcher::AdvRngSearcher(uint16_t seed, uint64_t min_advances, AdvRngMethod method)
     : seed(seed)
     , state(rngstate_from_seed(seed, min_advances, method))
 {}
 
-void AdvRng::advance_state(){
+void AdvRngSearcher::advance_state(){
     advance_rng_state(state);
 }
 
-void AdvRng::set_seed(uint16_t newseed){
+void AdvRngSearcher::set_seed(uint16_t newseed){
     seed = newseed;
     state = rngstate_from_seed(seed, 0, state.method);
 }
 
-void AdvRng::set_state_advances(uint64_t advances){
+void AdvRngSearcher::set_state_advances(uint64_t advances){
     state = rngstate_from_seed(seed, advances, state.method);
 }
 
-AdvPokemonResult AdvRng::generate_pokemon(){
+AdvPokemonResult AdvRngSearcher::generate_pokemon(){
     return pokemon_from_state(state);
 }
 
-void AdvRng::search_advance_range(
+void AdvRngSearcher::search_advance_range(
     std::map<AdvRngState, AdvPokemonResult>& hits,
     AdvRngFilters& target,
     uint64_t min_advances,
@@ -229,7 +229,7 @@ void AdvRng::search_advance_range(
     }
 }
 
-std::map<AdvRngState, AdvPokemonResult> AdvRng::search(
+std::map<AdvRngState, AdvPokemonResult> AdvRngSearcher::search(
     AdvRngFilters& target,
     const std::vector<uint16_t>& seeds,
     uint64_t min_advances,
@@ -366,7 +366,7 @@ void shrink_iv_ranges(IvRanges& mutated_ranges, IvRanges& fixed_ranges){
     shrink_iv_range(mutated_ranges.speed,   fixed_ranges.speed);
 }
 
-AdvRngFilters observation_to_filter(AdvObservedPokemon& observation, BaseStats& basestats, AdvRngMethod method){
+AdvRngFilters observation_to_filters(AdvObservedPokemon& observation, BaseStats& basestats, AdvRngMethod method){
     IvRanges filter_iv_ranges = {{0,31},{0,31},{0,31},{0,31},{0,31},{0,31}};
     for (size_t i=0; i<observation.level.size(); i++){
         uint8_t lv = observation.level[i];

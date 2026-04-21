@@ -16,6 +16,7 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Pokemon/Pokemon_StatsCalculation.h"
+#include "Pokemon/Pokemon_AdvRng.h"
 #include "PokemonFRLG_RngDisplays.h"
 
 namespace PokemonAutomation{
@@ -45,19 +46,57 @@ private:
         charmander
     };
 
+    struct StarterRngCalibrationHistory{
+        std::vector<double> seed_calibrations;
+        std::vector<double> advance_calibrations;
+        std::vector<AdvRngState> results;
+    };
+
+    bool have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t TARGET_SEED, AdvRngState& hit);
+
     AdvObservedPokemon read_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
-    void update_filter_display(AdvRngFilters& filters);
-    void update_search_results(std::map<AdvRngState, AdvPokemonResult>& possible_hits);
+    AdvRngFilters update_filters(AdvObservedPokemon& pokemon, StatReads& stats, EVs& evyield, BaseStats& BASE_STATS);
+    std::map<AdvRngState, AdvPokemonResult> get_starter_search_results(
+        SingleSwitchProgramEnvironment& env,
+        AdvRngSearcher& searcher, 
+        AdvRngFilters& filters,
+        const std::vector<uint16_t>& SEED_VALUES,
+        const uint64_t& ADVANCES, 
+        uint64_t& advances_radius, 
+        AdvObservedPokemon& pokemon
+    );
+    double get_seed_calibration_frames(
+        StarterRngCalibrationHistory& HISTORY, 
+        const std::vector<uint16_t>& SEED_VALUES, 
+        const int16_t& SEED_POSITION
+    );
+    double get_advances_calibration_frames(StarterRngCalibrationHistory& HISTORY, uint64_t ADVANCES);
+    bool update_calibration_history(
+        SingleSwitchProgramEnvironment& env,
+        StarterRngCalibrationHistory& HISTORY, 
+        const uint16_t& MAX_HISTORY_LENGTH,
+        double& SEED_CALIBRATION_FRAMES,
+        double& ADVANCES_CALIBRATION,
+        std::map<AdvRngState, AdvPokemonResult>& search_hits
+    );
 
-    void walk_to_rival_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Starter STARTER);
-    void auto_battle_rival(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AdvObservedPokemon& pokemon);
+    bool walk_to_rival_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    bool auto_battle_rival(
+        SingleSwitchProgramEnvironment& env, 
+        ProControllerContext& context, 
+        AdvObservedPokemon& pokemon,
+        BaseStats& BASE_STATS
+    );
 
-    void walk_to_route1_from_lab(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    void walk_home_from_route1(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    void heal_at_home(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    void walk_to_route1_from_home(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    bool autolevel_on_route1(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AdvObservedPokemon& pokemon);
+    bool walk_to_route1_from_lab(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    bool walk_to_route1_from_home(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    int autolevel_on_route1(
+        SingleSwitchProgramEnvironment& env, 
+        ProControllerContext& context, 
+        AdvObservedPokemon& pokemon,
+        BaseStats& BASE_STATS
+    );
 
     
     OCR::LanguageOCROption LANGUAGE;
@@ -78,6 +117,8 @@ private:
     SimpleIntegerOption<uint64_t>CONTINUE_SCREEN_FRAMES;
 
     BooleanCheckBoxOption USE_COPYRIGHT_TEXT;
+
+    BooleanCheckBoxOption IGNORE_WILD_SHINIES;
 
     SimpleIntegerOption<uint8_t> PROFILE;
 

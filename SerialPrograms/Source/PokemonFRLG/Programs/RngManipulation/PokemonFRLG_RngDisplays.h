@@ -25,6 +25,7 @@ public:
     RngFilterDisplay();
 
     void set(const AdvRngFilters& filter);
+    void reset();
 
 private:
     static std::string get_range_string(const IvRange& range);
@@ -49,16 +50,14 @@ public:
 
     void set(const std::vector<AdvRngState>& rng_states);
     void set(std::map<AdvRngState, AdvPokemonResult>& hits_map);
+    void reset();
 
 private:
     static std::vector<AdvRngState> get_rng_states_from_map(std::map<AdvRngState, AdvPokemonResult>& hits_map);
-    static std::string get_seeds_string(const std::vector<AdvRngState>& rng_states);
-    static std::string get_seeds_string(std::map<AdvRngState, AdvPokemonResult>& hits_map);
-    static std::string get_advances_string(const std::vector<AdvRngState>& rng_states); 
-    static std::string get_advances_string(std::map<AdvRngState, AdvPokemonResult>& hits_map);
+    static std::string get_hits_string(const std::vector<AdvRngState>& rng_states);
+    static std::string get_hits_string(std::map<AdvRngState, AdvPokemonResult>& hits_map);
 public:
-    StringOption seeds;
-    StringOption advances;
+    StringOption hits;
 };
 
 }

@@ -133,15 +133,15 @@ struct AdvRngFilters{
 void level_up_observed_pokemon(AdvObservedPokemon& pokemon, StatReads& newstats, EVs& evyield);
 
 // returns search filters that correspond with observed stats
-AdvRngFilters observation_to_filter(AdvObservedPokemon& observation, BaseStats& basestats, AdvRngMethod method = AdvRngMethod::Method1);
+AdvRngFilters observation_to_filters(AdvObservedPokemon& observation, BaseStats& basestats, AdvRngMethod method = AdvRngMethod::Method1);
 
-class AdvRng{
+class AdvRngSearcher{
 public:
     uint16_t seed;
     AdvRngState state;
 
-    AdvRng(uint16_t seed, AdvRngState state);
-    AdvRng(uint16_t seed, uint64_t min_advances, AdvRngMethod method = AdvRngMethod::Method1);
+    AdvRngSearcher(uint16_t seed, AdvRngState state);
+    AdvRngSearcher(uint16_t seed, uint64_t min_advances, AdvRngMethod method = AdvRngMethod::Method1);
 
     void set_seed(uint16_t seed);
     void set_state_advances(uint64_t advances);
