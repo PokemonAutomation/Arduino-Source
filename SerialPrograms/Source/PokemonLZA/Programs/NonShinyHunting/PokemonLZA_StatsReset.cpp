@@ -460,7 +460,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     overworld,
                     battle_menu
                 }
-                );
+            );
             switch (result){
             case 0:
                 env.log(STRING_POKEMON + " dialog finished.", COLOR_PURPLE);
