@@ -112,22 +112,25 @@ Keyboard::~Keyboard(){
 
 
 void Keyboard::run_controller_input(const ControllerInputState& state){
-
     if (state.type() != ControllerInputType::HID_Keyboard){
         return;
     }
 
     const KeyboardInputState& lstate = static_cast<const KeyboardInputState&>(state);
 
-    replace_on_next_command();
-
-//    WallClock timestamp = current_time();
-
-    issue_keys(
-        nullptr,
-        2000ms, 2000ms, 0ms,
-        std::vector<KeyboardKey>(lstate.keys().begin(), lstate.keys().end())
-    );
+//    WallClock timestamp;
+    if (lstate.is_neutral()){
+//        timestamp = current_time();
+        cancel_all_commands();
+    }else{
+        replace_on_next_command(nullptr);
+//        timestamp = current_time();
+        issue_keys(
+            nullptr,
+            2000ms, 2000ms, 0ms,
+            std::vector<KeyboardKey>(lstate.keys().begin(), lstate.keys().end())
+        );
+    }
 
 //    on_command_input(timestamp, controller_state);
 }

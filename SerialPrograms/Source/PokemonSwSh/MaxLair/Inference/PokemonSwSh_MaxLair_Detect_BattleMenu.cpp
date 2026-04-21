@@ -13,8 +13,8 @@
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/ColorClustering.h"
 #include "Pokemon/Inference/Pokemon_ReadHpBar.h"
+#include "Pokemon/Inference/Pokemon_TypeReader.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh_MaxLair_Detect_HPPP.h"
@@ -263,7 +263,12 @@ std::set<std::string> BattleMenuReader::read_opponent_in_summary(Logger& logger,
     PokemonType type0, type1;
     {
         ImageViewRGB32 types = extract_box_reference(screen, m_summary_opponent_types);
-        std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_type_symbols(screen, types, 0.2);
+        std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_type_symbols(
+            screen, 
+            types, 
+            0.2, 
+            PokemonTypeGeneration::GEN8
+        );
 
         std::string type_str = "Type Read Result:\n";
         for (const auto& item : candidates){

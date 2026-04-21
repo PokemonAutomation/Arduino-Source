@@ -185,7 +185,7 @@ void LabelImages::init_sam_session(bool use_gpu){
     const std::string sam_model_path = RESOURCE_PATH() + "ML/sam_cpu.onnx";
     if (Filesystem::exists(sam_model_path)){
         m_sam_session = std::make_unique<SAMSession>(sam_model_path, use_gpu);
-    } else{
+    }else{
         std::cerr << "Error: no such SAM model path " << sam_model_path << "." << std::endl;
         QMessageBox box;
         box.critical(nullptr, "SAM Model Does Not Exist",
@@ -264,7 +264,7 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
     if (json_obj == nullptr){
         // legacy format, load as an array
         json_array = loaded_json.to_array();
-    } else{
+    }else{
         json_array = json_obj->get_array("ANNOTATION");
     }
     if (json_array == nullptr){
@@ -279,7 +279,7 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
         try{
             ObjectAnnotation anno_obj = ObjectAnnotation::from_json((*json_array)[i]);
             m_annotations.emplace_back(std::move(anno_obj));
-        } catch(JsonParseException&){
+        }catch (JsonParseException&){
             m_fail_to_load_annotation_file = true;
             QMessageBox box;
             box.warning(nullptr, "Unable to Load Annotation",
@@ -376,7 +376,7 @@ bool LabelImages::run_sam_to_create_annotation(
                 m_output_boolean_mask
             );
             break;
-        }catch(Ort::Exception& e){
+        }catch (Ort::Exception& e){
             if (m_use_gpu_for_sam_anno){
                 std::cerr << "Warning: SAM session failed using the GPU. Will reattempt with the CPU.\n" << e.what() << std::endl;
                 m_use_gpu_for_sam_anno = false;
@@ -388,7 +388,7 @@ bool LabelImages::run_sam_to_create_annotation(
                     QString::fromStdString("Error: SAM session failed."));
                 return false;
             }
-        }catch(...){
+        }catch (...){
             std::cerr << "Error: Unknown error." << std::endl;
             QMessageBox box;
             box.warning(nullptr, "Error:",
@@ -529,7 +529,7 @@ void LabelImages::delete_selected_annotation(){
 
     // if (m_selected_obj_idx >= m_annotations.size()){
     //     m_selected_obj_idx = m_annotations.size() - 1;
-    // } else{
+    // }else{
     //     // no change to the currently selected index
     // }
 
@@ -704,13 +704,13 @@ void LabelImages::load_custom_label_set(const std::string& json_path){
             const std::string& label_slug = json_array[i].to_string_throw();
             new_database.add_entry(StringSelectEntry(label_slug, label_slug));
         }
-    } catch(FileException& e){
+    }catch (FileException& e){
         std::cerr << "Error: File exception " << e.message() << std::endl;
         QMessageBox box;
         box.warning(nullptr, "Unable to Load Custom Label Set",
             QString::fromStdString("Cannot open JSON file " + json_path + " for the custom label set. Probably wrong permission?"));
         return;
-    } catch(JsonParseException& e){
+    }catch (JsonParseException& e){
         std::cerr << "Error: JSON parse exception " << e.message() << std::endl;
         QMessageBox box;
         box.warning(nullptr, "Unable to Load Custom Label Set",

@@ -47,7 +47,7 @@ public:
     }
     virtual bool cancel(std::exception_ptr exception) noexcept override;
 
-    void reset();
+    bool reset(WallDuration timeout = WallDuration::max());
 
     bool remote_protocol_is_compatible() const{
         return m_remote_protocol_compatible;
@@ -60,7 +60,7 @@ public:
     }
 
     size_t pending() const;
-    void wait_for_pending();
+    bool wait_for_pending(WallDuration timeout = WallDuration::max());
 
 
 public:
@@ -70,7 +70,7 @@ public:
     void send_request(uint8_t opcode);
 
     void send_stream(const void* data, size_t bytes){
-        reliable_send(data, bytes);
+        reliable_send_blocking(data, bytes, WallDuration::max());
     }
 
 
@@ -94,9 +94,11 @@ private:
 
 
 private:
-    virtual void reliable_send(const void* data, size_t bytes) override;
+//    virtual size_t reliable_send_available() const override;
+    virtual size_t reliable_send_blocking(const void* data, size_t bytes, WallDuration timeout) override;
+    virtual bool reliable_try_send_all_or_nothing(const void* data, size_t bytes) override;
     virtual void on_recv(const void* data, size_t bytes) override;
-    virtual size_t unreliable_send(const void* data, size_t bytes) override;
+    virtual size_t unreliable_send(const void* data, size_t bytes) noexcept override;
 
 
 private:

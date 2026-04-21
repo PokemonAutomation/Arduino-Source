@@ -82,13 +82,19 @@ void JoyconController::run_controller_input(const ControllerInputState& state){
         }
     }
 
-    replace_on_next_command();
-
     JoyconState controller_state;
     deltas.to_state(controller_state);
 
-    WallClock timestamp = current_time();
-    controller_state.execute(nullptr, false, *this, 2000ms);
+    WallClock timestamp;
+    if (controller_state.is_neutral()){
+        timestamp = current_time();
+        cancel_all_commands();
+    }else{
+        replace_on_next_command(nullptr);
+
+        timestamp = current_time();
+        controller_state.execute(nullptr, false, *this, 2000ms);
+    }
 
     on_command_input(timestamp, controller_state);
 }

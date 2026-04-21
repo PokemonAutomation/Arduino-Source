@@ -23,6 +23,13 @@ namespace PokemonAutomation{
 namespace PABotBase2{
 
 
+struct PABB_NintendoSwitch_ControllerColors{
+    uint8_t body[3];
+    uint8_t buttons[3];
+    uint8_t left_grip[3];
+    uint8_t right_grip[3];
+};
+
 
 #define PABB_MSG_REQ_NS1_OEM_CONTROLLER_READ_SPI        0x91
 #define PABB_MSG_REQ_NS1_OEM_CONTROLLER_WRITE_SPI       0x92
@@ -37,6 +44,9 @@ struct PABB_PACK pabb2_Message_NS1_OemController_Spi : MessageHeader{
 #define PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_PLAYER_LIGHTS     0x94
 #define PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_USB_DISALLOWED    0x95
 #define PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_RUMBLE            0x96
+struct PABB_PACK pabb2_Message_Feedback_NS1_OemController_Rumble : MessageHeader{
+    pabb_NintendoSwitch_Rumble data;
+};
 
 
 #define PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_BUTTONS            0x97

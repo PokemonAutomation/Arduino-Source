@@ -18,6 +18,7 @@ const EnumDropdownDatabase<SortingRuleType>& SortingRuleType_Database(){
         {SortingRuleType::Alpha, "alpha", "Alpha"},
         {SortingRuleType::Ball_Slug,    "ball_slug",    "Ball Type"},
         {SortingRuleType::Gender,    "gender",    "Gender (Male, Female, Genderless)"},
+        //{SortingRuleType::Type,    "type",    "Types"}, Mainly used for testing. The order of the PokemonType Enum is not the most intuitive for sorting.
     });
     return database;
 }

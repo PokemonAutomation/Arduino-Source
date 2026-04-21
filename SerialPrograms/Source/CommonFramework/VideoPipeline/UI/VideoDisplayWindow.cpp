@@ -51,10 +51,6 @@ VideoDisplayWindow::~VideoDisplayWindow(){
 
 void VideoDisplayWindow::changeEvent(QEvent* event){
     QMainWindow::changeEvent(event);
-    if (this->windowState() == Qt::WindowMaximized){
-        this->showFullScreen();
-//        cout << "Display Widget: " << m_display_widget->width() << " x " << m_display_widget->height() << endl;
-    }
 }
 void VideoDisplayWindow::closeEvent(QCloseEvent* event){
     close();

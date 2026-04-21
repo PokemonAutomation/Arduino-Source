@@ -9,7 +9,6 @@
 #include "Common/PABotBase2/ReliableConnectionLayer/PABotBase2_ConnectionDebug.h"
 #include "MockDevice.h"
 
-//  REMOVE
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -58,7 +57,7 @@ void MockDevice::print() const{
 }
 
 
-size_t MockDevice::DeviceSideConnection::unreliable_send(const void* data, size_t bytes){
+size_t MockDevice::DeviceSideConnection::unreliable_send(const void* data, size_t bytes) noexcept{
     MockDevice& parent = m_parent;
     {
         WriteSpinLock lg(parent.m_device_to_host_lock);
@@ -115,7 +114,7 @@ size_t MockDevice::DeviceSideConnection::unreliable_recv(void* data, size_t max_
 }
 
 
-size_t MockDevice::HostSideConnection::unreliable_send(const void* data, size_t bytes){
+size_t MockDevice::HostSideConnection::unreliable_send(const void* data, size_t bytes) noexcept{
     MockDevice& parent = m_parent;
     {
         WriteSpinLock lg(parent.m_host_to_device_lock);

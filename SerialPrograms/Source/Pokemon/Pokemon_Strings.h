@@ -17,6 +17,7 @@ extern const std::string STRING_POKEBALL;
 extern const std::string STRING_POKEMON;
 extern const std::string STRING_POKEDEX;
 extern const std::string STRING_POKEJOB;
+extern const std::string STRING_POKERUS;
 
 extern const std::string UNICODE_MALE;
 extern const std::string UNICODE_FEMALE;
