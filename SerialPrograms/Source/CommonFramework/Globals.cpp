@@ -114,7 +114,7 @@ const std::string COMPILER_VERSION = "Unknown Compiler";
 const size_t LOG_HISTORY_LINES = 10000;
 
 #if defined(__APPLE__)
-static QString g_startup_profile;
+static std::string g_startup_profile;
 
 void set_startup_profile(int& argc, char* argv[]){
     for (int i = 1; i + 1 < argc; i++){
@@ -123,7 +123,7 @@ void set_startup_profile(int& argc, char* argv[]){
             for (QChar& c : profile){
                 if (!c.isLetterOrNumber() && c != u'_' && c != u'-') c = u'_';
             }
-            g_startup_profile = profile;
+            g_startup_profile = profile.toStdString();
             // Shift everything after --profile <name> down by 2.
             for (int j = i; j + 2 < argc; j++){
                 argv[j] = argv[j + 2];
@@ -132,6 +132,10 @@ void set_startup_profile(int& argc, char* argv[]){
             return;
         }
     }
+}
+
+const std::string& STARTUP_PROFILE(){
+    return g_startup_profile;
 }
 #endif
 
@@ -225,8 +229,8 @@ std::string get_runtime_base_path(){
     // QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) returns
     // "/Users/$USERNAME/Library/Application Support/SerialPrograms"
     QString appSupportPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    if (!g_startup_profile.isEmpty()){
-        appSupportPath += "/Profiles/" + g_startup_profile;
+    if (!g_startup_profile.empty()){
+        appSupportPath += "/Profiles/" + QString::fromStdString(g_startup_profile);
     }
     QDir().mkpath(appSupportPath);
     return appSupportPath.toStdString() + "/";

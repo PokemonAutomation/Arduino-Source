@@ -48,6 +48,7 @@ extern const size_t LOG_HISTORY_LINES;
 // This allows multiple instances of the program to run since settings are no longer shared.
 #if defined(__APPLE__)
 void set_startup_profile(int& argc, char* argv[]);
+const std::string& STARTUP_PROFILE();
 #endif
 
 // Path to the parent folder that holds all other folders, e.g. settings folder, screenshot folder, etc. 
