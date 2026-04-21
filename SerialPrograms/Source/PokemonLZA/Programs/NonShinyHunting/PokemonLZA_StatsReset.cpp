@@ -192,7 +192,7 @@ void StatsReset::enter_portal(SingleSwitchProgramEnvironment& env, ProController
         {
             overworld,
         }
-        );
+    );
 
     if (ret == 0){
         env.log("Detected overworld");
@@ -212,7 +212,7 @@ void StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
         {
             battle_menu,
         }
-        );
+    );
 
     if (ret == 0){
         env.log("Detected battle menu");
@@ -278,7 +278,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to travel to Quasartico Inc.",
                     env.console
-                    );
+                );
             }
             context.wait_for(100ms);
             env.log("Detected overworld. Fast traveled to Quasartico Inc.");
