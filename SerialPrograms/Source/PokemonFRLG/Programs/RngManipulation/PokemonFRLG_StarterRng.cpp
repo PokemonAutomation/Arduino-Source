@@ -374,14 +374,14 @@ AdvObservedPokemon StarterRng::read_summary(SingleSwitchProgramEnvironment& env,
 }
 
 
-AdvRngFilters StarterRng::update_filters(AdvObservedPokemon& pokemon, StatReads& stats, EVs& evyield, BaseStats& BASE_STATS){
+void StarterRng::update_filters(AdvRngFilters& filters, AdvObservedPokemon& pokemon, StatReads& stats, EVs& evyield, BaseStats& BASE_STATS){
     pokemon.level.emplace_back(pokemon.level.back() + 1);
     pokemon.stats.emplace_back(stats);
     pokemon.evs.emplace_back(evyield);
 
-    AdvRngFilters filters = observation_to_filters(pokemon, BASE_STATS);
+    AdvRngFilters new_filters = observation_to_filters(pokemon, BASE_STATS);
+    filters.ivs = new_filters.ivs;
     RNG_FILTERS.set(filters);
-    return filters;
 }
 
 std::map<AdvRngState, AdvPokemonResult> StarterRng::get_starter_search_results(
@@ -473,7 +473,7 @@ bool StarterRng::update_history(
     std::map<AdvRngState, AdvPokemonResult>& search_hits,
     bool force_finish
 ){
-    const int MAX_ADVANCE_POSSIBILITIES = 20;
+    const int MAX_ADVANCE_POSSIBILITIES = 5;
     const uint32_t ADVANCE_RADIUS = 2;
 
     if (search_hits.size() == 0){
@@ -634,6 +634,7 @@ bool StarterRng::auto_battle_rival(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
     AdvObservedPokemon& pokemon,
+    AdvRngFilters& filters,
     BaseStats& BASE_STATS
 ){
     Pokemon::EVs evyield = {0, 0, 0, 0, 0, 0};
@@ -741,7 +742,7 @@ bool StarterRng::auto_battle_rival(
     VideoSnapshot screen = env.console.video().snapshot();
     StatReads stats = reader.read_stats(env.logger(), screen);    
 
-    update_filters(pokemon, stats, evyield, BASE_STATS);
+    update_filters(filters, pokemon, stats, evyield, BASE_STATS);
 
     // exit battle
     pbf_mash_button(context, BUTTON_B, 20s);
@@ -814,6 +815,7 @@ int StarterRng::autolevel_on_route1(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
     AdvObservedPokemon& pokemon,
+    AdvRngFilters& filters,
     BaseStats& BASE_STATS
 ){
     Pokemon::EVs evyield = {0, 0, 0, 0, 0, 0};
@@ -868,7 +870,7 @@ int StarterRng::autolevel_on_route1(
                 env.log("Level-up stats detected. Reading stats...");
                 screen = env.console.video().snapshot();      
                 stats = reader.read_stats(env.logger(), screen);
-                update_filters(pokemon, stats, evyield, BASE_STATS);
+                update_filters(filters, pokemon, stats, evyield, BASE_STATS);
                 exit_wild_battle(env.console, context, false, true);
                 return 0;
             case -1:
@@ -1093,7 +1095,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             continue; // reset game
         }
 
-        failed = auto_battle_rival(env, context, pokemon, BASE_STATS);
+        failed = auto_battle_rival(env, context, pokemon, filters, BASE_STATS);
         if (failed){
             stats.errors++;
             continue; // reset game
@@ -1126,7 +1128,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             env.log("Level: " + std::to_string(4 + pokemon.level.size()));
             env.log("Speed EVs: " + std::to_string(pokemon.evs.back().speed));
 
-            int ret2 = autolevel_on_route1(env, context, pokemon, BASE_STATS);
+            int ret2 = autolevel_on_route1(env, context, pokemon, filters, BASE_STATS);
             if (ret2 < 0){
                 env.log("Error encountered while auto-leveling.");
                 stats.errors++;

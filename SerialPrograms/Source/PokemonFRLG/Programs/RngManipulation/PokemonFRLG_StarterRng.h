@@ -63,7 +63,7 @@ private:
 
     AdvObservedPokemon read_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
-    AdvRngFilters update_filters(AdvObservedPokemon& pokemon, StatReads& stats, EVs& evyield, BaseStats& BASE_STATS);
+    void update_filters(AdvRngFilters& filters, AdvObservedPokemon& pokemon, StatReads& stats, EVs& evyield, BaseStats& BASE_STATS);
     std::map<AdvRngState, AdvPokemonResult> get_starter_search_results(
         SingleSwitchProgramEnvironment& env,
         AdvRngSearcher& searcher, 
@@ -100,6 +100,7 @@ private:
         SingleSwitchProgramEnvironment& env, 
         ProControllerContext& context, 
         AdvObservedPokemon& pokemon,
+        AdvRngFilters& filters,
         BaseStats& BASE_STATS
     );
 
@@ -109,6 +110,7 @@ private:
         SingleSwitchProgramEnvironment& env, 
         ProControllerContext& context, 
         AdvObservedPokemon& pokemon,
+        AdvRngFilters& filters,
         BaseStats& BASE_STATS
     );
 
