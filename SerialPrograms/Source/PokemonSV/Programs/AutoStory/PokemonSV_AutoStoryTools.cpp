@@ -1394,15 +1394,19 @@ void check_num_sunflora_found(SingleSwitchProgramEnvironment& env, ProController
     VideoSnapshot screen = env.console.video().snapshot();
     ImageFloatBox num_sunflora_box = {0.27, 0.02, 0.04, 0.055};
     int number = OCR::read_number_waterfill(env.console, extract_box_reference(screen, num_sunflora_box), 0xff000000, 0xff808080);
+    std::string number_string = std::to_string(number);
+    std::string expected_number_string = std::to_string(expected_number);
 
-    if (number != expected_number){
+    // checks that expected_number is a prefix of number
+    // this is to handle the Asian languages that have extra characters after the number
+    if (number_string.compare(0, expected_number_string.size(), expected_number_string) == 0){
+        env.console.log("Number of sunflora found: " + expected_number_string);
+    }else{
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "The number of sunflora found is different than expected.",
             env.console
         );
-    }else{
-        env.console.log("Number of sunflora found: " + std::to_string(number));
     }
 
 

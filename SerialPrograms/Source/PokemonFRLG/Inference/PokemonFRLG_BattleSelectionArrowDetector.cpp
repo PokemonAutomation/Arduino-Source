@@ -111,8 +111,7 @@ BattleSelectionArrowDetector::BattleSelectionArrowDetector(
     : m_color(color)
     , m_overlay(overlay)
     , m_arrow_box(ImageFloatBox(0.768, 0.868, 0.212, 0.159))
-{
-}
+{}
 BattleSelectionArrowDetector::BattleSelectionArrowDetector(
     Color color,
     VideoOverlay* overlay,

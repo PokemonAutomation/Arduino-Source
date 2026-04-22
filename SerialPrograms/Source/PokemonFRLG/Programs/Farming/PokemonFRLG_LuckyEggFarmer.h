@@ -66,8 +66,9 @@ private:
     BooleanCheckBoxOption TAKE_VIDEO;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
+    EventNotificationOption NOTIFICATION_LUCKY_EGG;
+    EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationsOption NOTIFICATIONS;
 
 };
