@@ -231,6 +231,7 @@ void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     double FRAME_DURATION = 1000 / FRAMERATE; // ms
 
     const uint64_t SID_DELAY = uint64_t((TARGET_ADVANCES - 1) * FRAME_DURATION / 2); // advances pass 2 by 2, first one doesn't count (?)
+    env.log("Delay: " + std::to_string(SID_DELAY) + "ms");
 
     set_sid_from_name_screen(env, context, SID_DELAY);
     finish_intro_animations(env, context);
