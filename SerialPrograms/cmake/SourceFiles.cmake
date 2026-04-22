@@ -487,6 +487,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Recording/StreamHistoryTracker_SaveFrames.h
     Source/CommonFramework/Recording/StreamRecorder.cpp
     Source/CommonFramework/Recording/StreamRecorder.h
+    Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.cpp
+    Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.h
     Source/CommonFramework/Startup/NewVersionCheck.cpp
     Source/CommonFramework/Startup/NewVersionCheck.h
     Source/CommonFramework/Startup/SetupSettings.cpp
@@ -497,6 +499,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Tools/ErrorDumper.h
     Source/CommonFramework/Tools/FileDownloader.cpp
     Source/CommonFramework/Tools/FileDownloader.h
+    Source/CommonFramework/Tools/FileHash.cpp
+    Source/CommonFramework/Tools/FileHash.h
     Source/CommonFramework/Tools/FileUnzip.cpp
     Source/CommonFramework/Tools/FileUnzip.h
     Source/CommonFramework/Tools/GlobalThreadPools.cpp
@@ -1819,6 +1823,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/PokemonLZA_ButtonDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_DayNightChangeDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_DayNightChangeDetector.h
+    Source/PokemonLZA/Inference/PokemonLZA_DayNightStateDetector.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_DayNightStateDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_HyperspaceRewardNameReader.cpp

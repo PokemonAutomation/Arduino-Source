@@ -205,7 +205,7 @@ void checkpoint_73(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }
         );
 
-        mash_button_till_overworld(env.console, context, BUTTON_A, 360); // fight the Ghost Gym
+        mash_button_till_overworld(env.console, context, BUTTON_A, 420); // fight the Ghost Gym
 
     });  
 }

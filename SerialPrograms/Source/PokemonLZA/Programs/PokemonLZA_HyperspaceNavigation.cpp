@@ -48,7 +48,7 @@ bool check_calorie(
         if (additional_calorie_buffer == 0){
             console.log("min calorie reached");
             console.overlay().add_log("Min Calorie Reached");
-        } else{
+        }else{
             console.log("Close to min Calorie");
             console.overlay().add_log("Close to Min Calorie");
         }

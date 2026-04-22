@@ -62,8 +62,6 @@ void close_start_menu(ConsoleHandle& console, ProControllerContext& context){
 
 namespace {
 
-const ImageFloatBox MENU_ARROW_BOX(0.727692, 0.0523077, 0.0369231, 0.6438461);
-
 bool move_cursor_impl(
     ConsoleHandle& console,
     ProControllerContext& context,
@@ -104,8 +102,7 @@ bool move_cursor_impl(
         for (int i = 0; i < forward; i++){
             pbf_press_dpad(context, DPAD_DOWN, 320ms, 400ms);
         }
-    }
-    else{
+    }else{
         for (int i = 0; i < backward; i++){
             pbf_press_dpad(context, DPAD_UP, 320ms, 400ms);
         }

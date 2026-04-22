@@ -101,8 +101,7 @@ void SAMSession::run(
     size_t num_points = input_points.size() / 2;
     if(input_box.size() > 0){
         num_points += 2; // add the bounding box two corners
-    }
-    else{
+    }else{
         num_points += 1; // add a padding point where there is no bounding box
     }
 
@@ -237,7 +236,7 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
             cv::cvtColor(image_bgr, image, cv::COLOR_BGRA2RGB);
         } else if (image_bgr.channels() == 3){
             cv::cvtColor(image_bgr, image, cv::COLOR_BGR2RGB);
-        } else{
+        }else{
             std::cerr << "Error: wrong image channels. Only work with RGB or RGBA images." << std::endl;
             QMessageBox box;
             box.warning(nullptr, "Wrong Image Channels",

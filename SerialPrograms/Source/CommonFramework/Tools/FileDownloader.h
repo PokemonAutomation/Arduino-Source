@@ -8,6 +8,9 @@
 #define PokemonAutomation_FileDownloader_H
 
 #include <string>
+#include <functional>
+#include "Common/Cpp/CancellableScope.h"
+
 
 namespace PokemonAutomation{
     class Logger;
@@ -16,6 +19,16 @@ namespace FileDownloader{
 
 //  Throws OperationFailedException if failed to download.
 std::string download_file(Logger& logger, const std::string& url);
+
+//  Throws OperationFailedException if failed to download.
+void download_file_to_disk(
+    CancellableScope& scope,
+    Logger& logger, 
+    const std::string& url, 
+    const std::string& file_path, 
+    uint64_t expected_size,
+    std::function<void(uint64_t bytes_done, uint64_t total_bytes)> progress_callback
+);
 
 //  Throws OperationFailedException if failed to download.
 //  Returns empty value if invalid JSON.

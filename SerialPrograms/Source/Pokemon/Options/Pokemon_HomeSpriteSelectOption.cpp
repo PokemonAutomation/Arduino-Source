@@ -27,7 +27,7 @@ StringSelectDatabase make_all_home_sprites_database(){
             // we don't have the sprite. Use a replacement sprite instead:
             const auto& no_show_sprite = ALL_POKEMON_HOME_SPRITES().get_throw("floette-eternal-flower");
             ret.add_entry(StringSelectEntry(slug, form_ptr->display_name(), no_show_sprite.icon));
-        } else{
+        }else{
             ret.add_entry(StringSelectEntry(slug, form_ptr->display_name(), sprite->icon));
         }
     }

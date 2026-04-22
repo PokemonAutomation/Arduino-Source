@@ -14,6 +14,9 @@
 #include <QNetworkReply>
 #include <QObject>
 #include <QTimer>
+#include <QSaveFile>
+#include <QFileInfo>
+#include <QDir>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "FileDownloader.h"
@@ -89,6 +92,94 @@ std::string download_file(Logger& logger, const std::string& url){
 
     return std::string(downloaded_data.data(), downloaded_data.size());
 }
+
+void download_file_to_disk(
+    CancellableScope& scope,
+    Logger& logger, 
+    const std::string& url, 
+    const std::string& file_path,
+    uint64_t expected_size,
+    std::function<void(uint64_t bytes_done, uint64_t total_bytes)> progress_callback
+){
+//    cout << "download_file()" << endl;
+    QNetworkAccessManager network_access_manager;
+    QEventLoop loop;
+
+    // ensure the directory exists
+    QString filePath = QString::fromStdString(file_path);
+    QFileInfo fileInfo(filePath);
+    QString dirPath = fileInfo.absolutePath();
+    QDir().mkpath(dirPath);
+    
+    // 1. Initialize QSaveFile
+    QSaveFile file(QString::fromStdString(file_path));
+    if (!file.open(QIODevice::WriteOnly)) {
+        throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+            "Could not open save file: " + file_path);
+    }
+
+    QNetworkRequest request(QUrl(QString::fromStdString(url)));
+    // request.setAttribute(QNetworkRequest::AutoRedirectionPolicyAttribute, true);  // enable auto-redirects
+    request.setTransferTimeout(std::chrono::seconds(5));
+    
+    // 2. Start the GET request
+    QNetworkReply* reply = network_access_manager.get(request);
+
+    // Progress Bar Logic. and check for Cancel
+    QObject::connect(reply, &QNetworkReply::downloadProgress, 
+        [reply, &scope, expected_size, progress_callback](qint64 bytesReceived, qint64 bytesTotal) {
+
+            if (scope.cancelled()){
+                reply->abort();
+            }
+            
+            // Use expected_size if the network doesn't provide one
+            uint64_t total = (bytesTotal > 0) ? (uint64_t)bytesTotal : expected_size;
+
+            progress_callback(bytesReceived, total);
+        }
+    );
+
+    // 3. Stream chunks directly to the temporary file
+    QObject::connect(reply, &QNetworkReply::readyRead, [&file, reply]() {
+        file.write(reply->readAll());
+    });
+
+    // 4. Handle completion and errors
+    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    
+    // Start the loop. local wait mechanism that pauses execution of the function 
+    // while Qt handles the network request. 
+    // the loop stops once we see the signal QNetworkReply::finished.
+    loop.exec();
+
+    // // Final check for remaining data
+    if (reply->bytesAvailable() > 0) {
+        file.write(reply->readAll());
+    }
+
+    // 5. Finalize the transaction
+    if (reply->error() == QNetworkReply::NoError) {
+        // This moves the temporary file to the final destination 'file_path'
+        if (!file.commit()) {
+            throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+                "Failed to commit file to disk: " + file_path);
+        }
+    } else {
+        if (scope.cancelled()){
+            logger.log("Download cancelled by user.");
+            throw OperationCancelledException();
+        }else{
+            QString error_string = reply->errorString();
+            // QSaveFile automatically deletes the temp file if commit() isn't called
+            throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, 
+                "Network Error: " + error_string.toStdString());
+        }
+    }
+
+    reply->deleteLater();
+}
+
 JsonValue download_json_file(Logger& logger, const std::string& url){
     std::string downloaded_data = download_file(logger, url);
     return parse_json(downloaded_data);

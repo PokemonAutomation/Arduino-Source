@@ -172,6 +172,7 @@
 #include "ML/Inference/ML_PaddleOCRPipeline.h"
 #include "CommonTools/OCR/OCR_RawPaddleOCR.h"
 #include "CommonTools/Images/ImageTools.h"
+#include "PokemonFRLG/Inference/PokemonFRLG_BattleSelectionArrowDetector.h"
 
 
 
@@ -301,199 +302,6 @@ void TestProgram::on_press(){
 
 
 
-#if 0
-class TealDialogMatcher : public ImageMatch::WaterfillTemplateMatcher{
-public:
-    TealDialogMatcher() : WaterfillTemplateMatcher(
-        "PokemonLZA/DialogBox/DialogBoxTitleGreenLine-Template.png", Color(180,200,70), Color(200, 220, 115), 50
-    ){
-        m_aspect_ratio_lower = 0.9;
-        m_aspect_ratio_upper = 1.1;
-        m_area_ratio_lower = 0.8;
-        m_area_ratio_upper = 1.1;
-    }
-
-    static const ImageMatch::WaterfillTemplateMatcher& instance(){
-        static DialogTitleGreenLineMatcher matcher;
-        return matcher;
-    }
-};
-#endif
-
-
-
-
-
-class LogSender : public StreamSender{
-public:
-    virtual size_t send(const void* data, size_t bytes) override{
-//        cout << PABotBase2::dump_packet((const PacketHeader*)data) << endl;
-        cout << "Sending: ";
-        PABotBase2::PacketHeader_print((const PacketHeader*)data, false);
-        fflush(stdout);
-        return bytes;
-    }
-};
-
-void fp_LogSender(void* context, const void* data, size_t bytes){
-    ((LogSender*)context)->send(data, bytes);
-}
-
-#if 0
-std::string dump(const pabb2_PacketSender& sender){
-    std::string str;
-    str += "---------------\n";
-    str += "Slot Head: " + std::to_string(sender.slot_head) + "\n";
-    str += "Slot Tail: " + std::to_string(sender.slot_tail) + "\n";
-    str += "Buffer Head: " + std::to_string(sender.buffer_head) + "\n";
-    str += "Buffer Tail: " + std::to_string(sender.buffer_tail) + "\n";
-    for (uint8_t seqnum = sender.slot_head; seqnum != sender.slot_tail; seqnum++){
-        size_t offset = ~sender.offsets[seqnum & PABB2_PacketSender_SLOTS_MASK];
-        str += "Offset = " + std::to_string(offset) + "\n";
-        str += PABotBase2::dump_packet((const PacketHeader*)(sender.buffer + offset));
-        str += "\n";
-    }
-    return str;
-}
-#endif
-
-struct DataPacket : PacketHeaderData{
-    char data[256];
-
-    void set(uint8_t seqnum, uint16_t stream_offset, const char* str){
-        const size_t OVERHEAD = sizeof(PacketHeaderData) + sizeof(uint32_t);
-        const size_t MAX_SIZE = 256 - OVERHEAD;
-
-        size_t size = strlen(str);
-        if (size >= MAX_SIZE){
-            cout << "Data is too large." << endl;
-            size = MAX_SIZE;
-        }
-
-        this->magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
-        this->seqnum = seqnum;
-        this->packet_bytes = (uint8_t)(size + OVERHEAD);
-        this->opcode = PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA;
-        this->stream_offset = stream_offset;
-        memcpy(data, str, size);
-    }
-};
-
-
-#if 0
-pabb2_StreamCoalescer* coalescer;
-
-
-class MockConnection : public StreamConnection{
-public:
-    MockConnection()
-        : m_thread([this]{ thread_body(); })
-    {}
-    ~MockConnection(){
-        {
-            std::lock_guard<std::mutex> lg(m_lock);
-            m_stopping = true;
-        }
-        m_cv.notify_all();
-        m_thread.join();
-    }
-
-    virtual size_t send(const void* data, size_t bytes) override{
-        const PacketHeader* packet = (const PacketHeader*)data;
-#if 0
-        cout << "Sending: ";
-        PacketHeader_print(packet, false);
-        fflush(stdout);
-#endif
-
-        WallClock now = current_time();
-
-        struct{
-            PacketHeader header;
-            uint8_t crc[sizeof(uint32_t)];
-        } response;
-        response.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
-        response.header.seqnum = packet->seqnum;
-        response.header.packet_bytes = sizeof(response);
-        response.header.opcode = PABB2_CONNECTION_OPCODE_RET;
-        pabb_crc32_write_to_message(&response, sizeof(response));
-
-        std::lock_guard<std::mutex> lg(m_lock);
-
-        if (packet->opcode == PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA){
-            uint8_t stream_size = packet->packet_bytes - sizeof(PacketHeaderData) - sizeof(uint32_t);
-            for (uint8_t c = 0; c < stream_size; c++){
-                char expected = '0' + m_offset % 10;
-                char actual = ((const char*)packet)[sizeof(PacketHeaderData) + c];
-                if (expected != actual){
-                    cout << "Mismatch at: " << m_offset << ", expected = " << expected << ", actual = " << actual << endl;
-
-                    pabb2_StreamCoalescer_print(coalescer, true);
-
-                    system("pause");
-                }
-                m_offset++;
-            }
-
-        }
-
-
-
-//        cout << "enqueuing" << endl;
-        m_send_schedule.insert({
-            now + 500ms,
-            std::string((char*)&response, (char*)&response + sizeof(response))
-        });
-        m_cv.notify_all();
-
-        return bytes;
-    }
-
-
-private:
-    void thread_body(){
-        while (!m_stopping){
-            std::unique_lock<std::mutex> lg(m_lock);
-
-            while (!m_send_schedule.empty()){
-                auto iter = m_send_schedule.begin();
-                if (current_time() < iter->first){
-                    m_cv.wait_until(lg, iter->first);
-                    continue;
-                }
-                std::string& packet = iter->second;
-#if 0
-                cout << "Receiving: ";
-                PacketHeader_print((const PacketHeader*)packet.data(), false);
-                fflush(stdout);
-#endif
-                on_recv(packet.data(), packet.size());
-                m_send_schedule.erase(iter);
-            }
-
-            m_cv.wait(lg);
-        }
-    }
-
-
-private:
-    std::multimap<WallClock, std::string> m_send_schedule;
-
-    uint64_t m_offset = 0;
-
-    std::mutex m_lock;
-    std::condition_variable m_cv;
-    bool m_stopping = false;
-    Thread m_thread;
-};
-#endif
-
-
-
-
-
-
-
 
 
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
@@ -506,7 +314,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    using namespace PokemonBDSP;
 //    using namespace PokemonLA;
 //    using namespace PokemonSV;
-    using namespace PokemonLZA;
+//    using namespace PokemonLZA;
+    using namespace PokemonFRLG;
 
     [[maybe_unused]] Logger& logger = env.logger();
     [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
@@ -519,7 +328,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     auto snapshot = feed.snapshot();
 
-    UpdatePopupDetector detector(console);
+    BattleSelectionArrowDetector detector(COLOR_RED, &overlay, SafariBattleMenuOption::BALL);
+//    UpdatePopupDetector detector(console);
+    detector.make_overlays(overlays);
 
     cout << detector.detect(snapshot) << endl;
 

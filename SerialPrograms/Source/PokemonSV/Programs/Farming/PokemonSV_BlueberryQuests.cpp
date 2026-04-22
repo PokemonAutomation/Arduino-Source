@@ -289,8 +289,7 @@ std::vector<BBQuests> process_quest_list(
                     );
                     break;
                 }
-            }
-            else{
+            }else{
                 bool quest_in_table = false;
                 for (const std::unique_ptr<BBQuestTableRow>& row : exclusions_table){
                     if(n == row->quest){
