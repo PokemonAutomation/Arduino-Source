@@ -162,6 +162,9 @@ std::string PossibleHitsDisplay::get_hits_string(const std::vector<AdvRngState>&
         hits_string += "/";
         hits_string += std::to_string(hit.advance);
     }
+    if (hits_string.size() == 0){
+        hits_string += "No matches found";
+    }
     return hits_string;
 }
 std::string PossibleHitsDisplay::get_hits_string(std::map<AdvRngState, AdvPokemonResult>& hits_map){
