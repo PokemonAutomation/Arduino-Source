@@ -32,6 +32,7 @@ public:
 private:
     StaticTextOption STATIC_TEXT;
     StringOption IMAGE_PATH;
+    StringOption INPUT_TEXT;
     ScreenWatchOption SCREEN_WATCHER;
     MacAddressCell MAC_ADDRESS;
 };
