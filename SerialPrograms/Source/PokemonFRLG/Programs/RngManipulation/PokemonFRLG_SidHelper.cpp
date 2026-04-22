@@ -37,7 +37,7 @@ SidHelper_Descriptor::SidHelper_Descriptor()
 {}
 
 struct SidHelper_Descriptor::Stats : public StatsTracker {
-    public:
+public:
     Stats()
         : errors(m_stats["Errors"])
     {
@@ -48,7 +48,8 @@ struct SidHelper_Descriptor::Stats : public StatsTracker {
 };
 
 std::unique_ptr<StatsTracker> SidHelper_Descriptor::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
+//    return std::unique_ptr<StatsTracker>(new Stats());
+    return nullptr;
 }
 
 SidHelper::SidHelper()
@@ -81,7 +82,11 @@ SidHelper::SidHelper()
 
 namespace{
 
-void set_sid_from_name_screen(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& SID_DELAY){
+void set_sid_from_name_screen(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    const uint64_t& SID_DELAY
+){
     // this is performed blind to try to maximize consistency of timing
     // ensure the OK button is selected
     pbf_press_button(context, BUTTON_PLUS, 200ms, 300ms);
@@ -133,7 +138,6 @@ void finish_intro_animations(SingleSwitchProgramEnvironment& env, ProControllerC
 }
 
 void navigate_to_trainer_card(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-
     int errors = 0;
     while (true){
         if (errors >= 5){
@@ -144,7 +148,10 @@ void navigate_to_trainer_card(SingleSwitchProgramEnvironment& env, ProController
 
         open_start_menu(env.console, context);
 
-        bool cursor = move_cursor_to_position(env.console, context, SelectionArrowPositionStartMenu(1)); // the positions are different before recieving a Pokemon and Pokedex
+        // the positions are different before recieving a Pokemon and Pokedex
+        bool cursor = move_cursor_to_position(
+            env.console, context, SelectionArrowPositionStartMenu(1)
+        );
         if (!cursor){
             errors++;
             pbf_mash_button(context, BUTTON_B, 2000ms);
@@ -189,7 +196,13 @@ uint16_t read_tid(SingleSwitchProgramEnvironment& env, ProControllerContext& con
     return tid;
 }
 
-std::vector<std::pair<std::string, std::string>> get_sid_messages(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint16_t tid, SimpleIntegerOption<uint32_t>& TARGET_ADVANCES, SimpleIntegerOption<uint8_t>& NUM_CANDIDATES){
+std::vector<std::pair<std::string, std::string>> get_sid_messages(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    uint16_t tid,
+    SimpleIntegerOption<uint32_t>& TARGET_ADVANCES,
+    SimpleIntegerOption<uint8_t>& NUM_CANDIDATES
+){
     std::vector<std::pair<std::string, std::string>> messages;
 
     int start = -1 * NUM_CANDIDATES / 2;
@@ -197,7 +210,7 @@ std::vector<std::pair<std::string, std::string>> get_sid_messages(SingleSwitchPr
 
     Pokemon::AdvRngSearcher searcher(tid, TARGET_ADVANCES + 2*start);
 
-    for (int i=start; i<end; i++){
+    for (int i = start; i < end; i++){
         std::pair<std::string, std::string> m;
         uint16_t sid = searcher.state.s0 >> 16;
 
@@ -239,7 +252,9 @@ void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     uint16_t tid = read_tid(env, context);
 
-    std::vector<std::pair<std::string, std::string>> sid_messages = get_sid_messages(env, context, tid, TARGET_ADVANCES, NUM_CANDIDATES);
+    std::vector<std::pair<std::string, std::string>> sid_messages = get_sid_messages(
+        env, context, tid, TARGET_ADVANCES, NUM_CANDIDATES
+    );
 
     send_program_notification(env, NOTIFICATION_SIDS, COLOR_BLUE, "Possible SIDs:", sid_messages, "");
 
