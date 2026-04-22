@@ -158,6 +158,13 @@ public:
         uint8_t gender_threshold = 126
     );
 
+    void refine_search(
+        std::map<AdvRngState, AdvPokemonResult>& map,
+        AdvRngFilters& target,
+        uint16_t tid_xor_sid = 0,
+        uint8_t gender_threshold = 126
+    );
+
 private:
     void search_advance_range(
         std::map<AdvRngState, AdvPokemonResult>& hits,

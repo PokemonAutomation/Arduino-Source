@@ -245,6 +245,23 @@ std::map<AdvRngState, AdvPokemonResult> AdvRngSearcher::search(
     return hits;
 }
 
+void AdvRngSearcher::refine_search(
+    std::map<AdvRngState, AdvPokemonResult>& map,
+    AdvRngFilters& target,
+    uint16_t tid_xor_sid,
+    uint8_t gender_threshold
+){
+    for (auto iter = map.begin(); iter != map.end(); ){
+        state = iter->first;
+        AdvPokemonResult res = pokemon_from_state(state);
+        if (!check_for_match(res, target, tid_xor_sid, gender_threshold)){
+            iter = map.erase(iter);
+        }else{
+            iter++;
+        }
+    }
+}
+
 
 Pokemon::NatureAdjustments nature_to_adjustment(AdvNature nature){
     NatureAdjustments ret;

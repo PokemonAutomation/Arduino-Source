@@ -54,7 +54,7 @@ private:
     struct StarterRngCalibrationHistory{
         std::vector<double> seed_calibrations;
         std::vector<double> advance_calibrations;
-        std::vector<int64_t> continue_screen_adjustments;
+        std::vector<double> continue_screen_adjustments;
         std::vector<AdvRngState> results;
 
     };
@@ -90,7 +90,7 @@ private:
         const uint16_t& MAX_HISTORY_LENGTH,
         double& SEED_CALIBRATION_FRAMES,
         double& ADVANCES_CALIBRATION,
-        int64_t& CONTINUE_SCREEN_ADJUSTMENT,
+        double& CONTINUE_SCREEN_ADJUSTMENT,
         std::map<AdvRngState, AdvPokemonResult>& search_hits,
         bool force_finish = false
     );
