@@ -123,11 +123,11 @@ void PrizeCornerReset::on_config_value_changed(void* object){
 }
 
 std::string PrizeCornerReset::check_amount_redeemed(uint16_t slot_num, uint32_t redeem_num) const{
-    if (slot_num == 4 && redeem_num != 1) { //Only 1 Porygon in both FR and LG
+    if (slot_num == 4 && redeem_num != 1){ //Only 1 Porygon in both FR and LG
         return "Error: Cannot redeem more than 1 Porygon per reset due to coin case limit.";
-    } else if (slot_num == 3 && redeem_num > 2) { //2 Dratini LG or 1 Scyther FR
+    } else if (slot_num == 3 && redeem_num > 2){ //2 Dratini LG or 1 Scyther FR
         return "Error: Maximum redemption of 2 Dratini in LG or 1 Scyther in FR per reset due to coin case limit.";
-    } else if (slot_num == 2 && redeem_num > 3) { //Max of 3 for both games
+    } else if (slot_num == 2 && redeem_num > 3){ //Max of 3 for both games
         return "Error: Maximum redemption of 3 Dratini/Pinsir due to coin case limit.";
     } //Abra/Clefairy will run out of party space first before coins.
     return "";
@@ -195,7 +195,7 @@ void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControlle
 
     std::string amount_check;
     amount_check = check_amount_redeemed((uint16_t)SLOT.current_value(), NUM_REDEEM);
-    if (amount_check != "") {
+    if (amount_check != ""){
         throw UserSetupError(env.console, "Invalid number of redemptions for the selected prize. Please check your selected options.");
     }
 
@@ -245,7 +245,7 @@ void PrizeCornerReset::program(SingleSwitchProgramEnvironment& env, ProControlle
                 env.log("Prize is not shiny.");
             }
 
-            if(i < NUM_REDEEM - 1) {
+            if(i < NUM_REDEEM - 1){
                 //Check the next pokemon
                 pbf_press_dpad(context, DPAD_UP, 320ms, 320ms);
                 pbf_wait(context, 1000ms);

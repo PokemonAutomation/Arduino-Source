@@ -190,7 +190,7 @@ bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& en
             if (STOP_AFTER_CURRENT.should_stop()){
                 env.console.overlay().add_log("Dialog Choice: Cancel");
                 pbf_press_button(context, BUTTON_B, 160ms, 80ms);
-            } else{
+            }else{
                 confirm_entering_battle = true;
                 // confirm entering battle
                 env.console.overlay().add_log("Dialog Choice: Confirm");

@@ -58,27 +58,7 @@ public:
             throw ConnectionException(nullptr, "Unable to open serial connection (" + name + "). Error = " + std::to_string(error));
         }
 
-        DCB serial_params{};
-        serial_params.DCBlength = sizeof(serial_params);
-
-        if (!GetCommState(m_handle, &serial_params)){
-            DWORD error = GetLastError();
-            CloseHandle(m_handle);
-            throw ConnectionException(nullptr, "GetCommState() failed. Error = " + std::to_string(error));
-        }
-//        cout << "BaudRate = " << (int)serial_params.BaudRate << endl;
-//        cout << "ByteSize = " << (int)serial_params.ByteSize << endl;
-//        cout << "StopBits = " << (int)serial_params.StopBits << "0 means 1 bit" << endl;
-//        cout << "Parity   = " << (int)serial_params.Parity << endl;
-        serial_params.BaudRate = baud_rate;
-        serial_params.ByteSize = 8;
-        serial_params.StopBits = 0;
-        serial_params.Parity = 0;
-        if (!SetCommState(m_handle, &serial_params)){
-            DWORD error = GetLastError();
-            CloseHandle(m_handle);
-            throw ConnectionException(nullptr, "SetCommState() failed. Error = " + std::to_string(error));
-        }
+        set_baud_rate(baud_rate);
 
 #if 1
         COMMTIMEOUTS timeouts{};
@@ -136,8 +116,32 @@ public:
         m_listener.wait_and_ignore_exceptions();
     }
 
+    void set_baud_rate(uint32_t baud_rate){
+        DCB serial_params{};
+        serial_params.DCBlength = sizeof(serial_params);
+
+        if (!GetCommState(m_handle, &serial_params)){
+            DWORD error = GetLastError();
+            CloseHandle(m_handle);
+            throw ConnectionException(nullptr, "GetCommState() failed. Error = " + std::to_string(error));
+        }
+//        cout << "BaudRate = " << (int)serial_params.BaudRate << endl;
+//        cout << "ByteSize = " << (int)serial_params.ByteSize << endl;
+//        cout << "StopBits = " << (int)serial_params.StopBits << "0 means 1 bit" << endl;
+//        cout << "Parity   = " << (int)serial_params.Parity << endl;
+        serial_params.BaudRate = baud_rate;
+        serial_params.ByteSize = 8;
+        serial_params.StopBits = 0;
+        serial_params.Parity = 0;
+        if (!SetCommState(m_handle, &serial_params)){
+            DWORD error = GetLastError();
+            CloseHandle(m_handle);
+            throw ConnectionException(nullptr, "SetCommState() failed. Error = " + std::to_string(error));
+        }
+    }
+
 private:
-    void process_error(const std::string& message, bool allow_throw){
+    void process_error(const std::string& message){
         WriteSpinLock lg(m_error_lock);
 
         size_t consecutive_errors = m_consecutive_errors.fetch_add(1);
@@ -153,19 +157,16 @@ private:
             clear_error = "ClearCommError error flag = " + std::to_string(comm_error);
         }
 
-        if (consecutive_errors <= 10){
+        if (consecutive_errors <= 100){
             serial_debug_log(message);
         }
-        if (consecutive_errors == 10){
+        if (consecutive_errors == 100){
             serial_debug_log("Further error messages will be suppressed.");
-        }
-        if (consecutive_errors >= 100 && allow_throw){
-            throw ConnectionException(nullptr, "Serial Connection failed.");
         }
     }
 
 
-    virtual size_t unreliable_send(const void* data, size_t bytes) override{
+    virtual size_t unreliable_send(const void* data, size_t bytes) noexcept override{
         WriteSpinLock lg(m_send_lock, "SerialConnection::send()");
 #if 0
         for (size_t c = 0; c < bytes; c++){
@@ -182,12 +183,13 @@ private:
         }
 
         DWORD error = GetLastError();
-        process_error(
-            "Failed to write: " + std::to_string(written) +
-            " / " + std::to_string(bytes) +
-            ", error = " + std::to_string(error),
-            true
-        );
+        try{
+            process_error(
+                "Failed to write: " + std::to_string(written) +
+                " / " + std::to_string(bytes) +
+                ", error = " + std::to_string(error)
+            );
+        }catch (...){}
 //        auto stop = current_time();
 //        cout << "WriteFile() : " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count() << endl;
 
@@ -206,7 +208,7 @@ private:
             DWORD read;
             if (ReadFile(m_handle, buffer, 32, &read, nullptr) == 0){
                 DWORD error = GetLastError();
-                process_error("ReadFile() failed. Error = " + std::to_string(error), false);
+                process_error("ReadFile() failed. Error = " + std::to_string(error));
             }
 //            auto stop = current_time();
 //            cout << "ReadFile() : " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count() << endl;

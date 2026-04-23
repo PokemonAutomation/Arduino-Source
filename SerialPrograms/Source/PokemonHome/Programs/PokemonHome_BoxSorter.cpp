@@ -41,6 +41,7 @@ language
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Inference/Pokemon_TypeReader.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"

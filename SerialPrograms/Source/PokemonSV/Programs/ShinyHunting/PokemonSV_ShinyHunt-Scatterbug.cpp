@@ -187,7 +187,7 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, ProContro
         try{
             run_one_sandwich_iteration(env, context);
             consecutive_failures = 0;
-        }catch(OperationFailedException& e){
+        }catch (OperationFailedException& e){
             stats.m_errors++;
             env.update_stats();
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
@@ -220,7 +220,7 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, ProContro
             ++stats.m_game_resets;
             env.update_stats();
 
-        }catch(ProgramFinishedException&){
+        }catch (ProgramFinishedException&){
             GO_HOME_WHEN_DONE.run_end_of_program(context);
             throw;
         }

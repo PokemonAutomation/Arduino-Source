@@ -137,7 +137,7 @@ int FlavorPowerIconDetector::detect(const ImageViewRGB32& screen){
         const ImageViewRGB32 image_crop = extract_box_reference(screen, m_subtype_free_number_box);
         int number = ocr_number(image_crop);
         return number;
-    } else{
+    }else{
         // we have sub-types
         const ImageViewRGB32 image_crop = extract_box_reference(screen, m_subtype_number_box);
         int number = ocr_number(image_crop);

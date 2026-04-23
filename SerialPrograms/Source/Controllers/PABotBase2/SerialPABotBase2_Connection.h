@@ -36,6 +36,7 @@ public:
 
 private:
     bool open_serial_port();
+    bool connect_to_device();
     bool open_serial_connection();
     bool open_device_connection(bool set_to_null_controller);
     void connect_thread_body(bool set_to_null_controller);

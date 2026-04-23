@@ -20,7 +20,7 @@ namespace Pokemon {
 // GEN9: SV, LZA, HOME(Currently), Needs testing: Champions, LA, BDSP
 enum class PokemonTypeGeneration{
     GEN8,
-	GEN9,
+    GEN9,
 };
 
 //  Find all type symbols inside the image.

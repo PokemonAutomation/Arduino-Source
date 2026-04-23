@@ -39,8 +39,7 @@ WallDuration thread_cpu_time(const ThreadHandle& handle){
         )
     ){
         nanos = pth.pth_user_time + pth.pth_system_time; // user time + system time in ns
-    }
-    else{
+    }else{
         return WallDuration::min();
     }
 

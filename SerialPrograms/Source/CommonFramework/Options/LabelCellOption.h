@@ -45,6 +45,8 @@ public:
     const ImageViewRGB32& icon() const;
     Resolution resolution() const;
 
+    void set_text(std::string x);
+
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 

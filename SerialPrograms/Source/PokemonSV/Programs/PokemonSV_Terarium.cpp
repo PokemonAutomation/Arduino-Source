@@ -72,7 +72,7 @@ void return_to_plaza(const ProgramInfo& info, VideoStream& stream, ProController
                     fly_to_closest_pokecenter_on_map(info, stream, context);
                     context.wait_for_all_requests();
                     returned_to_pokecenter = true;
-                }catch(...){
+                }catch (...){
                     stream.log("Failed to return to Pokecenter. Closing map and retrying.");
                     laggy = true;
                 }

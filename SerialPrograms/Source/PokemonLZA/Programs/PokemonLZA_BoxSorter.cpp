@@ -316,7 +316,7 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                     if (dex_number_detector.dex_type() == DexType::HYPERSPACE){
                         name_slug = HYPERSPACE_DEX_SLUGS()[dex_number-1];
                         dex_number += (uint16_t)LUMIOSE_DEX_SLUGS().size();
-                    } else{
+                    }else{
                         name_slug = LUMIOSE_DEX_SLUGS()[dex_number-1];
                     }
                     

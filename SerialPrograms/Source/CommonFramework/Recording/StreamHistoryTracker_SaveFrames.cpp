@@ -237,7 +237,7 @@ void StreamHistoryTracker::on_frame(std::shared_ptr<const VideoFrame> frame){
         // Drop oldest if we are falling behind
         if (m_pending_frames.size() >= MAX_PENDING_FRAMES){
             m_pending_frames.pop_front(); 
-            m_logger.log("Worker thread lagging: Frame dropped.", COLOR_RED);
+            m_logger.log("StreamHistory worker thread lagging: Frame dropped.", COLOR_RED);
         }
         m_pending_frames.emplace_back(std::move(frame));
 

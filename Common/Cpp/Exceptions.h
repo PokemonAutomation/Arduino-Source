@@ -77,7 +77,7 @@ public:
 class ParseException : public Exception{
 public:
     ParseException() = default;
-    ParseException(std::string message) : m_message(std::move(message)) {}
+    ParseException(std::string message);
     virtual const char* name() const override{ return "ParseException"; }
     virtual std::string message() const override{ return m_message; }
 protected:

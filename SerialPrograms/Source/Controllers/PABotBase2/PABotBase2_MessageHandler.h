@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 namespace PABotBase2{
 
 
-
+#if 0
 class MessageHandler{
 public:
     virtual ~MessageHandler() = default;
@@ -38,6 +38,7 @@ public:
         assert_size_eq(logger, sizeof(MessageType), header);
     }
 };
+#endif
 
 
 }

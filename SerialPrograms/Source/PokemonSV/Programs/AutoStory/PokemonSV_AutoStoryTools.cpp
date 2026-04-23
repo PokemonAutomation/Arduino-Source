@@ -385,7 +385,7 @@ void overworld_navigation(
 
                     context.wait_for_all_requests();
                     if (should_realign){
-                        try {
+                        try{
                             realign_player(info, stream, context, PlayerRealignMode::REALIGN_OLD_MARKER);
                    
                         }catch (UnexpectedBattleException&){
@@ -411,7 +411,7 @@ void overworld_navigation(
                 auto_heal_from_menu_or_overworld(info, stream, context, 0, true);
             }
             context.wait_for_all_requests();
-            try {
+            try{
                 realign_player(info, stream, context, PlayerRealignMode::REALIGN_OLD_MARKER);
                 if (stop_condition == NavigationStopCondition::STOP_MARKER && !confirm_marker_present(info, stream, context)){
                     // if marker not present when using marker based navigation, don't keep walking forward.
@@ -556,7 +556,7 @@ void confirm_minimap_unlocked(SingleSwitchProgramEnvironment& env, ProController
     try{
         direction.change_direction(env.program_info(), env.console, context, 3.02);
         pbf_press_button(context, BUTTON_L, 200ms, 200ms);
-    }catch(OperationFailedException&){
+    }catch (OperationFailedException&){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "confirm_minimap_unlocked(): Unable to confirm that the minimap is unlocked. Likely because the direction cannot be detected. "
@@ -897,7 +897,7 @@ void handle_unexpected_battles(
     >&& action
 ){
     while (true){
-        try {
+        try{
             context.wait_for_all_requests();
             action(info, stream, context);
             return;
@@ -1019,7 +1019,7 @@ void handle_failed_action(
 ){
     size_t num_failures = 0;
     while (true){
-        try {
+        try{
             context.wait_for_all_requests();
             action(info, stream, context);
             return;
@@ -1114,7 +1114,7 @@ void press_A_until_dialog(
 
 bool is_ride_active(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     while (true){
-        try {
+        try{
             // open main menu
             enter_menu_from_overworld(info, stream, context, -1, MenuSide::NONE, true);
             context.wait_for_all_requests();
@@ -1135,7 +1135,7 @@ bool is_ride_active(const ProgramInfo& info, VideoStream& stream, ProControllerC
             }
             return is_ride_active;        
 
-        }catch(UnexpectedBattleException&){
+        }catch (UnexpectedBattleException&){
             run_wild_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
         }
     }
@@ -1200,7 +1200,7 @@ void realign_player_from_landmark(
             );
         }
 
-        try {
+        try{
             open_map_from_overworld(info, stream, context, false);
 
             // move cursor near landmark (pokecenter)
@@ -1330,7 +1330,7 @@ void move_cursor_towards_flypoint_and_go_there(
             );
         }
 
-        try {
+        try{
             open_map_from_overworld(info, stream, context, false);
 
             // move cursor near landmark (pokecenter)
@@ -1394,15 +1394,19 @@ void check_num_sunflora_found(SingleSwitchProgramEnvironment& env, ProController
     VideoSnapshot screen = env.console.video().snapshot();
     ImageFloatBox num_sunflora_box = {0.27, 0.02, 0.04, 0.055};
     int number = OCR::read_number_waterfill(env.console, extract_box_reference(screen, num_sunflora_box), 0xff000000, 0xff808080);
+    std::string number_string = std::to_string(number);
+    std::string expected_number_string = std::to_string(expected_number);
 
-    if (number != expected_number){
+    // checks that expected_number is a prefix of number
+    // this is to handle the Asian languages that have extra characters after the number
+    if (number_string.compare(0, expected_number_string.size(), expected_number_string) == 0){
+        env.console.log("Number of sunflora found: " + expected_number_string);
+    }else{
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "The number of sunflora found is different than expected.",
             env.console
         );
-    }else{
-        env.console.log("Number of sunflora found: " + std::to_string(number));
     }
 
 
@@ -1434,7 +1438,7 @@ void checkpoint_reattempt_loop(
         enter_menu_from_overworld(env.program_info(), env.console, context, -1);
        
         break;
-    }catch(OperationFailedException& e){
+    }catch (OperationFailedException& e){
         if (i > max_attempts){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
@@ -1475,7 +1479,7 @@ void checkpoint_reattempt_loop_tutorial(
         action(i);
 
         break;  
-    }catch(OperationFailedException& e){
+    }catch (OperationFailedException& e){
         if (i > max_attempts){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
