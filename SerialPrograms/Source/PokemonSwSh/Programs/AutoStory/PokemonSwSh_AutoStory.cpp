@@ -65,7 +65,6 @@ AutoStory::AutoStory()
     )
     , BALL_SELECT(
         "<b>Eternatus Ball:</b>",
-        "Use this ball to catch Eternatus.",
         LockMode::LOCK_WHILE_RUNNING,
         "master-ball"
     )
