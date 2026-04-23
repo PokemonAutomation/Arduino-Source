@@ -140,9 +140,9 @@ PossibleHitsDisplay::PossibleHitsDisplay()
     PA_ADD_STATIC(hits);
 }
 
-std::vector<AdvRngState> PossibleHitsDisplay::get_rng_states_from_map(std::map<AdvRngState,AdvPokemonResult>& hits_map){
+std::vector<AdvRngState> PossibleHitsDisplay::get_rng_states_from_map(const std::map<AdvRngState,AdvPokemonResult>& hits_map){
     std::vector<AdvRngState> rng_states;
-    for(std::map<AdvRngState,AdvPokemonResult>::iterator it = hits_map.begin(); it != hits_map.end(); ++it) {
+    for(std::map<AdvRngState,AdvPokemonResult>::const_iterator it = hits_map.begin(); it != hits_map.end(); ++it) {
         rng_states.emplace_back(it->first);
     }
     return rng_states;
@@ -167,14 +167,14 @@ std::string PossibleHitsDisplay::get_hits_string(const std::vector<AdvRngState>&
     }
     return hits_string;
 }
-std::string PossibleHitsDisplay::get_hits_string(std::map<AdvRngState, AdvPokemonResult>& hits_map){
+std::string PossibleHitsDisplay::get_hits_string(const std::map<AdvRngState, AdvPokemonResult>& hits_map){
     return get_hits_string(get_rng_states_from_map(hits_map));
 }
 
 void PossibleHitsDisplay::set(const std::vector<AdvRngState>& rng_states){
     hits.set(get_hits_string(rng_states));
 }
-void PossibleHitsDisplay::set(std::map<AdvRngState, AdvPokemonResult>& hits_map){
+void PossibleHitsDisplay::set(const std::map<AdvRngState, AdvPokemonResult>& hits_map){
     std::vector<AdvRngState> rng_states = get_rng_states_from_map(hits_map);
     set(rng_states);
 }

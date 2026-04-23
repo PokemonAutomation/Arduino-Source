@@ -59,28 +59,34 @@ private:
 
     };
 
-    bool have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t TARGET_SEED, AdvRngState& hit);
+    bool have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t& TARGET_SEED, const AdvRngState& hit);
 
     AdvObservedPokemon read_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
-    void update_filters(AdvRngFilters& filters, AdvObservedPokemon& pokemon, StatReads& stats, EVs& evyield, BaseStats& BASE_STATS);
+    void update_filters(
+        AdvRngFilters& filters, 
+        AdvObservedPokemon& pokemon, 
+        const StatReads& stats, 
+        const EVs& evyield, 
+        const BaseStats& BASE_STATS
+    );
     std::map<AdvRngState, AdvPokemonResult> get_starter_search_results(
         SingleSwitchProgramEnvironment& env,
         AdvRngSearcher& searcher, 
         AdvRngFilters& filters,
         const std::vector<uint16_t>& SEED_VALUES,
         const uint64_t& ADVANCES, 
-        uint64_t& advances_radius, 
-        AdvObservedPokemon& pokemon
+        const uint64_t& advances_radius, 
+        const AdvObservedPokemon& pokemon
     );
     double get_seed_calibration_frames(
-        StarterRngCalibrationHistory& CALIBRATION_HISTORY,
+        const StarterRngCalibrationHistory& CALIBRATION_HISTORY,
         const std::vector<uint16_t>& SEED_VALUES, 
         const int16_t& SEED_POSITION
     );
     double get_advances_calibration_frames(
-        StarterRngCalibrationHistory& CALIBRATION_HISTORY, 
-        uint64_t ADVANCES
+        const StarterRngCalibrationHistory& CALIBRATION_HISTORY, 
+        const uint64_t& ADVANCES
     );
 
     bool update_history(
@@ -88,10 +94,10 @@ private:
         StarterRngAdvanceHistory& ADVANCE_HISTORY,
         StarterRngCalibrationHistory& CALIBRATION_HISTORY, 
         const uint16_t& MAX_HISTORY_LENGTH,
-        double& SEED_CALIBRATION_FRAMES,
-        double& ADVANCES_CALIBRATION,
-        double& CONTINUE_SCREEN_ADJUSTMENT,
-        std::map<AdvRngState, AdvPokemonResult>& search_hits,
+        const double& SEED_CALIBRATION_FRAMES,
+        const double& ADVANCES_CALIBRATION,
+        const double& CONTINUE_SCREEN_ADJUSTMENT,
+        const std::map<AdvRngState, AdvPokemonResult>& search_hits,
         bool force_finish = false
     );
 
@@ -101,7 +107,7 @@ private:
         ProControllerContext& context, 
         AdvObservedPokemon& pokemon,
         AdvRngFilters& filters,
-        BaseStats& BASE_STATS
+        const BaseStats& BASE_STATS
     );
 
     bool walk_to_route1_from_lab(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
@@ -111,7 +117,7 @@ private:
         ProControllerContext& context, 
         AdvObservedPokemon& pokemon,
         AdvRngFilters& filters,
-        BaseStats& BASE_STATS
+        const BaseStats& BASE_STATS
     );
 
     

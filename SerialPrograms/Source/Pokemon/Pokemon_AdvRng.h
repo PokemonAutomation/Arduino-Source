@@ -133,7 +133,7 @@ struct AdvRngFilters{
 void level_up_observed_pokemon(AdvObservedPokemon& pokemon, StatReads& newstats, EVs& evyield);
 
 // returns search filters that correspond with observed stats
-AdvRngFilters observation_to_filters(AdvObservedPokemon& observation, BaseStats& basestats, AdvRngMethod method = AdvRngMethod::Method1);
+AdvRngFilters observation_to_filters(const AdvObservedPokemon& observation, const BaseStats& basestats, AdvRngMethod method = AdvRngMethod::Method1);
 
 class AdvRngSearcher{
 public:

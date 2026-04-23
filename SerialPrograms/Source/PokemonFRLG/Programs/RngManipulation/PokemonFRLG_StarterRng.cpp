@@ -301,7 +301,7 @@ AdvNature string_to_nature(std::string nature_string){
 
 } // namespace
 
-bool StarterRng::have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t TARGET_SEED, AdvRngState& hit){
+bool StarterRng::have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t& TARGET_SEED, const AdvRngState& hit){
     return (hit.seed == TARGET_SEED) && (hit.advance == ADVANCES);
 }
 
@@ -374,7 +374,13 @@ AdvObservedPokemon StarterRng::read_summary(SingleSwitchProgramEnvironment& env,
 }
 
 
-void StarterRng::update_filters(AdvRngFilters& filters, AdvObservedPokemon& pokemon, StatReads& stats, EVs& evyield, BaseStats& BASE_STATS){
+void StarterRng::update_filters(
+    AdvRngFilters& filters, 
+    AdvObservedPokemon& pokemon, 
+    const StatReads& stats, 
+    const EVs& evyield, 
+    const BaseStats& BASE_STATS
+){
     pokemon.level.emplace_back(pokemon.level.back() + 1);
     pokemon.stats.emplace_back(stats);
     pokemon.evs.emplace_back(evyield);
@@ -390,8 +396,8 @@ std::map<AdvRngState, AdvPokemonResult> StarterRng::get_starter_search_results(
     AdvRngFilters& filters,
     const std::vector<uint16_t>& SEED_VALUES,
     const uint64_t& ADVANCES, 
-    uint64_t& advances_radius, 
-    AdvObservedPokemon& pokemon
+    const uint64_t& advances_radius, 
+    const AdvObservedPokemon& pokemon
 ){
     std::map<AdvRngState, AdvPokemonResult> search_hits;
     for (int i=0; i<4; i++){
@@ -411,7 +417,7 @@ std::map<AdvRngState, AdvPokemonResult> StarterRng::get_starter_search_results(
 }
 
 double StarterRng::get_seed_calibration_frames(
-    StarterRngCalibrationHistory& HISTORY, 
+    const StarterRngCalibrationHistory& HISTORY, 
     const std::vector<uint16_t>& SEED_VALUES, 
     const int16_t& SEED_POSITION
 ){
@@ -443,7 +449,7 @@ double StarterRng::get_seed_calibration_frames(
     return average_offset;
 }
 
-double StarterRng::get_advances_calibration_frames(StarterRngCalibrationHistory& CALIBRATION_HISTORY, uint64_t ADVANCES){
+double StarterRng::get_advances_calibration_frames(const StarterRngCalibrationHistory& CALIBRATION_HISTORY, const uint64_t& ADVANCES){
     double sum = 0;
     uint16_t len = 0;
     for (size_t i=0; i<CALIBRATION_HISTORY.results.size(); i++){
@@ -467,10 +473,10 @@ bool StarterRng::update_history(
     StarterRngAdvanceHistory& ADVANCE_HISTORY,
     StarterRngCalibrationHistory& CALIBRATION_HISTORY, 
     const uint16_t& MAX_HISTORY_LENGTH,
-    double& SEED_CALIBRATION_FRAMES,
-    double& ADVANCES_CALIBRATION,
-    double& CONTINUE_SCREEN_ADJUSTMENT,
-    std::map<AdvRngState, AdvPokemonResult>& search_hits,
+    const double& SEED_CALIBRATION_FRAMES,
+    const double& ADVANCES_CALIBRATION,
+    const double& CONTINUE_SCREEN_ADJUSTMENT,
+    const std::map<AdvRngState, AdvPokemonResult>& search_hits,
     bool force_finish
 ){
     const int MAX_ADVANCE_POSSIBILITIES = 5;
@@ -504,7 +510,7 @@ bool StarterRng::update_history(
     
     std::vector<uint64_t> advances;
     std::vector<AdvRngState> hits;
-    for(std::map<AdvRngState,AdvPokemonResult>::iterator it=search_hits.begin(); it!=search_hits.end(); ++it) {
+    for(std::map<AdvRngState,AdvPokemonResult>::const_iterator it=search_hits.begin(); it!=search_hits.end(); ++it) {
         advances.emplace_back(it->first.advance);
         hits.emplace_back(it->first);
     }
@@ -635,7 +641,7 @@ bool StarterRng::auto_battle_rival(
     ProControllerContext& context, 
     AdvObservedPokemon& pokemon,
     AdvRngFilters& filters,
-    BaseStats& BASE_STATS
+    const BaseStats& BASE_STATS
 ){
     Pokemon::EVs evyield = {0, 0, 0, 0, 0, 0};
     switch(STARTER){
@@ -816,7 +822,7 @@ int StarterRng::autolevel_on_route1(
     ProControllerContext& context, 
     AdvObservedPokemon& pokemon,
     AdvRngFilters& filters,
-    BaseStats& BASE_STATS
+    const BaseStats& BASE_STATS
 ){
     Pokemon::EVs evyield = {0, 0, 0, 0, 0, 0};
     Pokemon::StatReads stats;
