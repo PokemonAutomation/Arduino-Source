@@ -30,28 +30,18 @@ language
 #include <algorithm>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/FrozenImageDetector.h"
-#include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Pokemon/Inference/Pokemon_TypeReader.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "Pokemon/Resources/Pokemon_PokemonNames.h"
-#include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon/Pokemon_BoxCursor.h"
 #include "Pokemon/Pokemon_CollectedPokemonInfo.h"
 #include "PokemonHome/Inference/PokemonHome_ButtonDetector.h"
-#include "PokemonHome/Inference/PokemonHome_BoxGenderDetector.h"
-#include "PokemonHome/Inference/PokemonHome_BallReader.h"
-#include "PokemonHome_BoxSorter.h"
 #include "PokemonHome_BoxNavigation.h"
+#include "PokemonHome_BoxSorter.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -217,7 +207,7 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     BoxCursor dest_cursor;
     BoxCursor nav_cursor = {0, 0, 0};
 
-	exit_menus(env, context, VIDEO_DELAY.get());
+    exit_menus(env, context, VIDEO_DELAY.get());
     
     BoxViewWatcher box_view_watcher(&env.console.overlay());
     SummaryScreenWatcher summary_screen_watcher(&env.console.overlay());
@@ -266,7 +256,6 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                     ErrorReport::SEND_ERROR_REPORT, "HomeBoxSorter(): does not find summary screen after 5 sec", env.console
                 );
             }
-
 
             // cycle through each summary of the current box and fill pokemon information
             for (size_t row = 0; row < BOX_ROWS; row++){
@@ -336,4 +325,3 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 }
 }
 }
-

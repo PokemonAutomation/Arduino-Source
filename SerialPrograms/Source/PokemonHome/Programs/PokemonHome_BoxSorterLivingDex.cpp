@@ -9,25 +9,24 @@
 #include <optional>
 #include <sstream>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Inference/Pokemon_TypeReader.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_BoxCursor.h"
 #include "Pokemon/Pokemon_CollectedPokemonInfo.h"
 #include "PokemonHome/Inference/PokemonHome_ButtonDetector.h"
-#include "PokemonHome_BoxSorterLivingDex.h"
 #include "PokemonHome_BoxNavigation.h"
-#include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Cpp/Json/JsonArray.h"
-#include "Common/Cpp/Json/JsonObject.h"
-#include "Pokemon/Inference/Pokemon_TypeReader.h"
+#include "PokemonHome_BoxSorterLivingDex.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -148,7 +147,7 @@ bool is_viable_for_dex(LivingDexEntry entry, CollectedPokemonInfo pokemonInfo) {
 
     if (entry.primary_type != pokemonInfo.primaryType || entry.secondary_type != pokemonInfo.secondaryType) {
         return false;
-	}
+    }
 
     return true;
 }
@@ -312,7 +311,7 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
     for (size_t box_idx = 0; box_idx < reject_box_count; box_idx++) {
         if (box_idx != 0) {
             dest_cursor = BoxCursor(REJECT_BOX_START - 1 + box_idx, 0, 0);
-			nav_cursor = move_cursor_to(env, context, nav_cursor, dest_cursor, GAME_DELAY);
+            nav_cursor = move_cursor_to(env, context, nav_cursor, dest_cursor, GAME_DELAY);
         }
         else {
             // Moving the cursor until it goes to the first slot
@@ -400,7 +399,7 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
 
     for (size_t i = 0; i < living_dex_order.size(); i++)
     {
-		bool found = false;
+        bool found = false;
         LivingDexEntry entry = living_dex_order[i];
         env.log("Looking for " + entry.slug + " in the living dex boxes.");
         for(size_t j = i; j < living_dex_boxes_data.size(); j++){
@@ -408,7 +407,7 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
                 continue;
             }
 
-			if (!is_viable_for_dex(entry, *living_dex_boxes_data[j])) {
+            if (!is_viable_for_dex(entry, *living_dex_boxes_data[j])) {
                 continue;
             }
 
@@ -440,25 +439,25 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
                 env.update_stats();
             }
 
-			break;
+            break;
         }
 
         if (found){
-			continue;
+            continue;
         }
 
-		env.log("Could not find a pokemon for " + entry.slug + " in the living dex boxes, looking in reject boxes for a valid match.");
+        env.log("Could not find a pokemon for " + entry.slug + " in the living dex boxes, looking in reject boxes for a valid match.");
 
         for (size_t j = 0; j < reject_boxes_data.size(); j++) {
             if (!reject_boxes_data[j].has_value()) {
                 continue;
             }
 
-			if (!is_viable_for_dex(entry, *reject_boxes_data[j])) {
+            if (!is_viable_for_dex(entry, *reject_boxes_data[j])) {
                 continue;
             }
 
-			found = true;
+            found = true;
 
             BoxCursor pokemon_cursor = BoxCursor(REJECT_BOX_START - 1 + j / 30, (j / 6) % 5, j % 6);
             BoxCursor destination_cursor = BoxCursor(LIVING_DEX_START_BOX - 1 + i / 30, (i / 6) % 5, i % 6);
@@ -482,12 +481,12 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
         }
 
         if (found) {
-			continue;
+            continue;
         }
 
         if (!living_dex_boxes_data[i].has_value()) {
             continue;
-		}
+        }
 
         // move the pokemon in the current living dex slot to the reject box or later in the living dex
         size_t empty_reject_slot = SIZE_MAX;
@@ -499,7 +498,7 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
             }
         }
         if (empty_reject_slot == SIZE_MAX) {
-			env.log("No empty reject box slots available to move pokemon out of the way, placing in open slot in living dex for now.");
+            env.log("No empty reject box slots available to move pokemon out of the way, placing in open slot in living dex for now.");
 
             for (size_t j = i + 1; j < living_dex_boxes_data.size(); j++) {
                 if (!living_dex_boxes_data[j].has_value()) {
@@ -521,8 +520,8 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
             throw UserSetupError(
                 env.logger(),
                 "ERROR: No empty slots available to move pokemon out of the way, please consider removing some duplicates or increasing the reject box range."
-			);
-		}
+            );
+        }
         ss << "Moving " << living_dex_boxes_data[i] << " at " << pokemon_cursor << " to " << destination_cursor;
         env.console.log(ss.str());
         ss.str("");
@@ -531,7 +530,7 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
         nav_cursor = move_cursor_to(env, context, nav_cursor, destination_cursor, GAME_DELAY);
         pbf_press_button(context, BUTTON_Y, 80ms, GAME_DELAY.get() + 240ms);
         context.wait_for_all_requests();
-		if (empty_living_dex_slot != SIZE_MAX) {
+        if (empty_living_dex_slot != SIZE_MAX) {
             std::swap(living_dex_boxes_data[i], living_dex_boxes_data[empty_living_dex_slot]);
         }
         else {
@@ -545,7 +544,7 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
     {
         if (!living_dex_boxes_data[i].has_value()) {
             continue;
-		}
+        }
 
         size_t empty_reject_slot = SIZE_MAX;
         for (size_t j = 0; j < reject_boxes_data.size(); j++) {
