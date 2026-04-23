@@ -79,6 +79,8 @@
 #include "MaxLair/PokemonSwSh_MaxLair_StrongBoss.h"
 #include "MaxLair/PokemonSwSh_MaxLair_BossFinder.h"
 
+#include "Programs/AutoStory/PokemonSwSh_AutoStory.h"
+
 #include "Programs/TestPrograms/PokemonSwSh_ShinyEncounterTester.h"
 #include "InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.h"
 #include "InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.h"
@@ -183,6 +185,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- Public Betas ----");
     ret.emplace_back(make_single_switch_program<DailyHighlightRNG_Descriptor, DailyHighlightRNG>());
+    ret.emplace_back(make_single_switch_program<AutoStory_Descriptor, AutoStory>());
 
 #if 0
     ret.emplace_back("---- Deprecated Programs ----");

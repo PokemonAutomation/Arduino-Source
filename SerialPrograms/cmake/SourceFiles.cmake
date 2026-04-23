@@ -2612,6 +2612,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/PokemonSwSh_Panels.h
     Source/PokemonSwSh/PokemonSwSh_Settings.cpp
     Source/PokemonSwSh/PokemonSwSh_Settings.h
+    Source/PokemonSwSh/Programs/AutoStory/PokemonSwSh_AutoStory.cpp
+    Source/PokemonSwSh/Programs/AutoStory/PokemonSwSh_AutoStory.h
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer.cpp
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer.h
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer2.cpp
