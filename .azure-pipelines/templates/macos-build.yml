@@ -542,7 +542,7 @@ stages:
           cd "$CACHE_DIR"
           if [ "$BUILD_TYPE" = "PrivateBeta" ]; then
               echo "=== Creating password-protected archive for PrivateBeta ==="
-              7z a -tzip -mx=9 "-p$ARTIFACT_PASSWORD" -mem=AES256 "$ZIP_NAME" "$DMG_NAME"
+              7z a -tzip -mx=9 "-p$ARTIFACT_PASSWORD" -mem=ZipCrypto "$ZIP_NAME" "$DMG_NAME"
               rm "$DMG_NAME"
               echo "=== Password-protected .zip created ==="
           else
