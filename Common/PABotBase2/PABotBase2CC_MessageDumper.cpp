@@ -125,7 +125,7 @@ std::string tostr(const PacketHeader* header){
         str += ", data = " + std::to_string((int32_t)((const PacketHeader_u32*)header)->data);
         return str;
     case PABB2_CONNECTION_OPCODE_INFO_BINARY:{
-        str += "LOG_BIN:";
+        str += "LOG_BIN: ";
         str += tostr_hexbytes(header + 1, header->packet_bytes - sizeof(PacketHeader) - sizeof(uint32_t));
         return str;
     }

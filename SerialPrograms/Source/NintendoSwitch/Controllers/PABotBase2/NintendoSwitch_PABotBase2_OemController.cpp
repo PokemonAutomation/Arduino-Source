@@ -248,7 +248,7 @@ void PABotBase2_OemController::run_preconnect_configure(
                 response.data() + sizeof(MessageHeader),
                 sizeof(controller_mac_address)
             );
-            logger.log("Controller MAC Address:" + tostr_hexbytes(controller_mac_address, sizeof(controller_mac_address)));
+            logger.log("Controller MAC Address: " + tostr_hexbytes(controller_mac_address, sizeof(controller_mac_address)));
         }else{
             logger.log(
                 "Invalid response size to PABB2_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS: body = " + std::to_string(response.size()),

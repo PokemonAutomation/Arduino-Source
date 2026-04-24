@@ -100,7 +100,14 @@ void set_sid_from_name_screen(
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
     pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
-    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(SID_DELAY - 15700)); // 2000 + 3000 + 1500 + 2000 + 500 + 1500 + 2000 + 3000 + 200 ms
+
+    // 2000 + 3000 + 1500 + 2000 + 500 + 1500 + 2000 + 3000 + 200 ms
+    Milliseconds delay(SID_DELAY > 15700
+        ? SID_DELAY - 15700
+        : 0
+    );
+    pbf_press_button(context, BUTTON_A, 200ms, delay);
+
     // finish dialogue and lock in SID
     pbf_press_button(context, BUTTON_A, 200ms, 0ms);
     context.wait_for_all_requests();

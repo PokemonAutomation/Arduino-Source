@@ -550,7 +550,7 @@ ControllerProfile ControllerSettingsTable::get_or_make_profile(
 
     bool found = false;
     this->run_on_all_rows([&, controller](ControllerSettingsRow& row){
-        if (row.controller_mac_address != mac_address){
+        if (row.controller_mac_address != mac_address || row.controller != controller){
             return false;
         }
 
