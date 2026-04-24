@@ -53,12 +53,26 @@ std::unique_ptr<StatsTracker> SidHelper_Descriptor::make_stats() const{
 }
 
 SidHelper::SidHelper()
-    : TARGET_ADVANCES(
+    : LANGUAGE(
+        "<b>Game Language:</b><br>"
+        "Language affects the number of advances (based on the number of text characters) that pass after the last button press.",
+        {
+            Language::English,
+            Language::Japanese,
+            Language::Spanish,
+            Language::French,
+            Language::German,
+            Language::Italian,
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
+    , TARGET_ADVANCES(
         "<b>Target Advances:</b><br>"
         "The target advances for finalizing the SID. This is arbitrary unless you're attempting to hit a specific TID/SID combination.<br>"
         "This value should always be odd.",
         LockMode::LOCK_WHILE_RUNNING, 
-        2301, 2000 // default, min
+        2301, 2275 // default, min
     )
     , NUM_CANDIDATES(
         "<b># Candidate SIDs:</b><br>"
@@ -74,6 +88,7 @@ SidHelper::SidHelper()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(TARGET_ADVANCES);
     PA_ADD_OPTION(NUM_CANDIDATES);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -93,17 +108,17 @@ void set_sid_from_name_screen(
     // confirm name (SID delay starts now)
     pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
     // advance to "...about to unfold!", picking the default rival name
-    pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1050ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1550ms);
     pbf_move_left_joystick(context, {0,-1}, 200ms, 300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1050ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1550ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
 
-    // 2000 + 3000 + 1500 + 2000 + 500 + 1500 + 2000 + 3000 + 200 ms
-    Milliseconds delay(SID_DELAY > 15700
-        ? SID_DELAY - 15700
+    // 2000 + 2500 + 1250 + 1750 + 500 + 1250 + 1750 + 2500 + 200 ms
+    Milliseconds delay(SID_DELAY > 13700
+        ? SID_DELAY - 13700
         : 0
     );
     pbf_press_button(context, BUTTON_A, 200ms, delay);
@@ -250,7 +265,34 @@ void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     double FRAMERATE = 59.999977; // FPS
     double FRAME_DURATION = 1000 / FRAMERATE; // ms
 
-    const uint64_t SID_DELAY = uint64_t((TARGET_ADVANCES - 1) * FRAME_DURATION / 2); // advances pass 2 by 2, first one doesn't count (?)
+    uint64_t FINAL_TEXT_FRAMES;
+    Language lang = LANGUAGE;
+    switch (lang){
+    case Language::English:
+        FINAL_TEXT_FRAMES = 249;
+        break;
+    case Language::Japanese:
+        FINAL_TEXT_FRAMES = 194;
+        break;
+    case Language::Italian:
+        FINAL_TEXT_FRAMES = 236;
+        break;
+    case Language::French:
+        FINAL_TEXT_FRAMES = 205;
+        break;
+    case Language::German:
+        FINAL_TEXT_FRAMES = 208;
+        break;
+    case Language::Spanish:
+        FINAL_TEXT_FRAMES = 202;
+        break;
+    default:
+        FINAL_TEXT_FRAMES = 249;
+    }
+
+    const double& FIXED_ADVANCES_OFFSET = 7; // determined empirically. Probably not console/setup dependent
+
+    const uint64_t SID_DELAY = uint64_t((TARGET_ADVANCES - 2*FINAL_TEXT_FRAMES + FIXED_ADVANCES_OFFSET) * FRAME_DURATION / 2); // advances pass 2 by 2
     env.log("Delay: " + std::to_string(SID_DELAY) + "ms");
 
     set_sid_from_name_screen(env, context, SID_DELAY);
