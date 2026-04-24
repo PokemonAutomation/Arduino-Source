@@ -9,6 +9,7 @@
 #include <map>
 #include <optional>
 #include <sstream>
+#include <vector>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
@@ -385,10 +386,12 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
         video_overlay_set.clear();
     }
 
+    if (DRY_RUN){
+        save_boxes_data_to_json(living_dex_boxes_data, "living_boxes_unsorted.json");
+        save_boxes_data_to_json(reject_boxes_data, "reject_boxes_unsorted.json");
+    }
 
     std::ostringstream ss;
-
-    // TODO: implement living dex ordering logic
 
     for (size_t i = 0; i < living_dex_order.size(); i++)
     {
@@ -410,26 +413,28 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
                 break;
             }
             else {
-                ss << "j: " << j << "i:" << i;
-                env.console.log(ss.str());
-                ss.str("");
+
                 BoxCursor pokemon_cursor = BoxCursor(LIVING_DEX_START_BOX - 1 + j / 30, (j / 6) % 5, j % 6);
                 BoxCursor destination_cursor = BoxCursor(LIVING_DEX_START_BOX - 1 + i / 30, (i / 6) % 5, i % 6);
-                ss << "Swapping " << living_dex_boxes_data[j] << " at " << pokemon_cursor << " and " << living_dex_boxes_data[i] << " at " << destination_cursor;
-                env.console.log(ss.str());
-                ss.str("");
 
-                nav_cursor = move_cursor_to(env, context, nav_cursor, pokemon_cursor, GAME_DELAY);
-                pbf_press_button(context, BUTTON_Y, 80ms, GAME_DELAY.get() + 240ms);
+                if (!DRY_RUN){
+                    ss << "Swapping " << living_dex_boxes_data[j] << " at " << pokemon_cursor << " and " << living_dex_boxes_data[i] << " at " << destination_cursor;
+                    env.console.log(ss.str());
+                    ss.str("");
 
-                nav_cursor = move_cursor_to(env, context, nav_cursor, destination_cursor, GAME_DELAY);
-                pbf_press_button(context, BUTTON_Y, 80ms, GAME_DELAY.get() + 240ms);
+                    nav_cursor = move_cursor_to(env, context, nav_cursor, pokemon_cursor, GAME_DELAY);
+                    pbf_press_button(context, BUTTON_Y, 80ms, GAME_DELAY.get() + 240ms);
 
-                context.wait_for_all_requests();
+                    nav_cursor = move_cursor_to(env, context, nav_cursor, destination_cursor, GAME_DELAY);
+                    pbf_press_button(context, BUTTON_Y, 80ms, GAME_DELAY.get() + 240ms);
 
-                std::swap(living_dex_boxes_data[j], living_dex_boxes_data[i]);
-                stats.swaps++;
-                env.update_stats();
+                    context.wait_for_all_requests();
+
+                    stats.swaps++;
+                    env.update_stats();
+                }
+
+                std::swap(living_dex_boxes_data[j], living_dex_boxes_data[i]);  
             }
 
             break;
@@ -454,21 +459,21 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
 
             BoxCursor pokemon_cursor = BoxCursor(REJECT_BOX_START - 1 + j / 30, (j / 6) % 5, j % 6);
             BoxCursor destination_cursor = BoxCursor(LIVING_DEX_START_BOX - 1 + i / 30, (i / 6) % 5, i % 6);
-            ss << "Swapping " << reject_boxes_data[j] << " at " << pokemon_cursor << " and " << living_dex_boxes_data[i] << " at " << destination_cursor;
-            env.console.log(ss.str());
-            ss.str("");
+            
+            if (!DRY_RUN){
+                ss << "Swapping " << reject_boxes_data[j] << " at " << pokemon_cursor << " and " << living_dex_boxes_data[i] << " at " << destination_cursor;
+                env.console.log(ss.str());
+                ss.str("");
+                nav_cursor = move_cursor_to(env, context, nav_cursor, pokemon_cursor, GAME_DELAY);
+                pbf_press_button(context, BUTTON_Y, 80ms, GAME_DELAY.get() + 240ms);
+                nav_cursor = move_cursor_to(env, context, nav_cursor, destination_cursor, GAME_DELAY);
+                pbf_press_button(context, BUTTON_Y, 80ms, GAME_DELAY.get() + 240ms);
+                context.wait_for_all_requests();
+                stats.swaps++;
+                env.update_stats();
+            }
 
-            nav_cursor = move_cursor_to(env, context, nav_cursor, pokemon_cursor, GAME_DELAY);
-            pbf_press_button(context, BUTTON_Y, 80ms, GAME_DELAY.get() + 240ms);
-
-            nav_cursor = move_cursor_to(env, context, nav_cursor, destination_cursor, GAME_DELAY);
-            pbf_press_button(context, BUTTON_Y, 80ms, GAME_DELAY.get() + 240ms);
-
-            context.wait_for_all_requests();
-
-            std::swap(living_dex_boxes_data[j], living_dex_boxes_data[i]);
-            stats.swaps++;
-            env.update_stats();
+            std::swap(living_dex_boxes_data[i], reject_boxes_data[j]);
 
             break;
         }
@@ -515,22 +520,26 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
                 "ERROR: No empty slots available to move pokemon out of the way, please consider removing some duplicates or increasing the reject box range."
             );
         }
-        ss << "Moving " << living_dex_boxes_data[i] << " at " << pokemon_cursor << " to " << destination_cursor;
-        env.console.log(ss.str());
-        ss.str("");
-        nav_cursor = move_cursor_to(env, context, nav_cursor, pokemon_cursor, GAME_DELAY);
-        pbf_press_button(context, BUTTON_Y, 80ms, GAME_DELAY.get() + 240ms);
-        nav_cursor = move_cursor_to(env, context, nav_cursor, destination_cursor, GAME_DELAY);
-        pbf_press_button(context, BUTTON_Y, 80ms, GAME_DELAY.get() + 240ms);
-        context.wait_for_all_requests();
-        if (empty_living_dex_slot != SIZE_MAX) {
+
+        if (!DRY_RUN){
+            ss << "Moving " << living_dex_boxes_data[i] << " at " << pokemon_cursor << " to " << destination_cursor;
+            env.console.log(ss.str());
+            ss.str("");
+            nav_cursor = move_cursor_to(env, context, nav_cursor, pokemon_cursor, GAME_DELAY);
+            pbf_press_button(context, BUTTON_Y, 80ms, GAME_DELAY.get() + 240ms);
+            nav_cursor = move_cursor_to(env, context, nav_cursor, destination_cursor, GAME_DELAY);
+            pbf_press_button(context, BUTTON_Y, 80ms, GAME_DELAY.get() + 240ms);
+            context.wait_for_all_requests();
+            stats.swaps++;
+            env.update_stats();
+        }
+
+        if (empty_living_dex_slot != SIZE_MAX){
             std::swap(living_dex_boxes_data[i], living_dex_boxes_data[empty_living_dex_slot]);
         }
         else {
             std::swap(living_dex_boxes_data[i], reject_boxes_data[empty_reject_slot]);
         }
-        stats.swaps++;
-        env.update_stats();
     }
 
     for (size_t i = living_dex_order.size(); i < living_dex_boxes_data.size(); i++)
@@ -554,27 +563,27 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
         BoxCursor pokemon_cursor = BoxCursor(LIVING_DEX_START_BOX - 1 + i / 30, i % 5, i % 6);
         BoxCursor destination_cursor = BoxCursor(REJECT_BOX_START - 1 + empty_reject_slot / 30, (empty_reject_slot / 6) % 5, empty_reject_slot % 6);
 
-        ss << "Moving " << living_dex_boxes_data[i] << " at " << pokemon_cursor << " to " << destination_cursor;
-        env.console.log(ss.str());
-        ss.str("");
-        nav_cursor = move_cursor_to(env, context, nav_cursor, pokemon_cursor, GAME_DELAY);
-        pbf_press_button(context, BUTTON_Y, 80ms, GAME_DELAY.get() + 240ms);
-        nav_cursor = move_cursor_to(env, context, nav_cursor, destination_cursor, GAME_DELAY);
-        pbf_press_button(context, BUTTON_Y, 80ms, GAME_DELAY.get() + 240ms);
-        context.wait_for_all_requests();
+        if (!DRY_RUN){
+            ss << "Moving " << living_dex_boxes_data[i] << " at " << pokemon_cursor << " to " << destination_cursor;
+            env.console.log(ss.str());
+            ss.str("");
+            nav_cursor = move_cursor_to(env, context, nav_cursor, pokemon_cursor, GAME_DELAY);
+            pbf_press_button(context, BUTTON_Y, 80ms, GAME_DELAY.get() + 240ms);
+            nav_cursor = move_cursor_to(env, context, nav_cursor, destination_cursor, GAME_DELAY);
+            pbf_press_button(context, BUTTON_Y, 80ms, GAME_DELAY.get() + 240ms);
+            context.wait_for_all_requests();
+            stats.swaps++;
+            env.update_stats();
+        }
+        
         std::swap(living_dex_boxes_data[i], reject_boxes_data[empty_reject_slot]);
-        stats.swaps++;
-        env.update_stats();
+        
     }
 
-    // Loop through living dex order
-    // Attempt to find pokemon in living_dex_boxes_data then in reject_boxes_data
-    // If found swap the pokemon into the living dex
-    // If empty and currently ocupied move to open reject box slot swapping the records
-    // If no empty reject slots move to the end of the living dex to be moved later when there are open slots
-    // Add a check to ensure enough reject slots?
-
-
+    if (DRY_RUN){
+        save_boxes_data_to_json(living_dex_boxes_data, "living_boxes_sorted.json");
+        save_boxes_data_to_json(reject_boxes_data, "reject_boxes_sorted.json");
+    }
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
