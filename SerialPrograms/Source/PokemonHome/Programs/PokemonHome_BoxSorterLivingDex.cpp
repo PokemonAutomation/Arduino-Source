@@ -95,6 +95,11 @@ BoxSorterLivingDex::BoxSorterLivingDex()
         LockMode::LOCK_WHILE_RUNNING,
         1, 1, (uint16_t)MAX_HOME_BOXES
     )
+    , SHINY_DEX(
+        "<b>Shiny Dex:</b><br>Enable or disable shiny dex mode.",
+        LockMode::LOCK_WHILE_RUNNING,
+        false
+    )
     , VIDEO_DELAY(
           "<b>Capture Card Delay:</b>",
           LockMode::LOCK_WHILE_RUNNING,
@@ -124,6 +129,7 @@ BoxSorterLivingDex::BoxSorterLivingDex()
     PA_ADD_OPTION(LIVING_DEX_START_BOX);
     PA_ADD_OPTION(REJECT_BOX_START);
     PA_ADD_OPTION(REJECT_BOX_END);
+    PA_ADD_OPTION(SHINY_DEX);
     PA_ADD_OPTION(VIDEO_DELAY);
     PA_ADD_OPTION(GAME_DELAY);
     PA_ADD_OPTION(OUTPUT_FILE);
@@ -131,7 +137,11 @@ BoxSorterLivingDex::BoxSorterLivingDex()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-bool is_viable_for_dex(LivingDexEntry entry, CollectedPokemonInfo pokemonInfo) {
+bool is_viable_for_dex(LivingDexEntry entry, CollectedPokemonInfo pokemonInfo, bool shiny_dex) {
+    if (shiny_dex != pokemonInfo.shiny){
+        return false;
+    }
+
     if (entry.nat_id != pokemonInfo.dex_number) {
         return false;
     }
@@ -156,25 +166,7 @@ bool is_viable_for_dex(LivingDexEntry entry, CollectedPokemonInfo pokemonInfo) {
 void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     StartProgramChecks::check_performance_class_wired_or_wireless(context);
 
-    ImageFloatBox type_box(0.615, 0.240, 0.071, 0.057);
-
-    for (size_t i = 0; i < 10; i++)
-    {
-        auto [t1, t2] = read_pokemon_types(
-            env.console.video().snapshot(),
-            type_box,
-            PokemonTypeGeneration::GEN9
-        );
-
-        env.log("Type read: " + POKEMON_TYPE_SLUGS().get_string(t1), COLOR_CYAN);
-        env.log("Type read: " + POKEMON_TYPE_SLUGS().get_string(t2), COLOR_CYAN);
-        pbf_wait(context, 2000ms);
-        context.wait_for_all_requests();
-    }
-
-
-
-    std::string path = RESOURCE_PATH() + "PokemonHome/DexTemplates/living.json";
+    std::string path = RESOURCE_PATH() + "PokemonHome/DexTemplates/living_form_dex_by_id_no_space.json";
     JsonValue json = load_json_file(path);
     const JsonArray& slugs = json.to_array_throw(path);
 
@@ -408,7 +400,7 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
                 continue;
             }
 
-            if (!is_viable_for_dex(entry, *living_dex_boxes_data[j])) {
+            if (!is_viable_for_dex(entry, *living_dex_boxes_data[j], SHINY_DEX)) {
                 continue;
             }
 
@@ -454,7 +446,7 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
                 continue;
             }
 
-            if (!is_viable_for_dex(entry, *reject_boxes_data[j])) {
+            if (!is_viable_for_dex(entry, *reject_boxes_data[j], SHINY_DEX)) {
                 continue;
             }
 

@@ -36,6 +36,7 @@ private:
     SimpleIntegerOption<uint16_t> LIVING_DEX_START_BOX;
     SimpleIntegerOption<uint16_t> REJECT_BOX_START;
     SimpleIntegerOption<uint16_t> REJECT_BOX_END;
+    BooleanCheckBoxOption SHINY_DEX;
     MillisecondsOption VIDEO_DELAY;
     MillisecondsOption GAME_DELAY;
     StringOption OUTPUT_FILE;
