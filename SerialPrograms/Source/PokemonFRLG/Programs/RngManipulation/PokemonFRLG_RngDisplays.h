@@ -9,6 +9,7 @@
 
 #include <vector>
 #include "Common/Cpp/Options/StringOption.h"
+#include "Common/Cpp/Options/TextEditOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Pokemon_AdvRng.h"
@@ -19,6 +20,20 @@ namespace NintendoSwitch{
 namespace PokemonFRLG{
 
 using namespace Pokemon;
+
+class SidHelperDisplay: public GroupOption{
+public:
+    SidHelperDisplay();
+
+    void set(uint16_t trainerId, const std::vector<std::pair<std::string, std::string>>& sid_messages);
+
+private:
+    static std::string get_sids_string(const std::vector<std::pair<std::string, std::string>>& sid_messages);
+
+public:
+    StringOption tid;
+    TextEditOption sids;
+};
 
 class RngFilterDisplay : public GroupOption{
 public:
