@@ -335,6 +335,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/AudioPipeline/IO/AudioSink.h
     Source/CommonFramework/AudioPipeline/IO/AudioSource.cpp
     Source/CommonFramework/AudioPipeline/IO/AudioSource.h
+    Source/CommonFramework/AudioPipeline/IO/DirectShowAudioCapture.cpp
+    Source/CommonFramework/AudioPipeline/IO/DirectShowAudioCapture.h
     Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.cpp
     Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.h
     Source/CommonFramework/AudioPipeline/Spectrum/FFTStreamer.cpp
@@ -513,10 +515,14 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Tools/VideoStream.h
     Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.cpp
     Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.h
+    Source/CommonFramework/VideoPipeline/Backends/CameraVideoSource_OpenCV.cpp
+    Source/CommonFramework/VideoPipeline/Backends/CameraVideoSource_OpenCV.h
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.5.cpp
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.5.h
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.cpp
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.h
+    Source/CommonFramework/VideoPipeline/Backends/DirectShowCameraList.cpp
+    Source/CommonFramework/VideoPipeline/Backends/DirectShowCameraList.h
     Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.cpp
     Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.h
     Source/CommonFramework/VideoPipeline/Backends/QCameraThread.h
