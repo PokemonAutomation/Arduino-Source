@@ -25,6 +25,7 @@ InferenceSession::InferenceSession(
     , m_overlays(stream.overlay())
     , m_triggered(nullptr)
 {
+    WallClock start_time = current_time();
     try{
         for (size_t c = 0; c < callbacks.size(); c++){
             const PeriodicInferenceCallback& callback = callbacks[c];
@@ -40,7 +41,8 @@ InferenceSession::InferenceSession(
                 stream.video_inference_pivot().add_callback(
                     scope, &m_triggered,
                     visual_callback,
-                    callback.period > std::chrono::milliseconds(0) ? callback.period : default_video_period
+                    callback.period > std::chrono::milliseconds(0) ? callback.period : default_video_period,
+                    start_time
                 );
                 visual_callback.make_overlays(m_overlays);
                 break;
@@ -49,7 +51,8 @@ InferenceSession::InferenceSession(
                 stream.audio_inference_pivot().add_callback(
                     scope, &m_triggered,
                     static_cast<AudioInferenceCallback&>(*callback.callback),
-                    callback.period > std::chrono::milliseconds(0) ? callback.period : default_audio_period
+                    callback.period > std::chrono::milliseconds(0) ? callback.period : default_audio_period,
+                    start_time
                 );
                 break;
             }
