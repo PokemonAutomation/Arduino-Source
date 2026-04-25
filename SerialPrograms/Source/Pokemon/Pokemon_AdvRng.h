@@ -133,7 +133,7 @@ struct AdvRngFilters{
 void level_up_observed_pokemon(AdvObservedPokemon& pokemon, StatReads& newstats, EVs& evyield);
 
 // returns search filters that correspond with observed stats
-AdvRngFilters observation_to_filters(AdvObservedPokemon& observation, BaseStats& basestats, AdvRngMethod method = AdvRngMethod::Method1);
+AdvRngFilters observation_to_filters(const AdvObservedPokemon& observation, const BaseStats& basestats, AdvRngMethod method = AdvRngMethod::Method1);
 
 class AdvRngSearcher{
 public:
@@ -154,6 +154,13 @@ public:
         const std::vector<uint16_t>& seeds,
         uint64_t min_advances,
         uint64_t max_advances,
+        uint16_t tid_xor_sid = 0,
+        uint8_t gender_threshold = 126
+    );
+
+    void refine_search(
+        std::map<AdvRngState, AdvPokemonResult>& map,
+        AdvRngFilters& target,
         uint16_t tid_xor_sid = 0,
         uint8_t gender_threshold = 126
     );

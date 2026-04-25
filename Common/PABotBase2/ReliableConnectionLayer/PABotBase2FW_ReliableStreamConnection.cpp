@@ -181,7 +181,7 @@ bool ReliableStreamConnectionFW::run_events(){
     case PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA:
         m_stream_ready = true;
         if (!m_stream_coalescer.push_stream((const PacketHeaderData*)packet)){
-            send_oob_info_str("Stream is full.");
+            send_oob_info_label_u32("Push Stream Failed", m_stream_coalescer.free_bytes());
             return true;
         }
         m_reliable_sender.send_oob_packet_u16(

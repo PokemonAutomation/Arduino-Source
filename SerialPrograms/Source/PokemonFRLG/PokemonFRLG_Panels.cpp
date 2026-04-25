@@ -22,6 +22,7 @@
 #include "Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Overworld.h"
 #include "Programs/RngManipulation/PokemonFRLG_RngHelper.h"
 #include "Programs/RngManipulation/PokemonFRLG_SidHelper.h"
+#include "Programs/RngManipulation/PokemonFRLG_StarterRng.h"
 #include "Programs/TestPrograms/PokemonFRLG_SoundListener.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadStats.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadBattleLevelUp.h"
@@ -67,6 +68,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back("---- Untested/Beta/WIP ----");
         ret.emplace_back(make_single_switch_program<ItemDuplication_Descriptor, ItemDuplication>());
         ret.emplace_back(make_single_switch_program<SidHelper_Descriptor, SidHelper>());
+        ret.emplace_back(make_single_switch_program<StarterRng_Descriptor, StarterRng>());
     }
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
