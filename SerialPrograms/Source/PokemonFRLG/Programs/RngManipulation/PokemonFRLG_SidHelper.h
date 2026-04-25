@@ -12,6 +12,7 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
+#include "PokemonFRLG_RngDisplays.h"
 
 
 namespace PokemonAutomation{
@@ -39,6 +40,8 @@ private:
 
     SimpleIntegerOption<uint32_t> TARGET_ADVANCES;
     SimpleIntegerOption<uint8_t> NUM_CANDIDATES;
+
+    SidHelperDisplay SIDS_DISPLAY;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     EventNotificationOption NOTIFICATION_SIDS;

@@ -88,6 +88,7 @@ SidHelper::SidHelper()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_OPTION(SIDS_DISPLAY);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(TARGET_ADVANCES);
     PA_ADD_OPTION(NUM_CANDIDATES);
@@ -236,7 +237,7 @@ std::vector<std::pair<std::string, std::string>> get_sid_messages(
         std::pair<std::string, std::string> m;
         uint16_t sid = searcher.state.s0 >> 16;
 
-        m.first = "Advances " + std::to_string(searcher.state.advance);
+        m.first = std::to_string(searcher.state.advance) + " Advances";
         m.second = std::to_string(sid);
         messages.push_back(m);
 
@@ -304,6 +305,8 @@ void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     std::vector<std::pair<std::string, std::string>> sid_messages = get_sid_messages(
         env, context, tid, TARGET_ADVANCES, NUM_CANDIDATES
     );
+
+    SIDS_DISPLAY.set(tid, sid_messages);
 
     send_program_notification(env, NOTIFICATION_SIDS, COLOR_BLUE, "Possible SIDs:", sid_messages, "");
 
