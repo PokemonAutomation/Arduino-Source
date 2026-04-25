@@ -29,11 +29,13 @@ void reset_and_perform_blind_sequence(
     uint8_t PROFILE
 );
 
+#if 0
 void reset_and_detect_copyright_text(
     ConsoleHandle& console, 
     ProControllerContext& context, 
     uint8_t PROFILE = 0
 );
+#endif
 
 }
 }

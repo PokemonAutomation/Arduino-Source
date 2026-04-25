@@ -15,6 +15,28 @@ namespace PokemonFRLG{
 
 using namespace Pokemon;
 
+SidHelperDisplay::SidHelperDisplay()
+    : GroupOption("TID/SID Results", LockMode::READ_ONLY)
+    , tid(false, "<b>Trainer ID:</b>", LockMode::READ_ONLY, "-", "")
+    , sids("<b>SID Possibilities:</b>", LockMode::READ_ONLY, "-", "")
+{
+    PA_ADD_STATIC(tid);
+    PA_ADD_STATIC(sids);
+}
+std::string SidHelperDisplay::get_sids_string(const std::vector<std::pair<std::string, std::string>>& sid_messages){
+    std::string sid_str = "";
+    for (auto& str_pair : sid_messages){
+        sid_str += str_pair.first + ": ";
+        sid_str += str_pair.second + "\n";
+    }
+    return sid_str;
+}
+void SidHelperDisplay::set(uint16_t trainerId, const std::vector<std::pair<std::string, std::string>>& sid_messages){
+    tid.set(std::to_string(trainerId));
+    sids.set(get_sids_string(sid_messages));
+}
+
+
 RngFilterDisplay::RngFilterDisplay()
     : GroupOption("Observed Stats", LockMode::READ_ONLY)
     , hp(false, "<b>HP IV:</b>", LockMode::READ_ONLY, "-", "")

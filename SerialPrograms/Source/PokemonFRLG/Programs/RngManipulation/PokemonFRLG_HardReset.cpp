@@ -213,6 +213,7 @@ void reset_and_perform_blind_sequence(
     }
 }
 
+#if 0
 void reset_and_detect_copyright_text(ConsoleHandle& console, ProControllerContext& context, uint8_t PROFILE){
     go_home(console, context);
     close_game_from_home(console, context);
@@ -280,6 +281,7 @@ void reset_and_detect_copyright_text(ConsoleHandle& console, ProControllerContex
     }
 
 }
+#endif
 
 }
 }

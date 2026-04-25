@@ -159,11 +159,6 @@ StarterRng::StarterRng()
     //     LockMode::LOCK_WHILE_RUNNING,
     //     1000, 192 // default, min
     // )
-    , USE_COPYRIGHT_TEXT(
-        "<b>Detect Copyright Text:</b><br>Start the seed timer only after detecting the copyright text. Can be helpful if your seeds are inconsistent.",
-        LockMode::LOCK_WHILE_RUNNING,
-        true // default
-    )
     , IGNORE_WILD_SHINIES(
         "<b>Ignore wild shinies</b><br>Do not stop the program when a wild shiny is encountered.",
         LockMode::LOCK_WHILE_RUNNING, 
@@ -206,7 +201,6 @@ StarterRng::StarterRng()
     PA_ADD_OPTION(SEED_DELAY);
     PA_ADD_OPTION(ADVANCES);
     // PA_ADD_OPTION(CONTINUE_SCREEN_FRAMES);
-    PA_ADD_OPTION(USE_COPYRIGHT_TEXT);
     PA_ADD_OPTION(PROFILE);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -965,7 +959,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     uint64_t CONTINUE_SCREEN_FRAMES = 200;
 
-    const uint64_t FIXED_SEED_OFFSET = USE_COPYRIGHT_TEXT ? -2140 : -845; // milliseconds. approximate;
+    const int64_t FIXED_SEED_OFFSET = -845; // milliseconds. approximate;
     double SEED_CALIBRATION_FRAMES = 0;
     double ADVANCES_CALIBRATION = 0;
     double CONTINUE_SCREEN_ADJUSTMENT = 0;
@@ -1062,14 +1056,12 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         env.log("In-game duration: " + std::to_string(INGAME_DELAY) + "ms");
 
         env.log("Resetting Game...");
-        if (USE_COPYRIGHT_TEXT){
-            reset_and_detect_copyright_text(env.console, context, PROFILE);
-            env.log("Starting blind button presses.");
-            perform_blind_sequence(context, PokemonFRLG_RngTarget::starters, SEED_BUTTON, EXTRA_BUTTON, CALIBRATED_SEED_DELAY, CONTINUE_SCREEN_DELAY, 0, INGAME_DELAY, false);
-        }else{
-            reset_and_perform_blind_sequence(
-                env.console, context, PokemonFRLG_RngTarget::starters, SEED_BUTTON, EXTRA_BUTTON, CALIBRATED_SEED_DELAY, CONTINUE_SCREEN_DELAY, 0, INGAME_DELAY, false, PROFILE);
-        }
+        reset_and_perform_blind_sequence(
+            env.console, context, PokemonFRLG_RngTarget::starters, 
+            SEED_BUTTON, EXTRA_BUTTON, CALIBRATED_SEED_DELAY, 
+            CONTINUE_SCREEN_DELAY, 0, INGAME_DELAY, 
+            false, PROFILE
+        );
         stats.resets++; 
 
         RNG_FILTERS.reset();

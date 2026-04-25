@@ -51,7 +51,6 @@ private:
     SimpleIntegerOption<uint64_t> INGAME_ADVANCES;
     FloatingPointOption INGAME_CALIBRATION;
 
-    BooleanCheckBoxOption USE_COPYRIGHT_TEXT;
     BooleanCheckBoxOption USE_TEACHY_TV;
 
     SimpleIntegerOption<uint8_t> PROFILE;
