@@ -133,6 +133,17 @@ StarterRng::StarterRng()
         LockMode::LOCK_WHILE_RUNNING,
         SeedButton::A
     )
+    , EXTRA_BUTTON(
+        "<b>Extra Button:</b><br>"
+        "Additional button presses that affect the seed.",
+        {
+            {BlackoutButton::None, "None", "None"},
+            {BlackoutButton::L, "L", "Blackout L"},
+            {BlackoutButton::R, "R", "Blackout R"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        BlackoutButton::None
+    )
     , SEED_DELAY(
         "<b>Seed Delay Time (ms):</b><br>The delay between starting the game and advancing past the title screen. Set this to match your target seed.",
         LockMode::LOCK_WHILE_RUNNING,
@@ -191,6 +202,7 @@ StarterRng::StarterRng()
     PA_ADD_OPTION(SEED);
     PA_ADD_OPTION(SEED_LIST);
     PA_ADD_OPTION(SEED_BUTTON);
+    PA_ADD_OPTION(EXTRA_BUTTON);
     PA_ADD_OPTION(SEED_DELAY);
     PA_ADD_OPTION(ADVANCES);
     // PA_ADD_OPTION(CONTINUE_SCREEN_FRAMES);
@@ -1053,10 +1065,10 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         if (USE_COPYRIGHT_TEXT){
             reset_and_detect_copyright_text(env.console, context, PROFILE);
             env.log("Starting blind button presses.");
-            perform_blind_sequence(context, PokemonFRLG_RngTarget::starters, SEED_BUTTON, CALIBRATED_SEED_DELAY, CONTINUE_SCREEN_DELAY, 0, INGAME_DELAY, false);
+            perform_blind_sequence(context, PokemonFRLG_RngTarget::starters, SEED_BUTTON, EXTRA_BUTTON, CALIBRATED_SEED_DELAY, CONTINUE_SCREEN_DELAY, 0, INGAME_DELAY, false);
         }else{
             reset_and_perform_blind_sequence(
-                env.console, context, PokemonFRLG_RngTarget::starters, SEED_BUTTON, CALIBRATED_SEED_DELAY, CONTINUE_SCREEN_DELAY, 0, INGAME_DELAY, false, PROFILE);
+                env.console, context, PokemonFRLG_RngTarget::starters, SEED_BUTTON, EXTRA_BUTTON, CALIBRATED_SEED_DELAY, CONTINUE_SCREEN_DELAY, 0, INGAME_DELAY, false, PROFILE);
         }
         stats.resets++; 
 
