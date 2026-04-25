@@ -526,7 +526,7 @@ void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProController
             pbf_press_button(context, BUTTON_R, 160ms, 160ms);
             pbf_wait(context, wait);
 
-            try {
+            try{
                 direction.change_direction(env.program_info(), env.console, context, 4.941664);
                 pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
                 pbf_press_button(context, BUTTON_R, 160ms, 160ms);

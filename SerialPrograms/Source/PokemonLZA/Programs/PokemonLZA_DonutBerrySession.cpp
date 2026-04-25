@@ -252,7 +252,7 @@ void BerrySession::add_berries(
         }
         if (p.first.starts_with("hyper-")){
             all_normal_berries = false;
-        } else{
+        }else{
             all_hyper_berries = false;
         }
     }
@@ -286,7 +286,7 @@ void BerrySession::add_berries(
     if (move_topdown){
         // reverse the order so that we can pop back
         std::reverse(ordered_berries.begin(), ordered_berries.end());
-    } else{
+    }else{
         // Move cursr to bottom of the list
         pbf_press_dpad(context, DPAD_UP, 100ms, 500ms);
         context.wait_for_all_requests();

@@ -60,8 +60,8 @@ private:
     SectionDividerOption m_advanced_options;
     MillisecondsOption HOOH_UP_DOWN;
     MillisecondsOption HOOH_LEFT_RIGHT;
-    MillisecondsOption LUGIA_UP_DOWN;
-    MillisecondsOption LUGIA_LEFT_RIGHT;
+    MillisecondsOption LUGIA_UP_DOWN0;
+    MillisecondsOption LUGIA_LEFT_RIGHT0;
 };
 
 }

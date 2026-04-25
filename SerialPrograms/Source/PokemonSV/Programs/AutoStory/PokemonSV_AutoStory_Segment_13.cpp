@@ -270,14 +270,14 @@ void checkpoint_29(
                 );
             }        
 
-            try {
+            try{
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::CLEAR_WITH_LETS_GO, 
                     0, +1, 20, 20, false);         
 
                 break;
 
-            }catch(OperationFailedException&){ // try again if fall into water
+            }catch (OperationFailedException&){ // try again if fall into water
                 pbf_mash_button(context, BUTTON_A, 2000ms);
 
                 // // walk back to start position before bridge

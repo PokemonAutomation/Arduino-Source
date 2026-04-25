@@ -4,9 +4,14 @@
  *
  */
 
+#include <string.h>
 #include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "PABotBase2_CommandQueueManager.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace PABotBase2{
@@ -19,19 +24,31 @@ void CommandQueueManager::set_command_queue_size(uint8_t command_queue_size){
     }
     m_cv.notify_all();
 }
+bool CommandQueueManager::cancel(std::exception_ptr exception) noexcept{
+    bool ret = Cancellable::cancel(std::move(exception));
+    {
+        std::lock_guard<Mutex> lg(m_lock);
+#if 0
+        try{
+            send_cancel(std::chrono::milliseconds(100));
+        }catch (...){}
+#endif
+    }
+    m_cv.notify_all();
+    return ret;
+}
 
-
-void CommandQueueManager::wait_for_all(){
+void CommandQueueManager::wait_for_all(Cancellable* cancellable){
     std::unique_lock<Mutex> lg(m_lock);
     while (!m_pending_commands.empty()){
-        m_scope.throw_if_cancelled();
-        m_cv.wait(lg);
+        throw_if_cancelled(cancellable);
+        cv_wait(cancellable, lg);
     }
 }
-void CommandQueueManager::wait_for_command_finish(uint8_t id){
+void CommandQueueManager::wait_for_command_finish(Cancellable* cancellable, uint8_t id){
     std::unique_lock<Mutex> lg(m_lock);
     while (true){
-        m_scope.throw_if_cancelled();
+        throw_if_cancelled(cancellable);
 
         //  Command doesn't exist.
         auto iter = m_pending_commands.find(id);
@@ -39,75 +56,89 @@ void CommandQueueManager::wait_for_command_finish(uint8_t id){
             return;
         }
 
-        if (iter->second.empty()){
-            m_cv.wait(lg);
-            continue;
-        }
-
-        m_pending_commands.erase(iter);
-        return;
+        cv_wait(cancellable, lg);
     }
 }
 
-void CommandQueueManager::send_cancel(){
-    m_pending_commands.clear();
-    MessageHeader message;
-    message.message_bytes = sizeof(MessageHeader);
-    message.opcode = PABB2_MESSAGE_OPCODE_CQ_CANCEL;
-    message.id = 0;
-    if (GlobalSettings::instance().LOG_EVERYTHING){
-        m_logger.log("[MLC]: Sending: " + tostr(&message), COLOR_DARKGREEN);
+void CommandQueueManager::send_cancel() noexcept{
+    bool success;
+    {
+        std::unique_lock<Mutex> lg(m_lock);
+        m_pending_cancel = true;
+        success = try_push_pending_cancel();
     }
-    m_connection.reliable_send(&message, message.message_bytes);
+    if (success){
+        m_cv.notify_all();
+    }
 }
-void CommandQueueManager::send_replace_on_next(){
-    m_pending_commands.clear();
+void CommandQueueManager::send_replace_on_next(Cancellable* cancellable){
     MessageHeader message;
     message.message_bytes = sizeof(MessageHeader);
     message.opcode = PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT;
     message.id = 0;
-    if (GlobalSettings::instance().LOG_EVERYTHING){
-        m_logger.log("[MLC]: Sending: " + tostr(&message), COLOR_DARKGREEN);
+    {
+        std::unique_lock<Mutex> lg(m_lock);
+        try_push_pending_cancel();
+        while (true){
+            throw_if_cancelled(cancellable);
+            if (m_connection.reliable_try_send_all_or_nothing(&message, message.message_bytes)){
+                break;
+            }
+            cv_wait(cancellable, lg);
+        }
+        m_pending_commands.clear();
     }
-    m_connection.reliable_send(&message, message.message_bytes);
+    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &message);
+    m_cv.notify_all();
 }
 
 
-uint8_t CommandQueueManager::send_command(MessageHeader& command){
-    std::unique_lock<Mutex> lg(m_lock);
-    while (true){
-        m_scope.throw_if_cancelled();
+uint8_t CommandQueueManager::send_command(Cancellable* cancellable, MessageHeader& command){
+    {
+        bool need_to_wait = false;
+        std::unique_lock<Mutex> lg(m_lock);
+        try_push_pending_cancel();
+        while (true){
+            if (need_to_wait){
+                cv_wait(cancellable, lg);
+            }
+            need_to_wait = true;
+            throw_if_cancelled(cancellable);
 
-        if (m_pending_commands.size() >= m_command_queue_size){
-            m_cv.wait(lg);
-            continue;
+            if (m_pending_commands.size() >= m_command_queue_size){
+                continue;
+            }
+
+            command.id = m_command_seqnum;
+
+            //  Wait until the slot is available.
+            auto iter = m_pending_commands.find(command.id);
+            if (iter != m_pending_commands.end()){
+                continue;
+            }
+
+            iter = m_pending_commands.emplace(
+                command.id,
+                std::make_shared<CommandHandle>()
+            ).first;
+
+            bool sent;
+            try{
+                sent = m_connection.reliable_try_send_all_or_nothing(&command, command.message_bytes);
+            }catch (...){
+                m_pending_commands.erase(iter);
+                throw;
+            }
+
+            if (sent){
+                m_command_seqnum++;
+                break;
+            }
+            m_pending_commands.erase(iter);
         }
-
-        command.id = m_command_seqnum;
-
-        //  Wait until the slot is available.
-        auto iter = m_pending_commands.find(command.id);
-        if (iter != m_pending_commands.end()){
-            m_cv.wait(lg);
-            continue;
-        }
-
-        m_pending_commands[command.id];
-        m_command_seqnum++;
-        break;
     }
-
-    auto iter = m_message_handlers.find(command.opcode);
-    if (iter != m_message_handlers.end()){
-        if (iter->second->should_print()){
-            m_logger.log("[MLC]: Sending: " + iter->second->tostr(&command), COLOR_DARKGREEN);
-        }
-    }else if (GlobalSettings::instance().LOG_EVERYTHING){
-        m_logger.log("[MLC]: Sending: " + tostr(&command), COLOR_DARKGREEN);
-    }
-
-    m_connection.reliable_send(&command, command.message_bytes);
-
+    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &command);
+    m_cv.notify_all();
     return command.id;
 }
 void CommandQueueManager::report_command_finished(const MessageHeader& finished_message){
@@ -118,11 +149,68 @@ void CommandQueueManager::report_command_finished(const MessageHeader& finished_
             m_logger.log("[MLC]: Received command finish for unknown ID: " + std::to_string(finished_message.id));
             return;
         }
-        iter->second = std::string((const char*)&finished_message, finished_message.message_bytes);
+        iter->second->finished = true;
+        memcpy(
+            &iter->second->device_timestamp,
+            &((const Message_u32&)finished_message).data,
+            sizeof(uint32_t)
+        );
+        m_pending_commands.erase(iter);
+        try_push_pending_cancel();
     }
     m_cv.notify_all();
 }
 
+
+bool CommandQueueManager::try_push_pending_cancel() noexcept{
+    //  Must call under lock.
+    if (!m_pending_cancel){
+        return false;
+    }
+
+    MessageHeader message;
+    message.message_bytes = sizeof(MessageHeader);
+    message.opcode = PABB2_MESSAGE_OPCODE_CQ_CANCEL;
+    message.id = 0;
+    try{
+        if (m_connection.reliable_try_send_all_or_nothing(&message, message.message_bytes)){
+            m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &message);
+            m_pending_cancel = false;
+            m_pending_commands.clear();
+            return true;
+        }
+    }catch (...){}
+    return false;
+}
+
+
+void CommandQueueManager::on_cancellable_cancel(){
+    {
+        std::unique_lock<Mutex> lg(m_lock);
+    }
+    m_cv.notify_all();
+}
+void CommandQueueManager::cv_wait(Cancellable* cancellable, std::unique_lock<Mutex>& lg){
+    if (cancellable == nullptr){
+        m_cv.wait(lg);
+        return;
+    }
+
+    cancellable->add_cancel_listener(*this);
+    m_cv.wait(lg);
+
+    //  Unlock to remove. Otherwise, it may deadlock with "on_cancellable_cancel()"
+    //  being called from a listener callback.
+    lg.unlock();
+    cancellable->remove_cancel_listener(*this);
+    lg.lock();
+}
+void CommandQueueManager::throw_if_cancelled(Cancellable* cancellable){
+    Cancellable::throw_if_cancelled();
+    if (cancellable){
+        cancellable->throw_if_cancelled();
+    }
+}
 
 
 

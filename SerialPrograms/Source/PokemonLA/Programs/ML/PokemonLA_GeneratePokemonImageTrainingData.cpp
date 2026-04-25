@@ -123,11 +123,11 @@ void GeneratePokemonImageTrainingData::program(SingleSwitchProgramEnvironment& e
         talk_to_box_npc(env, context);
 
         // TODO: Implement remaining steps
-    }catch(ProgramFinishedException&){
+    }catch (ProgramFinishedException&){
         // Program was stopped by user
         send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
         throw;
-    }catch(ScreenshotException& e){
+    }catch (ScreenshotException& e){
         std::string fail_message = e.message();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,

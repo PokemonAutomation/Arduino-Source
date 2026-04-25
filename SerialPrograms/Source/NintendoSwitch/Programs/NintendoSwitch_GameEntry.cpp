@@ -222,10 +222,10 @@ void close_game_from_home(ConsoleHandle& console, ControllerContext& context){
             continue;
 
         default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+            pbf_press_button(context, BUTTON_HOME, 160ms, 500ms);
+            console.log(
                 "close_game_from_home(): Failed to detect either the Home screen or the Close game menu after 10 seconds.",
-                console
+                COLOR_RED
             );
         }
     }

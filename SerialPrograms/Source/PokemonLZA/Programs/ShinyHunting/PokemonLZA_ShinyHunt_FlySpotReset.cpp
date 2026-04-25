@@ -120,7 +120,7 @@ void ShinyHunt_FlySpotReset::on_config_value_changed(void* object){
         if (ROUTE == Route::HYPERSPACE_WILD_ZONE){
             NUM_RESETS.set_visibility(ConfigOptionState::ENABLED);
             MIN_CALORIE_REMAINING.set_visibility(ConfigOptionState::ENABLED);
-        } else{
+        }else{
             NUM_RESETS.set_visibility(ConfigOptionState::HIDDEN);
             MIN_CALORIE_REMAINING.set_visibility(ConfigOptionState::HIDDEN);
         }
@@ -356,7 +356,7 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
                         MIN_CALORIE_REMAINING,
                         ready_to_stop_counter
                     );
-                } else{
+                }else{
                     route(env, context, stats, to_zoom_to_max);
                 }
                 to_zoom_to_max = false;

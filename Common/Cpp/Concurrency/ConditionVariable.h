@@ -35,21 +35,26 @@ public:
     }
 
     template <class Rep, class Period>
-    void wait_for(
+    bool wait_for(
         std::unique_lock<QMutex>& lock,
         const std::chrono::duration<Rep, Period>& rel_time
     ){
-        m_cv.wait(lock.mutex(), rel_time);
+        return m_cv.wait(lock.mutex(), rel_time);
     }
     template <class Rep, class Period, class Predicate>
-    void wait_for(
+    bool wait_for(
         std::unique_lock<QMutex>& lock,
         const std::chrono::duration<Rep, Period>& rel_time,
         Predicate pred
     ){
         auto abs_time = std::chrono::system_clock::now() + rel_time;
-        while (!pred()){
-            m_cv.wait(lock.mutex(), abs_time - std::chrono::system_clock::now());
+        while (true){
+            if (pred()){
+                return true;
+            }
+            if (!m_cv.wait(lock.mutex(), abs_time - std::chrono::system_clock::now())){
+                return false;
+            }
         }
     }
 

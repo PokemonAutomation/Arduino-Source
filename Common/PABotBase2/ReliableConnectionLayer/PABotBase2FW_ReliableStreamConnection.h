@@ -20,13 +20,6 @@
 #include "PabbTime.h"
 #else
 #include "Common/Cpp/Time.h"
-inline PokemonAutomation::WallClock pabb_current_time(){
-    return PokemonAutomation::current_time();
-}
-inline PokemonAutomation::Milliseconds pabb_milliseconds(int64_t milliseconds){
-    return PokemonAutomation::Milliseconds(milliseconds);
-}
-#define pabb_time_wrapsafe_cmplt(x, y)  ((x) < (y))
 #endif
 
 namespace PokemonAutomation{
@@ -38,6 +31,9 @@ class ReliableStreamConnectionFW final : public ReliableStreamConnectionPolling{
 public:
     ReliableStreamConnectionFW(UnreliableStreamConnectionPolling& unreliable_connection);
 
+    size_t packets_received() const{
+        return m_packets_received;
+    }
     bool has_unacked_sends() const{
         return m_reliable_sender.slots_used() != 0;
     }
@@ -56,7 +52,7 @@ public:
     }
 
     virtual bool run_events() override;
-    virtual void wait_for_event(uint16_t milliseconds) override;
+    virtual void wait_for_event(WallDuration timeout) override;
 
 
 public:
@@ -66,6 +62,7 @@ public:
     void send_oob_info_u32(uint32_t data){
         m_reliable_sender.send_oob_packet_u32(0, PABB2_CONNECTION_OPCODE_INFO_U32, data);
     }
+    void send_oob_info_binary(const void* data, uint8_t bytes);
     void send_oob_info_str(const char* str);
     void send_oob_info_label_h32(const char* str, const uint32_t& data){
         send_oob_info_label_i32(PABB2_CONNECTION_OPCODE_INFO_LABEL_H32, str, data);
@@ -95,6 +92,8 @@ private:
     PacketSender m_reliable_sender;
     PacketParser m_parser;
     StreamCoalescer m_stream_coalescer;
+
+    size_t m_packets_received = 0;
 
     WallClock m_last_retransmit;
 

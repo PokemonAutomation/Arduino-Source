@@ -209,7 +209,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
                 );
                 if (ret == 0){
                     env.log("Advance arrow detected.");
-                } else {
+                }else{
                     env.log("Battle Advance arrow was not detected.");
                     stats.errors++;
                     env.update_stats();
@@ -224,7 +224,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
             },
             {{pooch_detector}}
         );
-        pooch_detector.throw_if_no_sound();
+        pooch_detector.throw_if_no_sound(std::chrono::milliseconds(1000));
         if (res == 0){
             env.log("Shiny Poochyena detected!");
             stats.poochyena++;
@@ -262,7 +262,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
                 );
                 if (ret == 0){
                     env.log("Battle menu detecteed!");
-                } else {
+                }else{
                     env.log("Battle menu was not detected.");
                     stats.errors++;
                     env.update_stats();
@@ -277,7 +277,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControll
             },
             {{starter_detector}}
         );
-        starter_detector.throw_if_no_sound();
+        starter_detector.throw_if_no_sound(std::chrono::milliseconds(1000));
         context.wait_for_all_requests();
         if (res2 == 0){
             env.log("Shiny starter detected!");

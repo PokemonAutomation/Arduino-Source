@@ -456,7 +456,7 @@ ControllerProfile ControllerSettingsTable::random_profile(
     ControllerProfile profile;
 
     uint32_t seed = 0;
-    while (true){
+    for (size_t c = 0; c < 100; c++, seed++){
         if (mac_address){
             pabb_crc32_buffer(&seed, mac_address, 6 * sizeof(uint8_t));
         }else{
@@ -465,7 +465,7 @@ ControllerProfile ControllerSettingsTable::random_profile(
         }
 
         size_t index = seed % DATABASE.size();
-//        cout << "index = " << index << endl;
+//        cout << "index = " << index << ", seed = " << seed << ", size = " << DATABASE.size() << endl;
 
         DATABASE[index]->write_to_profile(profile, controller);
         if (BLACK_LIST.contains(profile.official_name)){
@@ -550,7 +550,7 @@ ControllerProfile ControllerSettingsTable::get_or_make_profile(
 
     bool found = false;
     this->run_on_all_rows([&, controller](ControllerSettingsRow& row){
-        if (row.controller_mac_address != mac_address){
+        if (row.controller_mac_address != mac_address || row.controller != controller){
             return false;
         }
 

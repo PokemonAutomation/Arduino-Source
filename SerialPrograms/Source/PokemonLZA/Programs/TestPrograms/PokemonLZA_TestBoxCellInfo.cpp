@@ -100,7 +100,7 @@ public:
             os << "Cell (" << int(m_last_row) << ", " << int(m_last_col) << ") ";
             if (!sth_in_cell){
                 os << "Empty";
-            } else{
+            }else{
                 os << m_info_watcher.info_str() << " Pokemon"; 
             }
             m_env.console.overlay().add_log(os.str());
