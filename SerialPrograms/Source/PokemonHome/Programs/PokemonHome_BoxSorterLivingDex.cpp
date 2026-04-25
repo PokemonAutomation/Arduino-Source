@@ -38,16 +38,6 @@ using namespace Pokemon;
 
 const size_t MAX_HOME_BOXES = 200;
 
-struct LivingDexEntry{
-    std::string species_slug;
-    std::string form_slug;
-    uint16_t nat_id;
-    PokemonType primary_type;
-    PokemonType secondary_type;
-    std::string slug;
-    bool has_gender_difference;
-};
-
 
 BoxSorterLivingDex_Descriptor::BoxSorterLivingDex_Descriptor()
     : SingleSwitchProgramDescriptor(
@@ -138,30 +128,131 @@ BoxSorterLivingDex::BoxSorterLivingDex()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-bool is_viable_for_dex(LivingDexEntry entry, CollectedPokemonInfo pokemonInfo, bool shiny_dex) {
-    if (shiny_dex != pokemonInfo.shiny){
+bool BoxSorterLivingDex::is_viable_for_dex(const LivingDexEntry& entry, const CollectedPokemonInfo& pokemonInfo) {
+    if (SHINY_DEX != pokemonInfo.shiny){
         return false;
     }
 
-    if (entry.nat_id != pokemonInfo.dex_number) {
+    if (entry.nat_id != pokemonInfo.dex_number){
         return false;
     }
 
     if (entry.has_gender_difference) {
-        if (entry.slug.ends_with("-female") && pokemonInfo.gender != StatsHuntGenderFilter::Female) {
+        if (entry.slug.ends_with("-female") && pokemonInfo.gender != StatsHuntGenderFilter::Female){
             return false;
         }
 
-        if (entry.slug.ends_with("-male") && pokemonInfo.gender != StatsHuntGenderFilter::Male) {
+        if (entry.slug.ends_with("-male") && pokemonInfo.gender != StatsHuntGenderFilter::Male){
             return false;
         }
     }
 
-    if (entry.primary_type != pokemonInfo.primaryType || entry.secondary_type != pokemonInfo.secondaryType) {
+    if (entry.primary_type != pokemonInfo.primaryType || entry.secondary_type != pokemonInfo.secondaryType){
+        return false;
+    }
+
+    if (entry.form_slug == "gigantamax" && !pokemonInfo.gmax){
         return false;
     }
 
     return true;
+}
+
+[[nodiscard]] BoxCursor BoxSorterLivingDex::populate_box_data(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    std::vector<SortingRule> sort_preferences,
+    std::vector<std::optional<CollectedPokemonInfo>>& boxes_data,
+    size_t box_count,
+    BoxCursor& nav_cursor
+){
+    BoxCursor dest_cursor;
+    size_t starting_box(nav_cursor.box);
+    VideoOverlaySet video_overlay_set(env.console);
+    BoxViewWatcher box_view_watcher(&env.console.overlay());
+    SummaryScreenWatcher summary_screen_watcher(&env.console.overlay());
+
+    for (size_t box_idx = 0; box_idx < box_count; box_idx++){
+        if (box_idx != 0){
+            dest_cursor = BoxCursor(starting_box + box_idx, 0, 0);
+            nav_cursor = move_cursor_to(env, context, nav_cursor, dest_cursor, GAME_DELAY);
+        } else{
+            env.log("Moving the cursor to the first slot on the page.");
+            if (!go_to_first_slot(env, context, VIDEO_DELAY)){
+                throw UserSetupError(
+                    env.logger(),
+                    "ERROR: Could not move cursor to the first slot, please consider adjusting delay."
+                );
+            }
+        }
+
+        context.wait_for_all_requests();
+        const std::string log_msg = "Checking box " + std::to_string(box_idx + 1) + "/" + std::to_string(box_count);
+        env.log(log_msg);
+        env.console.overlay().add_log(log_msg);
+
+        // Check box grid color stddev to find occupied slots and fill boxes_data with placeholder pokemon info.
+        const std::array<size_t, 2> first_pokemon_slot = find_occupied_slots_in_box(env, context, boxes_data, sort_preferences);
+
+        //enter the summary screen to read pokemon info
+        if (first_pokemon_slot[0] != SIZE_MAX){
+            // moving cursor to the first pokemon slot
+            dest_cursor = { starting_box + box_idx, first_pokemon_slot[0], first_pokemon_slot[1] };
+            nav_cursor = move_cursor_to(env, context, nav_cursor, dest_cursor, GAME_DELAY);
+
+            env.add_overlay_log("Checking Summary...");
+
+            pbf_press_button(context, BUTTON_A, 80ms, GAME_DELAY);
+            context.wait_for_all_requests();
+            video_overlay_set.clear();
+            pbf_press_dpad(context, DPAD_DOWN, 80ms, GAME_DELAY);
+            pbf_press_button(context, BUTTON_A, 80ms, 100ms);
+            context.wait_for_all_requests();
+            int ret = wait_until(env.console, context, Seconds(5), { summary_screen_watcher });
+            if (ret != 0){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT, "HomeBoxSorter(): does not find summary screen after 5 sec", env.console
+                );
+            }
+
+            // cycle through each summary of the current box and fill pokemon information
+            for (size_t row = 0; row < BOX_ROWS; row++){
+                for (size_t column = 0; column < BOX_COLS; column++){
+                    const size_t global_idx = to_global_index(box_idx, row, column);
+                    if (!boxes_data[global_idx].has_value()){
+                        continue;
+                    }
+
+                    // Read the summary screen and assign data to boxes_data[global_idx]
+                    read_summary_screen(env, context, boxes_data[global_idx].value());
+                }
+            }
+
+            // log detailed pokemon infomation of this box
+            std::ostringstream ss;
+            ss << std::endl;
+            for (size_t row = 0; row < BOX_ROWS; row++){
+                for (size_t column = 0; column < BOX_COLS; column++){
+                    ss << "[" << row << ", " << column << "]: " << boxes_data[to_global_index(box_idx, row, column)] << std::endl;
+                }
+            }
+            env.log(ss.str());
+
+            //get out of summary with a lot of delay because it's slow for some reasons
+            pbf_press_button(context, BUTTON_B, 80ms, 100ms);
+            context.wait_for_all_requests();
+            ret = wait_until(env.console, context, Seconds(5), { box_view_watcher });
+            if (ret != 0){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT, "BoxSorterLivingDex(): does not find box view after 5 sec", env.console
+                );
+            }
+            video_overlay_set.clear();
+        }
+        video_overlay_set.clear();
+    }
+
+    return nav_cursor;
 }
 
 void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -198,101 +289,14 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
     // vector that will store data for each slot
     std::vector<std::optional<CollectedPokemonInfo>> living_dex_boxes_data;
 
-    VideoOverlaySet video_overlay_set(env.console);
-
     exit_menus(env, context, VIDEO_DELAY.get());
 
     BoxCursor dest_cursor;
     BoxCursor nav_cursor((LIVING_DEX_START_BOX - 1), 0, 0);
 
-    BoxViewWatcher box_view_watcher(&env.console.overlay());
-    SummaryScreenWatcher summary_screen_watcher(&env.console.overlay());
-
     size_t living_dex_box_count = (size_t)std::ceil((double)living_dex_order.size() / 30);
 
-    //cycle through each living dex box
-    for (size_t box_idx = 0; box_idx < living_dex_box_count; box_idx++) {
-        if (box_idx != 0) {
-            dest_cursor = BoxCursor(LIVING_DEX_START_BOX - 1 + box_idx, 0, 0);
-            nav_cursor = move_cursor_to(env, context, nav_cursor, dest_cursor, GAME_DELAY);
-        }
-        else {
-            // Moving the cursor until it goes to the first slot
-            if (!go_to_first_slot(env, context, VIDEO_DELAY)) {
-                throw UserSetupError(
-                    env.logger(),
-                    "ERROR: Could not move cursor to the first slot, please consider adjusting delay."
-                );
-            }
-        }
-
-        context.wait_for_all_requests();
-        const std::string log_msg = "Checking box " + std::to_string(box_idx + 1) + "/" + std::to_string(living_dex_box_count);
-        env.log(log_msg);
-        env.console.overlay().add_log(log_msg);
-
-
-        // Check box grid color stddev to find occupied slots and fill living_dex_boxes_data with placeholder pokemon info.
-        const std::array<size_t, 2> first_pokemon_slot = find_occupied_slots_in_box(env, context, living_dex_boxes_data, sort_preferences);
-
-        //enter the summary screen to read pokemon info
-        if (first_pokemon_slot[0] != SIZE_MAX) {
-            // moving cursor to the first pokemon slot
-            dest_cursor = { LIVING_DEX_START_BOX - 1 + box_idx, first_pokemon_slot[0], first_pokemon_slot[1] };
-            nav_cursor = move_cursor_to(env, context, nav_cursor, dest_cursor, GAME_DELAY);
-
-            env.add_overlay_log("Checking Summary...");
-
-            pbf_press_button(context, BUTTON_A, 80ms, GAME_DELAY);
-            context.wait_for_all_requests();
-            video_overlay_set.clear();
-            pbf_press_dpad(context, DPAD_DOWN, 80ms, GAME_DELAY);
-            pbf_press_button(context, BUTTON_A, 80ms, 100ms);
-            context.wait_for_all_requests();
-            int ret = wait_until(env.console, context, Seconds(5), { summary_screen_watcher });
-            if (ret != 0) {
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT, "HomeBoxSorter(): does not find summary screen after 5 sec", env.console
-                );
-            }
-
-
-            // cycle through each summary of the current box and fill pokemon information
-            for (size_t row = 0; row < BOX_ROWS; row++) {
-                for (size_t column = 0; column < BOX_COLS; column++) {
-                    const size_t global_idx = to_global_index(box_idx, row, column);
-                    if (!living_dex_boxes_data[global_idx].has_value()) {
-                        continue;
-                    }
-
-                    // Read the summary screen and assign data to living_dex_boxes_data[global_idx]
-                    read_summary_screen(env, context, living_dex_boxes_data[global_idx].value());
-                }
-            }
-
-            // log detailed pokemon infomation of this box
-            std::ostringstream ss;
-            ss << std::endl;
-            for (size_t row = 0; row < BOX_ROWS; row++) {
-                for (size_t column = 0; column < BOX_COLS; column++) {
-                    ss << "[" << row << ", " << column << "]: " << living_dex_boxes_data[to_global_index(box_idx, row, column)] << std::endl;
-                }
-            }
-            env.log(ss.str());
-
-            //get out of summary with a lot of delay because it's slow for some reasons
-            pbf_press_button(context, BUTTON_B, 80ms, 100ms);
-            context.wait_for_all_requests();
-            ret = wait_until(env.console, context, Seconds(5), { box_view_watcher });
-            if (ret != 0) {
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT, "HomeBoxSorter(): does not find box view after 5 sec", env.console
-                );
-            }
-            video_overlay_set.clear();
-        }
-        video_overlay_set.clear();
-    }
+    nav_cursor = populate_box_data(env, context, sort_preferences, living_dex_boxes_data, living_dex_box_count, nav_cursor);
 
     dest_cursor = BoxCursor((REJECT_BOX_START - 1), 0, 0);
     nav_cursor = move_cursor_to(env, context, nav_cursor, dest_cursor, GAME_DELAY);
@@ -301,90 +305,7 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
     std::vector<std::optional<CollectedPokemonInfo>> reject_boxes_data;
     size_t reject_box_count = REJECT_BOX_END - REJECT_BOX_START + 1;
 
-    //cycle through each reject box
-    for (size_t box_idx = 0; box_idx < reject_box_count; box_idx++) {
-        if (box_idx != 0) {
-            dest_cursor = BoxCursor(REJECT_BOX_START - 1 + box_idx, 0, 0);
-            nav_cursor = move_cursor_to(env, context, nav_cursor, dest_cursor, GAME_DELAY);
-        }
-        else {
-            // Moving the cursor until it goes to the first slot
-            if (!go_to_first_slot(env, context, VIDEO_DELAY)) {
-                throw UserSetupError(
-                    env.logger(),
-                    "ERROR: Could not move cursor to the first slot, please consider adjusting delay."
-                );
-            }
-        }
-
-        context.wait_for_all_requests();
-        const std::string log_msg = "Checking box " + std::to_string(box_idx + 1) + "/" + std::to_string(reject_box_count);
-        env.log(log_msg);
-        env.console.overlay().add_log(log_msg);
-
-
-        // Check box grid color stddev to find occupied slots and fill reject_boxes_data with placeholder pokemon info.
-        const std::array<size_t, 2> first_pokemon_slot = find_occupied_slots_in_box(env, context, reject_boxes_data, sort_preferences);
-
-        //enter the summary screen to read pokemon info
-        if (first_pokemon_slot[0] != SIZE_MAX) {
-            // moving cursor to the first pokemon slot
-            dest_cursor = { REJECT_BOX_START - 1 + box_idx, first_pokemon_slot[0], first_pokemon_slot[1] };
-            nav_cursor = move_cursor_to(env, context, nav_cursor, dest_cursor, GAME_DELAY);
-
-            env.add_overlay_log("Checking Summary...");
-
-            pbf_press_button(context, BUTTON_A, 80ms, GAME_DELAY);
-            context.wait_for_all_requests();
-            video_overlay_set.clear();
-            pbf_press_dpad(context, DPAD_DOWN, 80ms, GAME_DELAY);
-            pbf_press_button(context, BUTTON_A, 80ms, 100ms);
-            context.wait_for_all_requests();
-            int ret = wait_until(env.console, context, Seconds(5), { summary_screen_watcher });
-            if (ret != 0) {
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT, "HomeBoxSorter(): does not find summary screen after 5 sec", env.console
-                );
-            }
-
-
-            // cycle through each summary of the current box and fill pokemon information
-            for (size_t row = 0; row < BOX_ROWS; row++) {
-                for (size_t column = 0; column < BOX_COLS; column++) {
-                    const size_t global_idx = to_global_index(box_idx, row, column);
-                    if (!reject_boxes_data[global_idx].has_value()) {
-                        continue;
-                    }
-
-                    // Read the summary screen and assign data to reject_boxes_data[global_idx]
-                    read_summary_screen(env, context, reject_boxes_data[global_idx].value());
-                }
-            }
-
-            // log detailed pokemon infomation of this box
-            std::ostringstream ss;
-            ss << std::endl;
-            for (size_t row = 0; row < BOX_ROWS; row++) {
-                for (size_t column = 0; column < BOX_COLS; column++) {
-                    ss << "[" << row << ", " << column << "]: " << reject_boxes_data[to_global_index(box_idx, row, column)] << std::endl;
-                }
-            }
-            env.log(ss.str());
-
-            //get out of summary with a lot of delay because it's slow for some reasons
-            pbf_press_button(context, BUTTON_B, 80ms, 100ms);
-            context.wait_for_all_requests();
-            ret = wait_until(env.console, context, Seconds(5), { box_view_watcher });
-            if (ret != 0) {
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT, "HomeBoxSorter(): does not find box view after 5 sec", env.console
-                );
-            }
-            video_overlay_set.clear();
-        }
-
-        video_overlay_set.clear();
-    }
+    nav_cursor = populate_box_data(env, context, sort_preferences, reject_boxes_data, reject_box_count, nav_cursor);
 
     if (DRY_RUN){
         save_boxes_data_to_json(living_dex_boxes_data, "living_boxes_unsorted.json");
@@ -393,26 +314,25 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
 
     std::ostringstream ss;
 
-    for (size_t i = 0; i < living_dex_order.size(); i++)
-    {
+    for (size_t i = 0; i < living_dex_order.size(); i++){
         bool found = false;
         LivingDexEntry entry = living_dex_order[i];
         env.log("Looking for " + entry.slug + " in the living dex boxes.");
         for(size_t j = i; j < living_dex_boxes_data.size(); j++){
-            if (!living_dex_boxes_data[j].has_value()) {
+            if (!living_dex_boxes_data[j].has_value()){
                 continue;
             }
 
-            if (!is_viable_for_dex(entry, *living_dex_boxes_data[j], SHINY_DEX)) {
+            if (!is_viable_for_dex(entry, *living_dex_boxes_data[j])){
                 continue;
             }
 
             found = true;
-            if (i == j) {
+            if (i == j){
                 // already in the right spot, do nothing
                 break;
             }
-            else {
+            else{
 
                 BoxCursor pokemon_cursor = BoxCursor(LIVING_DEX_START_BOX - 1 + j / 30, (j / 6) % 5, j % 6);
                 BoxCursor destination_cursor = BoxCursor(LIVING_DEX_START_BOX - 1 + i / 30, (i / 6) % 5, i % 6);
@@ -446,12 +366,12 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
 
         env.log("Could not find a pokemon for " + entry.slug + " in the living dex boxes, looking in reject boxes for a valid match.");
 
-        for (size_t j = 0; j < reject_boxes_data.size(); j++) {
+        for (size_t j = 0; j < reject_boxes_data.size(); j++){
             if (!reject_boxes_data[j].has_value()) {
                 continue;
             }
 
-            if (!is_viable_for_dex(entry, *reject_boxes_data[j], SHINY_DEX)) {
+            if (!is_viable_for_dex(entry, *reject_boxes_data[j])){
                 continue;
             }
 
@@ -478,28 +398,28 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
             break;
         }
 
-        if (found) {
+        if (found){
             continue;
         }
 
-        if (!living_dex_boxes_data[i].has_value()) {
+        if (!living_dex_boxes_data[i].has_value()){
             continue;
         }
 
         // move the pokemon in the current living dex slot to the reject box or later in the living dex
         size_t empty_reject_slot = SIZE_MAX;
         size_t empty_living_dex_slot = SIZE_MAX;
-        for (size_t j = 0; j < reject_boxes_data.size(); j++) {
-            if (!reject_boxes_data[j].has_value()) {
+        for (size_t j = 0; j < reject_boxes_data.size(); j++){
+            if (!reject_boxes_data[j].has_value()){
                 empty_reject_slot = j;
                 break;
             }
         }
-        if (empty_reject_slot == SIZE_MAX) {
+        if (empty_reject_slot == SIZE_MAX){
             env.log("No empty reject box slots available to move pokemon out of the way, placing in open slot in living dex for now.");
 
-            for (size_t j = i + 1; j < living_dex_boxes_data.size(); j++) {
-                if (!living_dex_boxes_data[j].has_value()) {
+            for (size_t j = i + 1; j < living_dex_boxes_data.size(); j++){
+                if (!living_dex_boxes_data[j].has_value()){
                     empty_living_dex_slot = j;
                     break;
                 }
@@ -508,13 +428,13 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
         BoxCursor pokemon_cursor = BoxCursor(LIVING_DEX_START_BOX - 1 + i / 30, (i / 6) % 5, i % 6);
         BoxCursor destination_cursor;
         
-        if (empty_reject_slot != SIZE_MAX) {
+        if (empty_reject_slot != SIZE_MAX){
             destination_cursor = BoxCursor(REJECT_BOX_START - 1 + empty_reject_slot / 30, (empty_reject_slot / 6) % 5, empty_reject_slot % 6);
         }
-        else if (empty_living_dex_slot != SIZE_MAX) {
+        else if (empty_living_dex_slot != SIZE_MAX){
             destination_cursor = BoxCursor(LIVING_DEX_START_BOX - 1 + empty_living_dex_slot / 30, (empty_living_dex_slot / 6) % 5, empty_living_dex_slot % 6);
         }
-        else {
+        else{
             throw UserSetupError(
                 env.logger(),
                 "ERROR: No empty slots available to move pokemon out of the way, please consider removing some duplicates or increasing the reject box range."
@@ -537,26 +457,25 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
         if (empty_living_dex_slot != SIZE_MAX){
             std::swap(living_dex_boxes_data[i], living_dex_boxes_data[empty_living_dex_slot]);
         }
-        else {
+        else{
             std::swap(living_dex_boxes_data[i], reject_boxes_data[empty_reject_slot]);
         }
     }
 
-    for (size_t i = living_dex_order.size(); i < living_dex_boxes_data.size(); i++)
-    {
-        if (!living_dex_boxes_data[i].has_value()) {
+    for (size_t i = living_dex_order.size(); i < living_dex_boxes_data.size(); i++){
+        if (!living_dex_boxes_data[i].has_value()){
             continue;
         }
 
         size_t empty_reject_slot = SIZE_MAX;
-        for (size_t j = 0; j < reject_boxes_data.size(); j++) {
-            if (!reject_boxes_data[j].has_value()) {
+        for (size_t j = 0; j < reject_boxes_data.size(); j++){
+            if (!reject_boxes_data[j].has_value()){
                 empty_reject_slot = j;
                 break;
             }
         }
 
-        if (empty_reject_slot == SIZE_MAX) {
+        if (empty_reject_slot == SIZE_MAX){
             break;
         }
 
