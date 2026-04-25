@@ -146,12 +146,6 @@ RngHelper::RngHelper()
         LockMode::UNLOCK_WHILE_RUNNING,
         0 // default
     )
-    , USE_COPYRIGHT_TEXT(
-        "<b>Detect Copyright Text:</b>"
-        "<br>Start the seed timer only after detecting the copyright text. Can be helpful if your seeds are inconsistent.",
-        LockMode::LOCK_WHILE_RUNNING,
-        true // default
-    )
     , USE_TEACHY_TV(
         "<b>Use Teachy TV:</b>"
         "<br>Opens the Teachy TV to quickly advance the RNG at 313x speed.<br>"
@@ -193,7 +187,6 @@ RngHelper::RngHelper()
     PA_ADD_OPTION(CONTINUE_SCREEN_CALIBRATION);
     PA_ADD_OPTION(INGAME_ADVANCES);
     PA_ADD_OPTION(INGAME_CALIBRATION);
-    PA_ADD_OPTION(USE_COPYRIGHT_TEXT);
     PA_ADD_OPTION(USE_TEACHY_TV);
     PA_ADD_OPTION(PROFILE);
     PA_ADD_OPTION(TAKE_VIDEO);
@@ -215,7 +208,7 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     double FRAMERATE = 59.999977; // FPS
     double FRAME_DURATION = 1000 / FRAMERATE;
 
-    int64_t FIXED_SEED_OFFSET = USE_COPYRIGHT_TEXT ? -2140 : -845; // milliseconds. approximate
+    int64_t FIXED_SEED_OFFSET = -845; // milliseconds. approximate
 
     while (!shiny_found){
         // prepare timings
@@ -258,13 +251,12 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
         
         // handle the blind part
-        if (USE_COPYRIGHT_TEXT){
-            reset_and_detect_copyright_text(env.console, context, PROFILE);
-            env.log("Starting blind button presses...");
-            perform_blind_sequence(context, TARGET, SEED_BUTTON, TOTAL_SEED_DELAY, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE);
-        }else{
-            reset_and_perform_blind_sequence(env.console, context, TARGET, SEED_BUTTON, TOTAL_SEED_DELAY, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE, PROFILE);
-        }
+        reset_and_perform_blind_sequence(
+            env.console, context, 
+            TARGET, SEED_BUTTON, TOTAL_SEED_DELAY, 
+            CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, 
+            SAFARI_ZONE, PROFILE
+        );
         env.log("Blind button presses complete.");
         stats.resets++;
 
