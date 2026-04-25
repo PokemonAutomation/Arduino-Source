@@ -59,6 +59,9 @@ public:
         const PathStats& path_stats,
         bool any_shiny, bool boss_is_shiny
     ) const = 0;
+    
+    // For BossFinder: whether the boss is in the "save on the go" list.
+    virtual bool is_in_save_list(const std::string& boss_slug) const { return false; }
 };
 
 
