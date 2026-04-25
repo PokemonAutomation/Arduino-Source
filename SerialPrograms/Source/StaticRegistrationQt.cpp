@@ -36,6 +36,9 @@
 #include "CommonFramework/Options/QtWidget/LabelCellWidget.h"
 #include "CommonFramework/Notifications/EventNotificationWidget.h"
 
+// Resource Download
+#include "CommonFramework/ResourceDownload/ResourceDownloadWidget.h"
+
 //  Integrations
 #include "Integrations/DiscordIntegrationSettingsWidget.h"
 
@@ -98,6 +101,12 @@ void register_all_statics(){
     //  Common Framework
     RegisterConfigWidget<LabelCellWidget>();
     RegisterConfigWidget<TestButtonWidget>();
+
+    // Resource Download
+    RegisterConfigWidget<DownloadButtonWidget>();
+    RegisterConfigWidget<DeleteButtonWidget>();
+    RegisterConfigWidget<CancelButtonWidget>();
+    RegisterConfigWidget<ProgressBarWidget>();
 
     //  Integrations
     RegisterConfigWidget<Integration::DiscordIntegrationSettingsWidget>();
