@@ -104,6 +104,17 @@ RngHelper::RngHelper()
         LockMode::LOCK_WHILE_RUNNING,
         SeedButton::A
     )
+    , EXTRA_BUTTON(
+        "<b>Extra Button:</b><br>"
+        "Additional button presses that affect the seed.",
+        {
+            {BlackoutButton::None, "None", "None"},
+            {BlackoutButton::L, "L", "Blackout L"},
+            {BlackoutButton::R, "R", "Blackout R"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        BlackoutButton::None
+    )
     , SEED_DELAY(
         "<b>Seed Delay Time (ms):</b><br>"
         "The delay between starting the game and advancing past the title screen. Set this to match your target seed.",
@@ -181,6 +192,7 @@ RngHelper::RngHelper()
     PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(NUM_RESETS);
     PA_ADD_OPTION(SEED_BUTTON);
+    PA_ADD_OPTION(EXTRA_BUTTON);
     PA_ADD_OPTION(SEED_DELAY);
     PA_ADD_OPTION(SEED_CALIBRATION);
     PA_ADD_OPTION(CONTINUE_SCREEN_FRAMES);
@@ -252,8 +264,8 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         
         // handle the blind part
         reset_and_perform_blind_sequence(
-            env.console, context, 
-            TARGET, SEED_BUTTON, TOTAL_SEED_DELAY, 
+            env.console, context, TARGET, 
+            SEED_BUTTON, EXTRA_BUTTON, TOTAL_SEED_DELAY, 
             CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, 
             SAFARI_ZONE, PROFILE
         );

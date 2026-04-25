@@ -7,6 +7,7 @@
 #include "CommonTools/Random.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonFRLG_BlindNavigation.h"
@@ -16,26 +17,47 @@ namespace NintendoSwitch{
 namespace PokemonFRLG{
 
 
-void set_seed_after_delay(ProControllerContext& context, SeedButton SEED_BUTTON, int64_t SEED_DELAY){
-    // wait on title screen for the specified delay
-    pbf_wait(context, std::chrono::milliseconds(SEED_DELAY));
+void set_seed_after_delay(ProControllerContext& context, SeedButton SEED_BUTTON, BlackoutButton BLACKOUT_BUTTON, int64_t SEED_DELAY){
+    // wait on title screen for the specified delay    
+    // hold the "blackout" button starting from the black screen after the copyright text until getting to the continue screen
+    if (BLACKOUT_BUTTON != BlackoutButton::None){
+        Button b_button;
+        switch (BLACKOUT_BUTTON){
+        case BlackoutButton::L:
+            b_button = BUTTON_L;
+            break;
+        case BlackoutButton::R:
+            b_button = BUTTON_R;
+            break;
+        default:
+            b_button = BUTTON_L;
+        }
+        Milliseconds blackout_wait = 3600ms; // wait for the copyright text to disappear
+        Milliseconds blackout_delay = std::chrono::milliseconds(SEED_DELAY) - blackout_wait;
+        Milliseconds blackout_hold = 30000ms; // wait for leaves/flames to appear on the title screen. It's okay if this is held over the seed button press
+        ssf_do_nothing(context, blackout_wait);
+        ssf_press_button(context, b_button, blackout_delay, blackout_hold, 0ms);
+    }else{
+        pbf_wait(context, std::chrono::milliseconds(SEED_DELAY));
+    }
+
     // hold the specified button for a few seconds through the transition to the Continue Screen
-    Button button;
+    Button s_button;
     switch (SEED_BUTTON){
     case SeedButton::A:
-        button = BUTTON_A;
+        s_button = BUTTON_A;
         break;
     case SeedButton::Start:
-        button = BUTTON_PLUS;
+        s_button = BUTTON_PLUS;
         break;
     case SeedButton::L:
-        button = BUTTON_L;
+        s_button = BUTTON_L;
         break;
     default:
-        button = BUTTON_A;
+        s_button = BUTTON_A;
         break;
     }
-    pbf_press_button(context, button, 3000ms, 0ms);
+    pbf_press_button(context, s_button, 3000ms, 0ms);
 }
 
 void load_game_after_delay(ProControllerContext& context, uint64_t CONTINUE_SCREEN_DELAY){
@@ -564,6 +586,7 @@ void perform_blind_sequence(
     ProControllerContext& context, 
     PokemonFRLG_RngTarget TARGET,
     SeedButton SEED_BUTTON,
+    BlackoutButton BLACKOUT_BUTTON,
     uint64_t SEED_DELAY,
     uint64_t CONTINUE_SCREEN_DELAY, 
     uint64_t TEACHY_DELAY, 
@@ -571,7 +594,7 @@ void perform_blind_sequence(
     bool SAFARI_ZONE
 ){
     pbf_press_button(context, BUTTON_A, 80ms, 0ms); // start the game from the Home screen
-    set_seed_after_delay(context, SEED_BUTTON, SEED_DELAY);
+    set_seed_after_delay(context, SEED_BUTTON, BLACKOUT_BUTTON, SEED_DELAY);
     load_game_after_delay(context, CONTINUE_SCREEN_DELAY);
     if (TEACHY_DELAY > 0){
         wait_with_teachy_tv(context, TEACHY_DELAY);

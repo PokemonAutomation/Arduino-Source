@@ -40,8 +40,10 @@ private:
     SimpleIntegerOption<uint64_t> NUM_RESETS;
 
     EnumDropdownOption<SeedButton> SEED_BUTTON;
+    EnumDropdownOption<BlackoutButton> EXTRA_BUTTON;
     SimpleIntegerOption<uint64_t> SEED_DELAY;
     SimpleIntegerOption<int64_t> SEED_CALIBRATION;
+
 
     SimpleIntegerOption<uint64_t> CONTINUE_SCREEN_FRAMES;
     FloatingPointOption CONTINUE_SCREEN_CALIBRATION;

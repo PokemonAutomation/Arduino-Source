@@ -52,6 +52,12 @@ namespace PokemonFRLG{
         L
     };
 
+    enum class BlackoutButton{
+        None,
+        L,
+        R
+    };
+
     // checks seed, continue screen, and in-game timings for the specificed RNG manipulation target
     // and fires an error if any of the timings are too short.
     void check_timings(
@@ -68,6 +74,7 @@ namespace PokemonFRLG{
         ProControllerContext& context, 
         PokemonFRLG_RngTarget TARGET,
         SeedButton SEED_BUTTON,
+        BlackoutButton BLACKOUT_BUTTON,
         uint64_t SEED_DELAY,
         uint64_t CONTINUE_SCREEN_DELAY, 
         uint64_t TEACHY_DELAY, 

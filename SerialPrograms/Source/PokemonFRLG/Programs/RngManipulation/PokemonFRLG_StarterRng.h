@@ -133,6 +133,7 @@ private:
     StringOption SEED; 
     TextEditOption SEED_LIST;
     EnumDropdownOption<SeedButton> SEED_BUTTON;
+    EnumDropdownOption<BlackoutButton> EXTRA_BUTTON;
     SimpleIntegerOption<uint64_t> SEED_DELAY;
 
     SimpleIntegerOption<uint64_t>ADVANCES;
