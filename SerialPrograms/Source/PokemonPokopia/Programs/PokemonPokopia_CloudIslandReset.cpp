@@ -45,15 +45,18 @@ public:
     Stats()
         : resets(m_stats["Resets"])
         , mew_stamps(m_stats["Mew Stamps"])
+        , recipes_purchased(m_stats["Recipes Purchased"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Resets");
         m_display_order.emplace_back("Mew Stamps");
+        m_display_order.emplace_back("Recipes Purchased");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
 
     std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& mew_stamps;
+    std::atomic<uint64_t>& recipes_purchased;
     std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> CloudIslandReset_Descriptor::make_stats() const{
@@ -70,6 +73,25 @@ CloudIslandReset::CloudIslandReset()
         500,
         0
     )
+    , COLLECT_MEW_STAMPS(
+        "<b>Collect Mew Stamps:</b><br>"
+        "Whether to collect Mew stamps from the Cloud Islands",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
+    , BUY_RECIPES(
+        "<b>Buy Recipes:</b><br>"
+        "Whether to buy recipes from the Cloud Island shop.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )
+    , SPEND_LIMIT(
+        "<b>Spend Limit:</b><br>"
+        "The limit for how many Life Coins should remain after buying recipes.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        5000,
+        0
+    )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -80,6 +102,9 @@ CloudIslandReset::CloudIslandReset()
 {
     PA_ADD_OPTION(STOP_AFTER_CURRENT);
     PA_ADD_OPTION(NUM_RESETS);
+    PA_ADD_OPTION(COLLECT_MEW_STAMPS);
+    PA_ADD_OPTION(BUY_RECIPES);
+    PA_ADD_OPTION(SPEND_LIMIT);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -290,6 +315,67 @@ bool CloudIslandReset::add_todays_stamp(SingleSwitchProgramEnvironment& env, Pro
     return true;
 }
 
+bool CloudIslandReset::buy_recipes(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    CloudIslandReset_Descriptor::Stats& stats = env.current_stats<CloudIslandReset_Descriptor::Stats>();
+    CoinCountWatcher coin_watcher(env.console);
+    int ret;
+
+    open_menu_option(env.console, context, PCMenuOption::SHOP);
+    env.console.log("Opened shop menu");
+
+    for (int i = 0; i < 5; i++){
+        if (!item_is_available(env.console, context, i)){
+            env.console.log("Recipe in index " + std::to_string(i) + " is not available for purchase, skipping");
+            continue;
+        }
+        RecipeType recipe_type = item_is_recipe(env.console, context, i);
+        // recipe_type = RecipeType::SINGLE; // Bypass for testing
+        // if (i != 1) { continue; } // Bypass for testing
+        switch (recipe_type){
+        // For now, treat all recipes types with the same priority
+        // TODO: Recipes costs are assumed to be 400 here but recipes can be on sale and cheaper ones can be prioritized
+        case RecipeType::SINGLE:
+        case RecipeType::DOUBLE:
+        case RecipeType::TRIPLE:
+        case RecipeType::QUAD:
+            env.console.log("Recipe is available in index " + std::to_string(i));
+            ret = wait_until(
+                env.console, context,
+                30s,
+                {coin_watcher}
+            );
+            if (ret != 0){
+                env.console.log("Failed to read coin count in shop menu");
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "buy_recipes() failed to read coin count in shop menu",
+                    env.console
+                );
+            }
+            env.console.log("Detected coin count: " + std::to_string(coin_watcher.coin_count()));
+            // For now, assume all recipes are the full 400 coins
+            if (coin_watcher.coin_count() - 400 < SPEND_LIMIT){
+                env.console.log("Spend limit reached, not buying more recipes");
+                return true;
+            }
+            buy_item(env.console, context, i);
+            stats.recipes_purchased++;
+            env.update_stats();
+            break;
+        case RecipeType::NOT_RECIPE:
+            env.console.log("Index " + std::to_string(i) + " does not contain a recipe, skipping");
+            continue;
+        default:
+            throw InternalProgramError(
+                nullptr, PA_CURRENT_FUNCTION,
+                "Unexpected recipe type detected in buy_recipes(): " + std::to_string((int)recipe_type)
+            );
+        }
+    }
+    exit_pc(env.console, context);
+    return false;
+}
+
 void CloudIslandReset::leave_cloud_island(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     CloudIslandReset_Descriptor::Stats& stats = env.current_stats<CloudIslandReset_Descriptor::Stats>();
 
@@ -330,16 +416,32 @@ void CloudIslandReset::program(SingleSwitchProgramEnvironment& env, ProControlle
 
     DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
 
+    bool all_stamps_mew = false;
+    bool spend_limit_reached = false;
+
     while (NUM_RESETS != 0 && stats.resets < NUM_RESETS){
         delete_cloud_island_save(env, context);
         create_cloud_island_after_delete(env, context);
         stats.resets++;
 
         open_cloud_island_pc(env, context);
-        bool all_stamps_mew = add_todays_stamp(env, context);
+        if (COLLECT_MEW_STAMPS && !all_stamps_mew){
+            all_stamps_mew = add_todays_stamp(env, context);
+        }
+        else {
+            exit_pc(env.console, context); // Exit PC since first access always force opens stamp card
+        }
+
+        if (BUY_RECIPES && !spend_limit_reached){
+            open_cloud_island_pc(env, context);
+            spend_limit_reached = buy_recipes(env, context);
+        }
 
         leave_cloud_island(env, context);
-        if (STOP_AFTER_CURRENT.should_stop() || all_stamps_mew){
+        bool collect_mew_stamps_done = !COLLECT_MEW_STAMPS || (COLLECT_MEW_STAMPS && all_stamps_mew);
+        bool buy_recipes_done = !BUY_RECIPES || (BUY_RECIPES && spend_limit_reached);
+
+        if (STOP_AFTER_CURRENT.should_stop() || (collect_mew_stamps_done && buy_recipes_done)){
             break;
         }
     }

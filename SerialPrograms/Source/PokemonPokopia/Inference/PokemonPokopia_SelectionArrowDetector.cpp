@@ -20,8 +20,8 @@ class SelectionArrowMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
     SelectionArrowMatcher(const char* path)
         : WaterfillTemplateMatcher(
-            path,
-            Color(230, 100, 30), Color(255, 190, 190),
+            path, 
+            Color(240, 170, 0), Color(255, 255, 200),
             100
         )
     {
@@ -76,8 +76,7 @@ bool SelectionArrowDetector::detect(const ImageViewRGB32& screen){
     size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
 
     const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
-        {0xffe6641e, 0xffffbebe}, // RGB(230, 100, 30), RGB(255, 190, 190)
-        {0xffe65a46, 0xffff9696} // RGB(230, 90, 70), RGB(255, 150, 150)
+        {0xfff0aa00, 0xffffffc8} // RGB(240, 170, 0), RGB(255, 255, 200)
     };
 
     bool found = match_template_by_waterfill(
