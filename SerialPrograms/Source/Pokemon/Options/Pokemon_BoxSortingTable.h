@@ -23,7 +23,8 @@ enum class SortingRuleType
     Alpha,
     Ball_Slug,
     Gender,
-    Type
+    Type,
+    Tera_Type,
 };
 
 struct SortingRule

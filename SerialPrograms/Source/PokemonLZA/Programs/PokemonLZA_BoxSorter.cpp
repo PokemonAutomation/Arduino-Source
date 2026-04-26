@@ -320,7 +320,7 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                         name_slug = LUMIOSE_DEX_SLUGS()[dex_number-1];
                     }
                     
-                    auto [primaryType, secondaryType] = read_pokemon_types(screen, ImageFloatBox(0.467, 0.256, 0.110, 0.041), PokemonTypeGeneration::GEN9);
+                    auto [primary_type, secondary_type] = read_pokemon_types(screen, ImageFloatBox(0.467, 0.256, 0.110, 0.041), PokemonTypeGeneration::GEN9);
                     boxes_data.push_back(
                         CollectedPokemonInfo{
                             .preferences = &sort_preferences,
@@ -328,8 +328,8 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
                             .name_slug = name_slug,
                             .shiny = shiny_detector.detect(screen),
                             .alpha = alpha_detector.detect(screen),
-                            .primaryType = primaryType,
-                            .secondaryType = secondaryType,
+                            .primary_type = primary_type,
+                            .secondary_type = secondary_type,
                         }
                         );
                     ss << "\u2705 " ;    //  checkbox
