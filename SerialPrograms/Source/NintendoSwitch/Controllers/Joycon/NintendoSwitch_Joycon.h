@@ -11,7 +11,6 @@
 #include "Controllers/Joystick.h"
 #include "Controllers/ControllerTypes.h"
 #include "Controllers/Controller.h"
-#include "Controllers/RumbleListener.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 
 namespace PokemonAutomation{

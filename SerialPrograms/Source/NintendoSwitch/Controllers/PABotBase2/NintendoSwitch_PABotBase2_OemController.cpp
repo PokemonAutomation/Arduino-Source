@@ -190,15 +190,19 @@ PABotBase2_OemController::PABotBase2_OemController(
             }
             if (!str_right.empty()){
                 if (!str.empty()){
-                    str += ", ";
+                    str += " - ";
                 }
                 str += "Right = ";
                 str += str_right;
             }
 
-            double magnitude =
-                left.lo_amp * left.lo_freq + left.hi_amp * left.hi_freq +
-                right.lo_amp * right.lo_freq + right.hi_amp * right.hi_freq;
+            double energy =
+                left.lo_amp * left.lo_freq * left.lo_freq +
+                left.hi_amp * left.hi_freq * left.hi_freq +
+                right.lo_amp * right.lo_freq * right.lo_freq +
+                right.hi_amp * right.hi_freq * right.hi_freq;
+
+            double magnitude = std::log10(energy + 1);
 
             if (m_on_rumble){
                 m_on_rumble(magnitude);

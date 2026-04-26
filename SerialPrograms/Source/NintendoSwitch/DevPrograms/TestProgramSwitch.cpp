@@ -173,6 +173,7 @@
 #include "CommonTools/OCR/OCR_RawPaddleOCR.h"
 #include "CommonTools/Images/ImageTools.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_BattleSelectionArrowDetector.h"
+#include "Controllers/RumbleListener.h"
 
 
 
