@@ -20,6 +20,7 @@
 #include "PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
+#include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_PartyDialogs.h"
 #include "PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.h"
