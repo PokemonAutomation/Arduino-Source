@@ -32,7 +32,8 @@ public:
     PABotBase2_OemController(
         Logger& logger,
         PABotBase2::Connection& connection,
-        ControllerType controller_type
+        ControllerType controller_type,
+        std::function<void(double magnitude)> on_rumble
     );
     ~PABotBase2_OemController();
     void stop();
@@ -45,8 +46,45 @@ public:
 
 
 protected:
+    static Button populate_report_buttons(
+        pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons,
+        const SwitchControllerState& controller_state
+    );
+    static bool populate_report_gyro(
+        pabb_NintendoSwitch_OemController_State0x30_Gyro& gyro,
+        const SwitchControllerState& controller_state
+    );
+
+    void issue_report(
+        Cancellable* cancellable,
+        WallDuration duration,
+        const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons
+    );
+    void issue_report(
+        Cancellable* cancellable,
+        WallDuration duration,
+        const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons,
+        const pabb_NintendoSwitch_OemController_State0x30_Gyro& gyro
+    );
+
+
+private:
+    virtual void update_status(Cancellable& cancellable) override;
+    virtual void stop_with_error(std::string message) override;
+
+#if 0
+    virtual void execute_state(
+        Cancellable* cancellable,
+        const SuperscalarScheduler::ScheduleEntry& entry
+    ) override;
+#endif
+
+
+protected:
+    //  Shared Utils
+
     template <uint16_t min_threshold, uint16_t max_threshold>
-    void encode_joystick(uint8_t data[3], const JoystickPosition& position){
+    static void encode_joystick(uint8_t data[3], const JoystickPosition& position){
         //  2048 is the neutral position.
         //
         //  1897 is the point where the joystick calibrator will register it as
@@ -103,38 +141,16 @@ protected:
         data[2] = (uint8_t)(wy >> 4);
     }
 
-    static Button populate_report_buttons(
-        pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons,
-        const SwitchControllerState& controller_state
-    );
-    static bool populate_report_gyro(
-        pabb_NintendoSwitch_OemController_State0x30_Gyro& gyro,
-        const SwitchControllerState& controller_state
-    );
-
-    void issue_report(
-        Cancellable* cancellable,
-        WallDuration duration,
-        const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons
-    );
-    void issue_report(
-        Cancellable* cancellable,
-        WallDuration duration,
-        const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons,
-        const pabb_NintendoSwitch_OemController_State0x30_Gyro& gyro
-    );
-
-
-private:
-    virtual void update_status(Cancellable& cancellable) override;
-    virtual void stop_with_error(std::string message) override;
-
-#if 0
-    virtual void execute_state(
-        Cancellable* cancellable,
-        const SuperscalarScheduler::ScheduleEntry& entry
-    ) override;
-#endif
+    struct RumbleData{
+        double lo_freq;
+        double lo_amp;
+        double hi_freq;
+        double hi_amp;
+    };
+    static double rumble_index_to_amp(uint8_t index);
+    static double rumble_index_to_freq(double index);
+    static RumbleData parse_rumble(const uint8_t data[4]);
+    static std::string rumble_to_str(const RumbleData& data);
 
 
 protected:
@@ -144,6 +160,8 @@ protected:
     Milliseconds m_ticksize;
     Milliseconds m_cooldown;
     Milliseconds m_timing_variation;
+
+    std::function<void(double magnitude)> m_on_rumble;
 
     std::unique_ptr<ControllerStatusThread> m_status_thread;
 

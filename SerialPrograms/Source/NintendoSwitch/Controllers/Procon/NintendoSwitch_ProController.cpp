@@ -36,8 +36,18 @@ const char ProController::NAME[] = "Nintendo Switch: Pro Controller";
 
 
 struct ProController::Data{
+    ListenerSet<RumbleListener> m_rumble_listeners;
     std::map<KeyboardKey, ProControllerDeltas> m_keyboard_mapping;
 };
+
+
+
+void ProController::add_listener(RumbleListener& listener){
+    m_data->m_rumble_listeners.add(listener);
+}
+void ProController::remove_listener(RumbleListener& listener){
+    m_data->m_rumble_listeners.remove(listener);
+}
 
 
 
@@ -100,6 +110,12 @@ void ProController::run_controller_input(const ControllerInputState& state){
 
     on_command_input(timestamp, controller_state);
 }
+
+
+void ProController::on_rumble(double magnitude){
+    m_data->m_rumble_listeners.run_method(&RumbleListener::on_rumble, magnitude);
+}
+
 
 
 

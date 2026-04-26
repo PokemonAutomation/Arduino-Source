@@ -12,6 +12,7 @@
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Controllers/Joystick.h"
 #include "Controllers/Controller.h"
+#include "Controllers/RumbleListener.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 
 //#include <iostream>
@@ -61,8 +62,14 @@ class ProController : public AbstractController{
 public:
     using ContextType = ProControllerContext;
 
+    void add_listener(RumbleListener& listener);
+    void remove_listener(RumbleListener& listener);
+
+
+public:
     ProController(Logger& logger);
     virtual ~ProController();
+
 
 public:
     static const char NAME[];
@@ -226,6 +233,12 @@ public:
     //  Controller Input
 
     virtual void run_controller_input(const ControllerInputState& state) override;
+
+
+protected:
+    //  Console -> Controller
+
+    void on_rumble(double magnitude);
 
 
 private:

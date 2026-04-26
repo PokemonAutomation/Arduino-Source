@@ -9,9 +9,10 @@
 
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Controllers/Joystick.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 #include "Controllers/ControllerTypes.h"
 #include "Controllers/Controller.h"
+#include "Controllers/RumbleListener.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -57,6 +58,11 @@ class JoyconController : public AbstractController{
 public:
     using ContextType = JoyconContext;
 
+    void add_listener(RumbleListener& listener);
+    void remove_listener(RumbleListener& listener);
+
+
+public:
     JoyconController(Logger& logger, ControllerClass controller_class);
     virtual ~JoyconController();
 
@@ -172,6 +178,12 @@ public:
     //  Controller Input
 
     virtual void run_controller_input(const ControllerInputState& state) override;
+
+
+protected:
+    //  Console -> Controller
+
+    void on_rumble(double magnitude);
 
 
 private:

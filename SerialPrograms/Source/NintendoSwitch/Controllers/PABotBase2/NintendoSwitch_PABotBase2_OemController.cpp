@@ -24,10 +24,12 @@ using namespace std::chrono_literals;
 PABotBase2_OemController::PABotBase2_OemController(
     Logger& logger,
     PABotBase2::Connection& connection,
-    ControllerType controller_type
+    ControllerType controller_type,
+    std::function<void(double magnitude)> on_rumble
 )
     : PABotBase2_Controller(logger, connection)
     , m_controller_type(controller_type)
+    , m_on_rumble(std::move(on_rumble))
 {
     using namespace PABotBase2;
 
@@ -189,27 +191,40 @@ PABotBase2_OemController::PABotBase2_OemController(
             }
             const auto* message = (const pabb2_Message_Feedback_NS1_OemController_Rumble*)header;
 
-            //  We don't do anything here yet.
-            uint32_t left, right;
-            memcpy(&left, message->data.left, sizeof(uint32_t));
-            memcpy(&right, message->data.right, sizeof(uint32_t));
+            RumbleData left = parse_rumble(message->data.left);
+            RumbleData right = parse_rumble(message->data.right);
 
-            const uint32_t NEUTRAL = 0x40400100;
-            bool is_active = false;
-            if (left != 0 && left != NEUTRAL){
-                is_active = true;
+            std::string str;
+            std::string str_left = rumble_to_str(left);
+            std::string str_right = rumble_to_str(right);
+            if (!str_left.empty()){
+                if (!str.empty()){
+                    str += ", ";
+                }
+                str += "Left = ";
+                str += str_left;
             }
-            if (right != 0 && right != NEUTRAL){
-                is_active = true;
+            if (!str_right.empty()){
+                if (!str.empty()){
+                    str += ", ";
+                }
+                str += "Right = ";
+                str += str_right;
             }
 
-            if (is_active){
-                m_logger.log(
-                    "Rumble: Left = " + tostr_hexbytes(&left, sizeof(uint32_t)) +
-                    ", Right = " + tostr_hexbytes(&right, sizeof(uint32_t)),
-                    COLOR_DARKGREEN
-                );
+            double magnitude =
+                left.lo_amp * left.lo_freq + left.hi_amp * left.hi_freq +
+                right.lo_amp * right.lo_freq + right.hi_amp * right.hi_freq;
+
+            if (m_on_rumble){
+                m_on_rumble(magnitude);
             }
+
+            if (str.empty()){
+                return;
+            }
+
+            m_logger.log("Rumble: " + str + " - Magnitude = " + tostr_fixed(magnitude, 3), COLOR_ORANGE);
         }
     );
 
@@ -601,6 +616,86 @@ void PABotBase2_OemController::update_status(Cancellable& cancellable){
 }
 void PABotBase2_OemController::stop_with_error(std::string message){
     PABotBase2_Controller::stop_with_error(std::move(message));
+}
+
+
+
+
+double PABotBase2_OemController::rumble_index_to_amp(uint8_t index){
+    if (index < 16){
+        const double TABLE[] = {
+            0,
+            0.007843,
+            0.011823,
+            0.014061,
+            0.01672,
+            0.019885,
+            0.023648,
+            0.028123,
+            0.033442,
+            0.039771,
+            0.047296,
+            0.056246,
+            0.066886,
+            0.079542,
+            0.094592,
+            0.112491,
+        };
+        return TABLE[index];
+    }else if (16 <= index && index < 32){
+        return std::pow(2, index * (1. / 16)) / 17;
+    }else{
+        return std::pow(2, index * (1. / 32)) / 8.7;
+    }
+}
+double PABotBase2_OemController::rumble_index_to_freq(double index){
+    double x = index + 64;
+    x *= (1. / 32);
+    return 10 * std::pow(2, x);
+}
+PABotBase2_OemController::RumbleData PABotBase2_OemController::parse_rumble(const uint8_t data[4]){
+    uint8_t lo_freq_i = data[2] & 0x7f;
+    uint16_t hi_freq_i = data[0] | ((uint16_t)(data[1] & 1) << 8);
+    uint8_t hi_amp_i = (uint8_t)data[1] >> 1;
+    uint16_t lo_amp_i = ((uint16_t)data[3] << 1) | ((uint8_t)data[2] >> 7);
+    lo_amp_i = std::max<uint16_t>(lo_amp_i, 0x80);
+    lo_amp_i -= 0x80;
+
+    return RumbleData{
+        rumble_index_to_freq(lo_freq_i),
+        rumble_index_to_amp(lo_amp_i),
+        rumble_index_to_freq(hi_freq_i * 0.25 + 32),
+        rumble_index_to_amp(hi_amp_i)
+    };
+
+#if 0
+    std::cout
+              << ", lo_freq_i = " << (unsigned)lo_freq_i
+              << ", lo_amp_i = " << lo_amp_i
+              << ", hi_freq_i = " << hi_freq_i
+              << ", hi_amp_i = " << (unsigned)hi_amp_i
+              << ", lo_freq = " << lo_freq
+              << ", lo_amp = " << lo_amp
+              << ", hi_freq = " << hi_freq
+              << ", hi_amp = " << hi_amp
+              << std::endl;
+#endif
+}
+std::string PABotBase2_OemController::rumble_to_str(const RumbleData& data){
+    std::string ret;
+    if (data.lo_amp != 0){
+        ret += "[";
+        ret += tostr_fixed(data.lo_amp, 3) + " x ";
+        ret += tostr_fixed(data.lo_freq, 0) + "Hz";
+        ret += "]";
+    }
+    if (data.hi_amp != 0){
+        ret += "[";
+        ret += tostr_fixed(data.hi_amp, 3) + " x ";
+        ret += tostr_fixed(data.hi_freq, 0) + "Hz";
+        ret += "]";
+    }
+    return ret;
 }
 
 
