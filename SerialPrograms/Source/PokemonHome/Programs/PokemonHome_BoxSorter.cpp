@@ -505,21 +505,6 @@ void read_summary_screen(
 void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     StartProgramChecks::check_performance_class_wired_or_wireless(context);
 
-    VideoOverlay& overlay = env.console.overlay();
-    ImageFloatBox gmax_test_box(0.459, 0.084, 0.043, 0.067);
-    GigantamaxDetector detector(COLOR_RED, &overlay, gmax_test_box);
-    for (size_t i = 0; i < 10; i++){
-        VideoSnapshot screen = env.console.video().snapshot();
-        if (detector.detect(screen)){
-            env.console.log("Gmax symbol detected", COLOR_CYAN);
-        } else{
-            env.console.log("Gmax symbol not detected", COLOR_RED);
-        }
-        pbf_wait(context, 2000ms);
-        context.wait_for_all_requests();
-    }
-
-
     const std::vector<SortingRule> sort_preferences = SORT_TABLE.preferences();
     if (sort_preferences.empty()){
         throw UserSetupError(env.console, "At least one sorting method selection needs to be made!");
