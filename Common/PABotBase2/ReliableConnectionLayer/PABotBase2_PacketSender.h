@@ -159,7 +159,6 @@ private:
     size_t m_buffer_tail;
 
     //  These store the offsets within the buffer where the packet starts.
-    //  The values stored here have their bits flipped so that zero means invalid.
     size_t m_offsets[SLOTS];
 
     uint8_t m_buffer[PABB2_PacketSender_BUFFER_SIZE];

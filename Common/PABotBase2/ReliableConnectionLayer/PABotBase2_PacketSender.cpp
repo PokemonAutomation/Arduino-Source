@@ -36,7 +36,6 @@ void PacketSender::reset(){
     m_stream_offset = 0;
     m_buffer_head = 0;
     m_buffer_tail = 0;
-    memset(m_offsets, 0, sizeof(m_offsets));
 }
 
 
@@ -45,16 +44,19 @@ bool PacketSender::remove(uint8_t seqnum){
 //        std::lock_guard<std::mutex> lg(print_lock);
 //        cout << "PacketSender::remove(" << this << "): " << (int)seqnum << endl;
 //    }
+
+    //  Seqnum is out of range.
+    if ((uint8_t)(seqnum - m_slot_head) >= SLOTS){
+        return false;
+    }
+    if ((uint8_t)(m_slot_tail - seqnum) > SLOTS){
+        return false;
+    }
+
+    //  Mark the slot has invalid.
     {
         size_t offset = m_offsets[seqnum & SLOTS_MASK];
-        if (offset == 0){
-            return false;
-        }
-        offset = ~offset;
         PacketHeader* packet = (PacketHeader*)(m_buffer + offset);
-        if (packet->seqnum != seqnum){
-            return false;
-        }
         packet->opcode = PABB2_CONNECTION_OPCODE_INVALID;
     }
 
@@ -65,7 +67,6 @@ bool PacketSender::remove(uint8_t seqnum){
 
     //  Clear out all acked requests from the front of the queue.
     while (true){
-        m_offsets[seqnum & SLOTS_MASK] = 0;
         seqnum++;
         m_slot_head = seqnum;
 
@@ -76,7 +77,7 @@ bool PacketSender::remove(uint8_t seqnum){
             return true;
         }
 
-        size_t offset = ~m_offsets[seqnum & SLOTS_MASK];
+        size_t offset = m_offsets[seqnum & SLOTS_MASK];
         m_buffer_head = offset;
 
         PacketHeader* packet = (PacketHeader*)(m_buffer + offset);
@@ -150,7 +151,7 @@ PacketHeader* PacketSender::reserve_packet(
     }
     m_buffer_tail = buffer_tail;
 
-    m_offsets[m_slot_tail & SLOTS_MASK] = ~offset;
+    m_offsets[m_slot_tail & SLOTS_MASK] = offset;
 
     PacketHeader* ret = (PacketHeader*)(m_buffer + offset);
 
@@ -188,7 +189,7 @@ bool PacketSender::send_stream_all_or_nothing(const void* data, size_t bytes) no
 
     while (bytes > 0){
         //  No slots available.
-        uint8_t slots_used = m_slot_tail - m_slot_head;
+        uint8_t slots_used = slot_tail - m_slot_head;
         if (slots_used == SLOTS){
             break;
         }
@@ -244,7 +245,7 @@ bool PacketSender::send_stream_all_or_nothing(const void* data, size_t bytes) no
         }
 //        printf("self->buffer_tail: %zu\n", self->buffer_tail);
 
-        m_offsets[slot_tail & SLOTS_MASK] = ~offset;
+        m_offsets[slot_tail & SLOTS_MASK] = offset;
 
         //  Build the packet header.
         PacketHeaderData* packet = (PacketHeaderData*)(m_buffer + offset);
@@ -265,11 +266,8 @@ bool PacketSender::send_stream_all_or_nothing(const void* data, size_t bytes) no
         bytes -= current;
     }
 
+    //  Insufficient space. Return without committing anything.
     if (bytes > 0){
-        //  Failed to send. Clear the offsets.
-        while (slot_tail != m_slot_tail){
-            m_offsets[--slot_tail & SLOTS_MASK] = 0;
-        }
         return false;
     }
 
@@ -279,7 +277,7 @@ bool PacketSender::send_stream_all_or_nothing(const void* data, size_t bytes) no
     m_stream_offset = stream_offset;
 
     while (m_slot_tail != slot_tail){
-        size_t offset = ~m_offsets[m_slot_tail++ & SLOTS_MASK];
+        size_t offset = m_offsets[m_slot_tail++ & SLOTS_MASK];
         PacketHeader* packet = (PacketHeader*)(m_buffer + offset);
 
         //  Send
@@ -311,7 +309,7 @@ bool PacketSender::iterate_retransmits(){
     uint8_t seqnum = m_retransmit_seqnum;
 
     while (head != tail){
-        size_t offset = ~m_offsets[head & SLOTS_MASK];
+        size_t offset = m_offsets[head & SLOTS_MASK];
         PacketHeader* packet = (PacketHeader*)(m_buffer + offset);
 
         //  Already acked.
