@@ -320,7 +320,14 @@ bool StarterRng::walk_to_rival_battle(SingleSwitchProgramEnvironment& env, ProCo
         { black_screen }
     );
 
-    return (ret < 0);
+    bool failed = ret < 0;
+    if (failed){
+        send_program_recoverable_error_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            "walk_to_rival_battle(): failed to initiate battle."
+        ); 
+    }
+    return failed;
 }
 
 bool StarterRng::auto_battle_rival(
@@ -353,7 +360,10 @@ bool StarterRng::auto_battle_rival(
         { battle_ready }
     );
     if (ret1 < 0){
-        env.log("auto_battle_rival(): failed to detect the battle menu.");
+        send_program_recoverable_error_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            "auto_battle_rival(): failed to detect the battle menu."
+        );
         return true;
     }
     env.log("Battle started. Using first move...");
@@ -370,7 +380,10 @@ bool StarterRng::auto_battle_rival(
         { battle_ready }
     );
     if (ret2 < 0){
-        env.log("auto_battle_rival(): failed to detect the battle menu.");
+        send_program_recoverable_error_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            "auto_battle_rival(): failed to detect the battle menu."
+        );
         return true;
     }
     env.log("Oak tutorial dialogue finished. Mashing A...");
@@ -396,7 +409,10 @@ bool StarterRng::auto_battle_rival(
         pbf_mash_button(context, BUTTON_B, 20s); // exit battle and dialogue
         return false;
     default:
-        env.log("auto_battle_rival(): no fainting detected with 5 minutes.");
+        send_program_recoverable_error_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            "auto_battle_rival(): no fainting detected with 5 minutes."
+        );
         return true;
     }
 
@@ -461,7 +477,10 @@ bool StarterRng::walk_to_route1_from_lab(SingleSwitchProgramEnvironment& env, Pr
     );
 
     if (ret < 0){
-        env.log("walk_to_route1_from_lab(): failed to exit lab.");
+        send_program_recoverable_error_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            "walk_to_route1_from_lab(): failed to exit lab."
+        );
         return true;
     }
 
@@ -491,7 +510,10 @@ bool StarterRng::walk_to_route1_from_home(SingleSwitchProgramEnvironment& env, P
     );
 
     if (ret < 0){
-        env.log("walk_to_route1_from_home(): failed to exit the house.");
+        send_program_recoverable_error_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            "walk_to_route1_from_home(): failed to exit the house."
+        );
         return true;
     }
 
@@ -524,7 +546,10 @@ int StarterRng::autolevel_on_route1(
         env.log("Triggering wild encounters...");
         int ret = grass_spin(env.console, context, leftright);
         if (ret < 0){
-            env.log("autolevel_on_route1(): failed to trigger encounter.");
+            send_program_recoverable_error_notification(
+                env, NOTIFICATION_ERROR_RECOVERABLE,
+                "autolevel_on_route1(): failed to trigger encounter."
+            );
             return -1;
         }
 
@@ -791,7 +816,6 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         bool failed = walk_to_rival_battle(env, context);
         if (failed){
             stats.errors++;
-            env.log("Failed to initiate rival battle.");
             continue; // reset game
         }
 
@@ -801,7 +825,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             continue; // reset game
         }
         if (pokemon.level.size() > 1){
-            searcher.refine_search(search_hits, filters, 0, 30);
+            searcher.refine_search(search_hits, filters, 30);
             POSSIBLE_HITS.set(SEED_CALIBRATION_FRAMES, CONTINUE_SCREEN_ADJUSTMENT, ADVANCES_CALIBRATION, search_hits);
             env.log("Number of search hits: " + std::to_string(search_hits.size()));
             finished = update_history(env.console, ADVANCE_HISTORY, CALIBRATION_HISTORY, MAX_HISTORY_LENGTH, SEED_CALIBRATION_FRAMES, ADVANCES_CALIBRATION, CONTINUE_SCREEN_ADJUSTMENT, search_hits, 5);
@@ -831,7 +855,6 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
             int ret2 = autolevel_on_route1(env, context, pokemon, filters, BASE_STATS);
             if (ret2 < 0){
-                env.log("Error encountered while auto-leveling.");
                 stats.errors++;
                 break;
             }else if(ret2 == 1){
@@ -857,7 +880,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             
             if (pokemon.level.size() > num_levels){
                 num_levels = pokemon.level.size();
-                searcher.refine_search(search_hits, filters, 0, 30);
+                searcher.refine_search(search_hits, filters, 30);
                 POSSIBLE_HITS.set(
                     SEED_CALIBRATION_FRAMES * FRAME_DURATION,
                     CONTINUE_SCREEN_ADJUSTMENT,

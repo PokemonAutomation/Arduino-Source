@@ -154,15 +154,15 @@ public:
         const std::vector<uint16_t>& seeds,
         uint64_t min_advances,
         uint64_t max_advances,
-        uint16_t tid_xor_sid = 0,
-        uint8_t gender_threshold = 126
+        int16_t gender_threshold = 126,
+        uint16_t tid_xor_sid = 0
     );
 
     void refine_search(
         std::map<AdvRngState, AdvPokemonResult>& map,
         AdvRngFilters& target,
-        uint16_t tid_xor_sid = 0,
-        uint8_t gender_threshold = 126
+        int16_t gender_threshold = 126,
+        uint16_t tid_xor_sid = 0
     );
 
 private:
@@ -171,8 +171,8 @@ private:
         AdvRngFilters& target,
         uint64_t min_advances,
         uint64_t max_advances,
-        uint16_t tid_xor_sid,
-        uint8_t gender_threshold
+        int16_t gender_threshold,
+        uint16_t tid_xor_sid
     );
 };
 

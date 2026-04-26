@@ -323,7 +323,10 @@ bool GiftRng::use_rare_candy(
         { party_menu }
     );
     if (ret < 0){
-        env.log("use_rare_candy(): failed to detect party menu.");
+        send_program_recoverable_error_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            "use_rare_candy(): failed to detect party menu."
+        ); 
         return true;
     }
 
@@ -348,7 +351,10 @@ bool GiftRng::use_rare_candy(
         { level_up }
     );
     if (ret2 < 0){
-        env.log("use_rare_candy(): failed to detect level-up stats.");
+        send_program_recoverable_error_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            "use_rare_candy(): failed to detect level-up stats."
+        ); 
         return true;
     }
 
@@ -367,7 +373,10 @@ bool GiftRng::use_rare_candy(
     int attempts = 0;
     while (true){
         if (attempts > 5){
-            env.log("use_rare_candy(): failed to return to bag menu in 5 attempts.");
+            send_program_recoverable_error_notification(
+                env, NOTIFICATION_ERROR_RECOVERABLE,
+                "use_rare_candy(): failed to return to bag menu in 5 attempts."
+            );
             return true;
         }
         BagWatcher bag_menu(COLOR_RED);
@@ -394,7 +403,10 @@ bool GiftRng::use_rare_candy(
             pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
             continue;
         default:
-            env.log("use_rare_candy(): failed to return to bag menu.");
+            send_program_recoverable_error_notification(
+                env, NOTIFICATION_ERROR_RECOVERABLE,
+                "use_rare_candy(): failed to return to bag menu."
+            ); 
             return true;
         }
     }
@@ -428,51 +440,67 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     env.log("Target Seed Value: " + std::to_string(TARGET_SEED));
 
     BaseStats BASE_STATS;
+    int16_t GENDER_THRESHOLD = -1;
     switch (TARGET){
     case PokemonFRLG_RngTarget::magikarp:
         BASE_STATS = { 20, 10, 55, 15, 20, 80 };
+        GENDER_THRESHOLD = 126;
         break;
     case PokemonFRLG_RngTarget::hitmonchan:
         BASE_STATS = { 50, 105, 79, 35, 110, 76 };
+        GENDER_THRESHOLD = -1;
         break;
     case PokemonFRLG_RngTarget::hitmonlee:
         BASE_STATS = { 50, 120, 53, 35, 110, 87 };
+        GENDER_THRESHOLD = -1;
         break;
     case PokemonFRLG_RngTarget::eevee:
         BASE_STATS = { 55, 55, 50, 45, 65, 55 };
+        GENDER_THRESHOLD = 30;
         break;
     case PokemonFRLG_RngTarget::lapras:
         BASE_STATS = { 130, 85, 80, 85, 95, 60 };
+        GENDER_THRESHOLD = 126;
         break;
     case PokemonFRLG_RngTarget::omanyte:
         BASE_STATS = { 35, 40, 100, 90, 55, 35 };
+        GENDER_THRESHOLD = 30;
         break;
     case PokemonFRLG_RngTarget::kabuto:
         BASE_STATS = { 30, 80, 90, 55, 45, 55 };
+        GENDER_THRESHOLD = 30;
         break;
     case PokemonFRLG_RngTarget::aerodactyl:
         BASE_STATS = { 80, 105, 65, 60, 75, 130 };
+        GENDER_THRESHOLD = 30;
         break;
     case PokemonFRLG_RngTarget::gamecornerabra:
         BASE_STATS = { 25, 20, 15, 105, 55, 90 };
+        GENDER_THRESHOLD = 63;
         break;
     case PokemonFRLG_RngTarget::gamecornerclefairy:
         BASE_STATS = { 70, 45, 48, 60, 65, 35 };
+        GENDER_THRESHOLD = 190;
         break;
     case PokemonFRLG_RngTarget::gamecornerdratini:
         BASE_STATS = { 41, 64, 45, 50, 50, 50 };
+        GENDER_THRESHOLD = 126;
         break;
     case PokemonFRLG_RngTarget::gamecornerscyther:
         BASE_STATS = { 70, 110, 80, 55, 80, 105 };
+        GENDER_THRESHOLD = 126;
         break;
     case PokemonFRLG_RngTarget::gamecornerpinsir:
         BASE_STATS = { 65, 125, 100, 55, 70, 85 };
+        GENDER_THRESHOLD = 126;
         break;
     case PokemonFRLG_RngTarget::gamecornerporygon:
         BASE_STATS = { 65, 60, 70, 85, 75, 40 };
+        GENDER_THRESHOLD = -1;
         break;
     case PokemonFRLG_RngTarget::togepi:
         BASE_STATS = { 35, 20, 65, 40, 65, 20 };
+        GENDER_THRESHOLD = 30;
         break; 
     default:
         break;
@@ -481,7 +509,7 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     const double FRAMERATE = 59.999977; // FPS
     const double FRAME_DURATION = 1000 / FRAMERATE;
 
-    uint8_t MAX_HISTORY_LENGTH = USE_TEACHY_TV ? 1 : 10;
+    uint8_t MAX_HISTORY_LENGTH = USE_TEACHY_TV ? 2 : 10;
     double SEED_BUMPS[] = {0, 1, -1, 2, -2};
 
     uint64_t CONTINUE_SCREEN_FRAMES = 200;
@@ -631,7 +659,7 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         AdvRngFilters filters = observation_to_filters(pokemon, BASE_STATS);
         RNG_FILTERS.set(filters);
 
-        std::map<AdvRngState, AdvPokemonResult> search_hits = get_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius);
+        std::map<AdvRngState, AdvPokemonResult> search_hits = get_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD);
         POSSIBLE_HITS.set(
             SEED_CALIBRATION_FRAMES * FRAME_DURATION,
             CONTINUE_SCREEN_ADJUSTMENT,
@@ -650,7 +678,7 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
                 stats.errors++;
             }
 
-            searcher.refine_search(search_hits, filters, 0, 30);
+            searcher.refine_search(search_hits, filters, GENDER_THRESHOLD);
             POSSIBLE_HITS.set(
                 SEED_CALIBRATION_FRAMES * FRAME_DURATION,
                 CONTINUE_SCREEN_ADJUSTMENT,

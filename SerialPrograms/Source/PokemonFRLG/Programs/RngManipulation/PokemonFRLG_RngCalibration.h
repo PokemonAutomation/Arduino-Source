@@ -46,7 +46,9 @@ std::map<AdvRngState, AdvPokemonResult> get_search_results(
     AdvRngFilters& filters,
     const std::vector<uint16_t>& SEED_VALUES,
     const uint64_t& ADVANCES, 
-    const uint64_t& advances_radius
+    const uint64_t& advances_radius,
+    int16_t gender_threshold = 126,
+    uint16_t tid_xor_sid = 0
 );
 
 // update IV ranges for RNG search filters with new stats/EVs after leveling up

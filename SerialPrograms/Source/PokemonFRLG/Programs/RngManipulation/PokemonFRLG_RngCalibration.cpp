@@ -114,14 +114,17 @@ std::map<AdvRngState, AdvPokemonResult> get_search_results(
     AdvRngFilters& filters,
     const std::vector<uint16_t>& SEED_VALUES,
     const uint64_t& ADVANCES, 
-    const uint64_t& advances_radius
+    const uint64_t& advances_radius,
+    int16_t gender_threshold,
+    uint16_t tid_xor_sid
+
 ){
     std::map<AdvRngState, AdvPokemonResult> search_hits;
     for (int i=0; i<4; i++){
         uint64_t adv_radius = advances_radius * (uint64_t(1) << i);
         uint64_t min_adv = ADVANCES - std::min(uint64_t(ADVANCES), adv_radius);    
         uint64_t max_adv = ADVANCES + adv_radius;
-        search_hits = searcher.search(filters, SEED_VALUES, min_adv, max_adv, 0, 30);
+        search_hits = searcher.search(filters, SEED_VALUES, min_adv, max_adv, gender_threshold, tid_xor_sid);
         if (search_hits.size() > 0){
             console.log("Number of search hits: " + std::to_string(search_hits.size()));
             return search_hits;
