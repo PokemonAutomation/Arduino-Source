@@ -10,6 +10,7 @@
 #include <vector>
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/TextEditOption.h"
+#include "Common/Cpp/Options/FloatingPointOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Pokemon_AdvRng.h"
@@ -82,9 +83,9 @@ private:
     static std::string get_hits_string(const std::vector<AdvRngState>& rng_states);
     static std::string get_hits_string(const std::map<AdvRngState, AdvPokemonResult>& hits_map);
 public:
-    StringOption seed_calibration;
-    StringOption csf_calibration;
-    StringOption advances_calibration;
+    FloatingPointOption seed_calibration;
+    FloatingPointOption csf_calibration;
+    FloatingPointOption advances_calibration;
     StringOption hits;
 };
 

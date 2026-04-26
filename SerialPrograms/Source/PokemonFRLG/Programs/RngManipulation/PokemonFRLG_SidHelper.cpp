@@ -151,9 +151,8 @@ void finish_intro_animations(SingleSwitchProgramEnvironment& env, ProControllerC
     );
 
     if (ret2 < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT, "SidHelper(): black screen lasted longer than 10 seconds", env.console
-        );
+        env.log("finish_intro_animations(): end of black screen not detected within 10 seconds. Continuing anyway...");
+        // if there's a problem, an error will be thrown when trying to navigate to the trainer card
     }
 
     pbf_wait(context, 2000ms);

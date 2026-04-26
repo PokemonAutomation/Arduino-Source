@@ -186,7 +186,7 @@ StarterRng::StarterRng()
     })
 {
     PA_ADD_OPTION(RNG_FILTERS);
-    PA_ADD_OPTION(POSSIBLE_HITS);
+    PA_ADD_OPTION(RNG_CALIBRATION);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(STARTER);
     PA_ADD_OPTION(MAX_RESETS);
@@ -628,7 +628,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     home_black_border_check(env.console, context);
 
     RNG_FILTERS.reset();
-    POSSIBLE_HITS.reset();
+    RNG_CALIBRATION.reset();
 
     const uint16_t TARGET_SEED = parse_seed(env.console, SEED);
     const std::vector<uint16_t> SEED_VALUES = parse_seed_list(env.console, SEED_LIST);
@@ -659,6 +659,8 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         break;
     }
 
+    const int16_t GENDER_THRESHOLD = 30;
+
     const double FRAMERATE = 59.999977; // FPS
     const double FRAME_DURATION = 1000 / FRAMERATE;
 
@@ -668,9 +670,9 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     uint64_t CONTINUE_SCREEN_FRAMES = 200;
 
     const int64_t FIXED_SEED_OFFSET = -845; // milliseconds. approximate;
-    double SEED_CALIBRATION_FRAMES = 0;
-    double ADVANCES_CALIBRATION = 0;
-    double CONTINUE_SCREEN_ADJUSTMENT = 0;
+    double SEED_CALIBRATION_FRAMES = RNG_CALIBRATION.seed_calibration / FRAME_DURATION;
+    double ADVANCES_CALIBRATION = RNG_CALIBRATION.advances_calibration;
+    double CONTINUE_SCREEN_ADJUSTMENT = RNG_CALIBRATION.csf_calibration;
 
     AdvRngSearcher searcher(TARGET_SEED, ADVANCES, AdvRngMethod::Method1);
     AdvPokemonResult target_result = searcher.generate_pokemon();
@@ -724,9 +726,11 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         }
         env.log("Advances search radius: " + std::to_string(advances_radius));
 
-        SEED_CALIBRATION_FRAMES = get_seed_calibration_frames(CALIBRATION_HISTORY, SEED_VALUES, SEED_POSITION);
-        ADVANCES_CALIBRATION = get_advances_calibration_frames(CALIBRATION_HISTORY, ADVANCES);
-
+        if (CALIBRATION_HISTORY.results.size() > 0){
+            SEED_CALIBRATION_FRAMES = get_seed_calibration_frames(CALIBRATION_HISTORY, SEED_VALUES, SEED_POSITION);
+            ADVANCES_CALIBRATION = get_advances_calibration_frames(CALIBRATION_HISTORY, ADVANCES);
+        }
+        
         if (CALIBRATION_HISTORY.results.size() > 0){
             AdvRngState prev_hit = CALIBRATION_HISTORY.results.back();
             double prev_csf_calibration = CALIBRATION_HISTORY.continue_screen_adjustments.back();
@@ -774,7 +778,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         stats.resets++; 
 
         RNG_FILTERS.reset();
-        POSSIBLE_HITS.reset();
+        RNG_CALIBRATION.reset();
 
         bool shiny_found = check_for_shiny(env.console, context, PokemonFRLG_RngTarget::starters);
 
@@ -800,8 +804,8 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         AdvRngFilters filters = observation_to_filters(pokemon, BASE_STATS);
         RNG_FILTERS.set(filters);
 
-        std::map<AdvRngState, AdvPokemonResult> search_hits = get_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius);
-        POSSIBLE_HITS.set(
+        std::map<AdvRngState, AdvPokemonResult> search_hits = get_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD);
+        RNG_CALIBRATION.set(
             SEED_CALIBRATION_FRAMES * FRAME_DURATION,
             CONTINUE_SCREEN_ADJUSTMENT,
             ADVANCES_CALIBRATION - CONTINUE_SCREEN_ADJUSTMENT,
@@ -825,8 +829,8 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             continue; // reset game
         }
         if (pokemon.level.size() > 1){
-            searcher.refine_search(search_hits, filters, 30);
-            POSSIBLE_HITS.set(SEED_CALIBRATION_FRAMES, CONTINUE_SCREEN_ADJUSTMENT, ADVANCES_CALIBRATION, search_hits);
+            search_hits = get_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD);
+            RNG_CALIBRATION.set(SEED_CALIBRATION_FRAMES, CONTINUE_SCREEN_ADJUSTMENT, ADVANCES_CALIBRATION, search_hits);
             env.log("Number of search hits: " + std::to_string(search_hits.size()));
             finished = update_history(env.console, ADVANCE_HISTORY, CALIBRATION_HISTORY, MAX_HISTORY_LENGTH, SEED_CALIBRATION_FRAMES, ADVANCES_CALIBRATION, CONTINUE_SCREEN_ADJUSTMENT, search_hits, 5);
             if (finished){
@@ -880,8 +884,8 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             
             if (pokemon.level.size() > num_levels){
                 num_levels = pokemon.level.size();
-                searcher.refine_search(search_hits, filters, 30);
-                POSSIBLE_HITS.set(
+                search_hits = get_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD);
+                RNG_CALIBRATION.set(
                     SEED_CALIBRATION_FRAMES * FRAME_DURATION,
                     CONTINUE_SCREEN_ADJUSTMENT,
                     ADVANCES_CALIBRATION - CONTINUE_SCREEN_ADJUSTMENT,

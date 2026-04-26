@@ -201,7 +201,7 @@ GiftRng::GiftRng()
     })
 {
     PA_ADD_OPTION(RNG_FILTERS);
-    PA_ADD_OPTION(POSSIBLE_HITS);
+    PA_ADD_OPTION(RNG_CALIBRATION);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(MAX_RESETS);
@@ -423,7 +423,7 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     home_black_border_check(env.console, context);
 
     RNG_FILTERS.reset();
-    POSSIBLE_HITS.reset();
+    RNG_CALIBRATION.reset();
 
     const uint16_t TARGET_SEED = parse_seed(env.console, SEED);
     const std::vector<uint16_t> SEED_VALUES = parse_seed_list(env.console, SEED_LIST);
@@ -515,9 +515,9 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     uint64_t CONTINUE_SCREEN_FRAMES = 200;
 
     const int64_t FIXED_SEED_OFFSET = -845; // milliseconds. approximate;
-    double SEED_CALIBRATION_FRAMES = 0;
-    double ADVANCES_CALIBRATION = 0;
-    double CONTINUE_SCREEN_ADJUSTMENT = 0;
+    double SEED_CALIBRATION_FRAMES = RNG_CALIBRATION.seed_calibration / FRAME_DURATION;
+    double ADVANCES_CALIBRATION = RNG_CALIBRATION.advances_calibration;
+    double CONTINUE_SCREEN_ADJUSTMENT = RNG_CALIBRATION.csf_calibration;
 
     AdvRngSearcher searcher(TARGET_SEED, ADVANCES, AdvRngMethod::Method1);
     AdvPokemonResult target_result = searcher.generate_pokemon();
@@ -571,8 +571,10 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         }
         env.log("Advances search radius: " + std::to_string(advances_radius));
 
-        SEED_CALIBRATION_FRAMES = get_seed_calibration_frames(CALIBRATION_HISTORY, SEED_VALUES, SEED_POSITION);
-        ADVANCES_CALIBRATION = get_advances_calibration_frames(CALIBRATION_HISTORY, ADVANCES);
+        if (CALIBRATION_HISTORY.results.size() > 0){
+            SEED_CALIBRATION_FRAMES = get_seed_calibration_frames(CALIBRATION_HISTORY, SEED_VALUES, SEED_POSITION);
+            ADVANCES_CALIBRATION = get_advances_calibration_frames(CALIBRATION_HISTORY, ADVANCES);
+        }
 
         if (CALIBRATION_HISTORY.results.size() > 0){
             AdvRngState prev_hit = CALIBRATION_HISTORY.results.back();
@@ -633,7 +635,7 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         stats.resets++; 
 
         RNG_FILTERS.reset();
-        POSSIBLE_HITS.reset();
+        RNG_CALIBRATION.reset();
 
         bool shiny_found = check_for_shiny(env.console, context, TARGET);
 
@@ -660,7 +662,7 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         RNG_FILTERS.set(filters);
 
         std::map<AdvRngState, AdvPokemonResult> search_hits = get_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD);
-        POSSIBLE_HITS.set(
+        RNG_CALIBRATION.set(
             SEED_CALIBRATION_FRAMES * FRAME_DURATION,
             CONTINUE_SCREEN_ADJUSTMENT,
             ADVANCES_CALIBRATION - CONTINUE_SCREEN_ADJUSTMENT,
@@ -678,8 +680,8 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
                 stats.errors++;
             }
 
-            searcher.refine_search(search_hits, filters, GENDER_THRESHOLD);
-            POSSIBLE_HITS.set(
+            search_hits = get_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD);
+            RNG_CALIBRATION.set(
                 SEED_CALIBRATION_FRAMES * FRAME_DURATION,
                 CONTINUE_SCREEN_ADJUSTMENT,
                 ADVANCES_CALIBRATION - CONTINUE_SCREEN_ADJUSTMENT,

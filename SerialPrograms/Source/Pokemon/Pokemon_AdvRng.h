@@ -132,6 +132,9 @@ struct AdvRngFilters{
 // input EVs are the ones earned since the last level up, not the total
 void level_up_observed_pokemon(AdvObservedPokemon& pokemon, StatReads& newstats, EVs& evyield);
 
+// returns the appropriate NatureAdjustments for an AdvNature
+Pokemon::NatureAdjustments nature_to_adjustment(AdvNature nature);
+
 // returns search filters that correspond with observed stats
 AdvRngFilters observation_to_filters(const AdvObservedPokemon& observation, const BaseStats& basestats, AdvRngMethod method = AdvRngMethod::Method1);
 

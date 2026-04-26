@@ -78,7 +78,7 @@ private:
     SimpleIntegerOption<uint64_t> MAX_RESETS;
 
     RngFilterDisplay RNG_FILTERS;
-    RngCalibrationDisplay POSSIBLE_HITS;
+    RngCalibrationDisplay RNG_CALIBRATION;
 
     StringOption SEED; 
     TextEditOption SEED_LIST;

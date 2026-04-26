@@ -157,9 +157,9 @@ void RngFilterDisplay::reset(){
 
 RngCalibrationDisplay::RngCalibrationDisplay()
     : GroupOption("RNG Calibration", LockMode::READ_ONLY)
-    , seed_calibration(false, "<b>Seed Calibration (ms):</b>", LockMode::READ_ONLY, "-", "")
-    , csf_calibration(false, "<b>Continue Screen Frames Calibration:</b>", LockMode::READ_ONLY, "-", "")
-    , advances_calibration(false, "<b>In-Game Advances Calibration:</b>", LockMode::READ_ONLY, "-", "")
+    , seed_calibration("<b>Seed Calibration (ms):</b>", LockMode::LOCK_WHILE_RUNNING, 0.0)
+    , csf_calibration("<b>Continue Screen Frames Calibration:</b>", LockMode::LOCK_WHILE_RUNNING, 0.0)
+    , advances_calibration("<b>In-Game Advances Calibration:</b>", LockMode::LOCK_WHILE_RUNNING, 0.0)
     , hits(false, "<b>Seeds/Advances:</b>", LockMode::READ_ONLY, "-", "")
 {
     PA_ADD_STATIC(seed_calibration);
@@ -205,9 +205,9 @@ void RngCalibrationDisplay::set(
     double a_calibration, 
     std::vector<AdvRngState>& rng_states
 ){
-    seed_calibration.set(std::to_string(s_calibration));
-    csf_calibration.set(std::to_string(c_calibration));
-    advances_calibration.set(std::to_string(a_calibration));
+    seed_calibration.set(s_calibration);
+    csf_calibration.set(c_calibration);
+    advances_calibration.set(a_calibration);
     hits.set(get_hits_string(rng_states));
 }
 void RngCalibrationDisplay::set(    
@@ -221,9 +221,9 @@ void RngCalibrationDisplay::set(
 }
 
 void RngCalibrationDisplay::reset(){
-    seed_calibration.set("-");
-    csf_calibration.set("-");
-    advances_calibration.set("-");
+    // seed_calibration.set(0.0);
+    // csf_calibration.set(0.0);
+    // advances_calibration.set(0.0);
     hits.set("-");
 }
 

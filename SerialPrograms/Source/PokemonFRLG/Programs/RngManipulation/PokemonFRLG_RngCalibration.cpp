@@ -134,6 +134,25 @@ std::map<AdvRngState, AdvPokemonResult> get_search_results(
     return search_hits;
 }
 
+bool range_is_valid(IvRange iv){
+    return (
+        iv.low <= iv.high &&
+        iv.low >= 0 &&
+        iv.high >= 0
+    );
+}
+
+bool ranges_are_valid(IvRanges ivs){
+    return (
+        range_is_valid(ivs.hp) &&
+        range_is_valid(ivs.attack) &&
+        range_is_valid(ivs.defense) &&
+        range_is_valid(ivs.spatk) &&
+        range_is_valid(ivs.spdef) &&
+        range_is_valid(ivs.speed)
+    );
+}
+
 void update_filters(
     AdvRngFilters& filters, 
     AdvObservedPokemon& pokemon, 
@@ -141,12 +160,49 @@ void update_filters(
     const EVs& evyield, 
     const BaseStats& BASE_STATS
 ){
+    EVs old_evs = pokemon.evs.back();
+    EVs new_evs = {
+        old_evs.hp + evyield.hp,
+        old_evs.attack + evyield.attack,
+        old_evs.defense + evyield.defense,
+        old_evs.spatk + evyield.spatk,
+        old_evs.spdef + evyield.spdef,
+        old_evs.speed + evyield.speed
+    };
+
     pokemon.level.emplace_back(pokemon.level.back() + 1);
     pokemon.stats.emplace_back(stats);
-    pokemon.evs.emplace_back(evyield);
+    pokemon.evs.emplace_back(new_evs);
 
-    AdvRngFilters new_filters = observation_to_filters(pokemon, BASE_STATS);
-    filters.ivs = new_filters.ivs;
+    while (true){
+        // in the worst case (the new stats are the problem), start over
+        if (pokemon.level.size() == 0){
+            filters.ivs = { {0,31}, {0,31}, {0,31}, {0,31}, {0,31}, {0,31} };
+            return;
+        }
+
+        AdvRngFilters new_filters = observation_to_filters(pokemon, BASE_STATS);
+
+        if (!ranges_are_valid(new_filters.ivs)){
+            IvRanges new_stat_ivs = calc_iv_ranges(BASE_STATS, pokemon.level.back(), pokemon.evs.back(), pokemon.stats.back(), nature_to_adjustment(pokemon.nature));
+            if (!ranges_are_valid(new_stat_ivs)){
+                // remove newest stats first if they aren't valid
+                pokemon.level.erase(pokemon.level.begin());
+                pokemon.stats.erase(pokemon.stats.begin());
+                pokemon.evs.erase(pokemon.evs.begin());
+            }else{
+                // remove oldest stats first
+                pokemon.level.pop_back();
+                pokemon.stats.pop_back();
+                pokemon.evs.pop_back();
+            }
+            continue;
+        }
+
+        filters.ivs = new_filters.ivs;
+        return;
+    }
+
 }
 
 double get_seed_calibration_frames(
