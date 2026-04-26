@@ -160,19 +160,7 @@ void update_filters(
     const EVs& evyield, 
     const BaseStats& BASE_STATS
 ){
-    EVs old_evs = pokemon.evs.back();
-    EVs new_evs = {
-        old_evs.hp + evyield.hp,
-        old_evs.attack + evyield.attack,
-        old_evs.defense + evyield.defense,
-        old_evs.spatk + evyield.spatk,
-        old_evs.spdef + evyield.spdef,
-        old_evs.speed + evyield.speed
-    };
-
-    pokemon.level.emplace_back(pokemon.level.back() + 1);
-    pokemon.stats.emplace_back(stats);
-    pokemon.evs.emplace_back(new_evs);
+    level_up_observed_pokemon(pokemon, stats, evyield);
 
     while (true){
         // in the worst case (the new stats are the problem), start over

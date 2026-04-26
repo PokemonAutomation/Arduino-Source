@@ -130,7 +130,7 @@ struct AdvRngFilters{
 // updates the AdvObservedPokemon with info from leveling up
 // assumes levels are earned sequentially
 // input EVs are the ones earned since the last level up, not the total
-void level_up_observed_pokemon(AdvObservedPokemon& pokemon, StatReads& newstats, EVs& evyield);
+void level_up_observed_pokemon(AdvObservedPokemon& pokemon, const StatReads& newstats, const EVs& evyield);
 
 // returns the appropriate NatureAdjustments for an AdvNature
 Pokemon::NatureAdjustments nature_to_adjustment(AdvNature nature);
