@@ -118,23 +118,7 @@ PABotBase2_OemController::PABotBase2_OemController(
     connection.message_logger().add_message<pabb2_Message_Feedback_NS1_OemController_Rumble>(
         "PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_RUMBLE",
         PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_RUMBLE,
-#if 0
-        [](const pabb2_Message_Feedback_NS1_OemController_Rumble* message){
-            uint32_t left, right;
-            memcpy(&left, message->data.left, sizeof(uint32_t));
-            memcpy(&right, message->data.right, sizeof(uint32_t));
-            const uint32_t NEUTRAL = 0x40400100;
-            if (left != 0 && left != NEUTRAL){
-                return true;
-            }
-            if (right != 0 && right != NEUTRAL){
-                return true;
-            }
-            return false;
-        },
-#else
         false,
-#endif
         [](const pabb2_Message_Feedback_NS1_OemController_Rumble* message){
             std::string str;
             str += tostr_hexbytes(&message->data, sizeof(pabb_NintendoSwitch_Rumble));

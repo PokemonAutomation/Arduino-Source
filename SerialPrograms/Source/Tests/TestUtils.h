@@ -64,7 +64,10 @@ public:
     virtual State state() const override { return State::RUNNING; }
     virtual size_t queue_limit() const override { return PABB_DEVICE_MINIMUM_QUEUE_SIZE; }
 
-    virtual void on_cancellable_cancel(std::exception_ptr reason) override{}
+    virtual void on_cancellable_cancel(
+        Cancellable& cancellable,
+        std::exception_ptr reason
+    ) override{}
 
     virtual void wait_for_all_requests(Cancellable* cancelled = nullptr) override {}
     virtual void stop_all_commands() override {}

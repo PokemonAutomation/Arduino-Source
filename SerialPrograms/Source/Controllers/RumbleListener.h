@@ -20,7 +20,10 @@ struct RumbleListener{
 template <typename ControllerType>
 class RumbleWatcher : public ExternalInferenceCallback, public RumbleListener{
 public:
-    RumbleWatcher(ControllerType& controller, double magnitude_threshold)
+    //  For now, the magnitudes are all over the place and inconsistent.
+    //  So the only thing this can really do is detect is *any* rumble is
+    //  happening. The magnitudes are trash.
+    RumbleWatcher(ControllerType& controller, double magnitude_threshold = 10)
         : ExternalInferenceCallback("RumbleWatcher")
         , m_controller(controller)
         , m_magnitude_threshold(magnitude_threshold)
