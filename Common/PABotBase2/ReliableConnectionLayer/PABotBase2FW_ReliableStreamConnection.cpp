@@ -32,16 +32,28 @@ ReliableStreamConnectionFW::ReliableStreamConnectionFW(UnreliableStreamConnectio
 
 
 
+
+bool ReliableStreamConnectionFW::reliable_send_all_or_nothing(const void* data, size_t bytes){
+    if (!m_stream_ready){
+        m_reliable_sender.send_oob_packet_empty(0, PABB2_CONNECTION_OPCODE_INFO_STREAM_NOT_READY);
+        return false;
+    }
+    if (m_reliable_sender.send_stream_all_or_nothing(data, bytes)){
+        return true;
+    }
+    m_reliable_sender.send_oob_packet_empty(0, PABB2_CONNECTION_OPCODE_INFO_STREAM_SEND_FULL);
+    return false;
+}
 void ReliableStreamConnectionFW::reliable_send(const void* data, size_t bytes){
     if (!m_stream_ready){
+        m_reliable_sender.send_oob_packet_empty(0, PABB2_CONNECTION_OPCODE_INFO_STREAM_NOT_READY);
         return;
     }
-
     if (m_reliable_sender.send_stream_all_or_nothing(data, bytes)){
         return;
     }
-
     m_reliable_sender.declare_stream_corrupted();
+    m_reliable_sender.send_oob_packet_empty(0, PABB2_CONNECTION_OPCODE_INFO_STREAM_SEND_FULL);
     m_reliable_sender.send_oob_packet_empty(0, PABB2_CONNECTION_OPCODE_INFO_STREAM_DEAD);
 }
 

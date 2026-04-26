@@ -33,6 +33,7 @@ public:
 
 class ReliableStreamConnectionPolling{
 public:
+    virtual bool reliable_send_all_or_nothing(const void* data, size_t bytes) = 0;
     virtual void reliable_send(const void* data, size_t bytes) = 0;
     virtual size_t reliable_recv(void* data, size_t max_bytes) = 0;
 

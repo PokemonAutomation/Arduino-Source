@@ -39,6 +39,7 @@ public:
     }
 
 public:
+    virtual bool reliable_send_all_or_nothing(const void* data, size_t bytes) override;
     virtual void reliable_send(const void* data, size_t bytes) override;
     virtual size_t reliable_recv(void* data, size_t bytes) override{
         return m_stream_coalescer.read(data, bytes);
