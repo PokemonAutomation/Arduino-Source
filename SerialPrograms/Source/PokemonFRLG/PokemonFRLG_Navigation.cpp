@@ -20,11 +20,13 @@
 #include "PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
+#include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_PartyDialogs.h"
 #include "PokemonFRLG/Inference/Sounds/PokemonFRLG_ShinySoundDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_BagDetector.h"
 #include "PokemonFRLG/Inference/Map/PokemonFRLG_MapDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.h"
 #include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
@@ -669,6 +671,65 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
             return;
         default:
             console.log("Failed to open party menu.");
+            errors++;
+            pbf_mash_button(context, BUTTON_B, 2000ms);
+            start_menu_is_open = false;
+            continue;
+        }
+    }
+}
+
+void open_bag_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context){
+    uint16_t errors = 0;
+    bool start_menu_is_open = false;
+    while (true){
+        if (errors > 5){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "open_party_menu_from_overworld(): Failed to open party menu 5 times in a row.",
+                console
+            );
+        }
+
+        context.wait_for_all_requests();
+        if (!start_menu_is_open){
+            open_start_menu(console, context); // This is unavoidable since we cannot detect the overworld.
+            start_menu_is_open = true;
+        }
+
+        StartMenuWatcher start_menu(COLOR_RED);
+        BagWatcher bag(COLOR_RED);
+
+        int ret = wait_until(
+            console, context, 10000ms,
+            { start_menu, bag }
+        );
+
+        switch (ret){
+        case 0:
+            if (menu_context == StartMenuContext::SAFARI_ZONE){
+                ret = move_cursor_to_position(console, context, SelectionArrowPositionSafariMenu::BAG);
+            } else {
+                ret = move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::BAG);
+            }
+
+            if (ret < 0){
+                console.log("Failed to navigate to BAG on the start menu.");
+                errors++;
+                context.wait_for_all_requests();
+                pbf_mash_button(context, BUTTON_B, 2000ms);
+                start_menu_is_open = false;
+            } else {
+                console.log("Navigated to BAG on the start menu");
+                context.wait_for_all_requests();
+                pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+            }
+            continue;
+        case 1:
+            console.log("Bag opened.");
+            return;
+        default:
+            console.log("Failed to open bag.");
             errors++;
             pbf_mash_button(context, BUTTON_B, 2000ms);
             start_menu_is_open = false;

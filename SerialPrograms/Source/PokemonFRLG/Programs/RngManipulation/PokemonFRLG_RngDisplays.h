@@ -59,12 +59,22 @@ public:
 };
 
 
-class PossibleHitsDisplay : public GroupOption{
+class RngCalibrationDisplay : public GroupOption{
 public:
-    PossibleHitsDisplay();
+    RngCalibrationDisplay();
 
-    void set(const std::vector<AdvRngState>& rng_states);
-    void set(const std::map<AdvRngState, AdvPokemonResult>& hits_map);
+    void set(
+        double s_calibraiton, 
+        double c_calibration, 
+        double a_calibration, 
+        std::vector<AdvRngState>& rng_states
+    );
+    void set(
+        double s_calibration, 
+        double c_calibration, 
+        double a_calibration, 
+        const std::map<AdvRngState, AdvPokemonResult>& hits_map
+    );
     void reset();
 
 private:
@@ -72,6 +82,9 @@ private:
     static std::string get_hits_string(const std::vector<AdvRngState>& rng_states);
     static std::string get_hits_string(const std::map<AdvRngState, AdvPokemonResult>& hits_map);
 public:
+    StringOption seed_calibration;
+    StringOption csf_calibration;
+    StringOption advances_calibration;
     StringOption hits;
 };
 

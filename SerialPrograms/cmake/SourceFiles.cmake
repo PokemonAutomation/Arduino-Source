@@ -1448,6 +1448,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.h
     Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.cpp
     Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h
+    Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PartyDialogs.cpp
+    Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PartyDialogs.h
     Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.cpp
     Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h
     Source/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.cpp
@@ -1458,6 +1460,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.cpp
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h
+    Source/PokemonFRLG/Inference/Menus/PokemonFRLG_BagDetector.cpp
+    Source/PokemonFRLG/Inference/Menus/PokemonFRLG_BagDetector.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.cpp
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.h
     Source/PokemonFRLG/Inference/Menus/PokemonFRLG_PartyHeldItemDetector.cpp
@@ -1480,6 +1484,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/PokemonFRLG_StatsReader.h
     Source/PokemonFRLG/Inference/PokemonFRLG_BattleLevelUpReader.cpp
     Source/PokemonFRLG/Inference/PokemonFRLG_BattleLevelUpReader.h
+    Source/PokemonFRLG/Inference/PokemonFRLG_PartyLevelUpReader.cpp
+    Source/PokemonFRLG/Inference/PokemonFRLG_PartyLevelUpReader.h
     Source/PokemonFRLG/Inference/PokemonFRLG_TrainerIdReader.cpp
     Source/PokemonFRLG/Inference/PokemonFRLG_TrainerIdReader.h
     Source/PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.cpp
@@ -1528,12 +1534,16 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngDisplays.h
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_HardReset.cpp
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_HardReset.h
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngCalibration.cpp
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngCalibration.h
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_SidHelper.cpp
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_SidHelper.h
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngHelper.cpp
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_RngHelper.h
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_StarterRng.cpp
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_StarterRng.h
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_GiftRng.cpp
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_GiftRng.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.cpp
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadStats.cpp

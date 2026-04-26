@@ -1,4 +1,4 @@
-/*  Starter RNG
+/*  Gift RNG
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -14,36 +14,33 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "Pokemon/Pokemon_StatsCalculation.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
-#include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
-#include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
+#include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_PartyDialogs.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h"
-#include "PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.h"
-#include "PokemonFRLG/Inference/PokemonFRLG_BattleLevelUpReader.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_BagDetector.h"
+#include "PokemonFRLG/Inference/PokemonFRLG_PartyLevelUpReader.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_StatsReader.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_BlindNavigation.h"
 #include "PokemonFRLG_RngNavigation.h"
 #include "PokemonFRLG_HardReset.h"
-#include "PokemonFRLG_StarterRng.h"
+#include "PokemonFRLG_GiftRng.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
 
 
-StarterRng_Descriptor::StarterRng_Descriptor()
+GiftRng_Descriptor::GiftRng_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonFRLG:StarterRng",
-        Pokemon::STRING_POKEMON + " FRLG", "Starter RNG",
-        "Programs/PokemonFRLG/StarterRng.html",
+        "PokemonFRLG:GiftRng",
+        Pokemon::STRING_POKEMON + " FRLG", "Gift RNG",
+        "Programs/PokemonFRLG/GiftRng.html",
         "Automatically calibrate timings to hit a specific RNG target for FRLG starters.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
@@ -51,31 +48,28 @@ StarterRng_Descriptor::StarterRng_Descriptor()
     )
 {}
 
-struct StarterRng_Descriptor::Stats : public StatsTracker{
+struct GiftRng_Descriptor::Stats : public StatsTracker{
     Stats()
         : resets(m_stats["Resets"])
         , shinies(m_stats["Shinies"])
         , nonshiny(m_stats["Non-Shiny Hits"])
-        , wildshinies(m_stats["Wild Shinies"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Resets");
         m_display_order.emplace_back("Shinies");
         m_display_order.emplace_back("Non-Shiny Hits", HIDDEN_IF_ZERO);
-        m_display_order.emplace_back("Wild Shinies", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& shinies;
     std::atomic<uint64_t>& nonshiny;
-    std::atomic<uint64_t>& wildshinies;
     std::atomic<uint64_t>& errors;
 };
-std::unique_ptr<StatsTracker> StarterRng_Descriptor::make_stats() const{
+std::unique_ptr<StatsTracker> GiftRng_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-StarterRng::StarterRng()
+GiftRng::GiftRng()
     : LANGUAGE(
         "<b>Game Language:</b>",
         {
@@ -89,20 +83,39 @@ StarterRng::StarterRng()
         LockMode::LOCK_WHILE_RUNNING,
         true
     )
-    , STARTER(
+    , TARGET(
         "<b>Target:</b><br>",
         {
-            {Starter::bulbasaur, "bulbasaur", "Bulbasaur"},
-            {Starter::squirtle, "squirtle", "Squirtle"},
-            {Starter::charmander, "charmander", "Charmander"},
+            {PokemonFRLG_RngTarget::magikarp, "magikarp", "Magikarp"},
+            {PokemonFRLG_RngTarget::hitmonchan, "hitmonchan", "Hitmonchan"},
+            {PokemonFRLG_RngTarget::hitmonlee, "hitmonlee", "Hitmonlee"},
+            {PokemonFRLG_RngTarget::eevee, "eevee", "Eevee"},
+            {PokemonFRLG_RngTarget::lapras, "lapras", "Lapras"},
+            {PokemonFRLG_RngTarget::omanyte, "omanyte", "Omanyte"},
+            {PokemonFRLG_RngTarget::kabuto, "kabuto", "Kabuto"},
+            {PokemonFRLG_RngTarget::aerodactyl, "aerodactyl", "Aerodactyl"},
+            {PokemonFRLG_RngTarget::gamecornerabra, "gamecornerabra", "Game Corner Abra"},
+            {PokemonFRLG_RngTarget::gamecornerclefairy, "gamecornerclefairy", "Game Corner Clefairy"},
+            {PokemonFRLG_RngTarget::gamecornerdratini, "gamecornerdratini", "Game Corner Dratini"},
+            {PokemonFRLG_RngTarget::gamecornerscyther, "gamecornerscyther", "Game Corner Scyther"},
+            {PokemonFRLG_RngTarget::gamecornerpinsir, "gamecornerpinsir", "Game Corner Pinsir"},
+            {PokemonFRLG_RngTarget::gamecornerporygon, "gamecornerporygon", "Game Corner Porygon"},
+            {PokemonFRLG_RngTarget::togepi, "togepi", "Togepi"},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        Starter::bulbasaur
+        PokemonFRLG_RngTarget::magikarp
     )    
     , MAX_RESETS(
         "<b>Max Resets:</b><br>",
         LockMode::UNLOCK_WHILE_RUNNING,
         50, 0 // default, min
+    )
+    , MAX_RARE_CANDIES(
+        "<b>Max Rare Candies:</b><br>"
+        "The number of rare candies in your bag. Make sure these are at the top position of the bag.<br>"
+        "Rare candies used during calibration will be restored after resetting.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0, 0, 999 // default, min, max
     )
     , SEED(
         false,
@@ -155,9 +168,11 @@ StarterRng::StarterRng()
     //     LockMode::LOCK_WHILE_RUNNING,
     //     1000, 192 // default, min
     // )
-    , IGNORE_WILD_SHINIES(
-        "<b>Ignore wild shinies</b><br>Do not stop the program when a wild shiny is encountered.",
-        LockMode::LOCK_WHILE_RUNNING, 
+    , USE_TEACHY_TV(
+        "<b>Use Teachy TV:</b>"
+        "<br>Opens the Teachy TV to quickly advance the RNG at 313x speed.<br>"
+        "<i>Warning: can result in larger misses.</i>",
+        LockMode::LOCK_WHILE_RUNNING,
         false // default
     )
     , PROFILE(
@@ -188,8 +203,9 @@ StarterRng::StarterRng()
     PA_ADD_OPTION(RNG_FILTERS);
     PA_ADD_OPTION(POSSIBLE_HITS);
     PA_ADD_OPTION(LANGUAGE);
-    PA_ADD_OPTION(STARTER);
+    PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(MAX_RESETS);
+    PA_ADD_OPTION(MAX_RARE_CANDIES);
     PA_ADD_OPTION(SEED);
     PA_ADD_OPTION(SEED_LIST);
     PA_ADD_OPTION(SEED_BUTTON);
@@ -197,6 +213,7 @@ StarterRng::StarterRng()
     PA_ADD_OPTION(SEED_DELAY);
     PA_ADD_OPTION(ADVANCES);
     // PA_ADD_OPTION(CONTINUE_SCREEN_FRAMES);
+    PA_ADD_OPTION(USE_TEACHY_TV);
     PA_ADD_OPTION(PROFILE);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -205,11 +222,11 @@ StarterRng::StarterRng()
 
 
 
-bool StarterRng::have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t& TARGET_SEED, const AdvRngState& hit){
+bool GiftRng::have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t& TARGET_SEED, const AdvRngState& hit){
     return (hit.seed == TARGET_SEED) && (hit.advance == ADVANCES);
 }
 
-AdvObservedPokemon StarterRng::read_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+AdvObservedPokemon GiftRng::read_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     // assumes we're already on the first summary page
     PokemonFRLG_Stats stats;
     StatsReader reader(COLOR_RED);
@@ -277,157 +294,65 @@ AdvObservedPokemon StarterRng::read_summary(SingleSwitchProgramEnvironment& env,
     return pokemon;
 }
 
-
-bool StarterRng::walk_to_rival_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    // return to the overworld
-    pbf_mash_button(context, BUTTON_B, 5000ms);
-    int num_steps_to_the_left;
-    switch(STARTER){
-    case Starter::bulbasaur:
-        num_steps_to_the_left = 2;
-        break;
-    case Starter::squirtle:
-        num_steps_to_the_left = 3;
-        break;
-    case Starter::charmander:
-        num_steps_to_the_left = 4;
-        break;
-    default:
-        num_steps_to_the_left = 2;
+bool GiftRng::use_rare_candy(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context,
+    AdvObservedPokemon& pokemon,
+    AdvRngFilters& filters,
+    const BaseStats& BASE_STATS,
+    bool first
+){
+    // navigate to the bag (only needed for the first use)
+    if (first){
+        open_bag_from_overworld(env.console, context);
+        // move left to the correct pocket (in case Teachy TV was used)
+        pbf_move_left_joystick(context, {-1, 0}, 200ms, 800ms);
+        pbf_move_left_joystick(context, {-1, 0}, 200ms, 800ms);
     }
 
-    // dodge rival
-    pbf_move_left_joystick(context, {0, -1}, 40ms, 460ms);
-    pbf_move_left_joystick(context, {0, -1}, 100ms, 400ms);
-
-    // line up with the doorway
-    pbf_move_left_joystick(context, {-1, 0}, 40ms, 460ms); // pivot left
-    for (int i=0; i<num_steps_to_the_left; i++){
-        pbf_move_left_joystick(context, {-1, 0}, 100ms, 400ms);
-    }
-    
-    // walk down and trigger battle
-    BlackScreenWatcher black_screen(COLOR_RED);
+    // use rare candy and watch for the party screen
+    PartyMenuWatcher party_menu(COLOR_RED);
     context.wait_for_all_requests();
-    int ret =  run_until<ProControllerContext>(
+    int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context) {
             for (int i=0; i<5; i++){
-                ssf_press_left_joystick(context, {0, -1}, 0ms, 20000ms, 0ms);
-                ssf_mash1_button(context, BUTTON_B, 20000ms); 
+                pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
             }
         },
-        { black_screen }
+        { party_menu }
     );
-
-    return (ret < 0);
-}
-
-bool StarterRng::auto_battle_rival(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
-    AdvObservedPokemon& pokemon,
-    AdvRngFilters& filters,
-    const BaseStats& BASE_STATS
-){
-    Pokemon::EVs evyield = {0, 0, 0, 0, 0, 0};
-    switch(STARTER){
-        case Starter::bulbasaur:
-            evyield.speed = 1;   // from charmander
-            break;
-        case Starter::squirtle:
-            evyield.spatk = 1;   // from bulbasaur
-            break;
-        case Starter::charmander:
-            evyield.defense = 1; // from squirtle
-    }
-
-    // detect the battle menu
-    BattleMenuWatcher battle_ready(COLOR_RED);
-    context.wait_for_all_requests();
-    int ret1 = run_until<ProControllerContext>(
-        env.console, context,
-        [](ProControllerContext& context) {
-            pbf_mash_button(context, BUTTON_B, 30s);
-        },
-        { battle_ready }
-    );
-    if (ret1 < 0){
-        env.log("auto_battle_rival(): failed to detect the battle menu.");
+    if (ret < 0){
+        env.log("use_rare_candy(): failed to detect party menu.");
         return true;
     }
-    env.log("Battle started. Using first move...");
 
-    // perform the first move and get through Oak's dialogue,
-    // which messes up most detectors when it dims the screen
-    pbf_mash_button(context, BUTTON_A, 1000ms); // execute first move
+    // select the last party slot (unknown how full the party is, so we can't detect a particular slot)
+    // only needed on the first use
+    if (first){
+        context.wait_for_all_requests();
+        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+    }
+
+    // watch for level up stats
+    PartyLevelUpWatcher level_up(COLOR_RED, PartyLevelUpDialog::stats);
     context.wait_for_all_requests();
     int ret2 = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context) {
-            pbf_mash_button(context, BUTTON_B, 30s);
-        },
-        { battle_ready }
-    );
-    if (ret2 < 0){
-        env.log("auto_battle_rival(): failed to detect the battle menu.");
-        return true;
-    }
-    env.log("Oak tutorial dialogue finished. Mashing A...");
-
-    // mash A until somebody faints
-    BattleOpponentFaintWatcher player_won(COLOR_RED);
-    BattleFaintWatcher player_lost(COLOR_RED);
-    context.wait_for_all_requests();
-    int ret3 = run_until<ProControllerContext>(
-        env.console, context,
-        [](ProControllerContext& context) {
-            pbf_mash_button(context, BUTTON_A, 300s);
-        },
-        { player_won, player_lost }
-    );
-
-    switch(ret3){
-    case 0:
-        env.log("Won battle against rival. Watching for level-up stats...");
-        break;
-    case 1:
-        env.log("Lost battle against rival.");
-        pbf_mash_button(context, BUTTON_B, 20s); // exit battle and dialogue
-        return false;
-    default:
-        env.log("auto_battle_rival(): no fainting detected with 5 minutes.");
-        return true;
-    }
-
-    // slowly advance dialog until level-up stats are visible
-    BattleLevelUpWatcher level_up_stats(COLOR_RED, BattleLevelUpDialog::stats);
-    BlackScreenWatcher black_screen(COLOR_RED);
-    context.wait_for_all_requests();
-    int ret4 = run_until<ProControllerContext>(
-        env.console, context,
-        [](ProControllerContext& context) {
-            for(int i=0; i<60; i++){
-                pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+            for (int i=0; i<30; i++){
+                pbf_press_button(context, BUTTON_A, 200ms, 800ms);
             }
         },
-        { level_up_stats, black_screen }
+        { level_up }
     );
-
-    switch(ret4){
-    case 0:
-        env.log("Level-up stats detected.");
-        break;
-    case 1:
-        env.log("Battle exited without detecting level-up stats");
-        return true; // will cause issues with keeping track of level and EVs
-    default:
-        env.log("auto_battle_rival(): no recognized state within 2 minutes of winning battle.");
+    if (ret2 < 0){
+        env.log("use_rare_candy(): failed to detect level-up stats.");
         return true;
     }
 
-    // read stats
-    BattleLevelUpReader reader(COLOR_RED);
+    PartyLevelUpReader reader(COLOR_RED);
     VideoOverlaySet overlays(env.console.overlay());
     reader.make_overlays(overlays);
 
@@ -435,170 +360,53 @@ bool StarterRng::auto_battle_rival(
     VideoSnapshot screen = env.console.video().snapshot();
     StatReads stats = reader.read_stats(env.logger(), screen);    
 
-    update_filters(filters, pokemon, stats, evyield, BASE_STATS);
+    update_filters(filters, pokemon, stats, {}, BASE_STATS);
     RNG_FILTERS.set(filters);   
 
-    // exit battle
-    pbf_mash_button(context, BUTTON_B, 20s);
-    context.wait_for_all_requests();
-
-    return false;
-}
-
-
-
-bool StarterRng::walk_to_route1_from_lab(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    // exit the lab
-    env.log("Exiting the lab...");
-    BlackScreenWatcher black_screen(COLOR_RED);
-    context.wait_for_all_requests();
-    int ret = run_until<ProControllerContext>(
-        env.console, context,
-        [](ProControllerContext& context) {
-            pbf_move_left_joystick(context, {0, -1}, 10s, 0ms);
-        },
-        { black_screen }
-    );
-
-    if (ret < 0){
-        env.log("walk_to_route1_from_lab(): failed to exit lab.");
-        return true;
-    }
-
-    env.log("Lab exited. Walking to Route 1...");
-    pbf_wait(context, 5000ms);
-    pbf_move_left_joystick(context, {-1, 0}, 1280ms, 300ms);
-    pbf_move_left_joystick(context, {0, +1}, 3150ms, 300ms);
-    pbf_move_left_joystick(context, {+1, 0}, 330ms, 300ms);
-    pbf_move_left_joystick(context, {0, +1}, 720ms, 300ms);
-    context.wait_for_all_requests();
-    return false;
-}
-
-bool StarterRng::walk_to_route1_from_home(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    // exit the house
-    env.log("Exiting the house...");
-    BlackScreenWatcher black_screen(COLOR_RED);
-    context.wait_for_all_requests();
-    int ret = run_until<ProControllerContext>(
-        env.console, context,
-        [](ProControllerContext& context) {
-            pbf_move_left_joystick(context, {0, -1}, 1000ms, 300ms);
-            pbf_move_left_joystick(context, {-1, 0}, 900ms, 300ms);
-            pbf_move_left_joystick(context, {0, -1}, 1000ms, 300ms);
-        },
-        { black_screen }
-    );
-
-    if (ret < 0){
-        env.log("walk_to_route1_from_home(): failed to exit the house.");
-        return true;
-    }
-
-    env.log("House exited. Walking to Route 1...");
-    pbf_wait(context, 5s);
-    pbf_move_left_joystick(context, {+1, 0}, 1370ms, 300ms);
-    pbf_move_left_joystick(context, {0, +1}, 1450ms, 300ms);
-    pbf_move_left_joystick(context, {+1, 0}, 300ms,  300ms);
-    pbf_move_left_joystick(context, {0, +1}, 1250ms, 300ms);
-
-    return false;
-}
-
-int StarterRng::autolevel_on_route1(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
-    AdvObservedPokemon& pokemon,
-    AdvRngFilters& filters,
-    const BaseStats& BASE_STATS
-){
-    Pokemon::EVs evyield = {0, 0, 0, 0, 0, 0};
-    Pokemon::StatReads stats;
-
-    env.log("Arrived at Route 1.");
-    bool leftright = true;
-    context.wait_for_all_requests();
-
+    // return to the bag (possibly learning a move, but trying to preven evolution)
+    int attempts = 0;
     while (true){
-        // trigger encounter
-        env.log("Triggering wild encounters...");
-        int ret = grass_spin(env.console, context, leftright);
-        if (ret < 0){
-            env.log("autolevel_on_route1(): failed to trigger encounter.");
-            return -1;
+        if (attempts > 5){
+            env.log("use_rare_candy(): failed to return to bag menu in 5 attempts.");
+            return true;
         }
-
-        if (ret == 1){ // shiny
-            return 1;
-        }
-
-        // auto battle
-        BattleResult ret2 = spam_first_move(env.console, context);
-
-        BattleLevelUpWatcher level_up(COLOR_RED, BattleLevelUpDialog::stats);
-        BlackScreenWatcher black_screen(COLOR_RED);
-        VideoSnapshot screen;
-        int ret3;
-        bool failed;
-        BattleLevelUpReader reader;          
-
-        switch (ret2){
-        case BattleResult::opponentfainted:
-            env.log("Opponent fainted.");
-            evyield.speed++; // always rattata or pidgey
-            leftright = !leftright;
-
-            context.wait_for_all_requests();
-            ret3 = run_until<ProControllerContext>(
-                env.console, context,
-                [](ProControllerContext& context) {
-                    for (int i=0; i<5; i++){
-                        pbf_press_button(context, BUTTON_B, 200ms, 1800ms);
-                    }
-                },
-                { level_up, black_screen }
-            );
-
-            switch (ret3){
-            case 0:
-                env.log("Level-up stats detected. Reading stats...");
-                screen = env.console.video().snapshot();      
-                stats = reader.read_stats(env.logger(), screen);
-                update_filters(filters, pokemon, stats, evyield, BASE_STATS);
-                RNG_FILTERS.set(filters);
-                exit_wild_battle(env.console, context, false, true);
-                return 0;
-            case -1:
-                exit_wild_battle(env.console, context, false, true);
-            default:
-                pbf_wait(context, 1000ms);
-                context.wait_for_all_requests();
-                continue;
-            }
-        case BattleResult::playerfainted:
-            env.log("Pokemon fainted. Mashing B through dialogues...");
-            pbf_mash_button(context, BUTTON_B, 30s); // skip through a few transitions and lots of dialogue
-            failed = walk_to_route1_from_home(env, context);
-            if (failed){
-                return -1;
-            }
-            context.wait_for_all_requests();
-            leftright = true;
+        BagWatcher bag_menu(COLOR_RED);
+        PartyMoveLearnWatcher move_learn(COLOR_RED);
+        context.wait_for_all_requests();
+        int ret3 = run_until<ProControllerContext>(
+            env.console, context,
+            [](ProControllerContext& context) {
+                for (int i=0; i<15; i++){
+                    pbf_press_button(context, BUTTON_B, 200ms, 1800ms);
+                }
+            },
+            { bag_menu, move_learn }
+        );
+        attempts++;
+        switch (ret3){
+        case 0:
+            env.log("Returned to bag.");
+            return false;
+        case 1:
+            env.log("Move learn opportunity detected.");
+            // don't learn move
+            pbf_press_button(context, BUTTON_B, 200ms, 1800ms);
+            pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
             continue;
-        case BattleResult::outofpp:
-        case BattleResult::unknown:
         default:
-            return -1;
+            env.log("use_rare_candy(): failed to return to bag menu.");
+            return true;
         }
     }
 }
 
-void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+
+void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     /*
     * Settings: Text Speed fast
     */
 
-    StarterRng_Descriptor::Stats& stats = env.current_stats<StarterRng_Descriptor::Stats>();
+    GiftRng_Descriptor::Stats& stats = env.current_stats<GiftRng_Descriptor::Stats>();
 
     home_black_border_check(env.console, context);
 
@@ -612,7 +420,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     if (SEED_POSITION == -1){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "StarterRng(): Target Seed is missing from the list of nearby seeds.",
+            "GiftRng(): Target Seed is missing from the list of nearby seeds.",
             env.console
         ); 
     }
@@ -620,16 +428,52 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     env.log("Target Seed Value: " + std::to_string(TARGET_SEED));
 
     BaseStats BASE_STATS;
-    switch (STARTER){
-    case Starter::bulbasaur:
-        BASE_STATS = { 45, 49, 49, 65, 65, 45 };
+    switch (TARGET){
+    case PokemonFRLG_RngTarget::magikarp:
+        BASE_STATS = { 20, 10, 55, 15, 20, 80 };
         break;
-    case Starter::squirtle:
-        BASE_STATS = { 44, 48, 65, 50, 64, 43 };
+    case PokemonFRLG_RngTarget::hitmonchan:
+        BASE_STATS = { 50, 105, 79, 35, 110, 76 };
         break;
-    case Starter::charmander:
-        BASE_STATS = { 39, 52, 43, 60, 50, 65 };
+    case PokemonFRLG_RngTarget::hitmonlee:
+        BASE_STATS = { 50, 120, 53, 35, 110, 87 };
         break;
+    case PokemonFRLG_RngTarget::eevee:
+        BASE_STATS = { 55, 55, 50, 45, 65, 55 };
+        break;
+    case PokemonFRLG_RngTarget::lapras:
+        BASE_STATS = { 130, 85, 80, 85, 95, 60 };
+        break;
+    case PokemonFRLG_RngTarget::omanyte:
+        BASE_STATS = { 35, 40, 100, 90, 55, 35 };
+        break;
+    case PokemonFRLG_RngTarget::kabuto:
+        BASE_STATS = { 30, 80, 90, 55, 45, 55 };
+        break;
+    case PokemonFRLG_RngTarget::aerodactyl:
+        BASE_STATS = { 80, 105, 65, 60, 75, 130 };
+        break;
+    case PokemonFRLG_RngTarget::gamecornerabra:
+        BASE_STATS = { 25, 20, 15, 105, 55, 90 };
+        break;
+    case PokemonFRLG_RngTarget::gamecornerclefairy:
+        BASE_STATS = { 70, 45, 48, 60, 65, 35 };
+        break;
+    case PokemonFRLG_RngTarget::gamecornerdratini:
+        BASE_STATS = { 41, 64, 45, 50, 50, 50 };
+        break;
+    case PokemonFRLG_RngTarget::gamecornerscyther:
+        BASE_STATS = { 70, 110, 80, 55, 80, 105 };
+        break;
+    case PokemonFRLG_RngTarget::gamecornerpinsir:
+        BASE_STATS = { 65, 125, 100, 55, 70, 85 };
+        break;
+    case PokemonFRLG_RngTarget::gamecornerporygon:
+        BASE_STATS = { 65, 60, 70, 85, 75, 40 };
+        break;
+    case PokemonFRLG_RngTarget::togepi:
+        BASE_STATS = { 35, 20, 65, 40, 65, 20 };
+        break; 
     default:
         break;
     }
@@ -637,7 +481,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     const double FRAMERATE = 59.999977; // FPS
     const double FRAME_DURATION = 1000 / FRAMERATE;
 
-    uint8_t MAX_HISTORY_LENGTH = 10;
+    uint8_t MAX_HISTORY_LENGTH = USE_TEACHY_TV ? 1 : 10;
     double SEED_BUMPS[] = {0, 1, -1, 2, -2};
 
     uint64_t CONTINUE_SCREEN_FRAMES = 200;
@@ -659,7 +503,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     RngAdvanceHistory ADVANCE_HISTORY;
     RngCalibrationHistory CALIBRATION_HISTORY; 
-    uint64_t INITIAL_ADVANCES_RADIUS = 1024;
+    uint64_t INITIAL_ADVANCES_RADIUS = USE_TEACHY_TV ? 8192 : 1024;
     uint64_t resets = 0;
     bool wildshiny_found = false;
 
@@ -727,23 +571,35 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         double CALIBRATED_ADVANCES = ADVANCES + ADVANCES_CALIBRATION;
         double INGAME_ADVANCES = CALIBRATED_ADVANCES - CONTINUE_SCREEN_FRAMES - CONTINUE_SCREEN_ADJUSTMENT;
 
+        double TEACHY_ADVANCES = 0;
+        bool should_use_teachy_tv = USE_TEACHY_TV && (INGAME_ADVANCES > 5000); // don't use Teachy TV for short in-game advance targets
+        if (should_use_teachy_tv) {
+            TEACHY_ADVANCES = std::floor((INGAME_ADVANCES - 5000) / 313) * 313;
+        }
+
         env.log("Seed calibration (frames): " + std::to_string(SEED_CALIBRATION_FRAMES));
         env.log("Advance calibration (frames / 2): " + std::to_string(ADVANCES_CALIBRATION));
         env.log("Continue screen adjustment (frames): " + std::to_string(CONTINUE_SCREEN_ADJUSTMENT));
 
         uint64_t CALIBRATED_SEED_DELAY = uint64_t(std::round(SEED_DELAY + FIXED_SEED_OFFSET + FRAME_DURATION * SEED_CALIBRATION_FRAMES));
         uint64_t CONTINUE_SCREEN_DELAY =  uint64_t(std::round(FRAME_DURATION * (CONTINUE_SCREEN_FRAMES + CONTINUE_SCREEN_ADJUSTMENT)));
-        uint64_t INGAME_DELAY =  uint64_t(std::round(FRAME_DURATION * INGAME_ADVANCES / 2));
+        uint64_t TEACHY_DELAY = uint64_t(TEACHY_ADVANCES * FRAME_DURATION / 313);
+        uint64_t INGAME_DELAY = uint64_t(std::round(FRAME_DURATION * (INGAME_ADVANCES - TEACHY_ADVANCES) / 2)) - (should_use_teachy_tv ? 13700 : 0);
 
         env.log("Title screen duration: " + std::to_string(CALIBRATED_SEED_DELAY) + "ms");
         env.log("Continue screen duration: " + std::to_string(CONTINUE_SCREEN_DELAY) + "ms");
-        env.log("In-game duration: " + std::to_string(INGAME_DELAY) + "ms");
+        if (should_use_teachy_tv){
+            env.log("Teachy TV duration: " + std::to_string(TEACHY_DELAY) + "ms");
+            env.log("Non-Teachy TV in-game duration: " + std::to_string(INGAME_DELAY) + "ms");
+        }else{
+            env.log("In-game duration: " + std::to_string(INGAME_DELAY) + "ms");
+        }
 
         env.log("Resetting Game...");
         reset_and_perform_blind_sequence(
-            env.console, context, PokemonFRLG_RngTarget::starters, 
+            env.console, context, TARGET, 
             SEED_BUTTON, EXTRA_BUTTON, CALIBRATED_SEED_DELAY, 
-            CONTINUE_SCREEN_DELAY, 0, INGAME_DELAY, 
+            CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, 
             false, PROFILE
         );
         stats.resets++; 
@@ -751,7 +607,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         RNG_FILTERS.reset();
         POSSIBLE_HITS.reset();
 
-        bool shiny_found = check_for_shiny(env.console, context, PokemonFRLG_RngTarget::starters);
+        bool shiny_found = check_for_shiny(env.console, context, TARGET);
 
         if (shiny_found){
             env.log("Shiny found!");
@@ -783,93 +639,36 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             search_hits
         );        
         bool finished = update_history(env.console, ADVANCE_HISTORY, CALIBRATION_HISTORY, MAX_HISTORY_LENGTH, SEED_CALIBRATION_FRAMES, ADVANCES_CALIBRATION, CONTINUE_SCREEN_ADJUSTMENT, search_hits, 1);
-        if (finished){
+        if (finished || (MAX_RARE_CANDIES == 0)){
             env.log("RNG search finished.");
             continue;
         }
 
-        bool failed = walk_to_rival_battle(env, context);
-        if (failed){
-            stats.errors++;
-            env.log("Failed to initiate rival battle.");
-            continue; // reset game
-        }
-
-        failed = auto_battle_rival(env, context, pokemon, filters, BASE_STATS);
-        if (failed){
-            stats.errors++;
-            continue; // reset game
-        }
-        if (pokemon.level.size() > 1){
-            searcher.refine_search(search_hits, filters, 0, 30);
-            POSSIBLE_HITS.set(SEED_CALIBRATION_FRAMES, CONTINUE_SCREEN_ADJUSTMENT, ADVANCES_CALIBRATION, search_hits);
-            env.log("Number of search hits: " + std::to_string(search_hits.size()));
-            finished = update_history(env.console, ADVANCE_HISTORY, CALIBRATION_HISTORY, MAX_HISTORY_LENGTH, SEED_CALIBRATION_FRAMES, ADVANCES_CALIBRATION, CONTINUE_SCREEN_ADJUSTMENT, search_hits, 5);
-            if (finished){
-                env.log("RNG search finished.");
-                continue;
-            }
-        }
-
-        failed = walk_to_route1_from_lab(env, context);
-        if (failed){
-            stats.errors++;
-            continue; // reset game
-        }
-
-        auto num_levels = pokemon.level.size();
-        uint16_t MAX_LEVELS = 3;
-        while(true){
-            if (num_levels > MAX_LEVELS){
-                env.log("RNG search not complete after 3 level-ups.");
-                update_history(env.console, ADVANCE_HISTORY, CALIBRATION_HISTORY, MAX_HISTORY_LENGTH, SEED_CALIBRATION_FRAMES, ADVANCES_CALIBRATION, CONTINUE_SCREEN_ADJUSTMENT, search_hits, true);
-                break;
-            }
-
-            env.log("Level: " + std::to_string(4 + pokemon.level.size()));
-            env.log("Speed EVs: " + std::to_string(pokemon.evs.back().speed));
-
-            int ret2 = autolevel_on_route1(env, context, pokemon, filters, BASE_STATS);
-            if (ret2 < 0){
-                env.log("Error encountered while auto-leveling.");
+        for (int i=0; i<MAX_RARE_CANDIES; i++){
+            bool failed = use_rare_candy(env, context, pokemon, filters, BASE_STATS, i == 0);
+            if (failed){
                 stats.errors++;
-                break;
-            }else if(ret2 == 1){
-                env.log("Wild shiny found!");
-                stats.wildshinies++;
-                send_program_notification(
-                    env,
-                    NOTIFICATION_SHINY,
-                    COLOR_YELLOW,
-                    "Wild Shiny found!",
-                    {}, "",
-                    env.console.video().snapshot(),
-                    true
-                );
-                if (TAKE_VIDEO){
-                    pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
-                }
-                if (!IGNORE_WILD_SHINIES){
-                    wildshiny_found = true;
-                    break;
-                }
             }
-            
-            if (pokemon.level.size() > num_levels){
-                num_levels = pokemon.level.size();
-                searcher.refine_search(search_hits, filters, 0, 30);
-                POSSIBLE_HITS.set(
-                    SEED_CALIBRATION_FRAMES * FRAME_DURATION,
-                    CONTINUE_SCREEN_ADJUSTMENT,
-                    ADVANCES_CALIBRATION - CONTINUE_SCREEN_ADJUSTMENT,
-                    search_hits
-                );
-                env.log("Number of search hits: " + std::to_string(search_hits.size()));
-                finished = update_history(env.console, ADVANCE_HISTORY, CALIBRATION_HISTORY, MAX_HISTORY_LENGTH, SEED_CALIBRATION_FRAMES, ADVANCES_CALIBRATION, CONTINUE_SCREEN_ADJUSTMENT, search_hits, 5);
-                if (finished){
-                    env.log("RNG search finished.");
-                    break;
-                }
+
+            searcher.refine_search(search_hits, filters, 0, 30);
+            POSSIBLE_HITS.set(
+                SEED_CALIBRATION_FRAMES * FRAME_DURATION,
+                CONTINUE_SCREEN_ADJUSTMENT,
+                ADVANCES_CALIBRATION - CONTINUE_SCREEN_ADJUSTMENT,
+                search_hits
+            );
+
+            bool force_finish = failed || (i == MAX_RARE_CANDIES - 1);
+            finished = update_history(
+                env.console, ADVANCE_HISTORY, 
+                CALIBRATION_HISTORY, MAX_HISTORY_LENGTH, 
+                SEED_CALIBRATION_FRAMES, ADVANCES_CALIBRATION, 
+                CONTINUE_SCREEN_ADJUSTMENT, search_hits, 
+                1, 2, force_finish
+            );
+
+            if (finished){
+                break;
             }
         }
 

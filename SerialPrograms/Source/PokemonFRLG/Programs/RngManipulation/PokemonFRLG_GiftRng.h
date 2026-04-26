@@ -1,11 +1,11 @@
-/*  Starter RNG
+/*  Gift RNG
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_PokemonFRLG_StarterRng_H
-#define PokemonAutomation_PokemonFRLG_StarterRng_H
+#ifndef PokemonAutomation_PokemonFRLG_GiftRng_H
+#define PokemonAutomation_PokemonFRLG_GiftRng_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
@@ -17,6 +17,7 @@
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Pokemon/Pokemon_StatsCalculation.h"
 #include "Pokemon/Pokemon_AdvRng.h"
+#include "PokemonFRLG_BlindNavigation.h"
 #include "PokemonFRLG_RngCalibration.h"
 #include "PokemonFRLG_RngDisplays.h"
 
@@ -24,16 +25,16 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
 
-class StarterRng_Descriptor : public SingleSwitchProgramDescriptor{
+class GiftRng_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-    StarterRng_Descriptor();
+    GiftRng_Descriptor();
     struct Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class StarterRng : public SingleSwitchProgramInstance{
+class GiftRng : public SingleSwitchProgramInstance{
 public:
-    StarterRng();
+    GiftRng();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
     virtual void start_program_border_check(
         VideoStream& stream,
@@ -41,7 +42,7 @@ public:
     ) override{}
 
 private:
-    enum class Starter{
+    enum class Gift{
         bulbasaur,
         squirtle,
         charmander
@@ -51,31 +52,21 @@ private:
 
     AdvObservedPokemon read_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
-    bool walk_to_rival_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    bool auto_battle_rival(
+    bool use_rare_candy(
         SingleSwitchProgramEnvironment& env, 
-        ProControllerContext& context, 
+        ProControllerContext& context,
         AdvObservedPokemon& pokemon,
         AdvRngFilters& filters,
-        const BaseStats& BASE_STATS
+        const BaseStats& BASE_STATS,
+        bool first
     );
-
-    bool walk_to_route1_from_lab(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    bool walk_to_route1_from_home(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    int autolevel_on_route1(
-        SingleSwitchProgramEnvironment& env, 
-        ProControllerContext& context, 
-        AdvObservedPokemon& pokemon,
-        AdvRngFilters& filters,
-        const BaseStats& BASE_STATS
-    );
-
     
     OCR::LanguageOCROption LANGUAGE;
 
-    EnumDropdownOption<Starter> STARTER;
+    EnumDropdownOption<PokemonFRLG_RngTarget> TARGET;
 
     SimpleIntegerOption<uint64_t> MAX_RESETS;
+    SimpleIntegerOption<uint64_t> MAX_RARE_CANDIES;
 
     RngFilterDisplay RNG_FILTERS;
     RngCalibrationDisplay POSSIBLE_HITS;
@@ -87,9 +78,8 @@ private:
     SimpleIntegerOption<uint64_t> SEED_DELAY;
 
     SimpleIntegerOption<uint64_t>ADVANCES;
-    // SimpleIntegerOption<uint64_t>CONTINUE_SCREEN_FRAMES;
 
-    BooleanCheckBoxOption IGNORE_WILD_SHINIES;
+    BooleanCheckBoxOption USE_TEACHY_TV;
 
     SimpleIntegerOption<uint8_t> PROFILE;
 
