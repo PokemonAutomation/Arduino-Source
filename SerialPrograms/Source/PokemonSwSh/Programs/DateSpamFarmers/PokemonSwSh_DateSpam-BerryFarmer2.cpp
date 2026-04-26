@@ -11,6 +11,7 @@
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "Controllers/RumbleListener.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -110,11 +111,13 @@ BerryFarmer2::BerryFarmer2()
         LockMode::UNLOCK_WHILE_RUNNING,
         "3200 ms"
     )
+#if 0
     , SECONDARY_ATTEMPT_MASH_TIME0(
         "<b>Secondary attempt mash time:</b><br>Mash ZL this many ticks for secondary fetch attempts.",
         LockMode::UNLOCK_WHILE_RUNNING,
         "1920 ms"
     )
+#endif
     , SOUND_THRESHOLD(
         "<b>Maximum Sound Error Coefficient",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -135,7 +138,7 @@ BerryFarmer2::BerryFarmer2()
 //    PA_ADD_OPTION(START_BATTLE_TIMEOUT);
     PA_ADD_OPTION(RUSTLING_INTERVAL);
     PA_ADD_OPTION(RUSTLING_TIMEOUT0);
-    PA_ADD_OPTION(SECONDARY_ATTEMPT_MASH_TIME0);
+//    PA_ADD_OPTION(SECONDARY_ATTEMPT_MASH_TIME0);
     PA_ADD_OPTION(SOUND_THRESHOLD);
 }
 
@@ -147,6 +150,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
     pbf_wait(context, 640ms);
     context.wait_for_all_requests();
 
+    RumbleWatcher<ProController> initial_rumble_detector(context);
     BerryTreeRustlingSoundDetector initial_rustling_detector(
         env.console, [&](float error_coefficient) -> bool {
             //  Warning: This callback will be run from a different thread than this function.
@@ -155,6 +159,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
         (float)SOUND_THRESHOLD
     );
 
+    RumbleWatcher<ProController> secondary_rumble_detector(context);
     BerryTreeRustlingSoundDetector secondary_rustling_detector(
         env.console, [&](float error_coefficient) -> bool {
             //  Warning: This callback will be run from a different thread than this function.
@@ -173,10 +178,16 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
             pbf_wait(context, RUSTLING_TIMEOUT0);
             context.wait_for_all_requests();
         },
-        { {initial_rustling_detector}, {battle_menu_detector}, {start_battle_detector} }
+        {
+            initial_rumble_detector,
+            initial_rustling_detector,
+            battle_menu_detector,
+            start_battle_detector,
+        }
     );
     switch (ret){
-    case 0:{
+    case 0:
+    case 1:{
         env.console.log("BerryFarmer: Initial Rustling detected.");
         WallClock initial_rustling_time = current_time();
         result = Rustling::Slow;
@@ -187,10 +198,13 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
                 pbf_wait(context, RUSTLING_TIMEOUT0);
                 context.wait_for_all_requests();
             },
-            { {secondary_rustling_detector} }
+            {
+                secondary_rumble_detector,
+                secondary_rustling_detector,
+            }
         );
 
-        if (ret1 == 0){
+        if (ret1 >= 0){
             env.console.log("BerryFarmer: Secondary Rustling detected.");
             WallClock secondary_rustling_time = current_time();
             if (std::chrono::duration_cast<Milliseconds>(secondary_rustling_time - initial_rustling_time).count() <= RUSTLING_INTERVAL){
@@ -199,7 +213,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
         }
         break;
     }
-    case 1:
+    case 2:
         env.log("Unexpected battle menu.", COLOR_RED);
         stats.add_error();
         env.update_stats();
@@ -207,7 +221,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
         run_away(env.console, context, EXIT_BATTLE_TIMEOUT0);
         result = Rustling::Battle;
         break;
-    case 2:{
+    case 3:{
         env.console.log("BerryFarmer: Battle Start detected.");
 //        wait_until(env.console, context, std::chrono::seconds(START_BATTLE_TIMEOUT), { battle_menu_detector });
 
@@ -265,6 +279,7 @@ uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env
     if (no_rustling >= 3){
         return attempts;
     }
+#if 0
     if (current_rustling == Rustling::Fast){
         // this is the last tree interaction for this time skip
         pbf_mash_button(context, BUTTON_ZL, SECONDARY_ATTEMPT_MASH_TIME0);
@@ -273,6 +288,7 @@ uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env
         stats.shakes++;
         current_rustling = check_rustling(env, context);
     }
+#endif
     if (current_rustling == Rustling::Battle){
         pbf_mash_button(context, BUTTON_B, 1000ms);
         env.console.log("Clearing dialog boxes...");

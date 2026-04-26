@@ -68,7 +68,7 @@ private:
 //    SimpleIntegerOption<uint16_t> START_BATTLE_TIMEOUT;
     SimpleIntegerOption<uint16_t> RUSTLING_INTERVAL;
     MillisecondsOption RUSTLING_TIMEOUT0;
-    MillisecondsOption SECONDARY_ATTEMPT_MASH_TIME0;
+//    MillisecondsOption SECONDARY_ATTEMPT_MASH_TIME0;
     FloatingPointOption SOUND_THRESHOLD;
 };
 
