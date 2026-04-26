@@ -50,8 +50,8 @@ language
 #include "PokemonHome/Inference/PokemonHome_ButtonDetector.h"
 #include "PokemonHome/Inference/PokemonHome_BoxGenderDetector.h"
 #include "PokemonHome/Inference/PokemonHome_BallReader.h"
-#include "PokemonHome_BoxSorter.h"
 #include "PokemonHome/Inference/PokemonHome_GigantamaxDetector.h"
+#include "PokemonHome_BoxSorter.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
