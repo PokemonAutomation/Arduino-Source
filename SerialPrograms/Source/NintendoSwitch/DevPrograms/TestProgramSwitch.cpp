@@ -304,6 +304,11 @@ void TestProgram::on_press(){
 
 
 
+
+
+
+
+
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -326,6 +331,21 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     // JoyconContext context(scope, console.controller<JoyconController>());
     VideoOverlaySet overlays(overlay);
 
+
+    RumbleWatcher<ProController> rumble(context, 200);
+    int ret = wait_until(
+        console, context,
+        WallClock::max(),
+        {rumble}
+    );
+    if (ret == 0){
+        cout << "Detected rumble magnitude: " << rumble.max_magnitude() << endl;
+    }else{
+        cout << "Did not detect anything." << endl;
+    }
+
+
+#if 0
     auto snapshot = feed.snapshot();
 
     BattleSelectionArrowDetector detector(COLOR_RED, &overlay, SafariBattleMenuOption::BALL);
@@ -333,6 +353,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     detector.make_overlays(overlays);
 
     cout << detector.detect(snapshot) << endl;
+#endif
 
 
 #if 0

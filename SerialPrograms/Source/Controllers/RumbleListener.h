@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_RumbleListener_H
 #define PokemonAutomation_RumbleListener_H
 
-#include "Common/Cpp/CancellableScope.h"
+#include "CommonTools/InferenceCallbacks/InferenceCallback.h"
 
 namespace PokemonAutomation{
 
@@ -18,10 +18,11 @@ struct RumbleListener{
 
 
 template <typename ControllerType>
-class RumbleWatcher : public Cancellable, public RumbleListener{
+class RumbleWatcher : public ExternalInferenceCallback, public RumbleListener{
 public:
     RumbleWatcher(ControllerType& controller, double magnitude_threshold)
-        : m_controller(controller)
+        : ExternalInferenceCallback("RumbleWatcher")
+        , m_controller(controller)
         , m_magnitude_threshold(magnitude_threshold)
         , m_max_magnitude(0)
     {

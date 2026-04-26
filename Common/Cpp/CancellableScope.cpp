@@ -78,7 +78,11 @@ bool Cancellable::cancel(std::exception_ptr reason) noexcept{
 //        return true;
 //    }
     if (!m_impl->m_listeners.empty()){
-        m_impl->m_listeners.run_method(&CancelListener::on_cancellable_cancel, data.cancel_reason);
+        m_impl->m_listeners.run_method(
+            &CancelListener::on_cancellable_cancel,
+            *this,
+            data.cancel_reason
+        );
     }
     return false;
 }

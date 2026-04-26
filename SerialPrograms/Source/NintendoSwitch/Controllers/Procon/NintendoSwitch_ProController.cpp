@@ -9,6 +9,7 @@
 #include "CommonTools/Async/SuperControlSession.tpp"
 #include "ControllerInput/ControllerInput.h"
 #include "ControllerInput/Keyboard/KeyboardInput_State.h"
+#include "Controllers/RumbleListener.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
 #include "NintendoSwitch_ProControllerState.h"

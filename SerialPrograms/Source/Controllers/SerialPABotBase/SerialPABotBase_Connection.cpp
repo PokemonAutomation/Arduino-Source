@@ -149,7 +149,7 @@ bool SerialPABotBase_Connection::cancel(std::exception_ptr reason) noexcept{
         return true;
     }
     if (m_botbase){
-        m_botbase->on_cancellable_cancel(cancel_reason());
+        m_botbase->on_cancellable_cancel(*this, cancel_reason());
     }
     return false;
 }

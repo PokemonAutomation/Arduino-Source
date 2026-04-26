@@ -15,6 +15,9 @@
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 
 namespace PokemonAutomation{
+
+struct RumbleListener;
+
 namespace NintendoSwitch{
 
 

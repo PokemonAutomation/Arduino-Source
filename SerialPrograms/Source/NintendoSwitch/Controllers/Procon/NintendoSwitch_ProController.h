@@ -12,7 +12,6 @@
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Controllers/Joystick.h"
 #include "Controllers/Controller.h"
-#include "Controllers/RumbleListener.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 
 //#include <iostream>
@@ -20,6 +19,9 @@
 //using std::endl;
 
 namespace PokemonAutomation{
+
+struct RumbleListener;
+
 namespace NintendoSwitch{
 
 

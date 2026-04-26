@@ -46,7 +46,10 @@ class Cancellable{
     void operator=(const Cancellable&) = delete;
 public:
     struct CancelListener{
-        virtual void on_cancellable_cancel(std::exception_ptr reason) = 0;
+        virtual void on_cancellable_cancel(
+            Cancellable& cancellable,
+            std::exception_ptr reason
+        ) = 0;
     };
     void add_cancel_listener(CancelListener& listener);
     void remove_cancel_listener(CancelListener& listener) noexcept;

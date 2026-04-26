@@ -9,10 +9,14 @@
 
 #include <string>
 #include <chrono>
+#include "Common/Cpp/CancellableScope.h"
 
 namespace PokemonAutomation{
 
+class Cancellable;
+
 enum class InferenceType{
+    EXTERNAL,
     VISUAL,
     AUDIO,
 };
@@ -46,21 +50,27 @@ private:
 };
 
 
+class ExternalInferenceCallback : public InferenceCallback, public Cancellable{
+public:
+    ExternalInferenceCallback(std::string label)
+        : InferenceCallback(InferenceType::EXTERNAL, std::move(label))
+    {}
+};
+
+
 
 //  Used by inference routines in InferenceRoutines.h.
 //  The struct contains an inference callback and its inference period: how long
 //  should an inference routine wait before calling the callback object again.
 struct PeriodicInferenceCallback{
-    InferenceCallback* callback;
+    InferenceCallback* callback = nullptr;
+
     //  Inference period. 0 value means the inference routine should use the
     //  default inference period, which is set as a parameter to the inference
     //  routine.
-    std::chrono::milliseconds period;
+    std::chrono::milliseconds period = std::chrono::milliseconds(0);
 
-    PeriodicInferenceCallback()
-        : callback(nullptr)
-        , period(std::chrono::milliseconds(0))
-    {}
+    PeriodicInferenceCallback(){}
     PeriodicInferenceCallback(
         InferenceCallback& p_callback,
         std::chrono::milliseconds p_period = std::chrono::milliseconds(0)
