@@ -132,6 +132,9 @@ struct AdvRngFilters{
 // input EVs are the ones earned since the last level up, not the total
 void level_up_observed_pokemon(AdvObservedPokemon& pokemon, StatReads& newstats, EVs& evyield);
 
+// returns the appropriate NatureAdjustments for an AdvNature
+Pokemon::NatureAdjustments nature_to_adjustment(AdvNature nature);
+
 // returns search filters that correspond with observed stats
 AdvRngFilters observation_to_filters(const AdvObservedPokemon& observation, const BaseStats& basestats, AdvRngMethod method = AdvRngMethod::Method1);
 
@@ -154,15 +157,15 @@ public:
         const std::vector<uint16_t>& seeds,
         uint64_t min_advances,
         uint64_t max_advances,
-        uint16_t tid_xor_sid = 0,
-        uint8_t gender_threshold = 126
+        int16_t gender_threshold = 126,
+        uint16_t tid_xor_sid = 0
     );
 
     void refine_search(
         std::map<AdvRngState, AdvPokemonResult>& map,
         AdvRngFilters& target,
-        uint16_t tid_xor_sid = 0,
-        uint8_t gender_threshold = 126
+        int16_t gender_threshold = 126,
+        uint16_t tid_xor_sid = 0
     );
 
 private:
@@ -171,8 +174,8 @@ private:
         AdvRngFilters& target,
         uint64_t min_advances,
         uint64_t max_advances,
-        uint16_t tid_xor_sid,
-        uint8_t gender_threshold
+        int16_t gender_threshold,
+        uint16_t tid_xor_sid
     );
 };
 

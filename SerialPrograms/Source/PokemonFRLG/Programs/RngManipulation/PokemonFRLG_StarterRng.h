@@ -17,6 +17,7 @@
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Pokemon/Pokemon_StatsCalculation.h"
 #include "Pokemon/Pokemon_AdvRng.h"
+#include "PokemonFRLG_RngCalibration.h"
 #include "PokemonFRLG_RngDisplays.h"
 
 namespace PokemonAutomation{
@@ -46,60 +47,9 @@ private:
         charmander
     };
 
-    struct StarterRngAdvanceHistory{
-        std::vector<double> seed_calibrations;
-        std::vector<std::vector<AdvRngState>> results;
-    };
-
-    struct StarterRngCalibrationHistory{
-        std::vector<double> seed_calibrations;
-        std::vector<double> advance_calibrations;
-        std::vector<double> continue_screen_adjustments;
-        std::vector<AdvRngState> results;
-
-    };
-
     bool have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t& TARGET_SEED, const AdvRngState& hit);
 
     AdvObservedPokemon read_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-
-    void update_filters(
-        AdvRngFilters& filters, 
-        AdvObservedPokemon& pokemon, 
-        const StatReads& stats, 
-        const EVs& evyield, 
-        const BaseStats& BASE_STATS
-    );
-    std::map<AdvRngState, AdvPokemonResult> get_starter_search_results(
-        SingleSwitchProgramEnvironment& env,
-        AdvRngSearcher& searcher, 
-        AdvRngFilters& filters,
-        const std::vector<uint16_t>& SEED_VALUES,
-        const uint64_t& ADVANCES, 
-        const uint64_t& advances_radius, 
-        const AdvObservedPokemon& pokemon
-    );
-    double get_seed_calibration_frames(
-        const StarterRngCalibrationHistory& CALIBRATION_HISTORY,
-        const std::vector<uint16_t>& SEED_VALUES, 
-        const int16_t& SEED_POSITION
-    );
-    double get_advances_calibration_frames(
-        const StarterRngCalibrationHistory& CALIBRATION_HISTORY, 
-        const uint64_t& ADVANCES
-    );
-
-    bool update_history(
-        SingleSwitchProgramEnvironment& env,
-        StarterRngAdvanceHistory& ADVANCE_HISTORY,
-        StarterRngCalibrationHistory& CALIBRATION_HISTORY, 
-        const uint16_t& MAX_HISTORY_LENGTH,
-        const double& SEED_CALIBRATION_FRAMES,
-        const double& ADVANCES_CALIBRATION,
-        const double& CONTINUE_SCREEN_ADJUSTMENT,
-        const std::map<AdvRngState, AdvPokemonResult>& search_hits,
-        bool force_finish = false
-    );
 
     bool walk_to_rival_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     bool auto_battle_rival(
@@ -128,7 +78,7 @@ private:
     SimpleIntegerOption<uint64_t> MAX_RESETS;
 
     RngFilterDisplay RNG_FILTERS;
-    PossibleHitsDisplay POSSIBLE_HITS;
+    RngCalibrationDisplay RNG_CALIBRATION;
 
     StringOption SEED; 
     TextEditOption SEED_LIST;
@@ -154,6 +104,3 @@ private:
 }
 }
 #endif
-
-
-
