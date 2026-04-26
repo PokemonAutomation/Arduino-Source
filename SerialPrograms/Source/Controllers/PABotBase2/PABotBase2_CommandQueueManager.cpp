@@ -184,7 +184,7 @@ bool CommandQueueManager::try_push_pending_cancel() noexcept{
 }
 
 
-void CommandQueueManager::on_cancellable_cancel(){
+void CommandQueueManager::on_cancellable_cancel(std::exception_ptr reason){
     {
         std::unique_lock<Mutex> lg(m_lock);
     }

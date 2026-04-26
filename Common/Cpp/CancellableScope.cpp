@@ -28,7 +28,7 @@ struct Cancellable::Data{
     {}
     std::atomic<bool> cancelled;
     mutable SpinLock lock;
-    std::exception_ptr exception;
+    std::exception_ptr cancel_reason;
     ListenerSet<Cancellable::CancelListener> m_listeners;
 };
 
@@ -36,7 +36,7 @@ struct Cancellable::Data{
 void Cancellable::add_cancel_listener(CancelListener& listener){
     m_impl->m_listeners.add(listener);
 }
-void Cancellable::remove_cancel_listener(CancelListener& listener){
+void Cancellable::remove_cancel_listener(CancelListener& listener) noexcept{
     m_impl->m_listeners.remove(listener);
 }
 
@@ -58,12 +58,17 @@ bool Cancellable::cancelled() const noexcept{
     auto scope_check = m_sanitizer.check_scope();
     return m_impl->cancelled.load(std::memory_order_acquire);
 }
-bool Cancellable::cancel(std::exception_ptr exception) noexcept{
+std::exception_ptr Cancellable::cancel_reason() const{
+    auto scope_check = m_sanitizer.check_scope();
+    ReadSpinLock lg(m_impl->lock);
+    return m_impl->cancel_reason;
+}
+bool Cancellable::cancel(std::exception_ptr reason) noexcept{
     auto scope_check = m_sanitizer.check_scope();
     Data& data(*m_impl);
     WriteSpinLock lg(data.lock);
-    if (exception && !data.exception){
-        data.exception = std::move(exception);
+    if (reason && !data.cancel_reason){
+        data.cancel_reason = std::move(reason);
     }
     if (data.cancelled.load(std::memory_order_relaxed)){
         return true;
@@ -72,7 +77,9 @@ bool Cancellable::cancel(std::exception_ptr exception) noexcept{
 //    if (data.cancelled.exchange(true, std::memory_order_relaxed)){
 //        return true;
 //    }
-    m_impl->m_listeners.run_method(&CancelListener::on_cancellable_cancel);
+    if (!m_impl->m_listeners.empty()){
+        m_impl->m_listeners.run_method(&CancelListener::on_cancellable_cancel, data.cancel_reason);
+    }
     return false;
 }
 void Cancellable::throw_if_cancelled() const{
@@ -82,8 +89,8 @@ void Cancellable::throw_if_cancelled() const{
         return;
     }
     ReadSpinLock lg(data.lock);
-    if (data.exception){
-        std::rethrow_exception(data.exception);
+    if (data.cancel_reason){
+        std::rethrow_exception(data.cancel_reason);
     }else{
         throw OperationCancelledException();
     }
@@ -95,8 +102,8 @@ bool Cancellable::throw_if_cancelled_with_exception() const{
         return false;
     }
     ReadSpinLock lg(data.lock);
-    if (data.exception){
-        std::rethrow_exception(data.exception);
+    if (data.cancel_reason){
+        std::rethrow_exception(data.cancel_reason);
     }
     return true;
 }

@@ -150,7 +150,7 @@ void PABotBase::stop(std::string error_message) noexcept{
     //  it is safe to destruct.
     m_state.store(State::STOPPED, std::memory_order_release);
 }
-void PABotBase::on_cancellable_cancel(){
+void PABotBase::on_cancellable_cancel(std::exception_ptr reason){
     {
         std::unique_lock<Mutex> lg(m_sleep_lock);
     }

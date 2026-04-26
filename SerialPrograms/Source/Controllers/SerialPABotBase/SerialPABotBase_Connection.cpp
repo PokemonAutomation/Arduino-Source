@@ -144,12 +144,12 @@ ControllerType SerialPABotBase_Connection::refresh_controller_type(){
     return current_controller;
 }
 
-bool SerialPABotBase_Connection::cancel(std::exception_ptr exception) noexcept{
-    if (ControllerConnection::cancel(std::move(exception))){
+bool SerialPABotBase_Connection::cancel(std::exception_ptr reason) noexcept{
+    if (ControllerConnection::cancel(std::move(reason))){
         return true;
     }
     if (m_botbase){
-        m_botbase->on_cancellable_cancel();
+        m_botbase->on_cancellable_cancel(cancel_reason());
     }
     return false;
 }

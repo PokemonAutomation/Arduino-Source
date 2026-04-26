@@ -67,7 +67,7 @@ public:
     virtual State state() const override{
         return m_state.load(std::memory_order_acquire);
     }
-    virtual void on_cancellable_cancel() override;
+    virtual void on_cancellable_cancel(std::exception_ptr reason) override;
 
     virtual size_t queue_limit() const override{
         return m_max_pending_requests.load(std::memory_order_relaxed);

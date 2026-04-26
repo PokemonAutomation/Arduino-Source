@@ -46,10 +46,10 @@ class Cancellable{
     void operator=(const Cancellable&) = delete;
 public:
     struct CancelListener{
-        virtual void on_cancellable_cancel() = 0;
+        virtual void on_cancellable_cancel(std::exception_ptr reason) = 0;
     };
     void add_cancel_listener(CancelListener& listener);
-    void remove_cancel_listener(CancelListener& listener);
+    void remove_cancel_listener(CancelListener& listener) noexcept;
 
 
 public:
@@ -60,6 +60,7 @@ public:
     CancellableScope* scope() const;
 
     bool cancelled() const noexcept;
+    std::exception_ptr cancel_reason() const;
 
     //  Throw an exception if this object has been cancelled.
     //  If there is no exception, it throws OperationCancelledException.
@@ -72,7 +73,7 @@ public:
     bool throw_if_cancelled_with_exception() const;
 
     //  Returns true if it was already cancelled.
-    virtual bool cancel(std::exception_ptr exception) noexcept;
+    virtual bool cancel(std::exception_ptr reason) noexcept;
 
 
 protected:

@@ -59,7 +59,7 @@ public:
 private:
     bool try_push_pending_cancel() noexcept;
 
-    virtual void on_cancellable_cancel() override;
+    virtual void on_cancellable_cancel(std::exception_ptr reason) override;
     void cv_wait(Cancellable* cancellable, std::unique_lock<Mutex>& lg);
     void throw_if_cancelled(Cancellable* cancellable);
 
