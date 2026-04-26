@@ -1,4 +1,4 @@
-/*  Globals
+﻿/*  Globals
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -9,6 +9,9 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
+#if defined(__APPLE__)
+#include <CoreFoundation/CFBundle.h>
+#endif
 #include "Globals.h"
 
 namespace PokemonAutomation{
@@ -110,22 +113,92 @@ const std::string COMPILER_VERSION = "Unknown Compiler";
 
 const size_t LOG_HISTORY_LINES = 10000;
 
+#if defined(__APPLE__)
+static std::string g_startup_profile;
+
+void set_startup_profile(int& argc, char* argv[]){
+    for (int i = 1; i + 1 < argc; i++){
+        if (strcmp(argv[i], "--profile") == 0){
+            QString profile = QString::fromUtf8(argv[i + 1]);
+            for (QChar& c : profile){
+                if (!c.isLetterOrNumber() && c != u'_' && c != u'-') c = u'_';
+            }
+            g_startup_profile = profile.toStdString();
+            // Shift everything after --profile <name> down by 2.
+            for (int j = i; j + 2 < argc; j++){
+                argv[j] = argv[j + 2];
+            }
+            argc -= 2;
+            return;
+        }
+    }
+}
+
+const std::string& STARTUP_PROFILE(){
+    return g_startup_profile;
+}
+#endif
 
 namespace{
 
 QString get_application_base_dir_path(){
     QString application_dir_path = qApp->applicationDirPath();
-    if (application_dir_path.endsWith(".app/Contents/MacOS")){
-        // a macOS bundle. Change working directory to the folder that hosts the .app folder.
-        QString app_bundle_path = application_dir_path.chopped(15);
-        QString base_folder_path = QFileInfo(app_bundle_path).dir().absolutePath();
-        return base_folder_path;
+#if defined(__APPLE__)
+    //  Use CFBundle to find the .app bundle path. Change working directory to the folder that hosts the .app bundle.
+    CFURLRef bundleURL = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+    if (bundleURL){
+        CFStringRef cfPath = CFURLCopyFileSystemPath(bundleURL, kCFURLPOSIXPathStyle);
+        CFRelease(bundleURL);
+        if (cfPath){
+            QString bundlePath = QDir::cleanPath(QString::fromCFString(cfPath));
+            CFRelease(cfPath);
+            if (bundlePath.endsWith(".app")){
+                return QFileInfo(bundlePath).dir().absolutePath();
+            }
+        }
     }
+#elif defined(__linux__)
+    // Check for AppImage environment variables to find the root directory, if running as an AppImage.
+    // PA_APPIMAGE_DIR is set by Azure via a patched AppRun script.
+    QByteArray dir = qgetenv("PA_APPIMAGE_DIR");
+    if (!dir.isEmpty()){
+        return QString::fromUtf8(dir);
+    }
+    QByteArray path = qgetenv("APPIMAGE");
+    if (!path.isEmpty()){
+        return QDir::cleanPath(QFileInfo(QString::fromUtf8(path)).dir().absolutePath());
+    }
+    QByteArray appDirBytes = qgetenv("APPDIR");
+    if (!appDirBytes.isEmpty()){
+        QString appDir = QString::fromUtf8(appDirBytes);
+        QFile mountinfo(QStringLiteral("/proc/self/mountinfo"));
+        if (mountinfo.open(QIODevice::ReadOnly | QIODevice::Text)){
+            while (!mountinfo.atEnd()){
+                QString line = QString::fromUtf8(mountinfo.readLine()).trimmed();
+                int dashSep = line.indexOf(QStringLiteral(" - "));
+                if (dashSep < 0){
+                    continue;
+                }
+                QStringList pre = line.left(dashSep).split(u' ', Qt::SkipEmptyParts);
+                QStringList post = line.mid(dashSep + 3).split(u' ', Qt::SkipEmptyParts);
+                if (pre.size() < 5 || post.size() < 2){
+                    continue;
+                }
+                QString mountPoint = pre[4].replace(QStringLiteral("\\040"), QStringLiteral(" "));
+                QString source = post[1].replace(QStringLiteral("\\040"), QStringLiteral(" "));
+                if (mountPoint == appDir && source.endsWith(QStringLiteral(".AppImage"))){
+                    return QDir::cleanPath(QFileInfo(source).dir().absolutePath());
+                }
+            }
+        }
+    }
+#endif
     return application_dir_path;
 }
 std::string get_resource_path(){
     //  Find the resource directory.
-    QString path = get_application_base_dir_path();
+    QString base = get_application_base_dir_path();
+    QString path = base;
     for (size_t c = 0; c < 5; c++){
         QString try_path = path + "/Resources/";
         QFile file(try_path);
@@ -134,11 +207,12 @@ std::string get_resource_path(){
         }
         path += "/..";
     }
-    return (QCoreApplication::applicationDirPath() + "/../Resources/").toStdString();
+    return (base + "/Resources/").toStdString();
 }
 std::string get_training_path(){
     //  Find the training data directory.
-    QString path = get_application_base_dir_path();
+    QString base = get_application_base_dir_path();
+    QString path = base;
     for (size_t c = 0; c < 5; c++){
         QString try_path = path + "/TrainingData/";
         QFile file(try_path);
@@ -147,26 +221,22 @@ std::string get_training_path(){
         }
         path += "/..";
     }
-    return (QCoreApplication::applicationDirPath() + "/../TrainingData/").toStdString();
+    return (base + "/TrainingData/").toStdString();
 }
 
 std::string get_runtime_base_path(){
-    //  On MacOS, find the writable application support directory
-    if (QSysInfo::productType() == "macos" || QSysInfo::productType() == "osx"){
-        // QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) returns
-        // "/Users/$USERNAME/Library/Application Support", the parent folder
-        // to hold application-specific persistent data.
-        // QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) returns
-        // "/Users/$USERNAME/Library/Application Support/SerialPrograms",
-        // the folder where we store persistent data.
-        QString appSupportPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-        QDir dir(appSupportPath);
-        if (!dir.exists()){
-            dir.mkpath(".");
-        }
-        return appSupportPath.toStdString() + "/";
+#if defined(__APPLE__)
+    // QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) returns
+    // "/Users/$USERNAME/Library/Application Support/SerialPrograms"
+    QString appSupportPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if (!g_startup_profile.empty()){
+        appSupportPath += "/Profiles/" + QString::fromStdString(g_startup_profile);
     }
+    QDir().mkpath(appSupportPath);
+    return appSupportPath.toStdString() + "/";
+#else
     return "./";
+#endif
 }
 
 std::string get_setting_path(){

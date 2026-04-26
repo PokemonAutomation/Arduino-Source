@@ -96,7 +96,7 @@ stages:
                 return 0
             }
 
-            $token = "$(GITHUB_PAT)"
+            $token = $env:GITHUB_TOKEN
             $repo = "${{ parameters.versionRepo }}"
             $filePath = "LatestVersion.json"
             $changeLogPath = "ChangeLog.md"

@@ -65,7 +65,7 @@ stages:
                 return 0
             }
 
-            $token = "$(GITHUB_PAT)"
+            $token = $env:GITHUB_TOKEN
             $repo = "${{ parameters.telemetryRepo }}"
             $filePath = "Developer/Telemetry.json"
             $branch = "main"
@@ -247,7 +247,7 @@ stages:
                 exit 1
             }
         env:
-          GITHUB_PAT: $(GITHUB_PAT)
+          GITHUB_TOKEN: $(GITHUB_PAT)
           TELEMETRY_KEY_1: $(TELEMETRY_KEY_1)
           TELEMETRY_KEY_2: $(TELEMETRY_KEY_2)
           TELEMETRY_VERSION: "v${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
