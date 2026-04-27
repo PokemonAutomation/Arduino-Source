@@ -392,6 +392,8 @@ void check_timings(
             );
         }
         return;
+    case PokemonFRLG_RngTarget::hitmonchan:
+    case PokemonFRLG_RngTarget::hitmonlee:
     case PokemonFRLG_RngTarget::hitmon:
         if (INGAME_DELAY < 4500){
             OperationFailedException::fire(
@@ -419,6 +421,9 @@ void check_timings(
             );
         }
         return;
+    case PokemonFRLG_RngTarget::omanyte:
+    case PokemonFRLG_RngTarget::kabuto:
+    case PokemonFRLG_RngTarget::aerodactyl:
     case PokemonFRLG_RngTarget::fossils:
         if (INGAME_DELAY < 6000){
             OperationFailedException::fire(
@@ -431,6 +436,8 @@ void check_timings(
     case PokemonFRLG_RngTarget::gamecornerabra:
     case PokemonFRLG_RngTarget::gamecornerclefairy:
     case PokemonFRLG_RngTarget::gamecornerdratini:
+    case PokemonFRLG_RngTarget::gamecornerscyther:
+    case PokemonFRLG_RngTarget::gamecornerpinsir:
     case PokemonFRLG_RngTarget::gamecornerbug:
     case PokemonFRLG_RngTarget::gamecornerporygon:
         if (INGAME_DELAY < 8500){
@@ -608,6 +615,8 @@ void perform_blind_sequence(
     case PokemonFRLG_RngTarget::magikarp:
         collect_magikarp_after_delay(context, INGAME_DELAY);
         return;
+    case PokemonFRLG_RngTarget::hitmonchan:
+    case PokemonFRLG_RngTarget::hitmonlee:
     case PokemonFRLG_RngTarget::hitmon:
         collect_hitmon_after_delay(context, INGAME_DELAY);
         return;
@@ -617,6 +626,9 @@ void perform_blind_sequence(
     case PokemonFRLG_RngTarget::lapras:
         collect_lapras_after_delay(context, INGAME_DELAY);
         return;
+    case PokemonFRLG_RngTarget::omanyte:
+    case PokemonFRLG_RngTarget::kabuto:
+    case PokemonFRLG_RngTarget::aerodactyl:
     case PokemonFRLG_RngTarget::fossils:
         collect_fossil_after_delay(context, INGAME_DELAY);
         return;
@@ -629,6 +641,8 @@ void perform_blind_sequence(
     case PokemonFRLG_RngTarget::gamecornerdratini:
         collect_gamecorner_after_delay(context, INGAME_DELAY, 2);
         return;
+    case PokemonFRLG_RngTarget::gamecornerscyther:
+    case PokemonFRLG_RngTarget::gamecornerpinsir:
     case PokemonFRLG_RngTarget::gamecornerbug:
         collect_gamecorner_after_delay(context, INGAME_DELAY, 3);
         return;
