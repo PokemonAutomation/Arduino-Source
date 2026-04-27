@@ -101,7 +101,8 @@ void rng_start_game_from_home(
                 check_online,
                 failed_to_connect,
                 black_screen,
-            }
+            },
+            1ms
         );
 
         //  Wait for screen to stabilize.

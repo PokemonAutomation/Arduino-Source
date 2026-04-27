@@ -830,7 +830,12 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         }
         if (pokemon.level.size() > 1){
             search_hits = get_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD);
-            RNG_CALIBRATION.set(SEED_CALIBRATION_FRAMES, CONTINUE_SCREEN_ADJUSTMENT, ADVANCES_CALIBRATION, search_hits);
+            RNG_CALIBRATION.set(
+                SEED_CALIBRATION_FRAMES * FRAME_DURATION, 
+                CONTINUE_SCREEN_ADJUSTMENT, 
+                ADVANCES_CALIBRATION, 
+                search_hits
+            );
             env.log("Number of search hits: " + std::to_string(search_hits.size()));
             finished = update_history(env.console, ADVANCE_HISTORY, CALIBRATION_HISTORY, MAX_HISTORY_LENGTH, SEED_CALIBRATION_FRAMES, ADVANCES_CALIBRATION, CONTINUE_SCREEN_ADJUSTMENT, search_hits, 5);
             if (finished){
