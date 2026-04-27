@@ -34,7 +34,7 @@ struct CollectedPokemonInfo{
     uint32_t ot_id = 0; // original trainer ID
     PokemonType primary_type = PokemonType::NONE;
     PokemonType secondary_type = PokemonType::NONE;
-    PokemonType tera_type = PokemonType::NONE;
+    PokemonTeraType tera_type = PokemonTeraType::NONE;
 };
 
 bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs);

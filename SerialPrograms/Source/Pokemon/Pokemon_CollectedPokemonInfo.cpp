@@ -111,7 +111,7 @@ std::ostream& operator<<(std::ostream& os, const std::optional<CollectedPokemonI
         os << "ot_id:" << pokemon->ot_id << " ";
         os << "primaryType:" << POKEMON_TYPE_SLUGS().get_string(pokemon->primary_type) << " ";
         os << "secondaryType:" << POKEMON_TYPE_SLUGS().get_string(pokemon->secondary_type) << " ";
-        os << "teraType:" << POKEMON_TYPE_SLUGS().get_string(pokemon->tera_type) << " ";
+        os << "teraType:" << POKEMON_TERA_TYPE_SLUGS().get_string(pokemon->tera_type) << " ";
         os << ")";
     }else{
         os << "(empty)";
