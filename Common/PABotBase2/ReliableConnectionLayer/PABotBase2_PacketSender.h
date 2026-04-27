@@ -52,16 +52,31 @@ public:
         m_max_packet_size = max_packet_size;
     }
 
+    uint8_t slots_used() const{
+        return m_slot_tail - m_slot_head;
+    }
+
     void print(bool ascii) const;
 
 
 public:
-    uint8_t slots_used() const{
-        return m_slot_tail - m_slot_head;
-    }
-    size_t buffer_used() const{
-        return m_buffer_tail - m_buffer_head;
-    }
+    //
+    //  Out-of-band messages that bypass the queue and go out as-is.
+    //  These may be dropped.
+    //
+    void send_oob_packet_empty(uint8_t seqnum, uint8_t opcode);
+    void send_oob_packet_u8(uint8_t seqnum, uint8_t opcode, uint8_t data);
+    void send_oob_packet_u16(uint8_t seqnum, uint8_t opcode, const uint16_t& data);
+    void send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, const uint32_t& data);
+    void send_oob_packet_data(
+        uint8_t seqnum, uint8_t opcode,
+        uint8_t bytes, const void* data
+    );
+    void send_oob_packet_u32_data(
+        uint8_t seqnum, uint8_t opcode,
+        const uint32_t& u32,
+        uint8_t bytes, const void* data
+    );
 
 
 public:
@@ -103,11 +118,6 @@ public:
     PacketHeader* reserve_packet(uint8_t opcode, uint8_t extra_bytes);
     void commit_packet(PacketHeader* packet);
 
-    //
-    //  Send the specified data on the data stream.
-    //  Returns true if success.
-    //
-    bool send_stream_all_or_nothing(const void* data, size_t bytes) noexcept;
 
     //  Returns true if something was retransmitted.
     bool iterate_retransmits();
@@ -115,22 +125,31 @@ public:
 
 public:
     //
-    //  Out-of-band messages that bypass the queue and go out as-is.
-    //  These may be dropped.
+    //  All-or-nothing (Atomic) Stream Sends
     //
-    void send_oob_packet_empty(uint8_t seqnum, uint8_t opcode);
-    void send_oob_packet_u8(uint8_t seqnum, uint8_t opcode, uint8_t data);
-    void send_oob_packet_u16(uint8_t seqnum, uint8_t opcode, const uint16_t& data);
-    void send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, const uint32_t& data);
-    void send_oob_packet_data(
-        uint8_t seqnum, uint8_t opcode,
-        uint8_t bytes, const void* data
-    );
-    void send_oob_packet_u32_data(
-        uint8_t seqnum, uint8_t opcode,
-        const uint32_t& u32,
-        uint8_t bytes, const void* data
-    );
+    //  This lets you push a bunch of data into the stream from different
+    //  sources. Then you can atomic commit them such that they either all or
+    //  nothing goes in.
+    //
+    //  This lets you incrementally construct a large message and not worry
+    //  about it being half-sent if you sender runs out of space.
+    //
+
+    bool enqueue_uncommitted_send_stream(const void* data, size_t bytes) noexcept;
+    void abort_uncommitted_send_stream();
+    void commit_uncommitted_send_stream() noexcept;
+
+    //
+    //  Send the specified data on the data stream.
+    //  Returns true if success.
+    //
+    bool send_stream_all_or_nothing(const void* data, size_t bytes) noexcept{
+        if (!enqueue_uncommitted_send_stream(data, bytes)){
+            return false;
+        }
+        commit_uncommitted_send_stream();
+        return true;
+    }
 
 
 private:
@@ -140,6 +159,7 @@ private:
 
     uint8_t m_slot_head;
     uint8_t m_slot_tail;
+    uint8_t m_slot_tail_uncommitted;
 
     //  A timer that increments each time "pabb2_PacketSender_iterate_retransmits()"
     //  is called and nothing is re-transmitted.
@@ -152,11 +172,13 @@ private:
 //    uint8_t m_pending_stream;
 
     uint16_t m_stream_offset;
+    uint16_t m_stream_offset_uncommitted;
 
     //  (buffer_head == buffer_tail) is ambiguous between empty and full.
     //  However, queue empty also has (slot_head == slot_tail).
     size_t m_buffer_head;
     size_t m_buffer_tail;
+    size_t m_buffer_tail_uncommitted;
 
     //  These store the offsets within the buffer where the packet starts.
     size_t m_offsets[SLOTS];

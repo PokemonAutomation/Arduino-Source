@@ -110,12 +110,15 @@ bool PacketHeader_check(const PacketHeader* packet, bool ascii){
 
 void PacketSender::print(bool ascii) const{
     std::cout << "---- ConnectionSender ---- (Start)" << std::endl;
-    std::cout << "Slot Head:         " << (int)m_slot_head << std::endl;
-    std::cout << "Slot Tail:         " << (int)m_slot_tail << std::endl;
-    std::cout << "Buffer Head:       " << m_buffer_head << std::endl;
-    std::cout << "Buffer Tail:       " << m_buffer_tail << std::endl;
-    std::cout << "Stream Offset:     " << m_stream_offset << std::endl;
-    std::cout << "Retransmit Seqnum: " << (int)m_retransmit_seqnum << std::endl;
+    std::cout << "Slot Head:             " << (int)m_slot_head << std::endl;
+    std::cout << "Slot Tail:             " << (int)m_slot_tail << std::endl;
+    std::cout << "Slot Tail (resv):      " << (int)m_slot_tail_uncommitted << std::endl;
+    std::cout << "Buffer Head:           " << m_buffer_head << std::endl;
+    std::cout << "Buffer Tail:           " << m_buffer_tail << std::endl;
+    std::cout << "Buffer Tail (resv):    " << m_buffer_tail_uncommitted << std::endl;
+    std::cout << "Stream Offset:         " << m_stream_offset << std::endl;
+    std::cout << "Stream Offset (resv):  " << m_stream_offset_uncommitted << std::endl;
+    std::cout << "Retransmit Seqnum:     " << (int)m_retransmit_seqnum << std::endl;
     for (uint8_t seqnum = m_slot_head; seqnum != m_slot_tail; seqnum++){
         size_t offset = m_offsets[seqnum & SLOTS_MASK];
         std::cout << "Offset: " << offset << std::endl;

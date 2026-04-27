@@ -39,8 +39,10 @@ public:
     }
 
 public:
-    virtual bool reliable_send_all_or_nothing(const void* data, size_t bytes) override;
-    virtual void reliable_send(const void* data, size_t bytes) override;
+    virtual bool enqueue_uncommitted_reliable_sends(const void* data, size_t bytes) noexcept override;
+    virtual void abort_uncommitted_reliable_sends() noexcept override;
+    virtual void commit_uncommitted_reliable_sends() noexcept override;
+
     virtual size_t reliable_recv(void* data, size_t bytes) override{
         return m_stream_coalescer.read(data, bytes);
     }

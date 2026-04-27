@@ -32,30 +32,24 @@ ReliableStreamConnectionFW::ReliableStreamConnectionFW(UnreliableStreamConnectio
 
 
 
-
-bool ReliableStreamConnectionFW::reliable_send_all_or_nothing(const void* data, size_t bytes){
+bool ReliableStreamConnectionFW::enqueue_uncommitted_reliable_sends(const void* data, size_t bytes) noexcept{
     if (!m_stream_ready){
         m_reliable_sender.send_oob_packet_empty(0, PABB2_CONNECTION_OPCODE_INFO_STREAM_NOT_READY);
         return false;
     }
-    if (m_reliable_sender.send_stream_all_or_nothing(data, bytes)){
+    if (m_reliable_sender.enqueue_uncommitted_send_stream(data, bytes)){
         return true;
     }
     m_reliable_sender.send_oob_packet_empty(0, PABB2_CONNECTION_OPCODE_INFO_STREAM_SEND_FULL);
     return false;
 }
-void ReliableStreamConnectionFW::reliable_send(const void* data, size_t bytes){
-    if (!m_stream_ready){
-        m_reliable_sender.send_oob_packet_empty(0, PABB2_CONNECTION_OPCODE_INFO_STREAM_NOT_READY);
-        return;
-    }
-    if (m_reliable_sender.send_stream_all_or_nothing(data, bytes)){
-        return;
-    }
-    m_reliable_sender.declare_stream_corrupted();
-    m_reliable_sender.send_oob_packet_empty(0, PABB2_CONNECTION_OPCODE_INFO_STREAM_SEND_FULL);
-    m_reliable_sender.send_oob_packet_empty(0, PABB2_CONNECTION_OPCODE_INFO_STREAM_DEAD);
+void ReliableStreamConnectionFW::abort_uncommitted_reliable_sends() noexcept{
+    m_reliable_sender.abort_uncommitted_send_stream();
 }
+void ReliableStreamConnectionFW::commit_uncommitted_reliable_sends() noexcept{
+    m_reliable_sender.commit_uncommitted_send_stream();
+}
+
 
 
 void ReliableStreamConnectionFW::send_oob_info_binary(const void* data, uint8_t bytes){
