@@ -38,9 +38,13 @@ bool ReliableStreamConnectionFW::enqueue_uncommitted_reliable_sends(const void* 
         return false;
     }
     if (m_reliable_sender.enqueue_uncommitted_send_stream(data, bytes)){
+        m_send_is_currently_full = false;
         return true;
     }
-    m_reliable_sender.send_oob_packet_empty(0, PABB2_CONNECTION_OPCODE_INFO_STREAM_SEND_FULL);
+    if (!m_send_is_currently_full){
+        m_send_is_currently_full = true;
+        m_reliable_sender.send_oob_packet_empty(0, PABB2_CONNECTION_OPCODE_INFO_STREAM_SEND_FULL);
+    }
     return false;
 }
 void ReliableStreamConnectionFW::abort_uncommitted_reliable_sends() noexcept{

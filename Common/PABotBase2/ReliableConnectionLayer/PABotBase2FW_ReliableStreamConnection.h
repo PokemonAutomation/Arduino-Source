@@ -96,9 +96,11 @@ private:
     PacketParser m_parser;
     StreamCoalescer m_stream_coalescer;
 
+    WallClock m_last_retransmit;
+
     size_t m_packets_received = 0;
 
-    WallClock m_last_retransmit;
+    bool m_send_is_currently_full = false;
 
     bool m_reset_flag = false;
 

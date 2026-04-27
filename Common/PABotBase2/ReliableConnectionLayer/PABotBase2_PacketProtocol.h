@@ -22,11 +22,17 @@
 namespace PokemonAutomation{
 namespace PABotBase2{
 
+//
+//  The currently supported baud rates are:
+//      -   115200
+//      -   921600
+//
+//  You can use any hardware/OS compatible baud-rate you want, but you must add
+//  it to the search list on CC-side.
+//
 
-//#define PABB2_CONNECTION_BAUD_RATE                  115200
-//#define PABB2_CONNECTION_BAUD_RATE                  921600
 #define PABB2_CONNECTION_MAGIC_NUMBER               0x81
-#define PABB2_CONNECTION_PROTOCOL_VERSION           2026041101
+#define PABB2_CONNECTION_PROTOCOL_VERSION           2026041102
 
 
 #define PABB2_CONNECTION_RETRANSMIT_FLAG            0x80
