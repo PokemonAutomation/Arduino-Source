@@ -62,9 +62,9 @@ void set_seed_after_delay(ProControllerContext& context, SeedButton SEED_BUTTON,
 
 void load_game_after_delay(ProControllerContext& context, uint64_t CONTINUE_SCREEN_DELAY){
     pbf_wait(context, std::chrono::milliseconds(CONTINUE_SCREEN_DELAY - 3000));
-    pbf_press_button(context, BUTTON_A, 33ms, 1467ms);
+    pbf_press_button(context, BUTTON_A, 50ms, 1450ms);
     // skip recap
-    pbf_press_button(context, BUTTON_B, 33ms, 2467ms);
+    pbf_press_button(context, BUTTON_B, 50ms, 2450ms);
     // need to later subtract 4000ms from delay to hit desired number of advances
 }
 
