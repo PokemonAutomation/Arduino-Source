@@ -674,7 +674,7 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             continue;
         }
 
-        for (int i=0; i<MAX_RARE_CANDIES; i++){
+        for (uint64_t i=0; i<MAX_RARE_CANDIES; i++){
             bool failed = use_rare_candy(env, context, pokemon, filters, BASE_STATS, i == 0);
             if (failed){
                 stats.errors++;
@@ -688,7 +688,7 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
                 search_hits
             );
 
-            bool force_finish = failed || (i == MAX_RARE_CANDIES - 1);
+            bool force_finish = failed || (i == (MAX_RARE_CANDIES - 1));
             finished = update_history(
                 env.console, ADVANCE_HISTORY, 
                 CALIBRATION_HISTORY, MAX_HISTORY_LENGTH, 
