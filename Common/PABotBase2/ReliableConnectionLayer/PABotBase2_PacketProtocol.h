@@ -22,11 +22,17 @@
 namespace PokemonAutomation{
 namespace PABotBase2{
 
+//
+//  The currently supported baud rates are:
+//      -   115200
+//      -   921600
+//
+//  You can use any hardware/OS compatible baud-rate you want, but you must add
+//  it to the search list on CC-side.
+//
 
-//#define PABB2_CONNECTION_BAUD_RATE                  115200
-//#define PABB2_CONNECTION_BAUD_RATE                  921600
 #define PABB2_CONNECTION_MAGIC_NUMBER               0x81
-#define PABB2_CONNECTION_PROTOCOL_VERSION           2026041100
+#define PABB2_CONNECTION_PROTOCOL_VERSION           2026041102
 
 
 #define PABB2_CONNECTION_RETRANSMIT_FLAG            0x80
@@ -90,12 +96,9 @@ struct PABB_PACK PacketHeader_u32{
 #define PABB2_CONNECTION_OPCODE_ASK_BUFFER_BYTES    0x05
 #define PABB2_CONNECTION_OPCODE_RET_BUFFER_BYTES    0x45
 
-//#define PABB2_CONNECTION_OPCODE_ASK_STREAM_READY    0x10
-//#define PABB2_CONNECTION_OPCODE_RET_STREAM_READY    0x50
-#define PABB2_CONNECTION_OPCODE_INFO_STREAM_DEAD    0x10
-#define PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA     0x12
-#define PABB2_CONNECTION_OPCODE_RET_STREAM_DATA     0x52
-#define PABB2_CONNECTION_OPCODE_ASK_STREAM_REQUEST  0x13    //  Unused for now.
+#define PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA         0x12
+#define PABB2_CONNECTION_OPCODE_RET_STREAM_DATA         0x52
+#define PABB2_CONNECTION_OPCODE_ASK_STREAM_REQUEST      0x13    //  Unused for now.
 struct PABB_PACK PacketHeaderData{
     uint8_t magic_number;
     uint8_t seqnum;
@@ -109,6 +112,11 @@ struct PABB_PACK PacketHeaderData{
 //
 //  Out-of-band Info (no acks needed)
 //
+
+#define PABB2_CONNECTION_OPCODE_INFO_STREAM_DEAD        0x10
+#define PABB2_CONNECTION_OPCODE_INFO_STREAM_NOT_READY   0x11
+#define PABB2_CONNECTION_OPCODE_INFO_STREAM_SEND_FULL   0x18
+#define PABB2_CONNECTION_OPCODE_INFO_STREAM_RECV_FULL   0x19
 
 #define PABB2_CONNECTION_OPCODE_INFO                    0x20
 #define PABB2_CONNECTION_OPCODE_INFO_U8                 0x21

@@ -30,7 +30,10 @@ public:
         ControllerType controller_type
     )
         : ProController(logger)
-        , PABotBase2_OemController(logger, connection, controller_type)
+        , PABotBase2_OemController(
+            logger, connection, controller_type,
+            [this](double magnitude){ on_rumble(magnitude); }
+        )
     {}
     ~PABotBase2_ProController(){
         PABotBase2_OemController::stop();

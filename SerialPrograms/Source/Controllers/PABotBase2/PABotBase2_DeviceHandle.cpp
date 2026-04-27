@@ -179,7 +179,7 @@ void DeviceHandle::query_command_queue(){
     m_logger.log("[MLC]: Command Queue Size: " + std::to_string(command_queue_size), COLOR_BLUE);
 
     //  For now we don't need to use that much queue size.
-    command_queue_size = std::min<uint8_t>(command_queue_size, 32);
+    command_queue_size = std::min<uint8_t>(command_queue_size, 64);
 
     m_logger.Logger::log("Setting queue size to: " + std::to_string(command_queue_size));
     m_command_queue.set_command_queue_size(command_queue_size);

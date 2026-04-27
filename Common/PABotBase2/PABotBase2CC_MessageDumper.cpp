@@ -74,11 +74,6 @@ std::string tostr(const PacketHeader* header){
         str += ", bytes = " + std::to_string(((const PacketHeader_u16*)header)->data);
         return str;
 
-    case PABB2_CONNECTION_OPCODE_INFO_STREAM_DEAD:
-        str += "PABB2_CONNECTION_OPCODE_INFO_STREAM_DEAD: seqnum = ";
-        str += std::to_string(header->seqnum);
-        str += ", offset = " + std::to_string(((const PacketHeaderData*)header)->stream_offset);
-        return str;
     case PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA:
         str += "PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA: seqnum = ";
         str += std::to_string(header->seqnum);
@@ -93,6 +88,24 @@ std::string tostr(const PacketHeader* header){
         str += "PABB2_CONNECTION_OPCODE_RET_STREAM: seqnum = ";
         str += std::to_string(header->seqnum);
         str += ", offset = " + std::to_string(((const PacketHeaderData*)header)->stream_offset);
+        return str;
+
+    case PABB2_CONNECTION_OPCODE_INFO_STREAM_DEAD:
+        str += "PABB2_CONNECTION_OPCODE_INFO_STREAM_DEAD: seqnum = ";
+        str += std::to_string(header->seqnum);
+        str += ", offset = " + std::to_string(((const PacketHeaderData*)header)->stream_offset);
+        return str;
+    case PABB2_CONNECTION_OPCODE_INFO_STREAM_NOT_READY:
+        str += "PABB2_CONNECTION_OPCODE_INFO_STREAM_NOT_READY: seqnum = ";
+        str += std::to_string(header->seqnum);
+        return str;
+    case PABB2_CONNECTION_OPCODE_INFO_STREAM_SEND_FULL:
+        str += "PABB2_CONNECTION_OPCODE_INFO_STREAM_SEND_FULL: seqnum = ";
+        str += std::to_string(header->seqnum);
+        return str;
+    case PABB2_CONNECTION_OPCODE_INFO_STREAM_RECV_FULL:
+        str += "PABB2_CONNECTION_OPCODE_INFO_STREAM_RECV_FULL: seqnum = ";
+        str += std::to_string(header->seqnum);
         return str;
 
     case PABB2_CONNECTION_OPCODE_INFO:
