@@ -157,7 +157,7 @@ void RngFilterDisplay::reset(){
 
 RngCalibrationDisplay::RngCalibrationDisplay()
     : GroupOption("RNG Calibration", LockMode::READ_ONLY)
-    , seed_calibration("<b>Seed Calibration (ms):</b>", LockMode::LOCK_WHILE_RUNNING, 0.0)
+    , seed_calibration("<b>Seed Calibration (ms):</b>", LockMode::LOCK_WHILE_RUNNING, 0)
     , csf_calibration("<b>Continue Screen Frames Calibration:</b>", LockMode::LOCK_WHILE_RUNNING, 0.0)
     , advances_calibration("<b>In-Game Advances Calibration:</b>", LockMode::LOCK_WHILE_RUNNING, 0.0)
     , hits(false, "<b>Seeds/Advances:</b>", LockMode::READ_ONLY, "-", "")
@@ -205,7 +205,7 @@ void RngCalibrationDisplay::set(
     double a_calibration, 
     std::vector<AdvRngState>& rng_states
 ){
-    seed_calibration.set(s_calibration);
+    seed_calibration.set(int64_t(std::round(s_calibration)));
     csf_calibration.set(c_calibration);
     advances_calibration.set(a_calibration);
     hits.set(get_hits_string(rng_states));
