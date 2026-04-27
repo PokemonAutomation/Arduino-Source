@@ -78,7 +78,8 @@ void rng_start_game_from_home(
         int ret1 = wait_until(
             console, context,
             std::chrono::seconds(2),
-            { black_screen }
+            { black_screen },
+            1ms
         );
 
         switch (ret1){
@@ -125,7 +126,7 @@ void rng_start_game_from_home(
             break;
         case 3:
             console.log("Detected check online.", COLOR_BLUE);
-            context.wait_for(std::chrono::seconds(1));
+            context.wait_for(std::chrono::milliseconds(100));
             break;
         case 4:
             console.log("Detected failed to connect.", COLOR_BLUE);
@@ -135,7 +136,7 @@ void rng_start_game_from_home(
             console.log("Detected black screen. Game started...");
             return;
         default:
-            console.log("start_game_from_home_with_inference(): No recognizable state after 30 seconds.", COLOR_RED);
+            console.log("rng_start_game_from_home(): No recognizable state after 30 seconds.", COLOR_RED);
             pbf_press_button(context, BUTTON_HOME, 160ms, 840ms);
         }
     }
