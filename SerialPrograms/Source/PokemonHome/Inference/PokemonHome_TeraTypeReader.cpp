@@ -71,7 +71,7 @@ struct TeraTypeSpriteDatabase {
             if (item.first == PokemonTeraType::NONE){
                 continue;
             }
-            m_type_map.emplace(item.first, TypeSprite(item.second, "Pokemon/Types/Tera/" + item.second + ".png"));
+            m_type_map.emplace(item.first, TypeSprite(item.second, "PokemonHome/TeraTypes/" + item.second + ".png"));
         }
     }
 };
