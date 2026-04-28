@@ -129,7 +129,7 @@ void rng_reset_and_return_home(
             BlackScreenWatcher black_screen(COLOR_BLUE, {0.1, 0.15, 0.8, 0.7});
             int ret3 = wait_until(
                 console, context,
-                std::chrono::seconds(2),
+                std::chrono::seconds(2 + (update_popup ? 1 : 0) + (connect_popup ? 1 : 0)),
                 { black_screen, update_menu, failed_to_connect },
                 1ms
             );

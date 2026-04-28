@@ -25,6 +25,8 @@
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_BagDetector.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_DexRegistrationDetector.h"
+#include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_PartyLevelUpReader.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_StatsReader.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
@@ -243,15 +245,21 @@ bool StaticRng::auto_catch(SingleSwitchProgramEnvironment& env, ProControllerCon
 
             BattleMenuWatcher battle_menu(COLOR_RED);
             PartyMenuWatcher party_menu(COLOR_RED);
+            DexRegistrationWatcher dex_registration(COLOR_RED);
             BlackScreenWatcher black_screen(COLOR_RED);
             context.wait_for_all_requests();
             int ret = run_until<ProControllerContext>(
                 env.console, context,
                 [](ProControllerContext& context) {
-                    pbf_mash_button(context, BUTTON_B, 30s);
+                    for (int i=0; i<60; i++){
+                        pbf_press_button(context, BUTTON_B, 200ms, 300ms);
+                    }
                 },
-                { battle_menu, party_menu, black_screen }
+                { battle_menu, party_menu, black_screen },
+                10ms
             );
+
+            int start_ret;
             switch (ret){
             case 0:
                 env.log("Battle menu detected");
@@ -262,24 +270,47 @@ bool StaticRng::auto_catch(SingleSwitchProgramEnvironment& env, ProControllerCon
                 pbf_mash_button(context, BUTTON_A, 1000ms);
                 continue;
             case 2:
+                env.log("Dex registration detected. Exiting battle...");
+                pbf_mash_button(context, BUTTON_B, 5000ms);
+                return false;
+            case 3:
                 env.log("Black screen detected. Battle exited.");
                 return false;
             default:
-                 send_program_recoverable_error_notification(
-                    env, NOTIFICATION_ERROR_RECOVERABLE,
-                    "auto_catch(): no recognized state after 30 seconds."
-                ); 
-                return true;
+                env.log("No recognized state. Try checking if in the overworld...");
+                StartMenuWatcher start_menu;
+                context.wait_for_all_requests();
+                start_ret = run_until<ProControllerContext>(
+                    env.console, context,
+                    [](ProControllerContext& context) {
+                        for (int i=0; i<3; i++){
+                            pbf_press_button(context, BUTTON_PLUS, 200ms, 2800ms);
+                            pbf_mash_button(context, BUTTON_B, 500ms);
+                        }
+                    },
+                    { start_menu }
+                );
+                if (start_ret < 0){
+                    send_program_recoverable_error_notification(
+                        env, NOTIFICATION_ERROR_RECOVERABLE,
+                        "auto_catch(): no recognized state after 30 seconds."
+                    ); 
+                    return true;
+                }
+                env.log("Overworld detected.");
+                pbf_mash_button(context, BUTTON_B, 500ms);
+                context.wait_for_all_requests();
+                return false;
             }
 
             break;
         }
 
         // select BAG (selection arrow does not wrap around)
-        pbf_move_left_joystick(context, {+1, 0}, 200ms, 300ms);
-        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
-        pbf_move_left_joystick(context, {+1, 0}, 200ms, 300ms);
-        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+        pbf_move_left_joystick(context, {+1, 0}, 100ms, 150ms);
+        pbf_move_left_joystick(context, {0, +1}, 100ms, 150ms);
+        pbf_move_left_joystick(context, {+1, 0}, 100ms, 150ms);
+        pbf_move_left_joystick(context, {0, +1}, 100ms, 150ms);
 
         BagWatcher bag_open(COLOR_RED);
         int ret2 = run_until<ProControllerContext>(
@@ -308,38 +339,6 @@ bool StaticRng::auto_catch(SingleSwitchProgramEnvironment& env, ProControllerCon
 
         // use ball
         pbf_mash_button(context, BUTTON_A, 5s);
-
-        // handle catch detection separately, since the white screen was also triggering the BattleMenuDetector
-        count = 0;
-        while (true){
-            if (count >= 10){
-                return false;
-            }
-            count++;
-
-            BlackScreenWatcher black_screen(COLOR_RED);
-            WhiteScreenOverWatcher white_screen(COLOR_RED);
-            context.wait_for_all_requests();
-            int ret = run_until<ProControllerContext>(
-                env.console, context,
-                [](ProControllerContext& context) {
-                    pbf_mash_button(context, BUTTON_B, 20s);
-                },
-                { black_screen, white_screen }
-            );
-            switch (ret){
-            case 0: 
-                env.log("Black screen detected. Battle exited.");
-                return false;
-            case 1:
-                env.log("White screen detected. Skipping through Pokedex entry...");
-                continue;
-            default:
-                break;
-            }
-
-            break;
-        }
     }
 
     env.log("auto_catch(): ran out of balls.");
