@@ -235,7 +235,7 @@ bool StaticRng::have_hit_target(SingleSwitchProgramEnvironment& env, const uint3
 }
 
 bool StaticRng::auto_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& MAX_BALL_THROWS){
-    for (int i=0; i<MAX_BALL_THROWS; i++){
+    for (uint64_t i=0; i<MAX_BALL_THROWS; i++){
         int count = 0;
         while(true){
             if (count >= 10){
