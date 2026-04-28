@@ -164,7 +164,7 @@ void save_boxes_data_to_json(const std::vector<std::optional<CollectedPokemonInf
             pokemon["ot_id"] = current_pokemon->ot_id;
             pokemon["primary_type"] = POKEMON_TYPE_SLUGS().get_string(current_pokemon->primary_type);
             pokemon["secondary_type"] = POKEMON_TYPE_SLUGS().get_string(current_pokemon->secondary_type);
-            pokemon["tera_type"] = POKEMON_TYPE_SLUGS().get_string(current_pokemon->tera_type);
+            pokemon["tera_type"] = POKEMON_TERA_TYPE_SLUGS().get_string(current_pokemon->tera_type);
         }
         pokemon_data.push_back(std::move(pokemon));
     }

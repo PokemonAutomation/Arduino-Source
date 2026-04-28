@@ -445,24 +445,8 @@ void read_summary_screen(
     bool is_gmax = gmax_detector.detect(screen);
     cur_pokemon_info.gmax = is_gmax;
 
-    auto [tera_type_primary, tera_type_secondary] = read_pokemon_types(screen, gmax_tera_symbol_box, PokemonTypeGeneration::GEN9);
-    cur_pokemon_info.tera_type = tera_type_primary;
-
-    if (is_gmax && tera_type_primary != PokemonType::NONE){
-        env.console.log(
-            "Gigantamax form detected with tera type: " 
-            + POKEMON_TYPE_SLUGS().get_string(tera_type_primary) 
-            + " . One of these is a false positive!", COLOR_RED
-        );
-    }
-
-    if (tera_type_secondary != PokemonType::NONE){
-        env.console.log(
-            "Secondary tera type detected: " 
-            + POKEMON_TYPE_SLUGS().get_string(tera_type_secondary) 
-            + " . This is a false positive!", COLOR_RED
-        );
-    }
+    PokemonTeraType tera_type = read_pokemon_tera_type(screen, gmax_tera_symbol_box);
+    cur_pokemon_info.tera_type = tera_type;
 
     const int alpha_stddev_value = (int)image_stddev(extract_box_reference(screen, alpha_box)).sum();
     const bool is_alpha = alpha_stddev_value > 40;
