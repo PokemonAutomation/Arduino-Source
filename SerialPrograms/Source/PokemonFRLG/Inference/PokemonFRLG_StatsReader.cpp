@@ -27,15 +27,15 @@ namespace NintendoSwitch {
 namespace PokemonFRLG {
 
 StatsReader::StatsReader(Color color)
-        : m_color(color), m_box_nature(0.028976, 0.729610, 0.502487, 0.065251),
+        : m_color(color), m_box_nature(0.028976, 0.729610, 0.502487, 0.066639),
             m_box_level(0.052000, 0.120140, 0.099000, 0.069416),
             m_box_name(0.163158, 0.122917, 0.262811, 0.066639),
             m_box_gender(0.430769, 0.114423, 0.034615, 0.081731),
-            m_box_hp(0.815558, 0.131247, 0.173049, 0.065251),
-            m_box_attack(0.891000, 0.245089, 0.097607, 0.063862),
+            m_box_hp(0.815558, 0.131247, 0.173049, 0.066639),
+            m_box_attack(0.891000, 0.245089, 0.097607, 0.066639),
             m_box_defense(0.891000, 0.325612, 0.097607, 0.066639),
             m_box_sp_attack(0.891000, 0.406134, 0.097607, 0.066639),
-            m_box_sp_defense(0.891000, 0.486657, 0.097607, 0.063862),
+            m_box_sp_defense(0.891000, 0.486657, 0.097607, 0.066639),
             m_box_speed(0.891000, 0.567180, 0.097607, 0.066639){}
 
 void StatsReader::make_overlays(VideoOverlaySet &items) const {
