@@ -162,6 +162,13 @@ bool check_for_shiny(ConsoleHandle& console, ProControllerContext& context, Poke
     case PokemonFRLG_RngTarget::gamecornerbug:
     case PokemonFRLG_RngTarget::gamecornerporygon:
         return shiny_check_summary(console, context);
+    case PokemonFRLG_RngTarget::electrode:
+    case PokemonFRLG_RngTarget::articuno:
+    case PokemonFRLG_RngTarget::zapdos:
+    case PokemonFRLG_RngTarget::moltres:
+    case PokemonFRLG_RngTarget::lugia:
+    case PokemonFRLG_RngTarget::deoxys_attack:
+    case PokemonFRLG_RngTarget::deoxys_defense:
     case PokemonFRLG_RngTarget::staticencounter:
     case PokemonFRLG_RngTarget::snorlax:
     case PokemonFRLG_RngTarget::mewtwo:

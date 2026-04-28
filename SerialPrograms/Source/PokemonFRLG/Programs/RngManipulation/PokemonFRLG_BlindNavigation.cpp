@@ -32,7 +32,7 @@ void set_seed_after_delay(ProControllerContext& context, SeedButton SEED_BUTTON,
         default:
             b_button = BUTTON_L;
         }
-        Milliseconds blackout_wait = 3600ms; // wait for the copyright text to disappear
+        Milliseconds blackout_wait = 3800ms; // wait for the copyright text to disappear
         Milliseconds blackout_delay = std::chrono::milliseconds(SEED_DELAY) - blackout_wait;
         Milliseconds blackout_hold = 30000ms; // wait for leaves/flames to appear on the title screen. It's okay if this is held over the seed button press
         ssf_do_nothing(context, blackout_wait);
@@ -652,6 +652,13 @@ void perform_blind_sequence(
     case PokemonFRLG_RngTarget::togepi:
         collect_togepi_egg_after_delay(context, INGAME_DELAY);
         return;
+    case PokemonFRLG_RngTarget::electrode:
+    case PokemonFRLG_RngTarget::articuno:
+    case PokemonFRLG_RngTarget::zapdos:
+    case PokemonFRLG_RngTarget::moltres:
+    case PokemonFRLG_RngTarget::lugia:
+    case PokemonFRLG_RngTarget::deoxys_attack:
+    case PokemonFRLG_RngTarget::deoxys_defense:
     case PokemonFRLG_RngTarget::staticencounter:
         encounter_static_after_delay(context, INGAME_DELAY);
         return;

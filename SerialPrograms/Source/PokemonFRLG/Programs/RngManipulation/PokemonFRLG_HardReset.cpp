@@ -39,7 +39,8 @@ void rng_reset_and_return_home(
     ConsoleType console_type = console.state().console_type(); // go_home() has already been called, so this should already be detected
     Milliseconds launch_delay = (console_type == ConsoleType::Switch1) ? 450ms : 950ms;
 
-    bool extra_resume_press = false;
+    bool update_popup = false;
+    bool connect_popup = false;
     WallClock deadline = current_time() + std::chrono::minutes(5);
     while (true){
         if (current_time() > deadline){
@@ -111,7 +112,11 @@ void rng_reset_and_return_home(
         // but we can make sure we've gotten back to the home screen and pause there
 
         // open the game and go back home ASAP
-        if (extra_resume_press){
+        if (update_popup){
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+            pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);
+        }
+        if (connect_popup){
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
         }
         pbf_press_button(context, BUTTON_A, 50ms, launch_delay);
@@ -136,10 +141,10 @@ void rng_reset_and_return_home(
                 break;
             case 1:
                 console.log("Update menu detected.", COLOR_BLUE);
-                extra_resume_press = true;
+                update_popup = true;
             case 2:
                 console.log("Failed to connect detected.", COLOR_BLUE);
-                extra_resume_press = true;
+                connect_popup = true;
             }
 
             context.wait_for_all_requests();
