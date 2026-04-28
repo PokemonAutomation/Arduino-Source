@@ -42,11 +42,6 @@ public:
     ) override{}
 
 private:
-    enum class Gift{
-        bulbasaur,
-        squirtle,
-        charmander
-    };
 
     bool have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t& TARGET_SEED, const AdvRngState& hit);
 
