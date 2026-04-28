@@ -23,25 +23,12 @@ enum class PokemonTypeGeneration{
     GEN9,
 };
 
-//  Find all tera type symbols inside the image.
-std::multimap<double, std::pair<PokemonTeraType, ImagePixelBox>> find_tera_type_symbols(
-    const ImageViewPlanar32& original_screen,
-    const ImageViewRGB32& image,
-    double max_area_ratio
-);
-
 //  Find all type symbols inside the image.
 std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_type_symbols(
     const ImageViewPlanar32& original_screen,
     const ImageViewRGB32& image, 
     double max_area_ratio,
     PokemonTypeGeneration generation
-);
-
-// Reads the tera type of a Pokemon.
-PokemonTeraType read_pokemon_tera_type(
-    const ImageViewRGB32& original_screen,
-    const ImageFloatBox& box
 );
 
 // Reads the types of a Pokemon. Second type will be PokemonType::NONE if the Pokemon is single-type
