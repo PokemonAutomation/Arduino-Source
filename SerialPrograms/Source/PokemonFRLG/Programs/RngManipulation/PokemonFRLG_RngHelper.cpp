@@ -119,7 +119,7 @@ RngHelper::RngHelper()
         "<b>Seed Delay Time (ms):</b><br>"
         "The delay between starting the game and advancing past the title screen. Set this to match your target seed.",
         LockMode::LOCK_WHILE_RUNNING,
-        35000, 28000 // default, min
+        35000, 30470 // default, min
     )
     , SEED_CALIBRATION(
          "<b>Seed Calibration (ms):</b>"

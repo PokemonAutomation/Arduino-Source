@@ -365,10 +365,10 @@ void check_timings(
             console
         );
     }
-    if (SEED_DELAY < 28000){
+    if (SEED_DELAY < 30000){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "The title screen delay cannot be less than 28000ms. Check your seed calibration.",
+            "The title screen delay cannot be less than 30s. Check your seed calibration.",
             console
         );
     }
