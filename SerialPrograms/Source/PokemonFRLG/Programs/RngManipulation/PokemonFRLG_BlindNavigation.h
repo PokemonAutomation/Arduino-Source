@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonFRLG_BlindNavigation_H
 
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleState.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -93,7 +94,8 @@ namespace PokemonFRLG{
         uint64_t CONTINUE_SCREEN_DELAY, 
         uint64_t TEACHY_DELAY, 
         uint64_t INGAME_DELAY, 
-        bool SAFARI_ZONE
+        bool SAFARI_ZONE,
+        ConsoleType console_type
     );
 
 }

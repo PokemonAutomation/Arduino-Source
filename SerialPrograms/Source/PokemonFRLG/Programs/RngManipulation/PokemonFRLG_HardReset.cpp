@@ -36,8 +36,7 @@ void rng_reset_and_return_home(
     close_game_from_home(console, context);
 
     // console specific delays between opening the game and returning to the Home screen
-    ConsoleType console_type = console.state().console_type(); // go_home() has already been called, so this should already be detected
-    Milliseconds launch_delay = (console_type == ConsoleType::Switch1) ? 450ms : 950ms;
+    Milliseconds launch_delay = 950ms;
 
     bool update_popup = false;
     bool connect_popup = false;
@@ -215,6 +214,7 @@ void reset_and_perform_blind_sequence(
     uint8_t PROFILE
 ){
     rng_reset_and_return_home(console, context, PROFILE); 
+    ConsoleType console_type = console.state().console_type();
 
     // attempt to resume the game and perform the blind sequence
     // by this point, the license check should be over, so we don't need to worry about it when resuming the game
@@ -234,8 +234,8 @@ void reset_and_perform_blind_sequence(
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             console, context,
-            [TARGET, SEED_BUTTON, BLACKOUT_BUTTON, SEED_DELAY, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE](ProControllerContext& context) {
-                perform_blind_sequence(context, TARGET, SEED_BUTTON, BLACKOUT_BUTTON, SEED_DELAY, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE);
+            [TARGET, SEED_BUTTON, BLACKOUT_BUTTON, SEED_DELAY, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE, console_type](ProControllerContext& context) {
+                perform_blind_sequence(context, TARGET, SEED_BUTTON, BLACKOUT_BUTTON, SEED_DELAY, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE, console_type);
             },
             { update_detector, user_selection_detector },
             1000ms

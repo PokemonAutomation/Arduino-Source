@@ -156,7 +156,7 @@ GiftRng::GiftRng()
     , SEED_DELAY(
         "<b>Seed Delay Time (ms):</b><br>The delay between starting the game and advancing past the title screen. Set this to match your target seed.",
         LockMode::LOCK_WHILE_RUNNING,
-        31338, 30470 // default, min
+        31338, 30400 // default, min
     )
     , ADVANCES(
         "<b>Advances:</b><br>The total number of RNG advances for your target.<br>This should be the combined amount of continue screen and in-game advances.",

@@ -17,7 +17,17 @@ namespace NintendoSwitch{
 namespace PokemonFRLG{
 
 
-void set_seed_after_delay(ProControllerContext& context, SeedButton SEED_BUTTON, BlackoutButton BLACKOUT_BUTTON, int64_t SEED_DELAY){
+void set_seed_after_delay(ProControllerContext& context, SeedButton SEED_BUTTON, BlackoutButton BLACKOUT_BUTTON, int64_t SEED_DELAY, ConsoleType console_type){
+    // be warned: not tested with all console types
+    switch (console_type){
+    case ConsoleType::Switch1:
+        // Switch 1 enters the game a little bit earlier
+        pbf_wait(context, 755ms);
+        break;
+    default:
+        break;
+    }
+
     // wait on title screen for the specified delay    
     // hold the "blackout" button starting from the black screen after the copyright text until getting to the continue screen
     if (BLACKOUT_BUTTON != BlackoutButton::None){
@@ -598,10 +608,11 @@ void perform_blind_sequence(
     uint64_t CONTINUE_SCREEN_DELAY, 
     uint64_t TEACHY_DELAY, 
     uint64_t INGAME_DELAY, 
-    bool SAFARI_ZONE
+    bool SAFARI_ZONE,
+    ConsoleType console_type
 ){
     pbf_press_button(context, BUTTON_A, 80ms, 0ms); // start the game from the Home screen
-    set_seed_after_delay(context, SEED_BUTTON, BLACKOUT_BUTTON, SEED_DELAY);
+    set_seed_after_delay(context, SEED_BUTTON, BLACKOUT_BUTTON, SEED_DELAY, console_type);
     load_game_after_delay(context, CONTINUE_SCREEN_DELAY);
     if (TEACHY_DELAY > 0){
         wait_with_teachy_tv(context, TEACHY_DELAY);
