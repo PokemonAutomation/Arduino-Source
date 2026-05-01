@@ -108,6 +108,15 @@ struct AdvPokemonResult{
     AdvIVs ivs;
 };
 
+struct AdvWildPokemonResult{
+    uint32_t pid;
+    uint8_t gender;
+    AdvNature nature;
+    AdvAbility ability;
+    AdvIVs ivs;
+    uint8_t encounter_slot;
+};
+
 struct AdvObservedPokemon{
     AdvGender gender;
     AdvNature nature;

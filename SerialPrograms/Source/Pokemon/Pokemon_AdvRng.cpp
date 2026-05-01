@@ -94,10 +94,8 @@ AdvIvGroup iv_group_from_state(uint32_t& state){
     return ivgroup;
 }
 
-AdvPokemonResult pokemon_from_state(AdvRngState& state){
-    uint32_t pid = pid_from_states(state.s0, state.s1);
+AdvPokemonResult pokemon_from_state(AdvRngState& state, uint32_t pid, AdvNature nature){
     uint8_t gender = gender_value_from_pid(pid);
-    AdvNature nature = nature_from_pid(pid);
     AdvAbility ability = ability_from_pid(pid);
 
     AdvIvGroup ivgroup1;
@@ -128,6 +126,42 @@ AdvPokemonResult pokemon_from_state(AdvRngState& state){
     ivs.spdef = ivgroup2.iv2;
 
     return {pid, gender, nature, ability, ivs};
+}
+
+AdvPokemonResult pokemon_from_state(AdvRngState& state){
+    uint32_t pid = pid_from_states(state.s0, state.s1);
+    AdvNature nature = nature_from_pid(pid);
+    return pokemon_from_state(state, pid, nature);
+}
+
+AdvPokemonResult reroll_wild_pokemon(uint8_t nature, uint16_t seed, uint64_t advances, uint32_t state, AdvRngMethod method){
+    uint32_t lowstate = state;
+    uint32_t highstate = increment_internal_rng_state(state);
+    while (true){
+        uint16_t pid = pid_from_states(lowstate, highstate);
+        if ((pid % 25) == nature){
+            AdvRngState rngstate = rngstate_from_internal_state(seed, advances, lowstate, method);
+            return pokemon_from_state(rngstate, pid, AdvNature(nature));
+        }else{
+            lowstate = increment_internal_rng_state(highstate);
+            highstate = increment_internal_rng_state(lowstate);
+        }
+    }
+}
+
+AdvWildPokemonResult wild_pokemon_from_state(AdvRngState& state){
+    uint8_t encounter_slot = (state.s0 >> 16) % 100;
+    uint8_t nature = (state.s1 >> 16) % 25;
+
+    AdvPokemonResult temp_poke = reroll_wild_pokemon(nature, state.seed, state.advance, state.s2, state.method);
+    return {
+        temp_poke.pid,
+        temp_poke.gender,
+        temp_poke.nature,
+        temp_poke.ability,
+        temp_poke.ivs,
+        encounter_slot
+    };
 }
 
 AdvShinyType shiny_type_from_pid(uint32_t pid, uint16_t tid_xor_sid){
