@@ -8,6 +8,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 //#include "Common/Cpp/Exceptions.h"
 #include "Common/PABotBase2/PABotBase2CC_MessageDumper.h"
+#include "CommonTools/Random.h"
 //#include "PABotBase2_ConnectionDebug.h"
 #include "PABotBase2CC_ReliableStreamConnection.h"
 
@@ -32,7 +33,7 @@ ReliableStreamConnection::ReliableStreamConnection(
     , m_unreliable_connection(unreliable_connection)
     , m_retransmit_timeout(retransmit_timeout)
     , m_print_lock(print_lock)
-    , m_reliable_sender(*this, 20)
+    , m_reliable_sender(*this, 24, random_u32())
     , m_log_everything(log_everything)
 //    , m_version_verified(false)
     , m_remote_protocol_compatible(false)
@@ -123,7 +124,11 @@ void ReliableStreamConnection::on_recv(const void* data, size_t bytes){
         cout << "ReliableStreamConnection::on_recv(): " << bytes << endl;
     }
 #endif
-    m_parser.push_bytes(*this, (const uint8_t*)data, bytes);
+    m_parser.push_bytes(
+        *this,
+        m_reliable_sender.session_id(),
+        (const uint8_t*)data, bytes
+    );
 }
 
 
@@ -168,11 +173,11 @@ size_t ReliableStreamConnection::unreliable_send(const void* data, size_t bytes)
 bool ReliableStreamConnection::reset(WallDuration timeout){
     {
         std::lock_guard<Mutex> lg(m_lock);
-        m_reliable_sender.reset();
+        m_reliable_sender.reset(m_reliable_sender.session_id() + 1);
         m_parser.reset();
         m_stream_coalescer.reset();
         throw_if_cancelled();
-        m_reliable_sender.send_packet(PABB2_CONNECTION_OPCODE_ASK_RESET, 0, nullptr);
+        m_reliable_sender.send_reset();
     }
     m_cv.notify_all();
     return wait_for_pending(timeout);
@@ -217,7 +222,7 @@ void ReliableStreamConnection::send_ack(uint8_t seqnum, uint8_t opcode){
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
     packet.header.opcode = opcode;
-    pabb_crc32_write_to_message(&packet, sizeof(packet));
+    pabb_crc32_write_to_message(m_reliable_sender.session_id(), &packet, sizeof(packet));
     unreliable_send(&packet, sizeof(packet));
 }
 void ReliableStreamConnection::send_ack_u16(uint8_t seqnum, uint8_t opcode, uint16_t data){
@@ -231,7 +236,7 @@ void ReliableStreamConnection::send_ack_u16(uint8_t seqnum, uint8_t opcode, uint
     packet.header.packet_bytes = sizeof(packet);
     packet.header.opcode = opcode;
     packet.header.data = data;
-    pabb_crc32_write_to_message(&packet, sizeof(packet));
+    pabb_crc32_write_to_message(m_reliable_sender.session_id(), &packet, sizeof(packet));
     unreliable_send(&packet, sizeof(packet));
 }
 
@@ -376,6 +381,7 @@ void ReliableStreamConnection::on_packet(const PacketHeader* packet){
     case PABB2_CONNECTION_OPCODE_INFO_LABEL_H32:
     case PABB2_CONNECTION_OPCODE_INFO_LABEL_U32:
     case PABB2_CONNECTION_OPCODE_INFO_LABEL_I32:
+//    case PABB2_CONNECTION_OPCODE_WRONG_SESSION:
 //        cout << "Received ack" << endl;
         if (!m_log_everything){
             m_logger.log("[RSC]: Receive: (0x" + tostr_hex(packet->opcode) + ") " + tostr(packet), COLOR_PURPLE);

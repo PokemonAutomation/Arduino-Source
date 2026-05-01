@@ -46,12 +46,20 @@ public:
         UnreliableStreamSender& connection,
         uint8_t max_packet_size
     );
-    void reset();
+    PacketSender(
+        UnreliableStreamSender& connection,
+        uint8_t max_packet_size,
+        SessionId session_id
+    );
+    void reset(const SessionId& session_id);
 
     void set_max_packet_size(uint8_t max_packet_size){
         m_max_packet_size = max_packet_size;
     }
 
+    const SessionId& session_id() const{
+        return m_session_id;
+    }
     uint8_t slots_used() const{
         return m_slot_tail - m_slot_head;
     }
@@ -87,6 +95,8 @@ public:
     //  Remove the packet corresponding to the specified seqnum from the queue.
     //  Returns true is successful, false if seqnum is not in the queue.
     bool remove(uint8_t seqnum);
+
+    void send_reset();
 
     //
     //  Send a packet with the specified opcode and extra data after the header.
@@ -154,6 +164,8 @@ public:
 
 private:
     UnreliableStreamSender& m_connection;
+
+    SessionId m_session_id;
 
     uint8_t m_max_packet_size;  //  0 = 256 bytes
 

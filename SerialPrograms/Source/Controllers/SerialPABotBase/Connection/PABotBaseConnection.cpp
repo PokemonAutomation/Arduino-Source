@@ -93,7 +93,7 @@ void PABotBaseConnection::send_message(const BotBaseMessage& message, bool is_re
     buffer += message.type;
     buffer += message.body;
     buffer += std::string(sizeof(uint32_t), 0);
-    pabb_crc32_write_to_message(&buffer[0], buffer.size());
+    pabb_crc32_write_to_message(0xffffffff, &buffer[0], buffer.size());
 
     m_connection->unreliable_send(&buffer[0], buffer.size());
 }

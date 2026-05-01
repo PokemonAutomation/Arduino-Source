@@ -113,7 +113,11 @@ bool ReliableStreamConnectionFW::run_recv_events(const WallDuration& timeout){
         ? POLL_RATE
         : timeout;
 
-    const PacketHeader* header = m_parser.pull_bytes(m_unreliable_connection, adjusted_timeout);
+    const PacketHeader* header = m_parser.pull_bytes(
+        m_unreliable_connection,
+        m_reliable_sender.session_id(),
+        adjusted_timeout
+    );
     if (header == nullptr){
         return false;
     }
@@ -149,22 +153,33 @@ bool ReliableStreamConnectionFW::run_recv_events(const WallDuration& timeout){
 
     //  Now handle the different opcodes.
     uint8_t opcode = header->opcode & PABB2_CONNECTION_OPCODE_MASK;
+
     switch (opcode){
-    case PABB2_CONNECTION_OPCODE_ASK_RESET:
+    case PABB2_CONNECTION_OPCODE_ASK_RESET:{
+        if (header->packet_bytes < sizeof(PacketHeader_u32)){
+            return true;
+        }
+
+        const PacketHeader_u32* packet = (const PacketHeader_u32*)header;
+
+#ifdef PABB2_SUPPORTS_PRINTF_LOGGING
+        printf("Resetting to session ID: %zx\n", (size_t)packet->data);
+#endif
         m_stream_ready = false;
         m_send_is_currently_full = false;
-        m_reliable_sender.reset();
+        m_reliable_sender.reset(packet->data);
         m_parser.reset();
         m_stream_coalescer.reset();
         m_stream_coalescer.push_packet(0);
+#ifdef PABB2_ENABLE
+        issue_reset_to_all();
+#endif
         m_reliable_sender.send_oob_packet_empty(
             header->seqnum,
             PABB2_CONNECTION_OPCODE_RET_RESET
         );
-#ifdef PABB2_ENABLE
-        issue_reset_to_all();
-#endif
         return true;
+    }
     case PABB2_CONNECTION_OPCODE_ASK_VERSION:
         m_stream_coalescer.push_packet(header->seqnum);
         m_reliable_sender.send_oob_packet_u32(
