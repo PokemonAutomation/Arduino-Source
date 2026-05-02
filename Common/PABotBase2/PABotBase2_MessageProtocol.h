@@ -23,7 +23,7 @@ namespace PABotBase2{
 
 
 
-#define PABB2_MESSAGE_PROTOCOL_VERSION      2026041106
+#define PABB2_MESSAGE_PROTOCOL_VERSION      2026041105
 
 
 struct PABB_PACK MessageHeader{

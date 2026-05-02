@@ -121,11 +121,17 @@ bool SerialPABotBase2_Connection::connect_to_device(){
     std::string str;
     WallClock start = current_time();
     while (current_time() - start < std::chrono::seconds(5)){
+        m_logger.log("Trying baud " + tostr_u_commas(921600) + " (no session ID)...");
+        m_unreliable_connection->set_baud_rate(921600);
+        if (m_stream_connection->reset(false, std::chrono::milliseconds(100))){
+            return true;
+        }
+
         for (size_t c = 0; c < sizeof(BAUD_RATES) / sizeof(uint32_t); c++){
             uint32_t baud_rate = BAUD_RATES[c];
-            m_logger.log("Trying baud " + tostr_u_commas(baud_rate) + "...");
+            m_logger.log("Trying baud " + tostr_u_commas(baud_rate) + " (with session ID)...");
             m_unreliable_connection->set_baud_rate(baud_rate);
-            if (m_stream_connection->reset(std::chrono::milliseconds(100))){
+            if (m_stream_connection->reset(true, std::chrono::milliseconds(100))){
                 return true;
             }
         }

@@ -170,14 +170,22 @@ size_t ReliableStreamConnection::unreliable_send(const void* data, size_t bytes)
 //  Send Path
 //
 
-bool ReliableStreamConnection::reset(WallDuration timeout){
+bool ReliableStreamConnection::reset(bool random_session_id, WallDuration timeout){
     {
         std::lock_guard<Mutex> lg(m_lock);
-        m_reliable_sender.reset(m_reliable_sender.session_id() + 1);
+        if (random_session_id){
+            m_reliable_sender.reset(m_reliable_sender.session_id() + 1);
+        }else{
+            m_reliable_sender.reset(0xffffffff);
+        }
         m_parser.reset();
         m_stream_coalescer.reset();
         throw_if_cancelled();
-        m_reliable_sender.send_reset();
+        if (random_session_id){
+            m_reliable_sender.send_reset();
+        }else{
+            m_reliable_sender.send_packet(PABB2_CONNECTION_OPCODE_ASK_RESET, 0, nullptr);
+        }
     }
     m_cv.notify_all();
     return wait_for_pending(timeout);
