@@ -50,6 +50,7 @@ private:
     bool use_rare_candy(
         SingleSwitchProgramEnvironment& env, 
         ProControllerContext& context,
+        GiftRng_Descriptor::Stats& stats,
         AdvObservedPokemon& pokemon,
         AdvRngFilters& filters,
         const BaseStats& BASE_STATS,

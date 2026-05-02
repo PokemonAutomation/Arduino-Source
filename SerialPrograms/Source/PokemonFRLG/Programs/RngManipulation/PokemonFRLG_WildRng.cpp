@@ -349,11 +349,16 @@ bool WildRng::have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_
     return (hit.seed == TARGET_SEED) && (hit.advance == ADVANCES);
 }
 
-bool WildRng::auto_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& MAX_BALL_THROWS){
-    for (uint64_t i=0; i<MAX_BALL_THROWS; i++){
+bool WildRng::auto_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, WildRng_Descriptor::Stats& stats, const uint64_t& MAX_BALL_THROWS){
+    for (uint64_t i=0; i<=MAX_BALL_THROWS; i++){
         int count = 0;
         while(true){
             if (count >= 10){
+                send_program_recoverable_error_notification(
+                    env, NOTIFICATION_ERROR_RECOVERABLE,
+                    "auto_catch(): failed to detect battle menu"
+                ); 
+                stats.errors++;
                 return false;
             }
             count++;
@@ -410,6 +415,7 @@ bool WildRng::auto_catch(SingleSwitchProgramEnvironment& env, ProControllerConte
                         env, NOTIFICATION_ERROR_RECOVERABLE,
                         "auto_catch(): no recognized state after 30 seconds."
                     ); 
+                    stats.errors++;
                     return true;
                 }
                 env.log("Overworld detected.");
@@ -420,6 +426,8 @@ bool WildRng::auto_catch(SingleSwitchProgramEnvironment& env, ProControllerConte
 
             break;
         }
+
+        if (i == MAX_BALL_THROWS) { break; }
 
         // select BAG (selection arrow does not wrap around)
         pbf_move_left_joystick(context, {+1, 0}, 100ms, 150ms);
@@ -442,6 +450,7 @@ bool WildRng::auto_catch(SingleSwitchProgramEnvironment& env, ProControllerConte
                 env, NOTIFICATION_ERROR_RECOVERABLE,
                 "auto_catch(): failed to open bag."
             ); 
+            stats.errors++;
             return true;
         }
 
@@ -558,6 +567,7 @@ AdvObservedPokemon WildRng::read_summary(SingleSwitchProgramEnvironment& env, Pr
 bool WildRng::use_rare_candy(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context,
+    WildRng_Descriptor::Stats& stats,
     AdvObservedPokemon& pokemon,
     AdvRngFilters& filters,
     const BaseStats& BASE_STATS,
@@ -589,6 +599,7 @@ bool WildRng::use_rare_candy(
             env, NOTIFICATION_ERROR_RECOVERABLE,
             "use_rare_candy(): failed to detect party menu."
         ); 
+        stats.errors++;
         return true;
     }
 
@@ -617,6 +628,7 @@ bool WildRng::use_rare_candy(
             env, NOTIFICATION_ERROR_RECOVERABLE,
             "use_rare_candy(): failed to detect level-up stats."
         ); 
+        stats.errors++;
         return true;
     }
 
@@ -626,12 +638,12 @@ bool WildRng::use_rare_candy(
 
     env.log("Reading stats...");
     VideoSnapshot screen = env.console.video().snapshot();
-    StatReads stats = reader.read_stats(env.logger(), screen);    
+    StatReads statreads = reader.read_stats(env.logger(), screen);    
 
-    update_filters(filters, pokemon, stats, {}, BASE_STATS);
+    update_filters(filters, pokemon, statreads, {}, BASE_STATS);
     RNG_FILTERS.set(filters);   
 
-    // return to the bag (possibly learning a move, but trying to preven evolution)
+    // return to the bag (possibly learning a move, but trying to prevent evolution)
     int attempts = 0;
     while (true){
         if (attempts > 5){
@@ -639,6 +651,7 @@ bool WildRng::use_rare_candy(
                 env, NOTIFICATION_ERROR_RECOVERABLE,
                 "use_rare_candy(): failed to return to bag menu in 5 attempts."
             );
+            stats.errors++;
             return true;
         }
         BagWatcher bag_menu(COLOR_RED);
@@ -669,6 +682,7 @@ bool WildRng::use_rare_candy(
                 env, NOTIFICATION_ERROR_RECOVERABLE,
                 "use_rare_candy(): failed to return to bag menu."
             ); 
+            stats.errors++;
             return true;
         }
     }
@@ -804,7 +818,6 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     RngCalibrationHistory CALIBRATION_HISTORY; 
     uint64_t INITIAL_ADVANCES_RADIUS = USE_TEACHY_TV ? 8192 : 1024;
     uint64_t resets = 0;
-    bool wildshiny_found = false;
 
     while (true){
         if (CALIBRATION_HISTORY.results.size() > 0){
@@ -819,10 +832,6 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
         if (resets > MAX_RESETS){
             env.log("Max resets reached.");
-            break;
-        }
-
-        if (wildshiny_found){
             break;
         }
 
@@ -859,15 +868,12 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
                     CONTINUE_SCREEN_ADJUSTMENT = prev_csf_calibration + 0.5;
                 }
                 CONTINUE_SCREEN_ADJUSTMENT = fmod(CONTINUE_SCREEN_ADJUSTMENT, 2);
-            }else{
-                // we're still not that close. Slightly vary the seed to more reliably hone in on advances
-                double seed_bump = SEED_BUMPS[ADVANCE_HISTORY.results.size() % 5];
-                SEED_CALIBRATION_FRAMES += seed_bump;
             }
-        }else{
-            double seed_bump = SEED_BUMPS[ADVANCE_HISTORY.results.size() % 5];
-            SEED_CALIBRATION_FRAMES += seed_bump;
         }
+
+        // if previous resets had uncertain advances, slightly modify the seed delay to try to hit a different target
+        double seed_bump = SEED_BUMPS[ADVANCE_HISTORY.results.size() % 5];
+        SEED_CALIBRATION_FRAMES += seed_bump;
 
         double CALIBRATED_ADVANCES = ADVANCES + ADVANCES_CALIBRATION;
         double INGAME_ADVANCES = CALIBRATED_ADVANCES - CONTINUE_SCREEN_FRAMES - CONTINUE_SCREEN_ADJUSTMENT;
@@ -928,10 +934,9 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             break;
         }
 
-        bool failed = auto_catch(env, context, MAX_BALL_THROWS);
+        bool failed = auto_catch(env, context, stats, MAX_BALL_THROWS);
         if (failed){
             env.log("Failed catch.");
-            stats.errors++;
             continue;
         }
 
@@ -958,10 +963,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         }
 
         for (uint64_t i=0; i<MAX_RARE_CANDIES; i++){
-            failed = use_rare_candy(env, context, pokemon, filters, BASE_STATS, i == 0);
-            if (failed){
-                stats.errors++;
-            }
+            failed = use_rare_candy(env, context, stats, pokemon, filters, BASE_STATS, i == 0);
 
             search_hits = get_wild_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD, SUPER_ROD);
             RNG_CALIBRATION.set(

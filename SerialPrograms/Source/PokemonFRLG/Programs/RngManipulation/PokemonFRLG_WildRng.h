@@ -164,11 +164,17 @@ private:
 
     AdvObservedPokemon read_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::set<std::string>& SPECIES_LIST);
 
-    bool auto_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const uint64_t& MAX_BALL_THROWS);
+    bool auto_catch(
+        SingleSwitchProgramEnvironment& env, 
+        ProControllerContext& context, 
+        WildRng_Descriptor::Stats& stats,
+        const uint64_t& MAX_BALL_THROWS
+    );
 
     bool use_rare_candy(
         SingleSwitchProgramEnvironment& env, 
         ProControllerContext& context,
+        WildRng_Descriptor::Stats& stats,
         AdvObservedPokemon& pokemon,
         AdvRngFilters& filters,
         const BaseStats& BASE_STATS,

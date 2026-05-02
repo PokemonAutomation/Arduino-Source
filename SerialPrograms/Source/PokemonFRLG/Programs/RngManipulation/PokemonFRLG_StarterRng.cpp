@@ -744,15 +744,12 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                     CONTINUE_SCREEN_ADJUSTMENT = prev_csf_calibration + 0.5;
                 }
                 CONTINUE_SCREEN_ADJUSTMENT = fmod(CONTINUE_SCREEN_ADJUSTMENT, 2);
-            }else{
-                // we're still not that close. Slightly vary the seed to more reliably hone in on advances
-                double seed_bump = SEED_BUMPS[ADVANCE_HISTORY.results.size() % 5];
-                SEED_CALIBRATION_FRAMES += seed_bump;
             }
-        }else{
-            double seed_bump = SEED_BUMPS[ADVANCE_HISTORY.results.size() % 5];
-            SEED_CALIBRATION_FRAMES += seed_bump;
         }
+
+        // if previous resets had uncertain advances, slightly modify the seed delay to try to hit a different target
+        double seed_bump = SEED_BUMPS[ADVANCE_HISTORY.results.size() % 5];
+        SEED_CALIBRATION_FRAMES += seed_bump;
 
         double CALIBRATED_ADVANCES = ADVANCES + ADVANCES_CALIBRATION;
         double INGAME_ADVANCES = CALIBRATED_ADVANCES - CONTINUE_SCREEN_FRAMES - CONTINUE_SCREEN_ADJUSTMENT;
