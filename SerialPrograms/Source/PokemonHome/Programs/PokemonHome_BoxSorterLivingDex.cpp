@@ -147,7 +147,7 @@ bool BoxSorterLivingDex::is_viable_for_dex(const LivingDexEntry& entry, const Co
         }
     }
 
-    if (entry.primary_type != pokemonInfo.primaryType || entry.secondary_type != pokemonInfo.secondaryType){
+    if (entry.primary_type != pokemonInfo.primary_type || entry.secondary_type != pokemonInfo.secondary_type){
         return false;
     }
 
