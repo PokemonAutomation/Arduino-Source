@@ -286,9 +286,9 @@ PacketHeader* PacketSender::reserve_packet(
     PacketHeader* ret = (PacketHeader*)(m_buffer + offset);
 
     ret->magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
-    ret->opcode = opcode;
     ret->seqnum = m_slot_tail++;
     ret->packet_bytes = packet_bytes;
+    ret->opcode = opcode;
     m_slot_tail_uncommitted = m_slot_tail;
 
     return ret;
@@ -441,9 +441,9 @@ bool PacketSender::enqueue_uncommitted_send_stream(const void* data, size_t byte
         //  Build the packet header.
         PacketHeaderData* packet = (PacketHeaderData*)(m_buffer + offset);
         packet->magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
-        packet->opcode = PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA;
         packet->seqnum = m_slot_tail_uncommitted++;
         packet->packet_bytes = (uint8_t)packet_bytes;  //  256 overflows to 0
+        packet->opcode = PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA;
         memcpy(&packet->stream_offset, &m_stream_offset_uncommitted, sizeof(uint16_t));   //  May be misaligned.
 
         //  Copy stream data.
