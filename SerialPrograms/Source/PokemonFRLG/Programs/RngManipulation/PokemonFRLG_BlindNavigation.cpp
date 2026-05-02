@@ -370,14 +370,14 @@ void check_timings(
 ){
     if (CONTINUE_SCREEN_DELAY < 3200){
         OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReport::NO_ERROR_REPORT,
             "The Continue Screen delay cannot be less than 3200ms (192 advances). Check your Continue Screen calibration.",
             console
         );
     }
     if (SEED_DELAY < 29500){
         OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReport::NO_ERROR_REPORT,
             "The title screen delay cannot be less than 29.5s. Check your seed calibration.",
             console
         );
@@ -387,7 +387,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::starters:
         if (INGAME_DELAY < 7500){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Starters: the in-game delay cannot be less than 7500ms (900 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -396,7 +396,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::magikarp:
         if (INGAME_DELAY < 7500){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Magikarp: the in-game delay cannot be less than 7500ms (900 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -407,7 +407,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::hitmon:
         if (INGAME_DELAY < 4500){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Hitmonchan/Hitmonlee: the in-game delay cannot be less than 4500ms (540 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -416,7 +416,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::eevee:
         if (INGAME_DELAY < 4000){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Eevee: the in-game delay cannot be less than 4000ms (480 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -425,7 +425,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::lapras:
         if (INGAME_DELAY < 7500){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Lapras: the in-game delay cannot be less than 7500ms (900 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -437,7 +437,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::fossils:
         if (INGAME_DELAY < 6000){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Fossils: the in-game delay cannot be less than 6000ms (720 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -452,7 +452,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::gamecornerporygon:
         if (INGAME_DELAY < 8500){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Game Corner: the in-game delay cannot be less than 8500ms (1020 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -461,7 +461,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::togepi:
         if (INGAME_DELAY < 12000) {
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Togepi: the in-game delay cannot be less than 12000ms (1440 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -470,7 +470,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::staticencounter:
         if (INGAME_DELAY < 5000){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Static Encounter: the in-game delay cannot be less than 5000ms (600 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -479,7 +479,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::snorlax:
         if (INGAME_DELAY < 16000){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Snorlax: the in-game delay cannot be less than 16000ms (1920 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -488,7 +488,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::mewtwo:
         if (INGAME_DELAY < 4500){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Mewtwo: the in-game delay cannot be less than 4500ms (540 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -497,7 +497,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::hooh:
         if (INGAME_DELAY < 4000){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Ho-oh: the in-game delay cannot be less than 4000ms (480 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -506,7 +506,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::hypno:
         if (INGAME_DELAY < 13000){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Hypno: the in-game delay cannot be less than 13000ms (1560 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -515,13 +515,13 @@ void check_timings(
     case PokemonFRLG_RngTarget::sweetscent:
         if (!SAFARI_ZONE && INGAME_DELAY < 8500){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Sweet Scent: the in-game delay cannot be less than 8500ms (1020 advances). Check your in-game advances and calibration.",
                 console
             );
         }else if (SAFARI_ZONE && INGAME_DELAY < 9500){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Sweet Scent: the in-game delay cannot be less than 9500ms (1140 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -530,7 +530,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::fishing:
         if (INGAME_DELAY < 5500){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Fishing: the in-game delay cannot be less than 5500ms (1800 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -539,7 +539,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::safarizonecenter:
         if (INGAME_DELAY < 30500){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Safari Zone Center: in-game delay cannot be less than 30500ms (3660 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -548,7 +548,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::safarizoneeast:
         if (INGAME_DELAY < 36500){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Safari Zone East: in-game delay cannot be less than 36500ms (4380 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -557,7 +557,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::safarizonenorth:
         if (INGAME_DELAY < 47500){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Safari Zone North: in-game delay cannot be less than 47500ms (5700 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -566,7 +566,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::safarizonewest:
         if (INGAME_DELAY < 61500){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Safari Zone West: in-game delay cannot be less than 52000ms (7380 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -575,7 +575,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::safarizonesurf:
         if (INGAME_DELAY < 40500){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Safari Zone Surfing: in-game delay cannot be less than 40500ms (4860 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -584,7 +584,7 @@ void check_timings(
     case PokemonFRLG_RngTarget::safarizonefish:
         if (INGAME_DELAY < 30000){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Safari Zone Fishing: in-game delay cannot be less than 30000ms (3600 advances). Check your in-game advances and calibration.",
                 console
             );
@@ -592,7 +592,7 @@ void check_timings(
         return;
     default:
         OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReport::NO_ERROR_REPORT,
             "Option not yet implemented.",
             console
         );

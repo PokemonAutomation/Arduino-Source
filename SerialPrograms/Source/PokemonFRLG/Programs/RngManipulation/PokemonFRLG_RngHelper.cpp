@@ -229,7 +229,7 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         double MODIFIED_INGAME_ADVANCES = INGAME_ADVANCES + INGAME_CALIBRATION;
         if (MODIFIED_INGAME_ADVANCES < 0) {
            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "In-game advances cannot be negative. Check your in-game advances and calibration.",
                 env.console
             ); 

@@ -71,16 +71,9 @@ public:
         double a_calibration, 
         std::vector<AdvRngState>& rng_states
     );
-    void set(
-        double s_calibration, 
-        double c_calibration, 
-        double a_calibration, 
-        const std::map<AdvRngState, AdvPokemonResult>& hits_map
-    );
     void reset();
 
 private:
-    static std::vector<AdvRngState> get_rng_states_from_map(const std::map<AdvRngState, AdvPokemonResult>& hits_map);
     static std::string get_hits_string(const std::vector<AdvRngState>& rng_states);
     static std::string get_hits_string(const std::map<AdvRngState, AdvPokemonResult>& hits_map);
 public:

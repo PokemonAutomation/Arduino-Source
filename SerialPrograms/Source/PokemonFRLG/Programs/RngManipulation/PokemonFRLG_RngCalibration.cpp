@@ -34,7 +34,7 @@ void check_seed_validity(ConsoleHandle& console, std::string seed_string){
 
     if (seed_string.size() != 4){
         OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReport::NO_ERROR_REPORT,
             "GiftRng(): Invalid seed length. Seeds should be 4 characters.",
             console
         ); 
@@ -44,7 +44,7 @@ void check_seed_validity(ConsoleHandle& console, std::string seed_string){
         auto iter = MAP.find(ch);
         if (iter == MAP.end()){
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "GiftRng(): Invalid seed character. Seeds should be hex strings (valid characters are 0-9 and A-F).",
                 console
             ); 
@@ -108,7 +108,7 @@ AdvNature string_to_nature(std::string nature_string){
 }
 
 
-std::map<AdvRngState, AdvPokemonResult> get_search_results(
+std::vector<AdvRngState> get_search_results(
     ConsoleHandle& console,
     AdvRngSearcher& searcher, 
     AdvRngFilters& filters,
@@ -119,12 +119,39 @@ std::map<AdvRngState, AdvPokemonResult> get_search_results(
     uint16_t tid_xor_sid
 
 ){
-    std::map<AdvRngState, AdvPokemonResult> search_hits;
+    std::vector<AdvRngState> search_hits;
     for (int i=0; i<4; i++){
         uint64_t adv_radius = advances_radius * (uint64_t(1) << i);
         uint64_t min_adv = ADVANCES - std::min(uint64_t(ADVANCES), adv_radius);    
         uint64_t max_adv = ADVANCES + adv_radius;
         search_hits = searcher.search(filters, SEED_VALUES, min_adv, max_adv, gender_threshold, tid_xor_sid);
+        if (search_hits.size() > 0){
+            console.log("Number of search hits: " + std::to_string(search_hits.size()));
+            return search_hits;
+        }
+    }
+    console.log("Number of search hits: " + std::to_string(search_hits.size()));
+    return search_hits;
+}
+
+std::vector<AdvRngState> get_wild_search_results(
+    ConsoleHandle& console,
+    AdvRngWildSearcher& searcher, 
+    AdvRngFilters& filters,
+    const std::vector<uint16_t>& SEED_VALUES,
+    const uint64_t& ADVANCES, 
+    const uint64_t& advances_radius,
+    int16_t gender_threshold,
+    bool super_rod,
+    uint16_t tid_xor_sid
+
+){
+    std::vector<AdvRngState> search_hits;
+    for (int i=0; i<4; i++){
+        uint64_t adv_radius = advances_radius * (uint64_t(1) << i);
+        uint64_t min_adv = ADVANCES - std::min(uint64_t(ADVANCES), adv_radius);    
+        uint64_t max_adv = ADVANCES + adv_radius;
+        search_hits = searcher.search(filters, SEED_VALUES, min_adv, max_adv, gender_threshold, super_rod, tid_xor_sid);
         if (search_hits.size() > 0){
             console.log("Number of search hits: " + std::to_string(search_hits.size()));
             return search_hits;
@@ -254,7 +281,7 @@ bool update_history(
     const double& SEED_CALIBRATION_FRAMES,
     const double& ADVANCES_CALIBRATION,
     const double& CONTINUE_SCREEN_ADJUSTMENT,
-    const std::map<AdvRngState, AdvPokemonResult>& search_hits,
+    const std::vector<AdvRngState>& search_hits,
     uint32_t max_advance_possibilities,
     uint32_t advance_radius,
     bool force_finish
@@ -273,7 +300,7 @@ bool update_history(
         CALIBRATION_HISTORY.seed_calibrations.emplace_back(SEED_CALIBRATION_FRAMES);
         CALIBRATION_HISTORY.advance_calibrations.emplace_back(ADVANCES_CALIBRATION);
         CALIBRATION_HISTORY.continue_screen_adjustments.emplace_back(CONTINUE_SCREEN_ADJUSTMENT);
-        CALIBRATION_HISTORY.results.emplace_back(search_hits.begin()->first);
+        CALIBRATION_HISTORY.results.emplace_back(search_hits[0]);
         if (CALIBRATION_HISTORY.results.size() > MAX_HISTORY_LENGTH){
             CALIBRATION_HISTORY.seed_calibrations.erase(CALIBRATION_HISTORY.seed_calibrations.begin());
             CALIBRATION_HISTORY.advance_calibrations.erase(CALIBRATION_HISTORY.advance_calibrations.begin());
@@ -287,9 +314,9 @@ bool update_history(
     
     std::vector<uint64_t> advances;
     std::vector<AdvRngState> hits;
-    for(std::map<AdvRngState,AdvPokemonResult>::const_iterator it=search_hits.begin(); it!=search_hits.end(); ++it) {
-        advances.emplace_back(it->first.advance);
-        hits.emplace_back(it->first);
+    for(auto hit : search_hits) {
+        advances.emplace_back(hit.advance);
+        hits.emplace_back(hit);
     }
     
     // get unique advances
@@ -366,6 +393,70 @@ bool update_history(
     return true;
 }
 
+
+
+bool are_indistinguishable(AdvPokemonResult res1, AdvPokemonResult res2){
+    return (
+        res1.nature == res2.nature &&
+        res1.gender == res2.gender &&
+        // res1.ability == res2.ability &&
+        res1.ivs.hp == res2.ivs.hp &&
+        res1.ivs.attack == res2.ivs.attack &&
+        res1.ivs.defense == res2.ivs.defense &&
+        res1.ivs.spatk == res2.ivs.spatk &&
+        res1.ivs.spdef == res2.ivs.spdef &&
+        res1.ivs.speed == res2.ivs.speed
+    );
+}
+
+bool are_indistinguishable(AdvWildPokemonResult res1, AdvWildPokemonResult res2){
+    return (
+        res1.species == res2.species &&
+        res1.level == res2.level &&
+        res1.nature == res2.nature &&
+        res1.gender == res2.gender &&
+        // res1.ability == res2.ability &&
+        res1.ivs.hp == res2.ivs.hp &&
+        res1.ivs.attack == res2.ivs.attack &&
+        res1.ivs.defense == res2.ivs.defense &&
+        res1.ivs.spatk == res2.ivs.spatk &&
+        res1.ivs.spdef == res2.ivs.spdef &&
+        res1.ivs.speed == res2.ivs.speed
+    );
+}
+
+bool all_indistinguishable(std::vector<AdvRngState> hits, AdvRngSearcher& searcher){
+    if (hits.size() < 2){
+        return true;
+    }
+    searcher.state = hits[0];
+    AdvPokemonResult first_result = searcher.generate_pokemon();
+    for (size_t i=1; i<hits.size(); i++){
+        searcher.state = hits[i];
+        AdvPokemonResult other_result = searcher.generate_pokemon();
+        if (!are_indistinguishable(first_result, other_result)){
+            return false;
+        }
+    }
+    return true;
+}
+
+bool all_indistinguishable(std::vector<AdvRngState> hits, AdvRngWildSearcher& searcher, bool super_rod){
+    if (hits.size() < 2){
+        return true;
+    }
+    searcher.state = hits[0];
+    AdvWildPokemonResult first_result = searcher.generate_pokemon(super_rod);
+
+    for (size_t i=1; i<hits.size(); i++){
+        searcher.state = hits[i];
+        AdvWildPokemonResult other_result = searcher.generate_pokemon(super_rod);
+        if (!are_indistinguishable(first_result, other_result)){
+            return false;
+        }
+    }
+    return true;
+}
 
 
 

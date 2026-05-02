@@ -169,14 +169,6 @@ RngCalibrationDisplay::RngCalibrationDisplay()
     PA_ADD_STATIC(hits);
 }
 
-std::vector<AdvRngState> RngCalibrationDisplay::get_rng_states_from_map(const std::map<AdvRngState,AdvPokemonResult>& hits_map){
-    std::vector<AdvRngState> rng_states;
-    for(std::map<AdvRngState,AdvPokemonResult>::const_iterator it = hits_map.begin(); it != hits_map.end(); ++it) {
-        rng_states.emplace_back(it->first);
-    }
-    return rng_states;
-}
-
 std::string RngCalibrationDisplay::get_hits_string(const std::vector<AdvRngState>& rng_states){
     std::string hits_string;
     for (size_t i=0; i<rng_states.size(); i++){
@@ -196,9 +188,6 @@ std::string RngCalibrationDisplay::get_hits_string(const std::vector<AdvRngState
     }
     return hits_string;
 }
-std::string RngCalibrationDisplay::get_hits_string(const std::map<AdvRngState, AdvPokemonResult>& hits_map){
-    return get_hits_string(get_rng_states_from_map(hits_map));
-}
 
 void RngCalibrationDisplay::set(
     double s_calibration, 
@@ -210,15 +199,6 @@ void RngCalibrationDisplay::set(
     csf_calibration.set(c_calibration);
     advances_calibration.set(a_calibration);
     hits.set(get_hits_string(rng_states));
-}
-void RngCalibrationDisplay::set(    
-    double s_calibration, 
-    double c_calibration, 
-    double a_calibration, 
-    const std::map<AdvRngState, AdvPokemonResult>& hits_map
-){
-    std::vector<AdvRngState> rng_states = get_rng_states_from_map(hits_map);
-    set(s_calibration, c_calibration, a_calibration, rng_states);
 }
 
 void RngCalibrationDisplay::reset(){

@@ -427,6 +427,7 @@ AdvObservedPokemon StaticRng::read_summary(SingleSwitchProgramEnvironment& env, 
     }
 
     AdvObservedPokemon pokemon = {
+        stats.name,
         gender,
         string_to_nature(stats.nature),
         AdvAbility::Any,
@@ -577,13 +578,13 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     if (SEED_POSITION == -1){
         OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReport::NO_ERROR_REPORT,
             "StaticRng(): Target Seed is missing from the list of nearby seeds.",
             env.console
         ); 
     }
 
-    env.log("Target Seed Value: " + std::to_string(TARGET_SEED));
+    env.log("Target Seed Value (base10): " + std::to_string(TARGET_SEED));
 
     BaseStats BASE_STATS;
     int16_t GENDER_THRESHOLD = -1;
@@ -798,7 +799,7 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         AdvRngFilters filters = observation_to_filters(pokemon, BASE_STATS);
         RNG_FILTERS.set(filters);
 
-        std::map<AdvRngState, AdvPokemonResult> search_hits = get_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD);
+        std::vector<AdvRngState> search_hits = get_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD);
         RNG_CALIBRATION.set(
             SEED_CALIBRATION_FRAMES * FRAME_DURATION,
             CONTINUE_SCREEN_ADJUSTMENT,

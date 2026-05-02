@@ -40,7 +40,7 @@ int16_t seed_position_in_list(uint16_t seed, std::vector<uint16_t> list);
 Pokemon::AdvNature string_to_nature(std::string nature_string);
 
 // get search hits for any of the provided seed values and advances range
-std::map<AdvRngState, AdvPokemonResult> get_search_results(
+std::vector<AdvRngState> get_search_results(
     ConsoleHandle& console,
     AdvRngSearcher& searcher, 
     AdvRngFilters& filters,
@@ -48,6 +48,18 @@ std::map<AdvRngState, AdvPokemonResult> get_search_results(
     const uint64_t& ADVANCES, 
     const uint64_t& advances_radius,
     int16_t gender_threshold = 126,
+    uint16_t tid_xor_sid = 0
+);
+
+std::vector<AdvRngState> get_wild_search_results(
+    ConsoleHandle& console,
+    AdvRngWildSearcher& searcher, 
+    AdvRngFilters& filters,
+    const std::vector<uint16_t>& SEED_VALUES,
+    const uint64_t& ADVANCES, 
+    const uint64_t& advances_radius,
+    int16_t gender_threshold = 126,
+    bool super_rod = false,
     uint16_t tid_xor_sid = 0
 );
 
@@ -79,11 +91,14 @@ bool update_history(
     const double& SEED_CALIBRATION_FRAMES,
     const double& ADVANCES_CALIBRATION,
     const double& CONTINUE_SCREEN_ADJUSTMENT,
-    const std::map<AdvRngState, AdvPokemonResult>& search_hits,
+    const std::vector<AdvRngState>& search_hits,
     uint32_t max_advance_possibilities = 1,
     uint32_t advance_radius = 2,
     bool force_finish = false
 );
+
+bool all_indistinguishable(std::vector<AdvRngState> hits, AdvRngSearcher& searcher);
+bool all_indistinguishable(std::vector<AdvRngState> hits, AdvRngWildSearcher& searcher, bool super_rod);
 
 
 

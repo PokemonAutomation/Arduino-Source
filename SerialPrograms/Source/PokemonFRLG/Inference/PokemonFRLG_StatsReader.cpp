@@ -31,7 +31,7 @@ StatsReader::StatsReader(Color color)
             m_box_level(0.052000, 0.120140, 0.099000, 0.069416),
             m_box_name(0.163158, 0.122917, 0.262811, 0.066639),
             m_box_gender(0.430769, 0.114423, 0.034615, 0.081731),
-            m_box_hp(0.815558, 0.131247, 0.173049, 0.066639),
+            m_box_hp(0.805274, 0.131247, 0.183790, 0.066639),
             m_box_attack(0.891000, 0.245089, 0.097607, 0.066639),
             m_box_defense(0.891000, 0.325612, 0.097607, 0.066639),
             m_box_sp_attack(0.891000, 0.406134, 0.097607, 0.066639),
@@ -54,7 +54,8 @@ void StatsReader::make_overlays(VideoOverlaySet &items) const {
 void StatsReader::read_page1(
     Logger &logger, Language language,
     const ImageViewRGB32 &frame,
-    PokemonFRLG_Stats &stats
+    PokemonFRLG_Stats &stats,
+    const std::set<std::string>& subset
 ){
     const bool save_debug_images = GlobalSettings::instance().SAVE_DEBUG_IMAGES;
     ImageViewRGB32 game_screen =
@@ -68,11 +69,21 @@ void StatsReader::read_page1(
         {combine_rgb(208, 208, 208), combine_rgb(255, 255, 255)},
         {combine_rgb(192, 192, 192), combine_rgb(255, 255, 255)},
     };
-    auto name_result = Pokemon::PokemonNameReader::instance().read_substring(
-            logger, language, extract_box_reference(game_screen, m_box_name),
-            name_text_color_ranges);
-    if (!name_result.results.empty()){
-        stats.name = name_result.results.begin()->second.token;
+
+    if (subset.size() > 0){
+        auto name_result = Pokemon::PokemonNameReader(subset).read_substring(
+                logger, language, extract_box_reference(game_screen, m_box_name),
+                name_text_color_ranges);
+        if (!name_result.results.empty()){
+            stats.name = name_result.results.begin()->second.token;
+        }
+    }else{
+        auto name_result = Pokemon::PokemonNameReader::instance().read_substring(
+                logger, language, extract_box_reference(game_screen, m_box_name),
+                name_text_color_ranges);
+        if (!name_result.results.empty()){
+            stats.name = name_result.results.begin()->second.token;
+        }
     }
 
     // Detect gender by comparing red vs blue pixels
@@ -339,10 +350,10 @@ void StatsReader::read_page2(
         );
     };
 
-    // HP box: shift right 70% to clear the "/" character.
+    // HP box: shift right 55% to clear the "/" character.
     ImageFloatBox total_hp_box(
-        m_box_hp.x + m_box_hp.width * 0.7, m_box_hp.y,
-        m_box_hp.width * 0.3, m_box_hp.height
+        m_box_hp.x + m_box_hp.width * 0.60, m_box_hp.y,
+        m_box_hp.width * 0.40, m_box_hp.height
     );
 
     auto assign_stat = [](std::optional<unsigned>& field, int value){

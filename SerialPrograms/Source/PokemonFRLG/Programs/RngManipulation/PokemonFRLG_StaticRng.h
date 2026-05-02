@@ -1,4 +1,4 @@
-/*  StaticRng
+/*  Static RNG
  *
  *  From: https://github.com/PokemonAutomation/
  *

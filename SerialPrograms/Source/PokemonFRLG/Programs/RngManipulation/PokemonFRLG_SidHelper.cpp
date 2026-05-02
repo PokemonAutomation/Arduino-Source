@@ -254,7 +254,7 @@ std::vector<std::pair<std::string, std::string>> get_sid_messages(
 void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (TARGET_ADVANCES % 2 == 0){
         OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT, "SidHelper(): the Target Advances setting needs to be odd", env.console
+            ErrorReport::NO_ERROR_REPORT, "SidHelper(): the Target Advances setting needs to be odd", env.console
         ); 
     }
 

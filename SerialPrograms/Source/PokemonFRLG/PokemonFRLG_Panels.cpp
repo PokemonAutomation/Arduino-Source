@@ -25,6 +25,7 @@
 #include "Programs/RngManipulation/PokemonFRLG_StarterRng.h"
 #include "Programs/RngManipulation/PokemonFRLG_GiftRng.h"
 #include "Programs/RngManipulation/PokemonFRLG_StaticRng.h"
+#include "Programs/RngManipulation/PokemonFRLG_WildRng.h"
 #include "Programs/TestPrograms/PokemonFRLG_SoundListener.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadStats.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadBattleLevelUp.h"
@@ -73,6 +74,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back(make_single_switch_program<StarterRng_Descriptor, StarterRng>());
         ret.emplace_back(make_single_switch_program<GiftRng_Descriptor, GiftRng>());
         ret.emplace_back(make_single_switch_program<StaticRng_Descriptor, StaticRng>());
+        ret.emplace_back(make_single_switch_program<WildRng_Descriptor, WildRng>());
     }
 
     if (PreloadSettings::instance().DEVELOPER_MODE){

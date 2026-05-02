@@ -52,7 +52,8 @@ public:
     // Reads from page 1 (Nature, Level, Name)
     void read_page1(
         Logger &logger, Language language,
-        const ImageViewRGB32 &frame, PokemonFRLG_Stats &stats
+        const ImageViewRGB32 &frame, PokemonFRLG_Stats &stats,
+        const std::set<std::string>& subset = {}
     );
 
     // Reads from page 2 (Stats: HP, Atk, Def, SpA, SpD, Spe)
