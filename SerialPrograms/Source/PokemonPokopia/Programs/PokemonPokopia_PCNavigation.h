@@ -39,6 +39,12 @@ const ImageFloatBox PC_PALETTE_GET_ITEMS_BOX{0.376000, 0.648500, 0.034000, 0.052
 const ImageFloatBox PC_PALETTE_STAMP_CARD_BOX{0.590000, 0.648500, 0.034000, 0.052500};
 const ImageFloatBox PC_PALETTE_APPRAISE_BOX{0.802500, 0.648500, 0.034000, 0.052500};
 
+// Shop Menu items. Apply the offset to get boxes for items 2-5
+const ImageFloatBox SHOP_DAILY_ITEM_TYPE_BOX_1{0.125000, 0.300000, 0.034000, 0.064000};
+const ImageFloatBox SHOP_DAILY_ITEM_SELECTOR_BOX_1{0.165000, 0.170000, 0.034000, 0.052500}; // Issue when detecting orange arrow on orange label in shop menu
+const ImageFloatBox SHOP_DAILY_ITEM_COIN_ICON_BOX_1(0.133000, 0.377000, 0.025000, 0.045000);
+const std::pair<double, double> SHOP_DAILY_ITEM_OFFSET(0.158000, 0);
+
 // Link Play menu options
 const ImageFloatBox LINK_PLAY_INVITE_BOX{0.048500, 0.249000, 0.027500, 0.057500};
 const ImageFloatBox LINK_PLAY_VISIT_BOX{0.048500, 0.443000, 0.027500, 0.057500};
@@ -128,6 +134,29 @@ void continue_until_prompt(
     ConsoleHandle& console, 
     ProControllerContext& context, 
     const ImageFloatBox prompt_box
+);
+
+// Check if the daily shop item at the specified index is a recipe
+// Return single, double, triple, or not a recipe
+RecipeType item_is_recipe(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    int item_index
+);
+
+// Check if the daily shop item at the specified index is available for purchase
+bool item_is_available(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    int item_index
+);
+
+// Buy the daily shop item at the specified index
+// TODO: Handle the case where you cannot afford the item. This is usually gated elsewhere to ensure this case is never reached
+void buy_item(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    int item_index
 );
 
 // Get the stamp in the specified area

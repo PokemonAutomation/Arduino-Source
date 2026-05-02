@@ -58,7 +58,7 @@ private:
     public:
         DeviceSideConnection(MockDevice& parent) : m_parent(parent) {}
         virtual size_t unreliable_send(const void* data, size_t bytes) noexcept override;
-        virtual size_t unreliable_recv(void* data, size_t max_bytes) override;
+        virtual size_t unreliable_recv(void* data, size_t max_bytes, const WallDuration& timeout) noexcept override;
     private:
         MockDevice& m_parent;
     };

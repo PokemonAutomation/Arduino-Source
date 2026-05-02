@@ -123,7 +123,7 @@ void Keyboard::run_controller_input(const ControllerInputState& state){
 //        timestamp = current_time();
         cancel_all_commands();
     }else{
-        replace_on_next_command(nullptr);
+        replace_on_next_command();
 //        timestamp = current_time();
         issue_keys(
             nullptr,

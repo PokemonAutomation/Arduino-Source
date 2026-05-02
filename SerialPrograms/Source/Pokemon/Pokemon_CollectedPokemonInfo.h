@@ -32,8 +32,9 @@ struct CollectedPokemonInfo{
     std::string ball_slug = "";
     StatsHuntGenderFilter gender = StatsHuntGenderFilter::Genderless;
     uint32_t ot_id = 0; // original trainer ID
-    PokemonType primaryType = PokemonType::NONE;
-    PokemonType secondaryType = PokemonType::NONE;
+    PokemonType primary_type = PokemonType::NONE;
+    PokemonType secondary_type = PokemonType::NONE;
+    PokemonTeraType tera_type = PokemonTeraType::NONE;
 };
 
 bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs);

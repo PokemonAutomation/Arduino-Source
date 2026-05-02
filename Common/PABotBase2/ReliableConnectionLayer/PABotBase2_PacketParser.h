@@ -60,7 +60,10 @@ public:
     //  This will never read more than is necessary unless there
     //  is an error.
     //
-    const PacketHeader* pull_bytes(UnreliableStreamConnectionPolling& connection);
+    const PacketHeader* pull_bytes(
+        UnreliableStreamConnectionPolling& connection,
+        WallDuration timeout
+    );
 
     //
     //  Parse packets by consuming data from an existing buffer.

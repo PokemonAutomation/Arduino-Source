@@ -55,7 +55,7 @@ void PABotBase2_Keyboard::update_status(Cancellable& cancellable){
     PABotBase2::MessageHeader request;
     request.message_bytes = sizeof(request);
     request.opcode = PABB2_MESSAGE_OPCODE_REQUEST_STATUS;
-    uint8_t id = m_connection.device().send_request(request);
+    uint8_t id = m_connection.device().send_request_with_response(request);
     PABotBase2::Message_u32 response;
     m_connection.device().wait_for_request_response<PABotBase2::Message_u32, PABB2_MESSAGE_OPCODE_RET_U32>(
         response, id
@@ -96,13 +96,13 @@ void PABotBase2_Keyboard::cancel_all_commands(){
     m_connection.device().command_queue().send_cancel();
     m_scheduler.clear_on_next();
 }
-void PABotBase2_Keyboard::replace_on_next_command(Cancellable* cancellable){
+void PABotBase2_Keyboard::replace_on_next_command(){
     std::lock_guard<Mutex> lg(m_state_lock);
     if (!is_ready()){
         throw InvalidConnectionStateException(error_string());
     }
     m_logger.log("replace_on_next_command()", COLOR_DARKGREEN);
-    m_connection.device().command_queue().send_replace_on_next(cancellable);
+    m_connection.device().command_queue().send_replace_on_next();
     m_scheduler.clear_on_next();
 }
 

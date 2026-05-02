@@ -59,7 +59,7 @@ void ProController_SysbotBase3::cancel_all_commands(){
     m_cv.notify_all();
     m_logger.log("cancel_all_commands(): Command Queue Size = " + std::to_string(queued), COLOR_DARKGREEN);
 }
-void ProController_SysbotBase3::replace_on_next_command(Cancellable* cancellable){
+void ProController_SysbotBase3::replace_on_next_command(){
     std::lock_guard<Mutex> lg(m_state_lock);
     if (m_stopping){
         throw InvalidConnectionStateException("");

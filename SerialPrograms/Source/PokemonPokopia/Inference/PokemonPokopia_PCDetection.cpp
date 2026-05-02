@@ -8,8 +8,12 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/OCR/OCR_NumberReader.h"
+#include "CommonTools/OCR/OCR_RawOCR.h"
 #include "PokemonPokopia_PCDetection.h"
 
 namespace PokemonAutomation{
@@ -37,8 +41,6 @@ public:
         return matcher;
     }
 };
-
-
 
 InfoIconDetector::InfoIconDetector(
     Color color,
@@ -194,6 +196,219 @@ bool StampDetector::detect(const ImageViewRGB32& screen){
         m_matcher.m_max_rmsd,
         [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
             m_last_detected = translate_to_parent(screen, m_box, object);
+            return true;
+        }
+    );
+
+    if (m_overlay){
+        if (found){
+            m_last_detected_box.emplace(*m_overlay, m_last_detected, COLOR_GREEN);
+        }else{
+            m_last_detected_box.reset();
+        }
+    }
+
+    return found;
+}
+
+class RecipeIconMatcher : public ImageMatch::WaterfillTemplateMatcher{
+public:
+    // Match the yellow negative space for the recipe icon
+    RecipeIconMatcher(const char* path)
+        : WaterfillTemplateMatcher(
+            path,
+            Color(210, 180, 0), Color(255, 250, 160), 2100
+        )
+    {
+        m_aspect_ratio_lower = 0.9;
+        m_aspect_ratio_upper = 1.1;
+        m_area_ratio_lower = 0.85;
+        m_area_ratio_upper = 1.1;
+    }
+
+    static const RecipeIconMatcher& single_matcher(){
+        static RecipeIconMatcher matcher("PokemonPokopia/Recipe.png");
+        return matcher;
+    }
+    static const RecipeIconMatcher& double_matcher(){
+        static RecipeIconMatcher matcher("PokemonPokopia/DoubleRecipe.png");
+        return matcher;
+    }
+    static const RecipeIconMatcher& triple_matcher(){
+        static RecipeIconMatcher matcher("PokemonPokopia/TripleRecipe.png");
+        return matcher;
+    }
+    static const RecipeIconMatcher& quad_matcher(){
+        static RecipeIconMatcher matcher("PokemonPokopia/QuadRecipe.png");
+        return matcher;
+    }
+};
+
+RecipeIconDetector::RecipeIconDetector(
+    Color color,
+    VideoOverlay* overlay,
+    const ImageFloatBox& box
+)
+    : m_color(color)
+    , m_overlay(overlay)
+    , m_arrow_box(box)
+{}
+void RecipeIconDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_arrow_box);
+}
+bool RecipeIconDetector::detect(const ImageViewRGB32& screen){
+    double screen_rel_size = (screen.height() / 1080.0);
+    double screen_rel_size_2 = screen_rel_size * screen_rel_size;
+
+    double min_area_1080p = 500;
+    double rmsd_threshold = 95;
+    size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
+
+    const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
+        {0xffd2b400, 0xfffffaa0} // RGB(210, 180, 0), RGB(255, 250, 160)
+    };
+
+    const std::vector<std::pair<const RecipeIconMatcher&, RecipeType>> matchers = {
+        {RecipeIconMatcher::single_matcher(), RecipeType::SINGLE},
+        {RecipeIconMatcher::double_matcher(), RecipeType::DOUBLE},
+        {RecipeIconMatcher::triple_matcher(), RecipeType::TRIPLE},
+        {RecipeIconMatcher::quad_matcher(), RecipeType::QUAD},
+    };
+
+    bool found = false;
+    m_recipe_type = RecipeType::NOT_RECIPE;
+
+    for (const auto& matcher_info : matchers) {
+        found = match_template_by_waterfill(
+            screen.size(),
+            extract_box_reference(screen, m_arrow_box),
+            matcher_info.first,
+            FILTERS,
+            {min_area, SIZE_MAX},
+            rmsd_threshold,
+            [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
+                m_last_detected = translate_to_parent(screen, m_arrow_box, object);
+                return true;
+            }
+        );
+        if (found) {
+            m_recipe_type = matcher_info.second;
+            break;
+        }
+    }
+
+    if (m_overlay){
+        if (found){
+            m_last_detected_box.emplace(*m_overlay, m_last_detected, COLOR_GREEN);
+        }else{
+            m_last_detected_box.reset();
+        }
+    }
+
+    return found;
+}
+
+CoinCountDetector::CoinCountDetector(Logger& logger)
+: m_logger(logger)
+// location in the shop menu
+, m_coin_count_box{0.900000, 0.053000, 0.075000, 0.035000}
+{}
+
+void CoinCountDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(COLOR_WHITE, m_coin_count_box);
+}
+
+bool CoinCountDetector::detect(const ImageViewRGB32& screen){
+    const ImageViewRGB32 coin_image_crop = extract_box_reference(screen, m_coin_count_box);
+
+    const bool text_inside_range = true;
+    const bool prioritize_numeric_only_results = true;
+    const size_t width_max = SIZE_MAX;
+    // The coin crop includes the "," in coin numbers like "1,000".
+    // We have to use `min_digit_area` to filter out "," when doing OCR.
+    // The min digit area computation is that any dot with size smaller than coin_image_crop.height()/5 is filtered out when OCR.
+    const size_t min_digit_area = coin_image_crop.height()*coin_image_crop.height() / 25;
+    m_coin_count = 0;
+    const std::vector<std::pair<uint32_t, uint32_t>> filters = {
+        {0xff808080, 0xffffffff},
+        {0xffa0a0a0, 0xffffffff},
+        {0xffc0c0c0, 0xffffffff},
+        {0xffe0e0e0, 0xffffffff},
+        {0xfff0f0f0, 0xffffffff},
+    };
+    int number = OCR::read_number_waterfill_multifilter(
+        m_logger,
+        GlobalThreadPools::computation_realtime(),
+        coin_image_crop, filters,
+        text_inside_range, prioritize_numeric_only_results, width_max, min_digit_area
+    );
+    if (number <= 0 || number > 999999){
+        return false;
+    }
+    m_coin_count = static_cast<uint32_t>(number);
+    return true;
+}
+
+CoinCountWatcher::CoinCountWatcher(Logger& logger)
+: CoinCountDetector(logger), VisualInferenceCallback("CoinCountWatcher")
+{}
+
+void CoinCountWatcher::make_overlays(VideoOverlaySet& items) const{
+    CoinCountDetector::make_overlays(items);
+}
+
+bool CoinCountWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+    return detect(frame);
+}
+
+class CoinIconMatcher : public ImageMatch::WaterfillTemplateMatcher{
+public:
+    CoinIconMatcher()
+        : WaterfillTemplateMatcher(
+            "PokemonPokopia/Coin.png",
+            Color(210, 150, 30), Color(255, 240, 140), 900
+        )
+    {
+        m_aspect_ratio_lower = 0.9;
+        m_aspect_ratio_upper = 1.1;
+        m_area_ratio_lower = 0.85;
+        m_area_ratio_upper = 1.1;
+    }
+};
+
+CoinIconDetector::CoinIconDetector(
+    Color color,
+    VideoOverlay* overlay,
+    const ImageFloatBox& box
+)
+    : m_color(color)
+    , m_overlay(overlay)
+    , m_arrow_box(box)
+{}
+void CoinIconDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_arrow_box);
+}
+bool CoinIconDetector::detect(const ImageViewRGB32& screen){
+    double screen_rel_size = (screen.height() / 1080.0);
+    double screen_rel_size_2 = screen_rel_size * screen_rel_size;
+
+    double min_area_1080p = 200;
+    double rmsd_threshold = 100;
+    size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
+
+    const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
+        {0xffd2961e, 0xfffff08c} // RGB(210, 150, 30), RGB(255, 240, 140)
+    };
+
+    bool found = match_template_by_waterfill(
+        screen.size(),
+        extract_box_reference(screen, m_arrow_box),
+        CoinIconMatcher(),
+        FILTERS,
+        {min_area, SIZE_MAX},
+        rmsd_threshold,
+        [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
+            m_last_detected = translate_to_parent(screen, m_arrow_box, object);
             return true;
         }
     );

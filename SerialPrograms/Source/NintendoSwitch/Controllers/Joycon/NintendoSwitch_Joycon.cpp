@@ -10,6 +10,7 @@
 #include "ControllerInput/ControllerInput.h"
 #include "ControllerInput/Keyboard/KeyboardInput_State.h"
 #include "Controllers/ControllerTypes.h"
+#include "Controllers/RumbleListener.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
 #include "NintendoSwitch_JoyconState.h"
@@ -37,8 +38,18 @@ const char RightJoycon::NAME[] = "Nintendo Switch: Right Joycon";
 
 
 struct JoyconController::Data{
+    ListenerSet<RumbleListener> m_rumble_listeners;
     std::map<KeyboardKey, JoyconDeltas> m_keyboard_mapping;
 };
+
+
+
+void JoyconController::add_listener(RumbleListener& listener){
+    m_data->m_rumble_listeners.add(listener);
+}
+void JoyconController::remove_listener(RumbleListener& listener){
+    m_data->m_rumble_listeners.remove(listener);
+}
 
 
 
@@ -90,13 +101,18 @@ void JoyconController::run_controller_input(const ControllerInputState& state){
         timestamp = current_time();
         cancel_all_commands();
     }else{
-        replace_on_next_command(nullptr);
+        replace_on_next_command();
 
         timestamp = current_time();
         controller_state.execute(nullptr, false, *this, 2000ms);
     }
 
     on_command_input(timestamp, controller_state);
+}
+
+
+void JoyconController::on_rumble(double magnitude){
+    m_data->m_rumble_listeners.run_method(&RumbleListener::on_rumble, magnitude);
 }
 
 

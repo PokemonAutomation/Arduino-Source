@@ -13,9 +13,9 @@
 #include "PABotBase2_Config.h"
 #else
 
-//  Must be power-of-two. (max 64)
+//  Must be power-of-two. (max 128)
 #ifndef PABB2_StreamCoalescer_SLOTS
-#define PABB2_StreamCoalescer_SLOTS         64
+#define PABB2_StreamCoalescer_SLOTS         128
 #endif
 
 //  Must be power-of-two, fits into uint16_t. (max 32768)
@@ -38,6 +38,7 @@ class StreamCoalescer{
     static_assert((SLOTS & SLOTS_MASK) == 0, "Must be power-of-two.");
     static_assert((BUFFER_SIZE & BUFFER_MASK) == 0, "Must be power-of-two.");
 
+
 public:
     StreamCoalescer(){
         reset();
@@ -59,7 +60,6 @@ public:
     //  Read data from the stream.
     //
     //  Returns the # of bytes actually read.
-    //  Returns (size_t)-1 if the stream has been reset.
     //  Returning less than "max_bytes" indicates the stream is out of usable data.
     //
     size_t read(void* data, size_t max_bytes);
@@ -72,16 +72,29 @@ private:
     );
     void read_buffer(
         void* data,
-        uint16_t stream_offset, uint8_t bytes
+        uint16_t stream_offset, uint16_t bytes
     );
-    void pop_leading_finished();
+    void advance_slot_head();
 
 
 public:
+    //
+    //  "tail" furthest into the future and marks where the next write should be.
+    //
+    //  "head" is the oldest hole in the coalescer. It may be temporarily be not
+    //  a hole, it just means it hasn't been advanced forward yet.
+    //
+    //  "free" is the oldest offset in the coalescer. Reads start here. It is
+    //  named "free" because everything below this is empty and can be reused
+    //  for new data.
+    //
+    //  Everything in the range [free, head) is valid data that hasn't been
+    //  read yet.
+    //
     uint8_t m_slot_head;
     uint8_t m_slot_tail;
 
-//    uint8_t m_seqnum;
+    uint16_t m_stream_free;
     uint16_t m_stream_head;
     uint16_t m_stream_tail;
 
@@ -90,7 +103,8 @@ public:
     //  255     =   Received non-stream packet.
     uint8_t m_lengths[SLOTS];
 
-    uint16_t m_offsets[SLOTS];
+    //  0xffff = non-stream packet
+    uint16_t m_end_offsets[SLOTS];
 
     uint8_t m_buffer[BUFFER_SIZE];
 };

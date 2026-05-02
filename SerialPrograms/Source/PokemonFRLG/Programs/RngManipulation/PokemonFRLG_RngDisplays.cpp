@@ -4,6 +4,7 @@
  *
  */
 
+#include <cmath>
 #include <vector>
 #include <iostream>
 #include <sstream>
@@ -14,6 +15,28 @@ namespace NintendoSwitch{
 namespace PokemonFRLG{
 
 using namespace Pokemon;
+
+SidHelperDisplay::SidHelperDisplay()
+    : GroupOption("TID/SID Results", LockMode::READ_ONLY)
+    , tid(false, "<b>Trainer ID:</b>", LockMode::READ_ONLY, "-", "")
+    , sids("<b>SID Possibilities:</b>", LockMode::READ_ONLY, "-", "")
+{
+    PA_ADD_STATIC(tid);
+    PA_ADD_STATIC(sids);
+}
+std::string SidHelperDisplay::get_sids_string(const std::vector<std::pair<std::string, std::string>>& sid_messages){
+    std::string sid_str = "";
+    for (auto& str_pair : sid_messages){
+        sid_str += str_pair.first + ": ";
+        sid_str += str_pair.second + "\n";
+    }
+    return sid_str;
+}
+void SidHelperDisplay::set(uint16_t trainerId, const std::vector<std::pair<std::string, std::string>>& sid_messages){
+    tid.set(std::to_string(trainerId));
+    sids.set(get_sids_string(sid_messages));
+}
+
 
 RngFilterDisplay::RngFilterDisplay()
     : GroupOption("Observed Stats", LockMode::READ_ONLY)
@@ -133,14 +156,20 @@ void RngFilterDisplay::reset(){
     nature.set("-");
 }
 
-PossibleHitsDisplay::PossibleHitsDisplay()
-    : GroupOption("Possible Hits", LockMode::READ_ONLY)
+RngCalibrationDisplay::RngCalibrationDisplay()
+    : GroupOption("RNG Calibration", LockMode::READ_ONLY)
+    , seed_calibration("<b>Seed Calibration (ms):</b>", LockMode::LOCK_WHILE_RUNNING, 0)
+    , csf_calibration("<b>Continue Screen Frames Calibration:</b>", LockMode::LOCK_WHILE_RUNNING, 0.0)
+    , advances_calibration("<b>In-Game Advances Calibration:</b>", LockMode::LOCK_WHILE_RUNNING, 0.0)
     , hits(false, "<b>Seeds/Advances:</b>", LockMode::READ_ONLY, "-", "")
 {
+    PA_ADD_STATIC(seed_calibration);
+    PA_ADD_STATIC(csf_calibration);
+    PA_ADD_STATIC(advances_calibration);
     PA_ADD_STATIC(hits);
 }
 
-std::vector<AdvRngState> PossibleHitsDisplay::get_rng_states_from_map(const std::map<AdvRngState,AdvPokemonResult>& hits_map){
+std::vector<AdvRngState> RngCalibrationDisplay::get_rng_states_from_map(const std::map<AdvRngState,AdvPokemonResult>& hits_map){
     std::vector<AdvRngState> rng_states;
     for(std::map<AdvRngState,AdvPokemonResult>::const_iterator it = hits_map.begin(); it != hits_map.end(); ++it) {
         rng_states.emplace_back(it->first);
@@ -148,7 +177,7 @@ std::vector<AdvRngState> PossibleHitsDisplay::get_rng_states_from_map(const std:
     return rng_states;
 }
 
-std::string PossibleHitsDisplay::get_hits_string(const std::vector<AdvRngState>& rng_states){
+std::string RngCalibrationDisplay::get_hits_string(const std::vector<AdvRngState>& rng_states){
     std::string hits_string;
     for (size_t i=0; i<rng_states.size(); i++){
         if (i > 0){
@@ -167,19 +196,35 @@ std::string PossibleHitsDisplay::get_hits_string(const std::vector<AdvRngState>&
     }
     return hits_string;
 }
-std::string PossibleHitsDisplay::get_hits_string(const std::map<AdvRngState, AdvPokemonResult>& hits_map){
+std::string RngCalibrationDisplay::get_hits_string(const std::map<AdvRngState, AdvPokemonResult>& hits_map){
     return get_hits_string(get_rng_states_from_map(hits_map));
 }
 
-void PossibleHitsDisplay::set(const std::vector<AdvRngState>& rng_states){
+void RngCalibrationDisplay::set(
+    double s_calibration, 
+    double c_calibration, 
+    double a_calibration, 
+    std::vector<AdvRngState>& rng_states
+){
+    seed_calibration.set(int64_t(std::round(s_calibration)));
+    csf_calibration.set(c_calibration);
+    advances_calibration.set(a_calibration);
     hits.set(get_hits_string(rng_states));
 }
-void PossibleHitsDisplay::set(const std::map<AdvRngState, AdvPokemonResult>& hits_map){
+void RngCalibrationDisplay::set(    
+    double s_calibration, 
+    double c_calibration, 
+    double a_calibration, 
+    const std::map<AdvRngState, AdvPokemonResult>& hits_map
+){
     std::vector<AdvRngState> rng_states = get_rng_states_from_map(hits_map);
-    set(rng_states);
+    set(s_calibration, c_calibration, a_calibration, rng_states);
 }
 
-void PossibleHitsDisplay::reset(){
+void RngCalibrationDisplay::reset(){
+    // seed_calibration.set(0.0);
+    // csf_calibration.set(0.0);
+    // advances_calibration.set(0.0);
     hits.set("-");
 }
 

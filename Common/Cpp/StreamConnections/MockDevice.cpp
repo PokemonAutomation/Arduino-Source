@@ -23,8 +23,7 @@ using std::endl;
 
 namespace PokemonAutomation{
 
-//  REMOVE
-extern std::mutex print_lock;
+//extern std::mutex print_lock;
 
 
 
@@ -91,7 +90,7 @@ size_t MockDevice::DeviceSideConnection::unreliable_send(const void* data, size_
     parent.m_host_cv.notify_all();
     return bytes;
 }
-size_t MockDevice::DeviceSideConnection::unreliable_recv(void* data, size_t max_bytes){
+size_t MockDevice::DeviceSideConnection::unreliable_recv(void* data, size_t max_bytes, const WallDuration& timeout) noexcept{
     MockDevice& parent = m_parent;
     WriteSpinLock lg(parent.m_host_to_device_lock);
     size_t bytes = std::min(max_bytes, parent.m_host_to_device_line.size());
@@ -100,7 +99,6 @@ size_t MockDevice::DeviceSideConnection::unreliable_recv(void* data, size_t max_
     std::copy(iter0, iter1, (uint8_t*)data);
     parent.m_host_to_device_line.erase(iter0, iter1);
 
-    //  REMOVE
 //    {
 //        std::lock_guard<Mutex> lg1(PokemonAutomation::print_lock);
 //        cout << "device_read_serial(): attempt = " << max_bytes << ", actual = " << bytes << endl;
@@ -231,7 +229,8 @@ size_t MockDevice::verify_stream_data(){
 void MockDevice::device_thread(){
     std::unique_lock<Mutex> lg(m_device_lock);
     while (!m_stopping.load(std::memory_order_relaxed)){
-        m_connection.run_events();
+        m_connection.run_send_events(Milliseconds(0));
+        m_connection.run_recv_events(Milliseconds(0));
         m_device_cv.wait_for(lg, Milliseconds(10));
     }
 }

@@ -29,10 +29,14 @@ public:
         Logger& logger,
         PABotBase2::Connection& connection,
         ControllerClass controller_class,
-        ControllerType controller_type
+        ControllerType controller_type,
+        std::function<void(double magnitude)> on_rumble
     )
         : JoyconType(logger, controller_class)
-        , PABotBase2_OemController(logger, connection, controller_type)
+        , PABotBase2_OemController(
+            logger, connection, controller_type,
+            std::move(on_rumble)
+        )
         , m_controller_type(controller_type)
     {}
     ~PABotBase2_JoyCon(){
@@ -72,8 +76,8 @@ public:
     virtual void cancel_all_commands() override{
         return PABotBase2_Controller::cancel_all_commands();
     }
-    virtual void replace_on_next_command(Cancellable* cancellable) override{
-        PABotBase2_Controller::replace_on_next_command(cancellable);
+    virtual void replace_on_next_command() override{
+        PABotBase2_Controller::replace_on_next_command();
     }
 
     virtual void wait_for_all(Cancellable* cancellable) override{
@@ -327,7 +331,8 @@ public:
         : PABotBase2_JoyCon<LeftJoycon>(
             logger, connection,
             ControllerClass::NintendoSwitch_LeftJoycon,
-            controller_type
+            controller_type,
+            [this](double magnitude){ on_rumble(magnitude); }
         )
     {
         m_valid_buttons = VALID_LEFT_JOYCON_BUTTONS;
@@ -346,7 +351,8 @@ public:
         : PABotBase2_JoyCon<RightJoycon>(
             logger, connection,
             ControllerClass::NintendoSwitch_RightJoycon,
-            controller_type
+            controller_type,
+            [this](double magnitude){ on_rumble(magnitude); }
         )
     {
         m_valid_buttons = VALID_RIGHT_JOYCON_BUTTONS;

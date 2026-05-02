@@ -419,7 +419,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 #endif
 
-#if 0
+#if 1
     stress_test(logger, scope);
 #endif
 

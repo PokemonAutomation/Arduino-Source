@@ -36,13 +36,13 @@ void PABotBase2_Controller::cancel_all_commands(){
     m_connection.device().command_queue().send_cancel();
     m_scheduler.clear_on_next();
 }
-void PABotBase2_Controller::replace_on_next_command(Cancellable* cancellable){
+void PABotBase2_Controller::replace_on_next_command(){
     std::lock_guard<Mutex> lg(m_state_lock);
     if (!is_ready()){
         throw InvalidConnectionStateException(error_string());
     }
     m_logger.log("replace_on_next_command()", COLOR_DARKGREEN);
-    m_connection.device().command_queue().send_replace_on_next(cancellable);
+    m_connection.device().command_queue().send_replace_on_next();
     m_scheduler.clear_on_next();
 }
 

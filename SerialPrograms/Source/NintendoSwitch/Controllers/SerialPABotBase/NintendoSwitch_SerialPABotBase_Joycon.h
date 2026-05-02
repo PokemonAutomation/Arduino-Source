@@ -67,7 +67,7 @@ public:
     virtual void cancel_all_commands() override{
         SerialPABotBase_Controller::cancel_all_commands();
     }
-    virtual void replace_on_next_command(Cancellable* cancellable) override{
+    virtual void replace_on_next_command() override{
         SerialPABotBase_Controller::replace_on_next_command();
     }
 

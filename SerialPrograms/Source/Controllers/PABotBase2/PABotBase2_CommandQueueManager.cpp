@@ -64,32 +64,25 @@ void CommandQueueManager::send_cancel() noexcept{
     bool success;
     {
         std::unique_lock<Mutex> lg(m_lock);
-        m_pending_cancel = true;
-        success = try_push_pending_cancel();
+        m_pending_special = PABB2_MESSAGE_OPCODE_CQ_CANCEL;
+        success = try_push_pending_specials();
     }
     if (success){
         m_cv.notify_all();
     }
 }
-void CommandQueueManager::send_replace_on_next(Cancellable* cancellable){
-    MessageHeader message;
-    message.message_bytes = sizeof(MessageHeader);
-    message.opcode = PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT;
-    message.id = 0;
+void CommandQueueManager::send_replace_on_next() noexcept{
+    bool success;
     {
         std::unique_lock<Mutex> lg(m_lock);
-        try_push_pending_cancel();
-        while (true){
-            throw_if_cancelled(cancellable);
-            if (m_connection.reliable_try_send_all_or_nothing(&message, message.message_bytes)){
-                break;
-            }
-            cv_wait(cancellable, lg);
+        if (m_pending_special != PABB2_MESSAGE_OPCODE_CQ_CANCEL){
+            m_pending_special = PABB2_MESSAGE_OPCODE_CQ_REPLACE_ON_NEXT;
         }
-        m_pending_commands.clear();
+        success = try_push_pending_specials();
     }
-    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &message);
-    m_cv.notify_all();
+    if (success){
+        m_cv.notify_all();
+    }
 }
 
 
@@ -97,7 +90,7 @@ uint8_t CommandQueueManager::send_command(Cancellable* cancellable, MessageHeade
     {
         bool need_to_wait = false;
         std::unique_lock<Mutex> lg(m_lock);
-        try_push_pending_cancel();
+        try_push_pending_specials();
         while (true){
             if (need_to_wait){
                 cv_wait(cancellable, lg);
@@ -109,6 +102,7 @@ uint8_t CommandQueueManager::send_command(Cancellable* cancellable, MessageHeade
                 continue;
             }
 
+//            cout << "Send: " << (unsigned)m_command_seqnum << ", queue size = " << m_pending_commands.size() << endl;
             command.id = m_command_seqnum;
 
             //  Wait until the slot is available.
@@ -122,13 +116,12 @@ uint8_t CommandQueueManager::send_command(Cancellable* cancellable, MessageHeade
                 std::make_shared<CommandHandle>()
             ).first;
 
-            bool sent;
-            try{
-                sent = m_connection.reliable_try_send_all_or_nothing(&command, command.message_bytes);
-            }catch (...){
-                m_pending_commands.erase(iter);
-                throw;
-            }
+            m_lock.unlock();
+            bool sent = m_connection.reliable_send_all_or_nothing(
+                &command, command.message_bytes,
+                WallDuration::max()
+            );
+            m_lock.lock();
 
             if (sent){
                 m_command_seqnum++;
@@ -137,13 +130,16 @@ uint8_t CommandQueueManager::send_command(Cancellable* cancellable, MessageHeade
             m_pending_commands.erase(iter);
         }
     }
+//    cout << "Post send 0: " << (unsigned)command.id << endl;
     m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &command);
+//    cout << "Post send 1: " << (unsigned)command.id << endl;
     m_cv.notify_all();
     return command.id;
 }
 void CommandQueueManager::report_command_finished(const MessageHeader& finished_message){
     {
         std::lock_guard<Mutex> lg(m_lock);
+//        cout << "Done: " << (unsigned)finished_message.id << endl;
         auto iter = m_pending_commands.find(finished_message.id);
         if (iter == m_pending_commands.end()){
             m_logger.log("[MLC]: Received command finish for unknown ID: " + std::to_string(finished_message.id));
@@ -156,35 +152,48 @@ void CommandQueueManager::report_command_finished(const MessageHeader& finished_
             sizeof(uint32_t)
         );
         m_pending_commands.erase(iter);
-        try_push_pending_cancel();
+        try_push_pending_specials();
     }
     m_cv.notify_all();
 }
 
 
-bool CommandQueueManager::try_push_pending_cancel() noexcept{
+bool CommandQueueManager::try_push_pending_specials() noexcept{
     //  Must call under lock.
-    if (!m_pending_cancel){
+    if (m_pending_special == PABB2_MESSAGE_OPCODE_INVALID){
         return false;
     }
 
     MessageHeader message;
     message.message_bytes = sizeof(MessageHeader);
-    message.opcode = PABB2_MESSAGE_OPCODE_CQ_CANCEL;
+    message.opcode = m_pending_special;
     message.id = 0;
+
+    m_lock.unlock();
+    bool sent = m_connection.reliable_send_all_or_nothing(
+        &message, message.message_bytes,
+        WallDuration::zero()
+    );
+    m_lock.lock();
+
+    if (!sent){
+        return false;
+    }
+
+    m_pending_special = PABB2_MESSAGE_OPCODE_INVALID;
+    m_pending_commands.clear();
+
     try{
-        if (m_connection.reliable_try_send_all_or_nothing(&message, message.message_bytes)){
-            m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &message);
-            m_pending_cancel = false;
-            m_pending_commands.clear();
-            return true;
-        }
+        m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &message);
     }catch (...){}
-    return false;
+    return true;
 }
 
 
-void CommandQueueManager::on_cancellable_cancel(){
+void CommandQueueManager::on_cancellable_cancel(
+    Cancellable& cancellable,
+    std::exception_ptr reason
+){
     {
         std::unique_lock<Mutex> lg(m_lock);
     }

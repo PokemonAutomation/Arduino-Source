@@ -29,10 +29,10 @@ namespace PABotBase2{
 void StreamCoalescer::reset(){
     m_slot_head = 0;
     m_slot_tail = 0;
+    m_stream_free = 0;
     m_stream_head = 0;
     m_stream_tail = 0;
     memset(m_lengths, 0, sizeof(m_lengths));
-
 }
 
 
@@ -61,7 +61,7 @@ void StreamCoalescer::write_buffer(
 }
 void StreamCoalescer::read_buffer(
     void* data,
-    uint16_t stream_offset, uint8_t bytes
+    uint16_t stream_offset, uint16_t bytes
 ){
     if (bytes == 0){
         return;
@@ -77,28 +77,32 @@ void StreamCoalescer::read_buffer(
         memcpy(data, m_buffer + stream_offset_s, bytes);
     }else{
         //  Wrap around
-        uint8_t block = (uint8_t)(BUFFER_SIZE - stream_offset_s);
+        uint16_t block = BUFFER_SIZE - stream_offset_s;
         memcpy(data, m_buffer + stream_offset_s, block);
         memcpy((uint8_t*)data + block, m_buffer, bytes - block);
     }
 }
-void StreamCoalescer::pop_leading_finished(){
-    uint8_t slot_head = m_slot_head;
-    uint8_t slot_tail = m_slot_tail;
-
+void StreamCoalescer::advance_slot_head(){
 //    printf("pabb2_StreamCoalescer_pop_leading_finished()\n");
 
-    while (slot_head != slot_tail){
-        uint8_t* slot = &m_lengths[slot_head & SLOTS_MASK];
+    while (m_slot_head != m_slot_tail){
+        uint8_t index = m_slot_head & SLOTS_MASK;
 //        printf("slot[%d] = %d\n", slot_head, *slot);
-        if (*slot != 0xff){
+
+        //  Slot is a hole. Cannot continue.
+        if (m_lengths[index] == 0){
             break;
         }
-        *slot = 0;
-        slot_head++;
-    }
 
-    m_slot_head = slot_head;
+        //  Update offset only if it's a stream packet.
+        if (m_lengths[index] != 0xff){
+            m_stream_head = m_end_offsets[index];
+        }
+
+        m_lengths[index] = 0;
+
+        m_slot_head++;
+    }
 }
 
 
@@ -106,7 +110,7 @@ uint16_t StreamCoalescer::free_bytes() const{
     if (m_slot_head == m_slot_tail){
         return BUFFER_SIZE;
     }
-    return (m_stream_head - m_stream_tail) & BUFFER_MASK;
+    return (m_stream_free - m_stream_tail) & BUFFER_MASK;
 }
 
 void StreamCoalescer::push_packet(uint8_t seqnum){
@@ -131,10 +135,11 @@ void StreamCoalescer::push_packet(uint8_t seqnum){
     }
 
     //  Mark slot as done.
-    m_lengths[seqnum & SLOTS_MASK] = 0xff;
+    uint8_t index = seqnum & SLOTS_MASK;
+    m_lengths[index] = 0xff;
 
     //  Pop all finished slots at the head of the queue.
-    pop_leading_finished();
+    advance_slot_head();
 
 
 //    printf("exit ---------------------\n");
@@ -142,7 +147,7 @@ void StreamCoalescer::push_packet(uint8_t seqnum){
 }
 
 bool StreamCoalescer::push_stream(const PacketHeaderData* packet){
-    pop_leading_finished();
+    advance_slot_head();
 
     uint8_t stream_size = packet->packet_bytes - sizeof(PacketHeaderData) - sizeof(uint32_t);
 
@@ -160,7 +165,6 @@ bool StreamCoalescer::push_stream(const PacketHeaderData* packet){
     }
 
     uint8_t seqnum = packet->seqnum;
-    uint8_t slot_head = m_slot_head;
 
 //    {
 //        std::lock_guard<std::mutex> lg(print_lock);
@@ -169,7 +173,7 @@ bool StreamCoalescer::push_stream(const PacketHeaderData* packet){
 
     //  Either before (old retransmit) or too far in future.
     {
-        uint8_t diff = seqnum - slot_head;
+        uint8_t diff = seqnum - m_slot_head;
 //        printf("seqnum = %d, slot_head = %d\n", seqnum, slot_head);
         if (diff >= SLOTS){
 //            printf("seqnum = %d, slot_head = %d\n", seqnum, slot_head);
@@ -182,10 +186,8 @@ bool StreamCoalescer::push_stream(const PacketHeaderData* packet){
     uint16_t stream_offset_s = packet->stream_offset;
     uint16_t stream_offset_e = stream_offset_s + stream_size;
 
-//    size_t stream_head = m_stream_head;
-
     //  Too far ahead that it's beyond our window.
-    if ((uint16_t)(stream_offset_e - m_stream_head) > BUFFER_SIZE){
+    if ((uint16_t)(stream_offset_e - m_stream_free) > BUFFER_SIZE){
 //        printf("Device: To far in future.\n");
         return false;
     }
@@ -203,8 +205,8 @@ bool StreamCoalescer::push_stream(const PacketHeaderData* packet){
     }
 
     uint8_t index = seqnum & SLOTS_MASK;
-    m_offsets[index] = stream_offset_s;
     m_lengths[index] = stream_size;
+    m_end_offsets[index] = stream_offset_e;
 
 //    cout << "index = " << (int)index << ", stream_offset_s = " << stream_offset_s << ", bytes = " << (int)stream_size << endl;
     write_buffer(packet + 1, stream_offset_s, stream_size);
@@ -213,59 +215,17 @@ bool StreamCoalescer::push_stream(const PacketHeaderData* packet){
 }
 
 size_t StreamCoalescer::read(void* data, size_t max_bytes){
-    size_t read = 0;
+    advance_slot_head();
 
-    while (max_bytes > 0){
-        uint8_t slot_head = m_slot_head;
-        uint8_t slot_tail = m_slot_tail;
-
-        //  Queue is empty.
-        if (slot_head == slot_tail){
-            break;
-        }
-
-        uint8_t index = slot_head & SLOTS_MASK;
-        uint8_t length = m_lengths[index];
-
-        //  Front of the queue is a hole. We don't have the data yet.
-        if (length == 0){
-            break;
-        }
-
-        uint16_t valid_to = m_offsets[index] + length;
-
-
-        //  Calculate the read boundaries.
-        uint16_t stream_head;
-        {
-            stream_head = m_stream_head;
-
-            //  Try to consume the entire packet.
-            uint16_t try_read = valid_to - stream_head;
-            if (try_read > max_bytes){
-                //  Nope, we're capped by "max_bytes".
-                length = (uint8_t)max_bytes;
-            }else{
-                //  We're consuming the entire packet. Remove from queue.
-                length = (uint8_t)try_read;
-                m_lengths[index] = 0xff;
-                pop_leading_finished();
-            }
-
-            if (length == 0){
-                return read;
-            }
-
-//            cout << "m_stream_head = " << m_stream_head << " -> " << m_stream_head + length << endl;
-            m_stream_head += length;
-        }
-
-        read_buffer(data, stream_head, length);
-
-        read += length;
-        data = (char*)data + length;
-        max_bytes -= length;
+    uint16_t read = m_stream_head - m_stream_free;
+//    if (read > 0){
+//        printf("read = %d, head = %d, free = %d\n", read, m_stream_head, m_stream_free);
+//    }
+    if (read > max_bytes){
+        read = (uint16_t)max_bytes;
     }
+    read_buffer(data, m_stream_free, read);
+    m_stream_free += read;
 
     return read;
 }

@@ -21,6 +21,30 @@ enum class MoveCategory{
     UNKNOWN,
 };
 
+enum class PokemonTeraType{
+    BUG,
+    DARK,
+    DRAGON,
+    ELECTRIC,
+    FAIRY,
+    FIGHTING,
+    FIRE,
+    FLYING,
+    GHOST,
+    GRASS,
+    GROUND,
+    ICE,
+    NONE,
+    NORMAL,
+    POISON,
+    PSYCHIC,
+    ROCK,
+    STEEL,
+    STELLAR,
+    WATER
+};
+const EnumStringMap<PokemonTeraType>& POKEMON_TERA_TYPE_SLUGS();
+
 enum class PokemonType{
     NONE,
     NORMAL,

@@ -31,8 +31,8 @@ struct PABB_NintendoSwitch_ControllerColors{
 };
 
 
-#define PABB_MSG_REQ_NS1_OEM_CONTROLLER_READ_SPI        0x91
-#define PABB_MSG_REQ_NS1_OEM_CONTROLLER_WRITE_SPI       0x92
+#define PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_READ_SPI        0x91
+#define PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_WRITE_SPI       0x92
 struct PABB_PACK pabb2_Message_NS1_OemController_Spi : MessageHeader{
     uint32_t controller_type;
     uint32_t address;

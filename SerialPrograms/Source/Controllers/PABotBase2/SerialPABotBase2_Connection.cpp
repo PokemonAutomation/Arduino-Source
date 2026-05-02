@@ -218,7 +218,7 @@ bool SerialPABotBase2_Connection::open_device_connection(bool set_to_null_contro
         request.message_bytes = sizeof(request);
         request.opcode = PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE;
         request.data = SerialPABotBase::controller_type_to_id(ControllerType::None);
-        m_device->send_request(request);
+        m_device->send_request_with_no_response(request);
 
 #if 0
         m_botbase->issue_request_and_wait(

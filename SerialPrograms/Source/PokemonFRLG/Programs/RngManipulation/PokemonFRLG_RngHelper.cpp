@@ -104,11 +104,22 @@ RngHelper::RngHelper()
         LockMode::LOCK_WHILE_RUNNING,
         SeedButton::A
     )
+    , EXTRA_BUTTON(
+        "<b>Extra Button:</b><br>"
+        "Additional button presses that affect the seed.",
+        {
+            {BlackoutButton::None, "None", "None"},
+            {BlackoutButton::L, "L", "Blackout L"},
+            {BlackoutButton::R, "R", "Blackout R"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        BlackoutButton::None
+    )
     , SEED_DELAY(
         "<b>Seed Delay Time (ms):</b><br>"
         "The delay between starting the game and advancing past the title screen. Set this to match your target seed.",
         LockMode::LOCK_WHILE_RUNNING,
-        35000, 28000 // default, min
+        35000, 30400 // default, min
     )
     , SEED_CALIBRATION(
          "<b>Seed Calibration (ms):</b>"
@@ -146,12 +157,6 @@ RngHelper::RngHelper()
         LockMode::UNLOCK_WHILE_RUNNING,
         0 // default
     )
-    , USE_COPYRIGHT_TEXT(
-        "<b>Detect Copyright Text:</b>"
-        "<br>Start the seed timer only after detecting the copyright text. Can be helpful if your seeds are inconsistent.",
-        LockMode::LOCK_WHILE_RUNNING,
-        true // default
-    )
     , USE_TEACHY_TV(
         "<b>Use Teachy TV:</b>"
         "<br>Opens the Teachy TV to quickly advance the RNG at 313x speed.<br>"
@@ -187,13 +192,13 @@ RngHelper::RngHelper()
     PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(NUM_RESETS);
     PA_ADD_OPTION(SEED_BUTTON);
+    PA_ADD_OPTION(EXTRA_BUTTON);
     PA_ADD_OPTION(SEED_DELAY);
     PA_ADD_OPTION(SEED_CALIBRATION);
     PA_ADD_OPTION(CONTINUE_SCREEN_FRAMES);
     PA_ADD_OPTION(CONTINUE_SCREEN_CALIBRATION);
     PA_ADD_OPTION(INGAME_ADVANCES);
     PA_ADD_OPTION(INGAME_CALIBRATION);
-    PA_ADD_OPTION(USE_COPYRIGHT_TEXT);
     PA_ADD_OPTION(USE_TEACHY_TV);
     PA_ADD_OPTION(PROFILE);
     PA_ADD_OPTION(TAKE_VIDEO);
@@ -215,7 +220,7 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     double FRAMERATE = 59.999977; // FPS
     double FRAME_DURATION = 1000 / FRAMERATE;
 
-    int64_t FIXED_SEED_OFFSET = USE_COPYRIGHT_TEXT ? -2140 : -845; // milliseconds. approximate
+    const int64_t FIXED_SEED_OFFSET = -845; // milliseconds. approximate
 
     while (!shiny_found){
         // prepare timings
@@ -252,19 +257,18 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         env.log("Continue Screen delay: " + std::to_string(CONTINUE_SCREEN_DELAY) + "ms");
         env.log("In-game delay: " + std::to_string(INGAME_DELAY) + "ms");
         env.log("Teachy TV delay: " + std::to_string(TEACHY_DELAY) + "ms");
-        env.log("Total time: " + std::to_string(SEED_DELAY + SEED_CALIBRATION + FIXED_SEED_OFFSET + CONTINUE_SCREEN_DELAY + INGAME_DELAY + TEACHY_DELAY) + "ms");
+        env.log("Total time: " + std::to_string(TOTAL_SEED_DELAY + CONTINUE_SCREEN_DELAY + INGAME_DELAY + TEACHY_DELAY) + "ms");
 
         check_timings(env.console, TARGET, TOTAL_SEED_DELAY, CONTINUE_SCREEN_DELAY, INGAME_DELAY, SAFARI_ZONE);
 
         
         // handle the blind part
-        if (USE_COPYRIGHT_TEXT){
-            reset_and_detect_copyright_text(env.console, context, PROFILE);
-            env.log("Starting blind button presses...");
-            perform_blind_sequence(context, TARGET, SEED_BUTTON, TOTAL_SEED_DELAY, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE);
-        }else{
-            reset_and_perform_blind_sequence(env.console, context, TARGET, SEED_BUTTON, TOTAL_SEED_DELAY, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE, PROFILE);
-        }
+        reset_and_perform_blind_sequence(
+            env.console, context, TARGET, 
+            SEED_BUTTON, EXTRA_BUTTON, TOTAL_SEED_DELAY, 
+            CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, 
+            SAFARI_ZONE, PROFILE
+        );
         env.log("Blind button presses complete.");
         stats.resets++;
 

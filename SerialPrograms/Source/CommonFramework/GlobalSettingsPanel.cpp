@@ -226,6 +226,18 @@ GlobalSettings::GlobalSettings()
     , PERFORMANCE(CONSTRUCT_TOKEN)
     , AUDIO_PIPELINE(CONSTRUCT_TOKEN)
     , VIDEO_PIPELINE(CONSTRUCT_TOKEN)
+    , COMMAND_QUEUE_LIMIT(
+        "<b>Maximum Command Queue Size:</b><br>"
+        "Do not queue more than this many commands to the controller at once. "
+        "Larger values will tolerate longer connection interrupts, but may increase cancellation latency after a burst of commands.",
+        LockMode::LOCK_WHILE_RUNNING,
+        64, 4, 255
+    )
+    , DEVICE_LOGGING_FLAG(
+        "<b>Configure Device-Specific Debug Logging:</b>",
+        LockMode::LOCK_WHILE_RUNNING,
+        0
+    )
     , ENABLE_LIFETIME_SANITIZER0(
         "<b>Enable Lifetime Sanitizer: (for debugging)</b><br>"
         "Check for C++ object lifetime violations. Terminate program with stack dump if violations are found. "
@@ -277,6 +289,8 @@ GlobalSettings::GlobalSettings()
 
     PA_ADD_OPTION(AUDIO_PIPELINE);
     PA_ADD_OPTION(VIDEO_PIPELINE);
+    PA_ADD_OPTION(COMMAND_QUEUE_LIMIT);
+    PA_ADD_OPTION(DEVICE_LOGGING_FLAG);
 
     PA_ADD_OPTION(ENABLE_LIFETIME_SANITIZER0);
 
@@ -301,8 +315,12 @@ void GlobalSettings::load_json(const JsonValue& json){
     const bool developer_mode = PreloadSettings::instance().DEVELOPER_MODE;
     BatchOption::load_json(json);
 
-    USE_PADDLE_OCR.set_visibility(developer_mode ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
-    SAVE_DEBUG_VIDEOS_ON_SWITCH.set_visibility(developer_mode ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    ConfigOptionState devmode_visibility = developer_mode
+        ? ConfigOptionState::ENABLED
+        : ConfigOptionState::HIDDEN;
+    USE_PADDLE_OCR.set_visibility(devmode_visibility);
+    SAVE_DEBUG_VIDEOS_ON_SWITCH.set_visibility(devmode_visibility);
+    DEVICE_LOGGING_FLAG.set_visibility(devmode_visibility);
 
     //  Remake this to update the color.
     m_discord_settings.set_text(
