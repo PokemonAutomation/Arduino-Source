@@ -914,7 +914,19 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         RNG_FILTERS.reset();
         RNG_CALIBRATION.reset();
 
-        bool shiny_found = check_for_shiny(env.console, context, TARGET);
+        int ret = watch_for_shiny_encounter(env.console, context);
+        if (ret < 1){
+            if (TARGET == PokemonFRLG_RngTarget::fishing || TARGET == PokemonFRLG_RngTarget::rocksmash){
+                env.log("No battle triggered. Resetting...");
+            }else{
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "WildRng(): Failed to trigger battle",
+                    env.console
+                ); 
+            }
+        }
+        bool shiny_found = (ret == 1);
 
         if (shiny_found){
             env.log("Shiny found!");
