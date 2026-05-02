@@ -62,9 +62,9 @@ PA_NO_INLINE void PacketSender::send_oob_packet_empty(uint8_t seqnum, uint8_t op
         uint8_t crc32[sizeof(uint32_t)];
     } packet;
     packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
-    packet.header.opcode = opcode;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
+    packet.header.opcode = opcode;
     pabb_crc32_write_to_message(m_session_id, &packet, sizeof(packet));
     m_connection.unreliable_send(&packet, sizeof(packet));
 }
@@ -74,9 +74,9 @@ PA_NO_INLINE void PacketSender::send_oob_packet_u8(uint8_t seqnum, uint8_t opcod
         uint8_t crc32[sizeof(uint32_t)];
     } packet;
     packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
-    packet.header.opcode = opcode;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
+    packet.header.opcode = opcode;
     packet.header.data = data;
     pabb_crc32_write_to_message(m_session_id, &packet, sizeof(packet));
     m_connection.unreliable_send(&packet, sizeof(packet));
@@ -87,9 +87,9 @@ PA_NO_INLINE void PacketSender::send_oob_packet_u16(uint8_t seqnum, uint8_t opco
         uint8_t crc32[sizeof(uint32_t)];
     } packet;
     packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
-    packet.header.opcode = opcode;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
+    packet.header.opcode = opcode;
     memcpy(&packet.header.data, &data, sizeof(uint16_t));
     pabb_crc32_write_to_message(m_session_id, &packet, sizeof(packet));
     m_connection.unreliable_send(&packet, sizeof(packet));
@@ -100,9 +100,9 @@ PA_NO_INLINE void PacketSender::send_oob_packet_u32(uint8_t seqnum, uint8_t opco
         uint8_t crc32[sizeof(uint32_t)];
     } packet;
     packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
-    packet.header.opcode = opcode;
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
+    packet.header.opcode = opcode;
     memcpy(&packet.header.data, &data, sizeof(uint32_t));
     pabb_crc32_write_to_message(m_session_id, &packet, sizeof(packet));
     m_connection.unreliable_send(&packet, sizeof(packet));
@@ -113,9 +113,9 @@ PA_NO_INLINE void PacketSender::send_oob_packet_data(
 ){
     PacketHeader header;
     header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
-    header.opcode = opcode;
     header.seqnum = seqnum;
     header.packet_bytes = sizeof(PacketHeader) + sizeof(uint32_t) + bytes;
+    header.opcode = opcode;
     uint32_t crc = m_session_id;
     pabb_crc32_buffer(&crc, &header, sizeof(PacketHeader));
     pabb_crc32_buffer(&crc, data, bytes);
@@ -130,9 +130,9 @@ PA_NO_INLINE void PacketSender::send_oob_packet_u32_data(
 ){
     PacketHeader_u32 header;
     header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
-    header.opcode = opcode;
     header.seqnum = seqnum;
     header.packet_bytes = sizeof(PacketHeader_u32) + sizeof(uint32_t) + bytes;
+    header.opcode = opcode;
     memcpy(&header.data, &u32, sizeof(uint32_t));
     uint32_t crc = m_session_id;
     pabb_crc32_buffer(&crc, &header, sizeof(PacketHeader_u32));
