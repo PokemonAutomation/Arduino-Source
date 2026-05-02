@@ -51,6 +51,7 @@ namespace PokemonFRLG{
         hooh,
         hypno,
         sweetscent,
+        rocksmash,
         fishing,
         safarizonecenter,
         safarizoneeast,

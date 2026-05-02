@@ -268,6 +268,15 @@ void use_sweet_scent(ProControllerContext& context, uint64_t INGAME_DELAY, bool 
     context.wait_for_all_requests();
 }
 
+void use_rock_smash(ProControllerContext& context, uint64_t INGAME_DELAY){
+    // three button presses
+    pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 300ms);
+    pbf_wait(context, std::chrono::milliseconds(INGAME_DELAY - 6500)); // 4000ms + 2000ms + 500ms
+    pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+    context.wait_for_all_requests();
+}
+
 void use_registered_fishing_rod(ProControllerContext& context, uint64_t INGAME_DELAY){
     uint32_t rng_wait = 50 * random_u32(0, 20); // helps avoid always hitting "Not even a nibble" (?)
     pbf_wait(context, std::chrono::milliseconds(rng_wait));
@@ -527,11 +536,19 @@ void check_timings(
             );
         }
         return;
+    case PokemonFRLG_RngTarget::rocksmash:
+        if (INGAME_DELAY < 6500){
+            OperationFailedException::fire(
+                ErrorReport::NO_ERROR_REPORT,
+                "Rock Smash: the in-game delay cannot be less than 7000ms (840 advances). Check your in-game advances and calibration.",
+                console
+            );
+        }
     case PokemonFRLG_RngTarget::fishing:
         if (INGAME_DELAY < 5500){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Fishing: the in-game delay cannot be less than 5500ms (1800 advances). Check your in-game advances and calibration.",
+                "Fishing: the in-game delay cannot be less than 5500ms (660 advances). Check your in-game advances and calibration.",
                 console
             );
         }
@@ -687,6 +704,9 @@ void perform_blind_sequence(
         return;
     case PokemonFRLG_RngTarget::sweetscent:
         use_sweet_scent(context, INGAME_DELAY, SAFARI_ZONE);
+        return;
+    case PokemonFRLG_RngTarget::rocksmash:
+        use_rock_smash(context, INGAME_DELAY);
         return;
     case PokemonFRLG_RngTarget::fishing:
         use_registered_fishing_rod(context, INGAME_DELAY);

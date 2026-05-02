@@ -75,6 +75,7 @@ RngHelper::RngHelper()
             {PokemonFRLG_RngTarget::hooh, "hooh", "Ho-oh"},
             {PokemonFRLG_RngTarget::hypno, "berryforesthypno", "Berry Forest Hypno"},
             {PokemonFRLG_RngTarget::sweetscent, "sweetscent", "Sweet Scent"},
+            {PokemonFRLG_RngTarget::rocksmash, "rocksmash", "Rock Smash"},
             {PokemonFRLG_RngTarget::fishing, "fishing", "Fishing"},
             {PokemonFRLG_RngTarget::safarizonecenter, "safarizonecenter", "Safari Zone Center (Sweet Scent)"},
             {PokemonFRLG_RngTarget::safarizoneeast, "safarizoneeast", "Safari Zone East (Sweet Scent)"},

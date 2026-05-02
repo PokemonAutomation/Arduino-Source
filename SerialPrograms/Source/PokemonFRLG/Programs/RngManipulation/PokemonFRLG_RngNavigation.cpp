@@ -175,6 +175,7 @@ bool check_for_shiny(ConsoleHandle& console, ProControllerContext& context, Poke
     case PokemonFRLG_RngTarget::hooh:
     case PokemonFRLG_RngTarget::hypno:
     case PokemonFRLG_RngTarget::sweetscent:
+    case PokemonFRLG_RngTarget::rocksmash:
     case PokemonFRLG_RngTarget::fishing:
     case PokemonFRLG_RngTarget::safarizonecenter:
     case PokemonFRLG_RngTarget::safarizoneeast:

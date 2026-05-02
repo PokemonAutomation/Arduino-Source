@@ -748,6 +748,9 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         GAME_LOCATION == GameLocation::safari_zone_entrance
     );
     switch (ENCOUNTER_TYPE){
+        case EncounterType::rocksmash:
+            TARGET = PokemonFRLG_RngTarget::rocksmash;
+            break;
         case EncounterType::grass:
             if (safari_zone){
                 if (GAME_LOCATION == GameLocation::safari_zone_area_1_east){
