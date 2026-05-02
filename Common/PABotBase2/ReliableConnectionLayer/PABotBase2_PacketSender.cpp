@@ -19,6 +19,7 @@
 namespace PokemonAutomation{
 namespace PABotBase2{
 
+
 PacketSender::PacketSender(
     UnreliableStreamSender& connection,
     uint8_t max_packet_size
@@ -26,9 +27,20 @@ PacketSender::PacketSender(
     : m_connection(connection)
     , m_max_packet_size(max_packet_size)
 {
-    reset();
+    reset(0);
 }
-void PacketSender::reset(){
+PacketSender::PacketSender(
+    UnreliableStreamSender& connection,
+    uint8_t max_packet_size,
+    SessionId session_id
+)
+    : m_connection(connection)
+    , m_max_packet_size(max_packet_size)
+{
+    reset(session_id);
+}
+void PacketSender::reset(const SessionId& session_id){
+    memcpy(&m_session_id, &session_id, sizeof(SessionId));
     m_slot_head = 0;
     m_slot_tail = 0;
     m_slot_tail_uncommitted = 0;
@@ -53,7 +65,7 @@ PA_NO_INLINE void PacketSender::send_oob_packet_empty(uint8_t seqnum, uint8_t op
     packet.header.seqnum = seqnum;
     packet.header.packet_bytes = sizeof(packet);
     packet.header.opcode = opcode;
-    pabb_crc32_write_to_message(&packet, sizeof(packet));
+    pabb_crc32_write_to_message(m_session_id, &packet, sizeof(packet));
     m_connection.unreliable_send(&packet, sizeof(packet));
 }
 PA_NO_INLINE void PacketSender::send_oob_packet_u8(uint8_t seqnum, uint8_t opcode, uint8_t data){
@@ -66,7 +78,7 @@ PA_NO_INLINE void PacketSender::send_oob_packet_u8(uint8_t seqnum, uint8_t opcod
     packet.header.packet_bytes = sizeof(packet);
     packet.header.opcode = opcode;
     packet.header.data = data;
-    pabb_crc32_write_to_message(&packet, sizeof(packet));
+    pabb_crc32_write_to_message(m_session_id, &packet, sizeof(packet));
     m_connection.unreliable_send(&packet, sizeof(packet));
 }
 PA_NO_INLINE void PacketSender::send_oob_packet_u16(uint8_t seqnum, uint8_t opcode, const uint16_t& data){
@@ -79,7 +91,7 @@ PA_NO_INLINE void PacketSender::send_oob_packet_u16(uint8_t seqnum, uint8_t opco
     packet.header.packet_bytes = sizeof(packet);
     packet.header.opcode = opcode;
     memcpy(&packet.header.data, &data, sizeof(uint16_t));
-    pabb_crc32_write_to_message(&packet, sizeof(packet));
+    pabb_crc32_write_to_message(m_session_id, &packet, sizeof(packet));
     m_connection.unreliable_send(&packet, sizeof(packet));
 }
 PA_NO_INLINE void PacketSender::send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, const uint32_t& data){
@@ -92,7 +104,7 @@ PA_NO_INLINE void PacketSender::send_oob_packet_u32(uint8_t seqnum, uint8_t opco
     packet.header.packet_bytes = sizeof(packet);
     packet.header.opcode = opcode;
     memcpy(&packet.header.data, &data, sizeof(uint32_t));
-    pabb_crc32_write_to_message(&packet, sizeof(packet));
+    pabb_crc32_write_to_message(m_session_id, &packet, sizeof(packet));
     m_connection.unreliable_send(&packet, sizeof(packet));
 }
 PA_NO_INLINE void PacketSender::send_oob_packet_data(
@@ -104,7 +116,7 @@ PA_NO_INLINE void PacketSender::send_oob_packet_data(
     header.seqnum = seqnum;
     header.packet_bytes = sizeof(PacketHeader) + sizeof(uint32_t) + bytes;
     header.opcode = opcode;
-    uint32_t crc = 0xffffffff;
+    uint32_t crc = m_session_id;
     pabb_crc32_buffer(&crc, &header, sizeof(PacketHeader));
     pabb_crc32_buffer(&crc, data, bytes);
     m_connection.unreliable_send(&header, sizeof(header));
@@ -122,7 +134,7 @@ PA_NO_INLINE void PacketSender::send_oob_packet_u32_data(
     header.packet_bytes = sizeof(PacketHeader_u32) + sizeof(uint32_t) + bytes;
     header.opcode = opcode;
     memcpy(&header.data, &u32, sizeof(uint32_t));
-    uint32_t crc = 0xffffffff;
+    uint32_t crc = m_session_id;
     pabb_crc32_buffer(&crc, &header, sizeof(PacketHeader_u32));
     pabb_crc32_buffer(&crc, data, bytes);
     m_connection.unreliable_send(&header, sizeof(header));
@@ -139,10 +151,12 @@ bool PacketSender::remove(uint8_t seqnum){
 //        cout << "PacketSender::remove(" << this << "): " << (int)seqnum << endl;
 //    }
 
-    //  Seqnum is out of range.
+    //  Too far in the future.
     if ((uint8_t)(seqnum - m_slot_head) >= SLOTS){
         return false;
     }
+
+    //  Too far in the past.
     if ((uint8_t)(m_slot_tail - seqnum) > SLOTS){
         return false;
     }
@@ -183,6 +197,27 @@ bool PacketSender::remove(uint8_t seqnum){
     }
 }
 
+void PacketSender::send_reset(){
+    PacketHeader_u32* packet = (PacketHeader_u32*)reserve_packet(
+        PABB2_CONNECTION_OPCODE_ASK_RESET,
+        sizeof(PacketHeader_u32) - sizeof(PacketHeader)
+    );
+    if (packet == NULL){
+        return;
+    }
+
+    memcpy(&packet->data, &m_session_id, sizeof(uint32_t));
+
+    //  We temporarily change the session ID to 0xffffffff
+    //  so that the CRC is generated correctly.
+    uint32_t tmp = m_session_id;
+    m_session_id = 0xffffffff;
+
+    commit_packet(packet);
+
+    m_session_id = tmp;
+
+}
 bool PacketSender::send_packet(
     uint8_t opcode, uint8_t extra_bytes, const void* extra_data
 ){
@@ -259,7 +294,7 @@ PacketHeader* PacketSender::reserve_packet(
     return ret;
 }
 void PacketSender::commit_packet(PacketHeader* packet){
-    pabb_crc32_write_to_message(packet, packet->packet_bytes);
+    pabb_crc32_write_to_message(m_session_id, packet, packet->packet_bytes);
 
     m_connection.unreliable_send(packet, packet->packet_bytes);
 
@@ -309,7 +344,7 @@ bool PacketSender::iterate_retransmits(){
         packet->opcode |= PABB2_CONNECTION_RETRANSMIT_FLAG;
         packet->magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
         uint8_t packet_bytes = packet->packet_bytes;
-        pabb_crc32_write_to_message(packet, packet_bytes);
+        pabb_crc32_write_to_message(m_session_id, packet, packet_bytes);
 
 #if 0
         printf("Retransmitting: %u\n", packet->seqnum);
@@ -416,7 +451,7 @@ bool PacketSender::enqueue_uncommitted_send_stream(const void* data, size_t byte
         m_stream_offset_uncommitted += (uint16_t)current;
 
         //  Build CRC
-        pabb_crc32_write_to_message(packet, packet_bytes);
+        pabb_crc32_write_to_message(m_session_id, packet, packet_bytes);
 
         data = (const char*)data + current;
         bytes -= current;

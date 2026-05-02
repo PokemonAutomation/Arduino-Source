@@ -55,7 +55,7 @@ void PABotBase2_Keyboard::update_status(Cancellable& cancellable){
     PABotBase2::MessageHeader request;
     request.message_bytes = sizeof(request);
     request.opcode = PABB2_MESSAGE_OPCODE_REQUEST_STATUS;
-    uint8_t id = m_connection.device().send_request(request);
+    uint8_t id = m_connection.device().send_request_with_response(request);
     PABotBase2::Message_u32 response;
     m_connection.device().wait_for_request_response<PABotBase2::Message_u32, PABB2_MESSAGE_OPCODE_RET_U32>(
         response, id

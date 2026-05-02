@@ -373,6 +373,17 @@ MessageLogger::MessageLogger(){
             return str;
         }
     );
+    add_message<Message_u32>(
+        "PABB2_MESSAGE_OPCODE_SET_LOGGING_FLAG",
+        PABB2_MESSAGE_OPCODE_SET_LOGGING_FLAG,
+        true,
+        [](const Message_u32* message){
+            std::string str;
+            str += "id = " + std::to_string(message->id);
+            str += ", flag = " + tostr_hex(message->data);
+            return str;
+        }
+    );
     add_message<MessageHeader>(
         "PABB2_MESSAGE_OPCODE_CQ_CAPACITY",
         PABB2_MESSAGE_OPCODE_CQ_CAPACITY,

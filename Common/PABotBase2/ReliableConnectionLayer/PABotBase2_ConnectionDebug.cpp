@@ -132,6 +132,7 @@ void StreamCoalescer::print(bool ascii) const{
     std::cout << "---- StreamCoalescer ---- (Start)" << std::endl;
     std::cout << "Slot Head:         " << (int)m_slot_head << std::endl;
     std::cout << "Slot Tail:         " << (int)m_slot_tail << std::endl;
+    std::cout << "Stream Free:       " << m_stream_free << std::endl;
     std::cout << "Stream Head:       " << m_stream_head << std::endl;
     std::cout << "Stream Tail:       " << m_stream_tail << std::endl;
     for (uint8_t seqnum = m_slot_head; seqnum != m_slot_tail; seqnum++){
@@ -142,13 +143,13 @@ void StreamCoalescer::print(bool ascii) const{
             std::cout << std::endl;
             continue;
         }
-        if (size == 255){
+        if (size == 0xff){
             std::cout << " non-stream" << std::endl;
             continue;
         }
 
-        uint16_t offset_s = m_offsets[index];
-        uint16_t offset_e = offset_s + size;
+        uint16_t offset_e = m_end_offsets[index];
+        uint16_t offset_s = offset_e - size;
         std::cout << "[" << offset_s << ":" << offset_e << "] => ";
 
         offset_s &= BUFFER_MASK;

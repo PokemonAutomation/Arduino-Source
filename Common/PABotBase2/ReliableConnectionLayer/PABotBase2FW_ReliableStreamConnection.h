@@ -44,6 +44,7 @@ public:
         return m_reliable_sender.slots_used() != 0;
     }
 
+
 public:
     virtual bool enqueue_uncommitted_reliable_sends(const void* data, size_t bytes) noexcept override;
     virtual void abort_uncommitted_reliable_sends() noexcept override;

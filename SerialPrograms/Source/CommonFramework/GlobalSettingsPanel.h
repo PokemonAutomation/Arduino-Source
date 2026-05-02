@@ -150,6 +150,7 @@ public:
     Pimpl<AudioPipelineOptions> AUDIO_PIPELINE;
     Pimpl<VideoPipelineOptions> VIDEO_PIPELINE;
     SimpleIntegerOption<uint8_t> COMMAND_QUEUE_LIMIT;
+    SimpleIntegerOption<uint32_t> DEVICE_LOGGING_FLAG;
 
     BooleanCheckBoxOption ENABLE_LIFETIME_SANITIZER0;
 

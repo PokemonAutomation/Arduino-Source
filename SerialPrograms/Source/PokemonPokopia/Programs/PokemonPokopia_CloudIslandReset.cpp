@@ -419,7 +419,7 @@ void CloudIslandReset::program(SingleSwitchProgramEnvironment& env, ProControlle
     bool all_stamps_mew = false;
     bool spend_limit_reached = false;
 
-    while (NUM_RESETS != 0 && stats.resets < NUM_RESETS){
+    while (NUM_RESETS == 0 || stats.resets < NUM_RESETS){
         delete_cloud_island_save(env, context);
         create_cloud_island_after_delete(env, context);
         stats.resets++;

@@ -9,6 +9,10 @@
 #include "PABotBase2_ConnectionDebug.h"
 #include "PABotBase2FW_ReliableStreamConnection.h"
 
+#ifdef PABB2_SUPPORTS_PRINTF_LOGGING
+#include <stdio.h>
+#endif
+
 //#include <iostream>
 //using std::cout;
 //using std::endl;
@@ -35,6 +39,9 @@ ReliableStreamConnectionFW::ReliableStreamConnectionFW(UnreliableStreamConnectio
 bool ReliableStreamConnectionFW::enqueue_uncommitted_reliable_sends(const void* data, size_t bytes) noexcept{
     if (!m_stream_ready){
         m_reliable_sender.send_oob_packet_empty(0, PABB2_CONNECTION_OPCODE_INFO_STREAM_NOT_READY);
+#ifdef PABB2_SUPPORTS_PRINTF_LOGGING
+        printf("Stream not ready...\n");
+#endif
         return false;
     }
     if (m_reliable_sender.enqueue_uncommitted_send_stream(data, bytes)){
@@ -44,6 +51,9 @@ bool ReliableStreamConnectionFW::enqueue_uncommitted_reliable_sends(const void* 
     if (!m_send_is_currently_full){
         m_send_is_currently_full = true;
         m_reliable_sender.send_oob_packet_empty(0, PABB2_CONNECTION_OPCODE_INFO_STREAM_SEND_FULL);
+#ifdef PABB2_SUPPORTS_PRINTF_LOGGING
+        printf("Send stream is full...\n");
+#endif
     }
     return false;
 }
@@ -103,28 +113,32 @@ bool ReliableStreamConnectionFW::run_recv_events(const WallDuration& timeout){
         ? POLL_RATE
         : timeout;
 
-    const PacketHeader* packet = m_parser.pull_bytes(m_unreliable_connection, adjusted_timeout);
-    if (packet == nullptr){
+    const PacketHeader* header = m_parser.pull_bytes(
+        m_unreliable_connection,
+        m_reliable_sender.session_id(),
+        adjusted_timeout
+    );
+    if (header == nullptr){
         return false;
     }
 
     m_packets_received++;
 
     //  Check the packet status.
-    switch (packet->magic_number){
+    switch (header->magic_number){
     case PABB2_PacketParser_RESULT_VALID:
         break;
     case PABB2_PacketParser_RESULT_INVALID:
 //        printf("PABB2_PacketParser_RESULT_INVALID\n");
         m_reliable_sender.send_oob_packet_empty(
-            packet->seqnum,
+            header->seqnum,
             PABB2_CONNECTION_OPCODE_INVALID_LENGTH
         );
         return true;
     case PABB2_PacketParser_RESULT_CHECKSUM_FAIL:
 //        printf("PABB2_PacketParser_RESULT_CHECKSUM_FAIL\n");
         m_reliable_sender.send_oob_packet_empty(
-            packet->seqnum,
+            header->seqnum,
             PABB2_CONNECTION_OPCODE_INVALID_CHECKSUM_FAIL
         );
 //        cout << "CRC error:";
@@ -138,74 +152,87 @@ bool ReliableStreamConnectionFW::run_recv_events(const WallDuration& timeout){
 //    printf("Device Received: %d\n", packet->opcode);
 
     //  Now handle the different opcodes.
-    uint8_t opcode = packet->opcode & PABB2_CONNECTION_OPCODE_MASK;
+    uint8_t opcode = header->opcode & PABB2_CONNECTION_OPCODE_MASK;
+
     switch (opcode){
-    case PABB2_CONNECTION_OPCODE_ASK_RESET:
-        m_reliable_sender.send_oob_packet_empty(
-            packet->seqnum,
-            PABB2_CONNECTION_OPCODE_RET_RESET
-        );
-        m_reliable_sender.reset();
+    case PABB2_CONNECTION_OPCODE_ASK_RESET:{
+        if (header->packet_bytes < sizeof(PacketHeader_u32)){
+            return true;
+        }
+
+        const PacketHeader_u32* packet = (const PacketHeader_u32*)header;
+
+#ifdef PABB2_SUPPORTS_PRINTF_LOGGING
+        printf("Resetting to session ID: %zx\n", (size_t)packet->data);
+#endif
+        m_stream_ready = false;
+        m_send_is_currently_full = false;
+        m_reliable_sender.reset(packet->data);
         m_parser.reset();
         m_stream_coalescer.reset();
         m_stream_coalescer.push_packet(0);
 #ifdef PABB2_ENABLE
         issue_reset_to_all();
 #endif
-        m_stream_ready = false;
+        m_reliable_sender.send_oob_packet_empty(
+            header->seqnum,
+            PABB2_CONNECTION_OPCODE_RET_RESET
+        );
         return true;
+    }
     case PABB2_CONNECTION_OPCODE_ASK_VERSION:
-        m_stream_coalescer.push_packet(packet->seqnum);
+        m_stream_coalescer.push_packet(header->seqnum);
         m_reliable_sender.send_oob_packet_u32(
-            packet->seqnum,
+            header->seqnum,
             PABB2_CONNECTION_OPCODE_RET_VERSION,
             PABB2_CONNECTION_PROTOCOL_VERSION
         );
         return true;
     case PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE:
-        m_stream_coalescer.push_packet(packet->seqnum);
+        m_stream_coalescer.push_packet(header->seqnum);
         m_reliable_sender.send_oob_packet_u16(
-            packet->seqnum,
+            header->seqnum,
             PABB2_CONNECTION_OPCODE_RET_PACKET_SIZE,
             PABB2_MAX_INCOMING_PACKET_SIZE
         );
         return true;
     case PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS:
-        m_stream_coalescer.push_packet(packet->seqnum);
+        m_stream_coalescer.push_packet(header->seqnum);
         m_reliable_sender.send_oob_packet_u8(
-            packet->seqnum,
+            header->seqnum,
             PABB2_CONNECTION_OPCODE_RET_BUFFER_SLOTS,
             PABB2_StreamCoalescer_SLOTS
         );
         return true;
     case PABB2_CONNECTION_OPCODE_ASK_BUFFER_BYTES:
-        m_stream_coalescer.push_packet(packet->seqnum);
+        m_stream_coalescer.push_packet(header->seqnum);
         m_reliable_sender.send_oob_packet_u16(
-            packet->seqnum,
+            header->seqnum,
             PABB2_CONNECTION_OPCODE_RET_BUFFER_BYTES,
             PABB2_StreamCoalescer_BUFFER_SIZE
         );
         return true;
+
     case PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA:
         m_stream_ready = true;
-        if (!m_stream_coalescer.push_stream((const PacketHeaderData*)packet)){
+        if (!m_stream_coalescer.push_stream((const PacketHeaderData*)header)){
             send_oob_info_label_u32("Push Stream Failed", m_stream_coalescer.free_bytes());
             return true;
         }
         m_reliable_sender.send_oob_packet_u16(
-            packet->seqnum,
+            header->seqnum,
             PABB2_CONNECTION_OPCODE_RET_STREAM_DATA,
             m_stream_coalescer.free_bytes()
         );
         return true;
     case PABB2_CONNECTION_OPCODE_RET_STREAM_DATA:
-        m_reliable_sender.remove(packet->seqnum);
+        m_reliable_sender.remove(header->seqnum);
         return true;
     default:
         m_reliable_sender.send_oob_packet_u8(
-            packet->seqnum,
+            header->seqnum,
             PABB2_CONNECTION_OPCODE_UNKNOWN_OPCODE,
-            packet->opcode
+            header->opcode
         );
     }
 

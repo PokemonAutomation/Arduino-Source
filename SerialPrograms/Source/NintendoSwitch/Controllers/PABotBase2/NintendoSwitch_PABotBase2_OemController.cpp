@@ -243,7 +243,7 @@ void PABotBase2_OemController::run_preconnect_configure(
         request.message_bytes = sizeof(request);
         request.opcode = PABB2_MESSAGE_OPCODE_CONTROLLER_MAC_ADDRESS;
         request.data = SerialPABotBase::controller_type_to_id(controller_type);
-        uint8_t id = connection.device().send_request(request);
+        uint8_t id = connection.device().send_request_with_response(request);
         std::string response = connection.device().wait_for_request_response(id, std::chrono::milliseconds(100));
         if (response.size() == sizeof(MessageHeader) + sizeof(controller_mac_address)){
             memcpy(
@@ -267,44 +267,58 @@ void PABotBase2_OemController::run_preconnect_configure(
             controller_type
         );
 
-    PABB_NintendoSwitch_ControllerColors colors;
+#if _WIN32
+#pragma pack(push, 1)
+#define PABB_PACK
+#elif __GNUC__
+#define PABB_PACK   __attribute__((packed))
+#else
+#define PABB_PACK
+#endif
+    struct Message{
+        pabb2_Message_NS1_OemController_Spi request;
+        PABB_NintendoSwitch_ControllerColors colors;
+    };
+#if _WIN32
+#pragma pack(pop)
+#endif
+    Message message;
+
     {
         Color color(profile.body_color);
-        colors.body[0] = color.red();
-        colors.body[1] = color.green();
-        colors.body[2] = color.blue();
+        message.colors.body[0] = color.red();
+        message.colors.body[1] = color.green();
+        message.colors.body[2] = color.blue();
     }
     {
         Color color(profile.button_color);
-        colors.buttons[0] = color.red();
-        colors.buttons[1] = color.green();
-        colors.buttons[2] = color.blue();
+        message.colors.buttons[0] = color.red();
+        message.colors.buttons[1] = color.green();
+        message.colors.buttons[2] = color.blue();
     }
     {
         Color color(profile.left_grip);
-        colors.left_grip[0] = color.red();
-        colors.left_grip[1] = color.green();
-        colors.left_grip[2] = color.blue();
+        message.colors.left_grip[0] = color.red();
+        message.colors.left_grip[1] = color.green();
+        message.colors.left_grip[2] = color.blue();
     }
     {
         Color color(profile.right_grip);
-        colors.right_grip[0] = color.red();
-        colors.right_grip[1] = color.green();
-        colors.right_grip[2] = color.blue();
+        message.colors.right_grip[0] = color.red();
+        message.colors.right_grip[1] = color.green();
+        message.colors.right_grip[2] = color.blue();
     }
 
 
-    pabb2_Message_NS1_OemController_Spi request;
-    request.message_bytes = sizeof(request) + sizeof(colors);
-    request.opcode = PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_WRITE_SPI;
-    request.controller_type = SerialPABotBase::controller_type_to_id(controller_type);
-    request.address = 0x00006050;
-    request.bytes = sizeof(PABB_NintendoSwitch_ControllerColors);
+    message.request.message_bytes = sizeof(message);
+    message.request.opcode = PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_WRITE_SPI;
+    message.request.controller_type = SerialPABotBase::controller_type_to_id(controller_type);
+    message.request.address = 0x00006050;
+    message.request.bytes = sizeof(PABB_NintendoSwitch_ControllerColors);
 
-    connection.message_logger().log_send(logger, true, &request);
+    connection.message_logger().log_send(logger, true, &message.request);
 
-    connection.device().connection().reliable_send_blocking(&request, sizeof(request), Milliseconds(100));
-    connection.device().connection().reliable_send_blocking(&colors, sizeof(colors), Milliseconds(100));
+    connection.device().connection().reliable_send_all_or_nothing(&message, sizeof(Message), Milliseconds(100));
 }
 
 
@@ -473,6 +487,8 @@ void PABotBase2_OemController::issue_report(
 void PABotBase2_OemController::update_status(Cancellable& cancellable){
     using namespace PABotBase2;
 
+//    cout << m_connection.device().dump_pending_requests() << endl;
+
     if (m_color_html.empty()){
         try{
             m_logger.log("Reading Controller Colors...");
@@ -486,7 +502,7 @@ void PABotBase2_OemController::update_status(Cancellable& cancellable){
             message.address = 0x00006050;
             message.bytes = sizeof(ControllerColors);
 
-            uint8_t id = m_connection.device().send_request(message);
+            uint8_t id = m_connection.device().send_request_with_response(message);
             std::string response = m_connection.device().wait_for_request_response(id);
 
             ControllerColors colors{};
@@ -538,7 +554,7 @@ void PABotBase2_OemController::update_status(Cancellable& cancellable){
         MessageHeader request;
         request.message_bytes = sizeof(request);
         request.opcode = PABB2_MESSAGE_OPCODE_REQUEST_STATUS;
-        uint8_t id = m_connection.device().send_request(request);
+        uint8_t id = m_connection.device().send_request_with_response(request);
         Message_u32 response;
         m_connection.device().wait_for_request_response<Message_u32, PABB2_MESSAGE_OPCODE_RET_U32>(
             response, id
@@ -552,7 +568,7 @@ void PABotBase2_OemController::update_status(Cancellable& cancellable){
         request.message_bytes = sizeof(request);
         request.opcode = PABB2_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS;
         request.data = SerialPABotBase::controller_type_to_id(m_controller_type);
-        uint8_t id = m_connection.device().send_request(request);
+        uint8_t id = m_connection.device().send_request_with_response(request);
         std::string response = m_connection.device().wait_for_request_response(id);
         if (response.size() == sizeof(MessageHeader) + sizeof(mac_address)){
             memcpy(

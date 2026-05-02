@@ -41,13 +41,10 @@ protected:
 
 class ReliableStreamConnectionPushing : public StreamConnectionPushing{
 public:
-    virtual size_t reliable_send_blocking(
+    virtual bool reliable_send_all_or_nothing(
         const void* data, size_t bytes,
-        WallDuration timeout = WallDuration::max()
-    ) = 0;
-    virtual bool reliable_try_send_all_or_nothing(
-        const void* data, size_t bytes
-    ) = 0;
+        WallDuration timeout
+    ) noexcept = 0;
 
 protected:
     void on_reliable_recv(const void* data, size_t bytes){

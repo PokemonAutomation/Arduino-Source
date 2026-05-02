@@ -38,10 +38,14 @@ namespace PABotBase2{
 #define PABB2_CONNECTION_RETRANSMIT_FLAG            0x80
 #define PABB2_CONNECTION_OPCODE_MASK                0x7f
 
+#define PABB2_CONNECTION_OPCODE_INVALID             0x00
+
 
 //
-//  Special
+//  Packets
 //
+
+using SessionId = uint32_t;
 
 struct PABB_PACK PacketHeader{
     uint8_t magic_number;
@@ -50,31 +54,13 @@ struct PABB_PACK PacketHeader{
     uint8_t opcode;
 };
 
-#define PABB2_CONNECTION_OPCODE_INVALID             0x00
-
-#define PABB2_CONNECTION_OPCODE_ASK_RESET           0x01
-#define PABB2_CONNECTION_OPCODE_RET_RESET           0x41
-
-
-struct PABB_PACK PacketHeader_u8{
-    uint8_t magic_number;
-    uint8_t seqnum;
-    uint8_t packet_bytes;
-    uint8_t opcode;
+struct PABB_PACK PacketHeader_u8 : PacketHeader{
     uint8_t data;
 };
-struct PABB_PACK PacketHeader_u16{
-    uint8_t magic_number;
-    uint8_t seqnum;
-    uint8_t packet_bytes;
-    uint8_t opcode;
+struct PABB_PACK PacketHeader_u16 : PacketHeader{
     uint16_t data;
 };
-struct PABB_PACK PacketHeader_u32{
-    uint8_t magic_number;
-    uint8_t seqnum;
-    uint8_t packet_bytes;
-    uint8_t opcode;
+struct PABB_PACK PacketHeader_u32 : PacketHeader{
     uint32_t data;
 };
 
@@ -83,6 +69,9 @@ struct PABB_PACK PacketHeader_u32{
 //
 //  Requests (acks required)
 //
+
+#define PABB2_CONNECTION_OPCODE_ASK_RESET           0x01
+#define PABB2_CONNECTION_OPCODE_RET_RESET           0x41
 
 #define PABB2_CONNECTION_OPCODE_ASK_VERSION         0x02
 #define PABB2_CONNECTION_OPCODE_RET_VERSION         0x42
@@ -99,11 +88,7 @@ struct PABB_PACK PacketHeader_u32{
 #define PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA         0x12
 #define PABB2_CONNECTION_OPCODE_RET_STREAM_DATA         0x52
 #define PABB2_CONNECTION_OPCODE_ASK_STREAM_REQUEST      0x13    //  Unused for now.
-struct PABB_PACK PacketHeaderData{
-    uint8_t magic_number;
-    uint8_t seqnum;
-    uint8_t packet_bytes;
-    uint8_t opcode;
+struct PABB_PACK PacketHeaderData : PacketHeader{
     uint16_t stream_offset;
 };
 
@@ -133,7 +118,6 @@ struct PABB_PACK PacketHeaderData{
 #define PABB2_CONNECTION_OPCODE_INVALID_LENGTH          0x30
 #define PABB2_CONNECTION_OPCODE_INVALID_CHECKSUM_FAIL   0x31
 #define PABB2_CONNECTION_OPCODE_UNKNOWN_OPCODE          0x32
-
 
 
 }

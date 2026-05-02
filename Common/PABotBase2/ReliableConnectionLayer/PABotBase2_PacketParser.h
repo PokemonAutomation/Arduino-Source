@@ -62,6 +62,7 @@ public:
     //
     const PacketHeader* pull_bytes(
         UnreliableStreamConnectionPolling& connection,
+        const uint32_t& session_id,
         WallDuration timeout
     );
 
@@ -72,6 +73,7 @@ public:
     //
     void push_bytes(
         PacketRunner& packet_runner,
+        const uint32_t& session_id,
         const uint8_t* data, size_t bytes
     );
 
