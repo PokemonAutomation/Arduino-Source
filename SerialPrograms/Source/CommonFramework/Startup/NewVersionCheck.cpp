@@ -74,7 +74,7 @@ struct ProgramVersion{
             return false;
         }
         std::string skip_version = GlobalSettings::instance().CHECK_FOR_UPDATES->SKIP_VERSION;
-        return version_text != skip_version;
+        return version_text > skip_version;
     }
 };
 
