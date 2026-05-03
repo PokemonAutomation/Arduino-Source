@@ -8,10 +8,15 @@
 #include <optional>
 #include <sstream>
 #include <vector>
+#include "Common/Cpp/Strings/Unicode.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/OCR/OCR_RawOCR.h"
+#include "CommonTools/OCR/OCR_Routines.h"
+#include "CommonTools/OCR/OCR_StringNormalization.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -217,7 +222,7 @@ std::array<size_t, 2> find_occupied_slots_in_box(
 // Read the current summary screen and assign various pokemon info into `cur_pokemon-info`
 void read_summary_screen(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-    CollectedPokemonInfo& cur_pokemon_info
+    CollectedPokemonInfo& cur_pokemon_info, Language ot_name_language
 ) {
     VideoOverlaySet video_overlay_set(env.console);
 
@@ -301,13 +306,39 @@ void read_summary_screen(
     cur_pokemon_info.primary_type = primary_type;
     cur_pokemon_info.secondary_type = secondary_type;
 
+    if (ot_name_language != Language::None){
+        const std::vector<OCR::TextColorRange>& text_filters = OCR::WHITE_TEXT_FILTERS();
+        std::vector<BlackWhiteRgb32Range> bw;
+        bw.reserve(text_filters.size());
+        for (const auto& f : text_filters){
+            bw.push_back({ true, f.mins, f.maxs });
+        }
+
+        auto filtered_images = to_blackwhite_rgb32_range(extract_box_reference(screen, ot_box), bw);
+
+        std::string best_raw;
+        for (auto& [img, px_count] : filtered_images){
+            if (px_count == 0){ 
+                continue; 
+            }
+            std::string candidate = OCR::ocr_read(ot_name_language, img, OCR::PageSegMode::SINGLE_LINE);
+            if (!candidate.empty() && best_raw.empty()){
+                best_raw = candidate;
+            }
+        }
+
+        env.log("Raw trainer name: " + best_raw);
+        std::string normalized = utf32_to_str(OCR::normalize_utf32(best_raw));
+        env.log("Normalized trainer name: " + normalized);
+        cur_pokemon_info.ot_name = normalized;
+    }
+
     env.add_overlay_log(create_overlay_info(cur_pokemon_info));
     video_overlay_set.clear();
 
     // NOTE edit when adding new struct members (detections go here likely)
 
     // level_box
-    // ot_box
     // nature_box
     // ability_box
 

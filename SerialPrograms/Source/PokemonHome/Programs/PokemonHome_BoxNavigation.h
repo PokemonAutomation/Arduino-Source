@@ -49,7 +49,8 @@ std::array<size_t, 2> find_occupied_slots_in_box(
 void read_summary_screen(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    Pokemon::CollectedPokemonInfo& cur_pokemon_info
+    Pokemon::CollectedPokemonInfo& cur_pokemon_info,
+    Language ot_name_language = Language::None
 );
 
 void print_boxes_data(
