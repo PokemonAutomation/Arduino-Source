@@ -12,6 +12,7 @@
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Pokemon_CollectedPokemonInfo.h"
 #include "Pokemon/Pokemon_Types.h"
@@ -30,8 +31,9 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class BoxSorterLivingDex : public SingleSwitchProgramInstance{
+class BoxSorterLivingDex : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
+    ~BoxSorterLivingDex();
     BoxSorterLivingDex();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
@@ -51,7 +53,7 @@ private:
     // Currently the checks include: 
     // National Dex Id, Types (for regional forms), Gender (if no gender difference either is fine)
     // Shiny (if the user has selected to only include shinies in the living dex).
-    bool is_viable_for_dex(const LivingDexEntry& entry, const CollectedPokemonInfo& pokemonInfo);
+    bool is_viable_for_dex(const LivingDexEntry& entry, const CollectedPokemonInfo& pokemonInfo, const std::string& normalized_ot_name);
 
     // Goes through the summary screen of each pokemon in the range of boxes. 
     // Populates the boxes_data vector with the pokemon info. Returns the final cursor position after reading the boxes.
@@ -61,13 +63,18 @@ private:
         std::vector<SortingRule> sort_preferences,
         std::vector<std::optional<CollectedPokemonInfo>>& boxes_data,
         size_t box_count,
-        BoxCursor& nav_cursor
+        BoxCursor& nav_cursor,
+        Language ot_name_language
     );
+
+    virtual void on_config_value_changed(void* object) override;
 
     SimpleIntegerOption<uint16_t> LIVING_DEX_START_BOX;
     SimpleIntegerOption<uint16_t> REJECT_BOX_START;
     SimpleIntegerOption<uint16_t> REJECT_BOX_END;
     BooleanCheckBoxOption SHINY_DEX;
+    OCR::LanguageOCROption OT_NAME_LANGUAGE;
+    StringOption OT_NAME;
     MillisecondsOption VIDEO_DELAY;
     MillisecondsOption GAME_DELAY;
     StringOption OUTPUT_FILE;

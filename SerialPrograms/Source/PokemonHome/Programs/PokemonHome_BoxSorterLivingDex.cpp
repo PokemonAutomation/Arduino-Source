@@ -11,6 +11,7 @@
 #include <sstream>
 #include <vector>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Strings/Unicode.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
@@ -20,6 +21,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
+#include "CommonTools/OCR/OCR_StringNormalization.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_TypeReader.h"
@@ -70,6 +72,10 @@ std::unique_ptr<StatsTracker> BoxSorterLivingDex_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
+BoxSorterLivingDex::~BoxSorterLivingDex(){
+    OT_NAME_LANGUAGE.remove_listener(*this);
+};
+
 BoxSorterLivingDex::BoxSorterLivingDex()
     : LIVING_DEX_START_BOX(
         "<b>Living Dex Starting Box:</b><br>Box number where the living dex placement begins (1-indexed).",
@@ -90,6 +96,31 @@ BoxSorterLivingDex::BoxSorterLivingDex()
         "<b>Shiny Dex:</b><br>Enable or disable shiny dex mode.",
         LockMode::LOCK_WHILE_RUNNING,
         false
+    )
+    , OT_NAME_LANGUAGE(
+        "<b>OT Name Language:</b><br>Language of the OT name you are filtering for. "
+        "If set to None, OT names will not be read.",
+        LanguageSet{
+            Language::English,
+            Language::Japanese,
+            Language::Spanish,
+            Language::French,
+            Language::German,
+            Language::Italian,
+            Language::Korean,
+            Language::ChineseSimplified,
+            Language::ChineseTraditional,
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        false
+    )
+    , OT_NAME(
+        false,
+        "<b>OT Name Filter:</b><br>Only keep pokemon with this OT name in the living dex. "
+        "Leave blank to accept any OT name.",
+        LockMode::LOCK_WHILE_RUNNING,
+        "",
+        "Enter OT name here..."
     )
     , VIDEO_DELAY(
           "<b>Capture Card Delay:</b>",
@@ -121,14 +152,38 @@ BoxSorterLivingDex::BoxSorterLivingDex()
     PA_ADD_OPTION(REJECT_BOX_START);
     PA_ADD_OPTION(REJECT_BOX_END);
     PA_ADD_OPTION(SHINY_DEX);
+    PA_ADD_OPTION(OT_NAME_LANGUAGE);
+    PA_ADD_OPTION(OT_NAME);
     PA_ADD_OPTION(VIDEO_DELAY);
     PA_ADD_OPTION(GAME_DELAY);
     PA_ADD_OPTION(OUTPUT_FILE);
     PA_ADD_OPTION(DRY_RUN);
     PA_ADD_OPTION(NOTIFICATIONS);
+
+    BoxSorterLivingDex::on_config_value_changed(this);
+
+    OT_NAME_LANGUAGE.add_listener(*this);
 }
 
-bool BoxSorterLivingDex::is_viable_for_dex(const LivingDexEntry& entry, const CollectedPokemonInfo& pokemonInfo) {
+void BoxSorterLivingDex::on_config_value_changed(void* object){
+    if (OT_NAME_LANGUAGE == Language::None){
+        OT_NAME.set_visibility(ConfigOptionState::HIDDEN);
+    }else{
+        OT_NAME.set_visibility(ConfigOptionState::ENABLED);
+    }
+}
+
+bool BoxSorterLivingDex::is_viable_for_dex(
+    const LivingDexEntry& entry, 
+    const CollectedPokemonInfo& pokemonInfo, 
+    const std::string& normalized_ot_name
+){
+    if (OT_NAME_LANGUAGE != Language::None){
+        if (normalized_ot_name != pokemonInfo.ot_name){
+            return false;
+        }
+    }
+
     if (SHINY_DEX != pokemonInfo.shiny){
         return false;
     }
@@ -164,7 +219,8 @@ bool BoxSorterLivingDex::is_viable_for_dex(const LivingDexEntry& entry, const Co
     std::vector<SortingRule> sort_preferences,
     std::vector<std::optional<CollectedPokemonInfo>>& boxes_data,
     size_t box_count,
-    BoxCursor& nav_cursor
+    BoxCursor& nav_cursor,
+    Language ot_name_language
 ){
     BoxCursor dest_cursor;
     size_t starting_box(nav_cursor.box);
@@ -224,7 +280,7 @@ bool BoxSorterLivingDex::is_viable_for_dex(const LivingDexEntry& entry, const Co
                     }
 
                     // Read the summary screen and assign data to boxes_data[global_idx]
-                    read_summary_screen(env, context, boxes_data[global_idx].value());
+                    read_summary_screen(env, context, boxes_data[global_idx].value(), ot_name_language);
                 }
             }
 
@@ -277,6 +333,11 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
         living_dex_order.emplace_back(std::move(entry));
     }
 
+    std::string ot_name = static_cast<std::string>(OT_NAME);
+    env.log("OT Name user input: " + ot_name);
+    std::string ot_name_normalized = utf32_to_str(OCR::normalize_utf32(ot_name));
+    env.log("OT Name normalized: " + ot_name_normalized);
+
     // TODO allow users to have rules for the "best" version of a pokemon to be kept in the living dex box
     // It would be nice to add OT as most users that care about living dex also like to have it with their OT
     const std::vector<SortingRule> sort_preferences(
@@ -296,7 +357,7 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
 
     size_t living_dex_box_count = (size_t)std::ceil((double)living_dex_order.size() / 30);
 
-    nav_cursor = populate_box_data(env, context, sort_preferences, living_dex_boxes_data, living_dex_box_count, nav_cursor);
+    nav_cursor = populate_box_data(env, context, sort_preferences, living_dex_boxes_data, living_dex_box_count, nav_cursor, OT_NAME_LANGUAGE);
 
     dest_cursor = BoxCursor((REJECT_BOX_START - 1), 0, 0);
     nav_cursor = move_cursor_to(env, context, nav_cursor, dest_cursor, GAME_DELAY);
@@ -305,7 +366,7 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
     std::vector<std::optional<CollectedPokemonInfo>> reject_boxes_data;
     size_t reject_box_count = REJECT_BOX_END - REJECT_BOX_START + 1;
 
-    nav_cursor = populate_box_data(env, context, sort_preferences, reject_boxes_data, reject_box_count, nav_cursor);
+    nav_cursor = populate_box_data(env, context, sort_preferences, reject_boxes_data, reject_box_count, nav_cursor, OT_NAME_LANGUAGE);
 
     if (DRY_RUN){
         save_boxes_data_to_json(living_dex_boxes_data, "living_boxes_unsorted.json");
@@ -323,7 +384,7 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
                 continue;
             }
 
-            if (!is_viable_for_dex(entry, *living_dex_boxes_data[j])){
+            if (!is_viable_for_dex(entry, *living_dex_boxes_data[j], ot_name_normalized)){
                 continue;
             }
 
@@ -371,7 +432,7 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
                 continue;
             }
 
-            if (!is_viable_for_dex(entry, *reject_boxes_data[j])){
+            if (!is_viable_for_dex(entry, *reject_boxes_data[j], ot_name_normalized)){
                 continue;
             }
 
