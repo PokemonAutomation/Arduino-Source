@@ -92,6 +92,15 @@ BoxSorterLivingDex::BoxSorterLivingDex()
         LockMode::LOCK_WHILE_RUNNING,
         1, 1, (uint16_t)MAX_HOME_BOXES
     )
+    , LIVING_DEX_STYLE(
+        "<b>Living Dex Style:</b><br>Please see the wiki for a detailed explanation of each style.",
+        {
+            {LivingDexStyle::SORTED_BY_FORMS, "sorted_by_forms", "Sorted by Forms"},
+            {LivingDexStyle::SORTED_BY_SPECIES, "sorted_by_species", "Sorted by Species"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        LivingDexStyle::SORTED_BY_FORMS
+    )
     , SHINY_DEX(
         "<b>Shiny Dex:</b><br>Enable or disable shiny dex mode.",
         LockMode::LOCK_WHILE_RUNNING,
@@ -151,6 +160,7 @@ BoxSorterLivingDex::BoxSorterLivingDex()
     PA_ADD_OPTION(LIVING_DEX_START_BOX);
     PA_ADD_OPTION(REJECT_BOX_START);
     PA_ADD_OPTION(REJECT_BOX_END);
+    PA_ADD_OPTION(LIVING_DEX_STYLE);
     PA_ADD_OPTION(SHINY_DEX);
     PA_ADD_OPTION(OT_NAME_LANGUAGE);
     PA_ADD_OPTION(OT_NAME);
@@ -314,7 +324,21 @@ bool BoxSorterLivingDex::is_viable_for_dex(
 void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     StartProgramChecks::check_performance_class_wired_or_wireless(context);
 
-    std::string path = RESOURCE_PATH() + "PokemonHome/DexTemplates/living_form_dex_by_id_no_space.json";
+    std::string path;
+    
+    switch (LIVING_DEX_STYLE){
+        case LivingDexStyle::SORTED_BY_FORMS:
+            path = RESOURCE_PATH() + "PokemonHome/DexTemplates/living_dex_by_forms.json";
+            break;
+        case LivingDexStyle::SORTED_BY_SPECIES:
+            path = RESOURCE_PATH() + "PokemonHome/DexTemplates/living_dex_by_species.json";
+            break;
+        default:
+            throw InternalProgramError(
+                &env.logger(), PA_CURRENT_FUNCTION, "Invalid living dex style"
+            );
+    }
+    
     JsonValue json = load_json_file(path);
     const JsonArray& slugs = json.to_array_throw(path);
 
@@ -340,6 +364,7 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
 
     // TODO allow users to have rules for the "best" version of a pokemon to be kept in the living dex box
     // It would be nice to add OT as most users that care about living dex also like to have it with their OT
+    // Sort preferences isn't really used as the json/options dictate the exact pokemon to be placed in each slot.
     const std::vector<SortingRule> sort_preferences(
         {
             { SortingRuleType::DexNo, false } 

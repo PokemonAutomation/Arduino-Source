@@ -49,6 +49,12 @@ private:
         bool has_gender_difference;
     };
 
+
+    enum class LivingDexStyle{
+        SORTED_BY_FORMS,
+        SORTED_BY_SPECIES
+    };
+
     // Checks if the given pokemon is viable for the living dex entry. 
     // Currently the checks include: 
     // National Dex Id, Types (for regional forms), Gender (if no gender difference either is fine)
@@ -69,12 +75,20 @@ private:
 
     virtual void on_config_value_changed(void* object) override;
 
+    // Working boxes
     SimpleIntegerOption<uint16_t> LIVING_DEX_START_BOX;
     SimpleIntegerOption<uint16_t> REJECT_BOX_START;
     SimpleIntegerOption<uint16_t> REJECT_BOX_END;
+
+    // Living dex style.
+    EnumDropdownOption<LivingDexStyle> LIVING_DEX_STYLE;
+
+    // Dex filters
     BooleanCheckBoxOption SHINY_DEX;
     OCR::LanguageOCROption OT_NAME_LANGUAGE;
     StringOption OT_NAME;
+
+    // Setup options
     MillisecondsOption VIDEO_DELAY;
     MillisecondsOption GAME_DELAY;
     StringOption OUTPUT_FILE;
