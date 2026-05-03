@@ -626,6 +626,11 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     }
 
     std::vector<AdvEncounterSlot> ENCOUNTER_SLOTS = location_map.find(loc_slug)->second;
+    env.log("Encounter slots");
+    for (size_t i=0; i<ENCOUNTER_SLOTS.size(); i++){
+        AdvEncounterSlot& slot = ENCOUNTER_SLOTS[i];
+        env.log("   Slot " + std::to_string(i) + ": " + slot.species + " " + std::to_string(slot.minlevel) + "-" + std::to_string(slot.maxlevel));
+    }    
 
     std::set<std::string> SPECIES_LIST;
     for (auto slot : ENCOUNTER_SLOTS){
