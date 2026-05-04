@@ -11,6 +11,7 @@
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/Language.h"
 #include "CommonTools/VisualDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 
@@ -49,23 +50,25 @@ enum class PartyLevelUpDialog{
 
 class PartyLevelUpDetector : public StaticScreenDetector{
 public:
-    PartyLevelUpDetector(Color color, PartyLevelUpDialog dialog_type);
+    PartyLevelUpDetector(Color color, PartyLevelUpDialog dialog_type, Language language);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
     PartyLevelUpDialog dialog_type;
+    bool jpn;
     ImageFloatBox m_border_top_box;
     ImageFloatBox m_border_right_box;
     ImageFloatBox m_dialog_top_box;
     ImageFloatBox m_dialog_right_box;
     ImageFloatBox m_plus_box;
+    ImageFloatBox m_plus_box_jpn;
 };
 class PartyLevelUpWatcher : public DetectorToFinder<PartyLevelUpDetector>{
 public:
-    PartyLevelUpWatcher(Color color, PartyLevelUpDialog dialog_type)
-        : DetectorToFinder("BattleLevelUpWatcher", std::chrono::milliseconds(250), color, dialog_type)
+    PartyLevelUpWatcher(Color color, PartyLevelUpDialog dialog_type, Language language)
+        : DetectorToFinder("PartyLevelUpWatcher", std::chrono::milliseconds(250), color, dialog_type, language)
     {}
 };
 

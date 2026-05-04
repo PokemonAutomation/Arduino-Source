@@ -418,7 +418,7 @@ bool StarterRng::auto_battle_rival(
     }
 
     // slowly advance dialog until level-up stats are visible
-    BattleLevelUpWatcher level_up_stats(COLOR_RED, BattleLevelUpDialog::stats);
+    BattleLevelUpWatcher level_up_stats(COLOR_RED, BattleLevelUpDialog::stats, LANGUAGE);
     BlackScreenWatcher black_screen(COLOR_RED);
     context.wait_for_all_requests();
     int ret4 = run_until<ProControllerContext>(
@@ -561,7 +561,7 @@ int StarterRng::autolevel_on_route1(
         // auto battle
         BattleResult ret2 = spam_first_move(env.console, context);
 
-        BattleLevelUpWatcher level_up(COLOR_RED, BattleLevelUpDialog::stats);
+        BattleLevelUpWatcher level_up(COLOR_RED, BattleLevelUpDialog::stats, LANGUAGE);
         BlackScreenWatcher black_screen(COLOR_RED);
         VideoSnapshot screen;
         int ret3;

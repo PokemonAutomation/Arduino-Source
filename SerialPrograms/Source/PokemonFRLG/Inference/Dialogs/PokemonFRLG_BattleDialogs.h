@@ -11,6 +11,7 @@
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/Language.h"
 #include "CommonTools/VisualDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 
@@ -148,23 +149,25 @@ enum class BattleLevelUpDialog{
 
 class BattleLevelUpDetector : public StaticScreenDetector{
 public:
-    BattleLevelUpDetector(Color color, BattleLevelUpDialog dialog_type);
+    BattleLevelUpDetector(Color color, BattleLevelUpDialog dialog_type, Language Language);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
     BattleLevelUpDialog dialog_type;
+    bool jpn;
     ImageFloatBox m_border_top_box;
     ImageFloatBox m_border_right_box;
     ImageFloatBox m_dialog_top_box;
     ImageFloatBox m_dialog_right_box;
     ImageFloatBox m_plus_box;
+    ImageFloatBox m_plus_box_jpn;
 };
 class BattleLevelUpWatcher : public DetectorToFinder<BattleLevelUpDetector>{
 public:
-    BattleLevelUpWatcher(Color color, BattleLevelUpDialog dialog_type)
-        : DetectorToFinder("BattleLevelUpWatcher", std::chrono::milliseconds(250), color, dialog_type)
+    BattleLevelUpWatcher(Color color, BattleLevelUpDialog dialog_type, Language language)
+        : DetectorToFinder("BattleLevelUpWatcher", std::chrono::milliseconds(250), color, dialog_type, language)
     {}
 };
 

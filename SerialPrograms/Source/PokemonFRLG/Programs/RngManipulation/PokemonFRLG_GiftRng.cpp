@@ -343,7 +343,7 @@ bool GiftRng::use_rare_candy(
     }
 
     // watch for level up stats
-    PartyLevelUpWatcher level_up(COLOR_RED, PartyLevelUpDialog::stats);
+    PartyLevelUpWatcher level_up(COLOR_RED, PartyLevelUpDialog::stats, LANGUAGE);
     context.wait_for_all_requests();
     int ret2 = run_until<ProControllerContext>(
         env.console, context,

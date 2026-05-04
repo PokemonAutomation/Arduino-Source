@@ -12,6 +12,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_BattleLevelUpReader.h"
 #include "PokemonFRLG_ReadBattleLevelUp.h"
@@ -35,7 +36,14 @@ ReadBattleLevelUp_Descriptor::ReadBattleLevelUp_Descriptor()
 ){}
 
 ReadBattleLevelUp::ReadBattleLevelUp()
-{}
+    : LANGUAGE(
+        "<b>Game Language:</b>",
+        Pokemon::PokemonNameReader::instance().languages(),
+        LockMode::LOCK_WHILE_RUNNING, true
+    )
+{
+    PA_ADD_OPTION(LANGUAGE);
+}
 
 void ReadBattleLevelUp::program(
     SingleSwitchProgramEnvironment &env,
@@ -45,8 +53,8 @@ void ReadBattleLevelUp::program(
         "Starting Read Battle Level Up program..."
     );
 
-    BattleLevelUpDetector plus_detector(COLOR_RED, BattleLevelUpDialog::plus);
-    BattleLevelUpDetector stats_detector(COLOR_RED, BattleLevelUpDialog::stats);
+    BattleLevelUpDetector plus_detector(COLOR_RED, BattleLevelUpDialog::plus, LANGUAGE);
+    BattleLevelUpDetector stats_detector(COLOR_RED, BattleLevelUpDialog::stats, LANGUAGE);
 
     env.log("Detecting the relevant dialogue box...");
     VideoSnapshot screen = env.console.video().snapshot();

@@ -30,12 +30,12 @@ namespace PokemonFRLG {
 
 BattleLevelUpReader::BattleLevelUpReader(Color color)
     : m_color(color)
-    , m_box_hp(0.904069, 0.402852, 0.068535, 0.079387)
-    , m_box_attack(0.904069, 0.496052, 0.068535, 0.079387)
-    , m_box_defense(0.904069, 0.589252, 0.068535, 0.079387)
-    , m_box_sp_attack(0.904069, 0.682452, 0.068535, 0.079387)
-    , m_box_sp_defense(0.904069, 0.775652, 0.068535, 0.079387)
-    , m_box_speed(0.904069, 0.868852, 0.068535, 0.0793879)
+    , m_box_hp(0.844069, 0.402852, 0.128535, 0.079387)
+    , m_box_attack(0.844069, 0.496052, 0.128535, 0.079387)
+    , m_box_defense(0.844069, 0.589252, 0.128535, 0.079387)
+    , m_box_sp_attack(0.844069, 0.682452, 0.128535, 0.079387)
+    , m_box_sp_defense(0.844069, 0.775652, 0.128535, 0.079387)
+    , m_box_speed(0.844069, 0.868852, 0.128535, 0.0793879)
 {}
 
 void BattleLevelUpReader::make_overlays(VideoOverlaySet &items) const {
