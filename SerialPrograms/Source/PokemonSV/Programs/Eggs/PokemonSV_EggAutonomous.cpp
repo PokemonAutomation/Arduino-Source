@@ -18,6 +18,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
+#include "PokemonSV/Inference/Map/PokemonSV_FastTravelDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
@@ -41,6 +42,24 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 using namespace Pokemon;
+
+
+static void confirm_cursor_centered_on_fast_travel(
+    const ProgramInfo& info, VideoStream& stream, ProControllerContext& context
+){
+    context.wait_for_all_requests();
+    context.wait_for(std::chrono::milliseconds(500));
+    ImageFloatBox center_cursor{0.484, 0.472, 0.030, 0.053};
+    FastTravelDetector fast_travel(COLOR_RED, center_cursor);
+    if (!fast_travel.detect(stream.video().snapshot())){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "confirm_cursor_centered_on_fast_travel(): Cursor is not centered on a fast travel icon.",
+            stream
+        );
+    }
+    stream.log("Confirmed that the cursor is centered on a fast travel icon.");
+}
 
 
 EggAutonomous_Descriptor::EggAutonomous_Descriptor()
@@ -124,7 +143,7 @@ EggAutonomous::EggAutonomous()
             {AutoSave::AfterStartAndKeep, "start-and-keep", "Save at beginning and after keeping a baby."},
             {AutoSave::EveryBatch, "every-batch", "Save before every batch of 4 or 5 eggs."},
             {AutoSave::AfterFetchComplete, "after-fetch", "Save after all eggs have been fetched from picnic."},
-            {AutoSave::BackupSaveAfterFetchAndKeep, "backup-fetch-and-keep", "Backup save after fetching eggs and save when keeping a baby."}
+            {AutoSave::BackupSaveAfterFetchAndKeep, "backup-fetch-and-keep", "Backup save after fetching all eggs, hard save at beginning and after keeping a baby."}
         },
         LockMode::LOCK_WHILE_RUNNING,
         AutoSave::AfterStartAndKeep
@@ -203,10 +222,10 @@ EggAutonomous::EggAutonomous()
 void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
-    DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
-
     //  Connect the controller.
     pbf_press_button(context, BUTTON_L, 80ms, 800ms);
+
+    DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
 
     {
         // reset_position_to_flying_spot(env, context);
@@ -234,7 +253,6 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     while (true){
         m_saved_after_fetched_eggs = false;
         m_in_critical_to_save_stage = false;
-        m_backup_saved_after_fetched_eggs = false;
 
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
@@ -259,7 +277,6 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 
         if (AUTO_SAVING == AutoSave::BackupSaveAfterFetchAndKeep){
             backup_save(env, context);
-            m_backup_saved_after_fetched_eggs = true;
         }
 
         // Recoverable loop to hatch eggs
@@ -287,7 +304,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 
                 // If there is no save during egg hatching, then the game is reset to before fetching eggs.
                 // So we need to break out of the recoverable hatch egg routine loop.
-                if (m_saved_after_fetched_eggs == false && m_backup_saved_after_fetched_eggs == false){
+                if (m_saved_after_fetched_eggs == false){
                     env.log("No save during egg hatching routine. After this reset, we should start the egg fetching routine now.");
                     game_already_resetted = true;
                     break;
@@ -763,6 +780,8 @@ void EggAutonomous::fly_between_zero_gate_and_pokecenter(SingleSwitchProgramEnvi
         try{
             if (to_pokecenter){
                 confirm_cursor_centered_on_pokecenter(env.program_info(), env.console, context);
+            }else{
+                confirm_cursor_centered_on_fast_travel(env.program_info(), env.console, context);
             }
             fly_to_overworld_from_map(env.program_info(), env.console, context);
             return true;
