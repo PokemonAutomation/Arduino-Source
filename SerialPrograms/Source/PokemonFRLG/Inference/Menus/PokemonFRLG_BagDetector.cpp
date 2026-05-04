@@ -22,7 +22,7 @@ namespace PokemonFRLG{
 
 
 BagDetector::BagDetector(Color color)
-    : m_bag_shadow_box(0.130769, 0.594471, 0.070192, 0.015865)
+    : m_bag_shadow_box(0.131250, 0.608173, 0.068269, 0.001442)
     , m_pocket_underline_box(0.043269, 0.137259, 0.279808, 0.005769)
     , m_menu_top_box(0.029808, 0.029086, 0.947115, 0.003606)
     , m_menu_right_box(0.977404, 0.034134, 0.005288, 0.597837)
