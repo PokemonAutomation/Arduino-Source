@@ -11,6 +11,8 @@
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "PokemonSwSh_MaxLair_Run_Entrance.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
@@ -63,11 +65,47 @@ void run_entrance(
         save_path = followed_path;
     }
     
-    // Overlay box to detect when a dialogue box, a Yes/No option to save a path or erasing a path if our list is full is present
-    OverlayBoxScope dialog_box(stream.overlay(), {0.78, 0.85, 0.03, 0.05});
-    OverlayBoxScope yes_no_box(stream.overlay(), {0.68, 0.75, 0.135, 0.02});
+    // Detects the standard SwSh black-border dialog box (any dialog present)
+    BlackDialogBoxDetector dialog_detector(false);
+
+    // Detects the yellow selection arrow in the bottom-right Yes/No area
+    SelectionArrowFinder yes_no_arrow(stream.overlay(), {0.63, 0.70, 0.22, 0.14});
+
+    // Overlay box to detect path-list text — distinguishes "list full" from "save path?" dialog
     OverlayBoxScope paths_box(stream.overlay(), {0.685, 0.515, 0.13, 0.013});
-    
+
+    // === TEMP TEST: remove this block after testing ===
+    {
+        ImageRGB32 test_image("/Users/alexhan/Desktop/Tests/2000120704084300_c.jpg");  // <-- set this path
+        if (!test_image){
+            stream.log("Test image failed to load.", COLOR_RED);
+        } else {
+            dialog_detector.process_frame(test_image, current_time());
+            stream.log(
+                std::string("BlackDialogBoxDetector: ") +
+                (dialog_detector.detected() ? "DETECTED" : "not detected"),
+                dialog_detector.detected() ? COLOR_GREEN : COLOR_RED
+            );
+
+            bool arrow_found = yes_no_arrow.detect(test_image);
+            stream.log(
+                std::string("SelectionArrowFinder (yes/no region): ") +
+                (arrow_found ? "DETECTED" : "not detected"),
+                arrow_found ? COLOR_GREEN : COLOR_RED
+            );
+
+            ImageStats paths_stats = image_stats(extract_box_reference(test_image, paths_box));
+            bool paths_present = is_white(paths_stats, 400, 10);
+            stream.log(
+                std::string("paths_box is_white: ") +
+                (paths_present ? "DETECTED" : "not detected"),
+                paths_present ? COLOR_GREEN : COLOR_RED
+            );
+        }
+        return;  // early exit — skip the normal loop during test
+    }
+    // === END TEMP TEST ===
+
     // Timeout: 5 minutes
     auto start_time = std::chrono::steady_clock::now();
     const auto timeout = std::chrono::minutes(5);
@@ -85,14 +123,12 @@ void run_entrance(
         VideoSnapshot screen = stream.video().snapshot();
         if (!screen) continue;
         
-        ImageStats dialog_box_stats = image_stats(extract_box_reference(screen, dialog_box));
-        
-        ImageStats yes_no_box_stats = image_stats(extract_box_reference(screen, yes_no_box));
-        
+        dialog_detector.process_frame(screen, current_time());
+        bool dialog_box_present = dialog_detector.detected();
+
+        bool yes_no_box_present = yes_no_arrow.detect(screen);
+
         ImageStats paths_box_stats = image_stats(extract_box_reference(screen, paths_box));
-        
-        bool dialog_box_present = is_grey(dialog_box_stats, 400, 1000);
-        bool yes_no_box_present = is_white(yes_no_box_stats, 400, 10);
         bool paths_box_present = is_white(paths_box_stats, 400, 10);
         
         if (paths_box_present && yes_no_box_present) {
