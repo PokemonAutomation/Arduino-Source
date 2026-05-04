@@ -33,6 +33,7 @@
 #include "PokemonFRLG_BlindNavigation.h"
 #include "PokemonFRLG_RngNavigation.h"
 #include "PokemonFRLG_HardReset.h"
+#include "PokemonFRLG_LocationsDatabase.h"
 #include "PokemonFRLG_RngStatsDatabase.h"
 #include "PokemonFRLG_EncountersDatabase.h"
 #include "PokemonFRLG_WildRng.h"
@@ -111,112 +112,12 @@ WildRng::WildRng()
         LockMode::LOCK_WHILE_RUNNING,
         EncounterType::grass
     )
+    , LOCATIONS_DATABASE(make_locations_database("PokemonFRLG/Locations.json"))
     , GAME_LOCATION(
         "<b>Location:</b>",
-        {
-            {GameLocation::altering_cave, "altering_cave", "Altering Cave"},
-            {GameLocation::berry_forest, "berry_forest", "Berry Forest"},
-            {GameLocation::bond_bridge, "bond_bridge", "Bond Bridge"},
-            {GameLocation::cape_brink, "cape_brink", "Cape Brink"},
-            {GameLocation::celadon_city, "celadon_city", "Celadon City"},
-            {GameLocation::cerulean_cave_1f, "cerulean_cave_1f", "Cerulean Cave 1F"},
-            {GameLocation::cerulean_cave_2f, "cerulean_cave_2f", "Cerulean Cave 2F"},
-            {GameLocation::cerulean_cave_b1f, "cerulean_cave_b1f", "Cerulean Cave B1F"},
-            {GameLocation::cerulean_city, "cerulean_city", "Cerulean City"},
-            {GameLocation::cinnabar_island, "cinnabar_island", "Cinnabar Island"},
-            {GameLocation::digletts_cave, "digletts_cave", "Digletts Cave"},
-            {GameLocation::five_island, "five_island", "Five Island"},
-            {GameLocation::five_isle_meadow, "five_isle_meadow", "Five Isle Meadow"},
-            {GameLocation::four_island, "four_island", "Four Island"},
-            {GameLocation::fuchsia_city, "fuchsia_city", "Fuchsia City"},
-            {GameLocation::green_path, "green_path", "Green Path"},
-            {GameLocation::icefall_cave_1f, "icefall_cave_1f", "Icefall Cave 1F"},
-            {GameLocation::icefall_cave_back_cavern, "icefall_cave_back_cavern", "Icefall Cave Back Cavern"},
-            {GameLocation::icefall_cave_b1f, "icefall_cave_b1f", "Icefall Cave B1F"},
-            {GameLocation::icefall_cave_entrance, "icefall_cave_entrance", "Icefall Cave Entrance"},
-            {GameLocation::kindle_road, "kindle_road", "Kindle Road"},
-            {GameLocation::lost_cave, "lost_cave", "Lost Cave"},
-            {GameLocation::memorial_pillar, "memorial_pillar", "Memorial Pillar"},
-            {GameLocation::mt_ember_exterior, "mt_ember_exterior", "Mt. Ember Exterior"},
-            {GameLocation::mt_ember_ruby_path_1f, "mt_ember_ruby_path_1f", "Mt. Ember Ruby Path 1F"},
-            {GameLocation::mt_ember_ruby_path_b1f, "mt_ember_ruby_path_b1f", "Mt. Ember Ruby Path B1F"},
-            {GameLocation::mt_ember_ruby_path_b2f, "mt_ember_ruby_path_b2f", "Mt. Ember Ruby Path B2F"},
-            {GameLocation::mt_ember_ruby_path_b3f, "mt_ember_ruby_path_b3f", "Mt. Ember Ruby Path B3F"},
-            {GameLocation::mt_ember_summit_path_1f, "mt_ember_summit_path_1f", "Mt. Ember Summit Path 1F"},
-            {GameLocation::mt_ember_summit_path_2f, "mt_ember_summit_path_2f", "Mt. Ember Summit Path 2F"},
-            {GameLocation::mt_ember_summit_path_3f, "mt_ember_summit_path_3f", "Mt. Ember Summit Path 3F"},
-            {GameLocation::mt_moon_1f, "mt_moon_1f", "Mt. Moon 1F"},
-            {GameLocation::mt_moon_b1f, "mt_moon_b1f", "Mt. Moon B1F"},
-            {GameLocation::mt_moon_b2f, "mt_moon_b2f", "Mt. Moon B2F"},
-            {GameLocation::one_island, "one_island", "One Island"},
-            {GameLocation::outcast_island, "outcast_island", "Outcast Island"},
-            {GameLocation::pallet_town, "pallet_town", "Pallet Town"},
-            {GameLocation::pattern_bush, "pattern_bush", "Pattern Bush"},
-            {GameLocation::pokemon_mansion_basement, "pokemon_mansion_basement", STRING_POKEMON +  " Mansion Basement"},
-            {GameLocation::pokemon_mansion_upper_floors, "pokemon_mansion_upper_floors", STRING_POKEMON + " Mansion Upper Floors"},
-            {GameLocation::pokemon_tower_3f, "pokemon_tower_3f", STRING_POKEMON + " Tower 3F"},
-            {GameLocation::pokemon_tower_4f, "pokemon_tower_4f", STRING_POKEMON + " Tower 4F"},
-            {GameLocation::pokemon_tower_5f, "pokemon_tower_5f", STRING_POKEMON + " Tower 5F"},
-            {GameLocation::pokemon_tower_6f, "pokemon_tower_6f", STRING_POKEMON + " Tower 6F"},
-            {GameLocation::pokemon_tower_7f, "pokemon_tower_7f", STRING_POKEMON + " Tower 7F"},
-            {GameLocation::power_plant, "power_plant", "Power Plant"},
-            {GameLocation::resort_gorgeous, "resort_gorgeous", "Resort Gorgeous"},
-            {GameLocation::rock_tunnel_1f, "rock_tunnel_1f", "Rock Tunnel 1F"},
-            {GameLocation::rock_tunnel_b1f, "rock_tunnel_b1f", "Rock Tunnel B1F"},
-            {GameLocation::route_1, "route_1", "Route 1"},
-            {GameLocation::route_10, "route_10", "Route 10"},
-            {GameLocation::route_11, "route_11", "Route 11"},
-            {GameLocation::route_12, "route_12", "Route 12"},
-            {GameLocation::route_13, "route_13", "Route 13"},
-            {GameLocation::route_14, "route_14", "Route 14"},
-            {GameLocation::route_15, "route_15", "Route 15"},
-            {GameLocation::route_16, "route_16", "Route 16"},
-            {GameLocation::route_17, "route_17", "Route 17"},
-            {GameLocation::route_18, "route_18", "Route 18"},
-            {GameLocation::route_19, "route_19", "Route 19"},
-            {GameLocation::route_2, "route_2", "Route 2"},
-            {GameLocation::route_20, "route_20", "Route 20"},
-            {GameLocation::route_21, "route_21", "Route 21"},
-            {GameLocation::route_22, "route_22", "Route 22"},
-            {GameLocation::route_23, "route_23", "Route 23"},
-            {GameLocation::route_24, "route_24", "Route 24"},
-            {GameLocation::route_25, "route_25", "Route 25"},
-            {GameLocation::route_3, "route_3", "Route 3"},
-            {GameLocation::route_4, "route_4", "Route 4"},
-            {GameLocation::route_5, "route_5", "Route 5"},
-            {GameLocation::route_6, "route_6", "Route 6"},
-            {GameLocation::route_7, "route_7", "Route 7"},
-            {GameLocation::route_8, "route_8", "Route 8"},
-            {GameLocation::route_9, "route_9", "Route 9"},
-            {GameLocation::ruin_valley, "ruin_valley", "Ruin Valley"},
-            {GameLocation::safari_zone_area_1_east, "safari_zone_area_1_east", "Safari Zone Area 1 - East"},
-            {GameLocation::safari_zone_area_2_north, "safari_zone_area_2_north", "Safari Zone Area 2 - North"},
-            {GameLocation::safari_zone_area_3_west, "safari_zone_area_3_west", "Safari Zone Area 3 - West"},
-            {GameLocation::safari_zone_entrance, "safari_zone_entrance", "Safari Zone Entrance"},
-            {GameLocation::seafoam_islands_1f, "seafoam_islands_1f", "Seafoam Islands 1F"},
-            {GameLocation::seafoam_islands_b1f, "seafoam_islands_b1f", "Seafoam Islands B1F"},
-            {GameLocation::seafoam_islands_b2f, "seafoam_islands_b2f", "Seafoam Islands B2F"},
-            {GameLocation::seafoam_islands_b3f, "seafoam_islands_b3f", "Seafoam Islands B3F"},
-            {GameLocation::seafoam_islands_b4f, "seafoam_islands_b4f", "Seafoam Islands B4F"},
-            {GameLocation::sevault_canyon, "sevault_canyon", "Sevault Canyon"},
-            {GameLocation::sevault_canyon_entrance, "sevault_canyon_entrance", "Sevault Canyon Entrance"},
-            {GameLocation::ss_anne, "ss_anne", "S.S. Anne"},
-            {GameLocation::tanoby_ruins, "tanoby_ruins", "Tanoby Ruins"},
-            {GameLocation::tanoby_ruins_chambers, "tanoby_ruins_chambers", "Tanoby Ruins Chambers"},
-            {GameLocation::three_isle_port, "three_isle_port", "Three Isle Port"},
-            {GameLocation::trainer_tower, "trainer_tower", "Trainer Tower"},
-            {GameLocation::treasure_beach, "treasure_beach", "Treasure Beach"},
-            {GameLocation::vermilion_city, "vermilion_city", "Vermilion City"},
-            {GameLocation::victory_road_1f, "victory_road_1f", "Victory Road 1F"},
-            {GameLocation::victory_road_2f, "victory_road_2f", "Victory Road 2F"},
-            {GameLocation::victory_road_3f, "victory_road_3f", "Victory Road 3F"},
-            {GameLocation::viridian_city, "viridian_city", "Viridian City"},
-            {GameLocation::viridian_forest, "viridian_forest", "Viridian Forest"},
-            {GameLocation::water_labyrinth, "water_labyrinth", "Water Labyrinth"},
-            {GameLocation::water_path, "water_path", "Water Path"},
-        },
+        LOCATIONS_DATABASE,
         LockMode::LOCK_WHILE_RUNNING,
-        GameLocation::route_1
+        "route_1"
     )    
     , MAX_RESETS(
         "<b>Max Resets:</b><br>",
@@ -712,10 +613,8 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     auto enc_entry = ENCOUNTER_TYPE.database().find(enc_idx);
     std::string enc_slug = enc_entry->slug;
 
-    GameLocation loc = GAME_LOCATION;
-    int loc_idx = static_cast <int> (loc);
-    auto loc_entry = GAME_LOCATION.database().find(loc_idx);
-    std::string loc_slug = loc_entry->slug;
+
+    std::string loc_slug = GAME_LOCATION.slug();
 
     std::map<std::string, std::vector<AdvEncounterSlot>> location_map = encounters_data.get_throw(enc_slug);
     if (location_map.find(loc_slug)==location_map.end()){
@@ -727,6 +626,11 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     }
 
     std::vector<AdvEncounterSlot> ENCOUNTER_SLOTS = location_map.find(loc_slug)->second;
+    env.log("Encounter slots");
+    for (size_t i=0; i<ENCOUNTER_SLOTS.size(); i++){
+        AdvEncounterSlot& slot = ENCOUNTER_SLOTS[i];
+        env.log("   Slot " + std::to_string(i) + ": " + slot.species + " " + std::to_string(slot.minlevel) + "-" + std::to_string(slot.maxlevel));
+    }    
 
     std::set<std::string> SPECIES_LIST;
     for (auto slot : ENCOUNTER_SLOTS){
@@ -756,10 +660,10 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     PokemonFRLG_RngTarget TARGET = PokemonFRLG_RngTarget::sweetscent;
 
     bool safari_zone = (
-        GAME_LOCATION == GameLocation::safari_zone_area_1_east  || 
-        GAME_LOCATION == GameLocation::safari_zone_area_2_north || 
-        GAME_LOCATION == GameLocation::safari_zone_area_3_west  || 
-        GAME_LOCATION == GameLocation::safari_zone_entrance
+        loc_slug == "safari_zone_area_1_east"  || 
+        loc_slug == "safari_zone_area_2_north" || 
+        loc_slug == "safari_zone_area_3_west"  || 
+        loc_slug == "safari_zone_entrance"
     );
     switch (ENCOUNTER_TYPE){
         case EncounterType::rocksmash:
@@ -767,11 +671,11 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             break;
         case EncounterType::grass:
             if (safari_zone){
-                if (GAME_LOCATION == GameLocation::safari_zone_area_1_east){
+                if (loc_slug == "safari_zone_area_1_east"){
                     TARGET = PokemonFRLG_RngTarget::safarizoneeast;
-                }else if (GAME_LOCATION == GameLocation::safari_zone_area_2_north){
+                }else if (loc_slug == "safari_zone_area_2_north"){
                     TARGET = PokemonFRLG_RngTarget::safarizonenorth;
-                }else if (GAME_LOCATION == GameLocation::safari_zone_area_3_west){
+                }else if (loc_slug == "safari_zone_area_3_west"){
                     TARGET = PokemonFRLG_RngTarget::safarizonewest;
                 }else{
                     TARGET = PokemonFRLG_RngTarget::safarizonecenter;
@@ -785,6 +689,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         case EncounterType::goodrod:
         case EncounterType::superrod:
             TARGET = safari_zone ? PokemonFRLG_RngTarget::safarizonefish : PokemonFRLG_RngTarget::fishing;
+            break;
         default:
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
@@ -915,9 +820,10 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         RNG_CALIBRATION.reset();
 
         int ret = watch_for_shiny_encounter(env.console, context);
-        if (ret < 1){
+        if (ret < 0){
             if (TARGET == PokemonFRLG_RngTarget::fishing || TARGET == PokemonFRLG_RngTarget::rocksmash){
                 env.log("No battle triggered. Resetting...");
+                continue;
             }else{
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,

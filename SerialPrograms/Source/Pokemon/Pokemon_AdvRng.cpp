@@ -181,27 +181,27 @@ uint8_t slot_number_from_roll(uint8_t roll, size_t size, bool super_rod) {
         if (super_rod){ // super rod
             if (roll < 40){
                return 0;
-                }else if(roll < 70){
+            }else if(roll < 80){
                return 1;
-                }else if(roll < 85){
+            }else if(roll < 95){
                return 2;
-                }else if(roll < 95){
+            }else if(roll < 99){
                return 3;
-                }else{
+            }else{
                return 4;
-                }
+            }
         }else{
             if (roll < 60){ // surfing and rock smash
                return 0;
-                }else if(roll < 90){
+            }else if(roll < 90){
                return 1;
-                }else if(roll < 95){
+            }else if(roll < 95){
                return 2;
-                }else if(roll < 99){
+            }else if(roll < 99){
                return 3;
-                }else{
+            }else{
                return 4;
-                }
+            }
         }
     case 3: // good rod
         if (roll < 60){
