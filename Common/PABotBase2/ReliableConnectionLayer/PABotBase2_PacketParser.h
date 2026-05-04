@@ -60,7 +60,11 @@ public:
     //  This will never read more than is necessary unless there
     //  is an error.
     //
-    const PacketHeader* pull_bytes(UnreliableStreamConnectionPolling& connection);
+    const PacketHeader* pull_bytes(
+        UnreliableStreamConnectionPolling& connection,
+        const uint32_t& session_id,
+        WallDuration timeout
+    );
 
     //
     //  Parse packets by consuming data from an existing buffer.
@@ -69,6 +73,7 @@ public:
     //
     void push_bytes(
         PacketRunner& packet_runner,
+        const uint32_t& session_id,
         const uint8_t* data, size_t bytes
     );
 

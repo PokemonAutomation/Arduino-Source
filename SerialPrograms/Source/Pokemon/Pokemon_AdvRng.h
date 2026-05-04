@@ -100,6 +100,12 @@ struct AdvRngState{
     }
 };
 
+struct AdvEncounterSlot{
+    std::string species;
+    uint8_t minlevel;
+    uint8_t maxlevel;
+};
+
 struct AdvPokemonResult{
     uint32_t pid;
     uint8_t gender;
@@ -108,7 +114,19 @@ struct AdvPokemonResult{
     AdvIVs ivs;
 };
 
+struct AdvWildPokemonResult{
+    std::string species;
+    uint32_t pid;
+    uint8_t gender;
+    AdvNature nature;
+    AdvAbility ability;
+    AdvIVs ivs;
+    uint8_t slot;
+    uint8_t level;
+};
+
 struct AdvObservedPokemon{
+    std::string species;
     AdvGender gender;
     AdvNature nature;
     AdvAbility ability;
@@ -119,6 +137,8 @@ struct AdvObservedPokemon{
 };
 
 struct AdvRngFilters{
+    std::string species;
+    uint8_t level;
     AdvGender gender;
     AdvNature nature;
     AdvAbility ability;
@@ -127,40 +147,87 @@ struct AdvRngFilters{
     AdvRngMethod method;
 };
 
-class AdvRng{
+// updates the AdvObservedPokemon with info from leveling up
+// assumes levels are earned sequentially
+// input EVs are the ones earned since the last level up, not the total
+void level_up_observed_pokemon(AdvObservedPokemon& pokemon, const StatReads& newstats, const EVs& evyield);
+
+// returns the appropriate NatureAdjustments for an AdvNature
+Pokemon::NatureAdjustments nature_to_adjustment(AdvNature nature);
+
+// returns search filters that correspond with observed stats
+AdvRngFilters observation_to_filters(const AdvObservedPokemon& observation, const BaseStats& basestats, AdvRngMethod method = AdvRngMethod::Method1);
+
+class AdvRngSearcher{
 public:
     uint16_t seed;
     AdvRngState state;
 
-    AdvRng(uint16_t seed, AdvRngState state);
-    AdvRng(uint16_t seed, uint64_t min_advances, AdvRngMethod method = AdvRngMethod::Method1);
+    AdvRngSearcher(uint16_t seed, AdvRngState state);
+    AdvRngSearcher(uint16_t seed, uint64_t min_advances, AdvRngMethod method = AdvRngMethod::Method1);
 
     void set_seed(uint16_t seed);
     void set_state_advances(uint64_t advances);
     void advance_state();
 
-    std::map<AdvRngState, AdvPokemonResult> search(
+    AdvPokemonResult generate_pokemon();
+
+    std::vector<AdvRngState> search(
         AdvRngFilters& target,
-        std::vector<uint16_t>& seeds,
+        const std::vector<uint16_t>& seeds,
         uint64_t min_advances,
         uint64_t max_advances,
-        uint16_t tid_xor_sid = 0,
-        uint8_t gender_threshold = 126
+        int16_t gender_threshold = 126,
+        uint16_t tid_xor_sid = 0
     );
 
 private:
     void search_advance_range(
-        std::map<AdvRngState, AdvPokemonResult>& hits,
+        std::vector<AdvRngState>& hits,
         AdvRngFilters& target,
         uint64_t min_advances,
         uint64_t max_advances,
-        uint16_t tid_xor_sid,
-        uint8_t gender_threshold
+        int16_t gender_threshold,
+        uint16_t tid_xor_sid
     );
 };
 
+class AdvRngWildSearcher{
+public:
+    uint16_t seed;
+    AdvRngState state;
+    const std::vector<AdvEncounterSlot>& encounter_slots;
 
+    AdvRngWildSearcher(uint16_t seed, AdvRngState state, const std::vector<AdvEncounterSlot>& encounter_slots);
+    AdvRngWildSearcher(uint16_t seed, uint64_t min_advances, const std::vector<AdvEncounterSlot>& encounter_slots, AdvRngMethod method = AdvRngMethod::Any);
 
+    void set_seed(uint16_t seed);
+    void set_state_advances(uint64_t advances);
+    void advance_state();
+
+    AdvWildPokemonResult generate_pokemon(bool super_rod = false);
+
+    std::vector<AdvRngState> search(
+        AdvRngFilters& target,
+        const std::vector<uint16_t>& seeds,
+        uint64_t min_advances,
+        uint64_t max_advances,
+        int16_t gender_threshold = 126,
+        bool super_rod = false,
+        uint16_t tid_xor_sid = 0
+    );
+
+private:
+    void search_advance_range(
+        std::vector<AdvRngState>& hits,
+        AdvRngFilters& target,
+        uint64_t min_advances,
+        uint64_t max_advances,
+        int16_t gender_threshold,
+        bool super_rod,
+        uint16_t tid_xor_sid
+    );
+};
 
 
 

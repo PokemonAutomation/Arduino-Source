@@ -33,7 +33,8 @@ public:
         Cancellable& scope,
         std::atomic<InferenceCallback*>* set_when_triggered,
         VisualInferenceCallback& callback,
-        std::chrono::milliseconds period
+        std::chrono::milliseconds period,
+        WallClock start_time
     );
 
     //  Returns the latency stats for the callback. Units are microseconds.

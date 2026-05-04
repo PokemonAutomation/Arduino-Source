@@ -35,7 +35,7 @@ public:
 
 public:
     void cancel_all_commands();
-    void replace_on_next_command(Cancellable* cancellable);
+    void replace_on_next_command();
 
     void wait_for_all(Cancellable* cancellable);
 

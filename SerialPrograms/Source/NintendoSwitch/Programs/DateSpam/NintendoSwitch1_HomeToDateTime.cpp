@@ -94,12 +94,12 @@ void home_to_date_time_Switch1_wired_blind(
     //  confirmation menus.
     ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms);
 }
-void home_to_date_time_Switch1_wireless_esp32_blind(
+void home_to_date_time_Switch1_wireless_blind(
     Logger& logger, ProControllerContext& context, bool to_date_change
 ){
     ThrottleScope scope(context->logging_throttler());
     if (scope){
-        context->logger().log("NintendoSwitch::home_to_date_time_Switch1_wireless_esp32_blind()");
+        context->logger().log("NintendoSwitch::home_to_date_time_Switch1_wireless_blind()");
     }
 
     Milliseconds tv = context->timing_variation();
@@ -361,16 +361,16 @@ void home_to_date_time_Switch1_wired_feedback(
 
 }
 
-void home_to_date_time_Switch1_wireless_esp32_feedback(
+void home_to_date_time_Switch1_wireless_feedback(
     VideoStream& stream, ProControllerContext& context, bool to_date_change
 ){
-    stream.log("home_to_date_time_Switch1_wireless_esp32_feedback()");
+    stream.log("home_to_date_time_Switch1_wireless_feedback()");
 
     size_t max_attempts = 5;
     for (size_t i = 0; i < max_attempts; i++){
         ThrottleScope scope(context->logging_throttler());
         if (scope){
-            context->logger().log("NintendoSwitch::home_to_date_time_Switch1_wireless_esp32_feedback()");
+            context->logger().log("NintendoSwitch::home_to_date_time_Switch1_wireless_feedback()");
         }
 
         Milliseconds tv = context->timing_variation();
@@ -416,7 +416,7 @@ void home_to_date_time_Switch1_wireless_esp32_feedback(
         );
         if (ret < 0){  // failed to detect "System" being highlighted. press home and re-try
             pbf_press_button(context, BUTTON_HOME, 100ms, 2000ms);
-            stream.log("home_to_date_time_Switch1_wireless_esp32_feedback: Failed to detect 'System' being highlighted. Re-try", COLOR_YELLOW);
+            stream.log("home_to_date_time_Switch1_wireless_feedback: Failed to detect 'System' being highlighted. Re-try", COLOR_YELLOW);
             continue;
         }        
 
@@ -454,7 +454,7 @@ void home_to_date_time_Switch1_wireless_esp32_feedback(
         );
         if (ret < 0){  // failed to detect "Synchronize clock" being highlighted. press home and re-try
             pbf_press_button(context, BUTTON_HOME, 100ms, 2000ms);
-            stream.log("home_to_date_time_Switch1_wireless_esp32_feedback: Failed to detect 'Synchronize clock' being highlighted. Re-try", COLOR_YELLOW);
+            stream.log("home_to_date_time_Switch1_wireless_feedback: Failed to detect 'Synchronize clock' being highlighted. Re-try", COLOR_YELLOW);
             continue;
         }
 

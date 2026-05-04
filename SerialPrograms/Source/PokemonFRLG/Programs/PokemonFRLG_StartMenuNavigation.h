@@ -24,6 +24,9 @@ using ProControllerContext = ControllerContext<ProController>;
 
 namespace PokemonFRLG {
 
+// Box that contains all the possible start menu selection arrow positions
+const ImageFloatBox MENU_ARROW_BOX(0.727692, 0.0523077, 0.0369231, 0.6438461);
+
 // Open the start menu from the overworld. Throws OperationFailedException if it fails to open the menu after several attempts.
 void open_start_menu(ConsoleHandle& console, ProControllerContext& context);
 

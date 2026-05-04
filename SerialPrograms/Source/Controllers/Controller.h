@@ -110,7 +110,7 @@ public:
     //  This lets you do stuff like suddenly change joystick movement in
     //  response to inference while simultaneously holding a button without
     //  ever releasing it during the transition.
-    virtual void replace_on_next_command(Cancellable* cancellable) = 0;
+    virtual void replace_on_next_command() = 0;
 
 
 public:
@@ -278,10 +278,10 @@ public:
     //
     //  This cancel is used when you need continuity from an ongoing
     //  sequence.
-    void cancel_lazy(Cancellable* cancellable){
+    void cancel_lazy(){
         auto scope = m_lifetime_sanitizer.check_scope();
         CancellableScope::cancel(nullptr);
-        m_controller.replace_on_next_command(cancellable);
+        m_controller.replace_on_next_command();
     }
 
     virtual bool cancel(std::exception_ptr exception) noexcept override{

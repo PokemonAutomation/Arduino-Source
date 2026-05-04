@@ -50,6 +50,8 @@ language
 #include "PokemonHome/Inference/PokemonHome_ButtonDetector.h"
 #include "PokemonHome/Inference/PokemonHome_BoxGenderDetector.h"
 #include "PokemonHome/Inference/PokemonHome_BallReader.h"
+#include "PokemonHome/Inference/PokemonHome_GigantamaxDetector.h"
+#include "PokemonHome/Inference/PokemonHome_TeraTypeReader.h"
 #include "PokemonHome_BoxSorter.h"
 
 namespace PokemonAutomation{
@@ -391,9 +393,7 @@ void read_summary_screen(
 
     ImageFloatBox national_dex_number_box(0.448, 0.245, 0.049, 0.04); //pokemon national dex number pos
     ImageFloatBox shiny_symbol_box(0.702, 0.09, 0.04, 0.06); // shiny symbol pos
-    // TODO: gmax symbol is at the same location as Tera type symbol! Need better detection to tell apart
-    // gmax symbol and tera types
-    ImageFloatBox gmax_symbol_box(0.463, 0.09, 0.04, 0.06); // gmax symbol pos
+    ImageFloatBox gmax_tera_symbol_box(0.463, 0.09, 0.04, 0.06); // gmax OR tera symbol pos
     ImageFloatBox origin_symbol_box(0.623, 0.095, 0.033, 0.05); // origin symbol pos
     ImageFloatBox pokemon_box(0.69, 0.18, 0.28, 0.46); // pokemon render pos
     ImageFloatBox level_box(0.546, 0.099, 0.044, 0.041); // Level
@@ -407,7 +407,7 @@ void read_summary_screen(
 
     video_overlay_set.add(COLOR_WHITE, national_dex_number_box);
     video_overlay_set.add(COLOR_BLUE, shiny_symbol_box);
-    video_overlay_set.add(COLOR_RED, gmax_symbol_box);
+    video_overlay_set.add(COLOR_RED, gmax_tera_symbol_box);
     video_overlay_set.add(COLOR_RED, alpha_box);
     video_overlay_set.add(COLOR_DARKGREEN, origin_symbol_box);
     video_overlay_set.add(COLOR_DARK_BLUE, pokemon_box);
@@ -442,10 +442,12 @@ void read_summary_screen(
     cur_pokemon_info.shiny = is_shiny;
     env.console.log("Shiny detection stddev:" + std::to_string(shiny_stddev_value) + " is shiny:" + std::to_string(is_shiny));
 
-    const int gmax_stddev_value = (int)image_stddev(extract_box_reference(screen, gmax_symbol_box)).sum();
-    const bool is_gmax = gmax_stddev_value > 30;
+    GigantamaxDetector gmax_detector(COLOR_RED, &env.console.overlay(), gmax_tera_symbol_box);
+    bool is_gmax = gmax_detector.detect(screen);
     cur_pokemon_info.gmax = is_gmax;
-    env.console.log("Gmax detection stddev:" + std::to_string(gmax_stddev_value) + " is gmax:" + std::to_string(is_gmax));
+
+    PokemonTeraType tera_type = read_pokemon_tera_type(screen, gmax_tera_symbol_box);
+    cur_pokemon_info.tera_type = tera_type;
 
     const int alpha_stddev_value = (int)image_stddev(extract_box_reference(screen, alpha_box)).sum();
     const bool is_alpha = alpha_stddev_value > 40;
@@ -465,10 +467,10 @@ void read_summary_screen(
     }
     cur_pokemon_info.ot_id = ot_id;
 
-    auto [primaryType, secondaryType] = read_pokemon_types(screen, type_box, PokemonTypeGeneration::GEN9);
+    auto [primary_type, secondary_type] = read_pokemon_types(screen, type_box, PokemonTypeGeneration::GEN9);
 
-    cur_pokemon_info.primaryType = primaryType;
-    cur_pokemon_info.secondaryType = secondaryType;
+    cur_pokemon_info.primary_type = primary_type;
+    cur_pokemon_info.secondary_type = secondary_type;
 
     env.add_overlay_log(create_overlay_info(cur_pokemon_info));
     video_overlay_set.clear();

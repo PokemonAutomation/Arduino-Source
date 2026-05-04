@@ -434,7 +434,7 @@ bool is_black(uint32_t x){
     uint8_t r = (uint8_t)(x >> 16);
     uint8_t g = (uint8_t)(x >>  8);
     uint8_t b = (uint8_t)(x >>  0);
-    return r < 0x10 && g < 0x10 && b < 0x10;
+    return r < 0x20 && g < 0x20 && b < 0x20;
 }
 
 
@@ -474,6 +474,7 @@ ControllerProfile ControllerSettingsTable::random_profile(
 
 //        cout << "name: " << profile.official_name << endl;
 
+        //  Apply random shuffles.
         if (seed & 0x80000000){
             profile.official_name.clear();
             std::swap(profile.body_color, profile.button_color);
@@ -550,7 +551,7 @@ ControllerProfile ControllerSettingsTable::get_or_make_profile(
 
     bool found = false;
     this->run_on_all_rows([&, controller](ControllerSettingsRow& row){
-        if (row.controller_mac_address != mac_address){
+        if (row.controller_mac_address != mac_address || row.controller != controller){
             return false;
         }
 

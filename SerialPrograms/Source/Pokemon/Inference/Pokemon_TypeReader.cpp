@@ -22,24 +22,12 @@ namespace Pokemon {
 using namespace Kernels;
 using namespace Kernels::Waterfill;
 
-
 class TypeSprite {
 public:
-    TypeSprite(const std::string& slug, PokemonTypeGeneration generation)
+    TypeSprite(const std::string& slug, const std::string& resource_location)
         : m_slug(slug)
     {
-        ImageRGB32 sprite;
-        switch (generation)
-        {       
-        case PokemonAutomation::Pokemon::PokemonTypeGeneration::GEN8:
-            sprite = ImageRGB32(RESOURCE_PATH() + "Pokemon/Types/Gen8/" + slug + ".png");
-            break;
-        case PokemonAutomation::Pokemon::PokemonTypeGeneration::GEN9:
-            sprite = ImageRGB32(RESOURCE_PATH() + "Pokemon/Types/Gen9/" + slug + ".png");
-            break;
-        default:
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid enum.");
-        }
+        ImageRGB32 sprite(RESOURCE_PATH() + resource_location);
 
         sprite = filter_rgb32_range(
             sprite,
@@ -85,7 +73,7 @@ struct Gen8TypeSpriteDatabase {
             if (item.first == PokemonType::NONE){
                 continue;
             }
-            m_type_map.emplace(item.first, TypeSprite(item.second, PokemonTypeGeneration::GEN8));
+            m_type_map.emplace(item.first, TypeSprite(item.second, "Pokemon/Types/Gen8/" + item.second + ".png"));
         }
     }
 };
@@ -103,7 +91,7 @@ struct Gen9TypeSpriteDatabase {
             if (item.first == PokemonType::NONE){
                 continue;
             }
-            m_type_map.emplace(item.first, TypeSprite(item.second, PokemonTypeGeneration::GEN9));
+            m_type_map.emplace(item.first, TypeSprite(item.second, "Pokemon/Types/Gen9/" + item.second + ".png"));
         }
     }
 };
@@ -132,25 +120,37 @@ size_t distance_sqr(const ImagePixelBox& a, const ImagePixelBox& b){
     return dist_x * dist_x + dist_y * dist_y;
 }
 
-std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image, PokemonTypeGeneration generation){
+bool image_validation(const ImageViewRGB32& image){
     size_t width = image.width();
     size_t height = image.height();
     if (width * height < 100){
-        return { 1.0, PokemonType::NONE };
+        return false;
     }
     if (width > 2 * height){
-        return { 1.0, PokemonType::NONE };
+        return false;
     }
     if (height > 2 * width){
-        return { 1.0, PokemonType::NONE };
+        return false;
     }
     ImageStats stats = image_stats(image);
     if (stats.stddev.sum() < 50){
         //        if (print){
         //            cout << "stats.stddev.sum() = " << stats.stddev.sum() << endl;
         //        }
+        return false;
+    }
+
+    return true;
+}
+
+std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image, PokemonTypeGeneration generation){
+
+    if (!image_validation(image)){
         return { 1.0, PokemonType::NONE };
     }
+
+    size_t width = image.width();
+    size_t height = image.height();
 
     double aspect_ratio = (double)width / height;
 
@@ -308,7 +308,6 @@ void find_type_symbol_candidates(
 
 //    cout << "candidates = " << candidates.size() << endl;
 }
-
 
 std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_type_symbols(
     const ImageViewPlanar32& original_screen,

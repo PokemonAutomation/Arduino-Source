@@ -27,8 +27,9 @@ bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs
            lhs.ball_slug == rhs.ball_slug &&
            lhs.gender == rhs.gender &&
            lhs.ot_id == rhs.ot_id &&
-           lhs.primaryType == rhs.primaryType &&
-           lhs.secondaryType == rhs.secondaryType;
+           lhs.primary_type == rhs.primary_type &&
+           lhs.secondary_type == rhs.secondary_type &&
+           lhs.tera_type == rhs.tera_type;
 }
 
 
@@ -75,11 +76,16 @@ bool operator<(const std::optional<CollectedPokemonInfo>& lhs, const std::option
             }
             break;
         case SortingRuleType::Type:
-            if (lhs->primaryType != rhs->primaryType){
-                return (lhs->primaryType < rhs->primaryType) != preference.reverse;
+            if (lhs->primary_type != rhs->primary_type){
+                return (lhs->primary_type < rhs->primary_type) != preference.reverse;
             }
-            if (lhs->secondaryType != rhs->secondaryType){
-                return (lhs->secondaryType < rhs->secondaryType) != preference.reverse;
+            if (lhs->secondary_type != rhs->secondary_type){
+                return (lhs->secondary_type < rhs->secondary_type) != preference.reverse;
+            }
+            break;
+        case SortingRuleType::Tera_Type:
+            if (lhs->tera_type != rhs->tera_type){
+                return (lhs->tera_type < rhs->tera_type) != preference.reverse;
             }
             break;
         default:
@@ -103,8 +109,9 @@ std::ostream& operator<<(std::ostream& os, const std::optional<CollectedPokemonI
         os << "ball:" << pokemon->ball_slug << " ";
         os << "gender:" << gender_to_string(pokemon->gender) << " ";
         os << "ot_id:" << pokemon->ot_id << " ";
-        os << "primaryType:" << POKEMON_TYPE_SLUGS().get_string(pokemon->primaryType) << " ";
-        os << "secondaryType:" << POKEMON_TYPE_SLUGS().get_string(pokemon->secondaryType) << " ";
+        os << "primaryType:" << POKEMON_TYPE_SLUGS().get_string(pokemon->primary_type) << " ";
+        os << "secondaryType:" << POKEMON_TYPE_SLUGS().get_string(pokemon->secondary_type) << " ";
+        os << "teraType:" << POKEMON_TERA_TYPE_SLUGS().get_string(pokemon->tera_type) << " ";
         os << ")";
     }else{
         os << "(empty)";
@@ -155,8 +162,9 @@ void save_boxes_data_to_json(const std::vector<std::optional<CollectedPokemonInf
             pokemon["ball"] = current_pokemon->ball_slug;
             pokemon["gender"] = gender_to_string(current_pokemon->gender);
             pokemon["ot_id"] = current_pokemon->ot_id;
-            pokemon["primaryType"] = POKEMON_TYPE_SLUGS().get_string(current_pokemon->primaryType);
-            pokemon["secondaryType"] = POKEMON_TYPE_SLUGS().get_string(current_pokemon->secondaryType);
+            pokemon["primary_type"] = POKEMON_TYPE_SLUGS().get_string(current_pokemon->primary_type);
+            pokemon["secondary_type"] = POKEMON_TYPE_SLUGS().get_string(current_pokemon->secondary_type);
+            pokemon["tera_type"] = POKEMON_TERA_TYPE_SLUGS().get_string(current_pokemon->tera_type);
         }
         pokemon_data.push_back(std::move(pokemon));
     }

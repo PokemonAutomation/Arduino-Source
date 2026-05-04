@@ -24,10 +24,12 @@ using namespace std::chrono_literals;
 PABotBase2_OemController::PABotBase2_OemController(
     Logger& logger,
     PABotBase2::Connection& connection,
-    ControllerType controller_type
+    ControllerType controller_type,
+    std::function<void(double magnitude)> on_rumble
 )
     : PABotBase2_Controller(logger, connection)
     , m_controller_type(controller_type)
+    , m_on_rumble(std::move(on_rumble))
 {
     using namespace PABotBase2;
 
@@ -57,8 +59,8 @@ PABotBase2_OemController::PABotBase2_OemController(
 
     //  Add controller-specific messages.
     connection.message_logger().add_message<pabb2_Message_NS1_OemController_Spi>(
-        "PABB_MSG_REQ_NS1_OEM_CONTROLLER_READ_SPI",
-        PABB_MSG_REQ_NS1_OEM_CONTROLLER_READ_SPI,
+        "PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_READ_SPI",
+        PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_READ_SPI,
         true,
         [](const pabb2_Message_NS1_OemController_Spi* message){
             std::string str;
@@ -70,8 +72,8 @@ PABotBase2_OemController::PABotBase2_OemController(
         }
     );
     connection.message_logger().add_message_min_length<pabb2_Message_NS1_OemController_Spi>(
-        "PABB_MSG_REQ_NS1_OEM_CONTROLLER_WRITE_SPI",
-        PABB_MSG_REQ_NS1_OEM_CONTROLLER_WRITE_SPI,
+        "PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_WRITE_SPI",
+        PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_WRITE_SPI,
         true,
         [](const pabb2_Message_NS1_OemController_Spi* message){
             std::string str;
@@ -116,23 +118,7 @@ PABotBase2_OemController::PABotBase2_OemController(
     connection.message_logger().add_message<pabb2_Message_Feedback_NS1_OemController_Rumble>(
         "PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_RUMBLE",
         PABB2_MESSAGE_INFO_NS1_OEM_CONTROLLER_RUMBLE,
-#if 0
-        [](const pabb2_Message_Feedback_NS1_OemController_Rumble* message){
-            uint32_t left, right;
-            memcpy(&left, message->data.left, sizeof(uint32_t));
-            memcpy(&right, message->data.right, sizeof(uint32_t));
-            const uint32_t NEUTRAL = 0x40400100;
-            if (left != 0 && left != NEUTRAL){
-                return true;
-            }
-            if (right != 0 && right != NEUTRAL){
-                return true;
-            }
-            return false;
-        },
-#else
         false,
-#endif
         [](const pabb2_Message_Feedback_NS1_OemController_Rumble* message){
             std::string str;
             str += tostr_hexbytes(&message->data, sizeof(pabb_NintendoSwitch_Rumble));
@@ -189,27 +175,44 @@ PABotBase2_OemController::PABotBase2_OemController(
             }
             const auto* message = (const pabb2_Message_Feedback_NS1_OemController_Rumble*)header;
 
-            //  We don't do anything here yet.
-            uint32_t left, right;
-            memcpy(&left, message->data.left, sizeof(uint32_t));
-            memcpy(&right, message->data.right, sizeof(uint32_t));
+            RumbleData left = parse_rumble(message->data.left);
+            RumbleData right = parse_rumble(message->data.right);
 
-            const uint32_t NEUTRAL = 0x40400100;
-            bool is_active = false;
-            if (left != 0 && left != NEUTRAL){
-                is_active = true;
+            std::string str;
+            std::string str_left = rumble_to_str(left);
+            std::string str_right = rumble_to_str(right);
+            if (!str_left.empty()){
+                if (!str.empty()){
+                    str += ", ";
+                }
+                str += "Left = ";
+                str += str_left;
             }
-            if (right != 0 && right != NEUTRAL){
-                is_active = true;
+            if (!str_right.empty()){
+                if (!str.empty()){
+                    str += " - ";
+                }
+                str += "Right = ";
+                str += str_right;
             }
 
-            if (is_active){
-                m_logger.log(
-                    "Rumble: Left = " + tostr_hexbytes(&left, sizeof(uint32_t)) +
-                    ", Right = " + tostr_hexbytes(&right, sizeof(uint32_t)),
-                    COLOR_DARKGREEN
-                );
+            double energy =
+                left.lo_amp * left.lo_freq * left.lo_freq +
+                left.hi_amp * left.hi_freq * left.hi_freq +
+                right.lo_amp * right.lo_freq * right.lo_freq +
+                right.hi_amp * right.hi_freq * right.hi_freq;
+
+            double magnitude = std::log10(energy + 1);
+
+            if (m_on_rumble){
+                m_on_rumble(magnitude);
             }
+
+            if (str.empty()){
+                return;
+            }
+
+            m_logger.log("Rumble: " + str + " - Magnitude = " + tostr_fixed(magnitude, 3), COLOR_ORANGE);
         }
     );
 
@@ -240,7 +243,7 @@ void PABotBase2_OemController::run_preconnect_configure(
         request.message_bytes = sizeof(request);
         request.opcode = PABB2_MESSAGE_OPCODE_CONTROLLER_MAC_ADDRESS;
         request.data = SerialPABotBase::controller_type_to_id(controller_type);
-        uint8_t id = connection.device().send_request(request);
+        uint8_t id = connection.device().send_request_with_response(request);
         std::string response = connection.device().wait_for_request_response(id, std::chrono::milliseconds(100));
         if (response.size() == sizeof(MessageHeader) + sizeof(controller_mac_address)){
             memcpy(
@@ -248,7 +251,7 @@ void PABotBase2_OemController::run_preconnect_configure(
                 response.data() + sizeof(MessageHeader),
                 sizeof(controller_mac_address)
             );
-            logger.log("Controller MAC Address:" + tostr_hexbytes(controller_mac_address, sizeof(controller_mac_address)));
+            logger.log("Controller MAC Address: " + tostr_hexbytes(controller_mac_address, sizeof(controller_mac_address)));
         }else{
             logger.log(
                 "Invalid response size to PABB2_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS: body = " + std::to_string(response.size()),
@@ -264,44 +267,58 @@ void PABotBase2_OemController::run_preconnect_configure(
             controller_type
         );
 
-    PABB_NintendoSwitch_ControllerColors colors;
+#if _WIN32
+#pragma pack(push, 1)
+#define PABB_PACK
+#elif __GNUC__
+#define PABB_PACK   __attribute__((packed))
+#else
+#define PABB_PACK
+#endif
+    struct Message{
+        pabb2_Message_NS1_OemController_Spi request;
+        PABB_NintendoSwitch_ControllerColors colors;
+    };
+#if _WIN32
+#pragma pack(pop)
+#endif
+    Message message;
+
     {
         Color color(profile.body_color);
-        colors.body[0] = color.red();
-        colors.body[1] = color.green();
-        colors.body[2] = color.blue();
+        message.colors.body[0] = color.red();
+        message.colors.body[1] = color.green();
+        message.colors.body[2] = color.blue();
     }
     {
         Color color(profile.button_color);
-        colors.buttons[0] = color.red();
-        colors.buttons[1] = color.green();
-        colors.buttons[2] = color.blue();
+        message.colors.buttons[0] = color.red();
+        message.colors.buttons[1] = color.green();
+        message.colors.buttons[2] = color.blue();
     }
     {
         Color color(profile.left_grip);
-        colors.left_grip[0] = color.red();
-        colors.left_grip[1] = color.green();
-        colors.left_grip[2] = color.blue();
+        message.colors.left_grip[0] = color.red();
+        message.colors.left_grip[1] = color.green();
+        message.colors.left_grip[2] = color.blue();
     }
     {
         Color color(profile.right_grip);
-        colors.right_grip[0] = color.red();
-        colors.right_grip[1] = color.green();
-        colors.right_grip[2] = color.blue();
+        message.colors.right_grip[0] = color.red();
+        message.colors.right_grip[1] = color.green();
+        message.colors.right_grip[2] = color.blue();
     }
 
 
-    pabb2_Message_NS1_OemController_Spi request;
-    request.message_bytes = sizeof(request) + sizeof(colors);
-    request.opcode = PABB_MSG_REQ_NS1_OEM_CONTROLLER_WRITE_SPI;
-    request.controller_type = SerialPABotBase::controller_type_to_id(controller_type);
-    request.address = 0x00006050;
-    request.bytes = sizeof(PABB_NintendoSwitch_ControllerColors);
+    message.request.message_bytes = sizeof(message);
+    message.request.opcode = PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_WRITE_SPI;
+    message.request.controller_type = SerialPABotBase::controller_type_to_id(controller_type);
+    message.request.address = 0x00006050;
+    message.request.bytes = sizeof(PABB_NintendoSwitch_ControllerColors);
 
-    connection.message_logger().log_send(logger, true, &request);
+    connection.message_logger().log_send(logger, true, &message.request);
 
-    connection.device().connection().reliable_send_blocking(&request, sizeof(request), Milliseconds(100));
-    connection.device().connection().reliable_send_blocking(&colors, sizeof(colors), Milliseconds(100));
+    connection.device().connection().reliable_send_all_or_nothing(&message, sizeof(Message), Milliseconds(100));
 }
 
 
@@ -470,6 +487,8 @@ void PABotBase2_OemController::issue_report(
 void PABotBase2_OemController::update_status(Cancellable& cancellable){
     using namespace PABotBase2;
 
+//    cout << m_connection.device().dump_pending_requests() << endl;
+
     if (m_color_html.empty()){
         try{
             m_logger.log("Reading Controller Colors...");
@@ -478,12 +497,12 @@ void PABotBase2_OemController::update_status(Cancellable& cancellable){
 
             pabb2_Message_NS1_OemController_Spi message;
             message.message_bytes = sizeof(pabb2_Message_NS1_OemController_Spi);
-            message.opcode = PABB_MSG_REQ_NS1_OEM_CONTROLLER_READ_SPI;
+            message.opcode = PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_READ_SPI;
             message.controller_type = SerialPABotBase::controller_type_to_id(m_controller_type);
             message.address = 0x00006050;
             message.bytes = sizeof(ControllerColors);
 
-            uint8_t id = m_connection.device().send_request(message);
+            uint8_t id = m_connection.device().send_request_with_response(message);
             std::string response = m_connection.device().wait_for_request_response(id);
 
             ControllerColors colors{};
@@ -491,7 +510,7 @@ void PABotBase2_OemController::update_status(Cancellable& cancellable){
                 memcpy(&colors, response.data() + sizeof(MessageHeader), sizeof(ControllerColors));
             }else{
                 m_logger.log(
-                    "Invalid response size to PABB_MSG_REQ_NS1_OEM_CONTROLLER_READ_SPI: body = " + std::to_string(response.size()),
+                    "Invalid response size to PABB2_MESSAGE_REQ_NS1_OEM_CONTROLLER_READ_SPI: body = " + std::to_string(response.size()),
                     COLOR_RED
                 );
 //                m_handle.set_status_line1("Error: See log for more information.", COLOR_RED);
@@ -535,7 +554,7 @@ void PABotBase2_OemController::update_status(Cancellable& cancellable){
         MessageHeader request;
         request.message_bytes = sizeof(request);
         request.opcode = PABB2_MESSAGE_OPCODE_REQUEST_STATUS;
-        uint8_t id = m_connection.device().send_request(request);
+        uint8_t id = m_connection.device().send_request_with_response(request);
         Message_u32 response;
         m_connection.device().wait_for_request_response<Message_u32, PABB2_MESSAGE_OPCODE_RET_U32>(
             response, id
@@ -549,7 +568,7 @@ void PABotBase2_OemController::update_status(Cancellable& cancellable){
         request.message_bytes = sizeof(request);
         request.opcode = PABB2_MESSAGE_OPCODE_PAIRED_MAC_ADDRESS;
         request.data = SerialPABotBase::controller_type_to_id(m_controller_type);
-        uint8_t id = m_connection.device().send_request(request);
+        uint8_t id = m_connection.device().send_request_with_response(request);
         std::string response = m_connection.device().wait_for_request_response(id);
         if (response.size() == sizeof(MessageHeader) + sizeof(mac_address)){
             memcpy(
@@ -601,6 +620,86 @@ void PABotBase2_OemController::update_status(Cancellable& cancellable){
 }
 void PABotBase2_OemController::stop_with_error(std::string message){
     PABotBase2_Controller::stop_with_error(std::move(message));
+}
+
+
+
+
+double PABotBase2_OemController::rumble_index_to_amp(uint8_t index){
+    if (index < 16){
+        const double TABLE[] = {
+            0,
+            0.007843,
+            0.011823,
+            0.014061,
+            0.01672,
+            0.019885,
+            0.023648,
+            0.028123,
+            0.033442,
+            0.039771,
+            0.047296,
+            0.056246,
+            0.066886,
+            0.079542,
+            0.094592,
+            0.112491,
+        };
+        return TABLE[index];
+    }else if (16 <= index && index < 32){
+        return std::pow(2, index * (1. / 16)) / 17;
+    }else{
+        return std::pow(2, index * (1. / 32)) / 8.7;
+    }
+}
+double PABotBase2_OemController::rumble_index_to_freq(double index){
+    double x = index + 64;
+    x *= (1. / 32);
+    return 10 * std::pow(2, x);
+}
+PABotBase2_OemController::RumbleData PABotBase2_OemController::parse_rumble(const uint8_t data[4]){
+    uint8_t lo_freq_i = data[2] & 0x7f;
+    uint16_t hi_freq_i = data[0] | ((uint16_t)(data[1] & 1) << 8);
+    uint8_t hi_amp_i = (uint8_t)data[1] >> 1;
+    uint16_t lo_amp_i = ((uint16_t)data[3] << 1) | ((uint8_t)data[2] >> 7);
+    lo_amp_i = std::max<uint16_t>(lo_amp_i, 0x80);
+    lo_amp_i -= 0x80;
+
+    return RumbleData{
+        rumble_index_to_freq(lo_freq_i),
+        rumble_index_to_amp(lo_amp_i),
+        rumble_index_to_freq(hi_freq_i * 0.25 + 32),
+        rumble_index_to_amp(hi_amp_i)
+    };
+
+#if 0
+    std::cout
+              << ", lo_freq_i = " << (unsigned)lo_freq_i
+              << ", lo_amp_i = " << lo_amp_i
+              << ", hi_freq_i = " << hi_freq_i
+              << ", hi_amp_i = " << (unsigned)hi_amp_i
+              << ", lo_freq = " << lo_freq
+              << ", lo_amp = " << lo_amp
+              << ", hi_freq = " << hi_freq
+              << ", hi_amp = " << hi_amp
+              << std::endl;
+#endif
+}
+std::string PABotBase2_OemController::rumble_to_str(const RumbleData& data){
+    std::string ret;
+    if (data.lo_amp != 0){
+        ret += "[";
+        ret += tostr_fixed(data.lo_amp, 3) + " x ";
+        ret += tostr_fixed(data.lo_freq, 0) + "Hz";
+        ret += "]";
+    }
+    if (data.hi_amp != 0){
+        ret += "[";
+        ret += tostr_fixed(data.hi_amp, 3) + " x ";
+        ret += tostr_fixed(data.hi_freq, 0) + "Hz";
+        ret += "]";
+    }
+    return ret;
 }
 
 

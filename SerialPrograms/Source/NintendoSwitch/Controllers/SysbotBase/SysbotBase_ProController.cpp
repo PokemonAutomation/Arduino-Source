@@ -67,7 +67,7 @@ void ProController_SysbotBase::cancel_all_commands(){
     m_scheduler.clear_on_next();
     m_logger.log("cancel_all_commands(): Command Queue Size = " + std::to_string(queue_size), COLOR_DARKGREEN);
 }
-void ProController_SysbotBase::replace_on_next_command(Cancellable* cancellable){
+void ProController_SysbotBase::replace_on_next_command(){
 //    cout << "ProController_SysbotBase::replace_on_next_command - Enter()" << endl;
     std::lock_guard<Mutex> lg(m_state_lock);
     m_cv.notify_all();

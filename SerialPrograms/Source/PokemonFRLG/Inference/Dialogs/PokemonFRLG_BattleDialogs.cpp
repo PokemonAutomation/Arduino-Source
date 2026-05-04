@@ -88,12 +88,14 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
     if ((is_white(menu_top_image) //All languages except japanese
         && is_white(menu_right_image)
         && is_solid(dialog_top_image, { 0.176, 0.357, 0.467 }, 0.25, 20) //40, 81, 106 teal
-        && is_solid(dialog_right_image, { 0.176, 0.357, 0.467 }, 0.25, 20))
+        && is_solid(dialog_right_image, { 0.176, 0.357, 0.467 }, 0.25, 20)
+        && !is_white(dialog_top_image))
         ||
         (is_white(menu_top_jpn_image) //japanese
         && is_white(menu_right_jpn_image)
         && is_solid(dialog_top_jpn_image, { 0.176, 0.357, 0.467 }, 0.25, 20)
-        && is_solid(dialog_right_jpn_image, { 0.176, 0.357, 0.467 }, 0.25, 20))
+        && is_solid(dialog_right_jpn_image, { 0.176, 0.357, 0.467 }, 0.25, 20)
+        && !is_white(dialog_top_jpn_image))
     ){
         return true;
     }

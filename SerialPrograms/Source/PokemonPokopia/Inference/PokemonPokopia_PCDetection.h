@@ -107,6 +107,117 @@ public:
     {}
 };
 
+enum class RecipeType{
+    SINGLE,
+    DOUBLE,
+    TRIPLE,
+    QUAD,
+    NOT_RECIPE
+};
+
+class RecipeIconDetector : public StaticScreenDetector{
+public:
+    RecipeIconDetector(
+        Color color,
+        VideoOverlay* overlay,
+        const ImageFloatBox& box
+    );
+
+    const ImageFloatBox& last_detected() const { return m_last_detected; }
+    const RecipeType& recipe_type() const { return m_recipe_type; }
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+
+    //  This is not const so that detectors can save/cache state.
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+private:
+    friend class RecipeWatcher;
+
+    const Color m_color;
+    VideoOverlay* m_overlay;
+    const ImageFloatBox m_arrow_box;
+
+    RecipeType m_recipe_type;
+    ImageFloatBox m_last_detected;
+    std::optional<OverlayBoxScope> m_last_detected_box;
+};
+class RecipeIconWatcher : public DetectorToFinder<RecipeIconDetector>{
+public:
+    RecipeIconWatcher(
+        Color color,
+        VideoOverlay* overlay,
+        const ImageFloatBox& box,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
+    )
+         : DetectorToFinder("RecipeIconWatcher", hold_duration, color, overlay, box)
+    {}
+};
+
+class CoinCountDetector : public StaticScreenDetector{
+public:
+    CoinCountDetector(Logger& logger);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+
+    //  This is not const so that detectors can save/cache state.
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+    uint32_t coin_count() const { return m_coin_count; }
+
+private:
+    Logger& m_logger;
+    ImageFloatBox m_coin_count_box;
+
+    uint32_t m_coin_count = 0;
+};
+
+class CoinCountWatcher : public CoinCountDetector, public VisualInferenceCallback{
+public:
+    CoinCountWatcher(Logger& logger);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+};
+
+class CoinIconDetector : public StaticScreenDetector{
+public:
+    CoinIconDetector(
+        Color color,
+        VideoOverlay* overlay,
+        const ImageFloatBox& box
+    );
+
+    const ImageFloatBox& last_detected() const { return m_last_detected; }
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+
+    //  This is not const so that detectors can save/cache state.
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+private:
+    friend class CoinIconWatcher;
+
+    const Color m_color;
+    VideoOverlay* m_overlay;
+    const ImageFloatBox m_arrow_box;
+
+    ImageFloatBox m_last_detected;
+    std::optional<OverlayBoxScope> m_last_detected_box;
+};
+class CoinIconWatcher : public DetectorToFinder<CoinIconDetector>{
+public:
+    CoinIconWatcher(
+        Color color,
+        VideoOverlay* overlay,
+        const ImageFloatBox& box,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
+    )
+         : DetectorToFinder("CoinIconWatcher", hold_duration, color, overlay, box)
+    {}
+};
+
 
 
 }

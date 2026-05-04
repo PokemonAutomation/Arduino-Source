@@ -12,9 +12,9 @@
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/ButtonOption.h"
-//#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
+#include "Common/Cpp/Options/ButtonOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "CommonFramework/Panels/PanelTools.h"
 
@@ -149,6 +149,8 @@ public:
     Pimpl<PerformanceOptions> PERFORMANCE;
     Pimpl<AudioPipelineOptions> AUDIO_PIPELINE;
     Pimpl<VideoPipelineOptions> VIDEO_PIPELINE;
+    SimpleIntegerOption<uint8_t> COMMAND_QUEUE_LIMIT;
+    SimpleIntegerOption<uint32_t> DEVICE_LOGGING_FLAG;
 
     BooleanCheckBoxOption ENABLE_LIFETIME_SANITIZER0;
 

@@ -42,7 +42,7 @@ public:
 
 private:
     virtual void enter_portal(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    virtual void run_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool attempt_move = false);
+    virtual void run_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool attempt_move = false, bool use_plus_move = false);
     virtual void run_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     virtual void on_config_value_changed(void* object) override;
     StartInGripOrGameOption START_LOCATION;
@@ -56,6 +56,7 @@ private:
         MAGEARNA,
         MELTAN,
         MELMETAL,
+        VOLCANION,
     };
     EnumDropdownOption<GiftPokemon> POKEMON;
 

@@ -23,7 +23,11 @@ namespace PokemonAutomation{
 namespace PABotBase2{
 
 
-const PacketHeader* PacketParser::pull_bytes(UnreliableStreamConnectionPolling& connection){
+const PacketHeader* PacketParser::pull_bytes(
+    UnreliableStreamConnectionPolling& connection,
+    const uint32_t& session_id,
+    WallDuration timeout
+){
     const uint8_t MIN_PACKET_SIZE = sizeof(PacketHeader) + sizeof(uint32_t);
 
     while (true){
@@ -37,8 +41,10 @@ const PacketHeader* PacketParser::pull_bytes(UnreliableStreamConnectionPolling& 
         //  Read enough to finish the header.
         m_index += (uint8_t)connection.unreliable_recv(
             m_buffer + index,
-            MIN_PACKET_SIZE - index
+            MIN_PACKET_SIZE - index,
+            timeout
         );
+        timeout = milliseconds_to_duration(0);
 
         //  Header is still incomplete.
         if (m_index < MIN_PACKET_SIZE){
@@ -95,8 +101,10 @@ const PacketHeader* PacketParser::pull_bytes(UnreliableStreamConnectionPolling& 
         uint8_t index = m_index;
         m_index += (uint8_t)connection.unreliable_recv(
             m_buffer + index,
-            packet_bytes - index
+            packet_bytes - index,
+            timeout
         );
+//        timeout = milliseconds_to_duration(0);
     }
 
     //  Packet is incomplete.
@@ -107,7 +115,9 @@ const PacketHeader* PacketParser::pull_bytes(UnreliableStreamConnectionPolling& 
 
     //  Verify the CRC.
 
-    uint32_t actual_crc = 0xffffffff;
+    uint32_t actual_crc = header->opcode == PABB2_CONNECTION_OPCODE_ASK_RESET
+        ? 0xffffffff
+        : session_id;
     pabb_crc32_buffer(&actual_crc, m_buffer, packet_bytes - sizeof(uint32_t));
 
     uint32_t expected_crc;
@@ -130,6 +140,7 @@ const PacketHeader* PacketParser::pull_bytes(UnreliableStreamConnectionPolling& 
 
 void PacketParser::push_bytes(
     PacketRunner& packet_runner,
+    const uint32_t& session_id,
     const uint8_t* data, size_t bytes
 ){
 //    cout << std::string((const char*)data, bytes) << endl;
@@ -199,7 +210,9 @@ void PacketParser::push_bytes(
 
             //  Verify the CRC.
 
-            uint32_t actual_crc = 0xffffffff;
+            uint32_t actual_crc = header->opcode == PABB2_CONNECTION_OPCODE_ASK_RESET
+                ? 0xffffffff
+                : session_id;
             pabb_crc32_buffer(&actual_crc, m_buffer, packet_bytes - sizeof(uint32_t));
 
             uint32_t expected_crc;

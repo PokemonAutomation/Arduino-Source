@@ -79,6 +79,7 @@ StatsReset::StatsReset()
             {GiftPokemon::MAGEARNA, "magearna", "Magearna"},
             {GiftPokemon::MELTAN,   "meltan",   "Meltan"  },
             {GiftPokemon::MELMETAL, "melmetal", "Melmetal"},
+            {GiftPokemon::VOLCANION,"volcanion","Volcanion"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         GiftPokemon::FLOETTE
@@ -151,7 +152,7 @@ StatsReset::~StatsReset(){
 }
 
 void StatsReset::on_config_value_changed(void* object){
-    ConfigOptionState state_ball  = (POKEMON == GiftPokemon::GENESECT || POKEMON == GiftPokemon::MELTAN)
+    ConfigOptionState state_ball  = (POKEMON == GiftPokemon::GENESECT || POKEMON == GiftPokemon::MELTAN || POKEMON == GiftPokemon::VOLCANION)
                                     ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN;
     ConfigOptionState state_donut = (POKEMON == GiftPokemon::GENESECT || POKEMON == GiftPokemon::MELMETAL)
                                     ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN;
@@ -199,7 +200,7 @@ void StatsReset::enter_portal(SingleSwitchProgramEnvironment& env, ProController
     }
 }
 
-void StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool attempt_move){
+void StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool attempt_move, bool use_plus_move){
     RunFromBattleWatcher battle_menu(COLOR_GREEN, &env.console.overlay(), 10ms);
 
     context.wait_for_all_requests();
@@ -218,6 +219,10 @@ void StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ProControllerCo
         if (attempt_move){
             pbf_press_button(context, BUTTON_Y, 50ms, 500ms);
             ssf_press_button(context, BUTTON_ZL, 0ms, 4s, 200ms);
+            if (use_plus_move){
+                pbf_wait(context, 500ms);
+                pbf_press_button(context, BUTTON_PLUS, 50ms, 500ms);
+            }
             pbf_mash_button(context, BUTTON_A, 4s);
         }
         context.wait_for_all_requests();
@@ -396,6 +401,44 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             pbf_mash_button(context, BUTTON_A, 5s);
         }
 
+        if (POKEMON == GiftPokemon::VOLCANION){
+            // fly to research lab
+            FastTravelState travel_status = open_map_and_fly_to(env.console, context, LANGUAGE, Location::POKEMON_RESEARCH_LAB);
+            if (travel_status != FastTravelState::SUCCESS){
+                stats.errors++;
+                env.update_stats();
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Failed to travel to Research Lab",
+                    env.console
+                    );
+            }
+            context.wait_for(100ms);
+            env.log("Detected overworld. Fast traveled to Research Lab");
+
+            run_towards_gate_with_A_button(env.console, context, 0, +1, Seconds(5));
+            pbf_mash_button(context, BUTTON_A, 10s);
+
+            // elevator sequence
+            run_towards_gate_with_A_button(env.console, context, 0, +1, Seconds(5));
+            pbf_press_button(context, BUTTON_A, 50ms, 1s);
+            pbf_press_button(context, BUTTON_A, 50ms, 1s);
+            pbf_press_dpad(context, DPAD_DOWN, 50ms, 1s);
+            pbf_mash_button(context, BUTTON_A, 10s);
+
+            pbf_move_left_joystick(context, {+0.7, +1}, 1s, 500ms);
+            pbf_move_left_joystick(context, {+0.6, -1}, 1s, 500ms);
+
+            pbf_mash_button(context, BUTTON_A, 30s);
+
+            run_battle(env, context, true, true);
+            // additional delay because Fissure takes longer to launch
+            pbf_wait(context, 4s);
+
+            run_catch(env, context);
+            pbf_mash_button(context, BUTTON_A, 20s);
+        }
+
         context.wait_for_all_requests();
         {
             BlackScreenOverWatcher detector;
@@ -435,6 +478,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 reset_game_from_home(env, env.console, context, true);
                 continue;
             default:
+                stats.errors++;
                 env.log(STRING_POKEMON + " dialog timed out.", COLOR_RED);
                 // fail safely and start over
                 go_home(env.console, context);

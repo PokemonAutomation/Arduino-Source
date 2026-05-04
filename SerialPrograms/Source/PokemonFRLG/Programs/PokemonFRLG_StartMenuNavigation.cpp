@@ -62,8 +62,6 @@ void close_start_menu(ConsoleHandle& console, ProControllerContext& context){
 
 namespace {
 
-const ImageFloatBox MENU_ARROW_BOX(0.727692, 0.0523077, 0.0369231, 0.6438461);
-
 bool move_cursor_impl(
     ConsoleHandle& console,
     ProControllerContext& context,

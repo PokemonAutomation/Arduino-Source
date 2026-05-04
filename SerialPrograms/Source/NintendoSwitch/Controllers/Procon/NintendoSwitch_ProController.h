@@ -19,6 +19,9 @@
 //using std::endl;
 
 namespace PokemonAutomation{
+
+struct RumbleListener;
+
 namespace NintendoSwitch{
 
 
@@ -61,8 +64,14 @@ class ProController : public AbstractController{
 public:
     using ContextType = ProControllerContext;
 
+    void add_listener(RumbleListener& listener);
+    void remove_listener(RumbleListener& listener);
+
+
+public:
     ProController(Logger& logger);
     virtual ~ProController();
+
 
 public:
     static const char NAME[];
@@ -226,6 +235,12 @@ public:
     //  Controller Input
 
     virtual void run_controller_input(const ControllerInputState& state) override;
+
+
+protected:
+    //  Console -> Controller
+
+    void on_rumble(double magnitude);
 
 
 private:

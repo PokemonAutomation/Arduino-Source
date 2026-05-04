@@ -11,6 +11,7 @@
 #include <map>
 #include <functional>
 #include "Common/Cpp/Logging/AbstractLogger.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "ReliableConnectionLayer/PABotBase2_PacketProtocol.h"
 #include "PABotBase2_MessageProtocol.h"
 
@@ -130,6 +131,7 @@ public:
 
 
 private:
+    mutable Mutex m_lock;
     std::map<uint8_t, MessagePrinter> m_converters;
 };
 

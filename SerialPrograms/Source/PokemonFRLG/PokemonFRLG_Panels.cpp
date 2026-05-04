@@ -21,6 +21,11 @@
 #include "Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Fishing.h"
 #include "Programs/ShinyHunting/PokemonFRLG_ShinyHunt-Overworld.h"
 #include "Programs/RngManipulation/PokemonFRLG_RngHelper.h"
+#include "Programs/RngManipulation/PokemonFRLG_SidHelper.h"
+#include "Programs/RngManipulation/PokemonFRLG_StarterRng.h"
+#include "Programs/RngManipulation/PokemonFRLG_GiftRng.h"
+#include "Programs/RngManipulation/PokemonFRLG_StaticRng.h"
+#include "Programs/RngManipulation/PokemonFRLG_WildRng.h"
 #include "Programs/TestPrograms/PokemonFRLG_SoundListener.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadStats.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadBattleLevelUp.h"
@@ -47,8 +52,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<NuggetBridgeFarmer_Descriptor, NuggetBridgeFarmer>());
     ret.emplace_back(make_single_switch_program<PickupFarmer_Descriptor, PickupFarmer>());
     ret.emplace_back(make_single_switch_program<EvTrainer_Descriptor, EvTrainer>());
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-    }
+    ret.emplace_back(make_single_switch_program<LuckyEggFarmer_Descriptor, LuckyEggFarmer>());
+    ret.emplace_back(make_single_switch_program<ItemDuplication_Descriptor, ItemDuplication>());
 
     //ret.emplace_back("---- General ----");
 
@@ -65,8 +70,11 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Untested/Beta/WIP ----");
-        ret.emplace_back(make_single_switch_program<LuckyEggFarmer_Descriptor, LuckyEggFarmer>());
-        ret.emplace_back(make_single_switch_program<ItemDuplication_Descriptor, ItemDuplication>());
+        ret.emplace_back(make_single_switch_program<SidHelper_Descriptor, SidHelper>());
+        ret.emplace_back(make_single_switch_program<StarterRng_Descriptor, StarterRng>());
+        ret.emplace_back(make_single_switch_program<GiftRng_Descriptor, GiftRng>());
+        ret.emplace_back(make_single_switch_program<StaticRng_Descriptor, StaticRng>());
+        ret.emplace_back(make_single_switch_program<WildRng_Descriptor, WildRng>());
     }
 
     if (PreloadSettings::instance().DEVELOPER_MODE){

@@ -31,7 +31,7 @@ void home_to_date_time_Switch1_blind(Logger& logger, ProControllerContext& conte
         home_to_date_time_Switch1_wired_blind(logger, context, to_date_change);
         return;
     case ControllerPerformanceClass::SerialPABotBase_Wireless:
-        home_to_date_time_Switch1_wireless_esp32_blind(logger, context, to_date_change);
+        home_to_date_time_Switch1_wireless_blind(logger, context, to_date_change);
         return;
     default:
         //  Slow version for tick-imprecise controllers.
@@ -45,7 +45,7 @@ bool home_to_date_time_Switch1_feedback(ConsoleHandle& console, ProControllerCon
         home_to_date_time_Switch1_wired_feedback(console, context, to_date_change);
         return true;
     case ControllerPerformanceClass::SerialPABotBase_Wireless:
-        home_to_date_time_Switch1_wireless_esp32_feedback(console, context, to_date_change);
+        home_to_date_time_Switch1_wireless_feedback(console, context, to_date_change);
         return true;
     default:
         return false;

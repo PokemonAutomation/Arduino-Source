@@ -76,6 +76,9 @@ enum class StartMenuContext {
 };
 void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context = StartMenuContext::STANDARD);
 
+// Starting from the start menu, a sub-screen of the start menu, or the overworld, navigate to the bag
+void open_bag_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context = StartMenuContext::STANDARD);
+
 // Uses Teleport to return to a PokeCenter. 
 // Assumes that Teleport is usable and the last party member has it learned
 void use_teleport_from_overworld(ConsoleHandle& console, ProControllerContext& context);

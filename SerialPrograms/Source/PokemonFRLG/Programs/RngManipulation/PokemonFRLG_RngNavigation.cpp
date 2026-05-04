@@ -145,22 +145,37 @@ bool check_for_shiny(ConsoleHandle& console, ProControllerContext& context, Poke
     case PokemonFRLG_RngTarget::togepi:
         hatch_togepi_egg(console, context);
     case PokemonFRLG_RngTarget::magikarp:
+    case PokemonFRLG_RngTarget::hitmonlee:
+    case PokemonFRLG_RngTarget::hitmonchan:
     case PokemonFRLG_RngTarget::hitmon:
     case PokemonFRLG_RngTarget::eevee:
     case PokemonFRLG_RngTarget::lapras:
+    case PokemonFRLG_RngTarget::omanyte:
+    case PokemonFRLG_RngTarget::kabuto:
+    case PokemonFRLG_RngTarget::aerodactyl:
     case PokemonFRLG_RngTarget::fossils:
     case PokemonFRLG_RngTarget::gamecornerabra:
     case PokemonFRLG_RngTarget::gamecornerclefairy:
     case PokemonFRLG_RngTarget::gamecornerdratini:
+    case PokemonFRLG_RngTarget::gamecornerscyther:
+    case PokemonFRLG_RngTarget::gamecornerpinsir:
     case PokemonFRLG_RngTarget::gamecornerbug:
     case PokemonFRLG_RngTarget::gamecornerporygon:
         return shiny_check_summary(console, context);
+    case PokemonFRLG_RngTarget::electrode:
+    case PokemonFRLG_RngTarget::articuno:
+    case PokemonFRLG_RngTarget::zapdos:
+    case PokemonFRLG_RngTarget::moltres:
+    case PokemonFRLG_RngTarget::lugia:
+    case PokemonFRLG_RngTarget::deoxys_attack:
+    case PokemonFRLG_RngTarget::deoxys_defense:
     case PokemonFRLG_RngTarget::staticencounter:
     case PokemonFRLG_RngTarget::snorlax:
     case PokemonFRLG_RngTarget::mewtwo:
     case PokemonFRLG_RngTarget::hooh:
     case PokemonFRLG_RngTarget::hypno:
     case PokemonFRLG_RngTarget::sweetscent:
+    case PokemonFRLG_RngTarget::rocksmash:
     case PokemonFRLG_RngTarget::fishing:
     case PokemonFRLG_RngTarget::safarizonecenter:
     case PokemonFRLG_RngTarget::safarizoneeast:

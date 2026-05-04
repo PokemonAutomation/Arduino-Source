@@ -11,12 +11,12 @@
 #include <vector>
 #include <map>
 #include <atomic>
+#include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/InferenceCallbacks/InferenceCallback.h"
 
 namespace PokemonAutomation{
 
-class Cancellable;
 class VideoStream;
 
 
@@ -38,7 +38,7 @@ class VideoStream;
 //  returned true. So it is expected that the object will be destructed soon
 //  after "scope.cancel()" is called.
 //
-class InferenceSession{
+class InferenceSession : public Cancellable::CancelListener{
 public:
     InferenceSession(
         Cancellable& scope, VideoStream& stream,
@@ -55,8 +55,14 @@ public:
 private:
     void clear() noexcept;
 
+    virtual void on_cancellable_cancel(
+        Cancellable& cancellable,
+        std::exception_ptr reason
+    ) override;
+
 
 private:
+    Cancellable& m_scope;
     VideoStream& m_stream;
     VideoOverlaySet m_overlays;
     std::map<InferenceCallback*, size_t> m_map;

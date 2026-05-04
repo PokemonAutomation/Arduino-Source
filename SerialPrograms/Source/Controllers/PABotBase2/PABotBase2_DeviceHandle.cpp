@@ -92,6 +92,20 @@ bool DeviceHandle::cancel(std::exception_ptr exception) noexcept{
 }
 
 
+std::string DeviceHandle::dump_pending_requests() const{
+    std::string ret = "Pending Requests:\n";
+    std::lock_guard<Mutex> lg(m_lock);
+    for (const auto& item : m_pending_requests){
+        ret += std::to_string(item.first);
+        ret += " : ";
+        ret += tostr_hexbytes(item.second.data(), item.second.size());
+        ret += "\n";
+    }
+    return ret;
+}
+
+
+
 
 void DeviceHandle::throw_incompatible_protocol(){
     m_logger.log(
@@ -175,14 +189,28 @@ void DeviceHandle::query_controller_list(){
     m_logger.Logger::log("Checking Controller List... (" + str + ")");
 }
 void DeviceHandle::query_command_queue(){
-    uint8_t command_queue_size = (uint8_t)query_u32(PABB2_MESSAGE_OPCODE_CQ_CAPACITY);
+    uint32_t command_queue_size = query_u32(PABB2_MESSAGE_OPCODE_CQ_CAPACITY);
     m_logger.log("[MLC]: Command Queue Size: " + std::to_string(command_queue_size), COLOR_BLUE);
 
-    //  For now we don't need to use that much queue size.
-    command_queue_size = std::min<uint8_t>(command_queue_size, 32);
+    //  Clip the command queue sizes.
+    command_queue_size = std::max<uint32_t>(command_queue_size, 4);
+    command_queue_size = std::min<uint32_t>(command_queue_size, 255);
+
+    //  Don't let it get too large since we don't need it.
+    command_queue_size = std::min<uint8_t>(
+        command_queue_size,
+        GlobalSettings::instance().COMMAND_QUEUE_LIMIT
+    );
 
     m_logger.Logger::log("Setting queue size to: " + std::to_string(command_queue_size));
-    m_command_queue.set_command_queue_size(command_queue_size);
+    m_command_queue.set_command_queue_size((uint8_t)command_queue_size);
+}
+void DeviceHandle::set_logging_flag(uint32_t flag){
+    PABotBase2::Message_u32 message;
+    message.message_bytes = sizeof(message);
+    message.opcode = PABB2_MESSAGE_OPCODE_SET_LOGGING_FLAG;
+    message.data = flag;
+    send_request_with_no_response(message);
 }
 void DeviceHandle::connect(){
     query_protocol();
@@ -195,6 +223,10 @@ void DeviceHandle::connect(){
 
     query_controller_list();
     query_command_queue();
+
+    if (m_device_firmware_version >= 2026050100){
+        set_logging_flag(GlobalSettings::instance().DEVICE_LOGGING_FLAG);
+    }
 }
 void DeviceHandle::try_set_controller_type(
     ControllerType controller_type,
@@ -207,7 +239,7 @@ void DeviceHandle::try_set_controller_type(
         : PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE;
     try{
         message.data = SerialPABotBase::controller_type_to_id(controller_type);
-        try_send_request(message, std::chrono::milliseconds(100));
+        try_send_request_with_response(message, std::chrono::milliseconds(100));
     }catch (...){}
 }
 
@@ -224,7 +256,21 @@ ControllerType DeviceHandle::refresh_controller_type(){
     return current_controller;
 }
 
-uint8_t DeviceHandle::send_request(MessageHeader& request){
+void DeviceHandle::send_request_with_no_response(MessageHeader& request){
+    request.id = 0;
+    std::unique_lock<Mutex> lg(m_lock);
+    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
+    m_connection.reliable_send_all_or_nothing(&request, request.message_bytes, WallDuration::max());
+}
+std::optional<uint8_t> DeviceHandle::try_send_request_with_no_response(
+    MessageHeader& request, WallDuration timeout
+) noexcept{
+    request.id = 0;
+    std::unique_lock<Mutex> lg(m_lock);
+    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
+    return m_connection.reliable_send_all_or_nothing(&request, request.message_bytes, timeout);
+}
+uint8_t DeviceHandle::send_request_with_response(MessageHeader& request){
     std::unique_lock<Mutex> lg(m_lock);
     while (true){
         throw_if_cancelled();
@@ -246,7 +292,7 @@ uint8_t DeviceHandle::send_request(MessageHeader& request){
     m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
 
     try{
-        m_connection.reliable_send_blocking(&request, request.message_bytes);
+        m_connection.reliable_send_all_or_nothing(&request, request.message_bytes, WallDuration::max());
     }catch (...){
         m_pending_requests.erase(request.id);
         m_request_seqnum--;
@@ -255,7 +301,9 @@ uint8_t DeviceHandle::send_request(MessageHeader& request){
 
     return request.id;
 }
-std::optional<uint8_t> DeviceHandle::try_send_request(MessageHeader& request, WallDuration timeout) noexcept{
+std::optional<uint8_t> DeviceHandle::try_send_request_with_response(
+    MessageHeader& request, WallDuration timeout
+) noexcept{
     std::unique_lock<Mutex> lg(m_lock);
     try{
         while (true){
@@ -281,14 +329,15 @@ std::optional<uint8_t> DeviceHandle::try_send_request(MessageHeader& request, Wa
     m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
 
     try{
-        m_connection.reliable_send_blocking(&request, request.message_bytes, timeout);
+        if (m_connection.reliable_send_all_or_nothing(&request, request.message_bytes, timeout)){
+            return request.id;
+        }
     }catch (...){
         m_pending_requests.erase(request.id);
         m_request_seqnum--;
-        return {};
     }
 
-    return request.id;
+    return {};
 }
 std::string DeviceHandle::wait_for_request_response(uint8_t id, WallDuration timeout){
     WallClock deadline = timeout == WallDuration::max()
@@ -325,7 +374,7 @@ uint32_t DeviceHandle::query_u32(uint8_t opcode){
     request.message_bytes = sizeof(MessageHeader);
     request.opcode = opcode;
 
-    send_request(request);
+    send_request_with_response(request);
 
     std::string response = wait_for_request_response(request.id);
     if (response.size() != sizeof(Message_u32)){
@@ -344,7 +393,7 @@ std::string DeviceHandle::query_data(uint8_t opcode){
     request.message_bytes = sizeof(MessageHeader);
     request.opcode = opcode;
 
-    send_request(request);
+    send_request_with_response(request);
 
     std::string response = wait_for_request_response(request.id);
     if (response.size() < sizeof(MessageHeader)){

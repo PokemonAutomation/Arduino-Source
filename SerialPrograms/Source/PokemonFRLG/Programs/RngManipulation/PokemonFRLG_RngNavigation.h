@@ -17,6 +17,9 @@ namespace NintendoSwitch{
     using ProControllerContext = ControllerContext<ProController>;
 namespace PokemonFRLG{
 
+    
+int watch_for_shiny_encounter(ConsoleHandle& console, ProControllerContext& context);
+
 bool check_for_shiny(ConsoleHandle& console, ProControllerContext& context, PokemonFRLG_RngTarget TARGET);
 
 

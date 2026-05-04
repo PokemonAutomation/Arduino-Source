@@ -115,7 +115,7 @@ void AsyncCommandSession<ControllerType>::dispatch(std::function<void(Controller
 
     if (m_current){
         //  Already a task running. Cancel it.
-        m_current->context.cancel_lazy(this);
+        m_current->context.cancel_lazy();
         m_cv.wait(lg, [this]{
             return cancelled() || m_current == nullptr;
         });

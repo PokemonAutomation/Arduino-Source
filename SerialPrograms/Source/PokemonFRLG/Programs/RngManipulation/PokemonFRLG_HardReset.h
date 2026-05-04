@@ -20,6 +20,7 @@ void reset_and_perform_blind_sequence(
     ProControllerContext& context, 
     PokemonFRLG_RngTarget TARGET,
     SeedButton SEED_BUTTON,
+    BlackoutButton BLACKOUT_BUTTON,
     uint64_t SEED_DELAY, 
     uint64_t CONTINUE_SCREEN_DELAY, 
     uint64_t TEACHY_DELAY, 
@@ -28,11 +29,13 @@ void reset_and_perform_blind_sequence(
     uint8_t PROFILE
 );
 
+#if 0
 void reset_and_detect_copyright_text(
     ConsoleHandle& console, 
     ProControllerContext& context, 
     uint8_t PROFILE = 0
 );
+#endif
 
 }
 }

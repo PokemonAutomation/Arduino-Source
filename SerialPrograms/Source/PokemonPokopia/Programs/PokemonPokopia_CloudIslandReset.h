@@ -51,9 +51,14 @@ private:
     void open_cloud_island_pc(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
     // Add today's stamp to the stamp collection. If full, replace a lower value one
-    // Exit the stamp menu when done
+    // Exit the PC when done
     // Return true if all stamps are Mew
     bool add_todays_stamp(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+    // Open the shop menu from the main PC menu and buy all available recipes until the spend limit reached
+    // Exit the PC when done
+    // Return true if the spend limit is reached and the program should stop buying recipes
+    bool buy_recipes(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
     // Starting from the overworld on a cloud Island, return home
     void leave_cloud_island(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
@@ -61,6 +66,9 @@ private:
 private:
     DeferredStopButtonOption STOP_AFTER_CURRENT;
     SimpleIntegerOption<uint32_t> NUM_RESETS;
+    BooleanCheckBoxOption COLLECT_MEW_STAMPS;
+    BooleanCheckBoxOption BUY_RECIPES;
+    SimpleIntegerOption<uint32_t> SPEND_LIMIT;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
