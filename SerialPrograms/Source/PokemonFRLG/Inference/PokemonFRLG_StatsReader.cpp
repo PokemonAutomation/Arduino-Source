@@ -27,28 +27,50 @@ namespace NintendoSwitch {
 namespace PokemonFRLG {
 
 StatsReader::StatsReader(Color color)
-        : m_color(color), m_box_nature(0.028976, 0.729610, 0.502487, 0.066639),
-            m_box_level(0.052000, 0.120140, 0.099000, 0.069416),
-            m_box_name(0.163158, 0.122917, 0.262811, 0.066639),
-            m_box_gender(0.430769, 0.114423, 0.034615, 0.081731),
-            m_box_hp(0.805274, 0.131247, 0.183790, 0.066639),
-            m_box_attack(0.891000, 0.245089, 0.097607, 0.066639),
-            m_box_defense(0.891000, 0.325612, 0.097607, 0.066639),
-            m_box_sp_attack(0.891000, 0.406134, 0.097607, 0.066639),
-            m_box_sp_defense(0.891000, 0.486657, 0.097607, 0.066639),
-            m_box_speed(0.891000, 0.567180, 0.097607, 0.066639){}
+    : m_color(color), 
+    m_box_nature(0.028976, 0.729610, 0.502487, 0.066639),
+    m_box_level(0.052000, 0.120140, 0.099000, 0.069416),
+    m_box_name(0.163158, 0.122917, 0.262811, 0.066639),
+    m_box_gender(0.430769, 0.114423, 0.034615, 0.081731),
+    m_box_hp(0.805274, 0.131247, 0.183790, 0.066639),
+    m_box_attack(0.891000, 0.245089, 0.097607, 0.066639),
+    m_box_defense(0.891000, 0.325612, 0.097607, 0.066639),
+    m_box_sp_attack(0.891000, 0.406134, 0.097607, 0.066639),
+    m_box_sp_defense(0.891000, 0.486657, 0.097607, 0.066639),
+    m_box_speed(0.891000, 0.567180, 0.097607, 0.066639),
+    m_box_nature_jpn(0.048718, 0.752884, 0.458205, 0.064423),
+    m_box_level_jpn(0.060256, 0.116346, 0.124359, 0.075962),
+    m_box_name_jpn(0.176282, 0.114423, 0.257051, 0.077885),
+    m_box_gender_jpn(0.435256, 0.115384, 0.035256, 0.076923),
+    m_box_hp_jpn(0.717165, 0.131662, 0.269632, 0.066876),
+    m_box_attack_jpn(0.859615, 0.243269, 0.121795, 0.068269),
+    m_box_defense_jpn(0.859615, 0.323792, 0.121795, 0.068269),
+    m_box_sp_attack_jpn(0.859615, 0.404315, 0.121795, 0.068269),
+    m_box_sp_defense_jpn(0.859615, 0.484838, 0.121795, 0.068269),
+    m_box_speed_jpn(0.859615, 0.565361, 0.121795, 0.068269)   
+{}
 
 void StatsReader::make_overlays(VideoOverlaySet &items) const {
     const BoxOption &GAME_BOX = GameSettings::instance().GAME_BOX;
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_nature));
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_level));
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_name));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_box_gender));
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_hp));
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_attack));
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_defense));
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_sp_attack));
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_sp_defense));
     items.add(m_color, GAME_BOX.inner_to_outer(m_box_speed));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_box_level_jpn));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_box_name_jpn));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_box_gender_jpn));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_box_hp_jpn));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_box_attack_jpn));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_box_defense_jpn));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_box_sp_attack_jpn));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_box_sp_defense_jpn));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_box_speed_jpn));
 }
 
 void StatsReader::read_page1(
@@ -61,6 +83,8 @@ void StatsReader::read_page1(
     ImageViewRGB32 game_screen =
             extract_box_reference(frame, GameSettings::instance().GAME_BOX);
 
+
+    const bool jpn = language == Language::Japanese;
     // Read Name (white text on lilac background).
     // Use multifiltered OCR across multiple narrow white bands. This tolerates
     // brightness shifts (down to ~0xc0) while still preferring cleaner bands.
@@ -72,14 +96,14 @@ void StatsReader::read_page1(
 
     if (subset.size() > 0){
         auto name_result = Pokemon::PokemonNameReader(subset).read_substring(
-                logger, language, extract_box_reference(game_screen, m_box_name),
+                logger, language, extract_box_reference(game_screen, jpn ? m_box_name_jpn : m_box_name),
                 name_text_color_ranges);
         if (!name_result.results.empty()){
             stats.name = name_result.results.begin()->second.token;
         }
     }else{
         auto name_result = Pokemon::PokemonNameReader::instance().read_substring(
-                logger, language, extract_box_reference(game_screen, m_box_name),
+                logger, language, extract_box_reference(game_screen, jpn ? m_box_name_jpn : m_box_name),
                 name_text_color_ranges);
         if (!name_result.results.empty()){
             stats.name = name_result.results.begin()->second.token;
@@ -87,7 +111,7 @@ void StatsReader::read_page1(
     }
 
     // Detect gender by comparing red vs blue pixels
-    ImageViewRGB32 gender_box = extract_box_reference(game_screen, m_box_gender);
+    ImageViewRGB32 gender_box = extract_box_reference(game_screen, jpn ? m_box_gender_jpn : m_box_gender);
 
     const bool replace_color_within_range = false;
     const ImageRGB32 red_region = filter_rgb32_range(
@@ -114,7 +138,7 @@ void StatsReader::read_page1(
 
 
 
-    ImageViewRGB32 level_box = extract_box_reference(game_screen, m_box_level);
+    ImageViewRGB32 level_box = extract_box_reference(game_screen, jpn ? m_box_level_jpn : m_box_level);
 
     ImageRGB32 level_upscaled =
             level_box.scale_to(level_box.width() * 4, level_box.height() * 4);
@@ -188,7 +212,7 @@ void StatsReader::read_page1(
     // Morph close on the inverted image (text=white) bridges gaps in text
     // regions by growing white->eroding back. Works per-channel on CV_8UC4.
     const static Pokemon::NatureReader reader("Pokemon/NatureCheckerOCR.json");
-    ImageViewRGB32 nature_raw = extract_box_reference(game_screen, m_box_nature);
+    ImageViewRGB32 nature_raw = extract_box_reference(game_screen, jpn ? m_box_nature_jpn : m_box_nature);
     if (save_debug_images){
         nature_raw.save("DebugDumps/ocr_nature_0_raw.png");
     }
@@ -319,9 +343,11 @@ void StatsReader::read_page1(
 }
 
 void StatsReader::read_page2(
-    Logger &logger, const ImageViewRGB32 &frame,
-    PokemonFRLG_Stats &stats
+    Logger &logger, Language language,
+    const ImageViewRGB32 &frame, PokemonFRLG_Stats &stats
 ){
+    const bool jpn = language == Language::Japanese;
+
     ImageViewRGB32 game_screen =
             extract_box_reference(frame, GameSettings::instance().GAME_BOX);
 
@@ -351,9 +377,10 @@ void StatsReader::read_page2(
     };
 
     // HP box: shift right 55% to clear the "/" character.
+    auto hp_box = jpn ? m_box_hp_jpn : m_box_hp;
     ImageFloatBox total_hp_box(
-        m_box_hp.x + m_box_hp.width * 0.60, m_box_hp.y,
-        m_box_hp.width * 0.40, m_box_hp.height
+        hp_box.x + hp_box.width * 0.60, hp_box.y,
+        hp_box.width * 0.40, hp_box.height
     );
 
     auto assign_stat = [](std::optional<unsigned>& field, int value){
@@ -362,11 +389,11 @@ void StatsReader::read_page2(
         }
     };
     assign_stat(stats.hp, read_stat(total_hp_box, "hp"));
-    assign_stat(stats.attack, read_stat(m_box_attack, "attack"));
-    assign_stat(stats.defense, read_stat(m_box_defense, "defense"));
-    assign_stat(stats.sp_attack, read_stat(m_box_sp_attack, "spatk"));
-    assign_stat(stats.sp_defense, read_stat(m_box_sp_defense, "spdef"));
-    assign_stat(stats.speed, read_stat(m_box_speed, "speed"));
+    assign_stat(stats.attack, read_stat(jpn ? m_box_attack_jpn : m_box_attack, "attack"));
+    assign_stat(stats.defense, read_stat(jpn ? m_box_defense_jpn : m_box_defense, "defense"));
+    assign_stat(stats.sp_attack, read_stat(jpn ? m_box_sp_attack_jpn : m_box_sp_attack, "spatk"));
+    assign_stat(stats.sp_defense, read_stat(jpn ? m_box_sp_defense_jpn : m_box_sp_defense, "spdef"));
+    assign_stat(stats.speed, read_stat(jpn ? m_box_speed_jpn : m_box_speed, "speed"));
 }
 
 } // namespace PokemonFRLG

@@ -240,7 +240,7 @@ AdvObservedPokemon StarterRng::read_summary(SingleSwitchProgramEnvironment& env,
 
     env.log("Reading Page 2 (Stats)...");
     VideoSnapshot screen2 = env.console.video().snapshot();
-    reader.read_page2(env.logger(), screen2, stats);
+    reader.read_page2(env.logger(), LANGUAGE, screen2, stats);
 
     StatReads statreads = {
         static_cast<int16_t>(stats.hp.value_or(0)),

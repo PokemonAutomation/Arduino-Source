@@ -51,15 +51,15 @@ public:
 
     // Reads from page 1 (Nature, Level, Name)
     void read_page1(
-        Logger &logger, Language language,
-        const ImageViewRGB32 &frame, PokemonFRLG_Stats &stats,
+        Logger& logger, Language language,
+        const ImageViewRGB32& frame, PokemonFRLG_Stats& stats,
         const std::set<std::string>& subset = {}
     );
 
     // Reads from page 2 (Stats: HP, Atk, Def, SpA, SpD, Spe)
     void read_page2(
-        Logger &logger, const ImageViewRGB32 &frame,
-        PokemonFRLG_Stats &stats
+        Logger& logger, Language language,
+        const ImageViewRGB32& frame, PokemonFRLG_Stats& stats
     );
 
 private:
@@ -74,6 +74,16 @@ private:
     ImageFloatBox m_box_sp_attack;
     ImageFloatBox m_box_sp_defense;
     ImageFloatBox m_box_speed;
+    ImageFloatBox m_box_nature_jpn;
+    ImageFloatBox m_box_level_jpn;
+    ImageFloatBox m_box_name_jpn;
+    ImageFloatBox m_box_gender_jpn;
+    ImageFloatBox m_box_hp_jpn;
+    ImageFloatBox m_box_attack_jpn;
+    ImageFloatBox m_box_defense_jpn;
+    ImageFloatBox m_box_sp_attack_jpn;
+    ImageFloatBox m_box_sp_defense_jpn;
+    ImageFloatBox m_box_speed_jpn;
 
 };
 
