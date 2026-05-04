@@ -126,7 +126,7 @@ void set_sid_from_name_screen(
 
     if (extra_press_at_end){
         pbf_press_button(context, BUTTON_A, 200ms, 800ms);
-        delay -= 1000ms;
+        delay = delay > 1000ms ? delay - 1000ms : 0ms;
     }
 
     pbf_press_button(context, BUTTON_A, 200ms, delay);
