@@ -39,7 +39,7 @@ using namespace Pokemon;
 
 
 // Move the red cursor to the first slot of the box
-// If the cursor is not add the first slot, move the cursor to the left and up one row at a time until it is at the first slot. 
+// If the cursor is not at the first slot, move the cursor to the left and up one row at a time until it is at the first slot. 
 bool go_to_first_slot(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -105,7 +105,7 @@ bool go_to_first_slot(
     ss << "Moving cursor from " << cur_cursor << " to " << dest_cursor;
     env.console.log(ss.str());
 
-    // TODO: shortest path movement though pages, boxes
+    // TODO: shortest path movement through pages, boxes
     for (size_t i = cur_cursor.box; i < dest_cursor.box; ++i) {
         pbf_press_button(context, BUTTON_R, 80ms, GAME_DELAY + 240ms);
     }
@@ -219,7 +219,7 @@ std::array<size_t, 2> find_occupied_slots_in_box(
     return first_pokemon_slot;
 }
 
-// Read the current summary screen and assign various pokemon info into `cur_pokemon-info`
+// Read the current summary screen and assign various pokemon info into `cur_pokemon_info`
 void read_summary_screen(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     CollectedPokemonInfo& cur_pokemon_info, Language ot_name_language
