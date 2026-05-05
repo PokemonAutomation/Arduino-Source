@@ -123,6 +123,16 @@ ConsoleSettings::ConsoleSettings()
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
+    , DATE_MENU_OPEN_SWITCH2(
+        "<b>Open Date Menu (Switch 2):</b>",
+        LockMode::LOCK_WHILE_RUNNING,
+        "208 ms"
+    )
+    , DATE_MENU_CLOSE_SWITCH2(
+        "<b>Close Date Menu (Switch 2):</b>",
+        LockMode::LOCK_WHILE_RUNNING,
+        "288 ms"
+    )
     , CODEBOARD_ENTRY_SWITCH1_WIRED(
         "Fast Code Entry Timings (Switch 1 Wired Controller)",
         false,
@@ -156,6 +166,8 @@ ConsoleSettings::ConsoleSettings()
     PA_ADD_OPTION(ENABLE_SBB3_PINGS);
     PA_ADD_OPTION(ENABLE_SBB3_LOGGING);
     PA_ADD_OPTION(TIMING_OPTIONS);
+    PA_ADD_OPTION(DATE_MENU_OPEN_SWITCH2);
+    PA_ADD_OPTION(DATE_MENU_CLOSE_SWITCH2);
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(CODEBOARD_ENTRY_SWITCH1_WIRED);
         PA_ADD_OPTION(CODEBOARD_ENTRY_SWITCH1_WIRELESS);

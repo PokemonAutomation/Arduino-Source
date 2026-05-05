@@ -411,7 +411,7 @@ AdvObservedPokemon StaticRng::read_summary(SingleSwitchProgramEnvironment& env, 
 
     env.log("Reading Page 2 (Stats)...");
     VideoSnapshot screen2 = env.console.video().snapshot();
-    reader.read_page2(env.logger(), screen2, stats);
+    reader.read_page2(env.logger(), LANGUAGE, screen2, stats);
 
     StatReads statreads = {
         static_cast<int16_t>(stats.hp.value_or(0)),
@@ -497,7 +497,7 @@ bool StaticRng::use_rare_candy(
     }
 
     // watch for level up stats
-    PartyLevelUpWatcher level_up(COLOR_RED, PartyLevelUpDialog::stats);
+    PartyLevelUpWatcher level_up(COLOR_RED, PartyLevelUpDialog::stats, LANGUAGE);
     context.wait_for_all_requests();
     int ret2 = run_until<ProControllerContext>(
         env.console, context,

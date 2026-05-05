@@ -99,14 +99,14 @@ void neutral_day_skip_switch2(ConsoleHandle& console, ProControllerContext& cont
         context->logger().log("PokemonSV::neutral_day_skip_switch2()");
     }
 
-    ssf_press_button(context, BUTTON_A, 216ms, 80ms);
+    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_OPEN_SWITCH2, 80ms);
     ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
     ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
     ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
     ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
     ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
     ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
-    ssf_press_button(context, BUTTON_A, 264ms, 80ms);
+    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_CLOSE_SWITCH2, 80ms);
 }
 
 void day_skip_from_overworld(ConsoleHandle& console, ProControllerContext& context){

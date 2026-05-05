@@ -84,7 +84,7 @@ void ReadStats::program(
 
     env.log("Reading Page 2 (Stats)...");
     VideoSnapshot screen2 = env.console.video().snapshot();
-    reader.read_page2(env.logger(), screen2, stats);
+    reader.read_page2(env.logger(), LANGUAGE, screen2, stats);
 
     env.log("HP (Total): " + (stats.hp.has_value() ? std::to_string(*stats.hp) : "???"));
     env.log("Attack: " +

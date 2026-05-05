@@ -224,13 +224,15 @@ bool BattleOutOfPpDetector::detect(const ImageViewRGB32& screen){
     return num_red_pixels > threshold;
 }
 
-BattleLevelUpDetector::BattleLevelUpDetector(Color color, BattleLevelUpDialog dialog_type)
+BattleLevelUpDetector::BattleLevelUpDetector(Color color, BattleLevelUpDialog dialog_type, Language language)
     : dialog_type(dialog_type)
+    , jpn(language == Language::Japanese)
     , m_border_top_box(0.619231, 0.374038, 0.362179, 0.001923) // gray (120, 115, 140)
     , m_border_right_box(0.982692, 0.376923, 0.001923, 0.597115)
     , m_dialog_top_box(0.626282, 0.393492, 0.341026, 0.006175)  // white
     , m_dialog_right_box(0.967949, 0.401923, 0.003846, 0.550962)
     , m_plus_box(0.862663, 0.402852, 0.034267, 0.553560)
+    , m_plus_box_jpn(0.895663, 0.402852, 0.021267, 0.553560)
 {}
 void BattleLevelUpDetector::make_overlays(VideoOverlaySet& items) const{
     const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
@@ -251,12 +253,23 @@ bool BattleLevelUpDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 dialog_right_image = extract_box_reference(game_screen, m_dialog_right_box);
    
     //Plus box is not solid white on the first screen, but is white on the second one
-    ImageViewRGB32 plus_image = extract_box_reference(game_screen, m_plus_box);
-    bool good_plus_image = (
-        dialog_type == BattleLevelUpDialog::either
-        || (dialog_type == BattleLevelUpDialog::plus && !is_white(plus_image))
-        || (dialog_type == BattleLevelUpDialog::stats && is_white(plus_image))
-    );
+    //For Japanese, this logic is flipped. The first screen will have no text in the 10s place,
+    //and the second screen always will
+    ImageViewRGB32 plus_image = extract_box_reference(game_screen, jpn ? m_plus_box_jpn : m_plus_box);
+    bool good_plus_image = false;
+    if (dialog_type == BattleLevelUpDialog::either){
+        good_plus_image = true;
+    }else if (jpn){
+        good_plus_image = (
+            (dialog_type == BattleLevelUpDialog::plus && is_white(plus_image)) ||
+            (dialog_type == BattleLevelUpDialog::stats && !is_white(plus_image))
+        );
+    }else{
+        good_plus_image = (
+            (dialog_type == BattleLevelUpDialog::plus && !is_white(plus_image)) ||
+            (dialog_type == BattleLevelUpDialog::stats && is_white(plus_image))
+        );
+    }
 
     if (is_solid(border_top_image, { 0.320, 0.307, 0.373 }, 0.25, 20)
         && is_solid(border_right_image, { 0.320, 0.307, 0.373 }, 0.25, 20)

@@ -30,12 +30,12 @@ namespace PokemonFRLG {
 
 PartyLevelUpReader::PartyLevelUpReader(Color color)
     : m_color(color)
-    , m_box_hp(0.904069, 0.051852, 0.068535, 0.079387)
-    , m_box_attack(0.904069, 0.145052, 0.068535, 0.079387)
-    , m_box_defense(0.904069, 0.238252, 0.068535, 0.079387)
-    , m_box_sp_attack(0.904069, 0.331452, 0.068535, 0.079387)
-    , m_box_sp_defense(0.904069, 0.424652, 0.068535, 0.079387)
-    , m_box_speed(0.904069, 0.517852, 0.068535, 0.0793879)
+    , m_box_hp(0.844069, 0.051852, 0.128535, 0.079387)
+    , m_box_attack(0.844069, 0.145052, 0.128535, 0.079387)
+    , m_box_defense(0.844069, 0.238252, 0.128535, 0.079387)
+    , m_box_sp_attack(0.844069, 0.331452, 0.128535, 0.079387)
+    , m_box_sp_defense(0.844069, 0.424652, 0.128535, 0.079387)
+    , m_box_speed(0.844069, 0.517852, 0.128535, 0.0793879)
 {}
 
 void PartyLevelUpReader::make_overlays(VideoOverlaySet &items) const {

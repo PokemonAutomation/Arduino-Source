@@ -101,7 +101,8 @@ namespace{
 void set_sid_from_name_screen(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    const uint64_t& SID_DELAY
+    const uint64_t& SID_DELAY,
+    bool extra_press_at_end
 ){
     // this is performed blind to try to maximize consistency of timing
     // ensure the OK button is selected
@@ -122,6 +123,12 @@ void set_sid_from_name_screen(
         ? SID_DELAY - 13700
         : 0
     );
+
+    if (extra_press_at_end){
+        pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+        delay = delay > 1000ms ? delay - 1000ms : 0ms;
+    }
+
     pbf_press_button(context, BUTTON_A, 200ms, delay);
 
     // finish dialogue and lock in SID
@@ -292,10 +299,12 @@ void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     const double& FIXED_ADVANCES_OFFSET = 7; // determined empirically. Probably not console/setup dependent
 
+    bool extra_press_at_end = (LANGUAGE == Language::German);
+
     const uint64_t SID_DELAY = uint64_t((TARGET_ADVANCES - 2*FINAL_TEXT_FRAMES + FIXED_ADVANCES_OFFSET) * FRAME_DURATION / 2); // advances pass 2 by 2
     env.log("Delay: " + std::to_string(SID_DELAY) + "ms");
 
-    set_sid_from_name_screen(env, context, SID_DELAY);
+    set_sid_from_name_screen(env, context, SID_DELAY, extra_press_at_end);
     finish_intro_animations(env, context);
     navigate_to_trainer_card(env, context);
 
