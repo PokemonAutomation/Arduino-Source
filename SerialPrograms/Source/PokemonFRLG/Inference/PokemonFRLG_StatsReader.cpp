@@ -74,9 +74,9 @@ void StatsReader::make_overlays(VideoOverlaySet &items) const {
 }
 
 void StatsReader::read_page1(
-    Logger &logger, Language language,
-    const ImageViewRGB32 &frame,
-    PokemonFRLG_Stats &stats,
+    Logger& logger, Language language,
+    const ImageViewRGB32& frame,
+    PokemonFRLG_Stats& stats,
     const std::set<std::string>& subset
 ){
     const bool save_debug_images = GlobalSettings::instance().SAVE_DEBUG_IMAGES;
@@ -343,15 +343,15 @@ void StatsReader::read_page1(
 }
 
 void StatsReader::read_page2(
-    Logger &logger, Language language,
-    const ImageViewRGB32 &frame, PokemonFRLG_Stats &stats
+    Logger& logger, Language language,
+    const ImageViewRGB32& frame, PokemonFRLG_Stats& stats
 ){
     const bool jpn = language == Language::Japanese;
 
     ImageViewRGB32 game_screen =
             extract_box_reference(frame, GameSettings::instance().GAME_BOX);
 
-    auto read_stat = [&](const ImageFloatBox &box, const std::string &name){
+    auto read_stat = [&](const ImageFloatBox& box, const std::string& name){
         ImageViewRGB32 stat_region = extract_box_reference(game_screen, box);
 
         if (!GlobalSettings::instance().USE_PADDLE_OCR){
@@ -376,19 +376,40 @@ void StatsReader::read_page2(
         );
     };
 
-    // HP box: shift right 55% to clear the "/" character.
-    auto hp_box = jpn ? m_box_hp_jpn : m_box_hp;
-    ImageFloatBox total_hp_box(
-        hp_box.x + hp_box.width * 0.60, hp_box.y,
-        hp_box.width * 0.40, hp_box.height
-    );
+    auto read_hp = [&](const ImageFloatBox& box){
+        // this captures the current HP, "/", and total HP
+        int res = read_stat(box, "hp");
+
+        // check for wrong numbers of digits to remove the "/"
+        // since hp will always be a 2 or 3 digit number.
+        // Be warned: "/" will sometimes be ignored entirely.
+        // Current HP can be anything between 0 and the total
+        std::string res_str = std::to_string(res);
+
+        // >5 digits unambiguously indicates the total HP should be 3 read digits
+        // For non-fainted Pokemon (a leading 0 would throw things off), 3 read digits unambiguously indicates the total HP should be 2 digits
+        // 4-5 read digits is ambiguous:
+        //      case 1: a 3-digit total where the "/" is included and current HP is one digit       (5 digits read)
+        //      case 2: a 2-digit total where the "/" is included and the current HP is two digits  (5 digits read)
+        //      case 3: a 3-digit total where the "/" is dropped and the current HP is one digit    (4 digits read)
+        //      case 4: a 2-digit total where the "/" is dropped and the current HP is two digits   (4 digits read)
+        // This will assume a 2-digit HP total in case of ambiguity, consistent with a Pokemon at full HP
+        if (res_str.size() > 5){ 
+            return std::stoi(res_str.substr(res_str.size() - 3));
+        }
+        if (res_str.size() > 2){ 
+            return std::stoi(res_str.substr(res_str.size() - 2));
+        }
+        return res;
+    };
 
     auto assign_stat = [](std::optional<unsigned>& field, int value){
         if (value != -1){
             field = static_cast<unsigned>(value);
         }
     };
-    assign_stat(stats.hp, read_stat(total_hp_box, "hp"));
+
+    assign_stat(stats.hp, read_hp(jpn ? m_box_hp_jpn : m_box_hp));
     assign_stat(stats.attack, read_stat(jpn ? m_box_attack_jpn : m_box_attack, "attack"));
     assign_stat(stats.defense, read_stat(jpn ? m_box_defense_jpn : m_box_defense, "defense"));
     assign_stat(stats.sp_attack, read_stat(jpn ? m_box_sp_attack_jpn : m_box_sp_attack, "spatk"));
