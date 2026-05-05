@@ -39,7 +39,6 @@ void rng_reset_and_return_home(
     Milliseconds launch_delay = 950ms;
 
     bool update_popup = false;
-    bool connect_popup = false;
     WallClock deadline = current_time() + std::chrono::minutes(5);
     while (true){
         if (current_time() > deadline){
@@ -54,7 +53,6 @@ void rng_reset_and_return_home(
         HomeMenuWatcher home(console, std::chrono::milliseconds(2000));
         UpdateMenuWatcher update_menu(console, COLOR_PURPLE);
         CheckOnlineWatcher check_online(COLOR_CYAN);
-        FailedToConnectWatcher failed_to_connect(COLOR_YELLOW);
 
         // first, get to the user select screen
         context.wait_for_all_requests();
@@ -66,7 +64,6 @@ void rng_reset_and_return_home(
                 home,
                 update_menu,
                 check_online,
-                failed_to_connect,
             }
         );
 
@@ -91,10 +88,6 @@ void rng_reset_and_return_home(
         case 3:
             console.log("Detected check online.", COLOR_BLUE);
             context.wait_for(std::chrono::seconds(1));
-            pbf_press_button(context, BUTTON_A, 160ms, 840ms);     
-            continue;
-        case 4:
-            console.log("Detected failed to connect.", COLOR_BLUE);
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             continue;
         default:
@@ -115,9 +108,6 @@ void rng_reset_and_return_home(
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);
         }
-        if (connect_popup){
-            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
-        }
         pbf_press_button(context, BUTTON_A, 50ms, launch_delay);
         pbf_press_button(context, BUTTON_HOME, 200ms, 1800ms);
 
@@ -128,8 +118,8 @@ void rng_reset_and_return_home(
             BlackScreenWatcher black_screen(COLOR_BLUE, {0.1, 0.15, 0.8, 0.7});
             int ret3 = wait_until(
                 console, context,
-                std::chrono::seconds(2 + (update_popup ? 1 : 0) + (connect_popup ? 1 : 0)),
-                { black_screen, update_menu, failed_to_connect },
+                std::chrono::seconds(2 + (update_popup ? 1 : 0)),
+                { black_screen, update_menu },
                 1ms
             );
             bool black_screen_detected = false;
@@ -141,9 +131,6 @@ void rng_reset_and_return_home(
             case 1:
                 console.log("Update menu detected.", COLOR_BLUE);
                 update_popup = true;
-            case 2:
-                console.log("Failed to connect detected.", COLOR_BLUE);
-                connect_popup = true;
             }
 
             context.wait_for_all_requests();
@@ -155,8 +142,7 @@ void rng_reset_and_return_home(
                 { 
                     home, 
                     user_select,
-                    update_menu,
-                    failed_to_connect 
+                    update_menu
                 }
             );
 
@@ -180,11 +166,6 @@ void rng_reset_and_return_home(
             case 2:
                 console.log("Detected update menu. Trying again...", COLOR_BLUE);
                 pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);
-                pbf_press_button(context, BUTTON_A, 50ms, launch_delay);
-                pbf_press_button(context, BUTTON_HOME, 200ms, 2800ms);
-                continue;
-            case 3:
-                console.log("Detected failed to connect.", COLOR_BLUE);
                 pbf_press_button(context, BUTTON_A, 50ms, launch_delay);
                 pbf_press_button(context, BUTTON_HOME, 200ms, 2800ms);
                 continue;
