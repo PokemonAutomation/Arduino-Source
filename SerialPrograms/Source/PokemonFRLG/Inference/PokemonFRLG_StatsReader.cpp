@@ -382,7 +382,7 @@ void StatsReader::read_page2(
 
         // check for wrong numbers of digits to remove the "/"
         // since hp will always be a 2 or 3 digit number.
-        // Be warned: "/" will sometimes be ignored entirely.
+        // Be warned: "/" is usually ignored entirely, but is sometimes detected as 2.
         // Current HP can be anything between 0 and the total
         std::string res_str = std::to_string(res);
 
