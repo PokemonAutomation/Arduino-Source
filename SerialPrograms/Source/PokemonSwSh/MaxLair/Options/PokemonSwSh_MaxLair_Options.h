@@ -62,9 +62,6 @@ public:
     
     // For BossFinder: whether the boss is in the "save on the go" list.
     virtual bool is_in_save_list(const std::string& boss_slug) const { return false; }
-
-    // For Standard/StrongBoss: whether to keep a followed path when prompted.
-    //virtual bool should_keep_followed_path() const { return false; }
 };
 
 
