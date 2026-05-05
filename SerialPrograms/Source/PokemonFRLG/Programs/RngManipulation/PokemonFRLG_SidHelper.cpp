@@ -72,7 +72,7 @@ SidHelper::SidHelper()
         "The target advances for finalizing the SID. This is arbitrary unless you're attempting to hit a specific TID/SID combination.<br>"
         "This value should always be odd.",
         LockMode::LOCK_WHILE_RUNNING, 
-        2301, 2275 // default, min
+        3001, 2275 // default, min
     )
     , NUM_CANDIDATES(
         "<b># Candidate SIDs:</b><br>"
@@ -125,8 +125,8 @@ void set_sid_from_name_screen(
     );
 
     if (extra_press_at_end){
-        pbf_press_button(context, BUTTON_A, 200ms, 800ms);
-        delay = delay > 1000ms ? delay - 1000ms : 0ms;
+        pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+        delay = delay > 1500ms ? delay - 1500ms : 0ms;
     }
 
     pbf_press_button(context, BUTTON_A, 200ms, delay);
@@ -299,7 +299,10 @@ void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     const double& FIXED_ADVANCES_OFFSET = 7; // determined empirically. Probably not console/setup dependent
 
-    bool extra_press_at_end = (LANGUAGE == Language::German);
+    bool extra_press_at_end = (
+        LANGUAGE == Language::German ||
+        LANGUAGE == Language::Japanese
+    );
 
     const uint64_t SID_DELAY = uint64_t((TARGET_ADVANCES - 2*FINAL_TEXT_FRAMES + FIXED_ADVANCES_OFFSET) * FRAME_DURATION / 2); // advances pass 2 by 2
     env.log("Delay: " + std::to_string(SID_DELAY) + "ms");
