@@ -688,7 +688,6 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     RngAdvanceHistory ADVANCE_HISTORY;
     RngCalibrationHistory CALIBRATION_HISTORY; 
     uint64_t INITIAL_ADVANCES_RADIUS = 1024;
-    uint64_t resets = 0;
     bool wildshiny_found = false;
 
     while (true){
@@ -702,7 +701,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             env.log("Missed target.");
         }
 
-        if (resets > MAX_RESETS){
+        if (stats.resets > MAX_RESETS){
             env.log("Max resets reached.");
             break;
         }

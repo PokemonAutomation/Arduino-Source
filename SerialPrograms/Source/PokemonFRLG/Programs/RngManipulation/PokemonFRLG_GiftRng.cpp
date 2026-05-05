@@ -539,7 +539,6 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     RngAdvanceHistory ADVANCE_HISTORY;
     RngCalibrationHistory CALIBRATION_HISTORY; 
     uint64_t INITIAL_ADVANCES_RADIUS = USE_TEACHY_TV ? 8192 : 1024;
-    uint64_t resets = 0;
 
     while (true){
         if (CALIBRATION_HISTORY.results.size() > 0){
@@ -552,7 +551,7 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             env.log("Missed target.");
         }
 
-        if (resets > MAX_RESETS){
+        if (stats.resets > MAX_RESETS){
             env.log("Max resets reached.");
             break;
         }
