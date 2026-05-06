@@ -690,6 +690,8 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     uint64_t INITIAL_ADVANCES_RADIUS = 1024;
     bool wildshiny_found = false;
 
+    uint16_t failed_searches = 0;
+
     while (true){
         if (CALIBRATION_HISTORY.results.size() > 0){
             env.log("Checking for nonshiny target hit...");
@@ -699,6 +701,16 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 break;
             }
             env.log("Missed target.");
+        }
+
+        if (failed_searches >= 5){
+            env.log("Failed to find any matches 5 times in a row");
+            OperationFailedException::fire(
+                ErrorReport::NO_ERROR_REPORT,
+                "Failed to find any matches 5 times in a row. Check your seed and advances settings.",
+                env.console
+            ); 
+            break;
         }
 
         if (stats.resets > MAX_RESETS){
@@ -811,6 +823,11 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         bool finished = update_history(env.console, ADVANCE_HISTORY, CALIBRATION_HISTORY, MAX_HISTORY_LENGTH, SEED_CALIBRATION_FRAMES, ADVANCES_CALIBRATION, CONTINUE_SCREEN_ADJUSTMENT, search_hits, 1);
         if (finished){
             env.log("RNG search finished.");
+            if (search_hits.size() == 0){
+                failed_searches++;
+            }else{
+                failed_searches = 0;
+            }
             continue;
         }
 
@@ -837,6 +854,11 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             finished = update_history(env.console, ADVANCE_HISTORY, CALIBRATION_HISTORY, MAX_HISTORY_LENGTH, SEED_CALIBRATION_FRAMES, ADVANCES_CALIBRATION, CONTINUE_SCREEN_ADJUSTMENT, search_hits, 5);
             if (finished){
                 env.log("RNG search finished.");
+                if (search_hits.size() == 0){
+                    failed_searches++;
+                }else{
+                    failed_searches = 0;
+                }
                 continue;
             }
         }
@@ -897,6 +919,11 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 finished = update_history(env.console, ADVANCE_HISTORY, CALIBRATION_HISTORY, MAX_HISTORY_LENGTH, SEED_CALIBRATION_FRAMES, ADVANCES_CALIBRATION, CONTINUE_SCREEN_ADJUSTMENT, search_hits, 5);
                 if (finished){
                     env.log("RNG search finished.");
+                    if (search_hits.size() == 0){
+                        failed_searches++;
+                    }else{
+                        failed_searches = 0;
+                    }
                     break;
                 }
             }
