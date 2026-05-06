@@ -22,7 +22,7 @@ void set_seed_after_delay(ProControllerContext& context, SeedButton SEED_BUTTON,
     switch (console_type){
     case ConsoleType::Switch1:
         // Switch 1 enters the game a little bit earlier
-        pbf_wait(context, 755ms);
+        pbf_wait(context, 750ms);
         break;
     default:
         break;
