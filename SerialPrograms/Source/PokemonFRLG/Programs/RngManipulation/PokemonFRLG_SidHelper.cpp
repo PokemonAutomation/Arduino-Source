@@ -209,7 +209,7 @@ void navigate_to_trainer_card(SingleSwitchProgramEnvironment& env, ProController
     }
 }
 
-uint16_t read_tid(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+uint16_t read_tid(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language lang){
     TrainerIdReader reader;
     VideoOverlaySet overlays(env.console.overlay());
     reader.make_overlays(overlays);
@@ -217,7 +217,7 @@ uint16_t read_tid(SingleSwitchProgramEnvironment& env, ProControllerContext& con
     VideoSnapshot screen = env.console.video().snapshot();
     env.log("Trainer Card detected.");
     env.log("Reading TID...");
-    uint16_t tid = reader.read_tid(env.logger(), screen);
+    uint16_t tid = reader.read_tid(env.logger(), lang, screen);
     env.log("TID: " + std::to_string(tid));
 
     context.wait_for_all_requests();
@@ -311,7 +311,7 @@ void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     finish_intro_animations(env, context);
     navigate_to_trainer_card(env, context);
 
-    uint16_t tid = read_tid(env, context);
+    uint16_t tid = read_tid(env, context, lang);
 
     std::vector<std::pair<std::string, std::string>> sid_messages = get_sid_messages(
         env, context, tid, TARGET_ADVANCES, NUM_CANDIDATES

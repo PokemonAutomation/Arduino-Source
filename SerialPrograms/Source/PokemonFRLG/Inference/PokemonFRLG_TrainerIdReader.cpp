@@ -26,6 +26,7 @@ namespace PokemonFRLG {
 TrainerIdReader::TrainerIdReader(Color color)
     : m_color(color)
     , m_box_tid(0.742683, 0.117314, 0.129734, 0.076006)
+    , m_box_tid_jpn(0.712981, 0.118836, 0.207212, 0.077373)
 {}
 
 void TrainerIdReader::make_overlays(VideoOverlaySet &items) const {
@@ -34,13 +35,13 @@ void TrainerIdReader::make_overlays(VideoOverlaySet &items) const {
 }
 
 uint16_t TrainerIdReader::read_tid(
-    Logger &logger, const ImageViewRGB32 &frame
+    Logger& logger, Language language, const ImageViewRGB32& frame
 ){
     ImageViewRGB32 game_screen =
             extract_box_reference(frame, GameSettings::instance().GAME_BOX);
 
     
-    ImageViewRGB32 tid_region = extract_box_reference(game_screen, m_box_tid);
+    ImageViewRGB32 tid_region = extract_box_reference(game_screen, language == Language::Japanese ? m_box_tid_jpn : m_box_tid);
 
     if (!GlobalSettings::instance().USE_PADDLE_OCR){
         // Tesseract-free path: waterfill segmentation + template matching

@@ -36,7 +36,23 @@ ReadTrainerId_Descriptor::ReadTrainerId_Descriptor()
 ){}
 
 ReadTrainerId::ReadTrainerId()
-{}
+    : LANGUAGE(
+        "<b>Game Language:</b><br>"
+        "Language affects the number of advances (based on the number of text characters) that pass after the last button press.",
+        {
+            Language::English,
+            Language::Japanese,
+            Language::Spanish,
+            Language::French,
+            Language::German,
+            Language::Italian,
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
+{
+    PA_ADD_OPTION(LANGUAGE);
+}
 
 void ReadTrainerId::program(
     SingleSwitchProgramEnvironment &env,
@@ -56,7 +72,7 @@ void ReadTrainerId::program(
     if (trainercard){
         env.log("Trainer Card detected.");
         env.log("Reading TID...");
-        uint16_t tid = reader.read_tid(env.logger(), screen);
+        uint16_t tid = reader.read_tid(env.logger(), LANGUAGE, screen);
         env.log("TID: " + std::to_string(tid));
     }else{
         env.log("Trainer Card not detected!");
