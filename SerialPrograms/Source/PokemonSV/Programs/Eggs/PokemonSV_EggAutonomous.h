@@ -58,6 +58,8 @@ private:
     bool move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t pokemon_row_in_party);
 
     void save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool from_overworld);
+    void backup_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void fly_between_zero_gate_and_pokecenter(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool to_pokecenter);
 
     //  Return true if you should rethrow.
     bool handle_recoverable_error(
@@ -91,6 +93,7 @@ private:
         AfterStartAndKeep,
         EveryBatch,
         AfterFetchComplete,
+        BackupSaveAfterFetchAndKeep,
     };
     EnumDropdownOption<AutoSave> AUTO_SAVING;
 

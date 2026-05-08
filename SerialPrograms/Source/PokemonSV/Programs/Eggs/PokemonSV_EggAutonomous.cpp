@@ -15,7 +15,11 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
+#include "PokemonSV/Inference/Map/PokemonSV_FastTravelDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
@@ -38,6 +42,24 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 using namespace Pokemon;
+
+
+static void confirm_cursor_centered_on_fast_travel(
+    const ProgramInfo& info, VideoStream& stream, ProControllerContext& context
+){
+    context.wait_for_all_requests();
+    context.wait_for(std::chrono::milliseconds(500));
+    ImageFloatBox center_cursor{0.484, 0.472, 0.030, 0.053};
+    FastTravelDetector fast_travel(COLOR_RED, center_cursor);
+    if (!fast_travel.detect(stream.video().snapshot())){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "confirm_cursor_centered_on_fast_travel(): Cursor is not centered on a fast travel icon.",
+            stream
+        );
+    }
+    stream.log("Confirmed that the cursor is centered on a fast travel icon.");
+}
 
 
 EggAutonomous_Descriptor::EggAutonomous_Descriptor()
@@ -120,7 +142,8 @@ EggAutonomous::EggAutonomous()
             {AutoSave::NoAutoSave, "none", "No auto-saving."},
             {AutoSave::AfterStartAndKeep, "start-and-keep", "Save at beginning and after keeping a baby."},
             {AutoSave::EveryBatch, "every-batch", "Save before every batch of 4 or 5 eggs."},
-            {AutoSave::AfterFetchComplete, "after-fetch", "Save after all eggs have been fetched from picnic."}
+            {AutoSave::AfterFetchComplete, "after-fetch", "Save after all eggs have been fetched from picnic."},
+            {AutoSave::BackupSaveAfterFetchAndKeep, "backup-fetch-and-keep", "Backup save after fetching all eggs, hard save at beginning and after keeping a baby."}
         },
         LockMode::LOCK_WHILE_RUNNING,
         AutoSave::AfterStartAndKeep
@@ -199,10 +222,10 @@ EggAutonomous::EggAutonomous()
 void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
-    DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
-    
     //  Connect the controller.
     pbf_press_button(context, BUTTON_L, 80ms, 800ms);
+
+    DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
 
     {
         // reset_position_to_flying_spot(env, context);
@@ -231,13 +254,6 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         m_saved_after_fetched_eggs = false;
         m_in_critical_to_save_stage = false;
 
-        // Do one iteration of the outmost loop of egg auto:
-        // - Start at Aera Zero flying spot
-        // - Go to front area of the observation station to start picnic
-        // - Make sandwich to gain egg power
-        // - Go to picnic basket to fetch eggs
-        // - Go on ride to hatch eggs
-
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
@@ -257,7 +273,11 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                     throw;
                 }
             } // end try catch
-        } // end recoverable loop to fetch eggs:
+        } // end recoverable loop to fetch eggs
+
+        if (AUTO_SAVING == AutoSave::BackupSaveAfterFetchAndKeep){
+            backup_save(env, context);
+        }
 
         // Recoverable loop to hatch eggs
         bool game_already_resetted = false;
@@ -282,8 +302,8 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                 // After resetting the game, we don't know how many eggs in party
                 num_party_eggs = -1;
 
-                // If there is no save during egg hatching, then the game is reset to before fetching eggs
-                // So we need to break out of the recoverable hatch egg routine loop
+                // If there is no save during egg hatching, then the game is reset to before fetching eggs.
+                // So we need to break out of the recoverable hatch egg routine loop.
                 if (m_saved_after_fetched_eggs == false){
                     env.log("No save during egg hatching routine. After this reset, we should start the egg fetching routine now.");
                     game_already_resetted = true;
@@ -321,7 +341,6 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             env.console.overlay().add_log("Round complete", COLOR_WHITE);
             throw ProgramFinishedException();
         }
-        // end of one full picnic->hatch iteration
     } // end the full egg autonomous loop
 
     env.update_stats();
@@ -450,7 +469,8 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
     auto save_game_if_needed = [&](){
         if (AUTO_SAVING == AutoSave::EveryBatch ||
             (AUTO_SAVING == AutoSave::AfterFetchComplete && m_saved_after_fetched_eggs == false) ||
-            (AUTO_SAVING == AutoSave::AfterStartAndKeep && m_in_critical_to_save_stage)){
+            (AUTO_SAVING == AutoSave::AfterStartAndKeep && m_in_critical_to_save_stage) ||
+            (AUTO_SAVING == AutoSave::BackupSaveAfterFetchAndKeep && m_in_critical_to_save_stage)){
             env.log("Saving game during egg hatching routine.");
             save_game(env, context, true);
             m_saved_after_fetched_eggs = true;
@@ -491,7 +511,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         // If the auto save mode is AfterStartAndKeep, which allows resetting the game in case no eggs in the box are kept,
         // then we can save the time of releasing hatched pokemon in case we will reset the game later.
         // So here we place the hatched pokemon back to the box
-        if (AUTO_SAVING == AutoSave::AfterStartAndKeep){
+        if (AUTO_SAVING == AutoSave::AfterStartAndKeep || AUTO_SAVING == AutoSave::BackupSaveAfterFetchAndKeep){
             // move party back into the box
             env.log("Unload party in case we will reset game later to save releasing time.");
             unload_one_column_from_party(env, env.console, context, NOTIFICATION_ERROR_RECOVERABLE, next_egg_column-1, HAS_CLONE_RIDE_POKEMON);
@@ -510,9 +530,9 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         }else{
             // no more eggs to hatch in box
 
-            if (AUTO_SAVING == AutoSave::AfterStartAndKeep){
+            if (AUTO_SAVING == AutoSave::AfterStartAndKeep || AUTO_SAVING == AutoSave::BackupSaveAfterFetchAndKeep){
                 // Check if we will reset game:
-                // We reset game if the auto save mode is AfterStartAndKeep and we have no pokemon kept during hatching this box
+                // We reset game if the auto save mode is AfterStartAndKeep (or BackupSaveAfterFetchAndKeep) and we have no pokemon kept during hatching this box
                 // m_in_critical_to_save_stage: whether we need to save the game for the current batch of eggs
                 // m_saved_after_fetched_eggs: whether we have saved the game already for a past batch of eggs in this box
                 if (m_in_critical_to_save_stage == false && m_saved_after_fetched_eggs == false){
@@ -633,10 +653,11 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, ProCon
 
     case StatsHuntAction::Discard:
         default:
-            // If the auto save mode is AfterStartAndKeep, which allows resetting the game in case no eggs in the box are kept,
-            // then we can save the time of releasing hatched pokemon in case we will reset the game later.
+            // If the auto save mode is AfterStartAndKeep or BackupSaveAfterFetchAndKeep, which allow resetting the game
+            // in case no eggs in the box are kept, then we can save the time of releasing hatched pokemon in case we
+            // will reset the game later.
             // Otherwise, release the pokemon now.
-            if (AUTO_SAVING != AutoSave::AfterStartAndKeep){
+            if (AUTO_SAVING != AutoSave::AfterStartAndKeep && AUTO_SAVING != AutoSave::BackupSaveAfterFetchAndKeep){
                 size_t local_errors = 0;
                 release_one_pokemon(env.program_info(), env.console, context, local_errors);
             }
@@ -747,6 +768,46 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, ProController
     }
 }
 
+void EggAutonomous::fly_between_zero_gate_and_pokecenter(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool to_pokecenter){
+    auto attempt = [&](std::chrono::milliseconds duration) -> bool {
+        open_map_from_overworld(env.program_info(), env.console, context);
+        context.wait_for(std::chrono::milliseconds(1000));
+        if (to_pokecenter){
+            pbf_move_left_joystick(context, {-0.35, 1}, duration, std::chrono::milliseconds(400));
+        }else{
+            pbf_move_left_joystick(context, {+0.35, -1}, duration, std::chrono::milliseconds(400));
+        }
+        try{
+            if (to_pokecenter){
+                confirm_cursor_centered_on_pokecenter(env.program_info(), env.console, context);
+            }else{
+                confirm_cursor_centered_on_fast_travel(env.program_info(), env.console, context);
+            }
+            fly_to_overworld_from_map(env.program_info(), env.console, context);
+            return true;
+        }catch(...){
+            pbf_press_button(context, BUTTON_B, 200ms, 500ms);
+            context.wait_for_all_requests();
+            return false;
+        }
+    };
+
+    using Ms = std::chrono::milliseconds;
+    const Ms base(450);
+    if (attempt(base)) return;
+    if (attempt(base)) return;
+    if (attempt(base - Ms(50))) return;
+    if (attempt(base + Ms(50))) return;
+    env.console.log("fly_between_zero_gate_and_pokecenter: All retries failed.");
+}
+
+void EggAutonomous::backup_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    fly_between_zero_gate_and_pokecenter(env, context, true);
+    context.wait_for(std::chrono::milliseconds(1000));   // settle after landing
+    heal_at_pokecenter(env.program_info(), env.console, context);
+    fly_between_zero_gate_and_pokecenter(env, context, false);
+}
+
 void change_settings_egg_program(SingleSwitchProgramEnvironment& env, ProControllerContext& context,  Language language){
     int8_t options_index = 4;
     enter_menu_from_overworld(env.program_info(), env.console, context, options_index, MenuSide::RIGHT);
@@ -788,7 +849,7 @@ bool EggAutonomous::handle_recoverable_error(
         return true;
     }
 
-    if (AUTO_SAVING == AutoSave::AfterStartAndKeep && m_in_critical_to_save_stage){
+    if ((AUTO_SAVING == AutoSave::AfterStartAndKeep || AUTO_SAVING == AutoSave::BackupSaveAfterFetchAndKeep) && m_in_critical_to_save_stage){
         // We have found a pokemon to keep, but before we can save the game to protect the pokemon, an error occurred.
         // To not lose the pokemon, don't reset.
         // Note: if AUTO_SAVING == AutoSave::EveryBatch, then we don't need to care about this critical stage, because
