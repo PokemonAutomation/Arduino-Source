@@ -81,7 +81,7 @@ bool ShinyHuntAutonomousRegigigas2::kill_and_return(VideoStream& stream, ProCont
 
     while (true){
         RaidCatchWatcher detector(stream.overlay());
-        YCommIconDetector overworld(true);
+        YCommIconWatcher overworld;
         context.wait_for_all_requests();
         int result = wait_until(
             stream, context,

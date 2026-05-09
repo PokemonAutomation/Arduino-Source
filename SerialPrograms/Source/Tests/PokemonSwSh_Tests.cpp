@@ -89,8 +89,7 @@ int test_pokemonSwSh_CheckNurseryArrowFinder(const ImageViewRGB32& image, bool t
 }
 
 int test_pokemonSwSh_YCommIconDetector(const ImageViewRGB32& image, bool target){
-    const bool is_on = true;
-    YCommIconDetector detector(is_on);
+    YCommIconWatcher detector;
     bool result = detector.process_frame(image, current_time());
     TEST_RESULT_EQUAL(result, target);
     return 0;

@@ -335,9 +335,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     auto snapshot = feed.snapshot();
 
-    WhiteDialogBoxDetector detector;
-    detector.make_overlays(overlays);
-    cout << detector.detect(snapshot) << endl;
+    YCommIconWatcher detector;
+    cout << detector.process_frame(snapshot, current_time()) << endl;
+
+//    WhiteDialogBoxDetector detector;
+//    detector.make_overlays(overlays);
+//    cout << detector.detect(snapshot) << endl;
 
 
 #if 0
