@@ -103,7 +103,7 @@ void WattTraderFarmer::buy_one(SingleSwitchProgramEnvironment& env, ProControlle
 
     bool purchased = false;
     while (true){
-        DialogTriangleDetector dialog(env.logger(), env.console, true);
+        DialogTriangleWatcher dialog;
         BuyCursorDetector item_select(env.console);
         BuyQuantityDetector quantity;
         context.wait_for_all_requests();

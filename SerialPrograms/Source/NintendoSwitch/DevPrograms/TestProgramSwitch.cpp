@@ -316,12 +316,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace OCR;
     using namespace NintendoSwitch;
     using namespace Pokemon;
-//    using namespace PokemonSwSh;
+    using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
 //    using namespace PokemonLA;
 //    using namespace PokemonSV;
 //    using namespace PokemonLZA;
-    using namespace PokemonFRLG;
+//    using namespace PokemonFRLG;
 
     [[maybe_unused]] Logger& logger = env.logger();
     [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
@@ -333,6 +333,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    auto snapshot = feed.snapshot();
+
+    WhiteDialogBoxDetector detector;
+    detector.make_overlays(overlays);
+    cout << detector.detect(snapshot) << endl;
+
+
+#if 0
     RumbleWatcher<ProController> rumble(context, 200);
     int ret = wait_until(
         console, context,
@@ -344,6 +352,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     }else{
         cout << "Did not detect anything." << endl;
     }
+#endif
 
 
 #if 0

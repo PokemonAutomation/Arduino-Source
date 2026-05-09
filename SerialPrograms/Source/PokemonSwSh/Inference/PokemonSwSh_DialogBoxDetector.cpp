@@ -65,6 +65,33 @@ bool BlackDialogBoxDetector::process_frame(const ImageViewRGB32& frame, WallCloc
 
 
 
+WhiteDialogBoxDetector::WhiteDialogBoxDetector(Color color)
+    : m_color(color)
+    , m_right(0.782, 0.850, 0.030, 0.050)
+    , m_triangle(color)
+{}
+
+void WhiteDialogBoxDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_right);
+    m_triangle.make_overlays(items);
+}
+bool WhiteDialogBoxDetector::detect(const ImageViewRGB32& screen){
+    ImageStats right = image_stats(extract_box_reference(screen, m_right));
+    if (!is_grey(right, 400, 1000)){
+        return false;
+    }
+
+    if (!m_triangle.detect(screen)){
+        return false;
+    }
+
+    return true;
+}
+
+
+
+
+
 
 }
 }

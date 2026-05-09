@@ -22,10 +22,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-namespace{
-    // This box covers all possible locations of the black triangle arrow
-    ImageFloatBox BLACK_TRIANGLE_BOX{0.771, 0.901, 0.031, 0.069};
-}
+
 
 class DialogTriangleMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
@@ -53,20 +50,58 @@ const DialogTriangleMatcher& DialogTriangleMatcher::instance(){
 
 
 
+
 DialogTriangleDetector::DialogTriangleDetector(
+    Color color,
+    ImageFloatBox box
+)
+    : m_color(color)
+    , m_box(box)
+{}
+
+void DialogTriangleDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_box);
+}
+bool DialogTriangleDetector::detect(const ImageViewRGB32& screen){
+    const std::vector<std::pair<uint32_t, uint32_t>> filters = {
+        {combine_rgb(0, 0, 0), combine_rgb(50, 50, 50)}
+    };
+
+    const double screen_rel_size = (screen.height() / 1080.0);
+    const size_t min_size = size_t(screen_rel_size * screen_rel_size * 500.0);
+
+    return match_template_by_waterfill(
+        screen.size(),
+        extract_box_reference(screen, m_box),
+        DialogTriangleMatcher::instance(),
+        filters,
+        {min_size, SIZE_MAX},
+        80,
+        [](Kernels::Waterfill::WaterfillObject& object) -> bool { return true; }
+    );
+}
+
+
+
+
+
+#if 0
+
+
+DialogTriangleWatcher::DialogTriangleWatcher(
     Logger& logger, VideoOverlay& overlay,
     bool stop_on_detected
 )
-    : VisualInferenceCallback("DialogTriangleDetector")
+    : VisualInferenceCallback("DialogTriangleWatcher")
     , m_logger(logger)
     , m_stop_on_detected(stop_on_detected)
 {}
 
 
-void DialogTriangleDetector::make_overlays(VideoOverlaySet& items) const{
+void DialogTriangleWatcher::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, BLACK_TRIANGLE_BOX);
 }
-bool DialogTriangleDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+bool DialogTriangleWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {combine_rgb(0, 0, 0), combine_rgb(50, 50, 50)}
     };
@@ -100,7 +135,7 @@ bool DialogTriangleDetector::process_frame(const ImageViewRGB32& frame, WallCloc
     return detected && m_stop_on_detected;
 }
 
-
+#endif
 
 
 

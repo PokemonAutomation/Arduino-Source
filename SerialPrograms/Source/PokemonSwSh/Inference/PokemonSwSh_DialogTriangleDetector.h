@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonSwSh_DialogTriangleDetector_H
 #define PokemonAutomation_PokemonSwSh_DialogTriangleDetector_H
 
-#include <atomic>
-#include "Common/Cpp/Logging/AbstractLogger.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "Common/Cpp/Color.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonTools/VisualDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
@@ -19,28 +19,26 @@ namespace PokemonSwSh{
 
 // Detect the black triangle arrow in the lower right portion of the white dialog box.
 // The dialog box shows up when talking to npcs.
-class DialogTriangleDetector : public VisualInferenceCallback{
+class DialogTriangleDetector : public StaticScreenDetector{
 public:
     DialogTriangleDetector(
-        Logger& logger, VideoOverlay& overlay,
-        bool stop_on_detected
+        Color color,
+        ImageFloatBox box = {0.771, 0.901, 0.031, 0.069}
     );
 
-    bool detected() const{
-        return m_detected.load(std::memory_order_acquire);
-    }
-
     virtual void make_overlays(VideoOverlaySet& items) const override;
-
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
-    Logger& m_logger;
-    bool m_stop_on_detected;
-
-    std::atomic<bool> m_detected;
+    Color m_color;
+    ImageFloatBox m_box;
 };
-
+class DialogTriangleWatcher : public DetectorToFinder<DialogTriangleDetector>{
+public:
+    DialogTriangleWatcher(Color color = COLOR_RED)
+         : DetectorToFinder("DialogTriangleWatcher", std::chrono::milliseconds(250), color)
+    {}
+};
 
 
 

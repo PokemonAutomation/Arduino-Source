@@ -55,12 +55,7 @@ int test_pokemonSwSh_MaxLair_BattleMenuDetector(const ImageViewRGB32& image, boo
 }
 
 int test_pokemonSwSh_DialogTriangleDetector(const ImageViewRGB32& image, bool target){
-    auto& logger = global_logger_command_line();
-    auto overlay = DummyVideoOverlay();
-    const bool stop_on_detected = true;
-
-    DialogTriangleDetector detector(logger, overlay, stop_on_detected);
-
+    DialogTriangleWatcher detector;
     bool result = detector.process_frame(image, current_time());
     TEST_RESULT_EQUAL(result, target);
     return 0;    

@@ -50,8 +50,8 @@ StateMachineAction mash_A_to_entrance(
 
         EntranceDetector entrance_detector(entrance);
         SelectionArrowFinder prompt(stream.overlay(), {0.362689, 0.282828, 0.625000, 0.580808});
-        DialogTriangleDetector triangle(stream.logger(), stream.overlay(), true);
-        BlackDialogBoxDetector dialog(true);
+        WhiteDialogBoxWatcher white_dialog;
+        BlackDialogBoxDetector black_dialog(true);
         ReceivePokemonWatcher receive(COLOR_RED);
 
         context.wait_for_all_requests();
@@ -61,8 +61,8 @@ StateMachineAction mash_A_to_entrance(
             {
                 entrance_detector,
                 prompt,
-                triangle,
-                dialog,
+                white_dialog,
+                black_dialog,
                 receive,
             },
             INFERENCE_RATE
