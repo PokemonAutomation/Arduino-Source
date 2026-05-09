@@ -16,6 +16,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
@@ -200,9 +201,9 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     assert_16_9_720p_min(env.logger(), env.console);
 
     DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
-    
+
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 80ms, 800ms);
+    require_player(env.console, context, BUTTON_L);
 
     {
         // reset_position_to_flying_spot(env, context);

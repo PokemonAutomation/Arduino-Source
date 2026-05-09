@@ -10,6 +10,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
@@ -332,7 +333,8 @@ void IngoMoveGrinder::program(SingleSwitchProgramEnvironment& env, ProController
     IngoMoveGrinder_Descriptor::Stats& stats = env.current_stats<IngoMoveGrinder_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
+    require_player(env.console, context, BUTTON_LCLICK);
+
     for (auto& row : move_issued)
     {
         for (auto& elem : row)

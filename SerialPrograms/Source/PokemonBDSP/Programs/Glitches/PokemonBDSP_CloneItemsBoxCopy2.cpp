@@ -11,6 +11,7 @@
 #include "CommonTools/VisualDetectors/ImageMatchDetector.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h"
@@ -98,7 +99,7 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, ProControl
 //    uint16_t POKEMON_TO_MENU_DELAY = GameSettings::instance().POKEMON_TO_MENU_DELAY;
 
     //  Connect the controller.
-    pbf_mash_button(context, BUTTON_RCLICK, 400ms);
+    require_player(env.console, context, BUTTON_RCLICK);
 
     //  Enter box system.
     menu_to_box(context);

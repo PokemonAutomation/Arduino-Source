@@ -159,7 +159,7 @@ GiftRng::GiftRng()
         31338, 30400 // default, min
     )
     , ADVANCES(
-        "<b>Advances:</b><br>The total number of RNG advances for your target.<br>This should be the combined amount of continue screen and in-game advances.",
+        "<b>Advances:</b><br>The total number of RNG advances for your target.",
         LockMode::LOCK_WHILE_RUNNING,
         10000, 600, 1000000000 // default, min
     )
@@ -539,7 +539,8 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     RngAdvanceHistory ADVANCE_HISTORY;
     RngCalibrationHistory CALIBRATION_HISTORY; 
     uint64_t INITIAL_ADVANCES_RADIUS = USE_TEACHY_TV ? 8192 : 1024;
-    uint64_t resets = 0;
+
+    uint16_t failed_searches = 0;
 
     while (true){
         if (CALIBRATION_HISTORY.results.size() > 0){
@@ -552,7 +553,17 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             env.log("Missed target.");
         }
 
-        if (resets > MAX_RESETS){
+        if (failed_searches >= 5){
+            env.log("Failed to find any matches 5 times in a row");
+            OperationFailedException::fire(
+                ErrorReport::NO_ERROR_REPORT,
+                "Failed to find any matches 5 times in a row. Check your seed and advances settings.",
+                env.console
+            ); 
+            break;
+        }
+
+        if (stats.resets > MAX_RESETS){
             env.log("Max resets reached.");
             break;
         }
@@ -670,6 +681,11 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         bool finished = update_history(env.console, ADVANCE_HISTORY, CALIBRATION_HISTORY, MAX_HISTORY_LENGTH, SEED_CALIBRATION_FRAMES, ADVANCES_CALIBRATION, CONTINUE_SCREEN_ADJUSTMENT, search_hits, 1);
         if (finished || (MAX_RARE_CANDIES == 0)){
             env.log("RNG search finished.");
+            if (search_hits.size() == 0){
+                failed_searches++;
+            }else{
+                failed_searches = 0;
+            }
             continue;
         }
 
@@ -694,6 +710,12 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             );
 
             if (finished){
+                env.log("RNG Search finished");
+                if (search_hits.size() == 0){
+                    failed_searches++;
+                }else{
+                    failed_searches = 0;
+                }
                 break;
             }
         }

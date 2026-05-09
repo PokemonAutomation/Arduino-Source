@@ -10,6 +10,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GlobalRoomHeal.h"
@@ -310,7 +311,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, ProContro
     };
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_B, 40ms, 40ms);
+    require_player(env.console, context, BUTTON_B);
 
     bool need_to_charge = true;
     if (START_LOCATION == StartLocation::Hearthome){

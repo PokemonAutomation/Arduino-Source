@@ -98,7 +98,7 @@ ErrorReportOption::ErrorReportOption()
 
 SendableErrorReport::SendableErrorReport()
     : m_timestamp(now_to_filestring())
-    , m_directory(ERROR_PATH_UNSENT + "/" + m_timestamp + "/")
+    , m_directory(RUNTIME_BASE_PATH() + ERROR_PATH_UNSENT + "/" + m_timestamp + "/")
     , m_processor(get_processor_name())
     , m_program(PreloadSettings::instance().DEVELOPER_MODE
         ? PROGRAM_NAME + " (" + PROGRAM_VERSION + "-dev)"

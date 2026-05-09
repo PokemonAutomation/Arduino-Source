@@ -15,6 +15,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h"
@@ -484,6 +485,9 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Pro
     ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = env.current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
 
     assert_16_9_720p_min(env.logger(), env.console);
+
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_LCLICK);
 
     m_iterations = 0;
 

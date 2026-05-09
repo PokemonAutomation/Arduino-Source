@@ -8,6 +8,7 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
@@ -110,7 +111,8 @@ void SurpriseTrade::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     }else{
-        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
+        //  Connect the controller.
+        require_player(env.console, context, BUTTON_B);
     }
 
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){

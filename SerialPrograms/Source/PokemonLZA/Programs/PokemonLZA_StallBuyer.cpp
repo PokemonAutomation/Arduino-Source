@@ -12,6 +12,7 @@
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
@@ -260,6 +261,9 @@ void StallBuyer::make_purchase(
 void StallBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 //    StallBuyer_Descriptor::Stats& stats = env.current_stats<StallBuyer_Descriptor::Stats>();
     assert_16_9_720p_min(env.logger(), env.console);
+
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_L);
 
 //    std::optional<int> stall_amount_item;
 

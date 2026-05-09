@@ -15,6 +15,7 @@
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 //#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
@@ -292,7 +293,9 @@ void RestaurantFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
     RestaurantFarmer_Descriptor::Stats& stats = env.current_stats<RestaurantFarmer_Descriptor::Stats>();
 
     DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
-    pbf_mash_button(context, BUTTON_B, 1000ms);
+
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_B);
 
 //    auto lobby = env.console.video().snapshot();
 

@@ -5,6 +5,7 @@ parameters:
   stageName: ''
   displayName: ''
   dependsOnStage: ''
+  buildType: ''
   targetOS: ''
   poolName: ''
   imageName: ''
@@ -17,6 +18,7 @@ parameters:
   macos_path: ''
   cmake_version_params: ''
   cmake_additional_param: ''
+  openssl_pkcs_args: ''
   versionMajor: 0
   versionMinor: 0
   versionPatch: 0
@@ -30,7 +32,7 @@ stages:
 
   jobs:
   - job: MacOS
-    timeoutInMinutes: 60
+    timeoutInMinutes: 180
     cancelTimeoutInMinutes: 1
     displayName: MacOS ${{ parameters.architecture }}
 
@@ -72,14 +74,14 @@ stages:
       - script: |
           export PATH=$(macos_path)
           cd "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/SerialPrograms"
-          cmake $(cmake_additional_param) $(cmake_version_params) --preset=$(cmake_preset) --fresh
+          cmake $(cmake_additional_param) $(cmake_version_params) --preset=$(cmake_preset)
         displayName: 'Configure CMake'
         condition: succeeded()
 
       - script: |
           export PATH=$(macos_path)
           cd "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/SerialPrograms"
-          cmake --build --preset=$(cmake_preset)
+          cmake --build --preset=$(cmake_preset) -j $(sysctl -n hw.logicalcpu)
         displayName: 'Build'
         condition: succeeded()
 
@@ -103,88 +105,460 @@ stages:
           APP_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/SerialPrograms.app"
           MACOS_DIR="$APP_DIR/Contents/MacOS"
           FW_DIR="$APP_DIR/Contents/Frameworks"
+          PLUGINS_DIR="$APP_DIR/Contents/PlugIns"
           BREW_PREFIX=$(brew --prefix)
 
-          mkdir -p "$FW_DIR"
+          mkdir -p "$FW_DIR" "$PLUGINS_DIR"
+
+          echo "=== Setting up Qt paths ==="
           if [ "$(architecture)" = "x64" ]; then
-              QT_BIN="/usr/local/Qt/$(qt_version)/macos/bin"
+              QT_ROOT="/usr/local/Qt/$(qt_version)/macos"
+              LIPO_ARCH="x86_64"
           else
-              QT_BIN="/opt/Qt/$(qt_version)/macos/bin"
+              QT_ROOT="/opt/Qt/$(qt_version)/macos"
+              LIPO_ARCH="arm64"
           fi
 
-          echo "=== Copying additional deps ==="
-          cp $BREW_PREFIX/opt/gcc/lib/gcc/current/libgcc_s.1.1.dylib $APP_DIR/Contents/Frameworks
-          cp $BREW_PREFIX/opt/protobuf/lib/libutf8_validity.dylib $APP_DIR/Contents/Frameworks
-          cp $BREW_PREFIX/opt/little-cms2/lib/liblcms2.2.dylib $APP_DIR/Contents/Frameworks
-          cp $BREW_PREFIX/opt/webp/lib/libsharpyuv.0.dylib $APP_DIR/Contents/Frameworks
-          cp $BREW_PREFIX/opt/jpeg-xl/lib/libjxl_cms.0.11.dylib $APP_DIR/Contents/Frameworks
-          cp $BREW_PREFIX/opt/vtk/lib/libvtkCommonComputationalGeometry-*.dylib $APP_DIR/Contents/Frameworks
-          cp $BREW_PREFIX/opt/vtk/lib/libvtkFiltersVerdict-*.dylib $APP_DIR/Contents/Frameworks
-          cp $BREW_PREFIX/opt/vtk/lib/libvtkfmt-*.dylib $APP_DIR/Contents/Frameworks
-          cp $BREW_PREFIX/opt/vtk/lib/libvtkFiltersGeometry-*.dylib $APP_DIR/Contents/Frameworks
-          cp $BREW_PREFIX/opt/vtk/lib/libvtkFiltersCore-*.dylib $APP_DIR/Contents/Frameworks
-          cp $BREW_PREFIX/opt/vtk/lib/libvtkCommonCore-*.dylib $APP_DIR/Contents/Frameworks
-          cp $BREW_PREFIX/opt/vtk/lib/libvtkCommonSystem-*.dylib $APP_DIR/Contents/Frameworks
+          QT_LIB="$QT_ROOT/lib"
+          QT_PLUGINS="$QT_ROOT/plugins"
+          QT_FRAMEWORKS="Core Gui Widgets Network SerialPort Multimedia MultimediaWidgets Concurrent DBus OpenGL OpenGLWidgets Svg PrintSupport"
 
-          echo "=== Running macdeployqt6 ==="
-          install_name_tool -add_rpath $BREW_PREFIX/lib $MACOS_DIR/SerialPrograms
-          otool -l $MACOS_DIR/SerialPrograms | grep -A2 LC_RPATH
-          "$QT_BIN/macdeployqt6" $APP_DIR -no-strip -verbose=3
-
-          echo "=== Fixing install IDs in copied libs ==="
-          for dylib in "$FW_DIR"/*.dylib; do
-              [ -f "$dylib" ] || continue
-              base=$(basename "$dylib")
-              install_name_tool -id "@executable_path/../Frameworks/$base" "$dylib"
-          done
-
-          echo "=== Rewriting internal dylib references ==="
-          for dylib in "$FW_DIR"/*.dylib; do
-              [ -f "$dylib" ] || continue
-              for linked in $(otool -L "$dylib" | awk 'NR>1 {print $1}' | grep "$BREW_PREFIX" || true); do
-                  base=$(basename "$linked")
-                  if [ -f "$FW_DIR/$base" ]; then
-                      install_name_tool -change "$linked" "@executable_path/../Frameworks/$base" "$dylib"
-                  fi
-              done
-          done
-
-          echo "=== Rewriting main executable references ==="
-          for linked in $(otool -L "$MACOS_DIR/SerialPrograms" | awk 'NR>1 {print $1}' | grep "$BREW_PREFIX" || true); do
-              base=$(basename "$linked")
-              if [ -f "$FW_DIR/$base" ]; then
-                  install_name_tool -change "$linked" "@executable_path/../Frameworks/$base" "$MACOS_DIR/SerialPrograms"
+          echo "=== Copying Qt frameworks $(architecture) ==="
+          for fw in $QT_FRAMEWORKS; do
+              [ -d "$QT_LIB/Qt${fw}.framework" ] || { echo "WARNING: Qt${fw}.framework not found, skipping"; continue; }
+              cp -R "$QT_LIB/Qt${fw}.framework" "$FW_DIR/"
+              FW_BINARY="$FW_DIR/Qt${fw}.framework/Versions/A/Qt${fw}"
+              if [ -f "$FW_BINARY" ]; then
+                  NUM_ARCHS=$(lipo -archs "$FW_BINARY" 2>/dev/null | wc -w | tr -d ' ')
+                  [ "$NUM_ARCHS" -gt 1 ] && lipo "$FW_BINARY" -thin "$LIPO_ARCH" -output "$FW_BINARY" || true
               fi
           done
 
-          echo "=== Creating tarballs for build and symbols ==="
-          mkdir -p "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build"
+          echo "=== Copying Qt plugins $(architecture) ==="
+          for plugin_type in imageformats platforms styles iconengines platforminputcontexts multimedia tls; do
+              [ -d "$QT_PLUGINS/$plugin_type" ] || continue
+              mkdir -p "$PLUGINS_DIR/$plugin_type"
+              for plugin in "$QT_PLUGINS/$plugin_type/"*.dylib; do
+                  [ -f "$plugin" ] || continue
+                  dest="$PLUGINS_DIR/$plugin_type/$(basename "$plugin")"
+                  cp "$plugin" "$dest"
+                  NUM_ARCHS=$(lipo -archs "$dest" 2>/dev/null | wc -w | tr -d ' ')
+                  [ "$NUM_ARCHS" -gt 1 ] && lipo "$dest" -thin "$LIPO_ARCH" -output "$dest" || true
+              done
+          done
+
+          echo "=== Recursively resolving all native dependencies ==="
+          ALL_RPATHS=$(otool -l "$MACOS_DIR/SerialPrograms" 2>/dev/null \
+              | awk '/cmd LC_RPATH/{f=1} f && /path /{print $2; f=0}' || true)
+
+          ALL_RPATHS="$ALL_RPATHS
+          $BREW_PREFIX/lib
+          $BREW_PREFIX/opt/gcc/lib/gcc/current"
+
+          add_rpaths_from() {
+              local binary="$1"
+              local new
+              new=$(otool -l "$binary" 2>/dev/null \
+                  | awk '/cmd LC_RPATH/{f=1} f && /path /{print $2; f=0}' || true)
+              if [ -n "$new" ]; then
+                  ALL_RPATHS="$ALL_RPATHS $new"
+              fi
+          }
+
+          resolve_rpath() {
+              local libname="${1#@rpath/}"
+              while IFS= read -r rpath; do
+                  [ -n "$rpath" ] || continue
+                  [ -f "$rpath/$libname" ] && echo "$rpath/$libname" && return 0
+              done <<< "$ALL_RPATHS"
+              return 0
+          }
+
+          copy_dep() {
+              local dep="$1"
+
+              if echo "$dep" | grep -q '^@rpath/'; then
+                  dep=$(resolve_rpath "$dep")
+                  [ -z "$dep" ] && return 0
+              fi
+              case "$dep" in @*|/usr/lib/*|/System/*|/Library/*) return 0 ;; esac
+
+              if echo "$dep" | grep -q '\.framework/'; then
+                  local fw_path fw_name dest_fw fw_bin num
+                  fw_path=$(echo "$dep" | sed 's|\(.*\.framework\)/.*|\1|')
+                  fw_name=$(basename "$fw_path" .framework)
+                  dest_fw="$FW_DIR/${fw_name}.framework"
+                  if [ ! -d "$dest_fw" ]; then
+                      [ -d "$fw_path" ] || return 0
+                      echo "  + framework: $fw_name"
+                      cp -R "$fw_path" "$FW_DIR/" || return 0
+                      fw_bin="$dest_fw/Versions/A/$fw_name"
+                      if [ -f "$fw_bin" ]; then
+                          add_rpaths_from "$fw_path/Versions/A/$fw_name"
+                          num=$(lipo -archs "$fw_bin" 2>/dev/null | wc -w | tr -d ' ')
+                          [ "$num" -gt 1 ] && lipo "$fw_bin" -thin "$LIPO_ARCH" -output "$fw_bin" || true
+                          resolve_deps "$fw_bin" || true
+                      fi
+                  fi
+              else
+                  local base dest num
+                  base=$(basename "$dep")
+                  dest="$FW_DIR/$base"
+                  if [ ! -f "$dest" ] && [ -f "$dep" ]; then
+                      echo "  + dylib: $base"
+                      add_rpaths_from "$dep"
+                      cp "$dep" "$dest" || return 0
+                      num=$(lipo -archs "$dest" 2>/dev/null | wc -w | tr -d ' ')
+                      [ "$num" -gt 1 ] && lipo "$dest" -thin "$LIPO_ARCH" -output "$dest" || true
+                      resolve_deps "$dest" || true
+                  fi
+              fi
+              return 0
+          }
+
+          resolve_deps() {
+              local binary="$1"
+              local dep
+              while IFS= read -r dep; do
+                  copy_dep "$dep"
+              done < <(otool -L "$binary" 2>/dev/null | awk 'NR>1 {print $1}' \
+                       | grep -Ev '^(/usr/lib/|/System/|/Library/)' || true)
+          }
+
+          resolve_deps "$MACOS_DIR/SerialPrograms"
+          for fw in $QT_FRAMEWORKS; do
+              FW_BINARY="$FW_DIR/Qt${fw}.framework/Versions/A/Qt${fw}"
+              if [ -f "$FW_BINARY" ]; then
+                  add_rpaths_from "$QT_LIB/Qt${fw}.framework/Versions/A/Qt${fw}"
+                  resolve_deps "$FW_BINARY"
+              fi
+          done
+
+          find "$PLUGINS_DIR" -name "*.dylib" -type f -print0 | while IFS= read -r -d '' plugin; do
+              add_rpaths_from "$plugin"
+              resolve_deps "$plugin"
+          done
+
+          echo "=== Copying ONNX Runtime ==="
+          ONNX_VERSION="1.23.2"
+          REPO_ROOT="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public"
+          ONNX_LIB_DIR="$REPO_ROOT/3rdPartyBinaries/onnxruntime-osx-$LIPO_ARCH-$ONNX_VERSION/lib"
+          if [ -d "$ONNX_LIB_DIR" ]; then
+              for lib in "$ONNX_LIB_DIR/"libonnxruntime*.dylib; do
+                  real=$(readlink -f "$lib" 2>/dev/null || echo "$lib")
+                  [ -f "$real" ] || continue
+                  real_name=$(basename "$real")
+                  cp "$real" "$FW_DIR/$real_name"
+              done
+          else
+              echo "WARNING: ONNX Runtime not found at $ONNX_LIB_DIR"
+          fi
+
+          echo "=== Copying GCC runtime libraries ==="
+          GCC_LIB_PATH="$(brew --prefix)/opt/gcc/lib/gcc/current"
+          if [ -d "$GCC_LIB_PATH" ]; then
+              for lib in libgcc_s.1.1 libgcc_s.1 libgfortran.5 libquadmath.0 libgomp.1; do
+                  src="$GCC_LIB_PATH/$lib.dylib"
+                  [ -f "$src" ] || [ -L "$src" ] || continue
+                  real=$(readlink -f "$src" 2>/dev/null || echo "$src")
+                  [ -f "$real" ] || continue
+                  real_name=$(basename "$real")
+                  if [ ! -f "$FW_DIR/$real_name" ]; then
+                      echo "  + GCC runtime: $real_name"
+                      cp "$real" "$FW_DIR/$real_name"
+                  fi
+              done
+          else
+              echo "WARNING: GCC runtime not found at $GCC_LIB_PATH"
+          fi
+
+          echo "=== Fixing all install IDs and references ==="
+          fix_refs() {
+              local binary="$1"
+              while IFS= read -r linked; do
+                  if echo "$linked" | grep -q '\.framework/'; then
+                      local fw_name fw_suffix
+                      fw_name=$(echo "$linked" | sed 's|.*[/]\([A-Za-z0-9._-]*\.framework\)/.*|\1|' | sed 's|\.framework$||')
+                      fw_suffix=$(echo "$linked" | sed 's|.*\.framework||')
+                      if [ -d "$FW_DIR/${fw_name}.framework" ]; then
+                          install_name_tool -change "$linked" \
+                              "@executable_path/../Frameworks/${fw_name}.framework${fw_suffix}" \
+                              "$binary" 2>/dev/null || true
+                      fi
+                  else
+                      local base
+                      base=$(basename "$linked")
+                      if [ -f "$FW_DIR/$base" ]; then
+                          install_name_tool -change "$linked" \
+                              "@executable_path/../Frameworks/$base" \
+                              "$binary" 2>/dev/null || true
+                      fi
+                  fi
+              done < <(otool -L "$binary" 2>/dev/null | awk 'NR>1 {print $1}' \
+                       | grep -Ev '^(@executable_path|@loader_path|/usr/lib/|/System/|/Library/)' || true)
+          }
+
+          echo "=== Fix install IDs and refs for flat dylibs ==="
+          find "$FW_DIR" -maxdepth 1 -name "*.dylib" -type f -print0 | while IFS= read -r -d '' dylib; do
+              base=$(basename "$dylib")
+              install_name_tool -id "@executable_path/../Frameworks/$base" "$dylib"
+              fix_refs "$dylib"
+          done
+
+          echo "=== Fix install IDs and refs for Qt framework binaries ==="
+          for fw in $QT_FRAMEWORKS; do
+              FW_BINARY="$FW_DIR/Qt${fw}.framework/Versions/A/Qt${fw}"
+              [ -f "$FW_BINARY" ] || continue
+              install_name_tool -id \
+                  "@executable_path/../Frameworks/Qt${fw}.framework/Versions/A/Qt${fw}" \
+                  "$FW_BINARY"
+              fix_refs "$FW_BINARY"
+          done
+
+          echo "=== Fix plugin refs ==="
+          find "$PLUGINS_DIR" -name "*.dylib" -type f -print0 | while IFS= read -r -d '' plugin; do
+              fix_refs "$plugin"
+          done
+
+          echo "=== Fix main executable refs ==="
+          install_name_tool -add_rpath "$BREW_PREFIX/lib"               "$MACOS_DIR/SerialPrograms" 2>/dev/null || true
+          install_name_tool -add_rpath "@executable_path/../Frameworks" "$MACOS_DIR/SerialPrograms" 2>/dev/null || true
+          fix_refs "$MACOS_DIR/SerialPrograms"
+
+          echo "=== Preparing build folder ==="
           cd "$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
 
           VERSION="${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
           FOLDER_NAME="SerialPrograms-$VERSION-MacOS-${{ parameters.architecture }}"
           mkdir -p "$FOLDER_NAME"
-          cp -R SerialPrograms.app "$FOLDER_NAME/"
 
-          echo "=== Moving Firmware to outside of the .app bundle ==="
-          mv "$FOLDER_NAME/SerialPrograms.app/Contents/Firmware" "$FOLDER_NAME/"
+          echo "=== Moving .app bundle and related resources to $FOLDER_NAME ==="
+          mv SerialPrograms.app "$FOLDER_NAME/"
+          mv "Firmware"  "$FOLDER_NAME/"
+          mv "Resources" "$FOLDER_NAME/"
+          mkdir -p "$FOLDER_NAME/SerialPrograms.app/Contents/Resources"
 
-          echo "=== Removing Scripts folder from .app bundle ==="
-          rm -rf "$FOLDER_NAME/SerialPrograms.app/Contents/Scripts"
-
-          tar -czf "cache-build/macos-build-${{ parameters.architecture }}.tar.gz" "$FOLDER_NAME"
+          echo "=== Archiving debug symbols ==="
           tar -czf "cache-symbols/macos-symbols-${{ parameters.architecture }}.tar.gz" cache-symbols/SerialPrograms.dSYM
 
           echo "Deployment complete for $(architecture) with enclosing folder: $FOLDER_NAME"
         displayName: 'Deploy app'
         condition: succeeded()
 
-      - task: Cache@2
-        displayName: 'Cache the build artifact'
+      - task: InstallAppleCertificate@2
+        displayName: 'Install Apple certificate'
         inputs:
-          key: 'macos-build-${{ parameters.architecture }} | "$(Build.BuildId)"'
-          path: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build'
+          certSecureFile: 'CodesignCertMac.p12'
+          certPwd: $(CERT_PW)
+          keychain: custom
+          keychainPassword: $(KEYCHAIN_PW)
+          customKeychainPath: '$(HOME)/Library/Keychains/azure-signing.keychain-db'
+          deleteCert: true
+          deleteCustomKeychain: true
+          opensslPkcsArgs: ${{ parameters.openssl_pkcs_args }}
         condition: succeeded()
+
+      - script: |
+          set -e
+          KEYCHAIN="$HOME/Library/Keychains/azure-signing.keychain-db"
+
+          echo "=== Activating keychain ==="
+          security list-keychains -d user -s "$KEYCHAIN" "$HOME/Library/Keychains/login.keychain-db"
+          security unlock-keychain -p "$(KEYCHAIN_PW)" "$KEYCHAIN"
+
+          echo "=== Allowing codesign to access private key ==="
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$(KEYCHAIN_PW)" "$KEYCHAIN"
+
+          echo "=== Verifying identities ==="
+          security find-identity -p codesigning -v
+        env:
+          KEYCHAIN_PW: $(KEYCHAIN_PW)
+        displayName: 'Authorize signing key'
+        condition: succeeded()
+
+      - script: |
+          set -euo pipefail
+          export PATH=${{ parameters.macos_path }}
+          VERSION="${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
+          FOLDER_NAME="SerialPrograms-$VERSION-MacOS-${{ parameters.architecture }}"
+          BUILD_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
+          APP_DIR="$BUILD_DIR/$FOLDER_NAME/SerialPrograms.app"
+          ENTITLEMENTS_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/SerialPrograms/cmake/MacOSXEntitlements.plist"
+
+          echo "=== Signing app ==="
+          codesign --deep --force --options runtime --timestamp --entitlements "$ENTITLEMENTS_DIR" --sign "$SIGN_IDENTITY" "$APP_DIR"
+
+          echo "=== Verifying code signature ==="
+          codesign --verify --deep --strict --verbose=2 "$APP_DIR"
+        env:
+          SIGN_IDENTITY: $(SIGNING_IDENTITY)
+        displayName: '(APP) Codesign, verify'
+        condition: succeeded()
+
+      - script: |
+          set -euo pipefail
+          export PATH=${{ parameters.macos_path }}
+          VERSION="${{ parameters.versionMajor }}.${{ parameters.versionMinor }}.${{ parameters.versionPatch }}"
+          BUILD_TYPE="${{ parameters.buildType }}"
+          FOLDER_NAME="SerialPrograms-$VERSION-MacOS-${{ parameters.architecture }}"
+          BUILD_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)"
+          DMG_PATH="$(Pipeline.Workspace)/SerialPrograms-MacOS-$(compiler)-$(architecture).dmg"
+          STAGING_DIR="$(Pipeline.Workspace)/dmg-staging"
+          SETTINGS_FILE="$(Pipeline.Workspace)/dmg-settings.py"
+
+          echo "=== Creating DMG staging directory ==="
+          rm -rf "$STAGING_DIR"
+          mkdir -p "$STAGING_DIR"
+          cp -R "$BUILD_DIR/$FOLDER_NAME" "$STAGING_DIR/SerialPrograms"
+
+          echo "=== Setting folder icon ==="
+          ICNS_PATH="$STAGING_DIR/SerialPrograms/SerialPrograms.app/Contents/Resources/icon.icns"
+          fileicon set "$STAGING_DIR/SerialPrograms" "$ICNS_PATH"
+          echo "✓ Folder icon set from $ICNS_PATH"
+
+          echo "=== Writing dmgbuild settings ==="
+          printf '%s\n' \
+              "format = 'UDZO'" \
+              "files = [defines['app']]" \
+              "symlinks = {'Applications': '/Applications'}" \
+              "icon_locations = {'SerialPrograms': (150, 100), 'Applications': (490, 100)}" \
+              "background = 'builtin-arrow'" \
+              "window_rect = ((200, 120), (520, 240))" \
+              "icon_size = 100" \
+              "text_size = 12" \
+              "default_view = 'icon-view'" \
+              "show_icon_preview = False" \
+              > "$SETTINGS_FILE"
+
+          echo "=== Creating DMG ==="
+          python3 -m dmgbuild \
+              -s "$SETTINGS_FILE" \
+              -D app="$STAGING_DIR/SerialPrograms" \
+              "SerialPrograms $VERSION-$BUILD_TYPE" \
+              "$DMG_PATH"
+
+          rm -rf "$STAGING_DIR" "$SETTINGS_FILE"
+          echo "=== DMG created: $DMG_PATH ==="
+        displayName: 'Create DMG'
+        condition: succeeded()
+
+      - script: |
+          set -euo pipefail
+          DMG_PATH="$(Pipeline.Workspace)/SerialPrograms-MacOS-$(compiler)-$(architecture).dmg"
+
+          echo "=== Signing DMG ==="
+          codesign --sign "$SIGN_IDENTITY" --timestamp "$DMG_PATH"
+
+          echo "=== Verifying DMG signature ==="
+          codesign --verify --verbose=2 "$DMG_PATH"
+        env:
+          SIGN_IDENTITY: $(SIGNING_IDENTITY)
+        displayName: '(DMG) Codesign, verify'
+        condition: succeeded()
+
+      - script: |
+          set -euo pipefail
+          DMG_PATH="$(Pipeline.Workspace)/SerialPrograms-MacOS-$(compiler)-$(architecture).dmg"
+
+          SUBMIT_JSON=$(xcrun notarytool submit "$DMG_PATH" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_APP_PW" \
+            --team-id "$APPLE_TEAM_ID" \
+            --output-format json)
+
+          REQUEST_ID=$(echo "$SUBMIT_JSON" | jq -r '.id')
+          [ -n "$REQUEST_ID" ] && [ "$REQUEST_ID" != "null" ]
+
+          echo "##vso[task.setvariable variable=DMG_NOTARY_REQUEST_ID]$REQUEST_ID"
+        env:
+          APPLE_ID: $(APPLE_ID)
+          APPLE_APP_PW: $(APPLE_APP_PW)
+          APPLE_TEAM_ID: $(APPLE_TEAM_ID)
+        displayName: '(DMG) Submit for notarization'
+        condition: succeeded()
+
+      - script: |
+          set -euo pipefail
+          MAX_WAIT=14400
+          INTERVAL=30
+          ELAPSED=0
+
+          while true; do
+            STATUS=$(xcrun notarytool info "$(DMG_NOTARY_REQUEST_ID)" \
+              --apple-id "$APPLE_ID" \
+              --password "$APPLE_APP_PW" \
+              --team-id "$APPLE_TEAM_ID" \
+              --output-format json | jq -r '.status')
+
+            case "$STATUS" in
+              Accepted) break ;;
+              Invalid)
+                xcrun notarytool log "$(DMG_NOTARY_REQUEST_ID)" \
+                  --apple-id "$APPLE_ID" \
+                  --password "$APPLE_APP_PW" \
+                  --team-id "$APPLE_TEAM_ID"
+                exit 1 ;;
+            esac
+
+            sleep "$INTERVAL"
+            ELAPSED=$((ELAPSED + INTERVAL))
+            [ "$ELAPSED" -lt "$MAX_WAIT" ]
+          done
+        env:
+          APPLE_ID: $(APPLE_ID)
+          APPLE_APP_PW: $(APPLE_APP_PW)
+          APPLE_TEAM_ID: $(APPLE_TEAM_ID)
+        displayName: '(DMG) Wait for notarization'
+        condition: succeeded()
+
+      - script: |
+          set -euo pipefail
+          DMG_PATH="$(Pipeline.Workspace)/SerialPrograms-MacOS-$(compiler)-$(architecture).dmg"
+          CACHE_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/cache-notarized"
+
+          echo "=== Stapling notarization ticket to DMG ==="
+          xcrun stapler staple "$DMG_PATH"
+
+          echo "=== Validating staple ==="
+          xcrun stapler validate "$DMG_PATH"
+
+          echo "=== Gatekeeper assessment ==="
+          spctl --assess --type open --context context:primary-signature --verbose=4 "$DMG_PATH"
+
+          echo "=== Moving DMG to cache ==="
+          rm -rf "$CACHE_DIR"
+          mkdir -p "$CACHE_DIR"
+          mv "$DMG_PATH" "$CACHE_DIR/"
+        displayName: '(DMG) Staple, verify'
+        condition: succeeded()
+
+      - script: |
+          set -e
+          DMG_NAME="SerialPrograms-MacOS-$(compiler)-$(architecture).dmg"
+          ZIP_NAME="SerialPrograms-MacOS-$(compiler)-$(architecture).zip"
+          CACHE_DIR="$(Pipeline.Workspace)/Arduino-Source-Internal/cache-notarized"
+          BUILD_TYPE="${{ parameters.buildType }}"
+
+          cd "$CACHE_DIR"
+          if [ "$BUILD_TYPE" = "PrivateBeta" ]; then
+              echo "=== Creating password-protected archive for PrivateBeta ==="
+              7z a -tzip -mx=9 "-p$ARTIFACT_PASSWORD" -mem=ZipCrypto "$ZIP_NAME" "$DMG_NAME"
+              rm "$DMG_NAME"
+              echo "=== Password-protected .zip created ==="
+          else
+              echo "=== DMG ready for publish ==="
+          fi
+        displayName: 'Prepare artifact for publish'
+        condition: succeeded()
+        env:
+          ARTIFACT_PASSWORD: $(ARTIFACT_PASSWORD)
+
+      - task: Cache@2
+        displayName: 'Cache notarized artifact for GitHub release'
+        inputs:
+          key: 'macos-notarized-${{ parameters.architecture }} | "$(Build.BuildId)"'
+          path: '$(Pipeline.Workspace)/Arduino-Source-Internal/cache-notarized'
+        condition: and(succeeded(), eq('${{ parameters.targetOS }}', 'All'), or(eq('${{ parameters.buildType }}', 'Release'), eq('${{ parameters.buildType }}', 'Beta')))
 
       - task: Cache@2
         displayName: 'Cache debug symbols'
@@ -192,3 +566,19 @@ stages:
           key: 'macos-symbols-${{ parameters.architecture }} | "$(Build.BuildId)"'
           path: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-symbols'
         condition: succeeded()
+
+      - task: PublishPipelineArtifact@1
+        displayName: 'Publish MacOS artifact (PrivateBeta)'
+        inputs:
+          targetPath: '$(Pipeline.Workspace)/Arduino-Source-Internal/cache-notarized/SerialPrograms-MacOS-$(compiler)-$(architecture).zip'
+          artifactName: 'SerialPrograms-MacOS-$(compiler)-$(architecture)'
+          publishLocation: 'pipeline'
+        condition: and(succeeded(), eq('${{ parameters.buildType }}', 'PrivateBeta'))
+
+      - task: PublishPipelineArtifact@1
+        displayName: 'Publish MacOS artifact'
+        inputs:
+          targetPath: '$(Pipeline.Workspace)/Arduino-Source-Internal/cache-notarized/SerialPrograms-MacOS-$(compiler)-$(architecture).dmg'
+          artifactName: 'SerialPrograms-MacOS-$(compiler)-$(architecture)'
+          publishLocation: 'pipeline'
+        condition: and(succeeded(), ne('${{ parameters.buildType }}', 'PrivateBeta'))

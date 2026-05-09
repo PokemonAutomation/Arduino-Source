@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_HID_Keyboard_State_H
-#define PokemonAutomation_HID_Keyboard_State_H
+#ifndef PokemonAutomation_StandardHid_Keyboard_State_H
+#define PokemonAutomation_StandardHid_Keyboard_State_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -14,6 +14,14 @@
 extern "C" {
 #endif
 
+
+//
+//  Console <-> Controller
+//
+
+typedef struct{
+    uint8_t data;
+} pabb_HID_Keyboard_LockLEDs;
 
 
 typedef struct{
@@ -29,6 +37,18 @@ bool pabb_HID_Keyboard_State_equals(
     const pabb_HID_Keyboard_State* state1
 );
 
+
+//
+//  Controller <-> CC
+//
+
+typedef struct{
+    //  Bit 0: Connected
+    //  Bit 4: Num Lock
+    //  Bit 5: Caps Lock
+    //  Bit 6: Scroll Lock
+    uint8_t status;
+} pabb_HID_Keyboard_Status;
 
 
 #ifdef __cplusplus

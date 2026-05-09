@@ -205,7 +205,7 @@ stages:
               fi
 
               if [ "$(MACOS_ARM64_CACHE_RESTORED)" = "true" ]; then
-                MACOS_ARM64_ARTIFACT=$(find "$ARTIFACTS_DIR/artifacts-macos-arm64/" -name "*.zip" -type f | head -n 1)
+                MACOS_ARM64_ARTIFACT=$(find "$ARTIFACTS_DIR/artifacts-macos-arm64/" -name "*.dmg" -not -name "._*" -type f | head -n 1)
                 if [ ! -f "$MACOS_ARM64_ARTIFACT" ]; then
                   echo "✗ Error: MacOS ARM64 artifact not found"
                   exit 1
@@ -217,7 +217,7 @@ stages:
               fi
 
               if [ "$(MACOS_X64_CACHE_RESTORED)" = "true" ]; then
-                MACOS_X64_ARTIFACT=$(find "$ARTIFACTS_DIR/artifacts-macos-x64/" -name "*.zip" -type f | head -n 1)
+                MACOS_X64_ARTIFACT=$(find "$ARTIFACTS_DIR/artifacts-macos-x64/" -name "*.dmg" -not -name "._*" -type f | head -n 1)
                 if [ ! -f "$MACOS_X64_ARTIFACT" ]; then
                   echo "✗ Error: MacOS X64 artifact not found"
                   exit 1
@@ -260,7 +260,7 @@ stages:
 
               if [ "$(MACOS_ARM64_CACHE_RESTORED)" = "true" ] && [ -n "$(MACOS_ARM64_ARTIFACT)" ]; then
                 OLD_PATH="$(MACOS_ARM64_ARTIFACT)"
-                NEW_NAME="PA-SerialPrograms-MacOS-ARM64-${VERSION}-${BUILD_DATE}.zip"
+                NEW_NAME="PA-SerialPrograms-MacOS-ARM64-${VERSION}-${BUILD_DATE}.dmg"
                 NEW_PATH="$ARTIFACTS_DIR/$NEW_NAME"
 
                 echo "Renaming: $(basename "$OLD_PATH") -> $NEW_NAME"
@@ -270,7 +270,7 @@ stages:
 
               if [ "$(MACOS_X64_CACHE_RESTORED)" = "true" ] && [ -n "$(MACOS_X64_ARTIFACT)" ]; then
                 OLD_PATH="$(MACOS_X64_ARTIFACT)"
-                NEW_NAME="PA-SerialPrograms-MacOS-x64-${VERSION}-${BUILD_DATE}.zip"
+                NEW_NAME="PA-SerialPrograms-MacOS-x64-${VERSION}-${BUILD_DATE}.dmg"
                 NEW_PATH="$ARTIFACTS_DIR/$NEW_NAME"
 
                 echo "Renaming: $(basename "$OLD_PATH") -> $NEW_NAME"

@@ -260,6 +260,8 @@ void StatsReset::run_catch(SingleSwitchProgramEnvironment& env, ProControllerCon
 void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_L);
 
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
 

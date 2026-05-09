@@ -9,6 +9,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_IvJudgeReader.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
@@ -181,7 +182,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     env.update_stats();
 
     //  Connect the controller.
-    pbf_move_right_joystick(context, {-1, -1}, 80ms, 0ms);
+    require_player(env.console, context, BUTTON_L);
 
     //  Move to corner.
     pbf_move_left_joystick(context, {-1, -1}, 1000ms, 0ms);

@@ -6,8 +6,9 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h"
@@ -121,7 +122,8 @@ void SeedFinder::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             1600ms
         );
     }else{
-        pbf_press_dpad(context, DPAD_LEFT, 40ms, 40ms);
+        //  Connect the controller.
+        require_player(env.console, context, BUTTON_LEFT);
     }
 
 

@@ -296,8 +296,8 @@ bool route_hyperspace_wild_zone(
 void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
-    // Mash button B to let Switch register the controller
-    pbf_mash_button(context, BUTTON_B, 500ms);
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_B);
 
     ShinyHunt_FlySpotReset_Descriptor::Stats& stats = env.current_stats<ShinyHunt_FlySpotReset_Descriptor::Stats>();
 

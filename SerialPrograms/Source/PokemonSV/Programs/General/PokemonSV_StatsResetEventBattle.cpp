@@ -12,6 +12,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
@@ -531,7 +532,7 @@ void StatsResetEventBattle::program(SingleSwitchProgramEnvironment& env, ProCont
     StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 80ms, 80ms);
+    require_player(env.console, context, BUTTON_L);
 
     while (true){
         if (TARGET == Target::Ursaluna){

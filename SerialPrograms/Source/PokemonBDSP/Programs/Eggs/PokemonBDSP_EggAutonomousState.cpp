@@ -453,7 +453,7 @@ void EggAutonomousState::hatch_rest_of_party(){
         int ret = run_until<ProControllerContext>(
             m_stream, m_context,
             [&](ProControllerContext& context){
-                egg_spin(context, 8min);
+                egg_spin(context, false, 8min);
             },
             {
                 {dialog},
@@ -481,7 +481,7 @@ void EggAutonomousState::spin_until_fetch_or_hatch(){
     int ret = run_until<ProControllerContext>(
         m_stream, m_context,
         [&](ProControllerContext& context){
-            egg_spin(context, m_travel_time_per_fetch);
+            egg_spin(context, false, m_travel_time_per_fetch);
         },
         {{dialog}}
     );

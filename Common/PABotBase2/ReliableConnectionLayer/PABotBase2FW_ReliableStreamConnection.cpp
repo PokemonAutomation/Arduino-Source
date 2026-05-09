@@ -136,7 +136,9 @@ bool ReliableStreamConnectionFW::run_recv_events(const WallDuration& timeout){
         );
         return true;
     case PABB2_PacketParser_RESULT_CHECKSUM_FAIL:
-//        printf("PABB2_PacketParser_RESULT_CHECKSUM_FAIL\n");
+#ifdef PABB2_SUPPORTS_PRINTF_LOGGING
+        printf("PABB2_PacketParser_RESULT_CHECKSUM_FAIL\n");
+#endif
         m_reliable_sender.send_oob_packet_empty(
             header->seqnum,
             PABB2_CONNECTION_OPCODE_INVALID_CHECKSUM_FAIL

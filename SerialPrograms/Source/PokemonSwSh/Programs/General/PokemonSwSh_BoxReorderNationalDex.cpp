@@ -179,7 +179,8 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, ProCont
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, DODGE_SYSTEM_UPDATE_WINDOW);
     }else{
-        pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
+        //  Connect the controller.
+        require_player(env.console, context, BUTTON_LCLICK);
     }
 
     // Read all the pokemon and return a list of their slugs in the current box order.

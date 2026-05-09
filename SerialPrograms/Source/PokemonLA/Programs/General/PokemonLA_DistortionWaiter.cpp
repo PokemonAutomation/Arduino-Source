@@ -10,6 +10,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonLA/PokemonLA_Settings.h"
@@ -84,9 +85,8 @@ DistortionWaiter::DistortionWaiter()
 void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DistortionWaiter_Descriptor::Stats& stats = env.current_stats<DistortionWaiter_Descriptor::Stats>();
 
-
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
+    require_player(env.console, context, BUTTON_LCLICK);
 
 
     NotificationDetector detector(env.console, LANGUAGE);

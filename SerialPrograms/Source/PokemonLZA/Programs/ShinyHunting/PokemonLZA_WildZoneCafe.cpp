@@ -289,8 +289,8 @@ void ShinyHunt_WildZoneCafe::program(SingleSwitchProgramEnvironment& env, ProCon
     //  detection on map during fast traveling.
     bool to_max_zoom_level_on_map = true;
 
-    // Mash button B to let Switch register the controller
-    pbf_mash_button(context, BUTTON_B, 500ms);
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_B);
 
     ShinyHunt_WildZoneCafe_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneCafe_Descriptor::Stats>();
 

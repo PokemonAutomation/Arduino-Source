@@ -13,6 +13,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/PokemonSV_Settings.h"
@@ -115,8 +116,8 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     TeraRoller_Descriptor::Stats& stats = env.current_stats<TeraRoller_Descriptor::Stats>();
 
-    //  Connect the controller
-    pbf_press_button(context, BUTTON_L, 80ms, 80ms);
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_L);
 
     bool first = true;
     uint32_t skip_counter = 0;

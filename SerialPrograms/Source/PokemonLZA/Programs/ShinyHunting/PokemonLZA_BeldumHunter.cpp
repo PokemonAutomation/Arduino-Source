@@ -13,6 +13,7 @@
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 //#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 //#include "PokemonLZA/PokemonLZA_Settings.h"
 //#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
@@ -164,6 +165,9 @@ bool BeldumHunter::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
 
 void BeldumHunter::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
+
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_L);
 
     BeldumHunter_Descriptor::Stats& stats = env.current_stats<BeldumHunter_Descriptor::Stats>();
 

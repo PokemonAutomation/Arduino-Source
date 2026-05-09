@@ -13,6 +13,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSV/PokemonSV_Settings.h"
@@ -530,6 +531,8 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
     }
     env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         assert_16_9_720p_min(console.logger(), console);
+        //  Connect the controller.
+        require_player(console, context, BUTTON_LCLICK);
     });
 
 //    Mode mode = MODE;

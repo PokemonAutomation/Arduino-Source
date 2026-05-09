@@ -137,6 +137,9 @@ AutoFossil::AutoFossil()
 void AutoFossil::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_L);
+
     DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
 
     const size_t num_fossils_to_revive = NUM_FOSSILS; // at least 1

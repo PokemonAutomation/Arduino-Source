@@ -11,6 +11,7 @@
 #include <deque>
 #include <map>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
@@ -101,8 +102,8 @@ public:
         if (header->opcode != response_opcode){
             throw SerialProtocolException(
                 m_logger, PA_CURRENT_FUNCTION,
-                "Received Incorrect Response Type: Expected = " + std::to_string(response_opcode) +
-                ", Actual = " + std::to_string(header->opcode)
+                "Received Incorrect Response Type: Expected = 0x" + tostr_hex(response_opcode) +
+                ", Actual = 0x" + tostr_hex(header->opcode)
             );
         }
         if (header->message_bytes != sizeof(ResponseType)){
@@ -113,6 +114,26 @@ public:
             );
         }
         memcpy(&response, header, sizeof(ResponseType));
+    }
+    template <typename ResponseType, uint8_t response_opcode>
+    std::string wait_for_request_response_min_size(uint8_t id){
+        std::string raw = wait_for_request_response(id);
+        const MessageHeader* header = (const MessageHeader*)raw.data();
+        if (header->opcode != response_opcode){
+            throw SerialProtocolException(
+                m_logger, PA_CURRENT_FUNCTION,
+                "Received Incorrect Response Type: Expected = 0x" + tostr_hex(response_opcode) +
+                ", Actual = 0x" + tostr_hex(header->opcode)
+            );
+        }
+        if (header->message_bytes < sizeof(ResponseType)){
+            throw SerialProtocolException(
+                m_logger, PA_CURRENT_FUNCTION,
+                "Received Incorrect Response Size: Minimum = " + std::to_string(sizeof(ResponseType)) +
+                ", Actual = " + std::to_string(header->message_bytes)
+            );
+        }
+        return raw;
     }
 
 

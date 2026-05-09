@@ -7,6 +7,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
@@ -84,7 +85,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, ProCont
     AutonomousBallThrower_Descriptor::Stats& stats = env.current_stats<AutonomousBallThrower_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 80ms, 0ms);
+    require_player(env.console, context, BUTTON_LCLICK);
 
     CatchResults results = basic_catcher(
         env.console, context, LANGUAGE,

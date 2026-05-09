@@ -47,7 +47,7 @@ else()
 endif()
 
 if(APPLE)
-    set(DEST_DIR "$<TARGET_FILE_DIR:SerialPrograms>/..")
+    set(DEST_DIR "$<TARGET_FILE_DIR:SerialPrograms>/../../..")
 elseif(PACKAGE_BUILD)
     set(DEST_DIR "$<TARGET_FILE_DIR:SerialPrograms>/Output")
     set(WIN_DEPLOY_DIR "${DEST_DIR}/Binaries64")

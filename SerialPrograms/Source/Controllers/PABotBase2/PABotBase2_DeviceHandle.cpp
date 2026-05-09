@@ -455,7 +455,8 @@ void DeviceHandle::on_recv(const void* data, size_t bytes){
             continue;
         case PABB2_MESSAGE_OPCODE_RET:
         case PABB2_MESSAGE_OPCODE_RET_U32:
-        case PABB2_MESSAGE_OPCODE_RET_DATA:{
+        case PABB2_MESSAGE_OPCODE_RET_DATA:
+        case PABB2_MESSAGE_OPCODE_RET_U32_DATA:{
             {
                 std::lock_guard<Mutex> lg(m_lock);
                 auto iter = m_pending_requests.find(header->id);

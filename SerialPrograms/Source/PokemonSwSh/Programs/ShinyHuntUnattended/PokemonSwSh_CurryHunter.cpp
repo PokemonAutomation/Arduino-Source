@@ -7,8 +7,9 @@
 #include "CommonFramework/Globals.h"
 #include "CommonTools/Async/InferenceSession.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
@@ -91,7 +92,8 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     }else{
-        pbf_press_button(context, BUTTON_R, 40ms, 400ms);
+        //  Connect the controller.
+        require_player(env.console, context, BUTTON_R);
     }
 
 

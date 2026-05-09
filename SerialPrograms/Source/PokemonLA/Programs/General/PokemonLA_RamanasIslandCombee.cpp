@@ -11,6 +11,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonLA/PokemonLA_Settings.h"
@@ -327,7 +328,7 @@ void RamanasCombeeFinder::program(SingleSwitchProgramEnvironment& env, ProContro
     RamanasCombeeFinder_Descriptor::Stats& stats = env.current_stats<RamanasCombeeFinder_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
+    require_player(env.console, context, BUTTON_LCLICK);
 
     bool fresh_from_reset = false;
     while (true){

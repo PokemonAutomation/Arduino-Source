@@ -7,6 +7,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include "PokemonSV_SandwichMaker.h"
@@ -76,6 +77,10 @@ SandwichMaker::SandwichMaker()
 
 void SandwichMaker::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
+
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_LCLICK);
+
     SandwichMaker_Descriptor::Stats& stats = env.current_stats<SandwichMaker_Descriptor::Stats>();
 
     for (int i = 0; i < NUM_SANDWICHES; i++){

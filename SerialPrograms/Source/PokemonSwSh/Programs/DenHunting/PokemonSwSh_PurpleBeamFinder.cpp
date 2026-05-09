@@ -9,8 +9,9 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
@@ -207,7 +208,8 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, ProControlle
         resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         pbf_mash_button(context, BUTTON_B, 800ms);
     }else{
-        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
+        //  Connect the controller.
+        require_player(env.console, context, BUTTON_B);
     }
     context.wait_for_all_requests();
 

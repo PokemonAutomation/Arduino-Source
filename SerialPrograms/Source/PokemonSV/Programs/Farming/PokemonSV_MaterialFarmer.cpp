@@ -10,6 +10,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
 #include "PokemonSV_MaterialFarmer.h"
@@ -69,7 +70,7 @@ void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
     assert_16_9_720p_min(env.logger(), env.console);
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 80ms, 400ms);
+    require_player(env.console, context, BUTTON_L);
 
     // Throw user setup errors early in program
     // - Ensure language is set

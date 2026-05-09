@@ -65,6 +65,8 @@ PostKillCatcher::PostKillCatcher()
 void PostKillCatcher::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_L);
 
     while (true){
         int8_t scrolls = RIGHT_SCROLLS;

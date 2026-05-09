@@ -10,6 +10,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
@@ -177,8 +178,9 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     assert_16_9_720p_min(env.logger(), env.console);
 
     EggHatcher_Descriptor::Stats& stats = env.current_stats<EggHatcher_Descriptor::Stats>();
+
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 80ms, 0ms);
+    require_player(env.console, context, BUTTON_L);
 
     if (START_LOCATION == StartLocation::AnywhereOffRide){
         // Get on ride:

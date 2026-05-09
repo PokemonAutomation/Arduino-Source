@@ -540,7 +540,8 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     AuctionFarmer_Descriptor::Stats& stats = env.current_stats<AuctionFarmer_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 80ms, 0ms);
+    require_player(env.console, context, BUTTON_LCLICK);
+
     pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
 

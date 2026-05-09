@@ -7,6 +7,7 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
@@ -76,7 +77,8 @@ void EventBeamFinder::program(SingleSwitchProgramEnvironment& env, ProController
         resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         pbf_mash_button(context, BUTTON_B, 5600ms);
     }else{
-        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
+        //  Connect the controller.
+        require_player(env.console, context, BUTTON_B);
     }
 
     bool parity = false;

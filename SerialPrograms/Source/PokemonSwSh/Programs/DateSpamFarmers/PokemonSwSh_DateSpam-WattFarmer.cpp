@@ -88,7 +88,8 @@ void WattFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         grip_menu_connect_go_home(context);
         pbf_wait(context, GRIP_MENU_WAIT0);
     }else{
-        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
+        //  Connect the controller.
+        require_player(env.console, context, BUTTON_B);
         ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 160ms);
     }
 

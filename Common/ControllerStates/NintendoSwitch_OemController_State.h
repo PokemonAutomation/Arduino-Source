@@ -15,6 +15,11 @@ extern "C" {
 #endif
 
 
+//
+//  Console <-> Controller
+//
+
+
 typedef struct{
     uint8_t left[4];
     uint8_t right[4];
@@ -62,6 +67,22 @@ bool pabb_NintendoSwitch_OemController_State0x30_equals(
     const pabb_NintendoSwitch_OemController_State0x30* state0,
     const pabb_NintendoSwitch_OemController_State0x30* state1
 );
+
+
+//
+//  Controller <-> CC
+//
+
+typedef struct{
+    //  Bit 0: Connected
+    //  Bit 1: Ready
+    //  Bit 2: Paired
+    uint8_t status;
+
+    uint8_t player_lights;
+
+    uint8_t paired_mac_address[6];
+} pabb_NintendoSwitch_OemController_Status;
 
 
 

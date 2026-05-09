@@ -185,6 +185,10 @@ void execute_fixed_routine(SingleSwitchProgramEnvironment& env, ConsoleHandle& c
 
 void ShinyHunt_HelioptileHunter::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
+
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_L);
+
     ShinyHunt_HelioptileHunter_Descriptor::Stats& stats = env.current_stats<ShinyHunt_HelioptileHunter_Descriptor::Stats>();
     
     // This routine do not care for day/night change as is supposed to stop before time change.

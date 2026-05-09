@@ -8,6 +8,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_BasicCatcher.h"
@@ -107,7 +108,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, ProCont
     env.update_stats();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
+    require_player(env.console, context, BUTTON_LCLICK);
 
     bool pokemon_caught = false;
     while (!pokemon_caught){

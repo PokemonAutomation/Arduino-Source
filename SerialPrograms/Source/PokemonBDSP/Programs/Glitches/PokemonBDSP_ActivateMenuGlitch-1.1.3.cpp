@@ -9,6 +9,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MapDetector.h"
@@ -52,6 +53,9 @@ void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, ProCont
     StartProgramChecks::check_performance_class_wired_or_wireless(context);
 
     VideoStream& stream = env.console;
+
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_ZL);
 
     //  Enable Strength
     pbf_mash_button(context, BUTTON_ZL, 2000ms);

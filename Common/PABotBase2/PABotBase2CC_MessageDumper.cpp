@@ -321,6 +321,18 @@ MessageLogger::MessageLogger(){
             return str;
         }
     );
+    add_message_min_length<Message_u32>(
+        "PABB2_MESSAGE_OPCODE_RET_U32_DATA",
+        PABB2_MESSAGE_OPCODE_RET_U32_DATA,
+        false,
+        [](const Message_u32* header){
+            std::string str;
+            str += "id = " + std::to_string(header->id);
+            str += ", u32 = " + std::to_string(header->data);
+            str += ", data = " + tostr_hexbytes(header + 1, header->message_bytes - sizeof(Message_u32));
+            return str;
+        }
+    );
 
 
     add_message<MessageHeader>(
@@ -592,6 +604,7 @@ void MessageLogger::log_recv(
                 "[MLC]: Receive: (0x" + tostr_hex(message->opcode) + ") Unknown Opcode",
                 COLOR_RED
             );
+            return;
         }
         if (always_log || iter->second.should_log(message)){
             logger.log(

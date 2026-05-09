@@ -7,8 +7,9 @@
 #include <cmath>
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -105,7 +106,8 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, P
             4000ms
         );
     }else{
-        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
+        //  Connect the controller.
+        require_player(env.console, context, BUTTON_B);
     }
 
     ShinyHuntTracker& stats = env.current_stats<ShinyHuntTracker>();

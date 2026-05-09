@@ -48,6 +48,9 @@ public:
     virtual bool is_ready() const override{
         return PABotBase2_Controller::is_ready();
     }
+    virtual ControllerPlayerNumber get_player_number(Cancellable& cancellable) override{
+        return PABotBase2_OemController::get_player_number(cancellable);
+    }
 
 
 public:

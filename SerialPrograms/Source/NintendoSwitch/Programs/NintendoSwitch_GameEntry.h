@@ -16,6 +16,14 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+void require_player(
+    Logger& logger,
+    ProControllerContext& context,
+    Button connect_button,
+    ControllerPlayerNumber required = ControllerPlayerNumber::PLAYER1
+);
+
+
 // Press Home button to go from game to Switch Home screen
 void go_home(ConsoleHandle& console, ProControllerContext& context);
 // Press Home button to go from game to Switch Home screen

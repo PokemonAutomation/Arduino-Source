@@ -13,6 +13,7 @@
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Inference/Battles/PokemonLZA_RunFromBattleDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
@@ -290,7 +291,9 @@ void JacintheInfiniteFarmer::program(SingleSwitchProgramEnvironment& env, ProCon
     JacintheInfiniteFarmer_Descriptor::Stats& stats = env.current_stats<JacintheInfiniteFarmer_Descriptor::Stats>();
 
     DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
-    pbf_mash_button(context, BUTTON_B, 1000ms);
+
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_B);
 
 //    auto lobby = env.console.video().snapshot();
 

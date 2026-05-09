@@ -9,6 +9,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -47,6 +48,9 @@ FriendSearchDisconnect::FriendSearchDisconnect()
 }
 
 void FriendSearchDisconnect::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_B);
+
     ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 80ms);
     context.wait_for_all_requests();
 

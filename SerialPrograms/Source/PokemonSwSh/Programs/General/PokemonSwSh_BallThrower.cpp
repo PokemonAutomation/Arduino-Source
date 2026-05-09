@@ -5,6 +5,7 @@
  */
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh_BallThrower.h"
@@ -39,7 +40,8 @@ void BallThrower::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         grip_menu_connect_go_home(context);
         pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().HOME_TO_GAME_DELAY0);
     }else{
-        pbf_press_button(context, BUTTON_X, 40ms, 40ms);
+        //  Connect the controller.
+        require_player(env.console, context, BUTTON_X);
     }
 
     while (true){

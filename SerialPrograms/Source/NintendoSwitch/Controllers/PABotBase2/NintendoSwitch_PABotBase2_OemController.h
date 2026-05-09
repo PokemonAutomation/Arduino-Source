@@ -44,6 +44,8 @@ public:
         ControllerType controller_type
     );
 
+    ControllerPlayerNumber get_player_number(Cancellable& cancellable);
+
 
 protected:
     static Button populate_report_buttons(
@@ -166,6 +168,7 @@ protected:
     std::unique_ptr<ControllerStatusThread> m_status_thread;
 
     std::string m_color_html;
+    std::atomic<ControllerPlayerNumber> m_player_number;
 };
 
 

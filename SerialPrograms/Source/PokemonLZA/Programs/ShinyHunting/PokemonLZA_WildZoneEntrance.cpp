@@ -507,8 +507,8 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
     //  detection on map during fast traveling.
     bool to_max_zoom_level_on_map = true;
 
-    //  Mash button B to let Switch register the controller
-    pbf_mash_button(context, BUTTON_B, 500ms);
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_B);
 
     //  Detect direction arrow to test the detector
     //  m_starting_angle = get_current_facing_angle(env, context);

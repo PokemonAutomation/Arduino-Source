@@ -231,6 +231,9 @@ void InPlaceCatcher::run(
 void InPlaceCatcher::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     InPlaceCatcher_Descriptor::Stats& stats = env.current_stats<InPlaceCatcher_Descriptor::Stats>();
 
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_L);
+
     AlertEyeTracker attack_tracker(COLOR_BLUE, &env.console.overlay(), 5000ms);
 
     ShinySoundHandler shiny_sound_handler(SHINY_DETECTED);

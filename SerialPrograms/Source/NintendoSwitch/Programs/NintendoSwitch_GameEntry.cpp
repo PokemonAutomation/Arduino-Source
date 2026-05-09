@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -29,6 +30,83 @@
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
+
+
+
+void require_player(
+    Logger& logger,
+    ProControllerContext& context,
+    Button connect_button,
+    ControllerPlayerNumber required
+){
+    logger.log("Connecting controller...");
+
+    const std::string& required_str = player_number_to_string(required);
+
+    ControllerPlayerNumber current = context->get_player_number(context);
+    const std::string* current_str = &player_number_to_string(current);
+    logger.log("Current Player Number: " + *current_str);
+    if (current == ControllerPlayerNumber::UNKNOWN){
+        if (connect_button != Button::BUTTON_NONE){
+            pbf_press_button(context, connect_button, 40ms, 24ms);
+            context.wait_for_all_requests();
+        }
+        return;
+    }
+
+    for (int retries = 0;; retries++){
+        if (current == required){
+            logger.log("Controller player matches required (" + *current_str + "). Continuing...", COLOR_BLUE);
+            return;
+        }
+
+        if (connect_button == Button::BUTTON_NONE){
+            throw UserSetupError(
+                logger,
+                "Please connect your controller to the console."
+            );
+        }
+
+        if (current != ControllerPlayerNumber::DISCONNECTED){
+            if (required == ControllerPlayerNumber::PLAYER1){
+                throw UserSetupError(
+                    logger,
+                    "Controller is connected as the wrong player. Please disconnect all other controllers."
+                );
+            }else{
+                throw UserSetupError(
+                    logger,
+                    "Controller is connected as the wrong player. Please reconnect to: " + required_str
+                );
+            }
+        }
+
+        if (retries >= 5){
+            if (required == ControllerPlayerNumber::PLAYER1){
+                throw UserSetupError(
+                    logger,
+                    "Failed to connect controller after 5 tries. Please disconnect all other controllers."
+                );
+            }else{
+                throw UserSetupError(
+                    logger,
+                    "Failed to connect controller after 5 tries."
+                );
+            }
+        }
+
+        logger.log("Attempt to connect controller...", COLOR_ORANGE);
+        pbf_press_button(context, connect_button, 40ms, 360ms);
+        context.wait_for_all_requests();
+
+        current = context->get_player_number(context);
+        current_str = &player_number_to_string(current);
+
+        logger.log("Current Player Number: " + *current_str);
+    }
+
+}
+
 
 
 
@@ -427,7 +505,13 @@ void start_game_from_home_with_inference(
         int ret = run_until<ProControllerContext>(
             console, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 10000ms);
+                if (context.controller().performance_class() == ControllerPerformanceClass::SerialPABotBase_Wired){
+                    pbf_mash_button(context, BUTTON_B, 10000ms);
+                }else{
+                    for (int c = 0; c < 10; c++){
+                        pbf_press_button(context, BUTTON_B, 200ms, 800ms);
+                    }
+                }
             },
             { detector }
         );
@@ -537,7 +621,13 @@ void start_game_from_home_with_inference(
         int ret = run_until<JoyconContext>(
             console, context,
             [](JoyconContext& context){
-                pbf_mash_button(context, BUTTON_B, 10000ms);
+                if (context.controller().performance_class() == ControllerPerformanceClass::SerialPABotBase_Wired){
+                    pbf_mash_button(context, BUTTON_B, 10000ms);
+                }else{
+                    for (int c = 0; c < 10; c++){
+                        pbf_press_button(context, BUTTON_B, 200ms, 800ms);
+                    }
+                }
             },
             { detector }
         );

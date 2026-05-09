@@ -11,6 +11,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
@@ -376,7 +377,7 @@ void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, ProControll
     IngoBattleGrinder_Descriptor::Stats& stats = env.current_stats<IngoBattleGrinder_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
+    require_player(env.console, context, BUTTON_LCLICK);
 
     // {
     //     // ImageRGB32 image("./scripts/LA_switch_pokemon_Kuro.png");

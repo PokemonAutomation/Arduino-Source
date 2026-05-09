@@ -5,6 +5,7 @@
  */
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA_BraviaryHeightGlitch.h"
 
@@ -31,6 +32,9 @@ BraviaryHeightGlitch::BraviaryHeightGlitch(){}
 
 
 void BraviaryHeightGlitch::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_LCLICK);
+
     while (true){
         pbf_press_button(context, BUTTON_Y, 240ms, 0ms);
         pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);

@@ -13,6 +13,6 @@ steps:
       !Repository/Deployment-SerialPrograms-Qt6.8.3-MSVC2022/
     workspaceRepo: true
 
-  - checkout: Arduino-Source
+  - checkout: self
     path: Arduino-Source-Internal/Repository/Public
     persistCredentials: true

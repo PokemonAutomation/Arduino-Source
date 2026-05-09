@@ -7,6 +7,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h"
@@ -71,7 +72,7 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env, ProControllerCont
     env.update_stats();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
+    require_player(env.console, context, BUTTON_LCLICK);
 
     Milliseconds box_scroll_delay = GameSettings::instance().BOX_SCROLL_DELAY0;
     Milliseconds box_change_delay = GameSettings::instance().BOX_CHANGE_DELAY0;

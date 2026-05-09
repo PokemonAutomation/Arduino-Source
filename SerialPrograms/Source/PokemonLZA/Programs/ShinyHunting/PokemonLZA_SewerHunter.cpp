@@ -210,7 +210,9 @@ void ShinyHunt_SewerHunter::program(SingleSwitchProgramEnvironment& env, ProCont
         );
     }
     WallClock start_time = current_time();
-    pbf_press_button(context, BUTTON_L, 100ms, 100ms); // connect
+
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_L);
 
     run_until<ProControllerContext>(
         env.console, context,

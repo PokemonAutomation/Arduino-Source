@@ -10,6 +10,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
@@ -221,7 +222,9 @@ void WigglytuffFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
     WigglytuffFarmer_Descriptor::Stats& stats = env.current_stats<WigglytuffFarmer_Descriptor::Stats>();
 
     DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
-    pbf_mash_button(context, BUTTON_B, 1000ms);
+
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_B);
 
     for (uint32_t rounds_since_last_save = 0;; rounds_since_last_save++){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);

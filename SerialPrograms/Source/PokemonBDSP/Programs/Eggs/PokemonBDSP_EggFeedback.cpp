@@ -35,7 +35,7 @@ void hatch_egg(VideoStream& stream, ProControllerContext& context){
         int ret = run_until<ProControllerContext>(
             stream, context,
             [](ProControllerContext& context){
-                egg_spin(context, 8min);
+                egg_spin(context, false, 8min);
             },
             {
                 {dialog},

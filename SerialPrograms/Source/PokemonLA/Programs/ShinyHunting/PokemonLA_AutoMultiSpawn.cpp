@@ -17,8 +17,8 @@
 #include "CommonTools/Async/InterruptableCommands.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
-#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
@@ -278,7 +278,7 @@ void AutoMultiSpawn::program(SingleSwitchProgramEnvironment& env, ProControllerC
     StartProgramChecks::check_performance_class_wired_or_wireless(context);
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
+    require_player(env.console, context, BUTTON_LCLICK);
 
     MultiSpawn spawn = SPAWN;
     const int max_num_despawn = MAX_DESPAWN_COUNT[(size_t)spawn];

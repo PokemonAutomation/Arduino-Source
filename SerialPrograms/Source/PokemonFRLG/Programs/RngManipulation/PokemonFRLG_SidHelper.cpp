@@ -72,7 +72,7 @@ SidHelper::SidHelper()
         "The target advances for finalizing the SID. This is arbitrary unless you're attempting to hit a specific TID/SID combination.<br>"
         "This value should always be odd.",
         LockMode::LOCK_WHILE_RUNNING, 
-        2301, 2275 // default, min
+        3001, 2275 // default, min
     )
     , NUM_CANDIDATES(
         "<b># Candidate SIDs:</b><br>"
@@ -125,8 +125,8 @@ void set_sid_from_name_screen(
     );
 
     if (extra_press_at_end){
-        pbf_press_button(context, BUTTON_A, 200ms, 800ms);
-        delay = delay > 1000ms ? delay - 1000ms : 0ms;
+        pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+        delay = delay > 1500ms ? delay - 1500ms : 0ms;
     }
 
     pbf_press_button(context, BUTTON_A, 200ms, delay);
@@ -209,7 +209,7 @@ void navigate_to_trainer_card(SingleSwitchProgramEnvironment& env, ProController
     }
 }
 
-uint16_t read_tid(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+uint16_t read_tid(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language lang){
     TrainerIdReader reader;
     VideoOverlaySet overlays(env.console.overlay());
     reader.make_overlays(overlays);
@@ -217,7 +217,7 @@ uint16_t read_tid(SingleSwitchProgramEnvironment& env, ProControllerContext& con
     VideoSnapshot screen = env.console.video().snapshot();
     env.log("Trainer Card detected.");
     env.log("Reading TID...");
-    uint16_t tid = reader.read_tid(env.logger(), screen);
+    uint16_t tid = reader.read_tid(env.logger(), lang, screen);
     env.log("TID: " + std::to_string(tid));
 
     context.wait_for_all_requests();
@@ -299,7 +299,10 @@ void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     const double& FIXED_ADVANCES_OFFSET = 7; // determined empirically. Probably not console/setup dependent
 
-    bool extra_press_at_end = (LANGUAGE == Language::German);
+    bool extra_press_at_end = (
+        LANGUAGE == Language::German ||
+        LANGUAGE == Language::Japanese
+    );
 
     const uint64_t SID_DELAY = uint64_t((TARGET_ADVANCES - 2*FINAL_TEXT_FRAMES + FIXED_ADVANCES_OFFSET) * FRAME_DURATION / 2); // advances pass 2 by 2
     env.log("Delay: " + std::to_string(SID_DELAY) + "ms");
@@ -308,7 +311,7 @@ void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     finish_intro_animations(env, context);
     navigate_to_trainer_card(env, context);
 
-    uint16_t tid = read_tid(env, context);
+    uint16_t tid = read_tid(env, context, lang);
 
     std::vector<std::pair<std::string, std::string>> sid_messages = get_sid_messages(
         env, context, tid, TARGET_ADVANCES, NUM_CANDIDATES

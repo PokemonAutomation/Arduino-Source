@@ -5,6 +5,7 @@
  */
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA_ClothingBuyer.h"
 
@@ -40,7 +41,7 @@ ClothingBuyer::ClothingBuyer()
 
 void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
+    require_player(env.console, context, BUTTON_LCLICK);
 
     while (true){
         // If this clothing is not bought:

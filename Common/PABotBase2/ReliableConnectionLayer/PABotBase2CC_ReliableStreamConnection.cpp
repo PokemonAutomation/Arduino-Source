@@ -253,19 +253,20 @@ void ReliableStreamConnection::send_ack_u16(uint8_t seqnum, uint8_t opcode, uint
 
 void ReliableStreamConnection::retransmit_thread(){
     WallClock next_retransmit = current_time() + m_retransmit_timeout;
+    std::unique_lock<Mutex> lg(m_lock);
     while (true){
-        std::unique_lock<Mutex> lg(m_lock);
         if (this->cancelled()){
             break;
         }
 
-        m_cv.wait_until(lg, next_retransmit);
-
-        if (this->cancelled()){
-            break;
-        }
         if (m_reliable_sender.slots_used() == 0){
-            continue;
+            m_cv.wait(lg);
+        }else{
+            m_cv.wait_until(lg, next_retransmit);
+        }
+
+        if (this->cancelled()){
+            break;
         }
         if (current_time() < next_retransmit){
             continue;

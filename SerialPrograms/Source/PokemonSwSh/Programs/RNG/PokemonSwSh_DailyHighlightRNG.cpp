@@ -453,7 +453,8 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, ProControll
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{
-        pbf_press_button(context, BUTTON_B, 80ms, 80ms);
+        //  Connect the controller.
+        require_player(env.console, context, BUTTON_B);
     }
 
 

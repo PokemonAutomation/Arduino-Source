@@ -10,6 +10,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP_PoffinCooker.h"
 
@@ -117,7 +118,7 @@ void PoffinCooker::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     env.update_stats();
 
     //  Connect the controller.
-    pbf_move_right_joystick(context, {-1, -1}, 80ms, 0ms);
+    require_player(env.console, context, BUTTON_L);
 
     env.log("Select the cooking option");
     //  Select the cooking option.

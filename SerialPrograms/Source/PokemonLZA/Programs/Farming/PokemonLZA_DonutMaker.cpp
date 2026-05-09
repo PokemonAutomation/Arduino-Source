@@ -627,8 +627,8 @@ void DonutMaker::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         }
     }
 
-    //  Mash button B to let Switch register the controller
-    pbf_mash_button(context, BUTTON_B, 200ms);
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_B);
 
     reset_map_filter_state(env, context);
 

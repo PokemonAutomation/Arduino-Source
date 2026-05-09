@@ -79,7 +79,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
     LeadingShinyTracker lead_tracker(env.console);
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_B, 40ms, 40ms);
+    require_player(env.console, context, BUTTON_B);
 
     bool reset = false;
     while (true){

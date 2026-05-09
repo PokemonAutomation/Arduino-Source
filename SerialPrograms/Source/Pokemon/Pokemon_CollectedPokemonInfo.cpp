@@ -27,6 +27,7 @@ bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs
            lhs.ball_slug == rhs.ball_slug &&
            lhs.gender == rhs.gender &&
            lhs.ot_id == rhs.ot_id &&
+           lhs.ot_name == rhs.ot_name &&
            lhs.primary_type == rhs.primary_type &&
            lhs.secondary_type == rhs.secondary_type &&
            lhs.tera_type == rhs.tera_type;
@@ -109,6 +110,7 @@ std::ostream& operator<<(std::ostream& os, const std::optional<CollectedPokemonI
         os << "ball:" << pokemon->ball_slug << " ";
         os << "gender:" << gender_to_string(pokemon->gender) << " ";
         os << "ot_id:" << pokemon->ot_id << " ";
+        os << "ot_name:" << pokemon->ot_name << " ";
         os << "primaryType:" << POKEMON_TYPE_SLUGS().get_string(pokemon->primary_type) << " ";
         os << "secondaryType:" << POKEMON_TYPE_SLUGS().get_string(pokemon->secondary_type) << " ";
         os << "teraType:" << POKEMON_TERA_TYPE_SLUGS().get_string(pokemon->tera_type) << " ";
@@ -162,6 +164,7 @@ void save_boxes_data_to_json(const std::vector<std::optional<CollectedPokemonInf
             pokemon["ball"] = current_pokemon->ball_slug;
             pokemon["gender"] = gender_to_string(current_pokemon->gender);
             pokemon["ot_id"] = current_pokemon->ot_id;
+            pokemon["ot_name"] = current_pokemon->ot_name;
             pokemon["primary_type"] = POKEMON_TYPE_SLUGS().get_string(current_pokemon->primary_type);
             pokemon["secondary_type"] = POKEMON_TYPE_SLUGS().get_string(current_pokemon->secondary_type);
             pokemon["tera_type"] = POKEMON_TERA_TYPE_SLUGS().get_string(current_pokemon->tera_type);

@@ -15,7 +15,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
@@ -518,8 +518,8 @@ std::set<std::string> OutbreakFinder::to_set(const StringSelectTableOption& opti
 }
 
 void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    // press a random button to let Switch register the wired controller
-    pbf_press_button(context, BUTTON_ZL, 10ms, 30ms);
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_ZL);
 
     bool fresh_from_reset = false;
     if (RESET_GAME_AND_CONTINUE_SEARCHING){

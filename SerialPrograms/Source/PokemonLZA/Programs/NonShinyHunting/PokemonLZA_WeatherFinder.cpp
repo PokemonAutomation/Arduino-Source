@@ -9,6 +9,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
@@ -191,6 +192,9 @@ void bench_it(SingleSwitchProgramEnvironment& env, ProControllerContext& context
 void WeatherFinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     WeatherFinder_Descriptor::Stats& stats = env.current_stats<WeatherFinder_Descriptor::Stats>();
     assert_16_9_720p_min(env.logger(), env.console);
+
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_L);
     
     bool isDay = !START_POSITION.current_value();
 

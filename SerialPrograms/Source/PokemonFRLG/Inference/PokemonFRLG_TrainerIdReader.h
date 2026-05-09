@@ -31,13 +31,13 @@ public:
 
     // Reads the Trainer ID on the Trainer Card
     uint16_t read_tid(
-        Logger &logger, const ImageViewRGB32 &frame
+        Logger& logger, Language language, const ImageViewRGB32& frame
     );
 
 private:
     Color m_color;
     ImageFloatBox m_box_tid;
-
+    ImageFloatBox m_box_tid_jpn;
 };
 
 } // namespace PokemonFRLG

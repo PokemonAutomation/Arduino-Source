@@ -191,6 +191,10 @@ bool HyperspaceRewardReset::check_reward(SingleSwitchProgramEnvironment& env, Pr
 
 void HyperspaceRewardReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
+
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_L);
+
     HyperspaceRewardReset_Descriptor::Stats& stats = env.current_stats<HyperspaceRewardReset_Descriptor::Stats>();
 
     /*

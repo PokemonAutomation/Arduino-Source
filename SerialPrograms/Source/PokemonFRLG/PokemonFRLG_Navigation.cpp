@@ -1086,7 +1086,10 @@ void home_black_border_check(ConsoleHandle& console, ProControllerContext& conte
         assert_16_9_720p_min(console, console);
 
         console.log("Going to home to check for black border.");
-        pbf_press_button(context, BUTTON_ZL, 120ms, 880ms); //  Connect the controller.
+
+        //  Connect the controller.
+        require_player(console, context, BUTTON_ZL);
+
         pbf_press_button(context, BUTTON_HOME, 120ms, 880ms);
         context.wait_for_all_requests();
         StartProgramChecks::check_border(console);

@@ -91,6 +91,9 @@ LZA_TurboMacro::LZA_TurboMacro()
 void LZA_TurboMacro::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     ProControllerContext context(scope, env.console.controller<ProController>());
 
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_NONE);
+
     switch (RUN_UNTIL_CALLBACK){
     case RunUntilCallback::NONE:
         run_table(env, scope);

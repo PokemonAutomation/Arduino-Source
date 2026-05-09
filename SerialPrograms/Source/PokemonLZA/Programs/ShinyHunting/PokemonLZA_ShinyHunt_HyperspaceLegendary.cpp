@@ -682,9 +682,9 @@ void hunt_virizion_rooftop(
 void ShinyHunt_HyperspaceLegendary::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     HyperspaceCalorieDetector::warm_ocr();
-    
-    // Mash button B to let Switch register the controller
-    pbf_mash_button(context, BUTTON_B, 200ms);
+
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_B);
 
     ShinyHunt_HyperspaceLegendary_Descriptor::Stats& stats = env.current_stats<ShinyHunt_HyperspaceLegendary_Descriptor::Stats>();
 

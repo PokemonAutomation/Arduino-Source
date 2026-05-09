@@ -11,6 +11,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -256,6 +257,9 @@ bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, ProCo
 void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     WildItemFarmer_Descriptor::Stats& stats = env.current_stats<WildItemFarmer_Descriptor::Stats>();
+
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_LCLICK);
 
     const std::vector<std::pair<double, double>> MANUVERS{
         {0, +1},

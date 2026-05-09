@@ -63,6 +63,9 @@ GimmighoulRoamingFarmer::GimmighoulRoamingFarmer()
 void GimmighoulRoamingFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_LCLICK);
+
     //  Start in game facing a roaming Gimmighoul somewhere safe. (ex. Pokemon Center since wild Pokemon can't fight you there.)
     uint8_t year = MAX_YEAR;
     for (uint32_t c = 0; c < SKIPS; c++){

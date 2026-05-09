@@ -30,11 +30,12 @@ public:
 
 private:
     static QImage frame_to_image(const QVideoFrame& frame);
+    VideoSnapshot convert(QVideoFrame frame, WallClock timestamp) noexcept;
     void convert(uint64_t seqnum, QVideoFrame frame, WallClock timestamp) noexcept;
     bool try_dispatch_conversion(uint64_t seqnum, QVideoFrame frame, WallClock timestamp) noexcept;
     void dispatch_conversion(uint64_t seqnum, QVideoFrame frame, WallClock timestamp) noexcept;
 
-    void push_new_screenshot(uint64_t seqnum, VideoSnapshot snapshot);
+    bool push_new_screenshot(uint64_t seqnum, VideoSnapshot snapshot);
 
     struct ObjectsToGC{
         std::vector<AsyncTask> tasks_to_free;
@@ -51,15 +52,8 @@ private:
     Mutex m_lock;
     ConditionVariable m_cv;
 
-    size_t m_active_conversions;
     std::map<uint64_t, AsyncTask> m_pending_conversions;
     bool m_queued_convert = false;
-
-    uint64_t m_converting_seqnum;
-
-    //  Store the latest converted snapshot + seqnum.
-    uint64_t m_converted_seqnum;
-    VideoSnapshot m_converted_snapshot;
 
     //  Keep an archive of older snapshots. The idea here is that we don't want
     //  snapshots to be destroyed in other places (such as the video pivot)
@@ -67,6 +61,7 @@ private:
     //  will periodically clear out on the conversion threads.
     std::map<uint64_t, VideoSnapshot> m_converted_snapshot_archive;
 
+    SpinLock m_stats_lock;
     PeriodicStatsReporterI32 m_stats_conversion;
 };
 

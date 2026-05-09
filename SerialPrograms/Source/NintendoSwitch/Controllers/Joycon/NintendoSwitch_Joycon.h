@@ -75,6 +75,10 @@ public:
         return NAME;
     };
 
+    virtual ControllerPlayerNumber get_player_number(Cancellable& cancellable){
+        return ControllerPlayerNumber::UNKNOWN;
+    }
+
 
 public:
     //  Press all the buttons set in the bitfield simultaneously.

@@ -6,6 +6,7 @@
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP_TradeRoutines.h"
@@ -58,6 +59,11 @@ SelfBoxTrade::SelfBoxTrade()
 void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     TradeStats& stats = env.current_stats<TradeStats>();
     env.update_stats();
+
+    //  Connect the controller.
+    env.run_in_parallel(scope, [](ConsoleHandle& console, ProControllerContext& context){
+        require_player(console, context, BUTTON_LCLICK);
+    });
 
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){
         if (box != 0){

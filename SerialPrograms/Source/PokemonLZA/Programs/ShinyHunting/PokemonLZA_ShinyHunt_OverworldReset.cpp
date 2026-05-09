@@ -95,6 +95,9 @@ ShinyHunt_OverworldReset::ShinyHunt_OverworldReset()
 void ShinyHunt_OverworldReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_L);
+
     ShinyHunt_OverworldReset_Descriptor::Stats& stats = env.current_stats<ShinyHunt_OverworldReset_Descriptor::Stats>();
 
     uint8_t shiny_count = 0;

@@ -36,7 +36,7 @@ MenuStabilityTester::MenuStabilityTester()
            {TestType::SimultaneousScrollA,  "scroll-A",     "Simultaneous Scroll + A"},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        TestType::Vertical
+        TestType::Horizontal
     )
     , VERTICAL_RANGE(
         "<b>Vertical Scroll Range:</b>",
@@ -46,7 +46,7 @@ MenuStabilityTester::MenuStabilityTester()
     , HORIZONTAL_RANGE(
         "<b>Horizontal Scroll Range:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        4
+        3
     )
     , PAUSE_BEFORE_UTURN(
         "<b>Pause Before Turning Around:</b>",

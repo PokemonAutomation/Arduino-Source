@@ -132,6 +132,9 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
     StartProgramChecks::check_performance_class_wired_or_wireless(context);
     assert_16_9_720p_min(env.logger(), env.console);
 
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_LCLICK);
+
     GimmighoulChestFarmer_Descriptor::Stats& stats = env.current_stats<GimmighoulChestFarmer_Descriptor::Stats>();
 
     if (START_LOCATION == StartLocation::FlyPoint){

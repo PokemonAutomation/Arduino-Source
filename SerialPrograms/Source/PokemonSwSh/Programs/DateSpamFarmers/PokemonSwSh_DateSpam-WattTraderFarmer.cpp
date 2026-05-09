@@ -10,6 +10,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
@@ -157,6 +158,9 @@ void WattTraderFarmer::buy_one(SingleSwitchProgramEnvironment& env, ProControlle
 
 void WattTraderFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     WattTraderFarmer_Descriptor::Stats& stats = env.current_stats<WattTraderFarmer_Descriptor::Stats>();
+
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_B);
 
     uint8_t year = MAX_YEAR;
     while (true){

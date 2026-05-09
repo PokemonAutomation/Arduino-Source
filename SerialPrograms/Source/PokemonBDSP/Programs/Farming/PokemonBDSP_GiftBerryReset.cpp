@@ -11,8 +11,9 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -106,7 +107,7 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
     env.update_stats();
 
     //  Connect the controller.
-    pbf_move_right_joystick(context, {-1, -1}, 80ms, 0ms);
+    require_player(env.console, context, BUTTON_L);
 
     const auto selected_berries = TARGET_BERRIES.selected_berries();
     for (const auto& berry_slug: selected_berries){

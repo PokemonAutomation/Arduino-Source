@@ -15,6 +15,9 @@ extern "C" {
 #endif
 
 
+//
+//  Console <-> Controller
+//
 
 typedef struct{
     uint8_t buttons0;
@@ -32,6 +35,16 @@ bool pabb_NintendoSwitch_WiredController_State_equals(
     const pabb_NintendoSwitch_WiredController_State* state0,
     const pabb_NintendoSwitch_WiredController_State* state1
 );
+
+
+//
+//  Controller <-> CC
+//
+
+typedef struct{
+    //  Bit 0: Connected
+    uint8_t status;
+} pabb_NintendoSwitch_WiredController_Status;
 
 
 

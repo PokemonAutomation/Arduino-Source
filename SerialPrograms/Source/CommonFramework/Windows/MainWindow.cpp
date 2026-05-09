@@ -66,7 +66,16 @@ MainWindow::MainWindow(QWidget* parent)
 //    statusbar = new QStatusBar(this);
 //    statusbar->setObjectName(QString::fromUtf8("statusbar"));
 //    setStatusBar(statusbar);
-    setWindowTitle(QString::fromStdString(PROGRAM_NAME + " Computer-Control Programs (" + PROGRAM_VERSION + ")"));
+    std::string title = PROGRAM_NAME + " Computer-Control Programs (" + PROGRAM_VERSION + ")";
+#if defined(__APPLE__)
+    if (!STARTUP_PROFILE().empty()){
+        setWindowTitle(QString::fromStdString(title + " [Profile: " + STARTUP_PROFILE() + "]"));
+    }else{
+        setWindowTitle(QString::fromStdString(title));
+    }
+#else
+    setWindowTitle(QString::fromStdString(title));
+#endif
 
     QHBoxLayout* hbox = new QHBoxLayout(centralwidget);
     QVBoxLayout* left_layout = new QVBoxLayout();

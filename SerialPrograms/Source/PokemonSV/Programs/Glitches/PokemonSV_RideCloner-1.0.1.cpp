@@ -424,6 +424,9 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     StartProgramChecks::check_performance_class_wired_or_wireless(context);
     assert_16_9_720p_min(env.logger(), env.console);
 
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_LCLICK);
+
     RideCloner101_Descriptor::Stats& stats = env.current_stats<RideCloner101_Descriptor::Stats>();
 
 

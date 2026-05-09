@@ -216,6 +216,9 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, ProController
 void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_LCLICK);
+
     TeraSelfFarmer_Descriptor::Stats& stats = env.current_stats<TeraSelfFarmer_Descriptor::Stats>();
 
     if (FILTER.MIN_STARS > FILTER.MAX_STARS){

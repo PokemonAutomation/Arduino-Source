@@ -9,6 +9,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -64,6 +65,9 @@ ESPTraining::ESPTraining()
 void ESPTraining::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     ESPTrainingStats& stats = env.current_stats<ESPTrainingStats>();
+
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_LCLICK);
 
     for (uint32_t c = 0; c < ROUNDS; c++){
         env.log("Round: " + tostr_u_commas(c));

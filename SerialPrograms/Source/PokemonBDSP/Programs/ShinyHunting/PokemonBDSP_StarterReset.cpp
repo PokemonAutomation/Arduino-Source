@@ -104,10 +104,11 @@ StarterReset::StarterReset()
 void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     StarterReset_Descriptor::Stats& stats = env.current_stats<StarterReset_Descriptor::Stats>();
 
-    std::shared_ptr<const ImageRGB32> briefcase = std::make_shared<const ImageRGB32>(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
+    std::shared_ptr<const ImageRGB32> briefcase =
+        std::make_shared<const ImageRGB32>(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_B, 40ms, 40ms);
+    require_player(env.console, context, BUTTON_B);
 
     size_t consecutive_failures = 0;
 

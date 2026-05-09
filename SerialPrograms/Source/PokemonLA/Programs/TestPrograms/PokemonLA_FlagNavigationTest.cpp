@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Globals.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Programs/PokemonLA_FlagNavigationAir.h"
 #include "PokemonLA_FlagNavigationTest.h"
@@ -56,6 +57,8 @@ FlagNavigationTest::FlagNavigationTest()
 
 
 void FlagNavigationTest::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_LCLICK);
 
     FlagNavigationAir session(
         env, env.console, context,

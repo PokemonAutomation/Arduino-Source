@@ -1034,6 +1034,10 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
 
 void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
+
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_LCLICK);
+
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
     env.update_stats();
 

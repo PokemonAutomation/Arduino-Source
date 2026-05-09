@@ -13,6 +13,7 @@
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
@@ -271,7 +272,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, ProControllerContext
     AutoHost_Descriptor::Stats& stats = env.current_stats<AutoHost_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 80ms, 80ms);
+    require_player(env.console, context, BUTTON_L);
 
     m_killswitch_time = WallClock::max();
 

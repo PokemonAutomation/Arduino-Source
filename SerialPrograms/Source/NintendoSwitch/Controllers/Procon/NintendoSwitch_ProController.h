@@ -80,6 +80,10 @@ public:
     };
     virtual ControllerClass controller_class() const override;
 
+    virtual ControllerPlayerNumber get_player_number(Cancellable& cancellable){
+        return ControllerPlayerNumber::UNKNOWN;
+    }
+
 
 public:
     //  Standard Commands

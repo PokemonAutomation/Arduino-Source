@@ -9,6 +9,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/PokemonLA_TravelLocations.h"
@@ -218,7 +219,7 @@ void NuggetFarmerHighlands::program(SingleSwitchProgramEnvironment& env, ProCont
     NuggetFarmerHighlands_Descriptor::Stats& stats = env.current_stats<NuggetFarmerHighlands_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 40ms, 40ms);
+    require_player(env.console, context, BUTTON_LCLICK);
 
     // Put a save here so that when the program reloads from error it won't break.
     save_game_from_overworld(env, env.console, context);

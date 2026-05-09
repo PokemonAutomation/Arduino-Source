@@ -23,7 +23,7 @@ namespace PABotBase2{
 
 
 
-#define PABB2_MESSAGE_PROTOCOL_VERSION      2026041105
+#define PABB2_MESSAGE_PROTOCOL_VERSION      2026050800
 
 
 struct PABB_PACK MessageHeader{
@@ -45,6 +45,7 @@ struct PABB_PACK Message_u32 : MessageHeader{
 #define PABB2_MESSAGE_OPCODE_RET                    0x11
 #define PABB2_MESSAGE_OPCODE_RET_U32                0x12
 #define PABB2_MESSAGE_OPCODE_RET_DATA               0x13
+#define PABB2_MESSAGE_OPCODE_RET_U32_DATA           0x14
 
 #define PABB2_MESSAGE_OPCODE_PROTOCOL_VERSION       0x20
 #define PABB2_MESSAGE_OPCODE_FIRMWARE_VERSION       0x21

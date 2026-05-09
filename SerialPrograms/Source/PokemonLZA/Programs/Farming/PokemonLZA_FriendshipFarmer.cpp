@@ -15,6 +15,7 @@
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
@@ -502,6 +503,9 @@ void FriendshipFarmer::hang_out_bench(SingleSwitchProgramEnvironment& env, ProCo
 
 void FriendshipFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
+
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_L);
 
     FriendshipFarmer_Descriptor::Stats& stats = env.current_stats<FriendshipFarmer_Descriptor::Stats>();
 

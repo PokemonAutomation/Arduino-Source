@@ -115,9 +115,8 @@ std::set<std::string> read_name(
 void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     PokemonSwSh::ShinyHuntTracker& stats = env.current_stats<PokemonSwSh::ShinyHuntTracker>();
 
-
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_B, 40ms, 40ms);
+    require_player(env.console, context, BUTTON_LCLICK);
 
     size_t consecutive_errors = 0;
 

@@ -11,6 +11,7 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonLA_TradeRoutines.h"
@@ -161,7 +162,8 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
 
     //  Connect both controllers.
     env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
-        pbf_press_button(context, BUTTON_LCLICK, 80ms, 0ms);
+        //  Connect the controller.
+        require_player(console, context, BUTTON_LCLICK);
     });
 
     uint8_t row = 0;

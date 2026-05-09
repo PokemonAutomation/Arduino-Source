@@ -33,6 +33,8 @@ public:
         VideoStream &stream, FeedbackType feedback_type
     ) override{}
 
+private:
+    OCR::LanguageOCROption LANGUAGE;    
 };
 
 } // namespace PokemonFRLG

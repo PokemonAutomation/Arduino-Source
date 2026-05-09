@@ -10,6 +10,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
@@ -153,7 +154,7 @@ void MassAttachItems::program(SingleSwitchProgramEnvironment& env, ProController
     MassAttachItems_Descriptor::Stats& stats = env.current_stats<MassAttachItems_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 80ms, 0ms);
+    require_player(env.console, context, BUTTON_LCLICK);
 
     BoxDetector box_detector;
     VideoOverlaySet overlays(env.console.overlay());

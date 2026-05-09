@@ -19,9 +19,10 @@
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_PokeballNameReader.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
@@ -411,7 +412,8 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             1600ms
         );
     }else{
-        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
+        //  Connect the controller.
+        require_player(env.console, context, BUTTON_B);
     }
 
     static const std::set<std::string> APRIBALLS{

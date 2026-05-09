@@ -8,6 +8,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
@@ -83,6 +84,9 @@ static void enter_jobs(ProControllerContext& context, uint16_t index){
 
 void PokeJobsFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     uint8_t year = MAX_YEAR;
+
+    //  Connect the controller.
+    require_player(env.console, context, BUTTON_B);
 
     // Play it safe in case some menu is open
     pbf_mash_button(context, BUTTON_B, MASH_B_DURATION0);

@@ -156,13 +156,34 @@ std::string dpad_to_string(DpadPosition dpad){
     }
 }
 
-std::string dpad_to_code_string(DpadPosition dpad){
+const std::string& dpad_to_code_string(DpadPosition dpad){
     return DPAD_CODE_STRINGS.get_string(dpad);
 }
 
 DpadPosition string_to_dpad(std::string dpad_string){
     return DPAD_STRINGS.get_enum(dpad_string);
 }
+
+
+const std::string& player_number_to_string(ControllerPlayerNumber number){
+    static const std::string STRINGS[] = {
+        "Unknown",
+        "Disconnected",
+        "Player 1",
+        "Player 2",
+        "Player 3",
+        "Player 4",
+        "Player 5",
+        "Player 6",
+        "Player 7",
+        "Player 8",
+    };
+    return STRINGS[(size_t)number];
+}
+
+
+
+
 
 
 

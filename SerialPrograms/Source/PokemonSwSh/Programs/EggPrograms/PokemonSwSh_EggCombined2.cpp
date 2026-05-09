@@ -6,6 +6,7 @@
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh_EggCombinedShared.h"
@@ -101,7 +102,8 @@ void EggCombined2::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             3200ms
         );
     }else{
-        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
+        //  Connect the controller.
+        require_player(env.console, context, BUTTON_B);
     }
 
     session.eggcombined2_body(env.console, context);
