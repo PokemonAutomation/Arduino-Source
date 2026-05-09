@@ -235,7 +235,7 @@ void checkpoint_52(
         // wait for dialog after leaving gym
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20000ms, 0, -1);
         
-        WhiteTriangleWatcher white_triangle(COLOR_RED, ImageFloatBox(0.948773, 0.034156, 0.013874, 0.024668));
+        WhiteTriangleWatcher white_triangle(COLOR_RED, ImageFloatBox(0.946, 0.029, 0.013874, 0.024668));
         // mash A until detect top right white triangle 1
         int ret = run_until<ProControllerContext>(
             env.console, context,
