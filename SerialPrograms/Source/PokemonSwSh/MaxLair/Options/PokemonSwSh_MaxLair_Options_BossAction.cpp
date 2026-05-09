@@ -60,11 +60,7 @@ BossActionRow::BossActionRow(std::string slug, const std::string& name_slug, con
     add_option(ball, "Ball");
     add_option(save_on_the_go, "Save Path");
     
-    save_on_the_go.set_visibility(
-        action == BossAction::CATCH_AND_STOP_IF_SHINY
-            ? ConfigOptionState::ENABLED
-            : ConfigOptionState::DISABLED
-    );
+    BossActionRow::on_config_value_changed(nullptr);
     
     action.add_listener(*this);
 }

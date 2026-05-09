@@ -27,7 +27,6 @@ enum class BossAction{
     CATCH_AND_STOP_IF_SHINY,
 };
 
-const EnumDropdownDatabase<BossAction>& BossAction_Database();
 
 class BossActionRow : public StaticTableRow, private ConfigOption::Listener{
 public:
