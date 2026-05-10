@@ -24,12 +24,17 @@ public:
 
     bool detect(const ImageViewRGB32& screen);
 
+    const std::vector<ImageFloatBox>& last_detection() const{
+        return m_last_detection;
+    }
+
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 protected:
     VideoOverlay& m_overlay;
     ImageFloatBox m_box;
+    std::vector<ImageFloatBox> m_last_detection;
     std::deque<OverlayBoxScope> m_arrow_boxes;
 };
 
