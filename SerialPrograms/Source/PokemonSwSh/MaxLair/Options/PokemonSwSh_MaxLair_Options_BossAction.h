@@ -7,14 +7,12 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Options_BossAction_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Options_BossAction_H
 
+#include <vector>
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/StaticTableOption.h"
 #include "CommonFramework/Options/LabelCellOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/ConfigOption.h"
-#include <vector>
-#include <memory>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
