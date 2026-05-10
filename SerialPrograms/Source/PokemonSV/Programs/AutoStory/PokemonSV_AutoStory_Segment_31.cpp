@@ -749,17 +749,21 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         direction.change_direction(env.program_info(), env.console, context, 2.575); //2.566167
 
         // climb the wall
-        pbf_press_button(context, BUTTON_B, 528ms, 0ms);
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 51ms);
-        pbf_move_left_joystick(context, {0, +1}, 5002ms, 0ms);
+        pbf_press_button(context, BUTTON_B, 528ms, 0ms); // jump
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, {0, +1}, {0, 0}, 51ms);  // climb
+        pbf_move_left_joystick(context, {0, +1}, 5002ms, 0ms); // up
         pbf_wait(context, 1551ms);
-        pbf_move_left_joystick(context, {-1, 0}, 2167ms, 0ms);
-        pbf_wait(context, 745ms);
+        pbf_move_left_joystick(context, {-1, 0}, 4400ms, 0ms); // left
+        pbf_wait(context, 1000ms);
+        pbf_move_left_joystick(context, {0, +1}, 4000ms, 0ms); // up
+        pbf_wait(context, 1000ms);
+        pbf_move_left_joystick(context, {1, 0}, 1300ms, 0ms); // right
+        pbf_wait(context, 1000ms);
         
     });
 
     // continue climbing wall
-    pbf_move_left_joystick(context, {0, +1}, 8804ms, 0ms);
+    pbf_move_left_joystick(context, {0, +1}, 5000ms, 0ms);
 
     get_off_ride(env.program_info(), env.console, context);
 
