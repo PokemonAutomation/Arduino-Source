@@ -67,10 +67,10 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Testing ----");
     ret.emplace_back(make_single_switch_program<BoxDraw_Descriptor, BoxDraw>());
     ret.emplace_back(make_single_switch_program<SnapshotDumper_Descriptor, SnapshotDumper>());
-    ret.emplace_back(make_single_switch_program<MenuStabilityTester_Descriptor, MenuStabilityTester>());
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
+    ret.emplace_back(make_single_switch_program<MenuStabilityTester_Descriptor, MenuStabilityTester>());
         ret.emplace_back(make_computer_program<TestProgramComputer_Descriptor, TestProgramComputer>());
         ret.emplace_back(make_multi_switch_program<TestProgram_Descriptor, TestProgram>());
         ret.emplace_back(make_single_switch_program<JoyconProgram_Descriptor, JoyconProgram>());

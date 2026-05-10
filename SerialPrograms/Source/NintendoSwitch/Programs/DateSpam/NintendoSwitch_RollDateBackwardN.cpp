@@ -116,7 +116,7 @@ void roll_date_backward_N_Switch1_sbb(ProControllerContext& context, uint8_t ski
     ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
 }
 void roll_date_backward_N_Switch2_wired(ProControllerContext& context, uint8_t skips){
-    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_OPEN_SWITCH2, 80ms);
+    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_OPEN_SWITCH2_0, 80ms);
     if (skips >= 60){
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 4160ms, 4160ms, 24ms);
     }else{
@@ -137,13 +137,13 @@ void roll_date_backward_N_Switch2_wired(ProControllerContext& context, uint8_t s
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
-    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_CLOSE_SWITCH2, 80ms);
+    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_CLOSE_SWITCH2_0, 80ms);
 }
 void roll_date_backward_N_Switch2_wireless(ProControllerContext& context, uint8_t skips){
     Milliseconds tv = context->timing_variation();
     Milliseconds unit = 24ms + tv;
 
-    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_OPEN_SWITCH2, 80ms);
+    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_OPEN_SWITCH2_0, 80ms);
     if (skips >= 60){
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 4160ms, 4160ms, unit);
     }else{
@@ -164,7 +164,7 @@ void roll_date_backward_N_Switch2_wireless(ProControllerContext& context, uint8_
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_CLOSE_SWITCH2, 80ms);
+    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_CLOSE_SWITCH2_0, 80ms);
 }
 void roll_date_backward_N(
     ConsoleHandle& console, ProControllerContext& context,
