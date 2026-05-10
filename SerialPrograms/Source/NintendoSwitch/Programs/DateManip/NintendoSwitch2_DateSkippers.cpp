@@ -37,7 +37,7 @@ void init_view(ProControllerContext& context){
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_CLOSE_SWITCH2.get() + tv, 80ms);
+    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_CLOSE_SWITCH2_0.get() + tv, 80ms);
 }
 
 
@@ -50,7 +50,7 @@ void increment_day_us(ProControllerContext& context){
     Milliseconds tv = context->timing_variation();
     Milliseconds unit = 24ms + tv;
 
-    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_OPEN_SWITCH2.get() + tv, 80ms);
+    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_OPEN_SWITCH2_0.get() + tv, 80ms);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
     ssf_issue_scroll(context, SSF_SCROLL_UP, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
@@ -58,7 +58,7 @@ void increment_day_us(ProControllerContext& context){
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_CLOSE_SWITCH2.get() + tv, 80ms);
+    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_CLOSE_SWITCH2_0.get() + tv, 80ms);
 }
 void increment_day_eu(ProControllerContext& context){
     ThrottleScope scope(context->logging_throttler());
@@ -69,14 +69,14 @@ void increment_day_eu(ProControllerContext& context){
     Milliseconds tv = context->timing_variation();
     Milliseconds unit = 24ms + tv;
 
-    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_OPEN_SWITCH2.get() + tv, 80ms);
+    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_OPEN_SWITCH2_0.get() + tv, 80ms);
     ssf_issue_scroll(context, SSF_SCROLL_UP, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_CLOSE_SWITCH2.get() + tv, 80ms);
+    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_CLOSE_SWITCH2_0.get() + tv, 80ms);
 }
 void increment_day_jp(ProControllerContext& context){
     ThrottleScope scope(context->logging_throttler());
@@ -87,14 +87,14 @@ void increment_day_jp(ProControllerContext& context){
     Milliseconds tv = context->timing_variation();
     Milliseconds unit = 24ms + tv;
 
-    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_OPEN_SWITCH2.get() + tv, 80ms);
+    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_OPEN_SWITCH2_0.get() + tv, 80ms);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
     ssf_issue_scroll(context, SSF_SCROLL_UP, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_CLOSE_SWITCH2.get() + tv, 80ms);
+    ssf_press_button(context, BUTTON_A, ConsoleSettings::instance().DATE_MENU_CLOSE_SWITCH2_0.get() + tv, 80ms);
 }
 
 

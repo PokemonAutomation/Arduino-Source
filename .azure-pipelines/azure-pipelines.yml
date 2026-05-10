@@ -241,7 +241,7 @@ stages:
           }
           Write-Host "=== Archive created ==="
         displayName: 'Archive Windows build artifact'
-        condition: and(succeeded(), ne('${{ parameters.buildType }}', 'Commit'))
+        condition: succeeded()
         env:
           ARTIFACT_PASSWORD: $(ARTIFACT_PASSWORD)
 
@@ -262,7 +262,7 @@ stages:
       - task: PublishPipelineArtifact@1
         displayName: 'Publish Windows artifact (PrivateBeta)'
         inputs:
-          targetPath: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/SerialPrograms-Windows-$(compiler)-$(architecture).zip'
+          targetPath: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Windows-$(compiler)-$(architecture).zip'
           artifactName: 'SerialPrograms-Windows-$(compiler)-$(architecture)'
           publishLocation: 'pipeline'
         condition: and(succeeded(), eq('${{ parameters.buildType }}', 'PrivateBeta'))
@@ -461,7 +461,7 @@ stages:
       - task: PublishPipelineArtifact@1
         displayName: 'Publish Linux artifact (PrivateBeta)'
         inputs:
-          targetPath: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/SerialPrograms-Ubuntu-$(compiler)-$(architecture).zip'
+          targetPath: '$(Pipeline.Workspace)/Arduino-Source-Internal/Repository/Public/build/$(cmake_preset)/cache-build/SerialPrograms-Ubuntu-$(compiler)-$(architecture).zip'
           artifactName: 'SerialPrograms-Linux-$(compiler)-$(architecture)'
           publishLocation: 'pipeline'
         condition: and(succeeded(), eq('${{ parameters.buildType }}', 'PrivateBeta'))

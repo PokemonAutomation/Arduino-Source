@@ -174,6 +174,7 @@
 #include "CommonTools/Images/ImageTools.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_BattleSelectionArrowDetector.h"
 #include "Controllers/RumbleListener.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 
 
 
@@ -335,8 +336,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     auto snapshot = feed.snapshot();
 
-    YCommIconWatcher detector;
-    cout << detector.process_frame(snapshot, current_time()) << endl;
+    SelectionArrowFinder arrow(overlay, {0.462377, 0.332039, 0.388222, 0.640777});
+
+    cout << arrow.detect(snapshot) << endl;
+
+    auto arrows = arrow.last_detection();
+    if (!arrows.empty()){
+        cout << arrows[0].y << endl;
+    }
 
 //    WhiteDialogBoxDetector detector;
 //    detector.make_overlays(overlays);

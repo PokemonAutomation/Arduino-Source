@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_SelectionArrowFinder_H
 
 #include <atomic>
+#include <vector>
 #include <deque>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
