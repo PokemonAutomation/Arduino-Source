@@ -706,11 +706,11 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         }
     );
 
-    // marker 5  {0.780729, 0.216667}
+    // marker 5  {0.780729, 0.216667}, {0.775, 0.216667}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
         {ZoomChange::KEEP_ZOOM, -1, +1, 0ms},
         FlyPoint::POKECENTER, 
-        {0.780729, 0.216667}
+        {0.775, 0.216667}
     );
     handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -734,7 +734,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
     do_action_and_monitor_for_battles(env.program_info(), env.console, context,
     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
         // walk towards wall
-        direction.change_direction(env.program_info(), env.console, context, 2.949863);
+        direction.change_direction(env.program_info(), env.console, context, 2.85);
 
         walk_forward_while_clear_front_path(env.program_info(), env.console, context, 5600ms);
 
@@ -744,6 +744,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
 
         // move back towards wall
         pbf_move_left_joystick(context, {0, +1}, 800ms, 400ms);
+        pbf_move_left_joystick(context, {-1, 0}, 800ms, 400ms);
         pbf_move_left_joystick(context, {-1, +1}, 3200ms, 400ms);
 
         direction.change_direction(env.program_info(), env.console, context, 2.575); //2.566167
