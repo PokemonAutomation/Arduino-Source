@@ -250,7 +250,13 @@ bool WildRng::have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_
     return (hit.seed == TARGET_SEED) && (hit.advance == ADVANCES);
 }
 
-bool WildRng::auto_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, WildRng_Descriptor::Stats& stats, bool safari_zone, const uint64_t& MAX_BALL_THROWS){
+bool WildRng::auto_catch(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    WildRng_Descriptor::Stats& stats, 
+    const uint64_t& MAX_BALL_THROWS,
+    bool safari_zone
+){
     for (uint64_t i=0; i<=MAX_BALL_THROWS; i++){
         int count = 0;
         while(true){
@@ -372,9 +378,14 @@ bool WildRng::auto_catch(SingleSwitchProgramEnvironment& env, ProControllerConte
     return true;
 }
 
-AdvObservedPokemon WildRng::read_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::set<std::string>& SPECIES_LIST){
+AdvObservedPokemon WildRng::read_summary(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    const std::set<std::string>& SPECIES_LIST, 
+    bool safari_zone
+){
     // navigate to the summary page of the last occupied (not necessarily 6th) party slot
-    open_party_menu_from_overworld(env.console, context);
+    open_party_menu_from_overworld(env.console, context, safari_zone ? StartMenuContext::SAFARI_ZONE : StartMenuContext::STANDARD);
     pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
     pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
 
@@ -474,11 +485,12 @@ bool WildRng::use_rare_candy(
     AdvObservedPokemon& pokemon,
     AdvRngFilters& filters,
     const BaseStats& BASE_STATS,
+    bool safari_zone,
     bool first
 ){
     // navigate to the bag (only needed for the first use)
     if (first){
-        open_bag_from_overworld(env.console, context);
+        open_bag_from_overworld(env.console, context, safari_zone ? PokemonFRLG::StartMenuContext::SAFARI_ZONE : PokemonFRLG::StartMenuContext::STANDARD);
         // move left to the correct pocket (in case Teachy TV was used)
         pbf_move_left_joystick(context, {-1, 0}, 200ms, 800ms);
         pbf_move_left_joystick(context, {-1, 0}, 200ms, 800ms);
@@ -871,14 +883,21 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             break;
         }
 
-        bool failed = auto_catch(env, context, stats, safari_zone, MAX_BALL_THROWS);
+        bool failed = auto_catch(env, context, stats, MAX_BALL_THROWS, safari_zone);
         if (failed){
             env.log("Failed catch.");
             continue;
         }
 
-        AdvObservedPokemon pokemon = read_summary(env, context, SPECIES_LIST);
-        RngStats species_stats = stats_data.get_throw(pokemon.species);
+        AdvObservedPokemon pokemon = read_summary(env, context, SPECIES_LIST, safari_zone);
+        RngStats species_stats;
+        try{
+            species_stats = stats_data.get_throw(pokemon.species);        
+        }catch (const InternalProgramError& err){
+            env.log(err.message());
+            env.log("Failed to load base stats.");
+            continue;
+        }
         BaseStats BASE_STATS = species_stats.base_stats;
         int16_t GENDER_THRESHOLD = species_stats.gender_threshold;
 
@@ -905,7 +924,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         }
 
         for (uint64_t i=0; i<MAX_RARE_CANDIES; i++){
-            failed = use_rare_candy(env, context, stats, pokemon, filters, BASE_STATS, i == 0);
+            failed = use_rare_candy(env, context, stats, pokemon, filters, BASE_STATS, safari_zone, i == 0);
 
             search_hits = get_wild_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD, SUPER_ROD);
             RNG_CALIBRATION.set(
