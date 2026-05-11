@@ -148,7 +148,7 @@ StarterRng::StarterRng()
     , ADVANCES(
         "<b>Advances:</b><br>The total number of RNG advances for your target.",
         LockMode::LOCK_WHILE_RUNNING,
-        10000, 600, 1000000000 // default, min
+        10000, 940, 1000000000 // default, min
     )
     // , CONTINUE_SCREEN_FRAMES(
     //     "<b>Continue Screen Frames:</b><br>The number of RNG advances to pass on the continue screen.<br>This should be less than the total number of advances above.",
@@ -670,7 +670,9 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     uint64_t CONTINUE_SCREEN_FRAMES = 200;
 
-    const int64_t FIXED_SEED_OFFSET = -845; // milliseconds. approximate;
+    const int64_t FIXED_SEED_OFFSET = -845; // milliseconds, approximate
+    const int64_t FIXED_ADVANCES_OFFSET = 160; // frames, approximate
+
     double SEED_CALIBRATION_FRAMES = RNG_CALIBRATION.seed_calibration / FRAME_DURATION;
     double ADVANCES_CALIBRATION = RNG_CALIBRATION.advances_calibration;
     double CONTINUE_SCREEN_ADJUSTMENT = RNG_CALIBRATION.csf_calibration;
@@ -762,7 +764,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         double seed_bump = SEED_BUMPS[ADVANCE_HISTORY.results.size() % 5];
         SEED_CALIBRATION_FRAMES += seed_bump;
 
-        double CALIBRATED_ADVANCES = ADVANCES + ADVANCES_CALIBRATION;
+        double CALIBRATED_ADVANCES = ADVANCES + ADVANCES_CALIBRATION + FIXED_ADVANCES_OFFSET;
         double INGAME_ADVANCES = CALIBRATED_ADVANCES - CONTINUE_SCREEN_FRAMES - CONTINUE_SCREEN_ADJUSTMENT;
 
         env.log("Seed calibration (frames): " + std::to_string(SEED_CALIBRATION_FRAMES));

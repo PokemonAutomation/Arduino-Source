@@ -168,7 +168,7 @@ StaticRng::StaticRng()
     , ADVANCES(
         "<b>Advances:</b><br>The total number of RNG advances for your target.",
         LockMode::LOCK_WHILE_RUNNING,
-        10000, 600, 1000000000 // default, min
+        10000, 520, 1000000000 // default, min
     )
     // , CONTINUE_SCREEN_FRAMES(
     //     "<b>Continue Screen Frames:</b><br>The number of RNG advances to pass on the continue screen.<br>This should be less than the total number of advances above.",
@@ -659,7 +659,9 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     uint64_t CONTINUE_SCREEN_FRAMES = 200;
 
-    const int64_t FIXED_SEED_OFFSET = -845; // milliseconds. approximate;
+    const int64_t FIXED_SEED_OFFSET = -845; // milliseconds, approximate
+    const int64_t FIXED_ADVANCES_OFFSET = 160; // frames, approximate
+
     double SEED_CALIBRATION_FRAMES = RNG_CALIBRATION.seed_calibration / FRAME_DURATION;
     double ADVANCES_CALIBRATION = RNG_CALIBRATION.advances_calibration;
     double CONTINUE_SCREEN_ADJUSTMENT = RNG_CALIBRATION.csf_calibration;
@@ -746,13 +748,13 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         double seed_bump = SEED_BUMPS[ADVANCE_HISTORY.results.size() % 5];
         SEED_CALIBRATION_FRAMES += seed_bump;
 
-        double CALIBRATED_ADVANCES = ADVANCES + ADVANCES_CALIBRATION;
+        double CALIBRATED_ADVANCES = ADVANCES + ADVANCES_CALIBRATION + FIXED_ADVANCES_OFFSET;
         double INGAME_ADVANCES = CALIBRATED_ADVANCES - CONTINUE_SCREEN_FRAMES - CONTINUE_SCREEN_ADJUSTMENT;
 
         double TEACHY_ADVANCES = 0;
-        bool should_use_teachy_tv = USE_TEACHY_TV && (INGAME_ADVANCES > 5000); // don't use Teachy TV for short in-game advance targets
+        bool should_use_teachy_tv = USE_TEACHY_TV && (INGAME_ADVANCES > 10000); // don't use Teachy TV for short in-game advance targets
         if (should_use_teachy_tv) {
-            TEACHY_ADVANCES = std::floor((INGAME_ADVANCES - 5000) / 313) * 313;
+            TEACHY_ADVANCES = std::floor((INGAME_ADVANCES - 2500) / 313) * 313;
         }
 
         env.log("Seed calibration (frames): " + std::to_string(SEED_CALIBRATION_FRAMES));
@@ -762,7 +764,7 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         uint64_t CALIBRATED_SEED_DELAY = uint64_t(std::round(SEED_DELAY + FIXED_SEED_OFFSET + FRAME_DURATION * SEED_CALIBRATION_FRAMES));
         uint64_t CONTINUE_SCREEN_DELAY =  uint64_t(std::round(FRAME_DURATION * (CONTINUE_SCREEN_FRAMES + CONTINUE_SCREEN_ADJUSTMENT)));
         uint64_t TEACHY_DELAY = uint64_t(TEACHY_ADVANCES * FRAME_DURATION / 313);
-        uint64_t INGAME_DELAY = uint64_t(std::round(FRAME_DURATION * (INGAME_ADVANCES - TEACHY_ADVANCES) / 2)) - (should_use_teachy_tv ? 13700 : 0);
+        uint64_t INGAME_DELAY = uint64_t(std::round(FRAME_DURATION * (INGAME_ADVANCES - TEACHY_ADVANCES) / 2)) - (should_use_teachy_tv ? 14067 : 0);
 
         env.log("Title screen duration: " + std::to_string(CALIBRATED_SEED_DELAY) + "ms");
         env.log("Continue screen duration: " + std::to_string(CONTINUE_SCREEN_DELAY) + "ms");
