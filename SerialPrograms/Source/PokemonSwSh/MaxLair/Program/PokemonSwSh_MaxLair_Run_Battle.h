@@ -24,7 +24,8 @@ StateMachineAction run_move_select(
     OcrFailureWatchdog& ocr_watchdog,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings,
-    bool currently_dmaxed, bool cheer_only
+    bool currently_dmaxed, bool cheer_only,
+    const EndBattleDecider& decider
 );
 
 StateMachineAction throw_balls(

@@ -201,7 +201,8 @@ StateMachineAction run_move_select(
     OcrFailureWatchdog& ocr_watchdog,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings,
-    bool currently_dmaxed, bool cheer_only
+    bool currently_dmaxed, bool cheer_only,
+    const EndBattleDecider& decider
 ){
     GlobalState& state = state_tracker[console_index];
     size_t player_index = state.find_player_index(console_index);
@@ -215,6 +216,14 @@ StateMachineAction run_move_select(
         currently_dmaxed, cheer_only
     )){
         return StateMachineAction::RESET_RECOVER;
+    }
+    
+    if (state.wins < 4) {
+        const std::string& opponent = state.opponent.empty() ? "" : *state.opponent.begin();
+        if (!opponent.empty() && decider.stop_for_non_boss(opponent)) {
+            stream.log("Stopping program as " + opponent + " was encountered.", COLOR_PURPLE);
+            return StateMachineAction::STOP_PROGRAM;
+        }
     }
 
 

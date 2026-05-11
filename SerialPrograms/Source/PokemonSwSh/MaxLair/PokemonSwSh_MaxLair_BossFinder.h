@@ -16,6 +16,7 @@
 #include "Options/PokemonSwSh_MaxLair_Options_Consoles.h"
 #include "Options/PokemonSwSh_MaxLair_Options_Hosting.h"
 #include "Options/PokemonSwSh_MaxLair_Options_BossAction.h"
+#include "Options/PokemonSwSh_MaxLair_Options_NonBossAction.h"
 
 
 namespace PokemonAutomation{
@@ -46,6 +47,7 @@ private:
 
     MaxLairInternal::Consoles CONSOLES;
     MaxLairInternal::BossActionTable BOSS_LIST;
+    MaxLairInternal::NonBossActionTable NON_BOSS_LIST;
     MaxLairInternal::HostingSettings HOSTING;
 
     TouchDateIntervalOption TOUCH_DATE_INTERVAL;
