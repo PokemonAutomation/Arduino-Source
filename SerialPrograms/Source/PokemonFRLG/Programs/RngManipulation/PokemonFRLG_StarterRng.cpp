@@ -779,6 +779,8 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         env.log("Continue screen duration: " + std::to_string(CONTINUE_SCREEN_DELAY) + "ms");
         env.log("In-game duration: " + std::to_string(INGAME_DELAY) + "ms");
 
+        check_timings(env.console, PokemonFRLG_RngTarget::starters, CALIBRATED_SEED_DELAY, CONTINUE_SCREEN_DELAY, INGAME_DELAY, false); 
+
         env.log("Resetting Game...");
         reset_and_perform_blind_sequence(
             env.console, context, PokemonFRLG_RngTarget::starters, 

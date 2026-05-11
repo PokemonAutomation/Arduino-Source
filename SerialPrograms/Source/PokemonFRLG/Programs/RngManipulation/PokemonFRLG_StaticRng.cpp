@@ -775,6 +775,8 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
             env.log("In-game duration: " + std::to_string(INGAME_DELAY) + "ms");
         }
 
+        check_timings(env.console, TARGET, CALIBRATED_SEED_DELAY, CONTINUE_SCREEN_DELAY, INGAME_DELAY, false); 
+
         env.log("Resetting Game...");
         reset_and_perform_blind_sequence(
             env.console, context, TARGET, 
