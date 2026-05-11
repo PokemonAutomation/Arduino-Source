@@ -66,6 +66,7 @@ private:
         SingleSwitchProgramEnvironment& env, 
         ProControllerContext& context, 
         WildRng_Descriptor::Stats& stats,
+        bool safari_zone,
         const uint64_t& MAX_BALL_THROWS
     );
 

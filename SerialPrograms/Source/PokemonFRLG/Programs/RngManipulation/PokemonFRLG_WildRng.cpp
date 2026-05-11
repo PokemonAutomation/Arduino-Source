@@ -250,7 +250,7 @@ bool WildRng::have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_
     return (hit.seed == TARGET_SEED) && (hit.advance == ADVANCES);
 }
 
-bool WildRng::auto_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, WildRng_Descriptor::Stats& stats, const uint64_t& MAX_BALL_THROWS){
+bool WildRng::auto_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, WildRng_Descriptor::Stats& stats, bool safari_zone, const uint64_t& MAX_BALL_THROWS){
     for (uint64_t i=0; i<=MAX_BALL_THROWS; i++){
         int count = 0;
         while(true){
@@ -330,36 +330,38 @@ bool WildRng::auto_catch(SingleSwitchProgramEnvironment& env, ProControllerConte
 
         if (i == MAX_BALL_THROWS) { break; }
 
-        // select BAG (selection arrow does not wrap around)
-        pbf_move_left_joystick(context, {+1, 0}, 100ms, 150ms);
-        pbf_move_left_joystick(context, {0, +1}, 100ms, 150ms);
-        pbf_move_left_joystick(context, {+1, 0}, 100ms, 150ms);
-        pbf_move_left_joystick(context, {0, +1}, 100ms, 150ms);
+        if (!safari_zone){
+            // select BAG (selection arrow does not wrap around)
+            pbf_move_left_joystick(context, {+1, 0}, 100ms, 150ms);
+            pbf_move_left_joystick(context, {0, +1}, 100ms, 150ms);
+            pbf_move_left_joystick(context, {+1, 0}, 100ms, 150ms);
+            pbf_move_left_joystick(context, {0, +1}, 100ms, 150ms);
 
-        BagWatcher bag_open(COLOR_RED);
-        int ret2 = run_until<ProControllerContext>(
-            env.console, context,
-            [](ProControllerContext& context) {
-                for (int i=0; i<5; i++){
-                    pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
-                }
-            },
-            { bag_open }
-        );
-        if (ret2 < 0){
-            send_program_recoverable_error_notification(
-                env, NOTIFICATION_ERROR_RECOVERABLE,
-                "auto_catch(): failed to open bag."
-            ); 
-            stats.errors++;
-            return true;
-        }
+            BagWatcher bag_open(COLOR_RED);
+            int ret2 = run_until<ProControllerContext>(
+                env.console, context,
+                [](ProControllerContext& context) {
+                    for (int i=0; i<5; i++){
+                        pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+                    }
+                },
+                { bag_open }
+            );
+            if (ret2 < 0){
+                send_program_recoverable_error_notification(
+                    env, NOTIFICATION_ERROR_RECOVERABLE,
+                    "auto_catch(): failed to open bag."
+                ); 
+                stats.errors++;
+                return true;
+            }
 
-        if (i == 0){
-            // go to balls pocket (pockets do not wrap around, topmost item will already be selected)
-            pbf_move_left_joystick(context, {+1, 0}, 200ms, 800ms);
-            pbf_move_left_joystick(context, {+1, 0}, 200ms, 800ms);
-            pbf_move_left_joystick(context, {+1, 0}, 200ms, 800ms);
+            if (i == 0){
+                // go to balls pocket (pockets do not wrap around, topmost item will already be selected)
+                pbf_move_left_joystick(context, {+1, 0}, 200ms, 800ms);
+                pbf_move_left_joystick(context, {+1, 0}, 200ms, 800ms);
+                pbf_move_left_joystick(context, {+1, 0}, 200ms, 800ms);
+            }
         }
 
         // use ball
@@ -867,7 +869,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             break;
         }
 
-        bool failed = auto_catch(env, context, stats, MAX_BALL_THROWS);
+        bool failed = auto_catch(env, context, stats, safari_zone, MAX_BALL_THROWS);
         if (failed){
             env.log("Failed catch.");
             continue;
