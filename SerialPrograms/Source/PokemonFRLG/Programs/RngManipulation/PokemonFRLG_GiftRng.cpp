@@ -96,7 +96,8 @@ GiftRng::GiftRng()
             {PokemonFRLG_RngTarget::aerodactyl, "aerodactyl", "Aerodactyl"},
             {PokemonFRLG_RngTarget::gamecornerabra, "gamecornerabra", "Game Corner Abra"},
             {PokemonFRLG_RngTarget::gamecornerclefairy, "gamecornerclefairy", "Game Corner Clefairy"},
-            {PokemonFRLG_RngTarget::gamecornerdratini, "gamecornerdratini", "Game Corner Dratini"},
+            {PokemonFRLG_RngTarget::gamecornerdratinifr, "gamecornerdratinifr", "Game Corner Dratini (FireRed)"},
+            {PokemonFRLG_RngTarget::gamecornerdratinilg, "gamecornerdratinilg", "Game Corner Dratini (LeafGreen)"},
             {PokemonFRLG_RngTarget::gamecornerscyther, "gamecornerscyther", "Game Corner Scyther"},
             {PokemonFRLG_RngTarget::gamecornerpinsir, "gamecornerpinsir", "Game Corner Pinsir"},
             {PokemonFRLG_RngTarget::gamecornerporygon, "gamecornerporygon", "Game Corner Porygon"},
@@ -489,7 +490,8 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         BASE_STATS = { 70, 45, 48, 60, 65, 35 };
         GENDER_THRESHOLD = 190;
         break;
-    case PokemonFRLG_RngTarget::gamecornerdratini:
+    case PokemonFRLG_RngTarget::gamecornerdratinifr:
+    case PokemonFRLG_RngTarget::gamecornerdratinilg:
         BASE_STATS = { 41, 64, 45, 50, 50, 50 };
         GENDER_THRESHOLD = 126;
         break;

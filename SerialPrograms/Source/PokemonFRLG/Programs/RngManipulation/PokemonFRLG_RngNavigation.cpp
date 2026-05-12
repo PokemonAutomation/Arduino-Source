@@ -156,10 +156,10 @@ bool check_for_shiny(ConsoleHandle& console, ProControllerContext& context, Poke
     case PokemonFRLG_RngTarget::fossils:
     case PokemonFRLG_RngTarget::gamecornerabra:
     case PokemonFRLG_RngTarget::gamecornerclefairy:
-    case PokemonFRLG_RngTarget::gamecornerdratini:
+    case PokemonFRLG_RngTarget::gamecornerdratinifr:
+    case PokemonFRLG_RngTarget::gamecornerdratinilg:
     case PokemonFRLG_RngTarget::gamecornerscyther:
     case PokemonFRLG_RngTarget::gamecornerpinsir:
-    case PokemonFRLG_RngTarget::gamecornerbug:
     case PokemonFRLG_RngTarget::gamecornerporygon:
         return shiny_check_summary(console, context);
     case PokemonFRLG_RngTarget::electrode:
