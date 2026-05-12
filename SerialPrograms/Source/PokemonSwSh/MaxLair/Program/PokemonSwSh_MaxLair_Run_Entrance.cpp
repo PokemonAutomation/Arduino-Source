@@ -4,16 +4,18 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
-#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonSwSh_MaxLair_Run_Entrance.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -42,7 +44,7 @@ void run_entrance(
     }
 
     context.wait_for(1000ms);
-    
+
     // Get the boss slug
     std::string boss_slug;
     if (runtime.host_index < runtime.console_settings.active_consoles()){
@@ -61,7 +63,71 @@ void run_entrance(
     }else{
         save_path = followed_path;
     }
-    
+
+
+#if 1
+    bool has_seen_yesno = false;
+    while (true){
+        WhiteDialogBoxWatcher dialog;
+        SelectionArrowFinder arrow(stream.overlay(), {0.462377, 0.332039, 0.388222, 0.640777});
+        YCommIconWatcher overworld;
+
+        context.wait_for_all_requests();
+        context.wait_for(100ms);
+
+        int ret = wait_until(
+            stream, context,
+            std::chrono::seconds(10),
+            {
+                dialog,
+                arrow,
+                overworld,
+            }
+        );
+        switch (ret){
+        case 0:
+            stream.log("Detected dialog menu.");
+            pbf_press_button(context, BUTTON_B, 80ms, 160ms);
+            continue;
+        case 1:{
+            stream.log("Detected arrow.");
+            if (!save_path){
+                pbf_press_button(context, BUTTON_B, 80ms, 160ms);
+                continue;
+            }
+            if (!has_seen_yesno){
+                has_seen_yesno = true;
+                pbf_press_button(context, BUTTON_A, 80ms, 160ms);
+                continue;
+            }
+            const std::vector<ImageFloatBox>& arrows = arrow.last_detection();
+            if (arrows.empty()){
+                continue;
+            }
+            if (arrows[0].y < 0.56){
+                // List of bosses is full, stop the program
+                stream.log("Cannot save path – saved list is full. Stopping program.", COLOR_RED);
+                OperationFailedException::fire(
+                    ErrorReport::NO_ERROR_REPORT,
+                    "Paths list is full. Program stopped.",
+                    stream
+                );
+            }
+            continue;
+        }
+        case 2:
+            stream.log("Detected overworld.");
+            return;
+        default:
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT,
+                "No recognized state after 10 seconds.",
+                stream
+            );
+        }
+    }
+
+#else
     // Selection arrow in the path-list area — present when the "list is full / replace?" dialog is active
     SelectionArrowFinder top_region(stream.overlay(), {0.63, 0.50, 0.22, 0.10});
 
@@ -78,7 +144,7 @@ void run_entrance(
     auto start_time = std::chrono::steady_clock::now();
     const auto timeout = std::chrono::minutes(5);
     
-    while(true){
+    while (true){
         auto now = std::chrono::steady_clock::now();
         if (now - start_time > timeout){
             stream.log("Entrance dialogue timed out after 5 minutes.", COLOR_RED);
@@ -100,7 +166,7 @@ void run_entrance(
         ImageStats dialog_box_stats = image_stats(extract_box_reference(screen, dialog_box));
         bool dialog_box_present = is_grey(dialog_box_stats, 400, 1000);
 
-        if (top_arrow_found && paths_box_present) {
+        if (top_arrow_found && paths_box_present){
             
             if (save_path){
                 // List of bosses is full, stop the program
@@ -116,7 +182,7 @@ void run_entrance(
                 pbf_press_button(context, BUTTON_B, 160ms, 1000ms);
             }
             
-        } else if (bottom_arrow_found) {
+        }else if (bottom_arrow_found){
             
             if (save_path){
                 if (followed_path){
@@ -145,6 +211,7 @@ void run_entrance(
         
         pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
     }
+    #endif
 }
 
 
