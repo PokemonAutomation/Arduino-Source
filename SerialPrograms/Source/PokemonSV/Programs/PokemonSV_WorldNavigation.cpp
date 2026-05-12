@@ -420,6 +420,17 @@ void move_cursor_to_position_offset_from_flypoint(const ProgramInfo& info, Video
         const uint16_t push_time_ticks = std::max(uint16_t(magnitude * scale + 0.5), uint16_t(3));
         Milliseconds push_time = push_time_ticks * 8ms;
         pbf_move_left_joystick(context, {move_x, move_y}, push_time, 240ms);
+        if (closest_dist2 > 100 && i > 4){ 
+            // add a wait for the case where the cursor is bouncing between a snap point and the desired location.
+            // the wait allows the true distance to be calculated. Without the wait, you could end up capturing a transitional moment 
+            // where the cursor is falling towards the snap point, therefore causing the calculated distance to be 
+            // less than expected, leading to the push being weaker than needed, which could perpetuate the issue
+            // as the push may not be strong enough to escape the gravity of a snap point.
+            // e.g. when caught in the gravity of a snap point, sqrt(closest_dist2) could be 45-50. But if you wait to let the 
+            // distance settle, the true sqrt(closest_dist2) could be 68.
+            // we only add the wait if closest_dist2 is large, so that we don't reduce the efficiency of small adjustments
+            pbf_wait(context, 500ms);
+        }
         context.wait_for_all_requests();
     }
 

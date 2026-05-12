@@ -86,14 +86,15 @@ void wait_with_teachy_tv(ProControllerContext& context, uint64_t TEACHY_DELAY){
     pbf_press_button(context, BUTTON_A, 200ms, 2300ms);
     pbf_move_left_joystick(context, {+1, 0}, 200ms, 2300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 300ms);
-    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(TEACHY_DELAY));
+    pbf_press_button(context, BUTTON_A, 200ms, 367ms); // the "static fuzz" that adds RNG advances doesn't kick in right away
+    pbf_wait(context, std::chrono::milliseconds(TEACHY_DELAY));
     // close teachy tv -> close bag -> reset start menu cursor position - > close start menu
     pbf_press_button(context, BUTTON_B, 200ms, 2300ms);
     pbf_press_button(context, BUTTON_B, 200ms, 2300ms);
     pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
     pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
     pbf_press_button(context, BUTTON_B, 200ms, 300ms);
-    // total non-teachy delay duration: 13700ms
+    // total non-teachy delay duration: 14067ms
 }
 
 
@@ -384,10 +385,10 @@ void check_timings(
             console
         );
     }
-    if (SEED_DELAY < 29500){
+    if (SEED_DELAY < 30000){
         OperationFailedException::fire(
             ErrorReport::NO_ERROR_REPORT,
-            "The title screen delay cannot be less than 29.5s. Check your seed calibration.",
+            "The title screen delay cannot be less than 30s. Check your seed delay and calibration.",
             console
         );
     }
@@ -397,7 +398,7 @@ void check_timings(
         if (INGAME_DELAY < 7500){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Starters: the in-game delay cannot be less than 7500ms (900 advances). Check your in-game advances and calibration.",
+                "Starters: the in-game delay cannot be less than 7500ms (740 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
@@ -406,7 +407,7 @@ void check_timings(
         if (INGAME_DELAY < 7500){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Magikarp: the in-game delay cannot be less than 7500ms (900 advances). Check your in-game advances and calibration.",
+                "Magikarp: the in-game delay cannot be less than 7500ms (740 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
@@ -417,7 +418,7 @@ void check_timings(
         if (INGAME_DELAY < 4500){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Hitmonchan/Hitmonlee: the in-game delay cannot be less than 4500ms (540 advances). Check your in-game advances and calibration.",
+                "Hitmonchan/Hitmonlee: the in-game delay cannot be less than 4500ms (380 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
@@ -426,7 +427,7 @@ void check_timings(
         if (INGAME_DELAY < 4000){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Eevee: the in-game delay cannot be less than 4000ms (480 advances). Check your in-game advances and calibration.",
+                "Eevee: the in-game delay cannot be less than 4000ms (320 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
@@ -435,7 +436,7 @@ void check_timings(
         if (INGAME_DELAY < 7500){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Lapras: the in-game delay cannot be less than 7500ms (900 advances). Check your in-game advances and calibration.",
+                "Lapras: the in-game delay cannot be less than 7500ms (740 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
@@ -447,7 +448,7 @@ void check_timings(
         if (INGAME_DELAY < 6000){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Fossils: the in-game delay cannot be less than 6000ms (720 advances). Check your in-game advances and calibration.",
+                "Fossils: the in-game delay cannot be less than 6000ms (560 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
@@ -462,7 +463,7 @@ void check_timings(
         if (INGAME_DELAY < 8500){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Game Corner: the in-game delay cannot be less than 8500ms (1020 advances). Check your in-game advances and calibration.",
+                "Game Corner: the in-game delay cannot be less than 8500ms (860 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
@@ -471,7 +472,7 @@ void check_timings(
         if (INGAME_DELAY < 12000) {
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Togepi: the in-game delay cannot be less than 12000ms (1440 advances). Check your in-game advances and calibration.",
+                "Togepi: the in-game delay cannot be less than 12000ms (1280 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
@@ -480,7 +481,7 @@ void check_timings(
         if (INGAME_DELAY < 5000){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Static Encounter: the in-game delay cannot be less than 5000ms (600 advances). Check your in-game advances and calibration.",
+                "Static Encounter: the in-game delay cannot be less than 5000ms (440 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
@@ -489,7 +490,7 @@ void check_timings(
         if (INGAME_DELAY < 16000){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Snorlax: the in-game delay cannot be less than 16000ms (1920 advances). Check your in-game advances and calibration.",
+                "Snorlax: the in-game delay cannot be less than 16000ms (1760 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
@@ -498,7 +499,7 @@ void check_timings(
         if (INGAME_DELAY < 4500){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Mewtwo: the in-game delay cannot be less than 4500ms (540 advances). Check your in-game advances and calibration.",
+                "Mewtwo: the in-game delay cannot be less than 4500ms (380 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
@@ -507,7 +508,7 @@ void check_timings(
         if (INGAME_DELAY < 4000){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Ho-oh: the in-game delay cannot be less than 4000ms (480 advances). Check your in-game advances and calibration.",
+                "Ho-oh: the in-game delay cannot be less than 4000ms (320 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
@@ -516,7 +517,7 @@ void check_timings(
         if (INGAME_DELAY < 13000){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Hypno: the in-game delay cannot be less than 13000ms (1560 advances). Check your in-game advances and calibration.",
+                "Hypno: the in-game delay cannot be less than 13000ms (1400 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
@@ -525,13 +526,13 @@ void check_timings(
         if (!SAFARI_ZONE && INGAME_DELAY < 8500){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Sweet Scent: the in-game delay cannot be less than 8500ms (1020 advances). Check your in-game advances and calibration.",
+                "Sweet Scent: the in-game delay cannot be less than 8500ms (1372 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }else if (SAFARI_ZONE && INGAME_DELAY < 9500){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Sweet Scent: the in-game delay cannot be less than 9500ms (1140 advances). Check your in-game advances and calibration.",
+                "Sweet Scent: the in-game delay cannot be less than 9500ms (1492 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
@@ -540,7 +541,7 @@ void check_timings(
         if (INGAME_DELAY < 6500){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Rock Smash: the in-game delay cannot be less than 7000ms (840 advances). Check your in-game advances and calibration.",
+                "Rock Smash: the in-game delay cannot be less than 7000ms (1192 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
@@ -548,61 +549,61 @@ void check_timings(
         if (INGAME_DELAY < 5500){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Fishing: the in-game delay cannot be less than 5500ms (660 advances). Check your in-game advances and calibration.",
+                "Fishing: the in-game delay cannot be less than 5500ms (500 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
         return;
     case PokemonFRLG_RngTarget::safarizonecenter:
-        if (INGAME_DELAY < 30500){
+        if (INGAME_DELAY < 39000){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Safari Zone Center: in-game delay cannot be less than 30500ms (3660 advances). Check your in-game advances and calibration.",
+                "Safari Zone Center: in-game delay cannot be less than 39000ms (5032 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
         return;
     case PokemonFRLG_RngTarget::safarizoneeast:
-        if (INGAME_DELAY < 36500){
+        if (INGAME_DELAY < 45000){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Safari Zone East: in-game delay cannot be less than 36500ms (4380 advances). Check your in-game advances and calibration.",
+                "Safari Zone East: in-game delay cannot be less than 45000ms (5752 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
         return;
     case PokemonFRLG_RngTarget::safarizonenorth:
-        if (INGAME_DELAY < 47500){
+        if (INGAME_DELAY < 46000){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Safari Zone North: in-game delay cannot be less than 47500ms (5700 advances). Check your in-game advances and calibration.",
+                "Safari Zone North: in-game delay cannot be less than 46000ms (5872 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
         return;
     case PokemonFRLG_RngTarget::safarizonewest:
-        if (INGAME_DELAY < 61500){
+        if (INGAME_DELAY < 60000){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Safari Zone West: in-game delay cannot be less than 52000ms (7380 advances). Check your in-game advances and calibration.",
+                "Safari Zone West: in-game delay cannot be less than 60000ms (7552 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
         return;
     case PokemonFRLG_RngTarget::safarizonesurf:
-        if (INGAME_DELAY < 40500){
+        if (INGAME_DELAY < 46000){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Safari Zone Surfing: in-game delay cannot be less than 40500ms (4860 advances). Check your in-game advances and calibration.",
+                "Safari Zone Surfing: in-game delay cannot be less than 46000ms (5872 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }
         return;
     case PokemonFRLG_RngTarget::safarizonefish:
-        if (INGAME_DELAY < 30000){
+        if (INGAME_DELAY < 35000){
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
-                "Safari Zone Fishing: in-game delay cannot be less than 30000ms (3600 advances). Check your in-game advances and calibration.",
+                "Safari Zone Fishing: in-game delay cannot be less than 35000ms (4040 advances). Check your in-game advances and calibration or pick a new target.",
                 console
             );
         }

@@ -35,7 +35,6 @@ void rng_reset_and_return_home(
     go_home(console, context);
     close_game_from_home(console, context);
 
-    // console specific delays between opening the game and returning to the Home screen
     Milliseconds launch_delay = 950ms;
 
     bool update_popup = false;
@@ -53,6 +52,7 @@ void rng_reset_and_return_home(
         HomeMenuWatcher home(console, std::chrono::milliseconds(2000));
         UpdateMenuWatcher update_menu(console, COLOR_PURPLE);
         CheckOnlineWatcher check_online(COLOR_CYAN);
+        BlackScreenWatcher black_screen(COLOR_BLUE, {0.1, 0.15, 0.8, 0.7});
 
         // first, get to the user select screen
         context.wait_for_all_requests();
@@ -64,6 +64,7 @@ void rng_reset_and_return_home(
                 home,
                 update_menu,
                 check_online,
+                black_screen
             }
         );
 
@@ -90,6 +91,11 @@ void rng_reset_and_return_home(
             context.wait_for(std::chrono::seconds(1));
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             continue;
+        case 4: 
+            console.log("Detected black screen (no user selection screen). Closing game...");
+            go_home(console, context);
+            close_game_from_home(console, context);
+            break;
         default:
             console.log("rng_start_game_and_return_home(): No recognizable state after 30 seconds.", COLOR_RED);
             pbf_press_button(context, BUTTON_HOME, 160ms, 840ms);
@@ -99,6 +105,7 @@ void rng_reset_and_return_home(
         context.wait_for_all_requests();
 
         // By this point, the user selection menu is open with the desired profile selected, and the game hasn't yet been started.
+        // OR the Switch only has one user, so the game will open directly from the Home screen
         // Everything up to this point has not been time-sensitive.
         // Waiting for all requests and using inference should be avoided for any button presses that happen *while the game is open*, 
         // but we can make sure we've gotten back to the home screen and pause there
@@ -115,7 +122,6 @@ void rng_reset_and_return_home(
             // make sure a black screen appeared as a result of the button presses
             // if a popup appears, flag that it happened even if it gets closed by the home button press
             // Not sure how to handle the online check, so leaving it out for now
-            BlackScreenWatcher black_screen(COLOR_BLUE, {0.1, 0.15, 0.8, 0.7});
             int ret3 = wait_until(
                 console, context,
                 std::chrono::seconds(2 + (update_popup ? 1 : 0)),
