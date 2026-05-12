@@ -118,7 +118,8 @@ RngHelper::RngHelper()
     )
     , SEED_DELAY(
         "<b>Seed Delay Time (ms):</b><br>"
-        "The delay between starting the game and advancing past the title screen. Set this to match your target seed.",
+        "The delay between starting the game and advancing past the title screen. Set this to match your target seed.<br>"
+        "<i>If using Ten Lines for seed info, select <b>Nintendo Switch 1</b> as your console even if using a Switch 2.</i>",
         LockMode::LOCK_WHILE_RUNNING,
         35000, 30400 // default, min
     )
