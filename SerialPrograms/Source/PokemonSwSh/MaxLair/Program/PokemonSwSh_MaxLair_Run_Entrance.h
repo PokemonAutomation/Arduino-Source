@@ -22,7 +22,7 @@ void run_entrance(
     AdventureRuntime& runtime,
     ProgramEnvironment& env, size_t console_index,
     VideoStream& stream, ProControllerContext& context,
-    bool save_path,
+    bool followed_path,
     GlobalStateTracker& state_tracker
 );
 
