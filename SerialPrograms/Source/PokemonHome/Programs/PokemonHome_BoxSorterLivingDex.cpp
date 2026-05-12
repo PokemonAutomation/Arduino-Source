@@ -381,6 +381,28 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
     BoxCursor nav_cursor((LIVING_DEX_START_BOX - 1), 0, 0);
 
     size_t living_dex_box_count = (size_t)std::ceil((double)living_dex_order.size() / 30);
+    size_t living_dex_end = LIVING_DEX_START_BOX + living_dex_box_count - 1;
+
+    if (REJECT_BOX_START > REJECT_BOX_END){
+        throw UserSetupError(
+            env.logger(),
+            "ERROR: Reject box range is invalid, please ensure start is less than or equal to end."
+        );
+    }
+
+    if (living_dex_end > MAX_HOME_BOXES){
+        throw UserSetupError(
+            env.logger(),
+            "ERROR: Living dex boxes exceed max box count, please adjust box settings."
+        );
+    }
+
+    if (LIVING_DEX_START_BOX <= REJECT_BOX_END && REJECT_BOX_START <= living_dex_end){
+        throw UserSetupError(
+            env.logger(),
+            "ERROR: Living dex boxes overlap with reject boxes, please adjust box settings."
+        );
+    }
 
     nav_cursor = populate_box_data(env, context, sort_preferences, living_dex_boxes_data, living_dex_box_count, nav_cursor, OT_NAME_LANGUAGE);
 
