@@ -182,7 +182,7 @@ WildRng::WildRng()
     , ADVANCES(
         "<b>Advances:</b><br>The total number of RNG advances for your target.",
         LockMode::LOCK_WHILE_RUNNING,
-        10000, 600, 1000000000 // default, min
+        10000, 700, 1000000000 // default, min
     )
     // , CONTINUE_SCREEN_FRAMES(
     //     "<b>Continue Screen Frames:</b><br>The number of RNG advances to pass on the continue screen.<br>This should be less than the total number of advances above.",
@@ -250,7 +250,13 @@ bool WildRng::have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_
     return (hit.seed == TARGET_SEED) && (hit.advance == ADVANCES);
 }
 
-bool WildRng::auto_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context, WildRng_Descriptor::Stats& stats, const uint64_t& MAX_BALL_THROWS){
+bool WildRng::auto_catch(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    WildRng_Descriptor::Stats& stats, 
+    const uint64_t& MAX_BALL_THROWS,
+    bool safari_zone
+){
     for (uint64_t i=0; i<=MAX_BALL_THROWS; i++){
         int count = 0;
         while(true){
@@ -330,36 +336,38 @@ bool WildRng::auto_catch(SingleSwitchProgramEnvironment& env, ProControllerConte
 
         if (i == MAX_BALL_THROWS) { break; }
 
-        // select BAG (selection arrow does not wrap around)
-        pbf_move_left_joystick(context, {+1, 0}, 100ms, 150ms);
-        pbf_move_left_joystick(context, {0, +1}, 100ms, 150ms);
-        pbf_move_left_joystick(context, {+1, 0}, 100ms, 150ms);
-        pbf_move_left_joystick(context, {0, +1}, 100ms, 150ms);
+        if (!safari_zone){
+            // select BAG (selection arrow does not wrap around)
+            pbf_move_left_joystick(context, {+1, 0}, 100ms, 150ms);
+            pbf_move_left_joystick(context, {0, +1}, 100ms, 150ms);
+            pbf_move_left_joystick(context, {+1, 0}, 100ms, 150ms);
+            pbf_move_left_joystick(context, {0, +1}, 100ms, 150ms);
 
-        BagWatcher bag_open(COLOR_RED);
-        int ret2 = run_until<ProControllerContext>(
-            env.console, context,
-            [](ProControllerContext& context) {
-                for (int i=0; i<5; i++){
-                    pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
-                }
-            },
-            { bag_open }
-        );
-        if (ret2 < 0){
-            send_program_recoverable_error_notification(
-                env, NOTIFICATION_ERROR_RECOVERABLE,
-                "auto_catch(): failed to open bag."
-            ); 
-            stats.errors++;
-            return true;
-        }
+            BagWatcher bag_open(COLOR_RED);
+            int ret2 = run_until<ProControllerContext>(
+                env.console, context,
+                [](ProControllerContext& context) {
+                    for (int i=0; i<5; i++){
+                        pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+                    }
+                },
+                { bag_open }
+            );
+            if (ret2 < 0){
+                send_program_recoverable_error_notification(
+                    env, NOTIFICATION_ERROR_RECOVERABLE,
+                    "auto_catch(): failed to open bag."
+                ); 
+                stats.errors++;
+                return true;
+            }
 
-        if (i == 0){
-            // go to balls pocket (pockets do not wrap around, topmost item will already be selected)
-            pbf_move_left_joystick(context, {+1, 0}, 200ms, 800ms);
-            pbf_move_left_joystick(context, {+1, 0}, 200ms, 800ms);
-            pbf_move_left_joystick(context, {+1, 0}, 200ms, 800ms);
+            if (i == 0){
+                // go to balls pocket (pockets do not wrap around, topmost item will already be selected)
+                pbf_move_left_joystick(context, {+1, 0}, 200ms, 800ms);
+                pbf_move_left_joystick(context, {+1, 0}, 200ms, 800ms);
+                pbf_move_left_joystick(context, {+1, 0}, 200ms, 800ms);
+            }
         }
 
         // use ball
@@ -370,9 +378,14 @@ bool WildRng::auto_catch(SingleSwitchProgramEnvironment& env, ProControllerConte
     return true;
 }
 
-AdvObservedPokemon WildRng::read_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::set<std::string>& SPECIES_LIST){
+AdvObservedPokemon WildRng::read_summary(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    const std::set<std::string>& SPECIES_LIST, 
+    bool safari_zone
+){
     // navigate to the summary page of the last occupied (not necessarily 6th) party slot
-    open_party_menu_from_overworld(env.console, context);
+    open_party_menu_from_overworld(env.console, context, safari_zone ? StartMenuContext::SAFARI_ZONE : StartMenuContext::STANDARD);
     pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
     pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
 
@@ -472,11 +485,12 @@ bool WildRng::use_rare_candy(
     AdvObservedPokemon& pokemon,
     AdvRngFilters& filters,
     const BaseStats& BASE_STATS,
+    bool safari_zone,
     bool first
 ){
     // navigate to the bag (only needed for the first use)
     if (first){
-        open_bag_from_overworld(env.console, context);
+        open_bag_from_overworld(env.console, context, safari_zone ? PokemonFRLG::StartMenuContext::SAFARI_ZONE : PokemonFRLG::StartMenuContext::STANDARD);
         // move left to the correct pocket (in case Teachy TV was used)
         pbf_move_left_joystick(context, {-1, 0}, 200ms, 800ms);
         pbf_move_left_joystick(context, {-1, 0}, 200ms, 800ms);
@@ -706,7 +720,9 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
     uint64_t CONTINUE_SCREEN_FRAMES = 200;
 
-    const int64_t FIXED_SEED_OFFSET = -845; // milliseconds. approximate;
+    const int64_t FIXED_SEED_OFFSET = -845; // milliseconds, approximate
+    const int64_t FIXED_ADVANCES_OFFSET = -352; // frames, approximate
+
     double SEED_CALIBRATION_FRAMES = RNG_CALIBRATION.seed_calibration / FRAME_DURATION;
     double ADVANCES_CALIBRATION = RNG_CALIBRATION.advances_calibration;
     double CONTINUE_SCREEN_ADJUSTMENT = RNG_CALIBRATION.csf_calibration;    
@@ -791,13 +807,15 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         double seed_bump = SEED_BUMPS[ADVANCE_HISTORY.results.size() % 5];
         SEED_CALIBRATION_FRAMES += seed_bump;
 
-        double CALIBRATED_ADVANCES = ADVANCES + ADVANCES_CALIBRATION;
+        double CALIBRATED_ADVANCES = ADVANCES + ADVANCES_CALIBRATION + FIXED_ADVANCES_OFFSET;
         double INGAME_ADVANCES = CALIBRATED_ADVANCES - CONTINUE_SCREEN_FRAMES - CONTINUE_SCREEN_ADJUSTMENT;
 
+        uint64_t TEACHY_TV_BUFFER = safari_zone ? 20000 : 10000; // Safari zone targets need extra time to walk to the right position
+
         double TEACHY_ADVANCES = 0;
-        bool should_use_teachy_tv = USE_TEACHY_TV && (INGAME_ADVANCES > 5000); // don't use Teachy TV for short in-game advance targets
+        bool should_use_teachy_tv = USE_TEACHY_TV && (INGAME_ADVANCES > TEACHY_TV_BUFFER); // don't use Teachy TV for short in-game advance targets
         if (should_use_teachy_tv) {
-            TEACHY_ADVANCES = std::floor((INGAME_ADVANCES - 5000) / 313) * 313;
+            TEACHY_ADVANCES = std::floor((INGAME_ADVANCES - TEACHY_TV_BUFFER + 7500) / 313) * 313;
         }
 
         env.log("Seed calibration (frames): " + std::to_string(SEED_CALIBRATION_FRAMES));
@@ -807,7 +825,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         uint64_t CALIBRATED_SEED_DELAY = uint64_t(std::round(SEED_DELAY + FIXED_SEED_OFFSET + FRAME_DURATION * SEED_CALIBRATION_FRAMES));
         uint64_t CONTINUE_SCREEN_DELAY =  uint64_t(std::round(FRAME_DURATION * (CONTINUE_SCREEN_FRAMES + CONTINUE_SCREEN_ADJUSTMENT)));
         uint64_t TEACHY_DELAY = uint64_t(TEACHY_ADVANCES * FRAME_DURATION / 313);
-        uint64_t INGAME_DELAY = uint64_t(std::round(FRAME_DURATION * (INGAME_ADVANCES - TEACHY_ADVANCES) / 2)) - (should_use_teachy_tv ? 13700 : 0);
+        uint64_t INGAME_DELAY = uint64_t(std::round(FRAME_DURATION * (INGAME_ADVANCES - TEACHY_ADVANCES) / 2)) - (should_use_teachy_tv ? 14067 : 0);
 
         env.log("Title screen duration: " + std::to_string(CALIBRATED_SEED_DELAY) + "ms");
         env.log("Continue screen duration: " + std::to_string(CONTINUE_SCREEN_DELAY) + "ms");
@@ -817,6 +835,8 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         }else{
             env.log("In-game duration: " + std::to_string(INGAME_DELAY) + "ms");
         }
+
+        check_timings(env.console, TARGET, CALIBRATED_SEED_DELAY, CONTINUE_SCREEN_DELAY, INGAME_DELAY, safari_zone); 
 
         env.log("Resetting Game...");
         reset_and_perform_blind_sequence(
@@ -863,14 +883,21 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             break;
         }
 
-        bool failed = auto_catch(env, context, stats, MAX_BALL_THROWS);
+        bool failed = auto_catch(env, context, stats, MAX_BALL_THROWS, safari_zone);
         if (failed){
             env.log("Failed catch.");
             continue;
         }
 
-        AdvObservedPokemon pokemon = read_summary(env, context, SPECIES_LIST);
-        RngStats species_stats = stats_data.get_throw(pokemon.species);
+        AdvObservedPokemon pokemon = read_summary(env, context, SPECIES_LIST, safari_zone);
+        RngStats species_stats;
+        try{
+            species_stats = stats_data.get_throw(pokemon.species);        
+        }catch (const InternalProgramError& err){
+            env.log(err.message());
+            env.log("Failed to load base stats.");
+            continue;
+        }
         BaseStats BASE_STATS = species_stats.base_stats;
         int16_t GENDER_THRESHOLD = species_stats.gender_threshold;
 
@@ -897,7 +924,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         }
 
         for (uint64_t i=0; i<MAX_RARE_CANDIES; i++){
-            failed = use_rare_candy(env, context, stats, pokemon, filters, BASE_STATS, i == 0);
+            failed = use_rare_candy(env, context, stats, pokemon, filters, BASE_STATS, safari_zone, i == 0);
 
             search_hits = get_wild_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD, SUPER_ROD);
             RNG_CALIBRATION.set(
