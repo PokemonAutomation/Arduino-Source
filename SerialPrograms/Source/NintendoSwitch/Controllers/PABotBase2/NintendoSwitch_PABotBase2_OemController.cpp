@@ -576,12 +576,7 @@ void PABotBase2_OemController::update_status(Cancellable& cancellable){
     case PABB_CID_NintendoSwitch_WirelessRightJoycon:
         break;
     default:
-        WriteSpinLock lg(m_error_lock);
-        if (m_error_string.empty()){
-            m_connection.set_status_line1("");
-        }else{
-            m_connection.set_status_line1(m_error_string, COLOR_RED);
-        }
+        m_connection.set_status_line1("");
         return;
     }
 
