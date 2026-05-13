@@ -49,6 +49,7 @@ public:
 private:
     Color m_color;
     ImageFloatBox m_box_name;
+    ImageFloatBox m_box_name_jpn;
     // ImageFloatBox m_box_level;
 };
 

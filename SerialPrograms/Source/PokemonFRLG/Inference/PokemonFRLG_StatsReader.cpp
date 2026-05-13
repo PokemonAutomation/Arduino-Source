@@ -85,26 +85,38 @@ void StatsReader::read_page1(
 
 
     const bool jpn = language == Language::Japanese;
-    // Read Name (white text on lilac background).
-    // Use multifiltered OCR across multiple narrow white bands. This tolerates
-    // brightness shifts (down to ~0xc0) while still preferring cleaner bands.
+
+    ImageViewRGB32 name_box = extract_box_reference(game_screen, jpn ? m_box_name_jpn : m_box_name);
+
+    // remove shadow
+    ImageRGB32 name_filtered = filter_rgb32_range(
+        name_box, 0xff000000, 0xffc7c7c7, Color(0xffc3c3c3), true
+    );
+    // make text black
+    name_filtered = filter_rgb32_range(
+        name_filtered, 0xffc8c8c8, 0xffffffff, Color(0xff000000), true
+    );
+
+    ImageRGB32 name_ready = preprocess_for_ocr(
+        name_filtered, "name", 7, 2, true, 
+        combine_rgb(0, 0, 0), jpn ? combine_rgb(160, 160, 160) : combine_rgb(120, 120, 120)
+    );
+
     const std::vector<OCR::TextColorRange> name_text_color_ranges{
-        {combine_rgb(224, 224, 224), combine_rgb(255, 255, 255)},
-        {combine_rgb(208, 208, 208), combine_rgb(255, 255, 255)},
-        {combine_rgb(192, 192, 192), combine_rgb(255, 255, 255)},
+        {combine_rgb(0, 0, 0), combine_rgb(120, 120, 120)}
     };
 
     if (subset.size() > 0){
         auto name_result = Pokemon::PokemonNameReader(subset).read_substring(
-                logger, language, extract_box_reference(game_screen, jpn ? m_box_name_jpn : m_box_name),
-                name_text_color_ranges);
+                logger, language, name_ready, name_text_color_ranges
+        );
         if (!name_result.results.empty()){
             stats.name = name_result.results.begin()->second.token;
         }
     }else{
         auto name_result = Pokemon::PokemonNameReader::instance().read_substring(
-                logger, language, extract_box_reference(game_screen, jpn ? m_box_name_jpn : m_box_name),
-                name_text_color_ranges);
+                logger, language, name_ready, name_text_color_ranges
+        );
         if (!name_result.results.empty()){
             stats.name = name_result.results.begin()->second.token;
         }
