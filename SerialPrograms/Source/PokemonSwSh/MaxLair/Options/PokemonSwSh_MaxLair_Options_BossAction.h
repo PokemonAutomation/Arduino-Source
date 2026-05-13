@@ -7,6 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Options_BossAction_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Options_BossAction_H
 
+#include <vector>
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/StaticTableOption.h"
 #include "CommonFramework/Options/LabelCellOption.h"
@@ -24,19 +26,21 @@ enum class BossAction{
 };
 
 
-class BossActionRow : public StaticTableRow{
+class BossActionRow : public StaticTableRow, private ConfigOption::Listener{
 public:
     BossActionRow(std::string slug, const std::string& name_slug, const std::string& sprite_slug);
+    virtual void on_config_value_changed(void* object) override;
 
     LabelCellOption pokemon;
     EnumDropdownCell<BossAction> action;
     PokemonBallSelectCell ball;
+    BooleanCheckBoxCell save_on_the_go;
 };
 
 class BossActionTable : public StaticTableOption{
 public:
     BossActionTable();
-    virtual std::vector<std::string> make_header() const;
+    virtual std::vector<std::string> make_header() const override;
 };
 
 

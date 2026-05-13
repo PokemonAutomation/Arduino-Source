@@ -4,10 +4,13 @@
  *
  */
 
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonTools/Images/SolidColorTest.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonSwSh_MaxLair_Run_Entrance.h"
 
 namespace PokemonAutomation{
@@ -20,7 +23,7 @@ void run_entrance(
     AdventureRuntime& runtime,
     ProgramEnvironment& env, size_t console_index,
     VideoStream& stream, ProControllerContext& context,
-    bool save_path,
+    bool followed_path,
     GlobalStateTracker& state_tracker
 ){
     GlobalState& state = state_tracker[console_index];
@@ -36,22 +39,82 @@ void run_entrance(
         }
     }
 
+    context.wait_for(1000ms);
 
-    OverlayBoxScope box(stream.overlay(), {0.782, 0.850, 0.030, 0.050});
-
-    pbf_wait(context, 2000ms);
-    while (true){
-        if (save_path){
-            pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
-        }else{
-            pbf_press_button(context, BUTTON_B, 160ms, 1000ms);
+    // Get the boss slug
+    std::string boss_slug;
+    if (runtime.host_index < runtime.console_settings.active_consoles()){
+        boss_slug = state_tracker.infer_actual_state(runtime.host_index).boss;
+    };
+    
+    bool save_path = false;
+    
+    if (!followed_path){
+        // Check if the user checked the box to save the path when running the BossFinder program
+        
+        if (!boss_slug.empty()){
+            save_path = runtime.actions.is_in_save_list(boss_slug);
+            stream.log("Boss: " + boss_slug + ", should save: " + (save_path ? "Yes" : "No"), COLOR_BLUE);
         }
-        context.wait_for_all_requests();
+    }else{
+        save_path = followed_path;
+    }
 
-        VideoSnapshot screen = stream.video().snapshot();
-        ImageStats stats = image_stats(extract_box_reference(screen, box));
-        if (!is_grey(stats, 400, 1000)){
-            break;
+
+    while (true){
+        WhiteDialogBoxWatcher dialog;
+        SelectionArrowFinder arrow(stream.overlay(), {0.462377, 0.332039, 0.388222, 0.640777});
+        YCommIconWatcher overworld;
+
+        context.wait_for_all_requests();
+        context.wait_for(100ms);
+
+        int ret = wait_until(
+            stream, context,
+            std::chrono::seconds(10),
+            {
+                dialog,
+                arrow,
+                overworld,
+            }
+        );
+        switch (ret){
+        case 0:
+            stream.log("Detected dialog menu.");
+            pbf_press_button(context, BUTTON_B, 80ms, 160ms);
+            continue;
+        case 1:{
+            stream.log("Detected arrow.");
+            if (!save_path){
+                pbf_press_button(context, BUTTON_B, 80ms, 160ms);
+                continue;
+            }
+            const std::vector<ImageFloatBox>& arrows = arrow.last_detection();
+            if (arrows.empty()){
+                continue;
+            }
+            if (arrows[0].y > 0.56){
+                pbf_press_button(context, BUTTON_A, 80ms, 160ms);
+                continue;
+            }
+
+            // List of bosses is full, stop the program
+            stream.log("Cannot save path – saved list is full. Stopping program.", COLOR_RED);
+            OperationFailedException::fire(
+                ErrorReport::NO_ERROR_REPORT,
+                "Paths list is full. Program stopped.",
+                stream
+            );
+        }
+        case 2:
+            stream.log("Detected overworld.");
+            return;
+        default:
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT,
+                "No recognized state after 10 seconds.",
+                stream
+            );
         }
     }
 }
