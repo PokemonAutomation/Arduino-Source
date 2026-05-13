@@ -455,10 +455,10 @@ void check_timings(
         return;
     case PokemonFRLG_RngTarget::gamecornerabra:
     case PokemonFRLG_RngTarget::gamecornerclefairy:
-    case PokemonFRLG_RngTarget::gamecornerdratini:
+    case PokemonFRLG_RngTarget::gamecornerdratinifr:
+    case PokemonFRLG_RngTarget::gamecornerdratinilg:
     case PokemonFRLG_RngTarget::gamecornerscyther:
     case PokemonFRLG_RngTarget::gamecornerpinsir:
-    case PokemonFRLG_RngTarget::gamecornerbug:
     case PokemonFRLG_RngTarget::gamecornerporygon:
         if (INGAME_DELAY < 8500){
             OperationFailedException::fire(
@@ -667,12 +667,12 @@ void perform_blind_sequence(
     case PokemonFRLG_RngTarget::gamecornerclefairy:
         collect_gamecorner_after_delay(context, INGAME_DELAY, 1);
         return;
-    case PokemonFRLG_RngTarget::gamecornerdratini:
+    case PokemonFRLG_RngTarget::gamecornerdratinifr:
+    case PokemonFRLG_RngTarget::gamecornerpinsir:
         collect_gamecorner_after_delay(context, INGAME_DELAY, 2);
         return;
     case PokemonFRLG_RngTarget::gamecornerscyther:
-    case PokemonFRLG_RngTarget::gamecornerpinsir:
-    case PokemonFRLG_RngTarget::gamecornerbug:
+    case PokemonFRLG_RngTarget::gamecornerdratinilg:
         collect_gamecorner_after_delay(context, INGAME_DELAY, 3);
         return;
     case PokemonFRLG_RngTarget::gamecornerporygon:
