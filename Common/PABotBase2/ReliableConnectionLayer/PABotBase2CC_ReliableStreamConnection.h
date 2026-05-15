@@ -30,6 +30,7 @@ class ReliableStreamConnection final
     , private UnreliableStreamSender
     , private PacketRunner
     , private StreamListener
+    , private Cancellable::CancelListener
 {
 public:
     ReliableStreamConnection(
@@ -70,7 +71,7 @@ public:
     void send_request(uint8_t opcode);
 
     void send_stream(const void* data, size_t bytes){
-        reliable_send_all_or_nothing(data, bytes, WallDuration::max());
+        reliable_send_all_or_nothing(nullptr, data, bytes, WallDuration::max());
     }
 
 
@@ -95,11 +96,19 @@ private:
 
 private:
     virtual bool reliable_send_all_or_nothing(
+        Cancellable* cancellable,
         const void* data, size_t bytes,
         WallDuration timeout
     ) noexcept override;
     virtual void on_recv(const void* data, size_t bytes) override;
     virtual size_t unreliable_send(const void* data, size_t bytes) noexcept override;
+
+
+private:
+    virtual void on_cancellable_cancel(
+        Cancellable& cancellable,
+        std::exception_ptr reason
+    ) override;
 
 
 private:

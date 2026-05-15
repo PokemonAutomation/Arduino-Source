@@ -260,7 +260,12 @@ void DeviceHandle::send_request_with_no_response(MessageHeader& request){
     request.id = 0;
     std::unique_lock<Mutex> lg(m_lock);
     m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
-    m_connection.reliable_send_all_or_nothing(&request, request.message_bytes, WallDuration::max());
+    m_connection.reliable_send_all_or_nothing(
+        nullptr,
+        &request,
+        request.message_bytes,
+        WallDuration::max()
+    );
 }
 std::optional<uint8_t> DeviceHandle::try_send_request_with_no_response(
     MessageHeader& request, WallDuration timeout
@@ -268,7 +273,12 @@ std::optional<uint8_t> DeviceHandle::try_send_request_with_no_response(
     request.id = 0;
     std::unique_lock<Mutex> lg(m_lock);
     m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
-    return m_connection.reliable_send_all_or_nothing(&request, request.message_bytes, timeout);
+    return m_connection.reliable_send_all_or_nothing(
+        nullptr,
+        &request,
+        request.message_bytes,
+        timeout
+    );
 }
 uint8_t DeviceHandle::send_request_with_response(MessageHeader& request){
     std::unique_lock<Mutex> lg(m_lock);
@@ -292,7 +302,12 @@ uint8_t DeviceHandle::send_request_with_response(MessageHeader& request){
     m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
 
     try{
-        m_connection.reliable_send_all_or_nothing(&request, request.message_bytes, WallDuration::max());
+        m_connection.reliable_send_all_or_nothing(
+            nullptr,
+            &request,
+            request.message_bytes,
+            WallDuration::max()
+        );
     }catch (...){
         m_pending_requests.erase(request.id);
         m_request_seqnum--;
@@ -329,7 +344,12 @@ std::optional<uint8_t> DeviceHandle::try_send_request_with_response(
     m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
 
     try{
-        if (m_connection.reliable_send_all_or_nothing(&request, request.message_bytes, timeout)){
+        if (m_connection.reliable_send_all_or_nothing(
+            nullptr,
+            &request,
+            request.message_bytes,
+            timeout
+        )){
             return request.id;
         }
     }catch (...){

@@ -319,7 +319,12 @@ void PABotBase2_OemController::run_preconnect_configure(
 
     connection.message_logger().log_send(logger, true, &message.request);
 
-    connection.device().connection().reliable_send_all_or_nothing(&message, sizeof(Message), Milliseconds(100));
+    connection.device().connection().reliable_send_all_or_nothing(
+        nullptr,
+        &message,
+        sizeof(Message),
+        Milliseconds(100)
+    );
 }
 
 

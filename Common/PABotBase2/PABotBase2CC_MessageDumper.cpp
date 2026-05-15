@@ -156,7 +156,7 @@ std::string tostr(const PacketHeader* header){
             (const char*)(packet + 1),
             header->packet_bytes - sizeof(PacketHeader_u32) - sizeof(uint32_t)
         );
-        str += ": " + tostr_hex(packet->data);
+        str += ": 0x" + tostr_hex(packet->data);
         return str;
     }
     case PABB2_CONNECTION_OPCODE_INFO_LABEL_U32:{

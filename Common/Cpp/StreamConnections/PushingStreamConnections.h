@@ -13,6 +13,8 @@
 
 namespace PokemonAutomation{
 
+class Cancellable;
+
 
 class StreamConnectionPushing{
 public:
@@ -42,6 +44,7 @@ protected:
 class ReliableStreamConnectionPushing : public StreamConnectionPushing{
 public:
     virtual bool reliable_send_all_or_nothing(
+        Cancellable* cancellable,
         const void* data, size_t bytes,
         WallDuration timeout
     ) noexcept = 0;

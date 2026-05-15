@@ -95,6 +95,7 @@ bool ReliableStreamConnection::wait_for_pending(WallDuration timeout){
 //
 
 bool ReliableStreamConnection::reliable_send_all_or_nothing(
+    Cancellable* cancellable,
     const void* data, size_t bytes,
     WallDuration timeout
 ) noexcept{
@@ -106,6 +107,9 @@ bool ReliableStreamConnection::reliable_send_all_or_nothing(
     std::unique_lock<Mutex> lg(m_lock);
     do{
         throw_if_cancelled();
+        if (cancellable){
+            cancellable->throw_if_cancelled();
+        }
         if (m_reliable_sender.slots_used() >= m_remote_slot_capacity){
             m_cv.wait_until(lg, deadline);
             continue;
@@ -162,6 +166,14 @@ size_t ReliableStreamConnection::unreliable_send(const void* data, size_t bytes)
     }catch (...){}
 //    cout << "ReliableStreamConnection::unreliable_send() - before send" << endl;
     return m_unreliable_connection.unreliable_send(data, bytes);
+}
+
+void ReliableStreamConnection::on_cancellable_cancel(
+    Cancellable& cancellable,
+    std::exception_ptr reason
+){
+    std::lock_guard<Mutex> lg(m_lock);
+    m_cv.notify_all();
 }
 
 

@@ -118,6 +118,7 @@ uint8_t CommandQueueManager::send_command(Cancellable* cancellable, MessageHeade
 
             m_lock.unlock();
             bool sent = m_connection.reliable_send_all_or_nothing(
+                cancellable,
                 &command, command.message_bytes,
                 WallDuration::max()
             );
@@ -171,6 +172,7 @@ bool CommandQueueManager::try_push_pending_specials() noexcept{
 
     m_lock.unlock();
     bool sent = m_connection.reliable_send_all_or_nothing(
+        nullptr,
         &message, message.message_bytes,
         WallDuration::zero()
     );
