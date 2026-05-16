@@ -146,6 +146,13 @@ CramomaticRNG::CramomaticRNG()
         LockMode::LOCK_WHILE_RUNNING,
         "80 ms"
     )
+    , DIALOG_RELEASE_DURATION(
+        "<b>Dialog Release Duration:</b><br>"
+        "After releasing the button, wait this long before checking the dialog.<br>"
+        "<font color=\"red\">For tick-imprecise controllers, this number will be increased automatically.</font>",
+        LockMode::LOCK_WHILE_RUNNING,
+        "1840 ms"
+    )
     , SAVE_SCREENSHOTS(
         "<b>Save Debug Screenshots:</b>",
         LockMode::LOCK_WHILE_RUNNING,
@@ -174,6 +181,7 @@ CramomaticRNG::CramomaticRNG()
     PA_ADD_OPTION(MAX_UNKNOWN_ADVANCES);
     PA_ADD_OPTION(ADVANCE_PRESS_DURATION);
     PA_ADD_OPTION(ADVANCE_RELEASE_DURATION);
+    PA_ADD_OPTION(DIALOG_RELEASE_DURATION);
     PA_ADD_OPTION(SAVE_SCREENSHOTS);
     PA_ADD_OPTION(LOG_VALUES);
 }
@@ -348,7 +356,7 @@ std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvi
 
     while (presses < 30 && !arrow_detected){
         presses++;
-        pbf_press_button(context, BUTTON_B, 80ms, 1320ms);
+        pbf_press_button(context, BUTTON_B, 80ms, DIALOG_RELEASE_DURATION);
         context.wait_for_all_requests();
 
         VideoSnapshot screen = env.console.video().snapshot();

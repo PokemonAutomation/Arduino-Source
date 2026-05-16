@@ -89,7 +89,7 @@ OrbeetleAttackAnimationDetector::Detection OrbeetleAttackAnimationDetector::run(
         return Detection::SPECIAL;
     }
     if (save_screenshot){
-        animation_image->save("orbeetle-attack-physical-" + now_to_filestring() + ".png");
+        //animation_image->save("orbeetle-attack-physical-" + now_to_filestring() + ".png");
         dump_debug_image(m_stream.logger(), "rng", "orbeetle-physical", animation_image);
     }
     m_stream.log("Orbeetle Attack Animation: Physical animation detected.");
