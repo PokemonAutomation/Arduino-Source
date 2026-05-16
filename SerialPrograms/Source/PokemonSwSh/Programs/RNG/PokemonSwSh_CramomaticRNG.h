@@ -62,6 +62,7 @@ private:
     SimpleIntegerOption<uint16_t> MAX_UNKNOWN_ADVANCES;
     MillisecondsOption ADVANCE_PRESS_DURATION;
     MillisecondsOption ADVANCE_RELEASE_DURATION;
+    MillisecondsOption DIALOG_RELEASE_DURATION;
     BooleanCheckBoxOption SAVE_SCREENSHOTS;
     BooleanCheckBoxOption LOG_VALUES;
 
