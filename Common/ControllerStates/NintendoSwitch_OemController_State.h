@@ -84,6 +84,11 @@ typedef struct{
     uint8_t paired_mac_address[6];
 } pabb_NintendoSwitch_OemController_Status;
 
+typedef enum{
+    HOST_SHUTDOWN,
+    CONNECTION_REJECTED,
+} DisconnectReason;
+
 
 
 #ifdef __cplusplus
