@@ -152,9 +152,26 @@ PABotBase2_OemController::PABotBase2_OemController(
     connection.device().add_message_handler(
         PABB2_MESSAGE_OPCODE_CONSOLE_DISCONNECT,
         [this](const MessageHeader* header){
-//            const auto* message = (const Message_u32*)header;
+            if (header->message_bytes != sizeof(Message_u32)){
+                m_logger.log(
+                    "PABB2_MESSAGE_OPCODE_CONSOLE_DISCONNECT: **(invalid size = " + std::to_string(header->message_bytes) + ")**",
+                    COLOR_RED
+                );
+                return;
+            }
+            const auto* message = (const Message_u32*)header;
             WriteSpinLock lg(m_error_lock);
-            m_error_string = "Disconnected by console.";
+            switch ((DisconnectReason)message->data){
+            case DisconnectReason::HOST_SHUTDOWN:
+                m_error_string = "Console turned off.";
+                break;
+            case DisconnectReason::CONNECTION_REJECTED:
+                m_error_string = "Rejected by console. Please re-pair the controller.";
+                break;
+            default:
+                m_error_string = "Disconnected by console.";
+            }
+
         }
     );
     connection.device().add_message_handler(
