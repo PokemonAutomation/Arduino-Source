@@ -136,7 +136,7 @@ void StreamCoalescer::print(bool ascii) const{
     std::cout << "Stream Head:       " << m_stream_head << std::endl;
     std::cout << "Stream Tail:       " << m_stream_tail << std::endl;
     for (uint8_t seqnum = m_slot_head; seqnum != m_slot_tail; seqnum++){
-        uint8_t index = seqnum & SLOTS_MASK;
+        uint8_t index = seqnum & SLOT_MASK;
         uint8_t size = m_lengths[index];
         std::cout << "    [" << (int)seqnum << "]: ";
         if (size == 0){

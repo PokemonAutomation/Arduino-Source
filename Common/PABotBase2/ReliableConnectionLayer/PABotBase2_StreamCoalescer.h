@@ -14,8 +14,11 @@
 #else
 
 //  Must be power-of-two. (max 128)
-#ifndef PABB2_StreamCoalescer_SLOTS
-#define PABB2_StreamCoalescer_SLOTS         128
+#ifndef PABB2_StreamCoalescer_SLOT_CAPACITY
+#define PABB2_StreamCoalescer_SLOT_CAPACITY      128
+#endif
+#ifndef PABB2_StreamCoalescer_REORDER_WINDOW
+#define PABB2_StreamCoalescer_REORDER_WINDOW     PABB2_StreamCoalescer_SLOT_CAPACITY
 #endif
 
 //  Must be power-of-two, fits into uint16_t. (max 32768)
@@ -31,11 +34,13 @@ namespace PABotBase2{
 
 
 class StreamCoalescer{
-    static constexpr uint8_t SLOTS = PABB2_StreamCoalescer_SLOTS;
-    static constexpr uint8_t SLOTS_MASK = SLOTS - 1;
+    static constexpr uint8_t REORDER_WINDOW = PABB2_StreamCoalescer_REORDER_WINDOW;
+    static constexpr uint8_t SLOT_CAPACITY = PABB2_StreamCoalescer_SLOT_CAPACITY;
+    static constexpr uint8_t SLOT_MASK = SLOT_CAPACITY - 1;
     static constexpr uint16_t BUFFER_SIZE = PABB2_StreamCoalescer_BUFFER_SIZE;
     static constexpr uint16_t BUFFER_MASK = BUFFER_SIZE - 1;
-    static_assert((SLOTS & SLOTS_MASK) == 0, "Must be power-of-two.");
+    static_assert(REORDER_WINDOW <= SLOT_CAPACITY, "Reorder window cannot be larger than capacity.");
+    static_assert((SLOT_CAPACITY & SLOT_MASK) == 0, "Must be power-of-two.");
     static_assert((BUFFER_SIZE & BUFFER_MASK) == 0, "Must be power-of-two.");
 
 
@@ -101,10 +106,10 @@ public:
     //  0       =   Not received yet.
     //  0-254   =   Received stream packet. # is the size.
     //  255     =   Received non-stream packet.
-    uint8_t m_lengths[SLOTS];
+    uint8_t m_lengths[SLOT_CAPACITY];
 
     //  0xffff = non-stream packet
-    uint16_t m_end_offsets[SLOTS];
+    uint16_t m_end_offsets[SLOT_CAPACITY];
 
     uint8_t m_buffer[BUFFER_SIZE];
 };

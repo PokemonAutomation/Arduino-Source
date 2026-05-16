@@ -202,7 +202,7 @@ bool ReliableStreamConnectionFW::run_recv_events(const WallDuration& timeout){
         m_reliable_sender.send_oob_packet_u8(
             header->seqnum,
             PABB2_CONNECTION_OPCODE_RET_BUFFER_SLOTS,
-            PABB2_StreamCoalescer_SLOTS
+            PABB2_StreamCoalescer_REORDER_WINDOW
         );
         return true;
     case PABB2_CONNECTION_OPCODE_ASK_BUFFER_BYTES:

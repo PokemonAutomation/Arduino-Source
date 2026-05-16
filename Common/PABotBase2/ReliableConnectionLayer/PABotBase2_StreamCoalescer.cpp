@@ -86,7 +86,7 @@ void StreamCoalescer::advance_slot_head(){
 //    printf("pabb2_StreamCoalescer_pop_leading_finished()\n");
 
     while (m_slot_head != m_slot_tail){
-        uint8_t index = m_slot_head & SLOTS_MASK;
+        uint8_t index = m_slot_head & SLOT_MASK;
 //        printf("slot[%d] = %d\n", slot_head, *slot);
 
         //  Slot is a hole. Cannot continue.
@@ -122,20 +122,20 @@ void StreamCoalescer::push_packet(uint8_t seqnum){
 //    printf("pabb2_StreamCoalescer_push_packet(%p): seqnum = %d, slot_head = %d\n", self, seqnum, slot_head);
 
     //  Either before (old retransmit) or too far in future.
-    if ((uint8_t)(seqnum - slot_head) >= SLOTS){
+    if ((uint8_t)(seqnum - slot_head) >= REORDER_WINDOW){
 //        printf("Device: Packet is out of range.\n");
         return;
     }
 
     //  Extend the tail if needed.
     uint8_t slot_tail = m_slot_tail;
-    if ((uint8_t)(seqnum - slot_tail) < SLOTS){
+    if ((uint8_t)(seqnum - slot_tail) < REORDER_WINDOW){
         slot_tail = seqnum + 1;
         m_slot_tail = slot_tail;
     }
 
     //  Mark slot as done.
-    uint8_t index = seqnum & SLOTS_MASK;
+    uint8_t index = seqnum & SLOT_MASK;
     m_lengths[index] = 0xff;
 
     //  Pop all finished slots at the head of the queue.
@@ -175,7 +175,7 @@ bool StreamCoalescer::push_stream(const PacketHeaderData* packet){
     {
         uint8_t diff = seqnum - m_slot_head;
 //        printf("seqnum = %d, slot_head = %d\n", seqnum, slot_head);
-        if (diff >= SLOTS){
+        if (diff >= REORDER_WINDOW){
 //            printf("seqnum = %d, slot_head = %d\n", seqnum, slot_head);
 //            printf("Device: In the past or too far ahead.\n");
             //  Negative means we're in the past and we can just ack.
@@ -194,7 +194,7 @@ bool StreamCoalescer::push_stream(const PacketHeaderData* packet){
 
     //  Extend the tail if needed.
     uint8_t slot_tail = m_slot_tail;
-    if ((uint8_t)(seqnum - slot_tail) < SLOTS){
+    if ((uint8_t)(seqnum - slot_tail) < REORDER_WINDOW){
         slot_tail = seqnum + 1;
         m_slot_tail = slot_tail;
     }
@@ -204,7 +204,7 @@ bool StreamCoalescer::push_stream(const PacketHeaderData* packet){
         m_stream_tail = stream_tail;
     }
 
-    uint8_t index = seqnum & SLOTS_MASK;
+    uint8_t index = seqnum & SLOT_MASK;
     m_lengths[index] = stream_size;
     m_end_offsets[index] = stream_offset_e;
 
