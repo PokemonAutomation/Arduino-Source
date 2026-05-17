@@ -14,9 +14,9 @@
 #include "PABotBase2_Config.h"
 #else
 
-//  Must be power-of-two. (max 64)
-#ifndef PABB2_PacketSender_SLOTS
-#define PABB2_PacketSender_SLOTS                64
+//  Must be power-of-two. (max 128)
+#ifndef PABB2_PacketSender_SLOT_CAPACITY
+#define PABB2_PacketSender_SLOT_CAPACITY        128
 #endif
 
 //  Must fit into size_t.
@@ -30,6 +30,12 @@
 
 #endif
 
+
+#ifndef PABB2_PacketSender_REORDER_WINDOW
+#define PABB2_PacketSender_REORDER_WINDOW       PABB2_PacketSender_SLOT_CAPACITY
+#endif
+
+
 namespace PokemonAutomation{
 namespace PABotBase2{
 
@@ -37,9 +43,11 @@ namespace PABotBase2{
 
 
 class PacketSender{
-    static constexpr uint8_t SLOTS = PABB2_PacketSender_SLOTS;
-    static constexpr uint8_t SLOTS_MASK = SLOTS - 1;
-    static_assert((SLOTS & SLOTS_MASK) == 0, "Must be power-of-two.");
+    static constexpr uint8_t REORDER_WINDOW = PABB2_PacketSender_REORDER_WINDOW;
+    static constexpr uint8_t SLOT_CAPACITY = PABB2_PacketSender_SLOT_CAPACITY;
+    static constexpr uint8_t SLOT_MASK = SLOT_CAPACITY - 1;
+    static_assert((SLOT_CAPACITY & SLOT_MASK) == 0, "Must be power-of-two.");
+    static_assert(REORDER_WINDOW <= SLOT_CAPACITY, "Reorder window cannot be larger than capacity.");
 
 public:
     PacketSender(
@@ -193,7 +201,7 @@ private:
     size_t m_buffer_tail_uncommitted;
 
     //  These store the offsets within the buffer where the packet starts.
-    size_t m_offsets[SLOTS];
+    size_t m_offsets[SLOT_CAPACITY];
 
     uint8_t m_buffer[PABB2_PacketSender_BUFFER_SIZE];
 };

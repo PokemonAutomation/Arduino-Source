@@ -17,9 +17,6 @@
 #ifndef PABB2_StreamCoalescer_SLOT_CAPACITY
 #define PABB2_StreamCoalescer_SLOT_CAPACITY      128
 #endif
-#ifndef PABB2_StreamCoalescer_REORDER_WINDOW
-#define PABB2_StreamCoalescer_REORDER_WINDOW     PABB2_StreamCoalescer_SLOT_CAPACITY
-#endif
 
 //  Must be power-of-two, fits into uint16_t. (max 32768)
 #ifndef PABB2_StreamCoalescer_BUFFER_SIZE
@@ -27,6 +24,12 @@
 #endif
 
 #endif
+
+
+#ifndef PABB2_StreamCoalescer_REORDER_WINDOW
+#define PABB2_StreamCoalescer_REORDER_WINDOW     PABB2_StreamCoalescer_SLOT_CAPACITY
+#endif
+
 
 namespace PokemonAutomation{
 namespace PABotBase2{
@@ -39,9 +42,9 @@ class StreamCoalescer{
     static constexpr uint8_t SLOT_MASK = SLOT_CAPACITY - 1;
     static constexpr uint16_t BUFFER_SIZE = PABB2_StreamCoalescer_BUFFER_SIZE;
     static constexpr uint16_t BUFFER_MASK = BUFFER_SIZE - 1;
-    static_assert(REORDER_WINDOW <= SLOT_CAPACITY, "Reorder window cannot be larger than capacity.");
     static_assert((SLOT_CAPACITY & SLOT_MASK) == 0, "Must be power-of-two.");
     static_assert((BUFFER_SIZE & BUFFER_MASK) == 0, "Must be power-of-two.");
+    static_assert(REORDER_WINDOW <= SLOT_CAPACITY, "Reorder window cannot be larger than capacity.");
 
 
 public:

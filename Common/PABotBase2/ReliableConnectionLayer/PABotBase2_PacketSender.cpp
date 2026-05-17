@@ -152,18 +152,18 @@ bool PacketSender::remove(uint8_t seqnum){
 //    }
 
     //  Too far in the future.
-    if ((uint8_t)(seqnum - m_slot_head) >= SLOTS){
+    if ((uint8_t)(seqnum - m_slot_head) >= REORDER_WINDOW){
         return false;
     }
 
     //  Too far in the past.
-    if ((uint8_t)(m_slot_tail - seqnum) > SLOTS){
+    if ((uint8_t)(m_slot_tail - seqnum) > REORDER_WINDOW){
         return false;
     }
 
     //  Mark the slot has invalid.
     {
-        size_t offset = m_offsets[seqnum & SLOTS_MASK];
+        size_t offset = m_offsets[seqnum & SLOT_MASK];
         PacketHeader* packet = (PacketHeader*)(m_buffer + offset);
         packet->opcode = PABB2_CONNECTION_OPCODE_INVALID;
     }
@@ -185,7 +185,7 @@ bool PacketSender::remove(uint8_t seqnum){
             return true;
         }
 
-        size_t offset = m_offsets[seqnum & SLOTS_MASK];
+        size_t offset = m_offsets[seqnum & SLOT_MASK];
         m_buffer_head = offset;
 
         PacketHeader* packet = (PacketHeader*)(m_buffer + offset);
@@ -235,7 +235,7 @@ PacketHeader* PacketSender::reserve_packet(
 ){
     //  No slots available.
     uint8_t slots_used = m_slot_tail - m_slot_head;
-    if (slots_used == SLOTS){
+    if (slots_used == REORDER_WINDOW){
         return NULL;
     }
 
@@ -281,7 +281,7 @@ PacketHeader* PacketSender::reserve_packet(
     }
     m_buffer_tail = buffer_tail;
 
-    m_offsets[m_slot_tail & SLOTS_MASK] = offset;
+    m_offsets[m_slot_tail & SLOT_MASK] = offset;
 
     PacketHeader* ret = (PacketHeader*)(m_buffer + offset);
 
@@ -318,7 +318,7 @@ bool PacketSender::iterate_retransmits(){
     uint8_t seqnum = m_retransmit_seqnum;
 
     while (head != tail){
-        size_t offset = m_offsets[head & SLOTS_MASK];
+        size_t offset = m_offsets[head & SLOT_MASK];
         PacketHeader* packet = (PacketHeader*)(m_buffer + offset);
 
         //  Already acked.
@@ -381,7 +381,7 @@ bool PacketSender::enqueue_uncommitted_send_stream(const void* data, size_t byte
     while (bytes > 0){
         //  No slots available.
         uint8_t slots_used = m_slot_tail_uncommitted - m_slot_head;
-        if (slots_used == SLOTS){
+        if (slots_used == REORDER_WINDOW){
             break;
         }
 
@@ -436,7 +436,7 @@ bool PacketSender::enqueue_uncommitted_send_stream(const void* data, size_t byte
         }
 //        printf("self->buffer_tail: %zu\n", self->buffer_tail);
 
-        m_offsets[m_slot_tail_uncommitted & SLOTS_MASK] = offset;
+        m_offsets[m_slot_tail_uncommitted & SLOT_MASK] = offset;
 
         //  Build the packet header.
         PacketHeaderData* packet = (PacketHeaderData*)(m_buffer + offset);
@@ -474,7 +474,7 @@ void PacketSender::commit_uncommitted_send_stream() noexcept{
     m_stream_offset = m_stream_offset_uncommitted;
 
     while (m_slot_tail != m_slot_tail_uncommitted){
-        size_t offset = m_offsets[m_slot_tail++ & SLOTS_MASK];
+        size_t offset = m_offsets[m_slot_tail++ & SLOT_MASK];
         PacketHeader* packet = (PacketHeader*)(m_buffer + offset);
 
         //  Send

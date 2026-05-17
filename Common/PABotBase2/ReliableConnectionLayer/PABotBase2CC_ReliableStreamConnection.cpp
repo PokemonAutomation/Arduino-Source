@@ -38,8 +38,8 @@ ReliableStreamConnection::ReliableStreamConnection(
 //    , m_version_verified(false)
     , m_remote_protocol_compatible(false)
     , m_remote_protocol(0)
-    , m_remote_slot_capacity(1)
-    , m_remote_buffer_capacity(PABB2_PacketSender_BUFFER_SIZE)
+    , m_max_unacked_packets(1)
+    , m_max_unacked_bytes(PABB2_PacketSender_BUFFER_SIZE)
 {
     m_retransmit_thread = thread_pool.dispatch_now_blocking(
         [this]{ retransmit_thread(); }
@@ -110,7 +110,7 @@ bool ReliableStreamConnection::reliable_send_all_or_nothing(
         if (cancellable){
             cancellable->throw_if_cancelled();
         }
-        if (m_reliable_sender.slots_used() >= m_remote_slot_capacity){
+        if (m_reliable_sender.slots_used() >= m_max_unacked_packets){
             m_cv.wait_until(lg, deadline);
             continue;
         }
@@ -210,7 +210,7 @@ bool ReliableStreamConnection::try_send_request(uint8_t opcode){
     std::lock_guard<Mutex> lg(m_lock);
 //    cout << "Sending: " << tostr_hex(opcode) << endl;
     throw_if_cancelled();
-    if (m_reliable_sender.slots_used() >= m_remote_slot_capacity){
+    if (m_reliable_sender.slots_used() >= m_max_unacked_packets){
         return 0;
     }
     return m_reliable_sender.send_packet(opcode, 0, nullptr);
@@ -219,7 +219,7 @@ void ReliableStreamConnection::send_request(uint8_t opcode){
     std::unique_lock<Mutex> lg(m_lock);
     while (true){
         throw_if_cancelled();
-        if (m_reliable_sender.slots_used() < m_remote_slot_capacity &&
+        if (m_reliable_sender.slots_used() < m_max_unacked_packets &&
             m_reliable_sender.send_packet(opcode, 0, nullptr)
         ){
             return;
@@ -483,7 +483,7 @@ void ReliableStreamConnection::process_RET_PACKET_SIZE(const PacketHeader* packe
     }
     const PacketHeader_u16* message = (const PacketHeader_u16*)packet;
     m_logger.log(
-        "[RSC]: Setting Packet Size to: " + std::to_string(message->data),
+        "[RSC]: Setting Packet Size: " + std::to_string(message->data) + " bytes",
         COLOR_BLUE
     );
     {
@@ -502,15 +502,15 @@ void ReliableStreamConnection::process_RET_BUFFER_SLOTS(const PacketHeader* pack
         return;
     }
     const PacketHeader_u8* message = (const PacketHeader_u8*)packet;
-    m_logger.log(
-        "[RSC]: Setting Buffer Slots to: " + std::to_string(message->data),
-        COLOR_BLUE
-    );
     {
         std::lock_guard<Mutex> lg(m_lock);
         m_reliable_sender.remove(packet->seqnum);
-        m_remote_slot_capacity = std::min<uint8_t>(message->data, PABB2_PacketSender_SLOTS);
+        m_max_unacked_packets = std::min<uint8_t>(message->data, PABB2_PacketSender_REORDER_WINDOW);
     }
+    m_logger.log(
+        "[RSC]: Setting Reorder Window: " + std::to_string(m_max_unacked_packets) + " slots",
+        COLOR_BLUE
+    );
     m_cv.notify_all();
 }
 void ReliableStreamConnection::process_RET_BUFFER_BYTES(const PacketHeader* packet){
@@ -522,15 +522,15 @@ void ReliableStreamConnection::process_RET_BUFFER_BYTES(const PacketHeader* pack
         return;
     }
     const PacketHeader_u16* message = (const PacketHeader_u16*)packet;
-    m_logger.log(
-        "[RSC]: Setting Buffer Slots to: " + std::to_string(message->data),
-        COLOR_BLUE
-    );
     {
         std::lock_guard<Mutex> lg(m_lock);
         m_reliable_sender.remove(packet->seqnum);
-        m_remote_buffer_capacity = std::min<uint16_t>(message->data, PABB2_PacketSender_BUFFER_SIZE);
+        m_max_unacked_bytes = std::min<uint16_t>(message->data, PABB2_PacketSender_BUFFER_SIZE);
     }
+    m_logger.log(
+        "[RSC]: Setting Reorder Window: " + std::to_string(m_max_unacked_bytes) + " bytes",
+        COLOR_BLUE
+    );
     m_cv.notify_all();
 }
 

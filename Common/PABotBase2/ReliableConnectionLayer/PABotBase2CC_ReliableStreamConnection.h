@@ -143,8 +143,8 @@ private:
     uint32_t m_remote_protocol;
 
 //    std::atomic<bool> m_version_verified;
-    uint8_t m_remote_slot_capacity;
-    uint16_t m_remote_buffer_capacity;
+    uint8_t m_max_unacked_packets;
+    uint16_t m_max_unacked_bytes;
 
     std::string m_error;
 
