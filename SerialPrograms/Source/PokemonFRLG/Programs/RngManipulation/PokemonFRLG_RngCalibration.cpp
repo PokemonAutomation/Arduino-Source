@@ -4,6 +4,7 @@
  *
  */
 
+#include <cmath>
 #include <utility>
 #include <sstream>
 #include <algorithm>
