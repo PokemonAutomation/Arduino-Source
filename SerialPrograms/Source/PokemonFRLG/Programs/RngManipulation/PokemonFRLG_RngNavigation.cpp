@@ -145,7 +145,7 @@ int auto_catch(
     const uint64_t& max_ball_throws,
     bool safari_zone
 ){
-    for (int i=0; i<=max_ball_throws; i++){
+    for (uint64_t i=0; i<=max_ball_throws; i++){
         int count = 0;
         while(true){
             if (count >= 10){
@@ -183,10 +183,10 @@ int auto_catch(
             case 2:
                 console.log("Dex registration detected. Exiting battle...");
                 pbf_mash_button(context, BUTTON_B, 5000ms);
-                return i;
+                return static_cast<int>(i);
             case 3:
                 console.log("Black screen detected. Battle exited.");
-                return i;
+                return static_cast<int>(i);
             default:
                 console.log("No recognized state. Try checking if in the overworld...");
                 StartMenuWatcher start_menu;
