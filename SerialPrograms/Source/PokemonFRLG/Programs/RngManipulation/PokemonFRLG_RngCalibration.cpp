@@ -121,11 +121,45 @@ RngTimings prepare_timings(
         TEACHY_ADVANCES = uint64_t((int)std::floor((modified_ingame_advances - TEACHY_TV_BUFFER + 7500) / 313) * 313);
     }
 
+    double seed_delay = SEED_DELAY + calibrations.seed_offset + FIXED_SEED_OFFSET;
+    double csf_delay = (CONTINUE_SCREEN_FRAMES + calibrations.csf_offset) * FRLG_FRAME_DURATION;
+    double teachy_delay = TEACHY_ADVANCES * FRLG_FRAME_DURATION / 313;
+    double ingame_delay = (modified_ingame_advances - TEACHY_ADVANCES) * FRLG_FRAME_DURATION / 2 - (should_use_teachy_tv ? 14067 : 0);
+
+    if (seed_delay < 0){
+        OperationFailedException::fire(
+            ErrorReport::NO_ERROR_REPORT,
+            "prepare_timings(): seed delay cannot be negative. Check your calibration values.",
+            console
+        ); 
+    }
+        if (csf_delay < 0){
+        OperationFailedException::fire(
+            ErrorReport::NO_ERROR_REPORT,
+            "prepare_timings(): CSF duration cannot be negative. Check your calibration values.",
+            console
+        ); 
+    }
+        if (teachy_delay < 0){
+        OperationFailedException::fire(
+            ErrorReport::NO_ERROR_REPORT,
+            "prepare_timings(): Teachy TV duration cannot be negative. Check your calibration values.",
+            console
+        ); 
+    }
+    if (ingame_delay < 0){
+        OperationFailedException::fire(
+            ErrorReport::NO_ERROR_REPORT,
+            "prepare_timings(): in-game duration cannot be negative. Check your calibration values.",
+            console
+        ); 
+    }
+
     RngTimings timings;
-    timings.seed_delay   = uint64_t(SEED_DELAY + calibrations.seed_offset + FIXED_SEED_OFFSET);
-    timings.csf_delay    = uint64_t((CONTINUE_SCREEN_FRAMES + calibrations.csf_offset) * FRLG_FRAME_DURATION);
-    timings.teachy_delay = uint64_t(TEACHY_ADVANCES * FRLG_FRAME_DURATION / 313);
-    timings.ingame_delay = uint64_t((modified_ingame_advances - TEACHY_ADVANCES) * FRLG_FRAME_DURATION / 2) - (should_use_teachy_tv ? 14067 : 0);
+    timings.seed_delay   = uint64_t(seed_delay);
+    timings.csf_delay    = uint64_t(csf_delay);
+    timings.teachy_delay = uint64_t(teachy_delay);
+    timings.ingame_delay = uint64_t(ingame_delay);
 
     console.log("Seed delay: " + std::to_string(timings.seed_delay) + "ms");
     console.log("Continue Screen delay: " + std::to_string(timings.csf_delay) + "ms");
@@ -209,7 +243,7 @@ std::vector<std::pair<AdvRngState,AdvRngState>> get_egg_search_results(
     uint16_t tid_xor_sid
 ){
     std::vector<std::pair<AdvRngState,AdvRngState>> search_hits;
-    for (int i=0; i<4; i++){
+    for (int i=0; i<1; i++){
         uint64_t held_adv_radius = held_advances_radius * (uint64_t(1) << i);
         uint64_t held_min_adv = HELD_ADVANCES - std::min(uint64_t(HELD_ADVANCES), held_adv_radius);    
         uint64_t held_max_adv = HELD_ADVANCES + held_adv_radius;

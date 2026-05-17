@@ -310,8 +310,8 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     RngCalibrations calibrations = {
         RNG_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,
-        RNG_CALIBRATION.advances_calibration,
-        RNG_CALIBRATION.csf_calibration
+        RNG_CALIBRATION.csf_calibration,
+        RNG_CALIBRATION.advances_calibration
     };
 
     AdvRngSearcher searcher(TARGET_SEED, ADVANCES, AdvRngMethod::Method1);
