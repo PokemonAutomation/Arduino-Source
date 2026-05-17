@@ -134,6 +134,16 @@ bool move_cursor_to_position(ConsoleHandle& console, ProControllerContext& conte
     );
 }
 
+bool move_cursor_to_position(ConsoleHandle& console, ProControllerContext& context, SelectionArrowPositionNoDexMenu destination){
+    return move_cursor_impl(
+        console, context,
+        MENU_ARROW_BOX,
+        NO_DEX_START_MENU_OPTION_COUNT,
+        [](int i){ return SelectionArrowDetector::arrow_box_for_position(static_cast<SelectionArrowPositionNoDexMenu>(i)); },
+        static_cast<int>(destination)
+    );
+}
+
 void save_game_to_overworld(ConsoleHandle& console, ProControllerContext& context){
 
     WallClock start = current_time();

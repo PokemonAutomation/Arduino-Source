@@ -46,8 +46,6 @@ public:
 
 private:
     static std::string get_range_string(const IvRange& range);
-    static std::string get_gender_string(const AdvGender& gender);
-    static std::string get_nature_string(const AdvNature& nature);
 
 public:
     StringOption hp;

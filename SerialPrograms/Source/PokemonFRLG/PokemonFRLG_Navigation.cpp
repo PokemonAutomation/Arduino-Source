@@ -650,6 +650,8 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
         case 0:
             if (menu_context == StartMenuContext::SAFARI_ZONE){
                 ret = move_cursor_to_position(console, context, SelectionArrowPositionSafariMenu::POKEMON);
+            } else if (menu_context == StartMenuContext::NO_DEX){
+                ret = move_cursor_to_position(console, context, SelectionArrowPositionNoDexMenu::POKEMON);
             } else {
                 ret = move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::POKEMON);
             }
@@ -709,6 +711,8 @@ void open_bag_from_overworld(ConsoleHandle& console, ProControllerContext& conte
         case 0:
             if (menu_context == StartMenuContext::SAFARI_ZONE){
                 ret = move_cursor_to_position(console, context, SelectionArrowPositionSafariMenu::BAG);
+            } else if (menu_context == StartMenuContext::NO_DEX){
+                ret = move_cursor_to_position(console, context, SelectionArrowPositionNoDexMenu::BAG);
             } else {
                 ret = move_cursor_to_position(console, context, SelectionArrowPositionStartMenu::BAG);
             }

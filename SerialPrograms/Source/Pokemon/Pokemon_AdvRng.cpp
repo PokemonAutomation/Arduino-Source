@@ -38,8 +38,9 @@ AdvRngState rngstate_from_internal_state(uint16_t seed, uint64_t advances, uint3
     uint32_t s2 = increment_internal_rng_state(s1);
     uint32_t s3 = increment_internal_rng_state(s2);
     uint32_t s4 = increment_internal_rng_state(s3);
+    uint32_t s5 = increment_internal_rng_state(s4);
 
-    return  {seed, advances, method, s0, s1, s2, s3, s4};
+    return  {seed, advances, method, s0, s1, s2, s3, s4, s5};
 }
 
 AdvRngState rngstate_from_seed(uint16_t seed, uint64_t advances, AdvRngMethod method){
@@ -58,7 +59,8 @@ void advance_rng_state(AdvRngState& state){
     state.s1 = state.s2;
     state.s2 = state.s3;
     state.s3 = state.s4;
-    state.s4 = increment_internal_rng_state(state.s4);
+    state.s4 = state.s5;
+    state.s5 = increment_internal_rng_state(state.s5);
 }
 
 uint32_t pid_from_states(uint32_t& s0, uint32_t& s1){
@@ -251,6 +253,124 @@ AdvWildPokemonResult wild_pokemon_from_state(AdvRngState state, std::vector<AdvE
     };
 }
 
+bool egg_held_at_state(uint32_t state, AdvEggCompatibility compatibility){
+    uint8_t compat_threshold;
+    switch (compatibility){
+    case AdvEggCompatibility::high:
+        compat_threshold = 70;
+        break;
+    case AdvEggCompatibility::medium:
+        compat_threshold = 50;
+        break;
+    case AdvEggCompatibility::low:
+    default:
+        compat_threshold = 20;
+        break;
+    }
+    return (((state >> 16) * 100) / 0xffff) < compat_threshold;
+}
+
+AdvIVs get_inherited_ivs(AdvRngState state){
+    uint8_t inherited_index_0 = (state.s0 >> 16) % 6;
+    uint8_t inherited_index_1 = (state.s1 >> 16) % 5;
+    uint8_t inherited_index_2 = (state.s2 >> 16) % 4;
+
+    uint8_t parent_0 = (state.s3 >> 16) % 2;
+    uint8_t parent_1 = (state.s4 >> 16) % 2;
+    uint8_t parent_2 = (state.s5 >> 16) % 2;
+
+    std::vector<uint8_t> stats_left = { 0, 1, 2, 3, 4, 5 };
+
+    AdvIVs inherited_ivs; // 0 -> not inherited, 1 -> from parent A, 2 -> from parent B
+
+    uint8_t stat_index = stats_left[inherited_index_0];
+    inherited_ivs[stat_index] = parent_0 + 1;
+    stats_left.erase(stats_left.begin() + stat_index);
+
+    stat_index = stats_left[inherited_index_1];
+    inherited_ivs[stat_index] = parent_1 + 1;
+    if (stat_index < 5){
+        stats_left.erase(stats_left.begin() + stat_index);
+    }
+
+    stat_index = stats_left[inherited_index_2];
+    inherited_ivs[stat_index] = parent_2 + 1;
+
+    return inherited_ivs;
+}
+
+AdvIVs apply_inherited_ivs(
+    AdvIVs& ivs, 
+    AdvIVs& inherited_ivs, 
+    AdvIVs& parentA_ivs, 
+    AdvIVs& parentB_ivs
+){
+    AdvIVs final_ivs;
+    for (uint8_t i=0; i<6; i++){
+        if (inherited_ivs[i] == 1){
+            final_ivs[i] = parentA_ivs[i];
+        }else if (inherited_ivs[i] == 2){
+            final_ivs[i] = parentB_ivs[i];
+        }else{
+            final_ivs[i] = ivs[i];
+        }
+    }
+
+    return final_ivs;
+}
+
+AdvPokemonResult egg_to_pokemon(
+    AdvEggResult& egg_result,
+    AdvIVs& parentA_ivs, 
+    AdvIVs& parentB_ivs
+){
+    AdvIVs final_ivs = apply_inherited_ivs(
+        egg_result.ivs, egg_result.inherited_ivs, 
+        parentA_ivs, parentB_ivs
+    );
+
+    return {
+        egg_result.pid, egg_result.gender, egg_result.nature, egg_result.ability, final_ivs
+    };
+}
+
+AdvEggResult egg_from_pickup_state(AdvRngState state, uint16_t held_pid_half){
+    uint16_t pickup_pid_half = state.s0 >> 16;
+    
+    AdvIVs ivs;
+
+    uint8_t iv1_advances = (state.method == AdvRngMethod::Method2 || state.method == AdvRngMethod::Method4) ? 1 : 2;
+    for (uint8_t i=0; i<iv1_advances; i++){
+        advance_rng_state(state);
+    }
+    AdvIvGroup hpatkdef = iv_group_from_state(state.s0);
+    ivs.hp = hpatkdef.iv0;
+    ivs.attack = hpatkdef.iv1;
+    ivs.defense = hpatkdef.iv2;
+
+    uint8_t iv2_advances = (state.method == AdvRngMethod::Method2) ? 2 : 1;
+    for (uint8_t i=0; i<iv2_advances; i++){
+        advance_rng_state(state);
+    }
+    AdvIvGroup spespaspd = iv_group_from_state(state.s0);
+    ivs.speed = spespaspd.iv0;
+    ivs.spatk = spespaspd.iv1;
+    ivs.spdef = spespaspd.iv2;
+
+    uint8_t inheritance_advances = (state.method == AdvRngMethod::Method3 || state.method == AdvRngMethod::Method4) ? 3 : 2;
+    for (uint8_t i=0; i<inheritance_advances; i++){
+        advance_rng_state(state);
+    }
+    AdvIVs inherited_ivs = get_inherited_ivs(state);
+
+    uint32_t pid = (pickup_pid_half << 16) + held_pid_half;
+    uint8_t gender = gender_value_from_pid(pid);
+    AdvNature nature = nature_from_pid(pid);
+    AdvAbility ability = ability_from_pid(pid);
+
+    return { pid, gender, nature, ability, ivs, inherited_ivs };
+}
+
 AdvShinyType shiny_type_from_pid(uint32_t pid, uint16_t tid_xor_sid){
     uint16_t pid0 = pid >> 16;
     uint16_t pid1 = pid & 0xffff;
@@ -267,10 +387,10 @@ AdvShinyType shiny_type_from_pid(uint32_t pid, uint16_t tid_xor_sid){
 
 
 bool check_for_match(AdvPokemonResult res, AdvRngFilters target, int16_t gender_threshold, uint16_t tid_xor_sid){
-    return (target.nature == AdvNature::Any || res.nature == target.nature)
-        && (target.ability == AdvAbility::Any || res.ability == target.ability)
-        && (target.gender == AdvGender::Any || gender_from_gender_value(res.gender, gender_threshold) == target.gender)
-        && (target.shiny == AdvShinyType::Any || shiny_type_from_pid(res.pid, tid_xor_sid) == target.shiny)
+    return (target.nature == AdvNature::Any || (res.nature == target.nature))
+        && (target.ability == AdvAbility::Any || (res.ability == target.ability))
+        && (target.gender == AdvGender::Any || (gender_from_gender_value(res.gender, gender_threshold) == target.gender))
+        && (target.shiny == AdvShinyType::Any || (shiny_type_from_pid(res.pid, tid_xor_sid) == target.shiny))
         && ((target.ivs.hp.low <= res.ivs.hp) && (target.ivs.hp.high >= res.ivs.hp))
         && ((target.ivs.attack.low <= res.ivs.attack) && (target.ivs.attack.high >= res.ivs.attack))
         && ((target.ivs.defense.low <= res.ivs.defense) && (target.ivs.defense.high >= res.ivs.defense))
@@ -282,10 +402,10 @@ bool check_for_match(AdvPokemonResult res, AdvRngFilters target, int16_t gender_
 bool check_for_match(AdvWildPokemonResult res, AdvRngFilters target, int16_t gender_threshold, uint16_t tid_xor_sid){
     return (target.species == res.species)
         && (target.level == res.level)
-        && (target.nature == AdvNature::Any || res.nature == target.nature)
-        && (target.ability == AdvAbility::Any || res.ability == target.ability)
-        && (target.gender == AdvGender::Any || gender_from_gender_value(res.gender, gender_threshold) == target.gender)
-        && (target.shiny == AdvShinyType::Any || shiny_type_from_pid(res.pid, tid_xor_sid) == target.shiny)
+        && (target.nature == AdvNature::Any || (res.nature == target.nature))
+        && (target.ability == AdvAbility::Any || (res.ability == target.ability))
+        && (target.gender == AdvGender::Any || (gender_from_gender_value(res.gender, gender_threshold) == target.gender))
+        && (target.shiny == AdvShinyType::Any || (shiny_type_from_pid(res.pid, tid_xor_sid) == target.shiny))
         && ((target.ivs.hp.low <= res.ivs.hp) && (target.ivs.hp.high >= res.ivs.hp))
         && ((target.ivs.attack.low <= res.ivs.attack) && (target.ivs.attack.high >= res.ivs.attack))
         && ((target.ivs.defense.low <= res.ivs.defense) && (target.ivs.defense.high >= res.ivs.defense))
@@ -294,181 +414,19 @@ bool check_for_match(AdvWildPokemonResult res, AdvRngFilters target, int16_t gen
         && ((target.ivs.speed.low <= res.ivs.speed) && (target.ivs.speed.high >= res.ivs.speed));
 }
 
-AdvRngSearcher::AdvRngSearcher(uint16_t seed, AdvRngState state)
-    : seed(seed)
-    , state(state)
-{}
-
-AdvRngSearcher::AdvRngSearcher(uint16_t seed, uint64_t min_advances, AdvRngMethod method)
-    : seed(seed)
-    , state(rngstate_from_seed(seed, min_advances, method))
-{}
-
-void AdvRngSearcher::advance_state(){
-    advance_rng_state(state);
-}
-
-void AdvRngSearcher::set_seed(uint16_t newseed){
-    seed = newseed;
-    state = rngstate_from_seed(seed, 0, state.method);
-}
-
-void AdvRngSearcher::set_state_advances(uint64_t advances){
-    state = rngstate_from_seed(seed, advances, state.method);
-}
-
-AdvPokemonResult AdvRngSearcher::generate_pokemon(){
-    return pokemon_from_state(state);
-}
-
-void AdvRngSearcher::search_advance_range(
-    std::vector<AdvRngState>& hits,
-    AdvRngFilters& target,
-    uint64_t min_advances,
-    uint64_t max_advances,
-    int16_t gender_threshold,
-    uint16_t tid_xor_sid
-){
-    for (uint8_t m=0; m<3; m++){
-        set_state_advances(min_advances);
-
-        AdvRngMethod method;
-        switch (m){
-        case 1:
-            method = AdvRngMethod::Method2;
-            break;
-        case 2:
-            method = AdvRngMethod::Method4;
-            break;
-        case 0:
-        default:
-            method = AdvRngMethod::Method1;
-            break;
-        }
-
-        if ((target.method != AdvRngMethod::Any) && (target.method != method)){
-            continue;
-        }else{
-            state.method = method;
-        }
-
-        for (uint64_t a=min_advances; a<max_advances; a++){
-            AdvPokemonResult res = pokemon_from_state(state);
-            bool match = check_for_match(res, target, gender_threshold, tid_xor_sid);
-            if (match){
-               hits.emplace_back(state);
-            }
-            advance_state();
-        }
-    }
-}
-
-std::vector<AdvRngState> AdvRngSearcher::search(
-    AdvRngFilters& target,
-    const std::vector<uint16_t>& seeds,
-    uint64_t min_advances,
-    uint64_t max_advances,
-    int16_t gender_threshold,
-    uint16_t tid_xor_sid
-){
-    std::vector<AdvRngState> hits;
-    for (uint16_t seed : seeds){
-        set_seed(seed);
-        search_advance_range(hits, target, min_advances, max_advances, gender_threshold, tid_xor_sid);
-    }
-    return hits;
-}
-
-
-AdvRngWildSearcher::AdvRngWildSearcher(uint16_t seed, AdvRngState state, const std::vector<AdvEncounterSlot>& encounter_slots)
-    : seed(seed)
-    , state(state)
-    , encounter_slots(encounter_slots)
-{}
-
-AdvRngWildSearcher::AdvRngWildSearcher(uint16_t seed, uint64_t min_advances, const std::vector<AdvEncounterSlot>& encounter_slots, AdvRngMethod method)
-    : seed(seed)
-    , state(rngstate_from_seed(seed, min_advances, method))
-    , encounter_slots(encounter_slots)
-{}
-
-void AdvRngWildSearcher::advance_state(){
-    advance_rng_state(state);
-}
-
-void AdvRngWildSearcher::set_seed(uint16_t newseed){
-    seed = newseed;
-    state = rngstate_from_seed(seed, 0, state.method);
-}
-
-void AdvRngWildSearcher::set_state_advances(uint64_t advances){
-    state = rngstate_from_seed(seed, advances, state.method);
-}
-
-AdvWildPokemonResult AdvRngWildSearcher::generate_pokemon(bool super_rod){
-    return wild_pokemon_from_state(state, encounter_slots, super_rod);
-}
-
-void AdvRngWildSearcher::search_advance_range(
-    std::vector<AdvRngState>& hits,
-    AdvRngFilters& target,
-    uint64_t min_advances,
-    uint64_t max_advances,
-    int16_t gender_threshold,
-    bool super_rod,
-    uint16_t tid_xor_sid
-){
-    for (uint8_t m=0; m<3; m++){
-        set_state_advances(min_advances);
-
-        AdvRngMethod method;
-        switch (m){
-        case 1:
-            method = AdvRngMethod::Method2;
-            break;
-        case 2:
-            method = AdvRngMethod::Method4;
-            break;
-        case 0:
-        default:
-            method = AdvRngMethod::Method1;
-            break;
-        }
-
-        if ((target.method != AdvRngMethod::Any) && (target.method != method)){
-            continue;
-        }else{
-            state.method = method;
-        }
-
-        for (uint64_t a=min_advances; a<max_advances; a++){
-            AdvWildPokemonResult res = wild_pokemon_from_state(state, encounter_slots, super_rod);
-            bool match = check_for_match(res, target, gender_threshold, tid_xor_sid);
-            if (match){
-                hits.emplace_back(state);
-            }
-            advance_state();
-        }
-    }
-}
-
-std::vector<AdvRngState> AdvRngWildSearcher::search(
-    AdvRngFilters& target,
-    const std::vector<uint16_t>& seeds,
-    uint64_t min_advances,
-    uint64_t max_advances,
-    int16_t gender_threshold,
-    bool super_rod,
-    uint16_t tid_xor_sid
-){
-    std::vector<AdvRngState> hits;
-    for (uint16_t seed : seeds){
-        set_seed(seed);
-        search_advance_range(hits, target, min_advances, max_advances, gender_threshold, super_rod, tid_xor_sid);
-    }
-    return hits;
-}
-
+// bool check_for_match(AdvEggResult res, AdvRngFilters target, int16_t gender_threshold, AdvIVs parentA_ivs, AdvIVs parentB_ivs, uint16_t tid_xor_sid){
+//     AdvIVs final_ivs = apply_inherited_ivs(res.ivs, res.inherited_ivs, parentA_ivs, parentB_ivs);
+//     return (target.nature == AdvNature::Any || (res.nature == target.nature))
+//         && (target.ability == AdvAbility::Any || (res.ability == target.ability))
+//         && (target.gender == AdvGender::Any || (gender_from_gender_value(res.gender, gender_threshold) == target.gender))
+//         && (target.shiny == AdvShinyType::Any || (shiny_type_from_pid(res.pid, tid_xor_sid) == target.shiny))
+//         && ((target.ivs.hp.low <= final_ivs.hp) && (target.ivs.hp.high >= final_ivs.hp))
+//         && ((target.ivs.attack.low <= final_ivs.attack) && (target.ivs.attack.high >= final_ivs.attack))
+//         && ((target.ivs.defense.low <= final_ivs.defense) && (target.ivs.defense.high >= final_ivs.defense))
+//         && ((target.ivs.spatk.low <= final_ivs.spatk) && (target.ivs.spatk.high >= final_ivs.spatk))
+//         && ((target.ivs.spdef.low <= final_ivs.spdef) && (target.ivs.spdef.high >= final_ivs.spdef))
+//         && ((target.ivs.speed.low <= final_ivs.speed) && (target.ivs.speed.high >= final_ivs.speed));
+// }
 
 Pokemon::NatureAdjustments nature_to_adjustment(AdvNature nature){
     NatureAdjustments ret;
@@ -576,6 +534,95 @@ Pokemon::NatureAdjustments nature_to_adjustment(AdvNature nature){
     }
 }
 
+AdvNature string_to_nature(const std::string& nature_string){
+    if (nature_string == "Hardy")   return AdvNature::Hardy;
+    if (nature_string == "Lonely")  return AdvNature::Lonely;    
+    if (nature_string == "Brave")   return AdvNature::Brave;  
+    if (nature_string == "Adamant") return AdvNature::Adamant;  
+    if (nature_string == "Naughty") return AdvNature::Naughty;  
+    if (nature_string == "Bold")    return AdvNature::Bold;  
+    if (nature_string == "Docile")  return AdvNature::Docile;  
+    if (nature_string == "Relaxed") return AdvNature::Relaxed;  
+    if (nature_string == "Impish")  return AdvNature::Impish;  
+    if (nature_string == "Lax")     return AdvNature::Lax;  
+    if (nature_string == "Timid")   return AdvNature::Timid;  
+    if (nature_string == "Hasty")   return AdvNature::Hasty;  
+    if (nature_string == "Serious") return AdvNature::Serious;  
+    if (nature_string == "Jolly")   return AdvNature::Jolly;  
+    if (nature_string == "Naive")   return AdvNature::Naive;  
+    if (nature_string == "Modest")  return AdvNature::Modest;  
+    if (nature_string == "Mild")    return AdvNature::Mild;  
+    if (nature_string == "Quiet")   return AdvNature::Quiet;  
+    if (nature_string == "Bashful") return AdvNature::Bashful;  
+    if (nature_string == "Rash")    return AdvNature::Rash;  
+    if (nature_string == "Calm")    return AdvNature::Calm;  
+    if (nature_string == "Gentle")  return AdvNature::Gentle;  
+    if (nature_string == "Sassy")   return AdvNature::Sassy;  
+    if (nature_string == "Careful") return AdvNature::Careful;  
+    if (nature_string == "Quirky")  return AdvNature::Quirky;  
+    return AdvNature::Any;
+}
+
+std::string nature_to_string(const AdvNature& nature){
+    switch (nature){
+    case AdvNature::Hardy:
+        return "Hardy";
+    case AdvNature::Lonely:
+        return "Lonely";
+    case AdvNature::Brave:
+        return "Brave";
+    case AdvNature::Adamant:
+        return "Adamant";
+    case AdvNature::Naughty:
+        return "Naughty";
+    case AdvNature::Bold:
+        return "Bold";
+    case AdvNature::Docile:
+        return "Docile";
+    case AdvNature::Relaxed:
+        return "Relaxed";
+    case AdvNature::Impish:
+        return "Impish";
+    case AdvNature::Lax:
+        return "Lax";
+    case AdvNature::Timid:
+        return "Timid";
+    case AdvNature::Hasty:
+        return "Hasty";
+    case AdvNature::Serious:
+        return "Serious";
+    case AdvNature::Jolly:
+        return "Jolly";
+    case AdvNature::Naive:
+        return "Naive";
+    case AdvNature::Modest:
+        return "Modest";
+    case AdvNature::Mild:
+        return "Mild";
+    case AdvNature::Quiet:
+        return "Quiet";
+    case AdvNature::Bashful:
+        return "Bashful";
+    case AdvNature::Rash:
+        return "Rash";
+    case AdvNature::Calm:
+        return "Calm";
+    case AdvNature::Gentle:
+        return "Gentle";
+    case AdvNature::Sassy:
+        return "Sassy";
+    case AdvNature::Careful:
+        return "Careful";
+    case AdvNature::Quirky:
+        return "Quirky";
+    default:
+        return "Any";
+    }
+}
+
+
+
+
 void shrink_iv_range(IvRange& mutated_range, IvRange& fixed_range){
     mutated_range.low  = std::max(mutated_range.low,  fixed_range.low);
     mutated_range.high = std::min(mutated_range.high, fixed_range.high);
@@ -612,6 +659,382 @@ AdvRngFilters observation_to_filters(const AdvObservedPokemon& observation, cons
         observation.shiny,
         method
     };
+}
+
+std::string gender_to_string(const AdvGender& gender){
+    switch (gender){
+    case AdvGender::Male:
+        return "Male";
+    case AdvGender::Female:
+        return "Female";
+    default:
+        return "Any";
+    }
+}
+
+
+AdvRngSearcher::AdvRngSearcher(uint16_t seed, AdvRngState state)
+    : seed(seed)
+    , state(state)
+{}
+
+AdvRngSearcher::AdvRngSearcher(uint16_t seed, uint64_t min_advances, AdvRngMethod method)
+    : seed(seed)
+    , state(rngstate_from_seed(seed, min_advances, method))
+{}
+
+void AdvRngSearcher::advance_state(){
+    advance_rng_state(state);
+}
+
+void AdvRngSearcher::set_seed(uint16_t newseed){
+    seed = newseed;
+    state = rngstate_from_seed(seed, 0, state.method);
+}
+
+void AdvRngSearcher::set_state_advances(uint64_t advances){
+    state = rngstate_from_seed(seed, advances, state.method);
+}
+
+AdvPokemonResult AdvRngSearcher::generate_pokemon(){
+    return pokemon_from_state(state);
+}
+
+void AdvRngSearcher::search_advance_range(
+    std::vector<AdvRngState>& hits,
+    AdvRngFilters& target,
+    uint64_t min_advances,
+    uint64_t max_advances,
+    int16_t gender_threshold,
+    uint16_t tid_xor_sid
+){
+    for (uint8_t m=0; m<3; m++){
+        set_state_advances(min_advances);
+
+        AdvRngMethod method;
+        switch (m){
+        case 1:
+            method = AdvRngMethod::Method2;
+            break;
+        case 2:
+            method = AdvRngMethod::Method4;
+            break;
+        case 0:
+        default:
+            method = AdvRngMethod::Method1;
+            break;
+        }
+
+        if ((target.method != AdvRngMethod::Any) && (target.method != method)){
+            continue;
+        }else{
+            state.method = method;
+        }
+
+        for (uint64_t a=min_advances; a<max_advances; a++){
+            AdvPokemonResult res = pokemon_from_state(state);
+            bool match = check_for_match(res, target, gender_threshold, tid_xor_sid);
+            if (match){
+               hits.emplace_back(state);
+            }
+            advance_state();
+        }
+    }
+}
+
+std::vector<AdvRngState> AdvRngSearcher::search(
+    AdvRngFilters& target,
+    const std::vector<uint16_t>& seeds,
+    uint64_t min_advances,
+    uint64_t max_advances,
+    int16_t gender_threshold,
+    uint16_t tid_xor_sid
+){
+    std::vector<AdvRngState> hits;
+    for (uint16_t seed : seeds){
+        set_seed(seed);
+        search_advance_range(hits, target, min_advances, max_advances, gender_threshold, tid_xor_sid);
+    }
+    return hits;
+}
+
+
+
+AdvRngWildSearcher::AdvRngWildSearcher(uint16_t seed, AdvRngState state, const std::vector<AdvEncounterSlot>& encounter_slots)
+    : seed(seed)
+    , state(state)
+    , encounter_slots(encounter_slots)
+{}
+
+AdvRngWildSearcher::AdvRngWildSearcher(uint16_t seed, uint64_t min_advances, const std::vector<AdvEncounterSlot>& encounter_slots, AdvRngMethod method)
+    : seed(seed)
+    , state(rngstate_from_seed(seed, min_advances, method))
+    , encounter_slots(encounter_slots)
+{}
+
+void AdvRngWildSearcher::advance_state(){
+    advance_rng_state(state);
+}
+
+void AdvRngWildSearcher::set_seed(uint16_t newseed){
+    seed = newseed;
+    state = rngstate_from_seed(seed, 0, state.method);
+}
+
+void AdvRngWildSearcher::set_state_advances(uint64_t advances){
+    state = rngstate_from_seed(seed, advances, state.method);
+}
+
+AdvWildPokemonResult AdvRngWildSearcher::generate_pokemon(bool super_rod){
+    return wild_pokemon_from_state(state, encounter_slots, super_rod);
+}
+
+void AdvRngWildSearcher::search_advance_range(
+    std::vector<AdvRngState>& hits,
+    AdvRngFilters& target,
+    uint64_t min_advances,
+    uint64_t max_advances,
+    int16_t gender_threshold,
+    bool super_rod,
+    uint16_t tid_xor_sid
+){
+    for (uint8_t m=0; m<3; m++){
+        set_state_advances(min_advances);
+
+        AdvRngMethod method;
+        switch (m){
+        case 1:
+            method = AdvRngMethod::Method2;
+            break;
+        case 2:
+            method = AdvRngMethod::Method4;
+            break;
+        case 0:
+        default:
+            method = AdvRngMethod::Method1;
+            break;
+        }
+
+        if ((target.method != AdvRngMethod::Any) && (target.method != method)){
+            continue;
+        }else{
+            state.method = method;
+        }
+
+        for (uint64_t a=min_advances; a<max_advances; a++){
+            AdvWildPokemonResult res = wild_pokemon_from_state(state, encounter_slots, super_rod);
+            bool match = check_for_match(res, target, gender_threshold, tid_xor_sid);
+            if (match){
+                hits.emplace_back(state);
+            }
+            advance_state();
+        }
+    }
+}
+
+std::vector<AdvRngState> AdvRngWildSearcher::search(
+    AdvRngFilters& target,
+    const std::vector<uint16_t>& seeds,
+    uint64_t min_advances,
+    uint64_t max_advances,
+    int16_t gender_threshold,
+    bool super_rod,
+    uint16_t tid_xor_sid
+){
+    std::vector<AdvRngState> hits;
+    for (uint16_t seed : seeds){
+        set_seed(seed);
+        search_advance_range(hits, target, min_advances, max_advances, gender_threshold, super_rod, tid_xor_sid);
+    }
+    return hits;
+}
+
+
+
+AdvRngEggSearcher::AdvRngEggSearcher(uint16_t held_seed, AdvRngState held_state, uint16_t pickup_seed, AdvRngState pickup_state)
+    : held_seed(held_seed)
+    , held_state(held_state)
+    , pickup_seed(held_seed)
+    , pickup_state(held_state)
+{}
+
+AdvRngEggSearcher::AdvRngEggSearcher(
+    uint16_t held_seed, 
+    uint64_t min_held_advances, 
+    uint16_t pickup_seed,
+    uint64_t min_pickup_advances,
+    AdvRngMethod method
+)
+    : held_seed(held_seed)
+    , held_state(rngstate_from_seed(held_seed, min_held_advances, method))
+    , pickup_seed(pickup_seed)
+    , pickup_state(rngstate_from_seed(pickup_seed, min_pickup_advances, method))
+{}
+
+void AdvRngEggSearcher::advance_held_state(){
+    advance_rng_state(held_state);
+}
+
+void AdvRngEggSearcher::set_held_seed(uint16_t newseed){
+    held_seed = newseed;
+    held_state = rngstate_from_seed(held_seed, 0, held_state.method);
+}
+
+void AdvRngEggSearcher::set_held_state_advances(uint64_t advances){
+    held_state = rngstate_from_seed(held_seed, advances, held_state.method);
+}
+
+void AdvRngEggSearcher::advance_pickup_state(){
+    advance_rng_state(pickup_state);
+}
+
+void AdvRngEggSearcher::set_pickup_seed(uint16_t newseed){
+    pickup_seed = newseed;
+    pickup_state = rngstate_from_seed(pickup_seed, 0, pickup_state.method);
+}
+
+void AdvRngEggSearcher::set_pickup_state_advances(uint64_t advances){
+    pickup_state = rngstate_from_seed(pickup_seed, advances, pickup_state.method);
+}
+
+AdvEggResult AdvRngEggSearcher::generate_egg(){
+    uint16_t held_pid_half = (((held_state.s1) >> 16) % 0xfffe) + 1;
+    return egg_from_pickup_state(pickup_state, held_pid_half);
+}
+
+AdvPokemonResult AdvRngEggSearcher::generate_pokemon(AdvIVs& parentA_ivs, AdvIVs& parentB_ivs){
+    AdvEggResult egg_result = generate_egg();
+    return egg_to_pokemon(egg_result, parentA_ivs, parentB_ivs);
+}
+
+void AdvRngEggSearcher::search_pickup_advances_range(
+        std::vector<std::pair<AdvRngState, AdvRngState>>& hits,
+        AdvRngFilters& target,
+        uint16_t held_pid_half,
+        uint64_t min_pickup_advances,
+        uint64_t max_pickup_advances,
+        AdvIVs& parentA_ivs,
+        AdvIVs& parentB_ivs,
+        int16_t gender_threshold,
+        uint16_t tid_xor_sid
+    ){
+    for (uint8_t m=0; m<4; m++){
+        set_pickup_state_advances(min_pickup_advances);
+
+        AdvRngMethod method;
+        switch (m){
+        case 1:
+            method = AdvRngMethod::Method2;
+            break;
+        case 2:
+            method = AdvRngMethod::Method3;
+            break;
+        case 3:
+            method = AdvRngMethod::Method4;
+            break;
+        case 0:
+        default:
+            method = AdvRngMethod::Method1;
+            break;
+        }
+
+        if ((target.method != AdvRngMethod::Any) && (target.method != method)){
+            continue;
+        }else{
+            pickup_state.method = method;
+        }
+
+        for (uint64_t a=min_pickup_advances; a<max_pickup_advances; a++){
+            AdvEggResult egg_res = egg_from_pickup_state(pickup_state, held_pid_half);
+            AdvPokemonResult poke_res = egg_to_pokemon(egg_res, parentA_ivs, parentB_ivs);
+            bool match = check_for_match(poke_res, target, gender_threshold, tid_xor_sid);
+            if (match){
+                std::pair<AdvRngState, AdvRngState> state_pair = { held_state, pickup_state };
+                hits.emplace_back(state_pair);
+            }
+            advance_pickup_state();
+        }
+    }
+}
+
+void AdvRngEggSearcher::search_pickups(
+    std::vector<std::pair<AdvRngState, AdvRngState>>& hits,
+    AdvRngFilters& target,
+    uint16_t held_pid_half,
+    const std::vector<uint16_t>& pickup_seeds,
+    uint64_t min_pickup_advances,
+    uint64_t max_pickup_advances,
+    AdvIVs& parentA_ivs,
+    AdvIVs& parentB_ivs,
+    int16_t gender_threshold,
+    uint16_t tid_xor_sid
+){
+    for (uint16_t pickup_seed : pickup_seeds){
+        set_pickup_seed(pickup_seed);
+        search_pickup_advances_range(hits, target, held_pid_half, min_pickup_advances, max_pickup_advances, parentA_ivs, parentB_ivs, gender_threshold, tid_xor_sid);
+    }
+}
+
+void AdvRngEggSearcher::search_held_advances_range(
+    std::vector<std::pair<AdvRngState, AdvRngState>>& hits,
+    AdvRngFilters& target,
+    uint64_t min_held_advances,
+    uint64_t max_held_advances,
+    const std::vector<uint16_t>& pickup_seeds,
+    uint64_t min_pickup_advances,
+    uint64_t max_pickup_advances,
+    AdvIVs& parentA_ivs,
+    AdvIVs& parentB_ivs,
+    AdvEggCompatibility compatibility,
+    int16_t gender_threshold,
+    uint16_t tid_xor_sid
+){
+    set_held_state_advances(min_held_advances);
+    for (uint64_t a=min_held_advances; a<max_held_advances; a++){
+        if (egg_held_at_state(held_state.s0, compatibility)){
+            uint16_t held_pid_half = (((held_state.s1) >> 16) % 0xfffe) + 1;
+            search_pickups(
+                hits, target, 
+                held_pid_half, pickup_seeds, 
+                min_pickup_advances, max_pickup_advances,
+                parentA_ivs, parentB_ivs,
+                gender_threshold, tid_xor_sid
+            );
+        }
+        
+        advance_held_state();
+    }
+
+    
+}
+
+std::vector<std::pair<AdvRngState, AdvRngState>> AdvRngEggSearcher::search(
+    AdvRngFilters& target,
+    const std::vector<uint16_t>& held_seeds,
+    uint64_t min_held_advances,
+    uint64_t max_held_advances,
+    const std::vector<uint16_t>& pickup_seeds,
+    uint64_t min_pickup_advances,
+    uint64_t max_pickup_advances,
+    AdvIVs& parentA_ivs,
+    AdvIVs& parentB_ivs,
+    AdvEggCompatibility compatibility,
+    int16_t gender_threshold,
+    uint16_t tid_xor_sid
+){
+    std::vector<std::pair<AdvRngState, AdvRngState>> hits;
+    for (uint16_t h_seed : held_seeds){
+        set_held_seed(h_seed);
+        search_held_advances_range(
+            hits, target,
+            min_held_advances, max_held_advances, 
+            pickup_seeds, min_pickup_advances, max_pickup_advances,
+            parentA_ivs, parentB_ivs, compatibility, 
+            gender_threshold, tid_xor_sid
+        );
+    }
+
+    return hits;
 }
 
 

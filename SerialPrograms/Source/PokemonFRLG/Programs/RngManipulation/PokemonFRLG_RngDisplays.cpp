@@ -68,72 +68,7 @@ std::string RngFilterDisplay::get_range_string(const IvRange& range){
     }
     return std::to_string(range.low) + " - " + std::to_string(range.high);
 }
-std::string RngFilterDisplay::get_gender_string(const AdvGender& gender){
-    switch (gender){
-    case AdvGender::Male:
-        return "Male";
-    case AdvGender::Female:
-        return "Female";
-    default:
-        return "Any";
-    }
-}
-std::string RngFilterDisplay::get_nature_string(const AdvNature& nature){
-    switch (nature){
-    case AdvNature::Hardy:
-        return "Hardy";
-    case AdvNature::Lonely:
-        return "Lonely";
-    case AdvNature::Brave:
-        return "Brave";
-    case AdvNature::Adamant:
-        return "Adamant";
-    case AdvNature::Naughty:
-        return "Naughty";
-    case AdvNature::Bold:
-        return "Bold";
-    case AdvNature::Docile:
-        return "Docile";
-    case AdvNature::Relaxed:
-        return "Relaxed";
-    case AdvNature::Impish:
-        return "Impish";
-    case AdvNature::Lax:
-        return "Lax";
-    case AdvNature::Timid:
-        return "Timid";
-    case AdvNature::Hasty:
-        return "Hasty";
-    case AdvNature::Serious:
-        return "Serious";
-    case AdvNature::Jolly:
-        return "Jolly";
-    case AdvNature::Naive:
-        return "Naive";
-    case AdvNature::Modest:
-        return "Modest";
-    case AdvNature::Mild:
-        return "Mild";
-    case AdvNature::Quiet:
-        return "Quiet";
-    case AdvNature::Bashful:
-        return "Bashful";
-    case AdvNature::Rash:
-        return "Rash";
-    case AdvNature::Calm:
-        return "Calm";
-    case AdvNature::Gentle:
-        return "Gentle";
-    case AdvNature::Sassy:
-        return "Sassy";
-    case AdvNature::Careful:
-        return "Careful";
-    case AdvNature::Quirky:
-        return "Quirky";
-    default:
-        return "Any";
-    }
-}
+
 void RngFilterDisplay::set(const AdvRngFilters& filter){
     hp.set(get_range_string(filter.ivs.hp));
     atk.set(get_range_string(filter.ivs.attack));
@@ -141,8 +76,8 @@ void RngFilterDisplay::set(const AdvRngFilters& filter){
     spatk.set(get_range_string(filter.ivs.spatk));
     spdef.set(get_range_string(filter.ivs.spdef));
     speed.set(get_range_string(filter.ivs.speed));
-    gender.set(get_gender_string(filter.gender));
-    nature.set(get_nature_string(filter.nature));
+    gender.set(gender_to_string(filter.gender));
+    nature.set(nature_to_string(filter.nature));
 }
 
 void RngFilterDisplay::reset(){

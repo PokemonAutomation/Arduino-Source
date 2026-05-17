@@ -44,18 +44,6 @@ public:
 private:
 
     bool have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t& TARGET_SEED, const AdvRngState& hit);
-
-    AdvObservedPokemon read_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-
-    bool use_rare_candy(
-        SingleSwitchProgramEnvironment& env, 
-        ProControllerContext& context,
-        GiftRng_Descriptor::Stats& stats,
-        AdvObservedPokemon& pokemon,
-        AdvRngFilters& filters,
-        const BaseStats& BASE_STATS,
-        bool first
-    );
     
     OCR::LanguageOCROption LANGUAGE;
 

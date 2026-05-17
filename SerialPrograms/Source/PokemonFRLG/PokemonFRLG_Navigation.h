@@ -72,7 +72,8 @@ bool exit_wild_battle(ConsoleHandle& console, ProControllerContext& context, boo
 // Starting from the start menu, a sub-screen of the start menu, or the overworld, navigate to the party screen
 enum class StartMenuContext {
     STANDARD,
-    SAFARI_ZONE
+    SAFARI_ZONE,
+    NO_DEX,
 };
 void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context = StartMenuContext::STANDARD);
 

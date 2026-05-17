@@ -190,17 +190,14 @@ void rng_reset_and_return_home(
 void reset_and_perform_blind_sequence(
     ConsoleHandle& console, 
     ProControllerContext& context, 
-    PokemonFRLG_RngTarget TARGET,
-    SeedButton SEED_BUTTON,
-    BlackoutButton BLACKOUT_BUTTON,
-    uint64_t SEED_DELAY, 
-    uint64_t CONTINUE_SCREEN_DELAY, 
-    uint64_t TEACHY_DELAY, 
-    uint64_t INGAME_DELAY, 
-    bool SAFARI_ZONE,
-    uint8_t PROFILE
+    PokemonFRLG_RngTarget target,
+    const SeedButton& seed_button,
+    const BlackoutButton& extra_button,
+    const RngTimings& timings,
+    bool safari_zone,
+    uint8_t profile
 ){
-    rng_reset_and_return_home(console, context, PROFILE); 
+    rng_reset_and_return_home(console, context, profile); 
     ConsoleType console_type = console.state().console_type();
 
     // attempt to resume the game and perform the blind sequence
@@ -221,11 +218,11 @@ void reset_and_perform_blind_sequence(
         context.wait_for_all_requests();
         int ret = run_until<ProControllerContext>(
             console, context,
-            [TARGET, SEED_BUTTON, BLACKOUT_BUTTON, SEED_DELAY, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE, console_type](ProControllerContext& context) {
-                perform_blind_sequence(context, TARGET, SEED_BUTTON, BLACKOUT_BUTTON, SEED_DELAY, CONTINUE_SCREEN_DELAY, TEACHY_DELAY, INGAME_DELAY, SAFARI_ZONE, console_type);
+            [target, seed_button, extra_button, timings, safari_zone, console_type](ProControllerContext& context) {
+                perform_blind_sequence(context, target, seed_button, extra_button, timings, safari_zone, console_type);
             },
             { update_detector, user_selection_detector },
-            1000ms
+            5000ms
         );
 
         switch (ret){
@@ -249,10 +246,10 @@ void reset_and_perform_blind_sequence(
 }
 
 #if 0
-void reset_and_detect_copyright_text(ConsoleHandle& console, ProControllerContext& context, uint8_t PROFILE){
+void reset_and_detect_copyright_text(ConsoleHandle& console, ProControllerContext& context, uint8_t profile){
     go_home(console, context);
     close_game_from_home(console, context);
-    rng_start_game_and_return_home(console, context, uint8_t(0), PROFILE);
+    rng_start_game_and_return_home(console, context, uint8_t(0), profile);
     pbf_wait(context, 200ms); // add an extra delay to try to ensure the game doesn't fail to launch
     go_home(console, context);
 
