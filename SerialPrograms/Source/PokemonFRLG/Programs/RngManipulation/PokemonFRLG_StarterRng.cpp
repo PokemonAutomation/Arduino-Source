@@ -600,8 +600,8 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     RngCalibrations calibrations = {
         RNG_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,
-        RNG_CALIBRATION.advances_calibration,
-        RNG_CALIBRATION.csf_calibration
+        RNG_CALIBRATION.csf_calibration,
+        RNG_CALIBRATION.advances_calibration
     };
 
 
