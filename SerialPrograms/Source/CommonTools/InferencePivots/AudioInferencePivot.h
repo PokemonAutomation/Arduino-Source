@@ -8,7 +8,7 @@
 #define PokemonAutomation_CommonTools_AudioInferencePivot_H
 
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Cpp/Concurrency/PeriodicScheduler.h"
+#include "Common/Cpp/Concurrency/BusyPeriodicRunner.h"
 #include "CommonFramework/Tools/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayTypes.h"
 #include "CommonTools/InferenceCallbacks/AudioInferenceCallback.h"
@@ -19,7 +19,7 @@ class AudioFeed;
 
 
 
-class AudioInferencePivot final : public PeriodicRunner, public OverlayStat{
+class AudioInferencePivot final : public BusyPeriodicRunner, public OverlayStat{
 public:
     AudioInferencePivot(CancellableScope& scope, AudioFeed& feed);
     virtual ~AudioInferencePivot();

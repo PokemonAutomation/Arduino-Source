@@ -8,7 +8,7 @@
 #define PokemonAutomation_CommonTools_VisualInferencePivot_H
 
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Cpp/Concurrency/PeriodicScheduler.h"
+#include "Common/Cpp/Concurrency/BusyPeriodicRunner.h"
 #include "CommonFramework/Tools/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayTypes.h"
@@ -20,7 +20,7 @@ class VideoFeed;
 
 
 
-class VisualInferencePivot final : public PeriodicRunner, public OverlayStat{
+class VisualInferencePivot final : public BusyPeriodicRunner, public OverlayStat{
 public:
     VisualInferencePivot(CancellableScope& scope, VideoFeed& feed);
     virtual ~VisualInferencePivot();

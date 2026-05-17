@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Concurrency/Watchdog.h"
+#include "Common/Cpp/Concurrency/PeriodicRunner.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "GlobalServices.h"
 
@@ -14,6 +15,10 @@ namespace PokemonAutomation{
 Watchdog& global_watchdog(){
     static Watchdog watchdog(GlobalThreadPools::unlimited_normal());
     return watchdog;
+}
+PeriodicRunner& global_periodic_runner(){
+    static PeriodicRunner runner;
+    return runner;
 }
 
 

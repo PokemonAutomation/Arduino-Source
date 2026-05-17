@@ -1,4 +1,4 @@
-/*  Periodic Scheduler
+/*  Busy Periodic Runner
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PeriodicScheduler_H
-#define PokemonAutomation_PeriodicScheduler_H
+#ifndef PokemonAutomation_BusyPeriodicRunner_H
+#define PokemonAutomation_BusyPeriodicRunner_H
 
 #include <chrono>
 #include <map>
@@ -67,14 +67,14 @@ private:
 //
 //  Adding and removing callbacks is thread-safe.
 //
-class PeriodicRunner : public Cancellable{
+class BusyPeriodicRunner : public Cancellable{
 public:
     virtual bool cancel(std::exception_ptr exception) noexcept override;
 
     double current_utilization() const;
 
 protected:
-    PeriodicRunner(ThreadPool& thread_pool);
+    BusyPeriodicRunner(ThreadPool& thread_pool);
     bool add_event(void* event, std::chrono::milliseconds period, WallClock start = current_time());
     void remove_event(void* event);
 

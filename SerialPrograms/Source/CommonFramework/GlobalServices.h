@@ -10,10 +10,11 @@
 namespace PokemonAutomation{
 
 class Watchdog;
+class PeriodicRunner;
 
 
 Watchdog& global_watchdog();
-
+PeriodicRunner& global_periodic_runner();
 
 
 }

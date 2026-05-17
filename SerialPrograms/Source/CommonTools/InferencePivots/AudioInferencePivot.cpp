@@ -45,7 +45,7 @@ struct AudioInferencePivot::PeriodicCallback{
 
 
 AudioInferencePivot::AudioInferencePivot(CancellableScope& scope, AudioFeed& feed)
-    : PeriodicRunner(GlobalThreadPools::unlimited_pivot())
+    : BusyPeriodicRunner(GlobalThreadPools::unlimited_pivot())
     , m_feed(feed)
 {
     attach(scope);
@@ -72,7 +72,7 @@ void AudioInferencePivot::add_callback(
         std::forward_as_tuple(scope, set_when_triggered, callback, period, start_time)
     ).first;
     try{
-        PeriodicRunner::add_event(&iter->second, period);
+        BusyPeriodicRunner::add_event(&iter->second, period);
     }catch (...){
         m_map.erase(iter);
         throw;
@@ -85,7 +85,7 @@ StatAccumulatorI32 AudioInferencePivot::remove_callback(AudioInferenceCallback& 
         return StatAccumulatorI32();
     }
     StatAccumulatorI32 stats = iter->second.stats;
-    PeriodicRunner::remove_event(&iter->second);
+    BusyPeriodicRunner::remove_event(&iter->second);
     m_map.erase(iter);
     return stats;
 }

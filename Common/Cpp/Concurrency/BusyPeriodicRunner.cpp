@@ -1,10 +1,10 @@
-/*  Periodic Scheduler
+/*  Busy Periodic Scheduler
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#include "PeriodicScheduler.h"
+#include "BusyPeriodicRunner.h"
 
 #include <iostream>
 using std::cout;
@@ -104,11 +104,11 @@ private:
 
 
 
-PeriodicRunner::PeriodicRunner(ThreadPool& thread_pool)
+BusyPeriodicRunner::BusyPeriodicRunner(ThreadPool& thread_pool)
     : m_thread_pool(thread_pool)
     , m_pending_waits(0)
 {}
-bool PeriodicRunner::add_event(void* event, std::chrono::milliseconds period, WallClock start){
+bool BusyPeriodicRunner::add_event(void* event, std::chrono::milliseconds period, WallClock start){
     throw_if_cancelled();
 
     m_pending_waits++;
@@ -124,7 +124,7 @@ bool PeriodicRunner::add_event(void* event, std::chrono::milliseconds period, Wa
     m_cv.notify_all();
     return ret;
 }
-void PeriodicRunner::remove_event(void* event){
+void BusyPeriodicRunner::remove_event(void* event){
     m_pending_waits++;
     std::lock_guard<Mutex> lg(m_lock);
     m_pending_waits--;
@@ -136,7 +136,7 @@ void PeriodicRunner::remove_event(void* event){
         m_utilization.push_idle();
     }
 }
-bool PeriodicRunner::cancel(std::exception_ptr exception) noexcept{
+bool BusyPeriodicRunner::cancel(std::exception_ptr exception) noexcept{
     if (Cancellable::cancel(std::move(exception))){
         return true;
     }
@@ -144,7 +144,7 @@ bool PeriodicRunner::cancel(std::exception_ptr exception) noexcept{
     m_cv.notify_all();
     return false;
 }
-void PeriodicRunner::thread_loop(){
+void BusyPeriodicRunner::thread_loop(){
     bool is_back_to_back = false;
     std::unique_lock<Mutex> lg(m_lock);
     WallClock last_check_timestamp = current_time();
@@ -196,12 +196,12 @@ void PeriodicRunner::thread_loop(){
         idle_since_last_check += end - start;
     }
 }
-void PeriodicRunner::stop_thread() noexcept{
-    PeriodicRunner::cancel(nullptr);
+void BusyPeriodicRunner::stop_thread() noexcept{
+    BusyPeriodicRunner::cancel(nullptr);
     m_runner.wait_and_ignore_exceptions();
 }
 
-double PeriodicRunner::current_utilization() const{
+double BusyPeriodicRunner::current_utilization() const{
     ReadSpinLock lg(m_stats_lock);
     return m_utilization.utilization();
 }
