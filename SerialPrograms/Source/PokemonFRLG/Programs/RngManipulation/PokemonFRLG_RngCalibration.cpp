@@ -4,8 +4,11 @@
  *
  */
 
+#include <utility>
 #include <sstream>
+#include <algorithm>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "PokemonFRLG_BlindNavigation.h"
 #include "PokemonFRLG_RngCalibration.h"
 
 namespace PokemonAutomation{
@@ -78,33 +81,52 @@ int16_t seed_position_in_list(uint16_t seed, std::vector<uint16_t> list){
     return -1;
 }
 
-AdvNature string_to_nature(std::string nature_string){
-    if (nature_string == "Hardy")   return AdvNature::Hardy;
-    if (nature_string == "Lonely")  return AdvNature::Lonely;    
-    if (nature_string == "Brave")   return AdvNature::Brave;  
-    if (nature_string == "Adamant") return AdvNature::Adamant;  
-    if (nature_string == "Naughty") return AdvNature::Naughty;  
-    if (nature_string == "Bold")    return AdvNature::Bold;  
-    if (nature_string == "Docile")  return AdvNature::Docile;  
-    if (nature_string == "Relaxed") return AdvNature::Relaxed;  
-    if (nature_string == "Impish")  return AdvNature::Impish;  
-    if (nature_string == "Lax")     return AdvNature::Lax;  
-    if (nature_string == "Timid")   return AdvNature::Timid;  
-    if (nature_string == "Hasty")   return AdvNature::Hasty;  
-    if (nature_string == "Serious") return AdvNature::Serious;  
-    if (nature_string == "Jolly")   return AdvNature::Jolly;  
-    if (nature_string == "Naive")   return AdvNature::Naive;  
-    if (nature_string == "Modest")  return AdvNature::Modest;  
-    if (nature_string == "Mild")    return AdvNature::Mild;  
-    if (nature_string == "Quiet")   return AdvNature::Quiet;  
-    if (nature_string == "Bashful") return AdvNature::Bashful;  
-    if (nature_string == "Rash")    return AdvNature::Rash;  
-    if (nature_string == "Calm")    return AdvNature::Calm;  
-    if (nature_string == "Gentle")  return AdvNature::Gentle;  
-    if (nature_string == "Sassy")   return AdvNature::Sassy;  
-    if (nature_string == "Careful") return AdvNature::Careful;  
-    if (nature_string == "Quirky")  return AdvNature::Quirky;  
-    return AdvNature::Any;
+
+RngTimings prepare_timings(
+    ConsoleHandle& console,
+    PokemonFRLG_RngTarget target,
+    const uint64_t& SEED_DELAY,
+    const uint64_t& CONTINUE_SCREEN_FRAMES,
+    const uint64_t& INGAME_ADVANCES,
+    const bool& USE_TEACHY_TV,
+    const RngCalibrations& calibrations,
+    const int64_t& FIXED_SEED_OFFSET, 
+    const int64_t& FIXED_ADVANCES_OFFSET,
+    bool safari_zone
+){
+    double modified_ingame_advances = INGAME_ADVANCES + calibrations.ingame_offset + FIXED_ADVANCES_OFFSET;
+    if (modified_ingame_advances < 0) {
+           OperationFailedException::fire(
+                ErrorReport::NO_ERROR_REPORT,
+                "In-game advances cannot be negative. Check your in-game advances and calibration.",
+                console
+            ); 
+        }
+
+    uint64_t TEACHY_ADVANCES = 0;
+
+    uint64_t TEACHY_TV_BUFFER = safari_zone ? 20000 : 12000; // Safari zone targets need extra time to walk to the right position
+
+    bool should_use_teachy_tv = USE_TEACHY_TV && (modified_ingame_advances > TEACHY_TV_BUFFER); // don't use Teachy TV for short in-game advance targets
+    if (should_use_teachy_tv) {
+        TEACHY_ADVANCES = uint64_t((int)std::floor((modified_ingame_advances - TEACHY_TV_BUFFER + 7500) / 313) * 313);
+    }
+
+    RngTimings timings;
+    timings.seed_delay   = uint64_t(SEED_DELAY + calibrations.seed_offset + FIXED_SEED_OFFSET);
+    timings.csf_delay    = uint64_t((CONTINUE_SCREEN_FRAMES + calibrations.csf_offset) * FRLG_FRAME_DURATION);
+    timings.teachy_delay = uint64_t(TEACHY_ADVANCES * FRLG_FRAME_DURATION / 313);
+    timings.ingame_delay = uint64_t((modified_ingame_advances - TEACHY_ADVANCES) * FRLG_FRAME_DURATION / 2) - (should_use_teachy_tv ? 14067 : 0);
+
+    console.log("Seed delay: " + std::to_string(timings.seed_delay) + "ms");
+    console.log("Continue Screen delay: " + std::to_string(timings.csf_delay) + "ms");
+    console.log("Teachy TV delay: " + std::to_string(timings.teachy_delay) + "ms");
+    console.log("In-game delay: " + std::to_string(timings.ingame_delay) + "ms");
+    console.log("Total time: " + std::to_string(timings.seed_delay + timings.csf_delay + timings.teachy_delay + timings.ingame_delay) + "ms");
+
+    check_timings(console, target, timings, safari_zone);
+
+    return timings;
 }
 
 
@@ -161,6 +183,46 @@ std::vector<AdvRngState> get_wild_search_results(
     return search_hits;
 }
 
+std::vector<std::pair<AdvRngState,AdvRngState>> get_egg_search_results(
+    ConsoleHandle& console,
+    AdvRngEggSearcher& searcher, 
+    AdvRngFilters& filters,
+    const std::vector<uint16_t>& HELD_SEED_VALUES,
+    const std::vector<uint16_t>& PICKUP_SEED_VALUES,
+    const uint64_t& HELD_ADVANCES, 
+    const uint64_t& held_advances_radius,
+    const uint64_t& PICKUP_ADVANCES, 
+    const uint64_t& pickup_advances_radius,
+    AdvIVs& parentA,
+    AdvIVs& parentB,
+    AdvEggCompatibility compatibility,
+    int16_t gender_threshold,
+    uint16_t tid_xor_sid
+){
+    std::vector<std::pair<AdvRngState,AdvRngState>> search_hits;
+    for (int i=0; i<4; i++){
+        uint64_t held_adv_radius = held_advances_radius * (uint64_t(1) << i);
+        uint64_t held_min_adv = HELD_ADVANCES - std::min(uint64_t(HELD_ADVANCES), held_adv_radius);    
+        uint64_t held_max_adv = HELD_ADVANCES + held_adv_radius;
+        uint64_t pickup_adv_radius = pickup_advances_radius * (uint64_t(1) << i);
+        uint64_t pickup_min_adv = PICKUP_ADVANCES - std::min(uint64_t(PICKUP_ADVANCES), pickup_adv_radius);    
+        uint64_t pickup_max_adv = PICKUP_ADVANCES + pickup_adv_radius;
+        search_hits = searcher.search(
+            filters, HELD_SEED_VALUES, 
+            held_min_adv, held_max_adv, 
+            PICKUP_SEED_VALUES, pickup_min_adv, pickup_max_adv, 
+            parentA, parentB, compatibility,
+            gender_threshold, tid_xor_sid
+        );
+        if (search_hits.size() > 0){
+            console.log("Number of search hits: " + std::to_string(search_hits.size()));
+            return search_hits;
+        }
+    }
+    console.log("Number of search hits: " + std::to_string(search_hits.size()));
+    return search_hits;
+}
+
 bool range_is_valid(IvRange iv){
     return (
         iv.low <= iv.high &&
@@ -185,7 +247,8 @@ void update_filters(
     AdvObservedPokemon& pokemon, 
     const StatReads& stats, 
     const EVs& evyield, 
-    const BaseStats& BASE_STATS
+    const BaseStats& BASE_STATS,
+    AdvRngMethod method
 ){
     level_up_observed_pokemon(pokemon, stats, evyield);
 
@@ -196,7 +259,7 @@ void update_filters(
             return;
         }
 
-        AdvRngFilters new_filters = observation_to_filters(pokemon, BASE_STATS);
+        AdvRngFilters new_filters = observation_to_filters(pokemon, BASE_STATS, method);
 
         if (!ranges_are_valid(new_filters.ivs)){
             IvRanges new_stat_ivs = calc_iv_ranges(BASE_STATS, pokemon.level.back(), pokemon.evs.back(), pokemon.stats.back(), nature_to_adjustment(pokemon.nature));
@@ -220,18 +283,37 @@ void update_filters(
 
 }
 
+
+uint64_t get_advances_radius(
+    ConsoleHandle& console, 
+    const RngCalibrationHistory& calibration_history,
+    const uint64_t& initial_radius
+){
+    uint64_t advances_radius = initial_radius;
+    for (size_t i=0; i<calibration_history.results.size(); i++){
+        advances_radius = advances_radius / 2;
+        if (advances_radius <= 4){
+            advances_radius = 4;
+            break;
+        }
+    }
+    console.log("Advances search radius: " + std::to_string(advances_radius));
+
+    return advances_radius;
+}
+
 double get_seed_calibration_frames(
-    const RngCalibrationHistory& HISTORY, 
-    const std::vector<uint16_t>& SEED_VALUES, 
-    const int16_t& SEED_POSITION
+    const RngCalibrationHistory& history, 
+    const std::vector<uint16_t>& seed_values, 
+    const int16_t& seed_position
 ){
     double sum = 0;
     uint16_t len = 0;
-    for (size_t i=0; i<HISTORY.results.size(); i++){
-        uint16_t seed = HISTORY.results[i].seed;
+    for (size_t i=0; i<history.results.size(); i++){
+        uint16_t seed = history.results[i].seed;
         int16_t position = -1;
-        for (size_t j=0; j<SEED_VALUES.size(); j++){
-            if (seed == SEED_VALUES[j]){
+        for (size_t j=0; j<seed_values.size(); j++){
+            if (seed == seed_values[j]){
                 position = int16_t(j);
                 break;
             }
@@ -239,8 +321,8 @@ double get_seed_calibration_frames(
         if (position < 0){
             continue;
         }
-        double calibration = HISTORY.seed_calibrations[i];
-        double offset = SEED_POSITION - position + calibration;
+        double calibration = history.calibrations[i].seed_offset;
+        double offset = seed_position - position + calibration;
         sum += offset;
         len++;
     }
@@ -253,13 +335,13 @@ double get_seed_calibration_frames(
     return average_offset;
 }
 
-double get_advances_calibration_frames(const RngCalibrationHistory& CALIBRATION_HISTORY, const uint64_t& ADVANCES){
+double get_advances_calibration_frames(const RngCalibrationHistory& history, const uint64_t& advance_target){
     double sum = 0;
     uint16_t len = 0;
-    for (size_t i=0; i<CALIBRATION_HISTORY.results.size(); i++){
-        uint64_t advance = CALIBRATION_HISTORY.results[i].advance;
-        double calibration = CALIBRATION_HISTORY.advance_calibrations[i];
-        double offset = calibration + ADVANCES - advance;
+    for (size_t i=0; i<history.results.size(); i++){
+        uint64_t advance = history.results[i].advance;
+        double calibration = history.calibrations[i].ingame_offset + history.calibrations[i].csf_offset;
+        double offset = calibration + advance_target - advance;
         sum += offset;
         len++;
     }
@@ -270,17 +352,52 @@ double get_advances_calibration_frames(const RngCalibrationHistory& CALIBRATION_
 
     double average_offset = sum / len;
     return average_offset;
+}
+
+RngCalibrations get_calibrations(
+    ConsoleHandle& console,
+    const RngCalibrationHistory& history,
+    const std::vector<uint16_t>& seed_values,
+    const int16_t& seed_position,
+    const uint64_t& advances
+){
+    RngCalibrations calibrations;
+
+    if (history.results.size() > 0){
+        calibrations.seed_offset = get_seed_calibration_frames(history, seed_values, seed_position);
+        calibrations.ingame_offset = get_advances_calibration_frames(history, advances);
+    }
+        
+    if (history.results.size() > 0){
+        AdvRngState prev_hit = history.results.back();
+        double prev_csf_offset = history.calibrations.back().csf_offset;
+        int64_t prev_advance_miss = int64_t(prev_hit.advance) - int64_t(advances);
+        if (prev_advance_miss != 0 && std::abs(prev_advance_miss) < 2){
+            console.log("Attempting to correct for off-by-one miss by modifying continue screen frames.");
+            if (prev_advance_miss > 0){
+                calibrations.csf_offset = prev_csf_offset - 0.5;
+            }else{
+                calibrations.csf_offset = prev_csf_offset + 0.5;
+            }
+            calibrations.csf_offset = fmod(calibrations.csf_offset, 2);
+            double csf_diff = calibrations.csf_offset - prev_csf_offset;
+            calibrations.ingame_offset -= csf_diff;
+        }
+    }
+
+    console.log("Seed calibration (frames): " + std::to_string(calibrations.seed_offset));
+    console.log("Continue screen adjustment (frames): " + std::to_string(calibrations.csf_offset));
+    console.log("Advance calibration (frames / 2): " + std::to_string(calibrations.ingame_offset));
+    return calibrations;
 }
 
 
 bool update_history(
     ConsoleHandle& console,
-    RngAdvanceHistory& ADVANCE_HISTORY,
-    RngCalibrationHistory& CALIBRATION_HISTORY, 
-    const uint16_t& MAX_HISTORY_LENGTH,
-    const double& SEED_CALIBRATION_FRAMES,
-    const double& ADVANCES_CALIBRATION,
-    const double& CONTINUE_SCREEN_ADJUSTMENT,
+    RngAdvanceHistory& advance_history,
+    RngCalibrationHistory& calibration_history, 
+    const uint16_t& max_history_length,
+    const RngCalibrations calibrations,
     const std::vector<AdvRngState>& search_hits,
     uint32_t max_advance_possibilities,
     uint32_t advance_radius,
@@ -297,18 +414,14 @@ bool update_history(
 
     if (search_hits.size() == 1){
         console.log("Updating calibrations...");
-        CALIBRATION_HISTORY.seed_calibrations.emplace_back(SEED_CALIBRATION_FRAMES);
-        CALIBRATION_HISTORY.advance_calibrations.emplace_back(ADVANCES_CALIBRATION);
-        CALIBRATION_HISTORY.continue_screen_adjustments.emplace_back(CONTINUE_SCREEN_ADJUSTMENT);
-        CALIBRATION_HISTORY.results.emplace_back(search_hits[0]);
-        if (CALIBRATION_HISTORY.results.size() > MAX_HISTORY_LENGTH){
-            CALIBRATION_HISTORY.seed_calibrations.erase(CALIBRATION_HISTORY.seed_calibrations.begin());
-            CALIBRATION_HISTORY.advance_calibrations.erase(CALIBRATION_HISTORY.advance_calibrations.begin());
-            CALIBRATION_HISTORY.continue_screen_adjustments.erase(CALIBRATION_HISTORY.continue_screen_adjustments.begin());
-            CALIBRATION_HISTORY.results.erase(CALIBRATION_HISTORY.results.begin());
+        calibration_history.calibrations.emplace_back(calibrations);
+        calibration_history.results.emplace_back(search_hits[0]);
+        if (calibration_history.results.size() > max_history_length){
+            calibration_history.calibrations.erase(calibration_history.calibrations.begin());
+            calibration_history.results.erase(calibration_history.results.begin());
         }
-        ADVANCE_HISTORY.results.clear();
-        ADVANCE_HISTORY.seed_calibrations.clear();
+        advance_history.results.clear();
+        advance_history.seed_calibrations.clear();
         return true;
     }
     
@@ -325,8 +438,8 @@ bool update_history(
     iter = std::unique(advances.begin(), advances.begin() + advances.size());
     advances.resize(std::distance(advances.begin(), iter));
 
-    ADVANCE_HISTORY.seed_calibrations.emplace_back(SEED_CALIBRATION_FRAMES);
-    ADVANCE_HISTORY.results.emplace_back(hits);
+    advance_history.seed_calibrations.emplace_back(calibrations.seed_offset);
+    advance_history.results.emplace_back(hits);
     
     // check advance history for repeated values
     std::vector<uint64_t> counts;
@@ -335,7 +448,7 @@ bool update_history(
     bool tie = false;
     for (uint64_t& adv : advances){
         uint64_t count = 0;
-        for (auto& res : ADVANCE_HISTORY.results){
+        for (auto& res : advance_history.results){
             for (auto& state : res){
                 if (std::abs(int64_t(state.advance) - int64_t(adv)) <= advance_radius){
                     count++;
@@ -359,10 +472,9 @@ bool update_history(
 
 
     // add the closest possibility to the advances mode for each attempt to the calibration history
-    console.log("Inferred hits from previous " + std::to_string(ADVANCE_HISTORY.results.size()) + " attempts: ");
-    for (size_t i=0; i<ADVANCE_HISTORY.results.size(); i++){
-        auto& res = ADVANCE_HISTORY.results[i];
-        auto& seed_calibration = ADVANCE_HISTORY.seed_calibrations[i];
+    console.log("Inferred hits from previous " + std::to_string(advance_history.results.size()) + " attempts: ");
+    for (size_t i=0; i<advance_history.results.size(); i++){
+        auto& res = advance_history.results[i];
         AdvRngState most_likely_hit;
         int64_t lowest_dist = INTMAX_MAX;
         for (auto& state : res){
@@ -372,33 +484,29 @@ bool update_history(
                 lowest_dist = state_dist;
             }
         }
-        CALIBRATION_HISTORY.seed_calibrations.emplace_back(seed_calibration);
-        CALIBRATION_HISTORY.advance_calibrations.emplace_back(ADVANCES_CALIBRATION);
-        CALIBRATION_HISTORY.continue_screen_adjustments.emplace_back(CONTINUE_SCREEN_ADJUSTMENT);
-        CALIBRATION_HISTORY.results.emplace_back(most_likely_hit);
+        calibration_history.calibrations.emplace_back(calibrations);
+        calibration_history.results.emplace_back(most_likely_hit);
         console.log("   " + std::to_string(most_likely_hit.seed) + " / " + std::to_string(most_likely_hit.advance));
     }
 
 
-    while (CALIBRATION_HISTORY.results.size() > MAX_HISTORY_LENGTH){
-        CALIBRATION_HISTORY.seed_calibrations.erase(CALIBRATION_HISTORY.seed_calibrations.begin());
-        CALIBRATION_HISTORY.advance_calibrations.erase(CALIBRATION_HISTORY.advance_calibrations.begin());
-        CALIBRATION_HISTORY.continue_screen_adjustments.erase(CALIBRATION_HISTORY.continue_screen_adjustments.begin());
-        CALIBRATION_HISTORY.results.erase(CALIBRATION_HISTORY.results.begin());
+    while (calibration_history.results.size() > max_history_length){
+        calibration_history.calibrations.erase(calibration_history.calibrations.begin());
+        calibration_history.results.erase(calibration_history.results.begin());
     }
 
-    ADVANCE_HISTORY.results.clear();
-    ADVANCE_HISTORY.seed_calibrations.clear();
+    advance_history.results.clear();
+    advance_history.seed_calibrations.clear();
 
     return true;
 }
 
 
 
-bool are_indistinguishable(AdvPokemonResult res1, AdvPokemonResult res2){
+bool are_indistinguishable(AdvPokemonResult res1, AdvPokemonResult res2, const int16_t& gender_threshold){
     return (
         res1.nature == res2.nature &&
-        res1.gender == res2.gender &&
+        gender_from_gender_value(res1.gender, gender_threshold) == gender_from_gender_value(res2.gender, gender_threshold) &&
         // res1.ability == res2.ability &&
         res1.ivs.hp == res2.ivs.hp &&
         res1.ivs.attack == res2.ivs.attack &&
@@ -409,12 +517,12 @@ bool are_indistinguishable(AdvPokemonResult res1, AdvPokemonResult res2){
     );
 }
 
-bool are_indistinguishable(AdvWildPokemonResult res1, AdvWildPokemonResult res2){
+bool are_indistinguishable(AdvWildPokemonResult res1, AdvWildPokemonResult res2, const int16_t& gender_threshold){
     return (
         res1.species == res2.species &&
         res1.level == res2.level &&
         res1.nature == res2.nature &&
-        res1.gender == res2.gender &&
+        gender_from_gender_value(res1.gender, gender_threshold) == gender_from_gender_value(res2.gender, gender_threshold) &&        
         // res1.ability == res2.ability &&
         res1.ivs.hp == res2.ivs.hp &&
         res1.ivs.attack == res2.ivs.attack &&
@@ -425,7 +533,7 @@ bool are_indistinguishable(AdvWildPokemonResult res1, AdvWildPokemonResult res2)
     );
 }
 
-bool all_indistinguishable(std::vector<AdvRngState> hits, AdvRngSearcher& searcher){
+bool all_indistinguishable(const std::vector<AdvRngState>& hits, AdvRngSearcher& searcher, const int16_t& gender_threshold){
     if (hits.size() < 2){
         return true;
     }
@@ -434,14 +542,14 @@ bool all_indistinguishable(std::vector<AdvRngState> hits, AdvRngSearcher& search
     for (size_t i=1; i<hits.size(); i++){
         searcher.state = hits[i];
         AdvPokemonResult other_result = searcher.generate_pokemon();
-        if (!are_indistinguishable(first_result, other_result)){
+        if (!are_indistinguishable(first_result, other_result, gender_threshold)){
             return false;
         }
     }
     return true;
 }
 
-bool all_indistinguishable(std::vector<AdvRngState> hits, AdvRngWildSearcher& searcher, bool super_rod){
+bool all_indistinguishable(const std::vector<AdvRngState>& hits, AdvRngWildSearcher& searcher, const int16_t& gender_threshold, bool super_rod){
     if (hits.size() < 2){
         return true;
     }
@@ -451,7 +559,46 @@ bool all_indistinguishable(std::vector<AdvRngState> hits, AdvRngWildSearcher& se
     for (size_t i=1; i<hits.size(); i++){
         searcher.state = hits[i];
         AdvWildPokemonResult other_result = searcher.generate_pokemon(super_rod);
-        if (!are_indistinguishable(first_result, other_result)){
+        if (!are_indistinguishable(first_result, other_result, gender_threshold)){
+            return false;
+        }
+    }
+    return true;
+}
+
+bool all_indistinguishable(
+    const std::vector<std::pair<AdvRngState, AdvRngState>>& hits, 
+    AdvRngEggSearcher& searcher,
+    const int16_t& gender_threshold,
+    AdvIVs& parentA_ivs, AdvIVs& parentB_ivs
+){
+    if (hits.size() < 2){
+        return true;
+    }
+    searcher.held_state = hits[0].first;
+    searcher.pickup_state = hits[0].second;
+
+    AdvPokemonResult first_result = searcher.generate_pokemon(parentA_ivs, parentB_ivs);
+
+     for (size_t i=1; i<hits.size(); i++){
+        searcher.held_state = hits[i].first;
+        searcher.pickup_state = hits[i].second;
+        AdvPokemonResult other_result = searcher.generate_pokemon(parentA_ivs, parentB_ivs);
+        if (!are_indistinguishable(first_result, other_result, gender_threshold)){
+            return false;
+        }
+    }
+    return true;
+}
+
+bool same_seeds(std::vector<AdvRngState> hits){
+    if (hits.size() < 2){
+        return true;
+    }
+    uint16_t first_seed = hits[0].seed;
+
+    for (size_t i=1; i<hits.size(); i++){
+        if (hits[i].seed != first_seed){
             return false;
         }
     }

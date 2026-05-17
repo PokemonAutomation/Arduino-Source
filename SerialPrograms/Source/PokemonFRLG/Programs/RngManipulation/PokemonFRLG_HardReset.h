@@ -18,15 +18,12 @@ namespace PokemonFRLG{
 void reset_and_perform_blind_sequence(
     ConsoleHandle& console, 
     ProControllerContext& context, 
-    PokemonFRLG_RngTarget TARGET,
-    SeedButton SEED_BUTTON,
-    BlackoutButton BLACKOUT_BUTTON,
-    uint64_t SEED_DELAY, 
-    uint64_t CONTINUE_SCREEN_DELAY, 
-    uint64_t TEACHY_DELAY, 
-    uint64_t INGAME_DELAY, 
-    bool SAFARI_ZONE,
-    uint8_t PROFILE
+    PokemonFRLG_RngTarget target,
+    const SeedButton& seed_button,
+    const BlackoutButton& extra_button,
+    const RngTimings& timings,
+    bool safari_zone,
+    uint8_t profile
 );
 
 #if 0

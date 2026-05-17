@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <utility>
 #include <vector>
+#include <stdexcept>
 #include "Pokemon_StatsCalculation.h"
 
 namespace PokemonAutomation{
@@ -28,6 +29,25 @@ struct AdvIVs{
     uint8_t spatk = 0;
     uint8_t spdef = 0;
     uint8_t speed = 0;
+
+    uint8_t& operator[](int index){
+        switch (index){
+        case 0: 
+            return hp;
+        case 1:
+            return attack;
+        case 2:
+            return defense;
+        case 3:
+            return speed;
+        case 4:
+            return spatk;
+        case 5:
+            return spdef;
+        default:
+            throw std::runtime_error("Invalid IVs index. Please report this as a bug.");
+        }
+    }
 };
 
 enum class AdvNature{
@@ -79,10 +99,17 @@ enum class AdvShinyType{
 };
 
 enum class AdvRngMethod{
-    Method1,
-    Method2,
-    Method4,
+    Method1, // egg normal
+    Method2, // egg split
+    Method3, // egg alternate
+    Method4, // egg mixed
     Any
+};
+
+enum class AdvEggCompatibility{
+    low,
+    medium,
+    high
 };
 
 struct AdvRngState{
@@ -94,9 +121,17 @@ struct AdvRngState{
     uint32_t s2;
     uint32_t s3;
     uint32_t s4;
+    uint32_t s5;
 
     bool operator<(const AdvRngState& rhs) const noexcept{
         return this->advance < rhs.advance;
+    }
+
+    bool operator==(const AdvRngState& rhs) const noexcept{
+        return (
+            this->advance == rhs.advance
+            && this->seed == rhs.seed\
+        );
     }
 };
 
@@ -123,6 +158,15 @@ struct AdvWildPokemonResult{
     AdvIVs ivs;
     uint8_t slot;
     uint8_t level;
+};
+
+struct AdvEggResult{
+    uint32_t pid;
+    uint8_t gender;
+    AdvNature nature;
+    AdvAbility ability;
+    AdvIVs ivs;
+    AdvIVs inherited_ivs;
 };
 
 struct AdvObservedPokemon{
@@ -155,8 +199,21 @@ void level_up_observed_pokemon(AdvObservedPokemon& pokemon, const StatReads& new
 // returns the appropriate NatureAdjustments for an AdvNature
 Pokemon::NatureAdjustments nature_to_adjustment(AdvNature nature);
 
+Pokemon::AdvNature string_to_nature(const std::string& nature_string);
+std::string nature_to_string(const AdvNature& nature);
+
+std::string gender_to_string(const AdvGender& gender);
+
+AdvGender gender_from_gender_value(uint8_t gender_value, int16_t threshold);
+
 // returns search filters that correspond with observed stats
 AdvRngFilters observation_to_filters(const AdvObservedPokemon& observation, const BaseStats& basestats, AdvRngMethod method = AdvRngMethod::Method1);
+
+AdvPokemonResult egg_to_pokemon(
+    AdvEggResult& egg_result,
+    AdvIVs& parentA_ivs, 
+    AdvIVs& parentB_ivs
+);
 
 class AdvRngSearcher{
 public:
@@ -229,6 +286,90 @@ private:
     );
 };
 
+
+class AdvRngEggSearcher{
+public:
+    uint16_t held_seed;
+    AdvRngState held_state;
+
+    uint16_t pickup_seed;
+    AdvRngState pickup_state;
+
+    AdvRngEggSearcher(uint16_t held_seed, AdvRngState held_state, uint16_t pickup_seed, AdvRngState pickup_state);
+    AdvRngEggSearcher(
+        uint16_t held_seed, uint64_t min_seed_advances, 
+        uint16_t pickup_seed, uint64_t min_pickup_advances, 
+        AdvRngMethod method = AdvRngMethod::Any
+    );
+
+    void set_held_seed(uint16_t seed);
+    void set_held_state_advances(uint64_t advances);
+    void advance_held_state();
+
+    void set_pickup_seed(uint16_t seed);
+    void set_pickup_state_advances(uint64_t advances);
+    void advance_pickup_state();
+
+    AdvEggResult generate_egg();
+    AdvPokemonResult generate_pokemon(AdvIVs& parentA_ivs, AdvIVs& parentB_ivs);
+
+    std::vector<std::pair<AdvRngState, AdvRngState>> search(
+        AdvRngFilters& target,
+        const std::vector<uint16_t>& held_seeds,
+        uint64_t min_held_advances,
+        uint64_t max_held_advances,
+        const std::vector<uint16_t>& pickup_seeds,
+        uint64_t min_pickup_advances,
+        uint64_t max_pickup_advances,
+        AdvIVs& parentA_ivs,
+        AdvIVs& parentB_ivs,
+        AdvEggCompatibility compatibility,
+        int16_t gender_threshold = 126,
+        uint16_t tid_xor_sid = 0
+    );
+
+private:
+
+    void search_held_advances_range(
+        std::vector<std::pair<AdvRngState, AdvRngState>>& hits,
+        AdvRngFilters& target,
+        uint64_t min_held_advances,
+        uint64_t max_held_advances,
+        const std::vector<uint16_t>& pickup_seeds,
+        uint64_t min_pickup_advances,
+        uint64_t max_pickup_advances,
+        AdvIVs& parentA_ivs,
+        AdvIVs& parentB_ivs,
+        AdvEggCompatibility compatibility,
+        int16_t gender_threshold,
+        uint16_t tid_xor_sid
+    );
+
+    void search_pickups(
+        std::vector<std::pair<AdvRngState, AdvRngState>>& hits,
+        AdvRngFilters& target,
+        uint16_t held_pid_half,
+        const std::vector<uint16_t>& pickup_seeds,
+        uint64_t min_pickup_advances,
+        uint64_t max_pickup_advances,
+        AdvIVs& parentA_ivs,
+        AdvIVs& parentB_ivs,
+        int16_t gender_threshold,
+        uint16_t tid_xor_sid
+    );
+
+    void search_pickup_advances_range(
+        std::vector<std::pair<AdvRngState, AdvRngState>>& hits,
+        AdvRngFilters& target,
+        uint16_t held_pid_half,
+        uint64_t min_pickup_advances,
+        uint64_t max_pickup_advances,
+        AdvIVs& parentA_ivs,
+        AdvIVs& parentB_ivs,
+        int16_t gender_threshold,
+        uint16_t tid_xor_sid
+    );
+};
 
 
 }

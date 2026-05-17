@@ -18,6 +18,7 @@
 #include "PokemonFRLG/Inference/PokemonFRLG_TrainerIdReader.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
+#include "PokemonFRLG_RngCalibration.h"
 #include "PokemonFRLG_SidHelper.h"
 
 namespace PokemonAutomation{
@@ -269,9 +270,6 @@ void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     // SidHelper_Descriptor::Stats& stats = env.current_stats<SidHelper_Descriptor::Stats>();
 
-    double FRAMERATE = 59.999977; // FPS
-    double FRAME_DURATION = 1000 / FRAMERATE; // ms
-
     uint64_t FINAL_TEXT_FRAMES;
     Language lang = LANGUAGE;
     switch (lang){
@@ -297,14 +295,14 @@ void SidHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         FINAL_TEXT_FRAMES = 249;
     }
 
-    const double& FIXED_ADVANCES_OFFSET = 7; // determined empirically. Probably not console/setup dependent
+    static const double FIXED_ADVANCES_OFFSET = 7; // determined empirically. Probably not console/setup dependent
 
     bool extra_press_at_end = (
         LANGUAGE == Language::German ||
         LANGUAGE == Language::Japanese
     );
 
-    const uint64_t SID_DELAY = uint64_t((TARGET_ADVANCES - 2*FINAL_TEXT_FRAMES + FIXED_ADVANCES_OFFSET) * FRAME_DURATION / 2); // advances pass 2 by 2
+    const uint64_t SID_DELAY = uint64_t((TARGET_ADVANCES - 2*FINAL_TEXT_FRAMES + FIXED_ADVANCES_OFFSET) * FRLG_FRAME_DURATION / 2); // advances pass 2 by 2
     env.log("Delay: " + std::to_string(SID_DELAY) + "ms");
 
     set_sid_from_name_screen(env, context, SID_DELAY, extra_press_at_end);

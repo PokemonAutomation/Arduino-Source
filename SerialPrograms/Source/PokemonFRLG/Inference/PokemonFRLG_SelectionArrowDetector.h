@@ -26,6 +26,16 @@ enum class SelectionArrowPositionSafariMenu {
     EXIT
 };
 
+const int NO_DEX_START_MENU_OPTION_COUNT = 6;
+enum class SelectionArrowPositionNoDexMenu{
+    POKEMON,
+    BAG,
+    TRAINER,
+    SAVE,
+    OPTION,
+    EXIT
+};
+
 const int START_MENU_OPTION_COUNT = 7;
 enum class SelectionArrowPositionStartMenu{
     POKEDEX,
@@ -71,6 +81,8 @@ public:
     static ImageFloatBox arrow_box_for_position(SelectionArrowPositionStartMenu position);
 
     static ImageFloatBox arrow_box_for_position(SelectionArrowPositionSafariMenu position);
+
+    static ImageFloatBox arrow_box_for_position(SelectionArrowPositionNoDexMenu position);
 
     static ImageFloatBox arrow_box_for_position(SelectionArrowPositionConfirmationMenu position);
 

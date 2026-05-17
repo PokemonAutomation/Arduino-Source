@@ -59,32 +59,6 @@ private:
     };
 
     bool have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t& TARGET_SEED, const AdvRngState& hit);
-
-    AdvObservedPokemon read_summary(
-        SingleSwitchProgramEnvironment& env, 
-        ProControllerContext& context, 
-        const std::set<std::string>& SPECIES_LIST, 
-        bool safari_zone
-    );
-
-    bool auto_catch(
-        SingleSwitchProgramEnvironment& env, 
-        ProControllerContext& context, 
-        WildRng_Descriptor::Stats& stats,
-        const uint64_t& MAX_BALL_THROWS,
-        bool safari_zone
-    );
-
-    bool use_rare_candy(
-        SingleSwitchProgramEnvironment& env, 
-        ProControllerContext& context,
-        WildRng_Descriptor::Stats& stats,
-        AdvObservedPokemon& pokemon,
-        AdvRngFilters& filters,
-        const BaseStats& BASE_STATS,
-        bool safari_zone,
-        bool first
-    );
     
     OCR::LanguageOCROption LANGUAGE;
 
