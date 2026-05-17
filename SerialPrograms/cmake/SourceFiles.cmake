@@ -1485,6 +1485,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.h
     Source/PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.cpp
     Source/PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h
+    Source/PokemonFRLG/Inference/PokemonFRLG_DaycareManDetector.cpp
+    Source/PokemonFRLG/Inference/PokemonFRLG_DaycareManDetector.h
     Source/PokemonFRLG/Inference/PokemonFRLG_DigitReader.cpp
     Source/PokemonFRLG/Inference/PokemonFRLG_DigitReader.h
     Source/PokemonFRLG/Inference/PokemonFRLG_StatsReader.cpp
@@ -1561,6 +1563,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_StaticRng.h
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_WildRng.cpp
     Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_WildRng.h
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_EggRng.cpp
+    Source/PokemonFRLG/Programs/RngManipulation/PokemonFRLG_EggRng.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.cpp
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.h
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadStats.cpp
