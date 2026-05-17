@@ -8,6 +8,7 @@
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
 #include "Common/Cpp/Concurrency/Watchdog.h"
+#include "Common/Cpp/Concurrency/PeriodicRunner.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ImageResolution.h"
 #include "Common/Qt/GlobalThreadPoolsQt.h"
@@ -35,6 +36,7 @@
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "CommonTools/OCR/OCR_RawOCR.h"
 #include "ControllerInput/ControllerInput.h"
+#include "Controllers/SerialPortPollerQt.h"
 #include "Integrations/DiscordWebhook.h"
 #include "Windows/MainWindow.h"
 
@@ -113,10 +115,13 @@ int run_program(int argc, char *argv[]){
 
 
 
-    //  Preload all the cameras now so we don't hang the UI later on.
-    ScopeExit cameras([]{
+    ScopeExit cleanup([]{
+        SerialPortPoller::instance().stop();
         GlobalMediaServices::instance().stop();
     });
+
+    //  Preload a bunch of stuff now so they are ready later.
+    SerialPortPoller::instance().ports();
     get_all_cameras();
 
     //  Force all the Qt thread pools to be constructed now on the main thread.
@@ -244,6 +249,7 @@ int main(int argc, char *argv[]){
     //  Stop misc. services.
     Integration::DiscordWebhook::DiscordWebhookSender::instance().stop();
     SystemSleepController::instance().stop();
+    global_periodic_runner().stop();
     global_watchdog().stop();
     static_cast<FileWindowLogger&>(global_logger_raw()).stop();
 

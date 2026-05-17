@@ -39,6 +39,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Concurrency/FireForgetDispatcher.cpp
     ../Common/Cpp/Concurrency/FireForgetDispatcher.h
     ../Common/Cpp/Concurrency/Mutex.h
+    ../Common/Cpp/Concurrency/PeriodicRunner.cpp
+    ../Common/Cpp/Concurrency/PeriodicRunner.h
     ../Common/Cpp/Concurrency/Qt6.9ThreadBugWorkaround.h
     ../Common/Cpp/Concurrency/ReverseLockGuard.h
     ../Common/Cpp/Concurrency/ScheduledTaskRunner.cpp
@@ -791,6 +793,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h
+    Source/Controllers/SerialPortPollerQt.cpp
+    Source/Controllers/SerialPortPollerQt.h
     Source/Controllers/StandardHid/StandardHid_Keyboard.cpp
     Source/Controllers/StandardHid/StandardHid_Keyboard.h
     Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.cpp

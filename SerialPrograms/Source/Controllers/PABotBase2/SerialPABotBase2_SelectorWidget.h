@@ -11,7 +11,7 @@
 #include "Common/Qt/NoWheelComboBox.h"
 #include "Controllers/ControllerDescriptor.h"
 #include "Controllers/ControllerSelectorWidget.h"
-#include "Controllers/NullController.h"
+#include "Controllers/SerialPortPollerQt.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h"
 #include "SerialPABotBase2_Descriptor.h"
 
@@ -84,7 +84,7 @@ public:
 
 
         m_ports.emplace_back(new SerialPABotBase2_Descriptor());
-        for (QSerialPortInfo& port : QSerialPortInfo::availablePorts()){
+        for (QSerialPortInfo& port : SerialPortPoller::instance().ports()){
             if (filter_serial_port(port)){
                 m_ports.emplace_back(
                     new SerialPABotBase2_Descriptor(port.portName().toStdString())
