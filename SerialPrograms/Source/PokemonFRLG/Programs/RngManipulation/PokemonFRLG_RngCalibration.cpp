@@ -91,17 +91,25 @@ RngTimings prepare_timings(
     const bool& USE_TEACHY_TV,
     const RngCalibrations& calibrations,
     const int64_t& FIXED_SEED_OFFSET, 
-    const int64_t& FIXED_ADVANCES_OFFSET,
-    bool safari_zone
+    const int64_t& FIXED_ADVANCES_OFFSET
 ){
     double modified_ingame_advances = INGAME_ADVANCES + calibrations.ingame_offset + FIXED_ADVANCES_OFFSET;
     if (modified_ingame_advances < 0) {
-           OperationFailedException::fire(
-                ErrorReport::NO_ERROR_REPORT,
-                "In-game advances cannot be negative. Check your in-game advances and calibration.",
-                console
-            ); 
-        }
+        OperationFailedException::fire(
+            ErrorReport::NO_ERROR_REPORT,
+            "In-game advances cannot be negative. Check your in-game advances and calibration.",
+            console
+        ); 
+    }
+
+    bool safari_zone = (
+        target == PokemonFRLG_RngTarget::safarizonecenter ||
+        target == PokemonFRLG_RngTarget::safarizoneeast ||
+        target == PokemonFRLG_RngTarget::safarizonenorth ||
+        target == PokemonFRLG_RngTarget::safarizonewest ||
+        target == PokemonFRLG_RngTarget::safarizonesurf ||
+        target == PokemonFRLG_RngTarget::safarizonefish
+    );
 
     uint64_t TEACHY_ADVANCES = 0;
 

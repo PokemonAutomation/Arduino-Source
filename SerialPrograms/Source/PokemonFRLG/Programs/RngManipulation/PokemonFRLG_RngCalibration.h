@@ -55,8 +55,7 @@ RngTimings prepare_timings(
     const bool& USE_TEACHY_TV,
     const RngCalibrations& calibrations,
     const int64_t& FIXED_SEED_OFFSET, 
-    const int64_t& FIXED_ADVANCES_OFFSET,
-    bool safari_zone = false
+    const int64_t& FIXED_ADVANCES_OFFSET
 );
 
 // get search hits for any of the provided seed values and advances range
