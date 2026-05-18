@@ -97,16 +97,16 @@ void PeriodicRunner::thread_body(){
 
         auto runnable = iter->second;
         try{
-            m_schedule.emplace(fire_time + runnable->second.period, iter->second);
+            m_schedule.emplace(fire_time + runnable->second.period, runnable);
         }catch (...){
             continue;
         }
 
         m_schedule.erase(iter);
 
-        std::lock_guard<Mutex> lg1(iter->second->second.lock);
+        std::lock_guard<Mutex> lg1(runnable->second.lock);
         m_lock.unlock();
-        iter->second->first->run();
+        runnable->first->run();
         m_lock.lock();
     }
 }
