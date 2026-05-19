@@ -512,8 +512,7 @@ static bool go_through_route_213_chasing(
             {{black_screen}}
         );
         if (ret < 0){
-            stream.log("go_through_route_213_tuber_chelsea: Didn't detect battle starting!", COLOR_RED);
-            return false;
+            stream.log("go_through_route_213_tuber_chelsea: Didn't detect battle starting!");
         } else if (ret == 0) {
             stream.log("go_through_route_213_tuber_chelsea: Starting battle.");
             handle_battle(stream, context, "route_213_tuber_chelsea");
@@ -665,7 +664,7 @@ static bool go_through_route_214(
     context.wait_for_all_requests();
     pbf_wait(context, 4000ms);
 
-    fly_to(stream, context, "solaceon_town");
+    fly_to(stream, context, FlyPoint::SolaceonTown);
 
     return true;
 }
@@ -1295,7 +1294,7 @@ static bool talk_to_cyrus_and_fly_hearthome(
     context.wait_for_all_requests();
     pbf_wait(context, 3000ms);
 
-    fly_to(stream, context, "hearthome_city");
+    fly_to(stream, context, FlyPoint::HearthomeCity);
 
     context.wait_for_all_requests();
     pbf_wait(context, 3000ms);
