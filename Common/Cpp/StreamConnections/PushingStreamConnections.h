@@ -43,11 +43,19 @@ protected:
 
 class ReliableStreamConnectionPushing : public StreamConnectionPushing{
 public:
-    virtual bool reliable_send_all_or_nothing(
+    //  Throws exception if cancelled or connection is dead.
+    virtual void reliable_send_all_or_nothing(
+        Cancellable* cancellable,
+        const void* data, size_t bytes
+    ) = 0;
+
+    //  Returns false if cannot send within timeout.
+    //  Throws exception if cancelled or connection is dead.
+    [[nodiscard]] virtual bool reliable_send_all_or_nothing(
         Cancellable* cancellable,
         const void* data, size_t bytes,
         WallDuration timeout
-    ) noexcept = 0;
+    ) = 0;
 
 protected:
     void on_reliable_recv(const void* data, size_t bytes){

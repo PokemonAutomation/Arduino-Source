@@ -248,7 +248,7 @@ void PABotBase2_OemController::stop(){
 }
 
 
-void PABotBase2_OemController::run_preconnect_configure(
+bool PABotBase2_OemController::run_preconnect_configure(
     Logger& logger,
     PABotBase2::Connection& connection,
     ControllerType controller_type
@@ -336,7 +336,7 @@ void PABotBase2_OemController::run_preconnect_configure(
 
     connection.message_logger().log_send(logger, true, &message.request);
 
-    connection.device().connection().reliable_send_all_or_nothing(
+    return connection.device().connection().reliable_send_all_or_nothing(
         nullptr,
         &message,
         sizeof(Message),

@@ -44,7 +44,7 @@ public:
     virtual bool cancel(std::exception_ptr exception) noexcept override;
 
     void connect();
-    void try_set_controller_type(
+    bool try_set_controller_type(
         ControllerType controller_type,
         bool clear_settings
     ) noexcept;
@@ -82,14 +82,20 @@ public:
     ControllerType refresh_controller_type();
 
     void send_request_with_no_response(MessageHeader& request);
-    std::optional<uint8_t> try_send_request_with_no_response(
+#if 0
+    bool try_send_request_with_no_response(
         MessageHeader& request, WallDuration timeout
     ) noexcept;
+#endif
 
     uint8_t send_request_with_response(MessageHeader& request);
+
+    //  Returns {} if cannot send request.
+    //  Throws if connection is dead.
     std::optional<uint8_t> try_send_request_with_response(
         MessageHeader& request, WallDuration timeout
-    ) noexcept;
+    );
+
     std::string wait_for_request_response(
         uint8_t id,
         WallDuration timeout = WallDuration::max()
