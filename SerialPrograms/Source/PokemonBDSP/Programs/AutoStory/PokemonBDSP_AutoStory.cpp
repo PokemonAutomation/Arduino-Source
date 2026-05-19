@@ -593,69 +593,6 @@ void BDSPAutoStory::program(
 
 
 
-bool activate_repel(
-    VideoStream& stream,
-    ProControllerContext& context
-){
-    stream.log("Activating repel");
-    DpadState dpad;
-    context.wait_for_all_requests();
-    pbf_press_button(context, BUTTON_X, 80ms, 300ms);
-    pbf_wait(context, 1000ms);
-    pbf_press_button(context, BUTTON_PLUS, 80ms, 300ms);
-    context.wait_for_all_requests();
-    pbf_wait(context, 1000ms);
-    pbf_press_button(context, BUTTON_B, 80ms, 300ms);
-    pbf_wait(context, 1000ms);
-    pbf_press_dpad(context, DPAD_UP, 80ms, 300ms);
-    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 2, false);
-    pbf_press_button(context, BUTTON_A, 80ms, 300ms);
-    context.wait_for_all_requests();
-
-    pbf_wait(context, 1000ms);
-    {
-        auto repel_tab_ref = std::make_shared<const ImageRGB32>(
-            RESOURCE_PATH() + "PokemonBDSP/AutoStory/Bag_RepelTab.png"
-        );
-
-        const ImageFloatBox repel_tab_box{0.735000, 0.055000, 0.045000, 0.080000};
-        const double repel_tab_rmsd = 50.0;
-
-        // BDSP bag has 8 compartment tabs; check before each press so zero-press
-        // detection works when the bag already starts on the repel tab.
-        bool found = false;
-        for (int press = 0; press <= 8; press++){
-            context.wait_for_all_requests();
-
-            ImageMatchWatcher watcher(repel_tab_ref, repel_tab_box, repel_tab_rmsd);
-            int ret = wait_until(stream, context, 400ms, {{watcher}});
-            if (ret == 0){
-                stream.log("[AutoStory] activate_repel: repel tab found after "
-                           + std::to_string(press) + " press(es).", COLOR_GREEN);
-                found = true;
-                break;
-            }
-
-            if (press < 8){
-                stream.log("[AutoStory] activate_repel: tab not found, pressing right ("
-                           + std::to_string(press + 1) + "/8).");
-                pbf_press_dpad(context, DPAD_RIGHT, 80ms, 300ms);
-            }
-        }
-
-        if (!found){
-            stream.log("[AutoStory] activate_repel: failed to find repel compartment tab.", COLOR_RED);
-            return false;
-        }
-    }
-    context.wait_for_all_requests();
-    pbf_wait(context, 400ms);
-    pbf_mash_button(context, BUTTON_A, 500ms);
-    pbf_mash_button(context, BUTTON_B, 2000ms);
-    return true;
-}
-
-
 }
 }
 }
