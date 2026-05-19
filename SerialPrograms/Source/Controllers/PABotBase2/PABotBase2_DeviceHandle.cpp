@@ -228,7 +228,7 @@ void DeviceHandle::connect(){
         set_logging_flag(GlobalSettings::instance().DEVICE_LOGGING_FLAG);
     }
 }
-void DeviceHandle::try_set_controller_type(
+bool DeviceHandle::try_set_controller_type(
     ControllerType controller_type,
     bool clear_settings
 ) noexcept{
@@ -237,10 +237,13 @@ void DeviceHandle::try_set_controller_type(
     message.opcode = clear_settings
         ? PABB2_MESSAGE_OPCODE_RESET_TO_CONTROLLER
         : PABB2_MESSAGE_OPCODE_CHANGE_CONTROLLER_MODE;
+
+    bool sent = false;
     try{
         message.data = SerialPABotBase::controller_type_to_id(controller_type);
-        try_send_request_with_response(message, std::chrono::milliseconds(100));
+        sent = try_send_request_with_response(message, std::chrono::milliseconds(100)).has_value();
     }catch (...){}
+    return sent;
 }
 
 ControllerType DeviceHandle::refresh_controller_type(){
@@ -263,11 +266,11 @@ void DeviceHandle::send_request_with_no_response(MessageHeader& request){
     m_connection.reliable_send_all_or_nothing(
         nullptr,
         &request,
-        request.message_bytes,
-        WallDuration::max()
+        request.message_bytes
     );
 }
-std::optional<uint8_t> DeviceHandle::try_send_request_with_no_response(
+#if 0
+bool DeviceHandle::try_send_request_with_no_response(
     MessageHeader& request, WallDuration timeout
 ) noexcept{
     request.id = 0;
@@ -280,6 +283,7 @@ std::optional<uint8_t> DeviceHandle::try_send_request_with_no_response(
         timeout
     );
 }
+#endif
 uint8_t DeviceHandle::send_request_with_response(MessageHeader& request){
     std::unique_lock<Mutex> lg(m_lock);
     while (true){
@@ -305,8 +309,7 @@ uint8_t DeviceHandle::send_request_with_response(MessageHeader& request){
         m_connection.reliable_send_all_or_nothing(
             nullptr,
             &request,
-            request.message_bytes,
-            WallDuration::max()
+            request.message_bytes
         );
     }catch (...){
         m_pending_requests.erase(request.id);
@@ -318,27 +321,24 @@ uint8_t DeviceHandle::send_request_with_response(MessageHeader& request){
 }
 std::optional<uint8_t> DeviceHandle::try_send_request_with_response(
     MessageHeader& request, WallDuration timeout
-) noexcept{
+){
+    std::map<uint8_t, std::string>::iterator iter;
     std::unique_lock<Mutex> lg(m_lock);
-    try{
-        while (true){
-            throw_if_cancelled();
+    while (true){
+        throw_if_cancelled();
 
-            request.id = m_request_seqnum;
+        request.id = m_request_seqnum;
 
-            //  Wait until the slot is available.
-            auto iter = m_pending_requests.find(request.id);
-            if (iter != m_pending_requests.end()){
-                m_cv.wait(lg);
-                continue;
-            }
-
-            m_pending_requests[request.id];
-            m_request_seqnum++;
-            break;
+        //  Wait until the slot is available.
+        iter = m_pending_requests.find(request.id);
+        if (iter != m_pending_requests.end()){
+            m_cv.wait(lg);
+            continue;
         }
-    }catch (...){
-        return {};
+
+        m_pending_requests[request.id];
+        m_request_seqnum++;
+        break;
     }
 
     m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &request);
@@ -353,10 +353,13 @@ std::optional<uint8_t> DeviceHandle::try_send_request_with_response(
             return request.id;
         }
     }catch (...){
-        m_pending_requests.erase(request.id);
+        m_pending_requests.erase(iter);
         m_request_seqnum--;
+        throw;
     }
 
+    m_pending_requests.erase(iter);
+    m_request_seqnum--;
     return {};
 }
 std::string DeviceHandle::wait_for_request_response(uint8_t id, WallDuration timeout){

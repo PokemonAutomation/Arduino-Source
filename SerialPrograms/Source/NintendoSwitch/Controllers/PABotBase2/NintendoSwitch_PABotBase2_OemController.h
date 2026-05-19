@@ -38,7 +38,7 @@ public:
     ~PABotBase2_OemController();
     void stop();
 
-    static void run_preconnect_configure(
+    static bool run_preconnect_configure(
         Logger& logger,
         PABotBase2::Connection& connection,
         ControllerType controller_type

@@ -94,14 +94,33 @@ bool ReliableStreamConnection::wait_for_pending(WallDuration timeout){
 //  StreamSender/StreamListener
 //
 
+void ReliableStreamConnection::reliable_send_all_or_nothing(
+    Cancellable* cancellable,
+    const void* data, size_t bytes
+){
+    const char* ptr = (const char*)data;
+    std::unique_lock<Mutex> lg(m_lock);
+    while (true){
+        throw_if_cancelled();
+        if (cancellable){
+            cancellable->throw_if_cancelled();
+        }
+        if (m_reliable_sender.slots_used() >= m_max_unacked_packets){
+            m_cv.wait(lg);
+            continue;
+        }
+        if (m_reliable_sender.send_stream_all_or_nothing(ptr, bytes)){
+            return;
+        }
+        m_cv.wait(lg);
+    }
+}
 bool ReliableStreamConnection::reliable_send_all_or_nothing(
     Cancellable* cancellable,
     const void* data, size_t bytes,
     WallDuration timeout
-) noexcept{
-    WallClock deadline = timeout == WallDuration::max()
-        ? WallClock::max()
-        : current_time() + timeout;
+){
+    WallClock deadline = current_time() + timeout;
 
     const char* ptr = (const char*)data;
     std::unique_lock<Mutex> lg(m_lock);

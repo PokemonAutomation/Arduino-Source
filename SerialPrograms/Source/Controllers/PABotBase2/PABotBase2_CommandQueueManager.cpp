@@ -117,18 +117,20 @@ uint8_t CommandQueueManager::send_command(Cancellable* cancellable, MessageHeade
             ).first;
 
             m_lock.unlock();
-            bool sent = m_connection.reliable_send_all_or_nothing(
-                cancellable,
-                &command, command.message_bytes,
-                WallDuration::max()
-            );
+            try{
+                m_connection.reliable_send_all_or_nothing(
+                    cancellable,
+                    &command, command.message_bytes
+                );
+            }catch (...){
+                m_lock.lock();
+                m_pending_commands.erase(iter);
+                throw;
+            }
             m_lock.lock();
 
-            if (sent){
-                m_command_seqnum++;
-                break;
-            }
-            m_pending_commands.erase(iter);
+            m_command_seqnum++;
+            break;
         }
     }
 //    cout << "Post send 0: " << (unsigned)command.id << endl;
@@ -171,11 +173,16 @@ bool CommandQueueManager::try_push_pending_specials() noexcept{
     message.id = 0;
 
     m_lock.unlock();
-    bool sent = m_connection.reliable_send_all_or_nothing(
-        nullptr,
-        &message, message.message_bytes,
-        WallDuration::zero()
-    );
+
+    bool sent = false;
+    try{
+        sent = m_connection.reliable_send_all_or_nothing(
+            nullptr,
+            &message, message.message_bytes,
+            WallDuration::zero()
+        );
+    }catch (...){}
+
     m_lock.lock();
 
     if (!sent){
@@ -185,9 +192,7 @@ bool CommandQueueManager::try_push_pending_specials() noexcept{
     m_pending_special = PABB2_MESSAGE_OPCODE_INVALID;
     m_pending_commands.clear();
 
-    try{
-        m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &message);
-    }catch (...){}
+    m_message_loggers.log_send(m_logger, GlobalSettings::instance().LOG_EVERYTHING, &message);
     return true;
 }
 
