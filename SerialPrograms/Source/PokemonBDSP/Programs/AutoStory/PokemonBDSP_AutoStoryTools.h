@@ -137,6 +137,13 @@ public:
 //  Shared utility functions (implementations in .cpp)
 // ---------------------------------------------------------------------------
 
+//  Save the game from the overworld with retries. Returns true if the save was
+//  verified via overworld detection, false if the blind fallback was used.
+bool save_game(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context
+);
+
 // Fake save game to be replaced with save_game when program runs smoothly
 void checkpoint_save(
     SingleSwitchProgramEnvironment& env,
@@ -206,9 +213,11 @@ void mash_until_dialogue_ends(
 
 //  Open the bag, navigate to the repel compartment tab, and use a repel.
 //  Returns false if the repel compartment tab could not be found.
+//  num_icons: 5 (early-game layout) or 8 (late-game layout).
 bool activate_repel(
     VideoStream& stream,
-    ProControllerContext& context
+    ProControllerContext& context,
+    int num_icons = 8
 );
 
 //  Walk to the nurse, heal the party, and exit the Pokemon Center.
@@ -220,13 +229,35 @@ bool heal_pokemon(
     const std::string& label
 );
 
+enum class FlyPoint {
+    CanalavCity,
+    CellesticTown,
+    EternaCity,
+    FloaromaTown,
+    HearthomeCity,
+    JubilifeCity,
+    OreburghCity,
+    PastoriaCity,
+    PokemonLeagueLower,
+    PokemonLeagueUpper,
+    Route221,
+    SandgemTown,
+    SolaceonTown,
+    SnowpointCity,
+    SunyshoreCity,
+    TwinleafTown,
+    VeilstoneCity,
+};
+
+std::string fly_point_name(FlyPoint place);
+
 // Open the map, move the cursor to either bottom left, bottom right or
 // top left, then move the cursor a number of steps, then checks for
 // correctness, and mashes A until a black screen is detected
 bool fly_to(
     VideoStream& stream,
     ProControllerContext& context,
-    const std::string& place
+    FlyPoint place
 );
 
 // Opens the X-menu from the overworld, navigates the cursor to `target`, and presses A.
