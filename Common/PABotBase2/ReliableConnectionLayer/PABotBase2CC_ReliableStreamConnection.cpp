@@ -105,7 +105,7 @@ void ReliableStreamConnection::reliable_send_all_or_nothing(
         if (cancellable){
             cancellable->throw_if_cancelled();
         }
-        if (m_reliable_sender.slots_used() >= m_max_unacked_packets){
+        if (m_reliable_sender.slots_used() >= m_remote_slot_capacity){
             m_cv.wait(lg);
             continue;
         }
