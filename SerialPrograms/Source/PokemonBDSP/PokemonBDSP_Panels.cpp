@@ -7,6 +7,8 @@
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 
+#include "PokemonBDSP/Programs/AutoStory/PokemonBDSP_AutoStory.h"
+
 #include "PokemonBDSP_Panels.h"
 #include "PokemonBDSP_Settings.h"
 
@@ -90,6 +92,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_SingleSwitchProgram<EggFetcher>());
     ret.emplace_back(make_SingleSwitchProgram<EggHatcher>());
     ret.emplace_back(make_SingleSwitchProgram<EggAutonomous>());
+
+    ret.emplace_back("---- Auto Story ----");
+    ret.emplace_back(make_single_switch_program<BDSPAutoStory_Descriptor, BDSPAutoStory>());
 
     ret.emplace_back("---- Glitches (v1.1.3) ----");
     ret.emplace_back(make_SingleSwitchProgram<ActivateMenuGlitch113>());
