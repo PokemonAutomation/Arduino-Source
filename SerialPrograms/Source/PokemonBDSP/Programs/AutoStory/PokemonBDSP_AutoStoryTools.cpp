@@ -16,6 +16,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/VisualDetectors/ImageMatchDetector.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 
@@ -55,24 +56,24 @@ const char* torterra_move_slug(TorterraMove move){
     return "unknown";
 }
 
-void fake_save_game(
+bool fake_save_game(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context
 ){
+    pbf_mash_button(context, BUTTON_L, 1000ms);
+
     context.wait_for_all_requests();
-    pbf_press_button(context, BUTTON_X, 80ms, 1000ms);
     pbf_press_button(context, BUTTON_X, 80ms, 1000ms);
     pbf_press_button(context, BUTTON_R, 80ms, 1000ms);
     pbf_mash_button(context, BUTTON_B, 2000ms);
     context.wait_for_all_requests();
+
+    return true;
 }
 
-
-void checkpoint_save(
+bool save_game(
     SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
+    ProControllerContext& context
 ){
     static constexpr size_t MAX_RETRIES = 10;
 
@@ -162,6 +163,18 @@ void checkpoint_save(
 
         context.wait_for_all_requests();
     }
+
+    return success;
+}
+
+
+void checkpoint_save(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
+){
+    bool success = fake_save_game(env, context);
 
     stats.m_checkpoint++;
     env.update_stats();
@@ -346,26 +359,33 @@ bool heal_pokemon(
     return true;
 }
 
+std::string fly_point_name(FlyPoint place) {
+    switch (place) {
+        case FlyPoint::CanalavCity:        return "canalave_city";
+        case FlyPoint::CellesticTown:      return "celestic_town";
+        case FlyPoint::EternaCity:         return "eterna_city";
+        case FlyPoint::FloaromaTown:       return "floaroma_town";
+        case FlyPoint::HearthomeCity:      return "hearthome_city";
+        case FlyPoint::JubilifeCity:       return "jubilife_city";
+        case FlyPoint::OreburghCity:       return "oreburgh_city";
+        case FlyPoint::PastoriaCity:       return "pastoria_city";
+        case FlyPoint::PokemonLeagueLower: return "pokemon_league_lower";
+        case FlyPoint::PokemonLeagueUpper: return "pokemon_league_upper";
+        case FlyPoint::Route221:           return "route_221";
+        case FlyPoint::SandgemTown:        return "sandgem_town";
+        case FlyPoint::SolaceonTown:       return "solaceon_town";
+        case FlyPoint::SnowpointCity:      return "snowpoint_city";
+        case FlyPoint::SunyshoreCity:      return "sunyshore_city";
+        case FlyPoint::TwinleafTown:       return "twinleaf_town";
+        case FlyPoint::VeilstoneCity:      return "veilstone_city";
+    }
+}
+
 bool fly_to(
     VideoStream& stream,
     ProControllerContext& context,
-    const std::string& place
+    FlyPoint place
 ){
-    static const std::unordered_set<std::string> EAST_CITIES = {
-        "celestic_town",
-        "hearthome_city",
-        "pastoria_city",
-        "pokemon_league_lower",
-        "pokemon_league_upper",
-        "solaceon_town",
-        "sunyshore_city",
-        "veilstone_city"
-    };
-
-    static const std::unordered_set<std::string> NORTH_CITY = {
-        "snowpoint_city",
-    };
-
     // Each city branch below should update this to the city icon's position on the fly map.
     // Detection: when the cursor brackets overlap the icon, its normally uniform
     // color becomes non-uniform (stddev rises). Box stays as a rough fallback
@@ -377,12 +397,24 @@ bool fly_to(
     pbf_wait(context, 1000ms);
     pbf_press_button(context, BUTTON_X, 80ms, 1000ms);
     pbf_press_button(context, BUTTON_PLUS, 80ms, 1000ms);
-    if (EAST_CITIES.count(place)){
-        pbf_move_left_joystick(context, {+1, -1}, 4000ms, 500ms);
-    } else if (NORTH_CITY.count(place)) {
-        pbf_move_left_joystick(context, {-1, +1}, 4000ms, 500ms);
-    } else {
-        pbf_move_left_joystick(context, {-1, -1}, 4000ms, 500ms);
+
+    switch (place) {
+        case FlyPoint::CellesticTown:
+        case FlyPoint::HearthomeCity:
+        case FlyPoint::PastoriaCity:
+        case FlyPoint::PokemonLeagueLower:
+        case FlyPoint::PokemonLeagueUpper:
+        case FlyPoint::SolaceonTown:
+        case FlyPoint::SunyshoreCity:
+        case FlyPoint::VeilstoneCity:
+            pbf_move_left_joystick(context, {+1, -1}, 4000ms, 500ms);
+            break;
+        case FlyPoint::SnowpointCity:
+            pbf_move_left_joystick(context, {-1, +1}, 4000ms, 500ms);
+            break;
+        default:
+            pbf_move_left_joystick(context, {-1, -1}, 4000ms, 500ms);
+            break;
     }
     context.wait_for_all_requests();
 
@@ -401,46 +433,50 @@ bool fly_to(
     };
     FlyAButtonDetector watcher_1(button_a_box);
 
-    if (place == "canalave_city") {
-
-    } else if (place == "celestic_town") {
-
-    } else if (place == "eterna_city") {
-
-    } else if (place == "floaroma_town") {
-
-    } else if (place == "hearthome_city") {
-
-        city_icon_box = {0.660000, 0.637000, 0.029000, 0.052000};
-        repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 16, false);
-        repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 7, false);
-
-    } else if (place == "jubilife_city") {
-
-    } else if (place == "oreburgh_city") {
-
-    } else if (place == "pastoria_city") {
-        
-    } else if (place == "pokemon_league_lower") {
-        
-    } else if (place == "pokemon_league_upper") {
-        
-    } else if (place == "route_221") {
-        
-    } else if (place == "sandgem_town") {
-        
-    } else if (place == "solaceon_town") {
-
-        city_icon_box = {0.735000, 0.603000, 0.030000, 0.022000};
-        repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 12, false);
-        repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 9, false);
-
-    } else if (place == "sunyshore_city") {
-        
-    } else if (place == "twinleaf_town") {
-        
-    } else if (place == "veilstone_city") {
-        
+    switch (place) {
+        case FlyPoint::CanalavCity:
+            break;
+        case FlyPoint::CellesticTown:
+            break;
+        case FlyPoint::EternaCity:
+            break;
+        case FlyPoint::FloaromaTown:
+            break;
+        case FlyPoint::HearthomeCity:
+            city_icon_box = {0.660000, 0.637000, 0.029000, 0.052000};
+            repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 16, false);
+            repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 7, false);
+            break;
+        case FlyPoint::JubilifeCity:
+            city_icon_box = {0.453000, 0.702000, 0.016000, 0.054000};
+            repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 4, false);
+            repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 5, false);
+            break;
+        case FlyPoint::OreburghCity:
+            break;
+        case FlyPoint::PastoriaCity:
+            break;
+        case FlyPoint::PokemonLeagueLower:
+            break;
+        case FlyPoint::PokemonLeagueUpper:
+            break;
+        case FlyPoint::Route221:
+            break;
+        case FlyPoint::SandgemTown:
+            break;
+        case FlyPoint::SolaceonTown:
+            city_icon_box = {0.735000, 0.603000, 0.030000, 0.022000};
+            repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 12, false);
+            repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 9, false);
+            break;
+        case FlyPoint::SnowpointCity:
+            break;
+        case FlyPoint::SunyshoreCity:
+            break;
+        case FlyPoint::TwinleafTown:
+            break;
+        case FlyPoint::VeilstoneCity:
+            break;
     }
 
     context.wait_for_all_requests();
@@ -458,16 +494,17 @@ bool fly_to(
     };
     CityIconDetector watcher_2(city_icon_box);
 
+    const std::string name = fly_point_name(place);
     int ret_1 = wait_until(stream, context, 3000ms, {{watcher_1}});
     int ret_2 = wait_until(stream, context, 4000ms, {{watcher_2}});
     if (ret_1 < 0) {
         stream.log("A button not found, retrying...", COLOR_RED);
     };
     if (ret_2 < 0) {
-        stream.log(place + " not found, retrying...", COLOR_RED);
+        stream.log(name + " not found, retrying...", COLOR_RED);
     };
     if (ret_1 == 0 and ret_2 == 0){
-        stream.log("Found " + place + ", flying towards it.", COLOR_GREEN);
+        stream.log("Found " + name + ", flying towards it.", COLOR_GREEN);
         BlackScreenOverWatcher flying_black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
         int ret = run_until<ProControllerContext>(
             stream, context,
@@ -477,10 +514,10 @@ bool fly_to(
             {{flying_black_screen}}
         );
         if (ret < 0){
-            stream.log("Flying to " + place + ": black screen not detected!", COLOR_RED);
+            stream.log("Flying to " + name + ": black screen not detected!", COLOR_RED);
             return false;
         } else if (ret == 0) {
-            stream.log("Flying to " + place + ": black screen detected!", COLOR_GREEN);
+            stream.log("Flying to " + name + ": black screen detected!", COLOR_GREEN);
             return true;
         }
     }
@@ -750,6 +787,57 @@ void open_menu(
     }
 
     pbf_press_button(context, BUTTON_A, 80ms, 200ms);
+}
+
+
+bool activate_repel(
+    VideoStream& stream,
+    ProControllerContext& context,
+    int num_icons
+){
+    stream.log("Activating repel");
+    open_menu(stream, context, MenuCursorPosition::BAG, num_icons);
+    context.wait_for_all_requests();
+    pbf_wait(context, 1000ms);
+
+    auto repel_tab_ref = std::make_shared<const ImageRGB32>(
+        RESOURCE_PATH() + "PokemonBDSP/AutoStory/Bag_RepelTab.png"
+    );
+    const ImageFloatBox repel_tab_box{0.735000, 0.055000, 0.045000, 0.080000};
+    const double repel_tab_rmsd = 50.0;
+
+    // BDSP bag has 8 compartment tabs; check before each press so zero-press
+    // detection works when the bag already starts on the repel tab.
+    bool found = false;
+    for (int press = 0; press <= 8; press++){
+        context.wait_for_all_requests();
+
+        ImageMatchWatcher watcher(repel_tab_ref, repel_tab_box, repel_tab_rmsd);
+        int ret = wait_until(stream, context, 400ms, {{watcher}});
+        if (ret == 0){
+            stream.log("[AutoStory] activate_repel: repel tab found after "
+                       + std::to_string(press) + " press(es).", COLOR_GREEN);
+            found = true;
+            break;
+        }
+
+        if (press < 8){
+            stream.log("[AutoStory] activate_repel: tab not found, pressing right ("
+                       + std::to_string(press + 1) + "/8).");
+            pbf_press_dpad(context, DPAD_RIGHT, 80ms, 300ms);
+        }
+    }
+
+    if (!found){
+        stream.log("[AutoStory] activate_repel: failed to find repel compartment tab.", COLOR_RED);
+        return false;
+    }
+
+    context.wait_for_all_requests();
+    pbf_wait(context, 400ms);
+    pbf_mash_button(context, BUTTON_A, 500ms);
+    pbf_mash_button(context, BUTTON_B, 2000ms);
+    return true;
 }
 
 
