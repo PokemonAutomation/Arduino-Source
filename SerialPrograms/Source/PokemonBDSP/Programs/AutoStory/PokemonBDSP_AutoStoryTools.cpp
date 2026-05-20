@@ -395,8 +395,7 @@ bool fly_to(
     DpadState dpad;
     context.wait_for_all_requests();
     pbf_wait(context, 1000ms);
-    pbf_press_button(context, BUTTON_X, 80ms, 1000ms);
-    pbf_press_button(context, BUTTON_PLUS, 80ms, 1000ms);
+    open_menu(stream, context, MenuCursorPosition::MAP, 8);
 
     switch (place) {
         case FlyPoint::CellesticTown:
@@ -726,8 +725,10 @@ void open_menu(
 ){
     using namespace std::chrono_literals;
 
+    context.wait_for_all_requests();
     overworld_to_menu(stream, context);
-    context.wait_for(1000ms);
+    pbf_wait(context, 1000ms);
+    context.wait_for_all_requests();
 
     MenuCursorDetector detector;
     {
@@ -835,7 +836,18 @@ bool activate_repel(
 
     context.wait_for_all_requests();
     pbf_wait(context, 400ms);
-    pbf_mash_button(context, BUTTON_A, 500ms);
+    pbf_press_button(context, BUTTON_A, 80ms, 300ms);
+    context.wait_for_all_requests();
+
+    const ImageFloatBox repel_item_box{0.720000, 0.100000, 0.070000, 0.150000};
+    SelectionArrowFinder arrow_finder(stream.overlay(), repel_item_box, COLOR_GREEN);
+    int arrow_ret = wait_until(stream, context, 2000ms, {{arrow_finder}});
+    if (arrow_ret != 0){
+        stream.log("[AutoStory] activate_repel: selection arrow not found after pressing A.", COLOR_RED);
+        return false;
+    }
+    stream.log("[AutoStory] activate_repel: selection arrow confirmed.", COLOR_GREEN);
+    pbf_press_button(context, BUTTON_A, 80ms, 105ms);
     pbf_mash_button(context, BUTTON_B, 2000ms);
     return true;
 }
