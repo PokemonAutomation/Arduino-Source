@@ -10,6 +10,7 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/StaticTextOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
@@ -36,23 +37,20 @@ public:
     ) override{}
 
 private:
+    SectionDividerOption m_target_settings;
     EnumDropdownOption<PokemonFRLG_RngTarget> TARGET;
-    SimpleIntegerOption<uint64_t> NUM_RESETS;
-
     EnumDropdownOption<SeedButton> SEED_BUTTON;
     EnumDropdownOption<BlackoutButton> EXTRA_BUTTON;
     SimpleIntegerOption<uint64_t> SEED_DELAY;
     SimpleIntegerOption<int64_t> SEED_CALIBRATION;
-
-
     SimpleIntegerOption<uint64_t> CONTINUE_SCREEN_FRAMES;
     FloatingPointOption CONTINUE_SCREEN_CALIBRATION;
-
     SimpleIntegerOption<uint64_t> INGAME_ADVANCES;
     FloatingPointOption INGAME_CALIBRATION;
 
+    SectionDividerOption m_program_settings;
     BooleanCheckBoxOption USE_TEACHY_TV;
-
+    SimpleIntegerOption<uint64_t> NUM_RESETS;
     SimpleIntegerOption<uint8_t> PROFILE;
 
     BooleanCheckBoxOption TAKE_VIDEO;

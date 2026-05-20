@@ -414,20 +414,6 @@ bool check_for_match(AdvWildPokemonResult res, AdvRngFilters target, int16_t gen
         && ((target.ivs.speed.low <= res.ivs.speed) && (target.ivs.speed.high >= res.ivs.speed));
 }
 
-// bool check_for_match(AdvEggResult res, AdvRngFilters target, int16_t gender_threshold, AdvIVs parentA_ivs, AdvIVs parentB_ivs, uint16_t tid_xor_sid){
-//     AdvIVs final_ivs = apply_inherited_ivs(res.ivs, res.inherited_ivs, parentA_ivs, parentB_ivs);
-//     return (target.nature == AdvNature::Any || (res.nature == target.nature))
-//         && (target.ability == AdvAbility::Any || (res.ability == target.ability))
-//         && (target.gender == AdvGender::Any || (gender_from_gender_value(res.gender, gender_threshold) == target.gender))
-//         && (target.shiny == AdvShinyType::Any || (shiny_type_from_pid(res.pid, tid_xor_sid) == target.shiny))
-//         && ((target.ivs.hp.low <= final_ivs.hp) && (target.ivs.hp.high >= final_ivs.hp))
-//         && ((target.ivs.attack.low <= final_ivs.attack) && (target.ivs.attack.high >= final_ivs.attack))
-//         && ((target.ivs.defense.low <= final_ivs.defense) && (target.ivs.defense.high >= final_ivs.defense))
-//         && ((target.ivs.spatk.low <= final_ivs.spatk) && (target.ivs.spatk.high >= final_ivs.spatk))
-//         && ((target.ivs.spdef.low <= final_ivs.spdef) && (target.ivs.spdef.high >= final_ivs.spdef))
-//         && ((target.ivs.speed.low <= final_ivs.speed) && (target.ivs.speed.high >= final_ivs.speed));
-// }
-
 Pokemon::NatureAdjustments nature_to_adjustment(AdvNature nature){
     NatureAdjustments ret;
     ret.attack = NatureAdjustment::NEUTRAL;
@@ -664,11 +650,11 @@ AdvRngFilters observation_to_filters(const AdvObservedPokemon& observation, cons
 std::string gender_to_string(const AdvGender& gender){
     switch (gender){
     case AdvGender::Male:
-        return "Male";
+        return "♂";
     case AdvGender::Female:
-        return "Female";
+        return "♀";
     default:
-        return "Any";
+        return "-";
     }
 }
 

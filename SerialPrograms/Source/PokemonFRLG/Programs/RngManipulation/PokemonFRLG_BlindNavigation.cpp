@@ -656,7 +656,7 @@ void check_timings(
     default:
         OperationFailedException::fire(
             ErrorReport::NO_ERROR_REPORT,
-            "Option not yet implemented.",
+            "RNG target not recognized. Please report this as a bug.",
             console
         );
     }
