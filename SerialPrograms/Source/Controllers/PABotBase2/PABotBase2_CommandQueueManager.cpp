@@ -106,15 +106,13 @@ uint8_t CommandQueueManager::send_command(Cancellable* cancellable, MessageHeade
             command.id = m_command_seqnum;
 
             //  Wait until the slot is available.
-            auto iter = m_pending_commands.find(command.id);
-            if (iter != m_pending_commands.end()){
-                continue;
-            }
-
-            iter = m_pending_commands.emplace(
+            bool success = m_pending_commands.emplace(
                 command.id,
                 std::make_shared<CommandHandle>()
-            ).first;
+            ).second;
+            if (!success){
+                continue;
+            }
 
             m_lock.unlock();
             try{
@@ -124,7 +122,7 @@ uint8_t CommandQueueManager::send_command(Cancellable* cancellable, MessageHeade
                 );
             }catch (...){
                 m_lock.lock();
-                m_pending_commands.erase(iter);
+                m_pending_commands.erase(command.id);
                 throw;
             }
             m_lock.lock();
