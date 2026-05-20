@@ -64,13 +64,14 @@ static void move_back_after_unexpected_battle(
     ProControllerContext& context,
     const std::string& trainerid
 ){
-    stream.log("Starting battle with " + trainerid, COLOR_GREEN);
+    stream.log("Finishing battle with " + trainerid, COLOR_GREEN);
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
 
     if (trainerid == "route_218_sailor_skyler") {
-        pbf_move_left_joystick(context, {0, +1}, 200ms, 100ms); // 1+
-        pbf_move_left_joystick(context, {-1, 0}, 200ms, 100ms); // 1+
+        pbf_move_left_joystick(context, {0, +1}, 400ms, 100ms); // 1+
+        pbf_move_left_joystick(context, {-1, 0}, 400ms, 100ms); // 1+
+        pbf_move_left_joystick(context, {0, -1}, 2800ms, 100ms); // 14+
     }
 }
 
@@ -95,24 +96,43 @@ static bool handle_battle(
     ) {
         // Select Razor leaf
         pbf_press_dpad(context, DPAD_UP, 280ms, 200ms);
+    } else if (
+        trainerid == "canalave_clint"
+    ) {
+        // Select Crunch
     }
     context.wait_for_all_requests();
 
-    BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-    int ret = run_until<ProControllerContext>(
-        stream, context,
-        [](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_A, 200000ms);
-        },
-        {{black_screen}}
-    );
-    if (ret < 0){
-        stream.log("handle_battle_" + trainerid + ": black screen not detected!", COLOR_RED);
-        return false;
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_A, 200000ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("handle_battle_" + trainerid + ": black screen not detected!", COLOR_RED);
+            return false;
+        }
     }
+    
     context.wait_for_all_requests();
     pbf_mash_button(context, BUTTON_B, 2000ms);
     stream.log("handle_battle_" + trainerid + ": transition confirmed.");
+    return true;
+}
+
+static bool test(
+    VideoStream& stream,
+    ProControllerContext& context
+){
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+    context.wait_for_all_requests();
+    stream.log("test: Testing...");
+    activate_repel(stream, context);
     return true;
 }
 
@@ -143,7 +163,6 @@ static bool cynthia_and_fly_to_jubilife(
     // Temporary, will be removed when the gym exit is done
 
     context.wait_for_all_requests();
-    open_menu(stream, context, MenuCursorPosition::MAP, 8);
     fly_to(stream, context, FlyPoint::JubilifeCity);
 
     // End of temporary addition
@@ -376,6 +395,158 @@ static bool go_through_building_route_218(
     return true;
 }
 
+static bool go_to_clint_and_pokemon_center(
+    VideoStream& stream,
+    ProControllerContext& context
+){
+    DpadState dpad;
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+    context.wait_for_all_requests();
+    stream.log("go_to_clint_and_pokemon_center: going to the Pokemon Center...");
+
+    pbf_move_left_joystick(context, {-1, 0}, 1400ms, 100ms); // 7+
+    pbf_move_left_joystick(context, {0, +1}, 1000ms, 100ms); // 5+
+    pbf_move_left_joystick(context, {-1, 0}, 800ms, 100ms); // 4+
+    pbf_move_left_joystick(context, {0, +1}, 4200ms, 100ms); // 21+
+    dpad.last_dir = DPAD_UP;
+    repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 4);
+
+    {
+        ShortDialogWatcher repel_dialog(COLOR_RED);
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 2000ms, 100ms); // 10+
+            },
+            {{repel_dialog}}
+        );
+        if (ret == 0){
+            stream.log("go_to_clint_and_pokemon_center: Not activating repel again.", COLOR_GREEN);
+            pbf_mash_button(context, BUTTON_B, 3000ms);
+        } else if (ret < 0){
+                stream.log("go_to_clint_and_pokemon_center: Didn't detect repel dialog box!", COLOR_RED);
+                return false;
+        }
+    }
+
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {+1, 0}, 2000ms, 300ms); // 10+
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 8);
+
+    {
+        ShortDialogWatcher talk_to_clint(COLOR_BLUE);
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 100000ms, 100ms);
+            },
+            {{talk_to_clint}}
+        );
+        if (ret < 0){
+            stream.log("go_to_clint_and_pokemon_center_clint: dialog box not detected!", COLOR_RED);
+            return false;
+        } else if (ret == 0) {
+            stream.log("go_to_clint_and_pokemon_center_clint: dialog box detected, starting battle.", COLOR_GREEN);
+            context.wait_for_all_requests();
+            pbf_wait(context, 2000ms);
+
+            BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+            ret = run_until<ProControllerContext>(
+                stream, context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen}}
+            );
+            if (ret < 0){
+                stream.log("go_to_clint_and_pokemon_center_clint: black screen not detected!", COLOR_RED);
+                return false;
+            } else if (ret == 0){
+                handle_battle(stream, context, "canalave_clint");
+                context.wait_for_all_requests();
+                pbf_wait(context, 3000ms);
+            }
+        }
+    }
+
+    context.wait_for_all_requests();
+    pbf_mash_button(context, BUTTON_B, 3000ms);
+    pbf_wait(context, 1000ms);
+    context.wait_for_all_requests();
+
+    pbf_move_left_joystick(context, {+1, 0}, 3000ms, 300ms); // 15+
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 3);
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_to_clint_and_pokemon_center: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_to_clint_and_pokemon_center: entered pokemon center", COLOR_GREEN);
+    };
+    return true;
+}
+
+static bool heal_and_exit_canalave_pokemon_center(
+    VideoStream& stream,
+    ProControllerContext& context
+){
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+    context.wait_for_all_requests();
+    stream.log("heal_and_exit_canalave_pokemon_center: healing and exiting...");
+    heal_pokemon(stream, context, "Canalave city");
+    return true;
+}
+
+static bool go_to_canalave_gym(
+    VideoStream& stream,
+    ProControllerContext& context
+){
+    DpadState dpad;
+    context.wait_for_all_requests();
+    pbf_wait(context, 2000ms);
+    context.wait_for_all_requests();
+    stream.log("go_to_canalave_gym: going for the gym...");
+
+    repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 2, false);
+    
+    pbf_move_left_joystick(context, {-1, 0}, 5000ms, 100ms); // 26+
+    pbf_move_left_joystick(context, {0, -1}, 1400ms, 100ms); // 9
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 7);
+
+    {
+        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}}
+        );
+        if (ret < 0){
+            stream.log("go_to_canalave_gym: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("go_to_canalave_gym: entered gym", COLOR_GREEN);
+    };
+    return true;
+    
+}
+
+
 
 void checkpoint_019(
     SingleSwitchProgramEnvironment& env,
@@ -385,6 +556,9 @@ void checkpoint_019(
 ){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
+            /*if (!test(env.console, context)){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "test: transition not detected.", env.console);
+            }*/
             if (!cynthia_and_fly_to_jubilife(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "cynthia_and_fly_to_jubilife: transition not detected.", env.console);
             }
@@ -406,6 +580,16 @@ void checkpoint_019(
             if (!go_through_building_route_218(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_building_route_218: transition not detected.", env.console);
             }
+            if (!go_to_clint_and_pokemon_center(env.console, context)){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_clint_and_pokemon_center: transition not detected.", env.console);
+            }
+            if (!heal_and_exit_canalave_pokemon_center(env.console, context)){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_and_exit_canalave_pokemon_center: transition not detected.", env.console);
+            }
+            if (!go_to_canalave_gym(env.console, context)){
+                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_canalave_gym: transition not detected.", env.console);
+            }
+            
         }
     );
 }
