@@ -650,9 +650,9 @@ AdvRngFilters observation_to_filters(const AdvObservedPokemon& observation, cons
 std::string gender_to_string(const AdvGender& gender){
     switch (gender){
     case AdvGender::Male:
-        return "♂";
+        return "\u2642";
     case AdvGender::Female:
-        return "♀";
+        return "\u2640";
     default:
         return "-";
     }
