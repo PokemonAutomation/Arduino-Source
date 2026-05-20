@@ -779,6 +779,7 @@ void perform_blind_sequence(
         modified_ingame_delay = timings.ingame_delay - 51430;
         walk_to_safarizonewest(context);
         use_sweet_scent(context, modified_ingame_delay, true);
+        return;
     case PokemonFRLG_RngTarget::safarizonesurf:
         modified_ingame_delay = timings.ingame_delay - 30300;
         walk_to_safarizonesurf(context);
