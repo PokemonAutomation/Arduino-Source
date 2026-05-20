@@ -40,13 +40,14 @@ private:
 
 private:
     struct Entry{
-        Mutex lock;
         WallDuration period;
         WallClock next;
+        bool busy;
 
         Entry(WallDuration p_period)
             : period(p_period)
             , next(current_time())
+            , busy(false)
         {}
     };
 

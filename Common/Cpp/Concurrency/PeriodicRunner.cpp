@@ -72,7 +72,7 @@ void PeriodicRunner::remove_runnable(Runnable& runnable) noexcept{
             return;
         }
 
-        if (iter->second.lock.try_lock()){
+        if (!iter->second.busy){
             m_schedule.erase(iter->second.next);
             m_runnables.erase(iter);
             break;
@@ -96,18 +96,21 @@ void PeriodicRunner::thread_body(){
         }
 
         auto runnable = iter->second;
+        WallClock next = fire_time + runnable->second.period;
         try{
-            m_schedule.emplace(fire_time + runnable->second.period, runnable);
+            m_schedule.emplace(next, runnable);
         }catch (...){
             continue;
         }
 
         m_schedule.erase(iter);
+        runnable->second.next = next;
 
-        std::lock_guard<Mutex> lg1(runnable->second.lock);
+        runnable->second.busy = true;
         m_lock.unlock();
         runnable->first->run();
         m_lock.lock();
+        runnable->second.busy = false;
     }
 }
 
