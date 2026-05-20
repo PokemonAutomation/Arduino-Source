@@ -10,6 +10,7 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/TextEditOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/LanguageOCROption.h"
@@ -45,26 +46,27 @@ private:
 
     bool have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t& TARGET_SEED, const AdvRngState& hit);
     
-    OCR::LanguageOCROption LANGUAGE;
-
-    EnumDropdownOption<PokemonFRLG_RngTarget> TARGET;
-
-    SimpleIntegerOption<uint64_t> MAX_RESETS;
-    SimpleIntegerOption<uint64_t> MAX_RARE_CANDIES;
-
+    SectionDividerOption m_calibration_displays;
+    RngTargetDisplay RNG_TARGET;
     RngFilterDisplay RNG_FILTERS;
     RngCalibrationDisplay RNG_CALIBRATION;
 
+    SectionDividerOption m_game_info;
+    OCR::LanguageOCROption LANGUAGE;
+
+    SectionDividerOption m_target_settings;
+    EnumDropdownOption<PokemonFRLG_RngTarget> TARGET;
     StringOption SEED; 
     TextEditOption SEED_LIST;
     EnumDropdownOption<SeedButton> SEED_BUTTON;
     EnumDropdownOption<BlackoutButton> EXTRA_BUTTON;
     SimpleIntegerOption<uint64_t> SEED_DELAY;
-
     SimpleIntegerOption<uint64_t>ADVANCES;
 
+    SectionDividerOption m_program_settings;
     BooleanCheckBoxOption USE_TEACHY_TV;
-
+    SimpleIntegerOption<uint64_t> MAX_RESETS;
+    SimpleIntegerOption<uint64_t> MAX_RARE_CANDIES;
     SimpleIntegerOption<uint8_t> PROFILE;
 
     BooleanCheckBoxOption TAKE_VIDEO;

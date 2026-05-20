@@ -45,6 +45,8 @@ uint16_t parse_seed(ConsoleHandle& console, std::string seed_string);
 std::vector<uint16_t> parse_seed_list(ConsoleHandle& console, std::string seed_list_string);
 int16_t seed_position_in_list(uint16_t seed, std::vector<uint16_t> list);
 
+std::string to_hex_string(const uint16_t& val);
+std::string to_hex_string(const uint32_t& val);
 
 RngTimings prepare_timings(
     ConsoleHandle& console,

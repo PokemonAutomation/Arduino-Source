@@ -66,7 +66,13 @@ std::unique_ptr<StatsTracker> StarterRng_Descriptor::make_stats() const{
 }
 
 StarterRng::StarterRng()
-    : LANGUAGE(
+    : m_calibration_displays(
+        "<font size=4><b>Calibration Displays</b></font> — These will update automatically as the program runs"
+    )
+    , m_game_info(
+        "<font size=4><b>Game Information</b></font>"
+    )
+    , LANGUAGE(
         "<b>Game Language:</b>",
         {
             Language::English,
@@ -79,8 +85,11 @@ StarterRng::StarterRng()
         LockMode::LOCK_WHILE_RUNNING,
         true
     )
+    , m_target_settings(
+        "<font size=4><b>Target Settings</b></font> — Get these from an RNG search tool"
+    )
     , STARTER(
-        "<b>Target:</b><br>",
+        "<b>Starter Species:</b>",
         {
             {Starter::bulbasaur, "bulbasaur", "Bulbasaur"},
             {Starter::squirtle, "squirtle", "Squirtle"},
@@ -89,11 +98,6 @@ StarterRng::StarterRng()
         LockMode::LOCK_WHILE_RUNNING,
         Starter::bulbasaur
     )    
-    , MAX_RESETS(
-        "<b>Max Resets:</b><br>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        50, 0 // default, min
-    )
     , SEED(
         false,
         "<b>Target Seed:</b>",
@@ -110,7 +114,7 @@ StarterRng::StarterRng()
         true
     )
     , SEED_BUTTON(
-        "<b>Seed Button:</b><br>",
+        "<b>Seed Button:</b>",
         {
             {SeedButton::A, "A", "A"},
             {SeedButton::Start, "Start", "Start"},
@@ -138,17 +142,22 @@ StarterRng::StarterRng()
         31338, 30400 // default, min
     )
     , ADVANCES(
-        "<b>Advances:</b><br>The total number of RNG advances for your target.",
+        "<b>Advances:</b><br>"
+        "The total number of RNG advances for your target.",
         LockMode::LOCK_WHILE_RUNNING,
         10000, 940, 1000000000 // default, min
     )
-    // , CONTINUE_SCREEN_FRAMES(
-    //     "<b>Continue Screen Frames:</b><br>The number of RNG advances to pass on the continue screen.<br>This should be less than the total number of advances above.",
-    //     LockMode::LOCK_WHILE_RUNNING,
-    //     1000, 192 // default, min
-    // )
+    , m_program_settings(
+        "<font size=4><b>Program Settings</b></font>"
+    )
+    , MAX_RESETS(
+        "<b>Max Resets:</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        50, 0 // default, min
+    )
     , IGNORE_WILD_SHINIES(
-        "<b>Ignore wild shinies</b><br>Do not stop the program when a wild shiny is encountered.",
+        "<b>Ignore wild shinies</b><br>"
+        "Do not stop the program when a wild shiny is encountered.",
         LockMode::LOCK_WHILE_RUNNING, 
         false // default
     )
@@ -160,7 +169,8 @@ StarterRng::StarterRng()
         0, 0, 8 // default, min, max
     )
     , TAKE_VIDEO(
-        "<b>Take Video:</b><br>Record a video when the shiny is found.", 
+        "<b>Take Video:</b><br>"
+        "Record a video when the shiny is found.", 
         LockMode::LOCK_WHILE_RUNNING, 
         true // default
     )
@@ -177,18 +187,22 @@ StarterRng::StarterRng()
         &NOTIFICATION_PROGRAM_FINISH,
     })
 {
+    PA_ADD_OPTION(m_calibration_displays);
+    PA_ADD_OPTION(RNG_TARGET);
     PA_ADD_OPTION(RNG_FILTERS);
     PA_ADD_OPTION(RNG_CALIBRATION);
+    PA_ADD_OPTION(m_game_info);
     PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(m_target_settings);
     PA_ADD_OPTION(STARTER);
-    PA_ADD_OPTION(MAX_RESETS);
     PA_ADD_OPTION(SEED);
     PA_ADD_OPTION(SEED_LIST);
     PA_ADD_OPTION(SEED_BUTTON);
     PA_ADD_OPTION(EXTRA_BUTTON);
     PA_ADD_OPTION(SEED_DELAY);
     PA_ADD_OPTION(ADVANCES);
-    // PA_ADD_OPTION(CONTINUE_SCREEN_FRAMES);
+    PA_ADD_OPTION(m_program_settings);
+    PA_ADD_OPTION(MAX_RESETS);
     PA_ADD_OPTION(PROFILE);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -553,21 +567,17 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     home_black_border_check(env.console, context);
 
     RNG_FILTERS.reset();
-    RNG_CALIBRATION.reset();
+    RNG_CALIBRATION.reset_hits();
 
     const uint16_t TARGET_SEED = parse_seed(env.console, SEED);
     const std::vector<uint16_t> SEED_VALUES = parse_seed_list(env.console, SEED_LIST);
     const int16_t SEED_POSITION = seed_position_in_list(TARGET_SEED, SEED_VALUES);
 
     if (SEED_POSITION == -1){
-        OperationFailedException::fire(
-            ErrorReport::NO_ERROR_REPORT,
-            "StarterRng(): Target Seed is missing from the list of nearby seeds.",
-            env.console
-        ); 
+        throw UserSetupError(env.console, "The target Seed is missing from the list of nearby seeds.");
     }
 
-    env.log("Target Seed Value (base10): " + std::to_string(TARGET_SEED));
+    env.log("Target Seed Value: " + to_hex_string(TARGET_SEED));
 
     BaseStats BASE_STATS;
     switch (STARTER){
@@ -597,17 +607,16 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     static const int16_t GENDER_THRESHOLD = 30;
 
+    static const std::set<std::string> SPECIES_LIST = { "bulbasuar", "squirtle", "charmander" };
 
-    RngCalibrations calibrations = {
-        RNG_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,
-        RNG_CALIBRATION.csf_calibration,
-        RNG_CALIBRATION.advances_calibration
-    };
-
+    env.log("RNG Target: " + std::to_string(STARTER.current_value()));
+    env.log("Target Seed: " + to_hex_string(TARGET_SEED));
+    env.log("Target Advances: " + std::to_string(ADVANCES));
 
     AdvRngSearcher searcher(TARGET_SEED, ADVANCES, AdvRngMethod::Method1);
     AdvPokemonResult target_result = searcher.generate_pokemon();
-    env.log("Target PID (base 10): " + std::to_string(target_result.pid));
+    RNG_TARGET.set_target(target_result, GENDER_THRESHOLD);
+    env.log("Target PID: " + to_hex_string(target_result.pid));
     env.log("Target Nature: " + nature_to_string(target_result.nature));
     env.log("Target IVs:");
     env.log("   HP: " + std::to_string(target_result.ivs.hp));
@@ -616,7 +625,15 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     env.log("   SpA: " + std::to_string(target_result.ivs.spatk));
     env.log("   SpD: " + std::to_string(target_result.ivs.spdef));
     env.log("   Spe: " + std::to_string(target_result.ivs.speed));
-
+    
+    RngCalibrations calibrations = {
+        RNG_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,
+        RNG_CALIBRATION.csf_calibration,
+        RNG_CALIBRATION.advances_calibration
+    };
+    env.log("Initial Seed calibration (frames): " + std::to_string(calibrations.seed_offset));
+    env.log("Initial CSF calibration (frames): " + std::to_string(calibrations.csf_offset));
+    env.log("Initial In-game calibration (frames x2): " + std::to_string(calibrations.ingame_offset));
 
     RngAdvanceHistory advance_history;
     RngCalibrationHistory calibration_history; 
@@ -690,13 +707,15 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         stats.resets++; 
 
         RNG_FILTERS.reset();
-        RNG_CALIBRATION.reset();
+        RNG_CALIBRATION.set_calibrations(calibrations);
+        RNG_CALIBRATION.reset_hits();
 
         bool shiny_found = check_for_shiny(env.console, context, PokemonFRLG_RngTarget::starters);
 
         if (shiny_found){
             env.log("Shiny found!");
             stats.shinies++;
+            RNG_CALIBRATION.hits.set("Shiny!");
             send_program_notification(
                 env,
                 NOTIFICATION_SHINY,
@@ -713,17 +732,12 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         }
 
         // Stage 1: initial search -- starter received
-        AdvObservedPokemon pokemon = read_summary(env.console, context, LANGUAGE);
+        AdvObservedPokemon pokemon = read_summary(env.console, context, LANGUAGE, SPECIES_LIST);
         AdvRngFilters filters = observation_to_filters(pokemon, BASE_STATS);
         RNG_FILTERS.set(filters);
 
         std::vector<AdvRngState> search_hits = get_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD);
-        RNG_CALIBRATION.set(
-            calibrations.seed_offset * FRLG_FRAME_DURATION,
-            calibrations.csf_offset,
-            calibrations.ingame_offset,
-            search_hits
-        );        
+        RNG_CALIBRATION.set_hits(search_hits);        
         bool finished = update_history(
             env.console, advance_history, calibration_history, 
             MAX_HISTORY_LENGTH, calibrations, search_hits, 1
@@ -752,12 +766,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         }
         if (pokemon.level.size() > 1){
             search_hits = get_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD);
-            RNG_CALIBRATION.set(
-                calibrations.seed_offset * FRLG_FRAME_DURATION,
-                calibrations.csf_offset,
-                calibrations.ingame_offset,
-                search_hits
-            );   
+            RNG_CALIBRATION.set_hits(search_hits);        
             env.log("Number of search hits: " + std::to_string(search_hits.size()));
             finished = update_history(
                 env.console, advance_history, calibration_history, 
@@ -825,12 +834,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             if (pokemon.level.size() > num_levels){
                 num_levels = pokemon.level.size();
                 search_hits = get_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD);
-                RNG_CALIBRATION.set(
-                    calibrations.seed_offset * FRLG_FRAME_DURATION,
-                    calibrations.csf_offset,
-                    calibrations.ingame_offset,
-                    search_hits
-                );   
+                RNG_CALIBRATION.set_hits(search_hits);
                 env.log("Number of search hits: " + std::to_string(search_hits.size()));
                 update_history(
                     env.console, advance_history, calibration_history, 

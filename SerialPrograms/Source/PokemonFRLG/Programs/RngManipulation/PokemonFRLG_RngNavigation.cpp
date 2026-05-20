@@ -503,7 +503,7 @@ bool check_for_shiny(ConsoleHandle& console, ProControllerContext& context, Poke
     default:
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Option not yet implemented.",
+            "RNG target not recognized. Please report this as a bug.",
             console
         );
     }

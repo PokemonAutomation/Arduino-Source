@@ -51,7 +51,10 @@ std::unique_ptr<StatsTracker> RngHelper_Descriptor::make_stats() const{
 }
 
 RngHelper::RngHelper()
-    : TARGET(
+    : m_target_settings(
+        "<font size=4><b>Target Settings</b></font> — Get these from an RNG search tool"
+    )
+    , TARGET(
         "<b>Target:</b>",
         {
             {PokemonFRLG_RngTarget::starters, "starters", "Bulbasaur / Squirtle / Charmander"},
@@ -89,12 +92,6 @@ RngHelper::RngHelper()
         LockMode::LOCK_WHILE_RUNNING,
         PokemonFRLG_RngTarget::starters
     )    
-    , NUM_RESETS(
-        "<b>Max Resets:</b><br>"
-        "This program requires manual calibration, so this should usually be set to 1 while calibrating.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        1, 0 // default, min
-    )
     , SEED_BUTTON(
         "<b>Seed Button:</b><br>"
         "The button to be pressed on the title screen to set the seed.",
@@ -160,12 +157,21 @@ RngHelper::RngHelper()
         LockMode::UNLOCK_WHILE_RUNNING,
         0 // default
     )
+    , m_program_settings(
+        "<font size=4><b>Program Settings</b></font>"
+    )    
     , USE_TEACHY_TV(
         "<b>Use Teachy TV:</b>"
         "<br>Opens the Teachy TV to quickly advance the RNG at 313x speed.<br>"
         "<i>Warning: can result in larger misses.</i>",
         LockMode::LOCK_WHILE_RUNNING,
         false // default
+    )
+    , NUM_RESETS(
+        "<b>Max Resets:</b><br>"
+        "This program requires manual calibration, so this should usually be set to 1 while calibrating.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        1, 0 // default, min
     )
     , PROFILE(
         "<b>User Profile Position:</b><br>"
@@ -192,8 +198,8 @@ RngHelper::RngHelper()
         &NOTIFICATION_PROGRAM_FINISH,
     })
 {
+    PA_ADD_OPTION(m_target_settings);
     PA_ADD_OPTION(TARGET);
-    PA_ADD_OPTION(NUM_RESETS);
     PA_ADD_OPTION(SEED_BUTTON);
     PA_ADD_OPTION(EXTRA_BUTTON);
     PA_ADD_OPTION(SEED_DELAY);
@@ -202,7 +208,9 @@ RngHelper::RngHelper()
     PA_ADD_OPTION(CONTINUE_SCREEN_CALIBRATION);
     PA_ADD_OPTION(INGAME_ADVANCES);
     PA_ADD_OPTION(INGAME_CALIBRATION);
+    PA_ADD_OPTION(m_program_settings);
     PA_ADD_OPTION(USE_TEACHY_TV);
+    PA_ADD_OPTION(NUM_RESETS);
     PA_ADD_OPTION(PROFILE);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -240,12 +248,21 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         || TARGET == PokemonFRLG_RngTarget::safarizonesurf
         || TARGET == PokemonFRLG_RngTarget::safarizonefish 
     );
+    
+    env.log("Target: " + std::to_string(TARGET.current_value()));
+    env.log("Seed Delay: " + std::to_string(SEED_DELAY) + "ms");
+    env.log("Continue Screen Frames: " + std::to_string(CONTINUE_SCREEN_FRAMES) + " frames");
+    env.log("In-game Advances: " + std::to_string(INGAME_ADVANCES) + " advances");
 
     const RngCalibrations CALIBRATIONS = {
         static_cast<double>(SEED_CALIBRATION),
         CONTINUE_SCREEN_CALIBRATION,
         INGAME_CALIBRATION
     };
+    env.log("Seed calibration (frames): " + std::to_string(CALIBRATIONS.seed_offset));
+    env.log("CSF calibration (frames): " + std::to_string(CALIBRATIONS.csf_offset));
+    env.log("In-game calibration (frames x2): " + std::to_string(CALIBRATIONS.ingame_offset));
+
 
     while (!shiny_found){
         RngTimings timings = prepare_timings(
