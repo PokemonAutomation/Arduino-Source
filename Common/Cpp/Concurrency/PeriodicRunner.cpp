@@ -96,15 +96,14 @@ void PeriodicRunner::thread_body(){
         }
 
         auto runnable = iter->second;
-        WallClock next = fire_time + runnable->second.period;
-        try{
-            m_schedule.emplace(next, runnable);
-        }catch (...){
-            continue;
-        }
 
-        m_schedule.erase(iter);
+        WallClock next = fire_time + runnable->second.period;
         runnable->second.next = next;
+
+        //  Move the node. This should never throw.
+        auto node = m_schedule.extract(iter);
+        node.key() = next;
+        m_schedule.insert(std::move(node));
 
         runnable->second.busy = true;
         m_lock.unlock();
