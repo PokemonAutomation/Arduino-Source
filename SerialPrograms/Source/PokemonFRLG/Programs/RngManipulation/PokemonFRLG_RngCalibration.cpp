@@ -123,7 +123,7 @@ RngTimings prepare_timings(
     console.log("CSF calibration (frames): " + std::to_string(calibrations.csf_offset));
     console.log("In-game calibration (frames x2): " + std::to_string(calibrations.ingame_offset));
 
-    double seed_delay = SEED_DELAY + calibrations.seed_offset + FIXED_SEED_OFFSET;
+    double seed_delay = SEED_DELAY + (calibrations.seed_offset * FRLG_FRAME_DURATION) + FIXED_SEED_OFFSET;
     double csf_delay = (CONTINUE_SCREEN_FRAMES + calibrations.csf_offset) * FRLG_FRAME_DURATION;
     double teachy_delay = TEACHY_ADVANCES * FRLG_FRAME_DURATION / 313;
     double ingame_delay = (modified_ingame_advances - TEACHY_ADVANCES) * FRLG_FRAME_DURATION / 2 - (should_use_teachy_tv ? 14067 : 0);
