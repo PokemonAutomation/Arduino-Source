@@ -45,6 +45,9 @@ public:
     FloatingPointOption SHINY_SOUND_THRESHOLD;
     FloatingPointOption SHINY_SOUND_LOW_FREQUENCY;
 
+    SectionDividerOption m_catch_audio_settings;
+    FloatingPointOption CATCH_FANFARE_THRESHOLD;
+
 private:
     virtual void on_config_value_changed(void* object) override;
 };

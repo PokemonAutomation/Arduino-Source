@@ -76,6 +76,12 @@ GameSettings::GameSettings()
         LockMode::LOCK_WHILE_RUNNING,
         1000, 0, 48000 //2000
     )
+    , m_catch_audio_settings("<font size=4><b>Catch Audio Settings:</b></font>")
+    , CATCH_FANFARE_THRESHOLD(
+        "<b>Shiny Sound Threshold:</b><br>Maximum error coefficient to trigger catch detection.",
+        LockMode::LOCK_WHILE_RUNNING,
+        0.80, 0, 1.0
+    )
 {
     PA_ADD_STATIC(m_game_device_settings);
     PA_ADD_OPTION(DEVICE);
@@ -87,6 +93,7 @@ GameSettings::GameSettings()
     PA_ADD_STATIC(m_shiny_audio_settings);
     PA_ADD_OPTION(SHINY_SOUND_THRESHOLD);
     PA_ADD_OPTION(SHINY_SOUND_LOW_FREQUENCY);
+    PA_ADD_OPTION(m_catch_audio_settings);
 
     GameSettings::on_config_value_changed(this);
     DEVICE.add_listener(*this);

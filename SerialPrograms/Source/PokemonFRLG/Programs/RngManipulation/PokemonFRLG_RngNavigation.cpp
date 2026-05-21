@@ -6,6 +6,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "PokemonFRLG/Inference/Sounds/PokemonFRLG_CatchFanfareDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
@@ -17,6 +18,7 @@
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_DexRegistrationDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_StatsReader.h"
+#include "PokemonFRLG/Inference/PokemonFRLG_PokemonSpriteReader.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_PartyLevelUpReader.h"
 #include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
@@ -123,6 +125,19 @@ AdvObservedPokemon read_summary(
         gender = AdvGender::Any;
         break;
     }
+    
+    if (
+           stats.name.empty()
+        || stats.name == "nidoran-m"
+        || stats.name == "nidoran-f"
+    ){
+        SummarySpriteReader sprite_reader(species);
+        ImageMatch::ImageMatchResult result = sprite_reader.read(screen1);
+        if (result.results.size() > 0){
+            stats.name = result.results.begin()->second;
+            console.log("Matched sprite: " + stats.name);
+        }
+    }
 
     AdvObservedPokemon pokemon = {
         stats.name,
@@ -145,6 +160,9 @@ int auto_catch(
     const uint64_t& max_ball_throws,
     bool safari_zone
 ){
+    float catch_coefficient = 1.0;
+    bool catch_detected = false;
+
     for (uint64_t i=0; i<=max_ball_throws; i++){
         int count = 0;
         while(true){
@@ -158,6 +176,10 @@ int auto_catch(
             PartyMenuWatcher party_menu(COLOR_RED);
             DexRegistrationWatcher dex_registration(COLOR_RED);
             BlackScreenWatcher black_screen(COLOR_RED);
+            CatchFanfareDetector catch_detector(console.logger(), [&](float error_coefficient) -> bool{
+                catch_coefficient = error_coefficient;
+                return true;
+            });
             context.wait_for_all_requests();
             int ret = run_until<ProControllerContext>(
                 console, context,
@@ -166,7 +188,7 @@ int auto_catch(
                         pbf_press_button(context, BUTTON_B, 200ms, 300ms);
                     }
                 },
-                { battle_menu, party_menu, black_screen },
+                { battle_menu, party_menu, dex_registration, black_screen, catch_detector},
                 10ms
             );
 
@@ -183,10 +205,15 @@ int auto_catch(
             case 2:
                 console.log("Dex registration detected. Exiting battle...");
                 pbf_mash_button(context, BUTTON_B, 5000ms);
-                return static_cast<int>(i);
+                return catch_detected ? static_cast<int>(i) : 0;
             case 3:
                 console.log("Black screen detected. Battle exited.");
-                return static_cast<int>(i);
+                return catch_detected ? static_cast<int>(i) : 0;
+            case 4: 
+                console.log("Catch detected!", COLOR_BLUE);
+                catch_detected = true;
+                pbf_wait(context, 2000ms);
+                continue;
             default:
                 console.log("No recognized state. Try checking if in the overworld...");
                 StartMenuWatcher start_menu;
@@ -208,7 +235,7 @@ int auto_catch(
                 console.log("Overworld detected.");
                 pbf_mash_button(context, BUTTON_B, 500ms);
                 context.wait_for_all_requests();
-                return static_cast<int>(i);
+                return catch_detected ? static_cast<int>(i) : 0;
             }
 
             break;
