@@ -243,7 +243,6 @@ OriginMark OriginMarkReader::read_mark(
     const size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
 
     ImageViewRGB32 image = extract_box_reference(original_screen, box);
-    const ImageStats roi_stats = image_stats(image);
 
     m_last_detected.clear();
 
