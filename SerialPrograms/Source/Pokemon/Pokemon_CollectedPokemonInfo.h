@@ -14,6 +14,7 @@
 #include <ostream>
 #include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "Pokemon/Options/Pokemon_BoxSortingTable.h"
+#include "Pokemon_OriginMarks.h"
 #include "Pokemon_Types.h"
 
 namespace PokemonAutomation{
@@ -36,6 +37,7 @@ struct CollectedPokemonInfo{
     PokemonType primary_type = PokemonType::NONE;
     PokemonType secondary_type = PokemonType::NONE;
     PokemonTeraType tera_type = PokemonTeraType::NONE;
+    OriginMark origin_mark = OriginMark::NONE;
 };
 
 bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs);
