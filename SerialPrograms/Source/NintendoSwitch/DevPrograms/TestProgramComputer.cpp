@@ -321,7 +321,7 @@ void stress_test(Logger& logger, CancellableScope& scope){
     );
 
     //  Connect
-    connection.reset(true);
+    connection.reset();
     connection.send_request(PABB2_CONNECTION_OPCODE_ASK_VERSION);
     connection.wait_for_pending();
     connection.send_request(PABB2_CONNECTION_OPCODE_ASK_PACKET_SIZE);

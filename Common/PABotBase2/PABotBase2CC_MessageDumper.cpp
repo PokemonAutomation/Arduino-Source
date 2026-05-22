@@ -51,7 +51,7 @@ std::string tostr(const PacketHeader* header){
     case PABB2_CONNECTION_OPCODE_RET_PACKET_SIZE:
         str += "PABB2_CONNECTION_OPCODE_RET_PACKET_SIZE: seqnum = ";
         str += std::to_string(header->seqnum);
-        str += ", bytes = " + std::to_string(((const PacketHeader_u16*)header)->data);
+        str += ", bytes = " + std::to_string(((const PacketHeader_u32*)header)->data);
         return str;
 
     case PABB2_CONNECTION_OPCODE_ASK_BUFFER_SLOTS:
@@ -61,7 +61,7 @@ std::string tostr(const PacketHeader* header){
     case PABB2_CONNECTION_OPCODE_RET_BUFFER_SLOTS:
         str += "PABB2_CONNECTION_OPCODE_RET_BUFFER_SLOTS: seqnum = ";
         str += std::to_string(header->seqnum);
-        str += ", slots = " + std::to_string(((const PacketHeader_u8*)header)->data);
+        str += ", slots = " + std::to_string(((const PacketHeader_u32*)header)->data);
         return str;
 
     case PABB2_CONNECTION_OPCODE_ASK_BUFFER_BYTES:
@@ -71,7 +71,7 @@ std::string tostr(const PacketHeader* header){
     case PABB2_CONNECTION_OPCODE_RET_BUFFER_BYTES:
         str += "PABB2_CONNECTION_OPCODE_RET_BUFFER_BYTES: seqnum = ";
         str += std::to_string(header->seqnum);
-        str += ", bytes = " + std::to_string(((const PacketHeader_u16*)header)->data);
+        str += ", bytes = " + std::to_string(((const PacketHeader_u32*)header)->data);
         return str;
 
     case PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA:
@@ -111,16 +111,6 @@ std::string tostr(const PacketHeader* header){
     case PABB2_CONNECTION_OPCODE_INFO:
         str += "PABB2_CONNECTION_OPCODE_INFO: seqnum = ";
         str += std::to_string(header->seqnum);
-        return str;
-    case PABB2_CONNECTION_OPCODE_INFO_U8:
-        str += "PABB2_CONNECTION_OPCODE_INFO_U8: seqnum = ";
-        str += std::to_string(header->seqnum);
-        str += ", data = " + std::to_string(((const PacketHeader_u8*)header)->data);
-        return str;
-    case PABB2_CONNECTION_OPCODE_INFO_U16:
-        str += "PABB2_CONNECTION_OPCODE_INFO_U16: seqnum = ";
-        str += std::to_string(header->seqnum);
-        str += ", data = " + std::to_string(((const PacketHeader_u16*)header)->data);
         return str;
     case PABB2_CONNECTION_OPCODE_INFO_H32:
         str += "PABB2_CONNECTION_OPCODE_INFO_H32: seqnum = ";

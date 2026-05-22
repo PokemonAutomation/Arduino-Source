@@ -48,7 +48,7 @@ public:
     }
     virtual bool cancel(std::exception_ptr exception) noexcept override;
 
-    bool reset(bool random_session_id, WallDuration timeout = WallDuration::max());
+    bool reset(WallDuration timeout = WallDuration::max());
 
     bool remote_protocol_is_compatible() const{
         return m_remote_protocol_compatible;
@@ -89,7 +89,7 @@ private:
     //  Send
 
     void send_ack(uint8_t seqnum, uint8_t opcode);
-    void send_ack_u16(uint8_t seqnum, uint8_t opcode, uint16_t data);
+    void send_ack_u32(uint8_t seqnum, uint8_t opcode, uint32_t data);
 
     void retransmit_thread();
 

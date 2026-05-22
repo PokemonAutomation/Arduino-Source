@@ -56,7 +56,7 @@ void PacketSender::reset(const SessionId& session_id){
 
 
 
-PA_NO_INLINE void PacketSender::send_oob_packet_empty(uint8_t seqnum, uint8_t opcode){
+PA_NO_INLINE void PacketSender::send_oob_packet_empty(uint8_t seqnum, uint8_t opcode) noexcept{
     struct{
         PacketHeader header;
         uint8_t crc32[sizeof(uint32_t)];
@@ -68,33 +68,7 @@ PA_NO_INLINE void PacketSender::send_oob_packet_empty(uint8_t seqnum, uint8_t op
     pabb_crc32_write_to_message(m_session_id, &packet, sizeof(packet));
     m_connection.unreliable_send(&packet, sizeof(packet));
 }
-PA_NO_INLINE void PacketSender::send_oob_packet_u8(uint8_t seqnum, uint8_t opcode, uint8_t data){
-    struct{
-        PacketHeader_u8 header;
-        uint8_t crc32[sizeof(uint32_t)];
-    } packet;
-    packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
-    packet.header.seqnum = seqnum;
-    packet.header.packet_bytes = sizeof(packet);
-    packet.header.opcode = opcode;
-    packet.header.data = data;
-    pabb_crc32_write_to_message(m_session_id, &packet, sizeof(packet));
-    m_connection.unreliable_send(&packet, sizeof(packet));
-}
-PA_NO_INLINE void PacketSender::send_oob_packet_u16(uint8_t seqnum, uint8_t opcode, const uint16_t& data){
-    struct{
-        PacketHeader_u16 header;
-        uint8_t crc32[sizeof(uint32_t)];
-    } packet;
-    packet.header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
-    packet.header.seqnum = seqnum;
-    packet.header.packet_bytes = sizeof(packet);
-    packet.header.opcode = opcode;
-    memcpy(&packet.header.data, &data, sizeof(uint16_t));
-    pabb_crc32_write_to_message(m_session_id, &packet, sizeof(packet));
-    m_connection.unreliable_send(&packet, sizeof(packet));
-}
-PA_NO_INLINE void PacketSender::send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, const uint32_t& data){
+PA_NO_INLINE void PacketSender::send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, const uint32_t& data) noexcept{
     struct{
         PacketHeader_u32 header;
         uint8_t crc32[sizeof(uint32_t)];
@@ -110,7 +84,7 @@ PA_NO_INLINE void PacketSender::send_oob_packet_u32(uint8_t seqnum, uint8_t opco
 PA_NO_INLINE void PacketSender::send_oob_packet_data(
     uint8_t seqnum, uint8_t opcode,
     uint8_t bytes, const void* data
-){
+) noexcept{
     PacketHeader header;
     header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     header.seqnum = seqnum;
@@ -127,7 +101,7 @@ PA_NO_INLINE void PacketSender::send_oob_packet_u32_data(
     uint8_t seqnum, uint8_t opcode,
     const uint32_t& u32,
     uint8_t bytes, const void* data
-){
+) noexcept{
     PacketHeader_u32 header;
     header.magic_number = PABB2_CONNECTION_MAGIC_NUMBER;
     header.seqnum = seqnum;
@@ -145,7 +119,7 @@ PA_NO_INLINE void PacketSender::send_oob_packet_u32_data(
 
 
 
-bool PacketSender::remove(uint8_t seqnum){
+bool PacketSender::remove(uint8_t seqnum) noexcept{
 //    {
 //        std::lock_guard<std::mutex> lg(print_lock);
 //        cout << "PacketSender::remove(" << this << "): " << (int)seqnum << endl;
@@ -182,6 +156,7 @@ bool PacketSender::remove(uint8_t seqnum){
         if (seqnum == m_slot_tail){
             m_buffer_head = 0;
             m_buffer_tail = 0;
+            m_buffer_tail_uncommitted = 0;
             return true;
         }
 
@@ -197,7 +172,7 @@ bool PacketSender::remove(uint8_t seqnum){
     }
 }
 
-void PacketSender::send_reset(){
+void PacketSender::send_reset() noexcept{
     PacketHeader_u32* packet = (PacketHeader_u32*)reserve_packet(
         PABB2_CONNECTION_OPCODE_ASK_RESET,
         sizeof(PacketHeader_u32) - sizeof(PacketHeader)
@@ -220,7 +195,7 @@ void PacketSender::send_reset(){
 }
 bool PacketSender::send_packet(
     uint8_t opcode, uint8_t extra_bytes, const void* extra_data
-){
+) noexcept{
     PacketHeader* packet = reserve_packet(opcode, extra_bytes);
     if (packet == NULL){
         return false;
@@ -232,7 +207,7 @@ bool PacketSender::send_packet(
 
 PacketHeader* PacketSender::reserve_packet(
     uint8_t opcode, uint8_t extra_bytes
-){
+) noexcept{
     //  No slots available.
     uint8_t slots_used = m_slot_tail - m_slot_head;
     if (slots_used == REORDER_WINDOW){
@@ -293,7 +268,7 @@ PacketHeader* PacketSender::reserve_packet(
 
     return ret;
 }
-void PacketSender::commit_packet(PacketHeader* packet){
+void PacketSender::commit_packet(PacketHeader* packet) noexcept{
     pabb_crc32_write_to_message(m_session_id, packet, packet->packet_bytes);
 
     m_connection.unreliable_send(packet, packet->packet_bytes);
@@ -306,7 +281,7 @@ void PacketSender::commit_packet(PacketHeader* packet){
 
 
 
-bool PacketSender::iterate_retransmits(){
+bool PacketSender::iterate_retransmits() noexcept{
     uint8_t head = m_slot_head;
     uint8_t tail = m_slot_tail;
 
@@ -463,7 +438,7 @@ bool PacketSender::enqueue_uncommitted_send_stream(const void* data, size_t byte
     abort_uncommitted_send_stream();
     return false;
 }
-void PacketSender::abort_uncommitted_send_stream(){
+void PacketSender::abort_uncommitted_send_stream() noexcept{
     m_slot_tail_uncommitted = m_slot_tail;
     m_buffer_tail_uncommitted = m_buffer_tail;
     m_stream_offset_uncommitted = m_stream_offset;
