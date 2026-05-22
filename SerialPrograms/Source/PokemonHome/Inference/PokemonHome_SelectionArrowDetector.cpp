@@ -42,11 +42,11 @@ public:
         }
     }
     static const SelectionArrowMatcher& RIGHT_ARROW(){
-        static SelectionArrowMatcher matcher("PokemonHome/SelectionArrowRight.png");
+        static SelectionArrowMatcher matcher("PokemonHome/SelectionArrows/SelectionArrowRight.png");
         return matcher;
     }
     static const SelectionArrowMatcher& DOWN_ARROW(){
-        static SelectionArrowMatcher matcher("PokemonHome/SelectionArrowDown.png");
+        static SelectionArrowMatcher matcher("PokemonHome/SelectionArrows/SelectionArrowDown.png");
         return matcher;
     }
 };
