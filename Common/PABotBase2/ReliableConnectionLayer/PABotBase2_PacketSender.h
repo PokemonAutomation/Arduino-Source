@@ -80,19 +80,17 @@ public:
     //  Out-of-band messages that bypass the queue and go out as-is.
     //  These may be dropped.
     //
-    void send_oob_packet_empty(uint8_t seqnum, uint8_t opcode);
-    void send_oob_packet_u8(uint8_t seqnum, uint8_t opcode, uint8_t data);
-    void send_oob_packet_u16(uint8_t seqnum, uint8_t opcode, const uint16_t& data);
-    void send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, const uint32_t& data);
+    void send_oob_packet_empty(uint8_t seqnum, uint8_t opcode) noexcept;
+    void send_oob_packet_u32(uint8_t seqnum, uint8_t opcode, const uint32_t& data) noexcept;
     void send_oob_packet_data(
         uint8_t seqnum, uint8_t opcode,
         uint8_t bytes, const void* data
-    );
+    ) noexcept;
     void send_oob_packet_u32_data(
         uint8_t seqnum, uint8_t opcode,
         const uint32_t& u32,
         uint8_t bytes, const void* data
-    );
+    ) noexcept;
 
 
 public:
@@ -102,15 +100,15 @@ public:
 
     //  Remove the packet corresponding to the specified seqnum from the queue.
     //  Returns true is successful, false if seqnum is not in the queue.
-    bool remove(uint8_t seqnum);
+    bool remove(uint8_t seqnum) noexcept;
 
-    void send_reset();
+    void send_reset() noexcept;
 
     //
     //  Send a packet with the specified opcode and extra data after the header.
     //  Returns true if successful. (enters the queue)
     //
-    bool send_packet(uint8_t opcode, uint8_t extra_bytes, const void* extra_data);
+    bool send_packet(uint8_t opcode, uint8_t extra_bytes, const void* extra_data) noexcept;
 
     //
     //  Send a single packet in two parts:
@@ -133,12 +131,12 @@ public:
     //  function can be called on this queue. It is undefined behavior to separate
     //  "reserve()" and "commit()" with another function on the same queue.
     //
-    PacketHeader* reserve_packet(uint8_t opcode, uint8_t extra_bytes);
-    void commit_packet(PacketHeader* packet);
+    PacketHeader* reserve_packet(uint8_t opcode, uint8_t extra_bytes) noexcept;
+    void commit_packet(PacketHeader* packet) noexcept;
 
 
     //  Returns true if something was retransmitted.
-    bool iterate_retransmits();
+    bool iterate_retransmits() noexcept;
 
 
 public:
@@ -154,7 +152,7 @@ public:
     //
 
     bool enqueue_uncommitted_send_stream(const void* data, size_t bytes) noexcept;
-    void abort_uncommitted_send_stream();
+    void abort_uncommitted_send_stream() noexcept;
     void commit_uncommitted_send_stream() noexcept;
 
     //

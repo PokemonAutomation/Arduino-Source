@@ -26,4 +26,11 @@ namespace PokemonAutomation{
 
 #endif
 
+
+namespace PokemonAutomation{
+    template <typename LockType>
+    using LockGuard = std::lock_guard<LockType>;
+}
+
+
 #endif
