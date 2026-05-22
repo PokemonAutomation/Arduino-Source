@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_PokemonHome_OriginMarkReader_H
 #define PokemonAutomation_PokemonHome_OriginMarkReader_H
 
+#include <vector>
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "Pokemon/Pokemon_OriginMarks.h"
-#include <vector>
 #include "CommonTools/DetectedBoxes.h"
+#include "Pokemon/Pokemon_OriginMarks.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

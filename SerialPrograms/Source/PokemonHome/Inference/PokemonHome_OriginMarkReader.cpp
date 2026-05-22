@@ -4,87 +4,19 @@
  *
  */
 
-#include "PokemonHome_OriginMarkReader.h"
 #include <map>
-#include "CommonTools/Images/WaterfillUtilities.h"
-#include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/ImageTypes/BinaryImage.h"
-#include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Tools/DebugDumper.h"
-#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
-#include <sstream>
 #include <vector>
-#include "CommonTools/ImageMatch/ExactImageMatcher.h"
-#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
-#include "CommonTools/Images/ImageFilter.h"
-#include "CommonFramework/Globals.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/DetectedBoxes.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "CommonTools/ImageMatch/ExactImageMatcher.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "PokemonHome_OriginMarkReader.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonHome{
-
-using ImageMatch::WaterfillTemplateMatcher;
-using namespace Kernels;
-using namespace Kernels::Waterfill;
-
-class OriginMarkSprite {
-public:
-    OriginMarkSprite(const std::string& slug, const std::string& resource_location)
-        : m_slug(slug)
-    {
-        ImageRGB32 sprite(RESOURCE_PATH() + resource_location);
-
-        sprite = filter_rgb32_range(
-            sprite,
-            0xff000000, 0xffffffff,
-            Color(0), false
-        );
-
-        PackedBinaryMatrix matrix = compress_rgb32_to_binary_min(sprite, 93, 100, 83);
-        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 10);
-
-        WaterfillObject object;
-        for (const WaterfillObject& item : objects){
-            object.merge_assume_no_overlap(item);
-        }
-
-        m_aspect_ratio = object.aspect_ratio();
-        m_matcher = std::make_unique<ImageMatch::WeightedExactImageMatcher>(
-            sprite.sub_image(object.min_x, object.min_y, object.width(), object.height()).copy(),
-            ImageMatch::WeightedExactImageMatcher::InverseStddevWeight{ 1, 64 }
-        );
-    }
-
-    const std::string& slug() const { return m_slug; }
-    double aspect_ratio() const { return m_aspect_ratio; }
-    const ImageMatch::WeightedExactImageMatcher& matcher() const { return *m_matcher; }
-
-private:
-    std::string m_slug;
-    double m_aspect_ratio;
-    std::unique_ptr<ImageMatch::WeightedExactImageMatcher> m_matcher;
-};
-
-struct OriginMarkSpriteDatabase {
-    std::map<OriginMark, OriginMarkSprite> m_mark_map;
-
-    static OriginMarkSpriteDatabase& instance(){
-        static OriginMarkSpriteDatabase data;
-        return data;
-    }
-
-    OriginMarkSpriteDatabase(){
-        for (const auto& item : Pokemon::ORIGIN_MARK_SLUGS()){
-            if (item.first == OriginMark::NONE || item.first == OriginMark::GAMEBOY){ //TODO: Need to find someone with the gameboy sprite
-                continue;
-            }
-            m_mark_map.emplace(item.first, OriginMarkSprite(item.second, "PokemonHome/OriginMarks/" + item.second + ".png"));
-        }
-    }
-};
 
 class MarkIconMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:

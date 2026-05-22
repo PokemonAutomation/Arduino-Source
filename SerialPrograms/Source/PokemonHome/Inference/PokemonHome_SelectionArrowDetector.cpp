@@ -5,15 +5,14 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonHome_SelectionArrowDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonHome{
-
 
 
 class SelectionArrowMatcher : public ImageMatch::WaterfillTemplateMatcher{
@@ -50,8 +49,6 @@ public:
         return matcher;
     }
 };
-
-
 
 SelectionArrowDetector::SelectionArrowDetector(
     Color color,
@@ -105,11 +102,6 @@ bool SelectionArrowDetector::detect(const ImageViewRGB32& screen){
 
     return found;
 }
-
-
-
-
-
 
 }
 }
