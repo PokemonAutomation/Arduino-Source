@@ -123,7 +123,7 @@ RngTimings prepare_timings(
     console.log("CSF calibration (frames): " + std::to_string(calibrations.csf_offset));
     console.log("In-game calibration (frames x2): " + std::to_string(calibrations.ingame_offset));
 
-    double seed_delay = SEED_DELAY + calibrations.seed_offset + FIXED_SEED_OFFSET;
+    double seed_delay = SEED_DELAY + (calibrations.seed_offset * FRLG_FRAME_DURATION) + FIXED_SEED_OFFSET;
     double csf_delay = (CONTINUE_SCREEN_FRAMES + calibrations.csf_offset) * FRLG_FRAME_DURATION;
     double teachy_delay = TEACHY_ADVANCES * FRLG_FRAME_DURATION / 313;
     double ingame_delay = (modified_ingame_advances - TEACHY_ADVANCES) * FRLG_FRAME_DURATION / 2 - (should_use_teachy_tv ? 14067 : 0);
@@ -442,6 +442,7 @@ bool update_history(
     }
 
     if (search_hits.size() == 1){
+        console.log("Hit " + to_hex_string(search_hits[0].seed) + " / " + std::to_string(search_hits[0].advance));
         console.log("Updating calibrations...");
         calibration_history.calibrations.emplace_back(calibrations);
         calibration_history.results.emplace_back(search_hits[0]);
@@ -515,7 +516,7 @@ bool update_history(
         }
         calibration_history.calibrations.emplace_back(calibrations);
         calibration_history.results.emplace_back(most_likely_hit);
-        console.log("   " + std::to_string(most_likely_hit.seed) + " / " + std::to_string(most_likely_hit.advance));
+        console.log("   " + to_hex_string(most_likely_hit.seed) + " / " + std::to_string(most_likely_hit.advance));
     }
 
 

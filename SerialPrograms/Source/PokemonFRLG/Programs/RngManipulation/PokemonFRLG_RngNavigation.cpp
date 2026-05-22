@@ -6,6 +6,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "PokemonFRLG/Inference/Sounds/PokemonFRLG_CatchFanfareDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h"
 #include "PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
@@ -17,6 +18,7 @@
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_DexRegistrationDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_StatsReader.h"
+#include "PokemonFRLG/Inference/PokemonFRLG_PokemonSpriteReader.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_PartyLevelUpReader.h"
 #include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
 #include "PokemonFRLG/PokemonFRLG_Navigation.h"
@@ -123,6 +125,19 @@ AdvObservedPokemon read_summary(
         gender = AdvGender::Any;
         break;
     }
+    
+    if (
+           stats.name.empty()
+        || stats.name == "nidoran-m"
+        || stats.name == "nidoran-f"
+    ){
+        SummarySpriteReader sprite_reader(species);
+        ImageMatch::ImageMatchResult result = sprite_reader.read(screen1);
+        if (result.results.size() > 0){
+            stats.name = result.results.begin()->second;
+            console.log("Matched sprite: " + stats.name);
+        }
+    }
 
     AdvObservedPokemon pokemon = {
         stats.name,
@@ -145,6 +160,9 @@ int auto_catch(
     const uint64_t& max_ball_throws,
     bool safari_zone
 ){
+    float catch_coefficient = 1.0;
+    bool catch_detected = false;
+
     for (uint64_t i=0; i<=max_ball_throws; i++){
         int count = 0;
         while(true){
@@ -158,6 +176,10 @@ int auto_catch(
             PartyMenuWatcher party_menu(COLOR_RED);
             DexRegistrationWatcher dex_registration(COLOR_RED);
             BlackScreenWatcher black_screen(COLOR_RED);
+            CatchFanfareDetector catch_detector(console.logger(), [&](float error_coefficient) -> bool{
+                catch_coefficient = error_coefficient;
+                return true;
+            });
             context.wait_for_all_requests();
             int ret = run_until<ProControllerContext>(
                 console, context,
@@ -166,7 +188,7 @@ int auto_catch(
                         pbf_press_button(context, BUTTON_B, 200ms, 300ms);
                     }
                 },
-                { battle_menu, party_menu, black_screen },
+                { battle_menu, party_menu, dex_registration, black_screen, catch_detector},
                 10ms
             );
 
@@ -183,10 +205,15 @@ int auto_catch(
             case 2:
                 console.log("Dex registration detected. Exiting battle...");
                 pbf_mash_button(context, BUTTON_B, 5000ms);
-                return static_cast<int>(i);
+                return catch_detected ? static_cast<int>(i) : 0;
             case 3:
                 console.log("Black screen detected. Battle exited.");
-                return static_cast<int>(i);
+                return catch_detected ? static_cast<int>(i) : 0;
+            case 4: 
+                console.log("Catch detected!", COLOR_BLUE);
+                catch_detected = true;
+                pbf_wait(context, 2000ms);
+                continue;
             default:
                 console.log("No recognized state. Try checking if in the overworld...");
                 StartMenuWatcher start_menu;
@@ -208,7 +235,7 @@ int auto_catch(
                 console.log("Overworld detected.");
                 pbf_mash_button(context, BUTTON_B, 500ms);
                 context.wait_for_all_requests();
-                return static_cast<int>(i);
+                return catch_detected ? static_cast<int>(i) : 0;
             }
 
             break;
@@ -324,8 +351,11 @@ bool use_rare_candy(
     VideoSnapshot screen = console.video().snapshot();
     StatReads statreads = reader.read_stats(console.logger(), screen);    
 
+    // try to exit the party menu before using the BattleDialogueWatcher,
+    // since the fading party screen can trigger it.
+    pbf_press_button(context, BUTTON_B, 200ms, 1800ms);
+
     update_filters(filters, pokemon, statreads, {}, base_stats, method);
-    // RNG_FILTERS.set(filters);   
 
     // return to the bag (possibly learning a move, but trying to prevent evolution)
     int attempts = 0;
@@ -336,15 +366,17 @@ bool use_rare_candy(
         }
         BagWatcher bag_menu(COLOR_RED);
         PartyMoveLearnWatcher move_learn(COLOR_RED);
+        BattleDialogWatcher evolution(COLOR_RED);
         context.wait_for_all_requests();
         int ret3 = run_until<ProControllerContext>(
             console, context,
             [](ProControllerContext& context) {
+                pbf_wait(context, 1000ms);
                 for (int i=0; i<15; i++){
                     pbf_press_button(context, BUTTON_B, 200ms, 1800ms);
                 }
             },
-            { bag_menu, move_learn }
+            { bag_menu, move_learn, evolution }
         );
         attempts++;
         switch (ret3){
@@ -355,7 +387,11 @@ bool use_rare_candy(
             console.log("Move learn opportunity detected.");
             // don't learn move
             pbf_press_button(context, BUTTON_B, 200ms, 1800ms);
-            pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+            pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
+            continue;
+        case 2:
+            console.log("Evolution screen detected.");
+            pbf_press_button(context, BUTTON_B, 200ms, 2800ms);
             continue;
         default:
             console.log("use_rare_candy(): failed to return to bag menu.");
