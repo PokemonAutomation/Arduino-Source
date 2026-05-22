@@ -1,6 +1,5 @@
 #ifdef PA_DPP
 
-#include <dpp/dpp.h>
 #include <Integrations/DppIntegration/DppUtility.h>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Logging/TaggedLogger.h"

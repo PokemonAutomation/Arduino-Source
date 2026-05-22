@@ -1,7 +1,6 @@
 #ifdef PA_DPP
 
 #include <set>
-#include <dpp/dpp.h>
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/StringToolsQt.h"
