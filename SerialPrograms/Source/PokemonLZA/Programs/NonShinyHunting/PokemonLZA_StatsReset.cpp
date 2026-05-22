@@ -458,7 +458,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             pbf_move_left_joystick(context, {0.05, 1}, 4800ms, 0ms);
             pbf_mash_button(context, BUTTON_A, 1s);
             context.wait_for_all_requests();
-            wait_until_overworld(env.console, context);
+            wait_until_overworld(env.console, context, 10s);
 
             // run to the right of roof
             pbf_press_button(context, BUTTON_Y, 100ms, 1s);
@@ -485,21 +485,21 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             ssf_press_button(context, BUTTON_B, 0ms, 1s, 0ms);
             pbf_move_left_joystick(context, {-0.2, 1}, 4s, 0ms);
             ssf_press_button(context, BUTTON_B, 0ms, 1s, 0ms);
-            pbf_move_left_joystick(context, {-0.8, 1}, 1500ms, 500ms);
+            pbf_move_left_joystick(context, {-0.8, 1}, 1500ms, 0ms);
 
             // climb ladder
             pbf_mash_button(context, BUTTON_A, 500ms);
             pbf_move_left_joystick(context, {0, 1}, 8s, 1500ms);
 
             ssf_press_button(context, BUTTON_B, 0ms, 1s, 0ms);
-            pbf_move_left_joystick(context, {-1, 0}, 2s, 500ms);
+            pbf_move_left_joystick(context, {-1, 0}, 2s, 0ms);
 
             enter_portal(env, context);
             context.wait_for(100ms);
 
             // run toward hoopa to start battle
             ssf_press_button(context, BUTTON_B, 0ms, 1s, 0ms);
-            pbf_move_left_joystick(context, {0, +1}, 8s, 0ms);
+            pbf_move_left_joystick(context, {0, 1}, 8s, 0ms);
 
             RunFromBattleWatcher battle_menu(COLOR_GREEN, &env.console.overlay(), 10ms);
             OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay(), 100ms);
@@ -560,7 +560,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                         pbf_mash_button(context, BUTTON_A, 60s);
                     }else if (POKEMON == GiftPokemon::MAGEARNA){
                         pbf_mash_button(context, BUTTON_A, 60s);
-                    }else if (POKEMON == GiftPokemon::HOOPA) {
+                    }else if (POKEMON == GiftPokemon::HOOPA){
                         pbf_mash_button(context, BUTTON_A, 120s);
                     }else{
                         pbf_mash_button(context, BUTTON_A, 30s);
