@@ -442,6 +442,7 @@ bool update_history(
     }
 
     if (search_hits.size() == 1){
+        console.log("Hit " + to_hex_string(search_hits[0].seed) + " / " + std::to_string(search_hits[0].advance));
         console.log("Updating calibrations...");
         calibration_history.calibrations.emplace_back(calibrations);
         calibration_history.results.emplace_back(search_hits[0]);
@@ -515,7 +516,7 @@ bool update_history(
         }
         calibration_history.calibrations.emplace_back(calibrations);
         calibration_history.results.emplace_back(most_likely_hit);
-        console.log("   " + std::to_string(most_likely_hit.seed) + " / " + std::to_string(most_likely_hit.advance));
+        console.log("   " + to_hex_string(most_likely_hit.seed) + " / " + std::to_string(most_likely_hit.advance));
     }
 
 
