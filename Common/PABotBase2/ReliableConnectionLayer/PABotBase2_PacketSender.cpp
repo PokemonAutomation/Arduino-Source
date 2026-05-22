@@ -156,6 +156,7 @@ bool PacketSender::remove(uint8_t seqnum) noexcept{
         if (seqnum == m_slot_tail){
             m_buffer_head = 0;
             m_buffer_tail = 0;
+            m_buffer_tail_uncommitted = 0;
             return true;
         }
 
