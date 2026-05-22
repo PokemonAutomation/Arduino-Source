@@ -351,8 +351,11 @@ bool use_rare_candy(
     VideoSnapshot screen = console.video().snapshot();
     StatReads statreads = reader.read_stats(console.logger(), screen);    
 
+    // try to exit the party menu before using the BattleDialogueWatcher,
+    // since the fading party screen can trigger it.
+    pbf_press_button(context, BUTTON_B, 200ms, 1800ms);
+
     update_filters(filters, pokemon, statreads, {}, base_stats, method);
-    // RNG_FILTERS.set(filters);   
 
     // return to the bag (possibly learning a move, but trying to prevent evolution)
     int attempts = 0;
@@ -363,15 +366,17 @@ bool use_rare_candy(
         }
         BagWatcher bag_menu(COLOR_RED);
         PartyMoveLearnWatcher move_learn(COLOR_RED);
+        BattleDialogWatcher evolution(COLOR_RED);
         context.wait_for_all_requests();
         int ret3 = run_until<ProControllerContext>(
             console, context,
             [](ProControllerContext& context) {
+                pbf_wait(context, 1000ms);
                 for (int i=0; i<15; i++){
                     pbf_press_button(context, BUTTON_B, 200ms, 1800ms);
                 }
             },
-            { bag_menu, move_learn }
+            { bag_menu, move_learn, evolution }
         );
         attempts++;
         switch (ret3){
@@ -382,7 +387,11 @@ bool use_rare_candy(
             console.log("Move learn opportunity detected.");
             // don't learn move
             pbf_press_button(context, BUTTON_B, 200ms, 1800ms);
-            pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+            pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
+            continue;
+        case 2:
+            console.log("Evolution screen detected.");
+            pbf_press_button(context, BUTTON_B, 200ms, 2800ms);
             continue;
         default:
             console.log("use_rare_candy(): failed to return to bag menu.");
