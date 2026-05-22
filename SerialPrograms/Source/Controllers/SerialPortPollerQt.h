@@ -10,6 +10,7 @@
 #ifndef PokemonAutomation_SerialPortPoller_H
 #define PokemonAutomation_SerialPortPoller_H
 
+#include <set>
 #include <QSerialPortInfo>
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/PeriodicRunner.h"
@@ -33,6 +34,7 @@ private:
     ~SerialPortPoller();
 
     mutable SpinLock m_lock;
+    std::set<std::string> m_last;
     QList<QSerialPortInfo> m_ports;
 };
 
