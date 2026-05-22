@@ -1283,6 +1283,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Pokemon/Pokemon_NatureChecker.h
     Source/Pokemon/Pokemon_Notification.cpp
     Source/Pokemon/Pokemon_Notification.h
+    Source/Pokemon/Pokemon_OriginMarks.cpp
+    Source/Pokemon/Pokemon_OriginMarks.h
     Source/Pokemon/Pokemon_ShinySparkleSet.cpp
     Source/Pokemon/Pokemon_ShinySparkleSet.h
     Source/Pokemon/Pokemon_StatsCalculation.cpp
@@ -1573,6 +1575,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_ReadBattleLevelUp.h
     Source/PokemonHome/Inference/PokemonHome_BallReader.cpp
     Source/PokemonHome/Inference/PokemonHome_BallReader.h
+    Source/PokemonHome/Inference/PokemonHome_OriginMarkReader.cpp
+    Source/PokemonHome/Inference/PokemonHome_OriginMarkReader.h
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.cpp
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.h
     Source/PokemonHome/Inference/PokemonHome_ButtonDetector.cpp
