@@ -448,25 +448,14 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         }
 
         if (POKEMON == GiftPokemon::HOOPA){
-            // fly to cafe soleil
-            FastTravelState travel_status = open_map_and_fly_to(env.console, context, LANGUAGE, Location::CAFE_SOLEIL);
-            if (travel_status != FastTravelState::SUCCESS){
-                stats.errors++;
-                env.update_stats();
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
-                    "Failed to travel to Café Soleil",
-                    env.console
-                );
-            }
-            context.wait_for(100ms);
-            env.log("Detected overworld. Fast traveled to Café Soleil");
-
-            // run to holovator
-            pbf_move_left_joystick(context, {1, 0.12}, 200ms, 500ms);
+            // run to holovator from bleu pokemon center
+            pbf_move_left_joystick(context, {1, -0.5}, 200ms, 500ms);
+            pbf_press_button(context, BUTTON_Y, 100ms, 1s);
+            pbf_move_left_joystick(context, {-0.14, -1}, 200ms, 500ms);
             pbf_press_button(context, BUTTON_L, 50ms, 500ms);
             ssf_press_button(context, BUTTON_B, 0ms, 1s, 0ms);
-            pbf_move_left_joystick(context, {0, 1}, 6500ms, 500ms);
+            pbf_move_left_joystick(context, {0, 1}, 6s, 0ms);
+            pbf_move_left_joystick(context, {0.05, 1}, 4800ms, 0ms);
             pbf_mash_button(context, BUTTON_A, 1s);
             context.wait_for_all_requests();
             wait_until_overworld(env.console, context);
