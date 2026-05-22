@@ -555,11 +555,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             }
             context.wait_for(100ms);
             // run toward hoopa to catch
-            ssf_press_button(context, BUTTON_B, 0ms, 2s, 0ms);
-            pbf_move_left_joystick(context, {0.05, +1}, 1500ms, 0ms);
-            pbf_mash_button(context, BUTTON_A, 1s);
-            // incase did not run
-            pbf_move_left_joystick(context, {0.05, +1}, 500ms, 0ms);
+            run_towards_gate_with_A_button(env.console, context, 0.063, 1, 2s);
             pbf_mash_button(context, BUTTON_A, 1s);
         }
 
