@@ -473,7 +473,10 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
         int ret = watch_for_shiny_encounter(env.console, context);
         if (ret < 0){
-            if (TARGET == PokemonFRLG_RngTarget::fishing || TARGET == PokemonFRLG_RngTarget::rocksmash){
+            if (   TARGET == PokemonFRLG_RngTarget::fishing 
+                || TARGET == PokemonFRLG_RngTarget::rocksmash
+                || TARGET == PokemonFRLG_RngTarget::safarizonefish
+            ){
                 env.log("No battle triggered. Resetting...");
                 continue;
             }else{
