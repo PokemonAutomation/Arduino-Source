@@ -430,7 +430,7 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         }
 
         int balls_thrown = auto_catch(env.console, context, MAX_BALL_THROWS);
-        if (balls_thrown < -1){
+        if (balls_thrown < 0){
             stats.errors++;
             send_program_recoverable_error_notification(
                 env, NOTIFICATION_ERROR_RECOVERABLE,
