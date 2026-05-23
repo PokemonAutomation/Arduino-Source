@@ -140,12 +140,12 @@ brew tap-new --no-git <yourname>/libdpp # change <yourname> to any desired name,
 ```
 Copy the formula into the tap:
 ```shell
-cp <SOURCE_DIR_ROOT>/3rdPartyBinaries/libdpp@10.1.5.rb $(brew --prefix)/Library/Taps/<yourname>/homebrew-libdpp/Formula/ # change <SOURCE_DIR_ROOT> to where *Arduino-Source* located
+cp <SOURCE_DIR_ROOT>/3rdPartyBinaries/libdpp@10.0.28.rb $(brew --prefix)/Library/Taps/<yourname>/homebrew-libdpp/Formula/ # change <SOURCE_DIR_ROOT> to where *Arduino-Source* located
 ```
 And then install it with:
 ```shell
 brew unlink libdpp # if you have already install the official one
-brew install libdpp@10.1.5
+brew install libdpp@10.0.28
 ```
 
 ### Verify Clang Version

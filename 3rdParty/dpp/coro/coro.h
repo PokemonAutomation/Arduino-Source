@@ -19,11 +19,8 @@
  *
  ************************************************************************************/
 
+#ifdef DPP_CORO
 #pragma once
-
-#include <dpp/export.h>
-
-#ifndef DPP_NO_CORO
 
 #if (defined(_LIBCPP_VERSION) and !defined(__cpp_impl_coroutine)) // if libc++ experimental implementation (LLVM < 14)
 #  define STDCORO_EXPERIMENTAL_HEADER
@@ -117,14 +114,13 @@ decltype(auto) co_await_resolve(T&& expr) noexcept {
 }
 
 #else
-
 /**
  * @brief Concept to check if a type has a useable `operator co_await()` member
  *
  * @note This is actually a C++20 concept but Doxygen doesn't do well with them
  */
 template <typename T>
-inline constexpr bool has_co_await_member;
+bool has_co_await_member;
 
 /**
  * @brief Concept to check if a type has a useable overload of the free function `operator co_await(expr)`
@@ -132,7 +128,7 @@ inline constexpr bool has_co_await_member;
  * @note This is actually a C++20 concept but Doxygen doesn't do well with them
  */
 template <typename T>
-inline constexpr bool has_free_co_await;
+bool has_free_co_await;
 
 /**
  * @brief Concept to check if a type has useable `await_ready()`, `await_suspend()` and `await_resume()` member functions.
@@ -140,15 +136,7 @@ inline constexpr bool has_free_co_await;
  * @note This is actually a C++20 concept but Doxygen doesn't do well with them
  */
 template <typename T>
-inline constexpr bool has_await_members;
-
-/**
- * @brief Concept to check if a type can be used with co_await
- * 
- * @note This is actually a C++20 concept but Doxygen doesn't do well with them
- */
-template <typename T>
-inline constexpr bool awaitable_type;
+bool has_await_members;
 
 /**
  * @brief Mimics the compiler's behavior of using co_await. That is, it returns whichever works first, in order : `expr.operator co_await();` > `operator co_await(expr)` > `expr`
@@ -156,7 +144,6 @@ inline constexpr bool awaitable_type;
  * This function is conditionally noexcept, if the returned expression also is.
  */
 decltype(auto) co_await_resolve(auto&& expr) {}
-
 #endif
 
 /**
@@ -166,12 +153,6 @@ template <typename T>
 using awaitable_result = decltype(co_await_resolve(std::declval<T>()).await_resume());
 
 } // namespace detail
-
-/**
- * @brief Concept to check if a type can be used with co_await
- */
-template <typename T>
-concept awaitable_type = requires (T expr) { detail::co_await_resolve(expr).await_ready(); };
 
 struct confirmation_callback_t;
 
@@ -201,5 +182,5 @@ inline int coro_alloc_count = 0;
 
 } // namespace dpp
 
-#endif /* DPP_NO_CORO */
+#endif /* DPP_CORO */
 

@@ -35,14 +35,6 @@ namespace dpp {
  * */
 enum sku_type : uint8_t {
 	/**
-	 * @brief Represents a durable one-time purchase
-	 */
-	DURABLE = 2,
-	/**
-	 * @brief Consumable one-time purchase
-	 */
-	CONSUMABLE = 3,
-	/**
 	 * @brief Represents a recurring subscription
 	 */
 	SUBSCRIPTION = 5,
@@ -99,7 +91,7 @@ public:
 	/**
 	 * @brief The type of SKU.
 	 */
-	sku_type type{sku_type::SUBSCRIPTION};
+	sku_type type = sku_type::SUBSCRIPTION;
 
 	/**
 	 * @brief ID of the parent application
@@ -129,13 +121,7 @@ public:
 	/**
 	 * @brief Construct a new SKU object with all data required.
 	 *
-	 * @param id ID of the SKU.
-	 * @param type Type of SKU (sku_type).
-	 * @param application_id ID of the parent application.
-	 * @param name Customer-facing name of your premium offering.
-	 * @param slug System-generated URL slug based on the SKU's name.
-	 * @param flags Flags bitmap from dpp::sku_flags.
-	 *
+	 * @param id SKU id.
 	 */
 	sku(const snowflake id, const sku_type type, const snowflake application_id, const std::string name, const std::string slug, const uint16_t flags);
 
@@ -173,4 +159,4 @@ public:
  */
 typedef std::unordered_map<snowflake, sku> sku_map;
 
-}
+} // namespace dpp

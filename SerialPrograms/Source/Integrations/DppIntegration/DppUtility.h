@@ -2,15 +2,7 @@
 #ifndef DPP_UTILITY_H
 #define DPP_UTILITY_H
 
-#if defined(__clang__)
-    #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wunused-parameter"
-#endif
 #include <dpp/dpp.h>
-#if defined(__clang__)
-    #pragma clang diagnostic pop
-#endif
-
 #include <atomic>
 #include "Common/Cpp/Logging/AbstractLogger.h"
 

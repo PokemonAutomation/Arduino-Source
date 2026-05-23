@@ -40,9 +40,7 @@ namespace dpp {
 
 enum sticker_format : uint8_t;
 
-/**
- * @brief Macro that expands to static_asserts checking sizeof and alignof are equal between two types.
- */
+/** @brief Macro that expands to static_asserts checking sizeof and alignof are equal between two types */
 #define DPP_CHECK_ABI_COMPAT(a, b) \
 static_assert(sizeof(a) == sizeof(b), #a " and " #b " must be the same size for ABI compatibility"); \
 static_assert(alignof(a) == alignof(b), #a " and " #b " must be the same alignment for ABI compatibility"); \
@@ -53,9 +51,7 @@ static_assert(alignof(a) == alignof(b), #a " and " #b " must be the same alignme
 namespace utility {
 
 /**
- * @brief Helper function to easily create discord's cdn endpoint urls.
- * @warning **For internal use only!**
- *
+ * For internal use only. Helper function to easily create discord's cdn endpoint urls
  * @see https://discord.com/developers/docs/reference#image-formatting-cdn-endpoints
  * @param allowed_formats A vector of supported formats for the endpoint from the discord docs
  * @param path_without_extension The path for the endpoint (without the extension e.g. `.png`)
@@ -70,9 +66,7 @@ namespace utility {
 std::string DPP_EXPORT cdn_endpoint_url(const std::vector<image_type> &allowed_formats, const std::string &path_without_extension, const dpp::image_type format, uint16_t size, bool prefer_animated = false, bool is_animated = false);
 
 /**
- * @brief Helper function to easily create discord's cdn endpoint urls.
- * @warning **For internal use only!**
- *
+ * For internal use only. Helper function to easily create discord's cdn endpoint urls
  * @see https://discord.com/developers/docs/reference#image-formatting-cdn-endpoints
  * @param allowed_formats A vector of supported formats for the endpoint from the discord docs
  * @param path_without_extension The path for the endpoint (without the extension e.g. `.png`)
@@ -88,9 +82,7 @@ std::string DPP_EXPORT cdn_endpoint_url(const std::vector<image_type> &allowed_f
 std::string DPP_EXPORT cdn_endpoint_url_hash(const std::vector<image_type> &allowed_formats, const std::string &path_without_extension, const std::string &hash, const dpp::image_type format, uint16_t size, bool prefer_animated = false, bool is_animated = false);
 
 /**
- * @brief Helper function to easily create discord's cdn endpoint urls (specialised for stickers)
- * @warning **For internal use only!**
- *
+ * For internal use only. Helper function to easily create discord's cdn endpoint urls (specialised for stickers)
  * @see https://discord.com/developers/docs/reference#image-formatting-cdn-endpoints
  * @param sticker_id The sticker ID. Returns empty string if 0
  * @param format The format type
@@ -106,17 +98,14 @@ enum avx_type_t : uint8_t {
 	 * @brief No AVX Support
 	 */
 	avx_none,
-
 	/**
 	 * @brief AVX support
 	 */
 	avx_1,
-
 	/**
 	 * @brief AVX2 support
 	 */
 	avx_2,
-
 	/**
 	 * @brief AVX512 support
 	 */
@@ -131,59 +120,31 @@ enum avx_type_t : uint8_t {
  * They have been sorted into numerical order of their ASCII value to keep C++ happy.
  */
 enum time_format : uint8_t {
-	/**
-	 * @brief "20 April 2021" - Long Date
-	 */
-	tf_long_date = 'D',
-
-	/**
-	 * @brief "Tuesday, 20 April 2021 16:20" - Long Date/Time
-	 */
-	tf_long_datetime = 'F',
-
-	/**
-	 * @brief "2 months ago" - Relative Time
-	 */
-	tf_relative_time = 'R',
-
-	/**
-	 * @brief "16:20:30" - Long Time
-	 */
-	tf_long_time = 'T',
-
-	/**
-	 * @brief "20/04/2021" - Short Date
-	 */
-	tf_short_date =	'd',
-
-	/**
-	 * @brief "20 April 2021 16:20" - Short Date/Time
-	 */
-	tf_short_datetime = 'f',
-
-	/**
-	 * @brief "16:20" - Short Time
-	 */
-	tf_short_time =	't',
+	/// "20 April 2021" - Long Date
+	tf_long_date		=	'D',
+	/// "Tuesday, 20 April 2021 16:20" - Long Date/Time
+	tf_long_datetime	=	'F',
+	/// "2 months ago" - Relative Time		
+	tf_relative_time	=	'R',
+	/// "16:20:30" - Long Time
+	tf_long_time		=	'T',
+	/// "20/04/2021" - Short Date
+	tf_short_date		=	'd',
+	/// "20 April 2021 16:20" - Short Date/Time
+	tf_short_datetime	=	'f',
+	/// "16:20" - Short Time
+	tf_short_time		=	't',
 };
 
 /**
  * @brief Guild navigation types for dpp::utility::guild_navigation()
  */
 enum guild_navigation_type {
-	/**
-	 * @brief _Customize_ tab with the server's dpp::onboarding_prompt
-	 */
+	/// _Customize_ tab with the server's dpp::onboarding_prompt
 	gnt_customize,
-
-	/**
-	 * @brief "16:20" _Browse Channels_ tab
-	 */
+	/// _Browse Channels_ tab
 	gnt_browse,
-
-	/**
-	 * @brief Server Guide
-	 */
+	/// Server Guide
 	gnt_guide,
 };
 
@@ -205,8 +166,8 @@ typedef std::function<void(const std::string& output)> cmd_result_t;
 /**
  * @brief Run a commandline program asynchronously. The command line program
  * is spawned in a separate std::thread, and when complete, its output from
- * stdout is passed to the callback function in its string parameter. For example:
- * ```cpp
+ * stdout is passed to the callback function in its string parameter. For example
+ * ```
  * dpp::utility::exec("/bin/ls", {"-al"}, [](const std::string& output) {
  *     std::cout << "Output of 'ls -al': " << output << "\n";
  * });
@@ -257,14 +218,9 @@ std::string DPP_EXPORT loglevel(dpp::loglevel in);
  * the value back in string form.
  */
 struct DPP_EXPORT iconhash {
-	/**
-	 * @brief High 64 bits.
-	 */
+	/** @brief High 64 bits */
 	uint64_t first;
-
-	/**
-	 * @brief Low 64 bits.
-	 */
+	/** @brief Low 64 bits */
 	uint64_t second;
 
 	/**
@@ -324,33 +280,6 @@ struct DPP_EXPORT iconhash {
 };
 
 /**
- * @brief User's primary guild (server tag)
- */
-struct DPP_EXPORT primaryguild {
-	/**
-	 * @brief The id of the user's primary guild
-	 *
-	 * @see guild
-	 */
-	snowflake id;
-
-	/**
-	 * @brief Whether the user is displaying the primary guild's server tag
-	 */
-	bool enabled;
-
-	/**
-	 * @brief The text of the user's server tag. Limited to 4 characters
-	 */
-	std::string tag;
-
-	/**
-	 * @brief The server tag badge
-	 */
-	iconhash badge;
-};
-
-/**
  * @brief Image to be received or sent to API calls.
  *
  * This class is carefully crafted to be 16 bytes,
@@ -392,13 +321,13 @@ struct DPP_EXPORT image_data {
 	 *
 	 * @param rhs Image to copy
 	 */
-	image_data(image_data&& rhs) noexcept = default;
+	image_data(image_data&&) noexcept = default;
 
 	/**
 	 * @brief Construct from string buffer
 	 *
 	 * @param format Image format
-	 * @param bytes Data in a string
+	 * @param str Data in a string
 	 * @see image_type
 	 */
 	image_data(image_type format, std::string_view bytes);
@@ -407,8 +336,8 @@ struct DPP_EXPORT image_data {
 	 * @brief Construct from byte buffer
 	 *
 	 * @param format Image format
-	 * @param bytes Data of the image
-	 * @param byte_size Image size in bytes
+	 * @param buf Byte buffer
+	 * @param size_t Image size in bytes
 	 * @see image_type
 	 */
 	image_data(image_type format, const std::byte* bytes, uint32_t byte_size);
@@ -432,8 +361,8 @@ struct DPP_EXPORT image_data {
 	/**
 	 * @brief Set image data.
 	 *
-	 * @param format Image format
-	 * @param bytes Data of the image
+	 * @param format Format of the image
+	 * @param data Data of the image
 	 */
 	void set(image_type format, std::string_view bytes);
 
@@ -441,8 +370,7 @@ struct DPP_EXPORT image_data {
 	 * @brief Set image data.
 	 *
 	 * @param format Format of the image
-	 * @param bytes Data of the image
-	 * @param byte_size Image size in bytes
+	 * @param data Data of the image
 	 */
 	void set(image_type format, const std::byte* bytes, uint32_t byte_size);
 
@@ -535,7 +463,7 @@ struct icon {
 	/**
 	 * @brief Get as icon hash.
 	 *
-	 * @warning The behavior is undefined if `is_iconhash() == false`
+	 * @warn The behavior is undefined if `is_iconhash() == false`
 	 * @return iconhash& This iconhash
 	 */
 	iconhash& as_iconhash() &;
@@ -543,7 +471,7 @@ struct icon {
 	/**
 	 * @brief Get as icon hash.
 	 *
-	 * @warning The behavior is undefined if `is_iconhash() == false`
+	 * @warn The behavior is undefined if `is_iconhash() == false`
 	 * @return iconhash& This iconhash
 	 */
 	const iconhash& as_iconhash() const&;
@@ -551,7 +479,7 @@ struct icon {
 	/**
 	 * @brief Get as icon hash.
 	 *
-	 * @warning The behavior is undefined if `is_iconhash() == false`
+	 * @warn The behavior is undefined if `is_iconhash() == false`
 	 * @return iconhash& This iconhash
 	 */
 	iconhash&& as_iconhash() &&;
@@ -567,7 +495,7 @@ struct icon {
 	/**
 	 * @brief Get as image data.
 	 *
-	 * @warning The behavior is undefined if `is_image_data() == false`
+	 * @warn The behavior is undefined if `is_image_data() == false`
 	 * @return image_data& This image
 	 */
 	image_data& as_image_data() &;
@@ -575,7 +503,7 @@ struct icon {
 	/**
 	 * @brief Get as image.
 	 *
-	 * @warning The behavior is undefined if `is_image_data() == false`
+	 * @warn The behavior is undefined if `is_image_data() == false`
 	 * @return image_data& This image
 	 */
 	const image_data& as_image_data() const&;
@@ -583,7 +511,7 @@ struct icon {
 	/**
 	 * @brief Get as image.
 	 *
-	 * @warning The behavior is undefined if `is_image_data() == false`
+	 * @warn The behavior is undefined if `is_image_data() == false`
 	 * @return image_data& This image
 	 */
 	image_data&& as_image_data() &&;
@@ -601,7 +529,7 @@ double DPP_EXPORT time_f();
 /**
  * @brief Returns true if D++ was built with voice support
  * 
- * @return bool True if voice support is compiled in (libopus)
+ * @return bool True if voice support is compiled in (libsodium/libopus) 
  */
 bool DPP_EXPORT has_voice();
 
@@ -634,25 +562,10 @@ std::string DPP_EXPORT bytes(uint64_t c);
  * and display as a string.
  */
 struct DPP_EXPORT uptime {
-	/**
-	 * @brief Number of days.
-	 */
-	uint16_t days;
-
-	/**
-	 * @brief Number of hours.
-	 */
-	uint8_t hours;
-
-	/**
-	 * @brief Number of minutes.
-	 */
-	uint8_t mins;
-
-	/**
-	 * @brief Number of seconds.
-	 */
-	uint8_t secs;
+	uint16_t days;	//!< Number of days
+	uint8_t hours;	//!< Number of hours
+	uint8_t mins;	//!< Number of minutes
+	uint8_t secs;	//!< Number of seconds
 
 	/**
 	 * @brief Construct a new uptime object
@@ -763,39 +676,25 @@ uint32_t DPP_EXPORT hsl(int h, int s, int l);
  * @param data The start of the data to display
  * @param length The length of data to display
  */
-std::string DPP_EXPORT debug_dump(const uint8_t* data, size_t length);
+std::string DPP_EXPORT debug_dump(uint8_t* data, size_t length);
 
 /**
- * @brief Returns the length of a UTF-8 string in codepoints.
- * @note Result is unspecified for strings that are not valid UTF-8.
- *
+ * @brief Returns the length of a UTF-8 string in codepoints
+ * 
  * @param str string to count length of
- * @return size_t Length of string
+ * @return size_t length of string (0 for invalid utf8)
  */
-size_t DPP_EXPORT utf8len(std::string_view str);
+size_t DPP_EXPORT utf8len(const std::string &str);
 
 /**
- * @brief Return subview of a UTF-8 encoded string in codepoints.
- * @note You must ensure that the resulting view is not used after the lifetime of the viewed string has ended.
- * @note Result is unspecified for strings that are not valid UTF-8.
- *
+ * @brief Return substring of a UTF-8 encoded string in codepoints
+ * 
  * @param str string to return substring from
  * @param start start codepoint offset
  * @param length length in codepoints
- * @return std::string_view The requested subview
+ * @return std::string Substring in UTF-8 or empty string if invalid UTF-8 passed in
  */
-std::string_view DPP_EXPORT utf8subview(std::string_view str, size_t start, size_t length);
-
-/**
- * @brief Return substring of a UTF-8 encoded string in codepoints.
- * @note Result is unspecified for strings that are not valid UTF-8.
- *
- * @param str string to return substring from
- * @param start start codepoint offset
- * @param length length in codepoints
- * @return std::string The requested substring
- */
-std::string DPP_EXPORT utf8substr(std::string_view str, size_t start, size_t length);
+std::string DPP_EXPORT utf8substr(const std::string& str, std::string::size_type start, std::string::size_type length);
 
 /**
  * @brief Read a whole file into a std::string.
@@ -1093,4 +992,4 @@ struct alignas(T) dummy {
 };
 
 } // namespace utility
-}
+} // namespace dpp

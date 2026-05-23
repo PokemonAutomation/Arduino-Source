@@ -29,7 +29,7 @@ struct job_dummy {
 
 }
 
-#ifndef DPP_NO_CORO
+#ifdef DPP_CORO
 
 #include "coro.h"
 
@@ -142,4 +142,4 @@ struct dpp::detail::std_coroutine::coroutine_traits<dpp::job, Args...> {
 	using promise_type = dpp::detail::job::promise<Args...>;
 };
 
-#endif /* DPP_NO_CORO */
+#endif /* DPP_CORO */

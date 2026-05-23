@@ -45,17 +45,17 @@ enum emoji_flags : uint8_t {
 	/**
 	 * @brief Managed (introduced by application)
 	 */
-	e_managed = 0b00000010,
+	e_managed =        0b00000010,
 
 	/**
 	 * @brief Animated emoji.
 	 */
-	e_animated = 0b00000100,
+	e_animated =       0b00000100,
 
 	/**
 	 * @brief Available (false if the guild doesn't meet boosting criteria, etc)
 	 */
-	e_available = 0b00001000,
+	e_available =      0b00001000,
 };
 
 /**
@@ -208,8 +208,7 @@ public:
 	/**
 	 * @brief Load an image into the object
 	 *
-	 * @param data Image binary data
-	 * @param size Size of the image.
+	 * @param image_blob Image binary data
 	 * @param type Type of image. It can be one of `i_gif`, `i_jpg` or `i_png`.
 	 * @return emoji& Reference to self
 	 * @throw dpp::length_exception Image content exceeds discord maximum of 256 kilobytes
@@ -249,4 +248,4 @@ public:
  */
 typedef std::unordered_map<snowflake, emoji> emoji_map;
 
-}
+} // namespace dpp

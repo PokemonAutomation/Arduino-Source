@@ -4,6 +4,7 @@
 
 #ifdef PA_DPP
 #include <atomic>
+#include <dpp/dpp.h>
 #include <Integrations/DppIntegration/DppCommandHandler.h>
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
