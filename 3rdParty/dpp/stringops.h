@@ -139,6 +139,9 @@ template <typename T> T from_string(const std::string &s, std::ios_base & (*f)(s
  */
 template <typename T> T from_string(const std::string &s)
 {
+	if (s.empty()) {
+		return static_cast<T>(0);
+	}
 	T t;
 	std::istringstream iss(s);
 	iss >> t;
@@ -217,4 +220,4 @@ template <typename T> std::string leading_zeroes(T i, size_t width)
 	return stream.str();
 }
 
-} // namespace dpp
+}
