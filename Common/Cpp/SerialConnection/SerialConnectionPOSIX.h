@@ -50,6 +50,14 @@ public:
 
         set_baud_rate(baud_rate);
 
+        int flags;
+        if (ioctl(m_fd, TIOCMGET, &flags) >= 0){
+            //  Set the bitmasks for DTR and RTS
+            flags |= TIOCM_DTR;
+            flags |= TIOCM_RTS;
+            ioctl(m_fd, TIOCMSET, &flags);
+        }
+
         //  Start receiver thread.
         try{
             m_listener = thread_pool.dispatch_now_blocking([this]{
