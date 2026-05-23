@@ -208,7 +208,6 @@ stages:
           )
 
           start "" Binaries64\SerialPrograms.exe
-
           '@
 
           Set-Content -Path "$BUILD_CACHE/SerialPrograms-Windows.cmd" -Value $cmdContent -Encoding UTF8
