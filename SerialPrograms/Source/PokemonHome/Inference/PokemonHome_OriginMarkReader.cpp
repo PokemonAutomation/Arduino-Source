@@ -83,6 +83,20 @@ const MarkIconMatcher& MarkIcon_Alola(){
     return ret;
 }
 
+const MarkIconMatcher& MarkIcon_GameBoy(){
+    static MarkIconMatcher ret(
+        "PokemonHome/OriginMarks/gameboy.png",
+        "gameboy",
+        Color(0xff61645b), Color(0xff646664),
+        10,
+        30.0,
+        {
+            {0xff61645b, 0xff646664},
+        }
+        );
+    return ret;
+}
+
 const MarkIconMatcher& MarkIcon_Go(){
     static MarkIconMatcher ret(
         "PokemonHome/OriginMarks/go.png",
@@ -187,6 +201,7 @@ const std::vector<const MarkIconMatcher*>& ALL_ORIGIN_MARK_MATCHERS(){
     static const std::vector<const MarkIconMatcher*> matchers = {
         &MarkIcon_Kalos(),
         &MarkIcon_Alola(),
+        &MarkIcon_GameBoy(),
         &MarkIcon_Go(),
         &MarkIcon_Lgpe(),
         &MarkIcon_Galar(),
@@ -204,6 +219,8 @@ const MarkIconMatcher& get_mark_icon_matcher(OriginMark mark){
         return MarkIcon_Kalos();
     case OriginMark::ALOLA:
         return MarkIcon_Alola();
+    case OriginMark::GAMEBOY:
+        return MarkIcon_GameBoy();
     case OriginMark::GO:
         return MarkIcon_Go();
     case OriginMark::LGPE:
