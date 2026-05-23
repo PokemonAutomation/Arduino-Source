@@ -6,6 +6,9 @@
 
 #include <stdint.h>
 #include <array>
+#include <iostream>
+using std::cout;
+using std::endl;
 
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -63,6 +66,47 @@ bool BlackDialogBoxDetector::process_frame(const ImageViewRGB32& frame, WallCloc
 }
 
 
+
+
+namespace{
+    std::array<ImageFloatBox, 2> EGG_HATCH_DIALOG_BOXES{{
+        {0.200, 0.900, 0.520, 0.050},
+        {0.270, 0.820, 0.480, 0.050},
+    }};
+}
+
+EggHatchBlackDialogBoxDetector::EggHatchBlackDialogBoxDetector(bool stop_on_detected)
+    : VisualInferenceCallback("EggHatchBlackDialogBoxDetector")
+    , m_stop_on_detected(stop_on_detected)
+    , m_detected(false)
+{}
+
+void EggHatchBlackDialogBoxDetector::make_overlays(VideoOverlaySet& items) const{
+    for (const auto& box : EGG_HATCH_DIALOG_BOXES){
+        items.add(COLOR_YELLOW, box);
+    }
+}
+
+bool EggHatchBlackDialogBoxDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+    static size_t s_frame_count = 0;
+    ++s_frame_count;
+
+    bool detected = true;
+    for (size_t i = 0; i < EGG_HATCH_DIALOG_BOXES.size(); ++i){
+        ImageStats stats = image_stats(extract_box_reference(frame, EGG_HATCH_DIALOG_BOXES[i]));
+        // Print once per ~60 frames (~1s). Only runs while open_menu_to_fly is active.
+        if (s_frame_count % 60 == 0){
+            cout << "EggHatchBlackDialogBox box[" << i << "]: avg_sum=" << stats.average.sum()
+                 << " stddev_sum=" << stats.stddev.sum() << endl;
+        }
+        if (!is_black(stats, 210, 30)){
+            detected = false;
+            break;
+        }
+    }
+    m_detected.store(detected, std::memory_order_release);
+    return detected && m_stop_on_detected;
+}
 
 
 WhiteDialogBoxDetector::WhiteDialogBoxDetector(Color color)
