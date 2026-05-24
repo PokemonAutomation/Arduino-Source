@@ -390,7 +390,7 @@ RngCalibrations get_calibrations(
     const int16_t& seed_position,
     const uint64_t& advances
 ){
-    RngCalibrations calibrations;
+    RngCalibrations calibrations = { 0, 0, 0 };
 
     if (history.results.size() > 0){
         calibrations.seed_offset = get_seed_calibration_frames(history, seed_values, seed_position);
