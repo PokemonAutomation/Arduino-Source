@@ -346,6 +346,8 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     env.log("Initial CSF calibration (frames): " + std::to_string(calibrations.csf_offset));
     env.log("Initial In-game calibration (frames x2): " + std::to_string(calibrations.ingame_offset));
 
+    Milliseconds launch_delay = INITIAL_LAUNCH_DELAY;
+
     RngAdvanceHistory advance_history;
     RngCalibrationHistory calibration_history; 
 
@@ -400,7 +402,7 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         reset_and_perform_blind_sequence(
             env.console, context, TARGET, 
             SEED_BUTTON, EXTRA_BUTTON, timings, 
-            false, PROFILE
+            launch_delay, false, PROFILE
         );
         stats.resets++;
 

@@ -15,6 +15,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
 
+static const Milliseconds INITIAL_LAUNCH_DELAY = 950ms;
+
 void reset_and_perform_blind_sequence(
     ConsoleHandle& console, 
     ProControllerContext& context, 
@@ -22,6 +24,7 @@ void reset_and_perform_blind_sequence(
     const SeedButton& seed_button,
     const BlackoutButton& extra_button,
     const RngTimings& timings,
+    Milliseconds& launch_delay,
     bool safari_zone,
     uint8_t profile
 );

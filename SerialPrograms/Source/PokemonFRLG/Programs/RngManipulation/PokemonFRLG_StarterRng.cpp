@@ -635,6 +635,8 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     env.log("Initial CSF calibration (frames): " + std::to_string(calibrations.csf_offset));
     env.log("Initial In-game calibration (frames x2): " + std::to_string(calibrations.ingame_offset));
 
+    Milliseconds launch_delay = INITIAL_LAUNCH_DELAY;
+
     RngAdvanceHistory advance_history;
     RngCalibrationHistory calibration_history; 
 
@@ -702,7 +704,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         reset_and_perform_blind_sequence(
             env.console, context, PokemonFRLG_RngTarget::starters, 
             SEED_BUTTON, EXTRA_BUTTON, timings,
-            false, PROFILE
+            launch_delay, false, PROFILE
         );
         stats.resets++; 
 
