@@ -94,6 +94,7 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(SHINY_SOUND_THRESHOLD);
     PA_ADD_OPTION(SHINY_SOUND_LOW_FREQUENCY);
     PA_ADD_OPTION(m_catch_audio_settings);
+    PA_ADD_OPTION(CATCH_FANFARE_THRESHOLD);
 
     GameSettings::on_config_value_changed(this);
     DEVICE.add_listener(*this);
