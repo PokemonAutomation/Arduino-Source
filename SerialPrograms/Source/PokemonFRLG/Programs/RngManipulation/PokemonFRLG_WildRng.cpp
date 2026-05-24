@@ -319,8 +319,6 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         throw UserSetupError(env.console, "The target Seed is missing from the list of nearby seeds.");
     }
 
-    env.log("Target Seed Value: " + to_hex_string(TARGET_SEED));
-
     PokemonFRLG_RngTarget TARGET = PokemonFRLG_RngTarget::sweetscent;
 
     bool safari_zone = (

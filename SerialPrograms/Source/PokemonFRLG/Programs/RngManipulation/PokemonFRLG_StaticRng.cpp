@@ -250,8 +250,6 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         throw UserSetupError(env.console, "The target Seed is missing from the list of nearby seeds.");
     }
 
-    env.log("Target Seed Value: " + to_hex_string(TARGET_SEED));
-
     BaseStats BASE_STATS;
     int16_t GENDER_THRESHOLD = -1;
     switch (TARGET){
