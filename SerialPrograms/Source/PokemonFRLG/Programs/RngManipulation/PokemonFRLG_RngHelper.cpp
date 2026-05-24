@@ -263,6 +263,7 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     env.log("CSF calibration (frames): " + std::to_string(CALIBRATIONS.csf_offset));
     env.log("In-game calibration (frames x2): " + std::to_string(CALIBRATIONS.ingame_offset));
 
+    Milliseconds launch_delay = INITIAL_LAUNCH_DELAY;
 
     while (!shiny_found){
         RngTimings timings = prepare_timings(
@@ -276,7 +277,7 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         reset_and_perform_blind_sequence(
             env.console, context, TARGET, 
             SEED_BUTTON, EXTRA_BUTTON, 
-            timings,
+            timings, launch_delay,
             SAFARI_ZONE, PROFILE
         );
         env.log("Blind button presses complete.");
