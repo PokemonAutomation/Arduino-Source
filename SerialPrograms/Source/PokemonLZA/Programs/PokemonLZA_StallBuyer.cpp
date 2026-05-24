@@ -122,7 +122,8 @@ int detect_stall_amount_item(SingleSwitchProgramEnvironment& env, StallBuyer_Des
     bool is_five_item_stall = five_item_stall_detector.detect(snapshot);
     bool is_two_item_stall = two_item_stall_detector.detect(snapshot);
 
-    int count = is_seven_item_stall + is_six_item_stall + is_five_item_stall + is_two_item_stall;
+    std::array<bool> vec = {is_seven_item_stall, is_six_item_stall, is_five_item_stall, is_two_item_stall};
+    auto count = std::count(vec.begin(), vec.end(), true);
     if (count == 1){
         // Exactly one kind of stall detected
         if (is_seven_item_stall){
