@@ -319,8 +319,6 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         throw UserSetupError(env.console, "The target Seed is missing from the list of nearby seeds.");
     }
 
-    env.log("Target Seed Value: " + to_hex_string(TARGET_SEED));
-
     PokemonFRLG_RngTarget TARGET = PokemonFRLG_RngTarget::sweetscent;
 
     bool safari_zone = (
@@ -403,6 +401,8 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     env.log("Initial CSF calibration (frames): " + std::to_string(calibrations.csf_offset));
     env.log("Initial In-game calibration (frames x2): " + std::to_string(calibrations.ingame_offset));
 
+    Milliseconds launch_delay = INITIAL_LAUNCH_DELAY;
+
     RngAdvanceHistory advance_history;
     RngCalibrationHistory calibration_history; 
 
@@ -463,7 +463,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
         reset_and_perform_blind_sequence(
             env.console, context, TARGET, 
             SEED_BUTTON, EXTRA_BUTTON, timings, 
-            safari_zone, PROFILE
+            launch_delay, safari_zone, PROFILE
         );
         stats.resets++; 
 
@@ -473,7 +473,10 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
         int ret = watch_for_shiny_encounter(env.console, context);
         if (ret < 0){
-            if (TARGET == PokemonFRLG_RngTarget::fishing || TARGET == PokemonFRLG_RngTarget::rocksmash){
+            if (   TARGET == PokemonFRLG_RngTarget::fishing 
+                || TARGET == PokemonFRLG_RngTarget::rocksmash
+                || TARGET == PokemonFRLG_RngTarget::safarizonefish
+            ){
                 env.log("No battle triggered. Resetting...");
                 continue;
             }else{
