@@ -46,7 +46,7 @@ void AutoStory_Segment_05::run_segment(
 }
 
 
-std::string AutoStory_checkpoint_018::name()       const{ return "005 - " + AutoStory_Segment_05().name(); }
+std::string AutoStory_checkpoint_018::name()       const{ return "018 - " + AutoStory_Segment_05().name(); }
 std::string AutoStory_checkpoint_018::start_text() const{ return "Fourth Gym Badge acquired (Pastoria City)."; }
 std::string AutoStory_checkpoint_018::end_text()   const{ return "Fifth Gym Badge acquired (Veilstone City)."; }
 

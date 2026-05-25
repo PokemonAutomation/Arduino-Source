@@ -35,7 +35,7 @@ void AutoStory_Segment_09::run_segment(
 }
 
 
-std::string AutoStory_Checkpoint_022::name()       const{ return "009 - " + AutoStory_Segment_09().name(); }
+std::string AutoStory_Checkpoint_022::name()       const{ return "022 - " + AutoStory_Segment_09().name(); }
 std::string AutoStory_Checkpoint_022::start_text() const{ return "Eighth Gym Badge acquired (Sunyshore City)."; }
 std::string AutoStory_Checkpoint_022::end_text()   const{ return "Elite Four and Champion defeated, credits roll."; }
 
