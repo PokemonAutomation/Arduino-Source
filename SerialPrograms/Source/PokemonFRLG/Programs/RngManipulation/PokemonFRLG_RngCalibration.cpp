@@ -390,12 +390,12 @@ RngCalibrations get_calibrations(
     const int16_t& seed_position,
     const uint64_t& advances
 ){
-    RngCalibrations calibrations = { 0, 0, 0 };
+    RngCalibrations calibrations{};
 
     if (history.results.size() > 0){
         calibrations.seed_offset = get_seed_calibration_frames(history, seed_values, seed_position);
         calibrations.ingame_offset = get_advances_calibration_frames(history, advances);
-   
+
         AdvRngState prev_hit = history.results.back();
         double prev_csf_offset = history.calibrations.back().csf_offset;
         int64_t prev_advance_miss = int64_t(prev_hit.advance) - int64_t(advances);

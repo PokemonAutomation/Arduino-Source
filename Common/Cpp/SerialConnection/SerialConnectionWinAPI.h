@@ -133,6 +133,8 @@ public:
         serial_params.ByteSize = 8;
         serial_params.StopBits = 0;
         serial_params.Parity = 0;
+        serial_params.fRtsControl = RTS_CONTROL_ENABLE;
+        serial_params.fDtrControl = DTR_CONTROL_ENABLE;
         if (!SetCommState(m_handle, &serial_params)){
             DWORD error = GetLastError();
             CloseHandle(m_handle);

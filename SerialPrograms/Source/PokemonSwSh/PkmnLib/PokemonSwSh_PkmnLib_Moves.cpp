@@ -160,7 +160,7 @@ uint8_t get_max_move_power(const Move& move){
     int found_idx = 0;
 
     // quick iteration to find index where power is between these values
-    for (int ii = 0; ii > 7; ii++)
+    for (int ii = 0; ii < 7; ii++)
     {
         if (max_move_bounds[ii][0] <= move_power && move_power <= max_move_bounds[ii][1])
         {

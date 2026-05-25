@@ -282,12 +282,7 @@ if (WIN32)
 
     add_library(dpp_lib IMPORTED UNKNOWN)
     set_target_properties(dpp_lib PROPERTIES
-        IMPORTED_LOCATION_RELEASE           ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/dpp.lib
-        IMPORTED_LOCATION_DEBUG             ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/dppd.lib
-        MAP_IMPORTED_CONFIG_DEBUG           DEBUG
-        MAP_IMPORTED_CONFIG_RELEASE         RELEASE
-        MAP_IMPORTED_CONFIG_RELWITHDEBINFO  RELEASE
-        MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
+        IMPORTED_LOCATION   ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/dpp.lib
     )
 
     add_library(discord_lib IMPORTED UNKNOWN)
@@ -492,7 +487,7 @@ else() # macOS and Linux
         target_link_libraries(SerialProgramsLib PUBLIC ${LEPTONICA_LINK_LIBRARIES})
     endif()
 
-    pkg_search_module(DPP dpp=10.0.28)
+    pkg_search_module(DPP dpp=10.1.5)
     if (DPP_FOUND) # enable dpp integration
         message(STATUS "Compiling with DPP integration enabled")
         target_compile_definitions(SerialProgramsLib PUBLIC PA_DPP)

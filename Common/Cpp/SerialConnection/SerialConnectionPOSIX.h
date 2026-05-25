@@ -13,6 +13,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <errno.h>
+#include <sys/ioctl.h>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
@@ -49,6 +50,14 @@ public:
         }
 
         set_baud_rate(baud_rate);
+
+        int flags;
+        if (ioctl(m_fd, TIOCMGET, &flags) >= 0){
+            //  Set the bitmasks for DTR and RTS
+            flags |= TIOCM_DTR;
+            flags |= TIOCM_RTS;
+            ioctl(m_fd, TIOCMSET, &flags);
+        }
 
         //  Start receiver thread.
         try{

@@ -213,13 +213,19 @@ double binomial_coefficient_double(size_t degree, size_t index){
 
 
 double random_match_probability(size_t total, size_t matched, double random_match_chance){
+    //  This effectively computes the binomial CDF function.
+    //  Mathematica: CDF[BinomialDistribution[total, random_match_chance], matched]
     if (total > 1000){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Cannot go beyond degree 1000.");
+    }
+    if (matched > total){
+        return 0;
     }
 
     double c_match = 1 - random_match_chance;
 
-    double misses[62];
+//    double misses[62];
+    std::vector<double> misses(total - matched + 1);
     {
         double miss = 1;
         misses[0] = miss;

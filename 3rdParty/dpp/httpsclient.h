@@ -26,16 +26,14 @@
 #include <list>
 #include <vector>
 #include <variant>
-#include <dpp/sslclient.h>
+#include <dpp/sslconnection.h>
 #include <dpp/version.h>
 #include <dpp/stringops.h>
 
 namespace dpp {
 
 static inline const std::string http_version = "DiscordBot (https://github.com/brainboxdotcc/DPP, "
-                                                + to_hex(DPP_VERSION_MAJOR, false) + "."
-                                                + to_hex(DPP_VERSION_MINOR, false) + "."
-                                                + to_hex(DPP_VERSION_PATCH, false) + ")";
+	+ to_hex(DPP_VERSION_MAJOR, false) + "." + to_hex(DPP_VERSION_MINOR, false) + "." + to_hex(DPP_VERSION_PATCH, false) + ")";
 
 static inline constexpr const char* DISCORD_HOST = "https://discord.com";
 
@@ -111,7 +109,7 @@ struct http_connect_info {
 	/**
 	 * @brief True if the connection should be SSL
 	 */
-	bool is_ssl;
+	bool is_ssl{};
 
 	/**
 	 * @brief The request scheme, e.g. 'https' or 'http'
@@ -127,18 +125,16 @@ struct http_connect_info {
 	 * @brief The port number, either determined from the scheme,
 	 * or from the part of the hostname after a colon ":" character
 	 */
-	uint16_t port;
+	uint16_t port{};
 };
+
+using https_client_completion_event = std::function<void(class https_client*)>;
 
 /**
  * @brief Implements a HTTPS socket client based on the SSL client.
  * @note plaintext HTTP without SSL is also supported via a "downgrade" setting
  */
-class DPP_EXPORT https_client : public ssl_client {
-	/**
-	 * @brief Current connection state
-	 */
-	http_state state;
+class DPP_EXPORT https_client : public ssl_connection {
 
 	/**
 	 * @brief The type of the request, e.g. GET, POST
@@ -209,19 +205,11 @@ class DPP_EXPORT https_client : public ssl_client {
 	 */
 	std::multimap<std::string, std::string> response_headers;
 
-	/**
-	 * @brief Handle input buffer
-	 * 
-	 * @param buffer Buffer to read
-	 * @return returns true if the connection should remain open
-	 */
-	bool do_buffer(std::string& buffer);
-
 protected:
 	/**
 	 * @brief Start the connection
 	 */
-	virtual void connect();
+	virtual void connect() override;
 
 	/**
 	 * @brief Get request state
@@ -230,6 +218,21 @@ protected:
 	http_state get_state();
 
 public:
+	/**
+	 * @brief If true the response timed out while waiting
+	 */
+	bool timed_out;
+
+	/**
+	 * @brief Function to call when HTTP request is completed
+	 */
+	https_client_completion_event completed;
+
+	/**
+	 * @brief Current connection state
+	 */
+	http_state state;
+
 	/**
 	 * @brief Connect to a specific HTTP(S) server and complete a request.
 	 * 
@@ -249,14 +252,15 @@ public:
 	 * @param extra_headers Additional request headers, e.g. user-agent, authorization, etc
 	 * @param plaintext_connection Set to true to make the connection plaintext (turns off SSL)
 	 * @param request_timeout How many seconds before the connection is considered failed if not finished
-	 * @param http_protocol Request HTTP protocol
+	 * @param protocol Request HTTP protocol (default: 1.1)
+	 * @param done Function to call when https_client request is completed
 	 */
-        https_client(const std::string &hostname, uint16_t port = 443, const std::string &urlpath = "/", const std::string &verb = "GET", const std::string &req_body = "", const http_headers& extra_headers = {}, bool plaintext_connection = false, uint16_t request_timeout = 5, const std::string &protocol = "1.1");
+        https_client(cluster* creator, const std::string &hostname, uint16_t port = 443, const std::string &urlpath = "/", const std::string &verb = "GET", const std::string &req_body = "", const http_headers& extra_headers = {}, bool plaintext_connection = false, uint16_t request_timeout = 5, const std::string &protocol = "1.1", https_client_completion_event done = {});
 
 	/**
 	 * @brief Destroy the https client object
 	 */
-        virtual ~https_client() = default;
+        virtual ~https_client() override;
 
 	/**
 	 * @brief Build a multipart content from a set of files and some json
@@ -274,17 +278,17 @@ public:
 	 * 
 	 * @param buffer The buffer contents. Can modify this value removing the head elements when processed.
 	 */
-        virtual bool handle_buffer(std::string &buffer);
+        virtual bool handle_buffer(std::string &buffer) override;
 
 	/**
 	 * @brief Close HTTPS socket
 	 */
-        virtual void close();
+        virtual void close() override;
 
 	/**
 	 * @brief Fires every second from the underlying socket I/O loop, used for timeouts
 	 */
-	virtual void one_second_timer();
+	virtual void one_second_timer() override;
 
 	/**
 	 * @brief Get a HTTP response header
@@ -348,7 +352,6 @@ public:
 	 * @return Split URL
 	 */
 	static http_connect_info get_host_info(std::string url);
-
 };
 
-} // namespace dpp
+}
