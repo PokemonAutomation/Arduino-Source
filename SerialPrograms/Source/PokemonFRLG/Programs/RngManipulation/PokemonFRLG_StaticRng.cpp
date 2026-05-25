@@ -314,7 +314,7 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     static const std::set<std::string> SPECIES_LIST = {
         "electrode", "snorlax", 
-        "articuno", "zapdos", "moltres", "mewtwo"
+        "articuno", "zapdos", "moltres", "mewtwo", 
         "hypno", "ho-oh", "lugia", "deoxys" 
     };
 
@@ -440,6 +440,11 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         }else if(balls_thrown == 0){
             env.log("Failed catch.");
             continue;
+        }
+
+        // skip through dialogue after the Hypno battle
+        if (TARGET == PokemonFRLG_RngTarget::hypno){
+            pbf_mash_button(context, BUTTON_B, 15s);
         }
 
         go_to_summary(env.console, context);
