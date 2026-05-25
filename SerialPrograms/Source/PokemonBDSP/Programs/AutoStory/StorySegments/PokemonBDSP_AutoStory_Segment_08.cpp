@@ -88,7 +88,7 @@ void AutoStory_Segment_08::run_segment(
 }
 
 
-std::string AutoStory_Checkpoint_021::name()       const{ return "008 - " + AutoStory_Segment_08().name(); }
+std::string AutoStory_Checkpoint_021::name()       const{ return "021 - " + AutoStory_Segment_08().name(); }
 std::string AutoStory_Checkpoint_021::start_text() const{ return "Seventh Gym Badge acquired (Snowpoint City)."; }
 std::string AutoStory_Checkpoint_021::end_text()   const{ return "Eighth Gym Badge acquired (Sunyshore City)."; }
 

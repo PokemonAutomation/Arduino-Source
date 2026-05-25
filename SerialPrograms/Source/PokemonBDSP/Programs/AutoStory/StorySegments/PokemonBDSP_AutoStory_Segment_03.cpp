@@ -287,7 +287,7 @@ void AutoStory_Segment_03::run_segment(
 }
 
 
-std::string AutoStory_Checkpoint_011::name()       const{ return "003 - " + AutoStory_Segment_03().name(); }
+std::string AutoStory_Checkpoint_011::name()       const{ return "011 - " + AutoStory_Segment_03().name(); }
 std::string AutoStory_Checkpoint_011::start_text() const{ return "Second Gym Badge acquired (Eterna City)."; }
 std::string AutoStory_Checkpoint_011::end_text()   const{ return "Third Gym Badge acquired (Hearthome City)."; }
 
@@ -315,7 +315,7 @@ void Checkpoint_011(
         }
     );
 }
-std::string AutoStory_Checkpoint_012::name()       const { return "003 - " + AutoStory_Segment_03().name(); }
+std::string AutoStory_Checkpoint_012::name()       const { return "012 - " + AutoStory_Segment_03().name(); }
 std::string AutoStory_Checkpoint_012::start_text() const { return "Second Gym Badge acquired (Eterna City)."; }
 std::string AutoStory_Checkpoint_012::end_text()   const { return "Third Gym Badge acquired (Hearthome City)."; }
 
@@ -343,7 +343,7 @@ void Checkpoint_012(
         }
     );
 }
-std::string AutoStory_Checkpoint_013::name()       const { return "003 - " + AutoStory_Segment_03().name(); }
+std::string AutoStory_Checkpoint_013::name()       const { return "013 - " + AutoStory_Segment_03().name(); }
 std::string AutoStory_Checkpoint_013::start_text() const { return "Second Gym Badge acquired (Eterna City)."; }
 std::string AutoStory_Checkpoint_013::end_text()   const { return "Third Gym Badge acquired (Hearthome City)."; }
 
@@ -371,7 +371,7 @@ void Checkpoint_013(
         }
     );
 }
-std::string AutoStory_Checkpoint_014::name()       const { return "003 - " + AutoStory_Segment_03().name(); }
+std::string AutoStory_Checkpoint_014::name()       const { return "014 - " + AutoStory_Segment_03().name(); }
 std::string AutoStory_Checkpoint_014::start_text() const { return "Second Gym Badge acquired (Eterna City)."; }
 std::string AutoStory_Checkpoint_014::end_text()   const { return "Third Gym Badge acquired (Hearthome City)."; }
 
@@ -399,7 +399,7 @@ void Checkpoint_014(
         }
     );
 }
-std::string AutoStory_Checkpoint_015::name()       const { return "003 - " + AutoStory_Segment_03().name(); }
+std::string AutoStory_Checkpoint_015::name()       const { return "015 - " + AutoStory_Segment_03().name(); }
 std::string AutoStory_Checkpoint_015::start_text() const { return "Second Gym Badge acquired (Eterna City)."; }
 std::string AutoStory_Checkpoint_015::end_text()   const { return "Third Gym Badge acquired (Hearthome City)."; }
 
@@ -428,7 +428,7 @@ void Checkpoint_015(
         }
     );
 }
-std::string AutoStory_Checkpoint_016::name()       const { return "003 - " + AutoStory_Segment_03().name(); }
+std::string AutoStory_Checkpoint_016::name()       const { return "016 - " + AutoStory_Segment_03().name(); }
 std::string AutoStory_Checkpoint_016::start_text() const { return "Second Gym Badge acquired (Eterna City)."; }
 std::string AutoStory_Checkpoint_016::end_text()   const { return "Third Gym Badge acquired (Hearthome City)."; }
 
