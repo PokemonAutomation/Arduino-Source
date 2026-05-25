@@ -41,7 +41,7 @@ public:
     ) const override;
 };
 
-// start: starter Pokemon chosen and received
+// start: starter Pokemon taken out of PC at level 100 and ready to be used in battle
 // end:   first Gym Badge acquired (Oreburgh City)
 void checkpoint_005(
     SingleSwitchProgramEnvironment& env,
@@ -62,7 +62,7 @@ public:
     ) const override;
 };
 
-// start: starter Pokemon chosen and received
+// start: starter Pokemon taken out of PC at level 100 and ready to be used in battle
 // end:   first Gym Badge acquired (Oreburgh City)
 void checkpoint_006(
     SingleSwitchProgramEnvironment& env,

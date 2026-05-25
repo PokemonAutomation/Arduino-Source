@@ -224,7 +224,7 @@ void AutoStory_Segment_02::run_segment(
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 }
-std::string AutoStory_checkpoint_007::name()       const { return "002 - " + AutoStory_Segment_02().name(); }
+std::string AutoStory_checkpoint_007::name()       const { return "007 - " + AutoStory_Segment_02().name(); }
 std::string AutoStory_checkpoint_007::start_text() const { return "First Gym Badge acquired (Oreburgh City)."; }
 std::string AutoStory_checkpoint_007::end_text()   const { return "Standing in front of the scientist in Valley windworks after beating Mars."; }
 
@@ -252,7 +252,7 @@ void checkpoint_007(
         }
     );
 }
-std::string AutoStory_checkpoint_008::name()       const { return "002 - " + AutoStory_Segment_02().name(); }
+std::string AutoStory_checkpoint_008::name()       const { return "008 - " + AutoStory_Segment_02().name(); }
 std::string AutoStory_checkpoint_008::start_text() const { return "First Gym Badge acquired (Oreburgh City)."; }
 std::string AutoStory_checkpoint_008::end_text()   const { return "Second Gym Badge acquired (Eterna City)."; }
 
@@ -281,7 +281,7 @@ void checkpoint_008(
     );
 }
 
-std::string AutoStory_checkpoint_009::name()       const{ return "002 - " + AutoStory_Segment_02().name(); }
+std::string AutoStory_checkpoint_009::name()       const{ return "009 - " + AutoStory_Segment_02().name(); }
 std::string AutoStory_checkpoint_009::start_text() const{ return "First Gym Badge acquired (Oreburgh City)."; }
 std::string AutoStory_checkpoint_009::end_text()   const{ return "Second Gym Badge acquired (Eterna City)."; }
 
@@ -309,7 +309,7 @@ void checkpoint_009(
         }
     );
 }
-std::string AutoStory_checkpoint_010::name()       const { return "002 - " + AutoStory_Segment_02().name(); }
+std::string AutoStory_checkpoint_010::name()       const { return "010 - " + AutoStory_Segment_02().name(); }
 std::string AutoStory_checkpoint_010::start_text() const { return "First Gym Badge acquired (Oreburgh City)."; }
 std::string AutoStory_checkpoint_010::end_text()   const { return "Second Gym Badge acquired (Eterna City)."; }
 
