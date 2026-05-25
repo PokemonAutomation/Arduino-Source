@@ -507,8 +507,9 @@ void EggAutonomous::open_menu_to_fly(
                 context.wait_for_all_requests();
             }
             break;
-        default:  // lambda timed out, X was ignored — retry
-            env.log("Menu didn't open, retrying X press.");
+        default:  // Lambda timed out without detecting menu or egg — recover to overworld as last resort
+            env.log("open_menu_to_fly: no state detected, recovering to overworld via B mash.");
+            mash_B_until_y_comm_icon(env, context, "Cannot recover to overworld after failed menu open.");
             break;
         }
     }
