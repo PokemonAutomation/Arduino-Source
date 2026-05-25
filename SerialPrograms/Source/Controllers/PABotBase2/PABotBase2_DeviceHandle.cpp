@@ -46,16 +46,23 @@ DeviceHandle::~DeviceHandle(){
                 "DeviceHandle::~DeviceHandle(): Waiting for " + std::to_string(m_pending_requests.size()) + " request(s) to finish."
             );
         }catch (...){}
-        bool ok = m_cv.wait_for(
+        size_t unacked = 0;
+         m_cv.wait_for(
             lg, std::chrono::milliseconds(100),
-            [this]{
-                return m_pending_requests.empty();
+            [&, this]{
+                unacked = 0;
+                for (const auto& item : m_pending_requests){
+                    if (item.second.empty()){
+                        unacked++;
+                    }
+                }
+                return unacked == 0;
             }
         );
-        if (!ok){
+        if (unacked != 0){
             try{
                 m_logger.log(
-                    "DeviceHandle::~DeviceHandle(): Timed out waiting for " + std::to_string(m_pending_requests.size()) + " request(s) to finish.",
+                    "DeviceHandle::~DeviceHandle(): Timed out waiting for " + std::to_string(unacked) + " request(s) to finish.",
                     COLOR_RED
                 );
             }catch (...){}
