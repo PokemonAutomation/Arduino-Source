@@ -74,7 +74,7 @@ GameSettings::GameSettings()
 {
     PA_ADD_STATIC(m_game_device_settings);
     PA_ADD_OPTION(DEVICE);
-    PA_ADD_STATIC(GAME_BOX);
+    PA_ADD_OPTION(GAME_BOX);
     PA_ADD_STATIC(m_soft_reset_timings);
     PA_ADD_OPTION(SELECT_BUTTON_MASH0);
     PA_ADD_OPTION(ENTER_GAME_WAIT0);
