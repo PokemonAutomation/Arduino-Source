@@ -133,14 +133,35 @@ public:
         serial_params.ByteSize = 8;
         serial_params.StopBits = 0;
         serial_params.Parity = 0;
-        serial_params.fRtsControl = RTS_CONTROL_ENABLE;
-        serial_params.fDtrControl = DTR_CONTROL_ENABLE;
         if (!SetCommState(m_handle, &serial_params)){
             DWORD error = GetLastError();
             CloseHandle(m_handle);
             throw ConnectionException(nullptr, "SetCommState() failed. Error = " + std::to_string(error));
         }
     }
+
+    void get_control_state(bool& dtr, bool& rts){
+        DCB serial_params{};
+        serial_params.DCBlength = sizeof(serial_params);
+        if (!GetCommState(m_handle, &serial_params)){
+            DWORD error = GetLastError();
+            CloseHandle(m_handle);
+            throw ConnectionException(nullptr, "GetCommState() failed. Error = " + std::to_string(error));
+        }
+
+        dtr = serial_params.fDtrControl != DTR_CONTROL_DISABLE;
+        rts = serial_params.fRtsControl != RTS_CONTROL_DISABLE;
+    }
+    void set_control_state(bool dtr, bool rts){
+        DCB serial_params{};
+        serial_params.DCBlength = sizeof(serial_params);
+        if (GetCommState(m_handle, &serial_params)){
+            serial_params.fRtsControl = rts ? RTS_CONTROL_ENABLE : RTS_CONTROL_DISABLE;
+            serial_params.fDtrControl = dtr ? DTR_CONTROL_ENABLE : DTR_CONTROL_DISABLE;
+            SetCommState(m_handle, &serial_params);
+        }
+    }
+
 
 private:
     void process_error(const std::string& message){

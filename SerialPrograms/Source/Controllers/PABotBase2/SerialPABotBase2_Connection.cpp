@@ -24,6 +24,9 @@ namespace PokemonAutomation{
 namespace SerialPABotBase{
 
 
+using namespace std::chrono_literals;
+
+
 
 
 SerialPABotBase2_Connection::SerialPABotBase2_Connection(
@@ -113,14 +116,19 @@ bool SerialPABotBase2_Connection::open_serial_port(){
 
     return true;
 }
-bool SerialPABotBase2_Connection::connect_to_device(){
-    const uint32_t BAUD_RATES[] = {
+bool SerialPABotBase2_Connection::try_connect_to_device(WallDuration timeout){
+    static const uint32_t BAUD_RATES[] = {
         921600,
         115200,
     };
-    std::string str;
-    WallClock start = current_time();
-    while (current_time() - start < std::chrono::seconds(5)){
+
+    bool dtr;
+    bool rts;
+    m_unreliable_connection->get_control_state(dtr, rts);
+    m_logger.log("DTR = " + std::to_string(dtr) + ", RTS = " + std::to_string(rts));
+
+    WallClock deadline = current_time() + timeout;
+    do{
         for (size_t c = 0; c < sizeof(BAUD_RATES) / sizeof(uint32_t); c++){
             uint32_t baud_rate = BAUD_RATES[c];
             m_logger.log("Trying baud " + tostr_u_commas(baud_rate) + " (with session ID)...");
@@ -129,8 +137,42 @@ bool SerialPABotBase2_Connection::connect_to_device(){
                 return true;
             }
         }
+    }while (current_time() < deadline);
+
+    return false;
+}
+
+bool SerialPABotBase2_Connection::connect_to_device(){
+    //  ESP32 needs RTS = 0, otherwise it keeps resetting on connection.
+    //  Pico debug probe wants DTS = 1 otherwise it shuts down the UART line.
+    //  When ESP32(-S3) is in bootloader, the only way to force it out is:
+    //      (DTS=0, RTS=1) -> (RTS=0, RTS=1)
+
+    //  Start with DTS=1, RTS=0. This is the working steady state for all boards.
+    m_unreliable_connection->set_control_state(true, false);
+    if (try_connect_to_device(5000ms)){
+        return true;
     }
-    str =
+
+    //  Now we can try this sequence to force the ESP32 out of bootloader.
+    m_logger.log("Forcing RTS -> true");
+    set_status_line0("ESP32 bootloader recovery...", COLOR_ORANGE);
+
+    m_unreliable_connection->set_control_state(false, false);
+    wait_for(100ms);
+    m_unreliable_connection->set_control_state(false, true);
+    wait_for(100ms);
+    m_unreliable_connection->set_control_state(true, true);
+    wait_for(100ms);
+
+    bool success = try_connect_to_device(2000ms);
+    //  Regardless of success or fail, set back to steady state: DTS=1, RTS=0
+    m_unreliable_connection->set_control_state(true, false);
+    if (success){
+        return true;
+    }
+
+    std::string str =
         "Unable to connect to controller.<br>"
         "Please make sure your microcontroller is flashed properly and<br>"
         "you are using the correct mode (PABotBase vs. PABotBase2).<br>" +

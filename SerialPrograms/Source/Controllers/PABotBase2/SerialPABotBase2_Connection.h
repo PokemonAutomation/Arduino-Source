@@ -36,6 +36,7 @@ public:
 
 private:
     bool open_serial_port();
+    bool try_connect_to_device(WallDuration timeout);
     bool connect_to_device();
     bool open_serial_connection();
     bool open_device_connection(bool set_to_null_controller);

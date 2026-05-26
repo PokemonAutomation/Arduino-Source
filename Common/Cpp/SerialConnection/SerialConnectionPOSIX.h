@@ -51,6 +51,7 @@ public:
 
         set_baud_rate(baud_rate);
 
+#if 0
         int flags;
         if (ioctl(m_fd, TIOCMGET, &flags) >= 0){
             //  Set the bitmasks for DTR and RTS
@@ -58,6 +59,7 @@ public:
             flags |= TIOCM_RTS;
             ioctl(m_fd, TIOCMSET, &flags);
         }
+#endif
 
         //  Start receiver thread.
         try{
@@ -214,6 +216,26 @@ public:
         if (cfgetospeed(&options) != baud){
 //            std::cout << "actual baud = " << cfgetospeed(&options) << std::endl;
             throw ConnectionException(nullptr, "Unable to set output baud rate.");
+        }
+    }
+
+    void get_control_state(bool& dtr, bool& rts){
+        int flags;
+        if (ioctl(m_fd, TIOCMGET, &flags) < 0){
+            int error = errno;
+            throw ConnectionException(nullptr, "ioctl() failed. Error = " + std::to_string(error));
+        }
+
+        dtr = flags & TIOCM_DTR;
+        rts = flags & TIOCM_RTS;
+    }
+    void set_control_state(bool dtr, bool rts){
+        int flags;
+        if (ioctl(m_fd, TIOCMGET, &flags) >= 0){
+            //  Set the bitmasks for DTR and RTS
+            flags |= dtr ? TIOCM_DTR : 0;
+            flags |= rts ? TIOCM_RTS : 0;
+            ioctl(m_fd, TIOCMSET, &flags);
         }
     }
 
