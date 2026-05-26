@@ -220,6 +220,12 @@ bool activate_repel(
     int num_icons = 8
 );
 
+//  Press A until the Strength selection arrow appears, confirm with A, then mash B for 3 s.
+void use_strength(
+    VideoStream& stream,
+    ProControllerContext& context
+);
+
 //  Walk to the nurse, heal the party, and exit the Pokemon Center.
 //  `label` names the center for log messages (e.g. "Veilstone").
 //  Returns false if the exit black screen was not detected.
@@ -231,7 +237,7 @@ bool heal_pokemon(
 
 enum class FlyPoint {
     CanalavCity,
-    CellesticTown,
+    CelesticTown,
     EternaCity,
     FloaromaTown,
     HearthomeCity,
