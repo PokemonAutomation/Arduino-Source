@@ -146,7 +146,7 @@ bool SerialPABotBase2_Connection::connect_to_device(){
     //  ESP32 needs RTS = 0, otherwise it keeps resetting on connection.
     //  Pico debug probe wants DTS = 1 otherwise it shuts down the UART line.
     //  When ESP32(-S3) is in bootloader, the only way to force it out is:
-    //      (DTS=0, RTS=1) -> (RTS=0, RTS=1)
+    //      (DTS=0, RTS=1) -> (DTS=1, RTS=1)
 
     //  Start with DTS=1, RTS=0. This is the working steady state for all boards.
     m_unreliable_connection->set_control_state(true, false);
