@@ -362,7 +362,7 @@ bool heal_pokemon(
 std::string fly_point_name(FlyPoint place) {
     switch (place) {
         case FlyPoint::CanalavCity:        return "canalave_city";
-        case FlyPoint::CellesticTown:      return "celestic_town";
+        case FlyPoint::CelesticTown:      return "celestic_town";
         case FlyPoint::EternaCity:         return "eterna_city";
         case FlyPoint::FloaromaTown:       return "floaroma_town";
         case FlyPoint::HearthomeCity:      return "hearthome_city";
@@ -398,7 +398,9 @@ bool fly_to(
     open_menu(stream, context, MenuCursorPosition::MAP, 8);
 
     switch (place) {
-        case FlyPoint::CellesticTown:
+        case FlyPoint::CelesticTown:
+            pbf_move_left_joystick(context, {-1, +1}, 4000ms, 500ms);
+            break;
         case FlyPoint::HearthomeCity:
         case FlyPoint::PastoriaCity:
         case FlyPoint::PokemonLeagueLower:
@@ -435,7 +437,10 @@ bool fly_to(
     switch (place) {
         case FlyPoint::CanalavCity:
             break;
-        case FlyPoint::CellesticTown:
+        case FlyPoint::CelesticTown:
+            city_icon_box = {0.660000, 0.470000, 0.012000, 0.020000};
+            repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 15, false);
+            repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 13, false);
             break;
         case FlyPoint::EternaCity:
             break;
@@ -850,6 +855,32 @@ bool activate_repel(
     pbf_press_button(context, BUTTON_A, 80ms, 105ms);
     pbf_mash_button(context, BUTTON_B, 2000ms);
     return true;
+}
+
+
+void use_strength(
+    VideoStream& stream,
+    ProControllerContext& context
+){
+    stream.log("[AutoStory] use_strength: pressing A until selection arrow appears.");
+    const ImageFloatBox box{0.670000, 0.600000, 0.100000, 0.150000};
+    SelectionArrowFinder arrow(stream.overlay(), box, COLOR_GREEN);
+
+    int ret = run_until<ProControllerContext>(
+        stream, context,
+        [](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_A, 30000ms);
+        },
+        {{arrow}}
+    );
+    if (ret != 0){
+        stream.log("[AutoStory] use_strength: selection arrow not found.", COLOR_RED);
+        return;
+    }
+
+    stream.log("[AutoStory] use_strength: selection arrow found, confirming.", COLOR_GREEN);
+    pbf_press_button(context, BUTTON_A, 80ms, 200ms);
+    pbf_mash_button(context, BUTTON_B, 4000ms);
 }
 
 
