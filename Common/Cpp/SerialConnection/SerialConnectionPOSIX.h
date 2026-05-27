@@ -145,6 +145,9 @@ public:
         std::cout << "ECHO    = " << (options.c_lflag & ECHO) << std::endl;
         std::cout << "ECHOE   = " << (options.c_lflag & ECHOE) << std::endl;
 #endif
+        //  Disable hangup on close.
+        options.c_lflag &= ~HUPCL;
+
         //  Configure for raw binary mode (8 bits, no parity, 1 stop bit)
         // No parity
         options.c_cflag &= ~PARENB;

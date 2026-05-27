@@ -56,6 +56,26 @@ bool SerialPABotBase2_Connection::cancel(std::exception_ptr exception) noexcept{
     }
     m_ready.store(false, std::memory_order_release);
     m_connect_thread.wait_and_ignore_exceptions();
+
+    try{
+        bool dtr, rts;
+        m_unreliable_connection->get_control_state(dtr, rts);
+        if (rts){
+            rts = false;
+            std::this_thread::sleep_for(50ms);
+            m_unreliable_connection->set_control_state(dtr, rts);
+        }
+#if 0
+        if (dtr){
+            dtr = false;
+            std::this_thread::sleep_for(50ms);
+            m_unreliable_connection->set_control_state(dtr, rts);
+        }
+#endif
+    }catch (...){
+//        cout << "exception thrown" << endl;
+    }
+
     return false;
 }
 
@@ -143,13 +163,26 @@ bool SerialPABotBase2_Connection::try_connect_to_device(WallDuration timeout){
 }
 
 bool SerialPABotBase2_Connection::connect_to_device(){
-    //  ESP32 needs RTS = 0, otherwise it keeps resetting on connection.
+    //  ESP32 needs to avoid (DTR=0, RTS=1) as that will reset the board.
     //  Pico debug probe wants DTS = 1 otherwise it shuts down the UART line.
     //  When ESP32(-S3) is in bootloader, the only way to force it out is:
     //      (DTS=0, RTS=1) -> (DTS=1, RTS=1)
 
-    //  Start with DTS=1, RTS=0. This is the working steady state for all boards.
-    m_unreliable_connection->set_control_state(true, false);
+    bool dtr, rts;
+    m_unreliable_connection->get_control_state(dtr, rts);
+
+    //  Carefully bring the state to DTR=1, RTS=0.
+    if (rts){
+        wait_for(50ms);
+        rts = false;
+        m_unreliable_connection->set_control_state(dtr, rts);
+    }
+    if (!dtr){
+        wait_for(50ms);
+        dtr = true;
+        m_unreliable_connection->set_control_state(dtr, rts);
+    }
+
     if (try_connect_to_device(5000ms)){
         return true;
     }
@@ -158,12 +191,11 @@ bool SerialPABotBase2_Connection::connect_to_device(){
     m_logger.log("Forcing RTS -> true");
     set_status_line0("ESP32 bootloader recovery...", COLOR_ORANGE);
 
-    m_unreliable_connection->set_control_state(false, false);
-    wait_for(100ms);
     m_unreliable_connection->set_control_state(false, true);
-    wait_for(100ms);
+    wait_for(50ms);
     m_unreliable_connection->set_control_state(true, true);
-    wait_for(100ms);
+    wait_for(50ms);
+    m_unreliable_connection->set_control_state(true, false);
 
     bool success = try_connect_to_device(2000ms);
     //  Regardless of success or fail, set back to steady state: DTS=1, RTS=0

@@ -20,6 +20,10 @@
 #include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "Common/Cpp/StreamConnections/PushingStreamConnections.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 void serial_debug_log(const std::string& msg);
@@ -153,13 +157,15 @@ public:
         rts = serial_params.fRtsControl != RTS_CONTROL_DISABLE;
     }
     void set_control_state(bool dtr, bool rts){
+#if 1
         DCB serial_params{};
         serial_params.DCBlength = sizeof(serial_params);
         if (GetCommState(m_handle, &serial_params)){
-            serial_params.fRtsControl = rts ? RTS_CONTROL_ENABLE : RTS_CONTROL_DISABLE;
             serial_params.fDtrControl = dtr ? DTR_CONTROL_ENABLE : DTR_CONTROL_DISABLE;
+            serial_params.fRtsControl = rts ? RTS_CONTROL_ENABLE : RTS_CONTROL_DISABLE;
             SetCommState(m_handle, &serial_params);
         }
+#endif
     }
 
 
