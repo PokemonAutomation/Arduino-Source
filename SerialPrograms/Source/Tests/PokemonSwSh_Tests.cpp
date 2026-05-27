@@ -39,9 +39,9 @@ std::vector<ImagePixelBox> find_selection_arrows(const ImageViewRGB32& image, si
 using namespace NintendoSwitch::PokemonSwSh;
 
 int test_pokemonSwSh_YCommMenuDetector(const ImageViewRGB32& image, bool target){
-    YCommMenuWatcher detector(true);
+    YCommMenuDetector detector(true);
 
-    bool result = detector.process_frame(image, current_time());
+    bool result = detector.detect(image);
     TEST_RESULT_EQUAL(result, target);
     return 0;
 }
