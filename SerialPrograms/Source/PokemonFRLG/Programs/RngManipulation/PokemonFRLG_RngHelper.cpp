@@ -117,9 +117,10 @@ RngHelper::RngHelper()
     , SEED_DELAY(
         "<b>Seed Delay Time (ms):</b><br>"
         "The delay between starting the game and advancing past the title screen. Set this to match your target seed.<br>"
-        "<i>If using Ten Lines for seed info, select <b>Nintendo Switch 1</b> as your console even if using a Switch 2.</i>",
+        "<i>If using Ten Lines for seed info, select <b>Nintendo Switch 1</b> as your console even if using a Switch 2.</i><br>"
+        "<b><i>Warning: values close to 30500ms can sometimes cause problems, and you may need to increase your seed calibration or pick a new target.</i></b>",
         LockMode::LOCK_WHILE_RUNNING,
-        35000, 30400 // default, min
+        31338, 30400 // default, min
     )
     , SEED_CALIBRATION(
          "<b>Seed Calibration (ms):</b>"
@@ -133,7 +134,7 @@ RngHelper::RngHelper()
         "<br>The number of RNG advances before loading the game.<br>"
         "These pass at the \"normal\" rate compared to other consoles.",
         LockMode::LOCK_WHILE_RUNNING,
-        1000, 192 // default, min
+        200, 192 // default, min
     )
     , CONTINUE_SCREEN_CALIBRATION(
         "<b>Continue Screen Frames Calibration:</b>"
@@ -148,7 +149,7 @@ RngHelper::RngHelper()
         "These pass at double the rate compared to other consoles, where every frame results in 2 advances.<br>"
         "<i>Warning: this needs to be long enough to accomodate all in-game button presses prior to the gift/encounter</i>",
         LockMode::LOCK_WHILE_RUNNING,
-        12345, 320 // default, min
+        9800, 320 // default, min
     )
     , INGAME_CALIBRATION(
         "<b>In-Game Advances Calibration:</b>"
