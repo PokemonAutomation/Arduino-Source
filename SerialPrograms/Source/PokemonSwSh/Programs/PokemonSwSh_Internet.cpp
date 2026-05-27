@@ -28,7 +28,7 @@ bool connect_to_internet_with_inference(
     bool ok = true;
 //    cout << "Waiting for Y-COMM to open..." << endl;
     for (size_t attempts = 0;;){
-        YCommMenuDetector detector(true);
+        YCommMenuWatcher detector(true);
         if (detector.detect(stream.video().snapshot())){
             stream.log("Y-COMM detected.");
             break;
@@ -69,7 +69,7 @@ bool connect_to_internet_with_inference(
 //    cout << "Waiting for Y-COMM to close..." << endl;
     //  Mash B until you leave Y-COMM.
     {
-        YCommMenuDetector detector(false);
+        YCommMenuWatcher detector(false);
         int result = run_until<ProControllerContext>(
             stream, context,
             [&](ProControllerContext& context){
