@@ -137,7 +137,8 @@ StarterRng::StarterRng()
     , SEED_DELAY(
         "<b>Seed Delay Time (ms):</b><br>"
         "The delay between starting the game and advancing past the title screen. Set this to match your target seed.<br>"
-        "<i>If using Ten Lines for seed info, select <b>Nintendo Switch 1</b> as your console even if using a Switch 2.</i>",
+        "<i>If using Ten Lines for seed info, select <b>Nintendo Switch 1</b> as your console even if using a Switch 2.</i><br>"
+        "<b>Warning: values close to 30500ms can sometimes cause problems, and you may need to manually increase your initial seed calibration or pick a new target.</b>",
         LockMode::LOCK_WHILE_RUNNING,
         31338, 30400 // default, min
     )
@@ -605,7 +606,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     static const int16_t GENDER_THRESHOLD = 30;
 
-    static const std::set<std::string> SPECIES_LIST = { "bulbasuar", "squirtle", "charmander" };
+    static const std::set<std::string> SPECIES_LIST = { "bulbasaur", "squirtle", "charmander" };
 
     env.log("RNG Target: " + std::to_string(STARTER.current_value()));
     env.log("Target Seed: " + to_hex_string(TARGET_SEED));
