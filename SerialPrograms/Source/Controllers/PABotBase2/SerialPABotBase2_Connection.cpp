@@ -57,24 +57,42 @@ bool SerialPABotBase2_Connection::cancel(std::exception_ptr exception) noexcept{
     m_ready.store(false, std::memory_order_release);
     m_connect_thread.wait_and_ignore_exceptions();
 
+    if (m_unreliable_connection == nullptr){
+        return false;
+    }
+
     try{
         bool dtr, rts;
         m_unreliable_connection->get_control_state(dtr, rts);
         if (rts){
             rts = false;
-            std::this_thread::sleep_for(50ms);
             m_unreliable_connection->set_control_state(dtr, rts);
+            Mutex lock;
+            ConditionVariable cv;
+            WallClock deadline = current_time() + 50ms;
+            std::unique_lock<Mutex> lg(lock);
+            cv.wait_until(lg, deadline, [=]{ return current_time() >= deadline; });
         }
 #if 0
-        if (dtr){
+        if (!dtr){
             dtr = false;
-            std::this_thread::sleep_for(50ms);
             m_unreliable_connection->set_control_state(dtr, rts);
+            Mutex lock;
+            ConditionVariable cv;
+            WallClock deadline = current_time() + 50ms;
+            std::unique_lock<Mutex> lg(lock);
+            cv.wait_until(lg, deadline, [=]{ return current_time() >= deadline; });
         }
 #endif
     }catch (...){
 //        cout << "exception thrown" << endl;
     }
+
+    Mutex lock;
+    ConditionVariable cv;
+    WallClock deadline = current_time() + 50ms;
+    std::unique_lock<Mutex> lg(lock);
+    cv.wait_until(lg, deadline, [=]{ return current_time() >= deadline; });
 
     return false;
 }
