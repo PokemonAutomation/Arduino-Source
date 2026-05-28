@@ -10,7 +10,7 @@
 #include <stddef.h>
 #include "StreamInterface.h"
 
-#ifdef PABB2_ENABLE
+#ifdef PABB2_FIRMWARE
 #include "PabbTime.h"
 #else
 #include "Common/Cpp/Time.h"

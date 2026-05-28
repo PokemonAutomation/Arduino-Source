@@ -196,7 +196,7 @@ bool ReliableStreamConnectionFW::run_recv_events(const WallDuration& timeout) no
         m_parser.reset();
         m_stream_coalescer.reset();
         m_stream_coalescer.push_packet(0);
-#ifdef PABB2_ENABLE
+#ifdef PABB2_FIRMWARE
         issue_reset_to_all();
 #endif
         send_oob_packet_empty(

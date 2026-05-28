@@ -16,7 +16,7 @@
 #define PABB2_ReliableConnectionFW_POLL_MS      50
 #endif
 
-#ifdef PABB2_ENABLE
+#ifdef PABB2_FIRMWARE
 #include "PabbTime.h"
 #include "LocalMutex.h"
 #include "Tools/ResetListener.h"
@@ -32,7 +32,7 @@ namespace PABotBase2{
 
 class ReliableStreamConnectionFW final
     : public ReliableStreamConnectionPolling
-#ifdef PABB2_ENABLE
+#ifdef PABB2_FIRMWARE
     , public ResetRunner
 #endif
 {

@@ -67,6 +67,7 @@ bool SerialPABotBase2_Connection::cancel(std::exception_ptr exception) noexcept{
         if (rts){
             rts = false;
             m_unreliable_connection->set_control_state(dtr, rts);
+            naked_wait(50ms);
             Mutex lock;
             ConditionVariable cv;
             WallClock deadline = current_time() + 50ms;
@@ -77,22 +78,13 @@ bool SerialPABotBase2_Connection::cancel(std::exception_ptr exception) noexcept{
         if (!dtr){
             dtr = false;
             m_unreliable_connection->set_control_state(dtr, rts);
-            Mutex lock;
-            ConditionVariable cv;
-            WallClock deadline = current_time() + 50ms;
-            std::unique_lock<Mutex> lg(lock);
-            cv.wait_until(lg, deadline, [=]{ return current_time() >= deadline; });
+            naked_wait(50ms);
         }
 #endif
+        naked_wait(50ms);
     }catch (...){
 //        cout << "exception thrown" << endl;
     }
-
-    Mutex lock;
-    ConditionVariable cv;
-    WallClock deadline = current_time() + 50ms;
-    std::unique_lock<Mutex> lg(lock);
-    cv.wait_until(lg, deadline, [=]{ return current_time() >= deadline; });
 
     return false;
 }
@@ -106,6 +98,14 @@ ControllerType SerialPABotBase2_Connection::refresh_controller_type(){
 }
 
 
+
+void SerialPABotBase2_Connection::naked_wait(WallDuration duration){
+    Mutex lock;
+    ConditionVariable cv;
+    WallClock deadline = current_time() + duration;
+    std::unique_lock<Mutex> lg(lock);
+    cv.wait_until(lg, deadline, [=]{ return current_time() >= deadline; });
+}
 bool SerialPABotBase2_Connection::open_serial_port(){
     {
         std::string text = "Opening serial port...";
