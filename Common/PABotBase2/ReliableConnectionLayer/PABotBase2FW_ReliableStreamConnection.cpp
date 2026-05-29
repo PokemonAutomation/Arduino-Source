@@ -237,6 +237,11 @@ bool ReliableStreamConnectionFW::run_recv_events(const WallDuration& timeout) no
             PABB2_StreamCoalescer_BUFFER_SIZE
         );
         return true;
+    case PABB2_CONNECTION_OPCODE_REBOOT_TO_BOOTLOADER:
+        if (m_reboot_to_bootloader){
+            m_reboot_to_bootloader();
+        }
+        return true;
 
     case PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA:
         m_stream_ready = true;
