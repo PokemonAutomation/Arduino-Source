@@ -380,7 +380,7 @@ AutoStory_Descriptor::AutoStory_Descriptor()
         false,
         { 
             "PokemonSV/AreaZero",
-            "PaddleOCR" // not needed since an OCR library is bundled with this program
+            // "PaddleOCR" // not needed since an OCR library is bundled with this program
         }
     )
 {}
