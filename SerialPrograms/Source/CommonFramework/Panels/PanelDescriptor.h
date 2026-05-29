@@ -10,7 +10,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "CommonFramework/ResourceDownload/ResourceType.h"
 #include "Common/Cpp/Color.h"
 
 namespace PokemonAutomation{
@@ -28,7 +27,7 @@ public:
         std::string category, std::string display_name,
         std::string doc_link,
         std::string description,
-        std::vector<ResourceType> required_resources = {}
+        std::vector<std::string> required_resources = {}
     );
     virtual ~PanelDescriptor() = default;
 
@@ -38,7 +37,7 @@ public:
     const std::string& display_name() const{ return m_display_name; }
     const std::string& doc_link() const{ return m_doc_link; }
     const std::string& description() const{ return m_description; }
-    const std::vector<ResourceType>& required_resources() const{ return m_required_resources; }
+    const std::vector<std::string>& required_resources() const{ return m_required_resources; }
 
     virtual std::unique_ptr<PanelInstance> make_panel() const = 0;
 
@@ -49,7 +48,7 @@ private:
     const std::string m_display_name;
     const std::string m_doc_link;
     const std::string m_description;
-    const std::vector<ResourceType> m_required_resources;
+    const std::vector<std::string> m_required_resources;
 };
 
 

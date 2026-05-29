@@ -34,7 +34,7 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
     bool deprecated,
-    std::vector<ResourceType> required_resources
+    std::vector<std::string> required_resources
 )
     : ProgramDescriptor(
         pick_color(color_class),

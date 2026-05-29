@@ -16,7 +16,7 @@ PanelDescriptor::PanelDescriptor(
     std::string category, std::string display_name,
     std::string doc_link,
     std::string description,
-    std::vector<ResourceType> required_resources
+    std::vector<std::string> required_resources
 )
     : m_color(color)
     , m_identifier(std::move(identifier))

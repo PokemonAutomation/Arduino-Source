@@ -378,7 +378,10 @@ AutoStory_Descriptor::AutoStory_Descriptor()
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         false,
-        { ResourceType::YOLO_MODEL_AREA_ZERO }
+        { 
+            "PokemonSV/AreaZero",
+            "PaddleOCR" // not needed since an OCR library is bundled with this program
+        }
     )
 {}
 

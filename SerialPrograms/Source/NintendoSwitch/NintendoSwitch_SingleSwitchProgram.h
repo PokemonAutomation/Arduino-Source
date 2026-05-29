@@ -12,7 +12,6 @@
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
-#include "CommonFramework/ResourceDownload/ResourceType.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
@@ -62,7 +61,7 @@ public:
         FeedbackType feedback,
         AllowCommandsWhenRunning allow_commands_while_running,
         bool deprecated = false,
-        std::vector<ResourceType> required_resources = {}
+        std::vector<std::string> required_resources = {}
     );
 
     ProgramControllerClass color_class() const{ return m_color_class; }
@@ -78,7 +77,7 @@ private:
     const FeedbackType m_feedback;
     const bool m_allow_commands_while_running;
     const bool m_deprecated;
-    const std::vector<ResourceType> m_required_resources;
+    const std::vector<std::string> m_required_resources;
 };
 
 

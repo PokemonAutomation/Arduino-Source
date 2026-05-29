@@ -116,7 +116,7 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     size_t max_switches,
     size_t default_switches,
     bool deprecated,
-    std::vector<ResourceType> required_resources
+    std::vector<std::string> required_resources
 )
     : ProgramDescriptor(
         pick_color(color_class),
