@@ -115,14 +115,16 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     size_t min_switches,
     size_t max_switches,
     size_t default_switches,
-    bool deprecated
+    bool deprecated,
+    std::vector<ResourceType> required_resources
 )
     : ProgramDescriptor(
         pick_color(color_class),
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),
-        std::move(description)
+        std::move(description),
+        std::move(required_resources)
     )
     , m_color_class(color_class)
     , m_feedback(feedback)

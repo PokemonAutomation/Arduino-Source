@@ -376,7 +376,9 @@ AutoStory_Descriptor::AutoStory_Descriptor()
         "Progress through the mainstory of SV.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
+        false,
+        { ResourceType::YOLO_MODEL_AREA_ZERO }
     )
 {}
 
