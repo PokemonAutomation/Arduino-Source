@@ -42,24 +42,146 @@ void AutoStory_Segment_04::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    AutoStory_Checkpoint_017().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_050().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_051().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_052().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_053().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_054().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_055().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_056().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_057().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_058().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_059().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_060().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_061().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_062().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_063().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_064().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_065().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_066().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 }
 
 
-std::string AutoStory_Checkpoint_017::name()       const{ return "004 - " + AutoStory_Segment_04().name(); }
-std::string AutoStory_Checkpoint_017::start_text() const{ return "Third Gym Badge acquired (Hearthome City)."; }
-std::string AutoStory_Checkpoint_017::end_text()   const{ return "Fourth Gym Badge acquired (Pastoria City)."; }
+std::string AutoStory_Checkpoint_050::name()       const{ return "004.01 - leave_gym"; }
+std::string AutoStory_Checkpoint_050::start_text() const{ return "Inside Hearthome City gym after third badge."; }
+std::string AutoStory_Checkpoint_050::end_text()   const{ return "Exited Hearthome City gym."; }
+void AutoStory_Checkpoint_050::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_050(env, context, options, stats);
+}
 
-void AutoStory_Checkpoint_017::run_checkpoint(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats
-) const{
-    Checkpoint_017(env, context, options, stats);
+std::string AutoStory_Checkpoint_051::name()       const{ return "004.02 - go_to_veilstone_pokemon_center"; }
+std::string AutoStory_Checkpoint_051::start_text() const{ return "Outside Hearthome City gym."; }
+std::string AutoStory_Checkpoint_051::end_text()   const{ return "Entered Veilstone City Pokemon Center."; }
+void AutoStory_Checkpoint_051::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_051(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_052::name()       const{ return "004.03 - heal_at_pokemon_center (Veilstone)"; }
+std::string AutoStory_Checkpoint_052::start_text() const{ return "Inside Veilstone City Pokemon Center."; }
+std::string AutoStory_Checkpoint_052::end_text()   const{ return "Healed and exited Veilstone City Pokemon Center."; }
+void AutoStory_Checkpoint_052::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_052(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_053::name()       const{ return "004.04 - go_to_galactic_warehouse"; }
+std::string AutoStory_Checkpoint_053::start_text() const{ return "Outside Veilstone City Pokemon Center."; }
+std::string AutoStory_Checkpoint_053::end_text()   const{ return "Reached Galactic Warehouse, battle started."; }
+void AutoStory_Checkpoint_053::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_053(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_054::name()       const{ return "004.05 - handle_battle (veilstone_galactic_grunts_1)"; }
+std::string AutoStory_Checkpoint_054::start_text() const{ return "In battle against Galactic Grunt at Veilstone."; }
+std::string AutoStory_Checkpoint_054::end_text()   const{ return "Defeated Galactic Grunt at Veilstone."; }
+void AutoStory_Checkpoint_054::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_054(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_055::name()       const{ return "004.06 - enter_galactic_warehouse"; }
+std::string AutoStory_Checkpoint_055::start_text() const{ return "Outside Galactic Warehouse."; }
+std::string AutoStory_Checkpoint_055::end_text()   const{ return "Entered Galactic Warehouse."; }
+void AutoStory_Checkpoint_055::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_055(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_056::name()       const{ return "004.07 - exit_galactic_warehouse"; }
+std::string AutoStory_Checkpoint_056::start_text() const{ return "Inside Galactic Warehouse."; }
+std::string AutoStory_Checkpoint_056::end_text()   const{ return "Exited Galactic Warehouse with TM Fly."; }
+void AutoStory_Checkpoint_056::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_056(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_057::name()       const{ return "004.08 - go_to_route_214"; }
+std::string AutoStory_Checkpoint_057::start_text() const{ return "Outside Galactic Warehouse."; }
+std::string AutoStory_Checkpoint_057::end_text()   const{ return "Arrived at Route 214, battle started."; }
+void AutoStory_Checkpoint_057::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_057(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_058::name()       const{ return "004.09 - handle_battle (route_214_psychic_abigail)"; }
+std::string AutoStory_Checkpoint_058::start_text() const{ return "In battle against Psychic Abigail on Route 214."; }
+std::string AutoStory_Checkpoint_058::end_text()   const{ return "Defeated Psychic Abigail on Route 214."; }
+void AutoStory_Checkpoint_058::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_058(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_059::name()       const{ return "004.10 - walk_through_route_214"; }
+std::string AutoStory_Checkpoint_059::start_text() const{ return "On Route 214 after Psychic Abigail."; }
+std::string AutoStory_Checkpoint_059::end_text()   const{ return "Walked through Route 214."; }
+void AutoStory_Checkpoint_059::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_059(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_060::name()       const{ return "004.11 - pass_by_valor_lakefront"; }
+std::string AutoStory_Checkpoint_060::start_text() const{ return "End of Route 214."; }
+std::string AutoStory_Checkpoint_060::end_text()   const{ return "Passed Valor Lakefront, entered building."; }
+void AutoStory_Checkpoint_060::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_060(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_061::name()       const{ return "004.12 - go_through_building_route_213"; }
+std::string AutoStory_Checkpoint_061::start_text() const{ return "Inside building between Route 214 and Route 213."; }
+std::string AutoStory_Checkpoint_061::end_text()   const{ return "Exited building onto Route 213."; }
+void AutoStory_Checkpoint_061::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_061(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_062::name()       const{ return "004.13 - go_through_route_213"; }
+std::string AutoStory_Checkpoint_062::start_text() const{ return "On Route 213."; }
+std::string AutoStory_Checkpoint_062::end_text()   const{ return "Walked through Route 213, entered east Pastoria building."; }
+void AutoStory_Checkpoint_062::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_062(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_063::name()       const{ return "004.14 - go_through_house_east_pastoria"; }
+std::string AutoStory_Checkpoint_063::start_text() const{ return "Inside east Pastoria building."; }
+std::string AutoStory_Checkpoint_063::end_text()   const{ return "Exited east Pastoria building into Pastoria City."; }
+void AutoStory_Checkpoint_063::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_063(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_064::name()       const{ return "004.15 - go_through_pastoria"; }
+std::string AutoStory_Checkpoint_064::start_text() const{ return "In Pastoria City."; }
+std::string AutoStory_Checkpoint_064::end_text()   const{ return "Entered Pastoria City Pokemon Center."; }
+void AutoStory_Checkpoint_064::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_064(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_065::name()       const{ return "004.16 - heal_at_pokemon_center (Pastoria)"; }
+std::string AutoStory_Checkpoint_065::start_text() const{ return "Inside Pastoria City Pokemon Center."; }
+std::string AutoStory_Checkpoint_065::end_text()   const{ return "Healed and exited Pastoria City Pokemon Center."; }
+void AutoStory_Checkpoint_065::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_065(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_066::name()       const{ return "004.17 - go_to_pastoria_gym"; }
+std::string AutoStory_Checkpoint_066::start_text() const{ return "Outside Pastoria City Pokemon Center."; }
+std::string AutoStory_Checkpoint_066::end_text()   const{ return "Fourth Gym Badge acquired (Pastoria City)."; }
+void AutoStory_Checkpoint_066::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_066(env, context, options, stats);
 }
 
 static void move_back_after_unexpected_battle(
@@ -89,109 +211,40 @@ static bool handle_battle(
     const std::string& trainerid
 ){
     context.wait_for_all_requests();
-    pbf_wait(context, 15000ms);
+    stream.log("Battling " + trainerid + "...", COLOR_GREEN);
+    BattleMenuWatcher battle_menu(BattleType::TRAINER);
+    int ret_menu = wait_until(stream, context, std::chrono::seconds(30), {{battle_menu}});
+    if (ret_menu < 0){
+        stream.log("handle_battle_" + trainerid + ": battle menu not detected!", COLOR_RED);
+        return false;
+    }
+    pbf_wait(context, 500ms);
     pbf_press_button(context, BUTTON_A, 80ms, 300ms);
     pbf_wait(context, 500ms);
 
-    if (trainerid == "veilstone_galactic_grunts_1"){
-        // Select Razor Leaf and mash that
-        pbf_press_dpad(context, DPAD_UP, 280ms, 200ms);
-        
-        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(
-            stream, context,
-            [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_A, 200000ms);
-            },
-            {{black_screen}}
-        );
-        if (ret < 0){
-            stream.log("handle_battle_veilstone_galactic_grunts_2: black screen not detected!", COLOR_RED);
-            return false;
-        }
-        context.wait_for_all_requests();
-        pbf_mash_button(context, BUTTON_B, 2000ms);
-        stream.log("handle_battle_veilstone_galactic_grunts_2: transition confirmed.");
-        return true;
-    } else if (trainerid == "route_214_psychic_abigail"){
-        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(
-            stream, context,
-            [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_A, 200000ms);
-            },
-            {{black_screen}}
-        );
-        if (ret < 0){
-            stream.log("handle_battle_psychic_abigail: black screen not detected!", COLOR_RED);
-            return false;
-        }
-        context.wait_for_all_requests();
-        pbf_mash_button(context, BUTTON_B, 2000ms);
-        stream.log("handle_battle_psychic_abigail: transition confirmed.");
-        return true;
-    } else if (trainerid == "route_214_collector_brady"){
-        // Select Bulldoze
-        pbf_press_dpad(context, DPAD_DOWN, 280ms, 200ms);
-
-        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(
-            stream, context,
-            [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_A, 200000ms);
-            },
-            {{black_screen}}
-        );
-        if (ret < 0){
-            stream.log("handle_battle_collector_brady: black screen not detected!", COLOR_RED);
-            return false;
-        }
-        context.wait_for_all_requests();
-        pbf_mash_button(context, BUTTON_B, 2000ms);
-        return true;
-    } else if (trainerid == "route_214_psychic_mitchell"){
-        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(
-            stream, context,
-            [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_A, 200000ms);
-            },
-            {{black_screen}}
-        );
-        if (ret < 0){
-            stream.log("handle_battle_psychic_mitchell: black screen not detected!", COLOR_RED);
-            return false;
-        }
-        context.wait_for_all_requests();
-        pbf_mash_button(context, BUTTON_B, 2000ms);
-        return true;
-    } else if (trainerid == "route_214_collector_douglas"){
-        // Select Bulldoze
-        pbf_press_dpad(context, DPAD_DOWN, 280ms, 200ms);
-
-        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(
-            stream, context,
-            [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_A, 200000ms);
-            },
-            {{black_screen}}
-        );
-        if (ret < 0){
-            stream.log("handle_battle_collector_douglas: black screen not detected!", COLOR_RED);
-            return false;
-        }
-        context.wait_for_all_requests();
-        pbf_mash_button(context, BUTTON_B, 2000ms);
-        return true;
-    } else if (
+    if (
+        trainerid == "veilstone_galactic_grunts_1" or
         trainerid == "route_213_tuber_chelsea" or
         trainerid == "route_213_tuber_jared" or
         trainerid == "route_213_beauty_cindy"
     ) {
-        // Select Razor leaf
+        // Select Razor Leaf
         pbf_press_dpad(context, DPAD_UP, 280ms, 200ms);
+    } else if (
+        trainerid == "route_214_collector_brady" or
+        trainerid == "route_214_collector_douglas"
+    ){
+        // Select Bulldoze
+        pbf_press_dpad(context, DPAD_DOWN, 280ms, 200ms);
+    } else if (
+        trainerid == "route_214_psychic_abigail" or
+        trainerid == "route_214_psychic_mitchell"
+    ){
+        // Select Crunch
+    }
+    context.wait_for_all_requests();
 
+    {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
         int ret = run_until<ProControllerContext>(
             stream, context,
@@ -201,15 +254,22 @@ static bool handle_battle(
             {{black_screen}}
         );
         if (ret < 0){
-            stream.log("route_213_tuber_chelsea / jared: black screen not detected!", COLOR_RED);
+            stream.log("handle_battle_" + trainerid + ": black screen not detected!", COLOR_RED);
             return false;
         }
-        context.wait_for_all_requests();
-        pbf_mash_button(context, BUTTON_B, 2000ms);
-        move_back_after_unexpected_battle(stream, context, trainerid);
-        return true;
     }
-    return false;
+
+    context.wait_for_all_requests();
+    pbf_mash_button(context, BUTTON_B, 2000ms);
+    if (
+        trainerid == "route_213_tuber_chelsea" or
+        trainerid == "route_213_tuber_jared" or
+        trainerid == "route_213_beauty_cindy"
+    ){
+        move_back_after_unexpected_battle(stream, context, trainerid);
+    }
+    stream.log("handle_battle_" + trainerid + ": transition confirmed.");
+    return true;
 }
 
 static bool leave_gym(
@@ -945,66 +1005,189 @@ static bool go_to_pastoria_gym(
     return true;
 }
 
-void Checkpoint_017(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats
-){
+void checkpoint_050(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             if (!leave_gym(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "leave_gym: transition not detected.", env.console);
             }
+        }
+    );
+}
+
+void checkpoint_051(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!go_to_veilstone_pokemon_center(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_veilstone_pokemon_center: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_052(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!heal_at_pokemon_center(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_at_pokemon_center: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_053(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!go_to_galactic_warehouse(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_galactic_warehouse: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_054(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!handle_battle(env.console, context, "veilstone_galactic_grunts_1")){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "handle_battle_veilstone_galactic_grunts_1: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_055(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!enter_galactic_warehouse(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "enter_galactic_warehouse: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_056(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!exit_galactic_warehouse(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "exit_galactic_warehouse: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_057(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!go_to_route_214(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_route_214: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_058(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!handle_battle(env.console, context, "route_214_psychic_abigail")){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "handle_battle_route_214_psychic_abigail: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_059(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!walk_through_route_214(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "walk_through_route_214: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_060(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!pass_by_valor_lakefront(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "pass_by_valor_lakefront: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_061(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!go_through_building_route_213(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_building_route_213: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_062(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!go_through_route_213(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_route_213: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_063(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!go_through_house_east_pastoria(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_house_east_pastoria: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_064(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!go_through_pastoria(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_pastoria: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_065(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!heal_at_pokemon_center(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_at_pokemon_center: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_066(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!go_to_pastoria_gym(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_pastoria_gym: transition not detected.", env.console);
             }
-        }
+        },
+        false
     );
 }
 

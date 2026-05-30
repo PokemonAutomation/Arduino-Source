@@ -159,15 +159,25 @@ void checkpoint_save(
     AutoStoryStats& stats
 );
 
-//  Save before the first attempt, then run `action(attempt_number)`.
-//  On any thrown exception, increment the reset counter and retry.
+//  Reload the game from the most recent backup save (auto-save).
+//  Called on retry when a checkpoint has no hard save (save=false).
+//  TODO: implement this function.
+void reload_backup_save(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context
+);
+
+//  If save=true (default): save the game before the first attempt, then run
+//  `action(attempt_number)`. On failure, reset from HOME and retry.
+//  If save=false: skip the hard save. On failure, reload from backup save and retry.
 //  Throws a fatal error after too many consecutive failures.
 void checkpoint_reattempt_loop(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats,
-    std::function<void(size_t attempt_number)>&& action
+    std::function<void(size_t attempt_number)>&& action,
+    bool save = true
 );
 
 //  Execute every action in `actions` in order, repeated `times` times.
