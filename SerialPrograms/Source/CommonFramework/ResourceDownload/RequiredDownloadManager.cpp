@@ -27,11 +27,11 @@ void RequiredDownloadManager::initialize_required_downloads(){
 
     // If an exception happened above, state variables below are never touched
 
-    std::vector<uint16_t> download_queue;
+    std::vector<std::string> download_queue;
     // Prevent multiple reallocations
     download_queue.reserve(downloads.size());  
     for (auto download : downloads){ // (re-)initialize m_download_queue
-        download_queue.push_back(download->get_index());
+        download_queue.push_back(download->get_name());
     }
     m_download_queue = std::move(download_queue);
     m_required_downloads = std::move(downloads);
@@ -50,7 +50,7 @@ RequiredResourceResult RequiredDownloadManager::find_resources_to_download(const
     // remote_resource to the required_download_list
     std::vector<std::shared_ptr<RequiredDownload>> required_download_list;
     for(const std::string& resource_type : required_resources){
-        auto [expected_resource, index] = get_resource_metadata_from_resource_type(resource_type, local_resources);
+        DownloadedResourceMetadata expected_resource = get_resource_metadata_from_resource_type(resource_type, local_resources);
         ResourceVersionStatus version_status = get_version_status(expected_resource);
 
         switch(version_status){
@@ -66,7 +66,7 @@ RequiredResourceResult RequiredDownloadManager::find_resources_to_download(const
         case ResourceVersionStatus::OUTDATED:
         case ResourceVersionStatus::NOT_APPLICABLE:{
             // we don't have the resource. check remote to see if correct version is available.
-            DownloadedResourceMetadata remote_resource = get_resource_metadata_from_resource_type(resource_type, remote_resources).metadata;
+            DownloadedResourceMetadata remote_resource = get_resource_metadata_from_resource_type(resource_type, remote_resources);
             uint16_t expected_version_num = expected_resource.version_num.value();
             uint16_t remote_version_num = remote_resource.version_num.value();
 
@@ -74,14 +74,14 @@ RequiredResourceResult RequiredDownloadManager::find_resources_to_download(const
                 // remote version matches what we expect
                 // add the resource to the download list
                 // m_required_downloads.emplace_back(RequiredDownload{remote_resource});
-                required_download_list.emplace_back(std::make_shared<RequiredDownload>(*this, remote_resource, index, m_queue_lock, m_cv));
+                required_download_list.emplace_back(std::make_shared<RequiredDownload>(*this, remote_resource, m_queue_lock, m_cv));
 
             }else if (expected_version_num < remote_version_num){
                 // remote version is more updated than we expect
                 // warn the user to upgrade CC.
                 // regardless, add the resource to the download list
                 // m_required_downloads.emplace_back(RequiredDownload{remote_resource});
-                required_download_list.emplace_back(std::make_shared<RequiredDownload>(*this, remote_resource, index, m_queue_lock, m_cv));
+                required_download_list.emplace_back(std::make_shared<RequiredDownload>(*this, remote_resource, m_queue_lock, m_cv));
                 upgrade_warning = true;
 
             }else if (expected_version_num > remote_version_num){
@@ -118,20 +118,20 @@ const std::vector<std::shared_ptr<RequiredDownload>>& RequiredDownloadManager::g
 }
 
 
-void RequiredDownloadManager::remove_from_download_list(uint16_t resource_index){
+void RequiredDownloadManager::remove_from_download_list(const std::string& resource_slug){
     std::lock_guard<Mutex> lg(m_queue_lock);
 
     // this requires C++20
-    std::erase(m_download_queue, resource_index);
+    std::erase(m_download_queue, resource_slug);
     m_cv.notify_all();
 }
 
-bool RequiredDownloadManager::is_download_ready_to_start(uint16_t resource_index){
+bool RequiredDownloadManager::is_download_ready_to_start(const std::string& resource_slug){
     // ASSUMES: the calling thread holds the m_lock. therefore, this function doesn't lock the mutex when accessing download_queue.
     // std::lock_guard<Mutex> lg(m_lock); 
 
     uint16_t MAX_CONCURRENT_DOWNLOADS = 10;
-    return is_resource_ready_in_queue(MAX_CONCURRENT_DOWNLOADS, resource_index, m_download_queue);
+    return is_resource_ready_in_queue(MAX_CONCURRENT_DOWNLOADS, resource_slug, m_download_queue);
 }
 
 void RequiredDownloadManager::check_if_all_downloads_done(){

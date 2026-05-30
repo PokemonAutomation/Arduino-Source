@@ -23,11 +23,10 @@ class RequiredDownloadManager;
 
 class RequiredDownload {
 public:
-    RequiredDownload(RequiredDownloadManager& download_manager, DownloadedResourceMetadata resource_metadata, uint16_t index, Mutex& lock, ConditionVariable& cv);
+    RequiredDownload(RequiredDownloadManager& download_manager, DownloadedResourceMetadata resource_metadata, Mutex& lock, ConditionVariable& cv);
 
 public:
     inline std::string get_name() const { return m_name; }
-    inline uint16_t get_index() const { return m_index; }
 
 public: 
     struct Listener{
@@ -64,10 +63,6 @@ private:
     RequiredDownloadManager& m_download_manager;
     DownloadedResourceMetadata m_resource_metadata;
 
-    // index within the local resource list. 
-    // this gives this Download a unique identifier,
-    // which is needed for ComputerProgramSession.m_download_queue.
-    uint16_t m_index;  
     std::string m_name;
     Mutex& m_lock;
     ConditionVariable& m_cv;

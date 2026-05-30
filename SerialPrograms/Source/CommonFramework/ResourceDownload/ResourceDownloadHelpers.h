@@ -38,11 +38,6 @@ enum class ResourceVersionStatus{
     // RETIRED, // no longer used
 };
 
-struct IndexedResourceMetadata {
-    DownloadedResourceMetadata metadata;
-    uint16_t index; // position in the local list of resources.
-};
-
 
 // there are three lists:
 // - local_resource_download_list(): List of resources with the version numbers that the programs expect. from the local ResourceDownloadList.json
@@ -63,11 +58,10 @@ ResourceVersionStatus compare_version_num(uint16_t expected_version_num, std::op
 
 
 // ASSUMES: given resource_list has every resource_type within it
-IndexedResourceMetadata get_resource_metadata_from_resource_type(const std::string& target_resource_type, const std::vector<DownloadedResourceMetadata>& resource_list);
+DownloadedResourceMetadata get_resource_metadata_from_resource_type(const std::string& target_resource_type, const std::vector<DownloadedResourceMetadata>& resource_list);
 
 
-bool is_resource_ready_in_queue(uint16_t max_concurrent_downloads, uint16_t resource_index, std::vector<uint16_t>& download_queue);
-ResourceVersionStatus get_version_status(uint16_t expected_version_num, std::optional<uint16_t> current_version_num);
+bool is_resource_ready_in_queue(uint16_t max_concurrent_downloads, const std::string& resource_slug, const std::vector<std::string>& download_queue);
 
 const std::unordered_set<std::string>& all_resource_names();
 

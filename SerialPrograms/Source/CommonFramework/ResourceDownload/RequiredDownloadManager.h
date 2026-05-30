@@ -48,12 +48,11 @@ public:
 
     const std::vector<std::shared_ptr<RequiredDownload>>& get_required_downloads();
 
-    // void add_to_download_list(uint16_t resource_index);
-    void remove_from_download_list(uint16_t resource_index);
+    void remove_from_download_list(const std::string& resource_slug);
 
-    // return true if given resource_index's position in m_download_queue is less than MAX_CONCURRENT_DOWNLOADS
+    // return true if given resource_slug's position in m_download_queue is less than MAX_CONCURRENT_DOWNLOADS
     // ASSUMES: the calling thread holds the m_lock. therefore, this function doesn't lock the mutex when accessing m_download_queue.
-    bool is_download_ready_to_start(uint16_t resource_index);
+    bool is_download_ready_to_start(const std::string& resource_slug);
 
     // check if the m_download_queue is empty
     // if so, trigger report_all_downloads_finished()
@@ -83,9 +82,8 @@ private:
     std::vector<std::shared_ptr<RequiredDownload>> m_required_downloads;  
 
     // queue of downloads
-    // each download is represented by an int, 
-    // which is their index within the local resource list. 
-    std::vector<uint16_t> m_download_queue;
+    // each download is represented by its slug
+    std::vector<std::string> m_download_queue;
 
     Mutex m_queue_lock;
     ConditionVariable m_cv;

@@ -16,10 +16,9 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-RequiredDownload::RequiredDownload(RequiredDownloadManager& download_manager, DownloadedResourceMetadata resource_metadata, uint16_t index, Mutex& lock, ConditionVariable& cv)
+RequiredDownload::RequiredDownload(RequiredDownloadManager& download_manager, DownloadedResourceMetadata resource_metadata, Mutex& lock, ConditionVariable& cv)
     : m_download_manager(download_manager)
     , m_resource_metadata(resource_metadata)
-    , m_index(index)
     , m_name(resource_metadata.resource_name)
     , m_lock(lock)
     , m_cv(cv)
@@ -29,7 +28,7 @@ RequiredDownload::RequiredDownload(RequiredDownloadManager& download_manager, Do
 DownloadThread RequiredDownload::initialize_download_thread(){
 
     DownloadThread::Hooks generic_row_hooks{
-        .is_ready_to_start = [this] { return m_download_manager.is_download_ready_to_start(m_index); },
+        .is_ready_to_start = [this] { return m_download_manager.is_download_ready_to_start(m_name); },
         .on_finished       = [this](bool success) { 
             // GlobalSettings::instance().update_resource_download_row_status(m_index, success);
             on_download_finished(); 
@@ -58,7 +57,7 @@ void RequiredDownload::cancel_download(){
 
 
 void RequiredDownload::on_download_finished(){
-    m_download_manager.remove_from_download_list(m_index);
+    m_download_manager.remove_from_download_list(m_name);
     m_download_manager.check_if_all_downloads_done();
 }
 
