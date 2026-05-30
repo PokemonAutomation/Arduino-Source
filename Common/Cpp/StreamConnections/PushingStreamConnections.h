@@ -19,12 +19,12 @@ class Cancellable;
 class StreamConnectionPushing{
 public:
     virtual ~StreamConnectionPushing(){}
-    virtual void stop(){};
+    virtual void stop() noexcept{};
 
     void add_listener(StreamListener& listener){
         m_listeners.add(listener);
     }
-    void remove_listener(StreamListener& listener){
+    void remove_listener(StreamListener& listener) noexcept{
         m_listeners.remove(listener);
     }
 

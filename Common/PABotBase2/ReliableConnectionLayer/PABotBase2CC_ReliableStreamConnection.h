@@ -43,9 +43,7 @@ public:
     );
     ~ReliableStreamConnection();
 
-    virtual void stop() override{
-        cancel(nullptr);
-    }
+    virtual void stop() noexcept override;
     virtual bool cancel(std::exception_ptr exception) noexcept override;
 
     bool reset(WallDuration timeout = WallDuration::max());
