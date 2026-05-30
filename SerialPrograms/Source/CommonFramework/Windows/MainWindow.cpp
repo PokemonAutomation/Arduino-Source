@@ -252,8 +252,8 @@ MainWindow::MainWindow(QWidget* parent)
         connect(
             settings, &QPushButton::clicked,
             this, [this](bool){
-                if (report_new_panel_intent(GlobalSettings_Descriptor::INSTANCE)){
-                    load_panel(nullptr, GlobalSettings_Descriptor::INSTANCE.make_panel());
+                if (report_new_panel_intent(GlobalSettings_Descriptor::instance())){
+                    load_panel(nullptr, GlobalSettings_Descriptor::instance().make_panel());
                 }
             }
         );
