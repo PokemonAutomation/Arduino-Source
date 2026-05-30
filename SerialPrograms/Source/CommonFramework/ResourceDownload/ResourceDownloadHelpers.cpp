@@ -126,5 +126,18 @@ ResourceVersionStatus get_version_status(uint16_t expected_version_num, std::opt
 }
 
 
+const std::unordered_set<std::string>& all_resource_names(){
+    static std::unordered_set<std::string> names = [](){
+        std::unordered_set<std::string> resource_names;
+        for (const DownloadedResourceMetadata& resource : local_resource_download_list()){
+            resource_names.insert(resource.resource_name);
+        }
+        return resource_names;
+    }();
+
+    return names;
+}
+
+
 
 }

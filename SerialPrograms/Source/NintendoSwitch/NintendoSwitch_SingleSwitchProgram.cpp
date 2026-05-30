@@ -33,14 +33,16 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     ProgramControllerClass color_class,
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
-    bool deprecated
+    bool deprecated,
+    std::vector<std::string> required_resources
 )
     : ProgramDescriptor(
         pick_color(color_class),
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),
-        std::move(description)
+        std::move(description),
+        std::move(required_resources)
     )
     , m_color_class(color_class)
     , m_feedback(feedback)
