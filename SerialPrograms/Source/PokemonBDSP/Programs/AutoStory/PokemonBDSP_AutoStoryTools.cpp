@@ -189,18 +189,31 @@ void checkpoint_save(
 }
 
 
+void reload_backup_save(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context
+){
+    // TODO: implement backup save reload.
+    // This is called when a checkpoint with save=false fails.
+    // Load the game's automatic backup save rather than resetting from HOME.
+    (void)env;
+    (void)context;
+}
+
+
 void checkpoint_reattempt_loop(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats,
-    std::function<void(size_t attempt_number)>&& action
+    std::function<void(size_t attempt_number)>&& action,
+    bool save
 ){
     static constexpr size_t MAX_ATTEMPTS = 20;
 
     for (size_t i = 0;; i++){
         try{
-            if (i == 0){
+            if (i == 0 && save){
                 checkpoint_save(env, context, notif_status_update, stats);
             }
 
@@ -216,14 +229,19 @@ void checkpoint_reattempt_loop(
                 throw;
             }
 
-            env.console.log("Resetting game from HOME before retry...", COLOR_ORANGE);
-            bool ok = reset_game_from_home(env, env.console, context, true, 1000ms);
-            if (!ok){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT,
-                    "Failed to reset game from HOME during checkpoint retry.",
-                    env.console
-                );
+            if (save){
+                env.console.log("Resetting game from HOME before retry...", COLOR_ORANGE);
+                bool ok = reset_game_from_home(env, env.console, context, true, 1000ms);
+                if (!ok){
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Failed to reset game from HOME during checkpoint retry.",
+                        env.console
+                    );
+                }
+            } else {
+                env.console.log("Reloading from backup save before retry...", COLOR_ORANGE);
+                reload_backup_save(env, context);
             }
         }
     }
@@ -413,6 +431,9 @@ bool fly_to(
         case FlyPoint::SnowpointCity:
             pbf_move_left_joystick(context, {-1, +1}, 4000ms, 500ms);
             break;
+        case FlyPoint::TwinleafTown:
+            pbf_move_left_joystick(context, {-1, -1}, 4000ms, 500ms);
+            break;
         default:
             pbf_move_left_joystick(context, {-1, -1}, 4000ms, 500ms);
             break;
@@ -474,12 +495,21 @@ bool fly_to(
             repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 9, false);
             break;
         case FlyPoint::SnowpointCity:
+            city_icon_box = {0.602000, 0.070000, 0.013000, 0.054000};
+            repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 12, false);
+            repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 1, false);
             break;
         case FlyPoint::SunyshoreCity:
             break;
         case FlyPoint::TwinleafTown:
+            city_icon_box = {0.415000, 0.870000, 0.013000, 0.022000};
+            repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 2, false);
+            repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 1, false);
             break;
         case FlyPoint::VeilstoneCity:
+            city_icon_box = {0.829000, 0.537000, 0.017000, 0.054000};
+            repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 8, false);
+            repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 10, false);
             break;
     }
 
@@ -880,7 +910,7 @@ void use_strength(
 
     stream.log("[AutoStory] use_strength: selection arrow found, confirming.", COLOR_GREEN);
     pbf_press_button(context, BUTTON_A, 80ms, 200ms);
-    pbf_mash_button(context, BUTTON_B, 4000ms);
+    pbf_mash_button(context, BUTTON_B, 6000ms);
 }
 
 
