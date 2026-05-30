@@ -39,24 +39,138 @@ void AutoStory_Segment_05::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    AutoStory_checkpoint_018().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_067().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_068().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_069().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_070().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_071().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_072().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_073().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_074().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_075().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_076().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_077().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_078().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_079().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_080().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_081().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_082().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 }
 
 
-std::string AutoStory_checkpoint_018::name()       const{ return "018 - " + AutoStory_Segment_05().name(); }
-std::string AutoStory_checkpoint_018::start_text() const{ return "Fourth Gym Badge acquired (Pastoria City)."; }
-std::string AutoStory_checkpoint_018::end_text()   const{ return "Fifth Gym Badge acquired (Veilstone City)."; }
+std::string AutoStory_Checkpoint_067::name()       const{ return "005.01 - go_to_pastoria_pokemon_center"; }
+std::string AutoStory_Checkpoint_067::start_text() const{ return "Fourth Gym Badge acquired (Pastoria City)."; }
+std::string AutoStory_Checkpoint_067::end_text()   const{ return "Entered Pastoria City Pokemon Center."; }
+void AutoStory_Checkpoint_067::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_067(env, context, options, stats);
+}
 
-void AutoStory_checkpoint_018::run_checkpoint(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats
-) const{
-    checkpoint_018(env, context, options, stats);
+std::string AutoStory_Checkpoint_068::name()       const{ return "005.02 - exit_pastoria_pokemon_center"; }
+std::string AutoStory_Checkpoint_068::start_text() const{ return "Inside Pastoria City Pokemon Center."; }
+std::string AutoStory_Checkpoint_068::end_text()   const{ return "Healed and exited Pastoria City Pokemon Center."; }
+void AutoStory_Checkpoint_068::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_068(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_069::name()       const{ return "005.03 - pastoria_city_drama"; }
+std::string AutoStory_Checkpoint_069::start_text() const{ return "Outside Pastoria City Pokemon Center."; }
+std::string AutoStory_Checkpoint_069::end_text()   const{ return "Pastoria City drama complete, exited east building."; }
+void AutoStory_Checkpoint_069::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_069(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_070::name()       const{ return "005.04 - go_through_house_east_pastoria"; }
+std::string AutoStory_Checkpoint_070::start_text() const{ return "Inside east Pastoria building."; }
+std::string AutoStory_Checkpoint_070::end_text()   const{ return "Exited east Pastoria building onto Route 213."; }
+void AutoStory_Checkpoint_070::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_070(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_071::name()       const{ return "005.05 - go_through_route_213_chasing"; }
+std::string AutoStory_Checkpoint_071::start_text() const{ return "On Route 213 chasing Galactic Grunts."; }
+std::string AutoStory_Checkpoint_071::end_text()   const{ return "Entered east Route 213 building."; }
+void AutoStory_Checkpoint_071::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_071(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_072::name()       const{ return "005.06 - go_through_building_route_213"; }
+std::string AutoStory_Checkpoint_072::start_text() const{ return "Inside building on Route 213."; }
+std::string AutoStory_Checkpoint_072::end_text()   const{ return "Exited building onto Route 214."; }
+void AutoStory_Checkpoint_072::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_072(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_073::name()       const{ return "005.07 - go_through_route_214"; }
+std::string AutoStory_Checkpoint_073::start_text() const{ return "On Route 214 chasing Galactic Grunts."; }
+std::string AutoStory_Checkpoint_073::end_text()   const{ return "Flew to Solaceon Town."; }
+void AutoStory_Checkpoint_073::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_073(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_074::name()       const{ return "005.08 - go_inside_solaceon_pokemon_center"; }
+std::string AutoStory_Checkpoint_074::start_text() const{ return "In Solaceon Town."; }
+std::string AutoStory_Checkpoint_074::end_text()   const{ return "Entered Solaceon Town Pokemon Center."; }
+void AutoStory_Checkpoint_074::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_074(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_075::name()       const{ return "005.09 - heal_at_solaceon_pokemon_center"; }
+std::string AutoStory_Checkpoint_075::start_text() const{ return "Inside Solaceon Town Pokemon Center."; }
+std::string AutoStory_Checkpoint_075::end_text()   const{ return "Healed and exited Solaceon Town Pokemon Center."; }
+void AutoStory_Checkpoint_075::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_075(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_076::name()       const{ return "005.10 - go_to_the_psyduck_route_210"; }
+std::string AutoStory_Checkpoint_076::start_text() const{ return "Outside Solaceon Town Pokemon Center."; }
+std::string AutoStory_Checkpoint_076::end_text()   const{ return "Reached Celestic Town Pokemon Center via Route 210."; }
+void AutoStory_Checkpoint_076::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_076(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_077::name()       const{ return "005.11 - heal_at_celestic_pokemon_center"; }
+std::string AutoStory_Checkpoint_077::start_text() const{ return "Inside Celestic Town Pokemon Center."; }
+std::string AutoStory_Checkpoint_077::end_text()   const{ return "Healed and exited Celestic Town Pokemon Center."; }
+void AutoStory_Checkpoint_077::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_077(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_078::name()       const{ return "005.12 - celestic_town_drama"; }
+std::string AutoStory_Checkpoint_078::start_text() const{ return "In Celestic Town."; }
+std::string AutoStory_Checkpoint_078::end_text()   const{ return "Entered Celestic Town cave."; }
+void AutoStory_Checkpoint_078::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_078(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_079::name()       const{ return "005.13 - discover_the_paintings"; }
+std::string AutoStory_Checkpoint_079::start_text() const{ return "Inside Celestic Town cave."; }
+std::string AutoStory_Checkpoint_079::end_text()   const{ return "Discovered paintings and exited cave."; }
+void AutoStory_Checkpoint_079::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_079(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_080::name()       const{ return "005.14 - talk_to_cyrus_and_fly_hearthome"; }
+std::string AutoStory_Checkpoint_080::start_text() const{ return "Outside Celestic Town cave."; }
+std::string AutoStory_Checkpoint_080::end_text()   const{ return "Entered Hearthome City Pokemon Center."; }
+void AutoStory_Checkpoint_080::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_080(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_081::name()       const{ return "005.15 - heal_at_hearthome_pokemon_center"; }
+std::string AutoStory_Checkpoint_081::start_text() const{ return "Inside Hearthome City Pokemon Center."; }
+std::string AutoStory_Checkpoint_081::end_text()   const{ return "Healed and exited Hearthome City Pokemon Center."; }
+void AutoStory_Checkpoint_081::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_081(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_082::name()       const{ return "005.16 - get_into_hearthome_gym"; }
+std::string AutoStory_Checkpoint_082::start_text() const{ return "Outside Hearthome City gym."; }
+std::string AutoStory_Checkpoint_082::end_text()   const{ return "Fifth Gym Badge acquired (Hearthome City)."; }
+void AutoStory_Checkpoint_082::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_082(env, context, options, stats);
 }
 
 static void move_back_after_unexpected_battle(
@@ -90,6 +204,7 @@ static bool handle_battle(
     const std::string& trainerid
 ){
     context.wait_for_all_requests();
+    stream.log("Battling " + trainerid + "...", COLOR_GREEN);
     BattleMenuWatcher battle_menu(BattleType::TRAINER);
     int ret_menu = wait_until(stream, context, std::chrono::seconds(30), {{battle_menu}});
     if (ret_menu < 0){
@@ -1359,66 +1474,178 @@ static bool get_into_hearthome_gym(
     return true;
 }
 
-void checkpoint_018(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats
-){
+void checkpoint_067(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
-            /*if (!leave_gym(env.console, context)){
-                OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "leave_gym: transition not detected.", env.console);
-            }*/
             if (!go_to_pastoria_pokemon_center(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_pastoria_pokemon_center: transition not detected.", env.console);
             }
+        }
+    );
+}
+
+void checkpoint_068(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!exit_pastoria_pokemon_center(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "exit_pastoria_pokemon_center: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_069(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!pastoria_city_drama(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "pastoria_city_drama: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_070(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!go_through_house_east_pastoria(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_house_east_pastoria: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_071(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!go_through_route_213_chasing(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_route_213_chasing: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_072(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!go_through_building_route_213(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_building_route_213: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_073(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!go_through_route_214(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_through_route_214: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_074(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!go_inside_solaceon_pokemon_center(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_inside_solaceon_pokemon_center: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_075(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!heal_at_solaceon_pokemon_center(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_at_solaceon_pokemon_center: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_076(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!go_to_the_psyduck_route_210(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_the_psyduck_route_210: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_077(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!heal_at_celestic_pokemon_center(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_at_celestic_pokemon_center: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_078(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!celestic_town_drama(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "celestic_town_drama: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_079(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!discover_the_paintings(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "discover_the_paintings: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_080(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!talk_to_cyrus_and_fly_hearthome(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "talk_to_cyrus_and_fly_hearthome: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_081(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!heal_at_hearthome_pokemon_center(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "heal_at_hearthome_pokemon_center: transition not detected.", env.console);
             }
+        },
+        false
+    );
+}
+
+void checkpoint_082(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
+        [&](size_t /*attempt*/){
             if (!get_into_hearthome_gym(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "get_into_hearthome_gym: transition not detected.", env.console);
             }
-        }
+        },
+        false
     );
 }
 
