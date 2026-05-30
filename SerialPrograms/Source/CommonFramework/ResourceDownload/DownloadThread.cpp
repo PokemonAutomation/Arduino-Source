@@ -8,6 +8,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "Common/Cpp/Filesystem.h"
+#include "Common/Cpp/ScopeExit.h"
 #include "CommonFramework/Tools/FileDownloader.h"
 #include "CommonFramework/Tools/FileUnzip.h"
 #include "CommonFramework/Tools/FileHash.h"
@@ -51,14 +52,9 @@ void DownloadThread::start_download_thread(){
         }
         
         // runs when lambda is finished
-        // updates action state, removes self from download queue
-        struct ScopeGuard {
-            DownloadThread* thread_ptr;
-            bool& success_ref;
-            ~ScopeGuard() {
-                thread_ptr->m_hooks.on_finished(success_ref);
-            }
-        } guard{this, success};
+        ScopeExit on_exit([&, this]{
+            m_hooks.on_finished(success);
+        });
 
         try {
             // std::this_thread::sleep_for(std::chrono::seconds(7));
@@ -78,10 +74,10 @@ void DownloadThread::start_download_thread(){
         }catch (const std::exception& e) {
             std::cout << "Standard exception: " << e.what() << std::endl;
             success = false;
-            m_hooks.report_exception_caught("ResourceDownloadButton::start_download");
+            m_hooks.report_exception_caught("DownloadThread::start_download_thread");
         } catch(...){
             success = false;
-            m_hooks.report_exception_caught("ResourceDownloadButton::start_download");
+            m_hooks.report_exception_caught("DownloadThread::start_download_thread");
         }
 
     }

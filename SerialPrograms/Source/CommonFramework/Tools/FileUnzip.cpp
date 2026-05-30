@@ -16,6 +16,7 @@
 #include "miniz-3.1.1/miniz.h"
 #include "Common/Cpp/Filesystem.h"
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/ScopeExit.h"
 #include "FileUnzip.h"
 #include <filesystem>
 #include <fstream>
@@ -130,10 +131,9 @@ void unzip_file(
     } 
 
     // This automatically calls mz_zip_reader_end when this function exits for any reason.
-    struct ZipCleanup {
-        mz_zip_archive* p;
-        ~ZipCleanup() { mz_zip_reader_end(p); }
-    } cleanup{&zip_archive};
+    ScopeExit on_exit([&]{
+        mz_zip_reader_end(&zip_archive);
+    });
 
     // Get total number of files in the archive
     int num_files = (int)mz_zip_reader_get_num_files(&zip_archive);

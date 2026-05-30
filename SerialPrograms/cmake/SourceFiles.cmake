@@ -187,6 +187,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Rectangle.h
     ../Common/Cpp/Rectangle.tpp
     ../Common/Cpp/RecursiveThrottler.h
+    ../Common/Cpp/ScopeExit.h
     ../Common/Cpp/SIMDDebuggers.h
     ../Common/Cpp/SerialConnection/SerialConnection.cpp
     ../Common/Cpp/SerialConnection/SerialConnection.h
