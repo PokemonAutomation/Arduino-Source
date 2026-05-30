@@ -5,15 +5,16 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/ResourceDownload/ResourceDownloadHelpers.h"
 #include "Common/Cpp/Json/JsonValue.h"
+#include "CommonFramework/ResourceDownload/ResourceDownloadHelpers.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "PanelInstance.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 

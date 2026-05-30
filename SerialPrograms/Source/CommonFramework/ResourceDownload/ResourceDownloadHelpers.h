@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_ResourceDownloadHelpers_H
 #define PokemonAutomation_ResourceDownloadHelpers_H
 
+#include <optional>
 #include <string>
 #include <unordered_set>
-#include <optional>
 
 
 namespace PokemonAutomation{
