@@ -8,6 +8,7 @@
 #define PokemonAutomation_ResourceDownloadHelpers_H
 
 #include <string>
+#include <vector>
 #include <unordered_set>
 #include <optional>
 
@@ -23,8 +24,8 @@ namespace Filesystem{
 struct DownloadedResourceMetadata{
     std::string resource_name;
     std::optional<uint16_t> version_num;
-    size_t size_compressed_bytes;
-    size_t size_decompressed_bytes;
+    uint64_t size_compressed_bytes;
+    uint64_t size_decompressed_bytes;
     std::string url;
     std::string sha256;
 };
@@ -37,21 +38,37 @@ enum class ResourceVersionStatus{
     // RETIRED, // no longer used
 };
 
-enum class RemoteMetadataStatus{
-    UNINITIALIZED,
-    NOT_AVAILABLE,
-    AVAILABLE,
-};
-struct RemoteMetadata {
-    RemoteMetadataStatus status = RemoteMetadataStatus::UNINITIALIZED;
+struct IndexedResourceMetadata {
     DownloadedResourceMetadata metadata;
+    uint16_t index; // position in the local list of resources.
 };
 
+
+// there are three lists:
+// - local_resource_download_list(): List of resources with the version numbers that the programs expect. from the local ResourceDownloadList.json
+// - list of resources downloaded locally. use get_version_status() to determine ResourceVersionStatus relative to the expected resource version number in the local list.
+// - remote_resource_download_list(): list of remote resources. the remote version numbers may or may not match the local list. from the remote ResourceDownloadList.json
 
 const std::vector<DownloadedResourceMetadata>& local_resource_download_list();
 const std::vector<DownloadedResourceMetadata>& remote_resource_download_list();
 std::optional<uint16_t> get_resource_version_num(Filesystem::Path folder_path);
+
+// for the given expected_resource, it tries to find its corresponding file downloaded locally.
+// it then returns the ResourceVersionStatus, which is the result of comparing the expected version number
+// (from the expected_resource) to the actual version number (from the downloaded file).
+// expected_resource is one of the items from local_resource_download_list(), which is a list of 
+// resources with the version numbers that the programs expect (from the local ResourceDownloadList.json).
+ResourceVersionStatus get_version_status(DownloadedResourceMetadata& expected_resource);
+ResourceVersionStatus compare_version_num(uint16_t expected_version_num, std::optional<uint16_t> current_version_num);
+
+
+// ASSUMES: given resource_list has every resource_type within it
+IndexedResourceMetadata get_resource_metadata_from_resource_type(const std::string& target_resource_type, const std::vector<DownloadedResourceMetadata>& resource_list);
+
+
+bool is_resource_ready_in_queue(uint16_t max_concurrent_downloads, uint16_t resource_index, std::vector<uint16_t>& download_queue);
 ResourceVersionStatus get_version_status(uint16_t expected_version_num, std::optional<uint16_t> current_version_num);
+
 const std::unordered_set<std::string>& all_resource_names();
 
 }
