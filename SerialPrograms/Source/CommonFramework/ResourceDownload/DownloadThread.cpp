@@ -46,9 +46,8 @@ void DownloadThread::start_download_thread(){
         bool success = false;
         {
             std::unique_lock<Mutex> lock(m_download_lock);
-            m_download_cv.wait(lock, [this] { return m_hooks.is_ready_to_start() || m_stopping; });
+            m_download_cv.wait(lock, [this] { return m_hooks.is_ready_to_start(); });
 
-            if (m_stopping) return;
         }
         
         // runs when lambda is finished
@@ -57,7 +56,6 @@ void DownloadThread::start_download_thread(){
             DownloadThread* thread_ptr;
             bool& success_ref;
             ~ScopeGuard() {
-                thread_ptr->m_stopping = true;
                 thread_ptr->m_hooks.on_finished(success_ref);
             }
         } guard{this, success};

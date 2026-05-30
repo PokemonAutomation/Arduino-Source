@@ -49,7 +49,6 @@ private:
     DownloadedResourceMetadata m_remote_metadata;
     AsyncTask m_worker;
 
-    std::atomic<bool> m_stopping{false};
     Mutex& m_download_lock;
     ConditionVariable& m_download_cv;
 };
