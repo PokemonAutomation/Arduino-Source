@@ -494,10 +494,20 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/ResourceDownload/DownloadThread.h
     Source/CommonFramework/ResourceDownload/RequiredDownload.cpp
     Source/CommonFramework/ResourceDownload/RequiredDownload.h
+    Source/CommonFramework/ResourceDownload/RequiredDownloadDialogWidget.cpp
+    Source/CommonFramework/ResourceDownload/RequiredDownloadDialogWidget.h
     Source/CommonFramework/ResourceDownload/RequiredDownloadManager.cpp
     Source/CommonFramework/ResourceDownload/RequiredDownloadManager.h
     Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.cpp
     Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.h
+    Source/CommonFramework/ResourceDownload/ResourceDownloadOptions.cpp
+    Source/CommonFramework/ResourceDownload/ResourceDownloadOptions.h
+    Source/CommonFramework/ResourceDownload/ResourceDownloadRow.cpp
+    Source/CommonFramework/ResourceDownload/ResourceDownloadRow.h
+    Source/CommonFramework/ResourceDownload/ResourceDownloadTable.cpp
+    Source/CommonFramework/ResourceDownload/ResourceDownloadTable.h
+    Source/CommonFramework/ResourceDownload/ResourceDownloadWidget.cpp
+    Source/CommonFramework/ResourceDownload/ResourceDownloadWidget.h
     Source/CommonFramework/Startup/NewVersionCheck.cpp
     Source/CommonFramework/Startup/NewVersionCheck.h
     Source/CommonFramework/Startup/SetupSettings.cpp

@@ -261,6 +261,7 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(TEMP_FOLDER);
     PA_ADD_OPTION(THEME);
     PA_ADD_OPTION(USE_PADDLE_OCR);
+    PA_ADD_OPTION(RESOURCE_DOWNLOAD_TABLE);
     PA_ADD_OPTION(WINDOW_SIZE);
     PA_ADD_OPTION(LOG_WINDOW_SIZE);
     PA_ADD_OPTION(LOG_WINDOW_STARTUP);
@@ -445,6 +446,10 @@ void GlobalSettings::on_press(){
 }
 
 
+
+void GlobalSettings::update_resource_download_row_status(const std::string& resource_slug, bool success){
+    RESOURCE_DOWNLOAD_TABLE.update_row_status(resource_slug, success);
+}
 
 
 

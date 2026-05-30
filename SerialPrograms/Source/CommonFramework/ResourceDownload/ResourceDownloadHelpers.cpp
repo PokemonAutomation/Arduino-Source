@@ -171,7 +171,6 @@ bool is_resource_ready_in_queue(uint16_t max_concurrent_downloads, const std::st
     return download_position < max_concurrent_downloads;
 }
 
-
 const std::unordered_set<std::string>& all_resource_names(){
     static std::unordered_set<std::string> names = [](){
         std::unordered_set<std::string> resource_names;
