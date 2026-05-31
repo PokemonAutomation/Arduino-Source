@@ -187,6 +187,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Rectangle.h
     ../Common/Cpp/Rectangle.tpp
     ../Common/Cpp/RecursiveThrottler.h
+    ../Common/Cpp/ScopeExit.h
     ../Common/Cpp/SIMDDebuggers.h
     ../Common/Cpp/SerialConnection/SerialConnection.cpp
     ../Common/Cpp/SerialConnection/SerialConnection.h
@@ -489,6 +490,12 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Recording/StreamHistoryTracker_SaveFrames.h
     Source/CommonFramework/Recording/StreamRecorder.cpp
     Source/CommonFramework/Recording/StreamRecorder.h
+    Source/CommonFramework/ResourceDownload/DownloadThread.cpp
+    Source/CommonFramework/ResourceDownload/DownloadThread.h
+    Source/CommonFramework/ResourceDownload/RequiredDownload.cpp
+    Source/CommonFramework/ResourceDownload/RequiredDownload.h
+    Source/CommonFramework/ResourceDownload/RequiredDownloadManager.cpp
+    Source/CommonFramework/ResourceDownload/RequiredDownloadManager.h
     Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.cpp
     Source/CommonFramework/ResourceDownload/ResourceDownloadHelpers.h
     Source/CommonFramework/Startup/NewVersionCheck.cpp
@@ -801,8 +808,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.h
     Source/Controllers/StandardHid/StandardHid_Keyboard_PABotBase2.cpp
     Source/Controllers/StandardHid/StandardHid_Keyboard_PABotBase2.h
-    Source/Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.cpp
-    Source/Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
     Source/Integrations/DiscordIntegrationSettingsWidget.cpp
@@ -1080,12 +1085,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_WiredController.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.cpp
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.h
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Joycon.cpp
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Joycon.h
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_OemController.cpp
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_OemController.h
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_ProController.cpp
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_ProController.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.cpp
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase3_ControllerState.h
@@ -1095,8 +1094,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Connection.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.cpp
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.h
-    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_ProController.cpp
-    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_ProController.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp
     Source/NintendoSwitch/DevPrograms/BoxDraw.h

@@ -11,6 +11,7 @@
 #include "Common/Cpp/Concurrency/PeriodicRunner.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ImageResolution.h"
+#include "Common/Cpp/ScopeExit.h"
 #include "Common/Qt/GlobalThreadPoolsQt.h"
 #include "StaticRegistration.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
@@ -59,23 +60,6 @@ void set_working_directory(){
     }
 }
 
-
-class ScopeExit{
-    ScopeExit(const ScopeExit&) = delete;
-    void operator=(const ScopeExit&) = delete;
-
-public:
-    template <typename Lambda>
-    ScopeExit(Lambda&& lambda)
-        : m_lambda(std::move(lambda))
-    {}
-    ~ScopeExit(){
-        m_lambda();
-    }
-
-private:
-    std::function<void()> m_lambda;
-};
 
 
 int run_program(int argc, char *argv[]){

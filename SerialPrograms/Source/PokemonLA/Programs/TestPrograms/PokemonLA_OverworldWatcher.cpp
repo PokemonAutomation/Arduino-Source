@@ -37,7 +37,7 @@ OverworldWatcher_Descriptor::OverworldWatcher_Descriptor()
 OverworldWatcher::OverworldWatcher(){}
 
 
-void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     BubbleDetector bubbles;
     ArcDetector arcs;
     QuestMarkDetector quest_marks;
@@ -55,10 +55,10 @@ void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, ProControlle
     );
 
     InferenceSession session(
-        context, env.console,
+        scope, env.console,
         {watcher}
     );
-    context.wait_until_cancel();
+    scope.wait_until_cancel();
 }
 
 

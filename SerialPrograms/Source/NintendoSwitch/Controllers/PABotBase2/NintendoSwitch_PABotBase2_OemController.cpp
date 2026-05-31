@@ -23,11 +23,12 @@ using namespace std::chrono_literals;
 
 PABotBase2_OemController::PABotBase2_OemController(
     Logger& logger,
+    RecursiveThrottler& logging_throttler,
     PABotBase2::Connection& connection,
     ControllerType controller_type,
     std::function<void(double magnitude)> on_rumble
 )
-    : PABotBase2_Controller(logger, connection)
+    : PABotBase2_Controller(logger, logging_throttler, connection)
     , m_controller_type(controller_type)
     , m_on_rumble(std::move(on_rumble))
     , m_player_number(ControllerPlayerNumber::UNKNOWN)

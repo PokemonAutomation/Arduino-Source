@@ -19,6 +19,7 @@ class SerialPABotBase_Controller : public ControllerWithScheduler{
 public:
     SerialPABotBase_Controller(
         Logger& logger,
+        RecursiveThrottler& logging_throttler,
         ControllerType controller_type,
         SerialPABotBase::SerialPABotBase_Connection& connection
     );

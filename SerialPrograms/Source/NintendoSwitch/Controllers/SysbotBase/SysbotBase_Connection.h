@@ -42,10 +42,6 @@ public:
     );
     ~TcpSysbotBase_Connection();
 
-    bool supports_command_queue() const{
-        return m_supports_command_queue.load(std::memory_order_relaxed);
-    }
-
     void write_data(const std::string& data);
 
 private:
@@ -60,8 +56,6 @@ private:
 private:
     Logger& m_logger;
     ClientSocket m_socket;
-
-    std::atomic<bool> m_supports_command_queue;
 
     std::string m_connecting_message;
 //    std::string m_version;

@@ -10,6 +10,10 @@
 #include "ControllerSelectorWidget.h"
 #include "NullController.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -37,14 +41,18 @@ std::unique_ptr<ControllerConnection> NullControllerDescriptor::open_connection(
 std::unique_ptr<AbstractController> NullControllerDescriptor::make_controller(
     Logger& logger,
     ControllerConnection& connection,
-    ControllerType controller_type,
-    ControllerResetMode reset_mode
+    ControllerType controller_type
 ) const{
     return nullptr;
 }
 QWidget* NullControllerDescriptor::make_selector_QtWidget(ControllerSelectorWidget& parent) const{
     return new QWidget(&parent);
 }
+
+
+
+
+const char NullController::NAME[] = "(none)";
 
 
 

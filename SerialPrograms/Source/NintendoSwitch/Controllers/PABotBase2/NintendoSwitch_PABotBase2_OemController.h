@@ -31,6 +31,7 @@ public:
 public:
     PABotBase2_OemController(
         Logger& logger,
+        RecursiveThrottler& logging_throttler,
         PABotBase2::Connection& connection,
         ControllerType controller_type,
         std::function<void(double magnitude)> on_rumble

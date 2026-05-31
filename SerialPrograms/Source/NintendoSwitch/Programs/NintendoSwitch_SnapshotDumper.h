@@ -34,7 +34,8 @@ public:
     ~SnapshotDumper();
     SnapshotDumper();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
+    virtual void start_program_controller_check(ControllerSession& session) override{}
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     virtual void on_config_value_changed(void* object) override;

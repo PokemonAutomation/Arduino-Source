@@ -7,7 +7,6 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "SysbotBase_Descriptor.h"
 #include "SysbotBase_Connection.h"
-#include "SysbotBase_ProController.h"
 #include "SysbotBase3_ProController.h"
 #include "SysbotBase_SelectorWidget.h"
 
@@ -58,19 +57,12 @@ std::unique_ptr<ControllerConnection> TcpSysbotBase_Descriptor::open_connection(
 std::unique_ptr<AbstractController> TcpSysbotBase_Descriptor::make_controller(
     Logger& logger,
     ControllerConnection& connection,
-    ControllerType controller_type,
-    ControllerResetMode reset_mode
+    ControllerType controller_type
 ) const{
     TcpSysbotBase_Connection& sbb_connection = static_cast<TcpSysbotBase_Connection&>(connection);
-    if (sbb_connection.supports_command_queue()){
-        return std::unique_ptr<AbstractController>(
-            new NintendoSwitch::ProController_SysbotBase3(logger, sbb_connection)
-        );
-    }else{
-        return std::unique_ptr<AbstractController>(
-            new NintendoSwitch::ProController_SysbotBase(logger, sbb_connection)
-        );
-    }
+    return std::unique_ptr<AbstractController>(
+        new NintendoSwitch::ProController_SysbotBase3(logger, sbb_connection)
+    );
 }
 
 
