@@ -52,7 +52,6 @@ TcpSysbotBase_Connection::TcpSysbotBase_Connection(
 )
     : m_logger(logger)
     , m_socket(GlobalThreadPools::unlimited_realtime())
-    , m_supports_command_queue(false)
     , m_last_ping_send(WallClock::min())
     , m_last_ping_receive(WallClock::min())
 {
@@ -133,7 +132,7 @@ void TcpSysbotBase_Connection::thread_loop(){
         }
 
         m_last_ping_send = current_time();
-        if (supports_command_queue() && NintendoSwitch::ConsoleSettings::instance().ENABLE_SBB3_PINGS){
+        if (NintendoSwitch::ConsoleSettings::instance().ENABLE_SBB3_PINGS){
             //  If we're more than 60 pings behind, just start clearing them.
             while (m_active_pings.size() > 60){
                 m_active_pings.erase(m_active_pings.begin());
@@ -267,21 +266,14 @@ void TcpSysbotBase_Connection::process_message(const std::string& message, WallC
 }
 void TcpSysbotBase_Connection::set_mode(const std::string& sbb_version){
     if (sbb_version.rfind("2.", 0) == 0){
-#if 1
         set_status_line1("sbb2 is no longer supported. Please upgrade to sbb3.", COLOR_RED);
         return;
-#else
-        m_logger.log("Detected sbb2. Using old (slow) command set.", COLOR_ORANGE);
-        write_data("configure mainLoopSleepTime 0\r\n");
-        m_supports_command_queue.store(false, std::memory_order_relaxed);
-#endif
     }else if (sbb_version.rfind("3.", 0) == 0){
         m_logger.log("Detected sbb3. Using CC command queue.", COLOR_BLUE);
         if (NintendoSwitch::ConsoleSettings::instance().ENABLE_SBB3_LOGGING){
             write_data("configure enableLogs 1\r\n");
         }
         write_data("configure enablePA 1\r\n");
-        m_supports_command_queue.store(true, std::memory_order_relaxed);
     }else{
         m_logger.log("Unrecognized sbb version: " + sbb_version, COLOR_RED);
         return;

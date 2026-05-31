@@ -1087,8 +1087,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Connection.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.cpp
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.h
-    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_ProController.cpp
-    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_ProController.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp
     Source/NintendoSwitch/DevPrograms/BoxDraw.h
