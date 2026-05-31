@@ -880,7 +880,7 @@ void fly_from_kanto_map(ConsoleHandle& console, ProControllerContext& context, K
         // blindly move the cursor to the specified fly spot
         switch (destination){
         case KantoFlyLocation::pallettown:
-            pbf_move_left_joystick(context, {0, -1}, 850ms, 100ms);
+            pbf_move_left_joystick(context, {0, -1}, 900ms, 100ms);
             pbf_move_left_joystick(context, {+1, 0}, 317ms, 100ms);
             break;
         case KantoFlyLocation::viridiancity:

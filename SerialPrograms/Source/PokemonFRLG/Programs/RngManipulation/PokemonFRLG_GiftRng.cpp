@@ -174,7 +174,7 @@ GiftRng::GiftRng()
         "The number of rare candies in your bag. Make sure these are at the top position of the bag.<br>"
         "Rare candies used during calibration will be restored after resetting.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        0, 0, 999 // default, min, max
+        0, 0, 95 // default, min, max
     )
     , PROFILE(
         "<b>User Profile Position:</b><br>"
@@ -484,7 +484,11 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             search_hits = get_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD);
             RNG_CALIBRATION.set_hits(search_hits);     
 
-            bool force_finish = failed || (i == (MAX_RARE_CANDIES - 1));
+            bool force_finish = (
+                   failed 
+                || (i == (MAX_RARE_CANDIES - 1))
+                || all_indistinguishable(search_hits, searcher, GENDER_THRESHOLD)
+            );
             finished = update_history(
                 env.console, advance_history, 
                 calibration_history, MAX_HISTORY_LENGTH, 
