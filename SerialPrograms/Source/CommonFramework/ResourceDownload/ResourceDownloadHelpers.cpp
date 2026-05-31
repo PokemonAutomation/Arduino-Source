@@ -66,7 +66,9 @@ std::vector<DownloadedResourceMetadata> deserialize_resource_list_json(const Jso
 
 const std::vector<DownloadedResourceMetadata>& local_resource_download_list(){
     // cout << "local_resource_download_list" << endl;
-    static std::vector<DownloadedResourceMetadata> local_resources = deserialize_resource_list_json(load_json_file(RESOURCE_PATH() + "ResourceDownloadList.json"));
+    static std::vector<DownloadedResourceMetadata> local_resources = deserialize_resource_list_json(
+        load_json_file(RESOURCE_PATH() + "ResourceDownloadList.json")
+    );
 
     return local_resources;
 }
