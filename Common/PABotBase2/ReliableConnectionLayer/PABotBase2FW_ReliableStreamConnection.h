@@ -39,6 +39,10 @@ class ReliableStreamConnectionFW final
 public:
     ReliableStreamConnectionFW(UnreliableStreamConnectionPolling& unreliable_connection);
 
+    void set_reboot_to_bootloader_callback(void(*reboot_to_bootloader)()){
+        m_reboot_to_bootloader = reboot_to_bootloader;
+    }
+
     size_t packets_received() const{
         return m_packets_received;
     }
@@ -119,6 +123,7 @@ private:
     bool m_stream_ready = false;
 
     Mutex m_sender_lock;
+    void(*m_reboot_to_bootloader)() = nullptr;
 };
 
 

@@ -30,6 +30,8 @@ public:
 
     void save_settings() const;
 
+    void validate_resource_list();
+
 public:
     // The implmentation is defined in "UI/PanelWidget.h" to avoid circular dependency
     // Returns a UI/PanelWidget.h:PanelWidget

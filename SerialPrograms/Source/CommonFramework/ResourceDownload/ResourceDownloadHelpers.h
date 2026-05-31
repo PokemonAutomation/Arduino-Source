@@ -7,8 +7,9 @@
 #ifndef PokemonAutomation_ResourceDownloadHelpers_H
 #define PokemonAutomation_ResourceDownloadHelpers_H
 
-#include <string>
 #include <optional>
+#include <string>
+#include <unordered_set>
 
 
 namespace PokemonAutomation{
@@ -51,6 +52,7 @@ const std::vector<DownloadedResourceMetadata>& local_resource_download_list();
 const std::vector<DownloadedResourceMetadata>& remote_resource_download_list();
 std::optional<uint16_t> get_resource_version_num(Filesystem::Path folder_path);
 ResourceVersionStatus get_version_status(uint16_t expected_version_num, std::optional<uint16_t> current_version_num);
+const std::unordered_set<std::string>& all_resource_names();
 
 }
 #endif

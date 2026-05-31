@@ -45,14 +45,24 @@ ReliableStreamConnection::ReliableStreamConnection(
         [this]{ retransmit_thread(); }
     );
 
-    m_unreliable_connection.add_listener(*this);
-    if (parent){
-        attach(*parent);
+    try{
+        m_unreliable_connection.add_listener(*this);
+        if (parent){
+            attach(*parent);
+        }
+    }catch (...){
+        stop();
+        throw;
     }
 }
 
 ReliableStreamConnection::~ReliableStreamConnection(){
-    cancel(nullptr);
+    stop();
+}
+void ReliableStreamConnection::stop() noexcept{
+    if (cancel(nullptr)){
+        return;
+    }
     detach();
     m_unreliable_connection.remove_listener(*this);
     m_retransmit_thread.wait_and_ignore_exceptions();
