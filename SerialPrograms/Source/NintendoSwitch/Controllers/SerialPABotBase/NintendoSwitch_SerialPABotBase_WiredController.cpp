@@ -33,6 +33,7 @@ SerialPABotBase_WiredController::SerialPABotBase_WiredController(
     : ProController(logger)
     , SerialPABotBase_Controller(
         logger,
+        logging_throttler(),
         controller_type,
         connection
     )

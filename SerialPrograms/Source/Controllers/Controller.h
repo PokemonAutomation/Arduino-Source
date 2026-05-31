@@ -34,7 +34,7 @@ public:
     virtual ~AbstractController();
 
     virtual Logger& logger() = 0;
-    virtual RecursiveThrottler& logging_throttler() = 0;
+    RecursiveThrottler& logging_throttler();
 
 
 public:

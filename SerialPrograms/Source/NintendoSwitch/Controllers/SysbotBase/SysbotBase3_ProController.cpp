@@ -25,7 +25,7 @@ ProController_SysbotBase3::ProController_SysbotBase3(
     SysbotBase::TcpSysbotBase_Connection& connection
 )
     : ProController(logger)
-    , ControllerWithScheduler(logger)
+    , ControllerWithScheduler(logger, logging_throttler())
     , m_connection(connection)
     , m_stopping(false)
     , m_pending_replace(false)

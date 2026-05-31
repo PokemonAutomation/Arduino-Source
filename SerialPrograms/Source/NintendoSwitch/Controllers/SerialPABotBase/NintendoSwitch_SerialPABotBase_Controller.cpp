@@ -22,10 +22,11 @@ using namespace std::chrono_literals;
 
 SerialPABotBase_Controller::SerialPABotBase_Controller(
     Logger& logger,
+    RecursiveThrottler& logging_throttler,
     ControllerType controller_type,
     SerialPABotBase::SerialPABotBase_Connection& connection
 )
-    : ControllerWithScheduler(logger)
+    : ControllerWithScheduler(logger, logging_throttler)
     , m_handle(connection)
     , m_serial(connection.botbase())
 {

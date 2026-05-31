@@ -31,7 +31,8 @@ public:
     )
         : ProController(logger)
         , PABotBase2_OemController(
-            logger, connection, controller_type,
+            logger, logging_throttler(),
+            connection, controller_type,
             [this](double magnitude){ on_rumble(magnitude); }
         )
     {}
@@ -41,9 +42,6 @@ public:
 
     virtual Logger& logger() override{
         return m_logger;
-    }
-    virtual RecursiveThrottler& logging_throttler() override{
-        return m_logging_throttler;
     }
     virtual bool is_ready() const override{
         return PABotBase2_Controller::is_ready();

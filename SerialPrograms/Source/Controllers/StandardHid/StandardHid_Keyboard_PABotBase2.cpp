@@ -21,8 +21,8 @@ PABotBase2_Keyboard::PABotBase2_Keyboard(
     PABotBase2::Connection& connection
 )
     : Keyboard(logger)
-    , KeyboardControllerWithScheduler(logger)
-        , m_connection(connection)
+    , KeyboardControllerWithScheduler(logger, logging_throttler())
+    , m_connection(connection)
 {
     using namespace PABotBase2;
 
