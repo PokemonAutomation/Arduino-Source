@@ -161,7 +161,7 @@ RoamingLegendaryRng::RoamingLegendaryRng()
         "The number of rare candies in your bag. Make sure these are at the top position of the bag.<br>"
         "Rare candies used during calibration will be restored after resetting.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        0, 0, 999 // default, min, max
+        0, 0, 50 // default, min, max
     )
     , MAX_BALL_THROWS(
         "<b>Max Balls Thrown:</b><br>"
@@ -169,7 +169,7 @@ RoamingLegendaryRng::RoamingLegendaryRng()
         "Balls thrown during calibration will be restored after resetting.<br>"
         "<i>Master Balls are strongly recommended for Roaming Legendary RNG.</i>",
         LockMode::UNLOCK_WHILE_RUNNING,
-        20, 1, 999 // default, min, max
+        30, 1, 999 // default, min, max
     )
     , PROFILE(
         "<b>User Profile Position:</b><br>"
@@ -456,14 +456,18 @@ void RoamingLegendaryRng::program(SingleSwitchProgramEnvironment& env, ProContro
             search_hits = get_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, GENDER_THRESHOLD);
             RNG_CALIBRATION.set_hits(search_hits);     
 
-            bool force_finish = failed || (i == (MAX_RARE_CANDIES - 1));
+            bool force_finish = (
+                   failed 
+                || (i == (MAX_RARE_CANDIES - 1)) 
+                || all_indistinguishable(search_hits, searcher, GENDER_THRESHOLD)
+            );
             finished = update_history(
                 env.console, advance_history, 
                 calibration_history, MAX_HISTORY_LENGTH, 
                 calibrations, search_hits, 
                 1, 2, force_finish
             );
-            finished = finished || all_indistinguishable(search_hits, searcher, GENDER_THRESHOLD);
+
         }
 
         env.log("RNG search finished.");

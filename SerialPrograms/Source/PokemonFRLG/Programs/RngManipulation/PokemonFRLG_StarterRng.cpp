@@ -798,7 +798,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 env.log("RNG search not complete after 3 level-ups.");
                 finished = update_history(
                     env.console, advance_history, calibration_history, 
-                    MAX_HISTORY_LENGTH, calibrations, search_hits, 5
+                    MAX_HISTORY_LENGTH, calibrations, search_hits, 5, 2, true
                 );         
                 break;
             }
