@@ -208,6 +208,7 @@ int auto_catch(
                 return catch_detected ? static_cast<int>(i) : 0;
             case 3:
                 console.log("Black screen detected. Battle exited.");
+                pbf_mash_button(context, BUTTON_B, 2500ms);
                 return catch_detected ? static_cast<int>(i) : 0;
             case 4: 
                 console.log("Catch detected!", COLOR_BLUE);
@@ -299,6 +300,9 @@ bool use_rare_candy(
         pbf_move_left_joystick(context, {-1, 0}, 200ms, 800ms);
         pbf_move_left_joystick(context, {-1, 0}, 200ms, 800ms);
         pbf_move_left_joystick(context, {-1, 0}, 200ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
     }
 
     // use rare candy and watch for the party screen

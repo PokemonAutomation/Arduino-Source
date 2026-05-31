@@ -195,14 +195,14 @@ WildRng::WildRng()
         "The number of rare candies in your bag. Make sure these are at the top position of the bag.<br>"
         "Rare candies used during calibration will be restored after resetting.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        0, 0, 999 // default, min, max
+        0, 0, 98 // default, min, max
     )
     , MAX_BALL_THROWS(
         "<b>Max Balls Thrown:</b><br>"
         "The number of " + STRING_POKEBALL + "s in your bag to attempt to throw. Make sure these are at the top position of the bag.<br>"
         "Balls thrown during calibration will be restored after resetting.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        20, 1, 999 // default, min, max
+        30, 1, 999 // default, min, max
     )
     , PROFILE(
         "<b>User Profile Position:</b><br>"
@@ -559,14 +559,17 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
             search_hits = get_wild_search_results(env.console, searcher, filters, SEED_VALUES, ADVANCES, advances_radius, gender_threshold, SUPER_ROD);
             RNG_CALIBRATION.set_hits(search_hits);         
 
-            bool force_finish = failed || (i == (MAX_RARE_CANDIES - 1));
+            bool force_finish = (
+                   failed 
+                || (i == (MAX_RARE_CANDIES - 1))
+                || all_indistinguishable(search_hits, searcher, gender_threshold, SUPER_ROD)
+            );
             finished = update_history(
                 env.console, advance_history, 
                 calibration_history, MAX_HISTORY_LENGTH,
                 calibrations, search_hits, 
                 1, 2, force_finish
             );
-            finished = finished || all_indistinguishable(search_hits, searcher, gender_threshold, SUPER_ROD);
         }
 
         env.log("RNG search finished.");
