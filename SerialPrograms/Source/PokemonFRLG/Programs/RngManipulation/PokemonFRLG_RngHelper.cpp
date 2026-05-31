@@ -285,7 +285,7 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         stats.resets++;
 
         // detect shinies
-        shiny_found = check_for_shiny(env.console, context, TARGET, LANGUAGE);
+        shiny_found = check_for_shiny(env.console, context, TARGET);
         if (shiny_found){
             env.log("Shiny found!");
             stats.shinies++;
