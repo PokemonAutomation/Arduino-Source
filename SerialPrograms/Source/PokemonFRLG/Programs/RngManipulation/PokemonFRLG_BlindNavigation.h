@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonFRLG_BlindNavigation_H
 #define PokemonAutomation_PokemonFRLG_BlindNavigation_H
 
+#include "CommonFramework/Language.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleState.h"
 
@@ -61,7 +62,10 @@ namespace PokemonFRLG{
         safarizonewest,
         safarizonesurf,
         safarizonefish,
-        // roaming
+        raikou,
+        entei,
+        suicune,
+        roaming
     };
 
     enum class SeedButton{

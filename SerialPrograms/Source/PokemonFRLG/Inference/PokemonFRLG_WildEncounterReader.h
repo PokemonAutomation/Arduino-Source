@@ -42,7 +42,7 @@ public:
     PokemonFRLG_WildEncounter read_encounter(
         Logger& logger, Language language,
         const ImageViewRGB32& frame, 
-        std::set<std::string>& subset,
+        const std::set<std::string>& subset,
         double max_log10p = MAX_LOG10P
     );
 

@@ -18,6 +18,7 @@
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_DexRegistrationDetector.h"
 #include "PokemonFRLG/Inference/Menus/PokemonFRLG_StartMenuDetector.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_StatsReader.h"
+#include "PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_PokemonSpriteReader.h"
 #include "PokemonFRLG/Inference/PokemonFRLG_PartyLevelUpReader.h"
 #include "PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
@@ -208,6 +209,7 @@ int auto_catch(
                 return catch_detected ? static_cast<int>(i) : 0;
             case 3:
                 console.log("Black screen detected. Battle exited.");
+                pbf_mash_button(context, BUTTON_B, 2500ms);
                 return catch_detected ? static_cast<int>(i) : 0;
             case 4: 
                 console.log("Catch detected!", COLOR_BLUE);
@@ -299,6 +301,9 @@ bool use_rare_candy(
         pbf_move_left_joystick(context, {-1, 0}, 200ms, 800ms);
         pbf_move_left_joystick(context, {-1, 0}, 200ms, 800ms);
         pbf_move_left_joystick(context, {-1, 0}, 200ms, 800ms);
+        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
     }
 
     // use rare candy and watch for the party screen
@@ -465,6 +470,109 @@ void hatch_daycare_egg(ConsoleHandle& console, ProControllerContext& context){
     context.wait_for_all_requests();
 }
 
+
+void travel_from_celio_to_kanto(ConsoleHandle& console, ProControllerContext& context){
+    // assumes the player is standing on Celio's left (west) side
+    pbf_move_left_joystick(context, {-1, 0}, 1280ms, 300ms);
+    leave_pokecenter(console, context);
+    // walk down to the One Island sign
+    WhiteDialogWatcher dialog_detected(COLOR_RED);
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context) {
+            // walk down
+            pbf_move_left_joystick(context, {0, -1}, 15000ms, 0ms);
+
+        },
+        { dialog_detected }
+    );
+    if (ret < 0){        
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "travel_from_celio_to_route2(): Failed to detect One Island sign.",
+            console
+        ); 
+    }
+
+    // walk to the ferry and take it to Vermilion
+    pbf_wait(context, 500ms);
+    pbf_move_left_joystick(context, {-1, 0 }, 430ms, 300ms);
+
+    context.wait_for_all_requests();
+    int ret2 = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context) {
+            // walk down to the sailor and initiate dialog
+            ssf_press_left_joystick(context, {0, -1}, 0ms, 20000ms);
+            ssf_mash1_button(context, BUTTON_A, 20000ms);
+        },
+        { dialog_detected }
+    );
+    if (ret2 < 0){        
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "travel_from_celio_to_route2(): Failed to initiate Seagallop ferry dialogue.",
+            console
+        ); 
+    }
+
+    BlackScreenWatcher black_screen(COLOR_RED);
+    context.wait_for_all_requests();
+    int ret3 = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context) {
+            // select vermilion (default option) and take ferry
+            pbf_mash_button(context, BUTTON_A, 20000ms);
+        },
+        { black_screen }
+    );
+    if (ret3 < 0){        
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "travel_from_celio_to_kanto(): Failed to initiate Seagallop ferry travel.",
+            console
+        );
+    }
+
+    // fly to pewter city
+    pbf_wait(context, 6000ms);
+    context.wait_for_all_requests();
+    console.log("Arrived at the Vermilion docks.");
+}
+
+void travel_to_route1(ConsoleHandle& console, ProControllerContext& context){
+    open_fly_map_from_overworld(console, context);
+    fly_from_kanto_map(console, context, KantoFlyLocation::pallettown);
+
+    // walk to the boundary of route 1
+    pbf_move_left_joystick(context, {+1, 0}, 1370ms, 300ms);
+    pbf_move_left_joystick(context, {0, +1}, 1450ms, 300ms);
+    pbf_move_left_joystick(context, {+1, 0}, 300ms,  300ms);
+    pbf_move_left_joystick(context, {0, +1}, 800ms, 300ms);
+
+    pbf_wait(context, 500ms);
+    context.wait_for_all_requests();
+    console.log("Arrived at Route 1.");
+}
+
+void use_repel(ConsoleHandle& console, ProControllerContext& context){
+    open_bag_from_overworld(console, context);
+    // move back to the Items pocket in case Teachy TV was used
+    pbf_move_left_joystick(context, {-1, 0}, 500ms, 500ms);
+    pbf_move_left_joystick(context, {-1, 0}, 500ms, 500ms);
+    // Repel is required to be in the 2nd position (Rare Candy is first)
+    for (int i=0; i<4; i++){
+        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+    }
+    pbf_wait(context, 500ms);
+    pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
+    pbf_mash_button(context, BUTTON_A, 2000ms);
+    // exit to overworld
+    pbf_mash_button(context, BUTTON_B, 5000ms);
+    context.wait_for_all_requests();
+    console.log("Used Repel.");
+}
+
 int watch_for_shiny_encounter(ConsoleHandle& console, ProControllerContext& context){
     BlackScreenWatcher battle_entered(COLOR_RED);
     context.wait_for_all_requests();
@@ -485,7 +593,59 @@ int watch_for_shiny_encounter(ConsoleHandle& console, ProControllerContext& cont
     return encounter_shiny ? 1 : 0;
 }
 
-bool check_for_shiny(ConsoleHandle& console, ProControllerContext& context, PokemonFRLG_RngTarget TARGET){
+int encounter_roamer(
+    ConsoleHandle& console, ProControllerContext& context, 
+    Language language, const std::set<std::string>& subset
+){
+    travel_from_celio_to_kanto(console, context);
+    int attempts = 0;
+    while (true){
+        if (attempts >= 250){
+            console.log("encounter_roamer(): Failed to encounter roamer in 250 attempts.");
+            return -1;
+        }
+        if ((attempts % 5) == 0){
+            travel_to_route1(console, context);
+        }
+        if (attempts == 0){
+            use_repel(console, context);
+        }
+
+        context.wait_for_all_requests();
+        pbf_move_left_joystick(context, {0, +1}, 200ms, 800ms);
+        int ret = grass_spin(console, context, true, 5s);
+        if (ret < 0){
+            attempts++;
+            pbf_move_left_joystick(context, {0, -1}, 200ms, 800ms);
+            continue;
+        }else if (ret == 1){
+            return ret;
+        }else{
+            WildEncounterReader reader(COLOR_RED);
+            VideoOverlaySet overlays(console.overlay());
+            reader.make_overlays(overlays);
+            console.log("Reading name...");
+            VideoSnapshot screen = console.video().snapshot();
+            PokemonFRLG_WildEncounter encounter = reader.read_encounter(console.logger(), language, screen, subset);
+            console.log("Name: " + encounter.name);
+
+            if (encounter.name == "pidgey" || encounter.name == "rattata"){
+                flee_battle(console, context);
+                use_repel(console, context);
+                pbf_move_left_joystick(context, {0, -1}, 200ms, 800ms);
+                continue;
+            }
+
+            return ret; // 0
+        }
+    }
+}
+
+bool check_for_shiny(
+    ConsoleHandle& console, ProControllerContext& context, 
+    PokemonFRLG_RngTarget TARGET,
+    Language language, const std::set<std::string>& subset
+){
     switch (TARGET){
     case PokemonFRLG_RngTarget::eggheld:
         return false;
@@ -536,6 +696,11 @@ bool check_for_shiny(ConsoleHandle& console, ProControllerContext& context, Poke
     case PokemonFRLG_RngTarget::safarizonesurf:
     case PokemonFRLG_RngTarget::safarizonefish:
         return watch_for_shiny_encounter(console, context) == 1;
+    case PokemonFRLG_RngTarget::raikou:
+    case PokemonFRLG_RngTarget::entei:
+    case PokemonFRLG_RngTarget::suicune:
+    case PokemonFRLG_RngTarget::roaming:
+        return encounter_roamer(console, context, language, subset) == 1;
     default:
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,

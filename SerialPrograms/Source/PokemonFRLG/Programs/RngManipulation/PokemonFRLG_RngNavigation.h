@@ -20,6 +20,10 @@ namespace NintendoSwitch{
 namespace PokemonFRLG{
 
 using namespace Pokemon;
+
+static const std::set<std::string> ROAMER_ROUTE1_SUBSET = { 
+    "raikou", "suicune", "entei", "rattata", "pidgey" 
+};
     
 void go_to_summary(
     ConsoleHandle& console, 
@@ -61,7 +65,17 @@ bool use_rare_candy(
 
 int watch_for_shiny_encounter(ConsoleHandle& console, ProControllerContext& context);
 
-bool check_for_shiny(ConsoleHandle& console, ProControllerContext& context, PokemonFRLG_RngTarget TARGET);
+int encounter_roamer(
+    ConsoleHandle& console, ProControllerContext& context, 
+    Language language, const std::set<std::string>& subset
+);
+
+bool check_for_shiny(
+    ConsoleHandle& console, ProControllerContext& context, 
+    PokemonFRLG_RngTarget TARGET,
+    Language language = Language::English, 
+    const std::set<std::string>& subset = ROAMER_ROUTE1_SUBSET
+);
 
 void hatch_daycare_egg(ConsoleHandle& console, ProControllerContext& context);
 

@@ -391,6 +391,25 @@ void walk_to_safarizonewest(ProControllerContext& context){
     // total duration: 51430ms
 }
 
+void activate_roamer(ProControllerContext& context, const uint64_t& ingame_delay){
+    // a lot of dialogue while Celio inserts the Sapphire
+    pbf_press_button(context, BUTTON_A, 200ms, 5300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 3300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 5300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - 26700)); //5500ms + 4*1500ms + 3500ms + 5500ms + 4*1500ms + 200
+    // finalize roamer
+    pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+    context.wait_for_all_requests();
+}
+
 
 void check_timings(
     ConsoleHandle& console, 
@@ -653,6 +672,18 @@ void check_timings(
             );
         }
         return;
+    case PokemonFRLG_RngTarget::raikou:
+    case PokemonFRLG_RngTarget::entei:
+    case PokemonFRLG_RngTarget::suicune:
+    case PokemonFRLG_RngTarget::roaming:
+        if (timings.ingame_delay < 27000){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Roaming: the in-game delay cannot be less than 27000ms (3400 frames). Check your in-game advances and calibration.",
+                console
+            );
+        }
+        return;
     default:
         OperationFailedException::fire(
             ErrorReport::NO_ERROR_REPORT,
@@ -790,6 +821,11 @@ void perform_blind_sequence(
         walk_to_safarizonefish(context);
         use_registered_fishing_rod(context, modified_ingame_delay);
         return;
+    case PokemonFRLG_RngTarget::raikou:
+    case PokemonFRLG_RngTarget::entei:
+    case PokemonFRLG_RngTarget::suicune:
+    case PokemonFRLG_RngTarget::roaming:
+        activate_roamer(context, timings.ingame_delay);
     }
 }
 
