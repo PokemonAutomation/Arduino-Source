@@ -50,8 +50,7 @@ public:
         m_controller = m_descriptor.make_controller(
             m_logger,
             connection,
-            connection.current_controller(),
-            ControllerResetMode::DO_NOT_RESET
+            connection.current_controller()
         );
         ProController* procon = dynamic_cast<ProController*>(m_controller.get());
         if (procon == nullptr){

@@ -28,8 +28,7 @@ using namespace std::chrono_literals;
 SerialPABotBase_WiredController::SerialPABotBase_WiredController(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection,
-    ControllerType controller_type,
-    ControllerResetMode reset_mode
+    ControllerType controller_type
 )
     : ProController(logger)
     , SerialPABotBase_Controller(
@@ -43,30 +42,6 @@ SerialPABotBase_WiredController::SerialPABotBase_WiredController(
 
     //  Add controller-specific messages.
     connection.add_message_printer<MessageType_WiredController_ControllerStateMs>();
-
-
-    switch (reset_mode){
-    case PokemonAutomation::ControllerResetMode::DO_NOT_RESET:
-        break;
-    case PokemonAutomation::ControllerResetMode::SIMPLE_RESET:
-        connection.botbase()->issue_request_and_wait(
-            DeviceRequest_change_controller_mode(controller_type_to_id(controller_type)),
-            nullptr
-        );
-        break;
-    case PokemonAutomation::ControllerResetMode::RESET_AND_CLEAR_STATE:
-        connection.botbase()->issue_request_and_wait(
-            DeviceRequest_reset_to_controller(controller_type_to_id(controller_type)),
-            nullptr
-        );
-        break;
-    }
-
-    //  Re-read the controller.
-    ControllerType current_controller = connection.refresh_controller_type();
-    if (current_controller != controller_type){
-        throw SerialProtocolException(logger, PA_CURRENT_FUNCTION, "Failed to set controller type.");
-    }
 
     m_status_thread.reset(new ControllerStatusThread(
         connection, *this
