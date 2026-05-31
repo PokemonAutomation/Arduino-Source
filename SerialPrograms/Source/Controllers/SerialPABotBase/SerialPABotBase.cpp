@@ -6,7 +6,6 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
-#include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "SerialPABotBase.h"
 
@@ -26,12 +25,6 @@ const std::map<pabb_ProgramID, uint32_t>& SUPPORTED_DEVICES(){
         {PABB_PID_PABOTBASE_ProMicro,           2025090303},
         {PABB_PID_PABOTBASE_Teensy2,            2025090303},
         {PABB_PID_PABOTBASE_TeensyPP2,          2025090303},
-        {PABB_PID_PABOTBASE_ESP32,              2025120815},
-        {PABB_PID_PABOTBASE_ESP32S3,            2025120815},
-        {PABB_PID_PABOTBASE_Pico1W_USB,         2025120815},
-        {PABB_PID_PABOTBASE_Pico1W_UART,        2025120815},
-        {PABB_PID_PABOTBASE_Pico2W_USB,         2025120815},
-        {PABB_PID_PABOTBASE_Pico2W_UART,        2025120815},
     };
     return database;
 }
@@ -60,8 +53,10 @@ const std::map<pabb_ProgramID, uint32_t>& SUPPORTED_DEVICES2(){
         {PABB_PID_UNSPECIFIED,              2026052100},
         {PABB_PID_PABOTBASE_ESP32,          2026052100},
         {PABB_PID_PABOTBASE_ESP32S3,        2026052100},
-        {PABB_PID_PABOTBASE_Pico1,          2026052100},
-        {PABB_PID_PABOTBASE_Pico2,          2026052100},
+        {PABB_PID_PABOTBASE_RP2040,         2026052100},
+        {PABB_PID_PABOTBASE_RP2350,         2026052100},
+        {PABB_PID_PABOTBASE_Pico1W,         2026052100},
+        {PABB_PID_PABOTBASE_Pico2W,         2026052100},
     };
     return database;
 }
