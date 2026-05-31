@@ -47,7 +47,7 @@ ReadBattleLevelUp::ReadBattleLevelUp()
 
 void ReadBattleLevelUp::program(
     SingleSwitchProgramEnvironment &env,
-    ProControllerContext &context
+    CancellableScope& scope
 ){
     env.log(
         "Starting Read Battle Level Up program..."
@@ -94,8 +94,7 @@ void ReadBattleLevelUp::program(
 
     env.log("Finished Reading Stats. Verification boxes are on overlay.",
                     COLOR_BLUE);
-    pbf_wait(context, 10s);
-    context.wait_for_all_requests();
+    scope.wait_for(10s);
 }
 
 } // namespace PokemonFRLG

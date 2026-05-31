@@ -53,6 +53,9 @@ public:
 //    std::unique_ptr<StatsTracker> make_stats() const override{
 //        return std::unique_ptr<StatsTracker>(new StatsTracker());
 //    }
+    virtual void start_program_controller_check(
+        ControllerSession& session, size_t console_index
+    ) override{}
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
     virtual void on_press() override;

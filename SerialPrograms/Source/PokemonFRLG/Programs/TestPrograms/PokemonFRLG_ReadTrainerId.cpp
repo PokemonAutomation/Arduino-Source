@@ -56,7 +56,7 @@ ReadTrainerId::ReadTrainerId()
 
 void ReadTrainerId::program(
     SingleSwitchProgramEnvironment &env,
-    ProControllerContext &context
+    CancellableScope& scope
 ){
     env.log(
         "Starting Read Trainer ID program... Please ensure you are on the Trainer Card."
@@ -77,7 +77,6 @@ void ReadTrainerId::program(
     }else{
         env.log("Trainer Card not detected!");
     }
-    context.wait_for_all_requests();
 }
 
 } // namespace PokemonFRLG

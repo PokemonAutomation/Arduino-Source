@@ -72,7 +72,7 @@ SoundListener::SoundListener()
 
 // void search_alpha_roar_from_audio_dump();
 
-void SoundListener::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void SoundListener::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     //  Connect the controller.
     // pbf_move_right_joystick(context, {-1, -1}, 80ms, 0ms);
 
@@ -110,10 +110,10 @@ void SoundListener::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     }
 
     InferenceSession session(
-        context, env.console,
+        scope, env.console,
         {{*detector, std::chrono::milliseconds(20)}}
     );
-    context.wait_until_cancel();
+    scope.wait_until_cancel();
 
     std::cout << "Audio test program Sound listener finished." << std::endl;
 }
