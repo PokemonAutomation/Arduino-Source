@@ -15,6 +15,7 @@
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonFramework/ResourceDownload/RequiredDownloadDialogWidget.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgramWidget.h"
 
@@ -111,9 +112,18 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
         this, [&](ProgramState state){
             std::string error;
             switch (state){
-            case ProgramState::STOPPED:
-                error = m_session.start_program();
+            case ProgramState::STOPPED:{
+                bool prereqs_downloaded = show_download_prereqs_popup(this, m_session.get_download_manager(), 
+                    [this](const std::string& msg) {
+                        this->error(msg);
+                    }
+                );
+
+                if (prereqs_downloaded){
+                    error = m_session.start_program();
+                }
                 break;
+            }
             case ProgramState::RUNNING:
                 error = m_session.stop_program();
                 break;
