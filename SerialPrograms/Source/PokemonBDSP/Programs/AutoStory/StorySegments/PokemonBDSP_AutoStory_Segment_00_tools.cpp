@@ -34,8 +34,11 @@
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.h"
 
+#include "PokemonBDSP/Programs/AutoStory/Detect/PokemonBDSP_AutoStory_OverworldDetector.h"
+
 #include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_BasicCatcher.h"
+#include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
 
 using namespace std::chrono_literals;
 
@@ -402,36 +405,65 @@ namespace PokemonAutomation {
             // ---------------------------------------------------------------------------
 
             void fight_starly(VideoStream& stream, ProControllerContext& context) {
-                stream.log("Starting Starly battle...");
+                stream.log("[AutoStory] Starting Starly battle...", COLOR_BLUE);
 
-                // Give time for battle transition
-                pbf_wait(context, 5000ms);
+                bool battle_menu_seen = false;
 
-                // Mash A to get through intro dialogue
-                pbf_mash_button(context, BUTTON_A, 5000ms);
+                while (true) {
 
-                // Use first move repeatedly (Tackle/Scratch/Pound)
-                for (int i = 0; i < 6; i++) {
-                    pbf_press_button(context, BUTTON_A, 100ms, 2000ms); // Select move
-                    pbf_wait(context, 3000ms); // Wait for animation + damage
+                    context.wait_for_all_requests();
+
+                    BattleMenuWatcher battle_menu(BattleType::STANDARD, COLOR_YELLOW);
+                    EndBattleWatcher end_battle;
+
+                    int ret = run_until<ProControllerContext>(
+                        stream,
+                        context,
+                        [](ProControllerContext& ctx) {
+                            pbf_mash_button(ctx, BUTTON_B, 120000ms);
+                        },
+                        {
+                            {battle_menu},
+                            battle_menu_seen
+                                ? PeriodicInferenceCallback{end_battle}
+                                : PeriodicInferenceCallback{},
+                        }
+                    );
+
+                    switch (ret) {
+
+                    case 0:
+                    {
+                        battle_menu_seen = true;
+                        stream.log("[AutoStory] Battle menu detected.", COLOR_BLUE);
+
+                        // Select Fight, then move slot 1.
+                        pbf_press_button(context, BUTTON_A, 80ms, 500ms);
+                        pbf_press_button(context, BUTTON_A, 80ms, 3000ms);
+                        break;
+                    }
+
+                    case 1:
+                    {
+                        stream.log("[AutoStory] Starly battle complete.", COLOR_GREEN);
+
+                        // Mash through post-battle XP / dialog, wait for overworld.
+                        OverworldWatcher overworld;
+                        run_until<ProControllerContext>(
+                            stream, context,
+                            [](ProControllerContext& ctx) {
+                                pbf_mash_button(ctx, BUTTON_B, 120000ms);
+                            },
+                            {{overworld}}
+                        );
+                        return;
+                    }
+
+                    default:
+                        stream.log("[AutoStory] Starly battle timed out.", COLOR_RED);
+                        return;
+                    }
                 }
-
-                // Mash through faint + post-battle dialogue
-                pbf_mash_button(context, BUTTON_A, 8000ms);
-
-                stream.log("Starly battle complete.");
-
-                wait_for_dialogue(stream, context, "Phase 9 (post battle text)");
-
-                pbf_mash_button(context, BUTTON_B, 20000ms);
-
-                wait_for_dialogue(stream, context, "Phase 9 (post battle text)");
-
-                pbf_mash_button(context, BUTTON_B, 5000ms);
-
-                context.wait_for_all_requests();
-
-
             }
 
             // ---------------------------------------------------------------------------
@@ -541,13 +573,24 @@ namespace PokemonAutomation {
             // ---------------------------------------------------------------------------
 
             void catch_1_pokemon(
+                SingleSwitchProgramEnvironment& env,
                 VideoStream& stream,
                 ProControllerContext& context
             ) {
                 stream.log("[AutoStory] Starting catch_1_pokemon helper...", COLOR_BLUE);
 
+                // Save once before attempting to catch. On failure the game
+                // resets back to this save, so the save lives outside the loop.
+                stream.log("[AutoStory] Saving game before catch attempt...", COLOR_BLUE);
+                save_game(stream, context);
                 context.wait_for_all_requests();
                 pbf_wait(context, 1000ms);
+
+                // -------------------------------------------------------
+                // Mini-checkpoint loop: retry from the save above if we
+                // run out of balls or our Pokemon faints.
+                // -------------------------------------------------------
+                while (true) {
 
                 BlackScreenWatcher battle_start;
                 BattleMenuWatcher battle_menu(BattleType::STANDARD, COLOR_YELLOW);
@@ -615,10 +658,11 @@ namespace PokemonAutomation {
 
                 if (menu_ret < 0) {
                     stream.log(
-                        "[AutoStory] Failed to detect battle menu.",
+                        "[AutoStory] Failed to detect battle menu. Resetting to checkpoint...",
                         COLOR_RED
                     );
-                    return;
+                    reset_game_from_home(env, env.console, context, true);
+                    continue;
                 }
 
                 stream.log("[AutoStory] Battle menu detected.", COLOR_GREEN);
@@ -626,7 +670,7 @@ namespace PokemonAutomation {
                 context.wait_for_all_requests();
                 pbf_wait(context, 500ms);
 
-                // Catch the pokemon.
+                // --- Throw balls ---
                 CatchResults result = basic_catcher(
                     stream,
                     context,
@@ -638,26 +682,81 @@ namespace PokemonAutomation {
                 switch (result.result) {
                 case CatchResult::POKEMON_CAUGHT:
                     stream.log(
-                        "[AutoStory] Pokemon successfully caught.",
+                        "[AutoStory] Pokemon successfully caught after " +
+                        std::to_string(result.balls_used) + " ball(s).",
                         COLOR_GREEN
                     );
-                    break;
+                    {
+                        OverworldWatcher overworld;
+                        run_until<ProControllerContext>(
+                            stream, context,
+                            [](ProControllerContext& ctx) {
+                                pbf_mash_button(ctx, BUTTON_B, 120000ms);
+                            },
+                            {{overworld}}
+                        );
+                    }
+                    return;
+
+                case CatchResult::POKEMON_FAINTED:
+                    stream.log("[AutoStory] Wild Pokemon fainted. Exiting battle.", COLOR_ORANGE);
+                    {
+                        OverworldWatcher overworld;
+                        run_until<ProControllerContext>(
+                            stream, context,
+                            [](ProControllerContext& ctx) {
+                                pbf_mash_button(ctx, BUTTON_B, 120000ms);
+                            },
+                            {{overworld}}
+                        );
+                    }
+                    return;
+
+                case CatchResult::OUT_OF_BALLS:
+                    stream.log(
+                        "[AutoStory] Ran out of Poke Balls after " +
+                        std::to_string(result.balls_used) + " throw(s). Resetting to checkpoint...",
+                        COLOR_RED
+                    );
+                    reset_game_from_home(env, env.console, context, true);
+                    continue;
+
+                case CatchResult::OWN_FAINTED:
+                    stream.log(
+                        "[AutoStory] Own Pokemon fainted. Resetting to checkpoint...",
+                        COLOR_RED
+                    );
+                    reset_game_from_home(env, env.console, context, true);
+                    continue;
+
+                case CatchResult::BALL_LIMIT_REACHED:
+                    stream.log(
+                        "[AutoStory] Ball limit reached (" +
+                        std::to_string(result.balls_used) + " throw(s)). Resetting to checkpoint...",
+                        COLOR_RED
+                    );
+                    reset_game_from_home(env, env.console, context, true);
+                    continue;
+
+                case CatchResult::CANNOT_THROW_BALL:
+                    stream.log(
+                        "[AutoStory] Cannot throw ball (menu timing issue). Resetting to checkpoint...",
+                        COLOR_RED
+                    );
+                    reset_game_from_home(env, env.console, context, true);
+                    continue;
 
                 default:
                     stream.log(
-                        "[AutoStory] Catch attempt failed.",
-                        COLOR_ORANGE
+                        "[AutoStory] Catch timed out after " +
+                        std::to_string(result.balls_used) + " ball(s). Resetting to checkpoint...",
+                        COLOR_RED
                     );
-                    break;
+                    reset_game_from_home(env, env.console, context, true);
+                    continue;
                 }
 
-                context.wait_for_all_requests();
-
-                // Force clear any remaining text boxes / summaries.
-                pbf_mash_button(context, BUTTON_B, 15000ms);
-
-                context.wait_for_all_requests();
-                pbf_wait(context, 2000ms);
+                } // end while(true)
             }
 
             // ---------------------------------------------------------------------------
@@ -713,27 +812,48 @@ namespace PokemonAutomation {
                             COLOR_ORANGE
                         );
 
+                        // If battle_ret == 0 (black screen transition), wait for the
+                        // battle menu to fully appear before attempting to navigate.
+                        if (battle_ret == 0) {
+                            BattleMenuWatcher wait_for_menu(BattleType::STANDARD, COLOR_YELLOW);
+                            wait_until(stream, context, 10s, {{wait_for_menu}});
+                            context.wait_for_all_requests();
+                        }
+
                         bool escaped = false;
                         auto deadline = std::chrono::steady_clock::now() + 30s;
 
                         while (std::chrono::steady_clock::now() < deadline) {
 
-                            // Advance text.
-                            pbf_press_button(context, BUTTON_B, 40ms, 120ms);
+                            // Advance any dialog / transition text.
+                            pbf_press_button(context, BUTTON_B, 40ms, 200ms);
                             context.wait_for_all_requests();
 
-                            // Move cursor to Run.
-                            pbf_move_left_joystick(context, {0, 1}, 80ms, 80ms);
+                            // Wait for the action-selection menu to be visible before navigating.
+                            BattleMenuWatcher menu_ready(BattleType::STANDARD, COLOR_YELLOW);
+                            if (wait_until(stream, context, 3s, {{menu_ready}}) != 0) {
+                                // Menu not yet visible, loop again.
+                                continue;
+                            }
+
+                            // Navigate to Run. Menu is 1x4 (Fight/Bag/Pokemon/Run) and wraps,
+                            // so pressing up once from Fight lands on Run.
+                            pbf_move_left_joystick(context, {0, -1}, 80ms, 80ms);
 
                             // Select Run.
-                            pbf_press_button(context, BUTTON_A, 60ms, 180ms);
+                            pbf_press_button(context, BUTTON_A, 60ms, 0ms);
                             context.wait_for_all_requests();
 
+                            // Watch for escape success or "can't escape" return to menu.
                             EndBattleWatcher battle_end;
-                            if (wait_until(stream, context, 1500ms, {{battle_end}}) == 0) {
+                            BattleMenuWatcher back_to_menu(BattleType::STANDARD, COLOR_YELLOW);
+                            int run_result = wait_until(stream, context, 4s, {{battle_end}, {back_to_menu}});
+                            if (run_result == 0) {
                                 escaped = true;
                                 break;
                             }
+                            // run_result == 1: failed to run, back at battle menu - retry.
+                            // run_result == -1: timed out - retry.
                         }
 
                     if (!escaped) {
@@ -751,9 +871,9 @@ namespace PokemonAutomation {
                         );
                     }
 
-                    // Let overworld stabilize.
-                    context.wait_for_all_requests();
-                    context.wait_for(1000ms);
+                    // Wait until truly back in the overworld before the next step.
+                    OverworldWatcher overworld;
+                    wait_until(stream, context, 5s, {{overworld}});
                 }
             }
 
@@ -794,40 +914,45 @@ namespace PokemonAutomation {
 
                 if (battle_ret >= 0) {
                     stream.log(
-                        "[AutoStory] battle detected during movement. ret = " + std::to_string(battle_ret),
+                        "[AutoStory] Battle detected during movement.",
                         COLOR_ORANGE
                     );
+
+                    if (battle_ret == 0) {
+                        BattleMenuWatcher wait_for_menu(BattleType::STANDARD, COLOR_YELLOW);
+                        wait_until(stream, context, 10s, {{wait_for_menu}});
+                        context.wait_for_all_requests();
+                    }
 
                     bool escaped = false;
                     auto deadline = std::chrono::steady_clock::now() + 30s;
 
                     while (std::chrono::steady_clock::now() < deadline) {
-                        // Spam escape inputs
-                        pbf_press_button(context, BUTTON_B, 40ms, 120ms);
+                        pbf_press_button(context, BUTTON_B, 40ms, 200ms);
                         context.wait_for_all_requests();
 
-                        pbf_move_left_joystick(context, { 0, 1 }, 80ms, 80ms); // down
-                        pbf_press_button(context, BUTTON_A, 60ms, 180ms);
+                        BattleMenuWatcher menu_ready(BattleType::STANDARD, COLOR_YELLOW);
+                        if (wait_until(stream, context, 3s, {{menu_ready}}) != 0) {
+                            continue;
+                        }
+
+                        // Press up once to wrap from Fight to Run.
+                        pbf_move_left_joystick(context, { 0, -1 }, 80ms, 80ms);
+
+                        pbf_press_button(context, BUTTON_A, 60ms, 0ms);
                         context.wait_for_all_requests();
 
                         EndBattleWatcher battle_end;
-                        if (wait_until(stream, context, 1500ms, { {battle_end} }) == 0) {
+                        BattleMenuWatcher back_to_menu(BattleType::STANDARD, COLOR_YELLOW);
+                        int run_result = wait_until(stream, context, 4s, {{battle_end}, {back_to_menu}});
+                        if (run_result == 0) {
                             escaped = true;
                             break;
                         }
                     }
 
-                    // Light text advance
-                    pbf_press_button(context, BUTTON_B, 40ms, 120ms);
-                    context.wait_for_all_requests();
-
-                    // Reposition cursor on "Run"
-                    pbf_move_left_joystick(context, { 0, 1 }, 80ms, 80ms);
-                    pbf_press_button(context, BUTTON_A, 60ms, 180ms);
-                    context.wait_for_all_requests();
-
                     if (!escaped) {
-                        stream.log("[AutoStory] run_from_battle failed. Exiting to HOME.", COLOR_RED);
+                        stream.log("[AutoStory] Failed to run from battle.", COLOR_RED);
 
                         pbf_press_button(context, BUTTON_HOME, 80ms, 1200ms);
                         pbf_press_button(context, BUTTON_X, 80ms, 300ms);
@@ -840,9 +965,9 @@ namespace PokemonAutomation {
                         );
                     }
 
-                    // Critical: let overworld stabilize before next step
-                    context.wait_for_all_requests();
-                    context.wait_for(1000ms);
+                    // Wait until truly back in the overworld before the next step.
+                    OverworldWatcher overworld;
+                    wait_until(stream, context, 5s, {{overworld}});
 
                     continue;
                 }
@@ -882,40 +1007,45 @@ namespace PokemonAutomation {
 
                 if (battle_ret >= 0) {
                     stream.log(
-                        "[AutoStory] battle detected during movement. ret = " + std::to_string(battle_ret),
+                        "[AutoStory] Battle detected during movement.",
                         COLOR_ORANGE
                     );
+
+                    if (battle_ret == 0) {
+                        BattleMenuWatcher wait_for_menu(BattleType::STANDARD, COLOR_YELLOW);
+                        wait_until(stream, context, 10s, {{wait_for_menu}});
+                        context.wait_for_all_requests();
+                    }
 
                     bool escaped = false;
                     auto deadline = std::chrono::steady_clock::now() + 30s;
 
                     while (std::chrono::steady_clock::now() < deadline) {
-                    // Spam escape inputs
-                        pbf_press_button(context, BUTTON_B, 40ms, 120ms);
+                        pbf_press_button(context, BUTTON_B, 40ms, 200ms);
                         context.wait_for_all_requests();
 
-                        pbf_move_left_joystick(context, { 0, 1 }, 80ms, 80ms); // down
-                        pbf_press_button(context, BUTTON_A, 60ms, 180ms);
+                        BattleMenuWatcher menu_ready(BattleType::STANDARD, COLOR_YELLOW);
+                        if (wait_until(stream, context, 3s, {{menu_ready}}) != 0) {
+                            continue;
+                        }
+
+                        // Press up once to wrap from Fight to Run.
+                        pbf_move_left_joystick(context, { 0, -1 }, 80ms, 80ms);
+
+                        pbf_press_button(context, BUTTON_A, 60ms, 0ms);
                         context.wait_for_all_requests();
 
                         EndBattleWatcher battle_end;
-                        if (wait_until(stream, context, 1500ms, { {battle_end} }) == 0) {
+                        BattleMenuWatcher back_to_menu(BattleType::STANDARD, COLOR_YELLOW);
+                        int run_result = wait_until(stream, context, 4s, {{battle_end}, {back_to_menu}});
+                        if (run_result == 0) {
                             escaped = true;
                             break;
                         }
                     }
 
-                    // Light text advance
-                    pbf_press_button(context, BUTTON_B, 40ms, 120ms);
-                    context.wait_for_all_requests();
-
-                    // Reposition cursor on "Run"
-                    pbf_move_left_joystick(context, { 0, 1 }, 80ms, 80ms);
-                    pbf_press_button(context, BUTTON_A, 60ms, 180ms);
-                    context.wait_for_all_requests();
-
                     if (!escaped) {
-                        stream.log("[AutoStory] run_from_battle failed. Exiting to HOME.", COLOR_RED);
+                        stream.log("[AutoStory] Failed to run from battle.", COLOR_RED);
 
                         pbf_press_button(context, BUTTON_HOME, 80ms, 1200ms);
                         pbf_press_button(context, BUTTON_X, 80ms, 300ms);
@@ -923,14 +1053,14 @@ namespace PokemonAutomation {
 
                         throw OperationFailedException(
                             ErrorReport::SEND_ERROR_REPORT,
-                            "Failed to run from battle while moving right.",
+                            "Failed to run from battle while moving up.",
                             stream
                         );
                     }
 
-                    // Critical: let overworld stabilize before next step
-                    context.wait_for_all_requests();
-                    context.wait_for(1000ms);
+                    // Wait until truly back in the overworld before the next step.
+                    OverworldWatcher overworld;
+                    wait_until(stream, context, 5s, {{overworld}});
 
                     continue;
                 }
@@ -969,40 +1099,45 @@ namespace PokemonAutomation {
 
                     if (battle_ret >= 0) {
                         stream.log(
-                            "[AutoStory] battle detected during movement. ret = " + std::to_string(battle_ret),
+                            "[AutoStory] Battle detected during movement.",
                             COLOR_ORANGE
                         );
+
+                        if (battle_ret == 0) {
+                            BattleMenuWatcher wait_for_menu(BattleType::STANDARD, COLOR_YELLOW);
+                            wait_until(stream, context, 10s, {{wait_for_menu}});
+                            context.wait_for_all_requests();
+                        }
 
                         bool escaped = false;
                         auto deadline = std::chrono::steady_clock::now() + 30s;
 
                         while (std::chrono::steady_clock::now() < deadline) {
-                            // Spam escape inputs
-                            pbf_press_button(context, BUTTON_B, 40ms, 120ms);
+                            pbf_press_button(context, BUTTON_B, 40ms, 200ms);
                             context.wait_for_all_requests();
 
-                            pbf_move_left_joystick(context, { 0, 1 }, 80ms, 80ms); // down
-                            pbf_press_button(context, BUTTON_A, 60ms, 180ms);
+                            BattleMenuWatcher menu_ready(BattleType::STANDARD, COLOR_YELLOW);
+                            if (wait_until(stream, context, 3s, {{menu_ready}}) != 0) {
+                                continue;
+                            }
+
+                            // Press up once to wrap from Fight to Run.
+                            pbf_move_left_joystick(context, { 0, -1 }, 80ms, 80ms);
+
+                            pbf_press_button(context, BUTTON_A, 60ms, 0ms);
                             context.wait_for_all_requests();
 
                             EndBattleWatcher battle_end;
-                            if (wait_until(stream, context, 1500ms, { {battle_end} }) == 0) {
+                            BattleMenuWatcher back_to_menu(BattleType::STANDARD, COLOR_YELLOW);
+                            int run_result = wait_until(stream, context, 4s, {{battle_end}, {back_to_menu}});
+                            if (run_result == 0) {
                                 escaped = true;
                                 break;
                             }
                         }
 
-                        // Light text advance
-                        pbf_press_button(context, BUTTON_B, 40ms, 120ms);
-                        context.wait_for_all_requests();
-
-                        // Reposition cursor on "Run"
-                        pbf_move_left_joystick(context, { 0, 1 }, 80ms, 80ms);
-                        pbf_press_button(context, BUTTON_A, 60ms, 180ms);
-                        context.wait_for_all_requests();
-
                         if (!escaped) {
-                            stream.log("[AutoStory] run_from_battle failed. Exiting to HOME.", COLOR_RED);
+                            stream.log("[AutoStory] Failed to run from battle.", COLOR_RED);
 
                             pbf_press_button(context, BUTTON_HOME, 80ms, 1200ms);
                             pbf_press_button(context, BUTTON_X, 80ms, 300ms);
@@ -1015,9 +1150,9 @@ namespace PokemonAutomation {
                             );
                         }
 
-                        // Critical: let overworld stabilize before next step
-                        context.wait_for_all_requests();
-                        context.wait_for(1000ms);
+                        // Wait until truly back in the overworld before the next step.
+                        OverworldWatcher overworld;
+                        wait_until(stream, context, 5s, {{overworld}});
 
                         continue;
                     }
@@ -1056,40 +1191,45 @@ namespace PokemonAutomation {
 
                     if (battle_ret >= 0) {
                         stream.log(
-                            "[AutoStory] battle detected during movement. ret = " + std::to_string(battle_ret),
+                            "[AutoStory] Battle detected during movement.",
                             COLOR_ORANGE
                         );
+
+                        if (battle_ret == 0) {
+                            BattleMenuWatcher wait_for_menu(BattleType::STANDARD, COLOR_YELLOW);
+                            wait_until(stream, context, 10s, {{wait_for_menu}});
+                            context.wait_for_all_requests();
+                        }
 
                         bool escaped = false;
                         auto deadline = std::chrono::steady_clock::now() + 30s;
 
                         while (std::chrono::steady_clock::now() < deadline) {
-                            // Spam escape inputs
-                            pbf_press_button(context, BUTTON_B, 40ms, 120ms);
+                            pbf_press_button(context, BUTTON_B, 40ms, 200ms);
                             context.wait_for_all_requests();
 
-                            pbf_move_left_joystick(context, { 0, 1 }, 80ms, 80ms); // down
-                            pbf_press_button(context, BUTTON_A, 60ms, 180ms);
+                            BattleMenuWatcher menu_ready(BattleType::STANDARD, COLOR_YELLOW);
+                            if (wait_until(stream, context, 3s, {{menu_ready}}) != 0) {
+                                continue;
+                            }
+
+                            // Press up once to wrap from Fight to Run.
+                            pbf_move_left_joystick(context, { 0, -1 }, 80ms, 80ms);
+
+                            pbf_press_button(context, BUTTON_A, 60ms, 0ms);
                             context.wait_for_all_requests();
 
                             EndBattleWatcher battle_end;
-                            if (wait_until(stream, context, 1500ms, { {battle_end} }) == 0) {
+                            BattleMenuWatcher back_to_menu(BattleType::STANDARD, COLOR_YELLOW);
+                            int run_result = wait_until(stream, context, 4s, {{battle_end}, {back_to_menu}});
+                            if (run_result == 0) {
                                 escaped = true;
                                 break;
                             }
                         }
 
-                        // Light text advance
-                        pbf_press_button(context, BUTTON_B, 40ms, 120ms);
-                        context.wait_for_all_requests();
-
-                        // Reposition cursor on "Run"
-                        pbf_move_left_joystick(context, { 0, 1 }, 80ms, 80ms);
-                        pbf_press_button(context, BUTTON_A, 60ms, 180ms);
-                        context.wait_for_all_requests();
-
                         if (!escaped) {
-                            stream.log("[AutoStory] run_from_battle failed. Exiting to HOME.", COLOR_RED);
+                            stream.log("[AutoStory] Failed to run from battle.", COLOR_RED);
 
                             pbf_press_button(context, BUTTON_HOME, 80ms, 1200ms);
                             pbf_press_button(context, BUTTON_X, 80ms, 300ms);
@@ -1097,14 +1237,14 @@ namespace PokemonAutomation {
 
                             throw OperationFailedException(
                                 ErrorReport::SEND_ERROR_REPORT,
-                                "Failed to run from battle while moving right.",
+                                "Failed to run from battle while moving left.",
                                 stream
                             );
                         }
 
-                        // Critical: let overworld stabilize before next step
-                        context.wait_for_all_requests();
-                        context.wait_for(1000ms);
+                        // Wait until truly back in the overworld before the next step.
+                        OverworldWatcher overworld;
+                        wait_until(stream, context, 5s, {{overworld}});
 
                         continue;
                     }
@@ -1143,40 +1283,45 @@ namespace PokemonAutomation {
 
                     if (battle_ret >= 0) {
                         stream.log(
-                            "[AutoStory] battle detected during movement. ret = " + std::to_string(battle_ret),
+                            "[AutoStory] Battle detected during movement.",
                             COLOR_ORANGE
                         );
+
+                        if (battle_ret == 0) {
+                            BattleMenuWatcher wait_for_menu(BattleType::STANDARD, COLOR_YELLOW);
+                            wait_until(stream, context, 10s, {{wait_for_menu}});
+                            context.wait_for_all_requests();
+                        }
 
                         bool escaped = false;
                         auto deadline = std::chrono::steady_clock::now() + 30s;
 
                         while (std::chrono::steady_clock::now() < deadline) {
-                            // Spam escape inputs
-                            pbf_press_button(context, BUTTON_B, 40ms, 120ms);
+                            pbf_press_button(context, BUTTON_B, 40ms, 200ms);
                             context.wait_for_all_requests();
 
-                            pbf_move_left_joystick(context, { 0, 1 }, 80ms, 80ms);
-                            pbf_press_button(context, BUTTON_A, 60ms, 180ms);
+                            BattleMenuWatcher menu_ready(BattleType::STANDARD, COLOR_YELLOW);
+                            if (wait_until(stream, context, 3s, {{menu_ready}}) != 0) {
+                                continue;
+                            }
+
+                            // Press up once to wrap from Fight to Run.
+                            pbf_move_left_joystick(context, { 0, -1 }, 80ms, 80ms);
+
+                            pbf_press_button(context, BUTTON_A, 60ms, 0ms);
                             context.wait_for_all_requests();
 
                             EndBattleWatcher battle_end;
-                            if (wait_until(stream, context, 1500ms, { {battle_end} }) == 0) {
+                            BattleMenuWatcher back_to_menu(BattleType::STANDARD, COLOR_YELLOW);
+                            int run_result = wait_until(stream, context, 4s, {{battle_end}, {back_to_menu}});
+                            if (run_result == 0) {
                                 escaped = true;
                                 break;
                             }
                         }
 
-                        // Light text advance
-                        pbf_press_button(context, BUTTON_B, 40ms, 120ms);
-                        context.wait_for_all_requests();
-
-                        // Reposition cursor on "Run"
-                        pbf_move_left_joystick(context, { 0, 1 }, 80ms, 80ms);
-                        pbf_press_button(context, BUTTON_A, 60ms, 180ms);
-                        context.wait_for_all_requests();
-
                         if (!escaped) {
-                            stream.log("[AutoStory] run_from_battle failed. Exiting to HOME.", COLOR_RED);
+                            stream.log("[AutoStory] Failed to run from battle.", COLOR_RED);
 
                             pbf_press_button(context, BUTTON_HOME, 80ms, 1200ms);
                             pbf_press_button(context, BUTTON_X, 80ms, 300ms);
@@ -1184,14 +1329,14 @@ namespace PokemonAutomation {
 
                             throw OperationFailedException(
                                 ErrorReport::SEND_ERROR_REPORT,
-                                "Failed to run from battle while moving right.",
+                                "Failed to run from battle while moving up.",
                                 stream
                             );
                         }
 
-                        // Critical: let overworld stabilize before next step
-                        context.wait_for_all_requests();
-                        context.wait_for(1000ms);
+                        // Wait until truly back in the overworld before the next step.
+                        OverworldWatcher overworld;
+                        wait_until(stream, context, 5s, {{overworld}});
 
                         continue;
                     }
