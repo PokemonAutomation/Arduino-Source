@@ -54,6 +54,7 @@ namespace PokemonAutomation {
             // ---------------------------------------------------------------------------
 
             void catch_1_pokemon(
+                SingleSwitchProgramEnvironment& env,
                 VideoStream& stream,
                 ProControllerContext& context
             );

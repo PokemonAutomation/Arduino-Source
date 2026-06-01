@@ -397,6 +397,7 @@ std::string fly_point_name(FlyPoint place) {
         case FlyPoint::TwinleafTown:       return "twinleaf_town";
         case FlyPoint::VeilstoneCity:      return "veilstone_city";
     }
+    return "unknown";
 }
 
 bool fly_to(
