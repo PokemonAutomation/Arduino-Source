@@ -51,7 +51,23 @@ std::unique_ptr<StatsTracker> RngHelper_Descriptor::make_stats() const{
 }
 
 RngHelper::RngHelper()
-    : m_target_settings(
+    : m_game_info(
+        "<font size=4><b>Game Information</b></font>"
+    )
+    , LANGUAGE(
+        "<b>Game Language:</b>",
+        {
+            Language::English,
+            Language::Japanese,
+            Language::Spanish,
+            Language::French,
+            Language::German,
+            Language::Italian,
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
+    , m_target_settings(
         "<font size=4><b>Target Settings</b></font> — Get these from an RNG search tool"
     )
     , TARGET(
@@ -87,7 +103,7 @@ RngHelper::RngHelper()
             {PokemonFRLG_RngTarget::safarizonewest, "safarizonewest", "Safari Zone West (Sweet Scent)"},
             {PokemonFRLG_RngTarget::safarizonesurf, "safarizonesurf", "Safari Zone Surfing"},
             {PokemonFRLG_RngTarget::safarizonefish, "safarizonefish", "Safari Zone Fishing"},
-            // {PokemonFRLG_RngTarget::roaming, "roaming", "Roaming Legendaries"}
+            {PokemonFRLG_RngTarget::roaming, "roaming", "Roaming Legendaries"}
         },
         LockMode::LOCK_WHILE_RUNNING,
         PokemonFRLG_RngTarget::starters
@@ -199,6 +215,8 @@ RngHelper::RngHelper()
         &NOTIFICATION_PROGRAM_FINISH,
     })
 {
+    PA_ADD_OPTION(m_game_info);
+    PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(m_target_settings);
     PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(SEED_BUTTON);
@@ -285,7 +303,7 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         stats.resets++;
 
         // detect shinies
-        shiny_found = check_for_shiny(env.console, context, TARGET);
+        shiny_found = check_for_shiny(env.console, context, TARGET, LANGUAGE);
         if (shiny_found){
             env.log("Shiny found!");
             stats.shinies++;

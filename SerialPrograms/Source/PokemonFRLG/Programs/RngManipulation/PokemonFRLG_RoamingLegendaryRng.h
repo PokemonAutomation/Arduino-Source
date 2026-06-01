@@ -1,36 +1,41 @@
-/*  RNG Helper
+/*  Roaming Legendary RNG
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_PokemonFRLG_RngHelper_H
-#define PokemonAutomation_PokemonFRLG_RngHelper_H
+#ifndef PokemonAutomation_PokemonFRLG_RoamingLegendaryRng_H
+#define PokemonAutomation_PokemonFRLG_RoamingLegendaryRng_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/TextEditOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
+#include "Pokemon/Pokemon_StatsCalculation.h"
+#include "Pokemon/Pokemon_AdvRng.h"
 #include "PokemonFRLG_BlindNavigation.h"
+#include "PokemonFRLG_RngCalibration.h"
+#include "PokemonFRLG_RngDisplays.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
 
-class RngHelper_Descriptor : public SingleSwitchProgramDescriptor{
+class RoamingLegendaryRng_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-    RngHelper_Descriptor();
+    RoamingLegendaryRng_Descriptor();
     struct Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class RngHelper : public SingleSwitchProgramInstance{
+class RoamingLegendaryRng : public SingleSwitchProgramInstance{
 public:
-    RngHelper();
+    RoamingLegendaryRng();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
     virtual void start_program_border_check(
         VideoStream& stream,
@@ -38,23 +43,31 @@ public:
     ) override{}
 
 private:
+
+    bool have_hit_target(SingleSwitchProgramEnvironment& env, const uint32_t& TARGET_SEED, const AdvRngState& hit);
+    
+    SectionDividerOption m_calibration_displays;
+    RngTargetDisplay RNG_TARGET;
+    RngFilterDisplay RNG_FILTERS;
+    RngCalibrationDisplay RNG_CALIBRATION;
+
     SectionDividerOption m_game_info;
     OCR::LanguageOCROption LANGUAGE;
 
     SectionDividerOption m_target_settings;
     EnumDropdownOption<PokemonFRLG_RngTarget> TARGET;
+    StringOption SEED; 
+    TextEditOption SEED_LIST;
     EnumDropdownOption<SeedButton> SEED_BUTTON;
     EnumDropdownOption<BlackoutButton> EXTRA_BUTTON;
     SimpleIntegerOption<uint64_t> SEED_DELAY;
-    SimpleIntegerOption<int64_t> SEED_CALIBRATION;
-    SimpleIntegerOption<uint64_t> CONTINUE_SCREEN_FRAMES;
-    FloatingPointOption CONTINUE_SCREEN_CALIBRATION;
-    SimpleIntegerOption<uint64_t> INGAME_ADVANCES;
-    FloatingPointOption INGAME_CALIBRATION;
+    SimpleIntegerOption<uint64_t>ADVANCES;
 
     SectionDividerOption m_program_settings;
     BooleanCheckBoxOption USE_TEACHY_TV;
-    SimpleIntegerOption<uint64_t> NUM_RESETS;
+    SimpleIntegerOption<uint64_t> MAX_RESETS;
+    SimpleIntegerOption<uint64_t> MAX_RARE_CANDIES;
+    SimpleIntegerOption<uint64_t> MAX_BALL_THROWS;
     SimpleIntegerOption<uint8_t> PROFILE;
 
     BooleanCheckBoxOption TAKE_VIDEO;
@@ -68,6 +81,3 @@ private:
 }
 }
 #endif
-
-
-
