@@ -817,14 +817,14 @@ static bool heal_small_house_route_216(
             const ImageFloatBox box{0.670000, 0.600000, 0.100000, 0.150000};
             SelectionArrowFinder arrow(stream.overlay(), box, COLOR_GREEN);
 
-            int ret = run_until<ProControllerContext>(
+            int arrow_ret = run_until<ProControllerContext>(
                 stream, context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 10000ms);
                 },
                 {{arrow}}
             );
-            if (ret != 0){
+            if (arrow_ret != 0){
                 stream.log("heal_small_house_route_216_sleep_in_a_bed: selection arrow not found.", COLOR_RED);
                 return false;
             }
