@@ -119,48 +119,16 @@ RngTimings prepare_timings(
         TEACHY_ADVANCES = uint64_t((int)std::floor((modified_ingame_advances - TEACHY_TV_BUFFER + 7500) / 313) * 313);
     }
 
-<<<<<<< HEAD
-    double seed_delay = SEED_DELAY + calibrations.seed_offset + FIXED_SEED_OFFSET;
-=======
     console.log("Seed calibration (frames): " + std::to_string(calibrations.seed_offset));
     console.log("CSF calibration (frames): " + std::to_string(calibrations.csf_offset));
     console.log("In-game calibration (frames x2): " + std::to_string(calibrations.ingame_offset));
 
     double seed_delay = SEED_DELAY + (calibrations.seed_offset * FRLG_FRAME_DURATION) + FIXED_SEED_OFFSET;
->>>>>>> main
     double csf_delay = (CONTINUE_SCREEN_FRAMES + calibrations.csf_offset) * FRLG_FRAME_DURATION;
     double teachy_delay = TEACHY_ADVANCES * FRLG_FRAME_DURATION / 313;
     double ingame_delay = (modified_ingame_advances - TEACHY_ADVANCES) * FRLG_FRAME_DURATION / 2 - (should_use_teachy_tv ? 14067 : 0);
 
     if (seed_delay < 0){
-<<<<<<< HEAD
-        OperationFailedException::fire(
-            ErrorReport::NO_ERROR_REPORT,
-            "prepare_timings(): seed delay cannot be negative. Check your calibration values.",
-            console
-        ); 
-    }
-        if (csf_delay < 0){
-        OperationFailedException::fire(
-            ErrorReport::NO_ERROR_REPORT,
-            "prepare_timings(): CSF duration cannot be negative. Check your calibration values.",
-            console
-        ); 
-    }
-        if (teachy_delay < 0){
-        OperationFailedException::fire(
-            ErrorReport::NO_ERROR_REPORT,
-            "prepare_timings(): Teachy TV duration cannot be negative. Check your calibration values.",
-            console
-        ); 
-    }
-    if (ingame_delay < 0){
-        OperationFailedException::fire(
-            ErrorReport::NO_ERROR_REPORT,
-            "prepare_timings(): in-game duration cannot be negative. Check your calibration values.",
-            console
-        ); 
-=======
         throw UserSetupError(console, "prepare_timings(): seed delay cannot be negative. Check your calibration values.");
     }
         if (csf_delay < 0){
@@ -171,7 +139,6 @@ RngTimings prepare_timings(
     }
     if (ingame_delay < 0){
         throw UserSetupError(console, "prepare_timings(): in-game duration cannot be negative. Check your calibration values.");
->>>>>>> main
     }
 
     RngTimings timings;
