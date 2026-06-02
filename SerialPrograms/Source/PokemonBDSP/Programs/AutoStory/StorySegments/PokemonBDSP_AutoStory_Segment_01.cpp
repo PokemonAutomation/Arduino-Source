@@ -250,7 +250,8 @@ namespace PokemonAutomation {
                     [&](size_t /*attempt*/) {
                         jubilife_to_oreburgh_gate(env, env.console, context);
                         oreburgh_gate_nav(env, env.console, context);
-                    }
+                    },
+                    true
                 );
             }
 
@@ -286,7 +287,9 @@ namespace PokemonAutomation {
                         //#. Oreburgh Gym navigation and battle
                         gym_Puzzle_01(env, env.console, context);
 
-                    }
+                    },
+
+                    true
                 );
             }
 

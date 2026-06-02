@@ -44,6 +44,7 @@ struct AutoStoryStats : public StatsTracker{
     std::atomic<uint64_t>& m_checkpoint;
     std::atomic<uint64_t>& m_segment;
     std::atomic<uint64_t>& m_reset;
+    bool m_first_run = true;
 };
 
 
@@ -263,6 +264,7 @@ enum class FlyPoint {
     SunyshoreCity,
     TwinleafTown,
     VeilstoneCity,
+    CurrentCity,    // cursor already starts on the city; skip all map navigation
 };
 
 std::string fly_point_name(FlyPoint place);

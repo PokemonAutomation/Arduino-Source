@@ -1480,7 +1480,8 @@ void checkpoint_067(SingleSwitchProgramEnvironment& env, ProControllerContext& c
             if (!go_to_pastoria_pokemon_center(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "go_to_pastoria_pokemon_center: transition not detected.", env.console);
             }
-        }
+        },
+        true
     );
 }
 
