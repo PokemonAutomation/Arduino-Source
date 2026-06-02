@@ -58,7 +58,8 @@ void checkpoint_022(
     checkpoint_reattempt_loop(env, context, options.notif_status_update, stats,
         [&](size_t /*attempt*/){
             // TODO: implement Segment 09 gameplay logic
-        }
+        },
+        true
     );
 }
 

@@ -185,8 +185,11 @@ void checkpoint_reattempt_loop(
 
     for (size_t i = 0;; i++){
         try{
-            if (i == 0 && save){
-                checkpoint_save(env, context, notif_status_update, stats);
+            if (i == 0){
+                if (save || stats.m_first_run){
+                    checkpoint_save(env, context, notif_status_update, stats);
+                }
+                stats.m_first_run = false;
             }
 
             action(i);
@@ -368,6 +371,7 @@ std::string fly_point_name(FlyPoint place) {
         case FlyPoint::SunyshoreCity:      return "sunyshore_city";
         case FlyPoint::TwinleafTown:       return "twinleaf_town";
         case FlyPoint::VeilstoneCity:      return "veilstone_city";
+        case FlyPoint::CurrentCity:        return "current_city";
     }
     return "unknown";
 }
@@ -387,6 +391,38 @@ bool fly_to(
     context.wait_for_all_requests();
     pbf_wait(context, 1000ms);
     open_menu(stream, context, MenuCursorPosition::MAP, 8);
+
+    if (place == FlyPoint::CurrentCity) {
+        ImageFloatBox button_a_box{0.540000, 0.960000, 0.070000, 0.035000};
+        struct FlyAButtonDetector : VisualInferenceCallback {
+            ImageFloatBox m_box;
+            FlyAButtonDetector(const ImageFloatBox& box)
+                : VisualInferenceCallback("FlyAButtonDetector"), m_box(box) {}
+            void make_overlays(VideoOverlaySet&) const override {}
+            bool process_frame(const ImageViewRGB32& frame, WallClock) override {
+                ImageStats s = image_stats(extract_box_reference(frame, m_box));
+                return s.stddev.sum() > 30.0;
+            }
+        };
+        FlyAButtonDetector watcher(button_a_box);
+        int ret = wait_until(stream, context, 3000ms, {{watcher}});
+        if (ret < 0) {
+            stream.log("CurrentCity: A button not found.", COLOR_RED);
+            return false;
+        }
+        BlackScreenOverWatcher flying_black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
+        int fly_ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){ pbf_mash_button(context, BUTTON_A, 200000ms); },
+            {{flying_black_screen}}
+        );
+        if (fly_ret < 0) {
+            stream.log("CurrentCity: black screen not detected!", COLOR_RED);
+            return false;
+        }
+        stream.log("CurrentCity: black screen detected, arrived.", COLOR_GREEN);
+        return true;
+    }
 
     switch (place) {
         case FlyPoint::CelesticTown:
@@ -483,6 +519,8 @@ bool fly_to(
             city_icon_box = {0.829000, 0.537000, 0.017000, 0.054000};
             repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 8, false);
             repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 10, false);
+            break;
+        case FlyPoint::CurrentCity:
             break;
     }
 

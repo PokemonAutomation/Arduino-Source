@@ -763,7 +763,8 @@ namespace PokemonAutomation {
                 [&](size_t /*attempt*/) {
                     // Segment 00-00: Intro and starter selection
                     tutorial_part_1_navigation(env, env.console, context);
-                }
+                },
+                true
             );
         }
         static void checkpoint_001(
@@ -784,6 +785,8 @@ namespace PokemonAutomation {
                     }
                     //Fight Starly
                     fight_starly(env.console, context);
+                },
+                true
 					post_starly_clenaup(env.console, context);
                 }
             );
@@ -798,7 +801,8 @@ namespace PokemonAutomation {
                 [&](size_t /*attempt*/) {
                     // Segment 00-002: Pokedex acquisition
                     tutorial_part_2_navigation(env, env.console, context);
-                }
+                },
+                true
             );
         }
         static void checkpoint_003(
@@ -811,7 +815,8 @@ namespace PokemonAutomation {
                 [&](size_t /*attempt*/) {
                     // Segment 00-003: Poketech acquisition
                     tutorial_part_3_navigation(env, env.console, context);
-                }
+                },
+                true
             );
         }
         static void checkpoint_004(
@@ -824,7 +829,8 @@ namespace PokemonAutomation {
                 [&](size_t /*attempt*/) {
                     // Segment 00-004: Poketech acquisition
                     tutorial_part_4_navigation(env, env.console, context);
-                }
+                },
+                true
             );
         }
 
