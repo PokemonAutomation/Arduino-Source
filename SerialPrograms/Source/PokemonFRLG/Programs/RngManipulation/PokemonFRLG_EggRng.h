@@ -104,6 +104,7 @@ private:
         uint16_t& times_not_held,
         bool& shiny_found,
         const bool& previously_hit_held_frame,
+        Milliseconds& launch_delay,
         const uint64_t& SEED_DELAY,
         const std::vector<uint16_t>& SEED_VALUES,
         const int16_t& SEED_POSITION,
