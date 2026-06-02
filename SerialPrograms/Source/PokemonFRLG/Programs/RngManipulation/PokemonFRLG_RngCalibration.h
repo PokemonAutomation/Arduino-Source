@@ -32,6 +32,14 @@ struct RngCalibrations{
     double seed_offset;
     double csf_offset;
     double ingame_offset;
+
+    bool operator==(const RngCalibrations& other) const {
+        return (
+               seed_offset   == other.seed_offset
+            && csf_offset    == other.csf_offset
+            && ingame_offset == other.ingame_offset
+        );
+    }
 };
 
 struct RngCalibrationHistory{
@@ -134,7 +142,8 @@ RngCalibrations get_calibrations(
     const RngCalibrationHistory& history,
     const std::vector<uint16_t>& seed_values,
     const int16_t& seed_position,
-    const uint64_t& advances
+    const uint64_t& advances,
+    bool csf_first = false
 );
 
 // infer hit seeds/advances, update the calibration history, and return whether or not the search is finished

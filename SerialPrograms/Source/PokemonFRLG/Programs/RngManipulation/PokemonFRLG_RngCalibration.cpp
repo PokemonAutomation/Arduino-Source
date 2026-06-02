@@ -388,7 +388,8 @@ RngCalibrations get_calibrations(
     const RngCalibrationHistory& history,
     const std::vector<uint16_t>& seed_values,
     const int16_t& seed_position,
-    const uint64_t& advances
+    const uint64_t& advances,
+    bool csf_first
 ){
     RngCalibrations calibrations{};
 
@@ -398,8 +399,16 @@ RngCalibrations get_calibrations(
 
         AdvRngState prev_hit = history.results.back();
         double prev_csf_offset = history.calibrations.back().csf_offset;
+        double prev_ingame_offset = history.calibrations.back().ingame_offset;
         int64_t prev_advance_miss = int64_t(prev_hit.advance) - int64_t(advances);
-        if (prev_advance_miss != 0 && std::abs(prev_advance_miss) < 2){
+        if (csf_first){
+            // always apply changes to the CSF, while still keeping it within +/-2 frames
+            double ingame_diff = calibrations.ingame_offset - prev_ingame_offset;
+            calibrations.csf_offset = fmod(prev_csf_offset + ingame_diff, 2);
+            double csf_diff = calibrations.csf_offset - prev_csf_offset;
+            calibrations.ingame_offset -= csf_diff;
+        }else if(prev_advance_miss != 0 && std::abs(prev_advance_miss) < 2){
+            // only update CSF when you're close to the target
             console.log("Attempting to correct for off-by-one miss by modifying continue screen frames.");
             if (prev_advance_miss > 0){
                 calibrations.csf_offset = prev_csf_offset - 0.5;

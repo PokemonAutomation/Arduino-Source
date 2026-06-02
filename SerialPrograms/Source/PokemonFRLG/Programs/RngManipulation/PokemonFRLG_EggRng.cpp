@@ -548,7 +548,7 @@ bool EggRng::reset_and_check_seed(
 ){
 
     static const int64_t FIXED_SEED_OFFSET = -845; // ms, approximate
-    static const int64_t FIXED_ADVANCES_OFFSET = pickup_frame ? -412 : -25;    // frames, approximate
+    static const int64_t FIXED_ADVANCES_OFFSET = pickup_frame ? -412 : 134;    // frames, approximate
 
     static const uint64_t CONTINUE_SCREEN_FRAMES = 200;
 
@@ -561,7 +561,7 @@ bool EggRng::reset_and_check_seed(
 
     send_program_status_notification(
         env, NOTIFICATION_STATUS_UPDATE,
-        "Calibrating."
+        pickup_frame ? "Calibrating pickup frame" : "Calibrating held frame"
     );
     env.update_stats();
 
@@ -570,7 +570,7 @@ bool EggRng::reset_and_check_seed(
     PokemonFRLG_RngTarget target = pickup_frame ? PokemonFRLG_RngTarget::eggpickup : PokemonFRLG_RngTarget::eggheld;  
 
     if (egg_history.results.size() > 0){
-        calibrations = get_calibrations(env.console, egg_history, SEED_VALUES, SEED_POSITION, advances);
+        calibrations = get_calibrations(env.console, egg_history, SEED_VALUES, SEED_POSITION, advances, !pickup_frame);
     }
     if (wild_history.results.size() > 0){ // the wild history is likely to have a better seed calibration
         calibrations.seed_offset = get_seed_calibration_frames(wild_history, SEED_VALUES, SEED_POSITION);
@@ -578,12 +578,17 @@ bool EggRng::reset_and_check_seed(
     }
 
     // if previous resets had uncertain advances, slightly modify the seed delay to try to hit a different target
-    double seed_bump = SEED_BUMPS[egg_advance_history.results.size() % 5];
-    calibrations.seed_offset += seed_bump;
+    if (pickup_frame){
+        double seed_bump = SEED_BUMPS[egg_advance_history.results.size() % 5];
+        calibrations.seed_offset += seed_bump;
+    }
 
-    // if the egg isn't ready over several resets, bump the advances
-    if (!pickup_frame){
-        double advances_bump = ADVANCE_BUMPS[int(std::floor(times_not_held / 4)) % 21];
+    // if the egg isn't ready over several resets, 
+    // or if there is repeated uncertainty about advances from previous resets,
+    // bump the advances
+    if (!pickup_frame && !previously_hit_held_frame){
+        int csf_bumps = int(std::floor(egg_advance_history.results.size() / 3) + std::floor(times_not_held / 4));
+        double advances_bump = ADVANCE_BUMPS[csf_bumps % 21];
         double orig_csf_offset = calibrations.csf_offset;
         calibrations.csf_offset = fmod(orig_csf_offset + advances_bump, 2);
         calibrations.ingame_offset += advances_bump - (calibrations.csf_offset - orig_csf_offset);
@@ -650,7 +655,7 @@ bool EggRng::reset_and_check_seed(
 
     WallDuration elapsed = current_time() - timestamp;
     auto elapsed_ms = std::chrono::duration_cast<Milliseconds>(elapsed);
-    uint64_t wild_advances_estimate = uint64_t(advances + 2 * elapsed_ms.count() / FRAME_DURATION);
+    uint64_t wild_advances_estimate = uint64_t(advances + 2 * elapsed_ms.count() / FRLG_FRAME_DURATION);
     env.log("Wild advances estimate: " + std::to_string(wild_advances_estimate));    
 
     int ret = watch_for_shiny_encounter(env.console, context);
@@ -784,7 +789,7 @@ bool EggRng::held_frame_check(
     static const uint64_t HELD_CHECK_ADVANCES_RADIUS = 8092;    
 
     static const uint16_t MAX_HISTORY_LENGTH = 2;
-    const uint64_t INITIAL_ADVANCES_RADIUS = USE_TEACHY_TV ? 4096 : 1024;
+    const uint64_t INITIAL_ADVANCES_RADIUS = USE_TEACHY_TV ? 1024 : 256;
 
     uint64_t advances_radius = get_advances_radius(env.console, held_calibration_history, INITIAL_ADVANCES_RADIUS);
 
@@ -792,16 +797,11 @@ bool EggRng::held_frame_check(
     walk_from_pond_to_daycare_man(env.console, context);
 
     // decide if it's a good idea to save and commit to this held frame
-    if (held_calibration_history.results.size() > 0){
-        AdvRngState prev_result = held_calibration_history.results.back();
-        previously_hit_held_frame = (
-            prev_result.seed == TARGET_HELD_SEED
-            && prev_result.advance == HELD_ADVANCES
-        );
-    }
-
+    bool locked_in = false;
     if (previously_hit_held_frame && (current_seed == TARGET_HELD_SEED)){
+        env.log("Committing to this Held Frame and saving the game...");
         save_game_to_overworld(env.console, context);
+        locked_in = true;
     }
 
     // collect and hatch egg
@@ -821,7 +821,7 @@ bool EggRng::held_frame_check(
 
     // calibrate 
     auto elapsed_ms = std::chrono::duration_cast<Milliseconds>(elapsed);
-    uint64_t advances_estimate = uint64_t(HELD_ADVANCES + 2 * elapsed_ms.count() / FRAME_DURATION);
+    uint64_t advances_estimate = uint64_t(HELD_ADVANCES + 2 * elapsed_ms.count() / FRLG_FRAME_DURATION);
     env.log("Test pickup advances estimate: " + std::to_string(advances_estimate));    
 
     auto search_hits = get_egg_search_results(
@@ -923,7 +923,13 @@ bool EggRng::held_frame_check(
         && newest_result.advance == HELD_ADVANCES
     );
 
-    if (previously_hit_held_frame && !(definitely_hit_held_frame || possibly_hit_held_frame)){
+    if (definitely_hit_held_frame){
+        env.log("Hit target held frame!");
+    } else if(possibly_hit_held_frame){
+        env.log("Possibly hit target held frame.");
+    }
+
+    if (locked_in && !(definitely_hit_held_frame || possibly_hit_held_frame)){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "EggRng(): Missed held frame after saving. Restart the program after repeating the manual in-game setup.",
@@ -933,7 +939,7 @@ bool EggRng::held_frame_check(
 
     previously_hit_held_frame = definitely_hit_held_frame;
 
-    return (previously_hit_held_frame && (definitely_hit_held_frame || possibly_hit_held_frame));
+    return (locked_in && (definitely_hit_held_frame || possibly_hit_held_frame));
 }
 
 
@@ -956,7 +962,7 @@ bool EggRng::pickup_frame_check(
 ){
 
     const uint16_t MAX_HISTORY_LENGTH = USE_TEACHY_TV ? 2 : 5;
-    const uint64_t INITIAL_ADVANCES_RADIUS = USE_TEACHY_TV ? 4096 : 1024;
+    const uint64_t INITIAL_ADVANCES_RADIUS = USE_TEACHY_TV ? 1024 : 256;
 
     uint64_t advances_radius = get_advances_radius(env.console, pickup_calibration_history, INITIAL_ADVANCES_RADIUS);
 
@@ -1155,7 +1161,7 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     RngCalibrationHistory pickup_calibration_history; 
 
     RngCalibrations calibrations = {
-        RNG_CALIBRATION.seed_calibration / FRAME_DURATION,
+        RNG_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,
         RNG_CALIBRATION.csf_calibration,
         RNG_CALIBRATION.advances_calibration
     };
@@ -1176,69 +1182,7 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 
     EggProgramState program_state = STARTING_POINT;
 
-
-
-    // ////////// TESTING //////////
-
-
-    // AdvObservedPokemon test_observation = {
-    //     "farfetch-d",
-    //     AdvGender::Female,
-    //     AdvNature::Quirky,
-    //     AdvAbility::Any,
-    //     { 5 },
-    //     { {20, 12, 12, 11, 12, 12} },
-    //     { {0, 0, 0, 0, 0, 0} },
-    //     AdvShinyType::Any
-    // };
-    // AdvRngFilters test_filters = observation_to_filters(test_observation, EGG_STATS.base_stats, AdvRngMethod::Any);
-    // RNG_FILTERS.set(test_filters);
-
-    // env.log(std::to_string(TARGET_HELD_SEED));
-    // auto search_hits = get_egg_search_results(
-    //     env.console, egg_searcher, test_filters,
-    //     { TARGET_HELD_SEED }, { TARGET_HELD_SEED },
-    //     HELD_ADVANCES, 10, 12000, 1000,
-    //     PARENT_A, PARENT_B, COMPATIBILITY,
-    //     EGG_STATS.gender_threshold, 0
-    // );
     
-    // for (auto& hit : search_hits){
-    //     env.log(std::to_string(hit.first.advance) + " | " + std::to_string(hit.second.advance));
-    // }
-    // std::vector<AdvRngState> held_hits;
-    // for (auto hit_pair : search_hits){
-    //     held_hits.emplace_back(hit_pair.first);
-    // }
-    // std::sort(held_hits.begin(), held_hits.end());
-    // std::vector<AdvRngState>::iterator iter;
-    // iter = std::unique(held_hits.begin(), held_hits.begin() + held_hits.size());
-    // held_hits.resize(std::distance(held_hits.begin(), iter));
-    // RNG_CALIBRATION.set(
-    //     calibrations.seed_offset * FRAME_DURATION,
-    //     calibrations.ingame_offset,
-    //     calibrations.csf_offset,
-    //     held_hits
-    // );
-
-    // RNG_CALIBRATION.set(0, 0, 0, held_hits);
-
-    // // egg_searcher.set_held_state_advances(3583);
-    // // egg_searcher.set_pickup_state_advances(13648);
-    // // AdvPokemonResult test_result = egg_searcher.generate_pokemon(parentA, parentB);
-    // // env.log("Test PID (base 10): " + std::to_string(test_result.pid));
-    // // env.log("Test Nature: " + nature_to_string(test_result.nature));
-    // // env.log("Test IVs (assuming Normal method):");
-    // // env.log("HP: " + std::to_string(test_result.ivs.hp));
-    // // env.log("Atk: " + std::to_string(test_result.ivs.attack));
-    // // env.log("Def: " + std::to_string(test_result.ivs.defense));
-    // // env.log("SpA: " + std::to_string(test_result.ivs.spatk));
-    // // env.log("SpD: " + std::to_string(test_result.ivs.spdef));
-    // // env.log("Spe: " + std::to_string(test_result.ivs.speed));
-
-
-    // ////////// TESTING //////////
-
     // main loop
     while (true){
         if (shiny_found){
@@ -1303,6 +1247,7 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
             wild_advance_history.results.clear();
             wild_advance_history.seed_calibrations.clear();
             program_state = EggProgramState::held_calibration;
+            STARTING_POINT.set(EggProgramState::held_calibration);
             continue;
 
         case EggProgramState::held_calibration:
@@ -1342,7 +1287,12 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
                 stats.candies += (candies_left - temp_candies_left);
                 balls_left = temp_balls_left;
                 candies_left = temp_candies_left;
-                program_state = EggProgramState::pickup_prep;
+                egg_advance_history.results.clear();
+                egg_advance_history.seed_calibrations.clear();
+                wild_advance_history.results.clear();
+                wild_advance_history.seed_calibrations.clear();
+                program_state = EggProgramState::pickup_calibration;
+                STARTING_POINT.set(EggProgramState::pickup_calibration);
             }
             continue;
 
@@ -1350,14 +1300,6 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
         //     cleanup_bad_held_frame(env, context);
         //     program_state = EggProgramState::held_prep;
         //     continue;
-
-        case EggProgramState::pickup_prep:
-            // prep_pickup_resets(env, context);
-            egg_advance_history.results.clear();
-            egg_advance_history.seed_calibrations.clear();
-            wild_advance_history.results.clear();
-            wild_advance_history.seed_calibrations.clear();
-            continue;
 
         case EggProgramState::pickup_calibration:
             current_seed = 0; // unused here
@@ -1389,6 +1331,7 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
             if (pickup_finished){
                 env.log("Hit pickup frame!");
                 program_state = EggProgramState::finished;
+                STARTING_POINT.set(EggProgramState::held_prep);
             }
             continue;
 

@@ -64,8 +64,6 @@ public:
     ) override{}
 
 private:
-    double FRAME_DURATION = 1000 / 59.999977; // ms
-
     enum class GameVersion{
         firered,
         leafgreen
@@ -75,7 +73,6 @@ private:
         held_prep,
         held_calibration,
         // held_cleanup,
-        pickup_prep,
         pickup_calibration,
         finished
     };
