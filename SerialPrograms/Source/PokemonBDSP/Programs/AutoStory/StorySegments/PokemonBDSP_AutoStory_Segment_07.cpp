@@ -1760,7 +1760,8 @@ void checkpoint_093(SingleSwitchProgramEnvironment& env, ProControllerContext& c
             if (!leave_gym(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "leave_gym: transition not detected.", env.console);
             }
-        }
+        },
+        true
     );
 }
 

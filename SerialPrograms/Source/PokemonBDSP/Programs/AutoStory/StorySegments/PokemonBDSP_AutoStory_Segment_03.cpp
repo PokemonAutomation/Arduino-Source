@@ -312,7 +312,9 @@ void Checkpoint_011(
             // TODO: implement Segment 03 gameplay logic
             eterna_gym_to_jupiter(env.console, context);
             
-        }
+        },
+            
+        true
     );
 }
 std::string AutoStory_Checkpoint_012::name()       const { return "012 - " + AutoStory_Segment_03().name(); }
@@ -340,7 +342,9 @@ void Checkpoint_012(
             // TODO: implement Segment 03 gameplay logic
             jupiter_to_coronet(env.console, context);
 
-        }
+        },
+
+        true
     );
 }
 std::string AutoStory_Checkpoint_013::name()       const { return "013 - " + AutoStory_Segment_03().name(); }
@@ -368,7 +372,9 @@ void Checkpoint_013(
             // TODO: implement Segment 03 gameplay logic
             coronet1(env.console, context);
 
-        }
+        },
+
+        true
     );
 }
 std::string AutoStory_Checkpoint_014::name()       const { return "014 - " + AutoStory_Segment_03().name(); }
@@ -396,7 +402,9 @@ void Checkpoint_014(
             // TODO: implement Segment 03 gameplay logic
             coronet_to_heartholme(env.console, context);
 
-        }
+        },
+
+        true
     );
 }
 std::string AutoStory_Checkpoint_015::name()       const { return "015 - " + AutoStory_Segment_03().name(); }
@@ -425,7 +433,9 @@ void Checkpoint_015(
 			heartholme_to_lost_tower(env.console, context);
 			lost_tower(env.console, context);
 
-        }
+        },
+
+        true
     );
 }
 std::string AutoStory_Checkpoint_016::name()       const { return "016 - " + AutoStory_Segment_03().name(); }
@@ -454,7 +464,8 @@ void Checkpoint_016(
             lost_tower_to_veilstone_gym(env.console, context);
             //#. Veilstone Gym navigation and battle
             gym_Puzzle_03(env.console, context);
-        }
+        },
+        true
     );
 }
 
