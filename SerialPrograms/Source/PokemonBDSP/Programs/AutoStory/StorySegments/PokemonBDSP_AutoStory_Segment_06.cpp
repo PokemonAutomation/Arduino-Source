@@ -624,7 +624,8 @@ void checkpoint_083(SingleSwitchProgramEnvironment& env, ProControllerContext& c
             if (!cynthia_and_fly_to_jubilife(env.console, context)){
                 OperationFailedException::fire(ErrorReport::SEND_ERROR_REPORT, "cynthia_and_fly_to_jubilife: transition not detected.", env.console);
             }
-        }
+        },
+        true
     );
 }
 

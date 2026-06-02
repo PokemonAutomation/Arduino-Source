@@ -249,7 +249,9 @@ void checkpoint_007(
             // TODO: implement Segment 02 gameplay logic
             roark_to_mars(env.console, context);
             
-        }
+        },
+            
+        true
     );
 }
 std::string AutoStory_checkpoint_008::name()       const { return "008 - " + AutoStory_Segment_02().name(); }
@@ -277,7 +279,9 @@ void checkpoint_008(
             // TODO: implement Segment 02 gameplay logic
             mars_to_eterna_forest(env.console, context);
          
-        }
+        },
+         
+        true
     );
 }
 
@@ -306,7 +310,9 @@ void checkpoint_009(
             // TODO: implement Segment 02 gameplay logic
             eterna_forest(env.console, context);
             
-        }
+        },
+            
+        true
     );
 }
 std::string AutoStory_checkpoint_010::name()       const { return "010 - " + AutoStory_Segment_02().name(); }
@@ -335,7 +341,8 @@ void checkpoint_010(
             eterna_forest_exit_to_gym(env.console, context);
             //#. Eterna Gym navigation and battle
             gym_Puzzle_02(env.console, context);
-        }
+        },
+        true
     );
 }
 
