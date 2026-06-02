@@ -407,58 +407,55 @@ namespace PokemonAutomation {
             void fight_starly(VideoStream& stream, ProControllerContext& context) {
                 stream.log("[AutoStory] Starting Starly battle...", COLOR_BLUE);
 
-                bool battle_menu_seen = false;
+                // Declare OUTSIDE the loop so accumulated detector state
+                // (trigger counts, black-screen transitions) is preserved across frames.
+                // STARTER type: player has no Pokeballs, so ball-count areas won't
+                // be white. STARTER skips that check and only verifies status bars
+                // and the Fight button color.
+                BattleMenuWatcher battle_menu(BattleType::STARTER, COLOR_YELLOW);
+                EndBattleWatcher  end_battle;
 
                 while (true) {
-
                     context.wait_for_all_requests();
 
-                    BattleMenuWatcher battle_menu(BattleType::STANDARD, COLOR_YELLOW);
-                    EndBattleWatcher end_battle;
-
+                    // Phase 1: wait for either battle menu or battle end.
                     int ret = run_until<ProControllerContext>(
-                        stream,
-                        context,
+                        stream, context,
                         [](ProControllerContext& ctx) {
                             pbf_mash_button(ctx, BUTTON_B, 120000ms);
                         },
-                        {
-                            {battle_menu},
-                            battle_menu_seen
-                                ? PeriodicInferenceCallback{end_battle}
-                                : PeriodicInferenceCallback{},
-                        }
-                    );
+            {
+                {battle_menu},
+                {end_battle},
+            }
+            );
 
                     switch (ret) {
-
                     case 0:
                     {
-                        battle_menu_seen = true;
-                        stream.log("[AutoStory] Battle menu detected.", COLOR_BLUE);
+                        stream.log("[AutoStory] Battle menu detected. Selecting move...", COLOR_BLUE);
 
                         // Select Fight, then move slot 1.
                         pbf_press_button(context, BUTTON_A, 80ms, 500ms);
                         pbf_press_button(context, BUTTON_A, 80ms, 3000ms);
+                        // Loop back - mash B through animations until next menu or end.
                         break;
                     }
-
                     case 1:
                     {
                         stream.log("[AutoStory] Starly battle complete.", COLOR_GREEN);
 
-                        // Mash through post-battle XP / dialog, wait for overworld.
+                        // Mash through XP / level-up / dialog screens back to overworld.
                         OverworldWatcher overworld;
                         run_until<ProControllerContext>(
                             stream, context,
                             [](ProControllerContext& ctx) {
                                 pbf_mash_button(ctx, BUTTON_B, 120000ms);
                             },
-                            {{overworld}}
+                            { {overworld} }
                         );
                         return;
                     }
-
                     default:
                         stream.log("[AutoStory] Starly battle timed out.", COLOR_RED);
                         return;
