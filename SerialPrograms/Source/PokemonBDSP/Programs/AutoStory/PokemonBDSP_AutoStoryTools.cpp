@@ -74,56 +74,37 @@ bool fake_save_game(
 bool save_game(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context
-){
-    static constexpr size_t MAX_RETRIES = 10;
+) {
+    static constexpr size_t MAX_RETRIES = 3;
 
-    bool success = false;
-
-    for (size_t attempt = 0; attempt < MAX_RETRIES; attempt++){
-        try{
+    for (size_t attempt = 0; attempt < MAX_RETRIES; attempt++) {
+        try {
             env.console.log(
                 "Checkpoint save attempt: " + std::to_string(attempt + 1)
             );
 
-            // ---------------------------
-            // Force-close anything weird first.
-            // ---------------------------
+            // Only mash B on retries - no need to on first attempt
+            // if already cleanly in the overworld.
+            if (attempt > 0) {
+                pbf_mash_button(context, BUTTON_B, 1000ms);
+            }
+
+            // Reuse existing feedback-based save: opens menu with MenuWatcher
+            // + respects GameSettings::OVERWORLD_TO_MENU_DELAY0 internally.
+            save_game(env.console, context);
+
+            // Return to overworld cleanly.
             pbf_mash_button(context, BUTTON_B, 1000ms);
 
-            // ---------------------------
-            // Aggressively attempt to open menu.
-            // No dependence on MenuWatcher.
-            // ---------------------------
-            pbf_press_button(context, BUTTON_X, 160ms, 1500ms);
-
-            // ---------------------------
-            // Trigger save
-            // ---------------------------
-            pbf_press_button(context, BUTTON_R, 160ms, 2500ms);
-
-            // ---------------------------
-            // Confirm save
-            // ---------------------------
-            pbf_press_button(context, BUTTON_ZL, 160ms, 5000ms);
-
-            // ---------------------------
-            // Return to overworld cleanly
-            // ---------------------------
-            pbf_mash_button(context, BUTTON_B, 1500ms);
-
-            // ---------------------------
-            // Verify overworld
-            // ---------------------------
+            // Verify overworld. Generous timeout: save animation + fade can be slow.
             OverworldWatcher overworld;
-
             int ret = wait_until(
                 env.console,
                 context,
-                std::chrono::seconds(5),
-                {overworld}
+                std::chrono::seconds(15),
+                { overworld }
             );
-
-            if (ret < 0){
+            if (ret < 0) {
                 throw OperationFailedException(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Failed to detect overworld after save.",
@@ -132,39 +113,30 @@ bool save_game(
             }
 
             env.console.log("Checkpoint save verified.");
+            return true;
 
-            success = true;
-            break;
-
-        }catch (OperationFailedException& e){
+        }
+        catch (OperationFailedException& e) {
             env.console.log(
                 "Checkpoint save failed: " + e.message(),
                 COLOR_RED
             );
-
             context.wait_for(1000ms);
         }
     }
 
-    // ---------------------------
-    // Blind fallback
-    // ---------------------------
-    if (!success){
-        env.console.log(
-            "All save retries failed. Using blind fallback.",
-            COLOR_ORANGE
-        );
+    // Blind fallback: reuse the non-feedback save_game(context) from GameNavigation
+    // rather than duplicating the button sequence manually.
+    env.console.log(
+        "All save retries failed. Using blind fallback.",
+        COLOR_ORANGE
+    );
+    pbf_mash_button(context, BUTTON_B, 1000ms);
+    save_game(context);  // PokemonBDSP_GameNavigation.h - non-feedback overload
+    pbf_mash_button(context, BUTTON_B, 2000ms);
+    context.wait_for_all_requests();
 
-        pbf_mash_button(context, BUTTON_B, 1000ms);
-        pbf_press_button(context, BUTTON_X, 160ms, 1500ms);
-        pbf_press_button(context, BUTTON_R, 160ms, 2500ms);
-        pbf_press_button(context, BUTTON_ZL, 160ms, 5000ms);
-        pbf_mash_button(context, BUTTON_B, 2000ms);
-
-        context.wait_for_all_requests();
-    }
-
-    return success;
+    return false;
 }
 
 
