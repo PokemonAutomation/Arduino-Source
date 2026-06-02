@@ -314,9 +314,9 @@ namespace PokemonAutomation {
             pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 745ms, 0ms);
             DateTime t{ 2026, 1, 1, 0, 0, 50 };
             set_time_fast(env, context, t);
-            walk_right_until_on_path(stream, context);
-            walk_up_through_grass_2(stream, context);
-            walk_right_through_grass_2(stream, context);
+            walk_right_until_on_path(stream, context, BattleType::STARTER);
+            walk_up_through_grass_2(stream, context, BattleType::STARTER);
+            walk_right_through_grass_2(stream, context, BattleType::STARTER);
             pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 730ms, 0ms);
             pbf_wait(context, 941ms);
             pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 1950ms, 0ms);
@@ -346,7 +346,7 @@ namespace PokemonAutomation {
         // ---------------------------------------------------------------------------
 
         static void tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context) {
-            pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 2010ms, 0ms);
+            /*pbf_move_left_joystick(context, {0.000000, -1.000000}, 2010ms, 0ms);
 
             wait_for_dialogue(stream, context, "Phase 14 (dawn tour)");
 
@@ -405,9 +405,9 @@ namespace PokemonAutomation {
 
             DateTime t{ 2026, 1, 1, 0, 0, 50 };
             set_time_fast(env, context, t);
-            walk_right_until_on_path(stream, context);
-            walk_up_through_grass_2(stream, context);
-            walk_right_through_grass_2(stream, context);
+            walk_right_until_on_path(stream, context, BattleType::STARTER);
+            walk_up_through_grass_2(stream, context, BattleType::STARTER);
+            walk_right_through_grass_2(stream, context, BattleType::STARTER);
             context.wait_for_all_requests();
             pbf_wait(context, 1500ms);
 
@@ -429,8 +429,9 @@ namespace PokemonAutomation {
 
             pbf_mash_button(context, BUTTON_B, 70000ms);
             context.wait_for_all_requests();
-            pbf_wait(context, 2000ms);
-            catch_1_pokemon(env, stream, context);
+            pbf_wait(context, 2000ms);*/
+            catch_1_pokemon(stream, context);
+            pbf_wait(context, 1500ms);
             context.wait_for_all_requests();
             save_game(stream, context);
             context.wait_for_all_requests();
